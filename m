@@ -1,429 +1,188 @@
-Return-Path: <netdev+bounces-296359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NsLNGao3JmpKTgIAu9opvQ
-	(envelope-from <netdev+bounces-296359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 05:31:54 +0200
+	id 706ZAJc6JmrLTgIAu9opvQ
+	(envelope-from <netdev+bounces-296360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 05:44:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3967652700
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 05:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59AFE652798
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 05:44:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=eKDb8Y2f;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=Ei03D+QJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296359-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296359-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=iAEYbVJK;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296360-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296360-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 919B03008E17
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 03:31:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 724A63009006
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 03:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE8E347500;
-	Mon,  8 Jun 2026 03:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189DB34D91F;
+	Mon,  8 Jun 2026 03:43:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8B0225775
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 03:31:50 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780889511; cv=none; b=lv3oKrBvR+gyytGlopA8Xt3c2oIYT4p9uQ7LNusSFk17Wg68AoO6fR+zSPHOkKL5vy8tUWvO5+bIU+JBgMQY1ly+itaYRWJeeKYU/RIq4ZHSNzR/Zg3B6rjL/QyihlFJe0uKKTY2wQmWgDp4971JyRnbr/ZHkjipIHc9ZeSiuQ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780889511; c=relaxed/simple;
-	bh=Ex1YHWZKMyUft7zTCR7zLPd9VoFEJ63ktGqW7Jr7bSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xv38y7HufrKPIqyu6z2ZDx0ers4k/BN8aKv8WRmb5nOMSL9ZwYgzhmHqFevlcnYMplW5+aHmbDHthflSRZ6rZadukIBuTCRXAIIfX9jZhzjR5iiSW6+gH5qDzDxXthAXq/GEWnR/RXoMnVT5fTJeidTYS1fW1mFnBjCm75i8wPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=eKDb8Y2f; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Ei03D+QJ; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6580FLNs2023398
-	for <netdev@vger.kernel.org>; Mon, 8 Jun 2026 03:31:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=PCJKeL7rA6qvumeb+wWZ0PNY
-	7hqL5jSNvC0EZReuFiU=; b=eKDb8Y2fQGPWRB70mwEDKUMKRKcbbUU6ZGjlnObH
-	RFF7CapCSEE9TJZQr+oVemFkQyoMjJxsaFLVBfISccl7JXl7PdCsSWk7Vp+6Njrj
-	TVQ2jjHhX16eo99YI2YewGiI45YlIb4zNCIMvlBzo/D3M5+19zmuyVypMlL0wjlF
-	JZhliGO2FWNJqKATroK0spXYDPAIlaURx200lRKunIz2sILc/w8X6iNJ9F+wDLfQ
-	sErXHJr9GpHhIgncQ4siKQB2bUt4PXKBCwwYaaUwUmD5LzxVgT/+zOIeTRSK4ALW
-	rWzoFFXo1ZFQJYI1AStoc8vJl9Mjik60/DFRVofVBgMoCA==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4embmrdpap-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 03:31:49 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-517582695d7so91828471cf.0
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 20:31:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E0D34CFD1
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 03:43:56 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780890238; cv=pass; b=QP/ZAtmKXPDWwwACptnacbH+q2shfeDAueGV/j6n4S3CdJaclcL8edSWW+Pksmv2OIAcSzL9jdrftFX5+3Ufz8CLGGkHxcfxLTvuHVH31K4/O8gY9V98IyeLks3lQCYPfflUTQkdgYd8WWSa10OXhjB20fjUOHmKjNHEhBvP0JM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780890238; c=relaxed/simple;
+	bh=6QXOhzjCcsRl3xqRJHqdA7rX4vdnjKaPiCPbYxcsCkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uTDjvw0QIE+SuxLxfPzjp5U4WFnRcI8ZjKQ+op3NIuSd27wBxKIEzAot+6eFNYW+u8qdemfcAdMrr20zcqMFngQmZsZ3CyqziJQaM/YrUhu9o92Aynj8AhFaRW/U37Yvk8xIUpyd7reWpRmmf2jWQKKsWsKPcMbM+XifN8X9CWk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iAEYbVJK; arc=pass smtp.client-ip=209.85.218.52
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-bed2b9bfa02so513489766b.1
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 20:43:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780890235; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KrV2iLeQtdo8qgg8UTBCdA0OcsH7Gc3QoqhKDFcTmZSuoviw21hdbL2J4wnyYk6Fp1
+         UYR9r4S3E30TD7wWyIbb4wgfeP5qVO9dZpuEuUPiuyQvd5jQNW1uecO2MHn64oiARSRR
+         7rpg9fFz7uRgqye6mFHEr1cHLbaxPho+T1P5qyYDhbYrhzkT/nrzAHG/otFCaq4ClDbA
+         bp1aCpF22wCs/YpDZDierGDbM0jL8xqk+3ZVa4mQoUYLqohyGMwKTjqUgGvJAyTsYUqc
+         9hARkginWwa2VNPpM/DhJ2kxlhViZelp3AovSz0GAK3O/3cgIMqmxZtQK7+y3X5ecZ+H
+         ZWSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=6QXOhzjCcsRl3xqRJHqdA7rX4vdnjKaPiCPbYxcsCkk=;
+        fh=ehdLjMpY0aVPcvel+T7NJDAcGVSjuu574OpSGeVhD2I=;
+        b=kmTLEg1tZrXSBD0GNyom9OkiJY3IqEBI+DDWrmIDnPuGTLkMdziLSuxpf6jevj73gS
+         J//hhWTyxEw5cqT+++BYiNMTCpUSmC00EOFO1bExy5YVeCl29SkZkvHICR6cd+980VWn
+         0+1maITrtqN54PQ4CJuaY2nPqYU0sr13Rv/AcFLdCPwksRW1xsBeg0kW1MXhbG/Y6evr
+         AtUVB21t7WhikHLctpqdrww9p+EUPadu0sQekxBFH4Ej3NPKfq2CbQEOYVKr7ks8oSnL
+         nodOnz+OudDL5ePDaVAXtFqMqP3a2VzdNxRsxhwrzijLb/1ReFDb6/VfRNoq/FqXXwkT
+         8fUw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780889509; x=1781494309; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCJKeL7rA6qvumeb+wWZ0PNY7hqL5jSNvC0EZReuFiU=;
-        b=Ei03D+QJ98DqWnOh1u9crx87n/YcZorOJmhC/5go7UyvcGeIzUN8CPDMRCWNqLKZhK
-         DheIssabLYp+L0636KSZGtCRkckki3Kus40YmcFmp5e1tp4U7YM/yn7QCR2iTaf6lPWP
-         hGNsKahK0MzWoBn5uR9IADsXlghhvY6wCJhITQJHs7RExzV6K1/gm7tIAuLKTu1Q9GAz
-         qXUqu+rrSWhxMehq86PjbSXhbFW2yVqbC5GsQrVVY/NTgt7SfsvJKBLsE4REmsHj2xy1
-         nQicujKGntBrJ0T8Uy+w5L5SOVoPGIG3FAUVSQwussksHBNyjyzPlsDhURFElmaQuH6k
-         OBDw==
+        d=gmail.com; s=20251104; t=1780890235; x=1781495035; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6QXOhzjCcsRl3xqRJHqdA7rX4vdnjKaPiCPbYxcsCkk=;
+        b=iAEYbVJKQ5YSxkVDuiK+hCyo101l+s2YXgunVYsuLjJu5PgMR2QlI/jBQDSCpTJXYt
+         Y0VRW9RkCXaYfBCDFZcNQXPNgVJTZMNpWQeYZcTFrBMuMrUB2qhgUi4iW3PnmlvR4O7V
+         gWZInbIgeIneHKrmuEZwE723KaeR7PcDekO4KZvhr9paKh9hFRdsVc/pHfdHwhv1M6mN
+         5VR5NG+zC8gsSCkPWXHHbxRQ6CZWY/JL2dfFm1tArCYfJMD0l455XsO/IUcjaZAmGtH2
+         wW7PBPOBIRCWKqaPoHMGPT87fy41yUWsboNt/4ybiDZKawztUhymdap4uEsldSkZMxNI
+         CTEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780889509; x=1781494309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PCJKeL7rA6qvumeb+wWZ0PNY7hqL5jSNvC0EZReuFiU=;
-        b=dzytdRBa57Y26O0OCQx6OsXaXEyug3ICo2HDDkYok2S/KAlPm0ORRYG98fdPQ02rnc
-         i8Zr/ukRRhu7adZ+lDlLbVD87/Dv7caHoOrEl+ngCf81kFUxKjR1XdqtMFUHBdVKHSPg
-         ce/acf4+BDlYVYIwhXA7ac8aVebDDDq1MzfLL9uLpfgroeWc99C08+q5vqKkyqY8Sqvz
-         3/fbNhR1LpMOpFeEWwQcW3R3fUHKW+zfPv8oKpCJ83ZSSlJ5WdPoiZcKCpK/dEqgwuLO
-         RLL+vWfKKg9Nm4tSVPHM9inST9lMF2JWxCaRWBo+xMcGP74nVhn/U9uTVgCM2GV2jSXU
-         iIxw==
-X-Forwarded-Encrypted: i=1; AFNElJ97glxWxFosKPt/4qW9wEz+1+y4dUHUd5gULX80OdbNghX273cBiU4z63JTMAKJNYM147Ey11w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznzERHAvWnSXsgbXAdScdsNWMaqEluP8MIDZodygZVy/l7iKKD
-	TXL7ANCLxchfx3giihK+EqCLqDL5dd7z3sqC6kEb1dxMDjNSJbW/VN6iVOzBE/8CyHJvtEaoiLJ
-	rmNyOV0XuKyEpCWvy+bXnV670CS9zr8xfV+ZNxUVgUl5EvdbHhccO1QU5FKI=
-X-Gm-Gg: Acq92OGu7c0Vm0YZHgCf17jyvj/5shjpkkI/xAdXUxGsjYsp2fHWm8B8WmpVXkV9E7g
-	Se1HYFBRoHdQuv8lhPJzSMubpEZUmzziEP45i8xfQvF7umsrduPfxFXelghRaSTarwODpfjaKL5
-	fzAxiZUjV+daOluStZKHDGJw3vs8Ng3DRo//09Ww7XSXOPHbee+e1BuCDQ68tnShisQVpt9mzFt
-	SEZHTfnoPZaUj9BoeYPLGROTOR8lJ/Rvsou8Q4QNsuQJTZ1zaB+6Q1o6uGVkcvsXPkVHe9F22yB
-	/2aPvTo4RNRV0nFtdjKthSDP7+eF8tNxJnPEuVpJEPr2qorYLWv0Uv3tCpJmMN3H7o6+vXz96A3
-	Vew9rrdgQqID1knWh0yXPuyYcC01X2lsVT7V8wW6Kl0gxsOZeFcbKcKsDKymq5E0aSHi2JjrOFS
-	obTpSmW1Tlf5VbW+xpjIAxffmhmIUijmb44j3ICydQ92ivYg==
-X-Received: by 2002:a05:622a:8cf:b0:50d:ea1f:f99f with SMTP id d75a77b69052e-51798825e05mr131737941cf.31.1780889508643;
-        Sun, 07 Jun 2026 20:31:48 -0700 (PDT)
-X-Received: by 2002:a05:622a:8cf:b0:50d:ea1f:f99f with SMTP id d75a77b69052e-51798825e05mr131737741cf.31.1780889508109;
-        Sun, 07 Jun 2026 20:31:48 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-396ac091b23sm43291931fa.17.2026.06.07.20.31.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 20:31:46 -0700 (PDT)
-Date: Mon, 8 Jun 2026 06:31:43 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Taniya Das <taniya.das@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Brian Masney <bmasney@redhat.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Linus Walleij <linusw@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Ajit Pandey <ajit.pandey@oss.qualcomm.com>,
-        Imran Shaik <imran.shaik@oss.qualcomm.com>,
-        Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-gpio@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/5] clk: qcom: Add a driver for PDM GP_MN fractional
- clock divider
-Message-ID: <h7ai3qajk4yq2jgvy6etqpchxuxo56sxtvcgvh7xhodw6jkias@ayn2thdck4ct>
-References: <20260602-pdm_clk_gp_mnd_v1-v1-0-1522662b6c53@oss.qualcomm.com>
- <20260602-pdm_clk_gp_mnd_v1-v1-2-1522662b6c53@oss.qualcomm.com>
+        d=1e100.net; s=20251104; t=1780890235; x=1781495035;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6QXOhzjCcsRl3xqRJHqdA7rX4vdnjKaPiCPbYxcsCkk=;
+        b=m6Hi7cTEesgmW5sOQSZyPI8Ugw5TtJS49M0dB6cqhWLzYtGeINacTlmfy635wYdO30
+         eGl1S1eP1Sj5bL+IrufnGtTDz8VrrhxK9ct2ntpb9VoBRUHSHTSVwcgZs2PKtGJvnJfo
+         I0o5mjSTAvz16mkB5npwyTGER4pZDlmN68y90rD45WjJoBwGL7lEBu87GvdqQZx1ExkJ
+         sp+eVdwz+ZE64DvGnqYTiJOaMycBeWwHCzONTG+Uyw59LXVlZJXjbKNx6UNver9SOx07
+         rpq4Pfr9IvlB/0qmHvUCSDjDcMUE+XjqScbWTl9OmtT2gqNXoEmPhZyVGO2cGQ2WfijS
+         peCg==
+X-Gm-Message-State: AOJu0Yxh8/5IxKANgJW885RZBMx/QK141O2gxoZx7ySOJ/UIxp5/b8xb
+	WA4+sXXR0p3tbYE6GSn9cz1ohtkK0S5Fe8l3+E/U0sGPSfoJuGNSeWRJJMSMhI3WeFgFCoxhp2/
+	MZXiVBPraxM9rX/EBANN8LVV8MJ42EPY=
+X-Gm-Gg: Acq92OEztVIewP+smXYQZ5ptAKTdQGP2ivZRTus+3DTNla9ViRH8u/tDfnop3NYY8aY
+	TzXUCeavf/HEd5Y5fpMzBGWNtE5CPNGceyQ7dKlT2vxhx+26lJazf3X68Z74gpA+h2D5G0FEWUS
+	DuWVSokOAXUBs8p7Nj3lZ0zxZU9NAP7CdYhAddR8LCedesBkrDXIWCs6qAjP9/Eqg1fqhWMRLDC
+	o7idU4ux1WVygwYc4NU5ZvFZN0mmYGrT98wOYL85sHHOdQUHaSSuN631fqTmExJRhHMOYywEMND
+	AJ7O0gtr0dMeiDK5OR7KSFtRdKYexn3UHzn6GrMvZa+ETVHGJrI=
+X-Received: by 2002:a17:907:6092:b0:bef:7481:8a4f with SMTP id
+ a640c23a62f3a-bf3738f957bmr670028466b.25.1780890234812; Sun, 07 Jun 2026
+ 20:43:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260602-pdm_clk_gp_mnd_v1-v1-2-1522662b6c53@oss.qualcomm.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDAyOCBTYWx0ZWRfX12sGwcXdrTng
- c5BqTaeHOoKRmx2fuTexbt5H3SgsS9cL+tCSMF2gqCR0GyQnxg3xeSnESib8QhhreQaPX8YCp/O
- KO6r1D6s94uV/0Sn4J2Nj8SmxJPqqSlWSvq3ZerFOtT831hQDLBS9EvVDdLQ9iWJeOvfYk9+v0G
- HfnqLIONLlhGlyfZypcUUkb2vgdr0asGv+let3PL+BVKKBSVte7oeX53isgY/MkgZP1p9L/Yyf5
- /sa0STdYVjWYrTzYyvmSq1h+af+9PxcewJYwfoe+pXN5yT80C67mmHMzcd0TnBZrTCbV2Y4B92o
- T3sY1tIvE8E0CJ/aklm6LeWG/LN87TGLEH41VKlxslm+x4EOVQFTRrwfvC4ptn/IOYsmXm6ujsT
- waVnuwhHZnuKEJIfZkBmz5JHV8+8Xca5w+zdFlAsWDjB7USMBB/nge6SXZUZRXiItHhXVofRFcD
- i/I0ZPcRbySgD0CbRHA==
-X-Authority-Analysis: v=2.4 cv=B5eJFutM c=1 sm=1 tr=0 ts=6a2637a5 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22 a=EUspDBNiAAAA:8
- a=LUSPxPFnT4N6VsWNMmAA:9 a=CjuIK1q_8ugA:10 a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-GUID: krmdMviCqLJAMsrLmYJSvbDOOc3pYDQn
-X-Proofpoint-ORIG-GUID: krmdMviCqLJAMsrLmYJSvbDOOc3pYDQn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-08_01,2026-06-05_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 spamscore=0 malwarescore=0 phishscore=0
- bulkscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080028
+References: <20260606-realtek_forward-v13-0-b9e409687cbe@gmail.com>
+In-Reply-To: <20260606-realtek_forward-v13-0-b9e409687cbe@gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Mon, 8 Jun 2026 00:43:42 -0300
+X-Gm-Features: AVVi8CfQuK5BJ19ZDrXVMuW8flPCvGA8iW4kZEP8TJUz50EN_btE22aWzuq3dN0
+Message-ID: <CAJq09z4cTkFd=bvdjhBnqkwmO20xiGvqkzFJm0FpM6+9oOJx9w@mail.gmail.com>
+Subject: Re: [net-next PATCH v13 0/9] net: dsa: realtek: rtl8365mb: bridge
+ offloading and VLAN support
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Linus Walleij <linusw@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Mieczyslaw Nalewaj <namiltd@yahoo.com>, Abdulkader Alrezej <abdulkader.alrezej@gmail.com>, 
+	Yury Norov <ynorov@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296359-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:yury.norov@gmail.com,m:linux@rasmusvillemoes.dk,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:namiltd@yahoo.com,m:abdulkader.alrezej@gmail.com,m:ynorov@nvidia.com,m:yurynorov@gmail.com,m:abdulkaderalrezej@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:taniya.das@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:linusw@kernel.org,m:richardcochran@gmail.com,m:konradybcio@kernel.org,m:ajit.pandey@oss.qualcomm.com,m:imran.shaik@oss.qualcomm.com,m:jagadeesh.kona@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[kernel.org,baylibre.com,redhat.com,gmail.com,oss.qualcomm.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-296360-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,qualcomm.com:email,qualcomm.com:dkim,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ayn2thdck4ct:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,yahoo.com,gmail.com,nvidia.com];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url,mail.gmail.com:mid,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C3967652700
+X-Rspamd-Queue-Id: 59AFE652798
 
-On Tue, Jun 02, 2026 at 08:51:50PM +0530, Taniya Das wrote:
-> The PDM (Pulse Density Modulation) hardware block on Qualcomm SoCs
-> contains a GP_MN clock divider that produces a fractional output
-> frequency from a fixed input clock (typically TCXO4):
-> 
->   Fout = Fin * (M / N)
-> 
-> The hardware encodes the period in the NDIV register as the 1's
-> complement of (N - M), and controls the duty cycle via a separate
-> DUTY register that counts the number of low-phase native clock
-> cycles over the period N.
-> 
-> Add a standalone platform driver for this block that uses
-> rational_best_approximation() to find the closest M/N pair within
-> the 9-bit M and 13-bit N hardware limits, programs the MDIV, NDIV,
-> and DUTY registers via regmap, and implements the full clk_ops
-> surface including determine_rate, set_rate, recalc_rate,
-> get_duty_cycle, and set_duty_cycle. The PDM AHB bus clock is gated
-> around every register access.
-> 
-> Signed-off-by: Taniya Das <taniya.das@oss.qualcomm.com>
-> ---
->  drivers/clk/qcom/Kconfig      |  15 ++
->  drivers/clk/qcom/Makefile     |   1 +
->  drivers/clk/qcom/clk-gp-mnd.c | 333 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 349 insertions(+)
-> 
-> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
-> index d9cff5b0281d8cc373b8ab14683370cb9b7f8bf3..df27aa10243435a20a57cca3ed4644284630d11e 100644
-> --- a/drivers/clk/qcom/Kconfig
-> +++ b/drivers/clk/qcom/Kconfig
-> @@ -1759,4 +1759,19 @@ config SM_VIDEOCC_8450
->  	  SM8450 or SM8475 devices.
->  	  Say Y if you want to support video devices and functionality such as
->  	  video encode/decode.
-> +
-> +config QCOM_CLK_GP_MND
-> +	tristate "Qualcomm PDM GP_MN clock divider"
-> +	depends on ARM64 || COMPILE_TEST
-> +	help
-> +	  Support for the Qualcomm PDM GP_MN clock divider found in PDM
-> +	  (Pulse Density Modulation) hardware blocks.
-> +	  Given an input clock of frequency Fin (TCXO4), the output
-> +	  frequency is Fout = Fin * (M / N).  For every N input cycles
-> +	  the divider produces M output cycles.  D controls the duty
-> +	  cycle: it is the number of native clock cycles in which the
-> +	  GP_MN output is low, counted over 8192 native clock cycles.
-> +
-> +	  Say Y or M if you want to support GP_MN-based frequency and
-> +	  duty-cycle configuration on Qualcomm SoCs.
->  endif
-> diff --git a/drivers/clk/qcom/Makefile b/drivers/clk/qcom/Makefile
-> index e100cfd6a52de9f88f11720d9c2043db5e553618..438f59b25c009ee72308fe41707d6efff6613690 100644
-> --- a/drivers/clk/qcom/Makefile
-> +++ b/drivers/clk/qcom/Makefile
-> @@ -207,6 +207,7 @@ obj-$(CONFIG_SM_VIDEOCC_8550) += videocc-sm8550.o
->  obj-$(CONFIG_SM_VIDEOCC_8750) += videocc-sm8750.o
->  obj-$(CONFIG_SM_VIDEOCC_MILOS) += videocc-milos.o
->  obj-$(CONFIG_SPMI_PMIC_CLKDIV) += clk-spmi-pmic-div.o
-> +obj-$(CONFIG_QCOM_CLK_GP_MND) += clk-gp-mnd.o
->  obj-$(CONFIG_KPSS_XCC) += kpss-xcc.o
->  obj-$(CONFIG_QCOM_HFPLL) += hfpll.o
->  obj-$(CONFIG_KRAITCC) += krait-cc.o
-> diff --git a/drivers/clk/qcom/clk-gp-mnd.c b/drivers/clk/qcom/clk-gp-mnd.c
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..826b6b62ddc7b272511accde1ca0e885018a8064
-> --- /dev/null
-> +++ b/drivers/clk/qcom/clk-gp-mnd.c
-> @@ -0,0 +1,333 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/clk-provider.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/pinctrl/consumer.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/rational.h>
-> +#include <linux/regmap.h>
-> +
-> +/*
-> + * PDM GP_MND clock divider register offsets.
-> + *
-> + * The hardware computes:
-> + *   Fout = Fin * (M / N)
-> + *
-> + * with duty cycle controlled by D, where M < D < (N - M).
-> + *
-> + * Register encoding:
-> + *   MDIV  = M
-> + *   NDIV  = ~(N - M)  [1's complement of (N - M), masked to N_REG_WIDTH bits]
-> + *   DUTY  = D
-> + */
-> +#define GP_MND_MDIV_REG		0x0
-> +#define GP_MND_NDIV_REG		0x4
-> +#define GP_MND_DUTY_REG		0x8
-> +
-> +#define GP_MND_M_WIDTH		9
-> +#define GP_MND_N_WIDTH		13
-> +
-> +#define GP_MND_MAX_M		GENMASK(GP_MND_M_WIDTH - 1, 0)
-> +#define GP_MND_MAX_N		GENMASK(GP_MND_N_WIDTH - 1, 0)
-> +
-> +/**
-> + * struct clk_gp_mnd - GP_MND fractional clock divider
-> + * @pdm_ahb_clk:	AHB bus clock required for register access
-> + * @regmap:		register map for the PDM block
-> + * @hw:			handle between common and hardware-specific interfaces
-> + * @m_val:		M value (numerator)
-> + * @n_val:		N value (period)
-> + */
-> +struct clk_gp_mnd {
-> +	struct clk		*pdm_ahb_clk;
-> +	struct regmap		*regmap;
-> +	struct clk_hw		hw;
-> +	unsigned int		m_val;
-> +	unsigned int		n_val;
-> +};
-> +
-> +#define to_clk_gp_mnd(_hw) container_of(_hw, struct clk_gp_mnd, hw)
-> +
-> +static int gp_mnd_clk_determine_rate(struct clk_hw *hw,
-> +				     struct clk_rate_request *req)
-> +{
-> +	unsigned long m = 0, n = 0;
-> +
-> +	rational_best_approximation(req->rate, req->best_parent_rate,
-> +				    (unsigned long)GP_MND_MAX_M,
-> +				    (unsigned long)GP_MND_MAX_N,
-> +				    &m, &n);
-> +
-> +	if (!m || !n)
-> +		return -EINVAL;
-> +
-> +	/* N = 2M + 1 leaves no valid D satisfying M < D < (N - M) */
-> +	if (n == 2 * m + 1)
-> +		return -EINVAL;
-> +
-> +	req->rate = DIV_ROUND_CLOSEST_ULL((u64)req->best_parent_rate * m, n);
-> +
-> +	return 0;
-> +}
-> +
-> +static int gp_mnd_clk_set_rate(struct clk_hw *hw, unsigned long rate,
-> +		unsigned long parent_rate)
-> +{
-> +	struct clk_gp_mnd *gp = to_clk_gp_mnd(hw);
-> +	unsigned long m = 0, n = 0;
-> +	unsigned int d_val, n_val;
-> +	int ret;
-> +
-> +	rational_best_approximation(rate, parent_rate,
-> +				    (unsigned long)GP_MND_MAX_M,
-> +				    (unsigned long)GP_MND_MAX_N,
-> +				    &m, &n);
-> +
-> +	if (!m || !n)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * When N = 2M + 1 the valid D range [M+1, M] is empty; no duty
-> +	 * cycle can satisfy M < D < (N - M).  Reject before touching hw.
-> +	 */
-> +	if (n == 2 * m + 1)
-> +		return -EINVAL;
-> +
-> +	ret = clk_prepare_enable(gp->pdm_ahb_clk);
+Sashikos' results are out:
 
-Can we use CLK_OPS_PARENT_ENABLE or pm_clk instead? Having to manually
-toggle the clock looks like a coomplete overkill.
+https://sashiko.dev/#/patchset/20260606-realtek_forward-v13-0-b9e409687cbe%40gmail.com
+(Gemini)
 
-> +	if (ret)
-> +		return ret;
-> +
-> +
-> +	ret = of_property_read_string_index(dev->of_node,
-> +					    "clock-output-names", 0,
-> +					    &init.name);
+After a few versions without comments, it now added a single comment
+on patch 7 (FDB). In that comment, it misses the fact that the DSA
+core already keeps track of multicast usage for shared ports (CPU,
+link).
 
-Do we need it? Can we generate the name instead?
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260606-realtek_forward-v13-0-b9e409687cbe%40gmail.com
+(Opus)
 
-> +	if (ret)
-> +		return dev_err_probe(dev, ret, "missing clock-output-names\n");
-> +
-> +	gp->hw.init = &init;
-> +
-> +	pin = devm_pinctrl_get(dev);
-> +	if (IS_ERR(pin))
-> +		return dev_err_probe(dev, PTR_ERR(pin), "missing pinctrl device\n");
-> +
-> +	pin_default_state = pinctrl_lookup_state(pin, "active");
-> +	if (IS_ERR(pin_default_state))
-> +		return dev_err_probe(dev, PTR_ERR(pin_default_state),
-> +				     "missing pinctrl default state\n");
+It commented about vlan_lock not being used by rtl8366rb and that it
+should be moved to the rtl8365mb private struct. However, rtl8366rb
+might indeed require the same lock, as the concurrency issues are
+mostly the same for both drivers.
 
-Isn't it done by default for you?
+It also complained about a couple of unused macros, which do little
+harm and help document the registers.
 
-> +
-> +	ret = pinctrl_select_state(pin, pin_default_state);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret,
-> +				     "failed to select pinctrl default state\n");
-> +
-> +	ret = devm_clk_hw_register(dev, &gp->hw);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret,
-> +				     "failed to register gp_mnd clock\n");
-> +
-> +	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, &gp->hw);
-> +}
-> +
-> +static const struct of_device_id clk_gp_mnd_match_table[] = {
-> +	{ .compatible = "qcom,clk-gp-mnd" },
-> +	{ }
-> +};
-> +MODULE_DEVICE_TABLE(of, clk_gp_mnd_match_table);
-> +
-> +static struct platform_driver clk_gp_mnd_driver = {
-> +	.probe  = clk_gp_mnd_probe,
-> +	.driver = {
-> +		.name		= "qcom-clk-gp-mnd",
-> +		.of_match_table	= clk_gp_mnd_match_table,
-> +	},
-> +};
-> +module_platform_driver(clk_gp_mnd_driver);
-> +
-> +MODULE_DESCRIPTION("Qualcomm PDM GP_MND clock divider driver");
-> +MODULE_LICENSE("GPL");
-> 
-> -- 
-> 2.34.1
-> 
+There is also an error message comment that I would consider if v14 is
+required. While using stringify, it will print the vlan id limits in
+hexadecimal, whereas the decimal format would be more user-friendly.
 
--- 
-With best wishes
-Dmitry
+From both reviews (and the history of them for older versions), I see
+no blocker for merging.
+
+Regards,
+
+Luiz
 
