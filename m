@@ -1,214 +1,247 @@
-Return-Path: <netdev+bounces-296476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KRLoHi2cJmrfZgIAu9opvQ
-	(envelope-from <netdev+bounces-296476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:40:45 +0200
+	id 1X/aHJicJmoQZwIAu9opvQ
+	(envelope-from <netdev+bounces-296477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:42:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39DC0655390
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:40:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B1F6553FD
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:42:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none ("invalid DKIM record") header.d=aerlync.com header.s=google header.b=QNyAtSUL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296476-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296476-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed)" header.from=aerlync.com (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=nxp.com header.s=selector1 header.b=Qx6KqS7V;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296477-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296477-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=nxp.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B3E03305FC4A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:32:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91887302E0F1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97723B47F1;
-	Mon,  8 Jun 2026 10:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47673B47FA;
+	Mon,  8 Jun 2026 10:35:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010040.outbound.protection.outlook.com [52.101.84.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445B938D017
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 10:32:43 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780914765; cv=none; b=rjP9xYLLZbAZ6i/WFxvNer9c4T29/Cj6L/hmmyQGJzozGVLb/e6w0XKy1HGTF318K/yVRbivQ/EQQ3MdXGtfhjlhRLLrmN9RCSrj40emhQDiFPERhghbNIJXHDO9U9toF4asfa98YoO0Nor/IcAsaDrnyh0wcZPV0TUfWfpdoHs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780914765; c=relaxed/simple;
-	bh=UwEbz+t34EV5iddH7QA8WixWMDCulwNmm3b2Mwp4hLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DZ/h5+JSomsMout/byh22ULUnUy9Hg+cDEO3KrEgv37PrqpJ5+o/xEYAWzYbPYeYw6BRmgJeo1jhi0deleow/eWb/wYP96CgSln+KTi0a4kKt1w0McotewXpOm5oo8OX7PRw2Fb/e515Yp24WwODcMScVkzaEJNzfTU1iobRcXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aerlync.com; spf=pass smtp.mailfrom=aerlync.com; dkim=fail (0-bit key) header.d=aerlync.com header.i=@aerlync.com header.b=QNyAtSUL reason="key not found in DNS"; arc=none smtp.client-ip=209.85.215.182
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c85b73ffb52so1658289a12.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 03:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=aerlync.com; s=google; t=1780914762; x=1781519562; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7z+CvKnAGor+c7U0dVX35N7V89+YB/8qEbvrSee3CY0=;
-        b=QNyAtSULm8FwJUssxe5WNhfafXswnyxxWqbrvXC3uz/xSpdEyIBafibzlJrqmpGCI6
-         E/tyY/AzIwyErdvzcj6LpmYDOsZ2Ke97EoiZOxVGJf6+1Y7JNfr0JaqIbPrjFdV5712/
-         hhE6ZMzP8yN007c6sUX0aBa+5n3qCjr7HHQe91z2MNOoR0QFCMNdQh2fyrkFFy6jD/Ly
-         +SSHAUM3eJzMPBoIEPz+wY+oKH8dNI2prVchI5K9D3h5NPoe0otRpz/T17z9Cq9C58hK
-         l+n6EW+dW00xngtUHntIOHLt2DXkslUQGfjg+JVEqLf/+4WXDMNS5XuhThyMFhh2p74d
-         kYdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780914762; x=1781519562;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7z+CvKnAGor+c7U0dVX35N7V89+YB/8qEbvrSee3CY0=;
-        b=F3IAADWtZtiry+2XDSEKLWcTo3Y3D5NGLPJSqDsBdVfIa7HzNC6OxyUYh1RfnBidU+
-         3migy2l/Id/YB1vI+quuF9qkZfnNzYKWFcuen+3RqPuCKBK7vkitvwKXTNXO031MgV+n
-         1chWNMqIf+Vh5gRDEVOF3s6RK7n65/6P3GISOrgralVWXJLZ7JQx8+cb8GBZp4RET9fs
-         6bceOKmtC9Zls9lHonXFbEacYk9+JN53dUC8SDKs0yLDJSyAPcpALapWmPIVuk6LkwrU
-         7kdwFJtp9PtpNY+bJvOkr0fVg74GgpCGxfDLjP3d4Y9hniWVJocm2yvWL2FMg7cznqp8
-         CKCQ==
-X-Forwarded-Encrypted: i=1; AFNElJ++Hrb1tdYSLD7fvd5beCVGh+PiQjej47bjPFhhuy/brwYcyKu7miygR7M0FkvJmhng32TxYWg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMTRBzhh1mIwbGGCxcPxa7XdHqYu7R+cdJ5MRpyCDJWb4DJZV6
-	0CY0GUgZg1sCzIklX66kX+xvBSe5Y4XYj6v+jTznJvDoPsVC3MGl+pJT3fxteBkLCrM=
-X-Gm-Gg: Acq92OGUZQyYw+CHg5pS4edRi7VCFGEQ0+Hvqc+z+lQUGpoauCMXcfkTmFpuB5votkb
-	btidIuZp+ZMAZ0afxEtw3f+Oey2hvGq82bMoCs8B60BjMx3Ofu7FVwgxAvMsm4ZmnTrZgbPCkul
-	eBvCEKtQgeh+MljpXzstfTpLoKq8/0IJOA+eTe3z0Of7BrkxEk1d/YE7Ygq38nfGWi8IcwXO7WJ
-	zxd7Lo4s3GlKmp0cV5JZ9I2+p/mTmgTI/S5p/8BWiuLeo1c/CkARbrTfne/+n0J3MLGPPT5QbrZ
-	0Kdh+YgJ3f7wz3k9Gzyd657PzGx8WZq0VUnRV64yZKPVGJ8bN+pcnGX0Xc0k4/tmU53RrNuilZ4
-	wU3p+trf7gVp+f1o3Qp7F0vaVZ2T1y6TB4CT/iMgD4R2Hb3oycs8iMjSIDUaheBiZSL+Kitn3UP
-	nx2GIraUpc/rYhStlcBq3h6NgR+EcT5oqTFmWPIhB/GZeDvBelQchm5wGUy9w=
-X-Received: by 2002:a05:6a21:4d92:b0:3b4:85db:1bd0 with SMTP id adf61e73a8af0-3b4ccd659aamr16493944637.12.1780914762547;
-        Mon, 08 Jun 2026 03:32:42 -0700 (PDT)
-Received: from manjaro ([103.186.230.13])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c85df03387asm16326028a12.4.2026.06.08.03.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 03:32:42 -0700 (PDT)
-From: Sayooj K Karun <sayooj@aerlync.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	netfilter-devel@vger.kernel.org
-Cc: Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	Sayooj K Karun <sayooj@aerlync.com>
-Subject: [PATCH nf-next] netfilter: nf_reject_ipv6: do not reject ICMPv6 Redirect with an ICMPv6 error
-Date: Mon,  8 Jun 2026 16:01:55 +0530
-Message-ID: <20260608103155.8339-1-sayooj@aerlync.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4A8387596;
+	Mon,  8 Jun 2026 10:35:13 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780914914; cv=fail; b=FDX7kuTxQZgiBwoL2Hht1MsU+avo1j8dzzfNbibuDwgFFkHEwcB29Y29KUtVS0PJXYgG2KJyMKQJHue6QmldJValu3AzLT8Zh5RSdgB1lV+vjODdtuTeoJhhdl54bD6C1CLcib4IAL/NPS3QqGPXtutvk+pWLqQwSaVJm0cFB/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780914914; c=relaxed/simple;
+	bh=tng7EII7MmzGGVyArFO2apYGau4waZJ82PY9MPoMJdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oPnYyncUw+7cG8VqoO6c09HQkU4Y4Jmenuu1oUhHRcIw/F8uwLylfYLRDV5TtuT/uinsfTS8fQeTEAladMZ4mg4gD1TsG1BUoQam9bu9QXjHqSUwTSXiAppgWzpRB3+iCXNqKoS9s4bgwr7N8sd+vL0C8hpLa2hUjrJle3a3VXs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Qx6KqS7V; arc=fail smtp.client-ip=52.101.84.40
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AdFGTMUHz3ppI7S4pqc7UoFmR4T149xuDNq6qwAPUNBprGpz0ny7tweNEULQ5n4Zu1HJJoHDTNY+/KH1hWYgFEoOAG54kf61/QVbNjousjin79ITioRkqiJ27IXHAT4igooqm7BPdBsmypXjFFTamumcgHEai9x8WDyV8Osnm4peWO7nTjNr4BXp9p62tU0evN57jNyPt0C8U37YzttEi3lQmRvX9bU4p+SRYOFimIqxg8X5yzXK3J4I+mNYx1DjvdOsNggBJQSxYmSLDrlGl9YuE7IJW748v3IMjwIgRhaF+FKeME/JpJm54wn4wHy8pH0KVES7WSNFuQzzdoABMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ggCTytPAaOCsdw9/CiHYcNLS1ii4qBaafUODHIXChdc=;
+ b=pc+A5jM1pqRWcmwNLZAYKHBJSEUN/+OWwvwffJJeotSfG1w8+XfR9RzsGKCRZSOCcMntNegrJ4L6bh68jR/FmdpMUoylT7R8UynZ6Vj+s+i8seX2MkOUe1n1BplRmtcCGdIpEHDCoOHVqN2UQhSEFvn9sFoi+ejhXSdWmcc1JKe1/FT1D0EUJt51sk0al2HnXgBjQ55tBKVlJ5LuX0PS9tvNengvd39kRBkEmz58lYIh69C4dalC1cWFIFZ/IchJudOCC1C3I5y33WWyXgsTgLrJzSNkRbyJERa1M8YxlJyBJqOGjc/YSrYk/HdblfvtujTJyU3APX1oUb4zZvcLig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ggCTytPAaOCsdw9/CiHYcNLS1ii4qBaafUODHIXChdc=;
+ b=Qx6KqS7Ve0toEP5PhfjcG2C0FxV7HNHDDk6/vOHDhe/V+jhHeLSjyG4bvDolTBBgGBNHta3qYzXbD2/N7fe+Sda8YDMO8/kVvKeaR5uXAurg9XhQEFdUNRY/skk8YAeNfCJwPLHKaVsfd87oR7Wjomdicfa6y79Jr5c91QHFqFWwppp8BGMql6Shotgwstx/clAw2xKjJ8saKATxeuCLu0Uqb6QlgVh2P6QpAtUyDX8YqqqEYCsmpY0YtF6mBHMjZhedpryZ9o2QUWZp5/RGyo6f4XWLjZMXGBeERAi6+cmCy/Jt0jFDHuv98C/trJa6XJ1RVRUPV7G1tz2JZAqnyQ==
+Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
+ (2603:10a6:150:319::13) by DU4PR04MB12347.eurprd04.prod.outlook.com
+ (2603:10a6:10:62e::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.12; Mon, 8 Jun 2026
+ 10:35:09 +0000
+Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
+ ([fe80::1739:3404:2175:33dd]) by GVXPR04MB12290.eurprd04.prod.outlook.com
+ ([fe80::1739:3404:2175:33dd%6]) with mapi id 15.21.0092.010; Mon, 8 Jun 2026
+ 10:35:09 +0000
+Date: Mon, 8 Jun 2026 13:35:05 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 09/12] dpaa2-switch: offload FDBs added on an
+ upper bond device
+Message-ID: <anq5hltzxak5fbnj4ajszwsml435jdxjs64dk5trhatiy6ulgk@qqxzamvbvaeb>
+References: <20260603143623.3712024-10-ioana.ciornei@nxp.com>
+ <20260606021054.4124776-1-kuba@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260606021054.4124776-1-kuba@kernel.org>
+X-ClientProxiedBy: AS4P189CA0044.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::13) To GVXPR04MB12290.eurprd04.prod.outlook.com
+ (2603:10a6:150:319::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GVXPR04MB12290:EE_|DU4PR04MB12347:EE_
+X-MS-Office365-Filtering-Correlation-Id: cba756ec-8437-4e5f-96f0-08dec5499d45
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|1800799024|376014|366016|22082099003|18002099003|56012099006|11063799006|5023799004|4143699003|27256017;
+X-Microsoft-Antispam-Message-Info:
+	coPqp6atlyxFAX/QFR2uzCsHZWU7QquX1bKIoJWaxRa7wI3TXPHEiAmUDMOYrhsaWSl6AQ2jpUDqkcJTdVEzqPuBmnkxu+vHwsJUNuTiPKhLt4b+jgZves+xLygWWFgJcSpPfvroB16K2jEi7GILYmI3LXy1Hayu9tG5ATC007wKAbbVRMIDg6bbfrS099nLNvTrt1Jxxq8yFCthrU6Z+0jPEF1QfAb4OxxGKAeuufBaDvoyueke4LGbnSB9Ohds5X23pCjPEQeCPV9xxM2icphx3TGH8bNx1MrY7KIDD3Bw8dp7zoJaIks+BIr55uKtiz5iGvncbzHD5wWUGW2q0WyKPG+RSzGS0KmAm+HlyUZyIPGMYdqKmkj550oQAcKqh3+pCRV1jP2pHFcZW8a8wOA09eBOCmdS3w3g06EBmMSWWObOER9xUMIkWbrtABcPYFmKKKAeDRiD7i5wiBj4SYUgK/LwhUedDUHX72hj9fP+XkPt6n8bLw0zUtpp5j8WkSI2MkuCd6qAp1ej1ePLKgjfT37xAr4DpE1BLwRcBQfbtLycVLdCqWOD4JB1/Cjqw1sarbg1FEV+YWPgLR0K0Tzoo7ifb+kQ45GsoNLyKvKYDH8JLNZ8VTpyRsc3pw0PE0vHTX4u4C5nHSfymzl1ZYt8OYXSpakF6VLpGE18dSkCcIKMOfbkDp/KjyhsxBfxaxHEWqKcO+ig7UAJH6ao3ZvnxTdjcdGJY2QYNHhNk+tjyQIg8c0t6fSjjeaB9xqz
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR04MB12290.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(1800799024)(376014)(366016)(22082099003)(18002099003)(56012099006)(11063799006)(5023799004)(4143699003)(27256017);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?stRBKWHa4uPGkHrNXAxue8GC/bDBiFLCcHBUxsJkuhSQmkZFpSiwp4c1MHVR?=
+ =?us-ascii?Q?pbY28MLdaIlIZX2O8CBWEe1wXCMCFX2YTP0x9T0qTegv6g9H2MUIp6IijJZ5?=
+ =?us-ascii?Q?7xC1DZDPTjVcNX8SCC9Oiv1m0xqml/WLBvX0fwQfOr4fjWsDt2pNF5sfySZ8?=
+ =?us-ascii?Q?Dm8qlE4tJq5V3W6JLNlwZvfWu4lKBlJPtO/F/33Spy1uKJ4aoDTueAvpbCYk?=
+ =?us-ascii?Q?ja9Q5RX2U/ZyRLnsjXnHIIigpqj+hR319QLzPSUDUdJAIooM02rtlzvXC5mE?=
+ =?us-ascii?Q?hiPjPZtbAPiK0Do/P7XcLNFPZ2EVFnzTFQ4KUMTmCbtq5m/Ru4jxrXYaUpK2?=
+ =?us-ascii?Q?k+1RXkgrSfBSS7/z5EsxOP2qd5i0luFPOzd5argYAynLAqZhT3ISSiKUaO28?=
+ =?us-ascii?Q?H7X0F9T0ptDTJrqRFWXwYdqqLlF0GJNiSiocUthjl3VbXgeKVqJmD9eHPRZ/?=
+ =?us-ascii?Q?C+lq0R1WmH5yhZ2YagagfzOBuS0nnmJvK3TPwcWaxDwuNGXTzMuRnXymRe0G?=
+ =?us-ascii?Q?28ZubliiukggoPK9Z4mEir+4iawELJtsDafjLd+htkD1Tm85EvtXK5Ucoiwp?=
+ =?us-ascii?Q?yXe9R8zybERh7YksFgGNAatKYvUuhexissF4vs9lMApjNVxxSVj18qW734JU?=
+ =?us-ascii?Q?8M65ijnoZjc53tRQbNc9CUAMrDk5ZeWUDTFFaIRGnwkqC3kVCMy+ngzFhYy8?=
+ =?us-ascii?Q?WFwMa3POeOhWELelvxGoDcy0sp7vvqxudM2PtpnHrsu1xQI41Md598msm1cX?=
+ =?us-ascii?Q?ro1YkTBavFzO3fIxp4RMx9F1pSxRnMBe9zVCchG8b+RWzhWdzN9umSLLEnix?=
+ =?us-ascii?Q?bXNXe2c18FtqUfwOgSiU/2Ehdbs56h4zwvfGNDdO5/AfuCjbv4bdZp7rVWGh?=
+ =?us-ascii?Q?Sl450IBKU8cXT0WxgXQmpZXWajoNpWozgNxtgQC5Cc4AYRyR/xQyI1TYZJwO?=
+ =?us-ascii?Q?+jJv7oRKcOsblntL7kWDltbrGWabl975pcNvFlBlIojY8I8yXimcJv+DJ0Ll?=
+ =?us-ascii?Q?l2Eg42dcwQgY3F1Iwr3uX7dY0DMaqD0V+PaZuEqWzbDXlNRcHj2LzXOIi/JA?=
+ =?us-ascii?Q?faaPrSMrJOlh0kcurA02iXzOoKOSlcRbfhQsQgSdJW+RdqDTc8bhT5b7P2yW?=
+ =?us-ascii?Q?gi2h27WcVqyfTB3EwkjY+0GnWttN7/kkFh9ZdNsk4VlnAu+kldcoMZT2Eb7r?=
+ =?us-ascii?Q?Vo1zC6G2DpIgx4fpo6qncd9Xb/sKuFhoyF35uN+uR5EdOQsU1xFisZQhZuPi?=
+ =?us-ascii?Q?3nRN/CEuGiboP0z6bZr+OWTX1HtL97HlizWpqhuNjxljfWfwfF8dO+Eac7Id?=
+ =?us-ascii?Q?hdyPqzQNmiortg3drGi+Q4YvoPhNw8Hltx1U0hXSjAy6CxPIsjoAe0dtZ4Id?=
+ =?us-ascii?Q?r9tP3b24YeWco75Galj5SGXI1Gz8iHY+D04ouzz1wVBFK63Eanh+Z6zocmJp?=
+ =?us-ascii?Q?lfUbLddf5Q7APhPchz8yViMR1nPnOb3AbvCwDHCsDC8shwF2FYtX8L+5brDY?=
+ =?us-ascii?Q?TGBB6okTDGX0TCLqegT6VekseTaA/eFLA4Oqg81ifrEInhj71+LdxMcc225Q?=
+ =?us-ascii?Q?Q8YNb0/oKTY139HXP2TlLCIx6MjNbb/j7i6g5tLa4LQ/Leeu/DYv7foYz7BD?=
+ =?us-ascii?Q?oUo63tKtcH5axYX1cAMjxZH+gv0pRuKHqhMR32b/1Ygt1seUs5jJdQ65P/B8?=
+ =?us-ascii?Q?xbs9+nC66ubrA3+iGAmJUsk8tja4OyQUQQea13uD0zCfHwr0jCsIj7cgAb1r?=
+ =?us-ascii?Q?T0c1dnBhjA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cba756ec-8437-4e5f-96f0-08dec5499d45
+X-MS-Exchange-CrossTenant-AuthSource: GVXPR04MB12290.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 10:35:09.6017
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cI2aUKndRBfnrjS0ywVSOD8KDqRTHW5nmvIDNmPf7JBPnEiu8WO0syF09hItWxJasxKrQDQf2rscU4fhqZIwFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB12347
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.14 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[aerlync.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296476-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:netdev@vger.kernel.org,m:edumazet@google.com,m:sayooj@aerlync.com,s:lists@lfdr.de];
-	R_DKIM_PERMFAIL(0.00)[aerlync.com:s=google];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296477-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[aerlync.com:~];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[sayooj@aerlync.com,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,aerlync.com:mid,aerlync.com:from_mime,aerlync.com:email]
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:from_mime,nxp.com:dkim,qqxzamvbvaeb:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 39DC0655390
+X-Rspamd-Queue-Id: D1B1F6553FD
 
-While fixing is_ineligible() for the L3 reject path, the bridge/netdev
-reject path was found to have the same defect. RFC 4443 section 2.4(e.2)
-mandates that an ICMPv6 error MUST NOT be originated in response to an
-ICMPv6 Redirect message (type 137).
+On Fri, Jun 05, 2026 at 07:10:54PM -0700, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> dpaa2-switch: offload FDBs added on an upper bond device
+> 
+> This patch adds support for offloading FDB entries added on upper bond
+> devices.
+> 
+> > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> > index fb754dae80697..fadebf6a758d1 100644
+> > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> [ ... ]
+> > @@ -616,6 +640,91 @@ static int dpaa2_switch_port_fdb_del(struct ethsw_port_priv *port_priv,
+> >  		return dpaa2_switch_port_fdb_del_mc(port_priv, addr);
+> >  }
+> >  
+> > +static struct dpaa2_mac_addr *
+> > +dpaa2_switch_mac_addr_find(struct list_head *addr_list,
+> > +			   const unsigned char *addr, u16 vid)
+> > +{
+> > +	struct dpaa2_mac_addr *a;
+> > +
+> > +	list_for_each_entry(a, addr_list, list)
+> > +		if (ether_addr_equal(a->addr, addr) && a->vid == vid)
+> > +			return a;
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +static int dpaa2_switch_lag_fdb_add(struct dpaa2_switch_lag *lag,
+> > +				    const unsigned char *addr, u16 vid)
+> > +{
+> > +	struct ethsw_port_priv *port_priv;
+> > +	struct dpaa2_mac_addr *a;
+> > +	int err = 0;
+> > +
+> > +	mutex_lock(&lag->fdb_lock);
+> > +
+> > +	a = dpaa2_switch_mac_addr_find(&lag->fdbs, addr, vid);
+> > +	if (a) {
+> > +		refcount_inc(&a->refcount);
+> 
+> [Severity: High]
+> If a port leaves the LAG, the fan-out for the FDB delete event will only
+> reach the remaining ports. Could this result in the refcount decrementing
+> fewer times than it incremented, preventing it from reaching zero and
+> permanently leaking the struct dpaa2_mac_addr?
 
-There are two IPv6 reject paths, and they suppress this in different
-places. The L3 path (ip6t_REJECT / nft_reject -> nf_send_unreach6())
-goes through icmpv6_send(), where is_ineligible() decides whether the
-triggering packet may generate an error; a companion fix makes that gate
-drop errors in response to a Redirect. The bridge/netdev path
-(nft_reject_bridge / nft_reject_netdev -> nf_reject_skb_v6_unreach())
-builds the ICMPv6 packet itself and never reaches is_ineligible().
-Its local guard, nf_skb_is_icmp6_unreach(), only matched
-ICMPV6_DEST_UNREACH and let every other type through,
-including Redirect.
+No, this is not a valid concern. When a port leaves a LAG which is also
+under a bridge port, the driver will first call
+switchdev_bridge_port_unoffload() which will eventually generate the
+necessary deletions of FDB entries.
 
-A triggerable scenario: a bridge or netdev firewall with a REJECT rule
-applied to incoming ICMPv6 traffic (e.g., dropping Redirects from an
-untrusted segment). When the Redirect hits the REJECT rule,
-nf_reject_skb_v6_unreach() builds and transmits a Destination Unreachable
-in response. Without this fix the guard lets the Redirect through and the
-error is erroneously sent, violating the RFC.
+> > @@ -3903,8 +4073,10 @@ static void dpaa2_switch_remove(struct fsl_mc_device *sw_dev)
+> >  	for (i = 0; i < DPAA2_SWITCH_RX_NUM_FQS; i++)
+> >  		netif_napi_del(&ethsw->fq[i].napi);
+> >  
+> > -	for (i = 0; i < ethsw->sw_attr.num_ifs; i++)
+> > +	for (i = 0; i < ethsw->sw_attr.num_ifs; i++) {
+> >  		dpaa2_switch_remove_port(ethsw, i);
+> > +		mutex_destroy(&ethsw->lags[i].fdb_lock);
+> > +	}
+> 
+> [Severity: High]
+> Are the dynamically allocated struct dpaa2_mac_addr entries in the lag->fdbs
+> list freed during driver teardown? It appears ethsw->lags is freed shortly
+> after this without iterating through the fdbs lists, which might cause a
+> memory leak of all active LAG FDB entries. Could this also happen if all
+> ports leave a LAG and it becomes unused, inheriting stale entries upon reuse?
 
-Extend the guard, renamed nf_skb_is_icmp6_unreach_or_redirect(), to also
-match NDISC_REDIRECT so that Redirect packets are skipped and both reject
-paths behave consistently.
-
-Link: https://lore.kernel.org/ah_hYJa3byoUyose@chamomile
-Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
----
- net/ipv6/netfilter/nf_reject_ipv6.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index ef5b7e85c..d4eec8d9a 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -8,6 +8,7 @@
- #include <net/ip6_route.h>
- #include <net/ip6_fib.h>
- #include <net/ip6_checksum.h>
-+#include <net/ndisc.h>
- #include <net/netfilter/ipv6/nf_reject.h>
- #include <linux/netfilter_ipv6.h>
- #include <linux/netfilter_bridge.h>
-@@ -104,7 +105,7 @@ struct sk_buff *nf_reject_skb_v6_tcp_reset(struct net *net,
- }
- EXPORT_SYMBOL_GPL(nf_reject_skb_v6_tcp_reset);
- 
--static bool nf_skb_is_icmp6_unreach(const struct sk_buff *skb)
-+static bool nf_skb_is_icmp6_unreach_or_redirect(const struct sk_buff *skb)
- {
- 	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
- 	u8 proto = ip6h->nexthdr;
-@@ -127,7 +128,7 @@ static bool nf_skb_is_icmp6_unreach(const struct sk_buff *skb)
- 	if (!tp)
- 		return false;
- 
--	return *tp == ICMPV6_DEST_UNREACH;
-+	return *tp == ICMPV6_DEST_UNREACH || *tp == NDISC_REDIRECT;
- }
- 
- struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
-@@ -143,8 +144,13 @@ struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
- 	if (!nf_reject_ip6hdr_validate(oldskb))
- 		return NULL;
- 
--	/* Don't reply to ICMPV6_DEST_UNREACH with ICMPV6_DEST_UNREACH */
--	if (nf_skb_is_icmp6_unreach(oldskb))
-+	/* Don't reply to ICMPV6_DEST_UNREACH with ICMPV6_DEST_UNREACH, and
-+	 * per RFC 4443 section 2.4(e.2) never originate an ICMPv6 error in
-+	 * response to an ICMPv6 Redirect. The L3 reject path enforces this
-+	 * via icmpv6_send()/is_ineligible(); this bridge/netdev path builds
-+	 * the packet itself, so it must check explicitly.
-+	 */
-+	if (nf_skb_is_icmp6_unreach_or_redirect(oldskb))
- 		return NULL;
- 
- 	/* Include "As much of invoking packet as possible without the ICMPv6
--- 
-2.54.0
+Not a valid concern. The deletion happens when the ports leave the LAG,
+there is no need to also walk through the entries.
 
 
