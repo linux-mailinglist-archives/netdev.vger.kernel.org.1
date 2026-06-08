@@ -1,281 +1,222 @@
-Return-Path: <netdev+bounces-296481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nBZ5MbudJmp7ZwIAu9opvQ
-	(envelope-from <netdev+bounces-296481-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:47:23 +0200
+	id 0GjfCNmeJmrZZwIAu9opvQ
+	(envelope-from <netdev+bounces-296483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:52:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D47B6554FA
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:47:23 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C74655558
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:52:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296481-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296481-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mojatatu.com header.s=google header.b=OIpo5gFL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296483-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296483-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4EAB3303F277
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:40:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5225630008AB
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2B138BF9A;
-	Mon,  8 Jun 2026 10:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D490823BD17;
+	Mon,  8 Jun 2026 10:47:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F463B9DA9
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 10:40:36 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780915239; cv=none; b=VL+E8bgJOaKwVsnWf3FQssMG0kMQl/pXMBSlC6AXbx1xJx20aP4TKLZ8irorq8U3BDKCegHX02H3fE4TWimFjWkBqhXVDmKeaSUDqPEwGHuIc4A++r2BTwT2erBzgFlWTYzZUCDtrLOj0W0oig2NU7JPrrVPJ3m8q1+28OK4b5A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780915239; c=relaxed/simple;
-	bh=E+SheBLH6hsoqgR7+Wkc3OBWiA4Qtf3j30gOsNlgyAU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SRHKVDmZllWTcNJ5QU0rdwYPkEFLOcbOundsZsO3WMzgtihiqusbG7umhnKLvxkVkjHXfuSG/Qcfrgb4WRwKuohv9NqQ2bUdU/0cH/KPfJKKi+/bMICV48jozkX8146w7WpeoH1tG8b3OWR+CmTtgEwhsq02PAtgNJycQLIY0Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
-X-QQ-mid: esmtpgz10t1780915195taef874dc
-X-QQ-Originating-IP: JW4ZB+tgZV9oE1LW8B+V9lQjcZqJmQrU/ZgiHfIbNCk=
-Received: from localhost.localdomain ( [36.24.184.84])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 08 Jun 2026 18:39:54 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8796568228109399643
-EX-QQ-RecipientCnt: 6
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v4 3/3] net: libwx: support vf per-queue statistics via ethtool -S
-Date: Mon,  8 Jun 2026 18:39:46 +0800
-Message-Id: <20260608103946.25786-4-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20260608103946.25786-1-mengyuanlou@net-swift.com>
-References: <20260608103946.25786-1-mengyuanlou@net-swift.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737504071CE
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 10:46:59 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780915620; cv=pass; b=GGqEPKirXi3fGFusEHyKugqEjVAIWs/+IZ+PnsVOTP9oUYE551zkLDPSeSJoc8Rjdi2utmy4cBstzEI97JMoNgtETDro6FhPmBwTRf4bA5pLzGXZpylJp0lhJTq1mW6CcTuxvkSDoa9AfzVJe3U7Xitnd9OcoslSPR2B/+loj5U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780915620; c=relaxed/simple;
+	bh=w3D+Pg3BAXCJwfO88zczxxmfP+wZznyTuK7USknRcDA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AAvdQjxsFmqiHjuUqYkCVETEhpiFvtn3OdxQya9u06Hqr6rgDKU+AAu/03fWGravu++4ok5E0b352cebHlhPhLYSC/GRyWaz2R1VS4aquL0414rHUyRsugRmkUKis8Pg/6rj0tQDsKMjWnrzo8x0u6Ss10UWy5LILuks55Kpd3w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=OIpo5gFL; arc=pass smtp.client-ip=209.85.210.169
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-84234c83142so1621744b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 03:46:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780915619; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Dd6pJFjdQE+3zdw3C7fZp/YspacBiSwC4KacVtVgDKZMfRvIFIRIliwrClJCFQ56bZ
+         6pVmw0D/pzt0z8HUdMZzENukbfcva0q3hmEHHrfPDyLfTOZw1RvH0fYe0Up9RgTEfRiG
+         cFwBQbxFpGVBK1YVJr6tVulKre9dO316AoEo0E+8ki0wDWg9hNWTtG5MnUYw8C0GJVZZ
+         QFOBGDXEF5bVLqSIUdiN0hTjwQ/NfbR1TbhnVLiuR4ZjvCHoscT6c881yAhk0pa0k8+r
+         WRUw3Uhn4/LYfurzcGsl15znKJcG+vnaKHzuLVVctlsWHKZlx1JR/SrA2L6nRy1okvry
+         VLDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hX75lj9UvWmArTL5O2CWCemxnLVEp3KiNKdt8nBqMA0=;
+        fh=g/U7ANc66XGS+qLMLSgwAfIZePycogdd1n1uy53TMs4=;
+        b=L0njIO58wnpMJiRrM4iuE2EWW/t9QNtBiys/C5QGZjWtCAykqb3XsFQzyMyc2217ZH
+         P/4CTji37LvR2iI057/8iTV4uxPvZHHm0sRIWxH8Nw6n33bO1n/MZ0owV7hzp0zPVPq1
+         vKYvohOX/fQf5TSUgWSlMKI9qfESG4lMMRmI716eV/PDqET+EVoKsmUaEKkwSLB/hVoY
+         A7mBzODWP8+56NLYPzX4nIna02n72c4KUnKgUjaHKdXvaOSUCuY05ud4w4tGWem73iFd
+         VtlS6LKmHV7rowjXQF4Og5ls8Mg5GDAxcyQciHGobX9eTBhzndkpJw0oTinQKD1SMTZr
+         vF7A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1780915619; x=1781520419; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hX75lj9UvWmArTL5O2CWCemxnLVEp3KiNKdt8nBqMA0=;
+        b=OIpo5gFLyQwR7iaxhsEFQZWRR4yljQMR2aBnhCboK72VRWQInxPoze+85oopiR9LUN
+         rwBmdfz39mTliHyjMvdM8D99IAl9NIe2se2GrVJTK1+r3dWBjN2Rd1ItqtE+c70wI5e1
+         8W1wR30oQTnzQpTycekm9HshIxikykaekJdnM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780915619; x=1781520419;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hX75lj9UvWmArTL5O2CWCemxnLVEp3KiNKdt8nBqMA0=;
+        b=ZALw0v2VQqitXoTBzVHyRF9cVkZ4X2RhGiD9KHkqmeanbkKPtW1GTzSszgi8HfDMDy
+         oqMLDHapNdTpHZ/wegYgdcGbWbkUlIBsb5GrPbIITPx7jnJzealkLwqERiJeo4sRwIze
+         JU3c8s8Pi7TGLiZ88nMLJc3HpPT1NNy5h8Gg98nTWdSTODtNZhD4+/htBF2uwnSLZsdk
+         DNRsro5m86kfQG7iOATvRAqIE25Xq9+UBtFTNczo7iM1JLSoa9tmEYydrRoJ4SPzKItm
+         rcRpWSPne+OuNNOaoliFwgXwwLzMk6AJz46VCZnVkyDfHKR6Wa3rLAd8cCQG/U7X/AF+
+         kwJA==
+X-Forwarded-Encrypted: i=1; AFNElJ8pXm9XnYytxsr47rltYUangZ0wlTl0i85MkCSIpxeaBg/YCJ9RQg3vFY/C0MTatxD5t40eLFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVozdHDYjTZ7IqcK66sdw2PyS6G0YOS+j7pERgezX2C22U4QMN
+	YetjG2QdkwxZLhxEbboeDOi8EFqBHVeQsloMxnF05j2DnL9OpxI+kZccjUQpeNJa6XuSVGSfokb
+	Jws33b3knz/kmt59udqg7yjteaEzp2aLXj6LxTK9A
+X-Gm-Gg: Acq92OGFTkOgp9MODZ+o86rSPGE/9fyxznEhecHS29tw5gbsANUJdUfBnNe6FNyMvdt
+	9rn28J9I6mWg3bO5z5So+Z1D7nQOu9v9Esoq6glqZW3pZ80wr2zQBeZogGZryoZSdiTdzi8yMyB
+	F0rMZodYeMPbZoHRZ2OT/HVHtHGW+/p+/2599V4Vtb7m2m5X00PumsxyIOqr54LrNWOduUhvjLS
+	cAB03Cu4T5ALNMqPb5ikfnOX9JpHAqMWaLT/J765NAnC1AG2Sf/vkzYtptMPbamgyB1PoTknVtx
+	FZKAfmygBHFw7d48+n4=
+X-Received: by 2002:a05:6a00:23ca:b0:842:5b63:6119 with SMTP id
+ d2e1a72fcca58-842b0e2f430mr14794701b3a.1.1780915618808; Mon, 08 Jun 2026
+ 03:46:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
-X-QQ-XMAILINFO: McnIZrOgyhy6kl1n9N8OHfUYK9Hcz7LJ6oXMY2a4whGkp2JTOJRSYQLB
-	QdRpsDeNoIXsWHswdQzcHh5gGqo9UOea+PHOgJpIfcfwdd0thRQBMhfAwdmQEQwyZh/r1O4
-	QKYDZWr1rjb/U2QcJS2GdMmLGLG5F8sWsun+LPxQNq7QNJrw+1bNfngTaCf1oIJAbHAWXi6
-	KCNQnsPs+OmRvaJXabLuo8Z95Vj1j/Yc/tmDDCI8Lrg+FjLZkcWsz383gv/Sa9OlxZY9OkF
-	jjBgpem5mWrmlhEGHGgVRTPoyohIEtN923Vv8fVABme/PY0rZcAIF3IC3ClUpISS776ah1p
-	Sa6Yrv9kuPYXBJqMXTICVraJh1cgPoBpF8gV1bPBrT6STXVuGpWNZCRhq0HbvtNQ3OO+bki
-	3aHlg+/kR+4aMaDHcsHeedJ3n0MUyDe1NWq+lUnWBumWbSIKga6ns1aBFO5T5GrLPL3Zpwh
-	1wPRoRRgOVH+DoQweKKEJlmRlL8x25hg3w4X4THSgTC827sRdj3+undWheK6d1RxIhbiVZV
-	3dBVcb4c7Ev+JvlhEwrbHI8kI0fx9uWbzGdK6o/h2Koz1pFFskQOlNv1X5WKiq+WCcSgCe8
-	Rnw/Onypu7ATyHJsTuXrteNXJPK0ZDUTkZltkobxTov9wP3SNhzL40f+6TrJuJhejF2TKNR
-	yUdFSwGuLZH+x3qaz/JIfsf+cQHysh3XbaqXe5jBcUA6wstYrblnfEoBLKdoY9sE2hxcGbF
-	WswiSpMeD0p9aMQ7rvNzdJvXX3Es1G9w8pS3MS8oNLZdld+oJeu5ADbEwUPTmWrOTMatyZu
-	sCEPyfmbWHNnnYLafcVLHoXvt5OFWz0tTA7U1sBuSg9whvFK6kxj9dDGiksFkEB2ys7uoa6
-	4ZQ/2HJAoOrm/utYYh+zpdORTqQyEv+GfQ2i8BfqqfLQevH1eqH8mmWJSzVhRc+gQ0sKfk6
-	wD/vV2LBg3OFziEzNlX35gJKdGImXSrBvFvX0XzrA+zYJYzxGy1KotIPgLJdShvTi+w+G/j
-	eGLLFsVWhxX051JA04xAd7FSRWlrdlRsuZfpspzbvBGfEAovX1ChgL1tFXP4XhrEtZ23OwA
-	edaudLyUuOaqigltSQeh9XrWqmYrmk3ggVY9W6JvRGlnwJoIVHbtvyvDw281CCbg12dfyvr
-	0gphEqMp+Pi/xTg4Y3GBYHKaZg==
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
+References: <20260605194640.2645386-1-sam.moelius@trailofbits.com>
+ <CAM0EoMmeftLxWNdQqWsJonxEtMoCCuJdeTEjNzQfc2GYUX+mtw@mail.gmail.com> <CAE+C+DZTme=GQBy9BaXCiPe0pO7Pv7XNM69iru0VTGFX_ybBKg@mail.gmail.com>
+In-Reply-To: <CAE+C+DZTme=GQBy9BaXCiPe0pO7Pv7XNM69iru0VTGFX_ybBKg@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 8 Jun 2026 06:46:46 -0400
+X-Gm-Features: AVVi8CeQlcB6w6tpNcR8QKmfjpjjni7kCUy9HMzVK5ay3z0dtfgs45EdiEocANQ
+Message-ID: <CAM0EoMmPb0jZGWeadX4KqsyQTx4Oo2gLg-3h+u=Ec=9rqzzjdQ@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: act_pedit: require matching IPv4 L4 protocol
+To: Samuel Moelius <sam.moelius@trailofbits.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, "open list:TC subsystem" <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>, Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DMARC_NA(0.00)[net-swift.com];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296481-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:victor@mojatatu.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296483-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D47B6554FA
+X-Rspamd-Queue-Id: 87C74655558
 
-Add per-queue TX/RX packet and byte counters to the VF ethtool stats
-table.
-The stats length is now dynamically determined based on whether the
-device is a VF or PF via wx_stats_len().
+On Sun, Jun 7, 2026 at 10:33=E2=80=AFAM Samuel Moelius
+<sam.moelius@trailofbits.com> wrote:
+>
+> On Sat, Jun 6, 2026 at 5:29=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+> >
+> > On Fri, Jun 5, 2026 at 3:46=E2=80=AFPM Samuel Moelius
+> > <sam.moelius@trailofbits.com> wrote:
+> > >
+> > > The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
+> > > header fields without confirming that the IPv4 protocol field matches
+> > > the selected transport header.
+> > >
+> > > That lets a rule written for TCP or UDP modify unrelated payload byte=
+s
+> > > in a packet carrying a different protocol.
+> > >
+> > > Verify the IPv4 protocol before applying TCP or UDP extended header
+> > > edits.
+> > >
+> > > Assisted-by: Codex:gpt-5.5-cyber-preview
+> > > Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+> > > ---
+> > >  net/sched/act_pedit.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > >
+> > > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> > > index bc20f08a2789..9a4590451f7e 100644
+> > > --- a/net/sched/act_pedit.c
+> > > +++ b/net/sched/act_pedit.c
+> > > @@ -341,6 +341,8 @@ static int pedit_l4_skb_offset(struct sk_buff *sk=
+b, int *hoffset, const int head
+> > >
+> > >                 if (!iph)
+> > >                         goto out;
+> > > +               if (iph->ihl < 5 || iph->protocol !=3D header_type)
+> > > +                       goto out;
+> >
+> > From inspection the fix looks reasonable.
+> > At first glance it seems that the only fix that resolves the issue you
+> > are describing is to check the protocol header.
+> > header length seems to be an extra thing. But let's do what the v6
+> > side seems to and skip frags as well? Something maybe along the lines
+> > of:
+> >
+> > if (iph->ihl < 5 || iph->protocol !=3D header_type || (iph->frag_off &
+> > htons(IP_OFFSET)))
+> >         goto out;
+>
+> I will submit an updated patch.
+>
+> > Are you able to describe how someone would configure a tc rule that
+> > will allow this to happen?
+> > IOW, how did you verify the problem and then validate that your fix wor=
+ks?
+>
+> The bug was validated using a custom init script in QEMU. The specific
+> line used was:
+>
+> /usr/sbin/tc filter add dev veth0 egress protocol ip pref 1 matchall
+> action pedit ex munge udp dport set 18053
+>
+> An IPv4 TCP packet with destination port 2222 was sent through that
+> path. With the unpatched kernel, the packet was received with TCP
+> destination port 18053. With the patched kernel, the same packet was
+> received unchanged.
+>
+> I can provide more details or artifacts if you would like.
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 48 +++++++++++++++----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  4 ++
- .../net/ethernet/wangxun/libwx/wx_vf_common.c |  2 +
- 3 files changed, 44 insertions(+), 10 deletions(-)
+A tdc test case is better. Victor or I can create one for you if you
+dont know how.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 30c6ef6103ac..86f6ac63acf7 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -48,6 +48,10 @@ static const struct wx_stats wx_gstrings_stats[] = {
- 	WX_STAT("rx_hwtstamp_cleared", rx_hwtstamp_cleared),
- };
- 
-+static const struct wx_stats wx_gstrings_stats_vf[] = {
-+	WX_STAT("non_eop_descs", non_eop_descs),
-+};
-+
- static const struct wx_stats wx_gstrings_fdir_stats[] = {
- 	WX_STAT("fdir_match", stats.fdirmatch),
- 	WX_STAT("fdir_miss", stats.fdirmiss),
-@@ -69,15 +73,26 @@ static const struct wx_stats wx_gstrings_rsc_stats[] = {
- #define WX_QUEUE_STATS_LEN ( \
- 		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
- 		(sizeof(struct wx_queue_stats) / sizeof(u64)))
--#define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
- #define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
- #define WX_RSC_STATS_LEN  ARRAY_SIZE(wx_gstrings_rsc_stats)
--#define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
-+
-+static inline unsigned int wx_global_stats_len(const struct wx *wx)
-+{
-+	return wx->pdev->is_virtfn ?
-+	       ARRAY_SIZE(wx_gstrings_stats_vf) : ARRAY_SIZE(wx_gstrings_stats);
-+}
-+
-+static inline unsigned int wx_stats_len(const struct wx *wx)
-+{
-+	struct net_device *netdev = wx->netdev;
-+
-+	return wx_global_stats_len(wx) + WX_QUEUE_STATS_LEN;
-+}
- 
- int wx_get_sset_count(struct net_device *netdev, int sset)
- {
- 	struct wx *wx = netdev_priv(netdev);
--	int len = WX_STATS_LEN;
-+	int len = wx_stats_len(wx);
- 
- 	switch (sset) {
- 	case ETH_SS_STATS:
-@@ -100,8 +115,11 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 
- 	switch (stringset) {
- 	case ETH_SS_STATS:
--		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
--			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
-+		for (i = 0; i < wx_global_stats_len(wx); i++)
-+			if (wx->pdev->is_virtfn)
-+				ethtool_puts(&p, wx_gstrings_stats_vf[i].stat_string);
-+			else
-+				ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
- 		if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
- 			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
- 				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
-@@ -134,10 +152,16 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 
- 	wx_update_stats(wx);
- 
--	for (i = 0; i < WX_GLOBAL_STATS_LEN; i++) {
--		p = (char *)wx + wx_gstrings_stats[i].stat_offset;
--		data[i] = (wx_gstrings_stats[i].sizeof_stat ==
--			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-+	for (i = 0; i < wx_global_stats_len(wx); i++) {
-+		if (wx->pdev->is_virtfn) {
-+			p = (char *)wx + wx_gstrings_stats_vf[i].stat_offset;
-+			data[i] = (wx_gstrings_stats_vf[i].sizeof_stat ==
-+				   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-+		} else {
-+			p = (char *)wx + wx_gstrings_stats[i].stat_offset;
-+			data[i] = (wx_gstrings_stats[i].sizeof_stat ==
-+				   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-+		}
- 	}
- 
- 	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
-@@ -219,9 +243,10 @@ EXPORT_SYMBOL(wx_get_pause_stats);
- 
- void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- {
--	unsigned int stats_len = WX_STATS_LEN;
- 	struct wx *wx = netdev_priv(netdev);
-+	unsigned int stats_len;
- 
-+	stats_len = wx_stats_len(wx);
- 	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
- 		stats_len += WX_FDIR_STATS_LEN;
- 
-@@ -851,6 +876,9 @@ static const struct ethtool_ops wx_ethtool_ops_vf = {
- 	.set_coalesce		= wx_set_coalesce,
- 	.get_ts_info		= ethtool_op_get_ts_info,
- 	.get_link_ksettings	= wx_get_link_ksettings_vf,
-+	.get_sset_count		= wx_get_sset_count,
-+	.get_strings		= wx_get_strings,
-+	.get_ethtool_stats	= wx_get_ethtool_stats,
- };
- 
- void wx_set_ethtool_ops_vf(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 260e14d5d541..ce172b6deb80 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -2917,6 +2917,9 @@ void wx_update_stats(struct wx *wx)
- 	wx->restart_queue = restart_queue;
- 	wx->tx_busy = tx_busy;
- 
-+	if (wx->pdev->is_virtfn)
-+		goto skip_hw_stats;
-+
- 	wx_update_xoff_rx_lfc(wx);
- 
- 	hwstats->gprc += rd32(wx, WX_RDM_PKT_CNT);
-@@ -2956,6 +2959,7 @@ void wx_update_stats(struct wx *wx)
- 		hwstats->qmprc += rd32_wrap(wx, WX_PX_MPRC(i),
- 					    &wx->last_stats.qmprc[i]);
- 
-+skip_hw_stats:
- 	spin_unlock(&wx->hw_stats_lock);
- }
- EXPORT_SYMBOL(wx_update_stats);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-index 26de78e9a69e..1d84fe35d7d9 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-@@ -5,6 +5,7 @@
- #include <linux/pci.h>
- 
- #include "wx_type.h"
-+#include "wx_hw.h"
- #include "wx_mbx.h"
- #include "wx_lib.h"
- #include "wx_vf.h"
-@@ -409,6 +410,7 @@ static void wxvf_service_task(struct work_struct *work)
- 
- 	wxvf_link_config_subtask(wx);
- 	wxvf_reset_subtask(wx);
-+	wx_update_stats(wx);
- 	wx_service_event_complete(wx);
- }
- 
--- 
-2.30.1
-
+cheers,
+jamal
 
