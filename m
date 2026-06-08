@@ -1,137 +1,142 @@
-Return-Path: <netdev+bounces-296757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296765-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /GhJBR5FJ2qzuAIAu9opvQ
-	(envelope-from <netdev+bounces-296757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:41:34 +0200
+	id w2uJFspFJ2rZuAIAu9opvQ
+	(envelope-from <netdev+bounces-296765-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:44:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0082565B061
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:41:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3BC965B0BF
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:44:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZDR4CQ3D;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296757-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296757-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=GV5Su1Br;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296765-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296765-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D7F263024B0B
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:40:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DE1A301CA7E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AC43B27FE;
-	Mon,  8 Jun 2026 22:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AFF3B42C8;
+	Mon,  8 Jun 2026 22:43:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8843B3B42C4;
-	Mon,  8 Jun 2026 22:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784A03B38B1
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 22:43:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780958430; cv=none; b=Y5LVktoGOqlxJbWv3eRtnmZ1W3gX8eHsI5JJYi1zXxuZWKDuod6MBn3Uup1qfD2RMeJH5+8ES2yP1RmkNklJhyyBB56COZ2nh6M/Aw59yDt1ED9yH+Cv+C4fpNkfdshUG+fCiqRnwLX/jTlZpcLLs3/KXQVLf97uxottQtf2O3k=
+	t=1780958637; cv=none; b=Qx5076memgOmiqq7iGiej5vr7kOqgiyR1VjdMnmU/aCotBR5ZeHTRohhth5TZpujpxi6gocBJS9H30pPDCjK2uo8ap3ONhDAXe0NGtNMCd7xluWfc5CvJVvoS85kPS38uYpoOjdv8FYFKtCReM0r/ySF2J0V110jTpLm1Tm7tSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780958430; c=relaxed/simple;
-	bh=WfnZGuuHbXyO1yTdOPaF6vPnp4GT9f4eEr3nub+n/Eg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BdV5PI+l1P6BgM3fCSpCt5Fy+albXFfODpgZWsL4UmgpKRHmi34zg5SJPQ9UkeAuKRf4h5uS/oxbAfoF8KQGzZvMSy87AewIujRpN+e05xKqhAwgRpKyBv+d5jCV2wF5yi3XNKEL4zVrm110Wn0dWqebwsJMSRSw8v5ByxX99R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDR4CQ3D; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255BC1F00898;
-	Mon,  8 Jun 2026 22:40:29 +0000 (UTC)
+	s=arc-20240116; t=1780958637; c=relaxed/simple;
+	bh=A0aMEuooSpehlxvLLcCYGZi3/rId/udlnvg3u80kiOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q8HBQGL7ewvAFwDhpOZjVPcEcSIBlGgjRtWcWxVhky2xuDrnh5hl8mXSMRor8F6E4ojfHjyoonQUZiflyD9GtaGFoF2Z6qvWngy4XfsM7RC5/YVqFwgEaQGoW9a/okxmWrS5RKkD2wNdaieezb0ubxkJdCKNVbLzZ+2ambPgiKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GV5Su1Br; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2773D1F008A4
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 22:43:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780958429;
-	bh=fQfQFv6/WzGMUKOzEK25pov0DPtrTdODou4at+fFukk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=ZDR4CQ3DINMCN8OaRQCt1dnwMA6I8KxAS4mThx6V+iEW+kxs878SGpBh8IeB2D1Lr
-	 ewPb4KMmAgkYgrNPZoOuHzqXKEfLiDmpqXbtzZjHfeTaAhUO9DrU4TB1hggdytPiUG
-	 28AYWML6cttKkrZFFDGxknTI9T2+WKr4OzOATxoudda0CKCsrkhUUdAqGXuaXA/NJl
-	 R+5Wmleo1h+Py9cN+l/MCTYX5/Fr8xqhP1Z9VmyXCrKXN6/1XdcbJCFmjGhJ3X2Npt
-	 dFjelqd5QvwIS74Iursx6znZDjzDKz/WGtRYc36LDIbHN9pIWSA6faN0fGNAOwOv1P
-	 KIMdub5WRUTvg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198B53812FD9;
-	Mon,  8 Jun 2026 22:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1780958636;
+	bh=yO33fZb1LjugzRw+G0ggE1zSXDOM86JcqH727KoL53Q=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=GV5Su1Br5SvCs/rJNXXZeLpyhUFI3jQikNovCcx5qQfodSUdXRHSVw7DWxNCJL3KT
+	 Ou1iT5jrVoWXlUuZ2Gvf+gJ9/3gVWTc42TyvGOdXuAir8y1XTOQGaUMi6Cwxw5zqkj
+	 MWv2oDZUFskzYtIx4Qk/BmlliyCwfAld4Us+jiDYSGykz5OxNPICZnBG6Mlqf+Ymzt
+	 omLwRHUBR72YpNwsMTp6K0HaG5OxXpCoK7fb36r1AMVz4EqT4uHJMwXb5m10bBmQsW
+	 wefup+Aa0hpns1Hue0lbWvYs8BdM1RjR6gbkmq6De1rCAuFKglyfGY74YQOGd1yaDG
+	 +dYmx5GlgXleg==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3965d76090bso43560811fa.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 15:43:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ851suRerh7fqTr73CncRoOmyx5Y9ecu/gApwLYjUwTzOILcHiocznrMbTcUoCzYpZRfLXQQLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXPkcwxP+ATWlwIz2HT0DMhM7suA05swVN1X6IdpQH9fA27DM1
+	4aUNH/ZKitZiq3BzKdlZE+4vDPwV0bnCaKOtqQmXUBQJBiN3Wo9VVdo0hKipl4xyMIRiUX1F5V+
+	63KGjaHQSbCCPcMSUUzJyfSjiRBGaEcU=
+X-Received: by 2002:a2e:a715:0:b0:396:b398:5990 with SMTP id
+ 38308e7fff4ca-396d0802544mr31409431fa.10.1780958634795; Mon, 08 Jun 2026
+ 15:43:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [pull-request] mlx5-next updates 2026-06-07
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178095842764.1698449.11301804131440980167.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Jun 2026 22:40:27 +0000
-References: <20260607111157.470978-1-tariqt@nvidia.com>
-In-Reply-To: <20260607111157.470978-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- dtatulea@nvidia.com, moshe@nvidia.com, shayd@nvidia.com
+References: <20260602-pdm_clk_gp_mnd_v1-v1-0-1522662b6c53@oss.qualcomm.com> <20260602-pdm_clk_gp_mnd_v1-v1-3-1522662b6c53@oss.qualcomm.com>
+In-Reply-To: <20260602-pdm_clk_gp_mnd_v1-v1-3-1522662b6c53@oss.qualcomm.com>
+From: Linus Walleij <linusw@kernel.org>
+Date: Tue, 9 Jun 2026 00:43:42 +0200
+X-Gmail-Original-Message-ID: <CAD++jLnqCipTxkOhiwQhKFymOxu1HOTbHzLbNrGTOkCO33y8Vg@mail.gmail.com>
+X-Gm-Features: AVVi8CdznhrC7lojiEVCZUJLtYjgr49qwHSYBFLmYEj8dqSmxJu9YBHItYZ4E9Y
+Message-ID: <CAD++jLnqCipTxkOhiwQhKFymOxu1HOTbHzLbNrGTOkCO33y8Vg@mail.gmail.com>
+Subject: Re: [PATCH 3/5] pinctrl: qcom: Add gp_mn mux function for QCS8300,
+ SA8775P and SC7280
+To: Taniya Das <taniya.das@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Brian Masney <bmasney@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Ajit Pandey <ajit.pandey@oss.qualcomm.com>, Imran Shaik <imran.shaik@oss.qualcomm.com>, 
+	Jagadeesh Kona <jagadeesh.kona@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, 
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296757-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:dtatulea@nvidia.com,m:moshe@nvidia.com,m:shayd@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296765-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:taniya.das@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:konradybcio@kernel.org,m:ajit.pandey@oss.qualcomm.com,m:imran.shaik@oss.qualcomm.com,m:jagadeesh.kona@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,baylibre.com,redhat.com,gmail.com,oss.qualcomm.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0082565B061
+X-Rspamd-Queue-Id: C3BC965B0BF
 
-Hello:
+On Tue, Jun 2, 2026 at 5:22=E2=80=AFPM Taniya Das <taniya.das@oss.qualcomm.=
+com> wrote:
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> Add the gp_mn pin mux function to the TLMM pin controllers for the
+> QCS8300, SA8775P and SC7280 SoCs. This function exposes the GP M/N
+> divider clock output on a dedicated GPIO pin, allowing the clock signal
+> to be routed externally.
+>
+> - QCS8300: gpio32
+> - SA8775P: gpio35
+> - SC7280:  gpio60
+>
+> Signed-off-by: Taniya Das <taniya.das@oss.qualcomm.com>
 
-On Sun, 7 Jun 2026 14:11:57 +0300 you wrote:
-> Hi,
-> 
-> The following pull-request contains common mlx5 updates
-> for your *net-next* tree.
-> Please pull and let me know of any problem.
-> 
-> Regards,
-> Tariq
-> 
-> [...]
+This looks all right and no-one is saying anything about it, should
+I just apply this one patch to the pin control tree? It doesn't seem
+to have any dependencies.
 
-Here is the summary with links:
-  - [pull-request] mlx5-next updates 2026-06-07
-    https://git.kernel.org/netdev/net-next/c/199f6b9a1603
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yours,
+Linus Walleij
 
