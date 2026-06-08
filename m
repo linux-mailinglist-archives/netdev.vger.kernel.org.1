@@ -1,354 +1,206 @@
-Return-Path: <netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jO/xL17NJmoukwIAu9opvQ
-	(envelope-from <netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:10:38 +0200
+	id oIIMOGDOJmp7kwIAu9opvQ
+	(envelope-from <netdev+bounces-296589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:14:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AE9656F78
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:10:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5AE65707A
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:14:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=ylwqYdsA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=kJF5s6UJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296589-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296589-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E8A630D8C52
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 14:00:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BFB933065E9F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 14:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997133CA4A8;
-	Mon,  8 Jun 2026 13:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E36C3C3C11;
+	Mon,  8 Jun 2026 14:04:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011022.outbound.protection.outlook.com [52.101.52.22])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45B13C3420;
-	Mon,  8 Jun 2026 13:59:23 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780927165; cv=fail; b=BLLeKM0vWCuxvwYvsiI0XWPTYuEhSv1OFrKZQH52rY0p7nQzAlabRquYy895A3laWN3NQRelKynzNGl5Fn+67bTyWyBq2bUA6hp5yufPwMqs1ZcpPQ/Rj4aBIL7K0+hY9VF33un0aakjykv7c/wyY6u+oRi8SgPkUFxlMeizcgE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780927165; c=relaxed/simple;
-	bh=PwAbTkNKmZLRZ26x8YPN6/S1mI8Tvo/7RHMvHHVYL/k=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=n7ytFGQoE0MrImBG5NXiuxdU0vtH63trC4FGiUlL9/Y/ZzI5v2RsPgZJGZtEY6Vn3PW4fPCvHppaFnJ55qTVDYmnjk6CgcXrIEWj3dsD+feVmQ+dindsN5wlAfyD6ZDOevN84mCtslaDuBQgEvBAyPWI5jtUSwXfHkDEjnch9Dw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ylwqYdsA; arc=fail smtp.client-ip=52.101.52.22
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ep+UUQAuaqq2VCW4LUTEZ+jlyWORGDnKrROma4RaV4qy7i+cMHky/CeqbqjhCmn43I8GLNe8uqSI7YQGUN0TwTm4UZYxLOiVb28IaGH3VTIduLirc/hUFQ/ehLV70NaJAT0661iA2g3/fjJGa5GIqPL2j+SL6RB+i+SBF1aW9gfjxAznxstelX9Z26uLgTQEObQnFPPbf5MWS42nNnHqzdPCS+2R3ffsojGsq48PJMzj25Ge0BbCPX9FAIlIaUQU3RNXAkxrHEU/UE1ySqotVSpl+P/IMP0d+qQI+hV+qvOdcjrS8ti96Alo/eEPmJVUzB5HZJoK8T83lo/V0xP0Tg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f9NUUiuF5j2bb81QIuz36SJ/RBj8+AGOvNYmi59zTw4=;
- b=PimhVdxJfJWGuZBqADoZ5LF+j8AB0QSlfICt5SzoEqD35p7gPP1/O3VJvP6dwsfThg9aN3o1QMZy8PEsTa1tb4/vY0QzJll8w3QnAoyBaDUGeqGgxkeRjpbUy5s5hjkutJ3UYmzoRSnsK+KMaCTcBEM8MSVAsLxKffL/4MtfMlRPb9OwQxcIf2O0eel1u9ya9B/5H5bWqhRFw6AK/dYim5PxB2Ovl31nSa4Of823hQF/1AyS/99sDMcp6eXMJpCavOcl3JsOxhPluh83gNPvJ3M7+xB4TyAdtWwz879N/SkccSZPjd5KnbpDWOCCS6v8JrbaR1dTEJxC0KG7GFjMPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f9NUUiuF5j2bb81QIuz36SJ/RBj8+AGOvNYmi59zTw4=;
- b=ylwqYdsAmJIkEdwueIDzqIm7KF39CcdQoCe5lfrfJqRUvOXBIun2zwXdkZsMazoJ7a2bbqYHSi6+wu23kOnGValkjok7dd0tyha/C2+Ai23zsuSQRqmKR1adf/OUxis7YqERT76Qr4VuXTxOn7kK+KskrYzgM/OglCYX6wIhNVw=
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by SJ0PR12MB6878.namprd12.prod.outlook.com (2603:10b6:a03:483::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
- 13:59:17 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0092.006; Mon, 8 Jun 2026
- 13:59:17 +0000
-Message-ID: <a51e97bd-39dc-492f-bd7d-f137423277df@amd.com>
-Date: Mon, 8 Jun 2026 15:59:04 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] udmabuf: emit one sg entry per pinned folio
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- Sumit Semwal <sumit.semwal@linaro.org>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org,
- sdf@fomichev.me, razor@blackwall.org, daniel@iogearbox.net,
- almasrymina@google.com, matttbe@kernel.org, skhawaja@google.com,
- dw@davidwei.uk, Bobby Eshleman <bobbyeshleman@meta.com>
-References: <20260603-tcpdm-large-niovs-v1-0-f37a4ac6726c@meta.com>
- <20260603-tcpdm-large-niovs-v1-2-f37a4ac6726c@meta.com>
- <bdce2488-fe77-4f36-9ed6-dd2c785fa7c1@amd.com>
- <aiMY8CpckM8Jav0g@devvm29614.prn0.facebook.com>
- <0c86f5d3-b5e9-4cac-aa9d-30c5c8ecca66@amd.com>
- <CAKB00G3opAoAYswsq2uz0Q6jgku8u4NthKOzCbSumZ0qK7QxcQ@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <CAKB00G3opAoAYswsq2uz0Q6jgku8u4NthKOzCbSumZ0qK7QxcQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BLAPR03CA0145.namprd03.prod.outlook.com
- (2603:10b6:208:32e::30) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0857F3C4551;
+	Mon,  8 Jun 2026 14:04:45 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780927488; cv=none; b=j4vy4vkuHVjtJwDpMaZ5J97NCYKuz9poIz1P0Zrg+VheokCIFhrhTJNRytu4EBv7V61ZR+KJ+4gKCyEu0RfCtG7UxLqGhLyP/ojtTloPAStouEppxJcTGpj+2NDBzy2z5tkepyMoZcP/m9i+TQzUXVEAF7tiW5ub11p063Txk9w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780927488; c=relaxed/simple;
+	bh=o9ZqeZQndmaawdy1VD/8gxEmuhGgfg1vq5AT0Ln5GrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t4Hlq0HCxtxrULOiZcCrOCAu8/ublYzwvbY03YT9ybNGpsPDtzCgMAE6YNTzkxx4uftZEKcTrW2+xaulnwlAnIwiond6izG5McfrQczEKH/rdrGPpFvS8GlQ026vAwfJV6bo2cRwGvPCG+I0LL+UVbQRqHGFK35lpt7UPoQzhYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kJF5s6UJ; arc=none smtp.client-ip=115.124.30.118
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1780927476; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=FzmVchP79tCuI2XT+vBVQjUl7+ilYcFgXsd3+S4/940=;
+	b=kJF5s6UJIBhDkFlRchtrOl5qM/4P72r+q5cLmv4lMSxaxrJX7M9Gz745XkWqWNKNMqNUx8+baz3lf5M/Ec0uoYF/tYCEJU48YBI4pJ6R4obRKKAOY2XridSCf8RLrh8hJXZPKgX+14rKekyHRxDhWLL6RiKIzd8pr6j6NwUdCQI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0X4Q0kgv_1780927475;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0X4Q0kgv_1780927475 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 08 Jun 2026 22:04:35 +0800
+Date: Mon, 8 Jun 2026 22:04:34 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, oliver.yang@linux.alibaba.com,
+	pasic@linux.ibm.com
+Subject: Re: [PATCH net-next v2 2/2] net/smc: reduce TX slot contention with
+ exclusive wait
+Message-ID: <aibL8g1hxAcZzPRJ@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20260528084819.6059-1-alibuda@linux.alibaba.com>
+ <20260528084819.6059-3-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SJ0PR12MB6878:EE_
-X-MS-Office365-Filtering-Correlation-Id: b38fb79d-df85-40fa-3e40-08dec566214a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|10063799003|22082099003|18002099003|6133799003|4143699003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	sowkkH5VJNgpxW0cbgb7TBleErXgSgCN+YosuSKXQZi2tW5oYouxuvGqXxqCg+tfv3Md81Nvob6w1CQrlbOIQmUxp8QiQrF9+yET3ehts3DjCLXe4nSur/YAJy6UJMhFWBoZLfVu2UZTAildwfjEhNPNOzNj0UADq4KqImVVzjLV3xHO5XqQovwEQr36nGlHw+TVSpyRGyMAaNUXCRvXGhl2pdZCvd+sm0kHJNlYfnAbbrX53/qVXhLU9mxWj+HNJmM1yfndtAV/eLstiTMYl786U2WuGWLsP5xe2Y4rOhRgRf4Vfuk1kZ5ED+PQBtt3tZq876JhI6lafz5a1wIr40sOBIsF+23w3cjRAwJHpayBSaDNp6DFrXwKk9AB83YLUx+tfUsSZ6ta1Hn8/RiLUA28i6kuIYhfjeXo5NaXAceRZ8BVfOJdCr/T9aoUdPzqzz79Bzcd57PC0G57Df//dACXThWXVHKKlYkLj2TNem43YPTnD6of9ehD6MCOs3gVSL/r1HETjjZwLwXuqK+BqPlPRu2UqrZ7R/3LYXUlbRnqi5aYFCztE0eH/UhX5JxLMlrulrdXf9Ojuxvv/y7VwsOR+D/jdjcYy4a0sRJUQhIYJVuB31aXOpP/3j4DymtGCSPx/ZzbhSgdxW2EDeJirb1b9OsKlaB83KAhn+IcHkQZSgs78Syiqa20FYJJ3Rpa
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(10063799003)(22082099003)(18002099003)(6133799003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MDNLRGZCMThncjlIbHkrQjRldXFoMFpENVRyU1NkdjgzaSt0L3RtMXlMdU5W?=
- =?utf-8?B?SWdsL0NkYk9Hb1VNZWpQenFHdEJpR0ZwUHN0MGg0Tml5Q0dESi9JVkVteW9v?=
- =?utf-8?B?OTFPZ2I5VXkrdHNpQXdiaUQzOTlaOVNZS2FERWw5eDRQUzJLVVp1dy9CaHhJ?=
- =?utf-8?B?UTVFSWRRWWhxYUVWY0dGQndDTVJTaktTb3pyUmFqVTlORGFoaEo4S1lERnF4?=
- =?utf-8?B?L084OCtNeTdqSW43N2gzZXF1VDdUbEtJNUhkY0NCWEFwbENPNitleW9OQUdU?=
- =?utf-8?B?N1o0VmhpWW5BU0RIQ1ZrbktmYkNNWWZhWmwzVFRVRzFjYnhIOHlPdDRQaUE0?=
- =?utf-8?B?aEN1R3EwQlloaDIwQzE0MHdiczhsODFOMmYyVmpSMXNrM0pZdm5oT3crSVlU?=
- =?utf-8?B?U2tWY0RmbkdQYmFRczhPaHVxRmE1UysvSUNPZEZyU3B4YzZpejJON1ppM1RG?=
- =?utf-8?B?TUYyV1pTejFUSlBld0t0aXdWSjcybldPTnBEb3l2QXE0aEdFazdPVDA5dmd5?=
- =?utf-8?B?bXFLcndLOU9maXpTWkFGS216MEhJc3ZSdG90ejhSU2U4WmVSdUs3M21oMzRo?=
- =?utf-8?B?Q1ErZG83WlFadUNQYXIwUmx0Z0RjSTBDZnIwYUdEdncrRzcxdDhaVFFrVlRR?=
- =?utf-8?B?elhJQUc5U09BUTNvcUt3disrSWFTQU54R0liYmxSdGpEM0tKeE1FSWVwR1hH?=
- =?utf-8?B?ai8zUml1YS9rOWoyeExxbUFWREx2ckZHbEdMTmZwZ3NudnZOMlZIeFFwSkhh?=
- =?utf-8?B?OE9FNlE3MStYSHdWblk2dy84Q3FtQlorOFJ0aGVaZitSekNzbkl3VmE0SEdr?=
- =?utf-8?B?L2R4VHhEKzIvYmRyVFFzZnNmUHZkWERtL2ZTcE8rOVcyRGlpQTRya0h5ZUcr?=
- =?utf-8?B?akRFODhud1I2OUF2bGx4ZHgwVFhERTNmeU4vSGMwYU9Da2xtMmpJeEJPWkNG?=
- =?utf-8?B?VmFBZEhjaGRObWJWcVZ4S3IrcVBPbERsT2ZldVR0bFNiS1pRQm8wUlpFbHhj?=
- =?utf-8?B?OHRDbXdETElCQ1I3bjhXaFVmbnhmbHU5dzFBa0N3ckR5dVNYOTNDdmpkcHNh?=
- =?utf-8?B?QUtJditLc284QVBRRjkxU2k2SVcvalh4d2MzZENTdVd4WHQxYnV5ckVMd1BZ?=
- =?utf-8?B?V3RxSFdZT3NhRGVrNno5RkR3NnAzU3FWQTlCVC9TdS9VWEk2eGxjVmRaOXBw?=
- =?utf-8?B?QmJiWkd5ZlhkL2I4bmgvd045Y3JmSkhYUGF1U0ZDT0VibDlKU1IrK2tTVFZo?=
- =?utf-8?B?aVdqZXZhck9wSTNHTlU3Kzd2OUE2RDNlN2xhYXpEWUdESExRK2FpK3RqNHND?=
- =?utf-8?B?Vi9XRHc5MURzdzNoR09xdW1mTDlBWnBja0RUczRVN2JoaDFKUkxqT2gvWkVs?=
- =?utf-8?B?eHVxZEYrL05CbVVicG5reklIVzhlZWE0UDBsOUJhT2dZMHZUOXpOOU0rU2V5?=
- =?utf-8?B?RURWNCtGbWprUkpHSWVIeHhiREpobHlVeTA4UkQxYmEvWk5PaTZ6c25TeXhT?=
- =?utf-8?B?a01YKzlWNG5xR2h0SXBBVkhtVWhYZ3lyQWU1YkU5WmY3T1FLeEVxQ0V4ejNt?=
- =?utf-8?B?QXA3dnJ2c0s3Y3ltRmJhbERGeE1zWkM3Vm5YbFYzRkducmN6OWlub2EvalRO?=
- =?utf-8?B?by81c2dZUEJhaHZOb2Y3WlA4Q1EyeFRhbUdUOWlsdkk1VzVkVG8xS0tObloz?=
- =?utf-8?B?NG1weDlMZytnZHdNaDFqTEU0c3kzMTZmdDVsWGZpMzdlam12Z3llczQzNXAw?=
- =?utf-8?B?a0V3T2NaMWE3WWVWSmZKdkM1TU0wYncyYTJIaFhaUE9nN2lGZXlvWmtGWUt1?=
- =?utf-8?B?NU9iRlgrUytrVWI3NmxRckQvTVJHNGpMTllzZWV3Rmd2ZlJEKzFSY3Q5TVY3?=
- =?utf-8?B?UHhJQXkzakFPZENvU0svSE53OG5nYnhGVE52eTRkU2FYdnVPOVlQbUh4UnBh?=
- =?utf-8?B?ODFxUmw3MGJpYXlGT1l3ZXQ5TjlMK3lxNWZWTEx6ZzY0WUE2VFordnczZHha?=
- =?utf-8?B?dU5qbTVaVGNjUFJOWGpGWldHK0RSL1dEb0VINFY4ZEpSZkxuOTBSQzArQkR4?=
- =?utf-8?B?WkhQZGNOZW54VHBWMXAvb2tybW9kcG51NnpLOWxxL0xYeWw2dXpMamV3TmxB?=
- =?utf-8?B?TUl5K2g1SGRBcnhMNXExWG4vblhWbFBKRHpMTzdXSlh6OHZpOElPalIralRO?=
- =?utf-8?B?WXk3Y05ZZzVOYkYvMEMxMFY2Q3ZidzA1aVN6dlN1UUxkdjVjaUl2dXBDUGpD?=
- =?utf-8?B?bTdHMy92VEh1V2l4MEdvYnAzOThwOE8xN0wwKzJKZVVrNU9kMEMvb2VuUlkr?=
- =?utf-8?Q?PdsqcNFJ0NuxrrF4q5?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b38fb79d-df85-40fa-3e40-08dec566214a
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 13:59:17.2139
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LayaBdD/cYOWVZImWkl8CxH4yZCvqOtvYxYU4HMkb9l2Xtpo9PMeB7WUm8lajznT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6878
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260528084819.6059-3-alibuda@linux.alibaba.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296588-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	REPLYTO_DOM_EQ_TO_DOM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296589-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:horms@kernel.org,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:oliver.yang@linux.alibaba.com,m:pasic@linux.ibm.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,intel.com,linaro.org,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
-	DKIM_TRACE(0.00)[amd.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dust.li@linux.alibaba.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	HAS_REPLYTO(0.00)[dust.li@linux.alibaba.com];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.alibaba.com:dkim,linux.alibaba.com:replyto,linux.alibaba.com:mid,linux.alibaba.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 04AE9656F78
+X-Rspamd-Queue-Id: 5A5AE65707A
 
-On 6/8/26 15:55, Bobby Eshleman wrote:
+On 2026-05-28 16:48:19, D. Wythe wrote:
+>smc_wr_tx_get_free_slot() waits for a free TX slot with
+>wait_event_interruptible_timeout(). Since the wait_event family
+>enqueues waiters as non-exclusive, wake_up() may wake multiple
+>waiters even though only one can use the slot, causing
+>thundering-herd contention when slots are scarce.
+>
+>Use an exclusive wait loop with prepare_to_wait_exclusive() so
+>wake_up() wakes only one waiter per freed slot.
+>smc_wr_wakeup_tx_wait() still uses wake_up_all() during link
+>teardown, so teardown behavior is unchanged.
+>
+>Performance measured with netperf TCP_RR (63 flows, 200B write /
+>1000B read, 60s duration):
+>
+>+-------------------------------+---------------+---------------+
+>| smcr_max_conns_per_lgr        | 32            | 255           |
+>|-------------------------------+---------------+---------------|
+>| before                        | 4.85 Gb/s     | 657.95 Mb/s   |
+>|-------------------------------+---------------+---------------|
+>| after                         | 5.01 Gb/s     | 2.2 Gb/s      |
+>+-------------------------------+---------------+---------------+
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>---
+> net/smc/smc_wr.c | 36 ++++++++++++++++++++++++++----------
+> 1 file changed, 26 insertions(+), 10 deletions(-)
+>
+>diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
+>index 130bc6c26fb3..3cb47f77130e 100644
+>--- a/net/smc/smc_wr.c
+>+++ b/net/smc/smc_wr.c
+>@@ -153,9 +153,11 @@ int smc_wr_tx_get_free_slot(struct smc_link *link,
+> 			    struct smc_rdma_wr **wr_rdma_buf,
+> 			    struct smc_wr_tx_pend_priv **wr_pend_priv)
+> {
+>+	unsigned long timeout = SMC_WR_TX_WAIT_FREE_SLOT_TIME;
+> 	struct smc_link_group *lgr = smc_get_lgr(link);
+> 	struct smc_wr_tx_pend *wr_pend;
+> 	u32 idx = link->wr_tx_cnt;
+>+	DEFINE_WAIT(wait);
+> 	int rc;
 > 
-> On Sun, Jun 7, 2026 at 11:42 PM Christian König <christian.koenig@amd.com <mailto:christian.koenig@amd.com>> wrote:
-> 
->     On 6/5/26 20:44, Bobby Eshleman wrote:
->     > On Fri, Jun 05, 2026 at 11:30:07AM +0200, Christian König wrote:
->     >> On 6/4/26 02:42, Bobby Eshleman wrote:
->     >>> From: Bobby Eshleman <bobbyeshleman@meta.com <mailto:bobbyeshleman@meta.com>>
->     >>>
->     >>> get_sg_table() emitted one PAGE_SIZE sg entry per page even when the
->     >>> underlying folio was larger.
->     >>>
->     >>> Instead, walk folios[] and emit one sg entry per folio. When folios
->     >>> represent large pages (as is for MFD_HUGETLB), each sg entry is a large
->     >>> page. Normal PAGE_SIZE sg tables are unchanged.
->     >>>
->     >>> Required by net/core/devmem to support rx-buf-size > PAGE_SIZE with
->     >>> udmabuf.
->     >>
->     >> That doesn't explain why this is required.
->     >
->     > Sure, can definitely add. Devmem currently requires dmabuf sg entries to
->     > be length and size aligned when it allocates niovs for NIC page pools.
->     > Though udmabuf is not violating any dmabuf contract by emitting
->     > PAGE_SIZE entries and the above restriction is probably more a
->     > shortfalling of devmem, by emitting a single entry per folio this patch
->     > allows udmabuf to be used by devmem for large pages.
->     >
->     >>
->     >> Please note that accessing the pages/folio of an sg-table returned by DMA-buf is illegal and strictly forbidden!
->     >>
->     >> Regards,
->     >> Christian.
->     >
->     > It seems both devmem and io_uring zcrx at least introspect through to
->     > the sg-table to build NIC page pools (not accessing the memory itself,
->     > however). Is there a better way?
-> 
->     That's an absolute NO-GO! We need to stop that immediately.
-> 
->     Touching the underlying struct page of an DMA-buf exported sg-table is strictly forbidden.
-> 
->     We even have code to wrap the sg_table and hide the struct pages on debug builds to catch those issues, see function dma_buf_wrap_sg_table().
-> 
->     My last status is that the NIC page pools are build directly from the DMA addresses exposed by the sg_table.
-> 
->     Was there any change I'm not aware of?
-> 
->     Regards,
->     Christian.
-> 
-> 
-> Oh no change, your mental model is still current.
-> They just go through each sg and use sg_dma_address() on each.
+> 	*wr_buf = NULL;
+>@@ -165,17 +167,31 @@ int smc_wr_tx_get_free_slot(struct smc_link *link,
+> 		if (rc)
+> 			return rc;
+> 	} else {
+>-		rc = wait_event_interruptible_timeout(
+>-			link->wr_tx_wait,
+>-			!smc_link_sendable(link) ||
+>-			lgr->terminating ||
+>-			(smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY),
+>-			SMC_WR_TX_WAIT_FREE_SLOT_TIME);
+>-		if (!rc) {
+>-			/* timeout - terminate link */
+>-			smcr_link_down_cond_sched(link);
+>-			return -EPIPE;
+>+		rc = 0;
+>+		for (;;) {
+>+			prepare_to_wait_exclusive(&link->wr_tx_wait, &wait,
+>+						  TASK_INTERRUPTIBLE);
+>+			if (!smc_link_sendable(link) || lgr->terminating ||
+>+			    smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY)
+>+				break;
+>+			timeout = schedule_timeout(timeout);
+>+			/* re-check */
+>+			if (!smc_link_sendable(link) || lgr->terminating ||
+>+			    smc_wr_tx_get_free_slot_index(link, &idx) != -EBUSY)
+>+				break;
+>+			if (!timeout) {
+>+				/* timeout - terminate link */
+>+				smcr_link_down_cond_sched(link);
+>+				break;
+>+			}
 
-Ah, thanks! That was a near heart attack :D
+The change itself looks correct to me. But I think we should probably define
+a wait_event_interruptible_exclusive_timeout() helper in include/linux/wait.h
+rather than open-coding it in smc ?
 
-Yeah that is perfectly correct, question is do you then still really need this udmabuf change? I mean the DMA API usually merges together contiguous DMA addresses.
+>+			if (signal_pending(current)) {
+>+				rc = -ERESTARTSYS;
+>+				break;
+>+			}
+> 		}
 
-Regards,
-Christian.
+One more thing, seems we changed the signal here, it's better to add a comment
+or note it in the commit message.
 
-> 
-> Best,
-> Bobby
-> 
-> 
->     >
->     > Best,
->     > Bobby
->     >
->     >>
->     >>> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com <mailto:bobbyeshleman@meta.com>>
->     >>> ---
->     >>>  drivers/dma-buf/udmabuf.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
->     >>>  1 file changed, 42 insertions(+), 5 deletions(-)
->     >>>
->     >>> diff --git a/drivers/dma-buf/udmabuf.c b/drivers/dma-buf/udmabuf.c
->     >>> index 94b8ecb892bb..f28dd3788ada 100644
->     >>> --- a/drivers/dma-buf/udmabuf.c
->     >>> +++ b/drivers/dma-buf/udmabuf.c
->     >>> @@ -141,26 +141,63 @@ static void vunmap_udmabuf(struct dma_buf *buf, struct iosys_map *map)
->     >>>         vm_unmap_ram(map->vaddr, ubuf->pagecount);
->     >>>  }
->     >>>
->     >>> +/* Return the number of contiguous pages backed by the folio at @i.
->     >>> + * A udmabuf may map only part of a folio, or reference the same folio
->     >>> + * in multiple non-contiguous runs, so folio_nr_pages() can't be used.
->     >>> + */
->     >>> +static pgoff_t udmabuf_folio_nr_pages(struct udmabuf *ubuf, pgoff_t i)
->     >>> +{
->     >>> +       struct folio *f = ubuf->folios[i];
->     >>> +       pgoff_t j;
->     >>> +
->     >>> +       for (j = 1; i + j < ubuf->pagecount; j++) {
->     >>> +               if (ubuf->folios[i + j] != f)
->     >>> +                       break;
->     >>> +               /* Same folio, but not a sequential offset within it. */
->     >>> +               if (ubuf->offsets[i + j] != ubuf->offsets[i] + j * PAGE_SIZE)
->     >>> +                       break;
->     >>> +       }
->     >>> +       return j;
->     >>> +}
->     >>> +
->     >>> +/* Count the contiguous folio runs in @ubuf, one sg entry per run. */
->     >>> +static unsigned int udmabuf_sg_nents(struct udmabuf *ubuf)
->     >>> +{
->     >>> +       unsigned int nents = 0;
->     >>> +       pgoff_t i;
->     >>> +
->     >>> +       for (i = 0; i < ubuf->pagecount; i += udmabuf_folio_nr_pages(ubuf, i))
->     >>> +               nents++;
->     >>> +       return nents;
->     >>> +}
->     >>> +
->     >>>  static struct sg_table *get_sg_table(struct device *dev, struct dma_buf *buf,
->     >>>                                      enum dma_data_direction direction)
->     >>>  {
->     >>>         struct udmabuf *ubuf = buf->priv;
->     >>> -       struct sg_table *sg;
->     >>>         struct scatterlist *sgl;
->     >>> -       unsigned int i = 0;
->     >>> +       struct sg_table *sg;
->     >>> +       pgoff_t i, run;
->     >>> +       unsigned int nents;
->     >>>         int ret;
->     >>>
->     >>> +       nents = udmabuf_sg_nents(ubuf);
->     >>> +
->     >>>         sg = kzalloc_obj(*sg);
->     >>>         if (!sg)
->     >>>                 return ERR_PTR(-ENOMEM);
->     >>>
->     >>> -       ret = sg_alloc_table(sg, ubuf->pagecount, GFP_KERNEL);
->     >>> +       ret = sg_alloc_table(sg, nents, GFP_KERNEL);
->     >>>         if (ret < 0)
->     >>>                 goto err_alloc;
->     >>>
->     >>> -       for_each_sg(sg->sgl, sgl, ubuf->pagecount, i)
->     >>> -               sg_set_folio(sgl, ubuf->folios[i], PAGE_SIZE,
->     >>> +       sgl = sg->sgl;
->     >>> +       for (i = 0; i < ubuf->pagecount; i += run) {
->     >>> +               run = udmabuf_folio_nr_pages(ubuf, i);
->     >>> +               sg_set_folio(sgl, ubuf->folios[i], run << PAGE_SHIFT,
->     >>>                              ubuf->offsets[i]);
->     >>> +               sgl = sg_next(sgl);
->     >>> +       }
->     >>>
->     >>>         ret = dma_map_sgtable(dev, sg, direction, 0);
->     >>>         if (ret < 0)
->     >>>
->     >>> --
->     >>> 2.53.0-Meta
->     >>>
->     >>
-> 
+Best regards,
+Dust
 
 
