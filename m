@@ -1,258 +1,180 @@
-Return-Path: <netdev+bounces-296353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7urnHBsqJmrkSwIAu9opvQ
-	(envelope-from <netdev+bounces-296353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 04:34:03 +0200
+	id KcnEH/ArJmo3TAIAu9opvQ
+	(envelope-from <netdev+bounces-296354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 04:41:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9E94652425
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 04:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA2966524AD
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 04:41:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=feh8QNO4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296353-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296353-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=s8lPYEYd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296354-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296354-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B436130154A5
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 02:33:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 02D0B3000521
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 02:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43CA31B824;
-	Mon,  8 Jun 2026 02:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8B931E846;
+	Mon,  8 Jun 2026 02:41:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A0A31A07B;
-	Mon,  8 Jun 2026 02:33:02 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780885984; cv=none; b=PSVwA6lobjWvEjfy3gzwfhFidef0MkLBYTD/p/F3AhQCmutFklUgyq2a3besjdzRsY9MRxi771mRIOcqhWF7IzN06IiB7YZzDVNYXc8Ae32yM4yl0v/PohIvhJU1yj7pReoNtDmf3TXSQ2pR6M2TsVBnhZq5GiIQpIFu9TOTegw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780885984; c=relaxed/simple;
-	bh=hRYA1v6TONHkk8dVg1Eh0j2KTA8iUyHFjBl7fyU0mGk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qURAe2J/HKiMSoNx1WMbS/xraMbZ+TgkDth5ms+iKzh439oWhoU25Aj2RL7VRvrcI7VWsZwHKGSBFxjL5XmkylOI7W00ZjHrYBOF7tvKBkHbVFvG9xlyMTNiEpJrgsXjZU9Ed6hSqvWu3z6pEjTK0O6lmJi3WPszUDGz/uDf+bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=feh8QNO4; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6580E8oS888595;
-	Sun, 7 Jun 2026 19:32:53 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=EO35ypFmyTTHdbX+vOV3YFL7O
-	077t34zhTJgKFXPeF8=; b=feh8QNO4BQMe3BQyLd1XrLwMk+m2TMOoLeVN3IvB9
-	/Nv1BAODC2FaB6UdVlAjJ8Z3NcdzQP7FpJOl/6l5/sN7k3F6ClkdzGh0BOuzQhdT
-	D9Jcxj5LaOZ32Zl7h2IhNahoEFb6lmlY+akB7AX3V1+EaqWLsTrETyE6i0ZX81LJ
-	Pgg19uQieaLZtWhIATKV36+2X2oeR/+cxYqaqd6/M25Q9jY+7r4/AjrdBYgocC5v
-	EnKRnegeWN8qHTi6m2KVhtLXOWzzSE2xUI9JGuWYGSVTvE0VUx/XjNeWu8KJuMR1
-	C90ue7k2T2CAjWQpepHNTbVDTjROJtmAHj3xc0ekSkvTw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4en7t8st49-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 07 Jun 2026 19:32:52 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Sun, 7 Jun 2026 19:32:52 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Sun, 7 Jun 2026 19:32:52 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 03CBF5B6932;
-	Sun,  7 Jun 2026 19:32:48 -0700 (PDT)
-Date: Mon, 8 Jun 2026 08:02:47 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v19 net-next 9/9] octeontx2-af: npc: cn20k: Allocate
- npc_priv and dstats dynamically.
-Message-ID: <aiYpz6XSjNXzFNtF@rkannoth-OptiPlex-7090>
-References: <20260605063245.3553861-1-rkannoth@marvell.com>
- <20260605063245.3553861-10-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDF92772D
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 02:41:47 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780886509; cv=pass; b=qjBWsaXzFv8QFbSmVdD9NkFPOoOqaFTYcIgHeK8CiK1yYKj8CVM4vg5ODYYg7WpcKhXE2vlBIECijKAd9QiOom5HAzxyxYAj8O7CVHf6sUOKCI2xypVLCKju4oyaN6ZoMec+kYNAT7wZDUENtafFCytj3QxUpMfGPE1TLRmvw5s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780886509; c=relaxed/simple;
+	bh=Nh7ZHpq/XNJFdqwO7lhwAzLTRleO5YExf1Y7bkJCOWU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QiHhJZpkRZ+mic7fr9BvabG4liFcOvOpZxXE5k34Hj3nGMp+Kst2bhID51IjpwYCSh6f3De5XBB0RE1N8SvtFIZgT29gepKWT8TWptQ7VuldqHRkJhxhrbnxKyw0NLBivk7oJh63ZN65v+bdyp6XtVwme59j4eVdAvWKMvLQcbo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s8lPYEYd; arc=pass smtp.client-ip=209.85.218.52
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-bf0170c80f7so610412566b.3
+        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 19:41:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780886506; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OS+k9O4gupaeNeCSQdblHPvSoqVkfT1Bnj36mvwL1XVNOluRQ/aJt77mG/IOPl0kcR
+         BkB3HAjE69xaN5flLyUFhTKD2anL12aYLW5qSsiTQ9B3m2Q/HfmXkxRW7AnNXeFrQ2ix
+         /T4A+e6GvsAZEo4OjFlF+MQ6oGcMqGeLEbaZq0QW4q2CxbBrGDpn7lFpwpAvvyZ8Vt9X
+         XcIAcE3VzUO7Is6ZaaP10QCijRMvRuP+gW7cNQ05Urh7dzga88zmn1HQ59wxgM4kK/gZ
+         Ec9bleTMAPF30/HpPSJI9A9+MsqZ1HiRK7hqjjplMYjWpNcT8J8OALKkvIhM9gBlbYkJ
+         J4HQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Nh7ZHpq/XNJFdqwO7lhwAzLTRleO5YExf1Y7bkJCOWU=;
+        fh=Vn3Qu57EU56adbqPBHc/tDK1r+NtNjTrX/UCn/kdGU4=;
+        b=gWhB2vSlLTYvLOOOuiIaFUVe706iwD4ujD/qGW+JcQfiCD/WXFp39Ia96faZmLrut1
+         isHSnr9+wVLpk9/88NC0hQYao74l+xEX9WeE+VAPx2lEVfEAMD7QBeRhiuRwnnUbn3fq
+         JszogVhPDu2jSa0CoBFd5/fnA1WB994IQlR9rOWKibD3i8Sy4GyPYRlZbkIZKqErTn9J
+         F/7vfLwKs+lFk+oQjRkIjzc8lHydo4UlSUYH4YKdvvTifkaN6snhvYy5ZKK7v56h/yuZ
+         XQ++P+MJDoZuutcw7OrCl46sPe5Memqy+b9zRx9NMpx7uodQo0J/6KLJFWBEoieZ/puC
+         c00A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780886506; x=1781491306; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nh7ZHpq/XNJFdqwO7lhwAzLTRleO5YExf1Y7bkJCOWU=;
+        b=s8lPYEYdSUpotTeS4lD9DjfPaCiw7SfjIm5hlKnQiFuFwaZmde+3Y2w0NcukwYbNy8
+         pP9wl9bZhvaB5s9Df/e0XufbOHjfXcnxf7E7NbeBgNS/Wgg1cIfUVwEbTm7P2H/dajO6
+         2YbgM20ZZEC0icHEDoYXACJ5xTLwfxXluXNfI8MEB3a7ho/yg0AUD1dkLSvwJQ+XRJwt
+         weoEgKaGpLoEySpSYoypWFDNZw0SEnhsEvk0DhYWn7Qi5vYw3lRop/mYoWtYDldZdnC9
+         LXUOnkjw8+W5fiuFU84bZ+8YIxlR3OugoyOUEAfkLEL0EYV3PNa7UZOIA1wP6jAybn5o
+         h0yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780886506; x=1781491306;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nh7ZHpq/XNJFdqwO7lhwAzLTRleO5YExf1Y7bkJCOWU=;
+        b=N/efEi5sAfy7j0W40i7FJlDH8QklZlngSIUzdVnA0r7XZkK407R7WsJzCmjl79iz/D
+         jzdau0DZtclO9fx+bosjKqwbZ5RH641uTTQQZPkyyhjIxORpIgW2QZ6pLeLVXwQhaeDC
+         sBPwb8YZL/psdxqmlsIkxvMRCUJRS5jKDHb2Ci1/EsyKjx69LUEzvzAQ6Sc3pdQ6qQ8P
+         o1IXDekSxoKHt0+Rb/yiA76X9B9E6vfAaSd5q9JyXPlBibhhrHsXBjq5888S8AG1nKEl
+         aQe8Gluft/rxKCi0XBAGOfQ/CEKLTVUMSoWmuW6aep7IhBhur+n8O69+cRJcaf5fR2Qi
+         7jAw==
+X-Forwarded-Encrypted: i=1; AFNElJ+VR9If1fW7LJ5ODcGfrfWmLXrSyGqyN3o6zEyogeYdhqpvFrmeDjL2Qbq7PC0GDwk5+uVAi8g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBYe5ALopT3o+WMsJzkI5HVj7E6dUfRC3rIZ5C+VecfCGTAR0n
+	0yqJEOr7f0a03RnuQsQgtMvmkP8F35I+TIDiNOD8dCBuMa6fwNojnkVf2szb9vZF9j85Ds3X8J6
+	B3TeJfDnEEFYuUsFc6ZtQylIH2/K8Dfw=
+X-Gm-Gg: Acq92OFkd38et4sFzcPx9y7S+CBO2nVVOcZBTyI8ul0ogu15uDq1gQCjeuOd/PWa6sh
+	R5y6V/coAo6NkGqE9NSmRlC/NLY7dgRmqt0BIrTyjBSx+OMJo+wE/WxZAfcrV7yQy6sjRTLSwrC
+	8p8pcZBa9uFaxgvKslJYg536dDOP4GtScAfPC6dLoEv+pAJOPQ6BLWs74Ntx2dyVARoEr7KmjoC
+	Da+gRgT3nTh4l9AEtpO2TkpbdvWyPJffjZmwEj944raNu/hUKqPavcqnrE4qawJFAHjZiDFZw9L
+	hr8GXwSx9ZwATN+tPs3uLFMakpZI4yyfxNh5k/kCueoMoEIawas=
+X-Received: by 2002:a17:907:7b8c:b0:bdf:bccd:a7e9 with SMTP id
+ a640c23a62f3a-bf36fba39d4mr553056166b.2.1780886506096; Sun, 07 Jun 2026
+ 19:41:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260605063245.3553861-10-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDAyMCBTYWx0ZWRfX/cNE3QrxZB/g
- HbY58fVdsT4APFIFwuys+mx8kFFlEt/d/rFN0NCkarWkZRqBE3dlyltOnnCaUoppspRRfBmqS6x
- 5oa/b1+NdEMrvYBwyCOO9gim1PiRTYEneRXs5cEOJoqcIK59Mvi8CPQsKBvN/cmkYxAG7m8W7ZF
- a6s5sT2iw33sIIHeojpJ4Ck89KUUUKu/DUNrX7PyfP1p0cZXpjse6mtLG8i9cojIp+hWUOtvNBx
- O7U7SQFWFjd9tRaEi/LufPhS4Sv65RXjKFi2ntEsa0r6quBpnrbNqz/h+DupMjbm6qhMJiIoslY
- VGM1oZQdPEkWweEezyAlZwkphEuUly+SjjwknuNPLzrAcUO30MkOsYWlwBPb2ih+hyrDNxCJYV4
- Y4kvm5fJ+cvpNpbn1NzB5tj81JnD9axcRYZq7CeKvRgXGl7LTr8mDWpobQTEcootBFeV1AiYB1g
- e8qHMItUTdkANPjNaKA==
-X-Authority-Analysis: v=2.4 cv=evLvCIpX c=1 sm=1 tr=0 ts=6a2629d4 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=gmVcXd00UEk1ZtStJLAA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: hOg0ES5fkkfv8KEGNfylvHo16a9DH8fl
-X-Proofpoint-GUID: hOg0ES5fkkfv8KEGNfylvHo16a9DH8fl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-08_01,2026-06-05_02,2025-10-01_01
+References: <20260606-realtek_forward-v13-0-b9e409687cbe@gmail.com>
+ <20260606-realtek_forward-v13-2-b9e409687cbe@gmail.com> <617aa489-4f0c-4fe0-8cf3-55c98f4d4d9e@yahoo.com>
+In-Reply-To: <617aa489-4f0c-4fe0-8cf3-55c98f4d4d9e@yahoo.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Sun, 7 Jun 2026 23:41:33 -0300
+X-Gm-Features: AVVi8Cdy2z9Vqfw4og3Kv21K7Vl64diqsXfUe7hpXdRDKjFHG4YNxhSZd60Rx3M
+Message-ID: <CAJq09z5_q2Pjpb3XBJiyzjt=KTCqcVF3FkcQOz5xtryKXVkpWA@mail.gmail.com>
+Subject: Re: [net-next PATCH v13 2/9] net: dsa: realtek: rtl8365mb: reject
+ unsupported topologies
+To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Linus Walleij <linusw@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-296353-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,rkannoth-OptiPlex-7090:mid,linux.dev:url,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:from_mime,marvell.com:email];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[yahoo.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:namiltd@yahoo.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:yury.norov@gmail.com,m:linux@rasmusvillemoes.dk,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yurynorov@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-296354-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D9E94652425
+X-Rspamd-Queue-Id: EA2966524AD
 
-On 2026-06-05 at 12:02:45, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Replace the file-scope static npc_priv with a kcalloc'd struct filled
-> from hardware bank/subbank geometry at init (num_banks is no longer a
-> const compile-time constant; drop init_done and use a non-NULL
-> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
-> through the CN20K NPC code paths, extend teardown to kfree the root
-> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
-> setup to use the discovered subbank count.
->
-> Allocate MCAM debugfs dstats via devm_kzalloc instead of a static matrix,
-> and use the allocated backing store consistently when computing deltas
-> (including the counter rollover compare).
->
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> Sashiko reports a potential deadlock around stats_lock, however I couldn't find a call chain reaching rtl8365mb_get_stats64() from softirq context. Can anyone point to such a path?
 
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260605063245.3553861-1-rkannoth%40marvell.com says
-:
+Hi,
 
->> @@ -397,6 +398,10 @@ int npc_cn20k_debugfs_init(struct rvu *rvu)
->>  	debugfs_create_file("vidx2idx", 0444, rvu->rvu_dbg.npc,
->>  			    npc_priv, &npc_vidx2idx_map_fops);
->>
->> +	dstats = devm_kzalloc(rvu->dev, sizeof(*dstats), GFP_KERNEL);
->> +	if (!dstats)
->> +		return -ENOMEM;
->> +
->>  	debugfs_create_file("dstats", 0444, rvu->rvu_dbg.npc, rvu,
->>  			    &npc_mcam_dstats_fops);
->What happens when this devm_kzalloc() fails?
->The only caller is rvu_dbg_npc_init() in
->drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c, which invokes
->npc_cn20k_debugfs_init() as a void call and discards the return value.
->By the time the new -ENOMEM path is taken, mcam_layout, mcam_default and
->vidx2idx have already been registered via debugfs_create_file(), and
->dstats, mismatch, idx2vidx and defrag are then skipped. Three of the
->four skipped files (mismatch, idx2vidx, defrag) have no relationship to
->dstats and seem to be dropped only as a side effect of where the
->allocation was placed.
->Would it be better to either move the dstats allocation up to
->npc_priv_init() (or to the very start of npc_cn20k_debugfs_init() before
->any debugfs_create_file()), or alternatively gate just the dstats
->debugfs_create_file() on the allocation success while still creating the
->unrelated files? In either case, should the caller also be updated to
->honor the return value?
+This patch series does not modify the stats collection logic itself.
+The analyzer likely flagged this because the series touches the loop
+that initializes the stats_locks, drawing attention to the locking
+structure. If this deadlock path is valid, it is a pre-existing bug.
 
-if "dtstats" debugfs is missing, it is still fine as this debugfs entry is used
-only for live debugging.
+Regarding the softirq context, my bet is that this path might be
+triggered by bonding or TC. Both can invoke dev_get_stats(), which
+eventually calls rtl8365mb_get_stats64(). During tests, you could
+inject a larger lock window (using mdelay()) to increase the chance of
+a softirq hitting while the lock is held.
 
->>  #include "cn20k/reg.h"
->>  #include "rvu_npc_fs.h"
->>
->> -static struct npc_priv_t npc_priv = {
->> -	.num_banks = MAX_NUM_BANKS,
->> -};
->> +static struct npc_priv_t *npc_priv;
->With the previous code, init_done was set to true only at the very end
->of npc_cn20k_init(), after npc_setup_mcam_section() succeeded, so
->'init_done == true' implied both the struct fields were populated and
->the hardware had been programmed.
->The new gate is 'npc_priv != NULL', but npc_priv is assigned by
->kcalloc() near the start of npc_priv_init(), well before bank_depth, kw,
->sb[], the xarrays, the mutex and the list head are populated. Does
->'npc_priv != NULL' still carry the same 'fully initialized' meaning that
->init_done used to?
+If that is indeed the case, we should replace spin_lock() with
+spin_lock_bh() in a separate fix targeted at the net tree (not
+net-next).
 
-npc_priv is initialized in npc_priv_init() during probe(). if any of the initialization
-fails, npc_priv is freed and set to NULL, and probe() returns with error.
+Regards,
 
->> @@ -4251,8 +4249,8 @@ int rvu_mbox_handler_npc_get_pfl_info(struct rvu *rvu, struct msg_req *req,
->>  		return -EOPNOTSUPP;
->>  	}
->>
->> -	rsp->kw_type = npc_priv.kw;
->> -	rsp->x4_slots = npc_priv.bank_depth;
->> +	rsp->kw_type = npc_priv->kw;
->> +	rsp->x4_slots = npc_priv->bank_depth;
->>  	return 0;
->>  }
->Should this handler also gain an 'if (!npc_priv)' guard?
->The other public entry points were updated to check for NULL:
->  npc_cn20k_vidx2idx()
->  npc_cn20k_idx2vidx()
->  npc_cn20k_dft_rules_idx_get()
->  npc_cn20k_dft_rules_alloc()
->  npc_cn20k_dft_rules_free()
->but rvu_mbox_handler_npc_get_pfl_info() now dereferences npc_priv->kw
->and npc_priv->bank_depth without a NULL check. Is that intentional, or
->is the asymmetry just an oversight?
-
-If npc_priv initialization fails, probe itself will fail. So these handlers are invoked much later by PF, which
-will be active only after AF is fully up.
-
->>
->> -	xa_destroy(&npc_priv.xa_sb_used);
->[ ... ]
->> +	if (!npc_priv)
->> +		return;
->>
->> -	for (i = 0; i < npc_priv.pf_cnt; i++)
->> -		xa_destroy(&npc_priv.xa_pf2idx_map[i]);
->> +	xa_destroy(&npc_priv->xa_sb_used);
->[ ... ]
->> +	npc_defrag_list_clear();
->> +	kfree(npc_priv);
->> +	npc_priv = NULL;
->>  }
->Previously the storage was a file-scope static, so teardown only flipped
->init_done. Now the storage itself is freed and the pointer cleared
->without any synchronization (no synchronize_rcu(), no flush of the mbox
->workqueue, no lock).
->If a racing mbox handler such as rvu_mbox_handler_npc_get_pfl_info() (or
->any of the npc_cn20k_dft_rules_* helpers) has already passed its
->'if (!npc_priv) return;' check but has not yet read a field, can it now
->dereference freed memory?
->The probe ordering may make this hard to reach today, but does the new
->free-and-NULL pattern introduce a use-after-free window that the old
->init_done flag did not have?
-
-rvu_remove() disables mbox first, so this case wont happen.
+Luiz
 
