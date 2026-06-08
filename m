@@ -1,336 +1,264 @@
-Return-Path: <netdev+bounces-296602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GiDuLGPSJmpxlAIAu9opvQ
-	(envelope-from <netdev+bounces-296602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:32:03 +0200
+	id qIz+Nz7TJmqklAIAu9opvQ
+	(envelope-from <netdev+bounces-296603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:35:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA78965737C
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:32:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 539EC6573F5
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:35:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=SeuFHyrn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296602-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296602-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=NcUFYYyJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296603-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296603-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=tu-dortmund.de;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6F7C8301C928
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 14:20:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E157C30A5B2D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 14:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5BA3C583B;
-	Mon,  8 Jun 2026 14:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41C43C5853;
+	Mon,  8 Jun 2026 14:22:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDC33C5523
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 14:20:43 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780928445; cv=pass; b=FRQNE1/CVMJDtAaQ/96PhDXeqYQik/XP4MiUyw+GR7bFAllHxPZRBgBv8bhmY1VDmffJl/aGyWZKDmQ30NeuOuuLfKtMUvvX1aGl8ArLZz+RFqQQMnw8FLYN5tdY4IQ+e9Ba6oPalZrjTG7/IzFdSaRhBWrFCEIWXN4gmHLzSYc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780928445; c=relaxed/simple;
-	bh=goVBPbGEYY6dqmwDEEyoB0ZQNu0i++zjxoebHoF+ErM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vqc1ky8aOvQcB9mgemUZRtkWnB1CeZsbpN5WLIkvv7v1cNImkk3c+eL7DOZSp4C3w+DNqWXAbHCVre1kRH/uft828ox2sr8S/Leb70tpDG9a1/Qbw1fP/w6KTRhRdGRMYSIQOMHRXhT4eDugsisx695LxbGC8ECcJ29foa119n0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=SeuFHyrn; arc=pass smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c0c32f6ce1so29158515ad.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 07:20:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780928443; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bO0AyLOcNG0qNNZN+n7+kFhBQY+Tt+u2LLlWTjD3mBaEpGAA2S3uV4rKZrLvWgfkIx
-         s8dpvFJSoCiQfcuJ3WOTux1hRtDyoerEiFIdWvQv9EqmoHqeMzrfZ5YsTflDrqneYjqa
-         Lr4Mf++pwYbL8EJJybMzyKHqqP8LPPMLdrT+6aOsi8M5KHcguC00wRKrDSU2+6RU2Y3U
-         LsLJIJUOOTL4qTBwHlJBV/e8207NcvtBjjUXH7bIY04gT6uoUOZo9VgpZJTzzN/niQDF
-         UieUqHueFNVUAw8AAAU9Y/V5PankJF/OuC3Kvx97mIFxkc4SS+BU2kMmQWlir2jtFX1u
-         cghw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bTSU8qGGB4GMU7MVxyCrKfUWS+7beNZEFnpam7Og7fY=;
-        fh=kSnoeSC/+SsvPZRm381O34fOniOoQF7hT2Yt0/VILEM=;
-        b=ODrUA3hPnOV1L+XyL+MZKn9N2ywAhzDwIMHnbKLLzJUFCna5+7FCdwkY55jJ2f7cfE
-         k2q5D8zCg7zDuTXtB8e/gb28tvURqpXVXOOvu0FK+9Hrd/OJA55ObprYjJXXbsM+qfNC
-         fingmhHGhZ+wmQ2h3UN/9s45gGgu69r2/w0iqSKJA7hgMHb0f0AAHZcMBvfRgXU+wo20
-         prJzJqVi1mi6P9JnAl6VE98DHCmLsSt1EgG7JlnyScvqTUl8RZKizYHASz4vUlII9vRz
-         0fL+QSePI9pshP0xuS+ZTOarUT09urigJ/pt+ha8Jg8jSgFqJ42m6YLyve5BalOLymjM
-         B6mg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780928443; x=1781533243; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bTSU8qGGB4GMU7MVxyCrKfUWS+7beNZEFnpam7Og7fY=;
-        b=SeuFHyrnyXde8RyAYQUrTEwIcb1EesWCpw59aINNM++YVoHj9F9t3vPtrnAkgWCof4
-         DLquBL8MGu/aiixRmuCabMLMCQ4j7/ympMTDjWq3ZvPIOzk75yRfPITMDdc0yN25c1P4
-         fZTkBGND90nEC/wX/3iYodUg43jPjcBQG5VetU9N4U9z4ehp7Td5sL51O0V0kL6kSFF5
-         OZ26q8YYDJNj/4cPr/shyRtjxSEtXW1fsjK5hv2wYHssVEROAIS5sPttBoXMq6LLL6fp
-         bpTEM3YduelzSzrPhewC7vSKoGs2Ap88jsVy9e5Zjw+QFyQ/pVDU+fkEY9xjGVaXBmcn
-         ckgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780928443; x=1781533243;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bTSU8qGGB4GMU7MVxyCrKfUWS+7beNZEFnpam7Og7fY=;
-        b=iKCOvBekwfGSDXX1nF7jbzb1ftHKls4w5Dxg56fdEcm1qTnHT2YTQOmFa3ruBh2CJy
-         l/VmG53pVAEkGsbDk/QwGCsjgHRUCdi/qQ2fq8bke9vpimCSG84Q7hQri4vxA8aLF0Sp
-         92EAdSb9w08FeiG08YO+S0vg1m9mvSfAD5wZFu4LjNaQXVf/fMvi0NioQFBQGLWrpMMs
-         VxAOa/aGGMUBlafOF91fJHEC4Egr/yIA4p2oOKV9+5mlVBgxp62Uk6QB+0zvvo1xEUdN
-         p3TDByS59g93JLbQkD3D6ET/1Pwot8nEnWdotdZwOGTBQVKPoQvV60PyOJezt25raki0
-         /8OA==
-X-Forwarded-Encrypted: i=1; AFNElJ9EfoqFSK4t7jLh78MPhGxmYt+kE/nRvrhVBgqglSFJ3GFvH8PilZBomAusW/jIrlJpXDbq5gs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq1ihHDJbsN5QRFohCGtbb5JACygL+XzGXokDwat0BcN+lMSgh
-	BGkr6bYYOvqhdEgYrdFknv3a0ZRyJlV47XJGzk94mT4lzi3Q1HBZHxPuavwPOsVlijH6Y7XzDHS
-	siimqrNLKodaUKJJ/4tke8a7v0wOxzf05WGcXdvuKuw==
-X-Gm-Gg: Acq92OH3flvQA7fAhoRoPVU5rdy5D1NO6neigxbG/LFTA8zqayZ+5SJIe3y8bJ3FUxo
-	wQswiE5XRN9RBu0IEkD/KNFB+rfjbF9Y5jaSOFGkpiNm/i1o65OO4gELYGp+C0BQrthnFBZX8la
-	Jr5SHX2z0/aoe2Qj0dk5veVYLTjLBxMGjGfZI4JxMOL0QRaMrcQ8Gbq5vEp8wD7lZJN6lEpcPyz
-	AlGUNGGhGU3e8syqMt9X2AAG+qPA2S4l18RC5sAnhebJnXwP8rjOk1vlwen4Tm6PCl1lNpClx0/
-	tKYFB/1xACDi54UF0z4kE3tDpV7ACfzrC+FJOLdaZ7OU65HLow==
-X-Received: by 2002:a17:903:fad:b0:2b2:ebed:7af5 with SMTP id
- d9443c01a7336-2c1e7b13addmr172377305ad.13.1780928442623; Mon, 08 Jun 2026
- 07:20:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4496D282F3C;
+	Mon,  8 Jun 2026 14:22:21 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780928545; cv=none; b=d+R7rno5seON2shEmg+9topE5cZtcRI07MCcsNLZQMg9tovbwlbRZwy8PhnMF+dICgODalCctOec8BJtFpUcrHTpBvx9I84kjPahPLhIeKNjRreqYaFZoyeYkHuDprRLPZSBt+D51SBWhASY/3MmuoLD7MzWRF61Zy+85I8UBwg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780928545; c=relaxed/simple;
+	bh=y4vALbuvRk0/F18Sg9jO/10j3xq8jP0c35s6LPh8uZM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UmG4m/fk1CSMQReM8F+rRaxjv80FAJ09QYVSoBp6T/EGxK1Zeu+FkTT9fWuQUputXuDiuJj52pGfhcBrL13j9WKP2VJoEDZ++UsUnIvtyrMTv09x2edBXZLHz5L1iz2c/u6PGKbWjjn9k/bzpMQu7ywfEXVRzbzoGdOA0E9GkwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=NcUFYYyJ; arc=none smtp.client-ip=129.217.128.51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1780928521;
+	bh=y4vALbuvRk0/F18Sg9jO/10j3xq8jP0c35s6LPh8uZM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=NcUFYYyJ77bXGKCBH6PsriVK8mgilPyVb+qd+BHeFdV4AynxDLwwgPXxnt2KLsfZq
+	 MAoYY1cf7KU/1wb8YEbOeal7UiaUURt2Cqeyn6GHT3aJde8g+rMP658+pwEt7QwmFD
+	 o1qS0n+iEWMf7D6Oxkpm+VCW8p8kOdOBd9rawyTk=
+Received: from [129.217.186.245] ([129.217.186.245])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 658ELxgl020041
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 8 Jun 2026 16:21:59 +0200 (CEST)
+Message-ID: <b8569d0f-7a99-4488-a1bb-63d813231b7d@tu-dortmund.de>
+Date: Mon, 8 Jun 2026 16:21:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260604163102.2658553-1-dominik.czarnota@trailofbits.com> <GV1P189MB198889FC61EF33D109D8B100C6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To: <GV1P189MB198889FC61EF33D109D8B100C6112@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-From: Dominik Czarnota <dominik.czarnota@trailofbits.com>
-Date: Mon, 8 Jun 2026 16:20:30 +0200
-X-Gm-Features: AVVi8CetG0KRwyOxlOoipvgIy7fDieIkrSeaBn3CaRiNNK87JciYz4irJmH4w6k
-Message-ID: <CAHypQ8X54PvnsrR6V2XUeD-z2c-F4zka56My+pSR3YaKxwCHig@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: Simon Horman <horms@kernel.org>, 
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+        Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+ <db2aa3b9-09d4-46d8-aafc-0a859ee8b635@tu-dortmund.de>
+ <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
+ <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:horms@kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[dominik.czarnota@trailofbits.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296602-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296603-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:j.koeppeler@tu-berlin.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dominik.czarnota@trailofbits.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,bootlin.com:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tu-dortmund.de:dkim,tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dql.limit:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA78965737C
+X-Rspamd-Queue-Id: 539EC6573F5
 
-Hi,
+On 6/8/26 15:13, Jonas Köppeler wrote:
+> 
+> On 6/8/26 3:04 PM, Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 08/06/2026 12.38, Simon Schippers wrote:
+>>> On 5/27/26 15:54, hawk@kernel.org wrote:
+>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>
+>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
+>>>> excessive NAPI scheduling overhead and qdisc requeues.
+>>>>
+>>>> Accumulate BQL completions and flush them when a configurable time
+>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
+>>>> queuing delay to the configured interval. Coalescing state persists
+>>>> across NAPI polls in struct veth_rq so completions can accumulate
+>>>> beyond a single budget=64 cycle.
+>>>>
+>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
+>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
+>>>> completion.
+>>>>
+>>>>    ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
+>>>>    ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
+>>>>
+>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>
+>>> I found the issue that n_bql may become infinitly large if producer
+>>> and consumer have the same speed (and tx_usecs is large). It could
+>>> cause a potential BUG_ON if n_bql grows beyond INT_MAX...
+>>> Also I figured that no hardware BQL driver ever completes more than
+>>> BQL limit many elements.
+>>>
+>>> Therefore, I propose a simpler logic (see attachment) that completes
+>>> either on the usual bql_flush_ns or if n_bql > dql.limit.
+>>> If n_bql > dql.limit then we either have the case above that the
+>>> producer is as fast as the consumer or we have BQL starvation.
+>>>
+>>> if (state->time + bql_flush_ns <= current_time ||
+>>>     state->n_bql > peer_txq->dql.limit) {
+>>>
+>>> It must be n_bql *bigger than* dql.limit because the producer will
+>>> always exceed the limit before it stops, see netdev_tx_sent_queue().
+>>> It is fast because peer_txq->dql.limit is in the cacheline of the
+>>> completion path, see dynamic_queue_limits.h.
+>>>
+>>> Another advantage is that we avoid the snippet checking for empty
+>>> and BQL stopped which requires an smp_rmb() and an test_bit().
+>>>
+>>> Apart from that I:
+>>> - Always call veth_bql_maybe_complete() in the for loop to have
+>>>    more accurate completion intervals when having mixed XDP and
+>>>    non-XDP packets.
+>>> - Made it so tx_usecs = 0 is now also a normal case.
+>>> - Change the type of n_bql to uint instead of int.
+>>> - Added _ONCE() for tx_coalesce_usecs as suggested by Paolo.
+>>> - Moved the bql_state init in __veth_napi_enable_range() in front
+>>>    of napi_enable() to avoid a race (Sashiko).
+>>> - Moved the bql_state reset in veth_napi_del_range() after the
+>>>    ptr_ring_cleanup() (probably does not matter but makes sense to me)
+>>>
+>>> Benchmarks look just fine, see commit message.
+>>>
+>>> WDYT?
+> 
+>>
+>> Looks good to me, I will use this in my V7 patchset.
+>>
+>> A bike-shedding issue: We change the coalescing parameters for the veth
+>> net_device, but should this be a TX or RX parameter?
+>>
+> 
+> Hi,
+> 
+> The results look a little bit suspicious, that in some cases the p99 is smaller than the average, which can happen if you have really large max values. It feels something is off with the methodology. I think we should drop the avg, and include the max value. This would give a better picture.
 
-On Fri, Jun 5, 2026 at 9:33=E2=80=AFAM Tung Quang Nguyen
-<tung.quang.nguyen@est.tech> wrote:
->
-> >Subject: [PATCH net] tipc: require admin privileges for TIPCv2 mutators
-> >
-> >TIPCv2 registers its generic-netlink mutating commands without permissio=
-n
-> >flags. Generic netlink only checks CAP_NET_ADMIN when an operation carri=
-es
-> >GENL_ADMIN_PERM or GENL_UNS_ADMIN_PERM, so callers without
-> >CAP_NET_ADMIN can invoke these setters.
-> >
-> >This allows an unprivileged caller to change TIPC control-plane state, i=
-ncluding
-> >bearer, link, network, monitor, peer and crypto-key state.
-> >TIPC_NL_MEDIA_SET is broader because it updates the shared media default=
-s
-> >returned by tipc_media_find(), including UDP MTU, priority, tolerance an=
-d
-> >window values, which can affect later bearer setup.
-> >
-> >Require CAP_NET_ADMIN for all TIPCv2 mutators. Use
-> >GENL_UNS_ADMIN_PERM for network-namespace scoped state, matching the
-> >legacy compat path and normal netns administration semantics. Use
-> >GENL_ADMIN_PERM for TIPC_NL_MEDIA_SET because it mutates global media
-> >defaults rather than state owned only by the target net namespace.
->
-> A similar patch has been submitted using the same AI:
-> https://patchwork.kernel.org/project/netdevbpf/patch/20260602133555.76972=
-7-2-michael.bommarito@gmail.com/
->
-> Your patch suggests using GENL_ADMIN_PERM while above patch does not.
-> Did AI suggest using GENL_ADMIN_PERM or you suggested it yourself ?
->
+Luckily I saved the raw test result from /tmp (the raw ping output
+is included).
 
-Yeah, the GENL_ADMIN_PERM came from AI. The reasoning is that
-TIPC_NL_MEDIA_SET changes media_info entries within the global
-media_info_array [0, 1] so I believe it should require CAP_NET_ADMIN
-in init_user_ns rather than the userns owning the target netns.
+extract_ping_p99() seems to be broken. It has issues ordering the
+numbers. So if there are 2 or 3 numbers after the point I think.
+avg ping is fine.
 
-However, since the legacy compat TIPC netlink path can reach the
-__tipc_nl_media_set functionality through the TIPC_CMD_SET_LINK_*
-operations, I agree that the GENL_UNS_ADMIN_PERM is the right flag for
-this fix. With my patch the TIPCv2's TIPC_NL_MEDIA_SET operation would
-be stricter than the compat path and one could still reach it by
-entering a new userns and using the legacy compat path.
+Claude Sonnet wrote a script for me to recalculate the p99 pings
+from the raw ping output).
+Below is the new result. Not 100% sure but this seems right now.
+Most pings are the same.
 
-That said, the global nature of the `media_info_array` warrants a
-separate discussion: should both v1 and v2 paths require CAP_NET_ADMIN
-in init_user_ns for the media link operations since global data is
-modified? If you agree, I think this could be handled in a separate
-patch.
+Ping RTT ms (p99)
+===========================================================================
+nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+-------+-------+-------+-------+-------+--------+--------+---------++------
+     0 | 0.028 | 0.115 | 0.159 | 0.161 |  0.163 |  0.161 |   0.163 || 0.154
+     1 | 0.027 | 0.123 | 0.169 | 0.172 |  0.169 |  0.173 |   0.172 || 0.169
+    10 | 0.030 | 0.117 | 0.189 | 0.193 |  0.195 |  0.192 |   0.196 || 0.186
+   100 | 0.045 | 0.134 | 0.233 | 0.368 |  0.365 |  0.369 |   0.361 || 0.358
+  1000 | 0.230 | 0.300 | 0.412 |  1.26 |   2.11 |   2.12 |    2.13 ||  2.07
+ 10000 |  2.04 |  2.55 |  2.54 |  2.72 |   3.77 |   12.1 |    20.1 ||  20.3
 
-[0] https://elixir.bootlin.com/linux/v7.0.11/source/net/tipc/bearer.c#L51-L=
-60
-[1] https://elixir.bootlin.com/linux/v7.0.11/source/net/tipc/bearer.c#L1328=
--L1342
+> 
+> Is state->n_bql += veth_ptr_is_bql(ptr) something that is commonly done in the kernel? It relies on bool normalization which feels a bit implicit to me.
 
-> >
-> >Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api=
-")
-> >Assisted-by: Codex:gpt-5.5-cyber-preview
-> >Signed-off-by: Dominik 'Disconnect3d' Czarnota
-> ><dominik.czarnota@trailofbits.com>
-> >---
-> > net/tipc/netlink.c | 12 ++++++++++++
-> > 1 file changed, 12 insertions(+)
-> >
-> >diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c index
-> >1a9a5bdaccf4..5bbe134284ac 100644
-> >--- a/net/tipc/netlink.c
-> >+++ b/net/tipc/netlink.c
-> >@@ -152,11 +152,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =
-=3D {
-> >       {
-> >               .cmd    =3D TIPC_NL_BEARER_DISABLE,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_bearer_disable,
-> >       },
-> >       {
-> >               .cmd    =3D TIPC_NL_BEARER_ENABLE,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_bearer_enable,
-> >       },
-> >       {
-> >@@ -168,11 +170,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =
-=3D {
-> >       {
-> >               .cmd    =3D TIPC_NL_BEARER_ADD,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_bearer_add,
-> >       },
-> >       {
-> >               .cmd    =3D TIPC_NL_BEARER_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_bearer_set,
-> >       },
-> >       {
-> >@@ -197,11 +201,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =
-=3D {
-> >       {
-> >               .cmd    =3D TIPC_NL_LINK_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_node_set_link,
-> >       },
-> >       {
-> >               .cmd    =3D TIPC_NL_LINK_RESET_STATS,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_node_reset_link_stats,
-> >       },
-> >       {
-> >@@ -213,6 +219,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
-{
-> >       {
-> >               .cmd    =3D TIPC_NL_MEDIA_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_media_set,
-> >       },
-> >       {
-> >@@ -228,6 +235,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
-{
-> >       {
-> >               .cmd    =3D TIPC_NL_NET_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_net_set,
-> >       },
-> >       {
-> >@@ -238,6 +246,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
-{
-> >       {
-> >               .cmd    =3D TIPC_NL_MON_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_node_set_monitor,
-> >       },
-> >       {
-> >@@ -255,6 +264,7 @@ static const struct genl_ops tipc_genl_v2_ops[] =3D =
-{
-> >       {
-> >               .cmd    =3D TIPC_NL_PEER_REMOVE,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_peer_rm,
-> >       },
-> > #ifdef CONFIG_TIPC_MEDIA_UDP
-> >@@ -269,11 +279,13 @@ static const struct genl_ops tipc_genl_v2_ops[] =
-=3D {
-> >       {
-> >               .cmd    =3D TIPC_NL_KEY_SET,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_node_set_key,
-> >       },
-> >       {
-> >               .cmd    =3D TIPC_NL_KEY_FLUSH,
-> >               .validate =3D GENL_DONT_VALIDATE_STRICT |
-> >GENL_DONT_VALIDATE_DUMP,
-> >+              .flags  =3D GENL_UNS_ADMIN_PERM,
-> >               .doit   =3D tipc_nl_node_flush_key,
-> >       },
-> > #endif
->
+Ok, we could swap for something like 
+
+if (veth_ptr_is_bql(ptr))
+	state->n_bql+;
+
+> 
+>> For physical NICs adjusting TX coalescing will affect the BQL as this
+>> affect the TX completion of the transmitted packets. For veth, it is the
+>> veth-peer's RX NAPI that is "completing" or emptying the ptr_ring, which
+>> is where this patch adds netdev_tx_completed_queue calls for BQL.
+>> Any opinions on the "TX" or "RX" color?
+
+Personally I would also say TX.
+
+> I think I would prefer to configure it on the tx dev, and the recv side gets the value from the peer. Maybe something like this.
+> 
+> @@ -997,11 +998,12 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>         struct veth_bql_state *state = &rq->bql_state;
+>         int i, done = 0, n_xdpf = 0;
+>         void *xdpf[VETH_XDP_BATCH];
+
+Why this deletion?
+
+> -       struct veth_priv *priv;
+> -       u64 bql_flush_ns;
+> +       u64 bql_flush_ns = 0;
+> 
+> -       priv = netdev_priv(rq->dev);
+> -       bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
+
+I see we should check if peer_txq exists.
+
+> +       if (peer_txq) {
+> +           struct veth_priv *peer_priv = netdev_priv(peer_txq->dev);
+> +           bql_flush_ns = (u64)READ_ONCE(peer_priv->tx_coal_usecs) * 1000;
+> +       }
+> 
+>         /* Clamp stored timestamp in case we migrated to a CPU with a behind
+>          * sched_clock(); prevents the deadline from never firing.
+> 
+> - Jonas
 
