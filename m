@@ -1,199 +1,128 @@
-Return-Path: <netdev+bounces-296712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tQNWFusmJ2q3sgIAu9opvQ
-	(envelope-from <netdev+bounces-296712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:32:43 +0200
+	id FMXeEGwmJ2qfsgIAu9opvQ
+	(envelope-from <netdev+bounces-296713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:30:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC74165A75C
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:32:42 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C906C65A723
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:30:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=hmh6GgEc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296712-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296712-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=H+RR+km9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296713-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296713-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 295E53013A50
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:25:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3EC8F300E289
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CBE3B19CD;
-	Mon,  8 Jun 2026 20:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956563955C6;
+	Mon,  8 Jun 2026 20:30:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741B13B14B0
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 20:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE1E38E8D4;
+	Mon,  8 Jun 2026 20:30:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780950306; cv=none; b=hb6RniKfTUlepoTbkj3FYwTtRH9Ckc5JpbPMTWn14p76PlJWTJzvmsW3nqRIjS7pAECFSSlKdRzVUCM/n4DtOf1FLXdpfJuk8bMI0FWk93OFovrt+nfIf97+3o3HXl+I509G9gqfdsXnNloCHUlYuM8kzbURXiRj4tDu0ZsNRB4=
+	t=1780950632; cv=none; b=qAUf6ntDygVV1PP6aIYD8VEOqwm6jbq7dADTPIBuC+UStkjuxsdYvy1cK+0lwcEehjNaOYOQlt/PMOUagPmr9SZQXwVdgJFM3NCqPSCDkrSnCzFoj+Qu3MhdP/muPoCfEN4cP2WNzrfw400x1b3AkX4SEXT3H/5/2h54MXssOCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780950306; c=relaxed/simple;
-	bh=CcXHn9S8u1cOPsToW7mASeAPsynC5+Mdc21kpMoNal8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ctAAerBHbZfiC2TwrqDWl+p6c4KLb/JzNXz+gH5ZlX8Kbw0Pad31DwXK3AAqDAjxMKPgHi8B6bJmV8be4wUmq6AVEWHyeJEqNdiaXme9j6Mb3orwunQcAl9aWE/RWur7s58xFnNAZC41JwKNwsM8PXrBY4KKqp3BdpbKUhdca7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmh6GgEc; arc=none smtp.client-ip=209.85.128.175
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7dc2b658544so43248557b3.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:25:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780950302; x=1781555102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kpFVOPiFzhLsPysXxjpYGvfhd5BQhGBhO9lG7IWGmcs=;
-        b=hmh6GgEc7bcGsxHB83OQIKYcTiEe/S7Q8SZZBrhVi9at0ZzBjldoUMttWQdmhS5aQd
-         SMlFXx2jmjIel8V8OAG2vsbrBlAxlsFQYdzpo/4L8YQzip6zXleEPH4jdpuL7xQ+9HkP
-         hrHeEFt8mDpDI+I+UNMljaaEXvlw8VwpAjkuBxQCePFFfVOHrUpwV+tNWKR0ccFhISl6
-         xcNHP/W3U2u1GoTmusdsEwoi+Tkqemq6mMWtHEvtk2jA9AqvG1z41nOMKQtUDrIS440u
-         T3anDQN2duMfAr4748QhUbMsgUoU/5efL+xmRZpa4RoRCZXQyDWf6UdQLPUTSgdllC+0
-         IkVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780950302; x=1781555102;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kpFVOPiFzhLsPysXxjpYGvfhd5BQhGBhO9lG7IWGmcs=;
-        b=Tse9IamWnTh1+9KZRLwMLSrznOnFNF5XTM2fL6JXbfBmku5SsC0KD+yD0UZKRHMm8o
-         ncUlnGSXHiog++C19YVYcqqwKrrHb4gQvDgA3cKHkf6LfJ7/OIh39rOyQX1hJeqwM8gH
-         +iqAsOAzefbHqqU/xo3SZ99qpo6TIFPMRs7jxYTat7nMg3HpzxtaJhdHYQ5wt5w1rkRX
-         ghafkRPrKq+uCZvD0Pefx3vCLvyWjt8QrCEniLQtd5/8VG82Y2dAiTt97r+H8TLfdpoZ
-         b6Q/AZiqRMWQRCgG2YgNsvaHbkKInKJBU6ytVH/DBRhh2fi5OaUKgOy0K3V0/Yc32hGq
-         qYtg==
-X-Gm-Message-State: AOJu0YzhAvRVmdu9/xoKAkQ4prKXeFH3l9dRqO2TxiHUD7qrEBtrSijf
-	y+d+6g9AgZlAoU1rm4Fg7Rcr3Jybh49maH2wAIzA/HR2k9oNRbeL5Iu6
-X-Gm-Gg: Acq92OFDA+uiOhTiaL3GddDY5Aik49gW6PgygWLsDu+xB1Wz0Pw8Yp5W/zwqBEDzOf4
-	yh4ZupSuejaXreAvNNGOW9p59Y0bOCEW5BChiA6e77+d0aBzhZgw8U0KkP9ixBaHxQunt+mSP29
-	ZC+9GCgBlYLrd+lg/z8ghTzwyD4FuuYWEBZwIKlLKhjghedHE3Oc4btWitvmLkLZk5qElOPtFOb
-	4hl6YnjIdMNjt2YYOm3sR7qYg6cy+GTatbbb977VGxIgkgRTC4V1Yt9UBnoM/B4ZTb9S/JAG6QE
-	L5lBunUM4OgPCDOQ2y2PV1lGCXYMAPvbUc4LWkMd8XAbFEbJ0GjyBTvT9YYma9Rj68woymq/rm5
-	JgdfShYUqE99OOlD30wIkqoz1/bq/vWvmyo8kmYkYmWNykaRUdOj9jMmqmr2dQUZXyn7WI5LzRY
-	sCbwOaspkMnjdm7SnPo4MBnpGsqexnihwuTqRJQCCJWJytNZX7sSgr/k7PSjsRTK6IwAJx7XBGK
-	wDOyy4LZ5o3X4VTdg==
-X-Received: by 2002:a05:690c:c14:b0:7d4:3090:f39 with SMTP id 00721157ae682-7ed11d43754mr165792837b3.42.1780950302145;
-        Mon, 08 Jun 2026 13:25:02 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20fa250dsm87973267b3.5.2026.06.08.13.25.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 13:25:01 -0700 (PDT)
-Date: Mon, 08 Jun 2026 16:25:01 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.cc30d5c2f9ee@gmail.com>
-In-Reply-To: <20260608173305.372987-3-kuba@kernel.org>
-References: <20260608173305.372987-1-kuba@kernel.org>
- <20260608173305.372987-3-kuba@kernel.org>
-Subject: Re: [PATCH net-next 2/2] selftests: drv-net: so_txtime: check IP
- versions
+	s=arc-20240116; t=1780950632; c=relaxed/simple;
+	bh=ro13X8bYyZN635AsD1TAc0Se21/nyspGsLYa8UAWjSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V3ER+b8z8I9camCrZ2uD6imXHw06An2RhxJV0O4Y6bmBQ0lxh600XEg3P2VtL8MOIXwedK+0VyhqDhnQvTYbfDLD2OOwk4bbpDUwpqDy+Yv4bL8pQDeFRovrYO3/e1i7ocDYhujEBcv8FUFEHIZEeM2hf+ls/KMCjlcqORiiq48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H+RR+km9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC9B41F00893;
+	Mon,  8 Jun 2026 20:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780950631;
+	bh=BDDI0zZ85tZ3dra1dzCyCbAmBdm/ZjszTpTSBf91ICk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=H+RR+km9F27/4FtD/nDVbbsskwOtzC3R+aaRnoK93RfDjLtT0P1d0+Vvj/oIZ7Ytx
+	 4Yq94jO7XGV2gcXKD4cl/8tcnEF6f6HuMrgHtevN41QbQ7T63wcm38+7Py0yNWpktj
+	 pwX/PwCeEYUO0L7oUu97Yj73OKH7CpIbY7bd2bZrICfzfNrv4sy5GkCNiAZFhvpOZ9
+	 Ntu5+0aRb6a5VoJeI0XntIfSNP4diIMlz8UD36rhBprJUcmtc+sRbx2QtCVVGBSqIF
+	 fDE+FDl7eU3HTyBklFfw4cORoaHSVqt0QlCHpb8kMh6teJ8vIJUaUDGNgNtQYb2mvZ
+	 eYFxS98Gok2BA==
+Date: Mon, 8 Jun 2026 13:30:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>, "Matthieu Baerts
+ (NGI0)" <matttbe@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Carolina Jubran <cjubran@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Daniel Zahka <daniel.zahka@gmail.com>, Shahar Shitrit
+ <shshitrit@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, Parav Pandit <parav@nvidia.com>, Adithya
+ Jayachandran <ajayachandra@nvidia.com>, "Shay Drori" <shayd@nvidia.com>,
+ Kees Cook <kees@kernel.org>, Daniel Jurgens <danielj@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next V5 00/12] devlink: add per-port resource
+ support
+Message-ID: <20260608133029.3e1ef109@kernel.org>
+In-Reply-To: <20260407194107.148063-1-tariqt@nvidia.com>
+References: <20260407194107.148063-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-296712-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:andrew@lunn.ch,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296713-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:horms@kernel.org,m:donald.hunter@gmail.com,m:jiri@resnulli.us,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:shuah@kernel.org,m:matttbe@kernel.org,m:chuck.lever@oracle.com,m:cjubran@nvidia.com,m:ohartoov@nvidia.com,m:moshe@nvidia.com,m:dtatulea@nvidia.com,m:daniel.zahka@gmail.com,m:shshitrit@nvidia.com,m:cratiu@nvidia.com,m:jacob.e.keller@intel.com,m:parav@nvidia.com,m:ajayachandra@nvidia.com,m:shayd@nvidia.com,m:kees@kernel.org,m:danielj@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:gal@nvidia.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,m:danielzahka@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,lunn.ch,davemloft.net,kernel.org,gmail.com,resnulli.us,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,intel.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lib.py:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AC74165A75C
+X-Rspamd-Queue-Id: C906C65A723
 
-Jakub Kicinski wrote:
-> This test needs more work, and it fails in non-obvious way
-> when IPv4 connectivity is not available:
-> 
->   # Exception| CMD[remote]: /tmp/vjquwblf/gukinuzqso_txtime -4 -c mono -t 1780939014114542914 -S None -D None a,0 -r
->   # Exception|   EXIT: -15
-> 
-> Explicitly check for IPv4 support to make the future triage
-> less painful.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, 7 Apr 2026 22:40:55 +0300 Tariq Toukan wrote:
+> Userspace patches for iproute2:
+> https://github.com/ohartoov/iproute2/tree/port_resources
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-but two comments FYI:
-
-> ---
->  tools/testing/selftests/drivers/net/so_txtime.py | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
-> index ddcd2c0e06a8..8fe061f52055 100755
-> --- a/tools/testing/selftests/drivers/net/so_txtime.py
-> +++ b/tools/testing/selftests/drivers/net/so_txtime.py
-> @@ -64,6 +64,7 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
->  @ksft_variants(_test_variants_mono())
->  def test_so_txtime_mono(cfg, ipver, args_tx, args_rx):
->      """Run all variants of monotonic (fq) tests."""
-> +    cfg.require_ipver(ipver)
-
-This may cause aconflict with my outstanding SO_TXTIME series.
-And more importantly miss having it in the new test_so_txtime_fq_tai
-variant.
-
-Could this test be moved to test_so_txtime that all of them call?
-
-(there is WIP to add another mono_hw variant too)
-
->      _qdisc_setup(cfg.ifname, "fq")
->      test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, True)
-> 
-> @@ -86,6 +87,7 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
->  @ksft_variants(_test_variants_etf())
->  def test_so_txtime_etf(cfg, ipver, args_tx, args_rx, expect_fail):
->      """Run all variants of etf tests."""
-> +    cfg.require_ipver(ipver)
->      try:
->          _qdisc_setup(cfg.ifname, "etf", "clockid CLOCK_TAI delta 400000")
->      except Exception as e:
-> -- 
-> 2.54.0
-> 
-
-
+Hi! As far as I can tell these iproute2 patches have not even been
+posted? Please try to get them upstream ASAP, we have to manually 
+carry them in the CI right now.
 
