@@ -1,167 +1,203 @@
-Return-Path: <netdev+bounces-296505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jb1iHPmrJmqwawIAu9opvQ
-	(envelope-from <netdev+bounces-296505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 13:48:09 +0200
+	id IkgrG56qJmpcawIAu9opvQ
+	(envelope-from <netdev+bounces-296506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 13:42:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD539655D75
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 13:48:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D72C6655CBF
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 13:42:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=CU33JHhO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296505-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296505-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=suse.com;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=QNEWST2G;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296506-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296506-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7980305B59D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 11:40:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5CE833016D3D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 11:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17C936B06A;
-	Mon,  8 Jun 2026 11:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBC236B048;
+	Mon,  8 Jun 2026 11:42:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEC336AB6B
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 11:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE2C3382CB;
+	Mon,  8 Jun 2026 11:42:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780918827; cv=none; b=iqCB+rltjrXMNa1AoxqaB3+cqemgVQ8+g2yVzcirez1OpNTd9gGy8Bp3CZulIzGwh2WWeGBiJhr7OaAW/ifu4cSjOeDgK998azACA8sY0a928AdavdgJ/JRF/ISOqDflMYnehe2iJm57E+dsK/8YUZHN7LHSVkDUnufUUbUYex4=
+	t=1780918931; cv=none; b=scVXCJqhiEj8t1C5lssFMbsgLTc3BjAGMT72YRB8LBn2NPe/t/2752DSLD1n5XWF2Z/yhy+71/dfvEPcA/f9gcRaTPcqKw3BR+9tXvkAlubs5dvrB7oXozTBEkZ5lJ7e0PKmBIfg5tkOjoVsJnOsGTsg2N5+qu4QmTtkNu9hgU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780918827; c=relaxed/simple;
-	bh=gt817j5d2FZcQYx9aiRFtGll+41qpg8M37eW3rPlaLM=;
-	h=Message-ID:From:To:Cc:In-Reply-To:Subject:Content-Type:Date; b=uDLueJ+ZP06Ix9sRTNJ1CBHcSQGSeXzkk41wNoE0VJV/7FaRRYX370zCOsKzp09nbS6WbLI+BQw4f3O1P98I0MaEXH0Rc996RT6pnOjUxMksNF29thNqd36wvpkQ01WGvgjkLahgmIBiOgyttfObKmr05e+l9vZTr4h1Ur31a6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CU33JHhO; arc=none smtp.client-ip=209.85.221.52
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-45efb698ef2so1895158f8f.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 04:40:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780918824; x=1781523624; darn=vger.kernel.org;
-        h=date:content-transfer-encoding:subject:in-reply-to:cc:to:from
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gt817j5d2FZcQYx9aiRFtGll+41qpg8M37eW3rPlaLM=;
-        b=CU33JHhOJJpl7G85SmXd37aYDGyPNc1hcQU4q+6OJ/2MUTacmuThcIoEtwOpdud9nR
-         9/HdLyCw/h6jDB7VnA4vDU8ICEQRvuBVcEz/L4CdSZ0GzGJTb1aL4wu6Dgvgw5vBRNyp
-         wA1tJLT+bol7dh3VO+K7B7YxZKMLkw9lCpk52epadCuzaKdyARU4lmYukD8IxlpERS+Q
-         uLUFqKLdIRuOCNN/e1LLwxwOPeJ+e6pVjjQj+injFQHEgDxYRUWWeBaAvQB9sgS8mKbz
-         +8ARhmnOYxUGm2JN95dC+P7KudilAnUI00WGu1vcxdbCtJnLchqiBwacxAHLp3mnBJUR
-         fq9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780918824; x=1781523624;
-        h=date:content-transfer-encoding:subject:in-reply-to:cc:to:from
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gt817j5d2FZcQYx9aiRFtGll+41qpg8M37eW3rPlaLM=;
-        b=szyEhWMxjpa1Tjn3y7fvH47ziaLodbtroMijfCyyokasSw2A7EPIRZ+TEcPFus4Og5
-         mkWRgkZq93htiUD2PzwUSccfM0bT7Y7EHYItIGg/b60OXvefBsZQBn13FSeRdqX2tghI
-         a22RPgHOtSJiOZoK3CFkzMS9cROGZhBVxknWOsWFg3OTmEpM2NOnw6LZuadgK3SHZrM0
-         M13KHoQ8JCx1pFvuTM5C8+HFA4oAbFln7d7zjS0Yrw2T4f915GaEw9JgEbq/W8w4xshf
-         cieuS2C3Fhy6mtOmujAIgxv1/wECVwnPMqRN3hcS+evg094/eDpdyW8W24aaHcEUFBcQ
-         JAXw==
-X-Forwarded-Encrypted: i=1; AFNElJ8kBNU5Vn0sADqVoLSc1PmWC0BCjtFoyRKLN51AkXuRvmyOuHHd061MXHP+uLh/6jx/ZzLQPZs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqjUhv3xiGTj5xkIbeMRXVVykpe9XGJbkD0m1afQLwP3yH/9Xb
-	W9rNZikTQOsWxXIMhJBaPVjwr18ToDTk691rBwy+vS4byfMC3gmidVHh2gLoZdliys4=
-X-Gm-Gg: Acq92OGavN4fLLFXxPTupcRWlMBCfFQCpzv/IrLal4sRnM+llpvCFM8PuT//BNObtS2
-	bbSS07iWnAGqgeCwpS09/DG6PIj8yReIQVzjQRFgo6xFS7V4nvfUnEX3dwGXkgIJfUDc2y3w28f
-	2Gu6i/x8cE1kPbibAt/z2O3lCsSpENxnFE+zwN9BQvjeXTjVZcpT20EuTLvUlDk9u9afMYa/ieI
-	xEg6quHVBt4FvE+V0Df7G12lB7TvdjgioWC6qrXKn/6qJQTV10VWPIdwDQA8MsJxeVTlE/ebMwW
-	Eb6f6W3tyYNiZ52wE6G4b8Xlpql/hPFqQVURkBWGs6mtzIfNrSaTlRHBFTWfQ0OBJncbMfiiy0+
-	m0HZDj1mgKRFXBbqcGZqYxYhKNG3puIcxPT8yK+1nr6CQfBrvoRP2QN7i0h0YYOvtu5Agu9zlm2
-	9j9fjywSsWw4eOgYbch5Q/GLkOk+CmCVeYRV0iPCmDH0aiXrIX4M/BkDSFFTBfARbmyRMrDVdmL
-	/pnljzPTi70K1YMFyzPLW8OLnB7CfTYtDC8kI8yla+Ydw==
-X-Received: by 2002:a05:6000:46cd:b0:460:1492:4f0d with SMTP id ffacd0b85a97d-4603063c591mr15377117f8f.34.1780918824402;
-        Mon, 08 Jun 2026 04:40:24 -0700 (PDT)
-Received: from localhost.localdomain (p200300ef2f13eb00c11aebd17f9598f1.dip0.t-ipconnect.de. [2003:ef:2f13:eb00:c11a:ebd1:7f95:98f1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2f2710sm40821903f8f.14.2026.06.08.04.40.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 04:40:24 -0700 (PDT)
-Message-ID: <6a26aa28.283787d8.1f1282.ba36@mx.google.com>
-From: "Andrea Cervesato" <andrea.cervesato@suse.com>
-To: "Askar Safin" <safinaskar@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org, "Christian Brauner" <brauner@kernel.org>, "Alexander
- Viro" <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>, "The 8472" <kernel@infinite-source.de>, patches@lists.linux.dev, "David
- Howells" <dhowells@redhat.com>, linux-mm@kvack.org, "Collin Funk" <collin.funk1@gmail.com>, "Joanne
- Koong" <joannelkoong@gmail.com>, "Miklos Szeredi" <miklos@szeredi.hu>, "David
- Laight" <david.laight.linux@gmail.com>, "Matthew Wilcox" <willy@infradead.org>, "Christoph
- Hellwig" <hch@infradead.org>, "Steven Rostedt" <rostedt@goodmis.org>, fuse-devel@lists.linux.dev, "David
- Hildenbrand" <david@kernel.org>, "Pedro Falcato" <pfalcato@suse.de>, ltp@lists.linux.it, "Jens
- Axboe" <axboe@kernel.dk>, "Stefan Metzmacher" <metze@samba.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "Andy
- Lutomirski" <luto@amacapital.net>, linux-api@vger.kernel.org, "Andrew
- Morton" <akpm@linux-foundation.org>, "Linus Torvalds" <torvalds@linux-foundation.org>, "Willy
- Tarreau" <w@1wt.eu>
-In-Reply-To: <20260606061031.3744880-1-safinaskar@gmail.com>
-Subject: Re: [LTP] [PATCH 0/5] vmsplice: fix some problems in my previous
- vmsplice patchset
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Jun 2026 11:40:22 +0000
+	s=arc-20240116; t=1780918931; c=relaxed/simple;
+	bh=ov11AtdknOjbPbvEAuBtvvbQw4lFh5u2GwL6JfHXgHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qwbKaDNwoZ22iGeGLmhLHKMoWcf565UQWmCV6A9E0AbJV65FPw3JN7xShEpxncILZmtCvzIFOIyz2l451djg/ohomo0wvFqEOkZEV/YAQMlPRFP/XQBfHSlBaemPOTz15QjHr0cJ5qxyK2NITJKphXol0QWQO98Ej86c579JPTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=QNEWST2G; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id C7CB8600B9;
+	Mon,  8 Jun 2026 13:42:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1780918926;
+	bh=ErubEafeLo+zjsNDtJUeukGYGLNVb+8KI47j6seZuTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QNEWST2GoLlzAlfmanPqgD3vPuXvd6Py6x+rdG9Rw023QwtSPUSayqhm5bKkfaphE
+	 Y0wnNyybrMEGrJmObV8JMD0NH7LhaEcNu2q0MF1GZN5WdCEPPoy5m/i8bgw+KynJRj
+	 +OKNKIDx7HTR6+qyJ+R9jJFUGc8mpT4OhdSVP3KKDyO0AIIPCAKPoEG55ole1re3Qu
+	 OdF30kz/xKM79XPxty+UzMlSiTzzy4SndlUiGjI5lpxAhutTfp6pWCQAELNRacTtfO
+	 0iHkQkDpFhmfzTA2W0Z8cCUd0nR6mC4rdjjI5AfvLbU4lNRYQbI0iV4kyClvUUUmqU
+	 HorIxBcRpJnYg==
+Date: Mon, 8 Jun 2026 13:42:04 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Sayooj K Karun <sayooj@aerlync.com>
+Cc: netfilter-devel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org,
+	edumazet@google.com
+Subject: Re: [PATCH nf-next] netfilter: nf_reject_ipv6: do not reject ICMPv6
+ Redirect with an ICMPv6 error
+Message-ID: <aiaqjP8q-UQ0YUK0@chamomile>
+References: <20260608103155.8339-1-sayooj@aerlync.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260608103155.8339-1-sayooj@aerlync.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MISSING_MIME_VERSION(2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	TAGGED_FROM(0.00)[bounces-296505-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:safinaskar@gmail.com,m:linux-fsdevel@vger.kernel.org,m:brauner@kernel.org,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:kernel@infinite-source.de,m:patches@lists.linux.dev,m:dhowells@redhat.com,m:linux-mm@kvack.org,m:collin.funk1@gmail.com,m:joannelkoong@gmail.com,m:miklos@szeredi.hu,m:david.laight.linux@gmail.com,m:willy@infradead.org,m:hch@infradead.org,m:rostedt@goodmis.org,m:fuse-devel@lists.linux.dev,m:david@kernel.org,m:pfalcato@suse.de,m:ltp@lists.linux.it,m:axboe@kernel.dk,m:metze@samba.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:luto@amacapital.net,m:linux-api@vger.kernel.org,m:akpm@linux-foundation.org,m:torvalds@linux-foundation.org,m:w@1wt.eu,m:collinfunk1@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrea.cervesato@suse.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,zeniv.linux.org.uk,suse.cz,infinite-source.de,lists.linux.dev,redhat.com,kvack.org,gmail.com,szeredi.hu,infradead.org,goodmis.org,suse.de,lists.linux.it,kernel.dk,samba.org,amacapital.net,linux-foundation.org,1wt.eu];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:sayooj@aerlync.com,m:netfilter-devel@vger.kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:netdev@vger.kernel.org,m:edumazet@google.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.cervesato@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296506-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mx.google.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.com:dkim,suse.com:from_mime,suse.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,aerlync.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BD539655D75
+X-Rspamd-Queue-Id: D72C6655CBF
 
-Hi Askar,
+On Mon, Jun 08, 2026 at 04:01:55PM +0530, Sayooj K Karun wrote:
+> While fixing is_ineligible() for the L3 reject path, the bridge/netdev
+> reject path was found to have the same defect. RFC 4443 section 2.4(e.2)
+> mandates that an ICMPv6 error MUST NOT be originated in response to an
+> ICMPv6 Redirect message (type 137).
+> 
+> There are two IPv6 reject paths, and they suppress this in different
+> places. The L3 path (ip6t_REJECT / nft_reject -> nf_send_unreach6())
+> goes through icmpv6_send(), where is_ineligible() decides whether the
+> triggering packet may generate an error; a companion fix makes that gate
+> drop errors in response to a Redirect. The bridge/netdev path
+> (nft_reject_bridge / nft_reject_netdev -> nf_reject_skb_v6_unreach())
+> builds the ICMPv6 packet itself and never reaches is_ineligible().
+> Its local guard, nf_skb_is_icmp6_unreach(), only matched
+> ICMPV6_DEST_UNREACH and let every other type through,
+> including Redirect.
+> 
+> A triggerable scenario: a bridge or netdev firewall with a REJECT rule
+> applied to incoming ICMPv6 traffic (e.g., dropping Redirects from an
+> untrusted segment). When the Redirect hits the REJECT rule,
+> nf_reject_skb_v6_unreach() builds and transmits a Destination Unreachable
+> in response. Without this fix the guard lets the Redirect through and the
+> error is erroneously sent, violating the RFC.
+> 
+> Extend the guard, renamed nf_skb_is_icmp6_unreach_or_redirect(), to also
+> match NDISC_REDIRECT so that Redirect packets are skipped and both reject
+> paths behave consistently.
+> 
+> Link: https://lore.kernel.org/ah_hYJa3byoUyose@chamomile
+> Signed-off-by: Sayooj K Karun <sayooj@aerlync.com>
+> ---
+>  net/ipv6/netfilter/nf_reject_ipv6.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+> index ef5b7e85c..d4eec8d9a 100644
+> --- a/net/ipv6/netfilter/nf_reject_ipv6.c
+> +++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+> @@ -8,6 +8,7 @@
+>  #include <net/ip6_route.h>
+>  #include <net/ip6_fib.h>
+>  #include <net/ip6_checksum.h>
+> +#include <net/ndisc.h>
+>  #include <net/netfilter/ipv6/nf_reject.h>
+>  #include <linux/netfilter_ipv6.h>
+>  #include <linux/netfilter_bridge.h>
+> @@ -104,7 +105,7 @@ struct sk_buff *nf_reject_skb_v6_tcp_reset(struct net *net,
+>  }
+>  EXPORT_SYMBOL_GPL(nf_reject_skb_v6_tcp_reset);
+>  
+> -static bool nf_skb_is_icmp6_unreach(const struct sk_buff *skb)
+> +static bool nf_skb_is_icmp6_unreach_or_redirect(const struct sk_buff *skb)
+>  {
+>  	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
+>  	u8 proto = ip6h->nexthdr;
+> @@ -127,7 +128,7 @@ static bool nf_skb_is_icmp6_unreach(const struct sk_buff *skb)
+>  	if (!tp)
+>  		return false;
+>  
+> -	return *tp == ICMPV6_DEST_UNREACH;
+> +	return *tp == ICMPV6_DEST_UNREACH || *tp == NDISC_REDIRECT;
+>  }
+>  
+>  struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
+> @@ -143,8 +144,13 @@ struct sk_buff *nf_reject_skb_v6_unreach(struct net *net,
+>  	if (!nf_reject_ip6hdr_validate(oldskb))
+>  		return NULL;
+>  
+> -	/* Don't reply to ICMPV6_DEST_UNREACH with ICMPV6_DEST_UNREACH */
+> -	if (nf_skb_is_icmp6_unreach(oldskb))
+> +	/* Don't reply to ICMPV6_DEST_UNREACH with ICMPV6_DEST_UNREACH, and
+> +	 * per RFC 4443 section 2.4(e.2) never originate an ICMPv6 error in
+> +	 * response to an ICMPv6 Redirect. The L3 reject path enforces this
+> +	 * via icmpv6_send()/is_ineligible(); this bridge/netdev path builds
+> +	 * the packet itself, so it must check explicitly.
 
-the patch-set doesn't apply:
+Please, shorter comment. With all these AI generated comments,
+codebase will bloat soon. Comments are usually reserve to non-obvious
+stuff IIRC, this extra validation can be possibly documented in the
+new nf_skb_is_icmp6_unreach_or_redirect_or_something_else().
 
-error: fs/read_write.c: does not exist in index
-hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort=
-".
-hint: Disable this message with "git config set advice.mergeConflict false"
-Applying: vmsplice: open-code do_writev and do_readv
-Patch failed at 0001 vmsplice: open-code do_writev and do_readv
+> +	 */
+> +	if (nf_skb_is_icmp6_unreach_or_redirect(oldskb))
 
-https://github.com/linux-test-project/ltp-agent/actions/runs/27129052434/jo=
-b/80065058557#step:8:21
+Please, use more generic function:
 
-Please update it to a new version after rebasing with the upstream master
-branch.
+        nf_skb_icmp6_is_valid()
 
-Regards,
---
-Andrea Cervesato
-SUSE QE Automation Engineer Linux
-andrea.cervesato@suse.com
+so this can grown with any other future extension without adding
+another _or_something_else() to the function name.
+
+Thanks.
+
+>  		return NULL;
+>  
+>  	/* Include "As much of invoking packet as possible without the ICMPv6
+> -- 
+> 2.54.0
+> 
 
