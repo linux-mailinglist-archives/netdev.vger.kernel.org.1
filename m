@@ -1,278 +1,182 @@
-Return-Path: <netdev+bounces-296649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296650-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AwM1A9LnJmpymwIAu9opvQ
-	(envelope-from <netdev+bounces-296649-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:03:30 +0200
+	id 0SZ/EojoJmqgmwIAu9opvQ
+	(envelope-from <netdev+bounces-296650-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:06:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F4065877A
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:03:29 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDCA26587E5
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:06:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="Zzgg5su/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296649-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296649-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Kfzda56T;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296650-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296650-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFF9136FC9D2
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:45:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 45337312A194
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74663E7151;
-	Mon,  8 Jun 2026 15:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD2E26ED3C;
+	Mon,  8 Jun 2026 15:48:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E16D3E6DC6
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 15:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9E52AE8D
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 15:48:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780933222; cv=none; b=EAsTNSsNKDPk7R1zdawjsl5V+D8JjGJvfochn4FWzDV/H89LxsfhF28kM6hwM2sIRUIeKhj92XAPCl0ecADfnq07e7ChZmdA6vuDyIBadILaA9jBuoc1qoDU2SGvU8wKy7uxLjSMnd0j69sVusOIXqoYC3lJCN2KmZM9NV2DiW0=
+	t=1780933701; cv=none; b=uJtMw5UtdwQvFrYvulFhVYjQRiSy7YzaNrAi7J/7lIZw83J8CPvfSUh0OhUxULvtTZqTAWtj25+KOSwrbpbCqvpLKwm3k83EnTSxNXhFSmvILf1RLjdwjOaSvG5byVzip+n04WpF/Phn/mJ0tOCNWsyEF1MpGb2G84/3DrEUKOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780933222; c=relaxed/simple;
-	bh=Sk5t69A0NsKjaJgPi0Dm9uLD8cbJxMb2E50MYcQ9K8Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nu/A4Mfdygf8yY6lSThG0N0kFmdTqWtwkjf0+PcLijNfDweakQsPRmFNnc7k69nKfi8a0EBdZ7yhSJ4S2DeieWL71/Y6QOtY4rmmrPxEZKyFnSSGiHW6J4ivTKzAlbekDncJKIx/ZUgsHBXEacFxa9QUbmeIwdTveSQH/FNskes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zzgg5su/; arc=none smtp.client-ip=209.85.210.193
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-842307472d4so1411352b3a.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 08:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780933221; x=1781538021; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1PQSUUr369qP40HbNZE8YmdPdco/pgXnDVzZ0VoLIYI=;
-        b=Zzgg5su/+mfgeEZdMKi2S0/K0tgkecUS+zqI2HEeXyMQ3C2pM4yfEx8h9ubY/ucMEP
-         G59MZ8b8XS+fOBZ93r8ior/oqqMq3ss5EKaBVv9r8sbfY82FoX6QNQYjiVdasvDvFeyL
-         91nYySC4PrJbA+aiFLc37yNIgxduk5MV3tcm8gDlavVetKzHYhe3ewskYLIFigVcsDCx
-         dsjNqab8vT8oKIS+6S2nOiKQS5UuiNdkkF/GCgrUSBWcs5CFIY/En9rYucvZ01lLq1z1
-         WVD25NwdemT/T0XecDmArD6BXcvf8I+J4VO515U3TaljFjOwqnMT1AJw2KpoTqD7BtE/
-         ZfIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780933221; x=1781538021;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1PQSUUr369qP40HbNZE8YmdPdco/pgXnDVzZ0VoLIYI=;
-        b=P6vsZeJqLiHoURDaM1Y5mECruzwMxs6x5wm2vPy9TzdQDSPEKTtLTPkF2gMk2TaVbd
-         +P/24VLzDB1t7s3ZRhrIHybY8UCoW2b5s6RBFn8+oADNOJ8kNx9qefRxZmcI6HEgdu1e
-         WTvyqRtlUz8MzHlUSJJlCJ8JCbYmpra32D0jNBZ3lbFW2+vHW47Zp1axTAcfJZ1D1mAk
-         CvjSmnU4ksAaAtOKL5sbOibsxGqku0ISt1OPdk9NH1OIXCk+nrGbhPFyIG+6/WAplefG
-         4r0PKZVdIq9gvTSriDA5al7pFQwXH3wYoqPZyX3HgPS/6dQX0MUZUyhEIGNJ4TumYkqM
-         ECLA==
-X-Gm-Message-State: AOJu0Yw+1b+k50WXyKcbk6+5Fkq4/3A5qJxS3kBuosef1YGdi5L302Dx
-	++LCtPjgYBR2KWetbrESH+BUegPmU9yWVKnx0UNnigyOHV3BxT9MLragV6VTGQYz
-X-Gm-Gg: Acq92OHvyZBpVSj3OdmDh72A4eiQ9tmzGhsvqRkVNfhG76NKfIni46ep855137EUTZF
-	bTT42wxe/jmH/Df9cw8i6P6sGF2GgL0vXP1B3YRx/A81TqOYAg8To7qWKe1DH+wKMjKe6WgokYQ
-	V3EkvCKTPaimDZdfP7KDxr/EjQntztnGA3QDsbPGTiZ0BPQTMFpgQaFjepGBAeQ4+tT9jBYgRbi
-	ximcYmmOVH6nFfrYOhPc3k8EddctKJSzm0oI8jvM9x2wgwntfBxo4lXYfxPKJjHWZWRFfqGpYa1
-	yL5OObSF43LgFbte3eafvkAqNNz+zebZQms1Tj2HS5IfoN5xGIEFGAUyLTQj7wb4DsjCDQWZ2jp
-	cpElyxmY6KhSc5rr9VPQsKVICAtC1aCKIyBvGe8GzsBdEM1OgbcAjpr7zDy4QuZODYztVefF27g
-	82H/c8gFt3i/qJRKuPX8SmTHdhlU0=
-X-Received: by 2002:a05:6a00:1819:b0:842:3841:fdba with SMTP id d2e1a72fcca58-842b0eadd19mr16900179b3a.6.1780933220692;
-        Mon, 08 Jun 2026 08:40:20 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:49::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828fe634sm18504027b3a.52.2026.06.08.08.40.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 08:40:20 -0700 (PDT)
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-X-Google-Original-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next v3 3/3] bnxt: convert to core rx_mode retry mechanism
-Date: Mon,  8 Jun 2026 08:40:14 -0700
-Message-ID: <20260608154014.227538-4-sdf@fomichev.me>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260608154014.227538-1-sdf@fomichev.me>
-References: <20260608154014.227538-1-sdf@fomichev.me>
+	s=arc-20240116; t=1780933701; c=relaxed/simple;
+	bh=gXWiAR3eG1hw3O6lLoirp5wSX06NvOORpD7MunpI880=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uz7GuSEa5OPbu5fj2KFf5mf+A7c82YSJNWMPUKFqL9KuHaQpJIPCe7yKdLHuBegXHCDvwFBTxN8+4xrFSTb8sgv5ZZJn2PIFoDupQVdZOkGlSoTwuAGOX9J/DLPh1634lzmQRR2Zg+cEF1Ve9Aga2GolQAKSnHidgm4TJ/XTQFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kfzda56T; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780933699;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iQZZjnNUgN0/UHamiYqEX7QtlS2rp32rDzK8Diz0cFA=;
+	b=Kfzda56Tw2UZJZoeFHRo8cjg+PblLXkWAvqFawo3Mvc4uRJ3ZidWofUhxVHMyOxFUVJnGj
+	kB9eYu0AtyitThiuUfvaPh8jensN+9GZyrnRiMaTQ5bdG2G7qM/RDF/5shqzbLOj5WjqyT
+	smUHJXFfZ9lVYHZ802UNor9Lxvrruhk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-lxBG658nMNS8ALq4SlugEQ-1; Mon,
+ 08 Jun 2026 11:48:14 -0400
+X-MC-Unique: lxBG658nMNS8ALq4SlugEQ-1
+X-Mimecast-MFC-AGG-ID: lxBG658nMNS8ALq4SlugEQ_1780933693
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7FCC1180075E;
+	Mon,  8 Jun 2026 15:48:12 +0000 (UTC)
+Received: from [10.44.32.246] (unknown [10.44.32.246])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 60DF31800370;
+	Mon,  8 Jun 2026 15:48:08 +0000 (UTC)
+Message-ID: <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
+Date: Mon, 8 Jun 2026 17:48:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ "Schmidt, Michal" <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ "Vaananen, Pasi" <pvaanane@redhat.com>, "Oros, Petr" <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260531194423.383366-1-ivecera@redhat.com>
+ <20260531194423.383366-2-ivecera@redhat.com>
+ <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296649-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296650-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[nvidia.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,microchip.com,linux.dev,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:arkadiusz.kubalewski@intel.com,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:kuba@kernel.org,m:jiri@resnulli.us,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64F4065877A
+X-Rspamd-Queue-Id: DDCA26587E5
 
-Remove the driver-specific BNXT_STATE_L2_FILTER_RETRY + timer + sp_task
-retry mechanism and rely on the core stack's ndo_set_rx_mode_async retry
-instead.
+On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
+>> From: Ivan Vecera <ivecera@redhat.com>
+>> Sent: Sunday, May 31, 2026 9:44 PM
+>> ...
+>>        -
+>>          name: gnss
+>>          doc: GNSS recovered clock
+>> +      -
+>> +        name: int-nco
+>> +        doc: |
+>> +          Device internal numerically controlled oscillator.
+>> +          When connected as a DPLL input, the DPLL enters NCO mode
+>> +          where the output frequency is adjusted by the host via
+>> +          the PTP clock interface.
+> 
+> Hi Ivan!
+> 
+> How would you control this in case of automatic mode dpll?
+> Automatic mode DPLL shall be controlled on HW level, such pin brakes
+> that rule and requires some driver magic to show it is higher
+> priority then the rest of the pins?
 
-bnxt_cfg_rx_mode() now returns errors instead of swallowing them. The
-PF-unavailable case (-ENODEV from HWRM on a VF) is normalized to
--EAGAIN at the boundary so callers can match on a single "retry me"
-errno without re-implementing the VF/-ENODEV check. Other errors
-propagate unchanged.
+The NCO pin can be connected only in manual mode. In other words a DPLL
+in automatic mode cannot select NCO pin (switch to NCO mode) by its own.
 
-This removes:
-- BNXT_STATE_L2_FILTER_RETRY state bit
-- BNXT_RX_MASK_SP_EVENT sp_event bit
-- Retry trigger from bnxt_timer()
-- BNXT_RX_MASK_SP_EVENT handling from bnxt_sp_task()
+If the DPLL device is in automatic mode then a user has to switch the
+device to manual mode and then manually set the NCO pin as connected.
 
-bnxt_init_chip() still calls bnxt_cfg_rx_mode() directly during open.
-On a fresh open dev->uc is empty and the call effectively cannot fail
-on the unicast path. But on FW reset reopen (bnxt_fw_reset_task ->
-bnxt_open) a VF may have a populated dev->uc and the PF may be
-transiently unavailable; since that path doesn't go through
-__dev_open(), the follow-up rx_mode call that would otherwise drive
-the core retry doesn't fire. On -EAGAIN, swallow the error and call
-netif_rx_mode_schedule_retry() explicitly. The unicast filter loop
-truncates vnic->uc_filter_count on failure, so the retry's delta check
-sees pending work and reinstalls.
+> Such NCO mode/pin is designed only for this single specific use case
+> where a timecard contains a DPLL and PHC?
 
-Cc: Michael Chan <michael.chan@broadcom.com>
-Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 30 ++++++++---------------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 --
- 2 files changed, 10 insertions(+), 22 deletions(-)
+This is designed for a HW where DPLL channels (devices) support ToD
+counters (can act as PHC besides DPLL functionality) and support the
+mode where DPLL is not locked to any physical input and allows tuning
+of its frequency.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index f3c76ffaa1ca..1eb214e4b511 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -11232,8 +11232,12 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
- 	}
- 
- 	rc = bnxt_cfg_rx_mode(bp, &bp->dev->uc, true);
--	if (rc)
-+	if (rc == -EAGAIN) {
-+		netif_rx_mode_schedule_retry(bp->dev);
-+		rc = 0;
-+	} else if (rc) {
- 		goto err_out;
-+	}
- 
- skip_rx_mask:
- 	rc = bnxt_hwrm_set_coal(bp);
-@@ -13716,7 +13720,7 @@ static int bnxt_set_rx_mode(struct net_device *dev,
- 	if (mask != vnic->rx_mask || uc_update || mc_update) {
- 		vnic->rx_mask = mask;
- 
--		bnxt_cfg_rx_mode(bp, uc, uc_update);
-+		return bnxt_cfg_rx_mode(bp, uc, uc_update);
- 	}
- 
- 	return 0;
-@@ -13758,11 +13762,10 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp, struct netdev_hw_addr_list *uc,
- 		rc = bnxt_hwrm_set_vnic_filter(bp, 0, i, vnic->uc_list + off);
- 		if (rc) {
- 			if (BNXT_VF(bp) && rc == -ENODEV) {
--				if (!test_and_set_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
--					netdev_warn(bp->dev, "Cannot configure L2 filters while PF is unavailable, will retry\n");
--				else
--					netdev_dbg(bp->dev, "PF still unavailable while configuring L2 filters.\n");
--				rc = 0;
-+				netdev_warn(bp->dev, "Cannot configure L2 filters while PF is unavailable, will retry\n");
-+				rc = -EAGAIN;
-+			} else if (rc == -EAGAIN) {
-+				netdev_warn(bp->dev, "FW busy while setting vnic filter, will retry\n");
- 			} else {
- 				netdev_err(bp->dev, "HWRM vnic filter failure rc: %x\n", rc);
- 			}
-@@ -13770,8 +13773,6 @@ static int bnxt_cfg_rx_mode(struct bnxt *bp, struct netdev_hw_addr_list *uc,
- 			return rc;
- 		}
- 	}
--	if (test_and_clear_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
--		netdev_notice(bp->dev, "Retry of L2 filter configuration successful.\n");
- 
- skip_uc:
- 	if ((vnic->rx_mask & CFA_L2_SET_RX_MASK_REQ_MASK_PROMISCUOUS) &&
-@@ -14362,9 +14363,6 @@ static void bnxt_timer(struct timer_list *t)
- 		}
- 	}
- 
--	if (test_bit(BNXT_STATE_L2_FILTER_RETRY, &bp->state))
--		bnxt_queue_sp_work(bp, BNXT_RX_MASK_SP_EVENT);
--
- 	if ((BNXT_CHIP_P5(bp)) && !bp->chip_rev && netif_carrier_ok(dev))
- 		bnxt_queue_sp_work(bp, BNXT_RING_COAL_NOW_SP_EVENT);
- 
-@@ -14727,7 +14725,6 @@ static void bnxt_ulp_restart(struct bnxt *bp)
- static void bnxt_sp_task(struct work_struct *work)
- {
- 	struct bnxt *bp = container_of(work, struct bnxt, sp_task);
--	struct net_device *dev = bp->dev;
- 
- 	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
- 	smp_mb__after_atomic();
-@@ -14805,13 +14802,6 @@ static void bnxt_sp_task(struct work_struct *work)
- 	/* These functions below will clear BNXT_STATE_IN_SP_TASK.  They
- 	 * must be the last functions to be called before exiting.
- 	 */
--	if (test_and_clear_bit(BNXT_RX_MASK_SP_EVENT, &bp->sp_event)) {
--		bnxt_lock_sp(bp);
--		if (test_bit(BNXT_STATE_OPEN, &bp->state))
--			bnxt_cfg_rx_mode(bp, &dev->uc, true);
--		bnxt_unlock_sp(bp);
--	}
--
- 	if (test_and_clear_bit(BNXT_RESET_TASK_SP_EVENT, &bp->sp_event))
- 		bnxt_reset(bp, false);
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 1920a161841e..29ff5a584d16 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2467,7 +2467,6 @@ struct bnxt {
- #define BNXT_STATE_DRV_REGISTERED	7
- #define BNXT_STATE_PCI_CHANNEL_IO_FROZEN	8
- #define BNXT_STATE_NAPI_DISABLED	9
--#define BNXT_STATE_L2_FILTER_RETRY	10
- #define BNXT_STATE_FW_ACTIVATE		11
- #define BNXT_STATE_RECOVER		12
- #define BNXT_STATE_FW_NON_FATAL_COND	13
-@@ -2622,7 +2621,6 @@ struct bnxt {
- 
- 	struct work_struct	sp_task;
- 	unsigned long		sp_event;
--#define BNXT_RX_MASK_SP_EVENT		0
- #define BNXT_RX_NTP_FLTR_SP_EVENT	1
- #define BNXT_LINK_CHNG_SP_EVENT		2
- #define BNXT_HWRM_EXEC_FWD_REQ_SP_EVENT	3
--- 
-2.53.0-Meta
+> Any diagram?
+> 
+> Is there any other use case for such pin? (NCO is rather a general
+> DPLL control mechanism?) Shouldn't it be called explicitly like
+> ptp-nco?
+I discussed this with Jiri and result was:
+- DPLL_MODE is input selection strategy
+- NCO is a case of manual selection strategy
+
+And *_INT_PTP_NCO or *_PTP_NCO?
+
+Yes, this could be reasonable... I can't think of anything else to use
+other than PTP... for now (can be changed in future).
+
+Thanks,
+Ivan
 
 
