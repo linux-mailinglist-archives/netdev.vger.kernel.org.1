@@ -1,159 +1,274 @@
-Return-Path: <netdev+bounces-296417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296418-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mq/yAxB+JmqZXQIAu9opvQ
-	(envelope-from <netdev+bounces-296417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:32:16 +0200
+	id ZbXbG5d+JmrFXQIAu9opvQ
+	(envelope-from <netdev+bounces-296418-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:34:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96CCD654138
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:32:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 291CE654190
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:34:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=samsung.com header.s=mail20170921 header.b=nx8PZRa5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296417-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296417-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=samsung.com;
+	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=mcTmQu2O;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296418-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296418-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amazon.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 193BB3011E9C
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:30:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AAC7B3011A46
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1703AEF5F;
-	Mon,  8 Jun 2026 08:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834DF3AFD16;
+	Mon,  8 Jun 2026 08:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FED2BEC3F
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 08:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6403AF66D;
+	Mon,  8 Jun 2026 08:32:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780907426; cv=none; b=IYn/xmV4vgDbxxkQjRj3ndtbpXW6mTO1RJpMKPlN9RNDY2bQaB69H7nrShPECZ0vrT0+GN7yNGNY3ADXM+ajWz/w24Rmrmo/qa/mLXctiHh/fGS6uViV6/O5l4xW2e5glYkZVzrJFLTxJcRtRqrO592GvVW2vpwpBaFD8YPzoQ8=
+	t=1780907540; cv=none; b=eLwazlilO3XFdWu2bQ4jlt2WK9PSjUK2tJZhy/aBUejFkSrH6IFbxGt9fCZp7H5kk/A+Z+sTl5CAMMp0OGYl4AHybFBqIK7dGmn+LUWQGb7FZvMdQBSHKBM08OdCH7R7inFZOmZ2mWOMT70wST01+qkXgal8Vrd7V0VeR8FxuUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780907426; c=relaxed/simple;
-	bh=uwHLugokt6wTViB6gk+QIYR6ZA3nKcU9v8GIUGnRLD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=KEblYiquOeQ2hBgb91IqQ/8yYIHE9T4RHTk+k6ZYYvWkn+mBGMyUxygR4+X2bzwDS1PjeQlUTTOT9B8af4QpSEuihrYqlv6XmawCuyiKbYasMLDM0gQoXhSBo8tJz3DyjKaK2LVU53tb65ySf24itVDIxcByWnvAmFp3Jy3UYUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=nx8PZRa5; arc=none smtp.client-ip=210.118.77.11
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260608083022euoutp01525ddcc6e279609b22baf615005d1bf0~3Dd15bJ_i3186431864euoutp01V
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 08:30:22 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260608083022euoutp01525ddcc6e279609b22baf615005d1bf0~3Dd15bJ_i3186431864euoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1780907422;
-	bh=wjeEYiLODKr24D2k4QSbkK13mn3e3WvrB5HFWfCI+Mc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nx8PZRa5udYktTVgfsn5NFFHUa0anqP+Lf438B0SRyHqaNPT+Z2alvfxDANX0dPc4
-	 iIIH5j6AoGsxoVmEIdBTv6bpZU5Ei5SWnwsvodFfB7wUEKenBlNrYeEghZv4RgVikX
-	 OlBZ+D7+m31Xh2U2BVQgVxTGqGwDSGa1sPlW+V9w=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260608083022eucas1p2ddbb690dd15bcc5297e83779ce13f694~3Dd1itoi62513225132eucas1p2F;
-	Mon,  8 Jun 2026 08:30:22 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260608083019eusmtip256610289b9ea9aea5e3d3d6b518c3b1e~3Ddywy60Q1379413794eusmtip2V;
-	Mon,  8 Jun 2026 08:30:18 +0000 (GMT)
-Date: Mon, 8 Jun 2026 10:30:18 +0200
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	linux-kernel@vger.kernel.org, k.domagalski@samsung.com,
-	k.tegowski@samsung.com, cs0617.lee@samsung.com
-Subject: Re: [PATCH net-next v2 1/3] net/stmmac/dwxgmac: Modify DMA
- functions for future hardware
-Message-ID: <aiZ9milz2xnxYBHM@AMDC4622.eu.corp.samsungelectronics.net>
+	s=arc-20240116; t=1780907540; c=relaxed/simple;
+	bh=pnhXkgoDFVyHjO14pQvt/qt42pkN37eKdqiTtc6AlK4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=crBqsWg0zjbXgPihXZ1ZzNVvM6pPP4b0+ywh+tOspkHf+bB5FcM9ShclsPt86zEOD7v9pN4D58GdEllT/+VtzG0lqc53kYvz4fWedZXF5/aAYU9O8SLWlEpUNElKa0cGBKHULoHmmzG6g6IuceVNHw3KnLY8erJUIGB1n2ttBNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=mcTmQu2O; arc=none smtp.client-ip=52.12.53.23
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1780907539; x=1812443539;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=daCceaZNyZPEM/C2MSBzM4sNT4KsF3tDP1TOnakkCWU=;
+  b=mcTmQu2O9XX/f0pFnM3sgYjKlyOIZuJNt7vZ6jXQjpT0J2u8ri9fnxci
+   TYAAY195Vtu5eWsUrDUXFvl91g4ibphYhzNGgoayh+xBwuE447dSEFrNn
+   qxnRXZ6X1nouoJlwdERBn0MYDvkKyF6+y8VN3Jxp7r0jmAsDcc1qKeWz/
+   n0HzjoLqg7apxnmD4kCNPKwwMDfsDNgWriZTj/W347ZUK6akqAPgYWdEm
+   rysFuXAIWYFqHPIv0uPUnUgeG8SdCdLmkFV7wZiSaip/ziqZQ0P6W7Rs9
+   q3pxyEYM+6xpl9F3FleL/2mJHYZfc5rEoYPdW9n4kalcPS7dndHDA1+Hw
+   A==;
+X-CSE-ConnectionGUID: 9eQeX9otRxCoL4fsIMbqTA==
+X-CSE-MsgGUID: 1k5YtbxpRfqTzep0OzJckA==
+X-IronPort-AV: E=Sophos;i="6.24,194,1774310400"; 
+   d="scan'208";a="21182260"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 08:32:05 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:18928]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.234:2525] with esmtp (Farcaster)
+ id 3d500f38-8053-4a0e-8d6d-cd8de58f80a1; Mon, 8 Jun 2026 08:32:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 3d500f38-8053-4a0e-8d6d-cd8de58f80a1
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 8 Jun 2026 08:32:05 +0000
+Received: from dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com
+ (172.19.78.185) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 8 Jun 2026
+ 08:32:02 +0000
+From: Simon Liebold <simonlie@amazon.de>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, Simon Liebold <lieboldsimonpaul@gmail.com>
+CC: Qi Tang <tpluszz77@gmail.com>, Florian Westphal <fw@strlen.de>, "Simon
+ Liebold" <simonlie@amazon.de>
+Subject: [PATCH 5.15.y] xfrm: hold dev ref until after transport_finish NF_HOOK
+Date: Mon, 8 Jun 2026 08:31:36 +0000
+Message-ID: <20260608083136.2842689-1-simonlie@amazon.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260605190210.13d9b18c@kernel.org>
-X-CMS-MailID: 20260608083022eucas1p2ddbb690dd15bcc5297e83779ce13f694
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_10f6c_"
-X-RootMTR: 20260601162618eucas1p1fb6e7ed11e0a77e709bca37cbc7e4f28
-X-EPHeader: CA
-X-CMS-RootMailID: 20260601162618eucas1p1fb6e7ed11e0a77e709bca37cbc7e4f28
-References: <20260601162537.553512-1-j.raczynski@samsung.com>
-	<CGME20260601162618eucas1p1fb6e7ed11e0a77e709bca37cbc7e4f28@eucas1p1.samsung.com>
-	<20260601162537.553512-2-j.raczynski@samsung.com>
-	<aiAULX7SlidVGmhq@AMDC4622.eu.corp.samsungelectronics.net>
-	<aiAiAbasQA3B3aT_@soc-5CG4396X81.clients.intel.com>
-	<20260605190210.13d9b18c@kernel.org>
+X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
-	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296417-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,samsung.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:larysa.zaremba@intel.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux-kernel@vger.kernel.org,m:k.domagalski@samsung.com,m:k.tegowski@samsung.com,m:cs0617.lee@samsung.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[samsung.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296418-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[amazon.de:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.raczynski@samsung.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,strlen.de,amazon.de];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 96CCD654138
+X-Rspamd-Queue-Id: 291CE654190
 
-------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_10f6c_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+From: Qi Tang <tpluszz77@gmail.com>
 
-On Fri, Jun 05, 2026 at 07:02:10PM -0700, Jakub Kicinski wrote:
-> 
-> +1, this feels a bit sloppy. The driver has some painful abstraction
-> layers but if we cut ourselves some slack because of that that'd be
-> basically encouraging shitty architectures.
-> -- 
-> pw-bot: cr
-> 
+[ Upstream commit 1c428b03840094410c5fb6a5db30640486bbbfcb ]
 
-Alright, will think about it.
-As said in commit, problem is that current code really does assume
-number of DMA=MTL=TC's and uses it interchangeably. So that was quite minimal
-setup to get this stuff to work.
-This is not longer true though for new hardware.
-XGMAC 3.20a and 3.40a are fully compatible with dwxgmac2 as far as
-I can tell, so new HW is generally supported with generic xgmac driver,
-only some features are extra. And since there is no free space in some
-registers, it should continue being that way.
+After async crypto completes, xfrm_input_resume() calls dev_put()
+immediately on re-entry before the skb reaches transport_finish.
+The skb->dev pointer is then used inside NF_HOOK and its okfn,
+which can race with device teardown.
 
-Probably better solution would be to not change these functions to return
-something, but rather check this in upper layer using synopsys_id or
-whatever version. Will see what is more feasible.
+Remove the dev_put from the async resumption entry and instead
+drop the reference after the NF_HOOK call in transport_finish,
+using a saved device pointer since NF_HOOK may consume the skb.
+This covers NF_DROP, NF_QUEUE and NF_STOLEN paths that skip
+the okfn.
 
-BR
-Jakub Raczynski
+For non-transport exits (decaps, gro, drop) and secondary
+async return points, release the reference inline when
+async is set.
 
-------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_10f6c_
-Content-Type: text/plain; charset="utf-8"
+Suggested-by: Florian Westphal <fw@strlen.de>
+Fixes: acf568ee859f ("xfrm: Reinject transport-mode packets through tasklet")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+[ net/xfrm/xfrm_input.c: dev_hold/dev_put are unconditional here rather
+than inside !crypto_done as in mainline, and the dev_put in the
+encap_type == -1 async-resumption block does not exist; adapted by
+gating dev_put at resume: with if (!async), adding if (async) dev_put
+at -EINPROGRESS return, gro_cells_receive paths, and drop label. ]
+Signed-off-by: Simon Liebold <simonlie@amazon.de>
+---
+ net/ipv4/xfrm4_input.c |  5 ++++-
+ net/ipv6/xfrm6_input.c |  5 ++++-
+ net/xfrm/xfrm_input.c  | 14 ++++++++++++--
+ 3 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index 1f50517289fd..740f6510215f 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -48,6 +48,7 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
+ {
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
+ 	struct iphdr *iph = ip_hdr(skb);
++	struct net_device *dev = skb->dev;
+ 
+ 	iph->protocol = XFRM_MODE_SKB_CB(skb)->protocol;
+ 
+@@ -71,8 +72,10 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
+ 	}
+ 
+ 	NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING,
+-		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
++		dev_net(dev), NULL, skb, dev, NULL,
+ 		xfrm4_rcv_encap_finish);
++	if (async)
++		dev_put(dev);
+ 	return 0;
+ }
+ 
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index 7dbefbb338ca..aaba607d31d5 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -41,6 +41,7 @@ static int xfrm6_transport_finish2(struct net *net, struct sock *sk,
+ int xfrm6_transport_finish(struct sk_buff *skb, int async)
+ {
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
++	struct net_device *dev = skb->dev;
+ 	int nhlen = skb->data - skb_network_header(skb);
+ 
+ 	skb_network_header(skb)[IP6CB(skb)->nhoff] =
+@@ -66,8 +67,10 @@ int xfrm6_transport_finish(struct sk_buff *skb, int async)
+ 	}
+ 
+ 	NF_HOOK(NFPROTO_IPV6, NF_INET_PRE_ROUTING,
+-		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
++		dev_net(dev), NULL, skb, dev, NULL,
+ 		xfrm6_transport_finish2);
++	if (async)
++		dev_put(dev);
+ 	return 0;
+ }
+ 
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index 7f326a01cbce..5b3776b91ba8 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -650,10 +650,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 		else
+ 			nexthdr = x->type->input(x, skb);
+ 
+-		if (nexthdr == -EINPROGRESS)
++		if (nexthdr == -EINPROGRESS) {
++			if (async)
++				dev_put(skb->dev);
+ 			return 0;
++		}
+ resume:
+-		dev_put(skb->dev);
++		if (!async)
++			dev_put(skb->dev);
+ 
+ 		spin_lock(&x->lock);
+ 		if (nexthdr < 0) {
+@@ -729,6 +733,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 		if (sp)
+ 			sp->olen = 0;
+ 		skb_dst_drop(skb);
++		if (async)
++			dev_put(skb->dev);
+ 		gro_cells_receive(&gro_cells, skb);
+ 		return 0;
+ 	} else {
+@@ -747,6 +753,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 			if (sp)
+ 				sp->olen = 0;
+ 			skb_dst_drop(skb);
++			if (async)
++				dev_put(skb->dev);
+ 			gro_cells_receive(&gro_cells, skb);
+ 			return err;
+ 		}
+@@ -757,6 +765,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ drop_unlock:
+ 	spin_unlock(&x->lock);
+ drop:
++	if (async)
++		dev_put(skb->dev);
+ 	xfrm_rcv_cb(skb, family, x && x->type ? x->type->proto : nexthdr, -1);
+ 	kfree_skb(skb);
+ 	return 0;
+
+base-commit: 241d66fa280c91b65942d641e92d06c9ae6a0b95
+-- 
+2.50.1
 
 
-------FoLMw5K6Fe9t5vMBf.HRV6LBdzA_42JMttv_zc4dtfIAKr8-=_10f6c_--
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
