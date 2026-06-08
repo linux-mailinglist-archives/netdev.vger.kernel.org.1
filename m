@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-296450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296445-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jbhSEtWRJmp3YwIAu9opvQ
-	(envelope-from <netdev+bounces-296450-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:56:37 +0200
+	id ohffHPKRJmqEYwIAu9opvQ
+	(envelope-from <netdev+bounces-296445-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75649654C6B
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:56:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1178654C76
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=runbox.com header.s=selector1 header.b="icsD6X Z";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296450-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296450-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=runbox.com header.s=selector1 header.b="tX4WCs F";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296445-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296445-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=gmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0DCA6300406D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:56:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2C8A301D687
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C0B3BCD27;
-	Mon,  8 Jun 2026 09:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CB43B7B76;
+	Mon,  8 Jun 2026 09:55:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9A23B8930;
-	Mon,  8 Jun 2026 09:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EBD3AB283
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 09:55:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780912550; cv=none; b=iJ9hrhz814iQ9s6fIwK2Hg4L1wBL6PDwChlVAVhf+SMRff2/s0SowlCNQpSzUXRAV9FekQ3ksNJHczTcM+eku0BDIE2UBXxT8APmT/oMRurxYgT6GD7fTHl4+rkgIiOkghbFA3SHYawfcjwTAzqkYI0gNy35NXhhxUTYx6mCoGM=
+	t=1780912535; cv=none; b=hLAM9yGGxcqVpQHGx50FDguBi5OsPK72K6tOYJHEnkil4/RVc+4HrJlCe6xdjAY4Q7gHX++VOgGn3cA5wv1YL0JjMNfDslrYkt8H4zGAsqoGXWCczyJ8cQIR+YzuWYtf7iq7kWhXz6B5qYusPBL3yfuogha7nRJTYlwQOIm9Iyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780912550; c=relaxed/simple;
-	bh=g2a+0peurYc++lj+MTJ+qK/QF5LhOp9QgWJzFwBQQ60=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QZy/PBmZ8IgIUEryjtzVSNM5YORLg+DlCm59Bvb7/56o3EOO5TKF0YNV+fm51nx/z+d+FRrbLeQ6a0thhEq6wKBnLhcnXLpI9HEh1PrKLKp8eCR6mw849GsyHddulBpZBC9ItyEPvxbTZBWBiVAJ0ylRPdlthWeWYZS4iJ2jnrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=icsD6XZk; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1780912535; c=relaxed/simple;
+	bh=kjgzlGkCqp1NC5w51WcCRLvPiI8hJDKE74lYbf8SGl0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D+k6CZ4LL+tb75IP/7SxD1b04gQ/9n44ut8S+XOF1GaTT58AwKnJ60OTV6U5LYLxd1UEz9G/WYMDZOEe7jseEGgDvyhA7lj9md35/gJVhVA2W2D1mgz833McYjKS2VpmzhjQb/VI28OrspKfWyRI9BvEZAENr9W8F/2CCgphf0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=tX4WCsF6; arc=none smtp.client-ip=185.226.149.37
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWhq-00BRyo-Iq; Mon, 08 Jun 2026 11:55:42 +0200
+	id 1wWWha-00BRun-Uq; Mon, 08 Jun 2026 11:55:26 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-	Subject:Cc:To:From; bh=hOyVQeN0Zn21ZxnkGr2+7/wIdoUqTpMPv9PBDwl37z8=; b=icsD6X
-	ZkBw0g9gkjA2bR0nerz7qipgEDZlx622c1sGNma5VNqMwp8twyiTzSNQN40T/brnpdSc/dZy3sHAl
-	ypKCCU0BNqgnJ6Ka7eBqltikYiGzd6LkrGkSpes2MK0ARnItbFL98wY+Mq9nYQQhd57Ay0LxqzgGb
-	PROGritLv9BwBXjgQRex+JVm7fGTBpIPB6jpAtJmrvWmj0vS1OOnkWYI1U5W/DUrhEmk3CdeBIBEi
-	BltFpMCCL8ATz+zGqNJYjLUDs7j5CCZH0LsptJK4qSacOz3th9Bv0xZ8IAfKR5/kfAOUvZ8h4Rq8p
-	Ae39CjVBliW0lGuOw6AtovHnaVHA==;
+	Subject:Cc:To:From; bh=ph85ZDRTWov53bumdN4BhGhFsj9VkRRexE10g5yL/6o=; b=tX4WCs
+	F66HH9Bh7fiprOEtpdwojmDpEB9IBYKVPLZaJ5xMKldw73K3oeFov+5ggDN30O3e3ZGHfzNBaO/ca
+	vkRrpOaFLZ0cH3APoGF7q6xpsQyHtnWLt9yRTYWKFRu61ErDi52RcBJs6H2j6ugvQp++iBYnwCBnM
+	OUlUFU7y07RJJYNNa9ubJ6AWtbqSPzYktH/do4lC8Y7lRpm6Cb4h+6tQOnX+RLPgz3OjL8c58YQl+
+	dsd6gwjP+2pMjw0dYQZM2VCuV0cGYUiQh437xgcSKzaSWJ281/yVj/AQYUkKfnomt0vx+fC/0tbf9
+	Yt6HhJubm2xflL3ACP38CLi51tcg==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWhp-0003ed-HD; Mon, 08 Jun 2026 11:55:41 +0200
+	id 1wWWhQ-0003ZK-7j; Mon, 08 Jun 2026 11:55:16 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1wWWhf-00Ag6G-K8;
-	Mon, 08 Jun 2026 11:55:31 +0200
+	id 1wWWhG-00Afz8-0J;
+	Mon, 08 Jun 2026 11:55:06 +0200
 From: david.laight.linux@gmail.com
 To: Kees Cook <kees@kernel.org>,
 	linux-hardening@vger.kernel.org,
-	coreteam@netfilter.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org
+	netdev@vger.kernel.org
 Cc: Arnd Bergmann <arnd@kernel.org>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Westphal <fw@strlen.de>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
 	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH net-next] net/netfilter/nfnetlink_cttimeout: Use strscpy() to copy strings into arrays
+Subject: [PATCH net-next] drivers/net/ethernet/emulex/benet: Use strscpy() to copy strings into arrays
 Date: Mon,  8 Jun 2026 10:54:59 +0100
-Message-Id: <20260608095523.2606-15-david.laight.linux@gmail.com>
+Message-Id: <20260608095500.2567-4-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,22 +84,22 @@ X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[runbox.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[gmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296450-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296445-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:arnd@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:fw@strlen.de,m:kuba@kernel.org,m:pablo@netfilter.org,m:pabeni@redhat.com,m:david.laight.linux@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:ajit.khaparde@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sriharsha.basavapatna@broadcom.com,m:david.laight.linux@gmail.com,m:andrew@lunn.ch,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,strlen.de,netfilter.org,redhat.com,gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
 	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -111,13 +110,13 @@ X-Spamd-Result: default: False [0.44 / 15.00];
 	DKIM_TRACE(0.00)[runbox.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,runbox.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,runbox.com:dkim,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 75649654C6B
+X-Rspamd-Queue-Id: C1178654C76
 
 From: David Laight <david.laight.linux@gmail.com>
 
@@ -148,22 +147,22 @@ All the patches are being sent individually to avoid very long cc lists.
 Apologies for the terse commit messages and likely unexpected tags.
 (There are about 100 patches in total.)
 
- net/netfilter/nfnetlink_cttimeout.c | 2 +-
+ drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nfnetlink_cttimeout.c b/net/netfilter/nfnetlink_cttimeout.c
-index dca6826af7de..7ed14accff22 100644
---- a/net/netfilter/nfnetlink_cttimeout.c
-+++ b/net/netfilter/nfnetlink_cttimeout.c
-@@ -165,7 +165,7 @@ static int cttimeout_new_timeout(struct sk_buff *skb,
- 	if (ret < 0)
- 		goto err;
+diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
+index eab81e073e1e..230c91559322 100644
+--- a/drivers/net/ethernet/emulex/benet/be_cmds.c
++++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
+@@ -2508,7 +2508,7 @@ int lancer_cmd_read_object(struct be_adapter *adapter, struct be_dma_mem *cmd,
  
--	strcpy(timeout->name, nla_data(cda[CTA_TIMEOUT_NAME]));
-+	strscpy(timeout->name, nla_data(cda[CTA_TIMEOUT_NAME]));
- 	timeout->timeout.l3num = l3num;
- 	timeout->timeout.l4proto = l4proto;
- 	refcount_set(&timeout->refcnt, 1);
+ 	req->desired_read_len = cpu_to_le32(data_size);
+ 	req->read_offset = cpu_to_le32(data_offset);
+-	strcpy(req->object_name, obj_name);
++	strscpy(req->object_name, obj_name);
+ 	req->descriptor_count = cpu_to_le32(1);
+ 	req->buf_len = cpu_to_le32(data_size);
+ 	req->addr_low = cpu_to_le32((cmd->dma & 0xFFFFFFFF));
 -- 
 2.39.5
 
