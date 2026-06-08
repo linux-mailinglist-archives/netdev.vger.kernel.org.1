@@ -1,158 +1,184 @@
-Return-Path: <netdev+bounces-296642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6WCZLI/kJmokmgIAu9opvQ
-	(envelope-from <netdev+bounces-296642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 17:49:35 +0200
+	id HBZ/NZPnJmptmwIAu9opvQ
+	(envelope-from <netdev+bounces-296643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:02:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E3F658535
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 17:49:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71AEF658762
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:02:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=kgQWjCvR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296642-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296642-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oBipKPHm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296643-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296643-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7DEC930E52EB
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:36:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B4323183C13
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87AFD3F58DC;
-	Mon,  8 Jun 2026 15:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F643D564B;
+	Mon,  8 Jun 2026 15:27:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1B83F58CD
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 15:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A7536E466;
+	Mon,  8 Jun 2026 15:27:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780932035; cv=none; b=fCliyqQHoxKt/929n0BNvfBfyjf5xZ72LEn/bNvvvH0MinYGGUN0yO22XwUc90hYnFnrk/zlfc1W9S74e4isrZ7EVntmhsA+NuDVhM6Vyd32cbGY+b524rOA7OivdbuCRx4EqiXEK3JRAnUeEd7rXt3ecI2U1HSKccKKExNisLc=
+	t=1780932455; cv=none; b=Xr2XoMajJy+aZNlFIHBNsCJnnbuAz3zz18XEQG3vCOIw9cpaPg2IWOBY1okkN8BKCOkqqdS2OIHo7Q0yGHkGtqeaoiOHQdg4yj+giKMVNoydTmQKX7r70K+qLPvwocC5aW4P5B+T8BIswHyPy2Ic1Pq5nN8rmP+GhVwMWXZTMI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780932035; c=relaxed/simple;
-	bh=ZnokL9vJuxctPfHNgTo+3iEanPUA6hSo6tJpy1bofuE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AyvJj9Mgf+ipL5ZRHe7Q4ay44b4eZbLslcZy43aDmsDtJ8zfWzqBw8BiB9PE8WA7qF4ww8Nbd8nMDQAaMfMelGExH9nip7xG1+I2Us0b2HXhBpJTpU9slQtSTnrmb+RakIhNSxf2uieRb9YibAWMZDQhmFAJM/0uyfGhUXbzmYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kgQWjCvR; arc=none smtp.client-ip=209.85.214.193
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2bf36a6905cso30598685ad.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 08:20:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780932034; x=1781536834; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DuxmpmIdpH3ndJdoAYsRiekrXsSax/s+T0BD+ZCuUpI=;
-        b=kgQWjCvRGmHB5CGibw2dnm+iNCj7BCCnIyydac20b+G7lnEvULBpIx2HdqfCtgGs8V
-         GD4Aq0oqsg7aRf4cbBfb/PP6kBtA2zGo71aDEDn7UN4WScQoQn91zU6zeqafoF8qTzH8
-         1/IRZDnGn2ZpUn26PUN471DC9VrdgfX69XV6JJaXHLU82Z5sNK262h8zvDO/lr0SRGUz
-         GbJx/gAGptjug2t+54j4aeOF1sbsMDeTox4gXIfuqUyBR/Cr9522iwsYcLwpVhtMxrn8
-         FiMrfSNVUNwgxcNYZcf9EDlqYV/4Tii+J/zs8GCq82y+npjnGkQBv5qOfWg7icVricrT
-         FHfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780932034; x=1781536834;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DuxmpmIdpH3ndJdoAYsRiekrXsSax/s+T0BD+ZCuUpI=;
-        b=g3gYgyWaMOp/VljWKrcT0a1+4HGXNLui5/EEncJET8MH7MCxV+RoGF/Ac7boUYfSTb
-         D/hrCphV5ladQjK70r9CKgwtf0v6ndE31UFqCGRxdSDaryMFaAMOvRu5K9XfmGLTysSL
-         aGCCuCxE1EbgBz6KIOgRJS3eSp0vw4Wa/1yD3LVtp9yd/Ip9hPLxs7D+rieBsxu8EEVl
-         ckdlnW/STDs3ZpOsp7E77UM9JsQWS9F2Z90TWOeZPe/bOzSOMpjnMsF2WQW73fAtfQ71
-         LOMRR09r/8gFSRWDZtf01/ooMmi0iwsDJlmmjC5Pb+2bGoTE06jXo0KWyg7d/PJaRtjU
-         o6rw==
-X-Forwarded-Encrypted: i=1; AFNElJ+112thGc+A7+MOgigXPhtrkvzsb/iVCv/mEyQlzILYw85oJj8//hpGSZA01cfW9SVtG65IoQM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/J6/tC5kVBjpE/ZEUFq0tZlN6vbS0cgkb1dotgE5YRTPOCSkL
-	qUwyEp4Vho9MvANg1PPME3zgtB1qLpYZcLgiE6Qv5+yHAh/ZA/TbcPf6
-X-Gm-Gg: Acq92OEx8YChNRddNtwCXQqHc5y6B82iE0VDKSVdxWvAbDswv5fNAnwt6YFPodoRJLj
-	ox+Dq0W4B4mcMRovnMsx0Ih5MHsye0EkKuDyowpfOUffa6F+0gvz/TpU5DZ31HReztLVnU2IKtD
-	bkhC4G8NB/NlXgmGuCgYxnTn5H9uSVn0ItSw/oIiiiX8Z8YV6rtNx4ZjMvRNLKgig0LiUfRKbS1
-	vuNNvPN3dcf1InEeoclgCYv0pPi3RRn6XTH43HJOKnuUrU/1P1e5iEB/Q5/cKuk89nKmfw4AtDQ
-	h2DclgKsWu6HLGNO/MR73Td/sGne+EIg/60EH6XBeVWEMDNSqroiDznwy52gXDDUSjtXd4MVjNX
-	ynXQQD39QsdUe+8cvxNL/f+WAS4qLXe+yQDcNOM/0tGoR3nkiQS7nx4pTdaTL2Hyv/QpQH8ru++
-	5B85qSvlxWXWFygxsCTRR1Joohjg==
-X-Received: by 2002:a17:903:2f08:b0:2c2:8659:da43 with SMTP id d9443c01a7336-2c28659dcdamr30769275ad.4.1780932033845;
-        Mon, 08 Jun 2026 08:20:33 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:7::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16649c01asm192713545ad.74.2026.06.08.08.20.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 08:20:33 -0700 (PDT)
-Date: Mon, 8 Jun 2026 08:20:28 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	michael.chan@broadcom.com, hkallweit1@gmail.com, maxime.chevallier@bootlin.com, 
-	joshwash@google.com, tariqt@nvidia.com, alexanderduyck@fb.com, willemb@google.com, 
-	jacob.e.keller@intel.com, kory.maincent@bootlin.com, jakub@cloudflare.com, nb@tipi-net.de
-Subject: Re: [PATCH net-next v2 00/12] net: ethtool: let ops locked drivers
- run without rtnl_lock
-Message-ID: <aibdpZV9mlUVsknb@devvm7509.cco0.facebook.com>
-References: <20260605002912.3456868-1-kuba@kernel.org>
- <aiNR_GaST-NnkZie@devvm7509.cco0.facebook.com>
- <20260605170952.52c00c2e@kernel.org>
+	s=arc-20240116; t=1780932455; c=relaxed/simple;
+	bh=Q6yMyuPrbfxp3d26feDoU/0MUfkyFzRW0W2fSiT2+lI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=S8UOLfmgu5IVfmcZe/XBNEyZIaFrZ1yXOQhXYdgrm/1pqdAAyS3KoA9DZduw4RNeAQB4/IfCE6T+s4x8JcY943P3czJMtbBBxkcSdbxPq3km0rHn3ygX8qyQYwMXDkriBNrI1DwpqVFl2Vo02hDknol1HGvdjyJyhyI/G9674bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBipKPHm; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 465DC1F00898;
+	Mon,  8 Jun 2026 15:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780932453;
+	bh=7AZ5vL34kYiiZacEbj+ZT/dglapfGdO2Op3ikt3we7k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=oBipKPHmEASagnU/g698KdvqU2dIkb4E5BUVk3yvYWBM4KLqWoqps17YWY2SHhRNo
+	 66LNtfzCYMIi3hBneUB3C3L8hhY88Irj7NphiIjvrVzR3WL5oS41gF0ye35SVRdRDa
+	 233hcXhm7laO4/rESAkMmsqMI9dkBma8Wieth9AHB3jRsLugNRE0eVmoYrvVqhlY6I
+	 r2SgzRCTrwmBfgwxX2zhIuWPnQjmoH2tzeEHKYYbLkuYbruLIvKaYDy6Au/hO98kDS
+	 bDI8eYZ9sHvUy174bPd6FL6Fw0ARxWfHvNyFli2tnEYz9EsWdD/gkEUdUVDXb6X4iJ
+	 eVewDUTn2RNGQ==
+From: Simon Horman <horms@kernel.org>
+To: muhammad.nazim.amirul.nazle.asmade@altera.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	Jose.Abreu@synopsys.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: xgmac2: disable RBUE in default RX interrupt mask
+Date: Mon,  8 Jun 2026 16:27:17 +0100
+Message-ID: <20260608152717.157757-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260604094512.21243-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+References: <20260604094512.21243-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260605170952.52c00c2e@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296642-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:jacob.e.keller@intel.com,m:kory.maincent@bootlin.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-296643-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:Jose.Abreu@synopsys.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,intel.com,cloudflare.com,tipi-net.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,synopsys.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 26E3F658535
+X-Rspamd-Queue-Id: 71AEF658762
 
-On 06/05, Jakub Kicinski wrote:
-> On Fri, 5 Jun 2026 15:48:48 -0700 Stanislav Fomichev wrote:
-> > netdev_ops_lock_dereference name trips me a bit (_compat suffix would've been
-> > more obvious), but I do agree with the reasoning about needing 'a' lock..
-> 
-> Guess I hate long lines more than I hate inconsistencies.
-> 
-> This:
-> 
-> 	something = netdev_lock_ops_compat_dereference(&dev->something, dev);
-> 
-> is uncomfortably close to 80 columns for me.
-> 
-> I think the existing naming is as good as we'll get..
-> If y'all disagree I can respin. I'll be sad but I'll respin :)
+From: 'Simon Horman' <horms@kernel.org>
 
-Nah, it's good. I feel like netdev_lock_ops_dereference is also already
-a bit too long :-/
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net: stmmac: xgmac2: disable RBUE in default RX interrupt mask
+
+This commit removes the RX Buffer Unavailable (RBUE) interrupt from the
+default enable masks for XGMAC2 devices. This is intended to prevent MAC
+interrupt storms that can occur under heavy RX pressure when the DMA
+runs out of RX descriptors.
+
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> index 51943705a2b03..b5fdc253a2f24 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> @@ -379,9 +379,9 @@
+>  #define XGMAC_RIE			BIT(6)
+>  #define XGMAC_TBUE			BIT(2)
+>  #define XGMAC_TIE			BIT(0)
+> -#define XGMAC_DMA_INT_DEFAULT_EN	(XGMAC_NIE | XGMAC_AIE | XGMAC_RBUE | \
+> +#define XGMAC_DMA_INT_DEFAULT_EN	(XGMAC_NIE | XGMAC_AIE | \
+>  					XGMAC_RIE | XGMAC_TIE)
+> -#define XGMAC_DMA_INT_DEFAULT_RX	(XGMAC_RBUE | XGMAC_RIE)
+> +#define XGMAC_DMA_INT_DEFAULT_RX	(XGMAC_RIE)
+
+[Severity: High]
+Does removing the RBUE interrupt break the driver's ability to recover from
+RX out-of-memory conditions, leading to a permanent RX queue stall?
+
+When stmmac_rx() processes packets, it calls stmmac_rx_refill() to replenish
+the ring descriptors. If page_pool_alloc_pages() fails due to memory
+pressure, the descriptors remain empty:
+
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:stmmac_rx_refill() {
+    ...
+    buf->page = page_pool_alloc_pages(rx_q->page_pool, gfp);
+    if (!buf->page)
+        break;
+    ...
+}
+
+stmmac_rx() then returns the number of processed packets, which will be
+less than the NAPI budget if the ring is empty. This causes
+stmmac_napi_poll_rx() to complete NAPI and re-enable interrupts:
+
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:stmmac_napi_poll_rx() {
+    ...
+    work_done = stmmac_rx(priv, budget, chan);
+    if (work_done < budget && napi_complete_done(napi, work_done)) {
+        ...
+        stmmac_enable_dma_irq(priv, priv->ioaddr, chan, 1, 0);
+    }
+    ...
+}
+
+When the hardware subsequently tries to receive a packet, it finds no
+descriptors and enters the Receive Buffer Unavailable (RBU) state. By
+removing XGMAC_RBUE from the RX interrupt enable mask, the MAC will no
+longer trigger an interrupt for the RBU state.
+
+Because no packets can be successfully received without descriptors, the
+normal Receive Interrupt (RIE) will also never fire. With NAPI stopped and
+no interrupts firing, the driver has no polling timer to retry allocation,
+which could result in a permanent stall of the RX queue.
+
+>  #define XGMAC_DMA_INT_DEFAULT_TX	(XGMAC_TIE)
+>  #define XGMAC_DMA_CH_Rx_WATCHDOG(x)	(0x0000313c + (0x80 * (x)))
+>  #define XGMAC_RWT			GENMASK(7, 0)
 
