@@ -1,122 +1,121 @@
-Return-Path: <netdev+bounces-296754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296755-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5W/DHKpEJ2qbuAIAu9opvQ
-	(envelope-from <netdev+bounces-296754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:39:38 +0200
+	id x/W/KdREJ2qjuAIAu9opvQ
+	(envelope-from <netdev+bounces-296755-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:40:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD2065B021
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:39:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2994465B037
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:40:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b="e/zlx72T";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296754-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296754-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nDN3GQ4w;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296755-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296755-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89849301495F
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:39:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0E863015CB7
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EF13B3886;
-	Mon,  8 Jun 2026 22:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363953B3886;
+	Mon,  8 Jun 2026 22:40:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8984B3B14DA;
-	Mon,  8 Jun 2026 22:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3481238B7A1;
+	Mon,  8 Jun 2026 22:40:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780958375; cv=none; b=QIRy3/P4Be06rFLDKoepsXUMas4u4LZwGJhiCrVQ+cvF89YLYSBar3xqKDID09nmjOGhACI7YjIlp+sW4qRbRFutrNVLOo63vBznRtlbBL6RDJEPyxGmMro8Y7Oj2rs03snMrn2vGHYFZW/gIcvgsSDEUw289GYZWgHP0TKh828=
+	t=1780958418; cv=none; b=OeioOVMoEoPY4fIF5OYFGdhRVfD4eWpsKGwdBzhdUO6ae1UoYHteURiifxZjMwrYwlE1v9JQEBId0rXT62oiET9wD4IfWB61q+zjZpd0fx9zm6e5roAFCQmrHQM9yll1Y4re1IESmMPpLByl0rxCbG4vYnUjDyXUZ9FVYb6LW7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780958375; c=relaxed/simple;
-	bh=+Fi3sVsuwExNL+7pNEZPC52ELM3zS+sCwv6XvTeLfIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HsIVzior6vwc68LFX9/gXBctoJCNg8BKEIbH/u5cBP9VhXcWWlQ94QAaPvxJBd2UNij6J2qA5frygiQVmD3M6YSiOBFK9Eo5AItu2sj0O95flzyaWcuhvxJz5SvTKdYBG3ob5O6oBLKB3Bwm216/7KZcM0eCYhVKNKPHOzz0604=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=e/zlx72T; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 95CA66017D;
-	Tue,  9 Jun 2026 00:39:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1780958371;
-	bh=JK1bd7LvraTNFT4vJa+JYC9LaSx8/4N0x/mO2QrqYkI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e/zlx72Tvq4BYNFBexcJ2DstWTQjL11q61Ft8ozJIrbs02Ws76UpVmIhArFAJcfeE
-	 DJo/Iw8qqTNEqwIT5vxnC2swIncTF1foDP1T/++fQNcB5ZslYhj+Xrjqcw0udo4N/M
-	 bob6cGRmjCH+zYiYUSj5JKxzSlt/gs6j4VdFOc19p1Fx7vy+AVlb+ZAjQcyLC0hRRE
-	 RO5K3Te5GcP4CkDjDn0xfTk2qncmhjYtrzOxx/jUw6dkeFG+rh14qTy+O2qEQp8NOa
-	 kzu8FZrgMmBws9wK0waI6S9inPv7MzrJIv39nRwm+pQd+4Hd4wx4bitXVKtchla2DM
-	 hT+Xjw7KwZ3ww==
-Date: Tue, 9 Jun 2026 00:39:29 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
-	horms@kernel.org
-Subject: Re: [PATCH net-next 00/15] Netfilter/IPVS updates for net-next
-Message-ID: <aidEoZt4bt085hss@chamomile>
-References: <20260607094954.48892-1-pablo@netfilter.org>
- <aiaubSEfDp_JQk_p@chamomile>
+	s=arc-20240116; t=1780958418; c=relaxed/simple;
+	bh=OACwnzi0kI0en+UEH2pxo2bVWDTgK1Uq5eYeMsjsGRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dgPm2mmp+PSG1b5kRDc1v1V2wx3rDwvukyk7/7nl8GCSt7PP+1nOFqJZKQWhRa+jhsRznroVDbz9EVlEJ6ZvR1NjKC+tdh4j3DBC6aW4DWP1VUlYOZ5sM/8dN2/xlhmSzCXitXK0Yb0UTmlgpRlLqPpK24xvlLVbhOXnSarRQxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDN3GQ4w; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77BD91F00893;
+	Mon,  8 Jun 2026 22:40:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780958416;
+	bh=M8nOicOlTfte/KI7cVfb83QF0FdOUbxS7QionoYVBZE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=nDN3GQ4wTdfyy69pVW0gsM3NBakREk0mdjhpqPH+SXHphXdt9EbT+pyQeBFoYPfDe
+	 /vPn3XXniwwPExv3gZVNBN7tLYULbU/iQqyWWDY+AihQvNMKkXFxdgmPdhw2i40Y9R
+	 SaY3rpMYQrwiOxWH/F4+qTusU3WxGddMw61rM024kH0yHiCnCTLaWyKbG+4U0seo6I
+	 RQyxrMGVAJ9WvbZlpPQNmmmgGzlLCo7lRdGqroxB9cm6vhgoG9yd/jZz44m3gfJy2/
+	 mjt2rz5mwUcyYLPwwVO7J3mOcHFw4yTuuym2C9XWmlpryJFz4rJq3StEo0Imj6uswv
+	 6l7HDZfbjkKjw==
+Date: Mon, 8 Jun 2026 15:40:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+ <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+ <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v19 net-next 1/9] octeontx2-af: Enforce single RVU AF
+ probe
+Message-ID: <20260608154014.1b7c8be1@kernel.org>
+In-Reply-To: <20260605063245.3553861-2-rkannoth@marvell.com>
+References: <20260605063245.3553861-1-rkannoth@marvell.com>
+	<20260605063245.3553861-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aiaubSEfDp_JQk_p@chamomile>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296755-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296754-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,netfilter.org:dkim,netfilter.org:from_mime]
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BAD2065B021
+X-Rspamd-Queue-Id: 2994465B037
 
-Hi,
+On Fri, 5 Jun 2026 12:02:37 +0530 Ratheesh Kannoth wrote:
+> There is only one admin-function PCI device per system.
+> Reject any additional AF probe with -EBUSY so the driver model matches
+> hardware and automated reviewers can rely on a single bound instance.
 
-On Mon, Jun 08, 2026 at 01:58:40PM +0200, Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> I'm replying to Sashiko.dev comments here:
-> 
-> * [PATCH net-next 06/15] netfilter: synproxy: fix unaligned memory access in timestamp adjustment
-> 
-> Refers to pre-existing issue. I think this comment is not correct?
+Could you point me to a PCI networking driver written in the last two
+decades which would have this sort of limitation?
 
-Yes, it is, inet_proto_csum_replace4() needs an even offset to the
-16-bit word. Checksum will be corrupted, but at least the alignment
-issue is addressed, which leaves things better than before. Maybe
-it is worth to add a note to this patch.
-
-I can post a v2 of this PR to refine the few things that make sense at
-this stage.
+At the very least you need to explain in the commit message **why**
+correctly handling multiple devices in a system is beyond your
+abilities.
+-- 
+pw-bot: cr
 
