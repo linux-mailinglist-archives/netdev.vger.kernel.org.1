@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-296681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296682-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NMvGKbsFJ2rzqAIAu9opvQ
-	(envelope-from <netdev+bounces-296681-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:11:07 +0200
+	id 6aofALoFJ2rxqAIAu9opvQ
+	(envelope-from <netdev+bounces-296682-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:11:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4030C65990C
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:11:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F279659906
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:11:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MSLXqfEY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296681-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296681-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Hpi+bsye;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296682-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296682-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D18F63055827
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 17:33:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 362C63059922
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 17:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC6731F995;
-	Mon,  8 Jun 2026 17:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516EE35677B;
+	Mon,  8 Jun 2026 17:33:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882B834F49F
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 17:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CA0352013
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 17:33:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780939996; cv=none; b=pZEOhMMDMxoAK0d9ejtXzInFHwk1pi/cCLAF7TOV9rVAq5VQHjKwzGQNrcquY08DsjCPbc0QTGD3f1milyJJtGGSswHeXzusDULyHNtX9t1z4B6PM3cn7LZejbJhdErpYQ+jZVmXyRowxkifyO3p4t7UADLkU6wb22JJEfCC4zs=
+	t=1780939997; cv=none; b=gbxLMgJT/fWPV3R+JapPpOL17c/MXahmxDhIk1xZ8s1qHov6REd/mzbCXeuBSKvwF5zs/mPKoeLbhOTEyELMy3H1hKkJ8dfbCunA+TGvYJnb6xJirI70JokLKd7ZlubWYeSMa1GTTCtVKVwWAmbgSg0L0Vp64O9Qw5BqSD7VPkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780939996; c=relaxed/simple;
-	bh=NEDrT+tkMKqVoISpLEK7odi7OXlLCcqFV/Kbr8tJH3Y=;
+	s=arc-20240116; t=1780939997; c=relaxed/simple;
+	bh=Eky4V1HhvRVfbg1RJIt+LIyGWm19sueySJ5hBLj8uRg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V3SpS2ZvD2kiSCwZTno18mnaj4uk1fHx0KOzTQhStlX5XRlHLVYATMfG7gcWfhtfEPfcsR6heeOhiRA8fjpqS459q3xaLYXoVDl8XsafQnsM5+2uuKr9WWDJxeXjpSRax0DZ7cH3rwPwbD1V44M/B0p6IWf7QUhmsB9YAMMB5kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSLXqfEY; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 263981F00898;
+	 MIME-Version; b=MDyVSfkkzCNOxng1fMsMB/hgWX8YTvK52aV/OOORhT4PyBNVVfJif7MXKNVK9DyHriv3ottG/AvAS/ZlPJ+6ql+g55WU64hqV1gXHMtbdZrNOLhgjNN9gtBN5JC+i0pCBfzEMArPVb5p9ZBJteUvQp1+YY2LV8fXXNhMNUSuBqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hpi+bsye; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9637F1F0089B;
 	Mon,  8 Jun 2026 17:33:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1780939995;
-	bh=s7X6UnisPEkqurWv3wNIstYO6ikwHJiSQVHVtg+i2cg=;
+	bh=QZGg6+zMOS1CYP+ntugAKQk1GIfcAEdDrsYd/TpBkvs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MSLXqfEYiyTUVjJmie+s7YPBbZYGk39xpXTnUr09jTlPrQDzIEuTAMY6RHTRUP88l
-	 ztBUQhoKiRFwXcCTiG9zunZPNuOccr2hq1O4WDaHVtWNeZhqR/YPP75YH61xgOj2eW
-	 xv3QuWLwSZ5Q9I7V6PfIQ2Z+qDVo1MT0SZJJCAfG99z4VAf1+KBOBGEEAqdSCgncxH
-	 J5bQjy45VCEIV0YVb1hipjmWzjGHolLOPeSG7fGK2ttShcQ6l2d3KdX158cfJJNau+
-	 VfyckdTxdgg1rqHqZ6F/VtMoiLAFBTx02G1zR52DIEfF5Ele/fSZ7Po0DOY9MiKqts
-	 PGyX/sPjyj/KQ==
+	b=Hpi+bsyelz7NCSXV0wd04aXDpQ96En24/gMwHb/1jrjkYE5+1FzT7LNqEtwRBRidb
+	 ZJA09yqxXS/JyTHfkP9u14TpmByu8ksQ9hQyig274EhwJNTn5/fqQCd39oINlmF7nF
+	 vt5N1SR/86etMGOjG3f0rfn3U27+y0Bb+Qz8DNL0hpGAo2FX1Iv+gqG9Gd1HW97FXH
+	 DRJbN79IcvnbY125EPNNH7r1mFOgsh05OwU/MWMXuNB7Ng8pSwkzwJ7mbycWmLd+45
+	 PnQd4owl4yfV4He6Wv9Uz6xSpObWWUR827ofye3+SolozpbdLMJXry2UezO6+2d2FM
+	 EOAqe1FpHSSkQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	willemdebruijn.kernel@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/2] selftests: drv-net: so_txtime: remember to deploy the binaries
-Date: Mon,  8 Jun 2026 10:33:04 -0700
-Message-ID: <20260608173305.372987-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/2] selftests: drv-net: so_txtime: check IP versions
+Date: Mon,  8 Jun 2026 10:33:05 -0700
+Message-ID: <20260608173305.372987-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260608173305.372987-1-kuba@kernel.org>
 References: <20260608173305.372987-1-kuba@kernel.org>
@@ -83,7 +83,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-296681-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296682-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
@@ -104,46 +104,42 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4030C65990C
+X-Rspamd-Queue-Id: 3F279659906
 
-The test seems to be written with a single-host loopback
-in mind. We need to deploy the binary to remote before
-we run it. This is just fixing an obvious issue, but
-more work will be needed to make the dual-host setup
-work reliably. Most of the runs still fail with:
+This test needs more work, and it fails in non-obvious way
+when IPv4 connectivity is not available:
 
-  FAIL: start time already passed
+  # Exception| CMD[remote]: /tmp/vjquwblf/gukinuzqso_txtime -4 -c mono -t 1780939014114542914 -S None -D None a,0 -r
+  # Exception|   EXIT: -15
+
+Explicitly check for IPv4 support to make the future triage
+less painful.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/drivers/net/so_txtime.py | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ tools/testing/selftests/drivers/net/so_txtime.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
-index 5d4388bfc6dd..ddcd2c0e06a8 100755
+index ddcd2c0e06a8..8fe061f52055 100755
 --- a/tools/testing/selftests/drivers/net/so_txtime.py
 +++ b/tools/testing/selftests/drivers/net/so_txtime.py
-@@ -18,14 +18,16 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
-     """Main function. Run so_txtime as sender and receiver."""
-     slow_machine = os.environ.get('KSFT_MACHINE_SLOW')
+@@ -64,6 +64,7 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
+ @ksft_variants(_test_variants_mono())
+ def test_so_txtime_mono(cfg, ipver, args_tx, args_rx):
+     """Run all variants of monotonic (fq) tests."""
++    cfg.require_ipver(ipver)
+     _qdisc_setup(cfg.ifname, "fq")
+     test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, True)
  
--    bin_path = cfg.test_dir / "so_txtime"
-+    if not hasattr(cfg, "bin_remote"):
-+        cfg.bin_local = cfg.test_dir / "so_txtime"
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
- 
-     tstart = time.time_ns() + (2000_000_000 if slow_machine else 200_000_000)
- 
-     cmd_addr = f"-S {cfg.addr_v[ipver]} -D {cfg.remote_addr_v[ipver]}"
--    cmd_base = f"{bin_path} -{ipver} -c {clockid} -t {tstart} {cmd_addr}"
--    cmd_rx = f"{cmd_base} {args_rx} -r"
--    cmd_tx = f"{cmd_base} {args_tx}"
-+    cmd_args = f"-{ipver} -c {clockid} -t {tstart} {cmd_addr}"
-+    cmd_rx = f"{cfg.bin_remote} {cmd_args} {args_rx} -r"
-+    cmd_tx = f"{cfg.bin_local} {cmd_args} {args_tx}"
- 
-     expect_fail = not expect_success
-     if slow_machine:
+@@ -86,6 +87,7 @@ from lib.py import NetDrvEpEnv, bkg, cmd, defer, tc
+ @ksft_variants(_test_variants_etf())
+ def test_so_txtime_etf(cfg, ipver, args_tx, args_rx, expect_fail):
+     """Run all variants of etf tests."""
++    cfg.require_ipver(ipver)
+     try:
+         _qdisc_setup(cfg.ifname, "etf", "clockid CLOCK_TAI delta 400000")
+     except Exception as e:
 -- 
 2.54.0
 
