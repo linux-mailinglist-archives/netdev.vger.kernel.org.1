@@ -1,249 +1,284 @@
-Return-Path: <netdev+bounces-296735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296736-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nAMSLLg1J2pitQIAu9opvQ
-	(envelope-from <netdev+bounces-296735-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:35:52 +0200
+	id gOGSD0E2J2qAtQIAu9opvQ
+	(envelope-from <netdev+bounces-296736-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:38:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F5E65AB17
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:35:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CAE665AB37
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:38:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=uo2OUVbR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296735-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296735-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=jvosburgh.net header.s=fm2 header.b=fIWuhia7;
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=ffCugiVi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296736-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296736-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=jvosburgh.net;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 778ED30055F6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 21:35:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE5223020D76
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 21:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5823AEF22;
-	Mon,  8 Jun 2026 21:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401E83AEF59;
+	Mon,  8 Jun 2026 21:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F2639E9D5
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 21:35:39 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780954541; cv=pass; b=ozA8ymnrzaP51D7G6cTJ05uXcezzQxZeTsHQCj1MOFmQxjKnvEt90aftCFOoFZLbbMftfaqytkfEXfixmx13z8QdY5Cr2r9ZlsqY8q77W2bQKH4k/vMUNbo/21U46p1yesq+gd7tu/GZ5ic3K9y5m6O8NYEsxy+sMmk7H3y5D68=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780954541; c=relaxed/simple;
-	bh=1A5zKEqAscmhGqROJUPu7ZRqKa1REMrRG6hrstD7bCg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OKIveQXpenZ4oLlQ3th/yAYYteJI0xSD43xX7HldrPHkqfvn06IMGyh02zd4DAPLOXAgnRSqWlG8EGM/BDzqx7wVF55H1oOBR/vcQeU9nYNI1zhAfPZ7Gha8SMe0EbVxdGycmsEKPqCSATS5moG48DnrhyLe+uBfyIN2JBHARt4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uo2OUVbR; arc=pass smtp.client-ip=74.125.82.54
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-13817614cd3so1478628c88.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 14:35:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780954539; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QS8O6w+G0AQ8g97YZi1TwVFL57FUKkgL0gGBM40PacVmBvcOu9WbuZkc0/OqqmuAa5
-         Xmqek97Ni+VhbGlAuwnitkcbuutJgz6NG51Uq1yoAmwx8J0Ed6ChEl/NVPSid1Sd9ji4
-         rENOzAAn7g6Ht447SaK3xQRmQxDzha/RqX4negGGR9/eg9f5GwmAUy4BWWRgBSDDGqAF
-         nV5wPB7z5QFDz4VYelwgr+sOnfAJSrrblIZ0U/JDXXY2KhPtZjg22Y6NfDUfmU8mEUXa
-         rEx6dr2ehc9vU+8UsI/CaNAgSXr7y/8wTy4ySXaCgIIwN+Iqc62Jn1DHJYQ72IhBXtRP
-         ok5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=kfEI3p6vfYRJLFYBKXtD1V6ydUrj2yea5C4lNu0JJ2A=;
-        fh=OjffW8p5H2XEIeRev/ThBkClUgFf7tlRYSJj6+8BnkY=;
-        b=e0+8GiBBhdrHEiFCUJ2P8uUbRHv+f9VHzZdF+su0WY5xO2WrcGITWvFNE7/mEHYhzG
-         ruWCgo4mGoCkFOJrV9qBqe9Pt+QEaq5f81vf9bPm7OxvgEd3OS/A1485siIjWxq+pOe8
-         kvSV5uBLv1ns1Qtkcfva9tXGsGOVVGQ1HbQlYLUWrsHnauaY++jPfv7ggWdw592FNOrg
-         6nElkdwcDFv+th5ZtkIQzxSpd/BBDg/fE1hteuuvPD8UJGj0A0GnSV1YHXdGW6/ExSI8
-         mBBnZ0Vim6Jt+m3VYTfOfkE3UKcZ0hXG46AktiHw0yiqyozktFxXX6SmgQnMSJ7Patp0
-         c7/Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780954539; x=1781559339; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kfEI3p6vfYRJLFYBKXtD1V6ydUrj2yea5C4lNu0JJ2A=;
-        b=uo2OUVbRa39U0wC/EJUyZ70AuVfZ4D5qWOO2Jx0vUNXm1mfnhx1yYx3KDRhv/2aYI6
-         F+0vATXhlu+ZEenNggghGhACfDSEh4azmVb3o4lWBECZhaDDjqrusmk1ToCFJo1VqK0s
-         wnaGRd9/XnEE789JK6TTDah6qKHGr5ApOV1DWp6AJX+cFzmmkN6jLaZ2dFXQXREL8Xmt
-         iovp1VAtUmVrZXe69ZZbsSj0jSDFfS9xXcsilB2TlHTQGcOxJIvraR+A3CzU2jxYAEch
-         w0rayS+pgRH0M+35kI4+lSsMFlAk7BXYhTqt2Q9drGcOLLjkkzhvIjEQc/ZxXWDl8aMf
-         zceA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780954539; x=1781559339;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kfEI3p6vfYRJLFYBKXtD1V6ydUrj2yea5C4lNu0JJ2A=;
-        b=UIJGnMot6EW19aROkdCTecTQPFABJw2ZzQlH+mcD9ExCpU2KJA4ybAVBw4bLsrNFPe
-         /FRhRFCxSYyH3se0HiQHT/B9n+ClAd1Y3EWcOV3JLwVsSqL6P8ecsLUnie4q53N1f97M
-         t1u6loOJWnI99ZqtU5TLfIHLUXIQqX61B30Ih0GBth/UdwVuneyWYsjQdQU5g2NN7Ymw
-         kACftXGQkNCqtiYzV6ODBJS5khcRZbXyOkgbEHsHzkhxcGrGjy5wk191mwqre+1zR/vP
-         zd4NOJruxlKntoIqW6e8CUuXf01B21kR3iBOh4GMhdC1oYXafPnzDgcpgqC4k2XB+8le
-         pirg==
-X-Forwarded-Encrypted: i=1; AFNElJ/YPy9m/eNXlOw0OB17GIIkinA/cuBBqfp+spwwetjWRt8TXyZdBjIuOR0Ybw/rb3GBe30eytA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV5IpkMNzPPzDF3mE2yGIznTqgMW7WcI4uAmyt4CK/3h/2BH6Y
-	A/O+YWU1ynO00oVgAkHMpeNz9k4XDMQtSdfNeehE1PW1wIzRNrwAwXbRzSN3MSCekMKW2UVtpjf
-	WNCSRpnJruPLgpZAZaO+PHDf9V7x55taKCA1uirfT
-X-Gm-Gg: Acq92OFhbZrmnrX37F+ia7UecEZ691OBuImGttYuqU6O/p+be9oY+0Adm36aF2LSBSd
-	+RqR1or5LvvF2vMFmwt8wv/dMptQ8FlJxxSljRVGnIouJr/9Lu1bdwWYfXs5gVtZWUPkB0gaUqj
-	cACy7bgc5YuGrZrecRva/CzKaAk3coJ7ifsw1wNI2ulXXwJxY4aoEu8mIvZ4Guanlg4IZVLTqi5
-	m7ul9+FRphYALxE6PUAH4ApvbmRKxWZeE7uzrRXuYV94SP3kpvC8QWrcZnZtzlUGim/SeLVqede
-	mYyxrkSaux6bIyil4KvQjBpjhkKLXr+Nf8+WkFfRCH4+r1dDwpyDZ+7BlU4X+YXvqzws9Yobh/m
-	5d4kwQKquwtm+55yb4F2M3TDNpvwr9f6wxWEsVBvxU7Km4H4fFO20diHvoO9S
-X-Received: by 2002:a05:7022:503:b0:137:f0d8:4ffe with SMTP id
- a92af1059eb24-13806764206mr8627440c88.36.1780954538395; Mon, 08 Jun 2026
- 14:35:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD628394793
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 21:37:24 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780954646; cv=none; b=QiUrxW6v+mxs15SvuOdtI5gtNWzBd64gdQwE1UhpcTQ6e0Nw0xAzpQU+1rfE1ZanpYJIrWcYcISTRDSMECgeajtlJJ+IzrkLgI5roazlQNYN0ExgdwAT5Beh/+Mk0+s8Ho+uNJroVhXLM4p9scMZJpx1N5PQ3Egmyu78UKTd97U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780954646; c=relaxed/simple;
+	bh=NzmzpcurZ6tos4/4NlLfYYB4IKEEF3+X7raO1WddR8Q=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=D3V6OmKnGASJbV3oryFn1HmyZ/AxA0gUuJw6Gti0qdGOzDI5cviDSd/gTr00ZJm6h4I0vdLiXHN5EQSBC6fs0nP5QIs6T+rfHJTZExOeW/6DcJiEyZMgcm1H16o+pNvhAX1KzgRCESFkSG3Exa32rUVDfVN4n1tfgf5FvGFXu44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=fIWuhia7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ffCugiVi; arc=none smtp.client-ip=103.168.172.157
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 238491400077;
+	Mon,  8 Jun 2026 17:37:24 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Mon, 08 Jun 2026 17:37:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm2; t=1780954644; x=1781041044; bh=+kLpmCziW1IqlS23DUjG6
+	8dKYgm3aLvpO0HfQHtid68=; b=fIWuhia7lD8jC0/esio2bWx2ENer2hODy8T2S
+	3QkVRJXtdKGUXUT5e7Irv1pRDnSmNeKsOu8CJCTwGp3l83ojRnxhvw9noh3xNUn0
+	SddHbvyDJvjJ/WVV4HuVt4sQm52nvevOwH8pb+ZaSUf2XOICLC/LNFhWSFHdHuT5
+	pGSO+ll1nCIiEVTvm4SoGBlpBqt6HtZYZ0vVp49dpk7E6svpE1kGFTSNfgVmo8uN
+	S6ONpCJeA0vXuUx/6n5mSnVTPumODw5clKlqkgpBUsG6TbMx/W8nFAZzjgP/57gT
+	nBcHpLUSwkufkIDf/cg2PuGJ90tVBYkAhVEJzYMsUAhe5e4XQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1780954644; x=1781041044; bh=+kLpmCziW1IqlS23DUjG68dKYgm3aLvpO0H
+	fQHtid68=; b=ffCugiViCbdi64lcXFrY/+z9WEfnhEgA1jEe56d/WIoTdrG+kgk
+	QK+svOOgK8RBudPN8/HP93oqd5JtRvABUsMHgsWbJqH8T+1yA4yilHehyALkIrUs
+	tjpzoR1+e8SjYEXoPokaRXEs3weRbj6gY9F1yu5parBK+FfDe3Z02Fvdq/cMAASS
+	rOZjkuBtVWyu4UnbRhfIk+Sgxthuq/DLuqhBLu4AR9C00nHPvLkPpegquvABQfaf
+	DaTyRrIIQl2MubUAgGqVapoHoVAee42Kszz7E9G6VTmN7tEsh+J07GH7ckYF5VBC
+	XTUJ2/NkH1JrJal46/id2ue7hHSwVbhMfcw==
+X-ME-Sender: <xms:EzYnaqzR2Xumbuid3SFQzBlqcKZL_SLZNWPypRchOgHBkGUKywCxsA>
+    <xme:EzYnaiE54J3WBsTFJ9x8_D2hcalTKd5KBPzNATtdfAysOcDqWQvPI1LdeegPjssB7
+    c8m2CBwrbr8IbrE32WKyxRgFjw5saVKMURbCR9u04X7YBf7evSgLiw>
+X-ME-Received: <xmr:EzYnansyibyo1FMISLpDn9Shfsgqxjyha9UvyOxCRdlfAXN07X-cj5hHwEXGO5B0Bspcgw>
+X-ME-Proxy-Cause: dmFkZTEvJdzo4XO5EwvRLePZwnvJ3thpEh8fpGC9pndLry1OAlUNMG8kxEhoSIdzgbX2Hg
+    BzEqUHgnNHQO1DHo1Lg0c54QMCEP6suyANf/tosKcEOd9UHLCKC6fO16VFbt68s7KWObBj
+    N5wsmh+kMEke3yLc4IhLrEowVL63noRDXlQk9gTYyR83aES+/zQVti7UDTuImET6Bxg+Us
+    1Swugzhpkf9nU+EQV97UI3DDATewu0InHUus3W633H3FzD240Ud7sUl/6aZ6PCnaDG6IqK
+    IZZVTf16B4WUvb+jXZwpFluDpEgnC3IPlX0bOD/0aNVWgT1hd5GwQLB0yhtQonPNw+BULU
+    Zgk4nWXvo7vSPTK6n1JhoPGU+pK/dqAJexMA5qGtOs/v0JobsBk4wtzZ6g16VxO31GwLUH
+    IbnuCDx2ybq/uAQzoRzY+kRMmoIW0/VVxjry/46WBD16B51UupO/ry9zZ3xDqyefUeVoNE
+    APcCMmJSMfAhtvn0e7d27tSBntxGqo3ujZjivPfqXbnlxdC3+AQpZWSDL+vQytO+ky2dh1
+    KW/48f+TtroE3dhikIG8+PZzbdPzBrdhm/ubwxQjb3FZ7Ttk6m/NNw5vOcKQWHrvNsTZjE
+    UoKA0IVddBXCpNUk385Kk1+PWpT5BAcCYuyWTci3ID68D9Fl0/DbIvG0HiVQ
+X-ME-Proxy: <xmx:EzYnaqA91-_PbyCXASUcZxxUb5LtfXyBKB4pwU65F3Hvj-C_nWFmQA>
+    <xmx:EzYnaqCTDVasMog9sdHmBR56AP61UFwGVwIgYgQIwvSH4NS96E-mpQ>
+    <xmx:EzYnasps6NgaXhdPT0JcuFJ533bVyLisIBSly1lErON6EiFphXSCSw>
+    <xmx:EzYnatHbhGwIERRDsj_d913ldYejA-OQW8X475HUkZ7RDRTYLVvnjA>
+    <xmx:FDYnarRvlGZkJ92X-AUlHYvtBA5rx11rdZDm8mOEtqKRAkbnz1VI1OQp>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Jun 2026 17:37:23 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 6BEFE9FC5D; Mon,  8 Jun 2026 14:37:22 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 69A379FB80;
+	Mon,  8 Jun 2026 14:37:22 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Louis Scalbert <louis.scalbert@6wind.com>
+cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com,
+    andy@greyhouse.net, shemminger@vyatta.com, maheshb@google.com,
+    jonas.gorski@gmail.com, horms@kernel.org
+Subject: Re: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable
+ slaves
+In-reply-to: <20260603150331.1919611-5-louis.scalbert@6wind.com>
+References: <20260603150331.1919611-1-louis.scalbert@6wind.com>
+ <20260603150331.1919611-5-louis.scalbert@6wind.com>
+Comments: In-reply-to Louis Scalbert <louis.scalbert@6wind.com>
+   message dated "Wed, 03 Jun 2026 17:03:29 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608125846.157004-1-jiayuan.chen@linux.dev>
- <20260608125846.157004-2-jiayuan.chen@linux.dev> <CAAVpQUDZoEVEX1kXok-29dzVHk=ZK_2MkZyZY8kRHCJCfAWVFg@mail.gmail.com>
- <DJ3XPJA746S5.NYKZWY1HBH8O@gmail.com> <CAAVpQUATP7S7OEZw4P_7fp5zmQO-T5jByxAfp0+YsjRENeWscg@mail.gmail.com>
- <CAADnVQKa2Z2HKKZMhyD1HrurQ4LTcCS0Mm0YPxtisGKwVfcxmg@mail.gmail.com>
-In-Reply-To: <CAADnVQKa2Z2HKKZMhyD1HrurQ4LTcCS0Mm0YPxtisGKwVfcxmg@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 8 Jun 2026 14:35:26 -0700
-X-Gm-Features: AVVi8CfNPnu_11Y9w6rUPwUMj9tXfuWG5h97XU5lB3N-O0DJfMa4Mh5VgPAmWag
-Message-ID: <CAAVpQUCJH3iknHSfNwMqvHVc_V09zNDK-YbXbqa-=K159PTqiw@mail.gmail.com>
-Subject: Re: [PATCH bpf v8 1/2] net: Validate protocol in skb_steal_sock() for
- BPF-assigned sockets
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Joe Stringer <joe@wand.net.nz>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1041443.1780954642.1@famine>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Jun 2026 14:37:22 -0700
+Message-ID: <1041444.1780954642@famine>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:joe@wand.net.nz,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:alexeistarovoitov@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296736-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296735-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,famine:mid,vger.kernel.org:from_smtp,6wind.com:email,jvosburgh.net:dkim,jvosburgh.net:email,jvosburgh.net:from_mime];
+	FORGED_RECIPIENTS(0.00)[m:louis.scalbert@6wind.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.dev,kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,iogearbox.net,wand.net.nz];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:email,mail.gmail.com:mid]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B1F5E65AB17
+X-Rspamd-Queue-Id: 8CAE665AB37
 
-On Mon, Jun 8, 2026 at 2:26=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+Louis Scalbert <louis.scalbert@6wind.com> wrote:
+
+>Apply the "lacp_strict" configuration from the previous commit.
 >
-> On Mon, Jun 8, 2026 at 1:55=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
-om> wrote:
-> >
-> > On Mon, Jun 8, 2026 at 1:02=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Mon Jun 8, 2026 at 10:21 AM PDT, Kuniyuki Iwashima wrote:
-> > > > On Mon, Jun 8, 2026 at 5:59=E2=80=AFAM Jiayuan Chen <jiayuan.chen@l=
-inux.dev> wrote:
-> > > >>
-> > > >> bpf_sk_assign_tcp_reqsk() can assign a TCP reqsk to a non-TCP skb,
-> > > >> causing a panic when the skb enters the wrong L4 receive path [1].
-> > > >> An initial attempt tried to fix this in the BPF helper by checking
-> > > >> iph->protocol, but Sashiko [2] revealed that BPF programs can bypa=
-ss
-> > > >> this check via a TOCTOU attack by modifying iph->protocol around t=
-he
-> > > >> call:
-> > > >>
-> > > >>     iph->protocol =3D IPPROTO_TCP;
-> > > >>     bpf_sk_assign_tcp_reqsk(udp_skb, tcp_sk);
-> > > >>     iph->protocol =3D IPPROTO_UDP;
-> > > >>
-> > > >> Furthermore, bpf_sk_assign() has had the same class of vulnerabili=
-ty
-> > > >> since its introduction =E2=80=94 it can assign any socket type to =
-any skb
-> > > >> without protocol validation.  Since the BPF helper check alone can=
-not
-> > > >> prevent a malicious BPF program from crashing the kernel, add prot=
-ocol
-> > > >
-> > > > I'm curious about the BPF maintainers' stance on this kind of "bug"
-> > > > where admin tries to shoot oneself in the foot.
-> > > >
-> > > > I saw Alexei said this recently, and I guess it applies here as wel=
-l ?
-> > > > https://lore.kernel.org/bpf/CAADnVQLh7VEKAtckzz=3DXOVPT8ovpDQshvPPC=
-WHDQu2OWQx27_w@mail.gmail.com/
-> > > >
-> > > > ---8<---
-> > > > Not every "bug" needs a fix.
-> > > > If a malicious bpf user wants to crash the kernel they will
-> > > > find a way to do so. Especially with agents.
-> > > > We cannot realistically close all of the holes.
-> > > > Right now the priority is to fix the issues that normal
-> > > > users can hit and not bots.
-> > > > ---8<---
-> > >
-> > > In addition to that I have to add that skb_steal_sock() is performanc=
-e
-> > > critical path of networking stack. Adding runtime overheard there
-> > > because bots can find a way to abuse the interfaces is not a good tra=
-de off.
-> > > If there is no simple way to fix it completely on the bpf side
-> > > then we have to flag this issue as "won't fix" and move on.
-> >
-> > I asked if we could fix this in the verifier but it seems difficult. [0=
-]
-> > Since this is triggered only by BPF misuse, treating it as "won't fix"
-> > makes more sense to me.
-> >
-> > [0]: https://lore.kernel.org/all/202648182730.i4ki.martin.lau@linux.dev=
-/
+>"lacp_strict" mode "on" asserts that the bonding master carrier is up
+>only when at least 'min_links' slaves are in the Collecting_Distributing
+>state.
 >
-> btw is earlier sashiko TOCTOU concern real?
-
-Yes, the selftest in patch 2 should reproduce null-ptr-deref.
-(I tested one in a prior version)
-
-
-> iph->protocol =3D IPPROTO_TCP;
-> bpf_sk_assign_tcp_reqsk(udp_skb, tcp_sk);
-> iph->protocol =3D IPPROTO_UDP;
+>Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+>Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+>---
+> drivers/net/bonding/bond_3ad.c     | 26 +++++++++++++++++++++++---
+> drivers/net/bonding/bond_options.c |  1 +
+> 2 files changed, 24 insertions(+), 3 deletions(-)
 >
-> as far as I can tell past bpf_sk_assign_tcp_reqsk()
-> the networking stack only looks at skb->protocol,
-> so modifying iph->protocol will only mess up
-> things on the wire (if this packet goes out).
+>diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
+d.c
+>index f0aa7d2f2171..98abb2fdd7a6 100644
+>--- a/drivers/net/bonding/bond_3ad.c
+>+++ b/drivers/net/bonding/bond_3ad.c
+>@@ -745,6 +745,21 @@ static void __set_agg_ports_ready(struct aggregator =
+*aggregator, int val)
+> 	}
+> }
+> =
 
-ip_rcv_finish_core() uses iph->protocol for early demux
-and ip_local_deliver_finish() also uses it for demux.
+>+static int __agg_usable_ports(struct aggregator *agg)
+>+{
+>+	struct port *port;
+>+	int valid =3D 0;
+>+
+>+	for (port =3D agg->lag_ports; port;
+>+	     port =3D port->next_port_in_aggregator) {
+>+		if (port->actor_oper_port_state & LACP_STATE_COLLECTING &&
+>+		    port->actor_oper_port_state & LACP_STATE_DISTRIBUTING)
+>+			valid++;
+>+	}
+>+
+>+	return valid;
+>+}
+>+
+> static int __agg_active_ports(struct aggregator *agg)
+> {
+> 	struct port *port;
+>@@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, boo=
+l *update_slave_arr)
+> 		switch (port->sm_mux_state) {
+> 		case AD_MUX_DETACHED:
+> 			port->actor_oper_port_state &=3D ~LACP_STATE_SYNCHRONIZATION;
+>-			ad_disable_collecting_distributing(port,
+>-							   update_slave_arr);
+> 			port->actor_oper_port_state &=3D ~LACP_STATE_COLLECTING;
+> 			port->actor_oper_port_state &=3D ~LACP_STATE_DISTRIBUTING;
+>+			ad_disable_collecting_distributing(port,
+>+							   update_slave_arr);
+
+	Is there a functional reason to move this?  I don't see anything
+obvious in ad_disable_collecting_distributing() that depends on the
+actor_oper_port_state.  Since you want this to be backported via stable,
+fewer actual changes reduce the chances of an issue applying the patch
+to an older version.
+
+	-J
+
+
+> 			port->ntt =3D true;
+> 			break;
+> 		case AD_MUX_WAITING:
+>@@ -2105,6 +2120,7 @@ static void ad_disable_distributing(struct port *po=
+rt, bool *update_slave_arr)
+> 			  port->actor_port_number,
+> 			  aggregator->aggregator_identifier);
+> 		__disable_distributing_port(port);
+>+		bond_3ad_set_carrier(port->slave->bond);
+> 		/* Slave array needs an update */
+> 		*update_slave_arr =3D true;
+> 	}
+>@@ -2128,6 +2144,7 @@ static void ad_enable_collecting_distributing(struc=
+t port *port,
+> 			  port->actor_port_number,
+> 			  aggregator->aggregator_identifier);
+> 		__enable_port(port);
+>+		bond_3ad_set_carrier(port->slave->bond);
+> 		/* Slave array needs update */
+> 		*update_slave_arr =3D true;
+> 		/* Should notify peers if possible */
+>@@ -2151,6 +2168,7 @@ static void ad_disable_collecting_distributing(stru=
+ct port *port,
+> 			  port->actor_port_number,
+> 			  aggregator->aggregator_identifier);
+> 		__disable_port(port);
+>+		bond_3ad_set_carrier(port->slave->bond);
+> 		/* Slave array needs an update */
+> 		*update_slave_arr =3D true;
+> 	}
+>@@ -2830,7 +2848,9 @@ int bond_3ad_set_carrier(struct bonding *bond)
+> 	active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggregator));
+> 	if (active) {
+> 		/* are enough slaves available to consider link up? */
+>-		if (__agg_active_ports(active) < bond->params.min_links) {
+>+		if ((bond->params.lacp_strict ? __agg_usable_ports(active)
+>+					: __agg_active_ports(active)) <
+>+		    bond->params.min_links) {
+> 			if (netif_carrier_ok(bond->dev)) {
+> 				netif_carrier_off(bond->dev);
+> 				goto out;
+>diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bon=
+d_options.c
+>index d358b831df77..94b7b0851f16 100644
+>--- a/drivers/net/bonding/bond_options.c
+>+++ b/drivers/net/bonding/bond_options.c
+>@@ -1706,6 +1706,7 @@ static int bond_option_lacp_strict_set(struct bondi=
+ng *bond,
+> 	netdev_dbg(bond->dev, "Setting LACP fallback to %s (%llu)\n",
+> 		   newval->string, newval->value);
+> 	bond->params.lacp_strict =3D newval->value;
+>+	bond_3ad_set_carrier(bond);
+> =
+
+> 	return 0;
+> }
+>-- =
+
+>2.39.2
+>
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
