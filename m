@@ -1,165 +1,176 @@
-Return-Path: <netdev+bounces-296394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YbTrMHJwJmoXWgIAu9opvQ
-	(envelope-from <netdev+bounces-296394-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:34:10 +0200
+	id 8OVTAXBxJmpTWgIAu9opvQ
+	(envelope-from <netdev+bounces-296395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:38:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B0365392B
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 327226539CE
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:38:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=fairphone.com header.s=fair header.b=zXqWonrW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296394-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296394-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=fairphone.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=xOGl3xVl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296395-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296395-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C67BF3004410
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:34:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 488423002927
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F637391E5F;
-	Mon,  8 Jun 2026 07:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCBB3932C8;
+	Mon,  8 Jun 2026 07:38:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D71F39099A
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 07:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2157639184E;
+	Mon,  8 Jun 2026 07:38:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780904039; cv=none; b=CzSkLB0ZTKKLVCPVKJX0OZ0XngNOX/Odi2sxFfYVf97ALmL+CyxKqjLGE/nYNv01wUVPE2/TgGRyRIdhvFsbaVFO0NFi7MB/BU6xP7eWlH4ao0lzEzSnEztjqovgUjf5YzUFDpnnd1wxk4+lSHadl60NUMw5dUPyLBXfJ0iSy90=
+	t=1780904292; cv=none; b=oRlpSFq0ro1y1xt43Ng6sUuPhR7Y9QnBKizlrnDjYXWEa0ZewTgkjnuodXFwUMSB4CaFflyTBlTU7eif4v7zw+UcqFEg+SEzz+5FzH7Z02CRAcvU5A7rdizV7fnroj9GWhyeZr5VCVtncAeTK7RkKui1eE4Fzn/XU0r2KYd0080=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780904039; c=relaxed/simple;
-	bh=JZV3RuIjk7olDlPabOIdv/O8zwlGAlzLEmaLXcyKcLk=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=LhIcZ++vbaSDlo17P4bnur6ohLed4rB/l6N9rn+5vde7osM9DSjIxVc/YiRbiEIVHHFtxxmoIx3Jsa2WCiVYRJ/PFucLTOTbMUqeh2zHwzEPCr4nR/ZNzKTjyQH8P756zKQ56QlvKlU8eU1RZ/vBsWsEAA/rMUNwSo1W+D2/ViU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=zXqWonrW; arc=none smtp.client-ip=209.85.218.48
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-beeba001887so506865666b.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 00:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1780904036; x=1781508836; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JZV3RuIjk7olDlPabOIdv/O8zwlGAlzLEmaLXcyKcLk=;
-        b=zXqWonrWFhauWO395Q9+0HIxwy4vwO+PkgEKGSBJ1qpZ1bh/XpORsolDvvzCSIAXQV
-         gUnJRBUtelCcgqPdViQrVpbFb0SNlYumwjdWwxufnh1zbgg6W/0RotckB/ZtiA2UjMDR
-         WE8U12rGibdjlyPDBrlyr+1/c9TOOlSXBEiwCCn4UxKtp4SWto0pfFfFDslBH6uKAo5R
-         6mVJKPKmGI2wJwT6bwLQEQwmwF5zkAj3NOWtYwNkQ30frILx5J4D/6ZqTjemYVKew6MS
-         gL4abfzJo0jsX0pBDpaO4kiKHplWefWimnG3emrWrb3zR/8EhLBbzFS/+OX43neTAl5/
-         8LAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780904036; x=1781508836;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JZV3RuIjk7olDlPabOIdv/O8zwlGAlzLEmaLXcyKcLk=;
-        b=ezUwYFxK0JlpDBOyT2fTJd5LcBYr+hohLmZfew0QXhieOqP2w9uvBmptmciVvlqnpv
-         mTDez+eApfwN5pURGHib1wMbHX/U8Y5u0eZA79vB2PM4rXg9dGrYbdTTrJwW3enEHd1q
-         XVSSHA8zYH5hm2o01nyq+AmZxeUzw5/rxG822x47hJF0K8oExn/pPJ5AnWRm4SWvzbNg
-         nUHo4n4A8Oq10qyoqRhEsgSYAUqDhBnwp4JOZTdrtjTMK16B8O975hm38NziDLAj/WBX
-         yhfFDisIf6vEJ97dWZPBie++C56PDriAUH2BTaay7UiYkHZ+EdK3euybg7iXvESRSRlP
-         Zk+w==
-X-Forwarded-Encrypted: i=1; AFNElJ9NBR5xnzcOPMSKylQ/xuWd80ViHkrmDtyATvM+K/r4UAE2hWe/JgyOpZsjglDaBAcIU1kX4l4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG0gVPEE54kw2S1ht9Ogo9AFCAugjFdsM4GTrGM3+b6weSUzgh
-	3r7YrMjSLFjpW1m3J0xjzG40e3YRj8cONDBMGLsxzDan/yWEI079oZF79GN+/UULNEw=
-X-Gm-Gg: Acq92OFG9x6Q5L8HUINNoUvF8kIzZAmhbL7cB8naKGet7vZ6P1VYsMYUqRgBGbA1zWr
-	sq/kMXlFlys042RFpzVtj++8heXDo2ceH3QCclsGTpU1OStpD0wh4T4uy+qcgfiwQRzx2DZEX4a
-	rPdfkAyUaoSPr2gBKH6UqcDA5xvryI/ix0e/rle+MIBnb/JoeWgwDURRidDZnWtr3wNJwrzjca8
-	YJoWzobeUgkio1MOOPL1h92hPwtOWQgaD33H1rwP1OD+bg+KSh1YJRXvsS/rWFbkD176/7cfsBt
-	LoQRUX+CMz7sQP2n35CF5mjZ40zvEsqmSbEjz7bboTgyWLAaTHmXu04fBmoAvLqXLvY3JOG6uAx
-	sAt4zLvfGZ6f21gIpLpcIhteqbRjLkr43BXdHIKr5nv0cBZK6qv25CJp3lWxAyV/IBDvAC6TAkr
-	oOo0HRp3X6hr0+lyxa3lo8oWkTBqIEqRhFFucDru0eJjQDQV8dmhJboVTei58CBRqGpih+XUSXZ
-	cRdlWU=
-X-Received: by 2002:a17:907:6c0f:b0:bcc:e8f:c3a8 with SMTP id a640c23a62f3a-bf3738f1e4amr638949766b.29.1780904035800;
-        Mon, 08 Jun 2026 00:33:55 -0700 (PDT)
-Received: from localhost (144-178-202-142.static.ef-service.nl. [144.178.202.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf0522834dbsm815190666b.27.2026.06.08.00.33.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 00:33:55 -0700 (PDT)
+	s=arc-20240116; t=1780904292; c=relaxed/simple;
+	bh=TVkMFcWkpvN5dTT8PMKDF0D2FnQHyxW4UR3JKyAZkEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lARC7gCxG/NuMYTPRjKu7gJ+SoyCxxsGdNVyjVwe5dzFcJLldQG3hvIbJMFUukk7RF/PZy3M3elJUSG4o4FftLevFkykbSuaJ/DGKjvpqryxd0LImeXg6Sd9aKB19ppcCEGoRF7R5uLCiXKbUckDqiYFM9gtAx3cvWDeJZ0gj98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xOGl3xVl; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uTEjW5smUv6BjOmVV42s9eCMcV2UCVsoxTFJQmZ5qEE=; b=xOGl3xVl77o2u+r2MjoshtVyVp
+	rTHyOxL/m+Sm70FywOwwZprDCD+oIjEa+8mQdfZZdhry7XSHV4EZbJyD+/XDl7TPl2lKoVFjp8Wlh
+	ud+tIEHEUed2VhnjMgrF7Jy5pZVOEjwteADzsuc3OnEqJsRTs1CEdSDVjPt/urDj/y98=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wWUYW-006a1p-6R; Mon, 08 Jun 2026 09:37:56 +0200
+Date: Mon, 8 Jun 2026 09:37:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javen <javen_xu@realsil.com.cn>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"nic_swsd@realtek.com" <nic_swsd@realtek.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v1 4/6] r8169: add support for RTL8116af
+Message-ID: <282e4c64-a088-4602-b053-7a8e1cd32c5a@lunn.ch>
+References: <20260605103906.1445-1-javen_xu@realsil.com.cn>
+ <20260605103906.1445-5-javen_xu@realsil.com.cn>
+ <5005c1c3-d807-456d-a9a0-c77bde9f437e@lunn.ch>
+ <b54b5f3a6703498fbc17e64548550ba0@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 08 Jun 2026 09:33:55 +0200
-Message-Id: <DJ3HSJ8UK5MN.3FWLDU8CG2J2R@fairphone.com>
-Cc: "Ajit Pandey" <ajit.pandey@oss.qualcomm.com>, "Imran Shaik"
- <imran.shaik@oss.qualcomm.com>, "Jagadeesh Kona"
- <jagadeesh.kona@oss.qualcomm.com>, <linux-arm-msm@vger.kernel.org>,
- <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH 5/5] arm64: dts: qcom: Add GP M/N clock controller node
- for SA8775P and QCS8300
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Taniya Das" <taniya.das@oss.qualcomm.com>, "Bjorn Andersson"
- <andersson@kernel.org>, "Michael Turquette" <mturquette@baylibre.com>,
- "Stephen Boyd" <sboyd@kernel.org>, "Brian Masney" <bmasney@redhat.com>,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
- <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Linus Walleij"
- <linusw@kernel.org>, "Richard Cochran" <richardcochran@gmail.com>, "Konrad
- Dybcio" <konradybcio@kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260602-pdm_clk_gp_mnd_v1-v1-0-1522662b6c53@oss.qualcomm.com>
- <20260602-pdm_clk_gp_mnd_v1-v1-5-1522662b6c53@oss.qualcomm.com>
-In-Reply-To: <20260602-pdm_clk_gp_mnd_v1-v1-5-1522662b6c53@oss.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b54b5f3a6703498fbc17e64548550ba0@realsil.com.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fairphone.com,quarantine];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[fairphone.com:s=fair];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296395-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,baylibre.com,redhat.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296394-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ajit.pandey@oss.qualcomm.com,m:imran.shaik@oss.qualcomm.com,m:jagadeesh.kona@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:netdev@vger.kernel.org,m:taniya.das@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:linusw@kernel.org,m:richardcochran@gmail.com,m:konradybcio@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[fairphone.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D0B0365392B
+X-Rspamd-Queue-Id: 327226539CE
 
-On Tue Jun 2, 2026 at 5:21 PM CEST, Taniya Das wrote:
-> Add the GP M/N divider clock controller node at 0x088d3000 to the
-> SA8775P (kodiak, lemans) and QCS8300 (monaco) SoC device trees.
+On Mon, Jun 08, 2026 at 06:32:19AM +0000, Javen wrote:
+> >> +static bool rtl_is_8116af(struct rtl8169_private *tp) {
+> >> +     return tp->mac_version == RTL_GIGA_MAC_VER_52 &&
+> >> +             (r8168_mac_ocp_read(tp, 0xdc00) & 0x0078) == 0x0030 &&
+> >> +             (r8168_mac_ocp_read(tp, 0xd006) & 0x00ff) == 0x0000;
+> >
+> >Do we know what these magic numbers mean?
+> 
+> 0xdc00 is a package-detect field. 0xd006 is internal HW id. RTL8116AF shares the same RTL_GIGA_MAC_VER_52 mac_version with other variants. 
 
-forgot this in the previous email, another kodiak=3D=3Dsc7280
+Since you know what they are, please add #defines.
 
-Regards
-Luca
+> >> @@ -2509,9 +2543,10 @@ void r8169_apply_firmware(struct
+> >rtl8169_private *tp)
+> >>               tp->ocp_base = OCP_STD_PHY_BASE;
+> >>
+> >>               /* PHY soft reset may still be in progress */
+> >> -             phy_read_poll_timeout(tp->phydev, MII_BMCR, val,
+> >> -                                   !(val & BMCR_RESET),
+> >> -                                   50000, 600000, true);
+> >> +             if (tp->phydev)
+> >> +                     phy_read_poll_timeout(tp->phydev, MII_BMCR, val,
+> >> +                                           !(val & BMCR_RESET),
+> >> +                                           50000, 600000, true);
+> >
+> >Maybe this all needs to move into the PHY driver?
+> 
+> This is after firmware application. And PHY_MDIO_CHG opcode switches the access callbacks between PHY and MAC accessors.
+> data == 0: phy_read/phy_write
+> data != 0: mac_mcu_read/mac_mcu_write
+> So the firmware may contain mixed PHY and MAC.
 
->
-> The node uses the qcom,clk-gp-mnd compatible, is clocked by the PDM
-> XO4 and AHB clocks from GCC, and exposes a single clock output
-> (gp_mn_clk) on the dedicated gp_mn pin mux function. The XO4 clock
-> is pre-assigned to 4.8 MHz (XO/4).
->
-> Signed-off-by: Taniya Das <taniya.das@oss.qualcomm.com>
-> ---
+Normally, the MAC does not touch the PHY, it only calls phylib/phylink
+API methods. If standard MII interfaces are used, you can connect any
+MAC to any PHY.
+
+If it is all integrated into silicon, then there is no choice, you
+know the MAC/PHY relationship. However, it is still good practice to
+keep MAC code in the MAC driver and PHY code in the PHY driver.
+
+Can firmware programming be moved into the PHY driver?
+
+> >> -     rg_saw_cnt = phy_read_paged(tp->phydev, 0x0c42, 0x13) & 0x3fff;
+> >> -     if (rg_saw_cnt > 0) {
+> >> -             u16 sw_cnt_1ms_ini;
+> >> +     if (tp->phydev) {
+> >> +             rg_saw_cnt = phy_read_paged(tp->phydev, 0x0c42, 0x13) & 0x3fff;
+> >> +             if (rg_saw_cnt > 0) {
+> >> +                     u16 sw_cnt_1ms_ini;
+> >>
+> >> -             sw_cnt_1ms_ini = (16000000 / rg_saw_cnt) & 0x0fff;
+> >> -             r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+> >> +                     sw_cnt_1ms_ini = (16000000 / rg_saw_cnt) & 0x0fff;
+> >> +                     r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+> >> +             }
+> >
+> >Can this move into the PHY driver?
+> 
+> It reads a counter from PHY, but the calculated value is programmed into MAC OCP register via r8168_mac_ocp_modify, which accesses r8169 through tp->mmio_addr. So I think this can not be moved.
+
+So, big picture, what is this doing? What is rg_saw_cnt?
+
+	Andrew
 
