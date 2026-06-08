@@ -1,236 +1,354 @@
-Return-Path: <netdev+bounces-296585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MtOrCe3LJmrWkgIAu9opvQ
-	(envelope-from <netdev+bounces-296585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:04:29 +0200
+	id jO/xL17NJmoukwIAu9opvQ
+	(envelope-from <netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:10:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61A9656E7C
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:04:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04AE9656F78
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 16:10:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=PorufVXY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296585-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296585-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
+	dkim=pass header.d=amd.com header.s=selector1 header.b=ylwqYdsA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296588-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F09C23050DE0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 13:59:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E8A630D8C52
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 14:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A683C8182;
-	Mon,  8 Jun 2026 13:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997133CA4A8;
+	Mon,  8 Jun 2026 13:59:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013035.outbound.protection.outlook.com [40.93.201.35])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011022.outbound.protection.outlook.com [52.101.52.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A532A3C4B78;
-	Mon,  8 Jun 2026 13:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45B13C3420;
+	Mon,  8 Jun 2026 13:59:23 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780927094; cv=fail; b=VQIr1gEMYTjkNIYL5lsBGeP3Xp/eIvz9hGmyPqq29JwMTSzibbpO3+kjEbpHO2CrqUYHxqneDMBrSC37OfRnV546qxIFDoRNTlCiHyatR3javeV/fljWreMetg5Rkw/VOhzetRtz18TrJgj+022Vlota6+dnbgVHCORscB3DJc4=
+	t=1780927165; cv=fail; b=BLLeKM0vWCuxvwYvsiI0XWPTYuEhSv1OFrKZQH52rY0p7nQzAlabRquYy895A3laWN3NQRelKynzNGl5Fn+67bTyWyBq2bUA6hp5yufPwMqs1ZcpPQ/Rj4aBIL7K0+hY9VF33un0aakjykv7c/wyY6u+oRi8SgPkUFxlMeizcgE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780927094; c=relaxed/simple;
-	bh=GAY2NVhuMjHg85rTH3Zb6+oE3zluy+H6QnhBlBejLak=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDng06HB3DzHef7Td9PVSwCIleqh3sT9H/xJI9hj6h+WmEInAfzzM9AnxQ9p2Qgim9x2Guo1s+HJgHYsrZd/VV5Z/t9Me/HFval5FldfhnlXc7V5bbT1Xj5twtmeBWY1Gha7hbU+O62i0nCKEkJ5mJm3GzZqshiWJkm0i4mf9bA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PorufVXY; arc=fail smtp.client-ip=40.93.201.35
+	s=arc-20240116; t=1780927165; c=relaxed/simple;
+	bh=PwAbTkNKmZLRZ26x8YPN6/S1mI8Tvo/7RHMvHHVYL/k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=n7ytFGQoE0MrImBG5NXiuxdU0vtH63trC4FGiUlL9/Y/ZzI5v2RsPgZJGZtEY6Vn3PW4fPCvHppaFnJ55qTVDYmnjk6CgcXrIEWj3dsD+feVmQ+dindsN5wlAfyD6ZDOevN84mCtslaDuBQgEvBAyPWI5jtUSwXfHkDEjnch9Dw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ylwqYdsA; arc=fail smtp.client-ip=52.101.52.22
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YEfnERIKkjTSq4HPxp2Or7waZ/Tl1YDxwHPwKNbnp6y9YxunLgNoba41iv5DllilBrt4K09F9g5iVpXTTJ0Mul9RkNNlJatYGYYXPhTScTftZxO6fUmw+08ovzuinDL+qDc9GYUGH2tlbAhpuyl6U9IRdsXW2aUOx0eNN8EY9eJJ08sRNUtwuLhXrlPKrajfRSvnDow4+Yq41UpTdeoiHawR9FJOVeSLTKERKnbZACO7ke71yMnT5M0NFxf6+veFUPcXTJ2oHg7xaP8J8IH7yG4Q+Wy6DW4vPikYYqZO7Njx01SSNuS6Ml3bWPuDbBHhZX2ZRQGXTSq/BCC1bw+aKw==
+ b=ep+UUQAuaqq2VCW4LUTEZ+jlyWORGDnKrROma4RaV4qy7i+cMHky/CeqbqjhCmn43I8GLNe8uqSI7YQGUN0TwTm4UZYxLOiVb28IaGH3VTIduLirc/hUFQ/ehLV70NaJAT0661iA2g3/fjJGa5GIqPL2j+SL6RB+i+SBF1aW9gfjxAznxstelX9Z26uLgTQEObQnFPPbf5MWS42nNnHqzdPCS+2R3ffsojGsq48PJMzj25Ge0BbCPX9FAIlIaUQU3RNXAkxrHEU/UE1ySqotVSpl+P/IMP0d+qQI+hV+qvOdcjrS8ti96Alo/eEPmJVUzB5HZJoK8T83lo/V0xP0Tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FG7jsmfOSD4ey6cDdPClVPpcORihIp2UVzXoD+DWe3o=;
- b=AmnsMb3bzOTbYb/rsYq6Z2UtfEx8hsQH5wlp8e83ncWYpDPJqyIERUKd5KhZpJ0Ibdo4q3l0TF/SARRGiz/2AvFuDeHHW8lJO5YfDUXtY3KUuEDUEeV/OUXH2W1EWHnOsvRu3BZMHZI3jmx4n9uW4+fkh4JFnMBZ3WsFDBH7Vlpn/1Pl6eSCNE9oery/ZVJ2x8oWVEWl5fDY4Uond+UYTscS5UKBXnk+Fi/K6XSqqGaUJy0LA4q9v8hgMR+tiM2oxJhmIeNdNlQUtxMfzAU9HgSCG0CRoSVqc6YLYbzGTsDbwFP0dAm+M5IwpFcqwibuI3I7aRxIMTxSH1M2Zgbg9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=f9NUUiuF5j2bb81QIuz36SJ/RBj8+AGOvNYmi59zTw4=;
+ b=PimhVdxJfJWGuZBqADoZ5LF+j8AB0QSlfICt5SzoEqD35p7gPP1/O3VJvP6dwsfThg9aN3o1QMZy8PEsTa1tb4/vY0QzJll8w3QnAoyBaDUGeqGgxkeRjpbUy5s5hjkutJ3UYmzoRSnsK+KMaCTcBEM8MSVAsLxKffL/4MtfMlRPb9OwQxcIf2O0eel1u9ya9B/5H5bWqhRFw6AK/dYim5PxB2Ovl31nSa4Of823hQF/1AyS/99sDMcp6eXMJpCavOcl3JsOxhPluh83gNPvJ3M7+xB4TyAdtWwz879N/SkccSZPjd5KnbpDWOCCS6v8JrbaR1dTEJxC0KG7GFjMPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FG7jsmfOSD4ey6cDdPClVPpcORihIp2UVzXoD+DWe3o=;
- b=PorufVXYUjBQTwemVHCcBMXZtTlasnXe2WRcl8HN/dXvtgT2aF/tDWPUPxSAN/vI8bzNsJQhWtNKd8fiWvC+N8w9rDsJelVegBPTTZ9FIBMpiFCPZPQtKs8J/aLNtcVcoKlyvRD7dh9KjPTZrq30iRqMIJKwThIsVD7SNbLLafLzNz7o95zsaoYeJ4jY/iYubYC0q9u64hEtPOLd1MBMhXN8TWZgomyR5jgkXzldl9iXB5rSJEkjUA+lReR+VVgxr2Ro0sCSGCU/7mlT2APwHHVCJR4kvW+iEM38VRc5befT1F3n1QzuazL759KMQ/g7zK6FhbG+Zh8FfCTt8+I62A==
-Received: from BN9PR03CA0685.namprd03.prod.outlook.com (2603:10b6:408:10e::30)
- by CY8PR12MB7121.namprd12.prod.outlook.com (2603:10b6:930:62::20) with
+ bh=f9NUUiuF5j2bb81QIuz36SJ/RBj8+AGOvNYmi59zTw4=;
+ b=ylwqYdsAmJIkEdwueIDzqIm7KF39CcdQoCe5lfrfJqRUvOXBIun2zwXdkZsMazoJ7a2bbqYHSi6+wu23kOnGValkjok7dd0tyha/C2+Ai23zsuSQRqmKR1adf/OUxis7YqERT76Qr4VuXTxOn7kK+KskrYzgM/OglCYX6wIhNVw=
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by SJ0PR12MB6878.namprd12.prod.outlook.com (2603:10b6:a03:483::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
- 13:58:10 +0000
-Received: from BN1PEPF00005FFF.namprd05.prod.outlook.com
- (2603:10b6:408:10e:cafe::10) by BN9PR03CA0685.outlook.office365.com
- (2603:10b6:408:10e::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.13 via Frontend Transport; Mon, 8
- Jun 2026 13:58:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN1PEPF00005FFF.mail.protection.outlook.com (10.167.243.231) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.113.7 via Frontend Transport; Mon, 8 Jun 2026 13:58:09 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 8 Jun
- 2026 06:57:56 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Mon, 8 Jun 2026 06:57:56 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Mon, 8 Jun 2026 06:57:51 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Shay Drory
-	<shayd@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>, Edward Srouji
-	<edwards@nvidia.com>, Simon Horman <horms@kernel.org>, Maher Sanalla
-	<msanalla@nvidia.com>, Parav Pandit <parav@nvidia.com>, Kees Cook
-	<kees@kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Patrisious Haddad
-	<phaddad@nvidia.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-Subject: [PATCH net-next V2 15/15] net/mlx5: SD, enable SD over ECPF and allow switchdev transition
-Date: Mon, 8 Jun 2026 16:55:47 +0300
-Message-ID: <20260608135547.482825-16-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260608135547.482825-1-tariqt@nvidia.com>
-References: <20260608135547.482825-1-tariqt@nvidia.com>
+ 13:59:17 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0092.006; Mon, 8 Jun 2026
+ 13:59:17 +0000
+Message-ID: <a51e97bd-39dc-492f-bd7d-f137423277df@amd.com>
+Date: Mon, 8 Jun 2026 15:59:04 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] udmabuf: emit one sg entry per pinned folio
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org,
+ sdf@fomichev.me, razor@blackwall.org, daniel@iogearbox.net,
+ almasrymina@google.com, matttbe@kernel.org, skhawaja@google.com,
+ dw@davidwei.uk, Bobby Eshleman <bobbyeshleman@meta.com>
+References: <20260603-tcpdm-large-niovs-v1-0-f37a4ac6726c@meta.com>
+ <20260603-tcpdm-large-niovs-v1-2-f37a4ac6726c@meta.com>
+ <bdce2488-fe77-4f36-9ed6-dd2c785fa7c1@amd.com>
+ <aiMY8CpckM8Jav0g@devvm29614.prn0.facebook.com>
+ <0c86f5d3-b5e9-4cac-aa9d-30c5c8ecca66@amd.com>
+ <CAKB00G3opAoAYswsq2uz0Q6jgku8u4NthKOzCbSumZ0qK7QxcQ@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <CAKB00G3opAoAYswsq2uz0Q6jgku8u4NthKOzCbSumZ0qK7QxcQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAPR03CA0145.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::30) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00005FFF:EE_|CY8PR12MB7121:EE_
-X-MS-Office365-Filtering-Correlation-Id: c613ff67-68de-4a74-dbc4-08dec565f984
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SJ0PR12MB6878:EE_
+X-MS-Office365-Filtering-Correlation-Id: b38fb79d-df85-40fa-3e40-08dec566214a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700016|7416014|376014|82310400026|22082099003|18002099003|11063799006|56012099006;
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|10063799003|22082099003|18002099003|6133799003|4143699003|11063799006|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	FAlr/k4V3R1yNFI28DDNNI7jvq0xi7MuBhglYVgfUpbCjUPWaZXJUzYCbtXJFMl90r6c5FucvZfOiLse1bZHtm0L+Yt2+xGqkXjNTKH2lBcYtkDqb1yRetHSJIJbDwEw2ymIhSz6vZETbiOO5LeTeuDJywp2KWq7GPsetqG+iHVpmpjBaL86wt/ph1LIoIcCEAPWlWGOUoExEoJxR6Ql/7/dleqCAV1d2v3UnoaRhv7CEMsc4xdDpP13dCHfog8nJM5HtN1HQn8p9sQq4oi6mYzVlZDSStqbfrpkVZdcPSo5Mu0xzEwW4KKnwKgXb9DT7t3VDhOxtPGqwrWBgrjzE9yyotYFCU1lRu5HuyA+NGcnZPh5i1qUEKBBHypOQW6SvR4s3Wv/1xjm7MsGABcXdRjivwO8v3H6PePSaEgIhhbqcScFNHQiIKu4POc510yTq5hDSliNYekMeCIbivuzK01Np46ktZHIqxp0RNgga3vnLwy+dTBLPiANJWeQSqSsMByVgbwkuO/ObJJbQUXNkz8CUgAm2s4XMhmEoWx/maKCxwWRozZiQVEeAxxBUdXxP12hUuZzQ1pCxpLcjDporIVJL/3rnWN4TwF8IWaQP92zlpKjlQZPqpcSD5Md/PIMo2ydVGMfhsXnH/EQe7p47hWrfU21FHKnX6R47SPCF3dnEB7/eykKn7w6PKzX7+1r/Qrd3Y/tB71v7wsvBdtQactkOgnb7RsQKpnA1LIVVyE=
+	sowkkH5VJNgpxW0cbgb7TBleErXgSgCN+YosuSKXQZi2tW5oYouxuvGqXxqCg+tfv3Md81Nvob6w1CQrlbOIQmUxp8QiQrF9+yET3ehts3DjCLXe4nSur/YAJy6UJMhFWBoZLfVu2UZTAildwfjEhNPNOzNj0UADq4KqImVVzjLV3xHO5XqQovwEQr36nGlHw+TVSpyRGyMAaNUXCRvXGhl2pdZCvd+sm0kHJNlYfnAbbrX53/qVXhLU9mxWj+HNJmM1yfndtAV/eLstiTMYl786U2WuGWLsP5xe2Y4rOhRgRf4Vfuk1kZ5ED+PQBtt3tZq876JhI6lafz5a1wIr40sOBIsF+23w3cjRAwJHpayBSaDNp6DFrXwKk9AB83YLUx+tfUsSZ6ta1Hn8/RiLUA28i6kuIYhfjeXo5NaXAceRZ8BVfOJdCr/T9aoUdPzqzz79Bzcd57PC0G57Df//dACXThWXVHKKlYkLj2TNem43YPTnD6of9ehD6MCOs3gVSL/r1HETjjZwLwXuqK+BqPlPRu2UqrZ7R/3LYXUlbRnqi5aYFCztE0eH/UhX5JxLMlrulrdXf9Ojuxvv/y7VwsOR+D/jdjcYy4a0sRJUQhIYJVuB31aXOpP/3j4DymtGCSPx/ZzbhSgdxW2EDeJirb1b9OsKlaB83KAhn+IcHkQZSgs78Syiqa20FYJJ3Rpa
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(7416014)(376014)(82310400026)(22082099003)(18002099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(10063799003)(22082099003)(18002099003)(6133799003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	hNTK4IzHH4XNt/Vrruuqb/LRzAXoXEhrp5FadbjNe9ZRLuiL2SPd8Dd07DkPE92IufCwOyEAOD/JWnlwpw/HNVbIP++4CN4P60zV6cErMqW8cMPezATHHJ25zSqFsPcNAy0TZyfDWqg4aaoZhvtgUx/MVomoieXW2PkLI0YIVo6Fv37qD/J4WB3N+LNVabdhFEIfnf+b69FXj2tpOvVJLIOJrAtRMLecTSekdO3kAf+BITs617sDzwXe9iv4iAzsFIC/kUvwl4JNTMRJ2kFUg9X/FKBBrbeqPqChOlUUlUbH0KxxO7pD5+56Z45rRDLWZSN3cdQmuAUbLj3T0vWVHUAEBxo/oS478OzRu8SvhjsC5ptIz+xTXpcQAgFEFS7KSMbL8aRgCqC8C83jHIM0yH035StXfVyx7goaWs3SuCHdApx3Mzu3u6nfTmWrc8dF
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 13:58:09.9855
+	=?utf-8?B?MDNLRGZCMThncjlIbHkrQjRldXFoMFpENVRyU1NkdjgzaSt0L3RtMXlMdU5W?=
+ =?utf-8?B?SWdsL0NkYk9Hb1VNZWpQenFHdEJpR0ZwUHN0MGg0Tml5Q0dESi9JVkVteW9v?=
+ =?utf-8?B?OTFPZ2I5VXkrdHNpQXdiaUQzOTlaOVNZS2FERWw5eDRQUzJLVVp1dy9CaHhJ?=
+ =?utf-8?B?UTVFSWRRWWhxYUVWY0dGQndDTVJTaktTb3pyUmFqVTlORGFoaEo4S1lERnF4?=
+ =?utf-8?B?L084OCtNeTdqSW43N2gzZXF1VDdUbEtJNUhkY0NCWEFwbENPNitleW9OQUdU?=
+ =?utf-8?B?N1o0VmhpWW5BU0RIQ1ZrbktmYkNNWWZhWmwzVFRVRzFjYnhIOHlPdDRQaUE0?=
+ =?utf-8?B?aEN1R3EwQlloaDIwQzE0MHdiczhsODFOMmYyVmpSMXNrM0pZdm5oT3crSVlU?=
+ =?utf-8?B?U2tWY0RmbkdQYmFRczhPaHVxRmE1UysvSUNPZEZyU3B4YzZpejJON1ppM1RG?=
+ =?utf-8?B?TUYyV1pTejFUSlBld0t0aXdWSjcybldPTnBEb3l2QXE0aEdFazdPVDA5dmd5?=
+ =?utf-8?B?bXFLcndLOU9maXpTWkFGS216MEhJc3ZSdG90ejhSU2U4WmVSdUs3M21oMzRo?=
+ =?utf-8?B?Q1ErZG83WlFadUNQYXIwUmx0Z0RjSTBDZnIwYUdEdncrRzcxdDhaVFFrVlRR?=
+ =?utf-8?B?elhJQUc5U09BUTNvcUt3disrSWFTQU54R0liYmxSdGpEM0tKeE1FSWVwR1hH?=
+ =?utf-8?B?ai8zUml1YS9rOWoyeExxbUFWREx2ckZHbEdMTmZwZ3NudnZOMlZIeFFwSkhh?=
+ =?utf-8?B?OE9FNlE3MStYSHdWblk2dy84Q3FtQlorOFJ0aGVaZitSekNzbkl3VmE0SEdr?=
+ =?utf-8?B?L2R4VHhEKzIvYmRyVFFzZnNmUHZkWERtL2ZTcE8rOVcyRGlpQTRya0h5ZUcr?=
+ =?utf-8?B?akRFODhud1I2OUF2bGx4ZHgwVFhERTNmeU4vSGMwYU9Da2xtMmpJeEJPWkNG?=
+ =?utf-8?B?VmFBZEhjaGRObWJWcVZ4S3IrcVBPbERsT2ZldVR0bFNiS1pRQm8wUlpFbHhj?=
+ =?utf-8?B?OHRDbXdETElCQ1I3bjhXaFVmbnhmbHU5dzFBa0N3ckR5dVNYOTNDdmpkcHNh?=
+ =?utf-8?B?QUtJditLc284QVBRRjkxU2k2SVcvalh4d2MzZENTdVd4WHQxYnV5ckVMd1BZ?=
+ =?utf-8?B?V3RxSFdZT3NhRGVrNno5RkR3NnAzU3FWQTlCVC9TdS9VWEk2eGxjVmRaOXBw?=
+ =?utf-8?B?QmJiWkd5ZlhkL2I4bmgvd045Y3JmSkhYUGF1U0ZDT0VibDlKU1IrK2tTVFZo?=
+ =?utf-8?B?aVdqZXZhck9wSTNHTlU3Kzd2OUE2RDNlN2xhYXpEWUdESExRK2FpK3RqNHND?=
+ =?utf-8?B?Vi9XRHc5MURzdzNoR09xdW1mTDlBWnBja0RUczRVN2JoaDFKUkxqT2gvWkVs?=
+ =?utf-8?B?eHVxZEYrL05CbVVicG5reklIVzhlZWE0UDBsOUJhT2dZMHZUOXpOOU0rU2V5?=
+ =?utf-8?B?RURWNCtGbWprUkpHSWVIeHhiREpobHlVeTA4UkQxYmEvWk5PaTZ6c25TeXhT?=
+ =?utf-8?B?a01YKzlWNG5xR2h0SXBBVkhtVWhYZ3lyQWU1YkU5WmY3T1FLeEVxQ0V4ejNt?=
+ =?utf-8?B?QXA3dnJ2c0s3Y3ltRmJhbERGeE1zWkM3Vm5YbFYzRkducmN6OWlub2EvalRO?=
+ =?utf-8?B?by81c2dZUEJhaHZOb2Y3WlA4Q1EyeFRhbUdUOWlsdkk1VzVkVG8xS0tObloz?=
+ =?utf-8?B?NG1weDlMZytnZHdNaDFqTEU0c3kzMTZmdDVsWGZpMzdlam12Z3llczQzNXAw?=
+ =?utf-8?B?a0V3T2NaMWE3WWVWSmZKdkM1TU0wYncyYTJIaFhaUE9nN2lGZXlvWmtGWUt1?=
+ =?utf-8?B?NU9iRlgrUytrVWI3NmxRckQvTVJHNGpMTllzZWV3Rmd2ZlJEKzFSY3Q5TVY3?=
+ =?utf-8?B?UHhJQXkzakFPZENvU0svSE53OG5nYnhGVE52eTRkU2FYdnVPOVlQbUh4UnBh?=
+ =?utf-8?B?ODFxUmw3MGJpYXlGT1l3ZXQ5TjlMK3lxNWZWTEx6ZzY0WUE2VFordnczZHha?=
+ =?utf-8?B?dU5qbTVaVGNjUFJOWGpGWldHK0RSL1dEb0VINFY4ZEpSZkxuOTBSQzArQkR4?=
+ =?utf-8?B?WkhQZGNOZW54VHBWMXAvb2tybW9kcG51NnpLOWxxL0xYeWw2dXpMamV3TmxB?=
+ =?utf-8?B?TUl5K2g1SGRBcnhMNXExWG4vblhWbFBKRHpMTzdXSlh6OHZpOElPalIralRO?=
+ =?utf-8?B?WXk3Y05ZZzVOYkYvMEMxMFY2Q3ZidzA1aVN6dlN1UUxkdjVjaUl2dXBDUGpD?=
+ =?utf-8?B?bTdHMy92VEh1V2l4MEdvYnAzOThwOE8xN0wwKzJKZVVrNU9kMEMvb2VuUlkr?=
+ =?utf-8?Q?PdsqcNFJ0NuxrrF4q5?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b38fb79d-df85-40fa-3e40-08dec566214a
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 13:59:17.2139
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c613ff67-68de-4a74-dbc4-08dec565f984
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00005FFF.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7121
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LayaBdD/cYOWVZImWkl8CxH4yZCvqOtvYxYU4HMkb9l2Xtpo9PMeB7WUm8lajznT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6878
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-296585-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296588-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:shayd@nvidia.com,m:ohartoov@nvidia.com,m:edwards@nvidia.com,m:horms@kernel.org,m:msanalla@nvidia.com,m:parav@nvidia.com,m:kees@kernel.org,m:moshe@nvidia.com,m:phaddad@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:dtatulea@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,Nvidia.com:dkim];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,intel.com,linaro.org,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
+	DKIM_TRACE(0.00)[amd.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B61A9656E7C
+X-Rspamd-Queue-Id: 04AE9656F78
 
-From: Shay Drory <shayd@nvidia.com>
+On 6/8/26 15:55, Bobby Eshleman wrote:
+> 
+> On Sun, Jun 7, 2026 at 11:42 PM Christian König <christian.koenig@amd.com <mailto:christian.koenig@amd.com>> wrote:
+> 
+>     On 6/5/26 20:44, Bobby Eshleman wrote:
+>     > On Fri, Jun 05, 2026 at 11:30:07AM +0200, Christian König wrote:
+>     >> On 6/4/26 02:42, Bobby Eshleman wrote:
+>     >>> From: Bobby Eshleman <bobbyeshleman@meta.com <mailto:bobbyeshleman@meta.com>>
+>     >>>
+>     >>> get_sg_table() emitted one PAGE_SIZE sg entry per page even when the
+>     >>> underlying folio was larger.
+>     >>>
+>     >>> Instead, walk folios[] and emit one sg entry per folio. When folios
+>     >>> represent large pages (as is for MFD_HUGETLB), each sg entry is a large
+>     >>> page. Normal PAGE_SIZE sg tables are unchanged.
+>     >>>
+>     >>> Required by net/core/devmem to support rx-buf-size > PAGE_SIZE with
+>     >>> udmabuf.
+>     >>
+>     >> That doesn't explain why this is required.
+>     >
+>     > Sure, can definitely add. Devmem currently requires dmabuf sg entries to
+>     > be length and size aligned when it allocates niovs for NIC page pools.
+>     > Though udmabuf is not violating any dmabuf contract by emitting
+>     > PAGE_SIZE entries and the above restriction is probably more a
+>     > shortfalling of devmem, by emitting a single entry per folio this patch
+>     > allows udmabuf to be used by devmem for large pages.
+>     >
+>     >>
+>     >> Please note that accessing the pages/folio of an sg-table returned by DMA-buf is illegal and strictly forbidden!
+>     >>
+>     >> Regards,
+>     >> Christian.
+>     >
+>     > It seems both devmem and io_uring zcrx at least introspect through to
+>     > the sg-table to build NIC page pools (not accessing the memory itself,
+>     > however). Is there a better way?
+> 
+>     That's an absolute NO-GO! We need to stop that immediately.
+> 
+>     Touching the underlying struct page of an DMA-buf exported sg-table is strictly forbidden.
+> 
+>     We even have code to wrap the sg_table and hide the struct pages on debug builds to catch those issues, see function dma_buf_wrap_sg_table().
+> 
+>     My last status is that the NIC page pools are build directly from the DMA addresses exposed by the sg_table.
+> 
+>     Was there any change I'm not aware of?
+> 
+>     Regards,
+>     Christian.
+> 
+> 
+> Oh no change, your mental model is still current.
+> They just go through each sg and use sg_dma_address() on each.
 
-Remove the restriction blocking SD on embedded CPU PFs (ECPF), enabling
-SD functionality on BlueField DPUs. Remove the blocker preventing SD
-devices from transitioning to switchdev mode.
+Ah, thanks! That was a near heart attack :D
 
-The infrastructure added in earlier patches properly handles this case.
+Yeah that is perfectly correct, question is do you then still really need this udmabuf change? I mean the DMA API usually merges together contiguous DMA addresses.
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c    | 6 ------
- drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c          | 8 --------
- 2 files changed, 14 deletions(-)
+Regards,
+Christian.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 9aec470fe126..cc791f2f63b9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -4451,12 +4451,6 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	if (esw_mode_from_devlink(mode, &mlx5_mode))
- 		return -EINVAL;
- 
--	if (mlx5_mode == MLX5_ESWITCH_OFFLOADS && mlx5_get_sd(esw->dev)) {
--		NL_SET_ERR_MSG_MOD(extack,
--				   "Can't change E-Switch mode to switchdev when multi-PF netdev (Socket Direct) is configured.");
--		return -EPERM;
--	}
--
- 	/* Avoid try_lock, active/inactive mode change is not restricted */
- 	if (mlx5_devlink_switchdev_active_mode_change(esw, mode))
- 		return 0;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-index d74a5a2862cb..ec01aecf3370 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-@@ -222,10 +222,6 @@ bool mlx5_sd_is_supported(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_pf(dev))
- 		return false;
- 
--	/* Block on embedded CPU PFs */
--	if (mlx5_core_is_ecpf(dev))
--		return false;
--
- 	err = mlx5_query_nic_vport_sd_group(dev, &sd_group);
- 	if (err || !sd_group)
- 		return false;
-@@ -252,10 +248,6 @@ static int sd_init(struct mlx5_core_dev *dev)
- 	if (!mlx5_core_is_pf(dev))
- 		return 0;
- 
--	/* Block on embedded CPU PFs */
--	if (mlx5_core_is_ecpf(dev))
--		return 0;
--
- 	err = mlx5_query_nic_vport_sd_group(dev, &sd_group);
- 	if (err)
- 		return err;
--- 
-2.44.0
+> 
+> Best,
+> Bobby
+> 
+> 
+>     >
+>     > Best,
+>     > Bobby
+>     >
+>     >>
+>     >>> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com <mailto:bobbyeshleman@meta.com>>
+>     >>> ---
+>     >>>  drivers/dma-buf/udmabuf.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
+>     >>>  1 file changed, 42 insertions(+), 5 deletions(-)
+>     >>>
+>     >>> diff --git a/drivers/dma-buf/udmabuf.c b/drivers/dma-buf/udmabuf.c
+>     >>> index 94b8ecb892bb..f28dd3788ada 100644
+>     >>> --- a/drivers/dma-buf/udmabuf.c
+>     >>> +++ b/drivers/dma-buf/udmabuf.c
+>     >>> @@ -141,26 +141,63 @@ static void vunmap_udmabuf(struct dma_buf *buf, struct iosys_map *map)
+>     >>>         vm_unmap_ram(map->vaddr, ubuf->pagecount);
+>     >>>  }
+>     >>>
+>     >>> +/* Return the number of contiguous pages backed by the folio at @i.
+>     >>> + * A udmabuf may map only part of a folio, or reference the same folio
+>     >>> + * in multiple non-contiguous runs, so folio_nr_pages() can't be used.
+>     >>> + */
+>     >>> +static pgoff_t udmabuf_folio_nr_pages(struct udmabuf *ubuf, pgoff_t i)
+>     >>> +{
+>     >>> +       struct folio *f = ubuf->folios[i];
+>     >>> +       pgoff_t j;
+>     >>> +
+>     >>> +       for (j = 1; i + j < ubuf->pagecount; j++) {
+>     >>> +               if (ubuf->folios[i + j] != f)
+>     >>> +                       break;
+>     >>> +               /* Same folio, but not a sequential offset within it. */
+>     >>> +               if (ubuf->offsets[i + j] != ubuf->offsets[i] + j * PAGE_SIZE)
+>     >>> +                       break;
+>     >>> +       }
+>     >>> +       return j;
+>     >>> +}
+>     >>> +
+>     >>> +/* Count the contiguous folio runs in @ubuf, one sg entry per run. */
+>     >>> +static unsigned int udmabuf_sg_nents(struct udmabuf *ubuf)
+>     >>> +{
+>     >>> +       unsigned int nents = 0;
+>     >>> +       pgoff_t i;
+>     >>> +
+>     >>> +       for (i = 0; i < ubuf->pagecount; i += udmabuf_folio_nr_pages(ubuf, i))
+>     >>> +               nents++;
+>     >>> +       return nents;
+>     >>> +}
+>     >>> +
+>     >>>  static struct sg_table *get_sg_table(struct device *dev, struct dma_buf *buf,
+>     >>>                                      enum dma_data_direction direction)
+>     >>>  {
+>     >>>         struct udmabuf *ubuf = buf->priv;
+>     >>> -       struct sg_table *sg;
+>     >>>         struct scatterlist *sgl;
+>     >>> -       unsigned int i = 0;
+>     >>> +       struct sg_table *sg;
+>     >>> +       pgoff_t i, run;
+>     >>> +       unsigned int nents;
+>     >>>         int ret;
+>     >>>
+>     >>> +       nents = udmabuf_sg_nents(ubuf);
+>     >>> +
+>     >>>         sg = kzalloc_obj(*sg);
+>     >>>         if (!sg)
+>     >>>                 return ERR_PTR(-ENOMEM);
+>     >>>
+>     >>> -       ret = sg_alloc_table(sg, ubuf->pagecount, GFP_KERNEL);
+>     >>> +       ret = sg_alloc_table(sg, nents, GFP_KERNEL);
+>     >>>         if (ret < 0)
+>     >>>                 goto err_alloc;
+>     >>>
+>     >>> -       for_each_sg(sg->sgl, sgl, ubuf->pagecount, i)
+>     >>> -               sg_set_folio(sgl, ubuf->folios[i], PAGE_SIZE,
+>     >>> +       sgl = sg->sgl;
+>     >>> +       for (i = 0; i < ubuf->pagecount; i += run) {
+>     >>> +               run = udmabuf_folio_nr_pages(ubuf, i);
+>     >>> +               sg_set_folio(sgl, ubuf->folios[i], run << PAGE_SHIFT,
+>     >>>                              ubuf->offsets[i]);
+>     >>> +               sgl = sg_next(sgl);
+>     >>> +       }
+>     >>>
+>     >>>         ret = dma_map_sgtable(dev, sg, direction, 0);
+>     >>>         if (ret < 0)
+>     >>>
+>     >>> --
+>     >>> 2.53.0-Meta
+>     >>>
+>     >>
+> 
 
 
