@@ -1,192 +1,162 @@
-Return-Path: <netdev+bounces-296381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VTVWICdqJmqsWAIAu9opvQ
-	(envelope-from <netdev+bounces-296381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:07:19 +0200
+	id vw+ZLV5rJmrkWAIAu9opvQ
+	(envelope-from <netdev+bounces-296383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:12:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F96653641
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:07:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 136F56536A8
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:12:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Ds8FYyBn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296381-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296381-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296383-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296383-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C672B30323A0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:03:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02705302BA67
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3870F38F945;
-	Mon,  8 Jun 2026 07:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D113290B0;
+	Mon,  8 Jun 2026 07:10:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D89235E1C5;
-	Mon,  8 Jun 2026 07:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202D02E6CB8
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 07:10:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780902187; cv=none; b=JHsmTzwMvt3HA1MonoQjbz4f46vJZQ0JF5oYfcA5uf1hdTk57oz3E29m7ggZTdzkXiICt1rC3MOWdncRnyA/YFif0fqW1pZNfN5ZescKdpI0/8RsNjxV/QuvevMwLhGHmNWdzr8chKOV3WS/RNfnK5Xk3u+0Tq2/fSBOeNptVKY=
+	t=1780902606; cv=none; b=FOX/Q1ugbp+3GcST64aSiEq4P4X/88U0R3AJEUGl3oV21RylehOFLpRKAPsN1YMEx39xv5YBklo8RLtU6gKTsROcgaAeNtgLOrM5qslrXo+jI4W2AGP9rVIJ2scmdm7krrYmXw9mhy0Agmr8fjxMV35EcwmPPMXh6iHExG+08OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780902187; c=relaxed/simple;
-	bh=/EV8js+2v8OzyEkyzphqS7BgoRmZaabHmg7vtIFY5t8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rKEv80/br3FXob8jYeqyjObK6o3gMLBqtwurQeIJKK7qKryUPrIGtaHfVzjyrD23NZdE+sAR32v3QU94mIsGF9EhqKS1hsoYBgF3XYDh0AFcd7DZbMGz89rvtf5ukTLoLvuelrJZkYOs3Ycb0WlaBA6Z/3RMRCusZaut1UCHhug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ds8FYyBn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 980A31F0089A;
-	Mon,  8 Jun 2026 07:03:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780902185;
-	bh=10dFrUC/6z32jGP8zynGCsubM/uQN+Pn4UzSAjajejM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ds8FYyBnv2B771u4jaYArIjXJx5UpC1WUxFyjTQDVhtf+l1qYyu5NwqVY+oOzuc6C
-	 YgqUxqU4gV2VnsPffdjORqDHElM1kd63ltUYUyVdF4TYaUEWtF2JD2pU6poVM1ArWL
-	 lMUinVJ6futH/7sdnAjzkFIuaCbufZx8fG+uk80ePL2EOH8cH49KxCDKv1sJ8txsUy
-	 Qpsb63Y/49p0ZHrtiY6ZwtKegiVpiUrgHwkrzV4CAq0F0zJwJnRUTZXAStb/+L2/kr
-	 FA/3lev2TYsrVndJqyIIwBECwbTBWrmYCkIgZRjk+HnLbC8Mzg1CGk5xkLhbQhHDnH
-	 KQOX+wjtpEfGA==
-Received: from johan by xi.lan with local (Exim 4.99.3)
-	(envelope-from <johan@kernel.org>)
-	id 1wWU0k-00000000LzQ-1V0O;
-	Mon, 08 Jun 2026 09:03:02 +0200
-Date: Mon, 8 Jun 2026 09:03:02 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Lee Jones <lee@kernel.org>,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Thierry Reding <thierry.reding@avionic-design.de>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	s=arc-20240116; t=1780902606; c=relaxed/simple;
+	bh=FPU6ZZSWbmtJRNRRYPgfsIG7mdKktKajqHvlHdZhhP4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gBx9IblFi6u/yXZZzUaEIAWdPwCtNabCXf2+1iFALaeYNAhtfYdOSRMfEcrDfTjZSZziTLN9FkKS4Tp6OJ8zplFi33bEPGLZ7ZIOtycvs29mlhkfwydY5WaNHCU+oUi9t7dAD32EtnefNit77astguEWKuhnwAh1lw9tBH4vABE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+X-QQ-mid: esmtpgz13t1780902536t0fb5b13f
+X-QQ-Originating-IP: DjFP08ug7f5Ljn8/qOjseuzvy/yAAxwE5KXMO+47ho4=
+Received: from lap-jiawenwu.trustnetic.com ( [36.24.184.84])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 08 Jun 2026 15:08:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17286028086524605664
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Peter Chen <peter.chen@kernel.org>,
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>, brgl@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 08/23] driver core: platform: provide
- platform_device_set_of_node_from_dev()
-Message-ID: <aiZpJkQBXg2pcczy@hovoldconsulting.com>
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-8-88c324a1b8d2@oss.qualcomm.com>
- <ah9O15bMlAYgSlHx@ashevche-desk.local>
- <aiK-EXwp_xhcbty9@hovoldconsulting.com>
- <aiLi0KZskrCyEYO5@ashevche-desk.local>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Fabio Baltieri <fabio.baltieri@gmail.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net v3 0/3] net: txgbe: fix module identification
+Date: Mon,  8 Jun 2026 15:08:39 +0800
+Message-Id: <20260608070842.36504-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aiLi0KZskrCyEYO5@ashevche-desk.local>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NWy4VZNGBv1F4Yaacy14AouuHtC0rjbzeiyRohd++c4FAJbrKUvH6Qj0
+	oKcB54x7WARcTdg8lu2Ag40UjwR5WoNL4F8ryKNa0hmv+if0KB7JA5TSbzqk0QfhX6DLhN1
+	23kdhEaEYQRNb1q0B5ABL92etlio939B9M49i9mEGZkj1660HxJqo0YyKnpaHZuf8b1fAR3
+	Lx+Um4vtegFSM94O0gUpRai/a9n+hrjF3C/MD1RK9h0l/a87ccJUsI+eYlpeIQnTDR5Qr97
+	2jcs3qjw3Yb6wib6ppeXsIimE5E8WJ2mxIH4ZtfyukECTqI9u+ALhSbEfmVYms/kjLFCUV0
+	x//kKiVwjQMynxwLoJT0U+En8i2avIUtuTCF6RNTbsO8po5Lxv3jv3mZdU+kdV4F6su8BRH
+	0J9VE04IiDeNUcpW854pBoAt21rWpNI8FmOrdxdKGcGm+DxVCnsz6Vm3B0AHVEW8Hze/rtx
+	/JUm7LtzpElrx2jnOJIXjfxRmx5Vp3jYt4K+tsANJb0t6fX8QUZOsI4XlSteLCxoMafzGMg
+	hqMcruM8DdSp2kzZ9KGRS56210Su8f+sSgtQJflX+EjonMzNGvDGZokjjUO+0h/6NMSSvci
+	QW4dCPg/Y1C4CCy0J0xy6KhuJ2G2ZgGg+HOrNx/KtWxLlJZCVNcyU6HeXJRFKcgHOeo3IEf
+	WRpKqq4WWr4hgA+EzIvAgk+S+9Phgceik93xVlH7Tf5IAAaSuNsmqvEkCNU3eLdeqP2+Swj
+	0r/Wnt7RDsSNsc/bEUbzM91LPOhQoPRK2/Ck3KTWCjFxIkLs3+T0xFF/VKKBX25nZTk33HZ
+	6aMFeMtD8o1AL6NaptE2b4mynnP9/DHJ6JNSRUCe2BM5jrLUznWPwjTts6n8EjcKGHl6XU/
+	JJakKgb/UMrScSateXro1/3X1RfA6lJ77gDEsCuSHc+8NVXgpXgptEK7L3wrm6DE6pDT9If
+	kaXQPYFuELKmczjShDFtVmyON7P4F4lbofBrmKLhQLKNKgAdhXKH97hsvH1F9+OxWqBD6eD
+	hvff7YWiaxlo/yIrri0FDbBDt0nONxoCRph7L326VJFXKhmXeqo69M8Kxx9d7o2uROkvH68
+	eMNFxwx6zwAZI2zEIgqdYVquGmoxbC8ZA==
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-296381-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[johan@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:andriy.shevchenko@linux.intel.com,m:bartosz.golaszewski@oss.qualcomm.com,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@c
- rapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:brgl@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296383-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[trustnetic.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johan@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[66];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,gmail.com,trustnetic.com];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:larysa.zaremba@intel.com,m:fabio.baltieri@gmail.com,m:jiawenwu@trustnetic.com,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[hovoldconsulting.com:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E5F96653641
+X-Rspamd-Queue-Id: 136F56536A8
 
-On Fri, Jun 05, 2026 at 05:53:04PM +0300, Andy Shevchenko wrote:
-> On Fri, Jun 05, 2026 at 02:16:17PM +0200, Johan Hovold wrote:
-> > On Wed, Jun 03, 2026 at 12:44:55AM +0300, Andy Shevchenko wrote:
-> > > On Thu, May 21, 2026 at 10:36:31AM +0200, Bartosz Golaszewski wrote:
-> > > > Provide a platform-specific variant of device_set_of_node_from_dev(). In
-> > > > addition to bumping the reference count of the OF node being assigned,
-> > > > it also assigns the fwnode of the platform device.
-> > > 
-> > > Can we rather investigate the way how to make that of node reuse thingy
-> > > (which is used solely by pin control) differently and then drop this confusing
-> > > device_set_of_node_from_dev() call altogether?
-> > 
-> > No, that call is needed. See commit 4e75e1d7dac9 ("driver core: add
-> > helper to reuse a device-tree node") for details.
-> 
-> Bart fixes the problem with the platform driver. At the result this will be
-> the only device_set_node() + 'reused = true'.  As for 'reused' flag, the need
-> is only for pinmux/pin control stuff.
+For AML devices, there are some issues where the wrong module
+indentified then configure PHY failed.
 
-And any other resource which may (eventually) be claimed by driver core
-or bus code.
+The module info buffers should be initialized to 0 before the firmware
+returns information. And DECLARE_PHY_INTERFACE_MASK() does not guarantee
+zeroed contents, so explicitly clear the temporary interface masks before
+setting supported interfaces.
 
-> The question here is if there is a better
-> way to make that 'reused' be done automatically without need of setting some
-> flag explicitly.
+Rework txgbe_identify_module() to validate module identifiers through
+explicit type checks instead of relying on transceiver_type heuristics.
+When using the SFP module, transceiver_type could be a random value,
+because it was read from an invalid register.
 
-That's not really relevant to the series at hand.
+---
+Changes log:
+v3:
+- Add a new macro DECLARE_PHY_INTERFACE_MASK_ZEROED().
 
-If this is something we want to merge then you need to continue setting
-the flag in order not to cause regressions.
+v2: https://lore.kernel.org/all/20260605030850.17796-1-jiawenwu@trustnetic.com
+- Split the patch into 3 fixes.
+- Change DECLARE_PHY_INTERFACE_MASK() to empty array.
 
-Johan
+v1: https://lore.kernel.org/all/F3DA1ECDCE0A1E9E+20260602025443.332456-1-jiawenwu@trustnetic.com
+---
+
+Jiawen Wu (3):
+  net: txgbe: initialize module info buffer
+  net: txgbe: distinguish module types by checking identifier
+  net: txgbe: initialize PHY interface to 0
+
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 24 +++++++++----------
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  3 +++
+ 2 files changed, 14 insertions(+), 13 deletions(-)
+
+-- 
+2.51.0
+
 
