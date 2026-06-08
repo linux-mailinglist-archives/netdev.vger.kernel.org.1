@@ -1,99 +1,96 @@
-Return-Path: <netdev+bounces-296520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DvVTEmG1JmpHbgIAu9opvQ
-	(envelope-from <netdev+bounces-296520-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:28:17 +0200
+	id 4eVIM3G2JmqjbgIAu9opvQ
+	(envelope-from <netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:32:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF9DA656291
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:28:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64CE065632D
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:32:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RlMGgb2t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296520-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296520-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="lL68/l1X";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D73ED304B1CD
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:22:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E09E30861F9
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5171837C90B;
-	Mon,  8 Jun 2026 12:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7835D3783B0;
+	Mon,  8 Jun 2026 12:22:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE64B37B417
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180E937881D
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:22:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780921337; cv=none; b=NJkRuHv4pVfXu6vu5lByisnZ5ZAHUsppIRYaW9f3c9oKp0qfQt7K/hPkdnZywSoGRLWnGRvNh5TqwuNvR7YPSVYdk+5CRdr4YZ3PP5I5QcKp1fjquLJSKXstY/4jsvmu+QW/LHiRiNiC7OusLj5op764uGTT/iJd5fQlGCIVyJg=
+	t=1780921362; cv=none; b=qbeYM7ohjjY/FO5LeyifN+tqdZDfN0XfPDwjRZWtl6C5DyqYpgWj8z8yQIufXvJvITOPcaWYSNbVGuOOnbtEWwAlOfikZS1D/9efuob0A3a5cujNT57smM091+NXrj4ghNPeq+0h2WOaP/ECD/3p5iM5CC2wNKfcCa2Zo2BZiRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780921337; c=relaxed/simple;
-	bh=cXhlPwKrLeHAVxJiuHh44tc8y7FFmo6iTPxjGHDtsLk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q5IIDn6oZTeFwL7F65uRDaGxAzgaCg8ZA68SOQFEKidTU7eJ8HQ5Kgyhn4BxBnCEYC/NfPp8shF4CnIcl8Bk4fwhX0NAoIkURDeco25a7Kk6nBZQwcIW/G8853Ui401IXJTAWW3dlJzWeMtwz3lqyTKA9Vtusm7qFLplbP/pv5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RlMGgb2t; arc=none smtp.client-ip=209.85.219.45
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8ce9df4732cso45112826d6.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 05:22:15 -0700 (PDT)
+	s=arc-20240116; t=1780921362; c=relaxed/simple;
+	bh=Dv4CwM9ZJOk/ZPx0EzS3EGyLNfcz1WIk/MBj+Uewcho=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PymKfmUZrwgfHKKykuD+lU5y0z86arWrfS1ZjHMltzcXkZyiL1Y5Ao6MrUxeXJWm9NkRK878hXNjOVY+tVlBwWB+CAiZuxtSx+koLLaULC40hf1dBnjObou6zTsg4AWELrgqToGWOqno/HBj8QN1vYzRmVnFafcjA2kVKsnPYCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lL68/l1X; arc=none smtp.client-ip=209.85.222.174
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-91591f19716so543001985a.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 05:22:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780921335; x=1781526135; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CrRhNerf5D40vnQiScNa9aZv5+AqBmJvjpLa5KmsVBc=;
-        b=RlMGgb2ty8etJjyV4i6z8SLJ6Jbg2hcxjVKdmZ9mw97UFy2CmE1WgtP0Uw44RkG/O7
-         jRd+4WpGzn5a3c5PH3YQmdGWlmnJqjl11rM9BLIpKmyFstPLS1RtN5v2+p9OCLqmeFIl
-         g45l6Ycezslai7RB7vPAwceHf2mb6VKzBLBLM7BNXndZce4y3GoqFAjiTwKaHiyB+flv
-         wF0ACLng81bVQrYtPxXVsMZQ5glElj5WtaWcu3zqkv5BErLrCcpYdTnwylo1KyXrN9+o
-         xPrp46yRfJj94kB+c319BjlOxTcl5civtFK0Wr64aBBPWF2GjsdPUkgLonHpIjdasDeb
-         uq+w==
+        d=gmail.com; s=20251104; t=1780921360; x=1781526160; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSD/IG5I8Kz7SKo3TgnNWdd+GMqLGnCV42fz5tyyscg=;
+        b=lL68/l1XTnja/AgP3x2Aox8rkZ7AYsxizYpNNRhDz6wP1f6gYXWytuBr3ROgXWo9uu
+         SHxqel6LVR5RhfLZgB1g+alZu5RbwSGPd5n17tnt8QuSULg5z0Sfis17BwV1aFqoq9gV
+         rKK8R69Ws494gHx0+SL2fi7vpVeCnMNB5iqHQn1to051drjbaSvUXGs8BfVT/D0mUYBn
+         /Zu2+Cjwg7cxnWnI5HPmnUgyyXAYDBCykEaWQgZUs28pUWbJVOPO7mes593KQd+TQ2nV
+         2hy1IzrRLEGsaVuf3+gWdf5r/5b8LFyWFcbBNqpryhQT4QIDi53NjbojCfzJchbpWvTE
+         WT7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780921335; x=1781526135;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CrRhNerf5D40vnQiScNa9aZv5+AqBmJvjpLa5KmsVBc=;
-        b=pCvEXrvT+/ztbSRjVike2/4F3SstsLOJ4HgulcOk4sAx1BRD+Dizfn2JGMJLbUmlTu
-         yNPLFA6vZy0aBCELcCkhdb7aVh47II0Dm/+13wlW4j9ahGgq9SBk6oKJ0rjh/NEWZ0xx
-         JckL806inY0qHtzrgMMfRv2fWn7rL0w6tRldGC2RC/c52fjyuXdkXVYEnRTdx2rXzdBk
-         GnLhxhUgYYVHjCpOPhG/S+V8Eq/Mexa869l78HEb7s+YAxyeu9XpwPMH49woI/KVpwRS
-         osCSNmBggh1PFUjKsQak6Xrnvz+f9YytXbbPPaMqUfcIcndV0Ds6X9j3kdZE1GQdnQbD
-         dVdg==
-X-Forwarded-Encrypted: i=1; AFNElJ8tv4Dqpxl+ufdMgSgpBAf7fDg7ibyv+lUL+Po/Z6Fqr66DXiEs8kX8Wxr7bcWuGjxVSnvaGkQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYccI4TpvHo2XVOuYTAG020AXJcuiHe5a8EiJF3BAFLWFIiipi
-	D0ZBeHqAplRyem5VEzzy5YDMM60+8jC93JZpERzT1c3M3aKoo8yWn4of
-X-Gm-Gg: Acq92OGiDWMNqXUyPmDBxGaZntO+SytzQAiLcMoiaSDUzUmjHYHoH4LsIhEUalM293L
-	QrN0eBw+zgA3IBvE72wACMwXbSJ4qGWJxvwI+g6f3tMe8dnvF1lH3pqRVW5WArYlm59dQw44YgV
-	NvXuWxUgP1De95M4rq6xq6SIJxImVAT8G2E97KagIbSvQcVILwWi5zUEf+q5DFsE363lppNQIYp
-	bpun7gl5WnMMwqLZNa9jEuLW5j0044dBi/WsrO6qmTsF2XbBco3A2vLyH3mYp12p29/u1HnWGcN
-	QYWIBbJiKMGsR8/94ZFwOZClvUG/XY/XVI8OOqe3Kc+vY+QPjh5InB1Ai79GlIMbspGsrl3akvB
-	3lRednMZT1f8meaDJ9GJR0i4dwU8A2I+Tr5wls+44bJXZWhMjOQQkKVsjgDio3s5HuSYWb/8fdz
-	yISMa2QCHyrs6Nz/GozguYMEkaDJOThj7fyw+ONgcWSood4pG3H0myfZaymP8AJs3rwLoWCCVRk
-	OkiDJSXHSgCx/br9ZcBPpjhZOBoyh0=
-X-Received: by 2002:a05:622a:2489:b0:516:cc8e:9fff with SMTP id d75a77b69052e-51795b83e9cmr202509471cf.52.1780921334588;
-        Mon, 08 Jun 2026 05:22:14 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780921360; x=1781526160;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MSD/IG5I8Kz7SKo3TgnNWdd+GMqLGnCV42fz5tyyscg=;
+        b=bV1ITe9NQxtmNqHyHwGEKebDbtbQSIZsx4B6JHbG47FjmAsxR7xRQaqCotnsVeCDv8
+         Jy/NhrooteiSvJh7KCVCNRdnbsRfOpK4LPo4sMShBLoUSo5pIn+15rQOE4sI7ETujKW/
+         TOxj8c4gwOHTxuMHy0lQRLmIoWeW0FI5Ff+ihgJmPmlc+5Us6CEQpHvX4vsuPadHD2Zu
+         vbum24w4waGvZSMt6s5xJDy7bgbpU6qdlqhnYhidb3gBjb0R+nm+tXMVN8eGI+eadm5D
+         Ei+Ghrpcz5Uj0xw+u+VgvQW0yc6lEWjAMH7Qzyq0LCdF1C9QBdO+3PH1rGdzsNMXsoyP
+         K3wA==
+X-Forwarded-Encrypted: i=1; AFNElJ8xmXY6cmP4XwRzbcycgP33+YTmN8Tw3Lgo1pmD8k63ZJUr6ylPXtW6Baqyy9aYDTqaweLKTho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWcVYl4lwC+gAihx5P7kzpGrq3G8oTDjFFz79BYoWDc0q2cban
+	2m+ZsXKakxDYxSaLfkCxURWnf373ReVJ238yWtr+/VgJzv4j8gobhxrJ
+X-Gm-Gg: Acq92OEfEFiM2VFGkVfv0CALEYNzg7VwOrjX9eu6CvHi0/n+zb0p7lNjuGdXFk2yYxd
+	YL7n4peXMKl4O99Db34KVpXzV6bKZ76WeaAFL9io0ezxUnvlepdA4dC9WwLFjSRthVGWjiUDAkm
+	IeyMI3+JUJSvUZ2GBrJRVTG6k5E2obI30iD6KzUhyTCdSZYUjAlxdDTnlb+ohTsUAWCbI/EwfDv
+	1gtBvppBpdj5amXt+CyvSDzREuadDq6+tbmG/fLU15WMneQ/vICeLeX2HDvbsUnM0TkP3TzuRjw
+	PsvYFHnRAvWS1cCawM2YJhn0a6V9IY4BLiIVVLi/t/pnfpbkeYfB7Cw9bZpjf7MBkp5bDa6ooS7
+	fDesnV/K1fAOyiONkvVzX6aHlJczO093dIIeFef+NKrH8S1gQP4OC+b1qMFY/P1w416LP2iPoby
+	XOd5eYRnYATL9q+P1ggxUcC6grI3KF5vHPbDvWwBNPaTRRYrIoOSv45tIIOlN6AQDN2K9nHWK26
+	URJlOBzKmIeg+I0kAlJVOZuQ0SEFYQ=
+X-Received: by 2002:a05:620a:28c5:b0:914:cf92:46fb with SMTP id af79cd13be357-915a9d8894amr2422734485a.32.1780921359977;
+        Mon, 08 Jun 2026 05:22:39 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-517af149fa5sm46086911cf.3.2026.06.08.05.22.13
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a381febsm1691715685a.23.2026.06.08.05.22.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 05:22:13 -0700 (PDT)
+        Mon, 08 Jun 2026 05:22:39 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Jon Maloy <jmaloy@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Ying Xue <ying.xue@windriver.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vlad Yasevich <vladislav.yasevich@hp.com>,
+	linux-sctp@vger.kernel.org,
 	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 3/3] tipc: reject inverted service ranges from peer bindings
-Date: Mon,  8 Jun 2026 08:22:06 -0400
-Message-ID: <20260608122206.458290-4-michael.bommarito@gmail.com>
+Subject: [PATCH net v3] sctp: fix uninit-value in __sctp_rcv_asconf_lookup()
+Date: Mon,  8 Jun 2026 08:22:34 -0400
+Message-ID: <20260608122234.459098-1-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260608122206.458290-1-michael.bommarito@gmail.com>
-References: <20260608122206.458290-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,99 +99,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296520-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296521-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ying.xue@windriver.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:vladislav.yasevich@hp.com,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DF9DA656291
+X-Rspamd-Queue-Id: 64CE065632D
 
-tipc_update_nametbl() inserts a binding advertised by a peer node using
-the lower and upper service-range bounds taken directly from the wire,
-without checking that lower <= upper. The local bind path validates the
-ordering (tipc_uaddr_valid()), but the name-distribution path does not.
+__sctp_rcv_asconf_lookup() in net/sctp/input.c only checks that the ASCONF
+chunk can hold the ADDIP header and a parameter header, then calls
+af->from_addr_param(), which reads the full address (16 bytes for IPv6)
+trusting the parameter's declared length.
 
-A binding with lower > upper is inserted at the far end of the
-service-range rbtree (keyed on lower) where no lookup or withdrawal can
-ever match it (service_range_foreach_match() requires sr->lower <= end).
-The publication, its service_range node and the augmented rbtree entry
-are then leaked for the lifetime of the namespace, and there is no
-per-peer cap equivalent to TIPC_MAX_PUBL on locally created bindings.
+An unauthenticated peer can send a truncated trailing ASCONF chunk that
+declares an IPv6 address parameter but stops after the 4-byte parameter
+header; reached from the no-association lookup path, from_addr_param() then
+reads uninitialized bytes past the parameter.
 
-Reject inverted ranges in the network path as well. A peer node can
-otherwise leak unbounded binding-table memory by sending PUBLICATION
-items with lower > upper.
+Impact: an unauthenticated SCTP peer makes the receive path read up to 16
+bytes of uninitialized memory past a truncated ASCONF address parameter.
 
-Fixes: 37922ea4a310 ("tipc: permit overlapping service ranges in name table")
-Assisted-by: Claude:claude-opus-4-7
+The sibling __sctp_rcv_init_lookup() bounds parameters with
+sctp_walk_params(); this path open-codes the fetch and omits the bound.
+Verify the whole address parameter lies within the chunk before
+from_addr_param() reads it, the same class of fix as commit 51e5ad549c43
+("net: sctp: fix KMSAN uninit-value in sctp_inq_pop").
+
+Fixes: df2185771439 ("[SCTP]: Update association lookup to look at ASCONF chunks as well")
+Assisted-by: Claude:claude-opus-4-8
 Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 ---
 v3:
-- Restructure the declaration block (move ua below key) at the
-  maintainer's request (Tung Quang Nguyen).
-
+- Simplify to a single bounds check that the whole address parameter
+  fits in the chunk, written as an addition to avoid unsigned wrap
+  (David Laight); drop the redundant lower-bound test and the
+  param_space/plen locals (Xin Long).
 v2:
-- Reorder the new u32 declarations in reverse-Xmas-tree order.
+- Regenerate from net/main so the patch has index lines and applies
+  cleanly (Xin Long).
+- Use unsigned int for the decoded length and compare it against the
+  remaining parameter space after the ADDIP header (David Laight).
+v2: https://lore.kernel.org/all/20260606183821.1688525-1-michael.bommarito@gmail.com/
+v1: https://lore.kernel.org/all/20260604175803.2142975-1-michael.bommarito@gmail.com/
 
- net/tipc/name_distr.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ net/sctp/input.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/tipc/name_distr.c b/net/tipc/name_distr.c
-index 190b49c5cbc3e..ba4f4906e13b7 100644
---- a/net/tipc/name_distr.c
-+++ b/net/tipc/name_distr.c
-@@ -280,12 +280,21 @@ static bool tipc_update_nametbl(struct net *net, struct distr_item *i,
- 				u32 node, u32 dtype)
- {
- 	struct publication *p = NULL;
-+	u32 lower = ntohl(i->lower);
-+	u32 upper = ntohl(i->upper);
- 	struct tipc_socket_addr sk;
--	struct tipc_uaddr ua;
- 	u32 key = ntohl(i->key);
-+	struct tipc_uaddr ua;
-+
-+	/* A peer-advertised binding with lower > upper can never be matched
-+	 * or withdrawn and would leak the publication; the local bind path
-+	 * rejects such ranges, so reject ranges learned from the network too.
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+index e119e460ccde0..864741fae4187 100644
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -1204,6 +1204,14 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
+ 	/* Skip over the ADDIP header and find the Address parameter */
+ 	param = (union sctp_addr_param *)(asconf + 1);
+ 
++	/* The whole address parameter must lie within the chunk before
++	 * af->from_addr_param() reads the variable-length address; otherwise a
++	 * truncated trailing ASCONF chunk lets it read uninitialized bytes past
++	 * the parameter.
 +	 */
-+	if (lower > upper)
-+		return false;
- 
- 	tipc_uaddr(&ua, TIPC_SERVICE_RANGE, TIPC_CLUSTER_SCOPE,
--		   ntohl(i->type), ntohl(i->lower), ntohl(i->upper));
-+		   ntohl(i->type), lower, upper);
- 	sk.ref = ntohl(i->port);
- 	sk.node = node;
- 
++	if (sizeof(*asconf) + ntohs(param->p.length) > ntohs(ch->length))
++		return NULL;
++
+ 	af = sctp_get_af_specific(param_type2af(param->p.type));
+ 	if (unlikely(!af))
+ 		return NULL;
+
+base-commit: 9988931df99cf5d68af360e1f23b9c674a0b1b4f
 -- 
 2.53.0
 
