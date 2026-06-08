@@ -1,234 +1,205 @@
-Return-Path: <netdev+bounces-296562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IbawIFbAJmp1cQIAu9opvQ
-	(envelope-from <netdev+bounces-296562-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:15:02 +0200
+	id BiC3DCbCJmptkAIAu9opvQ
+	(envelope-from <netdev+bounces-296563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:22:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A496567FE
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:15:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AE8656962
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:22:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-berlin.de header.s=dkim-tub26 header.b=KOKvek1c;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296562-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296562-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=tu-berlin.de;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=PLYDfwK+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296563-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296563-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 42988300C0F7
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 13:13:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ED3B230074F1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 13:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19D73370E4;
-	Mon,  8 Jun 2026 13:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886F033D6F0;
+	Mon,  8 Jun 2026 13:14:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4050E25B08C;
-	Mon,  8 Jun 2026 13:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F6125A2BB
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 13:14:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780924428; cv=none; b=NNDSowADbCtSdV1svfbF2BcJvbmETvljSVM8MUNENaNybgoLx9nW30acPZKEqxfYcEfemkPzi4Z/UCfdqHYh5GOcC5agBqLGiCeZeloFoFm/Hs2yqOT12fcqI6z50uwKFQ4pGobNjpPObAI/H183+zlcWQx6mVcztk7fgkcNh7U=
+	t=1780924479; cv=none; b=FAQRd6fGGqNfx5KVpLupYZMcYK3i/5abevRQeS6826HAM4UAPKDRZVbyYxVMcWSBTXFDKmmYSvxDT3VXdvTLECu07WTKE0EMbZHuehACzvcbG71quw/e3tFV17vMdoNJGLcbBGW16ijyMufqPokMOrx4X5ev001SDhZl+uSnGhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780924428; c=relaxed/simple;
-	bh=mvy10hRTDRi5Z60KMRZgDerGypXk+bmuBV9ZRiZvXRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=A/wDpxNRD8KRRs0MZv55HU6m/7lxfeCDVSfJaxekSW1kacfsOWDmU+ubyf2KeW+kTf4OFBUkc7fw7ORMuUNAIbi4jIyIcafL2OTSXk4n5F968yZPzjF+eWPY7exLXF+MM0RTooQ4c3c+SV0sd0q4W/c+2Im6//DI/a3EP4OrSDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=KOKvek1c; arc=none smtp.client-ip=130.149.7.70
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-  d=tu-berlin.de; s=dkim-tub26; t=1780924425;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=24yOuIKlqcFA9syMazCqxweLj6xoa6jUerFmuK+rQ4w=;
-  b=KOKvek1c6Drfc1kVEtLX6QDUzixP7MaMW/9ccghJWioLZZNN7sN1IZAc
-   ETx55nn8pI5osd+crN+arom5Y8K9yneZPEa2C0xTH/tq2Y/Sayr8w6GXu
-   eDHZmiG0RM+vYjswIf5GXQcF/JSjq1bQjCz7bf+ySXSNVTH3kavI2tTFY
-   l/cgzutXUSoObaFG9wquFo716g1D+T9k9N/Q54yfBmoFApk32P7O7B/n7
-   ytAvsM3XkIknn+jCX90bEk7wouU+9jZitkkt+kuEZxDJyjqe+LgL5vl/W
-   pSCSRVMC4uVtFfs9O5rW4ejfNF5aefeijLehdmSt9+nhV2s5bYIRBvDfB
-   Q==;
-X-CSE-ConnectionGUID: JxFSwjFWRRO53cGz9f/4uQ==
-X-CSE-MsgGUID: c+zXCUgFQzaFCpj0N2RZrA==
-X-IronPort-AV: E=Sophos;i="6.24,194,1774306800"; 
-   d="scan'208";a="48439609"
-Received: from bulkmail.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.143])
-  by mailrelay.tu-berlin.de with ESMTP; 08 Jun 2026 15:13:37 +0200
-Message-ID: <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
-Date: Mon, 8 Jun 2026 15:13:35 +0200
+	s=arc-20240116; t=1780924479; c=relaxed/simple;
+	bh=D1bGgDLTsoM4sMHZzIX6xiFO2h0wOvXawHu7jT5o9Jg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BeVLw3wzjvu6+F3luYqwdWuIH9pxtSjTuuaHDH0bKAKLwWIdrXscUjQtkjY5rE5BqI07X//tXeRD6EjMZPdUL7hTtfG1TaZ2k4Fig1LMMvtRabUqg7aD3rmp5M5cm8SzkXPv7AHeQ8rYsH77Hx/tkZyxm5iVIs5WjgLpweSJ4Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PLYDfwK+; arc=none smtp.client-ip=91.218.175.177
+Message-ID: <0e89ceb5-a2ae-4e7c-8fe2-5b6a89ba6ac5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780924475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w5cjOvMp5+XOuezkcj/1kNRUJs/JtZaiXyIj/tVZEek=;
+	b=PLYDfwK+/LOc9sdOejSTfW46zTnoYbJl6ZUncdH5ISqhh7yHv7sH7VIxrcaSxtjKjaxm17
+	j9n+6D/J5kdeEADJV10jjNwTamG91smxR+5MkGYgiTFyLYIGQerJwINkh69ETSxfmXEfSq
+	Zmh5HU4ebnXsMc6C/n8qgWNGZ3jP0AA=
+Date: Mon, 8 Jun 2026 21:14:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Simon Schippers
-	<simon.schippers@tu-dortmund.de>, <netdev@vger.kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
- <db2aa3b9-09d4-46d8-aafc-0a859ee8b635@tu-dortmund.de>
- <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-In-Reply-To: <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net] tcp: secure_seq: add back ports to TS offset
+To: xietangxin <xietangxin@yeah.net>, Willy Tarreau <w@1wt.eu>,
+ Eric Dumazet <edumazet@google.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Zhouyan Deng <dengzhouyan_nwpu@163.com>, Florian Westphal <fw@strlen.de>
+References: <20260302205527.1982836-1-edumazet@google.com>
+ <99caeafd-edf5-44a4-8742-4eada5d0f5d1@yeah.net>
+ <CANn89iK8GcY3GHCRs-8EVrDoBPhdw1iY4mBjZKe8gx58+ko73Q@mail.gmail.com>
+ <aiaOor1JLLu5Xn75@1wt.eu> <90cb7e92-2451-4c67-9f35-6ff96b7efd77@yeah.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <90cb7e92-2451-4c67-9f35-6ff96b7efd77@yeah.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	URL_NUMERIC_IP(1.50)[10.0.0.1];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-296563-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296562-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[yeah.net,1wt.eu,google.com];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:hawk@kernel.org,m:simon.schippers@tu-dortmund.de,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:xietangxin@yeah.net,m:w@1wt.eu,m:edumazet@google.com,m:pablo@netfilter.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:dengzhouyan_nwpu@163.com,m:fw@strlen.de,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tu-berlin.de:+];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[netfilter.org,davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com,163.com,strlen.de];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,dql.limit:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,tu-berlin.de:mid,tu-berlin.de:from_mime,tu-berlin.de:dkim]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 11A496567FE
+X-Rspamd-Queue-Id: 79AE8656962
 
 
-On 6/8/26 3:04 PM, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 08/06/2026 12.38, Simon Schippers wrote:
->> On 5/27/26 15:54, hawk@kernel.org wrote:
->>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+On 6/8/26 8:51 PM, xietangxin wrote:
+>
+> On 6/8/2026 5:42 PM, Willy Tarreau wrote:
+>> On Mon, Jun 08, 2026 at 01:51:49AM -0700, Eric Dumazet wrote:
+>>> On Sat, Jun 6, 2026 at 4:06 AM xietangxin <xietangxin@yeah.net> wrote:
+>>>>
+>>>> Hi Eric and netdev,
+>>>>
+>>>> I noticed a significant TCP performance regression (QPS drop) when using
+>>>> iptables MASQUERADE with the `--random-fully` option, and I have bisected
+>>>> it down to commit 165573e41f2f66ef98940cf65f838b2cb575d9d1
+>>>> (tcp: secure_seq: add back ports to TS offset).
+>>>>
+>>>> Here is the benchmark environment and test results.
+>>>> Environment:
+>>>> - Client & Server: 2 VMs
+>>>> - Server: Nginx listening on port 80 (HTTP), and ip 10.0.0.1
+>>>> - Benchmark tool: wrk (short-lived connections with "Connection: close")
+>>>>
+>>>> Test Commands
+>>>> 1. With random-fully:
+>>>>     # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE --random-fully
+>>>>     # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+>>>> 2. Without random-fully:
+>>>>     # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE
+>>>>     # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+>>>>
+>>>> Test Results (QPS):
+>>>> 1. Parent Commit (7f083faf59d14c04e01ec05a7507f036c965acf8):
+>>>>     - with random-fully:    18145.74, 15006.39, 15716.67
+>>>>     - without random-fully: 18556.36, 16339.22, 21506.02
+>>>>
+>>>> 2. Bad Commit (165573e41f2f66ef98940cf65f838b2cb575d9d1):
+>>>>     - with random-fully:    11074.76, 10383.20, 10164.81  <-- (~35% drop)
+>>>>     - without random-fully: 17310.75, 20279.85, 18399.48
+>>>>
+>>>> Is this performance degradation an expected side-effect of the security fix,
+>>>> or is there any sysctl param we should tune when `--random-fully` is
+>>>> required for high-concurrency short connections?
+>>> Hi Tangxin
 >>>
->>> Per-packet BQL completion forces DQL to converge on limit=2, causing
->>> excessive NAPI scheduling overhead and qdisc requeues.
+>>> I do not know why that patch would affect MASQUERADE performance.
 >>>
->>> Accumulate BQL completions and flush them when a configurable time
->>> threshold is exceeded, letting DQL discover a limit that bounds actual
->>> queuing delay to the configured interval. Coalescing state persists
->>> across NAPI polls in struct veth_rq so completions can accumulate
->>> beyond a single budget=64 cycle.
->>>
->>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->>> completion.
->>>
->>>    ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>>    ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>>
->>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>> ---
+>>> Pablo, Florian, do you have an idea?
+>> I suspect it's because MASQUERADE can shuffle the ports around and
+>> break the end-to-end mapping. With host-based ISN the increments
+>> remain positive regardless of the ports, while with port-based
+>> increments if you shuffle ports around, two consecutive uses of
+>> the same port can end up showing a decreasing ISN, and some
+>> outgoing SYN will get an ACK instead of a SYN-ACK, then send an
+>> RST, and a SYN again, causing a degradation.
 >>
->> I found the issue that n_bql may become infinitly large if producer
->> and consumer have the same speed (and tx_usecs is large). It could
->> cause a potential BUG_ON if n_bql grows beyond INT_MAX...
->> Also I figured that no hardware BQL driver ever completes more than
->> BQL limit many elements.
+>> I'm not saying this is necessarily what happens here but based on the
+>> commit message description I suspect that this is what's happening
+>> here. There's always a tradeoff between ISN secrecy and reliability
+>> unfortunately.
 >>
->> Therefore, I propose a simpler logic (see attachment) that completes
->> either on the usual bql_flush_ns or if n_bql > dql.limit.
->> If n_bql > dql.limit then we either have the case above that the
->> producer is as fast as the consumer or we have BQL starvation.
->>
->> if (state->time + bql_flush_ns <= current_time ||
->>     state->n_bql > peer_txq->dql.limit) {
->>
->> It must be n_bql *bigger than* dql.limit because the producer will
->> always exceed the limit before it stops, see netdev_tx_sent_queue().
->> It is fast because peer_txq->dql.limit is in the cacheline of the
->> completion path, see dynamic_queue_limits.h.
->>
->> Another advantage is that we avoid the snippet checking for empty
->> and BQL stopped which requires an smp_rmb() and an test_bit().
->>
->> Apart from that I:
->> - Always call veth_bql_maybe_complete() in the for loop to have
->>    more accurate completion intervals when having mixed XDP and
->>    non-XDP packets.
->> - Made it so tx_usecs = 0 is now also a normal case.
->> - Change the type of n_bql to uint instead of int.
->> - Added _ONCE() for tx_coalesce_usecs as suggested by Paolo.
->> - Moved the bql_state init in __veth_napi_enable_range() in front
->>    of napi_enable() to avoid a race (Sashiko).
->> - Moved the bql_state reset in veth_napi_del_range() after the
->>    ptr_ring_cleanup() (probably does not matter but makes sense to me)
->>
->> Benchmarks look just fine, see commit message.
->>
->> WDYT?
+>> Willy
+> Hi,
+>
+> Willy, your hypothesis is 100% correct!
+> I captured the packets during the benchmark on the bad commit,
+> and the trace perfectly shows the "SYN -> ACK -> RST".
+>
+> Here is the key snippet of the packet trace (Client: 10.0.0.2, Server: 10.0.0.1):
+>
+> // 1. First connection closes, Server sends last ACK(410615916), entering TIME_WAIT.
+> 12105 08:54:39.128861 10.0.0.1 -> 10.0.0.2 TCP 80 → 47824 [ACK] Seq=3315216203 Ack=410615916 TSval=273827652 TSecr=370383870
+>
+> // 2. ~200ms later, next short-conn reuses port 47824 via MASQUERADE --random-fully
+> 47637 08:54:39.332281 10.0.0.2 -> 10.0.0.1 TCP 47824 → 80 [SYN] Seq=559739866 TSval=4137539723 TSecr=0
+>
+> // 3. Server is sends a ACK with the old connection's expected ACK(410615916).
+> 48591 08:54:39.337692 10.0.0.1 -> 10.0.0.2 TCP 80 → 47824 [ACK] Seq=3315216203 Ack=410615916 TSval=273827858 TSecr=370383870
+>
+> // 4. Client receives the unexpected old ACK, responds with RST, and has to retry the connection.
+> 48600 08:54:39.337799 10.0.0.2 -> 10.0.0.1 TCP 47824 → 80 [RST] Seq=410615916 Win=0
+>
+>
+> Are there any architectural recommendations we should consider here,
+> or is this considered an acceptable trade-off for security?
 
-> 
-> Looks good to me, I will use this in my V7 patchset.
-> 
-> A bike-shedding issue: We change the coalescing parameters for the veth
-> net_device, but should this be a TX or RX parameter?
-> 
 
-Hi,
+It's classic PAWS problem when packets go through NAT/Gateway.
 
-The results look a little bit suspicious, that in some cases the p99 is 
-smaller than the average, which can happen if you have really large max 
-values. It feels something is off with the methodology. I think we 
-should drop the avg, and include the max value. This would give a better 
-picture.
+Can you test the performance with following different two configs (client) ?
 
-Is state->n_bql += veth_ptr_is_bql(ptr) something that is commonly done 
-in the kernel? It relies on bool normalization which feels a bit 
-implicit to me.
+     sysctl -w net.ipv4.tcp_timestamps=2
 
-> For physical NICs adjusting TX coalescing will affect the BQL as this
-> affect the TX completion of the transmitted packets. For veth, it is the
-> veth-peer's RX NAPI that is "completing" or emptying the ptr_ring, which
-> is where this patch adds netdev_tx_completed_queue calls for BQL.
-> Any opinions on the "TX" or "RX" color?
-I think I would prefer to configure it on the tx dev, and the recv side 
-gets the value from the peer. Maybe something like this.
+     sysctl -w net.ipv4.tcp_timestamps=0
 
-@@ -997,11 +998,12 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
-budget,
-         struct veth_bql_state *state = &rq->bql_state;
-         int i, done = 0, n_xdpf = 0;
-         void *xdpf[VETH_XDP_BATCH];
--       struct veth_priv *priv;
--       u64 bql_flush_ns;
-+       u64 bql_flush_ns = 0;
-
--       priv = netdev_priv(rq->dev);
--       bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
-+       if (peer_txq) {
-+           struct veth_priv *peer_priv = netdev_priv(peer_txq->dev);
-+           bql_flush_ns = (u64)READ_ONCE(peer_priv->tx_coal_usecs) * 1000;
-+       }
-
-         /* Clamp stored timestamp in case we migrated to a CPU with a 
-behind
-          * sched_clock(); prevents the deadline from never firing.
-
-- Jonas
 
