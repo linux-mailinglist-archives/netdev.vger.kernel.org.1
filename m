@@ -1,211 +1,332 @@
-Return-Path: <netdev+bounces-296634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Efv9J/HhJmpQmQIAu9opvQ
-	(envelope-from <netdev+bounces-296634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 17:38:25 +0200
+	id dRfoJKjpJmr/mwIAu9opvQ
+	(envelope-from <netdev+bounces-296635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:11:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C73C6582D8
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 17:38:25 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6762C658895
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:11:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=openvpn.net header.s=google header.b="VYtil/0R";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296634-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296634-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=openvpn.net;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=jpesk7is;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296635-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296635-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2E48230CCF09
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:30:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2E8F6322F07B
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 15:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9EB3CCA12;
-	Mon,  8 Jun 2026 15:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D483CCFD8;
+	Mon,  8 Jun 2026 15:08:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62913C7E1D
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 15:08:03 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780931285; cv=none; b=jDf8tEHKkATehdiRtEeeO4/Nlvi2ynRzPotN+tfopJ2mfFFVxhK1QwCo+qVvO6fPDPth8aAEZSSOKCsGR0s0kjGMaAdqqgNzPvX63rYTm4mMjrHgGS09Z6fJedzbJw5giz59dBbXXWzBjjuBtac8osNn+DnucJFET3oQxO4u16k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780931285; c=relaxed/simple;
-	bh=TME3hBeO2sV19LuopQPAXfkUqb6J+OT/a/RHnD0Yo58=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nl6Ya2XVYZdTNmtUPSbxSuKpc0SRPemdmPP8KDO3nxs/qblls2A+MN6u+R7/zasex0ZGQhCRvlYQ/tKgV6+pwKoWAPobHgltxnlRRGc2HBr/J9KaaCqNwqJsHkpJi54CJQscUeIfS59xsElGTbF9z0dFeeZmsTWf5rz9uBoDYwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VYtil/0R; arc=none smtp.client-ip=209.85.128.43
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490b12270b3so26755075e9.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 08:08:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1780931282; x=1781536082; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ARGB/fd7lJFaxUybSqs1NUj8RsjUxwRDSARI5MDr3Y=;
-        b=VYtil/0R3QaaEJc8YgivjYybqKPiyWqCBuPmWNZtfq+zxKxp/3zxiBYZyFnHJLnrKB
-         SUppJszYCFH5oZfmOZIUvq7SYju7BSfVrFkrtltOOAFe9YmGhvK3J+LLTMHaJRoq9Gja
-         Kpv0oXZs+9ce/g2u2z0fwXx1FL0mt2lGSJ+63EGntGwduLR4jxoY/XCx6UsZf0kUUoFo
-         mnydRmI4gADq3pXTo0rs3/qdzDHHglwFX4ERBHWXZD4riEmGKY29geSUyIkWyThmhHiu
-         BqyFdNqtlUfaaJ0IdsGV+PQgq2Mpt0aSOzWV0fPtf3CrfWunFpW8eZgCl+WrByfXVA2W
-         S02A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780931282; x=1781536082;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8ARGB/fd7lJFaxUybSqs1NUj8RsjUxwRDSARI5MDr3Y=;
-        b=oCdkVB6sDy6x7a5NhJEnXB1w/9etrrywqW2+WmWIsNDVmi/mnL5vwCSR1nDhShKS5I
-         lDUtmNn6/7slCYhidim31E93WJr6AuHtejmAndQKtICv8bkUR7sBq/nxmcm2n3lUmlv7
-         YCTUifL4R3qS3Hg2ocSOS8jeKQ4N4EyoIVl5POjN6vMBZDAwRmIgitk3ym6G2syZV9gD
-         Q+DFaA8JXyYtVA+x+9dKF5p+v3ownW8+1CDTsxMmL3cmkBrIuf9EeRVcSz4tSvdK+Phe
-         DZAU6H6n6exIm0QnQ/eUtiXILGsohIFiKoE+NqAqQLxeRzsUFzWO70ksWjjhCQUOBOBu
-         BeKQ==
-X-Gm-Message-State: AOJu0YyAXGDJAVc/x5bPXNj4pNhykUzta0lBJQWfQgokbEneekHLb1Zt
-	jk9165D1yV0sdqxcH4k5TAS2AIIYgjFtcqgHLZ0/KjI7bbJMa+OjfuwdOf7qcz8BNDrOXE91Hr5
-	zofaeZ6beTqNgkakOfH92UFF2sGrtaj+FiNhucNXxHKLGLYbavTQcTKU80sAEh7VmcGs=
-X-Gm-Gg: Acq92OHxPGYJpem0ZZkqBnbpzyMlu1ujgvxPJKTokV34pXiVsIcr01wMwBY/PK+BaUL
-	uWDN8NESHsF+pM9nvhfQBqL9heZAgTaz7IE0LgWXyrI64kh0yk/LukNCPxRJ8KeVYXcouX/FgJi
-	HA5cmuTNf0l07mUt0uCpR9S0Vsg2x4h6m4PKjcGyAJvsVC/sJ3qcr6HjXDPhHOUrzslPdYpZjgv
-	c0nC8+Q4tDKsE8e6hSCmOA31wp74wclFc40rfV0wDHF3y944sGo1f9YxZDuEgWh4liWFCNTBoOh
-	2P8QJSGrkqEqtF9qRRyY23uI2dE4wpkPaVxtXi1tbWgS+oXmVChuBjiLtuXKeU2PShFz2uZZMmo
-	LKYD8ik6YEVrBOfRKKNtGFON9RVYGG67njSX9RwI9MuNw4RTiSoFOIaQKu3UuwXmUf6lQok0kAA
-	MemUmm4FVy5NdLaDNRQS2waXI719fpHHeaamAEj0JsfRBaUJkX5tHkMU1iFA==
-X-Received: by 2002:a05:600d:8653:10b0:490:d079:2919 with SMTP id 5b1f17b1804b1-490d0792a47mr36956875e9.14.1780931282036;
-        Mon, 08 Jun 2026 08:08:02 -0700 (PDT)
-Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:7e36:aaf2:5280:7b3e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc39def5sm390659705e9.5.2026.06.08.08.08.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 08:08:01 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: netdev@vger.kernel.org
-Cc: Marco Baffo <marco@mandelbit.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Ralf Lici <ralf@mandelbit.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 6/6] ovpn: use monotonic clock for peer keepalive timeouts
-Date: Mon,  8 Jun 2026 17:07:37 +0200
-Message-ID: <20260608150741.3320919-7-antonio@openvpn.net>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260608150741.3320919-1-antonio@openvpn.net>
-References: <20260608150741.3320919-1-antonio@openvpn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA28D3C9EF3;
+	Mon,  8 Jun 2026 15:08:44 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780931326; cv=fail; b=l7qhYjTpyFyiuKsVQuX6rBuwBbeKBU7ozE0X4wMJ+nHqAbHWOqj+rlQ7/vgu8tn0g5jiN4j5VtcCUtT3PqK13Jkq8zeUJBPbXYxxky1Fg+FwQK53oXj+glx1HrETlwZ7l9T+GxtcvLpvgR7iOUXsvBZVBrESGCk98ECDjMC/KvA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780931326; c=relaxed/simple;
+	bh=JT8t0MwJqxczxX7tns6+dp/k+SeoCDMpeGOXl9iTtCg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jmonKyx9aza8HuDQJQ657HNB0VyeNA74Q4vRaTBigD4ORWe83cGp3vm8VwN9+HGNrIrZ/ZKdYTnZQHMmU+MKdJeLZElAWYLK1eEiTao7BvV49D4Xvzk0gyj2Nap2tyjabuuQGKLXkesJQdh3TL5pCjQx5MpAS3IBPrCI2cBrIao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jpesk7is; arc=fail smtp.client-ip=192.198.163.18
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780931325; x=1812467325;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JT8t0MwJqxczxX7tns6+dp/k+SeoCDMpeGOXl9iTtCg=;
+  b=jpesk7isetp3U4g3gpKy/QCBML8sW4b78OhAk8pONBcW34Tasj1Y/owX
+   M0t1xfhKZ2Y9HZDu+a2AD1FPI4TvsSdh+S4A9C+phBxvN3jdt6+2kQzMh
+   Q7QGfdwbXlGyx9mUWuTP5LScMF06qziLkCLiha7b48v4tenccUC2Pbihi
+   Lic/rhYiX5pVz/MSCZ6COTYOnsgXAP9ZZxU+BDg7UR9WC4JSPqBsOcTsx
+   h2D+wpq8PRXRv2r5RGbojYdN6mWeb+3tVb9pUC+CeW3rkMT6mfZRaBZKH
+   nhtiytX+Vhmx10EFRKHW/GIw+a0TCp6duRv62AXrW/y0I0aedAhPeK6yL
+   g==;
+X-CSE-ConnectionGUID: CVZLA1MnRy2+5fICLm/9wQ==
+X-CSE-MsgGUID: UmHe5cuzRae6cxQ8LZSL+Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="80801364"
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="80801364"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 08:08:44 -0700
+X-CSE-ConnectionGUID: ncRzkKTQSTG3pZAGpRC/Vw==
+X-CSE-MsgGUID: ZBzO0OkuROeS0y6oUdXnmw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="242610809"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 08:08:44 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 08:08:40 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 8 Jun 2026 08:08:40 -0700
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.0) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 08:08:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EDAGj/ZqL2lK35QvVCb+RfyjS27K7zm8Yr78CIfEac2E6d8u28HtYoMXCCPAcde9v6ChjTtjcUpyFaj3+aQsQjZWRlAvTqRG/4eDJ2pH99SIagUlPUR9I9nJLjoMe8kUz+SFkHUmdKR7RRezJZEIn+3ZdRX3ZInMJ6oFN2Gu6hMFFWeB+k47RLOdjPtwIg+DLY5f0ZoJt8tc48rVAh1McpkaJqN0OO0rJlonmlqcvdZWeA97Faz2VBCIL87NJMjN5ujOramojn0S1iHb0cQ1PXHgEOgORAqv266u9P7adfLWJu1QCSUpxggB+dxEeE3y3lQwHJ2ekewAfxWdZtt4Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8i6XZ/EGYfn/sMSq3cRBmgMpptYfXjov9q50jzFfsc8=;
+ b=cOEkBmeXOp/yErrMe+itprRe+xiUT2SMVpE2piHsQSvWbjlEcMUTbUlUnxdmp/4nYeSs2MSV5oQaKSy+Ni2HEivY+nHTKWn5vMq650WNtgHbSvvodP8ikWoPlzOYfRu/K9BKXffuHgHsCtn/CA8o9MV7SJwwhpDhneOzL3IsQtR+T2gBwIz3IN3QYIfFcflNB/jAhFsa9tbBFsglJifxVQVkjTUlkToXXhU+sXAbdkzJif1u2QwuwaijIZUCs2uz17ZqCVWGR7/AZGpNByzmRssNl1YtagyMyg810729OPF7vRAQnuNgtMN3olzTQd1bKpugfdOWRsdcYU0eeLYT7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by MN2PR11MB4631.namprd11.prod.outlook.com (2603:10b6:208:262::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
+ 15:08:29 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
+ 15:08:29 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+CC: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, "Zaremba, Larysa"
+	<larysa.zaremba@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Tantilov, Emil S"
+	<emil.s.tantilov@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
+	"Hay, Joshua A" <joshua.a.hay@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "Shanmugam, Jayaprakash"
+	<jayaprakash.shanmugam@intel.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+	<richardcochran@gmail.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Salin,
+ Samuel" <samuel.salin@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v8 01/15] virtchnl: move
+ virtchnl and virtchnl2 headers to 'include/linux/net/intel'
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v8 01/15] virtchnl: move
+ virtchnl and virtchnl2 headers to 'include/linux/net/intel'
+Thread-Index: AQHc91T6149WsKLmFkaLMhatbPt8prY0woaQ
+Date: Mon, 8 Jun 2026 15:08:28 +0000
+Message-ID: <IA3PR11MB898614A46016327AA546C9ABE51C2@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260608144127.2751230-1-larysa.zaremba@intel.com>
+ <20260608144127.2751230-2-larysa.zaremba@intel.com>
+In-Reply-To: <20260608144127.2751230-2-larysa.zaremba@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|MN2PR11MB4631:EE_
+x-ms-office365-filtering-correlation-id: 371bc451-d9cd-45e0-ec2a-08dec56fcc16
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|11063799006|4143699003|56012099006|18002099003|22082099003|38070700021;
+x-microsoft-antispam-message-info: H0dqquOaaF72TIsOcEOzJBoYXi6khreylz8Y8GYtaC2GSz3gM4WrJIFDEFGuOth3lQk5wW6MVJGj2Wu9I2xp2r4nFwayQoH0u876w4aHLnzWYQTnrK7XsGhhsUu+f2M6Y1BA1NXLpCpM/MHIPwUOBLbFWwszTz98tGwDg68ZHDg+h+z+xctRjRtjtr1uPT5UimRemuS891DRydaobY2wjFS6khUhD5Lu9ZZhCjOqxZ2YrlABU6mVXCKuhbX2LWv85eFPaD+bE9dska56ElgNvq5q7dpdeoVhehKWuP+5g8b6gocwJFsPedTKbXO0pCFqiPa/RyDYyEE8I2pTEUsxfvlEKDkFxpNzW5cYzDkhDf3zvD5wvz9BwPMWF1G4ULUYHRi483ipcZlAnzj0qRAMmtwo6ieQ4Pz6pUHOoZ/tqJ2QZ2Fh2Ont5G1WlYDQ7SY18IB5Ipi23SV0PFf/WIXY504DAOV+fNhEnszUM77Fp+N0/9slLxiLZyJqlfxWcyMg7+pasGtATLUY9m/eE9Ii5VImFmk5EH969wtVEfNx/AiFhtZ6QPdEqTT4UTYavcsNVU8hJ6M3zQ7+uKas/2IF0OFs5V43dYz/39NOeRoUkyJQRc7IK33LfgFcNUjjfSVwiBj6vxd0ex01s5WJIaLosR/sa2IXlk7aH8yi/0EAsZcAgSYPEvkLk3+zYE4jDcRtOkR4wEiXHa5WFRHeXSbKhVjSuSAfGa0k/MINH1g7XZ/0lxwwIa3TrNPVg5QUg5Yk
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(11063799006)(4143699003)(56012099006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?kSgXwlSyAtOSWt+mPAgIb7iOFirZvK3ugEzJHd54reQ4B4NQCOIJobZSn6dX?=
+ =?us-ascii?Q?NpZrwdNuISKgvxFR4o/dwpIifACXFsm8TqD8gvWnLUGWJkZuHUbWqPzy+BU/?=
+ =?us-ascii?Q?mGTXFzGvnbMAVcBCQ5HfFeH70sfwIDLz+ObbjABAH/SltBT8Vpw8ur4bs4u1?=
+ =?us-ascii?Q?kQKlyTHj8XiV3tNHNWVGpvAPAx44ld/GxGottwHsXC1qy49gQoUqHoQCOnrd?=
+ =?us-ascii?Q?jsW4n5cWyOUrH0400e3d0tZmcmEtzufD9dBcYuMiss78DK8e44KDbswL9N+V?=
+ =?us-ascii?Q?rVWR77YAw1Ps7POy/RiWcwtmbf1BkQYkzMNlgGlD3u6+zDYwP5zzSBGRqpL3?=
+ =?us-ascii?Q?AYXNEQwoY2K1wfPNpjOn6wJ9z20d+ETWxbx/lrg2S/JjaYEYNgBIOXHi0LLo?=
+ =?us-ascii?Q?oUDBIBhiSlWaCkREZYgjwHL1pSO/VVx4aolpBVtlRBA1f9OubbuJP4pBqhdZ?=
+ =?us-ascii?Q?fO/EnjD5hSMjtMhvs5LXj0jPsa1BGFOjolcM9VX4jvJ/uPLkZiWnlDIZNoMa?=
+ =?us-ascii?Q?5hOxG980JQCiUZnuTbfZ4Ad5F28MvUPvU9uNgy7wcHHVKrhK4lnOCoxG7D9h?=
+ =?us-ascii?Q?Nk9RIFfMncEypT/LHEaxWXlYYiGdHR3Ljjq7e1mdYUXKg9JEinMTWWUnWtQI?=
+ =?us-ascii?Q?SFkIs4gRR7hJcL45VT6Z6vumtBy9WniTD3lIwuchOMYcgyWpqPFnm8nB8JE7?=
+ =?us-ascii?Q?YZs8rcIX0YRZwVlWrdpLSxDZdBFPiYGwUy2l2u/C0GN1xQbPET+Bdoyc76WL?=
+ =?us-ascii?Q?Pk8HCveeOGON9+zE4Z/1R0VMoOcatTaH5OKro0IeiwIM3efQ/sy6QTgmfbTF?=
+ =?us-ascii?Q?X2W69fbZdtAoaiff2IIuV+S8kYECyyMhHZkAqq3BYkqKjulTf0CUmhQE8tky?=
+ =?us-ascii?Q?bNBcFXDJJZ87o5BmsXYYYuGOjmHIUNlUX7Dw0GOFLRLOlxpmciW1F1awrEme?=
+ =?us-ascii?Q?WYiuBxgQbRDyK96i7lbTmcTcEhT1uYMiGhr25HN2tMsXyqwl5izPsPvQWjns?=
+ =?us-ascii?Q?zeqSXCE7QiE7cED/fFG5Uxyi6+SIDeeTk+NeXORG0ArtklTBVyNSLwkesYoI?=
+ =?us-ascii?Q?5l9DfLHxCJ1oBhJ3IeWqEgGsie6XfpLaZkvxySt0RcSD3q3ZI3DQQDBMsPjn?=
+ =?us-ascii?Q?LQcLgONAWpu6/mtw0vEaDFEhKyuraRpKl90zIHJilwcLqgOs4WMgu6uR5if7?=
+ =?us-ascii?Q?m26ZRAaN5YX45ro6gt9y/xYoZUEMYdoP1Jf7Dv4XgmP4mkxNxD/uRzt4O0bg?=
+ =?us-ascii?Q?wLY7RCmpPuVJDj2Ba5DlnjQbCF56bhf8a3VyYA9OlIn8DVo2nQU5sqwvKv23?=
+ =?us-ascii?Q?KryJAqWC0gsQ1NLb69EkJoA+fCiWdbPb9+Fl7PG7sCbwOiV7Kd36b7+FpynQ?=
+ =?us-ascii?Q?OefXhkJjMznoCRbzhxuJbHV5TWgxpWxcYAih5El8s6EkhPv6AvpirAV3l3Bw?=
+ =?us-ascii?Q?Gy9uGIa8oDOGYuKvrSR0oXbUwvvpFiG0j+HMEnfl+boPNDRPohsCKFTN2uwd?=
+ =?us-ascii?Q?HFk2csjD77D5OeN80sMTnSC9QZthtCQC0WlIxXrHl00HhK06S82fElYN07sP?=
+ =?us-ascii?Q?6/z9lSQfNEefSuhq5OMWnb+aV5a52QkjvJsB/8U4KHN43T0t+YxVY02JvkJl?=
+ =?us-ascii?Q?/Lvmm4mgtkFYm2kUDlIzm0tU6Y9zPXOPYFFAbkYa+4Fc/ztVqYh8DGT6m+bO?=
+ =?us-ascii?Q?UmYeheKUJl0lYCpQSrfrLr0FAPiuUctBm6ZkYOKQwd5zm376bhuGZPv5QXyX?=
+ =?us-ascii?Q?+3j6Bv3VgXjmYHqclJI2xka+lUQTbfE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: hjTj3gdEW0e7x1EbIoCPn1vx0C9EZNXGydY7Q4Nw1ti1MTPECorWXTApdLiGJMqV+u0HFc23kcgM8mLHVu/w9hexJMkHH0t9QNmrVSI6N+7Nm+2tHEuflPF1b5GfgmWEcY9CQU5VfGaW5FNPzqzxD4CwPK3GHojiRpKyK8i50QmzcVFtuomO/IwWLM50wNwQiDPZH06CrztMr607g22acEKWMbSfzkw+XkUU6dik1ESJAh0FVyun5TkzMQbBxswfu0Efgd9MQecFJ0NHzjzGQtI+4a7ZTKimseeVhFNRC9TU/9nyJUb/vprG0AU15mtKRU8RdMoCKlT2UfXDlOvGhw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 371bc451-d9cd-45e0-ec2a-08dec56fcc16
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2026 15:08:28.8950
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xRM7EMP9/Cg9cNOdeZBgB6L51Q9vYXnR2RBRc8DWRnzYZPQiGYThPCv28vVis+jg0+oCnznkrgqSqUhno79odbPFKBo6jyom/wH5PEAWDDM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4631
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[openvpn.net,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[openvpn.net:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296634-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296635-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:marco@mandelbit.com,m:sd@queasysnail.net,m:ralf@mandelbit.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:antonio@openvpn.net,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:larysa.zaremba@intel.com,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:aleksander.lobakin@intel.com,m:sridhar.samudrala@intel.com,m:michal.swiatkowski@linux.intel.com,m:maciej.fijalkowski@intel.com,m:emil.s.tantilov@intel.com,m:madhu.chittim@intel.com,m:joshua.a.hay@intel.com,m:jacob.e.keller@intel.com,m:jayaprakash.shanmugam@intel.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:richardcochran@gmail.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:samuel.salin@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,lunn.ch,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[antonio@openvpn.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[openvpn.net:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,keepalive_work.work:url]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3C73C6582D8
+X-Rspamd-Queue-Id: 6762C658895
 
-From: Marco Baffo <marco@mandelbit.com>
 
-Replace ktime_get_real_seconds() with the monotonic ktime_get_boottime_seconds()
-to ensure the keepalive mechanism is robust against system clock modifications.
 
-Right now, the driver uses ktime_get_real_seconds() to track peer timeouts,
-relying on the system wall-clock.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Larysa Zaremba
+> Sent: Monday, June 8, 2026 4:41 PM
+> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>
+> Cc: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Samudrala,
+> Sridhar <sridhar.samudrala@intel.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; Zaremba, Larysa
+> <larysa.zaremba@intel.com>; Fijalkowski, Maciej
+> <maciej.fijalkowski@intel.com>; Tantilov, Emil S
+> <emil.s.tantilov@intel.com>; Chittim, Madhu <madhu.chittim@intel.com>;
+> Hay, Joshua A <joshua.a.hay@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; Shanmugam, Jayaprakash
+> <jayaprakash.shanmugam@intel.com>; Jiri Pirko <jiri@resnulli.us>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Simon Horman <horms@kernel.org>; Jonathan Corbet
+> <corbet@lwn.net>; Richard Cochran <richardcochran@gmail.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; netdev@vger.kernel.org; linux-
+> doc@vger.kernel.org; linux-kernel@vger.kernel.org; Salin, Samuel
+> <samuel.salin@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v8 01/15] virtchnl: move
+> virtchnl and virtchnl2 headers to 'include/linux/net/intel'
+>=20
+> From: Victor Raj <victor.raj@intel.com>
+>=20
+> virtchnl2 headers will be used by both idpf and ixd drivers, so they
+> have to be moved to an include directory. On top of that, it would be
+> useful to place all iavf headers together with other intel networking
+> headers.
+>=20
+> Move abovementioned intel header files into 'include/linux/net/intel'.
+>=20
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> Signed-off-by: Victor Raj <victor.raj@intel.com>
+> Tested-by: Samuel Salin <Samuel.salin@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  MAINTAINERS                                                   | 1 -
+>  drivers/net/ethernet/intel/i40e/i40e.h                        | 2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_common.c                 | 2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_prototype.h              | 2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h            | 2 +-
+>  drivers/net/ethernet/intel/iavf/iavf.h                        | 2 +-
+>  drivers/net/ethernet/intel/iavf/iavf_common.c                 | 2 +-
+>  drivers/net/ethernet/intel/iavf/iavf_prototype.h              | 3 ++-
+>  drivers/net/ethernet/intel/iavf/iavf_types.h                  | 4 +--
+> -
+>  drivers/net/ethernet/intel/ice/ice.h                          | 2 +-
+>  drivers/net/ethernet/intel/ice/ice_common.h                   | 2 +-
+>  drivers/net/ethernet/intel/ice/ice_vf_lib.h                   | 2 +-
+>  drivers/net/ethernet/intel/ice/virt/virtchnl.h                | 2 +-
+>  drivers/net/ethernet/intel/idpf/idpf.h                        | 2 +-
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.h                   | 2 +-
+>  drivers/net/ethernet/intel/idpf/idpf_virtchnl.h               | 2 +-
+>  include/linux/{avf =3D> net/intel}/virtchnl.h                   | 0
+>  .../intel/idpf =3D> include/linux/net/intel}/virtchnl2.h        | 0
+>  .../idpf =3D> include/linux/net/intel}/virtchnl2_lan_desc.h     | 0
+>  19 files changed, 16 insertions(+), 18 deletions(-)  rename
+> include/linux/{avf =3D> net/intel}/virtchnl.h (100%)  rename
+> {drivers/net/ethernet/intel/idpf =3D>
+> include/linux/net/intel}/virtchnl2.h (100%)  rename
+> {drivers/net/ethernet/intel/idpf =3D>
+> include/linux/net/intel}/virtchnl2_lan_desc.h (100%)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index eb8cdcc76324..952f09b40711 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12917,7 +12917,6 @@ T:	git
+> git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git
+>  F:	Documentation/networking/device_drivers/ethernet/intel/
+>  F:	drivers/net/ethernet/intel/
+>  F:	drivers/net/ethernet/intel/*/
 
-An administrative time adjustment or an NTP sync that steps the clock forward
-can cause `now' to instantly exceed `last_recv + timeout'.
+...
 
-When this occurs, the driver artificially expires healthy peers. Depending on
-the OpenVPN user-space configuration, this triggers a premature tunnel restart
-(if --keepalive or --ping-restart is used) or a complete disconnection of the
-client (if --ping-exit is used).
+>=20
+>  #define IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC	(60 * 1000)
+>  #define IDPF_VC_XN_IDX_M		GENMASK(7, 0)
+> diff --git a/include/linux/avf/virtchnl.h
+> b/include/linux/net/intel/virtchnl.h
+> similarity index 100%
+> rename from include/linux/avf/virtchnl.h rename to
+> include/linux/net/intel/virtchnl.h
+> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h
+> b/include/linux/net/intel/virtchnl2.h
+> similarity index 100%
+> rename from drivers/net/ethernet/intel/idpf/virtchnl2.h
+> rename to include/linux/net/intel/virtchnl2.h
+> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2_lan_desc.h
+> b/include/linux/net/intel/virtchnl2_lan_desc.h
+> similarity index 100%
+> rename from drivers/net/ethernet/intel/idpf/virtchnl2_lan_desc.h
+> rename to include/linux/net/intel/virtchnl2_lan_desc.h
+> --
+> 2.47.0
 
-Fixes: 3ecfd9349f40 ("ovpn: implement keepalive mechanism")
-Signed-off-by: Marco Baffo <marco@mandelbit.com>
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
----
- drivers/net/ovpn/io.c   | 4 ++--
- drivers/net/ovpn/peer.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-index a6b777a9c2d9..9a66d693039a 100644
---- a/drivers/net/ovpn/io.c
-+++ b/drivers/net/ovpn/io.c
-@@ -142,7 +142,7 @@ void ovpn_decrypt_post(void *data, int ret)
- 	}
- 
- 	/* keep track of last received authenticated packet for keepalive */
--	WRITE_ONCE(peer->last_recv, ktime_get_real_seconds());
-+	WRITE_ONCE(peer->last_recv, ktime_get_boottime_seconds());
- 
- 	rcu_read_lock();
- 	sock = rcu_dereference(peer->sock);
-@@ -294,7 +294,7 @@ void ovpn_encrypt_post(void *data, int ret)
- 
- 	ovpn_peer_stats_increment_tx(&peer->link_stats, orig_len);
- 	/* keep track of last sent packet for keepalive */
--	WRITE_ONCE(peer->last_sent, ktime_get_real_seconds());
-+	WRITE_ONCE(peer->last_sent, ktime_get_boottime_seconds());
- 	/* skb passed down the stack - don't free it */
- 	skb = NULL;
- err_unlock:
-diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
-index 8fdbb5050690..a21d02ac715e 100644
---- a/drivers/net/ovpn/peer.c
-+++ b/drivers/net/ovpn/peer.c
-@@ -45,7 +45,7 @@ static void unlock_ovpn(struct ovpn_priv *ovpn,
-  */
- void ovpn_peer_keepalive_set(struct ovpn_peer *peer, u32 interval, u32 timeout)
- {
--	time64_t now = ktime_get_real_seconds();
-+	time64_t now = ktime_get_boottime_seconds();
- 
- 	netdev_dbg(peer->ovpn->dev,
- 		   "scheduling keepalive for peer %u: interval=%u timeout=%u\n",
-@@ -1359,7 +1359,7 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
- {
- 	struct ovpn_priv *ovpn = container_of(work, struct ovpn_priv,
- 					      keepalive_work.work);
--	time64_t next_run = 0, now = ktime_get_real_seconds();
-+	time64_t next_run = 0, now = ktime_get_boottime_seconds();
- 	LLIST_HEAD(release_list);
- 
- 	spin_lock_bh(&ovpn->lock);
--- 
-2.53.0
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
