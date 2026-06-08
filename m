@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-296517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U/DoIn+2JmqobgIAu9opvQ
-	(envelope-from <netdev+bounces-296517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:33:03 +0200
+	id BCkcMDC1Jmo/bgIAu9opvQ
+	(envelope-from <netdev+bounces-296518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:27:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3058265633A
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:33:03 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EF5656278
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:27:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=aNWwivkF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296517-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296517-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=YxZFyBSc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296518-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296518-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FA063037899
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:22:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 748E23043985
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E769379C44;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D06937A496;
 	Mon,  8 Jun 2026 12:22:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BAE37881D
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8D9335BA7
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:22:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780921333; cv=none; b=a3XV+GhXI3uicOdRoFwMYHqF+6owXR2sUPlutFJXrh1b2YHdvDgOFF4E69urtyQHJ3DwgGUaxSOfrAz0K4zWWZ6vNkDnGkIUyig5C4Hpj0p9PeXjZwvWIjOjH5nx66pCbDxAc3YeQx+GcNCq9CJhEmlZRSdQir99YJWYrLZC1Ag=
+	t=1780921334; cv=none; b=Axfd1Sm+Ew3TbrqWlTH27a6M41zETBgJLRVZ/PlLrmaMRku6Whs7CPNp94PjE1SzYyAGhCNHpdU6LimitMbIEynFRTO8iMoacnG5hTzYLvdMizNraQLfDInxGTSFq8svjmW39FPzaN9/kXcZ4u+1Ft/PnNYdLZG4l9Pc8USax3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780921333; c=relaxed/simple;
-	bh=0EsdpCH8pHTvCMLVt3KknkhGO1YlifMiPnY7zkaWjT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n68M1KAfZFCwjELKYq5wHJc12S/fs6IXN0Z/mwqoTH74KyiTyQMPQ2fOOcCwi5yf75rdrXO3ATosQw/NzQFdM5UreUr4yjap0sowTPM1FloZrJ1IeUfMbOW8P28piC5i8225NADOOJjEJqUGUl7qciXtEVc+AJaSOJXC1+pDsvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aNWwivkF; arc=none smtp.client-ip=209.85.160.172
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5175b6c4e19so47408831cf.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 05:22:11 -0700 (PDT)
+	s=arc-20240116; t=1780921334; c=relaxed/simple;
+	bh=ZNWWAVNfC9RmhryDBGopsCMLOBQ2uMLl+zRSZ1fBt4E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GnhSDfdkwI2UW71qL1NfwLEK50TrHAobfsrPd3XLtROutfBmYMS/ReMbNcHJwR6vQqN7u2dZe32ioVEzA9PxRp1XCJus+nYLHh+Kbx7bmMD2pINqsesPBHB9ydieZ8z4j9elSUfzaNxDFOcqKEcj1zPMF38JbjVHCU2EHAXNRak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YxZFyBSc; arc=none smtp.client-ip=209.85.160.171
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51784eb2ba0so32150601cf.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 05:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780921331; x=1781526131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ajp3k/JE6ATQg+UyjC3GyoT0HgkEIVNSvEdv6MGdm7s=;
-        b=aNWwivkFjHuMrzGm4hNujn7ZaG6tE9fLnd9kIalhDUPkkmH0hnTnzUmwIFpmWtYiOL
-         kqPD8G5DmqP5iYi/B+KKbxGV1SzcSgRs4E/OyMVR9TQSsGwWZoWxPyGJb5scUnrty+NN
-         74KUI5dnL2V8O2jdfds5lzjkMv/Ugt5AO7cKEa0Gsy3UknGVOPrbosZe0+5MwUI98GCs
-         unlZ8BR1lwrCeP9yzhwF412XSz0bQ8rHnyrg+Gq1ahD4t1a40bIO3QLcc/ISrGTJa6mr
-         9uiR2ytaZnuV97yHZKcBKHxHHHghjKOiN3YBV6eZ87EfM5Jy5TNfpTrov03C+ZOatAYF
-         fing==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780921331; x=1781526131;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1780921332; x=1781526132; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ajp3k/JE6ATQg+UyjC3GyoT0HgkEIVNSvEdv6MGdm7s=;
-        b=a4i+fuDY5isE0+IHt/a1jbdUyKPyEu4XizLkX4XShEXFTqirNVAmVP/vFT73YGI/ib
-         kDQ8zkCHLku2j54FWbU9dIu312Zcx4A+5J7O/Qb39zp9YgF2Rrj5j2HNJmitE78VKnJb
-         vqQaevTCEK6004JtL01KGPjrmypxdTEssmMJsfHLZyC+01kVYS+hn4OxlOZpvhkowxho
-         BPyVeEwmMoQbxc8La7qgn2fqoclMmIETfmY0Q/A63w3Ef1OWM047SNnwGpckZKSlwQoe
-         6WbfHXQ+qwuYw9rjAX1GrJ8ddQvl9hLoy0/B37pmgz9qVqLVJ4l/9sZUt1tSMEtZ79dq
-         F91g==
-X-Forwarded-Encrypted: i=1; AFNElJ9B67Le7jh7RG7odjCxVf5s/YHqYCkK3dYk5QH/ydGTSr9BhosbV8TVWIeHSZzbl+4KrFEVaVs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrJZdqKEHMvBWQbU3feVK528F29v4+8qkuMLV5pH+29rlfhKzf
-	9aOUcLwfkPAgh53vepkxHfNV23ULNbFh3E+hpd/RckUW9v380tcFCow5
-X-Gm-Gg: Acq92OHLRHv1ajc3q1MGdjANlxcERel+bRagttnWqFeqC40c/j25S19stCWHcu8N7Lr
-	c4izySI/eTDSaeYvLX5nzbXmHcICXDru+/qE0l2tNsAbUtyFun4aOMPbVPIzTMkusmz6TH6aCo7
-	1PJch0UhnFiueP2qFMxJqEmuLosiffGtZpuxqEHwmCYbBDut5MuUkYsdSVWE//wnjfMhXkFLTvV
-	jiyb6BBf9jSYGEqgXbBzFk50tPp1t6AttIV1V4Um9M0dTI5XkI0JhnY8fOqvhvwjltB4tszvWiI
-	WISobDSIMXmZkQCJ2e6Kg8O75hRLIWGjgNIiaiFinaZyyGVlGSZH/yAtF+eGwhEsJazyULUTl64
-	IU2yfTvT1vXgR9wZSrn8b2ce0iFaiYvTICf51GW1mdT0gl2YlVlrxnRnLy6Ndu3D01Nf9QMEjYs
-	0MeBECYzvY1WtVI114lRO+dojxrT+NH/wyNF9l3ZuSqMeLXczTcgEC1gTQAx2AIODFZ0P43jIZe
-	KaNLEfWwgsYM3tSMLqqPqtOJDN18mQ=
-X-Received: by 2002:ac8:598d:0:b0:517:7590:228e with SMTP id d75a77b69052e-517959cb47bmr233971491cf.0.1780921330734;
-        Mon, 08 Jun 2026 05:22:10 -0700 (PDT)
+        bh=xPe7RROwML8YBDC9iBsnC3XTfs6XjaM8KgeZwP62gHY=;
+        b=YxZFyBScln/mLqyJheMjmyadkd6svfhMaj+b9QqT3ZtoT6IuqJqpRGNDa8r/swzqus
+         habZjfgrawnUZq3m1H2lAJlCC49mi5zJfitljqqSOSbpRjUvYRjY82A/FERrakd/oPrm
+         CtvqjKIy6tWie9DFLtu/8qHprbvSEM6WE4jY+pNF8saqupI3TGypU9voYF9NY/nO8CUq
+         hNyRQW0TciOuDGEGBLRkPyu3wgu1Eclq1ozR29OphJzwpg68ZpjguzoAE+s41vRk2T/7
+         y4mKkqHQjJDyhrCiV2CsO9kSZ55HZVNMxAUrfYIDwuMfiQXBOcvxXSLXcS98sUi5XFIB
+         w1Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780921332; x=1781526132;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xPe7RROwML8YBDC9iBsnC3XTfs6XjaM8KgeZwP62gHY=;
+        b=llTbIoBrTirpM3UqubUpqgnkB6fKsNZhp0p6xUamBTyC2sp9X9q7szBu6K/PY4hb1i
+         Wshe2xbdJNIBTuZYLNa+y8M9NeOgK3MJN0anWICJo4NzHREgz4d7JnTPsq2FPjFYVcUu
+         VoeR+Ttk3MZxxh9Rg4ywpi1byp4EuUcT6dbwn958LqztLO4h11CB9xrS/n+gYd8mB18n
+         HY1JxD1fSIgioz7rul6VKR6nwV8MV0NkfLBzBswG7oonYQa4Q0gZFOtX0mjgb9lmB8L7
+         6TjH0DXCkIJY/my9UAU0qg1DgHNHq5ddD6EjwoYP/iqpYy5/1mnRkE/+jVOVepvN/p6F
+         ki4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/ZM5AcnILK/0w3NOtpL/bZohxDk090kQtHeGYP7Hyvc1W12+3zp5e2jJoX+y/J/YXrQzmocgc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEc3fs0z1+/F8aEUJwwnk9PGOvG3t23e+yneIIrpQNnMj0pDPk
+	NdLhrbeqWB6bGPHuORR5s4DGwwIFFXvDXStY1QLlE/J72UcsKVwVHMl4
+X-Gm-Gg: Acq92OE0HPiljZgM2g7LkuDKapHSlQbJp2m5cgbqN3+r+iLu+q9KzJGVj0r1PN8pu3Q
+	wS8uMdCduKmqFCb+jM0xS3QOIFyhuAkr/iUk0M0MQ732N/xfDCuNATqf3mEFeB65SQ1HtU/yBfa
+	B7kZi/Vs2wJMJgJWDwaxVUE8tXR9XM3LZNvoQ1jEzZEa3zPx5i6jteNFOc0wGrCLx/h8VnRCaYw
+	ky48FKai2csW5TzyiGCe8r0wQJrxTHmI5OougcI84A5ivLo4jgSdCXVlc0HtOEWxLo2gz8Jbezt
+	VaX/kpVwd4Q6pgG68A+cSgsrmqlkFWBJWgF3WPLA9dMSQ7gglftaoQ6wUQg0l3ZM6mKV2CjWKZd
+	uSCsoWg3ddCTOrvzM/EBOH+TdR+vpjsj+5w++EfWzntat0LdLoi22XZOJZGRuZ3IXoFwQ/yxeGa
+	qN8HfAjrKbd3bOe1uqY/Wj7FlgClaZfGWMlOyMAP24sKErOFvf5ALeVAovlsTDnlLXXJ8TJ+w6Q
+	Zo/nJjTwKjdXDfZIGvprCgeLw+TeiY=
+X-Received: by 2002:a05:622a:a08:b0:516:d943:175f with SMTP id d75a77b69052e-51795c3dea1mr204571121cf.52.1780921331814;
+        Mon, 08 Jun 2026 05:22:11 -0700 (PDT)
 Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-517af149fa5sm46086911cf.3.2026.06.08.05.22.09
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-517af149fa5sm46086911cf.3.2026.06.08.05.22.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 05:22:10 -0700 (PDT)
+        Mon, 08 Jun 2026 05:22:11 -0700 (PDT)
 From: Michael Bommarito <michael.bommarito@gmail.com>
 To: Jon Maloy <jmaloy@redhat.com>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -86,10 +88,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	tipc-discussion@lists.sourceforge.net,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 0/3] tipc: fix netlink gate and receive-path bugs
-Date: Mon,  8 Jun 2026 08:22:03 -0400
-Message-ID: <20260608122206.458290-1-michael.bommarito@gmail.com>
+Subject: [PATCH net v3 1/3] tipc: require net admin for TIPCv2 netlink mutators
+Date: Mon,  8 Jun 2026 08:22:04 -0400
+Message-ID: <20260608122206.458290-2-michael.bommarito@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260608122206.458290-1-michael.bommarito@gmail.com>
+References: <20260608122206.458290-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,12 +105,12 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296517-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296518-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ying.xue@windriver.com,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
@@ -117,7 +121,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -129,53 +133,135 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3058265633A
+X-Rspamd-Queue-Id: 55EF5656278
 
-This is v3 of the public TIPC series. The discovery-message length
-patch (was patch 2/4) is dropped: tipc_msg_validate() already rejects
-the short messages it was guarding against, so it was redundant. The
-remaining three patches are unchanged in behaviour from v2 and address
-the receive-path review feedback.
+TIPCv2 registers mutating generic-netlink operations without admin
+permission flags. Generic netlink only checks CAP_NET_ADMIN when an
+operation sets GENL_ADMIN_PERM or GENL_UNS_ADMIN_PERM, so a local
+unprivileged process can currently change TIPC state through commands
+such as TIPC_NL_NET_SET, TIPC_NL_KEY_SET, TIPC_NL_KEY_FLUSH, and
+bearer enable/disable.
 
-Patch 1 gives the TIPCv2 mutating generic-netlink operations the admin
-gate the legacy API already has, so a local unprivileged process can no
-longer change TIPC state. Patch 2 drops CONN_ACK messages that
-acknowledge more outstanding sends than exist, preventing the
-snt_unacked underflow. Patch 3 rejects peer bindings with lower > upper,
-which would otherwise leak binding-table memory.
+The legacy TIPC netlink API already checks netlink_net_capable(...,
+CAP_NET_ADMIN) for administrative commands. Give the TIPCv2 mutators
+the equivalent generic-netlink gate. Use GENL_UNS_ADMIN_PERM for
+network-namespace scoped operations and GENL_ADMIN_PERM for
+TIPC_NL_MEDIA_SET, which updates the shared media defaults rather than
+state owned only by the target network namespace.
 
-Changes in v3:
+A QEMU/KASAN repro run as uid/gid 65534 with zero effective
+capabilities previously succeeded in changing the network id and node
+identity, setting and flushing key material, and enabling/disabling a
+UDP bearer. With this patch applied the same operations fail with
+-EPERM.
 
-  - Drop the discovery-message length patch; tipc_msg_validate()
-    already rejects the short messages it guarded against (Tung Quang
-    Nguyen).
-  - Patch 2 (snt_unacked): drop the conn_ack local and test
-    tsk->snt_unacked against msg_conn_ack() inline (Tung Quang Nguyen).
-  - Patch 3 (inverted ranges): restructure the declaration block, moving
-    ua below key at the maintainer's request (Tung Quang Nguyen).
+Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
+Link: https://lore.kernel.org/all/20260604163102.2658553-1-dominik.czarnota@trailofbits.com/
+Assisted-by: Codex:gpt-5-5-xhigh
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+v2:
+- Use GENL_ADMIN_PERM for TIPC_NL_MEDIA_SET because it updates global
+  media defaults, while keeping GENL_UNS_ADMIN_PERM for netns-scoped
+  mutators.
 
-Changes in v2:
+ net/tipc/netlink.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-  - Patch 1 uses GENL_ADMIN_PERM for TIPC_NL_MEDIA_SET and
-    GENL_UNS_ADMIN_PERM for the netns-scoped mutators.
-  - Patch 2 validates msg_conn_ack() at the start of the CONN_ACK block
-    and drops invalid messages instead of capping the value.
-  - Patch 3 reorders the new u32 declarations in reverse-Xmas-tree order.
-
-Michael Bommarito (3):
-  tipc: require net admin for TIPCv2 netlink mutators
-  tipc: prevent snt_unacked underflow on CONN_ACK
-  tipc: reject inverted service ranges from peer bindings
-
- net/tipc/name_distr.c | 13 +++++++++++--
- net/tipc/netlink.c    | 12 ++++++++++++
- net/tipc/socket.c     |  3 +++
- 3 files changed, 26 insertions(+), 2 deletions(-)
-
-
-base-commit: e7ae89a0c97ce2b68b0983cd01eda67cf373517d
+diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
+index 1a9a5bdaccf4f..5bbe134284acc 100644
+--- a/net/tipc/netlink.c
++++ b/net/tipc/netlink.c
+@@ -152,11 +152,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_DISABLE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_disable,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_ENABLE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_enable,
+ 	},
+ 	{
+@@ -168,11 +170,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_ADD,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_add,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_BEARER_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_bearer_set,
+ 	},
+ 	{
+@@ -197,11 +201,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_LINK_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_link,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_LINK_RESET_STATS,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit   = tipc_nl_node_reset_link_stats,
+ 	},
+ 	{
+@@ -213,6 +219,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_MEDIA_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_ADMIN_PERM,
+ 		.doit	= tipc_nl_media_set,
+ 	},
+ 	{
+@@ -228,6 +235,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_NET_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_net_set,
+ 	},
+ 	{
+@@ -238,6 +246,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_MON_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_monitor,
+ 	},
+ 	{
+@@ -255,6 +264,7 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_PEER_REMOVE,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_peer_rm,
+ 	},
+ #ifdef CONFIG_TIPC_MEDIA_UDP
+@@ -269,11 +279,13 @@ static const struct genl_ops tipc_genl_v2_ops[] = {
+ 	{
+ 		.cmd	= TIPC_NL_KEY_SET,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_set_key,
+ 	},
+ 	{
+ 		.cmd	= TIPC_NL_KEY_FLUSH,
+ 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
++		.flags	= GENL_UNS_ADMIN_PERM,
+ 		.doit	= tipc_nl_node_flush_key,
+ 	},
+ #endif
 -- 
 2.53.0
 
