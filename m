@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-296454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296451-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yK3iDjaSJmqXYwIAu9opvQ
-	(envelope-from <netdev+bounces-296454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:58:14 +0200
+	id BpvMMGWTJmrlYwIAu9opvQ
+	(envelope-from <netdev+bounces-296451-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:03:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65EE654CA6
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:58:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21559654D3C
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:03:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=runbox.com header.s=selector1 header.b="lflMKS t";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296454-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296454-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=runbox.com header.s=selector1 header.b="XfdPRi 1";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296451-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296451-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=gmail.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 60ECF30243AB
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:56:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83D8C306E2A9
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0F53C1966;
-	Mon,  8 Jun 2026 09:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26A93BCD3C;
+	Mon,  8 Jun 2026 09:55:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409173B8139;
-	Mon,  8 Jun 2026 09:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24503B895E;
+	Mon,  8 Jun 2026 09:55:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780912551; cv=none; b=QpenrFWu9M2vIhcX5UifESrFin4o/1bd/hB7O03WRxB7nwrT5DzskmsPydihx9Mw6tScCPKm4NyNsUJ5PYt2XmmwVFmK/6c2Nzn8o5ei5dY0JB6LVlnVHE+BjM2IRU2CI/eDWTIVApDKxCaIUu9oThhYzTtt2LUEhyrnkeh0FLs=
+	t=1780912550; cv=none; b=LmmnoWhUx5C4oiHIp2AOUx8rCEEHtg9+/5SQJUSPN15XuyPtQPvGYGKLbe46mHwvZSuz6XnVKfyCQIC1UFuEBEa6D33mV/YZWwljR+ndUnocHVMXgAklmrXmbIxsydd1dnhGT33toAec1Dqht04973QHY01ZQcD4u195lI+QqoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780912551; c=relaxed/simple;
-	bh=gB4CJM9dP7in9QBwWMOp90LxO7ryMvd+O+GFiDZwdvQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I6sYzuKz6x6re9KMRvCTxQA8w38en1GwKRmfawu3fP26ZOJa4ZNbbJze91ALXEdjXyna9yFH6MaNAPoKPrcjO31oiRFRx/ZxiJanjZfFv7t3MYFEOnNhIWsXA/ICuMJb4u0PZCXRzpoWzne4ZT25HIiZ33SSJFxI8vNh5cVOMiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=lflMKSt5; arc=none smtp.client-ip=185.226.149.38
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	s=arc-20240116; t=1780912550; c=relaxed/simple;
+	bh=Sx4Ze7AgX5RJCC8XRCD64N/GIkt8A6C2cwwFknSZMa4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qPIH5McdbxCvpfOYb6LbANgfX2JKZKu5U6g3XYDppAltOvpt3kyFaSVLd5PxerhMPr9QVJ8kxPtLBeN8+/RIPnvbgYs+kdPd5fDvWiGyoxF4kJLiM5xUoIv3rvh/daLrcjkW4EzwR5sQSuzGfjRqQiTze8Uo6vEVnzF5rd/F4OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=XfdPRi1k; arc=none smtp.client-ip=185.226.149.37
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWho-00BrAE-WD; Mon, 08 Jun 2026 11:55:41 +0200
+	id 1wWWhr-00BRz4-0g; Mon, 08 Jun 2026 11:55:43 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-	Subject:Cc:To:From; bh=XEzj64Mq/Yif2RRJnb+y71DCUVrc4J1PwqxH8n6Ogl8=; b=lflMKS
-	t5ulsiWL6QGMU8oH8KDRYOsnyANbP2QsbnPr5pHyxNFST52KXNjcozzRosjM04VbpU8o74GyR6rLH
-	21nGWJKY7q9mxgtyN4YVpm5hU1GrFBga2i6iimgV1l+wrZBUJ9DaFwFN8sA6s6MwW59yDxbJzTJUN
-	gkgze2Fa3GkiSeQgbb2ZOvDmtEULZxN/kpxBbTRyqBJDvJYvbH7FdpYU3reEg7xmb+0/baoW75Gha
-	WXIxvpYdhN7i+PpETeE8wvWcmZtYxjoSX+PqaCWGrAtZhLDX1z5/NjJdCWxdtUe3sMFjATI7SHrNE
-	ylizOgXJiPcqmYYq/Ld0+SlkWrPg==;
+	Subject:Cc:To:From; bh=MEGRMbuHpposeCciz6uVAu3BRF1Ammi62WRqbPW3TPk=; b=XfdPRi
+	1k/72dcTjk4m/Bgp0cm2XtwE5qP/bkGx+ZcxIfZ2d09qb/yDuxDou4E+exWgQggybZTmAj1s1P9Fd
+	AgUX07kkvGBBZPOtz9XxhtC8oySm/pSfQuUkfLVTEdcz/Nj2xrwvUKMJ1czcNPwjGtJdM9Da4m9TF
+	x7g3xvtDOBUxt5Z/Bs4PJWM+84G0rWAo+rxcJNS5BmfWmFRJyJO3OdS+IknYS0jvER7ebyg16yEY/
+	SSfJU0iAeDqenYWJkRpWY02UCw2x1TPcB4ZAhcKGKs8soJt3LUiIRBTXBKRZqLhFPPr3RQS27XClc
+	gjItoyXB6LA0S4oxnOn1CJJQbXnA==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWho-0003dA-6N; Mon, 08 Jun 2026 11:55:40 +0200
+	id 1wWWhp-0000GY-So; Mon, 08 Jun 2026 11:55:42 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1wWWhe-00Ag6G-M6;
-	Mon, 08 Jun 2026 11:55:30 +0200
+	id 1wWWhf-00Ag6G-4O;
+	Mon, 08 Jun 2026 11:55:31 +0200
 From: david.laight.linux@gmail.com
 To: Kees Cook <kees@kernel.org>,
 	linux-hardening@vger.kernel.org,
@@ -62,13 +62,14 @@ To: Kees Cook <kees@kernel.org>,
 Cc: Arnd Bergmann <arnd@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH net-next] net/devlink: Use strscpy() to copy strings into arrays
-Date: Mon,  8 Jun 2026 10:54:57 +0100
-Message-Id: <20260608095523.2606-13-david.laight.linux@gmail.com>
+Subject: [PATCH net-next] net/key: Use strscpy() to copy strings into arrays
+Date: Mon,  8 Jun 2026 10:54:58 +0100
+Message-Id: <20260608095523.2606-14-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -82,39 +83,39 @@ X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[runbox.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[gmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296454-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296451-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:herbert@gondor.apana.org.au,m:kuba@kernel.org,m:pabeni@redhat.com,m:steffen.klassert@secunet.com,m:david.laight.linux@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,resnulli.us,redhat.com,gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jiri@resnulli.us,m:pabeni@redhat.com,m:david.laight.linux@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[runbox.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,gondor.apana.org.au,redhat.com,secunet.com,gmail.com];
 	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[runbox.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[runbox.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[runbox.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C65EE654CA6
+X-Rspamd-Queue-Id: 21559654D3C
 
 From: David Laight <david.laight.linux@gmail.com>
 
@@ -145,22 +146,40 @@ All the patches are being sent individually to avoid very long cc lists.
 Apologies for the terse commit messages and likely unexpected tags.
 (There are about 100 patches in total.)
 
- net/devlink/port.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/key/af_key.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 485029d43428..108926d3f899 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -1222,7 +1222,7 @@ static void __devlink_port_type_set(struct devlink_port *devlink_port,
- 			devlink_port->type_eth.ifindex = netdev->ifindex;
- 			BUILD_BUG_ON(sizeof(devlink_port->type_eth.ifname) !=
- 				     sizeof(netdev->name));
--			strcpy(devlink_port->type_eth.ifname, netdev->name);
-+			strscpy(devlink_port->type_eth.ifname, netdev->name);
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index a166a88d8788..625822d19071 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -1195,7 +1195,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
+ 			err = -ENOMEM;
+ 			goto out;
  		}
- 		break;
- 	case DEVLINK_PORT_TYPE_IB:
+-		strcpy(x->aalg->alg_name, a->name);
++		strscpy(x->aalg->alg_name, a->name);
+ 		x->aalg->alg_key_len = 0;
+ 		if (key) {
+ 			x->aalg->alg_key_len = key->sadb_key_bits;
+@@ -1217,7 +1217,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
+ 				err = -ENOMEM;
+ 				goto out;
+ 			}
+-			strcpy(x->calg->alg_name, a->name);
++			strscpy(x->calg->alg_name, a->name);
+ 			x->props.calgo = sa->sadb_sa_encrypt;
+ 		} else {
+ 			int keysize = 0;
+@@ -1234,7 +1234,7 @@ static struct xfrm_state * pfkey_msg2xfrm_state(struct net *net,
+ 				err = -ENOMEM;
+ 				goto out;
+ 			}
+-			strcpy(x->ealg->alg_name, a->name);
++			strscpy(x->ealg->alg_name, a->name);
+ 			x->ealg->alg_key_len = 0;
+ 			if (key) {
+ 				x->ealg->alg_key_len = key->sadb_key_bits;
 -- 
 2.39.5
 
