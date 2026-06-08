@@ -1,169 +1,224 @@
-Return-Path: <netdev+bounces-296452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dPmDMYOTJmrqYwIAu9opvQ
-	(envelope-from <netdev+bounces-296452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:03:47 +0200
+	id oUSBFiaSJmqUYwIAu9opvQ
+	(envelope-from <netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F6ED654D49
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:03:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B8F654C95
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=runbox.com header.s=selector1 header.b="g0guGN R";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296452-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296452-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=gmail.com (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b="i4CYwU/n";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3AC18307512D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:56:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 245D7302D09A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741233B7778;
-	Mon,  8 Jun 2026 09:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE863B7B64;
+	Mon,  8 Jun 2026 09:55:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8D03B892D;
-	Mon,  8 Jun 2026 09:55:45 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780912550; cv=none; b=d3D+uHgVjgrQ12iKCqotdy20VPI+27PRmH6IlRpR7zmMBmjBLnIYzE9ZBmyOrDtfl4kK8g14fx86xQJUHy2xPWY+HG4935c7rWs26M+fOeQo79ZbFDVcqaGWdhNWH9BFTiYZJDkoRI6m40Ck2bMG38ectcC5XHKfX/s4xmklmzA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780912550; c=relaxed/simple;
-	bh=JBgBo18FOOVmxza4LLM2LjkvjKmcz6u9eYbUcIUglvU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Gke0PmU0eIjsg6Ay7Sxcxg1XdZeu6mbZ+For6TxkbmDWBqVUn5uzqyrwb8aC1p7kgMRZkdjUnfOzTfUjTQ+Ar7oLZNw0/mHe4e1mjoeqvDlNgyh5uNUPVGyy78RXK4RH7S/3tmKOM/dNHOkFE2PJwOFCOICk4F1O4ZB1BxdN9uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=g0guGNRS; arc=none smtp.client-ip=185.226.149.37
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWhr-00BRzw-AF; Mon, 08 Jun 2026 11:55:43 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
-	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-	Subject:Cc:To:From; bh=oeFxy8T5rznwD5j83Z0IyKAb1mHuGRQFCq+QufcT7ww=; b=g0guGN
-	RS7AepJOwOTc5K8Lpp446J38QnJEYfFLwI1sHhnUWJq8kO21ZyVcxB7vh0APUhHHctTwY/vg54yVm
-	aGtmZypEYKrpfvOKyt8p+mSEBqjTzPg8J8PN/1y8hIyrDDzKwlwYlqDPZhjQNKxiVDoHXN7x6P4ph
-	BIScc2V8nIh3Ylrlz/lYGahawwFDwVRwwPmWZnwsXd464/LfA6gllNKKQBht2xcecOJGjM8Ig8oh8
-	HRuiIg/TxSUOJX5PyeO3gls3E9HjkqT/6ld0K97L36hTJUvdzdIA3zoz1j4EiyCPFabaxBmQy9XMv
-	a1yv1g/4XDlxjG172cE0LYYjeUDA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wWWhq-0000H7-OK; Mon, 08 Jun 2026 11:55:42 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.95)
-	id 1wWWho-00Ag6G-5V;
-	Mon, 08 Jun 2026 11:55:40 +0200
-From: david.laight.linux@gmail.com
-To: Kees Cook <kees@kernel.org>,
-	linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Arnd Bergmann <arnd@kernel.org>,
-	Chas Williams <3chas3@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Matthieu CASTET <castet.matthieu@free.fr>,
-	Stanislaw Gruszka <stf_xl@wp.pl>,
-	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH next] drivers/usb/atm: Replace strcpy() + strlcat() with snprintf()
-Date: Mon,  8 Jun 2026 10:55:20 +0100
-Message-Id: <20260608095523.2606-36-david.laight.linux@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A523B5319
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 09:55:34 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780912536; cv=pass; b=kXlHDNVVu+fJDZw/kYWhH3jWhWZE7M5z0h4CctsCKbD5jdtFJYMJpKWIfPwW9wpUMmeM43QfGp8IzzkvQHpb9E6/nGnCTasxyXQR9inDQiyQEJUnswWogsFvYdmKohwlEg/xxRZ+E84Q+/oNRzsNJqiD9Dcd9N8xfiuMxmreu3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780912536; c=relaxed/simple;
+	bh=nEe6Hp2P+fr54/g8RIpCfyjhQRc1tqxdIbRPosUg3Nc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MQ7ShltU8ayEX/K75gDQzPg3AKkip5ljm06naVKHNvsg4EkBVYtBUrgOtVT+BopkmDTEBgFVLl61jDyGaYDNNc9nbT8u6DXUA0bhk6H4Lf7VbTgUFGOhokj+1ctsSkOfp52uMTTJr3aOabNv4ekDWEqhvmcDg4YceErtm9Ctehc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=i4CYwU/n; arc=pass smtp.client-ip=209.85.210.177
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-84230ab8857so1744215b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 02:55:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780912534; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CGypuAqkzgn/Zz4+Hh7jfRcFwqo3BvQzzcdEiA1lMzmZzrGNvBz3jB7IJvTWv0cRrv
+         UD5JBKGu6wwJRLvX7NMuRsfqxUV/61K93yAGBpwg4y9v/Ug9mDLAL9Y0ZGdCHhmjX4sH
+         ze46cz92PXAMVmqAjCgfx9wY4NS3zQN7kzrlJgCvcv5NOU4rb5MEck8eYuF1A7xetn1H
+         CCDwlnzzl4V/AkP5CNLIS79y1tJj8EpALiBU0/jylHU+Me/5ozDQ2bRhTwymjWU3D/jh
+         Qg7tJMuOglFQXBgbDZhnPlFPJipDkGOBWG7+ZWx2uGvKYZmxRKWg/ZCE/69AvGU1toUP
+         ByRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
+        fh=zfAMA90o8JRfRY27NA+1qn0M1w8+sO035EUZgAliPi8=;
+        b=I/CqQVsCaG0M73UaId17bnO52ZitL3A+BWvn+2fuVCpBoyF4D5CuUectru6RWCTiz9
+         TC0g1Gnjzs21TM23i6rgU5YW7rhVjYcbYiBy+r5YAWiU2whDqxR1D3rVz1IukQ223RYZ
+         +B42nWuXz+qUpf0ihcCQM/ZNQDJ8wpSFqrk4l/ox5zIIfKqa0VeGWqEBWSsDkqnD7DHe
+         cd0JZwp07VrZJyadJGBbd7b6Y8NDDQxUY0VEmZ3jNm9jUDf0/toK6EnAKtkFGyyrcxSN
+         YfkmXoyJHo3Ob/gN7sFrx+p6XY3Xt+QPhGQ7jFEIB3j4LEweQNMXhrjH0elCsL++0HDr
+         mGJw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1780912534; x=1781517334; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
+        b=i4CYwU/nzgEz2DJ9RMUlC/aTqIq3h769lyqC2PXduc3Cf/mrHk1dF8SVEKi27tzraO
+         WQeGWeCP2mtuQpohwOE0QevDyJzDwyh917iNpTWt7FrdMKkVhAdqF43tkNdYIYCPfAjL
+         e+z6nda8VPORPYu6KTs5nQa18dbaM5YXXsaus=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780912534; x=1781517334;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
+        b=af94Ifb3Gyaknkrez4iyIiwb7xUfJwS4uTCteUTPYPkzRYZhMQvXa4H4nmW4/f2jK1
+         uWdqbgjYTOFKmb7Dkz01IT8jdaj/UJPFkqU5Jlkjd4+jUDmLeoR638WVhxPPKudlvCHw
+         KetGlW/5W9sj0V7q1Y95NOdX6jOCia3dvko0La9qyc3Zz41zUt8+R2MNj+feuo1A/h63
+         36pdSMyOafBDoHsrS0yLlpMBQuRlkFeKDaD6hXdhnTyM8FLW8NCzL4Q0pWZE9OLcj0Kp
+         3c+aqQy3kwIuzScjL0kmABcBowEGjObTelPQZ9T6sAG7ZLfOxDvPt22Xwq+LdkxjHzBP
+         viIg==
+X-Forwarded-Encrypted: i=1; AFNElJ+RJQu8MZR9CKVMfxMTJO9kgHVu7sLVpk2AT9yTGoE/nxq9CcP2Flm3mgzgmR1ZrdmXKCf/r4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLyJffkG8ECKe0bql+4no2UhPAMG21M8Rk+9nvjEICnk9sOcUK
+	L5TTjNluOUPRWCGiCs6Z4dX7fQJNhuoBnFiWAU+K84+vseR0vOV6p1dtxOBPPzxbdG+ZrCNfks2
+	mn4mobEFtZDsLBQTvznPUdWtDODusYLzlQmzvbNQV
+X-Gm-Gg: Acq92OEXD3+6CQcTS8rmdC4yFQ8Xpb1lP1NlziMKjtjBRuV42HW8E7zv2w/CjvZdZNF
+	A9Lfq0WpgPfP7QYaL4V1/q2Ra9v/Zu94Ntw2E9PudDWoAILM3W0r+7SHSHdDo9K86GFTl/9BVRd
+	mGNLXhRTmfpn4p9HNc2pitQUYH6mBKBrTyhj5zv9KRkYwaLpLlEtNBSqcRzqdm098AhvWpoNcVI
+	iCd8UFGbOpJOdS3ny8ic8Ryctx851t25W1g7umr8KYLtS11dJewFIc6Lr4+HcKAA8eGZahCQEj2
+	bfiRVqna0KKHC+MQn/i3nnH5ndNMSA==
+X-Received: by 2002:a05:6a00:2d0d:b0:842:5711:9a2f with SMTP id
+ d2e1a72fcca58-842b0fb2273mr14704387b3a.36.1780912533858; Mon, 08 Jun 2026
+ 02:55:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260607095727.647295505@linuxfoundation.org> <20260607173214.92693-1-ojeda@kernel.org>
+In-Reply-To: <20260607173214.92693-1-ojeda@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 8 Jun 2026 05:55:22 -0400
+X-Gm-Features: AVVi8Ce0VqPP4wrmrfgQDErKpRLi3Z7rbl8b4dCcmWnRvhi1OSTpE0ZX-2GG1EY
+Message-ID: <CAM0EoMkszTXv82To=KnEYTgzQSmEdRW9XrAMVtJsUaDn=Akf6A@mail.gmail.com>
+Subject: Re: [PATCH 6.12 000/307] 6.12.93-rc1 review
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: gregkh@linuxfoundation.org, achill@achill.org, akpm@linux-foundation.org, 
+	broonie@kernel.org, conor@kernel.org, f.fainelli@gmail.com, 
+	hargar@microsoft.com, jonathanh@nvidia.com, linux-kernel@vger.kernel.org, 
+	linux@roeck-us.net, lkft-triage@lists.linaro.org, patches@kernelci.org, 
+	patches@lists.linux.dev, pavel@nabladev.com, rwarsow@gmx.de, shuah@kernel.org, 
+	sr@sladewatkins.com, stable@vger.kernel.org, sudipm.mukherjee@gmail.com, 
+	torvalds@linux-foundation.org, "Kito Xu (veritas501)" <hxzene@gmail.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[runbox.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[gmail.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296452-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:gregkh@linuxfoundation.org,m:achill@achill.org,m:akpm@linux-foundation.org,m:broonie@kernel.org,m:conor@kernel.org,m:f.fainelli@gmail.com,m:hargar@microsoft.com,m:jonathanh@nvidia.com,m:linux-kernel@vger.kernel.org,m:linux@roeck-us.net,m:lkft-triage@lists.linaro.org,m:patches@kernelci.org,m:patches@lists.linux.dev,m:pavel@nabladev.com,m:rwarsow@gmx.de,m:shuah@kernel.org,m:sr@sladewatkins.com,m:stable@vger.kernel.org,m:sudipm.mukherjee@gmail.com,m:torvalds@linux-foundation.org,m:hxzene@gmail.com,m:victor@mojatatu.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:ffainelli@gmail.com,m:sudipmmukherjee@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296446-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	DMARC_NA(0.00)[mojatatu.com];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linuxfoundation.org,free.fr,wp.pl];
-	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:3chas3@gmail.com,m:gregkh@linuxfoundation.org,m:castet.matthieu@free.fr,m:stf_xl@wp.pl,m:david.laight.linux@gmail.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[runbox.com:+];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,achill.org,linux-foundation.org,kernel.org,gmail.com,microsoft.com,nvidia.com,vger.kernel.org,roeck-us.net,lists.linaro.org,kernelci.org,lists.linux.dev,nabladev.com,gmx.de,sladewatkins.com,mojatatu.com,redhat.com,resnulli.us];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[runbox.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:from_mime,mojatatu.com:email,resnulli.us:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6F6ED654D49
+X-Rspamd-Queue-Id: A8B8F654C95
 
-From: David Laight <david.laight.linux@gmail.com>
+Hi Miguel,
 
-Avoid string function that are due to be deprecated.
+Thanks for reporting this.
 
-Signed-off-by: David Laight <david.laight.linux@gmail.com>
----
-This is one of a group of patches that remove potentially unbounded
-strcpy() calls.
+On Sun, Jun 7, 2026 at 1:32=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wrot=
+e:
+>
+> On Sun, 07 Jun 2026 11:56:37 +0200 Greg Kroah-Hartman <gregkh@linuxfounda=
+tion.org> wrote:
+> >
+> > This is the start of the stable review cycle for the 6.12.93 release.
+> > There are 307 patches in this series, all will be posted as a response
+> > to this one.  If anyone has any issues with these being applied, please
+> > let me know.
+> >
+> > Responses should be made by Tue, 09 Jun 2026 09:56:47 +0000.
+> > Anything received after that time might be too late.
+>
+> Boot-tested under QEMU for Rust x86_64, arm64 and riscv64; built-tested
+> for loongarch64:
+>
+> Tested-by: Miguel Ojeda <ojeda@kernel.org>
+>
+> arm32 also builds fine.
+>
+> On arm64, I am seeing:
+>
+>     net/sched/act_mirred.c:451:43: warning: variable 'm_eaction' is unini=
+tialized when used here [-Wuninitialized]
+>       451 |         is_redirect =3D tcf_mirred_is_act_redirect(m_eaction)=
+;
+>           |                                                  ^~~~~~~~~
+>     net/sched/act_mirred.c:429:18: note: initialize the variable 'm_eacti=
+on' to silence this warning
+>       429 |         int i, m_eaction;
+>           |                         ^
+>           |                          =3D 0
+>
+> due to commit a01fbdecc3a2 ("net/sched: act_mirred: Fix return code in
+> early mirred redirect error paths") here.
+>
+> And that one seems to be missing at least the assignment to the variable
+> that happened in commit a005fa5d7502 ("net/sched: act_mirred: Fix
+> blockcast recursion bypass leading to stack overflow").
+>
 
-They are mostly replaced by strscpy() or, when strlen() has just been
-called, with memcpy() (usually including the '\0').
+Unless i am looking at the wrong code version, in the current code i
+see m_eaction is always initialized before being used.
+m_eaction =3D READ_ONCE(m->tcfm_eaction);
+Probably a compiler false positive?
+As per suggestion emmited, initializing m_eaction to 0 should help.
+Not sure what the process is.
+Perhaps, Miguel you want to send the fix? commit should say "appease
+compiler ..."
 
-Calls with copy string literals into arrays are left unchanged.
-They are safe and easily detected as such.
+cheers,
+jamal
 
-The changes were made by getting the compiler to detect the calls and
-then fixing the code by hand.
 
-Note that all the changes are only compile tested.
-
-Some Makefiles were changed to allow files to contain strcpy().
-As well as 'difficult to fix' files, this included 'show' functions
-as they really need to use sysfs_emit() or seq_printf().
-
-All the patches are being sent individually to avoid very long cc lists.
-Apologies for the terse commit messages and likely unexpected tags.
-(There are about 100 patches in total.)
-
- drivers/usb/atm/ueagle-atm.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/drivers/usb/atm/ueagle-atm.c b/drivers/usb/atm/ueagle-atm.c
-index f3ae72feb5bf..df4477668296 100644
---- a/drivers/usb/atm/ueagle-atm.c
-+++ b/drivers/usb/atm/ueagle-atm.c
-@@ -1572,10 +1572,7 @@ static void cmvs_file_name(struct uea_softc *sc, char *const cmv_name, int ver)
- 	} else
- 		file = cmv_file[sc->modem_index];
- 
--	strcpy(cmv_name, FW_DIR);
--	strlcat(cmv_name, file, UEA_FW_NAME_MAX);
--	if (ver == 2)
--		strlcat(cmv_name, ".v2", UEA_FW_NAME_MAX);
-+	snprintf(cmv_name, UEA_FW_NAME_MAX, FW_DIR "%s%s", file, ver == 2 ? ".v2" : "");
- 	kernel_param_unlock(THIS_MODULE);
- }
- 
--- 
-2.39.5
-
+> I hope this helps!
+>
+> Cc: Kito Xu (veritas501) <hxzene@gmail.com>
+> Cc: Victor Nogueira <victor@mojatatu.com>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Cc: netdev@vger.kernel.org
+>
+> Cheers,
+> Miguel
 
