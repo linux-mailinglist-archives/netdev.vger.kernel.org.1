@@ -1,224 +1,196 @@
-Return-Path: <netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oUSBFiaSJmqUYwIAu9opvQ
-	(envelope-from <netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:58 +0200
+	id YdsyERyXJmoPZQIAu9opvQ
+	(envelope-from <netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:19:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B8F654C95
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:57:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4461654F9A
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:19:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mojatatu.com header.s=google header.b="i4CYwU/n";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296446-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=UV5EEmLM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 245D7302D09A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:55:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C6F123044592
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE863B7B64;
-	Mon,  8 Jun 2026 09:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C13C3C9EFB;
+	Mon,  8 Jun 2026 10:00:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A523B5319
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 09:55:34 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780912536; cv=pass; b=kXlHDNVVu+fJDZw/kYWhH3jWhWZE7M5z0h4CctsCKbD5jdtFJYMJpKWIfPwW9wpUMmeM43QfGp8IzzkvQHpb9E6/nGnCTasxyXQR9inDQiyQEJUnswWogsFvYdmKohwlEg/xxRZ+E84Q+/oNRzsNJqiD9Dcd9N8xfiuMxmreu3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780912536; c=relaxed/simple;
-	bh=nEe6Hp2P+fr54/g8RIpCfyjhQRc1tqxdIbRPosUg3Nc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MQ7ShltU8ayEX/K75gDQzPg3AKkip5ljm06naVKHNvsg4EkBVYtBUrgOtVT+BopkmDTEBgFVLl61jDyGaYDNNc9nbT8u6DXUA0bhk6H4Lf7VbTgUFGOhokj+1ctsSkOfp52uMTTJr3aOabNv4ekDWEqhvmcDg4YceErtm9Ctehc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=i4CYwU/n; arc=pass smtp.client-ip=209.85.210.177
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-84230ab8857so1744215b3a.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 02:55:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780912534; cv=none;
-        d=google.com; s=arc-20240605;
-        b=CGypuAqkzgn/Zz4+Hh7jfRcFwqo3BvQzzcdEiA1lMzmZzrGNvBz3jB7IJvTWv0cRrv
-         UD5JBKGu6wwJRLvX7NMuRsfqxUV/61K93yAGBpwg4y9v/Ug9mDLAL9Y0ZGdCHhmjX4sH
-         ze46cz92PXAMVmqAjCgfx9wY4NS3zQN7kzrlJgCvcv5NOU4rb5MEck8eYuF1A7xetn1H
-         CCDwlnzzl4V/AkP5CNLIS79y1tJj8EpALiBU0/jylHU+Me/5ozDQ2bRhTwymjWU3D/jh
-         Qg7tJMuOglFQXBgbDZhnPlFPJipDkGOBWG7+ZWx2uGvKYZmxRKWg/ZCE/69AvGU1toUP
-         ByRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
-        fh=zfAMA90o8JRfRY27NA+1qn0M1w8+sO035EUZgAliPi8=;
-        b=I/CqQVsCaG0M73UaId17bnO52ZitL3A+BWvn+2fuVCpBoyF4D5CuUectru6RWCTiz9
-         TC0g1Gnjzs21TM23i6rgU5YW7rhVjYcbYiBy+r5YAWiU2whDqxR1D3rVz1IukQ223RYZ
-         +B42nWuXz+qUpf0ihcCQM/ZNQDJ8wpSFqrk4l/ox5zIIfKqa0VeGWqEBWSsDkqnD7DHe
-         cd0JZwp07VrZJyadJGBbd7b6Y8NDDQxUY0VEmZ3jNm9jUDf0/toK6EnAKtkFGyyrcxSN
-         YfkmXoyJHo3Ob/gN7sFrx+p6XY3Xt+QPhGQ7jFEIB3j4LEweQNMXhrjH0elCsL++0HDr
-         mGJw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu.com; s=google; t=1780912534; x=1781517334; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
-        b=i4CYwU/nzgEz2DJ9RMUlC/aTqIq3h769lyqC2PXduc3Cf/mrHk1dF8SVEKi27tzraO
-         WQeGWeCP2mtuQpohwOE0QevDyJzDwyh917iNpTWt7FrdMKkVhAdqF43tkNdYIYCPfAjL
-         e+z6nda8VPORPYu6KTs5nQa18dbaM5YXXsaus=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780912534; x=1781517334;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YhR32XRkG8GtOPOWI9COuVD7tE9ztEbEqFhQoZ5bTrU=;
-        b=af94Ifb3Gyaknkrez4iyIiwb7xUfJwS4uTCteUTPYPkzRYZhMQvXa4H4nmW4/f2jK1
-         uWdqbgjYTOFKmb7Dkz01IT8jdaj/UJPFkqU5Jlkjd4+jUDmLeoR638WVhxPPKudlvCHw
-         KetGlW/5W9sj0V7q1Y95NOdX6jOCia3dvko0La9qyc3Zz41zUt8+R2MNj+feuo1A/h63
-         36pdSMyOafBDoHsrS0yLlpMBQuRlkFeKDaD6hXdhnTyM8FLW8NCzL4Q0pWZE9OLcj0Kp
-         3c+aqQy3kwIuzScjL0kmABcBowEGjObTelPQZ9T6sAG7ZLfOxDvPt22Xwq+LdkxjHzBP
-         viIg==
-X-Forwarded-Encrypted: i=1; AFNElJ+RJQu8MZR9CKVMfxMTJO9kgHVu7sLVpk2AT9yTGoE/nxq9CcP2Flm3mgzgmR1ZrdmXKCf/r4Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLyJffkG8ECKe0bql+4no2UhPAMG21M8Rk+9nvjEICnk9sOcUK
-	L5TTjNluOUPRWCGiCs6Z4dX7fQJNhuoBnFiWAU+K84+vseR0vOV6p1dtxOBPPzxbdG+ZrCNfks2
-	mn4mobEFtZDsLBQTvznPUdWtDODusYLzlQmzvbNQV
-X-Gm-Gg: Acq92OEXD3+6CQcTS8rmdC4yFQ8Xpb1lP1NlziMKjtjBRuV42HW8E7zv2w/CjvZdZNF
-	A9Lfq0WpgPfP7QYaL4V1/q2Ra9v/Zu94Ntw2E9PudDWoAILM3W0r+7SHSHdDo9K86GFTl/9BVRd
-	mGNLXhRTmfpn4p9HNc2pitQUYH6mBKBrTyhj5zv9KRkYwaLpLlEtNBSqcRzqdm098AhvWpoNcVI
-	iCd8UFGbOpJOdS3ny8ic8Ryctx851t25W1g7umr8KYLtS11dJewFIc6Lr4+HcKAA8eGZahCQEj2
-	bfiRVqna0KKHC+MQn/i3nnH5ndNMSA==
-X-Received: by 2002:a05:6a00:2d0d:b0:842:5711:9a2f with SMTP id
- d2e1a72fcca58-842b0fb2273mr14704387b3a.36.1780912533858; Mon, 08 Jun 2026
- 02:55:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E622385D61;
+	Mon,  8 Jun 2026 10:00:08 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780912810; cv=none; b=WyMwBlu6X7EtOGZgzEH6hmAKRdPG0lkB/DTrDV1rp/OD4g/8XzXmJgie254ZixX/fSFf08qS5+Zv16j7QxAd0UEkNjREH8l0ULR7ko3SVgb4XUH0RERiueB+i89GjODNtNi2gl4FmydEWGJOiPjUtwQ3N1+lcQDvRQJhx8RDyYU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780912810; c=relaxed/simple;
+	bh=+8XfG6k1tXnXQyksouw2wdiv9qe1TAlzvlG7+q25o10=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=kGbr/an7D5H0eQdMeDanKQcspJKblp0fbPk2BNjcNUhe23lhnb5bKGkWBPrsA/ye2AMDvQnnwWAiZqn9x+N5g1Y3XCvgBoQ9ZrOEi8O3Dy46sBv2MvFOTtYJcyLLpxV+/S+dhr2FkaAjRsdhzi6J23gqiSUUHhdDjzlcbjSpt70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UV5EEmLM; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6589JnGc2817660;
+	Mon, 8 Jun 2026 10:00:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=65j6K3TwLBQrNRKhondLRsIzcSz2
+	RghwB/4ES/qifHs=; b=UV5EEmLMDZHqmVT5rQDQxkhbNcFX77CbFN73v9mxnO/1
+	DtzDJlfofNoiZyIIwbLymoAy7mhzJQPutxptqfjwUCPH2XOsfnDDv7AOR6+htIad
+	Pnm9DPspSzefLg1+K7Jwnz07Shb+h3ddVc4bd/eMQbypjn0frh7vhc0jq4LknXAb
+	hKjPXDvLy7NBkG2eoTQHzASRSJ///hCJscoxFgns0XVIXZeG5zL9GvyFXzswKwj8
+	9m1wFt/ipiJoz5aacMY406rMi5vGREE4RQGrWlwx2vhnXcVPms2/hpRf3gg7oynH
+	a+sIOh1D9fAAn5pSaDEnlCuMjUA6h5c2zeT8SRAbxA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb23pq1p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 10:00:04 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6589ndU1010122;
+	Mon, 8 Jun 2026 10:00:03 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4emx8vvv9y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 10:00:03 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 658A02eu61473074
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Jun 2026 10:00:02 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C31F258068;
+	Mon,  8 Jun 2026 10:00:02 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 63D455806D;
+	Mon,  8 Jun 2026 10:00:01 +0000 (GMT)
+Received: from [9.123.9.7] (unknown [9.123.9.7])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Jun 2026 10:00:01 +0000 (GMT)
+Message-ID: <3ad19e86-234c-408f-896e-0d6c774fea49@linux.ibm.com>
+Date: Mon, 8 Jun 2026 15:30:00 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260607095727.647295505@linuxfoundation.org> <20260607173214.92693-1-ojeda@kernel.org>
-In-Reply-To: <20260607173214.92693-1-ojeda@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 8 Jun 2026 05:55:22 -0400
-X-Gm-Features: AVVi8Ce0VqPP4wrmrfgQDErKpRLi3Z7rbl8b4dCcmWnRvhi1OSTpE0ZX-2GG1EY
-Message-ID: <CAM0EoMkszTXv82To=KnEYTgzQSmEdRW9XrAMVtJsUaDn=Akf6A@mail.gmail.com>
-Subject: Re: [PATCH 6.12 000/307] 6.12.93-rc1 review
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: gregkh@linuxfoundation.org, achill@achill.org, akpm@linux-foundation.org, 
-	broonie@kernel.org, conor@kernel.org, f.fainelli@gmail.com, 
-	hargar@microsoft.com, jonathanh@nvidia.com, linux-kernel@vger.kernel.org, 
-	linux@roeck-us.net, lkft-triage@lists.linaro.org, patches@kernelci.org, 
-	patches@lists.linux.dev, pavel@nabladev.com, rwarsow@gmx.de, shuah@kernel.org, 
-	sr@sladewatkins.com, stable@vger.kernel.org, sudipm.mukherjee@gmail.com, 
-	torvalds@linux-foundation.org, "Kito Xu (veritas501)" <hxzene@gmail.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org, venkat88@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+From: Yeswanth Krishna <yeswanth@linux.ibm.com>
+Subject: [BUG] kernel BUG in team driver: buffer overflow in team_add_slave()
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=b4uCJNGx c=1 sm=1 tr=0 ts=6a2692a4 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=qBxafnndnmzGIJbaEr4A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: EeGipkoIuz3k5KIeLN3h9n4452L9zIqE
+X-Proofpoint-GUID: EeGipkoIuz3k5KIeLN3h9n4452L9zIqE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDA4OSBTYWx0ZWRfX0ddjqY7emiR9
+ DZZvPaoV2dNPCtRetacd+xFFzYlp9m9rnMcyx/VN1m3NCQl/1Zrd7KL1g6uSwpJ21F6ZtP/8KDS
+ +qOwCC8mCzF6eFgD0FQiuLDqvGu9z9pPZsp21H2MeYORSRjsbHHZFQnpEBBeht39wuDiIbM0vfM
+ RrbHxa6mMn8KzpYem4GLTq/+DCWlzrpT72sea+XbZXdB9Z0lZRti16FF0GaxfIRsBd8333qsgFr
+ qhS/i8TEaNFfGAUcSkOfgaW5ILdBWS9GjkRrdo+Uc3uoeYqRFFHMjHK86GCRAuz9BwDwOrJoaDF
+ RDQfq3WEhAJp00LNaAWc6CcE3VLwQG8+qfnTtmvet/ainqvzSnmxgi+kbmBsMYVBZSJAK6KRYEt
+ lvBx/t30de8nQ/oI/4Goi6SJYo9NgP8FOUQ0UaQ4MKNq+IpYbsDPM1chgpeI1UQAlYBoPKyWSfd
+ VJ/2v2sxlcGsONNJKvg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_02,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080089
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:ojeda@kernel.org,m:gregkh@linuxfoundation.org,m:achill@achill.org,m:akpm@linux-foundation.org,m:broonie@kernel.org,m:conor@kernel.org,m:f.fainelli@gmail.com,m:hargar@microsoft.com,m:jonathanh@nvidia.com,m:linux-kernel@vger.kernel.org,m:linux@roeck-us.net,m:lkft-triage@lists.linaro.org,m:patches@kernelci.org,m:patches@lists.linux.dev,m:pavel@nabladev.com,m:rwarsow@gmx.de,m:shuah@kernel.org,m:sr@sladewatkins.com,m:stable@vger.kernel.org,m:sudipm.mukherjee@gmail.com,m:torvalds@linux-foundation.org,m:hxzene@gmail.com,m:victor@mojatatu.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:ffainelli@gmail.com,m:sudipmmukherjee@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-296446-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	DMARC_NA(0.00)[mojatatu.com];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:venkat88@linux.ibm.com,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296461-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.ibm.com:from_mime,linux.ibm.com:mid];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,achill.org,linux-foundation.org,kernel.org,gmail.com,microsoft.com,nvidia.com,vger.kernel.org,roeck-us.net,lists.linaro.org,kernelci.org,lists.linux.dev,nabladev.com,gmx.de,sladewatkins.com,mojatatu.com,redhat.com,resnulli.us];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,mojatatu.com:dkim,mojatatu.com:from_mime,mojatatu.com:email,resnulli.us:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A8B8F654C95
+X-Rspamd-Queue-Id: D4461654F9A
 
-Hi Miguel,
+Hi Team ,
 
-Thanks for reporting this.
+I encountered a kernel crash while running selftests on kernel 7.1.0-rc6
+on a POWER10 system. The crash occurs when adding a slave device to a
+team interface, triggered by FORTIFY_SOURCE detecting a buffer overflow.
 
-On Sun, Jun 7, 2026 at 1:32=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wrot=
-e:
->
-> On Sun, 07 Jun 2026 11:56:37 +0200 Greg Kroah-Hartman <gregkh@linuxfounda=
-tion.org> wrote:
-> >
-> > This is the start of the stable review cycle for the 6.12.93 release.
-> > There are 307 patches in this series, all will be posted as a response
-> > to this one.  If anyone has any issues with these being applied, please
-> > let me know.
-> >
-> > Responses should be made by Tue, 09 Jun 2026 09:56:47 +0000.
-> > Anything received after that time might be too late.
->
-> Boot-tested under QEMU for Rust x86_64, arm64 and riscv64; built-tested
-> for loongarch64:
->
-> Tested-by: Miguel Ojeda <ojeda@kernel.org>
->
-> arm32 also builds fine.
->
-> On arm64, I am seeing:
->
->     net/sched/act_mirred.c:451:43: warning: variable 'm_eaction' is unini=
-tialized when used here [-Wuninitialized]
->       451 |         is_redirect =3D tcf_mirred_is_act_redirect(m_eaction)=
-;
->           |                                                  ^~~~~~~~~
->     net/sched/act_mirred.c:429:18: note: initialize the variable 'm_eacti=
-on' to silence this warning
->       429 |         int i, m_eaction;
->           |                         ^
->           |                          =3D 0
->
-> due to commit a01fbdecc3a2 ("net/sched: act_mirred: Fix return code in
-> early mirred redirect error paths") here.
->
-> And that one seems to be missing at least the assignment to the variable
-> that happened in commit a005fa5d7502 ("net/sched: act_mirred: Fix
-> blockcast recursion bypass leading to stack overflow").
->
+**System Information:**
+- Kernel: 7.1.0-rc6-160099.42-default+ (commit d548c6f4301b)
+- Architecture: powerpc64le (ppc64le)
+- Hardware: IBM POWER10 (9043-MRX), pSeries
+- Config: CONFIG_FORTIFY_SOURCE=y
 
-Unless i am looking at the wrong code version, in the current code i
-see m_eaction is always initialized before being used.
-m_eaction =3D READ_ONCE(m->tcfm_eaction);
-Probably a compiler false positive?
-As per suggestion emmited, initializing m_eaction to 0 should help.
-Not sure what the process is.
-Perhaps, Miguel you want to send the fix? commit should say "appease
-compiler ..."
+**Crash Location:**
 
-cheers,
-jamal
+[ 3492.897824][T77143] kernel BUG at lib/string_helpers.c:1044!
+[ 3492.898057][T77143] NIP [c000000000ac1120] __fortify_panic+0x18/0x28
+[ 3492.898096][T77143] [c00000000efdb350] [c00800000b857a18] 
+team_add_slave+0xc60/0xcc0 [team]
 
 
-> I hope this helps!
->
-> Cc: Kito Xu (veritas501) <hxzene@gmail.com>
-> Cc: Victor Nogueira <victor@mojatatu.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Cc: netdev@vger.kernel.org
->
-> Cheers,
-> Miguel
+**Call Trace:**
+
+__fortify_panic+0x18/0x28
+team_add_slave+0xc60/0xcc0 [team]
+do_set_master+0x19c/0x240
+do_setlink.isra.0+0x388/0x1450
+rtnl_newlink+0xac8/0x1030
+rtnetlink_rcv_msg+0x450/0x530
+netlink_rcv_skb+0x74/0x1b0
+rtnetlink_rcv+0x24/0x40
+netlink_unicast+0x2e0/0x430
+netlink_sendmsg+0x210/0x580
+____sys_sendmsg+0x30c/0x470
+___sys_sendmsg+0x94/0xf0
+__sys_sendmsg+0x84/0x100
+system_call_exception+0x154/0x2b0
+
+**Reproducer:**
+The crash is 100% reproducible via selftests:
+```bash
+cd tools/testing/selftests
+make -C drivers/net/team run_tests
+
+Please add below reported-by tag:
+yeswanth <yeswanth@linux.ibm.com>
+
+
+Thanks,
+Yeswanth Krishna
+
 
