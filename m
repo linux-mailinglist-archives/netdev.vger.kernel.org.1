@@ -1,222 +1,224 @@
-Return-Path: <netdev+bounces-296375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296376-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UZptOTdRJmohUwIAu9opvQ
-	(envelope-from <netdev+bounces-296375-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 07:20:55 +0200
+	id cY3IOYFiJmrTVgIAu9opvQ
+	(envelope-from <netdev+bounces-296376-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:34:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A119652CA1
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 07:20:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2047C65327C
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:34:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=Yh4ownvX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296375-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=onsemi.com;
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=rw3JJsAa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296376-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296376-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9519E300C81A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 05:19:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 051623015738
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 06:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95116374178;
-	Mon,  8 Jun 2026 05:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8821131F993;
+	Mon,  8 Jun 2026 06:33:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.151.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A5C371D19
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 05:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97F21E2858;
+	Mon,  8 Jun 2026 06:32:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780895968; cv=none; b=sM/r617XTyAglYtWWbQJWFrv3iw37D3eMJm0cGVzeVkK2mTbpNPHiLztZmsbKh/ykWkd6CSsShjkAjMoh+b5i92GiDcbdmiesFvbFA9CDgofE1I27Dt64oQI9zGRYQ9ZVqMieUSK3Ppjip4G4YE8mFmwF6C1r3OwI5R1ChNiPnI=
+	t=1780900380; cv=none; b=sbsQ8Z9z7HZJjpB+RkrCaJAPVP6YFslgycfJcBBsOXbAbX9njnm+zZTqch/tdAH3iGRp8HtUuaXs86McUHmTNRhzDXH4PzX8p/S1bwDeNh3vx9K6Lz0ixU2knAZA6DQmOE9WhgTcu2Kw/lYnu2si/T11cdfKm3xf7u8X7nyQE9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780895968; c=relaxed/simple;
-	bh=jCuwD3L+UGLhoo+rOweV6Jhoe0yvuz2rrXEI9p2ZUHk=;
+	s=arc-20240116; t=1780900380; c=relaxed/simple;
+	bh=tUndfLol09EHbqRK3TD+Yfcea1+P2fSjph7ZPfudk/4=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=pnR2ypJ2HmijlrsNAHuthkoCtnvndUcdCT7G4IFXIhQhiluuZoAuMURL2jwCKnpwECVKo681Kw/qHXXTuPdrz5XHZiLmrMgctQc/J+HuwduiN697zQl0LaCz4Dhkv3W0qfSHr0RKpNebAPJBA9t2Mx4X/UqI3O3bpB4JtDno4wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=Yh4ownvX; arc=none smtp.client-ip=170.10.151.120
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
-	s=mimecast20250127; t=1780895967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jCuwD3L+UGLhoo+rOweV6Jhoe0yvuz2rrXEI9p2ZUHk=;
-	b=Yh4ownvXsd2FR8opMF2NSzDqnEk8Hr6zaaI/t8odn/OEVlaUZwUTF5X/uq5zs9E8U7/ecm
-	suOYmkZ3z2m5MAKAZCLUGXQ03YNGCRY2EPL6lP7FOvs59kY6EZmW9/8PWE7MJUi2RiaM92
-	jrMQhgJWz9fc+NgU78Ug6JpePMDekGUiropT9XZ1LDB0U5lRBsQfBAWodo10E5ASP1Xz4M
-	Xci+PC5M3njzzCEev7MkM7iiAauXytZ/pOJ0gcQln24UbX3RFIpdgGp7OL1wlM2qZlix4C
-	u5KkfFynO0nTceTUZrez6J0zeeJ+Rgy+MUb2oyNPhfvU4CFDmwdZ/TJeG1bUCA==
-Received: from BYAPR05CU005.outbound.protection.outlook.com
- (mail-westusazon11010022.outbound.protection.outlook.com [52.101.85.22]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id usb-mta-19-80Cshg8JNRCiDFGEn5QSxQ-1; Sun,
- 07 Jun 2026 22:19:24 -0700
-X-MC-Unique: 80Cshg8JNRCiDFGEn5QSxQ-1
-X-Mimecast-MFC-AGG-ID: 80Cshg8JNRCiDFGEn5QSxQ_1780895961
-Received: from DM4PR02MB9263.namprd02.prod.outlook.com (2603:10b6:8:105::12)
- by BL3PR02MB8001.namprd02.prod.outlook.com (2603:10b6:208:358::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
- 05:19:19 +0000
-Received: from DM4PR02MB9263.namprd02.prod.outlook.com
- ([fe80::cce5:83d:e300:d648]) by DM4PR02MB9263.namprd02.prod.outlook.com
- ([fe80::cce5:83d:e300:d648%6]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
- 05:19:19 +0000
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-To: Randy Dunlap <rdunlap@infradead.org>, Andrew Lunn <andrew@lunn.ch>,
-	Piergiorgio Beruto <Pier.Beruto@onsemi.com>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Parthiban Veerasooran
-	<parthiban.veerasooran@microchip.com>, Richard Cochran
-	<richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jerry Ray
-	<jerry.ray@microchip.com>
-Subject: RE: [PATCH net-next v4 16/16] Documentation: networking: Add
- timestamp related APIs to OA TC6 framework
-Thread-Topic: [PATCH net-next v4 16/16] Documentation: networking: Add
- timestamp related APIs to OA TC6 framework
-Thread-Index: AQHc9XdYqyenjPnuP0avpxdMHovoULYyl8UAgAEBGuCAAIWRwIAAAtWg
-Date: Mon, 8 Jun 2026 05:19:19 +0000
-Message-ID: <DM4PR02MB926359E157836590EF0B91A2831C2@DM4PR02MB9263.namprd02.prod.outlook.com>
-References: <20260605-s2500-mac-phy-support-v4-0-de0fbc13c6d8@onsemi.com>
- <20260605-s2500-mac-phy-support-v4-16-de0fbc13c6d8@onsemi.com>
- <cf3d6937-1ffa-4d81-8e19-b3f607a7e1d1@infradead.org>
- <CY8PR02MB9249DA24FC3E3292FC2D7628831F2@CY8PR02MB9249.namprd02.prod.outlook.com>
- <DM4PR02MB9263A6240C8D09E368B6F980831C2@DM4PR02MB9263.namprd02.prod.outlook.com>
-In-Reply-To: <DM4PR02MB9263A6240C8D09E368B6F980831C2@DM4PR02MB9263.namprd02.prod.outlook.com>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR02MB9263:EE_|BL3PR02MB8001:EE_
-x-ms-office365-filtering-correlation-id: 93682136-362d-44a9-2aac-08dec51d7e14
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|22082099003|18002099003|6133799003|38070700021|921020|4143699003|11063799006|56012099006|3023799007
-x-microsoft-antispam-message-info: EqHL1PR1VoS/ua5fMkqLen3HqG4pf8uLtxUAdwlnw3nBYvP259jWA/WSqTYqOqJf+h+1zkM4OfYcCldAHOGWIJ/Skxe7EVH+34Ad7XE6hQTP8csuWZg2e6ctZrsrwv5UpnbbzPbbpnJwvhi6KOm6tuP40DeJeYo1fl59FXn4a1+QIMJFmX2hCia1ni5VocDHL9Sh6/7jIjwuSIq2oi5bs4IfAmIwh3YoG74l4QhCXBfhyTwgRMgAS/EZoAFd/uSzlDX6q54qpmwGGrUrM6m1pvnkpAuGpgWw0mN6/TDILSz/MkqA6bi2aTArjO3memCxK0n7dKZ8eCGUIAjifgFdwqhrymTt1At1agZnfP/nfXEZhUJH6O0qi1u86D2D3z4b0enntl1hl3wlBtbioOJ1ZTfNIIG9VwbN5dQKvpz1jYn5XbcFPMpQReqEV+lHLmFv13SE0hqLRwyT6gMp8YgaA0ugnuChS6GStwizBDW65cMitde/R171iYNxruf7N+JR0/bL/p+GxikEr2GwqgkbXjsljj1caaYdj+A9QN/xnHf+dD6aIly+muRfB0xbFG39B/wPjEg9Ih0Ya2i+jY4fKV1ly+ryY1wQm+VQAwjD7Y+yBsYzXdxfIYk7Hvetw+k4lHLW47PqhVP+ViG2dE2pJrI12d6Bvt6gq+udv9y1B+ISTq5gCvhoUL6NpzhCm2ui2g1CCNK6sxQL/mc5/di9RJp6G3i5/yD0w/rTSiPV6/eGJzzNLmx3MfCTguegY2mRo32T7514s0EFb61VwWTpqQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR02MB9263.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(22082099003)(18002099003)(6133799003)(38070700021)(921020)(4143699003)(11063799006)(56012099006)(3023799007);DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OWVtdWpVSVEwSVZtZ1NaMjhXL2wyUnJNcVFnaVU3RHdHS0lOT1FoQ2sxbHUz?=
- =?utf-8?B?YkoxakNIWXVFZXFSMllSY0tJVTFvWEc2cHZEQ1N4Q2dJa1hWdEVZRFdTcnJI?=
- =?utf-8?B?QzJXYkhzMVBzL1lVMlpXbFBqOXVaT012cXlBei9ZUXVpQXhMYWkvTzlZYkZO?=
- =?utf-8?B?ZkFJRTdhaldrcmxiM2toVmFqN3V0di9JdEFQZUwxOUpvSC9ZaWxpd2hWY0V2?=
- =?utf-8?B?VlRuY29JWWwwT2dZNEtBL2lONFlQM0hITWZNWUFlamtYSmVQM04za0NicW1v?=
- =?utf-8?B?QWZPWnpBdHJCSDNHS2h3b2NhK2xKNnhwNi9nOTBKYitENTFGbVF0aFhXdkt2?=
- =?utf-8?B?KytDRGhSNUxFMjRaNy96ZnJrNE1MRXJZWG5wWG5sYjZ3TGtIdHptT1NLc05U?=
- =?utf-8?B?Zmp3TVhMeEJ3bVdhZUVnV0lRazBNTnczYTNwbUpwZEU2RG96TWdGVnFSZ1Yz?=
- =?utf-8?B?cTNmZ2Y0V1R6Z0NxSDEzSXRvTlgrM1N0QlhBWFg4WU5wYUFCMGxBbWtQWDVT?=
- =?utf-8?B?VjZwb3FsZFJGV2RQUWpwbUhicllkcUp2YVJ5cTlZUy9zajhONVVyTkwwcU5o?=
- =?utf-8?B?UGo3QmFlTUJ4cDBDeTJvOUo4bU40aWxFalljdk00MDZEbEVGNHhlZ244VDBX?=
- =?utf-8?B?T2N2UUo1U29jZ1ZRQXNXU2VOUW50VVliM2ZGNkprSStPamNxQms3eFA3UjY4?=
- =?utf-8?B?ZERBVVZrY1pMY3M0OGF4WEdVRnMzUE1iZmc2OXh4c1R6VUdqS2RPMEdrT2Vl?=
- =?utf-8?B?N0hNSVlRc2hhQjFab1ZrazZQM0hKS2hMTWtiYnZzUW1yd1JxV2E1K3czQmNi?=
- =?utf-8?B?eCtUckY1WFNzQ0FEQWdHZ0NKYUNKUWJRMkFONi9KaStJbVZjNU1maUtaMGEv?=
- =?utf-8?B?NWlqUlorZ1JOZGxzQXhxM0ZIc0E2aDNTSkxPY0dLS1Qzd1Z6ZDI0UWtLU2E3?=
- =?utf-8?B?M1BQUDR1UmNMMXNqbVpsZlRtRnZNeE9ZK1hyT2NzZ0NreU1aNWo1MkFIWG41?=
- =?utf-8?B?K0tGNXBjZmpkZ3hweksyNnpxQ3BrRnpjeDlLSkJzVU5raFBwL255dU1DZTRG?=
- =?utf-8?B?NmZab2tESXpBV1hLa0FTaURIV1N2S0RLMGFHdTc3YlNMYWU2cUthVWVnTlFD?=
- =?utf-8?B?UWRxTFpEc3V4c0ZpK3Rwa21ac2Fkd3pZMVNodGZSY2w5dWtINk1ubWpzNWtG?=
- =?utf-8?B?TUtZakdtVXlia25hWjB6akVBdnNyNnFLZHJkUFlyRmZLTDNsSm9wZjZSTE5U?=
- =?utf-8?B?dTBkdVBWREQ3ekRlbWIrU0RuNHZwdTkvN2hBNjJYRkVPSTdSZnhGVGx5THph?=
- =?utf-8?B?ZDFlVW01SjR3Sm90NTc1dEhNSmFkZi9pbGNHckhTMHRjd1k0R0twSTlkZktu?=
- =?utf-8?B?b0lxdWo4V3ZVb2ZCclFFamV6N1RIWXdMV1JHak5IS0FVRDVSM3lXU0UzeSt5?=
- =?utf-8?B?TjJOb0xLOU9CUzR1aFdBbys3OFI4bm5rS3JnOUxoSVBLbWQ3R01VUThuVnkv?=
- =?utf-8?B?OTZUSWM2VzZhOGdVeVdUSmIwWFlqdmcwcWtYTEwxUDhJektlVmtWeHR5YnE1?=
- =?utf-8?B?cm1wVHFKNlBxRFQ4WFdnM1lNTlhnVThoa1JqanVBZmtjbmhPUlVPNlQ5Zlpp?=
- =?utf-8?B?eS9qanRYbFNiSEx5QU44VmVNbEY3RG1hckdjSEczeDlrWm96U0lYNlYvSlJu?=
- =?utf-8?B?ZlVwbTFsSVJUWVR2djJqbzdSdlQzaCtJTEx4T0ErN3dXdlNtMFpBY1kyQ1Yy?=
- =?utf-8?B?cElFQy95RFN1TWFpYjBTL3VpZWhLSXFnOVRVYUg1ZHdPOStGZUMva3ppZHJP?=
- =?utf-8?B?UnBZL1JETTNLejM1eWJGNnRjUlpSY0EzQVYxRzBaZTZCdUtDTHZzY2hxTnUr?=
- =?utf-8?B?Z1pUcXg2ZzJleTl5S0VVVkNHRDBtVDlzdmFKOUVnNjEvNkJNSFdoaml2QkVx?=
- =?utf-8?B?SExINDlMTzZHU3dRZlZ6aThoekFLV3o4UzlPNHYvdE1kdkRzUm95N1dtNWR0?=
- =?utf-8?B?YXdVTWovaDA3eU5oN3BYSzVQa09VdHdYZVZhQldaNWFLMFBsL2VFMjRIOHRL?=
- =?utf-8?B?UnNZMDlib1QrQjI0b0pibE1PM1ZaTHBjT3pRbGpVMFhtS1VrZ01tZjlxZW5N?=
- =?utf-8?B?Wk5WVmM4T2t4bTF0cmE3OE9lVlRBRjNxR2xJenBEZUZPVXI1UlNCcFVPQTFV?=
- =?utf-8?B?dGZLT1NvUHBwTnA2QVlocTZ4NVA0bi96WEJ3bFRZSSt1bzJ0bDU1NTdSYldj?=
- =?utf-8?B?SmlKQVdKUlRESDFXaDFuWUZ5cXFTanRLVFhvcXI0OHhEZXN6RmUwdTJjMmg4?=
- =?utf-8?B?VUd5ajdFczBDL0RlUVVtaHpTOUVVc2dTeXgwc2dBdWY3RkRTamRra21KenJ6?=
- =?utf-8?Q?ZzTtJyGBkGsuvjRc=3D?=
+	 Content-Type:MIME-Version; b=rXHq2LtZKKq7nGfvYX9vkh41ecGfxzSkclTgRVKbYkbwc+wWlmij3If0nU4MR88bk27VeaWf8ol1yQ+Ci2Kxl1GyX8vva/pChvIQ0vlGvFJaaWC3pCW7CdHEzfMsllPOIlGycUajwxXz/JdVT4NI2Y0UyMOrtNuu7g6sQbohq/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=rw3JJsAa; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6586WJME03402999, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1780900339;
+	bh=kzuIL5VnR4BuJuRmm32NHFPK9SCYgquyWS1h3/bGbMY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=rw3JJsAafBtU63fSLa+0wY2rrctAJrH1Mrk4WSs7hW4IgxpaLCEZyCSf9ums3AyAo
+	 j5/PiWvMtU93RDlmUGoemse7rZG5i4+Cupx7xPXcJEyf5cpvxBitW8evFyFkdOs1e9
+	 IsNvc0Jiga7A83+w3/stkJRabPOxzwgQ+YPMg/+4pTn+EEQu3esU+BzNQwkLrG+uTL
+	 JUrAvfUFn+oF296xai5YPJNPuOmqN0NDNjxS9GSvKP1787RsvYplwK506BL0CRtobg
+	 9Borwe3PoFZZsh7coCpP/a/jBj2tU4daao3mH48v6vc7G9WUM0OHMIYZtmUt/rxCZG
+	 pbJlDv6itIvYw==
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
+	by rtits2.realtek.com.tw (8.15.2/3.28/5.94) with ESMTPS id 6586WJME03402999
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 8 Jun 2026 14:32:19 +0800
+Received: from RS-EX-MBS3.realsil.com.cn (172.29.17.103) by
+ RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 8 Jun 2026 14:32:19 +0800
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) by
+ RS-EX-MBS3.realsil.com.cn ([172.29.17.103]) with mapi id 15.02.2562.017; Mon,
+ 8 Jun 2026 14:32:19 +0800
+From: Javen <javen_xu@realsil.com.cn>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "nic_swsd@realtek.com"
+	<nic_swsd@realtek.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
+	<horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v1 4/6] r8169: add support for RTL8116af
+Thread-Topic: [PATCH net-next v1 4/6] r8169: add support for RTL8116af
+Thread-Index: AQHc9NeKx3fmMihSw0SPIMX6a9yYtLYwzGSAgANkRqA=
+Date: Mon, 8 Jun 2026 06:32:19 +0000
+Message-ID: <b54b5f3a6703498fbc17e64548550ba0@realsil.com.cn>
+References: <20260605103906.1445-1-javen_xu@realsil.com.cn>
+ <20260605103906.1445-5-javen_xu@realsil.com.cn>
+ <5005c1c3-d807-456d-a9a0-c77bde9f437e@lunn.ch>
+In-Reply-To: <5005c1c3-d807-456d-a9a0-c77bde9f437e@lunn.ch>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: lS9U4Dzv2xIVF2w7gAsbVCFizefFSpwoxCyjHTHlXfQ5ioUgnDs26GtULm5ofGkNhv/qZOK78aNgc6oaSeem3r6qAFqP/13IJHmwuWRpElHyVEzNzqXAolGr2srpRHnsRvH5YWp5DdeIYOmSsP/zEntHarzHiReq5HSnj+0jeUniT9ioJB9MwoSTitbkH721neqnxXiPd7EEwFST9lRNDgT/In4ht2JYYcACEzAzxW2FPSTUP8QSgPuIg1eZB8bBhRKt/TXhwkIyFO2tgEHhwBP2n/7V9QMdfhVJPu3ZhYxkadV2QvHAGClDnLJaINTe7Wswgl9059A/NXO/jdHP1g==
-X-OriginatorOrg: onsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR02MB9263.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93682136-362d-44a9-2aac-08dec51d7e14
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2026 05:19:19.2787
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1+83gN+Z+fnhj6CW2GiXBM7mtldiv+FrZBRcaXx0qZv1b6tJOjRF/hUytLB7qBP4aKXdqjyVSqeRHxL8BZIbUoiI5YhBKIUqU8kbP2EhZRE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR02MB8001
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 6-KwMrqfiZOQSU6-W5ga-E0fTGH3y65oyIwhJciyDmI_1780895961
-X-Mimecast-Originator: onsemi.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296375-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:rdunlap@infradead.org,m:andrew@lunn.ch,m:Pier.Beruto@onsemi.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:parthiban.veerasooran@microchip.com,m:richardcochran@gmail.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-doc@vger.kernel.org,m:jerry.ray@microchip.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[infradead.org,lunn.ch,onsemi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,lwn.net,linuxfoundation.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[onsemi.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296376-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,DM4PR02MB9263.namprd02.prod.outlook.com:mid,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5A119652CA1
+X-Rspamd-Queue-Id: 2047C65327C
 
-PiA+IFN1YmplY3Q6IFJFOiBbUEFUQ0ggbmV0LW5leHQgdjQgMTYvMTZdIERvY3VtZW50YXRpb246
-IG5ldHdvcmtpbmc6IEFkZCB0aW1lc3RhbXANCj4gPiByZWxhdGVkIEFQSXMgdG8gT0EgVEM2IGZy
-YW1ld29yaw0KPiA+DQo+ID4gPg0KPiA+ID4gRG9jdW1lbnRhdGlvbi9uZXR3b3JraW5nL29hLXRj
-Ni1mcmFtZXdvcmsucnN0OjU1NDogV0FSTklORzogRXhwbGljaXQgbWFya3VwDQo+IGVuZHMNCj4g
-DQo+IFJhbmR5LA0KPiANCj4gVGhvdWdoIEkgZml4ZWQgdGhlIGlzc3VlcyB5b3UgcG9pbnRlZCBv
-dXQsIEkgY291bGRuJ3QgcmVwcm9kdWNlIHRoaXMgaXNzdWUgd2l0aCBlaXRoZXINCj4gIm1ha2Ug
-aHRtbGRvY3MiDQo+IG9yIHdpdGggInNwaGlueC1idWlsZCIgY29tbWFuZHMuDQo+IA0KPiBBbSBJ
-IG1pc3Npbmcgc29tZXRoaW5nIHdpdGggcmVzcGVjdCB0byBob3cgZG9jdW1lbnQgZ2VuZXJhdGlv
-bi92ZXJpZmljYXRpb24gaXMgZG9uZT8NCj4gDQoNCg0KSSBzZWUgdGhlIGVycm9yIG5vdy4gSSBk
-b24ndCBrbm93IHdoeSBJIGRpZG4ndCBzZWUgZWFybGllci4gU29ycnkgZm9yIGFza2luZyB0b28g
-c29vbi4NCg0KDQo+IA0KPiANCj4gDQo+ID4gPiBTZWUgYmVsb3cuDQo+ID4gPg0KDQo=
+>> +static bool rtl_is_8116af(struct rtl8169_private *tp) {
+>> +     return tp->mac_version =3D=3D RTL_GIGA_MAC_VER_52 &&
+>> +             (r8168_mac_ocp_read(tp, 0xdc00) & 0x0078) =3D=3D 0x0030 &&
+>> +             (r8168_mac_ocp_read(tp, 0xd006) & 0x00ff) =3D=3D 0x0000;
+>
+>Do we know what these magic numbers mean?
 
+0xdc00 is a package-detect field. 0xd006 is internal HW id. RTL8116AF share=
+s the same RTL_GIGA_MAC_VER_52 mac_version with other variants.=20
+
+>
+>>  static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private
+>> *tp)  {
+>>       switch (tp->mac_version) {
+>> @@ -2397,7 +2431,7 @@ static int rtl8169_set_link_ksettings(struct
+>net_device *ndev,
+>>       int duplex =3D cmd->base.duplex;
+>>       int speed =3D cmd->base.speed;
+>>
+>> -     if (!tp->sfp_mode)
+>> +     if (tp->sfp_mode !=3D RTL_SFP_8127_ATF)
+>>               return phylink_ethtool_ksettings_set(tp->phylink, cmd);
+>
+>Is this even needed? phylink should be able to handle sfp and copper in th=
+e
+>same way.
+
+I will try to handle this.
+
+>
+>> @@ -2509,9 +2543,10 @@ void r8169_apply_firmware(struct
+>rtl8169_private *tp)
+>>               tp->ocp_base =3D OCP_STD_PHY_BASE;
+>>
+>>               /* PHY soft reset may still be in progress */
+>> -             phy_read_poll_timeout(tp->phydev, MII_BMCR, val,
+>> -                                   !(val & BMCR_RESET),
+>> -                                   50000, 600000, true);
+>> +             if (tp->phydev)
+>> +                     phy_read_poll_timeout(tp->phydev, MII_BMCR, val,
+>> +                                           !(val & BMCR_RESET),
+>> +                                           50000, 600000, true);
+>
+>Maybe this all needs to move into the PHY driver?
+
+This is after firmware application. And PHY_MDIO_CHG opcode switches the ac=
+cess callbacks between PHY and MAC accessors.
+data =3D=3D 0: phy_read/phy_write
+data !=3D 0: mac_mcu_read/mac_mcu_write
+So the firmware may contain mixed PHY and MAC.
+
+>
+>> -     rg_saw_cnt =3D phy_read_paged(tp->phydev, 0x0c42, 0x13) & 0x3fff;
+>> -     if (rg_saw_cnt > 0) {
+>> -             u16 sw_cnt_1ms_ini;
+>> +     if (tp->phydev) {
+>> +             rg_saw_cnt =3D phy_read_paged(tp->phydev, 0x0c42, 0x13) & =
+0x3fff;
+>> +             if (rg_saw_cnt > 0) {
+>> +                     u16 sw_cnt_1ms_ini;
+>>
+>> -             sw_cnt_1ms_ini =3D (16000000 / rg_saw_cnt) & 0x0fff;
+>> -             r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1ms_ini);
+>> +                     sw_cnt_1ms_ini =3D (16000000 / rg_saw_cnt) & 0x0ff=
+f;
+>> +                     r8168_mac_ocp_modify(tp, 0xd412, 0x0fff, sw_cnt_1m=
+s_ini);
+>> +             }
+>
+>Can this move into the PHY driver?
+
+It reads a counter from PHY, but the calculated value is programmed into MA=
+C OCP register via r8168_mac_ocp_modify, which accesses r8169 through tp->m=
+mio_addr. So I think this can not be moved.
+
+>
+>> @@ -5017,9 +5054,11 @@ static void rtl8169_up(struct rtl8169_private *tp=
+)
+>>               rtl8168_driver_start(tp);
+>>
+>>       pci_set_master(tp->pci_dev);
+>> -     phy_init_hw(tp->phydev);
+>> -     phy_resume(tp->phydev);
+>> -     rtl8169_init_phy(tp);
+>> +     if (tp->phydev) {
+>> +             phy_init_hw(tp->phydev);
+>> +             phy_resume(tp->phydev);
+>> +             rtl8169_init_phy(tp);
+>> +     }
+>
+>Why is this needed?
+
+I will try to remove this.
+
+Thanks for your review.
+
+BRs,
+Javen
 
