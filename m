@@ -1,201 +1,189 @@
-Return-Path: <netdev+bounces-296377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bi/gAF5jJmr1VgIAu9opvQ
-	(envelope-from <netdev+bounces-296377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:38:22 +0200
+	id HEm0J6pjJmoPVwIAu9opvQ
+	(envelope-from <netdev+bounces-296378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:39:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 512086532CB
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:38:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0D86532FE
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 08:39:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=haDSYDLz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296377-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296377-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=hFRWZDvt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296378-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296378-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0ABE5301AB8D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 06:36:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 695F130166CA
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 06:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC6538B7DC;
-	Mon,  8 Jun 2026 06:36:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F80E32B11D;
+	Mon,  8 Jun 2026 06:39:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8176C31E842
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 06:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7408C2DAFB0;
+	Mon,  8 Jun 2026 06:39:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780900604; cv=none; b=e3QuU042YCEt+zLDGV/V2aFrL2zsTUg6qpPKUcQimJIL5mYV6wJHAXbew+5EsCniQ37EVDLadR1IMGDUgu8f86Vk37RtJ7bxLZVkbJHTuxUxtWVcCxwrqsYQIHQMbO/3CRjEMIfFIuvHkCt0e/00/I5klKZVaXgUo7JwakH6O9A=
+	t=1780900758; cv=none; b=DuoB1GLPD/8tmJEJxy/6QGaUO6YUSovvXhVQvBlwOC4a7OI+1Lk6t5qO2H9W/jDGCEpiW0W9LbprMHh1FGFV3eo8gUiwqUa2E8X9I29PC3jDwN3beBE4C/5FtpoeynH5tgUb1FadvrKiLdbddwPZ4YaaT8HfgvD9h/+61Ne0ZdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780900604; c=relaxed/simple;
-	bh=ZBSotCsPkGx72Cnm3YYP+qCFKM0v9NLL1DlLxzGpLbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chWGwMbMXKY/7zKqBA3Kdm7KXERZsUE/PK1FqARqVvLzP7gjUhatGsce8wfHSC0Nlc+mCjjA8NwDTqdNVqbvQYhxrt3S8deMh5vFGxese9IRH9jqbDxoYDqsx+sqgx1N4ZaJFjvENDsMArIf0zSusg7hZrrKoEMIm8pBu5qI1C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haDSYDLz; arc=none smtp.client-ip=209.85.216.41
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-36baeec21dcso2368267a91.3
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 23:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780900601; x=1781505401; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBBrRhDE6o7kPVb9YH45wyWFzzeDpsDDOVgKo6zJUAI=;
-        b=haDSYDLzTt/oHxDNcl387PVj/A7ltjVEYlPAhV6N18rble+RrdaMN8QPAlHIO25m3L
-         4GbhoR7N3NObeeQdhP7XvLAakGqFGGHtgyjDw0z+4v+ZBcKuor965sb5BS4Guq1ty75b
-         YaQqJBoaY+Z44qdff0n1AIgnnVPi/flc9bC6qYz0VbmlUMxyv6VOvHVlRl+/KBl+LFR6
-         EVmEBqG2Girg9CmbZTw7iNh6BlbAq48fh34PFi+BHGyJ44xj8XMiNL0z0/xGydF+QoSj
-         il17AXN/8fB/48LZ9CZgzZUjMDuqfPEOExSxH+IHpVvg/h7ZTXn5YsRNvm9mJrxLqi31
-         tRBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780900601; x=1781505401;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tBBrRhDE6o7kPVb9YH45wyWFzzeDpsDDOVgKo6zJUAI=;
-        b=a8lb7fCSD5Jbc2Wl63Iqzd+6oZD54rnPhrsKilX82bxOC7TnUe/5ZHEh0gA/frOByk
-         1IN9DIyzLM1vwA8W6dv5q2/ktqMoExC0Sci4l9jB/ZpfIUQKqemlUbUdw/tH/5U/C+rW
-         M3ALw0OAetedEiU8eh3hP6MJcBLBlBio7lfjmWaCD0OtihXWCjjT88rQnhs39fvC0ZJQ
-         A1o+TCGXx7sTaPgogFShT+L2d5jnh+9GqAYcjlNxu4RC1ZNC/WuQKbmsaPyYGvuRbwhD
-         OCFv+wuP9MWQhREo8pfAXyYJuNX65IZZu6qQS8xLdrpXoQ4ZI97sp4A+Jmx0wt75UgG2
-         VfPg==
-X-Gm-Message-State: AOJu0YzNzsmUctkqmxIm0Qtql4teX2u6bJPExxCxPxwDGwrXYnplzAYd
-	0OP/bp4fSMlUH/bc5Xc2pVQ3dmAd5B4yB/dhyU4APtz8RHanhlq1N0G7
-X-Gm-Gg: Acq92OGdhK/x1NhJAM+9Ov0Gx9pjVxRxlNhcrYZ9cu0T4B9oWYBe5wPi3SYHUFncUKv
-	9/Ag7bWYVz4uVc/Zzvew5gdbXnkFk12Yu7VE74T6goKbzABOzCwi607jLrdiwsCoOkjWk9B67qS
-	iLtgudZ6JHMx4jLacKlREFRId6AwVbZXHQM1Rs6Ou9EPzlMjJ8pcwalArezzxY5Uu4rW9ixcQoV
-	V5Q2WVg5FK/yXsyaXopoOJTQfC9YNbiMhaSnsYaFtiTyyh6ag4Qak82aYDC/OQJr0jhQ5GSKQZy
-	IY+TPDAnQUPabuSadQIQChnx6UH4KtlDVIMT/uTGrX48F5Ldqvieumor1mZ4IEu3HmSP3t+twPz
-	sVQQMYYIwA3ZLLbQkxcxInAkkTOTqVeXb9Mpp+AyDQjYieSXDOGsYY3Jgs8W91y56lmw/G1/OFF
-	PmClbd4pxGGKRaEzQ62URdWLTz8bzHeLMIuL9yEqBrSN5Hdi9bcY8ah0Mx4Sr/eg==
-X-Received: by 2002:a17:90b:57c4:b0:369:a9e8:dbf5 with SMTP id 98e67ed59e1d1-370ee643748mr14720295a91.3.1780900600627;
-        Sun, 07 Jun 2026 23:36:40 -0700 (PDT)
-Received: from Air.local ([198.176.50.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36f6bf827e6sm17786545a91.1.2026.06.07.23.36.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 23:36:39 -0700 (PDT)
-Date: Mon, 8 Jun 2026 14:36:32 +0800
-From: Weiming Shi <bestswngs@gmail.com>
-To: Allison Henderson <achender@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
-	Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH net] net/rds: fix NULL deref in rds_ib_send_cqe_handler()
- on masked atomic completion
-Message-ID: <aiZi3WoSSY8yN8JW@Air.local>
-References: <20260606192447.1179255-2-bestswngs@gmail.com>
- <73dcc08ff744364c097ec63bf81a26bd15e8f2af.camel@kernel.org>
+	s=arc-20240116; t=1780900758; c=relaxed/simple;
+	bh=xoAiNR1aG5lFMZ5bqyQiyMh3kzbSJz1ebAo56HSG7pc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=hP+XskCSG3TKR4T0hpkZbf5t1YpqZWa0prGttzwkqq+394JkpEHXU4PrOih3PSbgJlyGoK9CAq3YxRCIyniN3HZbsanoXIfbHBA0VYa9/5wOWGi9gYdGjKW6aiHAAZf8iu/5OVOmyAFUUHMAV7kvX5EuCFNPpf/GWOBtLoWaoxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hFRWZDvt; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEF561F00893;
+	Mon,  8 Jun 2026 06:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780900757;
+	bh=yQgVPfWGr6vtAEG800XS3HFQuEhSY4Uec91IsWS5QCs=;
+	h=Date:Subject:To:References:From:In-Reply-To;
+	b=hFRWZDvtKysB9++yA6AQLNs/D0oS+fdQ5o/a8xrja7gQrVSfhGtHiFbu+JQXKjeHu
+	 AKTNu5E1YplBVcyZTDGZGOL+n/OLWllV9Q4g25LrpjJ5k50Et7g+qqZvCIHjZBXZsq
+	 +1hHrs/nZIuXwDItrotAu92Zu2IcNh9AH/e/lkdCbKe9LOmc2TURySrZzqFWt0Rod2
+	 KyOkB98AwRPYXnYiMEiFtAbSm/hzzRy4XO+g3ICzo/cPBCQ6l5vG3bp7HcYdkDuJfe
+	 SV2UQpSkTSmJe0OzhUa/eo7ziXPaLepqO4yLc0hWh5gwN7zIEK36La0sZTw6aii2/3
+	 zR/QSGUllTWfA==
+Message-ID: <51137561-6955-41fe-b330-cb8482433b7d@kernel.org>
+Date: Mon, 8 Jun 2026 08:39:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73dcc08ff744364c097ec63bf81a26bd15e8f2af.camel@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: AW: [PATCH net-next 1/5] dt-bindings: net: realtek,rtl9301-mdio:
+ Add RTL931x series
+To: Markus Stockhausen <markus.stockhausen@gmx.de>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz,
+ daniel@makrotopia.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, devicetree@vger.kernel.org
+References: <20260607125406.2853607-1-markus.stockhausen@gmx.de>
+ <20260607125406.2853607-2-markus.stockhausen@gmx.de>
+ <0bbe9ff3-5d42-496b-b777-8eb657b6e6a2@kernel.org>
+ <003b01dcf698$16788010$43698030$@gmx.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <003b01dcf698$16788010$43698030$@gmx.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296377-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296378-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:markus.stockhausen@gmx.de,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:achender@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_TO(0.00)[gmx.de,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,asu.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 512086532CB
+X-Rspamd-Queue-Id: 1C0D86532FE
 
-On 26-06-07 12:32, Allison Henderson wrote:
-> On Sat, 2026-06-06 at 12:24 -0700, Weiming Shi wrote:
-> > rds_ib_xmit_atomic() always programs a masked atomic opcode
-> > (IB_WR_MASKED_ATOMIC_CMP_AND_SWP or IB_WR_MASKED_ATOMIC_FETCH_AND_ADD)
-> > for every RDS atomic cmsg.  But the completion-side switch in
-> > rds_ib_send_unmap_op() only handles the non-masked opcodes, so a masked
-> > atomic completion falls through to default and returns rm == NULL while
-> > send->s_op is left set.  rds_ib_send_cqe_handler() then dereferences the
-> > NULL rm via rm->m_final_op, oopsing in softirq context.  An unprivileged
-> > AF_RDS sendmsg() of an atomic cmsg over an active RDS/IB connection
-> > triggers it; on hardware that natively accepts masked atomics (mlx4,
-> > mlx5) no extra setup is needed.
-> > 
-> >   RDS/IB: rds_ib_send_unmap_op: unexpected opcode 0xd in WR!
-> >   Oops: general protection fault [#1] SMP KASAN
-> >   KASAN: null-ptr-deref in range [0x0000000000000190-0x0000000000000197]
-> >   RIP: rds_ib_send_cqe_handler+0x25c/0xb10 (net/rds/ib_send.c:282)
-> >   Call Trace:
-> >    <IRQ>
-> >    rds_ib_send_cqe_handler (net/rds/ib_send.c:282)
-> >    poll_scq (net/rds/ib_cm.c:274)
-> >    rds_ib_tasklet_fn_send (net/rds/ib_cm.c:294)
-> >    tasklet_action_common (kernel/softirq.c:943)
-> >    handle_softirqs (kernel/softirq.c:573)
-> >    run_ksoftirqd (kernel/softirq.c:479)
-> >    </IRQ>
-> >   Kernel panic - not syncing: Fatal exception in interrupt
-> > 
-> > Handle the masked atomic opcodes in the same case as the non-masked
-> > ones: they map to the same struct rds_message.atomic union member, so
-> > the existing container_of()/rds_ib_send_unmap_atomic() body is correct
-> > for them.
-> > 
-> > Fixes: 20c72bd5f5f9 ("RDS: Implement masked atomic operations")
-> > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > Assisted-by: Claude:claude-opus-4-8
-> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+On 07/06/2026 18:09, Markus Stockhausen wrote:
+>>> +          - enum:
+>>> +              - realtek,rtl9312-mdio
+>>> +              - realtek,rtl9313-mdio
+>>> +          - const: realtek,rtl9311-mdio
+>>> +      - const: realtek,rtl9311-mdio
+>>
+>> That one is part of enum with other single entries - rtl9301.
 > 
-> Hi Weiming,
+> This way?
 > 
-> Thanks for the thorough writeup, I've traced through the logic and the
-> fix looks correct to me as do the tags.  Thanks for catching this!
+>     oneOf:
+>       - items:
+>           - enum:
+>               - realtek,rtl9302b-mdio
+>               - realtek,rtl9302c-mdio
+>               - realtek,rtl9303-mdio
+>           - const: realtek,rtl9301-mdio
+>       - items:
+>           - enum:
+>               - realtek,rtl9312-mdio
+>               - realtek,rtl9313-mdio
+>           - const: realtek,rtl9311-mdio
+>       - enum:
+>           - realtek,rtl9301-mdio
+>           - realtek,rtl9311-mdio
 > 
-> Reviewed-by: Allison Henderson <achender@kernel.org>
-> Allison
-> 
-> > ---
-> >  net/rds/ib_send.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/net/rds/ib_send.c b/net/rds/ib_send.c
-> > index fcd04c29f543..d6be95542119 100644
-> > --- a/net/rds/ib_send.c
-> > +++ b/net/rds/ib_send.c
-> > @@ -170,6 +170,8 @@ static struct rds_message *rds_ib_send_unmap_op(struct rds_ib_connection *ic,
-> >  		break;
-> >  	case IB_WR_ATOMIC_FETCH_AND_ADD:
-> >  	case IB_WR_ATOMIC_CMP_AND_SWP:
-> > +	case IB_WR_MASKED_ATOMIC_FETCH_AND_ADD:
-> > +	case IB_WR_MASKED_ATOMIC_CMP_AND_SWP:
-> >  		if (send->s_op) {
-> >  			rm = container_of(send->s_op, struct rds_message, atomic);
-> >  			rds_ib_send_unmap_atomic(ic, send->s_op, wc_status);
+> Thanks in advance.
 > 
 
-Thanks for your review.
+Yes
 
+Best regards,
+Krzysztof
 
