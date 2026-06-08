@@ -1,216 +1,243 @@
-Return-Path: <netdev+bounces-296745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296746-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Av+VIFg+J2qntwIAu9opvQ
-	(envelope-from <netdev+bounces-296745-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:12:40 +0200
+	id fYIzOB4/J2q8twIAu9opvQ
+	(envelope-from <netdev+bounces-296746-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:15:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1ADC65AE8C
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:12:39 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C1965AEA2
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 00:15:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="aAc/I2rl";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296745-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296745-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=CoToDqiS;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296746-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296746-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 353E3300C92A
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:12:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DD6ED300EC71
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 22:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7793B0ADF;
-	Mon,  8 Jun 2026 22:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BB535F5F7;
+	Mon,  8 Jun 2026 22:15:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424AD3B0ADB
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 22:12:28 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780956749; cv=none; b=KaGUIXP6bhJBAffOsxdsEgGTQ/yokiRBdxouFR3LLF9I0YlY/QxOT1PbkDHeHg8mvCe0pGH2Cyx8mntSsIruJpdDQySss+SrCFJLaxmnROCtRDexfU9hh4SaxQpzgBYPVLcHleOYjlqAjxm0925DSuNTPBBCikZYu/2IqQ74m0o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780956749; c=relaxed/simple;
-	bh=1mW4UPRZnlwwXcOBTh1xw9GgO1hKSdsmrO2g0JXCE1Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qv3onulrlhtoVTW1YKtsDSevT+dwlJRXoF2n+KeU+fWv4oyoI6cyPBXzLGHsHU72R18svBck97kHrGEq4XIHto9621nZNcX5n4r31MSmYltJU2/V+trWJ6212zPdMsqj3uIU5oiiMiRpiGiZDQqXygkc1p+Jxy2xe0d4L6wBF2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aAc/I2rl; arc=none smtp.client-ip=209.85.128.48
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-490afc47455so24861215e9.2
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 15:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780956747; x=1781561547; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XT0sc3tiUNM3ws0Cy/hiiq3H/Zd9w72qwy4YmSm9Xlo=;
-        b=aAc/I2rl1Q9qV/IzGNfSTvkooFrBGPPwL4AKmXMydb/+ckwoByz7o++qBcA4eEpFq9
-         ZpYe+d3Yr1Tcnu1zWXHyZzseLQwkrNZeKlXQZPpicE/u+N7gJBCHTsD/4LbcnP82g22S
-         9sGsA4o1JLR63/ARvAz2HVq7s3XB9HS8J9OnYvapHUC2aak7acsAj9w4J++i/D4JP58m
-         cmJlRwnyhywRjGHyfQ+3UecLlLqyiF44jVi7Gx87AkFUZO44nL7Fl/RZCH1dKcvbwaYJ
-         r4rJdw8uW911MlyZrXIdWrBHnaAwTNRZMhI/P4ImKu18sxcYtcATuXoq9HcObosLCMH5
-         ritA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780956747; x=1781561547;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XT0sc3tiUNM3ws0Cy/hiiq3H/Zd9w72qwy4YmSm9Xlo=;
-        b=U+Ny1hDhSndhSgYB0ehgqVmUfESEiHyYefgBhlhfKeGEra+c2/6RyMZU1GilJuSmHY
-         qKP8mXZP3FVNTPulxJZtIasQINQx+Q2tRqs2Cm28UJMcf5ClxRKIqHD+kLZm8miT3Sbm
-         hrQDOr+6d8L2NY3TJGyRljx/R58ar7EGeX9RM388QE9F1krqCu+n/o/tVVJiv0MAB+vt
-         zC+eR0Jz6+VlHBQ2FKX4PwC0ANLAAKeeM28SFjENyf/nVj1jIWtyeqkCASQSKtfumUZe
-         92K7dB1gOm9DmZ6aTGWNpQYHdzvI/PbTwyuNJk3VIvkeJ+UC2bjj8DjynjNIapM891vv
-         EhaA==
-X-Forwarded-Encrypted: i=1; AFNElJ9Q7sy1D+r0GcaIn4uJ/fRcpnE/0/BKWAWKBA1IeArZWj/t2ajBXEfa3R8C3l1PmTd/LY8kOLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8tWHa4KXrLlXLCDDEyQAxuAuZXxdUocrRzc+oEIRrlQQhk1dv
-	hNc97npihJ6EXjN66fdEGN+ARxyf54zm3vNBXQq9mNMZXKC8tNx3CiaX
-X-Gm-Gg: Acq92OGfPaqmMsNVtaJGrTOI2MFd4WyILpvQ3mnFr11ovgYNGVET+DQfyQgPTtz1i3p
-	GnBgy1RfXWA3ZhyKqp1TnD9vjQwKhSwBkC6FbsTi4pU3kRNityntgRwtjq0gWWAgCyzxRit8tbs
-	JTY3IsluhJ1aqS8kMUg0baNq39Ng8osKLYqoabxKTc7zaXCAmjfBUn/LNn/V2T68eQqL/QVP5Gt
-	ToZSWW0mAJ12vxDqDbDNdx4FgZDNNmzJfXNRK8kdEqjtqUTeYmHpit/Y9bZRWmm92M0LfV+Apfh
-	77llkZGmTSL640luVh4Kj7627Vl+eYIn2kO2Q9fGJSX6BAOHyHSviTgy8H6ngArCXygz+m5KdiZ
-	vpyCu71C817mUktUZB3vGGaGjVg5KXIkeAUOH9g5ywKvm2eEQ3Wn2hBzTeYT5srgz20mJgn3WX0
-	O4vTqA34DzHJjBqOJMX1ZHkYlicvPxvP1ejsnHSnb2FP6yt+TntEU1fS/+rf13lAbcyjICUlaHg
-	07Py0uSUSVyoJrgJWnBcCtDdfF7NVwsEBA=
-X-Received: by 2002:a05:600c:4e47:b0:490:9bc2:bf8b with SMTP id 5b1f17b1804b1-490c25acd68mr288367305e9.5.1780956746379;
-        Mon, 08 Jun 2026 15:12:26 -0700 (PDT)
-Received: from gandalf.schnuecks.de (p200300c14f38df00921b0efffe889e28.dip0.t-ipconnect.de. [2003:c1:4f38:df00:921b:eff:fe88:9e28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3fd663sm493223885e9.10.2026.06.08.15.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 15:12:25 -0700 (PDT)
-Received: by gandalf.schnuecks.de (Postfix, from userid 500)
-	id 2E6BB3195CF8; Tue, 09 Jun 2026 00:12:25 +0200 (CEST)
-Date: Tue, 9 Jun 2026 00:12:25 +0200
-From: Simon Baatz <gmbnomis@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] tcp: refine tcp_sequence() for the FIN exception
-Message-ID: <aic-SfHAIsYCswa7@gandalf.schnuecks.de>
-References: <20260608151452.706822-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC68333441
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 22:15:51 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780956953; cv=fail; b=vCq3OmrW35e/AoAJChJgCQga2rNrx6xzv3uHHMYABgBVzOC9rGCIP6jcCNdsNqoeI7r8V//hcyZEA+IQqp6P8oPpMnwXShOvkdpHa9fSRnebvkxHVMy7I0wfP/VCasyZaX2P6qxpC095XVTgiLrZNil/8RN38NnFwL6CPi+n6r4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780956953; c=relaxed/simple;
+	bh=CVeOgTQYkZXdVFr4nLrUFoHanXtdb/VIA78AMYSdp/E=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j/SnhETG5aBtNYVZhhAm6F5EdTDemf2KiQOt8LgD/s+0pshGQd1R4dEzBDohfkBGsL7mwLRQSY6xgjwm0ULx8iJPhz/l9VNpYN6z7p4qFJ7o9msoS3op73HiYcQbEibWN1W5jLAKQO73QE5fnTgZGKEn3j3+EXvR1PtI7P60eX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CoToDqiS; arc=fail smtp.client-ip=198.175.65.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780956951; x=1812492951;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CVeOgTQYkZXdVFr4nLrUFoHanXtdb/VIA78AMYSdp/E=;
+  b=CoToDqiS7c1bHZsCQfBEZdCsafYfZi8wZmaXdq2adSow498wzWljn/Fu
+   mR0e0Rrzsb0X7VvqwE86CX3+FRi8wvqg2DuoHMparjmHWIrBDvoojTgCW
+   cOo0aSjcx+tHUBXFXE/7e+MbDoyxfKpxKD4QuxdkVhigEMv19Fo3bpPFg
+   04F4bNOEWK6N6HYN7LYilSAGG8uey1sAfcEQ/g0UiOTF0Ek4cHD/UFnz9
+   OAp/Sc5+Q7avgE+qGUswRKQ8ce7IqPdZEA9ctkRJ7DRzPbkFs4WiwSmWM
+   ghU7QjQqbpJQi42H1jXapHSMoKxtHRolQKI0XXBRY95FBSNdzwe6BpEkb
+   Q==;
+X-CSE-ConnectionGUID: H/iKCaFtQiKPmgwClkvyAA==
+X-CSE-MsgGUID: WIbjJngVRtW8umpVRRzATA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="99124160"
+X-IronPort-AV: E=Sophos;i="6.24,195,1774335600"; 
+   d="scan'208";a="99124160"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 15:15:51 -0700
+X-CSE-ConnectionGUID: nqlajjXiTBGEi6td44sGkA==
+X-CSE-MsgGUID: XO6SrA99T1CVi14eKG3UUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,195,1774335600"; 
+   d="scan'208";a="249956932"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 15:15:51 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 15:15:50 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 8 Jun 2026 15:15:50 -0700
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.54) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 15:15:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iJgOWPDaJNfiDH7gSPR6ClcQDODh3dv7hteRk/gxtW2MaZXXwHkSfnjaXUKHpad6V9UTnsiL/XLhMr0aNNbPkK4xl+YNj1AgfZ5hXAYR4gkWeGvKxnT7ZQAEXjloniLXfQNJqO3j/+QocAfYARfl4jZoHFBcMiY662cmcKsSbz85seYiCzJ1chLv7VWLnLpFgkYB15219TygSwKFqN7jVymT66+Z9MASf9IS1ytCRyxGmchtq3T5gTjNOt2AiBTTg/vaIDrs2gDon48ExL9YtRw93z1gdDj2UJ8FqVXSh+1DipEm5q5FBdzXKx1/AGV031BuotVnu7j/1Ym7c5NJ/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eLPgXnqjMJG6q/8R/exeZJTCiMwj8xgS5o8gakwD4yQ=;
+ b=bp+W3R2i/CkQRR+qBI4vnOvUv4CrNVBwx4Ky5rWNJwfRJ5ald8jRaKFxl+ttsrSlasugBFVZQOK5TYNS9XY/7YlwjRHG8bRHqsw/pPCOcucwX0nwriTuMk+yFxf0D/xjQvqWD90OYVOmwN4cM7MycoIMlc5z2dClQowA009bsf0n7kOMR4qwbNRfD3c+iH/GkiGoyVvUNbNR+0cg8TVOOIVNwDzPGyemu8sy6BQh07CpqeZQdo1fxL1HLCVIQ3ADsnzJ8mnmS/AOuEKYR0Dy6ZulcQlu5XOZCp80fxeYVcDzqOscX9nm5Cd5yFa5W/I+7TIBNKFdlHQlwdVJchgMUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
+ by DM6PR11MB4596.namprd11.prod.outlook.com (2603:10b6:5:2a6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
+ 22:15:48 +0000
+Received: from DS0PR11MB7381.namprd11.prod.outlook.com
+ ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
+ ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
+ 22:15:48 +0000
+Message-ID: <ce45017d-8caf-4b4c-b04a-44806bcf5e72@intel.com>
+Date: Mon, 8 Jun 2026 15:15:48 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 05/12] net: ethtool: optionally skip rtnl_lock
+ on Netlink path for SET ops
+To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<andrew+netdev@lunn.ch>, <horms@kernel.org>, <michael.chan@broadcom.com>,
+	<hkallweit1@gmail.com>, <maxime.chevallier@bootlin.com>,
+	<joshwash@google.com>, <tariqt@nvidia.com>, <alexanderduyck@fb.com>,
+	<willemb@google.com>, <kory.maincent@bootlin.com>, <sdf.kernel@gmail.com>,
+	<jakub@cloudflare.com>, <nb@tipi-net.de>
+References: <20260605002912.3456868-1-kuba@kernel.org>
+ <20260605002912.3456868-6-kuba@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20260605002912.3456868-6-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0198.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::23) To DS0PR11MB7381.namprd11.prod.outlook.com
+ (2603:10b6:8:134::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260608151452.706822-1-edumazet@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|DM6PR11MB4596:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4af058fb-4e9a-4f89-46af-08dec5ab7e4c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099006|11063799006|4143699003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info: iwNtNm8+zDu/CXwPEYvzbNm+ql99QT9lpu7MQHWNH1vu8oUyrgoVS5CNySJ5x9GgcqFXXUjw+bBLwjRZRJwawJXJs0aE22WKjcFGRGujOwHNGLD/Jz17bDAOW2EV83RthDmB31XYkYDh2tqfsffP/rnuLQAMFpUxNXH9c8nKDEx+WDW+EJxP9FIfzPR1x0PBhhp1XgYDaLQg1Ra4KBxPbxvnFXUEQNWN/OckIi53F0XFmTyVogy567tUj8fnqncaFPH7oprBrrbVLzghfG58H5UD06sZNbcrpaMvIl778e8pTWUD68Fk36HuKBrZzH6OOetmtC47riDfdQblnOdDlTg83zFElNRXH/b7YC7vUZX/Z3CM5SzfqEdU2ntJoOxiF1F3JAd90gfRuKBeTSntt26AZVjxDnkdmzPpgRL6vT3J7RHGpsa07aNEcLj+aYj8duzQOtRGHkN3S7bJQwUHLeej5m1SnA3craK0Ipi5H/2O5ezVCA45AjMj/EsKtQTOFNtjUO5DN3Aozx7PjSFSYbBRrVJW2ap3PD6XksYn4TXV7cGwQqskbNULHV3fTViN7JciWtm17x4lx8Oz258BBJPxqYvZ1nZK86JO/YMQN62HWN+DUbVMytL4AAWMernUFY/zWnzuAGV3Pgk6re3hBqu+g8ybQUiJgWDVrRhVEPU7tuBPKHS2+5d0sTPrJPpT
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099006)(11063799006)(4143699003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WVI3RWVTa01JT2dvZDljeWV6aTRVYTZwamZBVzZSeDVucDdKbWhaaUFnTGM3?=
+ =?utf-8?B?TE94UWdkNUlRb0VqMW1BWmdwNU1UTVUvRmpzdzZ5UXVUbDdGZWtFWDVRcXJS?=
+ =?utf-8?B?M1U4TklEeTR4WTNtY0hadGxkOGVIUkFGNHg1d0NpWU5HbFQ4QVAxV0x1MG82?=
+ =?utf-8?B?NEtmZC92eC9QNHl5WTJYVEZHejNldk1MNkhUMGtJV0U0Qlc0MFVXRlpnUjU0?=
+ =?utf-8?B?NDdqYTcrK2NXWUFLV1Q3TXlSVzJncHFFQW1RNnJHemxvbEpsNzJneTVVR3Rl?=
+ =?utf-8?B?NW00b2xOUFB6WGRZNzcrMHlJSHVia2pZcE5RVExoU05VajZIVkJuZVRvZ3Ba?=
+ =?utf-8?B?NGlqNEY5Z3BsYmtweTl5d2orT0FsNC9MNHFIeGNJSFo5UHRyYkp1MEJnbHA0?=
+ =?utf-8?B?dnNWWXE0MlhiYk5BZVRXOUNNeWNiWG5Zb1B6L09WM0c1bjFvNUdWbEwzdzBZ?=
+ =?utf-8?B?cVp3WDVHQTEvL2VSLzk3Z0hjbXQ1VWJvZHBYZkhSSUdUTHRFTmYwQkhFem5x?=
+ =?utf-8?B?UUVzdzhqUEVEYVgvbUlwTEJsMjNMeSszaFVpOVZiZkNpeTVDUzVOZm1XNEpq?=
+ =?utf-8?B?V2pxNEYrWS83RkhJWGhQendwWFYwUGZFa0kzVjZaUDBSVXp5NVc0cDBjV2lZ?=
+ =?utf-8?B?elRrVjlmK0Eya0xGS01UZVA3L0QrdkFOZzVxaDJ3bWh0bGdCOVJCYXBzWnJr?=
+ =?utf-8?B?cmwvWTZlN1NtYVNsOUQzTkRoS28wRmQwTVlxQ25GUUZ2ZDBDTzc2NWtLVGNT?=
+ =?utf-8?B?U3F1M3MzTDh2NHQrN2JVOTR5SDVnU0tNMHI5WFNqemtaRlhlYkR1V2wwMHlE?=
+ =?utf-8?B?ZjdxcTRCNlFnK3lmMWE1dkczWHBUTnVGc04rNVN1M29tTkNRcE0xSUcxUlVh?=
+ =?utf-8?B?SWJRbldLK3k5QXR1VkhwMGF0VTNkd0x0L2VxR3JKMjFSeDV3SHlDRy9sbWNi?=
+ =?utf-8?B?ZWRxc3EwQjlQaFp0eFdlZlozeEwwU3EvOVZkSnpRNHA2VmtvYm5aTjNJWlZ6?=
+ =?utf-8?B?RXQrOVRXc1hNUWVXZlBaM2NXaVB0NWxuclJPMHNKL1MyNGNIbllBV3hXZHli?=
+ =?utf-8?B?bnVKQmRIeUUxb0J2d3lCNzFGdmxCTVV1L2FJdE52U295cW5tMnMvZ2lXSmNr?=
+ =?utf-8?B?RkJxZnRRQzNQdXhoSzUrS1UrRkJaOU5JS0tIYUF3NENhNGEzK3hlUnhTL2x4?=
+ =?utf-8?B?MlVKbWJ4MXBYaGdvVFp5c1d6SVNxMjRVVjMzM3ZEY0UvRmd4R0FJb2Nybmxt?=
+ =?utf-8?B?YWRGYUpaTndpZkZvT2NjSXM5S1NDSDc0ZWtzS1RqTnQwNFI1d0Z0TkRvOElY?=
+ =?utf-8?B?V0xHRmFTd1A0MTVUOGNNclN5dWZzcWMyMVRrUkpRRzg0NnpvaFdXU1RGK093?=
+ =?utf-8?B?USs4NjBqbGd5ZWMyeHdvQk1FNHkvR0pzSFQ3ZzNYVmhSSkpnUjUwRUFkR1g2?=
+ =?utf-8?B?aEZnOU1VYkVweDMzT2padm9kL2JqRUlkR01EQUF4bFhCRkFmSXFrUXhISEhn?=
+ =?utf-8?B?dDlWbXBlOG1pOHZ0T1ovVjVqdnRsYzhScllrYzRnQUlDMmVmM2Vtd1NwS2FV?=
+ =?utf-8?B?Y0V3Y3ZubUZDQkFnWUhCSEZ5a0NENzVTZWZkd2Ixa3oxeUZZVmhyWHpQNWFH?=
+ =?utf-8?B?TTdaOTRFR3czYk9iNjg2NXhnR3lUQ1U4NUsrYjkzOVlzdjdDN29OdkFmQ0hx?=
+ =?utf-8?B?Y3MweEdJODJ4YWpxaWZGc1Z0ekRSNWR6NFk2M0EyVGk5Z1kvT0E2WmNBL2h3?=
+ =?utf-8?B?cC9JSTMzNTIvNC95eFl6QjZLU0ZIZURoV0VFbUlkK3BLdGR0QURFaXp0TGQ0?=
+ =?utf-8?B?elUxWVp4Q1ZvUTJJaUtzWTVmZVJxQk1TVHpqNEhFTVRzcnphWnU3Ujh0QjJu?=
+ =?utf-8?B?SFMxQ2hKM09oekhia1FSazQ1eVNyV1N4czJxR1k1ZVpJU0RPYW0wdGozOTFU?=
+ =?utf-8?B?WHU4QzZxQW5RYmFVNVlsVDBlRlhmbElSWTNVZ2o5OVFHdWpWSWpEdUJUbVUw?=
+ =?utf-8?B?Qi9xOU1JTXREWlY3Uk91SXRxYWh1bUZlNW02TGNCVk1zdjl1Wk9KVE9CM1pI?=
+ =?utf-8?B?dnhDSCs4bEpUcUFDMWNlYitndFlUUWhYMHlrOHZManEzNG5XdjY4TzJrMkpl?=
+ =?utf-8?B?L1hyYy93TFdxM3B2eTVQVVFQSzJsWFJTYjIyYVF2a24vTEpaMEMvczA0Vllh?=
+ =?utf-8?B?WWhjODBBNEJaNUxieVhYRUlSbHNydzNNbXRib3A2d21MVFlHRFNkVlA3VE8x?=
+ =?utf-8?B?Mm1SNmhiR2c5Nk45M1ZtVmpKWisxOFhid25mSm43TEZnVVJsaGZ3bXRZWEhG?=
+ =?utf-8?B?TnB0bWNsaVhMOTFaSmhrb0JrL1dhWEpjY3h3cmZmU1BTTnl2ai9hQT09?=
+X-Exchange-RoutingPolicyChecked: VkmLF+EZ5K0xbKODriG8vkfAgr82OEUOr3sYkqtf0hMn+a/FBRG3EyuCRBGNyN5bDIn0G/cHd5pFGifjqW4gggm6eP+FlnmRqEcok6ePG6TeN0NLB2m3uHjbD02B5kRBBEs/ds/l+5khNYYKFTm6kyY/yRcMbMR3pOxpRFO3Dha29Qlk4rgqOMJC/LfpSs8yO8X789HZPkxw8KKtudInD+Ac1gBvqFnaeX+zINLT7DSTBSLU53XVkzDu7eCEH7mt6k2ma1K7FRUKjsFRq8AVmuztoIX4m0vzKDTR9mLbLndhQiOgZtkALCsHjV1JYDll0Qb8umhPnaknVcLcDiVSig==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4af058fb-4e9a-4f89-46af-08dec5ab7e4c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2026 22:15:48.3967
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: L3sVfloZx9jAlcRj6TsXjhroBPn62LYE4WK7l87jRel8io6/DLvIwkBG9yEy5gPOcNew8omns3KJw0JINre3ZIJGbl4jdu+45TrJ/3LQYsw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4596
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-296745-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296746-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,intel.com:from_mime];
+	FORGED_SENDER(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:kory.maincent@bootlin.com,m:sdf.kernel@gmail.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,cloudflare.com,tipi-net.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1ADC65AE8C
+X-Rspamd-Queue-Id: E0C1965AEA2
 
-Hi Eric,
+On 6/4/2026 5:29 PM, Jakub Kicinski wrote:
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 1da49161d36f..74c8109b0cf3 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -935,7 +935,13 @@ struct kernel_ethtool_ts_info {
+>   * these bits separate, per GET and SET. GET is much easier to "unlock".
+>   */
+>  #define ETHTOOL_OP_NEEDS_RTNL_LINKSETTINGS	BIT(0)
+> -#define ETHTOOL_OP_NEEDS_RTNL_GPAUSEPARAM	BIT(1)
+> +#define ETHTOOL_OP_NEEDS_RTNL_SPFLAGS		BIT(1)
+> +#define ETHTOOL_OP_NEEDS_RTNL_SRINGPARAM	BIT(2)
+> +#define ETHTOOL_OP_NEEDS_RTNL_SCHANNELS		BIT(3)
+> +#define ETHTOOL_OP_NEEDS_RTNL_SCOALESCE		BIT(4)
+> +#define ETHTOOL_OP_NEEDS_RTNL_GPAUSEPARAM	BIT(5)
+> +#define ETHTOOL_OP_NEEDS_RTNL_SPAUSEPARAM	BIT(6)
+> +#define ETHTOOL_OP_NEEDS_RTNL_RSS		BIT(7)
 
-On Mon, Jun 08, 2026 at 03:14:52PM +0000, Eric Dumazet wrote:
-> Commit 0e24d17bd966 ("tcp: implement RFC 7323 window retraction
-> receiver requirements") removed the special FIN case that
-> was added in commit 1e3bb184e941 ("tcp: re-enable acceptance of
-> FIN packets when RWIN is 0").
+Whats the reasoning for changing order here? Is this sorted somehow?
+Would it make more sense to use an enum to define the bits instead so
+that patches don't have to do a -/+ of the same NAME?
 
-Commit 0e24d17bd966 did not remove the special handling; it is still
-present and covered by the test "tcp_rcv_zero_wnd_fin.pkt".
- 
-> If a peer sends a segment containing data and a FIN flag before
-> it learns about our window retraction and has a buggy TCP stack,
-> it might place the FIN one byte beyond what it thinks is the
-> right edge of the window (i.e., max_window_edge + 1).
-
-The FIN exception in tcp_data_queue() is not a generic allowance for
-incorrect FIN handling.  It is much more specific and only applies
-when:
-
-1. the packet is in-sequence 
-2. RWIN == 0
-3. the packet is a bare FIN
- 
-> The data portion (end_seq - th->fin) will end exactly at max_window_edge.
-> In this case, we will drop the packet if our receive queue is not empty,
-> even though the data was sent within the window we previously allowed.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Simon Baatz <gmbnomis@gmail.com>
-> ---
->  net/ipv4/tcp_input.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index ab7a4e5435a8a2cbb532d42c54af76d8541c903b..8560a9c6d38207c098d673497caf2c7652c36f5c 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -4812,18 +4812,20 @@ static enum skb_drop_reason tcp_sequence(const struct sock *sk,
->  					 const struct tcphdr *th)
->  {
->  	const struct tcp_sock *tp = tcp_sk(sk);
-> +	u32 seq_limit;
->  
->  	if (before(end_seq, tp->rcv_wup))
->  		return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
->  
-> -	if (unlikely(after(end_seq, tp->rcv_nxt + tcp_max_receive_window(tp)))) {
-> +	seq_limit = tp->rcv_nxt + tcp_max_receive_window(tp);
-> +	if (unlikely(after(end_seq, seq_limit))) {
->  		/* Some stacks are known to handle FIN incorrectly; allow the
->  		 * FIN to extend beyond the window and check it in detail later.
->  		 */
-> -		if (!after(end_seq - th->fin, tp->rcv_nxt + tcp_receive_window(tp)))
-> +		if (!after(end_seq - th->fin, seq_limit))
->  			return SKB_NOT_DROPPED_YET;
-
-It is not clear which additional case this change is intended to
-allow.  Are you sure such a packet would not be rejected by later
-checks in the data path?
-
-(For the existing FIN exception, the previous condition also seems
-broader than necessary. Actually, it should be sufficient to use
-"!after(end_seq - th->fin, tp->rcv_nxt)")
-
->  
-> -		if (after(seq, tp->rcv_nxt + tcp_max_receive_window(tp)))
-> +		if (after(seq, seq_limit))
->  			return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
->  
->  		/* Only accept this packet if receive queue is empty. */
-> -- 
-> 2.54.0.1032.g2f8565e1d1-goog
-> 
--- 
-Simon Baatz <gmbnomis@gmail.com>
+IMO not really worth re-rolling the series over, it just made it a bit
+more work to read the patch as I was reviewing.
 
