@@ -1,196 +1,151 @@
-Return-Path: <netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YdsyERyXJmoPZQIAu9opvQ
-	(envelope-from <netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:19:08 +0200
+	id AOZiM9qVJmqPZAIAu9opvQ
+	(envelope-from <netdev+bounces-296462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:13:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4461654F9A
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:19:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398BA654E9F
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 12:13:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=UV5EEmLM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296461-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=pass header.d=microchip.com header.s=mchp header.b=shgfuiQK;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296462-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296462-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microchip.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C6F123044592
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:05:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25C3F30B225A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 10:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C13C3C9EFB;
-	Mon,  8 Jun 2026 10:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433C63BBFC8;
+	Mon,  8 Jun 2026 10:04:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E622385D61;
-	Mon,  8 Jun 2026 10:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8C23845B0;
+	Mon,  8 Jun 2026 10:04:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780912810; cv=none; b=WyMwBlu6X7EtOGZgzEH6hmAKRdPG0lkB/DTrDV1rp/OD4g/8XzXmJgie254ZixX/fSFf08qS5+Zv16j7QxAd0UEkNjREH8l0ULR7ko3SVgb4XUH0RERiueB+i89GjODNtNi2gl4FmydEWGJOiPjUtwQ3N1+lcQDvRQJhx8RDyYU=
+	t=1780913094; cv=none; b=jCdPFSNSi3X/v7P5JMqHaypvU5bs8jYI2DXOCx1iOCLtqWrQMG3Dl4FL5l/exZr9+a0jGluIkjD7TCh7DZP7ZVRnsZfWBg9Y+xUZ251BC14Nd5Glh0arJGNA2EtreKJI/MwiKx4RqI9xcCATQlb6kR9knq8zv4j7biDVCeowWR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780912810; c=relaxed/simple;
-	bh=+8XfG6k1tXnXQyksouw2wdiv9qe1TAlzvlG7+q25o10=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=kGbr/an7D5H0eQdMeDanKQcspJKblp0fbPk2BNjcNUhe23lhnb5bKGkWBPrsA/ye2AMDvQnnwWAiZqn9x+N5g1Y3XCvgBoQ9ZrOEi8O3Dy46sBv2MvFOTtYJcyLLpxV+/S+dhr2FkaAjRsdhzi6J23gqiSUUHhdDjzlcbjSpt70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UV5EEmLM; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6589JnGc2817660;
-	Mon, 8 Jun 2026 10:00:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=65j6K3TwLBQrNRKhondLRsIzcSz2
-	RghwB/4ES/qifHs=; b=UV5EEmLMDZHqmVT5rQDQxkhbNcFX77CbFN73v9mxnO/1
-	DtzDJlfofNoiZyIIwbLymoAy7mhzJQPutxptqfjwUCPH2XOsfnDDv7AOR6+htIad
-	Pnm9DPspSzefLg1+K7Jwnz07Shb+h3ddVc4bd/eMQbypjn0frh7vhc0jq4LknXAb
-	hKjPXDvLy7NBkG2eoTQHzASRSJ///hCJscoxFgns0XVIXZeG5zL9GvyFXzswKwj8
-	9m1wFt/ipiJoz5aacMY406rMi5vGREE4RQGrWlwx2vhnXcVPms2/hpRf3gg7oynH
-	a+sIOh1D9fAAn5pSaDEnlCuMjUA6h5c2zeT8SRAbxA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb23pq1p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jun 2026 10:00:04 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 6589ndU1010122;
-	Mon, 8 Jun 2026 10:00:03 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4emx8vvv9y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jun 2026 10:00:03 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 658A02eu61473074
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 8 Jun 2026 10:00:02 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C31F258068;
-	Mon,  8 Jun 2026 10:00:02 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 63D455806D;
-	Mon,  8 Jun 2026 10:00:01 +0000 (GMT)
-Received: from [9.123.9.7] (unknown [9.123.9.7])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  8 Jun 2026 10:00:01 +0000 (GMT)
-Message-ID: <3ad19e86-234c-408f-896e-0d6c774fea49@linux.ibm.com>
-Date: Mon, 8 Jun 2026 15:30:00 +0530
+	s=arc-20240116; t=1780913094; c=relaxed/simple;
+	bh=9+58yqiTSd418xSitDakQTfFSHoTRjmFppCMknHSLbI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p+OmDnP7HaxheXcG2uudrBihd8L5QWuZhFfbvbHa3oHVxH6/UE4MsPoTF3vqRwNS4BSylTY1cnNmFJ9BeMIZ54Y59jxHhYE99cRnLXNuFpTBpO+6UJDqU8H674Xley+oz7f2Ok4LljbClr8OPArQP3isiwAbMMw7d1OPXTUJPUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=shgfuiQK; arc=none smtp.client-ip=68.232.154.123
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1780913092; x=1812449092;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9+58yqiTSd418xSitDakQTfFSHoTRjmFppCMknHSLbI=;
+  b=shgfuiQK+GIdkfYkArwc2xuTXvJlpqcLAMbAK0iyac8mfYG2Gw4wgsbj
+   D/xUqOz/Cg1xb9wf3OFUT57MjgS/z+giLtX1sq99thwBSMTXtDBc0BrA4
+   6JpMkZCcsXo6KpfhwjCAOpknebPEoJ3ES4EwUxTtwkZq90Jz8zokdGv8F
+   Y/PLkIzl5gw2lyZnc3/Tls7/9QVRiIxGk4slI8hc1///NrcipnQ0Ejptz
+   0WhtUBiw6diFD3O2fiftvkAQoZlHHKpz4WiNMDttrT6kFM1EWBVJH+F6z
+   wYouneFmhbFdAbrc6/ZJq34FijcxSByw1pCwx8DRupitAZA+4Okr2JiDb
+   A==;
+X-CSE-ConnectionGUID: VJXF0K4yQn6+NY9KzbJ/8Q==
+X-CSE-MsgGUID: 04IFOyfdT1eGg47NznAVrw==
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="57930075"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 03:04:52 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.41; Mon, 8 Jun 2026 03:04:51 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Mon, 8 Jun 2026 03:04:48 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: Bryan Whitehead <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next v3 0/2] net: lan743x: add RMII support for PCI11x1x
+Date: Mon, 8 Jun 2026 15:34:33 +0530
+Message-ID: <20260608100435.11214-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org, venkat88@linux.ibm.com
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-From: Yeswanth Krishna <yeswanth@linux.ibm.com>
-Subject: [BUG] kernel BUG in team driver: buffer overflow in team_add_slave()
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=b4uCJNGx c=1 sm=1 tr=0 ts=6a2692a4 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=qBxafnndnmzGIJbaEr4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: EeGipkoIuz3k5KIeLN3h9n4452L9zIqE
-X-Proofpoint-GUID: EeGipkoIuz3k5KIeLN3h9n4452L9zIqE
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDA4OSBTYWx0ZWRfX0ddjqY7emiR9
- DZZvPaoV2dNPCtRetacd+xFFzYlp9m9rnMcyx/VN1m3NCQl/1Zrd7KL1g6uSwpJ21F6ZtP/8KDS
- +qOwCC8mCzF6eFgD0FQiuLDqvGu9z9pPZsp21H2MeYORSRjsbHHZFQnpEBBeht39wuDiIbM0vfM
- RrbHxa6mMn8KzpYem4GLTq/+DCWlzrpT72sea+XbZXdB9Z0lZRti16FF0GaxfIRsBd8333qsgFr
- qhS/i8TEaNFfGAUcSkOfgaW5ILdBWS9GjkRrdo+Uc3uoeYqRFFHMjHK86GCRAuz9BwDwOrJoaDF
- RDQfq3WEhAJp00LNaAWc6CcE3VLwQG8+qfnTtmvet/ainqvzSnmxgi+kbmBsMYVBZSJAK6KRYEt
- lvBx/t30de8nQ/oI/4Goi6SJYo9NgP8FOUQ0UaQ4MKNq+IpYbsDPM1chgpeI1UQAlYBoPKyWSfd
- VJ/2v2sxlcGsONNJKvg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-08_02,2026-06-05_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080089
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:venkat88@linux.ibm.com,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296461-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	RCPT_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.ibm.com:from_mime,linux.ibm.com:mid];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296462-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:bryan.whitehead@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[thangaraj.s@microchip.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,microchip.com:mid,microchip.com:from_mime,microchip.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D4461654F9A
+X-Rspamd-Queue-Id: 398BA654E9F
 
-Hi Team ,
+This series adds RMII interface support for the Microchip PCI11x1x
+Ethernet controller.
 
-I encountered a kernel crash while running selftests on kernel 7.1.0-rc6
-on a POWER10 system. The crash occurs when adding a slave device to a
-team interface, triggered by FORTIFY_SOURCE detecting a buffer overflow.
+The PCI11x1x device supports RMII as an alternative MAC-PHY interface,
+selected via the STRAP_READ software strap register. Patch 1 reads the
+RMII strap bits from this register and sets the is_rmii_en flag. Patch 2
+uses this flag to configure the PHY interface mode, phylink supported
+interfaces, and enables RMII in hardware via the RMII_CTL register.
 
-**System Information:**
-- Kernel: 7.1.0-rc6-160099.42-default+ (commit d548c6f4301b)
-- Architecture: powerpc64le (ppc64le)
-- Hardware: IBM POWER10 (9043-MRX), pSeries
-- Config: CONFIG_FORTIFY_SOURCE=y
+Change Log:
+===========
+v2 -> v3:
+  - Update debug log to report selected interface (SGMII/RMII/RGMII)
+    instead of only SGMII enable/disable state [patch 1/2]
+  - Update commit message to document that EEE is disabled by setting
+    lpi_capabilities = 0 [patch 2/2]
 
-**Crash Location:**
+v1 -> v2:
+  - Remove redundant mac_capabilities &= ~MAC_1000FD; phylink already
+    handles capability reduction for RMII via phy_caps_from_interface()
+    [patch 2/2]
 
-[ 3492.897824][T77143] kernel BUG at lib/string_helpers.c:1044!
-[ 3492.898057][T77143] NIP [c000000000ac1120] __fortify_panic+0x18/0x28
-[ 3492.898096][T77143] [c00000000efdb350] [c00800000b857a18] 
-team_add_slave+0xc60/0xcc0 [team]
+Thangaraj Samynathan (2):
+  net: lan743x: add RMII strap status detection for PCI11x1x
+  net: lan743x: add support for RMII interface
 
+ drivers/net/ethernet/microchip/lan743x_main.c | 29 +++++++++++++++++--
+ drivers/net/ethernet/microchip/lan743x_main.h |  6 ++++
+ 2 files changed, 33 insertions(+), 2 deletions(-)
 
-**Call Trace:**
-
-__fortify_panic+0x18/0x28
-team_add_slave+0xc60/0xcc0 [team]
-do_set_master+0x19c/0x240
-do_setlink.isra.0+0x388/0x1450
-rtnl_newlink+0xac8/0x1030
-rtnetlink_rcv_msg+0x450/0x530
-netlink_rcv_skb+0x74/0x1b0
-rtnetlink_rcv+0x24/0x40
-netlink_unicast+0x2e0/0x430
-netlink_sendmsg+0x210/0x580
-____sys_sendmsg+0x30c/0x470
-___sys_sendmsg+0x94/0xf0
-__sys_sendmsg+0x84/0x100
-system_call_exception+0x154/0x2b0
-
-**Reproducer:**
-The crash is 100% reproducible via selftests:
-```bash
-cd tools/testing/selftests
-make -C drivers/net/team run_tests
-
-Please add below reported-by tag:
-yeswanth <yeswanth@linux.ibm.com>
-
-
-Thanks,
-Yeswanth Krishna
+-- 
+2.34.1
 
 
