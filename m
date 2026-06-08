@@ -1,246 +1,210 @@
-Return-Path: <netdev+bounces-296714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JfjgMjUnJ2rNsgIAu9opvQ
-	(envelope-from <netdev+bounces-296714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:33:57 +0200
+	id tplBIMUnJ2rmsgIAu9opvQ
+	(envelope-from <netdev+bounces-296715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:36:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D1065A77B
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:33:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0102565A7B6
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:36:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=UPhOH13r;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296714-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296714-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mojatatu.com header.s=google header.b=cVdgS4eJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296715-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296715-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB60130780F8
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:31:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 57253304671E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACE639989C;
-	Mon,  8 Jun 2026 20:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B57239DBC9;
+	Mon,  8 Jun 2026 20:36:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F32D33554F
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 20:31:34 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780950696; cv=none; b=TRrFcpgUj8naQy75K25MZNSQbbbUEjrtxucWnB47Rb1JxWn6YSt982UbkM4kQ/ZruVEqdJjtWdNeO1KNRhttu4ih+BYLAnGdm7Y1F3W5xHu4aleh+ZvjUrI9dPIYL7HNeZpmwC5khtSLqsRcIDdV75TYaOQXL/vScs5a9mLuIBQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780950696; c=relaxed/simple;
-	bh=g+hB/yLQ6vKKkVlN8bF6XCd8McWiw35mowG9ThCTB7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X60Wr1Udduwg2090u/BcBxuI5tPOOOVYMsam0mRAf4Eiec4swqJqEFcCGgaWnkI3/YDLHYeA+bTzhGUQLhU2t88auomQBsecFTNT5YUwOr+Cp+i1iHq9F+fV6idyL9UiSeDu+l/o3Fzj/4gKJd4ornmsrySoxf0XIv3LpquRGFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=UPhOH13r; arc=none smtp.client-ip=209.85.215.174
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c8585c51f1fso2355377a12.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:31:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E934397339
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 20:36:10 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780950973; cv=pass; b=q+bz3zb0/rGpmzm4eJXwXGwYlDYll3//N8dxHWsLjdSOsm8IJSUkZuP1MAjY8fBr+eMxtBbXHNYhUaHpUQToyXbs1xpe7Z7dzd6s/JaWaF9OMp+gp7S0zZBTXLTacHLXhWxN/uSknNZClW/reSMLlBLFIpVe+xE8H+pCzLkefRM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780950973; c=relaxed/simple;
+	bh=B2tN+Ldk/5pCXIYwJUJf0VGuPcRdSjXr3Cs1XxacmqI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J2mRjfY9SSjocIRZxMEvhaxtkIJ4Q6CEvn8nIY7p2oKg5ndPanBskArZ+W65nzvDnKBLkEZd9dkZjEq5tMS+yxsukHaiXCL1xBmoKoSbxuygb8Gj9vDNYYhViV3bpWyNHfDChUB00/RTziSZr+U23fA5frLC1qZnxEb/V+uBjTk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=cVdgS4eJ; arc=pass smtp.client-ip=209.85.210.169
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-842273a2c4dso3197758b3a.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:36:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780950970; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lXivRQ+Sqx6BEetpTnNqoV43ebUKt5mLiOMPW4wh96fN4LXb4P9XLM9GDD7duLi+oX
+         rrqgf3E7MAnj0gfSZw17Elr4tT3hpGzZ40Ubw+KH0o6gnunHFVko4g8Q6j/XcL1qF02w
+         jLbcmXQfxRwedk+/DE5+uP4EOfnYrmFf7KjRZaMKCfGji690+dK6RgRVuHBdY+4bcxUy
+         E5FwpuW5OF0Kz+7CIQKMGKqI5YP9sbdOLFQB4AX82rrtxveTZtdZXj5gPiamhPm0TTnl
+         EdDX/kk5+BTsoRhMJZkLuWE8KMbz9LytBpCLSgh7LX9gmW7HSUTQNTZrFt76hK6+gwby
+         MHOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oVe+ITC2ml8n3gt+xHvgBn+FPMhVSI7g98/qjcMm7ZU=;
+        fh=vIhxmJdbWE21aupSL2sM9dRxDFGj9wsLLDPcdzpwzNU=;
+        b=f+URsh0ghcr4FgC6dKOLp5KjtWX9je/ATyjhWSDPN2N/RI+053iVqIuuVkTS7iGKaP
+         +uzLpIBfcSfW7+SwYrn5bHYAR3pJUGN2uMdr68S9LPYXXhsTbBui4fDxJojJzl8tXM7P
+         ylNMXbcWU2TcSaqEtvFhpSuMp9MryrcoINQlYxmeV7dlb1byS7WxLD0COGzl5jmsptwd
+         HnEjhvaZPEign8OEYpRvPOAK7jxEAITOQa2l3zpnEGygu41fBKOMAitlUIxBTsgfvVEQ
+         8fV1koel5xFFOoIqQBIWTW5QwnzvEmwmhzZMC4eNSVm/je789KwahlkQUAg+P0o24ivJ
+         NQAw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1780950694; x=1781555494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gwfi1hNRVN18tx6MvutAXdjRReqdu40MZi3rUahoZ8o=;
-        b=UPhOH13r6lLqSx6YrNSgIY1lhaFxRo7ZrVw9xzxUrna1VUg0TyYdTdzG55X1doURsM
-         YrWs1reysVtG0FpYGb1MRokQauO/DRlVh2ut2R7EoO4HMaeNwmG7tHQxCgW2d3pA1O8F
-         GVIw7ZCuPLMKhcA4g9pplMsXljeuv6Hrc6UecfpJFBkrCcFIBo1Vz6TFGSHGbVz9lLW5
-         6t4oBbzIOkq2hWE7tNJk5R0O1i60EFD0hitC3b9ikj0BhXzqjLuOHsM7woR/4n2Zi9/d
-         WZFLIV1oExHYuQVYY5zuDeN4/QjI9wIxLltnD+J6IyRaj7nZyjyd+CM3dQ01GkkST81v
-         UMMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780950694; x=1781555494;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu.com; s=google; t=1780950970; x=1781555770; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gwfi1hNRVN18tx6MvutAXdjRReqdu40MZi3rUahoZ8o=;
-        b=HihMWng+klzL4xCJGTXn+nyVN02vXbI7FuCtEgZlDMfEGKSIxSoShtnDd3VkaWUnCB
-         +Okc7xCdcz0kY+j5ZmQm+vQhOMOVWkRqX+OqCLvC814JtjHRjvfs6xJn0AXSRitq2JGf
-         VKqiJcKSo6zOkTOQBT+/I510B4RjilJtjXxnlSFVSqeTQYRYlcDmpbltUbWqW0U+3iEf
-         MO/XBnA7GVJ80JIK/LbP+4UFktYEyA9BbGGzL0XPahhakiMq9vtmvE76cErEEOtkV2Qh
-         DL/0F243wkKbMuNXraGDMkAn4/QH8XIBkK1kwc6TRNT+tcUBblLtTMjFOzjFdTTg47EL
-         JJ5g==
-X-Gm-Message-State: AOJu0YzZdaYeAdSf1mhlMxfFJI9WiKq0xNTSCYpO81UkluFZ7DgXB7VH
-	T4kEfBAm+TPfL6Srw/ZmcVtMOWWySZ4XeECaEtVJCIuXMnJWgh7i8+htAaE/6eaiYw+BYXrYeA6
-	pQIX2wgw=
-X-Gm-Gg: Acq92OH5nA7lGdYf4DxIzSHNa7jLYO44eL2qkJsrtl5i/BuexfohQHZSepoxftKw81N
-	25JhbJQHXwvlP4EPVodANALEFnGRnZ/hWh+bvafR/Y8MDieZXXZJZ/GB8Gy77eKGfFwIwMGpwMN
-	6/iQUDc1bSdLQqOx1l6A9/74/uQ7BMju98VBW3D+F2YP5RLk2GI8Qh9A+guk6n5JQnGY9VcVZwL
-	g6zX9muzlgydV6zRE68Z32sl2vSj8zvMFfUJH76OTtn9478Shaw925zKIAkX7hjNwO2oXlIvDX5
-	PfwJzvmNbx9oGTcxAlGFu+0zQnPW3ZkcdzqZmoMzon4aFbC8R1+AqPCsNGjMPVd5CFb9v0n7h+6
-	p5pZ2qpbR2dX971FiCveXl356ErNpTHnVpqUhDwoQ2sNUngoef0a6d9umJ0Z+q/yOpV9PBifyu2
-	lFZSV85G7lXvQy0nKL9QZwQfbG
-X-Received: by 2002:a17:902:e5ca:b0:2c0:fa52:1c47 with SMTP id d9443c01a7336-2c1ec906ca3mr146009545ad.25.1780950693780;
-        Mon, 08 Jun 2026 13:31:33 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:e::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f8429fsm235533945ad.18.2026.06.08.13.31.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 13:31:33 -0700 (PDT)
-From: Joe Damato <joe@dama.to>
-To: netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Cc: horms@kernel.org,
-	Joe Damato <joe@dama.to>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net] bnxt: fix head underflow on XDP head-grow
-Date: Mon,  8 Jun 2026 13:31:28 -0700
-Message-ID: <20260608203129.920104-1-joe@dama.to>
-X-Mailer: git-send-email 2.52.0
+        bh=oVe+ITC2ml8n3gt+xHvgBn+FPMhVSI7g98/qjcMm7ZU=;
+        b=cVdgS4eJeN5HgZl+w4tI8DIit6ZRbVnjIJdVdral+2FhJrH9jMnq0s4E+LSDmDBgbq
+         fUY/ezY7NKmPj1/rjBo4ZI1Rw/IEClbaFo2l2nLOavxm6wcsyNuJqGKaMNKIvrBMt+/s
+         P+hm39Fwr2/RO11GTlal4Q1glmgKfkNFnwsKo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780950970; x=1781555770;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oVe+ITC2ml8n3gt+xHvgBn+FPMhVSI7g98/qjcMm7ZU=;
+        b=AOnFz+OYkys/oYhbozsgZCMROMZfpqtV2dvVI7rMTKQG29mcyt4I5TprwfEglmhSfl
+         tF9zpmmjhjkG2olwl5iMhWl6kUBROKRKvxTxOGrbR7obLhlr3I3l+m+jZfLtwd8u686W
+         wzSLpF4plwBoeuyd080Gf7I/UaR+ozC0TFAEK/CUHi/fa3e0hjKlPf9QLW8QMVb+mU4N
+         RsWYs5RpGX+r5aQevQpxA5NGE/WESpRGV9sc+eFzdl017GqlXWYe7Vj1Br+yeKuAgdwI
+         sLwxYaRhIpGIUrlwg/gs/sJgLBjmoiseR4hXEw2ozMQGKfBHMYYRO/LIgQNGx1HrI/C1
+         gBFA==
+X-Forwarded-Encrypted: i=1; AFNElJ9tiOtKkrIXIJE0r4YbwbPnp6Njeow4xQeCTEjxC0hGf5+rMShiCXcmKVDU2Ney6yApqf8v28c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXJjNYQ+MoaJSKSDzVB02FNny9/g23z6WtBaVxnR08K5ISJUpr
+	hPXivrBqya1uOUhOZaVBZAe9rF2azS5lG93XtvgbnXKioresX8daFp71YWeLVzKChf3WzfJkNAV
+	podRTGt7I4KdHFzUUQ5JfUgc4wGfgCH3yjFpZYDlL
+X-Gm-Gg: Acq92OGjXaENvP1YNx5oQvlzRi6aecyJ7G9hHxe7OHKfIsWAu6AeNsLu9ydUPugiE2M
+	Y05S/XAyYzuZFn/YeMZ7qHanNkZioTrrD8SvLSWm8QDAS28lQMuSue+JEurahT3cS7M+/pEf1hx
+	Hr3qLvan/wg9f+8R5t6pnbKRFzRFf5dp7T0o1DKswVM8SxDF4w7aaq9Ix+nal5wsIeBoa3rwIE+
+	j7XivitL+7C4mrLyM2vligf9NDJcJfbGQTXx0cv7L/conYzvuUg6rGB3s42NrAeUyIj5gpMTohS
+	ful1m0EBX7TserpoeX0=
+X-Received: by 2002:a05:6a00:4b04:b0:83e:d427:9817 with SMTP id
+ d2e1a72fcca58-842b0db7dbamr16329172b3a.11.1780950970140; Mon, 08 Jun 2026
+ 13:36:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260607095727.647295505@linuxfoundation.org> <20260607173214.92693-1-ojeda@kernel.org>
+ <CAM0EoMkszTXv82To=KnEYTgzQSmEdRW9XrAMVtJsUaDn=Akf6A@mail.gmail.com>
+ <CANiq72mJNbNzYO37VK7s=ua5v31xBrRp8EnHDvEnKF8Z77jDmA@mail.gmail.com>
+ <CAM0EoMmHd10iivCpDoEd3h+eae9fSnoGWAH_AkwFhrnS6PN63g@mail.gmail.com> <CANiq72k6J7FYT89svtX5qbCUWg-MKuhUHaT07cjk8o7PqaF8+A@mail.gmail.com>
+In-Reply-To: <CANiq72k6J7FYT89svtX5qbCUWg-MKuhUHaT07cjk8o7PqaF8+A@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 8 Jun 2026 16:35:59 -0400
+X-Gm-Features: AVVi8CekC54iinBDQEVgU-dJ9AL5uhMqEzLEARHoPqKy0ZaeCQmHeP3rPtW0Dmw
+Message-ID: <CAM0EoMn9EA_TS80QzXsTscBpCgfJHssq0GHtiNbrMU3FAiP2mw@mail.gmail.com>
+Subject: Re: [PATCH 6.12 000/307] 6.12.93-rc1 review
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, gregkh@linuxfoundation.org, achill@achill.org, 
+	akpm@linux-foundation.org, broonie@kernel.org, conor@kernel.org, 
+	f.fainelli@gmail.com, hargar@microsoft.com, jonathanh@nvidia.com, 
+	linux-kernel@vger.kernel.org, linux@roeck-us.net, 
+	lkft-triage@lists.linaro.org, patches@kernelci.org, patches@lists.linux.dev, 
+	pavel@nabladev.com, rwarsow@gmx.de, shuah@kernel.org, sr@sladewatkins.com, 
+	stable@vger.kernel.org, sudipm.mukherjee@gmail.com, 
+	torvalds@linux-foundation.org, "Kito Xu (veritas501)" <hxzene@gmail.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-296714-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:michael.chan@broadcom.com,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:somnath.kotur@broadcom.com,m:andrew.gospodarek@broadcom.com,m:horms@kernel.org,m:joe@dama.to,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[dama.to];
-	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_RECIPIENTS(0.00)[m:miguel.ojeda.sandonis@gmail.com,m:ojeda@kernel.org,m:gregkh@linuxfoundation.org,m:achill@achill.org,m:akpm@linux-foundation.org,m:broonie@kernel.org,m:conor@kernel.org,m:f.fainelli@gmail.com,m:hargar@microsoft.com,m:jonathanh@nvidia.com,m:linux-kernel@vger.kernel.org,m:linux@roeck-us.net,m:lkft-triage@lists.linaro.org,m:patches@kernelci.org,m:patches@lists.linux.dev,m:pavel@nabladev.com,m:rwarsow@gmx.de,m:shuah@kernel.org,m:sr@sladewatkins.com,m:stable@vger.kernel.org,m:sudipm.mukherjee@gmail.com,m:torvalds@linux-foundation.org,m:hxzene@gmail.com,m:victor@mojatatu.com,m:pabeni@redhat.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:miguelojedasandonis@gmail.com,m:ffainelli@gmail.com,m:sudipmmukherjee@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296715-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,linuxfoundation.org,achill.org,linux-foundation.org,gmail.com,microsoft.com,nvidia.com,vger.kernel.org,roeck-us.net,lists.linaro.org,kernelci.org,lists.linux.dev,nabladev.com,gmx.de,sladewatkins.com,mojatatu.com,redhat.com,resnulli.us];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama-to.20251104.gappssmtp.com:dkim,dama.to:email,dama.to:mid,dama.to:from_mime]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 88D1065A77B
+X-Rspamd-Queue-Id: 0102565A7B6
 
-The xdp.py test test_xdp_native_adjst_head_grow_data crashes when run on
-a bnxt machine (and also crashes in NIPA).
+Hi Miguel,
 
-It seems that the bug is an underflow in bnxt_rx_multi_page_skb, which
-builds the skb head:
+On Mon, Jun 8, 2026 at 7:16=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Mon, Jun 8, 2026 at 12:57=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > I believe this bug slipped in during a small window but was fixed very
+> > quickly. Probably some fix never trickled to stable.
+>
+> Yeah, as I mentioned above, I think commit a005fa5d7502 ("net/sched:
+> act_mirred: Fix blockcast recursion bypass leading to stack overflow")
+> is missing (at least).
+>
+> I would suggest reviewing the entire chain to see what needs to be backpo=
+rted.
+>
+> > If you can point me to the exact tree where this happens i can take a l=
+ook.
+>
+> This is the 6.12.y -rc tree:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.gi=
+t
+> linux-6.12.y
+>
+> The stable kernel team puts the link to the repository at the top of
+> the thread too:
+>
+>   https://lore.kernel.org/stable/20260607095727.647295505@linuxfoundation=
+.org/
+>
+> > Still curious: So only the arm compiler catches this?
+>
+> It likely gets caught by other arches too, i.e. I just happened to
+> catch it in my arm64 build.
+>
+> This is Clang, not GCC, by the way.
+>
 
-  napi_build_skb(data_ptr - bp->rx_offset, rxr->rx_page_size);
+I think it was too early AM here when i was looking at this.
+The answer was right there all along in what you said: The missing
+piece is commit a005fa5d7502
 
-The problem with this expression is that in page mode rx_offset is:
-
-  bp->rx_offset = NET_IP_ALIGN + XDP_PACKET_HEADROOM;
-
-Which evaluates (at least on x86_64) to 258.
-
-The test test_xdp_native_adjst_head_grow_data tests a case where the
-head is adjusted by -256.
-
-When this test runs, data_ptr is shifted to frag_start + 2 (where
-frag_start = page_address(page) + offset).
-
-Then, bnxt_rx_multi_page_skb is invoked and the napi_build_skb
-expression subtracts 258, landing at an address before frag_start. This
-could be either the previous fragment or the previous physical page when
-the frag_offset is < 256 (e.g. if the fragment started at offset 0).
-
-When the skb is freed, the page pool fragment reference is dropped on
-either the wrong page or the wrong frag of the right page. In either
-case, the corrupted reference count can lead to the page being
-prematurely recycled while still in use. Once (incorrectly) recycled, it
-can be handed out again and on driver teardown this would result in a
-double free.
-
-The commit under fixes updated this code to handle the case where the
-native page size is >= 64k, but it unintentionally broke the head grow
-case.
-
-To fix this, we need to do a bit of math to recover the offset if this
-is a page fragment since it is not passed into rx_skb_func
-(bnxt_rx_multi_page_skb, in this case).
-
-Once the offset is recovered, build the skb at the start of the fragment
-and then use skb_reserve to adjust the layout.
-
-There are two cases, the non-adjustment case and the adjustment case.
-
-In both cases, the skb is built at page_address(page) + frag_offset to
-account for the case where the native page size >= 64K and skb_reserve
-is called with data_ptr - (page_address(page) + frag_offset). That
-difference equals bp->rx_offset when data_ptr was not moved, or
-bp->rx_offset + xdp_adjust when XDP adjusted the head.
-
-Re-running the failing test with this commit applied causes the test to
-run successfully to completion.
-
-The other rx_skb_func implementations don't have this issue.
-
-Fixes: f6974b4c2d8e ("bnxt_en: Fix page pool logic for page size >= 64K")
-Signed-off-by: Joe Damato <joe@dama.to>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 35e1f8f663c7..448609cc1617 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1174,7 +1174,9 @@ static struct sk_buff *bnxt_rx_multi_page_skb(struct bnxt *bp,
- 	unsigned int len = offset_and_len & 0xffff;
- 	struct page *page = data;
- 	u16 prod = rxr->rx_prod;
-+	unsigned int frag_off;
- 	struct sk_buff *skb;
-+	void *frag_start;
- 	int err;
- 
- 	err = bnxt_alloc_rx_data(bp, rxr, prod, GFP_ATOMIC);
-@@ -1185,13 +1187,15 @@ static struct sk_buff *bnxt_rx_multi_page_skb(struct bnxt *bp,
- 	dma_addr -= bp->rx_dma_offset;
- 	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, rxr->rx_page_size,
- 				bp->rx_dir);
--	skb = napi_build_skb(data_ptr - bp->rx_offset, rxr->rx_page_size);
-+	frag_off = dma_addr - page_pool_get_dma_addr(page);
-+	frag_start = page_address(page) + frag_off;
-+	skb = napi_build_skb(frag_start, rxr->rx_page_size);
- 	if (!skb) {
- 		page_pool_recycle_direct(rxr->page_pool, page);
- 		return NULL;
- 	}
- 	skb_mark_for_recycle(skb);
--	skb_reserve(skb, bp->rx_offset);
-+	skb_reserve(skb, data_ptr - (u8 *)frag_start);
- 	__skb_put(skb, len);
- 
- 	return skb;
-
-base-commit: 9772589b57e44aedc240211c5c3f7a684a034d3a
--- 
-2.53.0-Meta
-
+cheers,
+jamal
+> I hope this helps!
+>
+> Cheers,
+> Miguel
 
