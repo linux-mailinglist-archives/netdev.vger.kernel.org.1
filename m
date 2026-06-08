@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-296693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296691-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ryaHBckNJ2qAqwIAu9opvQ
-	(envelope-from <netdev+bounces-296693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:45:29 +0200
+	id Dsr3AeANJ2qSqwIAu9opvQ
+	(envelope-from <netdev+bounces-296691-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:45:52 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13930659D59
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:45:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2582C659D6F
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:45:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296693-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296693-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296691-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296691-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E3D01308E807
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 18:35:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2DD833018A09
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 18:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636153E4C72;
-	Mon,  8 Jun 2026 18:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DC23E3C6D;
+	Mon,  8 Jun 2026 18:34:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DE93E5A1F
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 18:34:48 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814B63E1211
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 18:34:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780943691; cv=none; b=IE7vBOeuXtPPXVq4Ywog+blnAXB9O8PyKU1PcoRxkz3FWj7LWN7GQyRQKOaDahwfQxKZBSiGvvNKJx54Y6THFXiueH5yjWsO0KMiMumeZ7tsmyH3MtgeRTfJarzwEdiYJ8Jrt8SSkXosifcE5qGufdIkEKqsQnvnHExsaA9aonY=
+	t=1780943687; cv=none; b=aGmhAIfBcXP1O4AsnCZ9iHNGCkQonxhXP6j8AD1LG0Bj8XTrL1hV44M0Zkhh2sT4jNpXoV3tgAgMG0aDUZVoMmuHs0zkkvo/dYmePLFR9E6qh9m/PRPUO7T2mC0HCwuguqQHr9YOkSkZmHfHps5LqG+FLo7XmyaRqiCHNpXSPK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780943691; c=relaxed/simple;
-	bh=VnSvoON/zgjYj8aIqQ3qub4+RamRKXvWg+FW0wH0eRs=;
+	s=arc-20240116; t=1780943687; c=relaxed/simple;
+	bh=ucnZlmTMvuYHH0ldg7Rzadpxooc7vDPTejdg/SdlYbU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ARiomnSJ5xV6MOkroZJIDYjT7pJru2nyvKAjdZzM/kDKVo/ZGG893c2RGPhD+ULvMZaSGPkzNyMnA6xLQYe6AuW1DZhxFRKIuHB1smUE6PDlsoFirBdmbChDzAgA6LDdRY0zPjfJItpIkmY+Edqsf63g7u6VJ9R484iscdBpPu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=209.97.182.222
+	 MIME-Version; b=W7x+7Je3Sztcp5a23dukI3ex94PevpQgXS+8Y/BT5b7Ta08fD8TaKwKAiswkoqVOmsRcDdieqvi/AdJlYZddOLc134dpymGpk/FiBT8iNQBppIyl54NesjOOON4SBaghTUizOLHul4ievyIveW0XvkRzAflThHT11Avue351eRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
 Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowADH6sQ4CydqRBRuAA--.16762S3;
-	Tue, 09 Jun 2026 02:34:33 +0800 (CST)
+	by app1 (Coremail) with SMTP id ygmowADH6sQ4CydqRBRuAA--.16762S4;
+	Tue, 09 Jun 2026 02:34:35 +0800 (CST)
 From: Ren Wei <n05ec@lzu.edu.cn>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -47,9 +47,9 @@ Cc: kuba@kernel.org,
 	bird@lzu.edu.cn,
 	edragain@163.com,
 	n05ec@lzu.edu.cn
-Subject: [PATCH net v2 1/2] selftests: tc-testing: cover malformed IFE decode frames
-Date: Tue,  9 Jun 2026 02:34:22 +0800
-Message-ID: <cf59defd97a1ad7aed813573a24bccfa3e265e61.1780901080.git.edragain@163.com>
+Subject: [PATCH net v2 2/2] net: ife: require ETH_HLEN to be pullable in ife_decode()
+Date: Tue,  9 Jun 2026 02:34:23 +0800
+Message-ID: <f988cd8a9bbfacd570329c06eb7df9ec4c75cade.1780901080.git.edragain@163.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <cover.1780901080.git.edragain@163.com>
 References: <cover.1780901080.git.edragain@163.com>
@@ -60,10 +60,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADH6sQ4CydqRBRuAA--.16762S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF15WF4kWFWUCrWUCr18Grg_yoWrGFW8p3
-	yrGanFyry8tFy2yw18u3yUWF4Yga93ZrWxt3Wrt342v3W5uFyvqFWIkr40kr4DuryFvaya
-	y3Z29F47uw4DAa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:ygmowADH6sQ4CydqRBRuAA--.16762S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw17GFWrAFyDWF43JrW7CFg_yoW8Ww4fpw
+	13Gr1kKrWvqa47Cr1kWw4xW343Ca9xJFWxWFsYy3sY93Z8Zr17JFySgr45uF10vrZ5Wa9r
+	ZrnrZryUCa4DZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
 	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
 	IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
@@ -77,7 +77,7 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxuF15WF4kWFWUCrWUCr18Grg_yoWrGFW8p3
 	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
 	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
 	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAMCWome1AKEgAAs7
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQAMCWome1AKFAAAs9
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [0.54 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-296693-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296691-lists,netdev=lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:victor@mojatatu.com,m:jhs@mojatatu.com,m:yotam.gi@gmail.com,m:davem@davemloft.net,m:xiyou.wangcong@gmail.com,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:edragain@163.com,m:n05ec@lzu.edu.cn,m:yotamgi@gmail.com,m:xiyouwangcong@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -109,27 +109,25 @@ X-Spamd-Result: default: False [0.54 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lzu.edu.cn:from_mime,lzu.edu.cn:email,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lzu.edu.cn:from_mime,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 13930659D59
+X-Rspamd-Queue-Id: 2582C659D6F
 
 From: Yong Wang <edragain@163.com>
 
-Add a tc-testing regression case for IFE decode with a malformed
-ETH_P_IFE frame carrying only the minimal IFE metadata header followed
-by a truncated inner Ethernet header.
+ife decode may return after making only the outer IFE header and
+metadata pullable. The caller then passes the decapsulated packet to
+eth_type_trans(), which expects the inner Ethernet header to be
+accessible from the linear data area.
 
-The test installs an ingress flower rule with "action ife decode pipe"
-and injects an IFE frame from scapy, then verifies packet accounting
-through "tc -s -j filter show". Using JSON output makes the check less
-sensitive to formatting differences in tc's text output.
+With a malformed IFE frame, the inner Ethernet header may still be
+shorter than ETH_HLEN in the linear area, which can lead to a crash in
+the original code.
 
-To let the testcase send the larger frame shape it needs, extend
-scapyPlugin with an optional "mtu" field and apply it to the transmit
-interface before sendp(). This is needed because nsPlugin creates DEV0
-in the root namespace, so testcase setup commands executed inside the
-test namespace cannot adjust DEV0 directly.
+Fix this by extending the pull check in ife_decode() so that the inner
+Ethernet header is also guaranteed to be pullable before returning.
 
+Fixes: ef6980b6becb ("introduce IFE action")
 Cc: stable@vger.kernel.org
 Reported-by: Yuan Tan <yuantan098@gmail.com>
 Reported-by: Xin Liu <bird@lzu.edu.cn>
@@ -138,102 +136,26 @@ Signed-off-by: Yong Wang <edragain@163.com>
 Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
 Changes in v2:
-- add a tc-testing regression case for the malformed IFE decode frame
-- add an optional mtu field to scapyPlugin for the reproducer
+- move the ETH_HLEN pull check from tcf_ife_decode() into ife_decode()
+- apply Jamal's suggested total_pull + ETH_HLEN check shape
 - v1 link: https://lore.kernel.org/all/6200dc9e5ea7a85d500e72543d897c2d930fcdce.1780809474.git.edragain@163.com/
 
- .../tc-testing/plugin-lib/scapyPlugin.py      |  6 ++
- .../tc-testing/tc-tests/actions/ife.json      | 62 +++++++++++++++++++
- 2 files changed, 68 insertions(+)
+ net/ife/ife.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/tc-testing/plugin-lib/scapyPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/scapyPlugin.py
-index 254136e3da5a..e84b344dd1fa 100644
---- a/tools/testing/selftests/tc-testing/plugin-lib/scapyPlugin.py
-+++ b/tools/testing/selftests/tc-testing/plugin-lib/scapyPlugin.py
-@@ -50,5 +50,11 @@ class SubPlugin(TdcPlugin):
-             if '$' in scapyinfo['iface']:
-                 tpl = Template(scapyinfo['iface'])
-                 scapyinfo['iface'] = tpl.safe_substitute(NAMES)
-+            if 'mtu' in scapyinfo:
-+                subprocess.run(
-+                    [NAMES['IP'], 'link', 'set', 'dev',
-+                     scapyinfo['iface'], 'mtu', str(scapyinfo['mtu'])],
-+                    check=True, stdout=subprocess.DEVNULL,
-+                    stderr=subprocess.DEVNULL, env=ENVIR)
-             for count in range(scapyinfo['count']):
-                 sendp(pkt, iface=scapyinfo['iface'])
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json b/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
-index 808aef4afe22..062efbe284dc 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/ife.json
-@@ -1378,5 +1378,67 @@
-         "teardown": [
-             "$TC actions flush action ife"
-         ]
-+    },
-+    {
-+        "id": "8a7c",
-+        "name": "Decode malformed ife frame with truncated inner ethernet header",
-+        "category": [
-+            "actions",
-+            "ife",
-+            "scapy"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action ife",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc del dev $DEV1 clsact",
-+                0,
-+                1,
-+                2,
-+                255
-+            ],
-+            "$IP link set dev $DEV1 mtu 65535",
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol 0xed3e prio 1 flower action ife decode pipe"
-+        ],
-+        "cmdUnderTest": "$TC -s -j filter show dev $DEV1 ingress",
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 1,
-+            "mtu": 65535,
-+            "packet": "Ether(dst='ff:ff:ff:ff:ff:ff', type=0xED3E)/Raw(b'\\x00\\x02' + b'\\xcc' * 14 + b'\\xdd' * (5000 - 16 - 14))"
-+        },
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s -j filter show dev $DEV1 ingress",
-+        "matchJSON": [
-+            {
-+                "kind": "flower"
-+            },
-+            {
-+                "options": {
-+                    "actions": [
-+                        {
-+                            "kind": "ife",
-+                            "stats": {
-+                                "packets": 1
-+                            }
-+                        }
-+                    ]
-+                }
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-     }
- ]
+diff --git a/net/ife/ife.c b/net/ife/ife.c
+index be05b690b9ef..7a75947a31e3 100644
+--- a/net/ife/ife.c
++++ b/net/ife/ife.c
+@@ -79,7 +79,7 @@ void *ife_decode(struct sk_buff *skb, u16 *metalen)
+ 	if (unlikely(ifehdrln < 2))
+ 		return NULL;
+ 
+-	if (unlikely(!pskb_may_pull(skb, total_pull)))
++	if (unlikely(!pskb_may_pull(skb, total_pull + ETH_HLEN)))
+ 		return NULL;
+ 
+ 	ifehdr = (struct ifeheadr *)(skb->data + skb->dev->hard_header_len);
 -- 
 2.34.1
 
