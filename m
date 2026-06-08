@@ -1,275 +1,249 @@
-Return-Path: <netdev+bounces-296419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +nFfJRyAJmpJXgIAu9opvQ
-	(envelope-from <netdev+bounces-296419-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:41:00 +0200
+	id +Zv4IhZ/JmrvXQIAu9opvQ
+	(envelope-from <netdev+bounces-296420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:36:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A70D65426C
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:41:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D816541EF
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 10:36:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=Y6m5JREe;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296419-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296419-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=ep0Gdwqn;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=asSosIyv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296420-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296420-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73D2E3046737
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:33:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A7D5F3027334
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 08:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8C93AFCEA;
-	Mon,  8 Jun 2026 08:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6BA3AFD16;
+	Mon,  8 Jun 2026 08:33:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.34.181.151])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83DA30C16A;
-	Mon,  8 Jun 2026 08:33:40 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780907622; cv=none; b=DoeaaT0fhC6BiQpUHiulwXIT4T0qdOU0q91JlXER+1ZOBmrAzQrWgjCwV6e/5KNyX+0d3VroRTfY+w13fSaSAouL5UmhrD25JROxVVe5fQPQPi/A5OwiQhCJd/BOW50MmHrQxu+fzFrKmbeHt4YnmXOt/SF9drb5q5GeSIHTODA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780907622; c=relaxed/simple;
-	bh=IKZF5RhXvpth0PnDA1zu82C2S1KOp+wVNZj0LTRNO1Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VsbepA1ghjBvMBZHPBCzX7O5brMbeP/GplC14VnazjylCS+OzulX47LAZgYl/RlQ8q3TwhDVSVHwVPga+CNK74FF7ywm9l//LpRffTsQfarCAweDTebLjbmuhneyV/Y1D2PGhMBpLB+NK9lbe9hFhp7o2b8CCAKZozvD60l2jUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=Y6m5JREe; arc=none smtp.client-ip=52.34.181.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5204523C503
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 08:33:53 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780907635; cv=pass; b=a68Hc4STUleto+JMqvZYPoU0ZQtp9u+yoeYETkVK9yojDoRQJAHLWZGqu3AaYHFOll3mlcaHP+LSIQe7Nn+pz5AONTyGIdZQzdXEVeG0mdNHx6nbJLdtGzLTTFPfe+mBSlDvKP/Futn4Ba2L5kBFYspVHzF+VZifRJh+MwQ0WeA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780907635; c=relaxed/simple;
+	bh=0nqiI2Oz72uZYe6JVkcY4ic3RbUdI4EVsLX8KyD7tys=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W2+y8GA30wnSP/Yrhzc0vba7kYuSNqUnSgVADe1Yt6EaZ/KUjVHm+SxT35qtzBQdp7EHLwSEYDbDyzelzefP+rqGXXnenwldhtocxkb1yh/Ke5gd9CCs9cuBrLv0/0qF5MzeMbCrljrWdAkdBYAQh9VRNM5U1BCgL0dr9pD60bs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ep0Gdwqn; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=asSosIyv; arc=pass smtp.client-ip=205.220.180.131
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6586PTPu2808213
+	for <netdev@vger.kernel.org>; Mon, 8 Jun 2026 08:33:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	IBRH/L0+ykNXBtnHZ57xnJnQx1o5G/ly+oNHE8zUpZs=; b=ep0Gdwqnbabxu8K6
+	vqLpXcuMXTQsfH9/Sm2fdeCHBdBaTN4s7RU12o9n39I0g2fbmvRbTy5xD1YXkQNF
+	lKbsHb+7kKTBjpRr3pYVlMx/4PT0fJoTeon78XNOrHQSse9ibHz8k9QByq0gzGPm
+	bP7gbhtPXoQxoaf3e1g2CItSUNa6LLRiRBXV6xdX14ffl0CxsucYQX9163SE1uoQ
+	NkLSxDjyRbWGnqyEdB+q/Vf7MT8JggAJDj7KS+64P6HQImb+z1DMBSk5Sb5jKZNq
+	ImS8lV20Ldwz7zjWB1zXaShBAm+/nyDIiazudxq5oiCOLxHCt1wkJbbW3ntRE0eX
+	lUG+iQ==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4emb4w6vae-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 08:33:52 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-91579011fd1so595744385a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 01:33:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780907631; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YHDbqIWsDmF3XMBs+9ZA0H3nNEOhxCe70kuFSDssTDQ3w2jZmCmZh3LnxdSrbfm0m2
+         xvfk+Ums3VbvQqX2dq+fQl8/xZ0FDnLuP3XDJkgXw2CUaIey7cttQOB+RMjCkurZxY+m
+         8L143hh195lKm7WXujrSBTvKPOK/cDnj5RfV74r1BTdQs0IukTgrbhiJ9YRDEf8oUia1
+         gyV9PNRQGfUyVDgrqHFyWBSbZutReSWklb+iYIq4pDIXXI3cbjpgsyWL+ikpBVEz7NhH
+         Jn06+4m7THvUQpOJ7aoN9DjHLj3xO07aqg2woVzCvYdYFvlSul6Cfh9GeXl/SIAd/Qb3
+         3t9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IBRH/L0+ykNXBtnHZ57xnJnQx1o5G/ly+oNHE8zUpZs=;
+        fh=+U+wOP7WiTv8Ptfzga7iPb2mwP6CPiD0vkjCPr9fUL0=;
+        b=gmcNqfSS8znm1k3QQhBtknX7AwtwIOPxAfZiy5fXSbM2zrrzh/qaI9dIfkPtuZtflR
+         zDieMb5C6PgpLbirzJBhmv1idgZgz2UWv0/WTRQEKjold6B45w9A0zOYckewhJEPCKTq
+         iH42uQzQMVJoKRom9kbzp15F3q27pzf7+0lCTN9wLHrYLGz7twKDariVuYkQcfPWZuLB
+         9cZu19lUYthzf3U+sIn5fgkd+/lGE/2xWTy2R9Xe+fpgRXzeUhMgCjkV/A3yOF/UJGNT
+         jN2Hz8JP9Jc/C456NTjKVFtlSkYmh75icDRosiD9M0lIKdS6HbvrWrPRG7R1RLgM9N1G
+         HWjQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1780907620; x=1812443620;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=qngwAzncfuitbDQzUM6IN4kQok1T2y1l8ggLIdoSveU=;
-  b=Y6m5JREeIMOqWcsSWfvZmf6WRbkmMX20Ed0e7AF3KkPR4ZeToINstX+o
-   vq54EfW3gHkLeVkuXpyTI6aSd3wi9xpyldyC47FMhXBcZ8VqNj5f/3CDS
-   Ky5nFQ+Bm/ifiqnQBgeh+1Fjgx4ep2VK0CfHiHlWNz8GrygnfFrpIaOGd
-   /+r0xC+FwYqdMM4W+PyYuvnCfFWaIRxcGBhIahrxZ1JbGXrse2EdaTRdU
-   QokuZiFq86CEi5sWcRg0Da/tapgJ6V8/ueYtiAiV2A27Jz01a4nu4hOH0
-   361k0//rw9ypp4LTNm6q+XJ1rTRIXziyCd34xW0BVy6C/NzZylSsVZ0lk
-   g==;
-X-CSE-ConnectionGUID: /C18nJuPT5KmiS2vYbCH6g==
-X-CSE-MsgGUID: bFlceXtRRQCUofLR4Wzoow==
-X-IronPort-AV: E=Sophos;i="6.24,194,1774310400"; 
-   d="scan'208";a="21296664"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-007.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 08:33:38 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:12582]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.145:2525] with esmtp (Farcaster)
- id 1745114e-a832-4713-8b72-1c8955949e77; Mon, 8 Jun 2026 08:33:37 +0000 (UTC)
-X-Farcaster-Flow-ID: 1745114e-a832-4713-8b72-1c8955949e77
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 8 Jun 2026 08:33:37 +0000
-Received: from dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com
- (172.19.78.185) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 8 Jun 2026
- 08:33:35 +0000
-From: Simon Liebold <simonlie@amazon.de>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, Simon Liebold <lieboldsimonpaul@gmail.com>
-CC: Qi Tang <tpluszz77@gmail.com>, Florian Westphal <fw@strlen.de>, "Simon
- Liebold" <simonlie@amazon.de>
-Subject: [PATCH 5.10.y] xfrm: hold dev ref until after transport_finish NF_HOOK
-Date: Mon, 8 Jun 2026 08:33:23 +0000
-Message-ID: <20260608083323.2845151-1-simonlie@amazon.de>
-X-Mailer: git-send-email 2.50.1
+        d=oss.qualcomm.com; s=google; t=1780907631; x=1781512431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IBRH/L0+ykNXBtnHZ57xnJnQx1o5G/ly+oNHE8zUpZs=;
+        b=asSosIyv+vefY4nP3g+Pcywiu25HkjLyxLdl8p5LP8l3vbQEAzHH6kB/OmeMuDTPow
+         ZLVH+AAA7R3x6f3/8P5JhwPeHvUqTZpGYWp273ezpnr3vyFpFz6u1oa0FfqxZSGbUsqU
+         De7y9cWO+OkGqgcRSm1rskep1rV4fGGAiMNpHO6Nf7eZg2kZjZ3vwIBuDNMCthsq3Kp2
+         3hueSm17bx36TJa517yJudcaQsRehJcTJagrXwYBY1s5sYtWFx9XLNm769UQ38qE4dCt
+         hoC35MG/c1dzWVhzoEgr+iHD1zGQHCP9vQeX7JeMT7h8ciJ12NZHYz5F77hcC+4r4RJn
+         ONmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780907631; x=1781512431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IBRH/L0+ykNXBtnHZ57xnJnQx1o5G/ly+oNHE8zUpZs=;
+        b=cL/i4DucTIjSj4kXuAZ9UMgT1SpcpebtrfWKVEb5am87HU9nO1mhCEd7UKd05FqaQP
+         7Jp2x5SKQrtRKTAKQ6IzDMXnElYhoHfqq4ew9w6s7CPnNG2VTgjvwsoIY3tP7cmBR7B+
+         NNcFMZZs+Yhn/H+xOPIJaNyouEteSPwY8lZo2mML7C1Zda41kvdbN5lRMENy/kw8/vjs
+         kNXxJ3XGv24Wf77XP9AbaKEveMktBVIm2J7JSo8ghIVEjBVigdNGvvJ9sT3Ed3D+eDwq
+         CsjYcaPk36aeYdqHRQfHVmsOhgbhNqe6LyaGqRQAo/GUgxxn/7+Y4eIW07sGZ0uLNVQv
+         cuYA==
+X-Forwarded-Encrypted: i=1; AFNElJ96Z2+d4gb4LhViwG4LjTm6RIuvEBeUAkEw4tv+Tc1iXiNjfhGhWXNMdZkQxtT9ThAspIWuV7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4815+5eU3x1uOuHePXGka+TsZy4VSxo5wsrpZPn3uLDoIIiXN
+	fxLsl4LuI2waTrYL7aCavOJkkzIPnVlqPebhE+lEB+ZBLD97iZOgX55DGI9QKls2ZpVl4z8krk3
+	XSPGbaHnMQLaS7VNvMzMIyqOC3F4iVm5QMdGUI2K2n95blEffVklO17D5MBZXJiKps8ovavcfRw
+	avQ/ZQTnouOSKj+gH2NF1q/KT0GR2uuFCXNw==
+X-Gm-Gg: Acq92OFTWTd/eJ1kneYeNO5O9UUzPzq7ly++DV87MIOKSngVHjwDR6cGfhBkOGYJXze
+	71hpbnNWXeDB59jqHQraGo5Pko2oa+YwogKewjnfVkvtJoTEsPE5Y/1EQfYaZrMrPhIYVv9ZTRH
+	bNo9jhz7ZTHld5rTVPkXSqoeqZiGHWnsRJ8edaHZ8Ub/qThYMHcmuKgcZg8e756V8ukVpLz2Gzg
+	1+kfLg7CHXwDvi5S1QGATGExGz9pvPqnXdIZFRSWLzvi3R2FaPEBBmZrDjwbTOCei9phoeupqKR
+	xJUU+OgUsdx51ZsQX5y2V2xBlVRKZqKJ
+X-Received: by 2002:a05:620a:17a6:b0:914:ac45:a98 with SMTP id af79cd13be357-915a9c6e32bmr2219545685a.17.1780907631601;
+        Mon, 08 Jun 2026 01:33:51 -0700 (PDT)
+X-Received: by 2002:a05:620a:17a6:b0:914:ac45:a98 with SMTP id
+ af79cd13be357-915a9c6e32bmr2219542685a.17.1780907631140; Mon, 08 Jun 2026
+ 01:33:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+References: <20260607093515.3-1-ruoyuw560@gmail.com>
+In-Reply-To: <20260607093515.3-1-ruoyuw560@gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Mon, 8 Jun 2026 10:33:39 +0200
+X-Gm-Features: AVVi8Cdq2uS19grkU7T_vTFKEi0vYOKZPB1VB4gwshQzMf-1oB1BAdaKfXY16LM
+Message-ID: <CAFEp6-15U_PbgKf7zEtsMaN9JEA80fFPCc=mqmhtW4EXj8E-Jg@mail.gmail.com>
+Subject: Re: [PATCH] net: wwan: t7xx: check skb_clone in control TX
+To: Ruoyu Wang <ruoyuw560@gmail.com>
+Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+        Liu Haijun <haijun.liu@mediatek.com>,
+        Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: LCoRGEc9pNcq04qEo2lM5lGvpo0ofayo
+X-Proofpoint-GUID: LCoRGEc9pNcq04qEo2lM5lGvpo0ofayo
+X-Authority-Analysis: v=2.4 cv=YIWvDxGx c=1 sm=1 tr=0 ts=6a267e70 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
+ a=jP0pG5YJDZCNrw5WLJEA:9 a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDA3OSBTYWx0ZWRfX1JwfGu4iWNAh
+ lNfv2qxifL+iWbd9SHC7uouMq+HMIxa/+h9L11gzGYs1w9sKxjl9JyvAlcyfdRCqP9x1lK4/7Z9
+ S2GWxHIx3ee5QYz+Pg+tO7fExf0sxS4NhurEMD7gq2fIBYkH12Qf+/C0xFuc9D5w2lPsVVvxou+
+ r15T9WYj/qlV9OFNG4/kQCSxfYbz77HhcfIX3dgc/j3kz/CsJ2neGdyJOYvgT0Rw8ie94QnylZY
+ eQ/drVyQGyGhFzj8R35R2y2WCMBt90k089zSHobhE4ESgDHjUAx0PVB9vOzpGtWIUrDFrg65IpG
+ BVSKWqy6ag0R7m/dJnJzpAM6f8zvlg7oRR5wZvrjvNuXque+FLcVPLnp4j9EGyLZXZNCgQDqxfg
+ xuOtD0PRzeOqkX9S2uQUvZAYBU9OwUibHr5x/mwZ0+5RksbpbXkBOgVCJIkN0MgPmYjllFEKFx4
+ UwZBjZTDWQZ+Rvr90dA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_02,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0 impostorscore=0
+ spamscore=0 phishscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080079
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296419-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296420-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,amazon.de:mid,amazon.de:dkim,amazon.de:from_mime,amazon.de:email,strlen.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,secunet.com:email];
-	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
-	FORGED_SENDER(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:ruoyuw560@gmail.com,m:chandrashekar.devegowda@intel.com,m:haijun.liu@mediatek.com,m:ricardo.martinez@linux.intel.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,strlen.de,amazon.de];
-	DKIM_TRACE(0.00)[amazon.de:+];
+	FREEMAIL_CC(0.00)[intel.com,mediatek.com,linux.intel.com,gmail.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,oss.qualcomm.com:from_mime,oss.qualcomm.com:dkim,qualcomm.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0A70D65426C
+X-Rspamd-Queue-Id: 28D816541EF
 
-From: Qi Tang <tpluszz77@gmail.com>
+On Sun, Jun 7, 2026 at 11:35=E2=80=AFAM Ruoyu Wang <ruoyuw560@gmail.com> wr=
+ote:
+>
+> t7xx_port_ctrl_tx() clones each skb fragment before passing it to the
+> port transmit path. The clone is used immediately to set cloned->len, so
+> an skb_clone() failure results in a NULL pointer dereference.
+>
+> Check the clone before using it. If previous fragments were already
+> queued, preserve the driver's existing partial-write behavior by
+> returning the number of bytes submitted so far. Keep the existing byte
+> accounting unchanged so this patch only handles the allocation failure.
+>
 
-[ Upstream commit 1c428b03840094410c5fb6a5db30640486bbbfcb ]
+Looks like it deserves a 'Fixes' tag.
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html
 
-After async crypto completes, xfrm_input_resume() calls dev_put()
-immediately on re-entry before the skb reaches transport_finish.
-The skb->dev pointer is then used inside NF_HOOK and its okfn,
-which can race with device teardown.
+> Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
+> ---
+>  drivers/net/wwan/t7xx/t7xx_port_wwan.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/net/wwan/t7xx/t7xx_port_wwan.c b/drivers/net/wwan/t7=
+xx/t7xx_port_wwan.c
+> index 7fc569565..d2529df75 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+> @@ -106,6 +106,8 @@ static int t7xx_port_ctrl_tx(struct t7xx_port *port, =
+struct sk_buff *skb)
+>
+>         while (cur) {
+>                 cloned =3D skb_clone(cur, GFP_KERNEL);
+> +               if (!cloned)
+> +                       return cnt ? cnt : -ENOMEM;
 
-Remove the dev_put from the async resumption entry and instead
-drop the reference after the NF_HOOK call in transport_finish,
-using a saved device pointer since NF_HOOK may consume the skb.
-This covers NF_DROP, NF_QUEUE and NF_STOLEN paths that skip
-the okfn.
+This feels a bit inconsistent as the return value depends on where the
+clone fails in the loop.
+Wouldn=E2=80=99t it be clearer to either return 0 (indicating no submission=
+)
+or unconditionally return -ENOMEM on failure?
 
-For non-transport exits (decaps, gro, drop) and secondary
-async return points, release the reference inline when
-async is set.
-
-Suggested-by: Florian Westphal <fw@strlen.de>
-Fixes: acf568ee859f ("xfrm: Reinject transport-mode packets through tasklet")
-Cc: stable@vger.kernel.org
-Signed-off-by: Qi Tang <tpluszz77@gmail.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-[ net/xfrm/xfrm_input.c: dev_hold/dev_put are unconditional here rather
-than inside !crypto_done as in mainline, and the dev_put in the
-encap_type == -1 async-resumption block does not exist; adapted by
-gating dev_put at resume: with if (!async), adding if (async) dev_put
-at -EINPROGRESS return, gro_cells_receive paths, and drop label. ]
-Signed-off-by: Simon Liebold <simonlie@amazon.de>
----
- net/ipv4/xfrm4_input.c |  5 ++++-
- net/ipv6/xfrm6_input.c |  5 ++++-
- net/xfrm/xfrm_input.c  | 14 ++++++++++++--
- 3 files changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
-index 1f50517289fd..740f6510215f 100644
---- a/net/ipv4/xfrm4_input.c
-+++ b/net/ipv4/xfrm4_input.c
-@@ -48,6 +48,7 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
- {
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	struct iphdr *iph = ip_hdr(skb);
-+	struct net_device *dev = skb->dev;
- 
- 	iph->protocol = XFRM_MODE_SKB_CB(skb)->protocol;
- 
-@@ -71,8 +72,10 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
- 	}
- 
- 	NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING,
--		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
-+		dev_net(dev), NULL, skb, dev, NULL,
- 		xfrm4_rcv_encap_finish);
-+	if (async)
-+		dev_put(dev);
- 	return 0;
- }
- 
-diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-index 7dbefbb338ca..aaba607d31d5 100644
---- a/net/ipv6/xfrm6_input.c
-+++ b/net/ipv6/xfrm6_input.c
-@@ -41,6 +41,7 @@ static int xfrm6_transport_finish2(struct net *net, struct sock *sk,
- int xfrm6_transport_finish(struct sk_buff *skb, int async)
- {
- 	struct xfrm_offload *xo = xfrm_offload(skb);
-+	struct net_device *dev = skb->dev;
- 	int nhlen = skb->data - skb_network_header(skb);
- 
- 	skb_network_header(skb)[IP6CB(skb)->nhoff] =
-@@ -66,8 +67,10 @@ int xfrm6_transport_finish(struct sk_buff *skb, int async)
- 	}
- 
- 	NF_HOOK(NFPROTO_IPV6, NF_INET_PRE_ROUTING,
--		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
-+		dev_net(dev), NULL, skb, dev, NULL,
- 		xfrm6_transport_finish2);
-+	if (async)
-+		dev_put(dev);
- 	return 0;
- }
- 
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 0c3fa01ec67a..73c66b734480 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -649,10 +649,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 		else
- 			nexthdr = x->type->input(x, skb);
- 
--		if (nexthdr == -EINPROGRESS)
-+		if (nexthdr == -EINPROGRESS) {
-+			if (async)
-+				dev_put(skb->dev);
- 			return 0;
-+		}
- resume:
--		dev_put(skb->dev);
-+		if (!async)
-+			dev_put(skb->dev);
- 
- 		spin_lock(&x->lock);
- 		if (nexthdr < 0) {
-@@ -728,6 +732,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 		if (sp)
- 			sp->olen = 0;
- 		skb_dst_drop(skb);
-+		if (async)
-+			dev_put(skb->dev);
- 		gro_cells_receive(&gro_cells, skb);
- 		return 0;
- 	} else {
-@@ -746,6 +752,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 			if (sp)
- 				sp->olen = 0;
- 			skb_dst_drop(skb);
-+			if (async)
-+				dev_put(skb->dev);
- 			gro_cells_receive(&gro_cells, skb);
- 			return err;
- 		}
-@@ -756,6 +764,8 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- drop_unlock:
- 	spin_unlock(&x->lock);
- drop:
-+	if (async)
-+		dev_put(skb->dev);
- 	xfrm_rcv_cb(skb, family, x && x->type ? x->type->proto : nexthdr, -1);
- 	kfree_skb(skb);
- 	return 0;
-
-base-commit: 7adbe121223f7e32ab7e2592a72093f80f4e11a8
--- 
-2.50.1
-
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+>                 cloned->len =3D skb_headlen(cur);
+>                 ret =3D t7xx_port_send_skb(port, cloned, 0, 0);
+>                 if (ret) {
+> --
+> 2.51.0
+>
 
