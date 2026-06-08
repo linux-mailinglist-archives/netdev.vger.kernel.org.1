@@ -1,165 +1,186 @@
-Return-Path: <netdev+bounces-296785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6kAQMeRSJ2pTuwIAu9opvQ
-	(envelope-from <netdev+bounces-296785-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:40:20 +0200
+	id erUiNYtTJ2pouwIAu9opvQ
+	(envelope-from <netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:43:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEBB65B330
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:40:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6C365B359
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:43:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=multikernel-io.20251104.gappssmtp.com header.s=20251104 header.b=cDr5WnBo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296785-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296785-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=oracle.com header.s=corp-2025-04-25 header.b=jQDqKKxV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=oracle.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CB28030295B6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 23:40:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F01C03026A8E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 23:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40716341ADF;
-	Mon,  8 Jun 2026 23:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6937234041F;
+	Mon,  8 Jun 2026 23:42:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73F533BBC0
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 23:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C950C45039;
+	Mon,  8 Jun 2026 23:42:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780962015; cv=none; b=QOuMuJVmhJGML4iZMa321rf1QdGhS7fWV581+ZpYIKky3l4lZLLghHDhSFqBRQkjMK2PUTCrfu0VaZ47hsPyAGxQaCEfcsFD+BUsnUoPDeNpbYqnB5arO7XPAvUSs0Fo1BTa/PUPndYKL1eL3lCtDJpSbZhOZzo5LHvviq6Zwa8=
+	t=1780962164; cv=none; b=rK8d5F5polfBa70xJWWpCMsoIQQylImQYvNLUTH7Ih5Qb3Ps3N8JM1gqNBMOdcqG0MjAfIb6jr3XVcdcChharJYgnq2vaZQHgZDw9/4h8EfDMvtkXKrY5vP0I7rWWFHT6vsnJY/YvlGyN3dOGCAp423gY+SSrI+4qqVmhXvtNts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780962015; c=relaxed/simple;
-	bh=LWbDo1tNpzRF2EJu64QC+xXYbrCyN7SQkEugWAL/E8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CU/9Hq9YCW6xBvVCNh2BHQ/XCAIXeoD0fpVlyxK+yqdv5AFew10J/Qr1Q4pTzgNy5V9t2fpBV7Z7yGw7iIm1Fx3aNeIzf8L+8GK2dtE+Z6S8hwtFJmB0PKubcTDuvuin4pIGcfiKq6nCyvRN78Ae7rJ5FpKTxeTo0UmEfQyQtJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=multikernel.io; spf=pass smtp.mailfrom=multikernel.io; dkim=pass (2048-bit key) header.d=multikernel-io.20251104.gappssmtp.com header.i=@multikernel-io.20251104.gappssmtp.com header.b=cDr5WnBo; arc=none smtp.client-ip=74.125.82.182
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-304d7f31215so4221955eec.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 16:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=multikernel-io.20251104.gappssmtp.com; s=20251104; t=1780962013; x=1781566813; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4g/DRIeQmhcF8UCSnDGYAaCviFQymkXojIEQQcx2DQ=;
-        b=cDr5WnBoxwskt+uF8rdkxJg6OAbRKXF7LGsFo3obP37Cr7Kw+G0ZdlGNig+xaUgxjG
-         4SVcSXz4aMdxQYKhRecC1MuqcZSodRu/yRGKktTCgU6rXrGHODd8LxdeLs/HZOfz5C6U
-         B+RZ3PwY/wq9mffEUp4n8b0Dt6TwqOgHv2FaEccq0bqgeOCjzeLr4OPC9InzgzHkNTBd
-         hzKGQR58lle7NmJxoV2m2u5NF8wlDTqRDGPfEWOvAvMt7/MQr8CUJCY11dECx2R9Le20
-         xHEC/mrA8OgEVj3VUsc4rB7VE2ZGe79YlcvBNNRKwhO/uTLnQpDv6zthkSwoy2gzlMpJ
-         bzGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780962013; x=1781566813;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K4g/DRIeQmhcF8UCSnDGYAaCviFQymkXojIEQQcx2DQ=;
-        b=fQP/ydFPndvLD/ZWInm+HQz1UAkz+VhiXZACjBGEHnB9zwQ1HuqEFPBnz0o3xGoOp5
-         DuyTR49/j8hl1R+Zd3XSe4s9cKwoep9TmBaBa6OviMnjkJUCt0syBDJAjiPcKNz++ZrF
-         4RXLfUjqfolsd2q8aIB0uC8h8OCyx8tbGCkO7DJtQjyVo5YlywMn4e4DuL2icSgXZ3W8
-         g5e2w/U0VpOgC860XQyWi5As64RJWgESHvgRRPeEVDjLwdp3HMy/5a956IvMK+0PG0B1
-         LJnzn/1kgEOv5lPp8F/dDeyuPFzWMx9cDzbqcO2O3pATWWxJt2MhpnhctmYbsul/VzfH
-         C+oQ==
-X-Gm-Message-State: AOJu0Yw8IX1FG48OnmBysI4uTubK8bJNxfoK09rNhYrd/NR4+EiTkXTL
-	9d2ZXRgiNo18ioeRceqnWvTbsau7ZZXxezAtTyZn7Yz9nBbDNs9xuLk2yAYybw6oRb4=
-X-Gm-Gg: Acq92OEfiPTzGFtCHU++l2BVXF2KfvMMo3ZjeP7QA0kmj07DRD9Hcqit119cHmEHtky
-	BDH7FkTvsGLH1+GIIX4QRAxeBaFL/WK5bx5HNC43Biv+kb3PvFUaDBpTnBEv8zZwM6ysO0TNcKJ
-	Dr/w0L6FwDu0PaMvtAzjQHuxm9sBKfqQxHhZnvmLcKhHSrbQW2AcYBxZgS7iJAGw7Ex5r5qH5in
-	e3Ee5ODi3MZCzKF0KVuWH1fy4mPCNWOJ9/5K1WciCBF0p9IpHqX3qCgNO1p1mQL+RPOyeUgghTL
-	1QOSxne62nHHfaOD5G3h+l1BQpE84ySSyzuwLBR839XNKE63d/ffz4hjt0V8TooTFKtQT8nD76b
-	d7/MF0CXOYzeDNMxRZX6y72Qzq3uRZZBuCnj7t1SvJu0D+vZ8WauGJKtfv9HxdfIuyd5fgqSLeJ
-	YMsgbYSrru6awKC/sp9e7Am3yoQH+l53Tqz9sNJPJk4LYjXbvi0mwGOzoja8GJaSYf
-X-Received: by 2002:a05:7300:2311:b0:2f2:6dde:df66 with SMTP id 5a478bee46e88-3077b5a13cemr9177580eec.22.1780962012759;
-        Mon, 08 Jun 2026 16:40:12 -0700 (PDT)
-Received: from localhost ([129.210.115.107])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074db560d7sm26695452eec.5.2026.06.08.16.40.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 16:40:12 -0700 (PDT)
-Date: Mon, 8 Jun 2026 16:40:10 -0700
-From: Cong Wang <cwang@multikernel.io>
-To: DrRac27 <drrac27@riseup.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: [BUG] No cgroups in network namespace
-Message-ID: <aidS2sxy0c_Qhh4_@pop-os.localdomain>
-References: <e69b2aeb-0fb0-44a3-89b2-e4ddee16dbf2@riseup.net>
+	s=arc-20240116; t=1780962164; c=relaxed/simple;
+	bh=zgiCaXxXGVRzgNP89cYzhPkqnsgSBl8IG1Ajr12h3M0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XHuFni/tnQCd5omjQeAnsSYSXZguKnsxC9EC5ASvlzHicsO0Zgwg3mkeLHaxdifkSmVgl5kp6mR+4xNPrY3nWCOH4yr66tIKD6mBhgqNBxIXUMsd0h2oAg3WBA3/DiBSiYNnEut07dN/VTYsAYnla1aEW1MJvdDldjNElSy1OvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jQDqKKxV; arc=none smtp.client-ip=205.220.177.32
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 658HSdVc1690540;
+	Mon, 8 Jun 2026 23:42:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=ZAa2C7ZECaKPgBj3Rx8eALxC14FMM
+	ifdbPHRqlYnfpY=; b=jQDqKKxVvoNMm64LFI99ycrOmKy2use+gBnhrsMOyaS9q
+	foxqDb+Puxc4CIPdEarhoXARsTwyc6Uwe5hxcOZYSDZ2qwKl5BZA6yaqQPB4yTP/
+	Y1rSqJRXGNRUIKIExLSf6TNSZhwu0txSZh20iGIiPLwiYdNacCN+3vyb6zepVI4X
+	5ALSPQuj3nhut0c5Ss1CpXcWx+52WO2TKtzQzzouBOzvv9BXyPwVHgy94IUENzJ6
+	4mLlNcFTRXNpvDCIB5vKkjo3coxaCyaIFwSXC9dXyQp5rHp5kdTAD7Yz/f06fnyv
+	iRvmrTNSrF0Bppxpxobgt0yBNOljnWkzmlgxc4mtA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4emab4kefg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Jun 2026 23:42:25 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 658NSXbZ001362;
+	Mon, 8 Jun 2026 23:42:24 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ema0pdxdx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 08 Jun 2026 23:42:24 +0000 (GMT)
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 658NgOrx035097;
+	Mon, 8 Jun 2026 23:42:24 GMT
+Received: from mbpatil-ws.osdevelopmeniad.oraclevcn.com (mbpatil-ol10-ws.webad1iad.osdevelopmeniad.oraclevcn.com [100.100.228.95])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4ema0pdxdg-1;
+	Mon, 08 Jun 2026 23:42:24 +0000 (GMT)
+From: Manjunath Patil <manjunath.b.patil@oracle.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org, manjunath.b.patil@oracle.com
+Subject: [PATCH net-next] net/mlx5e: Report link down on administrative close
+Date: Mon,  8 Jun 2026 16:42:23 -0700
+Message-ID: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e69b2aeb-0fb0-44a3-89b2-e4ddee16dbf2@riseup.net>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_06,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999
+ adultscore=0 suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2605130000 definitions=main-2606080216
+X-Authority-Analysis: v=2.4 cv=cL/QdFeN c=1 sm=1 tr=0 ts=6a275361 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=o5oIOnhZENCTenyL_yNV:22 a=yPCof4ZbAAAA:8 a=lZAZS3N-niQ3KQdCBw4A:9
+ a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:13723
+X-Proofpoint-GUID: kv4sTv3mVoJiexyZRQrL7pzipiJT9XP-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDIxOCBTYWx0ZWRfXzdhKGvQjEc14
+ +I5ltglk/BtuK0Doz5JgXriE89bw5tIoxdLTmk7TOCWKe9k7OnAKf+8XZaiF1Cy/24NCuTLk4Yb
+ nZZE+J4A7eMmD/oHSGThAyMVzgMDOT8A9UmkJrzZl9N8wYRLiqRHomFsR8SXBhmQUIyDfErQQF7
+ qcEdNjcexw+4bFXhcBTDyk3PJadFwPBNbRLP5rtLgwbErIPHtpNfrrfMWs3gOJTQR3NQ8EZBJwO
+ nqWv/qrlGmB0rJ1vk3GPUi3tbqQO907ioATWR0exWUpavxPLr4xukmErqJd21ls30ASNcSvjApl
+ mNbZS2GN2G97ClJC1y5f5aVy2Mmf03n8HofaIvr0vtsey8NbBGFt/aF0oe/+YuQaKBlnQtgz9iM
+ kLMvsjLUOTmUVgqIekLxKRHpILDjRIqwERtjTRgVzkyx37tM9PA9hidlv4iUIgeHTdvzqXoTEKu
+ kZRmpGmfrqawzoCMLaGvioo7A5usQL0O7krUflvo=
+X-Proofpoint-ORIG-GUID: kv4sTv3mVoJiexyZRQrL7pzipiJT9XP-
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[multikernel-io.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:drrac27@riseup.net,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[multikernel.io];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296785-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[multikernel-io.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-296786-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:manjunath.b.patil@oracle.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[oracle.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:dkim,oracle.com:email,oracle.com:mid,oracle.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,multikernel.io:from_mime]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BEBB65B330
+X-Rspamd-Queue-Id: 2E6C365B359
 
-On Thu, Jun 04, 2026 at 02:47:14PM +0200, DrRac27 wrote:
-> Hey,
-> 
+mlx5e_update_carrier() reports both link-up and link-down carrier
+changes, but an administrative down does not reach it in practice. The
+close path first changes the port admin state and then clears
+MLX5E_STATE_OPENED and drops carrier silently in mlx5e_close_locked().
+Any queued carrier worker will skip update_carrier() once the device is
+no longer opened.
 
-Hi,
+This leaves "ip link set dev <dev> down" without a matching netdev
+"Link down" message, while reopening the device still reports "Link up".
 
-> 
-> I think I found a bug and wanted to let you know. If I create a network
-> namespace and enter it using iproute2 I can't use cgroupfs2:
-> 
-> $ sudo ip netns add testnetns
-> $ sudo ip netns exec testnetns stat -f -c %T /sys/fs/cgroup
-> sysfs
-> $ stat -f -c %T /sys/fs/cgroup
-> cgroup2fs
-> 
-> Is this to be expected?
+Report the link-down transition in mlx5e_close() before the common close
+helper clears the opened state and drops carrier. Guard the message with
+the current opened and carrier state to avoid duplicates when the netdev
+is already closed or carrier is already down.
 
-I think so, I guess (without digging source code) it creates a new mount
-namespace, then detaches /sys and mounts a fresh sysfs on /sys.
+Assisted-by: Codex:gpt-5
+Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+---
+Validation:
+- Built an OL8 mainline test kernel from this change.
+- Booted 7.1.0-rc6.bug123456.el8.v1.x86_64 on an mlx5-backed VM.
+- Confirmed `ip link set dev re0 down/up` and `re1 down/up` now emit
+  netdev `Link down` and `Link up` messages, alongside the existing RDMA
+  port state notifications.
 
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> 
-> I can reproduce it on Debian 13/12 as well as Arch Linux.
-> If I enter a network namespace via systemd.service (5) using
-> "NetworkNamespacePath=/run/netns/testnetns" I get my expected output:
-> "cgroupfs2" instead of "sysfs" (tested on Debian 13).
-> 
-> First reported here: https://github.com/systemd/systemd/issues/42461
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 8f2b3abe0092..a04a89f0eddf 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -3628,6 +3628,9 @@ int mlx5e_close(struct net_device *netdev)
+ 
+ 	mutex_lock(&priv->state_lock);
+ 	mlx5e_modify_admin_state(priv->mdev, MLX5_PORT_DOWN);
++	if (test_bit(MLX5E_STATE_OPENED, &priv->state) &&
++	    netif_carrier_ok(netdev))
++		netdev_info(netdev, "Link down\n");
+ 	err = mlx5e_close_locked(netdev);
+ 	mutex_unlock(&priv->state_lock);
+ 
 
-It might not re-mount hence the difference.
-
-Hope this helps.
-
-Regards,
-Cong
+base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
+-- 
+2.47.3
 
