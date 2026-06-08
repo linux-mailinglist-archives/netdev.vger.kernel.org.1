@@ -1,202 +1,298 @@
-Return-Path: <netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4eVIM3G2JmqjbgIAu9opvQ
-	(envelope-from <netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:32:49 +0200
+	id g60+BUy3JmrubgIAu9opvQ
+	(envelope-from <netdev+bounces-296527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:36:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64CE065632D
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:32:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65AB86563B6
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:36:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="lL68/l1X";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296521-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=realtek.com header.s=dkim header.b=SS5f8jJ5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296527-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296527-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realtek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E09E30861F9
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:22:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7A13304A928
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7835D3783B0;
-	Mon,  8 Jun 2026 12:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D7337B3FE;
+	Mon,  8 Jun 2026 12:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180E937881D
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591D2379C58;
+	Mon,  8 Jun 2026 12:28:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780921362; cv=none; b=qbeYM7ohjjY/FO5LeyifN+tqdZDfN0XfPDwjRZWtl6C5DyqYpgWj8z8yQIufXvJvITOPcaWYSNbVGuOOnbtEWwAlOfikZS1D/9efuob0A3a5cujNT57smM091+NXrj4ghNPeq+0h2WOaP/ECD/3p5iM5CC2wNKfcCa2Zo2BZiRQ=
+	t=1780921733; cv=none; b=CciU+TVblzd0hNqcIjfwo8xzIr+j0txAqJeSNbhGJXb/y9I0w27xDIbF0VcwIMBylVHmNfdHirxyWGFZFuhsx8AyOXIainiL2V/deQRh7ZtqJftQA9177fOk3eRWU5SXLfLmHBzKd8UuAIqfCRLFhn22SQIcMEmkb1iPxrmEJy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780921362; c=relaxed/simple;
-	bh=Dv4CwM9ZJOk/ZPx0EzS3EGyLNfcz1WIk/MBj+Uewcho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PymKfmUZrwgfHKKykuD+lU5y0z86arWrfS1ZjHMltzcXkZyiL1Y5Ao6MrUxeXJWm9NkRK878hXNjOVY+tVlBwWB+CAiZuxtSx+koLLaULC40hf1dBnjObou6zTsg4AWELrgqToGWOqno/HBj8QN1vYzRmVnFafcjA2kVKsnPYCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lL68/l1X; arc=none smtp.client-ip=209.85.222.174
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-91591f19716so543001985a.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 05:22:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780921360; x=1781526160; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSD/IG5I8Kz7SKo3TgnNWdd+GMqLGnCV42fz5tyyscg=;
-        b=lL68/l1XTnja/AgP3x2Aox8rkZ7AYsxizYpNNRhDz6wP1f6gYXWytuBr3ROgXWo9uu
-         SHxqel6LVR5RhfLZgB1g+alZu5RbwSGPd5n17tnt8QuSULg5z0Sfis17BwV1aFqoq9gV
-         rKK8R69Ws494gHx0+SL2fi7vpVeCnMNB5iqHQn1to051drjbaSvUXGs8BfVT/D0mUYBn
-         /Zu2+Cjwg7cxnWnI5HPmnUgyyXAYDBCykEaWQgZUs28pUWbJVOPO7mes593KQd+TQ2nV
-         2hy1IzrRLEGsaVuf3+gWdf5r/5b8LFyWFcbBNqpryhQT4QIDi53NjbojCfzJchbpWvTE
-         WT7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780921360; x=1781526160;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MSD/IG5I8Kz7SKo3TgnNWdd+GMqLGnCV42fz5tyyscg=;
-        b=bV1ITe9NQxtmNqHyHwGEKebDbtbQSIZsx4B6JHbG47FjmAsxR7xRQaqCotnsVeCDv8
-         Jy/NhrooteiSvJh7KCVCNRdnbsRfOpK4LPo4sMShBLoUSo5pIn+15rQOE4sI7ETujKW/
-         TOxj8c4gwOHTxuMHy0lQRLmIoWeW0FI5Ff+ihgJmPmlc+5Us6CEQpHvX4vsuPadHD2Zu
-         vbum24w4waGvZSMt6s5xJDy7bgbpU6qdlqhnYhidb3gBjb0R+nm+tXMVN8eGI+eadm5D
-         Ei+Ghrpcz5Uj0xw+u+VgvQW0yc6lEWjAMH7Qzyq0LCdF1C9QBdO+3PH1rGdzsNMXsoyP
-         K3wA==
-X-Forwarded-Encrypted: i=1; AFNElJ8xmXY6cmP4XwRzbcycgP33+YTmN8Tw3Lgo1pmD8k63ZJUr6ylPXtW6Baqyy9aYDTqaweLKTho=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWcVYl4lwC+gAihx5P7kzpGrq3G8oTDjFFz79BYoWDc0q2cban
-	2m+ZsXKakxDYxSaLfkCxURWnf373ReVJ238yWtr+/VgJzv4j8gobhxrJ
-X-Gm-Gg: Acq92OEfEFiM2VFGkVfv0CALEYNzg7VwOrjX9eu6CvHi0/n+zb0p7lNjuGdXFk2yYxd
-	YL7n4peXMKl4O99Db34KVpXzV6bKZ76WeaAFL9io0ezxUnvlepdA4dC9WwLFjSRthVGWjiUDAkm
-	IeyMI3+JUJSvUZ2GBrJRVTG6k5E2obI30iD6KzUhyTCdSZYUjAlxdDTnlb+ohTsUAWCbI/EwfDv
-	1gtBvppBpdj5amXt+CyvSDzREuadDq6+tbmG/fLU15WMneQ/vICeLeX2HDvbsUnM0TkP3TzuRjw
-	PsvYFHnRAvWS1cCawM2YJhn0a6V9IY4BLiIVVLi/t/pnfpbkeYfB7Cw9bZpjf7MBkp5bDa6ooS7
-	fDesnV/K1fAOyiONkvVzX6aHlJczO093dIIeFef+NKrH8S1gQP4OC+b1qMFY/P1w416LP2iPoby
-	XOd5eYRnYATL9q+P1ggxUcC6grI3KF5vHPbDvWwBNPaTRRYrIoOSv45tIIOlN6AQDN2K9nHWK26
-	URJlOBzKmIeg+I0kAlJVOZuQ0SEFYQ=
-X-Received: by 2002:a05:620a:28c5:b0:914:cf92:46fb with SMTP id af79cd13be357-915a9d8894amr2422734485a.32.1780921359977;
-        Mon, 08 Jun 2026 05:22:39 -0700 (PDT)
-Received: from server0 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a381febsm1691715685a.23.2026.06.08.05.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 05:22:39 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vlad Yasevich <vladislav.yasevich@hp.com>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] sctp: fix uninit-value in __sctp_rcv_asconf_lookup()
-Date: Mon,  8 Jun 2026 08:22:34 -0400
-Message-ID: <20260608122234.459098-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1780921733; c=relaxed/simple;
+	bh=hhCgifHx+p/UolaWdFdxrVFdRFynZWQm19sImxXBEVY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RdznJr9Vwhu0vzrivCC3CEZ1bq7FEh6KvgX9ohANdKj57GDm4lHxQgUqQGPAppXbG3rsbt//rE/4bD8kF0TywRRkhevXRM6Vvq14G2n8MqlbleXic7ek6SJN47i41oHrDTDSVeq2RB0T5pGEOKBk0YHJKv/yB65XLWtuDN4ut/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=SS5f8jJ5; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 658CSSo743683102, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1780921708; bh=oNkhPiG/mPVYB1Rr1dy3YgrrsdkA7y2cEZIitCzpR2Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=SS5f8jJ5lOmaSD5ivvlvLcEes3SLp4ieyTmWakyo53cyDWXiiD0Ro3+EGH6oDkFJo
+	 0ozDoOzn+dkSrgSC2bgaLamsx0ArHOuepka6CTsU1dCxQEeGySZvXue41+Fa8wjBaD
+	 oAzBqMqpadoW1aGMhfDh0R8szf/CvAuRx10bJxerd5OAeKyxUARb4SfRvmSdG+ceie
+	 p5NxiAnT0J60grzv6QPmg8PkKQxGx84uueGgWca7SA63Vbo8/deJPqpQ9mkBZdLhSX
+	 MlXYqDR2x8Hm5VXxYJjN2dq+OoIh87z3n6mjXoBCkpzXgBQsIivNFapKCWYby9Aqh9
+	 JZaxI0UIrF0pA==
+Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 658CSSo743683102
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 8 Jun 2026 20:28:28 +0800
+Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
+ RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 8 Jun 2026 20:28:28 +0800
+Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
+ RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
+ 15.02.2562.017; Mon, 8 Jun 2026 20:28:28 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: David Laight <david.laight.linux@gmail.com>
+CC: Andrew Lunn <andrew@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
+	<horms@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH] rtase: Workaround for IP fragmented UDP packet hardware
+ bug
+Thread-Topic: [PATCH] rtase: Workaround for IP fragmented UDP packet hardware
+ bug
+Thread-Index: AQHc8Y8ydZ9ThmFs6kuJK5zylfdiXbYpKbAAgATsPhD//7BLAIAApasw//+OlwCABp5KUA==
+Date: Mon, 8 Jun 2026 12:28:28 +0000
+Message-ID: <0758634ad8944162b7de0d915fcfa88e@realtek.com>
+References: <20260601062341.63981-1-justinlai0215@realtek.com>
+	<5c095b26-9720-45b0-a8d5-a8495291e45b@lunn.ch>
+	<447c46ad1f654222a8daa423149f0b89@realtek.com>
+	<20260604124606.7143581b@pumpkin>
+	<1489704deb9844b08848758af95a448e@realtek.com>
+ <20260604155308.770b2deb@pumpkin>
+In-Reply-To: <20260604155308.770b2deb@pumpkin>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296521-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:vladislav.yasevich@hp.com,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296527-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realtek.com:mid,realtek.com:dkim,realtek.com:from_mime,realtek.com:email,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64CE065632D
+X-Rspamd-Queue-Id: 65AB86563B6
 
-__sctp_rcv_asconf_lookup() in net/sctp/input.c only checks that the ASCONF
-chunk can hold the ADDIP header and a parameter header, then calls
-af->from_addr_param(), which reads the full address (16 bytes for IPv6)
-trusting the parameter's declared length.
+David Laight <david.laight.linux@gmail.com> wrote:
+>=20
+> On Thu, 4 Jun 2026 13:43:27 +0000
+> Justin Lai <justinlai0215@realtek.com> wrote:
+>=20
+> > David Laight <david.laight.linux@gmail.com> wrote:
+> > >
+> > > On Thu, 4 Jun 2026 08:33:51 +0000
+> > > Justin Lai <justinlai0215@realtek.com> wrote:
+> > >
+> > > > Andrew Lunn <andrew@lunn.ch> wrote:
+> > > > >
+> > > > > On Mon, Jun 01, 2026 at 02:23:41PM +0800, Justin Lai wrote:
+> > > > > > The hardware parser incorrectly interprets 319/320 in a short I=
+P
+> > > > > > fragmented UDP packet payload as standard PTP destination ports
+> > > > > > and treats the fragment as a PTP packet for further parsing.
+> > >
+> > > Is that a packet that has been segmented by IP, or one where the skb =
+is
+> > > fragmented enough that the data in the header is too short?
+> > > I thought that IPv4 required an mtu of 128 bytes (ish) and IPv6 somew=
+hat
+> > > larger - so I don't see how that is a problem.
+> > >
+> > > If the skb is fragmented then you need to move data into the header n=
+ot
+> pad
+> > > the frame.
+> > >
+> > > If the hardware really is broken then I suspect you need to disable t=
+he
+> feature
+> > > and suffer the consequences.
+> > >
+> > > > > >
+> > > > > > If the transport data is smaller than RTASE_MIN_PAD_LEN, the
+> > > > > > remaining data is insufficient for further parsing and causes h=
+ardware
+> TX
+> > > hang.
+> > > > >
+> > > > > Where does RTASE_SHORT_PKT_THRESH come into this?
+> > > > >
+> > > > > RTASE_MIN_PAD_LEN is 47, so matches all packets which need paddin=
+g
+> > > > > up to
+> > > > > 60 bytes, plus FCS. There are not many such packets, so why both
+> > > > > this all the complexity and just pad all small packets? Do you ha=
+ve
+> > > > > any performance numbers which show the complexity is worth it?
+> > > > >
+> > > > > > Pad these packets so the transport data reaches
+> RTASE_MIN_PAD_LEN
+> > > > > > before transmitting to avoid triggering the hardware issue.
+> > > > > >
+> > > > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > > > >
+> > > > > Is this a Fix? Please add a Fixes: tag. And base it on net.
+> > > > >
+> > > > >
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.htm
+> > > > > l
+> > > > >
+> > > > >     Andrew
+> > > > >
+> > > > > ---
+> > > > > pw-bot: cr
+> > > >
+> > > > Hi Andrew,
+> > > >
+> > > > RTASE_MIN_PAD_LEN is not the Ethernet minimum-frame padding
+> > > threshold.
+> > > > It is the minimum transport-data length required by the hardware
+> > > > parser after the packet is incorrectly detected as a PTP packet.
+> > > >
+> > > > Therefore, this workaround needs to pad the packets which can trigg=
+er
+> > > > the hardware issue, rather than just padding packets to the Etherne=
+t
+> > > > minimum frame size.
+> > >
+> > > Is that a longer length?
+> > > Excessive frame padding (beyond 60+FCS) can be treated as a protocol
+> error.
+> > >
+> > > -- David
+> > >
+> > > >
+> > > > I agree that RTASE_SHORT_PKT_THRESH is not necessary here. I will
+> > > > remove it in the next revision.
+> > > >
+> > > > Yes, this is a fix. I will add a Fixes tag and repost it against th=
+e
+> > > > net tree.
+> > > >
+> > > > Thanks,
+> > > > Justin
+> > > >
+> >
+> > Hi David,
+> >
+> > This is an IP fragmented packet, not a fragmented skb.
+>=20
+> Ok, your tests are broken for fragmented skb.
+> skb_tail_pointer() is the end of the initial fragment, not the
+> end of the actual data.
+> So you could be adding padding to a full length packet making
+> it overlong.
+> Somewhere you need to be looking at skb->len.
+> Probably with a fast-path check to ignore long packets.
+>=20
 
-An unauthenticated peer can send a truncated trailing ASCONF chunk that
-declares an IPv6 address parameter but stops after the 4-byte parameter
-header; reached from the no-association lookup path, from_addr_param() then
-reads uninitialized bytes past the parameter.
+You're right. skb_tail_pointer() only covers the linear area and can
+underestimate the transport-data length for non-linear skb.
 
-Impact: an unauthenticated SCTP peer makes the receive path read up to 16
-bytes of uninitialized memory past a truncated ASCONF address parameter.
+I will change the transport-data length calculation to use:
+trans_data_len =3D skb->len - skb_transport_offset(skb);
 
-The sibling __sctp_rcv_init_lookup() bounds parameters with
-sctp_walk_params(); this path open-codes the fetch and omits the bound.
-Verify the whole address parameter lies within the chunk before
-from_addr_param() reads it, the same class of fix as commit 51e5ad549c43
-("net: sctp: fix KMSAN uninit-value in sctp_inq_pop").
+> >
+> > The issue occurs on a non-initial IP fragment whose payload
+> > contains values matching the PTP event/general destination
+> > ports (319/320). The hardware parser incorrectly identifies the
+> > fragment as a PTP packet and attempts further parsing.
+>=20
+> Wait a minute, what stops someone using either of those port numbers
+> for something else?
+> There are no hard restrictions on the use of UDP port numbers.
+> So what does the hardware do with UDP packets to port 319/320 that
+> are being used for something else entirely?
+>=20
 
-Fixes: df2185771439 ("[SCTP]: Update association lookup to look at ASCONF chunks as well")
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
-v3:
-- Simplify to a single bounds check that the whole address parameter
-  fits in the chunk, written as an addition to avoid unsigned wrap
-  (David Laight); drop the redundant lower-bound test and the
-  param_space/plen locals (Xin Long).
-v2:
-- Regenerate from net/main so the patch has index lines and applies
-  cleanly (Xin Long).
-- Use unsigned int for the decoded length and compare it against the
-  remaining parameter space after the ADDIP header (David Laight).
-v2: https://lore.kernel.org/all/20260606183821.1688525-1-michael.bommarito@gmail.com/
-v1: https://lore.kernel.org/all/20260604175803.2142975-1-michael.bommarito@gmail.com/
+If the UDP destination port is 319 or 320, the hardware will identify
+the packet as a PTP packet and perform the corresponding PTP
+processing.
 
- net/sctp/input.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> > The workaround does not modify the IP or UDP length fields. The
+> > original protocol headers still describe the actual packet size.
+> >
+> > Therefore, the protocol-defined payload size remains unchanged.
+> >
+> > We have tested this workaround and have not observed issues
+> > caused by the additional padding.
+>=20
+> Have you checked all the systems that might receive such packets?
+>=20
 
-diff --git a/net/sctp/input.c b/net/sctp/input.c
-index e119e460ccde0..864741fae4187 100644
---- a/net/sctp/input.c
-+++ b/net/sctp/input.c
-@@ -1204,6 +1204,14 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
- 	/* Skip over the ADDIP header and find the Address parameter */
- 	param = (union sctp_addr_param *)(asconf + 1);
- 
-+	/* The whole address parameter must lie within the chunk before
-+	 * af->from_addr_param() reads the variable-length address; otherwise a
-+	 * truncated trailing ASCONF chunk lets it read uninitialized bytes past
-+	 * the parameter.
-+	 */
-+	if (sizeof(*asconf) + ntohs(param->p.length) > ntohs(ch->length))
-+		return NULL;
-+
- 	af = sctp_get_af_specific(param_type2af(param->p.type));
- 	if (unlikely(!af))
- 		return NULL;
+Could you clarify what kind of protocol error you are referring to?
 
-base-commit: 9988931df99cf5d68af360e1f23b9c674a0b1b4f
--- 
-2.53.0
+From my understanding, this workaround adds padding at the end of the
+frame without modifying the IP or UDP length fields. The
+protocol-defined packet length therefore remains unchanged.
+
+This appears similar to Ethernet frame padding, where additional bytes
+may exist beyond the protocol-defined payload length. Could you
+elaborate on how this case differs from the padding up to the Ethernet
+minimum frame size (60 bytes + FCS)?
+
+Thanks,
+Justin
+
+> -- David
+>=20
+> >
+> > Thanks,
+> > Justin
 
 
