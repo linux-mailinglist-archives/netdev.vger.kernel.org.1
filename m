@@ -1,367 +1,256 @@
-Return-Path: <netdev+bounces-296675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5qA4F6gEJ2o/qAIAu9opvQ
-	(envelope-from <netdev+bounces-296675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:06:32 +0200
+	id TRGRM/sEJ2psqAIAu9opvQ
+	(envelope-from <netdev+bounces-296676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:07:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCC96598A3
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:06:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31FCD6598C3
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 20:07:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Pr+zHCYK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296675-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296675-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=dSXiodLH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296676-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296676-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A035349C564
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 17:21:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12E7D3052E7F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 17:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AA43D7D6C;
-	Mon,  8 Jun 2026 17:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58263D7D6C;
+	Mon,  8 Jun 2026 17:26:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041003D6CA6
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 17:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9758837DEAB;
+	Mon,  8 Jun 2026 17:26:15 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780939314; cv=pass; b=j6TB2CpPd1QA2TgXSi+mbWZoub0uPDOCPJlYPzRPJ1km4XSr0dsxqUw98tbZFBFoOfRr7SxSe4veZJPZ9NsxvWiiNow98Eb9jklCee16NruxplcCVpOo6/mVAjGPoIkPYLrn8V0wksEtqfCuiMNXQK9o+I2GZo0jcg+dZhohSeE=
+	t=1780939577; cv=fail; b=rCJihz2BeS3mwIofaxBEwksybIbshVYUHSrDl8XJqXy2myX3LRUpux9PAfWmmBamuqvegnGyPw9cpO1PmxXAsppDnMgH9+Aoe1XlJqQ4EKkfXDxI5AUcPh64FW+P0TECo4sUGbcjIFZob11J024w6rnHKXrYDu0Ilm+9yfz6iNw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780939314; c=relaxed/simple;
-	bh=QhL6+Og5Q/2hRDexNOZHX54YQpZaWEITisbjv1OZ03M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UHK6g8LrZhONlnNiYDsajVN7NXsSHFBOk1jpG+3DQCHN0/SbcUFAWD1HR58Mn/RUhM4GNVgTfrA6cLIHcSEwfAMYbSgTVugRaToqlPyS/xTZXaJgxR0xwEy+3vXzIa9tP4ow3HObzN0FRkcG+K0gaBZHwNHl4xcS1cJQo3154j0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pr+zHCYK; arc=pass smtp.client-ip=74.125.82.49
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-13817614cd3so1006745c88.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 10:21:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780939312; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fiUACs1YyNvhhU2lm/TyybFtgbXAbhubgknLouf0odGiAeyL693PWGvXTTN263ZFqI
-         mD4PIziiMJPKNyBj/tymXjQSlzdqIeMl9xPhmdZpqiCkwkw2X9EtRKSeQ1hGUlwxE3e+
-         ukIFXdVO5g3hFl5+0r9zFUvEaLB/kSrvjTst1koWOiuR/Lbhs9wJjSJoYICoGU1nTHo2
-         CtJz5rWgFmamsFU8qJIg+lfMPSAXWlTRMX1sS83aggyp/joMP/PenjB8kt2gQknhAXr2
-         YwPskWbRK3VQoancVO9680g2OEQw7SSdEuA874AHSiQtXStLkI1CbRFbqMOrwoz/VYKS
-         83Tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Wd8GNmsbbskCMjCK+uQDvW4BClWHx0VSsIW/uXHLcIQ=;
-        fh=2xsvJuxyo2qBD/+odr/W7hZxPo5rVRo0Nbf/JoZ83ZI=;
-        b=YUXI4S421UjSNurcc7JJ//A4xgUnNpIAcn4nWOSAg5GfSjRJcVoP7ee/XdCS9mCMyx
-         OgQDLRg1IWEUkjC7DQhkfovaiIBDjZ4rbbS8ZSxw6VUpDj+QSiaSIDjl2eeJa+EUWTRB
-         Sbi8ZBl1Psvv/z8KMNkdXLcFLWxRc3rOkwY4q9j5hIbievCMtfK2tA5i58dmSyV7lNdv
-         M8SbESwhAjdSGz6h/KugERPNCX+5gwlE10zLzCjYxqWqR1ON+7SwZBP09Ux3FGoGXML7
-         el/+rbhicwRrSF/kxXpuv5dmwV5qG6xM0lEgAgtz2DqPjsjCN+hvShi35lVkwEopZ0RK
-         wNbQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780939312; x=1781544112; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wd8GNmsbbskCMjCK+uQDvW4BClWHx0VSsIW/uXHLcIQ=;
-        b=Pr+zHCYKZ61QQRxYPxO77pfbp9wONivQ5ufwLdbowWyUhXqeKmoOKiblLJW4SlzJQj
-         2TQFJmAlM8oeZke4LLhcdLhFA2yoeJvWwN4sVlOlSZGmqOB0iLaKSYJ9XByVPLy+ISEH
-         lMtKmDmiNwriLYzuDoeLMSqa8ccw85OEo/36sbw7LaxEOSTXmJCNUnyCgEXg9lzN9n3V
-         gmR9yOsJeYaCBnsS+1lIAB6PAVUxSg5P82CguyVXA6HSsEc8TLRBf3gqCZFbfeHpVmcS
-         8g8zZBf+XDKVqlQ967m9QL8r4SYrYHAnxHCg8LpFo+1o+tGfWiVsfwi0sBDG2G3WAGvt
-         0wNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780939312; x=1781544112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Wd8GNmsbbskCMjCK+uQDvW4BClWHx0VSsIW/uXHLcIQ=;
-        b=b/YV9URAxBo+lfDsgk5ZSzAMqYWm3lFFA/UyMTF276G6t8kX2aqsbHAEhPL1/5Itk9
-         T8dRrWTYl+0Cz3NbG/aFHqgMP1dpk35Yz8Z0H1ZA++RHC43aQGZLkeLp18R1rfhLonqX
-         Y56Jnm+q/eQPd5p1qUUNK2Yk+9RU6LOx8Sn18pmvXkhhMlloEMXKAezRkc7Z5ZCMZjpB
-         HglroHzKKrysA2ITXcVS0N7J165mIaFqkrjZdSI/SBjWEvKPZoAwDuf9U9oYWkRIKO3n
-         zwHTB0f60OF5jN5jbEdHiH5UXSxx2+QgM0UqcEcCESPYbqu4eF25olwdbXUnJQJFV9LT
-         /1Rw==
-X-Forwarded-Encrypted: i=1; AFNElJ+O8Tm0Kptgp7/RwmVSmCvbq2TkbcwB+nD0Azv+etce8rQ7E+17do0MdI/zjPLYDN+8cu4IdSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp/xCHu634Lk8x7qLhz7DL5hl5Z8/CqV3XdXemNJqjwFgzSFeg
-	t698jTanJ1LZqpr95djPE1CGC5fTzyVnLlUNpKVBY4YV6OQ72eAMZnledLCBic+0vn1jj7fcmR9
-	GMtWBIqmQsaSAChr4pLp2cUExBysn7Ag5iZCnexQY
-X-Gm-Gg: Acq92OGlJJFKBTT+tjdCDnZSLLecrSEE7rQx/v1iQ1CT0tn6Np+h8zxHP+8p9rYHoRg
-	xd3xsWCcNv0fgTvJsnBdptObH6Nsr35MaRGboRlIwEFQSgAa/fAL3K7Ur9CIDl7wjaoOT7F8rOf
-	HsbMytlaCgbh4ZCp18Rs0pS3i4BlxKlX3XQUAF2t0uc4lCOeZcM437YvQ3gPcZir2UqTawzQVWH
-	j5zTeumVppazQY4gK8yXK0JKJepu4Jh82HaFW0acZOzLDRFAkOCyG4DY2h+gvfHNlpFbdE/5i7a
-	PkXft5Cnff4TxApg6vAQqoTomateSPu3yyEpxHYm2SlmXa/zn1nPbrW7T6/leq2lORoEroYB4hd
-	0/yhTJ4ruVeapqywZ8RUabnkfiOQwWkxIWnfsmH9mp7C1DrL+uPX0FZoIhUI57HTjrTpF7HQ=
-X-Received: by 2002:a05:7022:439a:b0:137:ef27:e2b1 with SMTP id
- a92af1059eb24-13806731a20mr8368591c88.29.1780939311188; Mon, 08 Jun 2026
- 10:21:51 -0700 (PDT)
+	s=arc-20240116; t=1780939577; c=relaxed/simple;
+	bh=u+q8E8dSqkChZYbTGPo4s2ZmYXueojbCAK+xzrnZf2Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UfFq28HIJCEVNP6uWTH3TQzmnq4G4CdEfFBjQrjjeund2wZncaBb6nBPWj8Lz8AaiNeIfvKNnxnMjew9WWOQxoPkYod7W7Pd0kWkR0NFiyMUMmHIhibeTOLmRgAgqIOGVZda18ItaqJ+5wmJ4TkvFupgLQBgjB6TvG4NERy8w10=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dSXiodLH; arc=fail smtp.client-ip=198.175.65.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780939575; x=1812475575;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=u+q8E8dSqkChZYbTGPo4s2ZmYXueojbCAK+xzrnZf2Q=;
+  b=dSXiodLHv3OUYa5DpXQ0+HADMsxD3Q/WoMQPR0iOqmvyi0MMkYhbGV6u
+   kCQLOwq4dfyLGqmlKQ4mu27SPHUpabUpapRSTBZFqOQQvNmz6OAStJKWH
+   AjAhj7G33jFxo8u+0gxa8k8DWWOa2UOJRI9vl0ccCJC/eQtyyuw8yUj2x
+   HUeaEDWaoNcHxKtQQ8u+Id6V+oHQyeo+XENHwGV9+fADhduDymBq4ehZH
+   rnPlDIwUxVGpWYF168wk0NCRoOCJBz58En75GZ1oAg5J7Ib7BizzgJnOw
+   lganEBkd8RduuQzr5TmJW4WkyvwN1LUwcwM1rRuv6yY+N8OdfFi8cGjmU
+   w==;
+X-CSE-ConnectionGUID: AvC6PjiuR92Tk4VrFjvGUQ==
+X-CSE-MsgGUID: v/9/wOhCTyaVyb5eACKEAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="99099673"
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="99099673"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 10:26:15 -0700
+X-CSE-ConnectionGUID: oY2nz4NBS5yv8lYGAOejrQ==
+X-CSE-MsgGUID: EzsV5MI8Tl2xOeuFhWUuvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="250523394"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 10:23:11 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 10:23:10 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 8 Jun 2026 10:23:10 -0700
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.66) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 10:23:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lZDpL+NQRffGXi8AIwhcPMw1nKgknUNw+tJiBhBu2LLU7HO9k3g5pDlPPfiXt6vvq6ltvUG1RcypqLWmwaCK9v235LoCCM5mXZ/r7b/P4LOeR/mZa3usulCuiQOynqT3DgYGFbh8GAjipPCnhO4Ro6HtEMbPg+ODKD6LQ+u/n48ptgee0/xrhVOqWcA7Jss0APb6wcHH9gEMu8Y7BnkZaJWXrlfDE6yUwex3hVC9UbqL0H1riwGnT/lvtqMFR9ppJ+R4cJSanlpe7791lGcg7Sqae5Ga8bRh7pqucvMD+OThJqJrccu7Wx8bA9hoP0Qkt6/s+lsk+/C1lPjPkvIWmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u+q8E8dSqkChZYbTGPo4s2ZmYXueojbCAK+xzrnZf2Q=;
+ b=eXMc0trzg1cE14m11De0mk+5E9VxD8Q5iTcP+BpXVzUmAfznw8N+xu+sMM6Cm+bndw8wt7FWjKSS1FVZN81TQB1lWFb5CV7J5dNW3lhk4/bnVjL2jxgS9OwmyIh9MnJQy6IeNYJp5eDeOcyzAFLKXcnL9DC6UPlYGq3JI/LB8R2wgHHdvGZ4etNGA0x0jP0VtIyBit1xeIrtOjJt+3RmMeszdHgqPoBIBQhkyjSM4sTR4ituAJZVlhBiw/Z2gSkXO7aAQeAR0rWiX2Iw7u380qSDD6BJiuAzj56RCxGd3pWXUayL1hCYxhEJYZWcUglAbOYX4sD3C0VbPNLWXCaFcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
+ by PH0PR11MB5190.namprd11.prod.outlook.com (2603:10b6:510:3c::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
+ 17:23:06 +0000
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::6f05:5b37:2440:556e%5]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
+ 17:23:05 +0000
+From: "Salin, Samuel" <samuel.salin@intel.com>
+To: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Ilichev, Konstantin"
+	<konstantin.ilichev@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Korba, Przemyslaw"
+	<przemyslaw.korba@intel.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] idpf: add padding to PTP
+ virtchnl structures
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] idpf: add padding to PTP
+ virtchnl structures
+Thread-Index: AQHc7CJoRPuqaFisdUObcti//luNKLY0/oDw
+Date: Mon, 8 Jun 2026 17:23:05 +0000
+Message-ID: <SJ1PR11MB6297F99ED7581F11CE048F049B1C2@SJ1PR11MB6297.namprd11.prod.outlook.com>
+References: <20260525083835.481974-1-przemyslaw.korba@intel.com>
+In-Reply-To: <20260525083835.481974-1-przemyslaw.korba@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|PH0PR11MB5190:EE_
+x-ms-office365-filtering-correlation-id: 2f25d335-bba6-4c69-6391-08dec5829a42
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|11063799006|56012099006|18002099003|22082099003;
+x-microsoft-antispam-message-info: SzbXE6b4mlKpBxBAfsFDIQVFT0qCoKf25m+VHDgZkRnXXafmprKdnvSurJTTPE7QmcVbeiQ7NJQdIIdg1EKqezG0ozgwjqm2y7DUygJF2rnofS/AAR9NuEuZ3d6RsNH8o5bTUCwnt7ghI377E1bE3RMLOOpDJ9EFlvbBgIAOKx3NwJHK44lXNIIbvS39ro6gp1fdYY5dtyt0iRSe2rc3mQFybulBYXHYHmqyjDIY6+XBR50rFqIDEVaKe/LbKyfrXmdoxwsSEYwcEwEbxJTU5KvSyoRIS/Pgy6XqWRkdK1kwDAMrqs5Xf/s1aS+KfjyoVxK2LkKHbQAliRs0yY51l6FfYe+PVOkDgt0RvEgQ5L+mOn1cnhtibnJRsJZqe3A/VLD8vE+P7WXKB4TDpw3oY/hde0FffWPkuFU6kJYSXbtn3dZ2JGe9qm5cO0n2wS0QcNklog3cupq4PADqdfKee0MeTmpdw3vBeLAFOKCEYc1jDEdxM7WgXazjP0lJy6pav4LbIpfMVx5wPu9iMBgmq1FLbHYmYfkEPVUf+Lfh0BfVEY577i5NUIYjwFTRzOwCX2lZLekTJJK+EeAcjK1DAWIQQUh5DlTSD+llygECRgTg/33n5m+JXBt8pL1s/ye6vfVLFhzx9/wx4N7ftXfRiC3yTXRkvswlk/nn2eKSIb0vz41/fcyFUjaOiglk2Z5QTa8llRmaItxAu8XRP2ND8x73wurXrcddkrpmLTR7YWwgy+F9azaKgUKNdMI0JdSi
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7X6X33kXkpE880rRu1iy1WRMmWs8HBbBEa6AL70nuRTF18DmbBKVBkA8+jyj?=
+ =?us-ascii?Q?dQKGZW16WbIpRHxR2Mtck/n3RuweOv+e7nszhFQ8puNgTFnqsNbm3chd5SBT?=
+ =?us-ascii?Q?5u6OdlRiGCc852Y3Cj0cLIdtuSVpNRYKkzdo8QbKQl6slv+PWNteuxp65gp9?=
+ =?us-ascii?Q?Cfjv7YFzicQKAQGDejVM6mYETmDEiWEAc93V3oD/KsuYbc9g4fyssrhDB8Mk?=
+ =?us-ascii?Q?qmdgY3s+iTAkhAWO4ixPKD5k44e6mQnte3qxbk4le0RbcNEReOG926BGBzqe?=
+ =?us-ascii?Q?0iUhazNepSFTia9HWyHSJeCxNVtXwrkN9DJA4uJ7MSAU3moI5utERSZjILzN?=
+ =?us-ascii?Q?tnhyu3Ffy9K8gIHS4dqpm5RRByBZ/BbYdSD/khfAgnjUgQIWBDpTxBeX3MQm?=
+ =?us-ascii?Q?P4Jijnzd7kuVSXkzNnH/eVCMXHi9tMrpEcFZOMc5haYlmhJ7MbpYhIb77YkR?=
+ =?us-ascii?Q?SwvZXrhrnl4UnpBfV9xgFqUUZ8rRA2OLa6ewOrp2skCfqwTwDYvb62kJYDwX?=
+ =?us-ascii?Q?1h89StA1POYW80IwX0S1gIHkK7fDEdgCARji8KPpC7P5dBqiFQIIZcbmYa4V?=
+ =?us-ascii?Q?fb+DHoUptkHhpxV2EWXyuYWJIGcc6OJNeI6s2WFpcciX2Ng7dQl/aWh0Meuq?=
+ =?us-ascii?Q?E7ekjd+JCEmOncObfiX0vRftBXE+DIA+DH71BlGQE4EZnBxEHvvlrOyJT2Wv?=
+ =?us-ascii?Q?gq58Z6SJx7hpJ4GveLSzJB4FlOLA6pgEB2JCJZqiZghuCRw5Y5rAsGJhPZ/v?=
+ =?us-ascii?Q?XMj0T1mFO6O/itv41Ag/r1zxEcQe/plsnTJYl6+bkN6TZu+qHhhknyS4L35Z?=
+ =?us-ascii?Q?uUpRhvq1Cv+KdYZVOrbKrrMlcigBXSyD+WBzfBxLLO7ooWiwUAzTD158XcPL?=
+ =?us-ascii?Q?fU87M6C8N+uvTbJRz1tcsDaAIj5vzZA6mVI24yOpRfvsgIXYUGtfJ/c6OCEq?=
+ =?us-ascii?Q?Sgi67qIvyFoodKRGnlSTap4Jfr1+5q3JzyBkXZnD49aiBqwzMy7b+YE0rfaW?=
+ =?us-ascii?Q?dsC+fBYqOshcUxHmRXNgclKkKCYBLcm7uEUSzIG1W9PSydCk2P1IL7WEZ0TF?=
+ =?us-ascii?Q?gIoc4RDaZBIEfM4m8EPCv+7nq2Fv5orjZepKEI7M0oXSEUOcvJ6XiEBNMlw0?=
+ =?us-ascii?Q?/nyqgdQiVsVJQcbmQyWMt3M9bVTru/GtIcnJ/Dl1Ib+QKpL00WwOF5ya/N/x?=
+ =?us-ascii?Q?bWnM3SQxy1Ttc5uIeEvBRKzFJpd1i2U1D31gpexCHhU9NFyQOJoFGvTnoKc6?=
+ =?us-ascii?Q?5c1gHNRh4gaI5qp/wn1WKTnC95KJH6PV0XuaVi3YXH5HFybTA7zZ2f1vOS+1?=
+ =?us-ascii?Q?GHs/m6ns8V7u9Mh62bhP3+RFEezsAhEgnHsBGclInPNxQTkD1hhpMrubYcgT?=
+ =?us-ascii?Q?UUE5bpymWDWuhjugqGYojNfLoMclJbhJV4EoGtBhpaSRJ+icgnOnmVgBFZjs?=
+ =?us-ascii?Q?LvEhTfdGxCxrNgpJXDVbYqT9qPtEsRunzMmLdwCA/Vg8R9Kx7uMRdyc5vwEW?=
+ =?us-ascii?Q?ettH+G+fA9Wvc04iogr6puibzkW7PZXbcZC94re3XIXT8emBBYnXoHb2MBIT?=
+ =?us-ascii?Q?/bhKGHjq0+1hzXecjw6RarJ76GuZZLT8ASFq1+o/28MzBtVBVQWD2qG5SFPA?=
+ =?us-ascii?Q?2pIWMSc2RVVVwjpVk6Q8WtS2+N17jhcPjSMiGULpljG2KhhHJ1cgp0psRplU?=
+ =?us-ascii?Q?F5cFu/C807wpeUCZCYFEqm4UYarg96vipwioSZrjjaSyg3vO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608125846.157004-1-jiayuan.chen@linux.dev> <20260608125846.157004-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20260608125846.157004-2-jiayuan.chen@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 8 Jun 2026 10:21:40 -0700
-X-Gm-Features: AVVi8CdEYEu_V10M8S7Ftf79tPIdsLj4WF1IsqTeM2icUsCKu5PzvQ1A8P3-Rcc
-Message-ID: <CAAVpQUDZoEVEX1kXok-29dzVHk=ZK_2MkZyZY8kRHCJCfAWVFg@mail.gmail.com>
-Subject: Re: [PATCH bpf v8 1/2] net: Validate protocol in skb_steal_sock() for
- BPF-assigned sockets
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, Alexei Starovoitov <ast@kernel.org>
-Cc: bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Joe Stringer <joe@wand.net.nz>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Exchange-RoutingPolicyChecked: BsAoq/P0UkdjZG5uNIPolXnL6AEBdv7VilpLyk64f34wZq9VJv6owKlbplNCW3sz3v/AtM5LKX4d6xnVbLGGcIiAU4/oTOecp7FCUHKI3EfRCV0nDrJnPyrU5zYIAMppIxKiasbEbIm6TMiaJuLFHF9XrnPuEUVxnonVnljUfYXqt1ILr4kwdtibJqLxeaWVU8+jsmuex8Tl9N/Tmw60/c9kNWmGapXTo/C2mX2HFVjSNEiu3588UJn4r/bBOLZi9iOJ9af/oIbWtJ/Bb5nvLKcaxop615Q1KrWQLx0IJNF4R/WFXfk4ZUXT+ITof/ACmG8ZhTdcSunvLU4gtWRXnQ==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f25d335-bba6-4c69-6391-08dec5829a42
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2026 17:23:05.7525
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O/G7TAAEPErn7kblsdOcUrkO96rgHQZAQki0O5Asi72Ae4LUV9gdMRz0+Y/V263yJRdoB1LNMO/ErAVeew3yAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5190
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-296675-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:joe@wand.net.nz,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296676-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:przemyslaw.korba@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:konstantin.ilichev@intel.com,m:aleksander.lobakin@intel.com,m:stable@vger.kernel.org,m:aleksandr.loktionov@intel.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,SJ1PR11MB6297.namprd11.prod.outlook.com:mid,intel.com:dkim,intel.com:email,intel.com:from_mime,osuosl.org:email];
+	FORGED_SENDER(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,wand.net.nz];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,sashiko.dev:url,vger.kernel.org:from_smtp,linux.dev:email]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EBCC96598A3
+X-Rspamd-Queue-Id: 31FCD6598C3
 
-On Mon, Jun 8, 2026 at 5:59=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.dev=
-> wrote:
->
-> bpf_sk_assign_tcp_reqsk() can assign a TCP reqsk to a non-TCP skb,
-> causing a panic when the skb enters the wrong L4 receive path [1].
-> An initial attempt tried to fix this in the BPF helper by checking
-> iph->protocol, but Sashiko [2] revealed that BPF programs can bypass
-> this check via a TOCTOU attack by modifying iph->protocol around the
-> call:
->
->     iph->protocol =3D IPPROTO_TCP;
->     bpf_sk_assign_tcp_reqsk(udp_skb, tcp_sk);
->     iph->protocol =3D IPPROTO_UDP;
->
-> Furthermore, bpf_sk_assign() has had the same class of vulnerability
-> since its introduction =E2=80=94 it can assign any socket type to any skb
-> without protocol validation.  Since the BPF helper check alone cannot
-> prevent a malicious BPF program from crashing the kernel, add protocol
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 
-I'm curious about the BPF maintainers' stance on this kind of "bug"
-where admin tries to shoot oneself in the foot.
-
-I saw Alexei said this recently, and I guess it applies here as well ?
-https://lore.kernel.org/bpf/CAADnVQLh7VEKAtckzz=3DXOVPT8ovpDQshvPPCWHDQu2OW=
-Qx27_w@mail.gmail.com/
-
----8<---
-Not every "bug" needs a fix.
-If a malicious bpf user wants to crash the kernel they will
-find a way to do so. Especially with agents.
-We cannot realistically close all of the holes.
-Right now the priority is to fix the issues that normal
-users can hit and not bots.
----8<---
-
-
-> validation in skb_steal_sock() to reject mismatched sockets regardless
-> of how they were assigned.
->
-> The check is applied to all prefetched sockets.  Early demux paths
-> already only assign matching protocols (e.g., UDP early demux only
-> assigns UDP sockets to UDP skbs), so they pass the check naturally and
-> the extra branch is negligible.
->
-> Pass the expected protocol from callers rather than extracting it from
-> the IP header.  For IPv6, walking extension headers to find the L4
-> protocol is complex and unnecessary since each caller already knows
-> the protocol it handles.
->
-> [1] https://lore.kernel.org/bpf/20260403015851.148209-1-jiayuan.chen@linu=
-x.dev/
-> [2] https://sashiko.dev/#/patchset/20260403015851.148209-1-jiayuan.chen%4=
-0linux.dev
->
-> Fixes: cf7fbe660f2d ("bpf: Add socket assign support")
-> Fixes: e472f88891ab ("bpf: tcp: Support arbitrary SYN Cookie.")
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Przemyslaw Korba
+> Sent: Monday, May 25, 2026 1:38 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Ilichev, Konstantin
+> <konstantin.ilichev@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Korba, Przemyslaw
+> <przemyslaw.korba@intel.com>; stable@vger.kernel.org; Loktionov, Aleksand=
+r
+> <aleksandr.loktionov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] idpf: add padding to PTP virtc=
+hnl
+> structures
+>=20
+> Add padding to virtchnl2 PTP structures to match the Control Plane expect=
+ed
+> message sizes:
+> * virtchnl2_ptp_get_dev_clk_time: 8 -> 16 bytes
+> * virtchnl2_ptp_set_dev_clk_time: 8 -> 16 bytes
+> * virtchnl2_ptp_get_cross_time: 16 -> 24 bytes
+>=20
+> The FW expects the above sizes and PTP negotiation fails due to the misma=
+tch.
+> Previously neither the FW nor the driver checked message/reply sizes stri=
+ctly,
+> so the problem appeared only after recent validation improvements.
+>=20
+> reproduction steps:
+> ptp4l -i <pf> -m
+> Observe: failed to open /dev/ptp0: Permission denied
+>=20
+> Fixes: bf27283ba594 ("virtchnl: add PTP virtchnl definitions")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
 > ---
->  include/net/inet6_hashtables.h |  7 ++++---
->  include/net/inet_hashtables.h  |  7 ++++---
->  include/net/request_sock.h     | 16 +++++++++++++++-
->  net/ipv4/udp.c                 |  2 +-
->  net/ipv6/udp.c                 |  2 +-
->  5 files changed, 25 insertions(+), 9 deletions(-)
->
-> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtable=
-s.h
-> index 2cc5d416bbb5a..218498373a9c1 100644
-> --- a/include/net/inet6_hashtables.h
-> +++ b/include/net/inet6_hashtables.h
-> @@ -106,12 +106,13 @@ static inline
->  struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int =
-doff,
->                               const struct in6_addr *saddr, const __be16 =
-sport,
->                               const struct in6_addr *daddr, const __be16 =
-dport,
-> -                             bool *refcounted, inet6_ehashfn_t *ehashfn)
-> +                             bool *refcounted, inet6_ehashfn_t *ehashfn,
-> +                             int protocol)
->  {
->         struct sock *sk, *reuse_sk;
->         bool prefetched;
->
-> -       sk =3D skb_steal_sock(skb, refcounted, &prefetched);
-> +       sk =3D skb_steal_sock(skb, refcounted, &prefetched, protocol);
->         if (!sk)
->                 return NULL;
->
-> @@ -153,7 +154,7 @@ static inline struct sock *__inet6_lookup_skb(struct =
-sk_buff *skb, int doff,
->         struct sock *sk;
->
->         sk =3D inet6_steal_sock(net, skb, doff, &ip6h->saddr, sport, &ip6=
-h->daddr, dport,
-> -                             refcounted, inet6_ehashfn);
-> +                             refcounted, inet6_ehashfn, IPPROTO_TCP);
->         if (IS_ERR(sk))
->                 return NULL;
->         if (sk)
-> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.=
-h
-> index 6e2fe186d0dcb..a2a044f93cc4b 100644
-> --- a/include/net/inet_hashtables.h
-> +++ b/include/net/inet_hashtables.h
-> @@ -446,12 +446,13 @@ static inline
->  struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int d=
-off,
->                              const __be32 saddr, const __be16 sport,
->                              const __be32 daddr, const __be16 dport,
-> -                            bool *refcounted, inet_ehashfn_t *ehashfn)
-> +                            bool *refcounted, inet_ehashfn_t *ehashfn,
-> +                            int protocol)
->  {
->         struct sock *sk, *reuse_sk;
->         bool prefetched;
->
-> -       sk =3D skb_steal_sock(skb, refcounted, &prefetched);
-> +       sk =3D skb_steal_sock(skb, refcounted, &prefetched, protocol);
->         if (!sk)
->                 return NULL;
->
-> @@ -494,7 +495,7 @@ static inline struct sock *__inet_lookup_skb(struct s=
-k_buff *skb,
->         struct sock *sk;
->
->         sk =3D inet_steal_sock(net, skb, doff, iph->saddr, sport, iph->da=
-ddr, dport,
-> -                            refcounted, inet_ehashfn);
-> +                            refcounted, inet_ehashfn, IPPROTO_TCP);
->         if (IS_ERR(sk))
->                 return NULL;
->         if (sk)
-> diff --git a/include/net/request_sock.h b/include/net/request_sock.h
-> index 5a9c826a7092d..c2b8c6350b624 100644
-> --- a/include/net/request_sock.h
-> +++ b/include/net/request_sock.h
-> @@ -89,9 +89,11 @@ static inline struct sock *req_to_sk(struct request_so=
-ck *req)
->   * @skb: sk_buff to steal the socket from
->   * @refcounted: is set to true if the socket is reference-counted
->   * @prefetched: is set to true if the socket was assigned from bpf
-> + * @protocol: expected L4 protocol
->   */
->  static inline struct sock *skb_steal_sock(struct sk_buff *skb,
-> -                                         bool *refcounted, bool *prefetc=
-hed)
-> +                                         bool *refcounted, bool *prefetc=
-hed,
-> +                                         int protocol)
->  {
->         struct sock *sk =3D skb->sk;
->
-> @@ -103,6 +105,18 @@ static inline struct sock *skb_steal_sock(struct sk_=
-buff *skb,
->
->         *prefetched =3D skb_sk_is_prefetched(skb);
->         if (*prefetched) {
-> +               /* A non-full socket here is either a reqsk or a
-> +                * timewait sock, both only contain sock_common and
-> +                * lack sk_protocol. Since both can only be TCP,
-> +                * use IPPROTO_TCP as the protocol.
-> +                */
-> +               if (unlikely(((sk_fullsock(sk) ? sk->sk_protocol : IPPROT=
-O_TCP) !=3D protocol))) {
-> +                       skb_orphan(skb);
-> +                       *prefetched =3D false;
-> +                       *refcounted =3D false;
-> +                       return NULL;
-> +               }
-> +
->  #if IS_ENABLED(CONFIG_SYN_COOKIES)
->                 if (sk->sk_state =3D=3D TCP_NEW_SYN_RECV && inet_reqsk(sk=
-)->syncookie) {
->                         struct request_sock *req =3D inet_reqsk(sk);
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 0ac2bf4f8759b..ceb4d29a64aca 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -2618,7 +2618,7 @@ int udp_rcv(struct sk_buff *skb)
->                 goto csum_error;
->
->         sk =3D inet_steal_sock(net, skb, sizeof(struct udphdr), saddr, uh=
-->source, daddr, uh->dest,
-> -                            &refcounted, udp_ehashfn);
-> +                            &refcounted, udp_ehashfn, IPPROTO_UDP);
->         if (IS_ERR(sk))
->                 goto no_sk;
->
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 15e032194eccc..d9c12cce5acef 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -1106,7 +1106,7 @@ INDIRECT_CALLABLE_SCOPE int udpv6_rcv(struct sk_buf=
-f *skb)
->
->         /* Check if the socket is already available, e.g. due to early de=
-mux */
->         sk =3D inet6_steal_sock(net, skb, sizeof(struct udphdr), saddr, u=
-h->source, daddr, uh->dest,
-> -                             &refcounted, udp6_ehashfn);
-> +                             &refcounted, udp6_ehashfn, IPPROTO_UDP);
->         if (IS_ERR(sk))
->                 goto no_sk;
->
-> --
-> 2.43.0
->
+> 2.47.3
+
 
