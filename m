@@ -1,215 +1,243 @@
-Return-Path: <netdev+bounces-296719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7oraAlIsJ2qxswIAu9opvQ
-	(envelope-from <netdev+bounces-296719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:55:46 +0200
+	id ovcxFOQsJ2rKswIAu9opvQ
+	(envelope-from <netdev+bounces-296720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:58:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9F965A8E1
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:55:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2D565A911
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 22:58:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=s2QqLDp9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296719-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296719-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=elRxAke6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296720-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296720-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E11803012541
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:55:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D78D0304B7F1
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 20:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4503A48C5;
-	Mon,  8 Jun 2026 20:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A783F3A8735;
+	Mon,  8 Jun 2026 20:58:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865463A1687
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 20:55:38 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780952139; cv=pass; b=nuncidn8oCvK0eEW6hLb0aiim9QBdYFyhsJwdMttYQYQIeOlZSqpGhUuSqLdJcCJjbzhnnOAZK8L1oO0TskIt7Z+bQpq6nfs933qXJkRc4D36nSaIW8fzFiaSZsYYuQ42S9TgI9ErjU3uWNoB00Z7vx1NhRG25TgLbWclrMdLdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780952139; c=relaxed/simple;
-	bh=bGtzFFBnoXEhZVNSTDAVHXSCy3yikKw674g7i910kvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ie3fnNX8KdB0LmsclquGQRn/rvqBcguNcWSCU9nodBdNXVhVr2sF3ssC60CbGz5D4s7ykSmXPAwrWppxF5YROUcRFBMjJXMsGAnPSVPi9O+kn97Kaxo46f0WM1R4vIAxKiAbW3Le3STQcvo1wflSoncCq0RoLwpvl2XlEKf+V9g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s2QqLDp9; arc=pass smtp.client-ip=74.125.82.41
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-13809223fd4so4145344c88.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:55:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780952138; cv=none;
-        d=google.com; s=arc-20240605;
-        b=k8Rez2aDbmmqS0uVNrzX8rGdpb4HZqFKEVc/SqRQofD85Hznnp0Xcx2jKNdG+2mHFv
-         69jMyfG4XtqNtbQUtCkC+wQvwhFEI6jcrCCqiGJB3hbFZbkJeUWoAZr5D3o+2zTNs683
-         Laq7C3f7R32QoY01p9A5tFRK9NMDuKNqG+dhuECL+M7an1f1c1J/pUGr7fBBThBQYSFB
-         uoKs6D50bJnSSvBKx45b9Eep4W7P1MjLJF2mSNdwPIEG6I8nkssSL9qYj+DqFbaOPg8x
-         26NnJ7cTXeNkzIDzZ5d0n1VU5N4DlYWFBTR8UO5Q90JpkI70AjpakvZ8apFx8JMS/f3K
-         RCvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cj99u35GkuQHW83anj+PxNMaqIiv5iTy7TcOXLK7r+Y=;
-        fh=yan7JvrqlO2q2JnX0JG6Qv/jYsGKBC3saSEjSg1LbVY=;
-        b=SIJq+MCgCcUL/57eQrFMZSU+TNKwJEXFvSwxpHzpg5RBFn3R9APds9M4noWuyGwKHO
-         X/KFXXuVkrW+HUxjoCLYrOemkTAGfLxGMlL2syguHxGXzjvwJ2mBVGq+d2cWK1FI9xXX
-         oH1yrI4dT6RKSVbvUDk1crcuV+/RjItmv1deF93DKrTwNTDFOFftPNWUWXbhjyjrzh25
-         yUgyX8lD22hDXutR9VQBxTB36tcqFX20WGcrIhT4VZce/Pfe1NkyI9KJ0xi1iDdgh+00
-         BAzEy0TH0EKtUk5Nuqt1EaAXjL7TrHT8SRHVL/pwUpCOa4IcyyTbYimoiOvtFiqkA8d8
-         mzGg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ADD3A873C
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 20:58:05 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780952287; cv=none; b=FcDOImREJ58JOhu/x66c1SQHC9wyjb5zZ11plzO0oUCQrITpxQfLy/K2tziZxDuf/fdZSBxiucVsOM/4ET0uXtFGXstcvrE8dSl6f9JMCGa/og2NpxkihaRkX3wH5QId/Ulo40u/42cRXlE/a5fj0wUWmjEF3GT4rEP81T3ElDA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780952287; c=relaxed/simple;
+	bh=xusiV+58yhYXd0TIdeOS6L6TQO1R1egJtOD0784EK3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XEQFAkfh2UjMeFN/E6h557kiy9J41nTZ2y6nrQJ6IAZJFQg11JEyqOMRIRjqNBqzSlnORdFpwx6uzJ89evvEXYEGZKMdJ8myeHnTaMadIOM7H7r8OO+4i8+YCn8f/Tc2zgB/UX4PdFZ0zYzSHj/3iVWK/KvUAI0w86GQs0YwGj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=elRxAke6; arc=none smtp.client-ip=209.85.128.50
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so13741755e9.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780952138; x=1781556938; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cj99u35GkuQHW83anj+PxNMaqIiv5iTy7TcOXLK7r+Y=;
-        b=s2QqLDp9XrrWOGmFJ1MKZT1i60QMzpv5ZpxkPwapPijH56t6sLElVNYhpagFn4tHhW
-         qDZQ02PjzDY+FtkwsSDmLNFSjnM3hLM/Q287EAJ/T6xU70EjB+MYhib9sP60ho4WKeWF
-         eVADLhMM2TrOgM2Th8VfqZ5xmrKaEMH2cLPOY19nhnpBQYL5J3DRZPubvIe8mGArNdsd
-         2a8SVRSdzy72XgUTQgv4Hn/sB5nTBC5qrDBjQN5U3rwD6QDeGstnQpZP06RsOK4O4Q0j
-         mnryWYSwQ5cuTcw9ZOYYenuHZH9JT2eHlY2lYUlowwWcuTAGb//PRZlpWg/xyzOUmhV3
-         1GVg==
+        d=gmail.com; s=20251104; t=1780952284; x=1781557084; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gTQ1KaXLSBsahBxfVlFwG1v0to183HWN/l7wPZfkMLE=;
+        b=elRxAke6h1gDxOQ4muoYilbVbnwCntbvWdYTJF4lNUV/fJI3eDSDu+pKvnfa6ltRh5
+         CPLRQYdFIfIDJurVEqcJytDZrU+uDycn1jxOtIpHhWD6MUQVtIBcn779duzJj4RJzHrr
+         eqTjbw+q2xF/VSiwmOKi+KeXaaA9YF7LaEdQ4JqgmT0/MglinE6n7GlRS/a68Cc3qUpG
+         lL8whf+voCHBAvptpBUYWaB8PShI4o/eDLiO/59V/qRe/2k9/VC0KnZk84QOB9RjG2Is
+         0LxY/CeZ9a17GNzOHAV4xnQMn15Dnp5hDrYMHOdMzvFiZs5dMVJ+aX2g5hsysc2wIVtO
+         Ecjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780952138; x=1781556938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cj99u35GkuQHW83anj+PxNMaqIiv5iTy7TcOXLK7r+Y=;
-        b=Et5idLH6BRWAmaucz/xRq5EyBfI/KOsQsR7pw7tL59fFfTmSLtUpUmPsPy3hjT6iIQ
-         sxST6blz1PyD6wlDGIbCEM0BJI9Z52SmKc8WG3WLA3+4yc5dF7e+pJdceyCDjsjVyQEK
-         huXkfHj3IKepj005i+hzUpn0ofLEDGqYT4NyfLEXZBkZ/Bb8B98VCctnFr6yjPUNydfO
-         DWx8XGkg0Yvx2ok+5la1YhLB7YbR2AwHcy1VXTi+dNn042UTjWRy792FUvghN9ul+MFp
-         TVANQ7z9w1jSTS5j4ua+YJGiyy+YeOL6fXgWGYEM2Vb7eRvF5yFlxoeRSaVim052N9BT
-         AdDw==
-X-Forwarded-Encrypted: i=1; AFNElJ+fL3/93sTM3v+EAYxXujLrDQFrOX80+cQp+AoJk/ceaxU1WItS0lc1JBelaj9pDmvDFMvuTu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1mgom+W7RxeFHS7rczYr6yWViVjx8IXEsmThzQNOC/R2rxLdF
-	a98ps71w1HqmPG2AwH2eGDM0WlNc531ncGf+BlW+5FaK4RaMmNO46NwpWX/82FrI6RRq3+hrMNh
-	4usjjvGYnDrXLX45Wg9JZTR1lqyKBvqYf8bgkQL71
-X-Gm-Gg: Acq92OHvPrH8dJdaCe2wsz3VFHgsar2jBzraGqdWubMnDTwsWpLnG/natRNZ8SAgwYj
-	OiXD/Q6/BCccaX+S158EPwe2YzMlH7AgUrb3YLp3M2uW5PmWm3XGFqb3akJmae2DHqmPBjXVvMW
-	30pLH6MG5r37N4SKPnkUUuj+3vooekoq6Wnx6jD9IMNV1IBhleoeLU/M7IZZwaW6yDElEB5ERJc
-	4X7EIOmDWWEI59xiaUqOmuwHaCAev7Pspm8jqsUueNnvqhsqIMcnGH4U7nrJkdSlSnCD/4xWtPj
-	918I2hHAoyufJtw72mAjZ5o4sz3gaL+zAEjY/UD8raDImnEvs2dmpJfdNgH4yPNZdjeZTp0wlw0
-	va1WzxF1UoMVJUrN25mqw9QSm/Db9epWwTMX3qLrddkQnZaLuWHMbFmR5dcuSmCsd1OcHxLE=
-X-Received: by 2002:a05:7022:fb04:b0:138:51c:c5bf with SMTP id
- a92af1059eb24-138066c6ab3mr8922615c88.15.1780952136864; Mon, 08 Jun 2026
- 13:55:36 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780952284; x=1781557084;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gTQ1KaXLSBsahBxfVlFwG1v0to183HWN/l7wPZfkMLE=;
+        b=B/BScU5syNPrTaSKvpvk301NUBggMyB5YDB/a6lUA7Yv1pEMp2Z869XCxNZu5uZcn1
+         DtBCVsdgLj3riYQRpVNrZrXs2dTLcZtYZz8wS2Z9pGNX4DY9KvL5CyGVZOzfzszIQZpe
+         YP7iogNAe6TXewFgN4iqhyzKbfzoeLUmXpKlPJl/VK7ORwYAo/lnzseqdibdvqP2v8o5
+         Z2PZXLDMtZtoUZnf9VGMEV9dtHroKDQfBLfyoJSlUfS/pD+fAzoAVSDYNwSWjr04xq8r
+         uSJzUubFA1jt5omFVxbe+YxZLtlywenKZzePjvaE3cBvq0mKc4LK7ylJIOBp++ZOcjA8
+         mV/Q==
+X-Gm-Message-State: AOJu0YxezKSbwCYk+vQIqgs/CAqgqUAiDEvUEB6JyfmFzoITj+jI+k/5
+	/CyG4aV1Zk9W3dVp+yU3nfzHzeXQPuH5bO5ALwM5R0cE9fViOezXdwY/
+X-Gm-Gg: Acq92OF8KMc6IXGh0AgbKZUJ0s4hcTBn/B2Nyy2AIihvcwrLRfjGKVjf9QecVCefwEw
+	3qRsUezAXo1MkeqT4I4P9//0yktTKBBgJxUr4VYBdYskrrWTDicFkOdZ3jlAQNtvnVqhp71s/D5
+	jV8/ApBQqjCP0dpOMx1GIjfXoK36giy/ZrxKFTW2lvflO+U6sktiV0AUdVnIC2lB7QQiIdwgZ6/
+	1YRe4cZIr8EF/zSZrmUp+MuKwresUmkWR7Suh0FCBhKSDQlefq3TUeVN6KLb8SRE22lc9aPFSpZ
+	A31OzxcVX1NzKO2Pd4F8clWoKpO918vZp6F9gAE1UHfze28o8sv6d2eZSfSaPu4j6cfZfK1/bty
+	msFp6PSofpu6bXg7MV8lanTB9jQkxo0e0X3U9wjBmy172mvLIiP/dZ83JTs6I4culSIT6LEBjqJ
+	a5nIExMUPAcNb4cTYoz9Y5srK9qqSk5wYOm+H5
+X-Received: by 2002:a05:600c:154d:b0:490:44eb:c1ec with SMTP id 5b1f17b1804b1-490c260f3cdmr278543935e9.27.1780952283959;
+        Mon, 08 Jun 2026 13:58:03 -0700 (PDT)
+Received: from builder ([2001:9e8:f105:6a16:be24:11ff:fe30:5d85])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490c2d4891csm231011875e9.1.2026.06.08.13.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2026 13:58:03 -0700 (PDT)
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>
+Subject: [PATCH net-next 0/2] net: pse-pd: add Realtek/Broadcom PSE MCU support
+Date: Mon,  8 Jun 2026 20:57:55 +0000
+Message-ID: <20260608205758.1830521-1-jelonek.jonas@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608125846.157004-1-jiayuan.chen@linux.dev>
- <20260608125846.157004-2-jiayuan.chen@linux.dev> <CAAVpQUDZoEVEX1kXok-29dzVHk=ZK_2MkZyZY8kRHCJCfAWVFg@mail.gmail.com>
- <DJ3XPJA746S5.NYKZWY1HBH8O@gmail.com>
-In-Reply-To: <DJ3XPJA746S5.NYKZWY1HBH8O@gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 8 Jun 2026 13:55:25 -0700
-X-Gm-Features: AVVi8CfcOCPt_p28nph01Kh8d_ahK1oBr_59XCUgMmWvjwIoHLnnauWUude20WM
-Message-ID: <CAAVpQUATP7S7OEZw4P_7fp5zmQO-T5jByxAfp0+YsjRENeWscg@mail.gmail.com>
-Subject: Re: [PATCH bpf v8 1/2] net: Validate protocol in skb_steal_sock() for
- BPF-assigned sockets
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Joe Stringer <joe@wand.net.nz>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:bpf@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:joe@wand.net.nz,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:alexeistarovoitov@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296719-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-296720-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonek.jonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.dev,kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,gmail.com,iogearbox.net,wand.net.nz];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,mork.no,gmail.com];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A9F965A8E1
+X-Rspamd-Queue-Id: 0B2D565A911
 
-On Mon, Jun 8, 2026 at 1:02=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Mon Jun 8, 2026 at 10:21 AM PDT, Kuniyuki Iwashima wrote:
-> > On Mon, Jun 8, 2026 at 5:59=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux=
-.dev> wrote:
-> >>
-> >> bpf_sk_assign_tcp_reqsk() can assign a TCP reqsk to a non-TCP skb,
-> >> causing a panic when the skb enters the wrong L4 receive path [1].
-> >> An initial attempt tried to fix this in the BPF helper by checking
-> >> iph->protocol, but Sashiko [2] revealed that BPF programs can bypass
-> >> this check via a TOCTOU attack by modifying iph->protocol around the
-> >> call:
-> >>
-> >>     iph->protocol =3D IPPROTO_TCP;
-> >>     bpf_sk_assign_tcp_reqsk(udp_skb, tcp_sk);
-> >>     iph->protocol =3D IPPROTO_UDP;
-> >>
-> >> Furthermore, bpf_sk_assign() has had the same class of vulnerability
-> >> since its introduction =E2=80=94 it can assign any socket type to any =
-skb
-> >> without protocol validation.  Since the BPF helper check alone cannot
-> >> prevent a malicious BPF program from crashing the kernel, add protocol
-> >
-> > I'm curious about the BPF maintainers' stance on this kind of "bug"
-> > where admin tries to shoot oneself in the foot.
-> >
-> > I saw Alexei said this recently, and I guess it applies here as well ?
-> > https://lore.kernel.org/bpf/CAADnVQLh7VEKAtckzz=3DXOVPT8ovpDQshvPPCWHDQ=
-u2OWQx27_w@mail.gmail.com/
-> >
-> > ---8<---
-> > Not every "bug" needs a fix.
-> > If a malicious bpf user wants to crash the kernel they will
-> > find a way to do so. Especially with agents.
-> > We cannot realistically close all of the holes.
-> > Right now the priority is to fix the issues that normal
-> > users can hit and not bots.
-> > ---8<---
->
-> In addition to that I have to add that skb_steal_sock() is performance
-> critical path of networking stack. Adding runtime overheard there
-> because bots can find a way to abuse the interfaces is not a good trade o=
-ff.
-> If there is no simple way to fix it completely on the bpf side
-> then we have to flag this issue as "won't fix" and move on.
+This series adds a PSE-PD driver for the microcontroller (MCU) that fronts
+the PSE silicon on a range of managed switches, together with its DT
+binding.
 
-I asked if we could fix this in the verifier but it seems difficult. [0]
-Since this is triggered only by BPF misuse, treating it as "won't fix"
-makes more sense to me.
+Hardware model
+==============
 
-[0]: https://lore.kernel.org/all/202648182730.i4ki.martin.lau@linux.dev/
+These boards do not expose the PSE chips to the host directly. A small
+microcontroller sits on an I2C/SMBus or UART bus and manages one or more PSE
+chips behind it; the host CPU only ever talks to that MCU, using a fixed
+12-byte request/response protocol with a trailing checksum. The PSE silicon
+never appears on the bus.
 
-Thanks
+The same protocol family is used by MCUs fronting Realtek PSE chips
+(RTL8238B, RTL8239, RTL8239C) and Broadcom PSE chips (BCM59111, BCM59121),
+diverging in opcode numbering and a few response layouts. The driver
+abstracts that behind a per-dialect opcode table and parser hooks, selected
+by the compatible. The specific PSE chip behind the MCU is detected at
+runtime and only influences per-chip constants (power scaling and the
+per-port cap).
+
+Why the compatible names the protocol, not the chip
+===================================================
+
+The compatibles are "realtek,pse-mcu-rtk" and "realtek,pse-mcu-bcm". This is
+a deliberate choice and the part most likely to raise questions, so the
+reasoning up front.
+
+The node names the protocol dialect, not a part:
+
+  - The DT node describes the MCU, not a PSE chip: the PSE chips are behind
+    the MCU and never appear on the bus, so naming the node after one (e.g.
+    "realtek,rtl8239") would describe hardware that isn't at that address.
+
+  - The PSE chips are, in principle, usable without this MCU (host-driven
+    directly) - different hardware with a different programming model that
+    would warrant its own binding. Claiming the PSE-chip compatibles here
+    would collide with that.
+
+  - Naming the MCU silicon is equally wrong: these are ordinary
+    general-purpose microcontrollers (GigaDevice, Nuvoton, ...) that vary
+    across boards and are not dedicated to this application.
+
+  - What is fixed, and all the driver needs at DT-parse time, is the
+    protocol dialect, so the compatible encodes exactly that. The two
+    dialects share one protocol family and one binding, kept in a single
+    "realtek" vendor namespace because this MCU front-end is found almost
+    exclusively on Realtek-based switches; a "-rtk"/"-bcm" suffix selects
+    the dialect. This follows the "google,cros-ec-*" pattern: a compatible
+    for a firmware/protocol interface implemented by varying
+    microcontrollers.
+
+One compatible per dialect spans both transports:
+
+  - The 12-byte wire protocol is identical over I2C/SMBus and UART; only the
+    plumbing differs (SMBus vs native framing on I2C, baud rate on UART),
+    and the transport is already expressed structurally by the node's parent
+    bus (i2c@... vs serial@...). A "-i2c"/"-uart" suffix would only
+    duplicate that, for a protocol that does not change across transports.
+
+  - This is the multi-transport model used by e.g. "bosch,bmi160" (one
+    compatible, separate i2c and spi drivers binding it), rather than the
+    cros-ec model of per-transport compatibles - cros-ec splits because its
+    on-wire framing genuinely differs per bus, which is not the case here.
+
+The binding documents both points as well.
+
+Testing
+=======
+
+ - Linksys LGS328MPCv2  (RTL8238B, I2C)
+ - Zyxel GS1900-10HP A1 (BCM59121, UART)
+ - Zyxel GS1900-10HP B1 (RTL8238B, UART)
+ - Zyxel XMG1915-10EP   (RTL8239C, UART)
+ - Zyxel XS1930-12HP    (RTL8239, SMBus)
+
+---
+Jonas Jelonek (2):
+  dt-bindings: net: pse-pd: add bindings for Realtek/Broadcom PSE MCU
+  net: pse-pd: add Realtek/Broadcom PSE MCU driver
+
+ .../bindings/net/pse-pd/realtek,pse-mcu.yaml  |  154 +++
+ MAINTAINERS                                   |    7 +
+ drivers/net/pse-pd/Kconfig                    |   28 +
+ drivers/net/pse-pd/Makefile                   |    3 +
+ drivers/net/pse-pd/realtek-pse-core.c         | 1002 +++++++++++++++++
+ drivers/net/pse-pd/realtek-pse-i2c.c          |  164 +++
+ drivers/net/pse-pd/realtek-pse-uart.c         |  147 +++
+ drivers/net/pse-pd/realtek-pse.h              |   70 ++
+ 8 files changed, 1575 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
+ create mode 100644 drivers/net/pse-pd/realtek-pse-core.c
+ create mode 100644 drivers/net/pse-pd/realtek-pse-i2c.c
+ create mode 100644 drivers/net/pse-pd/realtek-pse-uart.c
+ create mode 100644 drivers/net/pse-pd/realtek-pse.h
+
+
+base-commit: 903db046d5579bef0ea699eae4b279dd6455fc9f
+-- 
+2.51.0
+
 
