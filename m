@@ -1,312 +1,204 @@
-Return-Path: <netdev+bounces-296511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296512-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YZgFEfyvJmq7bAIAu9opvQ
-	(envelope-from <netdev+bounces-296511-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:05:16 +0200
+	id u1f1NBexJmr1bAIAu9opvQ
+	(envelope-from <netdev+bounces-296512-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:09:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10AE655F2D
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:05:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7E0655FC7
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:09:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=netfilter.org header.s=2025 header.b=W9xPvfGP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296511-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296511-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=SrT4oLgh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296512-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296512-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 251FB30480C3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 11:58:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB0863007F60
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38630371885;
-	Mon,  8 Jun 2026 11:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03D372ED2;
+	Mon,  8 Jun 2026 12:04:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5341332AAA0;
-	Mon,  8 Jun 2026 11:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB06372696;
+	Mon,  8 Jun 2026 12:04:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780919924; cv=none; b=lzxactqogGht+8sRTRqK0lzTnEYOSMICSA8BZInmyITSnZQSCCxnPyd6yAeKkK697ME6ISgZ3iTvH6jxsRDOCFUjAOZeydedKn9HAGtd5xW8rg4tUkoGiJmK60QceIs10fo7y51uldrRIrksQKQF/YYtE7+7wEIbhj5NALKmkyE=
+	t=1780920264; cv=none; b=rimlEvqBeN95fjZEORQTI8MJGMZpuVZbdFHV2fuXr+tQ/wzDhZd8YFFf5202XAfgZuJHQQCMuONYDWQotLL2d/oTLEWfQLSP4ZFXQOdOVTdo91nVudfShOOwxK8kjcPL27KDpNIgTuWgcuSGSoPGMN6OPmtAXTaWUH5GZzw7odo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780919924; c=relaxed/simple;
-	bh=02GfgsWj0zdga+jHPzVRb34KmbV/p+t9O0OVqsIRqCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDRbtEju+A9+RLl+dC3MZ2HIZstp2uTTaTnocMj3uScPM1+vVz/eWw1p59rmr+CCZAs37nvHFtwtsL8Jo+cpcu2s6WCGO9i/ubO278VPlwSq4rIqOUQIZ/Zcj1Dp20MLK1y76CB82ls3o0WuFbCvYYpzuN8I2d74tEEiPssqnBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=W9xPvfGP; arc=none smtp.client-ip=217.70.190.124
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id DFB2E601A4;
-	Mon,  8 Jun 2026 13:58:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1780919920;
-	bh=IoB+Ot18cd6gKVtQ6gpjAMIec1tM54RSVRw+IZ0W9cQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W9xPvfGPSrVGPCEkcSbXbtBfrQUGC2W5udHeN6hTsMk0MTmjuxNcuCokvqT1Z/x/h
-	 wrgyoro1unUH0nhnLkn0l4xJ0ak8ECR6CTu+FjhEb+Zt6nsDVbwc6Oz/ptz1RhE51P
-	 Wc5ZLkX+LcC+1isS6yckdt7Jnu+6sMwhUNHMH4+AyHgXQB0KLvb8DkgyE2skX4IK8z
-	 mVSRYjgZEwIHwMwgyy7A2jKdpfwdNSASDJvzGGjsqOEd/VEVf5K/qUDQZpg9CpwEeO
-	 XdjEqCOXRo+6dUyDWKZjCJCxr2JF7U2YMX+CIzVb7mrB396jvybe4frX09lMzZYOQZ
-	 RmCsk+LXo/x3Q==
-Date: Mon, 8 Jun 2026 13:58:37 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, fw@strlen.de,
-	horms@kernel.org
-Subject: Re: [PATCH net-next 00/15] Netfilter/IPVS updates for net-next
-Message-ID: <aiaubSEfDp_JQk_p@chamomile>
-References: <20260607094954.48892-1-pablo@netfilter.org>
+	s=arc-20240116; t=1780920264; c=relaxed/simple;
+	bh=VFTY71FmyyBAF7QSirUul8eLh4ywEUN3jYudm65Gopc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Ec9krYYN+4ACQVdJ16jlYT8cl2sdT3u9dlXbsyjwqLEXyRArXYPJUlmA44kHWOuBuxpH8qlXQwI2PhYxDinzL2yoOPRs34lK9C87RI1lnwoblRuCr+BaZ42FlSNZy2B52Y2Qpyuz0JFYb0Lu/ZsoTtcFnVH93LwcxmJXL6X3w+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SrT4oLgh; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6587nmSv1596687;
+	Mon, 8 Jun 2026 12:04:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=f9Or2Z
+	z0HzX2sqdKsSO0pvkM1+40p2vgkpOS8tr1vAc=; b=SrT4oLgh+Lz6eI7v/YRqHW
+	w+0f2niJT6mn8/nIcNdgIZJeNNVbp3fZ5kEVN7LVCrYNrBccK1c7BpLjR5GrJKUu
+	6/fULpxC3Y5pJ/dPooP9VnDHyjiBjRzKUpy1CAHJykTwDHvPlGeqC0djeVVmbFYP
+	CLvKSxDS9UE3Up3/fPFq9cqA5pwhWFEqM8A3WpH9zgeyITFuRxO2DHdo/Ox+Jb+t
+	fN6QsSXci+p4RaFLQs1IfIrKkZ7ukdyDHIJHCpTipgC573gWnGBezoomH8yo16dT
+	vXYriaUu/oP7WbwpCX6FPuolSWFM385e9WFaUnHlH/E8yD3jvkaC9T2czeobu2iw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb7qf2rd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 12:04:18 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 658Bngsp023861;
+	Mon, 8 Jun 2026 12:04:18 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4emwvpwae1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Jun 2026 12:04:18 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 658C4H0p22020820
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Jun 2026 12:04:17 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A5A4D58067;
+	Mon,  8 Jun 2026 12:04:17 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 415E258056;
+	Mon,  8 Jun 2026 12:04:16 +0000 (GMT)
+Received: from [9.123.9.7] (unknown [9.123.9.7])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Jun 2026 12:04:15 +0000 (GMT)
+Message-ID: <fdef9aaf-af56-42b1-975b-19a4c19472dd@linux.ibm.com>
+Date: Mon, 8 Jun 2026 17:34:14 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260607094954.48892-1-pablo@netfilter.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] kernel BUG in team driver: buffer overflow in
+ team_add_slave()
+From: Yeswanth Krishna <yeswanth@linux.ibm.com>
+To: netdev@vger.kernel.org, venkat88@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <3ad19e86-234c-408f-896e-0d6c774fea49@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <3ad19e86-234c-408f-896e-0d6c774fea49@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=HppG3UTS c=1 sm=1 tr=0 ts=6a26afc2 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=6i1IRE6oVdN0yyl8cBUA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: fYkDlWuD2UVKzKd4I3KTttXR0ut-jb0n
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDEwOSBTYWx0ZWRfXzNH1u+l6N4uG
+ mGMm3mzOVvIvR2symKd0+harZ2tuIyyJf9SQp4r9N8uLgHyH9Vd1AuRyBRqksJUuNkcL+36wHEI
+ Kj3VSQWQzBd006tsWpOKkndWqpD+0Aym+XF2AXiBjr2DxNlHrImtZgXBs9+la3hIliCJdHUunOl
+ 74XA3mqvTb8c8bCpYEt8QZHbKDCKnPZyhE5OviAasY8/C3xW/0tS6O6ff5srkXuwnn8DKv1ES1J
+ 2n9LGmv1Iy/cL2hW7FHiM7cW1Y3fiuZeepM2fXnvhBvzSCIjY7HF4ZgNnYymfYTPXHfNjYUkwjm
+ 2dFR1WEyXsCP/Bt/n51dQxC07WwD5m/J6F08aZ9RQVWJenY4kZYEXNTOtecBFm/50wdTaIXtXen
+ +1TFF/w7kU0nW6xk5ZhUbMRgPagWri6UaYfkkqp6/ojeGN5UUYTbxHScrCVlyfG3zLE7cJxb5Oy
+ 4iSXKWkC4lyi2FGt1mA==
+X-Proofpoint-ORIG-GUID: fYkDlWuD2UVKzKd4I3KTttXR0ut-jb0n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_03,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 malwarescore=0 impostorscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606080109
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-296511-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:fw@strlen.de,m:horms@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:venkat88@linux.ibm.com,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296512-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	RCPT_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:from_mime,linux.ibm.com:mid];
 	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yeswanth@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url,netfilter.org:from_mime,netfilter.org:dkim,chamomile:mid,vger.kernel.org:from_smtp,open-mesh.org:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C10AE655F2D
+X-Rspamd-Queue-Id: 3F7E0655FC7
 
-Hi,
+Please add this tag Reported-by: yeswanth <yeswanth@linux.ibm.com>
 
-I'm replying to Sashiko.dev comments here:
-
-* [PATCH net-next 06/15] netfilter: synproxy: fix unaligned memory access in timestamp adjustment
-
-Refers to pre-existing issue. I think this comment is not correct?
-
-* [PATCH net-next 07/15] netfilter: synproxy: protect nf_ct_seqadj_init() with conntrack lock
-
-Refers to pre-existing issue. But I think it is not correct, reopened
-connections in TIME_WAIT are killed by TCP protocol tracker, so they
-start in a clean state.
-
-It also suggests check for NULL in seqadj = nfct_seqadj(ct); this is
-related to a bug in the ct extension generation ID which is addressed
-by this batch. Anyway, Florian and me agreed that adding this NULL
-check for safety is good to go, and I have a patch fot this.
-
-* [PATCH net-next 08/15] netfilter: cttimeout: detach dataplane timeout policy and repurpose refcount
-
-Wrong comment by AI. 
-
-> Does removing this assignment cause nftables ct timeout rules to silently fail
-> if a timeout extension is already present?
-
-The ct timeout is only applied to a new conntrack that unconfirmed,
-this override semantics does not make sense to me.
-
-* [PATCH net-next 11/15] netfilter: nf_conntrack_helper: add refcounting from datapath
-
-Refer to pre-existing issue. Yes, ->destroy() is missing here and in
-ctnetlink, I will post a patch to address this. This also refer to
-ctnetlink_change_helper().
-
-* [PATCH net-next 13/15] netfilter: conntrack: call nf_ct_gre_keymap_destroy() if master helper is pptp
-
-No other helper support the .destroy callback. AI assumes other
-helpers support this callback.
-
-* [PATCH net-next 14/15] netfilter: flowtable: avoid num_encaps underflow on bridge VLAN untag
-
-Refers to pre-existing issue. Yes, this function nft_dev_path_info()
-can be made more robust when failing to build a fast path. I have a
-follow up patch for this.
-
-There is another issue with the IPVS patch that adds the conn_max
-documentation (incorrect format), Julian Anastasov is ready to send a
-follow up patch address it.
-
-Let me know, thanks.
-
-On Sun, Jun 07, 2026 at 11:49:39AM +0200, Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> The following patchset contains Netfilter/IPVS updates for net-next,
-> this contains updates to address sashiko reports in IPVS and Netfilter
-> on possible pre-existing issues. This also includes a series to add
-> refcount for ct helper and timeout to deal with a corner case scenario
-> with unconfirmed conntracks flying to nfqueue.
-> 
-> 1) Add a conn_max sysctl to IPVS to limit the maximum number of
->    connections, from Julian Anastasov.
-> 
-> 2) Use get_unaligned_be16() to access TCP MSS in nfnetlink_osf,
->    from Fernando Fernandez Mancera.
-> 
-> 3) Use {READ,WRITE}_ONCE to access helper flags from nfnetlink_helper.
-> 
-> Several patches for the synproxy infrastructure, from Fernando
-> Fernandez Mancera:
-> 
-> 4) Drop packet if TCP timestamp adjustment fails.
-> 
-> 5) Continue parsing of TCP timestamp to deal with possible duplicates.
-> 
-> 6) Use {get,put}_unaligned_be32() to acess the TCP timestamp.
-> 
-> 7) Hold ct->lock to initialize nf_ct_seqadj_init().
-> 
-> Updates for the ct timeout infrastructure, to deal with a corner case
-> for unconfirmed conntracks flying to nfqueue:
-> 
-> 8) Add a refcount to track ct timeout policy use by ct extension,
->    release the timeout until the last ct extension drops the refcnt
->    on it.
-> 
-> Similar update for the ct helper infrastructure:
-> 
-> 9) Dynamic allocation of ct helpers, as a preparation for adding
->    refcount to track ct extension use.
-> 
-> 10) Move destroy_sibling_or_exp() to nf_conntrack_proto_gre, so
->     pptp conntrack helper module removal does not make this code
->     unreachable via the helper->destroy callback. This is another
->     dependency for the new refcount coming in this series.
-> 
-> 11) Add a refcount to track use of it from the ct extension, then
->     ct helper and timeout is reachable to the connection until
->     it goes away.
-> 
-> 12) Remove the genid infrastructure in ct extensions. The primary
->     goal was to detect that a ct extension such as ct timeout and
->     ct helper went stale for unconfirmed conntrack, either because
->     object or module was removed. This deactivates all ct extensions
->     though for this unconfirmed conntrack.
-> 
-> 13) Call nf_ct_gre_keymap_destroy() if this is a master conntrack
->     with a pptp helper only.
-> 
-> sashiko.dev reports one more relevant issue when unsetting the helper
-> via ctnetlink that I will address in a follow up patch.
-> 
-> Then, two more assorted updates:
-> 
-> 14) Avoid a unlikely underflow in bridge VLAN untag, only possible
->     if buggy bridge VLAN filtering is buggy, remove WARN_ON_ONCE
->     while at it. From David Carlier.
-> 
-> 15) Use get_unaligned_be32() in nf_conntrack_tcp to access sack
->     extension, from Rosen Penev.
-> 
-> Please, pull these changes from:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-26-06-07
-> 
-> Thanks.
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit bfa3d89cc15c09f7d1581c834a5ed725189ec19f:
-> 
->   Merge tag 'batadv-next-pullrequest-20260603' of https://git.open-mesh.org/batadv (2026-06-04 19:14:35 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-06-07
-> 
-> for you to fetch changes up to d3bf9eae486490832bd08fd62ab0ac601f346bd4:
-> 
->   netfilter: nf_conntrack: use get_unaligned_be32() in tcp_sack() (2026-06-07 11:13:47 +0200)
-> 
-> ----------------------------------------------------------------
-> netfilter pull request 26-06-07
-> 
-> ----------------------------------------------------------------
-> David Carlier (1):
->       netfilter: flowtable: avoid num_encaps underflow on bridge VLAN untag
-> 
-> Fernando Fernandez Mancera (5):
->       netfilter: nfnetlink_osf: fix mss parsing on big-endian architectures
->       netfilter: synproxy: drop packets if timestamp adjustment fails
->       netfilter: synproxy: adjust duplicate timestamp options
->       netfilter: synproxy: fix unaligned memory access in timestamp adjustment
->       netfilter: synproxy: protect nf_ct_seqadj_init() with conntrack lock
-> 
-> Julian Anastasov (1):
->       ipvs: add conn_max sysctl to limit connections
-> 
-> Pablo Neira Ayuso (7):
->       netfilter: nfnetlink_cthelper: use {READ,WRITE}_ONCE for accessing helper flags
->       netfilter: cttimeout: detach dataplane timeout policy and repurpose refcount
->       netfilter: nf_conntrack_helper: dynamically allocate struct nf_conntrack_helper
->       netfilter: nf_conntrack_pptp: move GRE specific cleanup to GRE tracker
->       netfilter: nf_conntrack_helper: add refcounting from datapath
->       netfilter: conntrack: revert ct extension genid infrastructure
->       netfilter: conntrack: call nf_ct_gre_keymap_destroy() if master helper is pptp
-> 
-> Rosen Penev (1):
->       netfilter: nf_conntrack: use get_unaligned_be32() in tcp_sack()
-> 
->  Documentation/networking/ipvs-sysctl.rst       |  35 +++++++
->  include/net/ip_vs.h                            |  22 +++++
->  include/net/netfilter/ipv4/nf_conntrack_ipv4.h |   4 +
->  include/net/netfilter/nf_conntrack_extend.h    |  12 ---
->  include/net/netfilter/nf_conntrack_helper.h    |  42 ++++++---
->  include/net/netfilter/nf_conntrack_timeout.h   |  27 +++++-
->  net/ipv4/netfilter/nf_nat_snmp_basic_main.c    |  27 +++---
->  net/netfilter/ipvs/ip_vs_conn.c                |  10 +-
->  net/netfilter/ipvs/ip_vs_ctl.c                 |  53 +++++++++++
->  net/netfilter/nf_conntrack_amanda.c            |  39 +++-----
->  net/netfilter/nf_conntrack_core.c              |  92 +++++-------------
->  net/netfilter/nf_conntrack_extend.c            |  32 +------
->  net/netfilter/nf_conntrack_ftp.c               |   5 +-
->  net/netfilter/nf_conntrack_h323_main.c         | 107 +++++++++------------
->  net/netfilter/nf_conntrack_helper.c            | 125 +++++++++++++++++--------
->  net/netfilter/nf_conntrack_irc.c               |   5 +-
->  net/netfilter/nf_conntrack_netbios_ns.c        |  20 ++--
->  net/netfilter/nf_conntrack_netlink.c           |  28 ++++--
->  net/netfilter/nf_conntrack_ovs.c               |   9 +-
->  net/netfilter/nf_conntrack_pptp.c              |  83 +++-------------
->  net/netfilter/nf_conntrack_proto.c             |  15 ++-
->  net/netfilter/nf_conntrack_proto_gre.c         |  61 ++++++++++++
->  net/netfilter/nf_conntrack_proto_tcp.c         |  10 +-
->  net/netfilter/nf_conntrack_sane.c              |   5 +-
->  net/netfilter/nf_conntrack_seqadj.c            |   2 +
->  net/netfilter/nf_conntrack_sip.c               |   5 +-
->  net/netfilter/nf_conntrack_snmp.c              |  21 ++---
->  net/netfilter/nf_conntrack_tftp.c              |   5 +-
->  net/netfilter/nf_conntrack_timeout.c           |  27 +++++-
->  net/netfilter/nf_flow_table_path.c             |   3 +-
->  net/netfilter/nf_synproxy_core.c               |  40 ++++----
->  net/netfilter/nfnetlink_cthelper.c             |  79 ++++++++--------
->  net/netfilter/nfnetlink_cttimeout.c            | 112 ++++++++++------------
->  net/netfilter/nfnetlink_osf.c                  |   6 +-
->  net/netfilter/nft_ct.c                         |  10 +-
->  net/netfilter/xt_CT.c                          |   3 -
->  36 files changed, 653 insertions(+), 528 deletions(-)
-> 
+On 08/06/26 3:30 pm, Yeswanth Krishna wrote:
+> Hi Team ,
+>
+> I encountered a kernel crash while running selftests on kernel 7.1.0-rc6
+> on a POWER10 system. The crash occurs when adding a slave device to a
+> team interface, triggered by FORTIFY_SOURCE detecting a buffer overflow.
+>
+> **System Information:**
+> - Kernel: 7.1.0-rc6-160099.42-default+ (commit d548c6f4301b)
+> - Architecture: powerpc64le (ppc64le)
+> - Hardware: IBM POWER10 (9043-MRX), pSeries
+> - Config: CONFIG_FORTIFY_SOURCE=y
+>
+> **Crash Location:**
+>
+> [ 3492.897824][T77143] kernel BUG at lib/string_helpers.c:1044!
+> [ 3492.898057][T77143] NIP [c000000000ac1120] __fortify_panic+0x18/0x28
+> [ 3492.898096][T77143] [c00000000efdb350] [c00800000b857a18] 
+> team_add_slave+0xc60/0xcc0 [team]
+>
+>
+> **Call Trace:**
+>
+> __fortify_panic+0x18/0x28
+> team_add_slave+0xc60/0xcc0 [team]
+> do_set_master+0x19c/0x240
+> do_setlink.isra.0+0x388/0x1450
+> rtnl_newlink+0xac8/0x1030
+> rtnetlink_rcv_msg+0x450/0x530
+> netlink_rcv_skb+0x74/0x1b0
+> rtnetlink_rcv+0x24/0x40
+> netlink_unicast+0x2e0/0x430
+> netlink_sendmsg+0x210/0x580
+> ____sys_sendmsg+0x30c/0x470
+> ___sys_sendmsg+0x94/0xf0
+> __sys_sendmsg+0x84/0x100
+> system_call_exception+0x154/0x2b0
+>
+> **Reproducer:**
+> The crash is 100% reproducible via selftests:
+> ```bash
+> cd tools/testing/selftests
+> make -C drivers/net/team run_tests
+>
+> Please add below reported-by tag:
+> yeswanth <yeswanth@linux.ibm.com>
+>
+>
+> Thanks,
+> Yeswanth Krishna
+>
 
