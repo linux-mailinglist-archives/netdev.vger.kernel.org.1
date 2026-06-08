@@ -1,119 +1,138 @@
-Return-Path: <netdev+bounces-296730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296731-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id gX0NMzMyJ2rFtAIAu9opvQ
-	(envelope-from <netdev+bounces-296730-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:20:51 +0200
+	id QIAdKBMzJ2r2tAIAu9opvQ
+	(envelope-from <netdev+bounces-296731-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:24:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B6E865AA4F
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:20:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A00BB65AA8F
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 23:24:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JRdn8rAD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296730-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296730-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=padl.com header.s=default header.b=GuN3h7UU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296731-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296731-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=padl.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A99C3021258
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 21:20:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C2403031339
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 21:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC0D3A1692;
-	Mon,  8 Jun 2026 21:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6953A382F;
+	Mon,  8 Jun 2026 21:22:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71CE3769EB;
-	Mon,  8 Jun 2026 21:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACFE3A3826;
+	Mon,  8 Jun 2026 21:22:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780953649; cv=none; b=J1yxjog+p3SCdfn9w5gvJ8IQROKQiuCeKxi1At2o0BNcr7kaEgAoEMpe5ynmmvPaxk8oTthAtJJPDN9uuNlcwHGlKqNJm0zuKm9A52+jqBPLCkSki+0E2cT9qi8igk9VZgovxjokmD/PEor7oM+HIxNlH8EdhQiVxaiFqb/wZsA=
+	t=1780953774; cv=none; b=UDXoy9V8DV3M0tjTpnH7XQDcPcVZp0V/jzvGzlWu38WqVpPLcEJPIph9YvIX63bWhrNf7w+CZ509qYn/EcaEHz8Fr/Ahbo/LHRyhdhilLW9f6y5vDuBqiQVMU+wNw5nRuDaIYl1tcTBAbzquZBht77FES8bv1+pievAf8DyxMqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780953649; c=relaxed/simple;
-	bh=xdXrA7WuZWOFV3zOKzTZwoFD9F+YW9X/LEhJKuP2uAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YUVEGQ5miIFeoqkt4tMjpC7ra+xlpGk3yup0MRfjZiTWXjeGxwJNNMnmWHcC6xjQknoDXcv43nfs+GYO5g9Hoq5hlQNOCKJRcqUpp5ABmOhWAeQ1N3f1hmfArn7TyJIuLm2rc0ieaf6auV2cwgVCNrzQDXgrg5tmTnko2WmAA3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRdn8rAD; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1603D1F00893;
-	Mon,  8 Jun 2026 21:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780953648;
-	bh=K8SFcbQD5TdWhbK/VoBNiPVzLEY9nk+UtISgZtbEMp0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=JRdn8rADw7sfFQHPDSXGx3rlEOCMh4Qb5EVoW20Ysncbl3l7yAfELft2S3vrPBEjb
-	 rlo2dokCX2C/lqUyYlzl4kFCSTEIgzNLThSMiwPYMfhEI0vXt4rtwnnUsOg2b7KwvV
-	 zy7TnsCeFd//uNZdmStnk3n/ef3tLdv8l/ubOL9idmWO034BNXoP7I48rB7q6+2AIT
-	 gYijpoYGfllhh5YjJc7SzU3ktWQqwbHvyjAvmQnltCPYXQajVXy7vnzUme4CeJpgJB
-	 Lw7uZdiSNlRnDWvDy+53Sk1XhRj1GJ903HwC1SeDYsAbJB/w6D2zdgHn+Wba1DdkVD
-	 8lwoBN8rXP/pQ==
-Date: Mon, 8 Jun 2026 14:20:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: <jgg@ziepe.ca>, <leon@kernel.org>, <brett.creeley@amd.com>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
- <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [for-next v3 0/5] ionic: RDMA completion timestamping support
-Message-ID: <20260608142047.6deff079@kernel.org>
-In-Reply-To: <20260606050003.3648306-1-abhijit.gangurde@amd.com>
-References: <20260606050003.3648306-1-abhijit.gangurde@amd.com>
+	s=arc-20240116; t=1780953774; c=relaxed/simple;
+	bh=8EIjrvUetgeNkzalIfRFNRue5/oVT2LXCEbrwIazQkg=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Kt/65KNvYCyD9oz+n8j8tLRrWr3IaW+8jWstgzSczTBT8lFiaYNnAXk2LMUQtf5tzoQm6/UANfJpGqYxtRZJ2OLh8mXidbUaoD+dQP+dpOcARhiGTlxUgBToVP1kVU9usBAUkmx8fEyZaa9AFtTu8AFCt2yNzau0t48QkN9R/tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=GuN3h7UU; arc=none smtp.client-ip=216.154.215.154
+Received: from smtpclient.apple (119-18-22-158.771216.mel.static.aussiebb.net [119.18.22.158])
+	by us.padl.com (Postfix) with ESMTPSA id B842F60961;
+	Mon,  8 Jun 2026 17:22:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1780953762; bh=8EIjrvUetgeNkzalIfRFNRue5/oVT2LXCEbrwIazQkg=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=GuN3h7UUAl/L/yJCtI+77MqQzOTSs+3WPPcM8hK0RFgBFvgQ+dbgxExqsxp3GBHUX
+	 4xg1gE7svWnajYoSBYOb2Q23RBNVkrl8n8x1Bbs0hZ7pDSWTemgBYT4T1cpBNEPsgr
+	 V9MDWFJA8NM6Xnrbm2IMXTvroRzb+X9fVQa1qYXs6xEPO2VZt9opMhdFf7yBD8yl3J
+	 a17vMKb/EkKfx8hHrf3A5QHxMJADDs9CU1nBklLfDvjg04njwFxLZ30jTok9PEaerm
+	 hv/Vj8EpjEVIzsz5rwjgtw5u/YN+OfkEF6/OaSpsO07ymp1w4ZSD8HhcCXVamERER7
+	 N5uMPWZ2VqqXg==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
+Subject: Re: [PATCH net-next 0/2] net: dsa: mv88e6xxx: add support for dcb pcp
+ app
+From: Luke Howard <lukeh@padl.com>
+In-Reply-To: <EA180F4E-7922-4A97-8912-E2D850E7F563@padl.com>
+Date: Tue, 9 Jun 2026 07:22:22 +1000
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Russell King <linux@armlinux.org.uk>,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Cedric Jehasse <cedric.jehasse@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4BD5E3E3-DB11-489B-9B6C-14A93C406940@padl.com>
+References: <20260604-net-next-mv88e6xxx-pcp-prio-v1-0-f9d10fe6cdc8@luminex.be>
+ <EA180F4E-7922-4A97-8912-E2D850E7F563@padl.com>
+To: cedric.jehasse@luminex.be
+X-Mailer: Apple Mail (2.3826.700.81.1.4)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[padl.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[padl.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296730-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:abhijit.gangurde@amd.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:allen.hubbe@amd.com,m:nikhil.agarwal@amd.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dwmw2@infradead.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-296731-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:cedric.jehasse@gmail.com,m:cedric.jehasse@luminex.be,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[lukeh@padl.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[padl.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,infradead.org:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,padl.com:dkim,padl.com:email,padl.com:mid,padl.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6B6E865AA4F
+X-Rspamd-Queue-Id: A00BB65AA8F
 
-On Sat, 6 Jun 2026 10:29:58 +0530 Abhijit Gangurde wrote:
-> This series adds RDMA completion timestamp support for ionic.
-> 
-> It enables PHC registration for RDMA timestamp capability, exposes a PHC
-> state page for safe user-space reads, maps that PHC state through RDMA
-> ucontext mmap, and extends the RDMA CQE format to carry completion
-> timestamps.
-> 
-> With this, user space can read completion timestamps and convert them to
-> wall time with low overhead.
 
-please CC David Woodhouse <dwmw2@infradead.org> on future versions.
-Since David is working on uAPI for clocks he may have some thoughts.
+
+> On 7 Jun 2026, at 13:12, Luke Howard <lukeh@padl.com> wrote:
+>=20
+>=20
+>=20
+>> On 4 Jun 2026, at 6:30=E2=80=AFpm, Cedric Jehasse via B4 Relay =
+<devnull+cedric.jehasse.luminex.be@kernel.org> wrote:
+>>=20
+>> To me the dcb pcp app feels like the natural way to configure the pcp =
+to QPri mappings in the switch.
+>=20
+> Revisiting this, I think the DCB PCP to PRIO mapping should instead =
+configure the Port IEEE Priority Remapping registers (6352) or Ingress =
+PCP mapping (6390). There=E2=80=99s nothing in dcb-app(8) that suggests =
+to me that PRIO implies queue just because the PCP selector was used.
+
+I=E2=80=99m wrong, DCB priorities are not PCP priorities, the closest =
+analogue is QPri. Comment withdrawn.
+
+Luke=
 
