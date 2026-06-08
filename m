@@ -1,252 +1,268 @@
-Return-Path: <netdev+bounces-296661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296662-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id pv9VKVv/JmqcpQIAu9opvQ
-	(envelope-from <netdev+bounces-296661-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 19:43:55 +0200
+	id OIs1DVbyJmpgoQIAu9opvQ
+	(envelope-from <netdev+bounces-296662-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:48:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0F16595B3
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 19:43:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C72E6658E5B
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:48:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Xy9b5SKC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296661-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296661-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=BEcMt4tH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296662-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296662-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67A023062F68
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 16:35:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3FFF53036F8A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 16:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02C63BFE34;
-	Mon,  8 Jun 2026 16:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E09F3C9897;
+	Mon,  8 Jun 2026 16:35:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14913C76BB
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 16:35:06 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780936508; cv=none; b=TK1z6Py8vFOCTu9rO/bRfshvQ84FIsYDq+3jBC4JZxyRpHsvCH3TzZziE2EfINpfVariGTe9gySMIRWKztDomTq2HXIn0kMgxv13mRkHQWnbGeWP2N3kJu6PCeqTGrbM9CpJiiF0iWLRJ7FKcdZ0+cyfPCEjgY4/k37Cm30YwsQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780936508; c=relaxed/simple;
-	bh=jN1np271Ao4AkRlwEErMav6w1EbKzf6/LLnCRZAAMDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o6wYXKhNN/3EPOakJT/2o9haujmRUuTOcMICfM1g1R7UDi1H4G3f6zeFvfo7cKm4kWRNPXIQQigdX9/H90Z83hggMeYF12ezx4SM8dFa3pmQeXU8DQ4EpGl15lpRC8VIdjeu3k5jdhqjx1q5mITtaMYaByOfiwWMgtMvcs64GfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xy9b5SKC; arc=none smtp.client-ip=209.85.128.65
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-490b8adf813so4693485e9.1
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 09:35:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780936505; x=1781541305; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oXDjqEbwtW2BwTfqI4ufJTWFGFA7tEvSW3qEJJY8Oek=;
-        b=Xy9b5SKCrJ1RzoOg5+5k2K/P6GFRrF3BJkDxaSS00Igq9pNaMIqBH7tPU2EgEjiydN
-         NOwGvLdTEOqhxgo+ebfakcD4DoHVBX78rnUxa4qaSWKcea39j52CUENYcmk/j7bwmgO0
-         Mt/TiWzbkpn2eunFVXr4AEyXt9jL9OTsDH20nOMQZ42ySlsGZnbCHrffmWG3dtMHx1Uv
-         UBGv1/SHFCaVq/flXnXpJ8ndkV0za+T9FOU7c6h+dd2dc/d5omwOTJvWBWFJwTg3u+Pu
-         QBj90fVr4IDkFRiqW2k5PTkkoYS1iXgBQkAzIrqBHfzHV0NtL/8OP0ObANUAOUvXi+/E
-         1UmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780936505; x=1781541305;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oXDjqEbwtW2BwTfqI4ufJTWFGFA7tEvSW3qEJJY8Oek=;
-        b=ZCk3kLeGY64RwZ8WmpJN9T+HsnhAJuRkIHO3/MuqvU4O1otz4ttERBH7xpp0tahilE
-         lov2epbrJDMnbX3w3nf517NKrUcsJagmxdNH52OPB7XfhOvQEV+2JcPQR102ZkCEJ0MP
-         eMwO439vfUKWRKD55RmPNw24xAxVluEx7jJFKjhk0puz7AvBmdsV57XF70mCtorLo6UL
-         z1BN+GNL69sJZ9wZX6h27dEC7JAIg8HTJL+uocMKYmWSiBzsud/CB23bfiFyIFq2Za4q
-         WLVRd+ulxy3iu6X+HGDLipNQ38A0ulLZEfureMpUhL1Ss5Kc8+MowXenPS3QrlMvj2BT
-         hdGA==
-X-Gm-Message-State: AOJu0YwC9/xSkmo/HtRDbtbvd2tAK6xT+/M2JUOdtjfa+ofZT1YU6U73
-	q1DNScjduE0MjTjtXbP7zOUXvYl9B3IJ9eQCLMFKos3G8PRhs8mfNL0e8gvflZZ6G1c=
-X-Gm-Gg: Acq92OEuCo99Lt/H+fR/rzrSa2yv/jZzlMcLR8yBCPdklrDdGCjUbAwhA5b/vUTzYBt
-	dXE1rPtNp8BkVz+ri+CUIjg6UxftACL1mhS+8iOXZhtG16EXrPn6ikKpt0JevDPs/NvLrIz7Pn/
-	7cnwunyTTZZFjXdahy1GMxNgxNNSSXftlzW5xKBFwdnDO5WuRolmJx9Mh9Mk7TtjlFnWiDsEtgA
-	TrB8J2zATmiMqmQ5XNZL4ki+w/K86O2xaHaNQlLYWV1TWtETqKX0CxxeywWfbm90d1poG27Q+Pc
-	ONgqyNy8DzlHWl7G6Xa8NkNGxHkgKxNrcoHmjX8qbpXyFH4dr1IueTuHgiVrX9D2VMteC+tKN6/
-	IGOzRwVEA6tGfsIQaPhIGF7L4Iv/Rdogw/xROv4fXM6J+aM8xG11/Pv3HqBp3GIpnLcGqgM3Y4L
-	d/D7ppcMshSJT8qlfdNaXLi/C0vmfssuF18fNhrQBR5Q==
-X-Received: by 2002:a05:600c:8b0c:b0:490:6e0f:29f4 with SMTP id 5b1f17b1804b1-490c260d263mr108067065e9.3.1780936505011;
-        Mon, 08 Jun 2026 09:35:05 -0700 (PDT)
-Received: from localhost ([104.28.225.185])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc23394asm404805355e9.0.2026.06.08.09.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 09:35:04 -0700 (PDT)
-From: Mariusz Klimek <maklimek97@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	idosch@nvidia.com,
-	ncardwell@google.com,
-	shuah@kernel.org,
-	kuniyu@google.com,
-	alice@isovalent.com,
-	Mariusz Klimek <maklimek97@gmail.com>
-Subject: [PATCH net-next 00/10] tcp: support non-GSO jumbograms
-Date: Mon,  8 Jun 2026 18:33:17 +0200
-Message-ID: <20260608130755.5626-1-maklimek97@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2623C457F;
+	Mon,  8 Jun 2026 16:35:49 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780936552; cv=fail; b=PpyMqtTFNZtQLAgvjRNFVID/LDbZeAJsMvxbUyAN8gptoqZYivoioj9YpSq84YBlI1WJaEvgvPtUou8SN3yRmxIOHbVOhxQ0AGQhWY+cd/zDvtCib0O+b5Z57PXHB/1VUPNPIHUXukVQCDPa9tZ5MS+BrKLJYk+BnKokp6IzHGE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780936552; c=relaxed/simple;
+	bh=f9v9k62514IrMIbhZlbkEIsavcPfA/GktWG99cpAzz4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PDHYCF/udtzDU2Yvzmp4hzi8ewAb5R2OYAjg2icq4ruXIkxdrKCrwpMqOxfGJerC1jC2ulnSg3iW0uBZKzBbq49TiLp/4l2GMvKN9I2CNYekO/e7ccLTa+arSwurfgFbeSHItUAOdhirl7FXcs8pC5Sdb0N9YblajFQQ0TAVBnQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BEcMt4tH; arc=fail smtp.client-ip=192.198.163.16
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1780936550; x=1812472550;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=f9v9k62514IrMIbhZlbkEIsavcPfA/GktWG99cpAzz4=;
+  b=BEcMt4tHXvMaVmv0hG/mlPwUneWFCvy9L3ahWAkXtVMs5PkBZs2xnfA2
+   7mv3J/q1T7yfuKXDVL7WEVlyn/wi7mRd2qSCV4asGxprKLPQ6wQqlmCrC
+   WvKsN+La8io5VrvDKybxxoPEPfxE3jgTk5RtA3fS+zl1SUYBDTuNydK0C
+   c+P6kJGAvmLOjOA8PHX1TmrMTCrFo+5s7RTgAysZ3aRfPLk0XFswxkCon
+   A+GDrPI5ZpZ7NvuMyFVMICPRFyAPqLAcAwWpFa63i719Z7s4Qs9q+g8GY
+   UL0TIwflBuKyEam2VzYxfE//rtd4XyVI0YSB791IklJSUwUAb3Z8D82d7
+   w==;
+X-CSE-ConnectionGUID: QIo/8K7RSe6tv8QF4FT4mw==
+X-CSE-MsgGUID: 9jDIvnUSQzOKqqa3XgnxxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="69212285"
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="69212285"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 09:35:49 -0700
+X-CSE-ConnectionGUID: 8o50fqOgTzWOXa312hvhYw==
+X-CSE-MsgGUID: bJbwQk4pRmCA55fTaCDTzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,194,1774335600"; 
+   d="scan'208";a="250699134"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 09:35:49 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 09:35:48 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 8 Jun 2026 09:35:48 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.69) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 8 Jun 2026 09:35:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=l+cgeSRAKHorgpRKmNmQIsnvnZq/8rf4VwbTFZAzXw4tc23n30/+t7i+EfTpU8zAcpdttqTVFVsMrwSEUQbyqqphtWqcZbuLxjEZygb5WyfxwjQWn+2DVmojJaYc1ky5eFAapx/pZy5BawNKhOst9g5fzdEZOYaZMT1h7L7NYx0guWaofiAfNQaDZS4fpj11MRsXwV5tzngb4QdwBGHT+DhQFj9XetTRfygLxAN1sPvTbOxm62sjfFUDMbpGsMEVoOBIeUrDX3z6ftUOyIxRQhjw+Vr/cgV2DQAWh10vlGxkUaObPj1iCPclEwpvHOCZrY/ACP6sftmTK4UF1RQ2Gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qTITS9SXwFMxIZ8D9eD2kNSOgIu5qviKdMoyKcOTBPU=;
+ b=Z/st1d4Jq8uLAZzfeaTNh8YKSbyKMRxQEQeS6nUicJPMoMt0utU0QhsB6rKtYZ9v8IgWgEhDXzChks2Qv/4jqPpAw1Ut/1zsa5TR98WEQtRugurs3jV91VprmW55n97M79Mj0RPtovOZGhq1lNMm7+2cVg0xYKsTXHMF42T1UCjwFrEDVrojpvKc2qiCFw9+3ynvT5v/1imvA2/HT1aes/TXhUsEZdmm0zAiem9R4PFXb5YLbB1c0s+xQnB0FyKYKcTvnkvyeGvCl0G01Ewee3GvnTqOUN1iEbNyLw+bJvqqAbTXO7GbtN/6+FEV0VYEfZkjDcnB87KFpzEM4j7+eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CH0PR11MB5394.namprd11.prod.outlook.com (2603:10b6:610:b9::14)
+ by DS0PR11MB6326.namprd11.prod.outlook.com (2603:10b6:8:ce::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Mon, 8 Jun 2026
+ 16:35:37 +0000
+Received: from CH0PR11MB5394.namprd11.prod.outlook.com
+ ([fe80::fd22:b4:e353:a968]) by CH0PR11MB5394.namprd11.prod.outlook.com
+ ([fe80::fd22:b4:e353:a968%6]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
+ 16:35:36 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Oros,
+ Petr" <poros@redhat.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
+	<Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>
+Subject: RE: [PATCH v14 net-next 07/13] dpll: balance create/delete
+ notifications in __dpll_pin_(un)register
+Thread-Topic: [PATCH v14 net-next 07/13] dpll: balance create/delete
+ notifications in __dpll_pin_(un)register
+Thread-Index: AQHc9qyHpEZfWlA5wk6B3UNH0MiQxrY03CyA
+Date: Mon, 8 Jun 2026 16:35:36 +0000
+Message-ID: <CH0PR11MB5394E8B56530DE253E731A2A9B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+References: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
+ <20260607183045.1213735-8-grzegorz.nitka@intel.com>
+In-Reply-To: <20260607183045.1213735-8-grzegorz.nitka@intel.com>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH0PR11MB5394:EE_|DS0PR11MB6326:EE_
+x-ms-office365-filtering-correlation-id: 69eecbd6-87b1-4f8b-be59-08dec57bf809
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021|56012099006|11063799006|4143699003|6133799003|22082099003|18002099003;
+x-microsoft-antispam-message-info: socEdVSO0BHkRwiAZ1GgaO+Rz6x/lSulGY2DDMzuY1+RRAkH9MDc6l4yrFcXr/DJll5hgfdvKvGG8JhE1CDLyUbOfj7AbkX7tJ3Sk8QXYeJ3XNfdFIDyzRocDnE654GmRDW+6RC1sMltA4EvAXNTGCHXnANzcyBv3bg2EaVSxjT+dZmTD1Jv/uQtKdBpDkk+oOhoj0eLE/OgUdqQ6Ry+db23UAXDppWmo/QRyOOhV8RUrzAXs59Kj0ReL2OaNE6F+wBsIht4RXLI69CCUJzvc3CdTCnRrFsCyvC3v0Uyw741CgGNy+fDpqUjyhA549+JQH/pqQa06fnACAy4IgBOo9AT7spGP/e+mV23qXQCwYcuAts0KNQW7yb1G7SOjO/M52yrheFISjJWGdOB7h+CuHMWEG0nN/23a8/Tu4KiwP3XX++OCAGMp3O3Uj6FMDZu3Yh3zP8NH7zRqafNI70+wB7bq/uQzYTao+T3S6gbVuLHsyGrbA/0zQAQO6cJCyI92vZJWAPG4VKxofVbJvtgtblksfJVdq+OiTabAJiPLFqd/g2x1qJRmaJCqK2eMJuUicAlKdhTy1C6pHCM1VS6UTw8aCfUAeky+hFFMVPScNAj5hRgWJC3HBjNzDEnYNO92usa6sxJaBpFfJFknpfazVaE8jRGY8Fi6p2Jkvf/Mth+QaowCYKbGCtbc4PmxHxu432WWC3k43T/einuu4kblySimCNRHr1VzSdx4sLRNvZUwWE9l+dH4Jl3nrVBgbxh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB5394.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021)(56012099006)(11063799006)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yc5I9Pa/w8kt4sKTt2hgZn+FDzxxMTIzcaWLaLcug7Gws+/rY+kdHsxhTRM/?=
+ =?us-ascii?Q?wx6fR22Ky1c7FxgnvoyPtaPBZGoO0OWk5nBEyxMWx0/xw8G8KVcOQFDTi6pC?=
+ =?us-ascii?Q?9JVbWA71wGPRjIF2eh3kNi5WlPhZLRygcrSQi2uAYLKLZUdGonveqiYtGph0?=
+ =?us-ascii?Q?aYF0bcYBHq97XdfIzdT6ZF10DYLrKg4LeSU3h2JRD7LutuW5QaP8fFpVujso?=
+ =?us-ascii?Q?/XB4ULtONkf6MQx3YSxDZHX5+M39tMohZ6tHO1oJMwkxj5k9sQQypPqmueoU?=
+ =?us-ascii?Q?VYa1cnBYSkdrWVZWH7SpRSm2aoYuKEV+FMglloQ6YQdktLf1TZtklVvyOObR?=
+ =?us-ascii?Q?nYu2PgFzhMUrewD86s4tUQ/UgwtUu3xc0XVycXVT2Vx0YJomsDZXqos4uqVt?=
+ =?us-ascii?Q?N13086c0FJ1gDSJnXvq6EJ/cBCudG+hEJjoH4lr958vR7F6+3SSGBoa2U0nb?=
+ =?us-ascii?Q?kNAVoikCl4Hvwz2kpC5oOhxBko/R/fjhoaAt4kHOZN1iQqyOGAe9EVVX0Jyx?=
+ =?us-ascii?Q?1GJXl7mpvowyOSVJnKxbiKo3GqGuZC1c4Wymf80jI6kB1JEC5LxwJsX91ohu?=
+ =?us-ascii?Q?pxyU+rMVOSkrlMfRBs30X6GG9rQgWwtSQDctak9JTuXRc6srtjFxfKnDplRy?=
+ =?us-ascii?Q?pBvSsHyEu4U4OEQRTw/90jI1v9LIgLumrF3X/hhdQr+/CHvDjs3d6QfLphUR?=
+ =?us-ascii?Q?S4X6DAXUsDYHQuS+WyTfyqMzlXri/vgKewcX9Z89Fp5mD5WVd0dZh+oVppgq?=
+ =?us-ascii?Q?SZMRcrWQdvtGcTiPeqJoCdkFGd3mxzabMcwd4vVmwFtiP1OGUqJDirwQ9Ebk?=
+ =?us-ascii?Q?ChRdJcE/26GK8QT3qwqwZyhKefwKzjP9kHhUUNtUZORuQr/fjtZcHOt0JrZD?=
+ =?us-ascii?Q?rDyUwQlcPkNpKCA00ols2aEx6Zz9nBQPhJsCfH7/JOjNn5afh/lyDzxarT26?=
+ =?us-ascii?Q?PHTSpFl16qX1bzKZcXSZkan8TekVA8QvO4mkc7ubEdN13By0LOgF/di1DDBu?=
+ =?us-ascii?Q?ZxKXfoKixJO5TosLWi0Kj5RYCaIMG5NLxRF5fHkcnIwxwBUpisX6lIT07pks?=
+ =?us-ascii?Q?HtJSdo5JfXB2gOQ8tk1HRo/nP3v5Yee0nrlk/Htpt69tNhG5Prvxgx1N4Ijb?=
+ =?us-ascii?Q?OjE0jXEFk39nyDVughqTsxGkFcrxA7FEQAnhNIr/AkK6ETPHnUY95VmYyjq4?=
+ =?us-ascii?Q?JabNKQOzAM3Ik3XZHaeH54s6oVC2pNu/b9hcLDYdFgUqmaVFXVC4TO8r8QlY?=
+ =?us-ascii?Q?R3LtTOxUGao8mzZska59vhLFiFcUDjLu82NqJmq2Xk2NU4dF7+oBOhfFbJaO?=
+ =?us-ascii?Q?T8dzEwt0CHNVyfhQUe5IEosjigKKfknnb4zdHm8FPquNKwEx5kYpI5GivJsq?=
+ =?us-ascii?Q?BtdcrlS4ghn1AtpQkSTYrqB635trGdBfLL+m4HtmdqJQd3U0yedXPGGt1V4F?=
+ =?us-ascii?Q?qqRqxfNuRiRTGvjv3CJ9XMW7CFZyiM3TRFURUixUSgptbyxGUvfmrhLEu1MA?=
+ =?us-ascii?Q?4hC55SSHCXcoc/OaJP4EYUUiLMl+3STzq6n+ReI0Om1UrZ4YAVJ+o3+8TENM?=
+ =?us-ascii?Q?4DscZTbEwMza3jpAcRc6WR5GYiPHJGMxEYhk/DvzRKzC1XoWFG9XORAaaRAk?=
+ =?us-ascii?Q?7Mk/BjnGwYgdoUhC8yCRrbXne63vmCafQ9q/k7/2y/4buZJkR5+6JPLlsZ0M?=
+ =?us-ascii?Q?FOIfoqBcBdagfcCztTVSjaxfYtOH1jRuW9QSyCK3oeMdcDsa8Fn9bqlH0iSz?=
+ =?us-ascii?Q?JAKT6HbR8yDPpWDHLJCSm84ynNwacro=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked: HVhsHDroiCUknLMgZsJyA1ROjFeOgyvwZSqUDYV9nxeGsIH0PMbhh2rKMay5QrQlCQPJQRnlJ41yF0oUiT0j2DQWECMfBkciMX10myxAuZR21vH1CEKYHsI4DBeDDryQm0G2AHAFvxTHKlQXbCZOCUxq4RK+OBBUTDSiCFMFEK+K7aCYx8gXgoDVyaW1wbGLzFocv9sGzxhSRgkK1J2wFVResBm0dLHhD+v9MT0yNlseFq7KdCEkA1pWyTPa9hlKbSK31/JbTWWLYfE2beWw13VA9dyJEfYE2wB5SA8iwPeFhgSMRfioamfnjMUvswxwsZVieqZ9q1IpkHy07IoqKw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB5394.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69eecbd6-87b1-4f8b-be59-08dec57bf809
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2026 16:35:36.5630
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2/XAokkAB2Vb1ju7mcfitE3yAwIH0Uz3pFVTxp0rS12lzcBuKuccYWqWykBMax9mWKqfwGIniT7EZVbOBfBWAw+alLBveuUwBoyZ9L957Dg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6326
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296661-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296662-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:ncardwell@google.com,m:shuah@kernel.org,m:kuniyu@google.com,m:alice@isovalent.com,m:maklimek97@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[maklimek97@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,nvidia.com,isovalent.com,gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:from_mime,CH0PR11MB5394.namprd11.prod.outlook.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maklimek97@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[arkadiusz.kubalewski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[big_tcp.sh:url,vger.kernel.org:from_smtp,msg_zerocopy.sh:url,fastmail.im:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1D0F16595B3
+X-Rspamd-Queue-Id: C72E6658E5B
 
-This series adds support for sending TCP jumbograms over MTUs above 65535,
-and adds support for setting such MTUs on veth devices.
+>From: Nitka, Grzegorz <grzegorz.nitka@intel.com>
+>Sent: Sunday, June 7, 2026 8:31 PM
+>
+>__dpll_pin_register() emits dpll_pin_create_ntf() internally, but
+>__dpll_pin_unregister() left the matching delete to its callers. The
+>counts then diverge on dpll_pin_on_pin_register() rollback and on
+>dpll_pin_on_pin_unregister(), leaking stale notifications.
+>
+>Emit dpll_pin_delete_ntf() inside __dpll_pin_unregister() and drop the
+>now-redundant call in dpll_pin_unregister().
+>
+>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
 
-The TCP stack is already capable of receiving jumbograms and (up until
-recently) sending GSO-jumbograms that get segmented before exiting the
-host. However, the TCP stack doesn't support sending regular jumbograms
-over high MTUs as described in RFC2675. Specifically, the TCP stack doesn't
-support an MSS greater than 65535.
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-No device currently supports setting an MTU greater than 65535 but there
-are some devices that could benefit from higher MTUs and that can
-theoretically support it. For example, IPoIB in connected-mode can support
-MTUs up to 2^31. Virtual devices such as veth have no physical limitations
-and therefore could also support such MTUs.
-
-This series only adds support for setting high MTUs on veth devices, with
-support for other devices being delegated to future patch series. Allowing
-jumbograms to pass through veth devices is useful for testing jumbogram
-functionality, and also increases throughput when compared to BIG TCP (see
-the benchmark numbers below).
-
-In addition to removing the upper limit on veth MTUs, This series adds the
-missing pieces that allow the TCP stack to send TCP jumbograms. This
-includes a bit of code removed recently by Alice's patch series [1]. Most
-of the patches in this series are rather trivial. The main problem
-addressed by this series is that the TCP stack conflates the TSO segment
-length with the MSS, but the TSO segment length is a 16-bit integer, which
-doesn't allow for MSS > 65535. This series decouples them.
-
-Running iperf over veth on an Intel Core i9-12900K CPU shows a 5%
-improvement in throughput.
-
-Commands:
-iperf3 -s
-iperf3 -c -l 500KiB ${SERVER_IP}%veth0
-
-MTU=524280, gso disabled:
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  24.8 GBytes   213 Gbits/sec
-[  5]   1.00-2.00   sec  25.5 GBytes   219 Gbits/sec
-[  5]   2.00-3.00   sec  26.0 GBytes   223 Gbits/sec
-[  5]   3.00-4.00   sec  25.8 GBytes   222 Gbits/sec
-[  5]   4.00-5.00   sec  25.8 GBytes   221 Gbits/sec
-[  5]   5.00-6.00   sec  25.4 GBytes   218 Gbits/sec
-[  5]   6.00-7.00   sec  25.3 GBytes   217 Gbits/sec
-[  5]   7.00-8.00   sec  26.1 GBytes   224 Gbits/sec
-[  5]   8.00-9.00   sec  25.9 GBytes   223 Gbits/sec
-[  5]   9.00-10.00  sec  25.6 GBytes   220 Gbits/sec
-[  5]  10.00-10.00  sec  28.3 MBytes   154 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.00  sec   256 GBytes   220 Gbits/sec
-
-MTU=1500, gso_max_size=524280:
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  24.1 GBytes   207 Gbits/sec
-[  5]   1.00-2.00   sec  24.1 GBytes   207 Gbits/sec
-[  5]   2.00-3.00   sec  24.6 GBytes   211 Gbits/sec
-[  5]   3.00-4.00   sec  24.4 GBytes   209 Gbits/sec
-[  5]   4.00-5.00   sec  24.5 GBytes   210 Gbits/sec
-[  5]   5.00-6.00   sec  24.3 GBytes   209 Gbits/sec
-[  5]   6.00-7.00   sec  24.6 GBytes   211 Gbits/sec
-[  5]   7.00-8.00   sec  24.0 GBytes   206 Gbits/sec
-[  5]   8.00-9.00   sec  23.9 GBytes   205 Gbits/sec
-[  5]   9.00-10.00  sec  24.1 GBytes   207 Gbits/sec
-[  5]  10.00-10.00  sec  7.81 MBytes   120 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.00  sec   243 GBytes   208 Gbits/sec
-
-[1] 20260205133925.526371-1-alice.kernel@fastmail.im (full link was blocked by gmail)
-
-Mariusz Klimek (10):
-  ipv6: do not fragment packets into jumbograms
-  ipv6: allow route exceptions with MTUs above 65535
-  ipv6: add jumbo payload option to non-gso jumbograms
-  tcp: decouple TSO segment length from MSS
-  tcp: split jumbograms with urgent pointer correctly
-  tcp: set MSS correctly for PMTU above 65535
-  veth: raise the max MTU above 65535
-  selftests/net: test sending TCP jumbograms over veth
-  selftests/net: add test cases with MTU above 65535 to big_tcp.sh
-  selftests/net: add jumbogram test case to msg_zerocopy.sh
-
- drivers/net/veth.c                          |   8 +-
- include/linux/ipv6.h                        |   6 +
- include/net/ip6_route.h                     |   5 +-
- include/net/ipv6.h                          |  11 +
- include/net/tcp.h                           |  12 +-
- net/ipv4/tcp.c                              |  12 +-
- net/ipv4/tcp_output.c                       |  84 +++--
- net/ipv4/tcp_timer.c                        |   4 +-
- net/ipv6/ip6_output.c                       |  24 +-
- net/ipv6/route.c                            |   2 +-
- tools/testing/selftests/net/Makefile        |   3 +
- tools/testing/selftests/net/big_tcp.sh      |  24 +-
- tools/testing/selftests/net/jumbogram.bpf.c |  36 ++
- tools/testing/selftests/net/jumbogram.sh    | 380 ++++++++++++++++++++
- tools/testing/selftests/net/jumbogram_rx.c  | 199 ++++++++++
- tools/testing/selftests/net/jumbogram_tx.c  | 139 +++++++
- tools/testing/selftests/net/msg_zerocopy.c  |   3 +-
- tools/testing/selftests/net/msg_zerocopy.sh |   3 +-
- 18 files changed, 897 insertions(+), 58 deletions(-)
- create mode 100644 tools/testing/selftests/net/jumbogram.bpf.c
- create mode 100755 tools/testing/selftests/net/jumbogram.sh
- create mode 100644 tools/testing/selftests/net/jumbogram_rx.c
- create mode 100644 tools/testing/selftests/net/jumbogram_tx.c
-
--- 
-2.47.3
+>Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>---
+> drivers/dpll/dpll_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>index ea45bb41376c..1aaf62775408 100644
+>--- a/drivers/dpll/dpll_core.c
+>+++ b/drivers/dpll/dpll_core.c
+>@@ -926,6 +926,7 @@ __dpll_pin_unregister(struct dpll_device *dpll, struct
+>dpll_pin *pin,
+> 		      const struct dpll_pin_ops *ops, void *priv, void
+>*cookie)
+> {
+> 	ASSERT_DPLL_PIN_REGISTERED(pin);
+>+	dpll_pin_delete_ntf(pin);
+> 	dpll_xa_ref_pin_del(&dpll->pin_refs, pin, ops, priv, cookie);
+> 	dpll_xa_ref_dpll_del(&pin->dpll_refs, dpll, ops, priv, cookie);
+> 	if (xa_empty(&pin->dpll_refs)) {
+>@@ -953,7 +954,6 @@ void dpll_pin_unregister(struct dpll_device *dpll,
+>struct dpll_pin *pin,
+> 		return;
+>
+> 	mutex_lock(&dpll_lock);
+>-	dpll_pin_delete_ntf(pin);
+> 	__dpll_pin_unregister(dpll, pin, ops, priv, NULL);
+> 	mutex_unlock(&dpll_lock);
+> }
+>--
+>2.39.3
 
 
