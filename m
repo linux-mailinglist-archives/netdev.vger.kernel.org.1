@@ -1,176 +1,194 @@
-Return-Path: <netdev+bounces-296700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296701-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7BQ9MfkXJ2otrgIAu9opvQ
-	(envelope-from <netdev+bounces-296700-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 21:28:57 +0200
+	id HV9LIt4YJ2qQrgIAu9opvQ
+	(envelope-from <netdev+bounces-296701-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 21:32:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59D865A0F2
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 21:28:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10DC265A146
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 21:32:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=multikernel-io.20251104.gappssmtp.com header.s=20251104 header.b=rSupFt4z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296700-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296700-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=tinyisr.com header.s=purelymail2 header.b=eD4HVcDj;
+	dkim=pass header.d=purelymail.com header.s=purelymail2 header.b=TN68slij;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296701-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296701-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=tinyisr.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DE789300BEA6
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 19:28:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5AAE300CC3F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 19:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8873D9678;
-	Mon,  8 Jun 2026 19:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5632533374F;
+	Mon,  8 Jun 2026 19:30:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9F033F8D6
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 19:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2C7249EB
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 19:30:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780946932; cv=none; b=rSmJyWirknVG8nVo85v59Ds4ZOirc0dDq0+0ktZo6oxr6lanhYo1xVU3sCiCyMB6pNRUQV8txUPi+lIcTjv5NRGNLJMIXlvA78tq9ptE2sjcOauWl4IAxO+XCefWE4OGoS1jwvka2sTQBQV1hxnSDI4IbxjZtvnjuweZ6f+4p94=
+	t=1780947028; cv=none; b=biOEB5ixgPe7sE6WKB59imzGy9MdIPTy5FSLBAnvG08y9LgXEgQTGre7XNG9PNsOc9LiRrLyqgcL7YVQcfxnc0AooN77Z4tKz6ZmoGkjlQzAsqP8zY5pQqdZFoSUnP7LS8NS5N01UMnvU4FJSVrWC1mX4653Vi/Md63niEb5QXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780946932; c=relaxed/simple;
-	bh=sqs/ZubQKPTfttoIER6Fmdln9yE0C8y67ApWAX5ifKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K17SLFzqZ+qvEfSCI5lbi62VvSFKWBDS1aq2J6HzEMinVSQtHqhB9wR49RWExTqM8Kg++ELOnhOo90gRiZT9YwFulWPPIx/5TQ7L/RXRLvyma+KjdYdGedblV3r13ouRP5IOeIDW82fbyTKpXBoSNiW6Zf/i84sX5D6WHyUF1Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=multikernel.io; spf=pass smtp.mailfrom=multikernel.io; dkim=pass (2048-bit key) header.d=multikernel-io.20251104.gappssmtp.com header.i=@multikernel-io.20251104.gappssmtp.com header.b=rSupFt4z; arc=none smtp.client-ip=74.125.82.179
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-3078e0dcd67so2729772eec.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 12:28:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=multikernel-io.20251104.gappssmtp.com; s=20251104; t=1780946931; x=1781551731; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3zapFnonrQM41kujDNo+8UITgO5BTVmp3mURqlxPhOk=;
-        b=rSupFt4zrrqqHiDk4+4dGraU/vD6GgIhqmIburqBJJxsc9yT1A+hATz8C0yLrYiQcb
-         dEGjnbjSd6g/DGWKQ2O3hyB1EfZ8NZAzaTVk8fVIIk9wDPv2MhoIvd5yplBJFroovpE2
-         dSs8hte6k0E7FI3CLOlTAag1DEV5FXFf95Hz9v4TUFOeZ1A5DU5AmANad2O72pWEu1MG
-         B/q21jk9d4O05skjlzMx01rK5nfHf1JoFFw2DFLM6esW4OqSQiG1+Wz7HaYGgvnOqCnt
-         EgbT2xzVq+EEdnKxJFMrR4yqbVE5ODGY672Cp911xEVMy4lY/oZ5cJuvm8GV9q39ZUmT
-         DvOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780946931; x=1781551731;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3zapFnonrQM41kujDNo+8UITgO5BTVmp3mURqlxPhOk=;
-        b=Q3CJ4KvLvDwPWxHo5Jsjad6TsT+017HMj9X1495D1AiND+QmSCcP+zGllxlxeC5TL2
-         p9A7yr6hFnSNNaQ/YRkXsl28nT9UFl+nBXoIBQBlxivdB6C7NNQZuHEnYLehVLYQf9tS
-         fQM8e63H1SjTPXddElo+7GOUw6q09SJPVMDfBMb4JR0kzsg6vO1YwfjQo4u8g3x+weLD
-         qhaiEyZnyH1q8J2rxaIZVER42eAU9N3Ge1niFRzZXao/pZzl35Tqz25NwaE+8iOmcMIi
-         mflqINfJZkrFbE8HBcKqyvU5UMKehNTaoIutnxe7uN0Dzxy+iLkwdOjGiYsvZGZ/sAH8
-         XtVQ==
-X-Gm-Message-State: AOJu0Yw/8jf5z26cad9brWkg1h3LMQfUZ2+NVzj3zmdLvhLZGnviRhy6
-	GIsTkQ25XclDbctdsohuVmrmS0o1CigAPxvSsC/cdSB0UoHBZep54Q9wwnpkjm5nAtJAp8pq6uo
-	0kVV4
-X-Gm-Gg: Acq92OGvFwLRmlsrSaHtfPYk5Hkmhk6VnRcqSVdn8vWxZLWC5SHTt1aCnJpKCvxBKV6
-	b72m5bwsCqqhJ9Nj8mCl2xoO7/i6Gd7UwtLLmyRzrW0ul+ndIqkqX7Eh/h+W5iQTJ4jMSkwG70C
-	OM55BXQD3Xk3YIBUs1EpwrQqagAZWvutkxZvw3eA8hIYWzXhFBSIyBmhRTy7dNbo7sg7/KBw2rT
-	UWedCUMzZAsch/L/wR9VabycZn16wm45g/OdU3K0bG3CHa0/k2kVmTx9176560RGPPY13BKal+h
-	Pe4DUvmf0HNc3XnlEy9ly/OB2IspATA7Q16FsyAr+cg4fhPxi3sYSqxWo7JDOpv5xq3LNQfb/n0
-	8wpF4iDHzuYeYeAJF/x6jj/wzXF5hh/2oQORqI9WCchqRA4N/FZTmbIipmv3ThNsjYi1tJ8sldy
-	efeSGkv4c9ZliVlkmjBKPil10s5jLkHnmJ066TU3JH8lPiAwFhuhY93wVj5VgiSLXhlis=
-X-Received: by 2002:a05:693c:374c:b0:304:2cc9:2ba8 with SMTP id 5a478bee46e88-3077b32a2a0mr8659792eec.30.1780946930508;
-        Mon, 08 Jun 2026 12:28:50 -0700 (PDT)
-Received: from localhost ([2601:647:6802:dbc0:44bd:f433:15c2:72b7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074df77a0asm19412202eec.27.2026.06.08.12.28.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 12:28:49 -0700 (PDT)
-Date: Mon, 8 Jun 2026 12:28:48 -0700
-From: Cong Wang <cwang@multikernel.io>
-To: Nolan Woods <nolan@i2labs.ca>
-Cc: netdev@vger.kernel.org
-Subject: Re: net: disable default loopback
-Message-ID: <aicX8Bk3e-zTmcsN@pop-os.localdomain>
-References: <350cea13-9bf1-4605-82c9-b85114fc88fd@i2labs.ca>
+	s=arc-20240116; t=1780947028; c=relaxed/simple;
+	bh=y6Z3Nh9xfxVMrcMIWL49eJhvk11FB6L3n4BUaqM14IE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hVOJx7ZhM6oyIzYyDQ4veDtiJ6FDNwFExkgRwg+x40QTZbOd2Q5/NXOcVnl0MBtm/CiLbTnh9MPMgFmOPNjrHVJN+eAC4VubVRtshOIiY6auoLoBrqPNlUZg2IdI9nxCBLb6b96OSIE6dmIqUKp0uTZlFmhPxt7ypWUEBPW6hLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=eD4HVcDj; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=TN68slij; arc=none smtp.client-ip=34.202.193.197
+DKIM-Signature: a=rsa-sha256; b=eD4HVcDjK2egTWJSZBxUTYw9V4hPslt9ojNDcrvWFAXWarfGNdtOoP03RFsx8DrUIiZfGI+6VRRAQUcsxJxpodWUNswer0bAS5bTK+XT4DkiHeNOC0D5VsmH5BXtRPkLjh7PyqD876dMawncmHIkOEhvDJre+l2VARgXoSKMIps3CtKqtRJAzQNVaFU0xJpD5wNP/gYxxOnRNERaL45yn5umE8e7QSA5Cb3hKRaHFMBzEQQJlbDK2m2Tk17vAFZkjlj6e/H0s/go+UmctnaJcPHJh1Nr2ePq2HYYX17Zk5RSrl8XkGs4iX9MHcBeFSrLaMk2/NCzJJBHpBMOF8R0uw==; s=purelymail2; d=tinyisr.com; v=1; bh=y6Z3Nh9xfxVMrcMIWL49eJhvk11FB6L3n4BUaqM14IE=; h=Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=TN68slijtR0hTRpHoEKHBC+f9hf386zv/gYRhxN3uvkf5ON0CCQfUmw5ZFrQP4Cyr3jx0U6LVTj0f6kAkK1Nuh+5zRTqL8c/1Xom6FY7aSx+daRu05fDCLs/q22CrzvXPWYymWqdNTHg5GHZD4xyHZZsfxHVJMtNFSRTdQxvH6j7VjMw2wjAaMFo9Gfz+VIpRMGfllchoum1Sd+Fh0lZKPCrIB6AHuWIRyq+xW+FgSrRqhNAgD/2ZSZaQ7OPAT5+pBpSol5pyCaKv1Zy2BKMTCMOHB05zq9TsHEhPTXkhPRyBOdqr80h/OpFIM78/xQ1pBjdKQRa62SU3odS0tb8kg==; s=purelymail2; d=purelymail.com; v=1; bh=y6Z3Nh9xfxVMrcMIWL49eJhvk11FB6L3n4BUaqM14IE=; h=Feedback-ID:Received:From:To:Subject:Date;
+Feedback-ID: 99681:12517:null:purelymail
+X-Pm-Original-To: netdev@vger.kernel.org
+Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 305744462;
+          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+          Mon, 08 Jun 2026 19:30:18 +0000 (UTC)
+From: Joris Vaisvila <joey@tinyisr.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	olteanv@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	devicetree@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Joris Vaisvila <joey@tinyisr.com>
+Subject: [PATCH net-next v4 0/4] net: dsa: mt7628 embedded switch initial support
+Date: Mon,  8 Jun 2026 22:29:44 +0300
+Message-ID: <20260608192948.289745-1-joey@tinyisr.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <350cea13-9bf1-4605-82c9-b85114fc88fd@i2labs.ca>
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
+Content-Type: text/plain; charset=UTF-8
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[multikernel-io.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[tinyisr.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[tinyisr.com:s=purelymail2,purelymail.com:s=purelymail2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:nolan@i2labs.ca,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[multikernel.io];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296700-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296701-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:olteanv@gmail.com,m:andrew@lunn.ch,m:devicetree@vger.kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:arinc.unal@arinc9.com,m:Landen.Chao@mediatek.com,m:dqfext@gmail.com,m:sean.wang@mediatek.com,m:daniel@makrotopia.org,m:joey@tinyisr.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[multikernel-io.20251104.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER(0.00)[joey@tinyisr.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tinyisr.com:+,purelymail.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joey@tinyisr.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch,vger.kernel.org,arinc9.com,mediatek.com,makrotopia.org,tinyisr.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,multikernel.io:from_mime,pop-os.localdomain:mid]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,purelymail.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tinyisr.com:dkim,tinyisr.com:mid,tinyisr.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B59D865A0F2
+X-Rspamd-Queue-Id: 10DC265A146
 
-On Fri, Mar 20, 2026 at 12:46:47AM +0700, Nolan Woods wrote:
-> Hello,
-> I am building a highly constrained Linux environment where I want to remove
-> any possibility of a process communicating with other local processes via
-> the network stack. It appears that the kernel automatically creates the
-> loopback device and I can't locate any configuration that might disable it.
-> I need to be able to create loopbacks in namespaces, disabling the network
-> stack entirely isn't an option. I also do not want to depend on NetFilter or
-> any sort of packet rules. I can disable the link after it is created, but
-> that approach still has the potential of the link being brought back up.
-> SELinux might be an option but is just another form of filtering
-> rules. Ideally the process wouldn't even have the option to bind to the
-> interface.
-> 
-> I found this comment that implies that there might be some sort of
-> unbreakable implicit network stack dependency on the loopback: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/net/core/dev.c#n13266
-> 
-> Can anyone elaborate on this?
+This patch series adds initial support for the MediaTek MT7628 Embedded
+Switch.
 
-Right, loopback is literally part of IPV4/IPV6 protocol, there are
-definitely implicit dependencies in Linux kernel. For starter, there are
-already many places hard-coding 'lo' in the Linux kernel
-(see dev_net(dev)->loopback_dev). It is not trivial to just disable/remove
-the loopback system-wide without breaking the entire system.
+The driver implements the basic functionality required to operate the
+switch using DSA. The hardware provides five internal Fast Ethernet user
+ports and one Gigabit port connected internally to the CPU MAC.
 
-There are a few solutions you can explore:
+Bridge offloading is not yet supported.
 
-1) Create a network namespace and disable loopback inside, this would
-only impact the processes inside the network namespace, not outside.
+Tested on an MT7628NN-based board.
 
-2) Use eBPF LSM (or something similar) to explicitly block 127.0.0.0/8
-subnet. This is also global, which means you have to explicitly make it
-per-process in your eBPF code.
+Changes since v3:
+=09- rebased on latest net-next
+=09mt7628 dsa driver:
+=09=09- simplified vlan_add hardware vlan slot search
+=09=09- fixed vlan_del not removing vid from port pvid
+=09=09- separated mii_read/mii_write error handling from return
+=09=09  value parsing. Updated RD_DONE/WT_DONE bit checking
+=09=09  with clearer logic and a comment.
+=09=09- moved NET_DSA_MT7628 after NET_DSA_MT7530 in Kconfig
+=09=09- added missing reset return value checks in probe
+=09=09- fixed mt7628_switch_ops missing const specifier
+=09=09- removed mdio node parsing from of, as there is nothing
+=09=09  to configure
+=09mt7628 dt binding:
+=09=09- updated description to be more clear about port count
+=09=09- dropped optional mdio subnode. the switch does not
+=09=09  expose an external MDIO bus and all integrated PHY
+=09=09  access is handled by the driver.
+=09=09- removed unused switch0 label in example
+Link: https://lore.kernel.org/netdev/20260428185510.261521-1-joey@tinyisr.c=
+om/t/#u
 
-3) Use seccomp user notification to intercept syscall's. For example,
-sandlock (https://github.com/multikernel/sandlock) leverages it to
-control network access (including loopback). More nicely, you could even
-intercept and filter netlink dump output which makes 'lo' not even
-visible to the process. :)
+Changes since v2:
+=09- fix binding issues found in review
+=09- fix ignored dsa_tag_8021q_register return value
+=09- add switch teardown to clean up tag_8021q
+=09- fix ordering issue where mdio probe fail would leak tag_8021q
+Link: https://lore.kernel.org/netdev/20260330184017.766200-1-joey@tinyisr.c=
+om/t/#u
 
-Hope this helps.
+Changes since v1:
+=09- changed port 6 phy-mode to internal
+=09- cleaned up tag_mt7628 rcv function and mask defines
+=09- fixed sorting error in drivers/net/dsa/ Kconfig and Makefile
+=09- fixed sorting error in net/dsa/ Kconfig and Makefile
+=09- fixed mt7628_mii_read/write return values on error
+Link: https://lore.kernel.org/netdev/20260326204413.3317584-1-joey@tinyisr.=
+com/t/#u
 
-Regards,
-Cong
+Thanks,
+Joris
+
+Joris Vaisvila (4):
+  dt-bindings: net: dsa: add MT7628 ESW
+  net: phy: mediatek: add phy driver for MT7628 built-in Fast Ethernet
+    PHYs
+  net: dsa: initial MT7628 tagging driver
+  net: dsa: initial support for MT7628 embedded switch
+
+ .../bindings/net/dsa/mediatek,mt7628-esw.yaml |  97 +++
+ drivers/net/dsa/Kconfig                       |   8 +
+ drivers/net/dsa/Makefile                      |   1 +
+ drivers/net/dsa/mt7628.c                      | 648 ++++++++++++++++++
+ drivers/net/phy/mediatek/Kconfig              |  10 +-
+ drivers/net/phy/mediatek/Makefile             |   1 +
+ drivers/net/phy/mediatek/mtk-fe-soc.c         |  50 ++
+ include/net/dsa.h                             |   2 +
+ net/dsa/Kconfig                               |   6 +
+ net/dsa/Makefile                              |   1 +
+ net/dsa/tag_mt7628.c                          |  89 +++
+ 11 files changed, 912 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/mediatek,mt76=
+28-esw.yaml
+ create mode 100644 drivers/net/dsa/mt7628.c
+ create mode 100644 drivers/net/phy/mediatek/mtk-fe-soc.c
+ create mode 100644 net/dsa/tag_mt7628.c
+
+--=20
+2.54.0
+
 
