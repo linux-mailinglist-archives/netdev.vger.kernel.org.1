@@ -1,186 +1,138 @@
-Return-Path: <netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id erUiNYtTJ2pouwIAu9opvQ
-	(envelope-from <netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:43:07 +0200
+	id x3tXEU5XJ2rtuwIAu9opvQ
+	(envelope-from <netdev+bounces-296787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:59:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6C365B359
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:43:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D3865B3E3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 01:59:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=oracle.com header.s=corp-2025-04-25 header.b=jQDqKKxV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296786-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=oracle.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ABy1IeMI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296787-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296787-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F01C03026A8E
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 23:42:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84C8E308C91D
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 23:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6937234041F;
-	Mon,  8 Jun 2026 23:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1618B2EA75E;
+	Mon,  8 Jun 2026 23:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C950C45039;
-	Mon,  8 Jun 2026 23:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E59F2D73A6
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 23:58:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780962164; cv=none; b=rK8d5F5polfBa70xJWWpCMsoIQQylImQYvNLUTH7Ih5Qb3Ps3N8JM1gqNBMOdcqG0MjAfIb6jr3XVcdcChharJYgnq2vaZQHgZDw9/4h8EfDMvtkXKrY5vP0I7rWWFHT6vsnJY/YvlGyN3dOGCAp423gY+SSrI+4qqVmhXvtNts=
+	t=1780963109; cv=none; b=IT7fOR0qoESVnLCLa/L2a75ooAd5A7JO86/sN+kTnaniH6hxKWYWGwATPfNvwtuOhI/Ie9xZALannluuxi5QSr4vl+hn6QWKS6DFfbn6YgLWAtm1qVl65qo/GsGhZFHe5TpgT+8fiLdIxq0mPBdA2Vr1z3xXghK/WIxij5B6up8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780962164; c=relaxed/simple;
-	bh=zgiCaXxXGVRzgNP89cYzhPkqnsgSBl8IG1Ajr12h3M0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XHuFni/tnQCd5omjQeAnsSYSXZguKnsxC9EC5ASvlzHicsO0Zgwg3mkeLHaxdifkSmVgl5kp6mR+4xNPrY3nWCOH4yr66tIKD6mBhgqNBxIXUMsd0h2oAg3WBA3/DiBSiYNnEut07dN/VTYsAYnla1aEW1MJvdDldjNElSy1OvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jQDqKKxV; arc=none smtp.client-ip=205.220.177.32
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 658HSdVc1690540;
-	Mon, 8 Jun 2026 23:42:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=ZAa2C7ZECaKPgBj3Rx8eALxC14FMM
-	ifdbPHRqlYnfpY=; b=jQDqKKxVvoNMm64LFI99ycrOmKy2use+gBnhrsMOyaS9q
-	foxqDb+Puxc4CIPdEarhoXARsTwyc6Uwe5hxcOZYSDZ2qwKl5BZA6yaqQPB4yTP/
-	Y1rSqJRXGNRUIKIExLSf6TNSZhwu0txSZh20iGIiPLwiYdNacCN+3vyb6zepVI4X
-	5ALSPQuj3nhut0c5Ss1CpXcWx+52WO2TKtzQzzouBOzvv9BXyPwVHgy94IUENzJ6
-	4mLlNcFTRXNpvDCIB5vKkjo3coxaCyaIFwSXC9dXyQp5rHp5kdTAD7Yz/f06fnyv
-	iRvmrTNSrF0Bppxpxobgt0yBNOljnWkzmlgxc4mtA==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4emab4kefg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Jun 2026 23:42:25 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 658NSXbZ001362;
-	Mon, 8 Jun 2026 23:42:24 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ema0pdxdx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 08 Jun 2026 23:42:24 +0000 (GMT)
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 658NgOrx035097;
-	Mon, 8 Jun 2026 23:42:24 GMT
-Received: from mbpatil-ws.osdevelopmeniad.oraclevcn.com (mbpatil-ol10-ws.webad1iad.osdevelopmeniad.oraclevcn.com [100.100.228.95])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4ema0pdxdg-1;
-	Mon, 08 Jun 2026 23:42:24 +0000 (GMT)
-From: Manjunath Patil <manjunath.b.patil@oracle.com>
-To: netdev@vger.kernel.org
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, manjunath.b.patil@oracle.com
-Subject: [PATCH net-next] net/mlx5e: Report link down on administrative close
-Date: Mon,  8 Jun 2026 16:42:23 -0700
-Message-ID: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1780963109; c=relaxed/simple;
+	bh=VK7Vqow+LqCery+/hsHgtw8qYAMwYsSWaSrW7ccFX/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WZ6eeQLN0XefBpW/SrZSjun/fCFze7v/qbfWg/2tt1DOkuusW9nj9RGn1UsgxqEypLWT5IGesEvPgo4BjaIjLL/G1IkN6rSLcitn55+A/2WHJG5T4Zl/8hH1SSeAK1RFMKeFspWTU4rs7MisGuapeNs9HVBPRyjeqzoqApXzGS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABy1IeMI; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 053341F00893;
+	Mon,  8 Jun 2026 23:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780963107;
+	bh=SpuO1pUoTIrSq1m5OY7yRHg7Tt7TntzPrjMkqWCxi7I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=ABy1IeMIu38/22RtGd/Zcr1xfUCr2WSirekSf1B9bUzvCJk1OqV3vufmuJICClxSS
+	 Og/X1/9rsCFMRxEZl40MlVZ00TbLdynqPCWF4xDEeGvOzU0FZ4ygmchEg54dVGOm4W
+	 dVA7SteMYjjx1urtwTgQ4bCrZrKFsb2gD0gyuxwsvTOowU7JIc9pLYMJqcCWcV9YkS
+	 frzrqph3LJqf+HgsTavZpK/e9oVZzR3SqBhWsKrNte5Soov184WfblVnATZegNx4/r
+	 v4CKr1fc7NGxuWhiockONbi3UD/lEPNmWgEFSNC1DNW9XHbr/9JJ7L78ZqeITlUO33
+	 rxxLdA4ceUThA==
+Date: Mon, 8 Jun 2026 16:58:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+ <michael.chan@broadcom.com>, <hkallweit1@gmail.com>,
+ <maxime.chevallier@bootlin.com>, <joshwash@google.com>,
+ <tariqt@nvidia.com>, <alexanderduyck@fb.com>, <willemb@google.com>,
+ <kory.maincent@bootlin.com>, <sdf.kernel@gmail.com>,
+ <jakub@cloudflare.com>, <nb@tipi-net.de>
+Subject: Re: [PATCH net-next v2 05/12] net: ethtool: optionally skip
+ rtnl_lock on Netlink path for SET ops
+Message-ID: <20260608165826.2525b726@kernel.org>
+In-Reply-To: <ce45017d-8caf-4b4c-b04a-44806bcf5e72@intel.com>
+References: <20260605002912.3456868-1-kuba@kernel.org>
+	<20260605002912.3456868-6-kuba@kernel.org>
+	<ce45017d-8caf-4b4c-b04a-44806bcf5e72@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-08_06,2026-06-05_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999
- adultscore=0 suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2605130000 definitions=main-2606080216
-X-Authority-Analysis: v=2.4 cv=cL/QdFeN c=1 sm=1 tr=0 ts=6a275361 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=o5oIOnhZENCTenyL_yNV:22 a=yPCof4ZbAAAA:8 a=lZAZS3N-niQ3KQdCBw4A:9
- a=5yU3S35YU4bGjq-dph-N:22 a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:13723
-X-Proofpoint-GUID: kv4sTv3mVoJiexyZRQrL7pzipiJT9XP-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDIxOCBTYWx0ZWRfXzdhKGvQjEc14
- +I5ltglk/BtuK0Doz5JgXriE89bw5tIoxdLTmk7TOCWKe9k7OnAKf+8XZaiF1Cy/24NCuTLk4Yb
- nZZE+J4A7eMmD/oHSGThAyMVzgMDOT8A9UmkJrzZl9N8wYRLiqRHomFsR8SXBhmQUIyDfErQQF7
- qcEdNjcexw+4bFXhcBTDyk3PJadFwPBNbRLP5rtLgwbErIPHtpNfrrfMWs3gOJTQR3NQ8EZBJwO
- nqWv/qrlGmB0rJ1vk3GPUi3tbqQO907ioATWR0exWUpavxPLr4xukmErqJd21ls30ASNcSvjApl
- mNbZS2GN2G97ClJC1y5f5aVy2Mmf03n8HofaIvr0vtsey8NbBGFt/aF0oe/+YuQaKBlnQtgz9iM
- kLMvsjLUOTmUVgqIekLxKRHpILDjRIqwERtjTRgVzkyx37tM9PA9hidlv4iUIgeHTdvzqXoTEKu
- kZRmpGmfrqawzoCMLaGvioo7A5usQL0O7krUflvo=
-X-Proofpoint-ORIG-GUID: kv4sTv3mVoJiexyZRQrL7pzipiJT9XP-
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296787-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:michael.chan@broadcom.com,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:joshwash@google.com,m:tariqt@nvidia.com,m:alexanderduyck@fb.com,m:willemb@google.com,m:kory.maincent@bootlin.com,m:sdf.kernel@gmail.com,m:jakub@cloudflare.com,m:nb@tipi-net.de,m:andrew@lunn.ch,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,broadcom.com,gmail.com,bootlin.com,nvidia.com,fb.com,cloudflare.com,tipi-net.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296786-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:manjunath.b.patil@oracle.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:dkim,oracle.com:email,oracle.com:mid,oracle.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E6C365B359
+X-Rspamd-Queue-Id: A5D3865B3E3
 
-mlx5e_update_carrier() reports both link-up and link-down carrier
-changes, but an administrative down does not reach it in practice. The
-close path first changes the port admin state and then clears
-MLX5E_STATE_OPENED and drops carrier silently in mlx5e_close_locked().
-Any queued carrier worker will skip update_carrier() once the device is
-no longer opened.
+On Mon, 8 Jun 2026 15:15:48 -0700 Jacob Keller wrote:
+> > @@ -935,7 +935,13 @@ struct kernel_ethtool_ts_info {
+> >   * these bits separate, per GET and SET. GET is much easier to "unlock".
+> >   */
+> >  #define ETHTOOL_OP_NEEDS_RTNL_LINKSETTINGS	BIT(0)
+> > -#define ETHTOOL_OP_NEEDS_RTNL_GPAUSEPARAM	BIT(1)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_SPFLAGS		BIT(1)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_SRINGPARAM	BIT(2)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_SCHANNELS		BIT(3)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_SCOALESCE		BIT(4)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_GPAUSEPARAM	BIT(5)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_SPAUSEPARAM	BIT(6)
+> > +#define ETHTOOL_OP_NEEDS_RTNL_RSS		BIT(7)  
+> 
+> Whats the reasoning for changing order here? Is this sorted somehow?
 
-This leaves "ip link set dev <dev> down" without a matching netdev
-"Link down" message, while reopening the device still reports "Link up".
+I went back and forth on this a little but at the end I wanted the GET
+and SET bits to be next to each other (PAUSE ones specifically, that's
+the only case where phylink forces us to add a GET bit).
 
-Report the link-down transition in mlx5e_close() before the common close
-helper clears the opened state and drops carrier. Guard the message with
-the current opened and carrier state to avoid duplicates when the netdev
-is already closed or carrier is already down.
+> Would it make more sense to use an enum to define the bits instead so
+> that patches don't have to do a -/+ of the same NAME?
 
-Assisted-by: Codex:gpt-5
-Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
----
-Validation:
-- Built an OL8 mainline test kernel from this change.
-- Booted 7.1.0-rc6.bug123456.el8.v1.x86_64 on an mlx5-backed VM.
-- Confirmed `ip link set dev re0 down/up` and `re1 down/up` now emit
-  netdev `Link down` and `Link up` messages, alongside the existing RDMA
-  port state notifications.
-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 8f2b3abe0092..a04a89f0eddf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3628,6 +3628,9 @@ int mlx5e_close(struct net_device *netdev)
- 
- 	mutex_lock(&priv->state_lock);
- 	mlx5e_modify_admin_state(priv->mdev, MLX5_PORT_DOWN);
-+	if (test_bit(MLX5E_STATE_OPENED, &priv->state) &&
-+	    netif_carrier_ok(netdev))
-+		netdev_info(netdev, "Link down\n");
- 	err = mlx5e_close_locked(netdev);
- 	mutex_unlock(&priv->state_lock);
- 
-
-base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
--- 
-2.47.3
+We'd need to add enum for bit ids and then defines for BIT(id)?
+Dunno, personally I don't really like that. And we never switch
+on the values here so enum buys us little. Maybe BTF, that's about it?
 
