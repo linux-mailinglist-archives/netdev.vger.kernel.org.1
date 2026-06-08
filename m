@@ -1,114 +1,179 @@
-Return-Path: <netdev+bounces-296654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rSMfGwzrJmp9nAIAu9opvQ
-	(envelope-from <netdev+bounces-296654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:17:16 +0200
+	id fqSmDxnrJmqEnAIAu9opvQ
+	(envelope-from <netdev+bounces-296655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:17:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38BFF65898B
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:17:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39396589A6
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 18:17:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="Xi/WSke0";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296654-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296654-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="M FUxWWs";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=dRYelcvQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296655-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296655-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E8E230E6BDE
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 16:03:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6120B304E653
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 16:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472D7332EDE;
-	Mon,  8 Jun 2026 16:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4E8331221;
+	Mon,  8 Jun 2026 16:03:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5420632FA3C
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 16:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5F4332EA7;
+	Mon,  8 Jun 2026 16:03:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780934616; cv=none; b=nIFS5psIYAoInpzPyqiHUg/cyS3FPny2zhIKyFjrBzmU6B97ZsAwHj5MzIY6MprfmYAI6SRy/g8wXTNb0E8pM68VA5vhXy9jdTcoJiGMr56CALMeNIQzgBfAfaVq/NQnEcAi+8pMIv1dbAYpqlwC8XXBLdfxkPK8/6fXxAfZ3oA=
+	t=1780934631; cv=none; b=ef8T/sQtWikmrMqzpB6Z0AcU7uHY0NuTUmu0IPRdlg2iB5dtVhDAvBjov+QqQr6t/0qMW0/UREso/0K7xxP9CUPthgQToHoY/dDeUbsL7DwLO9+TZZJB7RzoljvUDwu1GaVGL636KG3KF6yceM5bFt6jnyMyp2o0EqsU5Fe1C44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780934616; c=relaxed/simple;
-	bh=oAUFrV7Dcmzu+Gtgt2bMcwfnBbwk5+eFMBwXtUsRYBQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WKFB6KZ8LFju0dSIr3Sr8ptMbGtVeZ7v9eMtseNKOlna2ejkV6V4iv9sCrLJY23mxZTEHTvouGmbnI2p36QlXcMfFzJjtRsjkL/O+w0kLeyREeR0HU6V1/shs/OcC7GWEk13HaGarM+rZW22d1fU1w7QzbHa+LOi0PHoyU2Nl7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xi/WSke0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 995381F00893;
-	Mon,  8 Jun 2026 16:03:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780934615;
-	bh=bTFwLlP9Xda5SAvgZ1W/YNCfrYnOgGpX1iJxi+v1uJc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Xi/WSke0bT7EQ8BFzZx80hHvV4g+lTsFkERPCp9PRpM67t99R1KGFKkmaEbHYUiet
-	 v8bOqqjIaz/SC9hJBLneob8UGUAg7SbRw+CZlhEw7GNlAMDM94e4sV0ZsOXvrIA9sE
-	 yZRdHOvNUmnDd1aTE6ZHwovN9mRxp0AjWkLLAxf2iZ/l0174+tvLIY2+Yvohu2sKjK
-	 juDxylZMmeo+NiQDFKKOwasXWswfLFpcx/OMSpJoxuni97QDMnedQDeuNuXrA4sSEC
-	 5CpcLMfrwdh8xSvkJ5q41m1uy4OLpE8YatI7QLCHbXWwhLTj/6J1AuJXIDzTxShiQN
-	 hVWCut513PBAA==
-Date: Mon, 8 Jun 2026 09:03:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
- dsahern@kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [PATCH 1/3 net-next v5] ipv4: centralize devconf sysctl
- handling
-Message-ID: <20260608090333.21c94721@kernel.org>
-In-Reply-To: <20260607110123.5939-1-fmancera@suse.de>
-References: <20260607110123.5939-1-fmancera@suse.de>
+	s=arc-20240116; t=1780934631; c=relaxed/simple;
+	bh=aCdiaS58bUQL7UzePzNnvYQIC4XpFG8cK0MyqOyoThk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VqDI7xSfXSerTXtX7qGH+1ftIP6E+L0xoIHsQloeCWykpzHnlKozw25s6igWLkXh94BIj9pQwNJlrDCeov2Bof8Hpd9hwiCtwWkkKJJ903uH0WR3KP8oLDyz3U213fgirdNMi1giVaLYCxR3cn/Z3Ge/j7EYQX+x3PBUzgydDZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=MFUxWWsa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dRYelcvQ; arc=none smtp.client-ip=202.12.124.158
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C11477A00C2;
+	Mon,  8 Jun 2026 12:03:46 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Mon, 08 Jun 2026 12:03:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1780934626; x=
+	1781021026; bh=zRsyJ98tISk+ATAEz4XJUroqoFu+sTEph+r90M7pkMQ=; b=M
+	FUxWWsapxmAIkodmv5sxGWvRMBAYCE/MzQ18g7k/cV0iFFIw7eETOLLJjaX0xNWW
+	g4ttF8Wg1ymOmeF/BHzyYJXx06rL0CTGmW0gdRESmWmOcdGSs8a0UJiWI0h+4MaV
+	g0DfTWNT7c+QqAhIP3G7aQ1Epa/XKq/FyFwGIkYMNOG48Dwxn1eV5emHr6mz8v7i
+	He9erul3fTcCThBX6QZKi6DDh9hkzuSY6soytT7NBsrkqIzJWTJnaNC8qea6Kn2l
+	vGqrs2cM+EgJGFliRLPR+bG0Vkfypf2r05sDpINJS7dcnzw6rV+UG5MaBIPQ7/Q8
+	xP/ZjZoO3SX01qUc8YhXA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1780934626; x=1781021026; bh=zRsyJ98tISk+ATAEz4XJUroqoFu+sTEph+r
+	90M7pkMQ=; b=dRYelcvQwQzo2hGhgIFZlsHDoTOxbHSR3cLgLLOoKTM2X8HoBgl
+	TbndtHpHH8fE2Mz6gfva1AVb8nATlIPC/K+cT7CMasnkeVZYw4em3megL8zVRLC+
+	v9Awzt06ZK6eaahLTdN1xYEkDsFS4NZ2j2fgbOEW3vDWqmWRcs9PE00hszWyK3EJ
+	uTyBwKMs/GFGz5a5QnA+Ny8RLc5dgQDoUjSQhhUgcEoTvC02qbbQ501fdNO9r3Pd
+	HK0a6dVjDsAPuW5KY6lrEd+C+k3Ip1U+pJ1MNReSzo6uObt1hF4Z5OnW8t7z3HeU
+	EeW5rB1J0OivA+C+3aXj9SFw90qRpcmE54A==
+X-ME-Sender: <xms:4ecmaqofTAipvZ771gHudUl1oDmmmeuHooC3W4rzjm9mgmiz0VonHQ>
+    <xme:4ecmaqN0QryWmr4xkeDYWETiWm-vBDubA7RNQXLg6uod505eeFg4WLebi98x7VYs2
+    KfgSm85u2ycQo_GWlSjlnGkqmBHhOY8Bzk0L1CQ7MluzFOjQjjpBA>
+X-ME-Received: <xmr:4ecmauex5AN7TjKrBY-nI4UJwui1lo6jtkWHxW_zU5swDzTRTnWOhtw5IJKFR1KeAPn2NZjQ_ulwuQfEkCPM_Q0>
+X-ME-Proxy-Cause: dmFkZTEJiTZtvJ9ShH977Sp0pLa2KXTz8geBKwqEjOwfs1HT95RnTXnpfB2e0UrDPHqxOw
+    gJagGpYftydsSYAXc3/4LsGnpDiMhbMHLIDw34IdjYyZJMPi30S/lHorwaPy++tNt2jIqy
+    NspRvWuMUl4QG2QbPpe+V2/R3rgk64UEXOzKAAkzZeS90QbBgIw4cOgCYoM9YpdhHOyyal
+    66LNTuu8f9C87eEbeY4fMAFIr+CijbfO3VggQZMrWqWQZi+gZstFvB+Gev2py/MQJ2w858
+    kydruTmmi4QM7roIkOAax14wn4ggct6s7qcS4oJl3g1no7liM91wULWI2Dm1VdBzvTcPbm
+    h0qVp5g9xPGSlgXEnI2W2JqijSMe2NJh9N1iRZqp37HuqgtBSoKC+d9iZ29OsfvMsr5yzt
+    cb7NMNt8hcOByE/F+lp0YFZlURIy70RVvWJCalKMqdM2R7r0S+KnsBO1kQ7OtCDEXgcmVM
+    qPK5xdnJ2+QUA034VyFOt+P+rO1eQ/I8SeLHl5WiFB+i9oSnGtlATjhEk12q0aYCjUOqnk
+    D9cTnQgsjEN2GAO3Y0/oW6MZFzK9954DI+MfNCpC2aXSaUXXYAEDT93kYbYBdUJrxZirU7
+    tpn7qFwU2YQ9YU6qWKpqzLHTrXG6sZ5yQKMjp4qjW2VOJQdN9HKw37/kg7rQ
+X-ME-Proxy: <xmx:4ecmagUbKJ7-KNBSfEedX_qMP-UVLF86SzNvTEb_GnLHF2b786Z96A>
+    <xmx:4ecmavAMj2fvl7aF_FBQTUoSvORfEorKV7ZLwpA-qpuOVrSdctTVwA>
+    <xmx:4ecmar6gMv2Ic-FeQW1gmkt6FA7jdj4dzMrOW5zqIUtyQXDKwXpKEg>
+    <xmx:4ecmam1GEbsFS93YclIP8xe_zQ6Wo7SbCfMiZdNm-tQFW_yQfQ_5Yw>
+    <xmx:4ucmahgT7ABmLKCiUfTS0E62hOt4TK5S2Ms7XKZlZ2C1Bbo_htCqRwdl>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 8 Jun 2026 12:03:44 -0400 (EDT)
+Date: Mon, 8 Jun 2026 18:03:42 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Zijing Yin <yzjaurora@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: af_key: initialize alg_key_len for IPComp
+ states
+Message-ID: <aibn3tkGc3Iz1r5n@krikkit>
+References: <20260608144453.3553219-1-yzjaurora@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260608144453.3553219-1-yzjaurora@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296654-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:yzjaurora@gmail.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:idosch@nvidia.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_TO(0.00)[secunet.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:nicolas.dichtel@6wind.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296655-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:from_mime,krikkit:mid,messagingengine.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 38BFF65898B
+X-Rspamd-Queue-Id: A39396589A6
 
-On Sun,  7 Jun 2026 13:01:21 +0200 Fernando Fernandez Mancera wrote:
-> The logic for handling IPv4 devconf sysctls is scattered. Notification
-> and cache flushes are managed in devinet_conf_proc(), while a separate
-> ipv4_doint_and_flush() function and DEVINET_SYSCTL_FLUSHING_ENTRY macro
-> is used for properties that solely require a cache flush.
+note: fixes for IPsec should go to the "ipsec" tree, not net
 
-Hi Fernando!
+2026-06-08, 07:44:41 -0700, Zijing Yin wrote:
+> pfkey_msg2xfrm_state() handles the IPComp (SADB_X_SATYPE_IPCOMP) case by
+> allocating x->calg and copying only the algorithm name:
+> 
+> 	x->calg = kmalloc_obj(*x->calg);
+> 	if (!x->calg) {
+> 		err = -ENOMEM;
+> 		goto out;
+> 	}
+> 	strcpy(x->calg->alg_name, a->name);
+> 	x->props.calgo = sa->sadb_sa_encrypt;
+> 
+> Unlike the authentication (x->aalg) and encryption (x->ealg) branches of
+> the same function, the compression branch never initializes
+> calg->alg_key_len.  IPComp carries no key and the allocation only
+> reserves sizeof(struct xfrm_algo) (i.e. no room for a key), so the field
+> is left containing uninitialized slab data.
+> 
+> calg->alg_key_len is later used as a length by xfrm_algo_clone() when an
+> IPComp state is cloned during XFRM_MSG_MIGRATE:
 
-Do you have the necessary iproute2 patches pushed out somewhere?
-I'll pull them in the CI to make sure the test works.
+The patch looks correct, but do we want to start fixing random bugs in
+code that we're trying to get rid of and that nobody actually uses?
+
+If we do, then:
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+
+-- 
+Sabrina
 
