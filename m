@@ -1,403 +1,544 @@
-Return-Path: <netdev+bounces-296541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296542-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7pPfNba8JmovcAIAu9opvQ
-	(envelope-from <netdev+bounces-296541-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:59:34 +0200
+	id goytKGq9JmpZcAIAu9opvQ
+	(envelope-from <netdev+bounces-296542-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:02:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4386565F8
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 14:59:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9525A656649
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 15:02:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b="FHYQcl/j";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296541-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296541-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=j+rUH7yN;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=dokvD1DR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296542-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296542-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E37913004D3D
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 12:59:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0F8B93000B2F
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 13:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E648E2BDC28;
-	Mon,  8 Jun 2026 12:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6297B2874F8;
+	Mon,  8 Jun 2026 13:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F63230BE9
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 12:59:28 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780923569; cv=none; b=F7b6eVg9/l2+XvpvnOH49ocr9spUbrsOrETtcD3d/AoKr5TQ08XVIE0Zy2GBKhm1JJKprtRGpHlzl8xmKmXr+BDsWCKLgSlIpud3Yi9vHr62nxbTSn8UHOUDZ4D84ztEnO2Edtb3Apb0OkgnVgcXE3lHNSJyTgTRAQ0Gi4BkQR0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780923569; c=relaxed/simple;
-	bh=pppSCiti4jvi5EsxxegmSDnZrha/rHxM9F+JK/EvxDU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MlvQATfbAs77M6ZbaST43rqoIVKgOoff6GRbGNnPs1G4es22IYyakWPKNw3LMF2MAt55zzR021VVRD0u9UM08f/aN2X3CJi9wQpQDcnVzLp1yPT4Xwp1rNMLpXbGl6c3fij4JE5cwY8Fs6LoflRqh4vUwah0/iESw+E+IjN8pv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FHYQcl/j; arc=none smtp.client-ip=91.218.175.183
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780923566;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k3XNGhcQHJVmcyavdjn9EhDX/kEW3MIT6FKFuaZuhMc=;
-	b=FHYQcl/jKZ6FER/I7Nsw0rubDgjwRebm9faiJzCI6Qy+D8pGv+GbpsYyyaMA55ERV5fNNp
-	otTEdJUoB4CTR2WhYFXTqtOWwbmMlOHux0E0n4s3X5YKNLzplzDmAwIwYJtk6UlEz/Yi4n
-	ogIVPOzzs4Q498mo8pFRzuuYhHCq0lA=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Joe Stringer <joe@wand.net.nz>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v8 2/2] selftests/bpf: Add protocol check test for bpf_sk_assign_tcp_reqsk()
-Date: Mon,  8 Jun 2026 20:58:28 +0800
-Message-ID: <20260608125846.157004-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260608125846.157004-1-jiayuan.chen@linux.dev>
-References: <20260608125846.157004-1-jiayuan.chen@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03292D46CE
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 13:02:29 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780923751; cv=pass; b=BSxsnjyqDa6em9Ng8kAKLj7BNgVxM6srB2DfUSm02zd2491mSrfg5h/ylxYFn8TcCvQciIoMM0PKusInEAZzU4l9Apd8F1e84yrLeDZXiRXHqNqqCHD9vyp7H5Bw9cyP52PaomeMKDXgSlrt7R8flrw4ek20JPf87aPZarwn1ew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780923751; c=relaxed/simple;
+	bh=vVjU3pwVlqs1eGL3LgvYGVSpYqf3o7An1hUHG7tFne0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O9kq2i7D4R1Z6iFfl9Nu1R+urLW+hkUWbdw+cCRi23fzTWoois/yKsSA8zpnySazHKFw3TJNpbiT/w5aWUzMe7RWxs91M3BmrlrDNZNfQUoD4vH5ocDYBMfB9O3OlgrvvPeOFMa1v3HQuZcWzPjU63bOB8HrvogV7CD1DFK0qNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=j+rUH7yN; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=dokvD1DR; arc=pass smtp.client-ip=205.220.168.131
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 658B9Tij2993062
+	for <netdev@vger.kernel.org>; Mon, 8 Jun 2026 13:02:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	1xsUP1loZg3jYdsBk6X4zW9T5zMq3W/iPnEHzKVjyxY=; b=j+rUH7yNKShbdNZr
+	MqPeI10vwdoPUpfzUXM9yE67URwfG9f0JDVVLUsjGLRvD/v/a5wWvZlAOk53MIGY
+	LjIAmHuiq0Y7nQzBPMV/sLmmLpmTz4Z2Fhhe/9VKFllEevVNCvaKfs8Deh5mgVbP
+	XZUGYjS4x+joNYUOgYpqmjey1ARbnX7M9WqpEK2EfdQcRxxz5b4N181GIbqfv7uu
+	AHI36YCPoIxY5nEoCxDPPjX9+bOXKPxuxWB9fJL6ElDeMVwZj8kFrxTqi+vtPS6B
+	0U4A2fZclkQlc0vqe0jegAp6NKsUhWozFi7CmVerYMI7Q+oOXk65aSmTgo/iXTPD
+	nmpo6g==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4enuna8qu3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 13:02:28 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-915d33f7c28so176904485a.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 06:02:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780923748; cv=none;
+        d=google.com; s=arc-20240605;
+        b=T1TSYps6/SvZMiOdUFHGMZk7EwXi7f5oC+rAjhXsIRGISkoc7V0ciaEyR3OfA0AiOI
+         0/V5nmUmA8a0zhb+IRBEYHqDSWFnafnCidQs8w7i1uYc4VLmsLUXbriaMG1vy9HnrSgH
+         2aZo813boSXPQbEcOTVI18pfxhxN5EiJ9tk4Z985VYmLxxQ/R6QitYqvafP6au3bwgXt
+         Fx6qn2w45fKJ2Zmjp5kB5VQSnhGeAcM1fB3rzRM/AfEYWQcYKI+rP/QL+A5H1ZEsZgCS
+         43rkqUoNm+JvOPypzfreWDoSBoYlKYC4evKn15r+WJa3oxgR6cP6+22g2ASsKpv0McL/
+         mKhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=1xsUP1loZg3jYdsBk6X4zW9T5zMq3W/iPnEHzKVjyxY=;
+        fh=8mBY23aQFUyvVprr3WEnvvN3k6QnPXIiubiK5P9nNuQ=;
+        b=kgbjpUZmJd49AVm/IiT3xQsAoUg2bRMQMjw6u4gks8AH5s926+7RCa+T0YUr1LduLk
+         3wTqQ56QLi1L1jDnj0qbQ3L5YYA3FKMekW0+VuzwDT7bldATE1XsvJW4Q7KdHrQ3wSKE
+         B77Tx/iSSibjivfir/t9IufPXZ3pgHxllFnW1FDIkaaWMCMhrtxYmBHyskKYRAIfNWWE
+         5DXs4UEJ5K9yu7GZW2kScBwDKbtV4lFQKZ9Wx4gq6mlhJ2N9V4hhRgjySZdGTWuM0XGX
+         GWU0R0zGUkCs1zhnZDomNBqXo/WByWusCrXGFCUEtLn8lGPCcP83Zbj2eHY1CylQg+3G
+         nDvA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1780923748; x=1781528548; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1xsUP1loZg3jYdsBk6X4zW9T5zMq3W/iPnEHzKVjyxY=;
+        b=dokvD1DRYBiGP63raE7ShOQo13Jvif9/PNUM+gyueVk3taTeCbHFOJmQsi8I5o7lq1
+         k9Ig7Hhdz3VysevM8uaudeVv+oS0Yesjd3CUVRGc9zKYMNN7kf7QQWnyZARg+7Xyep8J
+         zZkLKS2nlddrUArOTiVW3t+Tqa4J5wcxpJJR0hGet4vRxi546vhF+o+5CB4by7Dquhww
+         I48fCSgbCNmHtya03oeLPFU63F2k6dzFEZ9MkKl8ifR715mhkTnkJ6+uLJqKYeQ0I1Kl
+         V/qT9SNfqipJwxSo/Exs6KlFF1kA007wn2UdlZLaFHSf8uNYnN0p5M3zEpEsvcoi2mIi
+         i98g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780923748; x=1781528548;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1xsUP1loZg3jYdsBk6X4zW9T5zMq3W/iPnEHzKVjyxY=;
+        b=pwhmWzFnB6BZE60uguwuIVJBpqUb1jkjiM5LOmq/uocmgV9w8jDRaTEEw25D/j7/hl
+         y/bDkmS9rO5zeqGM7iMs4zLOkEM/tQ+/pmHnHX6KCB8MLrukkBwUBVp429Dpl0AV6C1n
+         a38X5K4UmSh5eizdGAzqyRPlJctfiU62585Pjbi4QCbL8nXD8XRTFJkeZBqK1ALZL/3x
+         jnQIe1+BRKkYKbdb8q+qclE0PHSaAJbkJKigLoyuyYf6vgK/tmLqWE48WrVtHzhm7TS9
+         IsmG0uRIqcM4VTyArKSPdXfYX/qxrvOI1UT1tHY0hH8gdDY6SkCwNqqHf8eTf1hhbPmx
+         tO8Q==
+X-Forwarded-Encrypted: i=1; AFNElJ94fLoMDL9eqpljgjgMQ+H2mhQehr2rX6exhYEnsWD3AkxBhYTaEt4j8hXWmvja2vKzL+y5Irc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5hjTnQqDwhCNjeeofF5i45Tv5sJc7IhUAwoO8xa3dr/rDkIEM
+	vjfSzUu/GJsCgZgfcHMYLYgZdM2vKWcG1EQBlMQjphJ/GC4zju3MN9PEkdv/BO/GJ24//cuyiHV
+	/L925SDC+TapePffXqNLQe6+k7MboM8kfB6nVOgpF5UMI4fWH/x0c7/1FiW2RoINWUJxKk2s2W3
+	VML0wQ1dE2Bls4rOJFaJrqVMb7mVYrJrFwpg==
+X-Gm-Gg: Acq92OFrZ12PI1c+qYyqOTakT1swqm7gvQ7Ii00gKLuYE3gIyn69IBbqV9ST5no9Fqn
+	4xk3mKLFsQSrZ2Bb6CLka6Py5Omu+BvIrp/Na8ydqBKzH9yrkLdfwNXnKxC5BMJQSH6pbzZK587
+	Gj3qD/oAl+37ZEcmlnsDEKKF6GzkK7sOs9rkfCqTvjBDz43j9LW2JNM5Cnp1amx0Og/aZCsq9OQ
+	+D/iCsPICNwhehmNXXG6KY1iJ8WkWC5k8D02XfYqhCItfVm1n5o9Q7tKLGYYPy5MVjtz+C+NJCb
+	BeBmM6DoohJ3ocml6YJpweMkZst1jGjh
+X-Received: by 2002:a05:620a:454b:b0:915:2404:bfe9 with SMTP id af79cd13be357-915a9c35852mr2536193285a.9.1780923724554;
+        Mon, 08 Jun 2026 06:02:04 -0700 (PDT)
+X-Received: by 2002:a05:620a:454b:b0:915:2404:bfe9 with SMTP id
+ af79cd13be357-915a9c35852mr2535551485a.9.1780923662522; Mon, 08 Jun 2026
+ 06:01:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260608-block-as-nvmem-v3-0-82681f50aa35@oss.qualcomm.com>
+ <20260608-block-as-nvmem-v3-4-82681f50aa35@oss.qualcomm.com> <CAMRc=McmoWvezeH05_5AR7ZbAyg1L567HsKWbuD7711LwnjV0Q@mail.gmail.com>
+In-Reply-To: <CAMRc=McmoWvezeH05_5AR7ZbAyg1L567HsKWbuD7711LwnjV0Q@mail.gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Mon, 8 Jun 2026 15:00:51 +0200
+X-Gm-Features: AVVi8Cc-wgzw5gsLbwZHUHPYEgpxejd9uRTmITt11-0eb6tOd2NzMwDpPGAFaCc
+Message-ID: <CAFEp6-0JaOd8PpqMY_21BEDyDyYx1kDfskOS4VSd8nxP4KBXZw@mail.gmail.com>
+Subject: Re: [PATCH v3 4/7] block: implement NVMEM provider
+To: Bartosz Golaszewski <brgl@kernel.org>, daniel@makrotopia.org
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, Ulf Hansson <ulfh@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA4MDEyMyBTYWx0ZWRfX5N7oavJQGF1x
+ zLFnj4OdX4NSW6hwtZI2FxrZkw2RKnzzDO7Ct9d0TJDbD4wAK4rz13fcjQ4ZLC4FRyitGtw2OfJ
+ +KvoFBflzn3VH+iy/OKH1ysflIebznqNrsvqmn7MXiaFVR681/4HxpMoeFICT25a+0DRYk6qrMz
+ HghNVsf9Yqw+lni4TI7U7ZG2kL5ida580ZRbwAjiPmt+JgQV/7vNcSmyLYsdYmPwgE3n6qbW/yu
+ /0Lxz5+4cl0923rLpvFXDRme0s6Z+Gyhjr0EUUX/uk44LGbJAgkvj7EA2O2dog+WyuHiiCQwiUY
+ sn6sIYw3sheZ4VhImt9UIEkHmGRIhuTtm5zhSEklN7tl8Szc+torG/h9+BH8hhwAdtL+NV3K/FY
+ vzv4JCih7RjyN21RGW7tK5RtZA3ilWVzcYEe6rzdQImA/rS6sQd46RdwcH5GB3i/sPn+7hUS+GS
+ WQviks5g7rHCtQJhWLw==
+X-Authority-Analysis: v=2.4 cv=RfugzVtv c=1 sm=1 tr=0 ts=6a26bd65 cx=c_pps
+ a=qKBjSQ1v91RyAK45QCPf5w==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=Um2Pa8k9VHT-vaBCBUpS:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=VT4XjZGOAAAA:8
+ a=IjnKPMcg25KrRLxKrC4A:9 a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
+ a=6CpsfURP9XNmmWg3j1mJ:22
+X-Proofpoint-ORIG-GUID: gLQiR__kBRPBWe_TOZOBSapcmdPIh8wX
+X-Proofpoint-GUID: gLQiR__kBRPBWe_TOZOBSapcmdPIh8wX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_03,2026-06-05_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 bulkscore=0 adultscore=0 spamscore=0 suspectscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
+ definitions=main-2606080123
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296541-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:jiayuan.chen@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:andrii@kernel.org,m:eddyz87@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:martin.lau@linux.dev,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:joe@wand.net.nz,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296542-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[linux.dev,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,wand.net.nz,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:brgl@kernel.org,m:daniel@makrotopia.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[loic.poulain@oss.qualcomm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,vger.kernel.org:from_smtp,linux.dev:mid,linux.dev:dkim,linux.dev:from_mime,linux.dev:email,ipv6.sport:url]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,config.dev:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,qualcomm.com:email,qualcomm.com:dkim,makrotopia.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CB4386565F8
+X-Rspamd-Queue-Id: 9525A656649
 
-Add test_tcp_custom_syncookie_protocol_check to test assigning a TCP sk to
-UDP skb->sk. The test sends a UDP packet through TC ingress, where a BPF
-program calls bpf_sk_assign_tcp_reqsk() on it. A UDP server's recv() is
-used for synchronization to ensure the BPF program has finished processing
-before checking the result.
+On Mon, Jun 8, 2026 at 1:17=E2=80=AFPM Bartosz Golaszewski <brgl@kernel.org=
+> wrote:
+>
+> On Mon, 8 Jun 2026 12:50:41 +0200, Loic Poulain
+> <loic.poulain@oss.qualcomm.com> said:
+> > From: Daniel Golle <daniel@makrotopia.org>
+> >
+> > On embedded devices using an eMMC it is common that one or more partiti=
+ons
+> > on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPRO=
+M
+> > data. Allow referencing the partition in device tree for the kernel and
+> > Wi-Fi drivers accessing it via the NVMEM layer.
+> >
+> > To safely defer the freeing of the provider private data until all
+> > consumers have released their cells, a nvmem_dev() accessor is added to
+> > the NVMEM core to expose the struct device embedded in struct nvmem_dev=
+ice.
+> > This allows registering a devm action on the nvmem device itself, ensur=
+ing
+> > the private data outlives any active cell references.
+> >
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > ---
+> >  block/Kconfig                  |   9 +++
+> >  block/Makefile                 |   1 +
+> >  block/blk-nvmem.c              | 171 +++++++++++++++++++++++++++++++++=
+++++++++
+> >  drivers/nvmem/core.c           |  13 ++++
+> >  include/linux/nvmem-consumer.h |   6 ++
+> >  5 files changed, 200 insertions(+)
+> >
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706=
+f75c92bdf8b648f7c 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+> >         by falling back to the kernel crypto API when inline
+> >         encryption hardware is not present.
+> >
+> > +config BLK_NVMEM
+> > +     bool "Block device NVMEM provider"
+> > +     depends on OF
+> > +     depends on NVMEM
+> > +     help
+> > +       Allow block devices (or partitions) to act as NVMEM providers,
+> > +       typically used with eMMC to store MAC addresses or Wi-Fi
+> > +       calibration data on embedded devices.
+> > +
+> >  source "block/partitions/Kconfig"
+> >
+> >  config BLK_PM
+> > diff --git a/block/Makefile b/block/Makefile
+> > index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800=
+ea266190a43b3e63d 100644
+> > --- a/block/Makefile
+> > +++ b/block/Makefile
+> > @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION) +=3D blk-crypto.o=
+ blk-crypto-profile.o \
+> >                                          blk-crypto-sysfs.o
+> >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) +=3D blk-crypto-fallback.=
+o
+> >  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)        +=3D holder.o
+> > +obj-$(CONFIG_BLK_NVMEM)                +=3D blk-nvmem.o
+> > diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..99c7728fb7bccdc2216780a=
+73a89a9210f925049
+> > --- /dev/null
+> > +++ b/block/blk-nvmem.c
+> > @@ -0,0 +1,171 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * block device NVMEM provider
+> > + *
+> > + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
+> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> > + *
+> > + * Useful on devices using a partition on an eMMC for MAC addresses or
+> > + * Wi-Fi calibration EEPROM data.
+> > + */
+> > +
+> > +#include <linux/cleanup.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/nvmem-provider.h>
+> > +#include <linux/nvmem-consumer.h>
+> > +#include <linux/of.h>
+> > +#include <linux/pagemap.h>
+> > +#include <linux/property.h>
+> > +
+> > +#include "blk.h"
+> > +
+> > +
+>
+> Stray newline?
+>
+> > +/* List of all NVMEM devices */
+> > +static LIST_HEAD(nvmem_devices);
+> > +static DEFINE_MUTEX(devices_mutex);
+> > +
+> > +struct blk_nvmem {
+> > +     struct nvmem_device     *nvmem;
+> > +     dev_t                   devt;
+> > +     struct list_head        list;
+> > +};
+> > +
+> > +static int blk_nvmem_reg_read(void *priv, unsigned int from,
+> > +                           void *val, size_t bytes)
+> > +{
+> > +     blk_mode_t mode =3D BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
+> > +     struct blk_nvmem *bnv =3D priv;
+> > +     size_t bytes_left =3D bytes;
+> > +     struct file *bdev_file;
+> > +     loff_t pos =3D from;
+> > +     int ret =3D 0;
+> > +
+> > +     bdev_file =3D bdev_file_open_by_dev(bnv->devt, mode, priv, NULL);
+> > +     if (!bdev_file)
+> > +             return -ENODEV;
+> > +
+> > +     if (IS_ERR(bdev_file))
+> > +             return PTR_ERR(bdev_file);
+> > +
+> > +     while (bytes_left) {
+> > +             pgoff_t f_index =3D pos >> PAGE_SHIFT;
+> > +             struct folio *folio;
+> > +             size_t folio_off;
+> > +             size_t to_read;
+> > +
+> > +             folio =3D read_mapping_folio(bdev_file->f_mapping, f_inde=
+x, NULL);
+> > +             if (IS_ERR(folio)) {
+> > +                     ret =3D PTR_ERR(folio);
+> > +                     goto err_release_bdev;
+> > +             }
+> > +
+> > +             folio_off =3D offset_in_folio(folio, pos);
+> > +             to_read =3D min(bytes_left, folio_size(folio) - folio_off=
+);
+> > +             memcpy_from_folio(val, folio, folio_off, to_read);
+> > +             pos +=3D to_read;
+> > +             bytes_left -=3D to_read;
+> > +             val +=3D to_read;
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +err_release_bdev:
+> > +     fput(bdev_file);
+>
+> There's a __free() action defined in linux/file.h so you can use:
+>
+>         struct file *bdev_file __free(fput) =3D ...
+>
+> and avoid this label.
 
-Without the fix in bpf_sk_assign_tcp_reqsk(), this will cause a null
-pointer dereference panic when the kernel processes it through the UDP
-receive path.
+Ok, thanks, will use.
 
-Test result:
-	./test_progs -a tcp_custom_syncookie_protocol_check -v
-	setup_netns:PASS:create netns 0 nsec
-	setup_netns:PASS:ip 0 nsec
-	write_sysctl:PASS:open sysctl 0 nsec
-	write_sysctl:PASS:write sysctl 0 nsec
-	setup_netns:PASS:write_sysctl 0 nsec
-	test_tcp_custom_syncookie_protocol_check:PASS:open_and_load 0 nsec
-	setup_tc:PASS:qdisc add dev lo clsact 0 nsec
-	setup_tc:PASS:filter add dev lo ingress 0 nsec
-	run_protocol_check:PASS:start tcp_server 0 nsec
-	run_protocol_check:PASS:start udp_server 0 nsec
-	run_protocol_check:PASS:connect udp_client 0 nsec
-	run_protocol_check:PASS:send udp 0 nsec
-	run_protocol_check:PASS:recv udp 0 nsec
-	run_protocol_check:PASS:recv data 0 nsec
-	run_protocol_check:PASS:udp_intercepted 0 nsec
-	#492/1   tcp_custom_syncookie_protocol_check/IPv4 TCP:OK
-	run_protocol_check:PASS:start tcp_server 0 nsec
-	run_protocol_check:PASS:start udp_server 0 nsec
-	run_protocol_check:PASS:connect udp_client 0 nsec
-	run_protocol_check:PASS:send udp 0 nsec
-	run_protocol_check:PASS:recv udp 0 nsec
-	run_protocol_check:PASS:recv data 0 nsec
-	run_protocol_check:PASS:udp_intercepted 0 nsec
-	#492/2   tcp_custom_syncookie_protocol_check/IPv6 TCP:OK
-	#492     tcp_custom_syncookie_protocol_check:OK
-	Summary: 1/2 PASSED, 0 SKIPPED, 0 FAILED
+>
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +static int blk_nvmem_register(struct device *dev)
+> > +{
+> > +     struct device_node *child, *np =3D dev_of_node(dev);
+> > +     struct block_device *bdev =3D dev_to_bdev(dev);
+> > +     struct nvmem_config config =3D {};
+> > +     struct blk_nvmem *bnv;
+> > +
+> > +     /* skip devices which do not have a device tree node */
+> > +     if (!np)
+> > +             return 0;
+> > +
+> > +     /* skip devices without an nvmem layout defined */
+> > +     child =3D of_get_child_by_name(np, "nvmem-layout");
+> > +     if (!child)
+> > +             return 0;
+> > +     of_node_put(child);
+>
+> Same as above, can be:
+>
+>         struct device_node *child __free(device_node) =3D=3D ...
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../bpf/prog_tests/tcp_custom_syncookie.c     |  87 ++++++++++++++-
- .../bpf/progs/test_tcp_custom_syncookie.c     | 102 ++++++++++++++++++
- 2 files changed, 185 insertions(+), 4 deletions(-)
+Ack.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-index 00d5c32674fc9..03103b7b9c5bf 100644
---- a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-@@ -5,6 +5,7 @@
- #include <sched.h>
- #include <stdlib.h>
- #include <net/if.h>
-+#include <netinet/in.h>
- 
- #include "test_progs.h"
- #include "cgroup_helpers.h"
-@@ -47,11 +48,10 @@ static int setup_netns(void)
- 	return -1;
- }
- 
--static int setup_tc(struct test_tcp_custom_syncookie *skel)
-+static int setup_tc(int prog_fd)
- {
- 	LIBBPF_OPTS(bpf_tc_hook, qdisc_lo, .attach_point = BPF_TC_INGRESS);
--	LIBBPF_OPTS(bpf_tc_opts, tc_attach,
--		    .prog_fd = bpf_program__fd(skel->progs.tcp_custom_syncookie));
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach, .prog_fd = prog_fd);
- 
- 	qdisc_lo.ifindex = if_nametoindex("lo");
- 	if (!ASSERT_OK(bpf_tc_hook_create(&qdisc_lo), "qdisc add dev lo clsact"))
-@@ -147,7 +147,7 @@ void test_tcp_custom_syncookie(void)
- 	if (!ASSERT_OK_PTR(skel, "open_and_load"))
- 		return;
- 
--	if (setup_tc(skel))
-+	if (setup_tc(bpf_program__fd(skel->progs.tcp_custom_syncookie)))
- 		goto destroy_skel;
- 
- 	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-@@ -165,6 +165,85 @@ void test_tcp_custom_syncookie(void)
- 
- destroy_skel:
- 	system("tc qdisc del dev lo clsact");
-+	test_tcp_custom_syncookie__destroy(skel);
-+}
-+
-+/* TCP and UDP servers share the same port. The BPF program intercepts
-+ * the UDP packet, looks up the TCP listener via the dest port, and
-+ * attempts to assign a TCP reqsk to the UDP skb.
-+ * Although bpf_sk_assign_tcp_reqsk() assign udp skb to tcp reqsk, the
-+ * network stack should not crash.
-+ */
-+static void run_protocol_check(struct test_tcp_custom_syncookie *skel,
-+			       int family, const char *addr)
-+{
-+	int tcp_server, udp_server, udp_client;
-+	char buf[] = "test";
-+	int port, ret;
-+
-+	tcp_server = start_server(family, SOCK_STREAM, addr, 0, 0);
-+	if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
-+		return;
-+
-+	port = ntohs(get_socket_local_port(tcp_server));
-+
-+	/* UDP server on same port for synchronization and port sharing */
-+	udp_server = start_server(family, SOCK_DGRAM, addr, port, 0);
-+	if (!ASSERT_NEQ(udp_server, -1, "start udp_server"))
-+		goto close_tcp;
-+
-+	skel->bss->udp_intercepted = false;
-+
-+	udp_client = connect_to_fd(udp_server, 0);
-+	if (!ASSERT_NEQ(udp_client, -1, "connect udp_client"))
-+		goto close_udp_server;
-+
-+	ret = send(udp_client, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(ret, sizeof(buf), "send udp"))
-+		goto close_udp_client;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	/* recv() ensures TC ingress BPF has processed the skb */
-+	ret = recv(udp_server, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(ret, sizeof(buf), "recv udp"))
-+		goto close_udp_client;
-+
-+	ASSERT_STREQ(buf, "test", "recv data");
-+	ASSERT_EQ(skel->bss->udp_intercepted, true, "udp_intercepted");
-+
-+close_udp_client:
-+	close(udp_client);
-+close_udp_server:
-+	close(udp_server);
-+close_tcp:
-+	close(tcp_server);
-+}
-+
-+void test_tcp_custom_syncookie_protocol_check(void)
-+{
-+	struct test_tcp_custom_syncookie *skel;
-+	int i;
-+
-+	if (setup_netns())
-+		return;
- 
-+	skel = test_tcp_custom_syncookie__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	if (setup_tc(bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto)))
-+		goto destroy_skel;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		if (!test__start_subtest(test_cases[i].name))
-+			continue;
-+
-+		run_protocol_check(skel, test_cases[i].family,
-+				   test_cases[i].addr);
-+	}
-+
-+destroy_skel:
-+	system("tc qdisc del dev lo clsact");
- 	test_tcp_custom_syncookie__destroy(skel);
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-index 7d5293de19523..5cf99d2a12aa5 100644
---- a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-@@ -588,4 +588,106 @@ int tcp_custom_syncookie(struct __sk_buff *skb)
- 	return tcp_handle_ack(&ctx);
- }
- 
-+/* Test: call bpf_sk_assign_tcp_reqsk() on a UDP skb. */
-+bool udp_intercepted;
-+
-+static int badproto_lookup_assign(struct __sk_buff *skb,
-+				  struct bpf_sock_tuple *tuple, u32 tuple_size)
-+{
-+	struct bpf_tcp_req_attrs attrs = {};
-+	struct bpf_sock *skc;
-+	struct sock *sk;
-+
-+	skc = bpf_skc_lookup_tcp(skb, tuple, tuple_size, -1, 0);
-+	if (!skc)
-+		return TC_ACT_OK;
-+
-+	if (skc->state != TCP_LISTEN) {
-+		bpf_sk_release(skc);
-+		return TC_ACT_OK;
-+	}
-+
-+	sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
-+	if (!sk) {
-+		bpf_sk_release(skc);
-+		return TC_ACT_OK;
-+	}
-+
-+	attrs.mss = 1460;
-+	attrs.wscale_ok = 1;
-+	attrs.snd_wscale = 7;
-+	attrs.rcv_wscale = 7;
-+	attrs.sack_ok = 1;
-+
-+	bpf_sk_assign_tcp_reqsk(skb, sk, &attrs, sizeof(attrs));
-+
-+	bpf_sk_release(skc);
-+	return TC_ACT_OK;
-+}
-+
-+SEC("tc")
-+int tcp_custom_syncookie_badproto(struct __sk_buff *skb)
-+{
-+	void *data = (void *)(long)skb->data;
-+	void *data_end = (void *)(long)skb->data_end;
-+	struct bpf_sock_tuple tuple = {};
-+	struct ethhdr *eth;
-+	struct iphdr *iph;
-+	struct ipv6hdr *ip6h;
-+	struct udphdr *udp;
-+
-+	eth = (struct ethhdr *)data;
-+	if (eth + 1 > data_end)
-+		return TC_ACT_OK;
-+
-+	switch (bpf_ntohs(eth->h_proto)) {
-+	case ETH_P_IP:
-+		iph = (struct iphdr *)(eth + 1);
-+		if (iph + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		if (iph->protocol != IPPROTO_UDP)
-+			return TC_ACT_OK;
-+
-+		udp = (struct udphdr *)(iph + 1);
-+		if (udp + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		udp_intercepted = true;
-+
-+		tuple.ipv4.saddr = iph->saddr;
-+		tuple.ipv4.daddr = iph->daddr;
-+		tuple.ipv4.sport = udp->source;
-+		tuple.ipv4.dport = udp->dest;
-+
-+		return badproto_lookup_assign(skb, &tuple,
-+					      sizeof(tuple.ipv4));
-+	case ETH_P_IPV6:
-+		ip6h = (struct ipv6hdr *)(eth + 1);
-+		if (ip6h + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		if (ip6h->nexthdr != IPPROTO_UDP)
-+			return TC_ACT_OK;
-+
-+		udp = (struct udphdr *)(ip6h + 1);
-+		if (udp + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		udp_intercepted = true;
-+
-+		__builtin_memcpy(tuple.ipv6.saddr, &ip6h->saddr,
-+				 sizeof(tuple.ipv6.saddr));
-+		__builtin_memcpy(tuple.ipv6.daddr, &ip6h->daddr,
-+				 sizeof(tuple.ipv6.daddr));
-+		tuple.ipv6.sport = udp->source;
-+		tuple.ipv6.dport = udp->dest;
-+
-+		return badproto_lookup_assign(skb, &tuple,
-+					      sizeof(tuple.ipv6));
-+	default:
-+		return TC_ACT_OK;
-+	}
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+>
+> > +
+> > +     /*
+> > +      * skip block device too large to be represented as NVMEM devices=
+,
+> > +      * the NVMEM reg_read callback uses an unsigned int offset
+> > +      */
+> > +     if (bdev_nr_bytes(bdev) > UINT_MAX)
+> > +             return -EFBIG;
+>
+> This will mean a failed probe. Wouldn't it be better to use -ENODEV?
 
+That would indeed be an appropriate error.
+
+>
+> > +
+> > +     bnv =3D kzalloc_obj(*bnv);
+> > +     if (!bnv)
+> > +             return -ENOMEM;
+> > +
+> > +     config.id =3D NVMEM_DEVID_NONE;
+> > +     config.dev =3D &bdev->bd_device;
+> > +     config.name =3D dev_name(&bdev->bd_device);
+> > +     config.owner =3D THIS_MODULE;
+> > +     config.priv =3D bnv;
+> > +     config.reg_read =3D blk_nvmem_reg_read;
+> > +     config.size =3D bdev_nr_bytes(bdev);
+> > +     config.word_size =3D 1;
+> > +     config.stride =3D 1;
+> > +     config.read_only =3D true;
+> > +     config.root_only =3D true;
+> > +     config.ignore_wp =3D true;
+> > +     config.of_node =3D to_of_node(dev->fwnode);
+> > +
+> > +     bnv->devt =3D bdev->bd_device.devt;
+> > +     bnv->nvmem =3D nvmem_register(&config);
+> > +     if (IS_ERR(bnv->nvmem)) {
+> > +             dev_err_probe(&bdev->bd_device, PTR_ERR(bnv->nvmem),
+> > +                           "Failed to register NVMEM device\n");
+> > +             kfree(bnv);
+> > +             return PTR_ERR(bnv->nvmem);
+> > +     }
+> > +
+> > +     scoped_guard(mutex, &devices_mutex)
+> > +             list_add_tail(&bnv->list, &nvmem_devices);
+>
+> I'm not sure I understand the need to store these? Whatever you need to d=
+o in
+> remove() can be scheduled in a devres action here.
+
+I think the devm_ approach would work fine in practice. The only
+difference is that NVMEM unregistration would be delayed from
+device_del() to device_release(), but during that window any read
+attempt would simply return -ENODEV, so there is no real race or
+safety concern AFAIU. I guess the explicit list was initially kept to
+mirror the add_dev/remove_dev symmetry of the class interface. But,
+except if there is no strong technical argument against devm_, I will
+switch to that simpler approach in the next version.
+
+Daniel, feel free to nack or ask for authorship removal if needed.
+This patch submitted in your name has accumulated enough changes since
+the original submission that the current shape may no longer reflect
+your intent.
+
+>
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void blk_nvmem_unregister(struct device *dev)
+> > +{
+> > +     struct blk_nvmem *bnv_c, *bnv_t, *bnv =3D NULL;
+> > +
+> > +     scoped_guard(mutex, &devices_mutex) {
+> > +             list_for_each_entry_safe(bnv_c, bnv_t, &nvmem_devices, li=
+st) {
+> > +                     if (bnv_c->devt =3D=3D dev_to_bdev(dev)->bd_devic=
+e.devt) {
+> > +                             bnv =3D bnv_c;
+> > +                             list_del(&bnv->list);
+> > +                             break;
+> > +                     }
+> > +             }
+> > +
+> > +             if (!bnv)
+> > +                     return;
+> > +     }
+> > +
+> > +     nvmem_unregister(bnv->nvmem);
+> > +     kfree(bnv);
+> > +}
+> > +
+> > +static struct class_interface blk_nvmem_bus_interface __refdata =3D {
+> > +     .class =3D &block_class,
+> > +     .add_dev =3D &blk_nvmem_register,
+> > +     .remove_dev =3D &blk_nvmem_unregister,
+> > +};
+> > +
+> > +static int __init blk_nvmem_init(void)
+> > +{
+> > +     int ret;
+> > +
+> > +     ret =3D class_interface_register(&blk_nvmem_bus_interface);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     return 0;
+> > +}
+> > +device_initcall(blk_nvmem_init);
+> > diff --git a/drivers/nvmem/core.c b/drivers/nvmem/core.c
+> > index 311cb2e5a5c02d2c6979d7c9bbb7f94abdfbdad1..ee3481229c20b3063c86d0d=
+d66aabbf6b5e29169 100644
+> > --- a/drivers/nvmem/core.c
+> > +++ b/drivers/nvmem/core.c
+> > @@ -2154,6 +2154,19 @@ const char *nvmem_dev_name(struct nvmem_device *=
+nvmem)
+> >  }
+> >  EXPORT_SYMBOL_GPL(nvmem_dev_name);
+> >
+> > +/**
+> > + * nvmem_dev() - Get the struct device of a given nvmem device.
+> > + *
+> > + * @nvmem: nvmem device.
+> > + *
+> > + * Return: pointer to the struct device of the nvmem device.
+> > + */
+> > +struct device *nvmem_dev(struct nvmem_device *nvmem)
+> > +{
+> > +     return &nvmem->dev;
+> > +}
+> > +EXPORT_SYMBOL_GPL(nvmem_dev);
+>
+> This should still be a separate patch.
+
+Well yes, actually I should even remove this as this is no more needed.
+
+Regards,
+Loic
 
