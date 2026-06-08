@@ -1,194 +1,259 @@
-Return-Path: <netdev+bounces-296332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VS+rH84IJmrQRAIAu9opvQ
-	(envelope-from <netdev+bounces-296332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 02:11:58 +0200
+	id rQ8cIngPJmqeRwIAu9opvQ
+	(envelope-from <netdev+bounces-296333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 02:40:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61EA651FBF
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 02:11:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F62A652081
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 02:40:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=e7RkjrOH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296332-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296332-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=common-net.org header.s=mail header.b="Bcpq/5xV";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296333-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296333-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=common-net.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C633300DDC3
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 00:11:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 656B7300B9F6
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 00:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50E234CDD;
-	Mon,  8 Jun 2026 00:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABDA2E2DDD;
+	Mon,  8 Jun 2026 00:40:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.common-net.org (mail.common-net.org [139.28.148.254])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C343C15C
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 00:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DE0F9D9;
+	Mon,  8 Jun 2026 00:40:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780877499; cv=none; b=pFzHQL3fEgdmw6BltlP2UKCSTjwrwe7pM1r+6LWEj1PmX8Wtsxr6aJ9l+ntw53E2sK+7tiEQu8UKtcjfG4OBJvZlmciTui1aVvUmhqAuB05AZAS7S+gfCQzPtjbK+U2Y0WgG4AXRUsgHqvb7cgdmNLzd3sjYUOV+4nW1P9yhwX0=
+	t=1780879204; cv=none; b=thNZTqbx7F2Q7kn1TnO2nPNrT5LsXGat04eu0uYryGuwm49mtFXPfdQ6XXaJG6oAcalkRYgJDUsKan03D44GRAYpBO874eppExeave6B8WGR2nAwZ4/EgcXvDHTqKapYm7ktgkacorjqWW4JM58OD4fQrEdOpd5FaLblpiSvD2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780877499; c=relaxed/simple;
-	bh=V0kYIIvrIeCHLQ8a3wc6DSRe9JDMTon7cWNexfUqcao=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e7tde9zHLMU0SRwblWtDa456dBosbe2qtMqXcyWMnndOFVMWkwTuQQkEUP4Bnu6fPjuws/RV/emc8eWOujKUtHjpoK8o+FmUkuaXDoo9wyEScqhJTf8Ol7ywLOPs1EOV82BfR9NMzRXpHy9+9hgRXdLNcICANQi0jTlOwdOJx1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=e7RkjrOH; arc=none smtp.client-ip=74.125.82.179
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-304cf518c9dso4495258eec.1
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 17:11:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1780877496; x=1781482296; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7iRu3+QlhKqNKahUpScbtHabnmDiSQhKgGceKe0jaQ=;
-        b=e7RkjrOHhv++qxwhAuWd/AuFvCQY4F7jRBDn/V3rOo730Eqd7fB9WiFgyLeBBCr2ir
-         WFYVCiGMDjrSGmxZG9c6kRmm3qnUPue3RBP3EwUyY3pplXB2/qXz3cpEyTDRl81xw6mh
-         GwxeojuIlsiiSV5tpczuDZ01x8Fsu/pA8lz2ZgqdX13/HENe9FsbarExDj3ImIIC3N/S
-         cXqiQc6okzGjr8p4KkePcy6cJYQ01swMZBeaXDsMEmdFhFgDXohFfyJmIYi0W2G8zvmR
-         uF7hZ+dYbPLBSLF9y/WoTpmAhYoEKUpc6Q/XIYuE2kT3HPtBJZIsYuSe435UfMZjMeRU
-         er/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780877496; x=1781482296;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z7iRu3+QlhKqNKahUpScbtHabnmDiSQhKgGceKe0jaQ=;
-        b=e5+mzYakgwBAv0y3b+7OcAQicLVD9fa54OGHTv+6eVVbJIGsrrt5NQrOcLveE523Sr
-         29/qDzKvAfOZaQq4rxNaIyA58yHMLHHb/Kdzko/lHVTwx831ceQ6OvPxnIyO/IWZsAcm
-         0EWX3ifWMtfN5zdZVgUXB0Irmm1WWdChimAhtAYZc/ctuAhWuC9IIKfelrJcDGzqXEsi
-         FuV+Xoucaj5ZE6lj2FIaoTZDa7wYp3j1lFKpDQMiOebwOt59ld2fUUZ7k0mWbkb89Bk1
-         HVD1jYSr+oZ1uuNlVKmAu3F8sWQexoFlGLmGNSprnsI1zlsNLrApXOJXfYsWzRPy+JA6
-         dXlg==
-X-Forwarded-Encrypted: i=1; AFNElJ8zCdQnufZNnf8lt929jQTVKKXxBfzqW1HX1WdepB2PM/TeHrNTPlbvvcf31/O6WDEl2GfB08Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBuTAtNYsPd3YRQ7mFPuik/S68TAOEGFlMCkCwAhJwxnKgqOe8
-	KJ8QdAYdNEj3Rw6PPLxQAmtdgs0qES64dA28zAMHhRHfN0MG1BteEH9v9DH5vR2okA==
-X-Gm-Gg: Acq92OHZLnPtj7D1sa0wo4k1gg+e85d4Kx9eP0cDclc6af/3rawMNgaLl1BblpWFoeD
-	5GzPVF+VF1jw6uPYU/8Ff+rh7mlM5eA0hWBI75GhPRsb0cmuALOPQsMiPo4hwcBlOd6xJp9wFnc
-	2EX8+v9s9sNWDn2YL7hDLYssx7FSCxbWSzBMH96YtOXHYp18pYzLmniTuICbdbELPPiFwSOPT9R
-	22XlL6zBQU2XImODhbCwUfZEgrdEZXLcTNs9mDfwen0ml8HnISGWTtIC5iQyXUEL9Yth2UiJmqB
-	QUCMiy7KxZZV3tNHg2lm88RJQVZyy6D57MP9FRt9p7jIIC2nfyIdN4Hyo81cjfNxuBlF/pLgB2r
-	M3kNq5vclTmqdWUS18J1lA+VvcUh46LLXbvCydq6KgapEawmi61LEDvET0rv/RvIN/MGJW+cNg2
-	VCt0i8I1TSPw5h6MdS5Q==
-X-Received: by 2002:a05:7300:5356:b0:2d9:db50:c6a5 with SMTP id 5a478bee46e88-3077abe9a9amr9120785eec.0.1780877496218;
-        Sun, 07 Jun 2026 17:11:36 -0700 (PDT)
-Received: from p1.. ([2607:fb90:ecaf:d942:ceea:844:6820:3308])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074db528dcsm18032945eec.3.2026.06.07.17.11.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 17:11:35 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: netfilter-devel@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	Weiming Shi <bestswngs@gmail.com>,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH nf] netfilter: nf_log: validate MAC header was set before dumping it
-Date: Sun,  7 Jun 2026 17:11:24 -0700
-Message-ID: <20260608001124.309352-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780879204; c=relaxed/simple;
+	bh=fE/ADlnkBPH9pTGhVSqA6lM2fhCG+KALo3TglJMi/KE=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=NhCenHf/yyqwwFIxbr8Qn5e66/lSo05VMO+mXxjFDC+orbDbyTvZAUB3FDNbqNr9oYxvIHtkxSUX+mHgW82CYE5AYSyRQiQQhUOvxFzcYlr97HFRe147J0+OgBTs+9VfJbyMuf8ZcuUApDRUzmdx2b37dXWdaoXpmvrN0jyQju8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=common-net.org; spf=pass smtp.mailfrom=common-net.org; dkim=pass (1024-bit key) header.d=common-net.org header.i=@common-net.org header.b=Bcpq/5xV; arc=none smtp.client-ip=139.28.148.254
+Received: from lubuntu-18.04 (host-80-116-255-177.retail.telecomitalia.it [80.116.255.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.common-net.org (Postfix) with ESMTPSA id 966276D20B88;
+	Mon,  8 Jun 2026 02:39:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=common-net.org;
+	s=mail; t=1780879193;
+	bh=fE/ADlnkBPH9pTGhVSqA6lM2fhCG+KALo3TglJMi/KE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bcpq/5xVd5Jc8Qd0t3so+RQsmrD8gSiyi51MwZEGXJ2KjbCZc2NDXka6s2g4064oO
+	 WBGniBVD1Yy9RviQC0TXX1PwwJYusFIZ1dMyLQ1qEM+wcfXwG3B+UUkalekrTtme8v
+	 LpAqxrH+3H8aGF8yOCp944Th+pBKMV6ux4THqHZs=
+Date: Mon, 8 Jun 2026 02:39:51 +0200
+From: Andrea Mayer <andrea@common-net.org>
+To: Yuya Kusakabe <yuya.kusakabe@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Justin Iurman <justin.iurman@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-doc@vger.kernel.org, stefano.salsano@uniroma2.it, ahabdels@cisco.com,
+ Andrea Mayer <andrea.mayer@uniroma2.it>, andrea@common-net.org
+Subject: Re: [PATCH v2 0/7] seg6: add SRv6 Mobile User Plane (RFC 9433)
+ behaviors
+Message-Id: <20260608023951.ccd278890d7c489dbfe21113@common-net.org>
+In-Reply-To: <CAGCJULPdm8jbveZsUm467_LBHRf5g=Jqd=XvCVKdNE1F2U99jg@mail.gmail.com>
+References: <20260505-seg6-mobile-v2-0-9e8022bdfdb6@gmail.com>
+	<20260516182556.66af27a9c63208435911990b@uniroma2.it>
+	<CAGCJULPdm8jbveZsUm467_LBHRf5g=Jqd=XvCVKdNE1F2U99jg@mail.gmail.com>
+Organization: Common Net
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[common-net.org,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[common-net.org:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296332-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,asu.edu];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296333-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[andrea@common-net.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:yuya.kusakabe@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:dsahern@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:justin.iurman@gmail.com,m:shuah@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-doc@vger.kernel.org,m:stefano.salsano@uniroma2.it,m:ahabdels@cisco.com,m:andrea.mayer@uniroma2.it,m:andrea@common-net.org,m:yuyakusakabe@gmail.com,m:justiniurman@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	HAS_ORG_HEADER(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lwn.net,linuxfoundation.org,vger.kernel.org,uniroma2.it,cisco.com,common-net.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrea@common-net.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[common-net.org:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,uniroma2.it:email,common-net.org:mid,common-net.org:from_mime,common-net.org:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E61EA651FBF
+X-Rspamd-Queue-Id: 0F62A652081
 
-The fallback path of dump_mac_header() guards the MAC header access
-only with "skb->mac_header != skb->network_header", without checking
-skb_mac_header_was_set().  When the MAC header is unset, mac_header is
-0xffff, so the test passes and skb_mac_header(skb) returns
-skb->head + 0xffff, ~64 KiB past the buffer; the loop then reads
-dev->hard_header_len bytes out of bounds into the kernel log.
+On Wed, 20 May 2026 12:12:08 +0900
+Yuya Kusakabe <yuya.kusakabe@gmail.com> wrote:
 
-This is reachable via the netdev logger: nf_log_unknown_packet() calls
-dump_mac_header() unconditionally, and an skb sent through AF_PACKET
-with PACKET_QDISC_BYPASS reaches the egress hook with mac_header still
-unset (__dev_queue_xmit(), which would reset it, is bypassed).
+Hi Yuya,
 
-Add the skb_mac_header_was_set() check the ARPHRD_ETHER path already
-uses.  Only skbs with an unset MAC header are affected; valid ones are
-dumped as before.
+Thanks for the reply. Inline answers below.
 
- BUG: KASAN: slab-out-of-bounds in dump_mac_header (net/netfilter/nf_log_syslog.c:831)
- Read of size 1 at addr ffff88800ea49d3f by task exploit/148
- Call Trace:
-  kasan_report (mm/kasan/report.c:595)
-  dump_mac_header (net/netfilter/nf_log_syslog.c:831)
-  nf_log_netdev_packet (net/netfilter/nf_log_syslog.c:938 net/netfilter/nf_log_syslog.c:963)
-  nf_log_packet (net/netfilter/nf_log.c:260)
-  nft_log_eval (net/netfilter/nft_log.c:60)
-  nft_do_chain (net/netfilter/nf_tables_core.c:285)
-  nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
-  nf_hook_slow (net/netfilter/core.c:619)
-  nf_hook_direct_egress (net/packet/af_packet.c:257)
-  packet_xmit (net/packet/af_packet.c:280)
-  packet_sendmsg (net/packet/af_packet.c:3114)
-  __sys_sendto (net/socket.c:2265)
+> On Sun, May 17, 2026 at 1:26 AM Andrea Mayer <andrea.mayer@uniroma2.it>
+> wrote:
+>
+> > RFC 9433 Section 6 is titled "SRv6 Segment Endpoint Mobility
+> > Behaviors", but Section 6.7 defines H.M.GTP4.D as "SR Policy Headend
+> > with tunnel decapsulation and map to an SRv6 policy". This behavior
+> > receives IPv4 packets and is not bound to any SID, so it does not fit
+> > the endpoint model that seg6_local implements. Placing it there
+> > required relaxing the ETH_P_IPV6 guard to accept ETH_P_IP and adding
+> > input_family to seg6_action_desc, for a single behavior that does not
+> > share the endpoint model.
+> >
+> > seg6_local is not the natural place for this behavior. The UAPI cannot
+> > be undone once merged, so where it should live needs discussion on the
+> > list before we proceed.
+> >
+> > Given the volume, moving the MUP code into a separate seg6_mobile.c
+> > (say CONFIG_IPV6_SEG6_MUP) would keep seg6_local focused on the RFC
+> > 8986 endpoint framework.
+>
+> I will move the MUP code out of seg6_local into a new
+> net/ipv6/seg6_mobile.c under a new Kconfig symbol, and register the
+> behaviors under a new lwtunnel encap type rather than
+> LWTUNNEL_ENCAP_SEG6_LOCAL.
+>
 
-Fixes: 7eb9282cd0ef ("netfilter: ipt_LOG/ip6t_LOG: add option to print decoded MAC header")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Assisted-by: Claude:claude-opus-4-8
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
- net/netfilter/nf_log_syslog.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On the placement, the new lwtunnel encap type you propose could be a way to
+implement the seg6_mobile.c separation. Since this touches UAPI in
+include/uapi/linux/lwtunnel.h beyond the SRv6 subsystem and cannot be
+undone once merged, it needs careful design.
 
-diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
-index 7a8952b049d1..ed5283fb6b67 100644
---- a/net/netfilter/nf_log_syslog.c
-+++ b/net/netfilter/nf_log_syslog.c
-@@ -815,7 +815,7 @@ static void dump_mac_header(struct nf_log_buf *m,
- 
- fallback:
- 	nf_log_buf_add(m, "MAC=");
--	if (dev->hard_header_len &&
-+	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
- 	    skb->mac_header != skb->network_header) {
- 		const unsigned char *p = skb_mac_header(skb);
- 		unsigned int i;
--- 
-2.43.0
+> For naming I was thinking CONFIG_IPV6_SEG6_MOBILE and
+> LWTUNNEL_ENCAP_SEG6_MOBILE to match the file name, but I have no strong
+> preference over CONFIG_IPV6_SEG6_MUP if the list prefers that.
 
+On the Kconfig symbol I agree, CONFIG_IPV6_SEG6_MOBILE matches the RFC 9433
+Section 6 terminology better than CONFIG_IPV6_SEG6_MUP. Section 6 is titled
+"SRv6 Segment Endpoint Mobility Behaviors".
+
+> Once LWTUNNEL_ENCAP_SEG6_MOBILE is its own encap type, it feels
+> natural to me to put H.M.GTP4.D there too rather than adding a
+> separate LWTUNNEL_ENCAP_SEG6_MOBILE_HEADEND. What do you think?
+
+H.M.GTP4.D in v2 shares the SEG6_LOCAL_MOBILE_* attributes and processing
+helpers with the End.M.* behaviors. A separate
+LWTUNNEL_ENCAP_SEG6_MOBILE_HEADEND would require its own attribute set,
+lwtunnel_encap_ops, and iproute2 parser, similar to the current
+implementation of RFC 8986 in the kernel (seg6 and seg6local).
+
+As far as I can see, RFC 9433 has only one Headend behavior, and no L2 or
+reduced variants. So a single LWTUNNEL_ENCAP_SEG6_MOBILE handling both
+End.M.* and H.M.GTP4.D could be viable if accepting both input families
+(ETH_P_IPV6 for End.M.*, ETH_P_IP for H.M.GTP4.D) is treated as a design
+choice of the new encap type, not a stretching of the seg6_local endpoint
+processing model.
+
+These trade-offs are worth weighing in the final design. The patchset
+rework (shared helper functions, the layout of the new UAPI attributes,
+etc.) feeds into this decision. Like the encap type above, this is a UAPI
+choice and cannot be undone once merged. I think the lwtunnel direction
+will need feedback and comments from its community and maintainers.
+
+> Will do, following the End.DT4/End.DT6/End.DT46 model: one patchset
+> per behavior, with the behavior, helpers, and selftest as separate
+> patches. The new code will be aligned with seg6_local.c style as
+> part of this rework.
+
+Sounds good.
+
+> The mobile behaviors will define their own SEG6_MOBILE_* attribute
+> namespace under LWTUNNEL_ENCAP_SEG6_MOBILE, with no reuse of any
+> SEG6_LOCAL_* attribute. That keeps the established SEG6_LOCAL_*
+> semantics untouched.
+
+If LWTUNNEL_ENCAP_SEG6_MOBILE is added, using SEG6_MOBILE_* attributes
+instead of SEG6_LOCAL_* removes the NH6/SRH/OIF overload raised in v2.
+After solving the above, additional issues remain in the patchset,
+for example src is overloaded across MUP behaviors, and v4_mask_len
+needs revision. These are independent of the lwtunnel decision.
+
+> I will drop VRF support from the initial behaviors and revisit it
+> later as a separate optional attribute.
+
+OK.
+
+> Good idea. The prep patchset would introduce the SRv6-level reasons
+> (SEG6_INVALID_SRH, SEG6_HMAC, ...) and convert the existing
+> seg6_local and seg6_iptunnel call sites to use them. The
+> mobile-specific reasons (BAD_SID, BAD_GTPU) would then be added
+> together with the first behavior that uses them and reused by
+> subsequent behaviors. NOMEM and MTU_EXCEEDED would be dropped in
+> favor of the existing generic reasons, and the current
+> INVALID_SRH_SL / BAD_INNER misuses would be replaced by the new
+> SRv6-level reasons from the prep patchset.
+>
+> Would you prefer to lead on the prep patchset yourself, or would you
+> like me to prepare it?
+
+I can lead it. I have been evaluating the SRv6 drop reasons with my
+research group, alongside other pending SRv6 patches.
+
+We can sync offline on which SRv6 reasons fit your MUP behaviors, which
+v2 MUP-specific reasons would fit better as SRv6 or generic, and what
+stays MUP-specific.
+
+> I will replace the python3/scapy heredocs with a statically compiled
+> C helper for packet construction and validation, and extend the
+> selftests to cover the cases you mention (SRH / no-SRH input paths,
+> missing SRH where required, malformed SRH, and invalid attribute
+> values).
+
+Thanks. Maybe also worth covering bad packets, like fragmented input or
+malformed GTP-U extensions.
+
+> Thanks for taking that on. Given the cb/dst issues you described, I
+> am inclined to drop NF_HOOK support from the initial mobile
+> behaviors and add it in a follow-up patchset once your fix lands.
+> The initial behaviors would then do a direct input -> output flow
+> without the cb-context/finish-callback pattern, which avoids the
+> issues entirely on day one and decouples this series from the
+> pre-existing fix. Does that work for you, or would you prefer
+> NF_HOOK to be present from the start and rebased on top of your fix?
+
+Works for me. What matters is that the upcoming patches are well structured
+so NF_HOOK can be wired in cleanly in the follow-up.
+
+I am already working on the fix.
+
+Thanks,
+Andrea
+
+P.S. I am temporarily writing from another address due to a mail
+delivery issue at my @uniroma2.it address. Please always Cc my default
+andrea.mayer@uniroma2.it address on replies.
 
