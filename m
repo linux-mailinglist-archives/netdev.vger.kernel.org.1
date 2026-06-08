@@ -1,193 +1,206 @@
-Return-Path: <netdev+bounces-296431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296432-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GPSoMLOMJmpcYgIAu9opvQ
-	(envelope-from <netdev+bounces-296431-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:34:43 +0200
+	id UMPwHrGLJmosYgIAu9opvQ
+	(envelope-from <netdev+bounces-296432-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:30:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B3A654A29
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:34:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1597E6549D1
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 11:30:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=j51Qiku0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296431-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296431-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=eUpBEhFp;
+	dkim=pass header.d=redhat.com header.s=google header.b=EJTMSsyr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296432-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296432-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D0458300EFA0
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:29:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C588300914B
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 09:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F76B35295C;
-	Mon,  8 Jun 2026 09:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6956E3314DE;
+	Mon,  8 Jun 2026 09:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E10B2EC57C
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 09:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1177330B30
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 09:30:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780910953; cv=none; b=GYsBCtORna6I7SNKWFocmiC5V4u5pib5VwXszK+54y35pqv5OuSRNOBErhbj3M4Fa2N/phWkIuTZqZQnbmH3no/IM/21zLqpRF4+nqEI0rwQXK9B/YtM2AmvgUIMJ5UDAeGp4mSXzGA1VJLSITRUpVITNR7I/SqJrOlhOMPatvM=
+	t=1780911023; cv=none; b=t32PLhzpl4lchqxndNC0Ngyp2xAVm9Kzs6EHiBIbmSk9cxAd4tWua5lhIA6FA5QHnuXJBonVJh8FH50V864dy1gxvgH0jC/ttBgC0qeq2AlAE1Gatnq0Pb2dBo3Q4nFdt0cUqGuODbplbUpT7CxHqiRH9HC7GLNX/9utsikeWZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780910953; c=relaxed/simple;
-	bh=wDKFQMOG/eXGIXHuHGVAtY3FLXx2kteE6/OW5EcUKxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iHESx3fjb08tEuxx9enazt2rJZamVV6IbY7VhIeuA8psjh2yOzglCxyg3fYGiqKAJNuOCLcM4NqHwTssYcOfehMhff4CnMk0pXY+CEayj2nmMYiVSNza9tvhpsCK123a6e/GvIHuyA95y/MwZARV9CfrSsQxRDMkDq1Al/S2f1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j51Qiku0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76CB01F00893;
-	Mon,  8 Jun 2026 09:29:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780910952;
-	bh=fOAG6RO9IE4nsTI/RS9XCESeKjsw9dzfXz32mptaQog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=j51Qiku0GklR6YKD+8NSuaIOjXBwv8dB96gffFhJ19vSdtctstN0LUdBBn1ovJzj8
-	 rI/KOmk9Wz5Zdl0Nn1RA0KbKwXe2Sw5GqX8gikRsYI/01PYmdhFqAygt0u895iZRCA
-	 hzqWFdCTbLAHUTsP/mpt5wUoqZJAhZ94j/BfmDZgnzOg1seKGA1CZe75bDxDLnhdqO
-	 2lVPpCJ0zaNrEuUTlJZX9kSMLWBhRCrisiaqpc0mxv1BFIMM3EEVvb/gEBP+jK0Fnh
-	 M2qILM6BArN0gG5obghgg0qdho1D+p3VX7T4Sk3SAxtc1BZa6eV0weNcc7Q2MM0AUl
-	 s4JfELEaQy2cA==
-Date: Mon, 8 Jun 2026 11:29:09 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Use int instead of atomic_t for
- qdma users counter
-Message-ID: <aiaLZVvfsbj3zTgr@lore-desk>
-References: <20260606-airoha_qdma_users-no-atomic-v1-1-86e2d6a1bfaf@kernel.org>
+	s=arc-20240116; t=1780911023; c=relaxed/simple;
+	bh=FDGFp7VM1n9E00c1zxEOuRHsXkDQEmzTdngIEv398dY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lfoFk0nt6cvnZLJ8+81lOLGtQscF/59GdbOMorSafigyC0wy3oMRvPZdcc11P10m1AGFLxG47sqgMT4oAhvYU0JfOOt9z2ea5K0pqWpGQ0uymuAZABYZ2r/ZwFXyatCoWPqHViQGXIR0wKPJjZx65oqBD1qtJJcHOUPt81kXR/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUpBEhFp; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EJTMSsyr; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780911020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hmrI40I7iBW4u79freyI85Nz+vF4jfGPu+NMxL2IdmU=;
+	b=eUpBEhFp0tDU+roEB3Qgk8YfJR9q/5ZzW3apPwf0tXg4kJ3DM4dnFsoELoT+R7qo/CXwfm
+	vdIWih/e0P7EC4VP/2o7yOz3IkghB9EhPi6fOBPt9DShM+Ef2LBjWc5BNcHLBBfPg9lhZt
+	/NE9s6ia4Y9VV9iHqNEzcOXWCK/p0gI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-8OnXLPZrNGy3jJCHp_Slag-1; Mon, 08 Jun 2026 05:30:19 -0400
+X-MC-Unique: 8OnXLPZrNGy3jJCHp_Slag-1
+X-Mimecast-MFC-AGG-ID: 8OnXLPZrNGy3jJCHp_Slag_1780911018
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490c56e2576so23314595e9.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 02:30:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1780911018; x=1781515818; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hmrI40I7iBW4u79freyI85Nz+vF4jfGPu+NMxL2IdmU=;
+        b=EJTMSsyrwUeGEVXrPlevgTxGRiiLSOTr/+Xrv1BRLv2s9RyAO+Zu+nxkmHJ7/gZyfS
+         8juDFj15bUWrpxqt0Nz08UoEr+8B6auqAl9d1oYq/J0Y+RbmnY22av8YEJgnI1GSNmu4
+         Uj3UFzXRCVZoj4akHTzUfIY8GYKLszA/R3aOUMpOgJYKs1CW1q3JRWRh/YPnbrYKi7cw
+         hyrlxs6UR7McNzI4/s68k8BAY7r6mxj+ti4j06YFOYxeaWksdnZqXgzC2Uq4FDWrkrEO
+         sXtNYimCVA3B28evbFeKb/pTJ9zknPw8FW0cEb5iygZTQo4XkCcB20fdWOA/g/ER99kz
+         Mbsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780911018; x=1781515818;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hmrI40I7iBW4u79freyI85Nz+vF4jfGPu+NMxL2IdmU=;
+        b=YFNqmcT4RHvIogGlmlncoh8ZMuoLGxfLmMSWVgyXr/PgiGTLGxY8OURuRez7ufvb/2
+         mBont649jdlIF6KIOm/mjB8eEVZMMo/RXGSQDZUqDah8NU++Rob4aPlNnxgcGtoJTGRf
+         sM/psWxi02h6l2YqQnYk9GQAkI5NWl/E/qoWHhdbtOhlY4qHmsSbg9unOwQ3XRB6TFpe
+         ZsR5wc0riUYUyYhPUvAYNM3vG73YrIZ4TgyM+Om7tLHgMof9aCjHw8PXMpM/evgy+bxR
+         YAvHP1GdgMiIUcQcQBMbCsOAHcJycf2GhCg7FrrhNJYKSdVMMp74zN1H74fZCI/1qxwB
+         O7Ww==
+X-Forwarded-Encrypted: i=1; AFNElJ8Bc1SZJtOBQOM7K2oIBWMxd3+fK/fbKecxVmnHJGYqmrvWTVXopeS+PVWXITI7AQfx7OOcRj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmrBc9flXE+aHR3VPTR/lJeXEUF/GK/tFImVpP+86PMbHrBp3e
+	W0lshiy+PDvOVQV8LFTazBhAY0dYeMbrcTT+pzloq4pK6hHB6CZTMWIgrfS8eQ+42mKXvs7iYSc
+	it4u6xe0TTfoLDppmLgvbrAD0qMJkDJSTYxIrhwtpZJyxJnW9D/4FAXNQAA==
+X-Gm-Gg: Acq92OFgxj/WyoNi4evtYe354gGQQJqAyB3oOl6UsWgGztAkO0Cso9eiY/rpBXsee41
+	mC8+Kqaw4iCpGm8ordIKCOr+w0rtiOE+jfJwEu7vkzu6bJ2V/+A4jNXkgsAZjq/9icE9v3VGbPa
+	uc2QyteZtixpg3D/l6NyAARkZKPAn/5L/gkleP/IzsPeYZGpRY5qT/bJKTAx2EFHn6mwUtoolWQ
+	DllebW8bU34IqU4ud8RO2Lq+6D5rbI66oBe5bCndd8iLOt/YGsIecvWLp3fUdSnJk33am2dLZ74
+	iCnJ5jBXpLhQMdWW+iLgycqQmRcK6fBoBfzzeYoAsHdgRzTb3N+IOaVUZ7DGYDHVS51+iT6kB3Q
+	oHHQ+AWiFJoMFiEOTSrD4AdP+0h+KAnSUHUjVSiXFrwVQqzkaVXx6l5toMegdv8DYqQ==
+X-Received: by 2002:a05:600c:8183:b0:490:958c:46dc with SMTP id 5b1f17b1804b1-490c25b0a60mr222043615e9.17.1780911018105;
+        Mon, 08 Jun 2026 02:30:18 -0700 (PDT)
+X-Received: by 2002:a05:600c:8183:b0:490:958c:46dc with SMTP id 5b1f17b1804b1-490c25b0a60mr222043095e9.17.1780911017667;
+        Mon, 08 Jun 2026 02:30:17 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.44])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc39def5sm366496865e9.5.2026.06.08.02.30.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 02:30:16 -0700 (PDT)
+Message-ID: <b2052195-0411-4fb0-a802-718e07804188@redhat.com>
+Date: Mon, 8 Jun 2026 11:30:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m6PvL9voaHHuHzEe"
-Content-Disposition: inline
-In-Reply-To: <20260606-airoha_qdma_users-no-atomic-v1-1-86e2d6a1bfaf@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: geneve: gate GRO completion hints on socket config
+To: Kyle Zeng <kylebot@openai.com>, netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>
+References: <20260607013406.7294-1-kylebot@openai.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260607013406.7294-1-kylebot@openai.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296431-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296432-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kylebot@openai.com,m:netdev@vger.kernel.org,m:edumazet@google.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,vger.kernel.org:from_smtp,lore-desk:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,vger.kernel.org:from_smtp,openai.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 28B3A654A29
+X-Rspamd-Queue-Id: 1597E6549D1
 
-
---m6PvL9voaHHuHzEe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> QDMA users counter is always accessed holding RTNL lock so we do not
-> require atomic_t for it.
-
-Please drop this patch since I need to modify it to address Andrew's request
-about LAN/WAN configuration.
-
-Regards,
-Lorenzo
-
->=20
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+ 6/7/26 3:34 AM, Kyle Zeng wrote:
+> Geneve GRO receive only consumes the netdev GRO hint option when the
+> receiving Geneve socket has gro_hint enabled.  geneve_gro_complete(),
+> however, parses the hint option directly with geneve_opt_gro_hint_off()
+> and therefore extends the completion offset even for sockets that did not
+> enable hint processing.
+> 
+> That lets a packet for a normal Geneve socket carry a syntactically valid
+> hint with an attacker-controlled nested_hdr_len.  GRO receive validates
+> and pulls only the ordinary Geneve header/options, but completion can then
+> run the inner protocol completion callback at nhoff + gh_len where gh_len
+> includes the untrusted hint length.  This can make completion access beyond
+> the header area validated by receive.
+> 
+> Use geneve_sk_gro_hint_off() in the completion path, matching receive and
+> post-decap processing, so the hint is honored only for sockets that enabled
+> the feature.
+> 
+> Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
+> Signed-off-by: Kyle Zeng <kylebot@openai.com>
 > ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 4 ++--
->  drivers/net/ethernet/airoha/airoha_eth.h | 3 +--
->  2 files changed, 3 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 5a8e84fa9918..a5fe08864fa3 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1809,7 +1809,7 @@ static int airoha_dev_open(struct net_device *netde=
-v)
->  	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
->  			GLOBAL_CFG_TX_DMA_EN_MASK |
->  			GLOBAL_CFG_RX_DMA_EN_MASK);
-> -	atomic_inc(&qdma->users);
-> +	qdma->users++;
-> =20
->  	if (!airoha_is_lan_gdm_dev(dev) &&
->  	    airoha_ppe_is_enabled(qdma->eth, 1))
-> @@ -1863,7 +1863,7 @@ static int airoha_dev_stop(struct net_device *netde=
-v)
->  					    REG_GDM_FWD_CFG(port->id),
->  					    FE_PSE_PORT_DROP);
-> =20
-> -	if (atomic_dec_and_test(&qdma->users)) {
-> +	if (!--qdma->users) {
->  		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
->  				  GLOBAL_CFG_TX_DMA_EN_MASK |
->  				  GLOBAL_CFG_RX_DMA_EN_MASK);
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index 8f42973f9cf5..e89c2dff411f 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -525,8 +525,7 @@ struct airoha_irq_bank {
->  struct airoha_qdma {
->  	struct airoha_eth *eth;
->  	void __iomem *regs;
-> -
-> -	atomic_t users;
-> +	int users;
-> =20
->  	struct airoha_irq_bank irq_banks[AIROHA_MAX_NUM_IRQ_BANKS];
-> =20
->=20
-> ---
-> base-commit: 903db046d5579bef0ea699eae4b279dd6455fc9f
-> change-id: 20260606-airoha_qdma_users-no-atomic-0750cc2b42f1
->=20
-> Best regards,
-> --=20
-> Lorenzo Bianconi <lorenzo@kernel.org>
->=20
+>  drivers/net/geneve.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+> index c6563367d382..d62cbee6c0fe 100644
+> --- a/drivers/net/geneve.c
+> +++ b/drivers/net/geneve.c
+> @@ -948,13 +948,13 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
+>  	struct genevehdr *gh;
+>  	struct packet_offload *ptype;
+>  	__be16 type;
+> -	int gh_len;
+> +	unsigned int gh_len;
+>  	int err = -ENOSYS;
+>  
+>  	gh = (struct genevehdr *)(skb->data + nhoff);
+>  	gh_len = geneve_hlen(gh);
+>  	type = gh->proto_type;
+> -	geneve_opt_gro_hint_off(gh, &type, &gh_len);
+> +	geneve_sk_gro_hint_off(sk, gh, &type, &gh_len);
 
---m6PvL9voaHHuHzEe
-Content-Type: application/pgp-signature; name=signature.asc
+Sashiko noted that `geneve_sk_gro_hint_off` could race with
+geneve_quiesce() (and thus with geneve_unquiesce()): gro_complete could
+observe a different hint status WRT the gro_receive step.
 
------BEGIN PGP SIGNATURE-----
+I think you additionally need to validate the inner(most) network header
+offset as derived by `geneve_sk_gro_hint_off()` (i.e. gh_len + nhoff +
+eventual mac presence) vs the one computed by gro_receive (that is:
+NAPI_GRO_CB(skb)->inner_network_offset), and ev. error out in case of
+mismatch.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaiaLZQAKCRA6cBh0uS2t
-rO+6APwLDYmZI/JomfAanIi6AplM1iKDlhcwYtTDEJr1cs8BdgD/eLsP003LFzDw
-Bpn+4cLIONPJvzfc5X7KJC8GwM94vQc=
-=VKAi
------END PGP SIGNATURE-----
+/P
 
---m6PvL9voaHHuHzEe--
 
