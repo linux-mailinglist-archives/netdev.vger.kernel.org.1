@@ -1,199 +1,185 @@
-Return-Path: <netdev+bounces-296335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296336-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0uwKBisUJmpKSAIAu9opvQ
-	(envelope-from <netdev+bounces-296335-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 03:00:27 +0200
+	id +9JNNFoWJmqwSAIAu9opvQ
+	(envelope-from <netdev+bounces-296336-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 03:09:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 701996520AF
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 03:00:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64D426520DC
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 03:09:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=qVQ6ov7N;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296335-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296335-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296336-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296336-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=radxa.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 70D673006501
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 01:00:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 713CF3002B0A
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 01:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4998D28504D;
-	Mon,  8 Jun 2026 01:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6442F1FD0;
+	Mon,  8 Jun 2026 01:09:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB691CDFCA
-	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 01:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE329B8CF;
+	Mon,  8 Jun 2026 01:09:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780880423; cv=none; b=Cq0r2+wQY53KzS+3eoFoILghyoL2VHI8OTOPgwAGvtyxbgA1pZ+UnHYiXj/s8J585wU/RFy/E0GBFkkrwHlx1vVDcuAy+3kOpcJWzqPOT6yKJqU/SCNAfn7GHJHMntgulFN6onQvBMOhWRRrPZu5ehGZ2drUH1ZPUM//GuNdmVE=
+	t=1780880980; cv=none; b=nJJu4fLR4XOVdmvm9ki7CLyhiwDwEbc3P7KOVQFgVxsjs2PguxhJvsqJzdnb3+TP4HlaHN6v19bcK6exOdB+c7MNR//c27Zu77K3W0KoRZBxKzpaT2zSkLxoJ3cnlfmchlsoqzZ64ciIIUbjDsWMxlw1aKF+Y2rsVSdTrOxVqQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780880423; c=relaxed/simple;
-	bh=pxsBRDpzCaSXJSlYNmkIxUZ+hW+cKjVNZ10tp4sJHYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5D8Zm0BMey5L7OCo+CAMYKfLV1W+W2x/fV6Y+MOK7OEfGgH5W5Gms3R6kvqutr1O2YZeNRBwl8geyiZU+WbWpsXCFA810eZ88HlB/MRmYHrB1jC87vIoF/DNHcmyC/L0bW5BrYNx025pAgaYZb/wrM79j9qeVzmzwCDiBVJH/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=qVQ6ov7N; arc=none smtp.client-ip=74.125.82.47
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-13810b63a1aso5195067c88.1
-        for <netdev@vger.kernel.org>; Sun, 07 Jun 2026 18:00:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1780880421; x=1781485221; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y5Osf0k6o/Lbg67wyezRqjIUd5VU7+ISrwlc0l5JNNg=;
-        b=qVQ6ov7NtVH2dvCFDM/JeATY1d2vkhNAH4cw+MXnXtEDXTrndvwnc79NFT5HLbNVTy
-         zn8psJHlhJCvHz/JCmW5TpSEiyBCSjWf2udUlkBftVTZKgmsP5w4RHrOgGJK4U1FKP6a
-         kyotMD3FNm61rSGvIKDGT/ShU5g34watwRFD/1+SRf7TCuZDB/X07bvHvpjFJiFfB5fG
-         3Ij/I0jwI20v3SkTXhGGK29fcDr2KQYnbHorObSgmBuL74tVUPz9l2NwiSk8t4cK08cx
-         l13J82UhC+e2Pqn5bA+FJyNBl2ARWvstgngtqWzD4+TnY+lJbJAGzfgY4+hTjh9VLMnv
-         Ha0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780880421; x=1781485221;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y5Osf0k6o/Lbg67wyezRqjIUd5VU7+ISrwlc0l5JNNg=;
-        b=hO04FocXGTT8sVEw39zI9Y1k8MAF1OO5UdRWIPSf78oPU/EHtg2jyBuELbyEDmgvB1
-         w0wbzHns6qAotQHUdchC3Rv2EvwOxlPAUhYfKEbubLrJqD+xbY8gC7HPlWzB+nECEddB
-         ofgv27RchcxB9n3H6aveeE+MlTAFxmZBNX00Virux4ogiBhlL2JyD5lmn4wWlXULYT4a
-         eB5eU68trWvw9SnTS3ZyJTkUZv1G1BCQ4DgflVwEiqnxjmyUfse4EijZH/p5xGmu3BRL
-         D/dxobn2ExOkqFP+zXpGExLQuu36TTXva2JzFInOiwNtmgB5h/baWxWmqRyVZO6EqgXd
-         CQ9g==
-X-Gm-Message-State: AOJu0YxBky5FKdpuppcDsGBwz11LLq7MTKtLy35ZV8/XwlvK8/YlTGio
-	xPSi50F4EOqWXk7QVveWlEQOGxh9fsL0hHAD71VoitZwkcMEDbaQpVf+DmWziiKfXQ==
-X-Gm-Gg: Acq92OE3HSsLOZFBz0V0QjBom+P+HJttKsz2oxMikJcW4V3J+TKcmsVNpsMS95edI1T
-	DBpKH5dig3GfFCcQRecYw8Qu3V8E40/PE5/1oU0alvq8ZXFfqkdAydL8B9m1y3pfEoZn9Atx5Gy
-	oEG0dXtHdY68Bu84gGG+cpUE1nR74Pn1hqJHYDtuaRu6VAIJaGbTQBVhLYM/rWm4UfnKibEaxIQ
-	yOeMoAGzuh9KYkoutqHNMySOyJZGgQyYc2jA1Nf68HRMF0op9UTiC78vU2Rrgp1Bm/Gbi+ka2Os
-	SIDU15wTqM4e4UWqwOFCk4UBIH4Pbqslp7+8+r8rKpJkWENKbohwGEHHsZEJuWq1jQIk+XntQKs
-	wBxGJFV+Qs60kWwNu3pHAhyttjvRMeJYuLrgZ5FmloxYNwMbJz9RawmpOrQn2+QftilgcSy5u0k
-	Z9T7wIEMmRLJvmD42G
-X-Received: by 2002:a05:7022:ef18:b0:12d:b26f:cafd with SMTP id a92af1059eb24-1380666872amr6843410c88.5.1780880420985;
-        Sun, 07 Jun 2026 18:00:20 -0700 (PDT)
-Received: from p1 ([2607:fb90:ecaf:d942:c23d:2198:9c43:68d4])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-137f5489d17sm10787236c88.1.2026.06.07.18.00.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 18:00:20 -0700 (PDT)
-Date: Sun, 7 Jun 2026 18:00:17 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, bestswngs@gmail.com
-Subject: Re: [PATCH net] tun: zero the whole vnet header in tun_put_user()
-Message-ID: <mkkmzeske464wh2p5p55dpb5l6u3bsbtfum6vjvoosbxgek5xd@eezlud5652zi>
-References: <20260607054428.3050243-1-xmei5@asu.edu>
- <willemdebruijn.kernel.134e1b2cf583@gmail.com>
+	s=arc-20240116; t=1780880980; c=relaxed/simple;
+	bh=6mFesj4hgoULMnFuaTjtFmFx3IRjOGWujjUMOSGa2r4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GK/RlCP/ul40iqaXSKYTBHPMGR6043MY8cg1kLbraZWUMgDUntGDvn3Rj0eEHrdSeI0O+oqwfhhvMwdwCtoJgROjpWpeaHEf1nC3hFD7DnD4onHrrSPLNSgDdTdU/Z07T0MuZsgz7NoMpP6JhFdDi6Okl4vN8qoo3h6t2f3M050=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.206.16.166
+X-QQ-mid: zesmtpgz3t1780880959t22d2278c
+X-QQ-Originating-IP: bXSnog20lGiDAATqGnwBlNDtCTN8ekmUmHTMsQS2HH0=
+Received: from [127.0.0.1] ( [116.234.26.110])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 08 Jun 2026 09:09:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6460039914688242846
+Message-ID: <3ADB82C061204E67+dec56a7d-f8d1-4be9-9b21-3481a710df87@radxa.com>
+Date: Mon, 8 Jun 2026 09:11:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.134e1b2cf583@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/12] net: stmmac: tc956x: add TC956x/QPS615
+ support
+To: Daniel Thompson <daniel@riscstar.com>
+Cc: Alex Elder <elder@riscstar.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, maxime.chevallier@bootlin.com,
+ rmk+kernel@armlinux.org.uk, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, linusw@kernel.org,
+ brgl@kernel.org, arnd@arndb.de, gregkh@linuxfoundation.org,
+ mohd.anwar@oss.qualcomm.com, a0987203069@gmail.com,
+ alexandre.torgue@foss.st.com, ast@kernel.org, boon.khai.ng@altera.com,
+ chenchuangyu@xiaomi.com, chenhuacai@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, hkallweit1@gmail.com, inochiama@gmail.com,
+ john.fastabend@gmail.com, julianbraha@gmail.com, livelycarpet87@gmail.com,
+ matthew.gerlach@altera.com, mcoquelin.stm32@gmail.com, me@ziyao.cc,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, richardcochran@gmail.com,
+ rohan.g.thomas@altera.com, sdf@fomichev.me, siyanteng@cqsoftware.com.cn,
+ weishangjuan@eswincomputing.com, wens@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260501155421.3329862-1-elder@riscstar.com>
+ <20260501155421.3329862-11-elder@riscstar.com>
+ <DD71CDEABC7C16D5+02d052ff-13bb-4712-a847-91416f76c578@radxa.com>
+ <7f3a0f16-5159-4bbc-8b15-9b5841603bf6@riscstar.com>
+ <3A5C0389E7C0D241+21a4f16b-1af8-46ac-8831-0c1b49694df0@radxa.com>
+ <agH4qC74A540koDl@aspen.lan>
+Content-Language: en-US
+From: Xilin Wu <sophon@radxa.com>
+In-Reply-To: <agH4qC74A540koDl@aspen.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:radxa.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: MDqtQ4jGWXAGlDFsZ6teNi+ri0nkei5XfBZpP5QcO66nK0kgvh4BCaQl
+	Xv3oHRWmoZLiQ1NbhcZ1qXlPzIzEJ8CqCdsiu47q1Qn6F76e06528BVQ1LttQpUElnXfWVs
+	kxFAJ5ytcLC+VfARgmM31sq/2b7QO4PBBqhPnRI7sEDHqvvdwWDlv25MBk4KRA5bS4ucica
+	5LXUd562FvcGSuV/5jz0F2qItoNRjuYDfdVQn9Ufko3tz9ITXa9kLpaJH1DOIfOljiaTiM1
+	cm52MZ00AVEtz1epYd6lC8nyXQS77iE/Nko7iMytc+1tKt0H9lpaJW2fU/Q+dreKRRXaU4J
+	C7KZ1dJgfuieH3e5gBQzDZDgdNF9MhwvyNGQnczkg5M1eMnXrNypBMqTuOgGwJtDM7zXH7T
+	aL14LMPGqcut5WI7xpDFRVP8byDTHWJAF0aHiyGCVMlnVA9PHSMEzmSQ1nR2Y9Q476BFRC4
+	gZ3uTWWAKoUYbVPo0C2RjESWKWJUvHeKksk+VVbEYED45ujiEyjt8JVYaLp6nF9FaLzQANb
+	3rmqbPC/KMz+HZqvZE1vA0v13aS8u91Icyj4o41fJLWWreLEHmjko1yNMcIHfWgdp3knZm0
+	zGGPju3+xADUZ0IAFNwX7Aj33LiSbUsJ14uyp9uCjpNAT+xhmIuRRR4ZwaTyMf9QdBjZYPQ
+	2V22HYyjxivhLUFwTshRzC2ePMWyy+Z0fLfk2NUsbSZvEqDVKz/EeiGt98AXC+5a9OlRwcq
+	uVRELH4XNH4e4pA1gRUXqDQD6v7yszNBTvvQHJU8GcJagoWLLtOj/iADYboC++zeJvNNxaA
+	E2TS0jDnuvz+w11mRTOXml0xp3gU/6kcR9TVoPfyWf/966uwZSurnynl9XARHO4uscGHhhx
+	+ccDGOym4uCEc+bnxqt6u51SoQ5798+mxa8gFXpB2rM0r9RS6OuvQaZ5YX6r5XcQ06LtkLC
+	E4pSiQZCCa4RLLhuYmOGEpWqECYxcrP/FnHHjJifpUyFaMsNg69x+ef6ilhHzf4s4J7M=
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[radxa.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296335-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296336-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:netdev@vger.kernel.org,m:jasowang@redhat.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:bestswngs@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_MUA_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,lunn.ch,google.com,kernel.org,gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:daniel@riscstar.com,m:elder@riscstar.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:rmk+kernel@armlinux.org.uk,m:andersson@kernel.org,m:konradybcio@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:linusw@kernel.org,m:brgl@kernel.org,m:arnd@arndb.de,m:gregkh@linuxfoundation.org,m:mohd.anwar@oss.qualcomm.com,m:a0987203069@gmail.com,m:alexandre.torgue@foss.st.com,m:ast@kernel.org,m:boon.khai.ng@altera.com,m:chenchuangyu@xiaomi.com,m:chenhuacai@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:hkallweit1@gmail.com,m:inochiama@gmail.com,m:john.fastabend@gmail.com,m:julianbraha@gmail.com,m:livelycarpet87@gmail.com,m:matthew.gerlach@altera.com,m:mcoquelin.stm32@gmail.com,m:me@ziyao.cc,m:prabhakar.mahadev-lad.rj@bp.renesas.com,m:richardcochran@gmail.com,m:rohan.g.thomas@altera.com,m:sdf@fomichev.me,m:siyanteng@cqsoftware.com.cn,m:weishangjua
+ n@eswincomputing.com,m:wens@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,m:krzk@kernel.org,m:conor@kernel.org,m:johnfastabend@gmail.com,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:from_mime,asu.edu:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sophon@radxa.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[riscstar.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com,armlinux.org.uk,arndb.de,linuxfoundation.org,oss.qualcomm.com,gmail.com,foss.st.com,altera.com,xiaomi.com,iogearbox.net,ziyao.cc,bp.renesas.com,fomichev.me,cqsoftware.com.cn,eswincomputing.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[radxa.com:mid,radxa.com:from_mime,radxa.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 701996520AF
+X-Rspamd-Queue-Id: 64D426520DC
 
-On Sun, Jun 07, 2026 at 05:12:09PM -0400, Willem de Bruijn wrote:
-> Xiang Mei wrote:
-> > tun_put_user() declares an on-stack struct virtio_net_hdr_v1_hash_tunnel
-> > without zeroing it. For a non-tunnel skb, virtio_net_hdr_tnl_from_skb()
-> > only initializes the first 10 bytes (sizeof(struct virtio_net_hdr)),
-> > leaving bytes 10..23 (num_buffers and the hash/tunnel fields) as stack
-> > garbage.
-> > 
-> > An unprivileged user can set the vnet header size to 24 with
-> > TUNSETVNETHDRSZ, so __tun_vnet_hdr_put() copies all 24 bytes of the
-> > partially-initialized struct to userspace, leaking 14 bytes of kernel
-> > stack on every read of a non-tunnel packet.
-> >
-> > Fix it the same way tun_get_user() already does by zeroing the whole
-> > header right after declaration.
-> > 
-> > Fixes: 288f30435132 ("tun: enable gso over UDP tunnel support.")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Assisted-by: Claude:claude-opus-4-8
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+On 5/11/2026 11:41 PM, Daniel Thompson wrote:
+> Hi Xilin
 > 
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> On Thu, May 07, 2026 at 09:57:26PM +0800, Xilin Wu wrote:
+>> Do you think if a shutdown callback like this is required? It looks like the
+>> driver sometimes does a MDIO MMIO read when the PCIe link is down, causing
+>> the board to reset due to SoC side PCIe NoC timeout.
+>>
+>> After this change, the board can always shutdown gracefully.
 > 
-> > ---
-> >  drivers/net/tun.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 9e7744eb57a3..fed9dfdfcc3b 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -2070,6 +2070,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
-> >  		struct virtio_net_hdr_v1_hash_tunnel hdr;
-> >  		struct virtio_net_hdr *gso;
-> >  
-> > +		memset(&hdr, 0, sizeof(hdr));
+> I've preferred controlled reboots to power cycles throughout development
+> and I hadn't spotted any major problems with graceful shutdown (which
+> isn't to say there have never crashes but generally I expect `reboot`
+> to provoke a reboot successfully).
 > 
-> Alternatively clear the trailing bytes only when uninitialized in
-> virtio_net_hdr_tnl_from_skb. Sketch:
+> Just to be sure configured my board with irq=POLL (to match your setup)
+> and still can't reproduce.
 > 
-> "
-> +++ b/include/linux/virtio_net.h
-> @@ -437,6 +437,7 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
->                 if (feature_hdrlen && hdr->hdr_len)
->                         __virtio_net_set_hdrlen(skb, hdr, little_endian);
->  
-> +               memset(hdr + 1, 0, sizeof(*vhdr) - sizeof(*hdr));
->                 return ret;
->         }
-> "
+> We mostly run Debian/systemd so there might be something happening in
+> userspace to sequence things nicely. However I have ruled out
+> NetworkManager.service and networking.service (stopped this services
+> does *not* tear down the network link).
 > 
-> But it's not trivial to very that all fields beyond the basic header
-> do get initialized in the tunnel case. So clearing entirely certainly
-> is a more straightforward correctness analysis.
+> Can you share a bit more about how to reproduce the problem (including
+> reliability of reproduction)?
 > 
-> >  		ret = tun_vnet_hdr_tnl_from_skb(tun->flags, tun->dev, skb,
-> >  						&hdr);
-> >  		if (ret)
-> > -- 
-> > 2.43.0
-> > 
 > 
->
-Thanks for your review.
+> Daniel.
+> 
+
+Hi Daniel,
+
+Sorry for the late reply. After some more investigation, I think the 
+problem is more likely related to the PCIe platform driver rather than 
+this driver. So I agree that a shutdown callback is probably not needed 
+here.
+
+-- 
+Best regards,
+Xilin Wu <sophon@radxa.com>
+
 
