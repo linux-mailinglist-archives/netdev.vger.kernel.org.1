@@ -1,253 +1,259 @@
-Return-Path: <netdev+bounces-296392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Edu0KUxwJmoRWgIAu9opvQ
-	(envelope-from <netdev+bounces-296392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:33:32 +0200
+	id PtsBBXRwJmoYWgIAu9opvQ
+	(envelope-from <netdev+bounces-296393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:34:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1900B653914
-	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D52F65392F
+	for <lists+netdev@lfdr.de>; Mon, 08 Jun 2026 09:34:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b=rg6uyArX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296392-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296392-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=fairphone.com header.s=fair header.b=wGFcigS3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296393-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296393-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=fairphone.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E180B300C250
-	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:32:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2D2DC302293E
+	for <lists+netdev@lfdr.de>; Mon,  8 Jun 2026 07:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E7D38F646;
-	Mon,  8 Jun 2026 07:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AEC3909AC;
+	Mon,  8 Jun 2026 07:32:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010065.outbound.protection.outlook.com [52.101.69.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5686A247291;
-	Mon,  8 Jun 2026 07:32:42 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780903963; cv=fail; b=sy4pQ3MKuuRG7HhrU7Ga6w/D5fHrF0ogNzjheYaLsUVKgR14clPHdM/cEMjDklUIt3O7e7WwqU4ShXpZI5b3J6DuHXMuHbrdi5lJwkkM7jcBkvmRMVSTUMk4tHAVQYzDLDIyl9i+vlLLkwR41eWEvzFeaEvVJf1Fb9roe+49L9E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780903963; c=relaxed/simple;
-	bh=Dza1DjHUgiLWQajqtI2tOHLtYYLm0TgKhsYQJQAA9bc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sOwpmruqMTdmgR7RROzzJ3lVtkJENAcfuKwk+gNnZBkH4laLZvNlzNCPPJQp6r6effli2CLgbY07PLuV1f4+8ygnidbIIUzw+AVFhT7dUOqaDFAdpr66+MgG5RC1zZLORaSvP+GQ7sjP9LmuPiwK7EPl+v9wYTNImqbQ6UkKeAg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=rg6uyArX; arc=fail smtp.client-ip=52.101.69.65
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=URuSZ1Bl9WeO1ja7ZsSPargaB5uPBy5h3e8wR4cDxX9CEQrAm1LTTWL/9fowbqBsMK+KKU//3smkjqR9lH2dv7tOyYDGSvkfH/Rc3VQPZ8O3WBWCv8Ah8zAgW3hB04KP4HDCOdWxRCVcc+EjDIQIVdo47VdOY+yCK0f05T7722qQ+uvxPogwLWiZtpM5jM4E2INXS1A5Di05puurSGsqMwDtVLdn262//HJ7bioUSt9AR1tPDDqu4Eph0XUH1h87eeNTDebqKUk3Sv5gIeOeVOpTyCq0al6UGlnZwit9CfTSzeCNmcu/QbxtA7qgX7dQVsZouYYaOq4/f1BbwCz2WQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uX5CjJtzx1wL7BRoNilC3HuQ1bEm7S6kCkvAvhesr58=;
- b=PeeTXhq6cUhl9Z0cXCRPaSZeMSK60Z8t5gfs4h+eiEoh2PEtIq2fNk65B7o9UBX+BE/KbO7OpGSplGbkV5h1l0c5DsVH1b+/hEEClpiwUUzebOmswfE3/i5DEDqhH+fo2NeOBNNsn8USSN1rNdhUeMrPxmX/hsDrUZfygYrwxBNPYvJdLbRUFJsiIOvfI5A1DgbQHURIoWjYuYESemb8yHY7jI67irRjg8iPOg5jkmROpBjFHlTPMG9RChdRQfexK1Z6JzK7zIqYIxqAcDF6X6R76dtGlS8KlNiAC3SkJnq8cllKlJFNdXgp+uSkdLQQ2EEGmXOFApyZLZA0bY5wAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uX5CjJtzx1wL7BRoNilC3HuQ1bEm7S6kCkvAvhesr58=;
- b=rg6uyArX2nZyeU0cQ4hxGISt4gI9cSpk9Apawibn0C72JkW4g8blbp5aexbZ2/Gj44bf1Q9olSxpffmpr0eLMhRr6E6F7oPFmaYEafEYil1HJnHYVlMI4iLOhGrJtj6BQzdWSeZyuSC89q6OxOYx3AwtkfMXZJpLWvlu+8S+pqAvq5+shorEHXLo4Z1aekKUsFLQwJxFyOd6dvXRQ/29pFrIA+645pWi/3uXH9qkmOaCnawBbVHx0/bYxWuOWWCbPnQsvVzXl+NrVd7CotaD0st3PYP23IGMBYkk0ppPxAu2WelHhtNy7gsj6gOaKlAjTMNHXUtA2SziGeKfF/VHhQ==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- VI0P189MB3174.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:2c6::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.92.13; Mon, 8 Jun 2026 07:32:37 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0092.011; Mon, 8 Jun 2026
- 07:32:37 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-CC: Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [PATCH net v2 3/4] tipc: prevent snt_unacked underflow on
- CONN_ACK
-Thread-Topic: [PATCH net v2 3/4] tipc: prevent snt_unacked underflow on
- CONN_ACK
-Thread-Index: AQHc9ek/HpqKJvVBcE+lNYq5Rbw8T7Y0RJuQ
-Date: Mon, 8 Jun 2026 07:32:37 +0000
-Message-ID:
- <GV1P189MB1988203684AE33AEEDD5AF4EC61C2@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <cover.1780766454.git.michael.bommarito@gmail.com>
- <63f37dc57a6d2cc614cc466582cd8d69192c720c.1780766454.git.michael.bommarito@gmail.com>
-In-Reply-To:
- <63f37dc57a6d2cc614cc466582cd8d69192c720c.1780766454.git.michael.bommarito@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI0P189MB3174:EE_
-x-ms-office365-filtering-correlation-id: 5717d7f5-2220-4b68-a5d0-08dec5301d47
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|22082099003|18002099003|56012099006|11063799006|4143699003;
-x-microsoft-antispam-message-info:
- T97QUmTQj0NZTm6waFTD7DgC39d1l11uUhZIeehksxDoX54xX04lKXyOKeKT1se0Sm7f0gnnCByZ9Qty6bn30CV3NibXBeUMgumyVifc2VhHD2Q+zHQYwvygMlOeWuzaPn0mMMUSNkAZE1whTTQasC1GWRgBoB9GJlnFwS0v3yL8aGsSrbXVRiAtGvhpjaepMpGoP/GhfigTlOyW8UCaMwDgCDDNkJju8rLtMhYp7aqiIFD6cax/7DlphXACMI0lA3dMRm3/x+j4pUzraMpqWtBUerpLk5p+fDEKjIuWO72XI4g1wbVZQ6CGNHuvQUjcRS6pyjUG/DvNMJ3aS6RoqL083XoPtiPJ+aPkeKHaLhK/eymXb1ROW7WnkiDuRR2KEWnT1taAdDzuwHppOvKoxTqkZHZsw/XrJaMR6BxqiqrlHdCOn4IL6cjRB53Ub3wcfcXwPrUpLyr+UH4FNUjdnKz3ua2RBDr96VzBnbbPc8BRmZyJKGLZ7QiE0RweeRLy0HyGn6ySTNlaydUZyfZUB3ya3wtMLZsdvHu/lpHXjEuFMPSerOTH/LZzUph+Wzr3LORRW+OOnaTAbmPAbz709Bhyum9YSMDVrFWDJIMOE2u7IYgK410M4Px6oewz/SDv4j0wPwfuYE8ki56HIUFJSDNk4GnV75YASM778U8Dx/+uw042kbLmhxYW/i56i8cwlNplTXZn40DaAExjaHiBIdWUYWSJGd4CcTc0yLfF9cYTEtI2s5UC7CalTHYXh7PE
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(22082099003)(18002099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?vuwzRxMUsjiabZ6pdaQySAIudMGipIbvG1Btv1qvFu+9m518PHGRv/nYUy/A?=
- =?us-ascii?Q?GLr4Vd2b/BAREIEDdBaY4zXQldwsr/5IfAiHiLTugKRU3kJoHAmqHRa5Kffq?=
- =?us-ascii?Q?zCS8gnZ4Dyu7EFmtpXIVhf2Nv3qRSlnDK2GkaLTKWiIF05n3OfsVZpzmo9+X?=
- =?us-ascii?Q?VaspkVvJyV40PNtFezh1zeme6AEkM08A7sqCcI7MplAMFSD3qJy4/drQ410f?=
- =?us-ascii?Q?FX/DvLR/ED1b48QoIJ/P9Rd6eCQXVGjNxt0Vo7K4otR+QTeLYKkGlpGgw3TO?=
- =?us-ascii?Q?1UIiJjMPNAbQ4hDTv42xvrcWV7p8EZgCh3FGXd+3neCcF0rXB4imSiL5gVVM?=
- =?us-ascii?Q?ZSK/OCAVPihvbE+yKtzN7xl9rVxbyj40JSfhHEoGDCAuDp9GLrYCYoP+mL0Y?=
- =?us-ascii?Q?fWvQolO8yqcgrI3QkEuvBnXUqphm2tj+H/2vuPyq/1xPAUrX8rn2aX9uDCG1?=
- =?us-ascii?Q?asIfNoEbxRV9GyDRN3QmYF6t4507eP1vQXeaOWAfNT+8EAKvblSShngTdWAy?=
- =?us-ascii?Q?OlLkzzHrI9y1y07apEdm37d0XFddl6G5K7ZlegZkXidbuYFxB6/HMKzFAkW8?=
- =?us-ascii?Q?Fb/xPyHPZuHwXP28CqViG1ioD1tlp8654GIdycrKHsjibTq6viTr5FQR4mQO?=
- =?us-ascii?Q?N9jy+PPCwm3JXgsvCEBVhZnPUQpntACIC+rhqkoMQsZ6H5v24Avxy+2q9Oks?=
- =?us-ascii?Q?VocAupAcVnHG9q6SfsK6UTC64BcAAiRZayJQfYPtiQZdhvqeVN0GNZa7Ugx0?=
- =?us-ascii?Q?XabIdpwtKGmXAyArfuR0sfzf7RzC2KBzjEDutK2zZaXiMAKOela+W3u/l8LZ?=
- =?us-ascii?Q?cJ2pvip6Rjbcp73qEhbh4jlihcyTTzWMHEZxH98uq/5mNEan3sEikgtsua4k?=
- =?us-ascii?Q?nMZ6etvzUSGGE7kPycIDxyKB048swqvmoZX8QzFf83VRC++zQk5C4qwnt0ZC?=
- =?us-ascii?Q?UH/6wuwmV6XsLP4OdhrFpIFKN0RVhdqlPcNAq3rmdUUchYx6Ow7kko4ntbyd?=
- =?us-ascii?Q?MqWob6F19D7EiIYdnZWrg+NwnB9ay3Kh1vgd9b68fU0RpDoGYbqGAYs2Hs9z?=
- =?us-ascii?Q?qFeDokkxkM6xiFdWlHFyjFr8zOtSzxjDheZ/yRvw+zEdtCZBJc21vvhQsSZ+?=
- =?us-ascii?Q?wEuz0HDVgvotxNN9thGZsjtiBDEwgu/VeZocXtK0wDNV4HiFmIPOyELEg9vr?=
- =?us-ascii?Q?iKPN/Hd9lGlL9BjPhfrDKk1HC3kLrQNENhoMhxl4KGx5g3B5OUrJ7KD0qTOE?=
- =?us-ascii?Q?OntcEqrxTCov0nBTmp9gOurIBe0q28HyHD6AOZaK7XdTBJ1CBHigfEhAGnNL?=
- =?us-ascii?Q?hTHBFbGhTYU06RG61/5JmQ5Mx7kOCXqFO+1N2QzCmtVkpm9G4K2djVdUw3TD?=
- =?us-ascii?Q?ggYZcY83nA2TA3bJxmaVhKdemZJtGVj8tot3MP6VdUlV/gzB9mAEsF9l0tku?=
- =?us-ascii?Q?73br9p00jPdwP8DI9jGYbGrjBhYtEuRg0AO0lQCKOBpNnxZNfWmbYtrS0VDX?=
- =?us-ascii?Q?9x34ATjjE65aSzyPHzqARxuhvIkE2PewWEoNEi7wLel8ZVedScW+O7W8j8pH?=
- =?us-ascii?Q?yJF/q2JtuxPJP558bCdfBFg1Njg7fmAO6yOCFsmWE1MdKKrtzjOOJCHx6sgA?=
- =?us-ascii?Q?oPVQG5ek6c1OwatnUhmlsfQYvX/VEu4oGt+OiiKiReboDafzE32EhEvzwXoH?=
- =?us-ascii?Q?7yakZLqYE4vSaW69sRlQhS3WbkF8WcxHaRSfIs1kJhviApPwP2sbtWlsle1P?=
- =?us-ascii?Q?/9ee2m70Pg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D91D2E718F
+	for <netdev@vger.kernel.org>; Mon,  8 Jun 2026 07:32:56 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780903978; cv=none; b=n5QitgMrKmKFs2MSAVq0Dh+zFu9MPM+LLNyAM2zUzYYa9AM3amz1tLpwr3CKlMvYI5tkJdq2joGsYVk0kcNFCV4obpL5Gr58cobKLZJl4MpZr8sQwVwXiIjVTY7RFnzMPtNpTOV/WfsQbnNn3F5W4Cwcin26Qkw8yXeo1fn11YQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780903978; c=relaxed/simple;
+	bh=XMHyOQHx6WIm/tuQ1tglv5lWCjfTXh95qCF2ldK+bKM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Ycvg6gvx1IoI19XJorfJ9UKY/5Imd0CksimaYtsGmxq7FLHHgJ9/VGQeK6XxXtSXFLKWyeR0dAxvR34XMWIk8VC2eooAY+UVG/dehX49MrmMoOdJxM5PPPaS8cCdjNVv+i0ngh7941UzMxSJRIZMMUaQiu24vglWuxpNwt8OyQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=wGFcigS3; arc=none smtp.client-ip=209.85.218.53
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-bf1cdcfd6deso459726166b.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 00:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1780903975; x=1781508775; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5e4yVKORIbgcZMiPjlqQS5Msk7HSGQTKiassh3VqtIA=;
+        b=wGFcigS3B+FXukYWVi5TuZg0Iuo6fSbyAfy6NUHUuTyKi3aZ5s5eNx9ncKP3Jjj8qt
+         8i1LY9nXLim4RY+BzxCPdSXverYy2XgfIB4EfVKT6B4X/3vKM3K2FZS+gRBkP1euC3BZ
+         zGJ2tfn/wD1yVYyWbv/zeVMxld81oyJjV0K0MR8o/vGEekpoivOuxBgs4QjJlPkm1qlv
+         Rsqz9h21+KSR+WkU8nwsdA5YnNKdSGYjnzE2q5gS5mVJp7VNQxmYzdgBbofcDQuZwvbO
+         b99N69rEUw/T4Sb9GPoWywQgTWJ6HmTdtNeca54HsiJT4ZZx/FIvFqLlJAiczzl7xdFT
+         ab9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780903975; x=1781508775;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5e4yVKORIbgcZMiPjlqQS5Msk7HSGQTKiassh3VqtIA=;
+        b=U8CGpAgFG4O37CTb/yG2i5uOMGv75eA5TDiNpOECr69PC25AdO/+LrX0tnmYeuUPaw
+         CSbmTiBtIQYoxHv0a+LGJYCR7EEUTLq4JUHTT6uFpjWNx5Abx1Pmb4xENVVuZoGVJLAM
+         uvFrwIIruej+zyqfv8ziQ9EjNDDWXM/VIY1awhkhJ405wAZESixdtaL/4OWTnt60XeAo
+         SKiwsYetdg+5v+qxT8is0H0iAlnDeKpfj3PgCgAeNo3bdKRO6S7fIOpp9dtjLwjcQ84M
+         E/S7aVassCsD1ZZ1Qko6uDtRyF1eWJXK6ZGYqXxdlTUeZftwUbioqI7wLq1K4W/1xaDL
+         fq2A==
+X-Forwarded-Encrypted: i=1; AFNElJ8hOSGEt7HGyL2/sVFqkg08e03BZM7vWBRbXEobTusjpjRmaZ1q2I7/Z0M2ksBENeh3AntAdmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywt5BcZCxPTMahS4kfXr1bLmIOABkoXICRU9FQaLTdLhgW67+AB
+	jI0d56FF838w1eC6UsQxTFQraoc2YrD1cMo5bF/qBbX0X2MMgcBzuhI/rhq6zNO7Qr8=
+X-Gm-Gg: Acq92OGwV0Oo4DlitcRJAlf3+B+DOQ28ZF1qhsNHFd8EWdanMjLJhhpmtaFillOVz4K
+	PeMmNiBEloKKI9TmzyFVEGLeCBwRGb4a9UTKYx11BTqqdSyBIcTzhJmo8NLog/42Y4XqRi2+XSe
+	qtJyOl8VlZ2UDTLnUG+/EqZJUfEQxDlRqzM2btkMZ+ih/OGTmnwgQeeFx28F4vK9lum7JKhfTA/
+	xhZe9Q5VMpQmkN9R3XWw4TQ+Be/yKfZTkAqfJMpa5B3SBB37eCcmVSyXC+QDyzGSc/ACdc3g8o6
+	kRRbGU/ohbyQX2NzkFeVkryT0KQqOMd/p5Ue5OW0uxxwynEZaTegWofCd9RqsiSf0Aa7pshPwGR
+	j8Q1KYHBRP8VVImxviTW99wY3cx8d31m9BLlwfQZDeq1bGOEODUoSJJd5tGOZrdgAGlpqw9Y8A2
+	xYVeiwuKJPTHrfDJZbP+pNV0pJ3CcWDLYsT2d3wPq8G6S3ln9FvJxyzh9DFO930se6EOJzmmkxe
+	Z98lnI=
+X-Received: by 2002:a17:907:3f20:b0:bdf:8e2a:1092 with SMTP id a640c23a62f3a-bf370e639e5mr722825866b.3.1780903975340;
+        Mon, 08 Jun 2026 00:32:55 -0700 (PDT)
+Received: from localhost (144-178-202-142.static.ef-service.nl. [144.178.202.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf051d82a31sm831571366b.19.2026.06.08.00.32.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 00:32:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5717d7f5-2220-4b68-a5d0-08dec5301d47
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jun 2026 07:32:37.3057
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0fnmxkoYDWuM6le9q/yZlKIGwPeEK9ybd0bWZCGXBQLC50OPZWJayeuInR/euyQ240WdB++Rv9gQxhj66duJL4IDSdfyWlWb0DsDwbeQpWg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0P189MB3174
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 08 Jun 2026 09:32:54 +0200
+Message-Id: <DJ3HRRGJZN8F.3UNOV86ZOB47B@fairphone.com>
+Cc: "Ajit Pandey" <ajit.pandey@oss.qualcomm.com>, "Imran Shaik"
+ <imran.shaik@oss.qualcomm.com>, "Jagadeesh Kona"
+ <jagadeesh.kona@oss.qualcomm.com>, <linux-arm-msm@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH 5/5] arm64: dts: qcom: Add GP M/N clock controller node
+ for SA8775P and QCS8300
+From: "Luca Weiss" <luca.weiss@fairphone.com>
+To: "Taniya Das" <taniya.das@oss.qualcomm.com>, "Bjorn Andersson"
+ <andersson@kernel.org>, "Michael Turquette" <mturquette@baylibre.com>,
+ "Stephen Boyd" <sboyd@kernel.org>, "Brian Masney" <bmasney@redhat.com>,
+ "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Linus Walleij"
+ <linusw@kernel.org>, "Richard Cochran" <richardcochran@gmail.com>, "Konrad
+ Dybcio" <konradybcio@kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260602-pdm_clk_gp_mnd_v1-v1-0-1522662b6c53@oss.qualcomm.com>
+ <20260602-pdm_clk_gp_mnd_v1-v1-5-1522662b6c53@oss.qualcomm.com>
+In-Reply-To: <20260602-pdm_clk_gp_mnd_v1-v1-5-1522662b6c53@oss.qualcomm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[fairphone.com,quarantine];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[fairphone.com:s=fair];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296392-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,baylibre.com,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296393-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:michaelbommarito@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[est.tech];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:ajit.pandey@oss.qualcomm.com,m:imran.shaik@oss.qualcomm.com,m:jagadeesh.kona@oss.qualcomm.com,m:linux-arm-msm@vger.kernel.org,m:linux-clk@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-gpio@vger.kernel.org,m:netdev@vger.kernel.org,m:taniya.das@oss.qualcomm.com,m:andersson@kernel.org,m:mturquette@baylibre.com,m:sboyd@kernel.org,m:bmasney@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:linusw@kernel.org,m:richardcochran@gmail.com,m:konradybcio@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[est.tech:+];
+	FROM_NEQ_ENVFROM(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[fairphone.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[]
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1900B653914
+X-Rspamd-Queue-Id: 7D52F65392F
 
->Subject: [PATCH net v2 3/4] tipc: prevent snt_unacked underflow on
->CONN_ACK
->
->tipc_sk_conn_proto_rcv() subtracts the peer-supplied connection ack count
->from the unsigned 16-bit send counter snt_unacked without checking that it
->does not exceed the number of messages actually outstanding:
->
->	tsk->snt_unacked -=3D msg_conn_ack(hdr);
->
->msg_conn_ack() is read straight from a received CONN_MANAGER/CONN_ACK
->message. If the ack count is larger than snt_unacked, the subtraction wrap=
-s to
->a near-maximum value, leaving tsk_conn_cong() permanently true and
->starving the connection of further transmits.
->
->Validate the ACK count at the start of the CONN_ACK block and drop the
->message if it acknowledges more messages than are outstanding. A peer (or,
->for a local connection, the connected peer socket) can otherwise wedge a T=
-IPC
->connection's send side by sending an oversized connection ack.
->
->Fixes: 10724cc7bb78 ("tipc: redesign connection-level flow control")
->Assisted-by: Claude:claude-opus-4-7
->Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
->---
->v2:
->- Validate msg_conn_ack() at the beginning of the CONN_ACK block and
->  drop invalid messages instead of capping the peer-supplied value.
->
-> net/tipc/socket.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
->
->diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
->9329919fb07f0..80ad973cda16e 100644
->--- a/net/tipc/socket.c
->+++ b/net/tipc/socket.c
->@@ -1362,9 +1362,14 @@ static void tipc_sk_conn_proto_rcv(struct tipc_sock
->*tsk, struct sk_buff *skb,
-> 			__skb_queue_tail(xmitq, skb);
-> 		return;
-> 	} else if (mtyp =3D=3D CONN_ACK) {
->+		u16 conn_ack =3D msg_conn_ack(hdr);
+Hi Taniya,
 
-It is not necessary to declare a local variable here.
-We can do it in a simple way:
+On Tue Jun 2, 2026 at 5:21 PM CEST, Taniya Das wrote:
+> Add the GP M/N divider clock controller node at 0x088d3000 to the
+> SA8775P (kodiak, lemans) and QCS8300 (monaco) SoC device trees.
+>
+> The node uses the qcom,clk-gp-mnd compatible, is clocked by the PDM
+> XO4 and AHB clocks from GCC, and exposes a single clock output
+> (gp_mn_clk) on the dedicated gp_mn pin mux function. The XO4 clock
+> is pre-assigned to 4.8 MHz (XO/4).
+>
+> Signed-off-by: Taniya Das <taniya.das@oss.qualcomm.com>
+> ---
+>  arch/arm64/boot/dts/qcom/kodiak.dtsi | 14 ++++++++++++++
+>  arch/arm64/boot/dts/qcom/lemans.dtsi | 14 ++++++++++++++
+>  arch/arm64/boot/dts/qcom/monaco.dtsi | 14 ++++++++++++++
+>  3 files changed, 42 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/qcom/kodiak.dtsi b/arch/arm64/boot/dts/q=
+com/kodiak.dtsi
+> index 1ff9e1598d00429c03b2bcae41fa370ab2c892bd..cbc13ac37f8aeb0b1071ad060=
+9ec11e829d2c798 100644
+> --- a/arch/arm64/boot/dts/qcom/kodiak.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/kodiak.dtsi
+> @@ -4412,6 +4412,20 @@ usb2_role_switch: endpoint {
+>  			};
+>  		};
+> =20
+> +		gp_mn: clock-controller@88d3000 {
+> +			compatible =3D "qcom,clk-gp-mnd";
+> +			reg =3D <0x0 0x088d3000 0x0 0xc>;
+> +			clocks =3D <&gcc GCC_PDM_XO4_CLK>,
+> +				 <&gcc GCC_PDM_AHB_CLK>;
+> +			clock-names =3D "pdm_clk", "ahb_clk";
+> +			clock-output-names =3D "gp_mn_clk";
+> +			#clock-cells =3D <0>;
+> +			pinctrl-names =3D "active";
+> +			pinctrl-0 =3D <&gp_mn_active>;
+> +			assigned-clocks =3D <&gcc GCC_PDM_XO4_CLK>;
+> +			assigned-clock-rates =3D <4800000>;
+> +		};
 
-diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-index 9329919fb07f..f64f7a35b5c9 100644
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -1362,6 +1362,9 @@ static void tipc_sk_conn_proto_rcv(struct tipc_sock *=
-tsk, struct sk_buff *skb,
-                        __skb_queue_tail(xmitq, skb);
-                return;
-        } else if (mtyp =3D=3D CONN_ACK) {
-+               if (tsk->snt_unacked < msg_conn_ack(hdr))
-+                       goto exit;
+Am I missing something, or would this just configure gpio60 for all
+boards for this clock controller output? On QCM6490 Fairphone 5 this pin
+is connected to FP_3P3_EN, so it's definitely not unused.
 
->+
->+		if (conn_ack > tsk->snt_unacked)
->+			goto exit;
->+
-> 		was_cong =3D tsk_conn_cong(tsk);
-> 		tipc_sk_push_backlog(tsk, msg_nagle_ack(hdr));
->-		tsk->snt_unacked -=3D msg_conn_ack(hdr);
->+		tsk->snt_unacked -=3D conn_ack;
-> 		if (tsk->peer_caps & TIPC_BLOCK_FLOWCTL)
-> 			tsk->snd_win =3D msg_adv_win(hdr);
-> 		if (was_cong && !tsk_conn_cong(tsk))
->--
->2.53.0
+Maybe disable them by default and let the board enable it, if it wants
+to make use of this clock?
+
+Regards
+Luca
+
+> +
+>  		qspi: spi@88dc000 {
+>  			compatible =3D "qcom,sc7280-qspi", "qcom,qspi-v1";
+>  			reg =3D <0 0x088dc000 0 0x1000>;
+> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/q=
+com/lemans.dtsi
+> index 19f8cf4e15482947f6049188050c370340afaead..d192f92a896bb13017abdf820=
+62e8305aab3e5d5 100644
+> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
+> @@ -4353,6 +4353,20 @@ opp-384000000 {
+>  			};
+>  		};
+> =20
+> +		gp_mn: clock-controller@88d3000 {
+> +			compatible =3D "qcom,clk-gp-mnd";
+> +			reg =3D <0x0 0x088d3000 0x0 0xc>;
+> +			clocks =3D <&gcc GCC_PDM_XO4_CLK>,
+> +				 <&gcc GCC_PDM_AHB_CLK>;
+> +			clock-names =3D "pdm_clk", "ahb_clk";
+> +			clock-output-names =3D "gp_mn_clk";
+> +			#clock-cells =3D <0>;
+> +			pinctrl-names =3D "active";
+> +			pinctrl-0 =3D <&gp_mn_active>;
+> +			assigned-clocks =3D <&gcc GCC_PDM_XO4_CLK>;
+> +			assigned-clock-rates =3D <4800000>;
+> +		};
+> +
+>  		usb_0_hsphy: phy@88e4000 {
+>  			compatible =3D "qcom,sa8775p-usb-hs-phy",
+>  				     "qcom,usb-snps-hs-5nm-phy";
+> diff --git a/arch/arm64/boot/dts/qcom/monaco.dtsi b/arch/arm64/boot/dts/q=
+com/monaco.dtsi
+> index ebe5889daa5300efa7857314e9170d7d2fc33ef7..f6c5ec38c7491b7a16ebfb853=
+f8af88bdf1f0db3 100644
+> --- a/arch/arm64/boot/dts/qcom/monaco.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/monaco.dtsi
+> @@ -4867,6 +4867,20 @@ opp-384000000 {
+>  			};
+>  		};
+> =20
+> +		gp_mn: clock-controller@88d3000 {
+> +			compatible =3D "qcom,clk-gp-mnd";
+> +			reg =3D <0x0 0x088d3000 0x0 0xc>;
+> +			clocks =3D <&gcc GCC_PDM_XO4_CLK>,
+> +				 <&gcc GCC_PDM_AHB_CLK>;
+> +			clock-names =3D "pdm_clk", "ahb_clk";
+> +			clock-output-names =3D "gp_mn_clk";
+> +			#clock-cells =3D <0>;
+> +			pinctrl-names =3D "active";
+> +			pinctrl-0 =3D <&gp_mn_active>;
+> +			assigned-clocks =3D <&gcc GCC_PDM_XO4_CLK>;
+> +			assigned-clock-rates =3D <4800000>;
+> +		};
+> +
+>  		usb_1_hsphy: phy@8904000 {
+>  			compatible =3D "qcom,qcs8300-usb-hs-phy",
+>  				     "qcom,usb-snps-hs-7nm-phy";
 
 
