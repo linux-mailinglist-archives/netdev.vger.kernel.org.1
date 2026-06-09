@@ -1,115 +1,123 @@
-Return-Path: <netdev+bounces-296861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296862-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yO8HA1t3J2qoxgIAu9opvQ
-	(envelope-from <netdev+bounces-296861-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:15:55 +0200
+	id WUlWGwt4J2oDxwIAu9opvQ
+	(envelope-from <netdev+bounces-296862-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:18:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4019165BD34
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:15:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04FE865BD57
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:18:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=BtkpyO97;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296861-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296861-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=djnXbKzf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296862-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296862-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E509B301619D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 02:15:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 728DB3030516
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 02:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29912F747A;
-	Tue,  9 Jun 2026 02:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C782C11C6;
+	Tue,  9 Jun 2026 02:18:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01624285072
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 02:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE16C1A9F83;
+	Tue,  9 Jun 2026 02:18:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780971349; cv=none; b=T4gUn7l6YxWxDukkUgarO9h4QXtSura03ZX7ylnRfCmVw7/ajROn2/6BujZX/1WUsbJkBOs7h7isHY/ivg8010CVcuZW1ri0yLXicR5wEwZXpk3SRWCXMY8PlYxVQhiUc+p3Pu7vo40o+uVANTtP+VxTye0gLvSsacyKbwZXze4=
+	t=1780971527; cv=none; b=nFJf3jdOJe29ygB+XRjxJZVK/UEDjtfIufHrjxmvVjE9N58cGAwkbrMhlsByQ8siM+vqZuKUKfA7sCSivnyUkYfRb5DfwtzHZYdbHdOu1m9p9NlBBhHvNVY1KqJGvc2fq9RcBhXNsNYY2dau6mzIdnKRqIqEpBRmm0NpdrduGGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780971349; c=relaxed/simple;
-	bh=8mrA+bQiXpYaBTGHL7k3MZUvo6xYXvYgLgakzL63cPQ=;
+	s=arc-20240116; t=1780971527; c=relaxed/simple;
+	bh=I9U9k115McmluyRZ0AfqMeLOQM9cvy+nwwPqE5zOj3g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i0nsxuRRqQdWZrAJNkQpyhUhxkvQM3OrMVZVK8F1PC2Y0xTfmwwg72yKLR9mmQ6/uQpjNIk7I66RDzsZwlMJdrzGL3LCQYuEG+tqfdCxC6fv9dV7Ft1tk4N9c6KGC8F4nUREwgzkdra+8nW25htFOhbs0zl2OLCK7ikTZ0bW6w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtkpyO97; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB2E1F00893;
-	Tue,  9 Jun 2026 02:15:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hvY6g9Jt+xmmxkqONeTos6UgMap4Jz3IxNJ1QjDo/5hyrl+SzWxzH2Dh/sD/ngixR3zoBFCvo+A/nPDn3uHoG41ccZlggEPw/PWK5TB7kxZ/hLaPSuApwKr1jClQ+LxhuOb7g7qs8JUfFnjBuEqiYmV8Y8AVprLRlDHQt8zqBuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djnXbKzf; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E5771F00893;
+	Tue,  9 Jun 2026 02:18:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780971348;
-	bh=8mrA+bQiXpYaBTGHL7k3MZUvo6xYXvYgLgakzL63cPQ=;
+	s=k20260515; t=1780971526;
+	bh=JtOK+WsH59Rk12yQhjznrdMTBaRsxDtA5Omclm8PG6A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=BtkpyO97lepeavCkG0m5/cyRh/NK4XSjOLsdE4uUNHHlkEYX76G86KdyhQ7h4Y044
-	 wBQPJyzmKNYVotOphdGUkbhjE+GKQGmWI8GNsZEXMy+ocQePv/BefMEqrXnouioHAT
-	 UIOaBBn72GtkIbK7ET5KbW3VsztTUuJV4K2Htp50VQbZWRfxOxoUD8u18EsHE80HVn
-	 Tb4ih5OZ6fHznywGMULRNNOXbtjC1oma/+KDii7KA7rSVJhZXkd4uMVHVM47DbRPUR
-	 tdvJFC3k1fmQkffDNzLc9FcE5V+Ie8/dkFIu4whjHTQRmCgBH6HUqpX/nqSz3TzIz5
-	 JJnHh84fQMz2A==
-Date: Mon, 8 Jun 2026 19:15:47 -0700
+	b=djnXbKzfJR1ud1CIL3l7DpjvCirULDD5+gqLNT+/faeWOf1sxmuHwgM+SydH3CFM7
+	 86vAZRsqj6osWRQUcYujMXk06YwApWRCNlrC6bNMH9r8dqUK8g1lqjAJN/4YqAGOLj
+	 ePA82mbs5rgA+gva4fhRqvi05uh1GlGuy3ncmblg40BfH3BJVZmP/IRddsxYiFwzg5
+	 8HjtuHMAqw1eEGWra2waWqycISoa6a2y8e60mCm3NL/UVgfJRBLlfWOIKoD62/Pq0u
+	 LzQyT7p2WFU2N4vIEN38WvfHLElBKN6ATTW0qs78KV1vU0XY/Rk3x7xQqhQfD8rl9/
+	 elICtMxfkeSbw==
+Date: Mon, 8 Jun 2026 19:18:45 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, Madhur Agrawal <madhur.agrawal@airoha.com>
-Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
-Message-ID: <20260608191547.21a29bb8@kernel.org>
-In-Reply-To: <20260606-airoha-eth-lro-v1-1-0ebceb0eafc3@kernel.org>
-References: <20260606-airoha-eth-lro-v1-1-0ebceb0eafc3@kernel.org>
+To: Samuel Moelius <sam.moelius@trailofbits.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org (open list:TC subsystem),
+ linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH v2] net/sched: act_pedit: require matching IPv4 L4
+ protocol
+Message-ID: <20260608191845.72e968b7@kernel.org>
+In-Reply-To: <20260607193621.1057618-1-sam.moelius@trailofbits.com>
+References: <20260607193621.1057618-1-sam.moelius@trailofbits.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296861-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296862-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4019165BD34
+X-Rspamd-Queue-Id: 04FE865BD57
 
-On Sat, 06 Jun 2026 16:45:28 +0200 Lorenzo Bianconi wrote:
-> Add hardware TCP Large Receive Offload (LRO) support to the airoha_eth
-> driver, leveraging the EN7581/AN7583 SoC's 8 dedicated LRO hardware queues
-> mapped to RX queues 24=E2=80=9331. LRO hw offloading does not support
-> Scatter-Gather (SG) so it is required to increase the page_pool allocation
-> order to 2 for RX queues 24=E2=80=9331 (LRO queues).
+On Sun,  7 Jun 2026 19:35:46 +0000 Samuel Moelius wrote:
+> The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
+> header fields without confirming that the IPv4 protocol field matches
+> the selected transport header.
+> 
+> That lets a rule written for TCP or UDP modify unrelated payload bytes
+> in a packet carrying a different protocol.
+> 
+> Verify that the IPv4 header is long enough, that the protocol matches
+> the selected TCP or UDP header, and that the packet is not a non-initial
+> fragment before applying TCP or UDP extended header edits.
 
-NIPA says this doesn't apply
---=20
+This is a hardening patch?
+
+It doesn't apply to either networking tree cleanly, please rebase on
+net (if it's a fix) and net-next (if it's hardening) and repost
+-- 
 pw-bot: cr
 
