@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-297137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297138-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tlixOsA1KGrgAAMAu9opvQ
-	(envelope-from <netdev+bounces-297137-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:48:16 +0200
+	id OjJgJCg4KGqEAQMAu9opvQ
+	(envelope-from <netdev+bounces-297138-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:58:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68672661F76
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:48:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 091D1662128
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:58:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=uDyLQ552;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297137-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297137-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=JCWNXEBs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297138-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297138-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E80532DADB1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:35:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33AC931452E4
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8643CF02A;
-	Tue,  9 Jun 2026 15:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD59B49250B;
+	Tue,  9 Jun 2026 15:35:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC773812D3
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E5E1EB9F2
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:35:32 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781019242; cv=pass; b=XaxJvgFyl7UJC8qfUJhMmVryN8rGsVoHMzl/LlHCWa6Fq69h/+svol7SrknbaOTNZR4Obzn4nL9TK9wORV0ZBF+K4W5El7bJVnllRLIrT40ooNdojxNfVc9V3XuEfXMILV+rOmrQomnNmiWjZAX/jnrjtbBy3QPu5IT5SZP3khI=
+	t=1781019335; cv=pass; b=AK/PW0+MFtxMxgdkghMtUp1gWvDCSzj6HwT0Kr6LpJaMTbMKztm0BQVdV1cLeCSNPFdRmW26AgsXerIz0sB0k+hFIbZ/pBaQjZV+KLpJ7pBphCnKhCX2NUKNqeWpMch3xjbDrzNLr5lve+CuQlEICbq0M1yyiJ43RhbBMceWI0g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781019242; c=relaxed/simple;
-	bh=iUtvfyXgaDI5KnsIov4b9KjldMuCh8AdWzMWcmVt6ps=;
+	s=arc-20240116; t=1781019335; c=relaxed/simple;
+	bh=jEhv3A4XgoR5E1m4WOk5qJNIAYwzLvIQCdMGUYZ3aeI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HzqGhAhsUqI8EkObFckMCvHiFVWOek80J2R+HH2ZhZnTpsILpgXKHKeiUtPffspYQDfyt5qHF+70FoEuKJIhdItYkr0ow+gH4B5ANhteipfWZjqMXxR2WE/oEcBJ5XSVZn50ayN1BQhoc74O9u1lomizmtQDtdQcEmlwCDTzCbQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uDyLQ552; arc=pass smtp.client-ip=209.85.222.180
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-91563382bcfso653933585a.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:34:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781019240; cv=none;
+	 To:Cc:Content-Type; b=phK9DBjjJio0VXzuv6l5aMwrRgiSsVafyOoa6x24D124leRJ3V+ZSk+yGihwfgGFBdWKmmibMVw8EOwB22Y1pzTO98WZ4cfeqPuQokyge+rbfbq/SJPSizo46DuwOXogsxAYoiVVJupLfRmo+RN5q/QJ1cDfdsq70q+83r+2dHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JCWNXEBs; arc=pass smtp.client-ip=209.85.160.171
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-5176bbb9384so57235421cf.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:35:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781019332; cv=none;
         d=google.com; s=arc-20240605;
-        b=GxbGa9/tOWE0UuRcDiFh+wfcoJc4b8zCO483jdgD8oA8gLMTDgQu44CeKWbOzTZ7JK
-         FTczjlGZEY0gfIVWmUuiV5euu8VHrUOCN253kk06l2ZUxpoDq9CxEfcmJyTmmZtjCiqJ
-         PQ8xBxZsDfVrHPyO109Ce/ipsZmIazoczIUaDjeoEfpdSuTRQT2TweTZbQHYI9GdYR2W
-         nLaS8czQybJkFFr4iSxT3wNLb2tsmz94jakl0GQ3QZTsocrJyfhlXPqFQR/Y8T7nXmsd
-         kLxAwi5EpgQA9PB2ltdrWPIddO7ERSuIvF1N8tCzu8iTONqh96z1mjdaMRfM0GKXoFpy
-         hlRw==
+        b=XYFw6fmnG1KJnTPzjSUHg2xdSdm8Vht2ahSn+/Y3ioanUZReBXZfWjXtlc7H3XUAWA
+         W/pNPWuCpBFYP7EiuuHirRL2j6aVTdtopCS1AaiVU5vKfoJslINDNyXDsY6KtUHd9xyk
+         MZxTDk7ym3NuUuuy9xW5Y82uWGgNpxhSc82jOjg2sHMxyr7ZLWGFVox3gCCryUamAXri
+         5JTrX5a7dT+vULaVma4hhNMFubikaYo+5sxVjMT+4ENz5YSL8vKtSj2tyr7fHdn1WgKs
+         q3dhwELrEIf/P+qgI2//fL0khXjXd8hu2FNGCrZ14cCxpdHo7Yx1O5XN73u2CAXN6gwA
+         4eag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=iUtvfyXgaDI5KnsIov4b9KjldMuCh8AdWzMWcmVt6ps=;
-        fh=osR2wITpj4S9+ehn1Hp0OpcrkiTCvEXBVgz3qqW/dRk=;
-        b=EhSA8z2qbOeCH4s2JUqF8sLLwNEQdGh7vAW1YlKCPu25CiTw5XjJhQW+RFAotoMRgD
-         46Cb829QHQ+aP7Vm7kFED0UZeLPzDF4DFozzrAT5LVpMIBxTLUwqTDW+8+euBACjkP4N
-         X+fGOz/1lomRUlGMeJh/NURhwiOCR1aInSqZEOSeNEo51XbtR+KCiX7rDmojhkeDOdcf
-         GF/3Lg9l4UNjys+kIyBQFURsle5e96jgNN0/AXewV10nJwwOhxnLuBILp+S96+0qZtH6
-         aogbR7qL86zPYGDJvMxaqiQi2p1W1XdjPpdEV30rFWSNoDv25Bcu7J+j5zikwvmLDQhM
-         IWnA==;
+        bh=bZcUyMhLosI1gkW5rf0mHFs4ShRdokcu/9hZUN0yW3c=;
+        fh=iCCfES5oSa7yd0vRoYnD/lhuePxYyh/prZjMZQA3iOc=;
+        b=lupm3YdBQxmguojFo55mUb9+yPLdpsWi0WCfbjLXwvmQIT2lyVYsROSrcwtX3nJjXY
+         Uvb00wyGEsD81lRS5FPljdsA7j2896jsrEmKQK5Q4L260VAgGtlJVqlrT8MmGx4LaL12
+         W1nx9susga202U6/C500vrZi/SXFA8qCnve0ewfaPPWM6ZR21hGhPByqj/QcpHSVqJmk
+         whkHvRoXPnwN0mv3nboxECpE8eoh7gB6Eyvz0KxobZ0C+molYJeH3I1Zw1+fI9W4DPSv
+         hOiI/x2rTCU16tsV0OYhUAFd6LMVJgDY8Mb4I9R1Qba3pSKWm19XKFq25UwEk/AtFBDF
+         +U5g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781019240; x=1781624040; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1781019332; x=1781624132; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iUtvfyXgaDI5KnsIov4b9KjldMuCh8AdWzMWcmVt6ps=;
-        b=uDyLQ552O31jsOxQJk3vPlwwHhtCQ6UtsjOF5HJ79KJ5tWc/Yayvv/mT1OyH2Q4Tpq
-         aNAZ96YyqzjIkNtl0y8QIR/Nt3RpJrGeg7SIFIQeSCnGfUidze5a3Xb3RSKUrOvjC6aS
-         0D1C/NwJNIZDvWTciN9yxNNUDGb/iM5GBck6EOsalra4y0XRk0TWr7chrXT+NlvI4J7C
-         nMI9DKPV0YzObRuGYcuK870vNWuh47GxonDJ9iRbNh7h8MLnXllmc0c0dor1sCmC4d+s
-         /lsoLQbCzCdnol2a3xH6Bf5fPy/a6l6tZXItUxu53v8fdIGCceEma4wlZ+2pU3LhNoSR
-         74zQ==
+        bh=bZcUyMhLosI1gkW5rf0mHFs4ShRdokcu/9hZUN0yW3c=;
+        b=JCWNXEBsNc+NWAZAGu7fK5mcG4IiNstEaDSTbHycG2bvVoxNCDkgW/KopCpICN5e78
+         f2S2BEnjYt7SeA3rACYHkxyrKME3VcSCdy2thX/2PCgU1bS5rPdkW0esjDo/kU050pXo
+         woTp6jCkKItIBWtfvgO3gQV+4n7li/43tYyDTKfKPShVqYT60rnts7SWUj0XeFL54cOp
+         9qh3Mz4SF34XZfo3srWhARasmfBNMHSZDo08RNw8wCpzeTtbuOtfrDrcuqy8COhlRA2T
+         PoCfVfkWS/KMx2nSoE1tRBhtCCVoBh991l59tkNbGdnMlxs2/t35ekBGmqgZuimylAdC
+         dXVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781019240; x=1781624040;
+        d=1e100.net; s=20251104; t=1781019332; x=1781624132;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=iUtvfyXgaDI5KnsIov4b9KjldMuCh8AdWzMWcmVt6ps=;
-        b=OH5kZ6AStgSIAto/xhs/JcPl/ouxDjF/LNYlajgUeGU3BNrbr93y2HIzoApAJeRKB2
-         45I5NIdvnhEovfSBmAiMQdMEkric8gNQrQjovfBlFIckEPXpTNRZe8W8bGy2Fs9lK8VM
-         O/i5dwT2hjhLe+QU218sf+h0i/NjKcM05sVlZbX1DycjLawf2p9Oux81WP+OE96+SbO6
-         ULkp8ilBqV+vlR09kzx//BxtIB4K2O3LIaOw7Zby+FNSnKi6KTqLtwD2XsdJg2Jd2bEO
-         hCNq5rIv+6C0Fxe3s4Z9oS16CHOJFL7XAafVupvq8T8ckgW/Xd+nU37CfY1VpdkdO403
-         2+Lw==
-X-Forwarded-Encrypted: i=1; AFNElJ9uoMVJJ0pXWaBcp+lq6ToluSd/Tr+nnwz2OISW+ucfsDcx/41cuDbnQIt+JB8GqhGrDqRkMmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1+AgvTNi5uBQI9HRyUmtOG+XSUMSWxyd2burlwzM+GANfSyMZ
-	6yVU8yOW4+MhHfAlbnAFxCNMu1LRR2lkYzl2aR0OlpNUfFW9+xY9qkb7jpkhaT0WkkpzzwK/fQk
-	xGXCAXLYrUC0ubqXC3EnoNPFthp4IyaTu1Pf5cCMo
-X-Gm-Gg: Acq92OGS0/aqkQt/GkYYmBSCJQXdtfFV8Ac3kt8jeQ/JtqGiVXFsOUWWGmdpFQRA3Jx
-	CE+mmWp9kP358u4Z+n2WzMd9sR/FQ+6Si4e3rt8FIQhHhHw4ZL2ebcZ6qFWglgOlwHSN88HtRN5
-	F07LwmTNpTThkqFaxqLNLeaYxPI7rGuFoxPer7h+bZO/YuMFLzC8edBDcFuTTSiNnXZ7djdD18G
-	Az58Qt1yifrUH9eMxW0yPB38VqjqUBOwDmaRqe2o7WDWDvTRg1Bjt/X0LK7Lvkw9ZwHW0owDdjT
-	L8d1a1MB9lEBEdC2lWkrywTDFUtjQndcVFH2zhkt+3zBOvWDUjacDqafXcTMIvv/dL1cI90Uve2
-	Mb/g77wJ88GR8ZxbzqsKMFJysEwQuRQ==
-X-Received: by 2002:a05:620a:254a:b0:915:6758:24d8 with SMTP id
- af79cd13be357-915a9dea2b0mr3355951785a.42.1781019239064; Tue, 09 Jun 2026
- 08:33:59 -0700 (PDT)
+        bh=bZcUyMhLosI1gkW5rf0mHFs4ShRdokcu/9hZUN0yW3c=;
+        b=RzrqRzO4SDvfNvbKU4aLlTEubl+GNDG2GGDm36B4Dk+W0BBCp00qgnV1g9PVR2A2BU
+         3VTq+HyUhrz5vcl6jqHoN9ZyWku50kULn6VtD3sckp8mdsHg/fpST6TMZ+R5ilpKvTW/
+         V8oIzL85+ex2+m/iIw/tfxj26iBidoSdWf3eDRznISAJ/UUBh2sqJgP54+d838Q6yKMN
+         JPK/coj3+2XWMAfa6whPPhH8CrC7AI7F7ydIEywf3YzUdHgwnBDQmEBTqEIueGKG5xXD
+         WwejZLaMr7T0N1ceW5HzRQwxks9cGnSKtXBfKCC32mOx9SyA42gKzNhQghf2qHt0Xw1d
+         KPGw==
+X-Forwarded-Encrypted: i=1; AFNElJ+d2iXWdRWD5ervH+/WfM7E8vIu7kynew7s0uovAzJqkJQU5BeLrzi6ruLD4k2jWpM+NT7HZrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2p7hnex6j/Pr65ZQfkLU/Yz0SqxLM+bswVmdyULfxNKQgs/Fk
+	DY81J4Uc/v1vXyWhsDEXu+xqAMfoFMOkC6pM2sS2GEn0qZN7cMKT1rtHwLoEb0ie7Pyv1/wgg3y
+	Ke/F5VJ0WqX5z3AO04O2uSJnFY8WdFCLcR3u3sGng
+X-Gm-Gg: Acq92OHZPfMxxfg4iiG4O/LDn5tvrgyYd0DYGr7PX7PvYTnfZL0ewVUs3z3d7hbwnsg
+	lWteHSuyL+U83QhhWw77iqXU2QGh/WPZkxpe6kv2A5fNVKdF6mG0P2T6qXj+E8+bxqWk8Fq6o/C
+	TWTG95mz1lWTDR9GWuANu4BPFMWRJz6jkqt5WaZ8pK+8p86jc42XjrTucywxhneUYoEW7T0ai8/
+	i0yd6IAbBEg6dtA7wCIXllaQwgZ7qlcqE5aCKzWf/z4CWt7NlozXVTXMODn03yQInVadr47IPir
+	MzI5D6hCIyz7Xe5T6WjgTWt5Obr6ulRUMJym5f8Kj86DzS/seP+y+iJlXj2/K1xsQy1gpNXZ0pU
+	DldkkyKsR+0OrFjJyQ4bdpnQtOf7YCA==
+X-Received: by 2002:ac8:5fce:0:b0:516:e10f:b1ec with SMTP id
+ d75a77b69052e-51795b06c90mr300061241cf.11.1781019331144; Tue, 09 Jun 2026
+ 08:35:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260605002912.3456868-1-kuba@kernel.org> <20260605002912.3456868-3-kuba@kernel.org>
-In-Reply-To: <20260605002912.3456868-3-kuba@kernel.org>
+References: <20260605002912.3456868-1-kuba@kernel.org> <20260605002912.3456868-4-kuba@kernel.org>
+In-Reply-To: <20260605002912.3456868-4-kuba@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Jun 2026 08:33:46 -0700
-X-Gm-Features: AVVi8CdIeOuG_WsEGh1WRDFFFjdglaeeg3e5KDJT5nxr5f-aHJquXEoG4oUFIyg
-Message-ID: <CANn89iJKLEy76d11byC7og=KmAf++Ozi2yOc4tGY-97C+LPyHg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 02/12] net: ethtool: relax ethnl_req_get_phydev()
- locking assertion
+Date: Tue, 9 Jun 2026 08:35:19 -0700
+X-Gm-Features: AVVi8CdAnVV_OyKNqTHYX26kqUhoZXEA-ST3IJPV5vMjVkuMiZAp3VklMmMK0AQ
+Message-ID: <CANn89iJ3onhdKV4sC3FYrtnUXAWm1NQv__EpQhXKPB6mL7WE-g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 03/12] net: ethtool: make dev->hwprov ops-protected
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
 	andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com, 
@@ -128,7 +127,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-297137-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297138-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -149,25 +148,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tipi-net.de:email,bootlin.com:email,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 68672661F76
+X-Rspamd-Queue-Id: 091D1662128
 
 On Thu, Jun 4, 2026 at 5:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
 te:
 >
-> phydev <> netdev linking and lifecycle depends on rtnl_lock.
-> We want to switch to instance locks for most ethtool ops.
-> Let's add an assert that ops locked devices don't use phydev
-> today. If one does we can either opt the phy ops out of
-> being purely ops locked, or do deeper surgery to make phy
-> locking ops-compatible. I don't think there's any fundamental
-> challenge to make that work.
+> dev->hwprov tracks the active hwtstamp provider for the device.
+> Make it ops protected (instance lock if the netdev driver opts
+> into holding instance lock around callbacks, otherwise rtnl_lock).
 >
-> Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> hwprov is written and read in:
+>  - drivers/net/phy/phy_device.c
+>     phydev and ops protection don't currently mix, add a comment
+>  - net/ethtool/
+>     as of now holds both rtnl lock and ops lock, this one will
+>     soon only hold one lock or the other
+>
+> read in:
+>  - net/core/dev_ioctl.c
+>     holds both rtnl lock and ops lock
+>  - net/core/timestamping.c
+>     RCU reader
+>
+> The new netdev_ops_lock_dereference() helper does not have
+> "compat" in the name. The name would be quite long and I think
+> in this case it should be obvious that we need _a_ lock.
+> netdev_lock_dereference() already exists and means dev->lock
+> is always expected.
+>
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
