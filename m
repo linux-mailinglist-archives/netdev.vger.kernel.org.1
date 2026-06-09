@@ -1,213 +1,306 @@
-Return-Path: <netdev+bounces-297115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Rq4dCXIxKGqG/wIAu9opvQ
-	(envelope-from <netdev+bounces-297115-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:29:54 +0200
+	id 3FsXOJY3KGphAQMAu9opvQ
+	(envelope-from <netdev+bounces-297117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:56:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7428D661C09
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:29:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B066620C1
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:56:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eDnmlTR5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297115-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297115-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=H0G+XJ5b;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297117-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297117-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B3AC30E47BE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:18:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC42E313DA81
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168D74ADDBB;
-	Tue,  9 Jun 2026 15:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7B53769FD;
+	Tue,  9 Jun 2026 15:24:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573B54A13B9
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1269635E1D7;
+	Tue,  9 Jun 2026 15:24:52 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781018034; cv=none; b=uR1RTrdvKQFLfBmBpuo6QSYYueqY/d9+IISuC2x/joDiREMbPlxgcBnc/1dy4kcfHBU8TzePeDzOluka/Rb3A42ky6aF1m5bhRTYe8Qlg/7DYF59Jzx/SwyA8WMrYAGZ7RrSGjDloumysdya3r8caU019MK8HEkKBBC1z15vqsQ=
+	t=1781018695; cv=none; b=A2NHcR5ClKzOAjBGne7x5Jmtvbee/YjYXvO8ZzSG377od+0kgksI/3hJjz6FGmiNg/NjmLw+eWUFIT68k6gEePbTghIcCLs6ZayKiqW8tUhP9PcaURiGyqR+1MwWzvT6jR8CIJTVYoh3O5T8DQrc+S3FTAS/yqNuVRufbuur2QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781018034; c=relaxed/simple;
-	bh=Tgj2/f5KwE1aGzhSuEmxWHXJ26+0zAS918oxJXslIPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fcA3XqMNWIbgmT2MfTcG0/gbfe4Trie2uEmyem2Ba/tR/CWQBk3Z/fciTWSxHO3puheIyIrPNGc8FVw8vUYc6v9Pb1igsddwCHJf66/8sziISEG/urvr6rJLLg66yc65IbxLcAgpIjyJoSGokUcT7vsixpkyiZ3ZU3W6lDLBt1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eDnmlTR5; arc=none smtp.client-ip=209.85.221.53
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-45eedc94d37so2875973f8f.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:13:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781018021; x=1781622821; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LS9BfQsDmesJT0AInGwOXq/X3DAmc3WIA3Pzjrg2pfY=;
-        b=eDnmlTR51Qisn8G1HGxRzhpM/4f8MiowQoWhGCv01Ro0aAVP25snMxrWmcSmFcTQa0
-         kSqbawpNnq8FhnzmVbETXa0AnDSm4stItKLC4Vb+bMhOUcR10lyMCOcZgmKWbdPWBfGc
-         wCLJUWKNTcBfXOrfJtmb0tgKJkPFbwgWf9ORzDuJ3bziClvqziatwyT1BbLOOgzijpzK
-         bbX5zZb7b3RpVHqM1qG1Lqn+ZeCKvjm8kQUWqmQE9N609q5oyuTzJX+445Bm1oEnukUz
-         0Ojn7+KOKd3Ojcsh8qy6EKtFUukke8gP+aksgI/fnF4vwSMZLx4PEgQMyI7GQEVacC/i
-         OkYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781018021; x=1781622821;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LS9BfQsDmesJT0AInGwOXq/X3DAmc3WIA3Pzjrg2pfY=;
-        b=M+ys8BMZ1NLf9qIOYMyl4Tn7N4UiXE8KTOG5hlVRSbIcdkbkBZGrLeLfPhTzKlojAS
-         xsQXO3/TDEdzgxVlpVkKgFMCTVgDJk65NmL5wpliQ4+kC0USJKOjec6lNJ6GjkbQ4ehB
-         z72KaEsD88RU6oBykA70yDTaavWGyHDQDErShvjnawAaoaZ6sTEVOwhOcAPoTms0a5V9
-         gmGTTBp8PIkQcXb6KqPAgVFKlBuiFniDcmRW6KBZCYXuQWT/CI0aAv8Y5lhjVj/PVcDE
-         1J5gRNJW6dG4xM3HQkM2BuIuk1o3lv1u43JUkEn6aU71z/2EQQ35neLcxalBGgGwXCeW
-         Fuuw==
-X-Forwarded-Encrypted: i=1; AFNElJ9xnu2ZymYPiHjpyLGZPuFm3N29s4SMjSTjmANVlHd7HtbobFYo8SZQiaM0QMkKXwA2T2Bbf3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOL2uhrKeOSbJAWNF13XIdlbc4I95rg5S3nUAoC8c8DetQ7UM+
-	uUcrl6w/bbbOB7cXWw38uVv33DeGx/5SxIiLJZWerIXh71tAGAHedK8+rmRZrfgn
-X-Gm-Gg: Acq92OGw8Hh6koYUmkE5tMzewUx0ASpaKfmMQzenJOLKjfOwEFkcDT3OjsusREGJLTD
-	p4MK1m5uAQY91+beuyX49RXk+rpwqDKLVa/Q0LNvQJrfgkhE6i036m8Z8hVvXf7jwW9r3JWctN2
-	eU0Sd8huhzhB4xH0OH0rzfy+oP4ivaIZ2Tiba9OSe6IPvqoKHFNBuktOEdgnIKO+SP6F7LTrYr0
-	OLPw4dt81Tm2DXd5dyErN4fxAAnhyPKdwWI1lcnytrrv9WYEMK+wycN4J3GwWOdIr+tRWCFq275
-	5qW+s6eMBYEtBIgc/O43Jpl/m/FAhBV7fkm90kMU+YzlrN99WyPDYeOwXBsl44Tupjp3Vt2sro7
-	0IeaUrgMngDIeASmTDmrNlBTN9u1HX1V+9ru2bkjzjTzYTsEjyOvgzAe2CXX5Gq51smMULYMQgz
-	iRmKvV57TylmlP7ZjmZZxBhP5lnCVOvIvYhhlcnr1qhgOoPSWONlj2lwa9R6i4dr/zlkclqvI=
-X-Received: by 2002:a05:6000:4312:b0:45e:ea9b:edfb with SMTP id ffacd0b85a97d-460566db7d0mr4546819f8f.39.1781018020420;
-        Tue, 09 Jun 2026 08:13:40 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46028a6dce6sm55897116f8f.30.2026.06.09.08.13.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 08:13:40 -0700 (PDT)
-Date: Tue, 9 Jun 2026 16:13:38 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Kees Cook <kees@kernel.org>, linux-hardening@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Arnd Bergmann
- <arnd@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>
-Subject: Re: [PATCH net-next] net/devlink: Use strscpy() to copy strings
- into arrays
-Message-ID: <20260609161338.2222ff26@pumpkin>
-In-Reply-To: <c6eb816c-3f2d-4705-82ea-8c2c0ad70ded@redhat.com>
-References: <20260608095523.2606-13-david.laight.linux@gmail.com>
-	<c6eb816c-3f2d-4705-82ea-8c2c0ad70ded@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1781018695; c=relaxed/simple;
+	bh=HBoPFGOXGybi9zPjNvhBs4GVWkRnbZRL7P47phF5uJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hin+eoFCcgAQShKajG0m11q4PTGYpm/hB2rIShaWLOubXuigRe3kMtKA+YsyMnlJ1L/8maJ99hE2Xu6dIg9yUdjV5klIRfXYetq9Cm0cPs22CvVq6xKSyBRczZAq5Tsy1g3mJ5L2a9XgBAytGmRrw2W/x+myhC4RQAtMgs6XY8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H0G+XJ5b; arc=none smtp.client-ip=192.198.163.13
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781018693; x=1812554693;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HBoPFGOXGybi9zPjNvhBs4GVWkRnbZRL7P47phF5uJE=;
+  b=H0G+XJ5bIYimtJQcJLuS3eLXT1WH3dQ8er+6Apt7BaefoAV44r46WzWE
+   8N3WXL8F6zQ5yWOJrnS9blKfAE7c1xg8eKxeVp3moDZ45w4EJfcNx29yQ
+   mdn4Knlgii/qCTJVR8TGlWId9WTxhQMpIWsvLF7j5lyITJeAydfkHGBWu
+   dFqbwQo63yd8hDnQlf/BO5z0ywFwwmBI4LL9YOntjNofRwN0oEfKzU7AA
+   WOqBYq2Ghyh7ReCyVaAybPZVJXGifSJiy0nmXe5wimG798BKZdH1cbX3P
+   yPY3comgXso9fzJZ9y27aysjXvQVKOGZTNUYQlZvqauxLIe9MPEJ64PXT
+   A==;
+X-CSE-ConnectionGUID: UI4WHEsZQ6aSIwE11oMzHg==
+X-CSE-MsgGUID: Fzj+RrxzSwiu9YKVcopZrw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11812"; a="84352283"
+X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
+   d="scan'208";a="84352283"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 08:24:51 -0700
+X-CSE-ConnectionGUID: SIFLfa6ORfeM1YV6G9lz1g==
+X-CSE-MsgGUID: 6n6rabJGS8qCw/q/3/ezcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
+   d="scan'208";a="247759332"
+Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.162])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 08:24:42 -0700
+Date: Tue, 9 Jun 2026 18:24:40 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, ebadger@purestorage.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v7] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <aigwONAwxQx6rLef@ashevche-desk.local>
+References: <20260606070735.2163063-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260606070735.2163063-1-ernis@linux.microsoft.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297115-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jiri@resnulli.us,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297117-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[43];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ernis@linux.microsoft.com,m:mkalderon@marvell.com,m:jgg@ziepe.ca,m:leon@kernel.org,m:zyjzyj2000@gmail.com,m:sagi@grimberg.me,m:mgurtovoy@nvidia.com,m:haris.iqbal@ionos.com,m:jinpu.wang@ionos.com,m:bvanassche@acm.org,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:kch@nvidia.com,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:metze@samba.org,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:ebadger@purestorage.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:target-devel@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-cifs@vger.kernel.org,m:samba-technical@lists.samba.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:rds-devel@oss.oracle.com,m:jgg@nvidia.com,s:lists@lf
+ dr.de];
+	FREEMAIL_CC(0.00)[marvell.com,ziepe.ca,kernel.org,gmail.com,grimberg.me,nvidia.com,ionos.com,acm.org,kernel.dk,lst.de,samba.org,talpey.com,oracle.com,brown.name,redhat.com,davemloft.net,google.com,purestorage.com,vger.kernel.org,lists.infradead.org,lists.samba.org,oss.oracle.com];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,pumpkin:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:from_mime,intel.com:dkim,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ashevche-desk.local:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7428D661C09
+X-Rspamd-Queue-Id: 20B066620C1
 
-On Tue, 9 Jun 2026 15:39:35 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
-
-> On 6/8/26 11:54 AM, david.laight.linux@gmail.com wrote:
-> > From: David Laight <david.laight.linux@gmail.com>
-> > 
-> > Replacing strcpy() with strscpy() ensures that overflow of the target
-> > buffer cannot happen.
-> > 
-> > Signed-off-by: David Laight <david.laight.linux@gmail.com>
-> > ---
-> > This is one of a group of patches that remove potentially unbounded
-> > strcpy() calls.
-> > 
-> > They are mostly replaced by strscpy() or, when strlen() has just been
-> > called, with memcpy() (usually including the '\0').
-> > 
-> > Calls with copy string literals into arrays are left unchanged.
-> > They are safe and easily detected as such.
-> > 
-> > The changes were made by getting the compiler to detect the calls and
-> > then fixing the code by hand.
-> > 
-> > Note that all the changes are only compile tested.
-> > 
-> > Some Makefiles were changed to allow files to contain strcpy().
-> > As well as 'difficult to fix' files, this included 'show' functions
-> > as they really need to use sysfs_emit() or seq_printf().
-> > 
-> > All the patches are being sent individually to avoid very long cc lists.
-> > Apologies for the terse commit messages and likely unexpected tags.
-> > (There are about 100 patches in total.)
-> > 
-> >  net/devlink/port.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/devlink/port.c b/net/devlink/port.c
-> > index 485029d43428..108926d3f899 100644
-> > --- a/net/devlink/port.c
-> > +++ b/net/devlink/port.c
-> > @@ -1222,7 +1222,7 @@ static void __devlink_port_type_set(struct devlink_port *devlink_port,
-> >  			devlink_port->type_eth.ifindex = netdev->ifindex;
-> >  			BUILD_BUG_ON(sizeof(devlink_port->type_eth.ifname) !=
-> >  				     sizeof(netdev->name));
-> > -			strcpy(devlink_port->type_eth.ifname, netdev->name);
-> > +			strscpy(devlink_port->type_eth.ifname, netdev->name);  
+On Sat, Jun 06, 2026 at 12:07:15AM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
 > 
-> Given the above BUILD_BUG, I don't see how this change can help?!?
-> 
-> Generally speaking, I suggest restricting this kind of tool-assisted
-> changes to real problems (if any).
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
 
-My aim is to get to the point where the calling strcpy() is invalid
-unless it is used to copy a string literal into an array.
-If/when all the .c files are changed the .h file change can be committed
-to stop any new potential unbounded copies being added.
+...
 
-I do want to look at the 'fortify' version of strspcy().
-The current version can call strnlen() and then real_strscpy(), so
-ends up doing the length scan twice.
-(Never mind how much gets inlined.)
-strscpy() between arrays could be implemented as a memcpy() of the
-shorter length and an explicit zero of the final byte.
+>  	attr->max_qp_init_rd_atom =
+>  	    1 << (fls(qattr->max_qp_req_rd_atomic_resc) - 1);
 
-With the BUILD_BUG_ON() (which I didn't notice) the above could
-be e memcpy().
+FWIW, this one and below looks like reinvention of rounddown_pow_of_two().
 
--- David
+>  	attr->max_qp_rd_atom =
+> -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> +	    min(1U << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+>  		attr->max_qp_init_rd_atom);
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+...
+
+>  int ipoib_cm_dev_init(struct net_device *dev)
+>  {
+>  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
+> -	int max_srq_sge, i;
+> +	int i;
+> +	u32 max_srq_sge;
+>  	u8 addr;
+
+It seems the order is reversed xmas tree, why not preserving it?
+
+...
+
+> --- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+
+>  		max_send_wr =
+> -			min_t(int, wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+> +			min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+
+Now perfectly a single line
+
+		max_send_wr = min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+
+>  		max_recv_wr = max_send_wr;
+
+...
+
+> -		max_send_wr = min_t(int, wr_limit,
+> -			      /* QD * (REQ + RSP + FR REGS or INVS) + drain */
+> -			      clt_path->queue_depth * 4 + 1);
+> -		max_recv_wr = min_t(int, wr_limit,
+> -			      clt_path->queue_depth * 3 + 1);
+> +		max_send_wr = min_t(u32, wr_limit,
+> +				    /* QD * (REQ + RSP + FR REGS or INVS) + drain */
+> +				    clt_path->queue_depth * 4 + 1);
+> +		max_recv_wr = min_t(u32, wr_limit,
+> +				    clt_path->queue_depth * 3 + 1);
+
+Can we rather update the type of one of them and use min() instead?
+
+...
+
+> --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+
+Ditto.
+
+...
+
+> -static int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
+> -module_param(srpt_srq_size, int, 0444);
+> +static unsigned int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
+> +module_param(srpt_srq_size, uint, 0444);
+
+Theoretically this might break ABI (if somebody uses negative values for
+anything. I don't think it's the case, but just be informed.
+
+>  MODULE_PARM_DESC(srpt_srq_size,
+>  		 "Shared receive queue (SRQ) size.");
+
+...
+
+> --- a/drivers/nvme/target/rdma.c
+> +++ b/drivers/nvme/target/rdma.c
+
+> -	ndev->srq_size = min(ndev->device->attrs.max_srq_wr,
+> -			     nvmet_rdma_srq_size);
+> -	ndev->srq_count = min(ndev->device->num_comp_vectors,
+> -			      ndev->device->attrs.max_srq);
+> +	ndev->srq_size = min_t(u32, ndev->device->attrs.max_srq_wr,
+> +			       nvmet_rdma_srq_size);
+> +	ndev->srq_count = min_t(u32, ndev->device->num_comp_vectors,
+> +				ndev->device->attrs.max_srq);
+
+Same question, can we change type type of variables instead?
+
+>  	mutex_lock(&device_list_mutex);
+
+...
+
+>  	inline_page_count = num_pages(nport->inline_data_size);
+>  	inline_sge_count = max(cm_id->device->attrs.max_sge_rd,
+> -				cm_id->device->attrs.max_recv_sge) - 1;
+> +				cm_id->device->attrs.max_recv_sge);
+> +	inline_sge_count = inline_sge_count ? inline_sge_count - 1 : 0;
+
+Simple conditional might be better
+
+	if (inline_sge_count)
+		inline_sge_count--;
+	OR
+		inline_sge_count -= 1;
+
+...
+
+> +++ b/include/rdma/ib_verbs.h
+
+> -	int			max_qp;
+> -	int			max_qp_wr;
+> +	u32			max_qp;
+> +	u32			max_qp_wr;
+
+Nice, but please check that none of these (and beyond) were not used in signed
+multiplication or (which is more disasterous) division. Otherwise it might be
+subtle issues that will be hard to debug.
+
+...
+
+>  	conn_param->responder_resources =
+> -		min_t(u32, rds_ibdev->max_responder_resources, max_responder_resources);
+> +		min3(rds_ibdev->max_responder_resources,
+> +		     max_responder_resources, U8_MAX);
+>  	conn_param->initiator_depth =
+> -		min_t(u32, rds_ibdev->max_initiator_depth, max_initiator_depth);
+> +		min3(rds_ibdev->max_initiator_depth,
+> +		     max_initiator_depth, U8_MAX);
+
+I believe we can go a few characters over and leave them to be single lines.
+
+>  	conn_param->retry_count = min_t(unsigned int, rds_ib_retry_count, 7);
+
+What about this one?
+
+>  	conn_param->rnr_retry_count = 7;
+
+...
+
+>  int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
+>  {
+>  	const struct ib_device_attr *attrs = &device->attrs;
+> -	int max_qp_wr, depth, delta;
+> +	u32 max_qp_wr;
+> +	int depth, delta;
+>  	unsigned int max_sge;
+
+Reversed xmas tree order.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
 
