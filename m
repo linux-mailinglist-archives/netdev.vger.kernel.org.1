@@ -1,244 +1,191 @@
-Return-Path: <netdev+bounces-297028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id o8IuDoH/J2rI6wIAu9opvQ
-	(envelope-from <netdev+bounces-297028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:56:49 +0200
+	id 6ZL5EyIAKGrv6wIAu9opvQ
+	(envelope-from <netdev+bounces-297029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:59:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB2465FBC5
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:56:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CDD65FC26
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:59:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b="ab/hNcSi";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297028-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=microchip.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=MPY2Zide;
+	dkim=pass header.d=redhat.com header.s=google header.b=S1Zkh6nf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297029-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297029-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 47D01309C9F9
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:50:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BE450310C811
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13F64028D9;
-	Tue,  9 Jun 2026 11:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE7D404BF0;
+	Tue,  9 Jun 2026 11:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFD13FDBEC;
-	Tue,  9 Jun 2026 11:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D692404BF7
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:54:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781005837; cv=none; b=Nbf/PD91BsqxF8io7ULnaM/lcJzqqBoU1JjHlkalGuCcrfb4Iz8MT+MuvGAHc2ZIRXW66YaboyqPKhlDFRbeBokj0qHE5QWzPdmyrh8T/Y1gFEJvxV6BZBxF71pVAwM9+wvKvzr4GDSca05tAT4ZN34CppPZIRcPcVb9GvyumXQ=
+	t=1781006095; cv=none; b=Ui51Q6sX37NjAx5PxHYGsyfFQsjvcPl3b59Fda3rO0jK6lIJv+CfXHuDanK2Se3IMwaAk97CT9UT2b6uCX+FDBokBS0C1piMJ8OZTGTbuci9qBOktUSrFnxaL/ChFHfKR74q/74V3MCbr2kW3pxrG9lWwnng0oD/mv9bte4/oME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781005837; c=relaxed/simple;
-	bh=MU6EDuK1Hk2ydJJG7HBbqIXO3OkmP0YpxmgZiKbMHfI=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IYFKi0Ah3DYg7CbjJKtaC9NR/L7uSKROzg6dTn3WsTp5rR36cA8dGQWO1qIC08j1OnSXH7n8zHhQHad5ySLNd3he6PK/W2NEDw2eo2hgpnh3tiwMOGHLFXzlo9u4icarwwWvHdZ3qFijGmhCQwFOpE4agG74XadSsndF+QUo170=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ab/hNcSi; arc=none smtp.client-ip=68.232.153.233
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1781005837; x=1812541837;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=MU6EDuK1Hk2ydJJG7HBbqIXO3OkmP0YpxmgZiKbMHfI=;
-  b=ab/hNcSi2IHuoRpLH7liPOxJsKVtPfPlBEwnokOvlex/RN3L4ghpeFJl
-   L/k9EdAqPEcMjf6JnZSGmry3Uj8k6UkjOimsBjZX/oKwQ5I0ieSdpZYJP
-   s/IdKS2aPCqefQyBkyiqyPMgWv7fHoKAkpEHTGjfdaI1nCxJWJEfJO2U1
-   Pze+MhAmnFyfC8pPAhee+1/RTYe3WDZdnk6/Y6k73BwKBMrMSW3WwZSfO
-   3ZsYVisTPcPOg6WtDEFrY4G+i8R1EMUJgjipPQ9DqP1MoMq4/cG1q4NaY
-   BoolZ377h7I71KJ1TADAB4uGjZargiJyADQoKtwzSel182km4a7vICpXy
-   Q==;
-X-CSE-ConnectionGUID: zFAq9PcuQ9yx5sJ3gBlw8g==
-X-CSE-MsgGUID: z2vqpbSORsSg5f6Ep0ddDA==
-X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
-   d="scan'208";a="58821459"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jun 2026 04:50:36 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 9 Jun 2026 04:50:34 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Tue, 9 Jun 2026 04:50:30 -0700
-Message-ID: <39e0626955d50970208bdccc74c40c83e6ad1ea0.camel@microchip.com>
-Subject: Re: [PATCH net-next v7 4/9] net: dsa: lan9645x: add basic dsa
- driver for LAN9645X
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <UNGLinuxDriver@microchip.com>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Woojung
- Huh <woojung.huh@microchip.com>, Russell King <linux@armlinux.org.uk>, "Steen
- Hegelund" <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>
-Date: Tue, 9 Jun 2026 13:50:30 +0200
-In-Reply-To: <44c635f8-e17e-44bf-b34b-60abcde29577@lunn.ch>
-References: <20260603-dsa_lan9645x_switch_driver_base-v7-0-b2f90e676707@microchip.com>
-	 <20260603-dsa_lan9645x_switch_driver_base-v7-4-b2f90e676707@microchip.com>
-	 <9ee993d0-9a71-48ff-b368-fcebe1ee9e48@lunn.ch>
-	 <a9ab4d129f2e3158c1a7b01d0a975fac00a05893.camel@microchip.com>
-	 <44c635f8-e17e-44bf-b34b-60abcde29577@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1781006095; c=relaxed/simple;
+	bh=pURGLEfOlHNz5lnARlNYJ5uYP4yxdHs6TZKb5qNNxWs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TNhOoJbAo02QJlMsvzz91DXQnzt75nxi3V6ymrXUAm+GDCROOsDEi4yXxcNww3gihE7L8zxxWy9Yd31AafKLE5tvR3to9ca69157RVAlloTzA8T2mhGJoL7eDhIwWWLZgp/wJqx5mfJ+rwWmlcRiqRLbeQzFYZQzIGcSXqYPltk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MPY2Zide; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1Zkh6nf; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781006091;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1dZ0b3532+qnimQ22844Y+HuqWQ6wMYq0EdeEWLSznM=;
+	b=MPY2ZideULl+tqcDG1fU3Lmb9Hr+vKpDZlhyuE9/Tlp51FZL8/SX/b3E9yW+BF7eKxqEsQ
+	tb4UCWsDGXWLUcx1Cq6i/Ds7OBNra+a1Tjdx6Mo3yVO5JxGZNHXagHT9hQgDuLBcPDCJaQ
+	ZPY2V9jr6V35KYj8/u6Atqed+U0ESxA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-470-F1O2WzfRPDiXMhXxgko54A-1; Tue, 09 Jun 2026 07:54:50 -0400
+X-MC-Unique: F1O2WzfRPDiXMhXxgko54A-1
+X-Mimecast-MFC-AGG-ID: F1O2WzfRPDiXMhXxgko54A_1781006089
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45eec2ba533so3674856f8f.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 04:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1781006089; x=1781610889; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1dZ0b3532+qnimQ22844Y+HuqWQ6wMYq0EdeEWLSznM=;
+        b=S1Zkh6nftTyUm1VoiPGgTrQrsjXW4KC57vP2bN+vpseU0ggCpBh6ZPwk7FqrH5u5qy
+         Vbtrw4m01SehWjXZkmZyUSgSaO1O7UaZ80GB+oo9R321Zp8HTFC3yeXzz11KxVpX5UXZ
+         0od5AqM8xGfobkQUhmWHcjyMq5fwi+IHD7QQZjJr3PmNnfeZ4XoMSRMWIAdENTWlo5Fk
+         BVcuflUWDa8z0Pm8iAvQTDOST+DB4y9aMNAbTs8xK+jGBncpMjt/Y7bfLibUv4Y+41sg
+         4fcZHO6W8i71jSi8t7AgB5OFrJy0iYDG7IwU1qC6ZRRPxD29q2MfTdwK9KVOWeArC/b2
+         7DLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781006089; x=1781610889;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1dZ0b3532+qnimQ22844Y+HuqWQ6wMYq0EdeEWLSznM=;
+        b=K0ElT92a+abxNgTBa3VdV8QPLRGXVtjjD/oqahV41D4V1gUBKWNsos5027jjPITOP8
+         ID8av2Q086pkm7iIki2W0jNz3r6ojXJMQjCaI0KHTVMDSdnaOq+Q9Ztpl3rB36YEuu/9
+         OwryEfP288f7R8xHCzY85+4j/SQqKkGdLUXoqWIZhTZkEiMTnKLXol5kZS5O0/zoRKzL
+         8ZqICryC4ZJG0sbRkCPzzs36weygz2lN/vysE25vB8l7HefRjpu0rjFSi9B/jX2IAdxD
+         Eync6s9//wvZ1Tn7K7Pm6Nvt9adYm4H3fC3/rlbRvp9Kuv/46fcdmP83+lajrPecCKSJ
+         i1gg==
+X-Forwarded-Encrypted: i=1; AFNElJ+4wbBwc8CWP9Qu3m62qd0yYh//fvpWlWR+WnA5yGLafD+/LNxys+o4UBUnxFNWf7cvNZCI+3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpF+/lUq3nAzDn2eATXG1s5bft/TmWCnOHsPdflWhglr0WGpcS
+	kjHPbRLdORMnigTFfKKllKVhmT0lumBku4042yksfVftPzUc/mm+oxQ78ZMvdSikNyzjd4LsKAo
+	nF6t6n0F5cvonGmuVCVGBhzp/kisbwjOT4Qa98iIWhuru3BC7eNX3MTclkQ==
+X-Gm-Gg: Acq92OE5BfTTB91FVGZZbmJfT5OpoTIzFTMOIsUvn2Tzf7QMVPDt3sYg569Ox01YZXI
+	eNb4ut5MhjA8yexTo1kZnVHSwfGPXi3pIlbitz92wLEA9mvzfUfFPWBaPTcUImTahJWlI1h1tdp
+	nhIB+ic5GrRjbMLJBdLPKrKR1Ag8ZCqD5+6i2zvOs2/ygd2T5weH4Vmwxd9XWzRLPjQOm4iTl+z
+	0Uk8K4mhBF06ixD6F2IuJsrF+6SRS8s+/qTAqPlwS8Jh7Hq2XbAvN6LuydM8f2Me5jE2ivyemcH
+	2X9AhLhKHQ23gCA54r2An04xBkgpxpoKHJ/3byQsTp1eIWo/RNYb+HW1NqI0JNae8eD6wj1oVUc
+	lloHL1gUD67qEG7uMBBBE3Gh/TGkPhPNhHFsqjCt8a3CHGhd4ThGZ1qHlc/WeHViwKA==
+X-Received: by 2002:a05:600c:1f90:b0:490:b00c:8e6a with SMTP id 5b1f17b1804b1-490c2602971mr335847325e9.28.1781006088652;
+        Tue, 09 Jun 2026 04:54:48 -0700 (PDT)
+X-Received: by 2002:a05:600c:1f90:b0:490:b00c:8e6a with SMTP id 5b1f17b1804b1-490c2602971mr335846755e9.28.1781006088273;
+        Tue, 09 Jun 2026 04:54:48 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.44])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f35fd33sm67726434f8f.35.2026.06.09.04.54.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 04:54:47 -0700 (PDT)
+Message-ID: <f5a3896d-7fbc-410a-b727-e910b6b182c4@redhat.com>
+Date: Tue, 9 Jun 2026 13:54:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 1/2] tcp: rehash onto different local ECMP
+ path on retransmit timeout
+To: Neil Spring <ntspring@meta.com>, netdev@vger.kernel.org
+Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
+ davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org, horms@kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ martin.lau@linux.dev, daniel@iogearbox.net
+References: <20260604212246.265079-1-ntspring@meta.com>
+ <20260604212246.265079-2-ntspring@meta.com>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260604212246.265079-2-ntspring@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297028-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297029-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:UNGLinuxDriver@microchip.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:woojung.huh@microchip.com,m:linux@armlinux.org.uk,m:Steen.Hegelund@microchip.com,m:daniel.machon@microchip.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ntspring@meta.com,m:netdev@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dsahern@kernel.org,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:bpf@vger.kernel.org,m:martin.lau@linux.dev,m:daniel@iogearbox.net,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,microchip.com:dkim,microchip.com:mid,microchip.com:from_mime,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9DB2465FBC5
+X-Rspamd-Queue-Id: B4CDD65FC26
 
-On Tue, 2026-06-09 at 10:48 +0200, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> On Tue, Jun 09, 2026 at 09:08:13AM +0200, Jens Emil Schulz Ostergaard wro=
-te:
-> > On Mon, 2026-06-08 at 20:00 +0200, Andrew Lunn wrote:
-> > > EXTERNAL EMAIL: Do not click links or open attachments unless you kno=
-w the content is safe
-> > >=20
-> > > > +     dsa_switch_for_each_user_port(dp, ds) {
-> > > > +             if (dp->cpu_dp->ds !=3D ds) {
-> > > > +                     dev_err(ds->dev,
-> > > > +                             "NPI port on a remote switch is not s=
-upported\n");
-> > > > +                     return -EINVAL;
-> > > > +             }
-> > > > +
-> > > > +             if (first_cpu_dp && dp->cpu_dp !=3D first_cpu_dp) {
-> > > > +                     dev_err(ds->dev, "Multiple NPI ports not supp=
-orted\n");
-> > > > +                     return -EINVAL;
-> > > > +             }
-> > > > +
-> > > > +             first_cpu_dp =3D dp->cpu_dp;
-> > >=20
-> > > The reason i asked about NPI ports is because this is looping over
-> > > user ports. Yet you say one of these user ports is a CPU port. That
-> > > cannot be correct.
-> > >=20
-> > > The first port returned by dsa_tree_for_each_cpu_port() would be
-> > > first_cpu_dp.
-> > >=20
-> > >         Andrew
-> >=20
-> >=20
-> > I tried to mimic the approach in drivers/net/dsa/ocelot/felix.c:
-> >=20
-> > static int felix_tag_npi_setup(struct dsa_switch *ds)
-> > {
-> >       struct dsa_port *dp, *first_cpu_dp =3D NULL;
-> >       struct ocelot *ocelot =3D ds->priv;
-> >=20
-> >       dsa_switch_for_each_user_port(dp, ds) {
-> >               if (first_cpu_dp && dp->cpu_dp !=3D first_cpu_dp) {
-> >                       dev_err(ds->dev, "Multiple NPI ports not supporte=
-d\n");
-> >                       return -EINVAL;
-> >               }
-> >=20
-> >               first_cpu_dp =3D dp->cpu_dp;
-> >       }
-> >=20
-> >       if (!first_cpu_dp)
-> >               return -EINVAL;
-> >=20
-> >       felix_npi_port_init(ocelot, first_cpu_dp->index);
-> >=20
-> >       return 0;
-> > }
-> >=20
-> > Perhaps I misunderstand you, but there could be confusion about
-> > terminology. The chip designers have a concept of CPU port, which is
-> > used liberally in the datasheet, and in this driver code.
->=20
-> > However, the concept is different from the DSA concept of a CPU port.
->=20
-> And that is a problem because somebody reviewing this code is likely
-> to know DSA concepts much more than the individual devices concepts.
-> To aid overall Maintenance of all the DSA drivers, the driver should
-> try to keep with DSA meanings.
+On 6/4/26 11:22 PM, Neil Spring wrote:
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 7995a89bafc9..fc8e886f7791 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -5020,8 +5020,10 @@ static void tcp_rcv_spurious_retrans(struct sock *sk,
+>  	    skb->protocol == htons(ETH_P_IPV6) &&
+>  	    (tcp_sk(sk)->inet_conn.icsk_ack.lrcv_flowlabel !=
+>  	     ntohl(ip6_flowlabel(ipv6_hdr(skb)))) &&
+> -	    sk_rethink_txhash(sk))
+> +	    sk_rethink_txhash(sk)) {
+>  		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAREHASH);
+> +		__sk_dst_reset(sk);
 
-I have tried to explain the relationship between switch CPU port and NPI
-port in comments, but I am sure it could be clearer. I am also guilty of
-thinking in terms of these concepts because it is how the terms are used
-in the office, in the registers and datasheet and so on. It is hard
-writing a driver without knowing this distinction.
+Instead of touchin all the sk_rethink_txhash() call-sites, I'm wondering
+if the __sk_dst_reset() could be placed directly into
+sk_rethink_txhash() ? Note that this patch does not touch the
+dst_negative_advice() caller.
 
+> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+> index 0a88b376141d..7a2b1de7487c 100644
+> --- a/net/ipv6/af_inet6.c
+> +++ b/net/ipv6/af_inet6.c
+> @@ -823,6 +823,9 @@ int inet6_sk_rebuild_header(struct sock *sk)
+>  	fl6->flowi6_uid = sk_uid(sk);
+>  	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
+>  
+> +	if (ip6_multipath_hash_policy(sock_net(sk)) == 0 && sk->sk_txhash)
+> +		fl6->mp_hash = (sk->sk_txhash >> 1) ?: 1;
 
->=20
-> > Let us call the first switch CPU port, and the second DSA CPU port.
-> >=20
-> > The port we want to use as a DSA CPU port, i.e. the port with the
-> > 'ethernet =3D <&host_port>;' property in the device tree, will be
-> > configured to be an NPI port for injection/extraction for the switch CP=
-U
-> > port (which is not a physical port on the device).
->=20
-> > Therefore, this NPI port is not iterated by
-> > dsa_switch_for_each_user_port. The switch CPU port (index 9) is also no=
-t
-> > iterated by it. It is a chip internal construct with no representation
-> > in the device tree, and no struct dsa_port.
->=20
-> So first_cpu_dp is not a DSA CPU port. It is also not a NAPI port,
-> since that is a DSA CPU port. Then what is it? Why do you need the
-> concept of a switch CPU port?
->=20
->         Andrew
+I think you could place the above logic in a shared helper and re-use it
+in several places below to avoid code duplication.
 
-But first_cpu_dp _is_ a DSA CPU port (and the NPI port). What I meant is
-that we are iterating user ports with dsa_switch_for_each_user_port, so
-the iteration variable dp is never a DSA CPU port (and therefore not the
-NPI port). But we set first_cpu_dp =3D dp->cpu_dp, not first_cpu_dp =3D dp,
-so first_cpu_dp is indeed a DSA CPU port.
-
-We find it here so we can pass it to lan9645x_npi_port_init to configure
-the port module at index first_cpu_dp->index as an NPI port. In this
-particular function, the switch CPU port does not occur or play a role,
-I was just trying to explain the relationship in general.
-
-Thanks,
-Emil
+/P
 
 
