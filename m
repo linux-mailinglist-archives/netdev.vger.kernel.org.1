@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-297068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297069-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mtaUIiAfKGpH+QIAu9opvQ
-	(envelope-from <netdev+bounces-297068-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:11:44 +0200
+	id w/CUAJwgKGqd+QIAu9opvQ
+	(envelope-from <netdev+bounces-297069-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:18:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A53C660DE8
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:11:44 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAC9660EA6
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:18:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LXv55nef;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297068-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297068-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=BCWEB2eU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297069-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297069-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 252D23048225
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:10:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B8DAD30649F3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E78733987F;
-	Tue,  9 Jun 2026 14:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5A833D4F3;
+	Tue,  9 Jun 2026 14:09:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1EF32E6BC
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 14:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459E0322B88
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 14:09:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781014195; cv=none; b=dNlcoFxFx4qWaZrvx5dijpoIoLPJ7CRCErdiqJAOAzEUxQkILR3/pqt/dt6Hf7GS59Y4LUaggKd6+VnZchaSkZ7cCTXS1SDsqr3QQmipbU3CounrOhVPwVMSG8v64HSSqLu61tS+p2jPVmUypMItrUQwveu+lafQZObYy1cSPBc=
+	t=1781014199; cv=none; b=ht0GgzbmQN22LVkfSTwYDpaCnNJVbd/KpUTI8KZWrcmh9ZwTMmX/8UbXnusBJ3GQac202oGU+rYJDn2Gxagpbm5KW76ytUbJvrIhG5xGZxAafOKWgqFZ/15m7p/gwG2ERWxy1Wh9gJkfycPvsfmrGGsCvxKdzwWEcwM/TCJYE+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781014195; c=relaxed/simple;
-	bh=vsqwP8YXh+M2bNPBsEQcgcJw0h57NoyNsFB3+oAaB/E=;
+	s=arc-20240116; t=1781014199; c=relaxed/simple;
+	bh=5/OPioWXPOxINyKCOBiJ+YNYdZjseqWVv2yQXHZrtxg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MI6QnFTEWGB2FIx15HS266XZn0j2rwDu3w68JsIYe+9++oUag/QG/h9NHLS3ad4PDifsLRF/kBEMVbezOblFdHB4RZdowZ8RGvVVFApSzNeWcnuA5Bbw7oOUu+OZ7pA68g65jnxHRLV0X1TRtZUskYk84BqmdKtdg9Dek5suP8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LXv55nef; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Y61FAidYf8bstQMNMD5AIYs3PINGHSycwMHWeD0Kg1NoNZ1p/k05VXZB4TxX4nr/uf24F3CQTbDs/GlUAMKvrITgoavV1pVY2Iref23Y0pARc6J6hfwQ3/2KjcqgHBpab68jElSVUaDI+81/GemkbAXq42go12yHprAuXdHnD9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BCWEB2eU; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781014193;
+	s=mimecast20190719; t=1781014196;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0OWe4NSbohWDDQtxvPc65jvBtu4PNpfSBPoC6Q/fajc=;
-	b=LXv55nefu+9jVTrWnNM7GwJ8EDKxq+Tp1B4Cl996VQgdKOM/BKyArVdZsVjO9zazGDD2q5
-	P1u9zewqgvIarfrdGUfxd14sQmj8vaost4U4SddFcUGeojdr8+c+UP5/h1xS9V8QTxjp4A
-	Ot0uMENb/soX7AlaXo0+0VTOEttpwiE=
+	bh=7esvHq+dUpmKooYQgGpjyCb8hcHtrHglGKgUjfHEp/s=;
+	b=BCWEB2eUNYVJWkvRCgUS+C9znbtLeREXGmoiEQKgDWS6+M4lRT0RiCA9/i4wwWzWZrGA8j
+	5IldY9DMG0sAukGzu49XwyDmT14tIBH5AzVUTzAa5zQxrW33Pm47tOCCsqP5CyAQ4l7UVg
+	PrZQuoUev0d6GxAxZics3g7moknyrdw=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-zH8zfC1kODeBF1qVYB7I-w-1; Tue,
- 09 Jun 2026 10:09:47 -0400
-X-MC-Unique: zH8zfC1kODeBF1qVYB7I-w-1
-X-Mimecast-MFC-AGG-ID: zH8zfC1kODeBF1qVYB7I-w_1781014185
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-0UFaWmuMNPajQtBhxSIJTg-1; Tue,
+ 09 Jun 2026 10:09:55 -0400
+X-MC-Unique: 0UFaWmuMNPajQtBhxSIJTg-1
+X-Mimecast-MFC-AGG-ID: 0UFaWmuMNPajQtBhxSIJTg_1781014192
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F60218501E9;
-	Tue,  9 Jun 2026 14:09:45 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 151EB185FC4E;
+	Tue,  9 Jun 2026 14:09:52 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.32.43])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 059E33008B39;
-	Tue,  9 Jun 2026 14:09:40 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EA3901954102;
+	Tue,  9 Jun 2026 14:09:46 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -72,12 +72,16 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Li Daming <d4n.for.sec@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
 	Ren Wei <n05ec@lzu.edu.cn>,
 	Jeffrey Altman <jaltman@auristor.com>,
 	stable@kernel.org
-Subject: [PATCH net 4/5] afs: Fix netns teardown to cancel the preallocation charger
-Date: Tue,  9 Jun 2026 15:09:08 +0100
-Message-ID: <20260609140911.838677-5-dhowells@redhat.com>
+Subject: [PATCH net 5/5] rxrpc: serialize kernel accept preallocation with socket teardown
+Date: Tue,  9 Jun 2026 15:09:09 +0100
+Message-ID: <20260609140911.838677-6-dhowells@redhat.com>
 In-Reply-To: <20260609140911.838677-1-dhowells@redhat.com>
 References: <20260609140911.838677-1-dhowells@redhat.com>
 Precedence: bulk
@@ -87,7 +91,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -96,18 +100,18 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297068-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-297069-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FREEMAIL_CC(0.00)[redhat.com,auristor.com,kernel.org,davemloft.net,google.com,lists.infradead.org,vger.kernel.org,gmail.com,lzu.edu.cn];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:d4n.for.sec@gmail.com,m:n05ec@lzu.edu.cn,m:jaltman@auristor.com,m:stable@kernel.org,m:d4nforsec@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:d4n.for.sec@gmail.com,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,m:n05ec@lzu.edu.cn,m:jaltman@auristor.com,m:stable@kernel.org,m:d4nforsec@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -120,27 +124,33 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,infradead.org:email,auristor.com:email,davemloft.net:email,lzu.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,infradead.org:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,davemloft.net:email,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A53C660DE8
+X-Rspamd-Queue-Id: EEAC9660EA6
 
-Fix the teardown of an afs network namespace to make sure it cancels the
-work item that keeps the preallocated rxrpc call/conn/peer queue charged
-before incoming calls are disabled (i.e. listen 0).
+From: Li Daming <d4n.for.sec@gmail.com>
 
-Also, if net->live is false because the afs netns is being deleted, make
-afs_charge_preallocation() skip charging and make afs_rx_new_call() avoid
-requeuing the charger.
+rxrpc_kernel_charge_accept() reads rx->backlog without any
+socket/backlog synchronization and passes that raw pointer into
+rxrpc_service_prealloc_one(). A concurrent rxrpc_discard_prealloc()
+sets rx->backlog = NULL and frees the backlog rings, so a kernel
+preallocation worker can keep using a freed struct rxrpc_backlog
+while updating *_backlog_head/tail and array slots.
 
-(This was found by AI review).
+Serialize the state check and backlog lookup with the socket lock,
+and reject kernel preallocation once teardown has disabled
+listening or discarded the service backlog.
 
 Fixes: 00e907127e6f ("rxrpc: Preallocate peers, conns and calls for incoming service requests")
-Reported-by: Simon Horman <horms@kernel.org>
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Li Daming <d4n.for.sec@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Li Daming <d4n.for.sec@gmail.com>
-cc: Ren Wei <n05ec@lzu.edu.cn>
 cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Jeffrey Altman <jaltman@auristor.com>
 cc: Eric Dumazet <edumazet@google.com>
@@ -152,39 +162,45 @@ cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 cc: stable@kernel.org
 ---
- fs/afs/rxrpc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/rxrpc/call_accept.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 588f8de51167..d5cfd24e815b 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -127,6 +127,7 @@ void afs_close_socket(struct afs_net *net)
+diff --git a/net/rxrpc/call_accept.c b/net/rxrpc/call_accept.c
+index ee2d1319e69a..47824120f1da 100644
+--- a/net/rxrpc/call_accept.c
++++ b/net/rxrpc/call_accept.c
+@@ -471,13 +471,26 @@ int rxrpc_kernel_charge_accept(struct socket *sock, rxrpc_notify_rx_t notify_rx,
+ 			       unsigned long user_call_ID, gfp_t gfp,
+ 			       unsigned int debug_id)
  {
- 	_enter("");
+-	struct rxrpc_sock *rx = rxrpc_sk(sock->sk);
+-	struct rxrpc_backlog *b = rx->backlog;
++	struct rxrpc_backlog *b;
++	struct rxrpc_sock *rx;
++	struct sock *sk;
++	int ret;
  
-+	cancel_work_sync(&net->charge_preallocation_work);
- 	kernel_listen(net->socket, 0);
- 	flush_workqueue(afs_async_calls);
+-	if (sock->sk->sk_state == RXRPC_CLOSE)
+-		return -ESHUTDOWN;
++	sk = sock->sk;
++	rx = rxrpc_sk(sk);
++
++	lock_sock(sk);
++	if (sk->sk_state != RXRPC_SERVER_LISTENING || !rx->backlog) {
++		ret = -ESHUTDOWN;
++		goto out;
++	}
++
++	b = rx->backlog;
++	ret = rxrpc_service_prealloc_one(rx, b, notify_rx, user_call_ID,
++					 gfp, debug_id);
  
-@@ -742,7 +743,7 @@ void afs_charge_preallocation(struct work_struct *work)
- 		container_of(work, struct afs_net, charge_preallocation_work);
- 	struct afs_call *call = net->spare_incoming_call;
- 
--	for (;;) {
-+	while (READ_ONCE(net->live)) {
- 		if (!call) {
- 			call = afs_alloc_call(net, &afs_RXCMxxxx, GFP_KERNEL);
- 			if (!call)
-@@ -792,7 +793,8 @@ static void afs_rx_new_call(struct sock *sk, struct rxrpc_call *rxcall,
- 	if (!call->server)
- 		trace_afs_cm_no_server(call, rxrpc_kernel_remote_srx(call->peer));
- 
--	queue_work(afs_wq, &net->charge_preallocation_work);
-+	if (net->live)
-+		queue_work(afs_wq, &net->charge_preallocation_work);
+-	return rxrpc_service_prealloc_one(rx, b, notify_rx, user_call_ID,
+-					  gfp, debug_id);
++out:
++	release_sock(sk);
++	return ret;
  }
- 
- /*
+ EXPORT_SYMBOL(rxrpc_kernel_charge_accept);
 
 
