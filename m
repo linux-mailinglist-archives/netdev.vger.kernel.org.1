@@ -1,170 +1,187 @@
-Return-Path: <netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SYeJO4hhKGoJDAMAu9opvQ
-	(envelope-from <netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:55:05 +0200
+	id 9pMeFvdhKGooDAMAu9opvQ
+	(envelope-from <netdev+bounces-297240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:56:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4904266371D
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:55:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA91663747
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:56:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Mw2I8XJL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=trailofbits.com header.s=google header.b=bAMCUPGe;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297240-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297240-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D5813013278
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:55:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5DDE430188B2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759484B8DF8;
-	Tue,  9 Jun 2026 18:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14ED4C042C;
+	Tue,  9 Jun 2026 18:56:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7BC43CED8
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA7048AE04
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:56:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781031302; cv=none; b=RBSUh/oE5NZFT2xGVV32QDmbOmculVoy8iaRtxjILQw/WKjT720edGdSfv3OzC+0qYYShsxlbs87JUqn0cLDFqEa5Dmk3HVNBbr0Qy3FMrtfQiM/hV5hH/7FtUBKzOHVxCxwVEXj+hS9dut0eVdzQkXAuaVkFC6rJfCLn/+d2G4=
+	t=1781031412; cv=none; b=sc998TGKGCHo9eeyX2oXG0tPJ5HYXYN+q2SastLQEpx6ZCzNb8DmrPCq/TCLmiT5jxIhwxo7nB+b7kmO4lTayE6bO9sYVmyQQDBe3s3ZjYddz2oQxAd7WwggE6UiuAPFTIvKZD2jFdFK583UmdP5CaRLDjihl4yBODdCdYqG4FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781031302; c=relaxed/simple;
-	bh=A/eIXOo/JATBHzFdXaOYpHGmRhy/QM6ZfMygpy0hYyo=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Lf8BayPO5r0y13Ym73RCZPaABuzit8PriaPjgcYPXtsnrOGJGoO0xJ1wrTZWajVz/DDHGo8Ku7Hb1r67ng9TpGP49FUUMAscQaBe5nLQdxOnhWDp9cgSVtM0fdR00NK6Rx4T48QaFdumnq3N4lKum6aiEZx+R+UpGioN+2wd2R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mw2I8XJL; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C528B1F00893;
-	Tue,  9 Jun 2026 18:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781031301;
-	bh=RGayj3EPEyW5089OIaXcYNbn/0ET4KOcMbJw2winxU0=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=Mw2I8XJLMt2onLJe9nWC2GZhxhWi8zfGMtl/B0tCFAwHc705jalIDWvJU/v4sAeaC
-	 kxdP4DgHzpcl0llmNnv+Ofwby+0cygSYvF0BlQjO8vEPayiS/WE0myCz+Y/HOrw1ec
-	 I4H1Zil81EtnKd94JfiVwZx5vfMCchwRW6wr5jLox1j1TjvpTx/1ogZWRSK2Op06qI
-	 1DIWbaruxGC9CsuVLlVeQ2h/mf5x12zve65YxS5N4SXq0WzR1R4l1uUsyDIjZrxIn+
-	 x0BNUyDaT29AXBwGAh2VD2qAHM8xT+1k25sk6MZgxkiutKvkjEfOOF2bv6JOVPRD92
-	 E7JF4FHMNWmDw==
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 17581F40068;
-	Tue,  9 Jun 2026 14:55:00 -0400 (EDT)
-Received: from phl-imap-04 ([10.202.2.82])
-  by phl-compute-02.internal (MEProxy); Tue, 09 Jun 2026 14:55:00 -0400
-X-ME-Sender: <xms:g2EoauWHEsvJgMR53JJQL8E-zjzLaj8Wedkh_UNkZPlnxsIs7F23VA>
-    <xme:g2EoalZuptXfIi9w0pyrQ6IaCAtkAa1lRT1SeGTn4axm9A29PDwgpk0ZrotrUCKdd
-    WQa06Z5Ont5_7OBApbuNotCfeirCKkTcICqJuUXBYf4run4Z-n5Zzs>
-X-ME-Proxy-Cause: dmFkZTG0vcQMtM9rJJwi56/yDuZoleG0rCH5L0wD0NAvop4Ds8OPEkw/dtuRssna4SatzE
-    Vk6t4qctsS1+BvVh6cek0JFGEQGjzEM/HA0dk3aDmkB0CACh6OyTEOtjDHia6IqYnVbwBU
-    DVpZ0ivAzPum8UQ/yI1kJskLlqaYM+MyXsHht6dR4CRCxZGtrwxXNAAi1YioNRu2GJHtni
-    6EnI3oO0dd4sdsa94iXFbj+KL1LB/mHnz2kr83KjM8D26DcJa2MlL1ZzSaire5RamJY5wA
-    x9TvBkWxVBwfjOTrazISaBCNx6OoSoqqLRoEEWoJUZwYbhGbwAzUO3R+HIAsN+dDaAuUf3
-    W+ttynM+ugX8QyH49acjcvc/m3XBU0GRQhGW9H+GeHD2oG+Vh60sJKQIb9wc456OKEwlU9
-    dMRpiLfMqyRmzSkH52EGi/+n8ITwuX7wFWrSFR5hVIivbdHHQatRl1BSk1itNV/ti8XjaP
-    2+0Fhfbdc6KZb0yfQ1Kha4N0vTuOrsQ2U4fDlHa/85oCOaaxqLMAC+ikYPlaak7k5riAIa
-    uLwiEUDYzLvz+pi51dE5RQHpRoYNsKv2UNW6wKkWZSl/D6DlG0VACfJn5KlHYjvEdFnOZ1
-    qoIPEYcK+v0+cBkwHg2cl8IWHgSoPGw2PBGPDDcGsqePOKOUIBXKvl+PpMng
-X-ME-Proxy: <xmx:hGEoautAe-1TtFilFXc_vLs2m1RiNuU60EcZo9jl7kZWvP24yYgTQA>
-    <xmx:hGEoaj16gEbyRQh28CSQXEZuJ0g3lxlHuDuHsuY4rJ8kcatI2Z2ogQ>
-    <xmx:hGEoaq7nfIf7DoaqmIkfiE7WeR3Zz1csm7Ax8CSIXYZXArcs2BtkhQ>
-    <xmx:hGEoalOqjv5sQt0rPsSIxkWS9UFQemXGDpDmBNQSaGjAwPc6i55yqA>
-    <xmx:hGEoauEbeClV5qUrjQmCXCqo93tKLgDZRg1IPGt6Zem3K4Lfh8bGBMPS>
-Feedback-ID: i20964851:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id CE5EDB6006E; Tue,  9 Jun 2026 14:54:59 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1781031412; c=relaxed/simple;
+	bh=HJCGm0COA5ItiBybYQGy5woQjXOj1c/FVQ+aq0Bzo8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IMhPOMjC7u5zZB4C8+sttEzyZPUQeOOC6pV8x/AQTWq3SDEfkLM98qzlhVooboqclpaiD3ZDWOFwJ6KU0aBsQWEjgK1RZ7873CrSsE7QEBUfxYtfBq6vIsx7opPTV9DsERhxy0KFetPzz7LAoTfkyPJqwoMHtFVUTPEpYyvWM2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=bAMCUPGe; arc=none smtp.client-ip=209.85.219.50
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8ccf0fa0aacso82006856d6.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 11:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1781031410; x=1781636210; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=16iV7RIIpsvJlA2HjI7+KG5mxLD2wZSYZrTwJS1TsvY=;
+        b=bAMCUPGeCZaCNUZuI1s+oTJHWQHCcor5xmNLap8cSrfkfhjFL66Uqzz00L7LPSZSdv
+         sR0kTZl+mDjwkNKqvq3GsRzTrPBJ+GT3wxK8VTyuPll7Xv+gf7HqNFyuxh10QIQnkaTW
+         I82iOhwIQRc+TX6tRdUMB4I28BA2vXgjnJefipkC7VSwKH4Jxz/jnitzNoyRTPA7xnWd
+         9GItCvjm0iyfxllhAKHH18Fshi5WrZH5s+A40Dvjrg+VZ7s660Sy32m3Nv37veLYaMkc
+         UaPy4WNH5bTorYApPMPkxVijYNE6Q78/k4AJ0a9ynUHYj4AJ/bHx9q/worfEceEBMKmP
+         lOFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781031410; x=1781636210;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=16iV7RIIpsvJlA2HjI7+KG5mxLD2wZSYZrTwJS1TsvY=;
+        b=AURjjWUAycmMys2JPa9YIuwEUlFzeZWeNADoLmn/jPP2jjzApjBJXKirBE9UWEs3CG
+         ziriiJjZLoMNcgZlfHHPFFjxd2syGS6N5dGq/4MjsgwHH7H0DjIEKV6X6iZO4rEX82ak
+         Qe8BknxOvSSegAG+EP5x+cjoXbjYdxh9/yRm54F1l2jlhZmyZWadQ7KhJayohtGZyj2m
+         kQwBkYK+bMS6Lv0hos6rfBJBWBwU3WgPq+rVcgTHZ1b22gy5I5upEBT20GEaf45BmmXx
+         2A4ceoJlu76yAWeNYoPZe2PKFoDHsUF0p4xCawREVRUODo8UVam/zJBSk7B55skIsv1W
+         aMkA==
+X-Forwarded-Encrypted: i=1; AFNElJ/vnjbLjv6SM0AHG0hASzBKR40XGL93y9gT+0xDl/SzdhFWFzRYYVzX+XzdJjLLylDUo6d1XHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoEslRtUDCsVY9/dgwxJ08PLK7J1m4jWk8FoTlmpW4dx3TncLh
+	4z+aPM3zrV8OB86mSQK0JWZsn5hNSeWr2VEpdwsT8yDHPW4K0Vgyh0EqdmeGHCHzA1A=
+X-Gm-Gg: Acq92OGpt9RQUEYANQrQJz3UGMOzOXZJ7liXiTk4lfrbVT84NC9r/ao1bGnJcx/W3lz
+	imWGscaWel0RE478J0DupJ1Kn6qN0ke94w2L3MVFGEtY/rZIQhKupF1lgSAm7d+jDGdQ3rXstpD
+	Y/Z6cc6YV+HWN7qcdFShaEECjZptftsqd2N+Em6XaFBd/DNCuDaFrw4PxFle6VAHcSjomr4vjEH
+	nqqwJZeEPeq8KqY5tWn5bBbzefyHVsErfIiQSbrgRzn9YVdjgJrsJUWL6JnWk3kF+mkgMqym7PT
+	cThmvo+gquBCWQxNltlPFU3dh7pT2EyJbJmpO8qBMWt/sZRFHuFvPLPtWxx2ntbiIB8rXF715rP
+	gINQugTFUkdQ1m6ETRBkEVpgiv7UwLq3pwQNDAhZ3LDdrTd/Q6iJWmwzoPI3cesvUAhzG1VE/+V
+	fvo15PfdDT9p6ef7FoaXQzzTVP/ELUNqv8r+N7sA==
+X-Received: by 2002:a0c:ff49:0:b0:8a5:104b:e37b with SMTP id 6a1803df08f44-8cee629b32amr281614486d6.42.1781031410153;
+        Tue, 09 Jun 2026 11:56:50 -0700 (PDT)
+Received: from localhost ([161.35.96.86])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-8cecd06d600sm212001306d6.35.2026.06.09.11.56.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 11:56:49 -0700 (PDT)
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Max Tottenham <mtottenh@akamai.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Josh Hunt <johunt@akamai.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3 1/2] net/sched: act_pedit: require matching IPv4 L4 protocol
+Date: Tue,  9 Jun 2026 18:56:34 +0000
+Message-ID: <20260609185636.1599359-2-sam.moelius@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260609185636.1599359-1-sam.moelius@trailofbits.com>
+References: <20260609185636.1599359-1-sam.moelius@trailofbits.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A8villCpd8mN
-Date: Tue, 09 Jun 2026 14:54:39 -0400
-From: "Anna Schumaker" <anna@kernel.org>
-To: "Marco Crivellari" <marco.crivellari@suse.com>,
- linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: "Tejun Heo" <tj@kernel.org>, "Lai Jiangshan" <jiangshanlai@gmail.com>,
- "Frederic Weisbecker" <frederic@kernel.org>,
- "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
- "Michal Hocko" <mhocko@suse.com>, "Trond Myklebust" <trondmy@kernel.org>,
- "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
-Message-Id: <d9242324-720c-448f-9723-e11f0158f4b1@app.fastmail.com>
-In-Reply-To: 
- <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com>
-References: <20260507130117.252825-1-marco.crivellari@suse.com>
- <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com>
-Subject: Re: [PATCH v2] xprtrdma: Move long delayed work on system_dfl_long_wq
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.15 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297238-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-297240-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,app.fastmail.com:mid,suse.com:email];
-	FORGED_SENDER(0.00)[anna@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:marco.crivellari@suse.com,m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:trondmy@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:mtottenh@akamai.com,m:pctammela@mojatatu.com,m:johunt@akamai.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anna@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4904266371D
+X-Rspamd-Queue-Id: EBA91663747
 
-Hi Marco,
+The extended IPv4 L4 header mode in act_pedit can select TCP or UDP
+header fields without confirming that the IPv4 protocol field matches
+the selected transport header.
 
-On Fri, Jun 5, 2026, at 4:12 AM, Marco Crivellari wrote:
-> Hi,
->
-> On Thu, May 7, 2026 at 3:01=E2=80=AFPM Marco Crivellari
-> <marco.crivellari@suse.com> wrote:
->> [...]
->>  net/sunrpc/xprtrdma/transport.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> Gentle ping.
+That lets a rule written for TCP or UDP modify unrelated payload bytes
+in a packet carrying a different protocol.
 
-Thanks for the ping! I've had the patch in my
-testing branch for a bit, and just pushed it
-out to my linux-next for the next merge.
+Verify that the IPv4 header is long enough, that the protocol matches
+the selected TCP or UDP header, and that the packet is not a non-initial
+fragment before applying TCP or UDP extended header edits.
 
-Anna
+Fixes: 6c02568fd1ae ("net/sched: act_pedit: Parse L3 Header for L4 offset")
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+---
+Changes in v2:
+  - Add check of iph->frag_off & htons(IP_OFFSET)
+ net/sched/act_pedit.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
->
-> Thanks!
->
-> --=20
->
-> Marco Crivellari
->
-> SUSE Labs
+diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+index bd3b1da3cd63..0d652dea4a69 100644
+--- a/net/sched/act_pedit.c
++++ b/net/sched/act_pedit.c
+@@ -18,6 +18,7 @@
+ #include <linux/slab.h>
+ #include <linux/overflow.h>
+ #include <linux/unaligned.h>
++#include <net/ip.h>
+ #include <net/ipv6.h>
+ #include <net/netlink.h>
+ #include <net/pkt_sched.h>
+@@ -331,6 +332,9 @@ static int pedit_l4_skb_offset(struct sk_buff *skb, int *hoffset, const int head
+ 
+ 		if (!iph)
+ 			goto out;
++		if (iph->ihl < 5 || iph->protocol != header_type ||
++		    (iph->frag_off & htons(IP_OFFSET)))
++			goto out;
+ 		*hoffset = noff + iph->ihl * 4;
+ 		ret = 0;
+ 		break;
+-- 
+2.43.0
+
 
