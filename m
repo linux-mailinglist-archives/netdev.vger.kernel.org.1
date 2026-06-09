@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-296827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296828-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mTyZAilpJ2pwwQIAu9opvQ
-	(envelope-from <netdev+bounces-296827-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 03:15:21 +0200
+	id NyLJMitpJ2pzwQIAu9opvQ
+	(envelope-from <netdev+bounces-296828-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 03:15:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9F065B92F
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 03:15:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE0F65B935
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 03:15:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=l9KGMpBk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296827-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296827-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=sVNFKJ1r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296828-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296828-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C03530B63D3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 01:07:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C6F930BDD1E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 01:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C0A306B31;
-	Tue,  9 Jun 2026 01:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDD12EEE67;
+	Tue,  9 Jun 2026 01:06:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D12D31A7E2
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 01:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD0C70808
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 01:06:46 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780967180; cv=pass; b=IennBKEkHItkMMxdYZiibNEwpyuO5TwhRu8RoR2ONCAvsteYnW4FmlZQHhw3O2TpFJwDvXaAVNwI9FkYHoYnXZtR64ODrhD1+yFHM1dr4ujGhckeG8vkBjyhF46l5udMMVhaRG7fmyjY7d/TmzUjV4U+Iz3+LH0Pr2+NxcsrvzY=
+	t=1780967208; cv=pass; b=DMp1CdN9DRjXDQL9kcdH8b3Q36lSRpLoFPYqHGJfkleI5wZUJAjD2IwYbHKzJ1zGNvG19htcn1g7hLCaTFJrhnbzfC0e6nHnNAvr/ByLeVhRpOWG10K+A/NJXMQ/nq+IS6UNde8tF9S+NiaTwfe6CjACDpz/Bm1NQfwI3U3QtrI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780967180; c=relaxed/simple;
-	bh=toPMLNVQSV34/03MBqQ1HwuMFhQ+qWBkaUc14FgPq4A=;
+	s=arc-20240116; t=1780967208; c=relaxed/simple;
+	bh=vsmeg3z4qb4/4XguO1mK502Zh4Hgbjqc82BRiVEEmSY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M4XGFPEXU2HgKGrTMhQwwsXXgsoJA5xgZQq8LFBtG0rdPPidrGh1zvUWIFf7cbm1NWJH5+wcOg4Ldv9qn4GCA6YXxPerJTSX09DDKCe92Gorj90r5aoBiSZAD5vM0g7cZ6ZiKA6rRbEXYh2m1xgdWKf7fQalAhrmkER0KccN364=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l9KGMpBk; arc=pass smtp.client-ip=209.85.160.171
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-5175cb5946dso32122471cf.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 18:06:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780967178; cv=none;
+	 To:Cc:Content-Type; b=XMkz0t5QP22BD75Hzr/wMcz1oRzejU37RK9bWjZpByxma+xZCl7eR/CLViRDjvFAWXZ2RoS3j5XLkNSDt2UhWWCQgghkxbcM79iGfc9vyTbh8rI3XLCOaysOOO1T6IjAlm+FdEQbZxjWfOhpNsJlqlIILRJrL9CIELTYUZiFWAQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sVNFKJ1r; arc=pass smtp.client-ip=209.85.160.172
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5176465a4a4so68769841cf.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 18:06:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780967205; cv=none;
         d=google.com; s=arc-20240605;
-        b=LYteDZQcpay7aMQslKPKdvIZ0T8pi2gabqM4ATm/IWZp0CYf0kEhDszOMAVtvy8ecA
-         Xk2Dc5HAEwiWOcYFH6E2NOjN8kwRHlYvzFFjArPaQ3ebVAv00RrEvuEPH9fuueuYzlPw
-         wLYMq7TJEiVqyMcJ+M/hRbU9n88D/4zyphp4qlMe52IQXlu4qQLjVC+Snmol4l0OPvZT
-         1kiedzsKY5597kjyOnlEwTjYab5nRK3I9Cmqkc7UMm8ozylzRgxmPeLGaTJDc13zx3BY
-         PIBlY08dAm3fD/gTNrL+6ixtfOKK7hIkfrG0WEu9aMNOS2u9mz1srbcQyOk/8CaKpd9R
-         Cq4w==
+        b=LyzhUc/mQ5Q2hkpH6x2vcT9Bg1GkgGs1zDVN2PNvAFMdFw2EZldhppvlR+V9Qq6izB
+         W91PMAdViI9ZPzkyx9ZzHKqkwQ3xAhRztTG/Y5wH+D/Pk5h3Tr9xkT5BF/suSFRIbrP0
+         O1sb71Z6CbEaz+fS0qgf+e6VeDvgokzLuPgCtEdpHJT7iZQZsofJJKQNug0mY4oRnoSt
+         Ebj6PJnSwrWPilKknq5BzyxiI/5Wfv8w4R1PXOe8epqCInG5yY7GQg97C9rRCHsykJUQ
+         GRqW8yLG7LjpvS5MdTvcuq7wuEhQyMabYWmKs1EXiVlxTT8NKQYZrKYdu1YRTfwvPkCV
+         tBZg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Lqyzj2XHrXITuroG0QfMcLCW6DC20XarCYsV8zWnDag=;
-        fh=nxkqWVOMcjD+SgLvY75b47KiqeKsXF5zzb5mHRZcYds=;
-        b=Kbx+2dNU6qnfeHW+my/ApZGuBN32cZCJhWXJSVBUb87iKvPzGFyxp9pjekca1C75SS
-         ng4SxwCkqu2RjyFg4KlX8zLMp5+QCv+xlTaqWFnYh25nH+2lIOQYkXepw4hhUI8ZmapJ
-         md2G3ZdXEhxRrVnuJlwO8H+v5My7hRR0cQhpql7WBTn5w5fvlmF346UjA2cCpAZsAxVK
-         DDH1DcyT1+2pK+cgyr3+qqSjlj5j/SNNvADdPnb8KfHMMjcNG5Rf+h0A9AdEXQ0BupHM
-         hTK/RQu4rcq9C6DzS8pRSJXp6T8tFu1ROXhiAHxXnagquQb14kOznPpd+viqtW8OIfjh
-         /ENg==;
+        bh=4qoIqGrQdBgzZF2aU6fDwpwjHcQ9aPjAnheAZ6bTbfs=;
+        fh=dtWjvRWOcuS7Rua8SXydDRJlesj0RFe8AUunDi0v474=;
+        b=H3YC3FzDsORFsvq/5/L/cuvQ1RcPPnqd/BkzuDn87X4tX1OmTtEm25c0AoX79tPS1h
+         QloOu8RCBYoGqBY9VofGXEZjLYVfJOCEIXQTqh80Yu5AuHf9Ph9S0PpHXFRqDuR+QtVW
+         2EPI49xnBleC8oOhwdiXGrNJRs95KRTEjI03A5PNg0OykGXuJgFHrwTcWvOJ+nezP/i8
+         Xal5b2oX/wZ4kjf4IrcN9S1vl9lV/JMVl8VXjRWnVrEcfUO9QiOEChzEk7BnOM5+CpvV
+         ycwnobbroymk/zP421trGK+2rl0xHW3vBaGx4YX9KPHRBRPyRFVCiwwa1T/2nyjm/wO0
+         NePw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1780967178; x=1781571978; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1780967205; x=1781572005; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lqyzj2XHrXITuroG0QfMcLCW6DC20XarCYsV8zWnDag=;
-        b=l9KGMpBksUY9McfW1Sz2Aw80uwv5ggcxd1aSgOY/+FUpQFZHCUgNPXkzIGGdsl00Fa
-         p8htjfL949DBde9dKU5G8g6VQZ0xO0bRN6Kq+J+3MjEmjHr2kCm3QHYyLTp6n8/UhhWN
-         8+yqdmHHkNdwiKwO6obfb6DPCycfz1Sm2EjfRhPUajGkM+XrBiw276hggR9uboXlh4oi
-         0HRGx8hyUvZDYrj49HBsmrXqiTWFwuiWnh1enE28EN6Eq+qKKMmlPAJ1k+C+OaXLIatx
-         gz88FrUivhWncMCmeaBsjhE2HUbk3P5PM+pe0FD/xNFYTcIkezBlBdtbeTOT93bpwrTH
-         sRwg==
+        bh=4qoIqGrQdBgzZF2aU6fDwpwjHcQ9aPjAnheAZ6bTbfs=;
+        b=sVNFKJ1riHpa6F03FbHbsNnN9Vny2yKOFnuXjkHl2GE06beGBzjLdH8nJEeDlGfRGO
+         chv9uFyFpkYE6W5MN2upvOFqTefTKiExDVl0dIElRexEu1tcXx4t8jauOaDt8sg1F6yz
+         Vb5QBJYHcl4X7Nkt/pL3aih1yeWGuIB2fH0sWSwJbaETvicwaiELtjYoRq6LElWTqSKN
+         C1QLeLYwg8PHKTIz0XgjtiNekcRyuETMtC3V4cQwgvxx1rMOyOe5ToWI9732LPxkEcEQ
+         xa7F9u/CcRBjV9W3rbmRrObJRDFY2lr8ozaKwYz8RyzDML7Ry2VpcwPqg0qAgRqE/dNb
+         tiDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780967178; x=1781571978;
+        d=1e100.net; s=20251104; t=1780967205; x=1781572005;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Lqyzj2XHrXITuroG0QfMcLCW6DC20XarCYsV8zWnDag=;
-        b=rU9SDGw91+L1UPFAYPackqYd3zsnMWqT3JgX7LrbKmeFCYOT3pzIwwjKWFQcsYHYFE
-         rnloPTzX10zXclEKcrUranL53mkaTH0/NEZTMSvvVK1OK9nXZVpkogB3hzhdaH4O7aPJ
-         j4ShOC+wwV7lVHJty9ktylwz65hwhqVPmtLpiX9oJhTGBY/R8rjLKF4xE05LrqHslvNy
-         DMp0vVpiExoEKkGuUL37/9neVp1gREHpvXKajAWVEPqXI7tX6vlibnd5GqcBB+VUEPD+
-         e1+gk7zR4xeNipds9M0HZumiIKX/T3aIgGjicMbxz0+WrsIyzkwB7v9TGDK1rVIHa7ge
-         wehQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9YtDwP3k4vgwHdLi2j7k2IrNn4wzOLiJ1yMolcmK0WBswF/NnD1hsi+KVYeKQpI4D3Ij5ecAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx+UqnCDu3VKp1zS2njgvXrXmPKTLb9bIs447A5D7OdNMimwOF
-	SYHb1p02jr9IV99ylIQq2B3JAbQmeA9V6QjOfZEAaHi0uHdQcSoQuP9N8MzMsrYTr3d4tVy6tm8
-	Z+ivMHw5mSYrGvTp5OsLYh5HC9QMgX+9qsilwoODZ
-X-Gm-Gg: Acq92OEpGJgsjDxkAesGwzcg9QkB9BMTZXmgRqvtILGXNbGNRmQ6HDIFobQqYIEdt2l
-	jNGFTvfUACIgR84z8iXmEDXQ9EqzNVNX6gEXtXReQBUHoh3g6omIBJiRlrcnyYsw4pxY7jE/0jg
-	6P/f01V8r7CcANTiDEw2C0DnS1vQWO5i3jeqGMlxX47meiF1fmet4fM8Yj8iuIWrCqmGRocYKJd
-	6ALfpEBFgqfzuLB/fWG59C86jf+qggl++HMSnK637dvC1/PEJGt7JCZqOa6T+mC/g+HxQV1nMJm
-	KzPXveYu5Kbemj3nobHl0RnLzOgFi3F/Iv5Y4pUSUWVmlWubExTgLyz+aw6hGiiX5iY6XT+g1hj
-	X4KssBryiesrWevHD0PlfOIiv3Y4X
-X-Received: by 2002:ac8:610a:0:b0:517:675f:3ee8 with SMTP id
- d75a77b69052e-51795a874f7mr248477051cf.12.1780967177784; Mon, 08 Jun 2026
- 18:06:17 -0700 (PDT)
+        bh=4qoIqGrQdBgzZF2aU6fDwpwjHcQ9aPjAnheAZ6bTbfs=;
+        b=r/cVR9PoHeqWKCrMPqMNMTHM0qksCpg2ek299Xz+5/ZwccyTDBwe8dK8fNTVau3rR4
+         hcD9j2nnMT/u8zGMdRkALkXSiHwLAVl1KYyFbBOhode0s7fA1YbSQiko6LnMqcDpSnPw
+         o8B0tOHl8SGCbDH3rbn/A9m7MQmqadBZLFzukAqLhDtnqZgj6ma0xZTWPoXPps0hDa35
+         3X1Z56jeZzhzldIo+tSpvViyTMjN0WIpN7jM6um+WcklmvxU5Ek+OnIsAyiOFUZdr2MO
+         T/+ViaEWcJRBNgE3W0ALS34AN5DXRFXzUWeGUbmfs4lwT1GkyXm8LE94S74oIJyBguwa
+         TwzQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9gUtZWRzrgLU/wyYGgXNv4wEnZAoZbw6/2krTYeLYLHmhNMpwrV2h4CguzQn5qeBDXQWL/2t0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGbI26UmziqhBgeUjxLu9oMVAuzZD25OGTMj9uE5ne12ivyiOU
+	CbgmogFYWVgHnyXLU7LqmSuvSfROCar2FQGrQBVH5wzmjRllnesklrxmUG+iolLBMFZFXjQE696
+	RwIpOFPcmKSithAqZe1NeEXMyVQoriSYkYX7dQIgY
+X-Gm-Gg: Acq92OGJG5hQlF7bNSQdsZ4OEtsuYBYNUZr9iuwDVGNgGzYcdSRRmbtYYdcnBWsKoVo
+	ErZrysRuCYMF+SV6y5egYcX2pH3O6tKIBM5LCmp5LfFvr5tJ3SLv/m84dpWP7vIz1Mf+7eF4wjb
+	flK0ZxMWj73N8Qe/N4ZIUMNOKW8I5cEhmn7ygSPTBZglyjFR/d5R9J29Q07WJRX1KA99Tzrmzxc
+	+zohwL/8/2thUmlSg3opaT0/7CKeb07nEr4T8+zZTv5axiCtTNmBpmEog8EVzmtZ9G1k9vrQltY
+	YQCy1g65yfdigfkNvahbU6dEqzGCa6m0PONMeklBZJLwYGWIcJBC2WXW42+e1b/K0rgdHEjgZzN
+	HbaMqXoHoYQH0lXk67j4Wfa1pnXxt
+X-Received: by 2002:a05:622a:1808:b0:517:96f0:5658 with SMTP id
+ d75a77b69052e-51796f06eadmr252411441cf.14.1780967204755; Mon, 08 Jun 2026
+ 18:06:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609003749.1238146.66c32a2beed5.ets-change-class-stale-deficit@trailofbits.com>
-In-Reply-To: <20260609003749.1238146.66c32a2beed5.ets-change-class-stale-deficit@trailofbits.com>
+References: <20260609003658.1237966.5506cf1b9345.dualpi2-filter-no-match@trailofbits.com>
+In-Reply-To: <20260609003658.1237966.5506cf1b9345.dualpi2-filter-no-match@trailofbits.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 8 Jun 2026 18:06:06 -0700
-X-Gm-Features: AVVi8CdTn0o1ZZypJcD8pyWjV6AO7T-aXxJbTihXg56aSfRbxJ2PT3-45hEiGAk
-Message-ID: <CANn89i+1sjE5gA8q-0Lwmp5tSE7k=tKZ-iN9iS_yO5ymN3p21g@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: ets: reseed class deficit after quantum changes
+Date: Mon, 8 Jun 2026 18:06:33 -0700
+X-Gm-Features: AVVi8CfCqijTQAK4eV3JnDZMXEbbES1lZXpFvKQRqeZxD7_c6ANg-m-dv-f45jo
+Message-ID: <CANn89iJrhwO4cD4d6mqLpx7+yUFLKBAcmhsGFkEqU8KqsW5QGA@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: dualpi2: clear stale classification on filter miss
 To: Samuel Moelius <sam.moelius@trailofbits.com>
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -119,12 +119,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296827-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296828-lists,netdev=lfdr.de];
 	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
@@ -142,28 +142,29 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[trailofbits.com:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6B9F065B92F
+X-Rspamd-Queue-Id: 5BE0F65B935
 
-On Mon, Jun 8, 2026 at 5:38=E2=80=AFPM Samuel Moelius
+On Mon, Jun 8, 2026 at 5:37=E2=80=AFPM Samuel Moelius
 <sam.moelius@trailofbits.com> wrote:
 >
-> ETS class reconfiguration can change a class quantum while the class
-> remains active.  The scheduler keeps the old deficit and spends that
-> stale credit under the new configuration.
+> DualPI2 leaves previous classification state attached to an skb when
+> filter classification returns no match.  The enqueue path can then act
+> on stale state from an earlier classification attempt.
 >
-> This can be observed by making a class active, changing its quantum, and
-> then dequeuing with the old deficit still present.
+> A filter miss should fall back to the default path without reusing old
+> per-packet classification data.
 >
-> When an active class quantum changes, reseed its deficit from the new
-> quantum so the new class parameters take effect immediately.
+> Clear the classification result when the filter lookup does not match.
 >
 > Assisted-by: Codex:gpt-5.5-cyber-preview
 > Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
 > ---
 
-NACK
+We need a Fixes: tag
+
+pw-bot: cr
 
