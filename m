@@ -1,173 +1,177 @@
-Return-Path: <netdev+bounces-296932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id r2osInu+J2rF1QIAu9opvQ
-	(envelope-from <netdev+bounces-296932-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:19:23 +0200
+	id mOGVHyO/J2rl1QIAu9opvQ
+	(envelope-from <netdev+bounces-296933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:22:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 027EF65D1F8
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:19:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1CB65D245
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:22:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Y+Ne68ze;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296932-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296932-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=blackwall.org header.s=google header.b=Gv05w5BT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296933-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296933-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C216130CDA3F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 07:16:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 71E4A30BDA2A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 07:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA2C33AD91;
-	Tue,  9 Jun 2026 07:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFD2386C39;
+	Tue,  9 Jun 2026 07:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141252D97BB
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 07:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69F23859F9
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 07:19:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780989366; cv=none; b=T9b6j+sOHJWxOKUEy5NCucuR2ATqP116ENS+ZVpFyqXSYjaT/4g07jBKQs2pMXbB64dEox9Lpmjn2GUuR7RfTGrMBNpzTJpx7593gwB+JdK7nNh+t593gpDMCW1AbYXgQROYFIgsbthSpt7Ru0B2TQru8C2iylDkke6aws6PYb0=
+	t=1780989569; cv=none; b=b8iKpImaetQFNxCvgYSJ45emHwIX5me56GGdcOTXGFsNd01vcr/8EHWGrRX6o7Q/TLckmJd0roTWRFFMRjMhb4Im6kYEzulQOMaoPe3OrYRG2UPXMn/JJ6TV081cgxOV2TbMhDuBUL8vp89/qALRdZQTxChnWQVmIzBrWeyubBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780989366; c=relaxed/simple;
-	bh=hh8plpyDLmp7qYUu71tv3I6n+HRBSPfE+afzPnmPQiM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XcKTKKs5EMiloPuKKXFxyfdjdFZLItLxgd2mXJdK4YLsmuHMDZPuZigMx3hxVLz8yDmUdoK8XvoJblyxi9mX1gzqy9HHnU8oV+lqeiOq6s415A68SGhK/vvmZGzRlfrD9VM4kMMc1NumaaaxyD5PNFcFeLQprBki/7z3IGl9rfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+Ne68ze; arc=none smtp.client-ip=209.85.216.51
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-372b4330deeso1533741a91.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 00:16:04 -0700 (PDT)
+	s=arc-20240116; t=1780989569; c=relaxed/simple;
+	bh=hbu9LZPJQJKkJV5RA0xvycBkawmZo+tP6274zj/Z2kU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G4saEXvtKnPvazwgaLfXbHEWDiOBMp0JVCWuv4iDMLhr9UnhJlfyHrFkQLBYLwC498Am4gq+lQIl1oDKw5x+uG9IBRnGAMstzDINrfD1kea9sThoQHc9QpPCHag7Y0L+bOIQjTQ1kURlvsWMUBVEh3lH0l5y2SThOfNVhP3r9Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Gv05w5BT; arc=none smtp.client-ip=209.85.128.51
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-490be29c1c5so66217875e9.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 00:19:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780989364; x=1781594164; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J+WMj06VweuHxnnE2/mbYxrsGIb7CGFY2jdVSiz7USM=;
-        b=Y+Ne68zeZu6b3jU4TF2p0IPS0aG+wg8ZFMfWS7/3HIoDgev5xmm5TN0mp5pR+WAO3X
-         dNY6YiTfgrVIyWZpefkDUb1L8IioQoPwobHfUxF9I1UecXg3MKYVb8JEUUsxcj9tqJkl
-         XgH9rWrddDnFhNdS9HsFYKkFlhFkpIab+4fNKZu5C6GjF1NJ7dQPjnvVYDDWEXP2aKXg
-         /GYLawvL4PiIOkX/A+RZ24AU4BYfcV78+6OzkXF5+iNx48tWEW8ufEXPQiuPonYlOGgb
-         RTP7q2LXyIalJnNm5MjtBcac/km0rzsfLMK28tpeoTzFEDfOGk6vh57Kr+nnkplkYcfx
-         YJZg==
+        d=blackwall.org; s=google; t=1780989566; x=1781594366; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wq+m8phuoZlyVyvQJDDKnLnM7niPzjxS+4T8fLFpKmo=;
+        b=Gv05w5BTSlXax/BpBj4ZwAlU3jVrbxHe9nSA7fw3s7Mu85SiO72txegYx1SWAxxxYx
+         eyUTxoxrVQ28vvbwaFnarI3thFuLPgE9pLx4KSZ/Hky/1H++l+DeZty2oo3OE0t41Ltf
+         ItIHiA+vvedJrS4gM+TGrAeVdTfGM5BN1j30M6ZM5oKbM9WthTPjEMOwe59wHUJSdF6u
+         N+a66FAxiZ/VhB02VhORTDzqO5J9+1BlIanyZ7QlCLu0yTuxuFA+zYeStp1x/nfdgspK
+         cgflFauvtu7Z6fxXUME+5ePag+cnIqE30QVoB9Z2jB6ULjZU1Gt+ghXTGfkwDm3h+ZH7
+         fOUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780989364; x=1781594164;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J+WMj06VweuHxnnE2/mbYxrsGIb7CGFY2jdVSiz7USM=;
-        b=V6XSWIhuoSEL7L3sHdyKfL9HkhNgaqRwzoKL7M+rHMBBPGHrFy1NFnAYe9jhaTyxaq
-         vk/5keKR2RRowQE6cdRgzKsPy41UWq3KaTb748W4md517DNhHNQrRtUdVgjs8gSw0Z+5
-         oak4UMr7CR2rxADja2KLspam247VnMBQ2T2JxAxaURRDjMpGzzfQMm9R5a/BAqeHt9Oi
-         EvuCLdfuMoxt8EMcEPJJHMsAKoutjb6e8zgigx5RSDbV2k2KK83KwfWAq6nQdhTBNwPb
-         Sct4tVdsgBN3G2TTaLYJtwn7vAFTlBCmpI4u4Ge8ZloDLAM/l7DHn/BFDrpZ+pSWVYVe
-         uWqA==
-X-Forwarded-Encrypted: i=1; AFNElJ+AHv1BwA9ScGiWr8BrEZ/znkJsIWINXKkZtX9oqOJPGoICoQk55v+KMjB17hpbjbc1J/zKYsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD5k8mRX+o9Y1obOm3KdWMhn2wjTC8GSISfzwn1ArdQ3TCCcwj
-	87hnfQ7tSQon5ATe0zXxWdnkGRBv3hgTR2hepjAIE0Pf6JoDmZJbnZvk
-X-Gm-Gg: Acq92OHBeyp067K+sUA4YNss7Jkp2Rer2HVm9g8/9kHlNvlZ0UPegfg4W4gcFvWI2yv
-	NYqAWRlCcZaqOkFCAdeDfhn0vtkKHiqYw5/cwBmxqxky2WkG7Sk98VO1imTWySJJp2dipFIpgB0
-	hPtzHUtla8tsc5ex9WkZRET0tmm/79FyP24EpJpMAIJTxjaHyJzRAAoTte9utYSBmzD2AMBQXyx
-	iZvxX4MMWvUt281dTu+PA/fJZCcWDZSxUD7y0340K8ak/FX7sSSh5shntu5xAB6SqJ/8C5IlmVi
-	jCI1ecwGR/1ayDw1ULeK2D0V8ZZ5hPxZpuwnP3+7hnZvaJOjYs4F4K7XSowDcs9kb1yJl5gY13e
-	7dA8EAXPN3JPWWz3QYOf7RG0YtFcKtObDnw5deHUUGFXkb6eq1lh5TD1ddoL4IgXgSJrfltoYbu
-	Zf6gWznUD6qo6O+59YZilmt6+ZDcQYCsWU/nQUfzs3RBjp7EUy8giWDg==
-X-Received: by 2002:a17:90b:5747:b0:36b:9798:4f67 with SMTP id 98e67ed59e1d1-370eee03facmr18953062a91.8.1780989364319;
-        Tue, 09 Jun 2026 00:16:04 -0700 (PDT)
-Received: from haichao.tail057a43.ts.net ([2001:da8:e000:1206:37c9:44fa:729b:6aaa])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36f6d1fec5asm18109501a91.10.2026.06.09.00.16.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 00:16:03 -0700 (PDT)
-From: Ruoyu Wang <ruoyuw560@gmail.com>
-To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ruoyu Wang <ruoyuw560@gmail.com>
-Subject: [PATCH net v2] net: wwan: t7xx: check skb_clone in control TX
-Date: Tue,  9 Jun 2026 15:15:56 +0800
-Message-ID: <20260609071556.5-1-ruoyuw560@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        d=1e100.net; s=20251104; t=1780989566; x=1781594366;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wq+m8phuoZlyVyvQJDDKnLnM7niPzjxS+4T8fLFpKmo=;
+        b=cNi96z3QFtc+IofZAw+9wrFsWkeqSfpDEy0SHoPWpviSim0150SpIM0+aQGt4dNJj+
+         Kq2MRNcgpeuPfJ4slaAFgzutZc+GHYsE6kbGMIvfzd0405iqEWwMB1HdiTo5NuynsSYS
+         DNntNpqTVOVxN/rg6QIkP/7pL9inFrK+etdTFehXeJPaCROMPhk31bFvw0CSEbokGqlf
+         ZCBlXeU7diy5nCeDpT6RynV62jrHMVm/RkiSu6Nv/8u3FjyETn6kRQl8254lxC34xXAs
+         CIeaXh8mPmi5ip87Rtzslaz2xgj2mRb8BrSflZnEkltfxvRhbMrIgpr7q79wt8UMtD8Q
+         94dA==
+X-Gm-Message-State: AOJu0Yyu/yBoskKQ7yMejJ9FdJn3aYcY0sXovV9yiI4n+tKH0UnHYZ+m
+	G3wGux5GF+5tT9StFrNwcyyGjMfrt8+dYvM3zIKVM1TDB3t01jqLPJro0dyoUDjwc9g=
+X-Gm-Gg: Acq92OFW9CdXai1C0TftP4Wvtabn/bGWwfumsdGQ/Lxnm9oTgLlfDmS0hrOoV/UHyqV
+	JeLU43+L3/L6WQCMNNYzfljkrlcoA8Vr9fV+HF8rrbLCvxUF8Xg2qreW6C+Yzo91OrGAp7N51rY
+	4n7Gnev26qIzGpiHlRZp3ZkhS7KtE3xPd7Vjg/d+E6hlL9n8SbeHo4WM0+MaBouEyBINiDgUis8
+	tfpOR/6ohQSUJrgUR7y7WlAHZ7RLtg1PD2H8zsIq4SH9LQLPyAl10137wAlhYreMR4y5EwlIUOj
+	H35vUkXmmMb/T7v9TnilIC1UIp/Y+gp5q5p4KaBM7QcKc6wb6Wg4+5iMJzxHGO/TCrwYBe15TiK
+	+2adKKOBRBKlc15aYl55S8BoOehBwJEDjgObjdNvbNg8b5Z/Qsmav5quFAAQm1A5TezxfOneRj6
+	6QLLQyqR/GbcPlq9/onDptcvBAbuSfsKRenAmRxOAzUC7HbfDXRvz1AcL2hh/zTuu4qu71dyk8C
+	0k=
+X-Received: by 2002:a05:600c:6087:b0:490:b294:c652 with SMTP id 5b1f17b1804b1-490c25b0696mr319291365e9.20.1780989565866;
+        Tue, 09 Jun 2026 00:19:25 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3c1149sm401895235e9.4.2026.06.09.00.19.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 00:19:25 -0700 (PDT)
+Message-ID: <099ba3ba-49af-4ed2-8b58-31f8132f0d32@blackwall.org>
+Date: Tue, 9 Jun 2026 10:19:24 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] bridge: cfm: reject invalid CCM interval at
+ configuration time
+Content-Language: en-US, bg
+To: Xiang Mei <xmei5@asu.edu>, Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, bridge@lists.linux.dev,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ bestswngs@gmail.com
+References: <20260606215848.1951633-1-xmei5@asu.edu>
+ <20260609064613.GA652158@shredder>
+ <CAPpSM+QGAARoC2Jq2EfMkXCgBQXy7k64W6rBFdJ8mhpfrR0zXA@mail.gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <CAPpSM+QGAARoC2Jq2EfMkXCgBQXy7k64W6rBFdJ8mhpfrR0zXA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296932-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:chandrashekar.devegowda@intel.com,m:haijun.liu@mediatek.com,m:ricardo.martinez@linux.intel.com,m:loic.poulain@oss.qualcomm.com,m:ryazanov.s.a@gmail.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ruoyuw560@gmail.com,m:ryazanovsa@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[intel.com,mediatek.com,linux.intel.com,oss.qualcomm.com,gmail.com,sipsolutions.net];
+	DMARC_NA(0.00)[blackwall.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,lists.linux.dev,davemloft.net,google.com,redhat.com,gmail.com];
+	DKIM_TRACE(0.00)[blackwall.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296933-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:bridge@lists.linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ruoyuw560@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 027EF65D1F8
+X-Rspamd-Queue-Id: DF1CB65D245
 
-t7xx_port_ctrl_tx() clones each skb fragment before passing it to the
-port transmit path. The clone is used immediately to set cloned->len, so
-an skb_clone() failure results in a NULL pointer dereference.
+On 09/06/2026 09:51, Xiang Mei wrote:
+> Thanks for your review and the tip. V4 was sent.
+> 
+> Xiang
+> 
 
-Return -ENOMEM if skb_clone() fails.
+Please don't top post on netdev@.
 
-Fixes: 36bd28c1cb0d ("wwan: core: Support slicing in port TX flow of WWAN subsystem")
-Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
----
-Changes in v2:
-- Add Fixes tag.
-- Return -ENOMEM consistently on skb_clone() failure.
+Cheers,
+  Nik
 
- drivers/net/wwan/t7xx/t7xx_port_wwan.c | 2 ++
- 1 file changed, 2 insertions(+)
+> On Mon, Jun 8, 2026 at 11:46 PM Ido Schimmel <idosch@nvidia.com> wrote:
+>>
+>> On Sat, Jun 06, 2026 at 02:58:48PM -0700, Xiang Mei wrote:
+>>> ccm_tx_work_expired() re-arms itself via queue_delayed_work() using
+>>> the configured exp_interval converted by interval_to_us(). When
+>>> exp_interval is BR_CFM_CCM_INTERVAL_NONE or out of range,
+>>> interval_to_us() returns 0, causing the worker to fire immediately in
+>>> a tight loop that allocates skbs until OOM.
+>>>
+>>> Fix this by validating exp_interval at configuration time:
+>>>
+>>>   - Constrain IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL to the valid range
+>>>     [BR_CFM_CCM_INTERVAL_3_3_MS, BR_CFM_CCM_INTERVAL_10_MIN] in the
+>>>     netlink policy so userspace cannot set an invalid value.
+>>>
+>>>   - Reject starting CCM TX in br_cfm_cc_ccm_tx() when exp_interval has
+>>>     not yet been configured (defaults to 0 from kzalloc).
+>>>
+>>> Fixes: 2be665c3940d ("bridge: cfm: Netlink SET configuration Interface.")
+>>> Reported-by: Weiming Shi <bestswngs@gmail.com>
+>>> Suggested-by: Ido Schimmel <idosch@nvidia.com>
+>>> Signed-off-by: Xiang Mei <xmei5@asu.edu>
+>>
+>> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+>>
+>> Nit: I don't think that the Suggested-by is appropriate here since I
+>> merely had minor comments on the previous version.
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_wwan.c b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-index 7fc569565..01844d067 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-+++ b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-@@ -106,6 +106,8 @@ static int t7xx_port_ctrl_tx(struct t7xx_port *port, struct sk_buff *skb)
- 
- 	while (cur) {
- 		cloned = skb_clone(cur, GFP_KERNEL);
-+		if (!cloned)
-+			return -ENOMEM;
- 		cloned->len = skb_headlen(cur);
- 		ret = t7xx_port_send_skb(port, cloned, 0, 0);
- 		if (ret) {
--- 
-2.51.0
 
