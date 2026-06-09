@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-297267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297268-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ePtaMYBxKGpkEwMAu9opvQ
-	(envelope-from <netdev+bounces-297267-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:03:12 +0200
+	id WanuGdFxKGpuEwMAu9opvQ
+	(envelope-from <netdev+bounces-297268-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:04:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC07664016
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:03:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD89966402E
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:04:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Fel3rIq7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297267-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297267-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=C2SguJlO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297268-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297268-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1558B305930C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:59:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4214E303FDC0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 20:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36633C10A7;
-	Tue,  9 Jun 2026 19:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9461733C18B;
+	Tue,  9 Jun 2026 20:00:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C834376A06
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693D13101D4
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 20:00:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781035160; cv=none; b=FU2kupuKymknMt0JDZ3nBdDFwYI5Xnc2yTwmBQ+N7zN/wdSPGVK960EBJ/7CeCc2TybXreUXzsKReGrPIAMA3tXDVJuXiezEZZ+vGj86C+r9pFBuh+aylYFfoKrdliHepjOJcagRMEple8GjR8+fuOAIS4rKCOCQUBLwpuKOj8s=
+	t=1781035227; cv=none; b=Opo3Q1SNAFEM44zhUGvFekJd1L2j8foah63clbgTQPr+Xqikt3vS7wyAry9ZeFNs9XtmpaauW/xPYxYuT+XvQ0WPx1w4feLiuKs9X0JL6ZGZQJGoD336sSfDBgxDViLKZsOi/3Sh87OmlKwT3W6ODc4lyMAuVEonyMwF6kigbo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781035160; c=relaxed/simple;
-	bh=DXoaDw+nFHHzEco4U2utRXW7tSm9lEivdWkXOff4dYU=;
+	s=arc-20240116; t=1781035227; c=relaxed/simple;
+	bh=atkVeRtHl29QOTq/5yI22UI56jJr39PHMNYds0ex9c8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jWEUINwL87m2GQQS9HDNsAaL5AB7/76tmJCxEdI1IohWIC52zl90e+JSh6928ZO6CcpPyY7u0ACN0WtcpinKRa7s19JWXLtJQYr/p04cpXH51YFezN6cmC7nyO+xLSSyMtUwvs4R9a3nqvz7UIQhcBXD/icwsUIcrpj4UuKMCx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fel3rIq7; arc=none smtp.client-ip=209.85.210.173
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8422f148dfcso3450128b3a.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 12:59:19 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=npbWbCSJQSF/qkx9HAaze5+vdtI8rKp33LBdlKq1sFfi1Wy0mXbt6ljXE5rQaxz1RAj8dXiaSipbzfRWFahz2tB4DrECZkZBfOj7kXItkPIsYFQfYSvHbXNK67sKH10J3qrpWNAttY4K2diA7r4ZSExUpbKHRhbZHQ62qPnmt5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C2SguJlO; arc=none smtp.client-ip=209.85.214.173
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2bf22d29dabso40219445ad.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 13:00:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781035159; x=1781639959; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781035226; x=1781640026; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=otQ2DouNzBecQjUZVVBOpIn2RERYEO1d5eIeJdvBllg=;
-        b=Fel3rIq79QTJRVxWSP8ZUeM9lN3y4BXUg7kNH/vobDb1Gj9cFa7aNx+yC8UneYLqwg
-         NZc8lBi4ZuWcydaDZsdHvv6Kh6EPe0uLsNtV2SR+pVLErQ4BwKluRzFGbqSunPV6bxiV
-         GKVfhR2iP2VcJL4X/edPlK6STeoJ3GwFKC+L1gkm1dE833kjrmb5nlWKmwFgjdN6s78K
-         akQgwxYI+864eXzUb1NGUn2XP+l0w8JeNoPF3876dxijs4lfm1F5tuOgpVY82d29lIsJ
-         3gumIjVYCHCXh17loaFA5tquyPXK6sFqD+Q6JrNgwPMTigv4Hf+6zgu2q0sSiisGH9PK
-         2xkg==
+        bh=Ix3A9Bkx1Es21VmQaAIlLfNxieuTVS2PctS6G8kffR4=;
+        b=C2SguJlOSFlbm05lgCc49wTOFULsmUvhEmmNeCRF4rGF8aayECntBpzEJV0m+2SsZo
+         yg/Gny/UHmTNE3s1XYsWgD+mpwoXcEsPrtoYO4lTIXETX6Dm4DPZNq5hrLsyEtfaFuZg
+         IZjJNCAM6LqtyxWYMRrTHtmy07cMaUBjigH0d8p3kD0EUPn7xiCVT4CN3NMWu1NlX94o
+         +l6G4rBg/NDmg16ff9vdcDUhCOMe1xhaV+P5WcHKrDeCzgqfpA29D+OLzt/mzz71WqMA
+         HVU9GyfA42KT8cPOkboZH36J9yfl+oBfUOC1jCYCJqbxvvTIGGMIvTHMQR3Q5sMibP/0
+         Xdsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781035159; x=1781639959;
+        d=1e100.net; s=20251104; t=1781035226; x=1781640026;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=otQ2DouNzBecQjUZVVBOpIn2RERYEO1d5eIeJdvBllg=;
-        b=hisYHcIfRRfbLoyot951JOSdQCdm7sOAf7Z4MhlHyY30yFGvZpeRiqt0pk81+qRipU
-         Yp18QWTshoXpOmQr8zgyGlFad76r0HWALvzOTxIyEREPE6ZUACJz+ozAGfg380k/XQFz
-         OW4Tg3LLratynl3by7VxUnXZPVYrYR3EURbKCmkEGzNHQSNWRF75BmKPTlys/HVSoTlT
-         nkOs+5HkToD5xwq7GWjbTu+ZB0GhmcEXwu/463AsknK3HmZNa+PY4sbbip4qfDu1A5C3
-         ziblfD9km4+F0AKQxUxMOTyzMj9k48jn6Qp2jVddti78+3oyepILBZmxDTiJwd6jur2z
-         cSuA==
-X-Forwarded-Encrypted: i=1; AFNElJ9d/Gy7BJOOdl4W5sUuE2n+5ayyizeihEyMnclDbOzhHq6/96xPP3b23pitJTy3mi+0INa92K4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhdMQ2gEnRsAPgGFkwsl6y8CXcONO7R8Is/J2QI36p8e6XT3Ly
-	HfbYcqko1djXIolwftHhunGKLkJezzblhHhvmdtTmVI5LV7xsi3NYU0/
-X-Gm-Gg: Acq92OE5CQMaiR3RIJIOlBOMlLO4ngok+VtWThcXJTdap2H3hvyB6ftMr/W+XnCQtMy
-	ftwbWsZsQHH3NTj6jGHPsW6m63FwvocNuSRG1TJpD+6tPB1OsnJqbVj5IR5Egwt8d6l5AsH29S/
-	3l4inFydJgBFpUWceV9AIP1CY0EuY1GvtspC1L83hqfJCmEGPZUggq2K2vCDi5382LI+EVghslY
-	Vgn9wd90nqp0xQ+/gOuEmynLKfqhlr3FWMVLla88PQYrt4JRL+k+SSsFeGXZgumP9mHmyjgbaQb
-	XEeN9ZYryt0r3hxKs2yfQPB/YpGGEvQ3RlYX99HJAZbXnT9j2354Ft416/u/Xsqm46FUijYoxgX
-	ipEj1lNZHbT8LxofGfm900TMWNTzBP9FBbTi094iYVzmNOiFbPIQlQ+kNqa1GSWzoUGyP0sTkwL
-	f2fBcm/OlCr3tF0qpNRi/UmPnhwPLbMtKqf3SF/lIeRs8yWU0n87dOndRSj9S5nzDMGg==
-X-Received: by 2002:a05:6a00:4b4c:b0:842:7062:fb39 with SMTP id d2e1a72fcca58-842b0e1d338mr22386692b3a.4.1781035158574;
-        Tue, 09 Jun 2026 12:59:18 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:44::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828e5638sm22974276b3a.50.2026.06.09.12.59.18
+        bh=Ix3A9Bkx1Es21VmQaAIlLfNxieuTVS2PctS6G8kffR4=;
+        b=mKx9YfzOnSdY3umz5IplVK0VLqosJg44aBFXwse6jYZDE42rmF563dP2jkFB23EH64
+         J9krvEfFjlpyxkpUNmgXfN0KA8kA1Lev5Mrbom/8OiGmFZGyrs93WDJ+gQrNpGKHe+av
+         /1+PQUcm2HtmosISY8UKPGaeO+TdEypj0HFKiIIGfd33itO2oaUjA5G+IyJYUwnMAmxj
+         5Ejgv63tVT287o/SGz6jktGF6T+pZKn1caaixv7K/vrwY7igv++NXp3yzdddBh3YNFAh
+         h3KmMQplMQfBqc/tI0X6AZW3Hcxv78zktqLU3h0uRuqDtlo70hIp2YTQ6yAZMOuQwl2p
+         /BSw==
+X-Forwarded-Encrypted: i=1; AFNElJ8O8fwyKfqfNed6w5Fd3pjUdyHq8Q905FBgWoCgo2NPLb9B7dksUvZLdXH6tjEjTKW5ybhnjXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcDa39eE9arjOLsoXY3domUyAkc02zqyZruFnY1nExZ0EzxdWe
+	b8EzWOAa1x0iMkXRBLb5HNZDGuHhLnwFkrPj/nVYrg44bOXVHiifooI2
+X-Gm-Gg: Acq92OGg7V6Ows7hEMCJwExRZAkTsGJRFbuyZ/OLWP8K6EgqoWkH3/uG2xT+r//fnkn
+	yDaDuwFXzXtjdOIdp8lliNhsQJog0uXExEdIuUQSA9JUo78RQ3TeVIPADJg4s1clXYvrsp3EuLs
+	aGu05A1v0acGU4JwGdHuU/nHLrM5w9FtkfI+k6QgQ7ZNro5CBUr3haHc6RGzdlY1tgUynPVkdFB
+	hlowpLIsofVxNmGzN5y02x0E6FNlXIgKmMkC3IACTu1CTMGZnmcCDk4iJ/jxll0Adom5yTyaYHl
+	ncoVwuawcyUftQCM/laU86Ct5q/eAuF+5JdF3wy2ib3uOEEJ1507uZmqVhzIVmHVOxWR/G8prMY
+	joMxrvj6DCiyuJxuJwaDa7EWErAGLKT+GdkAOkAWWEO+u0snkfVS70e4mDSVtLhk4FlbRwLFEBS
+	GTFjynab89wrs2RbNXaeDbrb/7yQgSxzAsUg8EttI73vH2NuSWcWOQfA==
+X-Received: by 2002:a17:902:e747:b0:2c0:b5c1:8e22 with SMTP id d9443c01a7336-2c2a1bcd562mr54246885ad.12.1781035225586;
+        Tue, 09 Jun 2026 13:00:25 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:7::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6ce98sm203854515ad.10.2026.06.09.13.00.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 12:59:18 -0700 (PDT)
-Date: Tue, 9 Jun 2026 12:59:16 -0700
+        Tue, 09 Jun 2026 13:00:25 -0700 (PDT)
+Date: Tue, 9 Jun 2026 13:00:23 -0700
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
 	dw@davidwei.uk, daniel@iogearbox.net, razor@blackwall.org,
 	sdf@fomichev.me, dtatulea@nvidia.com, bobbyeshleman@meta.com
-Subject: Re: [PATCH net-next 3/4] netdev: avoid skipping objects on race with
- device disappearance
-Message-ID: <aihwlI9A2TKktq9I@devvm29614.prn0.facebook.com>
+Subject: Re: [PATCH net-next 4/4] netdev: don't use dev->flags for IFF_UP
+Message-ID: <aihw1/9pkcwuUbIF@devvm29614.prn0.facebook.com>
 References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-4-kuba@kernel.org>
+ <20260609190804.1137085-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,7 +94,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260609190804.1137085-4-kuba@kernel.org>
+In-Reply-To: <20260609190804.1137085-5-kuba@kernel.org>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -107,7 +106,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-297267-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297268-lists,netdev=lfdr.de];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -131,90 +130,34 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm29614.prn0.facebook.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1AC07664016
+X-Rspamd-Queue-Id: AD89966402E
 
-On Tue, Jun 09, 2026 at 12:08:03PM -0700, Jakub Kicinski wrote:
-> If the currently dumped device disappears while we were mid-dump
-> we will get the next device without resetting the sub-object ID.
-> This is quite unlikely, it was reported by an AI tool not a real
-> user. Let's fix it for better dump consistency.
+On Tue, Jun 09, 2026 at 12:08:04PM -0700, Jakub Kicinski wrote:
+> dev->flags are not technically ops lock protected. The IFF_UP flag
+> will not change when dev->lock is held, but other flags may change
+> so KCSAN would probably not be impressed. Because of this we added
+> a dedicated dev->up which is safe to read under dev->lock.
+> 
+> qstats want to make sure device is up, use dev->up.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  net/core/netdev-genl.c | 22 +++++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
+>  net/core/netdev-genl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index d35af460e886..18046ad0f883 100644
+> index 18046ad0f883..745e2eb6c9af 100644
 > --- a/net/core/netdev-genl.c
 > +++ b/net/core/netdev-genl.c
-> @@ -310,11 +310,14 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
->  			err = -ENODEV;
->  		}
->  	} else {
-> +		unsigned long start_ifindex = ctx->ifindex;
-> +
->  		for_each_netdev_lock_scoped(net, netdev, ctx->ifindex) {
-> +			if (ctx->ifindex != start_ifindex)
-> +				ctx->napi_id = 0;
->  			err = netdev_nl_napi_dump_one(netdev, skb, info, ctx);
->  			if (err < 0)
->  				break;
-> -			ctx->napi_id = 0;
->  		}
->  	}
+> @@ -773,7 +773,7 @@ netdev_nl_stats_by_queue(struct net_device *netdev, struct sk_buff *rsp,
+>  	const struct netdev_stat_ops *ops = netdev->stat_ops;
+>  	int i, err;
 >  
-> @@ -634,13 +637,17 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
->  			err = -ENODEV;
->  		}
->  	} else {
-> +		unsigned long start_ifindex = ctx->ifindex;
-> +
->  		for_each_netdev_lock_ops_compat_scoped(net, netdev,
->  						       ctx->ifindex) {
-> +			if (ctx->ifindex != start_ifindex) {
-> +				ctx->rxq_idx = 0;
-> +				ctx->txq_idx = 0;
-> +			}
->  			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
->  			if (err < 0)
->  				break;
-> -			ctx->rxq_idx = 0;
-> -			ctx->txq_idx = 0;
->  		}
->  	}
+> -	if (!(netdev->flags & IFF_UP))
+> +	if (!netdev->up)
+>  		return 0;
 >  
-> @@ -786,8 +793,6 @@ netdev_nl_stats_by_queue(struct net_device *netdev, struct sk_buff *rsp,
->  		ctx->txq_idx = ++i;
->  	}
->  
-> -	ctx->rxq_idx = 0;
-> -	ctx->txq_idx = 0;
->  	return 0;
->  }
->  
-> @@ -902,6 +907,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
->  	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
->  	const struct genl_info *info = genl_info_dump(cb);
->  	struct net *net = sock_net(skb->sk);
-> +	unsigned long start_ifindex;
->  	struct net_device *netdev;
->  	unsigned int ifindex;
->  	unsigned int scope;
-> @@ -934,7 +940,13 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
->  		return err;
->  	}
->  
-> +	start_ifindex = ctx->ifindex;
-> +
->  	for_each_netdev_lock_ops_compat_scoped(net, netdev, ctx->ifindex) {
-> +		if (ctx->ifindex != start_ifindex) {
-> +			ctx->rxq_idx = 0;
-> +			ctx->txq_idx = 0;
-> +		}
->  		err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
->  						    info, ctx);
->  		if (err < 0)
+>  	i = ctx->rxq_idx;
 > -- 
 > 2.54.0
 > 
