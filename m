@@ -1,345 +1,194 @@
-Return-Path: <netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297182-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0AgdLj1IKGpBBgMAu9opvQ
-	(envelope-from <netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:07:09 +0200
+	id SiroFXJMKGpGBwMAu9opvQ
+	(envelope-from <netdev+bounces-297182-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:25:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EF38662C1D
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:07:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D4D662EB9
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:25:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=UIK1piuF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Yyy6CNf/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297182-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297182-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 33C9030984C2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:58:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E13D303DAAC
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 17:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719D64ADD95;
-	Tue,  9 Jun 2026 16:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC344ADDA7;
+	Tue,  9 Jun 2026 17:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CE54ADD85
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 16:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43294A341E
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 17:01:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781024263; cv=none; b=HwfFQbzd8072ppwZk2JhCahRXZhvfurt86HCqGJJW3C6VLwyVs+gvDUuY1pdjrUmyBruqinFk1eaGDf9j/LVxLXeLigLctvNaU1tvPOfv7l4DQr7UdHaUmskChh6E4S5xHwGbMOfWv/GMY+0R8M2JlIAx8of4BMMgYL/bADQdaY=
+	t=1781024476; cv=none; b=eRwy5sCuRWnJXXWh+lHT1YBxpX1M8wjGOJVROYudtJ6dDar0e0KuRlp5AJtYYoUS9tubKK8MLO/ZftaxQGJriaPqs9bNnIOlmCLIr+NNNsP9Y839Xab8qN6WNZjaSpLDHa5ygW8noEhxMmsQHpc5qkalHrcw+CCBIq+l3sOKkaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781024263; c=relaxed/simple;
-	bh=JZcX41kc/PnmNGyLbsWtRkljYop+3TqNeiSZZrwHmck=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MS7eFOPCwVeFmBFcBYf6BRz/J3nK2fFCQN81bwb5jbdZ2AnTU68K58d4+s+3l90MuXT0QfdALEvA7m3kDrfEUS0fSwCqTl7UCmRsYyid5POAL4oaRejJkBX7X7D5PZZkEU5Nv3Y8mTWBXdUZPo9btiYmGqe5pIFmqzDoDTT3XIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIK1piuF; arc=none smtp.client-ip=209.85.128.179
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7e2fa3062easo59313697b3.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:57:41 -0700 (PDT)
+	s=arc-20240116; t=1781024476; c=relaxed/simple;
+	bh=JASw7Uc4klmotXzbY7lf/BYtivzVBrCr8+zwLgDE7mk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CrnJX3lgCgtpQQ4lXmnXeezGkEZ6eTLQ96IIARDZ/v4+ZN/g5Z173L6YPF72W61dpboMy/D/M8wpejps0KcrMC8fDjqqoWj/xw4L8Rt/uX+D6VNNBAq4qFfcw3X9VhlXOdFBoOL0ukvqG+gCIFLQREkWu8IF2IlmonYUjXBgcWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yyy6CNf/; arc=none smtp.client-ip=209.85.218.65
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-bec43eea342so46151466b.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 10:01:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781024261; x=1781629061; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=av7EYFBoj6gq1ZvLp6d893SbwiyvMCDkkTCv0M4AutE=;
-        b=UIK1piuF1PzV/1g9rsMp2cDSLJyyX8YMAM6K5fC4Un4kAvMjLeVHS8Srd9M+B8GUlj
-         O1tF/YuXyY/dKf+tsI0OaLMNFWO5Yfolvl2mA8jLgOPaExHB22gpNG3KUsiQAXYUQfh3
-         AVkaVkXMCKJDgC6/ryp3MNvaR++cCVBq4tP4++qpdYqKU4fP+BTT0V8E+/gWQp1zj+0i
-         zhSL3SgiZ3zGXwGdl/KVKRTRwMKX9oXkPNDd5xvl1GcriZ2oZNUdWq2wpk7WWlb3NjdI
-         iq+SdjbfrUFnl/JLyV3QzN52GDEkZRLzpoa0s4vxkKoWSdAO/tiw0yqo22c9+0uS59Rf
-         W4yQ==
+        d=gmail.com; s=20251104; t=1781024473; x=1781629273; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mPOtRVB9Jc0eGv63GKGHPuidlbtDTypX2bkjNHtGnSg=;
+        b=Yyy6CNf/dEKJ2pLiJwZUllB0nohlzgOBxVsMXhEFsKFqEMLwPfPPbHfkmSnHqSVFP6
+         g7zCMfVP6fugHq11B0XtjTfKaw4HMrzRyBunR0yqzul8Fm2b7jnJEONjbVkEtBw549Cd
+         dXFcOIJ9YKo7VDTdWcl3LuSIhsQ8O+MNlNE4CUGLj9aLgj4c4UQFBEloraW6MetW5mac
+         I+vi4EFUr8MNEmOSJbesZ8Us9ACBuQmxQuYSFxCBHxo4ntKCtvvvIhKguY3hNUPS6wH/
+         zshmO66tPmm+h5UN4YQCmKJYWh6R3J0G0Xc7duS8DM79+P+DRYpCFI0Pa8IOSQP3lH4W
+         lIwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781024261; x=1781629061;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=av7EYFBoj6gq1ZvLp6d893SbwiyvMCDkkTCv0M4AutE=;
-        b=pElVaWKQ4fxMR97zRz0mx4ncA1s9Y6Dc/QL4ikErejHcGowU4KkZx2WNE9466AgOyh
-         MExaK/RpYC8txu1BOBSxqOqiLKIcWKHApOPDaF9kxTb/HMt67l8jt0CH/IUe4uaNlOpG
-         BL23otg1S1jCc9BrKopBJ0p7kLxV1qXiy0GM78TbvgRlboEAYxJj5J5cPKHyiB3Rmnms
-         cMZtacTA67bYLTIPN/f9GBSXgBon7Lv6CYYfzImx8gJwz4x2o6EnaNnQDe6sGZG9/paK
-         jZbe7vTXgLCpu0qmh4K/fR376eE4P0lPzABJJ0eTYqv0Chr8pClHRmNVlB3FC0gNshpD
-         2e1A==
-X-Gm-Message-State: AOJu0YyQqWpCBZG+3Kknc/4ZHTxRXmXKCfgewrQ0K2aHBl5m7tuv2bnN
-	AFnUXFgSJECigFxw6V56D7mYaypCgsV4MFag2uUIfVyq/yFOJGXXPsq2qW3RHSgpU/g=
-X-Gm-Gg: Acq92OHAjH6lesLQMgNlSyKvpCwYny4KiU0Ypu9OeYBpCiMQEoCG68bufyw0+P7ZFeA
-	OAAl60o6/Qxxv+CtoWsuPNzWQX0UYF6rNH9bVn5xvL9/FpXMGhRQcXXEIRkdpRBLyPQqxX1qHuJ
-	MBswCIASA3GUZFZpIe1X/WNkncPOkmEzjTYninntcjYy81wr4PmujzQ4N8kt7blxz18hdPs1JPr
-	GdiKRA6hpsF6q8VOMfVRdxKcQjjjt0d+s9AsL/bmAavR8EgI8WJ089cnldUImI9iig2cG+ZxACT
-	x+GYTs5vkVZAnrNULi7mZ9Xq4Y9BdaZO0h5JryyIeix3v5y34MW0Jo/QAc4dxK+CR5bQyZL8HXH
-	LN6y/S8TPOyF5qvdf9d6CDVQIEq5S8h28asGxsLkKnq2TBXObyBdmumGXl9CxiexyuFuTsf4G6r
-	DQZyl5WAtgIHqoKl8O9uPPbRuwhVmagf8DSKoS
-X-Received: by 2002:a05:690c:710a:b0:7bd:5579:185a with SMTP id 00721157ae682-7ed0c80a062mr196768697b3.25.1781024260523;
-        Tue, 09 Jun 2026 09:57:40 -0700 (PDT)
-Received: from houminxi ([23.133.88.228])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea215825d2sm99814537b3.16.2026.06.09.09.57.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 09:57:40 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	amorenoz@redhat.com,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v2] selftests/net/openvswitch: add flow modify test
-Date: Wed, 10 Jun 2026 00:57:25 +0800
-Message-ID: <20260609165725.107484-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        d=1e100.net; s=20251104; t=1781024473; x=1781629273;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mPOtRVB9Jc0eGv63GKGHPuidlbtDTypX2bkjNHtGnSg=;
+        b=pIx2tNgXeVffSrEUmhLgTVYFImeCECuyjP8TsSrbiDD/WFIsAQ9Sh/kt2yFe6DtfHO
+         8cXHKtZVt0LlTiBEXQaj4pwwwCheDQGKuwc6/aOeORqRPiwqRc1QDOQRgvinAJRtyDK+
+         phiALdAWuLpUeujCr2QN98oPvK7zhAJZ5KlnUHFgSs/jS1hdGuTOoYODvfTwLmKx2FQb
+         YIet10EZXuevrefUi7D8tzAF5ww/tUcePQNtD71PJdHGr2bFe9kmcbp0/8X6yEapA62O
+         0DMklnBpQI+VqzUMnWAJxDu/1WcFC5ZidGiuo6eFr2CByY+ACQuD3LyFqCWSSSBbmRzL
+         iOkQ==
+X-Gm-Message-State: AOJu0YwGzPo5Nrj5QL+7GRsf2Zq9thuKP9kov1t8L2PpFyoN4CsqSMPV
+	vGsC692kXiMJT0+kGzeXIV6V8mWy7Vv71S27bIpPHEgGpOdjOS7DVbTv
+X-Gm-Gg: Acq92OGgV4JAOm270EYVym05iKIsz3VDwAcGFTyGQu4IP5QHZv4Xi6mBT/y/E/xnol+
+	rOFlJkRWeGYmTFLkKAOjXB8YuLJfKkkgftacs2Y0C27nHGS/cYHkeRiuDPC+KOQpwW6JA3PC6Nx
+	S1svtAhcHS+eQ1BPdCkdFyru2Or2gXJJKjHtIhzhRx+8wBGSFPbmp710Iy+QaRVCBmo7TKuB2BO
+	ucB9coqljbQPw9h6gqFHUFA2ko/I+PdZU01upjqADNv3/iCcICpm6RRbsHul2KZypQS5ecusc13
+	8WK9EsTUGj8Pega4MagiTUYSZirQN7NID1uRJBkbYO9klts76VrQjlC6uZk4T/38uB9X3F0NZwW
+	Zm+ZyjmkyfjMzTj1OpaUKbU9F5SgaqIisX5vF5BLAN9ouyxTwuMDa2ceuOWR75hI+xRXqZGQIR0
+	ucX67FhH4XIaX732q489XPRaw3Nbymc2w=
+X-Received: by 2002:a17:907:3f1c:b0:bd8:26e5:d7a1 with SMTP id a640c23a62f3a-bf36ff8eff6mr504052666b.2.1781024471389;
+        Tue, 09 Jun 2026 10:01:11 -0700 (PDT)
+Received: from localhost ([104.28.193.185])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf0559f1f62sm1095756966b.57.2026.06.09.10.01.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 10:01:10 -0700 (PDT)
+Message-ID: <715cf429-9f2b-4898-84b4-15dfba4a9a8e@gmail.com>
+Date: Tue, 9 Jun 2026 19:01:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/10] tcp: support non-GSO jumbograms
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, idosch@nvidia.com,
+ ncardwell@google.com, shuah@kernel.org, kuniyu@google.com,
+ alice@isovalent.com
+References: <20260608130755.5626-1-maklimek97@gmail.com>
+ <CANn89iLjG0krEoEE__3KUrcK+ZO+USZRC_2qZV5hAsxRpkTmhw@mail.gmail.com>
+Content-Language: en-US
+From: Mariusz Klimek <maklimek97@gmail.com>
+In-Reply-To: <CANn89iLjG0krEoEE__3KUrcK+ZO+USZRC_2qZV5hAsxRpkTmhw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-297182-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-297181-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[maklimek97@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:amorenoz@redhat.com,m:houminxi@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:ncardwell@google.com,m:shuah@kernel.org,m:kuniyu@google.com,m:alice@isovalent.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maklimek97@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2EF38662C1D
+X-Rspamd-Queue-Id: A3D4D662EB9
 
-Add mod_flow() and the mod-flow CLI command to ovs-dpctl.py, exercising
-OVS_FLOW_CMD_SET. Add test_flow_set which first modifies an existing
-flow with new actions and verifies the change via traffic, then modifies
-the same flow without actions and verifies the kernel handles the
-no-actions case gracefully.
+On 6/9/26 03:15, Eric Dumazet wrote:
+> On Mon, Jun 8, 2026 at 9:35 AM Mariusz Klimek <maklimek97@gmail.com> wrote:
+>>
+>> This series adds support for sending TCP jumbograms over MTUs above 65535,
+>> and adds support for setting such MTUs on veth devices.
+>>
+>> The TCP stack is already capable of receiving jumbograms and (up until
+>> recently) sending GSO-jumbograms that get segmented before exiting the
+>> host. However, the TCP stack doesn't support sending regular jumbograms
+>> over high MTUs as described in RFC2675. Specifically, the TCP stack doesn't
+>> support an MSS greater than 65535.
+>>
+>> No device currently supports setting an MTU greater than 65535 but there
+>> are some devices that could benefit from higher MTUs and that can
+>> theoretically support it. For example, IPoIB in connected-mode can support
+>> MTUs up to 2^31. Virtual devices such as veth have no physical limitations
+>> and therefore could also support such MTUs.
+>>
+>> This series only adds support for setting high MTUs on veth devices, with
+>> support for other devices being delegated to future patch series. Allowing
+>> jumbograms to pass through veth devices is useful for testing jumbogram
+>> functionality, and also increases throughput when compared to BIG TCP (see
+>> the benchmark numbers below).
+>>
+>> In addition to removing the upper limit on veth MTUs, This series adds the
+>> missing pieces that allow the TCP stack to send TCP jumbograms. This
+>> includes a bit of code removed recently by Alice's patch series [1]. Most
+>> of the patches in this series are rather trivial. The main problem
+>> addressed by this series is that the TCP stack conflates the TSO segment
+>> length with the MSS, but the TSO segment length is a 16-bit integer, which
+>> doesn't allow for MSS > 65535. This series decouples them.
+>>
+>> Running iperf over veth on an Intel Core i9-12900K CPU shows a 5%
+>> improvement in throughput.
+>>
+>> Commands:
+>> iperf3 -s
+>> iperf3 -c -l 500KiB ${SERVER_IP}%veth0
+> 
+> You are adding code to TCP fast path, for a narrow (and possibly
+> dangerous) use case.
+> 
+> I am sorry, I will not review this patch series coming from a first-timer.
 
-The no-actions path is unreachable from userspace OVS tools (dpctl
-mod-flow requires actions) but reachable via raw netlink. This is the
-code path where Adrian Moreno found a possible kfree_skb of ERR_PTR
-when reply allocation fails after locking.
+I understand your concerns and they're reasonable. I would still like to
+proceed with this series, though. What can I do for you to consider this
+series? Would it help to submit a few less-significant patches first before
+resubmitting this patch series? Should I resubmit it as an RFC?
 
-Make parse() skip OVS_FLOW_ATTR_ACTIONS when actstr is None so the
-kernel enters the post-lock allocation branch in ovs_flow_cmd_set().
-After the no-actions set, verify via dump-flows that the flow retained
-its drop action.
+This feature is opt-in, so even though I'm adding code to the TCP fastpath, it
+should be relatively straightforward to check that it doesn't introduce any
+bugs in the regular MTU < 65535 flow.
 
-Suggested-by: Aaron Conole <aconole@redhat.com>
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
----
-v1 -> v2:
-  - Add dump-flows verification after no-actions mod-flow (Aaron)
-  - Add docstring to mod_flow() (pylint C0116)
-  - Use f-string in DP-not-found message (pylint C0209)
----
- .../selftests/net/openvswitch/openvswitch.sh  | 77 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 40 +++++++++-
- 2 files changed, 114 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 82f066a0ceed..d533decca5c1 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -30,6 +30,7 @@ tests="
- 	drop_reason				drop: test drop reasons are emitted
- 	pop_vlan				vlan: POP_VLAN action strips tag
- 	dec_ttl					ttl: dec_ttl decrements IP TTL
-+	flow_set				flow-set: Flow modify
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -193,6 +194,23 @@ ovs_add_flow () {
- 	return 0
- }
- 
-+ovs_mod_flow () {
-+	if [ -n "$4" ]; then
-+		info "Modifying flow: sbx:$1 br:$2 flow:$3 act:$4"
-+		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
-+			mod-flow "$2" "$3" "$4"
-+	else
-+		info "Modifying flow (no actions): sbx:$1 br:$2 flow:$3"
-+		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
-+			mod-flow "$2" "$3"
-+	fi
-+	if [ $? -ne 0 ]; then
-+		info "Flow modify [ $3 ] failed"
-+		return 1
-+	fi
-+	return 0
-+}
-+
- ovs_del_flows () {
- 	info "Deleting all flows from DP: sbx:$1 br:$2"
- 	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py del-flows "$2"
-@@ -300,6 +318,65 @@ test_dec_ttl() {
- 	return 0
- }
- 
-+test_flow_set() {
-+	sbx_add "test_flow_set" || return $?
-+	ovs_add_dp "test_flow_set" flowset || return 1
-+
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "test_flow_set" "flowset" "$ns" \
-+			"${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add 10.0.0.1/24 dev c1
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add 10.0.0.2/24 dev s1
-+	ip netns exec server ip link set s1 up
-+
-+	ovs_add_flow "test_flow_set" flowset \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "test_flow_set" flowset \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+
-+	local fwd_flow="ufid:00000001-0002-0003-0004-000500060007"
-+	fwd_flow="$fwd_flow,in_port(1),eth(),eth_type(0x0800),ipv4()"
-+
-+	ovs_add_flow "test_flow_set" flowset "$fwd_flow" '2' \
-+		|| return 1
-+	ovs_add_flow "test_flow_set" flowset \
-+		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-+
-+	info "verify initial forwarding"
-+	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-+		10.0.0.2 || return 1
-+
-+	info "mod-flow with new actions (change to drop)"
-+	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" 'drop' \
-+		|| return 1
-+
-+	info "verify traffic is now dropped"
-+	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-+		10.0.0.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail after mod-flow to drop"
-+		     return 1; }
-+
-+	info "mod-flow without actions"
-+	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" || return 1
-+
-+	info "verify flow retained drop action via dump"
-+	python3 "$ovs_base/ovs-dpctl.py" dump-flows flowset \
-+		| grep -q "actions:drop" || \
-+		{ info "FAIL: flow not showing drop action"; return 1; }
-+
-+	info "verify drop actions unchanged"
-+	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-+		10.0.0.2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should still fail after no-actions set"
-+		     return 1; }
-+
-+	return 0
-+}
-+
- # psample test
- # - use psample to observe packets
- test_psample() {
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 3342e295293d..e1ecfad2c03e 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -2702,9 +2702,10 @@ class OvsFlow(GenericNetlinkSocket):
-             self["attrs"].append(["OVS_FLOW_ATTR_KEY", k])
-             self["attrs"].append(["OVS_FLOW_ATTR_MASK", m])
- 
--            a = ovsactions()
--            a.parse(actstr)
--            self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
-+            if actstr is not None:
-+                a = ovsactions()
-+                a.parse(actstr)
-+                self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
- 
-     def __init__(self):
-         GenericNetlinkSocket.__init__(self)
-@@ -2738,6 +2739,25 @@ class OvsFlow(GenericNetlinkSocket):
-             raise ne
-         return reply
- 
-+    def mod_flow(self, dpifindex, flowmsg):
-+        """Modify an existing flow in the kernel."""
-+        flowmsg["cmd"] = OVS_FLOW_CMD_SET
-+        flowmsg["version"] = OVS_DATAPATH_VERSION
-+        flowmsg["reserved"] = 0
-+        flowmsg["dpifindex"] = dpifindex
-+
-+        try:
-+            reply = self.nlm_request(
-+                flowmsg,
-+                msg_type=self.prid,
-+                msg_flags=NLM_F_REQUEST | NLM_F_ACK,
-+            )
-+            reply = reply[0]
-+        except NetlinkError as ne:
-+            print(flowmsg)
-+            raise ne
-+        return reply
-+
-     def del_flows(self, dpifindex):
-         """
-         Send a del message to the kernel that will drop all flows.
-@@ -3013,6 +3033,12 @@ def main(argv):
-     addflcmd.add_argument("flow", help="Flow specification")
-     addflcmd.add_argument("acts", help="Flow actions")
- 
-+    modflcmd = subparsers.add_parser("mod-flow")
-+    modflcmd.add_argument("modbr", help="Datapath name")
-+    modflcmd.add_argument("modflow", help="Flow specification")
-+    modflcmd.add_argument("modacts", help="Flow actions",
-+                          nargs="?", default=None)
-+
-     delfscmd = subparsers.add_parser("del-flows")
-     delfscmd.add_argument("flsbr", help="Datapath name")
- 
-@@ -3110,6 +3136,14 @@ def main(argv):
-         flow = OvsFlow.ovs_flow_msg()
-         flow.parse(args.flow, args.acts, rep["dpifindex"])
-         ovsflow.add_flow(rep["dpifindex"], flow)
-+    elif hasattr(args, "modbr"):
-+        rep = ovsdp.info(args.modbr, 0)
-+        if rep is None:
-+            print(f"DP '{args.modbr}' not found.")
-+            return 1
-+        flow = OvsFlow.ovs_flow_msg()
-+        flow.parse(args.modflow, args.modacts, rep["dpifindex"])
-+        ovsflow.mod_flow(rep["dpifindex"], flow)
-     elif hasattr(args, "flsbr"):
-         rep = ovsdp.info(args.flsbr, 0)
-         if rep is None:
 -- 
-2.54.0
-
+Mariusz K.
 
