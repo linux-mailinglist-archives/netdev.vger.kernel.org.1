@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-296806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296810-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L7G2FeFgJ2oOvgIAu9opvQ
-	(envelope-from <netdev+bounces-296806-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:01 +0200
+	id ZGDfMBphJ2obvgIAu9opvQ
+	(envelope-from <netdev+bounces-296810-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC18A65B647
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DF665B65D
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b="VHR49T/a";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296806-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296806-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=trailofbits.com header.s=google header.b=CKvGJEwb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296810-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296810-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BCB96302304B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:39:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D6F943089F75
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB219244665;
-	Tue,  9 Jun 2026 00:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6097C233928;
+	Tue,  9 Jun 2026 00:40:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFA4175A84
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1692472AF
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:40:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780965598; cv=none; b=T15FqvuRbat13BuBYySAlBFqJ2MaOMFLHawV+sd/xJ5BwurlUgbrmSiRrW1ieHULI+BeUyc5jDkl1AD3BucO9/AQ/xoWFeWjAX9ZH+TEgqnmELkd3qHB6RT3gT8HPdtPkHdjavl/xHgjpaHsOm/SizRxxXS0tbEG6tAt7SZa+5E=
+	t=1780965626; cv=none; b=X6rBTozIeZ3dN+Jk11UBgxh7LpYxEm9F7zTfCbPe7ItSmbHcpqrQyWmTjiZvGKHrvAnU5hz/E7zyS+yKUSWajznxSENvyjqxO94O2cj3npke7r7Fi5YnI8lk65/2cL784XVY4MV4/HayRcxY55haGaoBVt03YM4CdtoW0L1huhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780965598; c=relaxed/simple;
-	bh=p2uZsKrxUEOpWe7djXbdx8DpJ28EDQYdmntByMBO3MQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I+VNqt96BTFa9stJjxYsnKP1Tu2kJbobeVo/NiMhsYwb/pHT0Y1hfYqHd+QnTpSuIU3EoRQoTF+r+q+vxz7dMTalzox2jmbC8OJsl24DooNtrg38Ekcg5fXMGohWqnCe3ALiMTwy8nFLDrz0dNTiuAVFzYR3qDLm3tzumJoirm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=VHR49T/a; arc=none smtp.client-ip=209.85.222.176
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-915ab38ac14so538993885a.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:39:57 -0700 (PDT)
+	s=arc-20240116; t=1780965626; c=relaxed/simple;
+	bh=RL2nelPuVquWigElAbGuRaJ/oJl0cri7fXzRSPP3f/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tQxLFF3MFYbfjeNlWSGdTMeHBEsBqUum4WWMZ5VamYaoxdCUTCxavQwFmFr3ZBD3Fmtdf28G+2QoehW0IoXrpwZZHp5h116rZiEyGB+nofTp5528Msd8/nyffWyMLUzPk+ajo/Je5HW8ZbutiUJ9cdfYkDFbtzG0Ssl/6mx8fDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=CKvGJEwb; arc=none smtp.client-ip=209.85.222.170
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-9158c621ebbso589587185a.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780965596; x=1781570396; darn=vger.kernel.org;
+        d=trailofbits.com; s=google; t=1780965624; x=1781570424; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=G7lLYRcM+Slsi647qvlOPdQJaKxOeDZsJe3wtKNrsbE=;
-        b=VHR49T/a40vOtbOiQV2Ac23wEzPv+JGw85WOXX0z0q+xw0s+gzpmNuUVsSkKnJZP+h
-         K7jlztv0CrMSiNMtUy+oSJ9Lr7InShkE5VF+5ndxgSO0/YhYMiLx8gHYd+Aqf5dN0Cfl
-         kPMp5o8fnaORNXgtU2yrlpoHBZbn7a4QvzlxeUX+upbmvFZYyfJH/5THPk4jMa4oMVke
-         Nxi5l4jl23K/64s5iyM+9PPsHcJAczMEw82ORv+cuP/j0KsZjd9EFjP4Y2UiW3ZfvIc6
-         Eps8wJEA2t/6F+6lmnuqfnU5r5ZHb8+ouzl/RifpvxJLrZT8qqsO4DE7o8GCbSv8iQdn
-         ZXHA==
+        bh=9YFVBWQFtxi3MWtqjY5JFqeW6UBOy9JZ/sfyVQG1lYc=;
+        b=CKvGJEwbIt6+/r3sADgT4v+fW4fvJaSx5wZKAryWxIMLKnz37XKIYrPWhiOSRADmZT
+         frER4xk7o/ASzZ71Wmv5+BNXOOpZ3UuFmhmIeJOO4eOfYQfUk6AsS8LhhVakfb+/9KqZ
+         8rMcES2MkQUodOVdTBPdim5SaAiR1/NNTOMCwxs58+9PbLhut5wS0mXV+bHo+9qzm8Ay
+         uYWZ56kcb5FQ9bNHksIm03NVe58T2Js9BRFvmepTyF8Gmk+V1TMgjF6p9fqRfEfVxfJp
+         IXFNRwox+xnM3Ug8QnsobxjhhWPFScAkCONFppBJpZoMNov3sz9gFtIj4dUJY2kVxQJ8
+         WvTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780965596; x=1781570396;
+        d=1e100.net; s=20251104; t=1780965624; x=1781570424;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G7lLYRcM+Slsi647qvlOPdQJaKxOeDZsJe3wtKNrsbE=;
-        b=TubWqLM9Q20Z53zVa2LEwLF2m+Y4p3i8wBwEDvO0alUhQI08jsVP4x8MOInQ4QRfRe
-         xB7PVcyJ3EF9JHX4+SfKF1r37uTeNE3MvQVyJ4AApdxmG44CU0jJGAmWLaaXcKF8dK6n
-         O5ahaatoP9NRW2o9NS76F2wMojXJh3AVhUXSClBT6WjxtjJzg4v+cJMSmugYSQkIJRl0
-         AbROuSIicSpmbGAcR4FgMIqgqjpOBIAoF4vjX+EIIJpis6iJh+TEcSLG3TYssw/24f4B
-         7K+gsxEpzeMrRay7oSW5jfhtiDtOwRnHRvY9U5H4PDfgDKa+DL+zo3KFCPx5hN8134d/
-         gBZw==
-X-Forwarded-Encrypted: i=1; AFNElJ8ajfZrFtJnVGyRvaJTZzDu5IOdaH1DtljuwpetGOcAU/ryCiiC5fWHZwSldA+5yWJ/uPVchmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ2/Fudzaz08/Oa7kh6mGi4ZEGLHgpa7kP6TzOdB7crOcNZncg
-	vVXfic9pAYD8YGTZ+A1lkLK7Fom8HxmxlloZ0knvDFJKD+IJdILHRaec39ssDYgdJxw=
-X-Gm-Gg: Acq92OGFk19kOg6m1b9HLaIQNn/sx+m9tpBKjzjsNfNPvJZ0p7wHFoclTb6KA5wqvP6
-	ZiDEhDutCTsun+rRILS2jeNLOF9QowLidHMhBJeOSnvDMrbCa/oHfIDB0kZrk6IqdXKRFFggDDb
-	GS75wGbRSG+miX9kreENCPXfJRRObHnfQZi0PSBg8msB/STDUXitCWBXLYblm9pRvWUq00KWQnY
-	9PixfIWyOagTNXbUDgWbvEaoOx30qhrOkNDypEtcWm5eJSGLIzWlK3JahScHKh/18LpVbJEXW+r
-	eep1oT6p+K9I9y3UUu6500fl9icE42OQlh2DbaBS+qfl+u58lUef6OMXE9ayT+GM4gW6JiwExAo
-	kHoOiMu6kaShkSRX8CDgCPpAGdBCY2hpVg/b4spsSeMdbLb/yGnD11rKyNe3on+5etma3yXqs+7
-	0LitgaMiFZfGkObMf45/3An3xTFDnu/jm5CDoXoQ==
-X-Received: by 2002:a05:620a:bc5:b0:915:5215:d90c with SMTP id af79cd13be357-915a9ddb310mr3077996485a.51.1780965596639;
-        Mon, 08 Jun 2026 17:39:56 -0700 (PDT)
+        bh=9YFVBWQFtxi3MWtqjY5JFqeW6UBOy9JZ/sfyVQG1lYc=;
+        b=i0NUARw2MvATJWU1pwiLFo6fKlBDJ3QG5PuvE1GD0d37v8Isr/lKyzKCxOVYCY2G9g
+         h4JZwga+9ggJqQOGluxetkNIdkU2r7m+6cD2Ql4JSKy77AjG0FobVNBf5rVtKWz5TPr+
+         aRJpIjr2O8+G6DvcSTZIYcmv0gO45b8oupW25w2oLb9J0kY3mA8OiaJBrBLC2LKaFGn0
+         aimHT50CecVz4uHxzn8yyoj1L/USNqYfYWgU1mdAsR6hXyUG8ocbJnppBxgWT8stwway
+         TfrSFC2WQA2y0K4l9POGs6FBCe+W2AFJEA0lKcurt/RjJI55DTdHi34ki1S04SAw1Vco
+         SFlA==
+X-Forwarded-Encrypted: i=1; AFNElJ9I8Jtm9gs9MOUJeMs0yBgnNenSqIz6ET0OykJAaQcHWU1LiY43Qt5kz+xyryRA9IRYdKzA5bI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOMbvUSFx4ySTSv26G5gHXwXw/tqiFAIwlqVLyBifwFbumjMvp
+	ncElqMNMUhurf1II8ZeaVU4y0RtX9SKSfebpZgMZOmLzkielQJciXHvJfFYznCNcNxE=
+X-Gm-Gg: Acq92OGwLvv49WoX23dz5J0lQJ4MmxfPmotQB/pvbsYgovevh6H1SkyohjoPygZl5Io
+	FHSfsyjX89UI60R2ccW59KfEkzgv/8PzrXKMwI7UT47zsnwONYul+bHiAbmKwOlBtum2aLRSEqX
+	wtOWFcWsYUtW4zcwpvTt71S8TfSr95bhsoRBvi1JhmGqn6sMqi/n8JXlxzQdnSztOLQivdnSDrC
+	MyPYCfl0IG3MHGJzf9RXsNxjDLzxZMrRiu5FUEjeugf+3ASXtn7Oo/BKoRDmf5q3Nb7exnCYGlb
+	a55DWuq8ASrDyfxWPu00fQU5kEja9JH9mxPBJzEsNQbj814I6Q5Iz9D93ckfZQ2Ol0ubDlNhln8
+	B5vHcSs/fzl5ImtlxyyntbTJ3N/JL+4r89/Cr2u5QuRrr13W7ATY4sfZeA3bz10xmbdfkbKSCQn
+	HYktNDdmzmprpWflI64RGS19kXxZoBTsFlBKXDKA==
+X-Received: by 2002:a05:620a:40c5:b0:915:c4de:7ac8 with SMTP id af79cd13be357-915c4de8553mr1549647085a.24.1780965623660;
+        Mon, 08 Jun 2026 17:40:23 -0700 (PDT)
 Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a37bae6sm1925910285a.31.2026.06.08.17.39.55
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a243041sm1969686185a.18.2026.06.08.17.40.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 17:39:55 -0700 (PDT)
+        Mon, 08 Jun 2026 17:40:21 -0700 (PDT)
 From: Samuel Moelius <sam.moelius@trailofbits.com>
 To: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
@@ -85,9 +85,9 @@ Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org (open list:TC subsystem),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net/sched: fq: account internal fast-path enqueues against plimit
-Date: Tue,  9 Jun 2026 00:39:07 +0000
-Message-ID: <20260609003907.1238501.72ef81046550.fq-internal-plimit-bypass@trailofbits.com>
+Subject: [PATCH] net/sched: fq_pie: clamp flow deficit after quantum changes
+Date: Tue,  9 Jun 2026 00:39:59 +0000
+Message-ID: <20260609003958.1238678.04aa5c10b22f.fq-pie-change-quantum-stale-deficit@trailofbits.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296806-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296810-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
@@ -128,38 +128,62 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BC18A65B647
+X-Rspamd-Queue-Id: 40DF665B65D
 
-sch_fq has an internal fast path that can enqueue packets without
-applying the same packet-limit accounting as the normal path. The queue
-can grow past the configured plimit through that bypass.
+fq_pie keeps active flow deficits when userspace changes the scheduler
+quantum.  The next dequeue rounds can therefore spend credit that was
+accumulated under the previous quantum.
 
-The packet limit must apply to all enqueue paths.
+This can be observed by making a flow active, changing the quantum, and
+then dequeuing with the old deficit still present.
 
-Charge internal fast-path enqueues to the same plimit checks as ordinary
-enqueues.
+Clamp active flow deficits to the new quantum when the configured
+quantum changes.
 
 Assisted-by: Codex:gpt-5.5-cyber-preview
 Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
 ---
- net/sched/sch_fq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/sched/sch_fq_pie.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index f2edcf872981..608ff3ecfb16 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -548,7 +548,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	u8 band;
+diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
+index 7becbf5362b3..9c551bdb799d 100644
+--- a/net/sched/sch_fq_pie.c
++++ b/net/sched/sch_fq_pie.c
+@@ -284,6 +284,19 @@ static struct sk_buff *fq_pie_qdisc_dequeue(struct Qdisc *sch)
+ 	return skb;
+ }
  
- 	band = fq_prio2band(q->prio2band, skb->priority & TC_PRIO_MAX);
--	if (unlikely(q->band_pkt_count[band] >= sch->limit)) {
-+	if (unlikely(sch->q.qlen >= sch->limit)) {
- 		q->stat_band_drops[band]++;
- 		return qdisc_drop_reason(skb, sch, to_free, QDISC_DROP_BAND_LIMIT);
- 	}
++static void fq_pie_clamp_active_deficits(struct fq_pie_sched_data *q,
++					 u32 quantum)
++{
++	struct fq_pie_flow *flow;
++
++	list_for_each_entry(flow, &q->new_flows, flowchain)
++		if (READ_ONCE(flow->deficit) > quantum)
++			WRITE_ONCE(flow->deficit, quantum);
++	list_for_each_entry(flow, &q->old_flows, flowchain)
++		if (READ_ONCE(flow->deficit) > quantum)
++			WRITE_ONCE(flow->deficit, quantum);
++}
++
+ static int fq_pie_change(struct Qdisc *sch, struct nlattr *opt,
+ 			 struct netlink_ext_ack *extack)
+ {
+@@ -340,8 +353,10 @@ static int fq_pie_change(struct Qdisc *sch, struct nlattr *opt,
+ 		WRITE_ONCE(q->p_params.beta,
+ 			   nla_get_u32(tb[TCA_FQ_PIE_BETA]));
+ 
+-	if (tb[TCA_FQ_PIE_QUANTUM])
++	if (tb[TCA_FQ_PIE_QUANTUM]) {
++		fq_pie_clamp_active_deficits(q, nla_get_u32(tb[TCA_FQ_PIE_QUANTUM]));
+ 		WRITE_ONCE(q->quantum, nla_get_u32(tb[TCA_FQ_PIE_QUANTUM]));
++	}
+ 
+ 	if (tb[TCA_FQ_PIE_MEMORY_LIMIT])
+ 		WRITE_ONCE(q->memory_limit,
 -- 
 2.43.0
 
