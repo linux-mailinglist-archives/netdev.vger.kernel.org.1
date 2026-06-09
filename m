@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-297254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oA/JCYNvKGpiEgMAu9opvQ
-	(envelope-from <netdev+bounces-297254-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:43 +0200
+	id rnwwJYtvKGplEgMAu9opvQ
+	(envelope-from <netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA19B663EF9
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51265663EFE
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=WDFXQSwa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297254-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297254-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b="E4FkzV/g";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=iogearbox.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8483430FC679
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:49:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92C0F3019123
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0209F48B380;
-	Tue,  9 Jun 2026 19:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15A6411665;
+	Tue,  9 Jun 2026 19:49:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021724949F1
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C08411691
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:49:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034544; cv=none; b=YvFHCQ8dEahVj11UcC8XJfV0Us3pIlOim803IAJo8IwP0Gj+ocYK3E1ziwoK2SwwzewCA0yxFRwm06TV/TkBbohLRCHC2LicMqs1lFQx7e1P64GLnC3JEWzqY51VmRPcfa4pYM5+PPdtTNaBp1c7a49w9nmjNax1H5buob55LOo=
+	t=1781034559; cv=none; b=r1ZyvuLi0XwJ/AhHDErySIuCroWKS+lwNjyQbBmkda37lP/VUQ4w25Sik9lMADNn3sybdHXPkA8m/MZshAtnItSMKnlQ6yG9IyzHQ3EcVpV+W8NKVV2mX7eYDhNE3d2IhNvV++Rc7di8RYKV8IT55CVxkfFsLXaCWpF64mhkRvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034544; c=relaxed/simple;
-	bh=KykoCAFje42AUSScWpjzpzITDdkND/odcZAjC8S0Ljc=;
+	s=arc-20240116; t=1781034559; c=relaxed/simple;
+	bh=h7axR/czA/Xft3ZJetNJfqDTUMchzSFY0LcwUO5dzw0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bNcVdLNDw7lKNd4yrFgdIsVt4jEl/drXfiuDsNrEFsu3ot2nHVStkIJ8XnLuCukjXAIWjeN6XV6vkl/7JXKkzZDRyzfTyRkm8fgTrN9YFlGiC9o2DqxsO6Z8PjpIjztOybPJdWDe1Givoelfe3IGT+D7jCh+AyiaOO2lLh0ECLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WDFXQSwa; arc=none smtp.client-ip=213.133.104.62
+	 In-Reply-To:Content-Type; b=KS+Slos23q/X7KV+gvb6vKD6Mu0xG31bLmdRjDHIGl3Lphv8mjUe8uLxAKTIldiVEMFm+xW1GY+sBucYxNu0E56TWPjXGSZOpdqFyUhHpg0rxvsAP5fujDtTSgXiBRATToS9OUW3VEi5ECm+fE/Bf10WwvPbrwPGh9NcbT+EWig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=E4FkzV/g; arc=none smtp.client-ip=213.133.104.62
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
 	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=bOXhIxDwzsumzqRp7h1i6xOUbWW20SEKZBMhZs/BZFk=; b=WDFXQSwacU2dX9Wq37hhU/8NJ9
-	i9GPqMZ/Rc9fXgiVH0gtZAEQ0b4yVPqVevEo/xtQ/7xljGegvnG6U7xExvWvkM/3VuLZX41+84EjE
-	8h5B7UP5+KjE7VyvQlxXSc/nyzkcWjRKWI7VA1LrfxPDlXNmrUi5rsjzFusBw3N5brdRpk0IHLUNp
-	sz5ux51MMVqP0Fyn4u/9WCGr2+HVo1PQ2J8+LQnZmd/7cx1DLwFVIabh+vygvsW/4AeiaeVQbkZQ8
-	aF5MSUZ8ksmuwxujZ1ZcomdHVJIVJHMto5Uhx0qSjGo1DthkD1LH8xYDcPtKJ5ILKjVaoK0+51zvh
-	0Jire3Kg==;
+	bh=C85CeTSkeEIxhIFMao+8qHFW/a7UEIMkjBi8cvyrg80=; b=E4FkzV/g8yCeQjWo4FyF8ymG/S
+	kmN7B59TTLCaHfJ90k7RqHd0JdQgvtZICU1GQFpoUBrP207XaR0x1d9SQCseQJNKeWnaZHqQuTbh7
+	nOd12HhlxsQFVbH5vSEyhFRNRQiNy/pVZVYue1gwroHQinA/Wau7U6BW2itytbsrfmxyxwo9DULAM
+	L3x5WkSuFhWvFvmE18qLL/Liu4UFyuoQ9dz8+Cz8S3eDbxEv5JrH5xmOZxqNB0/4YSBasiqn5wHYI
+	Uw/r/FuD2NN+5pRPTnAvM2FdrjRolgYe8JtUJYxAmoDMiCJfj+bqoY5wVdJofYa23wQ0m8ywc1v+z
+	bkH9Ja2g==;
 Received: from sslproxy05.your-server.de ([78.46.172.2])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2RL-00088V-0i;
-	Tue, 09 Jun 2026 21:48:47 +0200
+	id 1wX2Ra-0008BC-37;
+	Tue, 09 Jun 2026 21:49:03 +0200
 Received: from localhost ([127.0.0.1])
 	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2RJ-0005rh-2q;
-	Tue, 09 Jun 2026 21:48:46 +0200
-Message-ID: <c724f512-b2fa-4ef3-993d-73f11d7173bd@iogearbox.net>
-Date: Tue, 9 Jun 2026 21:48:46 +0200
+	id 1wX2RZ-00085S-1y;
+	Tue, 09 Jun 2026 21:49:02 +0200
+Message-ID: <96cc2480-c675-4ab8-80f5-eac90dc4e95f@iogearbox.net>
+Date: Tue, 9 Jun 2026 21:49:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,15 +66,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/4] netdev: avoid skipping objects on race with
- device disappearance
+Subject: Re: [PATCH net-next 4/4] netdev: don't use dev->flags for IFF_UP
 To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
 Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
  andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
  razor@blackwall.org, sdf@fomichev.me, dtatulea@nvidia.com,
  bobbyeshleman@meta.com
 References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-4-kuba@kernel.org>
+ <20260609190804.1137085-5-kuba@kernel.org>
 Content-Language: en-US
 From: Daniel Borkmann <daniel@iogearbox.net>
 Autocrypt: addr=daniel@iogearbox.net; keydata=
@@ -120,7 +119,7 @@ Autocrypt: addr=daniel@iogearbox.net; keydata=
  rUD9YI1Je/WifL/HbIubHCCdK8/N7rblgUrZJMG3W+7vAvZsOh/6VTZeP4wCe7Gs/cJhE2gI
  DmGcR+7rQvbFQC4zQxEjo8fNaTwjpzLM9NIp4vG9SDIqAm20MXzLBAeVkofixCsosUWUODxP
  owLbpg7pFRJGL9YyEHpS7MGPb3jSLzucMAFXgoI8rVqoq6si2sxr2l0VsNH5o3NgoAgJNIg=
-In-Reply-To: <20260609190804.1137085-4-kuba@kernel.org>
+In-Reply-To: <20260609190804.1137085-5-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Virus-Scanned: Clear (ClamAV 1.4.3/28026/Tue Jun  9 08:25:31 2026)
@@ -135,7 +134,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297254-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297255-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -159,13 +158,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BA19B663EF9
+X-Rspamd-Queue-Id: 51265663EFE
 
 On 6/9/26 9:08 PM, Jakub Kicinski wrote:
-> If the currently dumped device disappears while we were mid-dump
-> we will get the next device without resetting the sub-object ID.
-> This is quite unlikely, it was reported by an AI tool not a real
-> user. Let's fix it for better dump consistency.
+> dev->flags are not technically ops lock protected. The IFF_UP flag
+> will not change when dev->lock is held, but other flags may change
+> so KCSAN would probably not be impressed. Because of this we added
+> a dedicated dev->up which is safe to read under dev->lock.
+> 
+> qstats want to make sure device is up, use dev->up.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Acked-by: Daniel Borkmann <daniel@iogearbox.net>
