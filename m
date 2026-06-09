@@ -1,274 +1,305 @@
-Return-Path: <netdev+bounces-297154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YbP4M0c9KGpPAwMAu9opvQ
-	(envelope-from <netdev+bounces-297154-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:20:23 +0200
+	id O9cGAn5AKGo+BAMAu9opvQ
+	(envelope-from <netdev+bounces-297156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:34:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7565B66249C
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:20:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD746626D1
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:34:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=Q5OiaR2v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297154-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297154-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=XE6BTqkM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297156-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297156-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B5F8F30C1093
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:13:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E85F30C6D8D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F36379C47;
-	Tue,  9 Jun 2026 16:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BB03B6C12;
+	Tue,  9 Jun 2026 16:20:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B535436D50D
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 16:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD843EDAB8
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 16:20:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781021590; cv=none; b=L6z/42f+6UhhbPAKt5IQanVhov0/Ce2b5zgVj+rca8TQJpNec9vWO6AhQRB5JCvm5jvB2ANdrcnpS6ZJcYSyCEgxtfpr1NHho9RX4K3udj7W+aLHornB5s3OYF9ZimQBNS6doNhGVNzGg60TFaZozgK3mYVty2Pdo2HPHctGyzM=
+	t=1781022015; cv=none; b=tXprApwr1ev6cykiZN5d41fmc9e6KdxmbaNclnXrXgtHOyxsoq8G8Ja/K0u5GxI4azV76CZkqB43RFxvX8eyhJEsdEJuaRFsKmTTa6GChx1o5ivwogM63Z2sBE2XXQppugnijfhy2ebHthHG7WYpa/fTXcihU4Q7zdEwp9GwXOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781021590; c=relaxed/simple;
-	bh=yOUFwU6jGqwKgoWV8t5gJ5vJTjesKPNgL57U36ItkqQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=luQe7yvNCoJ935FkvuSQRgFQH9wqs+Q0cJ0Z84I2vWTMNI3zaaT/LwqJ59m7u01/sgLcSLm/7iaMiEVNLnkhZo4v+ddQ9KIWoSIHfCeulD8NMi2qn1KK8zVcoeG0VIkXaP2ie97dvIANyt3lUXfQBrbmBkUdfuDUUk0I1+i3Okw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q5OiaR2v; arc=none smtp.client-ip=74.125.224.74
-Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-660555be5a0so8946620d50.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:13:08 -0700 (PDT)
+	s=arc-20240116; t=1781022015; c=relaxed/simple;
+	bh=Y0KkT+q8geByKfhlS7zKu7ViKUzzGvj3gP3iqgcc3vQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Pj5vXt+/zto7K1ons7HKbjqYPBxPHiH9VzTwuhRm/j3m4Hta8gsqtZnjv1thTZ3PMrpATDn4goihqsnS/uJSuwn5Lp2WEg/bLVcwdUN2Pw0HuD8uBOC+IMXni5BgH5JtO90cehOd7U0N1cPo9uMSKCIiFGrQHwhXsHZEyRvAypg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XE6BTqkM; arc=none smtp.client-ip=209.85.128.54
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4908b92904fso65792105e9.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781021588; x=1781626388; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cfs5PoZPmvtaZiUzkuEyf2bguIKUg1RpeUpLUfcea4s=;
-        b=Q5OiaR2v+tw+llRwXcdKOn/W1H3BaAYThJbAHxh73clopwEs+0J3Cy5CT5w1+97xcW
-         nyVx/2sSQykmJY+NYW+eGU6BKyvnRiFf1yYwyD6eWv4OS+HO5wiJ1DLkyKBMTtln258I
-         zQuLXm8xDrtnDv/JobKCWAPwHFxVybnTmgeuLIWY5N/kjea9puaXRo6a4MzVCCHnooIj
-         g+UJWv0aHL7WagelFoERf39mout/eKQ3f9opk9oqCrYEGSwpsyo18AdisjvOpxYfNKp5
-         ZUHXw/vQcDE+lQ3l+jlP7dnGOU0ALXASQz3zky1Mn1jfSj7242nYR/wRlCJinyRqro0L
-         jLLQ==
+        d=gmail.com; s=20251104; t=1781022011; x=1781626811; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJJFmXKdltcOKHe83Fb4sYqMYC7/AyrDhk+Jja8PbdI=;
+        b=XE6BTqkMuNYB3EChNkq8URljKH3/Fx5koEHt1x+n/y1g0+AwizMSTchounPGEnnAGV
+         polNMFwI8DlaLrh/yvEwzTLkMZlPCfPK8uPsM5Y59ugtpxHS+B8OKzfLUngn2ZuR/VIG
+         TlIA8RQ8JXlSyc5/QCiRCRajJK5o69CVTA4XFGtARHve7uEPFo4u1lNP5/SKWNZ5ExcM
+         eLBC7m6N33koAwpV9nUf899Sb0t5dB6OGvc93yX3fqV3y+gep2NwYJqbohmrpBascvBs
+         7MJNotietkc84SsA4shI2FZewvRh///fsQ1yRilO2NyNMDsmyxxHy2rdRAvj9UOilyBR
+         W/ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781021588; x=1781626388;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cfs5PoZPmvtaZiUzkuEyf2bguIKUg1RpeUpLUfcea4s=;
-        b=TiqEqbuc02BXjxuU6C9UuY/X5n29qS5aJNhFNcibFrqB4S4ZKomHLSQO/i361HxzRK
-         PYf9GylUYUrNGi9Z1mZJ792H4Q+f8hKP6bjaM1noEAGVvm930v9l9FVvCupPC8C4mUj4
-         Dv4JJ6A0GUf/lAaICVsyofwodUYDgm+Qe2M3BLTJ3KpWc2lqwBByqCCfzPT5UZV6WLO1
-         fFXFMy7o3hoZsO22eutY1ccYtZIh/uXkeFkW4L3GKwS/2zKHtw1k/KiSX5s4M023zt4M
-         YMwDg/e0UGE/FD7QJjbA2lcZbcBrAIPnXOeOoeovmxqxEt384Xds4zCBfl/i+C1C/H0s
-         qTEg==
-X-Forwarded-Encrypted: i=1; AFNElJ/UFvlHCPMbNsZod5cEgkLC+ICBDSZTWLz/xYnXTcx1Mi5Pr3vpcn1SGLZmunsXzT8skqqswYA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3EtQpSwpBHM7mVlvDbvinMrszGEFll7dEViBX7qudJOaWMev6
-	/dy3Bqe+fHSdEJJ7mn+DyGqvafidSZGTfFMy3StGR/mBR8eUGf/NZdqQwiJh/vxuXUWX8XFchnI
-	ekR8jQNUqJ15C6A==
-X-Received: from qvlh12.prod.google.com ([2002:a0c:f40c:0:b0:8ce:c42e:f14a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690e:120a:b0:661:37ed:647b with SMTP id 956f58d0204a3-66137ed65famr9013922d50.14.1781021587493;
- Tue, 09 Jun 2026 09:13:07 -0700 (PDT)
-Date: Tue,  9 Jun 2026 16:13:05 +0000
+        d=1e100.net; s=20251104; t=1781022011; x=1781626811;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WJJFmXKdltcOKHe83Fb4sYqMYC7/AyrDhk+Jja8PbdI=;
+        b=etHI+MTaDo1DUy65bDO8nLJYsxV62afVzLX91/WcT3zdwlxVkSOC3SAVn9h2lyvQAA
+         NTPISPbms2cuPY3fsN0o0Xjk8yhjK4+odWbYpG6QykPGGHU0DHfo6dbPtqaSi3XxYFFu
+         rTiMLp19vTBIsZM9qxWVxO1XPJw5T6LQXbyrKXyqmVC1HnXE98pZBvRi+ZQ6Ib3YDA7Z
+         GLq0eitP6SR8FrCmiaF2ZdtWH4+IEDcpdLrZaGutyDB7bcfbg9kAYcxG6YBXgKX4GTn5
+         cWHNyF4TClG4IwYwjJ5gE96A4Y9wwek79o8wN4MbbzxqfQDhIY0U6q51heCHOPIZjqSE
+         JkJQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+edyqjPGRT8R8MNCHyDjE7cKI9we0z2foRxvbextUla/D2jLwg/uU+IvgjG2+iTEqlBTX6DHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/eqZQj8XIFc3K6ypmtJNIN+ryC7V9Uyholfa6w7iMhupOF87j
+	FMzy2RC3vEw90+L8/q07GsYNBlO7UMZFOxom5DRK+Bqb/6r1hpXeO3kg
+X-Gm-Gg: Acq92OG1GB8sTLT+w2mtQp6ufsP74MKy9B1fKuh6B/hldIS1EYI6WNbApo3QTRvjBtr
+	xlhwfziXlZcpnuYhZ3wHrEzcFa8BbNwr5/ztTDZ3mHd5BDfFB7BlrwC+ihU+nsJohLh2D9oZy9r
+	fNgsz5yTWbPCGzdz+dTEblQfiUC5fUtoytyql0cmguQezMUcAGyXTgwUSFmLuZV96TI/0DylOKH
+	dq60yuuDqgqdWZFkM1Hx3hgb2ZAOWW1Z0wNtErErof3tcESCSVijKhTqiIXpOgSemn3T2Y+Lw3+
+	VnZbpaTxJFBsBIPMDbXLNj6jU1isGLT8ubbWfPYCv8viD1zDq5aSiPRWzZ6QRMvXwb+uGgG4im2
+	NeG48WLgyc6pBBiy9LB3AxyytvazGoBJdX7Lhtw9CHFc4fvTXhZEPCO7yEym1Y3EXS+0tsUQ1CK
+	OIKr8qj/mo+BZMIJ4VWPV2aL3rUctajIMqYhOThug1BzWfxGzIlVTIxngTo5Kp/6xi2DJd/4pqX
+	1QuSrprHuzaKvblbVsiZW0NnCqGi7g=
+X-Received: by 2002:a05:600c:3107:b0:490:9588:bdb6 with SMTP id 5b1f17b1804b1-490c264cc2emr354168145e9.33.1781022011172;
+        Tue, 09 Jun 2026 09:20:11 -0700 (PDT)
+Received: from [127.0.1.1] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc391aaasm569116365e9.1.2026.06.09.09.20.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 09:20:10 -0700 (PDT)
+From: Fidelio Lawson <lawson.fidelio@gmail.com>
+X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
+Subject: [PATCH net-next v10 0/3] ksz87xx: add support for low-loss cable
+ equalizer errata
+Date: Tue, 09 Jun 2026 18:19:54 +0200
+Message-Id: <20260609-ksz87xx_errata_low_loss_connections-v10-0-9ba4418cf3db@exotec.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
-Message-ID: <20260609161305.3186102-1-edumazet@google.com>
-Subject: [PATCH v2 net] net: watchdog: fix refcount tracking races
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com, 
-	syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIACo9KGoC/53R207EIBAG4FcxXIsZBsrBK9/DmA1QcOuhNaXW6
+ mbf3dnVZGt6Q7zggsN8/wAHVtLYpcJurw5sTHNXuqGniYDrKxb3vn9MvGtpgSGgBomSP5cva5Z
+ ll8bRT373MnzQKGUXh75PcaL6woNuktEJgwLJSHobU+6Wc8w969PE+7RM7OFnp7yHJyo8hZzO7
+ rsyDePnuaNZnCt+s3VV9iw4cOO8djYrqVHfpWWYUryJw+s5csYLqsDWocgFdzEnabUTRsgNKle
+ oUHWopE6BSGmjdza6DarWqKlDFaE6GlAqRbr/ttPmgjbQ1KENoa1XABhQRIUbVK9QhDpUE6pkl
+ rJV3mfIG9Ss0co3NYSK2Cr6LI8qwwa1F1SDqEMtoeQJwJg1xi3q/oE6QnMbQhBN4zCGP+jxePw
+ GSgbtopwDAAA=
+X-Change-ID: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Marek Vasut <marex@denx.de>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Tristram Ha <Tristram.Ha@microchip.com>
+Cc: Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Nicolai Buchwitz <nb@tipi-net.de>, 
+ Fidelio Lawson <fidelio.lawson@exotec.com>, 
+ Marek Vasut <marex@nabladev.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781022010; l=6595;
+ i=fidelio.lawson@exotec.com; s=20260326; h=from:subject:message-id;
+ bh=Y0KkT+q8geByKfhlS7zKu7ViKUzzGvj3gP3iqgcc3vQ=;
+ b=h3P6hO0M2P3TOTr4RdOSDDg6xi+LXfvmXkAFvhDZ9TvLMAogqWwfsfM9+iqnDwIHccNKQ+UF2
+ sXOtCffKQBMBFDuGXAcMvL3EV/IIl+Qg+D6VXwpBmzMKjrRmcuCywXo
+X-Developer-Key: i=fidelio.lawson@exotec.com; a=ed25519;
+ pk=866eH9Bmmpjc+ctgkr5T1uXxBefZzob3tEEuiVWZ6BI=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_RECIPIENTS(0.00)[m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:marex@denx.de,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:Tristram.Ha@microchip.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nb@tipi-net.de,m:fidelio.lawson@exotec.com,m:marex@nabladev.com,s:lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297154-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com,m:syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-297156-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,381d82bbf0253710b35d,3479efbc2821cb2a79f2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7565B66249C
+X-Rspamd-Queue-Id: 9AD746626D1
 
-Blamed commit converted the untracked dev_hold()/dev_put() calls
-in the watchdog code to use the tracked dev_hold_track()/dev_put_track()
-(which were later renamed/interfaced to netdev_hold() and netdev_put()).
+Hello,
 
-By introducing dev->watchdog_dev_tracker to store the
-reference tracking information without adding synchronization
-between netdev_watchdog_up() and dev_watchdog(), it enabled the
-race condition where this pointer could be overwritten or freed
-concurrently, leading to the list corruption crash syzbot reported:
+This patch implements the KSZ87xx short cable erratum
+described in Microchip document DS80000687C for KSZ87xx switches
+and the following support article:
 
-list_del corruption, ffff888114a18c00->next is NULL
- kernel BUG at lib/list_debug.c:52 !
-Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-CPU: 1 UID: 0 PID: 91 Comm: kworker/u8:5 Not tainted syzkaller #0 PREEMPT(lazy)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
-Workqueue: events_unbound linkwatch_event
- RIP: 0010:__list_del_entry_valid_or_report.cold+0x22/0x2a lib/list_debug.c:52
-Call Trace:
- <TASK>
-  __list_del_entry_valid include/linux/list.h:132 [inline]
-  __list_del_entry include/linux/list.h:246 [inline]
-  list_move_tail include/linux/list.h:341 [inline]
-  ref_tracker_free+0x1a7/0x6c0 lib/ref_tracker.c:329
-  netdev_tracker_free include/linux/netdevice.h:4491 [inline]
-  netdev_put include/linux/netdevice.h:4508 [inline]
-  netdev_put include/linux/netdevice.h:4504 [inline]
-  netdev_watchdog_down net/sched/sch_generic.c:600 [inline]
-  dev_deactivate_many+0x28c/0xfe0 net/sched/sch_generic.c:1363
-  dev_deactivate+0x109/0x1d0 net/sched/sch_generic.c:1397
-  linkwatch_do_dev net/core/link_watch.c:184 [inline]
-  linkwatch_do_dev+0xd3/0x120 net/core/link_watch.c:166
-  __linkwatch_run_queue+0x3a5/0x810 net/core/link_watch.c:240
-  linkwatch_event+0x8f/0xc0 net/core/link_watch.c:314
-  process_one_work+0xa0e/0x1980 kernel/workqueue.c:3314
-  process_scheduled_works kernel/workqueue.c:3397 [inline]
-  worker_thread+0x5ef/0xe50 kernel/workqueue.c:3478
-  kthread+0x370/0x450 kernel/kthread.c:436
-  ret_from_fork+0x69a/0xc80 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+Link: https://support.microchip.com/s/article/Solution-for-Using-CAT-5E-or-CAT-6-Short-Cable-with-a-Link-Issue-for-the-KSZ8795-Family
 
-This patch has three coordinated parts:
+According to the erratum, the embedded PHY receiver in KSZ87xx switches is
+tuned by default for long, high-loss Ethernet cables. When operating with
+short or low-loss cables (for example CAT5e or CAT6), the PHY equalizer may
+over-amplify the incoming signal, leading to internal distortion and link
+establishment failures.
 
-1) Zero tracker on free:
-   Modify netdev_tracker_free() to poison the tracker pointer after freeing.
-   This helps detect and avoid double frees.
+Microchip documents two independent mechanisms to mitigate this issue:
+adjusting the receiver low‑pass filter bandwidth and reducing the DSP
+equalizer initial value. These registers are located in the switch’s
+internal LinkMD table and cannot be accessed directly through a
+stand‑alone PHY driver.
 
-2) Remove netdev_watchdog_up() call from netif_carrier_on():
-   This ensures netdev_watchdog_up() is only called from process/BH context
-   (via linkwatch workqueue dev_activate()), allowing us to use
-   spin_lock_bh() for synchronization.
+To keep the PHY‑facing API clean, this series models the erratum handling
+as vendor‑specific Clause 22 PHY registers, virtualized by the KSZ8 DSA
+driver. Accesses are intercepted by ksz8_r_phy() / ksz8_w_phy() and
+translated into the appropriate indirect LinkMD register writes. The
+erratum affects the shared PHY analog front‑end and therefore applies
+globally to the switch.
 
-3) Synchronize watchdog up and watchdog timer:
-   Protect netdev_watchdog_up with tx_global_lock.
-   Only allocate a new tracker in netdev_watchdog_up() if one is
-   not already present.
-   In dev_watchdog(), keep the lock held while calling netdev_put()
-   to avoid races with concurrent netdev_watchdog_up().
-   In dev_watchdog(), ensure we don't release the tracker if the
-   timer was rescheduled either by dev_watchdog() itself or concurrently
-   by netdev_watchdog_up().
+Based on review feedback, the user‑visible interface is kept deliberately
+simple and predictable:
 
-Fixes: f12bf6f3f942 ("net: watchdog: add net device refcount tracker")
-Reported-by: syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6a26b751.c25708ab.1b19ef.0013.GAE@google.com/T/#u
-Tested-by: syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+- A boolean “short‑cable” PHY tunable applies a documented and
+  conservative preset (LPF bandwidth 62MHz, DSP EQ initial value 0).
+  This is the recommended KISS interface for the common short‑cable
+  scenario.
+
+- Two additional integer PHY tunables allow advanced or experimental
+  tuning of the LPF bandwidth and the DSP EQ initial value. These
+  controls are orthogonal, have no ordering requirements, and simply
+  override the corresponding setting when written.
+
+The tunables act as simple setters with no implicit state machine or
+invalid combinations, avoiding surprises for userspace and not relying
+on extended error reporting or netlink ethtool support.
+
+This series contains:
+
+  1. Support for the KSZ87xx low‑loss cable erratum in the KSZ8 DSA driver,
+     including the short‑cable preset and orthogonal tuning controls.
+
+  2. Addition of vendor‑specific PHY tunable identifiers for the
+     short‑cable preset, LPF bandwidth, and DSP EQ initial value.
+
+  3. Exposure of these tunables through the Micrel PHY driver via
+     get_tunable / set_tunable callbacks.
+
+This version follows the design agreed upon during v3 review and
+reworks the interface accordingly.
+
+This series is based on net-next.
+
+Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
 ---
-v2: fix compile error when CONFIG_NET_DEV_REFCNT_TRACKER is not set (Jakub and build bots)
+Changes in v10:
+- Switch PHY tunables from u8 to u32, as they are part of the global UAPI
+- Link to v9: https://patch.msgid.link/20260601-ksz87xx_errata_low_loss_connections-v9-0-fdbbb15592cb@exotec.com
 
- include/linux/netdevice.h |  7 ++++++-
- net/sched/sch_generic.c   | 28 +++++++++++++++++-----------
- 2 files changed, 23 insertions(+), 12 deletions(-)
+Changes in v9:
+- Drop incorrect Fixes tag
+- Fix typo in comment
+- Link to v8: https://patch.msgid.link/20260601-ksz87xx_errata_low_loss_connections-v8-0-cfa102cf62c0@exotec.com
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 0e1e581efc5ac264259b2f0fdfe41c50a6f47239..fb9f7cee1d29de5367ea902d352296f952525c57 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4488,7 +4488,12 @@ static inline void netdev_tracker_free(struct net_device *dev,
- 				       netdevice_tracker *tracker)
- {
- #ifdef CONFIG_NET_DEV_REFCNT_TRACKER
--	ref_tracker_free(&dev->refcnt_tracker, tracker);
-+	if (!tracker) {
-+		ref_tracker_free(&dev->refcnt_tracker, NULL);
-+	} else if (!IS_ERR(*tracker)) {
-+		ref_tracker_free(&dev->refcnt_tracker, tracker);
-+		*tracker = ERR_PTR(-EEXIST);
-+	}
- #endif
- }
- 
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index a93321db8fd75d30c61e146c290bbc139c37c913..55327448dccf6b2ed2b892043360c2f98178bd87 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -568,16 +568,18 @@ static void dev_watchdog(struct timer_list *t)
- 				dev->netdev_ops->ndo_tx_timeout(dev, i);
- 				netif_unfreeze_queues(dev);
- 			}
--			if (!mod_timer(&dev->watchdog_timer,
--				       round_jiffies(oldest_start +
--						     dev->watchdog_timeo)))
--				release = false;
-+			mod_timer(&dev->watchdog_timer,
-+				  round_jiffies(oldest_start +
-+						dev->watchdog_timeo));
-+			release = false;
- 		}
- 	}
--	spin_unlock(&dev->tx_global_lock);
--
-+	if (timer_pending(&dev->watchdog_timer))
-+		release = false;
- 	if (release)
- 		netdev_put(dev, &dev->watchdog_dev_tracker);
-+
-+	spin_unlock(&dev->tx_global_lock);
- }
- 
- void netdev_watchdog_up(struct net_device *dev)
-@@ -586,10 +588,16 @@ void netdev_watchdog_up(struct net_device *dev)
- 		return;
- 	if (dev->watchdog_timeo <= 0)
- 		dev->watchdog_timeo = 5*HZ;
-+	spin_lock_bh(&dev->tx_global_lock);
- 	if (!mod_timer(&dev->watchdog_timer,
--		       round_jiffies(jiffies + dev->watchdog_timeo)))
--		netdev_hold(dev, &dev->watchdog_dev_tracker,
--			    GFP_ATOMIC);
-+		       round_jiffies(jiffies + dev->watchdog_timeo))) {
-+#ifdef CONFIG_NET_DEV_REFCNT_TRACKER
-+		if (IS_ERR_OR_NULL(dev->watchdog_dev_tracker))
-+#endif
-+			netdev_hold(dev, &dev->watchdog_dev_tracker,
-+				    GFP_ATOMIC);
-+	}
-+	spin_unlock_bh(&dev->tx_global_lock);
- }
- EXPORT_SYMBOL_GPL(netdev_watchdog_up);
- 
-@@ -614,8 +622,6 @@ void netif_carrier_on(struct net_device *dev)
- 			return;
- 		atomic_inc(&dev->carrier_up_count);
- 		linkwatch_fire_event(dev);
--		if (netif_running(dev))
--			netdev_watchdog_up(dev);
- 	}
- }
- EXPORT_SYMBOL(netif_carrier_on);
--- 
-2.54.0.1064.gd145956f57-goog
+Changes in v8:
+- Clarify LPF/DSP EQ register definitions based on Microchip support article
+- Make short-cable preset reversible by restoring default settings when disabled
+- Link to v7: https://patch.msgid.link/20260524-ksz87xx_errata_low_loss_connections-v7-0-1cd49cfa24f0@exotec.com
+
+Changes in v7:
+- Rebased on net-next/main
+- Link to v6: https://patch.msgid.link/20260520-ksz87xx_errata_low_loss_connections-v6-0-43f33d4aaf0f@exotec.com
+
+Changes in v6:
+- Nitpicks corrections
+- Link to v5: https://patch.msgid.link/20260505-ksz87xx_errata_low_loss_connections-v5-0-da4002b21c42@exotec.com
+
+Changes in v5:
+- Added Fixes tag
+- Added validation to ensure that only the documented bitfields are accepted before writing the registers
+- Link to v4: https://patch.msgid.link/20260417-ksz87xx_errata_low_loss_connections-v4-0-6c7044ec4363@exotec.com
+
+Changes in v4:
+- Reworked the user‑visible API to a boolean short‑cable preset plus
+  orthogonal advanced tunables, following the KISS principle.
+- Dropped the previous mode‑selector semantics in favor of simple
+  setters with no ordering requirements
+- Added persistent tracking of LPF bandwidth and EQ initial value.
+- Clarified defaults and preset values to match Microchip documentation.
+- Link to v3: https://patch.msgid.link/20260414-ksz87xx_errata_low_loss_connections-v3-0-0e3838ca98c9@exotec.com
+
+Changes in v3:
+- Exposed all LPF bandwidth values supported by the hardware.
+- Added phy tunable.
+- Link to v2: https://patch.msgid.link/20260408-ksz87xx_errata_low_loss_connections-v2-1-9cfe38691713@exotec.com
+
+Changes in v2:
+- Dropped the device tree approach based on review feedback
+- Modeled the errata control as a vendor-specific Clause 22 PHY register
+- Added KSZ87xx-specific guards and replaced magic values with named macros
+- Rebased on Linux v7.0-rc1
+- Link to v1: https://patch.msgid.link/20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com
+
+To: Woojung Huh <woojung.huh@microchip.com>
+To: UNGLinuxDriver@microchip.com
+To: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Marek Vasut <marex@denx.de>
+To: Tristram Ha <Tristram.Ha@microchip.com>
+To: Simon Horman <horms@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+To: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Fidelio Lawson (3):
+      net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
+      net: ethtool: add KSZ87xx low-loss cable PHY tunables
+      net: phy: micrel: expose KSZ87xx low-loss cable tunables
+
+ drivers/net/dsa/microchip/ksz8.c       | 89 ++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/microchip/ksz8_reg.h   | 23 ++++++++-
+ drivers/net/dsa/microchip/ksz_common.h |  4 ++
+ drivers/net/phy/micrel.c               | 61 +++++++++++++++++++++++
+ include/uapi/linux/ethtool.h           |  3 ++
+ net/ethtool/common.c                   |  3 ++
+ net/ethtool/ioctl.c                    |  7 +++
+ 7 files changed, 189 insertions(+), 1 deletion(-)
+---
+base-commit: c2c0486c56800ce276e79c40a6e576ffd672f2a9
+change-id: 20260323-ksz87xx_errata_low_loss_connections-b65e76e2b403
+
+Best regards,
+--  
+Fidelio Lawson <fidelio.lawson@exotec.com>
 
 
