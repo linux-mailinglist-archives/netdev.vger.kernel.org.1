@@ -1,194 +1,200 @@
-Return-Path: <netdev+bounces-297326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xfSFAEWQKGpBGQMAu9opvQ
-	(envelope-from <netdev+bounces-297326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:14:29 +0200
+	id nHACEeCQKGpVGQMAu9opvQ
+	(envelope-from <netdev+bounces-297327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:17:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C866647C1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:14:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 977646647E8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:17:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=KacxR+J1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297326-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297326-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=NiPiqv1d;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297327-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297327-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1DB363074022
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:09:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1697A3039C90
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCFEB3101A5;
-	Tue,  9 Jun 2026 22:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E013735203D;
+	Tue,  9 Jun 2026 22:14:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E0B40D58C;
-	Tue,  9 Jun 2026 22:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9868A376A06
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:14:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042994; cv=none; b=Y7kjwGADViHJUgK0ihXc7sVtFBG9xAcrR86dEa9SYWIK+GivkAEUu+Xc069xrpBn4afmiOQFWE9SmGgZZgckK2IQ8vMrKIO5rCWAACsd6REJh43ziTuevFTcqaSuxml6099H7R+vaVStKKptOM2OZiMr1vb1vdoZ0Mn8ssg7VLI=
+	t=1781043272; cv=none; b=jG61QUvT4iAjZQLbK26ngSLVVgQnBPkHrpL4pewqak7p9ldt+jm5sr6/AhCIIH/S2dhRiSwYB7Yc/tuDmrGxBjjnVnZGh8iPJ4H6RLHSy98fk3RzxM+TtaLfH4MjQtfxhWWCTs/tQShAteR5BEnMWNVeWogAWJyFxWeOd9J31KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042994; c=relaxed/simple;
-	bh=aGX43GLxABFD4Cw0kwGvpjCU9UIDXIDWToEW4v4zKAg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WhjKXbZ1zEHaQMEVxA1JJTgNz2ysKUcJa/6oCuYEVxemfhjR3KH8L3QYblW3iSWHI153/g4/NRO0we8F8ccF8o2lL2mTQmrCYXRg/yoJHODEivX6sSuB2sV0s1o1lxxu/8A2BzzW6axxWnAjWArTvIYsIylky+0s8aLsHryGbiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KacxR+J1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 62B73C2BCB4;
-	Tue,  9 Jun 2026 22:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781042994;
-	bh=aGX43GLxABFD4Cw0kwGvpjCU9UIDXIDWToEW4v4zKAg=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=KacxR+J1UdY18lxKFc6V9u5KWLyh7o30Q5jNVTGILQ2bXBuhAbDYnNVn1oqciC/p6
-	 LSdEk5p2fRA2IibFElbY2nf/jt3OWT+bgWITdK0NEs5GukQvgVhcLJJrfEnK22d3Pa
-	 o9dCrFKIzbchGtILEfALjgd4VXyPHCUqJx2FUWJR/r+fgGvSOve7/GBJOD3LaCv8pb
-	 4IZs9TjZVH1wZzfmgfyr2GAKlJywAjlxYoAGoyD/V7QdrdtUxSdx99+PwRtMMarALC
-	 nb8ScAM8pzMmiVxv1vLSqS13Z8DQhunJXgwfDNJJi5j4e/MM9jc7s952xwwhp6dl/5
-	 50oPmjhuKn2Jg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BCCCD8CB2;
-	Tue,  9 Jun 2026 22:09:54 +0000 (UTC)
-From: Simon Baatz via B4 Relay <devnull+gmbnomis.gmail.com@kernel.org>
-Date: Wed, 10 Jun 2026 00:09:24 +0200
-Subject: [PATCH net-next] tcp: tighten the FIN exception in tcp_sequence()
+	s=arc-20240116; t=1781043272; c=relaxed/simple;
+	bh=LZcwby4Bb4TbDeDCNMBVA4quxqqIh6MKQHqvVIwT790=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XoGPbLSppJWJm+aEhrrEemxlCshC7JldImBz3DWWdIOOAEiAl2lXnoPjd4Md+Y+Rx7LlT8UjmmI9QBO8g01qNuuYkTlbUgQsXhy7/+lOsLrT7YH/vIdCAI3Meug4KooNvdwlDj4ge1vO4gB5CJs3ufIzy8C/510T8meHRe9CbcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NiPiqv1d; arc=none smtp.client-ip=209.85.222.169
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-9158c621ebbso707585585a.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:14:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781043270; x=1781648070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kXKq1m53vG14SwgeaJGnhYHB5gI7npB3nTQR+Cx4Mk=;
+        b=NiPiqv1dhqn/nToBop9CuV3dk4QxAVppUW2OLSvNQywJ4fuYAKRuwrZPfsVD467VGq
+         Evu29cWgrphWcBiQvil0OrOFcxBCJrIshempS0aoSfqe/WjlL71+uWn2sxp6q4yNWyWP
+         bHzuWLxLsx8rs4Iy6Nz6Oug30VYoANYoUbaSY4kJYQbyjjIFCoZbjVwebFwxG/TYx6a3
+         fbb9rknh0pMtSFWluV0/7vmVoYmme9Aom6DsoHR/18zxQC8K3bmvOpz6PNcpwEUJHvNL
+         /+cHfdITLlZV0VHqbLjWLEF1ti8wLB7+j1oTOvGzuWNp8RFOtwkYhnECX528ZpMhNCet
+         L16Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781043270; x=1781648070;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8kXKq1m53vG14SwgeaJGnhYHB5gI7npB3nTQR+Cx4Mk=;
+        b=mQB6KRyJyMrHriwRsLX04gepRz4sYtoHDfUmoOIh9YzLiqwPlPvC1nbNPiyNCLVMbb
+         tlRYfpgOPOXmCzikdkFhQRF9AbR+Vzbcbb68MReUHQ57pmRaYb1tj+I0fbGkASxbgl6S
+         WvPhG79m4CyRBkFAFm4bxR4zvE4IKz3QsvPrJYhXm4S4SHOrxWklmqKZ9UFAsUwS6cF/
+         6V8pqwDwCvjT8TF7HKgeWgIvkpcY0EY0ehee0JDicjVlPwKTm5tw/2ZBPW81q6wdtS4x
+         Zf2D4WR7RpkPcHXS6Z9/hw7D0h6hrq7VNLnxJWktZoT+jGFvk8Eb1szHl+UzauPcgoFw
+         OgGA==
+X-Gm-Message-State: AOJu0Yw+NsIGs+Bz6YLiJ/16wgx383qw9Mtqv1r96DA7NUi6o0qtdTIN
+	aq/ehxpydXNngAUhoLTnHVX7L2jYpruieEottGF24eMktt3INDSzi5sr8q5W4w==
+X-Gm-Gg: Acq92OHo5Wl2uScwAB7S2TTJ+qREh6+SHv3BWozN502jOeYNVmEjjra3O9o6hLVrd6H
+	qhH+g3HN6VEVcmbF3WYDAvSh/l6tpbUttV5Tac90eGet+Qp+54/7CjJ6VHHCuo/oWyaTH9RHI0Z
+	fpjtR2xTiTiaUZAAfHc/9O9Cu+h1Q9Ai4YUMv5urxk/e7WqjiPqovgtXbjnzcJZkvBZeyl3q2pX
+	HfUR/0sINoqpIMwSCdy6vhPzfV+EAmqMovOdDW9ejA1VX0avqTYj6i4e8IQ45xP1irC4o6dGaae
+	byNBhvSqorQVHsWnw5jayhDfaoeYTng/7FQDfQrrowe/v8THmf2NbS2IUe5zujqzSWO117xQ75y
+	eBfba/IFvTgtWivY8oSleshVM9wdVmZktNDpL1hv26nBGbduXZS5Qbvl1H9geRW2KESXGwEJQJL
+	TymYV/bUe5FbD8l/5Qu2TfboowXlllp3T1TLBNP3NNjBOXHD+n4QCeMCWGbPFnTaFAD9bNrbMXF
+	OPidml5z7vyB/82H94gdGvI3wgntgofzUcC8EM5b8FQ3IHGnvpm5fpRFtcMyyON2RBf0VEK+IZV
+X-Received: by 2002:a05:620a:4107:b0:915:98e9:2c1 with SMTP id af79cd13be357-915a9d76317mr3631128985a.32.1781043270404;
+        Tue, 09 Jun 2026 15:14:30 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9158a2465e7sm2275354885a.19.2026.06.09.15.14.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 15:14:29 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net] sctp: validate embedded address parameter length
+Date: Tue,  9 Jun 2026 18:14:28 -0400
+Message-ID: <7838b86b69f52add28808fb59034c8f992e97b2d.1781043268.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260610-tcp_fin_more_restrictive-v1-1-eefc30d7ddd8@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQrCMBBG4auUWRuIhcboVURCHf/qLJyWyVAKp
- Xc3uPwW7+1UYYJKt24nwypVZm04nzriz6hvBHk1Ux/7FFO8BuelTKLlOxuKoboJu6wIw5NzzMg
- XTiO1fDFMsv3Xd1J4UGxOj+P4AYwg7It0AAAA
-X-Change-ID: 20260609-tcp_fin_more_restrictive-5bc808e87c6a
-To: Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Simon Baatz <gmbnomis@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781042993; l=2714;
- i=gmbnomis@gmail.com; s=20260220; h=from:subject:message-id;
- bh=HFJpmhvgg3ixgB987Rc4iByrE21jxx8pxIpyevnMWns=;
- b=oPIv0XjKVR3yitOO56CyKcAknTDLI7cGqko7IbwwKp6boB19KAYKEyY8XjItrgE8aABtGgKCQ
- uY0fEuvtzRFBwUZexKYbxD5T480b4rYFou8IYtfVDKh8r+IH0b2Qj74
-X-Developer-Key: i=gmbnomis@gmail.com; a=ed25519;
- pk=T/JIz/6F5bf1uQJr69lmyi7czVG+F9TVZ/8x5z9Wtqw=
-X-Endpoint-Received: by B4 Relay for gmbnomis@gmail.com/20260220 with
- auth_id=641
-X-Original-From: Simon Baatz <gmbnomis@gmail.com>
-Reply-To: gmbnomis@gmail.com
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gmbnomis@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297326-lists,netdev=lfdr.de,gmbnomis.gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[gmbnomis@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297327-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 43C866647C1
+X-Rspamd-Queue-Id: 977646647E8
 
-From: Simon Baatz <gmbnomis@gmail.com>
+sctp_verify_asconf() and sctp_verify_param() only validate ADD_IP, DEL_IP,
+and SET_PRIMARY parameters against a fixed minimum size of sizeof(struct
+sctp_addip_param) + sizeof(struct sctp_paramhdr). This ensures the outer
+parameter is large enough to contain an embedded address parameter header,
+but does not verify that the embedded address parameter's declared length
+fits within the bounds of the outer parameter.
 
-Commit 1e3bb184e941 ("tcp: re-enable acceptance of FIN packets when
-RWIN is 0") added a special case in tcp_sequence() to mirror the FIN
-exception in tcp_data_queue(), which accepts bare in-order FINs even
-when the advertised window is zero. That behavior is not
-RFC-compliant, but was introduced in commit 2bd99aef1b19 ("tcp: accept
-bare FIN packets under memory pressure") to break tight FIN/ACK loops
-caused by broken clients.
+Later, sctp_process_param() and sctp_process_asconf_param() extract the
+embedded address parameter and pass it to af->from_addr_param(), which uses
+the address parameter length to parse the variable-length address payload.
+A malformed peer can therefore advertise an embedded address parameter
+length that exceeds the remaining bytes in the enclosing parameter.
 
-However, the condition added by commit 1e3bb184e941 ("tcp: re-enable
-acceptance of FIN packets when RWIN is 0") is broader than required
-and allows other non-compliant packets as well.
+Validate that addr_param->p.length does not exceed the space available
+after the sctp_addip_param header before processing the embedded address
+parameter. Reject malformed parameters when the embedded address length
+extends beyond the enclosing parameter bounds.
 
-Tighten the tcp_sequence() FIN exception to only allow packets where
-the packet is a bare in-order FIN and only the FIN flag extends beyond
-tcp_max_receive_window(). In particular, this exception is only
-reachable if tcp_max_receive_window() is zero. Otherwise the packet is
-already accepted by the normal sequence check.
+This prevents out-of-bounds reads when parsing malformed parameters carried
+in INIT or ASCONF processing paths.
 
-The existing packetdrill test tcp_rcv_zero_wnd_fin.pkt exercises this
-behavior already and does not need to be changed.
-
-Signed-off-by: Simon Baatz <gmbnomis@gmail.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: sashiko <sashiko-bot@kernel.org>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
- net/ipv4/tcp_input.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ net/sctp/sm_make_chunk.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index ab7a4e5435a8..1eddae246963 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4812,18 +4812,21 @@ static enum skb_drop_reason tcp_sequence(const struct sock *sk,
- 					 const struct tcphdr *th)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
-+	u32 seq_limit;
+diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
+index 85264862fb6b..40ce2cea7b53 100644
+--- a/net/sctp/sm_make_chunk.c
++++ b/net/sctp/sm_make_chunk.c
+@@ -2636,6 +2636,9 @@ static int sctp_process_param(struct sctp_association *asoc,
+ 			goto fall_through;
  
- 	if (before(end_seq, tp->rcv_wup))
- 		return SKB_DROP_REASON_TCP_OLD_SEQUENCE;
+ 		addr_param = param.v + sizeof(struct sctp_addip_param);
++		if (ntohs(addr_param->p.length) >
++		    ntohs(param.p->length) - sizeof(struct sctp_addip_param))
++			break;
  
--	if (unlikely(after(end_seq, tp->rcv_nxt + tcp_max_receive_window(tp)))) {
--		/* Some stacks are known to handle FIN incorrectly; allow the
--		 * FIN to extend beyond the window and check it in detail later.
-+	seq_limit = tp->rcv_nxt + tcp_max_receive_window(tp);
-+	if (unlikely(after(end_seq, seq_limit))) {
-+		/* Some stacks are known to send bare FIN packets
-+		 * in a loop even if we send RWIN 0 in our ACK. Allow
-+		 * them here, they are handled later in tcp_data_queue().
- 		 */
--		if (!after(end_seq - th->fin, tp->rcv_nxt + tcp_receive_window(tp)))
-+		if (seq == tp->rcv_nxt && end_seq - th->fin == tp->rcv_nxt)
- 			return SKB_NOT_DROPPED_YET;
+ 		af = sctp_get_af_specific(param_type2af(addr_param->p.type));
+ 		if (!af)
+@@ -3034,13 +3037,16 @@ static __be16 sctp_process_asconf_param(struct sctp_association *asoc,
+ 	union sctp_addr	addr;
+ 	struct sctp_af *af;
  
--		if (after(seq, tp->rcv_nxt + tcp_max_receive_window(tp)))
-+		if (after(seq, seq_limit))
- 			return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+-	addr_param = (void *)asconf_param + sizeof(*asconf_param);
+-
+ 	if (asconf_param->param_hdr.type != SCTP_PARAM_ADD_IP &&
+ 	    asconf_param->param_hdr.type != SCTP_PARAM_DEL_IP &&
+ 	    asconf_param->param_hdr.type != SCTP_PARAM_SET_PRIMARY)
+ 		return SCTP_ERROR_UNKNOWN_PARAM;
  
- 		/* Only accept this packet if receive queue is empty. */
-
----
-base-commit: 3abbe30231441f1fbb3305e9854c56a34650af53
-change-id: 20260609-tcp_fin_more_restrictive-5bc808e87c6a
-
-Best regards,
++	addr_param = (void *)asconf_param + sizeof(*asconf_param);
++	if (ntohs(addr_param->p.length) >
++	    ntohs(asconf_param->param_hdr.length) - sizeof(*asconf_param))
++		return SCTP_ERROR_PROTO_VIOLATION;
++
+ 	switch (addr_param->p.type) {
+ 	case SCTP_PARAM_IPV6_ADDRESS:
+ 		if (!asoc->peer.ipv6_address)
 -- 
-Simon Baatz <gmbnomis@gmail.com>
-
+2.47.1
 
 
