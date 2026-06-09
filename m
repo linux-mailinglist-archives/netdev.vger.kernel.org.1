@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-296904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IRzGE7ukJ2pG0AIAu9opvQ
-	(envelope-from <netdev+bounces-296904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 07:29:31 +0200
+	id VYvcE8ekJ2pI0AIAu9opvQ
+	(envelope-from <netdev+bounces-296905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 07:29:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF06365C6D8
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 07:29:30 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B8F65C6E3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 07:29:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmx.de header.s=s31663417 header.b=HOfyPwJv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296904-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296904-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmx.de header.s=s31663417 header.b=F189J4Cn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296905-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296905-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=gmx.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 339D5302C75D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 05:29:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73B02306EB0C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 05:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026FE3C1F40;
-	Tue,  9 Jun 2026 05:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B291F3C1F47;
+	Tue,  9 Jun 2026 05:29:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EDD217723;
-	Tue,  9 Jun 2026 05:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC0F217723;
+	Tue,  9 Jun 2026 05:29:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780982966; cv=none; b=VJRd5GSQSdg8VSYA5I/Bv3BnHp6zAbrWXFAyo8I/fzpQdQdDViyfgW8XrNRSJiw61OhJclsIZtJfjH5B8MqlaUZTVOyNc2RYDAbzqgnlPgRdE7LaYwBRVpk1G0vz4z2MpTnORu/HLVCWgXOukMm4PyQgYnu2ergeUm2hZZJjf+A=
+	t=1780982973; cv=none; b=fKSj0SWLFiR5F/jlz0gVgzjfeJQ1T13NjZN33zh89V8PWLvq1uYR2NZ9NvVGYHVDT9uFDCQO0ApQ7WnMJtibI81cRZz/HNJQdOeSpzIlV43qXn41z84cpmq87bACLqgEttFBvOb9iMJVTLVWOd1mfQY8GMs8K3PFv009fACaiSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780982966; c=relaxed/simple;
-	bh=Mus1mA4v+pL05M7ncHGUwwofOfa56V2tEZuuLJhcAKI=;
+	s=arc-20240116; t=1780982973; c=relaxed/simple;
+	bh=4B/Ose09lmoJLvvvnNOqln2GVp6hsAwQVqpPsz5RqM8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nHMmuUBeE4p83do/IGq0nBILaQK2guOXoAlYyHkVTnaIQZI0BsWrutZUn1eJEBnQZjXQzvkXbczWVmYtleh1TNLOQwlH6StByNx2VBYb17tQxYTznaWqjuNtU5n3gFta67FWvRyJumosY6Z0zWkf7c/IPg3ywTiPQGSKMASWCC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=HOfyPwJv; arc=none smtp.client-ip=212.227.15.19
+	 MIME-Version; b=LJVYApru2puCnhk5L7/WcAnizQXDV4OQN362AhO1i4ubyTFwwaArl3EnrmwFSX5HZ2LCNd2SxCqTBSBzFPcuCe92Azf85gPkm9BEDQg9QEpK8N1wxUBwNU553Doi/E8cvnhxpBX28FxQPEqU/WzXe2HuZpaZbM7t4HGIEG+XhGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=F189J4Cn; arc=none smtp.client-ip=212.227.15.15
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1780982962; x=1781587762;
+	s=s31663417; t=1780982963; x=1781587763;
 	i=markus.stockhausen@gmx.de;
-	bh=zGF6LrsOk0URxZuzgolnWc9xJnfBwLBrrO2c8CnGOto=;
+	bh=/AOnDc1UEdpysSemoZYwTYPyWj1r7QfZql6uLoFrssE=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=HOfyPwJv9ihtRt5ZOi3/VUc3mc4NPKe3z/JgLD6L8gmtabAmifHlNQj1pH+bZcek
-	 0ZjrT/2gPyfirzJZ8sovExQDTex0DQLeZ78Ogm43ea2+zFY9wghCfZSypE3TlkLl9
-	 S02OaYrWrEYPWB4se8LINoG16vqxr/EBCVjbt0hHQ6ESnToa3MtkRVqC0ntQttYkj
-	 AlerY4O4TFJv+x2Tswwb4REqSfMHwJPsrZUHOQR0ZFmv99/bagRcF2dpjfpm0w9Rq
-	 /WIOE0+l2YrvcNVUIDwNu6o+XO5CMCYB7z/2uTbySlIPz3T+OK6Z5N/YOkRxs8zbf
-	 jhGzv2B+icZGDMg9+g==
+	b=F189J4CnZpR2dFEanAhSLKvW957PCSKhCRrzlWi5wjNnJbhIrnBBCoFwXN67xdGg
+	 d2Q0XRtQb/QqwG6DJouN+oJdH6IzP9Nc1fEdpWBf6Sa0XJ3dtFhqLb4Bcvfa05mS4
+	 poFh9f0comKR/rEOMb5SAB9o0XDYY0RX6ERR7z/VBnMCaeBEWKBtVNkA/DrZItR3a
+	 DDHAS0a92cBOeeQAse+QtOQvZNHaCIsi9/yPZMREKojQfkKh2W216dAhHSAeqNdp3
+	 shi7kD+9Gej26ian9F8J/ixoOGG/9PXVPdoXfCqn/1JpIVObVXo++VsSps7JH97bv
+	 vlnM4vsR9IPP5O648A==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N95iH-1xHCrt348F-012J01; Tue, 09
- Jun 2026 07:29:22 +0200
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MTRMs-1wglCB0ez6-00VPtO; Tue, 09
+ Jun 2026 07:29:23 +0200
 From: Markus Stockhausen <markus.stockhausen@gmx.de>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -68,9 +68,9 @@ To: andrew@lunn.ch,
 	conor+dt@kernel.org,
 	devicetree@vger.kernel.org
 Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH net-next v2 2/5] net: mdio: realtek-rtl9300: Add prefix to register field defines
-Date: Tue,  9 Jun 2026 07:28:53 +0200
-Message-ID: <20260609052856.3142922-3-markus.stockhausen@gmx.de>
+Subject: [PATCH net-next v2 3/5] net: mdio: realtek-rtl9300: Make otto_emdio_read_cmd() generic
+Date: Tue,  9 Jun 2026 07:28:54 +0200
+Message-ID: <20260609052856.3142922-4-markus.stockhausen@gmx.de>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260609052856.3142922-1-markus.stockhausen@gmx.de>
 References: <20260609052856.3142922-1-markus.stockhausen@gmx.de>
@@ -81,91 +81,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:wLyJYxjTZK00nCNcGZX9Ha0+OYxgXEQIMqd0RQtHzj3nihA75sm
- 3l8DxOAV3j2w+FWP65j011igzMhdquWv34eQjrzKhnZHlhSmXCaeMEFv0lWiaidjRw5WiXK
- MgKSzcQgS1axsSBZt0iROoKT6AJ4Qt3PAAhiyKJVuwmHTveIqbgXlklov0HIEYbxbSt6471
- YRgjD2Z6LvxTG+Fih2VEA==
+X-Provags-ID: V03:K1:C279sYbLsVV4aDQDKuOF/GHiP80yi/ZZPCnBtZlTQa9r381i6Ce
+ wXveTSljf01kwQehpL8b3xz75CdmKIXhWLGYufFhDIgWow/LxA4+FA3UBr95VohhGyLnTtw
+ 02zZ1FddERmn4vP4gqv/SvvB9zSomfDgIEX4EJ0+wrlYVJrsaJ+nkBy/IUPJkBG6Nf9Ml1z
+ mKc9jLLpOPUJY9b47oBEw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ooVAXrQr9Z4=;OQIIeJWhANHuC6ebuKgjj4Pq8o7
- 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
- JlOYA2mzOgaP8p9E6A=
+UI-OutboundReport: notjunk:1;M01:P0:E2cwdbu+0Qs=;WkUMaNHzJAz30CoXxIvZeCRH3CQ
+ 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
+ Jb0d7wmI0y5bTpAQW1k81gAiGMF51nJGywHpf3m
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -174,7 +174,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
 	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -188,7 +188,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296904-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296905-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[gmx.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
@@ -199,165 +199,79 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[gmx.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:dkim,gmx.de:email,gmx.de:mid,gmx.de:from_mime,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[gmx.de:dkim,gmx.de:email,gmx.de:mid,gmx.de:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CF06365C6D8
+X-Rspamd-Queue-Id: F3B8F65C6E3
 
-The current Realtek Otto MDIO driver has some define leftovers without
-a SoC prefix. When adding new devices there will be an overlap for some
-of them. Sort this out as follows:
+The otto_emdio_read_cmd() helper still uses RTL9300 specific properties.
+This cannot be made generic as the I/O register has different layouts for
+the different SoCs. E.g.
 
-- PHY_CTRL_CMD/PHY_CTRL_MMD_DEVAD/PHY_CTRL_MMD_REG are common for all
-  series. Leave them as is but move them into a separate block.
-- Add RTL9300 prefix to all other defines and adapt the callers.
+- RTL930x: data in bits 31-16, data out bits 15-0
+- RTL931x: data in bits 15-0, data out bits 31-16
+
+Add a mask parameter to the function signature and fill it properly
+in the callers. As the masks will always have bits set from constant
+defines, there is no need for a consistency check.
 
 Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
 =2D--
- drivers/net/mdio/mdio-realtek-rtl9300.c | 63 +++++++++++++------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+ drivers/net/mdio/mdio-realtek-rtl9300.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/mdio/mdio-realtek-rtl9300.c b/drivers/net/mdio/md=
 io-realtek-rtl9300.c
-index 92c8f2512476..007a07136fa1 100644
+index 007a07136fa1..0068beff785b 100644
 =2D-- a/drivers/net/mdio/mdio-realtek-rtl9300.c
 +++ b/drivers/net/mdio/mdio-realtek-rtl9300.c
-@@ -59,23 +59,24 @@
- #define RTL9300_SMI_PORT0_15_POLLING_SEL	0xca08
- #define RTL9300_SMI_ACCESS_PHY_CTRL_0		0xcb70
- #define RTL9300_SMI_ACCESS_PHY_CTRL_1		0xcb74
--#define   PHY_CTRL_REG_ADDR			GENMASK(24, 20)
--#define   PHY_CTRL_PARK_PAGE			GENMASK(19, 15)
--#define   PHY_CTRL_MAIN_PAGE			GENMASK(14, 3)
--#define   PHY_CTRL_WRITE			BIT(2)
--#define   PHY_CTRL_READ				0
--#define   PHY_CTRL_TYPE_C45			BIT(1)
--#define   PHY_CTRL_TYPE_C22			0
--#define   PHY_CTRL_CMD				BIT(0)
--#define   PHY_CTRL_FAIL				BIT(25)
-+#define   RTL9300_PHY_CTRL_REG_ADDR		GENMASK(24, 20)
-+#define   RTL9300_PHY_CTRL_PARK_PAGE		GENMASK(19, 15)
-+#define   RTL9300_PHY_CTRL_MAIN_PAGE		GENMASK(14, 3)
-+#define   RTL9300_PHY_CTRL_WRITE		BIT(2)
-+#define   RTL9300_PHY_CTRL_READ			0
-+#define   RTL9300_PHY_CTRL_TYPE_C45		BIT(1)
-+#define   RTL9300_PHY_CTRL_TYPE_C22		0
-+#define   RTL9300_PHY_CTRL_FAIL			BIT(25)
- #define RTL9300_SMI_ACCESS_PHY_CTRL_2		0xcb78
--#define   PHY_CTRL_INDATA			GENMASK(31, 16)
--#define   PHY_CTRL_DATA				GENMASK(15, 0)
-+#define   RTL9300_PHY_CTRL_INDATA		GENMASK(31, 16)
-+#define   RTL9300_PHY_CTRL_DATA			GENMASK(15, 0)
- #define RTL9300_SMI_ACCESS_PHY_CTRL_3		0xcb7c
--#define   PHY_CTRL_MMD_DEVAD			GENMASK(20, 16)
--#define   PHY_CTRL_MMD_REG			GENMASK(15, 0)
- #define RTL9300_SMI_PORT0_5_ADDR_CTRL		0xcb80
+@@ -191,7 +191,7 @@ static int otto_emdio_run_cmd(struct mii_bus *bus, u32=
+ cmd,
+ }
 =20
-+#define PHY_CTRL_CMD				BIT(0)
-+#define PHY_CTRL_MMD_DEVAD			GENMASK(20, 16)
-+#define PHY_CTRL_MMD_REG			GENMASK(15, 0)
-+
- #define MAP_ADDRS_PER_REG			6
- #define MAP_BITS_PER_ADDR			5
- #define MAP_BITS_PER_BUS			2
-@@ -204,7 +205,7 @@ static int otto_emdio_read_cmd(struct mii_bus *bus, u3=
+ static int otto_emdio_read_cmd(struct mii_bus *bus, u32 cmd,
+-			       struct otto_emdio_cmd_regs *cmd_data, u32 *value)
++			       struct otto_emdio_cmd_regs *cmd_data, u32 mask, u32 *value)
+ {
+ 	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
+ 	int ret;
+@@ -205,7 +205,7 @@ static int otto_emdio_read_cmd(struct mii_bus *bus, u3=
 2 cmd,
  	if (ret)
  		return ret;
 =20
--	*value =3D FIELD_GET(PHY_CTRL_DATA, *value);
-+	*value =3D FIELD_GET(RTL9300_PHY_CTRL_DATA, *value);
+-	*value =3D FIELD_GET(RTL9300_PHY_CTRL_DATA, *value);
++	*value =3D (*value & mask) >> __ffs(mask);
 =20
  	return 0;
  }
-@@ -223,27 +224,27 @@ static int otto_emdio_9300_read_c22(struct mii_bus *=
-bus, int port, int regnum, u
- {
- 	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
- 	struct otto_emdio_cmd_regs cmd_data =3D {
--		.c22_data	=3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
--				  FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
--				  FIELD_PREP(PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
--		.io_data	=3D FIELD_PREP(PHY_CTRL_INDATA, port),
-+		.c22_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_REG_ADDR, regnum) |
-+				  FIELD_PREP(RTL9300_PHY_CTRL_PARK_PAGE, 0x1f) |
-+				  FIELD_PREP(RTL9300_PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
-+		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, port),
+@@ -230,7 +230,8 @@ static int otto_emdio_9300_read_c22(struct mii_bus *bu=
+s, int port, int regnum, u
+ 		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, port),
  	};
 =20
--	return otto_emdio_read_cmd(bus, PHY_CTRL_TYPE_C22, &cmd_data, value);
-+	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C22, &cmd_data, va=
+-	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C22, &cmd_data, va=
 lue);
++	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C22, &cmd_data,
++				   RTL9300_PHY_CTRL_DATA, value);
  }
 =20
  static int otto_emdio_9300_write_c22(struct mii_bus *bus, int port, int r=
 egnum, u16 value)
- {
- 	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
- 	struct otto_emdio_cmd_regs cmd_data =3D {
--		.c22_data	=3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
--				  FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
--				  FIELD_PREP(PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
--		.io_data	=3D FIELD_PREP(PHY_CTRL_INDATA, value),
-+		.c22_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_REG_ADDR, regnum) |
-+				  FIELD_PREP(RTL9300_PHY_CTRL_PARK_PAGE, 0x1f) |
-+				  FIELD_PREP(RTL9300_PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
-+		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, value),
- 		.port_mask_low	=3D BIT(port),
+@@ -256,7 +257,8 @@ static int otto_emdio_9300_read_c45(struct mii_bus *bu=
+s, int port,
+ 		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, port),
  	};
 =20
--	return otto_emdio_write_cmd(bus, PHY_CTRL_TYPE_C22, &cmd_data);
-+	return otto_emdio_write_cmd(bus, RTL9300_PHY_CTRL_TYPE_C22, &cmd_data);
- }
-=20
- static int otto_emdio_9300_read_c45(struct mii_bus *bus, int port,
-@@ -252,10 +253,10 @@ static int otto_emdio_9300_read_c45(struct mii_bus *=
-bus, int port,
- 	struct otto_emdio_cmd_regs cmd_data =3D {
- 		.c45_data	=3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
- 				  FIELD_PREP(PHY_CTRL_MMD_REG, regnum),
--		.io_data	=3D FIELD_PREP(PHY_CTRL_INDATA, port),
-+		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, port),
- 	};
-=20
--	return otto_emdio_read_cmd(bus, PHY_CTRL_TYPE_C45, &cmd_data, value);
-+	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C45, &cmd_data, va=
+-	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C45, &cmd_data, va=
 lue);
++	return otto_emdio_read_cmd(bus, RTL9300_PHY_CTRL_TYPE_C45, &cmd_data,
++				   RTL9300_PHY_CTRL_DATA, value);
  }
 =20
  static int otto_emdio_9300_write_c45(struct mii_bus *bus, int port,
-@@ -264,11 +265,11 @@ static int otto_emdio_9300_write_c45(struct mii_bus =
-*bus, int port,
- 	struct otto_emdio_cmd_regs cmd_data =3D {
- 		.c45_data	=3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
- 				  FIELD_PREP(PHY_CTRL_MMD_REG, regnum),
--		.io_data	=3D FIELD_PREP(PHY_CTRL_INDATA, value),
-+		.io_data	=3D FIELD_PREP(RTL9300_PHY_CTRL_INDATA, value),
- 		.port_mask_low	=3D BIT(port),
- 	};
-=20
--	return otto_emdio_write_cmd(bus, PHY_CTRL_TYPE_C45, &cmd_data);
-+	return otto_emdio_write_cmd(bus, RTL9300_PHY_CTRL_TYPE_C45, &cmd_data);
- }
-=20
- static int otto_emdio_read_c22(struct mii_bus *bus, int phy_id, int regnu=
-m)
-@@ -582,9 +583,9 @@ static int otto_emdio_probe(struct platform_device *pd=
-ev)
- static const struct otto_emdio_info otto_emdio_9300_info =3D {
- 	.addr_map_base =3D RTL9300_SMI_PORT0_5_ADDR_CTRL,
- 	.bus_map_base =3D RTL9300_SMI_PORT0_15_POLLING_SEL,
--	.cmd_fail =3D PHY_CTRL_FAIL,
--	.cmd_read =3D PHY_CTRL_READ,
--	.cmd_write =3D PHY_CTRL_WRITE,
-+	.cmd_fail =3D RTL9300_PHY_CTRL_FAIL,
-+	.cmd_read =3D RTL9300_PHY_CTRL_READ,
-+	.cmd_write =3D RTL9300_PHY_CTRL_WRITE,
- 	.cmd_regs =3D {
- 		.c22_data =3D RTL9300_SMI_ACCESS_PHY_CTRL_1,
- 		.c45_data =3D RTL9300_SMI_ACCESS_PHY_CTRL_3,
 =2D-=20
 2.54.0
 
