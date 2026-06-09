@@ -1,98 +1,65 @@
-Return-Path: <netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297264-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MJpOImdwKGoEEwMAu9opvQ
-	(envelope-from <netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:58:31 +0200
+	id q3E1HfBwKGpLEwMAu9opvQ
+	(envelope-from <netdev+bounces-297264-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:00:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A6D663F9E
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:58:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1186B663FEF
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:00:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=WpIrqjL+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QvSThxOG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297264-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297264-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1C1F430EC111
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:54:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 233C6303110F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8AA37C11E;
-	Tue,  9 Jun 2026 19:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDE33E451B;
+	Tue,  9 Jun 2026 19:56:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F6236495B
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3848E3905F4;
+	Tue,  9 Jun 2026 19:56:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034877; cv=none; b=ohGzAAIFivCd5zPeZTBlTBqX89++mtngkLTguvZJ+6DP0n6gKADMRImpLt8oWovdjuQJeu5vjFo/a31oiGvyY7sSWe4ENoieJ69VSjyAbtCwYlUrtTXRI8sNbNv8fgDKb7C7inc0yRKXjMojtcMB3S1x3VSZ7eS+8TE6ZJ4DK0Y=
+	t=1781034975; cv=none; b=svhnITqJsNmIRiQ+WEzoHqixkuUWlAEComAeJO09BsOBKokgtE7G8Ec5rGpNmRMu2PIvqPUs6O+Ikc+ewwBAKC+Ko2vDw4Q/vVGTiJhiskRrijIWwJcag2Sv8GBnBW1f7+5tO9VF3x2SmwAkyj5a5GoYcG8kLDZGlIQvNpMTTgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034877; c=relaxed/simple;
-	bh=3xnCFiwxO16Y9VzNXXYKEYs0FSQlDolB6VBLYuJ9zk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tgh1ZAek5p7Q2e8rzxjY9oK4VCaaRg4aVO3XfH6z3oHk0ipHxdN5ltjb9gOz9pp8WNVWB1RT4pyyHaORo1ZdG7Dv0hImEk2VGroC+d4TIqNON9Pt3kypai1g2b38pb/839WEHSEWse9Wg/pSg0pus5RNaTXJzzPIaJE3FIdJbwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=WpIrqjL+; arc=none smtp.client-ip=209.85.214.177
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c0c2c7e0c5so40661815ad.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 12:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781034875; x=1781639675; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qtHL6AfuvT6c490Bz3CZQZfiaDxF8fCiU9SZX1nVkbE=;
-        b=WpIrqjL+poY0IuoaQczPOeqXnvmtP5gnz8nZNkhNdEgl/jd2KGyInLs+LVM8KKLO6F
-         5wKVM2ZKvWNgpoD0EBI5850afAiHsfXOzBtL9Cbe1Xbkp6vJxYIrle1usLKgU8kLCYTm
-         0E5Rh0020uSyn9btasCPw5jnOjDDYI2tAdicOhCTsZZmnF8QLBVDzJtpGdoR17FUccP7
-         1nBdl2nbLUn7jQckpajVtG3xM2kdJoRYUiQTDbV01uOJtIDBfKipTeBa5UZjoKuzP0jT
-         SMQyVV38uCI6LsgMryeC/GrQZOLRdMPG2suEo9+i3YvXk17/beNvb4EQt+wEkCz03/5f
-         owOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781034875; x=1781639675;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qtHL6AfuvT6c490Bz3CZQZfiaDxF8fCiU9SZX1nVkbE=;
-        b=SU1tmVyJn0RfsvXiN2vC8MprP6xE4uaSusoyt0PjoOM2/eku5/dLE/waiE5AzHGWiI
-         PdSSTNLSOsZgt1yz9xJMDWb4IBhSWi8gW98IX7afSUckGOfot3bQijASUhmPDjazxUBA
-         iryrymavrSlWt20DpFZV5LWdYsS3VHG6uLJiJeJgdSC9NN+MW2cv0lGhgBlew3KN92Vo
-         tpw+m2YU/Sm7ilvsY6t0ZinC1BHGsbFeIinp6S7HhYbTDTo6SBQFYCdX9ML3Ug9/+kMX
-         OVy7t4zc7njpcqPsmPpr9NEVQmKgyb1+0BXaRQgofWcW8OHNfzkSbfanRSQ79Tu//7+V
-         yCTg==
-X-Forwarded-Encrypted: i=1; AFNElJ+7diypmcaznyBFWK0DcAhrau/lFyPjir52eJ3tLPSNE09gfl8/St/bbmf5P0jcokUG8yhM5g4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyib6kREJWnOzRnamO0MV+SiTRvh0QPgbtd2SyfDqH47/w2Yhn4
-	yYExFe4eNjg4gRR2oXkFq4SR7SXEcb8DF6UshesHKTNzhQzzBu1IEBedDhIGof5TxGY=
-X-Gm-Gg: Acq92OH4/YeJwLBu6TVUqvX8ZZjHQMek1uRPbyr6MXJY3MKYSfk20NITBPlKAZfo12u
-	9dg+1LPKrl2/ELAsNZoherDeeGPrCQm1cqR+0u0RLF716wqSCFZ9rYDMUp/Pf4ZKAfKKc+B19sS
-	hU33J1YQRUupJcy9F/TrsjOEnJu4p7z/B4SKBQAPR5wf1Cd+97BuhBtGEz7QnNvjPm97RMdnFZN
-	zy2rcJkdUTCMa9W+axAyQg0MKpgXQSqvHn8hLFZc72yl/m70T14jVGoR13oVhsjclA4XQ7czuR5
-	lb/yTuq6UK9a6moK3rmm1QUFIjTVZDRy8O8m3/brJfpHnqdkLkOmyEHdIvZ9KqTIX++MU+NurdS
-	rwbnRWXFGJDaaUvEdp7ok6dMmIemAwF/3duZ6pUj6opX5b+QM1kzpFvQN4gGsOfXMLnyT38U8Sb
-	Rq/uHqZDy03DFAGThUukl2cr2zOA==
-X-Received: by 2002:a17:903:987:b0:2bf:128d:f7ff with SMTP id d9443c01a7336-2c2a1be668cmr51148805ad.16.1781034875215;
-        Tue, 09 Jun 2026 12:54:35 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:42::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c24edbb49bsm92990365ad.38.2026.06.09.12.54.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 12:54:34 -0700 (PDT)
-Date: Tue, 9 Jun 2026 12:54:34 -0700
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	dw@davidwei.uk, daniel@iogearbox.net, razor@blackwall.org,
-	sdf@fomichev.me, dtatulea@nvidia.com, bobbyeshleman@meta.com
-Subject: Re: [PATCH net-next 4/4] netdev: don't use dev->flags for IFF_UP
-Message-ID: <aihvettu3tpPK9i/@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
-	daniel@iogearbox.net, razor@blackwall.org, sdf@fomichev.me,
-	dtatulea@nvidia.com, bobbyeshleman@meta.com
-References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-5-kuba@kernel.org>
+	s=arc-20240116; t=1781034975; c=relaxed/simple;
+	bh=6NOGgMTwvpFK9y9CwWV59BdaEs794jRjbrN/rBHlaP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=YU0ADBRRaPzT773Fqhuu8aVRjuUaMdTy0AGJZ5Q5llobRIN/+vd5bnZTJgOhNH0UsItjQHgfM9ToxhwusEcny24BpIau6lDRO9OPsImpws9Y5SXnmEouf7AJMWhvmSHnmIbCK8NyZzVhJ3/EfSWABIejr/twIzCoSKJs2iGJAsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QvSThxOG; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A840F1F00893;
+	Tue,  9 Jun 2026 19:56:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781034973;
+	bh=y4iRsk+AhfxJSSqxKswZ1/phd34ipK67r/z1ycidumM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To;
+	b=QvSThxOGvVJFNdr/naZAD6M8F4kr7tHnFy+Z5x0HnJL/H4yOVFl3qTjhpbbvPGMXQ
+	 cXBHVIgTsrYY2nzaNrl7bYLp6vnklAFTnZQoIcYV9NGY/Efnk/tQmTYqAA9txv/DT8
+	 QLQwMkUg9p9H7vm1ZqQ4AEd31RQjqayQa3zEkyboXBs7J1b/INwl2LvqmwkbktcPwY
+	 rMxsJIWA5Fwt7aVHw7Tk6enfab2EDtBKPtxIAHQIs4X0WnrC/AwdOpKaAbq9Lr+rf/
+	 BUyg3HdHYBXhG3pYTlAv3BqUpiW25/Fr1l0EXlFT6nTpJEpXw4jXyCecBwicC6NX39
+	 dmlfW70iAH08w==
+Date: Tue, 9 Jun 2026 14:56:12 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian Konig <christian.koenig@amd.com>, kvm@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH v6 2/5] PCI/TPH: expose enabled requester type and
+ capability helpers
+Message-ID: <20260609195612.GA85322@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,57 +68,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260609190804.1137085-5-kuba@kernel.org>
+In-Reply-To: <20260608185646.4085127-3-zhipingz@meta.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-4.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:zhipingz@meta.com,m:alex@shazbot.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:kvm@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-pci@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:kbusch@kernel.org,m:yochai@nvidia.com,m:yishaih@nvidia.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DMARC_NA(0.00)[dama.to];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297263-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297264-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:from_mime,dama.to:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,devvm20253.cco0.facebook.com:mid,dama-to.20251104.gappssmtp.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bhelgaas:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,meta.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F1A6D663F9E
+X-Rspamd-Queue-Id: 1186B663FEF
 
-On Tue, Jun 09, 2026 at 12:08:04PM -0700, Jakub Kicinski wrote:
-> dev->flags are not technically ops lock protected. The IFF_UP flag
-> will not change when dev->lock is held, but other flags may change
-> so KCSAN would probably not be impressed. Because of this we added
-> a dedicated dev->up which is safe to read under dev->lock.
-> 
-> qstats want to make sure device is up, use dev->up.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, Jun 08, 2026 at 11:56:39AM -0700, Zhiping Zhang wrote:
+> Add pcie_tph_enabled_req_type() so drivers can query the enabled TPH
+> requester mode without reaching into pci_dev internals, and
+> pcie_tph_supported() so they can test whether the device exposes the
+> PCIe TPH Extended Capability without doing the same.
+
+s/exposes/advertises/
+
+> This keeps pci_dev::tph_req_type and pci_dev::tph_cap inside the
+> PCI/TPH code and provides !CONFIG_PCIE_TPH stubs for callers.
+
+Update subject line to match capitalization of history
+(use "git log --oneline drivers/pci/tph.c")
+
+s/expose/Add/ in subject.
+
+("Expose" suggests that the interfaces already exist and we're just
+exporting them, but these interfaces didn't exist at all before.)
+
+> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+
+With the above,
+
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+
 > ---
->  net/core/netdev-genl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/pci/tph.c       | 25 +++++++++++++++++++++++++
+>  include/linux/pci-tph.h |  7 +++++++
+>  2 files changed, 32 insertions(+)
 > 
-
-Reviewed-by: Joe Damato <joe@dama.to>
+> diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+> index 91145e8d9d95..aa09113c46d4 100644
+> --- a/drivers/pci/tph.c
+> +++ b/drivers/pci/tph.c
+> @@ -174,6 +174,31 @@ u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev)
+>  }
+>  EXPORT_SYMBOL(pcie_tph_get_st_table_loc);
+>  
+> +/**
+> + * pcie_tph_enabled_req_type - Return the device's enabled TPH requester type
+> + * @pdev: PCI device to query
+> + *
+> + * Return: PCI_TPH_REQ_DISABLE, PCI_TPH_REQ_TPH_ONLY or PCI_TPH_REQ_EXT_TPH.
+> + */
+> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev)
+> +{
+> +	return pdev->tph_req_type;
+> +}
+> +EXPORT_SYMBOL(pcie_tph_enabled_req_type);
+> +
+> +/**
+> + * pcie_tph_supported - Whether the device advertises the TPH Extended Cap
+> + * @pdev: PCI device to query
+> + *
+> + * Return: true when the device exposes the PCIe TPH Extended Capability,
+> + * false otherwise.
+> + */
+> +bool pcie_tph_supported(struct pci_dev *pdev)
+> +{
+> +	return pdev->tph_cap != 0;
+> +}
+> +EXPORT_SYMBOL(pcie_tph_supported);
+> +
+>  /*
+>   * Return the size of ST table. If ST table is not in TPH Requester Extended
+>   * Capability space, return 0. Otherwise return the ST Table Size + 1.
+> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> index be68cd17f2f8..2e07bce77038 100644
+> --- a/include/linux/pci-tph.h
+> +++ b/include/linux/pci-tph.h
+> @@ -9,6 +9,8 @@
+>  #ifndef LINUX_PCI_TPH_H
+>  #define LINUX_PCI_TPH_H
+>  
+> +#include <linux/pci_regs.h>
+> +
+>  /*
+>   * According to the ECN for PCI Firmware Spec, Steering Tag can be different
+>   * depending on the memory type: Volatile Memory or Persistent Memory. When a
+> @@ -30,6 +32,8 @@ void pcie_disable_tph(struct pci_dev *pdev);
+>  int pcie_enable_tph(struct pci_dev *pdev, int mode);
+>  u16 pcie_tph_get_st_table_size(struct pci_dev *pdev);
+>  u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev);
+> +u8 pcie_tph_enabled_req_type(struct pci_dev *pdev);
+> +bool pcie_tph_supported(struct pci_dev *pdev);
+>  #else
+>  static inline int pcie_tph_set_st_entry(struct pci_dev *pdev,
+>  					unsigned int index, u16 tag)
+> @@ -41,6 +45,9 @@ static inline int pcie_tph_get_cpu_st(struct pci_dev *dev,
+>  static inline void pcie_disable_tph(struct pci_dev *pdev) { }
+>  static inline int pcie_enable_tph(struct pci_dev *pdev, int mode)
+>  { return -EINVAL; }
+> +static inline u8 pcie_tph_enabled_req_type(struct pci_dev *pdev)
+> +{ return PCI_TPH_REQ_DISABLE; }
+> +static inline bool pcie_tph_supported(struct pci_dev *pdev) { return false; }
+>  #endif
+>  
+>  #endif /* LINUX_PCI_TPH_H */
+> -- 
+> 2.53.0-Meta
+> 
 
