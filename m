@@ -1,161 +1,134 @@
-Return-Path: <netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GBz3NBCOKGreGAMAu9opvQ
-	(envelope-from <netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:04 +0200
+	id CmCsH92OKGoHGQMAu9opvQ
+	(envelope-from <netdev+bounces-297323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:08:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 723EE6646C7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E3F664732
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:08:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=SsBXGj7H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="T/mH8CIK";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297323-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297323-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DB94F3043EE1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:05:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62FC1303D335
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9823E5EC5;
-	Tue,  9 Jun 2026 22:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4263E5EC5;
+	Tue,  9 Jun 2026 22:05:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2F5331EA2
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33363EB0F6
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:05:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042701; cv=none; b=MObAPfSf/XioAaEfUPXUBjlhg4iG98RxymZzfu4Vqc3Q0MZUeb6xtCYzGZywSezHLeluSWXU7+dC5M5YScu9YNJL8b1hrEugDoLgvEgF/WVY6JRykv8Zqt9zM+TO/MpGpsA7HbZmyWYnA1Z7PcpXxDfXk5V8zXobVQ2uV3PpBMY=
+	t=1781042754; cv=none; b=K1L6crYR6q8QpYpokDpstx75KtG/Z3+AJ/NGW4Uc5bm9UUTizsIHXeOTMUT8Zi8PJEPaJemk1DeeKD9fvcq2qSYmL+RrUMsBHDug5f69RXflq/9HSEtBuyRUAEGu12EiScrPAcza5zfyZI1c3xmZ+FAJLCCZRm/epyCniXnQZrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042701; c=relaxed/simple;
-	bh=CmC5qziwznS7Kex6cuqYcE42ivbcGfXZ8w+wCL8lwbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dDx0yPaPq91Kmajbe82EsKfxELEyKvy5wP18dNpJI4P0Fu3ljHtgOyaxl2MspnJxvWF5Uyc7ZqRuparkIRcIDggzU7j8gAaA2SnzjaDMCpz94CSGcZY8XzNeZMFSfV0iqxQB0ifaHXTMxOKI6XJFqasvtafyYo1I1zdqCUVvpnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsBXGj7H; arc=none smtp.client-ip=209.85.216.48
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-36bba9a1089so3656606a91.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:05:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781042699; x=1781647499; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wt3b+Deif3nXdjZDbgXojibEH3nr7iYn6iIVS7zLH/A=;
-        b=SsBXGj7HmgMkx2KmaqBk3p2CVMN3yzsutXqKCvjXDUzk0U8GXHgm/cH9ndDTqTSVNH
-         RmQLxOFdtlq8fcsu+bIwGA3/mmbw3hZ9/flB+GD3FHVDdkwz2UUCtbrTxgdARQlRZdFA
-         hbJXgtNL8l8LEh3cZdz2qrE+wswnL9Mh/tTO/Efc15ht676DhAsLjm3t91QGEX/Cr4yJ
-         skgS6UzhfF7lJkjkyZKHrs1BYrNJw58ilJrDTZK4G4k4OtkUD78YKJPtbTqYnkM96bKK
-         O9cdfGOWESbZ8mxtuN8fSKQlHu+6/iQLLpV//c80BpgSDlrpKkemB0aWjdkyjwZA9n8G
-         018g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781042699; x=1781647499;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wt3b+Deif3nXdjZDbgXojibEH3nr7iYn6iIVS7zLH/A=;
-        b=aZGT5rPKVvSG3Io9WbtPEZ1gQJ7ldA2msePAurb5lb1rXmnbxTT1ZwUrZiYwERM1kj
-         SZEjnK5wsCmKIZpq2s/rRI05069sLdtJPz3z1ns3AS5sdqjMrikqQAMmBb+n6g5mW+zd
-         kvWVPrfcLKc9i3yLZafvoMJ7bF+sSjAgDVVEm5UdG6hRgmC1n02ht5Pixx4yLBzs/KP+
-         7s4qH1d/bDTq5ziO0HKVFiYXM07mK09FhYbPy9WwnGSfFYdYBm8zCycLMblGwCu+BRKw
-         xW8qddaRssBktl/m/DSEF4Q2wfU+p7GEbqOu3vFd5fpo3v3BA2BObB5v2Wh5DN8Nja/h
-         H6ig==
-X-Forwarded-Encrypted: i=1; AFNElJ9kR15XgEKLZqxdZcJeaZZ0GtJzGQiuHVCCcyQ9dXwF1Y+dH7E26EHOlM1IhUMIOwbqv/LlYis=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzfcc/FVROT6kLxh0UfLRxQvnXbnBO2zV1ZKleB+zQixbDAb6gg
-	g/i2ffqcqWPTbQQxuuwJ8VUiyzhVCI29raGycz5u5rE73bQE6/6iLzbm
-X-Gm-Gg: Acq92OEFcvL5g1VZYvE37AfSWbr4R9HdjOeqXLEHwI4S7sAfeqbRV9gJVAtlWYolZO4
-	6Q9QhCokGmu41xv12GigUntq4OdtgR7XPEaw88YDH/GUFYiDhNYw11YL70IXwfANoAYZ/gsJBzT
-	RQBeiGwyAXppr/1Ptg4gPerGxVvUYaICntyxHHIn5p4qJoeSnplc/m4balMZmI7SBiX/wcXhhXi
-	angTbwAKUrAoYrSs1ai4/beiLHiZgBVfAVD+QNP8uKgBBQ/aZKyErBTcwvAQgXY9kKf8YyhXGdd
-	LjKz+GZ0A3OF4rG0AV6aERjwWaKnpjoo4jz8aFIUag8OSMP6uWm51Jaf8hi82S6Hslx5jBul7US
-	G5nwyWJOizERdBgNGzylvfPXRVUpTuzFMOhohMQxTR5sL9yapd2zKa7rWQ53Ou6Q48s/GpM/hTD
-	dUFwKT1Fd7v+8ivWScfpPfyv/D1koFKPdq2DSkwu05UMb1H3ig9UfWbDY=
-X-Received: by 2002:a17:90b:4b04:b0:36a:5d1f:7b6 with SMTP id 98e67ed59e1d1-370ee5444e7mr22928910a91.2.1781042699375;
-        Tue, 09 Jun 2026 15:04:59 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:52::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37626873b88sm294358a91.0.2026.06.09.15.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 15:04:59 -0700 (PDT)
-Date: Tue, 9 Jun 2026 15:04:57 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
+	s=arc-20240116; t=1781042754; c=relaxed/simple;
+	bh=HoDSBKJjHVMPvX81IRFiiuGpxnHrJXtqODStpk0TR0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Uu5BzM+MANZ19BOeZqCU1DueDSaT4INOjU6BrlnF7bprYsppngEmLfiy3TOcQRyvshnrO1zyzC6RLbeQj5H0RtuCO2tGZMbnJeyDrk+Xh0PpNkOVrq3b6IdaROsEiNsQ0AYCYokdjDmzexvv/7kgH3qVaRzNSgjPKeSY0OI9W3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T/mH8CIK; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2672E1F00893;
+	Tue,  9 Jun 2026 22:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781042753;
+	bh=lsZr8NsT7I5W8zFPTZN43nG22GTSmPGdkPQAhmUqgBU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=T/mH8CIKbhCeGsEgqEE89PkBLqFcUqDkO4i7w6ZlDujoa2D3RMZovn0QkCwftFlEk
+	 Fvn6UBBt8ZhYKrhjjrp1f9oiWXL0SEGyCFuju/frjqzi008soKGrKdZoudi/RoqXgU
+	 /4IH8D+WcysYRNDirTXxT3PE+or4iaZ1GikstHMo0K20jNiwtbds3DcOKjV9GOhhiF
+	 2sf7k/+2rxKvLkCaYJRL4MVOEPrlBYjISlpumrwRx+1ZL3+fHWgq+dsEfACfWYUY5g
+	 PN+Shexic9RkqJucXqfq5XTDCku7KUMhvOI2Njqr7Bw2H2N1K517Ha9/FIEkwkPZwn
+	 I7ASWzCCjY8vQ==
+Date: Tue, 9 Jun 2026 15:05:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	dw@davidwei.uk, daniel@iogearbox.net, razor@blackwall.org,
-	sdf@fomichev.me, dtatulea@nvidia.com, bobbyeshleman@meta.com
-Subject: Re: [PATCH net-next 3/4] netdev: avoid skipping objects on race with
- device disappearance
-Message-ID: <aiiOCRpmdFcOf/yJ@devvm29614.prn0.facebook.com>
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
+ razor@blackwall.org, sdf@fomichev.me, dtatulea@nvidia.com,
+ bobbyeshleman@meta.com
+Subject: Re: [PATCH net-next 1/4] netdev: check for nla_put_u32() failures
+Message-ID: <20260609150552.2d962600@kernel.org>
+In-Reply-To: <15c024cd-7ab1-47b4-94e5-90db0f74227f@iogearbox.net>
 References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-4-kuba@kernel.org>
- <aihwlI9A2TKktq9I@devvm29614.prn0.facebook.com>
- <aih0ST30H9rlKX2f@devvm29614.prn0.facebook.com>
- <20260609141914.2957de35@kernel.org>
+	<20260609190804.1137085-2-kuba@kernel.org>
+	<15c024cd-7ab1-47b4-94e5-90db0f74227f@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260609141914.2957de35@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-297322-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297323-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,devvm29614.prn0.facebook.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 723EE6646C7
+X-Rspamd-Queue-Id: C7E3F664732
 
-On Tue, Jun 09, 2026 at 02:19:14PM -0700, Jakub Kicinski wrote:
-> On Tue, 9 Jun 2026 13:15:05 -0700 Bobby Eshleman wrote:
-> > I just noticed we handle this differently in rtnetlink with
-> > cb->seq/dev_base_seq/nl_dump_check_consistent(), but it seems like
-> > netdev-genl.c intentionally does not use NLM_F_DUMP_INTR?
+On Tue, 9 Jun 2026 21:52:25 +0200 Daniel Borkmann wrote:
+> > -	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> > +	err = nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> > +	if (err)
+> > +		goto err_unbind;
+> > +  
 > 
-> Intentionally is a strong word, but yes, it's "known".
+> Not sure about these three tbh... if the skbs are guaranteed to be
+> large enough, would a more straight forward ...
 > 
-> My mental model is that DUMP_INTR is required when we are dumping
-> unordered lists. In those cases we just count "how many objects
-> were already dumped", so if we dumped 4 objects then object #1 is
-> removed the dump will resume from object which was previously #6
-> thinking that it's #5 and #5 will never be dumped.
+>    WARN_ON_ONCE(err);
 > 
-> In netdev objects have ordered IDs, we don't count.
-> 
-> But in theory we probably maybe should also indicate consistency.
-> Nobody seems to care in practice.
+> ... suffice?
 
-gotcha, thanks for the clarification.
+Sure, I guess it's subjective whether it's better to add a WARN
+and have to explain why it can never happen or just call the
+undo function since it's already available :)
 
--Bobby
+> Unwinding at this point feels a bit excessive. Is there
+> any other way we could assert this earlier before we do all the ops
+> that need to be unwound?
+
+It's dead code. We keep getting patches for "nla_* return value not
+checked" tho, so if decided to squash these while at it..
+
+I'll respin with WARN
 
