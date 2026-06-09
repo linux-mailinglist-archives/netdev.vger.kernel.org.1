@@ -1,257 +1,228 @@
-Return-Path: <netdev+bounces-297276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297277-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6MkEHM92KGpcFAMAu9opvQ
-	(envelope-from <netdev+bounces-297276-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:25:51 +0200
+	id cNnfN8N5KGrtFAMAu9opvQ
+	(envelope-from <netdev+bounces-297277-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:38:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF3666412B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:25:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407D66641B6
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:38:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=hq832+iC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297276-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297276-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=fHVwoZRA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297277-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297277-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 52E393021EE6
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 20:25:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19CCB303D13C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 20:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632BF3905F4;
-	Tue,  9 Jun 2026 20:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC863905F4;
+	Tue,  9 Jun 2026 20:38:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF68349AE6
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 20:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91641372ED0;
+	Tue,  9 Jun 2026 20:38:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781036749; cv=none; b=FNpy6uZZlv3fcTNyroc3hZlITLUejQu6JvyUNjil+x7xqkiVtv9l6yhui9YfKtWwAMP2FqhxIi00y66VpQRB9c9PsUi4xSLcFRBi+xYFyliyF85wLnz7tCn1o4+XCWNmKS3djG3mz3/wne5qiLDnQPM0ST7MMEXy3oJjtknOAxI=
+	t=1781037504; cv=none; b=eH8c6LukRggvTZb4M7fnVRlsJGUNAoQVONHm+Czy3zbA4cx6rWKJgBp402uCJr3BD+smmAUNDREb3MYmGsK+R/FJCwQmnTj3XR4Li/enyf/n/OKhd2jUjL9SBAgdzza/1HK9w9gk31mQvnFS6l0bKayQUaQs8czyhkec8TsECfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781036749; c=relaxed/simple;
-	bh=oKkSVxT/Y4XKV2ObqYnE31wJmdQaPrWWo7tQBqtLFbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P1f8nR2qHrKEaViUxsB/fyhMpmCimYBNzeubsG8xUTboQ1Gpf/ImAFLNeme2FNr9WuYxrFb4aVt2m667JLav8Hxy3uKmrXlba6u7mwZf0DvTmyelKHQRasns+15T20UrV/oemK5D7vrWdKTVFfXgWiEi4PnYvFyVtArBBxUnSBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=hq832+iC; arc=none smtp.client-ip=209.85.221.53
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-45ef4223be7so3261590f8f.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 13:25:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1781036746; x=1781641546; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mQGRPMu1kxL0yXF36zCXENzLxRFFn1aJOYE1MvTj2ac=;
-        b=hq832+iCJCELZKBabJzXUSMFh2Vw1B+YSTJQ0mQZ+XR3ekPc8ylB6L9rDEFE/+CipP
-         +eLKBe93wo0Du9ub1yanTlZinNfb35i/yaH9Z6kPL3RwnNGRw7T6wSpJW4M9cCf4n5Ch
-         QJbPlpGbacUltuw6+INXRq5ut2XBfSPD6E6dQee+o5aXpBg+mGVv1yxOBAWgROCiXckP
-         3QcEWI0g0J66MSQKZN5qQvilbzpLhfDS9HSslDibqbcJ88pwLXuvIqxdO6dx28JpZl4p
-         3v2fm4/pi9sy2q2CYZ/oa0QJk9qIDXMhiYdJ8cX19K5V/D71YAkhjnSkk8dSRBttfBWR
-         zg7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781036746; x=1781641546;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mQGRPMu1kxL0yXF36zCXENzLxRFFn1aJOYE1MvTj2ac=;
-        b=BBMO86JieLhFuWnS9dT0sKtEzgMYVg8Rs47fSOkpzMhxxaERoR82CP/HZBtwOqzXU2
-         HXWUGQvJjyjovWTF4X3hH71ff1cquZp6WZW40fBuhd8eYunhYQJyS4NqVJeKFxgu0gBi
-         PQovAWaR/eKNDdR2GavMGy7f7xxr7k6kxfzrobrCBGAC13GYCY0VmEHU1KPDmU0GbGfL
-         z3ZpUHUXSHqn8lqcwegjEH1J5wl1BiYm9aC06PRSubGgStleXkQ5zIW2rt8LTnDVTaeR
-         8yh7SlKVpPFCprZ6dhO5uMi/78wzKz0PUKq15daUBLk0OVzRxu3u8uHePQphWTX0P1eb
-         MZxA==
-X-Forwarded-Encrypted: i=1; AFNElJ/tId+zQfdethpNNVYPgIPr0HFC2KKuX0tkqxRs482rQXMKjOKameBH6J0F3reQ+E52imv0miI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRymSyreJrDpBh78sjmLIM3HWLw7BlWKGrWumNX9d1gqyBBFbl
-	nsHPsvDPsFz3LVf3VscxkgZIhZLTXHVR/IvDsp81GW9w4N5GTKNp1KJWaozErBh1DbILLXcncY1
-	uCL9lgLiJxRM=
-X-Gm-Gg: Acq92OE4t7bFsq2bnOAouI2rKx+1t+AI44lCn1TVg+Ie6VKBF5I2NMZ69OpuG7e/zoN
-	lu3fR3xSCB+BogiI+puMt/kDBD835UcnKqb9kIM7jD3LO3GFqXmfCCUXft+qlcuFSTqljWiQXvh
-	lKmNLhGT2CY67O6KPQJxiZWkPIpLb7LoO8nZsiOSKH81MfnMvwM3/btf6mP6OTvu14RGgxMV/KO
-	b2OW6tjR7xg9kbKGYnXuHpc4l4K4m+dnSzF1th0KAt4DlNHd4i11DAPuQqRjhT+hSed80+Oa4Kc
-	FLp0XtJTdrAtYKPXmjMx1VPmqgntfhhvZ/xUNTv4O1H1fFGT7HiDEu0+Wvvi0/EclPOuHoGhaYV
-	/3PHawDKPwNIU+HOwwex+XFw7/dbS0ZgfGoUVG21XPZX5yIJHx3N3EsTXIn5H78ilBmOC6S+fbx
-	7r6J8N3X6Lj6wp9RW6bKGoZqF5HEJNses3Q7xsOgrhZTOwx0AXLvs7tWEtSJ+gjMnINhPXTsN0t
-	c7rL6tObs+A4MApRXi7OFZ+vcDusxKWCzCCGRU+QHCrjWqzM5WQAtQ=
-X-Received: by 2002:a05:6000:4022:b0:44a:b931:f32a with SMTP id ffacd0b85a97d-460566beef3mr6351288f8f.27.1781036746040;
-        Tue, 09 Jun 2026 13:25:46 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.223.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46028a6dcbdsm53432272f8f.7.2026.06.09.13.25.44
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 09 Jun 2026 13:25:45 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: david@ixit.cz,
-	oe-linux-nfc@lists.linux.dev
-Cc: david.laight.linux@gmail.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v4] nfc: llcp: bound SNL TLV parsing to the skb and add length checks
-Date: Tue,  9 Jun 2026 22:25:43 +0200
-Message-ID: <20260609202543.42282-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1781037504; c=relaxed/simple;
+	bh=kN949FbLieTFVYqrLU/gahcoR97DPDzdBVinybm3qc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=olEDRlUGYSyfMvFfTcfLEc/zajA43aP9bk3cVfgGJDXPD1YfpjwXjb4+FOemI0/+h5qzrpdqviLsXKGvncnhCHQvxITVRXvKedZTx9C8TMA6YfyOx92una3umk2sIOJKxppdFIPZ2k6m21NC4ZYaWE3nt+VRWmcDWVimxouEfy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=fHVwoZRA; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 2B52C600B9;
+	Tue,  9 Jun 2026 22:38:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1781037500;
+	bh=Ec7CX7V2wVQlwnod0QL2+D30YPNcnBDkLGAbkDyLoQY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fHVwoZRA5BA8D0Hc39zoGk9NRGzLDXZAC0Vz/8Wc4tRcugIi7tZNsi81oIKEn981Z
+	 IbiJXVZoIl0BqH3nZVigaJ0VCh27KQ7sU9d7JQ+koYdch3BBd5p7epaRKjUi0zoshN
+	 rdcdvtDrkI0daalBjJLrx8WzeC3pOJJ/IGU+mtrQcT8/v02NhaIw/8UluqNMO4d/te
+	 OCYLtzsCxNbTF8FXeA+HcP+ZwnX3207x356S6DPx0mLQEzEYgyQp6DQN+yTkThV28l
+	 Z8TxsoZKkPOubzZSAIb4052Jd08VzUEMrVXZz1h8pINedJ7EB09XcTyplLOAKXf2vB
+	 SnsDpkMNrY1Zg==
+Date: Tue, 9 Jun 2026 22:38:17 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: flowtable: use pskb_may_pull() in
+ nf_flow_ip6_tunnel_proto()
+Message-ID: <aih5uTn97bK29LDR@chamomile>
+References: <20260608-b4-nf_flow_ip6_tunnel_proto-update-v1-1-782c7052c8fd@kernel.org>
+ <aidMPKrm9gOcPLW-@chamomile>
+ <aifquGhK_Cijxq7m@lore-desk>
+ <aif9kL38LKNcX1Xu@chamomile>
+ <aigHh5cBKc12frX2@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aigHh5cBKc12frX2@lore-desk>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:david.laight.linux@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297276-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[0sec.ai];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[0sec.ai:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297277-lists,netdev=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,netfilter.org:dkim,netfilter.org:from_mime,chamomile:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0FF3666412B
+X-Rspamd-Queue-Id: 407D66641B6
 
-nfc_llcp_recv_snl() walked the SNL TLV list using a u16 offset/length
-pair derived from skb->len, without bounding reads to the actual skb
-data. Three problems followed:
+Hi Lorenzo,
 
-  - For a short frame (skb->len < LLCP_HEADER_SIZE), tlv_len underflowed.
-  - The per-TLV header (type, length) was read without checking that two
-    bytes remained.
-  - A declared TLV length could run past the end of the buffer, and an
-    SDREQ with length == 0 made "service_name_len = length - 1" underflow
-    (size_t), driving an out-of-bounds read in the following strncmp() /
-    nfc_llcp_sock_from_sn(). The SDRES case likewise read tlv[2]/tlv[3]
-    without a length check.
+On Tue, Jun 09, 2026 at 02:31:03PM +0200, Lorenzo Bianconi wrote:
+> > On Tue, Jun 09, 2026 at 12:28:08PM +0200, Lorenzo Bianconi wrote:
+> > > On Jun 09, Pablo Neira Ayuso wrote:
+> > > > Hi Lorenzo,
+> > > > 
+> > > > On Mon, Jun 08, 2026 at 07:06:52PM +0200, Lorenzo Bianconi wrote:
+> > > > > Switch nf_flow_ip6_tunnel_proto() from skb_header_pointer() to
+> > > > > pskb_may_pull() for header validation, aligning it with the approach
+> > > > > used in nf_flow_ip4_tunnel_proto().
+> > > > > Move ctx->offset update inside the IPPROTO_IPV6 conditional block since
+> > > > > it should only be adjusted when a tunnel is actually detected.
+> > > > > While at it, use nexthdr instead of the hardcoded IPPROTO_IPV6 constant
+> > > > > when setting ctx->tun.proto.
+> > > > > 
+> > > > > Fixes: d98103575dcdd ("netfilter: flowtable: Add IP6IP6 rx sw acceleration")
+> > > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > > > ---
+> > > > >  net/netfilter/nf_flow_table_ip.c | 10 +++++-----
+> > > > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> > > > > index 9c05a50d6013..2946399ab715 100644
+> > > > > --- a/net/netfilter/nf_flow_table_ip.c
+> > > > > +++ b/net/netfilter/nf_flow_table_ip.c
+> > > > > @@ -347,15 +347,15 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_flowtable_ctx *ctx,
+> > > > >  				     struct sk_buff *skb)
+> > > > >  {
+> > > > >  #if IS_ENABLED(CONFIG_IPV6)
+> > > > > -	struct ipv6hdr *ip6h, _ip6h;
+> > > > > +	struct ipv6hdr *ip6h;
+> > > > >  	__be16 frag_off;
+> > > > >  	u8 nexthdr;
+> > > > >  	int hdrlen;
+> > > > >  
+> > > > > -	ip6h = skb_header_pointer(skb, ctx->offset, sizeof(*ip6h), &_ip6h);
+> > > > > -	if (!ip6h)
+> > > > > +	if (!pskb_may_pull(skb, sizeof(*ip6h) + ctx->offset))
+> > > > >  		return false;
+> > > > >  
+> > > > > +	ip6h = (struct ipv6hdr *)(skb_network_header(skb) + ctx->offset);
+> > > > >  	if (ip6h->hop_limit <= 1)
+> > > > >  		return false;
+> > > > 
+> > > > Not shown in the patch, but is there still a corner case here that
+> > > > needs to be covered?
+> > > > 
+> > > > ipv6_skip_exthdr() uses skb_header_pointer() internal, then another
+> > > > pskb_may_pull() is needed to make sure no other IPv6 extension header
+> > > > sits between the outer and the inner IPPROTO_IPV6 header, allowing to
+> > > > be in a non-linear area of the skb?        
+> > > > 
+> > > > > @@ -367,9 +367,9 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_flowtable_ctx *ctx,
+> > > > >  
+> > > > 
+> > > > I mean:
+> > > > 
+> > > >         if (!pskb_may_pull(skb, hdrlen))
+> > > >                 return false;
+> > > > 
+> > > > where hdrlen is what ipv6_skip_exthdr() returns.
+> > > > 
+> > > > Then, I think it should be safe to call skb_pull() on
+> > > > ctx->tun.hdr_size.
+> > > > 
+> > > > Let me know, thanks.
+> > > 
+> > > I think you are right, here we need to run:
+> > > 
+> > > 	if (!pskb_may_pull(skb, hdrlen))
+> > > 		return false;
+> > > 
+> > > in order to be sure we can pull ctx->tun.hdr_size in nf_flow_ip_tunnel_pop().
+> > > Doing so, we can roll-back to the original skb_header_pointer() to access the
+> > > outer ip6 header here. What do you think?
+> > 
+> > Yes, initial skb_header_pointer() then pskb_may_pull(skb, hdrlen) to
+> > ensure the entire should be fine.
+> > 
+> > I think this need one more fix: This needs to resort to classic path
+> > if there are intermediate extension headers sitting in between the
+> > outer and inner headers in IP6IP6, ie. ipv6_ext_hdr() == true. Those
+> > extensions need to be handled by the IPv6 stack.
+> 
+> In my setup we have just a single Destination Option extension header (60)
+> between the outer and the inner IPV6 headers. In order to check if we have
+> other extensions headers other than Destination Option (and if so, send the
+> packet the networking stack) I guess we need to implement something similar
+> to ipv6_skip_exthdr(), agree?
 
-A nearby NFC device can reach this without authentication; LLCP link
-activation happens automatically after NFC-DEP.
+Maybe simpler check? If nexthdr is immediately IP6IP6 (ie. no
+intermediate headers are in place), then handle this from the
+flowtable datapath, otherwise fallback to classic. Thus, no new
+special parser function is needed.
 
-Walk the TLV list by pointer, bounded by skb_tail_pointer() over the
-linear skb data, and validate each TLV declared length before use. Add
-explicit length checks for SDREQ (>= 1) and SDRES (exactly 2).
+> > nf_flow_ip6_tunnel_proto() needs to be fixed to deal with this. 
+> 
+> Do you want to do it with a dedicated patch or do you prefer to do it in this
+> one?
 
-Found by 0sec automated security-research tooling (https://0sec.ai).
+I think a single patch to fix the issues in nf_flow_ip6_tunnel_proto()
+should be fine.
 
-Fixes: 19cfe5843e86 ("NFC: Initial SNL support")
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
-v4:
- - Add Fixes: tag pointing at the commit that introduced the unbounded
-   SNL TLV walk and the SDREQ service_name_len underflow (David Heidelberg).
+My understanding is that IP6IP6 tunnels are special, because it is
+handled in the received path as local traffic, then decapsulation
+happens and packet follows local output path. This is different to
+what we already have where packets follow forwarding path, not local
+input. The flowtable should only pull the outer IP6 header.
 
-v3 (review cleanups, no functional change to the fix):
- - Comment that only the linear part of the skb is parsed (David Laight).
- - Use int for service_name_len and print the bounded service name
-   directly with %.*s; drop the min_t()/cast (David Laight).
- - Require SDRES length to be exactly 2, not just >= 2 (David Laight).
+> > And I suspect nf_flow_ip4_tunnel_proto() with IP options have the same
+> > problem, the flowtable need to resort to the classic stack path.
+> 
+> In the IPv4 case, if the packet has options nf_flow_ip4_tunnel_proto() will
+> return false and so the packet will be sent to the networking stack.
 
-v2: https://lore.kernel.org/netdev/20260603135935.62647-1-doruk@0sec.ai/
- - Walk by pointer bounded on skb_tail_pointer(); drop the 16-bit
-   offset/tlv_len math and fix the short-frame underflow (David Laight).
- - Add an SDRES length check alongside SDREQ length >= 1 (David Laight).
- - Bound the SDREQ service-name pr_debug to the field length.
- - Rebased onto linux-nfc for-next (David Heidelberg).
-
- net/nfc/llcp_core.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
-
-diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-index dc65c719f..aed5fe1af 100644
---- a/net/nfc/llcp_core.c
-+++ b/net/nfc/llcp_core.c
-@@ -1286,10 +1286,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- {
- 	struct nfc_llcp_sock *llcp_sock;
- 	u8 dsap, ssap, type, length, tid, sap;
--	const u8 *tlv;
--	u16 tlv_len, offset;
-+	const u8 *tlv, *tlv_end;
- 	const char *service_name;
--	size_t service_name_len;
-+	int service_name_len;
- 	struct nfc_llcp_sdp_tlv *sdp;
- 	HLIST_HEAD(llc_sdres_list);
- 	size_t sdres_tlvs_len;
-@@ -1305,22 +1304,34 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- 		return;
- 	}
- 
-+	/*
-+	 * Walk the SNL TLV list in the linear part of the skb only,
-+	 * bounded by skb_tail_pointer(). Each TLV needs a two-byte
-+	 * header (type, length) and its declared length must fit before
-+	 * the end; this also keeps the walk safe for very short frames.
-+	 */
- 	tlv = &skb->data[LLCP_HEADER_SIZE];
--	tlv_len = skb->len - LLCP_HEADER_SIZE;
--	offset = 0;
-+	tlv_end = skb_tail_pointer(skb);
- 	sdres_tlvs_len = 0;
- 
--	while (offset < tlv_len) {
-+	while (tlv + 2 < tlv_end) {
- 		type = tlv[0];
- 		length = tlv[1];
- 
-+		if (tlv + 2 + length > tlv_end)
-+			break;
-+
- 		switch (type) {
- 		case LLCP_TLV_SDREQ:
-+			if (length < 1)
-+				break;
-+
- 			tid = tlv[2];
- 			service_name = (char *) &tlv[3];
- 			service_name_len = length - 1;
- 
--			pr_debug("Looking for %.16s\n", service_name);
-+			pr_debug("Looking for %.*s\n", service_name_len,
-+				 service_name);
- 
- 			if (service_name_len == strlen("urn:nfc:sn:sdp") &&
- 			    !strncmp(service_name, "urn:nfc:sn:sdp",
-@@ -1380,6 +1391,9 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- 			break;
- 
- 		case LLCP_TLV_SDRES:
-+			if (length != 2)
-+				break;
-+
- 			mutex_lock(&local->sdreq_lock);
- 
- 			pr_debug("LLCP_TLV_SDRES: searching tid %d\n", tlv[2]);
-@@ -1408,7 +1422,6 @@ static void nfc_llcp_recv_snl(struct nfc_llcp_local *local,
- 			break;
- 		}
- 
--		offset += length + 2;
- 		tlv += length + 2;
- 	}
- 
--- 
-2.53.0
-
+OK, then IPv4 is fine, thanks for explaining.
 
