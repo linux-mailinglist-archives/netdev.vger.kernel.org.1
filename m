@@ -1,107 +1,83 @@
-Return-Path: <netdev+bounces-297073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UxKUO/4jKGqt+gIAu9opvQ
-	(envelope-from <netdev+bounces-297073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:32:31 +0200
+	id 0kh3AJojKGqL+gIAu9opvQ
+	(envelope-from <netdev+bounces-297078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:30:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C4E66111A
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:32:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471796610BD
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:30:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="Y 1syMdv";
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=fL5TeSTB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297073-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297073-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nwDszgGM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297078-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297078-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F36483039F7C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:22:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 25DAA3054925
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E38533F37A;
-	Tue,  9 Jun 2026 14:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B619344029;
+	Tue,  9 Jun 2026 14:27:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C10328635
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 14:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DC734040F;
+	Tue,  9 Jun 2026 14:27:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781014906; cv=none; b=G9JSn5DYOVbKC0B8Eq4mGcx/3TIxq6X55gfuaedBsIgHkQDGElB/U/MHxOd4mDOOZOgGpenCZ4Coe2yyDxAWLfOxpRTBoLwX5l38ZfYX6gbdJkTUqBiLbzO2UvftRMS+JCht9vz0Rl3JDRSLU1Fs4ktqo2V+cAWN7RW/SJcUZkU=
+	t=1781015232; cv=none; b=eCa2K/B9wCHqbU05t0qruyFv+3aEvE90ne6WCHbxxENZtPC6i8b6TVKdKsdc4Ued+ymgg/2t7RnZQ0bobJpb2uz3ZrVPJg5VqUJOlNdGiM0WFOkORX5SbfyBIWrpBT+TBvoWPpw75BX/VTRk/uxFz3q8w7PyM7Nbj/9f0l+FreA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781014906; c=relaxed/simple;
-	bh=GEknocA44VLGQCFPldwKa4wrHw80zUgaD0NJ61aYPjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QpfJT+DtdUSIcTC+NCBxs4G0js31Djir7/DDafgv8mopV64OGVN0M/NNE4fkJL87HAxY33NOlpIggF8fusO/lGI/pqB6S3A2dwiL8UnzqcJt1I2s+D4rk0lCfQQ1BmH3RP0c4YOTAPdaZXMBf4+cQiy8SeHzYuj0J0bwSlMaIV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Y1syMdvu; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fL5TeSTB; arc=none smtp.client-ip=202.12.124.156
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 2397D7A0106;
-	Tue,  9 Jun 2026 10:21:43 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Tue, 09 Jun 2026 10:21:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1781014902; x=
-	1781101302; bh=dCDxGNVkpPoA3MaDM+5aH3tDaTjS+nHMUgKfHXARb44=; b=Y
-	1syMdvuPX/0cQgyTVpQtyJfNSkLXKT1SjzRJZvA9YugJh+c6cwFEmHPZuQfTjm1p
-	fYDMGrtUFSMg1Hlgi52CpOyFLfCXUmOXziAk+4q7Nw5enYVHqv3ihvzjMemXhOsY
-	uop1Mpx+mP8apBl0Zzy+QnbvfLPRd9tANYfFPTzodj6ZNAASS2qX2fuAHAxO8DI5
-	elNRnPodRgl8xeTKpeKV2DLh1J01mDH11uGqpgpd316GrJ0I0nopf1cWuDUgAKA8
-	zisoe5EhT0lOqw/atVoaDpPfinTXetXazgF6iwIJqWXMFysiZlEXGr/eYiYdJUuJ
-	/6Nbmuioc/LXjALzhfjoQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1781014902; x=1781101302; bh=d
-	CDxGNVkpPoA3MaDM+5aH3tDaTjS+nHMUgKfHXARb44=; b=fL5TeSTBYzzZKog1o
-	G8QzkKkRtNOzdSB/ILdGxUJqa3nlmtkgIRtfrZgh7NuyHgFffgNEK5UZ010HIPGY
-	yJFVMjLW9dEHT61NzejqBU0hZPKDPUZKNxMGtdtwr5/JIOyKoY4ktIrJQwK2rQwl
-	hKcPBvgacISdVYaRZXThpPN2UQ03D54D5W1TdmpI+P42TL4Lt7gyDAGYdq3e6J72
-	sadgmiMkVk+r4phzwZOLKsPC1Kc3+Z63P0cIppQpnOLcZKzSTeLmY0Hax+Y7O5nX
-	U4CHFCmJVNuNb75jKLZUgZ38hiDxmr2wIMKsuXOf/I+OmPSOiEVDnYzyW23cfHBM
-	io5fQ==
-X-ME-Sender: <xms:diEoaqeCx1e09gy4BiS_RjnZ0silLXcB65_wvJT8eAXgTG3l5o4dng>
-    <xme:diEoamyL_BWOy-qwytFL4Jyb5crdLNg5bIZHyJUeOkYQQWk4mb6joERmR29kLe-nE
-    SS_KHMlJuG9cA9q7KsQuXh5jtD2Dc80sV_GOo_Zi-jsr87ylz_LQAFB>
-X-ME-Received: <xmr:diEoavI5ePjbXpti46u1uvzCdOM1ehKtYaF-dpY4OTC7r6W0hfUks4gm579dxrz5X8DO5nkKYYnzYZFIu5sYgIw>
-X-ME-Proxy-Cause: dmFkZTFAYbPIEdlTaGgLlXLtM++A7Xm5v8ULkYXIB0CEeSRTBEVZ+ZnlmbpeGJkBRhW7Qa
-    qxgUrNWZT+Kvuqa4JS36FWYwG6mAwt0ck08N4/tWJKvr5xjlRRHzVO4ahoBcxeJroSjaiC
-    Lanrxv4hd6bLPHzP8TCKoNRopk+nsEAp/fM9ZztHWWPaD1PERQDtR4sOWCVSBLtsUvBDTn
-    XBLVkw4hNHH6gtnA1oJeBmJ9yy9jZZv6GdEsCFJ6+ynA+ciPmfY5mDDbFPQmqdvEhTDvNS
-    VVSTVM1dRgvkrdvAVgO+aI7wHSAzcy4Oo2p3P9UOCyzaVynRRnXp63xGApJDqAp518OBSe
-    forXluxPJSIW+kf4F5g/0nvLIvBPPTnp4QlLuXffKV1tHfNPQALDyJfmY/xV7bs5ToVmyC
-    HSui2OGzyu1+LjpqwfSZmQx+DngqTUGFwoY3UGGJMffshuopA6e4xE2e5l135/2fpZ3Ijh
-    CLjX/gB+6yhjgu1R3DhQD1j8MpqxmWX/VtvVj1u0LWwqGfffLr4SKEaz5zkM+uNSiVbD2x
-    h4zgOySKDedbQpKEfSIcD83yc1hWyW+XFO3IY/sGP/8u/90jsEHdcQJ/vV2rydvcfJijhV
-    PxfYV5n2PsGUsfh6eMqZDI+m9/fKTVPeQS+fX/KWdqexzH1NmqcACFfsLpIw
-X-ME-Proxy: <xmx:diEoaoHN5CM-9id7OXDzjl8jZgPLGa0pRUcxut1MmihertcQMI0wYQ>
-    <xmx:diEoar-VeauKHosjPjSyHAx5ea82NeKY5ZB-70Ko9GMzDruiiOwc7g>
-    <xmx:diEoaoISBP8PRLiwi7nc3Vb9nbh5FT-HM7gSQfONFTExDolP9oiOHg>
-    <xmx:diEoapupO9LgIGOU1jowuHw-hfRnDkQPXSGp0Qx-UH0XnnZHUUddbg>
-    <xmx:diEoap5KyL0IU27iu8gA81PrSz0QMInWGmD1RJN8dKVt50sdO_yAZvCc>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 9 Jun 2026 10:21:42 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH net-next 2/2] net: remove some unused EXPORT_SYMBOL()s
-Date: Tue,  9 Jun 2026 16:21:22 +0200
-Message-ID: <cbf1457c5d192a206f2f244ea3453766cb5dbbf9.1781013810.git.sd@queasysnail.net>
+	s=arc-20240116; t=1781015232; c=relaxed/simple;
+	bh=iygAOfvA2foW8/+jP6Ee21bgu2uYdvqpa6z2Rjyy9uk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWyQnNeFQ3UTnhTAzZvbj6ppLSL/rqsvEAarPZe+dquxt52/W9Ta7OxrU+uSgrF9o21HP5VDjo1kZ9Fb/jruXRL5QGgsSp0JGdQvfoOr8fMSb2oi62zANSJ6sAcsPpJwHz54Qzzdwy0fBVZ/VdFDv8oGLeWK+q1QqsxNsAlNp90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwDszgGM; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72C0D1F00893;
+	Tue,  9 Jun 2026 14:27:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781015229;
+	bh=7b6cZO88qxYhwPQRHX9JdG5EbRfREDm6sv5DAhrto3Y=;
+	h=From:To:Cc:Subject:Date:Reply-To;
+	b=nwDszgGMS4Q5Gx6dDnrYmmxG3JFRwCznR8eeTRISzUFizK3fvgodofWAu0j6qV7Vm
+	 x8jzUygPHi0X7dKckNz5MK6s/lYGVbDQhxCVCq/CV6YZzLrPMaloIQFmQ9JFuDUE5t
+	 bsKGaAtZc/eXQskQawfXOzP2QBNT3/JHr9JepY5csJaBJqqS9brT6suCfR/tDAY0dl
+	 3cy1egpS8C+a924GwJU7wfUap2OVoYsh+qWf3VZMyjzZUZq62sEE4olr+tg2BSk3eU
+	 n3m/ldEIak5tl9p0RlIcfwcAmJu0eCLrYxhxYEWpbrCZaUgMHWORyNWIt7SezgpP9w
+	 fnMRyl333y4xg==
+From: Gary Guo <gary@kernel.org>
+To: Danilo Krummrich <dakr@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Trevor Gross <tmgross@umich.edu>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Waiman Long <longman@redhat.com>,
+	Tamir Duberstein <tamird@kernel.org>
+Cc: nova-gpu@lists.linux.dev,
+	dri-devel@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	driver-core@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH v4] rust: make `build_assert` module the home of related macros
+Date: Tue,  9 Jun 2026 15:26:33 +0100
+Message-ID: <20260609142637.373347-1-gary@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <cover.1781013810.git.sd@queasysnail.net>
-References: <cover.1781013810.git.sd@queasysnail.net>
+Reply-To: Gary Guo <gary@garyguo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,206 +86,449 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297073-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:sd@queasysnail.net,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	REPLYTO_DN_EQ_FROM_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297078-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_RECIPIENTS(0.00)[m:dakr@kernel.org,m:acourbot@nvidia.com,m:aliceryhl@google.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:ojeda@kernel.org,m:boqun@kernel.org,m:gary@garyguo.net,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:tmgross@umich.edu,m:daniel.almeida@collabora.com,m:fujita.tomonori@gmail.com,m:yury.norov@gmail.com,m:will@kernel.org,m:peterz@infradead.org,m:mark.rutland@arm.com,m:mingo@redhat.com,m:longman@redhat.com,m:tamird@kernel.org,m:nova-gpu@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:linux-kernel@vger.kernel.org,m:rust-for-linux@vger.kernel.org,m:driver-core@lists.linux.dev,m:netdev@vger.kernel.org,m:fujitatomonori@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[gary@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[kernel.org,nvidia.com,google.com,gmail.com,ffwll.ch,garyguo.net,protonmail.com,umich.edu,collabora.com,infradead.org,arm.com,redhat.com];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gary@kernel.org,netdev@vger.kernel.org];
+	HAS_REPLYTO(0.00)[gary@garyguo.net];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,messagingengine.com:dkim,queasysnail.net:dkim,queasysnail.net:email,queasysnail.net:mid,queasysnail.net:from_mime]
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nvidia.com:email,garyguo.net:replyto,garyguo.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67C4E66111A
+X-Rspamd-Queue-Id: 471796610BD
 
-chtls was using a lot of symbols that no other module requires. Remove
-those EXPORT_SYMBOL()s.
+From: Gary Guo <gary@garyguo.net>
 
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Given the macro scoping rules, all macros are rendered twice, in the
+module and in the top-level of kernel crate.
+
+Add `#[doc(no_inline)]` to the prelude so it just shows up as re-export.
+Add `#[doc(hidden)]` to the macro definition and `#[doc(inline)]` to the
+re-export inside `build_assert` module so the top-level items are hidden.
+
+Acked-by: Danilo Krummrich <dakr@kernel.org>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Acked-by: Alexandre Courbot <acourbot@nvidia.com>
+Acked-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Acked-by: Boqun Feng <boqun@kernel.org>
+Signed-off-by: Gary Guo <gary@garyguo.net>
 ---
- net/core/stream.c               | 1 -
- net/ipv4/inet_connection_sock.c | 6 ------
- net/ipv4/inet_hashtables.c      | 2 --
- net/ipv4/tcp.c                  | 4 ----
- net/ipv4/tcp_ipv4.c             | 1 -
- net/ipv4/tcp_minisocks.c        | 2 --
- 6 files changed, 16 deletions(-)
+This is the remaining unapplied patch from
+https://lore.kernel.org/rust-for-linux/20260319121653.2975748-1-gary@kernel.org/.
 
-diff --git a/net/core/stream.c b/net/core/stream.c
-index 7a37e7dd2c43..2d748581862d 100644
---- a/net/core/stream.c
-+++ b/net/core/stream.c
-@@ -112,7 +112,6 @@ void sk_stream_wait_close(struct sock *sk, long timeout)
- 		remove_wait_queue(sk_sleep(sk), &wait);
- 	}
- }
--EXPORT_SYMBOL(sk_stream_wait_close);
+Changes:
+- Rebased so it applies cleanly. (both on linux-next and rust-next)
+- Picked up tags
+- Updated commit message to reflect that my other patch "rust: doc: disable
+  doc inlining for all prelude items" already reduce number of rendering
+  times from 3 to 2.
+---
+ drivers/gpu/nova-core/bitfield.rs    |  4 ++--
+ drivers/gpu/nova-core/num.rs         |  2 +-
+ rust/kernel/build_assert.rs          | 19 ++++++++++++-------
+ rust/kernel/io/register.rs           | 19 ++++++++++++-------
+ rust/kernel/io/resource.rs           |  2 +-
+ rust/kernel/ioctl.rs                 |  2 +-
+ rust/kernel/net/phy/reg.rs           |  8 +++++---
+ rust/kernel/num/bounded.rs           |  2 +-
+ rust/kernel/prelude.rs               | 12 ++++++++----
+ rust/kernel/sync/atomic/internal.rs  |  9 ++++++---
+ rust/kernel/sync/atomic/predefine.rs |  2 +-
+ rust/kernel/sync/locked_by.rs        |  2 +-
+ rust/kernel/sync/refcount.rs         |  8 +++++---
+ rust/kernel/xarray.rs                | 10 ++++++++--
+ 14 files changed, 64 insertions(+), 37 deletions(-)
+
+diff --git a/drivers/gpu/nova-core/bitfield.rs b/drivers/gpu/nova-core/bitfield.rs
+index 02efdcf78d89..660c3911402d 100644
+--- a/drivers/gpu/nova-core/bitfield.rs
++++ b/drivers/gpu/nova-core/bitfield.rs
+@@ -170,7 +170,7 @@ impl $name {
+     (@check_field_bounds $hi:tt:$lo:tt $field:ident as bool) => {
+         #[allow(clippy::eq_op)]
+         const _: () = {
+-            ::kernel::build_assert!(
++            ::kernel::build_assert::build_assert!(
+                 $hi == $lo,
+                 concat!("boolean field `", stringify!($field), "` covers more than one bit")
+             );
+@@ -181,7 +181,7 @@ impl $name {
+     (@check_field_bounds $hi:tt:$lo:tt $field:ident as $type:tt) => {
+         #[allow(clippy::eq_op)]
+         const _: () = {
+-            ::kernel::build_assert!(
++            ::kernel::build_assert::build_assert!(
+                 $hi >= $lo,
+                 concat!("field `", stringify!($field), "`'s MSB is smaller than its LSB")
+             );
+diff --git a/drivers/gpu/nova-core/num.rs b/drivers/gpu/nova-core/num.rs
+index 6c824b8d7b97..6eb174d136ab 100644
+--- a/drivers/gpu/nova-core/num.rs
++++ b/drivers/gpu/nova-core/num.rs
+@@ -49,7 +49,7 @@ macro_rules! impl_safe_as {
+             #[allow(unused)]
+             #[inline(always)]
+             pub(crate) const fn [<$from _as_ $into>](value: $from) -> $into {
+-                kernel::static_assert!(size_of::<$into>() >= size_of::<$from>());
++                ::kernel::build_assert::static_assert!(size_of::<$into>() >= size_of::<$from>());
  
- /**
-  * sk_stream_wait_memory - Wait for more memory for a socket
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 5b934ce8d98a..18b567288158 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -824,7 +824,6 @@ struct dst_entry *inet_csk_route_child_sock(const struct sock *sk,
- 	__IP_INC_STATS(net, IPSTATS_MIB_OUTNOROUTES);
- 	return NULL;
- }
--EXPORT_SYMBOL_GPL(inet_csk_route_child_sock);
+                 value as $into
+             }
+diff --git a/rust/kernel/build_assert.rs b/rust/kernel/build_assert.rs
+index 2ea2154ec30c..c3acb9b68a65 100644
+--- a/rust/kernel/build_assert.rs
++++ b/rust/kernel/build_assert.rs
+@@ -61,15 +61,16 @@
+ //! undefined symbols and linker errors, it is not developer friendly to debug, so it is recommended
+ //! to avoid it and prefer other two assertions where possible.
  
- /* Decide when to expire the request and when to resend SYN-ACK */
- static void syn_ack_recalc(struct request_sock *req,
-@@ -901,7 +900,6 @@ struct request_sock *inet_reqsk_alloc(const struct request_sock_ops *ops,
- 
- 	return req;
- }
--EXPORT_SYMBOL(inet_reqsk_alloc);
- 
- void __reqsk_free(struct request_sock *req)
- {
-@@ -911,7 +909,6 @@ void __reqsk_free(struct request_sock *req)
- 	kfree(req->saved_syn);
- 	kmem_cache_free(req->rsk_ops->slab, req);
- }
--EXPORT_SYMBOL_GPL(__reqsk_free);
- 
- static struct request_sock *inet_reqsk_clone(struct request_sock *req,
- 					     struct sock *sk)
-@@ -1280,7 +1277,6 @@ void inet_csk_destroy_sock(struct sock *sk)
- 
- 	sock_put(sk);
- }
--EXPORT_SYMBOL(inet_csk_destroy_sock);
- 
- void inet_csk_prepare_for_destroy_sock(struct sock *sk)
- {
-@@ -1301,7 +1297,6 @@ void inet_csk_prepare_forced_close(struct sock *sk)
- 	inet_csk_prepare_for_destroy_sock(sk);
- 	inet_sk(sk)->inet_num = 0;
- }
--EXPORT_SYMBOL(inet_csk_prepare_forced_close);
- 
- static int inet_ulp_can_listen(const struct sock *sk)
- {
-@@ -1405,7 +1400,6 @@ struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
- 	spin_unlock(&queue->rskq_lock);
- 	return child;
- }
--EXPORT_SYMBOL(inet_csk_reqsk_queue_add);
- 
- struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *child,
- 					 struct request_sock *req, bool own_req)
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 3e795547b40c..ba0faa9ae2bb 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -252,7 +252,6 @@ void inet_put_port(struct sock *sk)
- 	__inet_put_port(sk);
- 	local_bh_enable();
- }
--EXPORT_SYMBOL(inet_put_port);
- 
- int __inet_inherit_port(const struct sock *sk, struct sock *child)
- {
-@@ -331,7 +330,6 @@ int __inet_inherit_port(const struct sock *sk, struct sock *child)
- 	spin_unlock(&head->lock);
- 	return -ENOMEM;
- }
--EXPORT_SYMBOL_GPL(__inet_inherit_port);
- 
- static struct inet_listen_hashbucket *
- inet_lhash2_bucket_sk(struct inet_hashinfo *h, struct sock *sk)
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 890182a151e1..455441f1b694 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -297,7 +297,6 @@ enum {
++#[doc(inline)]
+ pub use crate::{
+-    build_assert,
++    build_assert_macro as build_assert,
+     build_error,
+     const_assert,
+     static_assert, //
  };
  
- DEFINE_PER_CPU(unsigned int, tcp_orphan_count);
--EXPORT_PER_CPU_SYMBOL_GPL(tcp_orphan_count);
+ #[doc(hidden)]
+-pub use build_error::build_error;
++pub use build_error::build_error as build_error_fn;
  
- long sysctl_tcp_mem[3] __read_mostly;
- 
-@@ -3027,7 +3026,6 @@ void tcp_set_state(struct sock *sk, int state)
- 	 */
- 	inet_sk_state_store(sk, state);
+ /// Static assert (i.e. compile-time assert).
+ ///
+@@ -105,6 +106,7 @@
+ /// static_assert!(f(40) == 42, "f(x) must add 2 to the given input.");
+ /// ```
+ #[macro_export]
++#[doc(hidden)]
+ macro_rules! static_assert {
+     ($condition:expr $(,$arg:literal)?) => {
+         const _: () = ::core::assert!($condition $(,$arg)?);
+@@ -133,6 +135,7 @@ macro_rules! static_assert {
+ /// }
+ /// ```
+ #[macro_export]
++#[doc(hidden)]
+ macro_rules! const_assert {
+     ($condition:expr $(,$arg:literal)?) => {
+         const { ::core::assert!($condition $(,$arg)?) };
+@@ -157,12 +160,13 @@ macro_rules! const_assert {
+ /// // foo(usize::MAX); // Fails to compile.
+ /// ```
+ #[macro_export]
++#[doc(hidden)]
+ macro_rules! build_error {
+     () => {{
+-        $crate::build_assert::build_error("")
++        $crate::build_assert::build_error_fn("")
+     }};
+     ($msg:expr) => {{
+-        $crate::build_assert::build_error($msg)
++        $crate::build_assert::build_error_fn($msg)
+     }};
  }
--EXPORT_SYMBOL_GPL(tcp_set_state);
  
- /*
-  *	State processing on a close. This implements the state shift for
-@@ -3506,7 +3504,6 @@ int tcp_disconnect(struct sock *sk, int flags)
- 	sk_error_report(sk);
- 	return 0;
+@@ -200,15 +204,16 @@ macro_rules! build_error {
+ /// const _: () = const_bar(2);
+ /// ```
+ #[macro_export]
+-macro_rules! build_assert {
++#[doc(hidden)]
++macro_rules! build_assert_macro {
+     ($cond:expr $(,)?) => {{
+         if !$cond {
+-            $crate::build_assert::build_error(concat!("assertion failed: ", stringify!($cond)));
++            $crate::build_assert::build_error_fn(concat!("assertion failed: ", stringify!($cond)));
+         }
+     }};
+     ($cond:expr, $msg:expr) => {{
+         if !$cond {
+-            $crate::build_assert::build_error($msg);
++            $crate::build_assert::build_error_fn($msg);
+         }
+     }};
  }
--EXPORT_SYMBOL(tcp_disconnect);
+diff --git a/rust/kernel/io/register.rs b/rust/kernel/io/register.rs
+index 388647f28292..f924c7c7c1db 100644
+--- a/rust/kernel/io/register.rs
++++ b/rust/kernel/io/register.rs
+@@ -108,9 +108,10 @@
  
- static inline bool tcp_can_repair_sock(const struct sock *sk)
- {
-@@ -5104,7 +5101,6 @@ void tcp_done(struct sock *sk)
- 	else
- 		inet_csk_destroy_sock(sk);
+ use core::marker::PhantomData;
+ 
+-use crate::io::IoLoc;
+-
+-use kernel::build_assert;
++use crate::{
++    build_assert::build_assert,
++    io::IoLoc, //
++};
+ 
+ /// Trait implemented by all registers.
+ pub trait Register: Sized {
+@@ -872,7 +873,7 @@ macro_rules! register {
+         @reg $(#[$attr:meta])* $vis:vis $name:ident ($storage:ty)
+             [ $size:expr, stride = $stride:expr ] @ $offset:literal { $($fields:tt)* }
+     ) => {
+-        ::kernel::static_assert!(::core::mem::size_of::<$storage>() <= $stride);
++        $crate::build_assert::static_assert!(::core::mem::size_of::<$storage>() <= $stride);
+ 
+         $crate::register!(@bitfield $(#[$attr])* $vis struct $name($storage) { $($fields)* });
+         $crate::register!(@io_base $name($storage) @ $offset);
+@@ -895,7 +896,9 @@ macro_rules! register {
+         @reg $(#[$attr:meta])* $vis:vis $name:ident ($storage:ty) => $alias:ident [ $idx:expr ]
+             { $($fields:tt)* }
+     ) => {
+-        ::kernel::static_assert!($idx < <$alias as $crate::io::register::RegisterArray>::SIZE);
++        $crate::build_assert::static_assert!(
++            $idx < <$alias as $crate::io::register::RegisterArray>::SIZE
++        );
+ 
+         $crate::register!(@bitfield $(#[$attr])* $vis struct $name($storage) { $($fields)* });
+         $crate::register!(
+@@ -912,7 +915,7 @@ macro_rules! register {
+             [ $size:expr, stride = $stride:expr ]
+             @ $base:ident + $offset:literal { $($fields:tt)* }
+     ) => {
+-        ::kernel::static_assert!(::core::mem::size_of::<$storage>() <= $stride);
++        $crate::build_assert::static_assert!(::core::mem::size_of::<$storage>() <= $stride);
+ 
+         $crate::register!(@bitfield $(#[$attr])* $vis struct $name($storage) { $($fields)* });
+         $crate::register!(@io_base $name($storage) @ $offset);
+@@ -938,7 +941,9 @@ macro_rules! register {
+         @reg $(#[$attr:meta])* $vis:vis $name:ident ($storage:ty)
+             => $base:ident + $alias:ident [ $idx:expr ] { $($fields:tt)* }
+     ) => {
+-        ::kernel::static_assert!($idx < <$alias as $crate::io::register::RegisterArray>::SIZE);
++        $crate::build_assert::static_assert!(
++            $idx < <$alias as $crate::io::register::RegisterArray>::SIZE
++        );
+ 
+         $crate::register!(@bitfield $(#[$attr])* $vis struct $name($storage) { $($fields)* });
+         $crate::register!(
+diff --git a/rust/kernel/io/resource.rs b/rust/kernel/io/resource.rs
+index b7ac9faf141d..17b0c174cfc5 100644
+--- a/rust/kernel/io/resource.rs
++++ b/rust/kernel/io/resource.rs
+@@ -229,7 +229,7 @@ impl Flags {
+     // Always inline to optimize out error path of `build_assert`.
+     #[inline(always)]
+     const fn new(value: u32) -> Self {
+-        crate::build_assert!(value as u64 <= c_ulong::MAX as u64);
++        build_assert!(value as u64 <= c_ulong::MAX as u64);
+         Flags(value as c_ulong)
+     }
  }
--EXPORT_SYMBOL_GPL(tcp_done);
+diff --git a/rust/kernel/ioctl.rs b/rust/kernel/ioctl.rs
+index 2fc7662339e5..5bb5b48cf949 100644
+--- a/rust/kernel/ioctl.rs
++++ b/rust/kernel/ioctl.rs
+@@ -6,7 +6,7 @@
  
- int tcp_abort(struct sock *sk, int err)
- {
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index fdc81150ff6c..ec09f97cc9e6 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1894,7 +1894,6 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
- 	TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS);
- 	goto discard;
- }
--EXPORT_SYMBOL(tcp_v4_do_rcv);
+ #![expect(non_snake_case)]
  
- enum skb_drop_reason tcp_add_backlog(struct sock *sk, struct sk_buff *skb)
- {
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index e6092c3ac840..ddc4b17a826b 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -392,7 +392,6 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- 	tcp_update_metrics(sk);
- 	tcp_done(sk);
- }
--EXPORT_SYMBOL(tcp_time_wait);
+-use crate::build_assert;
++use crate::build_assert::build_assert;
  
- void tcp_twsk_destructor(struct sock *sk)
- {
-@@ -670,7 +669,6 @@ struct sock *tcp_create_openreq_child(const struct sock *sk,
+ /// Build an ioctl number, analogous to the C macro of the same name.
+ #[inline(always)]
+diff --git a/rust/kernel/net/phy/reg.rs b/rust/kernel/net/phy/reg.rs
+index a7db0064cb7d..80e22c264ea8 100644
+--- a/rust/kernel/net/phy/reg.rs
++++ b/rust/kernel/net/phy/reg.rs
+@@ -9,9 +9,11 @@
+ //! defined in IEEE 802.3.
  
- 	return newsk;
- }
--EXPORT_SYMBOL(tcp_create_openreq_child);
+ use super::Device;
+-use crate::build_assert;
+-use crate::error::*;
+-use crate::uapi;
++use crate::{
++    build_assert::build_assert,
++    error::*,
++    uapi, //
++};
  
- /*
-  * Process an incoming packet for SYN_RECV sockets represented as a
+ mod private {
+     /// Marker that a trait cannot be implemented outside of this crate
+diff --git a/rust/kernel/num/bounded.rs b/rust/kernel/num/bounded.rs
+index f9f90d6ec482..dafe77782d79 100644
+--- a/rust/kernel/num/bounded.rs
++++ b/rust/kernel/num/bounded.rs
+@@ -364,7 +364,7 @@ pub fn try_new(value: T) -> Option<Self> {
+     // Always inline to optimize out error path of `build_assert`.
+     #[inline(always)]
+     pub fn from_expr(expr: T) -> Self {
+-        crate::build_assert!(
++        crate::build_assert::build_assert!(
+             fits_within(expr, N),
+             "Requested value larger than maximal representable value."
+         );
+diff --git a/rust/kernel/prelude.rs b/rust/kernel/prelude.rs
+index ca260cc3937a..f6e852638ade 100644
+--- a/rust/kernel/prelude.rs
++++ b/rust/kernel/prelude.rs
+@@ -79,9 +79,6 @@
+         VVec,
+         Vec, //
+     },
+-    build_assert,
+-    build_error,
+-    const_assert,
+     current,
+     dev_alert,
+     dev_crit,
+@@ -105,7 +102,6 @@
+     pr_info,
+     pr_notice,
+     pr_warn,
+-    static_assert,
+     str::CStrExt as _,
+     try_init,
+     try_pin_init,
+@@ -113,6 +109,14 @@
+     ThisModule, //
+ };
+ 
++#[doc(no_inline)]
++pub use crate::build_assert::{
++    build_assert,
++    build_error,
++    const_assert,
++    static_assert, //
++};
++
+ // `super::std_vendor` is hidden, which makes the macro inline for some reason.
+ #[doc(no_inline)]
+ pub use super::dbg;
+diff --git a/rust/kernel/sync/atomic/internal.rs b/rust/kernel/sync/atomic/internal.rs
+index ad810c2172ec..9c8a7a203abd 100644
+--- a/rust/kernel/sync/atomic/internal.rs
++++ b/rust/kernel/sync/atomic/internal.rs
+@@ -4,8 +4,11 @@
+ //!
+ //! Provides 1:1 mapping to the C atomic operations.
+ 
+-use crate::bindings;
+-use crate::macros::paste;
++use crate::{
++    bindings,
++    build_assert::static_assert,
++    macros::paste, //
++};
+ use core::cell::UnsafeCell;
+ use ffi::c_void;
+ 
+@@ -46,7 +49,7 @@ pub trait AtomicImpl: Sized + Copy + private::Sealed {
+ // In the future when a CONFIG_ARCH_SUPPORTS_ATOMIC_RMW=n architecture plans to support Rust, the
+ // load/store helpers that guarantee atomicity against RmW operations (usually via a lock) need to
+ // be added.
+-crate::static_assert!(
++static_assert!(
+     cfg!(CONFIG_ARCH_SUPPORTS_ATOMIC_RMW),
+     "The current implementation of atomic i8/i16/ptr relies on the architecure being \
+     ARCH_SUPPORTS_ATOMIC_RMW"
+diff --git a/rust/kernel/sync/atomic/predefine.rs b/rust/kernel/sync/atomic/predefine.rs
+index 7468153429e1..adc5fa126487 100644
+--- a/rust/kernel/sync/atomic/predefine.rs
++++ b/rust/kernel/sync/atomic/predefine.rs
+@@ -2,7 +2,7 @@
+ 
+ //! Pre-defined atomic types
+ 
+-use crate::static_assert;
++use crate::prelude::*;
+ use core::mem::{align_of, size_of};
+ use ffi::c_void;
+ 
+diff --git a/rust/kernel/sync/locked_by.rs b/rust/kernel/sync/locked_by.rs
+index 61f100a45b35..fb4a1430b3b4 100644
+--- a/rust/kernel/sync/locked_by.rs
++++ b/rust/kernel/sync/locked_by.rs
+@@ -3,7 +3,7 @@
+ //! A wrapper for data protected by a lock that does not wrap it.
+ 
+ use super::{lock::Backend, lock::Lock};
+-use crate::build_assert;
++use crate::build_assert::build_assert;
+ use core::{cell::UnsafeCell, mem::size_of, ptr};
+ 
+ /// Allows access to some data to be serialised by a lock that does not wrap it.
+diff --git a/rust/kernel/sync/refcount.rs b/rust/kernel/sync/refcount.rs
+index 6c7ae8b05a0b..23a5d201f343 100644
+--- a/rust/kernel/sync/refcount.rs
++++ b/rust/kernel/sync/refcount.rs
+@@ -4,9 +4,11 @@
+ //!
+ //! C header: [`include/linux/refcount.h`](srctree/include/linux/refcount.h)
+ 
+-use crate::build_assert;
+-use crate::sync::atomic::Atomic;
+-use crate::types::Opaque;
++use crate::{
++    build_assert::build_assert,
++    sync::atomic::Atomic,
++    types::Opaque, //
++};
+ 
+ /// Atomic reference counter.
+ ///
+diff --git a/rust/kernel/xarray.rs b/rust/kernel/xarray.rs
+index 46e5f43223fe..987c9c0c2198 100644
+--- a/rust/kernel/xarray.rs
++++ b/rust/kernel/xarray.rs
+@@ -5,10 +5,16 @@
+ //! C header: [`include/linux/xarray.h`](srctree/include/linux/xarray.h)
+ 
+ use crate::{
+-    alloc, bindings, build_assert,
++    alloc,
++    bindings,
++    build_assert::build_assert,
+     error::{Error, Result},
+     ffi::c_void,
+-    types::{ForeignOwnable, NotThreadSafe, Opaque},
++    types::{
++        ForeignOwnable,
++        NotThreadSafe,
++        Opaque, //
++    }, //
+ };
+ use core::{iter, marker::PhantomData, pin::Pin, ptr::NonNull};
+ use pin_init::{pin_data, pin_init, pinned_drop, PinInit};
+
+base-commit: 98cc68794c003bc76fc9da2e8a075e947eee5921
 -- 
 2.54.0
 
