@@ -1,250 +1,269 @@
-Return-Path: <netdev+bounces-297227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297228-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cEeMMMpaKGqQCgMAu9opvQ
-	(envelope-from <netdev+bounces-297227-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:26:18 +0200
+	id KEJQBetbKGrRCgMAu9opvQ
+	(envelope-from <netdev+bounces-297228-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:31:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8DDB6634DC
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:26:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11239663556
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:31:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=garyguo.net header.s=selector1 header.b=oo75oP0G;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297227-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297227-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=garyguo.net;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=RawhVVrO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297228-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297228-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA1A53008636
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:19:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3166D3079900
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0316048B367;
-	Tue,  9 Jun 2026 18:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEE84C6F08;
+	Tue,  9 Jun 2026 18:21:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020101.outbound.protection.outlook.com [52.101.196.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775943CF1FD;
-	Tue,  9 Jun 2026 18:19:48 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781029189; cv=fail; b=V4UbbZLSI1g/asr6vDTvv3WFAbvaY0RhoKuoKV4VBeSFlqEIHdBMsh5kfngdy7oK7WD80eDHIfQWC23Zq7Vm1zE2KzhCG5jQfaYuIRwsORf44CxJDaoqOx9bKJ98/JOX5OUSn4pkCGoVNziw09uWukR9t6tJ662icHvj/9987M0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781029189; c=relaxed/simple;
-	bh=KhgbSElSJGHvS1a6h+cBNuu4nv/4yU6mcrpIOO0KIEo=;
-	h=Content-Type:Date:Message-Id:To:Cc:Subject:From:References:
-	 In-Reply-To:MIME-Version; b=oES/4rLh4Y2/LhtmUpOu4lgjQ9ECtknJ+RnoSUXke4lYfGQUjuvRaYPJRbAE4HyUGNFSGb+D/oNmeAyD46QM0/OgXRTCJlAA0rxpQbwDWJiGCqm3jxJMhaXjGAMxnmpxr9SyKAwwDszblghMDEXnWlbs9hmr+noXgz1+g5MgYos=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=oo75oP0G; arc=fail smtp.client-ip=52.101.196.101
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pxs0v1NzPZlKgoI2EwsfZZNuAbwdtB9+iML7b+dCYFurlNOSI3Y0vgV+QdSqFZFifeeSlrBWm9Gh+Q3TD0cLkDFLTg08EvDT4K/314v62yoZ9obT5BO3N83MV5c+kV+XsPJIUFyvrBiZV+LA0XuXclHXP3d5eHtBaZVBI6DU5ywVTWehpkiDphNEnLQcCUYcv8QM4iP3xd5aG8YqXo6KXzKaa7D6l97dnba5VNz5LHsqcrvRgUGrlRHL6L2FNC2RDWBEHFt8CBp2mLaxqvLy39oQWLR7pNkSIRNhGSDJrhbGejPPrvDlJSnlqzjS7DBmkUV6kKF1FWvDqScAMJrABg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x2gYKZ8GWdsGTjtfLAtRtiXYRqSSVfBVhYeSRypP/Fs=;
- b=NCJ3Qye4SMpfgDQSYokouTbAYap8dXkptQbutE9oarIvfZYRi1GCy+05PQIP8aFi0EHBDUcqVWVGzcBpkxPSbtN8JFEqAM8zMcNjgXt6xOjomjZwpUoBrhHknOG2mB5Ymc6qJD50Ye9n5UencbxtMwsY7uNoRrvj5E0kTZ8C8HNOp8P3zjWX2URhuZDL3N34Hn/wrAnhVRwCdDMtDCknILMm0u+/PgTpyC+2VoQJWESURrhTWfp0I25bkHp8TINU8eY60gRKan+sH6x9PVIuQ4IbYWs2FheuS3UapTQi1BPZ/pb1pwzOGEV2ptQsVhuXJlzYDHKMlhbGSEWi5RXfKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x2gYKZ8GWdsGTjtfLAtRtiXYRqSSVfBVhYeSRypP/Fs=;
- b=oo75oP0G18yyqG7WPsTsWvx3X+8e3OIkIVi/tRLeCc4WTgBxikmXv7WF4FZ6ukb0BaHq4LtERcOr0BPScgT8KRA5hqtSqaicdd9s19NUYj8GKxFYybrwiIxcyA3li8yguaRfxbelMX6urdHSzUIckLjE8GFRMp23Y5trAXDBR+o=
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO0P265MB2811.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:182::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.15; Tue, 9 Jun 2026
- 18:19:45 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0092.011; Tue, 9 Jun 2026
- 18:19:44 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 09 Jun 2026 19:19:42 +0100
-Message-Id: <DJ4Q5J5OILOX.1KCPFIVUFN2VV@garyguo.net>
-To: "Miguel Ojeda" <miguel.ojeda.sandonis@gmail.com>, "Gary Guo"
- <gary@garyguo.net>
-Cc: "Danilo Krummrich" <dakr@kernel.org>, "Alexandre Courbot"
- <acourbot@nvidia.com>, "Alice Ryhl" <aliceryhl@google.com>, "David Airlie"
- <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Trevor
- Gross" <tmgross@umich.edu>, "Daniel Almeida"
- <daniel.almeida@collabora.com>, "FUJITA Tomonori"
- <fujita.tomonori@gmail.com>, "Yury Norov" <yury.norov@gmail.com>, "Will
- Deacon" <will@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, "Mark
- Rutland" <mark.rutland@arm.com>, "Ingo Molnar" <mingo@redhat.com>, "Waiman
- Long" <longman@redhat.com>, "Tamir Duberstein" <tamird@kernel.org>,
- <nova-gpu@lists.linux.dev>, <dri-devel@lists.freedesktop.org>,
- <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
- <driver-core@lists.linux.dev>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4] rust: make `build_assert` module the home of related
- macros
-From: "Gary Guo" <gary@garyguo.net>
-X-Mailer: aerc 0.21.0
-References: <20260609142637.373347-1-gary@kernel.org>
- <CANiq72miJLmc2EadxUa+yVZ5T72QuTES4Gz=YVUsNivYvR=wDQ@mail.gmail.com>
-In-Reply-To: <CANiq72miJLmc2EadxUa+yVZ5T72QuTES4Gz=YVUsNivYvR=wDQ@mail.gmail.com>
-X-ClientProxiedBy: DU2PR04CA0252.eurprd04.prod.outlook.com
- (2603:10a6:10:28e::17) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF774ADDA4
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:21:55 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781029317; cv=none; b=A0GZCLRHDqbjzTAYnfFaQEdBKu2QaKiRFD0I0b1ciItkHy2uxaA+Goo/JAlEP4kg7vhxzDXuQapVY068Q5hpiE/cEgTlDPDhqr/UC6rtp95iMq3eC7C1VKDler3yFEE0cpfNrS1vQcSp9KIvYmEATrKGPWJIMN0RQsF/IVpb5gU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781029317; c=relaxed/simple;
+	bh=MDqw6E1NFQvJRAPqDEem1t57vShB0cBoV13q5Qxc330=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WqhBFnLXAGPyHVzJTQFhozIJcyWhNVKitEqbyRgqwhp/31cvA27JdBsTZoRPRcolc7DpAGCXFl3+NWtp9o3+blfJLMic5XuG9tQKp65g+2HKZmAOqNvVkAOqGBU/LpsB2mFkC0swXSQKHmr5MdgdbU1YDFYpitlCagJGnqZV2EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RawhVVrO; arc=none smtp.client-ip=209.85.216.42
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-36b9b15af73so5522055a91.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 11:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781029315; x=1781634115; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qcqjUQA9kv2/3qirEOddNlpBhe6IWcklo76jpxd9AfA=;
+        b=RawhVVrOg/OQSQo4NeNprd+5IGEaO6LrXYvqyLhcdMI1qX8tsw7ujp20lc2/evpMFv
+         Af8HzSQKo5wbE5yP7giG040BEh4VsgoXFF5eyBu4zctf8fAOhNwpIIxI30vPOFtPyapG
+         OyDEV0ezgmRmVDj671vbbzmMxRqVUx9Gd39OmT0WU7DktyUqDpwYfg5YxnB1wssIDQv+
+         UxynomBMz4uqNJVG7IUY/a4hcuq2MhA04fHbVfaIfJrv8kLPMzWizLpGxGl3KMtEEShJ
+         sPl/5n2gRaSB5r/RTQ0DloP8xmbxrB9IYTTQ7zC068rdwk/Gz0MkaHq/Rex9jobGNBIJ
+         1TPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781029315; x=1781634115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qcqjUQA9kv2/3qirEOddNlpBhe6IWcklo76jpxd9AfA=;
+        b=oxggTmhltLCekvptZo5suYI4T0ovqQqosWQj1jJzh5oxIbXj/qU4O/O429w+w5ZHFV
+         pBguwlJHR2uyg9oAG/6lLivZyPmco1II3ajdoTLiRb/GmNIC2aS0y0b381Ww2vsALMn8
+         tI5KeNavRORbbxz1xgIXyfqz7wbB4CHfRtF1TLZgS2pkSN+r2WnTKcQXc93KGkAjglF8
+         ub2c1h0tM1CPHWFQD/UoJ4E6ckkVmKu7SeOtpFrQQDHTysex1o/uKPGnGBwypP5XmLWK
+         JHdXKZUOabBxPhkPeebfxNc5ZkZeHVE6mDjOoHavEUoVpo/vJEL6Ce0fYjrWwzG6SqcZ
+         ztYw==
+X-Forwarded-Encrypted: i=1; AFNElJ8pF0QZuySl+p66DGKetMiKzS99RDHlF8bj3fcCqeswVb522OSM+z+8PhOxXdo/PXHCktjGlYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcRAbrBBKSzd5K96uws/B4F8Om4vDMnf276uxHwQx2CtcU3t0P
+	jCdykOIA6UZ47CAjSt6az+uvTIjySs6A4AJ/DIf6tCH8ol7kvMZagZ5E
+X-Gm-Gg: Acq92OEu6d2pROEx764pS3FH4sc4gkgXy6PWXMwz6Xjl3glYzp9m8mYRs3ze2VXmcYj
+	D+ntlfBug7u0pv7FwqBkpCTr6qswiyK7WSLz9noL8qnETGJNBunorDuTq3Xs9sE8scBLIJTbF0P
+	B3LKL1L9f9wOwzKgWE/gNvPFY2Erz4PNmqtcJ/RQ14rFR9WL9KugXEbH8MWqA5fziZ6wrkP5iEy
+	VHeBIi6DrYWuCGOn2IcPicegRv7ForvxF5XbU8Y3fCG8pN0AYtWZTo7afKXsFbvX9MMcjn1mAwG
+	F2FhT7gmkrFSxgmrvXv6QkUXABPzckWMlAN39SOMJkTovfNpwSNLzp4muRmI7ffA26ZWjZVUfK/
+	5Z/5vuihgD7TcevrVJpl+nU+61Kx8XMO+4p54Ez0GzgAHb8nCkL0i0VcBlw52JrWyRFa6C/mdXL
+	LC8Ll6fwyDO6nfTz9wupS5w/jfjYhkRpuPvTwa5sL/NmUz6DsapK0Vq4kPN297IjQl
+X-Received: by 2002:a17:90b:5109:b0:372:94b9:76d8 with SMTP id 98e67ed59e1d1-37294b97715mr15579831a91.6.1781029314769;
+        Tue, 09 Jun 2026 11:21:54 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:8::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164fa072asm218684505ad.34.2026.06.09.11.21.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 11:21:54 -0700 (PDT)
+Date: Tue, 9 Jun 2026 11:21:52 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Sechang Lim <rhkrqnwk98@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf] bpf, sockmap: fix use-after-free when the stream
+ parser resizes the skb
+Message-ID: <aihZtYXz8CbxRo0L@devvm29614.prn0.facebook.com>
+References: <20260609112316.3685738-1-rhkrqnwk98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO0P265MB2811:EE_
-X-MS-Office365-Filtering-Correlation-Id: da1e3b0c-814f-49a4-9944-08dec653ae98
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|18002099003|22082099003|4143699003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	rKhIjfadBpCntIDyI1/1PRTQBmw3etHObGGkLum8sMnRayyngXUBabk9DpYulFh/lm7AmrCEGJrhRO/ZYRC65yQW5LhYFhNMl4iagpbURZXg7zO7st1YJKf5R9VEnw/wA/iqx6vcVKNsv4EzZhgVDAr1JpUwIO6gcfL2oFspLT9hEl1NaCJyoIl5WOUi/PNA6zTD0pkOOr8v5216xyGNyfQmJyIBzTsIKBOENDjEwRS9GcUy+VUdnabj/Fw0NgyJRfG/NWTd3zowex3xtCKi7hKmEFOUdgQ7AmrzNqW4mcCD+ojuCc2fKmhWvSv4P112TP6wk1Qq4kHSaakReoLUNxzsrHf1FETtbQH2ZV3ZX07YeZ33cGRchaavKKbPsJQCX/32kjEk4tyir++dsuh9EyDO+WK7mmU/prTh2sFEIsOZK8YSvvu+fxf7wKYWdtWh27w9ob2UgyOQIPY+ThPhVWLWgmO+dOA7M6jj29JA9epIX4zG1NkL6oVoONHunfw+1iNc6t/FAMv5wug3ywsxIvjfLQphamldOebykD+ZJx8YtQFF+KRRuMZKTI0+als6NioQqHUmS1TCSZOUPf9ZNHo2lvJjiEPC8cbZusn9tszkypgd2XimRy9f+8WZrGVFgo32mYkqupPHEiSxdnplEPOF+kfBitBbXMRc4caknDuiBIL6sVEvNOeqf6DTLLi3
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(18002099003)(22082099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S3lGNzd1WWozUG1Bd01lbERXcUFrK2g1bjNXeUU2MFM2Tm9BS0lwaENyWHB2?=
- =?utf-8?B?VTBpK0dYRnhmeU1LSDZCN2I1MVlKaUVZdmFidExRb3YzL2UydEJqYk9aQmNj?=
- =?utf-8?B?OXZMWVk2eExFanJwR2FMSm1tSWVxbGd4UHBjM0xTZ0FoMTRHS3UwZzg1czVm?=
- =?utf-8?B?T2JyNGtBT2x1blNjamxSNDhZZmhJVklLZVU0K3JKTFcxK0FQOG5mRWZQWlRB?=
- =?utf-8?B?REV0Y2dkRzZMaTJsbFl4UnNlODJMalNLbnFYZDNoV1ZPWjZ6SkZBOG9lSXlW?=
- =?utf-8?B?ZWJTbndIOHVaZkpraUZhb2JxQmtXcHFTSzRIYXllQWVnK05VL2ZyT3lZY2J5?=
- =?utf-8?B?ZWRHSUVNaTlCZEx5N2FnNlBTZmFrNXFLNTNsSkJaTGpzbWRZV2EzVmlNclho?=
- =?utf-8?B?cDZ0TzBBRElWZVlkT0didzM0T2owUW4yd0QvRUNISElRdXBBSENzNENxWVJp?=
- =?utf-8?B?REtsYkF0cFIyc1dmQ0VBUjVFbUF3a2x6RGhQdktjRThPZXZJc3dLVmRUbUto?=
- =?utf-8?B?RjRIWm9kd0R1empjaWxvM1hTSjMxVjZMYzlxdkVjLzFSWUxrOW02b0tBNy9w?=
- =?utf-8?B?dU9WUUxSTU5LVDNzYjM0N090QVRZaHFjMVNWQWc3SDYwMlRnK2t6NG1oWEFx?=
- =?utf-8?B?V0dUOHFhZFZCdU83VW5DVmQ4bnB2UUovNTdPczlxVlRUYjdnUkJkb0txSXR6?=
- =?utf-8?B?T2dmU0pGQjVSc3lwczBSbVFhUXJwNkNMYXdOcWhkb0UwVmVaMkp0U1p1TWVl?=
- =?utf-8?B?azVIbG9vS05hNmVZbnMvWlBJaFZvN01ycWRheGpKbTE1T0ZMZTkwMmNaZ2Q1?=
- =?utf-8?B?QmdpS2c3QzJnM2RZV3pOWXBUYjlSRGQwQnN6NkpIU0lKNzZwN3pDYzAzaUFx?=
- =?utf-8?B?QzlZRTBDVTN2Z293TDFlQWFEdHlMM0F2eVI3SFpvTGo0aHZQNVptQUtsN04z?=
- =?utf-8?B?ajRrRk8zMU1PbytWR1FHdW9vdmpwc1IvbTBPbWxjSWE4RW9hMmwrL2Zqams1?=
- =?utf-8?B?ZG9ncDhVV3NCYnFxbkZyNXh4OW9HNVFBTWVwUDZwZTF4ZjczbC9JQWloVzY4?=
- =?utf-8?B?ei9HUXNia0o5aHJ3aGNwWFlWSVFSc3AwMnhQNFJmWFgyRlhtQVJOeXFidFUz?=
- =?utf-8?B?bUl6RWFNSGt6enBKd2hBeU5CSUdKZ05JNHYvTmZxNDBzQ0YvNFBXa2swSktn?=
- =?utf-8?B?OWdaQkJxUzcxK1hiUzF1MTJMVU9MOXhIc3B2bGRDMlNqSzByNW1aY0k5amRv?=
- =?utf-8?B?Q3J6cGFWY0pPWHBBT0I5YmdVVDVwSDRmVW9vdkFLdkpDR1l0bmF3R25ZVy9w?=
- =?utf-8?B?ZVRLYUlYTUg3YXp5Tmg0YTFFRWtDdE9vTjQrc1pZdjBXc1hnUzd5bGVjTTlH?=
- =?utf-8?B?YisrdUN5dUt2OFc1TTFBUlNGYWM5VmdQUThCaHc1YVlVM0NTUHJZbnV5TXF2?=
- =?utf-8?B?b0Q2N0lUQzNiTUJEQzFlRkJsdGdqL2hHSWkxNmxuVGRFS3FBOFFlRTJxaVpG?=
- =?utf-8?B?dGZNVTBOU2xZMW4vUFF0bk5PUEFYYldZR2VrbUtGeXoySUJIUzd3SGtMdUJa?=
- =?utf-8?B?ck91Qm1TV0VJTWRaVk9CbjV1K25xMk1xWjBEVGtabHdkSFJoSG51ZGNFLzRw?=
- =?utf-8?B?NHBHR2NuMFptTytYNXNaQ28zOEJFMm9NOFl0NlgrUFlFbzdjU0w1N3NFK1Fi?=
- =?utf-8?B?aEJuUlprdlRRRDh4aEs3VXYwYmFMRG1NQ1o1dDhiT0tYcDR1a2lSTitBYUpS?=
- =?utf-8?B?SzNBZjREcGJNQTUxakpybkFzK1U4U21vQkxzMHBJNndGUmluOGNBL0xEazR0?=
- =?utf-8?B?MjVYaVhBNnBnNFlHeUtKdXdodG14bXEzQUZFNFQ3cmZzM0ZLbDh4SGE0azQ5?=
- =?utf-8?B?ZlVhWTdMN1Ewd1k2aUhpZnR6UDJNNkFJNTJnRXR0WVFQVmJ5YWVrT2IyVDA1?=
- =?utf-8?B?MFF4eDBTc21yS21ZOHpsbUE0Rk9zUFdOWm1rM3d0ZG4xSFUrems2UU5SS1JI?=
- =?utf-8?B?VTdiZDZPWklFK0RqRytwbi9FaEF4UU9wak4vNCtyR2R2RWhHWExPMFJtMWFQ?=
- =?utf-8?B?TFNScVltc2xyTGh0UFFTcEZlMjFYZWlhcmFNRmlWZ3ZXWkRHMENpVnBLc0ps?=
- =?utf-8?B?cWpsNnI5Q3phcFhsRlJXZnZDYUhlcDQrSGdWY2pXSGxVai9nV3EzSEFzcWIx?=
- =?utf-8?B?U1NIWjFkN003Q2ZUMUFyRkVoMlRhaWZZNzNaM3BsVUE3Ry9HM1MyK2xMTm9E?=
- =?utf-8?B?RW1kOExHaGZsODhodTFsb3hSTVcveEZVMWtLSFlvbzFIK1p4UHVFWVo4Zjhi?=
- =?utf-8?Q?BDJFF2sI2pq0jeV0jC?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: da1e3b0c-814f-49a4-9944-08dec653ae98
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2026 18:19:44.7927
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UqA2cKWpP78/+W1Pu5YS/HA8JnrMVXbM7xuaucXMISA12Lo5+sEQHvDPjfBK/wAv3PXnKE6gE/4epR1/fHIZ6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO0P265MB2811
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609112316.3685738-1-rhkrqnwk98@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
-	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-297228-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297227-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,garyguo.net];
-	FORGED_RECIPIENTS(0.00)[m:miguel.ojeda.sandonis@gmail.com,m:gary@garyguo.net,m:dakr@kernel.org,m:acourbot@nvidia.com,m:aliceryhl@google.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:ojeda@kernel.org,m:boqun@kernel.org,m:bjorn3_gh@protonmail.com,m:lossin@kernel.org,m:a.hindborg@kernel.org,m:tmgross@umich.edu,m:daniel.almeida@collabora.com,m:fujita.tomonori@gmail.com,m:yury.norov@gmail.com,m:will@kernel.org,m:peterz@infradead.org,m:mark.rutland@arm.com,m:mingo@redhat.com,m:longman@redhat.com,m:tamird@kernel.org,m:nova-gpu@lists.linux.dev,m:dri-devel@lists.freedesktop.org,m:linux-kernel@vger.kernel.org,m:rust-for-linux@vger.kernel.org,m:driver-core@lists.linux.dev,m:netdev@vger.kernel.org,m:miguelojedasandonis@gmail.com,m:fujitatomonori@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[garyguo.net:+];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,google.com,gmail.com,ffwll.ch,protonmail.com,umich.edu,collabora.com,infradead.org,arm.com,redhat.com,lists.linux.dev,lists.freedesktop.org,vger.kernel.org];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm29614.prn0.facebook.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8DDB6634DC
+X-Rspamd-Queue-Id: 11239663556
 
-On Tue Jun 9, 2026 at 6:19 PM BST, Miguel Ojeda wrote:
-> On Tue, Jun 9, 2026 at 4:27=E2=80=AFPM Gary Guo <gary@kernel.org> wrote:
->>
->> This is the remaining unapplied patch from
->> https://lore.kernel.org/rust-for-linux/20260319121653.2975748-1-gary@ker=
-nel.org/.
->
-> Thanks for rebasing! I had it as "Waiting for apply" in the
-> spreadsheet, but this saved me a bit of work.
->
-> Quick question below about the prelude...
->
->> +#[doc(no_inline)]
->> +pub use crate::build_assert::{
->> +    build_assert,
->> +    build_error,
->> +    const_assert,
->> +    static_assert, //
->> +};
->
-> Did you split this for some reason? I moved the file to a single group
-> per crate when I moved the file to the new formatting style, so I was
-> wondering if we could keep it non-split. I mean, it may be nicer for
-> macros since it allows us to group them, but I hope we don't end up
-> with many `use`s again if we go down that road again...
+On Tue, Jun 09, 2026 at 11:23:03AM +0000, Sechang Lim wrote:
+> sk_psock_strp_parse() runs the BPF_PROG_TYPE_SK_SKB stream-parser program to
+> find the length of the next message. strparser assembles a message out of
+> several received skbs by chaining them onto the head's frag_list and recording
+> where to append the next one in strp->skb_nextp:
+> 
+> 	*strp->skb_nextp = skb;
+> 	strp->skb_nextp = &skb->next;
+> 
+> and then calls the parser on the head:
+> 
+> 	len = (*strp->cb.parse_msg)(strp, head);
+> 
+> The parser is only meant to inspect the skb, but the program may call
+> bpf_skb_change_tail() -- or the sibling bpf_skb_pull_data(),
+> bpf_skb_change_head(), bpf_skb_adjust_room(), all allowed for SK_SKB. Once the
+> head carries a frag_list these go
+> 
+> 	... -> skb_ensure_writable -> pskb_may_pull -> __pskb_pull_tail
+> 
+> and __pskb_pull_tail() frees the frag_list skbs that strparser still tracks
+> through skb_nextp:
+> 
+> 	while ((list = skb_shinfo(skb)->frag_list) != insp) {
+> 		skb_shinfo(skb)->frag_list = list->next;
+> 		consume_skb(list);
+> 	}
+> 
+> strp->skb_nextp now points into a freed sk_buff. The next segment of the same
+> message arrives in __strp_recv(), which links it with *strp->skb_nextp = skb,
+> an 8-byte write into the freed skb. The free and the write happen in different
+> __strp_recv() calls, so the message has to span at least three segments before
+> it triggers.
+> 
+>   BUG: KASAN: slab-use-after-free in __strp_recv+0x447/0xda0
+>   Write of size 8 at addr ffff88810db86140 by task repro/349
+> 
+>   Call Trace:
+>    <IRQ>
+>    __strp_recv+0x447/0xda0
+>    __tcp_read_sock+0x13d/0x590
+>    tcp_bpf_strp_read_sock+0x195/0x320
+>    strp_data_ready+0x267/0x340
+>    sk_psock_strp_data_ready+0x1ce/0x350
+>    tcp_data_queue+0x1364/0x2fd0
+>    tcp_rcv_established+0xe07/0x1640
+>    [...]
+> 
+>   Allocated by task 349:
+>    skb_clone+0x17b/0x210
+>    __strp_recv+0x2c3/0xda0
+>    __tcp_read_sock+0x13d/0x590
+>    [...]
+> 
+>   Freed by task 349:
+>    kmem_cache_free+0x150/0x570
+>    __pskb_pull_tail+0x57b/0xc20
+>    skb_ensure_writable+0x236/0x260
+>    __bpf_skb_change_tail+0x1d4/0x590
+>    sk_skb_change_tail+0x2a/0x40
+>    bpf_prog_1b285dcd6c41373e+0x27/0x30
+>    bpf_prog_run_pin_on_cpu+0xf3/0x260
+>    sk_psock_strp_parse+0x118/0x1e0
+>    __strp_recv+0x4f6/0xda0
+>    [...]
+> 
+> The same resize also leaves the head's length inconsistent with its frags, so
+> a later __pskb_pull_tail() can instead hit the BUG_ON(skb_copy_bits(...)) in
+> net/core/skbuff.c.
+> 
+> Run the parser on a private clone of the head whenever the message spans more
+> than one skb, so a resizing helper can only touch the clone and strparser's
+> head and skb_nextp stay valid. Single-skb messages have no frag_list and are
+> still parsed in place.
+> 
+> Fixes: 8a31db561566 ("bpf: add access to sock fields and pkt data from sk_skb programs")
+> Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+> ---
+>  net/core/skmsg.c | 26 +++++++++++++++++++++-----
+>  1 file changed, 21 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index e1850caf1a71..d5b10f9b0ba8 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -1146,14 +1146,30 @@ static int sk_psock_strp_parse(struct strparser *strp, struct sk_buff *skb)
+>  	struct bpf_prog *prog;
+>  	int ret = skb->len;
+>  
+> -	rcu_read_lock();
+> +	guard(rcu)();
 
-I think I just kept it as is when rebasing. It's file to have them grouped =
-in
-the crate to.
+I'd probably not mix this rcu change into this patch, though I
+understand it drops an unlock() call in the new err return.
 
->
-> Or perhaps you did it for the attribute, i.e. it may behave
-> differently, but I doubt that is the case? i.e. if `no_inline` somehow
-> behaves differently this way.
->
->> rust/kernel/sync/atomic/predefine.rs
->
-> In this one you used the prelude, but in the others not -- which is
-> fine, we should be using the prelude more (though perhaps it is a
-> separate change), but I wonder if there was a reason.
+>  	prog = READ_ONCE(psock->progs.stream_parser);
+>  	if (likely(prog)) {
+> -		skb->sk = psock->sk;
+> -		ret = bpf_prog_run_pin_on_cpu(prog, skb);
+> -		skb->sk = NULL;
+> +		struct sk_buff *parse_skb = skb;
+> +
+> +		/*
+> +		 * strparser chains the message skbs through skb->frag_list and
+> +		 * keeps a pointer into that list in strp->skb_nextp.  The parser
+> +		 * program may call bpf_skb_change_tail() and friends, which go
+> +		 * through __pskb_pull_tail() and free the frag_list skbs that
+> +		 * strparser still tracks.  Run the program on a clone when a
+> +		 * frag_list is present so it cannot drop frags strparser owns.
+> +		 */
+> +		if (skb_has_frag_list(skb)) {
+> +			parse_skb = skb_clone(skb, GFP_ATOMIC);
+> +			if (!parse_skb)
+> +				return -ENOMEM;
 
-This one is using size_of, align_of, c_void which are all in prelude. Howev=
-er it
-looks like I forgot to actually remove these imports in the last version, a=
-nd I
-didn't change it during rebase.
+I wonder if this could be further gated by prog->aux->changes_pkt_data?
 
-Are you okay with fixing during applying, or do you want me to send a new v=
-ersion?
+One possible issue with adding an allocation here and returning -ENOMEM
+is that this will shutdown stream parsing permanently for this sk when
+under memory pressure, which is new behavior. Maybe, if we return 0, it
+looks like the caller's accounting stays true by taking the "needs more
+header" path, and then we can try again from the same place on the next
+data_ready, and so be resilient even under memory pressure? I guess the
+trade-off being that their may not come another data_ready to cause
+progress... not sure which is better. Maybe strp_start_timer could be
+used here too?
 
 Best,
-Gary
+Bobby
 
