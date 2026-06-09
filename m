@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-296792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4Kk8N59ZJ2o1vAIAu9opvQ
-	(envelope-from <netdev+bounces-296792-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:09:03 +0200
+	id VswABulZJ2o9vAIAu9opvQ
+	(envelope-from <netdev+bounces-296793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:10:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7148965B476
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:09:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB0F65B48A
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:10:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=Ca3nyHUh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296792-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-296792-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=trailofbits.com header.s=google header.b=jx9DNjlo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296793-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296793-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD4F1301A338
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:08:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66EE730316CC
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1CB42AA9;
-	Tue,  9 Jun 2026 00:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE75548EE;
+	Tue,  9 Jun 2026 00:10:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8553DEADC
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0933AC00
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:10:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780963730; cv=none; b=kSifzDdjgJ3emrCavaKF8Jaz6ThOEF8hiv9iDOmnyc8qO9EOEM70p9fQ3GaW/Uw+I70jHdY8MT54fe6DTaPInfHvcSiqijUH1VmQo0hIN3ABbZm09prHRXMsU2X+go/ENrtAouqLlgWcOcodjJOBqRxv1hwvBR9FaxpUleNvJyQ=
+	t=1780963813; cv=none; b=A3Tb32pJlM4zcLnmpamomTb+dqBfsXWupafWdJz8+oUFE+LRo9HgydeSxXBwTmgxiXa2PJBVOFVP7VUPGYrCRzfpvROJ/HX8LC1zLsXDKozrIc1KEv/4L7QqrVyIKQb8+ehOk/ZMJYmqO8QUllhjvGRIl6yDa1IB+00xTT9TrLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780963730; c=relaxed/simple;
-	bh=5U8oiBdbYg1PZ8fvQYzqAvI34P76dHAIuvIpS2zk8kM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ic4catVf09WKYnNw49IoblhUBhErAXN7JvZWyFfGIFMuFL3AqX+106yVcscaOFOA6GtlmEuRMl/orSBnPRSFnp6TB3ve76JaunHzUiFJwm69pcH10gpRZCIt1bAw9a3O+OHp12BR3ZUbZFMlZhQgaYAs/qVAHQWt7yjcHYOhinM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=Ca3nyHUh; arc=none smtp.client-ip=209.85.219.47
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8ce0f17a69cso37541306d6.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:08:49 -0700 (PDT)
+	s=arc-20240116; t=1780963813; c=relaxed/simple;
+	bh=CBLXBsl+/GKva8H+PWvMh4HA73Qy3u0e+6+UwWe22TU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LDOGiYgldQUnWHHtEuV1ptU97a1DgBizBEIYaiZzpuS5lluQQEMe4fK9fb6ioxHWKEkmE4ZieoNAYgQE97FnQ5yPe2O7KF116OenU4JLDnsqBnbd1yTYRkAyLPu7UsoT0MR2WZgNKoV19VrZ3fNqtHd3r8K8mYj5xA9ZuxsuPiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=jx9DNjlo; arc=none smtp.client-ip=209.85.222.176
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-915c36e32abso189184785a.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:10:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780963728; x=1781568528; darn=vger.kernel.org;
+        d=trailofbits.com; s=google; t=1780963811; x=1781568611; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4lidgO5F+++t6EB4HzmUPrlL28tLdwfkd2HVpHaeS1k=;
-        b=Ca3nyHUhGBR4sNN4OQxE54zsEuY4z+SQZMOmr+FGIhdes7N+ljm0vatGUS7ePVJYLb
-         qGrsilcKTCOJt9BVHG7guwlNM38haYxEjUxoCBh7ilQUsrkifApRhpWmvUdXJHKvPlDv
-         C2kza4SdrYWOsvqKEluNqjSAhc1tkJP5S3QxsZ+PmQWyrj3hcg3yg9qOncfhVDOlsDBJ
-         SHCcDPPK1VD64ibMbcaxWM24P0IcmpbfR00UmoNzzo7vMLs2spzfzhhZhBi+bvTfIb+r
-         N2pEbbKiCstfF5H6Bb7ZZ4kW3dsXKoFcvnGUR4cs07a1wICSfuFslJ+PoOOZ5RdRupij
-         dTag==
+        bh=rfJRQNth12Vv3rJ4W2UKh/f0U7VaUwjoEIMtP/Wtlic=;
+        b=jx9DNjloXtFs/e2bVPCpPlr/2FEhZYI55BK1p1hgiEe2Bjrw/qyGae7DTYC/o7xbmN
+         C5jdyFRZiOfQX0s5HfduqF9h1bAm+GHeF4vs7ZD62l4ivhJDWybh9TSe/rqoTBxv1oRJ
+         JFmuXT7mphyK5GnNkiHL3TSYl8LS6ekW4Wgg1JbSWTQvg+9r8tIH0xtZya5Mev0shBsS
+         XCXbehxHkBq3PNrKAWcsCbsJvZt2E6rJ3jmMZNh0Y997IzqcMx08Qr0aQlIAN8raRGeT
+         hT5vkYlnQGacEsw2fr5ZDfqaL/HlL/J+zx/X9RJCOXSQYf1lvMPnq0wBr3EyPOfWjGFK
+         8oyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780963728; x=1781568528;
+        d=1e100.net; s=20251104; t=1780963811; x=1781568611;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4lidgO5F+++t6EB4HzmUPrlL28tLdwfkd2HVpHaeS1k=;
-        b=haXi0PcEmIpMti5TfWVzqxRk3vEB7fiDDES/3ftfm0wX5DBjA0yv1QIpx8Lj1M9NA+
-         fpZxbOX5lQACuQ0vJziHqTp5vjQGhP8qZ40OiEYxGHndfFj2+WF2m05ww0gV0WALf3kH
-         6QzwLOSnz5EeeM6cgVDm6mxyyZaTDB5o/Kyc7D84KKLX+aVitUG392iIEBwNG+eE3tIY
-         Qbv/WlqvzpcjEHJgTIMoBDcQr5n1wXPsBax/22NfJGMl0RaQQRT87FJ09VuCNshjfUWK
-         UWAJTqvHYmkDOKW1snLYnvIxm3DJtyV8FJ7vJ2d1L3C1xY5DMByy9aFvcybLs7B4yFXV
-         Qyrw==
-X-Forwarded-Encrypted: i=1; AFNElJ/8g+9hgsnliBGhH5AOi/ha8lQw7zIttxAOAReqNglo21nAosxhJ4TNQrEmHML1E8ZfYvtgxaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ502Ymb0gZMxHWOyp8kOnkC23PWpmN7fnnxKVDapZPIi9UGok
-	lmBdxV48Bp/qsIdFnqJZsmTRpwBwFUWPv62esjRpqKXHZSaIMPHA89wGfXDo5onpE3s=
-X-Gm-Gg: Acq92OGp50098Obe8ZaU+GcUYMc5fMpohqbk/VrXqXpcO+Ps54AHPq9G+avEjxkb1bv
-	AyRDI3u51840Tnp79OOdvNkjCmeMvXj9FxPE4Dyx0HIBvH8kDHuVUUtDX1+/wB1RoIt1psRX3tm
-	a66fYkIcm4sqOfoZGLizYCj/3f8avreRfb9TSeA7cKyCkFYAY9Lo+tpBL8pcn6hAhA9Ok2ysROp
-	q8av6dFuG6JmKXeiFRKxQr/HY5Dz7e96gK9s1WbhtLkwF4UrZ4bBiB/hTT8YZr+VqqOQUcl/4IC
-	6kw1sIsi3T4OXreMi3BjdMeAErJbo4NsWamipG7cDxKGdQX/AoJBZcxC3lB3XjT8x31E1gpjaFV
-	iGJUSCyKkIQ/lS1+cRr2tasWR6NXgU+NPEV1qJworwLjv6uRXTOF8w/78wxng/riLWLcucb+kmD
-	qGLL4RMaWcoXFESFq9hdvUR67q7kuOJhfvPWgvIzj4plVsSYuU
-X-Received: by 2002:a05:6214:4246:b0:8ca:16a6:3d40 with SMTP id 6a1803df08f44-8cee5f9f6c6mr222900836d6.5.1780963728475;
-        Mon, 08 Jun 2026 17:08:48 -0700 (PDT)
+        bh=rfJRQNth12Vv3rJ4W2UKh/f0U7VaUwjoEIMtP/Wtlic=;
+        b=odLTehlrVXsvYN2aMM02GpJm3V31WFtWQeQZyOuzYEi2znMJJ5P2c/uwT9SvM8WS1V
+         PcIZQ25CyJ+rdH5dpoDM9Oov5Fp6DX+s5lRxLKHiNkKV4Y2+N5FEFj8kyOWaJ2hhrR26
+         /GALmC7br3rwYrOO2vMtZdyod839SBLCeOVcKR8exJ4Srzvnh2LkRrRo+IMUYGIZpuRM
+         Lg4Mwfs7CWK2iY9AIge9QNzwfqKp2Sc+bNVYjaCBMOZBDR+h0tl0K9dN3mzRUG52Aumi
+         3YL80MJTgMRcMW+p09bg+ArN4vUilBQqJdTrzf6eIJd9mw73T3kP/1tLP6dzXIMguBcl
+         2hDg==
+X-Forwarded-Encrypted: i=1; AFNElJ9ZEMtb4ouTdK2IK8/Da68q3kFVWHhadhnaM3PvJe6sVuOvPSoK7xu1TQVOECM0oO7d8y2eHpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhGjmIv5XLqXfJtD7W3qbanPOqoVUXk9tUnfEyrHpQXAhjG8RR
+	+u/n5nHpeMxEiuW0uBwAYwjL+Pyg+xS4ur0kbifkD8XPvEYCLYdOc7a7libXdX+saXk=
+X-Gm-Gg: Acq92OH2Y9g39jUGUqQANe1gEYUXdE1myx7dIsay+aCz9uCtHtV2K2ETk7LKvPeDthx
+	eTbcuJ9/jO87H6uV5Ef4FEIz5JiY9xCBuNrwByKokvfDEq2z2VqLzfXO0WDIkiL8uX4hegbOFO7
+	OyeCOFGH6yyv/sOASojnISOZXFMIKLE1t4i1oRkW0GXOLNiO31m99Dib75CMsThOyx+Xi3vERxn
+	UA2neLqCT8Fbwm9NX8YZ7rCI5c6/6Dg/JBcr+r9p6gAT8bR4LiP3UZ4CQWMzpByuVWHdqzWw+j4
+	cClAKx7l13SjxEzf1dJZ5nKTS0H4g6k1JInKlTek57qNaFN6mKakFNsaPZsiDDBQwJzotBta++9
+	iQJxdmjLUe62QXe2F+QxAUh8H+8ywLCWiBJuNeM7bmoggw1J+rqTKxbJz1IWESA2vTky/+4c741
+	cIbwMV93mW3HpWxHrPfHZJ+hQ4udv4FFPf1COLQw==
+X-Received: by 2002:a05:620a:44c2:b0:914:b65f:6b00 with SMTP id af79cd13be357-915a9c13262mr2630434385a.6.1780963810824;
+        Mon, 08 Jun 2026 17:10:10 -0700 (PDT)
 Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-8ceccdcc968sm192900746d6.22.2026.06.08.17.08.46
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-8cecd054d2asm183008646d6.23.2026.06.08.17.10.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 17:08:47 -0700 (PDT)
+        Mon, 08 Jun 2026 17:10:09 -0700 (PDT)
 From: Samuel Moelius <sam.moelius@trailofbits.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	cake@lists.bufferbloat.net (moderated list:CAKE QDISC),
 	netdev@vger.kernel.org (open list:TC subsystem),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net/sched: cake: clamp active flow deficit on rate changes
-Date: Tue,  9 Jun 2026 00:08:43 +0000
-Message-ID: <20260609000605.1234374.9ba17536ec9e.cake-rate-change-stale-flow-deficit@trailofbits.com>
+Subject: [PATCH] net/sched: choke: trim backlog when the limit shrinks
+Date: Tue,  9 Jun 2026 00:08:51 +0000
+Message-ID: <20260609000850.1234569.a788bb380be5.choke-limit-shrink@trailofbits.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -101,105 +99,77 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296792-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-296793-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:toke@toke.dk,m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[trailofbits.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime]
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7148965B476
+X-Rspamd-Queue-Id: 7FB0F65B48A
 
-Changing CAKE rate parameters updates the quantum used for future
-scheduling, but active flows can retain deficit computed under the old
-rate.
+CHOKE accepts a new packet limit that is smaller than the current queue
+length without trimming the existing backlog.  The queue can remain
+above its hard limit until later enqueue and dequeue activity eventually
+brings it down.
 
-That stale deficit lets an already active flow receive service based on
-the previous configuration after userspace changes the shaper rate.
+Userspace expects a reduced limit to take effect immediately.
 
-After recomputing rate-derived scheduling parameters, clamp positive
-active-flow deficits to the quantum that applies under the new
-configuration.
+Drop excess packets when a configured CHOKE limit is reduced below the
+current queue length.
 
 Assisted-by: Codex:gpt-5.5-cyber-preview
 Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
 ---
- net/sched/sch_cake.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ net/sched/sch_choke.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index 5862933be8d7..048d313e70fe 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -2621,6 +2621,36 @@ static void cake_configure_rates(struct Qdisc *sch, u64 rate, bool rate_adjust)
- 	qd->rate_shft = qd->tins[ft].tin_rate_shft;
- }
+diff --git a/net/sched/sch_choke.c b/net/sched/sch_choke.c
+index 2875bcdb18a4..c355c7a05da3 100644
+--- a/net/sched/sch_choke.c
++++ b/net/sched/sch_choke.c
+@@ -371,7 +371,7 @@ static int choke_change(struct Qdisc *sch, struct nlattr *opt,
+ 		return -EINVAL;
  
-+static void cake_clamp_flow_deficit(struct cake_tin_data *b,
-+				    struct cake_flow *flow,
-+				    int flow_mode)
-+{
-+	s32 quantum;
-+
-+	if (flow->deficit <= 0)
-+		return;
-+
-+	quantum = cake_get_flow_quantum(b, flow, flow_mode);
-+	if (flow->deficit > quantum)
-+		WRITE_ONCE(flow->deficit, quantum);
-+}
-+
-+static void cake_clamp_active_deficits(struct cake_sched_data *qd)
-+{
-+	struct cake_sched_config *q = qd->config;
-+	struct cake_flow *flow;
-+	u32 tin;
-+
-+	for (tin = 0; tin < qd->tin_cnt; tin++) {
-+		struct cake_tin_data *b = &qd->tins[tin];
-+
-+		list_for_each_entry(flow, &b->new_flows, flowchain)
-+			cake_clamp_flow_deficit(b, flow, q->flow_mode);
-+		list_for_each_entry(flow, &b->old_flows, flowchain)
-+			cake_clamp_flow_deficit(b, flow, q->flow_mode);
-+	}
-+}
-+
- static void cake_reconfigure(struct Qdisc *sch)
- {
- 	struct cake_sched_data *qd = qdisc_priv(sch);
-@@ -2628,6 +2658,7 @@ static void cake_reconfigure(struct Qdisc *sch)
- 	u32 buffer_limit;
+ 	mask = roundup_pow_of_two(ctl->limit + 1) - 1;
+-	if (mask != q->tab_mask) {
++	if (mask != q->tab_mask || sch->q.qlen > ctl->limit) {
+ 		struct sk_buff **ntab;
  
- 	cake_configure_rates(sch, qd->config->rate_bps, false);
-+	cake_clamp_active_deficits(qd);
- 
- 	if (q->buffer_config_limit) {
- 		buffer_limit = q->buffer_config_limit;
+ 		ntab = kvzalloc_objs(struct sk_buff *, mask + 1);
+@@ -390,7 +390,7 @@ static int choke_change(struct Qdisc *sch, struct nlattr *opt,
+ 				q->head = (q->head + 1) & q->tab_mask;
+ 				if (!skb)
+ 					continue;
+-				if (tail < mask) {
++				if (tail < ctl->limit) {
+ 					ntab[tail++] = skb;
+ 					continue;
+ 				}
 -- 
 2.43.0
 
