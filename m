@@ -1,94 +1,55 @@
-Return-Path: <netdev+bounces-296818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296814-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tDccNT1lJ2r6vwIAu9opvQ
-	(envelope-from <netdev+bounces-296818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:58:37 +0200
+	id NqrJM0NjJ2qovgIAu9opvQ
+	(envelope-from <netdev+bounces-296814-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:50:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3132465B7D4
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:58:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA1C65B6D6
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:50:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=Mr75bK+X;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296818-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296818-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nxCFhPVJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296814-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296814-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C97A302FB6E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:54:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CCB7301DEC5
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30002561A2;
-	Tue,  9 Jun 2026 00:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A74023A566;
+	Tue,  9 Jun 2026 00:50:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D32175A7E
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F28915E8B
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:50:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780966444; cv=none; b=MjwH5nBQ9HsmLuL9BRL2d9Km8ku9g+al903bxZ+PXHcx9Ji56bb6R4qkDQEL0m1fd3hazxK8owEgoqBXCp4nzJ4kLz8Cs8zZyBWSanO5JzljR6WAJeuQHsLv5GbgT6tN6Cq0rjfJslbJZCpzsLs9COHeruveiTp9OuoRSU6vw+E=
+	t=1780966208; cv=none; b=OxThCeTphxLRdX6jyzvkRCLc5T3L0JBFhcVm+gmgN+fn2uilj7zyZCHuYWni0Forcp9xK3Z4/cDlW70k21V7N/9qo3E+JF0BQ1IO5q8OCQ3HqqG+hgU4L3HqQOUKblQ36SOaqrGioFRnL1xlEUhjAaQ75sye0s/9342ImWKv4JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780966444; c=relaxed/simple;
-	bh=PeMGTAiBDA1zLaaR/tkHWppVR0Mrqa7pwBx29pP1yq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vu25n9EMj7pw1j3T8BiECzTKCwz7mfYgL6n/XtZohXKoNkn9dySJgE7w+bqSoztRdG5HSrFt3O0wN3IgadohAziOczxorLxnLFD5xmSEUz1dF/YWstbfIcfqVtE99PoPhS5/gDfAeTRGIbsw9Fiu3fk4L+oIEaLtmVKqgV5XEa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=Mr75bK+X; arc=none smtp.client-ip=209.85.219.51
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-8ccef25789fso34141286d6.3
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:54:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780966442; x=1781571242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SLIjYpf1CuOXyUq/M7hnmedCnWq0PTsVfjdjpT3u0Mo=;
-        b=Mr75bK+XSrCTmwWB3STn/l5lAm5EDPOaL7vEpwBHra2DkTMw69nFUKDDPpbuucF/ea
-         k7ol9Fa+gkozAh25rAJhjLaX/sk8ENWvD0u3LP45/gU9sUUK402vwPF8j7EY+eeHFbYK
-         XaW6z/cmXChP7y28/dyBonNdobicxAMbuSXVvcdZS1teTbldVVLBj2r+LwweYCz+4Oym
-         SwrvVCL4t9KrD8GO/RxntAg53aRPBVeMsiehBkliCytRjA5IUmDvSuIo1mKTxudoIBfb
-         GLDKo4hmycNo8C5V/XcjvkygxssCHEioKFRq13Wi3wX6Z9i0DJbyao5CCpC7eTraPg12
-         h1vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780966442; x=1781571242;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SLIjYpf1CuOXyUq/M7hnmedCnWq0PTsVfjdjpT3u0Mo=;
-        b=CqIIL9g2uGevw1cMqGL1qXqLXOpRbRO4JnOTod7Ma1JIDp24LGEmj5CGjkwSXXGtgM
-         8jl7LSmH+uK/CSXyWxTQkOHDID2q/arqUzAm28+OjR8pqKaXa60n8hSzveJ9T1EwsY55
-         atawiM9lF9fRXI/II7iQGSSIGR1dlIHL8Ns7Fdv27diY6LeZfqdBfsoV1POzSWSxHSlQ
-         Z1MTep2Tz8sq1cvMCnhnGttpNL69WfwphzacZnX/WciNaj8hJzT98o2Tk7vuWUWjZ5/Y
-         V97DYeKv/9FZNWOuNggIaBMMqrFJq/tJ/DpQKiw5vBtJJS1o884oRagtX0xFCbugubeQ
-         sx1A==
-X-Forwarded-Encrypted: i=1; AFNElJ8rDehS8O71/nJDTmQ7xV3ZwA2wkO76LwDEwFX2QonAlYEnt+tyWWHFD7P8JKYr4b3W3X4Aea8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlUcE537sgjUDrPbkFnhKAUfpEMUXuoMTT2Bf9MvLJHuJOFl8l
-	+yGVMXJOyP2XL3SvhUJLQXuDCAh8TNO9pmMECHc/2+XUanZ5hNhn8piwHR1BxsbkvoY=
-X-Gm-Gg: Acq92OFa79YWf8HT+j8s5iqi8CTCj/H71o+cJrhMizQIFHPL3Q3lwxntz/R+noW5wSO
-	ESX5DA6nx/7vnSiN/5zv5eYl3s13k1Ce7mzfP7/hJKoVwc7NdDQ7KbUcSZxkvJeRnRgjFgOTbZU
-	88GOMB6S+UirRRDXLzKtC+xSmMC869fJVPA1mPHVN2vFFqvXT1lZJaFJ8h1Q9PXavcl+KjioTFk
-	zXUgQvmGTf0u82FhseOXMmAUN9h8afsqY9jx0uVK6GvfoS1nrPgLUL21LRG/Ak8GOjpl6brxjOK
-	6WJxH7ElehF1m1yB8t+h8TMbNH/DmE76+GDWcJrOdlI5SpGgguddTO4ZoAsyN4baTvkOIezxD5q
-	u53i4JawnQ76yuDr6rgEfzrVAfL686sh9eQgte8opMNI7FpqLFOzi1kOBcsDcUXEWOeiKP+OpBF
-	gjyc+AAhE8IAH9W14z9PNrc5rX8+JcqIp0BkWwxA==
-X-Received: by 2002:a05:620a:454b:b0:915:7732:ea7c with SMTP id af79cd13be357-915a9da3801mr3019464085a.43.1780966441679;
-        Mon, 08 Jun 2026 17:54:01 -0700 (PDT)
-Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a2359ecsm1928705985a.14.2026.06.08.17.54.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 17:54:01 -0700 (PDT)
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org (open list:TC subsystem),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net/sched: hhf: clear heavy-hitter state on reset
-Date: Tue,  9 Jun 2026 00:49:38 +0000
-Message-ID: <20260609004937.1240807.c0dcec938172.hhf-reset-stale-classifier@trailofbits.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1780966208; c=relaxed/simple;
+	bh=CGv12sGWgvTsMe3tUUkZv2uVtgDGrxGHxoOAfIvRjqY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=i3l6smvPWLMD2IamdxUVkdqTzORHyF06wAT2ZReGD3tSUSzAxmE7yNZhDHWWGGRWJA+YszBGsmvCW+tOIk+uYp5daf6ZMVpVGzKzaKy0jgUWhiVXsknFGW61xlAvlhAckpDLA6L1QNlkELK62DGDatD9CUC54X2bEzCA/b+X+yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxCFhPVJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBA11F00893;
+	Tue,  9 Jun 2026 00:50:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780966206;
+	bh=4BRXMV3z09C+VLLFp+LaCDk0k636ZM/sYVGzBdOde60=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=nxCFhPVJxbWAm9zofD/TeEXR0Z/vWCUPbCAxc0vkzG15bpHR85+3dWlizk73kP+my
+	 GGG5PaDHK4X+dc+r8nlXzBSlDwOJ2FDpf45Vit4VnWSQrAwI1U0RNJPLK0zrm2c5Yo
+	 pgAFecJEB7f2uXCEBPfvrZrpMApNhmG9Pwm5O3LDJkwitrj6OSX4Am6JFEHHmDV+5B
+	 rwGAnXfFX2Og+jued0/nUOYtI0X8qumuwOdCBNJcQVw7tH74ClmOYfYYbD11EWx6iW
+	 hktvwQ4xI1DNWkS8BK8x1gUUVRO9QV+hFb7rwkAfQMFzmgti6/nqg6y1oSLRytiotU
+	 l6bO6VuRfiaYA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939D83812FDA;
+	Tue,  9 Jun 2026 00:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,96 +57,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] netdev: fix double-free in netdev_nl_bind_rx_doit()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178096620539.1733035.1756660792083140288.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jun 2026 00:50:05 +0000
+References: <20260606012124.4060950-1-kuba@kernel.org>
+In-Reply-To: <20260606012124.4060950-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ sashiko-bot@kernel.org, bobbyeshleman@gmail.com, dw@davidwei.uk,
+ daniel@iogearbox.net, razor@blackwall.org, sdf@fomichev.me,
+ willemb@google.com, kaiyuanz@google.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296814-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,davidwei.uk,iogearbox.net,blackwall.org,fomichev.me];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296818-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:sashiko-bot@kernel.org,m:bobbyeshleman@gmail.com,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:willemb@google.com,m:kaiyuanz@google.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3132465B7D4
+X-Rspamd-Queue-Id: 3FA1C65B6D6
 
-HHF reset does not clear the classifier state used to identify heavy
-hitters.  Packets after reset can therefore be scheduled using flow
-history from before the reset.
+Hello:
 
-The reset operation should return the qdisc to an empty state.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Clear the heavy-hitter classifier tables when HHF is reset.
+On Fri,  5 Jun 2026 18:21:24 -0700 you wrote:
+> Sashiko flags that genlmsg_reply() always consumes the skb.
+> The error path calls nlmsg_free(rsp) so we can't jump directly
+> to it. Let's not unbind, just propagate the error to the user.
+> This is the typical way of handling genlmsg_reply() failures.
+> They shouldn't happen unless user does something silly like
+> calling the kernel with an already-full rcvbuf.
+> 
+> [...]
 
-Assisted-by: Codex:gpt-5.5-cyber-preview
-Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
----
- net/sched/sch_hhf.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Here is the summary with links:
+  - [net] netdev: fix double-free in netdev_nl_bind_rx_doit()
+    https://git.kernel.org/netdev/net/c/c849de7d8757
 
-diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
-index 96021f52d835..1698c1b54dec 100644
---- a/net/sched/sch_hhf.c
-+++ b/net/sched/sch_hhf.c
-@@ -461,12 +461,34 @@ static struct sk_buff *hhf_dequeue(struct Qdisc *sch)
- 	return skb;
- }
- 
-+static void hhf_reset_classifier(struct hhf_sched_data *q)
-+{
-+	int i;
-+
-+	for (i = 0; i < HH_FLOWS_CNT; i++) {
-+		struct hh_flow_state *flow, *next;
-+		struct list_head *head = &q->hh_flows[i];
-+
-+		list_for_each_entry_safe(flow, next, head, flowchain) {
-+			list_del(&flow->flowchain);
-+			kfree(flow);
-+		}
-+	}
-+	WRITE_ONCE(q->hh_flows_current_cnt, 0);
-+
-+	for (i = 0; i < HHF_ARRAYS_CNT; i++)
-+		bitmap_zero(q->hhf_valid_bits[i], HHF_ARRAYS_LEN);
-+	q->hhf_arrays_reset_timestamp = hhf_time_stamp();
-+}
-+
- static void hhf_reset(struct Qdisc *sch)
- {
-+	struct hhf_sched_data *q = qdisc_priv(sch);
- 	struct sk_buff *skb;
- 
- 	while ((skb = hhf_dequeue(sch)) != NULL)
- 		rtnl_kfree_skbs(skb, skb);
-+	hhf_reset_classifier(q);
- }
- 
- static void hhf_destroy(struct Qdisc *sch)
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
