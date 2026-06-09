@@ -1,139 +1,201 @@
-Return-Path: <netdev+bounces-296868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BDb+D897J2qByAIAu9opvQ
-	(envelope-from <netdev+bounces-296868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:34:55 +0200
+	id L2zdLbd8J2qYyAIAu9opvQ
+	(envelope-from <netdev+bounces-296869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:38:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B20365BDD7
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:34:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF4865BDE3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 04:38:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="nwnbYsC/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296868-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296868-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=windriver.com header.s=PPS06212021 header.b=dfkRKkJr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296869-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-296869-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=windriver.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B16953025292
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 02:32:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6EE10301908F
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 02:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5682D8DD6;
-	Tue,  9 Jun 2026 02:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D2E30EF92;
+	Tue,  9 Jun 2026 02:38:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B209233942
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 02:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D8A23BCF7;
+	Tue,  9 Jun 2026 02:38:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780972362; cv=none; b=iMT026lxhwdIDB43ip6otqslqf0Bzhj79WtvkOgnB23ohfwpogVq1Q53FJ/V0fZh7OW1tD96TdwhzeLd29I5jC3ROoxduJAaM+rOcQbIzNGAN7gQlcOILS/q2KUJAsEya63ptdPPN+1Q/DxCEvcwo5li37u4zZSTHxeQhi3leRA=
+	t=1780972722; cv=none; b=Z6dMt7pmzAD7ar5Abth7jYzM0vVJDl274QkXhRu/Bh5gdKzX4rpYs4PRy8m/qW7TNQMSJ/fGIvY5lFGqAd3WT9w+74Na0ODTG+8xTJqiofGMj8eWkcx+fnoB1iVCPor55HSt61sODN8tu+PxISK72que21ECoA69jFh51RL8+9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780972362; c=relaxed/simple;
-	bh=jS2F9Jgzt846e9JgiW+XQlPdCYZNvcDO2LATGN0DKSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SOE0qK0NyaBO5MOJ4FUjDUak9Jrv9js8AbFocE7IsmDBRuqtvxJjpoBsneQpPYaiy7Wj5zOo5aTKAhL6AJjiRHsUn6KHxOmbjZxp8FekzU+fluJa/hIBTxiHD/OIpLSydzBKjHUiDIe8JR5WSjSxqfS3ZrulYSZzDiUisegRJUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwnbYsC/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9221F00893;
-	Tue,  9 Jun 2026 02:32:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780972361;
-	bh=rjTZYyEiFPG9lIFZHtHltObOA2EYCJttfoFzooVqXaE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=nwnbYsC/rWG3dvWoAVqhz+BuOVBXmNpQQ/+OzNP7IfDXyS3T1x5yW3JznbeyVwXZS
-	 gh9XzMMnfhFRb/7ljIf1bwor5DEFkHYBS6haVvyVDWWE1OUjATc+7j5f9WscGEEo4B
-	 R67XkpL1W31v2Vpptup7c3e3tVpizlBsR+J+EbyZcPwL64NIf/PDdrLxsieYlm7iFo
-	 en86VeOW7jtJt9WLOzfgVVZZxTDstcoZVIhdUjhb0a7hOb41pnBPWNR7VeWww+6b1a
-	 ELMJFk6XGDzwP5KaY3bW6hzLAEOfC+Ee2Omv1vyDky+z94lssufFrRA1JLOAQuR+Rh
-	 MOkfclrqxbABw==
-Date: Mon, 8 Jun 2026 19:32:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, idosch@nvidia.com,
- dsahern@kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [PATCH 1/3 net-next v5] ipv4: centralize devconf sysctl
- handling
-Message-ID: <20260608193239.5fe7c7d8@kernel.org>
-In-Reply-To: <c57b3480-3049-4e1c-8f26-4073a96cfec8@suse.de>
-References: <20260607110123.5939-1-fmancera@suse.de>
-	<20260608090333.21c94721@kernel.org>
-	<c57b3480-3049-4e1c-8f26-4073a96cfec8@suse.de>
+	s=arc-20240116; t=1780972722; c=relaxed/simple;
+	bh=RRaAkDfBV2yN44plEJro8olWN2RFPeoqkxR4bSBA8yU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fjnbh9iEIxX2H7EiRED3eQcHsr/yJww+JX8al0s/kAu2mluoh9FRqyOhmfA2r90uCw852sclKJK5FkBXHfHSPLfsEEzeRSvF3syryZ/SkCGQmRK3/loPW7eE80d2mrvA5X2fUWpeSmKnXx+ebE3iOt21NXrOYOlySnXU/v3UfNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=dfkRKkJr; arc=none smtp.client-ip=205.220.166.238
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6591dAHR1445044;
+	Mon, 8 Jun 2026 19:37:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=5mVFZtYxd
+	hwP6hmEO6eS5K+9TPEiImUTKl3kk5d2D04=; b=dfkRKkJriq7TEo1p3t93U8CHl
+	BXRteJ3FgcMBAWAvDMWuK6dynMhudGbSpOgp2gGz0FsGZpRQ71OzOnl3lZObQdEF
+	TR+opVcqGe0TH/BlgAMvugMIHQF9pBw7EpMKYj0sdMkRG6ofeAxNnE+fj8GusLbA
+	u4wkCYTtMcnGd4YZLImW7OIa/zYhSN0TB1bZNYo/oVH51MTWdlqwZDOvjCIPxw/W
+	x8Yzjr0AgLK6d7+1pEQkUV4FVQzzPYFfA121qyF4UxncwHKKNIc+2XpaDm0wwWZC
+	u/58MwdBknINfICppHI2vf5H75/YBPYDrSYpzFk/JHAIXt/463OdPTez1QZRA==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [128.224.246.36])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4emety3nvf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 08 Jun 2026 19:37:56 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Mon, 8 Jun 2026 19:37:56 -0700
+Received: from pek-yzhou-d3.wrs.com (10.11.232.110) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Mon, 8 Jun 2026 19:37:53 -0700
+From: Yun Zhou <yun.zhou@windriver.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>
+CC: <qingfang.deng@linux.dev>, <jiri@resnulli.us>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yun.zhou@windriver.com>
+Subject: [PATCH v2] flow_dissector: fix uninit-value in __skb_flow_dissect() for ETH_ADDRS
+Date: Tue, 9 Jun 2026 10:37:52 +0800
+Message-ID: <20260609023752.1245848-1-yun.zhou@windriver.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: cW1h867CUOu9oJH1__l_pjWm8cWWbDEi
+X-Authority-Analysis: v=2.4 cv=VKjtWdPX c=1 sm=1 tr=0 ts=6a277c84 cx=c_pps
+ a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
+ a=HK-ge7EqtdluswH-FwHe:22 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
+ a=vesAdP9fBmeZQYaB-p4A:9 a=DcSpbTIhAlouE1Uv7lRv:22 a=cQPPKAXgyycSBL8etih5:22
+ a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDAyMiBTYWx0ZWRfX0PrdjEdNw+83
+ wKQ+TbIJZTuiM7+7YGL/N+ec60OBAEdjB/Wy+ekUa7F3ZcnP3P9CDlh5BLd8nZNpb+NFUCsEWLw
+ R/eriu3xqM2zPVHxpvoIPgw5YEJpyH+IUD+kodln3rv9mmRHKtBCV8nkaicw0joIZ98UDQa6X3a
+ Ao88Q0cc+z2YggYjm6rmVNjmwvCtwcBY9BIiBvsGO6w9hzJk/Mwxb5OJ+DoM8MixAl9OhNBkOII
+ h/IW8+sjFPbJ6uiXGdtWQ+m7gq0s4Dgd5d1FsiJVhGMhe2sVx3RWlmjY/5FdHTfi/OgnkPkii1e
+ NLcdrlQF550ik65eo8mck5hCL3XYJBg5LgCAvZYZzezV0Lm2D2bJzeEYGG4rk4wgk22NRsG1/yO
+ GHGrJXlcX3YuwdLnI9wFhz4HmE4F9s/6nttcojk40W7V31JKF7zuNb4U9wVAEhzS0xpHdK6vcAl
+ qygKuXLX6UIzqT53Vkg==
+X-Proofpoint-GUID: cW1h867CUOu9oJH1__l_pjWm8cWWbDEi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-08_06,2026-06-09_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606090022
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[windriver.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[windriver.com:s=PPS06212021];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296868-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296869-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:nicolas.dichtel@6wind.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:qingfang.deng@linux.dev,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yun.zhou@windriver.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[windriver.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,syzkaller.appspot.com:url,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,windriver.com:dkim,windriver.com:email,windriver.com:mid,windriver.com:from_mime];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B20365BDD7
+X-Rspamd-Queue-Id: 4AF4865BDE3
 
-On Mon, 8 Jun 2026 19:41:54 +0200 Fernando Fernandez Mancera wrote:
-> On 6/8/26 6:03 PM, Jakub Kicinski wrote:
-> > On Sun,  7 Jun 2026 13:01:21 +0200 Fernando Fernandez Mancera wrote:  
-> >> The logic for handling IPv4 devconf sysctls is scattered. Notification
-> >> and cache flushes are managed in devinet_conf_proc(), while a separate
-> >> ipv4_doint_and_flush() function and DEVINET_SYSCTL_FLUSHING_ENTRY macro
-> >> is used for properties that solely require a cache flush.  
-> > 
-> > Hi Fernando!
-> > 
-> > Do you have the necessary iproute2 patches pushed out somewhere?
-> > I'll pull them in the CI to make sure the test works.
-> >   
-> 
-> Oh sorry, I thought this was using iproute2-next.
-> 
-> Yes, feel free to find it either here [0] or pick it from [1].
-> 
-> [0] https://lore.kernel.org/netdev/20260601143242.6729-1-fmancera@suse.de/
-> 
-> [1] 
-> https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=fdb064bf64e5df738f5f823a11f315340679d336
+__skb_flow_dissect() unconditionally reads 12 bytes from eth_hdr(skb)
+when FLOW_DISSECTOR_KEY_ETH_ADDRS is requested. This assumes the skb
+has a valid Ethernet header at mac_header, which is not always the case.
 
-Tests pass, thanks!
+The problem can be triggered by:
+ 1. Creating a TUN device in L3 mode (IFF_TUN, hard_header_len=0)
+ 2. Attaching a multiq qdisc with a flower filter matching on eth_src
+ 3. Sending a packet through AF_PACKET
 
-but ruff check fails with
+Since TUN in L3 mode has no link-layer header, mac_header points to
+the L3 data area. The flow dissector reads 12 bytes of uninitialized
+skb memory, which then propagates through fl_set_masked_key() and is
+used as a rhashtable lookup key in __fl_lookup(), as reported by KMSAN.
 
-tools/testing/selftests/net/rtnetlink.py:45: [E722] Do not use bare `except`
+Rejecting the filter in the control path (at tc filter add time) is
+not feasible because TC filter blocks can be shared between arbitrary
+devices -- a filter installed on an Ethernet device may later classify
+packets on a headerless device through a shared block. The device
+association is not fixed at filter creation time.
 
-There's a specific error cmd()/ip() raises on non-zero return, you can
-catch that one.
+Fix this in the data path by checking skb->dev->hard_header_len before
+reading. If the device does not have a link-layer header large enough
+to contain the Ethernet addresses, zero the key so the filter will not
+match.
+
+Reported-by: syzbot+fa2f5b1fb06147be5e16@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fa2f5b1fb06147be5e16
+Fixes: 67a900cc0436 ("flow_dissector: introduce support for Ethernet addresses")
+Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
+---
+v2:
+ - Adjust commit message and comment
+
+ net/core/flow_dissector.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 2a98f5fa74eb..1e6a2c04698c 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -1173,13 +1173,20 @@ bool __skb_flow_dissect(const struct net *net,
+ 
+ 	if (dissector_uses_key(flow_dissector,
+ 			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+-		struct ethhdr *eth = eth_hdr(skb);
+ 		struct flow_dissector_key_eth_addrs *key_eth_addrs;
+ 
+ 		key_eth_addrs = skb_flow_dissector_target(flow_dissector,
+ 							  FLOW_DISSECTOR_KEY_ETH_ADDRS,
+ 							  target_container);
+-		memcpy(key_eth_addrs, eth, sizeof(*key_eth_addrs));
++		/* TC filter blocks can be shared across devices with
++		 * different header lengths, so we cannot validate this
++		 * when the filter is installed -- check at dissect time.
++		 */
++		if (skb_mac_header_was_set(skb) &&
++		    skb_tail_pointer(skb) - skb_mac_header(skb) >= sizeof(*key_eth_addrs))
++			memcpy(key_eth_addrs, eth_hdr(skb), sizeof(*key_eth_addrs));
++		else
++			memset(key_eth_addrs, 0, sizeof(*key_eth_addrs));
+ 	}
+ 
+ 	if (dissector_uses_key(flow_dissector,
 -- 
-pw-bot: cr
+2.43.0
+
 
