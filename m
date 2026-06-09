@@ -1,198 +1,183 @@
-Return-Path: <netdev+bounces-296927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 33GLDmm4J2pw1AIAu9opvQ
-	(envelope-from <netdev+bounces-296927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 08:53:29 +0200
+	id cMAyM5e4J2p71AIAu9opvQ
+	(envelope-from <netdev+bounces-296928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 08:54:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D74465CF4E
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 08:53:28 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F6D465CF6A
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 08:54:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=CJPIU0qi;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296927-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296927-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=asu.edu header.s=google header.b=c+oqSdc5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296928-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296928-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA4D830031E0
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 06:51:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8349F30254B0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 06:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909FA3D6497;
-	Tue,  9 Jun 2026 06:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E092F7462;
+	Tue,  9 Jun 2026 06:52:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E2D3D3D18
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 06:51:33 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780987896; cv=none; b=B0DD7s1+qJByVCXrPZmUGf+/WOvsEfmDnOtxbEKBSIXY0RzzEVN65O78rgzDh2duMBiX7tncpAASqcpR/nynGGDSwa7TCY5i/YptbY10bQbKz1i5+pJv1cFGn+G2yv1M6AIATuEUiUFUiNKeeP3WAqnfTto5SGfsCUFTeZG3Ogc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780987896; c=relaxed/simple;
-	bh=Vteap/nHF7sQj3OHKsy3ErbiZFhlDHkL1pW6lncRNG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ICJVJ2K08ylfDv8VaAjhcdd679uHiiqBV3fysd3yW++YdusC1CaFR54mB6aAynWBFE+B8/6jBXQ2Sow8Rgsx0tdPxiXqpnIYNEnp91riiSASGHNtD1k9f7LtgLMD00rOTyKOQ1kcLw8Lu3oNJqUHFyGQ3i3IY12u44SA1JFmarU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=CJPIU0qi; arc=none smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c0c1e0b0faso35250405ad.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 23:51:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F042215746F
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 06:52:10 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780987932; cv=pass; b=UPs4dImLz9bg1HhXRtIbtwU/WNNH78BvUiY3sQDerMW72+4nwM+0r07ZCj3KpgT3u2z/XRtx7eLiKefeknRu1nrzyBMo6QMQ6d5rkDVPI0Z0IJPewdN9fEY2HQcvCiJQitTcf6AjF5pcymNVU391owKvhfWX+7JNC9lrQ4e0J0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780987932; c=relaxed/simple;
+	bh=X/iRlO1TvvmGyp0MM+znIVEUZN5pzHHcxW4d3e8AgKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EuG5k9RSjog7S71AqT+FxXPA7G2Q31NvqRcp1Oyxq+hA73bFx/pgOlABsQg4KmJ+tzOUgHeGxKxm9uxdBXHytbkTg0tY7VNx5SshXY1aImkXBCtcp32MkPcSDrBjuPbyHmERGMWFXNAXN5/P3rwhFsPtFVd6I9OU5h43nvYAShQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=c+oqSdc5; arc=pass smtp.client-ip=209.85.210.170
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-842288702fbso2058302b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 23:52:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780987930; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OjgrIy8tbjk3Dr4Gimmwp8ODElUmD/BHGL+rS4elUNj225WzaAu6J/euhQ+qiEeytt
+         UeLWaTXP1R9jUotsm3R3q1Tv4dvdEZXzkiGs8NlgFN+jTq0Ls+cw2s+jiW/NU9WAx1E4
+         XAQUe29UBXNWRndjlRs/qfqSjVNcdCeht+ipYQczvvUZSfjZj4bJzmebvOYT64n3RIRH
+         woGiqt6Ba8vwCB23jrWaQihdeBZaqLoAZxZniB6sAKgFGUve78byvf1Qy6IJQJ45mxfJ
+         yabL8mfDCQB9b7FYb5GfM/UFR5OS2D4VSYy8mS2DifRr3UcoIbfAUHYpk8wX5UsBaT4d
+         gh/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7P++uzpx+K3WEIGO/No/y6eG2e3IylOIU8Nw5uNReaw=;
+        fh=F5SIwZPCEJ6RPFO5FmSqekmMdPz8af1oJypOUxZ2YvE=;
+        b=jUf4vvn1day9QQO4AKgD6XnNZzeQnx2U5TtQvY6gF8//QcFjbdN2oQYU0dhCcE62nE
+         IR4GkrXrdUMGza/BtQS7exBJqac3Iz4v6MHqRQVTD/Nr1pyna3NV8F1F73594JRoTxwl
+         RzIho8TJ7HqhWsTVU1dIeDB0iaPOc5uOBjXRqPq5kbQ2EpEi7aMDMc6gU75x4k3Tg6pK
+         IHIHewJenfLiGuD1EPc+Sds3cgQpKr/MARd6+nJXw44dvJ+I4HDEo+q20eFg/p+AxTqI
+         +3taJf1evyiwcRy5pufXi3YOuECsfcoc9HN1Xcqm//0d51ZJ/5y6jfjMkJPRyRaYGLn9
+         Fwtg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1780987893; x=1781592693; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WUoCgjqP8cJvxOnwB2NaZqkz+8bhLbudTMsyg7OmkZg=;
-        b=CJPIU0qiGGGdSpWrgrNrNTIb8nOLqySuIdweAFx9W9/RRhPb0UqaKqJGYEgxi87Ckb
-         5GwBGqHQmmh5wvlNr4d5eJbUxzk02znG1wvJbjCV3GAJReJfIc3bQ672bNI5mA1RW3Zx
-         0oDQMgwPQEpqNlk7HIass2ju5o4e2OuydDgWAAaMstevvENo7KvBKb4HyMJUE1fw3/sx
-         dap0xRXa8QmruillykbqEGYlAejN0EHKIgkpWCZ7rU8pmxxgUTH50OMEHsYqMjFVp2vR
-         PJUiRB22H+LVzTUrPVzH/hXu+OBuRKiqAkv227hO+NuSzJ+9EA3Qj1aFpW0XWYnDiMe7
-         pAqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780987893; x=1781592693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=asu.edu; s=google; t=1780987930; x=1781592730; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WUoCgjqP8cJvxOnwB2NaZqkz+8bhLbudTMsyg7OmkZg=;
-        b=o2qaCXy5hMkM7WJ4dAPScu+yDmuBnjRl/XRZbSjb1NmYMZijAKf0EGom7gZ7oHB/jk
-         eD5E8SGSJ+uAD8R6ZQB7afjjJEcdV98JMNQOcoWZvb0OE1x/lNRMi7oHNq7v90D4r2hl
-         HpeYgW6UttBM4Q1Wpq9+NjHtTBT9UFZG8bLq0/13nysejDbDzSFpUhIIKLxL9U7pBNHv
-         EDQyNRvcFagLobDfRN4jAjRMD+xyHG14TS98t/Wava1xsRNR3Yia6xC8VrIo70uDELBh
-         Z7MWkEEYaF0eQBnnVZ0kfvSPBz6/4CrnlMzjZhSZNOqJVQ46Z4+oFS926yeRVDLWJPdp
-         fJ8w==
-X-Gm-Message-State: AOJu0Yxknf2aAdIuTW29LuNd4OZN0wYXul840cg6zND34bBU13r+LTMx
-	s7ingPwAB7vnQvaE+/xzN6/Vpk1By91JAvj/LyWS5VgRBz89a352ykd8xKzgCowd7scXSCceAe7
-	LwMKqofPz
-X-Gm-Gg: Acq92OGm/LIvB/9K7htOjxkSFFrbSHdCy+67uMKFjTlcwbskVlqL8B9Nnxr8psVhCp7
-	zzFvqtuBPhvYC70N1f+xYNiJx/v7EwTkwvG4FZ0lPAY/eM55OTWKa7ZM0G0MGTRGH43eE0GTC4y
-	MiHT0Ucq3uwd55XYRkCYVtfcPKgqihdQzvKfS57Vl2FPUKFbYd2HOWMXW156N2iNWy0cV91ObT9
-	eQNndZ4JGc4R/uUVZqJv2Pzlppfs746bDZjL/CnWcOybgFkUMEkC8kUeZb2rq5DuJbIU5xshxIV
-	fUMZCAjSzVNnCcXWGeZ7qnS8dXOnTyf0A376hQ3GcoK/MIlZHS6moH+Lk+7bCJ+Ci4MPU17gPiL
-	Tu/koch6MCe15z9KqlmBWbVdsZP6HLII+qlbeUntTizzFHhMLeF42P0/CzTKnCYyy4eW/llUPFf
-	594ArlPnxZdXWqy/A=
-X-Received: by 2002:a17:902:ecc3:b0:2b7:aa20:3c61 with SMTP id d9443c01a7336-2c1e8339808mr212606545ad.33.1780987892776;
-        Mon, 08 Jun 2026 23:51:32 -0700 (PDT)
-Received: from p1.. ([73.140.210.38])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6cea3sm197980385ad.7.2026.06.08.23.51.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 23:51:32 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: netdev@vger.kernel.org
-Cc: idosch@nvidia.com,
-	horms@kernel.org,
-	bridge@lists.linux.dev,
-	razor@blackwall.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net v4] bridge: cfm: reject invalid CCM interval at configuration time
-Date: Mon,  8 Jun 2026 23:51:16 -0700
-Message-ID: <20260609065116.2818837-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+        bh=7P++uzpx+K3WEIGO/No/y6eG2e3IylOIU8Nw5uNReaw=;
+        b=c+oqSdc54wht9ham5Syl6vas9IE90KCvOVvwLE4wNP+q9JcqLo72HCGbPMbzscSeaR
+         oZ6psLqQVWR83ygwWPKxIZ7IxUCZ2Yz4cl9YSqVgCHsoJ6Sa8TogGry9BufKY/j/5xeE
+         MldYaKZakNoynCNrEXhMbLf+b4vaKmxptagxH6IUPFMaNhfj9GZjdodGByuWwm12w+vb
+         EH9mUZx703irsLvzRf4ZrREbAmBTL7PIdYKGw5ecjX6c1Uf6V1TuqC8eZ0mkv8d+JGj6
+         ZA7wu8MrdPq6HQ7qIdAZqetgM/cjZ01sHZlPUlHD/jf0vsrbpAmsccqp9n4D6VgcnZu7
+         V/6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780987930; x=1781592730;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7P++uzpx+K3WEIGO/No/y6eG2e3IylOIU8Nw5uNReaw=;
+        b=Pa1ueh5ljnpcOnDRLC3mxAn/ckMIBTf2YSvjjPSER6uYSTd+0kA2SK6Dei/9aP2hy/
+         hMndkGQilGeiMICr8Iikqq1MYWu3pLT+/y77QHSMSuxV/MJHBuBGlyS2bVWpn/3+PStk
+         0YscrsZSseOfiW72ZdHnfcKGS+g/4+1IqxeVtJEuQwm95UfXUrMQlNIT1At0FYEO0PeX
+         vqdNsG8vc4Ok616AKzp4gojtkh5BYqU1qkpUGwYWTXZ9P8e0YUgPr7/C58fFouWpBtiG
+         pl4LnM4M96f7vdAEf2EtVNr3xOtpRcNiOWHAJxARwZQxQy6gyomqSo4p/7SsXgqevYTi
+         8eMQ==
+X-Gm-Message-State: AOJu0YzUTMToJocFDA5S7QwdHJOjIh1dT+uS7DGw1v62W9AgDAAqSOwd
+	DVraVXcv6P7TG2tKOMDFih4JdyXIiBqaFpnMV8bxXGLOtm3K1popE5O8r0ZPjNdgw3Cq4liURsN
+	n1tJzmtJbCgD12nNfa3q41hMWFWl9WJfo45Gv9Aa/
+X-Gm-Gg: Acq92OHw9ykSmd1aULPsavAQiReb28BwfymQ6E6woVwxDuhA6PyWInQ6MAArdJN8rkg
+	sIH3m+yITNSHQwZYK8AV78F95oX1hb1n4E8T4W2Q+PnD/0WNXpihZqZpWQQ89T/RT5BeaO7aSmK
+	Nqqv8+VKTGlgyDZTbOvfElvoLJDSLfNsBjDuB0RrOiCLZ9gT7FFdlwhGkb8BX9ifw8kMh/otPsm
+	UqIYIuB7umymMNeMjhczs1DWHAC7Lu9JKrK68MpmJ+OF4owzo5zGB6VLnimFuwZvCanDnl7ZCMJ
+	5sJ9MFD0dcy04vN/4w==
+X-Received: by 2002:a05:6a00:acd:b0:82f:776f:a78d with SMTP id
+ d2e1a72fcca58-842b0f9987amr17980453b3a.19.1780987930373; Mon, 08 Jun 2026
+ 23:52:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260606215848.1951633-1-xmei5@asu.edu> <20260609064613.GA652158@shredder>
+In-Reply-To: <20260609064613.GA652158@shredder>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Mon, 8 Jun 2026 23:51:59 -0700
+X-Gm-Features: AVVi8CcNtq0vP6OjZjLU7YHKFAxa-n9jLGai9XO-aEAr0BaDLTn9EOhL3ZDIi3I
+Message-ID: <CAPpSM+QGAARoC2Jq2EfMkXCgBQXy7k64W6rBFdJ8mhpfrR0zXA@mail.gmail.com>
+Subject: Re: [PATCH net v3] bridge: cfm: reject invalid CCM interval at
+ configuration time
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, bridge@lists.linux.dev, 
+	razor@blackwall.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, bestswngs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296928-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296927-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,lists.linux.dev,blackwall.org,davemloft.net,google.com,redhat.com,gmail.com,asu.edu];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:bridge@lists.linux.dev,m:razor@blackwall.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:bestswngs@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:idosch@nvidia.com,m:horms@kernel.org,m:bridge@lists.linux.dev,m:razor@blackwall.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:bestswngs@gmail.com,m:xmei5@asu.edu,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,lists.linux.dev,blackwall.org,davemloft.net,google.com,redhat.com,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[asu.edu:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:email,asu.edu:mid,asu.edu:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,asu.edu:dkim,asu.edu:email,asu.edu:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9D74465CF4E
+X-Rspamd-Queue-Id: 3F6D465CF6A
 
-ccm_tx_work_expired() re-arms itself via queue_delayed_work() using
-the configured exp_interval converted by interval_to_us(). When
-exp_interval is BR_CFM_CCM_INTERVAL_NONE or out of range,
-interval_to_us() returns 0, causing the worker to fire immediately in
-a tight loop that allocates skbs until OOM.
+Thanks for your review and the tip. V4 was sent.
 
-Fix this by validating exp_interval at configuration time:
+Xiang
 
- - Constrain IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL to the valid range
-   [BR_CFM_CCM_INTERVAL_3_3_MS, BR_CFM_CCM_INTERVAL_10_MIN] in the
-   netlink policy so userspace cannot set an invalid value.
-
- - Reject starting CCM TX in br_cfm_cc_ccm_tx() when exp_interval has
-   not yet been configured (defaults to 0 from kzalloc).
-
-Fixes: 2be665c3940d ("bridge: cfm: Netlink SET configuration Interface.")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
-v4: remove the Suggested-by tag
-v3: Correct the fix tag and avoid use magic numbers
-v2: Move validation out of the datapath and into configuration
-
- net/bridge/br_cfm.c         | 6 ++++++
- net/bridge/br_cfm_netlink.c | 4 +++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/net/bridge/br_cfm.c b/net/bridge/br_cfm.c
-index 118c7ea48c35..dea56fffa1c1 100644
---- a/net/bridge/br_cfm.c
-+++ b/net/bridge/br_cfm.c
-@@ -805,6 +805,12 @@ int br_cfm_cc_ccm_tx(struct net_bridge *br, const u32 instance,
- 		goto save;
- 	}
- 
-+	if (!interval_to_us(mep->cc_config.exp_interval)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Invalid CCM interval");
-+		return -EINVAL;
-+	}
-+
- 	/* Start delayed work to transmit CCM frames. It is done with zero delay
- 	 * to send first frame immediately
- 	 */
-diff --git a/net/bridge/br_cfm_netlink.c b/net/bridge/br_cfm_netlink.c
-index 2faab44652e7..91b9922dc3f2 100644
---- a/net/bridge/br_cfm_netlink.c
-+++ b/net/bridge/br_cfm_netlink.c
-@@ -34,7 +34,9 @@ br_cfm_cc_config_policy[IFLA_BRIDGE_CFM_CC_CONFIG_MAX + 1] = {
- 	[IFLA_BRIDGE_CFM_CC_CONFIG_UNSPEC]	 = { .type = NLA_REJECT },
- 	[IFLA_BRIDGE_CFM_CC_CONFIG_INSTANCE]	 = { .type = NLA_U32 },
- 	[IFLA_BRIDGE_CFM_CC_CONFIG_ENABLE]	 = { .type = NLA_U32 },
--	[IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL] = { .type = NLA_U32 },
-+	[IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL] =
-+		NLA_POLICY_RANGE(NLA_U32, BR_CFM_CCM_INTERVAL_3_3_MS,
-+				 BR_CFM_CCM_INTERVAL_10_MIN),
- 	[IFLA_BRIDGE_CFM_CC_CONFIG_EXP_MAID]	 = {
- 	.type = NLA_BINARY, .len = CFM_MAID_LENGTH },
- };
--- 
-2.43.0
-
+On Mon, Jun 8, 2026 at 11:46=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> On Sat, Jun 06, 2026 at 02:58:48PM -0700, Xiang Mei wrote:
+> > ccm_tx_work_expired() re-arms itself via queue_delayed_work() using
+> > the configured exp_interval converted by interval_to_us(). When
+> > exp_interval is BR_CFM_CCM_INTERVAL_NONE or out of range,
+> > interval_to_us() returns 0, causing the worker to fire immediately in
+> > a tight loop that allocates skbs until OOM.
+> >
+> > Fix this by validating exp_interval at configuration time:
+> >
+> >  - Constrain IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL to the valid range
+> >    [BR_CFM_CCM_INTERVAL_3_3_MS, BR_CFM_CCM_INTERVAL_10_MIN] in the
+> >    netlink policy so userspace cannot set an invalid value.
+> >
+> >  - Reject starting CCM TX in br_cfm_cc_ccm_tx() when exp_interval has
+> >    not yet been configured (defaults to 0 from kzalloc).
+> >
+> > Fixes: 2be665c3940d ("bridge: cfm: Netlink SET configuration Interface.=
+")
+> > Reported-by: Weiming Shi <bestswngs@gmail.com>
+> > Suggested-by: Ido Schimmel <idosch@nvidia.com>
+> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+>
+> Nit: I don't think that the Suggested-by is appropriate here since I
+> merely had minor comments on the previous version.
 
