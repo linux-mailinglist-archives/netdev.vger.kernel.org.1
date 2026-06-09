@@ -1,247 +1,157 @@
-Return-Path: <netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bXPvEBlwKGrYEgMAu9opvQ
-	(envelope-from <netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:13 +0200
+	id MJpOImdwKGoEEwMAu9opvQ
+	(envelope-from <netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:58:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1C2663F69
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A6D663F9E
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:58:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=YhMXw2Oo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=iogearbox.net;
+	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=WpIrqjL+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297263-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 25B483064B27
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:53:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1C1F430EC111
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F16376A03;
-	Tue,  9 Jun 2026 19:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8AA37C11E;
+	Tue,  9 Jun 2026 19:54:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9064ADDA8
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F6236495B
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:54:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034761; cv=none; b=riinnJCbjx8IRT1IAPhR8G0sID1PqtXZmel0+Um83xN1sgqi0KfRf6GKZmv4rLUe0TheBNJuJdXhRNL0PCC7wiqDB8WI9apBFMsCVnHV4vhFf3u5TOoz0HiqP1BNAkBfDOOIS/7uNegWik1PaLQWIaaL/bboIbRFbGuqafVItTw=
+	t=1781034877; cv=none; b=ohGzAAIFivCd5zPeZTBlTBqX89++mtngkLTguvZJ+6DP0n6gKADMRImpLt8oWovdjuQJeu5vjFo/a31oiGvyY7sSWe4ENoieJ69VSjyAbtCwYlUrtTXRI8sNbNv8fgDKb7C7inc0yRKXjMojtcMB3S1x3VSZ7eS+8TE6ZJ4DK0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034761; c=relaxed/simple;
-	bh=+4IUeBKAh2XI6VD6ap07Oetg6YVT2Xbh1M0B6mgBpgE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q6QNsAsuqrQRsK7kT2wjj3JasStEiuRUDU1eWGUoNsIWO3o+ko44XvoTNL5PptJtvipWcPd/J+JDnhELRrZZIjduvtnwe2SA4pdve9l1Wonc0j8L6wKw0CN0aMa086xbW4NkYOm4yqc28BD/0x9okf9ojHhC5WEeW7n91yNIiGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YhMXw2Oo; arc=none smtp.client-ip=213.133.104.62
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=C3Li/RVM0wb3b++4xIwjz1jl9fQ7gU1E5LJCKYCtnO8=; b=YhMXw2OoSShthQV9BLVjyXBsBJ
-	KreYKVPr889sTiC3abhGP/9Q0te9KvDLy747velPt+OEg1EYh2a9dRy1gCOWb92NLQEl6vVPVSCfj
-	Bj5ckDFL2u2F9nJ0w1O1VqXHLrwzn77wvukl8PTbFtbl5oLCSrMGJLaXBFsh1YekTFLMQe7vOr5uI
-	parYrEcx72/4helCb5nI5sQer19+QbRrrtDpKNCMU+eY08DXT7qrE9gNl5/V/QJlWXneG/+txNTp5
-	J5u6k7HjfTXJUZxNweMwC1FRXZzCFk7X9G56Ha81S9JkN9fUkcodJOc2HFjFdcX9WkJldvIatncPW
-	HPFXkQOQ==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2Us-0008Tl-19;
-	Tue, 09 Jun 2026 21:52:26 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2Ur-0008P7-01;
-	Tue, 09 Jun 2026 21:52:25 +0200
-Message-ID: <15c024cd-7ab1-47b4-94e5-90db0f74227f@iogearbox.net>
-Date: Tue, 9 Jun 2026 21:52:25 +0200
+	s=arc-20240116; t=1781034877; c=relaxed/simple;
+	bh=3xnCFiwxO16Y9VzNXXYKEYs0FSQlDolB6VBLYuJ9zk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tgh1ZAek5p7Q2e8rzxjY9oK4VCaaRg4aVO3XfH6z3oHk0ipHxdN5ltjb9gOz9pp8WNVWB1RT4pyyHaORo1ZdG7Dv0hImEk2VGroC+d4TIqNON9Pt3kypai1g2b38pb/839WEHSEWse9Wg/pSg0pus5RNaTXJzzPIaJE3FIdJbwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=WpIrqjL+; arc=none smtp.client-ip=209.85.214.177
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c0c2c7e0c5so40661815ad.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 12:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781034875; x=1781639675; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qtHL6AfuvT6c490Bz3CZQZfiaDxF8fCiU9SZX1nVkbE=;
+        b=WpIrqjL+poY0IuoaQczPOeqXnvmtP5gnz8nZNkhNdEgl/jd2KGyInLs+LVM8KKLO6F
+         5wKVM2ZKvWNgpoD0EBI5850afAiHsfXOzBtL9Cbe1Xbkp6vJxYIrle1usLKgU8kLCYTm
+         0E5Rh0020uSyn9btasCPw5jnOjDDYI2tAdicOhCTsZZmnF8QLBVDzJtpGdoR17FUccP7
+         1nBdl2nbLUn7jQckpajVtG3xM2kdJoRYUiQTDbV01uOJtIDBfKipTeBa5UZjoKuzP0jT
+         SMQyVV38uCI6LsgMryeC/GrQZOLRdMPG2suEo9+i3YvXk17/beNvb4EQt+wEkCz03/5f
+         owOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781034875; x=1781639675;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qtHL6AfuvT6c490Bz3CZQZfiaDxF8fCiU9SZX1nVkbE=;
+        b=SU1tmVyJn0RfsvXiN2vC8MprP6xE4uaSusoyt0PjoOM2/eku5/dLE/waiE5AzHGWiI
+         PdSSTNLSOsZgt1yz9xJMDWb4IBhSWi8gW98IX7afSUckGOfot3bQijASUhmPDjazxUBA
+         iryrymavrSlWt20DpFZV5LWdYsS3VHG6uLJiJeJgdSC9NN+MW2cv0lGhgBlew3KN92Vo
+         tpw+m2YU/Sm7ilvsY6t0ZinC1BHGsbFeIinp6S7HhYbTDTo6SBQFYCdX9ML3Ug9/+kMX
+         OVy7t4zc7njpcqPsmPpr9NEVQmKgyb1+0BXaRQgofWcW8OHNfzkSbfanRSQ79Tu//7+V
+         yCTg==
+X-Forwarded-Encrypted: i=1; AFNElJ+7diypmcaznyBFWK0DcAhrau/lFyPjir52eJ3tLPSNE09gfl8/St/bbmf5P0jcokUG8yhM5g4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyib6kREJWnOzRnamO0MV+SiTRvh0QPgbtd2SyfDqH47/w2Yhn4
+	yYExFe4eNjg4gRR2oXkFq4SR7SXEcb8DF6UshesHKTNzhQzzBu1IEBedDhIGof5TxGY=
+X-Gm-Gg: Acq92OH4/YeJwLBu6TVUqvX8ZZjHQMek1uRPbyr6MXJY3MKYSfk20NITBPlKAZfo12u
+	9dg+1LPKrl2/ELAsNZoherDeeGPrCQm1cqR+0u0RLF716wqSCFZ9rYDMUp/Pf4ZKAfKKc+B19sS
+	hU33J1YQRUupJcy9F/TrsjOEnJu4p7z/B4SKBQAPR5wf1Cd+97BuhBtGEz7QnNvjPm97RMdnFZN
+	zy2rcJkdUTCMa9W+axAyQg0MKpgXQSqvHn8hLFZc72yl/m70T14jVGoR13oVhsjclA4XQ7czuR5
+	lb/yTuq6UK9a6moK3rmm1QUFIjTVZDRy8O8m3/brJfpHnqdkLkOmyEHdIvZ9KqTIX++MU+NurdS
+	rwbnRWXFGJDaaUvEdp7ok6dMmIemAwF/3duZ6pUj6opX5b+QM1kzpFvQN4gGsOfXMLnyT38U8Sb
+	Rq/uHqZDy03DFAGThUukl2cr2zOA==
+X-Received: by 2002:a17:903:987:b0:2bf:128d:f7ff with SMTP id d9443c01a7336-2c2a1be668cmr51148805ad.16.1781034875215;
+        Tue, 09 Jun 2026 12:54:35 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:42::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c24edbb49bsm92990365ad.38.2026.06.09.12.54.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 12:54:34 -0700 (PDT)
+Date: Tue, 9 Jun 2026 12:54:34 -0700
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	dw@davidwei.uk, daniel@iogearbox.net, razor@blackwall.org,
+	sdf@fomichev.me, dtatulea@nvidia.com, bobbyeshleman@meta.com
+Subject: Re: [PATCH net-next 4/4] netdev: don't use dev->flags for IFF_UP
+Message-ID: <aihvettu3tpPK9i/@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
+	daniel@iogearbox.net, razor@blackwall.org, sdf@fomichev.me,
+	dtatulea@nvidia.com, bobbyeshleman@meta.com
+References: <20260609190804.1137085-1-kuba@kernel.org>
+ <20260609190804.1137085-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] netdev: check for nla_put_u32() failures
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
- razor@blackwall.org, sdf@fomichev.me, dtatulea@nvidia.com,
- bobbyeshleman@meta.com
-References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-2-kuba@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260609190804.1137085-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28026/Tue Jun  9 08:25:31 2026)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609190804.1137085-5-kuba@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297262-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DMARC_NA(0.00)[dama.to];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297263-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:mid,iogearbox.net:from_mime,vger.kernel.org:from_smtp]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:from_mime,dama.to:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,devvm20253.cco0.facebook.com:mid,dama-to.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF1C2663F69
+X-Rspamd-Queue-Id: F1A6D663F9E
 
-On 6/9/26 9:08 PM, Jakub Kicinski wrote:
-> Make sure we check if nla_put_u32(id) was successful after creating
-> objects. This is theoretical today, the skbs are large enough to
-> always fit the ID.
+On Tue, Jun 09, 2026 at 12:08:04PM -0700, Jakub Kicinski wrote:
+> dev->flags are not technically ops lock protected. The IFF_UP flag
+> will not change when dev->lock is held, but other flags may change
+> so KCSAN would probably not be impressed. Because of this we added
+> a dedicated dev->up which is safe to read under dev->lock.
+> 
+> qstats want to make sure device is up, use dev->up.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->   net/core/netdev-genl.c | 21 ++++++++++++++++++---
->   1 file changed, 18 insertions(+), 3 deletions(-)
+>  net/core/netdev-genl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index b4d48f3672a5..a10d353d5eab 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -1091,7 +1091,10 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
->   			goto err_unbind;
->   	}
->   
-> -	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
-> +	err = nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
-> +	if (err)
-> +		goto err_unbind;
-> +
 
-Not sure about these three tbh... if the skbs are guaranteed to be
-large enough, would a more straight forward ...
-
-   WARN_ON_ONCE(err);
-
-... suffice? Unwinding at this point feels a bit excessive. Is there
-any other way we could assert this earlier before we do all the ops
-that need to be unwound?
-
->   	genlmsg_end(rsp, hdr);
->   
->   	err = genlmsg_reply(rsp, info);
-> @@ -1227,7 +1230,10 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
->   		goto err_unlock_bind_dev;
->   	}
->   
-> -	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
-> +	err = nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
-> +	if (err)
-> +		goto err_unbind;
-> +
->   	genlmsg_end(rsp, hdr);
->   
->   	if (bind_dev != netdev)
-> @@ -1237,6 +1243,8 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
->   
->   	return genlmsg_reply(rsp, info);
->   
-> +err_unbind:
-> +	net_devmem_unbind_dmabuf(binding);
->   err_unlock_bind_dev:
->   	if (bind_dev != netdev)
->   		netdev_unlock(bind_dev);
-> @@ -1394,7 +1402,12 @@ int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
->   
->   	netdev_rx_queue_lease(rxq, rxq_lease);
->   
-> -	nla_put_u32(rsp, NETDEV_A_QUEUE_ID, queue_id);
-> +	err = nla_put_u32(rsp, NETDEV_A_QUEUE_ID, queue_id);
-> +	if (err) {
-> +		WARN_ON_ONCE(1); /* we can't delete the queue, ID must fit in */
-> +		goto err_unlease;
-> +	}
-
-.. in particular here :/ would be nicer if we could solve it differently
-
-> +
->   	genlmsg_end(rsp, hdr);
->   
->   	netdev_unlock(dev_lease);
-> @@ -1404,6 +1417,8 @@ int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
->   
->   	return genlmsg_reply(rsp, info);
->   
-> +err_unlease:
-> +	netdev_rx_queue_unlease(rxq, rxq_lease);
->   err_unlock_dev_lease:
->   	netdev_unlock(dev_lease);
->   err_put_netns:
-
+Reviewed-by: Joe Damato <joe@dama.to>
 
