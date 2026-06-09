@@ -1,135 +1,129 @@
-Return-Path: <netdev+bounces-296799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id M4PROsFeJ2oevQIAu9opvQ
-	(envelope-from <netdev+bounces-296799-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:30:57 +0200
+	id 3NJdAOBfJ2rGvQIAu9opvQ
+	(envelope-from <netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:35:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C47F65B595
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:30:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E0665B615
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:35:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="D/LUZLLn";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296799-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296799-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZODzerro;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 935A83088156
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:30:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF6DB3032F6B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF8D267B05;
-	Tue,  9 Jun 2026 00:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6D9261B92;
+	Tue,  9 Jun 2026 00:33:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479AC253B42;
-	Tue,  9 Jun 2026 00:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABFC244661;
+	Tue,  9 Jun 2026 00:33:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780965019; cv=none; b=G/4VcpajIL1kfYTVSocu1pCqjNxPevFMZ2gwA94yNJzgyBsLuAYTPlCSRZPIGFzQo6MjxOyUBokAxPYP1sQ1yGKl+u8+tuePZM3PDFylOtTBzCjI1H/Vu9fEfFSfgZsekEr1k1w/T5Pqyo6yQhtNqYq3z4S7J4SeYH+1/uiJseM=
+	t=1780965227; cv=none; b=sC5P05KF/MlXCyg9g9yr0z6bF14pMu0+ajjQ/7YsDswPNxC89fkrXlTO38SZ0alSuwYf1O9FTQajSDPgStSOLoBWXEQmtLUdnwUl+fZbWQy7Cv7z9IIZneTUgYs0IExBkAB+UUa2QdZC6n0+pxkuvy6xfVC+vmNRY5lOAiuhoxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780965019; c=relaxed/simple;
-	bh=/r7UX83fksvvC8dPRln3Smk45KDY8bpvY9ya0AJWu70=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sGzSKFfgA3AtvLZLZi6BwjMLSe1NkJNZvF4cH1fEmve5vAROJzhq0CQlXYBQvQ064nmyHjpMeTbrzWWU7DXggH0dLbzIknZkeDrY2UOY7zApG78OWY/+WZT5eoMPNZmHuybFaHZKeoREJJkszMb3eKU+m+R3KqiGHsXPtA2a8Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/LUZLLn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2191F00898;
-	Tue,  9 Jun 2026 00:30:18 +0000 (UTC)
+	s=arc-20240116; t=1780965227; c=relaxed/simple;
+	bh=t8gEdjbrs6qgE0T05yWWf+zBdM3rY8wM+GccnVr1ZFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A3jHFUnwLnGwhvTdp/oDP+34ov0/Atrp1nrPtuKkA9XLrQ/kQAdVSpxUXSkG3vpxQDaKAPChUmLyyYYUBz9MQUlf7ZRCqSACFP+luUlEoeHaO/xqM2BWMZWnHyma7EkIJVHltU256/THWC8IyDFKy3Fyi3qXFb2yu3oTPxEdDbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZODzerro; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9BDD1F00899;
+	Tue,  9 Jun 2026 00:33:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780965018;
-	bh=4y8HAiyOMRqIk+A63W6o980Kd5PM76PlpzNJJUSR1MM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=D/LUZLLn2QiEEW5sY3F9Z25HW8TyxZgn8fjglzI3hF3SF8pTQkVEG2wqQWZC8n7Nk
-	 xo8GSthux40/zBdtpwhi/qJ69q0zbDv5jZ6ATecp58rvai62ZWPqwHZK9NmZVRZP/N
-	 ZovSEcrd6JvcGLtyXPEJjupgqMJIRMkXjBiMluHe2IUl6NNZofRWQFLeIZ4bhzreJT
-	 q7CqR+129BFfVco/sHomnObJY0Oscv34zn9KTurTfsOfcjh6SmFzSR2NJGhpMm8+lq
-	 zwbscw/Dleik+GfstfnfcDkqtYUyayz5pv+LHVHGwu33blgpXjXqEpcKoJDcEMA7AX
-	 T8AKyJpMYM8GA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197523812FDA;
-	Tue,  9 Jun 2026 00:30:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1780965226;
+	bh=YuDJfJJTRs3UGqZWaxi44T79ItiIkoQpI092YqffL3E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ZODzerroKrElQpgiYs7ZyrZeFuZ/lXdg7gpSRRE4E6lwrOOFK+t4uKaAsmig7dkgs
+	 kGlydAKYDv9ZPW/J478CYPs0snXBTvoKFFJBsyCWFVZGaMXqmMSnm8tj4iya+4Xk3b
+	 sPC8xK1esKeHVJYHHyMwUResT23pi5JoFD/Ky829OQzKtU05jG0MCXuWTupmecWGgg
+	 90SvJDG0UafPP0qVa7zT671rkQ26LFmDh7B0myT3IhVjzlX0mhOksD6vqnN1IlaRFx
+	 HXsKHL7MSXwmXsINazzs3HSwLqOrfH7/zPbEGtyI3QyuFtiR9l1xA9EHLNlogSgzxv
+	 5gNsrgaT69ZOQ==
+From: Chuck Lever <cel@kernel.org>
+To: Kees Cook <kees@kernel.org>,
+	linux-hardening@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	david.laight.linux@gmail.com
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	Arnd Bergmann <arnd@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Trond Myklebust <trondmy@kernel.org>
+Subject: Re: [PATCH net-next] net/sunrpc/svcauth_unix: Use strscpy() to copy strings into arrays
+Date: Mon,  8 Jun 2026 20:33:38 -0400
+Message-ID: <178096512223.86595.14618546480318543216.b4-ty@b4>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260608095523.2606-16-david.laight.linux@gmail.com>
+References: <20260608095523.2606-16-david.laight.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 net] net: ibm: emac: mal: fix unchecked platform_get_irq
- return values
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178096501664.1726280.10497532304483486994.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jun 2026 00:30:16 +0000
-References: <20260603211734.30750-1-rosenp@gmail.com>
-In-Reply-To: <20260603211734.30750-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296799-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:david.laight.linux@gmail.com,m:chuck.lever@oracle.com,m:arnd@kernel.org,m:anna@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jlayton@kernel.org,m:pabeni@redhat.com,m:trondmy@kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-296800-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,oracle.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5C47F65B595
+X-Rspamd-Queue-Id: 64E0665B615
 
-Hello:
+From: Chuck Lever <chuck.lever@oracle.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+On Mon, 08 Jun 2026 10:55:00 +0100, david.laight.linux@gmail.com wrote:
+> Replacing strcpy() with strscpy() ensures that overflow of the target
+> buffer cannot happen.
 
-On Wed,  3 Jun 2026 14:17:34 -0700 you wrote:
-> platform_get_irq() returns a negative errno on failure.
-> Commit c4f5d0454cab5 moved the platform_get_irq() calls and explicitly
-> removed the error checks that were previously present, claiming
-> devm_request_irq() can handle it. However, a negative IRQ number
-> passed to devm_request_irq() fails with -EINVAL instead of
-> propagating the real error from platform_get_irq().
-> 
-> [...]
+Applied to nfsd-testing, thanks!
 
-Here is the summary with links:
-  - [PATCHv2,net] net: ibm: emac: mal: fix unchecked platform_get_irq return values
-    https://git.kernel.org/netdev/net-next/c/8084fc9292c2
+[1/1] net/sunrpc/svcauth_unix: Use strscpy() to copy strings into arrays
+      commit: cea9ba4f71e82766d782ed423c99bb12a69bbdf0
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--
+Chuck Lever <chuck.lever@oracle.com>
 
