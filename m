@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-297110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4Y3zCkEzKGoSAAMAu9opvQ
-	(envelope-from <netdev+bounces-297110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:37:37 +0200
+	id 5pR2KTMxKGp4/wIAu9opvQ
+	(envelope-from <netdev+bounces-297111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:28:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F909661D8E
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:37:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E07661BD7
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:28:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=FXEgfN6L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297110-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297110-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=aNvmHBx2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297111-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297111-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 66B2D3164C1F
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:16:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 885E630A7125
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C006347DFA3;
-	Tue,  9 Jun 2026 15:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B90C49690A;
+	Tue,  9 Jun 2026 15:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823B049251E
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9E9494A07
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:13:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781018015; cv=none; b=GgJJKCEDIAYejEykC9TpjkKs31sP2npVdhwbyKilPhhPN11ABIml5c+BwTLvo5iqmHa1jVOCkIMvdP/3DZpRV+Y6pksvbGpOntMpESic4CxA/PPSdgK4bW6iKz2EvqmcAPFluuFLfnCxWD12sMfx617CwjK/XL6aMYX3v0t6JEM=
+	t=1781018018; cv=none; b=MTUrQ7JrJ4ywfVsG/I1u2ndFhHkyOk5Y0peCDlqpVZ389WMy2C/LF1EGHtVkOyWcNPxqemX9bRJbo5x95+lkSiHksRkjz8kYzKq9gXF7qWEZqnnEPgn5YdoYxHv8hfR+Pc8/I3U98mHKHKvrn10HKj5nufnVB14qwYYYzK8XGA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781018015; c=relaxed/simple;
-	bh=22JVSQJjGwljeiZ18Gw1sbCII4IMcchJHTBgkArVf6c=;
+	s=arc-20240116; t=1781018018; c=relaxed/simple;
+	bh=s24y9GPV7y+NJAKmvwvAX1cER3c+JYcl/Cz6+DphJa0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nnntssbgqzHysiP9P3g+627YQW0nRp3UMQxqMH3fCfZjqSMecAGHNSVkO8ghq9qgqp0U8P6LmR0uVO87rY56JSdSiSwZiozi+hsOabfeE2BFf3s/c8tfzPb5bZ8gIFkxArArW6xxSlUbQ9FSq4GCgZjSArEjlIPE0Lp3ncjvesI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FXEgfN6L; arc=none smtp.client-ip=209.85.208.50
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-68c32f3c6d6so5797633a12.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:13:25 -0700 (PDT)
+	 MIME-Version; b=IObbUK0jju1uCFsJwi7eXOcaN0+c3Rv16SNX3r1mlQI0GIZAcE+rosHhCLYi8oWWPRALOGkFIcxxwe8Lubq3WfLByLrv9An2EMEpPJv0f6isJYrU185KApxt9SCCQy1BASBfWUW2Tf51C/V/D/hdmZYuIh8iwZksDNpkyL9nU2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aNvmHBx2; arc=none smtp.client-ip=209.85.208.53
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-68bfcf11050so10362341a12.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:13:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781018003; x=1781622803; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781018007; x=1781622807; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s1RxjqPGCItI5U8gOH4PdQCpjTve/F/Wr30HG8OpZBE=;
-        b=FXEgfN6L1Sq9TXRgK/T4lKpB+1arlqUMK4ABXd5vTaVjegpJVljqcDsuRh5dRd1mMA
-         M/LV4phtc4JRkyAv+k1Oyq7zxJ9aDnV0wQxnX0RO0Qb9jPiA2ZfO/w9Ygf1GoflDvujJ
-         pf7zhPV6flBXlhWach9y2luV6AdMAP0zVXHTVnsYOV1lPLTvzATJDoPAJEq7DPBUgJpj
-         a8AgQMdqTubUMW/bQYtp74cUv/gKVZ48Z72r6PMeZn6zD2BGzszuBIjiC7VbRpEjLXYz
-         21HSRkeqB2/tX++VeAzs/F/VHwh69g8hqf3MyroIMsKtCzVLt1M7rnRa3lvLLGfbjDRQ
-         f94Q==
+        bh=3neVONgdAVcEZX3f1l1KWGoYXB46SXm/tOXseRIlMNM=;
+        b=aNvmHBx2tHLb1lluUrYs1uQzVJcvwHSyvnhBJFTOWpn/IZLK9O06PRCpz+IJ90keLP
+         g24YjrWQNGyzoVkhvKukEngRyFm0AoW8aLvnezAZNa0LxFi/IaRwuDuFfEMKMuGp8BsK
+         LehignkKO11waRS0BofFk3GywQZKqx/pheAP0ZyqF4xO5NLE9oVDLLPrpJGz54zjIPQM
+         JaS3KBYZP2r4JRzZII8eGBBZAeG4jJiYjdgwEKAct5HBVAxesGsRdOrx6EBpR6Aro0kK
+         WZHl+V3eW1nvqpHTdk+jYWNqzTEsfbg1xIW3Q7sZ5k/2NJd7UtkfArzBj5dbYRj4jzOp
+         DJ6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781018003; x=1781622803;
+        d=1e100.net; s=20251104; t=1781018007; x=1781622807;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=s1RxjqPGCItI5U8gOH4PdQCpjTve/F/Wr30HG8OpZBE=;
-        b=N35yymQDkYYSNENhWPkxDbvVAxSoU5HVBz7oRml2f/VkP/CUvqSRB7F2TTxIejYny2
-         oGjhXc3FpNL9PcJw1Cr7yc3HxeZ0s4E2yVJf1ofkECe6s6hNjruu7pdxpa5TlQ4goh6A
-         zrXQ+Z+ORxhGH8mVajJAApdHKqJp6bPMZzT+hSOoqOlsKlP092gaxKsQeEKEF4RvxrlO
-         bRW9XWrxRr/oZLlAphugWf9IDY4G5bo+wJOx+/g+/ZTwxf+yfegiOaIvslLQEclh5q6j
-         +5a2VTSn5GLSp4yzdAtJE2gv+yWaKDoniP9EI52EY6IGiFOHR8U4HWYYIzOpZx9V7dMz
-         UfRw==
-X-Forwarded-Encrypted: i=1; AFNElJ8WTUlRt5nEv9yhlwtWu10I1/OZqVSpHx3mve0Bwo0huNIDKMAsAOpnMu1APJH9R62vjYO7Yng=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQMQJWzdvZ/zgYaWp0QfCe8u1Y3JZ3BDHWi2mzmZK4kjw39P9h
-	Xsk9XWH2gF75KfQK3+BVxt75kutXTYuTU48U260xlrercbgcOjf1Ur9A
-X-Gm-Gg: Acq92OFCDm0y5f3aqncEVjTlY5t1X9piDN4jWY/RtWKPhS58wx9fj5SejwQn6yqA5wG
-	aqhswpz3UxZ+wtu9J9V57DKKU5MBTg65tGpt8k+UbfYE3Kx2UQeSlXSE/ZWO1ljuCya9COCQ8gv
-	wTYgync+m8Qigac55kMVN1w2ypZ7LMnqbTCyg6QeHZqyDBWMGAV5qazYwUDxX+5OVheVkpBXDRs
-	8eCfj0ZFPN620D/TQlkEWbRsoItVk98yOVkv2JuOXYbnzkd6V9RX/xsASCOSt+FNRPEkzWkS/kL
-	AQqgARJ1dxZ+kf3J48cPE4T38+tBmySomf3zMuNmgDvuS1+AOUmMdpUd02nIdPqeXGDYAy+2fzx
-	gSzdCDxsVPuguEIKRaZs20sIwihlAoXPJFdRR5jFUYo5lsVE+5LS/ssr5fyXUgST9yHatM+VFgq
-	voWrLnhc+2shSKHhS5Vl+3bpXp+cqUSVsc
-X-Received: by 2002:a17:907:724a:b0:bef:1df6:12de with SMTP id a640c23a62f3a-bf36cdcebf5mr953590666b.0.1781018003482;
-        Tue, 09 Jun 2026 08:13:23 -0700 (PDT)
+        bh=3neVONgdAVcEZX3f1l1KWGoYXB46SXm/tOXseRIlMNM=;
+        b=rKVQxF4qsIJQBRw2zDXoCZQBZEMOJt3tr/DiEkCB2aDNHL9sx2RtgYMSFK5Tm9yuhg
+         R1ShKX5qHHW5iY6spc2f4Q2XyQJxl9sqK1jCDEpPDEfmIx7b4B3enNkWmKNjiAbxSjfY
+         J6lHsNo+BAl0XLmWYWBMheM9h1ChoUb8wal1f+0k5bU4vtz6I/YMdrby2+rNF6DBS9q4
+         MVBMmATbPRXTwDxAvBaUy1xz6lbGkYnW03LgCeg799StQ0VF329CrqOAzHUCYPlqT52R
+         e3s0ZBd1Vlpn4ulJASE0Bf1uId1vAQkpcjdL2p3dyBge68djiFMoq9IwKmXS6zQk+gkl
+         Mtfg==
+X-Forwarded-Encrypted: i=1; AFNElJ9vrjpjZpkXPcm8g2pJV1betHVMnBZhoZPo4wEtNdLXOkaLw19/P7yqDBDRqiKjJA9GK5SAgoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0muTC74d9a50que7Aj7v+hU6VaSYhjKR/wmBo6qmgCAWjmG0/
+	GeeBwpKJ1T6mj1ON5ENiGbSMbVftrzUHhbaaMnv1JS3hxwC0UZTvbgLu
+X-Gm-Gg: Acq92OEYRKnV1ogKLMKGhBzNG1dRR2LQGpN3+CYeDdm5lNBjlUc8lBjrCllK/FU6QIt
+	UdxQc4S3j58jlIIOXDYkRoxasUC1N7Z7yh3KzQVsM6uIy4esXIqpNyMe0wEwJUI3HP3ANkvE7UU
+	5kqN1f9hTwfZ9yrUf1s/gFX3aFvu0IXZvR2hF9VMvoJnCi1CfpcwcvHkPUrBkJ8Ndx5x4xeLpkG
+	N6W9J+sV9EpIS+yvfcNzvnL380QNMYvnysFL8NZtsYE6uK+wG1P1ZZyQ/8rzVz0cDLPCBP/Jf1A
+	pCKlakERxSa8lX8zdStZ2GquFLiUjeFbJoZVSjmgxSfzJceE6AC748kyzHCIgxFIS3IURaGH7fE
+	x7FLiSC1g52yVPESzekIzQAEz3ihbWCStVIOWtfABh7v/j5C+49E3w25M2nrs4+cfNwsTlJ4daw
+	ZV5vkO9mMplJgwtNaxP1/VNKS3Qtwgidto
+X-Received: by 2002:a17:906:d552:b0:bd9:2b46:99b0 with SMTP id a640c23a62f3a-bf93a00a5c3mr170280066b.49.1781018006681;
+        Tue, 09 Jun 2026 08:13:26 -0700 (PDT)
 Received: from Ansuel-XPS24 ([2.195.136.12])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-bf0517721e5sm1073637866b.9.2026.06.09.08.13.18
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-bf0517721e5sm1073637866b.9.2026.06.09.08.13.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 08:13:23 -0700 (PDT)
+        Tue, 09 Jun 2026 08:13:26 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -105,9 +105,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	llvm@lists.linux.dev
-Subject: [PATCH net-next v6 07/12] MAINTAINERS: add myself as PCS subsystem maintainer
-Date: Tue,  9 Jun 2026 17:12:03 +0200
-Message-ID: <20260609151212.29469-8-ansuelsmth@gmail.com>
+Subject: [PATCH net-next v6 08/12] of: property: fw_devlink: Add support for "pcs-handle"
+Date: Tue,  9 Jun 2026 17:12:04 +0200
+Message-ID: <20260609151212.29469-9-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260609151212.29469-1-ansuelsmth@gmail.com>
 References: <20260609151212.29469-1-ansuelsmth@gmail.com>
@@ -125,7 +125,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -133,7 +133,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[28];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297110-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297111-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:ansuelsmth@gmail.com,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -149,42 +149,42 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,lunn.ch:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F909661D8E
+X-Rspamd-Queue-Id: 04E07661BD7
 
-List all the files of the Ethernet PCS subsystem and add myself as
-maintainer.
+Add support for parsing PCS binding so that fw_devlink can
+enforce the dependency with Ethernet port.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/of/property.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index eb8cdcc76324..8174f005ab43 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9593,6 +9593,15 @@ F:	include/uapi/linux/if_bridge.h
- F:	include/linux/netfilter_bridge/
- F:	net/bridge/
+diff --git a/drivers/of/property.c b/drivers/of/property.c
+index 136946f8b746..e6584a2f705d 100644
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@ -1392,6 +1392,7 @@ DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-controller
+ DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
+ DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
+ DEFINE_SIMPLE_PROP(mmc_pwrseq, "mmc-pwrseq", NULL)
++DEFINE_SIMPLE_PROP(pcs_handle, "pcs-handle", "#pcs-cells")
+ DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+ DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
  
-+ETHERNET PCS SUBSYSTEM
-+M:	Christian Marangi <ansuelsmth@gmail.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/networking/pcs.rst
-+F:	drivers/net/pcs/pcs.c
-+F:	include/linux/pcs/pcs-provider.h
-+F:	include/linux/pcs/pcs.h
-+
- ETHERNET PHY LIBRARY
- M:	Andrew Lunn <andrew@lunn.ch>
- M:	Heiner Kallweit <hkallweit1@gmail.com>
+@@ -1548,6 +1549,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
+ 	{ .parse_prop = parse_interrupts, },
+ 	{ .parse_prop = parse_interrupt_map, },
+ 	{ .parse_prop = parse_access_controllers, },
++	{ .parse_prop = parse_pcs_handle, },
+ 	{ .parse_prop = parse_regulators, },
+ 	{ .parse_prop = parse_gpio, },
+ 	{ .parse_prop = parse_gpios, },
 -- 
 2.53.0
 
