@@ -1,135 +1,166 @@
-Return-Path: <netdev+bounces-296801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J73+KBlhJ2oavgIAu9opvQ
-	(envelope-from <netdev+bounces-296801-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:57 +0200
+	id Y3fJHJphJ2pCvgIAu9opvQ
+	(envelope-from <netdev+bounces-296803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:43:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BF565B658
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:40:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C457B65B686
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:43:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CmtSEKde;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296801-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296801-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=trailofbits.com header.s=google header.b=P5iNWwlG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296803-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296803-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 579903041787
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:36:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EACD3008A55
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3452223ABBE;
-	Tue,  9 Jun 2026 00:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A85231827;
+	Tue,  9 Jun 2026 00:37:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8F1231827;
-	Tue,  9 Jun 2026 00:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB77423ABBE
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:37:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780965401; cv=none; b=UokchU7C+BsGo7OQVfUA7RLIH4aK7bL5SkkGfncV/Q2vnVcCh38O1Ihe6G5ct/zGS5zcpOig3d1cqUbb0B6+DA/8EigahD4TWJ9Fc3UxjyZQw4/lFlQv3N3uqmK7PnBmfpqFpriAUPyhf99tOPeiIswji6Rkbo7z11aql4tFaWk=
+	t=1780965469; cv=none; b=ODw6c6pryG16I76TufLU8P+TyUEPkGwMBppH5+r3yLiS91hrw2dwnE9avJ+ITndLZkn7QOUi3D0SPNdXau8OCNBijADzMJxV/B4GdbTF9+DeXNoKifz5ZVcvDJr72ckl8XyTBIFuSf5WE7PmC8FLELR8836zWuql9nJ7ynBfP60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780965401; c=relaxed/simple;
-	bh=kPUAUDRbebuuxhK+vTmu+BbAG/G9Y1jk3lUHYiR37TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BH1WwYtCBIa9xXLCwt/2H4ML0mHRhoFmfryFLT8znCuAj0G72RGh4kp9j4ABBdmv8HOUDjlgbjo2LlpcrfnDA/0/8zO065WgJWQc/pCDVVxUmcB9zcd1rMA95V3OucXVNWBDeJpbo6gM6K8NrXWWhn+iMTi79siKXlGQjpNV/Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CmtSEKde; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41D781F00893;
-	Tue,  9 Jun 2026 00:36:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780965399;
-	bh=+7gNPHTfQZb3hdNUaxuzeumP3gV621exu5pPvLDRQIQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=CmtSEKdexUWbSGFjcflQoKjhlC7QjC7hX8CWC4EWTgKaHL+ZsKhWhno3jTN+dmtL5
-	 U1C7U15LZZEDl0Y66Hzcda3DYSLbtfDwkqqN20tAftLUZEe4gach8yzeOGEpPr0XiT
-	 TljfmoExjvP19svZEukvBMjBvgW8ozXbyC2H+qctPG01RqaoRIp0o7W3PRl4BauffA
-	 M8WYTK+5c3XJ88dVJRBOxwA9OR40F/CxD3Fn41HmQtnzuGee/MoJD4o6TzzPJfWIJR
-	 EVXrnVBO/b1xqRyvRA0YQxRLFMj9BiU2E/PmcFFZPj8daWV3Ii0teRo5sHNGA/TLjh
-	 KfnPO+9ASEmPA==
-Date: Mon, 8 Jun 2026 17:36:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jeff Garzik
- <jeff@garzik.org>, Roland Dreier <rdreier@cisco.com>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: ibm: emac: mal: fix potential system hang in
- mal_remove()
-Message-ID: <20260608173638.74da73fe@kernel.org>
-In-Reply-To: <CAKxU2N8oh03r2-zJhbOXF0Qqx7RzNSX=zq+i6Ld1c9YXJqDfKQ@mail.gmail.com>
-References: <20260603230821.5619-1-rosenp@gmail.com>
-	<f49d5ac6-ef78-4530-a420-d94e612581aa@intel.com>
-	<CAKxU2N8oh03r2-zJhbOXF0Qqx7RzNSX=zq+i6Ld1c9YXJqDfKQ@mail.gmail.com>
+	s=arc-20240116; t=1780965469; c=relaxed/simple;
+	bh=7dVCoz27J6syQHd7WaarXukg1B93myoCROqxRVJuNgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tbk1riXTYjXQUTsHChors4ZVcP2+DNshRRzqp8Fic+zl48bmLwRgQqW/sdR9+ttSCBtGnWm05RmRJKsMvSleTRZfN1aW/aj2M6hS4zUFhGZcbsbpAoblhm+WXnOkSGvQCPxbcPB4LAKtQtQFZZZXy/N8F6IpgIpHQYBHs/DQ7+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=P5iNWwlG; arc=none smtp.client-ip=209.85.219.53
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8ccf18ef922so70584706d6.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:37:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1780965467; x=1781570267; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cqiPHXkggCXQQpn1mhD4wgCcbTS6X06hPuE4jN0yLYU=;
+        b=P5iNWwlGX7l3Ri9su3/+LREfWC6deVG42HFZlLXorPWW/n27q+hdYtRULwbaVi36sY
+         h2XBAOFsqh4Nfu2MkriOVkNGZrbGbRxIVKsiaxMo+9W2yZXG5RDrxf3UECXmrSjgyMQr
+         HBBxOkFklLGHz0UVDBuSdCaxSn3AQ7VxsBBu3g+ZWbEBT7z38RpQqgQ6WkMxbU0BIX00
+         MJPUsfH163ThQjPfBIpx7dyzqm4Ast1Ehpr6O4uV/GwF/rnGDsL+W1ZUV2znPshmlvT4
+         O3nKUYTnv3hHXTK8llKub7zloCNaZIV1gyfAZWfx+njXaVAjh6EXzK2SpJV71XVsTVeZ
+         ApMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780965467; x=1781570267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cqiPHXkggCXQQpn1mhD4wgCcbTS6X06hPuE4jN0yLYU=;
+        b=sO+ljYjrCLV6x1cXk28zQlwaN74Ey8yPPuXbRZov9GyV4Xu8YVhKpdl44Q3zj00g6j
+         3mMYd6S5+xCLDAyw4A7tqzmiOvI8t4oN0a1ldNRHHKXP+6SesrD8Nx3wXy53vNK3dHFK
+         rM0ZuFHdbRq5+MFbcQNMfLFokvwRJ2aDwWJfm/Eljgl4FJEyjiOFcxUXBHRVeiS8Cg4b
+         s9wkQRHIBNpYWLQWI86VFRpg7rcXEQ+EscRMM1LdimqTuh6gbRcXtqUt9I8pB5VJYlTd
+         9CD+Xnd17vWBv7MHnCnIpJ7cmu3VpkLDbI3tzGHT9Q7gL6gqPlmY7ny7bPPjSw/1enQo
+         S+UQ==
+X-Forwarded-Encrypted: i=1; AFNElJ96TPNPbTgdxmz1dqFQRrpkY3++ToTNThAda73Xvo40xLmTlGD7hQ5zqRAy5jRBVD2BGjJ6LXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1g5ydx69gOkzW0U5spD2+QYIobuHaAHGyKpoxKD62W+GueZDR
+	4SCvnLgT3o76Xvum9KuGCf5S8btO515GyRAQyym6CslWcqZbIimi9nneT00BtQpBrcE=
+X-Gm-Gg: Acq92OG/l1DG6mL6mB5aif07Q83Vrve+A/sXH0AeAUIMuL+JpnaBocg6LKdfhX8ZmRe
+	YVX7yA2y2Pa3VLx1nolezY9jjC98QnN6vqXnGm15oRXoDSu+gwKVkVE/4a/CR7ijSGzfEzkH6F3
+	TPQUOOuqS4XfTL+LVYTBvfLax0OcE5n5xnwWkcNL7xZTCt0HpMGMdhEgO3cYGoPuVkadTXK0gmy
+	r8F4jf0KifpXW5MCcNqrQJeekSf8aDEyhZzSgTBi/MT32yGeVzfMnRE8vL4ZMT9m1dU9U8xIHMk
+	4+4UuA9YFVD97BkpXn45ceWxGUbwXFXgLYDVAEploT4XDdZAL6iIKH30lruYzsa1zljQlvTQcfe
+	+3lOQ6rV1ESiImBuFExqe4CtJyxdhQjadHkBjhvwp9d7HBJGkdRE8zI+FTxoTixJ6YzTDRXM93I
+	SrMXeBz5SMZzsT7e8de1MCEtMrOzncKjLJfn/dUQ==
+X-Received: by 2002:a05:620a:480a:b0:915:83b1:fc30 with SMTP id af79cd13be357-915a9e0e8ecmr2996308185a.55.1780965466934;
+        Mon, 08 Jun 2026 17:37:46 -0700 (PDT)
+Received: from localhost ([161.35.96.86])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a40d566sm1894363685a.47.2026.06.08.17.37.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 17:37:45 -0700 (PDT)
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org (open list:TC subsystem),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] net/sched: dualpi2: clear stale classification on filter miss
+Date: Tue,  9 Jun 2026 00:36:59 +0000
+Message-ID: <20260609003658.1237966.5506cf1b9345.dualpi2-filter-no-match@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296801-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-296803-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:jacob.e.keller@intel.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jeff@garzik.org,m:rdreier@cisco.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E6BF565B658
+X-Rspamd-Queue-Id: C457B65B686
 
-On Thu, 4 Jun 2026 16:03:43 -0700 Rosen Penev wrote:
-> > > -     if (!list_empty(&mal->list))
-> > > +     if (!list_empty(&mal->list)) {
-> > > +             napi_disable(&mal->napi);
-> > >               /* This is *very* bad */
-> > >               WARN(1, KERN_EMERG
-> > >                      "mal%d: commac list is not empty on remove!\n",
-> > >                      mal->index);  
-> >
-> > This one doesn't make sense to me. The list_empty check does a WARN()
-> > indicating that this is not supposed to happen.
-> >
-> > This implies that list_empty should be true, otherwise we'd see a WARN
-> > every time mal_remove is called.
-> >
-> > But in that case, we'd have been calling napi_disable incorrectly in
-> > most cases where it was previously unsafe according to your claim.
-> >
-> > At best, this list_empty check is the wrong way to tell if the napi is
-> > disabled, at worst, this whole change is pointless.  
-> I asked the AI. It doesn't agree:
+DualPI2 leaves previous classification state attached to an skb when
+filter classification returns no match.  The enqueue path can then act
+on stale state from an earlier classification attempt.
 
-FTR I agree with Jake, the patch seems to indicate bigger structural
-issues. Then again I don't want to encourage the stream of patches
-to this driver so let me just apply this..
+A filter miss should fall back to the default path without reusing old
+per-packet classification data.
+
+Clear the classification result when the filter lookup does not match.
+
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+---
+ net/sched/sch_dualpi2.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+index a22489c14458..8d345a8ee4e9 100644
+--- a/net/sched/sch_dualpi2.c
++++ b/net/sched/sch_dualpi2.c
+@@ -378,6 +378,8 @@ static int dualpi2_skb_classify(struct dualpi2_sched_data *q,
+ #endif
+ 		cb->classified = TC_H_MIN(res.classid) < __DUALPI2_C_MAX ?
+ 			TC_H_MIN(res.classid) : DUALPI2_C_CLASSIC;
++	} else {
++		cb->classified = DUALPI2_C_CLASSIC;
+ 	}
+ 	return NET_XMIT_SUCCESS;
+ }
+-- 
+2.43.0
+
 
