@@ -1,129 +1,171 @@
-Return-Path: <netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296802-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3NJdAOBfJ2rGvQIAu9opvQ
-	(envelope-from <netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:35:44 +0200
+	id BRaqMGFhJ2oxvgIAu9opvQ
+	(envelope-from <netdev+bounces-296802-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:42:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E0665B615
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:35:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F08565B66F
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 02:42:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZODzerro;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296800-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=trailofbits.com header.s=google header.b="P1n1Kw/s";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296802-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296802-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=trailofbits.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DF6DB3032F6B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:33:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8804E304409D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 00:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6D9261B92;
-	Tue,  9 Jun 2026 00:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146D123EA97;
+	Tue,  9 Jun 2026 00:36:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABFC244661;
-	Tue,  9 Jun 2026 00:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F6C223DFF
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 00:36:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780965227; cv=none; b=sC5P05KF/MlXCyg9g9yr0z6bF14pMu0+ajjQ/7YsDswPNxC89fkrXlTO38SZ0alSuwYf1O9FTQajSDPgStSOLoBWXEQmtLUdnwUl+fZbWQy7Cv7z9IIZneTUgYs0IExBkAB+UUa2QdZC6n0+pxkuvy6xfVC+vmNRY5lOAiuhoxA=
+	t=1780965418; cv=none; b=ro73jYla+c87vApsu5iEcO1kDRZyNCLqCywxZ0GcF+O0jH2CveuGpsDW9Y1KTAYJ/6oSGZrurSsk0p1yqN+tLWN9rsT5rBQ1qHw/Ynp8Hr6wfL8QR3t5anL9HzxWdG7oXvg4XaSnI0Bim0vw272HglDjdn7sQZmMYdeiqrZyCxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780965227; c=relaxed/simple;
-	bh=t8gEdjbrs6qgE0T05yWWf+zBdM3rY8wM+GccnVr1ZFw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A3jHFUnwLnGwhvTdp/oDP+34ov0/Atrp1nrPtuKkA9XLrQ/kQAdVSpxUXSkG3vpxQDaKAPChUmLyyYYUBz9MQUlf7ZRCqSACFP+luUlEoeHaO/xqM2BWMZWnHyma7EkIJVHltU256/THWC8IyDFKy3Fyi3qXFb2yu3oTPxEdDbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZODzerro; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9BDD1F00899;
-	Tue,  9 Jun 2026 00:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780965226;
-	bh=YuDJfJJTRs3UGqZWaxi44T79ItiIkoQpI092YqffL3E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ZODzerroKrElQpgiYs7ZyrZeFuZ/lXdg7gpSRRE4E6lwrOOFK+t4uKaAsmig7dkgs
-	 kGlydAKYDv9ZPW/J478CYPs0snXBTvoKFFJBsyCWFVZGaMXqmMSnm8tj4iya+4Xk3b
-	 sPC8xK1esKeHVJYHHyMwUResT23pi5JoFD/Ky829OQzKtU05jG0MCXuWTupmecWGgg
-	 90SvJDG0UafPP0qVa7zT671rkQ26LFmDh7B0myT3IhVjzlX0mhOksD6vqnN1IlaRFx
-	 HXsKHL7MSXwmXsINazzs3HSwLqOrfH7/zPbEGtyI3QyuFtiR9l1xA9EHLNlogSgzxv
-	 5gNsrgaT69ZOQ==
-From: Chuck Lever <cel@kernel.org>
-To: Kees Cook <kees@kernel.org>,
-	linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	david.laight.linux@gmail.com
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Arnd Bergmann <arnd@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
+	s=arc-20240116; t=1780965418; c=relaxed/simple;
+	bh=FBLLeI6ImGN0/Ndp2USqZZ9uV2tas/yhtpKmZfg5rlc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YGFLNgIga6MuYVb51NQ3kMzhoK74QTyC9L4pqfrwdWL8x1K51zeqnuycnzAxj6ejlvx8fJNAoeMwge5Km0W+QuWq7Tb6fta9z1tztkds16p7a5vuwX8/6+tDI8vI12hPRKBQ7ageXs5Gk4KORKeMUbmuEbRHW8Zov6kUMDlZggU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=P1n1Kw/s; arc=none smtp.client-ip=209.85.222.169
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-91587626ae1so560232185a.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 17:36:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=trailofbits.com; s=google; t=1780965416; x=1781570216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zTbEcM7UH1FXW0tMJYiIM9Tmk/7dMzRU32PgGhTsnQI=;
+        b=P1n1Kw/suFu3AxLYhbxkiG8gTKEjOzGLkQ5ABbq+wLTBT50em+WwaCGCFj+k+F6PYv
+         mVt8dklfhGKDaE4njPVsyoJ0P+kgaGWC5FPxUxto0bm9BwP6UxMwhnkzXED5pl3Fmnhz
+         flhRwGAX2dxu+//HtNyqmv7CTyqQBGT2Fxp+rGcEzgAjELAdNQEBwv1TMpo9F+SM2HI3
+         iTdtqipW0I58REO1xuuy3gaObZGL9OldsmVugxce3I4DUcIl1pYT6IJU0IJX3rDoZmsK
+         2K7nWjp2NwDkVj6rdA9k5lyiMhxObp6us8dfhxRf1EO4rEAlNkp9+i9MmCSJdvPesA3Y
+         1W0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780965416; x=1781570216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zTbEcM7UH1FXW0tMJYiIM9Tmk/7dMzRU32PgGhTsnQI=;
+        b=i79tIuQU5X/TqSyN3AIjBdk3Djd9B4D3o92DvnT6ZzJbN6Q2GUpBf0qqr45reqJXFn
+         R+9axe0KIlAN7OpRVPmxHR/v5Jnd7VmbkIfsQ6KLm98Br0S7DnNwHXujodbhftvxNgzd
+         cdcIGf81SIUJ3mQIxbks5bwmdrb6l81u+CCLjDni+vS+Xx67UqjUcoC9nfGM3ZXvW/p5
+         CDlwEd8VcJz8CCmYGmZd0NgZfplFGyQtlTBgestGbJ5jXC7xKxgVsHdkxeEm6as+dYKD
+         CTMWSgVmK8NjZGEob5uuD/2PELfX/UZ/tustdfm779UC/gWVj/okSqS114IJ7MkLebaY
+         fqpg==
+X-Forwarded-Encrypted: i=1; AFNElJ9yabuOGEfrREDbE5Tb5i1prRkNcG/mUEiP+T1wCmWoi3n204NRXx45bdU8XVvghbgc2I+Bd3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzooay+517wkQdKPAepmyfmAwkwTZfkOEpyGbKynUM81TC/qyVB
+	pw/HOQnlt9n7XBVBmxv4UIs43tCPTU+m6nBkyG8S1etculMs6S95JIy2+okx2+AoQC4=
+X-Gm-Gg: Acq92OEAyjIcu/CpLHkxblLsrzbhitC2FszC/KVgmxdte/x3Y7GY+UHYEQM3GDJ5C1p
+	6ZYlpbpSyaOImkXbQ6M2v4oqoLx8NH+IwcJyoHFtWOJCK+XhQtP7X8Ut1gm9J2m6NAkqRAWGUbp
+	kuKsRdhPiSIO633CE/l6lN7GsRgMc5A3BsmJixLF1hiQVIZzvKjuJLlFJua3komEUA/cLr79RJj
+	xgAdf4U3fKXl59gI9m8KbDE+vvLi1WxAOJk7h1vL0zFXaxEw+s/bWW67mGazUZBNQNKbPEvEEhi
+	FeIQrm56RLTS1aPuGi9tMCg6y/BNo326t1zS5XkNo5i8ELTWiMMg4LY/waH+hsqm/eg4D8HbFnX
+	Jj1Uk186vR/DdKR1+ewWpKnTwZEOymbaSqP7uhpgn2QE28qHc3u/7BJkwApb6W23uRZJRLHnIOg
+	NdUU40RPz8hmVeM0D+vMTRmShes/8yLOYMSBXkjw==
+X-Received: by 2002:a05:620a:404c:b0:911:e74a:1e73 with SMTP id af79cd13be357-915a9e26402mr2802766385a.55.1780965415690;
+        Mon, 08 Jun 2026 17:36:55 -0700 (PDT)
+Received: from localhost ([161.35.96.86])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-91589ea0bcfsm1924184185a.0.2026.06.08.17.36.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 17:36:54 -0700 (PDT)
+From: Samuel Moelius <sam.moelius@trailofbits.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
+	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Trond Myklebust <trondmy@kernel.org>
-Subject: Re: [PATCH net-next] net/sunrpc/svcauth_unix: Use strscpy() to copy strings into arrays
-Date: Mon,  8 Jun 2026 20:33:38 -0400
-Message-ID: <178096512223.86595.14618546480318543216.b4-ty@b4>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260608095523.2606-16-david.laight.linux@gmail.com>
-References: <20260608095523.2606-16-david.laight.linux@gmail.com>
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org (open list:TC subsystem),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] net/sched: drr: reseed active class deficit after quantum changes
+Date: Tue,  9 Jun 2026 00:36:18 +0000
+Message-ID: <20260609003617.1237785.3427a8f0e7b0.drr-change-class-stale-deficit@trailofbits.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:david.laight.linux@gmail.com,m:chuck.lever@oracle.com,m:arnd@kernel.org,m:anna@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jlayton@kernel.org,m:pabeni@redhat.com,m:trondmy@kernel.org,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-296800-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-296802-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:sam.moelius@trailofbits.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[trailofbits.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,oracle.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:mid,trailofbits.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64E0665B615
+X-Rspamd-Queue-Id: 1F08565B66F
 
-From: Chuck Lever <chuck.lever@oracle.com>
+Changing the quantum of an active DRR class leaves the old deficit in
+place.  The next scheduling round can therefore use credit accumulated
+under a different quantum.
 
-On Mon, 08 Jun 2026 10:55:00 +0100, david.laight.linux@gmail.com wrote:
-> Replacing strcpy() with strscpy() ensures that overflow of the target
-> buffer cannot happen.
+This can be observed by making a class active, changing its quantum, and
+then dequeuing with the old deficit still present.
 
-Applied to nfsd-testing, thanks!
+When an active class quantum changes, reseed its deficit from the new
+quantum so the changed class weight is reflected immediately.
 
-[1/1] net/sunrpc/svcauth_unix: Use strscpy() to copy strings into arrays
-      commit: cea9ba4f71e82766d782ed423c99bb12a69bbdf0
+Assisted-by: Codex:gpt-5.5-cyber-preview
+Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+---
+ net/sched/sch_drr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
---
-Chuck Lever <chuck.lever@oracle.com>
+diff --git a/net/sched/sch_drr.c b/net/sched/sch_drr.c
+index 01335a49e091..b40df8725ba6 100644
+--- a/net/sched/sch_drr.c
++++ b/net/sched/sch_drr.c
+@@ -98,8 +98,11 @@ static int drr_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
+ 		}
+ 
+ 		sch_tree_lock(sch);
+-		if (tb[TCA_DRR_QUANTUM])
++		if (tb[TCA_DRR_QUANTUM]) {
+ 			cl->quantum = quantum;
++			if (cl_is_active(cl))
++				cl->deficit = quantum;
++		}
+ 		sch_tree_unlock(sch);
+ 
+ 		return 0;
+-- 
+2.43.0
+
 
