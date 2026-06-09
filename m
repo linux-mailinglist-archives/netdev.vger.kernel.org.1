@@ -1,209 +1,154 @@
-Return-Path: <netdev+bounces-296983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296984-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JD8gOl3UJ2ow3AIAu9opvQ
-	(envelope-from <netdev+bounces-296983-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:52:45 +0200
+	id ieSkNK/WJ2qi3AIAu9opvQ
+	(envelope-from <netdev+bounces-296984-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:02:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6013865DFD7
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:52:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BCBB65E111
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:02:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ixit.cz header.s=dkim header.b=tO9p4qP4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296983-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296983-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=ixit.cz;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296984-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296984-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 81749302B081
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:45:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AD413097E29
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D283D6497;
-	Tue,  9 Jun 2026 08:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D993DB302;
+	Tue,  9 Jun 2026 08:47:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ixit.cz (ixit.cz [185.100.197.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03A52690F9;
-	Tue,  9 Jun 2026 08:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944323CF21B;
+	Tue,  9 Jun 2026 08:47:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780994728; cv=none; b=F16sk4M2wiVcGpliSxWiXQa8MUeIViSDP+vYPEm4Wh1zw+jKWfF8mkDZ1Es6eNO89SsuHvW1PNyC+CMHmMDbrs1DbM6Rzf7WDzcCo+QRKZGKT7gY63ZbWCb3Istc8gO6duN/X0br3QIGKXGJmElgZThYKx0Z/o87YjTNczYEpZg=
+	t=1780994871; cv=none; b=PHbRw16En1UFH+a+RsutGrwp7BKxvDRTnjkwb/52Z8h1mkp1qxe5zysUI2GEtaFNN5rUYPtOfzZt0BO+WGeOUJjRk5XRjhpOzWY9607YJayN9oJkdzV99g4geeFzEu1rXOSfmqDefxhgA3aC1dEqJmkAZPGiIxrM4NPfCpmCsQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780994728; c=relaxed/simple;
-	bh=qY0Gf/s2G711Kq1AGOT5hjpV5HDiaXm4APW6yi3X498=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Nkv/wQsDeet5ONURnkVkaqbDxGnm2oBUopB/vB1NpYks8Jmk/jUpudVS1dIDgom4BciiUWKcRgvUqve9qzuNB7AQDilMnIj3AhJZm7YdAoBHFy4FOr8gg3594DctlOvpIncv60i5yEKbGt/Qz4vEl/h3WJcYfzoMiV5cDzpHMYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=tO9p4qP4; arc=none smtp.client-ip=185.100.197.86
-Received: from [10.0.0.200] (unknown [10.88.125.21])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id 7D7E65340858;
-	Tue, 09 Jun 2026 10:45:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1780994721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=b2aT3aIG9gwRgEWpv77WKO5mO83tTKSk79K8/RmBFLE=;
-	b=tO9p4qP4TW8bNk6WgToPKVt1tHqeQBv00ah65OWnk73mxR3PUiWeTWkJsZnLHBZVnhFaTw
-	ACcgLWxyVJ4KAr+Qq8ZvFJEq4T3c9lmXAO9XVLQXcb7A6UA66uFpxOBQOlYkye6gTFvlpR
-	D1sqtRKuzqLAY7vRgFLGsrV4Fv4UfsE=
-Message-ID: <b3084b2a-f8fa-4bba-8a92-1a14fbacb622@ixit.cz>
-Date: Tue, 9 Jun 2026 10:45:21 +0200
+	s=arc-20240116; t=1780994871; c=relaxed/simple;
+	bh=LG+aoINgJAC7Y/fvo/TMBUo1dY7QqneuDuaM8unT4cc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=osucQNyg0XWXORzRRxR+X2cOv6PrPdeAL9ucCJWTGlG/O+uZX3gsI3XEKo7aurND/8ps8uNGLKY6gbJMfkwps1hXgFTBUEAE33HxDdARk+V7VIB9YHXdDnSi7pSRt0imMvg4zNI8QZKuAhAc9Acv1cGB3JOLVnXZtguxj1KBLkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-05 (Coremail) with SMTP id zQCowAB3zhEp0ydqLCTPEg--.48075S2;
+	Tue, 09 Jun 2026 16:47:37 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: idosch@nvidia.com,
+	petrm@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] mlxsw: fix refcount leak in mlxsw_sp_vrs_lpm_tree_replace()
+Date: Tue,  9 Jun 2026 08:47:30 +0000
+Message-Id: <20260609084730.215732-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Heidelberg <david@ixit.cz>
-Subject: NFC for next-20260609
-Autocrypt: addr=david@ixit.cz; keydata=
- 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
-To: davem@davemloft.net, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- oe-linux-nfc@lists.linux.dev
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAB3zhEp0ydqLCTPEg--.48075S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZrykuF4rJw4UAry7Kry8Zrb_yoW8Ar4kpa
+	1xtryj9rnrtr1Sqw4DJa97Xr9xuwnFqa1UurZakw4fZr1vyrWfAryjvFyUZw1UKr48JrWF
+	vF13Z3s5Aas3AF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Wrv_ZF1lYx0Ex4A2jsIE14v26F4UJVW0owAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
+	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
+	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
+	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
+	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbbAw3UUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRANA2onp3SzmAAAsi
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296983-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oe-linux-nfc@lists.linux.dev,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ixit.cz:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	ALIAS_RESOLVED(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296984-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:idosch@nvidia.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6013865DFD7
+X-Rspamd-Queue-Id: 5BCBB65E111
 
-The following changes since commit 4549871118cf616eecdd2d939f78e3b9e1dddc48:
+When mlxsw_sp_vrs_lpm_tree_replace() fails after replacing some VRs,
+the error rollback loop does not correctly revert the preceding
+replacements. The loop decrements the index but fails to update the
+vr pointer, which still points to the VR that caused the failure. As
+a result, the condition and the rollback call always operate on the
+same VR, potentially calling mlxsw_sp_vr_lpm_tree_replace() multiple
+times on it while never rolling back the earlier VRs. Those VRs
+continue to hold a reference to new_tree acquired via
+mlxsw_sp_lpm_tree_hold(), leaking the reference count of new_tree.
 
-   Linux 7.1-rc7 (2026-06-07 15:37:58 -0700)
+Fix by reinitializing vr inside the error loop with the updated index:
 
-are available in the Git repository at:
+	vr = &mlxsw_sp->router->vrs[i];
 
-   https://codeberg.org/linux-nfc/linux.git tags/nfc-for-next-20260609
+so that the loop correctly iterates over all VRs that were actually
+replaced.
 
-for you to fetch changes up to f6696b7206c3bd276bf81d5953a1489bf43dd783:
+Cc: stable@vger.kernel.org
+Fixes: fc922bb0dd94 ("mlxsw: spectrum_router: Use one LPM tree for all virtual routers")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-   nfc: digital: clamp SENSF_RES length to the destination buffer (2026-06-09 
-10:12:52 +0200)
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+index 7bd87d0547d8..3d6fdbab05e0 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+@@ -1018,6 +1018,7 @@ static int mlxsw_sp_vrs_lpm_tree_replace(struct mlxsw_sp *mlxsw_sp,
+ 
+ err_tree_replace:
+ 	for (i--; i >= 0; i--) {
++		vr = &mlxsw_sp->router->vrs[i];
+ 		if (!mlxsw_sp_vr_lpm_tree_should_replace(vr, proto, new_id))
+ 			continue;
+ 		mlxsw_sp_vr_lpm_tree_replace(mlxsw_sp,
+-- 
+2.34.1
 
-----------------------------------------------------------------
-nfc pull request for net:
-
-  - llcp: avoid userspace overflow on invalid optlen
-  - llcp: read llcp_sock->local under the socket lock in getsockopt
-  - nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
-  - nci: fix double completion race in nci_data_exchange_complete
-  - nci: uart: Constify struct tty_ldisc_ops
-  - nxp-nci: Add ISO15693 support
-  - nxp-nci: treat -ENXIO in IRQ thread as no data available
-  - digital: clamp SENSF_RES length to the destination buffer
-  - trf7970a: fix comment typos
-  - MAINTAINERS: Update address for David Heidelberg
-
-----------------------------------------------------------------
-Breno Leitao (2):
-       nfc: llcp: avoid userspace overflow on invalid optlen
-       nfc: llcp: read llcp_sock->local under the socket lock in getsockopt
-
-Carl Lee (2):
-       nfc: nxp-nci: Add ISO15693 support
-       nfc: nxp-nci: treat -ENXIO in IRQ thread as no data available
-
-Christophe JAILLET (1):
-       nfc: nci: uart: Constify struct tty_ldisc_ops
-
-David Heidelberg (1):
-       MAINTAINERS: Update address for David Heidelberg
-
-Doruk Tan Ozturk (1):
-       nfc: digital: clamp SENSF_RES length to the destination buffer
-
-Miles Krause (1):
-       nfc: trf7970a: fix comment typos
-
-Yun Zhou (1):
-       nfc: nci: fix use of uninitialized memory in CORE_INIT_RSP parsing
-
-Zhenghang Xiao (1):
-       nfc: nci: fix double completion race in nci_data_exchange_complete
-
-  MAINTAINERS                  |  2 +-
-  drivers/nfc/nxp-nci/core.c   |  1 +
-  drivers/nfc/nxp-nci/i2c.c    |  8 ++++++++
-  drivers/nfc/trf7970a.c       |  6 +++---
-  net/nfc/digital_technology.c |  2 ++
-  net/nfc/llcp_sock.c          | 14 +++++++++++---
-  net/nfc/nci/data.c           | 10 +++++-----
-  net/nfc/nci/rsp.c            | 41 ++++++++++++++++++++++++++++++++++++++---
-  net/nfc/nci/uart.c           |  2 +-
-  9 files changed, 70 insertions(+), 16 deletions(-)
 
