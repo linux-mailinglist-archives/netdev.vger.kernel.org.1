@@ -1,176 +1,247 @@
-Return-Path: <netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id q8DGEw1wKGrKEgMAu9opvQ
-	(envelope-from <netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:01 +0200
+	id bXPvEBlwKGrYEgMAu9opvQ
+	(envelope-from <netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB851663F5B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1C2663F69
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=UyXqKSNF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=YhMXw2Oo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297262-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=iogearbox.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1A7A2313582D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:51:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 25B483064B27
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3470640D59C;
-	Tue,  9 Jun 2026 19:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F16376A03;
+	Tue,  9 Jun 2026 19:52:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CCC48124E
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9064ADDA8
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:52:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034684; cv=none; b=nslCcyQftuup2AOSoW3Q8JIEGgdNehxnu3DBJHxIFSl7XNm8WtAS4gxHIuAW5coEFgWsUCHxvEY953BwwnZEsLy7rxtw+IEw7Fta9Zcn+wg1LOjMIkjacgNktCtbb91Z2OpuPP0XgTRloJkAw8Yg3x9ggqcOfD3mL9xYjKgaP2Q=
+	t=1781034761; cv=none; b=riinnJCbjx8IRT1IAPhR8G0sID1PqtXZmel0+Um83xN1sgqi0KfRf6GKZmv4rLUe0TheBNJuJdXhRNL0PCC7wiqDB8WI9apBFMsCVnHV4vhFf3u5TOoz0HiqP1BNAkBfDOOIS/7uNegWik1PaLQWIaaL/bboIbRFbGuqafVItTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034684; c=relaxed/simple;
-	bh=fGch22jZAhUnZc2JB3l1ZbWmjnBlSQCGkHHpCvFs43M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kybQUgzYuyCnKgFKcd/XepUf6fm3HgPdVJaZud4mZHghaL/C1jcKtQDIaQvbnQM6h0YiMjN9E3Pin5DKvZr8DfBnyc/w2M2wsEyakVTTyLoAEy8idvk+15yoAtJZRUmB9/EusGs7BUKPqxl3Zb/yEDY09zzt5omNWbgcrmAivyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=UyXqKSNF; arc=none smtp.client-ip=209.85.210.178
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8421f0e9c5bso2740768b3a.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 12:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781034677; x=1781639477; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pcuzUwojIicQgNYVYeBBnWiTMNVB+UCosfiJT5lPt0I=;
-        b=UyXqKSNF7MeRdF+p+a/Q7xA+qqR94IN04PtDH2BybrKhexarRDDXAfF4tdhOmxHZrT
-         RlIT5FXzHVn8mYXZfEr57p3iHASMqWqz0grvrUmfMehVf65VlftVCjtoDVLWqKuJ2g9g
-         9ntRMpn+aNfBGOf07KdDrVHSl7U16jlIZWlT2DK43BKSPQUuTwCReOjGXHDGdl3IdIKh
-         6zSSH7ggMDgL6SSWsEGUT3QNdVktO652YtC3QiGVVZcCBLfQYyp3ClOrutX6WYPXVWlz
-         BNBdDphHRGrgneVhKMvz8GzV2KcIL06RS45LwY9HXPKhba+SWOylLOZqSXtO/6/vdshY
-         IvAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781034677; x=1781639477;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcuzUwojIicQgNYVYeBBnWiTMNVB+UCosfiJT5lPt0I=;
-        b=MCALDfwgIiWmfbb1/IyaTLBuOIvydc7SRmJaTCDrxmcd353QomH8DlNrTTTTP0RWQ1
-         RVQjrYEsRpQxTJJqgjPwl602qIlyxNPpJZOk72Xr400oBkS949VaetLm+TwDBlmQirWy
-         ptJ2z7iWo1WEixniTlN68dTJuTdSO04Qpg3JqplRHT0pr7BfopDqOFSXfR7ENvPH+UgA
-         GNKMDNqKRBRUdC/snXMq2WYkIB4r0Zw0gGUkkSKlDpzrGtc6Ua8z1Qz/4r6DeEJtSiE3
-         poYtafC31NB4/KZETZQqhR1ojcfpyqMGbyXe1G/wxileiZZdM9bNsVlkpZMR8Slw8PHR
-         jh2Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+VFE7LJgFT5aYZx5UzyteQmUz7kAXBTSFZVRV9u00xUP38b8Y56DPBH8w7K/qWyEs7PI9DBzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBL+WlZ+2ex57bvAa2wGT/weXLgWuAb4i8qcsqia0sXE8+tkVm
-	JUSC/TKVB/d5AjgTL+1uPrUMp83CZJGrVNPK7P0msf9PoSUbgNkP34AxlWdVV6duJLM/OccTcGW
-	2o87B
-X-Gm-Gg: Acq92OGM88mUl3rTZRRuDlCzVl1bE1F3RIjsCwDgB2zu7BJzYUOntpOqenocDfz060b
-	8/hL3yHd8QiWsRfiGZ1gqCUCMYT1QABnWXh/yiP4k8XDE3qYdoKyEDe9uYhxMfiAIFtyAaGRlHx
-	qp4pxGdhKEhF3E/ZdDLxZCvTzgFfr2WoxI9LxGIONM/8DXAo73ebGMizQDOW309RxKiS9fhDLrg
-	acVHlSkwPJbufavZhAuAtcm3taP5bPEujYTNdA7NvkoVlicUihy0/XwkwSoie/0kr+hMzP4Ox6H
-	sAB985Afb/00vC48YMDf28JhlWUosaWWRpweglfZTLCcqY7CDGQFE3XN0867WLzWOfavWc+89WJ
-	nkogmjYPU/fPyeHYK+Q8S/CXDkSLwIypsL0KTeU8van2bdMT6l0dzozbZttAIXe4NYKFzMCxqUa
-	QaN6I80mkcLzsCn+Q=
-X-Received: by 2002:a05:6a00:b807:b0:829:8942:2c93 with SMTP id d2e1a72fcca58-842b0e1c7d0mr21125579b3a.9.1781034677416;
-        Tue, 09 Jun 2026 12:51:17 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4b::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8428325d9a3sm22197411b3a.34.2026.06.09.12.51.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 12:51:16 -0700 (PDT)
-Date: Tue, 9 Jun 2026 12:51:16 -0700
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	corbet@lwn.net, skhan@linuxfoundation.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: networking: add guidance on what to push
- via extack
-Message-ID: <aihutHOO7Dwp8aQ/@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
-	skhan@linuxfoundation.org, linux-doc@vger.kernel.org
-References: <20260609190919.1139517-1-kuba@kernel.org>
+	s=arc-20240116; t=1781034761; c=relaxed/simple;
+	bh=+4IUeBKAh2XI6VD6ap07Oetg6YVT2Xbh1M0B6mgBpgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q6QNsAsuqrQRsK7kT2wjj3JasStEiuRUDU1eWGUoNsIWO3o+ko44XvoTNL5PptJtvipWcPd/J+JDnhELRrZZIjduvtnwe2SA4pdve9l1Wonc0j8L6wKw0CN0aMa086xbW4NkYOm4yqc28BD/0x9okf9ojHhC5WEeW7n91yNIiGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YhMXw2Oo; arc=none smtp.client-ip=213.133.104.62
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=C3Li/RVM0wb3b++4xIwjz1jl9fQ7gU1E5LJCKYCtnO8=; b=YhMXw2OoSShthQV9BLVjyXBsBJ
+	KreYKVPr889sTiC3abhGP/9Q0te9KvDLy747velPt+OEg1EYh2a9dRy1gCOWb92NLQEl6vVPVSCfj
+	Bj5ckDFL2u2F9nJ0w1O1VqXHLrwzn77wvukl8PTbFtbl5oLCSrMGJLaXBFsh1YekTFLMQe7vOr5uI
+	parYrEcx72/4helCb5nI5sQer19+QbRrrtDpKNCMU+eY08DXT7qrE9gNl5/V/QJlWXneG/+txNTp5
+	J5u6k7HjfTXJUZxNweMwC1FRXZzCFk7X9G56Ha81S9JkN9fUkcodJOc2HFjFdcX9WkJldvIatncPW
+	HPFXkQOQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wX2Us-0008Tl-19;
+	Tue, 09 Jun 2026 21:52:26 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1wX2Ur-0008P7-01;
+	Tue, 09 Jun 2026 21:52:25 +0200
+Message-ID: <15c024cd-7ab1-47b4-94e5-90db0f74227f@iogearbox.net>
+Date: Tue, 9 Jun 2026 21:52:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260609190919.1139517-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] netdev: check for nla_put_u32() failures
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
+ razor@blackwall.org, sdf@fomichev.me, dtatulea@nvidia.com,
+ bobbyeshleman@meta.com
+References: <20260609190804.1137085-1-kuba@kernel.org>
+ <20260609190804.1137085-2-kuba@kernel.org>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20260609190804.1137085-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/28026/Tue Jun  9 08:25:31 2026)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
+	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297261-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[dama.to];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297262-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[iogearbox.net:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm20253.cco0.facebook.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama.to:from_mime,dama.to:email,linuxfoundation.org:email,dama-to.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp,lwn.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:mid,iogearbox.net:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BB851663F5B
+X-Rspamd-Queue-Id: EF1C2663F69
 
-On Tue, Jun 09, 2026 at 12:09:19PM -0700, Jakub Kicinski wrote:
-> Every now and then someone tries to duplicated extack
-> messages to dmesg. Document our guidance against this.
-> Also indicate that system level faults should continue
-> to go to system logs. The high level thinking is to try
-> to distinguish between what's important to the user vs
-> system admin.
+On 6/9/26 9:08 PM, Jakub Kicinski wrote:
+> Make sure we check if nla_put_u32(id) was successful after creating
+> objects. This is theoretical today, the skbs are large enough to
+> always fit the ID.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> CC: corbet@lwn.net
-> CC: skhan@linuxfoundation.org
-> CC: linux-doc@vger.kernel.org
-> ---
->  Documentation/networking/driver.rst | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>   net/core/netdev-genl.c | 21 ++++++++++++++++++---
+>   1 file changed, 18 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Documentation/networking/driver.rst b/Documentation/networking/driver.rst
-> index 195a916dc0de..abd366dd5e43 100644
-> --- a/Documentation/networking/driver.rst
-> +++ b/Documentation/networking/driver.rst
-> @@ -128,3 +128,16 @@ to be freed up.
->  If you return NETDEV_TX_BUSY from the ndo_start_xmit method, you
->  must not keep any reference to that SKB and you must not attempt
->  to free it up.
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index b4d48f3672a5..a10d353d5eab 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -1091,7 +1091,10 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+>   			goto err_unbind;
+>   	}
+>   
+> -	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> +	err = nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> +	if (err)
+> +		goto err_unbind;
 > +
-> +Error message reporting
-> +=======================
+
+Not sure about these three tbh... if the skbs are guaranteed to be
+large enough, would a more straight forward ...
+
+   WARN_ON_ONCE(err);
+
+... suffice? Unwinding at this point feels a bit excessive. Is there
+any other way we could assert this earlier before we do all the ops
+that need to be unwound?
+
+>   	genlmsg_end(rsp, hdr);
+>   
+>   	err = genlmsg_reply(rsp, info);
+> @@ -1227,7 +1230,10 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+>   		goto err_unlock_bind_dev;
+>   	}
+>   
+> -	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> +	err = nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+> +	if (err)
+> +		goto err_unbind;
 > +
-> +Number of driver configuration interfaces pass a Netlink extended ACK
+>   	genlmsg_end(rsp, hdr);
+>   
+>   	if (bind_dev != netdev)
+> @@ -1237,6 +1243,8 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+>   
+>   	return genlmsg_reply(rsp, info);
+>   
+> +err_unbind:
+> +	net_devmem_unbind_dmabuf(binding);
+>   err_unlock_bind_dev:
+>   	if (bind_dev != netdev)
+>   		netdev_unlock(bind_dev);
+> @@ -1394,7 +1402,12 @@ int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
+>   
+>   	netdev_rx_queue_lease(rxq, rxq_lease);
+>   
+> -	nla_put_u32(rsp, NETDEV_A_QUEUE_ID, queue_id);
+> +	err = nla_put_u32(rsp, NETDEV_A_QUEUE_ID, queue_id);
+> +	if (err) {
+> +		WARN_ON_ONCE(1); /* we can't delete the queue, ID must fit in */
+> +		goto err_unlease;
+> +	}
 
-Maybe I'm reading it wrong, but seems like it should be: "A number of" ?
+.. in particular here :/ would be nicer if we could solve it differently
 
-Reviewed-by: Joe Damato <joe@dama.to>
+> +
+>   	genlmsg_end(rsp, hdr);
+>   
+>   	netdev_unlock(dev_lease);
+> @@ -1404,6 +1417,8 @@ int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
+>   
+>   	return genlmsg_reply(rsp, info);
+>   
+> +err_unlease:
+> +	netdev_rx_queue_unlease(rxq, rxq_lease);
+>   err_unlock_dev_lease:
+>   	netdev_unlock(dev_lease);
+>   err_put_netns:
+
 
