@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-297244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BoUyLK5kKGrgDAMAu9opvQ
-	(envelope-from <netdev+bounces-297244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:08:30 +0200
+	id JK0MNcJkKGrsDAMAu9opvQ
+	(envelope-from <netdev+bounces-297245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:08:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD629663867
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:08:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9504663875
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:08:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kClfBauN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297244-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297244-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="kWkL45w/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297245-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297245-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F379D300ADAA
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:08:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5EA1230190B7
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D094D2ECA;
-	Tue,  9 Jun 2026 19:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E534D8D96;
+	Tue,  9 Jun 2026 19:08:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D167B4C954B
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53B84CA29C
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:08:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032091; cv=none; b=bhWtkhLZtWAaBWNKozqs33G3Fq3SVPpMFVzWQZLA9gJhJmQq96JXTPoj30crJsEo45TNYQKCBSEQsoThhJOvOSSgU3pg81GQYyubWr546j5fSjvOi0+BeWNaFj30PVqsJe5UUUoNLuaDIP53tlEfmJ5njDkx/5NQOSO52Tk5rOY=
+	t=1781032092; cv=none; b=jcygVxuJE2G7IemxxbBWInUIjv2CTKaAi+FKIFDDlsh951tL9ASdM0/pPPhJzSNU5hFMUIDCVRiI/qD5FmIlQBa8feE3d/jChXEnXmFXBarGPNztwAzLQTzXU8w7fEbUrffHGJn+AURjGe4Z5Jt5y32fLKaqsoeikcgV3JWc4nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032091; c=relaxed/simple;
-	bh=dm7R6wQ/52SNsqAZc7FFluQpKsmza5NrJmmw4KWjDk0=;
+	s=arc-20240116; t=1781032092; c=relaxed/simple;
+	bh=nlwtcxXtdlWDBQvHdYCXl5s0p6C3lur+YjX93OBYcm8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J2bq7+g4qoHLD2B0PbCz6TRzf1aYvxhdeGGGzMFhsWlWMH9gncxToLZBHk5Vt+aTFpl7vPOmP5BYYWgaagh5HMnpHePACC13LIc8KgmyVISuBDIXX7MQr7uDcFvGUUqKQgdgMFjB2/DUgDa/ZBvFjb0brU64m5mnk9+Sd0PKXcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kClfBauN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3488A1F00898;
+	 MIME-Version; b=q835pO1pHgi4oYgPq25+sjGZ2IOVeiy/MWHrX2VLM7a0LWPrTK7KDU7ZBU7WqbQm9XfaJwbFsz6d5xP+rLn2ldT9cPrCxUmhtcYAnQsSD5UCXcmjFgmZiQSI3WpczeeMqED4UH7fASCXujbWZdinVo5Y1aBCl6fQHm1LnJOQVhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWkL45w/; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E14A51F00893;
 	Tue,  9 Jun 2026 19:08:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032090;
-	bh=U1XgiC/VMVxxVG5e+DYvOKBgUIybiccNP4XomlqgTDE=;
+	s=k20260515; t=1781032091;
+	bh=GVxi1mVoUgaSl/yFAFc3UoriW9Jty4zjW3nu+EeuZAc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kClfBauN4gMnFFW9rbbYEDCa5neM2e9z8HYb/uoQxXQIajZ6RZqVDDIgDghTqBm6D
-	 m1jj+gnuI3knKw/lPok1HDCJmn356X8IDob716Fv8Goo1NE7BH9cqCse89/YaMQ7IU
-	 leL86tI3gRj1XcJ/HeRxFX9eSpOpiPQCzul2+rzwv3gQJj5t1NBAvdGvUXpYUfm2yk
-	 lt8cEhIxJtfA3o0gMzGiF8z4RPBWluSaF1pKM8nxNIBs3M6nU/KGLIFJs4y/r1pSar
-	 nPV1Dv18jiyKrYxp+v+F7danUI+/xttxMvoh74li5t+bjJpDopGhx4RqPPcInYV7Nn
-	 C0Ln8+kdx+Ulw==
+	b=kWkL45w/LS+d4cCnm93KwM3U4rc4Eemm9laE+ZkAcbKlJdz0MQ/wKy/Gqs/KP/ol/
+	 8Dh/ceL7nM7cc7+lfmA41NdBLsi3QeZdJfP8jgMxoFXPr1tJaRckqLCSDMQ3ahm6eY
+	 1B28eGoaTKlp1o9cS24aIoEJkgML/MKo5jFqqVT/X+M9td44nAwqwd7oWBUTHkAY2M
+	 jtV6AHBTi/KTWmzrJhtQyLZgmt5ZNK0+4xX/J8wRf7WxOXZA5rA7M94rOYoCj5zsH/
+	 rpTcvILLj4vpeio+NYYgU/3JTnTq7Y4h4sMtHCkY3eB5UwLBtzHbXuJuOJfzya8T2M
+	 JXbX5FGvx7CXg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	dtatulea@nvidia.com,
 	bobbyeshleman@meta.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/4] netdev: correct error code in netdev_nl_queue_fill_lease()
-Date: Tue,  9 Jun 2026 12:08:02 -0700
-Message-ID: <20260609190804.1137085-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/4] netdev: avoid skipping objects on race with device disappearance
+Date: Tue,  9 Jun 2026 12:08:03 -0700
+Message-ID: <20260609190804.1137085-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260609190804.1137085-1-kuba@kernel.org>
 References: <20260609190804.1137085-1-kuba@kernel.org>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297244-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -107,33 +107,91 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AD629663867
+X-Rspamd-Queue-Id: C9504663875
 
-netdev_nl_queue_fill_lease() returns ENOMEM on nla_put failures.
-This is wrong, the error code should be EMSGSIZE. But it doesn't
-matter, caller of netdev_nl_queue_fill_lease() just checks if
-the retcode is zero or not, and uses EMSGSIZE.
+If the currently dumped device disappears while we were mid-dump
+we will get the next device without resetting the sub-object ID.
+This is quite unlikely, it was reported by an AI tool not a real
+user. Let's fix it for better dump consistency.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/netdev-genl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/netdev-genl.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
 diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index a10d353d5eab..d35af460e886 100644
+index d35af460e886..18046ad0f883 100644
 --- a/net/core/netdev-genl.c
 +++ b/net/core/netdev-genl.c
-@@ -432,7 +432,7 @@ netdev_nl_queue_fill_lease(struct sk_buff *rsp, struct net_device *netdev,
- nla_put_failure_unlock:
- 	rcu_read_unlock();
- nla_put_failure:
--	return -ENOMEM;
-+	return -EMSGSIZE;
+@@ -310,11 +310,14 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 			err = -ENODEV;
+ 		}
+ 	} else {
++		unsigned long start_ifindex = ctx->ifindex;
++
+ 		for_each_netdev_lock_scoped(net, netdev, ctx->ifindex) {
++			if (ctx->ifindex != start_ifindex)
++				ctx->napi_id = 0;
+ 			err = netdev_nl_napi_dump_one(netdev, skb, info, ctx);
+ 			if (err < 0)
+ 				break;
+-			ctx->napi_id = 0;
+ 		}
+ 	}
+ 
+@@ -634,13 +637,17 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 			err = -ENODEV;
+ 		}
+ 	} else {
++		unsigned long start_ifindex = ctx->ifindex;
++
+ 		for_each_netdev_lock_ops_compat_scoped(net, netdev,
+ 						       ctx->ifindex) {
++			if (ctx->ifindex != start_ifindex) {
++				ctx->rxq_idx = 0;
++				ctx->txq_idx = 0;
++			}
+ 			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
+ 			if (err < 0)
+ 				break;
+-			ctx->rxq_idx = 0;
+-			ctx->txq_idx = 0;
+ 		}
+ 	}
+ 
+@@ -786,8 +793,6 @@ netdev_nl_stats_by_queue(struct net_device *netdev, struct sk_buff *rsp,
+ 		ctx->txq_idx = ++i;
+ 	}
+ 
+-	ctx->rxq_idx = 0;
+-	ctx->txq_idx = 0;
+ 	return 0;
  }
  
- static int
+@@ -902,6 +907,7 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+ 	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
+ 	const struct genl_info *info = genl_info_dump(cb);
+ 	struct net *net = sock_net(skb->sk);
++	unsigned long start_ifindex;
+ 	struct net_device *netdev;
+ 	unsigned int ifindex;
+ 	unsigned int scope;
+@@ -934,7 +940,13 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+ 		return err;
+ 	}
+ 
++	start_ifindex = ctx->ifindex;
++
+ 	for_each_netdev_lock_ops_compat_scoped(net, netdev, ctx->ifindex) {
++		if (ctx->ifindex != start_ifindex) {
++			ctx->rxq_idx = 0;
++			ctx->txq_idx = 0;
++		}
+ 		err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
+ 						    info, ctx);
+ 		if (err < 0)
 -- 
 2.54.0
 
