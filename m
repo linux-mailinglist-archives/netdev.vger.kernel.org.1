@@ -1,102 +1,103 @@
-Return-Path: <netdev+bounces-296989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296990-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DaDMCInYJ2oB3QIAu9opvQ
-	(envelope-from <netdev+bounces-296989-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:10:33 +0200
+	id DRWIOwjaJ2pz3QIAu9opvQ
+	(envelope-from <netdev+bounces-296990-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:16:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D64F65E20A
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF4165E340
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 11:16:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="CaMXA/CA";
-	dkim=pass header.d=redhat.com header.s=google header.b=f8jUnCKA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296989-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296989-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=FoU2a38l;
+	dkim=pass header.d=redhat.com header.s=google header.b=AoWdc3G0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296990-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296990-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F26B73131950
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:55:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9F59630208D5
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995693CFF79;
-	Tue,  9 Jun 2026 08:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59873F0A8A;
+	Tue,  9 Jun 2026 08:59:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586EB370D4C
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 08:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F773F0757
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 08:59:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780995309; cv=none; b=co2ARpZNqX6LDTVeYRKNnz6rO99JqRNikQLs5abS6IzYIUX2zcPrsdNFeK8m7dg5lpIn7stobvthRhToQOgT72oSJ81Pz8FdKpq2nAAQoBRBIqBxPW2l74mzhohCRr9gCo9AQQcSMOkg91s2pUrq4zDZKa+edJ30oaXCJVv2LpE=
+	t=1780995583; cv=none; b=dw0Kz/PmS4zcZwJH2/1wpJazykjuMcEMi+3QsUwuw7DuE9Ho0hdFk4+YRCwCVavW58IIQ1DzKYrT1col+TDERKv2x3vkWv8by9o4MslkDm7NnKfhtl91RxQWULFS0nzsBPTo7pKc2VnRqmegEV9QCmXaoJHIo9zxP94fKFgpa/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780995309; c=relaxed/simple;
-	bh=vtqnwbB0exq37hW3K5DWsmY1WEmWotF0SoGjv67OpdU=;
+	s=arc-20240116; t=1780995583; c=relaxed/simple;
+	bh=f5S+i3RVl0cUqmWNDjtmc/b/yyrLqBrgrSpRPlEOqsM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SSaNDEO9hbMYwvXpD+or9rrPRu/nOc82WF7tqEFyA6y6zIZEb8y6MHuBDJl//iK/pcyo10WhkuF1HgU5AdAUcrq4+8+TfLPgTSgreN79h2AlRstj5P6rpfBb5gLIJOaR20KJW8YPfpcVKwGSMVCe+KPctw0niBPQd6VcwuTGcxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CaMXA/CA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=f8jUnCKA; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=uociqh44KNU6SNwEK6qYie73YjMmivtvyFatwm4jo0x9VcwN3R0B63kSz1GWv9ZS1LwTuM/BWLkWM75sp//L1eJJPYv19g6RiDXyENXi7PaZuwd++yplX3HwYJcFOTxZIoMVPaihfg5MenFAGfuaGShfMAFoHad3+T12RdheDH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FoU2a38l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AoWdc3G0; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780995307;
+	s=mimecast20190719; t=1780995581;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nFkXaKSGjNQUZCN8lLg50D94jNF33SHSoppUjLuz1kw=;
-	b=CaMXA/CAdfKrld4YDy0ogyhSdkuTD4UO4ofTQAo1V1pkxwVad+aQR09kamyGMlgHYSMwNC
-	pG6PxEoziSAhlSWgm+R59tfohzwTcgNGcbpzhPdCaoFAZ03v9lWIFLGKWnRar/JDIDgzOM
-	lY8j8+LhXQI0Amkfnzz103mUtuKmmrM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CPgszwVt4cFE4ELVefG0ZpctOAG18a7ufhv6a2Zqquk=;
+	b=FoU2a38lJcL+uRzIBCzKpXpDGFmXs3dYTyND3fT/HHsakKyRDulzVKDseFNOAZmw7fQ/sM
+	25tjuQkN6/ZJagigM/3ZqIWsPSVX9gq468b7evnSkv+RK8ywAgYNELjH0HtHWzsvgSd/QF
+	QmIdbyNMQ1wPHr5FgHb+CR1IJG8SHcI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-o3mxBRBpN1uDatCe1coDOQ-1; Tue, 09 Jun 2026 04:54:04 -0400
-X-MC-Unique: o3mxBRBpN1uDatCe1coDOQ-1
-X-Mimecast-MFC-AGG-ID: o3mxBRBpN1uDatCe1coDOQ_1780995243
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-45ef9437b7aso3355018f8f.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 01:54:04 -0700 (PDT)
+ us-mta-668-djPX3keJMeexIWL-EMTuCQ-1; Tue, 09 Jun 2026 04:59:36 -0400
+X-MC-Unique: djPX3keJMeexIWL-EMTuCQ-1
+X-Mimecast-MFC-AGG-ID: djPX3keJMeexIWL-EMTuCQ_1780995576
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4601c9b630fso2114944f8f.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 01:59:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780995243; x=1781600043; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1780995576; x=1781600376; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nFkXaKSGjNQUZCN8lLg50D94jNF33SHSoppUjLuz1kw=;
-        b=f8jUnCKAhJdcTbd5J1xk3YEJDzWn/aJpRquLRn7PNEEWrq++JX7tHLCQ5RapcG8V8O
-         9/jFGu5PXhb52RHckWSKSOioYg9S/ccscjfSs3PEELNboryUU+08a3BuibMHP+lNY7wT
-         fzJEsk748xf2rkIMkJ82oOeOs71Du1UwQaFsPhirL/OikRy4M6oXzs1FSvEVrGLd0mGc
-         bhm2itqZn9jsSW1qsmA9Ov6mSD+2B8d72VNPV9stF0MSsTk+zRDBLh7KyaaU3oFAgj4U
-         9ZiCXPfrVjNyH6hf8vsb8/ncKKxq3/wK4TfBZ/qSxlfzfV8/4s4FhXR1knGCd7jXtOUw
-         PJkw==
+        bh=CPgszwVt4cFE4ELVefG0ZpctOAG18a7ufhv6a2Zqquk=;
+        b=AoWdc3G0VQcGsD3QMYITfXL22mZxSwJxsoDXmxZ+nqkzBQ1EuMhmL8rXQHYv4H/3mv
+         AocrqB1XTAX3Fr8Y/L+/93F5KlpTqnrv0L0/dh+AVzlbQYmrWc7OAGmaT6oFtzc3FzzG
+         QwA2NzIvyAPd6isRqSJlIc3oLj6ozCFTvD1ZkbgZpfGjGKzrbqkijlsuWkwWmOA20uLq
+         LKGQIdhG0l/sJ9KN5GozJsDjv0Cw7QvbsK1uSx9OB36jGhvTo1/1Nas/xkdRT2hP05qq
+         3Ko23kOVtTP46E/0Z7zV/JfsEKbjFYwn62rTqqvx4vEHc3fOMkUlyWkBWk6mtrDsSGN3
+         nteg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780995243; x=1781600043;
+        d=1e100.net; s=20251104; t=1780995576; x=1781600376;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nFkXaKSGjNQUZCN8lLg50D94jNF33SHSoppUjLuz1kw=;
-        b=DQljfoUe7Z5GyuZ6uHjJ1G2358pMBE4veo7WHto7CPnp+I578jI3j0iD1+z2dqqnkX
-         /drtGdjcHhQsJbDM2ngkyNmZ8O2wENfB0iUzx5zG3DcdEArViCos4oknoFZrExi4u+Ee
-         JqSIvmZy8SIgbDPBr0cySgjVvvjRSgh4tbKc/NY3M1KTqR2edZzlHrt5aQrWBfd55Iwh
-         R9r0KSZ7lr7lY35f5FkqFNNlDztsr7/73MToXiGLLvgPhqJ+6vxRS3Dj3MGO7vL4dsFe
-         GdQPRHZyuUp8RTc6jESsABSIftNQpUI5eRTvU72bLFjnFye9A5y8x1XLFMBrrype5X+6
-         3ONQ==
-X-Gm-Message-State: AOJu0Yz5WXvDQ5hJLUlinV7kObessb7AiSo5IQ1VuHDjxh1iCMGmWzPC
-	aI9HcczGxxfJH+gx8o0NVia9drGoeb8ZyOrAPyvWYIADXNG5RNbFF/mKZ0uwEzz16ybavgaIcL2
-	zKe018FptE4/jjVkaArkm7BDqZizjcGPczydDlm2GUK7do+OH0q8jL1leeg==
-X-Gm-Gg: Acq92OHnBfrOWFODjW0PNs6BA+6/MUjtsUeT40qN7snYSZfuAFqBRj4r58RMqpU2/E/
-	XEK9P4SaAnx5kMtx9Qbagh6e2wwf+X7hx3g3pgXg7KuHDVcfWGtEKMm+ERj3MbfdwmY+FONrR3q
-	FWa/MX3MyQgP/oJrOEQFOBWrtYuHY8DPNo10uIiujP70RKAhSbUo0wfV9Rxvm1ku5QIIeplznFQ
-	7HVpSJlsUBFkh34xs3aQTyxB7z9uf6dmxcHcn1ijyAzd4HqGDxHY5J4iu8TePhNY5POwr4y05sc
-	RNQgLv+qMeFc0wRy/+VNbU7nRPdIzmv8BYP3n+GIZtiEJVA+axitGDyaFm2Ny9Qrk4n76tFHsOq
-	kX8qngzXe6cvqqKdIEfIvYKrTjbib1SO/GRvyQx82XxkxTU9TDiH6LdirSETIrtngrg==
-X-Received: by 2002:a05:600c:3f0a:b0:490:be1e:6ce6 with SMTP id 5b1f17b1804b1-490d71fa51cmr19821795e9.9.1780995243334;
-        Tue, 09 Jun 2026 01:54:03 -0700 (PDT)
-X-Received: by 2002:a05:600c:3f0a:b0:490:be1e:6ce6 with SMTP id 5b1f17b1804b1-490d71fa51cmr19821465e9.9.1780995242881;
-        Tue, 09 Jun 2026 01:54:02 -0700 (PDT)
+        bh=CPgszwVt4cFE4ELVefG0ZpctOAG18a7ufhv6a2Zqquk=;
+        b=GzNI/5uzZx3bXMWv3XyfiZxw00Yx+5Nk2b4Enwu3C3y2K3beG5bC/8a7Pig+H/8B9w
+         FeJZFyxvkfunM6oqo1iDnQXqF4nmoMqcYx3oZ/CpAg4M3UnAbFrSA5fuD3vFoA1WXl+q
+         Pjh6fgtOnWWC19QHO9JEp8q1umMXv5sgr7NOpk6vRa1LJkf7oK3w/5Jn568qP53p///G
+         kpBNTM8ZKGHwxJFRZbzBmgA7eQ1QG28JRxX1cmXJabFYVFFAvEDUJZaTWnxms7mp8BDh
+         cJzZgyLoiF9OnqeZa3B4vT+IExWwaPWjChwJ33J2GlGUjKICW9B9z0ErpbDN74WS96c+
+         II9Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+w0gK+G7Z5NGfUgm8fX9Iio3/ublq85Lb8QrEHGBnrLNjFlSUdpaWZoHN8Giqk4DuBRQA8XUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6bbYCuf9h/PzNGeOOUV2btaWwTFSR2O045Bsm5xUp0x52NoUY
+	gH8W8C65251EtUQE/kdA4vR2N+Z8/94f64N8YLegEvNjQvS+7j7L0JNSdDmesJzJtdfZ/OlKAoW
+	x02UNLNxZC8AiH1eX1xdu7UWRMVWpo961zUJ9aUxc5J4UP+OTXKa5yxms1Q==
+X-Gm-Gg: Acq92OEkDkBT+jpkpnEg+eGglH6CMbGwVOCbo31/RA+owED5EI66mr6eewCAvEMLa8E
+	grRbJjx3kZIpidCsN3Gj5i5NCGAzOoJQiMCA4e6dZExFTrPO5rmRcYkPJKeWsa4yxc9fmiYjNI6
+	0n/hAhk1skkKr9UigLKAZ8c3tnHQ3Fn2Gq0JKBo43xQ/YQ/eGequjId3xqu/XCXrlUbwkWhPAwe
+	g2WVpa2WNKenGkADkb7YXQFxng0+g2uMjnCd+pxko8bml9Ammw4zy6Pdpf7aLfSSej2PFporvZ7
+	+c26wLMR3cfPLjWe24htT5FsnKP9nZ800FL/J8kHvM4/wYaodL5Na9vZC1wVUKtX729MRQOlFRI
+	3Ye5Db2XBTatNLTL8NgFlNdNxr073r1AEdiR8BuFiWvrujhRVwEOAXdD+P79khIDoYA==
+X-Received: by 2002:a05:600c:4ec7:b0:490:b8ee:d6a5 with SMTP id 5b1f17b1804b1-490c2589927mr315117345e9.6.1780995575645;
+        Tue, 09 Jun 2026 01:59:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:4ec7:b0:490:b8ee:d6a5 with SMTP id 5b1f17b1804b1-490c2589927mr315116965e9.6.1780995575267;
+        Tue, 09 Jun 2026 01:59:35 -0700 (PDT)
 Received: from [192.168.88.32] ([150.228.93.44])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490c2d2d11asm409565745e9.1.2026.06.09.01.54.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3d6c65sm455288105e9.12.2026.06.09.01.59.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 01:54:02 -0700 (PDT)
-Message-ID: <377b117a-b29a-4761-aae0-3236be1f0b49@redhat.com>
-Date: Tue, 9 Jun 2026 10:54:01 +0200
+        Tue, 09 Jun 2026 01:59:34 -0700 (PDT)
+Message-ID: <4e2fb478-1d37-47b7-9bb9-3553d5ca2fee@redhat.com>
+Date: Tue, 9 Jun 2026 10:59:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,40 +105,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable
- slaves
-To: Louis Scalbert <louis.scalbert@6wind.com>, Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, fbl@redhat.com, andy@greyhouse.net, shemminger@vyatta.com,
- maheshb@google.com, jonas.gorski@gmail.com, horms@kernel.org
-References: <20260603150331.1919611-1-louis.scalbert@6wind.com>
- <20260603150331.1919611-5-louis.scalbert@6wind.com>
- <1041444.1780954642@famine>
- <CAJ5u_Of1+eEL4iVe-sWzhOOva6xx3gPCeXeRP4Y3yCqny8=gOg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] dt-bindings: net: dsa: Convert lan9303.txt to yaml
+ format
+To: Frank.Li@oss.nxp.com, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Frank Li <Frank.Li@nxp.com>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Cc: imx@lists.linux.dev
+References: <20260603210929.3099363-1-Frank.Li@oss.nxp.com>
 From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-In-Reply-To: <CAJ5u_Of1+eEL4iVe-sWzhOOva6xx3gPCeXeRP4Y3yCqny8=gOg@mail.gmail.com>
+In-Reply-To: <20260603210929.3099363-1-Frank.Li@oss.nxp.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-296989-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-296990-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:louis.scalbert@6wind.com,m:jv@jvosburgh.net,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[oss.nxp.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,lwn.net,linuxfoundation.org,nxp.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:Frank.Li@oss.nxp.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:Frank.Li@nxp.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:imx@lists.linux.dev,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -151,39 +158,25 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,jvosburgh.net:email,sashiko.dev:url]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1D64F65E20A
+X-Rspamd-Queue-Id: EAF4165E340
 
-On 6/9/26 9:56 AM, Louis Scalbert wrote:
-> Le lun. 8 juin 2026 à 23:37, Jay Vosburgh <jv@jvosburgh.net> a écrit :
->>> @@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
->>>               switch (port->sm_mux_state) {
->>>               case AD_MUX_DETACHED:
->>>                       port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
->>> -                      ad_disable_collecting_distributing(port,
->>> -                                                         update_slave_arr);
->>>                       port->actor_oper_port_state &= ~LACP_STATE_COLLECTING;
->>>                       port->actor_oper_port_state &= ~LACP_STATE_DISTRIBUTING;
->>> +                      ad_disable_collecting_distributing(port,
->>> +                                                         update_slave_arr);
->>
->>         Is there a functional reason to move this?  I don't see anything
->> obvious in ad_disable_collecting_distributing() that depends on the
->> actor_oper_port_state.  Since you want this to be backported via stable,
->> fewer actual changes reduce the chances of an issue applying the patch
->> to an older version.
+On 6/3/26 11:09 PM, Frank.Li@oss.nxp.com wrote:
+> From: Frank Li <Frank.Li@nxp.com>
 > 
-> The path is ad_disable_collecting_distributing() ->
-> bond_3ad_set_carrier() -> __agg_usable_ports(). __agg_usable_ports()
-> reads port->actor_oper_port_state
+> Convert lan9303.txt to yaml format to fix below CHECK_DTBS warnings:
+> arch/arm/boot/dts/nxp/imx/imx53-kp-hsc.dtb: /soc/bus@50000000/i2c@53fec000/switch@a: failed to match any schema with compatible: ['smsc,lan9303-i2c']
 > 
-> It was found by
-> https://sashiko.dev/#/message/20260526084048.1696544-5-louis.scalbert%406wind.com
+> Additional changes:
+>   - rename switch-phy to switch in example.
+> 
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
 
-@Jay: it's not clear to me if you are ok with the series in the current
-shape, could you please clarify?
+Does not apply to net-next cleanly anymore. Please rebase and resend.
+While at it, please additionally add the target tree in the subj prefix.
 
 Thanks,
 
