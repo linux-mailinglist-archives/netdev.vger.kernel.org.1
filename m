@@ -1,79 +1,97 @@
-Return-Path: <netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cTk4BydJKGpxBgMAu9opvQ
-	(envelope-from <netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:11:03 +0200
+	id 0AgdLj1IKGpBBgMAu9opvQ
+	(envelope-from <netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:07:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0F7662C97
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:11:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF38662C1D
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:07:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=astralinux.ru header.s=mail header.b="m/OVoJhq";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=astralinux.ru;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UIK1piuF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297181-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2205830146B2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 17:02:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33C9030984C2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386214A139F;
-	Tue,  9 Jun 2026 17:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719D64ADD95;
+	Tue,  9 Jun 2026 16:57:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618F3FE35A;
-	Tue,  9 Jun 2026 17:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CE54ADD85
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 16:57:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781024527; cv=none; b=PVHI6MSO/0HOerRw/A2LZA+NvjrDArNhOiOxwtOgIXBrCFrXjDsohlJIZpjuMO7nvitZh+mEqNbuM2/32xrZvKcbvqs8WNOA/R1ZPQyzYAnt9Wav6iH4SLaCpYVYcq/sYbjYUzn75g3YKhoUomdpBeE4jwjkxq3W0NFOWNzKWEY=
+	t=1781024263; cv=none; b=HwfFQbzd8072ppwZk2JhCahRXZhvfurt86HCqGJJW3C6VLwyVs+gvDUuY1pdjrUmyBruqinFk1eaGDf9j/LVxLXeLigLctvNaU1tvPOfv7l4DQr7UdHaUmskChh6E4S5xHwGbMOfWv/GMY+0R8M2JlIAx8of4BMMgYL/bADQdaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781024527; c=relaxed/simple;
-	bh=VlT2GQMtF09lMcl1qD1/OfmoD7I5vnZUKdTaawBzjGM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QT/68BNoYlSfw9++8Q3tqW1dS7LDDWxIYWupHpSsuiiLZvx1z6VqkLj+gnerAu4qB4sIbVbT0CGsqN1KgZ0PZqdcuWxKyqRM57a66B4VeoZj5AcebXbBmD0rtEkgi/CrUQ1Whyv8MkKk0UF1lA+/KcquSnbTvPFWdiWMKEr63Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=m/OVoJhq; arc=none smtp.client-ip=93.188.205.243
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1781024519;
-	bh=VlT2GQMtF09lMcl1qD1/OfmoD7I5vnZUKdTaawBzjGM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=m/OVoJhqsTfi/TSwAIck8cWNLWIPxKsJqTlE+znqMrZYI3PVXba8iNtUWsxLE3u5G
-	 g5sTOta1vnyPHxwlD7ug6u/NfltyuMQTvaF6WjDrE2H+emL2pGph5sScQ40GJuSBJ5
-	 h6rOKtrVzfg86KyN9f8Qujalf/aIGhzwbuMGgIs1acziybrDeF5QvxqaHQC7fqUGkB
-	 4MYWUw2wXFMk+m7E/1P2dEZYAXY40a4CFEAL6NwwMS8+a63RYFtTvxpf9YL6/aT5AZ
-	 9IpWrmgRaivKpevhCYHJ2HFayRpkFQXAHKFb/TCGDcmeSueB69hyCK9vXX+HTGBBUr
-	 UtC9K3kYxSJOA==
-Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id F39BA1FA76;
-	Tue,  9 Jun 2026 20:01:58 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.205.207.5])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP;
-	Tue,  9 Jun 2026 20:01:56 +0300 (MSK)
-Received: from rbta-msk-lt-156703.astralinux.ru (unknown [10.198.18.49])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4gZZc83NQ2z2xd5;
-	Tue, 09 Jun 2026 19:48:40 +0300 (MSK)
-From: Alexey Panov <apanov@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Alexey Panov <apanov@astralinux.ru>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Veaceslav Falico <vfalico@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jeff Garzik <jeff@garzik.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	lvc-project@linuxtesting.org,
-	syzbot+9c081b17773615f24672@syzkaller.appspotmail.com
-Subject: [PATCH 5.10] bonding: limit BOND_MODE_8023AD to Ethernet devices
-Date: Tue,  9 Jun 2026 19:48:35 +0300
-Message-Id: <20260609164835.32573-1-apanov@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1781024263; c=relaxed/simple;
+	bh=JZcX41kc/PnmNGyLbsWtRkljYop+3TqNeiSZZrwHmck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MS7eFOPCwVeFmBFcBYf6BRz/J3nK2fFCQN81bwb5jbdZ2AnTU68K58d4+s+3l90MuXT0QfdALEvA7m3kDrfEUS0fSwCqTl7UCmRsYyid5POAL4oaRejJkBX7X7D5PZZkEU5Nv3Y8mTWBXdUZPo9btiYmGqe5pIFmqzDoDTT3XIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIK1piuF; arc=none smtp.client-ip=209.85.128.179
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7e2fa3062easo59313697b3.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:57:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781024261; x=1781629061; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=av7EYFBoj6gq1ZvLp6d893SbwiyvMCDkkTCv0M4AutE=;
+        b=UIK1piuF1PzV/1g9rsMp2cDSLJyyX8YMAM6K5fC4Un4kAvMjLeVHS8Srd9M+B8GUlj
+         O1tF/YuXyY/dKf+tsI0OaLMNFWO5Yfolvl2mA8jLgOPaExHB22gpNG3KUsiQAXYUQfh3
+         AVkaVkXMCKJDgC6/ryp3MNvaR++cCVBq4tP4++qpdYqKU4fP+BTT0V8E+/gWQp1zj+0i
+         zhSL3SgiZ3zGXwGdl/KVKRTRwMKX9oXkPNDd5xvl1GcriZ2oZNUdWq2wpk7WWlb3NjdI
+         iq+SdjbfrUFnl/JLyV3QzN52GDEkZRLzpoa0s4vxkKoWSdAO/tiw0yqo22c9+0uS59Rf
+         W4yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781024261; x=1781629061;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=av7EYFBoj6gq1ZvLp6d893SbwiyvMCDkkTCv0M4AutE=;
+        b=pElVaWKQ4fxMR97zRz0mx4ncA1s9Y6Dc/QL4ikErejHcGowU4KkZx2WNE9466AgOyh
+         MExaK/RpYC8txu1BOBSxqOqiLKIcWKHApOPDaF9kxTb/HMt67l8jt0CH/IUe4uaNlOpG
+         BL23otg1S1jCc9BrKopBJ0p7kLxV1qXiy0GM78TbvgRlboEAYxJj5J5cPKHyiB3Rmnms
+         cMZtacTA67bYLTIPN/f9GBSXgBon7Lv6CYYfzImx8gJwz4x2o6EnaNnQDe6sGZG9/paK
+         jZbe7vTXgLCpu0qmh4K/fR376eE4P0lPzABJJ0eTYqv0Chr8pClHRmNVlB3FC0gNshpD
+         2e1A==
+X-Gm-Message-State: AOJu0YyQqWpCBZG+3Kknc/4ZHTxRXmXKCfgewrQ0K2aHBl5m7tuv2bnN
+	AFnUXFgSJECigFxw6V56D7mYaypCgsV4MFag2uUIfVyq/yFOJGXXPsq2qW3RHSgpU/g=
+X-Gm-Gg: Acq92OHAjH6lesLQMgNlSyKvpCwYny4KiU0Ypu9OeYBpCiMQEoCG68bufyw0+P7ZFeA
+	OAAl60o6/Qxxv+CtoWsuPNzWQX0UYF6rNH9bVn5xvL9/FpXMGhRQcXXEIRkdpRBLyPQqxX1qHuJ
+	MBswCIASA3GUZFZpIe1X/WNkncPOkmEzjTYninntcjYy81wr4PmujzQ4N8kt7blxz18hdPs1JPr
+	GdiKRA6hpsF6q8VOMfVRdxKcQjjjt0d+s9AsL/bmAavR8EgI8WJ089cnldUImI9iig2cG+ZxACT
+	x+GYTs5vkVZAnrNULi7mZ9Xq4Y9BdaZO0h5JryyIeix3v5y34MW0Jo/QAc4dxK+CR5bQyZL8HXH
+	LN6y/S8TPOyF5qvdf9d6CDVQIEq5S8h28asGxsLkKnq2TBXObyBdmumGXl9CxiexyuFuTsf4G6r
+	DQZyl5WAtgIHqoKl8O9uPPbRuwhVmagf8DSKoS
+X-Received: by 2002:a05:690c:710a:b0:7bd:5579:185a with SMTP id 00721157ae682-7ed0c80a062mr196768697b3.25.1781024260523;
+        Tue, 09 Jun 2026 09:57:40 -0700 (PDT)
+Received: from houminxi ([23.133.88.228])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea215825d2sm99814537b3.16.2026.06.09.09.57.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 09:57:40 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	amorenoz@redhat.com,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next v2] selftests/net/openvswitch: add flow modify test
+Date: Wed, 10 Jun 2026 00:57:25 +0800
+Message-ID: <20260609165725.107484-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,146 +99,247 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected, bases: 2026/06/09 15:41:00
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: apanov@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 107 0.3.107 575e75fe8e3b9d45c142d144823c5de38605099e, {date_rfc_vio_soft_silent}, {Tracking_uf_ne_domains}, {Tracking_internal2}, {Tracking_from_domain_doesnt_match_to}, patch.msgid.link:7.1.1;astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;new-mail.astralinux.ru:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 203763 [Jun 09 2026]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.22
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2026/06/09 15:23:00 #28224840
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected, bases: 2026/06/09 15:41:00
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[astralinux.ru,quarantine];
-	R_DKIM_ALLOW(-0.20)[astralinux.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[astralinux.ru,gmail.com,greyhouse.net,davemloft.net,kernel.org,garzik.org,vger.kernel.org,jvosburgh.net,lunn.ch,google.com,redhat.com,linuxtesting.org,syzkaller.appspotmail.com];
-	TAGGED_FROM(0.00)[bounces-297183-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-297181-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:apanov@astralinux.ru,m:j.vosburgh@gmail.com,m:vfalico@gmail.com,m:andy@greyhouse.net,m:davem@davemloft.net,m:kuba@kernel.org,m:jeff@garzik.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:lvc-project@linuxtesting.org,m:syzbot+9c081b17773615f24672@syzkaller.appspotmail.com,m:jvosburgh@gmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[apanov@astralinux.ru,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:amorenoz@redhat.com,m:houminxi@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[apanov@astralinux.ru,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[astralinux.ru:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,9c081b17773615f24672];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,astralinux.ru:dkim,astralinux.ru:email,astralinux.ru:mid,astralinux.ru:from_mime,lunn.ch:email,msgid.link:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C0F7662C97
+X-Rspamd-Queue-Id: 2EF38662C1D
 
-From: Eric Dumazet <edumazet@google.com>
+Add mod_flow() and the mod-flow CLI command to ovs-dpctl.py, exercising
+OVS_FLOW_CMD_SET. Add test_flow_set which first modifies an existing
+flow with new actions and verifies the change via traffic, then modifies
+the same flow without actions and verifies the kernel handles the
+no-actions case gracefully.
 
-commit c84fcb79e5dbde0b8d5aeeaf04282d2149aebcf6 upstream.
+The no-actions path is unreachable from userspace OVS tools (dpctl
+mod-flow requires actions) but reachable via raw netlink. This is the
+code path where Adrian Moreno found a possible kfree_skb of ERR_PTR
+when reply allocation fails after locking.
 
-BOND_MODE_8023AD makes sense for ARPHRD_ETHER only.
+Make parse() skip OVS_FLOW_ATTR_ACTIONS when actstr is None so the
+kernel enters the post-lock allocation branch in ovs_flow_cmd_set().
+After the no-actions set, verify via dump-flows that the flow retained
+its drop action.
 
-syzbot reported:
-
- BUG: KASAN: global-out-of-bounds in __hw_addr_create net/core/dev_addr_lists.c:63 [inline]
- BUG: KASAN: global-out-of-bounds in __hw_addr_add_ex+0x25d/0x760 net/core/dev_addr_lists.c:118
-Read of size 16 at addr ffffffff8bf94040 by task syz.1.3580/19497
-
-CPU: 1 UID: 0 PID: 19497 Comm: syz.1.3580 Tainted: G             L      syzkaller #0 PREEMPT(full)
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Call Trace:
- <TASK>
-  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:378 [inline]
-  print_report+0xca/0x240 mm/kasan/report.c:482
-  kasan_report+0x118/0x150 mm/kasan/report.c:595
- check_region_inline mm/kasan/generic.c:-1 [inline]
-  kasan_check_range+0x2b0/0x2c0 mm/kasan/generic.c:200
-  __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
-  __hw_addr_create net/core/dev_addr_lists.c:63 [inline]
-  __hw_addr_add_ex+0x25d/0x760 net/core/dev_addr_lists.c:118
-  __dev_mc_add net/core/dev_addr_lists.c:868 [inline]
-  dev_mc_add+0xa1/0x120 net/core/dev_addr_lists.c:886
-  bond_enslave+0x2b8b/0x3ac0 drivers/net/bonding/bond_main.c:2180
-  do_set_master+0x533/0x6d0 net/core/rtnetlink.c:2963
-  do_setlink+0xcf0/0x41c0 net/core/rtnetlink.c:3165
-  rtnl_changelink net/core/rtnetlink.c:3776 [inline]
-  __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
-  rtnl_newlink+0x161c/0x1c90 net/core/rtnetlink.c:4072
-  rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6958
-  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
-  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-  netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
-  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
-  sock_sendmsg_nosec net/socket.c:727 [inline]
-  __sock_sendmsg+0x21c/0x270 net/socket.c:742
-  ____sys_sendmsg+0x505/0x820 net/socket.c:2592
-  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2646
-  __sys_sendmsg+0x164/0x220 net/socket.c:2678
-  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
-  __do_fast_syscall_32+0x1dc/0x560 arch/x86/entry/syscall_32.c:307
-  do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:332
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
- </TASK>
-
-The buggy address belongs to the variable:
- lacpdu_mcast_addr+0x0/0x40
-
-Fixes: 872254dd6b1f ("net/bonding: Enable bonding to enslave non ARPHRD_ETHER")
-Reported-by: syzbot+9c081b17773615f24672@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6966946b.a70a0220.245e30.0002.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
-Link: https://patch.msgid.link/20260113191201.3970737-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[ Alexey: Replace SLAVE_NL_ERR() with NL_SET_ERR_MSG() and slave_err()
-  because SLAVE_NL_ERR() is not present in linux-5.10.y. ]
-Signed-off-by: Alexey Panov <apanov@astralinux.ru>
+Suggested-by: Aaron Conole <aconole@redhat.com>
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
 ---
-Backport fix for CVE-2026-23099
- drivers/net/bonding/bond_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+v1 -> v2:
+  - Add dump-flows verification after no-actions mod-flow (Aaron)
+  - Add docstring to mod_flow() (pylint C0116)
+  - Use f-string in DP-not-found message (pylint C0209)
+---
+ .../selftests/net/openvswitch/openvswitch.sh  | 77 +++++++++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 40 +++++++++-
+ 2 files changed, 114 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 812e1792c232..86f0f155e986 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1763,6 +1763,13 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 	 */
- 	if (!bond_has_slaves(bond)) {
- 		if (bond_dev->type != slave_dev->type) {
-+			if (slave_dev->type != ARPHRD_ETHER &&
-+			    BOND_MODE(bond) == BOND_MODE_8023AD) {
-+				NL_SET_ERR_MSG(extack, "8023AD mode requires Ethernet devices");
-+				slave_err(bond_dev, slave_dev,
-+					  "Error: 8023AD mode requires Ethernet devices\n");
-+				return -EINVAL;
-+			}
- 			slave_dbg(bond_dev, slave_dev, "change device type from %d to %d\n",
- 				  bond_dev->type, slave_dev->type);
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 82f066a0ceed..d533decca5c1 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -30,6 +30,7 @@ tests="
+ 	drop_reason				drop: test drop reasons are emitted
+ 	pop_vlan				vlan: POP_VLAN action strips tag
+ 	dec_ttl					ttl: dec_ttl decrements IP TTL
++	flow_set				flow-set: Flow modify
+ 	psample					psample: Sampling packets with psample"
  
+ info() {
+@@ -193,6 +194,23 @@ ovs_add_flow () {
+ 	return 0
+ }
+ 
++ovs_mod_flow () {
++	if [ -n "$4" ]; then
++		info "Modifying flow: sbx:$1 br:$2 flow:$3 act:$4"
++		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
++			mod-flow "$2" "$3" "$4"
++	else
++		info "Modifying flow (no actions): sbx:$1 br:$2 flow:$3"
++		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
++			mod-flow "$2" "$3"
++	fi
++	if [ $? -ne 0 ]; then
++		info "Flow modify [ $3 ] failed"
++		return 1
++	fi
++	return 0
++}
++
+ ovs_del_flows () {
+ 	info "Deleting all flows from DP: sbx:$1 br:$2"
+ 	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py del-flows "$2"
+@@ -300,6 +318,65 @@ test_dec_ttl() {
+ 	return 0
+ }
+ 
++test_flow_set() {
++	sbx_add "test_flow_set" || return $?
++	ovs_add_dp "test_flow_set" flowset || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "test_flow_set" "flowset" "$ns" \
++			"${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	ip netns exec client ip addr add 10.0.0.1/24 dev c1
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add 10.0.0.2/24 dev s1
++	ip netns exec server ip link set s1 up
++
++	ovs_add_flow "test_flow_set" flowset \
++		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
++	ovs_add_flow "test_flow_set" flowset \
++		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
++
++	local fwd_flow="ufid:00000001-0002-0003-0004-000500060007"
++	fwd_flow="$fwd_flow,in_port(1),eth(),eth_type(0x0800),ipv4()"
++
++	ovs_add_flow "test_flow_set" flowset "$fwd_flow" '2' \
++		|| return 1
++	ovs_add_flow "test_flow_set" flowset \
++		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
++
++	info "verify initial forwarding"
++	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
++		10.0.0.2 || return 1
++
++	info "mod-flow with new actions (change to drop)"
++	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" 'drop' \
++		|| return 1
++
++	info "verify traffic is now dropped"
++	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
++		10.0.0.2 >/dev/null 2>&1 \
++		&& { info "FAIL: ping should fail after mod-flow to drop"
++		     return 1; }
++
++	info "mod-flow without actions"
++	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" || return 1
++
++	info "verify flow retained drop action via dump"
++	python3 "$ovs_base/ovs-dpctl.py" dump-flows flowset \
++		| grep -q "actions:drop" || \
++		{ info "FAIL: flow not showing drop action"; return 1; }
++
++	info "verify drop actions unchanged"
++	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
++		10.0.0.2 >/dev/null 2>&1 \
++		&& { info "FAIL: ping should still fail after no-actions set"
++		     return 1; }
++
++	return 0
++}
++
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index 3342e295293d..e1ecfad2c03e 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -2702,9 +2702,10 @@ class OvsFlow(GenericNetlinkSocket):
+             self["attrs"].append(["OVS_FLOW_ATTR_KEY", k])
+             self["attrs"].append(["OVS_FLOW_ATTR_MASK", m])
+ 
+-            a = ovsactions()
+-            a.parse(actstr)
+-            self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
++            if actstr is not None:
++                a = ovsactions()
++                a.parse(actstr)
++                self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
+ 
+     def __init__(self):
+         GenericNetlinkSocket.__init__(self)
+@@ -2738,6 +2739,25 @@ class OvsFlow(GenericNetlinkSocket):
+             raise ne
+         return reply
+ 
++    def mod_flow(self, dpifindex, flowmsg):
++        """Modify an existing flow in the kernel."""
++        flowmsg["cmd"] = OVS_FLOW_CMD_SET
++        flowmsg["version"] = OVS_DATAPATH_VERSION
++        flowmsg["reserved"] = 0
++        flowmsg["dpifindex"] = dpifindex
++
++        try:
++            reply = self.nlm_request(
++                flowmsg,
++                msg_type=self.prid,
++                msg_flags=NLM_F_REQUEST | NLM_F_ACK,
++            )
++            reply = reply[0]
++        except NetlinkError as ne:
++            print(flowmsg)
++            raise ne
++        return reply
++
+     def del_flows(self, dpifindex):
+         """
+         Send a del message to the kernel that will drop all flows.
+@@ -3013,6 +3033,12 @@ def main(argv):
+     addflcmd.add_argument("flow", help="Flow specification")
+     addflcmd.add_argument("acts", help="Flow actions")
+ 
++    modflcmd = subparsers.add_parser("mod-flow")
++    modflcmd.add_argument("modbr", help="Datapath name")
++    modflcmd.add_argument("modflow", help="Flow specification")
++    modflcmd.add_argument("modacts", help="Flow actions",
++                          nargs="?", default=None)
++
+     delfscmd = subparsers.add_parser("del-flows")
+     delfscmd.add_argument("flsbr", help="Datapath name")
+ 
+@@ -3110,6 +3136,14 @@ def main(argv):
+         flow = OvsFlow.ovs_flow_msg()
+         flow.parse(args.flow, args.acts, rep["dpifindex"])
+         ovsflow.add_flow(rep["dpifindex"], flow)
++    elif hasattr(args, "modbr"):
++        rep = ovsdp.info(args.modbr, 0)
++        if rep is None:
++            print(f"DP '{args.modbr}' not found.")
++            return 1
++        flow = OvsFlow.ovs_flow_msg()
++        flow.parse(args.modflow, args.modacts, rep["dpifindex"])
++        ovsflow.mod_flow(rep["dpifindex"], flow)
+     elif hasattr(args, "flsbr"):
+         rep = ovsdp.info(args.flsbr, 0)
+         if rep is None:
 -- 
-2.47.3
+2.54.0
+
 
