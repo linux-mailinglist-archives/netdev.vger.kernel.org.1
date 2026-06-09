@@ -1,80 +1,78 @@
-Return-Path: <netdev+bounces-297180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oih1GXpGKGrWBQMAu9opvQ
-	(envelope-from <netdev+bounces-297180-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:59:38 +0200
+	id cTk4BydJKGpxBgMAu9opvQ
+	(envelope-from <netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:11:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BEA662B2F
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:59:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0F7662C97
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 19:11:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=astralinux.ru header.s=mail header.b=mawrAYlY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297180-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297180-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=astralinux.ru header.s=mail header.b="m/OVoJhq";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297183-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=astralinux.ru;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 24DA6305421D
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:47:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2205830146B2
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 17:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078554963D4;
-	Tue,  9 Jun 2026 16:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386214A139F;
+	Tue,  9 Jun 2026 17:02:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEEF257452;
-	Tue,  9 Jun 2026 16:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E618F3FE35A;
+	Tue,  9 Jun 2026 17:02:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781023624; cv=none; b=XhNKjqy9cMoA9IFjxgtLGE1qBWJuyOprEK++bBnfU2gHK/D7zIfePmDusDlbwIKZKR5vUh0KhAlBicW65YRZYRWMvowN5e5pvmIbDWwpO6ODE9Irkfll//Kb9PiKMB8ZmA7bHMWVsEHi9FMjcWvnbb5JWRgkKwS9H/ifqG1gm0w=
+	t=1781024527; cv=none; b=PVHI6MSO/0HOerRw/A2LZA+NvjrDArNhOiOxwtOgIXBrCFrXjDsohlJIZpjuMO7nvitZh+mEqNbuM2/32xrZvKcbvqs8WNOA/R1ZPQyzYAnt9Wav6iH4SLaCpYVYcq/sYbjYUzn75g3YKhoUomdpBeE4jwjkxq3W0NFOWNzKWEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781023624; c=relaxed/simple;
-	bh=zd7otinO4B9I8rd1gNUK39hV2DeIxTjVexvphjc+8jg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uZW3WFwqMBswGdLxbgS29BEoxu5OO0QhNwsQ+Iz/E5vKVpmpKHZkJlpmqD3kw/XGBxHy1QwVG2NK5sCYDdEvu0Bke8/743QViV3eeWATsT4G9w70bWxo7FLrN9+NGmkPTH71mZA+cr/0q9IK5SVxY+K5iljRwSkFvwkDMZhBeIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=mawrAYlY; arc=none smtp.client-ip=93.188.205.243
+	s=arc-20240116; t=1781024527; c=relaxed/simple;
+	bh=VlT2GQMtF09lMcl1qD1/OfmoD7I5vnZUKdTaawBzjGM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QT/68BNoYlSfw9++8Q3tqW1dS7LDDWxIYWupHpSsuiiLZvx1z6VqkLj+gnerAu4qB4sIbVbT0CGsqN1KgZ0PZqdcuWxKyqRM57a66B4VeoZj5AcebXbBmD0rtEkgi/CrUQ1Whyv8MkKk0UF1lA+/KcquSnbTvPFWdiWMKEr63Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=m/OVoJhq; arc=none smtp.client-ip=93.188.205.243
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1781023610;
-	bh=zd7otinO4B9I8rd1gNUK39hV2DeIxTjVexvphjc+8jg=;
+	s=mail; t=1781024519;
+	bh=VlT2GQMtF09lMcl1qD1/OfmoD7I5vnZUKdTaawBzjGM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=mawrAYlYRNEWbSOfUXrmjK+PzLRhAhuvHm6pom2O1XkfJm+1h8GTDfcAJ0CEFQAP2
-	 gVrQT/zb28wkQ3zR/HyctRiUtYzOuyxupPlXugjsJzcFX81A+ioqiYzy+9JMTegLMa
-	 30C2vax74SYMRMj3TqErLY2BhjLW5JZ3+nfGu2Ebtu2DD2RE0mXHmx9O8DDYsyGMvD
-	 JvTExdF/qnNPHDnA4kPhWN930rkIWDyrRyTc7rlT/4SIZyBkZrjzMswd6gCva2k2V2
-	 JEIHNJJFzii/2FVHlEs/f7ZTKOVGaEX6hpeburj5EZDNfTFQETGLnkC3LNz4vCHSEj
-	 l5VS8JNYf9y1Q==
+	b=m/OVoJhqsTfi/TSwAIck8cWNLWIPxKsJqTlE+znqMrZYI3PVXba8iNtUWsxLE3u5G
+	 g5sTOta1vnyPHxwlD7ug6u/NfltyuMQTvaF6WjDrE2H+emL2pGph5sScQ40GJuSBJ5
+	 h6rOKtrVzfg86KyN9f8Qujalf/aIGhzwbuMGgIs1acziybrDeF5QvxqaHQC7fqUGkB
+	 4MYWUw2wXFMk+m7E/1P2dEZYAXY40a4CFEAL6NwwMS8+a63RYFtTvxpf9YL6/aT5AZ
+	 9IpWrmgRaivKpevhCYHJ2HFayRpkFQXAHKFb/TCGDcmeSueB69hyCK9vXX+HTGBBUr
+	 UtC9K3kYxSJOA==
 Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 551681FA44;
-	Tue,  9 Jun 2026 19:46:50 +0300 (MSK)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP id F39BA1FA76;
+	Tue,  9 Jun 2026 20:01:58 +0300 (MSK)
 Received: from new-mail.astralinux.ru (unknown [10.205.207.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Tue,  9 Jun 2026 19:46:47 +0300 (MSK)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP;
+	Tue,  9 Jun 2026 20:01:56 +0300 (MSK)
 Received: from rbta-msk-lt-156703.astralinux.ru (unknown [10.198.18.49])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4gZZYz1JwYz2xd5;
-	Tue, 09 Jun 2026 19:46:47 +0300 (MSK)
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4gZZc83NQ2z2xd5;
+	Tue, 09 Jun 2026 19:48:40 +0300 (MSK)
 From: Alexey Panov <apanov@astralinux.ru>
 To: stable@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Alexey Panov <apanov@astralinux.ru>,
-	Oliver Neukum <oneukum@suse.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Veaceslav Falico <vfalico@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kimball Murray <kmurray@f5.com>,
-	Soohoon Lee <Soohoon.Lee@f5.com>,
+	Jeff Garzik <jeff@garzik.org>,
 	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	lvc-project@linuxtesting.org,
-	Zqiang <qiang.zhang@linux.dev>
-Subject: [PATCH 5.10] usbnet: Fix using smp_processor_id() in preemptible code warnings
-Date: Tue,  9 Jun 2026 19:46:44 +0300
-Message-Id: <20260609164644.31375-1-apanov@astralinux.ru>
+	syzbot+9c081b17773615f24672@syzkaller.appspotmail.com
+Subject: [PATCH 5.10] bonding: limit BOND_MODE_8023AD to Ethernet devices
+Date: Tue,  9 Jun 2026 19:48:35 +0300
+Message-Id: <20260609164835.32573-1-apanov@astralinux.ru>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,7 +84,7 @@ Content-Transfer-Encoding: 8bit
 X-KSMG-AntiPhishing: NotDetected, bases: 2026/06/09 15:41:00
 X-KSMG-AntiSpam-Auth: dkim=none
 X-KSMG-AntiSpam-Envelope-From: apanov@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 107 0.3.107 575e75fe8e3b9d45c142d144823c5de38605099e, {date_rfc_vio_soft_silent}, {Tracking_uf_ne_domains}, {Tracking_internal2}, {Tracking_from_domain_doesnt_match_to}, patch.msgid.link:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;astralinux.ru:7.1.1;127.0.0.199:7.1.2;new-mail.astralinux.ru:7.1.1;syzkaller.appspot.com:5.0.1,7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Info: LuaCore: 107 0.3.107 575e75fe8e3b9d45c142d144823c5de38605099e, {date_rfc_vio_soft_silent}, {Tracking_uf_ne_domains}, {Tracking_internal2}, {Tracking_from_domain_doesnt_match_to}, patch.msgid.link:7.1.1;astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;new-mail.astralinux.ru:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1, FromAlignment: s
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiSpam-Lua-Profiles: 203763 [Jun 09 2026]
 X-KSMG-AntiSpam-Method: none
@@ -106,20 +104,21 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[astralinux.ru,quarantine];
 	R_DKIM_ALLOW(-0.20)[astralinux.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[apanov@astralinux.ru,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-297180-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[astralinux.ru,gmail.com,greyhouse.net,davemloft.net,kernel.org,garzik.org,vger.kernel.org,jvosburgh.net,lunn.ch,google.com,redhat.com,linuxtesting.org,syzkaller.appspotmail.com];
+	TAGGED_FROM(0.00)[bounces-297183-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:apanov@astralinux.ru,m:oneukum@suse.com,m:davem@davemloft.net,m:kuba@kernel.org,m:kmurray@f5.com,m:Soohoon.Lee@f5.com,m:netdev@vger.kernel.org,m:linux-usb@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:lvc-project@linuxtesting.org,m:qiang.zhang@linux.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:apanov@astralinux.ru,m:j.vosburgh@gmail.com,m:vfalico@gmail.com,m:andy@greyhouse.net,m:davem@davemloft.net,m:kuba@kernel.org,m:jeff@garzik.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:lvc-project@linuxtesting.org,m:syzbot+9c081b17773615f24672@syzkaller.appspotmail.com,m:jvosburgh@gmail.com,m:andrew@lunn.ch,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[apanov@astralinux.ru,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[apanov@astralinux.ru,netdev@vger.kernel.org];
@@ -127,86 +126,101 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[astralinux.ru:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,astralinux.ru:dkim,astralinux.ru:email,astralinux.ru:mid,astralinux.ru:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,msgid.link:url,syzkaller.appspot.com:url]
+	TAGGED_RCPT(0.00)[netdev,9c081b17773615f24672];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,astralinux.ru:dkim,astralinux.ru:email,astralinux.ru:mid,astralinux.ru:from_mime,lunn.ch:email,msgid.link:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C3BEA662B2F
+X-Rspamd-Queue-Id: 6C0F7662C97
 
-From: Zqiang <qiang.zhang@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
 
-commit 327cd4b68b4398b6c24f10eb2b2533ffbfc10185 upstream.
+commit c84fcb79e5dbde0b8d5aeeaf04282d2149aebcf6 upstream.
 
-Syzbot reported the following warning:
+BOND_MODE_8023AD makes sense for ARPHRD_ETHER only.
 
-BUG: using smp_processor_id() in preemptible [00000000] code: dhcpcd/2879
-caller is usbnet_skb_return+0x74/0x490 drivers/net/usb/usbnet.c:331
-CPU: 1 UID: 0 PID: 2879 Comm: dhcpcd Not tainted 6.15.0-rc4-syzkaller-00098-g615dca38c2ea #0 PREEMPT(voluntary)
+syzbot reported:
+
+ BUG: KASAN: global-out-of-bounds in __hw_addr_create net/core/dev_addr_lists.c:63 [inline]
+ BUG: KASAN: global-out-of-bounds in __hw_addr_add_ex+0x25d/0x760 net/core/dev_addr_lists.c:118
+Read of size 16 at addr ffffffff8bf94040 by task syz.1.3580/19497
+
+CPU: 1 UID: 0 PID: 19497 Comm: syz.1.3580 Tainted: G             L      syzkaller #0 PREEMPT(full)
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
 Call Trace:
  <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
- check_preemption_disabled+0xd0/0xe0 lib/smp_processor_id.c:49
- usbnet_skb_return+0x74/0x490 drivers/net/usb/usbnet.c:331
- usbnet_resume_rx+0x4b/0x170 drivers/net/usb/usbnet.c:708
- usbnet_change_mtu+0x1be/0x220 drivers/net/usb/usbnet.c:417
- __dev_set_mtu net/core/dev.c:9443 [inline]
- netif_set_mtu_ext+0x369/0x5c0 net/core/dev.c:9496
- netif_set_mtu+0xb0/0x160 net/core/dev.c:9520
- dev_set_mtu+0xae/0x170 net/core/dev_api.c:247
- dev_ifsioc+0xa31/0x18d0 net/core/dev_ioctl.c:572
- dev_ioctl+0x223/0x10e0 net/core/dev_ioctl.c:821
- sock_do_ioctl+0x19d/0x280 net/socket.c:1204
- sock_ioctl+0x42f/0x6a0 net/socket.c:1311
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl fs/ioctl.c:892 [inline]
- __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:378 [inline]
+  print_report+0xca/0x240 mm/kasan/report.c:482
+  kasan_report+0x118/0x150 mm/kasan/report.c:595
+ check_region_inline mm/kasan/generic.c:-1 [inline]
+  kasan_check_range+0x2b0/0x2c0 mm/kasan/generic.c:200
+  __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
+  __hw_addr_create net/core/dev_addr_lists.c:63 [inline]
+  __hw_addr_add_ex+0x25d/0x760 net/core/dev_addr_lists.c:118
+  __dev_mc_add net/core/dev_addr_lists.c:868 [inline]
+  dev_mc_add+0xa1/0x120 net/core/dev_addr_lists.c:886
+  bond_enslave+0x2b8b/0x3ac0 drivers/net/bonding/bond_main.c:2180
+  do_set_master+0x533/0x6d0 net/core/rtnetlink.c:2963
+  do_setlink+0xcf0/0x41c0 net/core/rtnetlink.c:3165
+  rtnl_changelink net/core/rtnetlink.c:3776 [inline]
+  __rtnl_newlink net/core/rtnetlink.c:3935 [inline]
+  rtnl_newlink+0x161c/0x1c90 net/core/rtnetlink.c:4072
+  rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6958
+  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+  netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+  sock_sendmsg_nosec net/socket.c:727 [inline]
+  __sock_sendmsg+0x21c/0x270 net/socket.c:742
+  ____sys_sendmsg+0x505/0x820 net/socket.c:2592
+  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2646
+  __sys_sendmsg+0x164/0x220 net/socket.c:2678
+  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+  __do_fast_syscall_32+0x1dc/0x560 arch/x86/entry/syscall_32.c:307
+  do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:332
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+ </TASK>
 
-For historical and portability reasons, the netif_rx() is usually
-run in the softirq or interrupt context, this commit therefore add
-local_bh_disable/enable() protection in the usbnet_resume_rx().
+The buggy address belongs to the variable:
+ lacpdu_mcast_addr+0x0/0x40
 
-Fixes: 43daa96b166c ("usbnet: Stop RX Q on MTU change")
-Link: https://syzkaller.appspot.com/bug?id=81f55dfa587ee544baaaa5a359a060512228c1e1
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Zqiang <qiang.zhang@linux.dev>
-Link: https://patch.msgid.link/20251011070518.7095-1-qiang.zhang@linux.dev
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-[ Alexey: Keep tasklet_schedule() because commit 2c04d279e857 ("net: usb:
-  Convert tasklet API to new bottom half workqueue mechanism") is not present
-  in linux-5.10.y. ]
+Fixes: 872254dd6b1f ("net/bonding: Enable bonding to enslave non ARPHRD_ETHER")
+Reported-by: syzbot+9c081b17773615f24672@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6966946b.a70a0220.245e30.0002.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Acked-by: Jay Vosburgh <jv@jvosburgh.net>
+Link: https://patch.msgid.link/20260113191201.3970737-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[ Alexey: Replace SLAVE_NL_ERR() with NL_SET_ERR_MSG() and slave_err()
+  because SLAVE_NL_ERR() is not present in linux-5.10.y. ]
 Signed-off-by: Alexey Panov <apanov@astralinux.ru>
 ---
-Backport fix for CVE-2025-40164
- drivers/net/usb/usbnet.c | 2 ++
- 1 file changed, 2 insertions(+)
+Backport fix for CVE-2026-23099
+ drivers/net/bonding/bond_main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 4a83228a2db5..4b34544d88aa 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -684,6 +684,7 @@ void usbnet_resume_rx(struct usbnet *dev)
- 	struct sk_buff *skb;
- 	int num = 0;
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 812e1792c232..86f0f155e986 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1763,6 +1763,13 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 	 */
+ 	if (!bond_has_slaves(bond)) {
+ 		if (bond_dev->type != slave_dev->type) {
++			if (slave_dev->type != ARPHRD_ETHER &&
++			    BOND_MODE(bond) == BOND_MODE_8023AD) {
++				NL_SET_ERR_MSG(extack, "8023AD mode requires Ethernet devices");
++				slave_err(bond_dev, slave_dev,
++					  "Error: 8023AD mode requires Ethernet devices\n");
++				return -EINVAL;
++			}
+ 			slave_dbg(bond_dev, slave_dev, "change device type from %d to %d\n",
+ 				  bond_dev->type, slave_dev->type);
  
-+	local_bh_disable();
- 	clear_bit(EVENT_RX_PAUSED, &dev->flags);
- 
- 	while ((skb = skb_dequeue(&dev->rxq_pause)) != NULL) {
-@@ -692,6 +693,7 @@ void usbnet_resume_rx(struct usbnet *dev)
- 	}
- 
- 	tasklet_schedule(&dev->bh);
-+	local_bh_enable();
- 
- 	netif_dbg(dev, rx_status, dev->net,
- 		  "paused rx queue disabled, %d skbs requeued\n", num);
 -- 
 2.47.3
 
