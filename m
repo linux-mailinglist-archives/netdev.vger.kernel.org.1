@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-297296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EqM4DgyIKGpVFwMAu9opvQ
-	(envelope-from <netdev+bounces-297296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 23:39:24 +0200
+	id /nYuEHSHKGpFFwMAu9opvQ
+	(envelope-from <netdev+bounces-297299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 23:36:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846976644C6
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 23:39:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F826644A4
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 23:36:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=Vg0GIRh4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297296-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297296-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=intel.com header.s=Intel header.b=SKPThtNC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297299-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297299-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A125A3091558
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 21:36:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF65830AA844
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 21:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA353FBED2;
-	Tue,  9 Jun 2026 21:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD9141168C;
+	Tue,  9 Jun 2026 21:36:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713DE3644C3
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 21:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E477403B15
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 21:36:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781040971; cv=none; b=r+E7vzTBoeJICC0xekUFHD0hkU757/E5GHIKwUz88DnHB/K3xKUblIutSTEjy47I5PhxWR3meUhsqmK0BZ96hH2ilyxP48HBJRIzEaw0BCLk1sjtD79vZ4j1207evuNOR7jBmawfB+jaTfMuDGuS+YUV6GK4POonV9YEMneHZeY=
+	t=1781040972; cv=none; b=pRU5xdi85vcOu2BYY4HMJaPZqwpD5Bw6JybVRYDpcNSQ7eCN+xGfJA/uOkyTwAmJGyLBfHV5JJb4b0qpjdJ8MaUCoRJw1MOpNyyc+fbTb72vwk4OZyNJdQqA+WmFfW5ZU1FK4EBwe5QVP7bA6/VtQQrS6M/skPKaWlxFvThOT0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781040971; c=relaxed/simple;
-	bh=pcSEizI3Ez21/tItl5AycJUUJjrkFWUYFda5BeMZkzc=;
+	s=arc-20240116; t=1781040972; c=relaxed/simple;
+	bh=mVXXhGscleP94SeAnVaZApnK0NKaPJVgrTB1Hj344LI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AoQFOLoDtEJJT4nwDun89tmzpQ1MqI4oQEKzwXaiM4ZG5Ea/1PSx/8YsoLtJCaefveZet9Rze1bM+9tlwVu0/IBB8/hQl8SbgsvizRT18cWzTfWjHxChGE9N1IrTReQ1i1AsWd2c+gGtvvsBWpIpmTusLGvS99VHijwmc6rorP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vg0GIRh4; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=iRx16DRxJfAW+BTryGRZNStnQpAgyYpVsC9PZ8SAjK5uIaahU8BRdvp8gvkg+OII3QD2E+T+5qI+wjNuXpDpJswHRKUdoQVpMpbDT+dRPlOuOedenZ6PnRrAtmC4cHNCU9Pd+HDhaqdUI5VnIVSiwoJZhRRkyDMymiWLwqvnze4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SKPThtNC; arc=none smtp.client-ip=198.175.65.20
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781040970; x=1812576970;
+  t=1781040971; x=1812576971;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pcSEizI3Ez21/tItl5AycJUUJjrkFWUYFda5BeMZkzc=;
-  b=Vg0GIRh44HgWiASX3Cg1v8hOFH46YC/uDJM4nNRXgB9DqLb8wXy0w1EO
-   +0tuhNxUkJrc025xqE1CQGJE5CVTOJbYi8MYcQUAptoTiREQccNjH7+av
-   tSBQZRfCXCAnaPyfeOGjGhLZ61oPkyV8eOeuGCIS16M2VYskIj8Zz/oAN
-   cFULqd66IYNnj2Lc+NX2Bol/WrXqbpEwSqf5ThH7E3d2teio20maIhC/l
-   uqYDp9aiwXim1YMHRJNXOEFpvBAQEi6ifgUJ2fLf9Fx2Qph3PQIgQmY1K
-   EZSoZwkPLgJ67n8Ynhey5AhSBE5tnREm1pgXkRhcBbWNvTSpSlKYdF0qo
-   g==;
-X-CSE-ConnectionGUID: bzbqcGAGRQOyMEk90fQQDQ==
-X-CSE-MsgGUID: 1spsbvPxTcW+6xmIKJWETg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11812"; a="81568515"
+  bh=mVXXhGscleP94SeAnVaZApnK0NKaPJVgrTB1Hj344LI=;
+  b=SKPThtNCIi4AhWJnGwNq7o3ZITwQev4k2J//PEcV0QfGLXR++I71WMgD
+   s5OIcLTP+YmArLLGJtqaOTlOWr7+mGRoaI+NU9VbS0lDlNjjK/gds/LoR
+   4nc5f1v3RHGItSmKgWk2OX2PxdVWrqlgGREvzacx820vBA99znHy04gsf
+   OAs1IieRFTwOLBHL/MV3SQG4ypLVjMTmcWy/ns/8yBQcwzZzhKtV6LC3c
+   FMn1UHZcYdSmEWgKZNwhzi+b9D4O/B1K6cOGyXGtVtlwKBDtRw4eaTauR
+   2F5GIb8yJKmAwPDyiRtmzkq8Vr+8SVAF1OYPvd/u/vNdFM5FcjH1wqARS
+   Q==;
+X-CSE-ConnectionGUID: N15svWroTGaTUzbNd/cCbQ==
+X-CSE-MsgGUID: /zzcAGIYQGeCcpBcX49yXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11812"; a="81568522"
 X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
-   d="scan'208";a="81568515"
+   d="scan'208";a="81568522"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 14:36:08 -0700
-X-CSE-ConnectionGUID: /d4vB7OLRUWeJG3vMmxAGA==
-X-CSE-MsgGUID: NwL84OcHRkqvBIUJ2ie+8A==
+X-CSE-ConnectionGUID: LP6XrXHeQtOhbJ4p3vN3wg==
+X-CSE-MsgGUID: zKHho4d9TiagUGAxG+UP4A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,196,1774335600"; 
-   d="scan'208";a="245838568"
+   d="scan'208";a="245838571"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa008.jf.intel.com with ESMTP; 09 Jun 2026 14:36:07 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,18 +68,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Marco Crivellari <marco.crivellari@suse.com>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	mhocko@suse.com,
-	jiangshanlai@gmail.com,
-	frederic@kernel.org,
-	tj@kernel.org,
-	bigeasy@linutronix.de,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net-next 01/15] idpf: Replace use of system_unbound_wq with system_dfl_wq
-Date: Tue,  9 Jun 2026 14:35:42 -0700
-Message-ID: <20260609213559.178657-2-anthony.l.nguyen@intel.com>
+Cc: Natalia Wochtman <anthony.l.nguyen@intel.com>,
+	richardcochran@gmail.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net-next 02/15] ice: remove redundant checks from PTP init
+Date: Tue,  9 Jun 2026 14:35:43 -0700
+Message-ID: <20260609213559.178657-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260609213559.178657-1-anthony.l.nguyen@intel.com>
 References: <20260609213559.178657-1-anthony.l.nguyen@intel.com>
@@ -99,79 +95,85 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297296-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[intel.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:marco.crivellari@suse.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:mhocko@suse.com,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:tj@kernel.org,m:bigeasy@linutronix.de,m:Samuel.salin@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[suse.com,intel.com,gmail.com,kernel.org,linutronix.de];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:richardcochran@gmail.com,m:przemyslaw.kitszel@intel.com,m:aleksandr.loktionov@intel.com,m:sx.rinitha@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297299-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 846976644C6
+X-Rspamd-Queue-Id: A9F826644A4
 
-From: Marco Crivellari <marco.crivellari@suse.com>
+From: Natalia Wochtman <natalia.wochtman@intel.com>
 
-This patch continues the effort to refactor workqueue APIs, which has begun
-with the changes introducing new workqueues and a new alloc_workqueue flag:
+Remove unnecessary condition checks in ice_ptp_setup_adapter() and
+ice_ptp_init(). They are duplicated in ice_pf_src_tmr_owned().
 
-   commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
-   commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
+Change ice_ptp_setup_adapter() to return void.
 
-The point of the refactoring is to eventually alter the default behavior of
-workqueues to become unbound by default so that their workload placement is
-optimized by the scheduler.
-
-Before that to happen, workqueue users must be converted to the better named
-new workqueues with no intended behaviour changes:
-
-   system_wq -> system_percpu_wq
-   system_unbound_wq -> system_dfl_wq
-
-This way the old obsolete workqueues (system_wq, system_unbound_wq) can be
-removed in the future.
-
-Link: https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Natalia Wochtman <natalia.wochtman@intel.com>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index f6b3b15364ff..7f9056404f64 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2022,7 +2022,7 @@ static void idpf_tx_read_tstamp(struct idpf_tx_queue *txq, struct sk_buff *skb)
- 		/* Fetch timestamp from completion descriptor through
- 		 * virtchnl msg to report to stack.
- 		 */
--		queue_work(system_unbound_wq, txq->tstamp_task);
-+		queue_work(system_dfl_wq, txq->tstamp_task);
- 		break;
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 36df742c326c..cca004265662 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -3059,14 +3059,9 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 	dev_err(ice_pf_to_dev(pf), "PTP reset failed %d\n", err);
+ }
  
+-static int ice_ptp_setup_adapter(struct ice_pf *pf)
++static void ice_ptp_setup_adapter(struct ice_pf *pf)
+ {
+-	if (!ice_pf_src_tmr_owned(pf) || !ice_is_primary(&pf->hw))
+-		return -EPERM;
+-
+ 	pf->adapter->ctrl_pf = pf;
+-
+-	return 0;
+ }
+ 
+ static int ice_ptp_setup_pf(struct ice_pf *pf)
+@@ -3309,10 +3304,9 @@ void ice_ptp_init(struct ice_pf *pf)
+ 	/* If this function owns the clock hardware, it must allocate and
+ 	 * configure the PTP clock device to represent it.
+ 	 */
+-	if (ice_pf_src_tmr_owned(pf) && ice_is_primary(hw)) {
+-		err = ice_ptp_setup_adapter(pf);
+-		if (err)
+-			goto err_exit;
++	if (ice_pf_src_tmr_owned(pf)) {
++		ice_ptp_setup_adapter(pf);
++
+ 		err = ice_ptp_init_owner(pf);
+ 		if (err)
+ 			goto err_exit;
 -- 
 2.47.1
 
