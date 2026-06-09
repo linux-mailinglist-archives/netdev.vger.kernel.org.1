@@ -1,160 +1,196 @@
-Return-Path: <netdev+bounces-297026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297027-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IKFvAAj7J2pa6gIAu9opvQ
-	(envelope-from <netdev+bounces-297026-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:37:44 +0200
+	id FZ3XFY3/J2rO6wIAu9opvQ
+	(envelope-from <netdev+bounces-297027-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:57:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 465FC65F8C1
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:37:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7926B65FBD0
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:57:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=NncCrnBT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297026-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297026-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.de;
+	dkim=pass header.d=netfilter.org header.s=2025 header.b=PD4tQSfC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297027-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297027-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 423533046FDF
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:33:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 162D530260A3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9535B3EFD32;
-	Tue,  9 Jun 2026 11:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8103F5BD9;
+	Tue,  9 Jun 2026 11:48:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8620C3A961B;
-	Tue,  9 Jun 2026 11:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE6B3BBFAC;
+	Tue,  9 Jun 2026 11:48:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781004837; cv=none; b=FaINuqJayAHv8x6wsflu3x9+a1F+NlaYa8acFecq4kcsytRFo322kRoS5Aq2CPr7f2CAhb5NQCG5lAOAfv0SeMCY1pjzaY6aX9OMXJZFIkdlj+ZadbfC0uuEJ13Pd3AW3HBE2JQAjhPe/BNQvmZAf80OqBsd4nYeBJ2MWkBUgV4=
+	t=1781005726; cv=none; b=J/T2xwvVz7DSQTZkx4mHXQrVISInoFTCnFIsS7YlAGcfKqGQPrbMOtaDqZ3uJJmtZeEv1+ZtyEQkZ4d4AnwGOC7zQ5GZfTjfL4x4ehSZ9dMivvRtINnLQdnsOnIOaq8+D90XG9yrXqnJU8Wiftv53zcaoSuYMEHUsN8sG8BqXD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781004837; c=relaxed/simple;
-	bh=cwytvaQUMxEx0pLof7ZQcdFc4hVZEP24cGqRX/fWv8M=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=CzSsLD9EviJPxB/CDY1+zlm6cmNv5VcYgwL759hw7WLq9O4S8QLOLSGt+vgxLPBxNdC2kbcXQIpJ7mPHTKBuJlg9nNI3LBV1yFBoqGtDy3TXEYWE/Qn3hBsgGvKQgyOgTw3W0wR4Q+o8xTxbpEg8cWxOF/Fj6Kj93NbOTO+1FKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=NncCrnBT; arc=none smtp.client-ip=44.246.77.92
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1781004836; x=1812540836;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=cwytvaQUMxEx0pLof7ZQcdFc4hVZEP24cGqRX/fWv8M=;
-  b=NncCrnBTYGpP9tAokN8+R7DA8paC2Jd/Na6aaxK/k6SwEIk+WsWFaSKJ
-   ehlOBA4Wi3+4cq/DmBr3XGQ/kMDG1QBXQsrsMD3e01HvX6l7jmDn4n1WZ
-   zd2m0ZglAVHmOgK8RWQSfmbtIeMEGZ5TmNXkFvxQKhxBVkeW+urBureBz
-   sv3l3LYyvgnWs1OwLjnDDEeesTjsoGYlY3sP+0d/Q9Rf/aLzaF6hUXmSI
-   7gUYf7AJyRHhOrHjtOOXMYw1ynR7p4nCUPGF2LaPYtFWpn7B9FDWEMm/J
-   8uukoiI5X9O9Wb1FTesDefiOngUtHacI5C+7u6ZucOMO3fb3GA7B5hOPv
-   Q==;
-X-CSE-ConnectionGUID: 7b/UbARdTTi6u5dr4hAXOg==
-X-CSE-MsgGUID: r18lWL52TtGQTHXQPrtKTw==
-X-IronPort-AV: E=Sophos;i="6.24,196,1774310400"; 
-   d="scan'208";a="21386408"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 11:33:53 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.53:27987]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.226:2525] with esmtp (Farcaster)
- id 8c1fb2b0-9479-4c6f-9568-8df99759ceda; Tue, 9 Jun 2026 11:33:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 8c1fb2b0-9479-4c6f-9568-8df99759ceda
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Tue, 9 Jun 2026 11:33:53 +0000
-Received: from dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com
- (172.19.78.185) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Tue, 9 Jun 2026
- 11:33:50 +0000
-From: Simon Liebold <simonlie@amazon.de>
-To: Sasha Levin <sashal@kernel.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, Simon Liebold <lieboldsimonpaul@gmail.com>
-CC: Sasha Levin <sashal@kernel.org>, Qi Tang <tpluszz77@gmail.com>, "Florian
- Westphal" <fw@strlen.de>
-Subject: Re: [PATCH 6.6.y] xfrm: hold dev ref until after transport_finish
- NF_HOOK
-In-Reply-To: <20260608-stable-reply-0012@kernel.org>
-References: <20260608082454.2786663-1-simonlie@amazon.de>
- <20260608-stable-reply-0012@kernel.org>
-Date: Tue, 9 Jun 2026 11:33:49 +0000
-Message-ID: <h6dsx7bo8dk2q.fsf@dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com>
+	s=arc-20240116; t=1781005726; c=relaxed/simple;
+	bh=ldWhcXnwh+A+XWhyxIjx0R8yNZMMzv9lZ1aS0VvRq4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bb+TzaZ2f0ipVG+Uran1H8RYkMTtR7b+Z4dZaHAwVrm3nSl14ZJ/eEzC/ednRu7JxhBTNkQGqo1ImhI6Zhk0FdBC5Pzd6AaDnjbE+n0N5FdP/upEUh81K6jMBOOcMsvEYiKF+cUhFmliRe1U23cyBU9fSwJoXkEOn4fu/JDFPa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=PD4tQSfC; arc=none smtp.client-ip=217.70.190.124
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5129460177;
+	Tue,  9 Jun 2026 13:48:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1781005715;
+	bh=QRqBRPh48kXFvPRrxaw0XzUQjHrYbLrSEoU1hs+N5ac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PD4tQSfCPqZRtYVfXg86OYvV02f0pmDA7e8RTlCABmmIzH7cybzmqVORO0liEoDDM
+	 b8i2fX5dpPlVe9l9BHlD6D4VeFZEb22FF0K434zpyVD0ilc+wGGlCsjmJvFv1MhB7p
+	 MQcNbIzhYxNtsKs1pWcXTIS7Zhy5Co2AR6iHNZAQZWHXEbiUd4wjzF90kUXXi65wGf
+	 9fh1ohBhqzXC0kVTv7fUcXbUYCgEvaAfKMKQFeAwandq2juX74Fhf0pL3ZCYiEclyv
+	 HUpP7pxpiCyVAe5Wgl7wjVZcLwv2YFQ7RrLS0g9docV8sAcSMyg9C1SxOz86w0DGNo
+	 oXPQuFSaxj5wA==
+Date: Tue, 9 Jun 2026 13:48:32 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: flowtable: use pskb_may_pull() in
+ nf_flow_ip6_tunnel_proto()
+Message-ID: <aif9kL38LKNcX1Xu@chamomile>
+References: <20260608-b4-nf_flow_ip6_tunnel_proto-update-v1-1-782c7052c8fd@kernel.org>
+ <aidMPKrm9gOcPLW-@chamomile>
+ <aifquGhK_Cijxq7m@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aifquGhK_Cijxq7m@lore-desk>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297026-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:sashal@kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,strlen.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[netfilter.org];
+	FORGED_SENDER(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[kernel.org,secunet.com,gondor.apana.org.au,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-297027-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amazon.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amazon.de:dkim,amazon.de:from_mime,dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com:mid];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,chamomile:mid,netfilter.org:dkim,netfilter.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 465FC65F8C1
+X-Rspamd-Queue-Id: 7926B65FBD0
 
-Sasha Levin <sashal@kernel.org> writes:
+On Tue, Jun 09, 2026 at 12:28:08PM +0200, Lorenzo Bianconi wrote:
+> On Jun 09, Pablo Neira Ayuso wrote:
+> > Hi Lorenzo,
+> > 
+> > On Mon, Jun 08, 2026 at 07:06:52PM +0200, Lorenzo Bianconi wrote:
+> > > Switch nf_flow_ip6_tunnel_proto() from skb_header_pointer() to
+> > > pskb_may_pull() for header validation, aligning it with the approach
+> > > used in nf_flow_ip4_tunnel_proto().
+> > > Move ctx->offset update inside the IPPROTO_IPV6 conditional block since
+> > > it should only be adjusted when a tunnel is actually detected.
+> > > While at it, use nexthdr instead of the hardcoded IPPROTO_IPV6 constant
+> > > when setting ctx->tun.proto.
+> > > 
+> > > Fixes: d98103575dcdd ("netfilter: flowtable: Add IP6IP6 rx sw acceleration")
+> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > ---
+> > >  net/netfilter/nf_flow_table_ip.c | 10 +++++-----
+> > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> > > index 9c05a50d6013..2946399ab715 100644
+> > > --- a/net/netfilter/nf_flow_table_ip.c
+> > > +++ b/net/netfilter/nf_flow_table_ip.c
+> > > @@ -347,15 +347,15 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_flowtable_ctx *ctx,
+> > >  				     struct sk_buff *skb)
+> > >  {
+> > >  #if IS_ENABLED(CONFIG_IPV6)
+> > > -	struct ipv6hdr *ip6h, _ip6h;
+> > > +	struct ipv6hdr *ip6h;
+> > >  	__be16 frag_off;
+> > >  	u8 nexthdr;
+> > >  	int hdrlen;
+> > >  
+> > > -	ip6h = skb_header_pointer(skb, ctx->offset, sizeof(*ip6h), &_ip6h);
+> > > -	if (!ip6h)
+> > > +	if (!pskb_may_pull(skb, sizeof(*ip6h) + ctx->offset))
+> > >  		return false;
+> > >  
+> > > +	ip6h = (struct ipv6hdr *)(skb_network_header(skb) + ctx->offset);
+> > >  	if (ip6h->hop_limit <= 1)
+> > >  		return false;
+> > 
+> > Not shown in the patch, but is there still a corner case here that
+> > needs to be covered?
+> > 
+> > ipv6_skip_exthdr() uses skb_header_pointer() internal, then another
+> > pskb_may_pull() is needed to make sure no other IPv6 extension header
+> > sits between the outer and the inner IPPROTO_IPV6 header, allowing to
+> > be in a non-linear area of the skb?        
+> > 
+> > > @@ -367,9 +367,9 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_flowtable_ctx *ctx,
+> > >  
+> > 
+> > I mean:
+> > 
+> >         if (!pskb_may_pull(skb, hdrlen))
+> >                 return false;
+> > 
+> > where hdrlen is what ipv6_skip_exthdr() returns.
+> > 
+> > Then, I think it should be safe to call skb_pull() on
+> > ctx->tun.hdr_size.
+> > 
+> > Let me know, thanks.
+> 
+> I think you are right, here we need to run:
+> 
+> 	if (!pskb_may_pull(skb, hdrlen))
+> 		return false;
+> 
+> in order to be sure we can pull ctx->tun.hdr_size in nf_flow_ip_tunnel_pop().
+> Doing so, we can roll-back to the original skb_header_pointer() to access the
+> outer ip6 header here. What do you think?
 
->> [PATCH 6.6.y] xfrm: hold dev ref until after transport_finish NF_HOOK
-> I'm holding all four of these (6.6, 6.1, 5.15 and 5.10) for now.
+Yes, initial skb_header_pointer() then pskb_may_pull(skb, hdrlen) to
+ensure the entire should be fine.
 
-You probably need to hold the backport I sent for 6.12 too:
-https://lore.kernel.org/all/20260605141254.1177152-1-simonlie@amazon.de/
+I think this need one more fix: This needs to resort to classic path
+if there are intermediate extension headers sitting in between the
+outer and inner headers in IP6IP6, ie. ipv6_ext_hdr() == true. Those
+extensions need to be handled by the IPv6 stack.
 
-> As adapted, the backport leaks a netdev reference on the nested transport-mode
-> path where both an async and a sync decapsulation happen: the inner dev_hold is
-> balanced by a dev_put that the older trees don't have, so the saved reference
-> is never released. Mainline avoids this because it has b05d42eefac7 ("xfrm:
-> hold device only for the asynchronous decryption") as a prerequisite.
+nf_flow_ip6_tunnel_proto() needs to be fixed to deal with this. 
+And I suspect nf_flow_ip4_tunnel_proto() with IP options have the same
+problem, the flowtable need to resort to the classic stack path.
 
-Sorry I missed this and thanks for catching. I'll send v2 for this.
-
-- Simon
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+Thanks.
 
