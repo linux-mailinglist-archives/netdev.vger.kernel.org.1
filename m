@@ -1,358 +1,260 @@
-Return-Path: <netdev+bounces-297080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MB44IO4jKGqp+gIAu9opvQ
-	(envelope-from <netdev+bounces-297080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:32:14 +0200
+	id uEMdHEshKGrA+QIAu9opvQ
+	(envelope-from <netdev+bounces-297070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:20:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A3C66110B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:32:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51BD660F06
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:20:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
+	dkim=pass header.d=mojatatu.com header.s=google header.b=e95Aen3O;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297070-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297070-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297080-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297080-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 961B930697FD
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:27:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6227D30548AF
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B645534041D;
-	Tue,  9 Jun 2026 14:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206FC3264DE;
+	Tue,  9 Jun 2026 14:14:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B352434D3B5;
-	Tue,  9 Jun 2026 14:27:16 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781015238; cv=none; b=JVyz4dI3tb+TOFyFlYHuVntsPAaqx/QSKm+soKrSc9lPgtnfiVqSUdKFOmXBgxlqm5B20IWk0XRqrtzBqEqHHcLbhZyjOVZmSjo9FRAzAR774xLBO+EjRfbLG/NQREK1gJliBHoab1Jz4sCnkk4IhT5OU37sapxCFr6viAIhbn0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781015238; c=relaxed/simple;
-	bh=nB6yR+5lHkcKXtcSPQmcAn47ObOmCovFrFplIEFItSw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OEdAVKjwEd9qtAqWmLoOyGzZJzqxenerF5zhhu2ijVk7IVPeXhFBwCMUK3zN+LQLtZIkm3Hu+TtY0l4S+syceub+nAlSUy8DN0FA5tWn+wtT/7VfPGE5dVoNbhE32AAqCj3U7x4TVdD7rxr6WOphQtYHsm8hWZCB2D12x1ahN0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91A421F00893;
-	Tue,  9 Jun 2026 14:27:12 +0000 (UTC)
-From: Greg Ungerer <gerg@linux-m68k.org>
-To: linux-m68k@lists.linux-m68k.org
-Cc: linux-kernel@vger.kernel.org,
-	arnd@kernel.org,
-	wei.fang@nxp.com,
-	frank.li@nxp.com,
-	shenwei.wang@nxp.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	nico@fluxnic.net,
-	adureghello@baylibre.com,
-	ulfh@kernel.org,
-	linux-mmc@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	olteanv@gmail.com,
-	Greg Ungerer <gerg@linux-m68k.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCHv2 4/4] m68k: coldfire: fix non-standard readX()/writeX() functions
-Date: Wed, 10 Jun 2026 00:13:01 +1000
-Message-ID: <20260609142139.1563360-6-gerg@linux-m68k.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260609142139.1563360-1-gerg@linux-m68k.org>
-References: <20260609142139.1563360-1-gerg@linux-m68k.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F39132A3DA
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 14:14:35 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781014477; cv=pass; b=dvPdx5Vx+2hwWWF3rzLzJBBTc3mpB3i2bdu5OJc9DHwJtQy0x/AOx3dZ7g9B9AEiodD8LBOINVaQh0ceJt0MAHbGJJPiJ2Bq9Pes1NResJ5dW0jgbgBKo0H3s8BGOHM8WdXavFNG6neVAtK3Up+JY2Miqke1E94lpzgheQbU9nY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781014477; c=relaxed/simple;
+	bh=WDuQ5aMcXXGMGWSgimjtG7u3272kvY4m8NMdW0ESSMg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IWmOjY/A6ynQyj2mSC6KdippKjFJ24dM7t07lJVdhp4PEQfb+Zr26iN7hwzEZqF5aWS+joLkrdXjFrSeC6GDtJTUnWOt+uI69FI+X3ulbdcXvKqG7pcXdhXx9TmG/VysMFz24S91mLWqrxhvuGC8yFq/k/xKkOD15/FgwGC9ndA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=e95Aen3O; arc=pass smtp.client-ip=209.85.128.173
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7e1916922b9so61750227b3.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 07:14:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781014474; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kmucaXeZ4rD8sHUsuUJ3CuBG5C6hTrwFHI7KrvapCvRXgHhpIo3faXdiBcjv/B0q4D
+         9BxxgJqcLSf+QgvMRjCi0o/T5ucrSW4y5Hgr7EIsccVnRoHoIkHE7DFNRu0Tc5dU+v5z
+         npLT8G4QRzOGu2sixs0I7q0KvGL2EMY3/YtMF1nGjxnJxLzibToL5o3bVjIoILArff29
+         PjvSegVBVAQFkjKD24A2oaSYT3fU9+HOzCs5ht+lDROjmqFV/gt6q8Z437Am31p4sEA3
+         qL6N52r7hVmu5U8wfXbsXeNgVq+8UMbSQQNGkRdl23eraeAndcuqlfZqAeNtG1txvLbG
+         OdoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LOl8Qoe1dz/fZX2fWuUlrIc82O13Oquj25wgqoFE3Kk=;
+        fh=bvaUPO7vaQn4wnxrs/Qsp2GXur6IiSbD+nQk7t0eZSY=;
+        b=hXpLu18r3gV2x/fzs8EMoKSVjZ0FjUZNbelKV74FnhCHvCVLYR4NeLGh5NKcA4QEkn
+         VspNFqsZ0PUXdeRt0pomNeAekDzI0RZ5lt4RzSplUH1lXflG6YblyJqrCuTDRScEnn4S
+         trzQp6gQCGN25v+mHmOgQgmCg9lLMMYrN/aVFv8aLyXwIMtxXab4MifDBV8Y7sO72AUy
+         3mpqmt53Cu+5qyhEtLc5wCjU9RytU+7+96HErAACPgvznpywbTpSI2osdYLSgF2M4iMC
+         yUj7IZcCTxtvFacE0MLcy7kGNU19jwDY1dslq/YjteZ16qsEhe9gXQkAkFb8MuOiXkW3
+         tc5Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1781014474; x=1781619274; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LOl8Qoe1dz/fZX2fWuUlrIc82O13Oquj25wgqoFE3Kk=;
+        b=e95Aen3O5dHbSQTKL9NqiyKZgl2ItLu8ohfqTaitGE+AXJt06zbBYhfvneCmXbvenv
+         I2/bSLwLuaOp4rZRY4RDyk1HKXStpr2eXmZF/UDr83kIDFaQTHUNNKWMZ+7AwNj9Qph0
+         0igV/rNHo86KuMeiXzSHrzA91DNi8JMSfrjII=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781014474; x=1781619274;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LOl8Qoe1dz/fZX2fWuUlrIc82O13Oquj25wgqoFE3Kk=;
+        b=owngEUsiq+U+UVqVLsGXVzpvsyJsFjsAaii9q703E0sD4o4GB0h0tMebdRM6K0zLUt
+         0MSZEj1T6iO7w1cK3IG/YsdNt9lGW7NDEmF+/TcvTRFW0C61wuE2sioCnx1In4zQ+/Bw
+         OIqV5Rnx2ayBqoPDxdTC9IiyHrmPeYEyoreP445h8MxriqoMtZcp5p2szCY7t5Jd4Mfv
+         lEh9ZeVdosaxuqLysFX26MImfyWS681JCFeIfd+ftCsFZ0jPIa+dGebnYb/OpYj3ZmJ7
+         Te7HZEHjg7ojgVa11/mLhew6NFK9Rvbqi8VX3G4bIazHmZnGKxfXdsO54Z8Bf6YtRuz7
+         kG+A==
+X-Forwarded-Encrypted: i=1; AFNElJ+yX5ubIpvpmfeF8USTOW1S8BqMznud5s2JUVUqtAyknEMCKMxio7N9Q51vGwc3O52/pZ90XTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr5WaZGGhfYMGGlmJGvamGsftr49r/UQIKhxwb5I6jVSdywYGZ
+	UuzuyXH9KpPQVTuRgkaKeVD0olGRZla5qhFEHjzXFFxpfg6U0sTXFKOmpZ0ZFB28S+vaw1RHXT4
+	nAmYPcuiUZjPoTBebUGXovESTv65nE4HZBaELdJMJ
+X-Gm-Gg: Acq92OE03dfcU7qEXte+7Bymajst8dKxSfpDmaoTaQ9YUhi2ZLlvvHdbZr7NvGvDCoI
+	PHjlWditvw+6cFWkJzrUtZpVYJcRVg+cHAIpEX59B1qJNAgF1ArBIcEv85i08oLmv6guWryritd
+	lASl2+MB+q2gkS1KJvN31itslf8vFYEayZdXoZcX2iDrrC+8e004MJADQZ1QD4EkS9ubgt7EBff
+	MJglamwAYXKA5wuuNyrogCga7I2+CYajOSmKDY9zBw+BUq41XlxbguOINQ4ee6vgue2QrAq47lu
+	i9YnYCdFAwymVwLzrDfTweSMZbXakp7BRyRm6O28nG78dwtiOfSPOZi3Efs=
+X-Received: by 2002:a05:690c:350a:b0:7b2:bf20:cdc3 with SMTP id
+ 00721157ae682-7ed0935434emr198858037b3.0.1781014474327; Tue, 09 Jun 2026
+ 07:14:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260605194640.2645386-1-sam.moelius@trailofbits.com>
+ <CAM0EoMmeftLxWNdQqWsJonxEtMoCCuJdeTEjNzQfc2GYUX+mtw@mail.gmail.com>
+ <CAE+C+DZTme=GQBy9BaXCiPe0pO7Pv7XNM69iru0VTGFX_ybBKg@mail.gmail.com>
+ <CAM0EoMmPb0jZGWeadX4KqsyQTx4Oo2gLg-3h+u=Ec=9rqzzjdQ@mail.gmail.com>
+ <CA+NMeC_3bzJzn_NjztcnM=C1M0Xrf7Xo26DiQNRy_o_iZPAnMg@mail.gmail.com> <CAE+C+Dact=a0_rAm61A=m9b=LJoV9Nkny5ozOxL_UAiK_pdy2Q@mail.gmail.com>
+In-Reply-To: <CAE+C+Dact=a0_rAm61A=m9b=LJoV9Nkny5ozOxL_UAiK_pdy2Q@mail.gmail.com>
+From: Victor Nogueira <victor@mojatatu.com>
+Date: Tue, 9 Jun 2026 11:14:23 -0300
+X-Gm-Features: AVVi8CfRUgo2g50UBvWG401fxh8GRky118G54qn7McPaksyOTW60evJJ1RTollU
+Message-ID: <CA+NMeC_ZXhUEwrKirP3TiamZB9CoTTPfomOPoxv3AaVNJR5BxQ@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: act_pedit: require matching IPv4 L4 protocol
+To: Samuel Moelius <sam.moelius@trailofbits.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"open list:TC subsystem" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297080-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FORGED_RECIPIENTS(0.00)[m:linux-m68k@lists.linux-m68k.org,m:linux-kernel@vger.kernel.org,m:arnd@kernel.org,m:wei.fang@nxp.com,m:frank.li@nxp.com,m:shenwei.wang@nxp.com,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:nico@fluxnic.net,m:adureghello@baylibre.com,m:ulfh@kernel.org,m:linux-mmc@vger.kernel.org,m:linux-can@vger.kernel.org,m:linux-spi@vger.kernel.org,m:olteanv@gmail.com,m:gerg@linux-m68k.org,m:mkl@pengutronix.de,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[gerg@linux-m68k.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,nxp.com,lists.linux.dev,fluxnic.net,baylibre.com,gmail.com,linux-m68k.org,pengutronix.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gerg@linux-m68k.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297070-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[victor@mojatatu.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,pengutronix.de:email,linux-m68k.org:email,linux-m68k.org:mid,linux-m68k.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mojatatu.com:dkim,mojatatu.com:email,mojatatu.com:from_mime,trailofbits.com:email,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 46A3C66110B
+X-Rspamd-Queue-Id: D51BD660F06
 
-Remove the local ColdFire definitions of readb()/readw()/readl() and
-writeb()/writew()/writel() and use the asm-generic versions of them.
+On Tue, Jun 9, 2026 at 10:57=E2=80=AFAM Samuel Moelius
+<sam.moelius@trailofbits.com> wrote:
+>
+> On Mon, Jun 8, 2026 at 10:41=E2=80=AFAM Victor Nogueira <victor@mojatatu.=
+com> wrote:
+> >
+> > On Mon, Jun 8, 2026 at 7:46=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> > >
+> > > On Sun, Jun 7, 2026 at 10:33=E2=80=AFAM Samuel Moelius
+> > > <sam.moelius@trailofbits.com> wrote:
+> > > >
+> > > > On Sat, Jun 6, 2026 at 5:29=E2=80=AFPM Jamal Hadi Salim <jhs@mojata=
+tu.com> wrote:
+> > > > >
+> > > > > On Fri, Jun 5, 2026 at 3:46=E2=80=AFPM Samuel Moelius
+> > > > > <sam.moelius@trailofbits.com> wrote:
+> > > > > >
+> > > > > > The extended IPv4 L4 header mode in act_pedit can select TCP or=
+ UDP
+> > > > > > header fields without confirming that the IPv4 protocol field m=
+atches
+> > > > > > the selected transport header.
+> > > > > >
+> > > > > > That lets a rule written for TCP or UDP modify unrelated payloa=
+d bytes
+> > > > > > in a packet carrying a different protocol.
+> > > > > >
+> > > > > > Verify the IPv4 protocol before applying TCP or UDP extended he=
+ader
+> > > > > > edits.
+> > > > > >
+> > > > > > Assisted-by: Codex:gpt-5.5-cyber-preview
+> > > > > > Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
+> > > > > > ---
+> > > > > >  net/sched/act_pedit.c | 2 ++
+> > > > > >  1 file changed, 2 insertions(+)
+> > > > > >
+> > > > > > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> > > > > > index bc20f08a2789..9a4590451f7e 100644
+> > > > > > --- a/net/sched/act_pedit.c
+> > > > > > +++ b/net/sched/act_pedit.c
+> > > > > > @@ -341,6 +341,8 @@ static int pedit_l4_skb_offset(struct sk_bu=
+ff *skb, int *hoffset, const int head
+> > > > > >
+> > > > > >                 if (!iph)
+> > > > > >                         goto out;
+> > > > > > +               if (iph->ihl < 5 || iph->protocol !=3D header_t=
+ype)
+> > > > > > +                       goto out;
+> > > > >
+> > > > > From inspection the fix looks reasonable.
+> > > > > At first glance it seems that the only fix that resolves the issu=
+e you
+> > > > > are describing is to check the protocol header.
+> > > > > header length seems to be an extra thing. But let's do what the v=
+6
+> > > > > side seems to and skip frags as well? Something maybe along the l=
+ines
+> > > > > of:
+> > > > >
+> > > > > if (iph->ihl < 5 || iph->protocol !=3D header_type || (iph->frag_=
+off &
+> > > > > htons(IP_OFFSET)))
+> > > > >         goto out;
+> > > >
+> > > > I will submit an updated patch.
+> > > >
+> > > > > Are you able to describe how someone would configure a tc rule th=
+at
+> > > > > will allow this to happen?
+> > > > > IOW, how did you verify the problem and then validate that your f=
+ix works?
+> > > >
+> > > > The bug was validated using a custom init script in QEMU. The speci=
+fic
+> > > > line used was:
+> > > >
+> > > > /usr/sbin/tc filter add dev veth0 egress protocol ip pref 1 matchal=
+l
+> > > > action pedit ex munge udp dport set 18053
+> > > >
+> > > > An IPv4 TCP packet with destination port 2222 was sent through that
+> > > > path. With the unpatched kernel, the packet was received with TCP
+> > > > destination port 18053. With the patched kernel, the same packet wa=
+s
+> > > > received unchanged.
+> > > >
+> > > > I can provide more details or artifacts if you would like.
+> > >
+> > > A tdc test case is better. Victor or I can create one for you if you
+> > > dont know how.
+> >
+> > It seems like v2 isn't applying so you'll have to send a new version.
+> > When you do, after waiting for the 24h period, can you resend with
+> > the attached patch (containing the tdc test)? Since this is a
+> > fix, in the new version, remember to target net and add a proper fixes
+> > tag.
+>
+> I'm sorry, I'm not quite following.
+>
+> I should send a multipart patch with the patch you shared as one of the p=
+arts?
 
-The implementation of the readX()/writeX() family of IO access functions
-is non-standard on ColdFire platforms. They either return big-endian (that
-is native endian) data, or on platforms with PCI bus support check the
-supplied address and return either big or little endian data based on that
-check. This is non-standard, they are expected to always return
-little-endian byte ordered data. Unfortunately this behavior also means
-that ioreadX()/iowroteX() and their big-endian counter parts
-ioreadXbe()/iowriteXbe() are currently broken because they are implemented
-using the readX()/writeX() functions.
+Yes, please send a patchset with patch 1 being your fix and patch 2 the tdc
+test.
 
-The change to use the asm-generic versions of readX()/writeX() itself is
-quite strait forward, just remove the ColdFire local versions of them.  But
-this of course has implications for any remaining drivers that use any of
-these IO access functions. A number of drivers can be independently fixed,
-before this final fix to readX()/writeX() for ColdFire. A small number of
-drivers cannot easily be independently fixed and remain in a working
-state. Those drivers are fixed here as well:
-
-drivers/dma/mcf-edma-main.c
-  Supports big-endian access by setting the big-endian flag of
-  the drivers struct fsl_edma_engine. But locally should be using
-  ioread32be() and iowrite32be() instead of ioread32() and iowrite32().
-
-drivers/net/can/flexcan/flexcan-core.c
-  Setting the driver quirks flag for big-endian access will force
-  driver to use correct access functions.
-
-drivers/spi/spi-fsl-dspi.c
-  Setting the regmap format_endian flags to use native endian will
-  force driver to use appropriate big or little endian access on
-  whatever platform it is built for.
-
-These drivers have only been compile tested.
-
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for drivers/net/can/flexcan
-Signed-off-by: Greg Ungerer <gerg@linux-m68k.org>
----
-v2: changed from RFC to PATCH
-    use separate regmap config for mcf5441x (spi-fsl-dspi.c)
-    reorder quirks for mcf5441x (flexcan-core.c)
-
- arch/m68k/include/asm/io_no.h          | 68 +++-----------------------
- drivers/dma/mcf-edma-main.c            | 14 +++---
- drivers/net/can/flexcan/flexcan-core.c |  1 +
- drivers/spi/spi-fsl-dspi.c             | 14 +++++-
- 4 files changed, 27 insertions(+), 70 deletions(-)
-
-diff --git a/arch/m68k/include/asm/io_no.h b/arch/m68k/include/asm/io_no.h
-index 4f0f34b06e37..2f12f4ed0da5 100644
---- a/arch/m68k/include/asm/io_no.h
-+++ b/arch/m68k/include/asm/io_no.h
-@@ -3,15 +3,10 @@
- #define _M68KNOMMU_IO_H
- 
- /*
-- * Convert a physical memory address into a IO memory address.
-- * For us this is trivially a type cast.
-- */
--#define iomem(a)	((void __iomem *) (a))
--
--/*
-- * The non-MMU m68k and ColdFire IO and memory mapped hardware access
-- * functions have always worked in CPU native endian. We need to define
-- * that behavior here first before we include asm-generic/io.h.
-+ * Historically the raw native endian IO access macros for non-MMU m68k and
-+ * ColdFire have accepted any integral value as the address argument.
-+ * The asm-generic versions of these expect "void __iomem *" for the address,
-+ * so define local permissive versions here.
-  */
- #define __raw_readb(addr) \
-     ({ u8 __v = (*(__force volatile u8 *) (addr)); __v; })
-@@ -45,66 +40,15 @@
-  * applies just the same of there is no MMU but something like a PCI bus
-  * is present.
-  */
--static int __cf_internalio(unsigned long addr)
-+static inline int __cf_internalio(unsigned long addr)
- {
- 	return (addr >= IOMEMBASE) && (addr <= IOMEMBASE + IOMEMSIZE - 1);
- }
- 
--static int cf_internalio(const volatile void __iomem *addr)
-+static inline int cf_internalio(const volatile void __iomem *addr)
- {
- 	return __cf_internalio((unsigned long) addr);
- }
--
--/*
-- * We need to treat built-in peripherals and bus based address ranges
-- * differently. Local built-in peripherals (and the ColdFire SoC parts
-- * have quite a lot of them) are always native endian - which is big
-- * endian on m68k/ColdFire. Bus based address ranges, like the PCI bus,
-- * are accessed little endian - so we need to byte swap those.
-- */
--#define readw readw
--static inline u16 readw(const volatile void __iomem *addr)
--{
--	if (cf_internalio(addr))
--		return __raw_readw(addr);
--	return swab16(__raw_readw(addr));
--}
--
--#define readl readl
--static inline u32 readl(const volatile void __iomem *addr)
--{
--	if (cf_internalio(addr))
--		return __raw_readl(addr);
--	return swab32(__raw_readl(addr));
--}
--
--#define writew writew
--static inline void writew(u16 value, volatile void __iomem *addr)
--{
--	if (cf_internalio(addr))
--		__raw_writew(value, addr);
--	else
--		__raw_writew(swab16(value), addr);
--}
--
--#define writel writel
--static inline void writel(u32 value, volatile void __iomem *addr)
--{
--	if (cf_internalio(addr))
--		__raw_writel(value, addr);
--	else
--		__raw_writel(swab32(value), addr);
--}
--
--#else
--
--#define readb __raw_readb
--#define readw __raw_readw
--#define readl __raw_readl
--#define writeb __raw_writeb
--#define writew __raw_writew
--#define writel __raw_writel
--
- #endif /* IOMEMBASE */
- 
- #if defined(CONFIG_COLDFIRE)
-diff --git a/drivers/dma/mcf-edma-main.c b/drivers/dma/mcf-edma-main.c
-index 9e1c6400c77b..4ed0ce644e37 100644
---- a/drivers/dma/mcf-edma-main.c
-+++ b/drivers/dma/mcf-edma-main.c
-@@ -21,9 +21,9 @@ static irqreturn_t mcf_edma_tx_handler(int irq, void *dev_id)
- 	unsigned int ch;
- 	u64 intmap;
- 
--	intmap = ioread32(regs->inth);
-+	intmap = ioread32be(regs->inth);
- 	intmap <<= 32;
--	intmap |= ioread32(regs->intl);
-+	intmap |= ioread32be(regs->intl);
- 	if (!intmap)
- 		return IRQ_NONE;
- 
-@@ -43,7 +43,7 @@ static irqreturn_t mcf_edma_err_handler(int irq, void *dev_id)
- 	struct edma_regs *regs = &mcf_edma->regs;
- 	unsigned int err, ch;
- 
--	err = ioread32(regs->errl);
-+	err = ioread32be(regs->errl);
- 	if (!err)
- 		return IRQ_NONE;
- 
-@@ -55,7 +55,7 @@ static irqreturn_t mcf_edma_err_handler(int irq, void *dev_id)
- 		}
- 	}
- 
--	err = ioread32(regs->errh);
-+	err = ioread32be(regs->errh);
- 	if (!err)
- 		return IRQ_NONE;
- 
-@@ -203,8 +203,8 @@ static int mcf_edma_probe(struct platform_device *pdev)
- 		edma_write_tcdreg(mcf_chan, cpu_to_le32(0), csr);
- 	}
- 
--	iowrite32(~0, regs->inth);
--	iowrite32(~0, regs->intl);
-+	iowrite32be(~0, regs->inth);
-+	iowrite32be(~0, regs->intl);
- 
- 	ret = mcf_edma->drvdata->setup_irq(pdev, mcf_edma);
- 	if (ret)
-@@ -248,7 +248,7 @@ static int mcf_edma_probe(struct platform_device *pdev)
- 	}
- 
- 	/* Enable round robin arbitration */
--	iowrite32(EDMA_CR_ERGA | EDMA_CR_ERCA, regs->cr);
-+	iowrite32be(EDMA_CR_ERGA | EDMA_CR_ERCA, regs->cr);
- 
- 	return 0;
- }
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index f5d22c61503f..f0571b97817b 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -295,6 +295,7 @@ static_assert(sizeof(struct flexcan_regs) ==  0x4 * 18 + 0xfb8);
- 
- static const struct flexcan_devtype_data fsl_mcf5441x_devtype_data = {
- 	.quirks = FLEXCAN_QUIRK_BROKEN_PERR_STATE |
-+		FLEXCAN_QUIRK_DEFAULT_BIG_ENDIAN |
- 		FLEXCAN_QUIRK_NR_IRQ_3 | FLEXCAN_QUIRK_NR_MB_16 |
- 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
- 		FLEXCAN_QUIRK_SUPPORT_RX_FIFO,
-diff --git a/drivers/spi/spi-fsl-dspi.c b/drivers/spi/spi-fsl-dspi.c
-index 9f2a7b8163b1..abd3b20c2f17 100644
---- a/drivers/spi/spi-fsl-dspi.c
-+++ b/drivers/spi/spi-fsl-dspi.c
-@@ -192,6 +192,7 @@ enum {
- 	DSPI_XSPI_REGMAP,
- 	S32G_DSPI_XSPI_REGMAP,
- 	DSPI_PUSHR,
-+	MCF5441X_DSPI_REGMAP,
- };
- 
- static const struct regmap_config dspi_regmap_config[] = {
-@@ -238,6 +239,17 @@ static const struct regmap_config dspi_regmap_config[] = {
- 		.reg_stride	= 2,
- 		.max_register	= 0x2,
- 	},
-+	[MCF5441X_DSPI_REGMAP] = {
-+		.reg_bits	= 32,
-+		.val_bits	= 32,
-+		.reg_stride	= 4,
-+		.max_register	= SPI_RXFR3,
-+		.volatile_table	= &dspi_volatile_table,
-+		.rd_table	= &dspi_access_table,
-+		.wr_table	= &dspi_access_table,
-+		.reg_format_endian = REGMAP_ENDIAN_BIG,
-+		.val_format_endian = REGMAP_ENDIAN_BIG,
-+	},
- };
- 
- static const struct fsl_dspi_devtype_data devtype_data[] = {
-@@ -303,7 +315,7 @@ static const struct fsl_dspi_devtype_data devtype_data[] = {
- 		.trans_mode		= DSPI_DMA_MODE,
- 		.max_clock_factor	= 8,
- 		.fifo_size		= 16,
--		.regmap			= &dspi_regmap_config[DSPI_REGMAP],
-+		.regmap			= &dspi_regmap_config[MCF5441X_DSPI_REGMAP],
- 	},
- 	[S32G] = {
- 		.trans_mode	  = DSPI_XSPI_MODE,
--- 
-2.54.0
-
+cheers,
+Victor
 
