@@ -1,173 +1,198 @@
-Return-Path: <netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rnwwJYtvKGplEgMAu9opvQ
-	(envelope-from <netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:51 +0200
+	id pif3N3ZvKGpfEgMAu9opvQ
+	(envelope-from <netdev+bounces-297256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51265663EFE
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51790663EEF
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b="E4FkzV/g";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297255-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=iogearbox.net;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=h6llugOy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297256-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297256-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 92C0F3019123
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:49:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03B1A30210E1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15A6411665;
-	Tue,  9 Jun 2026 19:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914E44A1393;
+	Tue,  9 Jun 2026 19:50:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C08411691
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011CE41166A;
+	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034559; cv=none; b=r1ZyvuLi0XwJ/AhHDErySIuCroWKS+lwNjyQbBmkda37lP/VUQ4w25Sik9lMADNn3sybdHXPkA8m/MZshAtnItSMKnlQ6yG9IyzHQ3EcVpV+W8NKVV2mX7eYDhNE3d2IhNvV++Rc7di8RYKV8IT55CVxkfFsLXaCWpF64mhkRvg=
+	t=1781034640; cv=none; b=Pyp98Cis3712PfSJrSAl9ck46K9ceWu4DS0b0vbPBI/RwQ3sj81jAj8bSatNRmAwPrE7TMHpoqO+65cc+cYE+BZvJptojjhg+jGqw2aH0w0H1fcKP1RbcpPfH0ls+VXYYULK+GzJt1GkBx82mGRqCELRLfJirBdhVsHKFBS6qHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034559; c=relaxed/simple;
-	bh=h7axR/czA/Xft3ZJetNJfqDTUMchzSFY0LcwUO5dzw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KS+Slos23q/X7KV+gvb6vKD6Mu0xG31bLmdRjDHIGl3Lphv8mjUe8uLxAKTIldiVEMFm+xW1GY+sBucYxNu0E56TWPjXGSZOpdqFyUhHpg0rxvsAP5fujDtTSgXiBRATToS9OUW3VEi5ECm+fE/Bf10WwvPbrwPGh9NcbT+EWig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=E4FkzV/g; arc=none smtp.client-ip=213.133.104.62
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=C85CeTSkeEIxhIFMao+8qHFW/a7UEIMkjBi8cvyrg80=; b=E4FkzV/g8yCeQjWo4FyF8ymG/S
-	kmN7B59TTLCaHfJ90k7RqHd0JdQgvtZICU1GQFpoUBrP207XaR0x1d9SQCseQJNKeWnaZHqQuTbh7
-	nOd12HhlxsQFVbH5vSEyhFRNRQiNy/pVZVYue1gwroHQinA/Wau7U6BW2itytbsrfmxyxwo9DULAM
-	L3x5WkSuFhWvFvmE18qLL/Liu4UFyuoQ9dz8+Cz8S3eDbxEv5JrH5xmOZxqNB0/4YSBasiqn5wHYI
-	Uw/r/FuD2NN+5pRPTnAvM2FdrjRolgYe8JtUJYxAmoDMiCJfj+bqoY5wVdJofYa23wQ0m8ywc1v+z
-	bkH9Ja2g==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2Ra-0008BC-37;
-	Tue, 09 Jun 2026 21:49:03 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wX2RZ-00085S-1y;
-	Tue, 09 Jun 2026 21:49:02 +0200
-Message-ID: <96cc2480-c675-4ab8-80f5-eac90dc4e95f@iogearbox.net>
-Date: Tue, 9 Jun 2026 21:49:01 +0200
+	s=arc-20240116; t=1781034640; c=relaxed/simple;
+	bh=fEc6RgFqgArsWG6l+smx1XCQosDlspRNYDFL91PwLD0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ISusHZduAHSU/WSLhls9qR0hj+lcqFs8RnxiWb/HnjPJlmKUsRdxTF9QIRvTQPC6w/KLW8+xl9hbRXKFWKLVsFAdXfGKFOrKvvJ9Zs9TFOrzGZjjGB0Q5Wmq9KEnQLuHj7dZcL2X4SfvNZjEzQj27L0BN9L7NKR7V5kL8sc+PYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6llugOy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 61D44C2BCB9;
+	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1781034639;
+	bh=fEc6RgFqgArsWG6l+smx1XCQosDlspRNYDFL91PwLD0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=h6llugOybMri4FBoedAzCaF3QxhQ38AXq9WowDReZrQoJWR9FGB6672SE3kRFnm08
+	 vh209GK4jMhn7jk//JGlka+MiqoeIWS2r067MY6LDASLqgdmiCj7xqA3l3f69VV+st
+	 EejXA7C3BeJ5i+E1HpwcgNAVAeafUdgx5X2E3BOXobtVaDdz1VX2QIxiHuyIzZALgy
+	 Y0ljZPclZuNdp7a8I/ZU9nzN8HqypQVBtXu/0Fa/4ft107jrzGFvinUAx5S0MR5MNB
+	 KzAbmS9IV1cJWZiv/WYMypQnKNArik0tkWvSjsOcRS4Kge3B9YoQwBmK/bIu3Lg5yQ
+	 r/3q4AfmB2q6Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42522CD8CB2;
+	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
+From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
+Subject: [PATCH net v4 0/4] MAC-PHY interrupt changed to level triggered
+ interrupt
+Date: Tue, 09 Jun 2026 12:50:23 -0700
+Message-Id: <20260609-level-trigger-v4-0-6f389abdd192@onsemi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] netdev: don't use dev->flags for IFF_UP
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, dw@davidwei.uk,
- razor@blackwall.org, sdf@fomichev.me, dtatulea@nvidia.com,
- bobbyeshleman@meta.com
-References: <20260609190804.1137085-1-kuba@kernel.org>
- <20260609190804.1137085-5-kuba@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260609190804.1137085-5-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28026/Tue Jun  9 08:25:31 2026)
+X-B4-Tracking: v=1; b=H4sIAH9uKGoC/12NywrDIBREfyXcdS0+0iR01f8oWVhzYy4kWlSkJ
+ fjvFZddzgxzzgkRA2GEe3dCwEyRvKuhv3RgNu0sMlpqBsnlwG9KsB0z7iwFshYDm8xL6Enplas
+ e6ucdcKVP4z3BYYK5lhvF5MO3ObJqU8MN/B+XFeNs0aPCkYuqkw/vIh50Nf6AuZTyA7OOn7+wA
+ AAA
+To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>, 
+ devicetree@vger.kernel.org, Piergiorgio Beruto <pier.beruto@onsemi.com>, 
+ Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781034634; l=2779;
+ i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
+ bh=fEc6RgFqgArsWG6l+smx1XCQosDlspRNYDFL91PwLD0=;
+ b=wrNsvzyOigtKx2OTV9speqae9RVqFkm2T1m5PXBBjQ6ub6iumIQb78jQrnNSTDwsxFOrDyWW9
+ EV6Xl8JpGg2Atk8rK6xRLfCR0bzXl0RCB5WN9x+A0iJfaJAtDZpBTqD
+X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
+ pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
+X-Endpoint-Received: by B4 Relay for
+ Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
+X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Reply-To: Selvamani.Rajagopal@onsemi.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297255-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297256-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
+	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Parthiban.Veerasooran@microchip.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:pier.beruto@onsemi.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:email,microchip.com:email,davemloft.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 51265663EFE
+X-Rspamd-Queue-Id: 51790663EEF
 
-On 6/9/26 9:08 PM, Jakub Kicinski wrote:
-> dev->flags are not technically ops lock protected. The IFF_UP flag
-> will not change when dev->lock is held, but other flags may change
-> so KCSAN would probably not be impressed. Because of this we added
-> a dedicated dev->up which is safe to read under dev->lock.
-> 
-> qstats want to make sure device is up, use dev->up.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+According to OPEN Alliance 10BASE-T1x MAC-PHY Serial Interface
+specification, MAC-PHY interrupt is "active low, level triggered".
+The specification mentions about the conditions in which the IRQ
+is asserted and deasserted.
+
+Bug is inadvertently introduced by treating the IRQ in the OA TC6
+framework driver and in dt-binding YAML file as edge triggered.
+
+Changes are done in two files
+ - OA TC6 framework Ethernet driver
+ - YAML file for the vendor that already uses OA TC6 framework.
+
+Maintainer for this driver is already informed and aware of these
+changes. Testing for these changes was done in onsemi's setup and
+found to be working.
+
+To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+Cc: Piergiorgio Beruto <pier.beruto@onsemi.com>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Conor Dooley <conor.dooley@microchip.com>
+Cc: devicetree@vger.kernel.org
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+
+Changes in v4:
+
+- IRQ handler is changed to interrupt handler + wake up thread
+  to interrupt handler + threaded irq. Threaded irq mechanism
+  is better suited for level triggered interrupt. Because it can
+  keep the interrupt disabled until interrupting conditions are 
+  handled by a handler thread.
+- SPI data handling function is called again on EAGAIN error code
+  as it indicates RX buffer overflow error, which requires draining
+  the bad data chunks.
+ 
+  - Changed wakeup thread to threaded IRQ 
+  - RX buffer overflow is handled before threaded irq returns
+
+- Link to v3: https://lore.kernel.org/r/20260601-level-trigger-v3-0-da73e7010532@onsemi.com
+
+---
+Selvamani Rajagopal (4):
+      net: ethernet: oa_tc6: Interrupt is active low, level triggered.
+      net: ethernet: oa_tc6: No return on rx buffer overflow error
+      net: ethernet: oa_tc6: mdiobus->parent initialized with NULL
+      dt-bindings: net: updated interrupt type to be active low, level triggered
+
+ .../devicetree/bindings/net/microchip,lan8650.yaml |  2 +-
+ drivers/net/ethernet/oa_tc6.c                      | 66 +++++++---------------
+ 2 files changed, 21 insertions(+), 47 deletions(-)
+---
+base-commit: 0aa05daef7848a5ac11158949dc73cd741995dc1
+change-id: 20260531-level-trigger-8cb1a83af034
+
+Best regards,
+-- 
+Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+
+
 
