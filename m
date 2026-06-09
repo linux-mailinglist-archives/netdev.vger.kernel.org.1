@@ -1,114 +1,108 @@
-Return-Path: <netdev+bounces-296899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id O5Z1EAOVJ2qRzAIAu9opvQ
-	(envelope-from <netdev+bounces-296899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 06:22:27 +0200
+	id 55JTBCeXJ2rvzAIAu9opvQ
+	(envelope-from <netdev+bounces-296900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 06:31:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE7C65C33B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 06:22:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAC865C36D
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 06:31:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=AI02nuPO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296899-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296899-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=YiRgfv5Y;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296900-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-296900-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5EAC63020EF7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 04:22:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5F49A3048638
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 04:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8E23812F1;
-	Tue,  9 Jun 2026 04:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19711318BB3;
+	Tue,  9 Jun 2026 04:31:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f228.google.com (mail-qk1-f228.google.com [209.85.222.228])
+Received: from mail-yx1-f99.google.com (mail-yx1-f99.google.com [74.125.224.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0C335F5F3
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 04:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB812135AD
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 04:31:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780978944; cv=none; b=ts6WLate52KV3UD6pJA4xUHbVZTi0rl0HnoilRA8yDUmBF0gxcbTrhuSgb3Hav/jYzogf5mbwGcu7+TArfD99Gy7mqk4B4BrIKGIgt1EmIkvlpoCvCyG7fOssHJKL9jvmMxbAsP1i7rFHtTaVnNEVJz2R+99WVoUh5xQCpk3//g=
+	t=1780979491; cv=none; b=M/7o7wBsqkdLA7vl4MT41MZjFA6ulgXmIKozhujUZxuiR6xHjYlzXifxjfzo06YTKDSgrG9/GmjVqEz0Kdxr3cVVJ71wWdGbkIa09bZQwMhWXbGVC9WYhHdVD178zi69A8tY6vMDmX3fiM0ykrgsRDpHTgDkv6mxP+E9n0NViLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780978944; c=relaxed/simple;
-	bh=XbkvJ9JrAlwcwgZSb782zcssqw8/TqYQNnZey9RZ9Jc=;
+	s=arc-20240116; t=1780979491; c=relaxed/simple;
+	bh=tjbkuf25zqirr5P96XpinIaEX3ilTfZklOF3Mj5GeMY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JlxuPKw2sARIEVJR6Vkd/deVSSKDvHCfuuINJ8YPgefAN0nAL9b4hRqhuKx2/EXCBLY99/vYY49AVzu4Fe0jSNb6raySoVZdEznHmN9BRFxKPRmz9HAuF6SK4DtQBQSkAg1vDCJRGJT2Szt7uQeGAk/Cl+XbGLY8uId/7DD5Q38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AI02nuPO; arc=none smtp.client-ip=209.85.222.228
-Received: by mail-qk1-f228.google.com with SMTP id af79cd13be357-9156b74006aso366257385a.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 21:22:22 -0700 (PDT)
+	 To:Cc:Content-Type; b=NBGVezbSPJgkF5sdKngJ+x5csUGSdHLzXJHqHRmaH1RDRb0CX/JfHoFQz1tPVPypNjFzs+QQle9SyQn1KSNLfn002lrHJtZG5NacOlsg0ehJc5jHg2kogllpUSuq0SFZdARVQ/ZIPOhFXPTCujKPFUGlCTO5v3KHPI1K6BKBAEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YiRgfv5Y; arc=none smtp.client-ip=74.125.224.99
+Received: by mail-yx1-f99.google.com with SMTP id 956f58d0204a3-66039d3efcbso5161616d50.2
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 21:31:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780978942; x=1781583742;
+        d=1e100.net; s=20251104; t=1780979489; x=1781584289;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XR+CmzcQ9/SujsIuuuMqKPpRgz9GFtR9iD8avrCjFxg=;
-        b=QO/qOkckzs+p8VjO+azt/5qxqN3E7d9QnuL/9m3xA/8Cbnu3HWYWxiLEBJFVyT/51D
-         6xqKyyMIQaUOuRhEwnj0w+3nDBHmyYW/Aw6ejNSx2OVb+ZqwG3epr+pEksqqes9L8n/S
-         p+0bEMtuYF6EnXuj5PqtfAOZ8QL0vbQ81ZKKX2NL+2ZRb1x/gfDyEubYlhwHFUMMdU2q
-         UwlK1zMk20+YXVH6dHNCkUJsMPCj7EQOr1FOHCR4xPKKN1wzkyNMdiEl901LaCJLNLzE
-         Bscfd/qxFh9unZHZBCW+GuT7EfH18rhtABj0T6p7kD5Rq1NyGP4HLjgTCqYUUO+gM7cy
-         zj4g==
-X-Gm-Message-State: AOJu0YyxITvVrjnqzi2sw6myWHBKNQgRWYVDfR2V0FnkchQ+8ss3bqeW
-	6JjuU6DnQ+Y6JkjwhSf2HdH7NSQN7YWkCf0V8DjyP/Zqx2pYmaXkS+97QzbNjNW4mI5ouN5/EV7
-	kAjYw3bSVwef8D+gak/XyMe71dfWmrSEPqIrk8D6XipFJ5+B2QKMk/PauRLSwxQlgIL+JkoR0yM
-	A+yDoeRNve9z5wVl7chicUaEuKdK/Xtqp8L15/uvZ1/7eodpx4VL02d/D4YOFzJYCDg2+VZozC+
-	DiimbrQ4Xo=
-X-Gm-Gg: Acq92OFM54AOUrrAkCfnRkstoGAvydAtLNDIyE9n6gUkSL5TT3F+yUK9tNRSJ6ZkeLv
-	qpCOqUGnw/5SpoKflXgoXx5XQTTxhUJ7HVKEpiVz/4BD36AzPLsogaOvbEMj6Bu8UJQ2MMhPDk8
-	oovPRdITaQaVaYOLB/L2R7rtT5qs5A9nGmkjcNGQ/U9PU2h+aMqY3QsZcg9jtiH92EQCCKP4ppN
-	zPuLKcpcJJjDVm+z+Hz7LtCkm1wPULV5XFQxSHwBKPxuH0Hn1CC9wC3I8jgWl/ABQuDhTvuH5WH
-	GzBP+m1H0FZ9UzzvfbG//KJCJ4tBEEmIc2KS+CPbPfCG6RmhoTe1UkKCjNttZIQonXT2geJ3QUo
-	TGf5FBhjWJgBFE6czvaLV6ArTGDkRenT3uXtb8ZaS1L6QiwG+rm40IOVjB8aRw7ktCHyDhr3cFT
-	YGeRocfNCznouQYr1XPzn+UM7wsUk50FwbbQgq1p+5yGi+0Gm0DcNMXqfXv0gf3tcne90=
-X-Received: by 2002:a05:620a:6cc7:b0:915:8d82:b149 with SMTP id af79cd13be357-915a9ccb099mr3050517485a.27.1780978941776;
-        Mon, 08 Jun 2026 21:22:21 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-21.dlp.protect.broadcom.com. [144.49.247.21])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8cecd03d96esm10037816d6.26.2026.06.08.21.22.21
+        bh=tjbkuf25zqirr5P96XpinIaEX3ilTfZklOF3Mj5GeMY=;
+        b=fadN0wa8j6zK8f9hNarrZRFLbJkYQ1mLX2sINukSMEpOBcQaX2Te1u5tTSRpsba1SR
+         f6XhV0pJ6BQSAB51ElAGUA9mOddPv5OXe8jiWgUUbOKNNJ7iCRYCjG/G2QbIFUxoUYDP
+         Ax+yR5DcBjfDFljF6t8a8+YWxbVM2yHiwgRJUZSVGyjtcZ9BVtdHQT9r6gBp44MuMvqv
+         1PmFT1EQNbw1Bxb2YpzAY7ZVbxHVH5z9ffni599FKXO9PcWY9pjbfKGBmBMmXDgLhMdo
+         uj/bHi0ULNCRzHnrhMjfD7r3hwpAhW0E+2W64lS7IMKOes4ZDXKObSw9QonjYKwwOJXv
+         4awQ==
+X-Gm-Message-State: AOJu0YxYjpOQJ9ByMp15Erj04KXmC2ojxNo9esU3/5uKA7IUgbQqR0yD
+	eaJ/TAOE1vcdqwog1+IJ/vyp3F6N/4gbob9mqvwGmJRMXdE2OYBdZ6Yyn8levXdNJVd4LVMgKUZ
+	ixP0Vqu3K8mu+wmQ1/FK1zthxAyQK+FS/H5nbHaYAL7BYEksD6nrR6z93ZdTb72s7XW7gjXsLTE
+	6JhN2xQBsOO4+6gWBh+RJ4ll3vvge/q1RkqWhdD6d8Dy9SiOt/HElPB31oIcz4kMi/CXOQC6Yyo
+	hrBh2y0gLU=
+X-Gm-Gg: Acq92OEvZPcC/QRa2k//WyrRhE0M9fgsrgY1tsUKVSRibpeiij3FD5aR5HTCTakHxYd
+	F70+Ch0DzoGfY8QAsFcZF83CysEw45dQals5eG8dmh3Q8ZCPprVcYkrw77AkLtgHfjEiV/26ilz
+	tcd8JqV4PdyWQRdEsmghe9yXsrivVMweo2dlqU2w4/gTvp32jUBFtU7GI+tj9h/zkvp9cy9iN1r
+	cKyjgQivqZ37AY8U1clGDSSZ4o4GQ+8yv1iFIb6LAio3yAgoCzB4smuEVB1PgUGtDYVsmeRvpHg
+	QVNRa4EGazra8EXR4hyKazNpzwUNJVejrrAxv2U3qmFaukGa/rSdofosv2TBAzsG8O9GzHNRTpB
+	gN2OLXbpGiUsLerwjmn0okzssUQbMTXgakc3CloJiD6vuAIes2chwatQyV0tKce4KKPz9gNsavN
+	lL8V73UjK+A1hThq0=
+X-Received: by 2002:a05:690e:150a:b0:65c:6164:f287 with SMTP id 956f58d0204a3-66106e51504mr15275093d50.16.1780979488740;
+        Mon, 08 Jun 2026 21:31:28 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
+        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-660d5f52c43sm1571653d50.6.2026.06.08.21.31.28
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Jun 2026 21:22:21 -0700 (PDT)
+        Mon, 08 Jun 2026 21:31:28 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-bebbba3c343so229117766b.0
-        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 21:22:21 -0700 (PDT)
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-68c2fe45057so4969503a12.3
+        for <netdev@vger.kernel.org>; Mon, 08 Jun 2026 21:31:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1780978940; x=1781583740; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1780979487; x=1781584287; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XR+CmzcQ9/SujsIuuuMqKPpRgz9GFtR9iD8avrCjFxg=;
-        b=AI02nuPO3U944WMHoLktEdIzemL6O18Om2ILDA6Rb0Ze7rKQD6/okIz2Wg5/eZPG9C
-         qxCknBr6NSQ6HS5OD0Kvb1B0PPHlXgPGmG2VQ6/bZ3s/Z7iDOtHXyg/CLtEAopDl+pUo
-         H/rHxFGNkqTarK6AZdXsabz1ag2YyzhlNydys=
-X-Received: by 2002:a17:907:cf8c:b0:bf1:7897:9477 with SMTP id a640c23a62f3a-bf370b6008dmr849590266b.18.1780978940127;
-        Mon, 08 Jun 2026 21:22:20 -0700 (PDT)
-X-Received: by 2002:a17:907:cf8c:b0:bf1:7897:9477 with SMTP id
- a640c23a62f3a-bf370b6008dmr849588566b.18.1780978939620; Mon, 08 Jun 2026
- 21:22:19 -0700 (PDT)
+        bh=tjbkuf25zqirr5P96XpinIaEX3ilTfZklOF3Mj5GeMY=;
+        b=YiRgfv5Y4JfZDLTVPBYWZ3s1edYDb507U1+V39wO9A8rxIddanwh1JcLQKQQ3A5yQl
+         mfVCasahxE4RL8M3R6p+WZACVIGU4DNysm21syO4GxnJwPghnAbhx2EWXoZgWrwwH8o4
+         +/omkata6OhdNKTxExdzAwCgy7P8Ul3fSR084=
+X-Received: by 2002:a05:6402:5256:b0:68a:c8c8:bf70 with SMTP id 4fb4d7f45d1cf-69238a4c67bmr342605a12.26.1780979487191;
+        Mon, 08 Jun 2026 21:31:27 -0700 (PDT)
+X-Received: by 2002:a05:6402:5256:b0:68a:c8c8:bf70 with SMTP id
+ 4fb4d7f45d1cf-69238a4c67bmr342599a12.26.1780979486880; Mon, 08 Jun 2026
+ 21:31:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260608203129.920104-1-joe@dama.to>
-In-Reply-To: <20260608203129.920104-1-joe@dama.to>
+References: <20260608154014.227538-1-sdf@fomichev.me> <20260608154014.227538-4-sdf@fomichev.me>
+In-Reply-To: <20260608154014.227538-4-sdf@fomichev.me>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Mon, 8 Jun 2026 21:22:07 -0700
-X-Gm-Features: AVVi8CeXmnXuosWbk5ifAWP-UZzQrdAi-4E8QncGPH0yg7sVs8DfeWTY_qzPgwk
-Message-ID: <CACKFLikOyMh3Kbee-AifLXQryyPt-CftW7VYHeeKWoCuMoXj8w@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt: fix head underflow on XDP head-grow
-To: Joe Damato <joe@dama.to>
-Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Somnath Kotur <somnath.kotur@broadcom.com>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>, horms@kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Date: Mon, 8 Jun 2026 21:31:14 -0700
+X-Gm-Features: AVVi8CeQmzCpy6VFKiq8zdNCVWyUJIK9dS1eipAUvWDY1tGJfT7kS7vJhzoG2Bw
+Message-ID: <CACKFLim4n-J+XL-CjJ4j7FHB+vkV927=M2p_3WADHw-ybFeFWw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] bnxt: convert to core rx_mode retry mechanism
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, Pavan Chebbi <pavan.chebbi@broadcom.com>
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001906f90653ca7992"
+	boundary="000000000000b3c4690653ca994d"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.76 / 15.00];
 	SIGNED_SMIME(-2.00)[];
@@ -116,88 +110,79 @@ X-Spamd-Result: default: False [-2.76 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296899-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-296900-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:joe@dama.to,m:netdev@vger.kernel.org,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:somnath.kotur@broadcom.com,m:andrew.gospodarek@broadcom.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:pavan.chebbi@broadcom.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	HAS_ATTACHMENT(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,dama.to:email]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,fomichev.me:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9AE7C65C33B
+X-Rspamd-Queue-Id: 6FAC865C36D
 
---0000000000001906f90653ca7992
+--000000000000b3c4690653ca994d
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 8, 2026 at 1:31=E2=80=AFPM Joe Damato <joe@dama.to> wrote:
+On Mon, Jun 8, 2026 at 8:40=E2=80=AFAM Stanislav Fomichev <sdf.kernel@gmail=
+.com> wrote:
 >
-> The xdp.py test test_xdp_native_adjst_head_grow_data crashes when run on
-> a bnxt machine (and also crashes in NIPA).
+> Remove the driver-specific BNXT_STATE_L2_FILTER_RETRY + timer + sp_task
+> retry mechanism and rely on the core stack's ndo_set_rx_mode_async retry
+> instead.
 >
-> It seems that the bug is an underflow in bnxt_rx_multi_page_skb, which
-> builds the skb head:
+> bnxt_cfg_rx_mode() now returns errors instead of swallowing them. The
+> PF-unavailable case (-ENODEV from HWRM on a VF) is normalized to
+> -EAGAIN at the boundary so callers can match on a single "retry me"
+> errno without re-implementing the VF/-ENODEV check. Other errors
+> propagate unchanged.
 >
->   napi_build_skb(data_ptr - bp->rx_offset, rxr->rx_page_size);
+> This removes:
+> - BNXT_STATE_L2_FILTER_RETRY state bit
+> - BNXT_RX_MASK_SP_EVENT sp_event bit
+> - Retry trigger from bnxt_timer()
+> - BNXT_RX_MASK_SP_EVENT handling from bnxt_sp_task()
 >
-> The problem with this expression is that in page mode rx_offset is:
+> bnxt_init_chip() still calls bnxt_cfg_rx_mode() directly during open.
+> On a fresh open dev->uc is empty and the call effectively cannot fail
+> on the unicast path. But on FW reset reopen (bnxt_fw_reset_task ->
+> bnxt_open) a VF may have a populated dev->uc and the PF may be
+> transiently unavailable; since that path doesn't go through
+> __dev_open(), the follow-up rx_mode call that would otherwise drive
+> the core retry doesn't fire. On -EAGAIN, swallow the error and call
+> netif_rx_mode_schedule_retry() explicitly. The unicast filter loop
+> truncates vnic->uc_filter_count on failure, so the retry's delta check
+> sees pending work and reinstalls.
 >
->   bp->rx_offset =3D NET_IP_ALIGN + XDP_PACKET_HEADROOM;
->
-> Which evaluates (at least on x86_64) to 258.
->
-> The test test_xdp_native_adjst_head_grow_data tests a case where the
-> head is adjusted by -256.
->
-> When this test runs, data_ptr is shifted to frag_start + 2 (where
-> frag_start =3D page_address(page) + offset).
->
-> Then, bnxt_rx_multi_page_skb is invoked and the napi_build_skb
-> expression subtracts 258, landing at an address before frag_start. This
-> could be either the previous fragment or the previous physical page when
-> the frag_offset is < 256 (e.g. if the fragment started at offset 0).
->
-> When the skb is freed, the page pool fragment reference is dropped on
-> either the wrong page or the wrong frag of the right page. In either
-> case, the corrupted reference count can lead to the page being
-> prematurely recycled while still in use. Once (incorrectly) recycled, it
-> can be handed out again and on driver teardown this would result in a
-> double free.
->
-> The commit under fixes updated this code to handle the case where the
-> native page size is >=3D 64k, but it unintentionally broke the head grow
-> case.
->
-> To fix this, we need to do a bit of math to recover the offset if this
-> is a page fragment since it is not passed into rx_skb_func
-> (bnxt_rx_multi_page_skb, in this case).
+> Cc: Michael Chan <michael.chan@broadcom.com>
+> Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-I wonder if we should add an offset field to struct bnxt_sw_rx_bd to
-simplify things for page mode.  Struct bnxt_sw_rx_agg_bd has the
-offset field for a similar purpose.  Thanks.
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
---0000000000001906f90653ca7992
+--000000000000b3c4690653ca994d
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -290,14 +275,14 @@ q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
 bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
 R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDSkF/T
-ZadjpVL0y1acEVunwb5MhV1n3mubeQrLbRaqhDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA2MDkwNDIyMjBaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDOabU9
+VhziRM1T5A9OAsbz00qh0reWQVQU/9D9Ltu+EzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA2MDkwNDMxMjdaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBtdBFaLJlom/Ji/bRswO0OQ1WF0l060jf6y5v2R/dT
-50N8s4k6+xYUIBCunuwNCSqBSNvQM7VLAEEQGq1ESvG3p6NJtZxs7dctgZIetxLsCjkWRE4GX3ln
-e6IsthSc8pApxUBPgG8iBf1sNyy2y/hjD1vj40h+2T+Gd+2PUxV73GHjYwiYbvwQq3pzeYtZ97nM
-v3pGD+iCHelrkG8WR7eMbcH5d9h3BVsyVyR11Ji/wCVN90/RxydRwDOFR1yGsdyTntnWngMxwe87
-oF+eADFVx6Nl7n5f/B0zgH3CHR7BtM9/SQUJnw1HpcrBCg5i3gliofDgh0d1+WZcA2/B4TRv
---0000000000001906f90653ca7992--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB7dAjL9ZLqEZ+heg6JZn5oGaq5VjSKzSDmT692B+Pv
+MMOj1eGVOQ3z6U636gU4pDKVAAZpRNng9KrykeplsX+3d10dpqKzZ+8v5T9WQbk63b2Aby/W4n1B
+PdL9bvLvncDw3If4he+zXY9EA/oDvBhDRiPgmkWaelz9IoTMtpHVA7z95SVdb/nsR6Cc9GDv6fvO
+Lzs3cS8SlMcsSERKSpdrXAyV/mC0ATOSOh9L9PhSvn93kA280efsdEcBJnrCGxLq2N9xDeufKt5+
+66irDmrgXyVGerJrQ/PRQ2Wzcw9u05FyCaz12ovOAPszojN7nooaT7s2dSQvBatv8kqVEhQ4
+--000000000000b3c4690653ca994d--
 
