@@ -1,92 +1,95 @@
-Return-Path: <netdev+bounces-297321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hv+lJy+OKGroGAMAu9opvQ
-	(envelope-from <netdev+bounces-297321-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:35 +0200
+	id GBz3NBCOKGreGAMAu9opvQ
+	(envelope-from <netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA86646CB
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:34 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 723EE6646C7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:05:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=SaekSMb1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297321-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297321-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=SsBXGj7H;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297322-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6E453023DC3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:01:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DB94F3043EE1
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C2538C2A9;
-	Tue,  9 Jun 2026 22:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9823E5EC5;
+	Tue,  9 Jun 2026 22:05:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E1130DED0
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2F5331EA2
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:05:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042479; cv=none; b=bYMLgDvQ/CnZWYlAAd6SDtnsQg3iXtLuNC1308/CFINBfiZwOXyjwVTmDB+4EgL+OXYeOz0Kk1oJHQeXRUdsDtjpn6i/crm+1d/qIUIt1PTECWL3pNd/RQyz+FZlc8gslhb5ALLxb9+PNNDqbTwKEMoJfw5O7RJIgGhPaBVofrI=
+	t=1781042701; cv=none; b=MObAPfSf/XioAaEfUPXUBjlhg4iG98RxymZzfu4Vqc3Q0MZUeb6xtCYzGZywSezHLeluSWXU7+dC5M5YScu9YNJL8b1hrEugDoLgvEgF/WVY6JRykv8Zqt9zM+TO/MpGpsA7HbZmyWYnA1Z7PcpXxDfXk5V8zXobVQ2uV3PpBMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042479; c=relaxed/simple;
-	bh=d/CCHrKjxU57muNoAvihf+56cTgEtzpWTDrBw6qscIE=;
+	s=arc-20240116; t=1781042701; c=relaxed/simple;
+	bh=CmC5qziwznS7Kex6cuqYcE42ivbcGfXZ8w+wCL8lwbQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V/sviSiWER1lT3r94aQm6NI+2bqw+81PcWww1b2guy3J9cL1xzOZDNv02/4wPKbV50hmvKbCCQ+dfBJ4EftmjmE7nQAfDwhZd6QnGOKFeRD7eiU8FHg8QKtunP7KQ9bg3KTeIqzBw0gdDfH9GkGA0T1sCBwW40MDo0b/0SkkbuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=SaekSMb1; arc=none smtp.client-ip=209.85.210.172
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8421f0e9c5bso2784137b3a.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:01:18 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dDx0yPaPq91Kmajbe82EsKfxELEyKvy5wP18dNpJI4P0Fu3ljHtgOyaxl2MspnJxvWF5Uyc7ZqRuparkIRcIDggzU7j8gAaA2SnzjaDMCpz94CSGcZY8XzNeZMFSfV0iqxQB0ifaHXTMxOKI6XJFqasvtafyYo1I1zdqCUVvpnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsBXGj7H; arc=none smtp.client-ip=209.85.216.48
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-36bba9a1089so3656606a91.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1781042477; x=1781647277; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781042699; x=1781647499; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eoD8BH/Hr/jWaBiFW6bawhy0i5xpJ3yl9SXADgS+DQw=;
-        b=SaekSMb1rJs3YU3ipWQVKpfINccBXYlbTw5CRpk76/Vqfl5UzP1sver6O293u64B6J
-         Dxo7IxkM00n7CXEwUAlTjsyjhx2co7k8sGa5q2HDZbSFx39Vmg7Af1TMnUPj7ajpv8pg
-         1dGg6fBMpJOYTJy9SnwzWcCCg4lx2GXCdVi+X1zwcaS3lX5XglIolflO1/me254PY4Vp
-         sSC1bmC/Xa9UYS/YmXBahWr1DHZsVP13XTeto5smDp5O9q+ForPrFytz/ut5JKcQliD4
-         VDXHQii2DpksVYCAiov5+aVsOJcTu/6e4xYVg/w9lU2YB630kokhJfEgzQChZM4btfBO
-         lODw==
+        bh=wt3b+Deif3nXdjZDbgXojibEH3nr7iYn6iIVS7zLH/A=;
+        b=SsBXGj7HmgMkx2KmaqBk3p2CVMN3yzsutXqKCvjXDUzk0U8GXHgm/cH9ndDTqTSVNH
+         RmQLxOFdtlq8fcsu+bIwGA3/mmbw3hZ9/flB+GD3FHVDdkwz2UUCtbrTxgdARQlRZdFA
+         hbJXgtNL8l8LEh3cZdz2qrE+wswnL9Mh/tTO/Efc15ht676DhAsLjm3t91QGEX/Cr4yJ
+         skgS6UzhfF7lJkjkyZKHrs1BYrNJw58ilJrDTZK4G4k4OtkUD78YKJPtbTqYnkM96bKK
+         O9cdfGOWESbZ8mxtuN8fSKQlHu+6/iQLLpV//c80BpgSDlrpKkemB0aWjdkyjwZA9n8G
+         018g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781042477; x=1781647277;
+        d=1e100.net; s=20251104; t=1781042699; x=1781647499;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eoD8BH/Hr/jWaBiFW6bawhy0i5xpJ3yl9SXADgS+DQw=;
-        b=iXQEAe7bLztwKdb+WXGD51v20+YnvipJJQhQSuX2SL0VPlRK7cxGiQy6jz/O253lGd
-         86QtFiMwdCVHOOP2c1v6qZ9F8w5hHQmkunf+sIBrvRgxnlFdhJH9E05FYRcdcr1utNoD
-         1cn2eqdAin0qQy8Jx59a4wEG2fRJXK68gpO8YXxV0rdvaHW+Cac5JdnqcR7kCxGNu5fH
-         fCBVF4CyxqvYC7NJzAEHvHSkGIWNVzoJt60xBCR1dK7gGB8fzeo6YZn8R1vWfRTe9Dn3
-         DiBvoEparCcKo94bmCUTSKurMAvaeenPc20DHKHWn+JVqGjfNsMVMsh7B1HYFA8KspUO
-         EoWw==
-X-Forwarded-Encrypted: i=1; AFNElJ8fP0T4yUqOhmc82BhM6DtJ8qZc/jsfQ/7VkTumhuyWkow7k8tXRmneDuMZ5xDTZcvu3k+Ojh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxree4Da0s/1CMdIDoos8zmyxxyb5yM8p43zDGFccFTP7WxFmdC
-	x5eQvVosCUaXGdWHDjFwDa6kIxU5fx6vZVVIzV16wIGPcDRY9875p2evQl24yxsB6w==
-X-Gm-Gg: Acq92OGAfNP4enZYEd3Qa0oOMiMnnkB3CMalAe7GHSlnLvlJkb9A15V6/XPtej8V7eQ
-	zJoRITv675cmeiXpp4sprAzKoiBco7Ac3XnIJNQpbUpE6YJwGaRSOujWg0WqtB6ZbchEWFw3pIZ
-	NbYn80htLk0RGJB9xDIC3DnPoIhLR8u/fZCFfcgBkEqwTemOzQrGMvEBcfDk4B3K4GpEhOwbLBl
-	Bjb2ZiNg22Z7FcO2+PZpedK1sKiSRjvwsrg3c85USZu6Rd+nmMpYZ6Af2eEWPmWM5KG5cfEyFn4
-	rC1I0qJAZVfP2tWQGfwlOkhz+QcTxgqLwZ/YShq+tYarJ8FvIzTQMrSZIQGjYZeLQqRzn1LjgNz
-	KBVbUkF2WXjbyThclIoaU0EZbMWhfmw7/mELl/1njczIBrYn6OLBfktdqM8gzXkPjPQQmEc7Khp
-	th+dP1EUahA94QlrM=
-X-Received: by 2002:a05:6a00:139c:b0:838:29b3:9ed1 with SMTP id d2e1a72fcca58-842b0fbc0e8mr23774626b3a.41.1781042477366;
-        Tue, 09 Jun 2026 15:01:17 -0700 (PDT)
-Received: from p1 ([2607:fb90:ec8e:a6b9:327:74a0:cc50:6c43])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-842828821d0sm22135675b3a.28.2026.06.09.15.01.15
+        bh=wt3b+Deif3nXdjZDbgXojibEH3nr7iYn6iIVS7zLH/A=;
+        b=aZGT5rPKVvSG3Io9WbtPEZ1gQJ7ldA2msePAurb5lb1rXmnbxTT1ZwUrZiYwERM1kj
+         SZEjnK5wsCmKIZpq2s/rRI05069sLdtJPz3z1ns3AS5sdqjMrikqQAMmBb+n6g5mW+zd
+         kvWVPrfcLKc9i3yLZafvoMJ7bF+sSjAgDVVEm5UdG6hRgmC1n02ht5Pixx4yLBzs/KP+
+         7s4qH1d/bDTq5ziO0HKVFiYXM07mK09FhYbPy9WwnGSfFYdYBm8zCycLMblGwCu+BRKw
+         xW8qddaRssBktl/m/DSEF4Q2wfU+p7GEbqOu3vFd5fpo3v3BA2BObB5v2Wh5DN8Nja/h
+         H6ig==
+X-Forwarded-Encrypted: i=1; AFNElJ9kR15XgEKLZqxdZcJeaZZ0GtJzGQiuHVCCcyQ9dXwF1Y+dH7E26EHOlM1IhUMIOwbqv/LlYis=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzfcc/FVROT6kLxh0UfLRxQvnXbnBO2zV1ZKleB+zQixbDAb6gg
+	g/i2ffqcqWPTbQQxuuwJ8VUiyzhVCI29raGycz5u5rE73bQE6/6iLzbm
+X-Gm-Gg: Acq92OEFcvL5g1VZYvE37AfSWbr4R9HdjOeqXLEHwI4S7sAfeqbRV9gJVAtlWYolZO4
+	6Q9QhCokGmu41xv12GigUntq4OdtgR7XPEaw88YDH/GUFYiDhNYw11YL70IXwfANoAYZ/gsJBzT
+	RQBeiGwyAXppr/1Ptg4gPerGxVvUYaICntyxHHIn5p4qJoeSnplc/m4balMZmI7SBiX/wcXhhXi
+	angTbwAKUrAoYrSs1ai4/beiLHiZgBVfAVD+QNP8uKgBBQ/aZKyErBTcwvAQgXY9kKf8YyhXGdd
+	LjKz+GZ0A3OF4rG0AV6aERjwWaKnpjoo4jz8aFIUag8OSMP6uWm51Jaf8hi82S6Hslx5jBul7US
+	G5nwyWJOizERdBgNGzylvfPXRVUpTuzFMOhohMQxTR5sL9yapd2zKa7rWQ53Ou6Q48s/GpM/hTD
+	dUFwKT1Fd7v+8ivWScfpPfyv/D1koFKPdq2DSkwu05UMb1H3ig9UfWbDY=
+X-Received: by 2002:a17:90b:4b04:b0:36a:5d1f:7b6 with SMTP id 98e67ed59e1d1-370ee5444e7mr22928910a91.2.1781042699375;
+        Tue, 09 Jun 2026 15:04:59 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:52::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37626873b88sm294358a91.0.2026.06.09.15.04.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 15:01:16 -0700 (PDT)
-Date: Tue, 9 Jun 2026 15:01:14 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, Florian Westphal <fw@strlen.de>, 
-	Phil Sutter <phil@nwl.cc>, davem@davemloft.net, edumazet@google.com, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, Weiming Shi <bestswngs@gmail.com>
-Subject: Re: [PATCH nf] netfilter: nf_log: validate MAC header was set before
- dumping it
-Message-ID: <uirq3v4lihhyfwg5x46xfupncevwzo4lgncit2ftsbq3jse67k@yavzv6oocv4d>
-References: <20260608001124.309352-1-xmei5@asu.edu>
- <aih9kXLYQKsWbUmP@chamomile>
+        Tue, 09 Jun 2026 15:04:59 -0700 (PDT)
+Date: Tue, 9 Jun 2026 15:04:57 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	dw@davidwei.uk, daniel@iogearbox.net, razor@blackwall.org,
+	sdf@fomichev.me, dtatulea@nvidia.com, bobbyeshleman@meta.com
+Subject: Re: [PATCH net-next 3/4] netdev: avoid skipping objects on race with
+ device disappearance
+Message-ID: <aiiOCRpmdFcOf/yJ@devvm29614.prn0.facebook.com>
+References: <20260609190804.1137085-1-kuba@kernel.org>
+ <20260609190804.1137085-4-kuba@kernel.org>
+ <aihwlI9A2TKktq9I@devvm29614.prn0.facebook.com>
+ <aih0ST30H9rlKX2f@devvm29614.prn0.facebook.com>
+ <20260609141914.2957de35@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,128 +98,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aih9kXLYQKsWbUmP@chamomile>
+In-Reply-To: <20260609141914.2957de35@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297321-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-297322-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,netfilter.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:netfilter-devel@vger.kernel.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:bestswngs@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:dw@davidwei.uk,m:daniel@iogearbox.net,m:razor@blackwall.org,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:bobbyeshleman@meta.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:dkim,asu.edu:email,asu.edu:from_mime]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,devvm29614.prn0.facebook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ECDA86646CB
+X-Rspamd-Queue-Id: 723EE6646C7
 
-On Tue, Jun 09, 2026 at 10:54:41PM +0200, Pablo Neira Ayuso wrote:
-> On Sun, Jun 07, 2026 at 05:11:24PM -0700, Xiang Mei wrote:
-> > The fallback path of dump_mac_header() guards the MAC header access
-> > only with "skb->mac_header != skb->network_header", without checking
-> > skb_mac_header_was_set().  When the MAC header is unset, mac_header is
-> > 0xffff, so the test passes and skb_mac_header(skb) returns
-> > skb->head + 0xffff, ~64 KiB past the buffer; the loop then reads
-> > dev->hard_header_len bytes out of bounds into the kernel log.
-> > 
-> > This is reachable via the netdev logger: nf_log_unknown_packet() calls
-> > dump_mac_header() unconditionally, and an skb sent through AF_PACKET
-> > with PACKET_QDISC_BYPASS reaches the egress hook with mac_header still
-> > unset (__dev_queue_xmit(), which would reset it, is bypassed).
-> > 
-> > Add the skb_mac_header_was_set() check the ARPHRD_ETHER path already
-> > uses.  Only skbs with an unset MAC header are affected; valid ones are
-> > dumped as before.
-> > 
-> >  BUG: KASAN: slab-out-of-bounds in dump_mac_header (net/netfilter/nf_log_syslog.c:831)
-> >  Read of size 1 at addr ffff88800ea49d3f by task exploit/148
-> >  Call Trace:
-> >   kasan_report (mm/kasan/report.c:595)
-> >   dump_mac_header (net/netfilter/nf_log_syslog.c:831)
-> >   nf_log_netdev_packet (net/netfilter/nf_log_syslog.c:938 net/netfilter/nf_log_syslog.c:963)
-> >   nf_log_packet (net/netfilter/nf_log.c:260)
-> >   nft_log_eval (net/netfilter/nft_log.c:60)
-> >   nft_do_chain (net/netfilter/nf_tables_core.c:285)
-> >   nft_do_chain_netdev (net/netfilter/nft_chain_filter.c:307)
-> >   nf_hook_slow (net/netfilter/core.c:619)
-> >   nf_hook_direct_egress (net/packet/af_packet.c:257)
-> >   packet_xmit (net/packet/af_packet.c:280)
-> >   packet_sendmsg (net/packet/af_packet.c:3114)
-> >   __sys_sendto (net/socket.c:2265)
-> > 
-> > Fixes: 7eb9282cd0ef ("netfilter: ipt_LOG/ip6t_LOG: add option to print decoded MAC header")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Assisted-by: Claude:claude-opus-4-8
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > ---
-> >  net/netfilter/nf_log_syslog.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/netfilter/nf_log_syslog.c b/net/netfilter/nf_log_syslog.c
-> > index 7a8952b049d1..ed5283fb6b67 100644
-> > --- a/net/netfilter/nf_log_syslog.c
-> > +++ b/net/netfilter/nf_log_syslog.c
-> > @@ -815,7 +815,7 @@ static void dump_mac_header(struct nf_log_buf *m,
-> >  
-> >  fallback:
-> >  	nf_log_buf_add(m, "MAC=");
-> > -	if (dev->hard_header_len &&
-> > +	if (dev->hard_header_len && skb_mac_header_was_set(skb) &&
-> >  	    skb->mac_header != skb->network_header) {
+On Tue, Jun 09, 2026 at 02:19:14PM -0700, Jakub Kicinski wrote:
+> On Tue, 9 Jun 2026 13:15:05 -0700 Bobby Eshleman wrote:
+> > I just noticed we handle this differently in rtnetlink with
+> > cb->seq/dev_base_seq/nl_dump_check_consistent(), but it seems like
+> > netdev-genl.c intentionally does not use NLM_F_DUMP_INTR?
 > 
-> Maybe this instead?
+> Intentionally is a strong word, but yes, it's "known".
 > 
-> +           skb_mac_header_was_set(skb) &&
-> +           skb_mac_header_len(skb) != 0) {
-
-Thanks for the quick reply to this patch.
-
-The skb_mac_header_len is a combination of
-1) `skb_mac_header_was_set(skb)` and
-2) `skb->network_header - skb->mac_header`
-
-However, we have skb_mac_header_was_set added in the
-original patch, and we have `skb->network_header - skb->mac_header`
-at the start of the fallback code block:
-
-```
-fallback:
-	nf_log_buf_add(m, "MAC=");
-	if (dev->hard_header_len &&
-	    skb->mac_header != skb->network_header) {
-	    ...
-```
-
-So I think the original patch should be enough.
-
-Xiang
+> My mental model is that DUMP_INTR is required when we are dumping
+> unordered lists. In those cases we just count "how many objects
+> were already dumped", so if we dumped 4 objects then object #1 is
+> removed the dump will resume from object which was previously #6
+> thinking that it's #5 and #5 will never be dumped.
 > 
-> >  		const unsigned char *p = skb_mac_header(skb);
-> >  		unsigned int i;
-> > -- 
-> > 2.43.0
-> > 
+> In netdev objects have ordered IDs, we don't count.
+> 
+> But in theory we probably maybe should also indicate consistency.
+> Nobody seems to care in practice.
+
+gotcha, thanks for the clarification.
+
+-Bobby
 
