@@ -1,350 +1,194 @@
-Return-Path: <netdev+bounces-296981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296982-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tDMKOKzSJ2q12wIAu9opvQ
-	(envelope-from <netdev+bounces-296981-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:45:32 +0200
+	id qeHABTXSJ2qP2wIAu9opvQ
+	(envelope-from <netdev+bounces-296982-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:43:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22D6265DEC7
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:45:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2D065DE82
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:43:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realtek.com header.s=dkim header.b=wLTFOZob;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296981-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296981-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realtek.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=nxp.com header.s=selector1 header.b=njNJAgcU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296982-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296982-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=nxp.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CCC023042E63
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:39:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E48E9300BB93
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667283EE1F6;
-	Tue,  9 Jun 2026 08:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938663403E5;
+	Tue,  9 Jun 2026 08:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011022.outbound.protection.outlook.com [52.101.70.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3EF3EE1FD;
-	Tue,  9 Jun 2026 08:39:50 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780994392; cv=none; b=Qvj9g8V0i6vjjZzBPZEp9ZIf4s9PGUMr8VCl3tJ7f8WpuSIc3ehZS/q+V44uNSmLWkXU6qlhLJqchonO41x3gVrFo1wF9BTJ/FbN9OsdWJ5BgXTI+2zgN4PwY5lwS5lRLNfcsXWWq0ME62Ij8tWl8tbGJniIPC11K0rtGGp1CV4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780994392; c=relaxed/simple;
-	bh=lOP7v9NziUzqOm/hPHeaqONicOIK7Q/Jq5zFuf7qkjg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=L5PlMRmt4t5hhpJIbLLSTIw/pVPYdBE8FnnWXX/21hL9JYOXg8z0xXjCjtBbb2zi96ig+9aH91Ph9WKmO2EKmejZZ5scnYAxE/LVIblFdB6M9RtTWcZSoFOVEsTeOe+uDEM6wTiW5TOMf0Ee8PVOlK0HGwYuvXjG/2UE+A1Nqdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=wLTFOZob; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6598dR4L1088503, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1780994368; bh=j9FMCAULSJ2VLjB2kPwE9fGP7EvS15eI5fhveW/1CaU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=wLTFOZob4QYLWRBV5MFxj4iVRJulJFpbjp+TZQ6LfBltgb7zhPIAG01FL9bLVDUyP
-	 R10lU5/bJqO6zogVpRZkubpbwDNvZqK65AwxMTvEpEte+C4rP3HvkdbA8nnNdvbikM
-	 JNNjn75ZXzlfUbebdT4th220lthJikvnb8jeCzelSnzlOmFbKqMy154oo1jWEW60jf
-	 sHFp6Gx1Np8PLg0lhnN+YIowtq5cCJ01Ael4BxMD2JeYtxc1R4bArAjho824t50czb
-	 +c/ygx78MSX/WuxVDP5eSjva/OE4Ke+GehOYRxwjPek1xl8M9lBqp++kbCkhLI8T5P
-	 FDyxVK1VuZC/A==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6598dR4L1088503
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 9 Jun 2026 16:39:28 +0800
-Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 9 Jun 2026 16:39:27 +0800
-Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
- RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
- 15.02.2562.017; Tue, 9 Jun 2026 16:39:27 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: David Laight <david.laight.linux@gmail.com>
-CC: Andrew Lunn <andrew@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
-	<horms@kernel.org>, Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH] rtase: Workaround for IP fragmented UDP packet hardware
- bug
-Thread-Topic: [PATCH] rtase: Workaround for IP fragmented UDP packet hardware
- bug
-Thread-Index: AQHc8Y8ydZ9ThmFs6kuJK5zylfdiXbYpKbAAgATsPhD//7BLAIAApasw//+OlwCABp5KUIAAIoyAgAEZ2qA=
-Date: Tue, 9 Jun 2026 08:39:27 +0000
-Message-ID: <94fd8b1a43e6401bb67e0a1310e212e0@realtek.com>
-References: <20260601062341.63981-1-justinlai0215@realtek.com>
-	<5c095b26-9720-45b0-a8d5-a8495291e45b@lunn.ch>
-	<447c46ad1f654222a8daa423149f0b89@realtek.com>
-	<20260604124606.7143581b@pumpkin>
-	<1489704deb9844b08848758af95a448e@realtek.com>
-	<20260604155308.770b2deb@pumpkin>
-	<0758634ad8944162b7de0d915fcfa88e@realtek.com>
- <20260608230053.5c1a7bc5@pumpkin>
-In-Reply-To: <20260608230053.5c1a7bc5@pumpkin>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3037830E84E;
+	Tue,  9 Jun 2026 08:43:28 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780994610; cv=fail; b=tvc5m5SFQ84e/3ZVO/sCEXtCRIrwPJ2Fq6O26uWyzfVwHuJHkBNpLbazkon4te5SuCa+ctmHNUGJLB/Css388Wm3BNF065SkIn3qJ/IjMiLEBJe2LwOGyqyBmULvHuSqQkHRrjMvF8SOT52jgJcPjRPWfIGvtdMTQ6U0dRPujR8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780994610; c=relaxed/simple;
+	bh=JxBTpxReV6BWnUsPXPfEKSxRmPtH5uaQiIuuaBhz71A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=DXfo2ewojjLOXgq1+YorwsnO3n3cbt6hQV+rSAPD8GMmWLp5xtNbRdsljtAzjUey94jUOz9CTiyAf4SRXLypEoxKM1JevX+9fLwwL7D9oDhX2NdNNiWH/MFuosdV8+cnK34p4rJlFmrIGvGhH8Oc1pHoss23X9b4wNetcyGW9Mg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=njNJAgcU; arc=fail smtp.client-ip=52.101.70.22
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CagMfmKiLCI850WZ5FsH+Jwr5P1pg5JEbJvbgew1FlNGPCAm5BnrahPLgnRhe3CDhFqBTKnOuqTmXaOz1N2qbo+jxcI/I1dYL1APzZQlziKsOtU0xpbymrTPMHP5JD749HjdVT/Dtf/lI4CtY9XG1VPyz7GJmjFRIu1KSUIGPbGER5dTY5nIItAG2vGCPDCQHRhs1whhHl7jtm8+m06OL6fyZwO4hn+YkubanhwboDsQCDKvOHGC1OnfL0dXIE4antIrHJNN2aVb3buaG2gjBFJjbjtibvZ1CesXTKAw99L3wMYpLVWUh2/Itd1Aueuz5h2Sdl7fkflW3WOEHEviOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hJPQOt45YOfVs2iHo/thRMW2m69muw0AeMtHePL31bI=;
+ b=ZBCVTM8+phkg9YeflRvEjyQ2g4HBJUL9vp1L/huE1/mwAl6YDgH6H87h2c42AJw7uxI2CCOEzpDYrIue4ZzjkZ9kW3EPXrF5Ml98X/n09j78j/86AwOYTE8Ii2585jC1iqYDqc2mDqfuNUZ9i6lEEu/6rJvkvLciaxUgghb3zODfZwQtXZXZcp1QavDI26yq4WQEyR82XgqjFr7i51kZ5B6PtFH8u/9yEibQF8WPG4JNznmMlHdrWSLfEFshtt4VhdpI8ZTq3297YyxHK7laN7bPkF/IborIn7/XZKYhXjS3GK3sH6YtjEAC8GzRzGENn9HCQy0kqMPRtzKpA0bD7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hJPQOt45YOfVs2iHo/thRMW2m69muw0AeMtHePL31bI=;
+ b=njNJAgcUzhePLrSbY4CKitItPYcIO/0XeK4IHQdmlZnvp8xjnJBkntRR6dP6MlSoFPFKkGX8uM14PI1T5QX/Cf+7ic9/5hHcUqpx5z+fttHSzk4FESHgaAzxcF4vrWYNsUAsqpzOynGR2LEQioSQZM80nKpKY2WKG40CjDJXnjMU9ka0Q11i1svCYP2f2MzkfaZ19EXsb1/KYUUL/OTluDFvq+0Sb5RP0YFIpad8MDwaJwzThMUPc35DNBAVpZTVEHqcW6+cOpJula/OpwO1Yda2mUhnamQ+nBuhjm7SMVKlL031H/UfBV7D3NdTvO3QvPt1AhwiIANXmfQJOWZhWg==
+Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
+ (2603:10a6:150:319::13) by AM9PR04MB8907.eurprd04.prod.outlook.com
+ (2603:10a6:20b:40a::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 9 Jun
+ 2026 08:43:26 +0000
+Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
+ ([fe80::1739:3404:2175:33dd]) by GVXPR04MB12290.eurprd04.prod.outlook.com
+ ([fe80::1739:3404:2175:33dd%6]) with mapi id 15.21.0092.010; Tue, 9 Jun 2026
+ 08:43:26 +0000
+Date: Tue, 9 Jun 2026 11:43:22 +0300
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 02/12] dpaa2-switch: add support for LAG
+ offload
+Message-ID: <drqze6rs2qc27vl6mhoq35iepplrr7qqldnt27q7nx74g77jt2@4mhmiisz6kxb>
+References: <20260603143623.3712024-3-ioana.ciornei@nxp.com>
+ <20260606021047.4124576-1-kuba@kernel.org>
+ <7qgoy4ksmvswiaikzjzgiribtglsftmu3nfzhyem2uom5va63s@w4ruzw4fzzba>
+ <20260608134533.1c913041@kernel.org>
+ <20260608134620.3ff18124@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260608134620.3ff18124@kernel.org>
+X-ClientProxiedBy: FR4P281CA0009.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c8::11) To GVXPR04MB12290.eurprd04.prod.outlook.com
+ (2603:10a6:150:319::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GVXPR04MB12290:EE_|AM9PR04MB8907:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b959b50-8514-44ab-dec4-08dec6032c3a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|11063799006|4143699003|22082099003|18002099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	AQjA3ziC4dVx2huOFmGp7vF1+NWUBQWiQeamPiRFF1ZpIM0po4vSkY3JWHhZImZ8dh5lnzCGqZ9JA69+5G5Ku7WwIt9Ao3/rOiNY4hUKeHJggRsdhpTuxrVTVH+CQGjdDGW9ojrTz0Cy7W2k3rrid4GLCvycEmdeH9Rx147H3YcLqMr5bMZ7fAMXu1QNTR+hvloyJWmUKeTTIOfAWb7xlegV9GWEMqzufsLVbFYCONtsgI5yw2K6azVuHw7Eb+AxwqVFVFR7cCmyDlTKr28X6NPI8Yea+E7ksAsjI55b45EW/2YvBM1Capk5Z7Qq6e3dMS+XMM5eZPwuP4/Qdx05eEdHHqxjuPlX4gC7c48QEt3dJmZd7UYIiUOG7L74mn/ojep4J2YLnNK4z+Lwbotyn8FgSqwFzZ1Shl0wO0KwxdVNF5wWUBlzHoZig1vP5CBfywqiTvQk0XhxA2O1XtLUDQLiOErh1wHrdy/8di2Jv6iSJlgSfmFiDC1TcdwGEQ/sL3MsG9UFto365XGwxu1hKGNd6iJLNmdKuldGx0e48Jpn25dqNoOtXigeWqHwUeeXccn8oEXTjtLiIU17Q7GgleCvWpPutrer1RTDnN8KHJSaDfWmDiBo5MPph5C32/Uh
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR04MB12290.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(11063799006)(4143699003)(22082099003)(18002099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?2xTJpgeXyjEOKUCePykMJ4pOJA79clX0aKO/bRwe+57KfzpjKFhsiIQ28ioF?=
+ =?us-ascii?Q?MhpuwfL4b2E4kNY5VwlKsfqPNR8tRlkxmlhx0PMWdTniFSg8xMCJBQcZo5wx?=
+ =?us-ascii?Q?NXAqSOrv0F3PzDj8Mihf//qRHItY5Sx0RD7P5WlaOc0jeQqhlOjF3IRbmBDA?=
+ =?us-ascii?Q?e4vAT1PcxjBGJX8MWwJVaxpKB262Iwu2yRiJuiUrGyPVI+eDGE2Pb+z3q/cT?=
+ =?us-ascii?Q?T3a/sPbOv4tYYZ1IzYTHp2g/h6olRvCm0q2SLZ0d6GrWAPxlkPxO4n3YmThn?=
+ =?us-ascii?Q?gvjib+dNQLfr9+ipybIGaiRnVZpl7EtNdoNoYdxm+RzDSkXGG/UOmnNYHTUF?=
+ =?us-ascii?Q?uRctf6Zvhg3ic4qaCmcZYWpaiFnHsUQZ/0jg/JIzK03C4chfiCZ8Yo8rSyfo?=
+ =?us-ascii?Q?8jgSexC+zUARKOSRhn/0bHEqb7WHPwP7DnMUndeGLzddQ7O7MoM4jEhAwRyw?=
+ =?us-ascii?Q?wtIlfQsu/JTksEilLdaoHlcqL74rjG5cVOma7e0WtBgy+GJE9jOo7XvZ7PVo?=
+ =?us-ascii?Q?nUqWq3yEjP/ohsM88KcLblCs7HGg8MZprRkZYwqvS9BHMdelNUwvcy5UPFcb?=
+ =?us-ascii?Q?h4dHWX2/ijHduf09VBtApwsFn2fngBA3CsFwR7K/3qBIHDD2nEFw0OhYwpcm?=
+ =?us-ascii?Q?pB8SM/cxNbORC6guztlvwfUboNhQLe3e4+hT6x2nRd5JnOTb5Gns5YR8iHUI?=
+ =?us-ascii?Q?R644aRPTufvwx09hO1Fmfxzso0iLoyYI7zdwsVF1ZL76YlroyVnsvvlF5Gvl?=
+ =?us-ascii?Q?UfzbAVgHvpcvg4dSe4oI+yS31Ypw9puU4CDLqoa2dbqjko5q4Yjpqig43nyO?=
+ =?us-ascii?Q?lbJl4WnvWFxdvhWzPWKZ1gv9+wrQCsTH65NURwZlHIGQGirRfFuxMA8yp6oK?=
+ =?us-ascii?Q?VgKQp33d5CEVF57WzWXq13NxXVGBbpTUS6JyhN3XEp/k5onb4NQwNVWpkH94?=
+ =?us-ascii?Q?JB+dq0WyRIeH7HX+jDog7hpHEq9UM/29ltMX93JX7p1Ff1zn9sxOag+6DbJ0?=
+ =?us-ascii?Q?Sh879FmxcyPPPS2FbYwJDTJWtPVYtWQBfQUfpaJxx/7ROY8pYX52ismoSpP6?=
+ =?us-ascii?Q?GxMEQTW5dMyUle4Q85hBAjFzDINwxCEfcnn3CI4HkV7YyUb4wquCB5UQvMk7?=
+ =?us-ascii?Q?Xp0xRtAao3N8YGGFj56Pg+F8EOCJ76x5XFpRkS4hZj3AlckjOz2kR3oRwg/P?=
+ =?us-ascii?Q?JlJSGbIEf7o8vjjn40dp0pRpJMKSxZ0gWm+j1KAFTtzKt+SnyW6vGs3UJIg7?=
+ =?us-ascii?Q?wAWlSinn50gjNXkzQE0YR2KDAT4V4MlUkWcvaoW+k/9PNVDs7h59TOSfJq6r?=
+ =?us-ascii?Q?OV/R+oO7db7d/6g5vrNBWARgcXamHA37YP1toAfP71kVCdHtvpzTHJxpeznI?=
+ =?us-ascii?Q?FYL5iRLB9HTrJ8RJC3aT8p7XqV0/nvwPIqF1pwTiTETWa33hvv+gNBrknOB9?=
+ =?us-ascii?Q?cM9ymjJWqds7TDBKtd2t50RD+7zwUL5Zm50J4neNJQYgJah4r2lOWAfoiJhC?=
+ =?us-ascii?Q?ROfcpWd2Xh8CJtJDXw7ogh7SHU507RUwOUI9GOp3fFB8xKCq7VvZVn8TVXA5?=
+ =?us-ascii?Q?Z/51wj5qqPaf2UAEDep+X+Gx50srpL9bpWE4vhOaMDnLUaTfso+8E+jktu+e?=
+ =?us-ascii?Q?92V8Vslx+t2iUc/kyTOyAStWkgGPrWTeh2WNR7ewaRQdvMr96OZtzn71S/Cj?=
+ =?us-ascii?Q?urs+oBc5lBX1iUD9YsqIURKgK32IXwkJOyi4hMcbXOLD7otRxMYTClshBQlF?=
+ =?us-ascii?Q?pkY8SYx9SA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b959b50-8514-44ab-dec4-08dec6032c3a
+X-MS-Exchange-CrossTenant-AuthSource: GVXPR04MB12290.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2026 08:43:26.3913
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 89R7daqUmVepJlLId8WwJH1PrUkuJOcDubS7wkdWiSMOlbqIt91aHx3XsQIjOCnkJT/juV6GiV6KnvcoPOaZqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8907
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296982-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296981-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 22D6265DEC7
+X-Rspamd-Queue-Id: 9F2D065DE82
 
-David Laight <david.laight.linux@gmail.com> wrote:
->=20
-> On Mon, 8 Jun 2026 12:28:28 +0000
-> Justin Lai <justinlai0215@realtek.com> wrote:
->=20
-> > David Laight <david.laight.linux@gmail.com> wrote:
-> > >
-> > > On Thu, 4 Jun 2026 13:43:27 +0000
-> > > Justin Lai <justinlai0215@realtek.com> wrote:
-> > >
-> > > > David Laight <david.laight.linux@gmail.com> wrote:
-> > > > >
-> > > > > On Thu, 4 Jun 2026 08:33:51 +0000 Justin Lai
-> > > > > <justinlai0215@realtek.com> wrote:
-> > > > >
-> > > > > > Andrew Lunn <andrew@lunn.ch> wrote:
-> > > > > > >
-> > > > > > > On Mon, Jun 01, 2026 at 02:23:41PM +0800, Justin Lai wrote:
-> > > > > > > > The hardware parser incorrectly interprets 319/320 in a
-> > > > > > > > short IP fragmented UDP packet payload as standard PTP
-> > > > > > > > destination ports and treats the fragment as a PTP packet f=
-or
-> further parsing.
-> > > > >
-> > > > > Is that a packet that has been segmented by IP, or one where the
-> > > > > skb is fragmented enough that the data in the header is too short=
-?
-> > > > > I thought that IPv4 required an mtu of 128 bytes (ish) and IPv6
-> > > > > somewhat larger - so I don't see how that is a problem.
-> > > > >
-> > > > > If the skb is fragmented then you need to move data into the
-> > > > > header not
-> > > pad
-> > > > > the frame.
-> > > > >
-> > > > > If the hardware really is broken then I suspect you need to
-> > > > > disable the
-> > > feature
-> > > > > and suffer the consequences.
-> > > > >
-> > > > > > > >
-> > > > > > > > If the transport data is smaller than RTASE_MIN_PAD_LEN,
-> > > > > > > > the remaining data is insufficient for further parsing and
-> > > > > > > > causes hardware
-> > > TX
-> > > > > hang.
-> > > > > > >
-> > > > > > > Where does RTASE_SHORT_PKT_THRESH come into this?
-> > > > > > >
-> > > > > > > RTASE_MIN_PAD_LEN is 47, so matches all packets which need
-> > > > > > > padding up to
-> > > > > > > 60 bytes, plus FCS. There are not many such packets, so why
-> > > > > > > both this all the complexity and just pad all small packets?
-> > > > > > > Do you have any performance numbers which show the complexity
-> is worth it?
-> > > > > > >
-> > > > > > > > Pad these packets so the transport data reaches
-> > > RTASE_MIN_PAD_LEN
-> > > > > > > > before transmitting to avoid triggering the hardware issue.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > > > > > >
-> > > > > > > Is this a Fix? Please add a Fixes: tag. And base it on net.
-> > > > > > >
-> > > > > > >
-> > > https://www.kernel.org/doc/html/latest/process/maintainer-netdev.htm
-> > > > > > > l
-> > > > > > >
-> > > > > > >     Andrew
-> > > > > > >
-> > > > > > > ---
-> > > > > > > pw-bot: cr
-> > > > > >
-> > > > > > Hi Andrew,
-> > > > > >
-> > > > > > RTASE_MIN_PAD_LEN is not the Ethernet minimum-frame padding
-> > > > > threshold.
-> > > > > > It is the minimum transport-data length required by the
-> > > > > > hardware parser after the packet is incorrectly detected as a P=
-TP
-> packet.
-> > > > > >
-> > > > > > Therefore, this workaround needs to pad the packets which can
-> > > > > > trigger the hardware issue, rather than just padding packets
-> > > > > > to the Ethernet minimum frame size.
-> > > > >
-> > > > > Is that a longer length?
-> > > > > Excessive frame padding (beyond 60+FCS) can be treated as a
-> > > > > protocol
-> > > error.
-> > > > >
-> > > > > -- David
-> > > > >
-> > > > > >
-> > > > > > I agree that RTASE_SHORT_PKT_THRESH is not necessary here. I
-> > > > > > will remove it in the next revision.
-> > > > > >
-> > > > > > Yes, this is a fix. I will add a Fixes tag and repost it
-> > > > > > against the net tree.
-> > > > > >
-> > > > > > Thanks,
-> > > > > > Justin
-> > > > > >
-> > > >
-> > > > Hi David,
-> > > >
-> > > > This is an IP fragmented packet, not a fragmented skb.
-> > >
-> > > Ok, your tests are broken for fragmented skb.
-> > > skb_tail_pointer() is the end of the initial fragment, not the end
-> > > of the actual data.
-> > > So you could be adding padding to a full length packet making it
-> > > overlong.
-> > > Somewhere you need to be looking at skb->len.
-> > > Probably with a fast-path check to ignore long packets.
-> > >
-> >
-> > You're right. skb_tail_pointer() only covers the linear area and can
-> > underestimate the transport-data length for non-linear skb.
-> >
-> > I will change the transport-data length calculation to use:
-> > trans_data_len =3D skb->len - skb_transport_offset(skb);
-> >
-> > > >
-> > > > The issue occurs on a non-initial IP fragment whose payload
-> > > > contains values matching the PTP event/general destination ports
-> > > > (319/320). The hardware parser incorrectly identifies the fragment
-> > > > as a PTP packet and attempts further parsing.
-> > >
-> > > Wait a minute, what stops someone using either of those port numbers
-> > > for something else?
-> > > There are no hard restrictions on the use of UDP port numbers.
-> > > So what does the hardware do with UDP packets to port 319/320 that
-> > > are being used for something else entirely?
-> > >
-> >
-> > If the UDP destination port is 319 or 320, the hardware will identify
-> > the packet as a PTP packet and perform the corresponding PTP
-> > processing.
->=20
-> But aren't I allowed to run my 'frobnicate' protocol on those ports?
->
-You are correct that UDP ports are not strictly bound to a specific
-protocol at the networking layer.
+On Mon, Jun 08, 2026 at 01:46:20PM -0700, Jakub Kicinski wrote:
+> On Mon, 8 Jun 2026 13:45:33 -0700 Jakub Kicinski wrote:
+> > On Mon, 8 Jun 2026 12:14:07 +0300 Ioana Ciornei wrote:
+> > > Please let me know how I should proceed.  
+> > 
+> > TBH I saw ~30 bugs and assumed that at least one of them must be real.
+> > https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260603143623.3712024-2-ioana.ciornei@nxp.com
+> > and
+> > https://sashiko.dev/#/patchset/20260603143623.3712024-2-ioana.ciornei@nxp.com
+> > 
+> > LMK if all are actually false positives. If not just ignore the silly
+> > ones. 
+> 
+> Well, I say "just ignore" - sometimes the AI being confused means that
+> code is hard to understand, even for humans. So I should have say
+> "exercise some judgment", I guess.
 
-However, 319/320 are the standardized and widely used ports for PTP
-(IEEE 1588). Our hardware relies on this common usage for PTP
-identification in the parser.
-> >
-> > > > The workaround does not modify the IP or UDP length fields. The
-> > > > original protocol headers still describe the actual packet size.
-> > > >
-> > > > Therefore, the protocol-defined payload size remains unchanged.
-> > > >
-> > > > We have tested this workaround and have not observed issues caused
-> > > > by the additional padding.
-> > >
-> > > Have you checked all the systems that might receive such packets?
-> > >
-> >
-> > Could you clarify what kind of protocol error you are referring to?
-> >
-> > From my understanding, this workaround adds padding at the end of the
-> > frame without modifying the IP or UDP length fields. The
-> > protocol-defined packet length therefore remains unchanged.
-> >
-> > This appears similar to Ethernet frame padding, where additional bytes
-> > may exist beyond the protocol-defined payload length. Could you
-> > elaborate on how this case differs from the padding up to the Ethernet
-> > minimum frame size (60 bytes + FCS)?
->=20
-> The padding of short packets to 64 bytes (inc FCS) is a special case.
-> I don't believe any other packets are expected to be padded.
-> There have been issues when packets get extended when hardware switches
-> add VLAN headers to padded packets.
-> I also think you'll find bug reports caused by one of the VM 'virtual net=
-work
-> interfaces' adding extra padding to frames before they reach the physical
-> network (possibly just making them even length).
-> I can't remember the full details, it caused the company I used to work f=
-or
-> some issues because we had some hardware that rejected frames with
-> unexpected padding, a google search showed it was a known problem with th=
-at
-> VM.
-> A quick search showed https://www.virtualbox.org/ticket/18202
-> I can't remember if that was the source of the padded packets.
->=20
-> David
->=20
-Thanks for the detailed feedback.
-
-As you mentioned, some hardware may enforce strict Ethernet frame
-length validation or be sensitive to tail padding beyond the
-original frame size.
-
-In our case, IP and UDP headers are not modified, and the
-protocol-defined length remains unchanged. Therefore, on hardware
-without strict L2 length validation, this padding is not expected
-to cause issues.
-
-However, on our hardware this workaround is required, as the
-known issue can result in TX hang if not applied.
-
-Thanks,
-Justin
-> >
-> > Thanks,
-> > Justin
-> >
-> > > -- David
-> > >
-> > > >
-> > > > Thanks,
-> > > > Justin
-> >
-> >
-
+Not all of them are false positives. I will address those that make
+sense in a v4 and note in the list of changes what I didn't address and
+why.
 
