@@ -1,162 +1,176 @@
-Return-Path: <netdev+bounces-297260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9HxeEntvKGpgEgMAu9opvQ
-	(envelope-from <netdev+bounces-297260-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:35 +0200
+	id q8DGEw1wKGrKEgMAu9opvQ
+	(envelope-from <netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7252663EF2
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:54:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB851663F5B
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 21:57:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b="U/AwDtbx";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297260-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297260-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=UyXqKSNF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297261-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 094FC30A5859
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:50:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A7A2313582D
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 19:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E4C4ADD97;
-	Tue,  9 Jun 2026 19:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3470640D59C;
+	Tue,  9 Jun 2026 19:51:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1119948A2DE;
-	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CCC48124E
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 19:51:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781034640; cv=none; b=Pa4VpYMQFj5w2sj2x6Prl4IdAa1m8xJiWAloOJ1KHjuGwgpKgL1UVZz222/6XhUgmxEsAie6Q1E0tKsa0O74Jj6nNy0SM1yRpV+1wGt2w9VGeq3BSNdt3pZphcybDjkt3/74x4uGS7BEC2R/Orydf2ChS33XXk7Tyfso2xAGDvg=
+	t=1781034684; cv=none; b=nslCcyQftuup2AOSoW3Q8JIEGgdNehxnu3DBJHxIFSl7XNm8WtAS4gxHIuAW5coEFgWsUCHxvEY953BwwnZEsLy7rxtw+IEw7Fta9Zcn+wg1LOjMIkjacgNktCtbb91Z2OpuPP0XgTRloJkAw8Yg3x9ggqcOfD3mL9xYjKgaP2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781034640; c=relaxed/simple;
-	bh=cr/MvAsXEhWjeYtC3UgDZ9svVa04M+bda+dTvROi4DU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CKG1Lakvd227J9mwuGxop/JAQPQGlaMATa2VCTwTIdAopxktSLogXg4cEPhvshL+lIJF+UhAgueEpFjg0Z72V+lKeqRcmRZ5j6DwIItpOE+E8HQsgAbSgImXGnf10OJZPZddfTE2jzw+N5QPP41l1oQtMHasfxErTd5rUEJbkRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/AwDtbx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A7F8C4AF10;
-	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781034639;
-	bh=cr/MvAsXEhWjeYtC3UgDZ9svVa04M+bda+dTvROi4DU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=U/AwDtbxGfb9CQ//t6TLqr6Qx3DW0XCi+5WmAM5TDKDbrndPf/o7Z6nFuHdSVx8P0
-	 qI1TpKduYgGURbw//NZzS41ayVi0n1oHpdeSTjfeQw8Zi0keCF8Uq35qUj6wJS4ZfN
-	 Kvh1eJcG4qeVSSRDz1V7rmE0YB44Fhte7QKG7rNdIHZk1sOhzBwbG8gUPx3cXv1bny
-	 h3kvbwMREYLdwF5Q7tPG9za4BzjE/kVE0FsDNYkAjSjJ5Q1xIti2TYBgxtjs1kLp4J
-	 yARMg5ltv2V6eEdauDoO1+aWtzGrEgUirN29B7/xmBJeyUflo6BMk8iVSAz3b9A/Da
-	 G0vINkPcwBWUw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8078FCD98C6;
-	Tue,  9 Jun 2026 19:50:39 +0000 (UTC)
-From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Tue, 09 Jun 2026 12:50:27 -0700
-Subject: [PATCH net v4 4/4] dt-bindings: net: updated interrupt type to be
- active low, level triggered
+	s=arc-20240116; t=1781034684; c=relaxed/simple;
+	bh=fGch22jZAhUnZc2JB3l1ZbWmjnBlSQCGkHHpCvFs43M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kybQUgzYuyCnKgFKcd/XepUf6fm3HgPdVJaZud4mZHghaL/C1jcKtQDIaQvbnQM6h0YiMjN9E3Pin5DKvZr8DfBnyc/w2M2wsEyakVTTyLoAEy8idvk+15yoAtJZRUmB9/EusGs7BUKPqxl3Zb/yEDY09zzt5omNWbgcrmAivyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=UyXqKSNF; arc=none smtp.client-ip=209.85.210.178
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8421f0e9c5bso2740768b3a.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 12:51:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781034677; x=1781639477; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pcuzUwojIicQgNYVYeBBnWiTMNVB+UCosfiJT5lPt0I=;
+        b=UyXqKSNF7MeRdF+p+a/Q7xA+qqR94IN04PtDH2BybrKhexarRDDXAfF4tdhOmxHZrT
+         RlIT5FXzHVn8mYXZfEr57p3iHASMqWqz0grvrUmfMehVf65VlftVCjtoDVLWqKuJ2g9g
+         9ntRMpn+aNfBGOf07KdDrVHSl7U16jlIZWlT2DK43BKSPQUuTwCReOjGXHDGdl3IdIKh
+         6zSSH7ggMDgL6SSWsEGUT3QNdVktO652YtC3QiGVVZcCBLfQYyp3ClOrutX6WYPXVWlz
+         BNBdDphHRGrgneVhKMvz8GzV2KcIL06RS45LwY9HXPKhba+SWOylLOZqSXtO/6/vdshY
+         IvAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781034677; x=1781639477;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pcuzUwojIicQgNYVYeBBnWiTMNVB+UCosfiJT5lPt0I=;
+        b=MCALDfwgIiWmfbb1/IyaTLBuOIvydc7SRmJaTCDrxmcd353QomH8DlNrTTTTP0RWQ1
+         RVQjrYEsRpQxTJJqgjPwl602qIlyxNPpJZOk72Xr400oBkS949VaetLm+TwDBlmQirWy
+         ptJ2z7iWo1WEixniTlN68dTJuTdSO04Qpg3JqplRHT0pr7BfopDqOFSXfR7ENvPH+UgA
+         GNKMDNqKRBRUdC/snXMq2WYkIB4r0Zw0gGUkkSKlDpzrGtc6Ua8z1Qz/4r6DeEJtSiE3
+         poYtafC31NB4/KZETZQqhR1ojcfpyqMGbyXe1G/wxileiZZdM9bNsVlkpZMR8Slw8PHR
+         jh2Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+VFE7LJgFT5aYZx5UzyteQmUz7kAXBTSFZVRV9u00xUP38b8Y56DPBH8w7K/qWyEs7PI9DBzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBL+WlZ+2ex57bvAa2wGT/weXLgWuAb4i8qcsqia0sXE8+tkVm
+	JUSC/TKVB/d5AjgTL+1uPrUMp83CZJGrVNPK7P0msf9PoSUbgNkP34AxlWdVV6duJLM/OccTcGW
+	2o87B
+X-Gm-Gg: Acq92OGM88mUl3rTZRRuDlCzVl1bE1F3RIjsCwDgB2zu7BJzYUOntpOqenocDfz060b
+	8/hL3yHd8QiWsRfiGZ1gqCUCMYT1QABnWXh/yiP4k8XDE3qYdoKyEDe9uYhxMfiAIFtyAaGRlHx
+	qp4pxGdhKEhF3E/ZdDLxZCvTzgFfr2WoxI9LxGIONM/8DXAo73ebGMizQDOW309RxKiS9fhDLrg
+	acVHlSkwPJbufavZhAuAtcm3taP5bPEujYTNdA7NvkoVlicUihy0/XwkwSoie/0kr+hMzP4Ox6H
+	sAB985Afb/00vC48YMDf28JhlWUosaWWRpweglfZTLCcqY7CDGQFE3XN0867WLzWOfavWc+89WJ
+	nkogmjYPU/fPyeHYK+Q8S/CXDkSLwIypsL0KTeU8van2bdMT6l0dzozbZttAIXe4NYKFzMCxqUa
+	QaN6I80mkcLzsCn+Q=
+X-Received: by 2002:a05:6a00:b807:b0:829:8942:2c93 with SMTP id d2e1a72fcca58-842b0e1c7d0mr21125579b3a.9.1781034677416;
+        Tue, 09 Jun 2026 12:51:17 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:4b::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8428325d9a3sm22197411b3a.34.2026.06.09.12.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 12:51:16 -0700 (PDT)
+Date: Tue, 9 Jun 2026 12:51:16 -0700
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	corbet@lwn.net, skhan@linuxfoundation.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] docs: networking: add guidance on what to push
+ via extack
+Message-ID: <aihutHOO7Dwp8aQ/@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+	skhan@linuxfoundation.org, linux-doc@vger.kernel.org
+References: <20260609190919.1139517-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-level-trigger-v4-4-6f389abdd192@onsemi.com>
-References: <20260609-level-trigger-v4-0-6f389abdd192@onsemi.com>
-In-Reply-To: <20260609-level-trigger-v4-0-6f389abdd192@onsemi.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>, 
- devicetree@vger.kernel.org, Piergiorgio Beruto <pier.beruto@onsemi.com>, 
- Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781034634; l=1207;
- i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=bMsW8U5V7GkXjBltoUBoX9kv1yVBsDFF/rrSFoglK5M=;
- b=N8mr1STIqO4eTYBJILLVX/hqFhKUZCTVDRyE5t0HXhobVyJaj/26YlIwDePI8G3Tf8HHLYeuS
- aGh6Zn3e2KUDXQOYz1t3ypYZD/o5FrWTcS1NYrg1YYvWhd1YUfSqcUH
-X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
- pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
-X-Endpoint-Received: by B4 Relay for
- Selvamani.Rajagopal@onsemi.com/20260531 with auth_id=803
-X-Original-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Reply-To: Selvamani.Rajagopal@onsemi.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609190919.1139517-1-kuba@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297260-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
-	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Parthiban.Veerasooran@microchip.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:pier.beruto@onsemi.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297261-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[Selvamani.Rajagopal@onsemi.com];
+	DMARC_NA(0.00)[dama.to];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm20253.cco0.facebook.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama.to:from_mime,dama.to:email,linuxfoundation.org:email,dama-to.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp,lwn.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B7252663EF2
+X-Rspamd-Queue-Id: BB851663F5B
 
-From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+On Tue, Jun 09, 2026 at 12:09:19PM -0700, Jakub Kicinski wrote:
+> Every now and then someone tries to duplicated extack
+> messages to dmesg. Document our guidance against this.
+> Also indicate that system level faults should continue
+> to go to system logs. The high level thinking is to try
+> to distinguish between what's important to the user vs
+> system admin.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: corbet@lwn.net
+> CC: skhan@linuxfoundation.org
+> CC: linux-doc@vger.kernel.org
+> ---
+>  Documentation/networking/driver.rst | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/Documentation/networking/driver.rst b/Documentation/networking/driver.rst
+> index 195a916dc0de..abd366dd5e43 100644
+> --- a/Documentation/networking/driver.rst
+> +++ b/Documentation/networking/driver.rst
+> @@ -128,3 +128,16 @@ to be freed up.
+>  If you return NETDEV_TX_BUSY from the ndo_start_xmit method, you
+>  must not keep any reference to that SKB and you must not attempt
+>  to free it up.
+> +
+> +Error message reporting
+> +=======================
+> +
+> +Number of driver configuration interfaces pass a Netlink extended ACK
 
-According to OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6)
-specification, interrupt type is active low, level triggered interrupt.
+Maybe I'm reading it wrong, but seems like it should be: "A number of" ?
 
-Fixes: ac49b950bea9 ("dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY")
-Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-
-changes in v4:
-  no change
-changes in v3
-  interrupts entry changed to level triggered from edge triggered
----
- Documentation/devicetree/bindings/net/microchip,lan8650.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-index 61e11d4a07c4..766ff58147ae 100644
---- a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-+++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-@@ -67,7 +67,7 @@ examples:
-         pinctrl-names = "default";
-         pinctrl-0 = <&eth0_pins>;
-         interrupt-parent = <&gpio>;
--        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
-+        interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
-         local-mac-address = [04 05 06 01 02 03];
-         spi-max-frequency = <15000000>;
-       };
-
--- 
-2.43.0
-
-
+Reviewed-by: Joe Damato <joe@dama.to>
 
