@@ -1,67 +1,85 @@
-Return-Path: <netdev+bounces-297096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297097-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PrXUI+csKGpb/gIAu9opvQ
-	(envelope-from <netdev+bounces-297096-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:10:31 +0200
+	id U4jzAXQxKGqK/wIAu9opvQ
+	(envelope-from <netdev+bounces-297097-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:29:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C29B6618F7
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:10:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B32A661C0E
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:29:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=b+yBEgVg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297096-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297096-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=nMSgLzgJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297097-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297097-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F69930D729A
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 14:59:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 97C8F3186F18
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2018D34BA24;
-	Tue,  9 Jun 2026 14:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBF8480967;
+	Tue,  9 Jun 2026 15:03:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AEF383C6E
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 14:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC6747D934
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 15:03:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781017144; cv=none; b=uDIUhAPPtazySqnrqHzzF+GR+ykYwVySQFhsUloAy9KgDu1tzTvvGeNcxau+2uyCrgy96DoclcOwe4ZmyU/uxwV7EakAyXy5xw8jEWxe0p6WE5rMgYB4OLhC0frewymMSoXJpqF3Q0MNO6dovfqNgYXvp7ec4kjBcffXy2va024=
+	t=1781017416; cv=none; b=eJ8Hl0UhpdPgFaiCx87gp0tYlILc7hrGLucxTTAgGJnyIXXvDSIW37d81wfvWlkvvAVh/ZVNMzHJ3eW205WQEYD4mTBqunR+lW7urdQ0QLdfpPapfGV50I+uCyTM3ukdSHKTen61ImGj1gkD+149Ay2AbARVC3nvAdAohmFYlAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781017144; c=relaxed/simple;
-	bh=cMT9LC19vPuV86F4Qp2FvF88/ufZ9va/QADtdSw8aYw=;
+	s=arc-20240116; t=1781017416; c=relaxed/simple;
+	bh=+z2z6iU/y2HMbTEBl5xiZqMcHJhJTx154BuN+bMnsSQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LFZJeqRoFSGUd+4OVUAIuy8pazcDofqd6FKPCt5clyaIHV1uwG2CNkx9hAayB0xGQpNEbKov1u/ETyM8sJFGSZXhPjhFO8kp51cQhYPpLH4N14OrReTmxuGxiT9bg02iXe68UZHpm6Qh6mLOpz62WKWSyEi1Rat3Agss9i5kfqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+yBEgVg; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781017140;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+OAvp4c0/m2NArQ5FisMbwXTexlBy9jZdB2Hd9gIJik=;
-	b=b+yBEgVgtuoLRrPpFYkANKIXKrx8aEFIX8rf1Fck0bfneUs+aglKw8J4g8J3Ugj3Q1+h6F
-	yIauAVKr8dzQnOiXoNCFmtohUR0o1ZgO4A1+5ND1aRQPnPptioVCIXSjLLlu2Oxpqwq8B1
-	jixOGlSKdAQCUXnkiDzNQ88Vwn+cmRk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-247-eegLj0yoPROChFpBu06HYA-1; Tue,
- 09 Jun 2026 10:58:55 -0400
-X-MC-Unique: eegLj0yoPROChFpBu06HYA-1
-X-Mimecast-MFC-AGG-ID: eegLj0yoPROChFpBu06HYA_1781017133
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AA7B1806D38;
-	Tue,  9 Jun 2026 14:58:53 +0000 (UTC)
-Received: from [10.44.34.233] (unknown [10.44.34.233])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CC7931800583;
-	Tue,  9 Jun 2026 14:58:48 +0000 (UTC)
-Message-ID: <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
-Date: Tue, 9 Jun 2026 16:58:47 +0200
+	 In-Reply-To:Content-Type; b=UxJO1/nR4XN9RXLY9Q2OFH2+3D2ZbD2GDjnyLNBh64Lu5a+IWC6tBNSlU38O7wQIsxuxiJC+qhElCWKwCfa6pt4iPRPwE+XnfOXwZpdDOjiz9j9qufR9DxLpNlcGpjClQJFKSFNeGAASkZO/tFwO+nHRVgG9eUkh/Y87RRL3S5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nMSgLzgJ; arc=none smtp.client-ip=209.85.221.54
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-45ef4223be7so3050688f8f.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 08:03:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781017413; x=1781622213; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dF6R6rSyS51mkSPdhY89TGjX1b36QZSQc6NNcgJtTqg=;
+        b=nMSgLzgJ+0LGhDQSq2vnp1fjNtlc3J3DJkMcVPGrBAl5d01XAO+DA59Nwhzeqtl73N
+         yXFNRcF3df4DzagMQpoZYapweT7rwpd6ZHfy6SdQU/e1YXA0GangGt9TsDp8+iNrNlF1
+         NrUdJ5TeARhgnShYmNIpzH/K0eJKAxyZ2myFmDbG1YN0yDtUf5txAg0dctwawYXbOTLN
+         FbYHbX8go8Gy0IqxnGjl19L5/yKF7QCjQuPjtIBiQBuIRk7sdX0GyBmaMO24qDpkXaJl
+         CvtwgQ0rwbw5BEP1LHyTjXD7dulMsCDq0wNLhjOk3YBky5Lnn9ld4hJ1X9eH7itOxLq/
+         8PyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781017413; x=1781622213;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dF6R6rSyS51mkSPdhY89TGjX1b36QZSQc6NNcgJtTqg=;
+        b=nCRL95PO7YL5PUPE3SGDdofjzhdbedgySPJhaP9sSHUi45O160xTA8ou6FGmIiaoKV
+         wWKPCJSfWBurrRKUgoqDFJowoqcuWF5URRBX8a8NA/R1CM7UaMLHc8tzVpzRvcXHvA0b
+         FnTaN/g/LrvCs1AJGMejNvXfGMcdMzOXc+iC7GHAWNf/WQ81rCiFyk9WlAJL0aS1th8L
+         7TtjoCa69aMaY4aEox40MtpyPX5UxUL4/zPzrIQtCO1OndSbwBK8twhgqN93qF2YjV9O
+         x8eJzfHA+iJVP+5Hhk9k1xTlXgbeDDEea+Q4StfSWSliD/K10IBPmCeIGFtNqi7E/YW/
+         yzxA==
+X-Forwarded-Encrypted: i=1; AFNElJ9bKmP8HdAXSkdGopwy5hwkDOlkLGN0/t9SMvByUUD2T7iePUdoUIzfOKcxL759ttklz3lZBmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIT31Qzl3/3nIvCyMOJIqor6qFV9pu0HJYyw7wll36KZYr9Oke
+	lb1/8lQuYj1zAJ6qq2V+c2mAWt2YJ7rrXWq8HiJsPjKpb/zKq6+4Bss1
+X-Gm-Gg: Acq92OEMj3Hry1YxHa1sqk6uowemvfRjpZTPqaeZnh5Ure+WbO4E7WX6FIDHii5vJky
+	vkVPhnrhsVvkYpyqdpEFCkPBElkMdXFKityiYsgnU32TJBSP1RYzHH0PzRrg5p7+0GwzdkbQ6v7
+	0o4aIo86fW+3amTK2Jga2yURP62K0FX7i0qPre3oHFBbCwadFnUIf5NH5v4WdUqrnUUhZIZvgxI
+	5iVdDV4c8kYMQ4Ik2rnV7TP7i/ohoD8UH+rVwO5+NiG5qF5yinHo5xDJ+cUvUUhKPWKb02ekhNB
+	Z3QotO4fWFEVt8i/u0CqLqdQsyNoRLaeX7vNkIsuVOr4Lo1iMERaiB5rrvBGG68o9/09QWaMN47
+	OsSKBwEzz0tLqzJxyRn4O6aDKu83yeOWGxFrx5RKlCDpCjYGKVy9DL6eYW0ou2nvFcUOuZKqBv9
+	in2czZN7ljTEl+XcMv1wUoZZ58nNMuvkJjSvSR3C+dpYtNZNEM87V74EjiWd6UuCiPbSa8Vpmds
+	FSOlDzIR+z8/r/UVMpe
+X-Received: by 2002:a05:6000:4a09:b0:45e:779a:302c with SMTP id ffacd0b85a97d-460566c94ddmr3982199f8f.29.1781017412556;
+        Tue, 09 Jun 2026 08:03:32 -0700 (PDT)
+Received: from [10.1.0.164] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2dcad5sm68854439f8f.5.2026.06.09.08.03.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 08:03:32 -0700 (PDT)
+Message-ID: <49c78c6e-5ccd-4789-ae53-359d4e5794c8@gmail.com>
+Date: Tue, 9 Jun 2026 17:03:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,135 +87,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Schmidt, Michal" <mschmidt@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, "Vaananen, Pasi" <pvaanane@redhat.com>,
- "Oros, Petr" <poros@redhat.com>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Simon Horman <horms@kernel.org>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20260531194423.383366-1-ivecera@redhat.com>
- <20260531194423.383366-2-ivecera@redhat.com>
- <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
- <CH0PR11MB53941698BDF5C3B8298CC0679B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <aifTFMZtWBgLzhCS@FV6GYCPJ69>
- <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
+Subject: Re: [PATCH net-next v9 2/3] net: ethtool: add KSZ87xx low-loss cable
+ PHY tunables
+To: Jakub Kicinski <kuba@kernel.org>, Marek Vasut <marex@nabladev.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, maxime.chevallier@bootlin.com,
+ horms@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ Tristram.Ha@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nb@tipi-net.de, fidelio.lawson@exotec.com
+References: <20260601-ksz87xx_errata_low_loss_connections-v9-2-fdbbb15592cb@exotec.com>
+ <20260604114119.170747-1-pabeni@redhat.com>
+ <20260604193545.0a906598@kernel.org>
+ <4098dafb-838e-4854-add6-cb3ce6668a70@nabladev.com>
+ <20260605163142.4bbcf502@kernel.org>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
+From: Fidelio LAWSON <lawson.fidelio@gmail.com>
+In-Reply-To: <20260605163142.4bbcf502@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297096-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:arkadiusz.kubalewski@intel.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:kuba@kernel.org,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,kernel.org,redhat.com,microchip.com,linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-297097-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:marex@nabladev.com,m:pabeni@redhat.com,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:Tristram.Ha@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nb@tipi-net.de,m:fidelio.lawson@exotec.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,bootlin.com,kernel.org,armlinux.org.uk,vger.kernel.org,tipi-net.de,exotec.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[resnulli.us:email,intel.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2C29B6618F7
+X-Rspamd-Queue-Id: 2B32A661C0E
 
-On 6/9/26 4:00 PM, Kubalewski, Arkadiusz wrote:
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Tuesday, June 9, 2026 10:51 AM
->>
->> Mon, Jun 08, 2026 at 07:03:46PM +0200, arkadiusz.kubalewski@intel.com
->> wrote:
->>>> From: Ivan Vecera <ivecera@redhat.com>
->>>> Sent: Monday, June 8, 2026 5:48 PM
+On 6/6/26 01:31, Jakub Kicinski wrote:
+> On Fri, 5 Jun 2026 05:16:54 +0200 Marek Vasut wrote:
+>> On 6/5/26 4:35 AM, Jakub Kicinski wrote:
+>>> On Thu,  4 Jun 2026 13:41:19 +0200 Paolo Abeni wrote:
+>>>> [Severity: High]
+>>>> Is it intentional to enforce an 8-bit type constraint for bandwidth and DSP
+>>>> equalizer tunables?
 >>>>
->>>> On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
->>>>>> From: Ivan Vecera <ivecera@redhat.com>
->>>>>> Sent: Sunday, May 31, 2026 9:44 PM
->>>>>> ...
->>>>>>         -
->>>>>>           name: gnss
->>>>>>           doc: GNSS recovered clock
->>>>>> +      -
->>>>>> +        name: int-nco
->>>>>> +        doc: |
->>>>>> +          Device internal numerically controlled oscillator.
->>>>>> +          When connected as a DPLL input, the DPLL enters NCO mode
->>>>>> +          where the output frequency is adjusted by the host via
->>>>>> +          the PTP clock interface.
->>>>>
->>>>> Hi Ivan!
->>>>>
->>>>> How would you control this in case of automatic mode dpll?
->>>>> Automatic mode DPLL shall be controlled on HW level, such pin brakes
->>>>> that rule and requires some driver magic to show it is higher
->>>>> priority then the rest of the pins?
->>>>
->>>> The NCO pin can be connected only in manual mode. In other words a DPLL
->>>> in automatic mode cannot select NCO pin (switch to NCO mode) by its own.
->>>>
+>>>> This heavily couples the global API to the 8-bit register layout of the
+>>>> KSZ87xx hardware without defining generic units like Hz for bandwidth.
 >>>
->>> Being picky on DPLL_MODE for enabling feature is not something we can
->>> allow if it is not related to HW limitation, is it?
->>> Could you please elaborate why it is not possible for AUTOMATIC mode?
+>>> AFAIK this is the one comment from AI that survives scrutiny.
+>>> Seems unlikely we'd need more bits, but then again - why not.
+>>> u32 should be our default for integer values, u8 is more for
+>>> booleans.
 >>
->> In automatic mode, the pin selection logic is defined upon prio. I can
->> imagine that if NCO pin has the highest prio of the available ones,
->> it gets picked. I would be aligned 100% with automatic mode behaviour.
->> Is there a real usecase for it?
->>
->> [..]
+>> Why waste memory space if we are already sure the space would not be used.
 > 
-> This is not true. AUTOMATIC mode is HW solution, SW driver ONLY
-> configures priorities on the inputs, not manages the active inputs.
-> This brakes that behavior, the SW driver would have to manually
-> override the AUTMATIC mode to be fed from such NCO pin as it doesn't
-> exists on it's priority list, HW cannot pick or use it.
+> Waste what memory? We are talking about a syscall argument effectively.
+> 
+> My point is that this is adding the arguments as u8 in
+> net/ethtool/ioctl.c, so as part of the global uAPI.
+> 
+> The driver can still store these as u8, since any value outside of that
+> range is invalid for ksz87xx, and the input is properly validated.
+> But we shouldn't constrain the value "in transit", at the uAPI level.
+> Another driver may need a larger range (however unlikely that is).
 
-Correct, AUTO mode is hardware feature and it should not be emulated
-by a driver. If the hardware does not support it then the switching
-between input references should be done by userspace (by monitoring
-ffo, phase_offset, operstate).
+Thanks for the clarification.
 
-> The real use case is that any DPLL can switch the mode to this one
-> instead of implementing MANUAL mode just to use the feature with a
-> 'virtual' pin.
+I will update the series to use u32 for the PHY tunables in the next 
+revision, while keeping the driver-side representation constrained to 
+the supported range.
 
-I don't expect this... but it is up to a driver. I don't plan such
-functionality in zl3073x as the NCO pin does not expose prio_get() and
-prio_set() callbacks - so it is clear that this pin cannot be part of
-the automatic selection.
-
-Ivan
+Thanks,
+Fidelio
 
 
