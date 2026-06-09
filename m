@@ -1,142 +1,200 @@
-Return-Path: <netdev+bounces-297052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VNXEBPYXKGpj9wIAu9opvQ
-	(envelope-from <netdev+bounces-297052-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 15:41:10 +0200
+	id dZWQMk8XKGot9wIAu9opvQ
+	(envelope-from <netdev+bounces-297053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 15:38:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011EB660ABF
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 15:41:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C54E660A5B
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 15:38:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=bTWh8AYf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297052-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297052-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=k+SVVA9z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297053-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297053-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C503430060A4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 13:30:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C689F3038A6B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 13:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEEC38AC65;
-	Tue,  9 Jun 2026 13:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35C1419302;
+	Tue,  9 Jun 2026 13:35:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AE328850E
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 13:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE694219E9;
+	Tue,  9 Jun 2026 13:35:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781011811; cv=none; b=TkZoETECdMKIHhZODGjw0uPHimmBL3YZWR7sfie9KKiEkWyo5aeZvnMvLpD3C4Wv6x8LK5lQdsQwpqS1nEWvcuIrCF8lX3d3vBNrZ2RvUch++X6dEYv8g+W5khZf/xtCivN4pSqhIoTWmqqx3akTfkIcFma+IIPXGv/Ij1RzRis=
+	t=1781012131; cv=none; b=o34B5qyQFlY3RJY/ZcAu3JNSjd2Yq5u77WEDDASJx4KSr9Z+/coGrwDuu4v5bj4Pi+wavkIj31mKTNj9rPThwTmy8oep9KxIQNKHoXNaYh4kvemB+M980T12wG7nwzDVS8j4xb8LJjYPwyMNeO9o1nQ88YehdLwWlXoNZtRNG2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781011811; c=relaxed/simple;
-	bh=fLLXdIlG+c1WK8htpNpQKmWEMgm10IiWOwSGccnoIc8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t/zZLqcLsw5BfUHGV30gfgaEEtcwgm2XOzVNWx9vnqctRk1A5DOSxAFhQWbkEM8aer8Nzu0n7Oj442tTcXmkcV8RtzzRIOvbudDkZPR/Ud72Xn5OxQmw0/dMIUEr2d6DcMFb/nfemnqZAXBOcMTmh9qQH3PDjInRPJjNYFq/GkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTWh8AYf; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD9F91F00893;
-	Tue,  9 Jun 2026 13:30:10 +0000 (UTC)
+	s=arc-20240116; t=1781012131; c=relaxed/simple;
+	bh=ml6eSRhxjCVHN3VXQbaaRvrvgZMio1B9YEW5sqBgfqQ=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Ns0wlQYiblcUtsUzcEftgW4pY8AnfhUGUPjVa2e4WKHLN8elrJA2QiTt6ery8FOVgINLtuUZnNKWxyUVT9ihCFLvTb/dbOZtd/Ethot8ahl3doq28BKsJ5RMvMTUo2FfiPMLVrN4LiAwAeUFzziHtihvrDVjE+ryk4SSZzI5vYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k+SVVA9z; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 771BC1F00898;
+	Tue,  9 Jun 2026 13:35:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781011810;
-	bh=/yRustlpKO/BsoqJ5LoKaT/yPOd5LE85+DB3PDO9sFk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=bTWh8AYffpChG+So00/Qi2ZUmMuEoFfjLQc8MLo7Ov+bn+LWmBagIdDM5qz6w/SWK
-	 awi4JXVUuBeUTDA1Q1syjIhzBLORGYMMpWffmAmvTfhGrjxHE5jN+IJng/+J2IKdYF
-	 7+JfkNtv85d/ic1LwzxwQ/3pC77ETQRg5EgjNtwc4Ft32voPNn38me6beBCSR6hMvJ
-	 S8b5a1t55iiJVpEyYEamtnKJm7Jq7Zh+wnSCsOU8PWh1iuHxstwO3QhX4lMztOV+rl
-	 cb886wIX3vM2XiwbMtOjJfqNYMY4JrMqaXvbv0H3VREvj8tEid3J/LoxVSiuASbh4b
-	 vK+AurQaIp68g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56E6239308D4;
-	Tue,  9 Jun 2026 13:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1781012128;
+	bh=+l/UTSLrEN1zHvyis/o72R6ISF/z8tIHnP6okV95VvQ=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=k+SVVA9zJ4tZ2kJQU/0gMLQJI0sP3l3f3+9EDObAoVEqmqmDGDRhfcPdLarcJ5hu5
+	 cosbVXc294Ptezv0LdrqnmGtqpTtieZ7tL8nDTJuoCg/x2CVjEcWbCsv+h/BZDvZes
+	 yWneKR6KG7VZ5nuw10SM1qjtQCn5Nkwe4NJIZgin8QUaK/EpyHwxYbs+DDnx9rLTAz
+	 EubtfDBFWaAVhMUJ1F4oY4VL/0JgUutzm2LlT4cq8rWa+emntjfO7dA84fZERFR2TN
+	 39XZDyqo8x2OqfKyvVqTch6UnfocgkjDXZ8s3yqsBOEF+QrHL/jojwdLEUrc5GY4/4
+	 fZsG68pIt97MA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 768C7F40078;
+	Tue,  9 Jun 2026 09:35:26 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Tue, 09 Jun 2026 09:35:26 -0400
+X-ME-Sender: <xms:nhYoaplIY6wt8kTkhGrccaO3i8dwZ4W4I6UK32dxAmJzR_RZNJ8Cxg>
+    <xme:nhYoavoyGhCnFRCcdyhKYQi21RJ6TedTCUqElDkX6oKHwsNB34l4sRB779JgyouOp
+    Cwe8Uk4EKdFC-wn5ciK2fdDMtgZWmTLgpefCvOHGO5Ce27bOAWUFRY>
+X-ME-Proxy-Cause: dmFkZTEDCIIiozq5l4PyMP1KhHxMo20yBOrr1DxMjIfh/X+ZS8v3yNvexBCw5JykEEfxJj
+    6MccADJBKKlCbmJe5OMK7gYITzGG3trc9yKUY9oLpnPrMH/J4PSSbHPnHNHJFqSYdElaII
+    9iBVeVo/7DH31ynwuHt+N3W8NVL0ph6AYsqcFJQmXwTw8ll1Otg1/PqGU70oWnnJpoSnej
+    6L23KmTHwLgcZfPQR3BFH5XELy6+HN8Jcbi0XqnZrEbG1VRgw9sjNzFt58mNpf7UDw9x5D
+    WnwfjZDFvdnMKHWtu8bdmeGV0EmimIcHzfIpunMpJ3Pb3s1+HkSIgkq8e4ULdtGOkh8qhk
+    OSnUiBs3qQrPNRK6d2FEY1FjLeMQn05ICZqbtfpqr6wuucoDO5aJdDlze+zm9r/lY8TCEC
+    5oOc89AqrumaZPWOjQx52klmbedIM3qLpc2Bi49iMA8FyRlUbEaEpYxgVQhYLjlMg9lQmu
+    tZN2pJkmE8PFIBnaRgiQOsBJxCC3Gxa59gP9uFk6nyJZpJLXFLQecy6A1lo5Qg50P4bs8N
+    jGiKa4rWv5pKSr18Nignfn5NF9GsXE+pZwNxNV63qut9IYMHsRAgnRfFWeNK9N+U5e8Jzg
+    6PjP7VflmeHMo5Lejr3TWlm+2rFVYFeQJTfP8bQ97pj/ZZJIG/KOReZ4EB6Q
+X-ME-Proxy: <xmx:nhYoamOGRchH9ufTadJUhsexv-Fie4rUdaps1S8wyYz1jkdUWmQJKg>
+    <xmx:nhYoalEKo-dU2IXldVZ-UEuGhCxQiR75Egv1pg1V9XepOdc5U66l5w>
+    <xmx:nhYoarGIMtfhRtt8Q3GvIgYfWw0FzuCybUVgu7WF55kBDn-aSIxUig>
+    <xmx:nhYoaq94dBwNO8GOvkiG7L6Qn1qP4Q4H5ZGU0-MpQD1i5RoJbbedOw>
+    <xmx:nhYoaspKch9W2TMlyF-K9Ujwm2Nzi-EDZWGjxV8y5EY8V8k3JTTQgXZH>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 45AD4780076; Tue,  9 Jun 2026 09:35:26 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] net: mctp: usb: minor fixes for MCTP over USB
- transport driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178101180914.2029912.4636936255342101999.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Jun 2026 13:30:09 +0000
-References: 
- <20260608-dev-mctp-usb-rx-requeue-v2-0-29a3aa507609@codeconstruct.com.au>
-In-Reply-To: 
- <20260608-dev-mctp-usb-rx-requeue-v2-0-29a3aa507609@codeconstruct.com.au>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
+X-ThreadId: AL3hV2aBoURB
+Date: Tue, 09 Jun 2026 09:35:06 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Hannes Reinecke" <hare@suse.de>,
+ "Donald Hunter" <donald.hunter@gmail.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Shuah Khan" <skhan@linuxfoundation.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "Sabrina Dubroca" <sd@queasysnail.net>, "Keith Busch" <kbusch@kernel.org>,
+ "Jens Axboe" <axboe@kernel.dk>, "Christoph Hellwig" <hch@lst.de>,
+ "Sagi Grimberg" <sagi@grimberg.me>, "Chaitanya Kulkarni" <kch@nvidia.com>,
+ "Jeff Layton" <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+ "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Anna Schumaker" <anna@kernel.org>
+Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+ "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <2dc23995-3ff9-4714-ac6c-d70255b15687@app.fastmail.com>
+In-Reply-To: <922040b0-f87e-484d-9f7b-78098024ad04@suse.de>
+References: <20260605-tls-session-tags-v1-0-47bd1d94d552@oracle.com>
+ <20260605-tls-session-tags-v1-3-47bd1d94d552@oracle.com>
+ <922040b0-f87e-484d-9f7b-78098024ad04@suse.de>
+Subject: Re: [PATCH 3/9] lib: Add a "tagset" data structure
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297052-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-297053-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jk@codeconstruct.com.au,m:matt@codeconstruct.com.au,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[suse.de,gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,linux-foundation.org,queasysnail.net,kernel.dk,lst.de,grimberg.me,nvidia.com,brown.name,oracle.com,talpey.com];
+	FORGED_SENDER(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FORGED_RECIPIENTS(0.00)[m:hare@suse.de,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:akpm@linux-foundation.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:sagi@grimberg.me,m:kch@nvidia.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-nfs@vger.kernel.org,m:chuck.lever@oracle.com,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:email,app.fastmail.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,msgid.link:url]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 011EB660ABF
+X-Rspamd-Queue-Id: 3C54E660A5B
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Tue, Jun 9, 2026, at 2:45 AM, Hannes Reinecke wrote:
+> On 6/5/26 19:34, Chuck Lever wrote:
+>> From: Chuck Lever <chuck.lever@oracle.com>
+>> 
+>> Access control mechanisms sometimes need to match metadata tags
+>> between a session and a resource. A tagset provides efficient
+>> membership testing and set intersection operations for this purpose.
+>> 
+>> The implementation uses a sorted array of string pointers. Unlike
+>> hash tables, sorted arrays support efficient intersection without
+>> needing to iterate one set and probe the other. Unlike rbtrees,
+>> they require no per-element node allocation, minimizing memory
+>> overhead for small sets typical of resource tagging.
+>> 
+> [ .. ]
+>
+>
+> Isn't this overcomplicating matters?
+> In the end, this a list of strings.
+> Wouldn't a simple rbtree holding the strings be sufficient?
+> (And quicker to lookup :-)
 
-On Mon, 08 Jun 2026 09:25:39 +0800 you wrote:
-> This series adds a couple of fixes in the ndo_open / ndo_stop path for
-> the MCTP over USB transport, where we are incorrectly sequencing two
-> error cases.
-> 
-> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> ---
-> Changes in v2:
-> - Add fixes tags
-> - Add re-queue note in 1/2 commit message
-> - Link to v1: https://patch.msgid.link/20260605-dev-mctp-usb-rx-requeue-v1-0-b86993d01ac0@codeconstruct.com.au
-> 
-> [...]
+This isn't overcomplicating matters.
 
-Here is the summary with links:
-  - [net,v2,1/2] net: mctp: usb: fix race between urb completion and rx_retry cancellation
-    https://git.kernel.org/netdev/net/c/54665dce9826
-  - [net,v2,2/2] net: mctp: usb: don't fail mctp_usb_rx_queue on a deferred submission
-    https://git.kernel.org/netdev/net/c/881a3113b749
+Consider that a TLS session might have several, even dozens of
+tags. An NFSD export might also have a dozen or more tags.
 
-You are awesome, thank you!
+We need a mechanism that will compute the intersection of those
+two sets efficiently -- that is not a simple lookup. Keeping a
+set of tags in a list or in an r-b tree would require MxN look
+up operations to compute that intersection.
+
+
+> Also see my comment in the previous patch. I really would make
+> 'tags' a nested attribute, and then parsing the 'tags' attribute
+> would be simple iteration over the tags.
+
+I leave it to Jakub to decide the best approach for passing tags
+via the netlink protocol.
+
+
+> (And don't name it tagset. That will be confusing the hell of out
+> of any storage folks, where a tagset is something completely
+> different.)
+
+Since the primary operation on this container is "intersection",
+set makes the most sense. Stringset?
+
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Chuck Lever
 
