@@ -1,178 +1,170 @@
-Return-Path: <netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LiVRHiViKGosDAMAu9opvQ
-	(envelope-from <netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:57:41 +0200
+	id SYeJO4hhKGoJDAMAu9opvQ
+	(envelope-from <netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:55:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62C9966374B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:57:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4904266371D
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:55:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kabelmail.de header.s=vfde-mb-mr2-23sep header.b=k0BcEpJq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=kabelmail.de;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Mw2I8XJL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297238-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3C0D63007A5E
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:55:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D5813013278
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C513AEF30;
-	Tue,  9 Jun 2026 18:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759484B8DF8;
+	Tue,  9 Jun 2026 18:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mr6.vodafonemail.de (mr6.vodafonemail.de [145.253.228.166])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B717D4B8DF8
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7BC43CED8
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:55:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781031351; cv=none; b=JiEIJ3oggJwsFe9SA8qOZvub5ukTCOPpQXRkSH5b0THWsU928hny0+PsCwLcDF932kd9oBixMXSeZv3mFNBeh0rXcqFA/vSG1Zu3eg+NiT7xshOSuTJGQ6j5N8s6ZtgVFH5uYHniVF8LUGxacUR45FTSinNhLS93OpOP56sU9+M=
+	t=1781031302; cv=none; b=RBSUh/oE5NZFT2xGVV32QDmbOmculVoy8iaRtxjILQw/WKjT720edGdSfv3OzC+0qYYShsxlbs87JUqn0cLDFqEa5Dmk3HVNBbr0Qy3FMrtfQiM/hV5hH/7FtUBKzOHVxCxwVEXj+hS9dut0eVdzQkXAuaVkFC6rJfCLn/+d2G4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781031351; c=relaxed/simple;
-	bh=YuvxwJJx0zt9zh5hZQrkkVLUdkpSh1EhkbFr2UpellQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SjzZQYLWfoYvVnAcOB86oCOv4IOX2lpVIW9oZ9TUBnwS34Am1rryfDlkAEf0RtVvVcW75HoYl58gV5lPqk6b4jRlalVnT+merD6nZvxyTJttAtimDuveqAYJZrpJLP336CITLaZTsud3AgKNBjmkSE5SPHC8Lo31UuPIAXOEmA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kabelmail.de; spf=pass smtp.mailfrom=kabelmail.de; dkim=pass (1024-bit key) header.d=kabelmail.de header.i=@kabelmail.de header.b=k0BcEpJq; arc=none smtp.client-ip=145.253.228.166
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kabelmail.de;
-	s=vfde-mb-mr2-23sep; t=1781030956;
-	bh=YuvxwJJx0zt9zh5hZQrkkVLUdkpSh1EhkbFr2UpellQ=;
-	h=Message-ID:Date:User-Agent:Subject:To:References:Content-Language:
-	 From:Autocrypt:In-Reply-To:Content-Type:From;
-	b=k0BcEpJqi7prqPyrPTVtZJc4owzCN1gBeb4b9TkC0HKEM+dKbmyLiIml3N3l0ABll
-	 wJ1qEW4Vdop0nHv56SZFkGzZI3Y6mEXiiIH5Z50BmzzwDxuzPfx4b0UPD4FI67rauS
-	 8Pp2yKMQoB/EQL1s3b/90jK+uW0Bn1JT+Uwc+GEM=
-Received: from smtp.vodafone.de (unknown [10.0.0.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mr6.vodafonemail.de (Postfix) with ESMTPS id 4gZdHJ37MRz3sVxP;
-	Tue,  9 Jun 2026 18:49:16 +0000 (UTC)
-Received: from [192.168.177.95] (212.71.13.3.adsl.dyn.edpnet.net [212.71.13.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.vodafone.de (Postfix) with ESMTPSA id 4gZdH86p9lz8sbN;
-	Tue,  9 Jun 2026 18:49:05 +0000 (UTC)
-Message-ID: <d4eefa75-3902-4014-983a-dadb88ff7bfd@kabelmail.de>
-Date: Tue, 9 Jun 2026 20:48:58 +0200
+	s=arc-20240116; t=1781031302; c=relaxed/simple;
+	bh=A/eIXOo/JATBHzFdXaOYpHGmRhy/QM6ZfMygpy0hYyo=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Lf8BayPO5r0y13Ym73RCZPaABuzit8PriaPjgcYPXtsnrOGJGoO0xJ1wrTZWajVz/DDHGo8Ku7Hb1r67ng9TpGP49FUUMAscQaBe5nLQdxOnhWDp9cgSVtM0fdR00NK6Rx4T48QaFdumnq3N4lKum6aiEZx+R+UpGioN+2wd2R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mw2I8XJL; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C528B1F00893;
+	Tue,  9 Jun 2026 18:55:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781031301;
+	bh=RGayj3EPEyW5089OIaXcYNbn/0ET4KOcMbJw2winxU0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=Mw2I8XJLMt2onLJe9nWC2GZhxhWi8zfGMtl/B0tCFAwHc705jalIDWvJU/v4sAeaC
+	 kxdP4DgHzpcl0llmNnv+Ofwby+0cygSYvF0BlQjO8vEPayiS/WE0myCz+Y/HOrw1ec
+	 I4H1Zil81EtnKd94JfiVwZx5vfMCchwRW6wr5jLox1j1TjvpTx/1ogZWRSK2Op06qI
+	 1DIWbaruxGC9CsuVLlVeQ2h/mf5x12zve65YxS5N4SXq0WzR1R4l1uUsyDIjZrxIn+
+	 x0BNUyDaT29AXBwGAh2VD2qAHM8xT+1k25sk6MZgxkiutKvkjEfOOF2bv6JOVPRD92
+	 E7JF4FHMNWmDw==
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 17581F40068;
+	Tue,  9 Jun 2026 14:55:00 -0400 (EDT)
+Received: from phl-imap-04 ([10.202.2.82])
+  by phl-compute-02.internal (MEProxy); Tue, 09 Jun 2026 14:55:00 -0400
+X-ME-Sender: <xms:g2EoauWHEsvJgMR53JJQL8E-zjzLaj8Wedkh_UNkZPlnxsIs7F23VA>
+    <xme:g2EoalZuptXfIi9w0pyrQ6IaCAtkAa1lRT1SeGTn4axm9A29PDwgpk0ZrotrUCKdd
+    WQa06Z5Ont5_7OBApbuNotCfeirCKkTcICqJuUXBYf4run4Z-n5Zzs>
+X-ME-Proxy-Cause: dmFkZTG0vcQMtM9rJJwi56/yDuZoleG0rCH5L0wD0NAvop4Ds8OPEkw/dtuRssna4SatzE
+    Vk6t4qctsS1+BvVh6cek0JFGEQGjzEM/HA0dk3aDmkB0CACh6OyTEOtjDHia6IqYnVbwBU
+    DVpZ0ivAzPum8UQ/yI1kJskLlqaYM+MyXsHht6dR4CRCxZGtrwxXNAAi1YioNRu2GJHtni
+    6EnI3oO0dd4sdsa94iXFbj+KL1LB/mHnz2kr83KjM8D26DcJa2MlL1ZzSaire5RamJY5wA
+    x9TvBkWxVBwfjOTrazISaBCNx6OoSoqqLRoEEWoJUZwYbhGbwAzUO3R+HIAsN+dDaAuUf3
+    W+ttynM+ugX8QyH49acjcvc/m3XBU0GRQhGW9H+GeHD2oG+Vh60sJKQIb9wc456OKEwlU9
+    dMRpiLfMqyRmzSkH52EGi/+n8ITwuX7wFWrSFR5hVIivbdHHQatRl1BSk1itNV/ti8XjaP
+    2+0Fhfbdc6KZb0yfQ1Kha4N0vTuOrsQ2U4fDlHa/85oCOaaxqLMAC+ikYPlaak7k5riAIa
+    uLwiEUDYzLvz+pi51dE5RQHpRoYNsKv2UNW6wKkWZSl/D6DlG0VACfJn5KlHYjvEdFnOZ1
+    qoIPEYcK+v0+cBkwHg2cl8IWHgSoPGw2PBGPDDcGsqePOKOUIBXKvl+PpMng
+X-ME-Proxy: <xmx:hGEoautAe-1TtFilFXc_vLs2m1RiNuU60EcZo9jl7kZWvP24yYgTQA>
+    <xmx:hGEoaj16gEbyRQh28CSQXEZuJ0g3lxlHuDuHsuY4rJ8kcatI2Z2ogQ>
+    <xmx:hGEoaq7nfIf7DoaqmIkfiE7WeR3Zz1csm7Ax8CSIXYZXArcs2BtkhQ>
+    <xmx:hGEoalOqjv5sQt0rPsSIxkWS9UFQemXGDpDmBNQSaGjAwPc6i55yqA>
+    <xmx:hGEoauEbeClV5qUrjQmCXCqo93tKLgDZRg1IPGt6Zem3K4Lfh8bGBMPS>
+Feedback-ID: i20964851:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id CE5EDB6006E; Tue,  9 Jun 2026 14:54:59 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: SFP/MDIO/I2C: help requested unlocking a SFP+ MCU to expose PHY
-To: Nicolai Buchwitz <nb@tipi-net.de>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org
-References: <ec5bd768-3f54-4c30-b5a2-1e0b43f789e3@kabelmail.de>
- <903daf32-aecd-4160-8f69-4fc329fdad3f@lunn.ch>
- <582a4a1181bf110e97d8d2d249dbd42a@tipi-net.de>
-Content-Language: nl
-From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
- 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
-In-Reply-To: <582a4a1181bf110e97d8d2d249dbd42a@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-purgate-server: smtpa05
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-size: 987
-X-purgate-ID: 155817::1781030955-36FE159A-F4BB0B61/0/0
+X-ThreadId: A8villCpd8mN
+Date: Tue, 09 Jun 2026 14:54:39 -0400
+From: "Anna Schumaker" <anna@kernel.org>
+To: "Marco Crivellari" <marco.crivellari@suse.com>,
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: "Tejun Heo" <tj@kernel.org>, "Lai Jiangshan" <jiangshanlai@gmail.com>,
+ "Frederic Weisbecker" <frederic@kernel.org>,
+ "Sebastian Andrzej Siewior" <bigeasy@linutronix.de>,
+ "Michal Hocko" <mhocko@suse.com>, "Trond Myklebust" <trondmy@kernel.org>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ NeilBrown <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>,
+ "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Message-Id: <d9242324-720c-448f-9723-e11f0158f4b1@app.fastmail.com>
+In-Reply-To: 
+ <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com>
+References: <20260507130117.252825-1-marco.crivellari@suse.com>
+ <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com>
+Subject: Re: [PATCH v2] xprtrdma: Move long delayed work on system_dfl_long_wq
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-5.15 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kabelmail.de,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kabelmail.de:s=vfde-mb-mr2-23sep];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297239-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297238-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,app.fastmail.com:mid,suse.com:email];
+	FORGED_SENDER(0.00)[anna@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:marco.crivellari@suse.com,m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:trondmy@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:andrew@lunn.ch,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[kabelmail.de:+];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anna@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,arm.com:url,kabelmail.de:dkim,kabelmail.de:mid,kabelmail.de:from_mime,odly.de:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 62C9966374B
+X-Rspamd-Queue-Id: 4904266371D
 
-Op 9/06/2026 om 10:32 schreef Nicolai Buchwitz:
-> Hi Andrew + Janpieter
+Hi Marco,
+
+On Fri, Jun 5, 2026, at 4:12 AM, Marco Crivellari wrote:
+> Hi,
 >
-> On 5.6.2026 18:51, Andrew Lunn wrote:
->
+> On Thu, May 7, 2026 at 3:01=E2=80=AFPM Marco Crivellari
+> <marco.crivellari@suse.com> wrote:
 >> [...]
+>>  net/sunrpc/xprtrdma/transport.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
->> Do you know what MCU is in the SFP? Is there a data sheet for it? Can
->> you read out the EEPROM holding its code over the I2C bus? You can
->> then disassemble/decompile the code and see what it is actually doing.
->
-> It put up a bit of a fight, but in the end I managed to take it apart.
-> uC seems to be a GD32E230F8 [1] [2].
->
-> [1] https://www.keil.arm.com/devices/gigadevice-gd32e230f8/boards/
-> [2] https://odly.de/lkml/10gtek-sfp-phy.jpg
->
-> Regards
-> Nicolai
->
->
-Thank you Nicolas for breaking out the module,
+> Gentle ping.
 
-Does this mean, because it's a pretty complicated microcontroller,
-that "transparent" is a no-go?
-I could eventually try to make Rollball work after all,
-but when I take a look at the microcontroller, I get the idea
-"firmware will filter all non-vendor approved commands to phy"
+Thanks for the ping! I've had the patch in my
+testing branch for a bit, and just pushed it
+out to my linux-next for the next merge.
 
-Thanks,
+Anna
 
-Janpieter Sollie
+>
+> Thanks!
+>
+> --=20
+>
+> Marco Crivellari
+>
+> SUSE Labs
 
