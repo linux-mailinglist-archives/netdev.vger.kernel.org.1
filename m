@@ -1,184 +1,161 @@
-Return-Path: <netdev+bounces-296954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296955-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jBBsNS3KJ2oI2QIAu9opvQ
-	(envelope-from <netdev+bounces-296954-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:09:17 +0200
+	id VyILECXLJ2pN2QIAu9opvQ
+	(envelope-from <netdev+bounces-296955-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:13:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4713C65D948
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:09:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4290A65D9F3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:13:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=QlVBfVfQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296954-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296954-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CqLGEOoB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296955-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296955-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C2A073053BA3
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:01:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 857A93080AC3
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D7E3E5EE1;
-	Tue,  9 Jun 2026 08:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA903E63B8;
+	Tue,  9 Jun 2026 08:02:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DE72D7DC6;
-	Tue,  9 Jun 2026 08:01:48 +0000 (UTC)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346ED2D7DC6;
+	Tue,  9 Jun 2026 08:02:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780992115; cv=none; b=fcU1EkkGijvHWvvQtUSUJEcG5QFi/55SgQxMUmbel5X0dZcxZ755I2ajVcNsMwmytzLbNNBAdOuGw074IKncg7L3uL3mSBhiQwnoeaXyXfYc6p4mygMGoTe9OOBV7gTHeval6iR1f7vjwzvRyZHsZEiT9sFSVX6VJYd3ytI4OLU=
+	t=1780992124; cv=none; b=RaA4Gx5/YQcP6TQ2A2/ChgTg+z/qXYAQYP39bYL2/UALptQc1fwEnrqSKC6lfiFY5SOws7P+8Fde+2uKzxKCIaaNhPO1LGQr2ID1cv3P4gYefRCYsMo7GEp2Om5kzHF2rYhb1hso81qQW03hVq2gPX17vlj0zICXGHP1ZSC5mGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780992115; c=relaxed/simple;
-	bh=GF/2fKS5++wTq9aTQx1jHjXP5ARLwa2s5AV5w0K2fpA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=flA56FHJxn24sui+V5RVMbtyggg7X1W8RrA6LGLR5vFNH6J+PS7tLyE8+8g1O/VzhNgc0lNhI2LS1Tqx6wmTmoNsoLBizOHWBHAv8serSi+H5eBzvlClpf5bakrh+b6YZeQnzomCEAtZW61V3bSxH9ljBZuI+ojDB24wjHE9fwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=QlVBfVfQ; arc=none smtp.client-ip=13.76.78.106
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=PXzN1
-	xAkeifUktlK/Qjjuspvc1N/0VC1hBVqxaAmblY=; b=QlVBfVfQlf+IugKux90DG
-	9WF2FTv2H3MlmqK5UHZiT5nLMwdxnMNxaT8mNeSYrB+r0iiR1dP8uOBZOBNVrbWh
-	HFo8N4h+P5XDoXCxhEVvsA/Tr6HL7gW4fgsYDbbjwdVnh6+kAT9mCssuhDGivgxx
-	3EepL3gsK06fIQoQj6f8jI=
-Received: from localhost.localdomain (unknown [101.5.13.135])
-	by web3 (Coremail) with SMTP id ygQGZQDnNJJZyCdqCLtCAg--.14269S2;
-	Tue, 09 Jun 2026 16:01:29 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Alexander Aring <alex.aring@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] 6lowpan: fix NHC entry use-after-free on error path
-Date: Tue,  9 Jun 2026 16:00:52 +0800
-Message-ID: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1780992124; c=relaxed/simple;
+	bh=16z0nb2qGfs6Z2maprE1CVF/YuZWUpbSpq91LDNUAlI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=s9kwi+hUMGg9av8jgXJRx1uIqRp55Tx/1FoSoLrNwpoFrAA6+qfF25nOdLqT/s1MypbbjDK/3V2EaCkHyRtlIGP15+fRTlKd0Q8Hnt8bi55MNdEnfdUeX7XrFN1m/FXuqAUhiC8Cf4JdT/tJhs3JUjb0GaeSPwQp0OdeC/beBCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqLGEOoB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14DE51F00893;
+	Tue,  9 Jun 2026 08:02:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780992122;
+	bh=oSBHxgyAAZgnL2cLmJ1SW2H3oqLDAuVwnjO7iHUNkkU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=CqLGEOoBf5yeAlzmhKOmqgh4eDSP0mbUzySlQd3mGBhxMCqiK1wQeoYvSotG9sirk
+	 NrO7FMj01zzGWrfsHbn7qKZy+3NuBR5Nr1w4EuxEEdTYN74DeLhYWHAb1egkNdwrGj
+	 qWcOqbakI3WnSyxCzCQkOQn1L+OPQwZeUcmVcXA8sZkKts2V1ahq4VPF7faB5BdA5u
+	 Uf91uEIPsf3pJiEwgTvz+mGt+CveGT2sHCc6TgiTPk52ujwysSbSD+Q+w/0ULede+5
+	 17al5iICvYMzCE4/5luW8XYKucOxxgNmJvAgNXk1HyqtcME0A7249bVEkjvYH6bGYl
+	 enZy9u1W4QSwg==
+Message-ID: <7f310d00c39da9edf0019c130d346ce30107fd29.camel@kernel.org>
+Subject: Re: [PATCH net] rds: mark snapshot pages dirty in
+ rds_info_getsockopt()
+From: Allison Henderson <achender@kernel.org>
+To: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Simon Horman
+ <horms@kernel.org>, Andy Grover <andy.grover@oracle.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Date: Tue, 09 Jun 2026 01:02:00 -0700
+In-Reply-To: <20260608-rds_fix-v1-1-006c88543408@debian.org>
+References: <20260608-rds_fix-v1-1-006c88543408@debian.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygQGZQDnNJJZyCdqCLtCAg--.14269S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF1rJr45Aw4fJF4UJF4rGrg_yoW8tryfpa
-	y3K39ayFyDZry3Zw4vyw409w17AF4DJr1fKF1rKa4UZ3Z8Gr1Sqr93Kr97Za9IvFs3Ca4D
-	XrWDX3s0yws8CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
-	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
-	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
-	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
-	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
-	z4vE14v_GFyl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbRVbPUUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgMNAWonQZv0bwAAsB
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-296955-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-bluetooth@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:alex.aring@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-wpan@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,m:alexaring@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-296954-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andy.grover@oracle.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kernel@vger.kernel.org,m:kernel-team@meta.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	FROM_HAS_DN(0.00)[]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4713C65D948
+X-Rspamd-Queue-Id: 4290A65D9F3
 
-lowpan_nhc_do_uncompression() looks up an NHC descriptor while holding
-lowpan_nhc_lock.  If the descriptor has no uncompress callback, the error
-path drops the lock before printing nhc->name.
+On Mon, 2026-06-08 at 02:32 -0700, Breno Leitao wrote:
+> rds_info_getsockopt() pins the destination user pages with FOLL_WRITE and
+> the RDS_INFO_* producers memcpy the snapshot into them through
+> kmap_atomic(). Because that copy goes through the kernel direct map, the
+> dirty bit on the user PTE is never set, so unpin_user_pages() releases th=
+e
+> pages without marking them dirty. A file-backed destination page can then
+> be reclaimed without writeback, silently discarding the copied data.
+>=20
+> Use unpin_user_pages_dirty_lock() with make_dirty=3Dtrue so the modified
+> pages are marked dirty before they are unpinned.
+>=20
+> Fixes: a8c879a7ee98 ("RDS: Info and stats")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+Hi Breno,
 
-lowpan_nhc_del() removes descriptors under the same lock and then relies
-on synchronize_net() before the owning module can be unloaded.  That only
-waits for net RX RCU readers.  lowpan_header_decompress() is also exported
-and can be reached from callers that are not necessarily covered by the net
-core RX critical section, for example the Bluetooth 6LoWPAN L2CAP receive
-path.
+Thanks for adding the Fixes tag. One thing though: now that this is
+standalone, it collides with "[PATCH net-next v3 2/2] rds: convert to
+getsockopt_iter" since both rewrite the same unpin in the out: block of
+rds_info_getsockopt(). =20
 
-This leaves a race where one task drops lowpan_nhc_lock in the error path,
-another task unregisters and frees the matching descriptor after
-synchronize_net() returns, and the first task then dereferences nhc->name
-for the warning.
+Easiest on everyone is to just keep it folded into the net-next series as
+a three-patch set, rather than splitting the fix out to net.
 
-With the post-unlock window widened, KASAN reports:
+With that, you can add my:
+Reviewed-by: Allison Henderson <achender@kernel.org>
 
-  BUG: KASAN: slab-use-after-free in lowpan_nhc_do_uncompression+0x1f4/0x220
-  Read of size 8
-  lowpan_nhc_do_uncompression
-  lowpan_header_decompress
+Thanks!
+Allison
 
-Fix this by printing the warning before dropping lowpan_nhc_lock, so the
-descriptor name is read while unregister is still excluded.  The malformed
-packet is still rejected with -ENOTSUPP.
 
-Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
-Cc: stable@vger.kernel.org
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: GLM:GLM-5.1
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
----
-diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-index 7b374595328d..a4dde85664f2 100644
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -117,9 +117,9 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
- 				return ret;
- 			}
- 		} else {
--			spin_unlock_bh(&lowpan_nhc_lock);
- 			netdev_warn(dev, "received nhc id for %s which is not implemented.\n",
- 				    nhc->name);
-+			spin_unlock_bh(&lowpan_nhc_lock);
- 			return -ENOTSUPP;
- 		}
- 	} else {
-
---
-2.43.0
+> ---
+>  net/rds/info.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/net/rds/info.c b/net/rds/info.c
+> index f1b29994934a..17061f6ff74e 100644
+> --- a/net/rds/info.c
+> +++ b/net/rds/info.c
+> @@ -235,7 +235,7 @@ int rds_info_getsockopt(struct socket *sock, int optn=
+ame, char __user *optval,
+> =20
+>  out:
+>  	if (pages)
+> -		unpin_user_pages(pages, nr_pages);
+> +		unpin_user_pages_dirty_lock(pages, nr_pages, true);
+>  	kfree(pages);
+> =20
+>  	return ret;
+>=20
+> ---
+> base-commit: 9772589b57e44aedc240211c5c3f7a684a034d3a
+> change-id: 20260608-rds_fix-92d6c7f04fe2
+>=20
+> Best regards,
 
 
