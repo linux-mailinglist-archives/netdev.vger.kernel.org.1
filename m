@@ -1,112 +1,98 @@
-Return-Path: <netdev+bounces-297334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297335-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k18wD5WUKGoBGgMAu9opvQ
-	(envelope-from <netdev+bounces-297334-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:32:53 +0200
+	id rAEnGymTKGrPGQMAu9opvQ
+	(envelope-from <netdev+bounces-297335-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:26:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 940E7664989
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:32:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BEE6648FF
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:26:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b=Ckt5g5mh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297334-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297334-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=baylibre.com header.s=google header.b=QCQJjyR5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297335-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297335-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5548C30A91C1
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:26:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0F98304E500
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 22:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FAB4C8FE7;
-	Tue,  9 Jun 2026 22:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28A14D2EE9;
+	Tue,  9 Jun 2026 22:26:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA734071FE
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9511C4071FE
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 22:26:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781043959; cv=none; b=HXdluAIQ6Xf/sqbKcylr4URVO/GsIsKOPJ/ditY+6mTblzRhHhFMXeqkEzfPTUMmGmRWg4pwJGGXh8mdWcUoCiMHlzaknTinj7pRPzyjPedvVf6KpF8K3zGQa9zHGJzeMhCLcmh4UkQqm0VZzw/pCKz/yJdl2+gvwaWjcmNHPBc=
+	t=1781043961; cv=none; b=S4wWUN2Cyo/BchsImb/hvFNZqUB1oV5lWrzGxLl5lGnTk5ltl19qC0f4/8T4Xq3nEeBN/n8n38nJrY0L4zuZE9psfgxPBJo6NVpHLCJ6cj6+sqNKNI76NkNUGTS296Vd/wjMlVFEU76YXidvtg6Q5083h8RtVmDCUYt5CJiKNH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781043959; c=relaxed/simple;
-	bh=gC5RijoMreJ37E+ZXnO6sSCfWOZUThbmrEidBKcTv9A=;
+	s=arc-20240116; t=1781043961; c=relaxed/simple;
+	bh=B4kz5SsRggjEFJjV3J/sE+7/gP1ESaf/r5J4kQ1a0Po=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=TzESouch8sXGszTsBnOnvngi/4eQ0NmiwsP8baQ4V03KuL66H3i7BE43ZUD2BTR0kr53aVXYKX4la9zRm3DeZm8pJmeGkgGbbY/3sOHS0RRyKCEn+0diA1oEERAf72pXgcoYxlr2mxydmYmY0qyj7/2osY8UDg39cKjy0WcEaM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=Ckt5g5mh; arc=none smtp.client-ip=209.85.214.172
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c0b9328c4aso42244385ad.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:25:57 -0700 (PDT)
+	 MIME-Version:Content-Type; b=N8sULs5IbEObobBHW9npriRVcVmDAcr4k+W41l5We0EKJPoiA3v+iVoTBG8Cadv4enAV66JIrGj0mpujGFuXudYebd+A/65zgZ0TSzru9vdoz+zgYRE4+5jE3U7OHzXHFN1HARvNTd91ft1uPvh1TZjiG1EqcBVLUAtKtPBsKVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=QCQJjyR5; arc=none smtp.client-ip=209.85.215.169
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c8588ec1b44so4165472a12.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 15:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1781043956; x=1781648756; darn=vger.kernel.org;
+        d=baylibre.com; s=google; t=1781043960; x=1781648760; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6D7duqRcD3fdsTRow2UhPRWiLjw5TIDW3U11ZLjAtzg=;
-        b=Ckt5g5mhS8YR2cizTWbJ5Fwk8gGj6VebB+0OEJgvf02706OxaHIh/MLoWUZkdc8W2v
-         tDVO9ou14uqgirHWrZKF4TT22SL8Kw6c9cIfwgHoNv09ym9tEccqMSP/b5lQeWoqDES9
-         4Y/1fE4bs5q1c26wMjvtkzwBbmD6R5ZssJo+Ql4XeIs+Yw9IhdJtj3WObSFvTKV2NsRh
-         KdAHyJOP9ZzIAXpBIl9bEt8fkARYApQC8HuCBb+LFcyPHM7jM2nhfg7jU3w/egVF/fFg
-         eqBE7VWfKHsswmA0XGrVNRgAu6OAU+Z/4WuvEPeIm2Pew6bt4mI47RFHA/Njj5qWoKdw
-         N24g==
+        bh=46q2U4nrUSnKYOo0Qk6SmRB++eNAzeKGUuI3ymafY8U=;
+        b=QCQJjyR57x2jUdD3ntf6Gyww23PmARz4+wAcMdlzZE7wY0U7MqkScjLb+CT50OyZh6
+         J/daVsPnZPc4yBpihDiUbgT4VGV0h9dxPXWbvpUu/q4qYgmBdvJ1euYLyvNvSbOGRONc
+         NPjGHwYjXnDtuu5yVjS/sY21m3uBsnTPnRJuOsQneVVFuatI+lmoqwBhPbOjxxEK26i+
+         W4YVcitKlZ3LHPjK6MRkSuj93knXfvNFg4+cImH/6dZ3x/Lgwx6UYIH+KHt1tYJGrJ+6
+         +QB+g0IXjgcInp0c8o8Sfa8HSlJCsKibi7ZbFiVKKp+yCmGtIOHT2erGIHX2sRanrN3V
+         ftYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781043956; x=1781648756;
+        d=1e100.net; s=20251104; t=1781043960; x=1781648760;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=6D7duqRcD3fdsTRow2UhPRWiLjw5TIDW3U11ZLjAtzg=;
-        b=VDjR0MEWh3koBCN4w9P0TPrU4L1djUoIN+5DNWDLflN+QLVTrPKyoY0znkXmJAFbqN
-         QiqjbLL12ZosnCX25wMtempQXZIL+1mOVpvB4f7gVi2zt1/i7mNgAMzI9+/sJu/AP7Hu
-         XPQHzB4x52bKJGck1Evq/IL9MpeVNMyJM8V2HX0k3CKxa+SwfXNHlR/T8zyHslrSvVj7
-         Cdl6ok030r+Nm9pnuhS22uwAkgVbT5wNk3RlG8GkLDhkfxvHYCfF+liglRDqlar+jKDb
-         smjJ5VTKRmJpS3pYWnyLq/oduXt0eVyJ+1sqDd0iluI6G2XvaLJGOCT8u5CwHbg9yXdR
-         wx7A==
-X-Forwarded-Encrypted: i=1; AFNElJ/VuVzLwNjVONveVYMgfpvYl0xc2F1mFgsE1+/MtwJrkI1XE1zfpKUw0QV3DgWS+jRdfX+0jos=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywsct6xUQHl7fLBRfaN5tlopfKMrD532UynHU2ZjcujRpL5k9Z8
-	VnxkqNAQCEubYXsmliMFMiNtTQavpdYnRHvjMYn2bv/5sFu74T2vDtGz5xz2k4pVOodEv/oCC0G
-	a/h6Ks4vv+j8F
-X-Gm-Gg: Acq92OGVjaJ8Gpnay530aGpikKN9QcRM0n9PPW1el57VXDILi/e7N63jr4eUK8qqJ53
-	1f0dl/XHGEai+1YoHY5Dl8Ue/dSPq0XMgj2BfcMibRp69ksKbWxbSR91ERjha9R5/0PYpi7iyp8
-	mVtgBLjR91+vYw6YdGzVGvdaXowm3vPDBm+73uoYDLFDqWQ2OUgbQFLBAQAI6p9wF8kSUSQQqbN
-	COBZ/vrG1bH8lYw5qu0dfm84bCglGWmsTXv9bSVgloaq8TdDoN+qNeFt7VTyQPpanLfkm7JlJ/+
-	GeW7NPKTq2/Zfihx+aGTVi0c4lJmjYHMxDEPOqex21FHZ+AxVXKjXBdQ4osocsYH/3KMz+vUzkx
-	ZbofuZ7mc59C5lugybY92bZ2W/5p0b/Z5W/GfU7kWyFczH6JEW55gv9pYrhc+MrkdG1C3gkaPuc
-	gG6NLaRYP3lLbCKKiV0OhvhYKuMiTRLJ8=
-X-Received: by 2002:a17:903:2381:b0:2c2:27be:39a7 with SMTP id d9443c01a7336-2c2a1c9ac2emr57718625ad.29.1781043956535;
-        Tue, 09 Jun 2026 15:25:56 -0700 (PDT)
+        bh=46q2U4nrUSnKYOo0Qk6SmRB++eNAzeKGUuI3ymafY8U=;
+        b=rLvv1TlcavrVvPEtK/aQFNqM7xwlJM/khke3pZZEV+Rue69wtR+lbgq7zcBlOGeTYj
+         3hM0OzYwI8x63vTNcqE+rDpoTgtepAcXF3OUEhaFurRYUaoiEgEoekxR0uIL+suNl/CI
+         iQJV4QqR91NE20K+W5s4gUfiA8q8yyp5RMjWgEFDuzZ2VAtS5nJTpknR1aXZBGorr4W0
+         Nn88SLV38tr8ZRZUSBShIoEHmgotjnHtk29Q37itDgFmSseHpmumG6uyu3E9nsCJFx2N
+         f0FinzLFRJUO5n0GXqRqdzcpkKwsD0t18geDMDJ0dzJ+ZILeh5P3Sk8WG+/PtEXoWza6
+         W6ZA==
+X-Forwarded-Encrypted: i=1; AFNElJ/cDL1jb63L4eTAY6tIj5dJpmwrMpBs6lLJTHtIW6uzNSUpHoerQoR+cfypJGuH0agXjtSFsfE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXmicPMggaKQuLFp9/AL83XUBvDb22L+9JlzpVxh7U0LBwOXiH
+	cVWgWt3qsfEJANgGMNX2aGTX+NRWBACMnulgPYuIbeT67p1e6TaSqToM9n3803rcOayf/jyr1CD
+	1lgKwQkrUvTwH
+X-Gm-Gg: Acq92OFXMuM10Sz2nzq9CjRBoWTSSBty8qitZ41KEG7XzyH97FlYC9A4KDaHKvGRhYK
+	ssx90NY2LPghttLdH0Ytttifs1gvNcu7UonKlMwDJ2g1KTV2WUBUXa8mwTVqr7rBvdu1DneuiR6
+	NjZ5bqNtMLD8fqe2t0SFk7ut1AImPh2GErGqz9xNuShoVKinOdgt8zc6LmujR313GEZ5fYn/C26
+	MCEo3rFLX2As1uzmb8DnzLvCdJyHzncCpgmf/bp3im+5AWJvwjR/mKNcEJgwGOLC17Av9G/fF3p
+	ZDCXfqhzvYhjvj6M/FRB1t2AOWfMmzq/cK9UjfERQZM87EXWuo9lyxYEnRO8ZtJSSPIeg6OZNdL
+	4F6HO5G9qTUEnxC73ZpVBen26SRdZSFch6DrStllkFc/qIb7w4POzb1ePy7G2qjaXZEAbQkaNqw
+	1ldX+lpiBItI6PKQHXzDBR11Um5CPrGk4=
+X-Received: by 2002:a05:6a21:390:b0:39f:a42:9247 with SMTP id adf61e73a8af0-3b4cd0670f4mr27316925637.37.1781043959893;
+        Tue, 09 Jun 2026 15:25:59 -0700 (PDT)
 Received: from localhost ([71.212.202.210])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2c164f6e2adsm238181875ad.5.2026.06.09.15.25.55
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-c85df0bd337sm19404461a12.29.2026.06.09.15.25.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 15:25:56 -0700 (PDT)
+        Tue, 09 Jun 2026 15:25:59 -0700 (PDT)
 From: Kevin Hilman <khilman@baylibre.com>
-To: linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
- Christian Lamparter <chunkeey@googlemail.com>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Aaro Koskinen <aaro.koskinen@iki.fi>, 
- Andreas Kemnade <andreas@kemnade.info>, Roger Quadros <rogerq@kernel.org>, 
- Tony Lindgren <tony@atomide.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
- Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
- Pavel Machek <pavel@kernel.org>, Matti Vaittinen <mazziesaccount@gmail.com>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- linux-wireless@vger.kernel.org, linux-omap@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
- linux-sh@vger.kernel.org, linux-input@vger.kernel.org, 
- linux-leds@vger.kernel.org, netdev@vger.kernel.org
-In-Reply-To: <20260520183815.2510387-1-arnd@kernel.org>
-References: <20260520183815.2510387-1-arnd@kernel.org>
-Subject: Re: (subset) [PATCH v2 00/10] gpiolib: fence off legacy interfaces
-Message-Id: <178104395573.234140.4413143072350533512.b4-ty@b4>
-Date: Tue, 09 Jun 2026 15:25:55 -0700
+To: nm@ti.com, vigneshr@ti.com, afd@ti.com, rogerq@kernel.org, 
+ tony@atomide.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+ richardcochran@gmail.com, aaro.koskinen@iki.fi, andreas@kemnade.info, 
+ Parvathi Pudi <parvathi@couthit.com>
+Cc: linux-omap@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+ danishanwar@ti.com, pratheesh@ti.com, j-rameshbabu@ti.com, praneeth@ti.com, 
+ srk@ti.com, rogerq@ti.com, krishna@couthit.com, mohan@couthit.com, 
+ pmohan@couthit.com, basharath@couthit.com
+In-Reply-To: <20260428072046.3022679-1-parvathi@couthit.com>
+References: <20260428072046.3022679-1-parvathi@couthit.com>
+Subject: Re: [PATCH v7 0/3] Add support for ICSSM Ethernet on AM57x,
+ AM437x, and AM335x
+Message-Id: <178104395875.234140.5899663583168202275.b4-ty@b4>
+Date: Tue, 09 Jun 2026 15:25:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,56 +107,59 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:nm@ti.com,m:vigneshr@ti.com,m:afd@ti.com,m:rogerq@kernel.org,m:tony@atomide.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:aaro.koskinen@iki.fi,m:andreas@kemnade.info,m:parvathi@couthit.com,m:linux-omap@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:danishanwar@ti.com,m:pratheesh@ti.com,m:j-rameshbabu@ti.com,m:praneeth@ti.com,m:srk@ti.com,m:rogerq@ti.com,m:krishna@couthit.com,m:mohan@couthit.com,m:pmohan@couthit.com,m:basharath@couthit.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
+	FREEMAIL_TO(0.00)[ti.com,kernel.org,atomide.com,gmail.com,iki.fi,kemnade.info,couthit.com];
 	FORGED_SENDER(0.00)[khilman@baylibre.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[40];
-	FORGED_RECIPIENTS(0.00)[m:linux-gpio@vger.kernel.org,m:arnd@kernel.org,m:linux-kernel@vger.kernel.org,m:arnd@arndb.de,m:chunkeey@googlemail.com,m:johannes@sipsolutions.net,m:aaro.koskinen@iki.fi,m:andreas@kemnade.info,m:rogerq@kernel.org,m:tony@atomide.com,m:tsbogend@alpha.franken.de,m:glaubitz@physik.fu-berlin.de,m:tglx@kernel.org,m:mingo@redhat.com,m:bp@alien8.de,m:dave.hansen@linux.intel.com,m:x86@kernel.org,m:hpa@zytor.com,m:linusw@kernel.org,m:brgl@kernel.org,m:dmitry.torokhov@gmail.com,m:lee@kernel.org,m:pavel@kernel.org,m:mazziesaccount@gmail.com,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-wireless@vger.kernel.org,m:linux-omap@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mips@vger.kernel.org,m:linux-sh@vger.kernel.org,m:linux-input@vger.kernel.org,m:linux-leds@vger.kernel.org,m:netdev@vger.kernel.org,m:chunkeey@gmail.com
- ,m:dmitrytorokhov@gmail.com,m:jonasgorski@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	DMARC_NA(0.00)[baylibre.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297334-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[baylibre.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[khilman@baylibre.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,kernel.org,atomide.com,alpha.franken.de,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-297335-lists,netdev=lfdr.de];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:dkim,baylibre.com:email,baylibre.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,arndb.de:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,baylibre.com:dkim,baylibre.com:email,baylibre.com:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 940E7664989
+X-Rspamd-Queue-Id: 07BEE6648FF
 
 
-On Wed, 20 May 2026 20:38:05 +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue, 28 Apr 2026 12:47:26 +0530, Parvathi Pudi wrote:
+> This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
+> AM437x and AM335x platforms.
 > 
-> This is an update of all the patches that are still required before
-> we can actually turn off CONFIG_GPIOLIB_LEGACY for most platforms
-> in the final patch of this series.
-> 
-> I originally posted this as a series in
-> https://lore.kernel.org/all/20250808151822.536879-1-arnd@kernel.org/
+> The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
+> of two PRU cores, with each PRU-ICSS instance capable of handling two
+> Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
+> to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
+> node has been added to the am437x-idk-evm.dts.
 > 
 > [...]
 
 Applied, thanks!
 
-[09/10] ARM: dts: omap2: add stlc4560 spi-wireless node
-        commit: c5a0ac76b364bbd1d4fb7e440edabcd2a369343c
+[1/3] arm: dts: ti: Add device tree support for PRU-ICSS on AM57xx
+      commit: 9c4fc66a770a018062e371d1c8a77184d4c15dad
+[2/3] arm: dts: ti: Add device tree support for PRU-ICSS on AM437x
+      commit: cd080146369be3a1750774eabbb839c45cc9a750
+[3/3] arm: dts: ti: Add device tree support for PRU-ICSS on AM335x
+      commit: 19ab47bb6b96820c28024ebfe674050fa2c54ad5
 
 Best regards,
 -- 
