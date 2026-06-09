@@ -1,218 +1,203 @@
-Return-Path: <netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297019-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 60DEGbz0J2oj6QIAu9opvQ
-	(envelope-from <netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:52 +0200
+	id tmLROk70J2oL6QIAu9opvQ
+	(envelope-from <netdev+bounces-297019-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:09:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31F565F563
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E5F65F510
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:09:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RGDhzDnd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=Usxk2Zp7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297019-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297019-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5C296308494C
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:05:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1ACCF30421FB
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EDF3FC5AC;
-	Tue,  9 Jun 2026 11:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C7D3FCB34;
+	Tue,  9 Jun 2026 11:06:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48043FBB73
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C68B3FC5B7
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:06:33 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781003114; cv=none; b=oyGyGpEGn1jgN99yHGzUENaLXK9ZUXvAz11Nb0NQDlgHHOQdlKB2j2fhjnBMgpGaI2ILf81PDPv+yI1JIilaHw/btIVsL3Jz7Fc9TiIWtHdunV0uzMHbcfp4XdpC7uEoK+G2689qEaRTr5KOg6bU7zlycoULpYo4HZkABqwXpGc=
+	t=1781003195; cv=none; b=H1uccL6GXZh5686WWdIo2gLnwac7aTBbnZ1xHjLHnQzAcjN2I8f2LSQKbAfGVtlOsgzyn3nELYzLIZZHj9C5DdqmrhkJUbvNBuv+FjN9+SmsbiA7Ijv80mu/J4g7U92/lVIeReDY4MZFiRib2qXRib5BNwnd40jI8AHJjPl+CKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781003114; c=relaxed/simple;
-	bh=FzHeD0sMZk02bfUIOVbZ7vcbl5dWXL2/Txt+74srelk=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EdcXK6AH6XDuMxk50f4dh+u/GHJBYA1+69BMCzV8inwydg4yUjtJXGIp2zBqAasRM5W+N7nnFdYI9jW/dEXnJdP6zbBvIlkAZVFMtpm/zctzlYzB86VjcZEBv+hPC8VgkS5pxU7Rdx/bMY1CRXjh5sKqfxNzVuYmd2l012yGHg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RGDhzDnd; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D5071F0089F
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:05:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781003113;
-	bh=+sX9ATTxluLYTPpyn9xT27ptWmmBF8CPbs0HcxCOGLE=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=RGDhzDndKBB2dkoo2ExWmstsyWaeZ8qJ18zZpU/Zh0vnaXRYAMzekOdsxjslSMmMP
-	 Zz8+CTH0TaVqx9FQtV3+0bfwMumlGnwVxTC4XbD3pQ9vXv5cjQPwxw+p/urFIYe+M1
-	 23mhKFfJTqrlZpJV745TVZPiLITUlVY6C7d5E8xA1cDZC81W784rbDYRkz7hR5lGZL
-	 64Iy0/HNkiWIMrL9ECwoHOiIF9wCFEfpU8Auj711VfrHHZui/L8EP/HRqjhrowKr2W
-	 OxVlAEX7eB4eXwfcJe6BQDfh51Xjtyo6bbEDsj8hF5jBGM4+Ii4e2FKcVqq3Vj0HgK
-	 9xuzxLAHXn0zA==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5aa612bf6efso5397361e87.3
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 04:05:13 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8VE9g8yg+jU8Igp5HeKnYLVNe4ATVPz2DExtU1TILS0hJTdUcUWenRDIVH4l43ATSq7Ov8FEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc5WtqZ/gpV7b5LFYt0Ua+RUW2GgqCBS1YsShpEranZoaUCXDH
-	qUUgO0QHFo1ZLBh9h4KE1HK7WZCHQjsyVq8TcmR3VFnzGifgyH9Wd/YTsFtOKWUVihEa1W0dGgt
-	ytqS1uxNgOBGGTTsMfUKwP6JrJS7L6k/kSwx+o0RASw==
-X-Received: by 2002:a05:6512:2253:b0:5aa:5c8c:9cf4 with SMTP id
- 2adb3069b0e04-5aa87b5f803mr5428916e87.17.1781003111998; Tue, 09 Jun 2026
- 04:05:11 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 9 Jun 2026 07:05:10 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 9 Jun 2026 07:05:10 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <CAFEp6-1syMQsvuQ+dLU39bnDeL5Ok7vK1mA7CS0v1m7cjhyMQw@mail.gmail.com>
+	s=arc-20240116; t=1781003195; c=relaxed/simple;
+	bh=AOcKZuFx/azQdwXcVpOXgJNhyio42f13QH5YqlSZKwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sgwDRfO6bCirf3BIxuYY0e1yqSwWQIJkHQAyV3/H+DAZvBlIGZE1YWHFnEfiZUPVtuulXS0JRYYtECD95+9bhz4MaF3Mc/sVM10tUtRRsZc3L/UvryBoNpgGNwiA+ZKmud+zWJs/PuNWsici9heDnAqebzi/uej2JI0RkHAaw3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Usxk2Zp7; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781003192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y17cxi8kkPSr+8QFQJlEXOIBw/gAA9pL1DpslweEtNw=;
+	b=Usxk2Zp7G73x6KqAgyRDkKSeFOKZL69W9GDj3N/qgbYw/DfdDF4c9qrSEX948FTa+nhuMY
+	3ayYmxI2H0FalzTtCopEKKOCf2JB5dc4yD0WmzMgbiHdD4xMKnmITDa+E0LyPu+sxKIMGx
+	uWtOn5xTTDVdOcV7rsHylaz4/ix1xkg=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-49-JolvAdtIPYeLI0XQlXTNEQ-1; Tue,
+ 09 Jun 2026 07:06:29 -0400
+X-MC-Unique: JolvAdtIPYeLI0XQlXTNEQ-1
+X-Mimecast-MFC-AGG-ID: JolvAdtIPYeLI0XQlXTNEQ_1781003187
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8821A195D01D;
+	Tue,  9 Jun 2026 11:06:27 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.0])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0DE993008B38;
+	Tue,  9 Jun 2026 11:06:23 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: bestswngs@gmail.com
+Cc: 3chas3@gmail.com,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	linux-atm-general@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	xmei5@asu.edu
+Subject: Re: [PATCH net] net: atm: fix use-after-free in sigd_put_skb()
+Date: Tue,  9 Jun 2026 13:06:15 +0200
+Message-ID: <20260609110615.196819-1-pabeni@redhat.com>
+In-Reply-To: <20260604164916.2681964-2-bestswngs@gmail.com>
+References: <20260604164916.2681964-2-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
- <20260609-block-as-nvmem-v4-4-45712e6b22c6@oss.qualcomm.com>
- <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com> <CAFEp6-1syMQsvuQ+dLU39bnDeL5Ok7vK1mA7CS0v1m7cjhyMQw@mail.gmail.com>
-Date: Tue, 9 Jun 2026 07:05:10 -0400
-X-Gmail-Original-Message-ID: <CAMRc=Mc=-G0+ESPJUUgxd+jJWwuEzBcVXSJyAbAhx6BFkHeimA@mail.gmail.com>
-X-Gm-Features: AVVi8CdBM8fdpM7hiE50yrSmJrPYo7K9sdF-J87b4PfgsolvJ2MbyT4LVehGYdI
-Message-ID: <CAMRc=Mc=-G0+ESPJUUgxd+jJWwuEzBcVXSJyAbAhx6BFkHeimA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/8] block: implement NVMEM provider
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-297019-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,kernel.org,redhat.com,google.com,lists.sourceforge.net,asu.edu];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297017-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:3chas3@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:horms@kernel.org,m:linux-atm-general@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:brgl@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,qualcomm.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,config.name:url];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C31F565F563
+X-Rspamd-Queue-Id: 47E5F65F510
 
-On Tue, 9 Jun 2026 12:13:08 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> Hi bartosz,
->
+From: AI Reviewer <ai@example.com>
 
-...
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev/
+---
+net: atm: fix use-after-free in sigd_put_skb()
 
->>
->> On the other hand, we don't want to not provide the block device just be=
-cause
->> someone added a DT property on one that's too big. I'd say: warn, but re=
-turn 0.
->> Does it make sense?
->
-> It=E2=80=99s still technically an error in the sense that we cannot provi=
-de
-> the required nvmem feature. However, it only becomes a real issue if a
-> consumer actually attempts to use it.
-> Also, the block device should still be added, since the return code
-> from add_dev is not checked. In any case, I=E2=80=99m fine with either
-> approach, as long as we emit a warning message.
->
+This commit addresses a use-after-free in sigd_put_skb() by pinning the
+socket with find_get_vcc() and checking if it is marked SOCK_DEAD under
+the callback lock.
 
-We don't check the return value now (why?) but if we ever do, the safer opt=
-ion
-is to return 0 IMO.
+> diff --git a/net/atm/signaling.c b/net/atm/signaling.c
+> index b991d937205af..3dbe8e0fdc9af 100644
+> --- a/net/atm/signaling.c
+> +++ b/net/atm/signaling.c
+> @@ -54,14 +54,31 @@ static struct atm_vcc *find_get_vcc(struct atm_vcc *vcc)
+>  
+>  static void sigd_put_skb(struct sk_buff *skb)
+>  {
+> -	if (!sigd) {
+> +	struct atm_vcc *vcc;
+> +	struct sock *sk;
+> +
+> +	vcc = find_get_vcc(READ_ONCE(sigd));
 
->>
->> > +     }
->> > +
->> > +     config.id =3D NVMEM_DEVID_NONE;
->> > +     config.dev =3D dev;
->> > +     config.name =3D dev_name(dev);
->> > +     config.owner =3D THIS_MODULE;
->> > +     config.priv =3D (void *)(uintptr_t)dev->devt;
->> > +     config.reg_read =3D blk_nvmem_reg_read;
->> > +     config.size =3D bdev_nr_bytes(bdev);
->> > +     config.word_size =3D 1;
->> > +     config.stride =3D 1;
->> > +     config.read_only =3D true;
->> > +     config.root_only =3D true;
->> > +     config.ignore_wp =3D true;
->> > +     config.of_node =3D to_of_node(dev->fwnode);
->> > +
->> > +     return PTR_ERR_OR_ZERO(devm_nvmem_register(dev, &config));
->>
->> And that was a wrong suggestion on my part too because I was under the
->> impression that we're in the probe() path, not device_add(). You can't u=
-se
->> devres here as the device at this point is not yet bound and may never b=
-e.
->
-> So I understand The bd_device is purely a class device with no bus, no dr=
-iver.
-> For driverless devices, devres_release_all() is called explicitly
-> within device_del() .
->
+[Severity: Critical]
+Does this introduce a regression where an ABA vulnerability allows a KASLR
+bypass if the daemon socket is freed and reallocated?
 
-Right.
+If the signaling daemon is closed, sigd is cleared and the socket freed, but
+an unprivileged thread in sigd_put_skb() might have already latched the old
+sigd pointer.
 
->>
->> Which leads me to the second point: this is not the moment to add the nv=
-mem
->> provider. This should happen at or after probe(). Once nvmem_register()
->> returns, you have a visible nvmem resource but nothing backing it in the=
- block
->> layer.
->
-> There is a short window during which a read attempt will 'properly'
-> fail, but this does seem somewhat fragile indeed.
->
->> Either do this in block core when registering a new device or schedule
->> a notifier here for the BUS_NOTIFY_BOUND_DRIVER event and do it in the n=
-otifier
->> callback.
->
-> So in the end, it seems that the simpler and more robust approach is
-> probably to move away from the class_interface driver and instead
-> register/unregister the nvmem directly in add_disk/del_gendisk.
-> If that's ok I will move to this approach in the next version.
->
+If an unprivileged user subsequently creates a new ATM socket, couldn't the
+slab allocator reuse the exact same memory address? In this case, find_get_vcc()
+would match the raw pointer and return the attacker's new socket.
 
-Yes, I think it's the right approach.
+Since the attacker's socket isn't marked SOCK_DEAD, sigd_put_skb() would blindly
+enqueue the signaling message to the attacker's receive queue.
 
-Bart
+Because the message contains literal kernel pointers (vcc, listen_vcc),
+wouldn't this allow an unprivileged KASLR bypass and message injection?
+
+[ ... ]
+
+[Severity: High]
+This is a pre-existing issue, but does sigd_send() leak memory when queuing
+SKBs to a closing listening socket?
+
+When processing an as_indicate message, sigd_send() resolves the listening
+socket via msg->listen_vcc, acquires lock_sock(), and appends an SKB:
+
+net/atm/signaling.c:sigd_send() {
+    ...
+    lock_sock(sk);
+    if (sk_acceptq_is_full(sk)) {
+        ...
+    }
+    sk_acceptq_added(sk);
+    skb_queue_tail(&sk->sk_receive_queue, skb);
+    ...
+}
+
+Does this code blindly queue an SKB without checking if the socket has been
+marked closed (ATM_VF_CLOSE) and already purged?
+
+If the listening socket is concurrently closed, vcc_release() will lock the
+socket, purge its receive queue, mark it closed, and release the lock.
+
+Could sigd_send() then acquire the lock and append the new SKB to the dead
+socket's receive queue? Since sk_free() expects an empty queue and does not
+purge it during memory free, would this permanently leak the SKB and allow
+an attacker to exhaust kernel memory?
+-- 
+This is an AI-generated review.
+
 
