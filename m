@@ -1,367 +1,289 @@
-Return-Path: <netdev+bounces-297171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1EAKHXVDKGoKBQMAu9opvQ
-	(envelope-from <netdev+bounces-297171-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:46:45 +0200
+	id y+mWLORFKGquBQMAu9opvQ
+	(envelope-from <netdev+bounces-297179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:57:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1FA6628D4
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:46:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 295DB662ACD
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 18:57:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cisco.com header.s=iport01 header.b=dbErejUA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297171-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297171-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cisco.com;
+	dkim=pass header.d=broadcom.com header.s=google header.b="O/QVF1YQ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297179-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297179-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D54BA31272A2
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:35:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 70190311EADB
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 16:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841DB4BCAA3;
-	Tue,  9 Jun 2026 16:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D165E47DD63;
+	Tue,  9 Jun 2026 16:44:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-6.cisco.com (rcdn-iport-6.cisco.com [173.37.86.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11514BC01A;
-	Tue,  9 Jun 2026 16:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E58492539
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 16:44:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781022776; cv=none; b=MvtuUs+1GRSQkYkT8RzDGpNEmZeZWWE2SIZ5cMM1TUat2HhLf1Rfnp/E9aowghwt6JAAFgeW1GSdaHpKH5bxhaNeJymmvmPuC+wp91M4AoTN2ZXYscDIWYRtmwAbfs2ShRzYSxQ2n392apxSuPVsvj62sppO752XBktaBJJpAe0=
+	t=1781023475; cv=none; b=fOsGw1yR3bbXIHWm89RS0Gilke6jiObyrsvF5oJHFAUUS4MDrzeqNyG0UuENC+XwC1mPJv7Ep+P3b41EUdaehtJ2IR7Q5ODSYBecMTdVqT4SSdDmeLr0XtRaDPop4hE3eGRt/gFiDNx9NspXjrlhHj1GmI5t7UtYZLuAGVuu36E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781022776; c=relaxed/simple;
-	bh=MYBn/BV06qLt+REdHK+//qM3Kxx0oxfsJkIFbD9eYmE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XfvWZnKFprpF2kWyc2lYRl3rJ+PwJNNcyq7IRCNYGgd9r9vhPwFGchhJPjIcgAdP38VsGb8nf3wcIghgKzX2KfCd3kgo+Er+c3qab98olQsUISWMTimOkUhc0L+/iPY+UEPOuD3UBb35aDF8zFBMrp9NTd1F8g68DrGbnZXEoDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (2048-bit key) header.d=cisco.com header.i=@cisco.com header.b=dbErejUA; arc=none smtp.client-ip=173.37.86.77
+	s=arc-20240116; t=1781023475; c=relaxed/simple;
+	bh=Vp9DBWc80OB0/gNFl5WPMwGfPIDDY1zzZbQdHxZL+Yc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=OGTNDDcTxjniJQJa/Z/pS5YI2EDCBun+i279HA7eM1/1W7igFk+8jk2X8awOM8y2bIuIpgEBiLpWKj6eOEMTBOKy1ETK1zVcpDqNJ8yWFEtpe6ffBntGRuuI0q+s9481yXYJDSs14YzW4E5c/aty9lfFM1pH0Q6Yay7990w/PYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=O/QVF1YQ; arc=none smtp.client-ip=209.85.214.227
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2bf1f074a12so60030145ad.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:44:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781023474; x=1781628274;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/E4eFgu6MtYbOMm2tImhw5v+nDyA/2xy8PKJOVrSiTI=;
+        b=X861boJdykiheF21yotWrOk1stiGwlKqGHJDk18igiO13IE1eyAk193Do6mA3xscO3
+         sgh5WeCxuXHIx1GqzaXCsxMGAbCh3RlkIMEl6aVyERSAYf/5DoHZuemx9zec5Ee89gok
+         zbkPODXPinQO9Hhs/Ad307LqpnrZRLJdt4lb5uvoqgAyQOlQlTKfZUVivwz6pJZPAw6D
+         JJj0BM3NsLJJ8T1BSynNa2SfTQ9wVtLo3FGUQU8NoEq7zCkb5kYr5JNOLyGabGSuludw
+         aV9QXqmwTVLnIojj29c/CZ5JFxAoXkckkOcvwGttbGeeunow3ebHvhkz5QuuLSlt5m1N
+         0HwA==
+X-Forwarded-Encrypted: i=1; AFNElJ/cBfIc8Nwzs1lEGrlqq2PCfHmBrW6oHTc8tJuZbO/dSFt1Jbwa24YmVK1b3k8MwYU92nQyZLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzQl4TZSa/G+2+oX6/tXyCrEBokH1NRAvio5hMFOEoCrs+lDic
+	skk9oNkFEkA2HCGDbXLDvh5pR1PLxit0EyEfBFNbbkU3XQLwKME0QQeTvUfDXd9wc1cq01JM3ZT
+	Tu7O2fzlCfPo2Tl/CSrzOjMqIeOeMnssVTmedN+6Cs/1QAw8FvDLu1JSyOqUs3Dvg6hqi3AtCwb
+	3w6ozi9X8CJ1OREQGr+fYEC6i2FrtC8OTICbuwXj7RYbovZ+jkvhljfZvuUVhlffNdbOe3AQC7T
+	sZ2yXoJxLg=
+X-Gm-Gg: Acq92OE6FKPVj2lysYu+SaGWm/B4U6Ar1uqfVkR72BTob+G9EdR01abqakeJfbkjzD2
+	zhVNHvY4aNUCHgiXViyVHLzZP6uecW4rywsDZ6hi/FV6Bkqdrkk9D/cyHSeBqKS8WaOrEZzC+aM
+	alecTeqc/X16j5plmeXtQUXhAJ2sZ8h0NBeUBHNPUfUT4mh9FtxyhmHIcklNQE9NghICHy0lIoV
+	KkGiq0ofCjWx0KuRgF86s3MVPoDQxfFDGNUi2CGPxg5WD6lMXc/CNLgnnTbyQlOg3h1Op9HF3wY
+	6/RsvERT5TlzpDDMP/29jd6CSbIsv0sg69RVgWCTvWTIEBNpMzOrENaovuoN0gvjnC28CYRJjm/
+	MKrDhWLdcWrLJ7nvvOOmgmqgexGRjXW04Io5QvvoeTgRBOKGRUdqqsJ1icjBOLDS8XbyFi6zpLZ
+	jZbYUrjFcV85CdrB04zXYx8DnALfB3XuTODXKpMeAF49jEsPj+QsXAYM9BioBdcntbMVHGUQ==
+X-Received: by 2002:a17:903:1206:b0:2c0:bb2d:a314 with SMTP id d9443c01a7336-2c1e85aad3cmr245237945ad.28.1781023473446;
+        Tue, 09 Jun 2026 09:44:33 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c299f8915bsm3412395ad.18.2026.06.09.09.44.32
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Jun 2026 09:44:33 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-bf44ff0961dso20911866b.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 09:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=7654; q=dns/txt;
-  s=iport01; t=1781022774; x=1782232374;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=8XDn75AblbgEJLBTGL0V4O3dG2zMp9DZV5PU4WcqQG4=;
-  b=dbErejUAweXj1elL6kQzdmeqUY98+sgNWgkBeSFGySJ2LTo5s6pywhwI
-   K7hwI1RZQVubP+ztY5IGucazhy0mnR+12lJPNW9rn9KCbyK4WV/dMN/5r
-   juD6ztHuKDBeigrMnMrCgS0lQplwK/c9ot7l8o1hpZ4aR+VhxK1izcuv3
-   mnmd9N/FPfWG+8EedkgXT803UNVr0dR6CUdSlTJ74Q5FN5TnT43XocUHc
-   4r5E8GG5Lcv0D/B3+lwzcf2x2BvYPg4jL/3qE5mhUyzMoEwszN/WOFUdM
-   A4hxAI2FpnWSJ32HHf/Ds1jFEVHDzghOgEBhHll9Ou7d0vIlzHyyOptq0
-   w==;
-X-CSE-ConnectionGUID: 6QutuVTfToarX9DM5ZhUFg==
-X-CSE-MsgGUID: WuWXq+CBT7u2bDDSvtAt2Q==
-X-IPAS-Result: =?us-ascii?q?A0AmAAAaPyhq/4//Ja1aHQEBAQEJARIBBQUBgXwIAQsBg?=
- =?us-ascii?q?laBUkNJhFeIHIc3giGeHhSBag8BAQEPUQQBAYUGAo03AiY0CQ4BAgQDAgMBA?=
- =?us-ascii?q?QEBAQEBAQEBAQsBAQUBAQECAQcFgQ4ThlyGWwIBAyMEUhAlAiYCAkYQBgESg?=
- =?us-ascii?q?wKCdAO1IHp/M4EBhH3ZRYFmAQsUAYEKLgGFcIJpAYFwhAY7hEEnG4FJRIEUA?=
- =?us-ascii?q?YJ5b4QFJYN0gmoEgg2BDxKQZwk/gQIcA1ksAVUTDQoLBwVhUjMDIAoLEhIYF?=
- =?us-ascii?q?QIUHBMPBBYyHXAMJxIsFzRYGwcFgUqBOxQxBCGBBYUSIx8DOYEVgXyBKGdpF?=
- =?us-ascii?q?TE1TQMLGA1IESw3Bg4bBD0BbgeMOhcPgUcBagcBgQ5COTIDDDIlFQgtCZMfg?=
- =?us-ascii?q?36NX2uBNZ9ZhCaBZqAPATKXZ5MEmQYio11ZhGiBaDyBWTMaCBsVgyJTGQ+OL?=
- =?us-ascii?q?RYcy2InMj8HAgcPApFzBIF5AQE?=
-IronPort-Data: A9a23:92baxatU3MvGwM64nOL5+hPrwefnVJZfMUV32f8akzHdYApBsoF/q
- tZmKWjUPv3ZY2L3f9t1PI2x8h4EsZDRy4I2TVQ6pS09Fi9EgMeUXt7xwmUckM+xwmwvaGo9s
- q3yv/GZdJhcokf0/0nrav666yEgiclkf5KkYMbcICd9WAR4fykojBNnioYRj5Vh6TSDK1vlV
- eja/YuFZDdJ5xYuajhKs/zb+Us21BjPkGpwUmIWNKgjUGD2zxH5PLpHTYmtIn3xRJVjH+LSb
- 47r0LGj82rFyAwmA9Wjn6yTWhVirmn6ZFXmZtJ+AsBOszAazsAA+v9T2Mk0NS+7vw60c+VZk
- 72hg3AfpTABZcUgkMxFO/VR/roX0aduoNcrKlDn2SCfItGvn3bEm51T4E8K0YIwpN9qHXxwy
- fIkLzkXXkGvor+EwI+VRbw57igjBJGD0II3oHpsy3TdSP0hW52GG/uM7t5D1zB2jcdLdRrcT
- 5NGMnw0M1KaPkAJYwtMYH49tL/Aan3XaDREqUmVpqof6GnIxws327/oWDbQUoDbH5wMwRrB+
- Qoq+UzGHy4qLZ+04wba7yimqsP0gz/SRNgrQejQGvlCxQf7KnYoIBEfS1a+ifWwlEO7X9VRN
- woS9zZGhaU+6UmiXNThdxK/p3GAs1gXXN84O+4n4gilyafO5QudQG8eQVZpYdoqrsIpBjony
- lOEgfvtGDpp9raVIVqF/72ZqzKaIyUZLWYeIyQDSGMt59jlvZF2jR/VSNtnOLC6g8ezGjzqx
- T2O6i8kiN07i8MX26il1U7IjijqpZXTSAMxoALNUQqYAhhRfoWpYcmsrFPc9/sFdNjfRViat
- 39CkM+bhAwTMayweOW2aL1lNNmUCzytaVUwXXYH80EdygmQ
-IronPort-HdrOrdr: A9a23:YxgA56njdD1YCCF9Jikn8O5iZrjpDfLa3DAbv31ZSRFFG/FwWf
- re+MjzsiWUtN9xYh8dcL+7VZVoLUm3yXcx2/hyAV7AZmbbURWTTL2KhLGKq1bd8m/Fh41gPM
- xbH5SWZueAaGRSvILW7Ba1FtA4zMLC0qy57N2utktFfEVGZ75t6gFhBh3eKE15QwFaGYE0fa
- DsgPav3wDQHkg/X4CcGmQPWfTFqpngkZLrZgNDOjscgTP+9Q9BLNXBYmKlNtB0aUI1/Ysf
-X-Talos-CUID: =?us-ascii?q?9a23=3AM9WZH2iv9ObcrMgUyBvbo7a4vTJuLETA0GruH0G?=
- =?us-ascii?q?EDm9zeOy5bAKi+J5KnJ87?=
-X-Talos-MUID: 9a23:i0sNmgpvlqGj+WzgnA4ezw5/C/dxoI+ENB8Qy58ql/KaKQVsYQ7I2Q==
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.24,196,1774310400"; 
-   d="scan'208";a="492117417"
-Received: from rcdn-l-core-06.cisco.com ([173.37.255.143])
-  by rcdn-iport-6.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 09 Jun 2026 16:32:54 +0000
-Received: from [127.0.0.1] (unknown [10.25.128.186])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by rcdn-l-core-06.cisco.com (Postfix) with ESMTPS id BBACE18000268;
-	Tue,  9 Jun 2026 16:32:53 +0000 (GMT)
-From: Satish Kharat <satishkh@cisco.com>
-Date: Tue, 09 Jun 2026 09:32:36 -0700
-Subject: [PATCH net-next v8 10/10] enic: add V2 VF probe with admin channel
- and PF registration
+        d=broadcom.com; s=google; t=1781023471; x=1781628271; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/E4eFgu6MtYbOMm2tImhw5v+nDyA/2xy8PKJOVrSiTI=;
+        b=O/QVF1YQMBWPCzTeQTf6DO+Mr1Q4vmvenyv5/K3hGaPEZPCnHM2F6t14nHvONVV7tY
+         BGRxjjUZIyhF1ngPcgfeJGuPcQajniX/MejJXBnUI4gMl13OogIqQizVWs2HexM2cTqc
+         vALarmpje1rdRA4/n1HLOWqYY2ZxhaTFl+ZLI=
+X-Forwarded-Encrypted: i=1; AFNElJ88Kn06fcEYFzTccA9qCcSXwBIgM0k8opeIFHnpfhlkT8cgqCPvrdwQ/UWX4VPT5sbQVOF052I=@vger.kernel.org
+X-Received: by 2002:a17:907:7289:b0:bf3:230c:4c64 with SMTP id a640c23a62f3a-bf371f52a44mr1079916766b.16.1781023471425;
+        Tue, 09 Jun 2026 09:44:31 -0700 (PDT)
+X-Received: by 2002:a17:907:7289:b0:bf3:230c:4c64 with SMTP id
+ a640c23a62f3a-bf371f52a44mr1079914766b.16.1781023470912; Tue, 09 Jun 2026
+ 09:44:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-enic-sriov-v2-admin-channel-v2-v8-10-8ad8babbb826@cisco.com>
-References: <20260609-enic-sriov-v2-admin-channel-v2-v8-0-8ad8babbb826@cisco.com>
-In-Reply-To: <20260609-enic-sriov-v2-admin-channel-v2-v8-0-8ad8babbb826@cisco.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sesidhar Baddela <sebaddel@cisco.com>, Satish Kharat <satishkh@cisco.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781022766; l=7884;
- i=satishkh@cisco.com; h=from:subject:message-id;
- bh=MYBn/BV06qLt+REdHK+//qM3Kxx0oxfsJkIFbD9eYmE=;
- b=iICukX4K48kCYBpOGqZsNcUGFtXGfW8HUf1na/+9BYq3ouR6nswJXFDM41YE9A+/njGgaQCyh
- 1nv7AIhXZKXCthEieFaERuRamhPJlFKXVP6E0B6UO/Y30t9TrlJ9Iwt
-X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
- pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
-X-Outbound-Client-TLS: ANONYMOUS;unknown [10.25.128.186];TLSv1.3;TLS_AES_256_GCM_SHA384;256
-X-Outbound-SMTP-Client: 10.25.128.186, [10.25.128.186]
-X-Outbound-Node: rcdn-l-core-06.cisco.com
+References: <20260608203129.920104-1-joe@dama.to> <CACKFLikOyMh3Kbee-AifLXQryyPt-CftW7VYHeeKWoCuMoXj8w@mail.gmail.com>
+ <aigoUdgW/icfFwvh@devvm20253.cco0.facebook.com>
+In-Reply-To: <aigoUdgW/icfFwvh@devvm20253.cco0.facebook.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 9 Jun 2026 09:44:17 -0700
+X-Gm-Features: AVVi8CeQ9UVEZ-dALzREYPtL9CweYyN0C8yEBj5PELc00kfklbKPfYsK-FDK3Hs
+Message-ID: <CACKFLinzaJr8EjXx7yME5cKv9LR1+pF+2iY43V+GeYdEjbUo+Q@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt: fix head underflow on XDP head-grow
+To: Joe Damato <joe@dama.to>, Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Somnath Kotur <somnath.kotur@broadcom.com>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, horms@kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000060eb3d0653d4d724"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[cisco.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-9.76 / 15.00];
+	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cisco.com,reject];
-	R_DKIM_ALLOW(-0.20)[cisco.com:s=iport01];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297171-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:joe@dama.to,m:michael.chan@broadcom.com,m:netdev@vger.kernel.org,m:pavan.chebbi@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:somnath.kotur@broadcom.com,m:andrew.gospodarek@broadcom.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297179-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[dama.to,broadcom.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sebaddel@cisco.com,m:satishkh@cisco.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[satishkh@cisco.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[cisco.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cisco.com:dkim,cisco.com:email,cisco.com:mid,cisco.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,broadcom.com:dkim,broadcom.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DA1FA6628D4
+X-Rspamd-Queue-Id: 295DB662ACD
 
-When a V2 SR-IOV VF probes, open the admin channel, initialize the
-MBOX protocol, perform the capability check with the PF, and register
-with the PF. This establishes the PF-VF communication path that the PF
-uses to send link state notifications.
+--00000000000060eb3d0653d4d724
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The admin channel and MBOX registration happen after enic_dev_init()
-(which discovers admin channel resources) and before register_netdev()
-so the VF is fully initialized before the interface is visible to
-userspace.
+On Tue, Jun 9, 2026 at 7:51=E2=80=AFAM Joe Damato <joe@dama.to> wrote:
+>
+> On Mon, Jun 08, 2026 at 09:22:07PM -0700, Michael Chan wrote:
+> > On Mon, Jun 8, 2026 at 1:31=E2=80=AFPM Joe Damato <joe@dama.to> wrote:
+> > >
+> > > To fix this, we need to do a bit of math to recover the offset if thi=
+s
+> > > is a page fragment since it is not passed into rx_skb_func
+> > > (bnxt_rx_multi_page_skb, in this case).
+> >
+> > I wonder if we should add an offset field to struct bnxt_sw_rx_bd to
+> > simplify things for page mode.  Struct bnxt_sw_rx_agg_bd has the
+> > offset field for a similar purpose.  Thanks.
+>
+> I don't mind doing that, but I wonder if that's better material for net-n=
+ext?
+>
+> In other words, we get the minimal fix in (this patch?) and then do the
+> cleanup and struct tweaking as a follow-up in net-next?
+>
+> I could definitely be wrong; I had just assumed patches for net were supp=
+osed
+> to be as minimal as possible.
 
-The admin channel is opened before enic_mbox_init() installs the
-receive handler.  This is safe because enic_admin_rq_cq_service()
-checks admin_rq_handler before enqueuing received buffers, so any
-interrupt that fires between open and mbox_init is harmlessly
-discarded.
+I think some minor refactoring/struct changes to make the fix
+cleaner/simpler should be fine for -net.  I think the total number of
+line changes should be about the same either way.
 
-On remove, the VF unregisters from the PF and closes its admin channel
-before tearing down data path resources.
+--00000000000060eb3d0653d4d724
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-V2 VFs are not provisioned with an RES_TYPE_SRIOV_INTR resource by
-firmware, so bypass that check in the admin channel capability
-detection for V2 VFs. The PF still requires this resource.
-
-The admin MSI-X vector reserved by enic_set_intr_mode()
-is used for the admin channel interrupt.
-enic_adjust_resources() ensures the reserved slot is within
-intr_avail bounds even at maximum queue configurations.  The
-admin INTR uses a RES_TYPE_INTR_CTRL slot shared with the
-data path.
-
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic.h      |  1 +
- drivers/net/ethernet/cisco/enic/enic_main.c | 88 ++++++++++++++++++++++++++---
- drivers/net/ethernet/cisco/enic/enic_res.c  |  3 +-
- 3 files changed, 82 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index db9c76d1150a..6f2f2c6e92b1 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -442,6 +442,7 @@ void enic_reset_addr_lists(struct enic *enic);
- int enic_sriov_enabled(struct enic *enic);
- int enic_is_valid_vf(struct enic *enic, int vf);
- int enic_is_dynamic(struct enic *enic);
-+int enic_is_sriov_vf_v2(struct enic *enic);
- void enic_set_ethtool_ops(struct net_device *netdev);
- int __enic_set_rsskey(struct enic *enic);
- void enic_ext_cq(struct enic *enic);
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index f3d335f06fbc..162c5e75ed0f 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -316,6 +316,11 @@ static int enic_is_sriov_vf(struct enic *enic)
- 	       enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
- }
- 
-+int enic_is_sriov_vf_v2(struct enic *enic)
-+{
-+	return enic->pdev->device == PCI_DEVICE_ID_CISCO_VIC_ENET_VF_V2;
-+}
-+
- int enic_is_valid_vf(struct enic *enic, int vf)
- {
- #ifdef CONFIG_PCI_IOV
-@@ -2348,15 +2353,19 @@ static int enic_adjust_resources(struct enic *enic)
- 		enic->intr_count = enic->intr_avail;
- 		break;
- 	case VNIC_DEV_INTR_MODE_MSIX: {
--		/* Reserve one MSI-X slot for the admin channel interrupt
--		 * when V2 SR-IOV admin channel resources are present.
--		 */
--		unsigned int admin_reserve =
--			enic->has_admin_channel ? 1 : 0;
--
- 		/* Adjust the number of wqs/rqs/cqs/interrupts that will be
--		 * used based on which resource is the most constrained
-+		 * used based on which resource is the most constrained.
-+		 * Reserve one extra MSI-X slot for the admin channel INTR
-+		 * when has_admin_channel is set so that
-+		 * enic_admin_setup_intr() can allocate at intr_count
-+		 * within the intr_avail bounds even when the data queue
-+		 * count is maxed out.  intr_count counts only the data-path
-+		 * IRQs (registered by enic_request_intr()); the admin INTR
-+		 * lives at msix index intr_count and is set up later by
-+		 * enic_admin_setup_intr().
- 		 */
-+		unsigned int admin_reserve = enic->has_admin_channel ? 1 : 0;
-+
- 		wq_avail = min(enic->wq_avail, ENIC_WQ_MAX);
- 		rq_default = max(netif_get_num_default_rss_queues(),
- 				 ENIC_RQ_MIN_DEFAULT);
-@@ -3037,6 +3046,38 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_dev_close;
- 	}
- 
-+	/* V2 VF: open admin channel and register with PF.
-+	 * Must happen before register_netdev so the VF is fully
-+	 * initialized before the interface is visible to userspace.
-+	 *
-+	 * admin_channel_open() runs before enic_mbox_init() installs
-+	 * the receive handler.  This is safe because
-+	 * enic_admin_rq_cq_service() checks admin_rq_handler before
-+	 * enqueuing any received buffer, so interrupts that fire
-+	 * between open and mbox_init are harmlessly discarded.
-+	 */
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		err = enic_admin_channel_open(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"Failed to open admin channel: %d\n", err);
-+			goto err_out_dev_deinit;
-+		}
-+		enic_mbox_init(enic);
-+		err = enic_mbox_vf_capability_check(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX capability check failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+		err = enic_mbox_vf_register(enic);
-+		if (err) {
-+			dev_err(dev,
-+				"MBOX VF registration failed: %d\n", err);
-+			goto err_out_admin_close;
-+		}
-+	}
-+
- 	netif_set_real_num_tx_queues(netdev, enic->wq_count);
- 	netif_set_real_num_rx_queues(netdev, enic->rq_count);
- 
-@@ -3061,7 +3102,7 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = enic_set_mac_addr(netdev, enic->mac_addr);
- 	if (err) {
- 		dev_err(dev, "Invalid MAC address, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	enic->tx_coalesce_usecs = enic->config.intr_timer_usec;
-@@ -3159,11 +3200,23 @@ static int enic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	err = register_netdev(netdev);
- 	if (err) {
- 		dev_err(dev, "Cannot register net device, aborting\n");
--		goto err_out_dev_deinit;
-+		goto err_out_admin_close;
- 	}
- 
- 	return 0;
- 
-+err_out_admin_close:
-+	if (enic_is_sriov_vf_v2(enic)) {
-+		if (enic->vf_registered) {
-+			int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+			if (unreg_err)
-+				netdev_warn(netdev,
-+					    "Failed to unregister from PF: %d\n",
-+					    unreg_err);
-+		}
-+		enic_admin_channel_close(enic);
-+	}
- err_out_dev_deinit:
- 	enic_dev_deinit(enic);
- err_out_dev_close:
-@@ -3200,6 +3253,23 @@ static void enic_remove(struct pci_dev *pdev)
- 
- 		cancel_work_sync(&enic->reset);
- 		cancel_work_sync(&enic->change_mtu_work);
-+
-+		/* Close the admin channel and unregister from the PF before
-+		 * unregister_netdev() to prevent a late PF notification from
-+		 * touching a netdev that has been freed.
-+		 */
-+		if (enic_is_sriov_vf_v2(enic)) {
-+			if (enic->vf_registered) {
-+				int unreg_err = enic_mbox_vf_unregister(enic);
-+
-+				if (unreg_err)
-+					netdev_warn(netdev,
-+						    "Failed to unregister from PF: %d\n",
-+						    unreg_err);
-+			}
-+			enic_admin_channel_close(enic);
-+		}
-+
- 		unregister_netdev(netdev);
- #ifdef CONFIG_PCI_IOV
- 		if (enic_sriov_enabled(enic)) {
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
-index 436326ace049..74cd2ee3af5c 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.c
-@@ -211,7 +211,8 @@ void enic_get_res_counts(struct enic *enic)
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_RQ) >= 1 &&
- 		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_CQ) >=
- 			ARRAY_SIZE(enic->admin_cq) &&
--		vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1;
-+		(enic_is_sriov_vf_v2(enic) ||
-+		 vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1);
- 
- 	dev_info(enic_get_dev(enic),
- 		"vNIC resources avail: wq %d rq %d cq %d intr %d admin %s\n",
-
--- 
-2.43.0
-
+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
+DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
+qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
+5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
+rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
+qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
+2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
+K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
+H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
+Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
+WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
+q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
+2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
+bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
+R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCTi2ax
+4G4tomwKZbBDoDUw6NAJqu4+zYMEf2l9v3GgcTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA2MDkxNjQ0MzFaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAqK4Jz6PzxHLSwRcEvgA9tuQgf/+Lmo7t9lh5q8yq9
+bdTdHBZ4XWADI8qE3SBkpkpwuLkNfaRF9rMqw7Sqsaz4Dj6zOZlEJyJJuZYvD+mevYI9aREinX3+
+nIJwcGqQiYJZScZNCiKj7FhohLLWQw/oGzdQU0nCSgXlZJUXX82pbuxM/HQ1Ixtw9LkUuo3KA2Bf
+dBCkiYRYdx/REdVud95w0XDVav0Ai/A8SYpFiej0ESde2sFA8mk1LI7zQU0hF5BBUap8OhD5Eosj
+AlT6vCtJJddrWOSjikW8mPqWwi15W+I8LOiMeuNip1mrVdqHO1vP6/Pomp5rhaSMJtpzJlAx
+--00000000000060eb3d0653d4d724--
 
