@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297234-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id y7zJAXxcKGrqCgMAu9opvQ
-	(envelope-from <netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:32 +0200
+	id d/m3NpNcKGrxCgMAu9opvQ
+	(envelope-from <netdev+bounces-297234-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D020663592
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2166766359B
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=LsjYvhUu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=aSnonK7S;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297234-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297234-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04B9F3035B54
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E53A303A91A
 	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7836F4C77D3;
-	Tue,  9 Jun 2026 18:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023AF4C8FEA;
+	Tue,  9 Jun 2026 18:32:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1E4363087
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11AB48AE03
 	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:32:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781029948; cv=none; b=MM3m3GlE0ygA9d+LjU9ThZVwHT30X7PKgbIPBpLl8M73ITn9BcpHd0oBwbPquI+L2hbcgnnQl8ElZUFYJLN+/fRKqMEArj2TWA7Yl2j/JF5+NBEgLjF6r5OBfxpFsGcvJU0Nimc88gkBy8lMMAIjYDn/W1/AQqrdZReOpZJeVh8=
+	t=1781029948; cv=none; b=T3XEmODyI00mM2byVwHlB1FsNlZMQoBWJXm1AHYtF3Up5O1dbmItJPLFlvkZ771/1lrvU9Id0XyXgA6675Bj+dIndfsH/6CR00Px59n/CZbs+YfOj230HXrXT8btoKz9PD/6seaBV4hVHoVEOPYkcAIASfAsVLwObUUaZEj24OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781029948; c=relaxed/simple;
-	bh=U1EklQm+nU1nLZqPXGdeCT5+o51yPHfWzGvDPtxNQEQ=;
+	bh=N3k5y8fp3cAn0GYvxCLEdMnRS8kTUxdZYIvTYHdWrJ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ohChkbP7HA8pczm4EZbY/yrLLoCHHpYHSlyne7p+TxqCulhCm1OkoPZa5/dIuJxhO/+SK7ZHu6nA1E3eXccdkpZSELZCS6Zt7wXh0loGAYx2xGm4Zok+CHGH99IcDPHLNo4oeJneJGpL8BC0zCeTJHq+cE5HGEUqVTFIGR1aWCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsjYvhUu; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192F01F00899;
+	 MIME-Version; b=iGhMS5AsyyCGJ1WvzOR2V1zp6aLoQ/LJelhxrpF3Y1jt4aVhNPCleNOISSJpDgD9KI4olTNUZIDIRAMKJmTkgU5rb8PQBGR2q7DThOg8PUpMqA2l+7bCHwEyoZjOmayNTVunmvRsrYPKsEUplqnn6G4GoZym8VSkP5kZPTXUe5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSnonK7S; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 888501F0089C;
 	Tue,  9 Jun 2026 18:32:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1781029947;
-	bh=sUEK4Aq097camM+Oo827VJQjdV0/OyLi5lR6dPIRNNc=;
+	bh=Zj+g0wTJyXtks4s0p+ugVL3oxHky3xp/anjYAInaF2k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=LsjYvhUunoUB9xB02LjhLOHqtvP2tM4dqBfVkWR4dnxp3xb1GuOBWqHnz0npqPpbe
-	 OLx49vP/ntHlE+a6Dvm5PaHAGUjkjMED88l4S7k6uXztfo29k6ud0Ig6T8F33BHY6f
-	 Nkb/5azkeM8DfZCA//B1i4KZ3M38L+Swqs9YeHye/vhn5m7WivuumMwhWbKM1rxAVh
-	 Yhy1OyRQA0RRsIZhSH/fdKJ23bgdNpDNZ7K2NJeAnY9CfAhN+nJq/S1bEvbPhCfYXj
-	 oHMPJ4BCan86quVbj3LPeVBKgScszau7m1C/ntse0sx8J8GJ89hLYH960Tf369FWXm
-	 fgYfrcHAleybw==
+	b=aSnonK7SFuVTCCoSovAZEP6ZyZuR7SptCh8aglOpz3AO6Jm7rSihHwcDqqbNxdp+S
+	 2cl/PPDgC7AKsd2/OjoTjvfChKqs+lSkWEuGv+MSrwq/KQOjqzI5iLuF+t5Rgmm0iv
+	 mTo+h/0JbZgJ7pkV/ajmjJWm07Poh6EHoJOWXI354nmZN/Ws71DjZghqEnfmoVjyek
+	 z4Y+05oc1vQVTgYai7BSOlgA8R0nSB3IiVt9tSSPh9SLGFcCVa9cQZHmgNF9h6Lqrv
+	 2p8rzPfV1WVzqCyd8WP2O15M5yVu5/GJxWMsez1y9Gs6OyKtOgTvFpkm0YD8atK8sY
+	 K094sfswAK22g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 3/4] net: shaper: add a comment why we don't need kfree_rcu() in flush
-Date: Tue,  9 Jun 2026 11:32:23 -0700
-Message-ID: <20260609183224.1108521-4-kuba@kernel.org>
+Subject: [PATCH net-next 4/4] net: shaper: add a note that we expect cap dumps to be tiny
+Date: Tue,  9 Jun 2026 11:32:24 -0700
+Message-ID: <20260609183224.1108521-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260609183224.1108521-1-kuba@kernel.org>
 References: <20260609183224.1108521-1-kuba@kernel.org>
@@ -80,7 +80,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297233-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297234-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -103,31 +103,34 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D020663592
+X-Rspamd-Queue-Id: 2166766359B
 
-We keep getting misguided patches to fix the flush.
-Add a comment.
+Various AI scan tools may complain that we don't support resuming
+the cap dump. This is true, but the cap dumps are tiny.
+net_shaper_nl_cap_pre_dumpit() sets up the dump for just
+one device, so the size of the dump scales with NET_SHAPER_SCOPE_MAX (3).
+
+We don't expect them to ever need more than a 4kB page.
+Document this.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/shaper/shaper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/shaper/shaper.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index 33958462e5e9..5a3b44c5d10f 100644
+index 5a3b44c5d10f..b65b356da16b 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -1470,6 +1470,10 @@ static void net_shaper_flush(struct net_shaper_binding *binding)
+@@ -1452,6 +1452,8 @@ int net_shaper_nl_cap_get_dumpit(struct sk_buff *skb,
  
- 	xa_for_each(&hierarchy->shapers, index, cur) {
- 		xa_erase(&hierarchy->shapers, index);
-+		/* No need to use kfree_rcu(), netdev is already unpublished,
-+		 * and synchronize_rcu() has been run as part of
-+		 * unregister_netdevice().
-+		 */
- 		kfree(cur);
+ 		ret = net_shaper_cap_fill_one(skb, binding, scope, flags,
+ 					      info);
++		/* cap dumps are tiny, we expect them to fit in a single skb */
++		WARN_ON_ONCE(ret == -EMSGSIZE);
+ 		if (ret)
+ 			return ret;
  	}
- 
 -- 
 2.54.0
 
