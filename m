@@ -1,247 +1,325 @@
-Return-Path: <netdev+bounces-297041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jvjeBpAHKGp07gIAu9opvQ
-	(envelope-from <netdev+bounces-297041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:31:12 +0200
+	id 5DOuC4sLKGq78wIAu9opvQ
+	(envelope-from <netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:48:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA91566012A
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:31:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E8966033E
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:48:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lPzkSg6f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297041-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297041-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=YN19mYgv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DC8143004CB5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:31:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A2833032CD0
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF4F40E8CB;
-	Tue,  9 Jun 2026 12:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681C5404893;
+	Tue,  9 Jun 2026 12:43:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F02029430;
-	Tue,  9 Jun 2026 12:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FC04183A2
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 12:43:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781008266; cv=none; b=S7dZlbahup8VSOiEJyfyYINFbfS0kQ28NQ1t02LBxoAvx462FUBKw18C/c0w9eLZOVfLFpeS2PtrMhoLdny9QOyevUjhYUMX1lyeDNtqi9QlJQ6HMemypMPWkC/nf43wZ8FntBHKbMIDLuqc4JgRjEeuc+SKgeqHwyELvhcaBfY=
+	t=1781008989; cv=none; b=FNfNCGsLo525iRQs40+SQgSWhIIr+ZKLx9sLIGHV4iJi19LNrXUE0o4XxxURWBbEw/IGNLOS54tv9lAzfqV4rfHTtAsltpWuEW7rcZlTf0GULtyynwF4e5p40DLKKorz9mEGD21y69cbLUtriVESIX8lq/Gc18xefqxdbjwBvLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781008266; c=relaxed/simple;
-	bh=YPwt4E1/e8himmYevZRXgTWF3kQYEVRHVJbGkTWZ8BI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p3lj9wpat9+SkXAQq8mSN5XKWkD9QvZNEaQe2oOTcK/sFAKlqgdfbLykd2RQijH9dH+QxCBv1IWzOVega71s79mChAn08Zv4TRLrJIvqfTJ2p9T829jwr2W3M7cWiJ2liFB4prMNZV5fjF9nIYXTSL62jvj1wb0DyCZDLmujFHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lPzkSg6f; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 094771F00893;
-	Tue,  9 Jun 2026 12:31:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781008265;
-	bh=XxGMHwpxpnnJ88QD7pD2AhEOfioYfC2UjFXsfe9cfiY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lPzkSg6f1t6qGPmiU2pqMH6rPHJwYIDfeMFT1q83mhwQedOLzr9k6Uf0bgQt9am3I
-	 J3nysXosPdEFLd9drknpm+VKEqicMDpWzIS/Qe+kevtH2Om4Qz+aVgYot6gIq2l70c
-	 z35PF09jIzVTL+pLbP9JEg+fhWE/wc/mCnvc/5TkljSL1ZEMdXbNEGxuB70Bxx+YF/
-	 a84efvuJDDqSkZPEFcH433xZPXWQiR4jvLCgEZWCopY4hVg0b9RIHWg4jksEenG/J6
-	 V/jzGI36VOc7jNHOcjuhhMEtnhEjWP/dZ/RDXH4eqWC+3Cduw8GrD00HGyp+1aVBqy
-	 PLXso7lMEt/Og==
-Date: Tue, 9 Jun 2026 14:31:03 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Subject: Re: [PATCH nf] netfilter: flowtable: use pskb_may_pull() in
- nf_flow_ip6_tunnel_proto()
-Message-ID: <aigHh5cBKc12frX2@lore-desk>
-References: <20260608-b4-nf_flow_ip6_tunnel_proto-update-v1-1-782c7052c8fd@kernel.org>
- <aidMPKrm9gOcPLW-@chamomile>
- <aifquGhK_Cijxq7m@lore-desk>
- <aif9kL38LKNcX1Xu@chamomile>
+	s=arc-20240116; t=1781008989; c=relaxed/simple;
+	bh=eQcE53H57mmugtVAqmdEXxaSypvWnM/iYQmtRBz9Vpc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Izoye+sIz/GRmkTLqZCIVsStYCuV6oHcIpT2zlFkBAZG/18oNjf97kNoelVyDV5UO4yzYrbBqaD05K6ZSM8qR1I4R5lMAR/jKdP71WXkX/90mrSjoh9oIEjL1/ctzOL0uueCAHCc7pWM4nM4Rkr93W26XEK2qQkHD2bmkxa/IZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YN19mYgv; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781008987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IxR+44t8/qx3fXoBokd6lsS+BQ1a++aQUffFzkcdiEE=;
+	b=YN19mYgvvQIZNQtdLJV5tFOIXoQGSncds47QhCEEwT6iFvzGRl4I4lhviDpxR61CGAHM/7
+	bWW95tW1PXhdD2VqK/VQZU8ywAPW7mzrTHc6o43uTYQ8PbTpCoAlbg3JRedtUQeS46IZYV
+	wT9izHrcVoWs/rPWCFyQAf4hQRFI6hs=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-uxaodqk_Mr6SZsfHb_7zPg-1; Tue,
+ 09 Jun 2026 08:43:01 -0400
+X-MC-Unique: uxaodqk_Mr6SZsfHb_7zPg-1
+X-Mimecast-MFC-AGG-ID: uxaodqk_Mr6SZsfHb_7zPg_1781008979
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D8D41964CF2;
+	Tue,  9 Jun 2026 12:42:59 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.65.94])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 876293008B38;
+	Tue,  9 Jun 2026 12:42:57 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Minxi Hou <houminxi@gmail.com>
+Cc: echaudro@redhat.com,  i.maximets@ovn.org,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  horms@kernel.org,  shuah@kernel.org,  netdev@vger.kernel.org,
+  dev@openvswitch.org,  linux-kselftest@vger.kernel.org,
+  amorenoz@redhat.com
+Subject: Re: [PATCH net-next] selftests/net/openvswitch: add flow modify test
+In-Reply-To: <20260605124222.963815-1-houminxi@gmail.com> (Minxi Hou's message
+	of "Fri, 5 Jun 2026 20:42:22 +0800")
+References: <20260605124222.963815-1-houminxi@gmail.com>
+Date: Tue, 09 Jun 2026 08:42:56 -0400
+Message-ID: <f7tjys7ga0f.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="t5tthOR2Bt0x9qQ/"
-Content-Disposition: inline
-In-Reply-To: <aif9kL38LKNcX1Xu@chamomile>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297041-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297042-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:amorenoz@redhat.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CA91566012A
+X-Rspamd-Queue-Id: C2E8966033E
 
+Hi Minxi,
 
---t5tthOR2Bt0x9qQ/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the quick turnaround with the test!
 
-> On Tue, Jun 09, 2026 at 12:28:08PM +0200, Lorenzo Bianconi wrote:
-> > On Jun 09, Pablo Neira Ayuso wrote:
-> > > Hi Lorenzo,
-> > >=20
-> > > On Mon, Jun 08, 2026 at 07:06:52PM +0200, Lorenzo Bianconi wrote:
-> > > > Switch nf_flow_ip6_tunnel_proto() from skb_header_pointer() to
-> > > > pskb_may_pull() for header validation, aligning it with the approach
-> > > > used in nf_flow_ip4_tunnel_proto().
-> > > > Move ctx->offset update inside the IPPROTO_IPV6 conditional block s=
-ince
-> > > > it should only be adjusted when a tunnel is actually detected.
-> > > > While at it, use nexthdr instead of the hardcoded IPPROTO_IPV6 cons=
-tant
-> > > > when setting ctx->tun.proto.
-> > > >=20
-> > > > Fixes: d98103575dcdd ("netfilter: flowtable: Add IP6IP6 rx sw accel=
-eration")
-> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > > ---
-> > > >  net/netfilter/nf_flow_table_ip.c | 10 +++++-----
-> > > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > > >=20
-> > > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_fl=
-ow_table_ip.c
-> > > > index 9c05a50d6013..2946399ab715 100644
-> > > > --- a/net/netfilter/nf_flow_table_ip.c
-> > > > +++ b/net/netfilter/nf_flow_table_ip.c
-> > > > @@ -347,15 +347,15 @@ static bool nf_flow_ip6_tunnel_proto(struct n=
-f_flowtable_ctx *ctx,
-> > > >  				     struct sk_buff *skb)
-> > > >  {
-> > > >  #if IS_ENABLED(CONFIG_IPV6)
-> > > > -	struct ipv6hdr *ip6h, _ip6h;
-> > > > +	struct ipv6hdr *ip6h;
-> > > >  	__be16 frag_off;
-> > > >  	u8 nexthdr;
-> > > >  	int hdrlen;
-> > > > =20
-> > > > -	ip6h =3D skb_header_pointer(skb, ctx->offset, sizeof(*ip6h), &_ip=
-6h);
-> > > > -	if (!ip6h)
-> > > > +	if (!pskb_may_pull(skb, sizeof(*ip6h) + ctx->offset))
-> > > >  		return false;
-> > > > =20
-> > > > +	ip6h =3D (struct ipv6hdr *)(skb_network_header(skb) + ctx->offset=
-);
-> > > >  	if (ip6h->hop_limit <=3D 1)
-> > > >  		return false;
-> > >=20
-> > > Not shown in the patch, but is there still a corner case here that
-> > > needs to be covered?
-> > >=20
-> > > ipv6_skip_exthdr() uses skb_header_pointer() internal, then another
-> > > pskb_may_pull() is needed to make sure no other IPv6 extension header
-> > > sits between the outer and the inner IPPROTO_IPV6 header, allowing to
-> > > be in a non-linear area of the skb?       =20
-> > >=20
-> > > > @@ -367,9 +367,9 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_=
-flowtable_ctx *ctx,
-> > > > =20
-> > >=20
-> > > I mean:
-> > >=20
-> > >         if (!pskb_may_pull(skb, hdrlen))
-> > >                 return false;
-> > >=20
-> > > where hdrlen is what ipv6_skip_exthdr() returns.
-> > >=20
-> > > Then, I think it should be safe to call skb_pull() on
-> > > ctx->tun.hdr_size.
-> > >=20
-> > > Let me know, thanks.
-> >=20
-> > I think you are right, here we need to run:
-> >=20
-> > 	if (!pskb_may_pull(skb, hdrlen))
-> > 		return false;
-> >=20
-> > in order to be sure we can pull ctx->tun.hdr_size in nf_flow_ip_tunnel_=
-pop().
-> > Doing so, we can roll-back to the original skb_header_pointer() to acce=
-ss the
-> > outer ip6 header here. What do you think?
->=20
-> Yes, initial skb_header_pointer() then pskb_may_pull(skb, hdrlen) to
-> ensure the entire should be fine.
->=20
-> I think this need one more fix: This needs to resort to classic path
-> if there are intermediate extension headers sitting in between the
-> outer and inner headers in IP6IP6, ie. ipv6_ext_hdr() =3D=3D true. Those
-> extensions need to be handled by the IPv6 stack.
+Minxi Hou <houminxi@gmail.com> writes:
 
-In my setup we have just a single Destination Option extension header (60)
-between the outer and the inner IPV6 headers. In order to check if we have
-other extensions headers other than Destination Option (and if so, send the
-packet the networking stack) I guess we need to implement something similar
-to ipv6_skip_exthdr(), agree?
+> Add mod_flow() and the mod-flow CLI command to ovs-dpctl.py, exercising
+> OVS_FLOW_CMD_SET. Add test_flow_set which first modifies an existing
+> flow with new actions and verifies the change via traffic, then modifies
+> the same flow without actions and verifies the kernel handles the
+> no-actions case gracefully.
+>
+> The no-actions path is unreachable from userspace OVS tools (dpctl
+> mod-flow requires actions) but reachable via raw netlink. This is the
+> code path where Adrian Moreno found a possible kfree_skb of ERR_PTR
+> when reply allocation fails after locking.
+>
+> Make parse() skip OVS_FLOW_ATTR_ACTIONS when actstr is None so the
+> kernel enters the post-lock allocation branch in ovs_flow_cmd_set().
+>
+> Suggested-by: Aaron Conole <aconole@redhat.com>
+> Signed-off-by: Minxi Hou <houminxi@gmail.com>
+> ---
+>  .../selftests/net/openvswitch/openvswitch.sh  | 72 +++++++++++++++++++
+>  .../selftests/net/openvswitch/ovs-dpctl.py    | 39 +++++++++-
+>  2 files changed, 108 insertions(+), 3 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> index a415e9dec8cd..71190bc662f9 100755
+> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> @@ -30,6 +30,7 @@ tests="
+>  	drop_reason				drop: test drop reasons are emitted
+>  	pop_vlan				vlan: POP_VLAN action strips tag
+>  	dec_ttl					ttl: dec_ttl decrements IP TTL
+> +	flow_set				flow-set: Flow modify
+>  	psample					psample: Sampling packets with psample"
+>  
+>  info() {
+> @@ -193,6 +194,23 @@ ovs_add_flow () {
+>  	return 0
+>  }
+>  
+> +ovs_mod_flow () {
+> +	if [ -n "$4" ]; then
+> +		info "Modifying flow: sbx:$1 br:$2 flow:$3 act:$4"
+> +		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
+> +			mod-flow "$2" "$3" "$4"
+> +	else
+> +		info "Modifying flow (no actions): sbx:$1 br:$2 flow:$3"
+> +		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
+> +			mod-flow "$2" "$3"
+> +	fi
+> +	if [ $? -ne 0 ]; then
+> +		info "Flow modify [ $3 ] failed"
+> +		return 1
+> +	fi
+> +	return 0
+> +}
+> +
+>  ovs_del_flows () {
+>  	info "Deleting all flows from DP: sbx:$1 br:$2"
+>  	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py del-flows "$2"
+> @@ -300,6 +318,60 @@ test_dec_ttl() {
+>  	return 0
+>  }
+>  
+> +test_flow_set() {
+> +	sbx_add "test_flow_set" || return $?
+> +	ovs_add_dp "test_flow_set" flowset || return 1
+> +
+> +	info "create namespaces"
+> +	for ns in client server; do
+> +		ovs_add_netns_and_veths "test_flow_set" "flowset" "$ns" \
+> +			"${ns:0:1}0" "${ns:0:1}1" || return 1
+> +	done
+> +
+> +	ip netns exec client ip addr add 10.0.0.1/24 dev c1
+> +	ip netns exec client ip link set c1 up
+> +	ip netns exec server ip addr add 10.0.0.2/24 dev s1
+> +	ip netns exec server ip link set s1 up
+> +
+> +	ovs_add_flow "test_flow_set" flowset \
+> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+> +	ovs_add_flow "test_flow_set" flowset \
+> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+> +
+> +	local fwd_flow="ufid:00000001-0002-0003-0004-000500060007"
+> +	fwd_flow="$fwd_flow,in_port(1),eth(),eth_type(0x0800),ipv4()"
+> +
+> +	ovs_add_flow "test_flow_set" flowset "$fwd_flow" '2' \
+> +		|| return 1
+> +	ovs_add_flow "test_flow_set" flowset \
+> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
+> +
+> +	info "verify initial forwarding"
+> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
+> +		10.0.0.2 || return 1
+> +
+> +	info "mod-flow with new actions (change to drop)"
+> +	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" 'drop' \
+> +		|| return 1
+> +
+> +	info "verify traffic is now dropped"
+> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
+> +		10.0.0.2 >/dev/null 2>&1 \
+> +		&& { info "FAIL: ping should fail after mod-flow to drop"
+> +		     return 1; }
+> +
+> +	info "mod-flow without actions"
+> +	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" || return 1
 
->=20
-> nf_flow_ip6_tunnel_proto() needs to be fixed to deal with this.=20
+This is one we could also verify with a grep as well::
 
-Do you want to do it with a dedicated patch or do you prefer to do it in th=
-is
-one?
+  python3 "$ovs_base/ovs-dpctl.py" dump-flows flowset | grep "$fwd_flow"
 
-> And I suspect nf_flow_ip4_tunnel_proto() with IP options have the same
-> problem, the flowtable need to resort to the classic stack path.
+and just check that it has no actions associated with it.  We wouldn't
+need anything persistent since we are just checking the reply.  That way
+we know that the set has updated the flow as well (instead of solely
+relying on the drop).
 
-In the IPv4 case, if the packet has options nf_flow_ip4_tunnel_proto() will
-return false and so the packet will be sent to the networking stack.
+> +	info "verify drop actions unchanged"
+> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
+> +		10.0.0.2 >/dev/null 2>&1 \
+> +		&& { info "FAIL: ping should still fail after no-actions set"
+> +		     return 1; }
+> +
+> +	return 0
+> +}
+> +
+>  # psample test
+>  # - use psample to observe packets
+>  test_psample() {
+> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> index 3342e295293d..9113473d425f 100644
+> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> @@ -2702,9 +2702,10 @@ class OvsFlow(GenericNetlinkSocket):
+>              self["attrs"].append(["OVS_FLOW_ATTR_KEY", k])
+>              self["attrs"].append(["OVS_FLOW_ATTR_MASK", m])
+>  
+> -            a = ovsactions()
+> -            a.parse(actstr)
+> -            self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
+> +            if actstr is not None:
+> +                a = ovsactions()
+> +                a.parse(actstr)
+> +                self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
+>  
+>      def __init__(self):
+>          GenericNetlinkSocket.__init__(self)
+> @@ -2738,6 +2739,24 @@ class OvsFlow(GenericNetlinkSocket):
+>              raise ne
+>          return reply
+>  
+> +    def mod_flow(self, dpifindex, flowmsg):
+> +        flowmsg["cmd"] = OVS_FLOW_CMD_SET
+> +        flowmsg["version"] = OVS_DATAPATH_VERSION
+> +        flowmsg["reserved"] = 0
+> +        flowmsg["dpifindex"] = dpifindex
+> +
+> +        try:
+> +            reply = self.nlm_request(
+> +                flowmsg,
+> +                msg_type=self.prid,
+> +                msg_flags=NLM_F_REQUEST | NLM_F_ACK,
+> +            )
+> +            reply = reply[0]
+> +        except NetlinkError as ne:
+> +            print(flowmsg)
+> +            raise ne
+> +        return reply
+> +
+>      def del_flows(self, dpifindex):
+>          """
+>          Send a del message to the kernel that will drop all flows.
+> @@ -3013,6 +3032,12 @@ def main(argv):
+>      addflcmd.add_argument("flow", help="Flow specification")
+>      addflcmd.add_argument("acts", help="Flow actions")
+>  
+> +    modflcmd = subparsers.add_parser("mod-flow")
+> +    modflcmd.add_argument("modbr", help="Datapath name")
+> +    modflcmd.add_argument("modflow", help="Flow specification")
+> +    modflcmd.add_argument("modacts", help="Flow actions",
+> +                          nargs="?", default=None)
+> +
+>      delfscmd = subparsers.add_parser("del-flows")
+>      delfscmd.add_argument("flsbr", help="Datapath name")
+>  
+> @@ -3110,6 +3135,14 @@ def main(argv):
+>          flow = OvsFlow.ovs_flow_msg()
+>          flow.parse(args.flow, args.acts, rep["dpifindex"])
+>          ovsflow.add_flow(rep["dpifindex"], flow)
+> +    elif hasattr(args, "modbr"):
+> +        rep = ovsdp.info(args.modbr, 0)
+> +        if rep is None:
+> +            print("DP '%s' not found." % args.modbr)
+> +            return 1
+> +        flow = OvsFlow.ovs_flow_msg()
+> +        flow.parse(args.modflow, args.modacts, rep["dpifindex"])
+> +        ovsflow.mod_flow(rep["dpifindex"], flow)
+>      elif hasattr(args, "flsbr"):
+>          rep = ovsdp.info(args.flsbr, 0)
+>          if rep is None:
 
-Regards,
-Lorenzo
-
->=20
-> Thanks.
-
---t5tthOR2Bt0x9qQ/
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaigHhwAKCRA6cBh0uS2t
-rPNnAQD2clizkaYI6q2SFGurL+WaRcTj9ESoJPOBP5XDNnQQPgEA4QlU2M0raNY/
-mga/LSvbwjDT18SqisXEtc2EE4WSlww=
-=B8ir
------END PGP SIGNATURE-----
-
---t5tthOR2Bt0x9qQ/--
 
