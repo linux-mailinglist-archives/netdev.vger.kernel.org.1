@@ -1,303 +1,215 @@
-Return-Path: <netdev+bounces-296953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id g+VjG9/HJ2o02AIAu9opvQ
-	(envelope-from <netdev+bounces-296953-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:59:27 +0200
+	id SoF2JQHLJ2pH2QIAu9opvQ
+	(envelope-from <netdev+bounces-296958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:12:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCBA765D775
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 09:59:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1365565D9E3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:12:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=6wind.com header.s=google header.b=XBR59D0f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296953-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296953-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=6wind.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=leroy-agon.com header.s=selector1 header.b=UxqGttYr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296958-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296958-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=leroy-agon.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A803A3047413
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 07:56:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F1AAE304921A
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D8F385D7C;
-	Tue,  9 Jun 2026 07:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E493E63B8;
+	Tue,  9 Jun 2026 08:05:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mibc-fr-09-outgoing-02.mailinblack.com (mibc-fr-09-outgoing-02.mailinblack.com [137.74.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046A53403E5
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 07:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC083E7BC7
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 08:05:46 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780991811; cv=pass; b=CJbL++uqh8Zlu9V99jH/rFG6aQ+WAAfZK7AwEnVdzEj4JawlnFXWq3W8Dw3FzfhMDJ6b3R90OsCJzXBx+nyRw2klKHrkNgI865CwbGKJFpw6Hwkf+ON0AFBXnVsfi8c3+8CZJL24/NhW9f+3ngtf+irQDbjs2uDXNluK7tsLyPk=
+	t=1780992349; cv=fail; b=LQUPrcVvdcjUszcqfNOfzKTl7gJu9f62F/iqCicJvEj/X9RXNFU4h9EMPxzG3WUyIOaee2RrihHjG1sTHE0AqnvGVm28JJjAQxrjyltQB+mHnzMxV+UtJZC373dCZJt5TGNRELb49AwvUHlZbQvXREq25I1doVEdiZsnm9moeMw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780991811; c=relaxed/simple;
-	bh=D/PjZZW3iigL2V46ozkn8FuHHslvndqsqplywR7ggLM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WQIe7gBDDYiVYhF8ZmhIw4RIlzt88J1/ZCskwy/5mf6cPuu18mlSAZMvlrBD2ptvLMiyAm6whHNmCbe/y8j9YgGavwJ3q0w1v/kF04tuKQg3qXwYgSKf2AWG0iH6R8qkl3ZvNgtIOBYdPgWRISZ3wKLbEbNmu4+A8rgNZHUo7Sg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=XBR59D0f; arc=pass smtp.client-ip=209.85.208.47
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-68ca6f01079so6139024a12.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 00:56:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780991808; cv=none;
-        d=google.com; s=arc-20240605;
-        b=RERiMzlPI7IinS4Brgz0gIHFsGGJhjdBS+jnvEptZJ48Mx0S6Yidqv+PZ2plY6SpvG
-         ltNr69QpZwVSOPQEQr/xknihdRNEUCTV1nshgrFPHXgKmeP+rM/VkxdJ0ijloGEZVJus
-         T5VztklKIA39BmMrJFs8C1/a3BmvTsq52WRVE330/NCxa+CWwz8vPjx7+aJ1aZJlekMQ
-         9Kgan6xb8TXF3mz29eK2AdVE26B0/ehQyY2Tg5RwYL7WFioYFe9apHOlXqbzmugg3bud
-         qo3iDn0dyKHB/MKOCIs+uekOmLPAhzN0fSw/hjUSeHkHr/GHsZCxUCXBKftKefeEjIgp
-         YRHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qlXpqdSIvaDRYi3v4lu9lGZ3LDCxsAMCc0+aS5zAWNo=;
-        fh=mXilKxTJGDOPTefkyrsG8lNp05KyOGit73pQqKosc60=;
-        b=JHkY6fwl1KnHIhJ4qQbMuyBltffGgsPkkCiLroGdp3SE3J7c0VwJLLPwVzqswvqOYD
-         XBAAaYfLAZ3ddtMoHuNEkBVwhxTmzb2hUu/zteqPXEdw6aMNiQnkQ4bYVC3nw6bvIXM/
-         +0huyDo0x1w6Elv62VAj0n5qm6IAID3HuS8Lod1VOWLn6w/1d+0f1GDv4fNFzQ43mu+o
-         bux+8YYZnGwf/1XjnPuZx4nEQvCaGG4AqIMU6h4fa7hYTJNpsLZfuiheP00mDTvm1lPM
-         CKSvCLywl2ejLqc2fk8C7sCiSPbF2Hgx90vE3vbBbQhg5UBQmE+7/YccJkP0eDQC19pv
-         aiDw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1780991808; x=1781596608; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qlXpqdSIvaDRYi3v4lu9lGZ3LDCxsAMCc0+aS5zAWNo=;
-        b=XBR59D0fkbPldsktNEBlvs8CyNI/zL6LFAQyd15RKqye8TpJ8hu8DZiVHsDgq17luL
-         OoCNNf7kdOLqQQSYU+enLXFoneFViu8Y0cEO9xr3dnPMwOdXkYtcyMXjCHhwXCJzGflp
-         WT7afGK2S2cm7/JYzYscjdWiiemxvzB2tSGidY55g2by7zguWD0LxEp6jD7V/mYQPifS
-         +CltfBUpDWSAc4sVYbszbWiT3irkMELVLj/m9f20lz1uGgCiNE78LtY0bvvM3HOTXA7T
-         XvyHBdpJuuWRcJi3hB8+33j7cWI1mtr+b7RARbWPFxVI4O6P/HfVSFqezJvESKaSJAp1
-         ec2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780991808; x=1781596608;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qlXpqdSIvaDRYi3v4lu9lGZ3LDCxsAMCc0+aS5zAWNo=;
-        b=pyLAj2UxgA/EPWD3HvFgSM1opJZ5XabG2X/ZEdxF/tG5O6ZD9A6ztaCKzwWdzm0hFS
-         zUlE/0f+Kr0VL3kgSfldpDc6xJovcSegiKlx8Hsm8lrcb95cb6IxrtwHeup0lQgjV8vy
-         Umyit3w7K5oeFEZThkIsBUKTxdNstdjMFbb07fq+9AqMYqenFzMzRIpRUouTo2kxCYOq
-         PXnrrczX7azPn4hXEopT7Idtyr1BsSe2NNP8Ib2BVbxTU3BzlEo6Pg5t2nJPtaZiSn+V
-         sbQ3yUBXJrs8SBvpMhuwJyhtJDpw/AJa5rj4VYo+IUD4LCbswq9UyIuQl8HFsIbe5ckg
-         Jpzg==
-X-Gm-Message-State: AOJu0Yy5R8PGLtayH2alL6hrFeJjmL6MMDB+N8+wsmhtRB5+cG8GuDv1
-	zqrAb3hU4rV03DGNuW4nui1tHdJ6BVPu5cski8ka+Hrgv1D47NzVTL6YViYRoa8aLD2SrxyjQYp
-	wX0/lw+FeOLgfS2TyXzZqoyrXlB9GQiEyNugqactFog==
-X-Gm-Gg: Acq92OGhJlW/Ow6G5O3TbUEel2v3e8Pq2y84MHKM1WiiDY71VVy2rkS/88tpBQQ0+Cd
-	cWD1GGjDjneq94sW5XQijyimASE9x4nBkugkk16nIReYKYsZ+2E7olli+t0gAg6edeM6tLaZB8M
-	vxyod4CKbZrhe5P1MwVdfgXLkv3WrtdNYTxRAVAqiaD3AZtHCnjtDQqTwZ3RFp/A6ZKaiGhcDWW
-	oMX+r8ZqRnW4dHM642zRQTt8daNELBRNdH2bh57KEdd0Smnksys3cirO9deo1Rtbk6WT7u4L1Mb
-	UWZF2dHmxzpHDTZrjWrmwP1Gurm6l3ZLk8nu7BjrLkGUCzu8l7f6JjOd4SQ=
-X-Received: by 2002:a05:6402:847:b0:68e:4c0:f5b1 with SMTP id
- 4fb4d7f45d1cf-68fa4c00598mr7993774a12.2.1780991808218; Tue, 09 Jun 2026
- 00:56:48 -0700 (PDT)
+	s=arc-20240116; t=1780992349; c=relaxed/simple;
+	bh=1zGuw4b4gpy1N0bnKjoxDFnBSaX6NNYGJoCwy1bs2+4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VS0DHwG070Fk4ql5u9ecquxIs5s0BLRN3i3nsLTc9oPQWZ0BsRhvCrNnuEY/gF9Qkf8fzAOTQ+7UUMKQv+huX4M3kv2y9K86POA/q9dnAhCOcQxrbxG8lA5xfIm+AXb2LpRPqs48TtuP0/plzfTknoOji3DYuePVE3tTmLLd3as=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leroy-agon.com; spf=pass smtp.mailfrom=leroy-agon.com; dkim=pass (2048-bit key) header.d=leroy-agon.com header.i=@leroy-agon.com header.b=UxqGttYr; arc=fail smtp.client-ip=137.74.84.56
+Received: from PA5P264CU001.outbound.protection.outlook.com (mail-francecentralazon11020117.outbound.protection.outlook.com [52.101.167.117])
+	by mx-2-mibc-fr-09.mailinblack.com (Postfix) with ESMTPS id 5887E1F4003D;
+	Tue, 09 Jun 2026 09:59:35 +0200 (CEST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=axl6daSQIqkpRlWx8d49dISxKf3NoIWg8x2zOtjXjMVcj5gTreqJG/Xc/EI049rj58lIRnxxXb0lVN5iayVBGkqJYN1lPtcahfAz9Sv3pjBysnf8PHjit0wMdACkbWEE9F8MmKloEKFXRgdsD20MsWOqPygkD8rBDTm+QTufj57w/a/cfc47Ht1wKvGh1cL5XHuSSJY62lKzpstXdSsB0PbqQAX4x7SMBFTOapSoR2D/pfNDa1PQvZu8qjGz8Ct3snIaHYd6WmHWmQB7kTnI+Z37/oi6cd9F7vI8v3nsAIIUPw+XHiCaC35Ne8O6Rg6OhWCxGmEErddejF8+My3Atg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1zGuw4b4gpy1N0bnKjoxDFnBSaX6NNYGJoCwy1bs2+4=;
+ b=KzGS6iMmEpH3bfiK7QtH0nA9Pe9zyDfyDVQG0a90NJfjuS8vbCUBHiLcbBEO4Por5Ib+/Hob/mmuUpVu9w5rpN/L/NXgF0Q54xPTHfqo3ZAUR0910xzi6gyiOdCE3GladLf6Q1rPvecf1KusCUB09FcWmbC9N1MSEcM4vXhd65Ha46brbc2PodOa875XMCzp2q67pKtGhoZxVyNumQMLVcvwJ+2H/tKEyMkR3P+6dwMIzrFTEVSbFiv+7grnehLfa5vKO6e6VufJdjjcKDPnj/Evb1eFqWgVqcmApwry5WTeFO2wGXpm2oDF6wCDJtP4MrN50dG5MpiZheF6QmvtHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=leroy-agon.com; dmarc=pass action=none
+ header.from=leroy-agon.com; dkim=pass header.d=leroy-agon.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leroy-agon.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1zGuw4b4gpy1N0bnKjoxDFnBSaX6NNYGJoCwy1bs2+4=;
+ b=UxqGttYrTq0sFPt2FLIZcv9Bxx2GN3cPlCmmFU9ZkpCPOq/YIfHf7X/qETwb7IdFtQX07uxxaSBkKgO00+P36NT6Hry3SpYiTk5osJO6JR1IrrDJEAqn3ivXA2C7xnCIjyhTf5mvFiGEnw9WuVifBjSc/lx24qJXCDvUfqKXdySxPPC9khmoYt2kj/CXqHisF+lsuPSorItdbUTCq66VLzNhuy6hHyjBbi5OQs9sUXl5K7TdkC87gwergpSlduTlQJSosKM+KGH9QX5icJfTDTWqPnUAcMGlmL9n9EH+WvojJDAUA0IuEJbIaZ5D5WNFxebDF5+ob4CsMtODPne0Tg==
+Received: from MRZP264MB2681.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:1e::10)
+ by PR0P264MB2582.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:1e1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.15; Tue, 9 Jun 2026
+ 07:59:31 +0000
+Received: from MRZP264MB2681.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::7076:2b3:9a13:82c4]) by MRZP264MB2681.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::7076:2b3:9a13:82c4%6]) with mapi id 15.21.0092.011; Tue, 9 Jun 2026
+ 07:59:31 +0000
+From: =?utf-8?B?Sm/Dq2wgRVNQT05ERQ==?= <joel.esponde@leroy-agon.com>
+To: Sasha Levin <sashal@kernel.org>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Robert Marko
+	<robert.marko@sartura.hr>, Jakub Kicinski <kuba@kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: Re: [PATCH 6.12.y] net: phy: micrel: fix LAN8814 QSGMII soft reset
+Thread-Topic: [PATCH 6.12.y] net: phy: micrel: fix LAN8814 QSGMII soft reset
+Thread-Index:
+ AQHc70+Wp1K41CMp+ka10OJNNdD4ubYs+JEAgAErZICAAkLSAIAEUeEAgAC9DoCAAHd3AA==
+Date: Tue, 9 Jun 2026 07:59:30 +0000
+Message-ID: <b0dd8c38-3d43-4fba-ac89-253ddd6e6855@leroy-agon.com>
+References: <7b95f12f-aac6-47bb-ab9f-eab98b3911fd@leroy-agon.com>
+ <20260603105137.lan8814-qsgmii@kernel.org>
+ <f27cff89-b439-42b4-b29d-2a54e4efd3b6@leroy-agon.com>
+ <20260605-stable-reply-0003@kernel.org>
+ <e03a6f5d-1f90-44ba-b000-925c43faa9a8@leroy-agon.com>
+ <20260608-stable-reply-0009@kernel.org>
+In-Reply-To: <20260608-stable-reply-0009@kernel.org>
+Accept-Language: fr-FR, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2681:EE_|PR0P264MB2582:EE_
+x-ms-office365-filtering-correlation-id: cc396b10-eb43-4d1c-2349-08dec5fd0973
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|38070700021|22082099003|18002099003|4143699003|11063799006|56012099006;
+x-microsoft-antispam-message-info:
+ u2Von3jNUVHHXpgak9p5dmxeIvXtP4lyBmvKEnvf6KFB6ddxgtYIXv7oMrCNboVn5Et+Fja++Liz2K45v53nRGLvMbISE3WaVBIaD4dSvJw97NMecIE1UAqkJNL1wW0IlIzNqbDYaNA3Zp9WM22RsTRYeRaTq3R7PWMXNL5bhuEYe6wsaj8uoDbk2gY9sci+zTGm0lyWZMHuYTzPuwvLZ7oI8vL3gm636jXMAGsu7+A2r2Mijg0UnuuC4nBZUVQbriKb4kjzXQLCZQqvk/qLCvCOAROhTgFtpCoCkd1X3O+9yIL08Y35gA5oHcUPjhdadrej+UB84WhWYlHtK4ZHfNE7CgNB4bFPvftxWtyp5zDFtFKPNpPmeGXdPfj0bC6kYIDaJJMRodMLqWfRE7opx0ZVEeNoymzFKN5KYUWkTI2f69j/uFCXR9HRCY+E/NbbBxC+E2KyxPBfxDh4wpkDGfExoupfM9XWCb7lXPQBqu+kYwWBi61fD+hCJi2CqMEsThwqm3HAtPPEuceGG0cx5Ls+cvNzXOkxNhODBZ9ZYb9oTIwT9Wl8J4MwHdZ8ldJzG9aT8YDpcHMm/S0A2+6PeY7dtXhGpZidqRZX2ePl2hFQXWDtZFNJHD2yjjAwaeKuNB1iDWSKr+7FKR/jhmOOFLXfIrI7HB+0bV/R83P3W6wsMyS9zyY4PubpsNL+7BfWbLt4f7ySrxjHghCW/ber2HzVNDq+BooTG6VWTwIIcKly1mNggGgcOCoagFsxpGOg
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:fr;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2681.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021)(22082099003)(18002099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dUlScFBsOUpLajdMb3NHelBSeUJqR2hOaGFhK3V3eE05SG9aVGZlTm1lU3hR?=
+ =?utf-8?B?MnlEQjJwMnlCQ092MEV6Yk5LQThmeTU2bFNqTlppak1ZTXM1MnNxYUo0MlN2?=
+ =?utf-8?B?QWxlQVNma1phZGxDcW9LWS81cHFZUkorL2l2TUc4QkhBTGs3aEVlUDQ1bWZ1?=
+ =?utf-8?B?dnBLeTFvTWtWeGJDWVpFNExCcGxFTHJyWEpGckcxNHphdi9raTNXVktzRDBK?=
+ =?utf-8?B?dUpkSk03cDd0TVFMTk1rS0V6UjMzWDZibVV6UUd1MkhIbXMwREs4a1diOWlL?=
+ =?utf-8?B?cEM4UG90Ync2R1pLaEtJam0yTGJ2Tm0vSTdBOEJ1em52dk5EMGZNSGNWN09T?=
+ =?utf-8?B?eWo0cEZGSW5SSmxqbWdROHc2ejAzcmgwVXd1dzVsd2VCRmh1dEErRzdPdHpn?=
+ =?utf-8?B?dTcrU3BuMEo0Z3J0M29OUFVlNDZFYzdpMGtYWUg1M25udThONHNpajZuU0Ux?=
+ =?utf-8?B?Mm9OVnN5Z2pSRXhyUUd1bDlYcEVjQjVLdVowekV1UEx4dE5taXFHL0U1YjNs?=
+ =?utf-8?B?RTNOM3lOS0lCTlBubnBRKzNpS09YbktwYmZvU0N5VGdxYUVybUluQW5ua3Fw?=
+ =?utf-8?B?NUhjUEcrU0xzWDBUbGluWXpGOUt1ZnFGSVlmR0puMVFnSi9NeE0xU09Fc2xC?=
+ =?utf-8?B?L1JDVUJ1VTRQNFBnYW1xUkF4Yng0dzM5d2NZcmVRbnBHb2ZWbVFBRlROT2Mz?=
+ =?utf-8?B?RTlrYjFZbEhzNDZFZGJEbnhtWjBLb1ZDOW1mYTQvTEZuVVlOWTJWU2RENTBS?=
+ =?utf-8?B?dGdPcklWNHMxWlptKzJXRzZzRGNZU3RaYndpdi9wQ1lsSDEwdEhzSUFXSzdm?=
+ =?utf-8?B?WG5lUmNEUkNiVzc5c3dpenJ2REkwZGlmYUp2YUIwYUFzZGI2SjZCZEs2NkJo?=
+ =?utf-8?B?OEVxQjVnd0RyVUdubUE5WTlsalVIKzRWZjhxcjFENFdMYlh3bUcrSTlMc09q?=
+ =?utf-8?B?Y016N0xMZHU3TkN6OHpIRzRONmxySjR0T0FuVnZYR0Zac3VsYkYzeENQK3BW?=
+ =?utf-8?B?U2k5T0dxS0R4VTNENGRVaGR6SllkZkd4N3lubXFGS3hvSkVGSXQ1bG9tMXNU?=
+ =?utf-8?B?bTBra2VwcHVLK1ovakxwL2ZqZlJEOFloNGVpVVVBUEJQN2ttbi9rc24yZ3I0?=
+ =?utf-8?B?T0lNQmJMK2VyRTNXY2VCbUwzamQ2dHlmM3Z3MERIRnYwR0Uwd0o2S1Y4UTZ5?=
+ =?utf-8?B?aCtESUYrZjQ1SXJoY2lUTUpzZVhWNEtqTm5uQ0NBYVY2WFBwSUFkSFVNM0pz?=
+ =?utf-8?B?S3VwNm5DU0NrK0J6N1doeGZ5eHVSZ0h2d2RxR0ZYY2lNZVZRMFU4YmlNZXlh?=
+ =?utf-8?B?RDNSYUxqeDZJSWhzNjdualR4bDdjblJLRHM1dmxUNmZ6bVhMTitUSUJQYnRR?=
+ =?utf-8?B?Rzg3S0pYUmdHRG9XN3lPdEFVaS9rRFdYcDNNeklmR3pCQ0NmSldLbFk4c2Q0?=
+ =?utf-8?B?MFJjZThxUWtuRzE3SGlsVy9OQXpMUFZuZ3FXaVZHTThLdlBvUFNRMGg5UDkr?=
+ =?utf-8?B?RHVwNnAyZlc2UTk5S0ExdlhHZWVabG1lb0pQeFdUVEtJb3kyMGFpYjRXZ256?=
+ =?utf-8?B?ek51MXZpNzRIdHhuOGRvYklENlRFa1RtMXVsYUNwbk1DQ2N0alM1djNCTWVK?=
+ =?utf-8?B?b0taV01CT0tlaDk4NWczVUFsS256NVNMbURiL1FTRGhleTY2MDkrWVVsTEda?=
+ =?utf-8?B?RGtiOUNVbHdOS0NWTWFNYWpQaWtxS0RMOU8rd0F3UnAyWVZNOFhhREwyazlv?=
+ =?utf-8?B?L01wMGJPS0RuVUtxZ2JEdzZhS2Ftbmp2K21FaGc2TCtMRlBMUU5TMFlib1pK?=
+ =?utf-8?B?Q1RNNFY1Rks1NXNNajl6RnJDbEtickF5TFNReDRHTk5XRXVFZlU3aThPeGh4?=
+ =?utf-8?B?emVqMHdKZHRFQ09Mb240eUw1cXdLN2kra28yN0NJM0MrZk9rV00vSGd6WEpl?=
+ =?utf-8?B?RlJnUVVmNnBpWFNRZ3dmWkg1MzdtV2J4VFpuWXhDNEp5b0ZucDN0aWNnbSsz?=
+ =?utf-8?B?MmtIcEJKdDFpMEZRUUppWXg3UytJOENBSHBjd2ROYis4NlpSVThmbzhaM1Jj?=
+ =?utf-8?B?QWJMd2xoMHZrTDJzUmpPcHU3MGdBRTc0ZFVUdk96eFI1Rys1S2wyT2J2NHpk?=
+ =?utf-8?B?L2JqTlVsUEdyd01pbzY0aXo0RlY0TlhhdjBhQy9IajEzMDRSU0s2dXVtdTRT?=
+ =?utf-8?B?VnBSRmpldU9PVU5rVUNZVmd2VjJkSTlJeGl0OXRnbTNkQ2VxY3ZSNWVKUng3?=
+ =?utf-8?B?ZU8yOWtuT2hFQks5RFlRNzJDNllRcXA5cmFPbW9GWm9RRGhEOTgvdUZKMlBD?=
+ =?utf-8?B?VVRpL1o5dm9sbUhhNDB5SzVJOEpkd2ZwK2YyQVUxM0NUb3A2clA2S1cwWXNL?=
+ =?utf-8?Q?S4hG7WVxM4558xRE=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <475AF73152E23645992308950EEE4A36@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260603150331.1919611-1-louis.scalbert@6wind.com>
- <20260603150331.1919611-5-louis.scalbert@6wind.com> <1041444.1780954642@famine>
-In-Reply-To: <1041444.1780954642@famine>
-From: Louis Scalbert <louis.scalbert@6wind.com>
-Date: Tue, 9 Jun 2026 09:56:37 +0200
-X-Gm-Features: AVVi8Cf6lUI8UQ4AsHoThF_evQAKZij1-N3GYYIQdFdAbzFyiH1wiOYxUsAfUS0
-Message-ID: <CAJ5u_Of1+eEL4iVe-sWzhOOva6xx3gPCeXeRP4Y3yCqny8=gOg@mail.gmail.com>
-Subject: Re: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable slaves
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net, 
-	shemminger@vyatta.com, maheshb@google.com, jonas.gorski@gmail.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Exchange-RoutingPolicyChecked:
+	eZRrKxabZdLOL9cj3abwbZ3GgbJvhEx4FNewng0rM6LQIst6eyuk8C36MxNLYkYO3/Ldalw4477ezhHdVdsndWMtxR2qa2WGPudLyuXQyXWi60YB0or1GLMVjkTB/Mjow3BYPDngPRnI8lwqywkadjSHoRGSxcPlTuN2r8PWifEH27RWjYab9OMCgRi4gbOuCZNJtRC3D15vDnfbB4GyBpUSY48JmCpbsoqJ7sxlPkdpQNOjx4OY+4d6BJfV2iNml94SMH1nMlNQaJOBb/Ze2SCe3UCgCgN5A60i/Hlb6JNnCNpTuc4p/GdzVOzX4ptwm4Ex5EBMuwbOQ5obISr5Gw==
+X-OriginatorOrg: leroy-agon.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2681.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc396b10-eb43-4d1c-2349-08dec5fd0973
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2026 07:59:30.8279
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0b97cad2-240b-425a-b0cb-987a43def8d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vjyhG7mKrpB/S+6RibW8Jz0INUK70UibRZT8TnSVj2bAvSLWLLtR3fgI+6PiUikPQMzm/Aj2sTdZAL2qPfsD+PRFEFDpzMPuH67VNMi03/4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR0P264MB2582
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[leroy-agon.com,reject];
+	R_DKIM_ALLOW(-0.20)[leroy-agon.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-296958-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-296953-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:jv@jvosburgh.net,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:sashal@kernel.org,m:gregkh@linuxfoundation.org,m:stable@vger.kernel.org,m:netdev@vger.kernel.org,m:robert.marko@sartura.hr,m:kuba@kernel.org,m:horatiu.vultur@microchip.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER(0.00)[joel.esponde@leroy-agon.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[leroy-agon.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joel.esponde@leroy-agon.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BCBA765D775
+X-Rspamd-Queue-Id: 1365565D9E3
 
-Hello Jay,
+PiBBdmVydGlzc2VtZW50IGRlIFPDqWN1cml0w6k6IE5lIGNsaXF1ZXogcGFzIHN1ciBsZXMgbGll
+bnMgb3UgbidvdXZyZXogcGFzIGxlcyBwacOoY2VzIGpvaW50ZXMgc2kgdm91cyBuZSBjb25uYWlz
+c2V6IHBhcyBsJ2V4cMOpZGl0ZXVyLg0KPg0KPj4gUmU6IFtQQVRDSCA2LjEyLnldIG5ldDogcGh5
+OiBtaWNyZWw6IGZpeCBMQU44ODE0IFFTR01JSSBzb2Z0IHJlc2V0DQo+IFF1ZXVlZCBmb3IgNi4x
+MiwgdGhhbmtzLg0KDQpUaGFua3MgZm9yIHRha2luZyBpbiBhY2NvdW50IHRoZSBwYXRjaCENCg0K
+QmVzdCByZWdhcmRzLA0KDQpKb8OrbA0KQ2UgbWVzc2FnZSDDqWxlY3Ryb25pcXVlIGV0IHNlcyBw
+acOoY2VzIGpvaW50ZXMgc29udCBjb25maWRlbnRpZWxzLiBJbHMgc29udCBkZXN0aW7DqXMgZXhj
+bHVzaXZlbWVudCDDoCBsYSBwZXJzb25uZSBvdSDDoCBsJ2VudGl0w6kgw6AgcXVpIGlscyBzb250
+IGFkcmVzc8Opcy4NClNpIHZvdXMgYXZleiByZcOndSBjZSBtZXNzYWdlIHBhciBlcnJldXIsIHZl
+dWlsbGV6IGVuIGluZm9ybWVyIGltbcOpZGlhdGVtZW50IGwnZXhww6lkaXRldXIgZXQgbGUgc3Vw
+cHJpbWVyIGRlIHZvdHJlIHN5c3TDqG1lLg0KVG91dGUgZGl2dWxnYXRpb24sIGRpc3RyaWJ1dGlv
+biBvdSBjb3BpZSBub24gYXV0b3Jpc8OpZSBkZSBjZSBtZXNzYWdlIG91IGRlIHNvbiBjb250ZW51
+IGVzdCBpbnRlcmRpdGUuDQpMJ2VudHJlcHJpc2UgZMOpY2xpbmUgdG91dGUgcmVzcG9uc2FiaWxp
+dMOpIGVuIGNhcyBkZSB0cmFuc21pc3Npb24gZGUgdmlydXMgb3UgZGUgdG91dGUgYXV0cmUgY29u
+dGFtaW5hdGlvbiBsacOpZSDDoCBjZXQgZW1haWwuDQo=
 
-Le lun. 8 juin 2026 =C3=A0 23:37, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9c=
-rit :
->
-> Louis Scalbert <louis.scalbert@6wind.com> wrote:
->
-> >Apply the "lacp_strict" configuration from the previous commit.
-> >
-> >"lacp_strict" mode "on" asserts that the bonding master carrier is up
-> >only when at least 'min_links' slaves are in the Collecting_Distributing
-> >state.
-> >
-> >Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
-> >Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
-> >---
-> > drivers/net/bonding/bond_3ad.c     | 26 +++++++++++++++++++++++---
-> > drivers/net/bonding/bond_options.c |  1 +
-> > 2 files changed, 24 insertions(+), 3 deletions(-)
-> >
-> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
-ad.c
-> >index f0aa7d2f2171..98abb2fdd7a6 100644
-> >--- a/drivers/net/bonding/bond_3ad.c
-> >+++ b/drivers/net/bonding/bond_3ad.c
-> >@@ -745,6 +745,21 @@ static void __set_agg_ports_ready(struct aggregator=
- *aggregator, int val)
-> >       }
-> > }
-> >
-> >+static int __agg_usable_ports(struct aggregator *agg)
-> >+{
-> >+      struct port *port;
-> >+      int valid =3D 0;
-> >+
-> >+      for (port =3D agg->lag_ports; port;
-> >+           port =3D port->next_port_in_aggregator) {
-> >+              if (port->actor_oper_port_state & LACP_STATE_COLLECTING &=
-&
-> >+                  port->actor_oper_port_state & LACP_STATE_DISTRIBUTING=
-)
-> >+                      valid++;
-> >+      }
-> >+
-> >+      return valid;
-> >+}
-> >+
-> > static int __agg_active_ports(struct aggregator *agg)
-> > {
-> >       struct port *port;
-> >@@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, bo=
-ol *update_slave_arr)
-> >               switch (port->sm_mux_state) {
-> >               case AD_MUX_DETACHED:
-> >                       port->actor_oper_port_state &=3D ~LACP_STATE_SYNC=
-HRONIZATION;
-> >-                      ad_disable_collecting_distributing(port,
-> >-                                                         update_slave_a=
-rr);
-> >                       port->actor_oper_port_state &=3D ~LACP_STATE_COLL=
-ECTING;
-> >                       port->actor_oper_port_state &=3D ~LACP_STATE_DIST=
-RIBUTING;
-> >+                      ad_disable_collecting_distributing(port,
-> >+                                                         update_slave_a=
-rr);
->
->         Is there a functional reason to move this?  I don't see anything
-> obvious in ad_disable_collecting_distributing() that depends on the
-> actor_oper_port_state.  Since you want this to be backported via stable,
-> fewer actual changes reduce the chances of an issue applying the patch
-> to an older version.
-
-The path is ad_disable_collecting_distributing() ->
-bond_3ad_set_carrier() -> __agg_usable_ports(). __agg_usable_ports()
-reads port->actor_oper_port_state
-
-It was found by
-https://sashiko.dev/#/message/20260526084048.1696544-5-louis.scalbert%406wi=
-nd.com
-
->
->         -J
->
->
-> >                       port->ntt =3D true;
-> >                       break;
-> >               case AD_MUX_WAITING:
-> >@@ -2105,6 +2120,7 @@ static void ad_disable_distributing(struct port *p=
-ort, bool *update_slave_arr)
-> >                         port->actor_port_number,
-> >                         aggregator->aggregator_identifier);
-> >               __disable_distributing_port(port);
-> >+              bond_3ad_set_carrier(port->slave->bond);
-> >               /* Slave array needs an update */
-> >               *update_slave_arr =3D true;
-> >       }
-> >@@ -2128,6 +2144,7 @@ static void ad_enable_collecting_distributing(stru=
-ct port *port,
-> >                         port->actor_port_number,
-> >                         aggregator->aggregator_identifier);
-> >               __enable_port(port);
-> >+              bond_3ad_set_carrier(port->slave->bond);
-> >               /* Slave array needs update */
-> >               *update_slave_arr =3D true;
-> >               /* Should notify peers if possible */
-> >@@ -2151,6 +2168,7 @@ static void ad_disable_collecting_distributing(str=
-uct port *port,
-> >                         port->actor_port_number,
-> >                         aggregator->aggregator_identifier);
-> >               __disable_port(port);
-> >+              bond_3ad_set_carrier(port->slave->bond);
-> >               /* Slave array needs an update */
-> >               *update_slave_arr =3D true;
-> >       }
-> >@@ -2830,7 +2848,9 @@ int bond_3ad_set_carrier(struct bonding *bond)
-> >       active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggrega=
-tor));
-> >       if (active) {
-> >               /* are enough slaves available to consider link up? */
-> >-              if (__agg_active_ports(active) < bond->params.min_links) =
-{
-> >+              if ((bond->params.lacp_strict ? __agg_usable_ports(active=
-)
-> >+                                      : __agg_active_ports(active)) <
-> >+                  bond->params.min_links) {
-> >                       if (netif_carrier_ok(bond->dev)) {
-> >                               netif_carrier_off(bond->dev);
-> >                               goto out;
-> >diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bo=
-nd_options.c
-> >index d358b831df77..94b7b0851f16 100644
-> >--- a/drivers/net/bonding/bond_options.c
-> >+++ b/drivers/net/bonding/bond_options.c
-> >@@ -1706,6 +1706,7 @@ static int bond_option_lacp_strict_set(struct bond=
-ing *bond,
-> >       netdev_dbg(bond->dev, "Setting LACP fallback to %s (%llu)\n",
-> >                  newval->string, newval->value);
-> >       bond->params.lacp_strict =3D newval->value;
-> >+      bond_3ad_set_carrier(bond);
-> >
-> >       return 0;
-> > }
-> >--
-> >2.39.2
-> >
->
-> ---
->         -Jay Vosburgh, jv@jvosburgh.net
-best regards,
-
-Louis Scalbert
 
