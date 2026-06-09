@@ -1,259 +1,214 @@
-Return-Path: <netdev+bounces-297273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AfygGVh0KGrrEwMAu9opvQ
-	(envelope-from <netdev+bounces-297273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:15:20 +0200
+	id LnlsMch0KGr9EwMAu9opvQ
+	(envelope-from <netdev+bounces-297274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:17:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71206640CD
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:15:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2814C6640E7
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 22:17:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=iAENGndj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297273-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297273-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=JS4NESIi;
+	dkim=pass header.d=redhat.com header.s=google header.b=tmdqwAyV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297274-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297274-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1CB33306B7C6
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 20:12:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24948305C580
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 20:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A723382374;
-	Tue,  9 Jun 2026 20:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79E937A4B9;
+	Tue,  9 Jun 2026 20:14:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A7C38CFE7;
-	Tue,  9 Jun 2026 20:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4932C36F918
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 20:14:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781035951; cv=none; b=IFFdV6fnXjnAuXlBzgE9BgOvy8UXZ1OTvK2BpfYPeBmBhA8BAZWzwLBQSzFIa4vHwlArvGydhq8JEriwkEzh05n/LncWgNdYHuol5KNXkyR0nQyf8bqbqD30l2/4deZkFsg6bRseQIzrhdbHAFdouyq1qKtZjdEpVwQ/MgH8n6A=
+	t=1781036078; cv=none; b=CY0fw1z/YEw6DUNXLy4CCeCO8cz6vymFt3G2I4XNFCCcVK/nhJaK3zlT67ENxUDTcfVHojkUQkqWaF7mKcsrJO90eqZLqySJtgkcL5KdFOkh+rVSJgwH1SnUw9TJ+D2v0vUqF/6zfbkRaAPj9olm8Fv5ucLr/Z10ivtVzIiEJnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781035951; c=relaxed/simple;
-	bh=D7/Mzo5e+5VWLEtVYVgkwc3DygrunrzHZAWo1Yrfk4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iTSbgpzFO7Tzjn0T6o7PJZZNBt4eDX/hQ1WNJa2h437vBEcMdm/AibUa9zSynmbrW2VR/pb8aneIXdT63ZIiCwZQIfEo69prPc+qzkpu9dxbHCTL7QSZ4qb/nadnTcdsF6OzM20sDwojd5c2tyr1JDgnEI6iV/7gC0ntzPMRYhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iAENGndj; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D88D21F00893;
-	Tue,  9 Jun 2026 20:12:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781035949;
-	bh=MpH5v7DVv18T+ddYArDGKMK3ROzq6Z3ud0/C2F8Yez4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iAENGndjkV7VfPS4uQ6HbD3iW7BCAUB33VXKE6+WpRPeK4lXbOF40065xNARysX5J
-	 riq4RUfeX0bBrMQZ7x9Tv8RmL0a1k/xhSWXQxs54WWfixacD9aZU9KA6B9ENc1B3Fa
-	 n29vkI5OvXfoFX+SZUChAuICFY8akoi3CLX6idcq3dCgj293X3Q3mex2Jj9V9Y25Rd
-	 WLZmbH3T+hgMobMmkcDRJrCtBbRiaSPs5AlWrz6L/ZpVDOxBApZs5j+8U8GcFErlcW
-	 tV20dcs08OnYOW/iWswZ4qvP0+TKBDtmVV8igSnlUeKCGYiq463DA2jmvJf355EQPc
-	 cgXjdiyXCuadA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	jiri@resnulli.us,
-	skhan@linuxfoundation.org
-Subject: [PATCH net-next 3/3] docs: net: fix minor issues with devlink docs
-Date: Tue,  9 Jun 2026 13:12:24 -0700
-Message-ID: <20260609201224.1191391-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260609201224.1191391-1-kuba@kernel.org>
-References: <20260609201224.1191391-1-kuba@kernel.org>
+	s=arc-20240116; t=1781036078; c=relaxed/simple;
+	bh=hprTfB754mLY1EMoptmcabMyk8Qi2IBNgYxDZtI+sD0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fTCn1MLNk5g6n0/pLX6LiopqMroyJ0VxE/rW2fGW6xjqXWgtb9NjUGT6OdhH1lOUc+/xkWS7Gp9+fR2eHEWuDjegV+XGfsqlc+iNr/8ioGHsnD+BFUWy+AA6++apgd5aGmCxcuQe10rVOCojCC1ByHgyk5gA8jbQQ5TGd2XOxWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JS4NESIi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tmdqwAyV; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781036076;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hprTfB754mLY1EMoptmcabMyk8Qi2IBNgYxDZtI+sD0=;
+	b=JS4NESIi8uIDfQb+NZsLbDIbpI5JPVMx+3iW7ayX7HnzYCT/XbKmU4m5OK2hZzPflMeEL0
+	VABktHeiOvgwUWWm9rvkmS6F4FbxDxaROESohspd41pepmfqi99VD+At/AXyKp+swteOlI
+	iJumZofZ6+HPRV6u825Lk76CHD66xO8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-F9DL9Gc8PJGN90lKvwzZ_Q-1; Tue, 09 Jun 2026 16:14:34 -0400
+X-MC-Unique: F9DL9Gc8PJGN90lKvwzZ_Q-1
+X-Mimecast-MFC-AGG-ID: F9DL9Gc8PJGN90lKvwzZ_Q_1781036073
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490b0682d2fso56659795e9.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 13:14:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1781036073; x=1781640873; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hprTfB754mLY1EMoptmcabMyk8Qi2IBNgYxDZtI+sD0=;
+        b=tmdqwAyV8sweQ+4yf72Tfz1NqU+yJbIV5m7Wcc6lUrH/KqEhlpdHmf2zHMgU67fCZn
+         zmedDU1OTZ/P7jn9LkWfOATk1HrVodlYM3sEEVbDIJczdmKsjZlfHxdjyk1pao1cmiAR
+         7quodlGILi7ydUjojrvZo0/QO7F5mxJiJwCkj8n9h3dllKE40cc13tl4VFALvVnd8L/C
+         SK/QvYd3qOwkOwPu7/q3ViDmRUcpKEc06OoM4MgLMB1fJghefDDX1HMd75iekgdDD+Fs
+         0PCidiUQMbgJzvk1+UPEx8FMZkkUzS7zUjqy3NVKbir6+r+6wlDzPkCQAWgVoP641IIZ
+         1TAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781036073; x=1781640873;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hprTfB754mLY1EMoptmcabMyk8Qi2IBNgYxDZtI+sD0=;
+        b=gsM8bsxKUH1brpxH7IRNr2k+zjIFPQ4NuAR1myJ2aI9smMP9VLWK2qXRuHkQS6kz22
+         awglki1GYyLLrDndwAmchQL9cbLDPY3MLgnQs0wvDiJOU8kYmAi6fqxcKyNjA6+wPEWn
+         BJv5MHtLospi7CmqbhFeKwoYMgs5ojMvpLDIKao36G3Ng3/viAKwXb6mUOcCwtWZlech
+         yrIAQYy9wg83mtF1WdbgDtxr7w+2c1lKssPJ2SovDqM1GBTwU4UlRaN1faJ3eJh9S2OM
+         N0W11rtMx4A5jgWiwpfEb59aS0+32Jn6IsSa1zgXfcrgKy0QPwo7Z7B2SLI07lS6Qc9a
+         eE0g==
+X-Forwarded-Encrypted: i=1; AFNElJ8Me4MO3KgMnL1HHuYHUgPG2h98Fo0dgMDeIxfNQEp04qpSiode1W9j10CUlQhUH5NctpxBrwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypY0agTCgOmw6957eE3kx+BrrbmgH2vuG6gSLNTXnsxleNd/tq
+	QtRvQgGiDxJQPWRx8x9t1Y7tu298vPFUDixeZ7NCwNfzb4exHbYaaeCeQXTbX/4dYa5MjB4VSEt
+	bMzWNxPqUhxZzyBbWxfWwuF4uveHK4JePS3DsRdRCyEXrPHbMKe2D0Kzanw==
+X-Gm-Gg: Acq92OEj1qqExxxflPShZVrz4ttuR2aRNxR2HGhBWu2pHeqBD6gJutpZkq4xQk+94Qh
+	5E++do0Mkv9HC+Wovg2iOt8J54rfVuAKZK7B97S9bRAc0woPSC1IEWYPlJwDbF8/kbcGnbi9xNs
+	xtftDib68RS3uOglTu5r+xwCRxr1pVEUSDsn3+PcBT2eu/z3XZF9VA3N4Wfevbk80JbeTNCrOIT
+	LDlmsrc3U6e/pmauORYBv1hqm8UYY9piOO3bo6gSpKsAy1nFnP5lXGvsb9KQjjmEg/eOMVxtcgP
+	JQCs4smyaa15Shg/ANIef16sJnpnHc3W32tGEzR9a0W6WakSKtFDJE8mojn6KQNlv80Jurfsz5/
+	J9gi2YyoZKiaimVCkaAjpKYvn5n5P4efsiuVcLNtj9F6X9TfJLQnitshi99E=
+X-Received: by 2002:a05:600c:a086:b0:490:52fb:12dd with SMTP id 5b1f17b1804b1-490c259f616mr361087345e9.10.1781036073025;
+        Tue, 09 Jun 2026 13:14:33 -0700 (PDT)
+X-Received: by 2002:a05:600c:a086:b0:490:52fb:12dd with SMTP id 5b1f17b1804b1-490c259f616mr361086915e9.10.1781036072659;
+        Tue, 09 Jun 2026 13:14:32 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3b5b06sm460746815e9.3.2026.06.09.13.14.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 13:14:31 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id ADE4C7BC400; Tue, 09 Jun 2026 22:14:30 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Avinash Duduskar <avinash.duduskar@gmail.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa
+ <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, KP Singh <kpsingh@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next] bpf: Add BPF_FIB_LOOKUP_VLAN flag to
+ bpf_fib_lookup() helper
+In-Reply-To: <20260609172052.81613-1-avinash.duduskar@gmail.com>
+References: <20260609172052.81613-1-avinash.duduskar@gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 09 Jun 2026 22:14:30 +0200
+Message-ID: <87a4t3a2u1.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.01 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MIXED_CHARSET(0.67)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297273-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:linux-doc@vger.kernel.org,m:bpf@vger.kernel.org,m:kuba@kernel.org,m:jiri@resnulli.us,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297274-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:hawk@kernel.org,m:kpsingh@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,resnulli.us:email,lwn.net:email]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B71206640CD
+X-Rspamd-Queue-Id: 2814C6640E7
 
-Update devlink documentation to match current code:
+Avinash Duduskar <avinash.duduskar@gmail.com> writes:
 
-- describe health reporter defaults (it's currently under "callbacks"),
-  best-effort auto-dump, and port-scoped reporters
-- fix generic parameter names and values
-- fix nested devlink setup wording and registration ordering
+> bpf_fib_lookup() returns the FIB-resolved egress ifindex straight
+> from the fib result. When the egress is a VLAN device, the returned
+> ifindex is the VLAN netdev's, which has no XDP xmit handler; XDP
+> programs that want to forward the frame (e.g. xdp-forward) must
+> instead target the underlying physical device and push the VLAN tag
+> themselves. Today the program has no way to learn either the
+> underlying ifindex or the VLAN tag without maintaining its own
+> VLAN-to-ifindex map in userspace and refreshing it on netlink
+> events.
+>
+> Add BPF_FIB_LOOKUP_VLAN. When the caller sets this flag and the fib
+> result is a VLAN device, populate the existing output fields
+> params->h_vlan_proto and params->h_vlan_TCI from the VLAN device,
+> and replace params->ifindex with the underlying real device's
+> ifindex. params->h_vlan_TCI carries the VID only, with PCP and DEI
+> bits zero; a consumer wanting to set egress priority writes PCP
+> itself. Only the immediate parent is resolved; stacked VLANs (QinQ)
+> are not walked. When the flag is not set, behaviour is unchanged:
+> h_vlan_proto and h_vlan_TCI are zeroed and ifindex is left at the
+> FIB result.
+>
+> This lets an XDP redirect target the physical device and learn the
+> tag to push in a single lookup, which xdp-forward's optional VLAN
+> mode (xdp-project/xdp-tools#504) wants from the kernel side.
+>
+> The change extends bpf_fib_set_fwd_params() to take the egress dev
+> and the lookup flags so the VLAN swap happens in the same place the
+> vlan output fields are zeroed by default. Both IPv4 and IPv6
+> callers pass through. The helper's input semantics are unchanged.
+> Under !CONFIG_VLAN_8021Q, is_vlan_dev() returns false and the new
+> block is a no-op.
+>
+> Suggested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: jiri@resnulli.us
-CC: corbet@lwn.net
-CC: skhan@linuxfoundation.org
-CC: linux-doc@vger.kernel.org
----
- Documentation/networking/devlink/devlink-health.rst | 12 ++++++++----
- Documentation/networking/devlink/devlink-params.rst |  2 +-
- Documentation/networking/devlink/devlink-port.rst   |  5 ++++-
- Documentation/networking/devlink/devlink-trap.rst   |  8 +++++---
- Documentation/networking/devlink/index.rst          | 10 +++++-----
- 5 files changed, 23 insertions(+), 14 deletions(-)
+Other than the bots' comment, I think we should make this bidirectional.
+I.e., it should also be possible to supply the vlan tag from the packet
+when doing the lookup.
 
-diff --git a/Documentation/networking/devlink/devlink-health.rst b/Documentation/networking/devlink/devlink-health.rst
-index 4d10536377ab..bedac58a2f36 100644
---- a/Documentation/networking/devlink/devlink-health.rst
-+++ b/Documentation/networking/devlink/devlink-health.rst
-@@ -33,7 +33,9 @@ asynchronously. All health reports handling is done by ``devlink``.
-   * Recovery procedures
-   * Diagnostics procedures
-   * Object dump procedures
--  * Out Of Box initial parameters
-+
-+Drivers also provide default values for generic reporter parameters when
-+creating a health reporter.
- 
- Different parts of the driver can register different types of health reporters
- with different handlers.
-@@ -45,8 +47,9 @@ Actions
- 
-   * A log is being send to the kernel trace events buffer
-   * Health status and statistics are being updated for the reporter instance
--  * Object dump is being taken and saved at the reporter instance (as long as
--    auto-dump is set and there is no other dump which is already stored)
-+  * Object dump is being taken and saved at the reporter instance. This is
-+    best effort and skipped when recovery is aborted, auto-dump is disabled,
-+    no dump callback is registered, or a dump is already stored.
-   * Auto recovery attempt is being done. Depends on:
- 
-     - Auto-recovery configuration
-@@ -75,7 +78,8 @@ User Interface
- ==============
- 
- User can access/change each reporter's parameters and driver specific callbacks
--via ``devlink``, e.g per error type (per health reporter):
-+via ``devlink``, e.g. per error type (per health reporter). Reporters may be
-+registered for the whole devlink instance or for a specific devlink port.
- 
-   * Configure reporter's generic parameters (like: disable/enable auto recovery)
-   * Invoke recovery procedure
-diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
-index ea17756dcda6..ca19ee3e63c8 100644
---- a/Documentation/networking/devlink/devlink-params.rst
-+++ b/Documentation/networking/devlink/devlink-params.rst
-@@ -122,7 +122,7 @@ own name.
-    * - ``enable_iwarp``
-      - Boolean
-      - Enable handling of iWARP traffic in the device.
--   * - ``internal_err_reset``
-+   * - ``internal_error_reset``
-      - Boolean
-      - When enabled, the device driver will reset the device on internal
-        errors.
-diff --git a/Documentation/networking/devlink/devlink-port.rst b/Documentation/networking/devlink/devlink-port.rst
-index 5e397798a402..9374ebe70f48 100644
---- a/Documentation/networking/devlink/devlink-port.rst
-+++ b/Documentation/networking/devlink/devlink-port.rst
-@@ -38,7 +38,7 @@ Devlink port flavours are described below.
-      - This indicates an eswitch port representing a port of PCI
-        subfunction (SF).
-    * - ``DEVLINK_PORT_FLAVOUR_VIRTUAL``
--     - This indicates a virtual port for the PCI virtual function.
-+     - Any virtual port facing the user.
- 
- Devlink port can have a different type based on the link layer described below.
- 
-@@ -134,6 +134,9 @@ Users may also set the IPsec crypto capability of the function using
- Users may also set the IPsec packet capability of the function using
- `devlink port function set ipsec_packet` command.
- 
-+The ``migratable`` attribute may be set only on ports with
-+``DEVLINK_PORT_FLAVOUR_PCI_VF``.
-+
- Users may also set the maximum IO event queues of the function
- using `devlink port function set max_io_eqs` command.
- 
-diff --git a/Documentation/networking/devlink/devlink-trap.rst b/Documentation/networking/devlink/devlink-trap.rst
-index 5885e21e2212..ac5bf9337198 100644
---- a/Documentation/networking/devlink/devlink-trap.rst
-+++ b/Documentation/networking/devlink/devlink-trap.rst
-@@ -516,9 +516,11 @@ Generic Packet Trap Groups
- 
- Generic packet trap groups are used to aggregate logically related packet
- traps. These groups allow the user to batch operations such as setting the trap
--action of all member traps. In addition, ``devlink-trap`` can report aggregated
--per-group packets and bytes statistics, in case per-trap statistics are too
--narrow. The description of these groups must be added to the following table:
-+action of all member drop traps whose action may legally change. Exception and
-+control traps remain unchanged. In addition, ``devlink-trap`` can report
-+aggregated per-group packets and bytes statistics, in case per-trap statistics
-+are too narrow. The description of these groups must be added to the following
-+table:
- 
- .. list-table:: List of Generic Packet Trap Groups
-    :widths: 10 90
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index f7ba7dcf477d..32f70879ddd0 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -13,8 +13,8 @@ new APIs prefixed by ``devl_*``. The older APIs handle all the locking
- in devlink core, but don't allow registration of most sub-objects once
- the main devlink object is itself registered. The newer ``devl_*`` APIs assume
- the devlink instance lock is already held. Drivers can take the instance
--lock by calling ``devl_lock()``. It is also held all callbacks of devlink
--netlink commands.
-+lock by calling ``devl_lock()``. It is also held across all callbacks of
-+devlink netlink commands.
- 
- Drivers are encouraged to use the devlink instance lock for their own needs.
- 
-@@ -33,11 +33,11 @@ devlink instances created underneath. In that case, drivers should make
-    lock of both nested and parent instances at the same time, devlink
-    instance lock of the parent instance should be taken first, only then
-    instance lock of the nested instance could be taken.
-- - Driver should use object-specific helpers to setup the
--   nested relationship:
-+ - Driver should use object-specific helpers to setup the nested relationship
-+   before registering the nested devlink instance:
- 
-    - ``devl_nested_devlink_set()`` - called to setup devlink -> nested
--     devlink relationship (could be user for multiple nested instances.
-+     devlink relationship (could be used for multiple nested instances).
-    - ``devl_port_fn_devlink_set()`` - called to setup port function ->
-      nested devlink relationship.
-    - ``devlink_linecard_nested_dl_set()`` - called to setup linecard ->
--- 
-2.54.0
+This requires a second flag, which has to be exclusive with
+BPF_FIB_LOOKUP_TBID, as the tbid field unfortunately overlaps with the
+VLAN fields (so they can't be used together as input).
+
+-Toke
 
 
