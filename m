@@ -1,162 +1,178 @@
-Return-Path: <netdev+bounces-297237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4jxECA1fKGp3CwMAu9opvQ
-	(envelope-from <netdev+bounces-297237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:44:29 +0200
+	id LiVRHiViKGosDAMAu9opvQ
+	(envelope-from <netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:57:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6A5663653
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:44:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C9966374B
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:57:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=pssxr77f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297237-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297237-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kabelmail.de header.s=vfde-mb-mr2-23sep header.b=k0BcEpJq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297239-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=kabelmail.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7EBD8302959B
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:44:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3C0D63007A5E
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416914C8FFC;
-	Tue,  9 Jun 2026 18:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C513AEF30;
+	Tue,  9 Jun 2026 18:55:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mr6.vodafonemail.de (mr6.vodafonemail.de [145.253.228.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C4E48A2A8
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B717D4B8DF8
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:55:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781030660; cv=none; b=BTMGmMzV7L4i0TKjEhBhPxV+fMmBsLrFoWTJe3GgQF+rV/+t2RnaoxAhaSTSEmauVuUN31BbJLqf/BWfkEVJdekaH0h+qzRKG1V43ErxlWvznBHMSqdSqDUtjYf7a6rXuVEhWSZ7c4YYKWTT3E+EtpswsSN4X1qdwAYH4Bq35fI=
+	t=1781031351; cv=none; b=JiEIJ3oggJwsFe9SA8qOZvub5ukTCOPpQXRkSH5b0THWsU928hny0+PsCwLcDF932kd9oBixMXSeZv3mFNBeh0rXcqFA/vSG1Zu3eg+NiT7xshOSuTJGQ6j5N8s6ZtgVFH5uYHniVF8LUGxacUR45FTSinNhLS93OpOP56sU9+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781030660; c=relaxed/simple;
-	bh=TxWuM5zJJiZ2uEQfXLV6/pZYHuuTsUQmZkx96ddDz9k=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=dL7eNIOd8gh0bmV3TPdAC8XGxzfWBLWb+XMEnCVgfTq93N1+jFokRhR+wNRT7MvK1++mQOdEgNJU1P3CuDEaCko4n1B0WWDjJt+Ntg5aLNo3YVPykqsmVyQsGNGutZPrbkcV9RCIM6+R35rcxpWWLQB7J2hU/hWFWF/sbi54N2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pssxr77f; arc=none smtp.client-ip=209.85.128.170
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7dc73a56b5aso40764297b3.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 11:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781030658; x=1781635458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L/2s4b/3r4lMpUo88wN71Ucwh7h+lI3cMN2Z1OcYoBE=;
-        b=pssxr77fC3yDqae0VK+i59A3yXg+SJP3oLGPMUbRiiFJK/M9ImCbmlJJNwXFETUBTT
-         520lRAgWG+ob0SgTcznXVM0+dgVb7wdnpnMmva82brRJvni7rCv29WM3kQUW3oUHOVlS
-         64oAgLPC1gPDJJuWZ/oPV8j3Ixk0EXJ5gfol3iTD/matbs18G54C5kTQqeQOPQpnixdb
-         8jB11/VduJ8KLr42ZgC4mpUjXZHejxGUEX0sWaknX1Ior4rWhPb8QXwXp9oQ/o4OEUvx
-         ekqUhOtLmqhSYWjbwnm+oZ+N4Z8bJiHRDQRzbCz5I+UhrUInxYeSf7dbYYKibbCQPb3q
-         jbyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781030658; x=1781635458;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L/2s4b/3r4lMpUo88wN71Ucwh7h+lI3cMN2Z1OcYoBE=;
-        b=Zu6BE5FyfejJg47EDOSlj2MkzIqRfWJfBYSVOOo3Qi0OmT51gtRYppk2YZXSV6eAxP
-         Z4PpEnkL+eyUFKgDZ7AQxb08OptM0CgvMQ7cLaqxuIE4WeqDOQ1hKaQJifHZuZTVgmJz
-         Nb7/ruBr+WDK2G2KUBIjyAm6khCnQqtONrt5DsrHj0u0QiwfGS8bIpRDi57MvFtn/bcu
-         Ijtz2pCMCl3UUBnCkKPoc7bjv7MnxQam+GroMYGfNOp3dVHbp7la1EM9TFEs8Vg0slqc
-         9CZ1qj0r0z/0TkRYgnladrmqr+laAQV4AG9Ha5TaBqiWn3l87rinPAcwZjt1nj/s5ADo
-         MAig==
-X-Gm-Message-State: AOJu0Yy4B1dsczci52RyUc5WUhwhF5bVyGqhoxn28O+wUfWPqRGfXpbd
-	958pXz4ZeYuPiMSLfIbv782nE29nObWfHK582VzuweSEL7/24V11KwM4
-X-Gm-Gg: Acq92OGDtf/DDasFKkPxrUlXQrDPMZVpCRC9tnE7IaArLiDDjbJPZTKKLxkw7HHGjqH
-	CgHWR52fmknae0AJcxVK66jjZjbvVKhbcaYlWx1EAX7FVnr5a/JYCSYqEHXXjCkfIhdOkTSPByf
-	4sI8zJHUyH8c6fqUPHGWXq5GQ7U51xlujlTKEuRMcld3AyR9h2R+3nWWhItiFW/SSfilWw6cQ+Y
-	rIjKKvxbUweLR06Wpx7SdKmYodL674L9zu9Z3ge/Eami73nPk2C+Wnw9hQqvEdbnZAFPXxU2azv
-	okj3UBL8rngmU+LHdKRsjR0SD2XRRXQPDI9NE8kQg85MLRtrUCAV2xGkDKFjBvkWrlgLmRP4Tm+
-	KRAffJLi38K+ZZ0EVKEw/uuTSDGIquRUFwOWsvElb+oaZtDOlp48LvNjsRns8wj6vsl0BdLcaTH
-	d4VwgKwZDEcPqkcNWcCZ04+ThEYpEuAJ1zvwEoy6dk4krQ7iOrovUlJJpNXi8rVNAN/RKl8mASE
-	3/dMvkDHj0w+8fEs/N5ZNmv2DvC
-X-Received: by 2002:a05:690c:4b81:b0:7d1:cd93:c8e0 with SMTP id 00721157ae682-7ed0a9db095mr202375437b3.11.1781030657700;
-        Tue, 09 Jun 2026 11:44:17 -0700 (PDT)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea20ea8191sm100312127b3.8.2026.06.09.11.44.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 11:44:16 -0700 (PDT)
-Date: Tue, 09 Jun 2026 14:44:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.2888ce77104d1@gmail.com>
-In-Reply-To: <20260609180803.1093428-1-kuba@kernel.org>
-References: <20260609180803.1093428-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next v2 0/2] selftests: drv-net: so_txtime: trivial
- fixes
+	s=arc-20240116; t=1781031351; c=relaxed/simple;
+	bh=YuvxwJJx0zt9zh5hZQrkkVLUdkpSh1EhkbFr2UpellQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SjzZQYLWfoYvVnAcOB86oCOv4IOX2lpVIW9oZ9TUBnwS34Am1rryfDlkAEf0RtVvVcW75HoYl58gV5lPqk6b4jRlalVnT+merD6nZvxyTJttAtimDuveqAYJZrpJLP336CITLaZTsud3AgKNBjmkSE5SPHC8Lo31UuPIAXOEmA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kabelmail.de; spf=pass smtp.mailfrom=kabelmail.de; dkim=pass (1024-bit key) header.d=kabelmail.de header.i=@kabelmail.de header.b=k0BcEpJq; arc=none smtp.client-ip=145.253.228.166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kabelmail.de;
+	s=vfde-mb-mr2-23sep; t=1781030956;
+	bh=YuvxwJJx0zt9zh5hZQrkkVLUdkpSh1EhkbFr2UpellQ=;
+	h=Message-ID:Date:User-Agent:Subject:To:References:Content-Language:
+	 From:Autocrypt:In-Reply-To:Content-Type:From;
+	b=k0BcEpJqi7prqPyrPTVtZJc4owzCN1gBeb4b9TkC0HKEM+dKbmyLiIml3N3l0ABll
+	 wJ1qEW4Vdop0nHv56SZFkGzZI3Y6mEXiiIH5Z50BmzzwDxuzPfx4b0UPD4FI67rauS
+	 8Pp2yKMQoB/EQL1s3b/90jK+uW0Bn1JT+Uwc+GEM=
+Received: from smtp.vodafone.de (unknown [10.0.0.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by mr6.vodafonemail.de (Postfix) with ESMTPS id 4gZdHJ37MRz3sVxP;
+	Tue,  9 Jun 2026 18:49:16 +0000 (UTC)
+Received: from [192.168.177.95] (212.71.13.3.adsl.dyn.edpnet.net [212.71.13.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.vodafone.de (Postfix) with ESMTPSA id 4gZdH86p9lz8sbN;
+	Tue,  9 Jun 2026 18:49:05 +0000 (UTC)
+Message-ID: <d4eefa75-3902-4014-983a-dadb88ff7bfd@kabelmail.de>
+Date: Tue, 9 Jun 2026 20:48:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: SFP/MDIO/I2C: help requested unlocking a SFP+ MCU to expose PHY
+To: Nicolai Buchwitz <nb@tipi-net.de>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+References: <ec5bd768-3f54-4c30-b5a2-1e0b43f789e3@kabelmail.de>
+ <903daf32-aecd-4160-8f69-4fc329fdad3f@lunn.ch>
+ <582a4a1181bf110e97d8d2d249dbd42a@tipi-net.de>
+Content-Language: nl
+From: Janpieter Sollie <janpieter.sollie@kabelmail.de>
+Autocrypt: addr=janpieter.sollie@kabelmail.de; keydata=
+ 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
+In-Reply-To: <582a4a1181bf110e97d8d2d249dbd42a@tipi-net.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-purgate-server: smtpa05
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-size: 987
+X-purgate-ID: 155817::1781030955-36FE159A-F4BB0B61/0/0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kabelmail.de,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kabelmail.de:s=vfde-mb-mr2-23sep];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297237-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297239-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:andrew@lunn.ch,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[kabelmail.de:+];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[janpieter.sollie@kabelmail.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,arm.com:url,kabelmail.de:dkim,kabelmail.de:mid,kabelmail.de:from_mime,odly.de:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EE6A5663653
+X-Rspamd-Queue-Id: 62C9966374B
 
-Jakub Kicinski wrote:
-> I noticed that so_txtime is only passing on NIPA setups which are
-> looped within a single host. The cross-machine cases just flat out
-> fail. The initial bug is obvious - the test does not deploy the binary.
-> But even with that I think more work would be needed to sync the
-> time / adjust the expectations for a dual-machine test.
-> 
-> Willem promised to follow up on the fundamental issues with 2-host
-> setups :)
+Op 9/06/2026 om 10:32 schreef Nicolai Buchwitz:
+> Hi Andrew + Janpieter
+>
+> On 5.6.2026 18:51, Andrew Lunn wrote:
+>
+>> [...]
+>
+>> Do you know what MCU is in the SFP? Is there a data sheet for it? Can
+>> you read out the EEPROM holding its code over the I2C bus? You can
+>> then disassemble/decompile the code and see what it is actually doing.
+>
+> It put up a bit of a fight, but in the end I managed to take it apart.
+> uC seems to be a GD32E230F8 [1] [2].
+>
+> [1] https://www.keil.arm.com/devices/gigadevice-gd32e230f8/boards/
+> [2] https://odly.de/lkml/10gtek-sfp-phy.jpg
+>
+> Regards
+> Nicolai
+>
+>
+Thank you Nicolas for breaking out the module,
 
-Yep.
+Does this mean, because it's a pretty complicated microcontroller,
+that "transparent" is a no-go?
+I could eventually try to make Rollball work after all,
+but when I take a look at the microcontroller, I get the idea
+"firmware will filter all non-vendor approved commands to phy"
 
-> v2:
->  - rebase & add cfg.require_ipver(ipver) to the new case
-> v1: https://lore.kernel.org/20260608173305.372987-1-kuba@kernel.org
+Thanks,
 
-Thanks for the rebase. I was just doing the same.
-Still has my tags, but to leave no doubt:
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Janpieter Sollie
 
