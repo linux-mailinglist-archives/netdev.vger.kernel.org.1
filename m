@@ -1,1093 +1,476 @@
-Return-Path: <netdev+bounces-297132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297134-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JYnrLkozKGoaAAMAu9opvQ
-	(envelope-from <netdev+bounces-297132-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:37:46 +0200
+	id WfwnEBM1KGqoAAMAu9opvQ
+	(envelope-from <netdev+bounces-297134-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:45:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C306661DA2
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:37:46 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9F7661EF3
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 17:45:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=nMkw1qh0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297132-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297132-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=LcGxZ5Yd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297134-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297134-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8294231895CF
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:29:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 58D0A323E397
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 15:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1FC48C3FF;
-	Tue,  9 Jun 2026 15:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7C248AE06;
+	Tue,  9 Jun 2026 15:29:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD4D480974;
-	Tue,  9 Jun 2026 15:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA176481AAB;
+	Tue,  9 Jun 2026 15:29:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781018890; cv=none; b=Xw50qB4WmHAeh5pzsNtfudm2JaHVuiEAyvHKcUlXYVVUuJxYI9MGxylDSthWBKaFaTWI6qqDbXAb01ArQ24pi5P/EM2R0bb6vGywFoHHIg4XBs7zg4FpyXtHXbzN/6pSD1cGnqQxab7PutLil9RlbP1mM81Qce1Ym+ZVoqO/iWI=
+	t=1781018988; cv=none; b=mJi254pyk6vPfit6wcPQsxL5TuPSUmDuE8NnRoCe4IpVR3K2two5d+kewof2y2oZQ/6B0nqvIUzbPvP/GWaliIUiylWDYhPmjyCmmJ+X7NNYoQmUwWmEdfqyDRvGi9bAtsVy9v85RQBjoX7fG3RcgRoaahQJKemVNIJPTS2kQCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781018890; c=relaxed/simple;
-	bh=qVJN9zpieiw1YNkU58H7Mn9XdV6JZGNRE1TJm/3n8/0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rIGjMvpHpAnFrq+pLYf49y9tkneDnjMsvaacYFiKtA8O78W+uCLus1OsQ0UXfhM555t3PNvY5zis1QPTt/zw2TdKVfoWUekMbd3qoP8wm33Bcv08dQanuVzVg0VhR9wHN20yPXAnNIn/lF54S2/qolvld7Wq3/VbcAb6mht8+r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMkw1qh0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4826FC4AF0D;
-	Tue,  9 Jun 2026 15:28:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781018890;
-	bh=qVJN9zpieiw1YNkU58H7Mn9XdV6JZGNRE1TJm/3n8/0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=nMkw1qh0z4xVfUpAwIS/Nj09I6hDBAzsftY+rfXYzpEtYwqHLBV/reiMXbjT8klIe
-	 ik1R6wJ/8srBy5CLNkFqM/MkbszpCtVOk9/cSNmUtBFWu3q1xIxpl/2no4/tBdgQ1p
-	 ldyGIlXBIPxfSTgfRVmvTicjbtjAA7zlODGYZV6vE/5iUl/UQU3ZcCxIzr6R378ttC
-	 Xa1zTKMRX7EvUeVrlteX3XOzvKApUanAA9goLTmWI7tJ230NPNUDrB4jhxR6n7kFix
-	 B6Qm6rP7IRCppbbxolXh3BEOdnExu1GIXdb+aCJ/jp70VTb3jIYHUv/kl/EhwNHrYc
-	 p0FqxYYBimUCA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4016BCD8CB9;
-	Tue,  9 Jun 2026 15:28:10 +0000 (UTC)
-From: Ciprian Regus via B4 Relay <devnull+ciprian.regus.analog.com@kernel.org>
-Date: Tue, 09 Jun 2026 18:28:12 +0300
-Subject: [PATCH net-next v4 13/13] net: ethernet: adi: Add a driver for the
- ADIN1140 MACPHY
+	s=arc-20240116; t=1781018988; c=relaxed/simple;
+	bh=Iey+KVSHrer1xSDrRH0aoKqVFIwktXA2Q6TNUw2TaQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rw4AhlyZsTGzNcz1FjUE2OpRaQmmGsqKPEyQCz0r355VBUC4esB+10uPz766obFrrGHkO5ZQrUEGUHlxf/BvPrnrcdbNot998fMyx0ulON/ZzFGJOtfZRPriGxclhwiQB/+kiQ75rjsQ65aCmFP9TJzmAqTmsY62fYFaAed6TKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcGxZ5Yd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C501F00898;
+	Tue,  9 Jun 2026 15:29:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781018986;
+	bh=+2Kg5NxevchnBqZEDOYXv8mXN0J4Mql1Y+krUmmSP5E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=LcGxZ5Yd4SSlkLWvwpsxzzCCJ4BGALNGtVJQbv1KeDc19iAMoXtq7FIjPlDhlDVx3
+	 8ewSnyGjT/87TNzjSh4XRCGtteNVpaLJQLsmRTRrdzunOQaUjfQLcOKEeDjk4sx5Ns
+	 OLtSoppPreDg3MHnnOtmpoBhg+oDds16QVWZz8PiGvh0nvbjxctXtg/naOHhs99wke
+	 MEDfmlqWxuYlvQMuxlgZYR18RNbj0V+SDOa1xQuwUhryqcDpXaInzNpDVWr737ok1+
+	 7WlV71I3MX84Dt3r8ojeE58bZzT+BCvcgdBRZetoNv8LgF4/ij6ROvyoLoY9O9h2tr
+	 tBGN4D+HO5fhg==
+Date: Tue, 9 Jun 2026 17:29:44 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
+Subject: Re: [PATCH net-next v6 12/12] net: airoha: add phylink support
+Message-ID: <aigxaDtZDnI-RTwN@lore-desk>
+References: <20260609151212.29469-1-ansuelsmth@gmail.com>
+ <20260609151212.29469-13-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-adin1140-driver-v4-13-0753e28ee004@analog.com>
-References: <20260609-adin1140-driver-v4-0-0753e28ee004@analog.com>
-In-Reply-To: <20260609-adin1140-driver-v4-0-0753e28ee004@analog.com>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <skhan@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org, 
- Ciprian Regus <ciprian.regus@analog.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781018886; l=30647;
- i=ciprian.regus@analog.com; s=20260330; h=from:subject:message-id;
- bh=lu1zPkRHiiKCSgGP4whNgNSpIglHmHwn4oFJlbElF5E=;
- b=uZvGjRuqu/cpAzKXhe1oUyfjzsOAKwQeo19REN+0D4ICb+5nSuDLr7moHZZ+aqTxPWp39gaTM
- cJ7Oh/xQjZUCQlc0+cWDrHGme0+GUa9MyH1m1Ry6gH46zIfQlV9VcAL
-X-Developer-Key: i=ciprian.regus@analog.com; a=ed25519;
- pk=8WoNhI0kQcQUl8YqJO5ZevROYk9HP8lOIeIgIYgjfbc=
-X-Endpoint-Received: by B4 Relay for ciprian.regus@analog.com/20260330 with
- auth_id=703
-X-Original-From: Ciprian Regus <ciprian.regus@analog.com>
-Reply-To: ciprian.regus@analog.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="m10PdqwZCK4gPtEq"
+Content-Disposition: inline
+In-Reply-To: <20260609151212.29469-13-ansuelsmth@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297132-lists,netdev=lfdr.de,ciprian.regus.analog.com];
-	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:ciprian.regus@analog.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297134-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	HAS_REPLYTO(0.00)[ciprian.regus@analog.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,analog.com:replyto,analog.com:email,analog.com:url,analog.com:mid,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt,lkml];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3C306661DA2
-
-From: Ciprian Regus <ciprian.regus@analog.com>
-
-Add a driver for ADIN1140. The device is a 10BASE-T1S MAC-PHY
-(integrated in the same package) that connects to a CPU over an SPI bus,
-and implements the Open Alliance TC6 protocol for control and frame
-transfers. As such, this driver relies on oa_tc6 for the communication
-with the device. The device has an alternative name (AD3306), so the
-driver can be probed using one of the two compatible strings.
-
-For control transactions, ADIN1140 only implements the protected mode.
-The driver has a custom implementation for the mii_bus access methods as a
-workaround for hardware issues:
-
-1. The OA TC6 standard defines the direct and indirect access modes for
-   MDIO transactions. The ADIN1140 incorrectly advertises indirect mode
-   only (supported capabilities register - 0x2, bit 9), while actually
-   implementing just the direct mode. We cannot rely on the CAP register
-   to choose an access method (which oa_tc6 does by default, even though
-   it only implements the direct mode), so the driver has to use its
-   own.
-2. The ADIN1140 cannot access the C22 register space of the internal
-   PHY, while the PHY is busy receiving frames. If that happens, the
-   CONFIG0 and CONFIG2 registers of the MAC will get corrupted and the
-   data transfer will stop. Those two registers configure settings for
-   the transfer protocol between the MAC and host, so the value for some
-   of their subfields shouldn't be changed while the netdev is up.
-   Since we know the PHY is internal, the MAC driver can implement a
-   custom mii_bus, which can intercept C22 accesses. Most of the
-   registers mapped in the 0x0 - 0x3 range (the only ones the PHY offers)
-   are read only, and their value can be read from somewhere else (e.g
-   the PHYID 1 & 2 have the same value as 0x1 in the MAC memory map).
-   For the fields that are R/W (loopback and AN/reset) in the control
-   register, the PHY driver already implements the set_loopback() and
-   config_aneg() functions. The C22 write function of the driver is a
-   no-op and is used to protect against the ioctl MDIO access path.
-   C45 accesses do not cause this issue, so we can properly implement
-   them.
-
-Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
-
----
-v4:
- - Renamed the macros used to define registers in MMS0 and MMS1 to
-   include ADIN1140_MAC_ prefix in order to match the TRM naming scheme
-   (MAC_register_name for MMS0 and MMS1).
- - Used the renamed OA_TC6_MAC_MMS1 macro for MMS1 instead of
-   OA_TC6_VEND_MMS1.
- - Updated the MAINTAINERS entry to reflect the dt bindings file rename to
-   adi,ad3306.yaml.
-v3 changelog:
- - Clear the unused destination address filter slots in
-   adin1140_rx_mode_work(). This is required in case we remove
-   multicast or unicast addresses from a netdev.
- - The device only allows destination MAC masks for the first 2 slots.
-   Fix adin1140_mac_filter_set() to take this into account.
- - use oa_tc6_{write,read}_register_mms, since the OA_TC6_MMS_REG()
-   macro was removed. Update the register address defines accordingly.
- - use the devres API for mdio and netdev alloc/register instead of
-   manually managing those.
- - use dev_err_probe() in several places to simplify logging during
-   probe.
- - use scoped_guard() instead of spin_lock/unlock(). Had to break some
-   sequences in their own function to fit the 80 character limit.
- - fix the comment describing the reason for skb padding in the TX path.
-v2 changelog:
- - Exported statistics that match the ethtool_stats entries as such and
-   kept the other ones custom, using ethtool strings.
- - Used phy_do_ioctl_running() for ndo_eth_ioctl.
- - Adapted the mii_bus and PHY handling to the newly added
-   OA_TC6_BROKEN_PHY flag for oa_tc6.
- - Used the oa_tc6_mdiobus_read_c45/oa_tc6_mdiobus_write_c45 functions
-   for the C45 read/write mii_bus operations.
- - Removed OA TC6 register definitions (e.g CONFIG2) from the adin1140
-   driver and instead used the ones exported from oa_tc6.h
- - Used OA_TC6_MMS_REG to define MMS registers instead of
-   ADIN1140_MMS_REG.
- - Returned default values for the MII_PHYSID1/MII_PHYSID2.
- - Set the mii_bus->phy_mask, since the the same PHY will be registered
-   32 times otherwise.
- - Updated the MAINTAINERS entry to include the dt-bindings.
----
- MAINTAINERS                         |   8 +
- drivers/net/ethernet/adi/Kconfig    |  12 +
- drivers/net/ethernet/adi/Makefile   |   1 +
- drivers/net/ethernet/adi/adin1140.c | 815 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 836 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 50f795dfa880..c3cab8f7b9ef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1858,6 +1858,14 @@ S:	Supported
- W:	https://ez.analog.com/linux-software-drivers
- F:	drivers/dma/dma-axi-dmac.c
- 
-+ANALOG DEVICES INC ETHERNET DRIVERS
-+M:	Ciprian Regus <ciprian.regus@analog.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+W:	https://ez.analog.com/linux-software-drivers
-+F:	Documentation/devicetree/bindings/net/adi,ad3306.yaml
-+F:	drivers/net/ethernet/adi/adin1140.c
-+
- ANALOG DEVICES INC ETHERNET PHY DRIVERS
- M:	Ciprian Regus <ciprian.regus@analog.com>
- L:	netdev@vger.kernel.org
-diff --git a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kconfig
-index 760a9a60bc15..bdb8ff7d15da 100644
---- a/drivers/net/ethernet/adi/Kconfig
-+++ b/drivers/net/ethernet/adi/Kconfig
-@@ -26,4 +26,16 @@ config ADIN1110
- 	  Say yes here to build support for Analog Devices ADIN1110
- 	  Low Power 10BASE-T1L Ethernet MAC-PHY.
- 
-+config ADIN1140
-+	tristate "Analog Devices ADIN1140 MAC-PHY"
-+	depends on SPI
-+	select ADIN1140_PHY
-+	select OA_TC6
-+	help
-+	  Say yes here to build support for Analog Devices, Inc. ADIN1140
-+	  10BASE-T1S Ethernet MAC-PHY.
-+
-+	  To compile this driver as a module, choose M here. The module will be
-+	  called adin1140.
-+
- endif # NET_VENDOR_ADI
-diff --git a/drivers/net/ethernet/adi/Makefile b/drivers/net/ethernet/adi/Makefile
-index d0383d94303c..0390ca8ccc49 100644
---- a/drivers/net/ethernet/adi/Makefile
-+++ b/drivers/net/ethernet/adi/Makefile
-@@ -4,3 +4,4 @@
- #
- 
- obj-$(CONFIG_ADIN1110) += adin1110.o
-+obj-$(CONFIG_ADIN1140) += adin1140.o
-diff --git a/drivers/net/ethernet/adi/adin1140.c b/drivers/net/ethernet/adi/adin1140.c
-new file mode 100644
-index 000000000000..306e5de6faa5
---- /dev/null
-+++ b/drivers/net/ethernet/adi/adin1140.c
-@@ -0,0 +1,815 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Driver for Analog Devices, Inc. ADIN1140 10BASE-T1S MAC-PHY
-+ *
-+ * Copyright 2026 Analog Devices Inc.
-+ */
-+
-+#include <linux/cleanup.h>
-+#include <linux/etherdevice.h>
-+#include <linux/kernel.h>
-+#include <linux/mdio.h>
-+#include <linux/module.h>
-+#include <linux/oa_tc6.h>
-+#include <linux/phy.h>
-+
-+#define ADIN1140_MAC_CONFIG2_FWD_UNK2HOST	BIT(2)
-+
-+#define ADIN1140_MAC_P1_LOOP_ADDR_REG	0xC4
-+
-+#define ADIN1140_MAC_ADDR_FILT_UPR_REG		0x50
-+#define ADIN1140_MAC_ADDR_FILT_APPLY2PORT1	BIT(30)
-+#define ADIN1140_MAC_ADDR_FILT_TO_HOST		BIT(16)
-+
-+#define ADIN1140_MAC_ADDR_FILT_LWR_REG		0x51
-+
-+#define ADIN1140_MAC_ADDR_MASK_UPR_REG	0x70
-+#define ADIN1140_MAC_ADDR_MASK_LWR_REG	0x71
-+
-+#define ADIN1140_MAC_FILT_MC_SLOT	0U
-+#define ADIN1140_MAC_FILT_BC_SLOT	1U
-+#define ADIN1140_MAC_FILT_UC_SLOT	2U
-+#define ADIN1140_MAC_FILT_MAX_SLOT	16U
-+#define ADIN1140_MAC_FILT_MASK_LIMIT	2U
-+
-+#define ADIN1140_MAC_RX_FRAME_CNT		0xA1
-+#define ADIN1140_MAC_RX_BC_FRAME_CNT		0xA2
-+#define ADIN1140_MAC_RX_MC_FRAME_CNT		0xA3
-+#define ADIN1140_MAC_RX_UC_FRAME_CNT		0xA4
-+#define ADIN1140_MAC_RX_CRC_ERR_CNT		0xA5
-+#define ADIN1140_MAC_RX_ALIGN_ERR_CNT		0xA6
-+#define ADIN1140_MAC_RX_PREAMBLE_ERR_CNT	0xA7
-+#define ADIN1140_MAC_RX_SHORT_ERR_CNT		0xA8
-+#define ADIN1140_MAC_RX_LONG_ERR_CNT		0xA9
-+#define ADIN1140_MAC_RX_PHY_ERR_CNT		0xAA
-+#define ADIN1140_MAC_RX_DRP_FULL_CNT		0xAB
-+#define ADIN1140_MAC_RX_DRP_FILTER_CNT		0xAD
-+#define ADIN1140_MAC_RX_IFG_ERR_CNT		0xAE
-+#define ADIN1140_MAC_TX_FRAME_CNT		0xB1
-+#define ADIN1140_MAC_TX_BC_FRAME_CNT		0xB2
-+#define ADIN1140_MAC_TX_MC_FRAME_CNT		0xB3
-+#define ADIN1140_MAC_TX_UC_FRAME_CNT		0xB4
-+#define ADIN1140_MAC_TX_SINGLE_COL_CNT		0xB5
-+#define ADIN1140_MAC_TX_MULTI_COL_CNT		0xB6
-+#define ADIN1140_MAC_TX_DEFERRED_CNT		0xB7
-+#define ADIN1140_MAC_TX_LATE_COL_CNT		0xB8
-+#define ADIN1140_MAC_TX_EXCESS_COL_CNT		0xB9
-+#define ADIN1140_MAC_TX_UNDERRUN_CNT		0xBA
-+
-+/* ADIN1140_MAC_FILT_MAX_SLOT - 3 (multicast, broadcast and unicast
-+ * reserved slots)
-+ */
-+#define ADIN1140_MAC_FILT_AVAIL	13U
-+
-+#define ADIN1140_PHY_CTRL_DEFAULT	0x1000
-+#define ADIN1140_PHY_STATUS_DEFAULT	0x082D
-+#define ADIN1140_PHY_ID1		0x0283
-+#define ADIN1140_PHY_ID2		0xBE00
-+
-+#define ADIN1140_STATS_CHECK_DELAY	(3 * HZ)
-+
-+enum adin1140_statistics_entry {
-+	rx_frames,
-+	rx_bc_frames,
-+	rx_mc_frames,
-+	rx_uc_frames,
-+	rx_crc_errors,
-+	rx_align_errors,
-+	rx_preamble_errors,
-+	rx_short_frame_errors,
-+	rx_long_frame_errors,
-+	rx_phy_errors,
-+	rx_fifo_full_dropped,
-+	rx_addr_filter_dropped,
-+	rx_ifg_errors,
-+	tx_frames,
-+	tx_bc_frames,
-+	tx_mc_frames,
-+	tx_uc_frames,
-+	tx_single_collision,
-+	tx_multi_collision,
-+	tx_deferred,
-+	tx_late_collision,
-+	tx_excess_collision,
-+	tx_underrun,
-+	ADIN1140_STATS_CNT,
-+};
-+
-+struct adin1140_statistics_reg {
-+	const char *name;
-+	enum adin1140_statistics_entry idx;
-+};
-+
-+struct adin1140_priv {
-+	struct net_device *netdev;
-+	struct oa_tc6 *tc6;
-+	struct mii_bus *mdiobus;
-+	struct phy_device *phydev;
-+	struct work_struct rx_mode_work;
-+	struct delayed_work stats_work;
-+
-+	/* Protects stats[] from concurrent updates in adin1140_stats_work
-+	 * and reads in the get_stats functions
-+	 */
-+	spinlock_t stat_lock;
-+	u64 stats[ADIN1140_STATS_CNT];
-+};
-+
-+static const u32 adin1140_stat_regs[] = {
-+	[rx_frames] = ADIN1140_MAC_RX_FRAME_CNT,
-+	[rx_bc_frames] = ADIN1140_MAC_RX_BC_FRAME_CNT,
-+	[rx_mc_frames] = ADIN1140_MAC_RX_MC_FRAME_CNT,
-+	[rx_uc_frames] = ADIN1140_MAC_RX_UC_FRAME_CNT,
-+	[rx_crc_errors] = ADIN1140_MAC_RX_CRC_ERR_CNT,
-+	[rx_align_errors] = ADIN1140_MAC_RX_ALIGN_ERR_CNT,
-+	[rx_preamble_errors] = ADIN1140_MAC_RX_PREAMBLE_ERR_CNT,
-+	[rx_short_frame_errors]	= ADIN1140_MAC_RX_SHORT_ERR_CNT,
-+	[rx_long_frame_errors] = ADIN1140_MAC_RX_LONG_ERR_CNT,
-+	[rx_phy_errors] = ADIN1140_MAC_RX_PHY_ERR_CNT,
-+	[rx_fifo_full_dropped] = ADIN1140_MAC_RX_DRP_FULL_CNT,
-+	[rx_addr_filter_dropped] = ADIN1140_MAC_RX_DRP_FILTER_CNT,
-+	[rx_ifg_errors] = ADIN1140_MAC_RX_IFG_ERR_CNT,
-+	[tx_frames] = ADIN1140_MAC_TX_FRAME_CNT,
-+	[tx_bc_frames] = ADIN1140_MAC_TX_BC_FRAME_CNT,
-+	[tx_mc_frames] = ADIN1140_MAC_TX_MC_FRAME_CNT,
-+	[tx_uc_frames] = ADIN1140_MAC_TX_UC_FRAME_CNT,
-+	[tx_single_collision] = ADIN1140_MAC_TX_SINGLE_COL_CNT,
-+	[tx_multi_collision] = ADIN1140_MAC_TX_MULTI_COL_CNT,
-+	[tx_deferred] = ADIN1140_MAC_TX_DEFERRED_CNT,
-+	[tx_late_collision] = ADIN1140_MAC_TX_LATE_COL_CNT,
-+	[tx_excess_collision] = ADIN1140_MAC_TX_EXCESS_COL_CNT,
-+	[tx_underrun] = ADIN1140_MAC_TX_UNDERRUN_CNT,
-+};
-+
-+static const struct adin1140_statistics_reg adin1140_stats[] = {
-+	{.name = "rx_unicast_frames", .idx = rx_uc_frames},
-+	{.name = "rx_preamble_errors", .idx = rx_preamble_errors},
-+	{.name = "rx_ifg_errors", .idx = rx_ifg_errors},
-+	{.name = "rx_addr_filter_dropped", .idx = rx_addr_filter_dropped},
-+	{.name = "tx_unicast_frames", .idx = tx_uc_frames},
-+};
-+
-+static int adin1140_mac_filter_set(struct adin1140_priv *priv,
-+				   const u8 *addr, const u8 *mask,
-+				   u8 slot)
-+{
-+	u32 reg_address;
-+	u32 val;
-+	int ret;
-+
-+	if (slot >= ADIN1140_MAC_FILT_MAX_SLOT)
-+		return -ENOSPC;
-+
-+	reg_address = ADIN1140_MAC_ADDR_FILT_UPR_REG + 2 * slot;
-+
-+	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					reg_address,
-+					get_unaligned_be16(&addr[0]) |
-+					ADIN1140_MAC_ADDR_FILT_APPLY2PORT1 |
-+					ADIN1140_MAC_ADDR_FILT_TO_HOST);
-+	if (ret)
-+		return ret;
-+
-+	reg_address = ADIN1140_MAC_ADDR_FILT_LWR_REG + 2 * slot;
-+	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					reg_address,
-+					get_unaligned_be32(&addr[2]));
-+	if (ret)
-+		return ret;
-+
-+	/* Only the first 2 destination MAC filter slots support masking.
-+	 * For the other entries, the destination address in the received
-+	 * frame must match exactly.
-+	 */
-+	if (slot >= ADIN1140_MAC_FILT_MASK_LIMIT)
-+		return 0;
-+
-+	val = get_unaligned_be16(&mask[0]);
-+	reg_address = ADIN1140_MAC_ADDR_MASK_UPR_REG + (2 * slot);
-+
-+	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					reg_address, val);
-+	if (ret)
-+		return ret;
-+
-+	val = get_unaligned_be32(&mask[2]);
-+	reg_address = ADIN1140_MAC_ADDR_MASK_LWR_REG + (2 * slot);
-+
-+	return oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					 reg_address, val);
-+}
-+
-+static int adin1140_mac_filter_clear(struct adin1140_priv *priv, u8 slot)
-+{
-+	u8 mask[ETH_ALEN];
-+	u8 addr[ETH_ALEN];
-+
-+	memset(mask, 0xFF, ETH_ALEN);
-+	memset(addr, 0x0, ETH_ALEN);
-+
-+	return adin1140_mac_filter_set(priv, addr, mask, slot);
-+}
-+
-+static int adin1140_filter_unicast(struct adin1140_priv *priv)
-+{
-+	/* Only the first 2 filter slots support masking, so no unicast
-+	 * address will ever need a mask. The first slots are used for the
-+	 * all multicast and broadcast filter.
-+	 */
-+	return adin1140_mac_filter_set(priv, priv->netdev->dev_addr, NULL,
-+				       ADIN1140_MAC_FILT_UC_SLOT);
-+}
-+
-+static int adin1140_filter_all_multicast(struct adin1140_priv *priv, bool en)
-+{
-+	u8 multicast_addr[ETH_ALEN] = {1, 0, 0, 0, 0, 0};
-+
-+	if (en)
-+		return adin1140_mac_filter_set(priv, multicast_addr,
-+					       multicast_addr,
-+					       ADIN1140_MAC_FILT_MC_SLOT);
-+
-+	return adin1140_mac_filter_clear(priv, ADIN1140_MAC_FILT_MC_SLOT);
-+}
-+
-+static int adin1140_filter_broadcast(struct adin1140_priv *priv, bool enabled)
-+{
-+	u8 mask[ETH_ALEN];
-+
-+	if (enabled) {
-+		memset(mask, 0xFF, ETH_ALEN);
-+		return adin1140_mac_filter_set(priv, mask, mask,
-+					       ADIN1140_MAC_FILT_BC_SLOT);
-+	}
-+
-+	return adin1140_mac_filter_clear(priv, ADIN1140_MAC_FILT_BC_SLOT);
-+}
-+
-+static int adin1140_default_filter_config(struct adin1140_priv *priv)
-+{
-+	int ret;
-+
-+	ret = adin1140_filter_broadcast(priv, true);
-+	if (ret)
-+		return ret;
-+
-+	return adin1140_filter_unicast(priv);
-+}
-+
-+static int adin1140_promiscuous_mode(struct adin1140_priv *priv, bool enabled)
-+{
-+	int ret;
-+	u32 val;
-+
-+	ret = oa_tc6_read_register(priv->tc6, OA_TC6_REG_CONFIG2, &val);
-+	if (ret)
-+		return ret;
-+
-+	if (enabled)
-+		val |= ADIN1140_MAC_CONFIG2_FWD_UNK2HOST;
-+	else
-+		val &= ~ADIN1140_MAC_CONFIG2_FWD_UNK2HOST;
-+
-+	return oa_tc6_write_register(priv->tc6, OA_TC6_REG_CONFIG2, val);
-+}
-+
-+static void adin1140_rx_mode_work(struct work_struct *work)
-+{
-+	struct adin1140_priv *priv = container_of(work, struct adin1140_priv,
-+						  rx_mode_work);
-+	struct netdev_hw_addr *ha;
-+	bool all_multi, promisc;
-+	u8 mask[ETH_ALEN];
-+	u8 start, end;
-+	u32 mac_addrs;
-+	u8 slot, i;
-+	int ret;
-+
-+	/* The ADIN1140 has 16 dest MAC address filter slots:
-+	 * 0 - reserved for all multicast filter.
-+	 * 1 - reserved for broadcast filter.
-+	 * 2 - reserved for the device's own unicast MAC.
-+	 * 3 -> 15 - available for other unicast/multicast filters.
-+	 */
-+
-+	mac_addrs = netdev_uc_count(priv->netdev) +
-+		    netdev_mc_count(priv->netdev);
-+
-+	if (priv->netdev->flags & IFF_PROMISC) {
-+		promisc = true;
-+		all_multi = false;
-+	} else if (priv->netdev->flags & IFF_ALLMULTI) {
-+		promisc = false;
-+		all_multi = true;
-+	} else if (mac_addrs <= ADIN1140_MAC_FILT_AVAIL) {
-+		promisc = false;
-+		all_multi = false;
-+
-+		slot = ADIN1140_MAC_FILT_UC_SLOT + 1;
-+		memset(mask, 0xFF, ETH_ALEN);
-+
-+		netdev_for_each_uc_addr(ha, priv->netdev) {
-+			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-+						      slot);
-+			if (ret)
-+				return;
-+
-+			slot++;
-+		}
-+
-+		netdev_for_each_mc_addr(ha, priv->netdev) {
-+			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-+						      slot);
-+			if (ret)
-+				return;
-+
-+			slot++;
-+		}
-+
-+		for (i = slot; i < ADIN1140_MAC_FILT_MAX_SLOT; i++) {
-+			ret = adin1140_mac_filter_clear(priv, i);
-+			if (ret)
-+				return;
-+		}
-+
-+	} else {
-+		/* The filter table is full. Enable promisc mode. */
-+		promisc = true;
-+		all_multi = false;
-+
-+		start = ADIN1140_MAC_FILT_UC_SLOT + 1;
-+		end = ADIN1140_MAC_FILT_MAX_SLOT;
-+		for (i = start; i < end; i++) {
-+			ret = adin1140_mac_filter_clear(priv, i);
-+			if (ret)
-+				return;
-+		}
-+	}
-+
-+	ret = adin1140_promiscuous_mode(priv, promisc);
-+	if (ret)
-+		return;
-+
-+	adin1140_filter_all_multicast(priv, all_multi);
-+}
-+
-+static void adin1140_rx_mode(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	schedule_work(&priv->rx_mode_work);
-+}
-+
-+static void adin1140_stats_work(struct work_struct *work)
-+{
-+	struct delayed_work *dwork = to_delayed_work(work);
-+	u64 stat_buff[ADIN1140_STATS_CNT] = {};
-+	struct adin1140_priv *priv;
-+	u32 reg_val;
-+	int ret;
-+	u32 i;
-+
-+	priv = container_of(dwork, struct adin1140_priv, stats_work);
-+
-+	for (i = 0; i < ARRAY_SIZE(adin1140_stat_regs); i++) {
-+		ret = oa_tc6_read_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					       adin1140_stat_regs[i],
-+					       &reg_val);
-+		if (ret)
-+			break;
-+
-+		stat_buff[i] = reg_val;
-+	}
-+
-+	scoped_guard(spinlock, &priv->stat_lock)
-+		memcpy(&priv->stats, stat_buff, sizeof(priv->stats));
-+
-+	schedule_delayed_work(dwork, ADIN1140_STATS_CHECK_DELAY);
-+}
-+
-+static int adin1140_configure(struct adin1140_priv *priv)
-+{
-+	int ret;
-+
-+	ret = oa_tc6_zero_align_receive_frame_enable(priv->tc6);
-+	if (ret)
-+		return ret;
-+
-+	/* Disable MAC loopback */
-+	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-+					ADIN1140_MAC_P1_LOOP_ADDR_REG, 0x0);
-+	if (ret)
-+		return ret;
-+
-+	return adin1140_default_filter_config(priv);
-+}
-+
-+static int adin1140_open(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	schedule_delayed_work(&priv->stats_work, ADIN1140_STATS_CHECK_DELAY);
-+
-+	phy_start(netdev->phydev);
-+	netif_start_queue(netdev);
-+
-+	return 0;
-+}
-+
-+static int adin1140_close(struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	cancel_delayed_work_sync(&priv->stats_work);
-+
-+	netif_stop_queue(netdev);
-+	phy_stop(netdev->phydev);
-+
-+	return 0;
-+}
-+
-+static netdev_tx_t adin1140_start_xmit(struct sk_buff *skb,
-+				       struct net_device *netdev)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	/* The MAC doesn't automatically pad the frame to a 60 byte minimum
-+	 * size in case the host sends a shorter skb, so we have to do it in
-+	 * the driver. The FCS will be added by the MAC.
-+	 */
-+	if (skb_put_padto(skb, ETH_ZLEN))
-+		return NETDEV_TX_OK;
-+
-+	return oa_tc6_start_xmit(priv->tc6, skb);
-+}
-+
-+static int adin1140_set_mac_address(struct net_device *netdev, void *addr)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+	struct sockaddr *address = addr;
-+	u8 mask[ETH_ALEN];
-+	int ret;
-+
-+	ret = eth_prepare_mac_addr_change(netdev, addr);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (ether_addr_equal(address->sa_data, netdev->dev_addr))
-+		return 0;
-+
-+	memset(mask, 0xFF, ETH_ALEN);
-+	ret = adin1140_mac_filter_set(priv, address->sa_data, mask,
-+				      ADIN1140_MAC_FILT_UC_SLOT);
-+	if (ret)
-+		return ret;
-+
-+	eth_commit_mac_addr_change(netdev, addr);
-+
-+	return 0;
-+}
-+
-+static void __adin1140_ndo_get_stats64(struct adin1140_priv *priv,
-+				       struct rtnl_link_stats64 *storage)
-+{
-+	storage->rx_errors = priv->stats[rx_crc_errors] +
-+			     priv->stats[rx_align_errors] +
-+			     priv->stats[rx_preamble_errors] +
-+			     priv->stats[rx_short_frame_errors] +
-+			     priv->stats[rx_long_frame_errors] +
-+			     priv->stats[rx_phy_errors] +
-+			     priv->stats[rx_ifg_errors];
-+
-+	storage->tx_errors = priv->stats[tx_excess_collision] +
-+			     priv->stats[tx_underrun];
-+
-+	storage->rx_dropped = priv->stats[rx_fifo_full_dropped] +
-+			      priv->stats[rx_addr_filter_dropped];
-+
-+	storage->multicast = priv->stats[rx_mc_frames];
-+
-+	storage->collisions = priv->stats[tx_single_collision] +
-+			      priv->stats[tx_multi_collision];
-+
-+	storage->rx_length_errors = priv->stats[rx_short_frame_errors] +
-+				    priv->stats[rx_long_frame_errors];
-+	storage->rx_over_errors = priv->stats[rx_fifo_full_dropped];
-+	storage->rx_crc_errors = priv->stats[rx_crc_errors];
-+	storage->rx_frame_errors = priv->stats[rx_align_errors];
-+	storage->rx_missed_errors = priv->stats[rx_fifo_full_dropped];
-+
-+	storage->tx_aborted_errors = priv->stats[tx_excess_collision];
-+	storage->tx_fifo_errors = priv->stats[tx_underrun];
-+	storage->tx_window_errors = priv->stats[tx_late_collision];
-+}
-+
-+static void adin1140_ndo_get_stats64(struct net_device *dev,
-+				     struct rtnl_link_stats64 *storage)
-+{
-+	struct adin1140_priv *priv = netdev_priv(dev);
-+
-+	storage->rx_packets = priv->netdev->stats.rx_packets;
-+	storage->tx_packets = priv->netdev->stats.tx_packets;
-+
-+	storage->rx_bytes = priv->netdev->stats.rx_bytes;
-+	storage->tx_bytes = priv->netdev->stats.tx_bytes;
-+
-+	scoped_guard(spinlock, &priv->stat_lock)
-+		__adin1140_ndo_get_stats64(priv, storage);
-+}
-+
-+static void adin1140_get_drvinfo(struct net_device *netdev,
-+				 struct ethtool_drvinfo *info)
-+{
-+	strscpy(info->driver, "ADIN1140", sizeof(info->driver));
-+	strscpy(info->bus_info, dev_name(netdev->dev.parent),
-+		sizeof(info->bus_info));
-+}
-+
-+static void adin1140_get_ethtool_stats(struct net_device *netdev,
-+				       struct ethtool_stats *stats, u64 *data)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+	u32 i;
-+
-+	scoped_guard(spinlock, &priv->stat_lock) {
-+		for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-+			data[i] = priv->stats[adin1140_stats[i].idx];
-+	}
-+}
-+
-+static void adin1140_get_ethtool_strings(struct net_device *netdev, u32 sset,
-+					 u8 *p)
-+{
-+	u32 i;
-+
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-+			ethtool_puts(&p, adin1140_stats[i].name);
-+
-+		break;
-+	}
-+}
-+
-+static int adin1140_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return ARRAY_SIZE(adin1140_stats);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static void __adin1140_eth_mac_stats(struct adin1140_priv *priv,
-+				     struct ethtool_eth_mac_stats *mac_stats)
-+{
-+	mac_stats->FramesReceivedOK = priv->stats[rx_frames];
-+	mac_stats->BroadcastFramesReceivedOK = priv->stats[rx_bc_frames];
-+	mac_stats->MulticastFramesReceivedOK = priv->stats[rx_mc_frames];
-+	mac_stats->FrameCheckSequenceErrors = priv->stats[rx_crc_errors];
-+	mac_stats->AlignmentErrors = priv->stats[rx_align_errors];
-+	mac_stats->FrameTooLongErrors = priv->stats[rx_long_frame_errors];
-+	mac_stats->FramesLostDueToIntMACRcvError =
-+					priv->stats[rx_fifo_full_dropped];
-+	mac_stats->FramesTransmittedOK = priv->stats[tx_frames];
-+	mac_stats->BroadcastFramesXmittedOK = priv->stats[tx_bc_frames];
-+	mac_stats->MulticastFramesXmittedOK = priv->stats[tx_mc_frames];
-+	mac_stats->SingleCollisionFrames = priv->stats[tx_single_collision];
-+	mac_stats->MultipleCollisionFrames = priv->stats[tx_multi_collision];
-+	mac_stats->FramesWithDeferredXmissions = priv->stats[tx_deferred];
-+	mac_stats->LateCollisions = priv->stats[tx_late_collision];
-+	mac_stats->FramesAbortedDueToXSColls =
-+					priv->stats[tx_excess_collision];
-+	mac_stats->FramesLostDueToIntMACXmitError = priv->stats[tx_underrun];
-+}
-+
-+static void adin1140_get_eth_mac_stats(struct net_device *netdev,
-+				       struct ethtool_eth_mac_stats *mac_stats)
-+{
-+	struct adin1140_priv *priv = netdev_priv(netdev);
-+
-+	scoped_guard(spinlock, &priv->stat_lock)
-+		__adin1140_eth_mac_stats(priv, mac_stats);
-+}
-+
-+static int adin1140_mdiobus_read(struct mii_bus *bus, int addr, int regnum)
-+{
-+	/* The ADIN1140's standard PHY C22 register map (OA TC6 0xFF00 -
-+	 * 0xFF1F), of which only 0xFF00 - 0xFF03 are implemented) cannot be
-+	 * accessed while frames are being received by the PHY. In case this
-+	 * happens the CONFIG0 and CONFIG2 register values will get corrupted,
-+	 * getting a random value. Both reads and writes cause the same
-+	 * behavior. This is a workaround that avoids MDIO accesses all
-+	 * together. Since this is a 10BASE-T1S PHY, only the loopback and
-+	 * reset (AN) bits in the control register (0x0) can be written.
-+	 * These functionalities have custom implementations in the PHY
-+	 * driver. C45 accesses do not cause this issue.
-+	 */
-+
-+	switch (regnum) {
-+	case MII_BMCR:
-+		return ADIN1140_PHY_CTRL_DEFAULT;
-+	case MII_BMSR:
-+		return ADIN1140_PHY_STATUS_DEFAULT;
-+	case MII_PHYSID1:
-+		return ADIN1140_PHY_ID1;
-+	case MII_PHYSID2:
-+		return ADIN1140_PHY_ID2;
-+	default:
-+		return 0xFFFF;
-+	}
-+}
-+
-+static int adin1140_mdiobus_write(struct mii_bus *bus, int addr, int regnum,
-+				  u16 val)
-+{
-+	return -EIO;
-+}
-+
-+static int adin1140_mdio_register(struct adin1140_priv *priv,
-+				  struct spi_device *spidev)
-+{
-+	priv->mdiobus = devm_mdiobus_alloc(&spidev->dev);
-+	if (!priv->mdiobus)
-+		return dev_err_probe(&spidev->dev, -ENOMEM,
-+				     "MDIO bus alloc failed\n");
-+
-+	priv->mdiobus->name = "adin1140-mdiobus";
-+	priv->mdiobus->priv = priv->tc6;
-+	priv->mdiobus->parent = &spidev->dev;
-+	priv->mdiobus->phy_mask = GENMASK(31, 1);
-+	priv->mdiobus->read = adin1140_mdiobus_read;
-+	priv->mdiobus->write = adin1140_mdiobus_write;
-+	priv->mdiobus->read_c45 = oa_tc6_mdiobus_read_c45;
-+	priv->mdiobus->write_c45 = oa_tc6_mdiobus_write_c45;
-+
-+	snprintf(priv->mdiobus->id, MII_BUS_ID_SIZE, "adin1140-%s.%u",
-+		 dev_name(&spidev->dev), spi_get_chipselect(spidev, 0));
-+
-+	return devm_mdiobus_register(&spidev->dev, priv->mdiobus);
-+}
-+
-+static void adin1140_handle_link_change(struct net_device *netdev)
-+{
-+	phy_print_status(netdev->phydev);
-+}
-+
-+static void adin1140_phy_remove(void *data)
-+{
-+	phy_disconnect(data);
-+}
-+
-+static int adin1140_phy_init(struct adin1140_priv *priv,
-+			     struct spi_device *spidev)
-+{
-+	int ret;
-+
-+	ret = adin1140_mdio_register(priv, spidev);
-+	if (ret)
-+		return ret;
-+
-+	priv->phydev = phy_find_first(priv->mdiobus);
-+	if (!priv->phydev)
-+		return dev_err_probe(&spidev->dev, -ENODEV, "No PHY found\n");
-+
-+	priv->phydev->is_internal = true;
-+	ret = phy_connect_direct(priv->netdev, priv->phydev,
-+				 &adin1140_handle_link_change,
-+				 PHY_INTERFACE_MODE_INTERNAL);
-+	if (ret)
-+		return dev_err_probe(&spidev->dev, ret,
-+				     "Can't attach PHY to %s\n",
-+				     priv->mdiobus->id);
-+
-+	ret = devm_add_action_or_reset(&spidev->dev, adin1140_phy_remove,
-+				       priv->phydev);
-+	if (ret)
-+		return ret;
-+
-+	phy_attached_info(priv->phydev);
-+
-+	return 0;
-+}
-+
-+static const struct ethtool_ops adin1140_ethtool_ops = {
-+	.get_drvinfo = adin1140_get_drvinfo,
-+	.get_link = ethtool_op_get_link,
-+	.get_ethtool_stats = adin1140_get_ethtool_stats,
-+	.get_sset_count = adin1140_get_sset_count,
-+	.get_strings = adin1140_get_ethtool_strings,
-+	.get_link_ksettings = phy_ethtool_get_link_ksettings,
-+	.set_link_ksettings = phy_ethtool_set_link_ksettings,
-+	.get_eth_mac_stats = adin1140_get_eth_mac_stats,
-+};
-+
-+static const struct net_device_ops adin1140_netdev_ops = {
-+	.ndo_open = adin1140_open,
-+	.ndo_stop = adin1140_close,
-+	.ndo_start_xmit	= adin1140_start_xmit,
-+	.ndo_set_mac_address = adin1140_set_mac_address,
-+	.ndo_validate_addr = eth_validate_addr,
-+	.ndo_set_rx_mode = adin1140_rx_mode,
-+	.ndo_eth_ioctl = phy_do_ioctl_running,
-+	.ndo_get_stats64 = adin1140_ndo_get_stats64,
-+};
-+
-+static void adin1140_oa_tc6_remove(void *data)
-+{
-+	oa_tc6_exit(data);
-+}
-+
-+static void adin1140_cancel_rx_mode_work(void *data)
-+{
-+	cancel_work_sync(data);
-+}
-+
-+static int adin1140_probe(struct spi_device *spi)
-+{
-+	struct oa_tc6_quirks tc6_quirks = {};
-+	struct net_device *netdev;
-+	struct adin1140_priv *priv;
-+	int ret;
-+
-+	netdev = devm_alloc_etherdev(&spi->dev, sizeof(struct adin1140_priv));
-+	if (!netdev)
-+		return -ENOMEM;
-+
-+	priv = netdev_priv(netdev);
-+	priv->netdev = netdev;
-+	spi_set_drvdata(spi, priv);
-+	spin_lock_init(&priv->stat_lock);
-+
-+	tc6_quirks.quirk_flags = OA_TC6_BROKEN_PHY;
-+
-+	priv->tc6 = oa_tc6_init(spi, netdev, &tc6_quirks);
-+	if (!priv->tc6)
-+		return -ENODEV;
-+
-+	ret = devm_add_action_or_reset(&spi->dev, adin1140_oa_tc6_remove,
-+				       priv->tc6);
-+	if (ret)
-+		return ret;
-+
-+	ret = adin1140_phy_init(priv, spi);
-+	if (ret)
-+		return ret;
-+
-+	if (device_get_ethdev_address(&spi->dev, netdev))
-+		eth_hw_addr_random(netdev);
-+
-+	ret = adin1140_configure(priv);
-+	if (ret)
-+		return ret;
-+
-+	INIT_WORK(&priv->rx_mode_work, adin1140_rx_mode_work);
-+	INIT_DELAYED_WORK(&priv->stats_work, adin1140_stats_work);
-+
-+	ret = devm_add_action_or_reset(&spi->dev, adin1140_cancel_rx_mode_work,
-+				       &priv->rx_mode_work);
-+	if (ret)
-+		return ret;
-+
-+	netdev->if_port = IF_PORT_10BASET;
-+	netdev->irq = spi->irq;
-+	netdev->netdev_ops = &adin1140_netdev_ops;
-+	netdev->ethtool_ops = &adin1140_ethtool_ops;
-+	netdev->netns_immutable = true;
-+	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
-+			      IFF_UNICAST_FLT;
-+
-+	ret = devm_register_netdev(&spi->dev, netdev);
-+	if (ret)
-+		return dev_err_probe(&spi->dev, ret,
-+				     "Failed to register netdev");
-+
-+	return 0;
-+}
-+
-+static const struct spi_device_id adin1140_spi_id[] = {
-+	{ .name = "ad3306" },
-+	{ .name = "adin1140" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(spi, adin1140_spi_id);
-+
-+static const struct of_device_id adin1140_match_table[] = {
-+	{ .compatible = "adi,ad3306" },
-+	{ .compatible = "adi,adin1140" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, adin1140_match_table);
-+
-+static struct spi_driver adin1140_driver = {
-+	.driver = {
-+		.name = "adin1140",
-+		.of_match_table = adin1140_match_table,
-+	 },
-+	.probe = adin1140_probe,
-+	.id_table = adin1140_spi_id,
-+};
-+module_spi_driver(adin1140_driver);
-+
-+MODULE_DESCRIPTION("Analog Devices, Inc. ADIN1140 10BASE-T1S MAC-PHY");
-+MODULE_AUTHOR("Ciprian Regus <ciprian.regus@analog.com>");
-+MODULE_LICENSE("GPL");
-
--- 
-2.43.0
+X-Rspamd-Queue-Id: CF9F7661EF3
 
 
+--m10PdqwZCK4gPtEq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> Add phylink support for each GDM port. For GDM1 add the internal interface
+> mode as the only supported mode. For GDM2/3/4 add the required
+> configuration of the PCS to make the external PHY or attached SFP cage
+> work.
+>=20
+> These needs to be defined in the GDM port node using the pcs-handle
+> property.
+>=20
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+
+Hi Christian,
+
+some nits inline.
+
+Regards,
+Lorenzo
+
+> ---
+>  drivers/net/ethernet/airoha/Kconfig       |   1 +
+>  drivers/net/ethernet/airoha/airoha_eth.c  | 167 +++++++++++++++++++++-
+>  drivers/net/ethernet/airoha/airoha_eth.h  |   3 +
+>  drivers/net/ethernet/airoha/airoha_regs.h |  12 ++
+>  4 files changed, 181 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/Kconfig b/drivers/net/ethernet/a=
+iroha/Kconfig
+> index ad3ce501e7a5..38dcc76e5998 100644
+> --- a/drivers/net/ethernet/airoha/Kconfig
+> +++ b/drivers/net/ethernet/airoha/Kconfig
+> @@ -20,6 +20,7 @@ config NET_AIROHA
+>  	depends on NET_DSA || !NET_DSA
+>  	select NET_AIROHA_NPU
+>  	select PAGE_POOL
+> +	select PHYLINK
+>  	help
+>  	  This driver supports the gigabit ethernet MACs in the
+>  	  Airoha SoC family.
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 5a8e84fa9918..eabd7b058f82 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/of_reserved_mem.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/tcp.h>
+> +#include <linux/pcs/pcs.h>
+
+Can you please respect the alphabetic order?
+
+>  #include <linux/u64_stats_sync.h>
+>  #include <net/dst_metadata.h>
+>  #include <net/page_pool/helpers.h>
+> @@ -1779,6 +1780,15 @@ static int airoha_dev_open(struct net_device *netd=
+ev)
+>  	u32 cur_len, pse_port =3D FE_PSE_PORT_PPE1;
+>  	struct airoha_qdma *qdma =3D dev->qdma;
+> =20
+> +	err =3D phylink_of_phy_connect(dev->phylink, netdev->dev.of_node, 0);
+> +	if (err) {
+> +		netdev_err(netdev, "%s: could not attach PHY: %d\n", __func__,
+> +			   err);
+
+Do we need specify the __func__ argument here?
+
+> +		return err;
+> +	}
+> +
+> +	phylink_start(dev->phylink);
+> +
+>  	netif_tx_start_all_queues(netdev);
+>  	err =3D airoha_set_vip_for_gdm_port(dev, true);
+>  	if (err)
+> @@ -1876,6 +1886,9 @@ static int airoha_dev_stop(struct net_device *netde=
+v)
+>  		}
+>  	}
+> =20
+> +	phylink_stop(dev->phylink);
+> +	phylink_disconnect_phy(dev->phylink);
+> +
+>  	return 0;
+>  }
+> =20
+> @@ -3148,6 +3161,153 @@ bool airoha_is_valid_gdm_dev(struct airoha_eth *e=
+th,
+>  	return false;
+>  }
+> =20
+> +/* Nothing to do in MAC, everything is handled in PCS */
+> +static void airoha_mac_config(struct phylink_config *config, unsigned in=
+t mode,
+> +			      const struct phylink_link_state *state)
+> +{
+> +}
+> +
+> +static void airoha_mac_link_up(struct phylink_config *config, struct phy=
+_device *phy,
+> +			       unsigned int mode, phy_interface_t interface,
+> +			       int speed, int duplex, bool tx_pause, bool rx_pause)
+> +{
+> +	struct airoha_gdm_dev *dev =3D container_of(config, struct airoha_gdm_d=
+ev,
+> +						  phylink_config);
+> +	struct airoha_gdm_port *port =3D dev->port;
+> +	struct airoha_eth *eth =3D dev->eth;
+> +	u32 frag_size_tx, frag_size_rx;
+> +	u32 mask, val;
+> +
+> +	/* TX/RX frag is configured only for GDM4 */
+> +	if (port->id !=3D 4)
+
+	if (port->id !=3D AIROHA_GDM4_IDX)
+		...
+
+> +		return;
+> +
+> +	switch (speed) {
+> +	case SPEED_10000:
+> +	case SPEED_5000:
+> +		frag_size_tx =3D 8;
+> +		frag_size_rx =3D 8;
+> +		break;
+> +	case SPEED_2500:
+> +		frag_size_tx =3D 2;
+> +		frag_size_rx =3D 1;
+> +		break;
+> +	default:
+> +		frag_size_tx =3D 1;
+> +		frag_size_rx =3D 0;
+> +	}
+> +
+> +	/* Configure TX/RX frag based on speed */
+> +	if (dev->nbq =3D=3D 1) {
+> +		mask =3D GDMA4_SGMII1_TX_FRAG_SIZE_MASK;
+> +		val =3D FIELD_PREP(GDMA4_SGMII1_TX_FRAG_SIZE_MASK,
+> +				 frag_size_tx);
+> +	}  else {
+> +		mask =3D GDMA4_SGMII0_TX_FRAG_SIZE_MASK;
+> +		val =3D FIELD_PREP(GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
+> +				 frag_size_tx);
+> +	}
+> +	airoha_fe_rmw(eth, REG_GDMA4_TMBI_FRAG, mask, val);
+> +
+> +	if (dev->nbq =3D=3D 1) {
+> +		mask =3D GDMA4_SGMII1_RX_FRAG_SIZE_MASK;
+> +		val =3D FIELD_PREP(GDMA4_SGMII1_RX_FRAG_SIZE_MASK,
+> +				 frag_size_tx);
+> +	} else {
+> +		mask =3D GDMA4_SGMII0_RX_FRAG_SIZE_MASK;
+> +		val =3D FIELD_PREP(GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
+> +				 frag_size_tx);
+> +	}
+> +	airoha_fe_rmw(eth, REG_GDMA4_RMBI_FRAG, mask, val);
+> +}
+> +
+> +/* Nothing to do in MAC, everything is handled in PCS */
+> +static void airoha_mac_link_down(struct phylink_config *config, unsigned=
+ int mode,
+> +				 phy_interface_t interface)
+> +{
+> +}
+> +
+> +static const struct phylink_mac_ops airoha_phylink_ops =3D {
+> +	.mac_config =3D airoha_mac_config,
+> +	.mac_link_up =3D airoha_mac_link_up,
+> +	.mac_link_down =3D airoha_mac_link_down,
+> +};
+> +
+> +static int airoha_fill_available_pcs(struct phylink_config *config,
+> +				     struct phylink_pcs **available_pcs,
+> +				     unsigned int num_available_pcs)
+> +{
+> +	struct device *dev =3D config->dev;
+> +
+> +	return fwnode_phylink_pcs_parse(dev_fwnode(dev), available_pcs,
+> +					&num_available_pcs);
+> +}
+> +
+> +static int airoha_setup_phylink(struct net_device *netdev)
+> +{
+> +	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> +	struct device_node *np =3D netdev->dev.of_node;
+> +	struct airoha_gdm_port *port =3D dev->port;
+> +	struct phylink_config *config;
+> +	phy_interface_t phy_mode;
+> +	struct phylink *phylink;
+> +	int err;
+> +
+> +	err =3D of_get_phy_mode(np, &phy_mode);
+> +	if (err) {
+> +		dev_err(&netdev->dev, "incorrect phy-mode\n");
+> +		return err;
+> +	}
+> +
+> +	config =3D &dev->phylink_config;
+
+remove new-line here.
+
+> +
+> +	config->dev =3D &netdev->dev;
+> +	config->type =3D PHYLINK_NETDEV;
+> +	config->mac_capabilities =3D MAC_ASYM_PAUSE | MAC_SYM_PAUSE |  MAC_1000=
+0FD;
+> +	if (port->id > AIROHA_GDM1_IDX)
+
+maybe
+	if (port->id !=3D AIROHA_GDM1_IDX)
+		...
+
+> +		config->mac_capabilities |=3D MAC_10 | MAC_100 | MAC_1000 |
+> +					    MAC_2500FD | MAC_5000FD;
+> +
+> +	err =3D fwnode_phylink_pcs_parse(dev_fwnode(&netdev->dev), NULL,
+> +				       &config->num_available_pcs);
+> +	if (err)
+> +		return err;
+> +
+> +	config->fill_available_pcs =3D airoha_fill_available_pcs;
+> +
+> +	/*
+> +	 * GDM1 only supports internal for Embedded Switch
+> +	 * and doesn't require a PCS.
+> +	 */
+> +	if (port->id =3D=3D AIROHA_GDM1_IDX) {
+> +		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+> +			  config->supported_interfaces);
+> +	} else {
+> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_10GBASER,
+> +			  config->supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_USXGMII,
+> +			  config->supported_interfaces);
+> +
+> +		phy_interface_copy(config->pcs_interfaces,
+> +				   config->supported_interfaces);
+> +	}
+> +
+> +	phylink =3D phylink_create(config, of_fwnode_handle(np),
+> +				 phy_mode, &airoha_phylink_ops);
+> +	if (IS_ERR(phylink))
+> +		return PTR_ERR(phylink);
+> +
+> +	dev->phylink =3D phylink;
+> +
+> +	return 0;
+> +}
+> +
+>  static int airoha_alloc_gdm_device(struct airoha_eth *eth,
+>  				   struct airoha_gdm_port *port,
+>  				   int nbq, struct device_node *np)
+> @@ -3210,7 +3370,7 @@ static int airoha_alloc_gdm_device(struct airoha_et=
+h *eth,
+>  	dev->nbq =3D nbq;
+>  	port->devs[index] =3D dev;
+> =20
+> -	return 0;
+> +	return airoha_setup_phylink(netdev);
+>  }
+> =20
+>  static int airoha_alloc_gdm_port(struct airoha_eth *eth,
+> @@ -3435,8 +3595,10 @@ static int airoha_probe(struct platform_device *pd=
+ev)
+>  				continue;
+> =20
+>  			netdev =3D netdev_from_priv(dev);
+> -			if (netdev->reg_state =3D=3D NETREG_REGISTERED)
+> +			if (netdev->reg_state =3D=3D NETREG_REGISTERED) {
+> +				phylink_destroy(dev->phylink);
+>  				unregister_netdev(netdev);
+> +			}
+>  			of_node_put(netdev->dev.of_node);
+>  		}
+>  		airoha_metadata_dst_free(port);
+> @@ -3472,6 +3634,7 @@ static void airoha_remove(struct platform_device *p=
+dev)
+>  				continue;
+> =20
+>  			netdev =3D netdev_from_priv(dev);
+> +			phylink_destroy(dev->phylink);
+>  			unregister_netdev(netdev);
+>  			of_node_put(netdev->dev.of_node);
+>  		}
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index 8f42973f9cf5..1b25603dc64d 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -554,6 +554,9 @@ struct airoha_gdm_dev {
+> =20
+>  	u32 flags;
+>  	int nbq;
+> +
+> +	struct phylink *phylink;
+> +	struct phylink_config phylink_config;
+>  };
+> =20
+>  struct airoha_gdm_port {
+> diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethe=
+rnet/airoha/airoha_regs.h
+> index 436f3c8779c1..27f2583e143a 100644
+> --- a/drivers/net/ethernet/airoha/airoha_regs.h
+> +++ b/drivers/net/ethernet/airoha/airoha_regs.h
+> @@ -358,6 +358,18 @@
+>  #define IP_FRAGMENT_PORT_MASK		GENMASK(8, 5)
+>  #define IP_FRAGMENT_NBQ_MASK		GENMASK(4, 0)
+> =20
+> +#define REG_GDMA4_TMBI_FRAG		0x2028
+> +#define GDMA4_SGMII1_TX_WEIGHT_MASK	GENMASK(31, 26)
+> +#define GDMA4_SGMII1_TX_FRAG_SIZE_MASK	GENMASK(25, 16)
+> +#define GDMA4_SGMII0_TX_WEIGHT_MASK	GENMASK(15, 10)
+> +#define GDMA4_SGMII0_TX_FRAG_SIZE_MASK	GENMASK(9, 0)
+> +
+> +#define REG_GDMA4_RMBI_FRAG		0x202c
+> +#define GDMA4_SGMII1_RX_WEIGHT_MASK	GENMASK(31, 26)
+> +#define GDMA4_SGMII1_RX_FRAG_SIZE_MASK	GENMASK(25, 16)
+> +#define GDMA4_SGMII0_RX_WEIGHT_MASK	GENMASK(15, 10)
+> +#define GDMA4_SGMII0_RX_FRAG_SIZE_MASK	GENMASK(9, 0)
+> +
+>  #define REG_MC_VLAN_EN			0x2100
+>  #define MC_VLAN_EN_MASK			BIT(0)
+> =20
+> --=20
+> 2.53.0
+>=20
+
+--m10PdqwZCK4gPtEq
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaigxaAAKCRA6cBh0uS2t
+rHFPAP97cmj+8BfYEl8mUIGN3PZbVXiliyedKeir67osftOllgEA3Y4ia6CUElbJ
+pr3Ro2MngcwyDQnAkJsLtyiN4LGLRgA=
+=jfk1
+-----END PGP SIGNATURE-----
+
+--m10PdqwZCK4gPtEq--
 
