@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-297232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q5JwGEtcKGrfCgMAu9opvQ
-	(envelope-from <netdev+bounces-297232-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:32:43 +0200
+	id y7zJAXxcKGrqCgMAu9opvQ
+	(envelope-from <netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F22DC66357A
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:32:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D020663592
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 20:33:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VUw+Gcfm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297232-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297232-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=LsjYvhUu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297233-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CE4393015870
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:32:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04B9F3035B54
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 18:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C634C6F14;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7836F4C77D3;
 	Tue,  9 Jun 2026 18:32:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5313EB114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1E4363087
 	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 18:32:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781029948; cv=none; b=afI8ydW3ZM+2nrMZRXQPzqrtYwvMW7GnucAFRO2HlfHstKDufLKG0lguYejPA2HLKGUqEFGgUXlu6/1wU9qGjJNcnufMma0khU3ofadIP/E0WPXVcm/0MB3oTRvuZj1UOlXEpSii6Ibei4y6CqgTTXcUdK7ksn41P/G+Lsj+wys=
+	t=1781029948; cv=none; b=MM3m3GlE0ygA9d+LjU9ThZVwHT30X7PKgbIPBpLl8M73ITn9BcpHd0oBwbPquI+L2hbcgnnQl8ElZUFYJLN+/fRKqMEArj2TWA7Yl2j/JF5+NBEgLjF6r5OBfxpFsGcvJU0Nimc88gkBy8lMMAIjYDn/W1/AQqrdZReOpZJeVh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781029948; c=relaxed/simple;
-	bh=/qu2BSr+iBthGCMoYTyJdgMJ748+2ydtUQXTpunJU08=;
+	bh=U1EklQm+nU1nLZqPXGdeCT5+o51yPHfWzGvDPtxNQEQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YRTBABOxDPWoVhDxnM6zV150V++yyycjLQmie0iH3Yf0cOKS4bNk5O8hPeEWiXqgS2Dm2teFHVXkriOMqw6L0t+c6unWPq6R6gZphviuQktofRWvnFAheBx8dmayE/isTO/9RxgbcYZXWoojuWO/1ZhgYtf9GUugTq+J0nYeDig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VUw+Gcfm; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96F741F0089A;
-	Tue,  9 Jun 2026 18:32:26 +0000 (UTC)
+	 MIME-Version; b=ohChkbP7HA8pczm4EZbY/yrLLoCHHpYHSlyne7p+TxqCulhCm1OkoPZa5/dIuJxhO/+SK7ZHu6nA1E3eXccdkpZSELZCS6Zt7wXh0loGAYx2xGm4Zok+CHGH99IcDPHLNo4oeJneJGpL8BC0zCeTJHq+cE5HGEUqVTFIGR1aWCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsjYvhUu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192F01F00899;
+	Tue,  9 Jun 2026 18:32:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781029946;
-	bh=nUUvvKklIjZzg63JaFgSbx5oWv0Zv057Z+XikoE1ZxM=;
+	s=k20260515; t=1781029947;
+	bh=sUEK4Aq097camM+Oo827VJQjdV0/OyLi5lR6dPIRNNc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VUw+GcfmHIdtCkO0db7pCqwGdEthJqZ0psogxuQcoei0ZMIerQ1r5xPjmQVw2EhyW
-	 ITTqYOeFONOXtjSI7wamSg9oVDdznKDknq2MjvMmZ7W+NLAYeR8szd5308FDUlWT0/
-	 WNYeh0lVzO4FDWsaYbbgEf/9zdAyy/1PMSkWcx/gYi6MRzq4zQ/acIII9AsEIuaJUn
-	 NOHqpt8PEAvZeaBj6StwhjMvIw1R9gxADVlmrimSqDT12fSvfODDVgEI5W0WhyyHZT
-	 R8K15B7pNIGEG2AF2pT/69Qd4Dlyzh+6TNm01QNBM+VFg170qhmeWtO3HtXvRVMfrO
-	 EsLxh71s8J6Jg==
+	b=LsjYvhUunoUB9xB02LjhLOHqtvP2tM4dqBfVkWR4dnxp3xb1GuOBWqHnz0npqPpbe
+	 OLx49vP/ntHlE+a6Dvm5PaHAGUjkjMED88l4S7k6uXztfo29k6ud0Ig6T8F33BHY6f
+	 Nkb/5azkeM8DfZCA//B1i4KZ3M38L+Swqs9YeHye/vhn5m7WivuumMwhWbKM1rxAVh
+	 Yhy1OyRQA0RRsIZhSH/fdKJ23bgdNpDNZ7K2NJeAnY9CfAhN+nJq/S1bEvbPhCfYXj
+	 oHMPJ4BCan86quVbj3LPeVBKgScszau7m1C/ntse0sx8J8GJ89hLYH960Tf369FWXm
+	 fgYfrcHAleybw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/4] net: shaper: drop unnecessary kfree_rcu in pre_insert
-Date: Tue,  9 Jun 2026 11:32:22 -0700
-Message-ID: <20260609183224.1108521-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/4] net: shaper: add a comment why we don't need kfree_rcu() in flush
+Date: Tue,  9 Jun 2026 11:32:23 -0700
+Message-ID: <20260609183224.1108521-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260609183224.1108521-1-kuba@kernel.org>
 References: <20260609183224.1108521-1-kuba@kernel.org>
@@ -75,12 +75,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297232-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297233-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -97,35 +97,37 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F22DC66357A
+X-Rspamd-Queue-Id: 3D020663592
 
-If we fail to insert a node into the XArray in net_shaper_pre_insert()
-we can free it directly - it was never visible to the RCU readers.
+We keep getting misguided patches to fix the flush.
+Add a comment.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/shaper/shaper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/shaper/shaper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index a5b42b697a93..33958462e5e9 100644
+index 33958462e5e9..5a3b44c5d10f 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -406,7 +406,7 @@ static int net_shaper_pre_insert(struct net_shaper_binding *binding,
- 	prev = xa_store(&hierarchy->shapers, index, cur, GFP_KERNEL);
- 	if (xa_err(prev)) {
- 		NL_SET_ERR_MSG(extack, "Can't insert shaper into device store");
--		kfree_rcu(cur, rcu);
-+		kfree(cur);
- 		ret = xa_err(prev);
- 		goto free_id;
+@@ -1470,6 +1470,10 @@ static void net_shaper_flush(struct net_shaper_binding *binding)
+ 
+ 	xa_for_each(&hierarchy->shapers, index, cur) {
+ 		xa_erase(&hierarchy->shapers, index);
++		/* No need to use kfree_rcu(), netdev is already unpublished,
++		 * and synchronize_rcu() has been run as part of
++		 * unregister_netdevice().
++		 */
+ 		kfree(cur);
  	}
+ 
 -- 
 2.54.0
 
