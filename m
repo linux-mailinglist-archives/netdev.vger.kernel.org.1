@@ -1,150 +1,153 @@
-Return-Path: <netdev+bounces-296957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-296959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wKF6O3LJJ2rS2AIAu9opvQ
-	(envelope-from <netdev+bounces-296957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:06:11 +0200
+	id A3xqFKPLJ2pv2QIAu9opvQ
+	(envelope-from <netdev+bounces-296959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:15:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA9965D8D9
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:06:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C724A65DA2F
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 10:15:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=RXCOQ87z;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=S+mb0wYb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296957-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-296957-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linutronix.de;
+	dkim=pass header.d=google.com header.s=20251104 header.b=rkDZ6UpX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-296959-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-296959-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 43336304EFBE
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:04:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03ED33032658
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 08:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AA33EA957;
-	Tue,  9 Jun 2026 08:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D694C3E834C;
+	Tue,  9 Jun 2026 08:08:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70443E5EE1;
-	Tue,  9 Jun 2026 08:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9911E3E3152
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 08:08:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780992272; cv=none; b=BHI+fbMuZlRMYIcoZ0C8cFLdWZMT96kRGtFqZ00GotSL65Das0h1NvBwzAeGJCBMT/M/rgfGfQQI7/5+Leaguu+oAxV0HfBJoF9J+eS/tFtpBOSvyBxecR5R3ycs3WJxdnBh4yPtJXFjSplZ7v6Msy74PcgNFPraLV0qeuZ2eLA=
+	t=1780992523; cv=none; b=pGRLkBBLNmvaxoezLwgX958tukMOPm0Iw/t2i9YPrtkge31+WqzKD3oncvVR2odl+G5mcMoq9gkYM0cooz/6psh2AH4+wNX/jghxgkCxFJ0gUOnlYKRmT6BC8HSAVEzACu70JCoXlOGSwS/w6x00LvsN3RDGfBZWfUm/HERe4Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780992272; c=relaxed/simple;
-	bh=VvMr4YoN9WSk3r+LXJC/KpAC8C8gcu6zJF59cg3PedQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jZ7zc9RlaMXZNQSXkB9HCueYymEbtuxzC5zEUQ3m0gAPt07+ccU8Q1HMU0aG9ah9+BF0T0569k0Q2XIsxaEbFEkMzeWeFZdecVD3/bTZI+rlIloBcZ5fPcsmM0+2rJ0Cs0LkW9ezL8fXnrGMUfVKDcPgkwM/N5JYjyvmn9cOWio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RXCOQ87z; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=S+mb0wYb; arc=none smtp.client-ip=193.142.43.55
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1780992262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VvMr4YoN9WSk3r+LXJC/KpAC8C8gcu6zJF59cg3PedQ=;
-	b=RXCOQ87z3kc14Bn22ngjOBOXRIDtZyAau336L+NN1RSEDTsU9q9tuuELu6pEQ7t5FskYHp
-	OVjUsb4w6Fr3AulIzjZwe5iFfMj6bGxeSQfUbfK4ParF9bBp11KCraM/W40gSl1RrV/QGz
-	PrNrKy/4sjZ1JGqFQwVcM7PKm+lefMh4/db2W5/rLbSlRoVv0ejpF51GjOfhjJ505b8dTG
-	JrO9g7WFR0p+aX4UdIGkOjgsfUuwn1HKpoGXwb03MG7U9VT2vyB6HxjMbKtfGUvY2WRbis
-	JiRFstIL52wbRU0t+epwY+KBHXa+G6JGT5LrlW6t0RVRb365ITMa/FE3HRQfTg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1780992262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VvMr4YoN9WSk3r+LXJC/KpAC8C8gcu6zJF59cg3PedQ=;
-	b=S+mb0wYblyXotB5WCLqaA5JeE1Jxp5t6R0+ysG5NSrd9/JxrftKBsWDItnhc38nA9js2bf
-	WAxU84FLztPj/pDg==
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: dsa: hellcreek: replace kcalloc with struct_size
-In-Reply-To: <20260608045640.5172-1-rosenp@gmail.com>
-References: <20260608045640.5172-1-rosenp@gmail.com>
-Date: Tue, 09 Jun 2026 10:04:21 +0200
-Message-ID: <87v7bsnnqy.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1780992523; c=relaxed/simple;
+	bh=pxJancrlprJPSbrDHuqyEvslmg5VVxVNpuuTV/xkQ2I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=S/pmDv2HQlOF2d8AId16jgxSolzglthvn3iusWNxakEHZQs3vVHbEMjKT97nGsGMTs4vJhBeDYSfFU9jZp3Tymnm/IbpWs6WApAApmBEmrj7OP+Jz+OUZUhfP4pyhPOjwaWGhShOCC5JbqZGq2eLPgi0dM3iayG0ec+/66SuDFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rkDZ6UpX; arc=none smtp.client-ip=209.85.219.74
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8ccf3d72081so74574336d6.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 01:08:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1780992521; x=1781597321; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9nWYC3dSWvR4KZYalL4EM8yGWAZq3uLiB7bAZi4rY9k=;
+        b=rkDZ6UpXrqlp/gqSxzwajLD4ZwqQBvohg1Wm0b+gnokpFFHR8JGclYx5QsjQ8NmuSU
+         FZPpd3fvBzXgvB51N5FiNH+kULP5XOBHWnVkD941tJhY6ACXu2CbEhgMYLUt7WG44gKT
+         G1aFyZ00082xeFfSOe1kT6Y2e0kSk0p8SmetJLbxYCwTe7aqPomsChw+UVxjdSYjPzbk
+         yiokw4b5A4r4NeNaJRs6HUeJab1uKkjnMQatfznJeD4Np064p0G8U71fNxxATMYFV1mJ
+         KlIgh8FKB2lANTxt5MoxTxuNreYBvjQCAfKd9+TqwUtYM4acLdDdCd1Vue3PVL5aV93x
+         8hpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780992521; x=1781597321;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9nWYC3dSWvR4KZYalL4EM8yGWAZq3uLiB7bAZi4rY9k=;
+        b=dximIf7KYalz/nToJIms2plCTcbbl7VVYpI3SEgcMfMzmnYQZHKLLEkFLRRzCdbSIK
+         s0oEKS5wcs7bJicT4L029HLP65qjLZEvUE4IuAkRZHJaVU8kG7NNmUi5Dvc4+1e8duuk
+         4CmhS1NARt8M6mnvrcH/+5uGdpkr3+yc2j3/aIPDWIoISXdEaO+RAWDUnIVLEx4q0YqS
+         kOn+hddyPVJ6SKcaUM6X8wz6Qt0ET3JBpLKAATVinROxlI3jxGhMOptLCmC9QfxF7Oim
+         JHoSKYtOXtZ6FqhTkWWcMGEolR8pgQAjd8kgh8KEf1ggjqOgOQbOXOzkghVNC79Wg7kW
+         aiHg==
+X-Forwarded-Encrypted: i=1; AFNElJ/IshsfkpnF6lzQEmplCNJ56ryi4f7vtydPlCUNX738OA7DzXXWQ29Lzmdf0XtpJ6vFWxl/OGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlqOSI3PF+vYMTQGtEL5nBdkvEwjb8gtOCWYo6/a6NrmoJsIzv
+	kCTdABGWdLnebzFqsNXE4oAvoFMi3bI0pOROrCzA8MESgY+L1Ek5KqTEDzSBiezZzTDFscbrVho
+	ThRWpN0y2i2yCRQ==
+X-Received: from qtqq23-n1.prod.google.com ([2002:a05:622a:8417:10b0:517:bf3:3417])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:650:b0:50b:4a84:aa94 with SMTP id d75a77b69052e-517959d5610mr278674121cf.7.1780992521260;
+ Tue, 09 Jun 2026 01:08:41 -0700 (PDT)
+Date: Tue,  9 Jun 2026 08:08:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1064.gd145956f57-goog
+Message-ID: <20260609080839.2506801-1-edumazet@google.com>
+Subject: [PATCH net-next 0/5] net: bridge: take care of p->flags accesses
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-296957-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rosenp@gmail.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,blackwall.org,vger.kernel.org,gmail.com,google.com];
+	TAGGED_FROM(0.00)[bounces-296959-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4EA9965D8D9
+X-Rspamd-Queue-Id: C724A65DA2F
 
---=-=-=
-Content-Type: text/plain
+(struct net_bridge_port)->flags can be read/written locklessly,
+and thus can fire KCSAN warnings, or real bugs.
 
-On Sun Jun 07 2026, Rosen Penev wrote:
-> One fewer allocation for the priv struct.
->
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Prefer atomic operations (test_bit(), clear_bit(), set_bit())
+and use READ_ONCE() for the remaining uses.
 
-Acked-by: Kurt Kanzenbach <kurt@linutronix.de>
+Eric Dumazet (5):
+  bridge: use atomic ops to read/change p->flags in sysfs
+  bridge: use atomic ops to read/change p->flags in br_netlink.c
+  net: bridge: use atomic ops to read/change p->flags (I)
+  net: bridge: use atomic ops to read/change p->flags (II)
+  net: bridge: use atomic ops to read/change p->flags (III)
 
-It looks correct, but i'm currently out of office. I'll test it next
-week on hardware.
+ net/bridge/br_arp_nd_proxy.c | 22 +++-----
+ net/bridge/br_fdb.c          |  2 +-
+ net/bridge/br_forward.c      | 15 +++---
+ net/bridge/br_if.c           |  2 +-
+ net/bridge/br_input.c        | 12 ++---
+ net/bridge/br_mrp.c          | 20 ++++----
+ net/bridge/br_mrp_netlink.c  |  8 +--
+ net/bridge/br_multicast.c    |  5 +-
+ net/bridge/br_netlink.c      | 99 +++++++++++++++++++-----------------
+ net/bridge/br_stp.c          |  4 +-
+ net/bridge/br_stp_bpdu.c     |  2 +-
+ net/bridge/br_switchdev.c    |  8 +--
+ net/bridge/br_sysfs_if.c     | 61 ++++++++++++----------
+ net/bridge/br_vlan_options.c |  2 +-
+ 14 files changed, 134 insertions(+), 128 deletions(-)
 
-Thanks,
-Kurt
+-- 
+2.54.0.1064.gd145956f57-goog
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmonyQUTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzggnXD/oCZui4Xz4iXkF8tS8rmAi1NCjQJeBp
-NO1t8uZg91kZYFF4AQXdgnu6w7X/7IsCL+fTfr/AAq9HWgN+IEERoc0UMncdXNaF
-Xq9ouuwNuvLAkGtfy02IiVNWP4PEz73D5StpyT5QkOTnxOGcN2M4kMCzsrac5xJI
-xLw8/IqPpnOCEHeIH1zjQl4vFXyRzkAVq/F805PlKxhWsCxsPJx20Q+AomDYb+7R
-o0kRWTkEkDVV1vcLiM2CqbdPHEr5COlNOnDfRKSaxVIy/bhAzpl/0ztKOqc0c0pO
-N27uzBt22kdSuDBMsbJbTVp3+dbJD5mgply0OhxGUTLLYoOceNHZBx0CvJxDVVTJ
-WexAT+EHRfUOmJU9pITvjCtYFUIO2SF8dAI077bbKO1lSCM7xCt8J2OpfxRJTO2/
-gT/mo81Ib9B6Tb4YtZU9ZqAhcX/bADtx0w6KppiSuS30QIt5n2ipI3bN99C+Z3dI
-u8hC/IMvSaEmKSuU1lb6jFIlae5sI/taUUUQRCk+SC1BDLXy/yKAtbeu6OpWTrej
-TNvnkelAheoUmRvld0fSIPVN81n10moYejrp1a5ySETveTY64+SqlrX3nJJJL+67
-7SRjidRpGx2gNIwQJFrHIr6OcFwj1+bXZ69IminCXBqfbB/gEyVEHqW9Gxyo2MSN
-6mFVOS59NFJS+w==
-=dPQg
------END PGP SIGNATURE-----
---=-=-=--
 
