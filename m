@@ -1,162 +1,219 @@
-Return-Path: <netdev+bounces-297352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297353-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SK/5DCGjKGoHHAMAu9opvQ
-	(envelope-from <netdev+bounces-297352-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:34:57 +0200
+	id 6Z8oLiqkKGokHAMAu9opvQ
+	(envelope-from <netdev+bounces-297353-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:39:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCD4664CF2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:34:56 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0810664D26
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:39:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=infradead.org header.s=bombadil.20210309 header.b=FysMfxkl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297352-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297352-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=infradead.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b=GcJ+PaQl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297353-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297353-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=meta.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A59143074EC9
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 23:34:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D74D6301B02B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 23:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA763EFD28;
-	Tue,  9 Jun 2026 23:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790D43EDADA;
+	Tue,  9 Jun 2026 23:39:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218B840D575;
-	Tue,  9 Jun 2026 23:34:51 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781048093; cv=none; b=hlJRHzkGuRXqOzto0wyVey+qxnskgFR2vs4H3ES6txbyVMtnBaDG0ji3mL0ZhJVR4UaBNAEbvULMXNy/rK+wRTN0on/Gm0oqIlnqZpUep4rj0+Mtj1kBD28vn5p9fn7WlX4CgY59qaBmpwdHf5nTxjMBZT0XwbY8d/Z3PWgYR0w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781048093; c=relaxed/simple;
-	bh=k6eBCDmxmDQAncavUpQqOPSqSk1YtXqB+bRLrSnD700=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LchTeXURyKMCUgQyP7KSdpYXVAnQhLCaHG6HFh3sZYJEUcukkNFe2noDvswvxGIblK8rIFC22uXQKnt01vhUZ8Wwrfe/UZCBovm+CWavlY1cgVyJKKC07ujNnJdnke86bhYf/VbbJVMpLJQ9M4lnpFEcVScPQiimvMEznXnvHd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FysMfxkl; arc=none smtp.client-ip=198.137.202.133
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=aGbkLzHaLk+xN8bG59z9ybcOFnLUGrRlxyY5MOGLRjc=; b=FysMfxklQ5Fiwtbv5PBTr4zsOP
-	YUsa9rd7d99eLDD3jtFZGrGFEmHABBKgO278R/W3KA/FZPDhZgf9wJqWYVM0wsU0nnTYJChAN41I4
-	vuQH+S62SBEJ+RLkEQnSe+szaYaEOxI+Vb165DjeZpNYEck2gQghaz4dIrS8sW1nxCMCWwROGxkRu
-	eknsOY++R92d/b53OjoTRGhm1lZVssoNziWjYlSHpF6kz2dRmJxXusW1FDmxte+orDqoWAxEwPxDh
-	/8nhSaIgFdXkGsS7vFs07obEDuwFSCqWUuzyUG+tHJEciKmac798vflTY76sXymw8CYzzS9t309Ga
-	EPU1MW3w==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wX5y6-00000006Vqg-0CsW;
-	Tue, 09 Jun 2026 23:34:50 +0000
-Message-ID: <6efbb21f-b072-4538-85cf-f7db0c30f677@infradead.org>
-Date: Tue, 9 Jun 2026 16:34:49 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFE23EDAC1
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 23:39:13 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781048355; cv=fail; b=aEdAJ6Gk86ljEcLwvwz8x25kbGpBjOYkMkFFCbziqlzJPVm+GswRm8Tw4rH0T5zpSMwuOP4XuUNc78+zFEzw6KndnTm6uhKgU3Dr+DtX2b+hhTgisDQwa5oDyfXCbbnLFq/5N6f7QjUBPZakFB9iy7IAgczLTrdHdVx+MEQjyfY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781048355; c=relaxed/simple;
+	bh=GJd2gJZmlAgFMCFkHrHwJ2yIaE6MPUQzzzENfnpUb+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lBm+uW5dyA9qXPMmkGspoADXcj7YMeUdN90Mr/LOhSQAFeyVrQOESM6Zcl4dCwt/FJpjnH8SJPyKvDkARBOTbzOZG7btn0hj74/BdL3amZt4zi23xLcijL7xGj4Cw7oj4mknpdv4asywEDrdWwZgDmcMBfcm+KTIAgN7deZNRNs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=GcJ+PaQl; arc=fail smtp.client-ip=67.231.153.30
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 659HkYWV3131380
+	for <netdev@vger.kernel.org>; Tue, 9 Jun 2026 16:39:13 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=GJd2gJZmlAgFMCFkHrHwJ2yIaE6MPUQzzzENfnpUb+A=; b=GcJ+PaQlVJQW
+	/QiaOOTC0nYPA6Pp1uWg5Nw0lxfOPK46wy3QRjqt6HHI/s8hYflLqOpkQeAGxxLh
+	hoyKhwGK2JX4YooWC50qu5EDWSMax2nyL/oD/rrE9huRAKUD3dcFOCQPD6EbqIBe
+	/w0OyjcqD5OfnfePJGKHwyaQUFmf3+Tzo3fYXQ5XrBU7OcozGO9AnrRjAwvSdxcY
+	Crl7znQ4/d1k0Z7Rho184bTWuJJxHxuMZzLmmMtWby4mzLYkfL9hkRHA6cnRmNak
+	77cxz9A7UldkmH6wLB52VlDZREdWuq79DRuezb/llSLMmzA0JKqEm6HamQd79ptg
+	ldQYgc2yiw==
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4epqhcj9nj-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 16:39:12 -0700 (PDT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7e6f01486a0so11913588a34.2
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 16:39:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781048352; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Av5rIBWvfiewQ8jInd1cXhn0j0C5i3KBSYlKVEl6sOmaCU7RiqrofGxXifV5ZD7+zo
+         7RN6LvV6jkp74hkSt5aNyMPAMkwuIIOR6qXbVBRUKzZHCDr2R+z2/kNTg6aAci6+eLUI
+         dWj9gPrzXstlWPcar2VxhogS+BvV3fo44AwGc5YTPhM8Ly//V/J34VMBCSTcbiFjXdRz
+         mWtSXeoeA90S6Bn9EsFtm2Z/uQ8MoriOKtD/3TbSXDEKlLMZ1/rW7Z/TaKKUFEnyfIqg
+         Hv4z4G70SG07px2mf7IzhWwvjbPgPFP+bh8irQnLz+IUQoDJKAIWw0PwQu4FrLeyslzF
+         avlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=VHRS+sWMPwoxZ0n+tLXpfsQUcezlTBJw4Sj0yHIKfGE=;
+        fh=xA/8p7RKjnBb6Vfft7uwmKTWRHOEHWFFKCQUi9ZP+TE=;
+        b=jEUOyjnh5TKImq99XX1KeIgpODaPwNUnSqkJItV7ug1xnEiTKMU/FodBxEWfZJZfUx
+         4oGV7I8zV5n2yfrx/cbI0v2b3/xhawvJxlEpmohftejyqzks1r4XAIiGWvGW9okxQrFa
+         C7ZuzWzrpwr0cAivOZx5HN4Rvl6UqBSgbwrLg1ft2uoA4Ad9xQVqA7OJReaan+IAZI2i
+         1NEeNxGznxx2ElyDyskhGImugJqzVPEgxdZwD4vlv3nEAt3B0vVVxPFlbyGPT9IfzU9p
+         vTydR5CAqU7wT/GADT/0p2Na4LjBxgrC6TGY6NFmiFiOTpTKSJky53a6VQCuk+gKoIH1
+         PQXw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781048352; x=1781653152;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VHRS+sWMPwoxZ0n+tLXpfsQUcezlTBJw4Sj0yHIKfGE=;
+        b=H54QrSpGzVo8qCYcLnr+yU10y7tpOl8/o2QQahk8lWYfBWNaR/h4s/SLQDXk+rvlcR
+         Rott6eSsmGIC0o0zbwCDD5SpHyAPw78Rah/cJrqKrMXO/r243jh8DtobBE/i+iiDygkj
+         l5LKDZ07qQX0GjjDCxk9QiYUYXLXDoXRt7hJn2cSbvCS+vwmsyNJmoRv81rVClsCrVUb
+         Pbf7uW7VAPy4Wr+1c8YuFhCAdhmq8MRf8N+Pa4W/z9KNRabwe/3KMBRS4Z6smTX5gRQO
+         etAg9teGU0PwGPiVKGGQ1QyyP4ZQ7sXC3RU8OTTeDHvlQnRsHeyD59VgaBjYxQ38OZAO
+         f52g==
+X-Forwarded-Encrypted: i=1; AFNElJ+wi5TVLHwhyil3U+Z7qXQ+tWRD1G1wWH7YPgS6LZvW6dNcx3eL9ZdfM58/iu9TfxJPHpPRYnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1+goj7Z6lQC9paxbWGzLS7BkLIzB0cMkRuOT9K/8U0g6kLXTV
+	WwJu9pyu/k9Aa6Atm/EyO4Ix+KwcOFdT6txGhbYPLLIkypvVq4w/12x2X7zGg0nXO+sA6ZQKlRS
+	2uBAXir3sxwvnphhA30ss510i5CUO/LjyuEbehITv8LKvZoOA2gg3aKaqqMep3+/qgngjJsNMU6
+	Zjor0g1cab26uYJQphQtN8vEmwG3UbnOs=
+X-Gm-Gg: Acq92OGrm31YBm/ebcPXONnCYnp2zFKQBdmTz+CCpcyhpkve+U3OE9Li1Bh0RTf7yX2
+	n7IdjTfCp8XeFcF9UCUbs3/HNkokCb1DFbO5ldBd1m/tSM+ZYGMd/u5p7/jJl3Z/c50aRLyOTOY
+	JSD9RDdqD9skGvAb3ha6WTquQPMyD7AjXT8yW6n2UkB+L+FpjpRUf+sbtw61iGGAsoHDXiNbYZJ
+	QPSDgY0EvfKzXHOi22LhWfMHVjFng==
+X-Received: by 2002:a05:6830:6108:b0:7e5:68d0:462d with SMTP id 46e09a7af769-7e751abe2fdmr3883347a34.19.1781048352093;
+        Tue, 09 Jun 2026 16:39:12 -0700 (PDT)
+X-Received: by 2002:a05:6830:6108:b0:7e5:68d0:462d with SMTP id
+ 46e09a7af769-7e751abe2fdmr3883310a34.19.1781048351521; Tue, 09 Jun 2026
+ 16:39:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] docs: networking: add guidance on what to push
- via extack
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, linux-doc@vger.kernel.org
-References: <20260609190919.1139517-1-kuba@kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260609190919.1139517-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260608185646.4085127-3-zhipingz@meta.com> <20260609195612.GA85322@bhelgaas>
+In-Reply-To: <20260609195612.GA85322@bhelgaas>
+From: Zhiping Zhang <zhipingz@meta.com>
+Date: Tue, 9 Jun 2026 16:38:59 -0700
+X-Gm-Features: AVVi8CfvpQJ6ajVUxnazmY-1cK1d-x3MxGzuw2_lfYAMYCTtvbg2jMZaGu0O5NM
+Message-ID: <CAH3zFs0u7qJ9JsfweOw_r0FqNUpixLvawZKp9pUTcWWQN6nZjw@mail.gmail.com>
+Subject: Re: [PATCH v6 2/5] PCI/TPH: expose enabled requester type and
+ capability helpers
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Christian Konig <christian.koenig@amd.com>, kvm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+        netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Keith Busch <kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: HeJjeyKeZZvRjWm0bZSeh6ut--ItDqfd
+X-Authority-Analysis: v=2.4 cv=L4ctheT8 c=1 sm=1 tr=0 ts=6a28a420 cx=c_pps
+ a=z9lCQkyTxNhZyzAvolXo/A==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22 a=xtH7KyWI9dI7BmFOsl-x:22
+ a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=1XWaLZrsAAAA:8 a=earV_t7fcAfV2sAEFq0A:9
+ a=QEXdDO2ut3YA:10 a=EyFUmsFV_t8cxB2kMr4A:22 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDIyNCBTYWx0ZWRfX1rWPJ8wRLAyI
+ aVQqRoZiTwD27qQbkbzcE88qVFinAGjKs2klDkDjLdU0YwziAqtdNj8Aldq7ognB4QFNP5kY/Cs
+ j1skPEhqoIWwpwdqkMBQdvlQkat/bqFj+HalVfyscG8qTlEU/450NF9/RRE0tNCOMtw5d9ZyZt2
+ hOUcXEHefGCW3bAtsUX8uQhzYg7yRUFQ0M9l9enoclOJM+YoZbcXlBOo6uyq7t+90Da/IWbxaPP
+ pV0ZEChCpKx6ZiEgY2Rd8pd1purFCkBAP+DztpSQ1jQOMHVWoFE83S4ILYbUlVEUzRjKp8ZJC9S
+ b+zBfTWowKAM8vqP/1reAXnpUFRjtnmEd2/0D8ubmNHbPNPx9b3xV7bHX/auU9sUeeG20fnOnl2
+ uXQA8PM634NxlVzu70iOSMLsGM4Gxe1eAl70sKyeisVdJQNS+YlhkGR3QE2nWl4p15DvntF3fbT
+ rc4W/71c2ylydEbGfUg==
+X-Proofpoint-ORIG-GUID: HeJjeyKeZZvRjWm0bZSeh6ut--ItDqfd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-09_04,2026-06-09_02,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[meta.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-297353-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297352-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:helgaas@kernel.org,m:alex@shazbot.org,m:jgg@ziepe.ca,m:leon@kernel.org,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:kvm@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-pci@vger.kernel.org,m:netdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:kbusch@kernel.org,m:yochai@nvidia.com,m:yishaih@nvidia.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[zhipingz@meta.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[meta.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,infradead.org:dkim,infradead.org:mid,infradead.org:from_mime,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9CCD4664CF2
+X-Rspamd-Queue-Id: C0810664D26
 
+On Tue, Jun 9, 2026 at 12:56=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org> =
+wrote:
+>
+> >
+> On Mon, Jun 08, 2026 at 11:56:39AM -0700, Zhiping Zhang wrote:
+> > Add pcie_tph_enabled_req_type() so drivers can query the enabled TPH
+> > requester mode without reaching into pci_dev internals, and
+> > pcie_tph_supported() so they can test whether the device exposes the
+> > PCIe TPH Extended Capability without doing the same.
+>
+> s/exposes/advertises/
+>
 
+ack, will fix in v7.
 
-On 6/9/26 12:09 PM, Jakub Kicinski wrote:
-> Every now and then someone tries to duplicated extack
+> > This keeps pci_dev::tph_req_type and pci_dev::tph_cap inside the
+> > PCI/TPH code and provides !CONFIG_PCIE_TPH stubs for callers.
+>
+> Update subject line to match capitalization of history
+> (use "git log --oneline drivers/pci/tph.c")
+>
+> s/expose/Add/ in subject.
+>
+> ("Expose" suggests that the interfaces already exist and we're just
+> exporting them, but these interfaces didn't exist at all before.)
+>
 
-                                      duplicate
+ack, thanks for pointing this out!
 
-> messages to dmesg. Document our guidance against this.
-> Also indicate that system level faults should continue
-> to go to system logs. The high level thinking is to try
-> to distinguish between what's important to the user vs
-> system admin.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: corbet@lwn.net
-> CC: skhan@linuxfoundation.org
-> CC: linux-doc@vger.kernel.org
-> ---
->  Documentation/networking/driver.rst | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/Documentation/networking/driver.rst b/Documentation/networking/driver.rst
-> index 195a916dc0de..abd366dd5e43 100644
-> --- a/Documentation/networking/driver.rst
-> +++ b/Documentation/networking/driver.rst
-> @@ -128,3 +128,16 @@ to be freed up.
->  If you return NETDEV_TX_BUSY from the ndo_start_xmit method, you
->  must not keep any reference to that SKB and you must not attempt
->  to free it up.
-> +
-> +Error message reporting
-> +=======================
-> +
-> +Number of driver configuration interfaces pass a Netlink extended ACK
+> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+>
+> With the above,
+>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+>
 
-   A number of ...
-(agreeing with Joe)
-
-> +(``extack``) object to the driver (either directly as an argument or
-> +as a member of a parameter struct). The drivers should try to report
-> +most errors via the ``extack`` object. System level exceptions,
-> +indicating that system or device is misbehaving or is in bad state
-
-                                                            bad state,
-
-> +should continue to be reported to system logs.
-> +
-> +Messages should be passed **either** via ``extack`` **or** to system logs.
-> +Drivers should not try to report the same information to both.
-
--- 
-~Randy
-
+Thanks,
+Zhiping
 
