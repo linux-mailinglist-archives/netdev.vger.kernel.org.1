@@ -1,177 +1,218 @@
-Return-Path: <netdev+bounces-297016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P3AvNa70J2og6QIAu9opvQ
-	(envelope-from <netdev+bounces-297016-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:38 +0200
+	id 60DEGbz0J2oj6QIAu9opvQ
+	(envelope-from <netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E03765F553
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31F565F563
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 13:10:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=aU55KofC;
-	dkim=pass header.d=redhat.com header.s=google header.b=Y37BYBNG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297016-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297016-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RGDhzDnd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297017-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7EDE31C81D5
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 10:59:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C296308494C
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 11:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A00B3FC5AC;
-	Tue,  9 Jun 2026 10:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EDF3FC5AC;
+	Tue,  9 Jun 2026 11:05:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102603FA5FD
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 10:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48043FBB73
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:05:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781002691; cv=none; b=Tu0e0irx5PqfxnM8Ls91krmeV8LKbuHvvHoskhvon+D7/WpWTbPcqcDOeIbUsLmvSWS7Dy1hnTDjiOMuFPROed+amy26WDXC6Od9keCA5Aky/eLMGRXMqyf6q90piEZgAuSdOTY9cHmArLOa3cTbi2UTgpQ6LZLqXJT9Ct9rTSs=
+	t=1781003114; cv=none; b=oyGyGpEGn1jgN99yHGzUENaLXK9ZUXvAz11Nb0NQDlgHHOQdlKB2j2fhjnBMgpGaI2ILf81PDPv+yI1JIilaHw/btIVsL3Jz7Fc9TiIWtHdunV0uzMHbcfp4XdpC7uEoK+G2689qEaRTr5KOg6bU7zlycoULpYo4HZkABqwXpGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781002691; c=relaxed/simple;
-	bh=JveCsx9Hslr13u/DSY0be/52qVCMiadnjjogqq+Li1I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l417U4FRpxpJtUTBdyM9yqKGNazp0fh0+ABpbBaCuQ1DpAWOcpM2C0Ai29kJrHr3CivC8AegkUYCdJzVM6g3XYBNT76vQ8SPiyF9FkTzHWAK8Yu8+lGWjJ5dBcLx37cg3HcTLOIEMVxUHXZMda69oQDEpqqR65FUH6MUYY9TAKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aU55KofC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y37BYBNG; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781002689;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DJCMh9QJ8mzt02qiZIC/NXMj7sB/BVWq0X5RNKCrb0M=;
-	b=aU55KofCFQf/HnRjUXzNLGWK28r6ynbCqs0nMeVq4OJddrT/EdcI0BpUCD4kXE243AcN2i
-	IbhPtoTn/h/Wre2vX6IsfpzwBpqsj9FcXkGuN3fCVvcV4cTrL2U2SN6UxX1w9W7AlJO3Qn
-	OttGSL+SIcSJ4C9BvSVy9zZ2m3BkL9E=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-91-1LuexCAaPzK8bOYa6CgEJw-1; Tue, 09 Jun 2026 06:58:07 -0400
-X-MC-Unique: 1LuexCAaPzK8bOYa6CgEJw-1
-X-Mimecast-MFC-AGG-ID: 1LuexCAaPzK8bOYa6CgEJw_1781002687
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-490b79e6b94so39006855e9.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 03:58:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781002686; x=1781607486; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DJCMh9QJ8mzt02qiZIC/NXMj7sB/BVWq0X5RNKCrb0M=;
-        b=Y37BYBNGPwbSiyc7JXQ8gdYU9lFaLeC3essTMnVF4+pXhNtpqcJwiv1HDXOLR+s8q2
-         SvQfapt3g17/NVkgJAVTIXgTmThEfNyBE1H6/af9z6Xteo5+ozlnmOKPCs1p3CIUW/Uk
-         axcQl4sWVdbDNlHc0tCoC/A/G4TypF228Wu43zJeDfYsuRQPbPoWp4Z0CTOX6K+T6gkE
-         YRp4wNBGxuJ6AmDUA8C1VLKpI+yhAEWeam0Z/6C87YmOmLldW+y8wG+zSk0bw6d2gsrF
-         BDlPT0HxUAUc7pycKk6DdYsP3lARw3zKzA4wDloM6Dtq7PW591d+vcCrMO7Yz5D6aY/7
-         7sIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781002686; x=1781607486;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DJCMh9QJ8mzt02qiZIC/NXMj7sB/BVWq0X5RNKCrb0M=;
-        b=G6ZNlyxGg4DBiNbDoBsxFQVHs4AxJA4NyPIYfezseSozphA5XFzshsQK0pOkCc2kAM
-         z1NfKHmSxxgStvmdLjt0p5sBvufZvOJH7j+7b7o2ETGnc20fZ3ZsdM7QFJ5UUYH4uDXc
-         VgUnPdlVPry6c39lvpzodEtK7qUCql+BJwm+nMMRPViEoYACvCd2Y2BiN+7swlAzRooX
-         vOvPsOx+W4T3W54r6zVnY2ThghQaOupJ3DO3axG9v8hnL2siOd6loyAmlDX7JtAKY72I
-         yXhWIS6wjFp+poRwhJp1DiwVuqRxordaudVBxwa1K+xbsntlsTZ818i4+17Zv8EWe/iI
-         Yx+w==
-X-Forwarded-Encrypted: i=1; AFNElJ8YZX95YQGi3xssS22LFcUTvJN0PGSo+rtbDUN6QU6d3JVm0Dsj5BZezYHkd9SUSSqlavWxogM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9qhVB8ZMu4rwCV7Wgkp6XkUGjhgRVWu6/Ugo4KPsCOUCZDgal
-	+oVzjBEKox0Uo3CxcvF9/bDy1TiMe9Sb+khv1+ymlLu2mQ0le0XP/p2WhVTQ124VS2T3dbObnDK
-	cBLV8BRqJ4hI8PwNjnTklaZKtttXvwLbdOQtMVFW2I7wJyHC1i2u/4HmFSA==
-X-Gm-Gg: Acq92OFSg77kmx7FoQkKIq8eJoyQFbxuxcx2zQ7GVCHpItl7+5uf2bLIGbZBTix3Y0+
-	7o9tJjcVSpTtsL9gKbqKxHCoASji2uKwQxFLXv0ZKROmtnD+rwl8YMt2QRIEKn+8+EliTnVmnWa
-	knVLUReE97TEOsASd6RUoT1ViCT94wPwI6iTsKAOX36z2pAse6YtIowAG0ssCrl6ukxO0+JGsFc
-	SNSIpJ3HUdhG0iGaq+p2vbafaB46QuYBrsehcUsDztdyUljCfNEJnLr1NJcxczrFmq9kg41d4gP
-	8qt3ozj8qUGo2BfiNtWIaR0RN3mzl45a1skke/Se2XJywybsZotD/ZXjSCWFll/KekUNsE5uUze
-	2U7NLS6z3k+1D+h4xCPUtygjTL6ivHV3hcvljndKU9Ycq41seZkgxQ5Q8+QVvvDeZLw==
-X-Received: by 2002:a05:600c:a51:b0:490:b189:212d with SMTP id 5b1f17b1804b1-490d724314cmr25872665e9.33.1781002686467;
-        Tue, 09 Jun 2026 03:58:06 -0700 (PDT)
-X-Received: by 2002:a05:600c:a51:b0:490:b189:212d with SMTP id 5b1f17b1804b1-490d724314cmr25872295e9.33.1781002686079;
-        Tue, 09 Jun 2026 03:58:06 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.44])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc39eb04sm477699555e9.6.2026.06.09.03.58.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 03:58:05 -0700 (PDT)
-Message-ID: <f4643f4f-8db9-4621-bc53-34992820ce19@redhat.com>
-Date: Tue, 9 Jun 2026 12:58:04 +0200
+	s=arc-20240116; t=1781003114; c=relaxed/simple;
+	bh=FzHeD0sMZk02bfUIOVbZ7vcbl5dWXL2/Txt+74srelk=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EdcXK6AH6XDuMxk50f4dh+u/GHJBYA1+69BMCzV8inwydg4yUjtJXGIp2zBqAasRM5W+N7nnFdYI9jW/dEXnJdP6zbBvIlkAZVFMtpm/zctzlYzB86VjcZEBv+hPC8VgkS5pxU7Rdx/bMY1CRXjh5sKqfxNzVuYmd2l012yGHg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RGDhzDnd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D5071F0089F
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 11:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781003113;
+	bh=+sX9ATTxluLYTPpyn9xT27ptWmmBF8CPbs0HcxCOGLE=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=RGDhzDndKBB2dkoo2ExWmstsyWaeZ8qJ18zZpU/Zh0vnaXRYAMzekOdsxjslSMmMP
+	 Zz8+CTH0TaVqx9FQtV3+0bfwMumlGnwVxTC4XbD3pQ9vXv5cjQPwxw+p/urFIYe+M1
+	 23mhKFfJTqrlZpJV745TVZPiLITUlVY6C7d5E8xA1cDZC81W784rbDYRkz7hR5lGZL
+	 64Iy0/HNkiWIMrL9ECwoHOiIF9wCFEfpU8Auj711VfrHHZui/L8EP/HRqjhrowKr2W
+	 OxVlAEX7eB4eXwfcJe6BQDfh51Xjtyo6bbEDsj8hF5jBGM4+Ii4e2FKcVqq3Vj0HgK
+	 9xuzxLAHXn0zA==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5aa612bf6efso5397361e87.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 04:05:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8VE9g8yg+jU8Igp5HeKnYLVNe4ATVPz2DExtU1TILS0hJTdUcUWenRDIVH4l43ATSq7Ov8FEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc5WtqZ/gpV7b5LFYt0Ua+RUW2GgqCBS1YsShpEranZoaUCXDH
+	qUUgO0QHFo1ZLBh9h4KE1HK7WZCHQjsyVq8TcmR3VFnzGifgyH9Wd/YTsFtOKWUVihEa1W0dGgt
+	ytqS1uxNgOBGGTTsMfUKwP6JrJS7L6k/kSwx+o0RASw==
+X-Received: by 2002:a05:6512:2253:b0:5aa:5c8c:9cf4 with SMTP id
+ 2adb3069b0e04-5aa87b5f803mr5428916e87.17.1781003111998; Tue, 09 Jun 2026
+ 04:05:11 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 9 Jun 2026 07:05:10 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 9 Jun 2026 07:05:10 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <CAFEp6-1syMQsvuQ+dLU39bnDeL5Ok7vK1mA7CS0v1m7cjhyMQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] selftests/net/openvswitch: guard command
- substitutions against empty output
-To: Minxi Hou <houminxi@gmail.com>, netdev@vger.kernel.org
-Cc: aconole@redhat.com, davem@davemloft.net, echaudro@redhat.com,
- edumazet@google.com, horms@kernel.org, i.maximets@ovn.org, kuba@kernel.org,
- shuah@kernel.org, dev@openvswitch.org, linux-kselftest@vger.kernel.org
-References: <20260604163016.3929371-1-houminxi@gmail.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260604163016.3929371-1-houminxi@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
+ <20260609-block-as-nvmem-v4-4-45712e6b22c6@oss.qualcomm.com>
+ <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com> <CAFEp6-1syMQsvuQ+dLU39bnDeL5Ok7vK1mA7CS0v1m7cjhyMQw@mail.gmail.com>
+Date: Tue, 9 Jun 2026 07:05:10 -0400
+X-Gmail-Original-Message-ID: <CAMRc=Mc=-G0+ESPJUUgxd+jJWwuEzBcVXSJyAbAhx6BFkHeimA@mail.gmail.com>
+X-Gm-Features: AVVi8CdBM8fdpM7hiE50yrSmJrPYo7K9sdF-J87b4PfgsolvJ2MbyT4LVehGYdI
+Message-ID: <CAMRc=Mc=-G0+ESPJUUgxd+jJWwuEzBcVXSJyAbAhx6BFkHeimA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/8] block: implement NVMEM provider
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, Ulf Hansson <ulfh@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297016-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:netdev@vger.kernel.org,m:aconole@redhat.com,m:davem@davemloft.net,m:echaudro@redhat.com,m:edumazet@google.com,m:horms@kernel.org,m:i.maximets@ovn.org,m:kuba@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297017-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:brgl@kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,qualcomm.com:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,config.name:url];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[brgl@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2E03765F553
+X-Rspamd-Queue-Id: C31F565F563
 
-On 6/4/26 6:30 PM, Minxi Hou wrote:
-> When ip-link output is unavailable, when the upcall daemon log has not
-> been written yet, or when pahole does not know the OVS drop subsystem
-> ID, the affected command substitutions silently produce empty strings.
-> The caller then passes empty sha= or pid= arguments to ovs_add_flow,
-> or matches against wrong drop reason codes, all without a diagnostic.
-> 
-> Add [ -z ] guards immediately after each assignment. For test_arp_ping,
-> also align the MAC extraction to use awk '/link\/ether/' as in
-> test_pop_vlan. The drop_reason guard returns ksft_skip because an
-> absent subsystem ID is an environment issue, not a test failure.
-> 
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
+On Tue, 9 Jun 2026 12:13:08 +0200, Loic Poulain
+<loic.poulain@oss.qualcomm.com> said:
+> Hi bartosz,
+>
 
-Whoops, I unintentionally replied to an old revision; same point, I
-think this is net-next material.
+...
 
-@ovs crew: WDYT?
+>>
+>> On the other hand, we don't want to not provide the block device just be=
+cause
+>> someone added a DT property on one that's too big. I'd say: warn, but re=
+turn 0.
+>> Does it make sense?
+>
+> It=E2=80=99s still technically an error in the sense that we cannot provi=
+de
+> the required nvmem feature. However, it only becomes a real issue if a
+> consumer actually attempts to use it.
+> Also, the block device should still be added, since the return code
+> from add_dev is not checked. In any case, I=E2=80=99m fine with either
+> approach, as long as we emit a warning message.
+>
 
-/P
+We don't check the return value now (why?) but if we ever do, the safer opt=
+ion
+is to return 0 IMO.
 
+>>
+>> > +     }
+>> > +
+>> > +     config.id =3D NVMEM_DEVID_NONE;
+>> > +     config.dev =3D dev;
+>> > +     config.name =3D dev_name(dev);
+>> > +     config.owner =3D THIS_MODULE;
+>> > +     config.priv =3D (void *)(uintptr_t)dev->devt;
+>> > +     config.reg_read =3D blk_nvmem_reg_read;
+>> > +     config.size =3D bdev_nr_bytes(bdev);
+>> > +     config.word_size =3D 1;
+>> > +     config.stride =3D 1;
+>> > +     config.read_only =3D true;
+>> > +     config.root_only =3D true;
+>> > +     config.ignore_wp =3D true;
+>> > +     config.of_node =3D to_of_node(dev->fwnode);
+>> > +
+>> > +     return PTR_ERR_OR_ZERO(devm_nvmem_register(dev, &config));
+>>
+>> And that was a wrong suggestion on my part too because I was under the
+>> impression that we're in the probe() path, not device_add(). You can't u=
+se
+>> devres here as the device at this point is not yet bound and may never b=
+e.
+>
+> So I understand The bd_device is purely a class device with no bus, no dr=
+iver.
+> For driverless devices, devres_release_all() is called explicitly
+> within device_del() .
+>
+
+Right.
+
+>>
+>> Which leads me to the second point: this is not the moment to add the nv=
+mem
+>> provider. This should happen at or after probe(). Once nvmem_register()
+>> returns, you have a visible nvmem resource but nothing backing it in the=
+ block
+>> layer.
+>
+> There is a short window during which a read attempt will 'properly'
+> fail, but this does seem somewhat fragile indeed.
+>
+>> Either do this in block core when registering a new device or schedule
+>> a notifier here for the BUS_NOTIFY_BOUND_DRIVER event and do it in the n=
+otifier
+>> callback.
+>
+> So in the end, it seems that the simpler and more robust approach is
+> probably to move away from the class_interface driver and instead
+> register/unregister the nvmem directly in add_disk/del_gendisk.
+> If that's ok I will move to this approach in the next version.
+>
+
+Yes, I think it's the right approach.
+
+Bart
 
