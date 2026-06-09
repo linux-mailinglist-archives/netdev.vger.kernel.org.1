@@ -1,249 +1,293 @@
-Return-Path: <netdev+bounces-297059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297060-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FwthGWUdKGrs+AIAu9opvQ
-	(envelope-from <netdev+bounces-297059-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:04:21 +0200
+	id OJoLNhYeKGoG+QIAu9opvQ
+	(envelope-from <netdev+bounces-297060-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:07:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F9EA660D4B
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:04:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8EC2660D8E
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 16:07:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=trailofbits.com header.s=google header.b=bjQYIjAJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297059-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297059-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=trailofbits.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Zb+rona3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297060-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297060-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 03CCF3059DF4
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 13:57:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7DEEF306EC30
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 13:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2073742B756;
-	Tue,  9 Jun 2026 13:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFE24183C8;
+	Tue,  9 Jun 2026 13:59:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C2E42B749
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 13:57:48 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781013469; cv=pass; b=EkPMClD9pi7rBTX5EwTNP4jbYlYhuukTeae8EE42sV0+3tuXJTEv38De70Yzn6NR7v2kAxhIG4l6tVzfZ383D4Qb+z0DqmnIhkk8JNba7GvsRVrpj0dFuRSmVzXORddE21eveoiJ0MgKz9DiBC61C0p163c3JncKbxI4Xw57Pco=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781013469; c=relaxed/simple;
-	bh=9H3n6jJ/Cewkf38K0o8Ik7o52T0PvcAbhtGUzZr9BTY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GzxljU2es6tUrf18ISaGbXTJZQvd1XhTihiyfb6vaBKMTx2TCC+0YL4TuZ9HkipTwEwGnTON9zJw7SdJNyNrvgNFuBmtScGjG1E3b9xTJj7O6wndFzybRcH+xu1IDMtAtKOto3UKqw9kWopG0cGvA6FbT54GQfjXCrZEEQ1LLsM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=bjQYIjAJ; arc=pass smtp.client-ip=209.85.167.46
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa68cfc182so4865508e87.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 06:57:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781013466; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BZZsnvkPMEGGDIBKuKrJtHM/xIrMx61ns+HoMBbRCn7M0oTuV6aHuZEG2QvN3NvMkL
-         mRh4o3gLW+qm7lvT37UVRaEJtLxQc7oF8bkfqht8zP6XwfFKpf5PBwaqYgn9g3siqhon
-         anh3lnGJ38aeiFWixEP753ArPIZ3Ysd54YFfUvR5vyrvRruCbeyhdF8M33ghy1WDAzVV
-         yCfJCOjt+eZd6qz8pr8HL2V0x3pBJP7npz506odnNUf0JUgZbsTyhtX7YgNuVg39qR5F
-         Ar7sOI9Mrd594ONknQmswEcIdPc67bzaYdap2Ti9O1xGa0VRwekcu3Oyph6IAqtuZVLn
-         5DVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tCb/PmfMqibccVPEB0SpuoNk3B936z3C+Or74Gj7qVo=;
-        fh=hQE/+H+kfNrHOjikPEdrnBdwH0Glu3CcKnVM5lR/Uz8=;
-        b=VaeHJP0F6pzWJNYGuIjS4YNcdYnXIM1cnRX5WRMBgxmftmKY9EdDmUkcEd8qSYhQh4
-         cxxU4MeuDCgw/wbFPmfD55dcTWqkPyS6Oplr+oQx6QQEK+pR6qaXulUGhlVOsk8uwfZc
-         acAB5IGmZ3uBv4vVgjBiF2RnG0+qVSFKiKe/CPAVMPZu9cuCNz88RKbpW2uagF7QufX2
-         1rr7vsQ8troKS7rdxgqEdfrr/mElKgS2eNi42Sa4Rdrct5M1wZ01upJRymm4BcQkGQf5
-         mWE/a7a7yXyLlpJs80RyJMYBPsD2PCzgvdZovHEu5tFu8gCr9YAbYcltHbS4ETCCW549
-         YzGA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1781013466; x=1781618266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tCb/PmfMqibccVPEB0SpuoNk3B936z3C+Or74Gj7qVo=;
-        b=bjQYIjAJqahJexFWhGtyCOeBHjEghT3B6Ba8fNKx5nCHFu3T6MkxpzYGhRxThJqAVa
-         oABo8tVHwM961v/gNiKzAHeQdvNk04fU7z+FZ82M3ksoP27AFJfg2h2p6bIf/jyRY50r
-         RIQOuXP19qhNMNQUZNLLfhe6+WfSdNDsN4fWiI40zKzgAN0IUKdAifCXvFXvXlUqrA7A
-         wxpRIxMMJsFP+UuuS2A8bcM9UsvUMFuU7USqFXgFnmBsP13LCxFiabTiHhh3UgxV5i3d
-         O9hqwoSORy/ktONkcCmI6N5Leu0J27pAuvqnf+mry1bkxyY6t7oUQUEc1Sj4I8+rwpm7
-         uFmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781013466; x=1781618266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tCb/PmfMqibccVPEB0SpuoNk3B936z3C+Or74Gj7qVo=;
-        b=pB1W2aKwbFLkBslLWoiWUFhVYMjZLvJP6ADwLrc6B/7pgxfEYGCi/e8/Ivn4gWHoZd
-         QEHXpa/PPztJPMVthm9jsOJ8NgoICM/KBkgicA3Khvd1GmMdebqPhAJYJUF4aZMJNK5C
-         KGuFbQkD4gTm68upTJ+UBQfZMNQmcMcirKr5B8xutZDCps789jmYRPXOXEdrZSZsaUmy
-         akwYubJwICmhbIdejVwv26kpBcBh7F1E3tiaRF6Io0i+puhVFcfT3/nfacfBRDjNmX+a
-         G7Z1tLEcvhvlcYfUH/8LZCsI8DjcTkz/CxnQB5P7p1X8EDFd6XTpW8n6OWCEwnR2LzO5
-         90bA==
-X-Forwarded-Encrypted: i=1; AFNElJ9X4wz/OKh1NnXiD0P15u4h0B75rj2kJBvJgBg00FcL25NAVKEUde5kpSqcTZ35PQWWJul9z7Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1SJa9KN+k0IxNzEJqbLpkKuMY7a91pnXzKqWhekUpvSAq5AkM
-	UlwmvDl1ogmrld7k68SKK9xWC3YnQL7p8EapSiCFtPrCk6QJd1WrPFnoiUSJht1y6gqycOEeQdU
-	X0jLLv+r8BQTbrHTRIK44PuYSMXjd2ErephN8nNC2MQ==
-X-Gm-Gg: Acq92OGS8TgcQicmLqR8w6TGvkH1XrkQ4+E73XkThWoxIzvv1AlqKLeZmVmtQRvgf1Y
-	jHO84U6VAuLoLf3JYLNmbuf6f0/9AfQ2So8aOFGzQh64/owew7l9UeD5ZEMrKOkL2/I5dGaJrfu
-	KKt2fTXzsxfPK0JUU3ZJb7pW32vaR1C1rdwz9anUE0cOQ7/nUl2/jgZrs6/NcTJIvBJbn2pTXzo
-	+3ysAh5UlVTqu4zWPRHyHfd0T6PgOOFCroH4GTsvCXh/ZvJzluJxvq74j/sr6NPnHKvLt1knNIG
-	H1bfJgVZmv5P5+dD
-X-Received: by 2002:a05:6512:3402:b0:5aa:500f:7bae with SMTP id
- 2adb3069b0e04-5aa87b8f846mr5956959e87.35.1781013466282; Tue, 09 Jun 2026
- 06:57:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F0D3FFAD7;
+	Tue,  9 Jun 2026 13:59:14 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781013556; cv=none; b=EVn/YVALw7YinHSuznYyukX+lgBVd3/WKXO4qHHNL2SD4j5I4schFxkqqbMFJbVNanoIbzjw56xBnEwkCxBE5n89Ku2xbsLujDq5JX3tGCKN1S1FaUvmOBwM3S+ogOiM3Q0SA3tLgLTrLY1pkrnTnImWfzMwquNJ1XgBV/A6WAw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781013556; c=relaxed/simple;
+	bh=SGpeduoIgjpwHb9NKzMDERcHhkrXLGonfeaNONdBvNc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IgNO8Tm5KAAQGXKpRfi324o/dH314jSass08DLv/cOEMD/VWKFSz4hWSfZwBNXouuTzYlVAJSU7FC67ASEVf9HdOEHLFe1wSMAqAbVSyh/ED9iXZDwyInMVXDcN2UMIs05DRHxRvyp1xrPcJGL70713FNy2Qy2KM5o0gC8lpAro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zb+rona3; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F931F00893;
+	Tue,  9 Jun 2026 13:59:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781013554;
+	bh=M5sOtZJNCdeKew31+SiH0I1uiASiB7jZ9KUuwaJ78DA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Zb+rona37684YmLY8VU3BpcVmVVizmZI7uU3vy7ZCagnn8ddxuL0S4fEsW3CImFQm
+	 wWxmejxqsBagFYhVckHrt59zYShFglSoXIAMwwc4CIsfjHQrspyAga1dqznbuOq1SV
+	 f38y7gMi54uwmInywsQUEzQAT3idlYUnBmFPlOccmmZCueJmRgHKXLjhu5Rq9XkVeB
+	 28bMTTQljwnH7BqHNKWE9maKYwWM/aQpiwEBrEvhU3HaapuLlxIYJEvUYu2CvV9QOA
+	 ObHtQUKlfcAHoaHS4AN8DUyJzs/QkyoggarDgtDkaavBc6VTyXLQzPdzSN+2x3/tn7
+	 Jknb++kx6zrdw==
+Message-ID: <90fc9fc1-f396-4ed1-888f-89a96294664e@kernel.org>
+Date: Tue, 9 Jun 2026 15:59:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260605194640.2645386-1-sam.moelius@trailofbits.com>
- <CAM0EoMmeftLxWNdQqWsJonxEtMoCCuJdeTEjNzQfc2GYUX+mtw@mail.gmail.com>
- <CAE+C+DZTme=GQBy9BaXCiPe0pO7Pv7XNM69iru0VTGFX_ybBKg@mail.gmail.com>
- <CAM0EoMmPb0jZGWeadX4KqsyQTx4Oo2gLg-3h+u=Ec=9rqzzjdQ@mail.gmail.com> <CA+NMeC_3bzJzn_NjztcnM=C1M0Xrf7Xo26DiQNRy_o_iZPAnMg@mail.gmail.com>
-In-Reply-To: <CA+NMeC_3bzJzn_NjztcnM=C1M0Xrf7Xo26DiQNRy_o_iZPAnMg@mail.gmail.com>
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-Date: Tue, 9 Jun 2026 09:57:33 -0400
-X-Gm-Features: AVVi8CcL42h7bbbdJNPC5seDh0BhA8B5YpsxGVBAJuC6UUt7sxXmbW93zGi3TDs
-Message-ID: <CAE+C+Dact=a0_rAm61A=m9b=LJoV9Nkny5ozOxL_UAiK_pdy2Q@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: act_pedit: require matching IPv4 L4 protocol
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"open list:TC subsystem" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: Simon Schippers <simon.schippers@tu-dortmund.de>,
+ =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+ <db2aa3b9-09d4-46d8-aafc-0a859ee8b635@tu-dortmund.de>
+ <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
+ <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
+ <b8569d0f-7a99-4488-a1bb-63d813231b7d@tu-dortmund.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <b8569d0f-7a99-4488-a1bb-63d813231b7d@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[trailofbits.com,reject];
-	R_DKIM_ALLOW(-0.20)[trailofbits.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297059-lists,netdev=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:victor@mojatatu.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297060-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[trailofbits.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:j.koeppeler@tu-berlin.de,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:kernel-team@cloudflare.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam.moelius@trailofbits.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,cloudflare.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mojatatu.com:email,mail.gmail.com:mid,trailofbits.com:dkim,trailofbits.com:email,trailofbits.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,dql.limit:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F9EA660D4B
+X-Rspamd-Queue-Id: D8EC2660D8E
 
-On Mon, Jun 8, 2026 at 10:41=E2=80=AFAM Victor Nogueira <victor@mojatatu.co=
-m> wrote:
->
-> On Mon, Jun 8, 2026 at 7:46=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
-> >
-> > On Sun, Jun 7, 2026 at 10:33=E2=80=AFAM Samuel Moelius
-> > <sam.moelius@trailofbits.com> wrote:
-> > >
-> > > On Sat, Jun 6, 2026 at 5:29=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
-.com> wrote:
-> > > >
-> > > > On Fri, Jun 5, 2026 at 3:46=E2=80=AFPM Samuel Moelius
-> > > > <sam.moelius@trailofbits.com> wrote:
-> > > > >
-> > > > > The extended IPv4 L4 header mode in act_pedit can select TCP or U=
-DP
-> > > > > header fields without confirming that the IPv4 protocol field mat=
-ches
-> > > > > the selected transport header.
-> > > > >
-> > > > > That lets a rule written for TCP or UDP modify unrelated payload =
-bytes
-> > > > > in a packet carrying a different protocol.
-> > > > >
-> > > > > Verify the IPv4 protocol before applying TCP or UDP extended head=
-er
-> > > > > edits.
-> > > > >
-> > > > > Assisted-by: Codex:gpt-5.5-cyber-preview
-> > > > > Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
-> > > > > ---
-> > > > >  net/sched/act_pedit.c | 2 ++
-> > > > >  1 file changed, 2 insertions(+)
-> > > > >
-> > > > > diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> > > > > index bc20f08a2789..9a4590451f7e 100644
-> > > > > --- a/net/sched/act_pedit.c
-> > > > > +++ b/net/sched/act_pedit.c
-> > > > > @@ -341,6 +341,8 @@ static int pedit_l4_skb_offset(struct sk_buff=
- *skb, int *hoffset, const int head
-> > > > >
-> > > > >                 if (!iph)
-> > > > >                         goto out;
-> > > > > +               if (iph->ihl < 5 || iph->protocol !=3D header_typ=
-e)
-> > > > > +                       goto out;
-> > > >
-> > > > From inspection the fix looks reasonable.
-> > > > At first glance it seems that the only fix that resolves the issue =
-you
-> > > > are describing is to check the protocol header.
-> > > > header length seems to be an extra thing. But let's do what the v6
-> > > > side seems to and skip frags as well? Something maybe along the lin=
-es
-> > > > of:
-> > > >
-> > > > if (iph->ihl < 5 || iph->protocol !=3D header_type || (iph->frag_of=
-f &
-> > > > htons(IP_OFFSET)))
-> > > >         goto out;
-> > >
-> > > I will submit an updated patch.
-> > >
-> > > > Are you able to describe how someone would configure a tc rule that
-> > > > will allow this to happen?
-> > > > IOW, how did you verify the problem and then validate that your fix=
- works?
-> > >
-> > > The bug was validated using a custom init script in QEMU. The specifi=
-c
-> > > line used was:
-> > >
-> > > /usr/sbin/tc filter add dev veth0 egress protocol ip pref 1 matchall
-> > > action pedit ex munge udp dport set 18053
-> > >
-> > > An IPv4 TCP packet with destination port 2222 was sent through that
-> > > path. With the unpatched kernel, the packet was received with TCP
-> > > destination port 18053. With the patched kernel, the same packet was
-> > > received unchanged.
-> > >
-> > > I can provide more details or artifacts if you would like.
-> >
-> > A tdc test case is better. Victor or I can create one for you if you
-> > dont know how.
->
-> It seems like v2 isn't applying so you'll have to send a new version.
-> When you do, after waiting for the 24h period, can you resend with
-> the attached patch (containing the tdc test)? Since this is a
-> fix, in the new version, remember to target net and add a proper fixes
-> tag.
 
-I'm sorry, I'm not quite following.
 
-I should send a multipart patch with the patch you shared as one of the par=
-ts?
+On 08/06/2026 16.21, Simon Schippers wrote:
+> On 6/8/26 15:13, Jonas Köppeler wrote:
+>>
+>> On 6/8/26 3:04 PM, Jesper Dangaard Brouer wrote:
+>>>
+>>>
+>>> On 08/06/2026 12.38, Simon Schippers wrote:
+>>>> On 5/27/26 15:54, hawk@kernel.org wrote:
+>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>
+>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
+>>>>> excessive NAPI scheduling overhead and qdisc requeues.
+>>>>>
+>>>>> Accumulate BQL completions and flush them when a configurable time
+>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
+>>>>> queuing delay to the configured interval. Coalescing state persists
+>>>>> across NAPI polls in struct veth_rq so completions can accumulate
+>>>>> beyond a single budget=64 cycle.
+>>>>>
+>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
+>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
+>>>>> completion.
+>>>>>
+>>>>>     ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
+>>>>>     ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
+>>>>>
+>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>> ---
+>>>>
+>>>> I found the issue that n_bql may become infinitly large if producer
+>>>> and consumer have the same speed (and tx_usecs is large). It could
+>>>> cause a potential BUG_ON if n_bql grows beyond INT_MAX...
+>>>> Also I figured that no hardware BQL driver ever completes more than
+>>>> BQL limit many elements.
+>>>>
+>>>> Therefore, I propose a simpler logic (see attachment) that completes
+>>>> either on the usual bql_flush_ns or if n_bql > dql.limit.
+>>>> If n_bql > dql.limit then we either have the case above that the
+>>>> producer is as fast as the consumer or we have BQL starvation.
+>>>>
+>>>> if (state->time + bql_flush_ns <= current_time ||
+>>>>      state->n_bql > peer_txq->dql.limit) {
+>>>>
+>>>> It must be n_bql *bigger than* dql.limit because the producer will
+>>>> always exceed the limit before it stops, see netdev_tx_sent_queue().
+>>>> It is fast because peer_txq->dql.limit is in the cacheline of the
+>>>> completion path, see dynamic_queue_limits.h.
+>>>>
+>>>> Another advantage is that we avoid the snippet checking for empty
+>>>> and BQL stopped which requires an smp_rmb() and an test_bit().
+>>>>
+>>>> Apart from that I:
+>>>> - Always call veth_bql_maybe_complete() in the for loop to have
+>>>>     more accurate completion intervals when having mixed XDP and
+>>>>     non-XDP packets.
+>>>> - Made it so tx_usecs = 0 is now also a normal case.
+>>>> - Change the type of n_bql to uint instead of int.
+>>>> - Added _ONCE() for tx_coalesce_usecs as suggested by Paolo.
+>>>> - Moved the bql_state init in __veth_napi_enable_range() in front
+>>>>     of napi_enable() to avoid a race (Sashiko).
+>>>> - Moved the bql_state reset in veth_napi_del_range() after the
+>>>>     ptr_ring_cleanup() (probably does not matter but makes sense to me)
+>>>>
+>>>> Benchmarks look just fine, see commit message.
+>>>>
+>>>> WDYT?
+>>
+>>>
+>>> Looks good to me, I will use this in my V7 patchset.
+>>>
+>>> A bike-shedding issue: We change the coalescing parameters for the veth
+>>> net_device, but should this be a TX or RX parameter?
+>>>
+>>
+>> Hi,
+>>
+>> The results look a little bit suspicious, that in some cases the p99 is smaller than the average, which can happen if you have really large max values. It feels something is off with the methodology. I think we should drop the avg, and include the max value. This would give a better picture.
+> 
+> Luckily I saved the raw test result from /tmp (the raw ping output
+> is included).
+> 
+> extract_ping_p99() seems to be broken. It has issues ordering the
+> numbers. So if there are 2 or 3 numbers after the point I think.
+> avg ping is fine.
+> 
+> Claude Sonnet wrote a script for me to recalculate the p99 pings
+> from the raw ping output).
+
+For programming switch to Claude Opus, as Sonnet cannot code IMHO.
+(Claude Opus wrote the selftest we placed in [1])
+
+Is your script still based on our github[1] selftest ?
+If so, then please make some PR(s) against my repo.
+I want this to be easy reproducible for others.
+
+[1] https://github.com/netoptimizer/veth-backpressure-performance-testing
+
+> Below is the new result. Not 100% sure but this seems right now.
+> Most pings are the same.
+> 
+> Ping RTT ms (p99)
+> ===========================================================================
+> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+> -------+-------+-------+-------+-------+--------+--------+---------++------
+>       0 | 0.028 | 0.115 | 0.159 | 0.161 |  0.163 |  0.161 |   0.163 || 0.154
+>       1 | 0.027 | 0.123 | 0.169 | 0.172 |  0.169 |  0.173 |   0.172 || 0.169
+>      10 | 0.030 | 0.117 | 0.189 | 0.193 |  0.195 |  0.192 |   0.196 || 0.186
+>     100 | 0.045 | 0.134 | 0.233 | 0.368 |  0.365 |  0.369 |   0.361 || 0.358
+>    1000 | 0.230 | 0.300 | 0.412 |  1.26 |   2.11 |   2.12 |    2.13 ||  2.07
+>   10000 |  2.04 |  2.55 |  2.54 |  2.72 |   3.77 |   12.1 |    20.1 ||  20.3
+> 
+>>
+>> Is state->n_bql += veth_ptr_is_bql(ptr) something that is commonly done in the kernel? It relies on bool normalization which feels a bit implicit to me.
+> 
+> Ok, we could swap for something like
+> 
+> if (veth_ptr_is_bql(ptr))
+> 	state->n_bql+;
+
+I'll see if I can adjust the V7 patch to this feedback.
+
+
+>>
+>>> For physical NICs adjusting TX coalescing will affect the BQL as this
+>>> affect the TX completion of the transmitted packets. For veth, it is the
+>>> veth-peer's RX NAPI that is "completing" or emptying the ptr_ring, which
+>>> is where this patch adds netdev_tx_completed_queue calls for BQL.
+>>> Any opinions on the "TX" or "RX" color?
+> 
+> Personally I would also say TX.
+> 
+
+Okay, we seem to have more votes for TX :-)
+
+
+>> I think I would prefer to configure it on the tx dev, and the recv
+>> side gets the value from the peer. Maybe something like this.
+>> 
+
+I'm considering if we should simplify the config by having veth pairs 
+have the same tx-coal value. WDYT?
+
+
+>> @@ -997,11 +998,12 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>>          struct veth_bql_state *state = &rq->bql_state;
+>>          int i, done = 0, n_xdpf = 0;
+>>          void *xdpf[VETH_XDP_BATCH];
+> 
+> Why this deletion?
+> 
+>> -       struct veth_priv *priv;
+>> -       u64 bql_flush_ns;
+>> +       u64 bql_flush_ns = 0;
+>>
+>> -       priv = netdev_priv(rq->dev);
+>> -       bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
+> 
+> I see we should check if peer_txq exists.
+> 
+>> +       if (peer_txq) {
+>> +           struct veth_priv *peer_priv = netdev_priv(peer_txq->dev);
+>> +           bql_flush_ns = (u64)READ_ONCE(peer_priv->tx_coal_usecs) * 1000;
+>> +       }
+>>
+>>          /* Clamp stored timestamp in case we migrated to a CPU with a behind
+>>           * sched_clock(); prevents the deadline from never firing.
+>>
+>> - Jonas
+
+--Jesper
+
 
