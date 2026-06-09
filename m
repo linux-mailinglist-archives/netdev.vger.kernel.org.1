@@ -1,325 +1,222 @@
-Return-Path: <netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5DOuC4sLKGq78wIAu9opvQ
-	(envelope-from <netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:48:11 +0200
+	id Z0ChK40KKGpg7wIAu9opvQ
+	(envelope-from <netdev+bounces-297043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:43:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E8966033E
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:48:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5C7660211
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:43:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=YN19mYgv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297042-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=A72kV2gu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297043-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297043-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A2833032CD0
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:43:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B40E300D577
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681C5404893;
-	Tue,  9 Jun 2026 12:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E474183CE;
+	Tue,  9 Jun 2026 12:43:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FC04183A2
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 12:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3662D413D86
+	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 12:43:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781008989; cv=none; b=FNfNCGsLo525iRQs40+SQgSWhIIr+ZKLx9sLIGHV4iJi19LNrXUE0o4XxxURWBbEw/IGNLOS54tv9lAzfqV4rfHTtAsltpWuEW7rcZlTf0GULtyynwF4e5p40DLKKorz9mEGD21y69cbLUtriVESIX8lq/Gc18xefqxdbjwBvLs=
+	t=1781009021; cv=none; b=MDh/cvpAKktkwukgJsX4LyTlFRTUT2unbGvEAnPRECTXK6jIndJgUB2Mp3duf7O5ojjYcisUH7uCw0ir07QkXS4mJTxqlTLCw+s3kEDM2D4XuZivf//ZHZbivtRphy6tw90womDS20z5ymHD9A8eNCOQ1uxQZ8t/RnX/MDj3LKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781008989; c=relaxed/simple;
-	bh=eQcE53H57mmugtVAqmdEXxaSypvWnM/iYQmtRBz9Vpc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Izoye+sIz/GRmkTLqZCIVsStYCuV6oHcIpT2zlFkBAZG/18oNjf97kNoelVyDV5UO4yzYrbBqaD05K6ZSM8qR1I4R5lMAR/jKdP71WXkX/90mrSjoh9oIEjL1/ctzOL0uueCAHCc7pWM4nM4Rkr93W26XEK2qQkHD2bmkxa/IZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YN19mYgv; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781008987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IxR+44t8/qx3fXoBokd6lsS+BQ1a++aQUffFzkcdiEE=;
-	b=YN19mYgvvQIZNQtdLJV5tFOIXoQGSncds47QhCEEwT6iFvzGRl4I4lhviDpxR61CGAHM/7
-	bWW95tW1PXhdD2VqK/VQZU8ywAPW7mzrTHc6o43uTYQ8PbTpCoAlbg3JRedtUQeS46IZYV
-	wT9izHrcVoWs/rPWCFyQAf4hQRFI6hs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-uxaodqk_Mr6SZsfHb_7zPg-1; Tue,
- 09 Jun 2026 08:43:01 -0400
-X-MC-Unique: uxaodqk_Mr6SZsfHb_7zPg-1
-X-Mimecast-MFC-AGG-ID: uxaodqk_Mr6SZsfHb_7zPg_1781008979
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D8D41964CF2;
-	Tue,  9 Jun 2026 12:42:59 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.94])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 876293008B38;
-	Tue,  9 Jun 2026 12:42:57 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: echaudro@redhat.com,  i.maximets@ovn.org,  davem@davemloft.net,
-  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
-  horms@kernel.org,  shuah@kernel.org,  netdev@vger.kernel.org,
-  dev@openvswitch.org,  linux-kselftest@vger.kernel.org,
-  amorenoz@redhat.com
-Subject: Re: [PATCH net-next] selftests/net/openvswitch: add flow modify test
-In-Reply-To: <20260605124222.963815-1-houminxi@gmail.com> (Minxi Hou's message
-	of "Fri, 5 Jun 2026 20:42:22 +0800")
-References: <20260605124222.963815-1-houminxi@gmail.com>
-Date: Tue, 09 Jun 2026 08:42:56 -0400
-Message-ID: <f7tjys7ga0f.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1781009021; c=relaxed/simple;
+	bh=r87AOgf09jBawFk7Oijp6ve8K4PXrB0C8y80U0hyvYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V+r5CCVavi5Zi0xJlACzG+O1iCQy4x7imLeELhpEl57q4vb7BzygrTejJeht7Se69y8r3BOEUmp/qW9WiZP4P1ItmfrPFRj/lY0JNKKfrI5PmPAYfNUXMXNgI6MgNnMzabBFI+xUcy64L+j9DivhMrkW1LqO+j2RoNlhup4hReo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A72kV2gu; arc=none smtp.client-ip=209.85.128.41
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-490aebf33e9so30979685e9.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 05:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781009017; x=1781613817; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kX0FouJIIFyZjl2k/xAPoma1e0chrivslO1nWJVjm1U=;
+        b=A72kV2gueiUXShVnAFagtIoPsLnTEa3A8dCCgQXPKJBWG6IkUN2QHHl1CLX3hqr4vH
+         uEhqBTqIknZ6+y1xTEHVudrjG33b73eWBabN6IJ0jrYu+7WGPoorxvSZdS08LlXeBPI9
+         pWCLm+VYqQEBKrH742GuK5UnUk/DesrNflzxYhtUaDXDLG+QpNWvymRNSnbMKsNt5ATq
+         W3eOm7MY7d9Hmj41DdrJ5dgRQrAZ/+d/s+j4p6YdwN4tIx82SUDOFrYYEyf6bIRNu1l7
+         f6/A4rimCgAUiG0ZSiGJdZUK+1UdevfS19CbaxSU/S5nSupBPLr/68joQPCPT4vJT8Bb
+         PyLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781009017; x=1781613817;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kX0FouJIIFyZjl2k/xAPoma1e0chrivslO1nWJVjm1U=;
+        b=DW0YiUNEsgbInmqeX+ZweindrVd3H8Fmtm7wL1oXAiTBz5NigaJP7WqLyFYziBD3S3
+         zzmZ/VM1H0ThhD1DuYy+CmTVqFVNv+kPmK1gJMNCvla9/65DnagD0M4SIjpxiwR5jZV0
+         GILrX+ZGqbrgIH5n44V40ZszbZlSXy2e9vwE/num6548H1hpdmLPciSka+I14CUD9SY0
+         gIej/R5PcT3G6wLb413St54jXZ19w87jQXZY3P69swZ+ZdzwCPYbrfQBkOsX1X6JcEc7
+         70+0kIoSybN3/Znng3mVPPubEgSZH3q2bvzXL4NoHRksYdQLs99I/FId8XRxRPxMKoQQ
+         xWuA==
+X-Forwarded-Encrypted: i=1; AFNElJ/8VyVxXkHc+jgM1CJClq2Jb3j5/OgrL/wwkeEQjkHpHVYCLlPqURPzs51nxMK9MiC1F8HknBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB+PjBNz2OTN0Nmsk2XzEH6daZFitKds2z1Q+dGqy8fcbMGe6h
+	qv5XCma2PxuC6L1aksxrpO0oynC7S2I9poumQXx7QLyafE2xMYBdOc1jlWlDBaU6
+X-Gm-Gg: Acq92OExq8o4/N+QkcG8s/UKh+QPjXvHKtzrfG2QM7if9Ox6mjlbwQpRl0DVeiNdM7E
+	o4gZd85kO15sLHnTMJAthFnub3aXPUgiaBq8odu7uPrOpa7spLcPNRyzNPUPoM5dnH9a6RNdYQv
+	77wvuJpbiykLTVl/P4eO2jERJdTxNpRlg/7+xotWKZ97NgQMquKgo061+tA9dxSdMjw+L4Xki+g
+	VNcHJz/7tX3/P1xe5oC3sfIGq7z2r1Zrg1yax/ZLPOCBMSSYPVDYl0zN6PpAABCPBRn9vBhc/5H
+	FBND705nDMvZGp2EJppEAw1MuBAFmQBCRYCHQ7oOKxPCVeMAU4rf/8n9fcBXRWiKESAANfC8+ED
+	Lngw46pScBF2dzeB28QEAGADmneRHilg7dApO5H71Ix6CvBKjJn72NPWb+kI79SRieuHgL3mFUy
+	HvfacUoP3LTgHhSVeQsqRfq9yEFjk79x6PUsMdwvQikv80bOo0qxomxY45eKJHhwqRdHg8fUk=
+X-Received: by 2002:a05:600c:3495:b0:490:bf1a:ed04 with SMTP id 5b1f17b1804b1-490c258995fmr317840935e9.1.1781009017249;
+        Tue, 09 Jun 2026 05:43:37 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2ec711sm60328903f8f.12.2026.06.09.05.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 05:43:36 -0700 (PDT)
+Date: Tue, 9 Jun 2026 13:43:34 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: Simon Horman <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "stable@vger.kernel.org"
+ <stable@vger.kernel.org>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "aleksander.lobakin@intel.com"
+ <aleksander.lobakin@intel.com>, Ping-Ke Shih <pkshih@realtek.com>, Larry
+ Chiu <larry.chiu@realtek.com>
+Subject: Re: [PATCH net v2] rtase: Workaround for IP fragmented UDP packet
+ hardware bug
+Message-ID: <20260609134334.3225b076@pumpkin>
+In-Reply-To: <1340406ab190498ab857ad9017529722@realtek.com>
+References: <20260604101356.15611-1-justinlai0215@realtek.com>
+	<20260608190627.182292-2-horms@kernel.org>
+	<1340406ab190498ab857ad9017529722@realtek.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297042-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:amorenoz@redhat.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-297043-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:justinlai0215@realtek.com,m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:richardcochran@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,gmail.com,intel.com,realtek.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,realtek.com:email,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C2E8966033E
+X-Rspamd-Queue-Id: DE5C7660211
 
-Hi Minxi,
+On Tue, 9 Jun 2026 08:20:10 +0000
+Justin Lai <justinlai0215@realtek.com> wrote:
 
-Thanks for the quick turnaround with the test!
+> Simon Horman <horms@kernel.org> wrote:
+> > 
+> > From: 'Simon Horman' <horms@kernel.org>
+> > 
+> > This is an AI-generated review of your patch. The human sending this email has
+> > considered the AI review valid, or at least plausible.
+> > Full review at: https://sashiko.dev
+> > ---
+> > rtase: Workaround for IP fragmented UDP packet hardware bug
+> > 
+> > The hardware parser incorrectly interprets 319/320 in a short IP fragmented
+> > UDP packet payload as standard PTP destination ports and treats the fragment
+> > as a PTP packet for further parsing. Pad these packets so the transport data
+> > reaches RTASE_MIN_PAD_LEN before transmitting to avoid triggering the
+> > hardware issue.
+> >   
+> > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > index ef13109c49cff..b686b84e15fe2 100644
+> > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c  
+> > 
+> > [ ... ]
+> >   
+> > > @@ -1247,6 +1248,52 @@ static u32 rtase_tx_csum(struct sk_buff *skb,  
+> > const struct net_device *dev)  
+> > >       return csum_cmd;
+> > >  }
+> > >
+> > > +static bool rtase_skb_is_udp(struct sk_buff *skb) {
+> > > +     int no = skb_network_offset(skb);
+> > > +     struct ipv6hdr *i6h, _i6h;
+> > > +     struct iphdr *ih, _ih;
+> > > +
+> > > +     switch (vlan_get_protocol(skb)) {
+> > > +     case htons(ETH_P_IP):
+> > > +             ih = skb_header_pointer(skb, no, sizeof(_ih), &_ih);
+> > > +             return ih && ih->protocol == IPPROTO_UDP;
+> > > +     case htons(ETH_P_IPV6):
+> > > +             i6h = skb_header_pointer(skb, no, sizeof(_i6h), &_i6h);
+> > > +             return i6h && i6h->nexthdr == IPPROTO_UDP;  
+> > 
+> > [Severity: High]
+> > Does this check fail to traverse IPv6 extension headers?
+> > 
+> > If an IPv6 packet contains extension headers, such as an IPv6 fragment
+> > (IPPROTO_FRAGMENT), the nexthdr field will contain the extension header's
+> > protocol number instead of UDP.
+> > 
+> > Doesn't this bypass the workaround for the exact fragmented packets it is
+> > intended to fix?
+> >   
+> Thanks for the review.
+> 
+> Unlike IPv4, IPv6 does not require extension header parsing for
+> this workaround. The hardware only treats IPv6 packets without
+> extension headers as PTP packets for further parsing.
+> 
+> Therefore, IPv6 packets carrying extension headers, including
+> fragments, do not enter this parsing path and are not affected
+> by the hardware issue addressed by this workaround.
+> 
+> Skipping such packets is intentional.
 
-Minxi Hou <houminxi@gmail.com> writes:
+I thought you said that the problem only arose with packets that are
+fragmented by IPv[46], in particular short final fragments.
+If your hardware checks for extension headers then doesn't that mean
+that you never have a problem with IPv6 packets.
 
-> Add mod_flow() and the mod-flow CLI command to ovs-dpctl.py, exercising
-> OVS_FLOW_CMD_SET. Add test_flow_set which first modifies an existing
-> flow with new actions and verifies the change via traffic, then modifies
-> the same flow without actions and verifies the kernel handles the
-> no-actions case gracefully.
->
-> The no-actions path is unreachable from userspace OVS tools (dpctl
-> mod-flow requires actions) but reachable via raw netlink. This is the
-> code path where Adrian Moreno found a possible kfree_skb of ERR_PTR
-> when reply allocation fails after locking.
->
-> Make parse() skip OVS_FLOW_ATTR_ACTIONS when actstr is None so the
-> kernel enters the post-lock allocation branch in ovs_flow_cmd_set().
->
-> Suggested-by: Aaron Conole <aconole@redhat.com>
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
->  .../selftests/net/openvswitch/openvswitch.sh  | 72 +++++++++++++++++++
->  .../selftests/net/openvswitch/ovs-dpctl.py    | 39 +++++++++-
->  2 files changed, 108 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index a415e9dec8cd..71190bc662f9 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -30,6 +30,7 @@ tests="
->  	drop_reason				drop: test drop reasons are emitted
->  	pop_vlan				vlan: POP_VLAN action strips tag
->  	dec_ttl					ttl: dec_ttl decrements IP TTL
-> +	flow_set				flow-set: Flow modify
->  	psample					psample: Sampling packets with psample"
->  
->  info() {
-> @@ -193,6 +194,23 @@ ovs_add_flow () {
->  	return 0
->  }
->  
-> +ovs_mod_flow () {
-> +	if [ -n "$4" ]; then
-> +		info "Modifying flow: sbx:$1 br:$2 flow:$3 act:$4"
-> +		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
-> +			mod-flow "$2" "$3" "$4"
-> +	else
-> +		info "Modifying flow (no actions): sbx:$1 br:$2 flow:$3"
-> +		ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py \
-> +			mod-flow "$2" "$3"
-> +	fi
-> +	if [ $? -ne 0 ]; then
-> +		info "Flow modify [ $3 ] failed"
-> +		return 1
-> +	fi
-> +	return 0
-> +}
-> +
->  ovs_del_flows () {
->  	info "Deleting all flows from DP: sbx:$1 br:$2"
->  	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py del-flows "$2"
-> @@ -300,6 +318,60 @@ test_dec_ttl() {
->  	return 0
->  }
->  
-> +test_flow_set() {
-> +	sbx_add "test_flow_set" || return $?
-> +	ovs_add_dp "test_flow_set" flowset || return 1
-> +
-> +	info "create namespaces"
-> +	for ns in client server; do
-> +		ovs_add_netns_and_veths "test_flow_set" "flowset" "$ns" \
-> +			"${ns:0:1}0" "${ns:0:1}1" || return 1
-> +	done
-> +
-> +	ip netns exec client ip addr add 10.0.0.1/24 dev c1
-> +	ip netns exec client ip link set c1 up
-> +	ip netns exec server ip addr add 10.0.0.2/24 dev s1
-> +	ip netns exec server ip link set s1 up
-> +
-> +	ovs_add_flow "test_flow_set" flowset \
-> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-> +	ovs_add_flow "test_flow_set" flowset \
-> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-> +
-> +	local fwd_flow="ufid:00000001-0002-0003-0004-000500060007"
-> +	fwd_flow="$fwd_flow,in_port(1),eth(),eth_type(0x0800),ipv4()"
-> +
-> +	ovs_add_flow "test_flow_set" flowset "$fwd_flow" '2' \
-> +		|| return 1
-> +	ovs_add_flow "test_flow_set" flowset \
-> +		'in_port(2),eth(),eth_type(0x0800),ipv4()' '1' || return 1
-> +
-> +	info "verify initial forwarding"
-> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 || return 1
-> +
-> +	info "mod-flow with new actions (change to drop)"
-> +	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" 'drop' \
-> +		|| return 1
-> +
-> +	info "verify traffic is now dropped"
-> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 >/dev/null 2>&1 \
-> +		&& { info "FAIL: ping should fail after mod-flow to drop"
-> +		     return 1; }
-> +
-> +	info "mod-flow without actions"
-> +	ovs_mod_flow "test_flow_set" flowset "$fwd_flow" || return 1
+-- David
 
-This is one we could also verify with a grep as well::
-
-  python3 "$ovs_base/ovs-dpctl.py" dump-flows flowset | grep "$fwd_flow"
-
-and just check that it has no actions associated with it.  We wouldn't
-need anything persistent since we are just checking the reply.  That way
-we know that the set has updated the flow as well (instead of solely
-relying on the drop).
-
-> +	info "verify drop actions unchanged"
-> +	ovs_sbx "test_flow_set" ip netns exec client ping -c 1 -W 2 \
-> +		10.0.0.2 >/dev/null 2>&1 \
-> +		&& { info "FAIL: ping should still fail after no-actions set"
-> +		     return 1; }
-> +
-> +	return 0
-> +}
-> +
->  # psample test
->  # - use psample to observe packets
->  test_psample() {
-> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> index 3342e295293d..9113473d425f 100644
-> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> @@ -2702,9 +2702,10 @@ class OvsFlow(GenericNetlinkSocket):
->              self["attrs"].append(["OVS_FLOW_ATTR_KEY", k])
->              self["attrs"].append(["OVS_FLOW_ATTR_MASK", m])
->  
-> -            a = ovsactions()
-> -            a.parse(actstr)
-> -            self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
-> +            if actstr is not None:
-> +                a = ovsactions()
-> +                a.parse(actstr)
-> +                self["attrs"].append(["OVS_FLOW_ATTR_ACTIONS", a])
->  
->      def __init__(self):
->          GenericNetlinkSocket.__init__(self)
-> @@ -2738,6 +2739,24 @@ class OvsFlow(GenericNetlinkSocket):
->              raise ne
->          return reply
->  
-> +    def mod_flow(self, dpifindex, flowmsg):
-> +        flowmsg["cmd"] = OVS_FLOW_CMD_SET
-> +        flowmsg["version"] = OVS_DATAPATH_VERSION
-> +        flowmsg["reserved"] = 0
-> +        flowmsg["dpifindex"] = dpifindex
-> +
-> +        try:
-> +            reply = self.nlm_request(
-> +                flowmsg,
-> +                msg_type=self.prid,
-> +                msg_flags=NLM_F_REQUEST | NLM_F_ACK,
-> +            )
-> +            reply = reply[0]
-> +        except NetlinkError as ne:
-> +            print(flowmsg)
-> +            raise ne
-> +        return reply
-> +
->      def del_flows(self, dpifindex):
->          """
->          Send a del message to the kernel that will drop all flows.
-> @@ -3013,6 +3032,12 @@ def main(argv):
->      addflcmd.add_argument("flow", help="Flow specification")
->      addflcmd.add_argument("acts", help="Flow actions")
->  
-> +    modflcmd = subparsers.add_parser("mod-flow")
-> +    modflcmd.add_argument("modbr", help="Datapath name")
-> +    modflcmd.add_argument("modflow", help="Flow specification")
-> +    modflcmd.add_argument("modacts", help="Flow actions",
-> +                          nargs="?", default=None)
-> +
->      delfscmd = subparsers.add_parser("del-flows")
->      delfscmd.add_argument("flsbr", help="Datapath name")
->  
-> @@ -3110,6 +3135,14 @@ def main(argv):
->          flow = OvsFlow.ovs_flow_msg()
->          flow.parse(args.flow, args.acts, rep["dpifindex"])
->          ovsflow.add_flow(rep["dpifindex"], flow)
-> +    elif hasattr(args, "modbr"):
-> +        rep = ovsdp.info(args.modbr, 0)
-> +        if rep is None:
-> +            print("DP '%s' not found." % args.modbr)
-> +            return 1
-> +        flow = OvsFlow.ovs_flow_msg()
-> +        flow.parse(args.modflow, args.modacts, rep["dpifindex"])
-> +        ovsflow.mod_flow(rep["dpifindex"], flow)
->      elif hasattr(args, "flsbr"):
->          rep = ovsdp.info(args.flsbr, 0)
->          if rep is None:
-
+...
 
