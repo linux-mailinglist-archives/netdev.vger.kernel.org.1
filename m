@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-297032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7vQuBicEKGpn7QIAu9opvQ
-	(envelope-from <netdev+bounces-297032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:16:39 +0200
+	id HhV5KigEKGps7QIAu9opvQ
+	(envelope-from <netdev+bounces-297033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:16:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6854C65FF45
-	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43A7F65FF50
+	for <lists+netdev@lfdr.de>; Tue, 09 Jun 2026 14:16:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=mV6xy3OV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297032-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297032-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=o2SMekiN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297033-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297033-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4531A3013AB7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:11:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CD76301497B
+	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 12:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1277940F8C3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DD440F8C5;
 	Tue,  9 Jun 2026 12:11:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF2040E8DF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF5740E8E3;
 	Tue,  9 Jun 2026 12:11:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781007061; cv=none; b=jeZWSyTMjAT6d+C4XM+Y3kKNTKJG19XtYfLRRJsjF378wCB7WjcujzPRbKlWpu4/l9ulNgowC0SgWEx06iiJLHYotRjl2IKEy4mWOxR3njg+R5G+u6hbql5wkPygIrD0URsyqIA4KfA56QhUIQaUPMklkg7jsMn8T03Zpk4nGHE=
+	t=1781007062; cv=none; b=L21l3lbD+bDE/hXHr5C12ZfCag3aGrYBGdd1Bvfv2Q4TXoTGl8pMlQOW0DVoKPw//WdbehjqaKQLtg+yO9W2XONETlCxmSywRCEMOcl3phU6BU7J9VouzQ6juf048drnFboXE3bggiwqi4mYvu4JzqI/Q5XhSzG3cfQ330QsC7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781007061; c=relaxed/simple;
-	bh=oZtc6DSHxtLmIXZm0aUXNjW5ryjFtUfqhq5/XtnJYak=;
+	s=arc-20240116; t=1781007062; c=relaxed/simple;
+	bh=nRif5GfTHAcPeanGYwYT9+VbLNgbIEinsbCPXtCMm5c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZE7if3nJb5fAAo3MNtYRE9TSmDxMGa7QtL+iTiJCSXPwAbelj6OETknIEV5NfnAulanz+ankw1QIB0+1crGiBfX/V/hiPxb0gAY9Af/ThNNTYhaOggcOyC5KasH7LlZU//3KsetjRDtpjIo+C4aVEw6KEHEdaLkmW9lTMs4WqbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV6xy3OV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 90E06C2BCC7;
+	 In-Reply-To:To:Cc; b=U8gtE3TRo3I/QOM/zQBZpD/cCalHhwY+5+zYOxUuWn4IQ44qkLqAItVASuN9U/KQzUBo0djQYDqBneX+vXrDw6G73M6/QeGrVXVbtAqy1wPcVBnkRJf65mpSpC15/svo4ktc837qudm3xBGuWVW1tzMktPtV/KAGYQRBCB1nYUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2SMekiN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3AF2C2BCB9;
 	Tue,  9 Jun 2026 12:11:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1781007061;
-	bh=oZtc6DSHxtLmIXZm0aUXNjW5ryjFtUfqhq5/XtnJYak=;
+	bh=nRif5GfTHAcPeanGYwYT9+VbLNgbIEinsbCPXtCMm5c=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=mV6xy3OVBcoqnI0Z+nO3ODV1QXCBjRQLqSbKz43HlpYCT5eL9ngCLZ/jic7B0o57L
-	 tIDjdPz8BQoV4SPK9bCRKhnPyrQZveAdXL7fC4/mibwspS9fMYMTiB373alvDQ7c2U
-	 grYhv9mbhyL2ZR+Z6+XLRRXQh6mQ2qJ9m6yjQl4uJ+at/noUfD34zEozqYrB33pTHO
-	 qP46v5n8VCPESm//U9+z7m6/63a6Wflx5DOJaMrTbFhXBJeZFUBTInKZZ6+fhz7PQN
-	 P6WivkqoTYXiN6nUwSH+bzowNHM5g7ynyYtaKe9N88Et3noYGXfBA0aFz9kgAur4KX
-	 zU1aUR3tX4dIg==
+	b=o2SMekiNIaGCy5Lu23utIhZEsPm5dqrrvK89NmEZAdTPRGoJoUGb0qVkUYRcNUNG3
+	 a8CXTpTXm4CYxosNE9Hj6+qmFavEI9ivNlAtpoivORg0o9U5RzuI1Ol6crLB0CjTkS
+	 OrZIDatQowHgxhtLlmGmL12TeIZ6zNdybtc2ZXZ4lNkzzg7hqDosE8Dnk7MjHtNcrz
+	 IUSdw2Jjw6bWkVanGDvQTZRQFR27RdRrRlIlxFGgt5UjjwQ8bkt71C+RGq4GpaAbfJ
+	 RT3Nm/O18Y/lLHc6E3FIAeEMSi6BhD0sAJM3zdd7E+02wQhGgAikic6Lvrrom3BSiq
+	 xLku9HO6A/7Dg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B7ECD8CA8;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8713CCD8C92;
 	Tue,  9 Jun 2026 12:11:01 +0000 (UTC)
 From: Cedric Jehasse via B4 Relay <devnull+cedric.jehasse.luminex.be@kernel.org>
-Date: Tue, 09 Jun 2026 14:10:50 +0200
-Subject: [PATCH net-next v7 1/2] net: dsa: mv88e6xxx: use the hw tx queues
+Date: Tue, 09 Jun 2026 14:10:51 +0200
+Subject: [PATCH net-next v7 2/2] net: dsa: mv88e6xxx: add support for
+ credit based shaper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +61,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-net-next-mv88e6xxx-cbs-v7-1-7d5d732df545@luminex.be>
+Message-Id: <20260609-net-next-mv88e6xxx-cbs-v7-2-7d5d732df545@luminex.be>
 References: <20260609-net-next-mv88e6xxx-cbs-v7-0-7d5d732df545@luminex.be>
 In-Reply-To: <20260609-net-next-mv88e6xxx-cbs-v7-0-7d5d732df545@luminex.be>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -73,11 +74,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Cedric Jehasse <cedric.jehasse@gmail.com>, 
  Cedric Jehasse <cedric.jehasse@luminex.be>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781007059; l=11502;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781007059; l=19695;
  i=cedric.jehasse@luminex.be; s=20260213; h=from:subject:message-id;
- bh=pgpb+YX014eD5g807V5tIM8bN22t0zjLVW2701Vk24g=;
- b=SgFy3Rz7MNSQBVBFElllTwyAo/vmdLOo83UtnoIBoj/esnVIGazRHyp3MzpfxHH+zv8ORx8lc
- 5S9sjQ/559NAOkp9qRY42yfO3vb4Wy5oMuJb4/jJc28zr7DARNxljLk
+ bh=hV5Z4jbZe/H79/cnGLd2uSZ223uXYNuDB7/w6qWBj4Y=;
+ b=tPrXIS0ZSQ2QcmoLuT66Cv0rTZVNOu5rGrUAc19HE30Iky6PImT/x4C1zB/vv7p7zA4uc41cK
+ SqUh4pIkWj5ARF5Ljs9XDBmOc3EtJvpcx5wXOtVZpxRar1cRu2ejdNs
 X-Developer-Key: i=cedric.jehasse@luminex.be; a=ed25519;
  pk=DL2RaHc2bc7tTDTMJdugm42BtJk4Ip+7V41Gkj+Avjk=
 X-Endpoint-Received: by B4 Relay for cedric.jehasse@luminex.be/20260213
@@ -94,7 +95,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297032-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
+	TAGGED_FROM(0.00)[bounces-297033-lists,netdev=lfdr.de,cedric.jehasse.luminex.be];
 	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lukeh@padl.com,m:kabel@kernel.org,m:cedric.jehasse@gmail.com,m:cedric.jehasse@luminex.be,m:cedricjehasse@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -105,7 +106,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
@@ -117,360 +118,553 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	HAS_REPLYTO(0.00)[cedric.jehasse@luminex.be];
 	TAGGED_RCPT(0.00)[netdev];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6854C65FF45
+X-Rspamd-Queue-Id: 43A7F65FF50
 
 From: Cedric Jehasse <cedric.jehasse@luminex.be>
 
-When transmitting fill in the PRI field in the dsa tag to select the
-egress queue is sent to.
-From the datasheets i've looked at these switches have 4 or 8 transmit
-queues per port.
-Note: skbs with skb->offload_fwd_mark set use the DSA_CMD_FORWARD
-tag. These are processed as normal ingress frames, meaning the queue
-they end up in can still be altered by other switch config. eg. priority
-overrides, tcam policies.
-This isn't done for vlan tagged frames because this would overwrite the
-PCP value in the vlan tag (The PRI field in the dsa
-tag is used as the PCP value in the vlan tag).
+Some of the chips supported by this driver have credit based shaper
+support. Support is added for the 6341, 6352, 6390 and 6393 families.
+This is configured using the Qav registers in the AVB register block.
+There are small differences in the Qav registers between the chip
+families (eg. the unit used for the rate and number of bits in the
+registers). mv88e6xxx_qav_info is introduced to configure this per chip.
+
+Eg. setting up 20mbps credit based shaper on a 1GBit link:
+tc qdisc add dev p8 parent root handle 100: mqprio \
+                num_tc 8 \
+                map 0 0 6 7 0 5 0 0 0 0 0 0 0 0 0 0 \
+                queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 \
+                hw 0
+
+tc qdisc replace dev p8 parent 100:8 cbs locredit -1470 hicredit 30 \
+    sendslope -980000 idleslope 20000 offload 1
+
+Note: only idleslope and hicredit can be programmed in the switch
+registers, other parameters won't affect settings.
 
 Signed-off-by: Cedric Jehasse <cedric.jehasse@luminex.be>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 35 +++++++++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/chip.h |  1 +
- net/dsa/tag_dsa.c                | 11 ++++++++++-
- 3 files changed, 46 insertions(+), 1 deletion(-)
+ drivers/net/dsa/mv88e6xxx/chip.c        | 133 ++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/chip.h        |  20 +++++
+ drivers/net/dsa/mv88e6xxx/global2.h     |   3 +
+ drivers/net/dsa/mv88e6xxx/global2_avb.c |  21 +++++
+ drivers/net/dsa/mv88e6xxx/port.c        |  63 +++++++++++++++
+ drivers/net/dsa/mv88e6xxx/port.h        |  20 +++++
+ 6 files changed, 260 insertions(+)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 8ca5fd40df92..ffd4fa41b7c5 100644
+index ffd4fa41b7c5..233128851247 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3979,6 +3979,7 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+@@ -32,6 +32,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/phylink.h>
+ #include <net/dsa.h>
++#include <net/pkt_sched.h>
  
- 	chip->ds = ds;
- 	ds->user_mii_bus = mv88e6xxx_default_mdio_bus(chip);
-+	ds->num_tx_queues = chip->info->num_tx_queues;
+ #include "chip.h"
+ #include "devlink.h"
+@@ -5015,6 +5016,7 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
+ 	.port_set_ether_type = mv88e6351_port_set_ether_type,
+ 	.port_set_jumbo_size = mv88e6165_port_set_jumbo_size,
+ 	.port_egress_rate_limiting = mv88e6097_port_egress_rate_limiting,
++	.port_set_scheduling_mode = mv88e6352_port_set_scheduling_mode,
+ 	.port_pause_limit = mv88e6097_port_pause_limit,
+ 	.port_disable_learn_limit = mv88e6xxx_port_disable_learn_limit,
+ 	.port_disable_pri_override = mv88e6xxx_port_disable_pri_override,
+@@ -5288,6 +5290,7 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
+ 	.port_set_ether_type = mv88e6351_port_set_ether_type,
+ 	.port_set_jumbo_size = mv88e6165_port_set_jumbo_size,
+ 	.port_egress_rate_limiting = mv88e6097_port_egress_rate_limiting,
++	.port_set_scheduling_mode = mv88e6352_port_set_scheduling_mode,
+ 	.port_pause_limit = mv88e6097_port_pause_limit,
+ 	.port_disable_learn_limit = mv88e6xxx_port_disable_learn_limit,
+ 	.port_disable_pri_override = mv88e6xxx_port_disable_pri_override,
+@@ -5446,6 +5449,7 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
+ 	.port_set_ether_type = mv88e6351_port_set_ether_type,
+ 	.port_set_jumbo_size = mv88e6165_port_set_jumbo_size,
+ 	.port_egress_rate_limiting = mv88e6097_port_egress_rate_limiting,
++	.port_set_scheduling_mode = mv88e6352_port_set_scheduling_mode,
+ 	.port_pause_limit = mv88e6097_port_pause_limit,
+ 	.port_disable_learn_limit = mv88e6xxx_port_disable_learn_limit,
+ 	.port_disable_pri_override = mv88e6xxx_port_disable_pri_override,
+@@ -5515,6 +5519,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	.port_get_cmode = mv88e6352_port_get_cmode,
+ 	.port_set_cmode = mv88e6390_port_set_cmode,
+ 	.port_setup_message_port = mv88e6xxx_setup_message_port,
++	.port_set_scheduling_mode = mv88e6390_port_set_scheduling_mode,
+ 	.stats_snapshot = mv88e6390_g1_stats_snapshot,
+ 	.stats_set_histogram = mv88e6390_g1_stats_set_histogram,
+ 	.stats_get_sset_count = mv88e6320_stats_get_sset_count,
+@@ -5580,6 +5585,7 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
+ 	.port_get_cmode = mv88e6352_port_get_cmode,
+ 	.port_set_cmode = mv88e6390x_port_set_cmode,
+ 	.port_setup_message_port = mv88e6xxx_setup_message_port,
++	.port_set_scheduling_mode = mv88e6390_port_set_scheduling_mode,
+ 	.stats_snapshot = mv88e6390_g1_stats_snapshot,
+ 	.stats_set_histogram = mv88e6390_g1_stats_set_histogram,
+ 	.stats_get_sset_count = mv88e6320_stats_get_sset_count,
+@@ -5637,6 +5643,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.port_set_ether_type = mv88e6393x_port_set_ether_type,
+ 	.port_set_jumbo_size = mv88e6165_port_set_jumbo_size,
+ 	.port_egress_rate_limiting = mv88e6097_port_egress_rate_limiting,
++	.port_set_scheduling_mode = mv88e6390_port_set_scheduling_mode,
+ 	.port_pause_limit = mv88e6390_port_pause_limit,
+ 	.port_disable_learn_limit = mv88e6xxx_port_disable_learn_limit,
+ 	.port_disable_pri_override = mv88e6xxx_port_disable_pri_override,
+@@ -5679,6 +5686,27 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.tcam_ops = &mv88e6393_tcam_ops,
+ };
  
- 	/* Since virtual bridges are mapped in the PVT, the number we support
- 	 * depends on the physical switch topology. We need to let DSA figure
-@@ -5689,6 +5690,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		 */
- 		.num_ports = 7,
- 		.num_internal_phys = 2,
-+		.num_tx_queues = 4,
- 		.invalid_port_mask = BIT(2) | BIT(3) | BIT(4),
- 		.max_vid = 4095,
- 		.port_base_addr = 0x8,
-@@ -5711,6 +5713,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_databases = 64,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x08,
- 		.phy_base_addr = 0x00,
-@@ -5733,6 +5736,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 10,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5757,6 +5761,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 11,
- 		.num_internal_phys = 0,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x10,
- 		.phy_base_addr = 0x0,
-@@ -5778,6 +5783,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 11,
- 		.num_internal_phys = 8,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5803,6 +5809,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 1024,
- 		.num_ports = 3,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5828,6 +5835,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 8,
- 		.num_internal_phys = 0,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x10,
- 		.phy_base_addr = 0x0,
-@@ -5850,6 +5858,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 6,
- 		.num_internal_phys = 5,
- 		.num_gpio = 11,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5875,6 +5884,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 1024,
- 		.num_ports = 6,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5901,6 +5911,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 6,
- 		.num_internal_phys = 0,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5926,6 +5937,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5952,6 +5964,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -5977,6 +5990,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6003,6 +6017,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6028,6 +6043,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 10,
- 		.num_internal_phys = 0,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x10,
- 		.phy_base_addr = 0x0,
-@@ -6051,6 +6067,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6076,6 +6093,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6100,6 +6118,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 16384,
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6125,6 +6144,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 8,
- 		.internal_phys_offset = 1,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6151,6 +6171,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 8,
- 		.num_tcam_entries = 256,
- 		.internal_phys_offset = 1,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6181,6 +6202,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 7,
- 		.num_internal_phys = 2,
- 		.invalid_port_mask = BIT(2) | BIT(3) | BIT(4),
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x08,
- 		.phy_base_addr = 0x00,
-@@ -6205,6 +6227,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6230,6 +6253,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_databases = 64,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.port_base_addr = 0x08,
- 		.phy_base_addr = 0x00,
-@@ -6254,6 +6278,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
- 		.num_tcam_entries = 256,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6282,6 +6307,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 2,
- 		.internal_phys_offset = 3,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6310,6 +6336,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 2,
- 		.internal_phys_offset = 3,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6337,6 +6364,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 5,
- 		.num_ports = 6,
- 		.num_gpio = 11,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6363,6 +6391,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6388,6 +6417,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_macs = 8192,
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6414,6 +6444,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 7,
- 		.num_internal_phys = 5,
- 		.num_gpio = 15,
-+		.num_tx_queues = 4,
- 		.max_vid = 4095,
- 		.max_sid = 63,
- 		.port_base_addr = 0x10,
-@@ -6442,6 +6473,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.invalid_port_mask = BIT(1) | BIT(2) | BIT(8),
- 		.num_internal_phys = 5,
- 		.internal_phys_offset = 3,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6468,6 +6500,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
- 		.num_tcam_entries = 256,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6495,6 +6528,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 9,
- 		.num_gpio = 16,
-+		.num_tx_queues = 8,
- 		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
-@@ -6521,6 +6555,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.num_ports = 11,	/* 10 + Z80 */
- 		.num_internal_phys = 8,
- 		.num_tcam_entries = 256,
-+		.num_tx_queues = 8,
- 		.internal_phys_offset = 1,
- 		.max_vid = 8191,
- 		.max_sid = 63,
++static const struct mv88e6xxx_qav_info mv88e6352_qav_info = {
++	.rate_unit = 32,
++	.rate_mask = GENMASK(14, 0),
++	.hilimit_mask = GENMASK(14, 0),
++	.queue_mask = GENMASK(3, 0),
++};
++
++static const struct mv88e6xxx_qav_info mv88e6341_qav_info = {
++	.rate_unit = 64,
++	.rate_mask = GENMASK(15, 0),
++	.hilimit_mask = GENMASK(13, 0),
++	.queue_mask = GENMASK(3, 0),
++};
++
++static const struct mv88e6xxx_qav_info mv88e6390_qav_info = {
++	.rate_unit = 64,
++	.rate_mask = GENMASK(15, 0),
++	.hilimit_mask = GENMASK(13, 0),
++	.queue_mask = GENMASK(7, 0),
++};
++
+ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 	[MV88E6020] = {
+ 		.prod_num = MV88E6XXX_PORT_SWITCH_ID_PROD_6020,
+@@ -6243,6 +6271,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.qav = &mv88e6352_qav_info,
+ 		.ops = &mv88e6240_ops,
+ 	},
+ 
+@@ -6380,6 +6409,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.qav = &mv88e6341_qav_info,
+ 		.ops = &mv88e6341_ops,
+ 	},
+ 
+@@ -6460,6 +6490,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_SUPPORTED,
+ 		.ptp_support = true,
++		.qav = &mv88e6352_qav_info,
+ 		.ops = &mv88e6352_ops,
+ 	},
+ 	[MV88E6361] = {
+@@ -6517,6 +6548,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_UNDOCUMENTED,
+ 		.ptp_support = true,
++		.qav = &mv88e6390_qav_info,
+ 		.ops = &mv88e6390_ops,
+ 	},
+ 	[MV88E6390X] = {
+@@ -6544,6 +6576,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.multi_chip = true,
+ 		.edsa_support = MV88E6XXX_EDSA_UNDOCUMENTED,
+ 		.ptp_support = true,
++		.qav = &mv88e6390_qav_info,
+ 		.ops = &mv88e6390x_ops,
+ 	},
+ 
+@@ -6572,6 +6605,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.pvt = true,
+ 		.multi_chip = true,
+ 		.ptp_support = true,
++		.qav = &mv88e6390_qav_info,
+ 		.ops = &mv88e6393x_ops,
+ 	},
+ };
+@@ -7193,6 +7227,104 @@ static int mv88e6xxx_crosschip_lag_leave(struct dsa_switch *ds, int sw_index,
+ 	return err_sync ? : err_pvt;
+ }
+ 
++static int mv88e6xxx_setup_tc_cbs(struct dsa_switch *ds, int port,
++				  struct tc_cbs_qopt_offload *cbs)
++{
++	const struct mv88e6xxx_avb_ops *avb_ops;
++	struct mv88e6xxx_chip *chip = ds->priv;
++	const struct mv88e6xxx_qav_info *qav;
++	const struct mv88e6xxx_ops *ops;
++	int hilimit_reg;
++	int rate_reg;
++	u8 queue_bit;
++	u32 rate = 0;
++	u16 hilimit;
++	int err;
++
++	ops = chip->info->ops;
++	avb_ops = ops->avb_ops;
++	qav = chip->info->qav;
++
++	if (!qav || !avb_ops || !avb_ops->port_qav_write ||
++	    !ops->port_set_scheduling_mode)
++		return -EOPNOTSUPP;
++
++	if (!dsa_is_user_port(ds, port))
++		return -EOPNOTSUPP;
++
++	if (!(qav->queue_mask & BIT(cbs->queue)))
++		return -EOPNOTSUPP;
++
++	queue_bit = BIT(cbs->queue);
++	rate_reg = MV88E6XXX_PORT_QAV_CFG_RATE(cbs->queue);
++	hilimit_reg = MV88E6XXX_PORT_QAV_CFG_HILIMIT(cbs->queue);
++
++	if (cbs->enable) {
++		if (cbs->hicredit <= 0 ||
++		    cbs->hicredit > qav->hilimit_mask)
++			return -ERANGE;
++
++		rate = DIV_ROUND_UP(cbs->idleslope, qav->rate_unit);
++		if (rate > qav->rate_mask)
++			return -ERANGE;
++		/* avoid using zero rate */
++		rate = max_t(u16, rate, 1);
++	}
++
++	mv88e6xxx_reg_lock(chip);
++
++	if (!cbs->enable) {
++		err = mv88e6xxx_port_qav_write(chip, port, rate_reg, 0);
++		if (err)
++			goto unlock;
++
++		if (!(chip->ports[port].cbs_active_queues & ~queue_bit)) {
++			err = mv88e6xxx_port_set_scheduling_mode(chip, port, 0);
++			if (err)
++				goto unlock;
++		}
++		chip->ports[port].cbs_active_queues &= ~queue_bit;
++		goto unlock;
++	}
++
++	hilimit = cbs->hicredit & qav->hilimit_mask;
++	err = mv88e6xxx_port_qav_write(chip, port, hilimit_reg, hilimit);
++	if (err)
++		goto unlock;
++
++	err = mv88e6xxx_port_qav_write(chip, port, rate_reg, rate);
++	if (err)
++		goto unlock;
++
++	if (!chip->ports[port].cbs_active_queues) {
++		u8 sched_mode = chip->info->num_tx_queues - 1;
++
++		err = mv88e6xxx_port_set_scheduling_mode(chip, port,
++							 sched_mode);
++		if (err) {
++			mv88e6xxx_port_qav_write(chip, port, rate_reg, 0);
++			goto unlock;
++		}
++	}
++	chip->ports[port].cbs_active_queues |= queue_bit;
++
++unlock:
++	mv88e6xxx_reg_unlock(chip);
++
++	return err;
++}
++
++static int mv88e6xxx_port_setup_tc(struct dsa_switch *ds, int port,
++				   enum tc_setup_type type, void *type_data)
++{
++	switch (type) {
++	case TC_SETUP_QDISC_CBS:
++		return mv88e6xxx_setup_tc_cbs(ds, port, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ static const struct phylink_mac_ops mv88e6xxx_phylink_mac_ops = {
+ 	.mac_select_pcs		= mv88e6xxx_mac_select_pcs,
+ 	.mac_prepare		= mv88e6xxx_mac_prepare,
+@@ -7252,6 +7384,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
+ 	.port_hwtstamp_get	= mv88e6xxx_port_hwtstamp_get,
+ 	.port_txtstamp		= mv88e6xxx_port_txtstamp,
+ 	.port_rxtstamp		= mv88e6xxx_port_rxtstamp,
++	.port_setup_tc		= mv88e6xxx_port_setup_tc,
+ 	.cls_flower_add		= mv88e6xxx_cls_flower_add,
+ 	.cls_flower_del         = mv88e6xxx_cls_flower_del,
+ 	.get_ts_info		= mv88e6xxx_get_ts_info,
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index cde71828e9d9..19d8eda19b78 100644
+index 19d8eda19b78..fb86e62c92ce 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.h
 +++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -136,6 +136,7 @@ struct mv88e6xxx_info {
- 	unsigned int num_internal_phys;
- 	unsigned int num_gpio;
- 	unsigned int num_tcam_entries;
-+	unsigned int num_tx_queues;
- 	unsigned int max_vid;
- 	unsigned int max_sid;
- 	unsigned int port_base_addr;
-diff --git a/net/dsa/tag_dsa.c b/net/dsa/tag_dsa.c
-index 2a2c4fb61a65..cc27b2994c6b 100644
---- a/net/dsa/tag_dsa.c
-+++ b/net/dsa/tag_dsa.c
-@@ -179,8 +179,17 @@ static struct sk_buff *dsa_xmit_ll(struct sk_buff *skb, struct net_device *dev,
- 			dsa_header[2] &= ~0x10;
- 		}
- 	} else {
-+		u16 queue = skb_get_queue_mapping(skb) & 0x7;
- 		u16 vid;
+@@ -125,6 +125,7 @@ enum mv88e6xxx_edsa_support {
+ };
  
-+		/* The PRI field is 3 bits. According to the documentation the
-+		 * 2 highest bits specify the egress queue in From_CPU DSA
-+		 * tagged frames. On devices with 8 queues it's possible to
-+		 * send to the 8 queues, which means the 3 bits are used.
-+		 */
-+		if (dp->ds->num_tx_queues == 4)
-+			queue <<= 1;
+ struct mv88e6xxx_ops;
++struct mv88e6xxx_qav_info;
+ 
+ struct mv88e6xxx_info {
+ 	enum mv88e6xxx_family family;
+@@ -177,6 +178,9 @@ struct mv88e6xxx_info {
+ 	/* Supports PTP */
+ 	bool ptp_support;
+ 
++	/* 802.1Qav credit based shaping */
++	const struct mv88e6xxx_qav_info *qav;
 +
- 		vid = br_dev ? MV88E6XXX_VID_BRIDGED : MV88E6XXX_VID_STANDALONE;
+ 	/* Internal PHY start index. 0 means that internal PHYs range starts at
+ 	 * port 0, 1 means internal PHYs range starts at port 1, etc
+ 	 */
+@@ -304,6 +308,9 @@ struct mv88e6xxx_port {
  
- 		skb_push(skb, DSA_HLEN + extra);
-@@ -191,7 +200,7 @@ static struct sk_buff *dsa_xmit_ll(struct sk_buff *skb, struct net_device *dev,
+ 	/* MacAuth Bypass control flag */
+ 	bool mab;
++
++	/* Queues with CBS currently enabled. */
++	u8 cbs_active_queues;
+ };
  
- 		dsa_header[0] = (cmd << 6) | tag_dev;
- 		dsa_header[1] = tag_port << 3;
--		dsa_header[2] = vid >> 8;
-+		dsa_header[2] = (queue << 5) | vid >> 8;
- 		dsa_header[3] = vid & 0xff;
- 	}
+ enum mv88e6xxx_region_id {
+@@ -607,6 +614,8 @@ struct mv88e6xxx_ops {
+ 				   size_t size);
  
+ 	int (*port_egress_rate_limiting)(struct mv88e6xxx_chip *chip, int port);
++	int (*port_set_scheduling_mode)(struct mv88e6xxx_chip *chip, int port,
++					u8 mode);
+ 	int (*port_pause_limit)(struct mv88e6xxx_chip *chip, int port, u8 in,
+ 				u8 out);
+ 	int (*port_disable_learn_limit)(struct mv88e6xxx_chip *chip, int port);
+@@ -764,6 +773,10 @@ struct mv88e6xxx_avb_ops {
+ 	int (*tai_read)(struct mv88e6xxx_chip *chip, int addr, u16 *data,
+ 			int len);
+ 	int (*tai_write)(struct mv88e6xxx_chip *chip, int addr, u16 data);
++
++	/* Access port-scoped 802.1Qav registers */
++	int (*port_qav_write)(struct mv88e6xxx_chip *chip, int port, int addr,
++			      u16 data);
+ };
+ 
+ struct mv88e6xxx_ptp_ops {
+@@ -799,6 +812,13 @@ struct mv88e6xxx_tcam_ops {
+ 	int (*flush_tcam)(struct mv88e6xxx_chip *chip);
+ };
+ 
++struct mv88e6xxx_qav_info {
++	u16 rate_unit; /* in kbps */
++	u16 rate_mask; /* QPri Rate valid bits mask */
++	u16 hilimit_mask; /* QPri HiLimit bits mask*/
++	u8 queue_mask; /* supported queues bitmask */
++};
++
+ static inline bool mv88e6xxx_has_stu(struct mv88e6xxx_chip *chip)
+ {
+ 	return chip->info->max_sid > 0 &&
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
+index 82f9b410de0b..7ff891cc7f65 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.h
++++ b/drivers/net/dsa/mv88e6xxx/global2.h
+@@ -186,6 +186,9 @@
+ #define MV88E6352_G2_AVB_CMD_BLOCK_MASK		0x00e0
+ #define MV88E6352_G2_AVB_CMD_ADDR_MASK		0x001f
+ 
++#define MV88E6XXX_PORT_QAV_CFG_RATE(queue)	(((queue) & 0x7) << 1)
++#define MV88E6XXX_PORT_QAV_CFG_HILIMIT(queue)	((((queue) & 0x7) << 1) + 1)
++
+ /* Offset 0x17: AVB Data Register */
+ #define MV88E6352_G2_AVB_DATA		0x17
+ 
+diff --git a/drivers/net/dsa/mv88e6xxx/global2_avb.c b/drivers/net/dsa/mv88e6xxx/global2_avb.c
+index 657783e043ff..6b54e275d21a 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2_avb.c
++++ b/drivers/net/dsa/mv88e6xxx/global2_avb.c
+@@ -110,6 +110,15 @@ static int mv88e6352_g2_avb_port_ptp_write(struct mv88e6xxx_chip *chip,
+ 	return mv88e6xxx_g2_avb_write(chip, writeop, data);
+ }
+ 
++static int mv88e6352_g2_avb_port_qav_write(struct mv88e6xxx_chip *chip,
++					   int port, int addr, u16 data)
++{
++	u16 writeop = MV88E6352_G2_AVB_CMD_OP_WRITE | (port << 8) |
++		      (MV88E6352_G2_AVB_CMD_BLOCK_QAV << 5) | addr;
++
++	return mv88e6xxx_g2_avb_write(chip, writeop, data);
++}
++
+ static int mv88e6352_g2_avb_ptp_read(struct mv88e6xxx_chip *chip, int addr,
+ 				     u16 *data, int len)
+ {
+@@ -149,6 +158,7 @@ const struct mv88e6xxx_avb_ops mv88e6352_avb_ops = {
+ 	.ptp_write		= mv88e6352_g2_avb_ptp_write,
+ 	.tai_read		= mv88e6352_g2_avb_tai_read,
+ 	.tai_write		= mv88e6352_g2_avb_tai_write,
++	.port_qav_write		= mv88e6352_g2_avb_port_qav_write,
+ };
+ 
+ static int mv88e6165_g2_avb_tai_read(struct mv88e6xxx_chip *chip, int addr,
+@@ -174,6 +184,7 @@ const struct mv88e6xxx_avb_ops mv88e6165_avb_ops = {
+ 	.ptp_write		= mv88e6352_g2_avb_ptp_write,
+ 	.tai_read		= mv88e6165_g2_avb_tai_read,
+ 	.tai_write		= mv88e6165_g2_avb_tai_write,
++	.port_qav_write		= mv88e6352_g2_avb_port_qav_write,
+ };
+ 
+ static int mv88e6390_g2_avb_port_ptp_read(struct mv88e6xxx_chip *chip,
+@@ -197,6 +208,15 @@ static int mv88e6390_g2_avb_port_ptp_write(struct mv88e6xxx_chip *chip,
+ 	return mv88e6xxx_g2_avb_write(chip, writeop, data);
+ }
+ 
++static int mv88e6390_g2_avb_port_qav_write(struct mv88e6xxx_chip *chip,
++					   int port, int addr, u16 data)
++{
++	u16 writeop = MV88E6390_G2_AVB_CMD_OP_WRITE | (port << 8) |
++		      (MV88E6352_G2_AVB_CMD_BLOCK_QAV << 5) | addr;
++
++	return mv88e6xxx_g2_avb_write(chip, writeop, data);
++}
++
+ static int mv88e6390_g2_avb_ptp_read(struct mv88e6xxx_chip *chip, int addr,
+ 				     u16 *data, int len)
+ {
+@@ -236,4 +256,5 @@ const struct mv88e6xxx_avb_ops mv88e6390_avb_ops = {
+ 	.ptp_write		= mv88e6390_g2_avb_ptp_write,
+ 	.tai_read		= mv88e6390_g2_avb_tai_read,
+ 	.tai_write		= mv88e6390_g2_avb_tai_write,
++	.port_qav_write		= mv88e6390_g2_avb_port_qav_write,
+ };
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index c90117d2dd83..23d1435db0d8 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -1348,6 +1348,51 @@ int mv88e6097_port_egress_rate_limiting(struct mv88e6xxx_chip *chip, int port)
+ 				    0x0001);
+ }
+ 
++int mv88e6352_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode)
++{
++	u16 reg;
++	int err;
++
++	if (mode > 3)
++		return -EINVAL;
++
++	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_EGRESS_RATE_CTL2,
++				  &reg);
++	if (err)
++		return err;
++
++	reg &= ~MV88E6XXX_PORT_EGRESS_RATE_CTL2_SCHEDULE_MASK;
++	reg |= mode << MV88E6XXX_PORT_EGRESS_RATE_CTL2_SCHEDULE_SHIFT;
++
++	return mv88e6xxx_port_write(chip, port,
++				    MV88E6XXX_PORT_EGRESS_RATE_CTL2, reg);
++}
++
++int mv88e6390_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode)
++{
++	u16 reg;
++	int err;
++
++	if (mode > MV88E6390_PORT_QUEUE_CTL_SCHEDULE_MASK)
++		return -EINVAL;
++
++	reg = MV88E6390_PORT_QUEUE_CTL_UPDATE |
++	      (MV88E6390_PORT_QUEUE_CTL_SCHEDULE <<
++	       MV88E6390_PORT_QUEUE_CTL_PTR_SHIFT) |
++	      (mode & MV88E6390_PORT_QUEUE_CTL_SCHEDULE_MASK);
++
++	err = mv88e6xxx_port_write(chip, port, MV88E6390_PORT_QUEUE_CTL,
++				   reg);
++	if (err)
++		return err;
++
++	return mv88e6xxx_port_wait_bit(chip, port, MV88E6390_PORT_QUEUE_CTL,
++				       __bf_shf(MV88E6390_PORT_QUEUE_CTL_UPDATE)
++				       , 0);
++}
++
+ /* Offset 0x0B: Port Association Vector */
+ 
+ int mv88e6xxx_port_set_assoc_vector(struct mv88e6xxx_chip *chip, int port,
+@@ -1761,3 +1806,21 @@ int mv88e6393x_port_set_policy(struct mv88e6xxx_chip *chip, int port,
+ 
+ 	return mv88e6393x_port_policy_write(chip, port, ptr, reg);
+ }
++
++int mv88e6xxx_port_qav_write(struct mv88e6xxx_chip *chip, int port, int addr,
++			     u16 data)
++{
++	if (!chip->info->ops->avb_ops->port_qav_write)
++		return -EOPNOTSUPP;
++
++	return chip->info->ops->avb_ops->port_qav_write(chip, port, addr, data);
++}
++
++int mv88e6xxx_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode)
++{
++	if (!chip->info->ops->port_set_scheduling_mode)
++		return -EOPNOTSUPP;
++
++	return chip->info->ops->port_set_scheduling_mode(chip, port, mode);
++}
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index f6041f91215e..cf8655a13729 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -241,6 +241,18 @@
+ 
+ /* Offset 0x0A: Egress Rate Control 2 */
+ #define MV88E6XXX_PORT_EGRESS_RATE_CTL2		0x0a
++#define MV88E6XXX_PORT_EGRESS_RATE_CTL2_SCHEDULE_MASK	0x3000
++#define MV88E6XXX_PORT_EGRESS_RATE_CTL2_SCHEDULE_SHIFT	12
++
++/* Offset 0x1C: Port Queue Control */
++#define MV88E6390_PORT_QUEUE_CTL			0x1c
++#define MV88E6390_PORT_QUEUE_CTL_UPDATE			0x8000
++#define MV88E6390_PORT_QUEUE_CTL_PTR_MASK		0x7f00
++#define MV88E6390_PORT_QUEUE_CTL_PTR_SHIFT		8
++#define MV88E6390_PORT_QUEUE_CTL_DATA_MASK		0x00ff
++#define MV88E6390_PORT_QUEUE_CTL_SCHEDULE		0x00
++#define MV88E6390_PORT_QUEUE_CTL_SCHEDULE_MASK		0x07
++
+ 
+ /* Offset 0x0B: Port Association Vector */
+ #define MV88E6XXX_PORT_ASSOC_VECTOR			0x0b
+@@ -569,6 +581,10 @@ int mv88e6165_port_set_jumbo_size(struct mv88e6xxx_chip *chip, int port,
+ 				  size_t size);
+ int mv88e6095_port_egress_rate_limiting(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6097_port_egress_rate_limiting(struct mv88e6xxx_chip *chip, int port);
++int mv88e6352_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode);
++int mv88e6390_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode);
+ int mv88e6xxx_port_set_assoc_vector(struct mv88e6xxx_chip *chip, int port,
+ 				    u16 pav);
+ int mv88e6097_port_pause_limit(struct mv88e6xxx_chip *chip, int port, u8 in,
+@@ -613,5 +629,9 @@ int mv88e6xxx_port_hidden_read(struct mv88e6xxx_chip *chip, int block, int port,
+ 			       int reg, u16 *val);
+ 
+ int mv88e6xxx_port_enable_tcam(struct mv88e6xxx_chip *chip, int port);
++int mv88e6xxx_port_qav_write(struct mv88e6xxx_chip *chip, int port, int addr,
++			     u16 data);
++int mv88e6xxx_port_set_scheduling_mode(struct mv88e6xxx_chip *chip, int port,
++				       u8 mode);
+ 
+ #endif /* _MV88E6XXX_PORT_H */
 
 -- 
 2.43.0
