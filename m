@@ -1,82 +1,66 @@
-Return-Path: <netdev+bounces-297787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297788-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DvUGJlihKWrUawMAu9opvQ
-	(envelope-from <netdev+bounces-297787-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:39:36 +0200
+	id ACOKBuKkKWoCbQMAu9opvQ
+	(envelope-from <netdev+bounces-297788-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:54:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F6D966C025
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:39:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862DD66C125
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:54:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=oracle.com header.s=corp-2025-04-25 header.b="CGVsG/EJ";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297787-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297787-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=oracle.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297788-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297788-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 11B44302DF88
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:39:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EB49F304CF7F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E747F348C70;
-	Wed, 10 Jun 2026 17:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1C934D4FE;
+	Wed, 10 Jun 2026 17:54:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EBF222582;
-	Wed, 10 Jun 2026 17:39:32 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F0E349CCD;
+	Wed, 10 Jun 2026 17:54:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781113173; cv=none; b=OZDYtw8XbPIa2kDvKxvXAO/IL3ybmOXXagHS1ZxbpUSHzm4vqDWVwlO/HLX0lyZi4kYyq/QgjWNFgcnkaX20JyezCCjxxJiHuwE762qwi+sLnPBsetpNO+DXVQh4hmb6CbKD0OnyzoIBWhDC6Er9uOlu+/FVmr0xtzvyJ1l7I/g=
+	t=1781114076; cv=none; b=BA41LXWFIo2J0rTCwD7GTjY//o4iP7ZufAJx2rFeDeaPU11Df8/6oPkJgG4+kq/uN1CEg3W+GCVtDatBjcxMQ9s8ygOKHkjIeoKWvEtm5jV/xfypQFt2D2DNH/0KOqz93yNpJoTaATz35JHAUH3e04vgQ2/fAldKfSmkyE5A4Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781113173; c=relaxed/simple;
-	bh=mFsPdIQNmumD6FdOZ1f3tsuWa3qRREaX+mUfFjjJrVM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RJTF9mM6MoNchMwFTI1Uis4ZoX1QO95mbIA7sZQwty93+HaNxNxVr+otJXThFOxqWhEAHOEOhPSWmINpI0MF8eNYJdbt6PQEa83Q7aPZXan/g9gIV6sv/1WFvNalYRaGmNwDWOkq9VJnbCOjgcFRQ78oeWEHWMGvLzi6uWEa4LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=CGVsG/EJ; arc=none smtp.client-ip=205.220.177.32
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65ADulOL140590;
-	Wed, 10 Jun 2026 17:39:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=KYcM7IBQoilglZiFsT2AYDGdPiR3Z
-	d59yAtoqkqCQaE=; b=CGVsG/EJZlJzknu1fMkTXnuvXp7Mr0jd3VMZdEZo5iUPI
-	X/ej4PJH61hpJoRLZ1nUrn3Ubwx1s/l1ajxWfsBNb8MO6H8+70BAP15VNU88qrxg
-	eQLNAW2rfRTrxYJ05Q9QCk9gwoBvRWdqNtDNJRifdE6L9DvsTUA7QuQe9QPZH/7E
-	n5H1Ryg0fo1g79VPPcE1m36dv3mgKog/yBPlimsGVDA6DuSwlVH0/EeSObnG885D
-	E09elU48TWLE2ZO8rjzFeiOSJOsNwtOKzN0e96w+7PFQGrm7YiPA2u1WLu6S5gnf
-	9qjI65JJ4aIAbMWdry5QG9NkM7DN3IHNy8Qsli0dw==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4embkjf5e2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Jun 2026 17:39:20 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 65AHXBvJ028974;
-	Wed, 10 Jun 2026 17:39:18 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4eqbqftdda-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Jun 2026 17:39:18 +0000 (GMT)
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 65AHbHKj011533;
-	Wed, 10 Jun 2026 17:39:17 GMT
-Received: from mbpatil-ws.osdevelopmeniad.oraclevcn.com (mbpatil-ol10-ws.webad1iad.osdevelopmeniad.oraclevcn.com [100.100.228.95])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4eqbqftdcg-1;
-	Wed, 10 Jun 2026 17:39:17 +0000 (GMT)
-From: Manjunath Patil <manjunath.b.patil@oracle.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        netdev@vger.kernel.org
-Cc: Manjunath Patil <manjunath.b.patil@oracle.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Patrisious Haddad <phaddad@nvidia.com>, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH net] net/mlx5e: Use sender devcom for MPV master-up
-Date: Wed, 10 Jun 2026 10:39:15 -0700
-Message-ID: <20260610173915.4053423-1-manjunath.b.patil@oracle.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1781114076; c=relaxed/simple;
+	bh=4bQw0v51lD5neyWw5XtpGHO9eOOSvY1l7333tvj/AmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YbyL/72Bl/Cv9AzY8+Y++oJsPPEkGxncRLmteKhEduVjMSXxnp7MfZVy93NIWTvRMaH6quNyoovV3CmxYUK4StSC6GKVzBdtQ3AB4ZfRrRXrNdD+7gd/S+FGa0D8Xowmk1EUgf33ShdLpLNgvtSfFR23KMPhZd3NmY1DjDwlLEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.76.78.106
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACnwLrIpClquC14AA--.36642S3;
+	Thu, 11 Jun 2026 01:54:20 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: alibuda@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	sidraya@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	mjambigi@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	ubraun@linux.ibm.com,
+	stefan.raspl@linux.ibm.com,
+	davem@davemloft.net,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	lx24@stu.ynu.edu.cn,
+	d4n.for.sec@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] net: smc: fix splice entry lifetime imbalance in smc_rx_splice
+Date: Thu, 11 Jun 2026 01:54:11 +0800
+Message-ID: <192d1b44ed358ca143f44ef167d14153bccc51e9.1781097957.git.d4n.for.sec@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1781097957.git.d4n.for.sec@gmail.com>
+References: <cover.1781097957.git.d4n.for.sec@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,136 +68,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-10_03,2026-06-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2605130000 definitions=main-2606100166
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDE2NiBTYWx0ZWRfX5k9kQImBYMJb
- TMnA5U8R2f/ilo5tGIBLsZOBGtQpXW/f1VA7Ezklmbh8vd0LZEpKoW82H6n/TnfbcP1d9RDy28P
- A5eORAeKQXS9F6vyr4KHmiOdxfaaOnrb5Zwp3zdgAEyKMuqG/iupBtskzaIosIetTg+20JwhziR
- QLQ+spAy96a/vM5bQnfy2vMl2pc3Op7aqgltz1KuQ17O4bPhPuUOHn/IjtYynVeF2eoaQaHajIT
- bRcePuOjn5svN4ijB8TFM65Oi4GRuxs3ThzUFClYtbQ7nbLmW65Xqq1UKRPA+ykYkVyx4k09LYf
- Za1nkOXPA1tPCq+4zjTjGCG6Kf8AwZG3m1JlL87tzFOqcLE6hNLt1VbYjWZRmSCLjfW4erRuuDq
- 7ICJ4z9sK8fu9ZcBReuJwwdAN5XVhUpFnX8AYrKs9w62HUPHstFHQ8ng+YMjRkheZ7y1j2j4AjI
- j5T+wUcwha70ZaEAu8w==
-X-Authority-Analysis: v=2.4 cv=ROSD2Yi+ c=1 sm=1 tr=0 ts=6a29a148 b=1 cx=c_pps
- a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=BqU2WV_vvsyTyxaotp0D:22 a=yPCof4ZbAAAA:8 a=VwQbUJbxAAAA:8
- a=JXUkVfB3YJkj4ag9OGkA:9
-X-Proofpoint-GUID: kFF8KusQBGovR0sKGsMd2h_cailNstJk
-X-Proofpoint-ORIG-GUID: kFF8KusQBGovR0sKGsMd2h_cailNstJk
+X-CM-TRANSID:ygmowACnwLrIpClquC14AA--.36642S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZw1rZF4xCry3KrWUWw48JFb_yoW5tF4UpF
+	W7GwsFyF1kCrn0grs7Kr4q9r4S9asxKr4UWr48Kw4fZFn3K340qa40gryIvrn8AFW0krWS
+	9F40qFnrJF45AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB21xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAS0I0E0xvYzx
+	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	JVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x02
+	62kKe7AKxVW8ZVWrXwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaV
+	Av8VW8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEOCWopHlEJggAAsA
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[oracle.com:D:+];
+X-Spamd-Result: default: False [0.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
-	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297787-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297788-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:ubraun@linux.ibm.com,m:stefan.raspl@linux.ibm.com,m:davem@davemloft.net,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:lx24@stu.ynu.edu.cn,m:d4n.for.sec@gmail.com,m:n05ec@lzu.edu.cn,m:d4nforsec@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:netdev@vger.kernel.org,m:manjunath.b.patil@oracle.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:phaddad@nvidia.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,davemloft.net,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[manjunath.b.patil@oracle.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[oracle.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,oracle.com:dkim,oracle.com:email,oracle.com:mid,oracle.com:from_mime,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ynu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F6D966C025
+X-Rspamd-Queue-Id: 862DD66C125
 
-After PCIe DPC recovery, mlx5 reloads the affected functions and
-replays multiport affiliation events. In the reported failure, the
-first relevant device error was:
+From: Daming Li <d4n.for.sec@gmail.com>
 
-  pcieport 0000:10:01.1: DPC: containment event
-  pcieport 0000:10:01.1: PCIe Bus Error: severity=Uncorrected (Fatal)
-  pcieport 0000:10:01.1:    [ 5] SDES                   (First)
+smc_rx_splice() hands candidate pages to splice_to_pipe() without taking
+references for the lifetime of each splice entry first. That breaks the
+splice ownership contract in the VM-backed RMB path.
 
-mlx5 recovered the PCI functions and resumed 0000:11:00.1. During
-that resume, RDMA multiport binding replayed
-MLX5_DRIVER_EVENT_AFFILIATION_DONE and mlx5e sent
-MPV_DEVCOM_MASTER_UP. The host then panicked with:
+splice_to_pipe() drops unqueued entries through spd_release(), while
+queued entries are later dropped through the pipe buffer release
+callback. The current code only tries to take page references after the
+splice succeeds, and it derives the number of queued VM pages from a
+mutated offset value. This can underflow page refcounts and trigger a
+use-after-free. It also leaves the socket lifetime imbalanced in the
+multi-page VM case, where one sock_hold() can be followed by multiple
+sock_put() calls.
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000010
-  RIP: mlx5_devcom_comp_set_ready+0x5/0x40 [mlx5_core]
-  RDI: 0000000000000000
+Fix this by taking the page and socket references for every candidate
+splice entry before calling splice_to_pipe(), and by releasing the
+matching private state, page reference, and socket reference from
+smc_rx_spd_release() for entries that never get queued. This makes the
+SMC splice path follow the normal splice lifetime rules and removes the
+broken post-splice VM page counting entirely.
 
-Call trace included:
-
-  mlx5_devcom_comp_set_ready
-  mlx5e_devcom_event_mpv
-  mlx5_devcom_send_event
-  mlx5_ib_bind_slave_port
-  mlx5r_mp_probe
-  mlx5_pci_resume
-
-MPV devcom registration publishes mlx5e private data to the component
-peer list before mlx5e_devcom_init_mpv() stores the returned component
-device in priv->devcom. A concurrent master-up event can therefore
-reach a peer whose private data is visible but whose priv->devcom
-backpointer is still NULL.
-
-MPV_DEVCOM_MASTER_UP already carries the sender/master mlx5e private
-data as event_data. The ready bit is stored on the shared devcom
-component, not on an individual peer. Use the sender devcom when
-marking the MPV component ready.
-
-This preserves the readiness transition while avoiding a NULL
-dereference of the peer devcom pointer during affiliation replay after
-PCI error recovery.
-
-Fixes: bf11485f8419 ("net/mlx5: Register mlx5e priv to devcom in MPV mode")
-Assisted-by: Codex:gpt-5
-Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
-Cc: stable@vger.kernel.org # 6.7+
+Fixes: 9014db202cb7 ("smc: add support for splice()")
+Cc: stable@vger.kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Co-developed-by: Liu Xiao <lx24@stu.ynu.edu.cn>
+Signed-off-by: Liu Xiao <lx24@stu.ynu.edu.cn>
+Signed-off-by: Daming Li <d4n.for.sec@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/smc/smc_rx.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 8f2b3abe0092..f7ff20b97e8c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -211,11 +211,14 @@ static void mlx5e_disable_async_events(struct mlx5e_priv *priv)
- 
- static int mlx5e_devcom_event_mpv(int event, void *my_data, void *event_data)
+diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
+index c1d9b923938d..88aee0d93597 100644
+--- a/net/smc/smc_rx.c
++++ b/net/smc/smc_rx.c
+@@ -150,18 +150,23 @@ static const struct pipe_buf_operations smc_pipe_ops = {
+ static void smc_rx_spd_release(struct splice_pipe_desc *spd,
+ 			       unsigned int i)
  {
--	struct mlx5e_priv *slave_priv = my_data;
-+	struct mlx5e_priv *master_priv = event_data;
- 
- 	switch (event) {
- 	case MPV_DEVCOM_MASTER_UP:
--		mlx5_devcom_comp_set_ready(slave_priv->devcom, true);
-+		if (!master_priv || !master_priv->devcom)
-+			return -EINVAL;
++	struct smc_spd_priv *priv = (struct smc_spd_priv *)spd->partial[i].private;
++	struct sock *sk = &priv->smc->sk;
 +
-+		mlx5_devcom_comp_set_ready(master_priv->devcom, true);
- 		break;
- 	case MPV_DEVCOM_MASTER_DOWN:
- 		/* no need for comp set ready false since we unregister after
++	kfree(priv);
+ 	put_page(spd->pages[i]);
++	sock_put(sk);
+ }
+ 
+ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+ 			 struct smc_sock *smc)
+ {
+ 	struct smc_link_group *lgr = smc->conn.lgr;
+-	int offset = offset_in_page(src);
+ 	struct partial_page *partial;
+ 	struct splice_pipe_desc spd;
+ 	struct smc_spd_priv **priv;
+ 	struct page **pages;
++	int offset = offset_in_page(src);
+ 	int bytes, nr_pages;
+ 	int i;
+ 
+@@ -209,6 +214,10 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+ 			offset = 0;
+ 		}
+ 	}
++	for (i = 0; i < nr_pages; i++) {
++		get_page(pages[i]);
++		sock_hold(&smc->sk);
++	}
+ 	spd.nr_pages_max = nr_pages;
+ 	spd.nr_pages = nr_pages;
+ 	spd.pages = pages;
+@@ -217,16 +226,8 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+ 	spd.spd_release = smc_rx_spd_release;
+ 
+ 	bytes = splice_to_pipe(pipe, &spd);
+-	if (bytes > 0) {
+-		sock_hold(&smc->sk);
+-		if (!lgr->is_smcd && smc->conn.rmb_desc->is_vm) {
+-			for (i = 0; i < PAGE_ALIGN(bytes + offset) / PAGE_SIZE; i++)
+-				get_page(pages[i]);
+-		} else {
+-			get_page(smc->conn.rmb_desc->pages);
+-		}
++	if (bytes > 0)
+ 		atomic_add(bytes, &smc->conn.splice_pending);
+-	}
+ 	kfree(priv);
+ 	kfree(partial);
+ 	kfree(pages);
 -- 
-2.47.3
+2.34.1
 
 
