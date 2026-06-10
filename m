@@ -1,223 +1,184 @@
-Return-Path: <netdev+bounces-297435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297436-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dkOJIeHxKGodOAMAu9opvQ
-	(envelope-from <netdev+bounces-297435-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:10:57 +0200
+	id MrcfEIvyKGpEOAMAu9opvQ
+	(envelope-from <netdev+bounces-297436-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:13:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21757665DEC
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:10:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D09665E2C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:13:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=kQ0fAZBd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297435-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297435-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=suse.com header.s=google header.b=I4jtxxH3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297436-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297436-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=suse.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8EAD63016426
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:10:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D5B73095145
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15082370D5C;
-	Wed, 10 Jun 2026 05:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5C5370D6E;
+	Wed, 10 Jun 2026 05:11:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E0F30C63B;
-	Wed, 10 Jun 2026 05:10:52 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781068254; cv=none; b=aEGE+ZzxQZKn5KwFQJ2Hj8sIyNfxSEDpaLrSVymIIJ5J7r17Vaeih+0QHPFiuajxAds62vuTHVnDkVcvbhGWdbX9iC36SLYGmGUKS3RaYF8YvuvOZEFz7lzm2ftwL7E9bJ3JMIkJiDgo7nHuO8Euss+FesWqDQsXrwa6ToqxCps=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781068254; c=relaxed/simple;
-	bh=ksaRSIEGRqNuKkR6GNSxHMgPdXUtwHT+tYNBKfbVXog=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyKgomM4E37RbC4kGFxlnAQAJ1K6RmIx9ICLgoylEL4qkwQ0VwtdR8Pd/GE9tLy3USD3DiIAJWuq5ehop3BOXzX9ngEM+r6lhUD48ladRp1tXb6jE+EtnjqxH9JQwBGcHFJMFonE6F5MNWlqvTzsUBUrIj+MbZnOllm3C0qblJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kQ0fAZBd; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A3TVrS2550628;
-	Tue, 9 Jun 2026 22:10:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=ONdJYD648I4Lsor1X/dqmnKnu
-	8RJk9wqHgawJy7PcnI=; b=kQ0fAZBdrsm1PYJquZ4d5uYfil6fV1BcL4OuSHu44
-	xQA4ykRbBd70Ks1KJCA7zmLInoGSv91jugPeHvGF4HSS2o2Sd+8vuI76vIlVApHL
-	yoC/HP49EaF3pyU0yDPJ6fFJJrYKOyugLI7snbxPJ8/6rm7Mur8ZjYqp6dez+5KP
-	KQ0lnEHwvWFZfeU2soIc4hWUMGjoqcojq/7E3xXUpE8Y/IZMveK/X4PGlTrneFZC
-	hfo+a6LFp137b9AbBnUDno24O/hh/V4uR+7Bjo0oOMCfVKs0vsbCErXH8CxZanTQ
-	nkG4aKS79IrQxgiDeyGPL0ozhrY6Ngc6IPyT0Xm1NMaAQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4eq02mr8sq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jun 2026 22:10:44 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 9 Jun 2026 22:10:43 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 9 Jun 2026 22:10:43 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id E4D0F3F708C;
-	Tue,  9 Jun 2026 22:10:39 -0700 (PDT)
-Date: Wed, 10 Jun 2026 10:40:38 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v20 net-next 5/9] octeontx2-af: npc: cn20k: add subbank
- search order control
-Message-ID: <aijxzksHTt0kLt5J@rkannoth-OptiPlex-7090>
-References: <20260609040453.711932-1-rkannoth@marvell.com>
- <20260609040453.711932-6-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B397B30C63B
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 05:11:10 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781068272; cv=pass; b=gFZc3t8n0LInxfLYP45+xLWUTrexfRd6IcnttIAgLQJ0KINJ1VCSfmuJfu6c7nHNXPY4f56o1Y79QpxMio2iKdUJUj6shqbWL9deoWqXOoYnbRc6z5qf0NQwE4Lv75pFLtNwaaYZelCJ9DAfXUzivv7IW+r2jJtkresHudBVwmo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781068272; c=relaxed/simple;
+	bh=RaoZu7AT59pWjSHSFhsYcGqd1OdcFRhOOHmZ9Wko9tQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AlVksTnLL+87eA+J8jDAT7Uxrgdrz/8G/FlcvBjwB6YSowGfHs08CS3cPx8YqZj66n2r04WVaa87k8OnymqpwvuBHJaZZZDUK1uxBVD0tvYjooKBDVMono5aYlCCzO4TrZzsMDD+MgXwYbJr9RZgP9Mo9OU9Ex/N1OcYkgGSoNA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=I4jtxxH3; arc=pass smtp.client-ip=209.85.167.41
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5aa69131836so5615414e87.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 22:11:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781068269; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CHqtnY1omdMeCBJHiAgUWRel+g7k3wAtuKvwMnAN51+GDu+uO0lQeRI2qOKFKa5183
+         9V3A1ITYD9Hr6n1+Mr+OPE2hbQm3Rc3pxiGp7qhpEhgWz1/5sN1btjMB357zcOMscnL0
+         iNyK+5kN1dfInK7hDdEk0zTjilnoFq6yVV9+2aJDS/bu7M1CnK94tfvl+BqUd6rZQrax
+         CieVgZY+//frutNxJ6mFdXL+GpD59vuyZcm2I26OJ4GLv0twM6PIloE3I7xuBTluQK4k
+         PumxYw6RYhV+npiNxCBJtZWvf2q5jymyHIOSdem+3xTazJ+eHM7rmiHU7n1NOWY9nyNZ
+         fH/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=MjPZkuasfySIcKEliRg5Qwh1GS8tecOIWXm1vwJNGmE=;
+        fh=GmxiGAdi/qmqDsWfPvfBB/bAIuhPOJ0i8NKl8E2Pr+4=;
+        b=kjG4SkbLRQQhbaBSPp8eIWAUsnrpUGu15v+iI91x0P24krgGzzILqk2QqDy4r8kYWl
+         NGxPvqw1nXIhhWjwU01xB7mwZZw00Wc+OjemOnUZac8x+z79qymaiMieNydeAAt8GhS2
+         qKU4hW2QkOnRO3B0yIFHqK07HY6t6LLXo7Na9rTvBeR8rSG7FM9gcgi2qpweQ310DroY
+         nHhto+hciRwu5ejAixOfGTsPzBu+8b1lyLcJN0xIyw1Tjg+rO4XGpnal93a8Ep0t23HT
+         N3+HsOPaL2kNMMV3/soV2r0DIKmd+BwS7yiRpmBHzhLfMjncoVKdfbJImOrz0V3VnKa4
+         HxhA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1781068269; x=1781673069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MjPZkuasfySIcKEliRg5Qwh1GS8tecOIWXm1vwJNGmE=;
+        b=I4jtxxH3dDAAvm3+VG+8ZyEjv1XPnsatmtSuTYI4bPFHiuLthRquM+KABcu3e8ICeF
+         0aK13F+Boh2de5md/g0x4NtbDbO3MdOPTxi9ZjOcpjARZkpxWl8awQ9K/MX12xopVtwj
+         79sRhXC+xcVwH5oGPDqE342GCdyvMInJPF45SURuLBmkhc7GdsFNN12oF7GEbVwxAXHQ
+         o0QpvzRKjCOB4TQLm2iXg96B/q2JYn3+cHNv4W7MG9LaTsv54u8mi+m/UWTkRsNtpb/W
+         A6Z3iolHJ3jqE4erXFSQWtr1bsTO9I+IlsjRs4jYjvINNhL81CLAS6K0E3ECDt3bFiaU
+         b6xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781068269; x=1781673069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MjPZkuasfySIcKEliRg5Qwh1GS8tecOIWXm1vwJNGmE=;
+        b=JVghuiAc/QuS3QOs1yu0FnO9SzeJT95NaUksswPDQbyt/6VlIbg4IDHKIsMBzf51sT
+         52T0mzp6EDblvjvdmR8OF/XCq/+QC+NjoslmWaaIQZ3cA+EMm8AbbA3XbID3F/H58zt4
+         /+dnYdCdm8qvDJWGaJmjTeQ88PTUIzNIJ2e0Q/fH7t7K4FZ4tsd4svGr7PuRn/MXkX6x
+         CGfX/cq4L3W1lX9cvFgwZ85RAFlIOjLf+0j8RdFFbFl/ZHdhJULfg02DkYZvJSJ5CiRy
+         ty4BS0UHuJUtq15b+6Ud1oNZc+H13l1qHZQOOuubH4qdU09c/QUOe4btD+rHMLj4AKcj
+         mNnw==
+X-Forwarded-Encrypted: i=1; AFNElJ9mXF2RNS8jnjGnl+pbw5jubfoG2+V+An+IdJdinNKTTQvDWk1mg0W/7wobe4DuavYo2/Rd6hQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEI5tGzuOfcxrE0nYRF2Z7gmrR5WP0M1P9yCYZ/Uwq2hSr3swm
+	gc1EP6LkI2YFzX1MailEQ4pdbredbajCT+fItedumUiSsVxju9ES8I7wNvOPdGDgsTzePGbk8Xw
+	n9mzqp7a4qct66VbHb+Xo+tgtFNaTRlvwKsAyz6od6w==
+X-Gm-Gg: Acq92OHCe12VQpOTA/fBzJc+gTnMfpV6C38vycIsCw/kHn3FrouKZ3PndI+ekqj5Qte
+	deJad1J2Q/4jPR9X/qdOIlbOhtQPBo1wAm/6RF2TcNR+/zO21Z6ZhZwTqt8mT8zmc0HC7H63N0G
+	kXE2XzMap44quOZkoEL42qmq31VBjLAzjDNVTvYToRas4tlyogNjJn6CKxQ8M7niXN3x3THebb6
+	F7j8xSDScSzm4kW+t/K0Ghf86EhevNdxJiIHs3EvFvIlQUAHDjMCoHqtdo2oD/hsogcvQD9+Mep
+	4SbQ30wRuAeLOQZv+JoxDLQ42o4WZEQOFUUoRxh++2hMuEnwt5F2pXlNHV3ayQ==
+X-Received: by 2002:a05:6512:61d9:10b0:5aa:75f2:c996 with SMTP id
+ 2adb3069b0e04-5aa87bb9a8emr4450473e87.16.1781068269041; Tue, 09 Jun 2026
+ 22:11:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260609040453.711932-6-rkannoth@marvell.com>
-X-Authority-Analysis: v=2.4 cv=cuGrVV4i c=1 sm=1 tr=0 ts=6a28f1d4 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=fMXJLkyFgcRvCBAknKgA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: CllH9FuE_tMIQKFLcdVhW1Wa03xlOMoR
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA0NSBTYWx0ZWRfX7ga/DON0hHSn
- lO7bZqWRxkHZA7nB/syEkna46VveHzPV6L/IRq7XBFbujNd3rLEwP2o0UcoXVxcCZntB6qCg2gY
- wmawvPdeR7pAzfla7C8fcK/lo0foOjSHqZh0n/n7RqGX9hWP4GUB2LxMsBsEHpiAU2EosSnNUjk
- 9U9XzNMxXspW2d5eRMpOozhE+rg2ABj7e55DMinLKaNJqkJgeSZQNii3zgH9HXsnEXSH9XPwJ9h
- ZRjqWGGGq/AL8EzCWKHiWlK10VEYXAxV3umyLoNIGmKl2VTSQ0FySZcmE2kGHGegV5VGEH3IDsd
- kMYBTPFjhz+oz3UHvmN7sSnZsM9D/qnILvmGV9sXY6cqp+0StOC6247WBr0xYjwO7t5dNyLIpRn
- THNLUhv4Vl9zaHnu29HTuLNNNT+uIHhf2ZmhCy4F0itc3ljMTy4uStN/VnO52qFoCLnSYgMz4lo
- 1dmcUqcbk3C2YvlsT9g==
-X-Proofpoint-ORIG-GUID: CllH9FuE_tMIQKFLcdVhW1Wa03xlOMoR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
+References: <20260507130117.252825-1-marco.crivellari@suse.com>
+ <CAAofZF5_MRtySWTMs-J3T676FwjJiLDpYLRWmsFaSXePo3nZPg@mail.gmail.com> <d9242324-720c-448f-9723-e11f0158f4b1@app.fastmail.com>
+In-Reply-To: <d9242324-720c-448f-9723-e11f0158f4b1@app.fastmail.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Wed, 10 Jun 2026 07:10:58 +0200
+X-Gm-Features: AVVi8Cd4rl3lKg-JT9WcRLU1iz-_cOhVgv4WWgAm98_6Ch-TnEwssJeJ6D60Ox4
+Message-ID: <CAAofZF6UbVgtzDkpaQusrHBg6u1q0E-49upzNL=Te-+PzDNNrQ@mail.gmail.com>
+Subject: Re: [PATCH v2] xprtrdma: Move long delayed work on system_dfl_long_wq
+To: Anna Schumaker <anna@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Hocko <mhocko@suse.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+	Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-297435-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anna@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-nfs@vger.kernel.org,m:netdev@vger.kernel.org,m:tj@kernel.org,m:jiangshanlai@gmail.com,m:frederic@kernel.org,m:bigeasy@linutronix.de,m:mhocko@suse.com,m:trondmy@kernel.org,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297436-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,linutronix.de,suse.com,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marco.crivellari@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,suse.com:dkim,suse.com:email,suse.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 21757665DEC
+X-Rspamd-Queue-Id: A8D09665E2C
 
-On 2026-06-09 at 09:34:49, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> CN20K NPC MCAM is split into 32 subbanks that are searched in a
-> predefined order during allocation. Lower-numbered subbanks have
-> higher priority than higher-numbered ones.
+On Tue, Jun 9, 2026 at 8:55=E2=80=AFPM Anna Schumaker <anna@kernel.org> wro=
+te:
 >
-> Add a runtime "srch_order" to control the order in which
-> subbanks are searched during MCAM allocation.
+> Hi Marco,
 >
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> On Fri, Jun 5, 2026, at 4:12 AM, Marco Crivellari wrote:
+> > Hi,
+> >
+> > On Thu, May 7, 2026 at 3:01=E2=80=AFPM Marco Crivellari
+> > <marco.crivellari@suse.com> wrote:
+> >> [...]
+> >>  net/sunrpc/xprtrdma/transport.c | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > Gentle ping.
+>
+> Thanks for the ping! I've had the patch in my
+> testing branch for a bit, and just pushed it
+> out to my linux-next for the next merge.
 
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260609040453.711932-1-rkannoth%40marvell.com says:
->> @@ -3906,6 +3906,122 @@ static void npc_unlock_all_subbank(void)
->>  		mutex_unlock(&npc_priv.sb[i].lock);
->>  }
->>
->> +int npc_cn20k_search_order_set(struct rvu *rvu,
->> +			       u64 narr[MAX_NUM_SUB_BANKS], int cnt)
->> +{
->[ ... ]
->> +	for (prio = 0; prio < cnt; prio++) {
->> +		sb_idx = narr[prio];
->> +		sb = &npc_priv.sb[sb_idx];
->[ ... ]
->> +		sb->arr_idx = prio;
->> +	}
->[ ... ]
->> +	for (int i = 0; i < cnt; i++)
->> +		subbank_srch_order[i] = (u32)narr[i];
->Do the get and set paths agree with init on what subbank_srch_order[]
->means?  The init path appears to treat the array as indexed by sb_idx
->with priority as the value:
->    /* npc_create_srch_order() */
->    for (int i = 0; i < cnt; i += 2) {
->        subbank_srch_order[i]     = cnt / 2 - val - 1;
->        subbank_srch_order[i + 1] = cnt / 2 + 1 + val;
->        val++;
->    }
->    subbank_srch_order[cnt - 1] = cnt / 2;
->    /* npc_subbank_init() */
->    sb->idx = idx;
->    sb->arr_idx = subbank_srch_order[idx];
->So initially subbank_srch_order[sb_idx] == priority (arr_idx).
->The new set helper, however, treats narr as indexed by priority with
->sb_idx as the value:
->    for (prio = 0; prio < cnt; prio++) {
->            sb_idx = narr[prio];
->            sb = &npc_priv.sb[sb_idx];
->            ...
->            sb->arr_idx = prio;
->    }
->    ...
->    for (int i = 0; i < cnt; i++)
->            subbank_srch_order[i] = (u32)narr[i];
->and the get helper returns subbank_srch_order verbatim.
->With cnt = 4 the round-trip then looks like:
->  after init:        subbank_srch_order = [1, 3, 0, 2]
->                     arr_idx[sb0..sb3]  = [1, 3, 0, 2]
->                     priority -> sb     = [2, 0, 3, 1]
->  user issues GET  -> [1, 3, 0, 2]  (validate accepts: distinct, < cnt)
->  user issues SET with the same array:
->                     arr_idx[sb0..sb3]  = [2, 0, 3, 1]
->                     priority -> sb     = [1, 3, 0, 2]
->That is, an unmodified GET -> SET echo silently inverts the runtime
->priority order of the MCAM subbanks.
->Should init be reworked so subbank_srch_order is indexed by priority
->(with npc_subbank_init() doing something like
->sb[subbank_srch_order[p]].arr_idx = p), or should set/get use the same
->indexing convention as init so a no-op round-trip is actually a no-op?
->> +	restrict_valid = false;
->> +
->> +	npc_unlock_all_subbank();
->> +	mutex_unlock(&mcam->lock);
->> +
->> +	return 0;
->[ ... ]
->> +}
->> +
->> +const u32 *npc_cn20k_search_order_get(bool *restricted_order, u32 *sz)
->> +{
->> +	*restricted_order = restrict_valid;
->> +	*sz = npc_priv.num_subbanks;
->> +	return subbank_srch_order;
+Many thanks Anna!
 
-There is due to bug in npc_subbank_init() (not introduced by this patch).
-Will post a patch to "net" tree.
+--=20
+
+Marco Crivellari
+
+SUSE Labs
 
