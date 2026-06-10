@@ -1,135 +1,140 @@
-Return-Path: <netdev+bounces-297517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id igZ/JHUbKWoVQwMAu9opvQ
-	(envelope-from <netdev+bounces-297517-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:08:21 +0200
+	id l37OF58bKWogQwMAu9opvQ
+	(envelope-from <netdev+bounces-297519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:09:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1FC5666F1F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:08:20 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 679DB666F44
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:09:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=iogearbox.net header.s=default2302 header.b=iezskWIU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297517-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297517-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=iogearbox.net;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=AVc9mwDe;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297519-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297519-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF010312103B
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:03:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5B3103006B2E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CF63A0B1D;
-	Wed, 10 Jun 2026 08:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963F539EF2B;
+	Wed, 10 Jun 2026 08:05:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317AB3955EB
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 08:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA3430676E;
+	Wed, 10 Jun 2026 08:05:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781078631; cv=none; b=ibMNCxSJ9njqEkatmE7vAuGXdWUPkoZsk8YOcq4qfeD/Iq/6flCvfIMssBMkIgE9nuR31AnXrRTDgnFUvxakaMq6aZ3DmKgxRU7D/PCcDr9QxaxvrR2PwkV/co/6nCODghmweN95dpormClREeqIdBnuUTCBu+BjGDXqnJjVwCA=
+	t=1781078736; cv=none; b=GvQO6VVTsge6T4AvqvzGx/MAH2w5e+CJmzTG8YvifSPN0VvGmu6wTqreVezHsdzpCUA8jtCx79Jhy+pdxVYxv/k9vBo4xkZyRg9Lf/E20DZulOrh8j9Z0bHZjeCfwwT4iNneYQgKvkXClgu850DE0cDB5mkQUTMyhtJuB3GzJkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781078631; c=relaxed/simple;
-	bh=TZrOT8djkYsR3Y60uYuCrKmOFe/p1F+vK6m7f9HiUVk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t3zVDeKySA1CjiO1sLQqtyB9M/SLp2U/yD70PbcRQDasLmfBeDvKeYZsiZky8D1Y7A+5r6hGYVnijf0Ft/j5b39bwCPixsRtJWdi4kNZXGFEKq2kq0+V919dY6Yp2UXQZP3UrHGBJvxyVDGWMDg73VuFfORQnRNXcXm0XKAXsSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=iezskWIU; arc=none smtp.client-ip=213.133.104.62
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=jtUVgGwM4/4YKET5/9R7Z4VqbBkAsNEzniTbNkK+P/A=; b=iezskWIUgfC7nL+6zFZpiPHJn5
-	e6R/p0d4zLok6ArmRrfN/l2Pp3iIKGmATxhbSRchzPUEc9PmXYgz5U8/917uDKuti+7DH1oFOdo2z
-	DLuSLcXL5Cb4g9tMv1DH45CxatngU5b4lN2o4bppXo+Kt9Hr5b+5p8OTWS0W7N3avLpuib0Y/ec8u
-	D76M5ioJjLnOVL/ZuPEzelwRK8vDKco2fUcBo8VMMzfrwnrpIOJWC0cYbLWqMByGukCuBtWzEDoyi
-	887sPuBzcFp8bgciVkxGwHzAzq4DJU2UWyn/BH6/b6vW3TZd/+bAp3gcM3p2xzUHBJcGTLsQuXiof
-	uSGB7Plw==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1wXDue-0009XB-0W;
-	Wed, 10 Jun 2026 10:03:48 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: razor@blackwall.org,
-	bobbyeshleman@meta.com,
-	dw@davidwei.uk,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 4/4] selftests/net: Add hugepage kernel config dependency for zcrx
-Date: Wed, 10 Jun 2026 10:03:44 +0200
-Message-ID: <20260610080344.701380-5-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260610080344.701380-1-daniel@iogearbox.net>
-References: <20260610080344.701380-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1781078736; c=relaxed/simple;
+	bh=Bku6vmbnfsIPF3upfNi33A0lpAy6UNfcQHI8Xaj7jk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGXazB/ZmJHdl5moDoxSYi2yGQSicZfT4rFwIEu4eqxqJyb31Yswt37wHQ7WT6ynDSeihufiF6rETYjkAm+t4Mqzu2z3Ptla/Xsm52naLo8E8LrhDCWBMiW6r8c6aA1ZiQ/ane4uim2EudcUTY5VBn8haStT04eKn2V30CYZ80E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AVc9mwDe; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SUBiUHt/0iiIKa8WSEzuAV3b4OE0sNSco6iZTF/7BsU=; b=AVc9mwDezYfcqmBMiqIwUCYUoM
+	Q7WdYxiJugJww1//sevc6nVN3YNGEIb1ab91J5FltT9bMo6KZKb9chMrSpLN+21EaPtwzcdK5FJhH
+	+TdA+GLaIdZE928yP4zk/+QF20dc/7uoTpRzXl9spIgb/+zWebK53U5SHIK6LIvjui2E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wXDwI-006wZA-Ak; Wed, 10 Jun 2026 10:05:30 +0200
+Date: Wed, 10 Jun 2026 10:05:30 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Greg Ungerer <gerg@linux-m68k.org>
+Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
+	arnd@kernel.org, wei.fang@nxp.com, frank.li@nxp.com,
+	shenwei.wang@nxp.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+	nico@fluxnic.net, adureghello@baylibre.com, ulfh@kernel.org,
+	linux-mmc@vger.kernel.org, linux-can@vger.kernel.org,
+	linux-spi@vger.kernel.org, olteanv@gmail.com
+Subject: Re: [PATCHv2 1/4] net: fec: do not use readl()/writel() for ColdFire
+Message-ID: <caa2a34c-5a73-4075-9f7f-77b30673a4e2@lunn.ch>
+References: <20260609142139.1563360-1-gerg@linux-m68k.org>
+ <20260609142139.1563360-3-gerg@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/28027/Wed Jun 10 08:29:13 2026)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609142139.1563360-3-gerg@linux-m68k.org>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297517-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:razor@blackwall.org,m:bobbyeshleman@meta.com,m:dw@davidwei.uk,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297519-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:gerg@linux-m68k.org,m:linux-m68k@lists.linux-m68k.org,m:linux-kernel@vger.kernel.org,m:arnd@kernel.org,m:wei.fang@nxp.com,m:frank.li@nxp.com,m:shenwei.wang@nxp.com,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:nico@fluxnic.net,m:adureghello@baylibre.com,m:ulfh@kernel.org,m:linux-mmc@vger.kernel.org,m:linux-can@vger.kernel.org,m:linux-spi@vger.kernel.org,m:olteanv@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lists.linux-m68k.org,vger.kernel.org,kernel.org,nxp.com,lists.linux.dev,fluxnic.net,baylibre.com,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid,iogearbox.net:from_mime,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1FC5666F1F
+X-Rspamd-Queue-Id: 679DB666F44
 
-test_iou_zcrx_large_buf in drivers/net/hw/nk_qlease.py runs iou-zcrx
-with rx_buf_len > page size, backed by a hugepage-mapped area. Thus
-add to the Kconfig.
+On Wed, Jun 10, 2026 at 12:12:58AM +1000, Greg Ungerer wrote:
+> Modify the FEC driver to not directly use readl() and writel() to access
+> hardware registers but instead local fec_readl() and fec_writel() methods.
+> This allows for different architecture users of this driver to have
+> different underlying access functions - to support both little and big
+> endian hardware.
+> 
+> The FEC hardware block in ColdFire SoC parts is accessed big-endian.
+> The usual kernel readl()/writel() IO memory access methods are defined to
+> access little endian data. Change access for ColdFire to use __raw_readl()
+> and __raw_writel() access methods - which do not modify or swap bytes
+> on access.
+> 
+> The FEC driver works today because the m68k architecture io.h has a
+> kludge in the definitions of the readl() and writel() functions for
+> ColdFire that allow big-endian access if the address of the register to
+> access is within the SoC's internal peripheral registers. This is being
+> fixed in the near future to define readl() and writel() correctly - with
+> no byte swapping. Thus the motivation for this fix here.
+> 
+> __raw_readl()/__raw_writel() access methods are used instead of the more
+> commonly used ioread32be()/iowrite32be() here because those are broken too,
+> because of the current readl()/writel() kludge. They are implemented in
+> asm-generic/io.h in terms of readl()/writel().
+> 
+> Note that even when readl() and writel() are fixed on ColdFire they will
+> not be the right thing to use within the FEC driver on ColdFire hardware.
+> 
+> Signed-off-by: Greg Ungerer <gerg@linux-m68k.org>
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- tools/testing/selftests/drivers/net/hw/config | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-index cd20024218cd..ed8642b68094 100644
---- a/tools/testing/selftests/drivers/net/hw/config
-+++ b/tools/testing/selftests/drivers/net/hw/config
-@@ -3,6 +3,7 @@ CONFIG_FAIL_FUNCTION=y
- CONFIG_FAULT_INJECTION=y
- CONFIG_FAULT_INJECTION_DEBUG_FS=y
- CONFIG_FUNCTION_ERROR_INJECTION=y
-+CONFIG_HUGETLBFS=y
- CONFIG_INET6_ESP=y
- CONFIG_INET6_ESP_OFFLOAD=y
- CONFIG_INET_ESP=y
--- 
-2.43.0
-
+    Andrew
 
