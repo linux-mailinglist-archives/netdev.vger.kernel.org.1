@@ -1,128 +1,135 @@
-Return-Path: <netdev+bounces-297729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297731-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U5AkFZR/KWrXXwMAu9opvQ
-	(envelope-from <netdev+bounces-297729-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:15:32 +0200
+	id HTnEAOGDKWqpYQMAu9opvQ
+	(envelope-from <netdev+bounces-297731-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:33:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C997666A9AF
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:15:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8EF166AD4F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:33:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TtwsI9nw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297729-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297729-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=G70YDoVx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297731-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297731-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 459B630182CE
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:15:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9FD2D30733F0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EF5427A14;
-	Wed, 10 Jun 2026 15:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0527F43CECA;
+	Wed, 10 Jun 2026 15:20:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B24C416D1D;
-	Wed, 10 Jun 2026 15:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F8B427A0C;
+	Wed, 10 Jun 2026 15:20:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781104491; cv=none; b=fp+E5smqBdBXmBH2bFfaqgLul74G+iTIBthe+KoEGACEEWP8XCB+FbpUvH3BIIp8KH1NYeoPIen4RCP46fwE9Oh1LA7SqiqAPYypQD6/iqO4rlmrVqfKAWR24wGW07c5NJ7xumYSCaDaZt54mPaWg9XH641P+cIDh7zUUC2OBfs=
+	t=1781104812; cv=none; b=FRQvNPCx+H4M6OZZcYKK31P2u0HQvU3txHGFEVFMv6/zp5KUnRqcFR2R12VJhrdnNPmeFsLNeYEkWBr+H7GzaMpQOCDUVhT0xCWB8ZvSQgJVUiB8lG0/PfT/+OHssG4WZv0JGqh4Q0cZP6HDcAw8jCEcxoPeapXaoUElWV2yCwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781104491; c=relaxed/simple;
-	bh=qujQ7F/3q/fn9IDdmZYMq+zpEgNokiXiIRhelNM3z4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JUEoGpHUidVL/y3W6GJ642UNtRi/+gdA/01yAleXP+lGOIFrVtcu7lns+YWv6uAk+5PJQh39oB7nwtE3DRtNZlg+fbyxw+ouqkwOqSgaNTFq4hfT65vSTuDoZd/GnXSDOH2fxsc7cGu0ajXYCBClz54ALYBKU1E01d2nwJ/bPkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtwsI9nw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 057711F00893;
-	Wed, 10 Jun 2026 15:14:48 +0000 (UTC)
+	s=arc-20240116; t=1781104812; c=relaxed/simple;
+	bh=pLCpcmfWdOkh9vAt/shqdNS3cH7550n0VAxQhyMZ4lk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bQte5zy04sanr71wqrlc9nfRB/gYtvX20QuZM9v+64T+dxbSvUcmkOAT+QUWfcUK5VMGEQnWhoTx6xBXDqdp6iMyGe/e8PJsQHFwLiliiU2olezkBqkeCRdTxpCjt65RTeNR3cLOvaAiqW8ZljfBq/dBQaeoCyLic3zCUMktoOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G70YDoVx; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80AB91F00899;
+	Wed, 10 Jun 2026 15:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781104489;
-	bh=0L8Gq+UhfVf7Y/GmoFXGXIyxgBspF5hA+qM+Yf+c/+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TtwsI9nwxfkGT79klYybINZ8LOntEF3pmEDLaEdA6G1249kB9uWsTLplpw9BzYe5g
-	 M0HjQUr3c1xVg+ZFkQ+mcX8Gw25UxnyNv/1e5f+fmLIM6inPqTppVKToBIXFK8KJwn
-	 WZh1HUmL9MfONCtIp0l9/78DrdAUqx7qanyJcvgIz6muAQUQf1j+v+08D6KZfjSGks
-	 19LTxAvzB7VR/abmlP2PuMvH4wtDs3/UyiJloHz2RRCWj+/kpalQElO20r7qrnNXnH
-	 9MyA6xa65SP3zlIfym5U4y4POM8QCkH5jwF39g/msfIaITu3wcpXd4kwRxb4UR+wdq
-	 NAQUPXavvwmyQ==
-Date: Wed, 10 Jun 2026 08:14:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, Ao
- Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li
- <qli01@tsinghua.edu.cn>, Ke Xu <xuke@tsinghua.edu.cn>
-Subject: Re: [PATCH net] fddi: validate skb length before parsing headers
-Message-ID: <20260610081448.3a963be9@kernel.org>
-In-Reply-To: <20260607112408.92988-1-zhaoyz24@mails.tsinghua.edu.cn>
-References: <20260607112408.92988-1-zhaoyz24@mails.tsinghua.edu.cn>
+	s=k20260515; t=1781104811;
+	bh=6i9Jm5okbfmlos5U23G4dUUUadPFjk0l2q7W1GIsH0Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=G70YDoVxLKzDElLXlSz++v14/zxFXPXqcoxYcHEC1HCdy3MTUn4WNEwMITXYWiDhw
+	 Q35bcOiqnDg15yAaBLx5JBG3Ao+b1nZKYMNYuDq3P6tEen81Kw0efuN7+7YNwtBGZK
+	 cX9vFCPBKfS9A4zTUxvWoCC4N7Z49aIeNtn+ii0RiJUpvbRrnFTmDzzljIACrE3U+s
+	 LAsie0jHVF5zQEirKVMznjshrxHUFutMtuafgxwpwAS/voolPcuugmUXYJDqXwyRuV
+	 c7k9WdV61ApUuQ/J77T1vfYat1m+QwZEf5cW5s+kA/Fmea9I+pu/en9FcooUVjwh7a
+	 WGMpdLLfMoOfw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93A323930D5F;
+	Wed, 10 Jun 2026 15:20:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] rds: mark snapshot pages dirty in
+ rds_info_getsockopt()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178110480913.3089075.6318008330720525320.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Jun 2026 15:20:09 +0000
+References: <20260608-rds_fix-v1-1-006c88543408@debian.org>
+In-Reply-To: <20260608-rds_fix-v1-1-006c88543408@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andy.grover@oracle.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
+ linux-kernel@vger.kernel.org, kernel-team@meta.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297729-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,kernel.org,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297731-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:achender@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andy.grover@oracle.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kernel@vger.kernel.org,m:kernel-team@meta.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C997666A9AF
+X-Rspamd-Queue-Id: C8EF166AD4F
 
-On Sun,  7 Jun 2026 19:24:04 +0800 Yizhou Zhao wrote:
-> KASAN reports this when such a frame is processed through a dummy FDDI
-> netdev that calls the real fddi_type_trans() on an exact kmalloc() copy
-> of the frame:
-> 
->   BUG: KASAN: slab-out-of-bounds in fddi_type_trans+0x385/0x3a0
->   Read of size 2 at addr ffff888009c6fe33
->   The buggy address is located 4 bytes to the right of
->   allocated 15-byte region [ffff888009c6fe20, ffff888009c6fe2f)
-> 
-> Reject short frames before reading the fields: require the minimum 802.2
-> header length before accessing dsap or daddr, and require the full SNAP
-> header length before reading the SNAP ethertype.  Returning protocol 0
-> causes the malformed packet to be ignored by protocol handlers.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
+Hello:
 
-I'm stripping these, the problem seems entirely theoretical.
-"I invented a fake driver and it makes the stack crash" is not serious.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 08 Jun 2026 02:32:05 -0700 you wrote:
+> rds_info_getsockopt() pins the destination user pages with FOLL_WRITE and
+> the RDS_INFO_* producers memcpy the snapshot into them through
+> kmap_atomic(). Because that copy goes through the kernel direct map, the
+> dirty bit on the user PTE is never set, so unpin_user_pages() releases the
+> pages without marking them dirty. A file-backed destination page can then
+> be reclaimed without writeback, silently discarding the copied data.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] rds: mark snapshot pages dirty in rds_info_getsockopt()
+    https://git.kernel.org/netdev/net/c/512db8267b73
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
