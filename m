@@ -1,215 +1,156 @@
-Return-Path: <netdev+bounces-297771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297765-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w/gaO2uQKWqnZgMAu9opvQ
-	(envelope-from <netdev+bounces-297771-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:27:23 +0200
+	id vAg2Ch2QKWqSZgMAu9opvQ
+	(envelope-from <netdev+bounces-297765-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:26:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E945F66B761
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:27:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF97466B738
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:26:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297771-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297771-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=Hfqm8rJw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297765-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297765-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 75C9730BFEC0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:19:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AD4EA303B4E5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83AE131197C;
-	Wed, 10 Jun 2026 16:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40702F8E99;
+	Wed, 10 Jun 2026 16:18:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDDB306B08
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 16:19:02 +0000 (UTC)
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1D92E9729
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 16:18:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781108347; cv=none; b=SDlP3CnBz6Tpi+/ys2D81tytGircUBZXXLrPmI+kdtwTvkIy4xj8gtc7gPSG78zFP/7Y6YeacS0Uw8KldwkGmN/Gfw1ZBDi7iHfiOBedjgQynbyvnmKHKvKI681L1eYxdSLYGotDiZLzn94mVlGDoq2epq89MbyGbBCd229TJv0=
+	t=1781108330; cv=none; b=Wvp70q5ENBU/DrivSyxqBTz7iA+N+uFUnuzhiBBqQ5v3ObknNb/dl7C1qfcVLv+ELgZvDSTLfigeTSCFPXiMWT8bE3LvwFikMYg5xTLWPYbM3JVg8dOky0Yd7AED86bEsdDxWQev7DQTj7djbIHSftqdgINYiC6diVLmrAw21ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781108347; c=relaxed/simple;
-	bh=K6ZofjL03BA8CZvMc6y/6obeY6FFf6rEC5hfrcfuLR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BooYxQJAkmpnkoNWpyZZcwoT7cr/CARTh+a1HK3Yiq99YQ2a1SeVvPS4ov8bsT037OLP/+QHTxFhvPWQUt3pOr4QrpuImZNK5IpcPB+1bIwq/2rpuonBoFMjX/w4I88P4NbeoiFkL8W2aBudoaswrGYDNtob3xNCBYhkngUJG2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app3 (Coremail) with SMTP id ywmowAB3tv5ajilqTEIfAA--.36361S3;
-	Thu, 11 Jun 2026 00:18:39 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	chia-yu.chang@nokia-bell-labs.com,
-	ij@kernel.org,
-	fmancera@suse.de,
-	yuuchihsu@gmail.com,
-	idosch@nvidia.com,
-	herbert@gondor.apana.org.au,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net: ipv4: bound TCP reordering sysctl writes
-Date: Thu, 11 Jun 2026 00:18:23 +0800
-Message-ID: <42cd30856907350e1b3834a3338364f9828a307b.1780979031.git.bronzed_45_vested@icloud.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1780979031.git.bronzed_45_vested@icloud.com>
-References: <cover.1780979031.git.bronzed_45_vested@icloud.com>
+	s=arc-20240116; t=1781108330; c=relaxed/simple;
+	bh=KVQDHPFdCfmYV8CVU0u8paMAbhS8jCaMhqDWllHJD6I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=apJguRHaSYIQ3wpxg11jw48Y5FeVzU4LVZR+5AY9+5tFTGUlE///5la/KGwa8hAlpLfSikYZ6O+Aowj1tdqtpWdNvR2ZDwlhA73O0HyVAUsemLlvl3EBrYIVVCHGuTf8RzlNo6idrANKYInlPyFWG2myUN9EGBykxNQh5l7rxDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hfqm8rJw; arc=none smtp.client-ip=209.85.222.201
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-915c8347cd5so168522285a.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 09:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781108328; x=1781713128; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tNTOcUI+St3YpbLpSN+OSV2cXCoRKjLVo1x1PwnabNM=;
+        b=Hfqm8rJwAEPwNk6EEP+Zdq2wqjTmRE8unSYIIHmQq5mnteIBuGzLvWyR/p1U5TYJyS
+         4ZIT5zwE2Vt1tCedicLrmFGfQn3d0RbRyLb/HaW36a5fFYGGncsxCNYnaFzCsPg2GF2y
+         nmNQ8Pcid+t3FTrmawEC8Ida9hsXN2yDXipPQgQMe00bojRaiq3atXD70nl6RDS4jIAJ
+         K/jd/FQSaL4RNLA7H5QNi84hkiEojQKUjy2Q0QvhQ9x8wBY8mRSNMc/FKDssrkkdx2xU
+         cbvMTuAYx3wfPo2UiWrjO2MIzvUrq3nEUuqwwmzC2bnv+jTjvQfnixGGCcQznhVQT3BM
+         q18Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781108328; x=1781713128;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tNTOcUI+St3YpbLpSN+OSV2cXCoRKjLVo1x1PwnabNM=;
+        b=Xe+3tEpTaOcubqndtbITVsvmn9/CNNJxbQranthuV40MU2Nphngnm5EOgUueU9ctNZ
+         noA8hqndEsTYOfTV04FlQ7rk+MhbwVUQg5mxGYdd2DXEEYo67LP7SJiMA0BowjRQFSJM
+         0QSkker0bPg/3d94r5u6R4yRSD/xCFl88Zxk+3Yb9Q5eNbwqV5SXTtf1Z42pTSqbk1j9
+         vJ8XXqqi4Haqi1+5nq1M4K5f0M0vkdX2AakLll7qg1ZK2T6S5KpX4HcZmNPPa5TPGsiE
+         GZh6NdJ6utzfmW38j0RcyXLHxcITFu77C+Sgo3u0d2wr+ZQ62TEDjQa4yX7/cCciqWd5
+         FlFw==
+X-Forwarded-Encrypted: i=1; AFNElJ9cBvhNoibAE829VaJeIppzEVGTT7A9GwUiJEARWFDllWsueIwEd0IASxCG03NXB6WYJcPZc64=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIJX6LqXg892Zt7yfCY+3E+fDAiUKIILWXZEysfAcvbiqs0j2R
+	R0ddFo4gl7Ly9YSYWnJ5ntHgGfemVKstHDU0Anhhtt+yP6BDiXqVotu5a/84soSgHazAjYHUp2X
+	h5nFNM3dje1J/xQ==
+X-Received: from qkpt4.prod.google.com ([2002:a05:620a:4504:b0:915:825a:debe])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:f12:b0:915:89d4:df17 with SMTP id af79cd13be357-915a9d76032mr4246418185a.33.1781108327479;
+ Wed, 10 Jun 2026 09:18:47 -0700 (PDT)
+Date: Wed, 10 Jun 2026 16:18:31 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywmowAB3tv5ajilqTEIfAA--.36361S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF47CFy8Kr1rCFW3CF1xXwb_yoW5urWDpF
-	W5t3y5Kry5G34fK3s3AFWjvr1SyF4kJw13CwnrGr1SkwsrKr97CFyFqrWa9F1j9rW2kryU
-	JF1qvFyDWw4qyFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8JVW8Jr1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsOCWopHlEI9gAAs-
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
+Message-ID: <20260610161836.1275531-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/5] net: bridge: take care of p->flags accesses
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297771-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:kuba@kernel.org,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:fmancera@suse.de,m:yuuchihsu@gmail.com,m:idosch@nvidia.com,m:herbert@gondor.apana.org.au,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,kernel.org,nokia-bell-labs.com,suse.de,gmail.com,nvidia.com,gondor.apana.org.au,lzu.edu.cn,icloud.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297765-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:razor@blackwall.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,blackwall.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:mid,icloud.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E945F66B761
+X-Rspamd-Queue-Id: EF97466B738
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
+(struct net_bridge_port)->flags can be read/written locklessly,
+and thus can fire KCSAN warnings, or real bugs.
 
-Reject invalid `net.ipv4.tcp_reordering` values before they reach TCP
-socket state. The sysctl is stored as an `int` but copied into the
-`u32` `tp->reordering` field for new sockets, so negative writes wrap
-to large values.
+Prefer atomic operations (test_bit(), clear_bit(), set_bit())
+and use READ_ONCE() for the remaining uses.
 
-With `tcp_mtu_probing=2`, the wrapped value can overflow the
-`tcp_mtu_probe()` size calculation and drive the MTU probing path into
-an out-of-bounds read. Route `tcp_reordering` writes through
-`proc_dointvec_minmax()` and clamp them to the per-netns range
-`[1, tcp_max_reordering]`.
+v2: addressed Nikolay's feedback on patches 3 & 4.
 
-Apply the matching cross-check to `tcp_max_reordering` so the existing
-invariant `tcp_max_reordering >= tcp_reordering` is preserved. This
-keeps the fix at the sysctl boundary and avoids changing the TCP fast
-path.
+Eric Dumazet (5):
+  bridge: use atomic ops to read/change p->flags in sysfs
+  bridge: use atomic ops to read/change p->flags in br_netlink.c
+  net: bridge: use atomic ops to read/change p->flags (I)
+  net: bridge: use atomic ops to read/change p->flags (II)
+  net: bridge: use atomic ops to read/change p->flags (III)
 
-Fixes: 91cc17c0e5e5 ("[TCP]: MTUprobe: receiver window & data available checks fixed")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/ipv4/sysctl_net_ipv4.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+ net/bridge/br_arp_nd_proxy.c | 22 +++-----
+ net/bridge/br_fdb.c          |  2 +-
+ net/bridge/br_forward.c      | 15 +++---
+ net/bridge/br_if.c           |  2 +-
+ net/bridge/br_input.c        | 12 ++---
+ net/bridge/br_mrp.c          | 20 ++++----
+ net/bridge/br_mrp_netlink.c  |  8 +--
+ net/bridge/br_multicast.c    |  5 +-
+ net/bridge/br_netlink.c      | 99 +++++++++++++++++++-----------------
+ net/bridge/br_stp.c          |  4 +-
+ net/bridge/br_stp_bpdu.c     |  2 +-
+ net/bridge/br_switchdev.c    |  8 +--
+ net/bridge/br_sysfs_if.c     | 61 ++++++++++++----------
+ net/bridge/br_vlan_options.c |  2 +-
+ 14 files changed, 134 insertions(+), 128 deletions(-)
 
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index c0e85cc171ae..c44afb9c321d 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -215,6 +215,40 @@ static int ipv4_fwd_update_priority(const struct ctl_table *table, int write,
- 	return ret;
- }
- 
-+static int proc_tcp_reordering(const struct ctl_table *table, int write,
-+			       void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table tmp = {
-+		.data		= table->data,
-+		.maxlen		= table->maxlen,
-+		.mode		= table->mode,
-+		.extra1		= SYSCTL_ONE,
-+	};
-+	struct net *net;
-+
-+	net = container_of(table->data, struct net, ipv4.sysctl_tcp_reordering);
-+	tmp.extra2 = &net->ipv4.sysctl_tcp_max_reordering;
-+
-+	return proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
-+}
-+
-+static int proc_tcp_max_reordering(const struct ctl_table *table, int write,
-+				   void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table tmp = {
-+		.data		= table->data,
-+		.maxlen		= table->maxlen,
-+		.mode		= table->mode,
-+	};
-+	struct net *net;
-+
-+	net = container_of(table->data, struct net,
-+			   ipv4.sysctl_tcp_max_reordering);
-+	tmp.extra1 = &net->ipv4.sysctl_tcp_reordering;
-+
-+	return proc_dointvec_minmax(&tmp, write, buffer, lenp, ppos);
-+}
-+
- static int proc_tcp_congestion_control(const struct ctl_table *ctl, int write,
- 				       void *buffer, size_t *lenp, loff_t *ppos)
- {
-@@ -1058,7 +1092,7 @@ static struct ctl_table ipv4_net_table[] = {
- 		.data		= &init_net.ipv4.sysctl_tcp_reordering,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec
-+		.proc_handler	= proc_tcp_reordering
- 	},
- 	{
- 		.procname	= "tcp_retries1",
-@@ -1293,7 +1327,7 @@ static struct ctl_table ipv4_net_table[] = {
- 		.data		= &init_net.ipv4.sysctl_tcp_max_reordering,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec
-+		.proc_handler	= proc_tcp_max_reordering
- 	},
- 	{
- 		.procname	= "tcp_dsack",
 -- 
-2.47.3
+2.54.0.1099.g489fc7bff1-goog
 
 
