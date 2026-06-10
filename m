@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297453-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bCwcILj/KGqTOgMAu9opvQ
-	(envelope-from <netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:00 +0200
+	id kmseNYz/KGqGOgMAu9opvQ
+	(envelope-from <netdev+bounces-297453-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:09:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F2A66617E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7E066616D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:09:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b="d6qx6F//";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b="Ge/OgChH";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297453-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297453-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 327C6314CBA5
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5633A31300B9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D34B371CF4;
-	Wed, 10 Jun 2026 06:06:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED125371D15;
+	Wed, 10 Jun 2026 06:06:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEEC368D4D;
-	Wed, 10 Jun 2026 06:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658A5282F2A;
+	Wed, 10 Jun 2026 06:06:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781071605; cv=none; b=cb5L6lp4xW9nfrU0unOx7cvTgELr/FOEJyIwv4dw/pwnYIYSlGv+cygueVVG5xfnD6nv2mfPtZbJOfoAMx6fL8NFIkdFqCDoUuo7XGv2uX9o4oXQpfujlLVPsH4AI6J3FIPlMXYpmpXdHwdjs4LL9xUj4q8dDd1up72y2Y9VHUM=
+	t=1781071603; cv=none; b=glCC13jkzxOwUtDDN6RPhmvbBRRNsE0IDj7zpmtqnfQNlimePEQcvQPPhvAtjBZ316DRylm8WFtwFP9djLS1VzO8X5jkBMLe5E9ImQf5zylhL7t3Bnue9VE+CBgAtx1TV6bOQvBMrDuoo4TUFD+VigmbvCiEindv30Tx8oboJQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781071605; c=relaxed/simple;
-	bh=OFwUD5u1SoDZUrt5BR+USGXeaypfWd/TJRpgiwRlTco=;
+	s=arc-20240116; t=1781071603; c=relaxed/simple;
+	bh=qUraGaKDVyw3heR703LGav4EN88vkDUqa5PTFzYHybU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rxl6jTMnBXs1Z2G1oH6TuzkLB1ckKLfLU6UqN6JQWlwqjRVhgOVPeOAMe8LckNxdKqa1uTx90Whb/DEVBfwvxVmf5w3NyCRmzwgy9uhrOgA72Hgy1c+r+BRB/8jyjxJCspHp4+f/q+QK0E1fA9wjuPwTVsErT1e4KtV8sMJNa5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=d6qx6F//; arc=none smtp.client-ip=113.46.200.218
+	 MIME-Version:Content-Type; b=AtCVRDrCFG1R5l1QtAdEx06cyid4BUN26EEyqFBssNV6I4XRUj5IqNTHQbNg9WsTe5WoQrDvS3mI15y7tpirnkfkXVBPMU7dZxInX7OV9gO4+sy2CJGyS/LsFuwwK+2Z34MWiP8R35SM4IselyrzvhIOJe6wD7+Iy6MVwJTSJyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Ge/OgChH; arc=none smtp.client-ip=113.46.200.226
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=0nVw7NtXG7zJSwe8+BGxCBrF5QqZhskdhRg8AYGXQvM=;
-	b=d6qx6F//EisVJ6ro3AQ+rk0jAPJUAFlRu/lHvJF6DuGCmvYfjPgHU8oikeyH6p2BwB2y5sFnA
-	GmX/y/OU02BBMV6KcgWRx4OmREI/F75Gz+G0DDW8XNer5VCVsaUBIt8E42MSFAGCZLtJd//OaAQ
-	rDRoqJWRflEJoJJgbb1r2Pg=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7n1tmXzpTJt;
-	Wed, 10 Jun 2026 13:58:45 +0800 (CST)
+	bh=SnSRLf03Jzzsy2DIn0FAY/xl4V+1/cHYD9HQEnA5J+o=;
+	b=Ge/OgChHz3Vo4lF+idoy7dm1/ptDLdvuPXik6D3MFEsr4buZmEu+bOwPAmLVjQVzQk0zVSDt5
+	ERIDW9KYdxw+4Al5cqL9Pn+98RbM/IkmUZA4ezR3X+04wbZqHV7R1M220wJ+tL+zCemhigZWA4q
+	yIhihrSwuz12pDmpnXbLUzw=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7g4xfDzKm4Y;
+	Wed, 10 Jun 2026 13:58:39 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id BCCF440569;
-	Wed, 10 Jun 2026 14:06:35 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4BA0440572;
+	Wed, 10 Jun 2026 14:06:36 +0800 (CST)
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -58,9 +58,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
 	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V4 net-next 3/6] net: hns3: support two more actions for tc flow
-Date: Wed, 10 Jun 2026 14:06:15 +0800
-Message-ID: <20260610060618.834987-4-shaojijie@huawei.com>
+Subject: [PATCH V4 net-next 4/6] net: hns3: support IP and tunnel VNI dissectors for tc flow
+Date: Wed, 10 Jun 2026 14:06:16 +0800
+Message-ID: <20260610060618.834987-5-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260610060618.834987-1-shaojijie@huawei.com>
 References: <20260610060618.834987-1-shaojijie@huawei.com>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297454-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297453-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	TO_DN_NONE(0.00)[];
@@ -109,111 +109,209 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D6F2A66617E
+X-Rspamd-Queue-Id: 2D7E066616D
 
-Currently, the driver supports only one action:HCLGE_FD_ACTION_SELECT_TC.
+Currently, the driver does not support FLOW_DISSECTOR_KEY_IP and
+FLOW_DISSECTOR_KEY_ENC_KEYID. But the hardware supports
+ip_tos (FLOW_DISSECTOR_KEY_IP) and
+outer_tun_vni (FLOW_DISSECTOR_KEY_ENC_KEYID).
 
-This patch adds support for HCLGE_FD_ACTION_SELECT_QUEUE and
-HCLGE_FD_ACTION_DROP_PACKET.
+This patch adds support for FLOW_DISSECTOR_KEY_IP and
+FLOW_DISSECTOR_KEY_ENC_KEYID.
 
-A rule can have only one action. Therefore, the driver intercepts rules
-that have multiple actions or no action.
-
-Note: The driver considers cls_flower->classid as an action:
-HCLGE_FD_ACTION_SELECT_TC.
+Additionally, since tc flow cannot effectively support
+l2_user_def, l3_user_def, and l4_user_def,
+this patch explicitly sets them to not be used.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 63 ++++++++++++++++---
- 1 file changed, 56 insertions(+), 7 deletions(-)
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 91 +++++++++++++++++--
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |  4 +
+ 2 files changed, 88 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 176ea5aac8aa..ed7cd0a0d267 100644
+index ed7cd0a0d267..b8d4858fe39a 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -7344,19 +7344,49 @@ static int hclge_get_tc_flower_action(struct hclge_dev *hdev,
+@@ -16,7 +16,7 @@
+ #include <linux/crash_dump.h>
+ 
+ #include <net/rtnetlink.h>
+-
++#include <net/vxlan.h>
+ #include "hclge_cmd.h"
+ #include "hclge_dcb.h"
+ #include "hclge_main.h"
+@@ -337,7 +337,9 @@ static const struct key_info tuple_key_info[] = {
+ 	{ OUTER_SRC_PORT, 16, KEY_OPT_LE16, -1, -1 },
+ 	{ OUTER_DST_PORT, 16, KEY_OPT_LE16, -1, -1 },
+ 	{ OUTER_L4_RSV, 32, KEY_OPT_LE32, -1, -1 },
+-	{ OUTER_TUN_VNI, 24, KEY_OPT_VNI, -1, -1 },
++	{ OUTER_TUN_VNI, 24, KEY_OPT_VNI,
++	  offsetof(struct hclge_fd_rule, tuples.outer_tun_vni),
++	  offsetof(struct hclge_fd_rule, tuples_mask.outer_tun_vni) },
+ 	{ OUTER_TUN_FLOW_ID, 8, KEY_OPT_U8, -1, -1 },
+ 	{ INNER_DST_MAC, 48, KEY_OPT_MAC,
+ 	  offsetof(struct hclge_fd_rule, tuples.dst_mac),
+@@ -5590,8 +5592,9 @@ static int hclge_init_fd_config(struct hclge_dev *hdev)
+ 
+ 	/* If use max 400bit key, we can support tuples for ether type */
+ 	if (hdev->fd_cfg.fd_mode == HCLGE_FD_MODE_DEPTH_2K_WIDTH_400B_STAGE_1) {
+-		key_cfg->tuple_active |=
+-				BIT(INNER_DST_MAC) | BIT(INNER_SRC_MAC);
++		key_cfg->tuple_active |= BIT(INNER_DST_MAC) |
++					 BIT(INNER_SRC_MAC) |
++					 BIT(OUTER_TUN_VNI);
+ 		if (hdev->ae_dev->dev_version >= HNAE3_DEVICE_VERSION_V3)
+ 			key_cfg->tuple_active |= HCLGE_FD_TUPLE_USER_DEF_TUPLES;
+ 	}
+@@ -5713,6 +5716,7 @@ static bool hclge_fd_convert_tuple(u32 tuple_bit, u8 *key_x, u8 *key_y,
+ 	u16 tmp_x_s, tmp_y_s;
+ 	u32 tmp_x_l, tmp_y_l;
+ 	u8 *p = (u8 *)rule;
++	__le32 le_x, le_y;
+ 	int i;
+ 
+ 	if (rule->unused_tuple & BIT(tuple_bit))
+@@ -5760,6 +5764,15 @@ static bool hclge_fd_convert_tuple(u32 tuple_bit, u8 *key_x, u8 *key_y,
+ 		*(__le32 *)key_x = cpu_to_le32(tmp_x_l);
+ 		*(__le32 *)key_y = cpu_to_le32(tmp_y_l);
+ 
++		return true;
++	case KEY_OPT_VNI:
++		calc_x(tmp_x_l, *(u32 *)(&p[offset]), *(u32 *)(&p[moffset]));
++		calc_y(tmp_y_l, *(u32 *)(&p[offset]), *(u32 *)(&p[moffset]));
++		le_x = cpu_to_le32(tmp_x_l);
++		le_y = cpu_to_le32(tmp_y_l);
++		memcpy(key_x, &le_x, HCLGE_VNI_LENGTH);
++		memcpy(key_y, &le_y, HCLGE_VNI_LENGTH);
++
+ 		return true;
+ 	default:
+ 		return false;
+@@ -7340,6 +7353,62 @@ static void hclge_get_cls_key_port(const struct flow_rule *flow,
+ 	}
+ }
+ 
++static int hclge_get_cls_enc_keyid(struct hclge_dev *hdev,
++				   const struct flow_rule *flow,
++				   struct hclge_fd_rule *rule,
++				   struct netlink_ext_ack *extack)
++{
++	if (flow_rule_match_key(flow, FLOW_DISSECTOR_KEY_ENC_KEYID)) {
++		struct flow_match_enc_keyid match;
++
++		flow_rule_match_enc_keyid(flow, &match);
++
++		/* vni is only 24 bits and must be greater than 0,
++		 * and it can not be masked.
++		 */
++		if (be32_to_cpu(match.mask->keyid) !=
++		    HCLGE_FD_VXLAN_VNI_UNMASK ||
++		    be32_to_cpu(match.key->keyid) >= VXLAN_N_VID ||
++		    !match.key->keyid) {
++			NL_SET_ERR_MSG_MOD(extack, "invalid enc_keyid");
++			return -EINVAL;
++		}
++
++		rule->tuples.outer_tun_vni = be32_to_cpu(match.key->keyid);
++		rule->tuples_mask.outer_tun_vni =
++						be32_to_cpu(match.mask->keyid);
++	} else {
++		rule->unused_tuple |= BIT(OUTER_TUN_VNI);
++	}
++
++	return 0;
++}
++
++static int hclge_get_cls_key_ip_tos(const struct flow_rule *flow,
++				    struct hclge_fd_rule *rule,
++				    struct netlink_ext_ack *extack)
++{
++	if (flow_rule_match_key(flow, FLOW_DISSECTOR_KEY_IP)) {
++		struct flow_match_ip match;
++
++		flow_rule_match_ip(flow, &match);
++
++		if (match.mask->ttl) {
++			NL_SET_ERR_MSG_MOD(extack, "unsupported TTL");
++			return -EOPNOTSUPP;
++		}
++
++		rule->tuples.ip_tos = match.key->tos;
++		rule->tuples_mask.ip_tos = match.mask->tos;
++		if (!rule->tuples_mask.ip_tos)
++			rule->unused_tuple |= BIT(INNER_IP_TOS);
++	} else {
++		rule->unused_tuple |= BIT(INNER_IP_TOS);
++	}
++
++	return 0;
++}
++
+ static int hclge_get_tc_flower_action(struct hclge_dev *hdev,
  				      struct flow_cls_offload *cls_flower,
  				      struct hclge_fd_rule *rule)
- {
-+	struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
+@@ -7397,6 +7466,9 @@ static int hclge_parse_cls_flower(struct hclge_dev *hdev,
  	struct netlink_ext_ack *extack = cls_flower->common.extack;
- 	struct hnae3_handle *handle = &hdev->vport[0].nic;
-+	struct flow_action *action = &flow->action;
-+	struct flow_action_entry *act;
- 	int tc;
+ 	int ret;
  
--	tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
--	if (tc < 0 || tc > hdev->tc_max) {
--		NL_SET_ERR_MSG_FMT_MOD(extack, "invalid traffic class: %d", tc);
--		return -EINVAL;
-+	if (!flow_action_has_entries(&flow->action)) {
-+		tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
-+		if (tc < 0 || tc > hdev->tc_max) {
-+			NL_SET_ERR_MSG_FMT_MOD(extack,
-+					       "invalid traffic class: %d",
-+					       tc);
-+			return -EINVAL;
-+		}
++	/* not support any user def tuples */
++	rule->unused_tuple |= HCLGE_FD_TUPLE_USER_DEF_TUPLES;
 +
-+		rule->action = HCLGE_FD_ACTION_SELECT_TC;
-+		rule->cls_flower.tc = tc;
-+		return 0;
- 	}
+ 	hclge_get_cls_key_basic(flow, rule);
+ 	hclge_get_cls_key_mac(flow, rule);
+ 	hclge_get_cls_key_vlan(flow, rule);
+@@ -7406,8 +7478,11 @@ static int hclge_parse_cls_flower(struct hclge_dev *hdev,
+ 		return ret;
  
--	rule->action = HCLGE_FD_ACTION_SELECT_TC;
--	rule->cls_flower.tc = tc;
+ 	hclge_get_cls_key_port(flow, rule);
++	ret = hclge_get_cls_key_ip_tos(flow, rule, extack);
++	if (ret)
++		return ret;
+ 
 -	return 0;
-+	act = &action->entries[0];
-+	switch (act->id) {
-+	case FLOW_ACTION_RX_QUEUE_MAPPING:
-+		if (act->rx_queue >= handle->kinfo.num_tqps) {
-+			NL_SET_ERR_MSG_FMT_MOD(extack,
-+					       "queue id (%u) should be less than %u",
-+					       act->rx_queue,
-+					       handle->kinfo.num_tqps);
-+			return -EINVAL;
-+		}
-+
-+		rule->queue_id = act->rx_queue;
-+		rule->action = HCLGE_FD_ACTION_SELECT_QUEUE;
-+		return 0;
-+	case FLOW_ACTION_DROP:
-+		rule->action = HCLGE_FD_ACTION_DROP_PACKET;
-+		return 0;
-+	default:
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "unsupported action(%d)", act->id);
-+		return -EOPNOTSUPP;
-+	}
++	return hclge_get_cls_enc_keyid(hdev, flow, rule, extack);
  }
  
- static int hclge_parse_cls_flower(struct hclge_dev *hdev,
-@@ -7420,6 +7450,25 @@ static int hclge_check_cls_flower(struct hclge_dev *hdev,
- 		return -EOPNOTSUPP;
- 	}
+ static int hclge_check_cls_flower(struct hclge_dev *hdev,
+@@ -7439,10 +7514,12 @@ static int hclge_check_cls_flower(struct hclge_dev *hdev,
+ 		       BIT_ULL(FLOW_DISSECTOR_KEY_VLAN) |
+ 		       BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+ 		       BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+-		       BIT_ULL(FLOW_DISSECTOR_KEY_PORTS);
++		       BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_IP);
  
-+	/* driver will parses classid into an action */
-+	if (cls_flower->classid && flow_action_has_entries(&flow->action)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "cannot specify both classid and action");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (!flow_action_has_entries(&flow->action) && !cls_flower->classid) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "must specify either classid or action");
-+		return -EINVAL;
-+	}
-+
-+	if (flow_action_has_entries(&flow->action) &&
-+	    !flow_offload_has_one_action(&flow->action)) {
-+		NL_SET_ERR_MSG_MOD(extack, "unsupported multiple actions");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	return 0;
- }
+ 	if (hdev->fd_cfg.fd_mode == HCLGE_FD_MODE_DEPTH_2K_WIDTH_400B_STAGE_1)
+-		support_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS);
++		support_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
++				BIT_ULL(FLOW_DISSECTOR_KEY_ENC_KEYID);
  
+ 	if (dissector->used_keys & ~support_keys) {
+ 		NL_SET_ERR_MSG_FMT_MOD(extack, "unsupported key set: %#llx",
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+index 032b472d2368..ccb19d960690 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+@@ -645,6 +645,9 @@ struct key_info {
+ #define HCLGE_FD_USER_DEF_DATA		GENMASK(15, 0)
+ #define HCLGE_FD_USER_DEF_OFFSET	GENMASK(15, 0)
+ #define HCLGE_FD_USER_DEF_OFFSET_UNMASK	GENMASK(15, 0)
++#define HCLGE_FD_VXLAN_VNI_UNMASK	GENMASK(31, 0)
++
++#define HCLGE_VNI_LENGTH		3
+ 
+ /* assigned by firmware, the real filter number for each pf may be less */
+ #define MAX_FD_FILTER_NUM	4096
+@@ -738,6 +741,7 @@ struct hclge_fd_rule_tuples {
+ 	u32 l4_user_def;
+ 	u8 ip_tos;
+ 	u8 ip_proto;
++	u32 outer_tun_vni;
+ };
+ 
+ struct hclge_fd_rule {
 -- 
 2.33.0
 
