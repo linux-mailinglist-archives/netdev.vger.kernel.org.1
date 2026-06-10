@@ -1,268 +1,255 @@
-Return-Path: <netdev+bounces-297812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297813-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mfxmAQO+KWprcgMAu9opvQ
-	(envelope-from <netdev+bounces-297812-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:41:55 +0200
+	id ESxVLRa+KWpvcgMAu9opvQ
+	(envelope-from <netdev+bounces-297813-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:42:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E68C66C8B6
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:41:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9A566C8BB
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:42:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SzNG84RE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297812-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297812-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmx.de header.s=s31663417 header.b=rMMVO9fc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297813-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297813-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=gmx.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A54533047428
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:41:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AB756300A31A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B08C3546FC;
-	Wed, 10 Jun 2026 19:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790F1361641;
+	Wed, 10 Jun 2026 19:42:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FCA17BB21
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 19:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4E2273803;
+	Wed, 10 Jun 2026 19:42:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781120495; cv=none; b=PrSAyKAgeg2Wjoo2ZF2ZddlUamx2arQu4FpNG4k1qHspbfwq42g1/rCLAkI7V35yQ76CFho7dhJvSlnlJPdiNPM9JDXH8b+Oo5/KCmjIAaZRjLdWVUJAX2qrh63tMGoiWdnHxleyOcydmDoXbCxalLCAByeNlbWhZB/FmgRC1+E=
+	t=1781120531; cv=none; b=QrOEnnMbByIPrI2xxSO12NHbgc5m4EUDruE/t+ExaUy9SaE5+XuS6tTsMkqTwRJF6jHKAktQmvzGKSzr51YJdkfN/WEFgl/UwhP0+zTBg2ziVlZ30wOYTJTeIVT19H4cmHX+mFjeSSCFCMEA/MKA7k1YxXFUTIlWNxD43vPfIAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781120495; c=relaxed/simple;
-	bh=VMyksX1H8QixVprg1c0D5jdm3y8bBDuMeYDw/6mXCzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fE1wyRF7mC1fhY3Si0H+RZFrYxgxAWCxMxmwEZkbZyswn25mUlN63GPwpE9BI+DRO1VIgzhaJUWc3JolpXoX3vWOiSx2Xkul83mRTNbe4wv5oe66D2dZTRAE3IN3XJJzgF2ozVr4BjmK2C3Ouu8miVaJekEeEpk/VjFxdj3wDRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzNG84RE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26EC1F00893;
-	Wed, 10 Jun 2026 19:41:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781120493;
-	bh=FFwSpWo6ng/SJN4QypHCZsShvbJkSJP4HOyREWhKSJE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=SzNG84REjHej9KTavL06bGtaXPGmq/e8GRvDnb1DQfL/ikBeTwP3BJbepthNwT4hm
-	 lCHOviRrGHWnjq7ayUqULG4dOgs6gkkYY19T/Jlf6wp3MNLLJIKr9kiDuHa5ywOsiv
-	 FDesNBtmNgd4mZFbwYqbWyqnhMkd+38NoREpAxbti5gf1lhIDl76vPa9bSbOXtnZVX
-	 MNtNEoO02A9aVY1qy6hu6/PcUw69MmnBDJo75Vic9AGqp5Jf5xdGms85lJlHgIkp7N
-	 gfvIjJXpZSpWl29WggA8tFfJj2msCxlDNRZ/HMyme8BZVTCU3SYd4V0rHqEXjUFrOi
-	 AYkAb9DxNMn4Q==
-Date: Wed, 10 Jun 2026 12:41:33 -0700
-From: Kees Cook <kees@kernel.org>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: Johan Thomsen <write@ownrisk.dk>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, dev@openvswitch.org
-Subject: Re: [BUG] FORTIFY: memcpy overflow in skb_tunnel_info_unclone() from
- geneve_xmit()
-Message-ID: <202606101240.85F6F74@keescook>
-References: <CAKv6aAM8_EWgXScnKmKYm_4SwGDVBK++dzfP+Y6msUXbp99QUw@mail.gmail.com>
- <18972686-936d-4fb0-850f-7e212c48ab97@ovn.org>
- <CAKv6aAPoo98bZ-oRk34huUtD3=j7EuGcL2sOLBB_rwzf4vpj3A@mail.gmail.com>
- <6831f6a7-7321-4657-8255-28252b1a3176@ovn.org>
+	s=arc-20240116; t=1781120531; c=relaxed/simple;
+	bh=Tk46LmWTxBxLQKVvXgJqo7yAy+rDHpoj6T98QlGBA1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=psdQK4LWqKh17JEuQDNpWSTVBabuRcbpMXQ/7cOwuZwbo5HY8yFjVynvqyh7scWY9ANcyCXIOXrjkamFBR1v+OrgKHPy3bW7iar5DDSLi4Iphaya0NljBLBEuklFdHf0PhdXBB4Z+aoguL3UBjkUGo9FI7ofHuMF0pjVf6LMly4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=rMMVO9fc; arc=none smtp.client-ip=212.227.15.19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1781120522; x=1781725322;
+	i=markus.stockhausen@gmx.de;
+	bh=Mt5PJKPLDy2YLhlggFcQY6pFt3Hb8C40rY84RcTunl0=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=rMMVO9fcDFBuZPHK7MI3xB9OaAtacUb5XtwZOazlgsoTspNRqrITyrwoLat4pdIb
+	 D/SFCDWrZ36zwxxgGPG/OFUf32MOxEg5k89YOi8RfEc3/q25YoyOKOcZH0cL3+W1n
+	 274sBwtjJxqgC8Y8E1hnlt90azVnN6/RJviyu01Cvtd9kCp8XzjbvQBkTetzH/sKR
+	 HQQjoFv3/ZOANiPK72sq8xFCbbbyw7bPdwKYP+b/EN4aA07605H8eIFtCEBwstYGT
+	 kjn8WAZ0IqL0Ie0SaGppOFKoS1OCwe9IvXaNzm529mNHeZGu4kIIBjpNkG2YWI0O/
+	 Fqu9gU+fwF18jKn/0w==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MJVDW-1wmrII2dBI-00IxVv; Wed, 10
+ Jun 2026 21:42:02 +0200
+From: Markus Stockhausen <markus.stockhausen@gmx.de>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	chris.packham@alliedtelesis.co.nz,
+	daniel@makrotopia.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org
+Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
+Subject: [PATCH net-next v3 0/5] net: mdio: realtek-rtl9300: Add RTL931x support
+Date: Wed, 10 Jun 2026 21:41:40 +0200
+Message-ID: <20260610194145.4153668-1-markus.stockhausen@gmx.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6831f6a7-7321-4657-8255-28252b1a3176@ovn.org>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1UbhwGL4cf+Al41hbyGOTVA6DFFYxgzHtnOATPaJZp0OqGBGfaa
+ WNmf8CMz2l2MHE2OR2M3x6McTn7FEIhGk28Nee88fAzercqxYDY6GZ/XPlGgStO44El7iO0
+ hgZMKko1DhlP1QwCyav8leItLcKhUGtBHLS7LRcn4Hseb2bnNIAjO5XdW36nj7WdBfwyOX7
+ SNaj8mVPCF4ma/9IlbWCA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:kE0zxELnV2U=;+OrHJx9sOMFSjXBBLaOMlNbrk0B
+ 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
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:write@ownrisk.dk,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:netdev@vger.kernel.org,m:dev@openvswitch.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:markus.stockhausen@gmx.de,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
+	FORGED_SENDER(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmx.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[kees@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297812-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297813-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmx.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kees@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,keescook:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[gmx.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,gmx.de:dkim,gmx.de:email,gmx.de:mid,gmx.de:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E68C66C8B6
+X-Rspamd-Queue-Id: 5C9A566C8BB
 
-On Wed, Jun 10, 2026 at 08:00:53PM +0200, Ilya Maximets wrote:
-> On 6/10/26 3:10 PM, Johan Thomsen wrote:
-> > Hi Ilya,
-> > 
-> > Sorry for the late follow-up.
-> > Your patch has now run without crashes in my setup for 36 hours and
-> > I'm unable to re-trigger a panic.
-> > 
-> >> But the operation in the diff above is kind of pointless as the memcpy
-> >> itself will copy the value again.
-> > 
-> > Right. So it would probably need at least a comment, if that ends up
-> > becoming the final fix.
-> > I'm not a kernel dev and I don't know what is the right thing to do here.
-> > 
-> > Happy to test alternative patches if needed.
-> 
-> OK.  Thanks for testing.
-> 
-> > 
-> > BR
-> > Johan
-> > 
-> > Den man. 8. jun. 2026 kl. 11.41 skrev Ilya Maximets <i.maximets@ovn.org>:
-> >>
-> >> On 6/8/26 10:25 AM, Johan Thomsen wrote:
-> >>> Hello,
-> >>>
-> >>> I am seeing what looks like a kernel bug in the Geneve/OVS/vhost
-> >>> transmit path on a Talos Linux node running Kube-ovn with Geneve
-> >>> overlay and KubeVirt VM traffic.
-> >>>
-> >>> Environment:
-> >>>
-> >>> Kernel: 6.18.33-talos
-> >>> Distro: Talos v1.13.3
-> >>>
-> >>> Compiler/config:
-> >>>
-> >>> CONFIG_CC_VERSION_TEXT="clang version 22.1.2"
-> >>> CONFIG_CC_IS_CLANG=y
-> >>> CONFIG_LTO=y
-> >>> CONFIG_LTO_CLANG=y
-> >>> CONFIG_LTO_CLANG_THIN=y
-> >>> CONFIG_FORTIFY_SOURCE=y
-> >>>
-> >>> Hardware: HPE ProLiant DL325 Gen11, AMD EPYC
-> >>>
-> >>> NIC driver: bnxt_en
-> >>>
-> >>> Workload/network:
-> >>>
-> >>> Kube-OVN, Geneve overlay
-> >>> Open vSwitch datapath
-> >>> KubeVirt/QEMU VM traffic via vhost/tap
-> >>>
-> >>> Relevant console output:
-> >>>
-> >>> [  648.742603] memcpy: detected buffer overflow: 104 byte write of
-> >>> buffer size 96
-> >>> [  648.749907] WARNING: CPU: 61 PID: 27020 at
-> >>> lib/string_helpers.c:1036 __fortify_report+0x45/0x60
-> >>> [  648.758689] Modules linked in: dm_round_robin dm_multipath lpfc
-> >>> nvmet_fc nvmet intel_rapl_msr intel_rapl_common ahci nvme_auth bnxt_en
-> >>> nvme hpilo hkdf libahci sp5100_tco watchdog k10temp
-> >>> [  648.775429] CPU: 61 UID: 107 PID: 27020 Comm: vhost-27002 Not
-> >>> tainted 6.18.29-talos #1 PREEMPT(none)
-> >>> [  648.784735] Hardware name: HPE ProLiant DL325 Gen11/ProLiant DL325
-> >>> Gen11, BIOS 2.84 11/05/2025
-> >>> [  648.890478]  skb_tunnel_info_unclone+0x179/0x190
-> >>> [  648.895152]  geneve_xmit+0x7fe/0xe00
-> >>> [  648.907240]  dev_hard_start_xmit+0xa7/0x1f0
-> >>> [  648.911479]  __dev_queue_xmit+0x864/0xf40
-> >>> [  648.919688]  do_execute_actions+0x9b9/0x1be0
-> >>> [  648.927727]  ovs_execute_actions+0x58/0x170
-> >>> [  648.931960]  ovs_dp_process_packet+0xb1/0x1c0
-> >>> [  648.936370]  ovs_vport_receive+0x90/0x100
-> >>> [  648.940428]  netdev_frame_hook+0x146/0x1a0
-> >>> [  648.954093]  __netif_receive_skb+0x3f/0x160
-> >>> [  648.958324]  process_backlog+0x10c/0x210
-> >>> [  648.962295]  __napi_poll+0x2f/0x190
-> >>> [  648.965832]  net_rx_action+0x2e3/0x500
-> >>> [  648.969632]  handle_softirqs+0xe7/0x310
-> >>> [  648.985387]  tun_get_user+0x137e/0x1510
-> >>> [  649.005878]  handle_tx+0x41f/0xd30
-> >>> [  649.029014]  vhost_run_work_list+0x52/0x90
-> >>> [  649.033162]  vhost_task_fn+0xc2/0x140
-> >>> [  649.064145] ---[ end trace 0000000000000000 ]---
-> >>> [  649.068820] ------------[ cut here ]------------
-> >>> [  649.073489] kernel BUG at lib/string_helpers.c:1043!
-> >>>
-> >>> I don't know whether this is a real overflow or a FORTIFY false-positive.
-> >>
-> >> Looks like a false-positive from the __counted_by fortification.
-> >>
-> >> I'd guess something like this would fit it:
-> >>
-> >> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
-> >> index 1fc2fb03ce3f9..e51c3795da474 100644
-> >> --- a/include/net/dst_metadata.h
-> >> +++ b/include/net/dst_metadata.h
-> >> @@ -164,6 +164,7 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
-> >>         if (!new_md)
-> >>                 return ERR_PTR(-ENOMEM);
-> >>
-> >> +       new_md->u.tun_info.options_len = md_size;
-> >>         memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
-> >>                sizeof(struct ip_tunnel_info) + md_size);
-> >>  #ifdef CONFIG_DST_CACHE
-> >> ---
-> >>
-> >> Johan, could you try this in your setup?
-> >>
-> >> The memory was actually allocated for the options, but the structure
-> >> is zeroed out on allocation, so the __counted_by check doesn't work
-> >> properly for the initial initialization copy.
-> >>
-> >> But the operation in the diff above is kind of pointless as the memcpy
-> >> itself will copy the value again.  So, I'm not sure if that's the right
-> >> solution here.
-> >>
-> >> Alternative might be to revert the kmalloc_flex back to the simple
-> >> kmalloc in metadata_dst_alloc.
-> 
-> A little less icky alternative might be to just split the copy in two:
-> 
-> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
-> index 1fc2fb03ce3f9..996ae8350360a 100644
-> --- a/include/net/dst_metadata.h
-> +++ b/include/net/dst_metadata.h
-> @@ -164,8 +164,12 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
->  	if (!new_md)
->  		return ERR_PTR(-ENOMEM);
->  
-> +	/* Copy in two stages to keep the __counted_by happy. */
->  	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
-> -	       sizeof(struct ip_tunnel_info) + md_size);
-> +	       sizeof(struct ip_tunnel_info));
-> +	memcpy(ip_tunnel_info_opts(&new_md->u.tun_info),
-> +	       ip_tunnel_info_opts(&md_dst->u.tun_info),
-> +	       md_size);
->  #ifdef CONFIG_DST_CACHE
->  	/* Unclone the dst cache if there is one */
->  	if (new_md->u.tun_info.dst_cache.cache) {
-> ---
-> 
-> Adding netdev maintainers for more opinions.
-> 
-> >>
-> >> CC: Kees
+The Realtek Otto switch platform consists of four different series
 
-Yeah, I think the split makes the most sense. This matches the proper
-spans, and is what we've done in the past in several places. It'll all
-get collapsed into the same binary output in most cases, so there's no
-real down-side.
+- RTL838x aka maple   : 28 port 1G Switches
+- RTL839x aka cypress : 52 port 1G Switches
+- RTL930x aka longan  : 28 port 1G/2.5G/10G Switches
+- RTL931x aka mango   : 56 port 1G/2.5G/10G Switches
 
--Kees
+This patch series adds support for the RTL931x devices. For this
 
--- 
-Kees Cook
+- Enhance device tree binding.
+- Implement final cleanups and enhancments for the driver.
+- Add RTL931x coding.
+
+Remark: Instead of this series it was planned to bring support for =20
+hardware polling configuration first. It turns out that more testing
+is needed - especially for the RTL83xx SoCs. Instead add the lineup=20
+of the RTL931x devices, that are known to have no obvious bus and
+polling issues (at least from testing and vendor SDK perspective). =20
+
+Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
+=2D--
+
+v2 -> v3
+  - Replace open mask coding with field_get()
+  - Fix typo in patch 4 subject
+  - Add Reviewed-by to all patches
+v2: https://lore.kernel.org/netdev/20260609052856.3142922-1-markus.stockha=
+usen@gmx.de/
+
+v1 -> v2
+  - Fix subject of cover letter
+  - Convert const/const to enum in device tree
+v1: https://lore.kernel.org/netdev/20260607125406.2853607-1-markus.stockha=
+usen@gmx.de/
+
+
+Markus Stockhausen (5):
+  dt-bindings: net: realtek,rtl9301-mdio: Add RTL931x series
+  net: mdio: realtek-rtl9300: Add prefix to register field defines
+  net: mdio: realtek-rtl9300: Make otto_emdio_read_cmd() generic
+  net: mdio: realtek-rtl9300: Add registers for high port count models
+  net: mdio: realtek-rtl9300: Add support for RTL931x
+
+ .../bindings/net/realtek,rtl9301-mdio.yaml    |   9 +-
+ drivers/net/mdio/mdio-realtek-rtl9300.c       | 210 +++++++++++++++---
+ 2 files changed, 185 insertions(+), 34 deletions(-)
+
+=2D-=20
+2.54.0
+
 
