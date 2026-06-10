@@ -1,247 +1,208 @@
-Return-Path: <netdev+bounces-297437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297438-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HHLJJgXyKGonOAMAu9opvQ
-	(envelope-from <netdev+bounces-297437-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:11:33 +0200
+	id 79XBHQ3zKGpiOAMAu9opvQ
+	(envelope-from <netdev+bounces-297438-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:15:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F629665E07
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:11:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D9A665E69
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:15:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=AKQtXqXp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297437-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297437-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=linux.dev header.s=key1 header.b=ehUx2dJl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297438-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297438-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E7A22303FED0
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:11:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A030C30709C3
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E393655D5;
-	Wed, 10 Jun 2026 05:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013BD371878;
+	Wed, 10 Jun 2026 05:13:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2AA370D57
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 05:11:19 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781068282; cv=fail; b=EdCPyvniSFcbdrzVdoXwWmdMQgBM1h5vARWuSQ5du4ulhPWxMx7rorWQiicrJlm8pkNh23b3XMPJW1tBi/uXzdgzTgICjV2eRJDfg+7ob1btb0jNjUe/svtMDSbJN6MsKqNcPvp1GM6jFwWsTReyB0DM3Hzi1Y3I+wU3MLXf170=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781068282; c=relaxed/simple;
-	bh=HlyZG4CrCsIazP3GIT0Hs/LrLYXADygVDXdgmv6uVuY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=umX3rpFicxwtrbvILvezib3G9FfVt822trKWGZQwDHAaS/2BDeA7th0SmN1S9H4C79dzsGA3/pkDzQnwKyiveijZhq1gDtdBD9QqN1yOWc6PC+poZvmN09qXqL31dV6RJAEqgkzTUV91vCnCKMkpkJOI00XssLS714BIFgSeBkc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AKQtXqXp; arc=fail smtp.client-ip=192.198.163.9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781068279; x=1812604279;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HlyZG4CrCsIazP3GIT0Hs/LrLYXADygVDXdgmv6uVuY=;
-  b=AKQtXqXp8dXNofiaYoZxgD8mLsYFl9FigwZ98eDBArHt1vVMNOIh94c2
-   cWNqNlQEUcd+wOYIQ9eZMsHp0l7zNLrrdNQD/tscOkT+qsbjxn94vGl1f
-   BdEs5cdyErmwSe2kDy8g+u4yQXXZKlQ6NBKABnzrgvFDAPLHvjqCdDUkM
-   3RfBZTSYtf5yxsrLe9QsB7yHL+2FKGH2+7YwuqXE6YNTdtSG4VfZEKWEj
-   a1AoERekI4wiaaD/3hifOyEcEorepEkzGhGYkH4LTYDmmYJE+rkwOXYe9
-   RcT90TQYeyBoaDJBrfCW7NJ3YjzM3iuQ/S7URP9igjQfKF2aL2ua5nIvZ
-   A==;
-X-CSE-ConnectionGUID: or4nECXZTQKpPIOHkUTGUw==
-X-CSE-MsgGUID: f1eoXlbARNuuTCNng5lxBw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11812"; a="92525408"
-X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
-   d="scan'208";a="92525408"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 22:11:15 -0700
-X-CSE-ConnectionGUID: 1XTjLm85RI+TecciVOEwBQ==
-X-CSE-MsgGUID: BS+ZBFxHTOaqKatw87Tgyw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
-   d="scan'208";a="244921801"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 22:11:14 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 9 Jun 2026 22:11:14 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 9 Jun 2026 22:11:14 -0700
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.33)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 9 Jun 2026 22:11:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZVZz/n9AqsNmO47KVvDgIyFODFExbo0/ktnUEwVyLM8PYs6X01tyHI+PDWPUmrnKj0wsIvdbR5BtzWIi4GyDCS59yGwCTtOCCJLh0O8FhXY1j2QCjf4ujCO/riByeu4JxH0DmBTyjVous3231K0k9JEht7cDYOr7EjUgzSduYPLv7dyqUtnFrYyzod/Zch9Qv8HHO8j8CEHHDlURxZzpaWX+lIWAFuvfA8eIT9sXcz2lgTfA3PgVlpngizH7854n0Sxv/OAK23cIEViGCEokA/nyBkZW7uCj3TTieAbXHgn185xiW6io1y+EFMsS5OlgQWxF8rsInVLasba6HHm+zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HlyZG4CrCsIazP3GIT0Hs/LrLYXADygVDXdgmv6uVuY=;
- b=SNyJUTzEbsuTTh9CqroHk/NAbGm8QX0EdScxTHgkHw7DOK8iWSVWW9oB+iVcAQB5O6uozCZg8h7VoJOxA+/fFN33oHJOMu8a9BsKierShNkcNxrUrtB+M4AXayOpznneA4A/qx510jNw067LToINuGMYQSpntD/xPhqA6h/0V74QfkZvbbe4ti2teA9suC0VWOA+Bd3OeBYnvowSoIfyPh9phmwsANaHq8NN6/a1UhvwC1Yf/HU72R1kFC4mlUZm1873fSUkrz+i6CSu5WA5qzTtqUdavpInve95FGKPqf1b3cNrTri1kgvpTm9y/Xg1O/+KqroSneG1P2RkqjXNmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com (2603:10b6:930:25::16)
- by IA3PR11MB9255.namprd11.prod.outlook.com (2603:10b6:208:578::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
- 2026 05:11:11 +0000
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::3aeb:4e49:6de6:9ee]) by CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::3aeb:4e49:6de6:9ee%4]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
- 05:11:11 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Michal Wilczynski
-	<michal.wilczynski@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: add missing xa_destroy for
- sched_node_ids
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: add missing xa_destroy
- for sched_node_ids
-Thread-Index: AQHc48KXlwgmux9ILEyKuWpjr2RRtbY3ZRCw
-Date: Wed, 10 Jun 2026 05:11:11 +0000
-Message-ID: <CY5PR11MB62584E5DC55FE21F11C1B3C18B1A2@CY5PR11MB6258.namprd11.prod.outlook.com>
-References: <20260514-jk-fix-missing-xa-destroy-v1-1-de437bf52347@intel.com>
-In-Reply-To: <20260514-jk-fix-missing-xa-destroy-v1-1-de437bf52347@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6258:EE_|IA3PR11MB9255:EE_
-x-ms-office365-filtering-correlation-id: 51e6cb03-7639-4c00-c1d6-08dec6aeb032
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|366016|376014|1800799024|11063799006|56012099006|18002099003|22082099003|3023799007|38070700021;
-x-microsoft-antispam-message-info: ln9cXdPM01iHf09vPTIHyZ6R3VJfm5H2Gbfo1woqo6YFymVzQWjmhHWUA0yXBr1LrR8eVyhq+wyv30GifnzQu33Xrj2phBmcucFgUG2BJahK3CS4EMIC24YvmqnLtQB6xNRZpU+Vqde6qnEyDVzFa0OVl2I1w9ZmnkPKG5N0i8Ci3NK+YAptqgXjRHyYEcjhiBF2czYgUPf6MKu7gudwKBw3v6BB8Yy2rxDau38gMFaFe2MLhMy923OMHDhEnyHU1lMRDed4qYwDDKV//8TZANJcAV2ctxAoG6FoEqaQZ04Myi8QOzp3wfN79CMjcik/iWn7u/IJMP4oJvqt0p4ar6j0hpMfov+VwwdwTHxe7Szml6LLQat7tXfXF6V4ETR3TWBFK/4fWtdbZoEWls0UsJwwDGSYDVXmE26KAaOic/UeZwXCjxDMuGxxpGpXOPOQEdpODEMxhj6yTnVFMASDZelIGmPYzJMRX2VfglC82Ip9EKLVw0IZHc9q2RJ+hHPTlmUoUFY99FbmmTI6XPbGOt8lSXZWqtt/aqlD3yqBNNwOUR+1eplkw0ZZSWAFtc1aGRG2qXQqporppR2+a8DRcyMJD4wXZVNwZjnAmSLprDdTUn3ayNcgO3j8YzZ6mPXsYgs3OZq3uDSOOvxSUP1KMY5zHwL8x7fZOw90x2ngT/jLnBcaSLdex7vRPB/nPj9utHw+0E5auP7TN0lJDIcnZJHZCFvXorJIpJZp5xAvL86v/9zQNS77jzUOiXqHhrHY
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6258.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(1800799024)(11063799006)(56012099006)(18002099003)(22082099003)(3023799007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ODhSQU5vQzNKTUlNQnBBSk1yVHZVVk5kdlF4alZhS01VaHVWRC9sZkovdHlD?=
- =?utf-8?B?cWdkMDhHSTQrME9BYjF5OGJhSm16ZmxLV0VSMFFsQ2lBSUxtWGR4TjJ1ZkN5?=
- =?utf-8?B?TW9Tb1E2ck02U3dDdXAzWkM0dm43TmFxNEcvdkxLWUcxY245NTFjd3ZoMzlH?=
- =?utf-8?B?dEZQSjNSaCtPOGxlT2hqeGMvVUgvbzhrbGYwQWpmU1liUTZsWnpmYzdab0Zi?=
- =?utf-8?B?dmVGMzJheHQrbFBVQWQ3cEx4WklqQnhsUldNdVB6RjBKTEcvcVZyWDlzL3Ba?=
- =?utf-8?B?WEloNXcxMHNSaXl1WkdrM2tmNGR4a0hTaFF2RDF3ZmNpV24zUUZza2licC9T?=
- =?utf-8?B?WHo5VUVWejhYcTNZOUYzZjllZmxuSWRGc3BtT3ozeGJTbHRreXZHeUYxUWpU?=
- =?utf-8?B?ODcvYWtJQ2FHbytoSzF2NHJtR0V5ditSVW5EUFE2MERsUEpoK2lNL3VySEw1?=
- =?utf-8?B?ejZVOFIzZ2JjeWE0c09HTTNQSjk5bERWZVhzSGxmMEp3anp5d0RFUFJ4K3c5?=
- =?utf-8?B?VmFac1BoZExLZ2NnTTFLR3hvNUEvVE4zM2pvMDZaUnNIT2tkSWVvWE5QZGZx?=
- =?utf-8?B?Ykkwb24rZDYzcys1Tjhuc0psaXZlc3NwRk5kV0N4MmdqbjhEb0FZT3JDMkV6?=
- =?utf-8?B?YTJDckFTRGMxMFBtemFDbjNWWHMzUm9sNCtTNUtBcGhiaHNyeCthSTN1VjNK?=
- =?utf-8?B?ajZWNXJuanZQRFQrZmhkUFNtakkrVU5kT2tNNldoYU5XTWpNMmpwNnhYQ3NQ?=
- =?utf-8?B?MkoyUVU0eUxxUmE3ZVc3UlNQankwOURWNXFBTWlWNkNJUTdJekYxWGtoeXV3?=
- =?utf-8?B?bVJGMzdxaTZxZUtwUWxSRHVud3pNY3lnRFZxOEJXWVZodjk4ZWRNeGxHbHAx?=
- =?utf-8?B?THR4ZDFleVZZZ0ovZ3JHdlcyYitaNHU2cnMyT0lobnJVMmJweHRidXdKVGJh?=
- =?utf-8?B?S0IvMnRSME9pcFJ2NlF0ckpJK3o2V1FvT25BV3lSWUc2YkFMdXpFMzNKMUlq?=
- =?utf-8?B?NEZ0d1k2WUlYa2hOSlFNaEhEeEJCV0tudno3aisrNUdaZCtwclYrYWU1a2R4?=
- =?utf-8?B?WDVNdWdKbWZZN083djZhNjNRRyt1NGUrbDk5Vk8vb1U3UklCUEVnT1VUaGRi?=
- =?utf-8?B?TVUxTFhqTk8raWZXbDJaTkZNSHFNcitTc2xUbjNMc0NNUExkdUY4b3ZJWGhJ?=
- =?utf-8?B?eTB5Zm11SmpQUjV1bGxxdkJhdlQzQnl3VFdkMHJKcDREUWV6aG91V0FKVFZO?=
- =?utf-8?B?WnlwdFgxeWFBSDdncnhubzF1MTFxNDBUTmJhcFVTZWdrQUJoa252STdKdlU4?=
- =?utf-8?B?K0h5ZFBuS2tjaWRpTkZVSmJtUlNLeXFCQndubnRlNlZJeW9LeHRnOWtncnk0?=
- =?utf-8?B?cVlMYTZNZk9vcmVlOG0ySXVTdkMvcXZsbUtnSUtOc21WRjNBRXBWQWdrUHFX?=
- =?utf-8?B?UnFkbFNzVXpjL1d2R0xmSEZvMS8zaEQzNkNiVVZQWmE0ZjE5ck5XQkNUREdx?=
- =?utf-8?B?TC8xUjFuQUovNHZYMDFhMVpKdWlIazIrM3ZINHM0Q21mMFJ1TE9DcnVmR01D?=
- =?utf-8?B?RWhaMUZ0RngxaTE2WWIwMmxaamY4cTE2WTVkeDRQbXJFVmllTkgwT0FFK1Zt?=
- =?utf-8?B?eDZqRTBwK0M0U1FFaFMyREpuOThYcFdlT29vcXZyVFB5dnFQRk5sd0FiMmh4?=
- =?utf-8?B?MWVMMjZWYmRCSXRPTFRmTVVtc2E5TSthOEpKR0dObU00N0s3OGkyYVhiVmlW?=
- =?utf-8?B?c0cyMDF1OUVVMU5ncDI3UVpYQndtRUZWQW84Z1IzbUJUZEpwdkRaNGJIaFA3?=
- =?utf-8?B?dFFwYVZPTStZM1RUTExWWXFMT2Nza2NmTFNGRGNVeVk1NldkODhwWnlxWmZz?=
- =?utf-8?B?aWVRMER4VGxNenN0V1I0VXlRMmxBMDFQSVJET0tpTnR5U0ZwL0lSZjQ5bC9R?=
- =?utf-8?B?aUNvMWNJWGlRUC9oRWUvOE9CZVRTSEZXaTlLYkEveGU1ZUJWeDNKdWs4RUhJ?=
- =?utf-8?B?N2h0UEc3citGRS9jZjVydGcycmZHU2xvR3JsZW9NZkgwcllQOS9ndnlzazlC?=
- =?utf-8?B?aWFWWGdzbnlpVWk5dHBLb1RZZVVVY3duRFJadnRxSzZCUUM2clR5K044eExV?=
- =?utf-8?B?TXBKaytoUHYxSklSc1ZvNXBsOGh3Ry9Yc3RncEVwUXNsaW5HeG1WU0grblBB?=
- =?utf-8?B?My93MC9keVN1alZYWlorckJaVXQ0R1dQdUkyS015S3hYVDZLcE5JVjd4bzQv?=
- =?utf-8?B?Y0o3NDdFdWUzcG1CN1FramlnWXR0WnczbXZzVGZ0b2FJWWNRVENNZi9aSHg0?=
- =?utf-8?Q?9E0IklpXo/w6RTSJLu?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C526370D6E
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 05:13:51 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781068432; cv=none; b=PSJ2kXmAKkFnndv2Hq3ykWnyos+reTP6c+2cfssK8OjlffOKf66pyNlldhTtECYntLXrFDvBVztSW1Mmj8ZKwywSte+gAFN1yVMLsraxp1OGEh9UNQGTuOY1MK97o3ZWGQlaMZ1LbeA4iHHRpSd372MpfBMAgis4Z4IY8r/ES2w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781068432; c=relaxed/simple;
+	bh=Jw44zc0riFpioKES9tU7Vrfr4BhP+D4LBHxN6e1YyZk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gepVXdeQto6I5V3o0+/v/YhPPQRFAb0FOzrXXHMXDz0SwUy+aM0LU4F0qJo33rzdzvEqORXguxon+HC1o/z3NJ4lpPb7/SfE/HXoslMdJRf+uf1Hu8yKgyFeVgI7CgfOazj+n7CtIXlrJaK9sYxXX6wYfERI9rwqQL0864WYm8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ehUx2dJl; arc=none smtp.client-ip=95.215.58.174
+Message-ID: <b35a2395-0e15-4390-ba7a-b48748e7e3f3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781068419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YAopxE9EczGUg3PSk7OujdIhtgCxg1HVADKqStzgMSs=;
+	b=ehUx2dJl+Ti4rMEszXvyVtRZEkTLbQmKkfKl36MgKtj/ym3Fx467HOftJa+95Axc/hYFES
+	t9Gl1XeKVVmZ9gEnf2GWwA13SX6apaZed7qWD1tfsJxR03wwM05hmV81wstCJtC5xycPOG
+	GbHUWw5jNe5ZBjkC7GBI3g50NaMnR20=
+Date: Wed, 10 Jun 2026 13:13:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: LnoyX6EPIqF+uHQL70hVh9xSJquTQrLymY/Udx5xTvKshMfHluS5Zz71wQxW8imsrLEZSQlHEOgmaAjqk4LnIyULlS8FqHl2sXAHD5WYsTue2jAIbJGnFQKVznTNyLP7xy2GSKNPwkSGHt7uBsHOrHc04R7rsJsCKgGH64fwqquGePifjlcVDre9VxAZMtMU7AnAjVLCVtBcXWNx3YeWWRMFVPaF6HFjlmxvyOKobfNae+2X0kM7bP7yOOs5DEyL6mZCPun0/syQ7T8l63c0gA5UWcs4YbNxqVOjrgR8C58cygQoyI8RxKxKUwuzEjBrKyM5YtXYOOJ2cHHTonKvzA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6258.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51e6cb03-7639-4c00-c1d6-08dec6aeb032
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2026 05:11:11.5743
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YpWRLHzQ+noXjG8wwonddAQmaHVWnrLy0DbAHW2EBDrJAiw10zIHKki1rpnXkdITopybKKHDxYE2w6Kp0X+RvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9255
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH] bpf: Unshare cloned skb before devmap egress XDP program
+To: sun jian <sun.jian.kdev@gmail.com>,
+ Menglong Dong <menglong.dong@linux.dev>
+Cc: Emil Tsalapatis <emil@etsalapatis.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+ shuah@kernel.org, liuhangbin@gmail.com
+References: <20260609100214.337538-1-sun.jian.kdev@gmail.com>
+ <L0cwr1-KRSKR7-dJdjDmJA@linux.dev>
+ <DJ4XIOT2RVMT.28I5LA2UOZVUI@etsalapatis.com>
+ <AgOg1pJHQN-gpKhYUz3SMw@linux.dev>
+ <CABFUUZH9F+tiitstSBy2-M=WC84jg28CVMXU+Lu-va6jm71fDw@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <CABFUUZH9F+tiitstSBy2-M=WC84jg28CVMXU+Lu-va6jm71fDw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.06 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:sun.jian.kdev@gmail.com,m:menglong.dong@linux.dev,m:emil@etsalapatis.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:liuhangbin@gmail.com,m:sunjiankdev@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297438-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:michal.wilczynski@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,linux.dev];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297437-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[etsalapatis.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,davemloft.net,gmail.com,fomichev.me];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,etsalapatis.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F629665E07
+X-Rspamd-Queue-Id: B5D9A665E69
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBJbnRlbC13aXJlZC1sYW4gPGlu
-dGVsLXdpcmVkLWxhbi1ib3VuY2VzQG9zdW9zbC5vcmc+IE9uIEJlaGFsZiBPZiBKYWNvYiBLZWxs
-ZXINCj4gU2VudDogMTQgTWF5IDIwMjYgMjI6MjUNCj4gVG86IE5ndXllbiwgQW50aG9ueSBMIDxh
-bnRob255Lmwubmd1eWVuQGludGVsLmNvbT47IEtpdHN6ZWwsIFByemVteXNsYXcgPHByemVteXNs
-YXcua2l0c3plbEBpbnRlbC5jb20+OyBNaWNoYWwgV2lsY3p5bnNraSA8bWljaGFsLndpbGN6eW5z
-a2lAaW50ZWwuY29tPg0KPiBDYzogaW50ZWwtd2lyZWQtbGFuQGxpc3RzLm9zdW9zbC5vcmc7IG5l
-dGRldkB2Z2VyLmtlcm5lbC5vcmc7IEtlbGxlciwgSmFjb2IgRSA8amFjb2IuZS5rZWxsZXJAaW50
-ZWwuY29tPg0KPiBTdWJqZWN0OiBbSW50ZWwtd2lyZWQtbGFuXSBbUEFUQ0ggaXdsLW5ldF0gaWNl
-OiBhZGQgbWlzc2luZyB4YV9kZXN0cm95IGZvciBzY2hlZF9ub2RlX2lkcw0KPg0KPiBDb21taXQg
-MTZkZmE0OTQwNmJjICgiaWNlOiBJbnRyb2R1Y2UgbmV3IHBhcmFtZXRlcnMgaW4gaWNlX3NjaGVk
-X25vZGUiKSBhZGRlZCBhIHNjaGVkX25vZGVfaWRzIHhhcnJheSB0byB0aGUgcG9ydCBpbmZvIHN0
-cnVjdHVyZSwgYnV0IG5ldmVyIGNhbGxlZCB4YV9kZXN0cm95IG9uIGl0Lg0KPg0KPiBTaW5jZSB4
-YXJyYXlzIGNhbiBhbGxvY2F0ZSBpbnRlcm5hbCBtZW1vcnksIHRoaXMgY2FuIHJlc3VsdCBpbiBh
-IG1lbW9yeSBsZWFrIGV2ZW4gaWYgZXZlcnkgZWxlbWVudCBpbiB0aGUgeGFycmF5IGhhcyBiZWVu
-IHJlbW92ZWQuDQo+DQo+IEFkZCBhIGNhbGwgdG8geGFfZGVzdHJveSB0aGUgc3RydWN0dXJlIGR1
-cmluZyBpY2VfZGVpbml0X2h3KCksIGFuZCBvbmUgdG8gdGhlIHVucm9sbGluZyBjbGVhbnVwIHBh
-dGggZHVyaW5nIGVycm9ycyBpbiBpY2VfaW5pdF9odygpLiBXaGlsZSBoZXJlLCByZW1vdmUgdGhl
-IG92ZXJseSB2ZXJib3NlIGNvbW1lbnQgZXhwbGFpbmluZyB0aGUgbmF0dXJlIG9mIHRoZSBzY2hl
-ZF9ub2RlX2lkcyB4YXJyYXkuDQo+DQo+IFRoaXMgd2FzIGNhdWdodCBieSBTYXNoaWtvIGR1cmlu
-ZyBkZXZlbG9wbWVudCBvZiB1bnJlbGF0ZWQgY29kZS4NCj4NCj4gRml4ZXM6IDE2ZGZhNDk0MDZi
-YyAoImljZTogSW50cm9kdWNlIG5ldyBwYXJhbWV0ZXJzIGluIGljZV9zY2hlZF9ub2RlIikNCj4g
-U2lnbmVkLW9mZi1ieTogSmFjb2IgS2VsbGVyIDxqYWNvYi5lLmtlbGxlckBpbnRlbC5jb20+DQo+
-IC0tLQ0KPiBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pY2UvaWNlX2NvbW1vbi5jIHwgNyAr
-KysrKy0tDQo+IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0p
-DQo+DQoNClRlc3RlZC1ieTogUmluaXRoYSBTIDxzeC5yaW5pdGhhQGludGVsLmNvbT4gKEEgQ29u
-dGluZ2VudCB3b3JrZXIgYXQgSW50ZWwpDQo=
+
+On 6/10/26 9:58 AM, sun jian wrote:
+> On Wed, Jun 10, 2026 at 9:21 AM Menglong Dong <menglong.dong@linux.dev> wrote:
+>> On 2026/6/10 08:06 Emil Tsalapatis <emil@etsalapatis.com> write:
+>>> On Tue Jun 9, 2026 at 7:06 AM EDT, Menglong Dong wrote:
+>>>> On 2026/6/9 18:02 Sun Jian <sun.jian.kdev@gmail.com> write:
+[...]
+>>>> Hi, Jian.
+>>>>
+>>>> This sounds like a good idea in this case. When I have a look at bpf_clone_redirect(),
+>>>> I found that it use skb_clone() too, which means it has the same problem. The
+>>>> data can be modified by other xdp prog in the destination NIC if we use
+>>>> bpf_clone_redirect().
+>>>>
+>>>> So maybe this is the default logic, and I'm not sure if this patch can break the
+>>>> existing users :/
+>>> I think for use cases where we are using bpf_clone_redirect() to use
+>>> one clone for inspection this would add an unnecessary copy. Maybe
+>>> adding *_copy() variants instead of changing the *_clone() would be
+>>> better? That way we wouldn't be changing the behavior for existing
+>>> consumers and the naming would be consistent with the skb_* methods.
+>> Agree. It's not a good idea to change the logic of the existing API. Or
+>> maybe we can add a BPF_F_CLONE flag for the existing API.
+>>
+>>> But more importantly, is there an actual use case for the kind of API
+>>> that the modified selftest requires? Nobody until now has considered
+>>> the existing behavior to be a problem.
+>> Agree too. Obviously, this is not a bug. For the use case in the commit
+>> log, it's something that can be fixed by the user themself. If we need
+>> modify the MAC, we'd better attach a BPF program for all the egress
+>> device in the devmap.
+>>
+[...]
+>>>>
+> Thanks for all the comments.
+>
+> I agree this should not be treated as a generic skb_clone() issue, and I
+> understand the concern about changing existing clone/shared-data semantics.
+>
+> The case I was trying to address is narrower: generic XDP devmap
+> broadcast/multi redirect with per-devmap-entry egress programs. The use case is
+> not newly introduced by this patch. The existing xdp_veth_egress test already
+> attaches xdp_devmap_prog to all egress devmap entries, and that program rewrites
+> eth->h_source based on ctx->egress_ifindex. My change only strengthens the test
+> from checking that the observed MAC is not equal to a single magic MAC to
+> checking that each destination observes the MAC selected for its own egress
+> ifindex.
+>
+> So attaching an egress program to all devmap entries is already what this test
+> does. The SKB_MODE failure happens because the cloned skbs can still share the
+> packet data, and a later per-egress rewrite can be observed by another
+> destination.
+>
+> That said, I see the concern that this may need a clearer semantic boundary
+> between clone and copy behavior. I will also check the last_dst path pointed out
+> by Sashiko before deciding whether this should be handled as a bug fix, or
+> whether it needs a separate explicit copy/isolated redirect semantic instead.
+
+
+I agree there's a real concern here. For context, native XDP already 
+makes a full copy
+of the frame for every broadcast destination:
+
+   dev_map_enqueue_multi -> dev_map_enqueue_clone -> xdpf_clone
+
+so on the native path each destination gets its own independent buffer.
+
+The generic path is the odd one out, because skb_clone() shares the 
+underlying data.
+I think this rationale should be spelled out in the commit message.
+
+Regarding performance: generic XDP is already a slow path — the ingress 
+side already
+linearizes / expands the skb (pskb_expand_head() in 
+netif_receive_generic_xdp())
+so the extra copy here is not a concern.
+
+
+However, there is one problem with the patch as it stands.
+
+The last destination is transmitted using the original skb directly, 
+without unsharing it.
+So with two destinations where the first one has no egress XDP program 
+and the second (i.e. the last one) does,
+the egress modification on the second destination will corrupt the 
+packet sent to the first.
+
+This could be addressed by doing the skb_unshare() inside 
+dev_map_generic_redirect() instead ?
+
+For the non-broadcast (existing) path the skb is not cloned, so 
+skb_unshare() simply returns it unchanged.
+
+
+
 
