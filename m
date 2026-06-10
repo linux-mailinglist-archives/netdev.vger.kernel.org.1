@@ -1,86 +1,53 @@
-Return-Path: <netdev+bounces-297506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xVJ3HjwXKWq+QQMAu9opvQ
-	(envelope-from <netdev+bounces-297506-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:50:20 +0200
+	id 0VKyEWgXKWrdQQMAu9opvQ
+	(envelope-from <netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:51:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31F2666C69
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:50:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A61B666C80
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:51:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=6wind.com header.s=google header.b=BM0rL+aa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297506-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297506-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=6wind.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="iT2MTn/J";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 014C2300D145
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:50:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9AB91302029B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794652D063E;
-	Wed, 10 Jun 2026 07:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED34386C12;
+	Wed, 10 Jun 2026 07:51:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0134A38643B
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 07:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758C6309EF2;
+	Wed, 10 Jun 2026 07:51:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781077814; cv=none; b=Pos4TqvUe0v4DIIHz4BxUCaVIpqfnM06uDoLDhXL5IDeNR66Ek14RBtXIyu/e6b+1JC4uKotnxGBiDR9ps4EZuNC5qrvZZz3fChedpmqucy4TMrfzl0Cprz4NYU6Im+ie20i9ziRPoqxn2QEQxf0xF7UKL/iISm056Ndbfjscyc=
+	t=1781077862; cv=none; b=hfoUsqrXzRPTHdVe36RG3sJscbkA/qUP/9kMYFFrFOJh4kpne5JW1Kh0KWRShUw8jvUzTmCMU+Ebf0vBiMDkcd4fbiYpA8Calbj5aJEAFUuqPy2UV6rqdZjO5GXiRVRKylQ7FylfpXg+8VzOSukaMLltRswU+JJMPESeC05a8Mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781077814; c=relaxed/simple;
-	bh=tyUGpCBtA1BH8feEKWhHYTU14OH43JiFA2UXV9u1u60=;
+	s=arc-20240116; t=1781077862; c=relaxed/simple;
+	bh=8bMQ+GGjH9oHEUku+aOkeCwNMq/gZ+jlMvBKtsGY4yU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b0KacNJCWj8/lhbjQxqA7rp1GN2Ysoda0U1Mf+S9NNmSQHnns74R/YfNPnIzIazNh6hyRvCKQzfAKOwKx5IAqBXfUBNLGOHvudR8jDV+5gV5aFzlDCXJUI5jOuyhVsbBdpXGWTuzP7nNGPFTev3l3mu1VM+Gu/TmS/Uj216pJgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=BM0rL+aa; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490c737bcafso2590775e9.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 00:50:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1781077811; x=1781682611; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BVKfWZi7wftjSkYa7BvXVr6m7jLimUgt3u2r7xVGHE=;
-        b=BM0rL+aaubGJpqgN4a9VKnSFcxzrI0tz+ytS9xPX5rZz792oTEHuDOAYV5jc/vK87b
-         ohiryfZUN5a5mHYHRh7CcSQtlCvdufRG9O9YKijOBsDdD0RcD56G7xEoA8EJH3Qiftri
-         WlmH9tyV5c7RS+DfetBK1WKZk54R31AeCaEtUPCHtFUrAP8U+eeZT1yLO6ETNd1o2huJ
-         RiYZOmJfkMoqrfoASM0vqIb2yTIpM0+7E2vUqOCU7ekQsu9iw16V2dv6+QI2qeNpwVJc
-         J8A9nUgqOyl+UUtJOFjbTbzbEggYeua5wsFjkj3J1mPgs7UqUaz9AtvCddOupAaxZReD
-         oQjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781077811; x=1781682611;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1BVKfWZi7wftjSkYa7BvXVr6m7jLimUgt3u2r7xVGHE=;
-        b=Y7nzo1OG2txsKH6A1wEYeL1Uh2A1Q9+akaOpka44dqO39bkIJZTsIVyQ/5fQ3b8X6M
-         sj+5pwrEtUZ6B1/vu2gAVI3uvis1DXm+5KxSRlCEHwWL+cmhmJ6u+RSPAPdBtKLKj1vQ
-         +zcUjwJ+c3OoWlPiXJMQjiGJhL3WNDbYGu3L3YJNynn7ibIPcu7mpY3nbhSE5KDQSDwT
-         MF+vdRL71KKuxUYmXzc8WWfsAU8qW4MR01WiUYmf9KBdVsFTGsFrKC9EJorXnLeeHSam
-         1fFkNA98BjBtYYihlMZezeGidkGkJ1atxqFOBeHzhE2Z1SuuCg9AMBEH1dHmC5c1cL/1
-         jG8w==
-X-Forwarded-Encrypted: i=1; AFNElJ+X5ufNh0iiQ/QHFUIlBOzhw73bBOOKfKAvRB0FcD7B7Yyv2MzB8dDbntl4L9hvph4lLrJrs8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXlWEVV4GjxzS/ehRJ5mpl3GeyZykuNAVVqBcYe+8YpQs6dMfO
-	DJOw/DuIEmCeQtTaLht8PituZXHI2PTmJndKPfRdUvs9Qo8knq829SAen/QmNxMD8MbV7WVIGjk
-	kD/hm0oI=
-X-Gm-Gg: Acq92OF1E/3HuKuw3GPzDrbLNe9ZEhWFkWcMpGdI+WDUgpcb/P0zo/oRM1DKp0h6bxg
-	ZtOo/klnH3Tsu5VxqDYclcRloeDReUxArc7JECdgXRs/MzoKy2HfPzuiRpPhKJ2ozI3uVHyPjkE
-	bL2c4nnXAwzThiITjgi49VK15SeEkH9vwNaTVdLDXpQL3/4eb4I50N1cLQ0HRZT4CO4fD2PIEbO
-	w2M/LoRkz45qFhvu6U/iijaLRG2XCYFJwf4awarvlrksqHYx/sL8+hs+8lRscszdZbRzRWXv1b5
-	1lPJGtTd61fUVXSSgb4dogLnGX6SIsyyo7zR1tYNlhUk/0AuyfiR/C0RuljIqZy9FZTwtI2yaH4
-	r4Xr2Ao3rY2EqjfiY72p1SQFo0VyWDDFSld0uMQJbIqPEfvHAnh96x5E7KcyD/RFyD76rZKD+00
-	txDO7d2owBpbW0/f7wx2zFMYCETp6NWZT8p5bgAj7WdgWFeXN2a5BZFKTWOCwFHV7jIDLe5RqmB
-	a64DJATuNUJ2d8=
-X-Received: by 2002:a05:600c:3f0e:b0:490:b288:1a82 with SMTP id 5b1f17b1804b1-490c24ff262mr171767545e9.0.1781077811405;
-        Wed, 10 Jun 2026 00:50:11 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3918fcsm624698755e9.3.2026.06.10.00.50.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 00:50:11 -0700 (PDT)
-Message-ID: <fdcc6f4b-6f81-4422-bfbc-7376dd5cd19f@6wind.com>
-Date: Wed, 10 Jun 2026 09:50:10 +0200
+	 In-Reply-To:Content-Type; b=izgLoIRhzG82PFsL6GBNx+rNz9BVXa7NhELr0qzKZYXd0gws8B4X8DwlLmOx/Fa4qTzzw+rPcXZYbd5+D4X8sQtW2oHWS5QLmNxB2sdVX0QKVLD5mxcJAxXoZ/AXedd8AUzryUG7Kdh8WctsvHxAwRWJfgHhpUFK0evXHUXh+Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iT2MTn/J; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D30871F00898;
+	Wed, 10 Jun 2026 07:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781077861;
+	bh=C21ioqc9Ezeu5eXyHoB4EfMIkqcwZ9bWBdHRNGhqoAI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=iT2MTn/JWnxi2uQCiTFl2WC5fYsuDJTfLmvXRMfHWh47xkzyaqWj5sfiMoq3xt30F
+	 7o0ity6LDLCuyoWm5KEj5NryxeIFkSGgz8I98My65kLukNnyFG0HKLknRIa6i1B2nX
+	 uTWBrOiA/J1d+FbaULtiVJEyM9yacbCTzytYl7EY3gW7+RLDbmMRSZdeeiDNI8UYms
+	 qyPVpASXvqnsjIhkqCr1cBtnTgdK2mC4UEtByv8rVb7L7S3XivwEZWXq2bZ+WjrcyP
+	 I2IE6YEg2/uMfkSy0SFsUKCU4N2N8xT6SVs6mp82k2UXIPNB+xndg/iVPnujrrez9V
+	 XIFpulbUjEm0A==
+Message-ID: <210184c2-6b62-4a8a-aa2d-ecc8e539f747@kernel.org>
+Date: Wed, 10 Jun 2026 09:50:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,79 +55,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next] ipv4: igmp: remove multicast group from hash
- table on device destruction
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20260609122646.2297540-1-yuyanghuang@google.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [net-next v1 1/6] dt-bindings: net: dwmac: Add snps,use-ncsi
+ property
+To: Minda Chen <minda.chen@starfivetech.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ devicetree@vger.kernel.org
+References: <20260610072420.64699-1-minda.chen@starfivetech.com>
+ <20260610072420.64699-2-minda.chen@starfivetech.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260609122646.2297540-1-yuyanghuang@google.com>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGPBBMBCgA5AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJp2mE8AAoJEBuTQ307QWKbeaIP
+ /ihHTkTW4KsN/DQ945JJbyu5tI0J80Wue7QyyLPglyKfhgb5cLLNPpOC8cCIJsc7+W3i2P38
+ s2c1cOH6CYGE7E9ur3Vfme8NW2S2I/Z8VC7bZnzyS23wT17LrsdS/qCpx4o8U+pt/xdXDKph
+ EGRYrIEmMpUWvyYzyYKGIe25FtaayIIKpq8eZYyFcp2f/sG5IkOW5uZzHPMPdcm87jU7fyuQ
+ rAU2vx9r+ulUfQ/q9Z2roC/ode3l7t2pN7BCBCsUDp6JCrUyZrtT1e7EbA0ZRP3aOBNk2P2E
+ DQOgJGjGdO5Yx2Y9LFtltu6JbsBJHi1syGRX3AtQYOMc4Y1WGoeZJmMlvKj2ZqqXNkcWi2DS
+ IQEWB0uW6CqFsBBIMGDa+6OzdaVO/uAVXWDWml02Men3CILdI1MbVjoh8ECqYUY7OQ+JJvNN
+ vnliuq5WM3Ghd3jg/LZZrxXjdIginRHFQCjIJYLKpLZWm1/iDFedcfzqRNYmTtqscdCNHW41
+ oT3Z7BmO9xwdjuwBS6nmS6JJwkbf5Ot2QR4pB/DRU7ZwjT1qHe+9r9gF32wXVQatHNGK/VVu
+ sfwOnkdxCWkp/qb2gdQRmZh+SedStWshigH6sNfuHBloF/q+hjMRc8b2m326OZdrbSHwY1Sz
+ vti8Hn7n8NjdHO9LKB7BIdjkA9DA5WsqOuVCzsFNBFVDXDQBEADNkrQYSREUL4D3Gws46JEo
+ Z9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLueMNsWLJBv
+ BaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6eiOMheesVS
+ 5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wAGldWsRxb
+ f3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA6z6lBZn0
+ WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9YegxWKvX
+ XHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt91pFzBSO
+ IpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gUBLHFTg2h
+ YnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/JoFzZ4B0
+ p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu4vXVFBYI
+ GmpyNPYzRm0QPwARAQABwsF2BBgBCgAgAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtBYpsFAmna
+ YUkACgkQG5NDfTtBYptX+BAApg32CkxwNucNEi8WfWA8oKkW0y8YDuY6ORMo9FWNGiT/OTy0
+ vyJrLocrpn86zwfjVp+eCrssPYh8eqJfnWqmYv6ACQtHPYzPZQ3mSo8H97Z01oUxITzCxpXm
+ ZkLgPIqtDPcC2E3dPM/fVxcyowM8XsaMA9wcsaUYrta8toOq2b9tKcjleKMfMrm0gQ9u7wUc
+ QbLkwj6TCLOwucb07GXzLTNF9PZmaDUpKAZjMjmrW+le+SFvQbhamx0rxLWPR0NWntXpbCn+
+ +ACch03p/JyTBVktxFsFyCt7pTPE1kEaeuXBTe/a2D9iQvRxRW19LvuO2e59/u1wYUiH/orz
+ wbIC2S4dBsPAPihL3ztOU1yE86GPyQtSE0kU+/7snnLt4QGi6PChf3t5gnNjAzjUUovO8rgI
+ c+5yN5heq5loYHgK6OQ9OlHzsPHO9e9MOQcKlFycs1pyijFGzDwdNUm/SchK8iWT2QApTx4A
+ K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
+ n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
+ qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
+In-Reply-To: <20260610072420.64699-2-minda.chen@starfivetech.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297506-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:yuyanghuang@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:idosch@nvidia.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:minda.chen@starfivetech.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:joabreu@synopsys.com,m:mcoquelin.stm32@gmail.com,m:linux@armlinux.org.uk,m:peppe.cavallaro@st.com,m:alexandre.torgue@foss.st.com,m:robh+dt@kernel.org,m:krzk+dt@kernel.org,m:conor@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:robh@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_TO(0.00)[starfivetech.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,synopsys.com,gmail.com,armlinux.org.uk,st.com,foss.st.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297507-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,6wind.com:dkim,6wind.com:replyto,6wind.com:mid,6wind.com:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,starfivetech.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E31F2666C69
+X-Rspamd-Queue-Id: 2A61B666C80
 
-Le 09/06/2026 à 14:26, Yuyang Huang a écrit :
-> When a device is destroyed under RTNL, ip_mc_destroy_dev() iterates through
-> the multicast list and calls ip_ma_put() on each membership, scheduling
-> them for RCU reclamation. However, they are not unlinked from the device's
-> multicast hash table (mc_hash).
-> 
-> Since the device remains published in dev->ip_ptr until after
-> ip_mc_destroy_dev() completes, concurrent RCU readers traversing mc_hash
-> can still locate and access the multicast group after its refcount is
-> decremented. If the RCU callback runs and frees the group while a reader is
-> accessing it, a use-after-free occurs.
-> 
-> Fix this by unlinking the multicast group from mc_hash using
-> ip_mc_hash_remove() before scheduling it for reclamation.
-> 
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
-A 'Fixes' tag may be useful for backports.
+On 10/06/2026 09:24, Minda Chen wrote:
+> Add snps,use-ncsi dts bindings property for Synopsys designware
+> ethernet MAC with RMII interface and used as sideband interface
+> network controller(NCSI).
 
-Regards,
-Nicolas
+Please use standard email subjects, so with the PATCH keyword in the
+title. `git format-patch -vX` helps here to create proper versioned
+patches. Another useful tool is b4. Skipping the PATCH keyword makes
+filtering of emails more difficult thus making the review process less
+convenient.
+
+> 
+> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 2449311c6d28..05b1d8428f65 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -545,6 +545,13 @@ properties:
+>        Enables the TSO feature otherwise it will be managed by MAC HW capability
+>        register.
+>  
+> +  snps,use-ncsi:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      Use the NC-SI stack instead of an MDIO PHY. Currently assumes
+
+You described the desired Linux feature or behavior, not the actual
+hardware. The bindings are about the latter, so instead you need to
+rephrase the property and its description to match actual hardware
+capabilities/features/configuration etc.
+
+Best regards,
+Krzysztof
 
