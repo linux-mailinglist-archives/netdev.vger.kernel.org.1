@@ -1,201 +1,176 @@
-Return-Path: <netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +t6cNaIoKWrvRgMAu9opvQ
-	(envelope-from <netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:04:34 +0200
+	id WN/FEVcnKWqCRgMAu9opvQ
+	(envelope-from <netdev+bounces-297549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:59:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB76966799C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:04:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C1366786A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:59:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=proton.me header.s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail header.b=KoEf9LrZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=proton.me;
+	dkim=pass header.d=6wind.com header.s=google header.b=b4GV6tBf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297549-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297549-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=6wind.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 89BD33071C69
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:48:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FB5632D2D11
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DE6391E76;
-	Wed, 10 Jun 2026 08:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D343B71A4;
+	Wed, 10 Jun 2026 08:52:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8E83AFAED;
-	Wed, 10 Jun 2026 08:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D703B583C
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 08:52:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781081313; cv=none; b=NL6DaTkc5rrEvt8xsDs4ZYshCx9bQSn5JzxdXfQ51dwqL2Oja0wbpgYMAgVUHNmoQSTEwBwjWt17b51MNZ7yhjo6v7PAFXIrNEixDKbsWbepvZKNZP31UNAEsLnPkrrPw60E34jMNxgXBJFtElp4rXaOpct8/prDyViFN/umQdc=
+	t=1781081541; cv=none; b=dTGcAiaf9FHCLpoNqNiFPP8ogC6a9UbuzJR107cKg90NCykKfggDKnkU7ylXaNEGuTclL49xtSbECgcutV9b57/7qQmEUXmLzCUIZLqpOjfIZB1ICk+pEBwstUL0uwMYjYFBtuQkeUVEGqqoPyAs8prGpU65bPI27/kxW/wc1ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781081313; c=relaxed/simple;
-	bh=oSb3BjOGDrpzBuRwag4cIOkHeHtiFcIdTetZsHm+c4U=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=MobmP8ozhsGNUbA7K61B3udOy7zZQc7ToJMv4TwN8pjTALKsWSf/SUQb4HE78T3JOxkvUJ7OAs9VQNE4mEo2e6iIrwO4u5Iw6mDilvzDT/+J0voaDzykY6VnWg2eNNdHDVSAWWPKHwKE+SDVuCTOLEgl+hZVZFl1NLybNWCstHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=KoEf9LrZ; arc=none smtp.client-ip=109.224.244.18
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail; t=1781081301; x=1781340501;
-	bh=CfVcEwBABCtgdPyDkYpsAiOBarZuyehRLdSudPytfdA=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=KoEf9LrZG6P6QnULGuMWCDZDfnxz6S50E14JtxRJYRIFKjbqWEhTjddsCgn91lvte
-	 28OPmDtR/cyls6a214m+18xcaM5uotWFlfTjHOGTMabhqaaxO6pbUYeeeytuxcemAm
-	 G/5ke57UcF4IUN8hGgfnSQEeqL8lOO666CEk5oaBGYQkVEfEn7fL/c3Xd0IYF5/t8a
-	 aql8pJ8tW8LbwKY8bEcQmcy25Hd8rQDRgXErBsFQBS5Uf3EmLLBcZy6lokvPqMf14O
-	 refda6lWpHrTRgMBQaClpwTPwXZSZSvPNfjVlYr1wA68Ko9DNE2PRgMlJGQCJR79fq
-	 dotmaQ98e4rPQ==
-Date: Wed, 10 Jun 2026 08:48:13 +0000
-To: "D . Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>
-From: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan Raspl <raspl@linux.ibm.com>, Ursula Braun <ubraun@linux.ibm.com>, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] net/smc: bound the peer producer cursor on SMC-D and SMC-R CDC receive
-Message-ID: <20260610084803.186516-1-hexlabsecurity@proton.me>
-Feedback-ID: 199661219:user:proton
-X-Pm-Message-ID: cc44dd5c1ee3ddfe483529e80be1c51ed93bd6d2
+	s=arc-20240116; t=1781081541; c=relaxed/simple;
+	bh=005kqibYyfonRcnHCwlpzKy2wPXsZAtXExaHgcOqx2w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g3AG+AW89KvSgLlIxbXV7swSklzmB0DPxpW6hUKv3pUbEJznnK+Dmm0dzURXZWR+NemxPdZDtvEwnOmBWsa1tmtwQueKFW9uEuO5WKmY6FqruFF6ZRLny+3sUfB8lqTk0PtaVfXQv/7Nd3B7eEwgEsWi3TXnJDatiNXC7/HTZqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=b4GV6tBf; arc=none smtp.client-ip=209.85.208.47
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-68f0fc103easo771833a12.2
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 01:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1781081538; x=1781686338; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=keO9Q9d4wSuesQmYGtEo2JR0GnYAaSiDUln8Q5/lybM=;
+        b=b4GV6tBf8+7tjGcAO9sUPh2xtm6sI1zM6D8eeaNJkPftnLoMPvNmX8ID/7bvE6Cqnb
+         sEcLO/J1Exie2QtMVAGJf7V5ZSedoLe/LjdOb9cEzU7igO0jRrIvSKexonPQhP22HGxM
+         d4wkJ986PCMGH0BB+ReJlaooXGlHBkpmScm72FJTNlSg1gemxi2yiswtUnVc62iBjJZJ
+         DTJPAG2aLhKmudxn8lGpaAJwS2mqJOHPPM53oBRJuhs0XXO4rsAQm2Vxz2h36og7MVP1
+         65naL/qvhYfnLKPHKRjjCy4ERbujPNTcQ9je/BzDpUfQgOHHXWHcFl8gpKBX/Vl4kwNN
+         sfgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781081538; x=1781686338;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=keO9Q9d4wSuesQmYGtEo2JR0GnYAaSiDUln8Q5/lybM=;
+        b=sfX9xvSGqOWPRrH6yI5mFkat6n2i3CaOj33Ate1XfFicgVo5IPA1DQES8MpbZ2i5Bo
+         hLnhuhCfg/YGAAo/X3bSZ8IoI3vIAw/3TGq3daG5du67dcK7nJwzczmSN8ZBFGeN4wqD
+         M4gXd4Jxam55z9S/QtFQHdK3mu/lLmr2tg887iT0towccc1B28W7/xBk6xkeQGBWrD+a
+         8yEAViF43lOYjophLdbWcc2QE4dQu8tz+NoMLB/4qnFUzdApc1GP2lz+sWoaC2K2GhNL
+         KRdauGGvYKj71qj8C9ZxORMIKLobqqcztH8h+NSpdP4kIGgXxVjwDbAW3i97r+e5EekE
+         iADg==
+X-Forwarded-Encrypted: i=1; AFNElJ9NbE7FStG/Wz43dFx3dz3dDq5Ji9KzdEqhZrz9v+MdZzRyKHYPJU+ZziJoqX3Njo7f97ZYtug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL9UfizL+9zh8JVn3MAfF3VFo/ZvUaXQ1JUm1Tdo4S4XLjjukS
+	udtRN9nceioRRgYDTKThb01QcOKtdPEWs7oPm3JsjMzXNiJvGmySABNRzZhNIvTBq1E=
+X-Gm-Gg: Acq92OFkk6HHXqv3GZ444P+7k9TUZAYQ6tp9Pr8CEEszsMp370ksVoiAAif1vA/itDW
+	/znHbMvkbEHcSxm1N+LNkSRzRav9NB1lx9xAa33cmUniKUGoXWsaKLZA3ZEf7UKiomy2wfS8v4U
+	/Zjhl5vlQ18PdjEGxO+s2HBKiHW87eoLZ+WQKIYVb3NgcHFgh4MNz6aROhQclfspu4nc5OnCDUO
+	8tgZPhId71bQX4qqSed7uRD51RnPVrCFky5CLQRUT3FkM/H/3WD74VvIXF23jIo/ZGv3m5WBp+w
+	0Mpjvv831WXcOV4ggoYYvkds8I+LtwKlCDIG5okMgid9jlHds7LYiROMiepovmU2z4IOsfzZOyM
+	DOCOJrMNLKCRqqyiy0OKo0KjP7UDQgu1djeXyLjSlMZd0Aq9B+Ce+fLvYsQA/KCZ081GuvRhdtQ
+	gu3WMD1NvyhtUilIy+2cLVTwo4O1U8syHqiP6+QWNcIKM3Lfr4Ol3iuewJALD0TRQF4hbUkFfbA
+	WJqrKSjJhOxYwk=
+X-Received: by 2002:a17:906:5a61:b0:beb:7979:47d5 with SMTP id a640c23a62f3a-bf93a7144efmr115138566b.6.1781081538525;
+        Wed, 10 Jun 2026 01:52:18 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:ab7:2110:6a1d:efff:fe52:1959? ([2a01:e0a:ab7:2110:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf054e05199sm1125952066b.29.2026.06.10.01.52.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2026 01:52:18 -0700 (PDT)
+Message-ID: <5224a3f8-16e9-4967-9fce-14e1a0fc5205@6wind.com>
+Date: Wed, 10 Jun 2026 10:52:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] ipv4: igmp: remove multicast group from hash
+ table on device destruction
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20260609122646.2297540-1-yuyanghuang@google.com>
+ <fdcc6f4b-6f81-4422-bfbc-7376dd5cd19f@6wind.com>
+ <CADXeF1FaYn2sDyM3Kfic5eyP2oQO9uQE_rFbwwRZFrOqyWSJcQ@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <CADXeF1FaYn2sDyM3Kfic5eyP2oQO9uQE_rFbwwRZFrOqyWSJcQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
-	R_DKIM_ALLOW(-0.20)[proton.me:s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:raspl@linux.ibm.com,m:ubraun@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297547-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297549-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:yuyanghuang@google.com,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:idosch@nvidia.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[proton.me:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,proton.me:dkim,proton.me:email,proton.me:mid,proton.me:from_mime]
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:from_mime,6wind.com:dkim,6wind.com:email,6wind.com:mid,6wind.com:replyto,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CB76966799C
+X-Rspamd-Queue-Id: 91C1366786A
 
-The SMC CDC receive path copies the peer's producer cursor -- a
-wire-controlled value -- into the local connection cursor with no upper
-bound against the receive buffer (RMB). A malicious peer can advertise a
-producer cursor past rmb_desc->len, which is then used out of bounds:
+Le 10/06/2026 à 10:37, Yuyang Huang a écrit :
+> On Wed, Jun 10, 2026 at 4:50 PM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
+>>
+>> Le 09/06/2026 à 14:26, Yuyang Huang a écrit :
+>>> When a device is destroyed under RTNL, ip_mc_destroy_dev() iterates through
+>>> the multicast list and calls ip_ma_put() on each membership, scheduling
+>>> them for RCU reclamation. However, they are not unlinked from the device's
+>>> multicast hash table (mc_hash).
+>>>
+>>> Since the device remains published in dev->ip_ptr until after
+>>> ip_mc_destroy_dev() completes, concurrent RCU readers traversing mc_hash
+>>> can still locate and access the multicast group after its refcount is
+>>> decremented. If the RCU callback runs and frees the group while a reader is
+>>> accessing it, a use-after-free occurs.
+>>>
+>>> Fix this by unlinking the multicast group from mc_hash using
+>>> ip_mc_hash_remove() before scheduling it for reclamation.
+>>>
+>>> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+>> A 'Fixes' tag may be useful for backports.
+> 
+> Thanks for the suggestion. Per discussion in the following thread, we
+> don't need to add the Fixes tag for a trivial fix.
+> 
+> https://lore.kernel.org/netdev/20260604101728.GA771160@shredder/
 
- - the urgent path uses the cursor count as a raw index:
-   smc_cdc_handle_urg_data_arrival() dereferences
-   *(rmb_desc->cpu_addr + rx_off + urg_curs.count - 1);
-
- - the receive path turns the cursor into a length:
-   smc_cdc_msg_recv_action() feeds it to smc_curs_diff() and
-   atomic_add()s the result into conn->bytes_to_rcv. The differing-wrap
-   branch returns (len - old.count) + new.count, which exceeds len for a
-   forged cursor and accumulates across CDCs, so bytes_to_rcv grows past
-   rmb_desc->len even when the cursor count itself is bounded;
-   smc_rx_recvmsg() then copies the wrap-around second chunk past the RMB.
-
-The RMB is a kernel allocation, so the reads disclose adjacent kernel
-memory, and a cursor pointing at an unmapped offset faults in the receive
-tasklet (softirq). Both transports are affected: SMC-D converts the
-cursor in smcd_cdc_msg_to_host() and SMC-R in smc_cdc_cursor_to_host(),
-and neither bounds the count.
-
-Bound the producer cursor count to the RMB at both conversion boundaries
-(this closes the urgent index on SMC-D and SMC-R) and enforce the
-documented "0 <=3D bytes_to_rcv <=3D rmb_desc->len" invariant in
-smc_cdc_msg_recv_action() (this closes the receive length, which the
-cursor-count clamp alone cannot because of the differing-wrap diff and
-the cumulative atomic_add).
-
-Fixes: de8474eb9d50 ("net/smc: urgent data support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
----
-Reproduced under KASAN on 6.12.y. A forged producer cursor with
-prod.count =3D rmb_desc->len + 1 and prod_flags.urg_data_present set produc=
-es
-a 1-byte out-of-bounds read in smc_cdc_handle_urg_data_arrival()
-(slab-out-of-bounds Read of size 1); the cursor-count clamp makes the same
-input in-bounds. A wrap-flipped cursor drives bytes_to_rcv past
-rmb_desc->len across several CDCs so smc_rx_recvmsg() over-reads; the
-bytes_to_rcv invariant keeps it bounded. SMC-D was exercised over the
-in-kernel loopback-ism and the SMC-R converter (smc_cdc_cursor_to_host)
-over an emulated RDMA loopback. Clamping prod.count alone does not bound
-the recv length, hence the separate bytes_to_rcv hunk.
-
- net/smc/smc_cdc.c |  2 ++
- net/smc/smc_cdc.h | 12 ++++++++++++
- 2 files changed, 14 insertions(+)
-
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 619b3bab3824..738c45fd5cd0 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -382,6 +382,8 @@ static void smc_cdc_msg_recv_action(struct smc_sock *sm=
-c,
- =09=09smp_mb__before_atomic();
- =09=09atomic_add(diff_prod, &conn->bytes_to_rcv);
- =09=09/* guarantee 0 <=3D bytes_to_rcv <=3D rmb_desc->len */
-+=09=09if (atomic_read(&conn->bytes_to_rcv) > conn->rmb_desc->len)
-+=09=09=09atomic_set(&conn->bytes_to_rcv, conn->rmb_desc->len);
- =09=09smp_mb__after_atomic();
- =09=09smc->sk.sk_data_ready(&smc->sk);
- =09} else {
-diff --git a/net/smc/smc_cdc.h b/net/smc/smc_cdc.h
-index 696cc11f2303..7fa6e0d3817f 100644
---- a/net/smc/smc_cdc.h
-+++ b/net/smc/smc_cdc.h
-@@ -230,6 +230,12 @@ static inline void smc_cdc_cursor_to_host(union smc_ho=
-st_cursor *local,
- =09smc_curs_copy_net(&net, peer, conn);
- =09temp.count =3D ntohl(net.count);
- =09temp.wrap =3D ntohs(net.wrap);
-+=09/* the peer producer cursor is wire-controlled; bound the SMC-R count t=
-o
-+=09 * our RMB before it is used as a raw index by the urgent path, mirrori=
-ng
-+=09 * the SMC-D conversion in smcd_cdc_msg_to_host().
-+=09 */
-+=09if (temp.count > conn->rmb_desc->len)
-+=09=09temp.count =3D conn->rmb_desc->len;
- =09if ((old.wrap > temp.wrap) && temp.wrap)
- =09=09return;
- =09if ((old.wrap =3D=3D temp.wrap) &&
-@@ -260,6 +266,12 @@ static inline void smcd_cdc_msg_to_host(struct smc_hos=
-t_cdc_msg *local,
-=20
- =09temp.wrap =3D peer->prod.wrap;
- =09temp.count =3D peer->prod.count;
-+=09/* the peer producer cursor is wire-controlled; a count past our RMB is
-+=09 * used as a raw index by the urgent path (smc_cdc_handle_urg_data_arri=
-val)
-+=09 * and as a length by the recv path.  Bound it to the RMB.
-+=09 */
-+=09if (temp.count > conn->rmb_desc->len)
-+=09=09temp.count =3D conn->rmb_desc->len;
- =09smc_curs_copy(&local->prod, &temp, conn);
-=20
- =09temp.wrap =3D peer->cons.wrap;
---=20
-2.43.0
-
-
+I probably misunderstood the commit, but you are talking about a
+'use-after-free', which doesn't seem trivial for me.
 
