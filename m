@@ -1,940 +1,242 @@
-Return-Path: <netdev+bounces-297609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oeKBLCZBKWpCTAMAu9opvQ
-	(envelope-from <netdev+bounces-297609-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:49:10 +0200
+	id 1dSWNQJBKWo2TAMAu9opvQ
+	(envelope-from <netdev+bounces-297608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:48:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5696686FA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:49:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D94466686DA
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:48:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=sipsolutions.net header.s=mail header.b=j6+Pdg5U;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297609-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297609-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=web.de header.s=s29768273 header.b=O72aWOTX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297608-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297608-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=web.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 924C5305C194
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:36:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BB320301C933
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8433F411E;
-	Wed, 10 Jun 2026 10:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED753EEAFE;
+	Wed, 10 Jun 2026 10:36:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274013AEF27;
-	Wed, 10 Jun 2026 10:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821133AC0DD;
+	Wed, 10 Jun 2026 10:36:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781087808; cv=none; b=oZPkEPFL8b+jncX2gpR+NRQjiqTn+LsPB3PQRGRBa6WIywFVF2v4lrSLMlCujWv4CtKZL3D35gWO647lpg/ibYhgft7Qb6MFQLNmhiF3ue6pD/ZauofxyPyfBtzDbb7nFacPFnUIB8wP8Z87imukaYUHQ/e2KD0mScBFnVQTrFk=
+	t=1781087797; cv=none; b=cQxxSzWfiYxm9Y9jY32tfkp7svA8lS5I1CzI5Fn7MXqYlpCteBZf2Rrv7GynVogqhhbFD3Pm+QMzd3Lv68hdwn8TT+KCW00F8kgjHNjVwMVDQ74RRTW9+QE/u7XxuLkR/PM7/9V5OW587sz2IZiVRO1quPgYr2fg8o/HgTAOS7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781087808; c=relaxed/simple;
-	bh=oz3IWg2QRJkYbZKqZB03jT140XIc256EGqQuQpSJjsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nvFGJA57tuXi8iB4bQcf7AS7P1f7GgU6qmiDJ2HRvwEb3Qb4OMUIT8wnlwtb1qbwNlFfj5iUvBe/xPEuD8tc2x5Y5MUX4ChQ7j90DVs6N0Q/01o1DCiC4bY3DU6hbri8jMStC0uJcb4LwiQ1C6jZpXKv6Fet0MFhloRywS4Yl4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=none smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=j6+Pdg5U; arc=none smtp.client-ip=168.119.38.16
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=2MW6/u48BCp1XZw6lweisn50pMGNMyE4y7udVMc3Hms=; t=1781087804; x=1782297404; 
-	b=j6+Pdg5UUelINTg6/BzPWdnX4QD/gXQuoNuHFN0NTvLCuC7HTwrlDS6R0bLc5M/Cb7fEH1RfIAZ
-	J4Htc0H3n/6kFhrGhchY99Ngzv9QSDykMyrtSgLvFYdKplj7MolQnjVHpzIVM18SNGGS6NdaUhzie
-	y4g2iX9GTI0XslF3uL6oAispRhbpX0U+g6aw7eVjIdOooo2n9Bkd1Z0B62OjIeDFJsjyuiUiwukt5
-	rXTbzYD+tgQ7pT62AxY67plCWZiAzSaDCrU6abh70vyoVqxdLHbdJJpc/q6ynS6HASfsVzezYY5Df
-	uJdVR01B+bGdSb1BlFTeiDzezQZUJhxfQIpg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1wXGIb-00000007tBl-0AKN;
-	Wed, 10 Jun 2026 12:36:41 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-next-2026-06-10
-Date: Wed, 10 Jun 2026 12:35:39 +0200
-Message-ID: <20260610103637.179340-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1781087797; c=relaxed/simple;
+	bh=sxojESLRIAg5WSIqEGLuDfTZ3dllHbFSpRiR8XKzC1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IZfDpT48EyTqHeoxggAEQLkFMqvVl8+7nz2VXw3J/tARp7bNWxVeIqA5rr3R8qJi30YRtfTnUmggiWGJA/eUAhsF8XF2Zv6qQv1QncX7gJ1ZLM7zSQ3sXqfdGXWT9xbhANSBNnqrtnTFrDf0A+YZU8O5+0G6NiaFZS2ss1Jp358=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=O72aWOTX; arc=none smtp.client-ip=212.227.15.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1781087787; x=1781692587; i=markus.elfring@web.de;
+	bh=fs8Ok3+cTNIYrAHYO5Pmt1zk9BZvwgmOOfLZc5NDLaQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=O72aWOTXuH/rcUEdH2KO0of1Ey5JQadlnowTewj60ou8m98hmdclzHtc+3FOHxyZ
+	 x6TDkVYEZsrqUll/VKw66j00HY953zHG4EEaT3L0C6/sQ3AaEwM6RtyGBSYEGUsyv
+	 jQcRAHZywq8lOQXJ7e0A3UFrcY6EO3/yMvSunpJWnPeIc9Q8hR5KhdqTRIkTd7dPa
+	 GJYhROEiAJgGlihHgvcAtcwj85cZg9eXwQhGt1PVBelTkng8CHIDF+mknwPimtO8p
+	 G6vCkDfTgJCsap1b4BnCdRWuO8nA/rvJm8bxKrt7VS1o1GzFfl4K9Njsdb3EKy2VZ
+	 Z+nGhGcKArqtiFsFRw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MTfon-1wei1O1e7Z-00Klox; Wed, 10
+ Jun 2026 12:36:27 +0200
+Message-ID: <0789aef1-4173-40aa-94e7-576b73ad0201@web.de>
+Date: Wed, 10 Jun 2026 12:36:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] i40e: Use common error handling code in
+ i40e_register_auxiliary_dev()
+To: Manuel Ebner <manuelebner@mailbox.org>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <f0b4e354-9ed7-43f5-8ffe-97019e421c02@web.de>
+ <c80c7ad9aa48dca8799ed2e76b1628aa7bec92b0.camel@mailbox.org>
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <c80c7ad9aa48dca8799ed2e76b1628aa7bec92b0.camel@mailbox.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:HhgeNHSkXEWFo8b3gYoOcOL+xPlZ1naCif/BIU3aNj8MlB3bEfU
+ YAZiLR1sETCCrWPLtisMQednRbzkFaYxiZHFQntZKYeOYzycpN9oVXGUIn5UTKoFfCP023D
+ LoDVISGal9DouXa1sGmsCLk83KmY9OCy9AqMYumPJjjaom18PzvYEXmtpcC4pMEwQy3x2IP
+ Fu0jUoKMeKRHNLjV6C1yA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:67BW7pd4GZ8=;Va1f6rwrb7apsVAhnpn6Rb595nf
+ NbQFjlasvCOZ5dzE9JGYETtqwL8lVUal5RkkKFoaQ+MjZj1DO9uQHhlQUIrxYBemdFz73LQob
+ /LixQfbSH3pBYX9h+xkZsDewi6Hr5gsV2hP8BDSWvdxd77Ku7DFCcaIOUURB+AptOyIyPO8u6
+ Y1PP8pY4X+ymifu8VBcb/qTKHxsWRnvzp8OQTswLsuAlv3LuUBVx89204fuO0qNpAi5WN9SYL
+ LqR0+HZpLZOeNIg5uO4qS2NDI6jU3VfmSactUDvjGudjGBggiA16PxpuAPnTBdymZVCsOhrNU
+ kdJVboJvWdfsuHtKilmF3VZBhHC1zTX1jChnO042xopM/KU0Qh09uokxCPkitcbyBizLIcq2m
+ WoYuVaEr/KgoAgQRPmAPA//e3Fbfv63oBHHHhgrlqiQKTICynpeZGeJeqptLwSGPtZ+NWyJtZ
+ cpXmsH1sebauuJwWofsg05T7cpdgDwkpzhlsgZ0qtXU/0KlBNMYPylRpZD0EnA6NQL/667InY
+ oghcu27xC1AJqbuLV7kAXu2g0yzgNUfyxrCIST99I605VQfssaD1MHltFwNOygFrGKQ4fXy2F
+ 1QoP25BKyzSHRgAYSGZJx41jtncyvJ8ZgPcXkFAnxg6h9t4iv6kdUmhyw+P/KjpYOdIzdVmTU
+ LcDaUBRoxZH7P+x6sLl64lx2qlvhKGOLVOnRqtVF3AVfGHOM1B1GAJTi+g6E6WdrKSvV46k8i
+ ykjBNYJd20lpgg4MnjrGQmO+OQxiacPj+iTqCxx5pa2+OnIMwYKe4iv0g+Y2yWRWqfO1/mkP/
+ 7KgZta9ygTyATrokey+cH1zBk0db1w7o8aFPp3qDsycKZzsxwlZeXEfzUrdE0gyXdeRgmlKnv
+ pt/BtTzn/OrbgfBLtYwk2+lsbmr/9HApXfYXuTUA43KEvmTCLdQlYupFSu9smdk2nmiPeuuZc
+ tHJedVAlS5LqLENxotlq8a/x3CglorJD3OCE75vqSi07y+vrvdghafXsAnQidYhLjYwdJP8Y6
+ rgpQFhtC2h8SxUv30AcvxoVbKSRmqVb/ePKSL6g5Gm+XImcHnzeNykPDucIN9mE7GX6lloNdT
+ 2bKdoHWC+Rq/Hslu/4jv5MWzpav1GONxx3MsXe5z7TEhDFVCNUv05oOEqic5iCXqo4jv3x6kh
+ 13CKs0DWSh5Ni/NaGbnldRhOzXPQtcUj1S6FyLY0UwsuGOs05OXELrdVimnUFfHv60M2ceTg5
+ btyM9etOQQmPDA+olGtjIZBvHeUQkdm0K7CR8b5Vp56z0T0o++KTUswbOsohRXwqNaIZJk+0G
+ lBwQAIYCTg+sfh/FZSgZqfp3TMX4NhxOR4C2bv5yT3U0TzksZwL6WJCX/wvqbwuxtxglKklu1
+ S+3zBGGEZUSo7ohwsRjq57JPYK4nkS6vemUvVRxxly9v/YW8aEIIpCtOjT0zlmOaYt5DcqeyJ
+ oX3gvG59P1bDHKRd4xa2ptD7oS/hL2EUZAu92n/CXxx79wDlhrkn04+3O1w8SuoygFhNvYrS2
+ YjdI4/IEAnUfc4eyytgYXt0EXGqfh3Zmga+BGMT+V2a2wabc/hubzkZlPXUexlx0h9yjTfaFA
+ 0MmtopQ1NShDYWM29Bc2oTvghcSpTicEaSWO3fom1sc4wWlb1/YUrxKChCEXbSxgvLPLhrrgB
+ EFTm1mhaCrmQ9BzS5FjJn0ZUutXDyH2H8Qd8DNDl0yF9J7nEPTH4sfbO927IYbl07RATbIYvE
+ Q/yH+Lc8fzWceBOTBOJUnsiw5AaFqem1aTQHPBkPyvLZ0IdHYaed6XKIzeaawkJF2J2cgwCHQ
+ bpqYEDbqViZBd9164NhqxhHl7iJdcekrDHbAk3TdNEhGbzdCR5siWPEOcu5K0xmMrERsUJwHm
+ ResCcwNl53Ay16DVasc8Q6/BTrRLEuhSdk8P8U8Wt29YmnlfknrXyLrOYG3OiWoACpFBPEyrz
+ 0m+lW372ujYdA3h6u3UiD+Fnmj8zHJc1/YRLLQwDb22N8oJh73iYWgYeal6TvOdvRl8nsHVXm
+ 42nsVVfpsfj2YoqsD3/g1uEhoZ9cqEY0suXwqVIKWlq3AEdaDkl/Sf01a57VCwtGpyKMIVMGK
+ VOLehhEks0TY9zGAiUmdyfaOsi9ZtR39lq//OmZlNemAUJzeTdOaA1XyvPOWf5S46UweibtGf
+ RGhgFl1F/4zDezmLXOmfiGiPyEjJQ130wn6T35mawZBa188x9VYR3GNfDFHY3Cur4muEZlGc5
+ AgVCkyTzj5rutxRaH+u0oGH3jhEuVd1EDfJP62BCEGUupAlsCoFLDX3a86jMqIzTbDozIZ0sq
+ dX18hMy5Qrp7BhmZ9e4mnhT4Gp4eyyfgb3WK/B/mOmeDU34erwRHlQ0C+lBw/YE059SROcLUG
+ quYgzUur50bL3KuOVTsBupxQfXZU6aDqvUF45fnXbA714Sj5pogKJktkdRHQ7bkV3Fs24vVfM
+ wxv5a5BpNHtbtfGDVpEiVCtUa8Jyk933FfHjs1ZZ+jgeC9oJyqH/Ts65GnCB0pYWwcRsRH0tg
+ 2LfrfCYW0anjQPOg2azz3v6GzoHp4CCoumvGysjS/BY+eVXaDKTI/YtY4f50nSDOsB/7V++su
+ qjFMj97pOiHs/z5jkIhc8rXHGWArsbWI1M71vfVT9Iw/qoBcxJ+qj25bNMGOioqUND+5SGdz8
+ wsrV92JIYVq9uaYJcraxlDAx7FLK0VYxifasrJsZ4BBHKETwQvNuWDbMaSOT1/Sn17nGtH3M0
+ B6FCEOQN/bo+ESkvQE/T9k+nmwA9inUCii4WVC1qnDk9lkdvcgl4FKW49mOeHKQHHXsFoCi1l
+ njfXhYlGKDS/2WjvVf8ACKDkcmoFtLUofOO+ZQjq9FU621i7RctGo7vegFDWU9evqn2d4LEGq
+ Ga5aK2LnkyGr7/egHCJRo3z8vQqV7zYBjBCmv7eY2LPUNJwoiVu0CVz57szC+z/8O528z9Iuo
+ GKXsbALRulhkvjRF+QCR44jEQmLqKDbXDhh9Y9TEam2LuRAsb5g/Yq2szAosxw1TURypOzyzs
+ EgceEyGcke+WLvWT3WStG5fZfuT2UqvTs7MaGMbz4rE0ZlLWbWqZUVSyDzushAiZEgxiZmRRp
+ 93rcIulVMjiBwvRrPn95r0PvZbJGZWadbduAzKYkFBuV63ulhVyAAfnz6UZU7kGrzhdCLRKIx
+ q+rxaRmowOdfaPc1dQ6AaKvF7E9OmaQ2Pq+jfDx46l/rxQVJQ0+BjmvEp0HSIOc4cOmoXH9xq
+ /k8ZWuLRj1UzpDN2dUYx64s+A1ZYL8KM9CcFRYeo+im9Zxo49/UIjXfHTNNsJb5CB25zv/cn0
+ Du0ifS8VC2JRTMYk+MW7K6R3hfAYZNIQo2BA4G/Vsz5AWZS2HGUzdMp48VAacMppxUMxDX2Nh
+ CbhQUR0cLEU3DlcASo9sWezp4/sma2lYSIpSNWw9adEk2uHPWefpm1gV3rkbCWCtmHUtW7/3j
+ WfgApdRwEzqC4WBgC0ydGvzsK1h67DTx/NgRoqNoS4S1HFls6tzB/UtgbbYQDcfFepdsyRDhS
+ QsI3Ix0nFYaYVwB5vAI/O8a5WuPRwfcS2P8IoSxjoVJqA4Yf/tdbQJkQjpQFriAM7eD/BKELz
+ JdTEwi6B2vte2D6chI0hbruM0WpMCfEw1inT0kroJT6jPICEFWWJ5eG73PNftkz2ZMt2tcx01
+ 2IfgNgenTaubE3uCas3BLwW2lNwwQKXAB6za/4q3fF7CMpOHEXhnGhod+NPEm1e9n4p9Z2a8n
+ GqaocR7cWKjNsxN50M5OyqfgIHx9Q2PdpVvqiqNWLmh/aznlBA5TIMY4Msqz+el8EdrbZ2Ypy
+ sDMx/UvivXU9U9znv9qMV01vVUIhzKG9jC7MAc60NoBkFS8uhCBBGekwZpCsxwCI/kuFbQnDF
+ gMhPS2/V0d5kzSQVrmY07gc772owTfEDkkXHIbxrIBmFQ1KkPASETsEaMthZkH9gDNT+DG8H4
+ XbVPu373HBNzndxEbLQtByY5e2lKLqXFPXe2YNHsTmaOq/R2oEfiOIO5Jd4yp2ObKE/OruN3H
+ HAA8a5Iiqf8N9hTbvAd/+HeRVe3XbXqOoF4ElVd7IZFtFikdzT8QDXSDBdCuv8apZIY4KiYLQ
+ PVzUVib+w9c5iXJkFK32KdQNXakTwEthArAV4E13jdnJmbLRvhREPP0CallG4SAT5d3d8j0M1
+ JpYoYf+kuGnz8BlAk355mwILSzGdl4aI6gXnnkGdeQdN6bFb2C/1NM2ILkYXOEWmhzavLVeLq
+ qcnLX3xzqhkJNgb7SANTARFIYLC+vYI9qyQcN26H6Nf9IVpZ8aShTU/gZxNwDyewj9O2jyp/+
+ pSyB6ZK+qAtZKfmuA7ZTZdzyyojdHMUiWyCQCiE12RL3f4cpqFMXaYXhaE8rmukOUw9GT76w0
+ 9eHQRTaD7GIVgeLP9EucpTRLkphhj1LwwxAgXBLpKWfde9KvPUIwFkYss3WTfsMtXNBdP39Hk
+ U0lwn0fzKeIAXY+b3mF6qANF/Dz4nBJ/8dh4/VM4fG5TzTt3s3wQMFMuo2hRdZ77wRiviqTtC
+ mQH9sZUROodmp64mEUasRMVimOJ0EsnCZG/N8mafCiTCD6KmUpz4sgplVeyFqd3h7ZhrSzM69
+ bPNjvMKAIsCbrwbsjWoXUjmJFqcqKYbMxxebMttYx4ItVt+DhvSa4VNzTNCYzpixPTQ8jqql9
+ xfjS5k+k/EeIG2FJAz0QDL4G2g3Yz0iRbGQQsGBsmX9vZ1ahck20eGGl3HAU95gEJyHjLWStu
+ Srbo6TEV6yEbXAhBawCcEgQNIT9teL71vpjv/cXCHx2hHAXOEJGZsN+eMu2T97aNgbin2fJ6X
+ hgpckb2VEP7yzyQa8dY8/HkDpeJIui9YYNap/6156fZHFDzSOS5jEB9lvX9+AVmlkKV/W0k92
+ K7TZIiVgoGzlpJJnqSBhw1vWcNqU2QcZGgaWVMWvaAUQs1JsU3AQcR86oiHfGizOAEg4aXytM
+ fHaF9tZMKaqvml4VKSlt6igcn/o0TUxYPh19srlMyYQ8oac3TNVFSl4y7cVVhNnBf7jbjba5a
+ ZaCZQGmGr7XSobjUBVoNxswA5LkwABeRFCh1QukuQTlt+/0s1uGVyto4D+1PG1l9jBjpl9UkY
+ f6mCQ6kfMIwj3EJlz03Uxai2o7TSRIEzC2MxAbTu70KtYVii2njb/QIvbgydHgMyyyWK46m+5
+ v7Y7x4ydkNMYEdaoHHnvgC4LaTtvLP2TO3iImz3a6/abxks84VzswNjzjxqTEVAYukSfXaRbY
+ hfG25BKPQyW074ECQVG4RDfu9sr4NkMaUhM/YmsEdO8rjlvRS1BI2VcLfpBVvPOnPSKkCnvxw
+ 7hGWXmGF9qSjnTQK1le+rugBBeaprA97afFtCRLTqlfhIaoX/ggMyKl19kCTZH/fh6IRzh4El
+ PWDWqtzcaI3y0WaP9mEL0vOXdQYcBI7qcvG2vUFTcy6SfRi1F9crFcZL4RPVGW6SiXbiTgqtX
+ 5VBZA8aTAnv10fjkG8fKvtH7LGmjV4+hiXR2fW1ObSpw74cbw3y771Jc8lXX981DFm8GD4sM8
+ Mdr7Eu0cX9QcvwgF93V+U7rGTCQZVJOSwANL6+G0rOq2Y8t9
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297608-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:manuelebner@mailbox.org,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:linux-kernel@vger.kernel.org,m:kernel-janitors@vger.kernel.org,m:aleksandr.loktionov@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[web.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-wireless@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[sipsolutions.net: no valid DMARC record];
-	RCPT_COUNT_TWO(0.00)[2];
-	TAGGED_FROM(0.00)[bounces-297609-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sipsolutions.net:dkim,sipsolutions.net:mid,sipsolutions.net:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,cmu-sei.github.io:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5B5696686FA
-
-Hi,
-
-This should be the last PR. Quite a few more driver things came
-(see the tag message) but otherwise it feels fairly simple.
-
-Please pull and let us know if there's any problem.
-
-Thanks,
-johannes
-
-
-
-The following changes since commit c2c0486c56800ce276e79c40a6e576ffd672f2a9:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-06-01 13:42:12 +0200)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2026-06-10
-
-for you to fetch changes up to 21352612198c83a8441482abbf3bd45e4f128dd0:
-
-  b43: add RF power offset for N-PHY r8 + radio 2057 r8 (2026-06-10 10:27:56 +0200)
-
-----------------------------------------------------------------
-Quite a few last updates, notably:
- - b43: new support for an 11n device
- - mt76:
-   - mt792x broken usb transport detection
-   - mt7921 regd improvements
-   - mt7927 support
- - iwlwifi:
-   - more kunit tests
-   - FW version updates
- - ath12k: WDS support
- - rtw89:
-   - RTL8922AU support
-   - USB 3 mode switch for performance
-   - better monitor radiotap support
-   - RTL8922DE preparations
- - cfg80211/mac80211:
-   - update UHR to D1.4, UHR DBE support
-   - finally remove 5/10 MHz support
-   - S1G rate reporting
-   - multicast encapsulation offload
-
-----------------------------------------------------------------
-Aaradhana Sahu (1):
-      wifi: ath12k: add hardware parameters for maximum supported clients
-
-Aditya Kumar Singh (1):
-      wifi: ath12k: Prevent incorrect vif chanctx switch when handling multi-radio contexts
-
-Alessio Ferri (7):
-      b43: add firmware mappings for rev22
-      b43: add d11 core revision 0x16 to id table
-      b43: route d11 corerev 22 to 24-bit indirect radio access
-      b43: support radio 2057 rev 8
-      b43: add IPA TX gain table for N-PHY r8 + radio 2057 r8
-      b43: add channel info table for N-PHY r8 + radio 2057 r8
-      b43: add RF power offset for N-PHY r8 + radio 2057 r8
-
-Andreas Kemnade (1):
-      wifi: wlcore: enable the right set of ciphers
-
-Arjan van de Ven (1):
-      wifi: mt76: mt7921/mt7925: fix NULL dereference in CSA beacon
-
-Aviel Zohar (2):
-      wifi: mt76: mt7925: validate skb length in testmode query
-      wifi: mt76: mt7915: validate skb length in txpower SKU query
-
-Avinash Bhatt (3):
-      wifi: iwlwifi: mld: add KUnit tests for duplicated beacon RSSI adjustment
-      wifi: iwlwifi: mld: add KUnit tests for PSD/EIRP RSSI adjustment
-      wifi: iwlwifi: mld: add KUnit tests for link grading
-
-Baochen Qiang (1):
-      wifi: ath12k: fix EAPOL TX failure caused by stale tcl_metadata bits
-
-Bitterblue Smith (16):
-      wifi: rtw89: usb: Support 2 bulk in endpoints
-      wifi: rtw89: Fix rtw89_usb_ops_mac_lv1_rcvy() for RTL8922AU
-      wifi: rtw89: Fix rtw89_usb_ops_mac_pre_init() for RTL8922AU
-      wifi: rtw89: Fix rtw89_usb_ops_mac_post_init() for RTL8922AU
-      wifi: rtw89: usb: Enable RX aggregation for RTL8922AU
-      wifi: rtw89: Fix rtw8922a_pwr_{on,off}_func() for USB
-      wifi: rtw89: Let hfc_param_ini have separate settings for USB 2/3
-      wifi: rtw89: Add rtw8922a_hfc_param_ini_usb{2,3}
-      wifi: rtw89: Add rtw8922a_dle_mem_usb{2,3}
-      wifi: rtw89: Add rtw8922au.c
-      wifi: rtw89: Enable the new rtw89_8922au module
-      wifi: rtlwifi: rtl8821ae: Fix C2H bit location in RX descriptor
-      wifi: rtl8xxxu: Detect the maximum supported channel width
-      wifi: rtw89: Add missing TX queue mappings for RTL8922AU
-      wifi: rtw88: Add more validation for the RX descriptor
-      wifi: rtw89: usb: Support switching to USB 3 mode
-
-Bjoern A. Zeeb (1):
-      wifi: mt76: fix argument to ieee80211_is_first_frag()
-
-Bryam Vargas (1):
-      wifi: mac80211: bound S1G TIM PVB walk to the TIM element
-
-Chelsy Ratnawat (1):
-      wifi: rtlwifi: rtl8821ae: Remove dead code in rtl8821ae_update_hal_rate_table()
-
-Chia-Yuan Li (2):
-      wifi: rtw89: add IO offload support via firmware
-      wifi: rtw89: offload DMAC and CMAC init IO to firmware
-
-Chih-Kang Chang (3):
-      wifi: rtw89: use struct to fill C2H recv ack
-      wifi: rtw89: check scan C2H event recv ack instead of C2H event done ack
-      wifi: rtw89: suspend DIG when remain-on-channel
-
-Chin-Yen Lee (2):
-      wifi: rtw88: fix wrong pci_get_drvdata type in AER handlers
-      wifi: rtw89: wow: send ARP reply packets instead of Null packets to keep alive
-
-Christos Longros (1):
-      wifi: rtw89: fix wrong pci_get_drvdata type in AER handlers
-
-David Laight (1):
-      rfkill: Replace strcpy() with memcpy()
-
-David Lee (1):
-      wifi: rtw89: usb: skip ACPI capability check for USB devices
-
-Devin Wittmayer (2):
-      wifi: mt76: mt7925: add Netgear A8500 USB device ID
-      wifi: mt76: mt7921: assert sniffer on chanctx change
-
-Dian-Syuan Yang (3):
-      wifi: rtw89: disable HTC field in AP mode
-      wifi: rtw89: disable CSI STBC for VHT 160MHz
-      wifi: rtw89: pci: enable LTR based on pcie control register
-
-Dylan Eskew (2):
-      wifi: mt76: mt7996: reduce phy work in set_coverage
-      wifi: mt76: mt7996: limit work in set_bitrate_mask
-
-ElXreno (2):
-      wifi: mt76: route TDLS-peer frames as 3-addr non-DS in HW encap
-      wifi: mt76: mt7925: don't disable AP BSS when removing TDLS peer
-
-Emmanuel Grumbach (2):
-      wifi: iwlwifi: add support for AX231
-      wifi: iwlwifi: bump maximum core version for BZ/SC/DR to 106
-
-Eric Huang (2):
-      wifi: rtw89: phy: support static PD level setting
-      wifi: rtw89: use firmware offload for PHY and RF batch register writes
-
-Felix Fietkau (3):
-      wifi: mac80211: report assoc_link_id in station info for non-MLD STAs on MLD AP
-      wifi: mt76: mt7996: fix out-of-bounds array access during hardware restart
-      wifi: mt76: mt7996: add missing max_remain_on_channel_duration
-
-Hangtian Zhu (1):
-      wifi: ath12k: allow peer_id 0 in dp peer lookup
-
-Hongling Zeng (1):
-      wifi: mt76: mt7921: fix resource leak in probe error path
-
-Hugo Villeneuve (1):
-      wifi: rtlwifi: fix typos in comments in rtl8821ae_card_disable()
-
-Ilan Peer (2):
-      wifi: iwlwifi: mld: Require HT support for NAN
-      wifi: mac80211: Free keys associated with NAN Device
-
-Ingyu Jang (1):
-      wifi: mt76: Drop unneeded mt76_register_debugfs_fops() return checks
-
-Israel Kozitz (1):
-      wifi: iwlwifi: mld: support FW TLV for NAN max channel switch time
-
-JB Tsai (5):
-      wifi: mt76: mt7921: refactor regulatory domain handling to regd.[ch]
-      wifi: mt76: mt7921: refactor CLC support check flow
-      wifi: mt76: mt7921: refactor regulatory notifier flow
-      wifi: mt76: mt7921: add auto regdomain switch support
-      wifi: mt76: mt7921: disable auto regd changes after user set
-
-Javier Tia (9):
-      wifi: mt76: mt7925: fix stale pointer comparisons in change_vif_links
-      wifi: mt76: mt7925: add 320MHz bandwidth to bss_rlm_tlv
-      wifi: mt76: mt7925: handle 320MHz bandwidth in RXV and TXS
-      wifi: mt76: mt7925: populate EHT 320MHz MCS map in sta_rec
-      wifi: mt76: mt7925: advertise EHT 320MHz capabilities for 6GHz band
-      wifi: mt76: mt7925: add MT7927 chip ID helpers
-      wifi: mt76: mt7925: add MT7927 firmware paths
-      wifi: mt76: mt7925: use irq_map for chip-specific interrupt handling
-      wifi: mt76: mt7925: disable ASPM and runtime PM for MT7927
-
-Jeff Johnson (4):
-      wifi: ath12k: Update Qualcomm copyrights
-      wifi: ath11k: Update Qualcomm copyrights
-      wifi: ath10k: Update Qualcomm copyrights
-      wifi: ath: Update copyright in testmode_i.h
-
-Jiajia Liu (2):
-      wifi: mt76: add wcid publish check in mt76_sta_add
-      wifi: mt76: transform aspm_conf for pci_disable_link_state
-
-Johan Hovold (5):
-      wifi: mt76: drop redundant device reference
-      wifi: mt76x0u: drop redundant device reference
-      wifi: mt76x2u: drop redundant device reference
-      wifi: mt76: mt792xu: drop redundant device reference
-      wifi: mt7601u: drop redundant device reference
-
-Johannes Berg (29):
-      wifi: cfg80211: remove 5/10 MHz channel support
-      wifi: mac80211: remove 5/10 MHz channel code
-      wifi: ieee80211: define some UHR link reconfiguration frame types
-      wifi: mac80211: unify link STA removal in vif link removal
-      wifi: mac80211: clean up return in ieee802_11_find_bssid_profile()
-      wifi: mac80211: rename "multi_link_inner" variable
-      wifi: mac80211: clarify beacon parsing with MBSSID/EMA
-      wifi: mac80211: use local ml_basic_elem in parsing
-      wifi: cfg80211: harden cfg80211_defragment_element()
-      wifi: mac80211: always expose multi-link element
-      wifi: mac80211: mlme: allow UHR only with MLO
-      wifi: mac80211: explain ieee80211_determine_chan_mode() parsing
-      wifi: Update UHR PHY capabilities to D1.4
-      wifi: Update UHR MAC capabilities to D1.4
-      wifi: mac80211: refactor link STA bandwidth update
-      wifi: mac80211: parse and apply UHR DBE channel
-      wifi: mac80211: AP: handle DBE for clients
-      wifi: mac80211_hwsim: claim DBE capability
-      Merge tag 'rtw-next-2026-06-03' of https://github.com/pkshih/rtw
-      wifi: iwlwifi: fw: cut down NIC wakeups during dump
-      wifi: iwlwifi: mvm: rename iwl_mvm_mac80211_idx_to_hwrate()
-      wifi: iwlwifi: move iwl_fw_rate_idx_to_plcp() to mvm
-      wifi: iwlwifi: mld: don't WARN on WoWLAN suspend w/o netdetect
-      wifi: iwlwifi: mvm: fix P2P-Device binding handling
-      wifi: iwlwifi: pcie: fix write pointer move detection
-      Merge tag 'ath-next-20260602' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      Merge tag 'iwlwifi-next-2026-06-03' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-      Merge tag 'mt76-next-2026-06-09' of https://github.com/nbd168/wireless
-      Merge tag 'ath-next-20260609' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Johnson Tsai (5):
-      wifi: rtw89: debug: disable hw_scan for latency-sensitive scenarios
-      wifi: rtw89: debug: disable inactive power save to reduce bus overhead
-      wifi: rtw89: 8832cu: Add ID 2c7c:8206 for RTL8832CU
-      wifi: rtw89: add dev_id_quirks to driver_info for per-device quirk control
-      wifi: rtw89: usb: add serial_number and uuid sysfs attributes for 0x28de:0x2432
-
-Kuan-Chung Chen (7):
-      wifi: rtw89: mlo: rearrange MLSR link decision flow
-      wifi: rtw89: phy: support per PHY RX statistics
-      wifi: rtw89: debug: bb_info entry including TX rate count for WiFi 7 chips
-      wifi: rtw89: debug: add PMAC counter in bb_info
-      wifi: rtw89: debug: extend bb_info with TX status and PER
-      wifi: rtw89: debug: add RX statistics in bb_info
-      wifi: rtw89: debug: add BB diagnose
-
-Kwan Lai Chee Hou (1):
-      wifi: ath12k: fix incorrect HT/VHT/HE/EHT MCS reporting in monitor mode
-
-Lachlan Hodges (1):
-      wifi: mac80211: basic S1G rx rate reporting support
-
-Lorenzo Bianconi (5):
-      wifi: mt76: mt7996: Fix NULL pointer dereference in mt7996_init_tx_queues()
-      wifi: mt76: mt7996: Fix possible token leak in mt7996_tx_prepare_skb()
-      wifi: mt76: mt7996: Fix possible NULL pointer dereference in mt7996_mac_write_txwi_80211()
-      wifi: mt76: mt7996: fix reading zeroed info->control.flags after mt76_tx_status_skb_add()
-      wifi: mt76: mt7996: remove redundant pdev->bus check in probe
-
-Louis Kotze (1):
-      wifi: rtw89: phy: increase RF calibration timeouts for USB transport
-
-Luka Gejak (2):
-      wifi: rtw88: increase TX report timeout to fix race condition
-      wifi: rtw88: usb: fix memory leaks on USB write failures
-
-Martin Kaiser (1):
-      wifi: rtw88: remove rtw_txq_dequeue
-
-Masashi Honma (9):
-      wifi: mac80211: Use struct instead of macro for PREQ frame
-      wifi: mac80211: Use struct instead of macro for PREP frame
-      wifi: mac80211: Use struct instead of macro for PERR frame
-      wifi: mac80211: Fix overread in PREQ frame processing
-      wifi: mac80211: Fix overread in PREP frame processing
-      wifi: mac80211: Fix PERR frame processing
-      wifi: mac80211: Add KUnit test for ieee80211_mesh_preq_size_ok
-      wifi: mac80211: Add KUnit test for ieee80211_mesh_prep_size_ok
-      wifi: mac80211: Add KUnit test for ieee80211_mesh_perr_size_ok
-
-Miaoqing Pan (3):
-      wifi: ath11k: fix invalid data access in ath11k_dp_rx_h_undecap_nwifi
-      wifi: ath11k: add MSDU length validation for TKIP MIC error
-      wifi: ath12k: fix memory leak in ath12k_wifi7_dp_rx_h_verify_tkip_mic()
-
-Miri Korenblit (7):
-      wifi: iwlwifi: remove stale comment
-      wifi: iwlwifi: remove mvm prefix from marker command
-      wifi: iwlwifi: mld: fix smatch warning
-      wifi: iwlwifi: mld: always allow mimo in NAN
-      wifi: iwlwifi: fix a typo
-      wifi: iwlwifi: trans: export the maximum supported hcmd size
-      wifi: iwlwifi: mvm: remove __must_check annotation from command sending
-
-Moriya Itzchaki (1):
-      wifi: iwlwifi: fix STEP_URM register address for SC devices
-
-Myeonghun Pak (1):
-      wifi: mt76: mt7925: clean up DMA on probe failure
-
-Nathan Chancellor (1):
-      wifi: mac80211: Fix -Wc23-extensions in hwmp_route_info_get()
-
-Pagadala Yesu Anjaneyulu (1):
-      wifi: iwlwifi: mld: set fast-balance scan for active EMLSR
-
-Panagiotis Petrakopoulos (1):
-      wifi: rtw88: Add NULL check for chip->edcca_th in rtw_fw_adaptivity_result()
-
-Ping-Ke Shih (41):
-      wifi: rtl8xxxu: validate action frame size before using in rtl8xxxu_dump_action()
-      wifi: rtlwifi: validate action frame size in rtl_action_proc()
-      wifi: rtlwifi: validate action frame size before using in _rtl_pci_tx_isr()
-      wifi: rtw89: 8922d: fix typo rx_freq_frome_ie
-      wifi: rtw89: pci: no need to wait CLK ready for RTL8922DE
-      wifi: rtw89: add AMPDU to radiotap
-      wifi: rtw89: add VHT beamformed to radiotap
-      wifi: rtw89: SNIFFER_MODE bit along IEEE80211_CONF_MONITOR
-      wifi: rtw89: phy: define PHY status IE length for generations
-      wifi: rtw89: phy: enable IE-09/IE-10 PHY status report for monitor mode
-      wifi: rtw89: move HE radiotap to an individual function
-      wifi: rtw89: fill VHT radiotap
-      wifi: rtw89: fill HE-SU/HE-TB/HE-MU/HE-EXT_SU radiotap
-      wifi: rtw89: debug: make implementation of beacon_info entry in order
-      wifi: rtw89: add debugfs entry of monitor mode options to capture HE-MU packets
-      wifi: rtw89: phy: check length before parsing PHY status IE
-      wifi: rtw89: phy: skip trailing 8-byte zeros of PHY status IE for RTL8922D
-      wifi: rtw89: phy: support PHY status IE-09 GEN2 for RTL8922D
-      wifi: rtw89: check skb headroom before adding radiotap
-      wifi: rtw89: phy: define BB wrap data for RTL8922D variants
-      wifi: rtw89: phy: set BB wrap of out-of-band DPD
-      wifi: rtw89: phy: set BB wrap of DPD by bandwidth
-      wifi: rtw89: phy: set BB wrap of control options
-      wifi: rtw89: phy: set BB wrap of QAM threshold
-      wifi: rtw89: phy: set BB wrap of QAM options
-      wifi: rtw89: phy: set BB wrap of trigger-base partial band
-      wifi: rtw89: phy: set BB wrap of CIM3K
-      wifi: rtw89: phy: change order to align register order
-      wifi: rtw89: phy: configure control options of BB wrapper by RFSI band
-      wifi: rtw89: phy: add BB wrapper generation 3 for RTL8922D variant
-      wifi: rtw89: pci: not disable PCI completion timeout control for a variant of RTL8922DE
-      wifi: rtw89: pci: disable PCI PHY error flag 8
-      wifi: rtw89: clear auto K delay value before downloading firmware
-      wifi: rtw89: 8922d: change naming number and update values for WDE/PLE quota
-      wifi: rtw89: mac: add field of release report size to DLE quota
-      wifi: rtw89: mac: consolidate quota into a struct for variant chips
-      wifi: rtw89: 8922d: add quota for RTL8922DE variant
-      wifi: rtw89: 8922d: refactor digital power compensation to support new format
-      wifi: rtw89: 8922d: support new digital power compensation format
-      wifi: rtw89: fw: load TX compensation element by RFE type
-      wifi: rtw89: 8851bu: add Mercusys MA60XNB (2c4e:0128)
-
-Po-Hao Huang (2):
-      wifi: rtw89: 8852a: refine power save to lower latency
-      wifi: rtw89: correct drop logic for malformed AMPDU frames
-
-Rajat Gupta (1):
-      wifi: mt76: use kfree_rcu for offchannel link in mt76_put_vif_phy_link
-
-Rosen Penev (11):
-      wifi: ath11k: use kzalloc_flex for struct scan_req_params
-      wifi: mac80211: fold tid_ampdu_rx allocations into a flexible array
-      wifi: wcn36xx: allocate chan_surveys with main struct
-      wifi: ath9k_htc: use module_usb_driver
-      wifi: ath9k: Clear DMA descriptors without memset
-      wifi: ath9k: remove TX99 power array zero init
-      wifi: ath9k: remove disabling of bands
-      wifi: ath9k_htc: allocate tx_buf and buf together
-      wifi: mt76: fix of_get_mac_address error handling
-      wifi: brcm80211: change current_bss to value
-      wifi: brcmfmac: flowring: simplify flow allocation
-
-Runyu Xiao (1):
-      wifi: qtnfmac: topaz: defer IRQ enabling until IPC init
-
-Ryder Lee (5):
-      wifi: mt76: mt7996: disable UNI_BSS_INFO_PROTECT_INFO for mt7996
-      wifi: mt76: mt7915: fix potential tx_retries underflow
-      wifi: mt76: mt7921: fix potential tx_retries underflow
-      wifi: mt76: mt7925: fix potential tx_retries underflow
-      wifi: mt76: mt7996: fix potential tx_retries underflow
-
-Sean Wang (22):
-      wifi: mt76: connac: replace is_mt7925() with is_connac3()
-      wifi: mt76: mt7925: use link-specific removal for non-MLD STA
-      wifi: mt76: connac: tolerate inactive BSS deactivation
-      wifi: mt76: mt792x: add MT7927 WFSYS reset support
-      wifi: mt76: mt792x: factor out common DMA queue allocation
-      wifi: mt76: mt7925: switch DMA init to common mt792x queue helpers
-      wifi: mt76: mt792x: add MT7927-specific PCIe DMA support
-      wifi: mt76: mt7925: sync MT7927 BSS band assignment
-      wifi: mt76: mt7925: add MBMC event handling
-      wifi: mt76: mt792x: enable CNM ops for MT7927
-      wifi: mt76: mt7925: add MT7927 PCIe support
-      wifi: mt76: mt7925: add MT7927 USB support
-      wifi: mt76: mt7925: keep TX BA state in the primary WCID
-      wifi: mt76: mt7925: pass WCID explicitly to mt7925_mcu_sta_ba()
-      wifi: mt76: mt7925: program BA state on active links
-      wifi: mt76: mt792x: skip MLD header rewrite for 802.3 encap TX
-      wifi: mt76: mt7921u: add MT7902 USB support
-      wifi: mt76: connac: use a helper to cache txpower_cur
-      wifi: mt76: connac: factor out rate power limit calculation
-      wifi: mt76: mt792x: report txpower for the requested vif link
-      wifi: mt76: mt792x: add common USB transport reset helpers
-      wifi: mt76: mt7921u: escalate broken USB transport to device reset
-
-Shahar Tzarfati (4):
-      wifi: iwlwifi: cfg: Revert "wifi: iwlwifi: cfg: move the MODULE_FIRMWARE to the per-rf file"
-      wifi: iwlwifi: remove orphaned DC2DC config enum
-      wifi: iwlwifi: stop supporting core101
-      wifi: iwlwifi: mld: drop TLC config cmd v4/v5 compat code
-
-Shin-Yi Lin (1):
-      wifi: rtw89: Correct data type for scan index to avoid infinite loop
-
-Stepan Ionichev (1):
-      wifi: wcn36xx: fix spelling mistakes in dxe header comment
-
-Tamizh Chelvam Raja (9):
-      wifi: ath12k: Set WDS vdev parameter for 4-address station interface
-      wifi: ath12k: Add support for 4-address mode
-      wifi: ath12k: Add 4-address mode support for eth offload
-      wifi: ath12k: Add support for 4-address NULL frame handling
-      wifi: ath12k: Add support for 4-address frame notification
-      wifi: ath12k: Handle 4-address EAPOL frames from WBM error path
-      wifi: mac80211: Add sta pointer sanity check in ieee80211_8023_xmit()
-      wifi: mac80211: Add multicast to unicast support for 802.3 path
-      wifi: mac80211: Add 802.3 multicast encapsulation offload support
-
-Thiyagarajan Pandiyan (1):
-      wifi: nl80211: Increase ie_len size to prevent truncated IEs in new peer notifications
-
-Tristan Madani (5):
-      wifi: rtw88: fix OOB read from firmware RX descriptor exceeding DMA buffer
-      wifi: rtw89: add bounds check on firmware mac_id in link lookup
-      wifi: wcn36xx: fix heap overflow from oversized firmware HAL response
-      wifi: wcn36xx: fix OOB read from firmware count in PRINT_REG_INFO indication
-      wifi: wcn36xx: fix OOB read from short trigger BA firmware response
-
-Wei Zhang (3):
-      wifi: ath11k: raise max vdevs to 4 on hardware with P2P and dual-station support
-      wifi: ath12k: fix inconsistent arvif state in vdev_create error paths
-      wifi: ath12k: fix NULL deref in change_sta_links for unready link
-
-Wen Gong (1):
-      wifi: ath12k: enable IEEE80211_VHT_EXT_NSS_BW_CAPABLE when NSS ratio is reported
-
-Zenm Chen (1):
-      wifi: mt76: mt76x2u: Add support for ELECOM WDC-867SU3S
-
-Zong-Zhe Yang (10):
-      wifi: rtw89: 8852bt: configure support_noise field explicitly
-      wifi: rtw89: chan: introduce new helper to get entity current configuration
-      wifi: rtw89: 8922d: update RF calibration flow for MLD
-      wifi: rtw89: debug: Wi-Fi 7 show count of SER L0 simulation
-      wifi: rtw89: debug: Wi-Fi 7 update simulation of SER L0/L1 by halt H2C command
-      wifi: rtw89: fw: dump status of H2C command and C2H event for SER
-      wifi: rtw89: fw: load TX power track element according to AID
-      wifi: rtw89: Wi-Fi 7 configure TX power limit for large MRU
-      wifi: rtw89: debug: show large MRU in txpwr_table dbgfs
-      wifi: rtw89: 8922d: configure TX shape settings
-
-傅继晗 (1):
-      wifi: mac80211: fix monitor mode frame capture for real chanctx drivers
-
- .../ABI/testing/sysfs-class-ieee80211-rtw89        |  24 +
- drivers/net/wireless/ath/ath10k/bmi.c              |   1 -
- drivers/net/wireless/ath/ath10k/ce.c               |   1 -
- drivers/net/wireless/ath/ath10k/coredump.c         |   1 -
- drivers/net/wireless/ath/ath10k/coredump.h         |   2 +-
- drivers/net/wireless/ath/ath10k/debug.c            |   1 -
- drivers/net/wireless/ath/ath10k/debugfs_sta.c      |   1 -
- drivers/net/wireless/ath/ath10k/htc.c              |   1 -
- drivers/net/wireless/ath/ath10k/htt.c              |   2 +-
- drivers/net/wireless/ath/ath10k/htt.h              |   2 +-
- drivers/net/wireless/ath/ath10k/htt_rx.c           |   1 -
- drivers/net/wireless/ath/ath10k/htt_tx.c           |   1 -
- drivers/net/wireless/ath/ath10k/hw.c               |   2 +-
- drivers/net/wireless/ath/ath10k/hw.h               |   2 +-
- drivers/net/wireless/ath/ath10k/pci.c              |   1 -
- drivers/net/wireless/ath/ath10k/pci.h              |   2 +-
- drivers/net/wireless/ath/ath10k/qmi_wlfw_v01.c     |   2 +-
- drivers/net/wireless/ath/ath10k/qmi_wlfw_v01.h     |   2 +-
- drivers/net/wireless/ath/ath10k/rx_desc.h          |   2 +-
- drivers/net/wireless/ath/ath10k/sdio.c             |   2 +-
- drivers/net/wireless/ath/ath10k/thermal.c          |   2 +-
- drivers/net/wireless/ath/ath10k/usb.h              |   2 +-
- drivers/net/wireless/ath/ath10k/wmi-tlv.h          |   2 +-
- drivers/net/wireless/ath/ath10k/wow.c              |   2 +-
- drivers/net/wireless/ath/ath11k/ahb.c              |   2 +-
- drivers/net/wireless/ath/ath11k/ahb.h              |   2 +-
- drivers/net/wireless/ath/ath11k/ce.c               |   1 -
- drivers/net/wireless/ath/ath11k/ce.h               |   2 +-
- drivers/net/wireless/ath/ath11k/core.c             |  10 +-
- drivers/net/wireless/ath/ath11k/coredump.c         |   1 -
- drivers/net/wireless/ath/ath11k/coredump.h         |   2 +-
- drivers/net/wireless/ath/ath11k/debug.c            |   1 -
- drivers/net/wireless/ath/ath11k/debugfs.c          |   1 -
- drivers/net/wireless/ath/ath11k/debugfs.h          |   2 +-
- .../net/wireless/ath/ath11k/debugfs_htt_stats.c    |   1 -
- .../net/wireless/ath/ath11k/debugfs_htt_stats.h    |   2 +-
- drivers/net/wireless/ath/ath11k/debugfs_sta.h      |   2 +-
- drivers/net/wireless/ath/ath11k/dp.c               |   1 -
- drivers/net/wireless/ath/ath11k/dp.h               |   2 +-
- drivers/net/wireless/ath/ath11k/dp_rx.c            |  59 +-
- drivers/net/wireless/ath/ath11k/dp_rx.h            |   2 +-
- drivers/net/wireless/ath/ath11k/dp_tx.c            |   1 -
- drivers/net/wireless/ath/ath11k/dp_tx.h            |   2 +-
- drivers/net/wireless/ath/ath11k/fw.c               |   1 -
- drivers/net/wireless/ath/ath11k/fw.h               |   2 +-
- drivers/net/wireless/ath/ath11k/hal_desc.h         |   2 +-
- drivers/net/wireless/ath/ath11k/hal_rx.c           |   2 +-
- drivers/net/wireless/ath/ath11k/hal_rx.h           |   2 +-
- drivers/net/wireless/ath/ath11k/hal_tx.c           |   2 +-
- drivers/net/wireless/ath/ath11k/hal_tx.h           |   2 +-
- drivers/net/wireless/ath/ath11k/hif.h              |   2 +-
- drivers/net/wireless/ath/ath11k/htc.c              |   2 +-
- drivers/net/wireless/ath/ath11k/htc.h              |   2 +-
- drivers/net/wireless/ath/ath11k/hw.c               |   2 +-
- drivers/net/wireless/ath/ath11k/mac.c              |  72 +-
- drivers/net/wireless/ath/ath11k/mac.h              |   2 +-
- drivers/net/wireless/ath/ath11k/mhi.h              |   2 +-
- drivers/net/wireless/ath/ath11k/p2p.c              |   2 +-
- drivers/net/wireless/ath/ath11k/p2p.h              |   2 +-
- drivers/net/wireless/ath/ath11k/pcic.c             |   1 -
- drivers/net/wireless/ath/ath11k/pcic.h             |   2 +-
- drivers/net/wireless/ath/ath11k/peer.c             |   2 +-
- drivers/net/wireless/ath/ath11k/peer.h             |   2 +-
- drivers/net/wireless/ath/ath11k/qmi.h              |   2 +-
- drivers/net/wireless/ath/ath11k/reg.h              |   2 +-
- drivers/net/wireless/ath/ath11k/rx_desc.h          |   2 +-
- drivers/net/wireless/ath/ath11k/spectral.c         |   1 -
- drivers/net/wireless/ath/ath11k/spectral.h         |   2 +-
- drivers/net/wireless/ath/ath11k/testmode.c         |   2 +-
- drivers/net/wireless/ath/ath11k/testmode.h         |   2 +-
- drivers/net/wireless/ath/ath11k/thermal.c          |   2 +-
- drivers/net/wireless/ath/ath11k/thermal.h          |   2 +-
- drivers/net/wireless/ath/ath11k/trace.h            |   2 +-
- drivers/net/wireless/ath/ath11k/wmi.h              |   2 +-
- drivers/net/wireless/ath/ath11k/wow.c              |   2 +-
- drivers/net/wireless/ath/ath11k/wow.h              |   2 +-
- drivers/net/wireless/ath/ath12k/acpi.c             |   2 +-
- drivers/net/wireless/ath/ath12k/acpi.h             |   2 +-
- drivers/net/wireless/ath/ath12k/core.h             |   9 +
- drivers/net/wireless/ath/ath12k/coredump.c         |   2 +-
- drivers/net/wireless/ath/ath12k/coredump.h         |   2 +-
- drivers/net/wireless/ath/ath12k/dbring.h           |   2 +-
- drivers/net/wireless/ath/ath12k/debug.h            |   2 +-
- drivers/net/wireless/ath/ath12k/debugfs.h          |   2 +-
- drivers/net/wireless/ath/ath12k/debugfs_sta.h      |   2 +-
- drivers/net/wireless/ath/ath12k/dp.c               |  10 +-
- drivers/net/wireless/ath/ath12k/dp_mon.c           |   6 +-
- drivers/net/wireless/ath/ath12k/dp_peer.c          |   2 +-
- drivers/net/wireless/ath/ath12k/dp_peer.h          |   2 +
- drivers/net/wireless/ath/ath12k/dp_rx.c            |  13 +-
- drivers/net/wireless/ath/ath12k/dp_rx.h            |   3 +-
- drivers/net/wireless/ath/ath12k/hal.h              |   4 +-
- drivers/net/wireless/ath/ath12k/hif.h              |   2 +-
- drivers/net/wireless/ath/ath12k/hw.h               |  25 +-
- drivers/net/wireless/ath/ath12k/mac.c              | 232 ++++-
- drivers/net/wireless/ath/ath12k/mac.h              |   3 +
- drivers/net/wireless/ath/ath12k/p2p.c              |   1 -
- drivers/net/wireless/ath/ath12k/p2p.h              |   2 +-
- drivers/net/wireless/ath/ath12k/peer.c             |  11 +-
- drivers/net/wireless/ath/ath12k/reg.c              |   2 +-
- drivers/net/wireless/ath/ath12k/reg.h              |   2 +-
- drivers/net/wireless/ath/ath12k/testmode.h         |   2 +-
- drivers/net/wireless/ath/ath12k/trace.c            |   2 +-
- drivers/net/wireless/ath/ath12k/trace.h            |   2 +-
- drivers/net/wireless/ath/ath12k/wifi7/dp_mon.c     |   3 +-
- drivers/net/wireless/ath/ath12k/wifi7/dp_rx.c      |  95 ++-
- drivers/net/wireless/ath/ath12k/wifi7/dp_tx.c      |  43 +-
- drivers/net/wireless/ath/ath12k/wifi7/dp_tx.h      |   4 +-
- .../net/wireless/ath/ath12k/wifi7/hal_qcc2072.c    |  16 +
- .../net/wireless/ath/ath12k/wifi7/hal_qcn9274.c    |  16 +
- drivers/net/wireless/ath/ath12k/wifi7/hal_tx.c     |   4 +-
- drivers/net/wireless/ath/ath12k/wifi7/hal_tx.h     |   1 +
- .../net/wireless/ath/ath12k/wifi7/hal_wcn7850.c    |  16 +
- drivers/net/wireless/ath/ath12k/wifi7/hw.c         |  48 +-
- drivers/net/wireless/ath/ath12k/wmi.c              |  47 +-
- drivers/net/wireless/ath/ath12k/wmi.h              |  17 +
- drivers/net/wireless/ath/ath12k/wow.h              |   2 +-
- drivers/net/wireless/ath/ath5k/base.c              |   2 -
- drivers/net/wireless/ath/ath9k/ar9002_mac.c        |  15 +-
- drivers/net/wireless/ath/ath9k/ar9003_mac.c        |  23 +-
- drivers/net/wireless/ath/ath9k/ar9003_phy.c        |   4 +-
- drivers/net/wireless/ath/ath9k/hif_usb.c           |  24 +-
- drivers/net/wireless/ath/ath9k/hif_usb.h           |   4 +-
- drivers/net/wireless/ath/ath9k/htc_drv_init.c      |  18 -
- drivers/net/wireless/ath/ath9k/hw.c                |  16 +-
- drivers/net/wireless/ath/ath9k/hw.h                |   2 -
- drivers/net/wireless/ath/ath9k/init.c              |   1 -
- drivers/net/wireless/ath/testmode_i.h              |   2 +-
- drivers/net/wireless/ath/wcn36xx/dxe.c             |   4 +-
- drivers/net/wireless/ath/wcn36xx/main.c            |  13 +-
- drivers/net/wireless/ath/wcn36xx/smd.c             |  13 +
- drivers/net/wireless/ath/wcn36xx/wcn36xx.h         |   2 +-
- drivers/net/wireless/broadcom/b43/main.c           |  22 +-
- drivers/net/wireless/broadcom/b43/radio_2057.c     | 230 ++++-
- drivers/net/wireless/broadcom/b43/tables_nphy.c    |  58 ++
- .../broadcom/brcm80211/brcmfmac/flowring.c         |  10 +-
- .../broadcom/brcm80211/brcmfmac/flowring.h         |   2 +-
- .../wireless/broadcom/brcm80211/brcmsmac/main.c    |  40 +-
- .../wireless/broadcom/brcm80211/brcmsmac/main.h    |   2 +-
- drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |  16 +-
- drivers/net/wireless/intel/iwlwifi/cfg/dr.c        |   4 +-
- drivers/net/wireless/intel/iwlwifi/cfg/rf-fm.c     |  12 -
- drivers/net/wireless/intel/iwlwifi/cfg/rf-gf.c     |   3 +-
- drivers/net/wireless/intel/iwlwifi/cfg/sc.c        |   4 +-
- .../net/wireless/intel/iwlwifi/fw/api/commands.h   |   4 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/config.h |  11 +-
- .../net/wireless/intel/iwlwifi/fw/api/datapath.h   |   2 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/debug.h  |  16 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/rs.h     |  34 +-
- drivers/net/wireless/intel/iwlwifi/fw/dbg.c        |  96 +--
- drivers/net/wireless/intel/iwlwifi/fw/file.h       |   1 +
- drivers/net/wireless/intel/iwlwifi/fw/img.h        |   1 +
- drivers/net/wireless/intel/iwlwifi/fw/rs.c         |  27 -
- drivers/net/wireless/intel/iwlwifi/iwl-config.h    |   6 +-
- drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |   6 +
- drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c |  10 +-
- drivers/net/wireless/intel/iwlwifi/iwl-prph.h      |   3 +-
- drivers/net/wireless/intel/iwlwifi/iwl-trans.c     |   5 +
- drivers/net/wireless/intel/iwlwifi/iwl-trans.h     |  15 +
- drivers/net/wireless/intel/iwlwifi/mld/d3.c        |   7 +-
- drivers/net/wireless/intel/iwlwifi/mld/link.c      |  15 +-
- drivers/net/wireless/intel/iwlwifi/mld/link.h      |   6 +
- drivers/net/wireless/intel/iwlwifi/mld/mac80211.c  |   9 +-
- drivers/net/wireless/intel/iwlwifi/mld/nan.c       |   3 +-
- drivers/net/wireless/intel/iwlwifi/mld/scan.c      |   8 +-
- drivers/net/wireless/intel/iwlwifi/mld/sta.c       |   6 +
- .../intel/iwlwifi/mld/tests/link-selection.c       | 282 ++++++-
- .../net/wireless/intel/iwlwifi/mld/tests/link.c    | 474 ++++++++++-
- .../net/wireless/intel/iwlwifi/mld/tests/utils.c   |  60 ++
- .../net/wireless/intel/iwlwifi/mld/tests/utils.h   |   9 +-
- drivers/net/wireless/intel/iwlwifi/mld/tlc.c       |  78 +-
- drivers/net/wireless/intel/iwlwifi/mld/tx.c        |   3 +-
- drivers/net/wireless/intel/iwlwifi/mvm/binding.c   |   5 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c  |   6 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  12 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |  26 +-
- .../net/wireless/intel/iwlwifi/mvm/time-event.c    |   3 +-
- drivers/net/wireless/intel/iwlwifi/mvm/tx.c        |  10 +-
- drivers/net/wireless/intel/iwlwifi/mvm/utils.c     |  32 +-
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   3 +-
- .../wireless/intel/iwlwifi/pcie/gen1_2/internal.h  |   1 +
- .../intel/iwlwifi/pcie/gen1_2/trans-gen2.c         |  12 +-
- .../net/wireless/intel/iwlwifi/pcie/gen1_2/trans.c |   7 +-
- drivers/net/wireless/mediatek/mt76/channel.c       |   2 +-
- drivers/net/wireless/mediatek/mt76/eeprom.c        |   2 +-
- drivers/net/wireless/mediatek/mt76/mac80211.c      |  19 +-
- drivers/net/wireless/mediatek/mt76/mt76.h          |   1 +
- .../net/wireless/mediatek/mt76/mt7615/debugfs.c    |   2 -
- drivers/net/wireless/mediatek/mt76/mt7615/init.c   |   1 -
- drivers/net/wireless/mediatek/mt76/mt7615/usb.c    |   3 -
- drivers/net/wireless/mediatek/mt76/mt76_connac.h   |  21 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mac.c   |  13 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mcu.c   |  49 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mcu.h   |  29 +-
- drivers/net/wireless/mediatek/mt76/mt76x0/usb.c    |   3 -
- drivers/net/wireless/mediatek/mt76/mt76x2/usb.c    |   5 +-
- .../net/wireless/mediatek/mt76/mt7915/debugfs.c    |   3 +-
- drivers/net/wireless/mediatek/mt76/mt7915/mac.c    |  10 +-
- drivers/net/wireless/mediatek/mt76/mt7915/main.c   |   3 +
- drivers/net/wireless/mediatek/mt76/mt7915/mcu.c    |   8 +
- drivers/net/wireless/mediatek/mt76/mt7921/Makefile |   2 +-
- .../net/wireless/mediatek/mt76/mt7921/debugfs.c    |   2 -
- drivers/net/wireless/mediatek/mt76/mt7921/init.c   |  98 +--
- drivers/net/wireless/mediatek/mt76/mt7921/mac.c    |  12 +-
- drivers/net/wireless/mediatek/mt76/mt7921/main.c   |  29 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mcu.c    |  12 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h |   1 -
- drivers/net/wireless/mediatek/mt76/mt7921/pci.c    |  20 +-
- drivers/net/wireless/mediatek/mt76/mt7921/regd.c   | 206 +++++
- drivers/net/wireless/mediatek/mt76/mt7921/regd.h   |  19 +
- drivers/net/wireless/mediatek/mt76/mt7921/usb.c    |  11 +-
- .../net/wireless/mediatek/mt76/mt7925/debugfs.c    |   2 -
- drivers/net/wireless/mediatek/mt76/mt7925/init.c   |  12 +-
- drivers/net/wireless/mediatek/mt76/mt7925/mac.c    |  29 +-
- drivers/net/wireless/mediatek/mt76/mt7925/main.c   | 101 ++-
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.c    | 116 ++-
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.h    |   3 +-
- drivers/net/wireless/mediatek/mt76/mt7925/mt7925.h |  29 +-
- drivers/net/wireless/mediatek/mt76/mt7925/pci.c    | 151 +++-
- .../net/wireless/mediatek/mt76/mt7925/pci_mac.c    |  12 +-
- .../net/wireless/mediatek/mt76/mt7925/testmode.c   |   5 +
- drivers/net/wireless/mediatek/mt76/mt7925/usb.c    |  22 +-
- drivers/net/wireless/mediatek/mt76/mt792x.h        |  33 +
- drivers/net/wireless/mediatek/mt76/mt792x_core.c   |  56 +-
- drivers/net/wireless/mediatek/mt76/mt792x_dma.c    | 198 ++++-
- drivers/net/wireless/mediatek/mt76/mt792x_regs.h   |  23 +
- drivers/net/wireless/mediatek/mt76/mt792x_usb.c    |  79 +-
- .../net/wireless/mediatek/mt76/mt7996/debugfs.c    |   6 +-
- drivers/net/wireless/mediatek/mt76/mt7996/dma.c    |   2 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mac.c    |  51 +-
- drivers/net/wireless/mediatek/mt76/mt7996/main.c   |  29 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mcu.c    |  36 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mt7996.h |  22 +-
- drivers/net/wireless/mediatek/mt76/mt7996/pci.c    |   2 +-
- drivers/net/wireless/mediatek/mt76/pci.c           |   8 +-
- drivers/net/wireless/mediatek/mt76/tx.c            |   2 +-
- drivers/net/wireless/mediatek/mt76/usb.c           |   2 +
- drivers/net/wireless/mediatek/mt7601u/usb.c        |   3 -
- .../wireless/quantenna/qtnfmac/pcie/topaz_pcie.c   |   6 +-
- drivers/net/wireless/realtek/rtl8xxxu/8188e.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8188f.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8192c.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8192e.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8192f.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8710b.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8723a.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/8723b.c      |   1 +
- drivers/net/wireless/realtek/rtl8xxxu/core.c       |  77 +-
- drivers/net/wireless/realtek/rtl8xxxu/regs.h       |   2 +
- drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu.h   |   7 +
- drivers/net/wireless/realtek/rtlwifi/base.c        |  17 +-
- drivers/net/wireless/realtek/rtlwifi/pci.c         |   7 +-
- .../net/wireless/realtek/rtlwifi/rtl8821ae/hw.c    |  21 +-
- .../net/wireless/realtek/rtlwifi/rtl8821ae/trx.h   |   2 +-
- drivers/net/wireless/realtek/rtw88/fw.c            |   3 +
- drivers/net/wireless/realtek/rtw88/pci.c           |  29 +-
- drivers/net/wireless/realtek/rtw88/rx.c            |  31 +-
- drivers/net/wireless/realtek/rtw88/rx.h            |   6 +-
- drivers/net/wireless/realtek/rtw88/sdio.c          |   8 +-
- drivers/net/wireless/realtek/rtw88/tx.c            |  25 +-
- drivers/net/wireless/realtek/rtw88/usb.c           |  22 +-
- drivers/net/wireless/realtek/rtw89/Kconfig         |  12 +
- drivers/net/wireless/realtek/rtw89/Makefile        |   3 +
- drivers/net/wireless/realtek/rtw89/chan.c          |  92 +-
- drivers/net/wireless/realtek/rtw89/chan.h          |  21 +-
- drivers/net/wireless/realtek/rtw89/core.c          | 815 ++++++++++++++++--
- drivers/net/wireless/realtek/rtw89/core.h          | 347 +++++++-
- drivers/net/wireless/realtek/rtw89/debug.c         | 940 +++++++++++++++++----
- drivers/net/wireless/realtek/rtw89/fw.c            | 500 ++++++++++-
- drivers/net/wireless/realtek/rtw89/fw.h            | 115 ++-
- drivers/net/wireless/realtek/rtw89/mac.c           | 153 +++-
- drivers/net/wireless/realtek/rtw89/mac.h           |  52 +-
- drivers/net/wireless/realtek/rtw89/mac80211.c      |  29 +-
- drivers/net/wireless/realtek/rtw89/mac_be.c        |  68 +-
- drivers/net/wireless/realtek/rtw89/pci.c           |  41 +-
- drivers/net/wireless/realtek/rtw89/pci.h           |   6 +-
- drivers/net/wireless/realtek/rtw89/pci_be.c        |  15 +
- drivers/net/wireless/realtek/rtw89/phy.c           | 622 +++++++++++++-
- drivers/net/wireless/realtek/rtw89/phy.h           | 164 +++-
- drivers/net/wireless/realtek/rtw89/phy_be.c        | 724 ++++++++++++----
- drivers/net/wireless/realtek/rtw89/ps.c            |   6 +
- drivers/net/wireless/realtek/rtw89/reg.h           | 289 +++++++
- drivers/net/wireless/realtek/rtw89/regd.c          |  24 +
- drivers/net/wireless/realtek/rtw89/rtw8851b.c      |  58 +-
- drivers/net/wireless/realtek/rtw89/rtw8851be.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8851bu.c     |   4 +
- drivers/net/wireless/realtek/rtw89/rtw8852a.c      |  63 +-
- drivers/net/wireless/realtek/rtw89/rtw8852ae.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852au.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852b.c      |  58 +-
- drivers/net/wireless/realtek/rtw89/rtw8852b_rfk.c  |   6 +-
- drivers/net/wireless/realtek/rtw89/rtw8852be.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852bt.c     |  58 +-
- drivers/net/wireless/realtek/rtw89/rtw8852bt_rfk.c |   6 +-
- drivers/net/wireless/realtek/rtw89/rtw8852bte.c    |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852bu.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852c.c      |  68 +-
- drivers/net/wireless/realtek/rtw89/rtw8852c.h      |   6 +-
- drivers/net/wireless/realtek/rtw89/rtw8852ce.c     |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8852cu.c     |  13 +
- drivers/net/wireless/realtek/rtw89/rtw8922a.c      | 335 +++++++-
- drivers/net/wireless/realtek/rtw89/rtw8922a_rfk.c  |  22 +-
- drivers/net/wireless/realtek/rtw89/rtw8922ae.c     |   2 +
- drivers/net/wireless/realtek/rtw89/rtw8922au.c     |  86 ++
- drivers/net/wireless/realtek/rtw89/rtw8922d.c      | 445 +++++++++-
- drivers/net/wireless/realtek/rtw89/rtw8922d_rfk.c  |  92 +-
- drivers/net/wireless/realtek/rtw89/rtw8922d_rfk.h  |   1 +
- drivers/net/wireless/realtek/rtw89/rtw8922de.c     |   2 +
- drivers/net/wireless/realtek/rtw89/sar.c           |   4 +
- drivers/net/wireless/realtek/rtw89/txrx.h          | 110 +++
- drivers/net/wireless/realtek/rtw89/usb.c           | 199 ++++-
- drivers/net/wireless/realtek/rtw89/usb.h           |  11 +-
- drivers/net/wireless/ti/wlcore/main.c              |  23 +-
- drivers/net/wireless/virtual/mac80211_hwsim_main.c |  30 +-
- include/linux/ieee80211-eht.h                      |  34 +-
- include/linux/ieee80211-mesh.h                     | 212 +++++
- include/linux/ieee80211-s1g.h                      |   2 +-
- include/linux/ieee80211-uhr.h                      | 201 ++++-
- include/linux/ieee80211.h                          |  17 +
- include/net/cfg80211.h                             |   4 +-
- include/net/mac80211.h                             |   5 +
- net/mac80211/agg-rx.c                              |  22 +-
- net/mac80211/ap.c                                  | 146 ++++
- net/mac80211/cfg.c                                 |  37 +-
- net/mac80211/chan.c                                |   4 +-
- net/mac80211/he.c                                  |  25 +-
- net/mac80211/ht.c                                  |  24 +-
- net/mac80211/ibss.c                                |  31 +-
- net/mac80211/ieee80211_i.h                         |  26 +-
- net/mac80211/iface.c                               |   6 +
- net/mac80211/link.c                                |  30 +
- net/mac80211/mesh.c                                |  36 +-
- net/mac80211/mesh_hwmp.c                           | 176 ++--
- net/mac80211/mesh_plink.c                          |   2 -
- net/mac80211/mlme.c                                | 567 +++++++++++--
- net/mac80211/offchannel.c                          |   4 +-
- net/mac80211/parse.c                               |  68 +-
- net/mac80211/rate.c                                |   8 +-
- net/mac80211/rx.c                                  |  45 +-
- net/mac80211/spectmgmt.c                           |  10 -
- net/mac80211/sta_info.c                            |  61 +-
- net/mac80211/sta_info.h                            |  35 +-
- net/mac80211/status.c                              |  25 +
- net/mac80211/tests/chan-mode.c                     |   4 +-
- net/mac80211/tests/elems.c                         | 282 +++++++
- net/mac80211/tx.c                                  | 111 ++-
- net/mac80211/util.c                                |   7 -
- net/rfkill/core.c                                  |   6 +-
- net/wireless/chan.c                                |  33 +-
- net/wireless/core.c                                |   4 +-
- net/wireless/nl80211.c                             |  16 +-
- net/wireless/scan.c                                |   6 +-
- net/wireless/util.c                                |   3 -
- 353 files changed, 11533 insertions(+), 2253 deletions(-)
- create mode 100644 Documentation/ABI/testing/sysfs-class-ieee80211-rtw89
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7921/regd.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7921/regd.h
- create mode 100644 drivers/net/wireless/realtek/rtw89/rtw8922au.c
+X-Rspamd-Queue-Id: D94466686DA
+
+>> +++ b/drivers/net/ethernet/intel/i40e/i40e_client.c
+>> @@ -304,15 +304,15 @@ static int i40e_register_auxiliary_dev(struct i40=
+e_info *ldev,
+>> const char *name)
+>> =C2=A0	ldev->aux_dev =3D aux_dev;
+>> =C2=A0
+>> =C2=A0	ret =3D ida_alloc(&i40e_client_ida, GFP_KERNEL);
+>> -	if (ret < 0) {
+>> -		kfree(i40e_aux_dev);
+>> -		return ret;
+>> -	}
+>> +	if (ret < 0)
+>> +		goto free_aux_dev;
+>> +
+>> =C2=A0	aux_dev->id =3D ret;
+>> =C2=A0
+>> =C2=A0	ret =3D auxiliary_device_init(aux_dev);
+>> =C2=A0	if (ret < 0) {
+>> =C2=A0		ida_free(&i40e_client_ida, aux_dev->id);
+>> +free_aux_dev:
+>> =C2=A0		kfree(i40e_aux_dev);
+>> =C2=A0		return ret;
+> why do you do this? There's no functional change, right?
+> is it just readability?
+Please take another look at corresponding information sources.
+
+* Centralized exiting of functions
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/=
+Documentation/process/coding-style.rst?h=3Dv7.1-rc7#n526
+
+* https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-stan=
+dard/recommendations/memory-management-mem/mem12-c/
+
+
+
+Would you like to increase the application of scope-based resource managem=
+ent?
+
+Regards,
+Markus
 
