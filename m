@@ -1,242 +1,209 @@
-Return-Path: <netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297655-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id L1UqLhhVKWqCVAMAu9opvQ
-	(envelope-from <netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:14:16 +0200
+	id Hkn+HcZTKWoFVAMAu9opvQ
+	(envelope-from <netdev+bounces-297655-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:08:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0749E669269
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:14:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F9A669161
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:08:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=Y9o1g5Qj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=PeXBa9Nn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297655-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297655-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 63E6A317631F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:06:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7529C3090DA6
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CDD404BF9;
-	Wed, 10 Jun 2026 12:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5577540587D;
+	Wed, 10 Jun 2026 12:08:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013036.outbound.protection.outlook.com [40.107.201.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62854403B0E;
-	Wed, 10 Jun 2026 12:06:27 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781093188; cv=fail; b=TBRsF76EQZK7YdQhFDMtMTyrKZeYF7dwUzb9eIciEOL2KeT6UyFp7iSPPhak54piLMYR5psjnfX09izN/xMJ7xd/jJfZijYKMSwZeB5s9nIpUBbCX9BTSWztqGtRB1Ua+GQXB2eZvCjypCka/mCxIq/qYGVQyh1+lLxeebkgRWA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781093188; c=relaxed/simple;
-	bh=ckjQqB0VTgF5zV2iVQHEy4SwTU3cAe53iVFsJYUgx9I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=n2ZMkGpEqxLJzY9+1n/sBjL/qbE7TF78OCpwEuSvCt10/WpnNtHBP9FKWeA2fIYZwhhsueLTvjxXBBpqObBA4C55y5x2OkF88W4Hta9JF2lhsLao9gOgjNINvUtn7l3W/NfYbbTZWWUOAxt1uBZIGY2Q00Al6eIOkRUe54a+NJE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y9o1g5Qj; arc=fail smtp.client-ip=40.107.201.36
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sTdyFUutRI8woeJbC5OlRFuuEkrUQj98rhmj3tVr4sYi+DEqNrrKrXsJpUDawS08FNEGzxC1G53mC4u/8dQGZLXGoKkfPPkTHRpu3h6Tc5rL5Z9lMtJdaamK4cfz4NAYQUwWH88fcztpxp24V9v9MF7bAaPeCRQS6jd1j2F6nEQNK4Q9Pb05+cja6CPW/J/MGTRl8UjNJKpBZgpYJoJYlCfm9wKlInDNKh1Ttdj/QSBnDKq3mkG7qCit/pQ0c15fF5mE/7Qkl/40sHW0MIBhw23/sQSvr8aiYFtUm771HEEUHBBw+dYvbXuHZhVisUqthx/3Zsnz/BeUZdoWCclBnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J/xw+qAK+C/doWNItpgQpTP6vqpIEqGC1vSOw7ef898=;
- b=daXPTAdkcXrLMu2Uu84xWXJd6Xhi1q4zZ+6aOlgkudXmEok68Sb4fKenxpFOy/5mAJq99i1GRVGm4Cuq5OMiLl8WIPQ3N5I8qHLTXd2xWT1Ddt0B3ww7HIozG40f+zfOvtpHqFBNv0wMlC3hA8Lz+TbdCeoT/EfUgB1q3N2EJbFodeL/Ri+e7ijxXfoobyBc2AHKC7VN2A5xIj3omXvTY0TpMg3XTWimVPnNYPpClU6nWbR8hR8hoZyhii1Jmnfj4u802s+I1gfFUn7XCSPupRWC/ojTp9BWVeFpCWFtGPX/Ss/wLLGmvEyMVBSvIT29GaELzkqIzxkREYtcKaHOXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J/xw+qAK+C/doWNItpgQpTP6vqpIEqGC1vSOw7ef898=;
- b=Y9o1g5QjDYK8Hj3966aWFolsZylHfPC5qE5MmpoVSDba6nGPG+KPhbIwr7bhSjJnfY8cPUoBC2vPubUEpfykjBqJo2YGejdvVKnxjwBxi4HEvTjdfHNkQKOg9iQb50/z9F90mLweVeWRYS6yns8BcnNO5zHd5KBQaRajrNtBU3F+sHAjV4en/UPSFX2OoagQuaKh2vEIxv4UufT9iQM6mZ25RE+M7B//j5Yak5qGPO2kRObceNsFSA8j4c2AfNBDV4MsmTFv4n1QGU8NG3/ukCnqK2SC/f5QqcKhMDOLm3Isd3NYq/EIBtKEKfWpi2wQHifqsmsgzbHlv1PvxTJEtg==
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- MW6PR12MB8705.namprd12.prod.outlook.com (2603:10b6:303:24c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
- 2026 12:06:22 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::16e2:19ba:8915:90be]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::16e2:19ba:8915:90be%5]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
- 12:06:20 +0000
-Message-ID: <9845fd42-e84f-43d7-98d3-9b2d0d1f23d9@nvidia.com>
-Date: Wed, 10 Jun 2026 15:06:16 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5e: Report link down on administrative
- close
-To: Manjunath Patil <manjunath.b.patil@oracle.com>, netdev@vger.kernel.org
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
-Content-Language: en-US
-From: Tariq Toukan <tariqt@nvidia.com>
-In-Reply-To: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0199.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e5::19) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B971404BCA
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 12:08:33 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781093315; cv=none; b=dVHiZnxYpvDlOr1mpTzY86/IjerVvXbv+qVPAntB87Ryn9THsjC2Mw9GPUFHayrJYlqq0gGttJp11h/K9SR4wLfvGfUpGOh089hRuENchEXXshKiKpIP1H6xrHg/gx8GAt1rdte/uidhJ+SkJ61YYKbpGcX7695m1B4qmhd0HPs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781093315; c=relaxed/simple;
+	bh=OMZlOCXpaovVcRo+FqsWLxmKYFRygEYqo9XgpYn1les=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VYebD1OmoJbQPsYjxDk1MovAFh4t0bQPbTNXsnh5XmDdYKXIPLt8R685Ke3Obu4tqnRaxXsl0qHDSdTM+5cpU0IfMrhyjaWT7ZbruEYNbRVshfnJrVgCCoMCDbW8tpQq2mScWG1bhoPLBLGKmksarqeCRCxFBjRWHbR+vWjQ9aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PeXBa9Nn; arc=none smtp.client-ip=209.85.216.51
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-36b7b7b7a80so4092525a91.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 05:08:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781093313; x=1781698113; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z/JZjOnmgY5Q7FGHdiYrMUdSiYaYtTF9tdiRSoMhHQU=;
+        b=PeXBa9NnfrXOVCeEgHi0nr8xpybZG4speHrUmQmFcZWALRCCnq3+IEdgCcEt3sbSH9
+         T0nDamxU7iU2PV3mYkdYDV82WizRQNNJwQJH7fAqFarttpvdf97WLPoj8fb+/mU6g9qq
+         czcisCfpB7wuiMz+bmw3WCHZ06IcMbbAoulLiruhfvWpFmM3PbefJvOiFRTaQhmbILRQ
+         9T8V6zx4W4HTk2sMI41XfGQTlgVAaNHpMEE2ARHCXbaxl4iwRnROnE8xUBzXySo9emHi
+         tZx6TwbLAlxOdoNa/GyGDj/jsV8J+fqd40DDYL0YHQGGgYlgCHfy5tddCiWTdawCXPwz
+         fPZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781093313; x=1781698113;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z/JZjOnmgY5Q7FGHdiYrMUdSiYaYtTF9tdiRSoMhHQU=;
+        b=WPJ0Rf/I4j9wJmlS7IQAKTJPeapEgDEIQDBGJwZb4xx7Nk8nb9aQ1Dn3MnmFX6ryiB
+         Y4P2ILVnd0WfJdIw3PoIIJMauLacrflTL0jF3bBeq1Zt43WOjTDw6I6Sieq//Th3y7/X
+         ZeFXtx4Azu72bjsLUEYBurdAeHGL0GSIt6a6MZsTRzN1tM3LIxzL19IgXPXrbp3FhLhT
+         anpBHa7lPE88DJ5+MaTTQebii9OMM4YDxIrOZmG/OiYmXHq6olEqjrWUmZvhzZIUwvJe
+         VQeS07wUa4Lw5cqRFtOetkE3zijidJFPb/hRl0TPXBYgUktkZLrr6PyNSYmLPbHljrOZ
+         ioAQ==
+X-Gm-Message-State: AOJu0YzWM3c9EXf7YwLDRAIfxcYtZNLdtm46hg0syl/NgtzPj0qVP+Nb
+	jFlk3H3NQLecGsGQte0FD5lBGHs86xorg0CRWKmK21qZad+TmyWht1/l
+X-Gm-Gg: Acq92OG5Y3BY97BM3pt4GWgynrutN17GY7QeKxVUdHYIlC3nr2s/QWjYEXwsCTOBE1z
+	OVngAU6t5Oap8ejayZv4aghZgaCCvjiuSxOUzW9XHSD7HWaMGFFDDcrU1KyIt92l4HNQaEzCLAz
+	tauqy6py8U54V2HmvGYQDE23EjSeSBPvcr0GSa69GRvTvEOQ3KhKCDlA0IQ8jeyBgFwxyldYrf+
+	8MlsQHY6eLzhZveQ63vxRixgN1cvsEe/eyVQJ9XHxFdjK+C6kqlQe2psgZotdHBCt+FlgwQjbM0
+	wAdzC7TaqldeDgscx02plbiAXKmFNdQ/CGQFYq7QUkrH+GVePcITIZNeMpirArZixiuEDgIA9Kr
+	hVu5nHMthWNgBPZE5oo1+6jJgiYZCxNIW4DAqVRDN+UTb3czKJbfFZXUl5QTfYlFqZ52bxT7Gcc
+	XRp+REa1NhiBgGxeawD80Y2JsDHAec7dochp1BnOQTal8dpOsnnx9gL5QVbOnMYb9IobFho/pXS
+	AiqK2WaIQ4yb7y62263qUx0
+X-Received: by 2002:a17:90b:570f:b0:36b:877c:42e5 with SMTP id 98e67ed59e1d1-37133372f4emr18171979a91.17.1781093313072;
+        Wed, 10 Jun 2026 05:08:33 -0700 (PDT)
+Received: from yafangs-Air ([240e:46c:2200:31a0:d9c3:9e95:32b9:9b7b])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3761e8a717asm3505874a91.0.2026.06.10.05.08.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 10 Jun 2026 05:08:32 -0700 (PDT)
+From: Yafang Shao <laoar.shao@gmail.com>
+To: jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Yafang Shao <laoar.shao@gmail.com>,
+	Tonghao Zhang <tonghao@bamaicloud.com>
+Subject: [PATCH net-next] bonding: add sysfs interface for broadcast_neighbor
+Date: Wed, 10 Jun 2026 20:08:12 +0800
+Message-ID: <20260610120812.49054-1-laoar.shao@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MW6PR12MB8705:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27e0e705-76de-41e0-285d-08dec6e8ae66
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|11063799006|6133799003|18002099003|22082099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	M0Y/ZpI4UmAqbUQVvz+QZk6XWnRks3ftk+0FUyRZnbFEEv3iGpb3X+qQ4ce4K5CRxYLztildFLrZ464TqChoRktd6fKdZ420sleSXHI4MZpcxdbW9kQnjXoavwPbLUoOU9K3Owuq7QXzsitg7ZEQ2tRTcSPOiXJB9W8lvMBJ6ojK8Xn8lzV4f7llClIr9Vi9qiKW0vt6U3dSyG2+StN8rbmRQVoL132pd8BdQ7amCTtd3DVhFfegrXSN2eUFNB/WqSHJIyJEApF5aPHoAaVil4+XT8d2AIeyH7jkqxER/Z3kWNd+ny2/NyBLLvuc07bJQ/uITz1fx4PLmrG1U75LTJieZr3j7Dy/SsIeZEzY/8dsDBQ+g282GWIDmYoYYLNNtA0KDf7hzdjeLfYJ7t/yvBd9kpaw0xYstBk7/2luQXwnQsFzfzaU17atBlROI0kyDQWQ445p0oEPmunIRWL3rgN08GGwGKvzQyn/8GVQaV/2GrK+63srP6QZ3kouDTzbQdlAVDX5zD9s4yHyeuao8OK8bSR7Qw+W+SCSgNCXaRkyZ7+c4jvrGyLCve4YTyMlxG2p5sarKgl5rOdgeisILxA3QHDf10hdyv8paR6RKHkBHW9j4OKdIOCm6Sf+VXAHN9ilF5W+y5tlrqN7gyeoAAkHGPslX5y9pWkAycC48RULGAy5owahoSs8OQ4EcK+6
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(11063799006)(6133799003)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ODFXMXpmWU9zV3gxOU9DSmlwRHJMSWErSm0welFUOElSVUUzd1dQTHluOGNm?=
- =?utf-8?B?Myt2V3lmQXFJVFVEM3drck05UG8vVEtYRXVqUXozenZsenNkeWxjOGZqaUlZ?=
- =?utf-8?B?bnFZN0dyNHlETDRQdWt5YWVMaURrU0tCd1RvZTVpUmNUSzlUVVRFa21VdTVO?=
- =?utf-8?B?S1BTb0VIWTc2WnoxTUs4VWZleVZ4alZOSUcxbTlHYTl1SnhkQ01OL205UThU?=
- =?utf-8?B?ZEg1NDZRdmZOQmZNQlNlT29OellnK21lWlMxMExGSUJoU0t2VkxBVVVqWlZ3?=
- =?utf-8?B?UmRkRDFUR2w3MDFjRDB6d2wrUDFreU9Wd0k0ZjA2MnVlMHZlaHU0YUdJc3Bs?=
- =?utf-8?B?UXVjN20yekloU3BNOWxxZE1VWC9rWTRCd3BBd3Arb3VyRzhYdWhDc3F3a1Np?=
- =?utf-8?B?NHVMZ3Z0YWRpNFVvdVVjMmJnM21KTTMvK2t4QXN6U2VDcVZab0xUT0FFWm5a?=
- =?utf-8?B?Q2ZMU296czRVZVV0ZGhwZkU1Rmt3YiswcnVKVGRQeUh4V0dybUpjVVNCOFI4?=
- =?utf-8?B?S0x3aStncU9LRkxFZGZUZktmYnBDNnR3Q0hzVkJSYzFLekpwajN4Q2V4RitG?=
- =?utf-8?B?d2MwRk9TUU5OVFhpMEpteTQySUFDUUhQbUlORmZHeHRGN2tjalA1YjhDTDZo?=
- =?utf-8?B?dEpFSnZyODRHaTFLeGRKejRWMFhEdnBkU1I2T0hYSUl1cEJzb3Z3NkkwM055?=
- =?utf-8?B?Qk04Z1RzcUNXMDlqYTRvVHhNQVk1Zk04ejFBVUJPMCtNWTdldXZqem1ZcEYr?=
- =?utf-8?B?SDVlT0Z4c1ZrWExPdUYrRXVPMlJ1SUY2MDVraENwTHlzSDlIQ014WVJ5Ukli?=
- =?utf-8?B?YmhRMEtRRm41Y2dCZTd5bGdhTnIwRGNEckZHVkg4eHU3NmFkOFNmZDJpMU5n?=
- =?utf-8?B?NG9IU0pxaGR2TnJyZTBEckRvTzJxanRhdEN0QjBmU3VSamY1UFZXZEd4dXdw?=
- =?utf-8?B?N1ZtMHBTYk5VWkZ2VHdyaUpFQXBxTC9ZeGZGVnlQem8yMXp4bkIrakJ0Rko2?=
- =?utf-8?B?UlRRMW0zcHFPN0NabTk4eE8wOFNxVDVRZ1pIR0JwblBjM2x3Z3BteXNTRldF?=
- =?utf-8?B?VlREZVlNbU9FVDU3bGFlOTJDbjhxMTVkZWJKUDNYT293WVR3OEdjWDNBWGR0?=
- =?utf-8?B?OXhjbEdXc0JMQ3o3NGczUDlQdExOMjJRZFNzVXdGZmhKeFlUaEcrVDB1V25w?=
- =?utf-8?B?NDJVUktiNXRSRjRwWGppZllRa2N1OUpFUmQzVkU2cnlEelVlZ1RhR0VrZWhZ?=
- =?utf-8?B?blkvL2tFOGlYRDB2STlLYUpmTisweCttanlWT2xPVUJ0clJoQzlKMWt3UEVv?=
- =?utf-8?B?SjhXbXh5KzIzTVRRMjQ2dmE3VEdpMG4ybTQ3ek5Pczc4QzlKUWV5a1k1TUNo?=
- =?utf-8?B?U0RuYzBGTE5vSG4xVC9CTXE2N1RMMUszZ2hXNjVkYVU5VEtVbHkxNVA2ZDZi?=
- =?utf-8?B?NnQvaExnazB4UmRJbmVtOTJkTXpHNjFxVWFFMFVpV3JJNEw1UHQxS2NQdFlR?=
- =?utf-8?B?NkoyNlQ1bVA4WSt2RkloRFZGQk85UFNXUFpYQW01QnhhS2duMnQzWkxva1Ix?=
- =?utf-8?B?NmxJUmRiUURVNVNybnZoQWhBWW5DVjVhcEdnSE15RFRTem9EeGdYTEc2NWds?=
- =?utf-8?B?Tk9ZNFZ3clIwd1Y1alVXN3FKTTFQMXJzc0N5MDhQcStTS0krcGtCWEU2QmpD?=
- =?utf-8?B?WGROQjZ1OVYveFE1Qk0wcEtDalNVaWo5dmlwQnRmWnZWNG9Sa0x2SVlweFVQ?=
- =?utf-8?B?S3NPSy96UVEwd0cxMU1qVnQ5NlNVa3lkQ21wVDFDNU9FVkdTa25tbFBLbWhZ?=
- =?utf-8?B?MzdBSXg2cGI1UkJBNHJlSHIrZ09VK1kzQk8zY0dPV2t3ZWlwY0I0RU40U1By?=
- =?utf-8?B?dzZwNjBxVzRGTXMxT3RjaVZSbHM5RkxMNmQ2d0wzVElHOVM0bkVtWXlmZDJY?=
- =?utf-8?B?Vi9hRVVBc05LWW5MTFdoUDdVRGtzWTJTaTRhZmFTM2dUY2ZPTlRDcUV2aEtX?=
- =?utf-8?B?ektFcGhWSnRsVEwwTHJyM1RaQkttNit2dy9ENFE2UjZrTVRvdEFlVC9UY250?=
- =?utf-8?B?VnVLK0x3WlVGUmlxQllyUThWQU1LMGg0aW1TZDA5SGdXNzUxNzBuVnd6WTdG?=
- =?utf-8?B?UUtKNmdjenJIK2s5VjdnTzkrdTk5SWNjcjBZdWJGSFg1OWtUNDQvY2I3cEs4?=
- =?utf-8?B?Q3ZPWDNlV3ArZElGZjFsWExjdHg5dkR3NmloQ1MyRmhRbDhFdis5eEJFOC9P?=
- =?utf-8?B?RXBaOFkxalpST1pLMElib090K0xGK0dFcW15N1haVFh6SDViUGhiVGdRcUMv?=
- =?utf-8?B?ek5nSSt2dmtxRFl0UUl0ME0velg4d2EyWVFVQ2hIUlpjOS9uSkpoQT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27e0e705-76de-41e0-285d-08dec6e8ae66
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 12:06:19.6509
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RNiBbvW7ACT1BqdYRP/KjsTgySPqpa/SnSueLZStdV70vjlVszDXbGrb9ws6S3K6BDaIRlfVLzBZGgADycN/bA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8705
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297654-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,bamaicloud.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297655-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:manjunath.b.patil@oracle.com,m:netdev@vger.kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:laoar.shao@gmail.com,m:tonghao@bamaicloud.com,m:andrew@lunn.ch,m:laoarshao@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,vger.kernel.org:from_smtp,nvidia.com:mid,nvidia.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bamaicloud.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0749E669269
+X-Rspamd-Queue-Id: C3F9A669161
 
+The upstream kernel has supported broadcast_neighbor for 802.3ad mode since
+commit ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
+When upgrading from our local kernel to 6.18.y stable, we switched from our
+out-of-tree implementation to the upstream one.
 
+However, the iproute2 package on our production servers is too old to
+support the broadcast_neighbor option. To enable this feature, add a new
+sysfs attribute at:
 
-On 09/06/2026 2:42, Manjunath Patil wrote:
-> mlx5e_update_carrier() reports both link-up and link-down carrier
-> changes, but an administrative down does not reach it in practice. The
-> close path first changes the port admin state and then clears
-> MLX5E_STATE_OPENED and drops carrier silently in mlx5e_close_locked().
-> Any queued carrier worker will skip update_carrier() once the device is
-> no longer opened.
-> 
-> This leaves "ip link set dev <dev> down" without a matching netdev
-> "Link down" message, while reopening the device still reports "Link up".
-> 
-> Report the link-down transition in mlx5e_close() before the common close
-> helper clears the opened state and drops carrier. Guard the message with
-> the current opened and carrier state to avoid duplicates when the netdev
-> is already closed or carrier is already down.
-> 
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
-> ---
-> Validation:
-> - Built an OL8 mainline test kernel from this change.
-> - Booted 7.1.0-rc6.bug123456.el8.v1.x86_64 on an mlx5-backed VM.
-> - Confirmed `ip link set dev re0 down/up` and `re1 down/up` now emit
->    netdev `Link down` and `Link up` messages, alongside the existing RDMA
->    port state notifications.
-> 
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 8f2b3abe0092..a04a89f0eddf 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -3628,6 +3628,9 @@ int mlx5e_close(struct net_device *netdev)
->   
->   	mutex_lock(&priv->state_lock);
->   	mlx5e_modify_admin_state(priv->mdev, MLX5_PORT_DOWN);
-> +	if (test_bit(MLX5E_STATE_OPENED, &priv->state) &&
-> +	    netif_carrier_ok(netdev))
-> +		netdev_info(netdev, "Link down\n");
->   	err = mlx5e_close_locked(netdev);
->   	mutex_unlock(&priv->state_lock);
->   
-> 
-> base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
+  /sys/class/net/<bond>/bonding/broadcast_neighbor
 
-Thanks for your patch.
+This allows enabling the feature by writing "1" to the sysfs file, matching
+the interface we previously maintained in our local kernel.
 
-I wouldn't print "Link down" as part of the "close" callback. I'd rather 
-get it printed in the event handler. Currently there is a print there, 
-but the callback is masked by the OPENED bit.
+The result is as follows,
 
-This made me revisit this area, and it surely needs some more 
-interesting enhancements.
-I'll probably come up with some changes soon.
+- For 802.3ad mode
+
+  $ ip link add bond0 type bond mode 802.3ad
+  $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
+  0
+  $ echo 1 > /sys/class/net/bond0/bonding/broadcast_neighbor
+  $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
+  1
+
+- For other modes
+
+  $ ip link add bond1 type bond
+  $ cat /sys/class/net/bond1/bonding/broadcast_neighbor
+  0
+  $ echo 1 > /sys/class/net/bond1/bonding/broadcast_neighbor
+  bash: echo: write error: Permission denied
+
+Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+Cc: Tonghao Zhang <tonghao@bamaicloud.com>
+---
+ drivers/net/bonding/bond_sysfs.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
+index eaba44c76a5e..24eb23634d98 100644
+--- a/drivers/net/bonding/bond_sysfs.c
++++ b/drivers/net/bonding/bond_sysfs.c
+@@ -750,6 +750,17 @@ static ssize_t bonding_show_ad_user_port_key(struct device *d,
+ static DEVICE_ATTR(ad_user_port_key, 0644,
+ 		   bonding_show_ad_user_port_key, bonding_sysfs_store_option);
+ 
++static ssize_t bonding_show_broadcast_neighbor(struct device *d,
++					       struct device_attribute *attr,
++					       char *buf)
++{
++	struct bonding *bond = to_bond(d);
++
++	return sysfs_emit(buf, "%d\n", bond->params.broadcast_neighbor);
++}
++static DEVICE_ATTR(broadcast_neighbor, 0644,
++		   bonding_show_broadcast_neighbor, bonding_sysfs_store_option);
++
+ static struct attribute *per_bond_attrs[] = {
+ 	&dev_attr_slaves.attr,
+ 	&dev_attr_mode.attr,
+@@ -789,6 +800,7 @@ static struct attribute *per_bond_attrs[] = {
+ 	&dev_attr_ad_actor_system.attr,
+ 	&dev_attr_ad_user_port_key.attr,
+ 	&dev_attr_arp_missed_max.attr,
++	&dev_attr_broadcast_neighbor.attr,
+ 	NULL,
+ };
+ 
+-- 
+2.52.0
+
 
