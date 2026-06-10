@@ -1,210 +1,193 @@
-Return-Path: <netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FvFmBPaqKGo2HwMAu9opvQ
-	(envelope-from <netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:08:22 +0200
+	id TpCbBbirKGqeHwMAu9opvQ
+	(envelope-from <netdev+bounces-297357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:11:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56B21664E5F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:08:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E41B664E7B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:11:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=iuQ8spfK;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="LUXJqJW/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297357-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297357-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2DFEA300A13D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:06:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2CBE301DE18
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6753A883F;
-	Wed, 10 Jun 2026 00:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8049B26ACC;
+	Wed, 10 Jun 2026 00:07:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C3E2110E
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 00:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD152110E
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 00:07:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781049976; cv=none; b=qHEQaCWMc79iw60D5US3Uz1XHhRjhgPk9pmmjiuGsYSRE8BSjG6vUkke44Esn6KXs7gMv51xNN8l0X53AePu/vtJvQCpKC24yHhJ/3aWLj4hgKmIAYiq43Ld4PxOYKuCqyepCrfcauY3R918icTTZBdrYITsCYNuERlP08VWLP4=
+	t=1781050050; cv=none; b=Eb7jdRUshRPfIrSaxYjy9dRwIOQkHR5XEiw4nM4wQQfo1u6P+eYutDCnH8p0etRC19bUn/uEL3eaN5a9eWhNGLV14lvEMMKKN0CKKp2QSuTPYx0RVbyLwg97FzePmQpwwuu0xaIeWGcsQSU6dgavf9iPpRWvDOx5USp4ttzUC1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781049976; c=relaxed/simple;
-	bh=r1vbyfeCtYG6OGx7YM1c8slsjLM5GVhJMK4JM/LtzFE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=Y4tNrYoN0OUHgZY/ck6So3UdbFKNPiUeO3aOGwjuGZErHeBEXHEpaPpXBkJHkNJAGEeJ1eZPhmLVOPjpZwnXUbOtbNfEU9ZtpnUS/5ThLRNKgATPolp3/s1Ismay4fW1KuHi05eta4F2Y08UiqZ7A6odSBRG3jUI2621RKDzOww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=iuQ8spfK; arc=none smtp.client-ip=74.125.82.172
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-304d7f31215so5476635eec.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 17:06:05 -0700 (PDT)
+	s=arc-20240116; t=1781050050; c=relaxed/simple;
+	bh=R6wTFJerY4zHzLwR6/5A/fKdajgXueZUllJW2IW4pb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KDpI18VVn0+pIYe2SMZGGvpaqHER4yI5hO3cpbL3YM8GOwTuZtk3+SJQ5ZiuEL/tzQQKqBFP2qwZyNwxRY+SPpqm4glGqb1b47zun5cAH/0o9HemlC8AtWH+UmEr4RgRtRUP0ZWw6IGoXV2wY3I1rt8XD06t4ygaoRhld8ODFpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUXJqJW/; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c0c3315c5dso64479145ad.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 17:07:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781049965; x=1781654765; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kj983b4aP9iTymCXxslRDVIMvDkVOBbHTYZp1bhw+6s=;
-        b=iuQ8spfK1Iat4dw7kvDF3eT0iRlrgXea8KgeclovNgqmuidX8lMZtX30UsXf7EZkZB
-         w6p4NrXwy92qPMAekQNDEWW/W6I/zuY0H/u/Sc/7A2Upk0I5t95ph6JNR65U2rLgtpdm
-         NLI+M/o5675+3eoCVCzu6KBAnDFu2j8IC5DkOpQS5QGGUzATHxtzSFz188Sn4xCaSvP2
-         sMY1/xCgDzwXzGzjdOG7yadGOhxkINQD6zEkTUg+u+A7PgJ33Qj+Ygg6PHf5P9nm9d7T
-         u5+csh++zvP4PGTg1HzekkkDhVcU8tj0yJMXLjkgZleg5fGuiMGk6ExeLimeEN2iPixR
-         CtsA==
+        d=gmail.com; s=20251104; t=1781050048; x=1781654848; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4V1HBHg1t0TYFtJtz4MVUwS8GXsguTkqaJWA9cR8iwg=;
+        b=LUXJqJW/zJMmtqHla46wwCltY/O9sJyysTPur+yTk4KUVTWS16mbn5apLUifTXDK2K
+         NU9ulYmC8+rIFPFLeECiw+JSG4GVNoYmGXMgWE9ce1P+Pf8DhozOBV4gh2O4Z23KGgqU
+         ikBl0nDlZ3333Tnw9RIsLOIBwCUCPefASzM/i5DB6fSKepE4X+ReFxURBiv+3dsWgb1H
+         LTWylh1h4onDFhQG0t3USVlnz1tXxKYjetvCyt0EJZC8oOlbwB4PTT3mr/C+8D4URuYY
+         ngnyphwY937F1Qz1k7mnYqauNg2bXYaIsuAFF+QcVEzs3VLBdMj3C4Y7AvM4ZnJ9Kfy4
+         LHoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781049965; x=1781654765;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kj983b4aP9iTymCXxslRDVIMvDkVOBbHTYZp1bhw+6s=;
-        b=P199y3fJwJwgHdIoD8K6VLi4eZwrOME1gTFISyGWyh8WETL6Q2SvLSxy3f5lVSNPms
-         DGcjGJbe/aAt0YKBYty3adU8kW+aY7bihhbt/ZiVAj+LRg/FQHUxw82crrs1sG00iemV
-         rLGHXOXTMB/FRkL4J4LHVITSmVgcRgRjfO9E4ngrj09WFdHoymWcanrN6asyUaQbuR/k
-         aPgyDZudyMU+/GsS2QMN2CFqu17HMqH++v/uxlHiLQ1UCui06ANXJ3HryVkDmRl2o1T0
-         0npFfAMgSHRsdV4Mq9kap0zxhQP9/KYablg5fLjDt74bkBQIqQf4HtvzOgq/pXAzG+jF
-         bA9w==
-X-Forwarded-Encrypted: i=1; AFNElJ/lBZA0nibu3+os1c4u7yQBYj6/e8oDfhIQ14LON8EoVoxZkvTaIRiCDfR6wBmiALq0DmJLrBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHKyBLu0bjvCWSJRzmINGdubHA2lh7d2h214F+ihTDQOTyUwBR
-	7m8mrPfShwU4VTEsYH2YltGObLZ/l2DEPOdxoW80+orKck7+eZoX2qcGhLLQNDT94TE=
-X-Gm-Gg: Acq92OEnp5QpwdLsXZtPa6ajObw9ONdMvC/wpcX2DtdyHhHpnnS0f+Il/zDBJua/U4Y
-	/nknu7G1qgHhd4hheWBbli6gCX2+b4/3LJ2Dh5u+xjO63XYX96Ysj/i8gAl3IN14Ifwsyfuf/FM
-	KpAIM4MZq4SQJS1mPQ55goCc9n+0VbctGxmWkjexO1Hkkv2ZcBySo7yiIeimcM0CE3re/81CThB
-	sJqZwhKFQ0ItOxb40FZfbnE4TYp7YQbBf55CdcIKtyaOrFvqnKWj1bHcHoWfW6rCSqC9WeBJEkz
-	DOA/qjXGp1Q0ltcqUWvwzuUYt4xIYQGr9whTUhPFkPQNmvMnXqwn5AeAy8gv4I1g10A5fiVpiiL
-	UEeXRjmxkPEHwsAAlM3o1xnT+A+8RfhF3S9J+TLJQRzEGhK8BL1SnEPzVW6HNwhtxVnKclzEdwa
-	ci0SI5dtoVRX/4u6E=
-X-Received: by 2002:a05:7300:d70d:b0:304:c520:4e14 with SMTP id 5a478bee46e88-3077b32888bmr15659364eec.11.1781049964814;
-        Tue, 09 Jun 2026 17:06:04 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::3297])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074db85f60sm28979462eec.8.2026.06.09.17.06.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 17:06:04 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781050048; x=1781654848;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4V1HBHg1t0TYFtJtz4MVUwS8GXsguTkqaJWA9cR8iwg=;
+        b=l1pGl1qZSQXvgSi9BQD06JQVJbVxbbtAS+q+zbt8CeBqZC43Tqp6Dz0xDB3zX3BDmw
+         3JY1dwVPoYrI4fgl2cy9a0iZSwcOplN7qnZmfYvoz2T36LecpNHZmhxWknwKXo725nRE
+         tWHc1ROMwAE0mtTg2dsY0AoeJTPIWECRLxMzu1hqcOhKG79CreA9FAHcUNjDIDUeo4a7
+         o2I5m1J8atPATNH5p413CSRN3kuBZOnYAyYfaci9Xr7qSWwlmzLsbpQlVCE2eFaPsH2S
+         7Oj8tZTHTODVaa0byx0EVWCSE51N/m3HtfNKqa0B/fdWTq52eyJnL9tIBGFvKG6XnNPT
+         Q2ww==
+X-Forwarded-Encrypted: i=1; AFNElJ+EjzW46RAM7Uvuy2bXuMtnVtcxORP2V6PeSACJvytMQze6RVYxiSitHcwKfAAkGv3drM/HAjs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfiUIBjU6VEUMltIBacL1FlYENaUp6h/u2X3ujGgdFlkyCfW9J
+	rOzktyED+466US4dn0CCYPBmpfswRQYEmy/yniddTfUI10aFFRc2QFTc4BuuJuDA
+X-Gm-Gg: Acq92OEkR1mXoyT+0UCltFIYzsOop8FFTBvgUVkgPoJ8w9WqB/tKTwM4T5ZWJWJHPDT
+	FcPdgEyvKSX3BbNiPr6kuE4vWvFo99UlPIlpfNRYnTbbC4P5o6zE+ylkQ/UuRaT+Dym80ZLQxiQ
+	EHW9tFZ6RItg/R6WRBEf6gNC5HabF+0cDq62ErZquiG+hXFwbDWzHwxC64penGtxWxHArukgdwh
+	iiYD76JGrgzZEbKlDOoWJ2U1T2xCaMDdv64MW1XobYf2u4vBP1UNLmkRZ//oGnzcD/LimW5UPiX
+	bYs8jh0dH1NrOJnUSxFUXnpAO/XcX9n22gdGn4bV4GkT9F2vN5hf72jMEOd3dKRkeJ/kyna7U9k
+	UiPxto8k+L9/mWFC3TKu5kSBuoxUzKtC5N5DAgmYfq//zN+LtKZSfNnCOwomK0l3nHguS9wA+/q
+	scPfnlIhrYnISWs6RsZNQ8hbXlZFDfauHuyx9ZLMqHRQwu7g/Sj3ZxEn0=
+X-Received: by 2002:a17:903:3885:b0:2c2:27be:39a9 with SMTP id d9443c01a7336-2c227be3b30mr225016415ad.9.1781050048350;
+        Tue, 09 Jun 2026 17:07:28 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:70::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164f6d37esm294792295ad.9.2026.06.09.17.07.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 17:07:28 -0700 (PDT)
+Date: Tue, 9 Jun 2026 17:07:26 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, razor@blackwall.org, ahmedabdelmoumen05@gmail.com,
+	netdev@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>,
+	David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net-next] net: Stop leased rxq before uninstalling its
+ memory provider
+Message-ID: <aiiqvvjwas6i+LeA@devvm29614.prn0.facebook.com>
+References: <20260609212240.677889-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 09 Jun 2026 20:06:01 -0400
-Message-Id: <DJ4XIOT2RVMT.28I5LA2UOZVUI@etsalapatis.com>
-Subject: Re: [PATCH] bpf: Unshare cloned skb before devmap egress XDP
- program
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Menglong Dong" <menglong.dong@linux.dev>, "Sun Jian"
- <sun.jian.kdev@gmail.com>
-Cc: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
- <martin.lau@linux.dev>, <davem@davemloft.net>, <kuba@kernel.org>,
- <hawk@kernel.org>, <john.fastabend@gmail.com>, <sdf@fomichev.me>,
- <shuah@kernel.org>, <liuhangbin@gmail.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260609100214.337538-1-sun.jian.kdev@gmail.com>
- <L0cwr1-KRSKR7-dJdjDmJA@linux.dev>
-In-Reply-To: <L0cwr1-KRSKR7-dJdjDmJA@linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260609212240.677889-1-daniel@iogearbox.net>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-297357-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:menglong.dong@linux.dev,m:sun.jian.kdev@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:liuhangbin@gmail.com,m:sunjiankdev@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[linux.dev,gmail.com];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[etsalapatis.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297356-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,blackwall.org,gmail.com,vger.kernel.org,meta.com,davidwei.uk];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,davemloft.net,gmail.com,fomichev.me];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:daniel@iogearbox.net,m:kuba@kernel.org,m:razor@blackwall.org,m:ahmedabdelmoumen05@gmail.com,m:netdev@vger.kernel.org,m:bobbyeshleman@meta.com,m:dw@davidwei.uk,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,etsalapatis-com.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp,etsalapatis.com:mid,etsalapatis.com:from_mime]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,davidwei.uk:email,nk_qlease.py:url,iogearbox.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 56B21664E5F
+X-Rspamd-Queue-Id: 5E41B664E7B
 
-On Tue Jun 9, 2026 at 7:06 AM EDT, Menglong Dong wrote:
-> On 2026/6/9 18:02 Sun Jian <sun.jian.kdev@gmail.com> write:
->> dev_map_redirect_clone() uses skb_clone() when redirecting a generic XDP
->> skb to multiple devmap destinations. The cloned skb can share packet dat=
-a
->> with other clones.
->>=20
->> If the destination devmap entry has an egress XDP program, that program
->> can modify packet data. Such modifications can then be observed by other
->> clones sharing the same packet data.
->>=20
->> This can be reproduced by strengthening xdp_veth_egress to configure a
->> different source MAC for each egress device and checking that store_mac_=
-1/2
->> observe the MAC configured for their own egress devices. Without the fix=
-,
->> the SKB_MODE subtest observes store_mac_1 receiving the MAC configured f=
-or
->> the next egress device.
->>=20
->> Fix this by unsharing the cloned skb before running the devmap egress XD=
-P
->> program. Limit the extra copy to destinations with an attached egress
->> program.
->
-> Hi, Jian.
->
-> This sounds like a good idea in this case. When I have a look at bpf_clon=
-e_redirect(),
-> I found that it use skb_clone() too, which means it has the same problem.=
- The
-> data can be modified by other xdp prog in the destination NIC if we use
-> bpf_clone_redirect().
->
-> So maybe this is the default logic, and I'm not sure if this patch can br=
-eak the
-> existing users :/
+On Tue, Jun 09, 2026 at 11:22:40PM +0200, Daniel Borkmann wrote:
+> netif_rxq_cleanup_unlease() tears down the memory provider that was
+> installed on a physical RX queue through a netkit queue lease. It
+> currently revokes the provider's DMA mappings before stopping the
+> physical queue:
+> 
+>   __netif_mp_uninstall_rxq(virt_rxq, p);            /* DMA unmap */
+>   __netif_mp_close_rxq(phys_rxq->dev, rxq_idx, p);  /* queue stop */
+> 
+> This inverts the ordering used by the regular teardown paths (normal
+> device unregister and the io_uring zcrx close path), which stop the
+> queue before revoking the provider's mappings.
+> 
+> With the physical queue still live, its NAPI can keep consuming
+> net_iov entries from the page_pool alloc cache after the
+> __netif_mp_uninstall_rxq() has already cleared their dma_addr,
+> opening a window for the device to DMA to a stale or zero address.
+> 
+> Fix it by swapping the two calls so the queue is stopped (and its
+> NAPI quiesced) before the provider is uninstalled. No functional
+> regression was observed across repeated runs of the nk_qlease.py
+> HW selftest, which exercises the lease teardown path; this was
+> tested against fbnic QEMU emulation.
+> 
+> Fixes: 5602ad61ebee ("net: Proxy netif_mp_{open,close}_rxq for leased queues")
+> Reported-by: Ahmed Abdelmoemen <ahmedabdelmoumen05@gmail.com>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Bobby Eshleman <bobbyeshleman@meta.com>
+> Cc: David Wei <dw@davidwei.uk>
+> ---
+>  net/core/netdev_rx_queue.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index de4dac4c88b3..00a7011eb4d5 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -338,12 +338,12 @@ void __netif_mp_uninstall_rxq(struct netdev_rx_queue *rxq,
+>  void netif_rxq_cleanup_unlease(struct netdev_rx_queue *phys_rxq,
+>  			       struct netdev_rx_queue *virt_rxq)
+>  {
+> -	struct pp_memory_provider_params *p = &phys_rxq->mp_params;
+>  	unsigned int rxq_idx = get_netdev_rx_queue_index(phys_rxq);
+> +	struct pp_memory_provider_params p = phys_rxq->mp_params;
+>  
+> -	if (!p->mp_ops)
+> +	if (!p.mp_ops)
+>  		return;
+>  
+> -	__netif_mp_uninstall_rxq(virt_rxq, p);
+> -	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, p);
+> +	__netif_mp_close_rxq(phys_rxq->dev, rxq_idx, &p);
+> +	__netif_mp_uninstall_rxq(virt_rxq, &p);
+>  }
+> -- 
+> 2.43.0
+> 
 
-I think for use cases where we are using bpf_clone_redirect() to use
-one clone for inspection this would add an unnecessary copy. Maybe
-adding *_copy() variants instead of changing the *_clone() would be
-better? That way we wouldn't be changing the behavior for existing
-consumers and the naming would be consistent with the skb_* methods.
-
-But more importantly, is there an actual use case for the kind of API
-that the modified selftest requires? Nobody until now has considered
-the existing behavior to be a problem.
-
->
-> Thanks!
-> Menglong Dong
->
->>=20
->> Tested with:
->>   ./test_progs -t xdp_veth_egress
->>   ./test_progs -t xdp_veth
->>   ./test_progs -t xdp
-> [...]
->> =20
->>  destroy_xdp_redirect_map:
->> --=20
->> 2.43.0
->>=20
->>=20
->>=20
-
+Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
