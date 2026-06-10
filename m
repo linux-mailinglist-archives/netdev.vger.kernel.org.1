@@ -1,271 +1,261 @@
-Return-Path: <netdev+bounces-297628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297626-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3dwBNIFEKWpRTQMAu9opvQ
-	(envelope-from <netdev+bounces-297628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:03:29 +0200
+	id w0WcChNFKWp+TQMAu9opvQ
+	(envelope-from <netdev+bounces-297626-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:05:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6905D6688D5
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:03:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AAA566892F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:05:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=compal.com (policy=reject);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297628-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297628-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=schleissheimer.onmicrosoft.com header.s=selector1-schleissheimer-onmicrosoft-com header.b=QBYNsBng;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297626-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297626-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=schleissheimer.de (policy=none);
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D31C530A0F00
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:58:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B06963135B12
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDE940D564;
-	Wed, 10 Jun 2026 10:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2853DCD89;
+	Wed, 10 Jun 2026 10:57:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from tpecef21.compal.com (exmail3.compal.com [59.120.207.196])
+Received: from FR4P281CU032.outbound.protection.outlook.com (mail-germanywestcentralazon11022099.outbound.protection.outlook.com [40.107.149.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4B73FD96E;
-	Wed, 10 Jun 2026 10:57:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781089056; cv=none; b=f3AgHgvBRIc5X02i6s2cuAdBNG5PrOsgraKOHGi0BwsAxEjnEX+bs8MJ1iiUzc7yDiqXILgGHZQHrBYq4DmJsCey+aMSWrZtPENrcJZEEfnKmzNy+YurZQk8jokwt8pASKJv82z1qSwTqmn7rNsifqy4bV779IAbfMorwmggp0k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781089056; c=relaxed/simple;
-	bh=OsmYCQzt+o3RV3waHI3Bqu1fLdPPjGC+Dw+9KHYIaC4=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578192BDC2A
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:56:57 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781089021; cv=fail; b=sIb6Nza4kTep+2kdAvYVJQOqPoRikjfTO+sY3Y+OK1f/GGN14EotzFvye3O8S66rAbRNS8bL8ral/zzULRnd9W97j715KLbH3Px4XZ2TvuAKNX438s6CnOeqN9CnR3gEfRpiEhstffiEmE+yW2+zUcqYk+cnb3ZvBpIlkLGzINY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781089021; c=relaxed/simple;
+	bh=deACWIGcpXF4jjjtXZ9DCT+zPQUctxWqUPTMa0eOEVs=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eJdKNxbdWfSw4QKnOf25h4g8fACwisZPEQtRpnE4iFGznXaFdb8lmU/qBh9aGxa0J39qfvAgtgpk45qJnf3CUfZYreahQbf+4QHnj696dWAvb5khmkrNGnKnnA4tEjdCqhnDq40Ft/+cZSmGMGsNZXU8sCJJXzQgZrLDF82Reas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=compal.com; spf=pass smtp.mailfrom=compal.com; arc=none smtp.client-ip=59.120.207.196
-X-UUID: 2ab28cd864bb11f1b2470fb4f881575f-20260610
-X-CID-CACHE: Type:Local,Time:202606101857+08,HitQuantity:4
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.15,REQID:1072366a-69cb-44b5-8155-c649996c393b,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e276073,CLOUDID:27d29c30-7784-4a77-a538-47ed6151d81b,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|817|836|865|
-	888|898,TC:-5,Content:-10|-8|-5|14|50,EDM:-3,IP:nil,URL:11|99|82|106|1,Fil
-	e:130,RT:-1,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DK
-	R:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 2ab28cd864bb11f1b2470fb4f881575f-20260610
-Received: from sdmg11.sdbg.compal.com [(10.113.168.9)] by tpecef21.compal.com
-	(envelope-from <jackbb_wu@compal.com>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1925890352; Wed, 10 Jun 2026 18:57:26 +0800
-X-UUID: fafd74a864ba11f193ca45dd90e675b2-20260610
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.15,REQID:dc6ba2bd-5014-4963-bb9a-a7c71c44cb72,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e276073,CLOUDID:e08c882a-13d2-4d29-83ea-b8014339a000,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111|817|836|865|
-	888|898,TC:-5,Content:-10|-8|-5|14|50,EDM:-3,IP:nil,URL:11|99|82|106|1,Fil
-	e:130,RT:-1,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DK
-	R:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: fafd74a864ba11f193ca45dd90e675b2-20260610
-Received: from sdbmbx11.tpe.compalcomm.com [(10.113.2.135)] by sdmg11.sdbg.compal.com
-	(envelope-from <jackbb_wu@compal.com>)
-	(Compal Mail Service with TLSv1.2 ECDHE-RSA-AES128-SHA 128/128)
-	with ESMTP id 1492383430; Wed, 10 Jun 2026 18:56:06 +0800
-Received: from SDBMBX13.tpe.compalcomm.com (10.113.2.137) by
- SDBMBX11.tpe.compalcomm.com (10.113.2.135) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 10 Jun 2026 18:56:00 +0800
-Received: from SDBMBX13.tpe.compalcomm.com ([fe80::ea2a:c2b2:8475:8d69]) by
- SDBMBX13.tpe.compalcomm.com ([fe80::ea2a:c2b2:8475:8d69%11]) with mapi id
- 15.02.2562.029; Wed, 10 Jun 2026 18:56:00 +0800
-From: "Wu. JackBB (GSM)" <JackBB_Wu@compal.com>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>, Jack Wu via B4 Relay
-	<devnull+jackbb_wu.compal.com@kernel.org>
-CC: Loic Poulain <loic.poulain@oss.qualcomm.com>, Johannes Berg
-	<johannes@sipsolutions.net>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, Wen-Zhi Huang <wen-zhi.huang@mediatek.com>,
-	Shi-Wei Yeh <shi-wei.yeh@mediatek.com>, Minano Tseng
-	<Minano.tseng@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mediatek@lists.infradead.org"
-	<linux-mediatek@lists.infradead.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "wojackbb@gmail.com" <wojackbb@gmail.com>
-Subject: RE: [External Mail] Re: [PATCH 00/11] net: wwan: t9xx: Add MediaTek
- T9XX WWAN driver
-Thread-Topic: [External Mail] Re: [PATCH 00/11] net: wwan: t9xx: Add MediaTek
- T9XX WWAN driver
-Thread-Index: AQHc8iePJegWnmu1bUi94DWo9+PN/LYrGJEzgAAe7YCAAtdz8IAJmspd
-Date: Wed, 10 Jun 2026 10:56:00 +0000
-Message-ID: <8f058bd8d7e54ec682d62c8f8cbeeb93@compal.com>
-References: <20260529-t9xx_driver_v1-v1-0-bdbfe2c01e57@compal.com>
- <20260601173401.2c892526@kernel.org>
- <c279aea41ecf41c6aca4314a2f4e306b@compal.com>,<e7df5082-ef48-43d0-ad07-10e1e64e1d26@gmail.com>,<98dcaccc34ac4083aef7d57d349c4b7a@compal.com>
-In-Reply-To: <98dcaccc34ac4083aef7d57d349c4b7a@compal.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
+	 Content-Type:MIME-Version; b=ma6xV4CYQG5A+XaoO6ASHCRbIQ5LmSBOe5Lcs4cxDlcC8kM1EunteW7RfD36WKZaeLkGuTEaMiei7vVrdTh8b9xFeiEOsKG5YPDzcKOV3RWu8kM/4ac+AVM9NG58wUyXg0qnzAyBTiFBvwwxpW30mz48pDc+Zc1mgmvMCJPq6hI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schleissheimer.de; spf=pass smtp.mailfrom=schleissheimer.de; dkim=pass (1024-bit key) header.d=schleissheimer.onmicrosoft.com header.i=@schleissheimer.onmicrosoft.com header.b=QBYNsBng; arc=fail smtp.client-ip=40.107.149.99
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vMEH3WWys3b5bvu54ZBoIykPcnV408+9k/QgcF0fi1xyQRTNza+edvtVDkquaNezU283oYxv53ZLNm4nerl2VMZO3vZ+CJI2MB+GUCvPVkAIMHlciSpsiX3pq86l5uvzaW/uZTlW7yFmh7568slVXIomQPYn6sjIc1TsD/CEFjiGAQbctUgXNwpLbsZBawgcm50dQsyxHoCXv18vmZ7Yj+wYpmA6rCPQym7qw6apzejmzcdLjR8o1sCyIEQkejaxpB6WbH5XEm5R3OS2PbXk+2PICMqruWM2y8mhQWwvD9zVwwG2j0yRGTQN5sDmSgjyOUaHLPXsfNTf9lUEdfkBnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GUOdRqdvX8KCprl1DxvIa0HSBn5K1fb7/nyCygyJ7co=;
+ b=Mh44zVxGohhGPKW+fNN916bRo+RogA3W5VzKITdH88gYcg2h02kf3drpM/hlLjYd2//vIJBla2LsxbiCmZ4QRqXbE58vIWutfJ09u69jUjwFfRKm0VSwfxoN172OlU6Wp2lFkQLhu79EVLaTNF70DZaJamzcggy/9nQkzOteM4X/TbDahnMeCVsPfnhTQQ55fRlqiOMMSYgEPJ/WNubNu4XdoOI8YZsx1sHaLKNfjYu6mSg+OE4dpfQch8uYXh5bhKIrsEoK43esv7++byScx5tG0WvXKHAxWcewFQjjjmX05J47RSjzaS2mGLZgW2UK84aShm4J7rSQJ5VXE3d/sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=schleissheimer.de; dmarc=pass action=none
+ header.from=schleissheimer.de; dkim=pass header.d=schleissheimer.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=schleissheimer.onmicrosoft.com; s=selector1-schleissheimer-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GUOdRqdvX8KCprl1DxvIa0HSBn5K1fb7/nyCygyJ7co=;
+ b=QBYNsBng8WMwwWTdAjjO7rNWs+WbR1jcRvymCb/QK9eWaKUlN9hhA3ZYoDRolRmRBJdS9I8NXFzux8kuX973mecPqpxW1C4QW+2CSNZqm7BUFvN44QhPmUma8NVaR1hTuZ8wkFHyBV375V7QULCE/z/fOMM4WT4uSBOIBl/zfZw=
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:52::10)
+ by FR2P281MB0283.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:f::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.113.11; Wed, 10 Jun 2026 10:56:54 +0000
+Received: from BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9]) by BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::2bc1:32a6:153:c3e9%4]) with mapi id 15.21.0092.014; Wed, 10 Jun 2026
+ 10:56:53 +0000
+From: Sven Schuchmann <schuchmann@schleissheimer.de>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: AW: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
+Thread-Topic: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.18
+Thread-Index: AQHc3HSt2FaNRg+Hc0Clgdk/8rilD7X/aQMAgAEuzo+AAGP6gIA22u/Z
+Date: Wed, 10 Jun 2026 10:56:53 +0000
+Message-ID:
+ <BEZP281MB2245F1C5486730A42CF105F1D91A2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+References:
+ <BEZP281MB224533D524B27CFC6E47B447D93E2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+ <57fb63c2-7a05-4bbe-ba2d-fc61ce1e3ba1@lunn.ch>
+ <BEZP281MB22458F571CC8251C141D933CD93F2@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+ <62b15f5f-c9db-4443-b0ee-ac7044459c08@lunn.ch>
+In-Reply-To: <62b15f5f-c9db-4443-b0ee-ac7044459c08@lunn.ch>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-x-tm-as-product-ver: SMEX-14.0.0.3239-9.1.2019-29998.006
-x-tm-as-result: No-10--31.405600-8.000000
-x-tmase-matchedrid: ySitKx1yZtkuv++HU7VXryRFbfQbCufdN0X64jGy2dbVc/AFNTvLS9XY
-	nKy9ZqbG0wNjG7j2lpfWtteiDVXz7mpW0A+eYNud4WMcbQqR5OFkrVIXZHd52KloHyDFpaEsbxq
-	9W35blN9+M8NObIEDkCLCiAPpH5Zk/7zDDoXJoQ2DhqUecocKp1Izqo1F8yQS6ZPX83a4JSt/+c
-	5g4eNP+u8BzumvjiFCXT2nCSyOs5j74diwVvyjRcFwCSR9lLGI8kOnQJj3cxIkxtQqXREtZO/yM
-	kwYZmJ2tOKF1u0biJAV2Z+xPG+d+I62nm6DaDgUVnni4UoVxuO6wG+1uTW14Id1FpoF4NeYU19U
-	ImjpbIGuh6YVToIwy41RNFEIob/KmQi8fYMxpGuFhGp9GNPDrc1nntU6vE00IXRpMFb6AcKB0h0
-	6Pr4Hn4t7NVVLHZ3t19I3/idrQ/CnuESkPwwQeXklMOiBtXiEHKqgYbpP2hyqHwywAOvb9XdQkp
-	MxxUGIhuCUFs6dGYrIgOfnPMXSLX09KsQd2DQzjmPZ0N3CeosKVVHIs2YAvkqeu0zeBUVuBx6SO
-	Ojq0ZiamtHOLn4EBMN+7Q+g/XmFvyTqgw6abkQRLjqoJJt/9frDHrB5YKTLXFAIRSIiEKJxg7sv
-	MtapLiJsZ0L4JGotLb8DWiq6ZlRX9HM7P8GE6Q==
-x-tm-as-user-approved-sender: No
-x-tm-as-user-blocked-sender: No
-x-tmase-result: 10--31.405600-8.000000
-x-tmase-version: SMEX-14.0.0.3239-9.1.2019-29998.006
-x-tm-snts-smtp: F0C02E8CA2FE024CD9E79C7CA05254B62E68CEAF98652B2FB8F2B1EBA89A107E2000:8
-Content-Type: text/plain; charset="big5"
-Content-Transfer-Encoding: base64
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BEZP281MB2245:EE_|FR2P281MB0283:EE_
+x-ms-office365-filtering-correlation-id: f43a2bdb-3893-4385-3505-08dec6defb9e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|23010399003|366016|22082099003|18002099003|38070700021|4143699003|56012099006;
+x-microsoft-antispam-message-info:
+ b+3NjXreU/LO1K2YBRDTqc+MJ5f8Ye3mKC+geOoJNWArL2GYjPBEn5KmfWJP6NfCixGQswgGok9a/2aAhkbxXtmGRBBau5eQBe6kfvZ86LhRJw174vy0qpdAfcMsNS7S0PlrLyjP/GGHfUIS0UZqbNM30bLStws+7kijU1nbtpjHR6IpJy2QgMWqbk46wAWstR0x/+gT2zHZwuVqQXGpS24LYRHNjsdTF4sbix2jN30upkjiPn9LOEx74g3IqwrVmSYNfwFs+dqf96j5rpxRdUoBzz714+FSbvbUX9HF3FMOqxli3PTIJ+na5O8HSxfEVEpRv9F7vmw1/6P8tH/HGMJSxp7ZRlD1IlTxnhz2eyGeANMZv4PzV5q5CbevCXDemEuyWs8BDqBI3KKZKd9AizXs3J0zWI6E3/v9Z014DLULOj0yqvybEC6GsjZ1eRasmMRa753FxiMxKwvK1dMN4MZm4t1nNbZw05yZFk9DmFXe3AnOPEA6gM0NktkxxtB8MOb+HR210wKeavbzuB6SrMsxlhbEtJfXYvDfzoFvDus7IFV6T3B7NuBwhnU21mGX1AUxvFBwhvLM4VXF74CV94Av7SDbpt7Gjd3PSZiVJ8mnIzBN33EWnAVahc+ITltQbHa55M9sp1FhdCT3fKPp425EiCp0NUqHrYK4T/+kjql/cv5dP+qPuS1YLFkH0/B+HjrdUdiRBJmpdicihbvXszoLzMt33CcXBdzn7rUWkDhiRW7LgrY7k3S7j0UHgFtG
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(366016)(22082099003)(18002099003)(38070700021)(4143699003)(56012099006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?k0mmnr3laQUdsrbcVF58wPorf4IdQAbhsPYTpBfq1Pouontsl0ih5toOsp?=
+ =?iso-8859-1?Q?LhjstTg3D56nIfgQHY6Ku8rVLAVWCLE1K9uC5FNT3fwvPqBKKT91x0dtDu?=
+ =?iso-8859-1?Q?eC9Dq2x5Gw6CuF7Phpl+s4P6pkvaZaHgKxNflWtOzUNcde1xERHws5LxS6?=
+ =?iso-8859-1?Q?j7HVKC4NhjAG7fSvw7INie4udjUI9Wms/Mq9JOGSFBrPkko5DvH9hNQKX1?=
+ =?iso-8859-1?Q?XN0JUppVr8bg42VvGnPZWww/cA+8hXIRUMTWYxvxILD0acvuk8TSd0MJRW?=
+ =?iso-8859-1?Q?oUcEUWA+DssfVplS2lKTEcMNZzyUNFxvQEC5vclUwTiRez9XvHuD8BWo43?=
+ =?iso-8859-1?Q?oZHpKmSsCbJYci9ujOhf9nncPm0hWFusE1bNldbhBr/z60o+tLXB3VGRWR?=
+ =?iso-8859-1?Q?J8WCxFmSYCSuvNOm22InvfMxoaHc7cysT7lhbpC/3AEIRi8cchbEg1LA4Z?=
+ =?iso-8859-1?Q?Fpgwqg5p0OAgekCcJZTeUFzTL3BG/rv8Rv6KBDnmX5YdnwH3VFPKQB/As/?=
+ =?iso-8859-1?Q?7FaZPEJxg1H9Bb6VprnZyCOiO9k2y1hlPW9snz11owQoRejuCUBOl01WiT?=
+ =?iso-8859-1?Q?/gOBzXcwqFQIzECIdm+ATVyqDF1AvUSt+kQI1b1YnCelsL0b2r+/3zpTOf?=
+ =?iso-8859-1?Q?S4GalPoUBC7hPu3pXmjkiNyu7Refho/FTnM8ZDPzXyiI1QB3qLISyzH2zI?=
+ =?iso-8859-1?Q?m7ZRsu2n3HpH0u3OCP8MYlExqHFQijfEpnhmGZoXPRP9o2kv2uaEplUUfZ?=
+ =?iso-8859-1?Q?iAqR0NcfGwH5fC/rFzWMtF80opPHICMpHjY+X7o0/LXEF+4+2n2obADiYX?=
+ =?iso-8859-1?Q?PeDEnB1lDjxXKLnNmFogGHQJDt5TRChcEQpdjVi/rMpOTiXCGGRQJSnWUz?=
+ =?iso-8859-1?Q?S2pF4PVvGq8MMYJlDgfVdF34HDCa63P0LWzOPrXMhuPf3Yjq95PjQ2Qa9F?=
+ =?iso-8859-1?Q?fhLcgpRch5gyMkGfb0hYyR+O203xRFiESKWuQmACXFa8YkuHqxLxPfEbI+?=
+ =?iso-8859-1?Q?DNE6hefgjrqEPu9Fx7rUEBq8bUnwxsbqB/8UOc4tBAp5vEcKIZXTHpLjOQ?=
+ =?iso-8859-1?Q?yanvC1soWCv2yVu7gVLFMoV//3khzzYxaKC6R6r4BKimLWNy3rfSDR/Ehi?=
+ =?iso-8859-1?Q?Pi59zCfGs2/e/QU1/MgB12My0h6C/rGjc6AOkBugBo4N2Ab0wa7joZ/NJe?=
+ =?iso-8859-1?Q?zk3IUYkDXMbu71SEfDLue1x0r4raitVrh/fVSlBr93TCjQApa7duRC22jL?=
+ =?iso-8859-1?Q?0YImNMtgdMEyDBhPxbUXqfd7feBQmP+M5Q5kuMhnHQOAUD/5vaCPUsr3WL?=
+ =?iso-8859-1?Q?14vrHEsQ77qofkTnuOAsXI7FbhWYPV6eRIFHd+DideHRe3U2ScWyrDEO+c?=
+ =?iso-8859-1?Q?IuctvmnSLURQ9vwkI8qZstltDjpDGyhPd3CsfOTyTBNCn/YUZz68OPp1eO?=
+ =?iso-8859-1?Q?lCNR83bbhwgMtHb50fA/uUpMxa5pDZ29jHvIaA4WSk3RGT9f589X94UCVN?=
+ =?iso-8859-1?Q?NrWqvwHCvErJnxaMLn0W07KPzMsQySpMmqYs0C95wfoMPwCcLI0k0tlCPN?=
+ =?iso-8859-1?Q?HT2TYaQ4roqiPtB5zFq5JKywoB8gfbgZGdkDxXnYACnbZsjoeo8kaPAe0S?=
+ =?iso-8859-1?Q?pVPCIEyZM3or35MfSp1BG33jaiOXqUwg7+r5bzfpVNrRapjdkcfu6lf2M3?=
+ =?iso-8859-1?Q?ySnC0WOtcVSJ/HVc9nuU7fpWSHVXx7XMS+QtYNQfAdlulFjjhVkBzjvdYx?=
+ =?iso-8859-1?Q?ckstObsumpRzflY3GuD6J3ql4E7i5ZXygnSG0+g2My9NmpcIJFl7zCxsTm?=
+ =?iso-8859-1?Q?HNmMfKG8TQ=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: schleissheimer.de
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: f43a2bdb-3893-4385-3505-08dec6defb9e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2026 10:56:53.9488
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ba05321a-a007-44df-8805-c7e62d5887b5
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: witv6bmwyVeM421Iq4kUl4CHr514HfOQaloeU6z060ZGdVNcYsdGJULJ7vuBGvBT8bI7dCyG6Ku2pjyNWexrHt4w1G5UU/KDTRKK9+tvizg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR2P281MB0283
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.14 / 15.00];
-	DMARC_POLICY_REJECT(2.00)[compal.com : SPF not aligned (relaxed), No valid DKIM,reject];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [0.44 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[schleissheimer.onmicrosoft.com:s=selector1-schleissheimer-onmicrosoft-com];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[schleissheimer.de : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297628-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ryazanov.s.a@gmail.com,m:kuba@kernel.org,m:devnull+jackbb_wu.compal.com@kernel.org,m:loic.poulain@oss.qualcomm.com,m:johannes@sipsolutions.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:wen-zhi.huang@mediatek.com,m:shi-wei.yeh@mediatek.com,m:Minano.tseng@mediatek.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:linux-doc@vger.kernel.org,m:wojackbb@gmail.com,m:ryazanovsa@gmail.com,m:devnull@kernel.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,sipsolutions.net,lunn.ch,davemloft.net,google.com,redhat.com,mediatek.com,gmail.com,collabora.com,kernel.org,lwn.net,linuxfoundation.org,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,compal.com:mid,compal.com:from_mime,msgid.link:url];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[JackBB_Wu@compal.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	R_DKIM_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWO(0.00)[2];
+	TAGGED_FROM(0.00)[bounces-297626-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,jackbb_wu.compal.com];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schuchmann@schleissheimer.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[schleissheimer.onmicrosoft.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,lunn.ch:email,schleissheimer.de:from_mime,schleissheimer.de:email,schleissheimer.onmicrosoft.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6905D6688D5
+X-Rspamd-Queue-Id: 8AAA566892F
 
-PiBsZXQgbWUgam9pbiB0aGUgZGlzY3Vzc2lvbiBhbmQgcHV0IG15IDJjLg0KPg0KPiBPbiA2LzIv
-MjYgMTM6NTgsIFd1LiBKYWNrQkIgKEdTTSkgd3JvdGU6DQo+ID4gSGkgSmFrdWIsDQo+ID4NCj4g
-PiA+IE9uIEZyaSwgMjkgTWF5IDIwMjYgMTg6MzE6MzkgKzA4MDAgSmFjayBXdSB2aWEgQjQgUmVs
-YXkgd3JvdGU6DQo+ID4gPiA+IDQzIGZpbGVzIGNoYW5nZWQsIDE0NzYxIGluc2VydGlvbnMoKykN
-Cj4gPiA+DQo+ID4gPiBQbGVhc2UgdHJ5IHRvIGN1dCB0aGlzIGRvd24gdG8gfjVrTG9DIGZvciB0
-aGUgaW5pdGlhbCBzdWJtaXNzaW9uLg0KPiA+ID4gV2hhdGV2ZXIgdGhlIGFic29sdXRlIG1pbmlt
-dW0gc2Vuc2libGUgY2h1bmsgb2YgY29kZSBpcy4NCj4gPiA+DQo+ID4gPiBFYWNoIHBhdGNoIG11
-c3QgYnVpbGQgY2xlYW5seSB3aXRoIFc9MQ0KPiA+DQo+ID4gV2UndmUgYWxyZWFkeSByZWR1Y2Vk
-IHRoaXMgc2lnbmlmaWNhbnRseSBmcm9tIHRoZSBvcmlnaW5hbCA0MWsgTG9DDQo+ID4gZG93biB0
-byB+MTQuN2sgYnkgc3RyaXBwaW5nIG91dCBub24tZXNzZW50aWFsIGZlYXR1cmVzIHN1Y2ggYXMN
-Cj4gPiBleGNlcHRpb24gaGFuZGxpbmcsIG1lbW9yeSBsb2dnaW5nLCBkZXZsaW5rLCBzdGF0aXN0
-aWNzLCBkZWJ1Zw0KPiA+IHRyYWNpbmcsIGFuZCBvdGhlcnMuDQo+ID4NCj4gPiBXZSBldmVuIHJl
-bW92ZWQgc29tZSBhcmd1YWJseSBuZWNlc3NhcnkgZmVhdHVyZXMgKFBNLCBtZGxvZywNCj4gPiB0
-aHJvdWdocHV0IG9wdGltaXphdGlvbnMpIHRoYXQgd2UgcGxhbiB0byBzdWJtaXQgYXMgZm9sbG93
-LXVwDQo+ID4gc2VyaWVzLg0KPg0KPiBHcmVhdCB3b3JrLiBIaWdobHkgYXBwcmVjaWF0ZSENCj4N
-Cj4gPiBOb3RlIHRoYXQgdGhlIGxpbmUgY291bnQgbWF5IHNsaWdodGx5IGluY3JlYXNlIGluIHYy
-LCBhcyB3ZSBwbGFuDQo+ID4gdG8gYWRkIG1pc3Npbmcga2RvYyBjb21tZW50cyBiYXNlZCBvbiBy
-ZXZpZXcgZmVlZGJhY2suDQo+ID4NCj4gPiBGb3IgcmVmZXJlbmNlLCB0aGUgdDd4eCBkcml2ZXIg
-KHR3byBnZW5lcmF0aW9ucyBvbGRlciwgc2ltcGxlciBIVykNCj4gPiBoYWQgYW4gaW5pdGlhbCBz
-dWJtaXNzaW9uIG9mIH4xMS4zayBMb0MgWzFdLiBUaGUgdDl4eCBoYXJkd2FyZSBpcw0KPiA+IG1v
-cmUgY29tcGxleCwgc28gd2UgYmVsaWV2ZSBiZWluZyBpbiBhIHNpbWlsYXIgcmFuZ2UgaXMgcmVh
-c29uYWJsZS4NCj4NCj4gTGV0IG1lIGVsYWJvcmF0ZSBhIGJpdCBoZXJlLiBUaGUgc2l6ZSBwcm9i
-bGVtIGlzIG5vdCBkdWUgdG8gYSBnaXQgb3IgYQ0KPiBtYWlsYm94IGxpbWl0YXRpb24uIEl0IGFy
-aXNlIGR1ZSB0byB0aGUgaHVtYW4gbGltaXRhdGlvbi4gVGhlIFQ3eHgNCj4gc3VibWlzc2lvbiBy
-ZXZpZXcgdG9vayBzb21ldGhpbmcgYWJvdXQgNCBtb250aHMgYW5kIDggaXRlcmF0aW9ucy4gQW5k
-IGl0DQo+IHdhcyAnb25seScgMTEuM2sgbGluZXMuIExldCdzIGRvIHNvbWUgZXh0cmFwb2xhdGlv
-biBhc3N1bWluZyB0aGF0DQo+IGZ1bmN0aW9uIGlzIGxpbmVhci4gMTQuN2sgaXMgMzAlIGJpZ2dl
-ciwgdGh1cywgZXN0aW1hdGVkIHJldmlld2luZyB0aW1lDQo+IHNob3VsZCBiZSA1IG1vbnRocyBh
-bmQgMiB3ZWVrcy4gQW5kIHRoaXMgbG9va3Mgb3B0aW1pc3RpYy4NCj4NCj4gUmVjb21tZW5kYXRp
-b24sIHNoYXJlZCBieSBKYWt1YiwgaXMgcHJhY3RpY2FsLiA1ayBsaW5lcyBtaWdodCBiZQ0KPiBy
-ZXZpZXdlZCBpbiBhIHJlYXNvbmFibGUgdGltZSBhbmQgbWVyZ2VkIHdpdGggdGhlIGZ1bGwgY29u
-ZmlkZW5jZSBvZiB0aGUNCj4gcXVhbGl0eS4NCj4NCj4gPiBXZSdkIGxpa2UgdG8ga2VlcCB0aGUg
-ZHJpdmVyIGZ1bmN0aW9uYWwgYW5kIHJldmlld2FibGUgaW4gaXRzDQo+ID4gY3VycmVudCBzY29w
-ZS4gRG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb25zIG9uIGhvdyB3ZSBjb3VsZCBmdXJ0aGVyDQo+
-ID4gcmVkdWNlIHRoZSBzaXplIHdoaWxlIG1haW50YWluaW5nIGEgd29ya2luZyBpbml0aWFsIHN1
-Ym1pc3Npb24/DQo+DQo+IE9mZiB0aGUgdG9wIG9mIG15IGhlYWQsIEkgd291bGQgc3VnZ2VzdCBq
-b2luaW5nIFQ3eHggYW5kIFQ5eHggY29kZQ0KPiBiYXNlcy4gSXQgY291bGQgYmUgZG9uZSB0aHJv
-dWdoIGZhY3RvcmluZyBvdXQgYSBjb3JlIGZ1bmN0aW9uYWxpdHkgb2YNCj4gVDd4eCBpbnRvIGEg
-bGlicmFyeSwgb3IgdGhyb3VnaCBtYWtpbmcgdGhlIGRyaXZlciBsYXllcmVkLg0KPg0KPiBJIGFt
-IG5vdCBwcmV0ZW5kaW5nIGJlaW5nIGFuIGV4cGVydCBpbiBhbnkgb2YgdGhlc2UgZHJpdmVycywg
-YnV0DQo+IGdlbmVyYWxseSBkaXZpZGUtbi1jb25xdWVyb3IgdG9nZXRoZXIgd2l0aCBjb2RlIHJl
-dXNlIHdvcmsgcmVsaWFibGUuIEFzDQo+IGFuIGFsdGVybmF0aXZlLCBJIGNvdWxkIHNwZW5kIGEg
-Y291cGxlIG9mIHdlZWtzIHJldmlld2luZyB0aGUgbmV3DQo+IHN1Ym1pc3Npb24gYW5kIHdpbGwg
-Y29tZSB3aXRoIG1vcmUgc3BlY2lmaWMgaWRlYXMgb24gd2hhdCBjYW4gYmUgdGhyb3duDQo+IGF3
-YXkgb3IgcmV1c2VkLg0KPg0KDQogIFRoYW5rIHlvdSBhZ2FpbiBmb3IgdGhlIHN1Z2dlc3Rpb25z
-IG9uIHJlZHVjaW5nIHRoZSBzdWJtaXNzaW9uIHNpemUuDQoNCiAgV2Ugd2VudCB3aXRoIHRoZSBz
-cGxpdCBhcHByb2FjaCBkaXNjdXNzZWQgZWFybGllciChWCB2MiBjb3ZlcnMgb25seSB0aGUNCiAg
-Y29udHJvbCBwbGFuZSAocGF0Y2hlcyAxoVY2KSBwbHVzIGEgTUFJTlRBSU5FUlMgZW50cnksIGJy
-aW5naW5nIGl0IGRvd24NCiAgdG8gfjcuOWsgTG9DIGFjcm9zcyA3IHBhdGNoZXMuIFRoZSBkYXRh
-IHBsYW5lIHdpbGwgZm9sbG93IGFzIGEgc2VwYXJhdGUNCiAgc2VyaWVzIG9uY2UgdGhlIGNvbnRy
-b2wgcGxhbmUgaXMgYWNjZXB0ZWQuDQoNCiAgdjIgYWxzbyBhZGRyZXNzZXMgYWxsIHJldmlldyBm
-ZWVkYmFjayBmcm9tIHYxLCBpbmNsdWRpbmcgVz0xIGNsZWFuDQogIGJ1aWxkcyBmb3IgZWFjaCBw
-YXRjaC4NCg0KICBMaW5rIHRvIHYyOiBodHRwczovL3BhdGNoLm1zZ2lkLmxpbmsvMjAyNjA2MTAt
-dDl4eF9kcml2ZXJfdjEtdjItMC1jNjVhZGRmMjNiM2ZAY29tcGFsLmNvbQ0KDQogIFdlIHdvdWxk
-IGFwcHJlY2lhdGUgYW55IGZ1cnRoZXIgZmVlZGJhY2sgeW91IG1heSBoYXZlLg0KDQogIEJlc3Qg
-cmVnYXJkcywNCiAgSmFjaw0KDQo+ID4gWzFdDQo+ID4gIGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5l
-bC5vcmcvcHJvamVjdC9uZXRkZXZicGYvY292ZXIvMjAyMjA1MDYxODEzMTAuMjE4MzgyOS0xLXJp
-Y2FyZG8ubWFydGluZXpAbGludXguaW50ZWwuY29tLw0KPiA+DQo+ID4gVGhhbmtzLg0KPiA+DQo+
-ID4NCj4gPiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+
-ID4gVGhpcyBtZXNzYWdlIG1heSBjb250YWluIGluZm9ybWF0aW9uIHdoaWNoIGlzIHByaXZhdGUs
-IHByaXZpbGVnZWQgb3INCj4gPiBjb25maWRlbnRpYWwgb2YgQ29tcGFsIEVsZWN0cm9uaWNzLCBJ
-bmMuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZA0KPiA+IHJlY2lwaWVudCBvZiB0aGlzIG1l
-c3NhZ2UsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBhbmQgZGVzdHJveS9kZWxldGUgdGhlDQo+
-ID4gbWVzc2FnZS4gQW55IHJldmlldywgcmV0cmFuc21pc3Npb24sIGRpc3NlbWluYXRpb24gb3Ig
-b3RoZXIgdXNlIG9mLCBvcg0KPiA+IHRha2luZyBvZiBhbnkgYWN0aW9uIGluIHJlbGlhbmNlIHVw
-b24gdGhpcyBpbmZvcm1hdGlvbiwgYnkgcGVyc29ucyBvcg0KPiA+IGVudGl0aWVzIG90aGVyIHRo
-YW4gdGhlIGludGVuZGVkIHJlY2lwaWVudCBpcyBwcm9oaWJpdGVkLg0KPiA+ID09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4NCj4gQW5kIHRoaXMgZGlzY2xh
-aW1lciBkb2VzIG5vdCBmYWNpbGl0YXRlIHRoZSByZXZpZXcuIEFtIEkgJ2ludGVuZGVkJw0KPiBy
-ZWNpcGllbnQgb3Igc2hvdWxkIEkgZGVzdHJveSB0aGUgbWVzc2FnZSBBU0FQPw0KDQpXZSBhcG9s
-b2dpemUgZm9yIGFueSBpbmNvbnZlbmllbmNlIHRoaXMgbWF5IGNhdXNlLg0KDQpDb3VsZCBJIHVz
-ZSBteSBwZXJzb25hbCBlbWFpbCBhZGRyZXNzICh3b2phY2tiYkBnbWFpbC5jb20pIHRvIGRpc2N1
-c3MgY29kZSByZXZpZXc/DQoNClRoaXMgd291bGQgYXZvaWQgdGhpcyBpc3N1ZS4NCg0KVGhhbmtz
-Lg0KDQoNCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NClRo
-aXMgbWVzc2FnZSBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB3aGljaCBpcyBwcml2YXRlLCBwcml2
-aWxlZ2VkIG9yIGNvbmZpZGVudGlhbCBvZiBDb21wYWwgRWxlY3Ryb25pY3MsIEluYy4gSWYgeW91
-IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCBvZiB0aGlzIG1lc3NhZ2UsIHBsZWFzZSBu
-b3RpZnkgdGhlIHNlbmRlciBhbmQgZGVzdHJveS9kZWxldGUgdGhlIG1lc3NhZ2UuIEFueSByZXZp
-ZXcsIHJldHJhbnNtaXNzaW9uLCBkaXNzZW1pbmF0aW9uIG9yIG90aGVyIHVzZSBvZiwgb3IgdGFr
-aW5nIG9mIGFueSBhY3Rpb24gaW4gcmVsaWFuY2UgdXBvbiB0aGlzIGluZm9ybWF0aW9uLCBieSBw
-ZXJzb25zIG9yIGVudGl0aWVzIG90aGVyIHRoYW4gdGhlIGludGVuZGVkIHJlY2lwaWVudCBpcyBw
-cm9oaWJpdGVkLg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PQ0K
+Hi Andrew,=0A=
+I think the patch ("net: usb: lan78xx: Fix cleanup in lan78xx_phy_init")=0A=
+you did is worth going mainline. Shouldn't it?=0A=
+Regards,=0A=
+   Sven=0A=
+=0A=
+________________________________________=0A=
+Von: Andrew Lunn <andrew@lunn.ch>=0A=
+Gesendet: Mittwoch, 06. Mai 2026 15:15=0A=
+An: Sven Schuchmann <schuchmann@schleissheimer.de>=0A=
+Cc: netdev@vger.kernel.org <netdev@vger.kernel.org>=0A=
+Betreff: Re: assert in phylink.c with lan7801 and dp83tc811 since kernel 6.=
+18=0A=
+=0A=
+...=0A=
+=0A=
+From ea55645b23092a0de7aa3ab0eaf7bcb73a7fb0e1 Mon Sep 17 00:00:00 2001=0A=
+From: Andrew Lunn <andrew@lunn.ch>=0A=
+Date: Wed, 6 May 2026 08:10:29 -0500=0A=
+Subject: [PATCH] net: usb: lan78xx: Fix cleanup in lan78xx_phy_init=0A=
+If phylink_connect_phy() fails, phylink_disconnect() should not be=0A=
+called. Rather than use lan78xx_phy_uninit() which does too much, add=0A=
+the cleanup at the end of the function and only undo what was=0A=
+successfully done.=0A=
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>=0A=
+---=0A=
+ drivers/net/usb/lan78xx.c | 14 ++++++++------=0A=
+ 1 file changed, 8 insertions(+), 6 deletions(-)=0A=
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c=0A=
+index bcf293ea1bd3..9cfc122d76ef 100644=0A=
+--- a/drivers/net/usb/lan78xx.c=0A=
++++ b/drivers/net/usb/lan78xx.c=0A=
+@@ -2842,7 +2842,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)=
+=0A=
+ =0A=
+        ret =3D lan78xx_mac_prepare_for_phy(dev);=0A=
+        if (ret < 0)=0A=
+-               goto phylink_uninit;=0A=
++               goto destroy_phylink;=0A=
+ =0A=
+        /* If no PHY is found, set up a fixed link. It is very specific to=
+=0A=
+         * the LAN7801 and is used in special cases like EVB-KSZ9897-1 wher=
+e=0A=
+@@ -2852,7 +2852,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)=
+=0A=
+        if (!phydev) {=0A=
+                ret =3D lan78xx_set_fixed_link(dev);=0A=
+                if (ret < 0)=0A=
+-                       goto phylink_uninit;=0A=
++                       goto destroy_phylink;=0A=
+ =0A=
+                /* No PHY found, so set up a fixed link and return early.=
+=0A=
+                 * No need to configure PHY IRQ or attach to phylink.=0A=
+@@ -2871,17 +2871,19 @@ static int lan78xx_phy_init(struct lan78xx_net *dev=
+)=0A=
+        if (ret) {=0A=
+                netdev_err(dev->net, "can't attach PHY to %s, error %pe\n",=
+=0A=
+                           dev->mdiobus->id, ERR_PTR(ret));=0A=
+-               goto phylink_uninit;=0A=
++               goto destroy_phylink;=0A=
+        }=0A=
+ =0A=
+        ret =3D lan78xx_configure_leds_from_dt(dev, phydev);=0A=
+        if (ret < 0)=0A=
+-               goto phylink_uninit;=0A=
++               goto disconnect_phylink;=0A=
+ =0A=
+        return 0;=0A=
+ =0A=
+-phylink_uninit:=0A=
+-       lan78xx_phy_uninit(dev);=0A=
++disconnect_phylink:=0A=
++       phylink_disconnect_phy(dev->phylink);=0A=
++destroy_phylink:=0A=
++       phylink_destroy(dev->phylink);=0A=
+ =0A=
+        return ret;=0A=
+ }=0A=
+--=0A=
+2.53.0=0A=
 
