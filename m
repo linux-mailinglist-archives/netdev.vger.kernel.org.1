@@ -1,202 +1,201 @@
-Return-Path: <netdev+bounces-297546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id efIKJAwnKWpyRgMAu9opvQ
-	(envelope-from <netdev+bounces-297546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:57:48 +0200
+	id +t6cNaIoKWrvRgMAu9opvQ
+	(envelope-from <netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:04:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CA5F667837
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:57:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB76966799C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:04:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=gIy88eYr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297546-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297546-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=proton.me header.s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail header.b=KoEf9LrZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297547-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=proton.me;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 440C9314C7BA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:47:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 89BD33071C69
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB0A391E76;
-	Wed, 10 Jun 2026 08:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DE6391E76;
+	Wed, 10 Jun 2026 08:48:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DB31DED5C
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 08:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8E83AFAED;
+	Wed, 10 Jun 2026 08:48:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781081259; cv=none; b=toPQ8MjO7xyMJ5XZvZMFSNGaE/hP4x23uAN7ursu2krX9Fvy7JW3jeM2RQByxqgmC6+tVXaaafgn6qiFphBp5R0pi0mBF8olLvbqFJfDEbog6lQFRxxnKZqdD/xaFdQ0kHBMgKVYIiy9H/HgzCk9pB0sd+WiTityfWYPvdPNOSQ=
+	t=1781081313; cv=none; b=NL6DaTkc5rrEvt8xsDs4ZYshCx9bQSn5JzxdXfQ51dwqL2Oja0wbpgYMAgVUHNmoQSTEwBwjWt17b51MNZ7yhjo6v7PAFXIrNEixDKbsWbepvZKNZP31UNAEsLnPkrrPw60E34jMNxgXBJFtElp4rXaOpct8/prDyViFN/umQdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781081259; c=relaxed/simple;
-	bh=HK15SMFGqGFB5dy9wkOYSIixsAG+ODoJmMn9s3DCY08=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=mXfq4eZbMcmoZC+5mWzpNxuByOrnldAQAVqNRQHB6B+DPoO1e/2A6lGm5Whn7fd+/qRSDjz2c42OHF7ciEMwg/1vZImgKJ9YrLkyTO8taS5gFmvXqmKtaVdQPEi7CD8oFh1ndpGX38k9F4Q1IQE7eaujf84fTi66Zyf39Q7SN74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIy88eYr; arc=none smtp.client-ip=209.85.221.51
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-45ef37b56e6so403233f8f.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 01:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781081257; x=1781686057; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OERKqt1g2K8cSM2CQc683H+z2iXNM2E/sBMWVP8ew3Q=;
-        b=gIy88eYrpImcaDJ+G0nicql1XWrKgTEE7Vb0rQ6xGOzVGZWCebWcba/xjzqe5wVIbN
-         YGWPCLuhp7659qZWa+O9zsFQ30Q5w4Ghj4e0Z26ASX0CpyCLl677ejwRC4TxaSHzMOFI
-         haSlUrlLj/rhCkZkNlrAKhArwHlqVyr4PUGDZlNhWGl7wAJcasB9BkHPK5dm0fuhrFZP
-         v3XpHIeeqgSoaloey/baTIE+7goqhpuB+GJuPfbXEiLJ+sPsrH3hBkpzYAiWTNXdaIQ3
-         JtU9Hk3Flsw9C1HtLOc20wtM9rMJtRvUssidzR+mr5l6B+S8VfOZEIs8IBfM6jXacA5z
-         DS4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781081257; x=1781686057;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OERKqt1g2K8cSM2CQc683H+z2iXNM2E/sBMWVP8ew3Q=;
-        b=T1Ib7Ccyqzuqw+0SQh7P5CEdsux9aIqzaGrVpF+NOQqjscNQG9Y1QTEE4uaHvZmQNA
-         g9Xgt05Ph34pbGwfIV/3ctVHL6U1X2ewEe0eWnXB+qlE4N7RweLwWQmFscJtTTbeUhoO
-         Ts93XqoiKBPDCCWxZeDpbWg+G9vCOka0/BHj6Nu+N+23BCV7HV6s1kmn6HCUv3f9DQSv
-         jA/9jlfVQJCKHlQ1lHATHYZjke2l7uHfa0VZm0C9lTvvGWuca9OpJHKdxnq79M5UpY2w
-         s9ZKHN+xj0prHDVqis0T0Bbcv7wRdoVAN2QJAlPpV6LmfmD/uQaU08qlMkNQsKhu06Do
-         VIfg==
-X-Forwarded-Encrypted: i=1; AFNElJ897cWD7bQw8kP8F6FXcb2S7Dz/KaInISe5l7Xc5NXAAzgoKzFeJOBsmzSnPc7UcrP6cVIgBBs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB+mLF3aICuTSG8dlCcPolwMxoIzJYANMwqMdQIwZ3GuVVHfTQ
-	jAEC7J4M45Q7ymlRVfajV7ezBaxI0I8xVi0dYDQP+ToMy2+pBnoVd5A=
-X-Gm-Gg: Acq92OFgOt3uU+VnMSGBOhyHgrjYgUC6kFQGCfaP4/4m24ucLORRVcg3c2RRBc6ZUFk
-	i9V4t3gjr6AbIJJMcvTxk10rqWi+Er/OKbqvEAYT8kI6Q6srRWvTk1cYI/RqW+J8ni4WLuBfxLU
-	jwmselQO/RgaTiRgFgQ0eJyNJ5ogdfeNdIRwPwkPVV+/4Cg+MUHok4KRBwainAjJct774y2+ngH
-	bBk/Pr6KlW4JCbHwxe1wijnIk1mMjTxGaiy5GVE/4o7ZPocl5FrZ9wwZoZ8hsrVI1f0YhMzvjho
-	E0pHyv4eSFwpjJ9SEmnm0L7VDCdJyQNNMcwUZDDhkh5p7GuKgBvmc+q28iBHUba06DpRwZC8PcR
-	anBiN/7aVRAsgY7ZEruSXmhwaclXtKfU9/zBQv/Av2EciXhPoPWBuIALxP9b1qH8khFkGB9jmug
-	wF3tvmwT5Wu7Agf7B3pgAWWNN1WgxtuSMp5/KjTZTlAuvpJigcgSNba+p8SkCiSB0pV6cLwpZMh
-	WA=
-X-Received: by 2002:a05:6000:2388:b0:451:51d6:5e24 with SMTP id ffacd0b85a97d-460566e8604mr3700520f8f.6.1781081256237;
-        Wed, 10 Jun 2026 01:47:36 -0700 (PDT)
-Received: from localhost (32.red-80-39-29.staticip.rima-tde.net. [80.39.29.32])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f351ac0sm123273485f8f.27.2026.06.10.01.47.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 01:47:35 -0700 (PDT)
-Message-ID: <d6c10dd0-daff-424e-bde4-8f47a036a8a0@gmail.com>
-Date: Wed, 10 Jun 2026 10:47:34 +0200
+	s=arc-20240116; t=1781081313; c=relaxed/simple;
+	bh=oSb3BjOGDrpzBuRwag4cIOkHeHtiFcIdTetZsHm+c4U=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=MobmP8ozhsGNUbA7K61B3udOy7zZQc7ToJMv4TwN8pjTALKsWSf/SUQb4HE78T3JOxkvUJ7OAs9VQNE4mEo2e6iIrwO4u5Iw6mDilvzDT/+J0voaDzykY6VnWg2eNNdHDVSAWWPKHwKE+SDVuCTOLEgl+hZVZFl1NLybNWCstHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=KoEf9LrZ; arc=none smtp.client-ip=109.224.244.18
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail; t=1781081301; x=1781340501;
+	bh=CfVcEwBABCtgdPyDkYpsAiOBarZuyehRLdSudPytfdA=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=KoEf9LrZG6P6QnULGuMWCDZDfnxz6S50E14JtxRJYRIFKjbqWEhTjddsCgn91lvte
+	 28OPmDtR/cyls6a214m+18xcaM5uotWFlfTjHOGTMabhqaaxO6pbUYeeeytuxcemAm
+	 G/5ke57UcF4IUN8hGgfnSQEeqL8lOO666CEk5oaBGYQkVEfEn7fL/c3Xd0IYF5/t8a
+	 aql8pJ8tW8LbwKY8bEcQmcy25Hd8rQDRgXErBsFQBS5Uf3EmLLBcZy6lokvPqMf14O
+	 refda6lWpHrTRgMBQaClpwTPwXZSZSvPNfjVlYr1wA68Ko9DNE2PRgMlJGQCJR79fq
+	 dotmaQ98e4rPQ==
+Date: Wed, 10 Jun 2026 08:48:13 +0000
+To: "D . Wythe" <alibuda@linux.alibaba.com>, Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: Mahanta Jambigi <mjambigi@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan Raspl <raspl@linux.ibm.com>, Ursula Braun <ubraun@linux.ibm.com>, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] net/smc: bound the peer producer cursor on SMC-D and SMC-R CDC receive
+Message-ID: <20260610084803.186516-1-hexlabsecurity@proton.me>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: cc44dd5c1ee3ddfe483529e80be1c51ed93bd6d2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Language: en-US, en-GB, es-ES
-To: Mario Limonciello <superm1@kernel.org>
-Cc: linux-usb@vger.kernel.org, SOUND ML <linux-sound@vger.kernel.org>,
- SCSI ML <linux-scsi@vger.kernel.org>, NETDEV ML <netdev@vger.kernel.org>,
- linux-media@vger.kernel.org, KERNEL ML <linux-kernel@vger.kernel.org>
-From: Xose Vazquez Perez <xose.vazquez@gmail.com>
-Subject: [FYI] Several firmware files removed from linux-firmware.git (affects
- multiple drivers)
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
+	R_DKIM_ALLOW(-0.20)[proton.me:s=6rcxnpf2zzez7flpf4ltxxhqgq.protonmail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297546-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:raspl@linux.ibm.com,m:ubraun@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297547-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:superm1@kernel.org,m:linux-usb@vger.kernel.org,m:linux-sound@vger.kernel.org,m:linux-scsi@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-media@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[xosevazquez@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xosevazquez@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[proton.me:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,proton.me:dkim,proton.me:email,proton.me:mid,proton.me:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CA5F667837
+X-Rspamd-Queue-Id: CB76966799C
 
-Hi,
+The SMC CDC receive path copies the peer's producer cursor -- a
+wire-controlled value -- into the local connection cursor with no upper
+bound against the receive buffer (RMB). A malicious peer can advertise a
+producer cursor past rmb_desc->len, which is then used out of bounds:
 
-In commit 1e6faaf837aea079582214c9c1382e5476175576 [1] of the
-linux-firmware.git repo, the following files were removed due
-to unknown licenses:
+ - the urgent path uses the cursor count as a raw index:
+   smc_cdc_handle_urg_data_arrival() dereferences
+   *(rmb_desc->cpu_addr + rx_off + urg_curs.count - 1);
 
-acenic/tg1.bin
-acenic/tg2.bin
-emi62/bitstream.fw
-emi62/loader.fw
-emi62/midi.fw
-emi62/spdif.fw
-ess/maestro3_assp_kernel.fw
-ess/maestro3_assp_minisrc.fw
-korg/k1212.dsp
-lgs8g75.fw
-mts_mt9234mu.fw
-mts_mt9234zba.fw
-myricom/lanai.bin
-qlogic/isp1000.bin
-sun/cassini.bin
-ttusb-budget/dspbootcode.bin
-vicam/firmware.fw
-yam/1200.bin
-yam/9600.bin
-yamaha/ds1_ctrl.fw
-yamaha/ds1_dsp.fw
-yamaha/ds1e_ctrl.fw
+ - the receive path turns the cursor into a length:
+   smc_cdc_msg_recv_action() feeds it to smc_curs_diff() and
+   atomic_add()s the result into conn->bytes_to_rcv. The differing-wrap
+   branch returns (len - old.count) + new.count, which exceeds len for a
+   forged cursor and accumulates across CDCs, so bytes_to_rcv grows past
+   rmb_desc->len even when the cursor count itself is bounded;
+   smc_rx_recvmsg() then copies the wrap-around second chunk past the RMB.
+
+The RMB is a kernel allocation, so the reads disclose adjacent kernel
+memory, and a cursor pointing at an unmapped offset faults in the receive
+tasklet (softirq). Both transports are affected: SMC-D converts the
+cursor in smcd_cdc_msg_to_host() and SMC-R in smc_cdc_cursor_to_host(),
+and neither bounds the count.
+
+Bound the producer cursor count to the RMB at both conversion boundaries
+(this closes the urgent index on SMC-D and SMC-R) and enforce the
+documented "0 <=3D bytes_to_rcv <=3D rmb_desc->len" invariant in
+smc_cdc_msg_recv_action() (this closes the receive length, which the
+cursor-count clamp alone cannot because of the differing-wrap diff and
+the cumulative atomic_add).
+
+Fixes: de8474eb9d50 ("net/smc: urgent data support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+---
+Reproduced under KASAN on 6.12.y. A forged producer cursor with
+prod.count =3D rmb_desc->len + 1 and prod_flags.urg_data_present set produc=
+es
+a 1-byte out-of-bounds read in smc_cdc_handle_urg_data_arrival()
+(slab-out-of-bounds Read of size 1); the cursor-count clamp makes the same
+input in-bounds. A wrap-flipped cursor drives bytes_to_rcv past
+rmb_desc->len across several CDCs so smc_rx_recvmsg() over-reads; the
+bytes_to_rcv invariant keeps it bounded. SMC-D was exercised over the
+in-kernel loopback-ism and the SMC-R converter (smc_cdc_cursor_to_host)
+over an emulated RDMA loopback. Clamping prod.count alone does not bound
+the recv length, hence the separate bytes_to_rcv hunk.
+
+ net/smc/smc_cdc.c |  2 ++
+ net/smc/smc_cdc.h | 12 ++++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+index 619b3bab3824..738c45fd5cd0 100644
+--- a/net/smc/smc_cdc.c
++++ b/net/smc/smc_cdc.c
+@@ -382,6 +382,8 @@ static void smc_cdc_msg_recv_action(struct smc_sock *sm=
+c,
+ =09=09smp_mb__before_atomic();
+ =09=09atomic_add(diff_prod, &conn->bytes_to_rcv);
+ =09=09/* guarantee 0 <=3D bytes_to_rcv <=3D rmb_desc->len */
++=09=09if (atomic_read(&conn->bytes_to_rcv) > conn->rmb_desc->len)
++=09=09=09atomic_set(&conn->bytes_to_rcv, conn->rmb_desc->len);
+ =09=09smp_mb__after_atomic();
+ =09=09smc->sk.sk_data_ready(&smc->sk);
+ =09} else {
+diff --git a/net/smc/smc_cdc.h b/net/smc/smc_cdc.h
+index 696cc11f2303..7fa6e0d3817f 100644
+--- a/net/smc/smc_cdc.h
++++ b/net/smc/smc_cdc.h
+@@ -230,6 +230,12 @@ static inline void smc_cdc_cursor_to_host(union smc_ho=
+st_cursor *local,
+ =09smc_curs_copy_net(&net, peer, conn);
+ =09temp.count =3D ntohl(net.count);
+ =09temp.wrap =3D ntohs(net.wrap);
++=09/* the peer producer cursor is wire-controlled; bound the SMC-R count t=
+o
++=09 * our RMB before it is used as a raw index by the urgent path, mirrori=
+ng
++=09 * the SMC-D conversion in smcd_cdc_msg_to_host().
++=09 */
++=09if (temp.count > conn->rmb_desc->len)
++=09=09temp.count =3D conn->rmb_desc->len;
+ =09if ((old.wrap > temp.wrap) && temp.wrap)
+ =09=09return;
+ =09if ((old.wrap =3D=3D temp.wrap) &&
+@@ -260,6 +266,12 @@ static inline void smcd_cdc_msg_to_host(struct smc_hos=
+t_cdc_msg *local,
+=20
+ =09temp.wrap =3D peer->prod.wrap;
+ =09temp.count =3D peer->prod.count;
++=09/* the peer producer cursor is wire-controlled; a count past our RMB is
++=09 * used as a raw index by the urgent path (smc_cdc_handle_urg_data_arri=
+val)
++=09 * and as a length by the recv path.  Bound it to the RMB.
++=09 */
++=09if (temp.count > conn->rmb_desc->len)
++=09=09temp.count =3D conn->rmb_desc->len;
+ =09smc_curs_copy(&local->prod, &temp, conn);
+=20
+ =09temp.wrap =3D peer->cons.wrap;
+--=20
+2.43.0
 
 
-This affects, at least, the following drivers:
-
-drivers/media/dvb-frontends/lgs8gxx.c:#define LGS8GXX_FIRMWARE "lgs8g75.fw"
-drivers/media/usb/gspca/vicam.c:#define VICAM_FIRMWARE "vicam/firmware.fw"
-drivers/media/usb/gspca/vicam.c:                pr_err("Failed to load \"vicam/firmware.fw\": %d\n", ret);
-drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c:      err = request_firmware(&fw, "ttusb-budget/dspbootcode.bin",
-drivers/media/usb/ttusb-budget/dvb-ttusb-budget.c:MODULE_FIRMWARE("ttusb-budget/dspbootcode.bin");
-drivers/net/ethernet/sun/cassini.c:     const char fw_name[] = "sun/cassini.bin";
-drivers/net/ethernet/sun/cassini.c:MODULE_FIRMWARE("sun/cassini.bin");
-drivers/scsi/qlogicpti.c:       const char fwname[] = "qlogic/isp1000.bin";
-drivers/scsi/qlogicpti.c:MODULE_FIRMWARE("qlogic/isp1000.bin");
-drivers/usb/misc/emi62.c:#define FIRMWARE_FW "emi62/midi.fw"
-drivers/usb/misc/emi62.c:#define FIRMWARE_FW "emi62/spdif.fw"
-drivers/usb/misc/emi62.c:       err = request_ihex_firmware(&bitstream_fw, "emi62/bitstream.fw",
-drivers/usb/misc/emi62.c:       err = request_ihex_firmware(&loader_fw, "emi62/loader.fw", &dev->dev);
-drivers/usb/misc/emi62.c:MODULE_FIRMWARE("emi62/bitstream.fw");
-drivers/usb/misc/emi62.c:MODULE_FIRMWARE("emi62/loader.fw");
-drivers/usb/serial/ti_usb_3410_5052.c:MODULE_FIRMWARE("mts_mt9234mu.fw");
-drivers/usb/serial/ti_usb_3410_5052.c:MODULE_FIRMWARE("mts_mt9234zba.fw");
-drivers/usb/serial/ti_usb_3410_5052.c:                          strscpy(buf, "mts_mt9234mu.fw");
-drivers/usb/serial/ti_usb_3410_5052.c:                          strscpy(buf, "mts_mt9234zba.fw");
-drivers/usb/serial/ti_usb_3410_5052.c:                          strscpy(buf, "mts_mt9234zba.fw");
-sound/pci/korg1212/korg1212.c:  err = request_firmware(&dsp_code, "korg/k1212.dsp", &pci->dev);
-sound/pci/korg1212/korg1212.c:MODULE_FIRMWARE("korg/k1212.dsp");
-sound/pci/maestro3.c:                          "ess/maestro3_assp_kernel.fw", &pci->dev);
-sound/pci/maestro3.c:                          "ess/maestro3_assp_minisrc.fw", &pci->dev);
-sound/pci/maestro3.c:MODULE_FIRMWARE("ess/maestro3_assp_kernel.fw");
-sound/pci/maestro3.c:MODULE_FIRMWARE("ess/maestro3_assp_minisrc.fw");
-sound/pci/ymfpci/ymfpci_main.c: err = request_firmware(&chip->dsp_microcode, "yamaha/ds1_dsp.fw",
-sound/pci/ymfpci/ymfpci_main.c:MODULE_FIRMWARE("yamaha/ds1_ctrl.fw");
-sound/pci/ymfpci/ymfpci_main.c:MODULE_FIRMWARE("yamaha/ds1_dsp.fw");
-sound/pci/ymfpci/ymfpci_main.c:MODULE_FIRMWARE("yamaha/ds1e_ctrl.fw");
-sound/pci/ymfpci/ymfpci_main.c: name = is_1e ? "yamaha/ds1e_ctrl.fw" : "yamaha/ds1_ctrl.fw";
-sound/pci/ymfpci/ymfpci_main.c: name = is_1e ? "yamaha/ds1e_ctrl.fw" : "yamaha/ds1_ctrl.fw";
-
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/?id=1e6faaf837aea079582214c9c1382e5476175576
 
