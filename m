@@ -1,193 +1,246 @@
-Return-Path: <netdev+bounces-297782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LV0dDoucKWqYagMAu9opvQ
-	(envelope-from <netdev+bounces-297782-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:19:07 +0200
+	id rNYgKNGcKWqqagMAu9opvQ
+	(envelope-from <netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:20:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE0E66BED1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:19:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF7466BEEA
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:20:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b="F4Q4/GBX";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297782-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297782-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=google.com header.s=20251104 header.b=t+8bi+uc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF997310D8F7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:13:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 931E531B8870
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6571434753B;
-	Wed, 10 Jun 2026 17:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBFF34753B;
+	Wed, 10 Jun 2026 17:15:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DA1265620
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 17:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E156A1A0BD0
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 17:15:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781111617; cv=none; b=arV0IKHuRCC+188KIcVEMxJlEaeIZMdefZi/wlvCYh+kRqxiRm1a+8ZVkCn/4QIQz0N2TAOdo2sxG9Q8hjRvxgKIKVBqJRluSJvzuC6rFlNMs+wj42MKUH52PZKvqZG26lnm6c6hf5MhDS9po1MPBuX5JrPkFXD8q2opDFU+zbc=
+	t=1781111702; cv=none; b=WiYah7tu1ijSUfuoShbvaM3VWy1fek8RNdjT+CLGNrWgBQ3MzQaFP4bcnrf4LV4+mbrkRDH8hkSyGOjeud07aTSvdrSJyADP84Clpor2EB5r8/+1Fz9gi9vOAnoK+Amwo6fPnK1Z6D9GfKP1H3FaolsM/yPAk5PCKSi+nMVxJyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781111617; c=relaxed/simple;
-	bh=7/xcZhoKpwGcZKaMKoiJxd4/lEx1O8tqAlHKlPik40w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKNvNsxzjwj1gT5RlCyLJxY+MYbDdhDQthtOt4YyB81tChuNBwgqHeG+RVvJEcLwkyaRLJQmU6PYpsKvS4vfQi9x4J/PrZHaC0GvgpHb6iYDHDEd3j+kDUAWDIP6EDvyVkec6NCgTuyqsfjvaemAW/sBciw86ihIj14XnvhLBJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=F4Q4/GBX; arc=none smtp.client-ip=209.85.221.50
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-45ef1629ff4so4918749f8f.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:13:34 -0700 (PDT)
+	s=arc-20240116; t=1781111702; c=relaxed/simple;
+	bh=uGjN+qrQhO1xBmofVqHwfXTApm/dXGN/dMa94oo2C8Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IjIeNr3ZaYOLyVj7LDSkHRrzdy8iebA6EFyrIWh9TSsGGHnlQBsEKiqx35+1teCB0z3+k7yWsM5WEXUL3HcNJ5pdeiOT4OO0zK2ZIZIQGehsYVim4P2U7eu+wfuRmJvoJubx+NY+/Xt9I0HT5cCa4SVKzSUGcyNPMVcx04/mfpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+8bi+uc; arc=none smtp.client-ip=209.85.222.202
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-915d33f7c28so668084285a.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1781111613; x=1781716413; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/xcZhoKpwGcZKaMKoiJxd4/lEx1O8tqAlHKlPik40w=;
-        b=F4Q4/GBXkSLZUOhJWMZvEeXpAkAbds5EQYR05ssiChmJsRlqw/USx8QDhdFOZ4SKYX
-         /H+hlmb+df93egcRYx7UxTIDLP/ANc7MGTEBc3qouLNMtycuzabFw4yIvPH8fKcnVsyj
-         pSToAfYP1d72jydtZpzmucsRPuKmZzhtXu+IrTFviRirwaKji3NHmugEI8DWohrfBxYW
-         Y8VVHGCHctqiidamPwKQYI7e3nnfNbiUhDKAxz5HsXpI0XMfGAtWO1jJTCy9H0wcTgW5
-         b8kikL+QgKAHXMLOFXlM4783zVj8BVZbTaWnMLr2mw1+d+ShQqKKRfXnJ8ngXwMQRvSv
-         Jxmg==
+        d=google.com; s=20251104; t=1781111700; x=1781716500; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LP7JeGO74FmNNcPZWHf7X5w3VRlbqkAA1Dn/5fda5kM=;
+        b=t+8bi+ucjLKdKLCtaPLnBcQj4Rm4N//1oV08+RQ9pHidiuXE8qQcs7sB1vYkjsavoV
+         jJ5qhXJki/fBugs2IgknajduuVAYwosdeM6poA9XBUuemeTowi1M2s4ndiS62/uz/0If
+         fjip1iKVysR9sxdw5clxTQ0Bv7PIrb/3DZlG+m40P2xBvL0w+AlYVCYwd8bB47+l30a5
+         VlfISRs+ZwYPDxu0PCktkyxBMCXvpvZFYMibEssaIFnm+avmfPP8uWhEqWZaz3CZ9v9U
+         iZ+a8b2ESE5Zo+H+3jpf7eEwlVo3RHUWb4JXR6hvfvuiYj/fWxokxCGJQYh3I/5tlxr7
+         a6fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781111613; x=1781716413;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7/xcZhoKpwGcZKaMKoiJxd4/lEx1O8tqAlHKlPik40w=;
-        b=Y7vfi7Fk/TXJCESh/jH3EC5qYcwirYBnaiMVgAXLqKCSJ48mkMcFncNDKLUklKJ90x
-         SLzRevaeKWhnAR9LiTwx16um6lPV43bAmU73YtWsEh8qj3g0TFRYKzMduufu8lGXIphl
-         hTJyKuWchqZqQdA212C3szrLZ+WvBZXlU0g9WZmUfemwjlVwlWHXr7pkva66GAA6C75L
-         6d+TYqqcpCt4YDcrErs96gWWbXC4Z9s8FDudwgW8BkvEJnWX+r9c7PEMEezYnXgQnqkt
-         +JdOAczLL1XSMZTpbv5nzQW90yFVQ5NYNL8xhIQhB/3vh50gzpPP1cxRhVKytD+Hurye
-         NyXg==
-X-Gm-Message-State: AOJu0YwnvMiL/q2uRIiBDNLj9541KvYIGF911jqnwFKEuwrk35CDoTti
-	UpZk1YUsQkwKLo6w/znwtkv1KA7OmladnL8pNeapnOePgUT2WZB6XAsCHjvA49vUIDg=
-X-Gm-Gg: Acq92OH5uwED5D+i56XxeWPFti/0Sgnef4A239N0KS/mIEVZTdaMHbdG6iDUdUQ8sr+
-	ntziY8P/pKrjMqFetf00HC7fYQSUUhoVLvCpEFExvb3QqIFCOov2qNTAehc816jlqoRFuGIVETI
-	giBVQhUgGBzW5sYiVwYzS9mxuCtawUy67xCbzS6h6s+CtrRyXIbYMdjBmuk2CHVigYFpggEJM+q
-	vI1QZEYpwG/3qY7alUcKttw1BZfCEcpA1hHRRVTwpDi3TnNH4FyrwO0zldOsDa5JAg2Ii/U6Mke
-	XSNMjb9RinNfzVNy24Y7c1Ok18O2k8xM49rAzrDGr779y5gn0ntsAsJ3oF3ZeiGl8CDrze3AbJR
-	5ofEI7xYlCm3olWJvwH8vHoPkhSGR2MrJY3RdAIqFVqKZu5HxXLMLRdiVSCcVYnx482ffJZx/q4
-	N1PrRPUNp4WxyOEWLr+FCaRUycQWxo8B6JATNTc2VbUfQaHE366vcwdyudr/XvzhxSOnonL/eeC
-	aDzJRbMZPKDLRhjpFyb+jpueQ==
-X-Received: by 2002:a05:600c:8b6a:b0:490:688b:ece5 with SMTP id 5b1f17b1804b1-490c261b08fmr390154585e9.30.1781111613608;
-        Wed, 10 Jun 2026 10:13:33 -0700 (PDT)
-Received: from localhost (p200300f65f47db046aec8c3a4b621e71.dip0.t-ipconnect.de. [2003:f6:5f47:db04:6aec:8c3a:4b62:1e71])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4601f2e4b18sm57539850f8f.10.2026.06.10.10.13.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 10:13:32 -0700 (PDT)
-Date: Wed, 10 Jun 2026 19:13:30 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: David Heidelberg <david+nfc@ixit.cz>
-Cc: netdev@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Ian Ray <ian.ray@gehealthcare.com>, Carl Lee <carl.lee@amd.com>, 
-	Tomasz Unger <tomasz.unger@yahoo.pl>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] nfc: Use named initializers for struct
- i2c_device_id
-Message-ID: <aima4QhlwCzWa2vF@monoceros>
-References: <20260518133311.644160-2-u.kleine-koenig@baylibre.com>
- <c5b5025c-1925-41cc-89ee-3c52a1192f26@kernel.org>
+        d=1e100.net; s=20251104; t=1781111700; x=1781716500;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LP7JeGO74FmNNcPZWHf7X5w3VRlbqkAA1Dn/5fda5kM=;
+        b=mWO49CPs++txEgr5fgGjh/G8ACb8EAQS9LpV9c9hPGNPBbJIgIwYowOlZ0I4CFtdMa
+         sGxiKxFiEWU+/og8lvPGdDAfgR1HvMLnRia/UrMciWNVUHlCLDeZXRMrU8DMvp7amLYT
+         ZW+sFn5f8IMcdt/RbuWkp6NtxcCunPQ1Is0qn/qMA1dLEmFtFoIiR5Yc/I2p8P6ENbvA
+         ku6jTOgJpU/1mTZ0R0YGSX9LvbopPc/ePOJLYd+fj14OVtS9vBC1pAI41mfxc03jP+Vs
+         YAf4JIomA347O8RVkZn4sNsL/9xKdrWckMDD3kVPXwItjKytFHbKIMZBFIseJdC0+Ua4
+         tlFg==
+X-Forwarded-Encrypted: i=1; AFNElJ+BG7ZPavRu1FRn2VYgJngICyEE1/9/lEmQIMJBRKZXdWa0nDAiWuZeKuxdahcy3Ju6EuoJRhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtUJeaJoNGtvn+udlUsjk7pJvxQHub1ALQ0mbzXRidDcib6qLA
+	3xvgQi8dzV/VyKURgAOfC4v30YokEzfINBL1ODYmctHbgG+2pRTSCnb6Bh4t/wLexgLboITl4X0
+	lft2rzp8imvMmsA==
+X-Received: from qkle10.prod.google.com ([2002:a05:620a:12ca:b0:915:9acf:1f82])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:6287:b0:915:c4de:7ad8 with SMTP id af79cd13be357-915c4de84efmr2599048085a.38.1781111699468;
+ Wed, 10 Jun 2026 10:14:59 -0700 (PDT)
+Date: Wed, 10 Jun 2026 17:14:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4wajsa3zx244mfzu"
-Content-Disposition: inline
-In-Reply-To: <c5b5025c-1925-41cc-89ee-3c52a1192f26@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
+Message-ID: <20260610171458.1359630-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] ip6_tunnel: annotate data-races around
+ t->err_count and t->err_time
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297782-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297783-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:david+nfc@ixit.cz,m:netdev@vger.kernel.org,m:krzk@kernel.org,m:horms@kernel.org,m:kuba@kernel.org,m:andriy.shevchenko@linux.intel.com,m:ian.ray@gehealthcare.com,m:carl.lee@amd.com,m:tomasz.unger@yahoo.pl,m:linux-kernel@vger.kernel.org,m:david@ixit.cz,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,linux.intel.com,gehealthcare.com,amd.com,yahoo.pl];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre.com:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,nfc];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[monoceros:mid,baylibre.com:dkim,baylibre.com:email,baylibre.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9EE0E66BED1
+X-Rspamd-Queue-Id: ECF7466BEEA
 
+ip6_tnl_xmit() and ipip6_tunnel_xmit() run locklessly (dev->lltx == true).
 
---4wajsa3zx244mfzu
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next] nfc: Use named initializers for struct
- i2c_device_id
-MIME-Version: 1.0
+ip6gre_err() and ipip6_err() also run locklessly.
 
-Hello David,
+We need to add READ_ONCE() and WRITE_ONCE() annotations
+around t->err_count and t->err_time.
 
-On Mon, May 18, 2026 at 05:09:54PM +0200, Krzysztof Kozlowski wrote:
-> On 18/05/2026 15:33, Uwe Kleine-K=F6nig (The Capable Hub) wrote:
-> > While being less compact, using named initializers allows to more easily
-> > see which members of the structs are assigned which value without having
-> > to lookup the declaration of the struct. And it's also more robust
-> > against changes to the struct definition.
-> >=20
-> > While touching all these arrays, unify usage of whitespace in the list
-> > terminator.
-> >=20
-> > This patch doesn't modify the compiled arrays, only their representation
-> > in source form benefits. The former was confirmed with x86 and arm64
-> > builds.
-> >=20
-> > Signed-off-by: Uwe Kleine-K=F6nig (The Capable Hub) <u.kleine-koenig@ba=
-ylibre.com>
->=20
-> You need to refresh your tree to next - you miss David.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+v2: addressed sashiko's feedback (Jakub).
 
-@krzk: Thanks for that hint.
+ net/ipv6/ip6_gre.c    |  8 ++++----
+ net/ipv6/ip6_tunnel.c | 11 ++++++-----
+ net/ipv6/sit.c        | 22 ++++++++++++----------
+ 3 files changed, 22 insertions(+), 19 deletions(-)
 
-@david: Would it help you if I resent this patch or do you have it on
-your radar already?
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 365b4059eb20354c256c491a16db0e606e0a9790..a43382000619049df7a3127f5106ca12608b0344 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -445,11 +445,11 @@ static int ip6gre_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
+ 		return 0;
+ 	}
+ 
+-	if (time_before(jiffies, t->err_time + IP6TUNNEL_ERR_TIMEO))
+-		t->err_count++;
++	if (time_before(jiffies, READ_ONCE(t->err_time) + IP6TUNNEL_ERR_TIMEO))
++		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
+ 	else
+-		t->err_count = 1;
+-	t->err_time = jiffies;
++		WRITE_ONCE(t->err_count, 1);
++	WRITE_ONCE(t->err_time, jiffies);
+ 
+ 	return 0;
+ }
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 9d1037ac082f6aad36c152ffdbe0f30237b65fc3..3445f81d9957e0ddd3f23d8b550ef5772672dba6 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -1104,7 +1104,7 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
+ 	struct ipv6_tel_txoption opt;
+ 	struct dst_entry *dst = NULL, *ndst = NULL;
+ 	struct net_device *tdev;
+-	int mtu;
++	int err_count, mtu;
+ 	unsigned int eth_hlen = t->dev->type == ARPHRD_ETHER ? ETH_HLEN : 0;
+ 	unsigned int psh_hlen = sizeof(struct ipv6hdr) + t->encap_hlen;
+ 	unsigned int max_headroom = psh_hlen;
+@@ -1214,14 +1214,15 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
+ 		goto tx_err_dst_release;
+ 	}
+ 
+-	if (t->err_count > 0) {
++	err_count = READ_ONCE(t->err_count);
++	if (err_count > 0) {
+ 		if (time_before(jiffies,
+-				t->err_time + IP6TUNNEL_ERR_TIMEO)) {
+-			t->err_count--;
++				READ_ONCE(t->err_time) + IP6TUNNEL_ERR_TIMEO)) {
++			WRITE_ONCE(t->err_count, err_count - 1);
+ 
+ 			dst_link_failure(skb);
+ 		} else {
+-			t->err_count = 0;
++			WRITE_ONCE(t->err_count, 0);
+ 		}
+ 	}
+ 
+diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
+index 201347b4e12742451de6d6036281d1abaff0dd84..9c4efc441711f89d3ef8093f4764a5b8083afb99 100644
+--- a/net/ipv6/sit.c
++++ b/net/ipv6/sit.c
+@@ -595,11 +595,11 @@ static int ipip6_err(struct sk_buff *skb, u32 info)
+ 	if (t->parms.iph.ttl == 0 && type == ICMP_TIME_EXCEEDED)
+ 		goto out;
+ 
+-	if (time_before(jiffies, t->err_time + IPTUNNEL_ERR_TIMEO))
+-		t->err_count++;
++	if (time_before(jiffies, READ_ONCE(t->err_time) + IPTUNNEL_ERR_TIMEO))
++		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
+ 	else
+-		t->err_count = 1;
+-	t->err_time = jiffies;
++		WRITE_ONCE(t->err_count, 1);
++	WRITE_ONCE(t->err_time, jiffies);
+ out:
+ 	return err;
+ }
+@@ -909,8 +909,8 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
+ 	struct net_device *tdev;	/* Device to other host */
+ 	unsigned int max_headroom;	/* The extra header space needed */
+ 	__be32 dst = tiph->daddr;
++	int err_count, mtu;
+ 	struct flowi4 fl4;
+-	int    mtu;
+ 	u8 ttl;
+ 	u8 protocol = IPPROTO_IPV6;
+ 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
+@@ -986,13 +986,15 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
+ 		}
+ 	}
+ 
+-	if (tunnel->err_count > 0) {
++	err_count = READ_ONCE(tunnel->err_count);
++	if (err_count > 0) {
+ 		if (time_before(jiffies,
+-				tunnel->err_time + IPTUNNEL_ERR_TIMEO)) {
+-			tunnel->err_count--;
++				READ_ONCE(tunnel->err_time) + IPTUNNEL_ERR_TIMEO)) {
++			WRITE_ONCE(tunnel->err_count, err_count - 1);
+ 			dst_link_failure(skb);
+-		} else
+-			tunnel->err_count = 0;
++		} else {
++			WRITE_ONCE(tunnel->err_count,  0);
++		}
+ 	}
+ 
+ 	/*
+-- 
+2.54.0.1099.g489fc7bff1-goog
 
-Best regards
-UWe
-
---4wajsa3zx244mfzu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmopmzYACgkQj4D7WH0S
-/k7Xzgf9Fxyi6laW4HqGp9U22Qti2JfXd4MYYOfISvcfOj/0RvVQ67QtRSlejhxY
-OSZx4/tqeNeWLxFcT7kfmjZF/iEbcHD/rGthcf7GPKNjM8TcVVJxK/O8Av0XvZD4
-f/lw285dzS9V06C5C1DK5SX5Jh4Y/Egb3x4R3pCXaWo+s60WvgLkr4M1aRLCm8NE
-dism62gmIOWcyJxRdIuhXaZaXlsmDIkTsRm7A4ipH3fnYmgaSkaf0w8LyYcDu34A
-zrORh4OM0gK2ehBNomvlyTDDKPEwHkuldkI2VX6arXZaIddlvKHkGk+uFyHrtu/O
-lM3Pm/KGXYohoAT8U53UqFXxolA8Pw==
-=VaSC
------END PGP SIGNATURE-----
-
---4wajsa3zx244mfzu--
 
