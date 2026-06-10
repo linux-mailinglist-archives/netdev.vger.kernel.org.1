@@ -1,246 +1,235 @@
-Return-Path: <netdev+bounces-297673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297674-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lbC+MsBhKWoiWAMAu9opvQ
-	(envelope-from <netdev+bounces-297673-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:08:16 +0200
+	id /0i6M8lhKWomWAMAu9opvQ
+	(envelope-from <netdev+bounces-297674-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:08:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4142A66996D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:08:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6463E669977
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:08:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackwall.org header.s=google header.b=CQtPOJY2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297673-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297673-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=0sec.ai header.s=google header.b=XaV52jL3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297674-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297674-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A28A13070579
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:00:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6563730799D7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B16176025;
-	Wed, 10 Jun 2026 13:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A32922259F;
+	Wed, 10 Jun 2026 13:00:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40ED1A23A6
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19024176FB1
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:00:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781096428; cv=none; b=rJFMQIECDtCws0Cb01EI8ksSZKuehNR2TqJ3jf/CA4F+xUXW4dbraU2wwfkoZzqJOBqTBvM2Tf6nYkWFLLqQfC/wZdwfYV/wMp0Eyz/uO1LNflx3Us+/5AiTa5r9z1sIIvOfvRfNTto4UW0slCkjMlyC874EUZFNYHVAPLF1NAQ=
+	t=1781096452; cv=none; b=BNrg9gpmc+EouX4etGKkssWHcc8ppBPg8hBFq2Tlpdv/P2Bs0nSWIVkvGQpRXZrBs3S8+yF66bZoOqC3cH45qDW6ZCzgT1BT8jD1G6u2SqtuUDNW5B2D6HMbEPzsmXeJWQpSTZqMJQF70wsd0amVd85anc9j7eCen6GRL+JsLBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781096428; c=relaxed/simple;
-	bh=uq7wrb9BbQ1qXAKnJdJNozsHGi7MiMtjMK3/FO+D/6w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GsBaqPXkhQ8F5eh4/6PPqGbenvLR4/6iGjyZEa2suTl7OkdT5qlL2aqCAEa9VF5mv5b2SSZqFPCka23XGG3b7ucz3neOuqCo7Zd74beAEpO5d6Cu3jWBDv778amT+TCD61w5ayn/t29Cj58QSHvQ+Ap25hBE9Ifsv0VvfHjh/9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=CQtPOJY2; arc=none smtp.client-ip=209.85.221.47
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-45eedcdaeaaso4626527f8f.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:00:26 -0700 (PDT)
+	s=arc-20240116; t=1781096452; c=relaxed/simple;
+	bh=epcyt5Wh1odVH3k/9F+LSiRC9CHJsqkFCDU6Pk58NqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m4vISDsCWzN5fTxmhvi4i1AINqMT1U974IZykoeW4hejiqUMKpniM1ttLLAVPa96WYR5FS/WKRkzvBT0FxKz2WHm0Ak2zfXFBUMz2TYpLLZaEUYhMX0n/tucxOtszuMqTRLLr3DcfEcyKG52aNiI42FE2pQqRczDSzVByy5CK0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=XaV52jL3; arc=none smtp.client-ip=209.85.221.53
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-45eeea039ebso3603930f8f.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1781096425; x=1781701225; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l2P6FLzmFEnjYSd7sEJKghiq0OYnETpmGfmCNb5FcbA=;
-        b=CQtPOJY2jisKI2aaW4keCgID1p1TlkxzLM/jYDgMT5szYv9qvByjG0lcBU2K1bm2Ay
-         L4kROpfaJnXsq6pcA2hU3VqhElaxWiIoAClicW2te1//G0t379oR0WC+8nNSWfGmOO7f
-         mqndrwVcmItvcEDv03IVHE1f0rbUf5ul9hmFxgs3yjyoqvjgtdJHBdUcM4kyqxmcP71f
-         BpDry7soJaN3fcp/qDLJlMwjEObTfcfKfNyG96Qiy6Toqskuf3yCKD6dod9IUH8i9cSq
-         ipORPJvh7TtTOMqp0eEk+fOwpC1vO9os1aQp+OR6WjezmSysEOANemvriztHTuwc5GhR
-         Z5/g==
+        d=0sec.ai; s=google; t=1781096449; x=1781701249; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+G46dKJififF+uN+6x6XZ6FUhL5eRIvRdEqEqHKs0cw=;
+        b=XaV52jL3lCR5jNZfr2GbWCU0+KHc5anVVNWVt/koB/t6BFObU4PAu2YMafDQ9QyvFy
+         cZq9x7A8WEhmDwv+fR1MUH6BwYDN1Kn8Jl2VJTk1JLFGuBW37WAjJA13Am1BVPnPoaLy
+         iNrEwFg7QUtvhJiEMB9pf7lYo0rtKeOgIci03OouvJHwVrXRV3lIoQNomVS/yzPhTlb6
+         dkSXBQxB4daki2TwwjiePTMp2ETfR6vvIeMu8pje2d1+BDYV/skj5I7cVfSgmFMcjt7n
+         D36EoWc1Yg0q+RCSmEQWmLF8d3ilOSnJ6zojwPV6vt7efl/bzgKf9hRycPmVdRvmv0fA
+         S4cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781096425; x=1781701225;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l2P6FLzmFEnjYSd7sEJKghiq0OYnETpmGfmCNb5FcbA=;
-        b=mxfhmWryCIn8LjZ7sO3LSXh+hGaB5olQdYeMrPnnhc3DJdNn/Jk7D152Ex+Xhs92NQ
-         FHHTcKuuewvkn8Ld/bY3shjn7HReg0k7rxtQQ3O/v/P9Sgwu5z6JgNjTmGkKwkEuRXVv
-         Pdib4e8vOV+y2GNPh8YxpYnN9SaoZ+OniVNaVrxxiUfmmiQzOe9mB4Vic4HbwmB7nO4a
-         oYtHE7hzqWIzETHd1XA7Dxi9sqtYk1xqFfJ3P5lVuZtlrzpNSHkotAPs2bPAvRsvVoYl
-         2qwDshZB7eefpvEM6+NGfhjDU6WWxpFaSR4+4MCSTsZ/BpXKKECpvbmWDh0kCoxvMyqm
-         W2Lg==
-X-Forwarded-Encrypted: i=1; AFNElJ+ErpfVSkLlJelGLsMex51Vx6hXuYzehGFRfLp//pWAQrqYS1PTjB9KmP3KF189vYhv0obdAJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzS/AlVoBZa9vXfmgmTcTcukbbXxF47rBouMEiXSYmyByQMTlil
-	W2R6I7gW7aJm0+30v8VL0Af0veLxTMZMigTX6xRDh+ryzf2wYK0XruqF9fzcG7MKP9w=
-X-Gm-Gg: Acq92OFHapGWd1QxaxfS73BAg63tjMU3NIpeARtTA3ICCxDrLu2tKSUTrzH1vHDxL87
-	oSesQWHVtiNw68nR61jg6K7HDFsPt0TPyg6B0sFtUd5slWGUAtjxnh3/McdEufFwvhRg7vv7WZO
-	+wN1z512xPVSF/vQLuR+6sFl3h4x0nIxId3EsbCw4/BlXOZYjYqZDiKFWrOlqDUEH0sU/R5Q741
-	EtJAzVFkgdNJqzWV83trUNY6ej5q52ISxadGEqtIye4E1KD9V5wv0ePIofoU48oVaTWYr1ftSIS
-	GhObKJWnrkK1jS2BO1qGNw28dPwqduZJava1rtCzVQNPw+zi4B3EJ91PmR69SmUVO4uC9P33kkA
-	Q5hNtIXeU+CtQPEnexzT9Uj1jIo4CtgHrnw24JjNPJ066KVQRkFTjCB6Oasy/MT1jUQs+rxEMkj
-	FEqXdZrRPnjVhK6AsAtfb27TtRDjlfAhnK83sngRk+P6hG7shSnBYuPHWyh8/oL0mnhcvMKG7VL
-	2M=
-X-Received: by 2002:a5d:504e:0:b0:45e:f302:95b with SMTP id ffacd0b85a97d-46030767c03mr28533594f8f.37.1781096424749;
-        Wed, 10 Jun 2026 06:00:24 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f35fb24sm76832421f8f.34.2026.06.10.06.00.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 06:00:24 -0700 (PDT)
-Message-ID: <e1745196-d315-4dcc-8157-8a56a91f4e20@blackwall.org>
-Date: Wed, 10 Jun 2026 16:00:22 +0300
+        d=1e100.net; s=20251104; t=1781096449; x=1781701249;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+G46dKJififF+uN+6x6XZ6FUhL5eRIvRdEqEqHKs0cw=;
+        b=rK3Y+gZnCx3zzoo33n0kgjqMUcKgtLk2hEFkkGm5txf0CMbYKubwC9wOuiSee9su9B
+         kZ+Y1MMDdsFQklQ6tpKzI0gWZD1TFs6CxL0I+xqrluGm43Z28ZNzWoXJVaLZ+e0ZQIx4
+         d5zeo0+TmIM7iH6D+6l7w7lJCDqwOnsl7zOvzbUQ/N1n+yYI6nn08SQTuvftUaiCnKSO
+         K0ntGhSoKNZUBcXm7+hRHEaYBg16BL0M/yFyZJsHsUrAA/uCzkhBCF5E/dYAtSyEH8P2
+         1R3Qmbn8+XOPzFn275dEiGvAAkW3NqTrngfBP8slaGAXrudGv5aXaPCrIMeD6BbM8MQu
+         l5kw==
+X-Forwarded-Encrypted: i=1; AFNElJ9lOxOKE2fXk1EnWsQyBOrRbYo28ZFSX9gXEklrYR4BQgiRJ6A3VrGx7/F7vz9j0GW+ea+Wcqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSrIfRgU3V+QM6hWTssS6v386U74rg8uXWpCGYs2NuT/hi18KJ
+	zREeMNySux46EJkO1UoBU1oIBMnPo/1ZdTdVj8SEjC3wsAoqIBdALhON/y2OCSm62ibH
+X-Gm-Gg: Acq92OHnZYH4LhLGgYUZuRHjTTBKy/Er24C+QjRLCm0v1C15TfD0SGCl9bcOHIXZd0R
+	/auVs26CATZQQjn++XH9zlmg9TVBCgUfbU1gCvxBB0dGZPqshJtMz40OTrHgoPUILlXBNVb8Wme
+	qOrX9HK4SjghZj7ePO7MUoBGaQ8WpdzoyapbgMVCUIHv8F6DL9hyod4W2NpeLcwaI1LR4FK6LKK
+	cUzcDlYRsr7aywte80NiHimBabPfdED3fIWgWAZGyxoLRD8Pwz8Det4r+QhlrqpAbYSMQgBUlw0
+	dx2QRo4HY05uJ9iq5e9DtsMcECSEMGe1S3Cs4GyYqUXUlssNBC2wS2xvGzsurlVkVg0bsppmBNu
+	rkmY9B3AeZ7irXvlgpSVhLfB6pncN3jYt54dcCJZJ1zx8CB1j6WaSufrMYGoS/Bf7jVbKWMiIg0
+	5FGE5Ue8O8VOt5tVe6EJuUhW+JjYcQb/6PMdrRhtFjtoJ3IxdFKmS42k/pbjgfZUc3zf2T/4L5d
+	JIl4vehY87Hs1sraDm0PL0lH3jkC8y63n+qvlv9m3Mem8bnTYue1Z/6ijhAv255iPQ=
+X-Received: by 2002:adf:e011:0:10b0:43c:ef4f:79e4 with SMTP id ffacd0b85a97d-4603063a15cmr27177266f8f.37.1781096448976;
+        Wed, 10 Jun 2026 06:00:48 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.222.237])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2eadefsm74123638f8f.11.2026.06.10.06.00.47
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 10 Jun 2026 06:00:48 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
+Date: Wed, 10 Jun 2026 15:00:46 +0200
+Message-ID: <20260610130046.59867-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] bonding: add sysfs interface for
- broadcast_neighbor
-Content-Language: en-US, bg
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, Tonghao Zhang <tonghao@bamaicloud.com>
-References: <20260610120812.49054-1-laoar.shao@gmail.com>
- <1f949cfc-eebc-4813-9dfc-b9a9ec79494d@blackwall.org>
- <CALOAHbBeBez2DAQD+1PPc1Dmm0HH0PQcytG-eaxgWyThRt890A@mail.gmail.com>
- <dd10cb23-261c-40b1-8b33-15a519f366c8@blackwall.org>
- <CALOAHbAnKP96ZZrVZw8duABJTUhmdcUZ_yWcJoRdjCCV9_pb2g@mail.gmail.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <CALOAHbAnKP96ZZrVZw8duABJTUhmdcUZ_yWcJoRdjCCV9_pb2g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297673-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:laoar.shao@gmail.com,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:tonghao@bamaicloud.com,m:laoarshao@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[blackwall.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297674-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[0sec.ai];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[0sec.ai:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bamaicloud.com:email,blackwall.org:dkim,blackwall.org:email,blackwall.org:mid,blackwall.org:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0sec.ai:url,0sec.ai:from_mime,0sec.ai:dkim,0sec.ai:email,0sec.ai:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4142A66996D
+X-Rspamd-Queue-Id: 6463E669977
 
-On 10/06/2026 15:49, Yafang Shao wrote:
-> On Wed, Jun 10, 2026 at 8:45 PM Nikolay Aleksandrov <razor@blackwall.org> wrote:
->>
->> On 10/06/2026 15:39, Yafang Shao wrote:
->>> On Wed, Jun 10, 2026 at 8:30 PM Nikolay Aleksandrov <razor@blackwall.org> wrote:
->>>>
->>>> On 10/06/2026 15:08, Yafang Shao wrote:
->>>>> The upstream kernel has supported broadcast_neighbor for 802.3ad mode since
->>>>> commit ce7a381697cb ("net: bonding: add broadcast_neighbor option for 802.3ad").
->>>>> When upgrading from our local kernel to 6.18.y stable, we switched from our
->>>>> out-of-tree implementation to the upstream one.
->>>>>
->>>>> However, the iproute2 package on our production servers is too old to
->>>>> support the broadcast_neighbor option. To enable this feature, add a new
->>>>> sysfs attribute at:
->>>>>
->>>>>      /sys/class/net/<bond>/bonding/broadcast_neighbor
->>>>>
->>>>> This allows enabling the feature by writing "1" to the sysfs file, matching
->>>>> the interface we previously maintained in our local kernel.
->>>>>
->>>>> The result is as follows,
->>>>>
->>>>> - For 802.3ad mode
->>>>>
->>>>>      $ ip link add bond0 type bond mode 802.3ad
->>>>>      $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
->>>>>      0
->>>>>      $ echo 1 > /sys/class/net/bond0/bonding/broadcast_neighbor
->>>>>      $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
->>>>>      1
->>>>>
->>>>> - For other modes
->>>>>
->>>>>      $ ip link add bond1 type bond
->>>>>      $ cat /sys/class/net/bond1/bonding/broadcast_neighbor
->>>>>      0
->>>>>      $ echo 1 > /sys/class/net/bond1/bonding/broadcast_neighbor
->>>>>      bash: echo: write error: Permission denied
->>>>>
->>>>> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
->>>>> Cc: Tonghao Zhang <tonghao@bamaicloud.com>
->>>>> ---
->>>>>     drivers/net/bonding/bond_sysfs.c | 12 ++++++++++++
->>>>>     1 file changed, 12 insertions(+)
->>>>>
->>>>> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
->>>>> index eaba44c76a5e..24eb23634d98 100644
->>>>> --- a/drivers/net/bonding/bond_sysfs.c
->>>>> +++ b/drivers/net/bonding/bond_sysfs.c
->>>>> @@ -750,6 +750,17 @@ static ssize_t bonding_show_ad_user_port_key(struct device *d,
->>>>>     static DEVICE_ATTR(ad_user_port_key, 0644,
->>>>>                    bonding_show_ad_user_port_key, bonding_sysfs_store_option);
->>>>>
->>>>> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
->>>>> +                                            struct device_attribute *attr,
->>>>> +                                            char *buf)
->>>>> +{
->>>>> +     struct bonding *bond = to_bond(d);
->>>>> +
->>>>> +     return sysfs_emit(buf, "%d\n", bond->params.broadcast_neighbor);
->>>>> +}
->>>>> +static DEVICE_ATTR(broadcast_neighbor, 0644,
->>>>> +                bonding_show_broadcast_neighbor, bonding_sysfs_store_option);
->>>>> +
->>>>>     static struct attribute *per_bond_attrs[] = {
->>>>>         &dev_attr_slaves.attr,
->>>>>         &dev_attr_mode.attr,
->>>>> @@ -789,6 +800,7 @@ static struct attribute *per_bond_attrs[] = {
->>>>>         &dev_attr_ad_actor_system.attr,
->>>>>         &dev_attr_ad_user_port_key.attr,
->>>>>         &dev_attr_arp_missed_max.attr,
->>>>> +     &dev_attr_broadcast_neighbor.attr,
->>>>>         NULL,
->>>>>     };
->>>>>
->>>>
->>>> Then update your iproute2 package, sysfs use for options is discouraged
->>>
->>> Could you please explain in detail why this is discouraged?
->>>
->>>> and is not being extended on purpose. Move to netlink.
->>>
->>
->> Networking has been moving to netlink-only options for awhile now. Check for
->> example:
->> 1e16f382ae0b ("net: bridge: add warning comments to avoid extending sysfs")
->>
->> The preferred way to configure device types is via iproute2/netlink.
-> 
-> Thanks for your explanation, but I still don't understand the benefit
-> of it. Could you elaborate further?
-> 
+The async decrypt completion path mirrors the encrypt one but is missing
+the net reference that guards against the tipc_crypto being freed during
+netns teardown.
 
-The benefits of netlink over sysfs?? There are so many.. it will help if you
-look into how netlink vs sysfs operate. Netlink is structured, transactional,
-typed, easily extendable, you can dump, do specific queries, it is less calls 
-and it supports notifications. I'm sure I'm missing, but in a nutshell it's
-preferred. :)
+When crypto_aead_decrypt() is offloaded to cryptd (the SIMD aead wrapper
+queues the request when crypto_simd_usable() is false), the cryptd worker
+runs tipc_aead_decrypt_done() asynchronously. If the bearer's netns is
+torn down in the meantime, tipc_exit_net() -> tipc_crypto_stop() frees the
+tipc_crypto, and the completion then reads it: tipc_aead_decrypt_done()
+dereferences aead->crypto->stats and aead->crypto->net, and
+tipc_crypto_rcv_complete() dereferences aead->crypto->aead[] and the node
+table, reading freed memory:
 
+  BUG: KASAN: slab-use-after-free in tipc_crypto_rcv_complete
+  Read of size 8 at addr ffff888104c8c808 by task kworker/3:2/70
+  Workqueue: cryptd cryptd_queue_worker
+  Call Trace:
+   tipc_crypto_rcv_complete+0x1dd6/0x2240
+   tipc_aead_decrypt_done+0x1c3/0x300
+   cryptd_aead_crypt+0x3ae/0x660
+   cryptd_queue_worker+0x12b/0x200
+   process_one_work+0x66c/0x10c0
+   worker_thread+0x55d/0xc80
+   kthread+0x269/0x340
+  Allocated by task 1550:
+   tipc_crypto_start+0x7e/0x890
+   tipc_init_net+0x30d/0x480
+   ...
+  Freed by task 116:
+   tipc_crypto_stop+0x1a4/0x2a0
+   tipc_exit_net+0x11c/0x1c0
+   cleanup_net+0x510/0xaf0
 
+This is the same class of bug that commit e279024617134 ("net/tipc: fix
+slab-use-after-free Read in tipc_aead_encrypt_done") fixed for the
+encrypt side. The encrypt path takes maybe_get_net(aead->crypto->net)
+before crypto_aead_encrypt() and drops it with put_net() on the
+synchronous return paths and in tipc_aead_encrypt_done(); the -EINPROGRESS
+/-EBUSY return keeps the reference for the async callback to release. The
+decrypt path was left without the equivalent guard.
 
+Mirror the encrypt-side fix on the decrypt path: take a net reference
+before crypto_aead_decrypt() (failing with -ENODEV and the matching
+bearer put if it cannot be acquired), keep it across the -EINPROGRESS/
+-EBUSY async return, and drop it with put_net() on the synchronous
+success/error return and at the end of tipc_aead_decrypt_done().
+
+Reproduced under KASAN on v6.12.92: a UDP bearer with a cluster key is
+flooded with encrypted frames from an unknown peer (driving the cluster-
+key decrypt path) while the bearer's netns is repeatedly torn down. The
+SIMD aead must be forced onto its cryptd async child for the completion
+to outlive tipc_crypto_stop(), and the cryptd worker was delayed to land
+the narrow race deterministically; with the patch applied the same
+workload runs cleanly. Found by 0sec automated security-research tooling
+while auditing the siblings of commit e279024617134.
+
+Found by 0sec automated security-research tooling (https://0sec.ai).
+
+Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+---
+ net/tipc/crypto.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index 6d3b6b89b1d1..84a6489da036 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 		goto exit;
+ 	}
+ 
++	/* Get net to avoid freed tipc_crypto when delete namespace */
++	if (!maybe_get_net(aead->crypto->net)) {
++		tipc_bearer_put(b);
++		rc = -ENODEV;
++		goto exit;
++	}
++
+ 	/* Now, do decrypt */
+ 	rc = crypto_aead_decrypt(req);
+ 	if (rc == -EINPROGRESS || rc == -EBUSY)
+ 		return rc;
+ 
+ 	tipc_bearer_put(b);
++	put_net(aead->crypto->net);
+ 
+ exit:
+ 	kfree(ctx);
+@@ -984,6 +992,7 @@ static void tipc_aead_decrypt_done(void *data, int err)
+ 	}
+ 
+ 	tipc_bearer_put(b);
++	put_net(net);
+ }
+ 
+ static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
+-- 
+2.43.0
 
 
