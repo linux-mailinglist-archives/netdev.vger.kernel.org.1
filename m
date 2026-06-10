@@ -1,154 +1,177 @@
-Return-Path: <netdev+bounces-297777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /MwHMiyUKWr+ZwMAu9opvQ
-	(envelope-from <netdev+bounces-297777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:43:24 +0200
+	id lmh3OIiUKWojaAMAu9opvQ
+	(envelope-from <netdev+bounces-297778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:44:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A4666B9C8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:43:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F66866B9FD
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 18:44:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=J6w0LCPd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297777-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297777-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297778-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297778-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 82C553125D91
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:32:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 42F1031B3A4E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70689332EBB;
-	Wed, 10 Jun 2026 16:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B07B337BA4;
+	Wed, 10 Jun 2026 16:35:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27465332EAC
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 16:32:46 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5A21A683E
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 16:35:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781109169; cv=none; b=eDgtXo1YmVOiLXCuQSkrG4C206lkS6uNZ8hK3tV3vigw+8eLiBfgiHh3k8jimQ02oK8wQcbYhsy63U+O8AgcdKWeEtX9a3y8LJpYyLc+zpcx2ITX0UtJtIgN6Pq/RcXto6EzKomCDTpGFoWceAO9QovA5kiMkLvUJOQRVw/wl1Q=
+	t=1781109342; cv=none; b=UUrL2zVTwvXBB1oi69ctlAudgVc3Z3hcjuICVi3q2M/QigPVxI9hHK/mAgZ8BJ1ULdoMcqXPaZ/wlQQ6BeRjeNJpkfaFh4nx9JwZwZZCov0COxRqMz0b7ISZIOfOyQart8TZ81bWIXLQY6MmsCvQgWT68UKJPbwIsAR2GxH1W5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781109169; c=relaxed/simple;
-	bh=TMEzfUQLssg5wNKq/jlt1a3iau2h5D0PdUtQtzIN32I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L7ESRdVYPTdQj1sWcDGYk+2zLJPcbHRiwnBZmavky8UaShqv/fMo1DZz2hl/cD0OhbWZjdiMw/vb49nw/yMfMhFxdy3QSnEbhMoVrITvKUhj/e9sTNmmQ/f65dseJpnO+2DM+Eog4tpl5d/jxBzjRJEEZWY8qGicpqjilu4SYoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=J6w0LCPd; arc=none smtp.client-ip=185.171.202.116
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 5FC1BC4FEDD;
-	Wed, 10 Jun 2026 16:32:47 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 441305FFC9;
-	Wed, 10 Jun 2026 16:32:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D9456106B9B31;
-	Wed, 10 Jun 2026 18:32:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781109164; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=DJ6myqASREWHuJJOHXc0Aa1s/r8YHpCv7VS2pMiv0nE=;
-	b=J6w0LCPdG5UtkYkRNtVFCqKJL1exBSA8b6gtJkFG8z5mvYDfQ1rolBl+BwJMnKpGrtpzsd
-	a0WFBN8zXcw2HRUpKZUmdg9zehLNxGxGtwA5tt9DFNxsyi2T4Q3iwmAeHh5vFVR5TKvUGD
-	mK/DTj5krxkMNz/gmH2h9ZZT1pZxbpt0v1AUSYKaYwgH4MLMOzBXpouGISXNXxwW/UMy/i
-	Qmn8Yj4n67rP0IVGd2fP/7Hq5pnvL7fBh8oSLRKpqVIrqvl4m+KPjTK4h1WV5LO/9SscBo
-	sfoCYNPi0AvzHj66vm3Ho1jtNAXmmfXAyv0g/IUCExp152L1WC5ctn0Xypem3w==
-Message-ID: <6309a8e9-c0cb-4473-8d94-c6c4ca8ec3f9@bootlin.com>
-Date: Wed, 10 Jun 2026 18:32:38 +0200
+	s=arc-20240116; t=1781109342; c=relaxed/simple;
+	bh=RNrOcw2cd6RSgaCwtIgv/AGzXa3s9CKa0YF2HEC519k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=I93SYU3d6VAYZxRBsbeF1qNdjK8joGYRdzhaQR2lKukRA3nfzxJyPcVgtIa0svGhlzJKh69Qwr5XU7UMCIvIiZLyqA/Ptce3n4XCH95uJ49kPX9qo/wWwKEWivo3YEkiH1eFdJjBLVbquK7FNm8eTJ6D53lkuNesUKGZPas14G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.229.168.213
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACHqMJFkilql_R3AA--.54502S3;
+	Thu, 11 Jun 2026 00:35:20 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org
+Cc: dhowells@redhat.com,
+	marc.dionne@auristor.com,
+	kuba@kernel.org,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	bronzed_45_vested@icloud.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] rxrpc: input: reject ACKALL outside transmit phase
+Date: Thu, 11 Jun 2026 00:35:12 +0800
+Message-ID: <16a8974906e0d32578ffc2a47bba2329939b50e0.1780989782.git.bronzed_45_vested@icloud.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1780989782.git.bronzed_45_vested@icloud.com>
+References: <cover.1780989782.git.bronzed_45_vested@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/4] net: phy: realtek: add support for
- RTL8261C_CG
-To: javen <javen_xu@realsil.com.cn>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, freddy_gu@realsil.com.cn, nb@tipi-net.de
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- daniel@makrotopia.org, vladimir.oltean@nxp.com
-References: <20260609020727.1152-1-javen_xu@realsil.com.cn>
- <20260609020727.1152-4-javen_xu@realsil.com.cn>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260609020727.1152-4-javen_xu@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowACHqMJFkilql_R3AA--.54502S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF13CFy8tw13XFy3Aw43Jrb_yoW8trWDpF
+	W3Gr4rKrZ8XF4ayw47tryI9a15ZF4kGry3JFyDu3sYvFn8GF1YqF1kKa90qFZ8C3yxGrWU
+	JrZrKa4UCa17ArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8JVW8Jr1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsOCWopHlEJIwAAsr
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297778-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:linux-afs@lists.infradead.org,m:netdev@vger.kernel.org,m:dhowells@redhat.com,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[redhat.com,auristor.com,kernel.org,gmail.com,lzu.edu.cn,icloud.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[realsil.com.cn,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,tipi-net.de];
-	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297777-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,realsil.com.cn:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[icloud.com:mid,icloud.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lzu.edu.cn:from_mime,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 35A4666B9C8
+X-Rspamd-Queue-Id: 5F66866B9FD
 
-Hi,
+From: Wyatt Feng <bronzed_45_vested@icloud.com>
 
-On 6/9/26 04:07, javen wrote:
-> From: Javen Xu <javen_xu@realsil.com.cn>
-> 
-> This patch adds support for Realtek phy chip RTL8261C_CG. Its PHY ID is
-> 0x001cc898.
-> 
-> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+rxrpc_input_ackall() accepts ACKALL packets without checking whether
+the call is in a state that can legitimately have outstanding transmit
+buffers.  A forged ACKALL can therefore reach a new service call in
+RXRPC_CALL_SERVER_RECV_REQUEST before any reply packets have been
+queued.
 
-[...]
+In that state call->tx_top is zero and call->tx_queue is NULL, so
+rxrpc_rotate_tx_window() dereferences a NULL txqueue and triggers a
+null-pointer dereference.
 
-> +static int rtl8261x_config_aneg(struct phy_device *phydev)
-> +{
-> +	bool changed = false;
-> +	u16 adv_1g = 0;
-> +	int ret;
-> +
-> +	if (phydev->autoneg == AUTONEG_DISABLE)
-> +		return genphy_c45_pma_setup_forced(phydev);
+Fix rxrpc_input_ackall() to mirror the transmit-state gating already
+used for normal ACK processing, and ignore ACKALL when there is no
+outstanding transmit window to rotate.
 
-This condition above is already done when calling genphy_c45_config_aneg,
-is it really necessary to put it there ?
+Fixes: b341a0263b1b ("rxrpc: Implement progressive transmission queue struct")
+Cc: stable@vger.kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/rxrpc/input.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-> +
-> +	ret = genphy_c45_an_setup_master_slave(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +	if (ret > 0)
-> +		changed = true;
-
-I'm wondering if this call to genphy_c45_an_setup_master_slave() may actually
-be integrated directly into genphy_c45_config_aneg(), as we do for C22.
-
-It _may_ break some C45 phys that would rely on default values though, but this
-should be more correct ?
-
-Maxime
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 24aceb183c2c..d3fb3bc62e86 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -1206,8 +1206,22 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ static void rxrpc_input_ackall(struct rxrpc_call *call, struct sk_buff *skb)
+ {
+ 	struct rxrpc_ack_summary summary = { 0 };
++	rxrpc_seq_t top = READ_ONCE(call->tx_top);
++
++	switch (__rxrpc_call_state(call)) {
++	case RXRPC_CALL_CLIENT_SEND_REQUEST:
++	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
++	case RXRPC_CALL_SERVER_SEND_REPLY:
++	case RXRPC_CALL_SERVER_AWAIT_ACK:
++		break;
++	default:
++		return;
++	}
++
++	if (call->tx_bottom == top)
++		return;
+ 
+-	if (rxrpc_rotate_tx_window(call, call->tx_top, &summary))
++	if (rxrpc_rotate_tx_window(call, top, &summary))
+ 		rxrpc_end_tx_phase(call, false, rxrpc_eproto_unexpected_ackall);
+ }
+ 
+-- 
+2.47.3
 
 
