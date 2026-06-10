@@ -1,235 +1,177 @@
-Return-Path: <netdev+bounces-297451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2WfYDmn+KGpVOgMAu9opvQ
-	(envelope-from <netdev+bounces-297451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:04:25 +0200
+	id oIb7Gyj/KGp3OgMAu9opvQ
+	(envelope-from <netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:07:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297C06660F1
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:04:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813A666615B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:07:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=sxkWv3Dt;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297451-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297451-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=huawei.com header.s=dkim header.b=Zypc0XdB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=huawei.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9636A3023C11
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:04:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B94E7301DBB9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B244E282F2A;
-	Wed, 10 Jun 2026 06:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740E53438BD;
+	Wed, 10 Jun 2026 06:06:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012029.outbound.protection.outlook.com [52.101.48.29])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A07E2DCF6C;
-	Wed, 10 Jun 2026 06:04:03 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781071444; cv=fail; b=oyNz0QhtECKPJ7o1gZhxUnbBZoas1HWnht7DYXGBFuuAg/CpknpFuOXTZL6PPdzaVH9CnyWJMHKclwYdfyxNyMy92z2KW3hjnL4azLsZTXmAhRp87OSpAsbhEjJ8Eo72ZfwQOQ9aSgD7XQndDYcbMJDcAaxMBbaHgOiMrhrpcSM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781071444; c=relaxed/simple;
-	bh=oRQBolwRKakmBR2d98hIwQXqTbYRiG/n7S1FlUDX8kk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=blvfZo/thRO/NSdSsssnzGxLBDpdScuCNuAP/MDdUAVw1ArXSWYwa/Q7LyJWoVBDzaxoKYJNzeryOh2LEDBdzOzuUYEUids93e89ufOvmjRJo8iHbl5Cuh//TKGJjtncZrWVDxrfDlXpXyLVKp3tUy5tuy/R0pG1QFHJI5QVC8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sxkWv3Dt; arc=fail smtp.client-ip=52.101.48.29
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F7HUOKvJaCEcI7GvIdIefEVH0ew8Xb7hZ9bpWlg3s+UCCsn2kKWgkV8u1xc9c18NhOCBFOeKnN9RfiQ397qXbQhXEOe/r+HdCBozYPmTTiXeV6SQxxSDXjkTIOsSb22oDvnxSJhCRXSz6h4pMyjqWzQOoocQoC3vs8KfHkNsY5xEfomgwj3ShgbSwu9EDwBanbZZFHUFvKGVkGPoxxkMn2ng1VGLHhYMoBr05UDn4kl0I54A5o6lFBnoCJT9PkHNsJ/1GmMMGCyI+Ef7kgnrb11m/hvlJOAWkiASfjMTje829NOVHG+vUmILizxm9KTHNtra3+ibQgSkVjXaz2ToTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X4A5rDKLs5c1DfK3aRQLi2W+iLoqcDR+9XxDHsmCrRw=;
- b=DC+/qgWUiVQBPM3N7ie2hd3qxW7B9qzk2YqqTL3Pz4lN9XiPilyszTNnAmp9FeGTLNKpR1h8rrZ0Lkii4LCbfsYr4PDcAw7jq91Vly4qKV+ZY+JCDBmd2vnvfXkYgAt1wM6ZtDHC89lQYSttGyKvh/Fe84g+uR90n/uyF0iUMctpZU9qCJlAbNODiG/WFBpAhJ+sXcztat+vpAmiuyMiZflgRt5ypcfEENbcXpH6Bcx62QmjxN22bRCTK1+5zRiB4jXnbucFrg+1B7zAlf5kIKjV71xTOtkUV6Ny7oFopDMo/eMCqlaMFdcKODGZgjQgaBs1JTmurwPiWCOzLFXOtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X4A5rDKLs5c1DfK3aRQLi2W+iLoqcDR+9XxDHsmCrRw=;
- b=sxkWv3DtgkYHUdr123nYeO75k3fa5LSD5hdQLissRjOPl9mDoPmhUGDIwttydCKX+Ui3xn69F9XmxK0NPP35seQgjVT1h0jHS4VtLchU4hBDQIfUXXUBNx9CC1W0+H/Ryl+qUmqQQbAKBwWS2TCfGc0S5uLVQ2gr/VGsJFtnBHk=
-Received: from DM4PR12MB6254.namprd12.prod.outlook.com (2603:10b6:8:a5::17) by
- MN2PR12MB4062.namprd12.prod.outlook.com (2603:10b6:208:1d0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.14; Wed, 10 Jun
- 2026 06:04:00 +0000
-Received: from DM4PR12MB6254.namprd12.prod.outlook.com
- ([fe80::8211:9b5a:99d2:ffa1]) by DM4PR12MB6254.namprd12.prod.outlook.com
- ([fe80::8211:9b5a:99d2:ffa1%6]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
- 06:04:00 +0000
-Message-ID: <17b68fb1-768e-49f6-884d-49e0952621b8@amd.com>
-Date: Wed, 10 Jun 2026 07:03:54 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v27 3/5] cxl/sfc: Initialize dpa without a mailbox
-Content-Language: en-US
-To: "Dan Williams (nvidia)" <djbw@kernel.org>,
- alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-Cc: Dan Williams <dan.j.williams@intel.com>,
- Ben Cheatham <benjamin.cheatham@amd.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20260609215755.8685-1-alejandro.lucero-palau@amd.com>
- <20260609215755.8685-4-alejandro.lucero-palau@amd.com>
- <6a28a0c349c9b_4fa7810099@djbw-dev.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <6a28a0c349c9b_4fa7810099@djbw-dev.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0286.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:38f::13) To DM4PR12MB6254.namprd12.prod.outlook.com
- (2603:10b6:8:a5::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB49125B0B3;
+	Wed, 10 Jun 2026 06:06:36 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781071601; cv=none; b=oKrSuKdN6zxuie1YaUD+s0Yx0ZV1ZqDsTSKQHERcO9n2+4ab/1/oAG8GQ8u/oZ1c9PS7dEgMeU7xqJaGiMIV8PhOGWSeCRgxucy11EbspXBPjMgS4I86B0GxUJMExt1fPkC/ibtXlMpK9P9BcTY0g7Okph1tp+ZdBER0a3K+ao8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781071601; c=relaxed/simple;
+	bh=uAPz3u7FR97ImKZe49+xSl2+ebWGiEN63ft1iK99pZk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QDXXUjT5n0nHBWVEonFlAClKY2VV47EYgbEjDSCekRdhbStnu3Hw6w/uFJnbYFT0wZnuEmoCTmUTBDZfDuHHfc1qMCVBsdBr+A9yNwfLVjg5JXb9LGmunlS8cje543A/Vd3eHuPJ+g4wmCBNTuIhNq+5KbkYWAOfAJa7YGnXWbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Zypc0XdB; arc=none smtp.client-ip=113.46.200.225
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=OOt1/6axTY4K9Ez/wLDcMKt7dUwM/2HSAPJ0ngyJUJg=;
+	b=Zypc0XdBYGKpyQ3PcpI8ppCNMd39i2DWiDSFmsZgXVnVcHnVyo9SPyhhylPaSOXHEKiagWcNp
+	WElRzQB31sYKU8qzb6UHK6wWl6d8OyJHPjPktaiENHpDeURHEX4DUtV/QHidJpBewRUYxaIpRuE
+	m+xLv7CVNoy40KU5s4Ec3IA=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7j2dTjz1K990;
+	Wed, 10 Jun 2026 13:58:41 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 32CFC4056E;
+	Wed, 10 Jun 2026 14:06:34 +0800 (CST)
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 10 Jun 2026 14:06:33 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
+	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH V4 net-next 0/6] net: hns3: enhance tc flow offload support
+Date: Wed, 10 Jun 2026 14:06:12 +0800
+Message-ID: <20260610060618.834987-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6254:EE_|MN2PR12MB4062:EE_
-X-MS-Office365-Filtering-Correlation-Id: f193db5b-684f-4e38-91cd-08dec6b6109c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|921020|4143699003|11063799006|56012099006|3023799007|22082099003|6133799003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	PExHHrP4c3D9H7kvIyHkM4XVjxNbp4roYvgLPfwxyUWKUMD8Y+kaOfDW5ekfmzyvK4ORRERCxM1B45kLqqi/HivBbOWK5uWGdctCOCjYunhN2mab85TSEgx7bqZd8et2xSgrHfx7uXhGX5H0WsGyafrQX9IoT7khQn7IGu37/UYlGud/G6JtyhhdJ8tbfZ3WnuKe/PTAOVyd/MPm7TutbQGmvZU1ppwaT1DYS1ZN4qpRKEetBXtlnEziSQO2up706H7FNbLPpyjT9tt9REPpYWO/BJxSMOwhoHZnTRUe59aLSV46D4dVFpdpK3rxiPRzFQhV036B24gM6nC+koDMpZV7+b8sp9EgFXniPqGm3YYtI0YGPUB+rg0svIa5IKbXBPQXnneDHBXKF8ke9lxUNSj8eEo6lo4heS5Sx96kJJNiNsi5lypdEl0SkAaNTDc55f1+EeKx14VUgIzlFpAkzq/kuYq6Tzyy8onmMhb9CFd8xk08s6EZ9qt6+BViEFyZHDfBXQ9+XiAQO0KgCsZV3dJ/ivujM/nXGX8QCtN1RSkGFvdpMpcX1J46QkTgSBhQx3xbjpIhLGCFajmOxPuVCfr+b7c8HZkUhFlgR+R3nKoMOoC+jzzGCrI6ghQmPQWT7MF0e115ADbdEkjklx1q884TJdPibK1xn3eaIH97YVoLZuVNvC8EaMP/+4A01RSYRDhCD1ye7umGW3IYN7T9z6dk7/9DPZnjES/SX+7VvGOvC/s0X7hZotYrYN+Y1eW2
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6254.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(921020)(4143699003)(11063799006)(56012099006)(3023799007)(22082099003)(6133799003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NGx3RVEwNWlYWExjUmFSSWJPTm9oems5UFREOU4xcmxFWmppTzlMcnBJR09O?=
- =?utf-8?B?eEV0dGoxN2M1S2c4ZEJWZGcyTituaFhXV05EN1R0RE90TlRRZURwNkZLWlFx?=
- =?utf-8?B?T2dIeGE4YjNzZXU1Sm9tdnVVcGg5NzRIQStrOGNSY0kzSHBRS2cxczduZnJr?=
- =?utf-8?B?TVlqSVlPOGw1SmhaVXlkRnpyNVVxUHdVZG5mckQvdzBJd01iVGltcUU2a1Ar?=
- =?utf-8?B?bGp5SzZ0UWd5QVMydVE3Z3FYTjRNaFpqTWpzdkNZZ1M4OEtHTWp6RjRlWXc4?=
- =?utf-8?B?cjdIcktFUEtjajBIK0UxY05YZUpnUXU3NUs3TFFFbGg2US9SQm9DTSs1cVds?=
- =?utf-8?B?REhGeTdkdEVZNG9LeGt6blA4WTUzYll3Wk93dnFYdGtkNHJlVnZBUEdBaUFB?=
- =?utf-8?B?ekRJSzVreWQwWi9Mc1RIOTBBQmN0ZWsrOVNTY3JRUktXdmROeUEvQk9uRkJC?=
- =?utf-8?B?SDlHRkRicjRVSGQ3RGEwZXcrdTd6TFdzVzNidHpNaE5VcVlYYkpRYTUzK3Rq?=
- =?utf-8?B?ZWtHS1E3djBIWXZqUzF2Q2VZc1ZCTmZsYUswendhKzBCOVlCTVc3aTcrSGlm?=
- =?utf-8?B?ZFlhSDRBYnZabXhjQ1dzbU5HUkFPRndJcDA0R0ZnQkduQ0NjUnlOQWpYQjhj?=
- =?utf-8?B?WWhxejA4NXBIWldBYVVZK2I5czBMMEM0SUtKM3M4ZC9yS0NXZ1VhOHMyODZl?=
- =?utf-8?B?bUFVY2lOcGpJdjVOamQ3TTUvZlpoUUtQdW5iNU91K3BIL09VektVQ0FqOGNB?=
- =?utf-8?B?VXZVbU8rUEtkTmhlVDNyMXVVTlBUWkJjMWZpMlVLSG5yc0pVVys0YTFJQm9o?=
- =?utf-8?B?eUNsMTFDTHVaa1QzdTNoRnRuMGM4QW10YUJRNzlSWmlTWGpkbnp5SG80cWVv?=
- =?utf-8?B?UlJYTEtVRmcwRVBJRGM1Z0prY0kveUZiSE96R09VRUpxSXI5Wlo4RUNOTGta?=
- =?utf-8?B?ak1NakFvWXhFZm1Qd1dtYTZTQTBOaXpaZFdPRzFSN3RCeXdBNG82UmR6UVgy?=
- =?utf-8?B?R3VXQzhaRGp0WUJQNTBaWlB6cmdtNmlyZTg1ZWI5akdnaVR2Zy9KeW9BaWJX?=
- =?utf-8?B?dEZza1dPckZTRDZabnZmNFJVZ3A3TW1ocnRsaUVLaVAvU1VvYTRuTFhPZ0ZP?=
- =?utf-8?B?Ym4xVU0vV0RvMzladG5NdnBTeVVpQnVPTk84VVAvZVQxWFVDZzRrWGhtTWlL?=
- =?utf-8?B?OEIybmVrQkNmakY3Z3V0V2tRZTlSekR6VUcweGNGQlF0ei9NWmJvbHo3RmYr?=
- =?utf-8?B?ck93eUFRZUNJTWppaTUxYVZUb3ZDSnhDTitsWVFIbzBWM3hRanVrU0pTTU14?=
- =?utf-8?B?bVBVTlhXVGdqWVVpb2gyUXp2NUdpbkl5dWFrM1NSQnlwQWJzUHhFNm5wejdZ?=
- =?utf-8?B?cUYwT1cxdlp1cURaUDE2Qk92d0dnY2pRdVVZNkFIbkwvaXFEdFNYUXEwSVVn?=
- =?utf-8?B?c1VpdTZLUGhwT1B0Vm12cndnYjY3by9XWVFCMmdJZm81Y0pscVBnaHdaNENC?=
- =?utf-8?B?N0hrdml4c0FONTRlakMvclFOUWpSeGtmbit1a1JtbXR3WkpHazVza0tya2dX?=
- =?utf-8?B?TXYyYWFueDhFNVJsMklQTXZFU0VyT2R0NDIweGhMdWJkOXhqN1NGOU9CclhH?=
- =?utf-8?B?Z2pSUFJYTFNKL0E3R2FMTktXS0RxRzI1LzhzYlZEVlpzTmYzaURDTmEwMDZR?=
- =?utf-8?B?dCtLNmxLSHV5K08vMndNTEVaVlo2RFRGRjU1R21XNkI2bTcxNS83TTVEWkZB?=
- =?utf-8?B?VkloSHFrTVU0ZU5pUU11SzJNWFVuYXdvZDBRa3Y5N096ejFnbndtNm4xNkhQ?=
- =?utf-8?B?Q2hsYWoxbkZYclpveDJGL1JCNCtJb2IydUZuOStaQlVZTmhPdk9PbHBjeG1U?=
- =?utf-8?B?ZkpOcm9iM2lBQVdSZzFzUisyM25SN0NUMjhsVU9sMm9uWHFncU90YitQckNi?=
- =?utf-8?B?bVNTdFVOZ29mN3dEYmMxbmNUb2JsZGR5ZmtRWW1Obkw2Z0JnVE9HM1c3Yjdn?=
- =?utf-8?B?bXdUVS8xQjg1dVlhUnB5WjdLblJrVm05ZmsxU3RIdEw5VCtYT0dnL3ZzSDFn?=
- =?utf-8?B?TzNIanN4WTJKczJFWjdoQVhwYXZGN2pwaGlRdTdTSytaUFJpbEpXbis2ajFH?=
- =?utf-8?B?OXg3c21PNDdTN1VzMnFwTGlsZkFlQnpkN2JPUTZ4RTBiazJRY09PY2N2ZzNW?=
- =?utf-8?B?cHlMeUNDa2tFSHVTRDNlQllQbkZIdVpIeGJCcVBxRkdVODVBc2ZEZFRmQ2hm?=
- =?utf-8?B?alNPa0Y3bEZFYVJSQU84ekpwR0J1UlQ0Tm9PUEQ0dk9WSVJEM0RYU0Z0ZTd3?=
- =?utf-8?B?azZYYXdxWVBPTG1MWVFvaUtCQ1dKWmRiV3lDbytzOXM5UUExbC9FQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f193db5b-684f-4e38-91cd-08dec6b6109c
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6254.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 06:04:00.2617
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JvC1KQ7Uw4rsNDaC9ZiktN2Pywr4/FNN/4mHFzyE8/rDUYfKBBSZN6pWVe2I7mK/sDp/ulNgdVfSSpd8yfcmzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4062
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-297452-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297451-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:djbw@kernel.org,m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:dan.j.williams@intel.com,m:benjamin.cheatham@amd.com,m:Jonathan.Cameron@huawei.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:dkim,amd.com:email,amd.com:mid,amd.com:from_mime,vger.kernel.org:from_smtp,huawei.com:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:mid,huawei.com:from_mime,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 297C06660F1
+X-Rspamd-Queue-Id: 813A666615B
+
+This patchset enhances the tc flow offload support for hns3 driver:
+
+- Patch 1: Refactor hclge_add_cls_flower() to support more actions
+- Patch 2: Improve unused_tuple parameter setting for separate src/dst configuration
+- Patch 3: Add support for HCLGE_FD_ACTION_SELECT_QUEUE and HCLGE_FD_ACTION_DROP_PACKET actions
+- Patch 4: Add support for FLOW_DISSECTOR_KEY_IP and FLOW_DISSECTOR_KEY_ENC_KEYID dissectors
+- Patch 5: Add debugfs support for dumping FD rules
+- Patch 6: Move FD code to a separate file (hclge_fd.c) for better code organization
+
+---
+v3 -> v4:
+  - Fix issues pointed out by Jakub Kicinski:
+    a) Fix byte order issue of KEY_OPT_VNI under big-endian architectures.
+    b) Fix issue where match.mask->ttl was silently ignored in FLOW_DISSECTOR_KEY_IP.
+  - Use NL_SET_ERR_MSG_MOD() and extack to return errors instead of dev_err(),
+    as suggested by Jakub.
+  - Links:
+    v3: https://lore.kernel.org/all/20260602133337.2216918-1-shaojijie@huawei.com/
+    AI report: https://sashiko.dev/#/patchset/20260602133337.2216918-1-shaojijie%40huawei.com
+
+v2 -> v3:
+  - Fix issues pointed out by Simon Horman and Paolo Abeni:
+    a) Fix incorrect condition for identifying unused tuples when IP/MAC
+       addresses are all-zero but masks are non-zero.
+    b) Fix inappropriate log output in error paths.
+    c) Fix issue where tc flower supported keys did not distinguish between
+       different FD modes.
+    d) Fix unnecessary distinction between IPv4 and IPv6 in debugfs.
+  - Links:
+    v2: https://lore.kernel.org/all/20260523105449.661848-1-shaojijie@huawei.com/
+    AI report: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260523105449.661848-1-shaojijie%40huawei.com
+
+v1 -> v2:
+  - Fix "restricted __le32 degrades to integer" warnings, pointed out by Jakub.
+  - Fix "diagnostic behavior may be improved by adding 'format(printf, 5, 7)'"
+    warnings, pointed out by Jakub.
+  - Link:
+    v1: https://lore.kernel.org/all/20260518093526.1109595-1-shaojijie@huawei.com/
+---
+
+Jijie Shao (6):
+  net: hns3: refactor add_cls_flower to prepare for multiple actions
+  net: hns3: improve the unused_tuple parameter setting
+  net: hns3: support two more actions for tc flow
+  net: hns3: support IP and tunnel VNI dissectors for tc flow
+  net: hns3: debugfs support for dumping fd rules
+  net: hns3: move fd code to a separate file
+
+ drivers/net/ethernet/hisilicon/hns3/Makefile  |    1 +
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |    3 +-
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |    6 +
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |    3 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |  155 +
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.c | 2593 +++++++++++++++++
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.h |   33 +
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 2514 +---------------
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |    6 +
+ 9 files changed, 2840 insertions(+), 2474 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.h
 
 
-On 6/10/26 00:24, Dan Williams (nvidia) wrote:
-> alejandro.lucero-palau@ wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Type3 relies on mailbox CXL_MBOX_OP_IDENTIFY command for initializing
->> memdev state params which end up being used for DPA initialization.
->>
->> Allow a Type2 driver to initialize DPA simply by giving the size of its
->> volatile hardware partition.
->>
->> Move related functions to memdev.
-> The code movement is not strictly necessary. Just add cxl_set_capacity()
-> and we can consider a move later if mbox.o and memdev.o are ever not
-> both included in cxl_core.o by default.
-
-
-I think it is the right thing to do as the new function uses add_part() 
-(moved) and the other add_part() client is the other function moved, 
-cxl_mem_dpa_fetch().
-
-Note cxl_mem_get_partition() used by cxl_mem_dpa_fetch() is the one 
-working with mbox commands and it remains in the same place inside 
-core/mbox.c and the only cxl_mem_dpa_fetch() client is cxl/pci.c
-
-
-This was reviewed and accepted so no reason for not doing it ...
-
-
->
->> Add sfc driver as the client.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
->> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> [..]
->> +/**
->> + * cxl_set_capacity: initialize dpa by a driver without a mailbox.
->> + *
->> ++ * @cxlds: pointer to cxl_dev_state
-> Stray "+"?
-
-
-I'll fix it.
-
-
-Thanks!
+base-commit: 61abe5db23f0799e602352c796de6fcf76d23b41
+-- 
+2.33.0
 
 
