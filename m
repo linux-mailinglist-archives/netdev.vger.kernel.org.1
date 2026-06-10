@@ -1,280 +1,243 @@
-Return-Path: <netdev+bounces-297671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297672-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7xLSNF9gKWrXVwMAu9opvQ
-	(envelope-from <netdev+bounces-297671-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:02:23 +0200
+	id eoHxNdtgKWr2VwMAu9opvQ
+	(envelope-from <netdev+bounces-297672-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:04:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF7066989A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:02:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78DFF6698FA
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:04:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NewJnCjw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297671-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297671-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=linux.dev header.s=key1 header.b=WUy0xljL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297672-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297672-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F0DBD308EF8F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:57:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 93A9B30B7F99
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA79401496;
-	Wed, 10 Jun 2026 12:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A645D218EBA;
+	Wed, 10 Jun 2026 13:00:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB1D3E95A9
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 12:57:27 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781096257; cv=pass; b=tfYPqv/1yvsx3kJ9rjiqcZGGo5gruaChIYWqHKmOC0XSc0l6z4EkxKC2BvwlI8akNESuhSZ8ttQLKTPnYXvslKXQSiumd88c5MrMvU3r6J0HWNnY6AxZTzT0IzdfglhOx5cTdD307Kt7/vswI+S9AH+tfEc5JzVVgenBuoLb0wk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781096257; c=relaxed/simple;
-	bh=q2xrk2+3HgVBwtdYlqpdYX5IRzhRsvOcg4kEjVmgO2s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=chN5nGm0bdrsKf+NetBwmzdsEIdhDBtEDbJnfO4yiT6tuyHKOGcH+dTFSdx/+g3ZupXP9x12NyQmKmudCZxh3ckCRzRa+8bd2vWm32elaVluqj08B5b1UAbp7l3d7ZjVdAHLsc6PB7OOUPpulGJFMLI9vyMkH8N/DL7htmGHELs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NewJnCjw; arc=pass smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-7e0fc8ead7eso71832467b3.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 05:57:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781096247; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BU4r5AoQMZxXDficUI+wO2oeifbU27GMacA6fEb2YSOJSETqoE0Et1MCi31qtv1bHD
-         QLtdhOV38IUEAdkOXV/0ryO4HIu7iYMXJsv/uIFzTFWOq9BnB+c6HtjnCJWgxphKdzQd
-         zvTpOgzSbtunj/uEeDfEoBDQ5FpFsh8gYxf4CMq0veK1djUP6ccGU6bXiRreSmm5mZh4
-         JWsVmBYOumyHYJ7Xa7F8gItQyVjfc06xIz7ouXsKUGEPkW2MFzWPXkK0pw49LELotiFq
-         OIc1hl5P80A5AekuxFMYiR3/5m3mVKUUtKkwyl44yAVWHPzQCgQWfPSUJ7cq8uVoEV5A
-         wiFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qgB64hxjLKV54PVNKO9CubkDHQaU9AKR4BLgHTuoKgU=;
-        fh=02xq1mbVUlueCs600WjfOh4avCXnXbGBIQ4PWA+Pu2Y=;
-        b=by/qv/4D8dz/Vro0EKVm7Gon3XdIVceE7ML1GLn81j/a66iMwigejObMhdKuYfLKUB
-         bpFETlI+PoK/bh2qhvqFG2Nrk3rVM6Uk8QRoowr/c++TIJwxiMmlWYSCo31/Qk2qQ3wv
-         9b9ClKtrYjBd7TiFhsMj7IgH6c9HOc2zM5VNXvOvIu6z/VDjyCOryBZGjkSRdqWXCo+Y
-         R/jMt7gypTHTqV46SjdWWwUvx1WDDH5CDT2zJ4sCarqWI8pjnewxwO2VISiwlt3Wv+tP
-         l0BuvmnhJyfJFxwEapuRaQt3LyqSKd2AqZ9/aCdNGxCh5ph3Gd0iz7vHmcxAZGcHsrWJ
-         eB1A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781096247; x=1781701047; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qgB64hxjLKV54PVNKO9CubkDHQaU9AKR4BLgHTuoKgU=;
-        b=NewJnCjw8sgiSbGtR6pyHLDeuEbzFgLypp9t8s0zNclnj2gMsnvdnE/6SeAeqGRSK1
-         yD8Bc7YEiDGHGKKop6ftsudm04WZ4BSw6KnzFtaK7cIr/zFMKP//X6kZiAbxjQAn6TsC
-         TmzHbHHa324+htcuuL3sCnXDpWKkYR+gV+nHREK0FCKC/CZSnpUJ5DxfrNXUugGEF46q
-         6tiYtHVADYy0CN+y+bMGMgcZLd2NYsYYpPmdpSHYvhkr5VYh6Bgy/qeqFrqj/XbrPj09
-         vFgO4o6GSn197SjMU8yANb7x/Lrdz0U2Q2YgRChQR7IVz2n+tN0GutZ514I9ISDOXe4G
-         EH4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781096247; x=1781701047;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qgB64hxjLKV54PVNKO9CubkDHQaU9AKR4BLgHTuoKgU=;
-        b=rA2byuJjqR+s8Iahz7wsbhS6zsIrr38weLqQdfoxMhVyHoqYNoD3/czBa2+soQxzd0
-         X2UaPP+CNNTDtzc7gCap68y3uiDfulfx/DeWteUaTO4hcRtH2nc+PFlaCdPvb7Ab/TUu
-         D6I2nC8DL1w5a4fK/c4mej/CcJy3FVxSUFjlVmnDjdyG/q4cvDxxcpinHpVR7VRM9Pdu
-         fSiB3ov0gsBzX8pJ7eh93uphtk9vNt9Pk++0LUhPy/J7kq8VGCm+6Vp469oFGajgX2Yx
-         LnzFqNTW/syavFYrN9G+uJ31CgspTbBgSPFG8Mz6XrdLOZdWurHHhPqjKcCcfQYJAcOn
-         iOMw==
-X-Forwarded-Encrypted: i=1; AFNElJ96OI1z+HAxrEYjJ8HxqZeRL7We7GYjuhreqI19GQ49vg7o4O4m9N2b6+t4OicXJAofv0tyWDg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJpRUlvPUUGMzKV6KfObvLVcnTR8bQ/GoTenwvAK5jH33htr/l
-	Id2hyyCg1zes02TIdaeB83wByHK7kRm6Qqhvj58pS+jt3Q6bSdPnaXxUUiLRVZJtMXn7IjAMUAE
-	Rxk9i04fXMNB2q8cQdQYtsAKRylJDq0w=
-X-Gm-Gg: Acq92OE6udIxIedDXC5LdBaOtfPdet5PjDR6cUkAsd1Lxs1Gd6LGiWtgEvbBSyTtDvH
-	y3O0CUh8lXSM+5AjxALekrUICaMnZA6/1Wyygm9A6IuCnLYkA1NiVJ5LIzGb40+sFQbycUBeE3J
-	eSLy/VS8SIwUI3Bi+c/+xDXFDBENNFORAPnGo8uHcVdTgZ8yfpZiycDFR320i7+GXQDTUKfMUzF
-	Lind7DVJ1o71kNakMYK8qhA2lOydnW7jDZIP5kg2MfjGla/1BoC8NrP8LD0pqDET3QDl9lNo+bV
-	nl86We0rb05E84Mtf9vgrNDFb9mCK1e6Rt330mbz8U43o2MdHd4=
-X-Received: by 2002:a05:690c:e3ec:b0:7c0:de77:f475 with SMTP id
- 00721157ae682-7ed0b874511mr247378527b3.8.1781096246753; Wed, 10 Jun 2026
- 05:57:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24993E16AB
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:00:18 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781096420; cv=none; b=I6PaBf9cljZEIDEgpETle+H9U5u5E72OMNfr18UJeneO7lA9XYFwB61qH21IAEXqOhK4ieSTqPPST1+8droXaPFYzAi1LqAHu2u3dCC4bZLDDsWo9KjNpU+vJjkOSfPlaeu0YUH1STrTXa6aGzI71ZbHjqEiJG+H8g0vFNJsCF8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781096420; c=relaxed/simple;
+	bh=A9EvpKcqN53vmQLvEM3hL0lEKlk78UrMK3C3bXsNnZI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PScbhevz20lB1bWkS3KQOQytjrli4wIh1T1gAqLCwNO8SP7kGTMzv+8nnniOoKpr8GEAQroOFqPIRK8DV70qJ0Agkpy5QeJhw2nrhVjAMK1PDukTVIjgCZttk0+5h45B5/IbGgcq3I+uvLjJeD0zEG/0KLuNUGpzVZj64ykaiBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WUy0xljL; arc=none smtp.client-ip=95.215.58.183
+Message-ID: <08c35c70-a59e-4e0e-91db-22b5ec30b611@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781096407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5SGtVNbcwG9pfhAaZcDYoFasUWq/H1TadDKPDknF8II=;
+	b=WUy0xljLQiJAIo67fX3LQRJbG2sHV+A9+3ozf9jf9XImgyJA9KCXtOyj593qFuDCYbCYQg
+	ra5M/me58EipPsMZMBemokyOnIQGyn3qBFvzbjJ0FxEToT9cndDdD/tmfvxpMnsu4GHBUu
+	twjmYgOsWPZbcu+UB12Eqbv3UcTHuFU=
+Date: Wed, 10 Jun 2026 20:59:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260610120812.49054-1-laoar.shao@gmail.com> <1f949cfc-eebc-4813-9dfc-b9a9ec79494d@blackwall.org>
- <CALOAHbBeBez2DAQD+1PPc1Dmm0HH0PQcytG-eaxgWyThRt890A@mail.gmail.com>
- <dd10cb23-261c-40b1-8b33-15a519f366c8@blackwall.org> <69e48cef-5c98-44c8-8855-5a2ebe615c94@blackwall.org>
-In-Reply-To: <69e48cef-5c98-44c8-8855-5a2ebe615c94@blackwall.org>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Wed, 10 Jun 2026 20:56:50 +0800
-X-Gm-Features: AVVi8Ce3T2su91XKm-hLYAiIPwd3EF1Y39K5uZr_TnJRNQZMSKNSVg93xiCq9VQ
-Message-ID: <CALOAHbC4Z1TFL9xY4QZzdDsvQ9h-MfxkZRjPVG_JPHCzGNjpyw@mail.gmail.com>
-Subject: Re: [PATCH net-next] bonding: add sysfs interface for broadcast_neighbor
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, Tonghao Zhang <tonghao@bamaicloud.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf v2] bpf: Run generic devmap egress prog on private skb
+To: Sun Jian <sun.jian.kdev@gmail.com>, bpf@vger.kernel.org
+Cc: Menglong Dong <menglong.dong@linux.dev>,
+ Emil Tsalapatis <emil@etsalapatis.com>, Jiayuan Chen
+ <jiayuan.chen@linux.dev>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Hangbin Liu <liuhangbin@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vu?=
+ =?UTF-8?Q?sen?= <toke@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260610102850.483291-1-sun.jian.kdev@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260610102850.483291-1-sun.jian.kdev@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:sun.jian.kdev@gmail.com,m:bpf@vger.kernel.org,m:menglong.dong@linux.dev,m:emil@etsalapatis.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:liuhangbin@gmail.com,m:toke@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:sunjiankdev@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297672-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297671-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:razor@blackwall.org,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:tonghao@bamaicloud.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,etsalapatis.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,redhat.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RSPAMD_EMAILBL_FAIL(0.00)[laoarshao@gmail.com:query timed out,razor.blackwall.org:query timed out,tonghao.bamaicloud.com:query timed out];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,blackwall.org:email,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,bamaicloud.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BCF7066989A
+X-Rspamd-Queue-Id: 78DFF6698FA
 
-On Wed, Jun 10, 2026 at 8:52=E2=80=AFPM Nikolay Aleksandrov <razor@blackwal=
-l.org> wrote:
->
-> On 10/06/2026 15:45, Nikolay Aleksandrov wrote:
-> > On 10/06/2026 15:39, Yafang Shao wrote:
-> >> On Wed, Jun 10, 2026 at 8:30=E2=80=AFPM Nikolay Aleksandrov <razor@bla=
-ckwall.org> wrote:
-> >>>
-> >>> On 10/06/2026 15:08, Yafang Shao wrote:
-> >>>> The upstream kernel has supported broadcast_neighbor for 802.3ad mod=
-e since
-> >>>> commit ce7a381697cb ("net: bonding: add broadcast_neighbor option fo=
-r
-> >>>> 802.3ad").
-> >>>> When upgrading from our local kernel to 6.18.y stable, we switched f=
-rom our
-> >>>> out-of-tree implementation to the upstream one.
-> >>>>
-> >>>> However, the iproute2 package on our production servers is too old t=
-o
-> >>>> support the broadcast_neighbor option. To enable this feature, add a=
- new
-> >>>> sysfs attribute at:
-> >>>>
-> >>>>     /sys/class/net/<bond>/bonding/broadcast_neighbor
-> >>>>
-> >>>> This allows enabling the feature by writing "1" to the sysfs file, m=
-atching
-> >>>> the interface we previously maintained in our local kernel.
-> >>>>
-> >>>> The result is as follows,
-> >>>>
-> >>>> - For 802.3ad mode
-> >>>>
-> >>>>     $ ip link add bond0 type bond mode 802.3ad
-> >>>>     $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>     0
-> >>>>     $ echo 1 > /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>     $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>     1
-> >>>>
-> >>>> - For other modes
-> >>>>
-> >>>>     $ ip link add bond1 type bond
-> >>>>     $ cat /sys/class/net/bond1/bonding/broadcast_neighbor
-> >>>>     0
-> >>>>     $ echo 1 > /sys/class/net/bond1/bonding/broadcast_neighbor
-> >>>>     bash: echo: write error: Permission denied
-> >>>>
-> >>>> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> >>>> Cc: Tonghao Zhang <tonghao@bamaicloud.com>
-> >>>> ---
-> >>>>    drivers/net/bonding/bond_sysfs.c | 12 ++++++++++++
-> >>>>    1 file changed, 12 insertions(+)
-> >>>>
-> >>>> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/
-> >>>> bond_sysfs.c
-> >>>> index eaba44c76a5e..24eb23634d98 100644
-> >>>> --- a/drivers/net/bonding/bond_sysfs.c
-> >>>> +++ b/drivers/net/bonding/bond_sysfs.c
-> >>>> @@ -750,6 +750,17 @@ static ssize_t bonding_show_ad_user_port_key(st=
-ruct
-> >>>> device *d,
-> >>>>    static DEVICE_ATTR(ad_user_port_key, 0644,
-> >>>>                   bonding_show_ad_user_port_key, bonding_sysfs_store=
-_option);
-> >>>>
-> >>>> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
-> >>>> +                                            struct device_attribute=
- *attr,
-> >>>> +                                            char *buf)
-> >>>> +{
-> >>>> +     struct bonding *bond =3D to_bond(d);
-> >>>> +
-> >>>> +     return sysfs_emit(buf, "%d\n", bond->params.broadcast_neighbor=
-);
-> >>>> +}
-> >>>> +static DEVICE_ATTR(broadcast_neighbor, 0644,
-> >>>> +                bonding_show_broadcast_neighbor, bonding_sysfs_stor=
-e_option);
-> >>>> +
-> >>>>    static struct attribute *per_bond_attrs[] =3D {
-> >>>>        &dev_attr_slaves.attr,
-> >>>>        &dev_attr_mode.attr,
-> >>>> @@ -789,6 +800,7 @@ static struct attribute *per_bond_attrs[] =3D {
-> >>>>        &dev_attr_ad_actor_system.attr,
-> >>>>        &dev_attr_ad_user_port_key.attr,
-> >>>>        &dev_attr_arp_missed_max.attr,
-> >>>> +     &dev_attr_broadcast_neighbor.attr,
-> >>>>        NULL,
-> >>>>    };
-> >>>>
-> >>>
-> >>> Then update your iproute2 package, sysfs use for options is discourag=
-ed
-> >>
-> >> Could you please explain in detail why this is discouraged?
-> >>
-> >>> and is not being extended on purpose. Move to netlink.
-> >>
-> >
-> > Networking has been moving to netlink-only options for awhile now. Chec=
-k for
-> > example:
-> > 1e16f382ae0b ("net: bridge: add warning comments to avoid extending sys=
-fs")
-> >
-> > The preferred way to configure device types is via iproute2/netlink.
-> >
-> >
->
-> The author of this option also had sysfs initially in his patch-set and
-> then removed it, here's my comment at that time:
-> https://lore.kernel.org/all/d0e0379e-79fb-4a95-b160-6c1ca4276081@blackwal=
-l.org/
->
-> and also Jay's confirmation that sysfs shouldn't be extended:
-> https://lore.kernel.org/all/1319073.1747143053@vermin/
 
-Understood. So we'll have to keep this patch in our local kernel.
-The production environment is complex enough as it is... ;-)
+On 6/10/26 6:28 PM, Sun Jian wrote:
+> Generic XDP devmap multi redirect uses skb_clone() for the
+> intermediate destinations and sends the last destination with the
+> original skb. This can leave multiple destinations sharing the same
+> packet data.
+>
+> This becomes visible when a devmap egress program mutates packet data.
+> One destination can observe changes made for another destination. The
+> last-destination path has the same problem: the last destination runs on
+> the original skb, so its egress program can modify packet data still
+> shared with earlier cloned skbs.
+>
+> Native XDP broadcast redirect does not have this issue because
+> xdpf_clone() copies the frame data for each destination. Generic XDP
+> should provide the same per-destination isolation before running a
+> devmap egress program.
+>
+> Fix this by making cloned skbs private in dev_map_generic_redirect()
+> before running the devmap egress program. Use skb_copy() instead of
+> skb_unshare() so that allocation failure does not consume the skb and
+> the existing caller error paths keep their ownership semantics.
+>
+> Add a selftest that covers the last-destination case where earlier
+> destinations do not have a devmap egress program, while the final
+> destination does.
+>
+> Tested with:
+>    ./test_progs -t xdp_veth_egress
+>    ./test_progs -t xdp_veth
+>    ./test_progs -t xdp
+>
+> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+> Suggested-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+> ---
+> v1: https://lore.kernel.org/bpf/CABFUUZFimdrZdq=NWi+N-0sJZWvMwY=f4iF6-3TVMS8=m07Zmw@mail.gmail.com/
+>
+> Changes in v2:
+> - Move the private-copy step into dev_map_generic_redirect() so the
+>    last-destination path is covered as well.
+> - Use skb_copy() instead of skb_unshare() to keep caller ownership
+>    unchanged on allocation failure.
+> - Add a generic XDP last-destination selftest case.
+>
+>   kernel/bpf/devmap.c                           |  10 ++
+>   .../selftests/bpf/prog_tests/test_xdp_veth.c  | 151 +++++++++++++++++-
+>   2 files changed, 158 insertions(+), 3 deletions(-)
+>
+> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> index cc0a43ebab6b..59f267685bc6 100644
+> --- a/kernel/bpf/devmap.c
+> +++ b/kernel/bpf/devmap.c
+> @@ -700,12 +700,22 @@ int dev_map_enqueue_multi(struct xdp_frame *xdpf, struct net_device *dev_rx,
+>   int dev_map_generic_redirect(struct bpf_dtab_netdev *dst, struct sk_buff *skb,
+>   			     const struct bpf_prog *xdp_prog)
+>   {
+> +	struct sk_buff *nskb;
+>   	int err;
+>   
+>   	err = xdp_ok_fwd_dev(dst->dev, skb->len);
+>   	if (unlikely(err))
+>   		return err;
+>   
+> +	if (dst->xdp_prog && skb_cloned(skb)) {
+> +		nskb = skb_copy(skb, GFP_ATOMIC);
+> +		if (!nskb)
+> +			return -ENOMEM;
+> +
+> +		consume_skb(skb);
+> +		skb = nskb;
+> +	}
+> +
 
---=20
-Regards
-Yafang
+
+LGTM.
+
+
+Please split selftest as a seprated patch of a patchset.
+
+>   	/* Redirect has already succeeded semantically at this point, so we just
+>   	 * return 0 even if packet is dropped. Helper below takes care of
+>   	 * freeing skb.
+> diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
+> index 3e98a1665936..1f0b9ade12fe 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
+> @@ -456,7 +456,11 @@ static void xdp_veth_egress(u32 flags)
+>   			.remote_flags = flags,
+>   		
+
+
+[...]
+
+> +	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
+> +		struct bpf_devmap_val devmap_val = {};
+> +		int ifindex = if_nametoindex(net_config.veth_cfg[i].local_veth);
+> +
+> +		SYS(destroy_xdp_redirect_map,
+> +		    "ip -n %s neigh add %s lladdr 00:00:00:00:00:01 dev %s",
+> +		    net_config.veth_cfg[i].namespace, IP_NEIGH,
+> +		    net_config.veth_cfg[i].remote_veth);
+> +
+> +		if (attach_programs_to_veth_pair(bpf_objs, VETH_EGRESS_SKEL_NB,
+> +						 &net_config, prog_cfg, i))
+> +			goto destroy_xdp_redirect_map;
+> +
+> +		err = bpf_map_update_elem(mac_map, &ifindex, egress_macs[i], 0);
+> +		if (!ASSERT_OK(err, "bpf_map_update_elem"))
+> +			goto destroy_xdp_redirect_map;
+> +
+> +		devmap_val.ifindex = ifindex;
+> +		devmap_val.bpf_prog.fd = -1;
+> +
+> +		if (i == VETH_PAIRS_COUNT - 1)
+> +			devmap_val.bpf_prog.fd =
+> +				bpf_program__fd(xdp_redirect_multi_kern->progs.xdp_devmap_prog);
+> +
+> +		err = bpf_map_update_elem(egress_map, &ifindex, &devmap_val, 0);
+
+
+The kernel walks DEVMAP_HASH in bucket order so I don't think we can 
+guarantee that the entry at VETH_PAIRS_COUNT - 1 is the last dst.
+
+Could we use i as the key instead, so the entry order becomes 
+deterministic? (bucket is key & (n_buckets - 1).)
 
