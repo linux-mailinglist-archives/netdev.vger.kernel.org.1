@@ -1,84 +1,96 @@
-Return-Path: <netdev+bounces-297482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297483-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id V+0pEBoFKWqsOwMAu9opvQ
-	(envelope-from <netdev+bounces-297482-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:32:58 +0200
+	id rRUaKUYFKWq5OwMAu9opvQ
+	(envelope-from <netdev+bounces-297483-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:33:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90CEA666463
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:32:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F4150666476
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:33:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=blackwall.org header.s=google header.b=Rkohv5Ib;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297482-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297482-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=1eZ8uAO1;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FvImT5ig;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=1eZ8uAO1;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FvImT5ig;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297483-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297483-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6251B304EA1B
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:27:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2ADB3010B83
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E288C3019BA;
-	Wed, 10 Jun 2026 06:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB3F372EE4;
+	Wed, 10 Jun 2026 06:28:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE721A5B90
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BD437104C
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:28:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781072835; cv=none; b=PHt0ZmXCAJEaM1rDeGsdXC0xPYWsmUtUPlnq68ogEmRyy3P97wWGZVFigIgb4zLldNaAF2RtkMi+660B4Q2ZmQTcCCpcuCVjSwFW8sBVk+THYScUgVKwj+n9opAKWPjk3DF/m2ssG7ol9nDUxtM+ZQV14T4htWjyyemrzhuieYY=
+	t=1781072907; cv=none; b=lhv86xmAaOME+6hM8vcNgV9hoN7Yqb5fZca1X1eMhqgY4wxyef4KD+a1hh+FLGkGji9KlNxlj5/OD0eLglL1bPfy28Tqqu71w+H9eA14i2kVUKlx/AZmrjArp4n/UHVvrYvSdN4m+e0R1hATBtBNbpkOvv/jhaKsasBweN86mTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781072835; c=relaxed/simple;
-	bh=zHk4TF/iCDFb1jjnvh8IIfqq0u5BFsKY/w2Jt09Hfyc=;
+	s=arc-20240116; t=1781072907; c=relaxed/simple;
+	bh=DyTeYd9vnRDq8G0JZHC8wrAMUnfSahzSGTPtCFrWgkA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e0DGHZoJWmGbdCNW38JS49cc/WZFdvi+reHH0JEEDrg99bQNWPgkjI7DxrLnH34H7NcKWutfOkOy9+W6THuYMibuDua0garn3nNnsgvYdtXFquELDwsNtEQG9/jx2AB9tSPGNoPi1YTBsLNJ18nKkpQ44848iwdk3dRqhFznq2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Rkohv5Ib; arc=none smtp.client-ip=209.85.128.50
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-490b1bbcf3aso52628425e9.1
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 23:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1781072833; x=1781677633; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9oxKVU0hw/V+LeBxqsgE4VPZXZMlQT+5pcvHUiDUUjA=;
-        b=Rkohv5IbhJ3qrjRZoLvauS7SQ2OlrHJqonuJ5MGLwPMTnrVgvllyf8edknz3es5+to
-         /DVSRd2EcHOMqIfYqZ238iDenHSNDLRN4t8W+ysrMR7aMTdx8jB8l+BkmYVIj6RVce2I
-         lkEKYo344cOluCgOEIjzOX/V0/egu3ejf035sWCWEqua3mknptM0E6A9BAjBHAhP1ULy
-         7QMXJ5yxrBvxuBhkKea4BNuQKNhgCQkmE8U4YK1vUpDMXQi/ThwUv7x3hQrW1PUrzfS6
-         aSwb3LNuQUpfTE7xe+QgZIrUaROQRCsPXW68KZ5s9bEZ9y6CSoV5qtPe0c+lfYv3Lupg
-         Jt1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781072833; x=1781677633;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9oxKVU0hw/V+LeBxqsgE4VPZXZMlQT+5pcvHUiDUUjA=;
-        b=ddCoxkGNaz2qtm23S1kutXnv4OO7xUcxCpO9mRCVmxkKP9LdXljmr2w4ig/q5VAvtf
-         Ulx7a6+LofUHmT52ia7F9cLLJ4q0Y0+Hmqm/6OustEyA52IxJhqkCeKaqb6mYY5ulmhp
-         OZMUFSuTyXq1/0RTs19iSrwDsHmDgHBQiUBCcMSdXmcml2R8smuEaiwUDIE1uJ+tSnZG
-         zfaCUnRwHJcj3//QbYFdxL3ZykqKQAWPif/OBIDOuRPLRohyVSUXgdovoMIskx5t9/Eh
-         Zt7BWLYxeAjXBR/LDuCWSBSQ9EC2V2UgoiD0ZGAkUTk7VcJB4Qosemt9kG042ukifM87
-         0qPA==
-X-Forwarded-Encrypted: i=1; AFNElJ8G4sh9IAZi6fUfC7hlFFiSjc2HoX7X0mBoDO8LLU5Rw76mT49Gx2xCm3njyA9mxDB/8B3bz7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfBvJq1H7RTIR1LQl79DCpb0mVwusOg7I+nFH5iigVV/qfIIUp
-	+EApWoB048FMz2pmgbNLPn80pjFg6p2Kgh+dLeQXTyEF2WLj/A/aP5WiCi46WaJZwwI=
-X-Gm-Gg: Acq92OGxjM+KftyV6XRmKTMi+8jWz4JkfmM4YaMo4PGOUL1hlm5v75pRSL4QJrIT1uF
-	vTB0M6sN4BLHPlFdzYHZ8I7lZ70kyJ731oJIYiC9cTSEEuBb3B2NgWquXSB9yyoVSbxNppG7tGU
-	Z5GDqi/0ZZt/IZdTdI3B+UL38WkBfhUn/l2Ne/M2wqW7E1c9UMqPSE2HNNoma0VAwXseKpxUdQv
-	BC3s3iK0q1oA6EcR4L8smIbayhoYQKUyoIVudTZBG5d9wFu7qswTD6Ra8LJvs055p1A1YVMpYVy
-	eDOxMWVE+BSJvBUiJ18wCkrqPC/qD0BO6w44ZyesjpsnDRLvdhYhSLSW6ebnVT4xhU44H3YD8gr
-	ZKBCiVU3nL8csRzW/KFu8izxZphF47Bho1tfjVHuAympX+O+I4vMFD1WrRTt9a5H01YU1RkRBCP
-	aJOaZzy3NsAcZYSy62L5al7baDOMLjfawTckptCxXf61luJwU9Ngy+xZK8j+WJ57fm
-X-Received: by 2002:a05:600c:4e4e:b0:490:c2a2:e91e with SMTP id 5b1f17b1804b1-490d7244543mr83594545e9.34.1781072832727;
-        Tue, 09 Jun 2026 23:27:12 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2eadefsm71329082f8f.11.2026.06.09.23.27.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 23:27:12 -0700 (PDT)
-Message-ID: <9c330505-483c-47fc-9a7a-29b8abd6aad7@blackwall.org>
-Date: Wed, 10 Jun 2026 09:27:11 +0300
+	 In-Reply-To:Content-Type; b=L9glwglnQVTwluB47ldQmLgI3c1QbY0LvvWeERR7LagwRjbhgfupFT+TTZXKpELnSZzd8WsCaMtzbnVi87r7rYoF71oXpRvONNnHBzvK9EvlTItar/6XlTutUZ8+OF4DWfRnstBn/lcB6xkY0R6STD77Nu6ZAx6xmXZirPCocgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1eZ8uAO1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FvImT5ig; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1eZ8uAO1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FvImT5ig; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 21A8175CAD;
+	Wed, 10 Jun 2026 06:28:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781072904; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKq54TbrhGR2RKbLwCmDopNOKQM89rNy60MxYSxRYSA=;
+	b=1eZ8uAO1kHm49tmPC2q3ED8xJp6MTDoBYt3oiFtF0oq5WNgnWiF1P/FKgUSJ6a9oo/G+51
+	fg6/mFVSq8bIdzLPD9WhpdjEJZjVHG2SFIDaKdpkp4K/aPyM4p8oz+hZdUi2UEYBhr1SQb
+	SusT2Qk82FNHUVs/l644QPNTZqagX8o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781072904;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKq54TbrhGR2RKbLwCmDopNOKQM89rNy60MxYSxRYSA=;
+	b=FvImT5igKlFgdnlITdLU9XlJzw0zRtVBqFn4Tf16atqsboP7hMxBBPdvO+NkqI9z6v+gk5
+	OAf7cU7/g6UporCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781072904; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKq54TbrhGR2RKbLwCmDopNOKQM89rNy60MxYSxRYSA=;
+	b=1eZ8uAO1kHm49tmPC2q3ED8xJp6MTDoBYt3oiFtF0oq5WNgnWiF1P/FKgUSJ6a9oo/G+51
+	fg6/mFVSq8bIdzLPD9WhpdjEJZjVHG2SFIDaKdpkp4K/aPyM4p8oz+hZdUi2UEYBhr1SQb
+	SusT2Qk82FNHUVs/l644QPNTZqagX8o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781072904;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKq54TbrhGR2RKbLwCmDopNOKQM89rNy60MxYSxRYSA=;
+	b=FvImT5igKlFgdnlITdLU9XlJzw0zRtVBqFn4Tf16atqsboP7hMxBBPdvO+NkqI9z6v+gk5
+	OAf7cU7/g6UporCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 48848779A7;
+	Wed, 10 Jun 2026 06:28:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TSJhDwcEKWp+CQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 10 Jun 2026 06:28:23 +0000
+Message-ID: <f967eb48-9e54-497a-b5dc-ade6fa6c49d3@suse.de>
+Date: Wed, 10 Jun 2026 08:28:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,117 +98,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/5] net: bridge: use atomic ops to read/change
- p->flags (II)
-Content-Language: en-US, bg
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20260609080839.2506801-1-edumazet@google.com>
- <20260609080839.2506801-5-edumazet@google.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260609080839.2506801-5-edumazet@google.com>
+Subject: Re: [PATCH 2/9] handshake: Add tags to "done" downcall
+To: Chuck Lever <cel@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sabrina Dubroca <sd@queasysnail.net>, Keith Busch <kbusch@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>,
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>,
+ Anna Schumaker <anna@kernel.org>
+Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+ Chuck Lever <chuck.lever@oracle.com>
+References: <20260605-tls-session-tags-v1-0-47bd1d94d552@oracle.com>
+ <20260605-tls-session-tags-v1-2-47bd1d94d552@oracle.com>
+ <40199ef9-416e-4a58-908a-ed514dfd6ff2@suse.de>
+ <7b5276ff-cceb-446c-97ec-65ad80689495@app.fastmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <7b5276ff-cceb-446c-97ec-65ad80689495@app.fastmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297482-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-297483-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,davemloft.net,google.com,redhat.com,lwn.net,linuxfoundation.org,linux-foundation.org,queasysnail.net,kernel.dk,lst.de,grimberg.me,nvidia.com,brown.name,oracle.com,talpey.com];
+	FORGED_RECIPIENTS(0.00)[m:cel@kernel.org,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:akpm@linux-foundation.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:kbusch@kernel.org,m:axboe@kernel.dk,m:hch@lst.de,m:sagi@grimberg.me,m:kch@nvidia.com,m:jlayton@kernel.org,m:neil@brown.name,m:okorniev@redhat.com,m:Dai.Ngo@oracle.com,m:tom@talpey.com,m:trondmy@kernel.org,m:anna@kernel.org,m:kernel-tls-handshake@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-nvme@lists.infradead.org,m:linux-nfs@vger.kernel.org,m:chuck.lever@oracle.com,m:donaldhunter@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[hare@suse.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hare@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,blackwall.org:dkim,blackwall.org:mid,blackwall.org:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 90CEA666463
+X-Rspamd-Queue-Id: F4150666476
 
-On 09/06/2026 11:08, Eric Dumazet wrote:
-> Use READ_ONCE(p->flags) in br_port_flag_is_set() to keep its ABI.
+On 6/9/26 16:29, Chuck Lever wrote:
 > 
-> Use test_bit(), clear_bit(), set_bit() in:
+> On Tue, Jun 9, 2026, at 2:41 AM, Hannes Reinecke wrote:
+>> On 6/5/26 19:34, Chuck Lever wrote:
+>>> We'd like tlshd to tag certificates according to admin-defined
+>>> characteristics. The tag list is to be returned on a successful
+>>> handshake. Upper Layer Protocols (such as NFS) can then authorize
+>>> access based on the set of tags returned to the kernel.
+>>>
+>>> For example, suppose NFSD wants to restrict access to an export to
+>>> only clients that present certificates whose issuer DN contains
+>>> "O=Oracle". tlshd can parse incoming certificates, and add an
+>>> "oraclegroup" tag to handshakes where a client presents a
+>>> certificate with "O=Oracle" somewhere in its Issuer field. NFSD can
+>>> then be configured to look for that tag and permit access only when
+>>> it is present. NFSD needs no knowledge of x.509 certificates.
+>>>
+>>> This patch plumbs in the netlink protocol elements for tlshd to
+>>> return a list of tags to the kernel when a TLS or QUIC handshake
+>>> succeeds. Subsequent patches add tag extraction and storage in
+>>> the handshake layer.
 > 
->     net/bridge/br_input.c
->     net/bridge/br_mrp.c
->     net/bridge/br_mrp_netlink.c
+>> Not sure if I agree with this; to my untrained eye the 'tag' attribute
+>> is just a string, and someone else will have to parse that. But we
+>> are at the netlink level here, so we _can_ have nested tags.
+>> Wouldn't it be better to make 'tags' a nested tag (ie a list of tags)
+>> such that we can avoid parsing in the caller/consumer?
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->   net/bridge/br_if.c          |  2 +-
->   net/bridge/br_input.c       | 12 ++++++------
->   net/bridge/br_mrp.c         | 20 ++++++++++----------
->   net/bridge/br_mrp_netlink.c |  8 ++++----
->   4 files changed, 21 insertions(+), 21 deletions(-)
+> Had some time to digest your comment a little more...
 > 
-[snip]
-> @@ -1246,7 +1246,7 @@ static int br_mrp_rcv(struct net_bridge_port *p,
->   static int br_mrp_process(struct net_bridge_port *p, struct sk_buff *skb)
->   {
->   	/* If there is no MRP instance do normal forwarding */
-> -	if (likely(!(p->flags & BR_MRP_AWARE)))
-> +	if (likely(!test_bit(BR_MRP_AWARE_BI, &p->flags)))
+> The tag attribute is declared "multi-attr: true", so it is already a
+> list rather than a single delimited string. tlshd emits one
+> HANDSHAKE_A_DONE_TAG attribute per tag, and the kernel receives each
+> tag as a separate netlink attribute. There is no string to split in
+> the consumer; the parsing you are worried about does not happen.
+> 
+> This matches remote-auth directly above it, which is likewise a
+> multi-attr scalar list in the same DONE message.
+> 
+> A nested attribute earns its keep when each list element is a
+> structured record with several sub-fields to group. A tag is a single
+> string, so nesting would add a container attribute, a second
+> attribute-set, and a nested policy without making anything on the
+> consumer side simpler. If a tag later needs to carry structured
+> metadata, nesting becomes the right tool, but that is not in scope for
+> this series.
+> 
+Ah. So one can have several 'tag' attributes in one 'done' downcall?
+That's perfect.
 
-s/BR_MRP_AWARE_BI/BR_MRP_AWARE_BIT/
+So you can add my:
 
->   		goto out;
->   
->   	return br_mrp_rcv(p, skb, p->dev);
-> diff --git a/net/bridge/br_mrp_netlink.c b/net/bridge/br_mrp_netlink.c
-> index 86f0e75d6e345f8f388ae163860a685279174222..cebd4037744ffa2796c170c1e1ac2f213b315760 100644
-> --- a/net/bridge/br_mrp_netlink.c
-> +++ b/net/bridge/br_mrp_netlink.c
-> @@ -538,9 +538,9 @@ int br_mrp_ring_port_open(struct net_device *dev, u8 loc)
->   	}
->   
->   	if (loc)
-> -		p->flags |= BR_MRP_LOST_CONT;
-> +		set_bit(BR_MRP_LOST_CONT_BIT, &p->flags);
->   	else
-> -		p->flags &= ~BR_MRP_LOST_CONT;
-> +		clear_bit(BR_MRP_LOST_CONT_BIT, &p->flags);
->   
->   	br_ifinfo_notify(RTM_NEWLINK, NULL, p);
->   
-> @@ -560,9 +560,9 @@ int br_mrp_in_port_open(struct net_device *dev, u8 loc)
->   	}
->   
->   	if (loc)
-> -		p->flags |= BR_MRP_LOST_IN_CONT;
-> +		set_bit(BR_MRP_LOST_CONT_BIT, &p->flags);
->   	else
-> -		p->flags &= ~BR_MRP_LOST_IN_CONT;
-> +		clear_bit(BR_MRP_LOST_CONT_BIT, &p->flags);
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-this one changes LOST_IN_CONT to LOST_CONT_BIT
+Cheers,
 
->   
->   	br_ifinfo_notify(RTM_NEWLINK, NULL, p);
->   
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
