@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297455-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oIb7Gyj/KGp3OgMAu9opvQ
-	(envelope-from <netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:07:36 +0200
+	id TtkREr//KGqWOgMAu9opvQ
+	(envelope-from <netdev+bounces-297455-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813A666615B
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E61666181
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=Zypc0XdB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297452-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b=TbFXtTxP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297455-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297455-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B94E7301DBB9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9515331506EF
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740E53438BD;
-	Wed, 10 Jun 2026 06:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADD7370D69;
+	Wed, 10 Jun 2026 06:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB49125B0B3;
-	Wed, 10 Jun 2026 06:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04051371CF9;
+	Wed, 10 Jun 2026 06:06:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781071601; cv=none; b=oKrSuKdN6zxuie1YaUD+s0Yx0ZV1ZqDsTSKQHERcO9n2+4ab/1/oAG8GQ8u/oZ1c9PS7dEgMeU7xqJaGiMIV8PhOGWSeCRgxucy11EbspXBPjMgS4I86B0GxUJMExt1fPkC/ibtXlMpK9P9BcTY0g7Okph1tp+ZdBER0a3K+ao8=
+	t=1781071605; cv=none; b=dTlhkHzhaCTDH3JwJs9zhbqz2KZOgtemP936hbZqKnC+CHXYIl9SAylobl29irGos7mtfsltn50yPfFOGeVwv1eV7gvvZVt5XvjbX+R3v3IHLGeNI9dWLCgfe6TwHMbp6exJHOpqKOORIpdiSjyeghyIUPZMrFj7H3PtENEyEEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781071601; c=relaxed/simple;
-	bh=uAPz3u7FR97ImKZe49+xSl2+ebWGiEN63ft1iK99pZk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QDXXUjT5n0nHBWVEonFlAClKY2VV47EYgbEjDSCekRdhbStnu3Hw6w/uFJnbYFT0wZnuEmoCTmUTBDZfDuHHfc1qMCVBsdBr+A9yNwfLVjg5JXb9LGmunlS8cje543A/Vd3eHuPJ+g4wmCBNTuIhNq+5KbkYWAOfAJa7YGnXWbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Zypc0XdB; arc=none smtp.client-ip=113.46.200.225
+	s=arc-20240116; t=1781071605; c=relaxed/simple;
+	bh=ORL8HEf+gZmLveijujYpM4411zyoXEaocR/ndIm+bD0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q7dDPwwohXqEeDWIcUOSuGl8GFnSHvIiVuNCF0G8FFX7kVnLEMpfJnUz48CtZR5b0KdQMO7xxS+k2jTqOWQI1Umgnz3LS6k25j2/u7wgCP/sdCm9fbMVVDmEM4o6fp3rDcf4yNbobdSYGykaRUwnWRAOyyyB+ElXJAWB010/TBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TbFXtTxP; arc=none smtp.client-ip=113.46.200.218
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=OOt1/6axTY4K9Ez/wLDcMKt7dUwM/2HSAPJ0ngyJUJg=;
-	b=Zypc0XdBYGKpyQ3PcpI8ppCNMd39i2DWiDSFmsZgXVnVcHnVyo9SPyhhylPaSOXHEKiagWcNp
-	WElRzQB31sYKU8qzb6UHK6wWl6d8OyJHPjPktaiENHpDeURHEX4DUtV/QHidJpBewRUYxaIpRuE
-	m+xLv7CVNoy40KU5s4Ec3IA=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7j2dTjz1K990;
-	Wed, 10 Jun 2026 13:58:41 +0800 (CST)
+	bh=44osuMQq6VbJ68FcJd6eZjXdOVAFOTnYwPWqDkLeeGk=;
+	b=TbFXtTxP2ccWtgK4q7snOIHVn4XGXoCUur/1ZFy4u+e6SOTPS95as9kWp/WXqsAB7uDX6idJC
+	txc9WpoDk/eFV2IL6HilB/Yw8/rVqrI7bZRK/kSjtcCNoNO9pjoI7xD0bAD2bIjL2vEqsxbZqHX
+	zSYQ4hKgPkHnkbEJQTFfIeI=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7m1C35zpStT;
+	Wed, 10 Jun 2026 13:58:44 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 32CFC4056E;
+	by mail.maildlp.com (Postfix) with ESMTPS id A9D5D203B1;
 	Wed, 10 Jun 2026 14:06:34 +0800 (CST)
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -57,10 +58,12 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
 	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V4 net-next 0/6] net: hns3: enhance tc flow offload support
-Date: Wed, 10 Jun 2026 14:06:12 +0800
-Message-ID: <20260610060618.834987-1-shaojijie@huawei.com>
+Subject: [PATCH V4 net-next 1/6] net: hns3: refactor add_cls_flower to prepare for multiple actions
+Date: Wed, 10 Jun 2026 14:06:13 +0800
+Message-ID: <20260610060618.834987-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260610060618.834987-1-shaojijie@huawei.com>
+References: <20260610060618.834987-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +87,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297452-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297455-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	TO_DN_NONE(0.00)[];
@@ -104,73 +107,214 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,huawei.com:dkim,huawei.com:mid,huawei.com:from_mime,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 813A666615B
+X-Rspamd-Queue-Id: 92E61666181
 
-This patchset enhances the tc flow offload support for hns3 driver:
+Remove the tc parameter from the add_cls_flower() ops callback and
+refactor action parsing to support future extensions for SELECT_QUEUE
+and DROP_PACKET actions.
 
-- Patch 1: Refactor hclge_add_cls_flower() to support more actions
-- Patch 2: Improve unused_tuple parameter setting for separate src/dst configuration
-- Patch 3: Add support for HCLGE_FD_ACTION_SELECT_QUEUE and HCLGE_FD_ACTION_DROP_PACKET actions
-- Patch 4: Add support for FLOW_DISSECTOR_KEY_IP and FLOW_DISSECTOR_KEY_ENC_KEYID dissectors
-- Patch 5: Add debugfs support for dumping FD rules
-- Patch 6: Move FD code to a separate file (hclge_fd.c) for better code organization
+Changes:
+* Remove the tc parameter from the add_cls_flower() callback signature.
+* Extract TC-based action parsing into hclge_get_tc_flower_action().
+* Move the dissector->used_keys check from hclge_parse_cls_flower() to
+  hclge_check_cls_flower(), and restrict ETH_ADDRS to
+  HCLGE_FD_MODE_DEPTH_2K_WIDTH_400B_STAGE_1 mode since hardware only
+  supports MAC matching there.
+* Migrate error reporting from dev_err() to netlink extended ACK (extack).
 
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
-v3 -> v4:
-  - Fix issues pointed out by Jakub Kicinski:
-    a) Fix byte order issue of KEY_OPT_VNI under big-endian architectures.
-    b) Fix issue where match.mask->ttl was silently ignored in FLOW_DISSECTOR_KEY_IP.
-  - Use NL_SET_ERR_MSG_MOD() and extack to return errors instead of dev_err(),
-    as suggested by Jakub.
-  - Links:
-    v3: https://lore.kernel.org/all/20260602133337.2216918-1-shaojijie@huawei.com/
-    AI report: https://sashiko.dev/#/patchset/20260602133337.2216918-1-shaojijie%40huawei.com
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |  3 +-
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 93 ++++++++++++-------
+ 3 files changed, 60 insertions(+), 38 deletions(-)
 
-v2 -> v3:
-  - Fix issues pointed out by Simon Horman and Paolo Abeni:
-    a) Fix incorrect condition for identifying unused tuples when IP/MAC
-       addresses are all-zero but masks are non-zero.
-    b) Fix inappropriate log output in error paths.
-    c) Fix issue where tc flower supported keys did not distinguish between
-       different FD modes.
-    d) Fix unnecessary distinction between IPv4 and IPv6 in debugfs.
-  - Links:
-    v2: https://lore.kernel.org/all/20260523105449.661848-1-shaojijie@huawei.com/
-    AI report: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260523105449.661848-1-shaojijie%40huawei.com
-
-v1 -> v2:
-  - Fix "restricted __le32 degrades to integer" warnings, pointed out by Jakub.
-  - Fix "diagnostic behavior may be improved by adding 'format(printf, 5, 7)'"
-    warnings, pointed out by Jakub.
-  - Link:
-    v1: https://lore.kernel.org/all/20260518093526.1109595-1-shaojijie@huawei.com/
----
-
-Jijie Shao (6):
-  net: hns3: refactor add_cls_flower to prepare for multiple actions
-  net: hns3: improve the unused_tuple parameter setting
-  net: hns3: support two more actions for tc flow
-  net: hns3: support IP and tunnel VNI dissectors for tc flow
-  net: hns3: debugfs support for dumping fd rules
-  net: hns3: move fd code to a separate file
-
- drivers/net/ethernet/hisilicon/hns3/Makefile  |    1 +
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |    3 +-
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    |    6 +
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   |    3 +-
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |  155 +
- .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.c | 2593 +++++++++++++++++
- .../ethernet/hisilicon/hns3/hns3pf/hclge_fd.h |   33 +
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 2514 +---------------
- .../hisilicon/hns3/hns3pf/hclge_main.h        |    6 +
- 9 files changed, 2840 insertions(+), 2474 deletions(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.c
- create mode 100644 drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_fd.h
-
-
-base-commit: 61abe5db23f0799e602352c796de6fcf76d23b41
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index d7c3df1958f3..a724935b655a 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -778,7 +778,7 @@ struct hnae3_ae_ops {
+ 				 u32 len, u8 *data);
+ 	bool (*get_cmdq_stat)(struct hnae3_handle *handle);
+ 	int (*add_cls_flower)(struct hnae3_handle *handle,
+-			      struct flow_cls_offload *cls_flower, int tc);
++			      struct flow_cls_offload *cls_flower);
+ 	int (*del_cls_flower)(struct hnae3_handle *handle,
+ 			      struct flow_cls_offload *cls_flower);
+ 	bool (*cls_flower_active)(struct hnae3_handle *handle);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index 4c34a144d21c..6ecb32e28e79 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -2678,13 +2678,12 @@ static int hns3_setup_tc(struct net_device *netdev, void *type_data)
+ static int hns3_setup_tc_cls_flower(struct hns3_nic_priv *priv,
+ 				    struct flow_cls_offload *flow)
+ {
+-	int tc = tc_classid_to_hwtc(priv->netdev, flow->classid);
+ 	struct hnae3_handle *h = hns3_get_handle(priv->netdev);
+ 
+ 	switch (flow->command) {
+ 	case FLOW_CLS_REPLACE:
+ 		if (h->ae_algo->ops->add_cls_flower)
+-			return h->ae_algo->ops->add_cls_flower(h, flow, tc);
++			return h->ae_algo->ops->add_cls_flower(h, flow);
+ 		break;
+ 	case FLOW_CLS_DESTROY:
+ 		if (h->ae_algo->ops->del_cls_flower)
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index e17b92a411a2..77bd23e2c11e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -7328,28 +7328,33 @@ static void hclge_get_cls_key_port(const struct flow_rule *flow,
+ 	}
+ }
+ 
++static int hclge_get_tc_flower_action(struct hclge_dev *hdev,
++				      struct flow_cls_offload *cls_flower,
++				      struct hclge_fd_rule *rule)
++{
++	struct netlink_ext_ack *extack = cls_flower->common.extack;
++	struct hnae3_handle *handle = &hdev->vport[0].nic;
++	int tc;
++
++	tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
++	if (tc < 0 || tc > hdev->tc_max) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "invalid traffic class: %d", tc);
++		return -EINVAL;
++	}
++
++	rule->action = HCLGE_FD_ACTION_SELECT_TC;
++	rule->cls_flower.tc = tc;
++	return 0;
++}
++
+ static int hclge_parse_cls_flower(struct hclge_dev *hdev,
+ 				  struct flow_cls_offload *cls_flower,
+ 				  struct hclge_fd_rule *rule)
+ {
+ 	struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
+ 	struct netlink_ext_ack *extack = cls_flower->common.extack;
+-	struct flow_dissector *dissector = flow->match.dissector;
+ 	int ret;
+ 
+-	if (dissector->used_keys &
+-	    ~(BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_VLAN) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+-	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS))) {
+-		dev_err(&hdev->pdev->dev, "unsupported key set: %#llx\n",
+-			dissector->used_keys);
+-		return -EOPNOTSUPP;
+-	}
+-
+ 	hclge_get_cls_key_basic(flow, rule);
+ 	hclge_get_cls_key_mac(flow, rule);
+ 	hclge_get_cls_key_vlan(flow, rule);
+@@ -7364,51 +7369,65 @@ static int hclge_parse_cls_flower(struct hclge_dev *hdev,
+ }
+ 
+ static int hclge_check_cls_flower(struct hclge_dev *hdev,
+-				  struct flow_cls_offload *cls_flower, int tc)
++				  struct flow_cls_offload *cls_flower)
+ {
++	struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
++	struct netlink_ext_ack *extack = cls_flower->common.extack;
++	struct flow_dissector *dissector = flow->match.dissector;
+ 	u32 prio = cls_flower->common.prio;
+-
+-	if (tc < 0 || tc > hdev->tc_max) {
+-		dev_err(&hdev->pdev->dev, "invalid traffic class\n");
+-		return -EINVAL;
+-	}
++	u64 support_keys;
+ 
+ 	if (prio == 0 ||
+ 	    prio > hdev->fd_cfg.rule_num[HCLGE_FD_STAGE_1]) {
+-		dev_err(&hdev->pdev->dev,
+-			"prio %u should be in range[1, %u]\n",
+-			prio, hdev->fd_cfg.rule_num[HCLGE_FD_STAGE_1]);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "prio %u should be in range[1, %u]",
++				       prio,
++				       hdev->fd_cfg.rule_num[HCLGE_FD_STAGE_1]);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (test_bit(prio - 1, hdev->fd_bmap)) {
+-		dev_err(&hdev->pdev->dev, "prio %u is already used\n", prio);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "prio %u is already used", prio);
+ 		return -EINVAL;
+ 	}
++
++	support_keys = BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_VLAN) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
++		       BIT_ULL(FLOW_DISSECTOR_KEY_PORTS);
++
++	if (hdev->fd_cfg.fd_mode == HCLGE_FD_MODE_DEPTH_2K_WIDTH_400B_STAGE_1)
++		support_keys |= BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS);
++
++	if (dissector->used_keys & ~support_keys) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "unsupported key set: %#llx",
++				       dissector->used_keys);
++		return -EOPNOTSUPP;
++	}
++
+ 	return 0;
+ }
+ 
+ static int hclge_add_cls_flower(struct hnae3_handle *handle,
+-				struct flow_cls_offload *cls_flower,
+-				int tc)
++				struct flow_cls_offload *cls_flower)
+ {
++	struct netlink_ext_ack *extack = cls_flower->common.extack;
+ 	struct hclge_vport *vport = hclge_get_vport(handle);
+ 	struct hclge_dev *hdev = vport->back;
+ 	struct hclge_fd_rule *rule;
+ 	int ret;
+ 
+ 	if (!hnae3_ae_dev_fd_supported(hdev->ae_dev)) {
+-		dev_err(&hdev->pdev->dev,
+-			"cls flower is not supported\n");
++		NL_SET_ERR_MSG_MOD(extack, "cls flower is not supported");
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	ret = hclge_check_cls_flower(hdev, cls_flower, tc);
+-	if (ret) {
+-		dev_err(&hdev->pdev->dev,
+-			"failed to check cls flower params, ret = %d\n", ret);
++	ret = hclge_check_cls_flower(hdev, cls_flower);
++	if (ret)
+ 		return ret;
+-	}
+ 
+ 	rule = kzalloc_obj(*rule);
+ 	if (!rule)
+@@ -7420,8 +7439,12 @@ static int hclge_add_cls_flower(struct hnae3_handle *handle,
+ 		return ret;
+ 	}
+ 
+-	rule->action = HCLGE_FD_ACTION_SELECT_TC;
+-	rule->cls_flower.tc = tc;
++	ret = hclge_get_tc_flower_action(hdev, cls_flower, rule);
++	if (ret) {
++		kfree(rule);
++		return ret;
++	}
++
+ 	rule->location = cls_flower->common.prio - 1;
+ 	rule->vf_id = 0;
+ 	rule->cls_flower.cookie = cls_flower->cookie;
 -- 
 2.33.0
 
