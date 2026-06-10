@@ -1,224 +1,210 @@
-Return-Path: <netdev+bounces-297424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 37+nMyHhKGpjLQMAu9opvQ
-	(envelope-from <netdev+bounces-297424-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:59:29 +0200
+	id BpT3CrHhKGrxLQMAu9opvQ
+	(envelope-from <netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:01:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1526665AF8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:59:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F93665B13
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:01:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=WdqRy6u3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297424-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297424-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=huawei.com;
+	dkim=pass header.d=jvosburgh.net header.s=fm2 header.b=h64zDGnf;
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="P WA+vF9";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=jvosburgh.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9F4E301A7F2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 03:59:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5A59307AE52
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 04:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D05333A9CF;
-	Wed, 10 Jun 2026 03:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE31337B87;
+	Wed, 10 Jun 2026 04:01:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E7B335564;
-	Wed, 10 Jun 2026 03:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DDB7E792
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 04:01:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781063965; cv=none; b=pGj8BKCocBqZqgVCWsIh7dg5DdaKl/AuFDb77ixB4OptnMTYQCXihKOdkOu0M+1QQNsjro8CIxW966N/bJ40Rc43IczL38i+f+nRSr4kjf0JAoOkQn3aQLgh1MoNDsQlv/2Z3Uhc5Vbqy4vbcqi4f8i5YhDFYLpRKS7qUF80DHQ=
+	t=1781064110; cv=none; b=nlZozxdE62w/q+ox7Fgx3aw5Z7rbVwe6Q/yj/BaWv4KsFg4T8My9lyRLNJIo7OHh93WHB64Zzdq1UHm+OSgf6FQ2vn9mctAkCw64FsACWv2jGHJMNna/Dlh178SpfxQU5/PPNzSXhqSgStrIGpnko8KPMbnbdziBdOMw6315NOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781063965; c=relaxed/simple;
-	bh=Dmz51v9w6Ls2qgeHfUsFwqv3UPHz5aq1fWSp+qLL6U4=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fK5mKrb42AfrDnD7WjlhzcS7WVcsR+79ceBIJnDg7hi7Ab3DM+YS8dMIJJakDhaU95LBjFw83lrkIS3KKb2noMECCvWRNd4SacPPyYwuaYwhdJEJWGUBKBRJxSC6i+e8gg4z7b+ljrpt4ECSZ7rt5j6aRuG/yDdbvYGBizczb7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WdqRy6u3; arc=none smtp.client-ip=113.46.200.226
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=vYpQI444eCT/9B22GAgj2lgiHR0IYTAf7MYHj36rmus=;
-	b=WdqRy6u30ZS5bvwebbt/9rDNWY3F2bH/h6ymCM7qN0VMuN7+BzXq0x6UIOg9uQwTnJOKIDQQR
-	ri8dhrNz4xWiYeX4gkFqAcIo4FWPgVHpmtYDBH6L1ULq8vH2acrMvXFzfG4QqYlji0Ik8WSPhEC
-	eOjx0DL/l4BdfmRC0YRaCwA=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gZsJn5mRhzKm4w;
-	Wed, 10 Jun 2026 11:51:21 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5AEFC40571;
-	Wed, 10 Jun 2026 11:59:18 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 10 Jun 2026 11:59:17 +0800
-Message-ID: <479aefe2-cca3-4868-9796-97c17b4436f5@huawei.com>
-Date: Wed, 10 Jun 2026 11:59:17 +0800
+	s=arc-20240116; t=1781064110; c=relaxed/simple;
+	bh=kJItE6LCRQHYsVfmrfj/JgBGeugjj9/2SeijFcHgysA=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=TEQKQTh1PopJAIoBnB9XCrIw+tQ9t8/K6lNgvhnwxuJhGU6BrSrs+xIEgqfXnSM9spDy7Tm83SlJ83Np/hDlP9By+lkaOfIaNWI6cywEVdzWDbhLEPxrIEAJACEX2VCe3OA+SBNWEnjC5A+yCchRBc/LgIYtpaE1EISWVAvBsaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=h64zDGnf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PWA+vF9b; arc=none smtp.client-ip=103.168.172.159
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 4036C140010E;
+	Wed, 10 Jun 2026 00:01:47 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 10 Jun 2026 00:01:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1781064107; x=1781150507; bh=rtkq9QeQyqsoW7C8ybhLaXi9M4w1EIPd
+	lMEVK7HHaug=; b=h64zDGnfaFSzVfXz27Kg8++5KPcv1ucteG9xf1f5oElTmv0a
+	U7+y+rY/T9SLPmV3Mi78zK3fQNS3CyclT9In4hGTRsBk6YA3GCuZK0BK1mL6aBet
+	PCsUYXs8Y4pHLPnTS8edQLvLJMBN7u709t6xpWR/ZrurIWWrYVCARRF2RzXl+BAe
+	H8/6Abyemp91iSO+PKJcDLE1FU/vUgD9QgxDq3b6Do690aM6Hcxqi5BAT5Gj0faX
+	CDOxA008vJEUQ03f2GrspK2J2p6OTn5rMdvyc2rpLUqgftJobc1c56vKPcB9v2U/
+	Ae8hDPNK2LCx2NLb1iHBesYytZU9xkRc+3n1pA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781064107; x=
+	1781150507; bh=rtkq9QeQyqsoW7C8ybhLaXi9M4w1EIPdlMEVK7HHaug=; b=P
+	WA+vF9bfNcwA9phxl9h8TOVobwxGRayH3cmVSfExm/NnaT5nAz2yQmHeQWyqiA4+
+	7bFowR/K70Hq23gmg9j9Ka69qM0ZYExSInD5K7pf8BdJlC62mzqitgSzFtu846Yw
+	ivBzo9ktiH9neEwKFv9VxdoX4KrDgCLxHeJrUnutIS0SJ92Cpxx++Jz4WO2mtmZr
+	5ipEaSik6eJlmehs+nlXtpI2abn7eqj39fZsYq+QjowUQ5hCa38VpNp8shdz474e
+	DzMwk3kMbXiEfHONtb/rrUo8NpvlwBPzKEGZ1tADYhNC8wIw8MULkPx0O81n0BOB
+	vfJ2tjjk65boToxNFOhGg==
+X-ME-Sender: <xms:quEoauq5i48l4Taab3t6nvNfkViqo52800DUuCAn7V1zLhHsu_Y-OQ>
+    <xme:quEoaofPb7S-iJ9qTGnnji1v_s-GSquBwdMJAy_iF7WsHHHeoEDyzWPXd59ZE_ZQl
+    vBOcIuyCryU9arUfq_aaD1q3WXsMenbi2MJGLERcGDCOotVEQo2Suw>
+X-ME-Received: <xmr:quEoaunf03JmIWiPzTEERFyFWq0eOqcJXCF1osq-5m6ZRp5vCF2KcKGXFMDWlDqMpJSuCw>
+X-ME-Proxy-Cause: dmFkZTFtdog3ahJS6oblJc6KfiKoQcQn9TZC3+osVPA6IIFp0zKzXPxPLDat0JBdaXhTuQ
+    uTze0MgNaJgM+UX/f7mT85+RJVimKd9OaakZkO5moOIvfQMV1h6vgYZTGXX19GIQI1HyPm
+    b9tHb5pIoN4O2wqcwt16csxBrCBcgwl+ckO7ZAtYGOCee8vIbHFDShkwzL2aDKY9XTGSdb
+    n4k2LI/jLJ8HrmpOnwzIdM4Sd4hAr//78/Z1iFWpNXZFGrR2SJmdmSWLiY97P1w5Px3xzG
+    OhegtvuYFFe5sqZ0rb+zwuPiOl2esjxH1NNzVJ6J5/OvbrMMOCXyHV5zGUR/JwVNxF/UV1
+    x4meYa+SbT1RWzQaOUzpH/4AuEa2I87HXa/h1Lw9HKXkXLI6qUqBcxGFwzeVz34dN2sYuE
+    ADmhVAZ4YyNzmX72jw7TYlJ4Y8+kHpzkNDkXWjamsRAWR1HkO8WRFYBYyBlKY3i3MMkeq6
+    Z1xKdvvQytmeaFX1EbjKwigVaELL06W4paJq3Y2b0u/2mKdFxNwAfvHyht9M2BhlLitf8P
+    fP9Eei2+bJTbyaUaptyXkbqUXUg0DVrYjdaMtd8PePvJ697Ekj3VnN0EQC79c3jevfKLjP
+    raCTsieN1Mb6eJm3aSFiQrR1nWEoHQ0MryjNpue5Hov+xs3nQGjHICn2ETeA
+X-ME-Proxy: <xmx:quEoanbp2-rbrlvZddcvAak9eCdmavD1I-IdEkqoY4EMtuCz9ME0gw>
+    <xmx:quEoar4BtWbnOXgfzp3NWbQfVAdF3mpsPrXl5F3QPw8O_-Gba4I28A>
+    <xmx:quEoapBDyeQboJfYILe51kidny2h0LVCG4thJuhUo_6xL1UdFdAdCg>
+    <xmx:quEoah8yvi7YCSf_uqfCUdl6gnqvf6qMc0_8MYe40RRPrnmla7fFsA>
+    <xmx:q-EoarIURfKFImFqgTheYZ8m5fHL9VAqegmhlHM43wxIMpRC2TUsLrH_>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Jun 2026 00:01:46 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 497349FC5D; Tue,  9 Jun 2026 21:01:45 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 487E59FC59;
+	Tue,  9 Jun 2026 21:01:45 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Paolo Abeni <pabeni@redhat.com>
+cc: Louis Scalbert <louis.scalbert@6wind.com>, netdev@vger.kernel.org,
+    andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+    fbl@redhat.com, andy@greyhouse.net, shemminger@vyatta.com,
+    maheshb@google.com, jonas.gorski@gmail.com, horms@kernel.org
+Subject: Re: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable slaves
+In-reply-to: <377b117a-b29a-4761-aae0-3236be1f0b49@redhat.com>
+References: <20260603150331.1919611-1-louis.scalbert@6wind.com> <20260603150331.1919611-5-louis.scalbert@6wind.com> <1041444.1780954642@famine> <CAJ5u_Of1+eEL4iVe-sWzhOOva6xx3gPCeXeRP4Y3yCqny8=gOg@mail.gmail.com> <377b117a-b29a-4761-aae0-3236be1f0b49@redhat.com>
+Comments: In-reply-to Paolo Abeni <pabeni@redhat.com>
+   message dated "Tue, 09 Jun 2026 10:54:01 +0200."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V3 net-next 3/6] net: hns3: support two more actions for
- tc flow
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20260602133337.2216918-1-shaojijie@huawei.com>
- <20260602133337.2216918-4-shaojijie@huawei.com>
- <20260605174021.7d4c6ec4@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20260605174021.7d4c6ec4@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 09 Jun 2026 21:01:45 -0700
+Message-ID: <1120239.1781064105@famine>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[huawei.com:D:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-297424-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297425-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:shaojijie@huawei.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url,famine:mid];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:louis.scalbert@6wind.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[6wind.com,vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaojijie@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1526665AF8
+X-Rspamd-Queue-Id: 25F93665B13
+
+Paolo Abeni <pabeni@redhat.com> wrote:
+
+>On 6/9/26 9:56 AM, Louis Scalbert wrote:
+>> Le lun. 8 juin 2026 =C3=A0 23:37, Jay Vosburgh <jv@jvosburgh.net> a =C3=
+=A9crit :
+>>>> @@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, =
+bool *update_slave_arr)
+>>>>               switch (port->sm_mux_state) {
+>>>>               case AD_MUX_DETACHED:
+>>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_SYN=
+CHRONIZATION;
+>>>> -                      ad_disable_collecting_distributing(port,
+>>>> -                                                         update_slave=
+_arr);
+>>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_COL=
+LECTING;
+>>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_DIS=
+TRIBUTING;
+>>>> +                      ad_disable_collecting_distributing(port,
+>>>> +                                                         update_slave=
+_arr);
+>>>
+>>>         Is there a functional reason to move this?  I don't see anything
+>>> obvious in ad_disable_collecting_distributing() that depends on the
+>>> actor_oper_port_state.  Since you want this to be backported via stable,
+>>> fewer actual changes reduce the chances of an issue applying the patch
+>>> to an older version.
+>>=20
+>> The path is ad_disable_collecting_distributing() ->
+>> bond_3ad_set_carrier() -> __agg_usable_ports(). __agg_usable_ports()
+>> reads port->actor_oper_port_state
+>>=20
+>> It was found by
+>> https://sashiko.dev/#/message/20260526084048.1696544-5-louis.scalbert%40=
+6wind.com
+>
+>@Jay: it's not clear to me if you are ok with the series in the current
+>shape, could you please clarify?
+
+	This was the last question I had; everything in this version
+seems reasonable.
+
+	For the series:
+
+Acked-by: Jay Vosburgh <jv@jvosburgh.net>
+
+	-J
 
 
-on 2026/6/6 8:40, Jakub Kicinski wrote:
-> On Tue, 2 Jun 2026 21:33:34 +0800 Jijie Shao wrote:
->> Currently, the driver supports only one action:HCLGE_FD_ACTION_SELECT_TC.
->>
->> This patch adds support for HCLGE_FD_ACTION_SELECT_QUEUE and
->> HCLGE_FD_ACTION_DROP_PACKET.
->>
->> A rule can have only one action. Therefore, the driver intercepts rules
->> that have multiple actions or no action.
->>
->> Note: The driver considers cls_flower->classid as an action:
->> HCLGE_FD_ACTION_SELECT_TC.
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   .../hisilicon/hns3/hns3pf/hclge_main.c        | 59 ++++++++++++++++---
->>   1 file changed, 52 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
->> index 5e1f76513622..aa85abda2909 100644
->> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
->> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
->> @@ -7344,18 +7344,45 @@ static int hclge_get_tc_flower_action(struct hclge_dev *hdev,
->>   				      struct flow_cls_offload *cls_flower,
->>   				      struct hclge_fd_rule *rule)
->>   {
->> +	struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
->>   	struct hnae3_handle *handle = &hdev->vport[0].nic;
->> +	struct flow_action *action = &flow->action;
->> +	struct flow_action_entry *act;
->>   	int tc;
->>   
->> -	tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
->> -	if (tc < 0 || tc > hdev->tc_max) {
->> -		dev_err(&hdev->pdev->dev, "invalid traffic class: %d\n", tc);
->> -		return -EINVAL;
->> +	if (!flow_action_has_entries(&flow->action)) {
->> +		tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
->> +		if (tc < 0 || tc > hdev->tc_max) {
->> +			dev_err(&hdev->pdev->dev,
->> +				"invalid traffic class: %d\n", tc);
->> +			return -EINVAL;
->> +		}
->> +
->> +		rule->action = HCLGE_FD_ACTION_SELECT_TC;
->> +		rule->cls_flower.tc = tc;
->> +		return 0;
->>   	}
->>   
->> -	rule->action = HCLGE_FD_ACTION_SELECT_TC;
->> -	rule->cls_flower.tc = tc;
->> -	return 0;
->> +	act = &action->entries[0];
->> +	switch (act->id) {
->> +	case FLOW_ACTION_RX_QUEUE_MAPPING:
->> +		if (act->rx_queue >= handle->kinfo.num_tqps) {
->> +			dev_err(&hdev->pdev->dev,
->> +				"queue id (%u) should be less than %u\n",
->> +				act->rx_queue, handle->kinfo.num_tqps);
->> +			return -EINVAL;
->> +		}
->> +
->> +		rule->queue_id = act->rx_queue;
->> +		rule->action = HCLGE_FD_ACTION_SELECT_QUEUE;
->> +		return 0;
->> +	case FLOW_ACTION_DROP:
->> +		rule->action = HCLGE_FD_ACTION_DROP_PACKET;
->> +		return 0;
->> +	default:
->> +		dev_err(&hdev->pdev->dev, "unsupported action(%d)\n", act->id);
->> +		return -EOPNOTSUPP;
->> +	}
->>   }
->>   
->>   static int hclge_parse_cls_flower(struct hclge_dev *hdev,
->> @@ -7412,6 +7439,24 @@ static int hclge_check_cls_flower(struct hclge_dev *hdev,
->>   		return -EOPNOTSUPP;
->>   	}
->>   
->> +	/* driver will parses classid into an action */
->> +	if (cls_flower->classid && flow_action_has_entries(&flow->action)) {
->> +		dev_err(&hdev->pdev->dev,
->> +			"please not set classid and action together\n");
->> +		return -EOPNOTSUPP;
->> +	}
->> +
->> +	if (!flow_action_has_entries(&flow->action) && !cls_flower->classid) {
->> +		dev_err(&hdev->pdev->dev, "please set action or classid\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	if (flow_action_has_entries(&flow->action) &&
->> +	    !flow_offload_has_one_action(&flow->action)) {
->> +		dev_err(&hdev->pdev->dev, "unsupported multiple actions\n");
->> +		return -EOPNOTSUPP;
->> +	}
->> +
->>   	return 0;
-> Please use struct flow_cls_offload::common:extack and
-> NL_SET_ERR_MSG_MOD() to return these to the caller instead of dumping
-> them into the system logs.
+>Thanks,
+>
+>Paolo
+>
 
-Okay, I will modify all the error logs under hclge_add_cls_flower() to NL_SET_ERR_MSG_MOD().
-
-Thanks,
-Jijie Shao
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
 
