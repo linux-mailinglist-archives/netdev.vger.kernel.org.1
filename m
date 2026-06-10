@@ -1,356 +1,169 @@
-Return-Path: <netdev+bounces-297583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3hDMMxU0KWpSSQMAu9opvQ
-	(envelope-from <netdev+bounces-297583-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:53:25 +0200
+	id HMueEwoxKWq4SAMAu9opvQ
+	(envelope-from <netdev+bounces-297563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:40:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7065A66807C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:53:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE43667EDD
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:40:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=EGz2VVow;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297583-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297583-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=linux.dev header.s=key1 header.b="AspQ/LZa";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297563-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297563-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7FCC8308CC49
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:49:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B2873094CA9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FC93EFFCB;
-	Wed, 10 Jun 2026 09:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2083BED30;
+	Wed, 10 Jun 2026 09:26:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010013.outbound.protection.outlook.com [52.101.69.13])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E823EFD21;
-	Wed, 10 Jun 2026 09:47:30 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781084852; cv=fail; b=b9v3u71EIixZyYPZkECFkbWW1gHiHHRva5weUvF614xNJm9S7JGrodlcbuBpJUTdb3Bv2HMBx182+Hkgv2PXV4d79JgnMGWlkR/mDUjkCog9q67HEoHqxXuD/WwiCSsd0PD+PZa09gvTJ5JikdjyNQilaiCvpAqWSJ/i4L9qiN0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781084852; c=relaxed/simple;
-	bh=v81uUEXOzTxbPAmnnwhMfycPxAbOlpY8fmcS8zFAkww=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HMGk25v3FxL/Mwbtdt9fDdERF0nnpXhguL6SHDzwNDBeV78GcU4w6028Px5eDqtzxuhxeeNKh7+VXzq2Su7xF2qZYpJMZE5eY6kInUzOC+RQATM6KX2No4z3mEDW2SFoWD3gzVZ48S3mpJHIWcfFr6iDHhfi3qBc5GfmPbaGva0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=EGz2VVow; arc=fail smtp.client-ip=52.101.69.13
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BrIRyufoF7OJr7OXg1hwVhofeFCcPqcvrJ7OnOoYzZ+9rluo7VZYKaVp1y54BQOxAwA6ss6l8qDbmNl323IqxcV/OuBCb44W3sL9Z6s2f9LxcR1iFGJgld7ypmcNNcPL9trc9HiCpX3TOF07lr1+GIhJdrlRlDTuBJUXVr8O2corYMnQQBbkzPdxIj0yWP6+F97X9Tf8zPClvILYrPrwY0qr1uh0xfFDyssO91QBJRBepu3l+oOO1QeLjdJuT1dfNZxu3mqhqxqknEdJZlYN8IOFsItRX2H6Heut/CI8mQhvlRERYB2CwawWqlCPW+LbvNkgS6yR1yy8iJ1PyCILgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Zo/EJGqpWQQwJOeuZ3YsdEo8pShNHpKnQONSPwqejQk=;
- b=AMI0ReHNS0SxNFZheXtYDgPPvO3bjHBGZn7+6ke9ct4nfYv3s4k6dyplxU96kf1hpJL3zmMY9lwHoeFJ55AOQ7hGmU70gL8ukWTrMNl+PfDxbOPA2B06r7m0mQVTCQ0HBIziFhBTbJWmtd0dP4XUdnjpIOhiHISW1D5eGHpZfV3kO5TKRw+58jiy/+zPIrDjAGixy4Il2Rxoyz0GZqf8CJINZZMmdhXQj9Fus3KiyN1zKSkx3YY0WcOBskRaW7alErxLAfXLsrIk3teN4wQxJXSB7tlyNB+48TAB64P/1nmpj9q47reuaoV+B/r0v3cwqbCJ2jb0w+pTUPwDBp0GHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zo/EJGqpWQQwJOeuZ3YsdEo8pShNHpKnQONSPwqejQk=;
- b=EGz2VVow6gHsYXuG/1Q6UvQIiHx6n2D+0QuGc30CpequQu1hYzrTaMWn7I1amX2QdYYMOhM3bnZN4nwJaqthsFGRpDfAngCqrqaW3+b3rcKXJZrWqWL0Ay3ZUTLqRl8/4/IU/S+JoxdXC9auypuQxx7ojEzPuvtRrulxZ8SArfw+nRMJ2nKDD568eCnNanOpJXSVmehhE1IPSK9jOcmVxaYBooMOOMpyf95yrODZnN/aj+0FpHUxeSPxOGrLIuUr400Ys9Ds+Cx98K34BhwlOGnf76kXOw4hGRq8Xb4tRCrYs/6lL2fGywLqzbtmK0g4JUrQcVtnPlqpZVW6Q8/Oiw==
-Received: from DBAPR04MB7207.eurprd04.prod.outlook.com (2603:10a6:10:1b2::17)
- by AS5PR04MB9875.eurprd04.prod.outlook.com (2603:10a6:20b:652::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.14; Wed, 10 Jun
- 2026 09:47:28 +0000
-Received: from DBAPR04MB7207.eurprd04.prod.outlook.com
- ([fe80::761a:f8dc:80dc:5e14]) by DBAPR04MB7207.eurprd04.prod.outlook.com
- ([fe80::761a:f8dc:80dc:5e14%6]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
- 09:47:27 +0000
-From: wei.fang@oss.nxp.com
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	wei.fang@nxp.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net-next 15/15] net: enetc: add ndo_get_vf_config() support
-Date: Wed, 10 Jun 2026 17:18:44 +0800
-Message-Id: <20260610091844.3423693-16-wei.fang@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260610091844.3423693-1-wei.fang@oss.nxp.com>
-References: <20260610091844.3423693-1-wei.fang@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR01CA0039.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::16) To DBAPR04MB7207.eurprd04.prod.outlook.com
- (2603:10a6:10:1b2::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6D83DCD8F
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 09:26:41 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781083605; cv=none; b=SXgo0OXlLm4QQ3Vxsek9uiRnlmH7axuXDMnz8ukJaA1W0dCzQ+Tl7mW8Z1Wp/Uq2EloaZ3gXZn4KaZWb42TjYsI8dF7rgXeMpuPuxmOSKqEr8LnW2nGclP1pR/2kHIlxmChtb4WZNknB3ZjvUEdaFsWjQZOKHqp0beAdCRIfaQo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781083605; c=relaxed/simple;
+	bh=rDYf0gnIrYdQKrUthpTVKGSXzN6k7STc6mNhFd5HTq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uj2hlG6ACBghNwb1VlMt2R8Cvxs1DgeyIoffFaiZfwJIFKAhx6DM2d+xt0l/gwZ8Vg8/J+iETzY8EKnrUga3+QYp/H0IPXrGkj19ZrH4Y3tVtrKDwL8fv4s3MduC/PGlCvINQg1Mb0fW86v3/WHB7qd/BKG4OnpQ5zkWsPCdi9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AspQ/LZa; arc=none smtp.client-ip=91.218.175.183
+Message-ID: <d26c8934-6d4c-4171-9e6f-f58a249dd9ff@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781083589;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hBbMp/terYy4HVPHHevofPr5zOE+Mp6tKWsqJZs/Bdc=;
+	b=AspQ/LZakOFXxrC2SCXedf0yZ3uQXNlZ64Y9A5eYt+43qCH6ANEViDyPPbNSHxH+NtVN0v
+	eC/mlBawAupz6KoDEM2cO0tzxBxFotGX2gjr9JjnzByOYHBZZzON+QniA2+PgL53c/dP84
+	3+m0JXoe9FR2NFr7Tfq+KfqtoF44VK0=
+Date: Wed, 10 Jun 2026 17:26:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBAPR04MB7207:EE_|AS5PR04MB9875:EE_
-X-MS-Office365-Filtering-Correlation-Id: b52b521f-0efd-417d-0c59-08dec6d547ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|19092799006|376014|366016|6133799003|22082099003|18002099003|921020|3023799007|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	NXdLhKY3cS0JQCSZvsacvHwy2uMPk+2HIS1YXQQwsj4aIoZ/k/GB9Y5A3WNiEtmEx79u6wXIYgjvSMlBFKYl5V2IyrjDIfnISlf6KqtS3GsDziYExfbgppWZWiaIy9kUQISXFhMzmyShpXW3L4wBNm6o/MZjqFL+EvNS9XQ9cGA2IKTqxJgG5F6F0ncPQ7MjkZPETs8lsw+pZn7QqFVZGPzGPhV7sG/ZNHItKmoRzL1xgcjAU7A/9iCw3QLBvDuCThXTyO5De0X/nqmwJTuyCW27vooYTu/1z66A8J5L7yWYqHLjtr5fqtWxzQhQcHN4QHs8ScVCHYnLFFtPVNv00YeAjH315gQ0YyikX5A0wq+nGvZfTN5gxe6GazhcyHbxt8zOGOCt9Le1wpMsyw6DEOBffLJ26A+YuHIItueUUz94g2ouxvOewcsTh/4LyS1DN6Ieq8ccOMLeR8jIL5Bgjeud35QqYz30M+4e4iK/gKtJxT0z9psdJsT7ETG7j02F1qxABbcSB/JdiqnyEC232Edl+wZU95VjN8Tw8l8i4PDg4ZNTDWzMhL8sPVPumm9kFf0pAmDssJdmGkzqND2JJYJYz4SzV7mCBKaM4TEwtOKOaTMQU/l4+1Ft9eQJl52d+52XgSWAfdESkSvobSyDYhkQ7D5aUtiPgu+qgkC5hB5HAQiyVXYtn/4nbvKyXLhCVNi5zx3zHG0syA0kdQ7yC6dQshEScTFSiqwFUmIchjA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBAPR04MB7207.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(19092799006)(376014)(366016)(6133799003)(22082099003)(18002099003)(921020)(3023799007)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?lf39ZhqI6GSyyFEGTrbGW2I6bU5S6amVY6T6EmbsSYv9DEEX9H9UYlvwQAMH?=
- =?us-ascii?Q?bKhSGOfhVFmd7H0kfeEzyI+khX5TUdZETyywLFQvX/3TpO3OS2YiVjhrGCOt?=
- =?us-ascii?Q?0azN/zx23yZEg6URDL4hSr/c4hNHaHwzzPguC/ElQQGmnWCv6DIgzyb+un18?=
- =?us-ascii?Q?dh+1n2tTykcpPvMMZxswWlKxA0gQb9CvHE44zN5Kh/qZHQLoxQXPlWEU4puA?=
- =?us-ascii?Q?ZOUmEtXZDHJ+kQOvsVEc2MFGMGmKkkvZ/LAKvj1CilGDrJRJsf23ZyACSZcp?=
- =?us-ascii?Q?zkHi8A+/Sm7MnrXOLuSMs5ewKWa+WaWNAuEp3lijQKdVHcPgbnqVGTBauC3y?=
- =?us-ascii?Q?mDED+/RlAOczdjQ48WDmc5t2whke2xCgnBrQeKaj6sltCPE5Y1LGO8VZI3O4?=
- =?us-ascii?Q?mH4mmypereZGEtNRRns7THPzvYMxn688a/6ME1upf9ul+2mbqBPA9s8u6NXO?=
- =?us-ascii?Q?XAMjCnr5k/yubjFM5Ydbxi4eO7gaEmPUOA1OLSJl4w37w0EtgTLX35TVJG9A?=
- =?us-ascii?Q?4Ada713EaN4KmFM4Ybi7p9q/scfpLwXwthkaZ8keyIPKHSVa2XDEN1dfIvAM?=
- =?us-ascii?Q?ynmygwj61WHaFy5poVNeEcrHqtxveK4wEeB1nezVxdBCsGkSot6k8geqj449?=
- =?us-ascii?Q?xQt4XTPDQaZpbG35rPKQjrTfT3+XdhwDNbjrBuoiN5DOP6aM3YylBmwaFY+i?=
- =?us-ascii?Q?YpaJYHco4x7up9Pu2pSO/MWduUEyZhW5UVOIyus6iqipfJi6m1f+hDy1wm3x?=
- =?us-ascii?Q?WrqQCOoCg+ib/FYjSkgVD+3pNdWEoY1/k5rQ5z3fj4hIPq3lZtDHf2ulEfu8?=
- =?us-ascii?Q?9vFJXjFZi8nZWOZtNEEyyLKgtC3+ZniZItYSURqrmtpj114Wz1ne7JQJ1xMx?=
- =?us-ascii?Q?pwGO5WkLsf+4E7Rjb39sf2MiDSDbpai7ry7Pv545eLCVLw0Nr+RdGn4EG6TK?=
- =?us-ascii?Q?bYhacoJOD5PX24IoNEI5HBSP0d+RWMiLW5NsTjcw48Hqt5be08MPIzjJ8ljN?=
- =?us-ascii?Q?ZekWmzOI7okFaxrknjxYDEhqLJ30maERcAPpS8Poq6DO9dGnJySO1z1hbAAR?=
- =?us-ascii?Q?C6Jga6Zxk8P1NgEbKmZaHXZkfapSmK3UZk48XbbauZG9+J8D7oNKXNhU4p0X?=
- =?us-ascii?Q?YzM9oMEvXZB3nIwxmt0uV54Phq+zxP9zqF7Ux+Iq3ECVYHNPrwOIuxeKcHku?=
- =?us-ascii?Q?91pK9qYPIYFiDuCYMKnwReVaZYiS64+40/d76t1K/H1BqDGYwxqgm6m8s/bd?=
- =?us-ascii?Q?vyxzz/Wi8lk4PYkHGVnFJlyYm3bme9eVXuUv82cWsRWc12LR27ILYUZwcdmz?=
- =?us-ascii?Q?oVB2qkXtgteRGfVSn20NU5LySCo1X7UrCLmFn3J05eBybObCWQy+i77oT7IF?=
- =?us-ascii?Q?UrMAe2/QVPVBIwL4goActOPXjgec/juGoLjSMfDoQBbTrjUhqTofPkckIQXi?=
- =?us-ascii?Q?W/E79ZMX0UAGypbSoFUcukmIZYF8NBHtlvc3DSPcjn1DIiezFrowAsx6x3Fc?=
- =?us-ascii?Q?78lrl470l7Y3YIxx19fAMgC/MZaI6VNTopweaIGx+pvAJMSyNKuM2Y0ddhb/?=
- =?us-ascii?Q?yq0ZErGlePe9S7GhFKLIYPvwD24Ej9E8lIoBp+yFsbRyRM9G2a6sfV6s+brD?=
- =?us-ascii?Q?XdF4pZddZAlNUoE0OlM4eeh8YBxpx4PxXNvdcnYYy817qS2rpcTGDo4yWNGF?=
- =?us-ascii?Q?lLkquchgdCEkRHF4kuu1wiHtPrNBw6pURW8e+/asn53YspoaInKq50fsitRx?=
- =?us-ascii?Q?UczB/W0LoSjIUoQQku0lh3jdyIYBwPvfZgZkL+OwoYOwklqL6mZz?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b52b521f-0efd-417d-0c59-08dec6d547ef
-X-MS-Exchange-CrossTenant-AuthSource: DBAPR04MB7207.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 09:47:27.4308
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fGC99V0KlOW+RUCOUj4u3/n1me9HkfSe1np/dUOO+AwC6TJq1bXhPa5SMD6FSCYESzIVlv4BB1fi1Sp6BR3JSsjBOPfCrePs8miOtiaJP5kEfF4pxwzjGhFk27wTkclI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9875
+Subject: Re: [Kernel Bug] INFO: task hung in xt_find_table
+To: Longxing Li <coregee2000@gmail.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: syzkaller@googlegroups.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAHPqNmyfm4j0Vy--8rpYMEY1wOP-TgmnRWYd=7ragj1Z29=F7g@mail.gmail.com>
+ <aih7PqPryonzP7cI@chamomile>
+ <CAHPqNmxbS+YLQeOLOibm5rOBxA_nciMAVuEe5ERCOs3uE6+8+Q@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <CAHPqNmxbS+YLQeOLOibm5rOBxA_nciMAVuEe5ERCOs3uE6+8+Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [3.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297583-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297563-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:coregee2000@gmail.com,m:pablo@netfilter.org,m:syzkaller@googlegroups.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,netfilter.org];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:claudiu.manoil@nxp.com,m:vladimir.oltean@nxp.com,m:xiaoning.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:wei.fang@nxp.com,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.nxp.com:mid,oss.nxp.com:from_mime,vger.kernel.org:from_smtp,NXP1.onmicrosoft.com:dkim,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,nxp.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7065A66807C
+X-Rspamd-Queue-Id: 2CE43667EDD
 
-From: Wei Fang <wei.fang@nxp.com>
 
-Without ndo_get_vf_config(), userspace tools such as 'ip link show'
-cannot query the current VF configuration from the PF.
+On 6/10/26 3:14 PM, Longxing Li wrote:
+> sorry for not containing report plain text in last email. the report
+> is as follows:
+>
+> INFO: task syz-executor.4:42949 blocked for more than 143 seconds.
+>        Not tainted 7.0.6 #1
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:syz-executor.4  state:D stack:26456 pid:42949 tgid:42937
+> ppid:9759   task_flags:0x400140 flags:0x00080002
+> Call Trace:
+>   <TASK>
+>   context_switch kernel/sched/core.c:5298 [inline]
+>   __schedule+0x1006/0x5f00 kernel/sched/core.c:6911
+>   __schedule_loop kernel/sched/core.c:6993 [inline]
+>   schedule+0xe7/0x3a0 kernel/sched/core.c:7008
+>   schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7065
+>   __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+>   __mutex_lock+0xd9e/0x1df0 kernel/locking/mutex.c:776
+>   xt_find_table+0x59/0x1a0 net/netfilter/x_tables.c:1245
+>   ip6t_unregister_table_exit+0x22/0x50 net/ipv6/netfilter/ip6_tables.c:1808
+>   ops_exit_list net/core/net_namespace.c:199 [inline]
+>   ops_undo_list+0x2dd/0xa50 net/core/net_namespace.c:252
+>   setup_net+0x1f3/0x3a0 net/core/net_namespace.c:462
+>   copy_net_ns+0x351/0x7c0 net/core/net_namespace.c:579
+>   create_new_namespaces+0x3f6/0xac0 kernel/nsproxy.c:130
+>   copy_namespaces+0x45c/0x580 kernel/nsproxy.c:195
+>   copy_process+0x30cc/0x76d0 kernel/fork.c:2227
+>   kernel_clone+0xea/0x8f0 kernel/fork.c:2655
+>   __do_sys_clone+0xce/0x120 kernel/fork.c:2796
+>   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>   do_syscall_64+0x11b/0xf80 arch/x86/entry/syscall_64.c:94
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x471ecd
+> RSP: 002b:00007f51f163e008 EFLAGS: 00000202 ORIG_RAX: 0000000000000038
+> RAX: ffffffffffffffda RBX: 000000000059bf80 RCX: 0000000000471ecd
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000040080020
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000202 R12: 000000000059bf8c
+> R13: 000000000000000b R14: 000000000059bf80 R15: 00007f51f161e000
+>   </TASK>
 
-To support this, extend struct enetc_vf_state to track the per-VF VLAN
-and spoofchk settings, and update the corresponding setter callbacks to
-persist their state when the hardware is programmed.
 
-enetc_pf_get_vf_config() reads back the persisted state and reports MAC
-address, VLAN parameters, spoofchk, and trust state through struct
-ifla_vf_info.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
- .../net/ethernet/freescale/enetc/enetc4_pf.c  |  1 +
- .../net/ethernet/freescale/enetc/enetc_pf.c   | 24 ++++++++++++++
- .../net/ethernet/freescale/enetc/enetc_pf.h   |  4 +++
- .../freescale/enetc/enetc_pf_common.c         | 31 +++++++++++++++++++
- .../freescale/enetc/enetc_pf_common.h         |  2 ++
- 5 files changed, 62 insertions(+)
+This is not a deadlock — there's no lock cycle.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index c8059c67119c..4faff9e62749 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -615,6 +615,7 @@ static const struct net_device_ops enetc4_ndev_ops = {
- 	.ndo_hwtstamp_set	= enetc_hwtstamp_set,
- 	.ndo_set_vf_trust	= enetc_pf_set_vf_trust,
- 	.ndo_set_vf_mac		= enetc_pf_set_vf_mac,
-+	.ndo_get_vf_config	= enetc_pf_get_vf_config,
- };
- 
- static struct phylink_pcs *
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 209a3503609f..f11d401ba4c9 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -243,6 +243,7 @@ static int enetc_pf_set_vf_vlan(struct net_device *ndev, int vf, u16 vlan,
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
- 	struct enetc_pf *pf = enetc_si_priv(priv->si);
-+	struct enetc_vf_state *vf_state;
- 
- 	if (priv->si->errata & ENETC_ERR_VLAN_ISOL)
- 		return -EOPNOTSUPP;
-@@ -255,6 +256,17 @@ static int enetc_pf_set_vf_vlan(struct net_device *ndev, int vf, u16 vlan,
- 		return -EPROTONOSUPPORT;
- 
- 	enetc_set_isol_vlan(&priv->si->hw, vf + 1, vlan, qos);
-+
-+	vf_state = &pf->vf_state[vf];
-+	mutex_lock(&vf_state->lock);
-+	/* Currently only C-tags is supported, so tpid is always 0,
-+	 * which indicates ETH_P_8021Q.
-+	 */
-+	vf_state->tpid = 0;
-+	vf_state->qos = qos;
-+	vf_state->vid = vlan;
-+	mutex_unlock(&vf_state->lock);
-+
- 	return 0;
- }
- 
-@@ -262,6 +274,7 @@ static int enetc_pf_set_vf_spoofchk(struct net_device *ndev, int vf, bool en)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
- 	struct enetc_pf *pf = enetc_si_priv(priv->si);
-+	struct enetc_vf_state *vf_state;
- 	u32 cfgr;
- 
- 	if (vf >= pf->total_vfs)
-@@ -271,6 +284,16 @@ static int enetc_pf_set_vf_spoofchk(struct net_device *ndev, int vf, bool en)
- 	cfgr = (cfgr & ~ENETC_PSICFGR0_ASE) | (en ? ENETC_PSICFGR0_ASE : 0);
- 	enetc_port_wr(&priv->si->hw, ENETC_PSICFGR0(vf + 1), cfgr);
- 
-+	vf_state = &pf->vf_state[vf];
-+	mutex_lock(&vf_state->lock);
-+
-+	if (en)
-+		vf_state->flags |= ENETC_VF_FLAG_SPOOFCHK;
-+	else
-+		vf_state->flags &= ~ENETC_VF_FLAG_SPOOFCHK;
-+
-+	mutex_unlock(&vf_state->lock);
-+
- 	return 0;
- }
- 
-@@ -528,6 +551,7 @@ static const struct net_device_ops enetc_ndev_ops = {
- 	.ndo_xdp_xmit		= enetc_xdp_xmit,
- 	.ndo_hwtstamp_get	= enetc_hwtstamp_get,
- 	.ndo_hwtstamp_set	= enetc_hwtstamp_set,
-+	.ndo_get_vf_config	= enetc_pf_get_vf_config,
- };
- 
- static struct phylink_pcs *
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index 378ca4464538..55057073416c 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -12,11 +12,15 @@ enum enetc_vf_flags {
- 	ENETC_VF_FLAG_TRUSTED		= BIT(1),
- 	ENETC_VF_FLAG_UC_PROMISC	= BIT(2),
- 	ENETC_VF_FLAG_MC_PROMISC	= BIT(3),
-+	ENETC_VF_FLAG_SPOOFCHK		= BIT(4),
- };
- 
- struct enetc_vf_state {
- 	struct mutex lock; /* Prevent concurrent access */
- 	enum enetc_vf_flags flags;
-+	u8 tpid; /* SI-based VLAN TPID (0: 0x8100, 1: 0x88a8) */
-+	u8 qos; /* SI-based VLAN QOS (priority) bits */
-+	u16 vid; /* SI-based VLAN ID */
- };
- 
- struct enetc_port_caps {
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 52e7d2d2149b..597e020a0128 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -527,5 +527,36 @@ int enetc_pf_set_vf_mac(struct net_device *ndev, int vf, u8 *mac)
- }
- EXPORT_SYMBOL_GPL(enetc_pf_set_vf_mac);
- 
-+int enetc_pf_get_vf_config(struct net_device *ndev, int vf,
-+			   struct ifla_vf_info *ivi)
-+{
-+	struct enetc_ndev_priv *priv = netdev_priv(ndev);
-+	struct enetc_pf *pf = enetc_si_priv(priv->si);
-+	struct enetc_vf_state *vf_state;
-+
-+	if (vf >= pf->total_vfs)
-+		return -EINVAL;
-+
-+	vf_state = &pf->vf_state[vf];
-+	mutex_lock(&vf_state->lock);
-+
-+	ivi->vf = vf;
-+	ivi->spoofchk = !!(vf_state->flags & ENETC_VF_FLAG_SPOOFCHK);
-+	ivi->trusted = !!(vf_state->flags & ENETC_VF_FLAG_TRUSTED);
-+	enetc_get_si_hw_addr(pf, vf + 1, ivi->mac);
-+
-+	if (vf_state->vid) {
-+		ivi->vlan = vf_state->vid;
-+		ivi->qos = vf_state->qos;
-+		ivi->vlan_proto = vf_state->tpid ? htons(ETH_P_8021AD) :
-+						   htons(ETH_P_8021Q);
-+	}
-+
-+	mutex_unlock(&vf_state->lock);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(enetc_pf_get_vf_config);
-+
- MODULE_DESCRIPTION("NXP ENETC PF common functionality driver");
- MODULE_LICENSE("Dual BSD/GPL");
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index b2a2b06c794a..0e487ea9c0a5 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -19,6 +19,8 @@ int enetc_vlan_rx_del_vid(struct net_device *ndev, __be16 prot, u16 vid);
- int enetc_init_sriov_resources(struct enetc_pf *pf);
- int enetc_pf_set_vf_trust(struct net_device *ndev, int vf, bool setting);
- int enetc_pf_set_vf_mac(struct net_device *ndev, int vf, u8 *mac);
-+int enetc_pf_get_vf_config(struct net_device *ndev, int vf,
-+			   struct ifla_vf_info *ivi);
- 
- static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
- {
--- 
-2.34.1
+The runner is simply under heavy pressure on all three axes: CPU (zswap 
+compression) + memory (direct reclaim) + IO (swap).
+
+The hung task is just a victim. The actual holder is another task that 
+took the mutex and then fell into direct reclaim.
+
+Likely stack of the holder:
+get_entries
+   xt_find_table_lock
+   copy_entries_to_user
+     alloc_counters
+        vzalloc  -> direct reclaim
+
+"INFO: task hung" reports of this kind are common on the official 
+syzkaller dashboard https://syzkaller.appspot.com/upstream/
+
 
 
