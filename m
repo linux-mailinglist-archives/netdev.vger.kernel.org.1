@@ -1,290 +1,287 @@
-Return-Path: <netdev+bounces-297679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vgFaFiBjKWphWAMAu9opvQ
-	(envelope-from <netdev+bounces-297679-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:14:08 +0200
+	id KnlBAEhiKWo0WAMAu9opvQ
+	(envelope-from <netdev+bounces-297678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:10:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4DD669A07
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:14:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585686699B3
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:10:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=GqZNqFqb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297679-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297679-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=ownrisk-dk.20251104.gappssmtp.com header.s=20251104 header.b=ueOvockl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297678-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297678-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DF3453009F05
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:10:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C289D300B1D5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3319405C41;
-	Wed, 10 Jun 2026 13:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F107D403AF7;
+	Wed, 10 Jun 2026 13:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2F127B353
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD40027B353
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:10:24 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781097031; cv=pass; b=oFq9flDaHpboCg1e/WWoS2LjFUI8kIfxj8kxfzF+xXQezekaEB6h1c9ZjzzEOqvANCBqbipmMZERMl58jbpFWlkBYZbF8BdDPjwZRPU5F3xg+Lyk56AJgtI0s0BkWJdP6fsGQJhRmAZcoXMyBxKWhXY/IfjhBQJn2x3vcgafBhw=
+	t=1781097027; cv=pass; b=A8qZp8ulNCicYmg16tatiZwbC55TOhjnsg0S2vz/Dw4wia/Rvc3KRuSqIgCTPeOrCsSQQonBnOse3sTjmbsHZuWeEdJakEUBdoBuZXAN2Djpbn/ehz5PZWlO5HuW9IupatXRjbsQNGpCyDMAeTdMFdAkGxcBYjBZv2+To4G/pyo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781097031; c=relaxed/simple;
-	bh=CO80aREBKT4jwJQ1+t1e5YeUYBJqmiXpHflXmYTKDQk=;
+	s=arc-20240116; t=1781097027; c=relaxed/simple;
+	bh=KSTC4k+mFyL/3WNFMO+LVJpA3iwxG32DnXcDXmUeysY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nyKp62x2k3Elhfx+W4b/bpt+THx18qQitx/FhfGXlO2G+X82yFptJpHKBBMAeyeXxCMESPmfKPkevZoG6ulgwMxVLgEh6O/cqF2SJ9m6Zy3Nv67EPYbOBTrcpm9kFTJqqAEgfLJOAMhJEXJWRxeM2c0MARxkXPq2QnLqPj0ktfM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GqZNqFqb; arc=pass smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-7e2fc11088dso61017627b3.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:10:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781097030; cv=none;
+	 To:Cc:Content-Type; b=EHn0xN+6XdRDs+gSfx6oaiud9Y8JxfzMoq4k3SJEa/Aw8WpMKYWOKFSkzVyX0hs1P9N155OS2ivEaQyP2Ur2IFQfM0EYOf8S/f8jNauuy3IFt3y7PtkKvu7XZYk1ph5X9zYRzRxDvpWdmxtt6G5oNiXsacKuEzduMO8MtDVtGdk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ownrisk.dk; spf=none smtp.mailfrom=ownrisk.dk; dkim=pass (2048-bit key) header.d=ownrisk-dk.20251104.gappssmtp.com header.i=@ownrisk-dk.20251104.gappssmtp.com header.b=ueOvockl; arc=pass smtp.client-ip=209.85.219.46
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8ccef25789fso46269976d6.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:10:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781097023; cv=none;
         d=google.com; s=arc-20240605;
-        b=al0n/AXq/bAszTxIx/Rm0EG1Rg+DH9pepBpmdVarYtu2wghzuF4/sQc7XwhXKwvenO
-         8ba2+CUe+6h+v91rAoSORg7MD38+qcYHlXprguj6/xt9MJK3ZNoSY8YiULa6FJpRZyqH
-         xFPowyZxi8os0RwWJPtho/g5gze7MsKtb7MUwE1ZmNqfp/f8qXjcrPrxMmFJB2Nfmjv3
-         XUU9FTxihKSNQjldkqb15KkWTyaZ2/VVtgaUTBVYnqyNixNW4ui1oI6QuPPWbBKt+v/0
-         Q8hBiyLLn/DrtA2Qon4HGezZ4JThRk8kf3AEYJZLZh6K8J1FT7rKlGvcAvmRVBb8RMzc
-         2NKw==
+        b=Dv0pErV8tff/YO9drR6USYucnB0GPMMt0UydJ0w82ezNGjlnCfBFOm2JUgSDB9bxM3
+         KPbBmrBIFYmmJ5gFb4yUzb6tpe4AmjujcvG+XIuyHX0beFyePPZl47ELEXzqJs/uyOyn
+         /5q2UXzbn9fTmxiqKPZK88lu3kM5xGHhAvcZMIGy3VC8byZDvoyUV6CJerJhUWU8V4C2
+         7Bx/WEl1hdj41Fu2nsiHmJm/rdF6xowfO6xgaeG1pdVrpZC1F/KQj/UE7UyqkaxuWr96
+         dIkYrAWexyxYmdxlFCQunT/IpCH/ykfd0U+ZEubI8WoyIxThQve3UtSORzES7dvg9rzf
+         RRkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=XZ3cqlRT6t+bS9u/ulWJ1j1xI14SQqJ0tTJW5gmHh3k=;
-        fh=ijVgaA7YFtgz5U5Dur2p9oq1+XfLbktOBQNilcELb4Y=;
-        b=iCEUGmrr8jPRkOus0FTFr0qaABOY6CrO9MOK/Gxtavrw6+VJ9H4WZZgki6Da9jK1uw
-         +lm6qApc/c0NU2NABKpjEFIPYYRyPNwDF+Nr8VY99ogzxE17nWEf55iucjvWV/RR4Qk5
-         qxlEkSwm0VueStrM2wRWRFp9uM5GwGSBXDtDCS96pCQwd23cf04OGJWQKqI56s8famGL
-         iBFchlMg6CkKWUoI4ImXmnj35TuzkQZ7+k8G5AZsWWzRQJ/2yCV50SwuxJqKEOxRdt8H
-         aRBG79hJ6jU0jLUyaR9OxqYbfrorimCrhNZTKjvViOJc/YfD+kXBj9UJ/20v3QP/4R6s
-         D1mQ==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Sk9yvx8yYFR+qstLbRfhe+1164wVXZHqqAIjMOm9vvo=;
+        fh=SaOnNSnHlCQ5+u/JDOQ/NfGV/l5OyacYGAOpKT/1N6c=;
+        b=lGB8kq9fyOk7gHZrnNN7cr7m12XZjg2hmrl514BF1hqvh1eysAmtywlWO3tgNLpWaG
+         /6cdioqV1LNZXQzCCmT7L//i7GYWcagnzg5EMtBIjEiLYPBEz2ARexP045HnLIej//Of
+         xfE1Qv6VXZ5qqQFINwyndGAv9cJ3KmMPyUd0PJXslv9i7VCsi7As0ZZ3jVUj2Osi8HQH
+         sKCIGIEYdtAoK4+IDl+PyjgXVJsPgDwTjqQX6GZbHc53tFVcnDRb48W4RdAomdPPmXQb
+         CXsYii+LZNNjvJcv+WFpBdxyJtfyuR7nC1NEBnswwpVLbL00DAkIccXJN+tQdxlidPDg
+         4jZQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781097030; x=1781701830; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XZ3cqlRT6t+bS9u/ulWJ1j1xI14SQqJ0tTJW5gmHh3k=;
-        b=GqZNqFqbrHsHzf/1kIgEpsEIOAOIrX3yldiLe7fW0cEM5aocdwfmBaGM0G5mInt2o5
-         o1mgQloWQRrS3+aSfszdbDXVqZnepsHiQBxPZG4mGKMTS5elYEU5AOtM4iwG2AlY6vb4
-         sXlt98IfWUqVo4aKTo4ce0Di14cHEiOVUpBb4cGKD0YI9pbp4ROaZdTN1bqfYNXv+JKm
-         BmAGGyQGcg6Jp9HJ4aTakYyBaFOc+yxfqMQdHXx4DnOhY6a89iqbOrAumx76ipc9YTdb
-         ukPuwTBRL1iaywJ0Xc2SmKM/AelXph7mRIx+hvBZbCz2lQN9Tf7MHJm5NFQSbcX8t/3H
-         bGWA==
+        d=ownrisk-dk.20251104.gappssmtp.com; s=20251104; t=1781097023; x=1781701823; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sk9yvx8yYFR+qstLbRfhe+1164wVXZHqqAIjMOm9vvo=;
+        b=ueOvockl5ycP5D8P9hY+PpH1uhtyyzW5SNGOUillYesthhbZ22fL5DrW6t8ionFg0w
+         yS+gWV2WtEmzeD+hgdrVHKhPyTf/reT4cnrnx0b9eEk3zTX2G25WyE+wowqXIu0A2ds6
+         5nAK3EvsIL+iXOxhiX2avW+UMDFKeVPcdhKPTwPNhrpyJdcEeHfbC/3beqFrmtwsZFIt
+         mYQ2MvoWVtXvm3sUM2V2bZn+KiPRaywwV6DAvENihjb4+xI2ItiQAehVXLGzCE5w0LxF
+         NqCW3ePGJG0SbM42a+E51VgU+pT2ARZxna2QWbqGXyJ/IlzZ1s9yTPxEsam7jF7z6IAe
+         Q6QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781097030; x=1781701830;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XZ3cqlRT6t+bS9u/ulWJ1j1xI14SQqJ0tTJW5gmHh3k=;
-        b=d6VbbU2n/2mUELQDyNNoMlFjAv+XxZ4U+p5CNjh5M6tJnYUxIk5jI14Rh2PIEin0dm
-         iKAkziCiS2bgXi/h/ZvL1kiVgX0SOJfwlg5rQh6sEIm3ZhErm2XQ8x5uSC0yt8eUW0QW
-         1qslvHLql/1MaUtOEE5ZVcM5bRSOQRtphRe9oEq4dnRHBYqKmPfHciRiy0VkhA0BPHgw
-         qVCdJFU7rJO27YCjyUeaBENmueHRqwGiWyK1tvByT6ZVfzq0As/cpp712JKq14cDA2cA
-         BLX39K4fH3WsF4i8EQF9zmhs9xsaoUxSgTmmwJOcyhIZxN3TQCntmTWVMDmNjxddKyuJ
-         2RCA==
-X-Forwarded-Encrypted: i=1; AFNElJ/9nf1+M8eeKh5DZDdbcW2CRnjDCQxJh4v0A4vEkvkc4L6ZPL/qB3uoG1pHcWsfRd+6IVpk6KA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX7rZH8pZ6wpwcD1QHEarCw/qYozYo6Kh1hrNWaN92MBIQoQCn
-	IwFBZTjilKG8CyybdcOIqQoABmXz2Nv33cTZjNJhzUVemLy/pKd0JWm2uTb7+ZqAb5xRi9xhTpP
-	Cvuugw6QuSr3/Oe0cm7WXp8qpxwCmeCs=
-X-Gm-Gg: Acq92OHmxAKC7fzoYPio0En3qlURJH+v2nXRO1U3LhM11Ct5RbwLQQS5wuIFwCwv1Bh
-	p6d1INv+Aw9rZGsYo5gHXuh1lbQo26tRLve/w2G7Ja+qTv962KvCKfTDs1JMX+4XjJP11ky5z7m
-	LKG1xEijMhNzNZhGuYK+BBIO6VIQvoUZu07NV8tdHSTNmQHJTQVCYrUbbvEClqgeUMhA0JTVu8a
-	bEIqMuKUwYs8i35Bmd0TC2i1Gt10CC4j40p4OlaDAThq8r8DhIRGLUjl/kcjnJB1LAnMdprt1gH
-	Xhg0xawO0cTajX3BrX8deKE8MrBLZ2flQv3WfZ+bVrsU9TMHFTg=
-X-Received: by 2002:a05:690c:6d08:b0:7db:f1b4:15ed with SMTP id
- 00721157ae682-7ed0a200dc4mr240287727b3.3.1781097029483; Wed, 10 Jun 2026
- 06:10:29 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781097023; x=1781701823;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sk9yvx8yYFR+qstLbRfhe+1164wVXZHqqAIjMOm9vvo=;
+        b=fSMcg2n2q0hENsByYWFXGfgTqEuB1j59BI8dmjUhHO6IlUwQJDJzYlyP9hwoZZj+uP
+         U7ApyIHlVThbNXpxJADXzDpol5rswXt4CjmsalbHXzmAMvCy7g8U1b9HLRRohmVDby6j
+         YJc82OX5HsbTwvf1crqCYF80+8sbme5Ez4DLACqbqYdRDwdtfnibAPqETdhtsXqI2csg
+         dUuKLGl4oUkj2IkNkBRG94enNXKf8lzumQxONMKFjri7FfQLstkL2VL9FFfY9dVBE/b0
+         FJDZtfg+QuhyEyXFv2fkY+M7sNyoeeBTO05tsp9uVfUmGMO2tObqW6YjnXHVL3crpAV2
+         e56w==
+X-Gm-Message-State: AOJu0Ywyop2UsSY0cSR409bNq1+PCKHZvx3ppxoj6hNDrYHWmRFw6Unz
+	AOgk0VY7rq7fn0DAI7ptg2dEpyKv/HEaj7pFYFEG8O1XxV449udVyeMcKKnTGK1KQZLQS4P7qV1
+	exOR5ZVQoreGWZgPcgIS55bCkC1LgMHw3C9Nu3O7/h8tkwGBLF7KAoO8=
+X-Gm-Gg: Acq92OHhm/yETnVqYHrgIE8ScjRCtSQXXY0FbFE+JwJlRREMc4jQsYD+C1QNnkSEhMg
+	LfP+YAA7V1mT1tms4N47mELdqLhwOQ7hb6/kMSsBRCm+vBrntwM6bdcmBMn5Yh8bkNPDzvCw7HT
+	hIPYwuOXFgzBqRZPuqI7bxl6DsfAQRRjn7HqfHV6cQOo8eHotylrHzSmcKIL8l7Q4H1qc0HtEqz
+	E7rD0h1XCAVlGwBRlWFZ8GsiYJQmz/9rswG/EfygMvIhem9AV8VpRIHGEQHSiNASU+JdFIeH3Va
+	0kyIVhmaf8e+bhLjUoxEpxP4Dpfi85gTRQt5as3bQMO2TKD8
+X-Received: by 2002:a0c:fb43:0:b0:8cc:f3e0:87fd with SMTP id
+ 6a1803df08f44-8cee5f9f83dmr297340816d6.8.1781097023425; Wed, 10 Jun 2026
+ 06:10:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260610120812.49054-1-laoar.shao@gmail.com> <1f949cfc-eebc-4813-9dfc-b9a9ec79494d@blackwall.org>
- <CALOAHbBeBez2DAQD+1PPc1Dmm0HH0PQcytG-eaxgWyThRt890A@mail.gmail.com>
- <dd10cb23-261c-40b1-8b33-15a519f366c8@blackwall.org> <CALOAHbAnKP96ZZrVZw8duABJTUhmdcUZ_yWcJoRdjCCV9_pb2g@mail.gmail.com>
- <e1745196-d315-4dcc-8157-8a56a91f4e20@blackwall.org>
-In-Reply-To: <e1745196-d315-4dcc-8157-8a56a91f4e20@blackwall.org>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Wed, 10 Jun 2026 21:09:52 +0800
-X-Gm-Features: AVVi8Cf-I_bA34n6I3A9X25h7PWQZzeM9D7tCYB1QxkVLq4i1JJwUygsE7udRnU
-Message-ID: <CALOAHbAXFmpG83RaaM9NMzQ_pT7Dseh1vYuMurG-0QMsFFk_Hw@mail.gmail.com>
-Subject: Re: [PATCH net-next] bonding: add sysfs interface for broadcast_neighbor
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, Tonghao Zhang <tonghao@bamaicloud.com>
+References: <CAKv6aAM8_EWgXScnKmKYm_4SwGDVBK++dzfP+Y6msUXbp99QUw@mail.gmail.com>
+ <18972686-936d-4fb0-850f-7e212c48ab97@ovn.org>
+In-Reply-To: <18972686-936d-4fb0-850f-7e212c48ab97@ovn.org>
+From: Johan Thomsen <write@ownrisk.dk>
+Date: Wed, 10 Jun 2026 15:10:12 +0200
+X-Gm-Features: AVVi8Ccp_06BgJAKDooqyTG9fYqL1BcRnGWGV3YUI8gE4NE5slL-gOTtE8rqtZk
+Message-ID: <CAKv6aAPoo98bZ-oRk34huUtD3=j7EuGcL2sOLBB_rwzf4vpj3A@mail.gmail.com>
+Subject: Re: [BUG] FORTIFY: memcpy overflow in skb_tunnel_info_unclone() from geneve_xmit()
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org, Kees Cook <kees@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[ownrisk-dk.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297679-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:razor@blackwall.org,m:jv@jvosburgh.net,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:tonghao@bamaicloud.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:netdev@vger.kernel.org,m:dev@openvswitch.org,m:kees@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[ownrisk.dk];
+	FORGED_SENDER(0.00)[write@ownrisk.dk,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297678-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[laoarshao@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[write@ownrisk.dk,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ownrisk-dk.20251104.gappssmtp.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bamaicloud.com:email,mail.gmail.com:mid,vger.kernel.org:from_smtp,blackwall.org:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,ovn.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4E4DD669A07
+X-Rspamd-Queue-Id: 585686699B3
 
-On Wed, Jun 10, 2026 at 9:00=E2=80=AFPM Nikolay Aleksandrov <razor@blackwal=
-l.org> wrote:
+Hi Ilya,
+
+Sorry for the late follow-up.
+Your patch has now run without crashes in my setup for 36 hours and
+I'm unable to re-trigger a panic.
+
+> But the operation in the diff above is kind of pointless as the memcpy
+> itself will copy the value again.
+
+Right. So it would probably need at least a comment, if that ends up
+becoming the final fix.
+I'm not a kernel dev and I don't know what is the right thing to do here.
+
+Happy to test alternative patches if needed.
+
+BR
+Johan
+
+Den man. 8. jun. 2026 kl. 11.41 skrev Ilya Maximets <i.maximets@ovn.org>:
 >
-> On 10/06/2026 15:49, Yafang Shao wrote:
-> > On Wed, Jun 10, 2026 at 8:45=E2=80=AFPM Nikolay Aleksandrov <razor@blac=
-kwall.org> wrote:
-> >>
-> >> On 10/06/2026 15:39, Yafang Shao wrote:
-> >>> On Wed, Jun 10, 2026 at 8:30=E2=80=AFPM Nikolay Aleksandrov <razor@bl=
-ackwall.org> wrote:
-> >>>>
-> >>>> On 10/06/2026 15:08, Yafang Shao wrote:
-> >>>>> The upstream kernel has supported broadcast_neighbor for 802.3ad mo=
-de since
-> >>>>> commit ce7a381697cb ("net: bonding: add broadcast_neighbor option f=
-or 802.3ad").
-> >>>>> When upgrading from our local kernel to 6.18.y stable, we switched =
-from our
-> >>>>> out-of-tree implementation to the upstream one.
-> >>>>>
-> >>>>> However, the iproute2 package on our production servers is too old =
-to
-> >>>>> support the broadcast_neighbor option. To enable this feature, add =
-a new
-> >>>>> sysfs attribute at:
-> >>>>>
-> >>>>>      /sys/class/net/<bond>/bonding/broadcast_neighbor
-> >>>>>
-> >>>>> This allows enabling the feature by writing "1" to the sysfs file, =
-matching
-> >>>>> the interface we previously maintained in our local kernel.
-> >>>>>
-> >>>>> The result is as follows,
-> >>>>>
-> >>>>> - For 802.3ad mode
-> >>>>>
-> >>>>>      $ ip link add bond0 type bond mode 802.3ad
-> >>>>>      $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>>      0
-> >>>>>      $ echo 1 > /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>>      $ cat /sys/class/net/bond0/bonding/broadcast_neighbor
-> >>>>>      1
-> >>>>>
-> >>>>> - For other modes
-> >>>>>
-> >>>>>      $ ip link add bond1 type bond
-> >>>>>      $ cat /sys/class/net/bond1/bonding/broadcast_neighbor
-> >>>>>      0
-> >>>>>      $ echo 1 > /sys/class/net/bond1/bonding/broadcast_neighbor
-> >>>>>      bash: echo: write error: Permission denied
-> >>>>>
-> >>>>> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> >>>>> Cc: Tonghao Zhang <tonghao@bamaicloud.com>
-> >>>>> ---
-> >>>>>     drivers/net/bonding/bond_sysfs.c | 12 ++++++++++++
-> >>>>>     1 file changed, 12 insertions(+)
-> >>>>>
-> >>>>> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding=
-/bond_sysfs.c
-> >>>>> index eaba44c76a5e..24eb23634d98 100644
-> >>>>> --- a/drivers/net/bonding/bond_sysfs.c
-> >>>>> +++ b/drivers/net/bonding/bond_sysfs.c
-> >>>>> @@ -750,6 +750,17 @@ static ssize_t bonding_show_ad_user_port_key(s=
-truct device *d,
-> >>>>>     static DEVICE_ATTR(ad_user_port_key, 0644,
-> >>>>>                    bonding_show_ad_user_port_key, bonding_sysfs_sto=
-re_option);
-> >>>>>
-> >>>>> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
-> >>>>> +                                            struct device_attribut=
-e *attr,
-> >>>>> +                                            char *buf)
-> >>>>> +{
-> >>>>> +     struct bonding *bond =3D to_bond(d);
-> >>>>> +
-> >>>>> +     return sysfs_emit(buf, "%d\n", bond->params.broadcast_neighbo=
-r);
-> >>>>> +}
-> >>>>> +static DEVICE_ATTR(broadcast_neighbor, 0644,
-> >>>>> +                bonding_show_broadcast_neighbor, bonding_sysfs_sto=
-re_option);
-> >>>>> +
-> >>>>>     static struct attribute *per_bond_attrs[] =3D {
-> >>>>>         &dev_attr_slaves.attr,
-> >>>>>         &dev_attr_mode.attr,
-> >>>>> @@ -789,6 +800,7 @@ static struct attribute *per_bond_attrs[] =3D {
-> >>>>>         &dev_attr_ad_actor_system.attr,
-> >>>>>         &dev_attr_ad_user_port_key.attr,
-> >>>>>         &dev_attr_arp_missed_max.attr,
-> >>>>> +     &dev_attr_broadcast_neighbor.attr,
-> >>>>>         NULL,
-> >>>>>     };
-> >>>>>
-> >>>>
-> >>>> Then update your iproute2 package, sysfs use for options is discoura=
-ged
-> >>>
-> >>> Could you please explain in detail why this is discouraged?
-> >>>
-> >>>> and is not being extended on purpose. Move to netlink.
-> >>>
-> >>
-> >> Networking has been moving to netlink-only options for awhile now. Che=
-ck for
-> >> example:
-> >> 1e16f382ae0b ("net: bridge: add warning comments to avoid extending sy=
-sfs")
-> >>
-> >> The preferred way to configure device types is via iproute2/netlink.
+> On 6/8/26 10:25 AM, Johan Thomsen wrote:
+> > Hello,
 > >
-> > Thanks for your explanation, but I still don't understand the benefit
-> > of it. Could you elaborate further?
+> > I am seeing what looks like a kernel bug in the Geneve/OVS/vhost
+> > transmit path on a Talos Linux node running Kube-ovn with Geneve
+> > overlay and KubeVirt VM traffic.
 > >
+> > Environment:
+> >
+> > Kernel: 6.18.33-talos
+> > Distro: Talos v1.13.3
+> >
+> > Compiler/config:
+> >
+> > CONFIG_CC_VERSION_TEXT="clang version 22.1.2"
+> > CONFIG_CC_IS_CLANG=y
+> > CONFIG_LTO=y
+> > CONFIG_LTO_CLANG=y
+> > CONFIG_LTO_CLANG_THIN=y
+> > CONFIG_FORTIFY_SOURCE=y
+> >
+> > Hardware: HPE ProLiant DL325 Gen11, AMD EPYC
+> >
+> > NIC driver: bnxt_en
+> >
+> > Workload/network:
+> >
+> > Kube-OVN, Geneve overlay
+> > Open vSwitch datapath
+> > KubeVirt/QEMU VM traffic via vhost/tap
+> >
+> > Relevant console output:
+> >
+> > [  648.742603] memcpy: detected buffer overflow: 104 byte write of
+> > buffer size 96
+> > [  648.749907] WARNING: CPU: 61 PID: 27020 at
+> > lib/string_helpers.c:1036 __fortify_report+0x45/0x60
+> > [  648.758689] Modules linked in: dm_round_robin dm_multipath lpfc
+> > nvmet_fc nvmet intel_rapl_msr intel_rapl_common ahci nvme_auth bnxt_en
+> > nvme hpilo hkdf libahci sp5100_tco watchdog k10temp
+> > [  648.775429] CPU: 61 UID: 107 PID: 27020 Comm: vhost-27002 Not
+> > tainted 6.18.29-talos #1 PREEMPT(none)
+> > [  648.784735] Hardware name: HPE ProLiant DL325 Gen11/ProLiant DL325
+> > Gen11, BIOS 2.84 11/05/2025
+> > [  648.890478]  skb_tunnel_info_unclone+0x179/0x190
+> > [  648.895152]  geneve_xmit+0x7fe/0xe00
+> > [  648.907240]  dev_hard_start_xmit+0xa7/0x1f0
+> > [  648.911479]  __dev_queue_xmit+0x864/0xf40
+> > [  648.919688]  do_execute_actions+0x9b9/0x1be0
+> > [  648.927727]  ovs_execute_actions+0x58/0x170
+> > [  648.931960]  ovs_dp_process_packet+0xb1/0x1c0
+> > [  648.936370]  ovs_vport_receive+0x90/0x100
+> > [  648.940428]  netdev_frame_hook+0x146/0x1a0
+> > [  648.954093]  __netif_receive_skb+0x3f/0x160
+> > [  648.958324]  process_backlog+0x10c/0x210
+> > [  648.962295]  __napi_poll+0x2f/0x190
+> > [  648.965832]  net_rx_action+0x2e3/0x500
+> > [  648.969632]  handle_softirqs+0xe7/0x310
+> > [  648.985387]  tun_get_user+0x137e/0x1510
+> > [  649.005878]  handle_tx+0x41f/0xd30
+> > [  649.029014]  vhost_run_work_list+0x52/0x90
+> > [  649.033162]  vhost_task_fn+0xc2/0x140
+> > [  649.064145] ---[ end trace 0000000000000000 ]---
+> > [  649.068820] ------------[ cut here ]------------
+> > [  649.073489] kernel BUG at lib/string_helpers.c:1043!
+> >
+> > I don't know whether this is a real overflow or a FORTIFY false-positive.
 >
-> The benefits of netlink over sysfs?? There are so many.. it will help if =
-you
-> look into how netlink vs sysfs operate. Netlink is structured, transactio=
-nal,
-> typed, easily extendable, you can dump, do specific queries, it is less c=
-alls
-> and it supports notifications. I'm sure I'm missing, but in a nutshell it=
-'s
-> preferred. :)
-
-Thank you for the explanation. Requesting package upgrades on
-production servers is often challenging, particularly when additional
-library updates are required. Consequently, sysadmins prefer utilizing
-native shell commands, such as echo, to avoid these dependencies;-)
-
-Honestly, if a feature needs userspace tools to be upgraded, it will
-take years to see it in production... ;-)
-
---=20
-Regards
-Yafang
+> Looks like a false-positive from the __counted_by fortification.
+>
+> I'd guess something like this would fit it:
+>
+> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+> index 1fc2fb03ce3f9..e51c3795da474 100644
+> --- a/include/net/dst_metadata.h
+> +++ b/include/net/dst_metadata.h
+> @@ -164,6 +164,7 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+>         if (!new_md)
+>                 return ERR_PTR(-ENOMEM);
+>
+> +       new_md->u.tun_info.options_len = md_size;
+>         memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+>                sizeof(struct ip_tunnel_info) + md_size);
+>  #ifdef CONFIG_DST_CACHE
+> ---
+>
+> Johan, could you try this in your setup?
+>
+> The memory was actually allocated for the options, but the structure
+> is zeroed out on allocation, so the __counted_by check doesn't work
+> properly for the initial initialization copy.
+>
+> But the operation in the diff above is kind of pointless as the memcpy
+> itself will copy the value again.  So, I'm not sure if that's the right
+> solution here.
+>
+> Alternative might be to revert the kmalloc_flex back to the simple
+> kmalloc in metadata_dst_alloc.
+>
+> CC: Kees
+>
+> Best regards, Ilya Maximets.
+>
+> >
+> > I cannot reproduce the issue on Talos v1.12.X which uses a gcc built
+> > kernel, whereas the affected kernel is built with clang. Don't know
+> > whether this is relevant here.
+> >
+> > I am currently trying to make a reliable reproducer, but I can almost
+> > always trigger the issue when iperf stressing the VM-network.
+> >
+> > Please let me know if this should go to a more specific
+> > maintainer/list or further info is needed. I am able to test candidate
+> > patches if provided.
+> >
+> > Downstream bug reports:
+> > https://github.com/siderolabs/talos/issues/13440
+> > https://github.com/kubeovn/kube-ovn/issues/6767
+> >
+> > Thanks,
+> > Johan
+>
 
