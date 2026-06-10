@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-297682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297683-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LEONJzFqKWrdWQMAu9opvQ
-	(envelope-from <netdev+bounces-297682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:44:17 +0200
+	id J4QMNyJpKWqYWQMAu9opvQ
+	(envelope-from <netdev+bounces-297683-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:39:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EEF9669DEF
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:44:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8A5669D36
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 15:39:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HkiQtbdI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297682-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297682-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dkAkY5IB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297683-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297683-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7F9793109336
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:34:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9BF69300AD7F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF83409603;
-	Wed, 10 Jun 2026 13:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7357340DFB6;
+	Wed, 10 Jun 2026 13:34:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9354540B6E7
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8F240BCD3
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:34:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781098458; cv=none; b=p/kFc+7AL+n0zOoYF/q+JsCUIQ1LxSmtoFsBJEy8rid654FtrskHw022bjTiVSoPF/ROIjThMdt7w8KXBoNW1c3znxD3EvO3r/dh3xiExaG9tdudihvdoNfCcMJWi0LJHB5vXT7iWE9sQ3W2YZj1yxsta/2+sosrAIhZ0C/fftM=
+	t=1781098460; cv=none; b=WBRyqBQxPX14UM6HbsWnGazileme2g4chEuMCyMsAXN0EQENUt1FYXXeEc3o+XbiWq8fTyCc5Vbc7ybpg89S3NxPmynUEj0luezGrqnM79f8uGOLHCipJkswVH6XZroXjrFgG6T0Kp6lbEa9yhY9+u6JGr/iKWA43N2ESbJuGmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781098458; c=relaxed/simple;
-	bh=qgrA3XioKdkJphht2g8d3A6h701hC/9PRE5eNNfMt8k=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Q6IovgHQWzj0JBA5N76WJVo9oSJEF1jlUyImfLRz/QvfZAvQD/Vc8OimjdLjQAaaP8se83MUtpM8vZIsocUJK2YWG7+pn89C0O1pvw1zbQxsRWaiV+r+yUSGyeTAEqb3SsnfqmlAQ6A5DCpff4JDZSHESnBXMYL9qDjjTX94t/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HkiQtbdI; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5001F00893;
-	Wed, 10 Jun 2026 13:34:12 +0000 (UTC)
+	s=arc-20240116; t=1781098460; c=relaxed/simple;
+	bh=ujYjaKQmH/43BAUSYahWwODlSqyewlW/Te4uswwIl+s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Rvy7K3VzW5fiB/Atw6xOJp6fMeOs1lCqDdeSiF1M1XbquwpwGg6RxrHclVEHL0BjUfUp8HJNa3TQKWyPYS+O615RFEIuKO+gGxoJZtSz+c9uOqOnZWGLFhDaxgQZOWcs/7ACUzp1EIjdcS8Y/P0t9DQJYpEp1wc1n+abJIC+gos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dkAkY5IB; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E681F00899;
+	Wed, 10 Jun 2026 13:34:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781098452;
-	bh=pud1BKNlE340QqB4LGfMxf04oM6t5suYLOhM/DdiAO0=;
-	h=From:Subject:Date:To:Cc;
-	b=HkiQtbdIhjM43fJCPp/ffFJDxFzwsT3cnJXX0EzqTwMusjiO2M4XhYPjBbePdgoNL
-	 Z/TfQnTF+PV6dK0VAfJaUYtz+V9dv30cDiVoIw/Hgk9WhlmWZ1wgDrCRE4q2OBAPKM
-	 ev9d1Nwq37b6VLf3XrDUoMPod/ndCmujlghN46Cb6d4D5/utQ2ot/xXSbFUwFIdy7l
-	 V78+5ibnp4V9QNQdhw/LqLC40kpWEqGtb2WBrYb61LpSLfNaQsBNrrieUbL+vPBrE8
-	 O2w8SapdOfLxd091jSR+CxiTwSHJ79KWQtQaf1yuiWUJHqWKEXYoUEMNg5QfZKk9eg
-	 THbhH5McTNGIA==
+	s=k20260515; t=1781098455;
+	bh=c2swTuD8KfvTTLbEuvUbdA4Gtz8qC+3kctJH8isA5Ig=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=dkAkY5IBJa0H60g+Dd5GekRjIxrLf2l390iTQAc1+DEsmDoZluqAPB3fJPOuYK1+n
+	 k+Ia2baEqc0XMPhPWYaENYejP+E+0RYFpfOHTUNokeigulc2FY5i7SncIln5tP+4c4
+	 wGfgar0/yV8K3YJevIEkXx8Nm3plf4flN65JXgu7UP9tvg+5Mj2DBxMXw0v9IG7q4w
+	 ag+3FjABlKQkjCkJL4mBooTHVxmExwWb5CzcZlbMiwtmNazW7cXzWc9qwcCd09XKn0
+	 uZRWLzr44rIaKo/nW9DkSLZYQz5y8952SBv5pWtvry1g9toLPVMXtsN2iRDhFbIywa
+	 qYW8QOWobCF/g==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net-next v4 0/2] airoha: add the capability to configure
- GDM3/GDM4 as WAN/LAN on demand
-Date: Wed, 10 Jun 2026 15:33:35 +0200
-Message-Id: <20260610-airoha-ethtool-priv_flags-v4-0-60e89cf28fea@kernel.org>
+Date: Wed, 10 Jun 2026 15:33:36 +0200
+Subject: [PATCH net-next v4 1/2] net: airoha: refactor QDMA start/stop into
+ reusable helpers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,11 +58,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/43NTQqDMBAF4KtI1k3JjzXaVe9RSolxoqGSSBKCR
- bx7gytLQcrAwOMx3ywogDcQ0LVYkIdkgnE2h/JUIDVI2wM2Xc6IEVaRPFga7waJIQ7RuRFP3qS
- nHmUfcFtJKYjKqyYo308etJk3+44sRGxhjuiRm8GE6Px7e5ro1v/hJ4opLgltmWo0NJreXuAtj
- Gfn+41NbE+JI4plSpRMCSkp0Jr9UHxP1UcUzxSHGninuBb08kWt6/oB5XQpe2MBAAA=
-X-Change-ID: 20260606-airoha-ethtool-priv_flags-b6aa70caa780
+Message-Id: <20260610-airoha-ethtool-priv_flags-v4-1-60e89cf28fea@kernel.org>
+References: <20260610-airoha-ethtool-priv_flags-v4-0-60e89cf28fea@kernel.org>
+In-Reply-To: <20260610-airoha-ethtool-priv_flags-v4-0-60e89cf28fea@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -77,12 +75,12 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297682-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297683-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -102,61 +100,105 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5EEF9669DEF
+X-Rspamd-Queue-Id: DF8A5669D36
 
-Add the capability to configure GDM3/GDM4 as WAN/LAN on demand when QoS
-offload is created or destroyed.
-Make dev->qdma an RCU pointer so the TX path can safely dereference it
-without holding RTNL.
-Introduce airoha_qdma_start() and airoha_qdma_stop() helpers.
+Factor out airoha_qdma_start() and airoha_qdma_stop() from
+airoha_dev_open() and airoha_dev_stop(). These helpers will be reused
+by the QDMA hot-migration logic introduced in the next patch to
+dynamically switch GDM3/GDM4 ports between LAN and WAN QDMA blocks.
+Add a DMA engine busy poll in airoha_qdma_stop() to wait for in-flight
+DMA transfers to complete before cleaning up TX queues.
 
+Tested-by: Madhur Agrawal <madhur.agrawal@airoha.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-Changes in v4:
-- Move back QDMA TX/RX DMA enable to airoha_dev_open()/airoha_dev_stop().
-- Configure GDM3/4 as WAN if GDM2 is not available in ndo_init()
-  callback.
-- Protect qdma pointer in airoha_gdm_dev struct using RCU.
-- Rely on rtnl_dereference() to access qdma pointer in the control path.
-- Add airoha_qdma_start() and airoha_qdma_stop() utility routines in
-  patch 1/2
-- Link to v3: https://lore.kernel.org/r/20260608-airoha-ethtool-priv_flags-v3-1-3e8e3dc3f715@kernel.org
+ drivers/net/ethernet/airoha/airoha_eth.c | 53 ++++++++++++++++++++++----------
+ 1 file changed, 36 insertions(+), 17 deletions(-)
 
-Changes in v3:
-- Do not introduce ethtool private flags support to configure LAN/WAN
-  for GDM3/4 and rely on tc qdisc offload for it instead.
-- Set GDM3/4 ports as LAN by default.
-- Move QDMA TX/RX DMA enable from airoha_dev_open() to airoha_probe()
-  and the corresponding disable from airoha_dev_stop() to airoha_qdma_cleanup().
-- Link to v2: https://lore.kernel.org/r/20260607-airoha-ethtool-priv_flags-v2-1-742c7aa1e182@kernel.org
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 5a8e84fa9918..aeac66df5f3b 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1771,6 +1771,40 @@ static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
+ 	spin_unlock(&port->stats.lock);
+ }
+ 
++static void airoha_qdma_start(struct airoha_qdma *qdma)
++{
++	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
++			GLOBAL_CFG_TX_DMA_EN_MASK |
++			GLOBAL_CFG_RX_DMA_EN_MASK);
++	atomic_inc(&qdma->users);
++}
++
++static void airoha_qdma_stop(struct airoha_qdma *qdma)
++{
++	u32 status;
++
++	if (!atomic_dec_and_test(&qdma->users))
++		return;
++
++	airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
++			  GLOBAL_CFG_TX_DMA_EN_MASK |
++			  GLOBAL_CFG_RX_DMA_EN_MASK);
++
++	if (read_poll_timeout(airoha_qdma_rr, status,
++			      !(status & (GLOBAL_CFG_TX_DMA_BUSY_MASK |
++					  GLOBAL_CFG_RX_DMA_BUSY_MASK)),
++			      USEC_PER_MSEC, 50 * USEC_PER_MSEC, true,
++			      qdma, REG_QDMA_GLOBAL_CFG))
++		dev_warn(qdma->eth->dev, "QDMA DMA engine busy timeout\n");
++
++	for (int i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
++		if (!qdma->q_tx[i].ndesc)
++			continue;
++
++		airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
++	}
++}
++
+ static int airoha_dev_open(struct net_device *netdev)
+ {
+ 	int err, len = ETH_HLEN + netdev->mtu + ETH_FCS_LEN;
+@@ -1806,10 +1840,7 @@ static int airoha_dev_open(struct net_device *netdev)
+ 	}
+ 	port->users++;
+ 
+-	airoha_qdma_set(qdma, REG_QDMA_GLOBAL_CFG,
+-			GLOBAL_CFG_TX_DMA_EN_MASK |
+-			GLOBAL_CFG_RX_DMA_EN_MASK);
+-	atomic_inc(&qdma->users);
++	airoha_qdma_start(qdma);
+ 
+ 	if (!airoha_is_lan_gdm_dev(dev) &&
+ 	    airoha_ppe_is_enabled(qdma->eth, 1))
+@@ -1862,19 +1893,7 @@ static int airoha_dev_stop(struct net_device *netdev)
+ 		airoha_set_gdm_port_fwd_cfg(qdma->eth,
+ 					    REG_GDM_FWD_CFG(port->id),
+ 					    FE_PSE_PORT_DROP);
+-
+-	if (atomic_dec_and_test(&qdma->users)) {
+-		airoha_qdma_clear(qdma, REG_QDMA_GLOBAL_CFG,
+-				  GLOBAL_CFG_TX_DMA_EN_MASK |
+-				  GLOBAL_CFG_RX_DMA_EN_MASK);
+-
+-		for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
+-			if (!qdma->q_tx[i].ndesc)
+-				continue;
+-
+-			airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
+-		}
+-	}
++	airoha_qdma_stop(qdma);
+ 
+ 	return 0;
+ }
 
-Changes in v2:
-- Rework airoha_dev_set_wan_flag routine
-- Enable GDM_STRIP_CRC_MASK in airoha_disable_gdm2_loopback()
-- Do not always reset REG_SRC_PORT_FC_MAP6 in
-  airoha_disable_gdm2_loopback() but use the same condition used in
-  airoha_enable_gdm2_loopback().
-- Link to v1: https://lore.kernel.org/r/20260606-airoha-ethtool-priv_flags-v1-1-401b2c9fe9f1@kernel.org
-
----
-Lorenzo Bianconi (2):
-      net: airoha: refactor QDMA start/stop into reusable helpers
-      net: airoha: defer GDM3/GDM4 WAN mode and GDM2 loopback to QoS offload
-
- drivers/net/ethernet/airoha/airoha_eth.c  | 273 +++++++++++++++++++++++++-----
- drivers/net/ethernet/airoha/airoha_eth.h  |  24 ++-
- drivers/net/ethernet/airoha/airoha_ppe.c  |  18 +-
- drivers/net/ethernet/airoha/airoha_regs.h |   1 +
- 4 files changed, 267 insertions(+), 49 deletions(-)
----
-base-commit: 5855479abc796c3b5d7b2f2ca147d68fc56cae1f
-change-id: 20260606-airoha-ethtool-priv_flags-b6aa70caa780
-
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.54.0
 
 
