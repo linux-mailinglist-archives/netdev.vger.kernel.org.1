@@ -1,254 +1,192 @@
-Return-Path: <netdev+bounces-297844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297845-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id csM7KaLcKWoeegMAu9opvQ
-	(envelope-from <netdev+bounces-297844-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 23:52:34 +0200
+	id F8lsGVLiKWryewMAu9opvQ
+	(envelope-from <netdev+bounces-297845-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 00:16:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053B366D20A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 23:52:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C0466D2C0
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 00:16:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=iWdxJgxm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297844-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297844-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=asu.edu header.s=google header.b=maoqxLO0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297845-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297845-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2085E3144E7D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:52:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2BEF3110BB2
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A919314B8C;
-	Wed, 10 Jun 2026 21:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960C93546D1;
+	Wed, 10 Jun 2026 22:16:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B512D6E72
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 21:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233892E7375
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 22:16:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781128340; cv=none; b=iOnH2gjTs7B913JjbaGhqJSOAQJKZE+WnhCLyXA74UPN7TzTR1gPGg2MUWGtwo/2McqvDjIIuKglWJsFzXppc4baG3CSFNY+KAmzmZELU2xlnT93+yVa9zuzJljzfAZMwYTVr+j0F2c5oqVLViGYXvSjMm2s1rxfnzmHafgx6sc=
+	t=1781129781; cv=none; b=Qg/mNkSz+lvl24rH3oLFRKv5jXOczdYHg+iCYNeHpF1xuBydIePFl1OuSh6MXfNwBK503bpqk/wJkHNQ9l2znOM73K97P2MwlJvLYM/E8BwBJmUz83AFCzq9M8j8MKqfZLw6IoHYb4/trEf6IWeFTxGL0Xcmt8ccDtEBePEXLRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781128340; c=relaxed/simple;
-	bh=zipjgAzMkalo/Pp3aPEMTis0IPGNah676JG0Rbdr1Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c/KVBwWrE5/v3AO587SSq3RC0RIPoGcSddep/oDU7oZS6qcfAPk3cM47hKQDyCX9FQvlka1h7C6oLze7/HOoV5hCeLkg6+HTX7ERTp/F+BpvaQUiErRJdveBFSzq2E6ld3tAZYnSstqcn0LofjGhr7FQ966jFGkA8g/oZ4jcczs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iWdxJgxm; arc=none smtp.client-ip=209.85.128.51
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-490c1915793so52278995e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 14:52:18 -0700 (PDT)
+	s=arc-20240116; t=1781129781; c=relaxed/simple;
+	bh=sA5wDrFp+CIULT1bCPxy5eyB03Jyi7VOtlavmBqnXaI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SfiwLzKVuGmB5O/8QVTjYJtJT9yD0zreMwnLFxqjMRTe1yQ9p7EOBKlOFhl4uSDFbbYf37ETrH/ru4y6mbRaY9TIE20fFeFC7n3c3oRhFKncjgaGDOhtBD0nFYA0A+Lx6aItCB3PRmlfhNGKtHr5w9nQN/EqypN0CBiIvK6dS1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=maoqxLO0; arc=none smtp.client-ip=209.85.216.53
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-36baeec21dcso4763146a91.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 15:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781128337; x=1781733137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pu9xDm8soA90OJqRQivplXBBU0m7fynUgXp21Gt49gw=;
-        b=iWdxJgxmJSl41iMKUWNQwH7uxtH+pJcubLpLFRPhIBlBPjFwjdsJen4+dX7KaEZDui
-         I+RB7uRhhO3vd7LPDzyxqzx3IdE9TItFrGh0ARFm+qaVrtUmPAz9elVqQSJSrHYaz4s1
-         oPcyavXq/w9Hv2yBLC5VFlOAF9DPcid/EQM4uxBEUuCv/IktUB8eiIvNcJEZw8MDMOZT
-         I039gT+AQGvLy/9ain8uO0JgVeZ8yqfHKcGlzjW2VFwCccmJM4S8tct9tNRQg8w+5TKa
-         auRbgtpHGo1nV0xP/erVAW54qFmH2X2W4Ox9Y6yHSHWBacv1ydSameF2JPFMlDolGyoK
-         WJsA==
+        d=asu.edu; s=google; t=1781129778; x=1781734578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AnoVRF6dvwmy9F0C12un1rCKf6ehebtbYfYrWq+XNsU=;
+        b=maoqxLO0+siIgAsGky2xHKpnv/2zus5g0orwzvYOzBksAPuaY3+KC5A8L0xB+qrSK5
+         U9UQ/sVPLG1s7IqzD0AMyRfdi4eGhFAHKGN6/uxYvujjzoCR93Gntn7Yde4VAXR9sKtv
+         6tXhgP5gUkRxLiohviaky0kBb86CAQZ0vohVg+XciqQYquW1BU710EApMlfypH+Ussf6
+         Lvh30Lp9fT2ZxwBeR4hXrpTVhUBCJk48vwXnot2rbLvqk2ugDi3B5UI02iw5B4VEO9wO
+         UKc5H0OulDGo23N3qxk2uDL+JarPd5qiqrfOVOFhvid7VetAs7KuvXmUIZ8d2H3VJKZT
+         ulrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781128337; x=1781733137;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Pu9xDm8soA90OJqRQivplXBBU0m7fynUgXp21Gt49gw=;
-        b=d9/3MKCW9lCBYSU5DMrRwiOSqPYvR38RC5RNSgp2/nlMP0xWyAfg1ba7bZAMw0S6KC
-         hGz8DWobjq9ptMTcQWTlsrGE/QSSLQfb/P2atHfw5yfkAqI/rxJL9qj9JoIBgKS8Ta3/
-         qb8nDwFDzDXGXRHe1UCx/Q7J2ASRMMEdA/P8gsgs5YTZUxe/nOhVBA9R9z5PuXSf2BWZ
-         c0LaVq6vCr0vKduIOUlX1eLvMfmOp3UukZ9BXQe4deH0geJGNbRpZxLTkL/BjeR3/S7X
-         pjdnLfdKRFJ2yXANWEbm4LYEKrYPXUDgbdyiBp02JLkH1L6icl9GcZNocmwaiIWtTTJd
-         CkWA==
-X-Forwarded-Encrypted: i=1; AFNElJ/59IG2imGfB99ri2RHyHzHaEzS3rIGAz3eAK7B5KIY/wbiyTtayztOFlOh0Vibze66ue411A8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJWIEaOhyGhqY/I6mXW19rWqTozk0ZSEYI7hIxxrqVBEBPaY+l
-	FtcFNESM51/4JqV0Lpm4G4lxq7+IbnR6YJtQI3JLrP3bqJadLwIM07yhsC7IL+h3
-X-Gm-Gg: Acq92OGKh8wc/zhyU4CG26/TuUZUetjIqqqfxABNI578rVfypvF0UHOOldb5lCJArky
-	O6YxAhSEWxA5hAmNZJf0QrZgEVI1wNZfhjDqSLmcWrYkXMY5+1nyktkDpRIZe5P+uEY6uHMOOx+
-	dyHtdVfQXIxSUYrovndrlXUOKHoSbCiPsL3he7xaXLA+7diOPByoN8ACtG0YmYY18GvD9FyGgT9
-	kc/DnpI9KgESy4j9oj/xZrYldQ58FR4AkajDUhgvjSlIKAjES49+SObyZbdnt/md4Ru+pva2JGU
-	m5k+yhh2H+/wzf9nzfudv82XYMeiYUU9bSKUioN759nOVUIu8NnT19JxdpDSHaIw1ZA6fOqR4SY
-	OaQ+xcuCWBuxJRPSZ5CYXzjH86dV4ZBFNA2+Qb1Ykw3vxkh9f7iAQHbB0ftYCRSmWcNPuvF4aW6
-	AoIR/WY5/eILVE6zdboVYoAu++MQdhzp/m++3wgmrbjAB1HzzENAR/GWOeqMK8WnPm5Xd0wm9nc
-	uZv2uovaw==
-X-Received: by 2002:a5d:64c5:0:b0:460:2d45:fe8c with SMTP id ffacd0b85a97d-460677b902fmr46333f8f.38.1781128337225;
-        Wed, 10 Jun 2026 14:52:17 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f344558sm71699352f8f.18.2026.06.10.14.52.16
+        d=1e100.net; s=20251104; t=1781129778; x=1781734578;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AnoVRF6dvwmy9F0C12un1rCKf6ehebtbYfYrWq+XNsU=;
+        b=ZCiYRhBdje54Tu42t7FGPsFSBy7O5vKIckOYcL6dLJCsWzc/ywfxPvt8rmOkznOOfE
+         /uvzVTF4A4OORAp1ssWarMrOS3Jx0AimS33kp8r0z70US4rnOtxBhivwHLCiDAoqGkML
+         M8+eaqzOu5oon56VZlrCmjPadai+/YZbFFziVim8IISISoaYcIMoQTwgsqaEWbF7hEqS
+         9WdBH8XwdhMhgsCle54gKiqFNBsrVGvLidPkr2Gz+4/uYxBGAvdYJNhLxKDCJq1qTfxS
+         ija2hj44gpG/NzyaocMp8XE18S1CrUD7L+S/C6Q3IlNNf0/2IFKo36HnvNvF9kKSRLXh
+         6Z+g==
+X-Forwarded-Encrypted: i=1; AFNElJ/5b7jdQSsyF6vVkKgrpggWDV90d21QTMIT3JLEN37yHlvRna/0nAexwIpW+78Vb5UUPrqdmNM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2M/U9TCeViNN/8GM5s1VRG8CH7vqIlaHbZ5DxotiSVdetySRq
+	Kifxl0BqbhmdNP88yIATwPi0DbdBZWG8uXvbkO9FbPZLUdpvLsUSCb2UFsojz+EwGg==
+X-Gm-Gg: Acq92OFKqloPdnV+yisLyFLtmXG5sMRI0RSUeQpmreS8algOMIB8HhU9kij4cMD4qxN
+	EeG62SceDY71yckZJYfl10VnGI357RD2IueZQ110ZXoIbByBc5p4deOoD1v9ZHlSk+/moFf9dQN
+	HWtavxr0mjpMLjHiTTT8vjZtDn7dN1x+rH2Bd83ZroTEp2q17szdfygC5ej7/1a5kIMilb6LMJV
+	zRvi+QiCtoJLIEeZ9ildgW3KIuzpRSp2Bc9ysdtgwFRktN8a5BcsvJ4IicDI2lHc0xE0FWwA54L
+	sh33SuKg4HtYwlJBdZ3rTPF0A6mI6qhR4busO7gVlXKet08lcOsFRjDyeNdX2X6UHwpJd6jfghj
+	Q2fsDnrwFiScGliCkjKlXODfehtWsnrkSJMZ9Zi1n9yb29rz0aIWpWclzP148dsTwwPvgLdC1Nj
+	fHx3L7f28wqaEWIQXJftU=
+X-Received: by 2002:a17:90b:57f0:b0:36b:71e6:3e01 with SMTP id 98e67ed59e1d1-377a4d95a42mr152613a91.16.1781129778354;
+        Wed, 10 Jun 2026 15:16:18 -0700 (PDT)
+Received: from p1.. ([2607:fb91:1582:d2f1:7bbf:a7c4:749b:120a])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3775549af53sm356019a91.11.2026.06.10.15.16.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 14:52:16 -0700 (PDT)
-Date: Wed, 10 Jun 2026 22:52:15 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Kees Cook <kees@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, linux-hardening@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Arnd Bergmann
- <arnd@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>
-Subject: Re: [PATCH net-next] net/devlink: Use strscpy() to copy strings
- into arrays
-Message-ID: <20260610225215.6783c5bf@pumpkin>
-In-Reply-To: <202606101355.6353D5C1@keescook>
-References: <20260608095523.2606-13-david.laight.linux@gmail.com>
-	<c6eb816c-3f2d-4705-82ea-8c2c0ad70ded@redhat.com>
-	<202606101355.6353D5C1@keescook>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Wed, 10 Jun 2026 15:16:18 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	minhquangbui99@gmail.com,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] virtio-net: fix len check in receive_big()
+Date: Wed, 10 Jun 2026 15:16:06 -0700
+Message-ID: <20260610221606.1091465-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297844-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kees@kernel.org,m:pabeni@redhat.com,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:jiri@resnulli.us,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev,gmail.com,asu.edu];
+	TAGGED_FROM(0.00)[bounces-297845-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pumpkin:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,asu.edu:dkim,asu.edu:email,asu.edu:mid,asu.edu:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 053B366D20A
+X-Rspamd-Queue-Id: D4C0466D2C0
 
-On Wed, 10 Jun 2026 13:58:51 -0700
-Kees Cook <kees@kernel.org> wrote:
+receive_big() bounds the device-announced length by
+(big_packets_num_skbfrags + 1) * PAGE_SIZE.  That is still too loose:
+add_recvbuf_big() sets sg[1] to start at offset
+sizeof(struct padded_vnet_hdr) into the first page, so the chain
+actually carries hdr_len + (PAGE_SIZE - sizeof(padded_vnet_hdr)) +
+big_packets_num_skbfrags * PAGE_SIZE bytes -- 20 bytes less than the
+check allows for the common hdr_len == 12 case.
 
-> On Tue, Jun 09, 2026 at 03:39:35PM +0200, Paolo Abeni wrote:
-> > On 6/8/26 11:54 AM, david.laight.linux@gmail.com wrote:  
-> > > From: David Laight <david.laight.linux@gmail.com>
-> > > 
-> > > Replacing strcpy() with strscpy() ensures that overflow of the target
-> > > buffer cannot happen.
-> > > 
-> > > Signed-off-by: David Laight <david.laight.linux@gmail.com>
-> > > ---
-> > > This is one of a group of patches that remove potentially unbounded
-> > > strcpy() calls.
-> > > 
-> > > They are mostly replaced by strscpy() or, when strlen() has just been
-> > > called, with memcpy() (usually including the '\0').
-> > > 
-> > > Calls with copy string literals into arrays are left unchanged.
-> > > They are safe and easily detected as such.
-> > > 
-> > > The changes were made by getting the compiler to detect the calls and
-> > > then fixing the code by hand.
-> > > 
-> > > Note that all the changes are only compile tested.
-> > > 
-> > > Some Makefiles were changed to allow files to contain strcpy().
-> > > As well as 'difficult to fix' files, this included 'show' functions
-> > > as they really need to use sysfs_emit() or seq_printf().
-> > > 
-> > > All the patches are being sent individually to avoid very long cc lists.
-> > > Apologies for the terse commit messages and likely unexpected tags.
-> > > (There are about 100 patches in total.)
-> > > 
-> > >  net/devlink/port.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/net/devlink/port.c b/net/devlink/port.c
-> > > index 485029d43428..108926d3f899 100644
-> > > --- a/net/devlink/port.c
-> > > +++ b/net/devlink/port.c
-> > > @@ -1222,7 +1222,7 @@ static void __devlink_port_type_set(struct devlink_port *devlink_port,
-> > >  			devlink_port->type_eth.ifindex = netdev->ifindex;
-> > >  			BUILD_BUG_ON(sizeof(devlink_port->type_eth.ifname) !=
-> > >  				     sizeof(netdev->name));
-> > > -			strcpy(devlink_port->type_eth.ifname, netdev->name);
-> > > +			strscpy(devlink_port->type_eth.ifname, netdev->name);  
-> > 
-> > Given the above BUILD_BUG, I don't see how this change can help?!?
-> > 
-> > Generally speaking, I suggest restricting this kind of tool-assisted
-> > changes to real problems (if any).  
-> 
-> How did this patch get generated? This isn't an "unbounded" case: both
-> devlink_port->type_eth.ifname and netdev->name have known sizes. I think
-> a way to focus these kinds of refactors would be to replace strcpy()
-> with a macro wrapper that fails a build when the sizes aren't known, but
-> then otherwise calls strscpy instead. With that in place, you can find
-> all the actually unbounded cases and work through each of them, and once
-> they have all been purged from the kernel, that strcpy macro can land,
-> which will keep new unbounded instances from showing up.
-> 
+A malicious virtio backend can announce a len in that gap.  page_to_skb()
+then walks one frag past the page chain, storing a NULL page->private
+into skb_shinfo()->frags[MAX_SKB_FRAGS], which is both an out-of-bounds
+write past the static frag array and a NULL frag handed up the rx path.
 
-My current wrapper (which will allow the above is):
-#if !defined(ALLOW_STRCPY)
-#define strcpy(dst, src) ({ \ 
-        size_t _dst_size, _src_size; \
-        char *const _dst = dst; \
-        const char *_src = src; \
-        bool _use_memcpy = true; \
-\
-        _dst_size = __is_array(dst) ? sizeof(dst) : __builtin_object_size(dst, 1); \
-        BUILD_BUG_ON_MSG(!_dst_size, "strcpy() dst size zero"); \
-        BUILD_BUG_ON_MSG(_dst_size == SIZE_MAX, "strcpy() dst size unknown"); \
-\
-        if (__builtin_constant_p(_src && _src[0])) \
-                _src_size = __builtin_strlen(_src) + 1; \
-        else { \
-                BUILD_BUG_ON_MSG(!__is_array(src), "strcpy() src unbounded"); \
-                _src_size = sizeof(src); \
-                BUILD_BUG_ON_MSG(!_src_size, "strcpy() src is zero length array"); \
-                _use_memcpy = _src_size <= 32; \
-        } \
-        BUILD_BUG_ON_MSG(!statically_true(_src_size <= _dst_size), "strcpy() src too big"); \
-        if (_use_memcpy) \
-                __underlying_memcpy(_dst, _src, _src_size); \
-        else \
-                __underlying_strcpy(_dst, _src); \
-        _dst; \
-})
+Bound len by the size add_recvbuf_big() actually advertised.
 
-__FORTIFY_INLINE __diagnose_as(__builtin_strcpy, 1, 2)
-char *(strcpy)(char * const POS p, const char * const POS q)
-{
-        BUILD_BUG_ON_MSG(1, "Direct call to strcpy");
-        return p;
-}
-#else
-...
-#endif
+Fixes: 0c716703965f ("virtio-net: fix received length check in big packets")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+ drivers/net/virtio_net.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-The one I was using before required the source be a constant string.
-
-Note that this is just intended to find the unbounded copies at compile time,
-rather than being a suggested patch.
-The ALLOW_STRCPY is needed for things like the acpi code which are out of tree
-(and other files I didn't want to fix).
-
-The acpi code is stunningly bad, it saves the string lengths for the kmalloc()
-calls and then uses strcpy() to copy the data.
-If anyone manages to gen them out of sync it will overwrite memory.
-
-	David
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index f4adcfee7a80..afe73eda1491 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -1999,15 +1999,17 @@ static struct sk_buff *receive_big(struct net_device *dev,
+ 				   struct virtnet_rq_stats *stats)
+ {
+ 	struct page *page = buf;
++	unsigned long max_len;
+ 	struct sk_buff *skb;
+ 
+ 	/* Make sure that len does not exceed the size allocated in
+ 	 * add_recvbuf_big.
+ 	 */
+-	if (unlikely(len > (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE)) {
++	max_len = vi->hdr_len + (PAGE_SIZE - sizeof(struct padded_vnet_hdr)) +
++		  vi->big_packets_num_skbfrags * PAGE_SIZE;
++	if (unlikely(len > max_len)) {
+ 		pr_debug("%s: rx error: len %u exceeds allocated size %lu\n",
+-			 dev->name, len,
+-			 (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE);
++			 dev->name, len, max_len);
+ 		goto err;
+ 	}
+ 
+-- 
+2.43.0
 
 
