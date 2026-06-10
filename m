@@ -1,226 +1,421 @@
-Return-Path: <netdev+bounces-297590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z6rZHQI6KWqVSgMAu9opvQ
-	(envelope-from <netdev+bounces-297590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:18:42 +0200
+	id vs4uCoc5KWp/SgMAu9opvQ
+	(envelope-from <netdev+bounces-297591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:16:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3237668301
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:18:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864416682C2
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:16:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=hvvsC4m9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297590-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297590-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=N9bXsgh5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297591-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297591-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53757300AB28
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:13:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 065BF30913E5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDABD3DCD97;
-	Wed, 10 Jun 2026 10:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB333EDAA6;
+	Wed, 10 Jun 2026 10:15:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013021.outbound.protection.outlook.com [40.107.159.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105053DE434
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:13:25 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781086409; cv=fail; b=rk7UqkNx5ceNz9h3LsXKlOKD70CUXMHdL3bXf9aU9hDFe5dRbsavoQrD4vvHSebmhdJAIa2b3kbh3qhVURWDFu0YLnv2mZa2jG7hgrw0PKWJvTRyZiXDqH+WqcMYF6+R+XfZCq3Ah7OVmUE6Uf9FUwRQHw9vA68PdLxqfNeZbMA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781086409; c=relaxed/simple;
-	bh=SCf0gjm9Brm+6f5nuIPgd6MLO2KEFGjqMgjNVhzfKcE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MnuT7X9GiXoK1feJgt5ByOotQUFloosTOYOt6U+tskAeBpo3hBuqhWlm+j0OpDN20Xz0jh+PSjJZf0bgN/+SgIe1+cklCdpQ4UgL5pk/rxyZ0a+zszMCvIpo5s5GOKDgDOL+ANYlEsJ5RxER/TvkH+GiECn9NdvYwviutFrm7nU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=hvvsC4m9; arc=fail smtp.client-ip=40.107.159.21
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p7hHKvyTfN1gRo84+bZrgBg60IJkacmVmO1naDd8n3LHPzmbDCW0V3zbtjxy21glOxX4J8Ui5c0G40RGjNIWa9zhD7afW5l8g7/OhIDnGzIqHEnJNw8bITkCkI2R9BPXajDyV07CXG03UpvQkCwJ7E04gqG1s99SfY0Ibit1aIvOQsvOQILI0JXHGujbc1TAjd9X141JpQRr+8wZoJEv5OhVVALtO4k4SvbUC6efkxdaR91nSp2Mhyk4jHbUMcHvIdigvPEpl1v2Z7d2QKCZFAPYnBAU4PSLuA3jVVPDk/6ieQvbe+7fFaTJTNepV9L7fCI0Zm3fci0HR8uzmDvMgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SCf0gjm9Brm+6f5nuIPgd6MLO2KEFGjqMgjNVhzfKcE=;
- b=Svymy9MdS+n7CjXvvNrni0yJO67DGwOH2tRLAUeSPlSliPYcahuAlyQSJw1KlbVnKm7QS6h62d/Ecni46/N0ZtwYXp8ACkYCJ9jF8RB8mdkzoIB3N7pSYu4B01WrZpSe7cz2KxZ7ecJvbFLUHalI/uwxLmjkk/26X0MCxvTkuus7NNspGGhSjVUTmZDCwVH5LhOk7f+iV/ZYTnZyBgP6Semq0NuALC/8CixscvHoicClt2bGaXxNluHxfUwSzqnFdmzxAIBXm+tfO7A5o04l9WpdYjuVFpZNT5TRGcqCyfTUSl9CcZeHnbUi+K9BXLEbHm+qYeu9Iz2DRxFzqYbzKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SCf0gjm9Brm+6f5nuIPgd6MLO2KEFGjqMgjNVhzfKcE=;
- b=hvvsC4m9DBOWavxjW2vsy48WjGNKuPwSYu9BB7IGKFfqkJBG0UDRN5E6dZko1f78SeBMC8mL895bAsQo7oGWI+YlATJr6ccQyFZClI2wo5fLwgz89gInruhs6+OXXV/TDyb4ggm1NQV1uBphD9Efx4cJOw4M01nkO14DkTghJZNNfZaFX49Bvwy5rvXqlp7hVrICQdspFbw3P4nL7B5WYyevfz3Vl74UMJ1wxMSO/vgtHxzCHXNihdZd98XLpP/vi1e0hiIT2XC/Ka+i9QaoE17fsQtsqH/UI5n95kOXwY+jf4Yvdw/bEwu6oNvHYIdouT61EH9P92ArhsghsNV0Gw==
-Received: from DU2PR04MB8629.eurprd04.prod.outlook.com (2603:10a6:10:2dc::6)
- by DU4PR04MB11030.eurprd04.prod.outlook.com (2603:10a6:10:593::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.15; Wed, 10 Jun
- 2026 10:13:21 +0000
-Received: from DU2PR04MB8629.eurprd04.prod.outlook.com
- ([fe80::9d04:7526:a901:fe47]) by DU2PR04MB8629.eurprd04.prod.outlook.com
- ([fe80::9d04:7526:a901:fe47%6]) with mapi id 15.21.0113.011; Wed, 10 Jun 2026
- 10:13:21 +0000
-From: "Wei Fang (OSS)" <wei.fang@oss.nxp.com>
-To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>
-CC: "imx@lists.linux.dev" <imx@lists.linux.dev>, "Frank.Li@kernel.org"
-	<Frank.Li@kernel.org>, network dev <netdev@vger.kernel.org>
-Subject: RE: [PATCH v4 net-next 5/9] net: dsa: netc: initialize the group
- bitmap of ETT and ECT
-Thread-Topic: [PATCH v4 net-next 5/9] net: dsa: netc: initialize the group
- bitmap of ETT and ECT
-Thread-Index: AQHc97/mLNuYQ8KoE0eAZZEekplxrLY3IsWAgABxP2A=
-Date: Wed, 10 Jun 2026 10:13:21 +0000
-Message-ID:
- <DU2PR04MB86291549B9C1DA3827ED90A1881A2@DU2PR04MB8629.eurprd04.prod.outlook.com>
-References: <20260609032955.2066089-6-wei.fang@oss.nxp.com>
- <20260610032759.A09281F00898@smtp.kernel.org>
-In-Reply-To: <20260610032759.A09281F00898@smtp.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU2PR04MB8629:EE_|DU4PR04MB11030:EE_
-x-ms-office365-filtering-correlation-id: 220a3e7a-ddcd-424d-1032-08dec6d8e670
-x-ms-exchange-sharedmailbox-routingagent-processed: True
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|19092799006|38070700021|6133799003|18002099003|22082099003|11063799006|56012099006|4143699003;
-x-microsoft-antispam-message-info:
- Gv3BAjQlyundbbqehJ6Zk03QMIHiDUWp+xGMTUnstMMW7g0CrnY37y6CRvNXEiWnaUlxKzPT9UzdnPqAfjy7xSZmrt6PHnlEzwFr6HBfF/033iVdU+pmHWB6qM25gOi9bfa+0YbvlNcjgd5fLgtbPTGNhNg8siL7eNdgC1/hUhCtYEpGdJeLHFhGoJiHPH7ES08ske0/lsuPsqIfHLqX2eOJVtnKVw58gxQMf2AF+nWqydcwp5r1hRcJTb3gcvw/s3q+KMMv5YCHTuiffyAdo3XCWEQgWHl59dXb/5itk6fEpTvAv7dZOwqT5WB9XXzitt8QXQNFuhQd/JrkrBDoqGbSmac45/CmtgIvRn1lYP71rbvTGmCg2vQheWhHg/2ClLhkrbv3bkic0U+su4/O/31MdmPq0z8N6XOhBBVwq3fB7YBkDgdYHWMxV6GRKwRa0EEEx1Y+ry3hxqukjgWR7gA4r5pE77OQjxlwoFf+3li4t0EJFnEBRbgfN8WkjqTZZPGZTPPCpa+DooigkOO/oQmw8UvB1ObIxD4n98GfmF3boqu/k4/cEIsuAi5d3u0YiwrUINOAU3W/8lSHnpNVPzZpNUkilPjH62hetHwbdPORFQ0rrzDF1ucICxSWRmP6EU9iGcC0BSKEutNpJj6j/+oNTRz2Rhj4ypxYehRJRGlA3ksWAvdgqRVRTBaLwOKU3eYNN1dSG8IkwqEIYZ3F8PI8ZrbK50Jfvc+mACbr+Rb6BaOT6nL3sp7TK+ZAkcaj
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8629.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(19092799006)(38070700021)(6133799003)(18002099003)(22082099003)(11063799006)(56012099006)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Qkswb2EwdGVxRTZxdXAvTW53Y0N6dnR3UUR0QUgxeEIxS0NBVGxjWjk4WHM1?=
- =?utf-8?B?clEwdVMyczFoNkszSC9NNnREUTZkV0pydlVVdjdVWjZockRmb0ZZTzcrTXVx?=
- =?utf-8?B?UDhwb3JSN2krbU1yK0g1UGdoRDlLRkJjNUhqeGRFQ0tPMU1jYXduTzhhZnpC?=
- =?utf-8?B?aWtmUDdaVjdnUjlXQ29YQUNRYUJWM3B0WTlLOWRqY2RWN0ZucmZiOFZBQVNX?=
- =?utf-8?B?aGt1ckE2RXNOSHk1UHZ5dEZIUm00SW9hV2VjTXAzMDRxRVM2bFJSd2kzMkpN?=
- =?utf-8?B?MWpZcFM1d3BoaUgyV0ZJTExiNWtWV0NweWV1WmZEcVYxK2tFT2JFVWZKSU5X?=
- =?utf-8?B?Yjg3YmtRcWRsQjkrWUpLQWtvcHh4K0dRcmlOazVLWjN0TFJjL1ZreWY2OTgr?=
- =?utf-8?B?Ulp3bTF1WnplNW1QTDNmQkxjT28rdlBQdWlITis4eW1BOStScEdsUjNGN2d2?=
- =?utf-8?B?UWFZT3FlZkp4Q001Mm0wczRBcVB1WTRqZjdTVUVHZUY1cEVBeUFmNFozWHhP?=
- =?utf-8?B?RWg0cXJxdTd4TituRjhWVGpNMnRxMlh1TUZ1TFpHZzdKSjhIc0dPMHM3R3Az?=
- =?utf-8?B?cnUrL3AwQWRmdm82OEZkLy83d1VkL2dTeVJRbGJZNXJqZjhBd0NwQS9peFdq?=
- =?utf-8?B?eTk3UnNaOWwxSVFYdmhoM0FjZStLS3VQL3BmbngyckVkQTdEWkEzWXp1c2Jw?=
- =?utf-8?B?TGsyVEYvUVFheFlZYyt4Y3d5eFdhc0Z2eWc5a0pPTlJqa3Awd2lwMytGOTdC?=
- =?utf-8?B?SEM1RSs2dnJiaWpnZTNGVjRpcDZNR25XUTJXQ1kvYmYxa2d6Zk5CMnZSSFgr?=
- =?utf-8?B?MSszT1dQU0ZaM1hJeGVXbXhhM1JFR3ZQVSsyYVNhOFhtRVJsTGxHZW1EeTRm?=
- =?utf-8?B?Mm9FVkRlZWNTd1c4WmRBbUVIOU9LZnRNMDd3RDJ3S0Zya3IwVENtQS9QdTdx?=
- =?utf-8?B?NVdLQllQTXJGZ2Z4WnpMSVo5N0pzTVhhU2x4NXlPRWtMdHNqSjZEb3IweWw1?=
- =?utf-8?B?K2lJTGhranpWWWRzdUZDVVFlVWdJZHFETmhkMnpNY3F6NU5RemcwYWdjUlg1?=
- =?utf-8?B?dDFKbEYwZ1RyTW5aZzYya3JMWG9XdEpkZkhaVmpMK09Cc0JoRGhsZ1NHTG5a?=
- =?utf-8?B?VCtCUDhid3ZzMDc4dWs3MmNiazBrUm1DWllOajNRcURUQjNmTmRhOUdpRnEz?=
- =?utf-8?B?VDl3RUNJSGdmaWQ1bnVVSVY0eFVpMm8zeEx3ZGN5d1dsOWE4UDdMNTgzNXF0?=
- =?utf-8?B?c3lsTmZsek5RbUdoTWlWak0yZWZFR3A2ejZOaGRpQ3lpRmhsd2hqZGFGUlBn?=
- =?utf-8?B?a2haY0ZrUnlJK1l5eWFNblFxeDlSV3htVU44MzdKMjdWYlFJR0dQUS9tSVl1?=
- =?utf-8?B?UUdrV002dGhUcHZqWlBYWWdQajdJQzZyUmJSS1grTjJnRWk4cFJpWEx3NllR?=
- =?utf-8?B?UmFkekVEUkEwbDNSNWxVUEhxQzZYU0hsdHJ6MXo5M0VLUGN2ajNDZ3M5U2xl?=
- =?utf-8?B?WUpyNTlxdmsyVnI1ZXpqY21lSkhKekh4U3o3amtGaHdwZnprNDJrUURLa1Ro?=
- =?utf-8?B?N0lsT2NEdlJRSWVEa21RNnROdzFpWUxtZFd5Wnk4TmFaUUQ1SkJRbmFWSGRu?=
- =?utf-8?B?cThoc3N1MFhzWDN2Z3RhZkxSUWhtdzhVN3NYREN1dVAzci80NHZ1MHZ5ZENM?=
- =?utf-8?B?eDNDTUJ0QTk1RFM2TGxPdURFSFNrdHZON2dEVVVuT2xrK25HajFnQ2RxTmpJ?=
- =?utf-8?B?bFIvM3ErNWNTMVBjVGhJUks3SDc3MDRvMTlRZk1mYjJqWUQwQmZKd3VNVEJQ?=
- =?utf-8?B?Z1dDTFp1MHJwV2YrdzUzR3pncjcvbUc2d21OVFFpd1NNaDRVcTB0dFI1dXFt?=
- =?utf-8?B?aENKRDNaZUViaEl2c3B1OUtrVHk1MGR2ZUNONzFDQUVPeWxaWm1Rb2RRYWRX?=
- =?utf-8?B?d00zZVVWSWJ4SWxEcHN3bU1aSzhDNXlvSXVnRTBnTDJMRjQyVmVSS0MvNUdl?=
- =?utf-8?B?K1dHMTJmOVNZWmp2ZW1nakJwSDhnV3ZveVp6R1d6Wi9jcHBqSVNOVllvZ2Jp?=
- =?utf-8?B?RXlzVlA0MkJNaTFRdW5iTmljdTJpZUZudTROLzBYRDZrZ3c0WWRTWTg4TGIv?=
- =?utf-8?B?R3Z0L1htRWZOcXZGbXhhWHFFU0Zvd29XM3VyZ0pRbTFLek8rV0ZHQmhoSXpi?=
- =?utf-8?B?V1pET1ppcHFURFprckw2eXhWYzFhQUk0VmFiOVVhV0VsdWE5VWRJWCtsdFBj?=
- =?utf-8?B?Q05SUmd2M2JlVENQQVdqV2VtWDhzdUY5SVB6STVJTHFIQ1RBUVVMbFpMeW81?=
- =?utf-8?Q?ej5ils13EVSurtVdNa?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1513ED13F;
+	Wed, 10 Jun 2026 10:15:47 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781086549; cv=none; b=Uysp4zVV3pXtxpYaf9nTkX9VraQqowUiY4Hnt00cekNP3r5Vr1R9foZrBGIK9feADSV0md041biVfoWDTSFjxDzxCnfQW/4+NSRNNLIGHbRiXKAXEBXIZxMYQ0GZt9zSE1UCqd3byMvxEo5dIqF6KfMSkRBQel9WjAd7gvrLNY4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781086549; c=relaxed/simple;
+	bh=vEq9Rv03mpbNdTfPWEWfnwT22GPNBbx9wYn4wx9W5mE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r28YNvbxuXaeFPBEIfiw9zNb7C09QYm9gPxHxZyUZ5oO4CVjGVQmvKSoisNaYYDkEg+0MKIh3cOXqSvmQPedk4shTBA+VMI2OZmPZS8wb9n9K7FCJz4uZctBkbhMGizYEpbKKWTA//WAtvV/6hslyt4AXoGpyJ5os+icE8Z2cwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9bXsgh5; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B851B1F00893;
+	Wed, 10 Jun 2026 10:15:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781086547;
+	bh=jVGzH0+5ZsJlz3zw8RMPQKLSocsN610DG7FY1dVE+9I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=N9bXsgh5a9VWrjRTE7YjLalzQXWWiZ21iZlZUS9sxb2X6VHiXqGpry/Oo26DnlISt
+	 cdZbf7dgMSXe7zRIXzySBD6Yj3T9M36o3xBcmNZe8p6qM9c5/8HFJPoHcP5emUAPHe
+	 wbD0pyUC1nqO6gH2xhe/WYSATQ99BcyrR2KCAhzUmyAM5JmoNzIVU4cJ2gQnsWTHd0
+	 syNJS4m7oW1KLf+O/gfaEX0muKz46vKGll+8J44B/FsvBa9YfcxD95Eb11RNXeZWAf
+	 lfqdHj5OlKlDjt7DV/Kdj3e9joTa0MmiaMmKLajNGR+x2/LZ3qYJK7prKYmhid7Kca
+	 B0oCao+1w1/yg==
+Message-ID: <ffca21d8-ee29-4d63-8db2-73634124fdd8@kernel.org>
+Date: Wed, 10 Jun 2026 12:15:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8629.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 220a3e7a-ddcd-424d-1032-08dec6d8e670
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2026 10:13:21.4086
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: t1gLXFi/1w9WXW8grL+wH/Xwpb11BAi9PRUx8eWJWOMCKuFflYkVXAuezLrfiyIjibmq05gTBNB8EjjYCXW0/w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11030
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
+ coalescing via ethtool tx-usecs
+To: Simon Schippers <simon.schippers@tu-dortmund.de>,
+ =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
+References: <20260527135418.1166665-1-hawk@kernel.org>
+ <20260527135418.1166665-6-hawk@kernel.org>
+ <db2aa3b9-09d4-46d8-aafc-0a859ee8b635@tu-dortmund.de>
+ <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
+ <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
+ <b8569d0f-7a99-4488-a1bb-63d813231b7d@tu-dortmund.de>
+ <90fc9fc1-f396-4ed1-888f-89a96294664e@kernel.org>
+ <5e6315b1-b734-4f5f-af5e-bc76612f0993@tu-dortmund.de>
+ <fb84879b-9fdf-4474-b152-9cbf0887bd21@tu-dortmund.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <fb84879b-9fdf-4474-b152-9cbf0887bd21@tu-dortmund.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sashiko-reviews@lists.linux.dev,m:imx@lists.linux.dev,m:Frank.Li@kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297591-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:j.koeppeler@tu-berlin.de,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:kernel-team@cloudflare.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297590-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[NXP1.onmicrosoft.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,cloudflare.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,DU2PR04MB8629.eurprd04.prod.outlook.com:mid,NXP1.onmicrosoft.com:dkim,vger.kernel.org:from_smtp,oss.nxp.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tu-dortmund.de:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C3237668301
+X-Rspamd-Queue-Id: 864416682C2
 
-PiBjb21taXQgODY2NzJhNTkzY2FlNjE1NmI0N2QwMmYwZDJlYWQzOGNmYTUzOTUzYg0KPiBBdXRo
-b3I6IFdlaSBGYW5nIDx3ZWkuZmFuZ0BueHAuY29tPg0KPiANCj4gbmV0OiBkc2E6IG5ldGM6IGlu
-aXRpYWxpemUgdGhlIGdyb3VwIGJpdG1hcCBvZiBFVFQgYW5kIEVDVA0KPiANCj4gVGhpcyBjb21t
-aXQgY2FsY3VsYXRlcyBhbmQgYWxsb2NhdGVzIGluZGV4IGJpdG1hcHMgZm9yIHRoZSBFZ3Jlc3Mg
-VHJlYXRtZW50DQo+IFRhYmxlIChFVFQpIGFuZCBFZ3Jlc3MgQ291bnQgVGFibGUgKEVDVCkgYmFz
-ZWQgb24gaGFyZHdhcmUgY2FwYWJpbGl0aWVzLiBUaGUNCj4gYml0bWFwIHNpemVzIGFyZSBjYWxj
-dWxhdGVkIGJ5IGRpdmlkaW5nIHRoZSB0b3RhbCBoYXJkd2FyZSBlbnRyaWVzIGJ5IHRoZQ0KPiBu
-dW1iZXIgb2YgYXZhaWxhYmxlIHBvcnRzLg0KPiANCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9u
-ZXQvZHNhL25ldGMvbmV0Y19tYWluLmMNCj4gYi9kcml2ZXJzL25ldC9kc2EvbmV0Yy9uZXRjX21h
-aW4uYw0KPiA+IGluZGV4IGZhN2RkMzA3Y2UxMzAuLmQ0NDc1YWQ3ZWQ2YzIgMTAwNjQ0DQo+ID4g
-LS0tIGEvZHJpdmVycy9uZXQvZHNhL25ldGMvbmV0Y19tYWluLmMNCj4gPiArKysgYi9kcml2ZXJz
-L25ldC9kc2EvbmV0Yy9uZXRjX21haW4uYw0KPiANCj4gWyAuLi4gXQ0KPiANCj4gPiArc3RhdGlj
-IGludCBuZXRjX2luaXRfbnRtcF9iaXRtYXBfc2l6ZXMoc3RydWN0IG5ldGNfc3dpdGNoICpwcml2
-KQ0KPiA+ICt7DQo+ID4gKwl1MzIgbnVtX3BvcnRzID0gbmV0Y19udW1fYXZhaWxhYmxlX3BvcnRz
-KHByaXYpOw0KPiA+ICsJc3RydWN0IG5ldGNfc3dpdGNoX3JlZ3MgKnJlZ3MgPSAmcHJpdi0+cmVn
-czsNCj4gPiArCXN0cnVjdCBudG1wX3VzZXIgKm50bXAgPSAmcHJpdi0+bnRtcDsNCj4gPiArCXUz
-MiB2YWw7DQo+ID4gKw0KPiA+ICsJaWYgKCFudW1fcG9ydHMpDQo+ID4gKwkJcmV0dXJuIC1FSU5W
-QUw7DQo+ID4gKw0KPiA+ICsJdmFsID0gbmV0Y19iYXNlX3JkKHJlZ3MsIE5FVENfRVRUQ0FQUik7
-DQo+ID4gKwludG1wLT5ldHRfYml0bWFwX3NpemUgPSBORVRDX0dFVF9OVU1fRU5UUklFUyh2YWwp
-IC8gbnVtX3BvcnRzOw0KPiANCj4gW1NldmVyaXR5OiBIaWdoXQ0KPiBDb3VsZCBjYWxjdWxhdGlu
-ZyB0aGUgYml0bWFwIHNpemUgdXNpbmcgdGhlIG51bWJlciBvZiBhdmFpbGFibGUgcG9ydHMgbGVh
-ZCB0bw0KPiBvdXQtb2YtYm91bmRzIGFjY2Vzc2VzIGJ5IHRoZSBoYXJkd2FyZT8NCj4gDQo+IElm
-IGFueSBwaHlzaWNhbCBwb3J0cyBhcmUgZGlzYWJsZWQgaW4gdGhlIGRldmljZSB0cmVlLCB0aGUg
-YXZhaWxhYmxlIHBvcnQNCj4gY291bnQgd2lsbCBiZSBzdHJpY3RseSBsZXNzIHRoYW4gdGhlIGhh
-cmR3YXJlJ3MgYWN0dWFsIHBoeXNpY2FsIHBvcnQgY291bnQuDQo+IA0KPiBXaGVuIHRoZSBoYXJk
-d2FyZSBwZXJmb3JtcyBhbiBlZ3Jlc3MgbG9va3VwLCBpdCBhZGRzIHRoZSBwaHlzaWNhbCBwb3J0
-IGluZGV4DQo+IHRvIHRoZSBiYXNlIEVUVCBvciBFQ1QgZW50cnkgSUQuIEJlY2F1c2UgdGhlIGdy
-b3VwIHNpemUgaXMgY29tcHJlc3NlZCBoZXJlDQo+IGJhc2VkIG9ubHkgb24gYXZhaWxhYmxlIHBv
-cnRzLCBpdCBhcHBlYXJzIHRoZSBoYXJkd2FyZSBjb3VsZCBhY2Nlc3MgYW4gZW50cnkNCj4gb3V0
-c2lkZSBvZiB0aGUgaW50ZW5kZWQgZ3JvdXAuIEZvciB0aGUgaGlnaGVzdCBhbGxvY2F0ZWQgZ3Jv
-dXAgaW5kaWNlcywNCj4gd291bGQgdGhpcyBhZGRpdGlvbiBleGNlZWQgdGhlIGJvdW5kYXJpZXMg
-b2YgdGhlIGVudGlyZSBFVFQvRUNUIHRhYmxlPw0KDQpUaGlzIGlzIGEgZmFsc2UgcG9zaXRpdmUu
-ICJpdCBhZGRzIHRoZSBwaHlzaWNhbCBwb3J0IGluZGV4IHRvIHRoZSBiYXNlIEVUVCBvciBFQ1QN
-CmVudHJ5IElEIiBpcyBhIHdyb25nIHN0YXRlbWVudCwgYWN0dWFsbHksIGl0IGlzIG5vdCBwaHlz
-aWNhbCBwb3J0IGluZGV4LCBidXQgcmF0aGVyDQp0aGUgcG9ydCdzIG9mZnNldCB3aXRoaW4gdGhl
-IGdyb3VwLg0KDQo=
+
+
+
+On 10/06/2026 09.04, Simon Schippers wrote:
+> On 6/9/26 17:08, Simon Schippers wrote:
+>> On 6/9/26 15:59, Jesper Dangaard Brouer wrote:
+>>>
+>>>
+>>> On 08/06/2026 16.21, Simon Schippers wrote:
+>>>> On 6/8/26 15:13, Jonas Köppeler wrote:
+>>>>>
+>>>>> On 6/8/26 3:04 PM, Jesper Dangaard Brouer wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 08/06/2026 12.38, Simon Schippers wrote:
+>>>>>>> On 5/27/26 15:54, hawk@kernel.org wrote:
+>>>>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>>>
+>>>>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
+>>>>>>>> excessive NAPI scheduling overhead and qdisc requeues.
+>>>>>>>>
+>>>>>>>> Accumulate BQL completions and flush them when a configurable time
+>>>>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
+>>>>>>>> queuing delay to the configured interval. Coalescing state persists
+>>>>>>>> across NAPI polls in struct veth_rq so completions can accumulate
+>>>>>>>> beyond a single budget=64 cycle.
+>>>>>>>>
+>>>>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
+>>>>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
+>>>>>>>> completion.
+>>>>>>>>
+>>>>>>>>      ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
+>>>>>>>>      ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
+>>>>>>>>
+>>>>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>>> ---
+>>>>>>>
+>>>>>>> I found the issue that n_bql may become infinitly large if producer
+>>>>>>> and consumer have the same speed (and tx_usecs is large). It could
+>>>>>>> cause a potential BUG_ON if n_bql grows beyond INT_MAX...
+>>>>>>> Also I figured that no hardware BQL driver ever completes more than
+>>>>>>> BQL limit many elements.
+>>>>>>>
+>>>>>>> Therefore, I propose a simpler logic (see attachment) that completes
+>>>>>>> either on the usual bql_flush_ns or if n_bql > dql.limit.
+>>>>>>> If n_bql > dql.limit then we either have the case above that the
+>>>>>>> producer is as fast as the consumer or we have BQL starvation.
+>>>>>>>
+>>>>>>> if (state->time + bql_flush_ns <= current_time ||
+>>>>>>>       state->n_bql > peer_txq->dql.limit) {
+>>>>>>>
+>>>>>>> It must be n_bql *bigger than* dql.limit because the producer will
+>>>>>>> always exceed the limit before it stops, see netdev_tx_sent_queue().
+>>>>>>> It is fast because peer_txq->dql.limit is in the cacheline of the
+>>>>>>> completion path, see dynamic_queue_limits.h.
+>>>>>>>
+>>>>>>> Another advantage is that we avoid the snippet checking for empty
+>>>>>>> and BQL stopped which requires an smp_rmb() and an test_bit().
+>>>>>>>
+>>>>>>> Apart from that I:
+>>>>>>> - Always call veth_bql_maybe_complete() in the for loop to have
+>>>>>>>      more accurate completion intervals when having mixed XDP and
+>>>>>>>      non-XDP packets.
+>>>>>>> - Made it so tx_usecs = 0 is now also a normal case.
+>>>>>>> - Change the type of n_bql to uint instead of int.
+>>>>>>> - Added _ONCE() for tx_coalesce_usecs as suggested by Paolo.
+>>>>>>> - Moved the bql_state init in __veth_napi_enable_range() in front
+>>>>>>>      of napi_enable() to avoid a race (Sashiko).
+>>>>>>> - Moved the bql_state reset in veth_napi_del_range() after the
+>>>>>>>      ptr_ring_cleanup() (probably does not matter but makes sense to me)
+>>>>>>>
+>>>>>>> Benchmarks look just fine, see commit message.
+>>>>>>>
+>>>>>>> WDYT?
+>>>>>
+>>>>>>
+>>>>>> Looks good to me, I will use this in my V7 patchset.
+>>>>>>
+>>>>>> A bike-shedding issue: We change the coalescing parameters for the veth
+>>>>>> net_device, but should this be a TX or RX parameter?
+>>>>>>
+>>>>>
+>>>>> Hi,
+>>>>>
+>>>>> The results look a little bit suspicious, that in some cases the p99 is smaller than the average, which can happen if you have really large max values. It feels something is off with the methodology. I think we should drop the avg, and include the max value. This would give a better picture.
+>>>>
+>>>> Luckily I saved the raw test result from /tmp (the raw ping output
+>>>> is included).
+>>>>
+>>>> extract_ping_p99() seems to be broken. It has issues ordering the
+>>>> numbers. So if there are 2 or 3 numbers after the point I think.
+>>>> avg ping is fine.
+>>>>
+>>>> Claude Sonnet wrote a script for me to recalculate the p99 pings
+>>>> from the raw ping output).
+>>>
+>>> For programming switch to Claude Opus, as Sonnet cannot code IMHO.
+>>
+>> Already used 95% of my Copilot Pro+ Tokens this month :P
+>>
+
+LOL - I'm lucky to (still) have unlimited tokens.
+
+>>> (Claude Opus wrote the selftest we placed in [1])
+>>>
+>>> Is your script still based on our github[1] selftest ?
+>>> If so, then please make some PR(s) against my repo.
+>>> I want this to be easy reproducible for others.
+>>>
+>>> [1] https://github.com/netoptimizer/veth-backpressure-performance-testing
+>>>
+>>
+>> I forked Jonas latest branch [1] and ran the tests with that.
+>>
+>> But I faced 2 issues that I then fixed:
+>> - Ping fails in some runs (~20%) -> My fix: Retry the run until it
+>>    works.
+>> - extract_ping_p99() has a bug for me which caused wrong results,
+>>    as pointed out by Jonas -> Also fixed it
+>>
+>> Because of the inconsistencies I will rerun over night to have
+>> clean benchmark results.
+>>
+>> I will make a PR tomorrow.
+>>
+>> [1] https://github.com/jkoeppeler/veth-backpressure-performance-testing/tree/pktgen-and-benchmark
+>>
+> 
+> I ran the benchmarks over night and they look fine,
+> see ASCII table below.
+> I do not see a regression, tx_usecs of 50us even outperforms stock.
+> 
+
+Very interesting that tx_usecs 50us is generally performing better.
+It seems we should "sweep" the area between 0-100 usecs for finding best
+default from the beginning. (And see cool colored graphs that Jonas
+generated).
+
+
+> I did a PR, see [1]. Most of the code changes are by Jonas,
+> because he rewrote the code to allow the usage of pktgen and
+> added the bql_sweep.sh script. Thanks Jonas!
+> My part is the 2 bugfixes, the output as ASCII table and
+> the new benchmark results with my new 'v7' method.
+> 
+> I have not tested bql_sweep.sh inside virtme-ng, I ran my benchmarks
+> on the host system. I guess you could mount the folder with read+write
+> in vng and then run bql_sweep.sh there.
+> 
+> [1] https://github.com/netoptimizer/veth-backpressure-performance-testing/pull/9
+> 
+
+I will take a look today.
+- Will likely just merge after sanity checking as I want us iterate faster
+
+> 
+> System information:
+> Ryzen 5 5600X @ fixed 4.3 GHz, 3200 MHz RAM, CPU mitigations disabled,
+> SMT disabled, on host system (NOT virtme-ng).
+> 
+> Patched benchmark command:
+> sudo ./veth_bql_sweep.sh --runs 10 --tx-usecs-list \
+> "0 50 100 500 1000 5000 10000" --nrules-list "0 1 10 100 1000 10000" \
+> --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
+> 
+> Stock benchmark command:
+> sudo ./veth_bql_sweep.sh --runs 10 --tx-usecs-list "0" --nrules-list \
+> "0 1 10 100 1000 10000" --pktgen --duration 20 --qdisc fq_codel \
+> --no-bpftrace
+> 
+> Throughput (pps)
+> ===========================================================================
+> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+> -------+-------+-------+-------+-------+--------+--------+---------++------
+>       0 | 1.62M | 1.89M | 1.75M | 1.73M |  1.73M |  1.73M |   1.73M || 1.76M
+>       1 | 1.51M | 1.72M | 1.63M | 1.60M |  1.60M |  1.60M |   1.60M || 1.65M
+>      10 | 1.33M | 1.52M | 1.47M | 1.41M |  1.41M |  1.41M |   1.41M || 1.45M
+>     100 |  681K |  751K |  756K |  726K |   721K |   723K |    730K ||  736K
+>    1000 |  116K |  123K |  124K |  124K |   124K |   125K |    123K ||  126K
+>   10000 |   13K |   13K |   13K |   13K |    13K |    13K |     13K ||   13K
+> 
+> 
+> Ping RTT ms (avg)
+> ===========================================================================
+> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+> -------+-------+-------+-------+-------+--------+--------+---------++------
+>       0 | 0.016 | 0.089 | 0.136 | 0.137 |  0.138 |  0.134 |   0.135 || 0.132
+>       1 | 0.018 | 0.097 | 0.144 | 0.146 |  0.146 |  0.150 |   0.147 || 0.142
+>      10 | 0.019 | 0.093 | 0.156 | 0.164 |  0.164 |  0.164 |   0.167 || 0.158
+>     100 | 0.029 | 0.104 | 0.180 | 0.315 |  0.312 |  0.314 |   0.311 || 0.307
+>    1000 | 0.139 | 0.201 | 0.309 | 0.971 |   1.66 |   1.81 |    1.82 ||  1.77
+>   10000 |  1.12 |  1.74 |  1.72 |  1.83 |   2.90 |   9.14 |    15.9 ||  17.2
+> 
+> 
+> Ping RTT ms (p99)
+> ===========================================================================
+> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+> -------+-------+-------+-------+-------+--------+--------+---------++------
+>       0 | 0.026 | 0.122 | 0.161 | 0.164 |  0.164 |  0.159 |   0.161 || 0.155
+>       1 | 0.028 | 0.123 | 0.169 | 0.173 |  0.173 |  0.175 |   0.173 || 0.165
+>      10 | 0.032 | 0.119 | 0.187 | 0.194 |  0.193 |  0.193 |   0.197 || 0.185
+>     100 | 0.047 | 0.134 | 0.232 | 0.368 |  0.369 |  0.367 |   0.359 || 0.361
+>    1000 | 0.232 | 0.303 | 0.409 |  1.27 |   2.13 |   2.10 |    2.13 ||  2.10
+>   10000 |  1.94 |  2.52 |  2.59 |  2.69 |   3.87 |   12.0 |    20.0 ||  20.3
+> 
+
+Looks like 50us delivers better (lower) latency and higher throughput 
+across the range.
+I'm strongly considering changing V7 to use 50usec as default.
+
+> 
+>>>> Below is the new result. Not 100% sure but this seems right now.
+>>>> Most pings are the same.
+>>>>
+>>>> Ping RTT ms (p99)
+>>>> ===========================================================================
+>>>> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
+>>>> -------+-------+-------+-------+-------+--------+--------+---------++------
+>>>>        0 | 0.028 | 0.115 | 0.159 | 0.161 |  0.163 |  0.161 |   0.163 || 0.154
+>>>>        1 | 0.027 | 0.123 | 0.169 | 0.172 |  0.169 |  0.173 |   0.172 || 0.169
+>>>>       10 | 0.030 | 0.117 | 0.189 | 0.193 |  0.195 |  0.192 |   0.196 || 0.186
+>>>>      100 | 0.045 | 0.134 | 0.233 | 0.368 |  0.365 |  0.369 |   0.361 || 0.358
+>>>>     1000 | 0.230 | 0.300 | 0.412 |  1.26 |   2.11 |   2.12 |    2.13 ||  2.07
+>>>>    10000 |  2.04 |  2.55 |  2.54 |  2.72 |   3.77 |   12.1 |    20.1 ||  20.3
+>>>>
+>>>>>
+>>>>> Is state->n_bql += veth_ptr_is_bql(ptr) something that is commonly done in the kernel? It relies on bool normalization which feels a bit implicit to me.
+>>>>
+>>>> Ok, we could swap for something like
+>>>>
+>>>> if (veth_ptr_is_bql(ptr))
+>>>>      state->n_bql+;
+>>>
+>>> I'll see if I can adjust the V7 patch to this feedback.
+>>
+>> Yes, and also this snippet pointed out by Jonas below:
+>>
+>>   -       struct veth_priv *priv;
+>>   -       u64 bql_flush_ns;
+>>   +       u64 bql_flush_ns = 0;
+>>
+>>   -       priv = netdev_priv(rq->dev);
+>>   -       bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
+>>   +       if (peer_txq) {
+>>   +           struct veth_priv *peer_priv = netdev_priv(peer_txq->dev);
+>>   +           bql_flush_ns = (u64)READ_ONCE(peer_priv->tx_coal_usecs) * 1000;
+>>   +       }
+>>
+>> Or is peer_txq != 0 guaranteed in veth_xdp_rcv()?
+>>
+>>
+>> And also I would change in the commit message:
+>>
+>> "Flushing when n_bql exceeds dql.limit handles two cases:
+>> - BQL starvation
+>> - The steady-state case where the producer and consumer run at the
+>>    same speed with a large tx-usecs, which would otherwise allow n_bql
+>>    to grow without bound (and potentially overflow int)."
+>>
+>> ... to just...
+>>
+>> "Flushing when n_bql exceeds dql.limit handles BQL starvation."
+>>
+>> ... because after rethinking I think I overstated here.
+>> n_bql should also not grow infinitely for the v6 version.
+>> Nevertheless the new method should be simpler and faster.
+
+Ok, adjusted this for V7 patch.
+
+>>>
+>>>
+>>>>>
+>>>>>> For physical NICs adjusting TX coalescing will affect the BQL as this
+>>>>>> affect the TX completion of the transmitted packets. For veth, it is the
+>>>>>> veth-peer's RX NAPI that is "completing" or emptying the ptr_ring, which
+>>>>>> is where this patch adds netdev_tx_completed_queue calls for BQL.
+>>>>>> Any opinions on the "TX" or "RX" color?
+>>>>
+>>>> Personally I would also say TX.
+>>>>
+>>>
+>>> Okay, we seem to have more votes for TX :-)
+>>>
+>>>
+>>>>> I think I would prefer to configure it on the tx dev, and the recv
+>>>>> side gets the value from the peer. Maybe something like this.
+>>>>>
+>>>
+>>> I'm considering if we should simplify the config by having veth pairs have the same tx-coal value. WDYT?
+>>
+>> I can not think of a case where a user would like to have a different
+>> tx-coal value on either side..
+>> So it's fine for me.
+
+Okay, agreed - switching V7 to have mirrored tx-coal value.
+
+--Jesper
 
