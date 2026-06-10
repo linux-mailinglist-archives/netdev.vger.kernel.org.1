@@ -1,52 +1,97 @@
-Return-Path: <netdev+bounces-297791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oMt6Lh+mKWpybQMAu9opvQ
-	(envelope-from <netdev+bounces-297791-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:59:59 +0200
+	id GWeMLWymKWqbbQMAu9opvQ
+	(envelope-from <netdev+bounces-297793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 20:01:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAC1766C1A6
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:59:58 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E03166C1E3
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 20:01:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297791-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297791-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=eOrXu8e5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297793-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297793-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9C4CB300D56C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:59:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EC4230E9BC9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940DD3546E4;
-	Wed, 10 Jun 2026 17:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8314F3546C4;
+	Wed, 10 Jun 2026 17:59:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF6D3546E5;
-	Wed, 10 Jun 2026 17:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A6D352037
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 17:59:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781114369; cv=none; b=Xs1TexsuTV3TwnLfUdGAvFY8ln8pQA48CPJ4u+/gOYFviZbJoFIm8Mk9aXYXoSqwBGQTNFE/7zySBOnf1ljXv0wxEJfDugZ8paPjFsEIPj4fIiqP93DslgGrvjZx279/49sSBu8YJJ2pqC4EfdHuqexf9ZaAVFrBW/Y9VazjS/M=
+	t=1781114376; cv=none; b=b6gzWZZ9hEAs3z47jN0wgbBgaBDV2iJc9j9oBY0+JexVYmpwUuBbjnk9o4uAFCIE0qtZvyhxjj1Ex7PFWC/nF2MteQKQR69j5E7mCLoetUMwjvZFRBLdByVCP8oM2rndq2uLdnSOaQlcLLG0pmbWEyLeWt/XSqC0G6dU0TiMu4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781114369; c=relaxed/simple;
-	bh=zpTeorYlY6HcA3ishC/vc9S0siFloCceXbyPl8pB9HQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mC4lsl0B1oH30ZJ6DWo5ptzOOFbyHpPwgLxd47m9UB95CQynjxDjfR9oOYm8ySydF7RABEV1zCURw4QlwLD6X8gBX/9xijCpJ74+/hMAYXf93c2VYuMxZKq5P9TSp0c9qyU3Gkxd8TwRXyFxeoug0Lu+NcEniGqd4VkjkukUjbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 556FD6080D; Wed, 10 Jun 2026 19:59:26 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next 2/2] selftests: netfilter: add phony nft_offload test
-Date: Wed, 10 Jun 2026 19:58:44 +0200
-Message-ID: <20260610175906.1767-3-fw@strlen.de>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260610175906.1767-1-fw@strlen.de>
-References: <20260610175906.1767-1-fw@strlen.de>
+	s=arc-20240116; t=1781114376; c=relaxed/simple;
+	bh=MOH8uvDl49+FgVeTGAfgbY1LaUOs8A8UBGtliJWpA48=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DTdv3yCzEdGH5vLW9wc4MTwIVz0G4Nk84NY+nGpHSutPEF7GCcZuhzRv97B9qQcBL8xyc7iQaQcjWRUSv96vz3EKm2X99ELVfxLbTdCLcMO9y0MsV2uCj2ovYcIfDSCrEFlPDl84rApPpcZ2zVh84Gmz7oNJK3pKkpACBV3EoWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eOrXu8e5; arc=none smtp.client-ip=209.85.210.177
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-842848fd613so6019405b3a.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:59:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781114374; x=1781719174; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wE+IA+8Dk7eFT8d7+2Q1/q+SA8sUoegIzrCmxHEg14k=;
+        b=eOrXu8e5c6ft/upmrbjYIHBEepU/1etQL7kKI1pChoglqY/hecddzLh8UpHRdizZ0t
+         a9pqrkSk66dA66z4GrmF2QUoJemnZ8lTXPgJ+Ku1BG6TXTEOWVXxGJmCDeKwU0H6BGgO
+         LGDd8Dd9NcJKUf+fUG9cIt3Ud86n7ke4Y5BMrsNInWekb7jNVaj2YXj2uHUrRHn85m/T
+         EjWv5K+yLTlXf9J2mi+ADNh8wbIJueUD/R2znelggZm+MVqGhIzpxgVXXaiOIkk9/psx
+         Dz1Ur1g5PljuhTCZmxsWtVEqcyHwzn1oButyELiJxLhEb8i7g7J0z4SoNwPF+JGrY2hc
+         ZimQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781114374; x=1781719174;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wE+IA+8Dk7eFT8d7+2Q1/q+SA8sUoegIzrCmxHEg14k=;
+        b=pAWkkfqnBL8UPGLdlyZFS3NhrnZDp8vL5BEhAsx9q8VSqx2s7QJQRx5TjMHRs2SdiY
+         9w5XI0meMdbL3JEEB4XHQZjiCopbAlthxD79OTb+Rg7agwJwQbaIZLi87mCzv5OERU2Z
+         3S/hwLVVtjgeayk1wZi0sg8qw2WHAOjb0TEySRx+ghE2Grotv+F6Z15EEtSpmZiO/vUZ
+         C3zbMcNj5XXhBd4DaYPz+iwg9ztz3owNuEHpPp3OfNdl0bcotUb+P99/qzjpeNCEwBbX
+         lcU4LsoKbzMurt7SdrOF4FIoaOhh/785ot3jLbyTqqulUkX2m0WAozbm0Mlcvao3hfsI
+         TEfA==
+X-Forwarded-Encrypted: i=1; AFNElJ8YtHrJZVQt10eadwzESXHULAvAufogiLoRSawQ+wk+qUI5EYd4zDNKsSNgJaEo4Dhbr18/+BA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3S/hDpTcWuo8Fw6DS0sCVsulMvtBUhJ8vFeHQ5D3mlo9kE/O6
+	yvKPuNN2I3PIl2V9e+ne60OKuBp7JdsTMlSdTpBods34cmByR6V3MUzl
+X-Gm-Gg: Acq92OG3RTogbYP4+IyWsh1KqiC/6CDfdEG4DYLzd1x/sAE4kLhNy4YBPJXq3ouF7df
+	SH7nyz5B6tjpJIrtr8t99OFZVQD3lnp/Ey6iWGO2AU5ijkZPk5ii7aoQy7XSozica7odrMUGJHl
+	/fwfzUl+eGIzq88icgl6J3HzRXUrN6zaiKb04nDHN1T3F69DfVLQNB+mWtZaFJevCmkhdn8LCkz
+	L0ncaXPhYGRpYOgf6Ui9wglrfneW9GO24+99V6WOz9nHF0g+O+XGJr7KTfjhA8XPMEejSjFGcQt
+	xv715zE4UrWTc1M8Ql8OmE6TeUTALRhMXzxu1ehGQsqeDMQHzyTAaRDpEYNbTvI5bhdecrSeS0Y
+	XhKJJNMIyNqlD8RE3kD9UBhKccnUXb+2JVLE9dWrHRmPUVYeWmXue91/CubqaIRKxxXyIjlFf6k
+	UCpX6OD6Kfw0SQ+9aBJt3YdhJOhaWopN/cFni6LX4p31/J0jj0NBg3ywVpsX13pXIeUqRhudyJ6
+	4k4bI+zUpY=
+X-Received: by 2002:a05:6a00:10c2:b0:842:3be7:4d51 with SMTP id d2e1a72fcca58-8430a66ee10mr9635935b3a.15.1781114374097;
+        Wed, 10 Jun 2026 10:59:34 -0700 (PDT)
+Received: from cps-manycore-1.. ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8428325d9a3sm25235306b3a.34.2026.06.10.10.59.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jun 2026 10:59:33 -0700 (PDT)
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Cong Wang <cong.wang@bytedance.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf] bpf, sockmap: take the socket lock in udp_bpf_recvmsg()
+Date: Wed, 10 Jun 2026 17:59:17 +0000
+Message-ID: <20260610175922.1103871-1-rhkrqnwk98@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,232 +100,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[strlen.de];
-	TAGGED_FROM(0.00)[bounces-297791-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:fw@strlen.de,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-297793-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:cong.wang@bytedance.com,m:ast@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,strlen.de:email,strlen.de:mid,strlen.de:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AAC1766C1A6
+X-Rspamd-Queue-Id: 2E03166C1E3
 
-... "phony", because its not testing offloads, it tests the control
-plane code.  Also test error unwind via fault injection framework.
+udp_bpf_recvmsg() drains the psock ingress_msg queue through
+sk_msg_recvmsg() without holding the socket lock. __sk_msg_recvmsg()
+walks the head sk_msg's scatterlist and updates each entry in place
+(sge->length -= copy, sge->offset += copy), drops the page once an entry
+is consumed, and frees the sk_msg when it is drained. ingress_lock only
+serializes the queue list operations, not this per-entry consume;
+copy_page_to_iter() can fault, so the loop cannot hold a spinlock.
 
-For a proper test, real hardware would be required given we'd have
-check if 'previously handed off to hardware' offload commands are
-properly removed again on failure or rule flush.
+Two threads calling recvmsg() on the same UDP socket then consume the
+same sk_msg at once:
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
+  CPU0                                CPU1
+
+  sk_msg_recvmsg                      sk_msg_recvmsg
+    copy = sge->length                 copy = sge->length
+    copy_page_to_iter(copy)            copy_page_to_iter(copy)
+    sge->length -= copy
+      /* sge->length == 0 */
+                                       sge->length -= copy
+                                         /* underflows to ~0U */
+
+The next pass loads the underflowed length into a signed int, the value
+is negative so the copied + copy > len clamp is skipped, and
+copy_page_to_iter() is handed ~2^64 as its size_t bytes, which trips
+page_copy_sane(). The same race can put_page() one page twice and free
+the sk_msg while the other reader still walks it.
+
+  WARNING: CPU: 0 PID: 5484 at lib/iov_iter.c:356 copy_page_to_iter
+  WARNING: CPU: 1 PID: 5485 at lib/iov_iter.c:356 copy_page_to_iter
+  CPU: 1 UID: 0 PID: 5485 Comm: syz.6.1204 Not tainted 7.1.0-rc7 #1
+  RIP: 0010:copy_page_to_iter+0xa9/0x270
+  Call Trace:
+   <TASK>
+   __sk_msg_recvmsg+0x384/0x9a0
+   udp_bpf_recvmsg+0x1a0/0x6f0
+   sock_recvmsg+0x124/0x150
+   __sys_recvfrom+0x1c2/0x2b0
+   __x64_sys_recvfrom+0x7b/0x90
+   do_syscall_64+0x115/0x6d0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+
+tcp_bpf_recvmsg_parser() already serializes this with lock_sock() around
+__sk_msg_recvmsg(); udp_bpf_recvmsg() does not. Take the socket lock
+around the sk_msg_recvmsg() consume so a given ingress sk_msg is drained
+by one reader at a time. The wait path is left unlocked, as
+udp_msg_wait_data() sleeps without dropping the socket lock.
+
+Fixes: 1f5be6b3b063 ("udp: Implement udp_bpf_recvmsg() for sockmap")
+Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 ---
- .../testing/selftests/net/netfilter/Makefile  |   1 +
- tools/testing/selftests/net/netfilter/config  |   6 +
- .../selftests/net/netfilter/nft_offload.sh    | 132 ++++++++++++++++++
- 3 files changed, 139 insertions(+)
- create mode 100755 tools/testing/selftests/net/netfilter/nft_offload.sh
+ net/ipv4/udp_bpf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
-index d953ee218c0f..f88dd4ef8d26 100644
---- a/tools/testing/selftests/net/netfilter/Makefile
-+++ b/tools/testing/selftests/net/netfilter/Makefile
-@@ -32,6 +32,7 @@ TEST_PROGS := \
- 	nft_meta.sh \
- 	nft_nat.sh \
- 	nft_nat_zones.sh \
-+	nft_offload.sh \
- 	nft_queue.sh \
- 	nft_synproxy.sh \
- 	nft_tproxy_tcp.sh \
-diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-index 979cff56e1f5..563a1e5c6322 100644
---- a/tools/testing/selftests/net/netfilter/config
-+++ b/tools/testing/selftests/net/netfilter/config
-@@ -11,6 +11,7 @@ CONFIG_BRIDGE_NF_EBTABLES_LEGACY=m
- CONFIG_BRIDGE_VLAN_FILTERING=y
- CONFIG_CGROUP_BPF=y
- CONFIG_CRYPTO_SHA1=m
-+CONFIG_DEBUG_FS=y
- CONFIG_DUMMY=m
- CONFIG_INET_DIAG=m
- CONFIG_INET_ESP=m
-@@ -33,9 +34,14 @@ CONFIG_IPV6_TUNNEL=m
- CONFIG_IP_VS=m
- CONFIG_IP_VS_PROTO_TCP=y
- CONFIG_IP_VS_RR=m
-+CONFIG_FAIL_FUNCTION=y
-+CONFIG_FAULT_INJECTION=y
-+CONFIG_FAULT_INJECTION_DEBUG_FS=y
-+CONFIG_FUNCTION_ERROR_INJECTION=y
- CONFIG_MACVLAN=m
- CONFIG_NAMESPACES=y
- CONFIG_NET_CLS_U32=m
-+CONFIG_NETDEVSIM=m
- CONFIG_NETFILTER=y
- CONFIG_NETFILTER_ADVANCED=y
- CONFIG_NETFILTER_NETLINK=m
-diff --git a/tools/testing/selftests/net/netfilter/nft_offload.sh b/tools/testing/selftests/net/netfilter/nft_offload.sh
-new file mode 100755
-index 000000000000..152f09a81403
---- /dev/null
-+++ b/tools/testing/selftests/net/netfilter/nft_offload.sh
-@@ -0,0 +1,132 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source lib.sh
-+
-+checktool "nft --version" "run test without nft tool"
-+modprobe -q netdevsim
-+
-+sysfs="/sys/kernel/debug/fail_function"
-+failname="/proc/self/make-it-fail"
-+duration=30
-+fault=0
-+ret=0
-+file_ft=""
-+file_rs=""
-+id=$((RANDOM%65536))
-+
-+read t < /proc/sys/kernel/tainted
-+if [ "$t" -ne 0 ];then
-+	echo SKIP: kernel is tainted
-+	exit $ksft_skip
-+fi
-+
-+cleanup() {
-+    cleanup_netdevsim "$id" "$NS"
-+    cleanup_ns "$NS"
-+    [ $fault -eq 1 ] && echo '!nsim_setup_tc' > "$sysfs/inject"
-+    rm -f "$file_ft" "$file_rs"
-+}
-+trap cleanup EXIT
-+
-+skip() {
-+	echo "SKIP: $@"
-+	[ $ret -eq 0 ] && exit 4
-+
-+	exit $ret
-+}
-+
-+set -e
-+setup_ns NS
-+
-+nsim=$(create_netdevsim "$id" "$NS" )
-+
-+nsim_port=$(create_netdevsim_port "$id" "$NS" 2)
-+
-+file_ft=$(mktemp)
-+cat > "$file_ft" <<EOF
-+flush ruleset
-+table inet t {
-+	flowtable f {
-+		flags offload
-+		hook ingress priority filter + 10
-+		devices = { "$nsim_port", "dummyf1" }
-+	}
-+
-+	chain cf {
-+		type filter hook forward priority 0; policy accept;
-+		ct state new meta l4proto tcp flow add @f
-+	}
-+}
-+EOF
-+
-+if ip netns exec "$NS" nft -f "$file_ft"; then
-+	echo "PASS: flowtable offload"
-+else
-+	echo "FAIL: flowtable offload"
-+	ret=1
-+fi
-+
-+file_rs=$(mktemp)
-+cat > "$file_rs" <<EOF
-+table netdev t {
-+	chain c {
-+		type filter hook ingress device $nsim_port priority 1
-+		flags offload
-+		ip saddr 10.2.1.1 ip daddr 10.2.1.2 ip protocol icmp accept
-+		ip saddr 10.2.1.1 ip daddr 10.2.1.3 ip protocol icmp drop
-+		ip saddr 10.2.1.0/24 ip daddr 10.2.1.0/24 ip protocol icmp accept
-+		ip6 saddr dead:beef::1 ip6 daddr dead:beef::2 meta l4proto ipv6-icmp accept
-+		ip6 saddr dead:beef::1 ip6 daddr dead:beef::3 meta l4proto ipv6-icmp drop
-+		ip6 saddr dead:beef::/64 ip6 daddr dead:beef::/64 meta l4proto ipv6-icmp accept
-+	}
-+}
-+EOF
-+if ip netns exec "$NS" nft -f "$file_rs"; then
-+	echo "PASS: ruleset offload"
-+else
-+	echo "FAIL: ruleset offload"
-+	ret=1
-+fi
-+
-+test -d "$sysfs" || skip "$sysfs not present"
-+grep -q nsim_setup_tc "$sysfs/injectable" || skip "nsim_setup_tc fault injection not available"
-+
-+echo Y > "$sysfs/task-filter"
-+echo 0 > "$sysfs/verbose"
-+echo "nsim_setup_tc" > "$sysfs/inject"
-+fault=1
-+
-+p=$(((RANDOM%90) + 10))
-+echo $p > "$sysfs/probability"
-+echo -1 > "$sysfs/times"
-+
-+count=0
-+ok=0
-+
-+now=$(date +%s)
-+stop=$((now+$duration))
-+
-+# fault-injection enabled rule loads are expected to fail.
-+set +e
-+while [ $now -le $stop ]; do
-+	for f in "$file_ft" "$file_rs"; do
-+		ip netns exec "$NS" bash -c "echo 1 > $failname ; ip netns exec "$NS" nft -f $f" 2> /dev/null
-+		[ $? -eq 0 ] && ok=$((ok+1))
-+		count=$((count+1))
-+	done
-+	now=$(date +%s)
-+done
-+
-+sleep 5
-+
-+read t < /proc/sys/kernel/tainted
-+if [ "$t" -eq 0 ];then
-+	echo PASS: kernel not tainted. $count rounds, $ok successful ruleset loads with P $p.
-+else
-+	echo ERROR: kernel is tainted. $count rounds, $ok successful ruleset loads with P $p.
-+	dmesg
-+	ret=1
-+fi
-+
-+exit $ret
+diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+index 9f33b07b1481..8dd73e9ee1ea 100644
+--- a/net/ipv4/udp_bpf.c
++++ b/net/ipv4/udp_bpf.c
+@@ -80,7 +80,9 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	}
+ 
+ msg_bytes_ready:
++	lock_sock(sk);
+ 	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
++	release_sock(sk);
+ 	if (!copied) {
+ 		long timeo;
+ 		int data;
 -- 
-2.53.0
+2.43.0
 
 
