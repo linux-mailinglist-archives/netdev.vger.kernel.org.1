@@ -1,246 +1,192 @@
-Return-Path: <netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rNYgKNGcKWqqagMAu9opvQ
-	(envelope-from <netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:20:17 +0200
+	id fks8MwCgKWpuawMAu9opvQ
+	(envelope-from <netdev+bounces-297784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:33:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECF7466BEEA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:20:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB6F66BF92
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:33:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=t+8bi+uc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297783-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297784-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297784-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 931E531B8870
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:15:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A86D302ACC7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 17:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBFF34753B;
-	Wed, 10 Jun 2026 17:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72273343893;
+	Wed, 10 Jun 2026 17:33:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E156A1A0BD0
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 17:15:00 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB1C28851F
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 17:33:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781111702; cv=none; b=WiYah7tu1ijSUfuoShbvaM3VWy1fek8RNdjT+CLGNrWgBQ3MzQaFP4bcnrf4LV4+mbrkRDH8hkSyGOjeud07aTSvdrSJyADP84Clpor2EB5r8/+1Fz9gi9vOAnoK+Amwo6fPnK1Z6D9GfKP1H3FaolsM/yPAk5PCKSi+nMVxJyc=
+	t=1781112828; cv=none; b=JiO4uApgciJBU47SMS2aqxS3CKl8OgAwib+E+SHSTqTHKFb/qyj41n6Q0hnREl5Lq1885faC+zRGisNbXQ42RivaShAzYryARnack0PVyScoNxUuHyqFjzZASRQk0OJwjXiCCL3andfLGDv116LlalZiW7mHjeCk9T6vGmb6vDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781111702; c=relaxed/simple;
-	bh=uGjN+qrQhO1xBmofVqHwfXTApm/dXGN/dMa94oo2C8Y=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IjIeNr3ZaYOLyVj7LDSkHRrzdy8iebA6EFyrIWh9TSsGGHnlQBsEKiqx35+1teCB0z3+k7yWsM5WEXUL3HcNJ5pdeiOT4OO0zK2ZIZIQGehsYVim4P2U7eu+wfuRmJvoJubx+NY+/Xt9I0HT5cCa4SVKzSUGcyNPMVcx04/mfpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+8bi+uc; arc=none smtp.client-ip=209.85.222.202
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-915d33f7c28so668084285a.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 10:15:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781111700; x=1781716500; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LP7JeGO74FmNNcPZWHf7X5w3VRlbqkAA1Dn/5fda5kM=;
-        b=t+8bi+ucjLKdKLCtaPLnBcQj4Rm4N//1oV08+RQ9pHidiuXE8qQcs7sB1vYkjsavoV
-         jJ5qhXJki/fBugs2IgknajduuVAYwosdeM6poA9XBUuemeTowi1M2s4ndiS62/uz/0If
-         fjip1iKVysR9sxdw5clxTQ0Bv7PIrb/3DZlG+m40P2xBvL0w+AlYVCYwd8bB47+l30a5
-         VlfISRs+ZwYPDxu0PCktkyxBMCXvpvZFYMibEssaIFnm+avmfPP8uWhEqWZaz3CZ9v9U
-         iZ+a8b2ESE5Zo+H+3jpf7eEwlVo3RHUWb4JXR6hvfvuiYj/fWxokxCGJQYh3I/5tlxr7
-         a6fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781111700; x=1781716500;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LP7JeGO74FmNNcPZWHf7X5w3VRlbqkAA1Dn/5fda5kM=;
-        b=mWO49CPs++txEgr5fgGjh/G8ACb8EAQS9LpV9c9hPGNPBbJIgIwYowOlZ0I4CFtdMa
-         sGxiKxFiEWU+/og8lvPGdDAfgR1HvMLnRia/UrMciWNVUHlCLDeZXRMrU8DMvp7amLYT
-         ZW+sFn5f8IMcdt/RbuWkp6NtxcCunPQ1Is0qn/qMA1dLEmFtFoIiR5Yc/I2p8P6ENbvA
-         ku6jTOgJpU/1mTZ0R0YGSX9LvbopPc/ePOJLYd+fj14OVtS9vBC1pAI41mfxc03jP+Vs
-         YAf4JIomA347O8RVkZn4sNsL/9xKdrWckMDD3kVPXwItjKytFHbKIMZBFIseJdC0+Ua4
-         tlFg==
-X-Forwarded-Encrypted: i=1; AFNElJ+BG7ZPavRu1FRn2VYgJngICyEE1/9/lEmQIMJBRKZXdWa0nDAiWuZeKuxdahcy3Ju6EuoJRhY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtUJeaJoNGtvn+udlUsjk7pJvxQHub1ALQ0mbzXRidDcib6qLA
-	3xvgQi8dzV/VyKURgAOfC4v30YokEzfINBL1ODYmctHbgG+2pRTSCnb6Bh4t/wLexgLboITl4X0
-	lft2rzp8imvMmsA==
-X-Received: from qkle10.prod.google.com ([2002:a05:620a:12ca:b0:915:9acf:1f82])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:6287:b0:915:c4de:7ad8 with SMTP id af79cd13be357-915c4de84efmr2599048085a.38.1781111699468;
- Wed, 10 Jun 2026 10:14:59 -0700 (PDT)
-Date: Wed, 10 Jun 2026 17:14:58 +0000
+	s=arc-20240116; t=1781112828; c=relaxed/simple;
+	bh=K+maDEpyPdOC1FrcjOkvuB703sMgXedPUtlxfT+ghfM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hu/8lTxxn8tW5fWTvcgNG029YutVCrmK0m1F8xk/ck39PtvThsNEJZXzfH3uj6tb8qqV7nUdw+h7Q5pLoS+bCgb2gXZqRsiI4a5UnjlpZQD8LomCUgSPpYIx6estWr31jeBH9LwoDhZw5q89Kkke19WxOP9KS8Vv4n2gRHBtNWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACHqMLsnylqcR54AA--.54546S3;
+	Thu, 11 Jun 2026 01:33:35 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org
+Cc: 3chas3@gmail.com,
+	yuantan098@gmail.com,
+	zcliangcn@gmail.com,
+	bird@lzu.edu.cn,
+	tr0jan@lzu.edu.cn,
+	zzhan461@ucr.edu,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] atm: svc: fix listen state corruption in svc_listen
+Date: Thu, 11 Jun 2026 01:33:27 +0800
+Message-ID: <4af79c95e316b9a65a4c6302fc912a5944198b6b.1781031726.git.zzhan461@ucr.edu>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1781031726.git.zzhan461@ucr.edu>
+References: <cover.1781031726.git.zzhan461@ucr.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
-Message-ID: <20260610171458.1359630-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] ip6_tunnel: annotate data-races around
- t->err_count and t->err_time
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowACHqMLsnylqcR54AA--.54546S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFWrurWUCr1DGF4rWw17KFg_yoW5Gw17pr
+	sxKasxWrW8Jr1IqrnayFWUWrn5C3WkJrW7G345J3Z3XanFgF4rX34vqrW5Kr13ArWkCF4r
+	XFn8uFZ09ws8Za7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAS0I0E0xvYzx
+	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	JVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE
+	-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8GwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsOCWopHlEJawAAsj
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297783-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297784-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:linux-atm-general@lists.sourceforge.net,m:netdev@vger.kernel.org,m:3chas3@gmail.com,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:tr0jan@lzu.edu.cn,m:zzhan461@ucr.edu,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,lzu.edu.cn,ucr.edu];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
+	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ucr.edu:mid,ucr.edu:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ECF7466BEEA
+X-Rspamd-Queue-Id: 6BB6F66BF92
 
-ip6_tnl_xmit() and ipip6_tunnel_xmit() run locklessly (dev->lltx == true).
+From: Zhao Zhang <zzhan461@ucr.edu>
 
-ip6gre_err() and ipip6_err() also run locklessly.
+svc_listen() can corrupt the vcc_hash hlist by inserting the same socket
+twice. The function never validates that listen is only entered from the
+unconnected state, and it publishes listener state even when the
+signaling daemon reports an error. A connected socket is already hashed,
+so calling listen() on it re-adds the same sk_node and causes hlist
+corruption. A successful listener can also later flow into svc_connect()
+and get inserted again because listener state was not tracked correctly.
 
-We need to add READ_ONCE() and WRITE_ONCE() annotations
-around t->err_count and t->err_time.
+Fix the state machine in net/atm/svc.c. Reject listen on connected or
+otherwise invalid socket states, only mark the socket as listening after
+the signaling reply succeeds, record listener state on sk->sk_state, and
+reject connect on sockets already marked as listeners. This removes the
+double-insert list-corruption bug at its source.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Fixes: 9301e320e98f ("[ATM]: track and close listen sockets when sigd exits")
+Cc: stable@vger.kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
+Assisted-by: Codex:GPT-5.4
+Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-v2: addressed sashiko's feedback (Jakub).
+ net/atm/svc.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
- net/ipv6/ip6_gre.c    |  8 ++++----
- net/ipv6/ip6_tunnel.c | 11 ++++++-----
- net/ipv6/sit.c        | 22 ++++++++++++----------
- 3 files changed, 22 insertions(+), 19 deletions(-)
-
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index 365b4059eb20354c256c491a16db0e606e0a9790..a43382000619049df7a3127f5106ca12608b0344 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -445,11 +445,11 @@ static int ip6gre_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 		return 0;
- 	}
- 
--	if (time_before(jiffies, t->err_time + IP6TUNNEL_ERR_TIMEO))
--		t->err_count++;
-+	if (time_before(jiffies, READ_ONCE(t->err_time) + IP6TUNNEL_ERR_TIMEO))
-+		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
- 	else
--		t->err_count = 1;
--	t->err_time = jiffies;
-+		WRITE_ONCE(t->err_count, 1);
-+	WRITE_ONCE(t->err_time, jiffies);
- 
- 	return 0;
- }
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 9d1037ac082f6aad36c152ffdbe0f30237b65fc3..3445f81d9957e0ddd3f23d8b550ef5772672dba6 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -1104,7 +1104,7 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
- 	struct ipv6_tel_txoption opt;
- 	struct dst_entry *dst = NULL, *ndst = NULL;
- 	struct net_device *tdev;
--	int mtu;
-+	int err_count, mtu;
- 	unsigned int eth_hlen = t->dev->type == ARPHRD_ETHER ? ETH_HLEN : 0;
- 	unsigned int psh_hlen = sizeof(struct ipv6hdr) + t->encap_hlen;
- 	unsigned int max_headroom = psh_hlen;
-@@ -1214,14 +1214,15 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
- 		goto tx_err_dst_release;
- 	}
- 
--	if (t->err_count > 0) {
-+	err_count = READ_ONCE(t->err_count);
-+	if (err_count > 0) {
- 		if (time_before(jiffies,
--				t->err_time + IP6TUNNEL_ERR_TIMEO)) {
--			t->err_count--;
-+				READ_ONCE(t->err_time) + IP6TUNNEL_ERR_TIMEO)) {
-+			WRITE_ONCE(t->err_count, err_count - 1);
- 
- 			dst_link_failure(skb);
- 		} else {
--			t->err_count = 0;
-+			WRITE_ONCE(t->err_count, 0);
- 		}
- 	}
- 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 201347b4e12742451de6d6036281d1abaff0dd84..9c4efc441711f89d3ef8093f4764a5b8083afb99 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -595,11 +595,11 @@ static int ipip6_err(struct sk_buff *skb, u32 info)
- 	if (t->parms.iph.ttl == 0 && type == ICMP_TIME_EXCEEDED)
+diff --git a/net/atm/svc.c b/net/atm/svc.c
+index 005964250ecd..dfc4f3762bf8 100644
+--- a/net/atm/svc.c
++++ b/net/atm/svc.c
+@@ -168,6 +168,10 @@ static int svc_connect(struct socket *sock, struct sockaddr_unsized *sockaddr,
+ 		error = -EINVAL;
  		goto out;
+ 	}
++	if (test_bit(ATM_VF_LISTEN, &vcc->flags)) {
++		error = -EINVAL;
++		goto out;
++	}
  
--	if (time_before(jiffies, t->err_time + IPTUNNEL_ERR_TIMEO))
--		t->err_count++;
-+	if (time_before(jiffies, READ_ONCE(t->err_time) + IPTUNNEL_ERR_TIMEO))
-+		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
- 	else
--		t->err_count = 1;
--	t->err_time = jiffies;
-+		WRITE_ONCE(t->err_count, 1);
-+	WRITE_ONCE(t->err_time, jiffies);
+ 	switch (sock->state) {
+ 	default:
+@@ -302,6 +306,14 @@ static int svc_listen(struct socket *sock, int backlog)
+ 		error = -EADDRINUSE;
+ 		goto out;
+ 	}
++	if (sock->state == SS_CONNECTED) {
++		error = -EISCONN;
++		goto out;
++	}
++	if (sock->state != SS_UNCONNECTED) {
++		error = -EINVAL;
++		goto out;
++	}
+ 	set_bit(ATM_VF_WAITING, &vcc->flags);
+ 	sigd_enq(vcc, as_listen, NULL, NULL, &vcc->local);
+ 	for (;;) {
+@@ -315,10 +327,14 @@ static int svc_listen(struct socket *sock, int backlog)
+ 		error = -EUNATCH;
+ 		goto out;
+ 	}
++	error = -sk->sk_err;
++	if (error)
++		goto out;
+ 	set_bit(ATM_VF_LISTEN, &vcc->flags);
++	sk->sk_state = TCP_LISTEN;
+ 	vcc_insert_socket(sk);
+ 	sk->sk_max_ack_backlog = backlog > 0 ? backlog : ATM_BACKLOG_DEFAULT;
+-	error = -sk->sk_err;
++	error = 0;
  out:
- 	return err;
- }
-@@ -909,8 +909,8 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
- 	struct net_device *tdev;	/* Device to other host */
- 	unsigned int max_headroom;	/* The extra header space needed */
- 	__be32 dst = tiph->daddr;
-+	int err_count, mtu;
- 	struct flowi4 fl4;
--	int    mtu;
- 	u8 ttl;
- 	u8 protocol = IPPROTO_IPV6;
- 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
-@@ -986,13 +986,15 @@ static netdev_tx_t ipip6_tunnel_xmit(struct sk_buff *skb,
- 		}
- 	}
- 
--	if (tunnel->err_count > 0) {
-+	err_count = READ_ONCE(tunnel->err_count);
-+	if (err_count > 0) {
- 		if (time_before(jiffies,
--				tunnel->err_time + IPTUNNEL_ERR_TIMEO)) {
--			tunnel->err_count--;
-+				READ_ONCE(tunnel->err_time) + IPTUNNEL_ERR_TIMEO)) {
-+			WRITE_ONCE(tunnel->err_count, err_count - 1);
- 			dst_link_failure(skb);
--		} else
--			tunnel->err_count = 0;
-+		} else {
-+			WRITE_ONCE(tunnel->err_count,  0);
-+		}
- 	}
- 
- 	/*
+ 	release_sock(sk);
+ 	return error;
 -- 
-2.54.0.1099.g489fc7bff1-goog
+2.47.3
 
 
