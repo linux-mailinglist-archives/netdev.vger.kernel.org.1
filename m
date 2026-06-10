@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-297379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J6jaBxy9KGp/IwMAu9opvQ
-	(envelope-from <netdev+bounces-297379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 03:25:48 +0200
+	id WHWBKlK9KGqEIwMAu9opvQ
+	(envelope-from <netdev+bounces-297380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 03:26:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66CC6665314
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 03:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A31665319
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 03:26:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TmpnhpTT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297379-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297379-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eUtOg2mR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297380-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297380-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4192C30E5CBE
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:20:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3C1F3110AB9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206BD258EC1;
-	Wed, 10 Jun 2026 01:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BA523EAA0;
+	Wed, 10 Jun 2026 01:20:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167AE23EAA0;
-	Wed, 10 Jun 2026 01:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207B87E0FF;
+	Wed, 10 Jun 2026 01:20:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781054412; cv=none; b=LXRROMOYrmxXg+bSwMX23AaXcepRNZp0TFESUrMAPbnqZoWqRr39CN2SgcZKMPfGTH2Wfcep6BromUtKftstQFO3/yEes1TGMbyKi0L59A9lpqmsSCyOzBojOAiK5+IWUgVZw54UjZjTq1LSYFOqUSnGzUCu0Z80k9n2ksL31Ds=
+	t=1781054418; cv=none; b=N/CbTTTa5bVpTRTOsnidQgON1U5XvKlnOZZ9aWHQQIUw4oUVHKfb2dESlDqYqbP3ltnA3bgNkc+foZXnvVIN4gy8NXbluR4m+9teT0ikw/gQ/QCzVsYcxG1t+UHddxBX/aCsDzhIWzy/0s8ZlUgGCXL+K6AQ1Gu60sw4HwlOny8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781054412; c=relaxed/simple;
-	bh=YZd3be3IXnDZ/5Yj+BTL31xQ9xwaraRHtHu5Obu2grg=;
+	s=arc-20240116; t=1781054418; c=relaxed/simple;
+	bh=CHLiqPsKNMX5exPT742i0+3IE+Iy/k4VLewc72kYpw8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=L8dMadoYHCwB4KQu5gdAJ7mMBcIrdz35QWirNHiDHJ/KiufDrW7BwB0O+hw6WTx1/qg4KM1rERJOmI0DCt+mVc1TDBumOR6sM8S2UW9K9hICsMYVnz/vK8LKwKp4pmEoDDWuyLBcWqq1/nebHSXxuNNm339KxoOkHrq6vDpxLe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TmpnhpTT; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF27B1F00893;
-	Wed, 10 Jun 2026 01:20:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hb5zvjrvTiFzHyzWWc2lOmtJIz7yV1BqrQmJVjQDZjWxY7EUFpkVpv/NbuvYLL5J+kOhn86r12cC6wskZIbmbcOd7ypOHBHjWpOISrEY2DlamlnEw0mAiezzL4l1tADoKRB27uL1eyaAkI/tgLxja3iBZDU2Xp0+cbIx44UJoXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUtOg2mR; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B051F1F00893;
+	Wed, 10 Jun 2026 01:20:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781054411;
-	bh=0vyG63OBWEbKlctZRJlU9wsCWVVM5Z3bEQFpubuwNp0=;
+	s=k20260515; t=1781054414;
+	bh=aKGhdlzuvfHlB4+p9iqkgQqduQF9ViQTH2yVd3SVtuQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TmpnhpTTSaRC1u6MqD08AGBWqHD2qvukcdUTc5pVFAC4jnfh/ClrgseiH7p+eTuxf
-	 /nTjvIkuoK6GMLyc8rYjcy8ZkC+UhSI9DkzZzv3sFOn0axlq/m3kbvBtfNhA8PfVq1
-	 CtHfhSxfXY1jEeIkVNP0ltWzbJE/XBaxLbxYjlbbTStTEslZ+SxVvRK3PTpmiHRTLn
-	 mq5Z6LRWVdr9Fa3Z2CpUhGD40URXdoBWWjEBqCgiHUpVd7Cs27/F3IeTEHRwnPUsJk
-	 /4+aC+q+9F0Ixhqfj4yYfeAtC9Xa6DGxkYaAEg1SayC0i5HQaqayhquY5bzZ3OGnsn
-	 g9/DZ6iYObkIQ==
+	b=eUtOg2mR1lCcDK8GHRNBijPvBxSw0/KeFz0ihiof2G8EChKTtyN9VTuNEEzrPzHsH
+	 +wJ6kG6bkglUnVdSedQRwvvdcD+KWhL4+Uyj/M3EeVXCKLhjzucWbId1uqr6nU4+x9
+	 mjEVsZqO1uJLBdXxIJ3IHoYRO0WKYxtX38JPRyOj2dOGFEa20tkAeilGfLH+GbmTc1
+	 Fn4O6coR4Wjm5t9oIIiAud2LQgks9rgWD/TmOfzJJh+7fEMvY2s0vE3h9XuAaYTniu
+	 noPxj9tWbhoYDOYhcGfOJOsZRz9Nivy5AuSqSAltNWjvNgXrMGeZKNx5iPWikLOT3S
+	 8renqt1l/1NQw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569A33930A12;
-	Wed, 10 Jun 2026 01:20:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197403930A12;
+	Wed, 10 Jun 2026 01:20:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,19 +57,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] sctp: fix uninit-value in
- __sctp_rcv_asconf_lookup()
+Subject: Re: [PATCH next] drivers/usb/atm: Replace strcpy() + strlcat() with
+ snprintf()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178105440888.2779729.14941795177786710168.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Jun 2026 01:20:08 +0000
-References: <20260608122234.459098-1-michael.bommarito@gmail.com>
-In-Reply-To: <20260608122234.459098-1-michael.bommarito@gmail.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- vladislav.yasevich@hp.com, linux-sctp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <178105441263.2779729.6672573959508250060.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Jun 2026 01:20:12 +0000
+References: <20260608095523.2606-36-david.laight.linux@gmail.com>
+In-Reply-To: <20260608095523.2606-36-david.laight.linux@gmail.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: kees@kernel.org, linux-hardening@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, arnd@kernel.org, 3chas3@gmail.com,
+ gregkh@linuxfoundation.org, castet.matthieu@free.fr, stf_xl@wp.pl
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -81,56 +81,55 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,hp.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297379-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:marcelo.leitner@gmail.com,m:lucien.xin@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:vladislav.yasevich@hp.com,m:linux-sctp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:michaelbommarito@gmail.com,m:marceloleitner@gmail.com,m:lucienxin@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,linuxfoundation.org,free.fr,wp.pl];
+	TAGGED_FROM(0.00)[bounces-297380-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:kees@kernel.org,m:linux-hardening@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:arnd@kernel.org,m:3chas3@gmail.com,m:gregkh@linuxfoundation.org,m:castet.matthieu@free.fr,m:stf_xl@wp.pl,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 66CC6665314
+X-Rspamd-Queue-Id: F0A31665319
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  8 Jun 2026 08:22:34 -0400 you wrote:
-> __sctp_rcv_asconf_lookup() in net/sctp/input.c only checks that the ASCONF
-> chunk can hold the ADDIP header and a parameter header, then calls
-> af->from_addr_param(), which reads the full address (16 bytes for IPv6)
-> trusting the parameter's declared length.
+On Mon,  8 Jun 2026 10:55:20 +0100 you wrote:
+> From: David Laight <david.laight.linux@gmail.com>
 > 
-> An unauthenticated peer can send a truncated trailing ASCONF chunk that
-> declares an IPv6 address parameter but stops after the 4-byte parameter
-> header; reached from the no-association lookup path, from_addr_param() then
-> reads uninitialized bytes past the parameter.
+> Avoid string function that are due to be deprecated.
+> 
+> Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> ---
+> This is one of a group of patches that remove potentially unbounded
+> strcpy() calls.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] sctp: fix uninit-value in __sctp_rcv_asconf_lookup()
-    https://git.kernel.org/netdev/net/c/f8373d7090b7
+  - [next] drivers/usb/atm: Replace strcpy() + strlcat() with snprintf()
+    https://git.kernel.org/netdev/net-next/c/41d3e102edc2
 
 You are awesome, thank you!
 -- 
