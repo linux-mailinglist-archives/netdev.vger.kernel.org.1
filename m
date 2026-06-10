@@ -1,225 +1,218 @@
-Return-Path: <netdev+bounces-297850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id s3PEMcfoKWrsfQMAu9opvQ
-	(envelope-from <netdev+bounces-297850-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 00:44:23 +0200
+	id Ep5MMIDtKWoKfwMAu9opvQ
+	(envelope-from <netdev+bounces-297851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 01:04:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2261866D3C5
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 00:44:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B58366D4C3
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 01:04:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=m3SRT+06;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297850-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297850-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=FOxMWFHR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297851-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297851-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46A533093A8A
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:44:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 74EB830117B1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 23:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07B0369D7C;
-	Wed, 10 Jun 2026 22:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD15356766;
+	Wed, 10 Jun 2026 23:04:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EA53164BA
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 22:44:09 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781131450; cv=pass; b=mHlrXXMlV95qkakhrUXcIkiRNQg/yrMn/68hdvnG72AoQ/bE01pWitzIamF2wwlveT9YRf5dxoK2PfxF3J80GQ9l6YK/RPAa+BvIGo48PnRIug493Xsqt3WcAEtLaMqvNLeiNgGpfeW6rbcTT/B+c5U9u5BDhGiS5jLGrdUrsIM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781131450; c=relaxed/simple;
-	bh=br20ZOx5+JfsJTf3ObD/E7biiXwgMeTM26yhtT8hmaI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HJhLZE6jNIhZ1EFbvNrkE556VPkw+jsw3I88bB0XL+135D0RG6GqDH0Y0AslcDReQkw7cD3Jbfop7En1FgRyKexRfZBlY8CzkNEhga6MNFf3+l7ypaZkEMcSqxfP3OI1VtVRyRpgS6njhIL1p9BJoINMWtb7GuHMNuVfRbBVd6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=m3SRT+06; arc=pass smtp.client-ip=209.85.219.53
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8ccf01ba514so61135526d6.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 15:44:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781131448; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZQ/CNQYpWnSI2+xBKzamxr3A0lUAHDN7Ph1ZRTLXfdBnOmuRGc4cCfIrrcCAbo/I7R
-         uPPMh5zRC3hOs/utmr29N9OUsCU/dryfhJh8Nc3ujz2m9v+GrQBgYGsLeYiluac3hgmv
-         fA7UInelIkL6madRbSdo/yWiRxlrwu/msMxh88vXtXT2ja/oQCRwPuVdTNqVC/Ffy6tb
-         Jl+7IE6geEdvWmHGOz2evUTtvgJjmSLgeM+siefBpKaRBCjJkSAqyxAWTyYymUOD/LEX
-         7c1gdDRbCx9/xNmbMKOZoLgM13qY2pcX6G1C+mVP+kLb4gFRFwUqpTXcxAU+rSx7yqqp
-         VyaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=H+9ItBe9lxcsMAXxEA8xORo0f4DOTn6OB37cmsN38zA=;
-        fh=cLHzcLkcNhE+3jjaQvEbXPEgBKwHl3d8j/J0jWMy8SE=;
-        b=Nn1pWCEcLYNCiX/Og1QRf+FLDlnG2NXn0SQayk5YrrzZNC/7YVKNQICfH9xwDMhajF
-         4cSMHcGiu6bYZi903wPMpeq6eEV1e2tTjaiKl0tN6KMrC6htF/QD4idqSwEdzn0jIxcK
-         ETaYtLfm1yDytyQaRtWVJ0okvtEvZ4OWWWXVdhRh2xR0OBkrnyssjmHTkEYkg3JrKoN9
-         dvkzL22NqdGtMb4LhG4p6H7EiPJ54fIdVFnVAIduUCZORfEcr5c/gebJg/Ehs8cTjvtk
-         XUGAmzf6/GzwdkIb6392x0cG6KwcQWPnRVLN4ocTx06D6/X6mkfjQldqy5iJ7J/xpKuV
-         mXZw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1781131448; x=1781736248; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H+9ItBe9lxcsMAXxEA8xORo0f4DOTn6OB37cmsN38zA=;
-        b=m3SRT+06aZAT6HTQo/sP+VcRE3Wgd8lxukkJ5gUKDFETHz/VYHnVhIWNBWtq16I3BK
-         fI2iHspzmrG5j6s0Mrqe4BaJ7E8Pjv1Ev8eHJ2e/N0jJR/+02rnjOcmdJH3zq3NAYp/s
-         Jxf07xePH3CGpJ1xh/gI77FgygeO+fHsVHqUU6pFXcbm1cgM0mYf3116jr+yWduBwShJ
-         4ozoexKOZtVcA2+xbb3mvhfdRjg2sLpqgh3tQMHS1OZNxyBc4cr3BoXd+MjfFn5xskXX
-         y3p88z8nFODJY9KX2hhvXykhHu8MAC1KyJI2V5hg7bzg/n4RDqPIceYcocTHFYvhQHjh
-         t9QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781131448; x=1781736248;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=H+9ItBe9lxcsMAXxEA8xORo0f4DOTn6OB37cmsN38zA=;
-        b=AoDEl9PhybrvVnmtaTVTdb1ExiRyWul+WyxLMip2Gg2cf9eX07V4kUVqZuCNZvtbem
-         9k+yymSQD/HFxytk2yhvzXxeuueVWxcLbJf+XS+IuyV84sNuLGYVUx8uYh6wc5nQG3tq
-         Pd6aVRkrQqeVZZLqdI9sPFr3l99eLSgBOmhmTeapHZMRnYvsXML1aBRlZ2gHp3IZ64JL
-         YXbDT/5dgLhN76NuSbuaQbZoFBZYjnzspQfF/u80YGKEz6iNcBn1RicvXutQm6MfQJxQ
-         nheg2Tnx6zvNYqvSc0XV5X7hXhMA5iU2bJ6gx7TVtjm9nBbfz9ve94b/pVLOUm4EM38a
-         oU9A==
-X-Forwarded-Encrypted: i=1; AFNElJ/foieW8+eI+Uz/y9MtPMCgWyhvOIrSQmgdRvZD8+d1U2jnT7mgRR7/pvBS4CbT2FPs+La0lgA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJyHbIkUWLGeBOWhXHQIQZK2uFOxgUz3vKG+wQSjWaaNjouD1X
-	p36tUG5aqVu4TfocRH92gVDw/FWOZFuLqQvxzBemfHQ5IZYFBoywkSxG/yIqh/oDH247w+scNBC
-	tke5RhBiC9HiyVtNm6ZyZJsCGsJEzhnQmRtmxAauJ
-X-Gm-Gg: Acq92OFxBpOmKDKq2SmKrSzrCCSd2K6ohrGnuyEChoLxO2EIOqe5mGuMf0l9BQxJs3R
-	RK2Olvh6t0afkLdckebXGN86ZkDNC8/CM6NCO9AipbrX2P4AbWG7pUdyqngQrFF/3s8e/2gN4yx
-	662YfwOMX9gfcXs1klI27LtYVfwdXExrEoQadlNLjzjaYvFQP/qudB3wrTlyFfmeAwHpnyEqlpQ
-	fMBbh/YtrKLM4z2U4wJI7KYdUmj4sgiMCDIAOXHZ5v/kiRGmFYhQYsVjfzIB3DKRqGWtz8kyAz3
-	2p+B7gun5XqcLrQJLrZm09SG/dEbbNPbxImNr8uTtc+7CTDxZMfQ
-X-Received: by 2002:a05:6214:2346:b0:8ac:7d43:f88d with SMTP id
- 6a1803df08f44-8d1d4ce4492mr3920606d6.0.1781131448284; Wed, 10 Jun 2026
- 15:44:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48643009E2;
+	Wed, 10 Jun 2026 23:04:10 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781132653; cv=none; b=irPC12//VY3IaWBWoagiZMo8hwaHe6T1tMxnjecB9NFyC3jZLInxVaemFmIl+qFq/FxySqkyYV2zWJRq+NRljaO5b2xxa95VO+3lQsdUR4aNpy5ejYtjBeYhbWMLewPsT56T3bSZfeJC6uYYOOaDVRmdGAHlu9pekaXNZVsfizM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781132653; c=relaxed/simple;
+	bh=2WEt2ZvPmO8EdZFzEBlx7T5A1KmdG5Y87ekuzMLuv9U=;
+	h=Subject:To:Cc:From:Date:Message-Id; b=P89uerfmYmPyUzSvahBThk5lrOwN9SV4ND+SKtIvaqGwsnSEOcGr4ZJcCYYB+O4CKwvuPYUf8nNb+qg1pKFaZQUlD1gEQtKebQAjU7o3/Vcj7eR0WGX6MKoKM6oXP6attgX4AxGyUGxphxGTgDqszTLkgy+7x+0fYqqVas6DX/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FOxMWFHR; arc=none smtp.client-ip=198.175.65.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781132651; x=1812668651;
+  h=subject:to:cc:from:date:message-id;
+  bh=2WEt2ZvPmO8EdZFzEBlx7T5A1KmdG5Y87ekuzMLuv9U=;
+  b=FOxMWFHRuXty4yvzIqv/HU31HDYKrMNFevZigJG46xand/Ngsh0Kqwwn
+   vOZhummYrOE0GzP2cD1FFeSPpDL9PcYVdA2dU9F9281ufVE7BqksOJAEq
+   Eq1sqPnZWhZgfjxKE2F3uwlKX52WdBOBRoPJW8EHy8KKjjlBQDVSPHEOA
+   NjWeY+GH7AOnkmsWA/rmY1bf44O5IetFdzLi4N9an88KtvJJXM295d4jL
+   hZy7POiRHQVbYn1RWFxp9HRdI4aNNspirYgExfTjcnd+j2ATy5Vb+f7yo
+   j3rJJQlggcU5b5wAq8iCLqdPMZNw4Ubp4aYYd/CNTk82hTlQxpKWi+RWP
+   A==;
+X-CSE-ConnectionGUID: DnPT5Bl/QSqHqDJst181bA==
+X-CSE-MsgGUID: dlNZ3+ZXRiGdBCZiTEt+uw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="104603416"
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="104603416"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 16:04:11 -0700
+X-CSE-ConnectionGUID: 7TgrP9meTPiiDW9rjfO8ZQ==
+X-CSE-MsgGUID: UQIYMZYcQPegPMuXE9rW3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="251409765"
+Received: from davehans-spike.ostc.intel.com (HELO localhost.localdomain) ([10.165.164.11])
+  by fmviesa005.fm.intel.com with ESMTP; 10 Jun 2026 16:04:09 -0700
+Subject: [PATCH v2 0/5] mm: Unconditional per-VMA locks and cleanups
+To: linux-kernel@vger.kernel.org
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, Alice Ryhl <aliceryhl@google.com>, Andrew Morton <akpm@linux-foundation.org>, Arve Hjønnevåg <arve@android.com>, Carlos Llamas <cmllamas@google.com>, Christian Brauner <christian@brauner.io>, David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org, Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org, Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan <surenb@google.com>, Todd Kjos <tkjos@android.com>, Vlastimil Babka <vbabka@kernel.org>
+From: Dave Hansen <dave.hansen@linux.intel.com>
+Date: Wed, 10 Jun 2026 16:04:09 -0700
+Message-Id: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260610221606.1091465-1-xmei5@asu.edu> <20260610181911-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260610181911-mutt-send-email-mst@kernel.org>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Wed, 10 Jun 2026 15:43:56 -0700
-X-Gm-Features: AVVi8Cf4mx5kl6MBvN9Gs2AR7WfDTm5JmMFtZi116xPgZJQCsmqqvhdrImRjBvw
-Message-ID: <CAPpSM+RWNGnugK1+Oo53jsPXd5bTtf-NPzqW2UNo9Y0GQBs_sw@mail.gmail.com>
-Subject: Re: [PATCH net] virtio-net: fix len check in receive_big()
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	minhquangbui99@gmail.com, bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	R_BAD_CTE_7BIT(3.50)[unknown];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	BROKEN_CONTENT_TYPE(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-297850-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297851-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER(0.00)[dave.hansen@linux.intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org,lists.linux.dev,gmail.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:dave.hansen@linux.intel.com,m:aliceryhl@google.com,m:akpm@linux-foundation.org,m:arve@android.com,m:cmllamas@google.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:surenb@google.com,m:tkjos@android.com,m:vbabka@kernel.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,asu.edu:dkim,asu.edu:email,asu.edu:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2261866D3C5
+X-Rspamd-Queue-Id: 4B58366D4C3
 
-Thanks for the quick reply. It comes faster than my reproduction email!
+tl;dr: Make per-VMA locks available in all configs. Simplify some
+of the per-VMA lock users now that they can rely on them being
+always available.
 
-On Wed, Jun 10, 2026 at 3:22=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Wed, Jun 10, 2026 at 03:16:06PM -0700, Xiang Mei wrote:
-> > receive_big() bounds the device-announced length by
-> > (big_packets_num_skbfrags + 1) * PAGE_SIZE.  That is still too loose:
-> > add_recvbuf_big() sets sg[1] to start at offset
-> > sizeof(struct padded_vnet_hdr) into the first page, so the chain
-> > actually carries hdr_len + (PAGE_SIZE - sizeof(padded_vnet_hdr)) +
-> > big_packets_num_skbfrags * PAGE_SIZE bytes -- 20 bytes less than the
-> > check allows for the common hdr_len =3D=3D 12 case.
-> >
-> > A malicious virtio backend can announce a len in that gap.  page_to_skb=
-()
-> > then walks one frag past the page chain, storing a NULL page->private
-> > into skb_shinfo()->frags[MAX_SKB_FRAGS], which is both an out-of-bounds
-> > write past the static frag array and a NULL frag handed up the rx path.
-> > Bound len by the size add_recvbuf_big() actually advertised.
-> >
-> > Fixes: 0c716703965f ("virtio-net: fix received length check in big pack=
-ets")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
->
-> Let's instead (or additionally?), bound the frags array index.
->
-> Seems more robust.
+Binder and networking folks: Your code is the target of the cleanups.
+I'm cc'ing you now on v2 because there's emerging consensus on the mm
+side that the approach here is sane. I'm not quite sure how this pile
+would get merged, but ack/review tags would be appreciated if this
+looks good to you.
 
-Good call! I'll keep the length tightening in receive_big() and also
-harden the page_to_skb() frag loop. So it can't index past
-MAX_SKB_FRAGS or walk a NULL chain page, independent of what length
-the caller validated. v2 will have both.
+Longer version:
 
->
-> > ---
-> >  drivers/net/virtio_net.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index f4adcfee7a80..afe73eda1491 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -1999,15 +1999,17 @@ static struct sk_buff *receive_big(struct net_d=
-evice *dev,
-> >                                  struct virtnet_rq_stats *stats)
-> >  {
-> >       struct page *page =3D buf;
-> > +     unsigned long max_len;
-> >       struct sk_buff *skb;
-> >
-> >       /* Make sure that len does not exceed the size allocated in
-> >        * add_recvbuf_big.
-> >        */
-> > -     if (unlikely(len > (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE=
-)) {
-> > +     max_len =3D vi->hdr_len + (PAGE_SIZE - sizeof(struct padded_vnet_=
-hdr)) +
-> > +               vi->big_packets_num_skbfrags * PAGE_SIZE;
-> > +     if (unlikely(len > max_len)) {
-> >               pr_debug("%s: rx error: len %u exceeds allocated size %lu=
-\n",
-> > -                      dev->name, len,
-> > -                      (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE);
-> > +                      dev->name, len, max_len);
-> >               goto err;
-> >       }
-> >
-> > --
-> > 2.43.0
->
+When working on some x86 shadow stack code, it was a real pain to
+avoid causing recursive locking problems with mmap_lock. One way
+to avoid those was to avoid mmap_lock and use per-VMA locks instead.
+They are great, but they are not available in all configs which
+makes them unusable in generic code, or if you want to completely
+avoid mmap_lock.
+
+Make per-VMA locks available in all configs. Right now, they are
+only available on select architectures when SMP and MMU are enabled.
+But all of the primitives that per-VMA locks are built on (RCU, maple
+trees, refcounts) work just fine without SMP or MMU.
+
+The only real downside is that making VMAs a wee bit bigger on !MMU
+and !SMP builds.
+
+The upside is much cleaner code, lower complexity and less #ifdeffery.
+
+Clean up a binder VMA locking site now that it can rely on per-VMA
+locks.
+
+Building on top of universally-available per-VMA locks, introduce a
+new helper. Since the new API does not require callers to have a
+fallback to mmap_lock, it's much easier to use. Callers can
+potentially replace this very common kernel idiom:
+
+	mmap_read_lock(mm);
+	vma = vma_lookup()
+	// fiddle with vma
+	mmap_read_unlock(mm);
+
+with:
+
+	vma = vma_start_read_unlocked(mm, address);
+	// fiddle with vma
+	vma_end_read(vma);
+
+Which avoids mmap_lock entirely in the fast path.
+
+Use that new API for another binder site and one in the TCP code.
+
+Cc: Suren Baghdasaryan <surenb@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: Lorenzo Stoakes <ljs@kernel.org>
+Cc: Vlastimil Babka <vbabka@kernel.org>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: linux-mm@kvack.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Arve Hjønnevåg <arve@android.com>
+Cc: Todd Kjos <tkjos@android.com>
+Cc: Christian Brauner <christian@brauner.io>
+Cc: Carlos Llamas <cmllamas@google.com>
+Cc: Alice Ryhl <aliceryhl@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org
+
+Changes from v1:
+ * Better naming and non-loopy, simpler implementation.
+   Thanks Suren and Lorenzo!
+ * Cc networking and binder folks
+ * Add tags. Thanks reviewers!
+ * Drop x86 shadow stack changes
+
+ arch/arm/Kconfig                       |    1 
+ arch/arm64/Kconfig                     |    1 
+ arch/loongarch/Kconfig                 |    1 
+ arch/powerpc/platforms/powernv/Kconfig |    1 
+ arch/powerpc/platforms/pseries/Kconfig |    1 
+ arch/riscv/Kconfig                     |    1 
+ arch/s390/Kconfig                      |    1 
+ arch/x86/Kconfig                       |    2 -
+ drivers/android/binder_alloc.c         |   43 ++++++++-----------------
+ fs/proc/internal.h                     |    2 -
+ fs/proc/task_mmu.c                     |   51 ------------------------------
+ include/linux/mm.h                     |   12 -------
+ include/linux/mm_types.h               |    7 ----
+ include/linux/mmap_lock.h              |   51 +-----------------------------
+ kernel/bpf/task_iter.c                 |    5 ---
+ kernel/fork.c                          |    2 -
+ mm/Kconfig                             |   13 -------
+ mm/Kconfig.debug                       |    1 
+ mm/debug.c                             |    4 --
+ mm/init-mm.c                           |    2 -
+ mm/memory.c                            |    2 -
+ mm/mmap_lock.c                         |   51 ++++++++++++++++--------------
+ mm/pagewalk.c                          |    2 -
+ mm/rmap.c                              |    2 -
+ mm/userfaultfd.c                       |   55 ---------------------------------
+ net/ipv4/tcp.c                         |   31 +++++-------------
+ rust/kernel/mm.rs                      |    7 ----
+ tools/testing/vma/include/dup.h        |    4 --
+ tools/testing/vma/vma_internal.h       |    1 
+ 29 files changed, 54 insertions(+), 303 deletions(-)
 
