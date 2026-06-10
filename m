@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-297570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id cAK/H940KWptSQMAu9opvQ
-	(envelope-from <netdev+bounces-297570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:56:46 +0200
+	id V+GbFAQ1KWp0SQMAu9opvQ
+	(envelope-from <netdev+bounces-297571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:57:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83A86680CA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:56:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD1B16680D2
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:57:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=fEy2Qhr1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297570-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297570-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=NXP1.onmicrosoft.com header.s=selector1-NXP1-onmicrosoft-com header.b=HWg6YOcQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297571-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297571-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=nxp.com (policy=none);
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 463783160315
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:46:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F6FE31C012C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11B93E2777;
-	Wed, 10 Jun 2026 09:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685A63E3C49;
+	Wed, 10 Jun 2026 09:46:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011016.outbound.protection.outlook.com [52.101.70.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7893E3169;
-	Wed, 10 Jun 2026 09:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71153DD86D;
+	Wed, 10 Jun 2026 09:46:29 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781084789; cv=fail; b=KLH5/Fw4qnqyuc4wiP0xC/fqbC+1hYPHzLLFf+GF1uhtb7xhTkwvN6viU4D5zhnrZNUgQejIlxSd11TWcqb7mOKpUrkEHE+MG613EKGJZqOzvTOM5BWbWzqZqKkfoLY2bnl+21bAp+DcJAwAfHoTVbuoiUMBaHyElLxd4tsIlGU=
+	t=1781084793; cv=fail; b=IHl41+3WRQUEREJHgZd+EpXksDv5KMKlq1zrNoXgVR8Nw3UtknXHiOJYJR1JXY5v05RTHZBcgPAywgm6BsPbfW6rt5ppwQwL+jvIhZFYYIHssI3oW61dOyYw064xF4vFFU+5O1Y64k8Vqn0eH36EebxGee0pRgToo3l6lpEry+w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781084789; c=relaxed/simple;
-	bh=5BL+M1xB7GNAePsGbwnCLnabvS0DTru4999UAKVLKpw=;
+	s=arc-20240116; t=1781084793; c=relaxed/simple;
+	bh=qiR1xXDm2HyKs7/PIx28Y5NxVO19U3cg/APRvORnChE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fq3nB+kWRh7XSh+a9L2I4MB+f08NqoWFTBaLyI0s5xZyIOe3w13JfDRuVlnITLfQr6c1bXdvy8wPQ0jzlvfpqyvF42vQ0kpfeq1VWh/U7R+8a414ynUGfSoQI4P6/9SE6/jVxjg395c5gJHNVMA09qMORIFdv+UUMpaAtAvlkNo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=fEy2Qhr1; arc=fail smtp.client-ip=52.101.70.16
+	 Content-Type:MIME-Version; b=qGLIo0mVWfH47pIAAQuArBP0H6L59PC/zX1DMd0nckvKvAurhby+StAzbzOSjNW+efTE1iDCVDwUuHqoWCBzVs2KpLs7VS5OJMK7IE8PIi2OJUjoYEXtwKelPsvj0Py/R45QNESk7TZ4MBbH9a6QDtsN9WnUG8e950r684MyqVg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=HWg6YOcQ; arc=fail smtp.client-ip=52.101.70.16
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k1WAAfkdBsfadOCZb+1DTgns9Yf+71vmebUiHLgvipxjDLBHlmdLX4azO3a7hIQesAvUKr7cyVX6TipRRFpdfODYUMjfs6hGHqu/vPhUczR3LdRinqPVXeO6aKmh165PXcvDC7jbXf46iNFRmsBoeZBU90COLMxp3YuZBeKml5coXAtW6Fowsl9Fn2yYH/Nlo/ef+/Wl8GxZvNEkHslfTIPuyMubbQxOgqLrMzlE6wT/r/QkJA7/hdQXsCiz8CkAn0G1lCWTZN+LoHCFrmKIIHQiHllSiF2ssASCQ0H0eRYGbqslG7v9pd/UZPxJ4H8F6R8ESm1cE+WBUogUNNgPQg==
+ b=JPeZYPRilvN3LN2WjdXAaJ0g1WhYZn0knEnyInwa7HszfsQLTFfMTFBk/NkmzoJH7hmu0ptOi+dMvwflEphkN5q6VLsMUCVXX2IafZoali3a5BUtysaR0UTuJ2RL79FTyFE37fNUefQFtoGnDxKSgsQ4sFVitSxNregBSHS6B6lNBgGnXdFI6wbanSR5QdhYpH/3z7HT+Sss1dQbAK4SrcO5mxyuHejpfkSJFx/uo8PUpH4Uw6o+S8yqrgaj9ZzHYMRjUumaoNDgYDfgpagCk6Z8+k1maqj81iaa+xARHpdNW6GXquBgqKHolpDiHtrjLyNLu/ZHyu4xmq9V6kFx3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GtmOMewGN/ZOagJjUxXBLUyIxBMn5Aoa3vzDb47TkEg=;
- b=lCQalHSRVOemL5EKxLhbXzg7heZlVSncTRkbx3sS7vTZj9YOMWxFv88+tvOCmWSsuMborQ4CT0g8LYbMESJweRB1shCghTZ9OWTPw9cyJ40eiVmlJH9deZmulLzvgnuUJQBtK43Qe73AZLdNYdVhv3oAxIcMLV+ZjbDeIT2+9mJZkrmHII8c2HL5PDPrbDqj08KKTnSlu4zksKmuyRHSOMLMU+rw1H14dU0wWeVZDHgwlx0DlPwzmR/lQ1nn2FX69nHkNISAXsbEIzJx6uYp1h8bPwPLHfLKaDnEPxACVYfBzPyUcLdw3VbWqyOOrtxv4rvckW33IJkcd2HxK0TVwQ==
+ bh=OeIYabRarpZr0qQu6tvVI99vPDCE6mufirrkCdvPgXU=;
+ b=Wm+9hn8hLMjDSRsIJcD96dp/dtcyOtocOqWmhrGsUs7LEHBsftR0MCbYqZQXMb/FVy4D9SOjov7rBDPVknQv44rh213nd5/6gpR7UkVL+rZsWQCBHUfpsXY/CmD6gl6j4rfxLiiq8bIq7e9CKjF7ffvb2KEi4Z01rQSkFEbV2QubKk9eFdvkFk6UWIDLbggdu54ncOmpYWv8fHF7vKWxMq8PGDR9O1jRPn0dvwY24UY1PMmbNQzZ0ahr3LuSOiQJI3hd+WzCf4KxUkriP1BzPrN5of+Wdku+BNEYbKde/rJieNwceXHshdcVUao+ZBT/aeIXzV9RoNvPRShi+V9Hkw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GtmOMewGN/ZOagJjUxXBLUyIxBMn5Aoa3vzDb47TkEg=;
- b=fEy2Qhr1HnfxabongBvPiSqluJAnSOOWOqmwu4djzS2AS65VDfBadRS2Ufrrg5VSXXKfXdG0pFJnVZOv+s2rAKunHIPzDv59/v39UUrNPIbJRR2yTTGstCzUj6kYZTbpXI27QygGMnHeMeZqnbqKaMZHfc4wdm6Ei93GzJH0UPYmCIsANi3FuvaRXi0Hu8Se9vuiansNRv66mU8aj5aR/RSLSDHLdX1YuvkqT6Ml3VtutlZmFiWsrVoMaRAgGYnJqGVf4espL05GE52HadtydjxONMO5K0V1WqCo1CIG979mWWZ9YR89wpPLXcDyhjfu+4WoPW/9XbfMMdvi9O1vhg==
+ bh=OeIYabRarpZr0qQu6tvVI99vPDCE6mufirrkCdvPgXU=;
+ b=HWg6YOcQAApfe6D2Ky4NSmGdopaM992qU4+XEIRlWepGlSP6YZ4CcH6E8gz/zker/MT9PeWgZ2I+X+oBudrbGaks1GUhRpGQSo98jIHEeJ0/x2Q9yhlk0gVWEnsLRTy2pgybPTZkCoMJiweitQdfhp8PkNd5u3v0Q2Ko1f4K6BmuJNVSXnpSSPBL9aVptcrZ3JRfFr3SwcwUJfgxmcn/bfxtcLqtxhA59a9spIXqAN0JIWvZnRfd7F/jHsr9k7rijkEj+ExY2RxikLVoWos7NQLUbsv/HC2ngt5BkcN9o1YXkdw0c8yfspyOg9gXY8uSUiPURZAfpHmWTtgGp54j/A==
 Received: from DBAPR04MB7207.eurprd04.prod.outlook.com (2603:10a6:10:1b2::17)
  by GV1PR04MB10991.eurprd04.prod.outlook.com (2603:10a6:150:206::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.11; Wed, 10 Jun
- 2026 09:46:17 +0000
+ 2026 09:46:23 +0000
 Received: from DBAPR04MB7207.eurprd04.prod.outlook.com
  ([fe80::761a:f8dc:80dc:5e14]) by DBAPR04MB7207.eurprd04.prod.outlook.com
  ([fe80::761a:f8dc:80dc:5e14%6]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
- 09:46:17 +0000
+ 09:46:23 +0000
 From: wei.fang@oss.nxp.com
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -72,16 +72,16 @@ To: claudiu.manoil@nxp.com,
 Cc: imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net-next 03/15] net: enetc: add link status message support to PF driver
-Date: Wed, 10 Jun 2026 17:18:32 +0800
-Message-Id: <20260610091844.3423693-4-wei.fang@oss.nxp.com>
+Subject: [PATCH v2 net-next 04/15] net: enetc: add link speed message support to PF driver
+Date: Wed, 10 Jun 2026 17:18:33 +0800
+Message-Id: <20260610091844.3423693-5-wei.fang@oss.nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260610091844.3423693-1-wei.fang@oss.nxp.com>
 References: <20260610091844.3423693-1-wei.fang@oss.nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: MA5P287CA0120.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:1d0::6) To DBAPR04MB7207.eurprd04.prod.outlook.com
+X-ClientProxiedBy: SI1PR02CA0060.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::17) To DBAPR04MB7207.eurprd04.prod.outlook.com
  (2603:10a6:10:1b2::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -91,57 +91,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DBAPR04MB7207:EE_|GV1PR04MB10991:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e3a650c-9192-44d3-5414-08dec6d51e52
+X-MS-Office365-Filtering-Correlation-Id: 58df379d-fe3b-4722-aaea-08dec6d521b3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|366016|1800799024|19092799006|23010399003|921020|18002099003|22082099003|21046099003|6133799003|56012099006|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	Mxl9zndOrl0RTCTb41KAoSC5o2wTEq/xNdDCXAE1DQ6z81P2OLOGMDOXIMzbqjSqgjm7xkMXFYcTJmB9YCfNH8lxi2Dcyi2OCCxaBjb7UBFjXQHTRepHjiV4sgwwGy7N1fy4pw4L1lh7cfGBM5g5AlvFIMbw6W7wTWuvI8h26dM9KtbsoA70PTIDUItLU+uILre94aAsPYMQiJ3DaHHTPFYbsua93XXZCPa9RP/jHpHFz/nw8N+nh605i234eIY04cizsdW6G0sinZHVrR5cwpnI9v4zHqAlg58dHSKN4FpD8kfl+xGJOixgUpxkhmwzFN1WgjGidbvP0+DKziltpXH48CwRj319iRnJ3qcCjUYbrbDotqiI3hFiPCEODaPqLNKg1H4OnwaTQo0aj9G+j7+DcdNzIaCAF+/nNv0Jz+KR4Wcueo8pllrMGzBNsanuyhIfCoYiQY+rgpSIi34K+3s+5WTAjX8Qag8zeci9ARFOGwWmgF/KEK8YFnwHFJAmJB3BKCGwS9JBLF0kTewVt1dfQIKCbeEGFoXtNgqT5v2uGmL3tCOoXzlNn6WnKW64zMxX6qwe/I/RxL2VgvgmDK4egnsE/OTndWveseyP8s8h4obTmtu7jX/pWtIOK5lOM3rSZ80ATc3Pg2VfOwtLjiqhLFO4S8o0s7ttMlr7DfpBHJ5vS1O2TOvmfMz2u+mADY43B5oy3AFStU5rEUXbMAdNHZi1b7WFSZP1wpoel1U=
+	GG6VhCXUldlRSXpWrgBQn1dTW7qYivA9Z6l23iwkRYLF+qo6KbUPAd02vOUEBQyN0dbBKqm3dcCcSBiiTuN14kOc7fgjJPOr8QBuuwaUeALg2ye0959oj2OrAgjyN0a4a82oKB2yitTKlTACVDjy6oPYTERc1ls+2U0E7bY9yknILxmQgnvdNROor3Z4zMRBk9DADJNoYnfhgrgslU5riXiFekPgKGZJB2zdOyJ4pd87tZIpEI1539XG6FmfQjJrqp86lrSuKwOpHAyRT9697j06RUWnWqZ7EeD6eu4sYL9GDwx2kR64H32EwJs2EQs9NBw0Sfa4ayY5nVYYNNQz85r+t5g1v9dsd+Pqy4gSL0g3Abc32O7+KlbR7nP76t16kpTZmW2hstOZg9aeZmIAzoMaDDGBETxEMpJBNLGAuH8ouLBr6+YkEx7xH0HTBQqidLbdeINfWIYwNOFwmnpRASexiKHaU4dQ1L/xzNiAEiPTAtTV/pZ9mVsb4CkhzEQHHWPm1YMnWwtO94fU7tytBa46mtvihVhvirZmLVSXlzXNk9Dz5PGEyEKpL+3IJgs1qpwMGPH23nwMH5jwo2rEnrmhvt1LKCPksYy0zOAiYtBl6MwAfzsKlqDbgA6rQcF7Xb6Z/Zbxm1pnku2vVRvQHdO3cwL8fU4jezaO70ErJg5U5WLmFnPSbVa6B1YmrITthmJGVoJzbNRRIcWtimPsfy4lIFTTrV8kIQP7aq3Mde8=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBAPR04MB7207.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(19092799006)(23010399003)(921020)(18002099003)(22082099003)(21046099003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?loQjdL2bHOLldAuW7kepJGuq+zuaBVfSNCsIy3rsP9eXtaCObFm0OuNdki7a?=
- =?us-ascii?Q?bl3mf4AZJT+V3kfKUpGNs7cGx6FgTmnpwkR5axvBSmmEf6ej40SEwyBV8tK6?=
- =?us-ascii?Q?CiC7//fjLTV0xy7yrFDz0xVjo4spT7fTD9G6OFyjy0aRrcvr5pP9Q1DukKIl?=
- =?us-ascii?Q?ixRovtBk9WvqnkxWngs/a34S+h0onMDxJZqWtOnZ2Df4MNJ7WUZKsRB29WmU?=
- =?us-ascii?Q?cvqS5NPcKijukyhVGPQTLHaVMKPDvYuKbkQF8Z2UR0MJxJcglkXwjuuHCV59?=
- =?us-ascii?Q?fr5oIt7kAaWt++I+l6KBbdHBK4gwXAICUEhckb+3A+o3RPwvu9AAoZ16CN6F?=
- =?us-ascii?Q?5nZcQwe4lIPFllM+ILWYf8xuRedMwcK/aiz3W9un9pVjVsoAYTpTJPGE0GGS?=
- =?us-ascii?Q?kOqOqHoTI1t7n2AQexChYELtJbUSg5qO7kiVyinHzBPWd4jW+j2q0YDZ0itb?=
- =?us-ascii?Q?PUHmtXKh0PXCfFGT5+F+O1XfUrFKHWHsjm5LMnJgKU+fYGt6y+mYZ4TcX5hX?=
- =?us-ascii?Q?42mKeImSvteVHoocl0m8/Dbycb/UiQ/aGuBDQ7ceuR9jvP0lcD0orj8yR5ku?=
- =?us-ascii?Q?n2s1bq1Sb5OcgB3QR5ovdkM6GCajYdxq+MhnqHszcrzPprppNLPIjdHjpQkP?=
- =?us-ascii?Q?kkyGVnOa7IgGo/lcR8IOQbLNYPjGotvVcnLPlb0OFSVrl7u59dSleEEx204K?=
- =?us-ascii?Q?COBgpRnEcph7lHTTrqNCskj9kc+vq4H/vUUNDpyz4E/eMVl8XZ6n93MUBmQm?=
- =?us-ascii?Q?y7zrip92ZHmTmPhyxiM+5ZcCoxvWhBs2X7dc6V/en3ZUiTwlIQvBdoayOwZ+?=
- =?us-ascii?Q?MEsiUto6JtwPDEXV7jIZYm+xxE0PU/T82SuZ3ZFEkB997d2l2hqOGg0470mw?=
- =?us-ascii?Q?Rj21WBPQWNVm3uRzXSjEXK3WIMhyWpnjOsBhyT/YvVoFYJyrT7vtfPj5+Yr7?=
- =?us-ascii?Q?VuaweH7IcuBGsL4ridOckR2rL+lUOZd4gS3+uW/Q5RiDFn5LLRsWVsGyNDJN?=
- =?us-ascii?Q?0Nu3UYjwrsKlvrm+8aTdWBh/qtnjumJSPNicKXwswPTRE7Epe/0SnbzVMIvD?=
- =?us-ascii?Q?nDs62kZ4pSEttK5PbBAHTt8pq9ub93xVmS6pZOc4SJmvzdDekBwZIzrc290R?=
- =?us-ascii?Q?Lfwc8uKVvfFdKDZPruuPNna6KBkuiYHhTHvSEFaCUJrfJn7xqmfb5e2D2Mzl?=
- =?us-ascii?Q?rjmW87ioG3mNWhw0p78d2Nd4nRSFNv/XTYbLcyTH3bti6bQBqeCheZ4ZQKbs?=
- =?us-ascii?Q?PtWjkCtudTu9GNVTHP8CBq9Wp3q7Otneoy25HvhAlFJxp1Dsthg2wWbj59Lm?=
- =?us-ascii?Q?catH/6+Vx1kJHFq6djjSVI4jabKM0Z4WrARNpGyx7Qzu/fLKKwpvkv//1T8H?=
- =?us-ascii?Q?V5kren1YnlhcBcCjBk6mjiGiEyCW0JA8lQM41S/dPE/aCABge+GW6ZuRKGNH?=
- =?us-ascii?Q?m9m3YFS4qvVy9+O4JZCcwLGUc/bKmY6P7nyeMRABa8yyhr+pvG8ST6M699/j?=
- =?us-ascii?Q?DCtJf8iiJIH3qkZexyq7r32eQ9+C7NKYbj5fTo3gqgfDg6V0P9kvvi1Y+yCn?=
- =?us-ascii?Q?S6riKKhCWR39j/m1on+JYW8RZIdvSapamMhViQPUT8vCLZ4cmxOX6k3ptBjU?=
- =?us-ascii?Q?tE6YOQ9OLZCu77wairoZnsm8Pj3tHhF4J75H8RvJi6VMgnj3FmelobJw0NgC?=
- =?us-ascii?Q?/eKR7U0yr6izGZtd1Y8Rf/rnOqkgT+GoCUJ0hwYnSP+YbcrW7Z99+FRlvesr?=
- =?us-ascii?Q?Kt5rtDEzX+4yFj8vwJkMvZy/87avFKnklIjmlzAUsfews3IlFCdm?=
+	=?us-ascii?Q?a4shJbnN0kpMyJeWPap+xj8lYozyJilnL+WlgBvcdqZ2VO1Heqcuy8ARzdWD?=
+ =?us-ascii?Q?yvGricCW5gJNEFUQ5mN1oBoAn5EvxiRnxPtICm35x6ej8EXWgTT14z/9WHWy?=
+ =?us-ascii?Q?e0nE1jaRhltf202xnlqIrpxGPeDNaOJ5ljpGavUKjrnGMoQpkrF8fi9ECxDP?=
+ =?us-ascii?Q?aGy5vHq/H1VfPxQVKkMqHveE1tHUCHFcIWS+9kBKc/MEK15vQnVxHpPFENZ2?=
+ =?us-ascii?Q?fGMTzYsa/N3cS14XxsKN6Ef3DybSIxE88ZPDcjqVxIi17TFK7wnEsJzK3dUp?=
+ =?us-ascii?Q?3DSVa9n0vXJzBVl5UbgCo6U9IdDxoeNFaVMICOJAhDTKHledOLzh166v3Ez7?=
+ =?us-ascii?Q?9oOhNzttDBcA7UDmcYi+Hcq+pg8+mJswbueubOj7HADo4TetaOewraMGrFZw?=
+ =?us-ascii?Q?2racb9z8VcuZjEY6t0asCywSwQqx9k0GVvJJGw1Z+Kh/6FRFZpdG0M9J6O6g?=
+ =?us-ascii?Q?MONL+6qU1b+ly/zBnxIs5kxRmal+Tk+Hxs/9JLZ+yUrP5+7glKTrOjE4vbZG?=
+ =?us-ascii?Q?EpYwRLFcHZdP0RGKrT3CAm5SC5JUtcHN7moAIwXPAbIZvv7viiJepPHYxHC/?=
+ =?us-ascii?Q?e0lEpTdwI1uQdj6JqwI0RrW8f9HPzwIiE3j94CbtYTl3AX38n4/9pRGywPtY?=
+ =?us-ascii?Q?bGeQ/Vz6jT46i8OTbN7/Lb8RrSVfFOVwTC0dnAQ6dK47IJNCKYfTMv9mlyC7?=
+ =?us-ascii?Q?n2IoLr/Fst1CvVtELetvE2/FeZ5ylRFWj8od5BjdowDvGf73nroYApU+Scpk?=
+ =?us-ascii?Q?+c9ts4uKyKKLMfxdmN22rWSeSDzcX+CPPcIA6cN3o12lhDYGAE+BTLx9cVUP?=
+ =?us-ascii?Q?SXzW3ZTxGRno1djLGgoV0eAn/HTOoFIHpwxupLgHGFT43OixhmxLsbKab1Pr?=
+ =?us-ascii?Q?uDi1fPbjyKTgPHhkvRHUNnmA6/qQCOSDYuNSSvSlmp/kZuF02FcqPt8svpGb?=
+ =?us-ascii?Q?hbOSAAncLmSSV3egXWTwhDrPK7NooklpLjuLWgLR4AIlJFPQMljt5e2EvSuK?=
+ =?us-ascii?Q?hMGhdYyMhf9lndjo3m6hBO6oL7mlgJrupiWR0eTjFtEIse9Vma9CdXajSSPQ?=
+ =?us-ascii?Q?mlFBOoFH8dfrzcaoJrjoZ6tOC0HxXnGT+vev90GSnRDgWs06kJpg+5qCH0D0?=
+ =?us-ascii?Q?o08EvWXjJ2PnEoDyPQS1Ar3HIR1mynkwLxVMjsRwk3Sg0eIa1FdZQfmmtivi?=
+ =?us-ascii?Q?cBdLpWNbNna3NrSnENBFoKP9a1lNglF2pxaui6q2qfxPcpH2S6FpnroXTHVL?=
+ =?us-ascii?Q?9aEZP3yBXAb2ahtbzxjKr6y2zKmmvJzm9ZlPqk83AKDM5uVGfLM3CCXT7DGe?=
+ =?us-ascii?Q?BFtKqXCF4cctJBZ2XuvXpXJPxrZT7pw7niUign2zs6M4urDeE66CLbJfHfRh?=
+ =?us-ascii?Q?rFTCw7vS0mUGDjSp/jDzQgODg89gAW8H1pcsalOxZ2SwVxiQXr8Eyfq9y3DW?=
+ =?us-ascii?Q?qU//3hOmiyhzQZIZFSLngNTecB8cknbhBNLYVEUj0ruVDo0+cMld0Zuzk+wA?=
+ =?us-ascii?Q?CvTh/as6Opq57us4wYGGuNOTcmZkc09GzJeGLDHU9zhKMGXqACyJ/aoQTbU2?=
+ =?us-ascii?Q?oWVTcEFPRLUkI+q/TsOEdrypko4/l2SeuZTtS8ALjWppTnwBjGWqSRx7ot91?=
+ =?us-ascii?Q?NZTYy6TOnI0tbkOFTe7F7TTPfkqpMwmXUcFUdb20ZVBOuYr+ohbmQz+Z37Ep?=
+ =?us-ascii?Q?uAH8fBz0iNwQD/hT+gq+/ds/pIf3OvrfkgMFLD5+zpF6t+IQIfRqUkkOP7wM?=
+ =?us-ascii?Q?VMI8tGq+Ofb3JxvCU9ry77rDJLK/L3LxTPqF7HKSqErFL5qCDNJv?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e3a650c-9192-44d3-5414-08dec6d51e52
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58df379d-fe3b-4722-aaea-08dec6d521b3
 X-MS-Exchange-CrossTenant-AuthSource: DBAPR04MB7207.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 09:46:17.4194
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 09:46:23.0210
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ajVaXRpyoQA9W8ZAcsjOe/akBmYob26qqgGgYdHCFgbL29g4+wTJPPF6RHLk0nTzGH7V0zoBiKJQHEHE232vD/O/IwYgqk1wVi8zXgRFw1WnX9bxQHRfSINqaJ2YV2tF
+X-MS-Exchange-CrossTenant-UserPrincipalName: zVIF0plJPCX1jpskymhqBuGZQkFzOHUe28qXkUQEKaHN/rA/Kwcqad+gdzMMe0sSgeL6JFd9ZL6/twpxn8w/3DT1KdQJjnaH19PPpeZueQ9ur64fZWXUX0+vl9H4uIQk
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10991
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [3.44 / 15.00];
@@ -150,12 +150,12 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[NXP1.onmicrosoft.com:s=selector1-NXP1-onmicrosoft-com];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[nxp.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297570-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297571-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER(0.00)[wei.fang@oss.nxp.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -173,451 +173,214 @@ X-Spamd-Result: default: False [3.44 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_NO_DN(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,NXP1.onmicrosoft.com:dkim,nxp.com:email,oss.nxp.com:mid,oss.nxp.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C83A86680CA
+X-Rspamd-Queue-Id: DD1B16680D2
 
 From: Wei Fang <wei.fang@nxp.com>
 
-Add link status message support to the PF driver using three command IDs
-under message class 0x80 (ENETC_MSG_CLASS_ID_LINK_STATUS):
+When a VF is driven by DPDK, the VF relies on the PF to provide accurate
+link speed information so that the VF-side user space application can
+make correct forwarding and configuration decisions.
 
-1. ENETC_MSG_GET_CURRENT_LINK_STATUS (cmd_id 0)
-The VF queries the current PF link status synchronously. This command is
-not used by the Linux VF driver but is intended for DPDK-owned VFs.
+Therefore, add link speed message support for DPDK-owned VF. The PF will
+reply the current link speed when it receives the get link speed message
+from VF.
 
-2. ENETC_MSG_REGISTER_LINK_CHANGE_NOTIFIER (cmd_id 1)
-The VF registers for link change notification. Upon registration, the PF
-immediately notifies the VF of the current link status via a PSI-to-VSI
-message, and continues to do so on every subsequent link state change.
+With this enhancement, VFs controlled by DPDK can obtain real-time link
+speed information from the PF, improving overall link state visibility,
+synchronization between PF/VF, and enabling more accurate performance
+adjustments in VF-side applications.
 
-3. ENETC_MSG_UNREGISTER_LINK_CHANGE_NOTIFIER (cmd_id 2)
-The VF unregisters from link change notification.
-
-PSI-to-VSI notifications are sent via the ENETC_PSIMSGSR register. A new
-msg_lock mutex is introduced in struct enetc_pf to protect concurrent
-access between the phylink callbacks and the VSI-to-PSI message handler.
-The bitmask link_status_ms_mask tracks which VFs have registered for
-notifications and is cleared when SR-IOV is disabled.
-
-Two functions are exported for use by PF drivers:
-  enetc_pf_notify_vf_link_up()
-  enetc_pf_notify_vf_link_down()
-
-Through this mechanism, VFs can accurately perceive the link status and
-report it to upper layers such as the kernel network stack, containers,
-and virtual machines.
-
-Note that currently only the ENETC v4 driver supports this feature, while
-v1 does not.
+Note that currently the link speed change notification is not supported.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- .../net/ethernet/freescale/enetc/enetc4_pf.c  |   2 +
- .../net/ethernet/freescale/enetc/enetc_hw.h   |   5 +
- .../ethernet/freescale/enetc/enetc_mailbox.h  |  18 ++
- .../net/ethernet/freescale/enetc/enetc_msg.c  | 201 +++++++++++++++++-
- .../net/ethernet/freescale/enetc/enetc_pf.h   |   4 +
- .../freescale/enetc/enetc_pf_common.c         |   2 +
- .../freescale/enetc/enetc_pf_common.h         |   9 +
- 7 files changed, 235 insertions(+), 6 deletions(-)
+ .../ethernet/freescale/enetc/enetc_mailbox.h  | 30 +++++++
+ .../net/ethernet/freescale/enetc/enetc_msg.c  | 85 +++++++++++++++++++
+ 2 files changed, 115 insertions(+)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index f7c532758e1c..4b69c19b2319 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -944,6 +944,7 @@ static void enetc4_pl_mac_link_up(struct phylink_config *config,
- 	enetc4_set_rx_pause(pf, rx_pause);
- 	enetc4_mac_tx_enable(pf);
- 	enetc4_mac_rx_enable(pf);
-+	enetc_pf_notify_vf_link_up(pf);
- }
- 
- static void enetc4_pl_mac_link_down(struct phylink_config *config,
-@@ -954,6 +955,7 @@ static void enetc4_pl_mac_link_down(struct phylink_config *config,
- 
- 	enetc4_mac_rx_graceful_stop(pf);
- 	enetc4_mac_tx_graceful_stop(pf);
-+	enetc_pf_notify_vf_link_down(pf);
- }
- 
- static const struct phylink_mac_ops enetc_pl_mac_ops = {
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-index bf99b65d7598..7b66c5be1ccf 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
-@@ -80,6 +80,11 @@ static inline u32 enetc_vsi_set_msize(u32 size)
- #define ENETC_SIMSGSR_SET_MC(val) ((val) << 16)
- #define ENETC_SIMSGSR_GET_MC(val) ((val) >> 16)
- 
-+#define ENETC_PSIMSGSR		0x208
-+/* n is VF index, which is less than 15 */
-+#define  PSIMSGSR_MS(n)		BIT((n) + 1)
-+#define  PSIMSGSR_MC		GENMASK(31, 16)
-+
- /* SI statistics */
- #define ENETC_SIROCT	0x300
- #define ENETC_SIRFRM	0x308
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
-index d9677da38989..43b9ee2ab3e4 100644
+index 43b9ee2ab3e4..46446330e222 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_mailbox.h
-@@ -107,6 +107,7 @@ enum enetc_msg_class_id {
- 
+@@ -108,6 +108,7 @@ enum enetc_msg_class_id {
  	/* Common Class ID for PSI-to-VSI and VSI-to-PSI messages */
  	ENETC_MSG_CLASS_ID_MAC_FILTER		= 0x20,
-+	ENETC_MSG_CLASS_ID_LINK_STATUS		= 0x80,
+ 	ENETC_MSG_CLASS_ID_LINK_STATUS		= 0x80,
++	ENETC_MSG_CLASS_ID_LINK_SPEED		= 0x81,
  	ENETC_MSG_CLASS_ID_IP_REVISION		= 0xf0,
  };
  
-@@ -118,11 +119,23 @@ enum enetc_msg_ip_revision_cmd_id {
- 	ENETC_MSG_GET_IP_MN			= 1,
+@@ -125,6 +126,13 @@ enum enetc_msg_link_status_cmd_id {
+ 	ENETC_MSG_UNREGISTER_LINK_CHANGE_NOTIFIER,
  };
  
-+enum enetc_msg_link_status_cmd_id {
-+	ENETC_MSG_GET_CURRENT_LINK_STATUS,
-+	ENETC_MSG_REGISTER_LINK_CHANGE_NOTIFIER,
-+	ENETC_MSG_UNREGISTER_LINK_CHANGE_NOTIFIER,
++enum enetc_msg_link_speed_cmd_id {
++	ENETC_MSG_GET_CURRENT_LINK_SPEED,
++	/* The following command IDs are not currently supported */
++	ENETC_MSG_REGISTER_SPEED_CHANGE_NOTIFIER,
++	ENETC_MSG_UNREGISTER_SPEED_CHANGE_NOTIFIER,
 +};
 +
  /* Class-specific error return codes of MAC filter */
  enum enetc_mac_filter_class_code {
  	ENETC_MF_CLASS_CODE_INVALID_MAC,
+@@ -136,6 +144,23 @@ enum enetc_link_status_class_code {
+ 	ENETC_LINK_STATUS_CLASS_CODE_DOWN,
  };
  
-+/* Class-specific notifications/codes of link status */
-+enum enetc_link_status_class_code {
-+	ENETC_LINK_STATUS_CLASS_CODE_UP,
-+	ENETC_LINK_STATUS_CLASS_CODE_DOWN,
++/* Class-specific notifications/codes of link speed */
++enum enetc_link_speed_class_code {
++	ENETC_MSG_SPEED_UNKNOWN,
++	ENETC_MSG_SPEED_10M_HD,
++	ENETC_MSG_SPEED_10M_FD,
++	ENETC_MSG_SPEED_100M_HD,
++	ENETC_MSG_SPEED_100M_FD,
++	ENETC_MSG_SPEED_1000M,
++	ENETC_MSG_SPEED_2500M,
++	ENETC_MSG_SPEED_5G,
++	ENETC_MSG_SPEED_10G,
++	ENETC_MSG_SPEED_25G,
++	ENETC_MSG_SPEED_40G,
++	ENETC_MSG_SPEED_50G,
++	ENETC_MSG_SPEED_100G,
 +};
 +
  struct enetc_msg_swbd {
  	void *vaddr;
  	dma_addr_t dma;
-@@ -161,6 +174,11 @@ struct enetc_msg_mac_exact_filter {
- /* The generic message format applies to the following messages:
-  * Get IP revision message, class_id 0xf0.
-  * cmd_id 1: get IP minor revision
+@@ -179,6 +204,11 @@ struct enetc_msg_mac_exact_filter {
+  * cmd_id 0x0: get the current link status
+  * cmd_id 0x1: register link status change notification
+  * cmd_id 0x2: unregister link status change notification
 + *
-+ * Link status message, class id 0x80.
-+ * cmd_id 0x0: get the current link status
-+ * cmd_id 0x1: register link status change notification
-+ * cmd_id 0x2: unregister link status change notification
++ * Link speed message, class_id 0x81.
++ * cmd_id 0x0: get the current link speed.
++ * cmd_id 0x1: register link speed change notification, not supported yet
++ * cmd_id 0x2: unregister link speed change notification, not supported yet
   */
  struct enetc_msg_generic {
  	struct enetc_msg_header hdr;
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_msg.c b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-index a89a5a418a23..eac71f90d80b 100644
+index eac71f90d80b..b24903b23a61 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_msg.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_msg.c
-@@ -136,6 +136,148 @@ static u16 enetc_msg_handle_ip_revision(struct enetc_pf *pf, void *vf_msg)
+@@ -9,6 +9,9 @@
+ 					   ENETC_MSG_CLASS_ID_CMD_NOT_SUPPORT)
+ #define ENETC_PF_MSG_PERM_DENY	FIELD_PREP(ENETC_PF_MSG_CLASS_ID, \
+ 					   ENETC_MSG_CLASS_ID_PERMISSION_DENY)
++#define ENETC_PF_MSG_SPEED(s)	(FIELD_PREP(ENETC_PF_MSG_CLASS_ID, \
++					    ENETC_MSG_CLASS_ID_LINK_SPEED) | \
++				 FIELD_PREP(ENETC_PF_MSG_CLASS_CODE, (s)))
+ 
+ static void enetc_msg_disable_mr_int(struct enetc_pf *pf)
+ {
+@@ -274,6 +277,84 @@ static u16 enetc_msg_handle_link_status(struct enetc_pf *pf, int vf_id,
  	}
  }
  
-+static u16 enetc_msg_get_link_status(struct enetc_pf *pf)
++static u16 enetc_msg_get_link_speed(struct enetc_pf *pf, int vf_id)
 +{
-+	struct net_device *ndev = pf->si->ndev;
-+	u16 pf_msg;
++	struct enetc_ndev_priv *priv = netdev_priv(pf->si->ndev);
++	struct enetc_vf_state *vf_state = &pf->vf_state[vf_id];
++	struct ethtool_link_ksettings link_info = {};
 +
-+	pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+			    ENETC_MSG_CLASS_ID_LINK_STATUS);
-+
-+	if (netif_carrier_ok(ndev))
-+		pf_msg |= FIELD_PREP(ENETC_PF_MSG_CLASS_CODE,
-+				     ENETC_LINK_STATUS_CLASS_CODE_UP);
-+	else
-+		pf_msg |= FIELD_PREP(ENETC_PF_MSG_CLASS_CODE,
-+				     ENETC_LINK_STATUS_CLASS_CODE_DOWN);
-+
-+	return pf_msg;
-+}
-+
-+static int enetc_pf_send_msg(struct enetc_pf *pf, u32 msg_code, u16 ms_mask)
-+{
-+	struct enetc_hw *hw = &pf->si->hw;
-+	u16 old_ms_mask = ms_mask;
-+	u16 ms_status;
-+	u32 val;
-+
-+	/* The MS bit is set, indicating that the corresponding VF has not
-+	 * read the last message, PF cannot send new message to the VF. So
-+	 * the bit corresponding to VF is cleared from ms_mask.
++	/* A malicious or malfunctioning VM could potentially spam these
++	 * messages in a tight loop causing global rtnl_lock contention,
++	 * which may severely starve other processes on the host that
++	 * require rtnl_lock for routine network configuration, resulting
++	 * in a system-wide control-plane denial of service. Therefore,
++	 * we expect the VF query for link speed to be trusted. There's no
++	 * need to consider the transition from trusted to untrusted here,
++	 * as this won't cause rntl_lock() to be called frequently.
 +	 */
-+	ms_status = enetc_rd(hw, ENETC_PSIMSGSR) & 0xffff;
-+	ms_mask &= ~ms_status;
-+	if (!ms_mask)
-+		return -EIO;
++	mutex_lock(&vf_state->lock);
++	if (!(vf_state->flags & ENETC_VF_FLAG_TRUSTED)) {
++		mutex_unlock(&vf_state->lock);
 +
-+	if (ms_mask != old_ms_mask)
-+		dev_warn_ratelimited(&pf->si->pdev->dev,
-+				     "PF cannot send message to VF(s) 0x%x\n",
-+				     ms_mask ^ old_ms_mask);
++		return ENETC_PF_MSG_PERM_DENY;
++	}
++	mutex_unlock(&vf_state->lock);
 +
-+	/* Writing a 1 when the bit is already set is undefined.
-+	 * Writing a 0 has no effect. Sending messages only to
-+	 * VFs where the MR bit is not set.
-+	 */
-+	enetc_wr(hw, ENETC_PSIMSGSR,
-+		 FIELD_PREP(PSIMSGSR_MC, msg_code) | ms_mask);
++	rtnl_lock();
++	phylink_ethtool_ksettings_get(priv->phylink, &link_info);
++	rtnl_unlock();
 +
-+	return read_poll_timeout(enetc_rd, val, !(val & ms_mask), 1000,
-+				 200000, false, hw, ENETC_PSIMSGSR);
++	switch (link_info.base.speed) {
++	case SPEED_10:
++		if (link_info.base.duplex == DUPLEX_HALF)
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_10M_HD);
++		else if (link_info.base.duplex == DUPLEX_FULL)
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_10M_FD);
++		else
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_UNKNOWN);
++	case SPEED_100:
++		if (link_info.base.duplex == DUPLEX_HALF)
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_100M_HD);
++		else if (link_info.base.duplex == DUPLEX_FULL)
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_100M_FD);
++		else
++			return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_UNKNOWN);
++	case SPEED_1000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_1000M);
++	case SPEED_2500:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_2500M);
++	case SPEED_5000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_5G);
++	case SPEED_10000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_10G);
++	case SPEED_25000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_25G);
++	case SPEED_40000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_40G);
++	case SPEED_50000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_50G);
++	case SPEED_100000:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_100G);
++	default:
++		return ENETC_PF_MSG_SPEED(ENETC_MSG_SPEED_UNKNOWN);
++	}
 +}
 +
-+static void enetc_msg_notify_vf_link_status(struct enetc_pf *pf, u16 ms_mask,
-+					    bool link_up)
-+{
-+	u16 pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				ENETC_MSG_CLASS_ID_LINK_STATUS);
-+
-+	if (link_up)
-+		pf_msg |= FIELD_PREP(ENETC_PF_MSG_CLASS_CODE,
-+				     ENETC_LINK_STATUS_CLASS_CODE_UP);
-+	else
-+		pf_msg |= FIELD_PREP(ENETC_PF_MSG_CLASS_CODE,
-+				     ENETC_LINK_STATUS_CLASS_CODE_DOWN);
-+
-+	if (enetc_pf_send_msg(pf, pf_msg, ms_mask))
-+		dev_err_ratelimited(&pf->si->pdev->dev,
-+				    "PF notifies link status failed\n");
-+}
-+
-+static void enetc_pf_reply_msg(struct enetc_hw *hw, int vf_id, u16 pf_msg)
-+{
-+	/* w1c to clear the corresponding VF MR bit */
-+	enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIMR_BIT(vf_id));
-+	enetc_wr(hw, ENETC_PSIMSGRR, ENETC_SIMSGSR_SET_MC(pf_msg) |
-+		 ENETC_PSIMR_BIT(vf_id));
-+}
-+
-+static void enetc_msg_register_link_status_notifier(struct enetc_pf *pf,
-+						    int vf_id)
-+{
-+	u16 pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				ENETC_MSG_CLASS_ID_CMD_SUCCESS);
-+
-+	mutex_lock(&pf->msg_lock);
-+
-+	enetc_pf_reply_msg(&pf->si->hw, vf_id, pf_msg);
-+
-+	/* SR-IOV is being disabled if pf->sriov_enabled is false, so no
-+	 * need to set link_status_ms_mask and notify the link status.
-+	 */
-+	if (!pf->sriov_enabled)
-+		goto msg_unlock;
-+
-+	pf->link_status_ms_mask |= PSIMSGSR_MS(vf_id);
-+
-+	/* Notify VF the current link status */
-+	enetc_msg_notify_vf_link_status(pf, PSIMSGSR_MS(vf_id),
-+					netif_carrier_ok(pf->si->ndev));
-+
-+msg_unlock:
-+	mutex_unlock(&pf->msg_lock);
-+}
-+
-+static void enetc_msg_unregister_link_status_notifier(struct enetc_pf *pf,
-+						      int vf_id)
-+{
-+	u16 pf_msg = FIELD_PREP(ENETC_PF_MSG_CLASS_ID,
-+				ENETC_MSG_CLASS_ID_CMD_SUCCESS);
-+
-+	mutex_lock(&pf->msg_lock);
-+
-+	pf->link_status_ms_mask &= ~PSIMSGSR_MS(vf_id);
-+	enetc_pf_reply_msg(&pf->si->hw, vf_id, pf_msg);
-+
-+	mutex_unlock(&pf->msg_lock);
-+}
-+
-+static u16 enetc_msg_handle_link_status(struct enetc_pf *pf, int vf_id,
-+					void *vf_msg)
++static u16 enetc_msg_handle_link_speed(struct enetc_pf *pf, int vf_id,
++				       void *vf_msg)
 +{
 +	struct enetc_msg_header *msg_hdr = vf_msg;
 +
 +	switch (msg_hdr->cmd_id) {
-+	case ENETC_MSG_GET_CURRENT_LINK_STATUS:
-+		/* Currently, this message is intended only for
-+		 * DPDK-owned VFs.
-+		 */
-+		return enetc_msg_get_link_status(pf);
-+	case ENETC_MSG_REGISTER_LINK_CHANGE_NOTIFIER:
-+		enetc_msg_register_link_status_notifier(pf, vf_id);
-+		return 0;
-+	case ENETC_MSG_UNREGISTER_LINK_CHANGE_NOTIFIER:
-+		enetc_msg_unregister_link_status_notifier(pf, vf_id);
-+		return 0;
++	case ENETC_MSG_GET_CURRENT_LINK_SPEED:
++		return enetc_msg_get_link_speed(pf, vf_id);
++	case ENETC_MSG_REGISTER_SPEED_CHANGE_NOTIFIER:
++	case ENETC_MSG_UNREGISTER_SPEED_CHANGE_NOTIFIER:
 +	default:
 +		return ENETC_PF_MSG_NOTSUPP;
 +	}
 +}
 +
-+/* If *pf_msg is set to 0, it means that PF has responded to VF in
-+ * enetc_msg_handle_rxmsg() through enetc_pf_reply_msg(), which also
-+ * clears the corresponding VF MR bit in PSIIDR.
-+ */
- static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
- 				   u16 *pf_msg)
- {
-@@ -211,6 +353,9 @@ static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
- 	case ENETC_MSG_CLASS_ID_IP_REVISION:
- 		*pf_msg = enetc_msg_handle_ip_revision(pf, msg);
+ /* If *pf_msg is set to 0, it means that PF has responded to VF in
+  * enetc_msg_handle_rxmsg() through enetc_pf_reply_msg(), which also
+  * clears the corresponding VF MR bit in PSIIDR.
+@@ -356,6 +437,9 @@ static void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int vf_id,
+ 	case ENETC_MSG_CLASS_ID_LINK_STATUS:
+ 		*pf_msg = enetc_msg_handle_link_status(pf, vf_id, msg);
  		break;
-+	case ENETC_MSG_CLASS_ID_LINK_STATUS:
-+		*pf_msg = enetc_msg_handle_link_status(pf, vf_id, msg);
++	case ENETC_MSG_CLASS_ID_LINK_SPEED:
++		*pf_msg = enetc_msg_handle_link_speed(pf, vf_id, msg);
 +		break;
  	default:
  		dev_err_ratelimited(dev,
  				    "Unsupported message class ID: 0x%x\n",
-@@ -236,7 +381,6 @@ static void enetc_msg_task(struct work_struct *work)
- 		goto out;
- 
- 	for (i = 0; i < pf->num_vfs; i++) {
--		u32 psimsgrr;
- 		u16 msg_code;
- 
- 		if (!(ENETC_PSIMR_BIT(i) & mr_status))
-@@ -244,12 +388,14 @@ static void enetc_msg_task(struct work_struct *work)
- 
- 		enetc_msg_handle_rxmsg(pf, i, &msg_code);
- 
--		/* w1c to clear the corresponding VF MR bit */
--		enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIMR_BIT(i));
-+		/* If msg_code is 0, it means that PF has responded to VF
-+		 * in enetc_msg_handle_rxmsg() through enetc_pf_reply_msg(),
-+		 * which also clears the corresponding VF MR bit in PSIIDR.
-+		 */
-+		if (!msg_code)
-+			continue;
- 
--		psimsgrr = ENETC_SIMSGSR_SET_MC(msg_code);
--		psimsgrr |= ENETC_PSIMR_BIT(i); /* w1c */
--		enetc_wr(hw, ENETC_PSIMSGRR, psimsgrr);
-+		enetc_pf_reply_msg(hw, i, msg_code);
+@@ -540,6 +624,7 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
+ 			dev_err(&pdev->dev, "pci_enable_sriov err %d\n", err);
+ 			goto err_en_sriov;
+ 		}
++
  	}
  
- out:
-@@ -367,6 +513,11 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	int err;
- 
- 	if (!num_vfs) {
-+		mutex_lock(&pf->msg_lock);
-+		pf->sriov_enabled = false;
-+		pf->link_status_ms_mask = 0;
-+		mutex_unlock(&pf->msg_lock);
-+
- 		pci_disable_sriov(pdev);
- 		enetc_msg_psi_free(pf);
- 		pf->num_vfs = 0;
-@@ -379,6 +530,11 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 			goto err_msg_psi;
- 		}
- 
-+		/* As PCI SR-IOV is not enabled at the moment, there is no
-+		 * concurrent access to sriov_enabled. So no need to use
-+		 * msg_lock to protect sriov_enabld.
-+		 */
-+		pf->sriov_enabled = true;
- 		err = pci_enable_sriov(pdev, num_vfs);
- 		if (err) {
- 			dev_err(&pdev->dev, "pci_enable_sriov err %d\n", err);
-@@ -389,6 +545,7 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
  	return num_vfs;
- 
- err_en_sriov:
-+	pf->sriov_enabled = false;
- 	enetc_msg_psi_free(pf);
- err_msg_psi:
- 	pf->num_vfs = 0;
-@@ -396,3 +553,35 @@ int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	return err;
- }
- EXPORT_SYMBOL_GPL(enetc_sriov_configure);
-+
-+static void enetc_pf_notify_vf_link_status(struct enetc_pf *pf,
-+					   bool link_up)
-+{
-+	u16 ms_mask;
-+
-+	if (!pf->num_vfs)
-+		return;
-+
-+	mutex_lock(&pf->msg_lock);
-+
-+	ms_mask = pf->link_status_ms_mask;
-+	if (!ms_mask)
-+		goto msg_unlock;
-+
-+	enetc_msg_notify_vf_link_status(pf, ms_mask, link_up);
-+
-+msg_unlock:
-+	mutex_unlock(&pf->msg_lock);
-+}
-+
-+void enetc_pf_notify_vf_link_up(struct enetc_pf *pf)
-+{
-+	enetc_pf_notify_vf_link_status(pf, true);
-+}
-+EXPORT_SYMBOL_GPL(enetc_pf_notify_vf_link_up);
-+
-+void enetc_pf_notify_vf_link_down(struct enetc_pf *pf)
-+{
-+	enetc_pf_notify_vf_link_status(pf, false);
-+}
-+EXPORT_SYMBOL_GPL(enetc_pf_notify_vf_link_down);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index 07bb9aab89aa..a5c13a4cc197 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -60,6 +60,10 @@ struct enetc_pf {
- 	const struct enetc_pf_ops *ops;
- 
- 	int num_mfe;	/* number of mac address filter table entries */
-+	/* Message lock, prevent concurrent access */
-+	struct mutex msg_lock;
-+	bool sriov_enabled;
-+	u16 link_status_ms_mask;
- };
- 
- #define phylink_to_enetc_pf(config) \
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 44c546b77d3f..e3bed5580d17 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -458,6 +458,8 @@ int enetc_init_sriov_resources(struct enetc_pf *pf)
- 	for (int i = 0; i < pf->total_vfs; i++)
- 		mutex_init(&pf->vf_state[i].lock);
- 
-+	mutex_init(&pf->msg_lock);
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(enetc_init_sriov_resources);
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-index 5bf7c20aba42..bbe21c739cf7 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.h
-@@ -26,9 +26,18 @@ static inline u16 enetc_get_ip_revision(struct enetc_hw *hw)
- 
- #if IS_ENABLED(CONFIG_PCI_IOV)
- int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs);
-+void enetc_pf_notify_vf_link_up(struct enetc_pf *pf);
-+void enetc_pf_notify_vf_link_down(struct enetc_pf *pf);
- #else
- static inline int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
- {
- 	return 0;
- }
-+
-+static inline void enetc_pf_notify_vf_link_up(struct enetc_pf *pf)
-+{
-+}
-+
-+static inline void enetc_pf_notify_vf_link_down(struct enetc_pf *pf)
-+{}
- #endif
 -- 
 2.34.1
 
