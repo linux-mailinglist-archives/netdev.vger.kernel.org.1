@@ -1,252 +1,262 @@
-Return-Path: <netdev+bounces-297485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297486-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ekqkD3sIKWpgPAMAu9opvQ
-	(envelope-from <netdev+bounces-297485-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:47:23 +0200
+	id bdNOLhwKKWrTPAMAu9opvQ
+	(envelope-from <netdev+bounces-297486-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:54:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31AF76665DD
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:47:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DAE66667B
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:54:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=proton.me header.s=protonmail header.b=G0pDnmEy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297485-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297485-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=proton.me;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=l+QiMkWi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297486-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297486-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5BC4F30034A7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:41:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3FD89303E2B8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FCF3769F6;
-	Wed, 10 Jun 2026 06:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C84D381B0C;
+	Wed, 10 Jun 2026 06:54:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-106119.protonmail.ch (mail-106119.protonmail.ch [79.135.106.119])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490FA375F9C
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B29C379C48;
+	Wed, 10 Jun 2026 06:54:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781073686; cv=none; b=RAGjTsBRisFD3yVFqx6QBuuneKievx2WVxjqmhSf2figpTWVBO3yUCXfv+o3Kh7GdHNDQX8h16OgFMe/+bbvdSmLw/WepGW4mjIdWouoh9MPeiHePCFr9ajQSfYQOldkGaFEI3c3zzcY9evTk2tmk+4jqWp0xnlgdhRfQ5D0bT0=
+	t=1781074456; cv=none; b=DJ2KADy8cxQo1WZ6f0SKIPVnY6DtkljOezKpnxVpWkpfl116wzVzgiHpKUrIU2VZkdpFdjgDyeh20UQ3aw/KHSLkTsVJt6Parxzbl/BtCBDP1ZCuBHcr2cwAHlYMMTaS3SmdzUZDHX91HFiPHa3x7qpGNOB5ZInQ/AqtICOsZ0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781073686; c=relaxed/simple;
-	bh=5ohSV1senSBYP367LMcv7ypDaWZ2ZIHigLiKwiF4Wdk=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=kAweiy1JWAUDVx6+q+r6YOeFecTcPycSSilm9M8XRpLSTK7ruFLwESHFX7VbkD5+Rw4Itn+AtmpR9H3ike3vxzpq2oQamlwAfsPsIaN1GUiJkrY62+ZPi/CMPiwSRoZ64m5b32cICd9o08oTewTkyBi45Pvtt5a8003/ZObQ4zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=G0pDnmEy; arc=none smtp.client-ip=79.135.106.119
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1781073675; x=1781332875;
-	bh=28RGYCY/6vRrF5swlXj8TafDmaZjT45mQ9JGQeGoON8=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=G0pDnmEyt9TFQ4uo1eiZVjpcj4HoqpOkAW2arjEsV9dW/yFAOhYIXintCgq6mYwaH
-	 yeOr52jfErh1gA7eZ9sZg7FNtxf7AH4uv7Ur+K4xof1WQMgvpN/KQuJ+XKB2yZTyrL
-	 BsmglJZPzuJaCek++j56gP7U6bRWFEFI95Nlo5/u3UrrmMrbqbuOnOH5Fip4D6zDBo
-	 x4T8C8NalNo0PVYl4lGx/9Rxxa5jbip0yjCNc9MYbeYRT2kbJCdUVlVVJTBPWS84rs
-	 zblG2ne5tzxVlV5iFB2yp4m/PbgSnGIGgANpZS3fi1g6+//JGpZZNnZ7/P/OQEUC9L
-	 KzZcEbumwWPtw==
-Date: Wed, 10 Jun 2026 06:41:10 +0000
-To: David Heidelberg <david@ixit.cz>
-From: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: oe-linux-nfc@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] nfc: nci: add data_len bound checks to activation parameter extractors
-Message-ID: <20260610064104.143042-1-hexlabsecurity@proton.me>
-Feedback-ID: 199661219:user:proton
-X-Pm-Message-ID: 369b714db19cee64cd16caeac9ccaaa9313e7c48
+	s=arc-20240116; t=1781074456; c=relaxed/simple;
+	bh=vninL9vr3iJarLE1AcSHNljqr3Xe4j3TbLmikMIoe/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=D9WBtaFdtFDSM0xRcrBsKMhaVn7SKP9Mm+t+CS3DOUfY7oBaRlln52OU+uI2Ao5YrHoqAZIKEL3R2aExo7XaHp4E1MUgGS1thaG3Djl2dwrcEcnOwZu+xUWYB6jVI2VGF4T1HOJ76et+B7RNvYPQqEXvEKyB3GESo4Ufn+TeTr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+QiMkWi; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3410A1F00893;
+	Wed, 10 Jun 2026 06:54:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781074455;
+	bh=9K2g/Vxczuc522ijWC1UP39o6qSw2+XJGcitWPlMCGk=;
+	h=Date:Subject:To:References:From:In-Reply-To;
+	b=l+QiMkWi9KOxUgcT43WgknZU8IB6nDGaDffvVPvY9xzfOq4SI7CrI0BqiSlRR9zTb
+	 seJ9pBIh8D+WpsQqHBiF7czj1qj0kHdj2LD+N0sVzMMV+dUBa42dE8jkUpkt5LdtjB
+	 g4J47C737onpMD0btSS0xzaEHljOZO5nSq0U0RufxZAlT3k99Gz8IPmubfbfSuU4T/
+	 i20RuodE0BcnN/yUa0q/FmmeW+1iGj8yNKmoreCtyNVRhh/ATijPxFjrNKTts9Hrxj
+	 zS4Gl1yOn6mO99aPMsH173yvcPjNEM9Fvhln6vPjx3dNJR6lS1ouQ8si2uYHQ9YCTm
+	 5xh8bi3MHC0Pw==
+Message-ID: <6bd0229b-4895-48a2-9e36-0ea5296c7fb5@kernel.org>
+Date: Wed, 10 Jun 2026 08:54:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next 1/3] dt-bindings: ptp: renesas,rcar-gen4-gptp: Add
+ binding for R-Car Gen4
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "DavidS. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-renesas-soc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260609215711.2960150-1-niklas.soderlund+renesas@ragnatech.se>
+ <20260609215711.2960150-2-niklas.soderlund+renesas@ragnatech.se>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260609215711.2960150-2-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
-	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297485-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[ragnatech.se,kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297486-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[proton.me:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,proton.me:dkim,proton.me:email,proton.me:mid,proton.me:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,devicetree.org:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 31AF76665DD
+X-Rspamd-Queue-Id: 72DAE66667B
 
-nci_extract_activation_params_iso_dep() and
-nci_extract_activation_params_nfc_dep() read an inner length byte from
-the NCI RF_INTF_ACTIVATED_NTF payload and use it to memcpy() into fixed
-kernel buffers, but neither function receives the caller-validated
-activation_params_len.  A crafted NCI notification with
-activation_params_len=3D1 and an inner length byte of up to 20 (NFC-A) or
-50 (NFC-B) causes memcpy() to read that many bytes past the one valid
-byte in the activation params region -- a slab out-of-bounds read of
-kernel memory adjacent to the NCI skb.
+On 09/06/2026 23:57, Niklas Söderlund wrote:
+> Add bindings for the R-Car Gen4 gPTP timer. The timer enables accurate
+> synchronization of the clock in the control system. The timer is
+> system-wide and used by different Ethernet devices on each Gen4 platform.
 
-The sibling nci_extract_rf_params_*() family was given equivalent
-protection by commit 571dcbeb8e63 ("net: nfc: nci: Fix parameter
-validation for packet data"), but the two activation parameter
-extractors were not updated at that time.
+A nit, subject: drop second/last, redundant "binding for". The
+"dt-bindings" prefix is already stating that these are bindings.
+See also:
+https://elixir.bootlin.com/linux/v6.17-rc3/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
 
-Add a data_len parameter to both functions, guard against an empty
-region before consuming the inner length byte, decrement the remaining
-count after consuming it, and clamp the copy length to what is actually
-available.  Update both call sites to pass ntf.activation_params_len,
-which is already validated against the skb at ntf.c:801.
 
-Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
----
-v2: no functional change. Resend of
-    https://lore.kernel.org/all/20260607094822.322125-1-hexlabsecurity@prot=
-on.me/
-    (2026-06-07), which did not reach the NFC maintainer: the MAINTAINERS
-    address for NFC, david+nfc@ixit.cz, rejected delivery ("550 User
-    doesn't exist" -- the +nfc subaddress expanded to
-    #/Kernel/Linux/NFC@ixit.cz), so this is resent to david@ixit.cz. Also
-    added the Cc: stable tag for the backport and dropped stable@vger from
-    the direct Cc (it should follow the mainline merge, not precede it).
+> 
+>   - On R-Car S4 it is shared between RSWITCH and RAVB.
+> 
+>   - On R-Car V4H it is shared between RTSN and RAVB.
+> 
+>   - On R-Car V4M it is only used by RAVB.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> ---
+>  .../bindings/ptp/renesas,rcar-gen4-gptp.yaml  | 64 +++++++++++++++++++
+>  MAINTAINERS                                   |  6 ++
+>  2 files changed, 70 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml b/Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml
+> new file mode 100644
+> index 000000000000..99e6e3ca73b6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml
+> @@ -0,0 +1,64 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +# Copyright (C) 2026 Renesas Electronics Corp.
+> +# Copyright (C) 2026 Niklas Söderlund <niklas.soderlund@ragnatech.se>
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/ptp/renesas,rcar-gen4-gptp.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Renesas R-Car Gen4 gPTP timer
+> +
+> +maintainers:
+> +  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
+> +
+> +description:
+> +  The R-Car Gen4 gPTP timer enables accurate synchronization of the clock in
+> +  the control system. The timer is system-wide and used by different Ethernet
+> +  devices on each Gen4 platform.
+> +
+> +    - On R-Car S4 it is shared between RSWITCH and RAVB.
+> +    - On R-Car V4H it is shared between RTSN and RAVB.
+> +    - On R-Car V4M it is only used by RAVB.
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - enum:
+> +          - renesas,r8a779f0-gptp # S4-8
+> +          - renesas,r8a779g0-gptp # V4H
+> +          - renesas,r8a779h0-gptp # V4M
+> +      - const: renesas,rcar-gen4-gptp # Generic R-Car Gen4
 
-Verification (NFC-A ISO-DEP, NFC_ATS_MAXSIZE =3D 20):
+Please drop comment or drop generic compatible and make it specific.
+Generic compatibles are discouraged, so don't advertise that. Look how
+other RECENT Renesas bindings do it.
 
-  data_len  inner_len  without patch              with patch
-  --------  ---------  -------------------------  --------------------
-  1         0          rats_res_len=3D0, clean       same
-  1         1          memcpy +1B OOB              clamped to 0, clean
-  1         20         memcpy +20B OOB  <-- PoC   clamped to 0, clean
-  2         2          memcpy +1B OOB              clamped to 1, clean
-  21        20         memcpy 20B clean            same
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  power-domains:
+> +    maxItems: 1
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - power-domains
+> +  - resets
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/r8a779g0-cpg-mssr.h>
+> +    #include <dt-bindings/power/r8a779g0-sysc.h>
+> +
+> +    gptp: gptp@e6449000 {
 
-NFC-B (attrib_res, max 50) and NFC-DEP poll/listen (atr_res/atr_req,
-max 62) have the same shape and receive the same fix.
+Drop unused label. Node name usually is "phc". Could be "ptp", but not
+"gptp". What is gptp in generic names?
 
- net/nfc/nci/ntf.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+>  L:	linux-iio@vger.kernel.org
 
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index c96512bb8653..753f4cf08748 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -525,15 +525,19 @@ static int nci_rf_discover_ntf_packet(struct nci_dev =
-*ndev,
 
- static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
- =09=09=09=09=09=09 struct nci_rf_intf_activated_ntf *ntf,
--=09=09=09=09=09=09 const __u8 *data)
-+=09=09=09=09=09=09 const __u8 *data, __u8 data_len)
- {
- =09struct activation_params_nfca_poll_iso_dep *nfca_poll;
- =09struct activation_params_nfcb_poll_iso_dep *nfcb_poll;
-
- =09switch (ntf->activation_rf_tech_and_mode) {
- =09case NCI_NFC_A_PASSIVE_POLL_MODE:
-+=09=09if (data_len < 1)
-+=09=09=09return -EINVAL;
- =09=09nfca_poll =3D &ntf->activation_params.nfca_poll_iso_dep;
- =09=09nfca_poll->rats_res_len =3D min_t(__u8, *data++, NFC_ATS_MAXSIZE);
-+=09=09data_len--;
-+=09=09nfca_poll->rats_res_len =3D min_t(__u8, nfca_poll->rats_res_len, dat=
-a_len);
- =09=09pr_debug("rats_res_len %d\n", nfca_poll->rats_res_len);
- =09=09if (nfca_poll->rats_res_len > 0) {
- =09=09=09memcpy(nfca_poll->rats_res,
-@@ -542,8 +546,12 @@ static int nci_extract_activation_params_iso_dep(struc=
-t nci_dev *ndev,
- =09=09break;
-
- =09case NCI_NFC_B_PASSIVE_POLL_MODE:
-+=09=09if (data_len < 1)
-+=09=09=09return -EINVAL;
- =09=09nfcb_poll =3D &ntf->activation_params.nfcb_poll_iso_dep;
- =09=09nfcb_poll->attrib_res_len =3D min_t(__u8, *data++, 50);
-+=09=09data_len--;
-+=09=09nfcb_poll->attrib_res_len =3D min_t(__u8, nfcb_poll->attrib_res_len,=
- data_len);
- =09=09pr_debug("attrib_res_len %d\n", nfcb_poll->attrib_res_len);
- =09=09if (nfcb_poll->attrib_res_len > 0) {
- =09=09=09memcpy(nfcb_poll->attrib_res,
-@@ -562,7 +570,7 @@ static int nci_extract_activation_params_iso_dep(struct=
- nci_dev *ndev,
-
- static int nci_extract_activation_params_nfc_dep(struct nci_dev *ndev,
- =09=09=09=09=09=09 struct nci_rf_intf_activated_ntf *ntf,
--=09=09=09=09=09=09 const __u8 *data)
-+=09=09=09=09=09=09 const __u8 *data, __u8 data_len)
- {
- =09struct activation_params_poll_nfc_dep *poll;
- =09struct activation_params_listen_nfc_dep *listen;
-@@ -570,9 +578,13 @@ static int nci_extract_activation_params_nfc_dep(struc=
-t nci_dev *ndev,
- =09switch (ntf->activation_rf_tech_and_mode) {
- =09case NCI_NFC_A_PASSIVE_POLL_MODE:
- =09case NCI_NFC_F_PASSIVE_POLL_MODE:
-+=09=09if (data_len < 1)
-+=09=09=09return -EINVAL;
- =09=09poll =3D &ntf->activation_params.poll_nfc_dep;
- =09=09poll->atr_res_len =3D min_t(__u8, *data++,
- =09=09=09=09=09  NFC_ATR_RES_MAXSIZE - 2);
-+=09=09data_len--;
-+=09=09poll->atr_res_len =3D min_t(__u8, poll->atr_res_len, data_len);
- =09=09pr_debug("atr_res_len %d\n", poll->atr_res_len);
- =09=09if (poll->atr_res_len > 0)
- =09=09=09memcpy(poll->atr_res, data, poll->atr_res_len);
-@@ -580,9 +592,13 @@ static int nci_extract_activation_params_nfc_dep(struc=
-t nci_dev *ndev,
-
- =09case NCI_NFC_A_PASSIVE_LISTEN_MODE:
- =09case NCI_NFC_F_PASSIVE_LISTEN_MODE:
-+=09=09if (data_len < 1)
-+=09=09=09return -EINVAL;
- =09=09listen =3D &ntf->activation_params.listen_nfc_dep;
- =09=09listen->atr_req_len =3D min_t(__u8, *data++,
- =09=09=09=09=09    NFC_ATR_REQ_MAXSIZE - 2);
-+=09=09data_len--;
-+=09=09listen->atr_req_len =3D min_t(__u8, listen->atr_req_len, data_len);
- =09=09pr_debug("atr_req_len %d\n", listen->atr_req_len);
- =09=09if (listen->atr_req_len > 0)
- =09=09=09memcpy(listen->atr_req, data, listen->atr_req_len);
-@@ -806,12 +822,14 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- =09=09switch (ntf.rf_interface) {
- =09=09case NCI_RF_INTERFACE_ISO_DEP:
- =09=09=09err =3D nci_extract_activation_params_iso_dep(ndev,
--=09=09=09=09=09=09=09=09    &ntf, data);
-+=09=09=09=09=09=09=09=09    &ntf, data,
-+=09=09=09=09=09=09=09=09    ntf.activation_params_len);
- =09=09=09break;
-
- =09=09case NCI_RF_INTERFACE_NFC_DEP:
- =09=09=09err =3D nci_extract_activation_params_nfc_dep(ndev,
--=09=09=09=09=09=09=09=09    &ntf, data);
-+=09=09=09=09=09=09=09=09    &ntf, data,
-+=09=09=09=09=09=09=09=09    ntf.activation_params_len);
- =09=09=09break;
-
- =09=09case NCI_RF_INTERFACE_FRAME:
---
-2.43.0
-
+Best regards,
+Krzysztof
 
