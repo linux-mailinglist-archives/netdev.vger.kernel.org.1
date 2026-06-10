@@ -1,459 +1,242 @@
-Return-Path: <netdev+bounces-297653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FczfLnRSKWqdUwMAu9opvQ
-	(envelope-from <netdev+bounces-297653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:03:00 +0200
+	id L1UqLhhVKWqCVAMAu9opvQ
+	(envelope-from <netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:14:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF1E6690A6
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:02:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0749E669269
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:14:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b=AncBorru;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297653-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297653-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=tu-dortmund.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=Y9o1g5Qj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297654-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2756311E995
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:00:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63E6A317631F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C7340489A;
-	Wed, 10 Jun 2026 12:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CDD404BF9;
+	Wed, 10 Jun 2026 12:06:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013036.outbound.protection.outlook.com [40.107.201.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487B540488C;
-	Wed, 10 Jun 2026 12:00:42 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781092847; cv=none; b=PAfcghiuQMxaekGRQm9iII/MMeIYEeJ7DCLsgESTwRFyPxCFT/Mm+ucldId96t4KpSpQ2C+wrmNBoEGCCd2U450O18PKRzwVW+h5mw5fjmgUTsTznTKsirBwWgEkLIRectIYdTubb2fbRrZDI1JFUCb1+LCzILQMFODjReQot3Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781092847; c=relaxed/simple;
-	bh=apdiJ2DO6MzYCPJEQ3xXu3KvikcOG8WaoZApYxQ8jrk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N+uQX6/Sd/pgx6+Vz7CgHydpPth9HxTH3FPtzzl7AcClk9+W5fe4DPH3wEz7riDSxgAAL/3b0Ciz27UV32e6ILSU2BU1Xd6zU1S/jzZ8BM2NfE2Fz2UdD1+GfiQDssFSKGdMk3VGhWqySoa1sF0HsfnAeWlWs3SB1EUVrMhkVu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=AncBorru; arc=none smtp.client-ip=129.217.128.51
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1781092815;
-	bh=apdiJ2DO6MzYCPJEQ3xXu3KvikcOG8WaoZApYxQ8jrk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=AncBorruT0Ld5K1uLRfLzA8/hxMh6jr3jRFS9nu1I5uZwq8D1zJHq2jyPJtlMwSlq
-	 yyHqvY70Nku6e8ZsB5nt6rGs3Oa67XUGYeeR+xqfoXrogt2rdmoSSMZ9hrVctHUHsp
-	 iq/MYO0nNCvgQbk9ZRUAgz+ddwHdDE6yB7nd4InI=
-Received: from [129.217.186.234] ([129.217.186.234])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 65AC0EWD025831
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 14:00:14 +0200 (CEST)
-Message-ID: <476dff81-a5af-4319-84d3-0852906f2be9@tu-dortmund.de>
-Date: Wed, 10 Jun 2026 14:00:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62854403B0E;
+	Wed, 10 Jun 2026 12:06:27 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781093188; cv=fail; b=TBRsF76EQZK7YdQhFDMtMTyrKZeYF7dwUzb9eIciEOL2KeT6UyFp7iSPPhak54piLMYR5psjnfX09izN/xMJ7xd/jJfZijYKMSwZeB5s9nIpUBbCX9BTSWztqGtRB1Ua+GQXB2eZvCjypCka/mCxIq/qYGVQyh1+lLxeebkgRWA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781093188; c=relaxed/simple;
+	bh=ckjQqB0VTgF5zV2iVQHEy4SwTU3cAe53iVFsJYUgx9I=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=n2ZMkGpEqxLJzY9+1n/sBjL/qbE7TF78OCpwEuSvCt10/WpnNtHBP9FKWeA2fIYZwhhsueLTvjxXBBpqObBA4C55y5x2OkF88W4Hta9JF2lhsLao9gOgjNINvUtn7l3W/NfYbbTZWWUOAxt1uBZIGY2Q00Al6eIOkRUe54a+NJE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y9o1g5Qj; arc=fail smtp.client-ip=40.107.201.36
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sTdyFUutRI8woeJbC5OlRFuuEkrUQj98rhmj3tVr4sYi+DEqNrrKrXsJpUDawS08FNEGzxC1G53mC4u/8dQGZLXGoKkfPPkTHRpu3h6Tc5rL5Z9lMtJdaamK4cfz4NAYQUwWH88fcztpxp24V9v9MF7bAaPeCRQS6jd1j2F6nEQNK4Q9Pb05+cja6CPW/J/MGTRl8UjNJKpBZgpYJoJYlCfm9wKlInDNKh1Ttdj/QSBnDKq3mkG7qCit/pQ0c15fF5mE/7Qkl/40sHW0MIBhw23/sQSvr8aiYFtUm771HEEUHBBw+dYvbXuHZhVisUqthx/3Zsnz/BeUZdoWCclBnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J/xw+qAK+C/doWNItpgQpTP6vqpIEqGC1vSOw7ef898=;
+ b=daXPTAdkcXrLMu2Uu84xWXJd6Xhi1q4zZ+6aOlgkudXmEok68Sb4fKenxpFOy/5mAJq99i1GRVGm4Cuq5OMiLl8WIPQ3N5I8qHLTXd2xWT1Ddt0B3ww7HIozG40f+zfOvtpHqFBNv0wMlC3hA8Lz+TbdCeoT/EfUgB1q3N2EJbFodeL/Ri+e7ijxXfoobyBc2AHKC7VN2A5xIj3omXvTY0TpMg3XTWimVPnNYPpClU6nWbR8hR8hoZyhii1Jmnfj4u802s+I1gfFUn7XCSPupRWC/ojTp9BWVeFpCWFtGPX/Ss/wLLGmvEyMVBSvIT29GaELzkqIzxkREYtcKaHOXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J/xw+qAK+C/doWNItpgQpTP6vqpIEqGC1vSOw7ef898=;
+ b=Y9o1g5QjDYK8Hj3966aWFolsZylHfPC5qE5MmpoVSDba6nGPG+KPhbIwr7bhSjJnfY8cPUoBC2vPubUEpfykjBqJo2YGejdvVKnxjwBxi4HEvTjdfHNkQKOg9iQb50/z9F90mLweVeWRYS6yns8BcnNO5zHd5KBQaRajrNtBU3F+sHAjV4en/UPSFX2OoagQuaKh2vEIxv4UufT9iQM6mZ25RE+M7B//j5Yak5qGPO2kRObceNsFSA8j4c2AfNBDV4MsmTFv4n1QGU8NG3/ukCnqK2SC/f5QqcKhMDOLm3Isd3NYq/EIBtKEKfWpi2wQHifqsmsgzbHlv1PvxTJEtg==
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ MW6PR12MB8705.namprd12.prod.outlook.com (2603:10b6:303:24c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
+ 2026 12:06:22 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::16e2:19ba:8915:90be]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::16e2:19ba:8915:90be%5]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
+ 12:06:20 +0000
+Message-ID: <9845fd42-e84f-43d7-98d3-9b2d0d1f23d9@nvidia.com>
+Date: Wed, 10 Jun 2026 15:06:16 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Report link down on administrative
+ close
+To: Manjunath Patil <manjunath.b.patil@oracle.com>, netdev@vger.kernel.org
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
+Content-Language: en-US
+From: Tariq Toukan <tariqt@nvidia.com>
+In-Reply-To: <20260608234223.3731557-1-manjunath.b.patil@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0199.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e5::19) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 5/5] veth: time-based BQL completion
- coalescing via ethtool tx-usecs
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
-        =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
-        netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
-References: <20260527135418.1166665-1-hawk@kernel.org>
- <20260527135418.1166665-6-hawk@kernel.org>
- <db2aa3b9-09d4-46d8-aafc-0a859ee8b635@tu-dortmund.de>
- <7fcb9f02-db61-416c-a6f5-b737d74110ec@kernel.org>
- <e8478d82-5af6-44f7-a481-584c09ae8337@tu-berlin.de>
- <b8569d0f-7a99-4488-a1bb-63d813231b7d@tu-dortmund.de>
- <90fc9fc1-f396-4ed1-888f-89a96294664e@kernel.org>
- <5e6315b1-b734-4f5f-af5e-bc76612f0993@tu-dortmund.de>
- <fb84879b-9fdf-4474-b152-9cbf0887bd21@tu-dortmund.de>
- <ffca21d8-ee29-4d63-8db2-73634124fdd8@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <ffca21d8-ee29-4d63-8db2-73634124fdd8@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MW6PR12MB8705:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27e0e705-76de-41e0-285d-08dec6e8ae66
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|11063799006|6133799003|18002099003|22082099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	M0Y/ZpI4UmAqbUQVvz+QZk6XWnRks3ftk+0FUyRZnbFEEv3iGpb3X+qQ4ce4K5CRxYLztildFLrZ464TqChoRktd6fKdZ420sleSXHI4MZpcxdbW9kQnjXoavwPbLUoOU9K3Owuq7QXzsitg7ZEQ2tRTcSPOiXJB9W8lvMBJ6ojK8Xn8lzV4f7llClIr9Vi9qiKW0vt6U3dSyG2+StN8rbmRQVoL132pd8BdQ7amCTtd3DVhFfegrXSN2eUFNB/WqSHJIyJEApF5aPHoAaVil4+XT8d2AIeyH7jkqxER/Z3kWNd+ny2/NyBLLvuc07bJQ/uITz1fx4PLmrG1U75LTJieZr3j7Dy/SsIeZEzY/8dsDBQ+g282GWIDmYoYYLNNtA0KDf7hzdjeLfYJ7t/yvBd9kpaw0xYstBk7/2luQXwnQsFzfzaU17atBlROI0kyDQWQ445p0oEPmunIRWL3rgN08GGwGKvzQyn/8GVQaV/2GrK+63srP6QZ3kouDTzbQdlAVDX5zD9s4yHyeuao8OK8bSR7Qw+W+SCSgNCXaRkyZ7+c4jvrGyLCve4YTyMlxG2p5sarKgl5rOdgeisILxA3QHDf10hdyv8paR6RKHkBHW9j4OKdIOCm6Sf+VXAHN9ilF5W+y5tlrqN7gyeoAAkHGPslX5y9pWkAycC48RULGAy5owahoSs8OQ4EcK+6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(11063799006)(6133799003)(18002099003)(22082099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ODFXMXpmWU9zV3gxOU9DSmlwRHJMSWErSm0welFUOElSVUUzd1dQTHluOGNm?=
+ =?utf-8?B?Myt2V3lmQXFJVFVEM3drck05UG8vVEtYRXVqUXozenZsenNkeWxjOGZqaUlZ?=
+ =?utf-8?B?bnFZN0dyNHlETDRQdWt5YWVMaURrU0tCd1RvZTVpUmNUSzlUVVRFa21VdTVO?=
+ =?utf-8?B?S1BTb0VIWTc2WnoxTUs4VWZleVZ4alZOSUcxbTlHYTl1SnhkQ01OL205UThU?=
+ =?utf-8?B?ZEg1NDZRdmZOQmZNQlNlT29OellnK21lWlMxMExGSUJoU0t2VkxBVVVqWlZ3?=
+ =?utf-8?B?UmRkRDFUR2w3MDFjRDB6d2wrUDFreU9Wd0k0ZjA2MnVlMHZlaHU0YUdJc3Bs?=
+ =?utf-8?B?UXVjN20yekloU3BNOWxxZE1VWC9rWTRCd3BBd3Arb3VyRzhYdWhDc3F3a1Np?=
+ =?utf-8?B?NHVMZ3Z0YWRpNFVvdVVjMmJnM21KTTMvK2t4QXN6U2VDcVZab0xUT0FFWm5a?=
+ =?utf-8?B?Q2ZMU296czRVZVV0ZGhwZkU1Rmt3YiswcnVKVGRQeUh4V0dybUpjVVNCOFI4?=
+ =?utf-8?B?S0x3aStncU9LRkxFZGZUZktmYnBDNnR3Q0hzVkJSYzFLekpwajN4Q2V4RitG?=
+ =?utf-8?B?d2MwRk9TUU5OVFhpMEpteTQySUFDUUhQbUlORmZHeHRGN2tjalA1YjhDTDZo?=
+ =?utf-8?B?dEpFSnZyODRHaTFLeGRKejRWMFhEdnBkU1I2T0hYSUl1cEJzb3Z3NkkwM055?=
+ =?utf-8?B?Qk04Z1RzcUNXMDlqYTRvVHhNQVk1Zk04ejFBVUJPMCtNWTdldXZqem1ZcEYr?=
+ =?utf-8?B?SDVlT0Z4c1ZrWExPdUYrRXVPMlJ1SUY2MDVraENwTHlzSDlIQ014WVJ5Ukli?=
+ =?utf-8?B?YmhRMEtRRm41Y2dCZTd5bGdhTnIwRGNEckZHVkg4eHU3NmFkOFNmZDJpMU5n?=
+ =?utf-8?B?NG9IU0pxaGR2TnJyZTBEckRvTzJxanRhdEN0QjBmU3VSamY1UFZXZEd4dXdw?=
+ =?utf-8?B?N1ZtMHBTYk5VWkZ2VHdyaUpFQXBxTC9ZeGZGVnlQem8yMXp4bkIrakJ0Rko2?=
+ =?utf-8?B?UlRRMW0zcHFPN0NabTk4eE8wOFNxVDVRZ1pIR0JwblBjM2x3Z3BteXNTRldF?=
+ =?utf-8?B?VlREZVlNbU9FVDU3bGFlOTJDbjhxMTVkZWJKUDNYT293WVR3OEdjWDNBWGR0?=
+ =?utf-8?B?OXhjbEdXc0JMQ3o3NGczUDlQdExOMjJRZFNzVXdGZmhKeFlUaEcrVDB1V25w?=
+ =?utf-8?B?NDJVUktiNXRSRjRwWGppZllRa2N1OUpFUmQzVkU2cnlEelVlZ1RhR0VrZWhZ?=
+ =?utf-8?B?blkvL2tFOGlYRDB2STlLYUpmTisweCttanlWT2xPVUJ0clJoQzlKMWt3UEVv?=
+ =?utf-8?B?SjhXbXh5KzIzTVRRMjQ2dmE3VEdpMG4ybTQ3ek5Pczc4QzlKUWV5a1k1TUNo?=
+ =?utf-8?B?U0RuYzBGTE5vSG4xVC9CTXE2N1RMMUszZ2hXNjVkYVU5VEtVbHkxNVA2ZDZi?=
+ =?utf-8?B?NnQvaExnazB4UmRJbmVtOTJkTXpHNjFxVWFFMFVpV3JJNEw1UHQxS2NQdFlR?=
+ =?utf-8?B?NkoyNlQ1bVA4WSt2RkloRFZGQk85UFNXUFpYQW01QnhhS2duMnQzWkxva1Ix?=
+ =?utf-8?B?NmxJUmRiUURVNVNybnZoQWhBWW5DVjVhcEdnSE15RFRTem9EeGdYTEc2NWds?=
+ =?utf-8?B?Tk9ZNFZ3clIwd1Y1alVXN3FKTTFQMXJzc0N5MDhQcStTS0krcGtCWEU2QmpD?=
+ =?utf-8?B?WGROQjZ1OVYveFE1Qk0wcEtDalNVaWo5dmlwQnRmWnZWNG9Sa0x2SVlweFVQ?=
+ =?utf-8?B?S3NPSy96UVEwd0cxMU1qVnQ5NlNVa3lkQ21wVDFDNU9FVkdTa25tbFBLbWhZ?=
+ =?utf-8?B?MzdBSXg2cGI1UkJBNHJlSHIrZ09VK1kzQk8zY0dPV2t3ZWlwY0I0RU40U1By?=
+ =?utf-8?B?dzZwNjBxVzRGTXMxT3RjaVZSbHM5RkxMNmQ2d0wzVElHOVM0bkVtWXlmZDJY?=
+ =?utf-8?B?Vi9hRVVBc05LWW5MTFdoUDdVRGtzWTJTaTRhZmFTM2dUY2ZPTlRDcUV2aEtX?=
+ =?utf-8?B?ektFcGhWSnRsVEwwTHJyM1RaQkttNit2dy9ENFE2UjZrTVRvdEFlVC9UY250?=
+ =?utf-8?B?VnVLK0x3WlVGUmlxQllyUThWQU1LMGg0aW1TZDA5SGdXNzUxNzBuVnd6WTdG?=
+ =?utf-8?B?UUtKNmdjenJIK2s5VjdnTzkrdTk5SWNjcjBZdWJGSFg1OWtUNDQvY2I3cEs4?=
+ =?utf-8?B?Q3ZPWDNlV3ArZElGZjFsWExjdHg5dkR3NmloQ1MyRmhRbDhFdis5eEJFOC9P?=
+ =?utf-8?B?RXBaOFkxalpST1pLMElib090K0xGK0dFcW15N1haVFh6SDViUGhiVGdRcUMv?=
+ =?utf-8?B?ek5nSSt2dmtxRFl0UUl0ME0velg4d2EyWVFVQ2hIUlpjOS9uSkpoQT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27e0e705-76de-41e0-285d-08dec6e8ae66
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 12:06:19.6509
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RNiBbvW7ACT1BqdYRP/KjsTgySPqpa/SnSueLZStdV70vjlVszDXbGrb9ws6S3K6BDaIRlfVLzBZGgADycN/bA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8705
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-5.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297653-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:hawk@kernel.org,m:j.koeppeler@tu-berlin.de,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:kernel-team@cloudflare.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,cloudflare.com];
+	TAGGED_FROM(0.00)[bounces-297654-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:manjunath.b.patil@oracle.com,m:netdev@vger.kernel.org,m:saeedm@nvidia.com,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RSPAMD_EMAILBL_FAIL(0.00)[simon.schippers@tu-dortmund.de:query timed out];
+	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:dkim,tu-dortmund.de:email,tu-dortmund.de:mid,tu-dortmund.de:from_mime,bql_sweep.sh:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,vger.kernel.org:from_smtp,nvidia.com:mid,nvidia.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5CF1E6690A6
-
-On 6/10/26 12:15, Jesper Dangaard Brouer wrote:
-> 
-> 
-> 
-> On 10/06/2026 09.04, Simon Schippers wrote:
->> On 6/9/26 17:08, Simon Schippers wrote:
->>> On 6/9/26 15:59, Jesper Dangaard Brouer wrote:
->>>>
->>>>
->>>> On 08/06/2026 16.21, Simon Schippers wrote:
->>>>> On 6/8/26 15:13, Jonas Köppeler wrote:
->>>>>>
->>>>>> On 6/8/26 3:04 PM, Jesper Dangaard Brouer wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 08/06/2026 12.38, Simon Schippers wrote:
->>>>>>>> On 5/27/26 15:54, hawk@kernel.org wrote:
->>>>>>>>> From: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>>
->>>>>>>>> Per-packet BQL completion forces DQL to converge on limit=2, causing
->>>>>>>>> excessive NAPI scheduling overhead and qdisc requeues.
->>>>>>>>>
->>>>>>>>> Accumulate BQL completions and flush them when a configurable time
->>>>>>>>> threshold is exceeded, letting DQL discover a limit that bounds actual
->>>>>>>>> queuing delay to the configured interval. Coalescing state persists
->>>>>>>>> across NAPI polls in struct veth_rq so completions can accumulate
->>>>>>>>> beyond a single budget=64 cycle.
->>>>>>>>>
->>>>>>>>> Add ethtool tx-usecs support for runtime tuning. Default is 100 us;
->>>>>>>>> setting tx-usecs to 0 disables coalescing and falls back to per-packet
->>>>>>>>> completion.
->>>>>>>>>
->>>>>>>>>      ethtool -C <veth-dev> tx-usecs 500  # 500us coalescing
->>>>>>>>>      ethtool -C <veth-dev> tx-usecs 0    # per-packet (no coalescing)
->>>>>>>>>
->>>>>>>>> Co-developed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>>>>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>> ---
->>>>>>>>
->>>>>>>> I found the issue that n_bql may become infinitly large if producer
->>>>>>>> and consumer have the same speed (and tx_usecs is large). It could
->>>>>>>> cause a potential BUG_ON if n_bql grows beyond INT_MAX...
->>>>>>>> Also I figured that no hardware BQL driver ever completes more than
->>>>>>>> BQL limit many elements.
->>>>>>>>
->>>>>>>> Therefore, I propose a simpler logic (see attachment) that completes
->>>>>>>> either on the usual bql_flush_ns or if n_bql > dql.limit.
->>>>>>>> If n_bql > dql.limit then we either have the case above that the
->>>>>>>> producer is as fast as the consumer or we have BQL starvation.
->>>>>>>>
->>>>>>>> if (state->time + bql_flush_ns <= current_time ||
->>>>>>>>       state->n_bql > peer_txq->dql.limit) {
->>>>>>>>
->>>>>>>> It must be n_bql *bigger than* dql.limit because the producer will
->>>>>>>> always exceed the limit before it stops, see netdev_tx_sent_queue().
->>>>>>>> It is fast because peer_txq->dql.limit is in the cacheline of the
->>>>>>>> completion path, see dynamic_queue_limits.h.
->>>>>>>>
->>>>>>>> Another advantage is that we avoid the snippet checking for empty
->>>>>>>> and BQL stopped which requires an smp_rmb() and an test_bit().
->>>>>>>>
->>>>>>>> Apart from that I:
->>>>>>>> - Always call veth_bql_maybe_complete() in the for loop to have
->>>>>>>>      more accurate completion intervals when having mixed XDP and
->>>>>>>>      non-XDP packets.
->>>>>>>> - Made it so tx_usecs = 0 is now also a normal case.
->>>>>>>> - Change the type of n_bql to uint instead of int.
->>>>>>>> - Added _ONCE() for tx_coalesce_usecs as suggested by Paolo.
->>>>>>>> - Moved the bql_state init in __veth_napi_enable_range() in front
->>>>>>>>      of napi_enable() to avoid a race (Sashiko).
->>>>>>>> - Moved the bql_state reset in veth_napi_del_range() after the
->>>>>>>>      ptr_ring_cleanup() (probably does not matter but makes sense to me)
->>>>>>>>
->>>>>>>> Benchmarks look just fine, see commit message.
->>>>>>>>
->>>>>>>> WDYT?
->>>>>>
->>>>>>>
->>>>>>> Looks good to me, I will use this in my V7 patchset.
->>>>>>>
->>>>>>> A bike-shedding issue: We change the coalescing parameters for the veth
->>>>>>> net_device, but should this be a TX or RX parameter?
->>>>>>>
->>>>>>
->>>>>> Hi,
->>>>>>
->>>>>> The results look a little bit suspicious, that in some cases the p99 is smaller than the average, which can happen if you have really large max values. It feels something is off with the methodology. I think we should drop the avg, and include the max value. This would give a better picture.
->>>>>
->>>>> Luckily I saved the raw test result from /tmp (the raw ping output
->>>>> is included).
->>>>>
->>>>> extract_ping_p99() seems to be broken. It has issues ordering the
->>>>> numbers. So if there are 2 or 3 numbers after the point I think.
->>>>> avg ping is fine.
->>>>>
->>>>> Claude Sonnet wrote a script for me to recalculate the p99 pings
->>>>> from the raw ping output).
->>>>
->>>> For programming switch to Claude Opus, as Sonnet cannot code IMHO.
->>>
->>> Already used 95% of my Copilot Pro+ Tokens this month :P
->>>
-> 
-> LOL - I'm lucky to (still) have unlimited tokens.
-> 
->>>> (Claude Opus wrote the selftest we placed in [1])
->>>>
->>>> Is your script still based on our github[1] selftest ?
->>>> If so, then please make some PR(s) against my repo.
->>>> I want this to be easy reproducible for others.
->>>>
->>>> [1] https://github.com/netoptimizer/veth-backpressure-performance-testing
->>>>
->>>
->>> I forked Jonas latest branch [1] and ran the tests with that.
->>>
->>> But I faced 2 issues that I then fixed:
->>> - Ping fails in some runs (~20%) -> My fix: Retry the run until it
->>>    works.
->>> - extract_ping_p99() has a bug for me which caused wrong results,
->>>    as pointed out by Jonas -> Also fixed it
->>>
->>> Because of the inconsistencies I will rerun over night to have
->>> clean benchmark results.
->>>
->>> I will make a PR tomorrow.
->>>
->>> [1] https://github.com/jkoeppeler/veth-backpressure-performance-testing/tree/pktgen-and-benchmark
->>>
->>
->> I ran the benchmarks over night and they look fine,
->> see ASCII table below.
->> I do not see a regression, tx_usecs of 50us even outperforms stock.
->>
-> 
-> Very interesting that tx_usecs 50us is generally performing better.
-> It seems we should "sweep" the area between 0-100 usecs for finding best
-> default from the beginning. (And see cool colored graphs that Jonas
-> generated).
-> 
-
-For quick verification I ran 5 runs in the 10-90us range
-for --nrules=0 and 20s per run. Here the results:
-
-sudo ./veth_bql_sweep.sh --runs 5 --tx-usecs-list \
-"0 10 20 30 40 50 60 70 80 90" --nrules-list "0" --pktgen \
- --duration 20 --qdisc fq_codel --no-bpftrace
-
-Throughput (pps)
-================================================================================
-nrules |  10us |  20us |  30us |  40us |  50us |  60us |  70us |  80us |  90us |
--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-     0 | 1.75M | 1.76M | 1.76M | 1.76M | 1.76M | 1.76M | 1.77M | 1.77M | 1.76M |
+X-Rspamd-Queue-Id: 0749E669269
 
 
-Ping RTT ms (avg)
-================================================================================
-nrules |  10us |  20us |  30us |  40us |  50us |  60us |  70us |  80us |  90us |
--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-     0 | 0.133 | 0.133 | 0.132 | 0.132 | 0.130 | 0.133 | 0.132 | 0.131 | 0.131 |
 
+On 09/06/2026 2:42, Manjunath Patil wrote:
+> mlx5e_update_carrier() reports both link-up and link-down carrier
+> changes, but an administrative down does not reach it in practice. The
+> close path first changes the port admin state and then clears
+> MLX5E_STATE_OPENED and drops carrier silently in mlx5e_close_locked().
+> Any queued carrier worker will skip update_carrier() once the device is
+> no longer opened.
+> 
+> This leaves "ip link set dev <dev> down" without a matching netdev
+> "Link down" message, while reopening the device still reports "Link up".
+> 
+> Report the link-down transition in mlx5e_close() before the common close
+> helper clears the opened state and drops carrier. Guard the message with
+> the current opened and carrier state to avoid duplicates when the netdev
+> is already closed or carrier is already down.
+> 
+> Assisted-by: Codex:gpt-5
+> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+> ---
+> Validation:
+> - Built an OL8 mainline test kernel from this change.
+> - Booted 7.1.0-rc6.bug123456.el8.v1.x86_64 on an mlx5-backed VM.
+> - Confirmed `ip link set dev re0 down/up` and `re1 down/up` now emit
+>    netdev `Link down` and `Link up` messages, alongside the existing RDMA
+>    port state notifications.
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 8f2b3abe0092..a04a89f0eddf 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -3628,6 +3628,9 @@ int mlx5e_close(struct net_device *netdev)
+>   
+>   	mutex_lock(&priv->state_lock);
+>   	mlx5e_modify_admin_state(priv->mdev, MLX5_PORT_DOWN);
+> +	if (test_bit(MLX5E_STATE_OPENED, &priv->state) &&
+> +	    netif_carrier_ok(netdev))
+> +		netdev_info(netdev, "Link down\n");
+>   	err = mlx5e_close_locked(netdev);
+>   	mutex_unlock(&priv->state_lock);
+>   
+> 
+> base-commit: e43ffb69e0438cddd72aaa30898b4dc446f664f8
 
-Ping RTT ms (p99)
-================================================================================
-nrules |  10us |  20us |  30us |  40us |  50us |  60us |  70us |  80us |  90us |
--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-     0 | 0.158 | 0.156 | 0.155 | 0.159 | 0.156 | 0.156 | 0.156 | 0.153 | 0.153 |
+Thanks for your patch.
 
+I wouldn't print "Link down" as part of the "close" callback. I'd rather 
+get it printed in the event handler. Currently there is a print there, 
+but the callback is masked by the OPENED bit.
 
-Now 50us is just as fast as stock, even though I changed *nothing* :/
-Nevertheless still great.
-
-Even 10us seems valid. Maybe it just has to be as big as the time
-for running a single veth_xdp_rcv() execution? Idk :D
-
-> 
->> I did a PR, see [1]. Most of the code changes are by Jonas,
->> because he rewrote the code to allow the usage of pktgen and
->> added the bql_sweep.sh script. Thanks Jonas!
->> My part is the 2 bugfixes, the output as ASCII table and
->> the new benchmark results with my new 'v7' method.
->>
->> I have not tested bql_sweep.sh inside virtme-ng, I ran my benchmarks
->> on the host system. I guess you could mount the folder with read+write
->> in vng and then run bql_sweep.sh there.
->>
->> [1] https://github.com/netoptimizer/veth-backpressure-performance-testing/pull/9
->>
-> 
-> I will take a look today.
-> - Will likely just merge after sanity checking as I want us iterate faster
-> 
->>
->> System information:
->> Ryzen 5 5600X @ fixed 4.3 GHz, 3200 MHz RAM, CPU mitigations disabled,
->> SMT disabled, on host system (NOT virtme-ng).
->>
->> Patched benchmark command:
->> sudo ./veth_bql_sweep.sh --runs 10 --tx-usecs-list \
->> "0 50 100 500 1000 5000 10000" --nrules-list "0 1 10 100 1000 10000" \
->> --pktgen --duration 20 --qdisc fq_codel --no-bpftrace
->>
->> Stock benchmark command:
->> sudo ./veth_bql_sweep.sh --runs 10 --tx-usecs-list "0" --nrules-list \
->> "0 1 10 100 1000 10000" --pktgen --duration 20 --qdisc fq_codel \
->> --no-bpftrace
->>
->> Throughput (pps)
->> ===========================================================================
->> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
->> -------+-------+-------+-------+-------+--------+--------+---------++------
->>       0 | 1.62M | 1.89M | 1.75M | 1.73M |  1.73M |  1.73M |   1.73M || 1.76M
->>       1 | 1.51M | 1.72M | 1.63M | 1.60M |  1.60M |  1.60M |   1.60M || 1.65M
->>      10 | 1.33M | 1.52M | 1.47M | 1.41M |  1.41M |  1.41M |   1.41M || 1.45M
->>     100 |  681K |  751K |  756K |  726K |   721K |   723K |    730K ||  736K
->>    1000 |  116K |  123K |  124K |  124K |   124K |   125K |    123K ||  126K
->>   10000 |   13K |   13K |   13K |   13K |    13K |    13K |     13K ||   13K
->>
->>
->> Ping RTT ms (avg)
->> ===========================================================================
->> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
->> -------+-------+-------+-------+-------+--------+--------+---------++------
->>       0 | 0.016 | 0.089 | 0.136 | 0.137 |  0.138 |  0.134 |   0.135 || 0.132
->>       1 | 0.018 | 0.097 | 0.144 | 0.146 |  0.146 |  0.150 |   0.147 || 0.142
->>      10 | 0.019 | 0.093 | 0.156 | 0.164 |  0.164 |  0.164 |   0.167 || 0.158
->>     100 | 0.029 | 0.104 | 0.180 | 0.315 |  0.312 |  0.314 |   0.311 || 0.307
->>    1000 | 0.139 | 0.201 | 0.309 | 0.971 |   1.66 |   1.81 |    1.82 ||  1.77
->>   10000 |  1.12 |  1.74 |  1.72 |  1.83 |   2.90 |   9.14 |    15.9 ||  17.2
->>
->>
->> Ping RTT ms (p99)
->> ===========================================================================
->> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
->> -------+-------+-------+-------+-------+--------+--------+---------++------
->>       0 | 0.026 | 0.122 | 0.161 | 0.164 |  0.164 |  0.159 |   0.161 || 0.155
->>       1 | 0.028 | 0.123 | 0.169 | 0.173 |  0.173 |  0.175 |   0.173 || 0.165
->>      10 | 0.032 | 0.119 | 0.187 | 0.194 |  0.193 |  0.193 |   0.197 || 0.185
->>     100 | 0.047 | 0.134 | 0.232 | 0.368 |  0.369 |  0.367 |   0.359 || 0.361
->>    1000 | 0.232 | 0.303 | 0.409 |  1.27 |   2.13 |   2.10 |    2.13 ||  2.10
->>   10000 |  1.94 |  2.52 |  2.59 |  2.69 |   3.87 |   12.0 |    20.0 ||  20.3
->>
-> 
-> Looks like 50us delivers better (lower) latency and higher throughput across the range.
-> I'm strongly considering changing V7 to use 50usec as default.
-> 
->>
->>>>> Below is the new result. Not 100% sure but this seems right now.
->>>>> Most pings are the same.
->>>>>
->>>>> Ping RTT ms (p99)
->>>>> ===========================================================================
->>>>> nrules |   0us |  50us | 100us | 500us | 1000us | 5000us | 10000us || stock
->>>>> -------+-------+-------+-------+-------+--------+--------+---------++------
->>>>>        0 | 0.028 | 0.115 | 0.159 | 0.161 |  0.163 |  0.161 |   0.163 || 0.154
->>>>>        1 | 0.027 | 0.123 | 0.169 | 0.172 |  0.169 |  0.173 |   0.172 || 0.169
->>>>>       10 | 0.030 | 0.117 | 0.189 | 0.193 |  0.195 |  0.192 |   0.196 || 0.186
->>>>>      100 | 0.045 | 0.134 | 0.233 | 0.368 |  0.365 |  0.369 |   0.361 || 0.358
->>>>>     1000 | 0.230 | 0.300 | 0.412 |  1.26 |   2.11 |   2.12 |    2.13 ||  2.07
->>>>>    10000 |  2.04 |  2.55 |  2.54 |  2.72 |   3.77 |   12.1 |    20.1 ||  20.3
->>>>>
->>>>>>
->>>>>> Is state->n_bql += veth_ptr_is_bql(ptr) something that is commonly done in the kernel? It relies on bool normalization which feels a bit implicit to me.
->>>>>
->>>>> Ok, we could swap for something like
->>>>>
->>>>> if (veth_ptr_is_bql(ptr))
->>>>>      state->n_bql+;
->>>>
->>>> I'll see if I can adjust the V7 patch to this feedback.
->>>
->>> Yes, and also this snippet pointed out by Jonas below:
->>>
->>>   -       struct veth_priv *priv;
->>>   -       u64 bql_flush_ns;
->>>   +       u64 bql_flush_ns = 0;
->>>
->>>   -       priv = netdev_priv(rq->dev);
->>>   -       bql_flush_ns = (u64)priv->tx_coal_usecs * 1000;
->>>   +       if (peer_txq) {
->>>   +           struct veth_priv *peer_priv = netdev_priv(peer_txq->dev);
->>>   +           bql_flush_ns = (u64)READ_ONCE(peer_priv->tx_coal_usecs) * 1000;
->>>   +       }
->>>
->>> Or is peer_txq != 0 guaranteed in veth_xdp_rcv()?
->>>
->>>
->>> And also I would change in the commit message:
->>>
->>> "Flushing when n_bql exceeds dql.limit handles two cases:
->>> - BQL starvation
->>> - The steady-state case where the producer and consumer run at the
->>>    same speed with a large tx-usecs, which would otherwise allow n_bql
->>>    to grow without bound (and potentially overflow int)."
->>>
->>> ... to just...
->>>
->>> "Flushing when n_bql exceeds dql.limit handles BQL starvation."
->>>
->>> ... because after rethinking I think I overstated here.
->>> n_bql should also not grow infinitely for the v6 version.
->>> Nevertheless the new method should be simpler and faster.
-> 
-> Ok, adjusted this for V7 patch.
-> 
->>>>
->>>>
->>>>>>
->>>>>>> For physical NICs adjusting TX coalescing will affect the BQL as this
->>>>>>> affect the TX completion of the transmitted packets. For veth, it is the
->>>>>>> veth-peer's RX NAPI that is "completing" or emptying the ptr_ring, which
->>>>>>> is where this patch adds netdev_tx_completed_queue calls for BQL.
->>>>>>> Any opinions on the "TX" or "RX" color?
->>>>>
->>>>> Personally I would also say TX.
->>>>>
->>>>
->>>> Okay, we seem to have more votes for TX :-)
->>>>
->>>>
->>>>>> I think I would prefer to configure it on the tx dev, and the recv
->>>>>> side gets the value from the peer. Maybe something like this.
->>>>>>
->>>>
->>>> I'm considering if we should simplify the config by having veth pairs have the same tx-coal value. WDYT?
->>>
->>> I can not think of a case where a user would like to have a different
->>> tx-coal value on either side..
->>> So it's fine for me.
-> 
-> Okay, agreed - switching V7 to have mirrored tx-coal value.
-> 
-> --Jesper
+This made me revisit this area, and it surely needs some more 
+interesting enhancements.
+I'll probably come up with some changes soon.
 
