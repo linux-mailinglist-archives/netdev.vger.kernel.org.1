@@ -1,268 +1,438 @@
-Return-Path: <netdev+bounces-297474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aOTMBG0DKWpeOwMAu9opvQ
-	(envelope-from <netdev+bounces-297474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:25:49 +0200
+	id Kc3BIjUDKWpPOwMAu9opvQ
+	(envelope-from <netdev+bounces-297478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:24:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FCDA66637F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:25:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AEDA666355
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:24:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=f2s4spfU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297474-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297474-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=rUtIXBfX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297478-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297478-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D2FC31AC30D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:19:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 44FE03003607
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A6D372EFA;
-	Wed, 10 Jun 2026 06:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C14D372677;
+	Wed, 10 Jun 2026 06:21:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010052.outbound.protection.outlook.com [40.93.198.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F8937269C
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:18:59 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781072341; cv=fail; b=uqo3+vwOYItDiPjx0ZMeKAJN3V5LvtfUP1VFbD9D6qpbKURro1eeIq3FyxJCrlemj8eOPph3Fi/+/V3+p/R8tjTNmt9lizQQNaHmnMD5+jKGFpw1NdleX4XfnZQ0FszagA8TTlcOi7ou7apJGZfPJ5bLynBHH8D2fMoQgfeqWZw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781072341; c=relaxed/simple;
-	bh=QBquUKAC2wVTWxWsZpopImm3bARkBv7WW49lj8/xYzg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f6ZerhJ4gH5B8/p1mYDyncoDbYLiJ/HbfESAWnZa79MwZi7TDXyltmDjJKUJxJTI/pDRZj21C85Vb4DkaDkKt2k5Zr6llQ8V1CMiLUdElkA0nKPRvvco8+05FMpInvrNzIsYuS2ta+3LF+COmN2EUytfG2UiBx4W5kWd2UWDFME=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=f2s4spfU; arc=fail smtp.client-ip=40.93.198.52
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oyTFbYD9KMDmtetIsop5VRQLRtw3tyDEHYzl+3CN7HxmwDp3d4taItL46UAPGK4h1iegNo0C6tHQRVIKtXOaD9uKRXL18J39fvO27HhIjs8dTtCcHiOKHIaLMijQRMhxwgKOZwT7sybuv2IoT4/x7gTuM1fWV1VJCIb1C/WFQDWmH0GZNzMD1c80tvQNGew5kyzNigWopERNesxmdILcKhE7nbxnPxCBM6OUURpznMvRuff38D/Mb4KxeQa2R5ovPn4aL4pDe3y00/AEVoPD17caRgMjANBxxEOQ4rUPDbkFvE/Q0u3Nzs5Ivxa8MDCMHVvksxC37I5ynl/vstpplg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pVG4QlH/I5Yd10NSuiE4dvtFGaI/Et8f6TjPjL0w+fQ=;
- b=ZCc4tc4rvkL5fBjqBSi+qTjQjjbfJd1H6A4bSoaOpFeqsRlckptn6wLFBxlFQWI/iE8yYdSdqQSrN5I6lLdfuv/fyom+n2Uur10rFSb2vpxKDWTgcldz+5VlUOc88bUhVQ1nbvBR2ivZpTF1DXq2pPykbPk/99+InvX8KXxkzwIuR706CZYue0LOLmeJVw2CB0dPdrCZQNeMuRCmWMHgQxb4JTHVz0XpIFbcujdfHrSgTYznO13uoqcXL0RCR6ZUwEblpY0tQwtkYdANVf+ww4Sdy8nuf+Oo4VUwW1amhEJ1XkzV+sk6/A/OPZf7+wlGj7VCkm0n/+e3LplduqMFjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pVG4QlH/I5Yd10NSuiE4dvtFGaI/Et8f6TjPjL0w+fQ=;
- b=f2s4spfUz2crJgQAv42cxMwa1SgfQwfqkUUzQCmPTaPopyayLVQx0CIvf3UVX7BUD4AxwVhP7qHxXn4p3ZywpR3b2xTueHzkZKt0I7a5UEp6lALADYiHq2ElF32DgLopuolYuT9DZlGcsOjKtMjoqAasDBq3kJ/zWnCegyqci5U=
-Received: from MN2PR14CA0021.namprd14.prod.outlook.com (2603:10b6:208:23e::26)
- by BN7PPFB3F5C406F.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6e0) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
- 2026 06:18:56 +0000
-Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
- (2603:10b6:208:23e:cafe::5) by MN2PR14CA0021.outlook.office365.com
- (2603:10b6:208:23e::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.92.13 via Frontend Transport; Wed, 10
- Jun 2026 06:18:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.113.7 via Frontend Transport; Wed, 10 Jun 2026 06:18:55 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 10 Jun
- 2026 01:18:53 -0500
-From: Eric Joyner <eric.joyner@amd.com>
-To: <netdev@vger.kernel.org>
-CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>, Eric Joyner
-	<eric.joyner@amd.com>
-Subject: [PATCH net-next v4 5/5] ionic: Add .get_fec_stats ethtool handler
-Date: Tue, 9 Jun 2026 23:18:30 -0700
-Message-ID: <20260610061830.51037-6-eric.joyner@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20260610061830.51037-1-eric.joyner@amd.com>
-References: <20260610061830.51037-1-eric.joyner@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B7537204D
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:21:54 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781072516; cv=none; b=jmiPQ+xxBmUBb2SDgR3Cf6ULMbwYM9QO7tL1C7I+JzFoRY7XSbVx9X5VaZgkpVhiG8C7811YQW1D3ddmtadCSD3RvrGzh4BtCQKqedbIS2bdpBX/FSA9WOZ5y1d5Vm1hmNgDq4eg5yrYMCEuoCKxIvtGEcQGfmmn8fCVbWTFkz0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781072516; c=relaxed/simple;
+	bh=Pe88eUAgT0wbmUNBsOs8zzWsG9xBnZCTpa0+FNgBMlg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J8IldNuHU2b3RiZhlUfSAy9fjQwHvWFNoomo3/H+n6B9ab7O51JOcVULCIo6ohziq0+6w4eRoywESslDGqVVfOEzCinHq+jXc5NYyjzdDNIrWd+Cpsq1fLjNiUzQCxqSbhaJNJaq96qY3uVO6xsEFuqDFPHsVBWHB/PRBaIOVJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rUtIXBfX; arc=none smtp.client-ip=209.85.210.174
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-842264dde84so3650327b3a.0
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 23:21:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781072514; x=1781677314; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lp8Xg7BLPbTEgIPBs+tIAGAGPHg6LJRApIau6bGcWZc=;
+        b=rUtIXBfXGKW8/E31jLUIZ4kOY1pmfLDitWbwPOQmQLLBqGUmMJCdS/HLM+PO4TCJun
+         +cHk9t9uX7xc6pzsb7PfkwPiIMe+NkUovVUFm/bAyxCZ6zCIMkug1+911tGafzte2Vp+
+         Zh36y1dvgA1pyBzMnqGS+uCJF7ToQORq1DuP0D7zq8Ihn5rY0fu/u3+OvVSe2rwfgEIF
+         tMIaBtYgvPygZzxkgLVcK3TtrJ1fjSxdykzdhsPxSAtuEfLe4L4Wh1J5IrIE+SkBYHRs
+         kPn8LN7+nvU8odxAklMZrH4X08HMsCE0boWNv9yO9VwtR0WAWAWIKDZ9HF68EoOD9mkC
+         qGnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781072514; x=1781677314;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lp8Xg7BLPbTEgIPBs+tIAGAGPHg6LJRApIau6bGcWZc=;
+        b=WRQ3BdP+J8XqZrM7FWU/kRO7ijFs+btjyWrfvSza6XtsdsfqKd4YmKVz9oxyd0EOPL
+         CnT9WZeRkxwL+Qi+1jHzoUKeBdcpbL+pHVpgGAiVZJQEnxlfj6KC04e8SMwEJqq6W8rh
+         Y6Gx3+8WFomML0e+iheb3W09blTFqyCyDTvYNvo1FnO9eV+8nC43yPWDWFnpcwgIAzAE
+         mCowEVDDp/auAe75cY9rvxnlXxe8Vz7jelKaR5/wYYEjocXOsefAcZ1OoGWpYVLLnY1h
+         7M3FwtgQOH2BFh3nPMlWDAi1SrG5MCetO5/RaKZdG10TbrQkD855Qe4HCu0MjpZ/Y8Zg
+         EeLg==
+X-Forwarded-Encrypted: i=1; AFNElJ+181SjvZpHyIm8AVU6vRW6dHOLLjfX/yO7XhLgscp/1kg8I9GWROnyvSQQCaJeH4LD8/ONOg4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyjzm1l2bGsFnSa6zn0KPZRW62f+PBWAzlx1vhI44Rt08C1Z2Tg
+	AD4gEZ0zxMiHaM2q2faBEOMX5ZotWAdCRzAfqUmTQ0tQGo7H+QwEsYk9
+X-Gm-Gg: Acq92OE0d+QBrBrO1LJi2oVfpVuZFxYA+sg5GNx9tFcDlMzoPnEW3RmK4rdX0s6Tt97
+	VDX44e3bm4Evypv88ZfH/pCcX41ViPXdffqpP2hhRGoFyXFi0Pvw2dHud+xDAG12oek9+6OZfVH
+	uuxM+HGam5jLFcUMbyCNicXefhV8aaObQ531xvwP/5hBdNw+AhWfIBlT+n2UgCFd+ND01BAUKKe
+	wEDi+AVwH24qQA4CTIPNUI7/6hGPNyRBzyUwNtcVEQt/jSltsOlhlg+a2AIyHGf6anGFhQ24mY7
+	RuhBTKCdo1qQFw5CF6sd6Va1lmjz5g1ECwwYRmQ8cocW9QyGewOhYcuWmsMmNiG3E0Ry5D7wiyT
+	Ryf8mmYH4M1anfDi9WM+ujZ+2+D+oaYf9SVDA/uU7+L1SQGE9q7/SMUuNnwhOwxcMNkBmYmoG2B
+	3k75bskMmCAyVfpdrqL1bBe0TAxXxIqXhtPwKRQEx+PMUWooDvARE+hMdSU6wFaA==
+X-Received: by 2002:a05:6a00:1bc7:b0:83f:250d:5a5 with SMTP id d2e1a72fcca58-842b6787af8mr18982395b3a.16.1781072513757;
+        Tue, 09 Jun 2026 23:21:53 -0700 (PDT)
+Received: from kfuzz ([202.120.234.33])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8428221c3e4sm24196986b3a.5.2026.06.09.23.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jun 2026 23:21:53 -0700 (PDT)
+From: Yiming Qian <yimingqian591@gmail.com>
+To: security@kernel.org,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: keenanat2000@gmail.com,
+	yimingqian591@gmail.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: skmsg: preserve sg.copy across SG transforms
+Date: Wed, 10 Jun 2026 06:21:36 +0000
+Message-ID: <20260610062137.49075-1-yimingqian591@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|BN7PPFB3F5C406F:EE_
-X-MS-Office365-Filtering-Correlation-Id: 933dbcf3-5bac-46a2-1430-08dec6b826c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|82310400026|36860700016|376014|1800799024|56012099006|3023799007|11063799006|22082099003|6133799003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	1Nrs8cB4R5Lags4apxZDNyFIu0WRjwRWa1hnJ3Zg7/y+qce7Pz8KX/BxnRAeMUNQL1kFGhCmpiBgm5di8KPwEJez+JfhbgNizgLsVDERlx1tepAx7yPh4QLoN1SHyyeTSVbFl+qHvPtk1UnihcyR8Iv0p919dQHSysCStoC83dy546eMZgTYEuifullPmNh16Brg0/0Kzc7NmxT/lH7h+qk0whKQPi9snKRxvUbt0u1ZAgighvymPwlcfhR/bQcRgcw1sh7dkW3l1vhlY5S6GVGa3+mbk7OP0GzIJ7SaZZYYGh+FzokOm9on2UNEGgj6HYWunVYxUdj3OpMHqvoPHIHkRr+ORgkY1VhjnEsrKTD5m5FTbn7fQdtA2JAAaeeFjybt1sboN9++iHS6/R1jOVLTvDer8+51En1qScKtIBXLLPHyaQvaIYwjQzEVGlK3HiZwQAZ+LeNtcI79+aGwsIlHT4Nq5VhUK84u//rWHKjqlNJdDxeYQm7uhczyZiYGhohwvDJmIk5fTKIKNnK4pHi/0e23owae5pGluzO5FivuEmPXFH1bG37vfHeUAePiGkes6o5qNpLMHWbGUsB6bhOnWsJr9X+9Lf3ku/5q0NYgBQke9P/W7tVmnndfqKTJridrL0GXtUfZniWD/btR1T1M6xYi+N/PunD7BqeRFKzvz9U33VkTdcz6kU8kPe1O4JFCBuivU1iWx/LWfXrEtrSez9rE3khMKrOfdPmknmI=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(82310400026)(36860700016)(376014)(1800799024)(56012099006)(3023799007)(11063799006)(22082099003)(6133799003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	2eL6vDAdbuwHFJX/I2Q+XqvkfL+WZznQT+RgCEqt5zAcdbFJkY/K79lV3foVq0TjIjkx2i5J+nrw8HlUdxuINHjy35ixp/xYPWO2QCL5BKKKtxbMd8kaJARJGJN0yy0GjMWNxq4PO/U3fLXvsMXh+UOBN1uFbRk+B0IjGgBhyQcSn/mW9OGlLG62M/H8/h/LTKU61yJXRrYPMkuQCwHDF8661O5Z0YpbfWnbCDe4RElvqocieCr6MFyDMDpWA9/lW48M4MvEWm4IUqTcI8eE0MNx8aY9uM/3sCYVWz8xRGZn+3bUT2v/inokD8vsZjB+Tn0ASu8LYRDIxBvx3jvtzrSsgdtGvvvqlMTfSbUStICwniZPGKCOhxgsTh6+ARF49GVIX2zVFr5loFELa8aY9b50VYXok5Z8mG8nsqMsGQtB5Fz/E2UyluWWwRhmPbYN
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 06:18:55.9664
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 933dbcf3-5bac-46a2-1430-08dec6b826c8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD7.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPFB3F5C406F
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297474-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com,cloudflare.com,queasysnail.net,davemloft.net,google.com,redhat.com];
+	FORGED_SENDER(0.00)[yimingqian591@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:security@kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:keenanat2000@gmail.com,m:yimingqian591@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:eric.joyner@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[eric.joyner@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yimingqian591@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,amd.com:dkim,amd.com:email,amd.com:mid,amd.com:from_mime];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7FCDA66637F
+X-Rspamd-Queue-Id: 1AEDA666355
 
-Reports FEC statistics totals and an 802.3ck FEC histogram. Per-lane
-counts currently aren't supported.
+The sk_msg sg.copy bitmap is part of the scatterlist entry ownership
+state. A set bit tells sk_msg_compute_data_pointers() not to expose the
+entry through writable BPF ctx->data. This protects entries backed by
+pages that are not private to the sk_msg, such as splice-backed file
+page-cache pages.
 
-The reporting of these statistics is gated by DEV_CAP_EXTRA_STATS and
-checks for IONIC_STAT_INVALID, since only the newest devices support
-reporting all of these stats. Older devices can only report some of the
-statistics or not at all, and so the output will properly exclude those
-unsupported statistics.
+Several sk_msg transform paths move, copy, split, or compact
+msg->sg.data[] entries without moving the matching sg.copy bit. This can
+make an externally backed entry arrive at a new slot with a clear copy
+bit. A later SK_MSG verdict can then expose sg_virt(sge) as writable
+ctx->data and BPF stores can modify the original page cache.
 
-Assisted-by: Claude:claude-4.6-sonnet
-Signed-off-by: Eric Joyner <eric.joyner@amd.com>
+Keep sg.copy synchronized with sg.data[] whenever entries are
+transferred, shifted, split, or copied into a new sk_msg. Clear the bit
+when an entry is replaced by a newly allocated private page or freed.
+This covers the BPF pull/push/pop helpers, sk_msg_shift_left/right(),
+sk_msg_xfer(), and tls_split_open_record(), including the partial tail
+entry created during TLS open-record splitting.
+
+Fixes: d3b18ad31f93 ("tls: add bpf support to sk_msg handling")
+Cc: stable@vger.kernel.org
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Reported-by: Keenan Dong <keenanat2000@gmail.com>
+Signed-off-by: Yiming Qian <yimingqian591@gmail.com>
 ---
- .../ethernet/pensando/ionic/ionic_ethtool.c   | 72 +++++++++++++++++++
- 1 file changed, 72 insertions(+)
+v2:
+- Use __assign_bit() and the _assign helper suffix suggested in review.
+- Broaden the fix beyond tls_split_open_record() to the sk_msg entry
+  transform paths in BPF pull/push/pop helpers, sk_msg shift helpers,
+  sk_msg_xfer(), and entry allocation/free cleanup.
+- Expand the commit message to explain why sg.copy must move with the
+  scatterlist entry.
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-index 6069fa460913..41bb27669907 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-@@ -425,6 +425,77 @@ static int ionic_get_fecparam(struct net_device *netdev,
- 	return 0;
+ include/linux/skmsg.h | 15 +++++++++++----
+ net/core/filter.c     | 27 +++++++++++++++++++++++++++
+ net/core/skmsg.c      |  2 ++
+ net/tls/tls_sw.c      |  4 ++++
+ 4 files changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+index 19f4f253b4f90..937823856de59 100644
+--- a/include/linux/skmsg.h
++++ b/include/linux/skmsg.h
+@@ -4,6 +4,7 @@
+ #ifndef _LINUX_SKMSG_H
+ #define _LINUX_SKMSG_H
+ 
++#include <linux/bitops.h>
+ #include <linux/bpf.h>
+ #include <linux/filter.h>
+ #include <linux/scatterlist.h>
+@@ -199,11 +200,14 @@ static inline void sk_msg_xfer(struct sk_msg *dst, struct sk_msg *src,
+ 			       int which, u32 size)
+ {
+ 	dst->sg.data[which] = src->sg.data[which];
++	__assign_bit(which, dst->sg.copy, test_bit(which, src->sg.copy));
+ 	dst->sg.data[which].length  = size;
+ 	dst->sg.size		   += size;
+ 	src->sg.size		   -= size;
+ 	src->sg.data[which].length -= size;
+ 	src->sg.data[which].offset += size;
++	if (!src->sg.data[which].length)
++		__clear_bit(which, src->sg.copy);
  }
  
-+static const struct ethtool_fec_hist_range ionic_fec_ranges[] = {
-+	{ 0, 0},
-+	{ 1, 1},
-+	{ 2, 2},
-+	{ 3, 3},
-+	{ 4, 4},
-+	{ 5, 5},
-+	{ 6, 6},
-+	{ 7, 7},
-+	{ 8, 8},
-+	{ 9, 9},
-+	{ 10, 10},
-+	{ 11, 11},
-+	{ 12, 12},
-+	{ 13, 13},
-+	{ 14, 14},
-+	{ 15, 15},
-+	{ 0, 0},
-+};
-+
-+#define IONIC_FEC_STAT(dst, src)			\
-+	do {						\
-+		if ((src) != IONIC_STAT_INVALID)	\
-+			(dst) = le64_to_cpu((src));	\
-+	} while (0)
-+
-+static void
-+ionic_fill_fec_hist(const struct ionic_port_extra_stats *port_extra_stats,
-+		    struct ethtool_fec_hist *hist)
-+{
-+	__le64 fec_cw_err_bin;
-+	int i;
-+
-+	if (port_extra_stats->fec_codeword_error_bin[0] == IONIC_STAT_INVALID)
-+		return;
-+
-+	hist->ranges = ionic_fec_ranges;
-+	/* All bins in ranges must be set */
-+	for (i = 0; i < ARRAY_SIZE(ionic_fec_ranges) - 1; i++) {
-+		fec_cw_err_bin = port_extra_stats->fec_codeword_error_bin[i];
-+
-+		if (fec_cw_err_bin != IONIC_STAT_INVALID)
-+			hist->values[i].sum = le64_to_cpu(fec_cw_err_bin);
-+		else
-+			hist->values[i].sum = 0;
-+	}
-+}
-+
-+static void ionic_get_fec_stats(struct net_device *netdev,
-+				struct ethtool_fec_stats *fec_stats,
-+				struct ethtool_fec_hist *hist)
-+{
-+	struct ionic_port_extra_stats *port_extra_stats;
-+	struct ionic_lif *lif = netdev_priv(netdev);
-+
-+	if (!(lif->ionic->ident.dev.capabilities &
-+	      cpu_to_le64(IONIC_DEV_CAP_EXTRA_STATS)))
-+		return;
-+
-+	port_extra_stats = &lif->ionic->idev.port_info->extra_stats;
-+
-+	IONIC_FEC_STAT(fec_stats->corrected_blocks.total,
-+		       port_extra_stats->rsfec_correctable_blocks);
-+	IONIC_FEC_STAT(fec_stats->uncorrectable_blocks.total,
-+		       port_extra_stats->rsfec_uncorrectable_blocks);
-+	IONIC_FEC_STAT(fec_stats->corrected_bits.total,
-+		       port_extra_stats->fec_corrected_bits_total);
-+
-+	ionic_fill_fec_hist(port_extra_stats, hist);
-+}
-+
- static int ionic_set_fecparam(struct net_device *netdev,
- 			      struct ethtool_fecparam *fec)
+ static inline void sk_msg_xfer_full(struct sk_msg *dst, struct sk_msg *src)
+@@ -273,16 +277,19 @@ static inline void sk_msg_page_add(struct sk_msg *msg, struct page *page,
+ static inline void sk_msg_sg_copy(struct sk_msg *msg, u32 i, bool copy_state)
  {
-@@ -1161,6 +1232,7 @@ static const struct ethtool_ops ionic_ethtool_ops = {
- 	.get_module_eeprom_by_page	= ionic_get_module_eeprom_by_page,
- 	.get_pauseparam		= ionic_get_pauseparam,
- 	.set_pauseparam		= ionic_set_pauseparam,
-+	.get_fec_stats		= ionic_get_fec_stats,
- 	.get_fecparam		= ionic_get_fecparam,
- 	.set_fecparam		= ionic_set_fecparam,
- 	.get_ts_info		= ionic_get_ts_info,
+ 	do {
+-		if (copy_state)
+-			__set_bit(i, msg->sg.copy);
+-		else
+-			__clear_bit(i, msg->sg.copy);
++		__assign_bit(i, msg->sg.copy, copy_state);
+ 		sk_msg_iter_var_next(i);
+ 		if (i == msg->sg.end)
+ 			break;
+ 	} while (1);
+ }
+ 
++static inline void sk_msg_sg_copy_assign(struct sk_msg *dst, u32 dst_i,
++					 const struct sk_msg *src, u32 src_i)
++{
++	__assign_bit(dst_i, dst->sg.copy, test_bit(src_i, src->sg.copy));
++}
++
+ static inline void sk_msg_sg_copy_set(struct sk_msg *msg, u32 start)
+ {
+ 	sk_msg_sg_copy(msg, start, true);
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 80439767e0eea..40037413dd4ec 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2733,11 +2733,13 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
+ 		poffset += len;
+ 		sge->length = 0;
+ 		put_page(sg_page(sge));
++		__clear_bit(i, msg->sg.copy);
+ 
+ 		sk_msg_iter_var_next(i);
+ 	} while (i != last_sge);
+ 
+ 	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
++	__clear_bit(first_sge, msg->sg.copy);
+ 
+ 	/* To repair sg ring we need to shift entries. If we only
+ 	 * had a single entry though we can just replace it and
+@@ -2763,9 +2765,11 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
+ 			break;
+ 
+ 		msg->sg.data[i] = msg->sg.data[move_from];
++		sk_msg_sg_copy_assign(msg, i, msg, move_from);
+ 		msg->sg.data[move_from].length = 0;
+ 		msg->sg.data[move_from].page_link = 0;
+ 		msg->sg.data[move_from].offset = 0;
++		__clear_bit(move_from, msg->sg.copy);
+ 		sk_msg_iter_var_next(i);
+ 	} while (1);
+ 
+@@ -2794,6 +2798,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ {
+ 	struct scatterlist sge, nsge, nnsge, rsge = {0}, *psge;
+ 	u32 new, i = 0, l = 0, space, copy = 0, offset = 0;
++	bool sge_copy, nsge_copy, nnsge_copy, rsge_copy = false;
+ 	u8 *raw, *to, *from;
+ 	struct page *page;
+ 
+@@ -2866,6 +2871,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 			sk_msg_iter_var_prev(i);
+ 		psge = sk_msg_elem(msg, i);
+ 		rsge = sk_msg_elem_cpy(msg, i);
++		rsge_copy = test_bit(i, msg->sg.copy);
+ 
+ 		psge->length = start - offset;
+ 		rsge.length -= psge->length;
+@@ -2890,24 +2896,32 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 
+ 	/* Shift one or two slots as needed */
+ 	sge = sk_msg_elem_cpy(msg, new);
++	sge_copy = test_bit(new, msg->sg.copy);
+ 	sg_unmark_end(&sge);
+ 
+ 	nsge = sk_msg_elem_cpy(msg, i);
++	nsge_copy = test_bit(i, msg->sg.copy);
+ 	if (rsge.length) {
+ 		sk_msg_iter_var_next(i);
+ 		nnsge = sk_msg_elem_cpy(msg, i);
++		nnsge_copy = test_bit(i, msg->sg.copy);
+ 		sk_msg_iter_next(msg, end);
+ 	}
+ 
+ 	while (i != msg->sg.end) {
+ 		msg->sg.data[i] = sge;
++		__assign_bit(i, msg->sg.copy, sge_copy);
+ 		sge = nsge;
++		sge_copy = nsge_copy;
+ 		sk_msg_iter_var_next(i);
+ 		if (rsge.length) {
+ 			nsge = nnsge;
++			nsge_copy = nnsge_copy;
+ 			nnsge = sk_msg_elem_cpy(msg, i);
++			nnsge_copy = test_bit(i, msg->sg.copy);
+ 		} else {
+ 			nsge = sk_msg_elem_cpy(msg, i);
++			nsge_copy = test_bit(i, msg->sg.copy);
+ 		}
+ 	}
+ 
+@@ -2921,6 +2935,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 		get_page(sg_page(&rsge));
+ 		sk_msg_iter_var_next(new);
+ 		msg->sg.data[new] = rsge;
++		__assign_bit(new, msg->sg.copy, rsge_copy);
+ 	}
+ 
+ 	sk_msg_reset_curr(msg);
+@@ -2948,25 +2963,33 @@ static void sk_msg_shift_left(struct sk_msg *msg, int i)
+ 		prev = i;
+ 		sk_msg_iter_var_next(i);
+ 		msg->sg.data[prev] = msg->sg.data[i];
++		sk_msg_sg_copy_assign(msg, prev, msg, i);
+ 	} while (i != msg->sg.end);
+ 
+ 	sk_msg_iter_prev(msg, end);
++	__clear_bit(msg->sg.end, msg->sg.copy);
+ }
+ 
+ static void sk_msg_shift_right(struct sk_msg *msg, int i)
+ {
+ 	struct scatterlist tmp, sge;
++	bool tmp_copy, sge_copy;
+ 
+ 	sk_msg_iter_next(msg, end);
+ 	sge = sk_msg_elem_cpy(msg, i);
++	sge_copy = test_bit(i, msg->sg.copy);
+ 	sk_msg_iter_var_next(i);
+ 	tmp = sk_msg_elem_cpy(msg, i);
++	tmp_copy = test_bit(i, msg->sg.copy);
+ 
+ 	while (i != msg->sg.end) {
+ 		msg->sg.data[i] = sge;
++		__assign_bit(i, msg->sg.copy, sge_copy);
+ 		sk_msg_iter_var_next(i);
+ 		sge = tmp;
++		sge_copy = tmp_copy;
+ 		tmp = sk_msg_elem_cpy(msg, i);
++		tmp_copy = test_bit(i, msg->sg.copy);
+ 	}
+ }
+ 
+@@ -3026,6 +3049,8 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 		struct scatterlist *nsge, *sge = sk_msg_elem(msg, i);
+ 		int a = start - offset;
+ 		int b = sge->length - pop - a;
++		u32 sge_i = i;
++		bool sge_copy = test_bit(i, msg->sg.copy);
+ 
+ 		sk_msg_iter_var_next(i);
+ 
+@@ -3038,6 +3063,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				sg_set_page(nsge,
+ 					    sg_page(sge),
+ 					    b, sge->offset + pop + a);
++				__assign_bit(i, msg->sg.copy, sge_copy);
+ 			} else {
+ 				struct page *page, *orig;
+ 				u8 *to, *from;
+@@ -3054,6 +3080,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				memcpy(to, from, a);
+ 				memcpy(to + a, from + a + pop, b);
+ 				sg_set_page(sge, page, a + b, 0);
++				__clear_bit(sge_i, msg->sg.copy);
+ 				put_page(orig);
+ 			}
+ 			pop = 0;
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index e1850caf1a71a..30c3b9a2681c4 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -66,6 +66,7 @@ int sk_msg_alloc(struct sock *sk, struct sk_msg *msg, int len,
+ 			sge = &msg->sg.data[msg->sg.end];
+ 			sg_unmark_end(sge);
+ 			sg_set_page(sge, pfrag->page, use, orig_offset);
++			__clear_bit(msg->sg.end, msg->sg.copy);
+ 			get_page(pfrag->page);
+ 			sk_msg_iter_next(msg, end);
+ 		}
+@@ -186,6 +187,7 @@ static int sk_msg_free_elem(struct sock *sk, struct sk_msg *msg, u32 i,
+ 			sk_mem_uncharge(sk, len);
+ 		put_page(sg_page(sge));
+ 	}
++	__clear_bit(i, msg->sg.copy);
+ 	memset(sge, 0, sizeof(*sge));
+ 	return len;
+ }
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 964ebc268ee46..a47f6a1e2c77d 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -623,6 +623,7 @@ static int tls_split_open_record(struct sock *sk, struct tls_rec *from,
+ 	struct scatterlist *sge, *osge, *nsge;
+ 	u32 orig_size = msg_opl->sg.size;
+ 	struct scatterlist tmp = { };
++	u32 tmp_i = 0;
+ 	struct sk_msg *msg_npl;
+ 	struct tls_rec *new;
+ 	int ret;
+@@ -644,6 +645,7 @@ static int tls_split_open_record(struct sock *sk, struct tls_rec *from,
+ 		if (sge->length > apply) {
+ 			u32 len = sge->length - apply;
+ 
++			tmp_i = i;
+ 			get_page(sg_page(sge));
+ 			sg_set_page(&tmp, sg_page(sge), len,
+ 				    sge->offset + apply);
+@@ -675,6 +677,7 @@ static int tls_split_open_record(struct sock *sk, struct tls_rec *from,
+ 	nsge = sk_msg_elem(msg_npl, j);
+ 	if (tmp.length) {
+ 		memcpy(nsge, &tmp, sizeof(*nsge));
++		sk_msg_sg_copy_assign(msg_npl, j, msg_opl, tmp_i);
+ 		sk_msg_iter_var_next(j);
+ 		nsge = sk_msg_elem(msg_npl, j);
+ 	}
+@@ -682,6 +685,7 @@ static int tls_split_open_record(struct sock *sk, struct tls_rec *from,
+ 	osge = sk_msg_elem(msg_opl, i);
+ 	while (osge->length) {
+ 		memcpy(nsge, osge, sizeof(*nsge));
++		sk_msg_sg_copy_assign(msg_npl, j, msg_opl, i);
+ 		sg_unmark_end(nsge);
+ 		sk_msg_iter_var_next(i);
+ 		sk_msg_iter_var_next(j);
 -- 
-2.17.1
-
+2.34.1
 
