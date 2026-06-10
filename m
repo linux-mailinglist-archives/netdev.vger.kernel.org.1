@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-297456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id owwPE9T/KGqbOgMAu9opvQ
-	(envelope-from <netdev+bounces-297456-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:28 +0200
+	id bCwcILj/KGqTOgMAu9opvQ
+	(envelope-from <netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DBB666618D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:10:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F2A66617E
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:09:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=huawei.com header.s=dkim header.b=jETP5Knk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297456-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297456-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=huawei.com header.s=dkim header.b="d6qx6F//";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297454-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=huawei.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF1F2315DA13
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 327C6314CBA5
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACC9369D70;
-	Wed, 10 Jun 2026 06:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D34B371CF4;
+	Wed, 10 Jun 2026 06:06:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B281371D08;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEEC368D4D;
 	Wed, 10 Jun 2026 06:06:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781071606; cv=none; b=ZDs1WtBUHOMtfgPUj1kawUUAvGW9CY1QpdEm1EMQr+EKq1urnVHexKZ/MCqBmFbOn8cyOqphNajvb/M9/xPieFhPEdNbv3G9sVBEoR3F0fxDK3+yT0zHWGWwZ4Eu5KwgHfu4KxWHiSMfx4m1fmZjR4Ze28jG8RQ0hLdA5cw5dtM=
+	t=1781071605; cv=none; b=cb5L6lp4xW9nfrU0unOx7cvTgELr/FOEJyIwv4dw/pwnYIYSlGv+cygueVVG5xfnD6nv2mfPtZbJOfoAMx6fL8NFIkdFqCDoUuo7XGv2uX9o4oXQpfujlLVPsH4AI6J3FIPlMXYpmpXdHwdjs4LL9xUj4q8dDd1up72y2Y9VHUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781071606; c=relaxed/simple;
-	bh=uOgRtPaKijMc1G5rKKcKi+qMjlVdXR4JVHankMdJbbA=;
+	s=arc-20240116; t=1781071605; c=relaxed/simple;
+	bh=OFwUD5u1SoDZUrt5BR+USGXeaypfWd/TJRpgiwRlTco=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CSZyyTNNBOTiMyh5lGOp/ZIqW4j5zh9wozcrBcY6dlv5Ik8o6/ALtf0lxRrsgM/FhUidIaGWZ1hPQskGkYuFfk53HX5txjAXjnyCdWpoy+hIGQVtZyjbE9r88DXtkQYDeuXm8+zYMIHiGCQDvzXx/B4/3JNKt29c5nFhaFvj7WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jETP5Knk; arc=none smtp.client-ip=113.46.200.218
+	 MIME-Version:Content-Type; b=Rxl6jTMnBXs1Z2G1oH6TuzkLB1ckKLfLU6UqN6JQWlwqjRVhgOVPeOAMe8LckNxdKqa1uTx90Whb/DEVBfwvxVmf5w3NyCRmzwgy9uhrOgA72Hgy1c+r+BRB/8jyjxJCspHp4+f/q+QK0E1fA9wjuPwTVsErT1e4KtV8sMJNa5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=d6qx6F//; arc=none smtp.client-ip=113.46.200.218
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=AaXfUqN8wD/nqgz+Hx/HK+nzDb8Bsvr3DwLjrV4kuOw=;
-	b=jETP5KnkTndsjoMem6CTlQxapw3Q5GSmdyEHu8xCb8CApvIjdwtPLFTjLk/h3uivNveSCteEC
-	zyztqQ1VVsEQVrED5K+U+kHPaEoy92dNaRZOTRI+6EO2FMSft7fr5k+bbtMdXcFH0hjjhFQNxLW
-	PT7P9Cute51BPEIYqK8OtY4=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7m5L5zzpStT;
-	Wed, 10 Jun 2026 13:58:44 +0800 (CST)
+	bh=0nVw7NtXG7zJSwe8+BGxCBrF5QqZhskdhRg8AYGXQvM=;
+	b=d6qx6F//EisVJ6ro3AQ+rk0jAPJUAFlRu/lHvJF6DuGCmvYfjPgHU8oikeyH6p2BwB2y5sFnA
+	GmX/y/OU02BBMV6KcgWRx4OmREI/F75Gz+G0DDW8XNer5VCVsaUBIt8E42MSFAGCZLtJd//OaAQ
+	rDRoqJWRflEJoJJgbb1r2Pg=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4gZw7n1tmXzpTJt;
+	Wed, 10 Jun 2026 13:58:45 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4631A203B7;
+	by mail.maildlp.com (Postfix) with ESMTPS id BCCF440569;
 	Wed, 10 Jun 2026 14:06:35 +0800 (CST)
 Received: from localhost.huawei.com (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 10 Jun 2026 14:06:34 +0800
+ 15.2.1544.36; Wed, 10 Jun 2026 14:06:35 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
@@ -58,9 +58,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<chenhao418@huawei.com>, <huangdonghua3@h-partners.com>,
 	<yangshuaisong@h-partners.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V4 net-next 2/6] net: hns3: improve the unused_tuple parameter setting
-Date: Wed, 10 Jun 2026 14:06:14 +0800
-Message-ID: <20260610060618.834987-3-shaojijie@huawei.com>
+Subject: [PATCH V4 net-next 3/6] net: hns3: support two more actions for tc flow
+Date: Wed, 10 Jun 2026 14:06:15 +0800
+Message-ID: <20260610060618.834987-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260610060618.834987-1-shaojijie@huawei.com>
 References: <20260610060618.834987-1-shaojijie@huawei.com>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297456-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297454-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shaojijie@huawei.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	TO_DN_NONE(0.00)[];
@@ -109,60 +109,111 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,huawei.com:mid,huawei.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9DBB666618D
+X-Rspamd-Queue-Id: D6F2A66617E
 
-Currently, when the tc tool is used to set flow table rules, the IP address
-and MAC address can be configured separately, for example, src_xx or dst_xx
-can be configured separately.
+Currently, the driver supports only one action:HCLGE_FD_ACTION_SELECT_TC.
 
-Therefore, the driver needs to check whether the mask is all zero in
-keys, such as FLOW_DISSECTOR_KEY_IPV4_ADDRS, FLOW_DISSECTOR_KEY_IPV6_ADDRS,
-and FLOW_DISSECTOR_KEY_ETH_ADDRS.
-If the mask is all zero, the tuple is not configured.
-In this case, the driver adds the tuple to unused_tuple.
+This patch adds support for HCLGE_FD_ACTION_SELECT_QUEUE and
+HCLGE_FD_ACTION_DROP_PACKET.
+
+A rule can have only one action. Therefore, the driver intercepts rules
+that have multiple actions or no action.
+
+Note: The driver considers cls_flower->classid as an action:
+HCLGE_FD_ACTION_SELECT_TC.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c  | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 63 ++++++++++++++++---
+ 1 file changed, 56 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 77bd23e2c11e..176ea5aac8aa 100644
+index 176ea5aac8aa..ed7cd0a0d267 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -7242,6 +7242,10 @@ static void hclge_get_cls_key_mac(const struct flow_rule *flow,
- 		ether_addr_copy(rule->tuples_mask.dst_mac, match.mask->dst);
- 		ether_addr_copy(rule->tuples.src_mac, match.key->src);
- 		ether_addr_copy(rule->tuples_mask.src_mac, match.mask->src);
-+		if (is_zero_ether_addr(match.mask->dst))
-+			rule->unused_tuple |= BIT(INNER_DST_MAC);
-+		if (is_zero_ether_addr(match.mask->src))
-+			rule->unused_tuple |= BIT(INNER_SRC_MAC);
- 	} else {
- 		rule->unused_tuple |= BIT(INNER_DST_MAC);
- 		rule->unused_tuple |= BIT(INNER_SRC_MAC);
-@@ -7290,6 +7294,10 @@ static int hclge_get_cls_key_ip(const struct flow_rule *flow,
- 		rule->tuples.dst_ip[IPV4_INDEX] = be32_to_cpu(match.key->dst);
- 		rule->tuples_mask.dst_ip[IPV4_INDEX] =
- 						be32_to_cpu(match.mask->dst);
-+		if (!match.mask->src)
-+			rule->unused_tuple |= BIT(INNER_SRC_IP);
-+		if (!match.mask->dst)
-+			rule->unused_tuple |= BIT(INNER_DST_IP);
- 	} else if (addr_type == FLOW_DISSECTOR_KEY_IPV6_ADDRS) {
- 		struct flow_match_ipv6_addrs match;
+@@ -7344,19 +7344,49 @@ static int hclge_get_tc_flower_action(struct hclge_dev *hdev,
+ 				      struct flow_cls_offload *cls_flower,
+ 				      struct hclge_fd_rule *rule)
+ {
++	struct flow_rule *flow = flow_cls_offload_flow_rule(cls_flower);
+ 	struct netlink_ext_ack *extack = cls_flower->common.extack;
+ 	struct hnae3_handle *handle = &hdev->vport[0].nic;
++	struct flow_action *action = &flow->action;
++	struct flow_action_entry *act;
+ 	int tc;
  
-@@ -7302,6 +7310,10 @@ static int hclge_get_cls_key_ip(const struct flow_rule *flow,
- 				      match.key->dst.s6_addr32);
- 		ipv6_addr_be32_to_cpu(rule->tuples_mask.dst_ip,
- 				      match.mask->dst.s6_addr32);
-+		if (ipv6_addr_any(&match.mask->src))
-+			rule->unused_tuple |= BIT(INNER_SRC_IP);
-+		if (ipv6_addr_any(&match.mask->dst))
-+			rule->unused_tuple |= BIT(INNER_DST_IP);
- 	} else {
- 		rule->unused_tuple |= BIT(INNER_SRC_IP);
- 		rule->unused_tuple |= BIT(INNER_DST_IP);
+-	tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
+-	if (tc < 0 || tc > hdev->tc_max) {
+-		NL_SET_ERR_MSG_FMT_MOD(extack, "invalid traffic class: %d", tc);
+-		return -EINVAL;
++	if (!flow_action_has_entries(&flow->action)) {
++		tc = tc_classid_to_hwtc(handle->netdev, cls_flower->classid);
++		if (tc < 0 || tc > hdev->tc_max) {
++			NL_SET_ERR_MSG_FMT_MOD(extack,
++					       "invalid traffic class: %d",
++					       tc);
++			return -EINVAL;
++		}
++
++		rule->action = HCLGE_FD_ACTION_SELECT_TC;
++		rule->cls_flower.tc = tc;
++		return 0;
+ 	}
+ 
+-	rule->action = HCLGE_FD_ACTION_SELECT_TC;
+-	rule->cls_flower.tc = tc;
+-	return 0;
++	act = &action->entries[0];
++	switch (act->id) {
++	case FLOW_ACTION_RX_QUEUE_MAPPING:
++		if (act->rx_queue >= handle->kinfo.num_tqps) {
++			NL_SET_ERR_MSG_FMT_MOD(extack,
++					       "queue id (%u) should be less than %u",
++					       act->rx_queue,
++					       handle->kinfo.num_tqps);
++			return -EINVAL;
++		}
++
++		rule->queue_id = act->rx_queue;
++		rule->action = HCLGE_FD_ACTION_SELECT_QUEUE;
++		return 0;
++	case FLOW_ACTION_DROP:
++		rule->action = HCLGE_FD_ACTION_DROP_PACKET;
++		return 0;
++	default:
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "unsupported action(%d)", act->id);
++		return -EOPNOTSUPP;
++	}
+ }
+ 
+ static int hclge_parse_cls_flower(struct hclge_dev *hdev,
+@@ -7420,6 +7450,25 @@ static int hclge_check_cls_flower(struct hclge_dev *hdev,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	/* driver will parses classid into an action */
++	if (cls_flower->classid && flow_action_has_entries(&flow->action)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "cannot specify both classid and action");
++		return -EOPNOTSUPP;
++	}
++
++	if (!flow_action_has_entries(&flow->action) && !cls_flower->classid) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "must specify either classid or action");
++		return -EINVAL;
++	}
++
++	if (flow_action_has_entries(&flow->action) &&
++	    !flow_offload_has_one_action(&flow->action)) {
++		NL_SET_ERR_MSG_MOD(extack, "unsupported multiple actions");
++		return -EOPNOTSUPP;
++	}
++
+ 	return 0;
+ }
+ 
 -- 
 2.33.0
 
