@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-297446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297447-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id K6iXMJ73KGorOQMAu9opvQ
-	(envelope-from <netdev+bounces-297446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:35:26 +0200
+	id 52WPBAr4KGo5OQMAu9opvQ
+	(envelope-from <netdev+bounces-297447-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:37:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1749F665F7C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:35:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CFF0665F96
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:37:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=L20XeXTW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297446-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297446-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=secunet.com header.s=202301 header.b=Mv88YLx3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297447-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297447-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=secunet.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D50CB3058822
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:33:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 13D1D3027311
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5518F278161;
-	Wed, 10 Jun 2026 05:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE5B2FE566;
+	Wed, 10 Jun 2026 05:37:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F74F25EF9C;
-	Wed, 10 Jun 2026 05:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718CD246788;
+	Wed, 10 Jun 2026 05:37:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781069613; cv=none; b=iNSsLpE9cZqlc1iv2oo6bJbM6W0ikB7tDvZbk642D4me5BRKJaaz7bTkLnF8ZpmvbcFzhoXzpCbOV6Hg3jU7fSVmuMvm1cFp2bmu5ZW1uJa/mfOj9wDvs5U+nde1xvOx81dquA7e8NubXXMHAGEt8qPYKaI1imuuLT7R5wAZgm4=
+	t=1781069829; cv=none; b=G2aZnEbj898Oviane7HK0DPByDg71k1AMDHm1PDdfYB8Y90gcJbjy+1HyObrFw2g7136NzB73tuc+aVb5CT4Vvu15tDU4/aisMOaEDXNdjCjpm5BZ4xMOtYO562Vp1xlYOJJOMiM85ft5f89zAtFADJdExPjSNWkuddSv5E/bcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781069613; c=relaxed/simple;
-	bh=glGS0N/fbM9bKyXKoiq+e2Xat20Ysf22iyQm7KEy9Y0=;
+	s=arc-20240116; t=1781069829; c=relaxed/simple;
+	bh=r0zIRam0HY/RGCuXi86KtxWTjO2YQuTrsB6Nq9lKnlc=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AqLwDelvajdbdPkTNtPgcNjbMmW2xX93r/W0uB7PqWO6QeF7byZ9LYFYD8/V2QmBQpGxdpcMXVEZa9WufwRK7q4oL7duM1Vca/lEdlaF+GlQzEkjwcduw6FcCaHRoJOoa86VO51XhfC5GUh8FX2n6ovIXyUvtNVWlVfyjjn0SJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=L20XeXTW; arc=none smtp.client-ip=67.231.148.174
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A1vOar2480491;
-	Tue, 9 Jun 2026 22:33:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=abo8MIl6AcrSt5xTzZxGw1LUt
-	qIhlLpeB2G3TSM555c=; b=L20XeXTW1EFghSTV7fYiEWTVFCfmIAB6LU9P5OhtS
-	2ZbB+NguZ6u2WHSQIqb4uLFb+kK1XO+bbQCNId926RfsggWbeBuXJqe8txdUMYC+
-	9ocqu9y2kuQWgQzIx3uYzofpuTOgMsDkYeFG/ukbx9Ia05cyEBXHg1y2j6nyWsW2
-	xchAlXuX/gsviAswN28oOMaZRvHJCGePEeZxTR1nyn8P4g4aTceY46KPod6byo2B
-	frTablooIlwrOdfni4JGaTvyAjJv901jRc05wDAWeTHAK8SWNCnhDh5dj/mJgDnm
-	rDSfebQFgpMNwsA+mWVwaMM+flwgJagq5/WGMZgSIS44g==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4epex1m8sh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jun 2026 22:33:21 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 9 Jun 2026 22:33:20 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 9 Jun 2026 22:33:20 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 7FF905B693C;
-	Tue,  9 Jun 2026 22:33:17 -0700 (PDT)
-Date: Wed, 10 Jun 2026 11:03:16 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v20 net-next 9/9] octeontx2-af: npc: cn20k: Allocate
- npc_priv and dstats dynamically.
-Message-ID: <aij3HPN_y0j6nZ5k@rkannoth-OptiPlex-7090>
-References: <20260609040453.711932-1-rkannoth@marvell.com>
- <20260609040453.711932-10-rkannoth@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m6/VU+hl4MaI6/Guz/aSvNGbXW12qpbcGhkmvvbL3iZkY/NzIYOwaFXuG/P3C1WxYXX0xj3FPuwBpRVt0fxvjKxVgaV9x9N4lCD6Ytdjo+6v9IYIsdcxx34Khr6hShZc27G0RV0LwUHSvtgERlyTHPa7IHwpFEyotrzd2RML3cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Mv88YLx3; arc=none smtp.client-ip=62.96.220.36
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 5272C20743;
+	Wed, 10 Jun 2026 07:37:04 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id YchcY681ui08; Wed, 10 Jun 2026 07:37:03 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id B5F392065A;
+	Wed, 10 Jun 2026 07:37:03 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B5F392065A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1781069823;
+	bh=M8q7M9x/uyiIw2ivZXkSif9yz1VVIbf6870JsMhgCoE=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=Mv88YLx3apY0MhVoUZqHZTLeEf+7m1lQrLkNrSa1+phZL0E7d8/3iq2OIKwOU6w4t
+	 24HRmOETmQTjbA19eVv0tRO6IQDDY7gnIIwizFR7y04gC+jjBxEl1/z1Q3kPh9mcfZ
+	 wRt4fd+t3F1e7yNGQRWPelYhm4j1vUvkUAiiya367WCkTHSH8fz252Z/j+FnPkfNCe
+	 EXL90cZj1s8aqK5734mWreMiDAbUpPkFVme6eTX7CUuOX09Uf1Q2QU+qNxduVNA9EJ
+	 edK0A3yBWp7uh3ynVlzy7gEJcGoeWEGhkDK5Jwp9clSgQ5MGoUF9UuNAxLiNkzPvvX
+	 n6LWmXKpv1M/A==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 10 Jun
+ 2026 07:37:03 +0200
+Received: (nullmailer pid 2119962 invoked by uid 1000);
+	Wed, 10 Jun 2026 05:37:02 -0000
+Date: Wed, 10 Jun 2026 07:37:02 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Alessandro Schino <7991aleschino@gmail.com>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH ipsec v3] esp: fix page frag reference leak on
+ skb_to_sgvec failure
+Message-ID: <aij3_qm9x7LJUfbG@secunet.com>
+References: <20260605122215.825-1-7991aleschino@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,105 +80,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260609040453.711932-10-rkannoth@marvell.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA1MCBTYWx0ZWRfX5mP75wYbj254
- EcXu13LXeGlwJtkp4kTJlswxp89YjnGYM/OAyq1SWS5Ck5U+YsKjhxaGICSbWLk/rLFGuNRCpLO
- WrAwJgggU89yC6gth+Iy0pbdxbyqj1tAfq/xN+/lpwdpKiGekeqM23Zed1UkDp4sFPOJ5jXSSBA
- QFcEABlJRBDvRQH4ZmtJzUXB59C+w2x/jG6zL2/e1UOoL/bQIIp/uWok/VnutRmuI+dWleJUBVE
- KWvXDb+fOU1CXNjKa1oWkG9z2mK5NDetEi3oGaJJrDoVcExcJ7MhXeh86QHzcCudzXxbTqLy5SV
- +kocSZ6xAfGK5GNou0IfeCBZFbVqzeOIzkPJkGRCYClXsdG+Nnoy7v5P5chlB8MpJeeedvv3Lqm
- vob0SjIcWkrOZS165gI0VJ7Kiu+7NOTpY5aDKXL9ppWTDIyj8Zpf7sU0PaWR01jXhRBaSbvU23T
- axcqTx5Wf/jEVwyht8g==
-X-Proofpoint-ORIG-GUID: ZfqGGg1ERAmLUg-RZy2wX6Y7YyqgmwXt
-X-Authority-Analysis: v=2.4 cv=Aa2B2XXG c=1 sm=1 tr=0 ts=6a28f721 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=9R54UkLUAAAA:8
- a=M5GUcnROAAAA:8 a=I6v_eIbEzFDS9DFWy1EA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: ZfqGGg1ERAmLUg-RZy2wX6Y7YyqgmwXt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
+In-Reply-To: <20260605122215.825-1-7991aleschino@gmail.com>
+X-ClientProxiedBy: EXCH-02.secunet.de (10.32.0.172) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-297446-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,rkannoth-OptiPlex-7090:mid,marvell.com:dkim,marvell.com:email,marvell.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,npc_priv.sb:url];
-	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:7991aleschino@gmail.com,m:netdev@vger.kernel.org,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297447-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[secunet.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1749F665F7C
+X-Rspamd-Queue-Id: 9CFF0665F96
 
-On 2026-06-09 at 09:34:53, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> Replace the file-scope static npc_priv with a kcalloc'd struct filled
-> from hardware bank/subbank geometry at init (num_banks is no longer a
-> const compile-time constant; drop init_done and use a non-NULL
-> npc_priv pointer for liveness). Thread npc_priv_get() / pointer access
-> through the CN20K NPC code paths, extend teardown to kfree the root
-> struct on failure and in npc_cn20k_deinit, and adjust MCAM section
-> setup to use the discovered subbank count.
->
-> Allocate MCAM debugfs dstats via devm_kzalloc instead of a static matrix,
-> and use the allocated backing store consistently when computing deltas
-> (including the counter rollover compare).
->
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+On Fri, Jun 05, 2026 at 02:22:15PM +0200, Alessandro Schino wrote:
+> In esp_output_tail(), when esp->inplace is false, the old skb page frags
+> are replaced with a new page from the xfrm page_frag cache The source
+> scatterlist (sg) is built from the old frags before the replacement, and
+> esp_ssg_unref() is responsible for releasing the old page references
+> after the crypto operation completes
+> 
+> However, if the second skb_to_sgvec() call (which builds the destination
+> scatterlist from the new page) fails, the code jumps to error_free which
+> only calls kfree(tmp). The old page frag references captured in the
+> source scatterlist are never released:
+> 
+>   1 sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
+>   2 nr_frags is set to 1 and frag[0] is replaced with the new page
+>   3 Second skb_to_sgvec() fails -> goto error_free
+> 
+> Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
+> unconditionally unrefs the source scatterlist frags. Since req->src is
+> not yet initialized by aead_request_set_crypt() at the point of the
+> error, the source scatterlist is obtained directly via esp_req_sg()
+> Existing callers pass false to preserve the original behavior
+> 
+> The same issue exists in both esp4 and esp6 as the code is identical
+> 
+> Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
+> Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
+> Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
 
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260609040453.711932-1-rkannoth%40marvell.com says:
-
-> -	kfree(npc_priv.xa_pf2idx_map);
->> +	kfree(npc_priv->xa_pf2idx_map);
->>  	/* No need to destroy mutex lock as it is
->>  	 * part of subbank structure
->>  	 */
->> -	kfree(npc_priv.sb);
->> +	kfree(npc_priv->sb);
->>  	kfree(subbank_srch_order);
->> -	bitmap_clear(npc_priv.en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
->> +	bitmap_clear(npc_priv->en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
->>  		     MAX_SUBBANK_DEPTH);
->> +	npc_defrag_list_clear();
->> +	kfree(npc_priv);
->> +	npc_priv = NULL;
->>  }
->Now that npc_priv is dynamically allocated, en_map is an embedded
->DECLARE_BITMAP inside the struct that is unconditionally kfree'd two
->lines later:
->	bitmap_clear(npc_priv->en_map, 0, MAX_NUM_BANKS * MAX_NUM_SUB_BANKS *
->		     MAX_SUBBANK_DEPTH);
->	npc_defrag_list_clear();
->	kfree(npc_priv);
->	npc_priv = NULL;
->Does this bitmap_clear still serve a purpose? Pre-patch it cleared
->state on a static struct that persisted across unbind/rebind, but with
->the dynamic allocation it can be removed.
-Not needed. But kept as part of graceful shutdown.
+Applied, thanks Alessandro!
 
