@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-297826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297827-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id z7aqM2bBKWo1cwMAu9opvQ
-	(envelope-from <netdev+bounces-297826-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:56:22 +0200
+	id GYgxE2PCKWqCcwMAu9opvQ
+	(envelope-from <netdev+bounces-297827-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:00:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD3966C9FA
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:56:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B471F66CA83
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:00:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297826-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297826-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297827-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297827-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BEB82301414F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:56:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 48BB630506A8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B77B37B01A;
-	Wed, 10 Jun 2026 19:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F90037C109;
+	Wed, 10 Jun 2026 19:56:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5474B37BE9F;
-	Wed, 10 Jun 2026 19:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4335D3750CA;
+	Wed, 10 Jun 2026 19:56:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781121378; cv=none; b=KxhHteQk7JqK8KmZeGnOzOk0MNd01h/oVA/hPXPG9q5zIRWt2fghMnllzzGULLLMEU2KKb893jFiVoue//n5p2RwKCimbAYclVigLHuSqFp2kUlYtFnWiAOIsHJkjoBdBCBhnX8jdpf3r/f9bwV2fsu7zLQiassmBFxcrO7Is9k=
+	t=1781121408; cv=none; b=ATO7tNXVPPJaCXqUisv4tODrp7SXU2U4/gYvNjGRofFOTizRQAVZLp3wwZJyzpt+XULS6kHDwPVqtuvJqO9COWYAonZTWXppsDUw8vbxY5BKhSnl7gDCkb6sjFSnwQi7Gw/WheDTXrxNkjeiA5Pf9yfH6hbjejo9fk38oq4RxBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781121378; c=relaxed/simple;
-	bh=PijonR1mDq/t31C4tGX6F0NY5Tarvq87noLxXZVcH4g=;
+	s=arc-20240116; t=1781121408; c=relaxed/simple;
+	bh=wsPcBkEezwUyCSzoz7RegeWEbE7Vtg12lgbR38Oju44=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZsRLvDeP5fnlQAtc01rQShYYfQrIUJaPfqiWZT7x7EoclZDBkGsK7WLSxG+mArIa36UPbgloE6iPAKizqJl6pUIG6OBeGioc7fMrU/URAU1l0T0rNeyq0FfxIO14FKYsc8IXAISFBOgJ7vhxUBygNFRdKEnxWvHCENpi9avkjHc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=UPN3JLmzWZO3fXdxuCofuvM6vQMroAptX48oCMt4epD+FEXDiV9PIQFu6CBq3lcO8XZv4P9cwjBbocLbf3IuZH2RQqfIUgAudc2E0Py/Be8peXXoYr9C7XsdUi/NvO7AUAGlVYFi9H1ARCnPHVl4FcfBnU7Qj22fOOTrosC9Fas=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wXP21-000000000GQ-1QYr;
-	Wed, 10 Jun 2026 19:56:09 +0000
-Date: Wed, 10 Jun 2026 20:56:06 +0100
+	id 1wXP2U-000000000HN-0mCX;
+	Wed, 10 Jun 2026 19:56:38 +0000
+Date: Wed, 10 Jun 2026 20:56:35 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
 	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
@@ -53,9 +53,9 @@ To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next 5/8] net: dsa: mt7530: replace mt7530_read with
- regmap_read
-Message-ID: <3b29bb8668e29c7cf6519a71cd98fdd88d22570b.1781119435.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 6/8] net: dsa: mt7530: convert to use field accessor
+ macros
+Message-ID: <2580140b496d1817392d8437943f54805d5a4fe9.1781119435.git.daniel@makrotopia.org>
 References: <cover.1781119435.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,11 +71,11 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297826-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297827-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[makrotopia.org];
@@ -98,405 +98,601 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5DD3966C9FA
+X-Rspamd-Queue-Id: B471F66CA83
 
-Replace all mt7530_read() calls with direct regmap_read() calls and
-remove the wrapper function. The WARN_ON_ONCE error logging is dropped
-as regmap provides its own error handling.
-
-Most callsites follow the val = mt7530_read(priv, reg) pattern and are
-converted mechanically using the following semantic patch:
-
-@@
-expression priv, reg;
-identifier val;
-@@
--val = mt7530_read(priv, reg);
-+regmap_read(priv->regmap, reg, &val);
-
-Remaining inline uses are converted by hand.
+Use FIELD_GET and FIELD_PREP instead of open-coding register fields.
+Replace 0x1f constant with (PHY_MAX_ADDR - 1).
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/mt7530.c | 115 +++++++++++++++++++--------------------
- 1 file changed, 56 insertions(+), 59 deletions(-)
+ drivers/net/dsa/mt7530.c |  64 ++++++------
+ drivers/net/dsa/mt7530.h | 208 ++++++++++++++++++++++-----------------
+ 2 files changed, 148 insertions(+), 124 deletions(-)
 
 diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 0b561621fbdf..4168adca949f 100644
+index 4168adca949f..dcf72ab0cd66 100644
 --- a/drivers/net/dsa/mt7530.c
 +++ b/drivers/net/dsa/mt7530.c
-@@ -152,30 +152,15 @@ core_clear(struct mt7530_priv *priv, u32 reg, u32 val)
+@@ -208,16 +208,16 @@ mt7530_fdb_read(struct mt7530_priv *priv, struct mt7530_fdb *fdb)
+ 			__func__, __LINE__, i, reg[i]);
+ 	}
  
- 
- static u32
--mt7530_read(struct mt7530_priv *priv, u32 reg)
-+mt7530_mii_poll(struct mt7530_dummy_poll *p)
- {
--	int ret;
- 	u32 val;
- 
--	ret = regmap_read(priv->regmap, reg, &val);
--	if (ret) {
--		WARN_ON_ONCE(1);
--		dev_err(priv->dev,
--			"failed to read mt7530 register\n");
--		return 0;
--	}
-+	regmap_read(p->priv->regmap, p->reg, &val);
- 
- 	return val;
+-	fdb->vid = (reg[1] >> CVID) & CVID_MASK;
+-	fdb->aging = (reg[2] >> AGE_TIMER) & AGE_TIMER_MASK;
+-	fdb->port_mask = (reg[2] >> PORT_MAP) & PORT_MAP_MASK;
+-	fdb->mac[0] = (reg[0] >> MAC_BYTE_0) & MAC_BYTE_MASK;
+-	fdb->mac[1] = (reg[0] >> MAC_BYTE_1) & MAC_BYTE_MASK;
+-	fdb->mac[2] = (reg[0] >> MAC_BYTE_2) & MAC_BYTE_MASK;
+-	fdb->mac[3] = (reg[0] >> MAC_BYTE_3) & MAC_BYTE_MASK;
+-	fdb->mac[4] = (reg[1] >> MAC_BYTE_4) & MAC_BYTE_MASK;
+-	fdb->mac[5] = (reg[1] >> MAC_BYTE_5) & MAC_BYTE_MASK;
+-	fdb->noarp = ((reg[2] >> ENT_STATUS) & ENT_STATUS_MASK) == STATIC_ENT;
++	fdb->vid = FIELD_GET(CVID_MASK, reg[1]);
++	fdb->aging = FIELD_GET(AGE_TIMER_RD_MASK, reg[2]);
++	fdb->port_mask = FIELD_GET(PORT_MAP_MASK, reg[2]);
++	fdb->mac[0] = FIELD_GET(MAC_BYTE_0_MASK, reg[0]);
++	fdb->mac[1] = FIELD_GET(MAC_BYTE_1_MASK, reg[0]);
++	fdb->mac[2] = FIELD_GET(MAC_BYTE_2_MASK, reg[0]);
++	fdb->mac[3] = FIELD_GET(MAC_BYTE_3_MASK, reg[0]);
++	fdb->mac[4] = FIELD_GET(MAC_BYTE_4_MASK, reg[1]);
++	fdb->mac[5] = FIELD_GET(MAC_BYTE_5_MASK, reg[1]);
++	fdb->noarp = FIELD_GET(ENT_STATUS_MASK, reg[2]) == STATIC_ENT;
  }
  
--static u32
--mt7530_mii_poll(struct mt7530_dummy_poll *p)
--{
--	return mt7530_read(p->priv, p->reg);
--}
--
--static void
--
- static int
- mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
- {
-@@ -198,7 +183,7 @@ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
- 	/* Additional sanity for read command if the specified
- 	 * entry is invalid
+ static void
+@@ -228,22 +228,22 @@ mt7530_fdb_write(struct mt7530_priv *priv, u16 vid,
+ 	u32 reg[3] = { 0 };
+ 	int i;
+ 
+-	reg[1] |= vid & CVID_MASK;
++	reg[1] |= FIELD_PREP(CVID_MASK, vid);
+ 	reg[1] |= ATA2_IVL;
+ 	reg[1] |= ATA2_FID(FID_BRIDGED);
+-	reg[2] |= (aging & AGE_TIMER_MASK) << AGE_TIMER;
+-	reg[2] |= (port_mask & PORT_MAP_MASK) << PORT_MAP;
++	reg[2] |= FIELD_PREP(AGE_TIMER_RD_MASK, aging);
++	reg[2] |= FIELD_PREP(PORT_MAP_MASK, port_mask);
+ 	/* STATIC_ENT indicate that entry is static wouldn't
+ 	 * be aged out and STATIC_EMP specified as erasing an
+ 	 * entry
  	 */
--	val = mt7530_read(priv, MT7530_ATC);
-+	regmap_read(priv->regmap, MT7530_ATC, &val);
- 	if ((cmd == MT7530_FDB_READ) && (val & ATC_INVALID))
- 		return -EINVAL;
+-	reg[2] |= (type & ENT_STATUS_MASK) << ENT_STATUS;
+-	reg[1] |= mac[5] << MAC_BYTE_5;
+-	reg[1] |= mac[4] << MAC_BYTE_4;
+-	reg[0] |= mac[3] << MAC_BYTE_3;
+-	reg[0] |= mac[2] << MAC_BYTE_2;
+-	reg[0] |= mac[1] << MAC_BYTE_1;
+-	reg[0] |= mac[0] << MAC_BYTE_0;
++	reg[2] |= FIELD_PREP(ENT_STATUS_MASK, type);
++	reg[1] |= FIELD_PREP(MAC_BYTE_5_MASK, mac[5]);
++	reg[1] |= FIELD_PREP(MAC_BYTE_4_MASK, mac[4]);
++	reg[0] |= FIELD_PREP(MAC_BYTE_3_MASK, mac[3]);
++	reg[0] |= FIELD_PREP(MAC_BYTE_2_MASK, mac[2]);
++	reg[0] |= FIELD_PREP(MAC_BYTE_1_MASK, mac[1]);
++	reg[0] |= FIELD_PREP(MAC_BYTE_0_MASK, mac[0]);
  
-@@ -216,7 +201,8 @@ mt7530_fdb_read(struct mt7530_priv *priv, struct mt7530_fdb *fdb)
- 
- 	/* Read from ARL table into an array */
- 	for (i = 0; i < 3; i++) {
--		reg[i] = mt7530_read(priv, MT7530_TSRA1 + (i * 4));
-+		regmap_read(priv->regmap, MT7530_TSRA1 + (i * 4),
-+			    &reg[i]);
- 
- 		dev_dbg(priv->dev, "%s(%d) reg[%d]=0x%x\n",
- 			__func__, __LINE__, i, reg[i]);
-@@ -323,7 +309,8 @@ mt7530_setup_port6(struct dsa_switch *ds, phy_interface_t interface)
- 	regmap_update_bits(priv->regmap, MT7530_P6ECR, P6_INTF_MODE_MASK,
- 			   P6_INTF_MODE(1));
- 
--	xtal = mt7530_read(priv, MT753X_MTRAP) & MT7530_XTAL_MASK;
-+	regmap_read(priv->regmap, MT753X_MTRAP, &xtal);
-+	xtal &= MT7530_XTAL_MASK;
- 
- 	if (xtal == MT7530_XTAL_25MHZ)
- 		ssc_delta = 0x57;
-@@ -367,9 +354,9 @@ mt7531_pll_setup(struct mt7530_priv *priv)
- 	u32 hwstrap;
- 	u32 val;
- 
--	val = mt7530_read(priv, MT7531_CREV);
--	top_sig = mt7530_read(priv, MT7531_TOP_SIG_SR);
--	hwstrap = mt7530_read(priv, MT753X_TRAP);
-+	regmap_read(priv->regmap, MT7531_CREV, &val);
-+	regmap_read(priv->regmap, MT7531_TOP_SIG_SR, &top_sig);
-+	regmap_read(priv->regmap, MT753X_TRAP, &hwstrap);
- 	if ((val & CHIP_REV_M) > 0)
- 		xtal = (top_sig & PAD_MCM_SMI_EN) ? MT7531_XTAL_FSEL_40MHZ :
- 						    MT7531_XTAL_FSEL_25MHZ;
-@@ -378,26 +365,26 @@ mt7531_pll_setup(struct mt7530_priv *priv)
- 						   MT7531_XTAL_FSEL_40MHZ;
- 
- 	/* Step 1 : Disable MT7531 COREPLL */
--	val = mt7530_read(priv, MT7531_PLLGP_EN);
-+	regmap_read(priv->regmap, MT7531_PLLGP_EN, &val);
- 	val &= ~EN_COREPLL;
- 	regmap_write(priv->regmap, MT7531_PLLGP_EN, val);
- 
- 	/* Step 2: switch to XTAL output */
--	val = mt7530_read(priv, MT7531_PLLGP_EN);
-+	regmap_read(priv->regmap, MT7531_PLLGP_EN, &val);
- 	val |= SW_CLKSW;
- 	regmap_write(priv->regmap, MT7531_PLLGP_EN, val);
- 
--	val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 	val &= ~RG_COREPLL_EN;
- 	regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
- 
- 	/* Step 3: disable PLLGP and enable program PLLGP */
--	val = mt7530_read(priv, MT7531_PLLGP_EN);
-+	regmap_read(priv->regmap, MT7531_PLLGP_EN, &val);
- 	val |= SW_PLLGP;
- 	regmap_write(priv->regmap, MT7531_PLLGP_EN, val);
+ 	/* Write array into the ARL table */
+ 	for (i = 0; i < 3; i++)
+@@ -385,22 +385,22 @@ mt7531_pll_setup(struct mt7530_priv *priv)
  
  	/* Step 4: program COREPLL output frequency to 500MHz */
--	val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 	val &= ~RG_COREPLL_POSDIV_M;
- 	val |= 2 << RG_COREPLL_POSDIV_S;
+ 	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
+-	val &= ~RG_COREPLL_POSDIV_M;
+-	val |= 2 << RG_COREPLL_POSDIV_S;
++	val &= ~RG_COREPLL_POSDIV_MASK;
++	val |= RG_COREPLL_POSDIV(2);
  	regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
-@@ -405,13 +392,13 @@ mt7531_pll_setup(struct mt7530_priv *priv)
+ 	usleep_range(25, 35);
  
  	switch (xtal) {
  	case MT7531_XTAL_FSEL_25MHZ:
--		val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+		regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 		val &= ~RG_COREPLL_SDM_PCW_M;
- 		val |= 0x140000 << RG_COREPLL_SDM_PCW_S;
+ 		regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
+-		val &= ~RG_COREPLL_SDM_PCW_M;
+-		val |= 0x140000 << RG_COREPLL_SDM_PCW_S;
++		val &= ~RG_COREPLL_SDM_PCW_MASK;
++		val |= RG_COREPLL_SDM_PCW(0x140000);
  		regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
  		break;
  	case MT7531_XTAL_FSEL_40MHZ:
--		val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+		regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 		val &= ~RG_COREPLL_SDM_PCW_M;
- 		val |= 0x190000 << RG_COREPLL_SDM_PCW_S;
+ 		regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
+-		val &= ~RG_COREPLL_SDM_PCW_M;
+-		val |= 0x190000 << RG_COREPLL_SDM_PCW_S;
++		val &= ~RG_COREPLL_SDM_PCW_MASK;
++		val |= RG_COREPLL_SDM_PCW(0x190000);
  		regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
-@@ -419,14 +406,14 @@ mt7531_pll_setup(struct mt7530_priv *priv)
+ 		break;
  	}
- 
- 	/* Set feedback divide ratio update signal to high */
--	val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 	val |= RG_COREPLL_SDM_PCW_CHG;
- 	regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
- 	/* Wait for at least 16 XTAL clocks */
- 	usleep_range(10, 20);
- 
- 	/* Step 5: set feedback divide ratio update signal to low */
--	val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 	val &= ~RG_COREPLL_SDM_PCW_CHG;
- 	regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
- 
-@@ -437,11 +424,11 @@ mt7531_pll_setup(struct mt7530_priv *priv)
- 	regmap_write(priv->regmap, MT7531_ANA_PLLGP_CR2, 0x4f40000);
- 
- 	/* Step 6: Enable MT7531 PLL */
--	val = mt7530_read(priv, MT7531_PLLGP_CR0);
-+	regmap_read(priv->regmap, MT7531_PLLGP_CR0, &val);
- 	val |= RG_COREPLL_EN;
- 	regmap_write(priv->regmap, MT7531_PLLGP_CR0, val);
- 
--	val = mt7530_read(priv, MT7531_PLLGP_EN);
-+	regmap_read(priv->regmap, MT7531_PLLGP_EN, &val);
- 	val |= EN_COREPLL;
- 	regmap_write(priv->regmap, MT7531_PLLGP_EN, val);
- 	usleep_range(25, 35);
-@@ -700,11 +687,11 @@ mt7530_read_port_stats(struct mt7530_priv *priv, int port,
- {
- 	u32 val, reg = MT7530_PORT_MIB_COUNTER(port) + offset;
- 
--	val = mt7530_read(priv, reg);
-+	regmap_read(priv->regmap, reg, &val);
- 	*data = val;
- 
- 	if (size == 2) {
--		val = mt7530_read(priv, reg + 4);
-+		regmap_read(priv->regmap, reg + 4, &val);
- 		*data |= (u64)val << 32;
- 	}
- }
-@@ -1012,7 +999,7 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
- 
- 	mutex_lock(&priv->reg_mutex);
- 
--	val = mt7530_read(priv, MT753X_MTRAP);
-+	regmap_read(priv->regmap, MT753X_MTRAP, &val);
- 
- 	val &= ~MT7530_P5_PHY0_SEL & ~MT7530_P5_MAC_SEL & ~MT7530_P5_RGMII_MODE;
- 
-@@ -1380,7 +1367,7 @@ mt7530_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
- 	if (!dsa_is_cpu_port(ds, port))
- 		return 0;
- 
--	val = mt7530_read(priv, MT7530_GMACCR);
-+	regmap_read(priv->regmap, MT7530_GMACCR, &val);
- 	val &= ~MAX_RX_PKT_LEN_MASK;
- 
- 	/* RX length also includes Ethernet header, MTK tag, and FCS length */
-@@ -1579,7 +1566,7 @@ mt7530_vlan_cmd(struct mt7530_priv *priv, enum mt7530_vlan_cmd cmd, u16 vid)
- 		return ret;
- 	}
- 
--	val = mt7530_read(priv, MT7530_VTCR);
-+	regmap_read(priv->regmap, MT7530_VTCR, &val);
- 	if (val & VTCR_INVALID) {
- 		dev_err(priv->dev, "read VTCR invalid\n");
- 		return -EINVAL;
-@@ -1791,14 +1778,16 @@ mt7530_port_mdb_add(struct dsa_switch *ds, int port,
- 	const u8 *addr = mdb->addr;
- 	u16 vid = mdb->vid;
- 	u8 port_mask = 0;
-+	u32 val;
+@@ -1555,7 +1555,7 @@ mt7530_vlan_cmd(struct mt7530_priv *priv, enum mt7530_vlan_cmd cmd, u16 vid)
+ 	u32 val;
  	int ret;
  
- 	mutex_lock(&priv->reg_mutex);
+-	val = VTCR_BUSY | VTCR_FUNC(cmd) | vid;
++	val = VTCR_BUSY | VTCR_FUNC(cmd) | VTCR_VID(vid);
+ 	regmap_write(priv->regmap, MT7530_VTCR, val);
  
+ 	INIT_MT7530_DUMMY_POLL(&p, priv, MT7530_VTCR);
+@@ -1786,7 +1786,7 @@ mt7530_port_mdb_add(struct dsa_switch *ds, int port,
  	mt7530_fdb_write(priv, vid, 0, addr, 0, STATIC_EMP);
--	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL))
--		port_mask = (mt7530_read(priv, MT7530_ATRD) >> PORT_MAP)
--			    & PORT_MAP_MASK;
-+	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL)) {
-+		regmap_read(priv->regmap, MT7530_ATRD, &val);
-+		port_mask = (val >> PORT_MAP) & PORT_MAP_MASK;
-+	}
+ 	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL)) {
+ 		regmap_read(priv->regmap, MT7530_ATRD, &val);
+-		port_mask = (val >> PORT_MAP) & PORT_MAP_MASK;
++		port_mask = FIELD_GET(PORT_MAP_MASK, val);
+ 	}
  
  	port_mask |= BIT(port);
- 	mt7530_fdb_write(priv, vid, port_mask, addr, -1, STATIC_ENT);
-@@ -1818,14 +1807,16 @@ mt7530_port_mdb_del(struct dsa_switch *ds, int port,
- 	const u8 *addr = mdb->addr;
- 	u16 vid = mdb->vid;
- 	u8 port_mask = 0;
-+	u32 val;
- 	int ret;
- 
- 	mutex_lock(&priv->reg_mutex);
- 
+@@ -1815,7 +1815,7 @@ mt7530_port_mdb_del(struct dsa_switch *ds, int port,
  	mt7530_fdb_write(priv, vid, 0, addr, 0, STATIC_EMP);
--	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL))
--		port_mask = (mt7530_read(priv, MT7530_ATRD) >> PORT_MAP)
--			    & PORT_MAP_MASK;
-+	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL)) {
-+		regmap_read(priv->regmap, MT7530_ATRD, &val);
-+		port_mask = (val >> PORT_MAP) & PORT_MAP_MASK;
-+	}
+ 	if (!mt7530_fdb_cmd(priv, MT7530_FDB_READ, NULL)) {
+ 		regmap_read(priv->regmap, MT7530_ATRD, &val);
+-		port_mask = (val >> PORT_MAP) & PORT_MAP_MASK;
++		port_mask = FIELD_GET(PORT_MAP_MASK, val);
+ 	}
  
  	port_mask &= ~BIT(port);
- 	mt7530_fdb_write(priv, vid, port_mask, addr, -1,
-@@ -1903,7 +1894,7 @@ mt7530_hw_vlan_del(struct mt7530_priv *priv,
+@@ -1923,7 +1923,7 @@ mt7530_hw_vlan_update(struct mt7530_priv *priv, u16 vid,
  
- 	new_members = entry->old_members & ~BIT(entry->port);
+ 	regmap_read(priv->regmap, MT7530_VAWD1, &val);
  
--	val = mt7530_read(priv, MT7530_VAWD1);
-+	regmap_read(priv->regmap, MT7530_VAWD1, &val);
- 	if (!(val & VLAN_VALID)) {
- 		dev_err(priv->dev,
- 			"Cannot be deleted due to invalid entry\n");
-@@ -1930,7 +1921,7 @@ mt7530_hw_vlan_update(struct mt7530_priv *priv, u16 vid,
- 	/* Fetch entry */
- 	mt7530_vlan_cmd(priv, MT7530_VTCR_RD_VID, vid);
+-	entry->old_members = (val >> PORT_MEM_SHFT) & PORT_MEM_MASK;
++	entry->old_members = FIELD_GET(PORT_MEM_MASK, val);
  
--	val = mt7530_read(priv, MT7530_VAWD1);
-+	regmap_read(priv->regmap, MT7530_VAWD1, &val);
- 
- 	entry->old_members = (val >> PORT_MEM_SHFT) & PORT_MEM_MASK;
- 
-@@ -2048,7 +2039,7 @@ static int mt753x_port_mirror_add(struct dsa_switch *ds, int port,
- 	if ((ingress ? priv->mirror_rx : priv->mirror_tx) & BIT(port))
- 		return -EEXIST;
- 
--	val = mt7530_read(priv, MT753X_MIRROR_REG(priv->id));
-+	regmap_read(priv->regmap, MT753X_MIRROR_REG(priv->id), &val);
- 
- 	/* MT7530 only supports one monitor port */
- 	monitor_port = MT753X_MIRROR_PORT_GET(priv->id, val);
-@@ -2061,7 +2052,7 @@ static int mt753x_port_mirror_add(struct dsa_switch *ds, int port,
- 	val |= MT753X_MIRROR_PORT_SET(priv->id, mirror->to_local_port);
- 	regmap_write(priv->regmap, MT753X_MIRROR_REG(priv->id), val);
- 
--	val = mt7530_read(priv, MT7530_PCR_P(port));
-+	regmap_read(priv->regmap, MT7530_PCR_P(port), &val);
- 	if (ingress) {
- 		val |= PORT_RX_MIR;
- 		priv->mirror_rx |= BIT(port);
-@@ -2080,7 +2071,7 @@ static void mt753x_port_mirror_del(struct dsa_switch *ds, int port,
- 	struct mt7530_priv *priv = ds->priv;
- 	u32 val;
- 
--	val = mt7530_read(priv, MT7530_PCR_P(port));
-+	regmap_read(priv->regmap, MT7530_PCR_P(port), &val);
- 	if (mirror->ingress) {
- 		val &= ~PORT_RX_MIR;
- 		priv->mirror_rx &= ~BIT(port);
-@@ -2091,7 +2082,7 @@ static void mt753x_port_mirror_del(struct dsa_switch *ds, int port,
- 	regmap_write(priv->regmap, MT7530_PCR_P(port), val);
- 
- 	if (!priv->mirror_rx && !priv->mirror_tx) {
--		val = mt7530_read(priv, MT753X_MIRROR_REG(priv->id));
-+		regmap_read(priv->regmap, MT753X_MIRROR_REG(priv->id), &val);
- 		val &= ~MT753X_MIRROR_EN(priv->id);
- 		regmap_write(priv->regmap, MT753X_MIRROR_REG(priv->id), val);
- 	}
-@@ -2123,8 +2114,11 @@ mt7530_gpio_get(struct gpio_chip *gc, unsigned int offset)
- {
- 	struct mt7530_priv *priv = gpiochip_get_data(gc);
- 	u32 bit = mt7530_gpio_to_bit(offset);
-+	u32 val;
-+
-+	regmap_read(priv->regmap, MT7530_LED_GPIO_DATA, &val);
- 
--	return !!(mt7530_read(priv, MT7530_LED_GPIO_DATA) & bit);
-+	return !!(val & bit);
- }
- 
- static int
-@@ -2146,8 +2140,11 @@ mt7530_gpio_get_direction(struct gpio_chip *gc, unsigned int offset)
- {
- 	struct mt7530_priv *priv = gpiochip_get_data(gc);
- 	u32 bit = mt7530_gpio_to_bit(offset);
-+	u32 val;
-+
-+	regmap_read(priv->regmap, MT7530_LED_GPIO_DIR, &val);
- 
--	return (mt7530_read(priv, MT7530_LED_GPIO_DIR) & bit) ?
-+	return (val & bit) ?
- 		GPIO_LINE_DIRECTION_OUT : GPIO_LINE_DIRECTION_IN;
- }
- 
-@@ -2438,7 +2435,7 @@ mt7530_setup(struct dsa_switch *ds)
- 		return ret;
+ 	/* Manipulate entry */
+ 	vlan_op(priv, entry);
+@@ -2436,7 +2436,7 @@ mt7530_setup(struct dsa_switch *ds)
  	}
  
--	id = mt7530_read(priv, MT7530_CREV);
-+	regmap_read(priv->regmap, MT7530_CREV, &id);
- 	id >>= CHIP_NAME_SHIFT;
+ 	regmap_read(priv->regmap, MT7530_CREV, &id);
+-	id >>= CHIP_NAME_SHIFT;
++	id = FIELD_GET(CHIP_NAME_MASK, id);
  	if (id != MT7530_ID) {
  		dev_err(priv->dev, "chip %x can't be supported\n", id);
-@@ -2681,7 +2678,7 @@ mt7531_setup(struct dsa_switch *ds)
- 		return ret;
+ 		return -ENODEV;
+@@ -2679,7 +2679,7 @@ mt7531_setup(struct dsa_switch *ds)
  	}
  
--	id = mt7530_read(priv, MT7531_CREV);
-+	regmap_read(priv->regmap, MT7531_CREV, &id);
- 	id >>= CHIP_NAME_SHIFT;
+ 	regmap_read(priv->regmap, MT7531_CREV, &id);
+-	id >>= CHIP_NAME_SHIFT;
++	id = FIELD_GET(CHIP_NAME_MASK, id);
  
  	if (id != MT7531_ID) {
-@@ -2692,7 +2689,7 @@ mt7531_setup(struct dsa_switch *ds)
- 	/* MT7531AE has got two SGMII units. One for port 5, one for port 6.
- 	 * MT7531BE has got only one SGMII unit which is for port 6.
+ 		dev_err(priv->dev, "chip %x can't be supported\n", id);
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index dd33b0df3419..abf19aa69520 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -6,6 +6,8 @@
+ #ifndef __MT7530_H
+ #define __MT7530_H
+ 
++#include <linux/bitfield.h>
++
+ #define MT7530_NUM_PORTS		7
+ #define MT7530_NUM_PHYS			5
+ #define MT7530_NUM_FDB_RECORDS		2048
+@@ -146,19 +148,22 @@ enum mt753x_to_cpu_fw {
+ #define  STATIC_ENT			3
+ #define MT7530_ATA2			0x78
+ #define  ATA2_IVL			BIT(15)
+-#define  ATA2_FID(x)			(((x) & 0x7) << 12)
++#define  ATA2_FID_MASK			GENMASK(14, 12)
++#define  ATA2_FID(x)			FIELD_PREP(ATA2_FID_MASK, x)
+ 
+ /* Register for address table write data */
+ #define MT7530_ATWD			0x7c
+ 
+ /* Register for address table control */
+ #define MT7530_ATC			0x80
+-#define  ATC_HASH			(((x) & 0xfff) << 16)
++#define  ATC_HASH_MASK			GENMASK(27, 16)
++#define  ATC_HASH(x)			FIELD_PREP(ATC_HASH_MASK, x)
+ #define  ATC_BUSY			BIT(15)
+ #define  ATC_SRCH_END			BIT(14)
+ #define  ATC_SRCH_HIT			BIT(13)
+ #define  ATC_INVALID			BIT(12)
+-#define  ATC_MAT(x)			(((x) & 0xf) << 8)
++#define  ATC_MAT_MASK			GENMASK(11, 8)
++#define  ATC_MAT(x)			FIELD_PREP(ATC_MAT_MASK, x)
+ #define  ATC_MAT_MACTAB			ATC_MAT(0)
+ 
+ enum mt7530_fdb_cmd {
+@@ -171,32 +176,29 @@ enum mt7530_fdb_cmd {
+ 
+ /* Registers for table search read address */
+ #define MT7530_TSRA1			0x84
+-#define  MAC_BYTE_0			24
+-#define  MAC_BYTE_1			16
+-#define  MAC_BYTE_2			8
+-#define  MAC_BYTE_3			0
+-#define  MAC_BYTE_MASK			0xff
++#define  MAC_BYTE_0_MASK		GENMASK(31, 24)
++#define  MAC_BYTE_1_MASK		GENMASK(23, 16)
++#define  MAC_BYTE_2_MASK		GENMASK(15, 8)
++#define  MAC_BYTE_3_MASK		GENMASK(7, 0)
+ 
+ #define MT7530_TSRA2			0x88
+-#define  MAC_BYTE_4			24
+-#define  MAC_BYTE_5			16
+-#define  CVID				0
+-#define  CVID_MASK			0xfff
++#define  MAC_BYTE_4_MASK		GENMASK(31, 24)
++#define  MAC_BYTE_5_MASK		GENMASK(23, 16)
++#define  CVID_MASK			GENMASK(11, 0)
+ 
+ #define MT7530_ATRD			0x8C
+-#define	 AGE_TIMER			24
+-#define  AGE_TIMER_MASK			0xff
+-#define  PORT_MAP			4
+-#define  PORT_MAP_MASK			0xff
+-#define  ENT_STATUS			2
+-#define  ENT_STATUS_MASK		0x3
++#define  AGE_TIMER_RD_MASK		GENMASK(31, 24)
++#define  PORT_MAP_MASK			GENMASK(11, 4)
++#define  ENT_STATUS_MASK		GENMASK(3, 2)
+ 
+ /* Register for vlan table control */
+ #define MT7530_VTCR			0x90
+ #define  VTCR_BUSY			BIT(31)
+ #define  VTCR_INVALID			BIT(16)
+-#define  VTCR_FUNC(x)			(((x) & 0xf) << 12)
+-#define  VTCR_VID			((x) & 0xfff)
++#define  VTCR_FUNC_MASK			GENMASK(15, 12)
++#define  VTCR_FUNC(x)			FIELD_PREP(VTCR_FUNC_MASK, x)
++#define  VTCR_VID_MASK			GENMASK(11, 0)
++#define  VTCR_VID(x)			FIELD_PREP(VTCR_VID_MASK, x)
+ 
+ enum mt7530_vlan_cmd {
+ 	/* Read/Write the specified VID entry from VAWD register based
+@@ -216,13 +218,13 @@ enum mt7530_vlan_cmd {
+ /* Per VLAN Egress Tag Control */
+ #define  VTAG_EN			BIT(28)
+ /* VLAN Member Control */
+-#define  PORT_MEM(x)			(((x) & 0xff) << 16)
++#define  PORT_MEM_MASK			GENMASK(23, 16)
++#define  PORT_MEM(x)			FIELD_PREP(PORT_MEM_MASK, x)
+ /* Filter ID */
+-#define  FID(x)				(((x) & 0x7) << 1)
++#define  FID_MASK			GENMASK(3, 1)
++#define  FID(x)				FIELD_PREP(FID_MASK, x)
+ /* VLAN Entry Valid */
+ #define  VLAN_VALID			BIT(0)
+-#define  PORT_MEM_SHFT			16
+-#define  PORT_MEM_MASK			0xff
+ 
+ enum mt7530_fid {
+ 	FID_STANDALONE = 0,
+@@ -247,11 +249,11 @@ enum mt7530_vlan_egress_attr {
+ /* Age count */
+ #define  AGE_CNT_MASK			GENMASK(19, 12)
+ #define  AGE_CNT_MAX			0xff
+-#define  AGE_CNT(x)			(AGE_CNT_MASK & ((x) << 12))
++#define  AGE_CNT(x)			FIELD_PREP(AGE_CNT_MASK, x)
+ /* Age unit */
+ #define  AGE_UNIT_MASK			GENMASK(11, 0)
+ #define  AGE_UNIT_MAX			0xfff
+-#define  AGE_UNIT(x)			(AGE_UNIT_MASK & (x))
++#define  AGE_UNIT(x)			FIELD_PREP(AGE_UNIT_MASK, x)
+ 
+ #define MT753X_ERLCR_P(x)		(0x1040 + ((x) * 0x100))
+ #define  ERLCR_CIR_MASK			GENMASK(31, 16)
+@@ -282,30 +284,31 @@ enum mt7530_stp_state {
+ #define MT7530_PCR_P(x)			(0x2004 + ((x) * 0x100))
+ #define  PORT_TX_MIR			BIT(9)
+ #define  PORT_RX_MIR			BIT(8)
+-#define  PORT_VLAN(x)			((x) & 0x3)
++#define  PCR_PORT_VLAN_MASK		GENMASK(1, 0)
+ 
+ enum mt7530_port_mode {
+ 	/* Port Matrix Mode: Frames are forwarded by the PCR_MATRIX members. */
+-	MT7530_PORT_MATRIX_MODE = PORT_VLAN(0),
++	MT7530_PORT_MATRIX_MODE = 0,
+ 
+ 	/* Fallback Mode: Forward received frames with ingress ports that do
+ 	 * not belong to the VLAN member. Frames whose VID is not listed on
+ 	 * the VLAN table are forwarded by the PCR_MATRIX members.
  	 */
--	val = mt7530_read(priv, MT7531_TOP_SIG_SR);
-+	regmap_read(priv->regmap, MT7531_TOP_SIG_SR, &val);
- 	priv->p5_sgmii = !!(val & PAD_DUAL_SGMII_EN);
+-	MT7530_PORT_FALLBACK_MODE = PORT_VLAN(1),
++	MT7530_PORT_FALLBACK_MODE = 1,
  
- 	/* Force link down on all ports before internal reset */
-@@ -2882,7 +2879,7 @@ static void mt7531_rgmii_setup(struct mt7530_priv *priv,
- {
- 	u32 val;
- 
--	val = mt7530_read(priv, MT7531_CLKGEN_CTRL);
-+	regmap_read(priv->regmap, MT7531_CLKGEN_CTRL, &val);
- 	val |= GP_CLK_EN;
- 	val &= ~GP_MODE_MASK;
- 	val |= GP_MODE(MT7531_GP_MODE_RGMII);
-@@ -3061,7 +3058,7 @@ static void mt753x_phylink_get_caps(struct dsa_switch *ds, int port,
- 
- 	config->lpi_capabilities = MAC_100FD | MAC_1000FD | MAC_2500FD;
- 
--	eeecr = mt7530_read(priv, MT753X_PMEEECR_P(port));
-+	regmap_read(priv->regmap, MT753X_PMEEECR_P(port), &eeecr);
- 	/* tx_lpi_timer should be in microseconds. The time units for
- 	 * LPI threshold are unspecified.
+ 	/* Security Mode: Discard any frame due to ingress membership
+ 	 * violation or VID missed on the VLAN table.
  	 */
-@@ -3089,7 +3086,7 @@ static void mt7530_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	int port = pcs_to_mt753x_pcs(pcs)->port;
- 	u32 pmsr;
+-	MT7530_PORT_SECURITY_MODE = PORT_VLAN(3),
++	MT7530_PORT_SECURITY_MODE = 3,
+ };
  
--	pmsr = mt7530_read(priv, MT7530_PMSR_P(port));
-+	regmap_read(priv->regmap, MT7530_PMSR_P(port), &pmsr);
+-#define  PCR_MATRIX(x)			(((x) & 0xff) << 16)
+-#define  PORT_PRI(x)			(((x) & 0x7) << 24)
+-#define  EG_TAG(x)			(((x) & 0x3) << 28)
+-#define  PCR_MATRIX_MASK		PCR_MATRIX(0xff)
++#define  PCR_MATRIX_MASK		GENMASK(23, 16)
++#define  PCR_MATRIX(x)			FIELD_PREP(PCR_MATRIX_MASK, x)
++#define  PORT_PRI_MASK			GENMASK(26, 24)
++#define  PORT_PRI(x)			FIELD_PREP(PORT_PRI_MASK, x)
++#define  EG_TAG_MASK			GENMASK(29, 28)
++#define  EG_TAG(x)			FIELD_PREP(EG_TAG_MASK, x)
+ #define  PCR_MATRIX_CLR			PCR_MATRIX(0)
+-#define  PCR_PORT_VLAN_MASK		PORT_VLAN(3)
  
- 	state->link = (pmsr & PMSR_LINK);
- 	state->an_complete = state->link;
+ /* Register for port security control */
+ #define MT7530_PSC_P(x)			(0x200c + ((x) * 0x100))
+@@ -314,10 +317,10 @@ enum mt7530_port_mode {
+ /* Register for port vlan control */
+ #define MT7530_PVC_P(x)			(0x2010 + ((x) * 0x100))
+ #define  PORT_SPEC_TAG			BIT(5)
+-#define  PVC_EG_TAG(x)			(((x) & 0x7) << 8)
+-#define  PVC_EG_TAG_MASK		PVC_EG_TAG(7)
+-#define  VLAN_ATTR(x)			(((x) & 0x3) << 6)
+-#define  VLAN_ATTR_MASK			VLAN_ATTR(3)
++#define  PVC_EG_TAG_MASK		GENMASK(10, 8)
++#define  PVC_EG_TAG(x)			FIELD_PREP(PVC_EG_TAG_MASK, x)
++#define  VLAN_ATTR_MASK			GENMASK(7, 6)
++#define  VLAN_ATTR(x)			FIELD_PREP(VLAN_ATTR_MASK, x)
+ #define  ACC_FRM_MASK			GENMASK(1, 0)
+ 
+ enum mt7530_vlan_port_eg_tag {
+@@ -337,12 +340,13 @@ enum mt7530_vlan_port_acc_frm {
+ 	MT7530_VLAN_ACC_UNTAGGED = 2,
+ };
+ 
+-#define  STAG_VPID			(((x) & 0xffff) << 16)
++#define  STAG_VPID_MASK			GENMASK(31, 16)
++#define  STAG_VPID(x)			FIELD_PREP(STAG_VPID_MASK, x)
+ 
+ /* Register for port port-and-protocol based vlan 1 control */
+ #define MT7530_PPBV1_P(x)		(0x2014 + ((x) * 0x100))
+-#define  G0_PORT_VID(x)			(((x) & 0xfff) << 0)
+-#define  G0_PORT_VID_MASK		G0_PORT_VID(0xfff)
++#define  G0_PORT_VID_MASK		GENMASK(11, 0)
++#define  G0_PORT_VID(x)			FIELD_PREP(G0_PORT_VID_MASK, x)
+ #define  G0_PORT_VID_DEF		G0_PORT_VID(0)
+ 
+ /* Register for port MAC control register */
+@@ -418,8 +422,8 @@ enum mt7530_vlan_port_acc_frm {
+ #define  MT7531_DIS_CLR			BIT(31)
+ 
+ #define MT7530_GMACCR			0x30e0
+-#define  MAX_RX_JUMBO(x)		((x) << 2)
+ #define  MAX_RX_JUMBO_MASK		GENMASK(5, 2)
++#define  MAX_RX_JUMBO(x)		FIELD_PREP(MAX_RX_JUMBO_MASK, x)
+ #define  MAX_RX_PKT_LEN_MASK		GENMASK(1, 0)
+ #define  MAX_RX_PKT_LEN_1522		0x0
+ #define  MAX_RX_PKT_LEN_1536		0x1
+@@ -505,16 +509,16 @@ enum mt7530_vlan_port_acc_frm {
+ /* Register for PHY Indirect Access Control */
+ #define MT7531_PHY_IAC			0x701C
+ #define  MT7531_PHY_ACS_ST		BIT(31)
+-#define  MT7531_MDIO_REG_ADDR_MASK	(0x1f << 25)
+-#define  MT7531_MDIO_PHY_ADDR_MASK	(0x1f << 20)
+-#define  MT7531_MDIO_CMD_MASK		(0x3 << 18)
+-#define  MT7531_MDIO_ST_MASK		(0x3 << 16)
+-#define  MT7531_MDIO_RW_DATA_MASK	(0xffff)
+-#define  MT7531_MDIO_REG_ADDR(x)	(((x) & 0x1f) << 25)
+-#define  MT7531_MDIO_DEV_ADDR(x)	(((x) & 0x1f) << 25)
+-#define  MT7531_MDIO_PHY_ADDR(x)	(((x) & 0x1f) << 20)
+-#define  MT7531_MDIO_CMD(x)		(((x) & 0x3) << 18)
+-#define  MT7531_MDIO_ST(x)		(((x) & 0x3) << 16)
++#define  MT7531_MDIO_REG_ADDR_MASK	GENMASK(29, 25)
++#define  MT7531_MDIO_PHY_ADDR_MASK	GENMASK(24, 20)
++#define  MT7531_MDIO_CMD_MASK		GENMASK(19, 18)
++#define  MT7531_MDIO_ST_MASK		GENMASK(17, 16)
++#define  MT7531_MDIO_RW_DATA_MASK	GENMASK(15, 0)
++#define  MT7531_MDIO_REG_ADDR(x)	FIELD_PREP(MT7531_MDIO_REG_ADDR_MASK, x)
++#define  MT7531_MDIO_DEV_ADDR(x)	FIELD_PREP(MT7531_MDIO_REG_ADDR_MASK, x)
++#define  MT7531_MDIO_PHY_ADDR(x)	FIELD_PREP(MT7531_MDIO_PHY_ADDR_MASK, x)
++#define  MT7531_MDIO_CMD(x)		FIELD_PREP(MT7531_MDIO_CMD_MASK, x)
++#define  MT7531_MDIO_ST(x)		FIELD_PREP(MT7531_MDIO_ST_MASK, x)
+ 
+ enum mt7531_phy_iac_cmd {
+ 	MT7531_MDIO_ADDR = 0,
+@@ -542,14 +546,14 @@ enum mt7531_mdio_st {
+ 
+ /* Register for RGMII clock phase */
+ #define MT7531_CLKGEN_CTRL		0x7500
+-#define  CLK_SKEW_OUT(x)		(((x) & 0x3) << 8)
+ #define  CLK_SKEW_OUT_MASK		GENMASK(9, 8)
+-#define  CLK_SKEW_IN(x)			(((x) & 0x3) << 6)
++#define  CLK_SKEW_OUT(x)		FIELD_PREP(CLK_SKEW_OUT_MASK, x)
+ #define  CLK_SKEW_IN_MASK		GENMASK(7, 6)
++#define  CLK_SKEW_IN(x)			FIELD_PREP(CLK_SKEW_IN_MASK, x)
+ #define  RXCLK_NO_DELAY			BIT(5)
+ #define  TXCLK_NO_REVERSE		BIT(4)
+-#define  GP_MODE(x)			(((x) & 0x3) << 1)
+ #define  GP_MODE_MASK			GENMASK(2, 1)
++#define  GP_MODE(x)			FIELD_PREP(GP_MODE_MASK, x)
+ #define  GP_CLK_EN			BIT(0)
+ 
+ enum mt7531_gp_mode {
+@@ -599,8 +603,10 @@ enum mt7531_xtal_fsel {
+ #define  PAD_MCM_SMI_EN			BIT(0)
+ 
+ #define MT7530_IO_DRV_CR		0x7810
+-#define  P5_IO_CLK_DRV(x)		((x) & 0x3)
+-#define  P5_IO_DATA_DRV(x)		(((x) & 0x3) << 4)
++#define  P5_IO_CLK_DRV_MASK		GENMASK(1, 0)
++#define  P5_IO_CLK_DRV(x)		FIELD_PREP(P5_IO_CLK_DRV_MASK, x)
++#define  P5_IO_DATA_DRV_MASK		GENMASK(5, 4)
++#define  P5_IO_DATA_DRV(x)		FIELD_PREP(P5_IO_DATA_DRV_MASK, x)
+ 
+ #define MT7531_CHIP_REV			0x781C
+ 
+@@ -610,15 +616,15 @@ enum mt7531_xtal_fsel {
+ #define  SW_PLLGP			BIT(0)
+ 
+ #define MT7530_P6ECR			0x7830
+-#define  P6_INTF_MODE_MASK		0x3
+-#define  P6_INTF_MODE(x)		((x) & 0x3)
++#define  P6_INTF_MODE_MASK		GENMASK(1, 0)
++#define  P6_INTF_MODE(x)		FIELD_PREP(P6_INTF_MODE_MASK, x)
+ 
+ #define MT7531_PLLGP_CR0		0x78a8
+ #define  RG_COREPLL_EN			BIT(22)
+-#define  RG_COREPLL_POSDIV_S		23
+-#define  RG_COREPLL_POSDIV_M		0x3800000
+-#define  RG_COREPLL_SDM_PCW_S		1
+-#define  RG_COREPLL_SDM_PCW_M		0x3ffffe
++#define  RG_COREPLL_POSDIV_MASK		GENMASK(25, 23)
++#define  RG_COREPLL_POSDIV(x)		FIELD_PREP(RG_COREPLL_POSDIV_MASK, x)
++#define  RG_COREPLL_SDM_PCW_MASK	GENMASK(21, 1)
++#define  RG_COREPLL_SDM_PCW(x)		FIELD_PREP(RG_COREPLL_SDM_PCW_MASK, x)
+ #define  RG_COREPLL_SDM_PCW_CHG		BIT(0)
+ 
+ /* Registers for RGMII and SGMII PLL clock */
+@@ -629,10 +635,10 @@ enum mt7531_xtal_fsel {
+ #define MT7530_TRGMII_RCK_CTRL		0x7a00
+ #define  RX_RST				BIT(31)
+ #define  RXC_DQSISEL			BIT(30)
+-#define  DQSI1_TAP_MASK			(0x7f << 8)
+-#define  DQSI0_TAP_MASK			0x7f
+-#define  DQSI1_TAP(x)			(((x) & 0x7f) << 8)
+-#define  DQSI0_TAP(x)			((x) & 0x7f)
++#define  DQSI1_TAP_MASK			GENMASK(14, 8)
++#define  DQSI0_TAP_MASK			GENMASK(6, 0)
++#define  DQSI1_TAP(x)			FIELD_PREP(DQSI1_TAP_MASK, x)
++#define  DQSI0_TAP(x)			FIELD_PREP(DQSI0_TAP_MASK, x)
+ 
+ #define MT7530_TRGMII_RCK_RTT		0x7a04
+ #define  DQS1_GATE			BIT(31)
+@@ -641,8 +647,8 @@ enum mt7531_xtal_fsel {
+ #define MT7530_TRGMII_RD(x)		(0x7a10 + (x) * 8)
+ #define  BSLIP_EN			BIT(31)
+ #define  EDGE_CHK			BIT(30)
+-#define  RD_TAP_MASK			0x7f
+-#define  RD_TAP(x)			((x) & 0x7f)
++#define  RD_TAP_MASK			GENMASK(6, 0)
++#define  RD_TAP(x)			FIELD_PREP(RD_TAP_MASK, x)
+ 
+ #define MT7530_TRGMII_TXCTRL		0x7a40
+ #define  TRAIN_TXEN			BIT(31)
+@@ -650,18 +656,23 @@ enum mt7531_xtal_fsel {
+ #define  TX_RST				BIT(28)
+ 
+ #define MT7530_TRGMII_TD_ODT(i)		(0x7a54 + 8 * (i))
+-#define  TD_DM_DRVP(x)			((x) & 0xf)
+-#define  TD_DM_DRVN(x)			(((x) & 0xf) << 4)
++#define  TD_DM_DRVP_MASK		GENMASK(3, 0)
++#define  TD_DM_DRVP(x)			FIELD_PREP(TD_DM_DRVP_MASK, x)
++#define  TD_DM_DRVN_MASK		GENMASK(7, 4)
++#define  TD_DM_DRVN(x)			FIELD_PREP(TD_DM_DRVN_MASK, x)
+ 
+ #define MT7530_TRGMII_TCK_CTRL		0x7a78
+-#define  TCK_TAP(x)			(((x) & 0xf) << 8)
++#define  TCK_TAP_MASK			GENMASK(11, 8)
++#define  TCK_TAP(x)			FIELD_PREP(TCK_TAP_MASK, x)
+ 
+ #define MT7530_P5RGMIIRXCR		0x7b00
+ #define  CSR_RGMII_EDGE_ALIGN		BIT(8)
+-#define  CSR_RGMII_RXC_0DEG_CFG(x)	((x) & 0xf)
++#define  CSR_RGMII_RXC_0DEG_CFG_MASK	GENMASK(3, 0)
++#define  CSR_RGMII_RXC_0DEG_CFG(x)	FIELD_PREP(CSR_RGMII_RXC_0DEG_CFG_MASK, x)
+ 
+ #define MT7530_P5RGMIITXCR		0x7b04
+-#define  CSR_RGMII_TXC_CFG(x)		((x) & 0x1f)
++#define  CSR_RGMII_TXC_CFG_MASK		GENMASK(4, 0)
++#define  CSR_RGMII_TXC_CFG(x)		FIELD_PREP(CSR_RGMII_TXC_CFG_MASK, x)
+ 
+ /* Registers for GPIO mode */
+ #define MT7531_GPIO_MODE0		0x7c0c
+@@ -670,9 +681,9 @@ enum mt7531_xtal_fsel {
+ 
+ #define MT7531_GPIO_MODE1		0x7c10
+ #define  MT7531_GPIO11_RG_RXD2_MASK	GENMASK(15, 12)
+-#define  MT7531_EXT_P_MDC_11		(2 << 12)
++#define  MT7531_EXT_P_MDC_11		FIELD_PREP(MT7531_GPIO11_RG_RXD2_MASK, 2)
+ #define  MT7531_GPIO12_RG_RXD3_MASK	GENMASK(19, 16)
+-#define  MT7531_EXT_P_MDIO_12		(2 << 16)
++#define  MT7531_EXT_P_MDIO_12		FIELD_PREP(MT7531_GPIO12_RG_RXD3_MASK, 2)
+ 
+ #define MT753X_CPORT_SPTAG_CFG		0x7c10
+ #define  CPORT_SW2FE_STAG_EN		BIT(1)
+@@ -704,7 +715,7 @@ enum mt7531_xtal_fsel {
+ #define MT7530_LED_GPIO_DATA		0x7d18
+ 
+ #define MT7530_CREV			0x7ffc
+-#define  CHIP_NAME_SHIFT		16
++#define  CHIP_NAME_MASK			GENMASK(31, 16)
+ #define  MT7530_ID			0x7530
+ 
+ #define MT7531_CREV			0x781C
+@@ -716,10 +727,13 @@ enum mt7531_xtal_fsel {
+ #define  RG_SYSPLL_EN_NORMAL		BIT(15)
+ #define  RG_SYSPLL_VODEN		BIT(14)
+ #define  RG_SYSPLL_LF			BIT(13)
+-#define  RG_SYSPLL_RST_DLY(x)		(((x) & 0x3) << 12)
++#define  RG_SYSPLL_RST_DLY_MASK		GENMASK(13, 12)
++#define  RG_SYSPLL_RST_DLY(x)		FIELD_PREP(RG_SYSPLL_RST_DLY_MASK, x)
+ #define  RG_SYSPLL_LVROD_EN		BIT(10)
+-#define  RG_SYSPLL_PREDIV(x)		(((x) & 0x3) << 8)
+-#define  RG_SYSPLL_POSDIV(x)		(((x) & 0x3) << 5)
++#define  RG_SYSPLL_PREDIV_MASK		GENMASK(9, 8)
++#define  RG_SYSPLL_PREDIV(x)		FIELD_PREP(RG_SYSPLL_PREDIV_MASK, x)
++#define  RG_SYSPLL_POSDIV_MASK		GENMASK(6, 5)
++#define  RG_SYSPLL_POSDIV(x)		FIELD_PREP(RG_SYSPLL_POSDIV_MASK, x)
+ #define  RG_SYSPLL_FBKSEL		BIT(4)
+ #define  RT_SYSPLL_EN_AFE_OLT		BIT(0)
+ 
+@@ -731,38 +745,48 @@ enum mt7531_xtal_fsel {
+ #define  MT7531_PHY_PLL_OFF		BIT(5)
+ #define  MT7531_PHY_PLL_BYPASS_MODE	BIT(4)
+ 
+-#define MT753X_CTRL_PHY_ADDR(addr)	((addr + 1) & 0x1f)
++#define MT753X_CTRL_PHY_ADDR(addr)	(((addr) + 1) & (PHY_MAX_ADDR - 1))
+ 
+ #define CORE_PLL_GROUP5			0x404
+-#define  RG_LCDDS_PCW_NCPO1(x)		((x) & 0xffff)
++#define  RG_LCDDS_PCW_NCPO1_MASK	GENMASK(15, 0)
++#define  RG_LCDDS_PCW_NCPO1(x)		FIELD_PREP(RG_LCDDS_PCW_NCPO1_MASK, x)
+ 
+ #define CORE_PLL_GROUP6			0x405
+-#define  RG_LCDDS_PCW_NCPO0(x)		((x) & 0xffff)
++#define  RG_LCDDS_PCW_NCPO0_MASK	GENMASK(15, 0)
++#define  RG_LCDDS_PCW_NCPO0(x)		FIELD_PREP(RG_LCDDS_PCW_NCPO0_MASK, x)
+ 
+ #define CORE_PLL_GROUP7			0x406
+ #define  RG_LCDDS_PWDB			BIT(15)
+ #define  RG_LCDDS_ISO_EN		BIT(13)
+-#define  RG_LCCDS_C(x)			(((x) & 0x7) << 4)
++#define  RG_LCCDS_C_MASK		GENMASK(6, 4)
++#define  RG_LCCDS_C(x)			FIELD_PREP(RG_LCCDS_C_MASK, x)
+ #define  RG_LCDDS_PCW_NCPO_CHG		BIT(3)
+ 
+ #define CORE_PLL_GROUP10		0x409
+-#define  RG_LCDDS_SSC_DELTA(x)		((x) & 0xfff)
++#define  RG_LCDDS_SSC_DELTA_MASK	GENMASK(11, 0)
++#define  RG_LCDDS_SSC_DELTA(x)		FIELD_PREP(RG_LCDDS_SSC_DELTA_MASK, x)
+ 
+ #define CORE_PLL_GROUP11		0x40a
+-#define  RG_LCDDS_SSC_DELTA1(x)		((x) & 0xfff)
++#define  RG_LCDDS_SSC_DELTA1_MASK	GENMASK(11, 0)
++#define  RG_LCDDS_SSC_DELTA1(x)		FIELD_PREP(RG_LCDDS_SSC_DELTA1_MASK, x)
+ 
+ #define CORE_GSWPLL_GRP1		0x40d
+-#define  RG_GSWPLL_PREDIV(x)		(((x) & 0x3) << 14)
+-#define  RG_GSWPLL_POSDIV_200M(x)	(((x) & 0x3) << 12)
++#define  RG_GSWPLL_PREDIV_MASK		GENMASK(15, 14)
++#define  RG_GSWPLL_PREDIV(x)		FIELD_PREP(RG_GSWPLL_PREDIV_MASK, x)
++#define  RG_GSWPLL_POSDIV_200M_MASK	GENMASK(13, 12)
++#define  RG_GSWPLL_POSDIV_200M(x)	FIELD_PREP(RG_GSWPLL_POSDIV_200M_MASK, x)
+ #define  RG_GSWPLL_EN_PRE		BIT(11)
+ #define  RG_GSWPLL_FBKSEL		BIT(10)
+ #define  RG_GSWPLL_BP			BIT(9)
+ #define  RG_GSWPLL_BR			BIT(8)
+-#define  RG_GSWPLL_FBKDIV_200M(x)	((x) & 0xff)
++#define  RG_GSWPLL_FBKDIV_200M_MASK	GENMASK(7, 0)
++#define  RG_GSWPLL_FBKDIV_200M(x)	FIELD_PREP(RG_GSWPLL_FBKDIV_200M_MASK, x)
+ 
+ #define CORE_GSWPLL_GRP2		0x40e
+-#define  RG_GSWPLL_POSDIV_500M(x)	(((x) & 0x3) << 8)
+-#define  RG_GSWPLL_FBKDIV_500M(x)	((x) & 0xff)
++#define  RG_GSWPLL_POSDIV_500M_MASK	GENMASK(9, 8)
++#define  RG_GSWPLL_POSDIV_500M(x)	FIELD_PREP(RG_GSWPLL_POSDIV_500M_MASK, x)
++#define  RG_GSWPLL_FBKDIV_500M_MASK	GENMASK(7, 0)
++#define  RG_GSWPLL_FBKDIV_500M(x)	FIELD_PREP(RG_GSWPLL_FBKDIV_500M_MASK, x)
+ 
+ #define CORE_TRGMII_GSW_CLK_CG		0x410
+ #define  REG_GSWCK_EN			BIT(0)
 -- 
 2.54.0
 
