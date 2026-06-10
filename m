@@ -1,183 +1,221 @@
-Return-Path: <netdev+bounces-297461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id onhrCwkAKWqhOgMAu9opvQ
-	(envelope-from <netdev+bounces-297461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:11:21 +0200
+	id O2mzHUwAKWqoOgMAu9opvQ
+	(envelope-from <netdev+bounces-297462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:12:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC87666619D
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:11:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684F16661A9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:12:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=DGqfKSh6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297461-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297461-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297462-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297462-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E287A302F617
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:11:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 77EF930319F9
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C7B370D7D;
-	Wed, 10 Jun 2026 06:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4D4371D08;
+	Wed, 10 Jun 2026 06:11:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF65370D54
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:11:15 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781071876; cv=pass; b=AAGBvdcwvNc5pWaHWl5rOO4wf42fRTBHa2L/HOXZB0r5OsgpzrbmERUUccLML1iVaUfu/GcOQP5jAB3CE1vig0sFhoOE2q/IizGV3BVbiRRPSN093yr3dY8Uqq04sB0XTpcs0YRlDhOLWOXKuiw7y38/fB6dJQ4rouUg306jjw0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781071876; c=relaxed/simple;
-	bh=QYif3R/spp7mR49jiuqCRarwjPV6UuVKEEqXbXLTWBE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OnK052lRuXjHc5fkWkB5ceUjJeLNCEHG5pMZsB/ATwiTPMK93qcmKWIGJiklu9xEFwXhIzgNKf39BBFnIwmaCte+K3rOIFbc6kkT+qrs96G3reQC4T6UWFWE+ku1+EsRQUrBPH5lUyDNxnPqTd/j80HwHz+bM9mIkgF16EfrMH8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DGqfKSh6; arc=pass smtp.client-ip=209.85.208.54
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6913160c9ddso8505970a12.2
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 23:11:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781071874; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Gk/0kGufuVUJh0sG9i+nZjucGz5I6pYtIlf8NOUtURGcGpdfpStiBRLqCwehuhq/mY
-         AHp504okr4IBaBozcHFCKoZiqx1bwYe3/u6JFytSuTNRinOTf98NQbQ24MmxwIcAj9HZ
-         Lw5lZt6kXz63QHxHm6T12uXMnTDi6tji0/e2sKuK85FChCfmqaEqEZA7pnv4k4h3MA93
-         MHcH4BquIy4fGh+/KM6EPjH3bbvVdHgHUV2RANKOvsY2Zl6tET2x/v+OuhELY3xwHLW6
-         zFaCKvfr0UK6N02u+sdRxw3lqdGhun+Js/Oht7xCmIObTunZVaiADVXdHW2VUejoWJt/
-         qgUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Uc426gs+gKlawhZVrWgjK5dZaPGvEZGz0i45gd463Jo=;
-        fh=PxP6mQ+Adba8Zo38Ug8djYVDGwg+h+lF6Z99d7XWv1s=;
-        b=Syj5IwTaG/E9l1NjpPZh7lEOBUoxtSnzH2R9xRYdcICdKBvTH8X4if9h6tSHFQ1Y7p
-         JlWLA4HjbvBodo6rOz9DajgcVjqaWnuMQ0bhgNRWoC9ybrO1kDe5c/e2kGIQVmK46/3t
-         wxojA6gxzgeBI1fjWepWTyhLdEteNWaEWp99PIsOGwYx0H1dA4w4u/u3roz+uDiPr5Vb
-         weU0aZ24TyiKIBYxrNCvNBhbUPuW5UI3EvV8KHYPZ4Kpxw88R+tNVTE5KqbW1S6whrQJ
-         o2TbenPaPnjKzPqLmRlgzrBR6r6bcoDlZ8gvEmVkE5bAJQ3RBLDs/hzh3A56mvJfz8Uc
-         sqCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781071874; x=1781676674; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uc426gs+gKlawhZVrWgjK5dZaPGvEZGz0i45gd463Jo=;
-        b=DGqfKSh6MJ7LIlg1jU8WDefsSeRZKnbzwf/RSqYf6Alcz/6e+HCiiPAeQZVIQ7314/
-         6gUBftjIqr/BamS8n2GorKFSkH6t2rfmVCDiv/RcPdaOWv5KXEetm6OKTjppxmG2NwFs
-         +0peRyWRTVnuytM3u1vK7lH16o4nPPN3pCiputiePN7qDGX4r0Q75IJLA0ORYjvq1mnk
-         MS58Zq82MZkX6qEiSWi/qYGsJk+janomo7vCgfo3I+j1KZe25quyZoIMaAPBpD5SRWn3
-         980CprARXvhYJISoAMbzBrUJUvgJiln8jfYpBqDCuk/Chb48YD4GvGeu2j5fa7Xi6Qp4
-         DVmQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749BA2E92B3
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 06:11:30 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781071891; cv=none; b=SToT4dHMApQPJMDmakx71GUtV+JE32UNWV3k3mSxPi66u82Q84gvPlObVpkU974kshFivg+fv/C5MgJkXzMM7DLf+mHM4FgydUCAphKzKb13PlJaWN6eufyo25hI4fBQd1R6lazcC1JSX5o/d1cKZmMCK6gyXDijNFSchwkUCks=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781071891; c=relaxed/simple;
+	bh=SJfpH95K3KVqOA6PwQXNrKEDVjcGxQcdnpDNckbiD44=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YXQRI6tsUadJJqsyW5YMJCDAdRW/h0m0zrpFeZAqvKiSkPt6gCZ78vJiAiF0r4TmZnOJN4bWOvmaQyNHSRYC+HwZnh6mIHPvhZQVJ1H57OCzhgb8PvkZ8NqvOFoFvddm2miNp1wm8AW/2wldz1BsJKTSh/qPqpJkpGx3ugKtmvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7e6fd5f007eso13472007a34.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 23:11:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781071874; x=1781676674;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uc426gs+gKlawhZVrWgjK5dZaPGvEZGz0i45gd463Jo=;
-        b=c+02LN5gyX0WTvgZW5OWTnav2n1rm3b9VC2b8HKLNgHsh4hcvh0JZmxZb48/MqPqVb
-         siMjuJwK+tMjo6SWW1g/KGry5Br1pUBNYTMezcsJ7NNBKizr7eHFRxwOmhbnyIxHARNW
-         TUwjZBfSTXgx4CKCRTvryfua+gtq6Nlr2vKAF4S//z0kY8kcvN1RWmD7zNyxnxOT07Rr
-         OvlyOXR/5a0zSs29dBMPHqoZjWQpNuq2zVtbH/JO2VtU+xVFAQNfH294a4AqUCsnanJ8
-         Ou2//HQgmCd0uMe/s6GS79mqMQaKq6V90fKGZlqcOEGAKjr44YsxVlbcoaJE0kFWGRPh
-         vVRg==
-X-Gm-Message-State: AOJu0Yx16uJpAzmtA4RSCTqAaMDqbPBae/aewmMuXxgO+Wo8pqDfgc9n
-	I0nHl1KsriTqAyn+DKKVdcg+IHVBzMFRDehY+4r16o+kMgepEqWeVvDK+5ME7eOefQUEqoL9oGk
-	CVtrYOOurwUEEsz8UNylYPzFF5wp8Q7M=
-X-Gm-Gg: Acq92OHrk7IL8IbBlTXdJdJlwxSEEBI/wzvK/WI1SKRsbyruJ1KOvGrMhnBy40bvoxP
-	sIz7+LEzGw+kJp3vKIg0E8s+VEehu+ulFmEK7EmuPxXB+Ondz/rfzi96szHbDN65KEY1AWjONFU
-	ZRagMFAAVt7tMDy6uStuDNCziXzfk731vb7P4lcVidkfOXhRWiODu3h56MfO7XEMWZ3k61EtTkT
-	cxwvV+y6vcRN9Mo+ijQlIEOKatsPf69mhDSUA9g0N2j1rt5A7idMs7AVGSbrGhoIVZsBS0QKlXd
-	eYZWoFDadpOm7MP8H+QqPXD8EZKeY9VfWH3YWe77dazYu4ylFcY=
-X-Received: by 2002:a05:6402:364a:b0:691:52e1:646 with SMTP id
- 4fb4d7f45d1cf-69152e108b3mr6477436a12.18.1781071873869; Tue, 09 Jun 2026
- 23:11:13 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781071889; x=1781676689;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JNWluBeT0hw+OaMJX5X8l/3bAeW8JB8X5Q39LAJfYoE=;
+        b=i1m9pesAYs8TzW1JQYANUYr+VUcWdJpobqXBWpgiXf50GrMwuIqCrM7JCHC8D+6yzI
+         j6hckRVuOBymZKWkte8XjpDRIdHcIykQ8ZjCddUnM+Ipumr2bCt8ZMs6TIwGmu0GPcFe
+         mAPjsljbXyIRfgt+uirKwHChVrqWL+RwBYxALKPfo+5gfRDcP3hNLQYvBzXPANqotm7y
+         qcbaxwPF12DS4UCP9M+n+Xlf+QcjAs6YrF4FqBteQJL19CtFQ9u3z+dTtKusEaAoZfHb
+         yuRec5Oe4Jc6r1Lxk2sLGYQ60ohjgIgHOnt8Z8SX9JSAVPn3HAnEtPbTBioWrLJ5Dp2a
+         rDmw==
+X-Forwarded-Encrypted: i=1; AFNElJ9yOSWtlqcnmBbGW7CxHaXdrYSYJDC9g2oUDW+U8FnIqYD02GT+58xE9q7zRbEJFHiqagHEWBs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYVpMHjAfEnpbEaptvPLJAC16ALk1m+AyxGA8/OLQ11/xA24Oe
+	qJ1IgJhuBUmudl8mI6E3fBHj9Jhc41tZmIo5HsbvtmEpSEpe4ps6r+9+emoOxpJ1T4zWNUas3oQ
+	FWMsjjYSbc5gvSo4yQBT62cSntmw5F2d0DgTpZxfou1FSjOg5OGE8PRqhK+c=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260605122215.825-1-7991aleschino@gmail.com> <aij3_qm9x7LJUfbG@secunet.com>
-In-Reply-To: <aij3_qm9x7LJUfbG@secunet.com>
-From: Alessandro Schino <7991aleschino@gmail.com>
-Date: Wed, 10 Jun 2026 08:11:01 +0200
-X-Gm-Features: AVVi8CfhpwF9TnRNcypnziUhI73i74ZlVyJ8N_21zhB7w7uYR1zjBhXX3f07XHY
-Message-ID: <CABNe9nPN9-w91L8TMetYXszAE7C3ZFirrgPkB5kcKHot2XCaOQ@mail.gmail.com>
-Subject: Re: [PATCH ipsec v3] esp: fix page frag reference leak on
- skb_to_sgvec failure
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: netdev@vger.kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	pabeni@redhat.com, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:4c86:b0:69d:8cf6:2e5a with SMTP id
+ 006d021491bc7-69e6d487e50mr9983736eaf.23.1781071889482; Tue, 09 Jun 2026
+ 23:11:29 -0700 (PDT)
+Date: Tue, 09 Jun 2026 23:11:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a290011.39669fcc.33b062.00b1.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: refcount bug in nsim_fib_event_nb (3)
+From: syzbot <syzbot+cb2aa2390ac024e25f5c@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=bd38685893011045];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:netdev@vger.kernel.org,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297461-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[7991aleschino@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[7991aleschino@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297462-lists,netdev=lfdr.de,cb2aa2390ac024e25f5c];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid,vger.kernel.org:from_smtp,secunet.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url,appspotmail.com:email,syzkaller.appspot.com:url];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BC87666619D
+X-Rspamd-Queue-Id: 684F16661A9
 
-You're welcome!
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    6f3ed7fec72f Merge tag 'for-7.1/dm-fixes-3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1144db7e580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bd38685893011045
+dashboard link: https://syzkaller.appspot.com/bug?extid=cb2aa2390ac024e25f5c
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/625fc484e456/disk-6f3ed7fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fd23de5678d1/vmlinux-6f3ed7fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5395fddce64e/bzImage-6f3ed7fe.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cb2aa2390ac024e25f5c@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+refcount_t: addition on 0; use-after-free.
+WARNING: lib/refcount.c:25 at refcount_warn_saturate+0x9f/0x110 lib/refcount.c:25, CPU#1: kworker/u8:8/1044
+Modules linked in:
+CPU: 1 UID: 0 PID: 1044 Comm: kworker/u8:8 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: netns cleanup_net
+RIP: 0010:refcount_warn_saturate+0x9f/0x110 lib/refcount.c:25
+Code: eb 66 85 db 74 3e 83 fb 01 75 4c e8 4b 36 23 fd 48 8d 3d 14 85 f1 0a 67 48 0f b9 3a eb 4a e8 38 36 23 fd 48 8d 3d 11 85 f1 0a <67> 48 0f b9 3a eb 37 e8 25 36 23 fd 48 8d 3d 0e 85 f1 0a 67 48 0f
+RSP: 0018:ffffc90005e4f270 EFLAGS: 00010293
+RAX: ffffffff84a135d8 RBX: 0000000000000002 RCX: ffff888027863d80
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8f92baf0
+RBP: 0000000000000000 R08: ffff888027863d80 R09: 0000000000000005
+R10: 0000000000000100 R11: 0000000000000004 R12: ffff8880117bd000
+R13: dffffc0000000000 R14: ffff88803392903c R15: ffff8880117bd000
+FS:  0000000000000000(0000) GS:ffff888126283000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000557b57a3d220 CR3: 00000000352b4000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __refcount_add include/linux/refcount.h:-1 [inline]
+ __refcount_inc include/linux/refcount.h:366 [inline]
+ refcount_inc include/linux/refcount.h:383 [inline]
+ fib_info_hold include/net/ip_fib.h:629 [inline]
+ nsim_fib4_prepare_event drivers/net/netdevsim/fib.c:930 [inline]
+ nsim_fib_event_schedule_work drivers/net/netdevsim/fib.c:1000 [inline]
+ nsim_fib_event_nb+0x1055/0x1240 drivers/net/netdevsim/fib.c:1043
+ call_fib_notifier+0x45/0x80 net/core/fib_notifier.c:25
+ call_fib_entry_notifier net/ipv4/fib_trie.c:90 [inline]
+ fib_leaf_notify net/ipv4/fib_trie.c:2176 [inline]
+ fib_table_notify net/ipv4/fib_trie.c:2194 [inline]
+ fib_notify+0x36b/0x5e0 net/ipv4/fib_trie.c:2217
+ fib_net_dump net/core/fib_notifier.c:70 [inline]
+ register_fib_notifier+0x184/0x360 net/core/fib_notifier.c:108
+ nsim_fib_create+0x85d/0x9f0 drivers/net/netdevsim/fib.c:1596
+ nsim_dev_reload_create drivers/net/netdevsim/dev.c:1604 [inline]
+ nsim_dev_reload_up+0x374/0x7c0 drivers/net/netdevsim/dev.c:1058
+ devlink_reload+0x501/0x8d0 net/devlink/dev.c:475
+ devlink_pernet_pre_exit+0x1ff/0x420 net/devlink/core.c:558
+ ops_pre_exit_list net/core/net_namespace.c:161 [inline]
+ ops_undo_list+0x187/0x940 net/core/net_namespace.c:234
+ cleanup_net+0x56e/0x800 net/core/net_namespace.c:702
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	eb 66                	jmp    0x68
+   2:	85 db                	test   %ebx,%ebx
+   4:	74 3e                	je     0x44
+   6:	83 fb 01             	cmp    $0x1,%ebx
+   9:	75 4c                	jne    0x57
+   b:	e8 4b 36 23 fd       	call   0xfd23365b
+  10:	48 8d 3d 14 85 f1 0a 	lea    0xaf18514(%rip),%rdi        # 0xaf1852b
+  17:	67 48 0f b9 3a       	ud1    (%edx),%rdi
+  1c:	eb 4a                	jmp    0x68
+  1e:	e8 38 36 23 fd       	call   0xfd23365b
+  23:	48 8d 3d 11 85 f1 0a 	lea    0xaf18511(%rip),%rdi        # 0xaf1853b
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	eb 37                	jmp    0x68
+  31:	e8 25 36 23 fd       	call   0xfd23365b
+  36:	48 8d 3d 0e 85 f1 0a 	lea    0xaf1850e(%rip),%rdi        # 0xaf1854b
+  3d:	67                   	addr32
+  3e:	48                   	rex.W
+  3f:	0f                   	.byte 0xf
 
 
-Il giorno mer 10 giu 2026 alle ore 07:37 Steffen Klassert
-<steffen.klassert@secunet.com> ha scritto:
->
-> On Fri, Jun 05, 2026 at 02:22:15PM +0200, Alessandro Schino wrote:
-> > In esp_output_tail(), when esp->inplace is false, the old skb page frags
-> > are replaced with a new page from the xfrm page_frag cache The source
-> > scatterlist (sg) is built from the old frags before the replacement, and
-> > esp_ssg_unref() is responsible for releasing the old page references
-> > after the crypto operation completes
-> >
-> > However, if the second skb_to_sgvec() call (which builds the destination
-> > scatterlist from the new page) fails, the code jumps to error_free which
-> > only calls kfree(tmp). The old page frag references captured in the
-> > source scatterlist are never released:
-> >
-> >   1 sg[] is built from old frags via skb_to_sgvec() (no extra get_page)
-> >   2 nr_frags is set to 1 and frag[0] is replaced with the new page
-> >   3 Second skb_to_sgvec() fails -> goto error_free
-> >
-> > Fix this by adding a bool parameter to esp_ssg_unref() that, when true,
-> > unconditionally unrefs the source scatterlist frags. Since req->src is
-> > not yet initialized by aead_request_set_crypt() at the point of the
-> > error, the source scatterlist is obtained directly via esp_req_sg()
-> > Existing callers pass false to preserve the original behavior
-> >
-> > The same issue exists in both esp4 and esp6 as the code is identical
-> >
-> > Fixes: cac2661c53f3 ("esp4: Avoid skb_cow_data whenever possible")
-> > Fixes: 03e2a30f6a27 ("esp6: Avoid skb_cow_data whenever possible")
-> > Signed-off-by: Alessandro Schino <7991aleschino@gmail.com>
->
-> Applied, thanks Alessandro!
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
