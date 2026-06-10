@@ -1,479 +1,210 @@
-Return-Path: <netdev+bounces-297355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id +PBSFuinKGqAHQMAu9opvQ
-	(envelope-from <netdev+bounces-297355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:55:20 +0200
+	id FvFmBPaqKGo2HwMAu9opvQ
+	(envelope-from <netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:08:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACF50664DB4
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 01:55:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B21664E5F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 02:08:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=FYmNCNRL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297355-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297355-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=iuQ8spfK;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297356-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E259230A19B7
-	for <lists+netdev@lfdr.de>; Tue,  9 Jun 2026 23:51:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DFEA300A13D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 00:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7890C3EAC86;
-	Tue,  9 Jun 2026 23:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6753A883F;
+	Wed, 10 Jun 2026 00:06:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77981E492D
-	for <netdev@vger.kernel.org>; Tue,  9 Jun 2026 23:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C3E2110E
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 00:06:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781049107; cv=none; b=tTIhvOfpnkyUvlMeihrAtPVz82OADi31OhNCRmsWAiAHuzxlxIqcYOmpVe2meOQ+FRZUUjO/jM5aT3cOEMbOVb6L0YLgxamIw5SlWpfcNi275PeRx1qC5ObwcMeBi+EcbwpST4xNn5R6OOthi6Qf5wIdN3lZy6cFVJXOFcwctLg=
+	t=1781049976; cv=none; b=qHEQaCWMc79iw60D5US3Uz1XHhRjhgPk9pmmjiuGsYSRE8BSjG6vUkke44Esn6KXs7gMv51xNN8l0X53AePu/vtJvQCpKC24yHhJ/3aWLj4hgKmIAYiq43Ld4PxOYKuCqyepCrfcauY3R918icTTZBdrYITsCYNuERlP08VWLP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781049107; c=relaxed/simple;
-	bh=GFvYv6F5JXSgGBdTvAtYZW/jY+Zo6S7GJXvCZR5lYOg=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GhzzoGi3a6KweQjEkDZrffbkN8lMcUeMWMplN6KolAeMYf2BFL+XlGciiqOcLvxEPlaUEXYp4yuEjokpNWMzF0HrVgGzgSay5bnk07+6v8zd5PrlnCRaI9LMGz7pzCmLsWy/LDGrhVOiNmnc6QIGH74WwYWI/3p21Yt2QUzH9FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYmNCNRL; arc=none smtp.client-ip=209.85.128.49
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4908b92904fso70518875e9.0
-        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 16:51:45 -0700 (PDT)
+	s=arc-20240116; t=1781049976; c=relaxed/simple;
+	bh=r1vbyfeCtYG6OGx7YM1c8slsjLM5GVhJMK4JM/LtzFE=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=Y4tNrYoN0OUHgZY/ck6So3UdbFKNPiUeO3aOGwjuGZErHeBEXHEpaPpXBkJHkNJAGEeJ1eZPhmLVOPjpZwnXUbOtbNfEU9ZtpnUS/5ThLRNKgATPolp3/s1Ismay4fW1KuHi05eta4F2Y08UiqZ7A6odSBRG3jUI2621RKDzOww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=iuQ8spfK; arc=none smtp.client-ip=74.125.82.172
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-304d7f31215so5476635eec.1
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 17:06:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781049104; x=1781653904; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sEcoODBbAmHhF71HEbR7vlQdemMO8cJnQFdN0SVH2Vk=;
-        b=FYmNCNRLZsa4l7hZoLRwEFsBFMiZf3ZUZoFZVVMtifpI3eOYTPUx1IGBjqbnAVS+Fk
-         EA2n2vnau2d3QHnI1cqU4iH8vKx1BU3QoRWtcJB9MS2LkICqzAyINtlfVEGPvYgxDa7e
-         e0z0cDE4lYxtDWrNyLI0j827zuIAOwrz5skytVFc83/nteS+mbQRrWWsKwyTta4r63ve
-         XOQEppStMLHB41z/aN9BH3M58ZyuvhryiCx/x+4jIwxR7Q8a74JcrnjVMsPuYF7JHoOi
-         I63FWzRxioCtWnJyAtD0HOSvF9fbXLjmQW/qaVR2RLSBKmU4WKkIqgwAketGOoC7dgE2
-         /89w==
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781049965; x=1781654765; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kj983b4aP9iTymCXxslRDVIMvDkVOBbHTYZp1bhw+6s=;
+        b=iuQ8spfK1Iat4dw7kvDF3eT0iRlrgXea8KgeclovNgqmuidX8lMZtX30UsXf7EZkZB
+         w6p4NrXwy92qPMAekQNDEWW/W6I/zuY0H/u/Sc/7A2Upk0I5t95ph6JNR65U2rLgtpdm
+         NLI+M/o5675+3eoCVCzu6KBAnDFu2j8IC5DkOpQS5QGGUzATHxtzSFz188Sn4xCaSvP2
+         sMY1/xCgDzwXzGzjdOG7yadGOhxkINQD6zEkTUg+u+A7PgJ33Qj+Ygg6PHf5P9nm9d7T
+         u5+csh++zvP4PGTg1HzekkkDhVcU8tj0yJMXLjkgZleg5fGuiMGk6ExeLimeEN2iPixR
+         CtsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781049104; x=1781653904;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sEcoODBbAmHhF71HEbR7vlQdemMO8cJnQFdN0SVH2Vk=;
-        b=UiDHFKjDepH6Ap3u7fbkwU1+ZF5mFuu0cdt7V2G7IGkc2tYBLrEY57e5bmsZPVuDFk
-         FMq6gUxHg2g8ay7vC0jhyY7WfZ6MWxNTFnTdsCxopAUo66jGE9qfRDr/WtSgLceUWxYI
-         3bP7cWeiOdIcKd8HOXG/qdqNvZNrCeQ+/d27J8CgeB1cjqEEdm/BmOaPlvYFuCz2e/lb
-         wJZSa9J6EewQtTAzUkZwxw2bB/sR3NWJxn67wwDiYqoqKGq0SJjpbBBQaXwad05FqxHX
-         WuQ6ATArdx61lPBCjETxxP94U0wNmSYedmOVa9oOWwJTol12qU3oiOfUk5yFYbdMqdn3
-         Z2yQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9iIYlgsDNDiVZUMWJ9tFP1Kt0GNo+sYrYzcZD1pMotUKMKcJKe6yCynRIzJgF34adyjm0Xifk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTRT3wUPpacNbe6vMJLYREPrg04SU3A4JmNmtuC1bcGPTFJSo2
-	yRhIHyIJk5nsdvxChFdEIWLyjxIap3myaZTidY6Cjc1UJDA3N0rnD+gt
-X-Gm-Gg: Acq92OEA5kthEb1/8GcZcZH1Vi5wXvHa2MEx2Rv86ipogwNnAVSl5y7O8WtxRqd9Y+H
-	gYnYH8eG8JWRMr3ybgBbDqcK+Nn1144YE1FXYnqcUalb34gJfOuMKTQ98EfUIiGJh3VBm8YVEzO
-	9bRv4bTncPAnEMTIaPPxer6r48xcAriPYKq5eMYQ9uwLOaFBMwooiH/F0Wh+t0d/IAAkmCmZNkQ
-	BJBtr3JlVH30CABgjTHY476uGfqqoYQglwpRctQnFINiYoA4+kZaUwsPJbWZBBQdTHhxT/AeaYU
-	t7uGcPZ9SGThmYJYGiQdl4DAfOGh0TjQL4XqoqJroJ4piqHQYR7XeHX7SbNGnvkYwoll9YV4ct6
-	lJ3gvoyBlx2K4FxQy0aZSoYm1sD1x0u6uWuiY/XfvmJulJLXAld+gQyGFCFukH61xX2ciqHmRW3
-	UlnT/r1yQBHZWIbI1R5A+5C+bCT1jlsTOjUOZPT9YOxsUi4xfQEuRq/oZDk3dMwWZx
-X-Received: by 2002:a05:600c:c165:b0:490:a2fd:e1e5 with SMTP id 5b1f17b1804b1-490c2623527mr425785595e9.17.1781049103934;
-        Tue, 09 Jun 2026 16:51:43 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-103.ip49.fastwebnet.it. [93.34.88.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490dcaa924bsm23335215e9.1.2026.06.09.16.51.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 16:51:43 -0700 (PDT)
-Message-ID: <6a28a70f.3dabba3e.312002.39c0@mx.google.com>
-X-Google-Original-Message-ID: <aiinCyCvlCBpEVQX@Ansuel-XPS.>
-Date: Wed, 10 Jun 2026 01:51:39 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
-Subject: Re: [PATCH net-next v6 12/12] net: airoha: add phylink support
-References: <20260609151212.29469-1-ansuelsmth@gmail.com>
- <20260609151212.29469-13-ansuelsmth@gmail.com>
- <aigxaDtZDnI-RTwN@lore-desk>
+        d=1e100.net; s=20251104; t=1781049965; x=1781654765;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kj983b4aP9iTymCXxslRDVIMvDkVOBbHTYZp1bhw+6s=;
+        b=P199y3fJwJwgHdIoD8K6VLi4eZwrOME1gTFISyGWyh8WETL6Q2SvLSxy3f5lVSNPms
+         DGcjGJbe/aAt0YKBYty3adU8kW+aY7bihhbt/ZiVAj+LRg/FQHUxw82crrs1sG00iemV
+         rLGHXOXTMB/FRkL4J4LHVITSmVgcRgRjfO9E4ngrj09WFdHoymWcanrN6asyUaQbuR/k
+         aPgyDZudyMU+/GsS2QMN2CFqu17HMqH++v/uxlHiLQ1UCui06ANXJ3HryVkDmRl2o1T0
+         0npFfAMgSHRsdV4Mq9kap0zxhQP9/KYablg5fLjDt74bkBQIqQf4HtvzOgq/pXAzG+jF
+         bA9w==
+X-Forwarded-Encrypted: i=1; AFNElJ/lBZA0nibu3+os1c4u7yQBYj6/e8oDfhIQ14LON8EoVoxZkvTaIRiCDfR6wBmiALq0DmJLrBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHKyBLu0bjvCWSJRzmINGdubHA2lh7d2h214F+ihTDQOTyUwBR
+	7m8mrPfShwU4VTEsYH2YltGObLZ/l2DEPOdxoW80+orKck7+eZoX2qcGhLLQNDT94TE=
+X-Gm-Gg: Acq92OEnp5QpwdLsXZtPa6ajObw9ONdMvC/wpcX2DtdyHhHpnnS0f+Il/zDBJua/U4Y
+	/nknu7G1qgHhd4hheWBbli6gCX2+b4/3LJ2Dh5u+xjO63XYX96Ysj/i8gAl3IN14Ifwsyfuf/FM
+	KpAIM4MZq4SQJS1mPQ55goCc9n+0VbctGxmWkjexO1Hkkv2ZcBySo7yiIeimcM0CE3re/81CThB
+	sJqZwhKFQ0ItOxb40FZfbnE4TYp7YQbBf55CdcIKtyaOrFvqnKWj1bHcHoWfW6rCSqC9WeBJEkz
+	DOA/qjXGp1Q0ltcqUWvwzuUYt4xIYQGr9whTUhPFkPQNmvMnXqwn5AeAy8gv4I1g10A5fiVpiiL
+	UEeXRjmxkPEHwsAAlM3o1xnT+A+8RfhF3S9J+TLJQRzEGhK8BL1SnEPzVW6HNwhtxVnKclzEdwa
+	ci0SI5dtoVRX/4u6E=
+X-Received: by 2002:a05:7300:d70d:b0:304:c520:4e14 with SMTP id 5a478bee46e88-3077b32888bmr15659364eec.11.1781049964814;
+        Tue, 09 Jun 2026 17:06:04 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:600::3297])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3074db85f60sm28979462eec.8.2026.06.09.17.06.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 17:06:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aigxaDtZDnI-RTwN@lore-desk>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 09 Jun 2026 20:06:01 -0400
+Message-Id: <DJ4XIOT2RVMT.28I5LA2UOZVUI@etsalapatis.com>
+Subject: Re: [PATCH] bpf: Unshare cloned skb before devmap egress XDP
+ program
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Menglong Dong" <menglong.dong@linux.dev>, "Sun Jian"
+ <sun.jian.kdev@gmail.com>
+Cc: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
+ <martin.lau@linux.dev>, <davem@davemloft.net>, <kuba@kernel.org>,
+ <hawk@kernel.org>, <john.fastabend@gmail.com>, <sdf@fomichev.me>,
+ <shuah@kernel.org>, <liuhangbin@gmail.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260609100214.337538-1-sun.jian.kdev@gmail.com>
+ <L0cwr1-KRSKR7-dJdjDmJA@linux.dev>
+In-Reply-To: <L0cwr1-KRSKR7-dJdjDmJA@linux.dev>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297355-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:menglong.dong@linux.dev,m:sun.jian.kdev@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:liuhangbin@gmail.com,m:sunjiankdev@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[linux.dev,gmail.com];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297356-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,davemloft.net,gmail.com,fomichev.me];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mx.google.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,etsalapatis-com.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp,etsalapatis.com:mid,etsalapatis.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ACF50664DB4
+X-Rspamd-Queue-Id: 56B21664E5F
 
-On Tue, Jun 09, 2026 at 05:29:44PM +0200, Lorenzo Bianconi wrote:
-> > Add phylink support for each GDM port. For GDM1 add the internal interface
-> > mode as the only supported mode. For GDM2/3/4 add the required
-> > configuration of the PCS to make the external PHY or attached SFP cage
-> > work.
-> > 
-> > These needs to be defined in the GDM port node using the pcs-handle
-> > property.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> 
-> Hi Christian,
-> 
-> some nits inline.
-> 
-> Regards,
-> Lorenzo
-> 
-> > ---
-> >  drivers/net/ethernet/airoha/Kconfig       |   1 +
-> >  drivers/net/ethernet/airoha/airoha_eth.c  | 167 +++++++++++++++++++++-
-> >  drivers/net/ethernet/airoha/airoha_eth.h  |   3 +
-> >  drivers/net/ethernet/airoha/airoha_regs.h |  12 ++
-> >  4 files changed, 181 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/airoha/Kconfig b/drivers/net/ethernet/airoha/Kconfig
-> > index ad3ce501e7a5..38dcc76e5998 100644
-> > --- a/drivers/net/ethernet/airoha/Kconfig
-> > +++ b/drivers/net/ethernet/airoha/Kconfig
-> > @@ -20,6 +20,7 @@ config NET_AIROHA
-> >  	depends on NET_DSA || !NET_DSA
-> >  	select NET_AIROHA_NPU
-> >  	select PAGE_POOL
-> > +	select PHYLINK
-> >  	help
-> >  	  This driver supports the gigabit ethernet MACs in the
-> >  	  Airoha SoC family.
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> > index 5a8e84fa9918..eabd7b058f82 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -8,6 +8,7 @@
-> >  #include <linux/of_reserved_mem.h>
-> >  #include <linux/platform_device.h>
-> >  #include <linux/tcp.h>
-> > +#include <linux/pcs/pcs.h>
-> 
-> Can you please respect the alphabetic order?
-> 
-> >  #include <linux/u64_stats_sync.h>
-> >  #include <net/dst_metadata.h>
-> >  #include <net/page_pool/helpers.h>
-> > @@ -1779,6 +1780,15 @@ static int airoha_dev_open(struct net_device *netdev)
-> >  	u32 cur_len, pse_port = FE_PSE_PORT_PPE1;
-> >  	struct airoha_qdma *qdma = dev->qdma;
-> >  
-> > +	err = phylink_of_phy_connect(dev->phylink, netdev->dev.of_node, 0);
-> > +	if (err) {
-> > +		netdev_err(netdev, "%s: could not attach PHY: %d\n", __func__,
-> > +			   err);
-> 
-> Do we need specify the __func__ argument here?
+On Tue Jun 9, 2026 at 7:06 AM EDT, Menglong Dong wrote:
+> On 2026/6/9 18:02 Sun Jian <sun.jian.kdev@gmail.com> write:
+>> dev_map_redirect_clone() uses skb_clone() when redirecting a generic XDP
+>> skb to multiple devmap destinations. The cloned skb can share packet dat=
+a
+>> with other clones.
+>>=20
+>> If the destination devmap entry has an egress XDP program, that program
+>> can modify packet data. Such modifications can then be observed by other
+>> clones sharing the same packet data.
+>>=20
+>> This can be reproduced by strengthening xdp_veth_egress to configure a
+>> different source MAC for each egress device and checking that store_mac_=
+1/2
+>> observe the MAC configured for their own egress devices. Without the fix=
+,
+>> the SKB_MODE subtest observes store_mac_1 receiving the MAC configured f=
+or
+>> the next egress device.
+>>=20
+>> Fix this by unsharing the cloned skb before running the devmap egress XD=
+P
+>> program. Limit the extra copy to destinations with an attached egress
+>> program.
 >
+> Hi, Jian.
+>
+> This sounds like a good idea in this case. When I have a look at bpf_clon=
+e_redirect(),
+> I found that it use skb_clone() too, which means it has the same problem.=
+ The
+> data can be modified by other xdp prog in the destination NIC if we use
+> bpf_clone_redirect().
+>
+> So maybe this is the default logic, and I'm not sure if this patch can br=
+eak the
+> existing users :/
 
-I was following a pattern also used in other driver. Maybe we should stop
-following it?
- 
-> > +		return err;
-> > +	}
-> > +
-> > +	phylink_start(dev->phylink);
-> > +
-> >  	netif_tx_start_all_queues(netdev);
-> >  	err = airoha_set_vip_for_gdm_port(dev, true);
-> >  	if (err)
-> > @@ -1876,6 +1886,9 @@ static int airoha_dev_stop(struct net_device *netdev)
-> >  		}
-> >  	}
-> >  
-> > +	phylink_stop(dev->phylink);
-> > +	phylink_disconnect_phy(dev->phylink);
-> > +
-> >  	return 0;
-> >  }
-> >  
-> > @@ -3148,6 +3161,153 @@ bool airoha_is_valid_gdm_dev(struct airoha_eth *eth,
-> >  	return false;
-> >  }
-> >  
-> > +/* Nothing to do in MAC, everything is handled in PCS */
-> > +static void airoha_mac_config(struct phylink_config *config, unsigned int mode,
-> > +			      const struct phylink_link_state *state)
-> > +{
-> > +}
-> > +
-> > +static void airoha_mac_link_up(struct phylink_config *config, struct phy_device *phy,
-> > +			       unsigned int mode, phy_interface_t interface,
-> > +			       int speed, int duplex, bool tx_pause, bool rx_pause)
-> > +{
-> > +	struct airoha_gdm_dev *dev = container_of(config, struct airoha_gdm_dev,
-> > +						  phylink_config);
-> > +	struct airoha_gdm_port *port = dev->port;
-> > +	struct airoha_eth *eth = dev->eth;
-> > +	u32 frag_size_tx, frag_size_rx;
-> > +	u32 mask, val;
-> > +
-> > +	/* TX/RX frag is configured only for GDM4 */
-> > +	if (port->id != 4)
-> 
-> 	if (port->id != AIROHA_GDM4_IDX)
-> 		...
-> 
-> > +		return;
-> > +
-> > +	switch (speed) {
-> > +	case SPEED_10000:
-> > +	case SPEED_5000:
-> > +		frag_size_tx = 8;
-> > +		frag_size_rx = 8;
-> > +		break;
-> > +	case SPEED_2500:
-> > +		frag_size_tx = 2;
-> > +		frag_size_rx = 1;
-> > +		break;
-> > +	default:
-> > +		frag_size_tx = 1;
-> > +		frag_size_rx = 0;
-> > +	}
-> > +
-> > +	/* Configure TX/RX frag based on speed */
-> > +	if (dev->nbq == 1) {
-> > +		mask = GDMA4_SGMII1_TX_FRAG_SIZE_MASK;
-> > +		val = FIELD_PREP(GDMA4_SGMII1_TX_FRAG_SIZE_MASK,
-> > +				 frag_size_tx);
-> > +	}  else {
-> > +		mask = GDMA4_SGMII0_TX_FRAG_SIZE_MASK;
-> > +		val = FIELD_PREP(GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
-> > +				 frag_size_tx);
-> > +	}
-> > +	airoha_fe_rmw(eth, REG_GDMA4_TMBI_FRAG, mask, val);
-> > +
-> > +	if (dev->nbq == 1) {
-> > +		mask = GDMA4_SGMII1_RX_FRAG_SIZE_MASK;
-> > +		val = FIELD_PREP(GDMA4_SGMII1_RX_FRAG_SIZE_MASK,
-> > +				 frag_size_tx);
-> > +	} else {
-> > +		mask = GDMA4_SGMII0_RX_FRAG_SIZE_MASK;
-> > +		val = FIELD_PREP(GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
-> > +				 frag_size_tx);
-> > +	}
-> > +	airoha_fe_rmw(eth, REG_GDMA4_RMBI_FRAG, mask, val);
-> > +}
-> > +
-> > +/* Nothing to do in MAC, everything is handled in PCS */
-> > +static void airoha_mac_link_down(struct phylink_config *config, unsigned int mode,
-> > +				 phy_interface_t interface)
-> > +{
-> > +}
-> > +
-> > +static const struct phylink_mac_ops airoha_phylink_ops = {
-> > +	.mac_config = airoha_mac_config,
-> > +	.mac_link_up = airoha_mac_link_up,
-> > +	.mac_link_down = airoha_mac_link_down,
-> > +};
-> > +
-> > +static int airoha_fill_available_pcs(struct phylink_config *config,
-> > +				     struct phylink_pcs **available_pcs,
-> > +				     unsigned int num_available_pcs)
-> > +{
-> > +	struct device *dev = config->dev;
-> > +
-> > +	return fwnode_phylink_pcs_parse(dev_fwnode(dev), available_pcs,
-> > +					&num_available_pcs);
-> > +}
-> > +
-> > +static int airoha_setup_phylink(struct net_device *netdev)
-> > +{
-> > +	struct airoha_gdm_dev *dev = netdev_priv(netdev);
-> > +	struct device_node *np = netdev->dev.of_node;
-> > +	struct airoha_gdm_port *port = dev->port;
-> > +	struct phylink_config *config;
-> > +	phy_interface_t phy_mode;
-> > +	struct phylink *phylink;
-> > +	int err;
-> > +
-> > +	err = of_get_phy_mode(np, &phy_mode);
-> > +	if (err) {
-> > +		dev_err(&netdev->dev, "incorrect phy-mode\n");
-> > +		return err;
-> > +	}
-> > +
-> > +	config = &dev->phylink_config;
-> 
-> remove new-line here.
-> 
-> > +
-> > +	config->dev = &netdev->dev;
-> > +	config->type = PHYLINK_NETDEV;
-> > +	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |  MAC_10000FD;
-> > +	if (port->id > AIROHA_GDM1_IDX)
-> 
-> maybe
-> 	if (port->id != AIROHA_GDM1_IDX)
-> 		...
-> 
-> > +		config->mac_capabilities |= MAC_10 | MAC_100 | MAC_1000 |
-> > +					    MAC_2500FD | MAC_5000FD;
-> > +
-> > +	err = fwnode_phylink_pcs_parse(dev_fwnode(&netdev->dev), NULL,
-> > +				       &config->num_available_pcs);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	config->fill_available_pcs = airoha_fill_available_pcs;
-> > +
-> > +	/*
-> > +	 * GDM1 only supports internal for Embedded Switch
-> > +	 * and doesn't require a PCS.
-> > +	 */
-> > +	if (port->id == AIROHA_GDM1_IDX) {
-> > +		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-> > +			  config->supported_interfaces);
-> > +	} else {
-> > +		__set_bit(PHY_INTERFACE_MODE_SGMII,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_10GBASER,
-> > +			  config->supported_interfaces);
-> > +		__set_bit(PHY_INTERFACE_MODE_USXGMII,
-> > +			  config->supported_interfaces);
-> > +
-> > +		phy_interface_copy(config->pcs_interfaces,
-> > +				   config->supported_interfaces);
-> > +	}
-> > +
-> > +	phylink = phylink_create(config, of_fwnode_handle(np),
-> > +				 phy_mode, &airoha_phylink_ops);
-> > +	if (IS_ERR(phylink))
-> > +		return PTR_ERR(phylink);
-> > +
-> > +	dev->phylink = phylink;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int airoha_alloc_gdm_device(struct airoha_eth *eth,
-> >  				   struct airoha_gdm_port *port,
-> >  				   int nbq, struct device_node *np)
-> > @@ -3210,7 +3370,7 @@ static int airoha_alloc_gdm_device(struct airoha_eth *eth,
-> >  	dev->nbq = nbq;
-> >  	port->devs[index] = dev;
-> >  
-> > -	return 0;
-> > +	return airoha_setup_phylink(netdev);
-> >  }
-> >  
-> >  static int airoha_alloc_gdm_port(struct airoha_eth *eth,
-> > @@ -3435,8 +3595,10 @@ static int airoha_probe(struct platform_device *pdev)
-> >  				continue;
-> >  
-> >  			netdev = netdev_from_priv(dev);
-> > -			if (netdev->reg_state == NETREG_REGISTERED)
-> > +			if (netdev->reg_state == NETREG_REGISTERED) {
-> > +				phylink_destroy(dev->phylink);
-> >  				unregister_netdev(netdev);
-> > +			}
-> >  			of_node_put(netdev->dev.of_node);
-> >  		}
-> >  		airoha_metadata_dst_free(port);
-> > @@ -3472,6 +3634,7 @@ static void airoha_remove(struct platform_device *pdev)
-> >  				continue;
-> >  
-> >  			netdev = netdev_from_priv(dev);
-> > +			phylink_destroy(dev->phylink);
-> >  			unregister_netdev(netdev);
-> >  			of_node_put(netdev->dev.of_node);
-> >  		}
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-> > index 8f42973f9cf5..1b25603dc64d 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> > @@ -554,6 +554,9 @@ struct airoha_gdm_dev {
-> >  
-> >  	u32 flags;
-> >  	int nbq;
-> > +
-> > +	struct phylink *phylink;
-> > +	struct phylink_config phylink_config;
-> >  };
-> >  
-> >  struct airoha_gdm_port {
-> > diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-> > index 436f3c8779c1..27f2583e143a 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_regs.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_regs.h
-> > @@ -358,6 +358,18 @@
-> >  #define IP_FRAGMENT_PORT_MASK		GENMASK(8, 5)
-> >  #define IP_FRAGMENT_NBQ_MASK		GENMASK(4, 0)
-> >  
-> > +#define REG_GDMA4_TMBI_FRAG		0x2028
-> > +#define GDMA4_SGMII1_TX_WEIGHT_MASK	GENMASK(31, 26)
-> > +#define GDMA4_SGMII1_TX_FRAG_SIZE_MASK	GENMASK(25, 16)
-> > +#define GDMA4_SGMII0_TX_WEIGHT_MASK	GENMASK(15, 10)
-> > +#define GDMA4_SGMII0_TX_FRAG_SIZE_MASK	GENMASK(9, 0)
-> > +
-> > +#define REG_GDMA4_RMBI_FRAG		0x202c
-> > +#define GDMA4_SGMII1_RX_WEIGHT_MASK	GENMASK(31, 26)
-> > +#define GDMA4_SGMII1_RX_FRAG_SIZE_MASK	GENMASK(25, 16)
-> > +#define GDMA4_SGMII0_RX_WEIGHT_MASK	GENMASK(15, 10)
-> > +#define GDMA4_SGMII0_RX_FRAG_SIZE_MASK	GENMASK(9, 0)
-> > +
-> >  #define REG_MC_VLAN_EN			0x2100
-> >  #define MC_VLAN_EN_MASK			BIT(0)
-> >  
-> > -- 
-> > 2.53.0
-> > 
+I think for use cases where we are using bpf_clone_redirect() to use
+one clone for inspection this would add an unnecessary copy. Maybe
+adding *_copy() variants instead of changing the *_clone() would be
+better? That way we wouldn't be changing the behavior for existing
+consumers and the naming would be consistent with the skb_* methods.
 
+But more importantly, is there an actual use case for the kind of API
+that the modified selftest requires? Nobody until now has considered
+the existing behavior to be a problem.
 
+>
+> Thanks!
+> Menglong Dong
+>
+>>=20
+>> Tested with:
+>>   ./test_progs -t xdp_veth_egress
+>>   ./test_progs -t xdp_veth
+>>   ./test_progs -t xdp
+> [...]
+>> =20
+>>  destroy_xdp_redirect_map:
+>> --=20
+>> 2.43.0
+>>=20
+>>=20
+>>=20
 
--- 
-	Ansuel
 
