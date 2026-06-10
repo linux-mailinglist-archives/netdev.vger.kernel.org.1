@@ -1,405 +1,335 @@
-Return-Path: <netdev+bounces-297817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297818-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0qBNDTu+KWqAcgMAu9opvQ
-	(envelope-from <netdev+bounces-297817-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:42:51 +0200
+	id J2b/EE6+KWqFcgMAu9opvQ
+	(envelope-from <netdev+bounces-297818-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:43:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9761D66C8E2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:42:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DC366C8ED
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 21:43:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmx.de header.s=s31663417 header.b=LO0PTyHU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297817-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297817-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=gmx.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=IfhbuNZe;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297818-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297818-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B8E28304C05E
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:42:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 58F5E31556B7
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3184B3793BF;
-	Wed, 10 Jun 2026 19:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFD23793BF;
+	Wed, 10 Jun 2026 19:42:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2466B145355;
-	Wed, 10 Jun 2026 19:42:22 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781120545; cv=none; b=K0eWjnq8sFebPLm6F/n4uBN+SpCOrC8LGqp3s2LZudaurLghAI5AJRVvRNWX0sFPtYtxssBvXVkz6/Eh3EMsnZYxU+P3X4yWfFYzfd9y20nBw1BDdVyUhIw8K2U6ifGxS3dPcixXze96+TQSHfW5Yg5hX847t65k+r5VS6u/EX8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781120545; c=relaxed/simple;
-	bh=AGpkop/q6ykPJYgQxXxrCmzksLizorNg1PFhcR17Fv0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QECIR0jc8oO16e9nOYYpcOfSRzmcL1uqlEhJv6IdGlX91zyNBhgIZEH+4SuV6L/hfWhSq7YfHobytrpE0rHIkdf/SR5638LyCbVggaiz/0+RCxN3mzBscSa5XlrBYdyNRQJmQJucigYDTE8ocoHcz4n58CatpnGGGltwRL9H/NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=LO0PTyHU; arc=none smtp.client-ip=212.227.15.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1781120525; x=1781725325;
-	i=markus.stockhausen@gmx.de;
-	bh=6XNUQsEXyWheisBL3Qmj9zl0jSlfI2OKzXTzsN2d9EA=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=LO0PTyHUKHYcu18aPl9QSdzsPV68jVmSuQXjqEwAxGmIVkUynVl+osRR9fSFNucj
-	 Y8W1ojf25UbcHlVaQQTne6wVWeNNGrQ4NXVNBaHhbCZFLPg3GkiYtCEDn+Ubt73Nk
-	 0eHDs1dzf+Rk+mGJ+z/Sg4/dpK0cfx4/LyukczbwdqP0ppz8Cphp0aaIrTJC9n0mL
-	 3clhGBhCvODvfDmMvjof3bb6DGLmNx2sl0d0ihLUxTKJjJMEPvlhe/J8dcWmSG/E/
-	 BxIEMIfmoer3/5FwncxAuALgiX2XJ2Cz4ZBl8jSNAr9+dVuaMSgJSjtmyD5ksnUOU
-	 QmUL2tex1k9CFjsYdQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MRCK6-1wuXs115YC-00OSDr; Wed, 10
- Jun 2026 21:42:05 +0200
-From: Markus Stockhausen <markus.stockhausen@gmx.de>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	chris.packham@alliedtelesis.co.nz,
-	daniel@makrotopia.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	devicetree@vger.kernel.org
-Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH net-next v3 5/5] net: mdio: realtek-rtl9300: Add support for RTL931x
-Date: Wed, 10 Jun 2026 21:41:45 +0200
-Message-ID: <20260610194145.4153668-6-markus.stockhausen@gmx.de>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260610194145.4153668-1-markus.stockhausen@gmx.de>
-References: <20260610194145.4153668-1-markus.stockhausen@gmx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A571C244685;
+	Wed, 10 Jun 2026 19:42:27 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781120549; cv=fail; b=tw0ygkM65jb9Vz5tdgscAM3a++LBKCX9hUlvpfPqdZJyqo/kbHKRAHWH7vpQ1yHR6+R8HwrIFktFpxAZaEKJnD9j/glDiKdGtB1Z4vSrYq+s+fTbk52ExhnbaGHSzRLoi34qW1hL8414FxeGRE5rSM0BzhMFxkA7AxHOy7A2XM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781120549; c=relaxed/simple;
+	bh=q/0EVvTDwtl6Vt+tzAIWa6wwjCJGfBOMQFCyiSVO3f8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ewcn2UxxXlWWawOj9zsmaAPaPqr6uA3Q/W5zTWnSht3XrHp3r9kcoFyF26fT2hEiJd0J4v3/CGM2PrKu9/ryx/8uHTp+mPNgB2mFtCfVADDe9gfGnPeoPClqtEpevBBlYkz9LVUJQg7y5t6UoM57kdmMxrba0KAV5SRUlchpFI8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IfhbuNZe; arc=fail smtp.client-ip=192.198.163.18
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781120547; x=1812656547;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=q/0EVvTDwtl6Vt+tzAIWa6wwjCJGfBOMQFCyiSVO3f8=;
+  b=IfhbuNZefj8GY7ezElo0OU1N6djDoWb9a9rz2zHYYbegkOTTSfYxyzds
+   LsMBQw4Ogioz5BhcyeIqNZFAej4zq0uFUAcrjfr0J+rzBnl/93llpknGy
+   uLRtAyC+EK3cdq+IOKUTp3eqiVzwUelhAxIV+3TqAZQaM+eEHwzaSVNod
+   rUJJmA0j88EaW2OSeFQchDsgEAbm5eKosGfryvWYVqnNx6qnizg6jV6YF
+   FVrfKc7cxqv9MZhPKkY74VXmzu9KefvqjSDGs59jRhZhHMaFESIBWhdZj
+   nCFMh03Q8LqAc+ucEctB1iyrM93/nJgpQlNnkJ6DOWgpUv8hnqNs6Yii7
+   Q==;
+X-CSE-ConnectionGUID: QNwciNkuQ8aZuoSd3r2+ew==
+X-CSE-MsgGUID: iqYEA6VHSIybYV63Cs86hg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="81058379"
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="81058379"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 12:42:27 -0700
+X-CSE-ConnectionGUID: rSSgURzWT5yWsgHy0MK3lA==
+X-CSE-MsgGUID: YCHQrI9zTeaGx6E9a1GM8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="246124274"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 12:42:26 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 10 Jun 2026 12:42:25 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 10 Jun 2026 12:42:25 -0700
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.40) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 10 Jun 2026 12:42:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x1ejAj4iDjCYlTTOpjpOSAdGuS3ScNE5po92NYbS1dEHX1ZGQ1OXE0RzmUpVFGww0k/hPlDwSQS7cVYYisUYSbwmjO5gRw4x4yTnVEbCwE5ffPcfb3v2FQYK40oXwFeq431tQRJnF0HL5AeZGsift2qAdOE8eMD87xWzIR4Xo2s5xpfWgE2qMvRtYA49Jpal8uiUd4wPHv2KsVQo/eN5KVjqduwr9dGVj6S1RbHKyDY9bWOtZZDFsXuo5RG+jMsveNxYmfXfP3TKaSfEfOq8miwhykaAv3VPgYShMF+yKqF/E/y4Mgr3b0M4uFUtV/bh4Yrml11eTkxZVL6tUyIPeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x7qIe00VFIM7Zrb83Nbf7GlVckulIVFssDf4v3f/pZs=;
+ b=hQCQDvdy5k0G5GhGJ4JbuLf5UcT+70/tGI+lZG1sz6FDULq+DFxMUc0NEs7iC3pismKL8UmgUYAxRKDnaUdezyClUQYgb1rqaFeRJ04Ojyjv6cAguTj5+BaRGZCHy7bemHyiNhxR02Sit1pJWxIk3B3dRMefqLw2+LANIjWM3e8/0DEi5yrU2ZjbvrAg1ptMCju5n+40/8/4WptIJYgppNObDXsOEvngpWafBJgqwfgAqoAtBXioqhdsErB6QJT7IulVNnVlnLt/743R+7cQrUtUmdgP0qAVl+KELPztW/5ntCjkP3twihEMba874AGELlnZ8d9U5b0leRApxRRAQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
+ by SN7PR11MB7091.namprd11.prod.outlook.com (2603:10b6:806:29a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Wed, 10 Jun
+ 2026 19:42:20 +0000
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.21.0092.011; Wed, 10 Jun 2026
+ 19:42:20 +0000
+From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Vecera, Ivan" <ivecera@redhat.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "kuba@kernel.org" <kuba@kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "edumazet@google.com"
+	<edumazet@google.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"horms@kernel.org" <horms@kernel.org>, "Prathosh.Satish@microchip.com"
+	<Prathosh.Satish@microchip.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCH v14 net-next 04/13] dpll: send delete notification before
+ unregister in on-pin rollback
+Thread-Topic: [PATCH v14 net-next 04/13] dpll: send delete notification before
+ unregister in on-pin rollback
+Thread-Index: AQHc9qx1WAOADYOsh0eBk268hx/sxrY03vWAgADwD5CAAOECgA==
+Date: Wed, 10 Jun 2026 19:42:19 +0000
+Message-ID: <IA1PR11MB62193E85F10A8ADD43343946921A2@IA1PR11MB6219.namprd11.prod.outlook.com>
+References: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
+ <20260607183045.1213735-5-grzegorz.nitka@intel.com>
+ <CH0PR11MB539452AD940A13941ED1E6D69B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <IA1PR11MB621956E9C0B9EBBD32C8A332921D2@IA1PR11MB6219.namprd11.prod.outlook.com>
+In-Reply-To: <IA1PR11MB621956E9C0B9EBBD32C8A332921D2@IA1PR11MB6219.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|SN7PR11MB7091:EE_
+x-ms-office365-filtering-correlation-id: 21f5546a-7637-4ac5-5b08-08dec72862a3
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|1800799024|7416014|376014|366016|22082099003|18002099003|6133799003|56012099006|11063799006|4143699003|38070700021;
+x-microsoft-antispam-message-info: a1e7NewNC6fStH17btnq6gAyTN2sXcEJ16XfHI8vO2kZUP0uFWEQ6+8gX1/qpeGBe9YoOFUeOTf4GWORmxTAXV4+BzrGmlrl3cvQX829LhqSwM064eJhAZbAMIZZI+6oZuXFZ4vpZO/+syYd02l4rbOrv3SnkTyiBNOQyVqajnAWVykH65flaQpCgGDaDvBLL2P/M18NYSWUUJrtWmbxB1DfA6MQSj8rQH+ObAdOBPGnV/SeHtQ13nDxn4hnBJHdKWCc1d0KxgBG60kRTflXGmLGUy3i4lBpgGVQBFxISBhOGZSBzOjpwrvDh2bRmZNLCLAuURWnxzPip4cLdqUiBxzy+8nTRQP0jlpLbYZw/CKcuWWc8RE2rsbLZOQNQzgqlT92Dp2LJBr9bdargEic1G1xe2vizIeRd/hVeHJdBzEmN5DQtCfaozAWil5ZDnWrPFRnuxuDugV7s7yabldsYvtpZ/2Bw8Dl6Wvr0hrmsMle2oP3Wi6MDctj0+KctUdLbZvqouDBWb829kC/V/ErQQhimqSzl7qcIjBtH8BLjJG2+Gxm65oR7p9QD+iJU/xmqQQLxmZWy3y28e8A7gzuupupYQm1FY5rwmKXSeuF1F+xmZtQmxgTf5RbZ2+Gow+tou3LTj39xYzy5ZGTKHbVKTU3qD/xrFDsEVTypjdt5HWWb21VgqB3VpXrrv3jrRuF5y/NqZmjbENw5gp5g9hav9Gsym0mpuLeJDbf4biJUdeWfF0DJyJp7ta3zvqP6WnJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(376014)(366016)(22082099003)(18002099003)(6133799003)(56012099006)(11063799006)(4143699003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Cu8hTaZxFz4goggKMQTMjQjimZd+Ei+nQJ+hJy58oyFVhphpw4xG26ZtwvEE?=
+ =?us-ascii?Q?TSFVsxSGS3JY5pC1/5lGLsGPmndAQefhL3HK+H+HXAEvR7FfIj+WVyMSxhEk?=
+ =?us-ascii?Q?1GgQNowJI9JKJ/ThwEyI04rT4W3f1iw6sx+pHvyUCEr0WxxV/t0as0daAmPa?=
+ =?us-ascii?Q?Ymd+MXAGzBSgb6SLD55VJYlg6qs3cMPWAjsUovZxmYpIIQSELfYV5W88Y3KU?=
+ =?us-ascii?Q?M5J1YsbzSd95K2yH9UO+CpPizQOe+SxVMQHnkty3Cd/4TljVwMxLpH0f1kgX?=
+ =?us-ascii?Q?lx89ntLbFqYv+uO3d1rJESK2izNFV/83dcKFr9C/B6xMshDnJrRYQ4oVaYLt?=
+ =?us-ascii?Q?J7cQlZe2hZuQaKxdmVwsHWSUyDcQGxGynEdyHEEB1IDJZ50BPQ3iJrBpRp5V?=
+ =?us-ascii?Q?l2gPYSaabf7j0OQ837IDBija6SsmwiytjPEY9n9rUbie5vw+fA9+ftyMkSvs?=
+ =?us-ascii?Q?5+qfXpah8Vacsa1kXHmA9Dt5sMIj7xyouk4Wm2zs4kahFf46yuK4vwa3SXjN?=
+ =?us-ascii?Q?67F95CuGzJimDDfynexegkmc13KFjSBRn9pyg8pIZHf8Iz7jaM74REz0Cfvl?=
+ =?us-ascii?Q?viNM2WT0ZCOV5Ib8+wzDDPCk2YWOvOdac003QD8ksxCWB56IyZotPbnGrytn?=
+ =?us-ascii?Q?g4jloyvu68zO4K4NFAlt2U1nNuPZ4OSp2VhwxZAv8wj+zEqCBQV8mcDdSn7/?=
+ =?us-ascii?Q?ps3HbMmGT64g5knBNMsgE3M3NhgoGjBdu0Wv4jddzSs+yylBHBDe+2rTsoRp?=
+ =?us-ascii?Q?xakdCrNTS0KaKnDu4IHd7uh/z4Q/cFJCnSggCUSLIYzksX9wA+W2ILsQ/2Zt?=
+ =?us-ascii?Q?77aGn8O+/UXFMhopZ/odLwtOiYIVaU4i51Y+Ft8Z5Rkjc4RDB1s4Ob1hUvuT?=
+ =?us-ascii?Q?ZRgHW8KiDT6Qhf6k8xx4bSHxgbhPFtIkvygMTi1CahY76jmWg4X8MF536Yz6?=
+ =?us-ascii?Q?LfR7grK5mYC/gfDntTw/dyDHhi1LfUPAANl+TI89PRehVo8aYk08i79rcfJ1?=
+ =?us-ascii?Q?yB63Ffa4BH+VFnTRvPohJbTvLPAOXu8m3KXQQin8x5KnqU86WC+qLyBbQKm0?=
+ =?us-ascii?Q?seWiN7bwv1ooOFZb58mILdUrENKXZ/BBhq6mQsC9ZY+QfVppFj9oXxTgr/l+?=
+ =?us-ascii?Q?bxNMgaXIfFHstLn6mNeLClh3zEe6geSgazw3hgKtXGfhTngSJ3YPxriSmD95?=
+ =?us-ascii?Q?YErEd1E3Dwm/OfzABZh2r1sGhkjKVgo+VehtA9eczcCe4QA/egz7aE86vkVz?=
+ =?us-ascii?Q?Pt+x7PgI6LLwFs5S7e7xF7vvHRF7JbnyfgXqgPyvBt4VrKuW8Iv5i0jwGA4R?=
+ =?us-ascii?Q?5v5SvUfCl7yNlcaqQblCwLOE3BT0rGd/T+UXBs4tQQmGSHVDlS5R54Hqlbpu?=
+ =?us-ascii?Q?DB0wwtQI6LJl5mDDgaebl2stsGdSmox/aHIt7hfrJAlxXRCOeDJ0xS990LTt?=
+ =?us-ascii?Q?xOm6rlBBka16hDZWXCZpBqdGqEN2S0k1FOcOTylVh5dQuXai7PuBBY9y5Lr9?=
+ =?us-ascii?Q?tZw9FM1Yqqw65FpEGWJrq8c73jUqw1LL0OZIe+rQg7UwChp5f8LenIrN3lbb?=
+ =?us-ascii?Q?afoxFFv34JHkeWaU4KmjQOQVOOFHpWda/wYh0MVPAe3DyJXq1NedIgCcAqPA?=
+ =?us-ascii?Q?D9i4hO0v34ij3nuiD1NHQHt9UmxK2DqVFENcOnfKanAPRQi2H0I0QgdWsa/h?=
+ =?us-ascii?Q?gyf+LZ8APicpU6DKvEm8dFb7NuScJnGOBTtbO01x+oQfPRh18C2qEkKAkyII?=
+ =?us-ascii?Q?mwMvKiJYoQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tJ9UwvCf84/5W2RkCxBLdkPJ2tdH92GlGx9i2TMOyEQhFPFVtNg
- ap86zyMr4FHrXeqWct4GovmXvoaLXHtLqiMJZJoa4mrSkJJem0QP2aoB3J2CMX1V4CK79Jl
- 3md7Q5c8ZjrBRDNQOicF6aDoUwbVQPKNiwInQ+IcqTBoxJftuW4usbAYQ9hfLY0mmeae+fq
- PTwUKQ3Yg7CwDHoEbUzxQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:R+DlgJPcifU=;znttS/evZCAeOmbmVEUvKEWw0jk
- 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
+X-Exchange-RoutingPolicyChecked: n3sEQXrT60kxIcj7FNPuyQsLkQLGYhFmxbcbbzqDHZVzmnXCH7b4JmPQK1kljKDnzD7XWK4dzh0vnyLa1y8gteouP/0KS67f/LZHoIQ6gcEAyAgfuKxH5OzT/cMH/0xeUUvK6qQK0dlt9f23pW3AfewqlQZybd0EIMgQp4D1TeII42gTNG51pkD3T0QBtU9gsA0SX2p4Mk604nyGbC9mlVjRvCGDQDv+TAHZX54gnky+oL8hSmFTMVaZ2ejkQ5TCQFOzUoj4rcHkEYugAoafUB5g8cpMQ7v48r/22sDUc1ZE5eU+QMCpg9S360RzkOX/Lo7LMLf4GMhwSOl9IIuh8g==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21f5546a-7637-4ac5-5b08-08dec72862a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2026 19:42:20.0325
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tzV61h/cjKgsYzyY4e6GggRk0KBP4z7zM7YYULz+93M+TceWwfY4NTpQqGBnJzp5m4iQTUNb/k6RqImYaRwUNe9Wq/H1C/+9QoK+KB5s8Ro=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7091
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:markus.stockhausen@gmx.de,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	FORGED_SENDER(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-297818-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:arkadiusz.kubalewski@intel.com,m:netdev@vger.kernel.org,m:ivecera@redhat.com,m:vadim.fedorenko@linux.dev,m:kuba@kernel.org,m:jiri@resnulli.us,m:edumazet@google.com,m:przemyslaw.kitszel@intel.com,m:richardcochran@gmail.com,m:donald.hunter@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew+netdev@lunn.ch,m:intel-wired-lan@lists.osuosl.org,m:horms@kernel.org,m:Prathosh.Satish@microchip.com,m:anthony.l.nguyen@intel.com,m:pabeni@redhat.com,m:davem@davemloft.net,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297817-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[gmx.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,linux.dev,kernel.org,resnulli.us,google.com,intel.com,gmail.com,vger.kernel.org,lunn.ch,lists.osuosl.org,microchip.com,davemloft.net];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmx.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,gmx.de:dkim,gmx.de:email,gmx.de:mid,gmx.de:from_mime]
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9761D66C8E2
+X-Rspamd-Queue-Id: 91DC366C8ED
 
-The MDIO driver has been prepared for multiple device support. Add all
-required bits for the RTL931x (aka mango) series. This is straightforward
-but some things are worth to be mentioned.
 
-- In contrast to RTL930x the I/O register has the input/output fields
-  swapped. Upper 16 bits are for read/outputs, and the lower 16 bits
-  are for write/inputs.
-- The supported "pages" are 8192 and thus the raw page is 8191
-- The devices support up to 56 ports. Thus the MAX_PORTS definition
-  is increased by this commit.
-- There are multiple global SMI controller registers with a different
-  layout from RTL930x devices. Therefore a separate setup_controller()
-  callback is added.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-=2D--
- drivers/net/mdio/mdio-realtek-rtl9300.c | 123 +++++++++++++++++++++++-
- 1 file changed, 122 insertions(+), 1 deletion(-)
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Nitka, Grzegorz
+> Sent: Tuesday, June 9, 2026 9:10 AM
+> To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>;
+> netdev@vger.kernel.org
+> Cc: Vecera, Ivan <ivecera@redhat.com>; vadim.fedorenko@linux.dev;
+> kuba@kernel.org; jiri@resnulli.us; edumazet@google.com; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; richardcochran@gmail.com;
+> donald.hunter@gmail.com; linux-kernel@vger.kernel.org;
+> andrew+netdev@lunn.ch; intel-wired-lan@lists.osuosl.org;
+> horms@kernel.org; Prathosh.Satish@microchip.com; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; pabeni@redhat.com; davem@davemloft.net
+> Subject: Re: [Intel-wired-lan] [PATCH v14 net-next 04/13] dpll: send dele=
+te
+> notification before unregister in on-pin rollback
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
+> > Sent: Monday, June 8, 2026 6:45 PM
+> > To: Nitka, Grzegorz <grzegorz.nitka@intel.com>; netdev@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Oro=
+s,
+> Petr
+> > <poros@redhat.com>; richardcochran@gmail.com;
+> andrew+netdev@lunn.ch;
+> > Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
+> > <anthony.l.nguyen@intel.com>; Prathosh.Satish@microchip.com; Vecera,
+> > Ivan <ivecera@redhat.com>; jiri@resnulli.us; vadim.fedorenko@linux.dev;
+> > donald.hunter@gmail.com; horms@kernel.org; pabeni@redhat.com;
+> > kuba@kernel.org; davem@davemloft.net; edumazet@google.com
+> > Subject: RE: [PATCH v14 net-next 04/13] dpll: send delete notification
+> before
+> > unregister in on-pin rollback
+> >
+> > >From: Nitka, Grzegorz <grzegorz.nitka@intel.com>
+> > >Sent: Sunday, June 7, 2026 8:31 PM
+> > >
+> > >The rollback path in dpll_pin_on_pin_register() called
+> > >__dpll_pin_unregister() before dpll_pin_delete_ntf(). When the
+> > >unregister dropped the pin's last DPLL reference it cleared the
+> > >DPLL_REGISTERED mark in dpll_pin_xa, so the subsequent
+> > >dpll_pin_event_send() failed dpll_pin_available() and aborted with
+> > >-ENODEV. As a result userspace was never notified of the rollback
+> > >deletion and remained out of sync with the kernel.
+> > >
+> > >Send the delete notification first, matching the order used by
+> > >dpll_pin_unregister() and dpll_pin_on_pin_unregister().
+> > >
+> > >Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions=
+")
+> > >Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> > >---
+> > > drivers/dpll/dpll_core.c | 2 +-
+> > > 1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > >diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+> > >index cea7e2be2cbc..80195f3a84f3 100644
+> > >--- a/drivers/dpll/dpll_core.c
+> > >+++ b/drivers/dpll/dpll_core.c
+> > >@@ -1007,9 +1007,9 @@ int dpll_pin_on_pin_register(struct dpll_pin
+> > >*parent, struct dpll_pin *pin,
+> > > dpll_unregister:
+> > > 	xa_for_each(&parent->dpll_refs, i, ref)
+> > > 		if (i < stop) {
+> > >+			dpll_pin_delete_ntf(pin);
+> > > 			__dpll_pin_unregister(ref->dpll, pin, ops, priv,
+> > > 					      parent);
+> > >-			dpll_pin_delete_ntf(pin);
+> >
+> > Hey Grzegorz,
+> >
+> > Since patch 7/13 this is already part of __dpll_pin_unregister ?
+> > The call should be removed at all? Please make sure all calls to
+> > __dpll_pin_unregister(..) are aware of that, also maybe better to
+> > put this all related to one patch?
+> >
+>=20
+> Yes, I think this patch is a good candidate to squash with 7/13 (with
+> proper commit message edit).
+> Same 'Fixes' tag and both touch notifications fix.
+>=20
+> Thanks
+>=20
+> Grzegorz
 
-diff --git a/drivers/net/mdio/mdio-realtek-rtl9300.c b/drivers/net/mdio/md=
-io-realtek-rtl9300.c
-index 1cdf2049cfa5..892ed3780a65 100644
-=2D-- a/drivers/net/mdio/mdio-realtek-rtl9300.c
-+++ b/drivers/net/mdio/mdio-realtek-rtl9300.c
-@@ -73,6 +73,31 @@
- #define RTL9300_SMI_ACCESS_PHY_CTRL_3		0xcb7c
- #define RTL9300_SMI_PORT0_5_ADDR_CTRL		0xcb80
-=20
-+#define RTL9310_NUM_BUSES			4
-+#define RTL9310_NUM_PAGES			8192
-+#define RTL9310_NUM_PORTS			56
-+#define RTL9310_SMI_GLB_CTRL1			0x0cbc
-+#define   RTL9310_SMI_GLB_FMT_SEL_C45(intf)	BIT((intf) * 2 + 1)
-+#define RTL9310_SMI_INDRT_ACCESS_CTRL_0		0x0c00
-+#define   RTL9310_PHY_CTRL_REG_ADDR		GENMASK(10, 6)
-+#define   RTL9310_PHY_CTRL_MAIN_PAGE		GENMASK(23, 11)
-+#define   RTL9310_PHY_CTRL_READ			0
-+#define   RTL9310_PHY_CTRL_WRITE		BIT(4)
-+#define   RTL9310_PHY_CTRL_TYPE_C45		BIT(3)
-+#define   RTL9310_PHY_CTRL_TYPE_C22		0
-+#define   RTL9310_PHY_CTRL_FAIL			BIT(1)
-+#define RTL9310_SMI_INDRT_ACCESS_BC_PHYID_CTRL	0x0c14
-+#define   RTL9310_BC_PORT_ID			GENMASK(10, 5)
-+#define RTL9310_SMI_INDRT_ACCESS_CTRL_1		0x0c04
-+#define RTL9310_SMI_INDRT_ACCESS_CTRL_2_LOW	0x0c08
-+#define RTL9310_SMI_INDRT_ACCESS_CTRL_2_HIGH	0x0c0c
-+#define RTL9310_SMI_INDRT_ACCESS_CTRL_3		0x0c10 /* I/O fields flipped */
-+#define   RTL9310_PHY_CTRL_DATA			GENMASK(31, 16)
-+#define   RTL9310_PHY_CTRL_INDATA		GENMASK(15, 0)
-+#define RTL9310_SMI_INDRT_ACCESS_MMD_CTRL	0x0c18
-+#define RTL9310_SMI_PORT_ADDR_CTRL		0x0c74
-+#define RTL9310_SMI_PORT_POLLING_SEL		0x0c9c
-+
- #define PHY_CTRL_CMD				BIT(0)
- #define PHY_CTRL_MMD_DEVAD			GENMASK(20, 16)
- #define PHY_CTRL_MMD_REG			GENMASK(15, 0)
-@@ -81,7 +106,7 @@
- #define MAP_BITS_PER_ADDR			5
- #define MAP_BITS_PER_BUS			2
- #define MAP_BUSES_PER_REG			16
--#define MAX_PORTS				28
-+#define MAX_PORTS				56
- #define MAX_SMI_BUSSES				4
- #define RAW_PAGE(priv)				((priv)->info->num_pages - 1)
-=20
-@@ -294,6 +319,60 @@ static int otto_emdio_9300_write_c45(struct mii_bus *=
-bus, int port,
- 	return otto_emdio_write_cmd(bus, RTL9300_PHY_CTRL_TYPE_C45, &cmd_data);
- }
-=20
-+static int otto_emdio_9310_read_c22(struct mii_bus *bus, int port, int re=
-gnum, u32 *value)
-+{
-+	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
-+	struct otto_emdio_cmd_regs cmd_data =3D {
-+		.broadcast	=3D FIELD_PREP(RTL9310_BC_PORT_ID, port),
-+		.c22_data	=3D FIELD_PREP(RTL9310_PHY_CTRL_REG_ADDR, regnum) |
-+				  FIELD_PREP(RTL9310_PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
-+	};
-+
-+	return otto_emdio_read_cmd(bus, RTL9310_PHY_CTRL_TYPE_C22, &cmd_data,
-+				   RTL9310_PHY_CTRL_DATA, value);
-+}
-+
-+static int otto_emdio_9310_write_c22(struct mii_bus *bus, int port, int r=
-egnum, u16 value)
-+{
-+	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
-+	struct otto_emdio_cmd_regs cmd_data =3D {
-+		.c22_data	=3D FIELD_PREP(RTL9310_PHY_CTRL_REG_ADDR, regnum) |
-+				  FIELD_PREP(RTL9310_PHY_CTRL_MAIN_PAGE, RAW_PAGE(priv)),
-+		.io_data	=3D FIELD_PREP(RTL9310_PHY_CTRL_INDATA, value),
-+		.port_mask_high	=3D (u32)(BIT_ULL(port) >> 32),
-+		.port_mask_low	=3D (u32)(BIT_ULL(port)),
-+	};
-+
-+	return otto_emdio_write_cmd(bus, RTL9310_PHY_CTRL_TYPE_C22, &cmd_data);
-+}
-+
-+static int otto_emdio_9310_read_c45(struct mii_bus *bus, int port,
-+				    int dev_addr, int regnum, u32 *value)
-+{
-+	struct otto_emdio_cmd_regs cmd_data =3D {
-+		.broadcast	=3D FIELD_PREP(RTL9310_BC_PORT_ID, port),
-+		.c45_data	=3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
-+				  FIELD_PREP(PHY_CTRL_MMD_REG, regnum),
-+	};
-+
-+	return otto_emdio_read_cmd(bus, RTL9310_PHY_CTRL_TYPE_C45, &cmd_data,
-+				   RTL9310_PHY_CTRL_DATA, value);
-+}
-+
-+static int otto_emdio_9310_write_c45(struct mii_bus *bus, int port,
-+				     int dev_addr, int regnum, u16 value)
-+{
-+	struct otto_emdio_cmd_regs cmd_data =3D {
-+		.c45_data	=3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
-+				  FIELD_PREP(PHY_CTRL_MMD_REG, regnum),
-+		.io_data	=3D FIELD_PREP(RTL9310_PHY_CTRL_INDATA, value),
-+		.port_mask_high	=3D (u32)(BIT_ULL(port) >> 32),
-+		.port_mask_low	=3D (u32)(BIT_ULL(port)),
-+	};
-+
-+	return otto_emdio_write_cmd(bus, RTL9310_PHY_CTRL_TYPE_C45, &cmd_data);
-+}
-+
- static int otto_emdio_read_c22(struct mii_bus *bus, int phy_id, int regnu=
-m)
- {
- 	struct otto_emdio_priv *priv =3D otto_emdio_bus_to_priv(bus);
-@@ -413,6 +492,22 @@ static int otto_emdio_9300_setup_controller(struct ot=
-to_emdio_priv *priv)
- 	return 0;
- }
-=20
-+static int otto_emdio_9310_setup_controller(struct otto_emdio_priv *priv)
-+{
-+	int i, err;
-+
-+	/* Put the interfaces into C45 mode if required */
-+	for (i =3D 0; i < priv->info->num_buses; i++) {
-+		err =3D regmap_assign_bits(priv->regmap, RTL9310_SMI_GLB_CTRL1,
-+					 RTL9310_SMI_GLB_FMT_SEL_C45(i),
-+					 priv->smi_bus_is_c45[i]);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int otto_emdio_probe_one(struct device *dev, struct otto_emdio_pri=
-v *priv,
- 				 struct fwnode_handle *node)
- {
-@@ -624,8 +719,34 @@ static const struct otto_emdio_info otto_emdio_9300_i=
-nfo =3D {
- 	.write_c45 =3D otto_emdio_9300_write_c45,
- };
-=20
-+static const struct otto_emdio_info otto_emdio_9310_info =3D {
-+	.addr_map_base =3D RTL9310_SMI_PORT_ADDR_CTRL,
-+	.bus_map_base =3D RTL9310_SMI_PORT_POLLING_SEL,
-+	.cmd_fail =3D RTL9310_PHY_CTRL_FAIL,
-+	.cmd_read =3D RTL9310_PHY_CTRL_READ,
-+	.cmd_write =3D RTL9310_PHY_CTRL_WRITE,
-+	.cmd_regs =3D {
-+		.broadcast =3D RTL9310_SMI_INDRT_ACCESS_BC_PHYID_CTRL,
-+		.c22_data =3D RTL9310_SMI_INDRT_ACCESS_CTRL_0,
-+		.c45_data =3D RTL9310_SMI_INDRT_ACCESS_MMD_CTRL,
-+		.ext_page =3D RTL9310_SMI_INDRT_ACCESS_CTRL_1,
-+		.io_data =3D RTL9310_SMI_INDRT_ACCESS_CTRL_3,
-+		.port_mask_low =3D RTL9310_SMI_INDRT_ACCESS_CTRL_2_LOW,
-+		.port_mask_high =3D RTL9310_SMI_INDRT_ACCESS_CTRL_2_HIGH,
-+	},
-+	.num_buses =3D RTL9310_NUM_BUSES,
-+	.num_pages =3D RTL9310_NUM_PAGES,
-+	.num_ports =3D RTL9310_NUM_PORTS,
-+	.setup_controller =3D otto_emdio_9310_setup_controller,
-+	.read_c22 =3D otto_emdio_9310_read_c22,
-+	.read_c45 =3D otto_emdio_9310_read_c45,
-+	.write_c22 =3D otto_emdio_9310_write_c22,
-+	.write_c45 =3D otto_emdio_9310_write_c45,
-+};
-+
- static const struct of_device_id otto_emdio_ids[] =3D {
- 	{ .compatible =3D "realtek,rtl9301-mdio", .data =3D &otto_emdio_9300_inf=
-o },
-+	{ .compatible =3D "realtek,rtl9311-mdio", .data =3D &otto_emdio_9310_inf=
-o },
- 	{}
- };
- MODULE_DEVICE_TABLE(of, otto_emdio_ids);
-=2D-=20
-2.54.0
+Hi Arek,
+
+I revisited your comment, from the perspective of redundant calls
+to dpll_pin_delete_ntf after patch 7/13 is applied to.
+Yes, there are still 2 "redundant" calls to dpll_pin_delete_ntf on top of _=
+_dpll_pin_unregister.
+I'm going to send v14 with this fix and reordered commits in the patchset (=
+7/13 moved up).
+
+Regards
+
+Grzegorz
+
+> > > 		}
+> > > 	dpll_xa_ref_pin_del(&pin->parent_refs, parent, ops, priv, pin);
+> > > unlock:
+> > >--
+> > >2.39.3
 
 
