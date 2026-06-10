@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-297428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297429-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LJzhNfHnKGoeNAMAu9opvQ
-	(envelope-from <netdev+bounces-297428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:28:33 +0200
+	id Guw0IGXoKGqaNAMAu9opvQ
+	(envelope-from <netdev+bounces-297429-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:30:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5B0665BE9
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:28:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3553665BFB
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:30:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="ieJXoGc/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297428-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297428-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=NxviLJkI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297429-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297429-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5145F30B6CEF
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 04:28:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9536730B8F25
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 04:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198D33630A0;
-	Wed, 10 Jun 2026 04:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA153655D8;
+	Wed, 10 Jun 2026 04:30:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94963451C1;
-	Wed, 10 Jun 2026 04:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D294F36493C;
+	Wed, 10 Jun 2026 04:30:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781065710; cv=none; b=VxXiiSl2+LERZxtdPZFMxOrCw3byh+kSUdEueO+1fk8oTUfZyjKvXFDxFPmgZZEZ+V7fUk2xPnw64ahVJ1J1tHqewnSSaW5awbtKZXiGG67jo428H8QIYPmirzN3LjYYKiGb9BRZUaYn8sNDOWPaoia8fquHBLcXgI91S6yb9eM=
+	t=1781065827; cv=none; b=k9FhRB4VyOwaSURZQTWsUoYC4LyR6uOng6JtijaVG7oWLjAz/QO6iGQ5+dizU3MDfVoh0MOcjrtYKFBCru8mrcVhZ6hsQNx6XGOHb/FUcZOxAXyfkTeaPHH7BkkQyxUjUFUPHoyiXbcChbmjMp0ITvoO8VLRvRlgnf8YODnfM2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781065710; c=relaxed/simple;
-	bh=0MK9QSxckQG39FnkMAMZw15nyDI4CnqM0OQfHOH+HyE=;
+	s=arc-20240116; t=1781065827; c=relaxed/simple;
+	bh=N4HXRqyQUmsUFWSCprb44oKWAbPFtXp6ppERf4nZcMc=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=henqJIOTu4WczSFNrGGTpBSZyn8GLRXVTwY6Wr9zgX8f/oGHfxgpJEQ+FwF1Q/fQOLgvE+kVz9gVYAylGqMaeM4YFEcME7pKydP/ZfU0xUYYUHZzZYDWM3/T9cWTPQVrN3m445vV5wLCV5b8PY5SZU2b8rW7u7tDBSbsyy9K4L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ieJXoGc/; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A1vDOo2132393;
-	Tue, 9 Jun 2026 21:28:06 -0700
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVbG2CG4yW7mNj4j4R7m6f2lT6o8i8smxIG0ijU4FE/EZCHxqG/S3NAWkPwELe+6CRrWZsxDBS/dwILKB3OWsCF9+fghUo02eNMSKV/QPN7Lbg3o1RNZ/S/xx10aRcPEKpd1Yd8TEt+dGfySt2TKB6wuZgxZEpUe/rMIiV4JNi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=NxviLJkI; arc=none smtp.client-ip=67.231.156.173
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A3TaXj2550742;
+	Tue, 9 Jun 2026 21:30:17 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=gK+pmPzdUWKqkakBm3x9MXnOJ
-	/5O9DYDIfPO4VTCpFg=; b=ieJXoGc/pY4bSM+9thAmMXlX9g7Qr1jBVZEuT/INL
-	Ct5d/TinnwcbFNZRaYri7mYGuapBWzsMGdYlUHFpQKdPeVkGadKOpwxt35OFX5NX
-	TbGYcuqe81T0/qfYtF/RCVuf1DBOQGcE9t4aYm06Q+fKuivYfVIfF6dY8OuBtEEN
-	QE1vbitifsztSwW0m3lU1GIXWq+y4DixLRjEuvIankxA30GKaHU/Jc/45Z2NMM0I
-	rY9UjA9RTrnY5s3i8rQ6SPXfM41sBy41Grpp5yTo+TLPvU1cfs2JU1EY99mHL/uI
-	axT8FGDU9VcyvO0FEWVF9eJtpKpLHK8nCEv9trumP/M4Q==
+	:references:subject:to; s=pfpt0220; bh=wdcwEmkhix0X1vneBn/2YUdje
+	tzUCPKRrIKLvoBygMc=; b=NxviLJkIWhwUj1FXDYKBE0RaQ3RpNR7gpeupReWBc
+	VbGLI7zMdgLdqn7WMaw1mLa9T//sR1xUORGa+sKQvt+XvgA65FfNGY7+kfz1cO7Z
+	3b1rFZRsiGljU8dW5aeN2rfyxs4B84O4+WpRro+eKMKQm3wXb2j3xpDi5z63Wm4J
+	0Z9jE1a8hsJEtmki4Uv6l0pCGW1HL4RuTgc6cmHw8ZuzhYZYw1NRMtS0lw+35UNh
+	RhyHbKplizfkIpuv1mXi84/SDh+ikTm3n5XWm1TEq33JpIT4MuJ5dT48Uk8W9vI1
+	CfNOrNPgDbGmuBaH46bpAxT1izYkIP+dDJXLE65fEYElQ==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4eps391nyj-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4eq02mr548-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jun 2026 21:28:05 -0700 (PDT)
+	Tue, 09 Jun 2026 21:30:17 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 9 Jun 2026 21:28:05 -0700
+ 15.2.1544.25; Tue, 9 Jun 2026 21:30:16 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 9 Jun 2026 21:28:05 -0700
+ Transport; Tue, 9 Jun 2026 21:30:16 -0700
 Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 6F9A83F708D;
-	Tue,  9 Jun 2026 21:28:01 -0700 (PDT)
-Date: Wed, 10 Jun 2026 09:58:00 +0530
+	by maili.marvell.com (Postfix) with SMTP id B78E15B693E;
+	Tue,  9 Jun 2026 21:30:12 -0700 (PDT)
+Date: Wed, 10 Jun 2026 10:00:11 +0530
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
         <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH v20 net-next 5/9] octeontx2-af: npc: cn20k: add subbank
- search order control
-Message-ID: <aijn0C6m3CWW38Xg@rkannoth-OptiPlex-7090>
+Subject: Re: [PATCH v20 net-next 6/9] octeontx2: cn20k: Coordinate default
+ rules with NIX LF lifecycle
+Message-ID: <aijoU869xdZHM36E@rkannoth-OptiPlex-7090>
 References: <20260609040453.711932-1-rkannoth@marvell.com>
- <20260609040453.711932-6-rkannoth@marvell.com>
+ <20260609040453.711932-7-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,23 +79,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260609040453.711932-6-rkannoth@marvell.com>
-X-Authority-Analysis: v=2.4 cv=KKlqylFo c=1 sm=1 tr=0 ts=6a28e7d6 cx=c_pps
+In-Reply-To: <20260609040453.711932-7-rkannoth@marvell.com>
+X-Authority-Analysis: v=2.4 cv=cuGrVV4i c=1 sm=1 tr=0 ts=6a28e859 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=c92rfblmAAAA:8
- a=M5GUcnROAAAA:8 a=dCuOX9PjPCUG7w9EUSQA:9 a=CjuIK1q_8ugA:10
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=QXcCYyLzdtTjyudCfB6f:22 a=c92rfblmAAAA:8
+ a=M5GUcnROAAAA:8 a=5IvDXcuzzZJvPDbM8RkA:9 a=CjuIK1q_8ugA:10
  a=GvGzcOZaWPEFPQC_NcjD:22 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: RNY3cHcq0RujwKNQjg6oAzSviw599ohL
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDAzOCBTYWx0ZWRfX20iuIVF0X/x0
- IOJHTuqoQnQqRIZYXyxdECO25FQVaG80o+xLXbaaAe4CO/hEickL5FK+mqAhNOfe/CHxcsjxgGV
- vhV5UKt7ci+tiiiSu0YjGV9aQFpGXhX3Lx3uXTSe4XDxen21+5MrgW/cNzIOruaUrgpfUidcavz
- xD5Zf53vI5P2ttFORfIcJTVVcbVeZ0USb+j/JdmVSwAtZX97n6Ly75p4/a/RL+3rbAR3+dMH7j4
- EBe6v58tY/2B4WZ0F/ILMXEhXruIEDCaVIwt8eN/+sSS5xaKuUrP13VduZpxv4fyVCGcJCXdMF5
- 9MXp/4P+fNcsakP9ZSzEOqeTM6dGr6IRSGltzFWGoNv/DtlWub93jOntEGipNU9AGDDof0SgSJK
- 3mCL+qn2vFMWv90sHKNwV2idOUrKTCg7DPx0ujdPOcTNwOwtZGgKD9Z6LMqveIWmfRWxl9f9f8/
- TEL3PxvZ6kSOR47Xm3w==
-X-Proofpoint-GUID: RNY3cHcq0RujwKNQjg6oAzSviw599ohL
+X-Proofpoint-GUID: LaOco9Vs9lcS7pWqqW73yGqoTWidW6b3
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDAzOCBTYWx0ZWRfX7/u0w+ucZLhJ
+ 1T6M/ZqUPY85/zIdErQu/7+HDJTNTjCLrQ/WOjHnPahNt3xnySXFv30e2E/7NHBoA2eE07kmzTw
+ E3YuLo6GhGZKTOa0DrgmGoZIm0pUuPbPz6DEoKGodcJyvDEsaP7xxPlx41ycA6l3goBLNmROD2J
+ DlttP8aA4TRNeS/HsKAtsF0PJD81oHGj8l5gSB1qAFF62Rhr49OcYCoJYlrwPGyDH+70+8M9GFM
+ 6qjm4ysIbFVuQpbttPt1Si2Pjw6KZLz/D6Ksh7OS+pNvDcBRZEXNpsBsBKPy1zCOt+aRFaFOQiM
+ Ayeor3SNqt+B9fRX+Pp3SFTBuQ+5Ez04VSeJISgF2qkpnCRVNYl1UNtx+HhAmjzNdb78Qu3C9bv
+ 5Ucos0mu6OBG14mqG9ea6YetpTijte+BFZC8eSWOr4eIsyBdDJiqWlTT6GmEuUSaOrJUK+ecPNc
+ ye4+x2ZKaHqcmcyd0vA==
+X-Proofpoint-ORIG-GUID: LaOco9Vs9lcS7pWqqW73yGqoTWidW6b3
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
@@ -106,13 +106,13 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
-	TAGGED_FROM(0.00)[bounces-297428-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:from_mime];
+	TAGGED_FROM(0.00)[bounces-297429-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:email,marvell.com:from_mime,rkannoth-OptiPlex-7090:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
@@ -134,72 +134,52 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2D5B0665BE9
+X-Rspamd-Queue-Id: C3553665BFB
 
-On 2026-06-09 at 09:34:49, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
-> CN20K NPC MCAM is split into 32 subbanks that are searched in a
-> predefined order during allocation. Lower-numbered subbanks have
-> higher priority than higher-numbered ones.
+On 2026-06-09 at 09:34:50, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Add NIX_LF_DONT_FREE_DFT_IDXS so the PF can send NIX LF free during hw
+> reinit or teardown without the AF freeing CN20K default NPC rule indexes
+> while the driver still owns that state (otx2_init_hw_resources and
+> otx2_free_hw_resources).
 >
-> Add a runtime "srch_order" to control the order in which
-> subbanks are searched during MCAM allocation.
+> On CN20K, allocate default NPC rules from NIX LF alloc before
+> nix_interface_init, roll back with npc_cn20k_dft_rules_free on failure,
+> and free from NIX LF free when the new flag is not set. Tighten
+> rvu_mbox_handler_nix_lf_alloc error handling: use a single rc, propagate
+> qmem_alloc and other errors, and set -ENOMEM only when kcalloc fails
+> (remove the blanket -ENOMEM at the free_mem path).
 >
 > Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
 
-https://sashiko.dev/#/patchset/20260609040453.711932-1-rkannoth%40marvell.com says:
+https://sashiko.dev/#/patchset/20260609040453.711932-1-rkannoth%40marvell.com says
 
->> @@ -3906,6 +3906,122 @@ static void npc_unlock_all_subbank(void)
->>  		mutex_unlock(&npc_priv.sb[i].lock);
->>  }
+>> -	if (err)
+>> +	rc = qmem_alloc(rvu->dev, &pfvf->rq_ctx, req->rq_cnt, hwctx_size);
+>> +	if (rc)
+>>  		goto free_mem;
 >>
->> +int npc_cn20k_search_order_set(struct rvu *rvu,
->> +			       u64 narr[MAX_NUM_SUB_BANKS], int cnt)
->> +{
->[ ... ]
->> +	for (prio = 0; prio < cnt; prio++) {
->> +		if (rsrc[FREE][prio] == -1)
->> +			xa_erase(&npc_priv.xa_sb_free, prio);
->> +
->> +		if (rsrc[USED][prio] == -1)
->> +			xa_erase(&npc_priv.xa_sb_used, prio);
+>>  	pfvf->rq_bmap = kcalloc(req->rq_cnt, sizeof(long), GFP_KERNEL);
+>> -	if (!pfvf->rq_bmap)
+>> +	if (!pfvf->rq_bmap) {
+>> +		rc = -ENOMEM;
+>>  		goto free_mem;
 >> +	}
->> +
->> +	for (int i = 0; i < cnt; i++)
->> +		subbank_srch_order[i] = (u32)narr[i];
->Does this change the semantic meaning of the subbank_srch_order array?
->During initialization in npc_create_srch_order(), subbank_srch_order is
->mapped as subbank_idx -> priority. The devlink parameter npc_srch_order
->expects an array ordered by priority (narr[priority] = subbank_idx),
->which is handled correctly by the earlier loops in this function.
->However, assigning subbank_srch_order[i] = narr[i] here silently changes
->the array in-place from mapping (idx -> priority) to mapping (priority -> idx).
-Thank you. npc_create_srch_order() is creating it properly but npc_subbank_init() is
-not settig this order properly. This is a bug. This patch did not introduce this bug.
-Will post a patch to "net" tree.
+>This is a pre-existing issue, but does this code allow a memory leak if a VF
+>sends consecutive allocation requests?
+>Looking at rvu_mbox_handler_nix_lf_alloc(), the AF driver handles the NIX LF
+>allocation by allocating DMA memory via qmem_alloc() and heap memory via
+>kcalloc(). It appears to directly overwrite the context pointers (such as
+>pfvf->rq_ctx and pfvf->rq_bmap) without checking if they are already
+>allocated.
+>If a misbehaving VF sends this allocation message multiple times sequentially
+>without an intervening NIX_LF_FREE message, could the previously allocated
+>memory be silently overwritten and leaked?
+>It looks like a similar pattern might also exist for NPA LF allocations in
+>rvu_mbox_handler_npa_lf_alloc() where pfvf->aura_ctx and pfvf->pool_ctx are
+>allocated in a similar manner.
 
->> +
->> +	restrict_valid = false;
->> +
->> +	npc_unlock_all_subbank();
->> +	mutex_unlock(&mcam->lock);
->> +
->> +	return 0;
->[ ... ]
->> +const u32 *npc_cn20k_search_order_get(bool *restricted_order, u32 *sz)
->> +{
->> +	*restricted_order = restrict_valid;
->> +	*sz = npc_priv.num_subbanks;
->> +	return subbank_srch_order;
->Could this result in scrambled subbank search orders if a user space tool
->reads the default order and then writes it back?
->Since this directly returns subbank_srch_order, if it is called before any
->set operation occurs, it returns the original idx -> priority mapping.
->If called after a set operation, it returns a priority -> subbank_idx
->mapping.
->If the original default order is read by devlink and then written back
->unmodified, the set path will misinterpret the original idx -> priority
->array as a priority -> subbank_idx array, scrambling the search order.
+This is a pre-existing issue.
 
-Same comment as above.
+A hardening series to "net-next" post merge of this series would address
+this issue.
 
