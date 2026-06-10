@@ -1,274 +1,289 @@
-Return-Path: <netdev+bounces-297432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VIpoEwvwKGrMNwMAu9opvQ
-	(envelope-from <netdev+bounces-297432-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:03:07 +0200
+	id gAuMAn7xKGoJOAMAu9opvQ
+	(envelope-from <netdev+bounces-297433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:09:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A241665D42
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:03:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507B2665DB1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:09:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=renesas.com header.s=selector1 header.b=D6d5ck1L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297432-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297432-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=renesas.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=CRb+nUH1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297433-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297433-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 62353301A2B8
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:03:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F9C2305A5D3
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 05:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14DC26E165;
-	Wed, 10 Jun 2026 05:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331873644CF;
+	Wed, 10 Jun 2026 05:08:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010067.outbound.protection.outlook.com [52.101.229.67])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFDD2EB0F;
-	Wed, 10 Jun 2026 05:03:00 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781067782; cv=fail; b=LdwVQFOmhuDA8FtHuxzCSNZPrbclAZBxsQ3itwEwqAAUNx14lwbkzTb+rH9xMKJda3A5S3pTwIMXGloV00Iow8tkfHp4MrFFXxtUBy9ez2C8uwuJOzCi+K59Gpvx5MCADGdk4PzbRkAPjrOelT2egTnaFd7z3Ye342y/iRukrC8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781067782; c=relaxed/simple;
-	bh=68PdQOd6hoVKxPjwxlbrPs31wg2qsL6W73wTSOl7DcQ=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XjcRWk7+ZBOK7N/Y9bhFL/2cby0abBbnKYTuRVTthysT6s4zqFmRsK+cXrj/Waw+AnaWh9hxPAoG5NFg/cxwUXNkBTUMLFDLhL2LQy5evNyfNRy+Xjp4k0wtpHsFKKvGZb4qipNNnRlhRZCv589Vt1dhEFz0icro6kD8I6l+uRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=D6d5ck1L; arc=fail smtp.client-ip=52.101.229.67
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QrSSHwO0oOvK9JMhWfkKeL0YIh7W+rQjFY/BsgGLA/Mu4x1qpEF5oOyfNpNHGvnIUKKvUALusdG/JXV2IBWMuqJ9dK/cdMtpq8FxgX8fMeVvpM+uLc/1mpUVVvrVaechf5/gMuNrFjK8RfShK4PREDp2q/UKS4yKei73UJrBDRVrooUDeOCQwASOKAWR8+UBKGxHJ7U7NYY4TyCbvqaLTPRGAJfAeiJ8CjsATqAeCiJTgY+zyNPdkTVCUgtrHd1SmrdwnoLnFfkH9WyHNBQzlLZm9XVq6Au2obvegTX7BnbKgGaBfl+5+AwMgJBvle04pNoseK4edteYCCa8Doc1kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=68PdQOd6hoVKxPjwxlbrPs31wg2qsL6W73wTSOl7DcQ=;
- b=et6/N/wcR05rOyvXPznq4hYp0CkBC16G4c+EmdxRh49MHXtnMXlrBRMMQzFd+gpeEzgvVHDHP5zHD/JFafcZ2Ng9C0gA3vndMB+Tw1okzMJbDbS4hfN1My2cYVv/WvRS8UW1hVYH1QdUagziJjOAyM/ah9QdqI3Tj2SBOlogReaiI+PtmBf4gG+f0OWPhegzTy4zH+Zl3ufaGAynSHbyzvUd2NU+aALDAsG01nCHlVmvKAHGorR4Jl29gW0CCKlSPzt8oC4HMRti07hevAMqvnQP6vKApQoz2VRKjye4yikLovBiS2YfvsWdtnkCkGWpJvrBZC3Poaw8gfIi/C24vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=68PdQOd6hoVKxPjwxlbrPs31wg2qsL6W73wTSOl7DcQ=;
- b=D6d5ck1LdyqKQoUK/67PpucC3MZYb9pEd0LbEiRuMVRsw/YA80iv0uCBqDwIgS+jkGBDMC2VPqSb3Sku8a8VABYJLp3PRD+S5bNmHykRQ8MiDtpE5gpB67K0Oixoz0Uh4khqio8klSvFycLpzBSNzhIDH8MQ8q7PTUG+JPxgpK8=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by OSZPR01MB6648.jpnprd01.prod.outlook.com (2603:1096:604:110::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.15; Wed, 10 Jun
- 2026 05:02:58 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::655d:9c47:4499:eb3a%5]) with mapi id 15.21.0113.011; Wed, 10 Jun 2026
- 05:02:48 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: =?utf-8?B?TmlrbGFzIFPDtmRlcmx1bmQ=?=
-	<niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>, magnus.damm
-	<magnus.damm@gmail.com>, Richard Cochran <richardcochran@gmail.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "DavidS. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [net-next 0/3] ptp: Add driver for R-Car Gen4 gPTP timer
-Thread-Topic: [net-next 0/3] ptp: Add driver for R-Car Gen4 gPTP timer
-Thread-Index: AQHc+Fs3milErLaePE6c6cVEOdftPrY3Op7Q
-Date: Wed, 10 Jun 2026 05:02:48 +0000
-Message-ID:
- <TY4PR01MB1428267DC1F642A7935EC302D821A2@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References: <20260609215711.2960150-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20260609215711.2960150-1-niklas.soderlund+renesas@ragnatech.se>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|OSZPR01MB6648:EE_
-x-ms-office365-filtering-correlation-id: 60ed3cbb-c021-46a1-2699-08dec6ad843a
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|23010399003|921020|11063799006|56012099006|38070700021|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- SbFD+5jtWBGPZZpaj0hCAzMUIYpz3q9nij1e0CY+fgMQ1fIXK5Aex+UAyCNsID7DiiiyNXg43n4F7JwBQwKrfF7Md41BiHqh1JgaVBy+Kb9vGFojDOVhg7CHCyzhJ8NrxomochmrUdpXOb7EE7R195Un0sP761CHn3Px26e7Fg05iXOZB7cO4SdSuqNXggxBgZbDNX2nQyHrs9N5N+4u9z8uxfiHOWhpXlvG+ZgMnttXnDatHOkQ5eLdPBinckb5w4IV36S1/ZXochJvEbYu92VRGZ5tnxkUH00nwGi02u9NHK7RMKjATytvbX+7Xi0DFfVX/BbeOdHw4cbDXj1iwY5PSEkKvRkoxB9GP6OwgPdpvME2Go9WTnWQv5CvjkNNAIR6Q6cLMeRXVrNNyAkAddMnX3RpWtgD6GGTG/JvkSTNrDXmnKVQjGNEYJ3Wrle2ICKZ7+u8TFAU1Xq5cwdTkxOHoDZD0TwMLdgpUKhLe/6aPo6wT8uvw8MyfXyUATbJFy30/ge5PKNcQ9QzwXV3SDrzbMs9MI1peyaTz37k9a5FJRq4e8VwrVE7Sqld8WQ+FMrjHZJMkWGpafcIaQ/WBXGo+qy3yiEyORqcbBfRBm77Ob42ZM+zn7liGfv6Vzk/j+ijs5/RjGLB8qIzza6WdGNOhdcsVgkeVTzDAzt3KcrwnNETj1W0dBiZydWUlTish/CUSZkIg4/pHeo/MYKx+B7qSIGARzWUJ2tsYjg6dq6DlfuWVuAZ6OLjBEoWlRJXDd+KwnYkfv8r3AWLIeINiw==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(23010399003)(921020)(11063799006)(56012099006)(38070700021)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MG9LTURBYnFiWDZXaThXNmxlVGZrTXVLdFY4VWJGRncvRjQzeG9RU2Y4RjU2?=
- =?utf-8?B?NWZ0cUxxNmJsd1Q4Sm5jcFdyTGNNMlc5WEVkN1NsQ3ZQMTNSRnAyNHhnS0RU?=
- =?utf-8?B?NG5QbTdnUW5nOEtDcTRhM2JkN1RxYTVIZ3ZDalFXWnByS20xOUNhSFlNaW9o?=
- =?utf-8?B?c0FRQ25yWkt2Z3hYeGZBU3VIRk82T2R5aTVGaFJBekR3U3VBQXVaSm5rQ0tF?=
- =?utf-8?B?OTdWdGhIYlNqZWtDSjNNSjc5cytrQVUzTTVrUXlLZ3ZZek52L2dTSTUzV0Zn?=
- =?utf-8?B?Q3FIWGtJdjVDVDRxLzZwdjFjclJwY2lQS3VDTDU4MlJSQkRqMVBGU2RYVDND?=
- =?utf-8?B?UEFKc1c5UVNCdmVmeWs1QjRrRzlCSGhBN2hyenBJS2sxN2xEdno0UFVqbndU?=
- =?utf-8?B?ak5XMU5GM2cwRlR4Ync2TUNFVHdGQ29XUXNDSWpmRXZQczBEb0hrOVdFaFV2?=
- =?utf-8?B?aWl2MlUxNWlza1ZSWkhWUURMZFJJT295REtlNkZKYjN1SjBBeUxjcGRhYWNI?=
- =?utf-8?B?WXNPdDFIZjJLcmZKdHpKNXIvWlIxRTBMNGs4alFUV1I0SitXT2VUY1V3cDJW?=
- =?utf-8?B?YjI5eGlBT2pMaHpKclh2clpQc1FtNXVsVnJHT1RLaXI0bmhmNERXTW0zV21i?=
- =?utf-8?B?TTV3WnI5SldZQUY5WkdHZVM0Mzh0N1hTOVZDZVpVcGMwampTMkd4ek1IdTFz?=
- =?utf-8?B?a1dZY1lKOG1XaGtJYlE0QXFtM0lzZElteit5T3ZWYUdFSDRsYTQwc1FOWGhG?=
- =?utf-8?B?RmM4UVRYNjFBdU5ZbElHV0J6VnRCVDBPTXAzdUE3dFdCekY3T1d2MHZ1OHhl?=
- =?utf-8?B?R1lBMWhxU3FHUDBscVpURVpuOU1KZ2lNNDVxQklpU1JoN2ZDcFNubnlpdlVs?=
- =?utf-8?B?U0YwYXVSOFpwNWkxaStzaGRrcEpYclJVQ2toSXoyQUlwRk0wRmlZdUh0TVFy?=
- =?utf-8?B?VVB6V0FYYVFFaHE0OFl5d0I2TXBZNG5ia1E5UDJ4N3VYNVZjTjR0SkVVOUFM?=
- =?utf-8?B?QXRud2NOemtndXo3cllmaG5kam03L1czRHA5SGRRZ0kvT0J4bzVZRUtid3VZ?=
- =?utf-8?B?RWtOalZxZzNTSklzZUo2czMrMGZSYTE2ZVFJNXR2MCtHREJycFFMZmR5dUJ0?=
- =?utf-8?B?UU5RVWRvTWFqUTV6bGNRREtJNit0bWh2V2V5d1hhRC9PTG1ZaXVUQzlrbDBI?=
- =?utf-8?B?Q3Z2MHgxWS93Y3BuRDJKRHhSSE1tMElIbVg4akJvTFVWbFJqMUJ4aUIwSDhU?=
- =?utf-8?B?Y0x3em9oVlZCbmY3dGY1cDNoYVh3Q0laeEpTeWVoRG52c0gxZXFUZlRyNDBi?=
- =?utf-8?B?RndwTGRubXdOMXd5bSsvbW1qQ29jWERTaG83aVNmbGZYb2tzdUczQmozdVZH?=
- =?utf-8?B?ZFZEWlpTKzlWWHM1TDQ3d3lxQzZ2NXpQM0k1Qlh4MWZ0OFpZRXNBSlR3UHBx?=
- =?utf-8?B?bTF2OUwvaWZVN1gyU1E5L2xKVTVXQWRxK1A2bFc5L3VFSjNUNjFlbmdQTGdx?=
- =?utf-8?B?M0w2NmthQjB4QzlMYXBTVzNEZFhieWNjT091YmF3OGQ3NVIvTXQ3WEhQdTQ5?=
- =?utf-8?B?WFBpYm9lSXR2Tjg0OVRFdzNJVVBNdXA3S1lqdHIvSTY1UkszUFlEQ3hySVhM?=
- =?utf-8?B?SVRvcTRncVZQdWxYMElkTjhpNVlmK0I2TUZjb1NoK1VYdnZIb3V4MEFFcXA1?=
- =?utf-8?B?WnBIYnRETGhWTEs2bnd4c2JQdHRqWnJ2RlFPWHlBZ0JPUFVUbHUwdUJpRGRU?=
- =?utf-8?B?RWdLME5NcTg1alV6eE9ZQXFrNzZZTkdJZGpnbGtjWTlwZktjQnZUMFN3eXd1?=
- =?utf-8?B?dHIrclFoSzJHbGpaWjhvd0M4dkIwU2NKak9qL2JWdWhZRDdDV2JqVktiVGdZ?=
- =?utf-8?B?dUQ0bExod2N1RUlKVVZLdmJkQU1GeHd0bEtsdm0vdEIrUlFDK3FwR0krVWg3?=
- =?utf-8?B?OFo4VXJlV2MwcExTVCsxOWhGdXIzMlRBVHpsaXp5eTh1MnZ3L0RLdzE0U3JD?=
- =?utf-8?B?TE1TM1F2QUJtN1RlZWRzK3RLbTRNd0g0N1RTaXdJWWVLVDFKRFpCNHd5eWlS?=
- =?utf-8?B?VThpWE1rR0pRNzJyS2F0Y3FOUU9nZ081TkRleFBsSkF2TlcyZnpXdXFZRVR0?=
- =?utf-8?B?YkNtZ0h4bGR0dktPY241TnFDU0ZQZDY2elJwbzhqbWl1UzB0MDZ3VEpjRWVS?=
- =?utf-8?B?ZFlJaHpRbGpSTWJPak1DdUl6OWtaZHIwRXdMc1c3d1Vsa3B0dkV1V3QrQlRE?=
- =?utf-8?B?VTcycjFlSko4M2p5dnBSRjJoR0Z3eEJmWjlDbHJaVzhBNitMWk5tSVhIMUxC?=
- =?utf-8?B?WGVuU1VEWmtNS2llcXptQ0VBZDhvQ0FYRldDL09SUHpHMlpxeHBQZz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91CE33A9CF;
+	Wed, 10 Jun 2026 05:08:20 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781068102; cv=none; b=cRcn0SYQqN4H7jh5k893C3Lu0qfEgzUWSK+/JOXE4l2SR13eLyCAvO4QaQfVB67K9kPKkRvVQeM6wp/guJKTdYjIrVweVn/8t0YFPyj2yuSDNo3Wq0vF4WfKNOwMTrLglPS5PgHJ8NkldVJ6uiBsrQHDQF7V+ymK90ad7p8LqY8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781068102; c=relaxed/simple;
+	bh=56ykVSxhP4jJYDZxoiPuKDf82/tTDNLw+KCygLVGy8A=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bRNtBVYk1K2Y0tYGh9qQ9Cs3z7ahpT78ixMrakdjbvNNlT0ZFvThltVKzJT9uy6CO2tlyWOYzAWK/9/QeMiawm0GyfniXFaXg6dFBEBFuhuf88sdP2t5Q7YVVisfb+F6j3M80/+LzgLHaeqNmrzxiVNct5JQt5ky++jxELEYYok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CRb+nUH1; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A1vOY52480491;
+	Tue, 9 Jun 2026 22:08:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=WBzB6/YmneL0QxPEVjfK94gOO
+	szcvvcEGwK33bjdzOo=; b=CRb+nUH1gGN1wEqKTBt8wV4gkxWLsCUpKa2D+WLaR
+	o35HwjHAjib5Csqnm1f5Ozf0TR3k/U7PaPdyJTOLqpvsFgzS9k+li/pjFq9bAOKY
+	jRK6P3gvLtpLf2H146iC1OGgeh73aBfaawGABEgzIL8+rz9pI7kQ0gb9Hj41KNMb
+	oPJD/JwWzsdos53NRetVAGEg00oGYv9UNvFKnBQ0Vb/JbQ7VestDC1O1BOfe0BQe
+	ZMX7tKdKh7lmSAcZHwj2RKXeH9qnaw6lJQJemPYAIkPsVFbXQtuFl7BMHmwe4KEz
+	Gviimju/+IrbmtluO0jjZGqQCYxFWDE63C50Y3SWN3VXg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4epex1m6m9-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jun 2026 22:08:10 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 9 Jun 2026 22:08:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 9 Jun 2026 22:08:09 -0700
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 43D213F708C;
+	Tue,  9 Jun 2026 22:08:06 -0700 (PDT)
+Date: Wed, 10 Jun 2026 10:38:05 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
+        <edumazet@google.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH v20 net-next 2/9] octeontx2-af: npc: cn20k: debugfs
+ enhancements
+Message-ID: <aijxNS4BooInl2Si@rkannoth-OptiPlex-7090>
+References: <20260609040453.711932-1-rkannoth@marvell.com>
+ <20260609040453.711932-3-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60ed3cbb-c021-46a1-2699-08dec6ad843a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2026 05:02:48.2867
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: prukAEII+1m3SEsYPPXl27tjDcb9PwLMW5jpjZtpXSh/sHhD+JtSoqdcb1mNoodIfmMEsIlQXuufosFDM3HmlA3pr4k3lYkzNw6Pt/XhmYA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSZPR01MB6648
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260609040453.711932-3-rkannoth@marvell.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA0NSBTYWx0ZWRfXyfTEs/sxSK7m
+ eQbyHkizCTqXejeL+qxlrG+E2w1ErVY04G4Wrdua5fbN3S/p6X4WhBVRptK/D3Nn9c4dE4TvinQ
+ AsyCvrRPYU3CGy1w8uCNbj5ctCyHMwyLRvfUhoB+SLusNzLpW+oqXx/DazY0NW8OlHOhyo3vVEc
+ XAK3dTQTSa6FUQeTfPkGQe7A1ESDKVT5Ap5bM5h7YCAOFmoI0NbUqryjjiSZN4Set55tYQkDmTa
+ 1o0JoEsIkbQno4rvLUIu8BocWK5GdPQh4A+rF4wPZtD7zIo+eHJ/RwrJIlLmuzsEARh21DjYrz/
+ XIrN5Dc86J5F+unGnGzUcB4manuLjuDpB7hvdKHWqnSPL5MueYSlqpTrxdjTHWtbKVUYyxu9xfd
+ HIiqeH7ljDOZI/UXNwo/xdmlwxOs0fItKCg89sWFOBMe6xpQpmi8QLJ/IjtQrofdfzd9R5vZQPM
+ kXBhQxnS3nO1uiykbrA==
+X-Proofpoint-ORIG-GUID: qbpRyo_6t2ZBg_q1AZn7hM0qynkIjzRb
+X-Authority-Analysis: v=2.4 cv=Aa2B2XXG c=1 sm=1 tr=0 ts=6a28f13a cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=l0iWHRpgs5sLHlkKQ1IR:22 a=TtqV-g6YmW1Jfm2GSLaY:22 a=9R54UkLUAAAA:8
+ a=M5GUcnROAAAA:8 a=Fkqlh9ncZL4VOkbnhOEA:9 a=CjuIK1q_8ugA:10
+ a=YTcpBFlVQWkNscrzJ_Dz:22 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: qbpRyo_6t2ZBg_q1AZn7hM0qynkIjzRb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.44 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297432-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[ragnatech.se,kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[renesas.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.dege@renesas.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,redhat.com,marvell.com];
+	TAGGED_FROM(0.00)[bounces-297433-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:horms@kernel.org,m:jiri@resnulli.us,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9A241665D42
+X-Rspamd-Queue-Id: 507B2665DB1
 
-SGVsbG8gTmlrbGFzLA0KDQpUaGFuayB5b3UgZm9yIHlvdXIgZWZmb3J0IHRvIGNsZWFuIHRoaXMg
-ZHJpdmVyIHVwLg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE5pa2xh
-cyBTw7ZkZXJsdW5kIDxuaWtsYXMuc29kZXJsdW5kK3JlbmVzYXNAcmFnbmF0ZWNoLnNlPg0KPiBT
-ZW50OiBUdWVzZGF5LCBKdW5lIDksIDIwMjYgMTE6NTcgUE0NCj4gVG86IFJvYiBIZXJyaW5nIDxy
-b2JoQGtlcm5lbC5vcmc+OyBLcnp5c3p0b2YgS296bG93c2tpIDxrcnprK2R0QGtlcm5lbC5vcmc+
-OyBDb25vciBEb29sZXkNCj4gPGNvbm9yK2R0QGtlcm5lbC5vcmc+OyBHZWVydCBVeXR0ZXJob2V2
-ZW4gPGdlZXJ0K3JlbmVzYXNAZ2xpZGVyLmJlPjsgbWFnbnVzLmRhbW0NCj4gPG1hZ251cy5kYW1t
-QGdtYWlsLmNvbT47IFJpY2hhcmQgQ29jaHJhbiA8cmljaGFyZGNvY2hyYW5AZ21haWwuY29tPjsg
-QW5kcmV3IEx1bm4NCj4gPGFuZHJldytuZXRkZXZAbHVubi5jaD47IERhdmlkUy4gTWlsbGVyIDxk
-YXZlbUBkYXZlbWxvZnQubmV0PjsgRXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29nbGUuY29tPjsN
-Cj4gSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47IFBhb2xvIEFiZW5pIDxwYWJlbmlA
-cmVkaGF0LmNvbT47IGxpbnV4LXJlbmVzYXMtc29jQHZnZXIua2VybmVsLm9yZzsNCj4gZGV2aWNl
-dHJlZUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IG5ldGRl
-dkB2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IE5pa2xhcyBTw7ZkZXJsdW5kIDxuaWtsYXMuc29kZXJs
-dW5kK3JlbmVzYXNAcmFnbmF0ZWNoLnNlPg0KPiBTdWJqZWN0OiBbbmV0LW5leHQgMC8zXSBwdHA6
-IEFkZCBkcml2ZXIgZm9yIFItQ2FyIEdlbjQgZ1BUUCB0aW1lcg0KPiANCj4gSGVsbG8sDQo+IA0K
-PiBUaGlzIHNlcmllcyBpcyB0aGUgZmlyc3QgcGFydCBjbGVhbmluZyB1cCBob3cgUFRQIHRpbWVy
-IHN1cHBvcnQgaXMgaW1wbGVtZW50ZWQgb24gUi1DYXIgR2VuNC4NCj4gQ3VycmVudGx5IHRoZXJl
-IGlzIHBhcnRpYWwgc3VwcG9ydCBmb3IgaXQgaW4gc29tZSBvZiB0aGUgRXRoZXJuZXQgZGV2aWNl
-cyB0aGF0IGNhbiB1c2UgaXQsIGJ1dCBub3QNCj4gYWxsLg0KPiANCj4gVGhlIHBhcnRpYWwgc3Vw
-cG9ydCBoYXZlIGJlZW4gaW1wbGVtZW50ZWQgYnkgaGFja2luZyB0aGUgZ1BUUCBtb2R1bGUgZGly
-ZWN0bHkgaW50byB0aGUgZmlyc3QgRXRoZXJuZXQNCj4gZGV2aWNlIGRyaXZlciB0aGF0IHVzZWQg
-aXQsIFJUU04gZm9yIFY0SCBhbmQgUlNXSVRDSCBmb3IgUzQuIFRoaXMgaXMgdW5kZXJzdGFuZGFi
-bGUgYXMgZWFybGllciBSLUNhcg0KPiBnZW5lcmF0aW9ucyBoYWQgYSBkZWRpY2F0ZWQgZ1BUUCB0
-aW1lciBmb3IgZWFjaCBFdGhlcm5ldCBkZXZpY2UsIGJ1dCBvbg0KPiBHZW40IHRoZXJlIGlzIGEg
-c2luZ2xlIHN5c3RlbS13aWRlIFBUUCB0aW1lciBzaGFyZWQgYnkgYWxsLg0KPiANCj4gVGhlIGN1
-cnJlbnQgaW1wbGVtZW50YXRpb24gbWFrZXMgaXQgaW1wb3NzaWJsZSBmb3Igb3RoZXIgRXRoZXJu
-ZXQgZGV2aWNlcyBvbiB0aGUgcGxhdGZvcm0gdG8gdXNlIHRoZQ0KPiBQVFAgdGltZXIgd2l0aG91
-dCBtZXNzaW5nIGFyb3VuZCB3aXRoIG90aGVyIEV0aGVybmV0IGRldmljZSBkcml2ZXJzLg0KPiAN
-Cj4gVGhlIGVmZm9ydCB0byBjbGVhbiB0aGlzIHVwIHN0YXJ0cyB3aXRoIHRoaXMgc2VyaWVzIHdo
-aWNoIGFkZHMgdGhlIHN5c3RlbS13aWRlIGdQVFAgdGltZXIgYXMgaXRzIG93bg0KPiBkcml2ZXIg
-YW5kIGRldmljZSB0cmVlIG5vZGUuDQo+IA0KPiBUaGlzIHNlcmllcyB3aWxsIHRoZW4gYmUgZm9s
-bG93ZWQgYnkgd29yayB0byBhZGQgcHJvcGVyIFBUUCBzdXBwb3J0IHRvIHRoZSBSLUNhciBSQVZC
-IEdlbjQgZHJpdmVyLA0KPiB3aGljaCBjdXJyZW50bHkgYWR2ZXJ0aXNlcyB0byB1c2VyLXNwYWNl
-IGl0IHN1cHBvcnRzIFBUUCBidXQgd2hpY2ggaW1wbGVtZW50YXRpb24gaXMgYnJva2VuIGFuZCBk
-b2VzDQo+IG5vdCB3b3JrLg0KPiANCj4gVGhpcyB3aWxsIGluIHR1cm4gYmUgZm9sbG93ZWQgYnkg
-d29yayB0byB0aGUgUlRTTiBhbmQgUlNXSVRDSCBkcml2ZXJzIHdpbGwgYmUgYmUgc3dpdGNoZWQg
-ZnJvbSBpdHMNCj4gY3VycmVudCBwYXJ0aWFsIHN1cHBvcnQgYnkgbWFwcGluZyB0aGUgZ1BUUCBh
-ZGRyZXNzIHNwYWNlIGRpcmVjdGx5IHRvIGluc3RlYWQgdXNlIHRoaXMgZHJpdmVyLg0KPiANCj4g
-V2hpbGUgaGF2aW5nIGJvdGggdGhpcyBkcml2ZXIgYW5kIHRoZSAiZGlyZWN0IGFjY2Vzc2luZyBv
-ZiByZWdpc3RlcnMgYnkgdGhlIHVzZXIgZHJpdmVyIiBpbiBvcGVyYXRpb24NCj4gYXQgdGhlIHNh
-bWUgdGltZSB3b3JrcywgYnV0IGl0IGlzIG5vdCByZWNvbW1lbmRlZC4gSXQgd29ya3MgYnkgY2hh
-bmNlIGR1ZSB0byBob3cgYm90aCB0aGUgUlRTTiBhbmQNCj4gUlNXSVRDSCBkcml2ZXJzIGludGVy
-bmFsIHdvcmtpbmdzLg0KPiANCj4gRm9yIHRoaXMgcmVhc29uIHRoaXMgbmV3IHNvbHV0aW9uIHdp
-bGwgb25seSBiZSBlbmFibGVkIG9uIHBsYXRmb3JtcyBhZnRlciBhbGwgdXNlcidzIG9mIHRoZSBn
-UFRQIGNsb2NrDQo+IGhhdmUgbW92ZWQgdG8gb25seSB1c2UgdGhlIG5ldyBjZW50cmFsaXplZCB0
-aW1lci4NCj4gDQo+IEZvciBzb21lIHBsYXRmb3JtcyB0aGlzIGlzIHN0cmFpZ2h0IGZvcndhcmQs
-IHN1Y2ggYXMgVjRIIFNwYXJyb3cgSGF3aywgd2hpY2ggb25seSBoYXZlIHRoZSBSQVZCDQo+IEV0
-aGVybmV0IGludGVyZmFjZS4gVGhpcyBwbGF0Zm9ybSBjdXJyZW50bHkgaGF2ZSBubyB1c2VycyBv
-ZiB0aGUgUFRQIHRpbWVyLCBidXQgc3RpbGwgYWR2ZXJ0aXNlIGl0DQo+IHN1cHBvcnRzIGl0LiBU
-aGlzIGFuZCB0aGUgc29vbiB0byBiZSBwb3N0ZWQgUkFWQiBwYXRjaGVzIHNvbHZlcyB0aGF0Lg0K
-PiANCj4gQXMgdGhlIFJBVkIgcGF0Y2hlcyBkZXBlbmRzIG9uIHRoaXMgc2VyaWVzIHRoZSBkZXZp
-Y2UgdHJlZSBub2RlIGZvciB0aGUgZ1BUUCBjbG9jayBpcyBhZGRlZCBpbiB0aGlzDQo+IHNlcmll
-cyBidXQgd2lsbCBiZSBlbmFibGVkIGFuZCBsaW5rZWQgdG8gY29uc3VtZXJzIGluIHRoZSBSQVZC
-IGdQVFAgc2VyaWVzIGZvciBwbGF0Zm9ybXMgd2hlcmUgaXQgd2lsbA0KPiBub3QgY29uZmxpY3Qg
-d2l0aCBSVFNOIGFuZCBSU1dJVENILiBBbmQgZnVydGhlciBlbmFibGVkIGFzIG1vcmUgb2YgdGhp
-cyBpcyBjbGVhbmVkIHVwLg0KPiANCj4gVGhlIGdQVFAgZHJpdmVyIGl0c2VsZiBpcyBoZWF2aWx5
-IGluZmx1ZW5jZSBieSB0aGUgZXhpc3RpbmcgcGFydGlhbCBzdXBwb3J0IGZvciBnUFRQIGluIHRo
-ZSBSVFNOIGFuZA0KPiBSU1dJVENIIGRyaXZlcnMgYW5kIHRoZSBSZW5lc2FzIEJTUC4NCj4gDQo+
-IE5pa2xhcyBTw7ZkZXJsdW5kICgzKToNCj4gICBkdC1iaW5kaW5nczogcHRwOiByZW5lc2FzLHJj
-YXItZ2VuNC1ncHRwOiBBZGQgYmluZGluZyBmb3IgUi1DYXIgR2VuNA0KPiAgIHB0cDogQWRkIGRy
-aXZlciBmb3IgUi1DYXIgR2VuNA0KPiAgIGFybTY0OiBkdHM6IHJlbmVzYXM6IHI4YTc3OWcwOiBB
-ZGQgZ1BUUCBub2RlDQo+IA0KPiAgLi4uL2JpbmRpbmdzL3B0cC9yZW5lc2FzLHJjYXItZ2VuNC1n
-cHRwLnlhbWwgIHwgIDY0ICsrKysrDQo+ICBNQUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgfCAgIDcgKw0KPiAgYXJjaC9hcm02NC9ib290L2R0cy9yZW5lc2FzL3I4
-YTc3OWcwLmR0c2kgICAgIHwgICA5ICsNCj4gIGRyaXZlcnMvcHRwL0tjb25maWcgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB8ICAxMiArDQo+ICBkcml2ZXJzL3B0cC9NYWtlZmlsZSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgIDEgKw0KPiAgZHJpdmVycy9wdHAvcHRwX3JjYXJfZ2VuNC5j
-ICAgICAgICAgICAgICAgICAgIHwgMjE5ICsrKysrKysrKysrKysrKysrKw0KPiAgNiBmaWxlcyBj
-aGFuZ2VkLCAzMTIgaW5zZXJ0aW9ucygrKQ0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50
-YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9wdHAvcmVuZXNhcyxyY2FyLWdlbjQtZ3B0cC55YW1s
-DQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9wdHAvcHRwX3JjYXJfZ2VuNC5jDQo+IA0K
-PiAtLQ0KPiAyLjU0LjANCj4gDQpBcmUgeW91IGF3YXJlLCB0aGF0IEdlbjUgaXMgb24gdGhlIGhv
-cml6b24/IFRoZSBmaXJzdCBwYXRjaGVzIGZvciBYNUggaGF2ZSBiZWVuIHVwLXN0cmVhbWVkLiBY
-NUggd2lsbA0KYmUgdXNpbmcgdGhlIHNhbWUgZ1BUUCBkcml2ZXIuIEkgdGhpbmsgaXQgd291bGQg
-YmUgYSBnb29kIGlkZWEgdG8gbWFrZSB0aGlzIGRyaXZlciBnZW5lcmljLCBtZWFuaW5nDQpsZWF2
-ZSBvdXQgdGhlIHJlZmVyZW5jZXMgdG8gR2VuNC4gV2hhdCBkbyB5b3UgdGhpbms/DQoNCkJlc3Qg
-cmVnYXJkcywNCg0KTWljaGFlbA0K
+On 2026-06-09 at 09:34:46, Ratheesh Kannoth (rkannoth@marvell.com) wrote:
+> Improve MCAM visibility and field debugging for CN20K NPC.
+>
+> - Extend "mcam_layout" to show enabled (+) or disabled state per entry
+>   so status can be verified without parsing the full "mcam_entry" dump.
+> - Add "dstats" debugfs entry: for enabled MCAM indices, print hit deltas
+>   since the prior read by comparing hardware counters to a per-entry
+>   software baseline and advancing that baseline after each read (hardware
+>   counters are not cleared).
+> - Add "mismatch" debugfs entry: lists MCAM entries that are enabled
+>   but not explicitly allocated, helping diagnose allocation/field issues.
+>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260609040453.711932-1-rkannoth%40marvell.com says:
+
+> +				continue;
+>> +			if (stats == dstats[bank][idx])
+>> +				continue;
+>> +
+>> +			if (stats < dstats[bank][idx])
+>> +				dstats[bank][idx] = 0;
+>The dstats[][] array is module-global and the show handler both reads
+>and writes it on every read.  A few observations about that contract,
+>which the commit message describes as "hit deltas since the prior
+>read":
+>The baseline survives across npc_cn20k_enable_mcam_entry(..., false)
+>followed by a re-enable with a different tenant.  If the new tenant's
+>hardware counter happens to equal the cached baseline, this branch
+>silently skips the entry:
+>	if (stats == dstats[bank][idx])
+>		continue;
+>On counter rollback the code zeroes the baseline first and then
+>computes the delta against zero:
+>	if (stats < dstats[bank][idx])
+>		dstats[bank][idx] = 0;
+>	...
+>	delta = stats - dstats[bank][idx];
+>so the very next read after a rollback reports the full absolute
+>counter value rather than a delta.  Is that the intended behaviour?
+>Also, since dstats[][] is a single shared baseline, two concurrent
+>readers (for example an operator session and a monitoring script)
+>serialise on stats_lock but each read advances the baseline for the
+>other, so each one sees only a fraction of the deltas.  Would
+>per-open state (allocated in the open() callback rather than file
+>scope) be more in line with what the commit message promises?
+
+Thanks for pointing this out. The dstats matrix is intended purely
+as a lightweight telemetry tool to identify which MCAM entries are
+actively being hit by current traffic via debugfs, rather than
+providing strict, transactionally guaranteed billing or accounting
+metrics.
+You are correct that a stale baseline could cause a transient
+under-reporting on the very first read after a reallocation if the
+hardware counter quickly surpasses the old baseline. However,
+during that first read, the fallback logic will immediately catch
+up and synchronize dstats[bank][idx] to the current hardware state
+(stats). All subsequent reads will reflect completely accurate hit
+increments.
+Given that this is non-critical debugfs telemetry, i would like to
+keep this as it is. or fix it as part of "net" tree.
+
+>> +
+>> +			pf = 0xFFFF;
+>> +			map = xa_load(&npc_priv->xa_idx2pf_map, mcam_idx);
+>> +			if (map)
+>> +				pf = xa_to_value(map);
+>> +
+>> +			delta = stats - dstats[bank][idx];
+>> +
+>> +			snprintf(buff, sizeof(buff), "%u\t%#04x\t%llu\n",
+>> +				 mcam_idx, pf, delta);
+>> +			seq_puts(s, buff);
+>> +
+>> +			dstats[bank][idx] = stats;
+>> +		}
+>> +	}
+>> +
+>> +	mutex_unlock(&stats_lock);
+>> +	return 0;
+>> +}
+>npc_mcam_dstats_show() calls npc_mcam_idx_2_key_type() and then uses
+>key_type to decide whether to skip bank 1 for X4 entries, but it does
+>not take sb->lock while doing so.  The existing npc_mcam_layout_show()
+>in the same file holds sb->lock around exactly these field reads:
+>	mutex_lock(&sb->lock);
+>	...
+>	if (sb->key_type == NPC_MCAM_KEY_X4) {
+>	...
+>The mutators __npc_subbank_mark_used() and __npc_subbank_free() update
+>sb->key_type under sb->lock via their npc_subbank_alloc /
+>npc_subbank_free wrappers.
+>If a subbank is concurrently being retyped, can this reader observe a
+>transient sb->key_type value (for example 0 mid-free, or X4 for a
+>subbank being retyped to X2) and as a result drop or duplicate
+>entries due to the "key_type == NPC_MCAM_KEY_X4 && bank != 0" filter?
+
+The dstats matrix is intended purely
+as a lightweight telemetry tool to identify which MCAM entries are
+actively being hit by current traffic via debugfs, rather than
+providing strict, transactionally guaranteed billing or accounting
+metrics. So these concurrency issue wont defeat the purpose of this
+mcam entry.
+
+>> +static int npc_mcam_mismatch_show(struct seq_file *s, void *unused)
+>> +{
+>> +	struct npc_priv_t *npc_priv;
+>> +	struct npc_subbank *sb;
+>> +	int mcam_idx, sb_off;
+>> +	struct rvu *rvu;
+>> +	char buff[64];
+>> +	void *map;
+>> +	int rc;
+>> +
+>> +	npc_priv = npc_priv_get();
+>> +	rvu = s->private;
+>> +
+>> +	seq_puts(s, "index\tsb idx\tkw type\n");
+>> +	for (int bank = npc_priv->num_banks - 1; bank >= 0; bank--) {
+>> +		for (int idx = npc_priv->bank_depth - 1; idx >= 0; idx--) {
+>> +			mcam_idx = bank * npc_priv->bank_depth + idx;
+>> +
+>> +			if (!test_bit(mcam_idx, npc_priv->en_map))
+>> +				continue;
+>> +
+>> +			map = xa_load(&npc_priv->xa_idx2pf_map, mcam_idx);
+>> +			if (map)
+>> +				continue;
+>> +
+>> +			rc = npc_mcam_idx_2_subbank_idx(rvu, mcam_idx,
+>> +							&sb, &sb_off);
+>> +			if (rc)
+>> +				continue;
+>> +
+>> +			snprintf(buff, sizeof(buff), "%u\t%d\t%u\n",
+>> +				 mcam_idx, sb->idx, sb->key_type);
+>> +
+>> +			seq_puts(s, buff);
+>> +		}
+>> +	}
+>> +	return 0;
+>> +}
+>The same observation applies to npc_mcam_mismatch_show(): sb->idx and
+>sb->key_type are read here without holding sb->lock, while the rest
+>of npc.c serialises mutations of these fields under that lock.  Was
+>sb->lock omitted intentionally for these debug paths?
+
+This was omitted intentionally. npc_mcam_mismatch_show() is a debugfs dump
+intended to provide a point-in-time snapshot. Acquiring sb->lock per subbank would
+only protect that specific iteration and wouldn't guarantee full consistency
+across the entire loop snapshot anyway. Therefore, we avoided the locks here.
 
