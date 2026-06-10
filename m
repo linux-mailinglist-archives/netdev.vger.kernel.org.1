@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-297585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297553-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zRiFBPQ2KWrfSQMAu9opvQ
-	(envelope-from <netdev+bounces-297585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:05:40 +0200
+	id 9PVmDhs5KWppSgMAu9opvQ
+	(envelope-from <netdev+bounces-297553-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:14:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 888806681AD
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C031066829D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 12:14:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=starfivetech.com (policy=quarantine);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297585-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297585-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297553-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297553-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA36730C09BC
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:57:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FF66342147F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC7D3E2759;
-	Wed, 10 Jun 2026 09:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D35C3B95E0;
+	Wed, 10 Jun 2026 08:58:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2122.outbound.protection.partner.outlook.cn [139.219.17.122])
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2092.outbound.protection.partner.outlook.cn [139.219.146.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA003E2754;
-	Wed, 10 Jun 2026 09:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28A03B27EF;
+	Wed, 10 Jun 2026 08:58:45 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781085466; cv=fail; b=UFi82lCC/NI446i6IHyo/fArgFsPi0twBesarhJbuVRKcAXWndZcaVLxWXAHg9SmPqPgCMVDFhnWLJQSnmwmpn4LsNjIBmsbHyvY8VBqFKXhNWcxZ4GtbBdDgL29/3SVEJy4Kp5WM9B5yP//L/XRRUpYA4BBpq9Ua9+0nVRDciI=
+	t=1781081929; cv=fail; b=KDEvBnM961RaklVdlWhMeq6b9LJ293vCr0ks4OaSA5WbsJq136tZnKzALzkiIFryYaJ13BSkT+LtXGjqUejNH7QL0s/Y8FXihBRMOdLLB8GpDPgRJ0ysp5XNXLvO+ZVSopT0WmUL6e7+7pisL63UdNDc5eopkCoqZRCR7fOa+Go=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781085466; c=relaxed/simple;
-	bh=7A7KVgft2ue4eb9zKiDHikW+tlvjwHfl/XQsYG/ETi0=;
+	s=arc-20240116; t=1781081929; c=relaxed/simple;
+	bh=JjpNc9EVBsM0/q1E3c/n4qbP0SATs7eGD/yQ7V6xCbA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dLRrMUQZDtIE/1HdmEKt3f5H1tsRAfx4CG5NpUjZquM7CvCnq2O+rkjqknDty9255MIHXTUh+b6hI7FmUl/fg1NhIK2iBNnN7F3ddvxadAEhnBUyB8CfMOZrgmnlYI1WtMcvw9M/ii2xycuBs9Y6HlQbtFLLoOrforJYoyP5xRc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.122
+	 Content-Type:MIME-Version; b=gnT+094DfqR8K5G5Wq6KedAzJP1ReObzFyVb/SUKl5BR/huGKttvhmHZTNSQ9RLq5p7kmKnHvcVZJS20sYMHNsbQ2DfW+PPq9by4dTq93L21j0/mqEJHJUyoUOMlEvNfB4ok1DHrCD5cn1kB4R9ttEiLjL1D4DblqfAxfJrGX8w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.92
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QdcNdO5iiNm4OrOFjxv5MD2tCAwpDmELJMv3FXpMYaG9/U8AJcSWtXFsHqozDwTl155rkF7QgRXjIy79MbhYyim0d3QI16N5Cfur0CFfnaALSgqVVGDSd/wOnbFVVB6wrolTJOpzmTPnSX31fZyd1oEwVnlTCcFRlyGnHazOzKI7h+fNEyWxwPrDThrtyGzJ8mOuNVLLQRPA9P7Dq/DrFiDvhH6qCyd9ZI4lfKhjhXxUUli0/k1BaNgCT3XBNij8JPTQA6vQaFMlxLJdHfq0y14giYr9uGDrI2rm/A0bkL8iS9b7wfYvf8lwoN62fSizNIz7uwx44g741xHLmvikKA==
+ b=eDD5ta9xuLzlOW0PywSUyiBqDfMG+hrKPlKihVmupG6/SJx01PUhTWfPcIw9j7hBiQAMJmZaHpV19vQt5Zw6dBG+epCOGvaxBBJdG+ggA8dV6TKibUcyWS/8QyvarVHPLGsmrnPIK74p56TuMziJaJTSqjnZUGzUs8pfrGeIddaHZYPGlZ9cAjvNZTISe6mUjhEH3MtdXGMRGBZHZ6MfI2SqOyU7PStZ5nCBFbf0SpW/uX6PYo1SMCBWzAvGXNKXQ9JlmJKLIrg9+ziEceQVilbY4AOpTWcfkVWsaN4haFvfGY5CGhZZ15sCIBZ8up13TJAY6OltSasp7+qfh+l65g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dcEeQm5DdxCT9YGQcyHsXOsVRp1Z3YT5KA+ISTv0vl4=;
- b=Hj/YAxmos8PrAV4e5JRjMi0UnIuB9uv3Sx8zBlkFXkch5XbVuYlddHD9icqMssDuMcLyI0XFQbqyoZVWxY2yrvHgiNtgB5reEFPbQTZadvMNwfa2/RG6QhZ4s8mh6am+zk8krpgAZe819iwC0cRBPnDXTcQER8LnkbgDj2vtralHfYseyXX5RTpIYAoQJdIk7+JjbArJJHudz4nTJ/AAty6yIZe1c7gjND99Ngze5mVZt/vs0kv5dItFqyYDKxC+yBkhcso621TfwJx3m9HjvnqMQVJOoSd5e6LrMVbI7ztYb4ICiKtdIlqaVsBDot598PcjsgFrlVvdK4fUu59Y4w==
+ bh=InpX30kLV6j6y1pktEdVB4ByqdJlg7uYDA3SRiJYWv4=;
+ b=fT5br+uFYC3r7lRB4lNby1NGNZTo+yg1MkFnLJuIHy1jESNL0+2Sa26FJT8lGa2m7cKLZ7IygOEdtdEwE/zV/gksc7qcBZBU7/IZWCKdUmJvA46cLcn7Y+xmQIEyNmm1FqERGFiUCbUskw5ap3i680C8z/+srv2+29WvBhU0eKk6k6zWGc51VAiAUfaDRrY2Lq9FhbstTtU6vc9IEAQm3HtQJFVKuBncVCqBlc0Zua/fFo6M0RGBhHIjkaP3b3RLS6C8PLCYpVI5Kj9d+B1CL7UlWEzxVrYEsnjm3wZXGEMM9lYrp3hxM+pjlMpaVYx8XeWHTmMJeAsjEkVduCLRkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -48,11 +48,11 @@ Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c311:25::15) by SHXPR01MB0512.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c311:1c::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.11; Wed, 10 Jun
- 2026 07:24:32 +0000
+ 2026 07:24:33 +0000
 Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
  ([fe80::9b99:12dc:a115:b90f]) by
  SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
- with mapi id 15.21.0092.014; Wed, 10 Jun 2026 07:24:32 +0000
+ with mapi id 15.21.0092.014; Wed, 10 Jun 2026 07:24:33 +0000
 From: Minda Chen <minda.chen@starfivetech.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -72,9 +72,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	devicetree@vger.kernel.org,
 	Minda Chen <minda.chen@starfivetech.com>
-Subject: [net-next v1 4/6] net: stmmac: Add NCSI VLAN setting
-Date: Wed, 10 Jun 2026 15:24:18 +0800
-Message-Id: <20260610072420.64699-5-minda.chen@starfivetech.com>
+Subject: [net-next v1 5/6] net: dwmac4: Add NCSI mac speed and duplex setting in NCSI case
+Date: Wed, 10 Jun 2026 15:24:19 +0800
+Message-Id: <20260610072420.64699-6-minda.chen@starfivetech.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20260610072420.64699-1-minda.chen@starfivetech.com>
 References: <20260610072420.64699-1-minda.chen@starfivetech.com>
@@ -90,56 +90,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0512:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ea83b61-68bd-4287-89fc-08dec6c1510c
+X-MS-Office365-Filtering-Correlation-Id: 0c7bd859-6635-4299-39ce-08dec6c1519d
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
  BCL:0;ARA:13230040|23010399003|366016|1800799024|7416014|376014|52116014|22082099003|18002099003|38350700014|921020|56012099006;
 X-Microsoft-Antispam-Message-Info:
- N2UYCamWLi8kfLNvctwz8tbHbavysmPtdg0bGatJb5/gvfKmju6y+r6Omm30DdLnDMOHTGXWyJ/BN+o0hKTum6I4TFt75inJwWsR1cnz4HwPP9NIY7VBXXk7b3xcVPSxqQt1EPC8dvyapwBY9gyZyz1RND5fbCcuTIm2OHPRVLN+XfREVIiNdvwjs4njZtFf0N/Aj9Bal3agk5hkBXu9dcZ3NGMkqQDUYd4zceSza1A2JuaVR6IjaO6fLyV6X3uf4OQfU6eDX25EuKTU1lDomiW1+Ya/d3yr9ig7znTtbugJzsbu9hZ/fyPiTYJevOWuHgNSTLjoIOE2PU70Gr5P0kJjsOuV9I2/VjV7nrEMCYE7vvNuHR4HXBFRH4YhslqJSdSmmRvXowjDZHypBvO+LH5ENi8yMmuqFEGhNQbv8k2cV7dwg7YZw22hSJUFQsE8/jeSYbU41EDTwBBhHjmt3Oa1tWs3oIRX6K+0C60kTJ1fEb++nRciAcyAd/Vn4s/OzvWd7a+S2Zejt69RfhqqATDjlyiVjLJmKyYx971vvt6otUeQxZwy1uzFnYGhyrLeV4C7abmlSoqX40y41MCM4w==
+ OhizK9a9QWKpfD0TrbLK41fzQBC+JmpxAbeeLdGmilo00Hh+RwSNUJMHfyFfgkKxqgSSN++eYDGjUA7N1caeM2ne5WzxmxExoME7WpQI/j1DtR9q6dpav8YT7ZKgRybOl51YVSH0K29RYTB/s1MkS3NnpbR+pDLqaK9H01lQ2rtjFL1oaILa7w7pKGzhDIXJQ8n0roEMyq8yfBjKTTAfl+3ZYANErqLOQe0t9AKAi2IKkg0DHuCnHr1FychGvbt9xgZsoK4pnT1egdFtWTmoX5S1MJ2EppH3aYeo6mApXCw00rIM3ptitXD0aNifxhIPbAzE+/UbwXabbhCxpKSeOEO3aocYYKL7cC0X8LZjcTcW+i9QtYBjJmvMWSYet0WY6ip0pVe5ESpNBVlqPV9LE6DcrfySVOg1NM/JVxXUfv1a+GIUXjqrS7fj8BfGQ7tOcMumF9T6frRBvkHUlWPJrbwFAHrlq7MMEnnVzmcGvbWH0QByhyLWZeeaglSmPRILCgz05w1gtm+vUATkw3X8h3iaVRDozWPxt4csgLalv99ujt7hGSL19B7rh3ySbgJPXd7ALlA85jxUJJPeMH1JtA==
 X-Forefront-Antispam-Report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(7416014)(376014)(52116014)(22082099003)(18002099003)(38350700014)(921020)(56012099006);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?NG9Jt8yWfgB6anf1e4/6pJbRxvY7EpvpUDjYTnaU+nQgTR5bD9PMUjWWeecJ?=
- =?us-ascii?Q?OyGVZ/+Vye8BSaucl0JgzXr095g1bnqeodlHiEZJ6sxegNIR3mWri6KOc4OB?=
- =?us-ascii?Q?ZM9ldswESPKo9qHSxAeTA1DW5x7KF1cNQc1/tysQPphRudNp2NWt43ZoI3vq?=
- =?us-ascii?Q?t8muQl9t4M5NDkkfK7qBuVj9wXQqJu3/k6wNNZBr0k4i4Pr0t5aBswt51w3i?=
- =?us-ascii?Q?HlhRMSVHc0Tg2zAei2zWNFixKmAorqz/Yt+d70LggwtD7Q0DBfpaXQIDKM5G?=
- =?us-ascii?Q?dxUUczJB9e4U5BTMnCSoN/SL1+K7HhSkSdASntvQrTXwqAqljEg/1TxHbQt7?=
- =?us-ascii?Q?VUQw/TokjqfZNe9H1fS9+Rl6C809QoIXJhbJ4lfF4qXDBV4vpTf3EbJRJesG?=
- =?us-ascii?Q?xRx7zEbTtis2gMKlJEDp38N/3PYMLmEFfXaDbtS4Cf1tDU9xbvFAdc8oJohE?=
- =?us-ascii?Q?O5shTb3ytN3bjamZ9thcUmVaXO77kckYcInJl1xH63PFHyOzYEQZU8EfFgZ1?=
- =?us-ascii?Q?NyawEFAoooCNGl+negCVM/2d+Kx2UUCQ/ojtfDLAq6ddHBNhepcZZGQRR2x5?=
- =?us-ascii?Q?etFyEi9/JnYz1AWzvCPsCrp4Fj6blstDsRuNI0onS2gNF//1gLMVJi82dy1m?=
- =?us-ascii?Q?Dkm2iJZFOIlOqaIxi29eYO8KkVmGqk5EPThRVON2vo5muWfHPYe6/D3nXvYw?=
- =?us-ascii?Q?hTCJnPyQ8drQ/fsEJ2BAjKI29s5GHSiDnC7z/KjbOS4yEF3HcLj3QbHLoWq7?=
- =?us-ascii?Q?9HurUEoqC0Sf5ufJpTpVFvjLk8+8qwZ4jbIGuE7YFSuPyNrL6H4kfmKOZ63K?=
- =?us-ascii?Q?s14tOzDayTv5X6VyMLDPQZ2joqqDVzRz9Coobw7PHR9QMzumxLVEjWVBTS8w?=
- =?us-ascii?Q?7xc9FdidMFABifPPJ2RSKhORlCUR1ohr7LEKPLlfyGLHnF7N8CQj7V4ZuemS?=
- =?us-ascii?Q?Z9xr4SM4VjpFUIi5M/56ZKerKy7WPuJQK/IyoF4qDwWWdpgEGMU1NjOTeVjW?=
- =?us-ascii?Q?c9B23OFYRMYB+IK0xIYMq3ttIdcJvm66N/TVqYXFSknrDwF90kHpobH9yT8Y?=
- =?us-ascii?Q?VzyN9UfCBl8ILaGjksFy0sKXgNxuWWRNGWZ5jBPJdLlGt4dk7okWgj0drMD0?=
- =?us-ascii?Q?MZoPhLepc6TFgdefoYDRCmM0LXYKqv04bzqdw241FDIj0Vw62vpaythV0Y5p?=
- =?us-ascii?Q?m+9eJC6YjbH18L3iCfUuYOn58D1SJSDrMYi1wV3XMjAcoznyjOFTMhIqAkzJ?=
- =?us-ascii?Q?Re0fgisB+aExD2gf3uS0aVTbWUzGw9onVaKD41vxIyQWUVzs5cSMsGpwndD1?=
- =?us-ascii?Q?p+8bGJd3ab74jY5CMMSVDy/5O5Xfd7om7//dJfk9Q9JE+/m7JfFkQuME2HJ0?=
- =?us-ascii?Q?+igFkgueyTto22jPFlIsxDSkAxMpcCZ8ilsGN4wVLvgxeBiKq1qV9JI7iv4p?=
- =?us-ascii?Q?rLp/AhABPeCOox38ISCR3pMpaU+Sxz5gO52nQ6xj6PSBSKEl5vwD7rRagx7I?=
- =?us-ascii?Q?Xhg1SZmgcyb1W7jN8RkNgjmYqxa7Arnkj8eUCKPOkqZiOhtBU4/GK6MvO5mI?=
- =?us-ascii?Q?ovNkZ0Kbd2R+KgyJBDJIy5hsYk9nIfD2odyw06DZB9pFQ02ZLxIXKNbEQ5xv?=
- =?us-ascii?Q?vK+RB+//cRzqtajGlsBIX3cSFZTHxpa1XGGxnGEpbL6modS30oGrcGeYJDzj?=
- =?us-ascii?Q?THgWRb86OzuPzGq4LLTS+IYT1Ofe3BWbjaCfmLAK6IG5FMWFfAlSSkqFDgy5?=
- =?us-ascii?Q?3GYtnFbv3KoxXJELMRXkbOzI83l5qgg=3D?=
+ =?us-ascii?Q?GXhVKwehCrWR0siaDlt0oPrMAQeeJGt7SKLbdkvlS0ODPuVQNMguclL+Mjbj?=
+ =?us-ascii?Q?qiSEhVWxWnAWbLyoynGildhpW/YzRBCz3Z+86Us41FhV60JsRsa6Sfujyhdn?=
+ =?us-ascii?Q?RajV9Vi8EBngJu2vrnGuMQJByI4RkxyGFORxvDBU3n9P+a1ssAkOb2EQiEkO?=
+ =?us-ascii?Q?RFEdkL4jv8P4II4C9RFYMs30u2KDypNliz/HhU36WM4GilBmCeyCozNo5Tyc?=
+ =?us-ascii?Q?hk+eF0UBeqPjOh+uszQ1iZevmIBClxjwJ28IIw8FdT0Fp63k78Qy0uXjUsCg?=
+ =?us-ascii?Q?U9bmBVUb3b4NoV/IoK2ZUbZVVGNJLpQt5ZVxL4PcbS82lLf5g3nino9X6KxF?=
+ =?us-ascii?Q?Uvpc5NMoryCRoUpSw6QJTToPSCMiscFqenHYdRitIFn9TIHxs8ihBzD3nZ/D?=
+ =?us-ascii?Q?p4SRjW05ZqFJe4cB2WDF62lf5bRToduk7ReUVhG01KtGJxpuCARr2WBWqb5p?=
+ =?us-ascii?Q?TO4Z3aYghedK+zEPSQ9qxzvkmY3/kFkMci+Z78ltme2MaVlvPp+fi70TXFC3?=
+ =?us-ascii?Q?1f+qqryw08uhIq7fg/PeIRbD3KgcI4nB0e8Jkm8GdCjHuU+JQL+OcDIdfFaS?=
+ =?us-ascii?Q?RYgjaPrVBXqQNfYxz5gVsNpcwyAJIRaWoyYwueYfxVYJq05zoLWb5B2hvWJi?=
+ =?us-ascii?Q?RGnk4dQQKe9XRKoAvJCwGjaxpqofkYx/y3HcTUK5dkXMRvxbzPhShRYDzevM?=
+ =?us-ascii?Q?h5qB+zWnXSzXC9640Uttt0fYCYBpznWsvj1jmb4cpkNMjNlVFsv/7YpNpGSs?=
+ =?us-ascii?Q?GVC1lAk2L7DvWSPJkKW1y0CdadwIKs3p99w7R7rkoXmilnsbwc4e6XvOR2gt?=
+ =?us-ascii?Q?LttW3364aWbTfJm4uEaF2M8RTjPE/zzg7R2S5ekTsL15Nq/7P4jkZADdqVWs?=
+ =?us-ascii?Q?07jL8X2GQSEUTX4tHFJdLmbslzEbZUxwwV2E+D3VMlqScO1fpauWJDzv/mbk?=
+ =?us-ascii?Q?ktC182/me7EGZf1uijCFdiRaw5PoiOAy1LFD4rgE0bNGM+hvtMfpVuU+5qLE?=
+ =?us-ascii?Q?2Vyq0+m/T7Jjzb6HUqp66AuzX9sZ+OShxH75TIQv3hz885T+GvE7gh+61d6Q?=
+ =?us-ascii?Q?Ekitol7wLUCK9LNKuWL5h9Wln7OCA0rcyOYxZaGa6jxG9uD3hEwUiCTNOehD?=
+ =?us-ascii?Q?VsYyNddGJG/RTfmD9v0N6iFMu86BctFPrNaDxdZMhKNR+jihAC6sVuURdMOD?=
+ =?us-ascii?Q?zM3mHf5M5vp7U4r5SkrR4hWgpyQpqXyuPcTLqNOlIZn4uLgWN98b6WwtWHg2?=
+ =?us-ascii?Q?kGVtzOB4m5nIK0IjEYZ8lAXfregXKOJmDXtJuhkK5SJE5m+lm2hf+3VQJT7g?=
+ =?us-ascii?Q?YDRvDcTnxFD2O61S6cwe77I3nYWXhWEL0F0F4Cy/g8ZEXjv5yhPpq++NrcoF?=
+ =?us-ascii?Q?YZ5PPfv0KjIb/sEQhfqlcY5BR8OXhudhBUIC6QhHPcAigyWStIl/14XNOgei?=
+ =?us-ascii?Q?ZVlknH3uZiIywPZy8FFvOXeX3YpzJWIlQjip39K5stnnOunfUU4vW6ROdq+R?=
+ =?us-ascii?Q?xhh9OUrT83sif/S74p9donEZbyUCoJMHNY+HMYkeY69cRQh/tJHjmbpEqbi9?=
+ =?us-ascii?Q?y2M3R7sM1HRoQ9Wa94ngU0d/f8UwQWO79vFyRCZczvBsBc42ZAm8Ou4Wt6ZV?=
+ =?us-ascii?Q?T5hqO4mZDZxGdmXSVThEzKmOW28Ib6uqZXoxucw6kxpp69CUtY5ZlZGrkNog?=
+ =?us-ascii?Q?3jhWs/+GD+3xcA3duDp08ZKv/zRCdmNMTYZCyWw2vX1bCZo0/GFp9800RUkN?=
+ =?us-ascii?Q?aNC+phaYCkVV/PyMZmFZOWCkckp+20o=3D?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ea83b61-68bd-4287-89fc-08dec6c1510c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c7bd859-6635-4299-39ce-08dec6c1519d
 X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 07:24:32.4963
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 07:24:33.4471
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EfWjy8E6tY5496EKO53T9pTnlBBz88PYp4NZjoyq6AM4qjKDtwaihUP87mkr1hhZ+MmeU7QANZzZWJeuIvJfMl5hMfVtKmbCehECNgZBALE=
+X-MS-Exchange-CrossTenant-UserPrincipalName: yyzqIVijSGKpdwky3Y575whHm81eiMMGXe90LYcxrIcgBBn9Gryo+8FGllhP+ADKw4zSdnEpg1StaxCZ2jazalUCepu1il/dilVbLWYaTW8=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0512
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [5.04 / 15.00];
@@ -162,7 +162,7 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297585-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297553-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
@@ -174,53 +174,44 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:email,starfivetech.com:mid,starfivetech.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,starfivetech.com:email,starfivetech.com:mid,starfivetech.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 888806681AD
+X-Rspamd-Queue-Id: C031066829D
 
-Add NCSI vlan setting while in NCSI cases,
-The code process is like NCSI mode in faraday
-ftgmac100.c.
+Add dwmac4 mac speed config and duplex setting in NCSI case
+because NCSI lack of PHY, will not call stmmac_mac_link_up().
 
 Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b6af53783883..b8ce04d71d08 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6866,6 +6866,9 @@ static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid
- 	bool is_double = false;
- 	int ret;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+index c6fcfae27c3d..7db4c5dc1f80 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+@@ -46,7 +46,20 @@ static void dwmac4_core_init(struct mac_device_info *hw,
+ 	u32 value;
  
-+	if (priv->plat->use_ncsi)
-+		return ncsi_vlan_rx_add_vid(ndev, proto, vid);
-+
- 	ret = pm_runtime_resume_and_get(priv->device);
- 	if (ret < 0)
- 		return ret;
-@@ -6908,6 +6911,9 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 	bool is_double = false;
- 	int ret;
+ 	value = readl(ioaddr + GMAC_CONFIG);
+-	writel(value | GMAC_CORE_INIT, ioaddr + GMAC_CONFIG);
++	if (priv->plat->use_ncsi) {
++		/*
++		 * In NCSI case, because lack of PHY, will NOT
++		 * set the mac speed config and mac duplex
++		 * in stmmac_mac_link_up(). Now set these in
++		 * core init function.
++		 */
++		value |= GMAC_CORE_INIT;
++		value &= ~priv->hw->link.speed_mask;
++		value |= priv->hw->link.duplex | priv->hw->link.speed100;
++		writel(value, ioaddr + GMAC_CONFIG);
++	} else {
++		writel(value | GMAC_CORE_INIT, ioaddr + GMAC_CONFIG);
++	}
  
-+	if (priv->plat->use_ncsi)
-+		return ncsi_vlan_rx_kill_vid(ndev, proto, vid);
-+
- 	ret = pm_runtime_resume_and_get(priv->device);
- 	if (ret < 0)
- 		return ret;
-@@ -7943,6 +7949,9 @@ static int __stmmac_dvr_probe(struct device *device,
- 	ndev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
- 			     NETDEV_XDP_ACT_XSK_ZEROCOPY;
- 
-+	if (priv->plat->use_ncsi)
-+		ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+
- 	ret = stmmac_tc_init(priv, priv);
- 	if (!ret) {
- 		ndev->hw_features |= NETIF_F_HW_TC;
+ 	/* Configure LPI 1us counter to number of CSR clock ticks in 1us - 1 */
+ 	clk_rate = clk_get_rate(priv->plat->stmmac_clk);
 -- 
 2.17.1
 
