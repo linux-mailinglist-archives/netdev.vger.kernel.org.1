@@ -1,138 +1,192 @@
-Return-Path: <netdev+bounces-297692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rNNoDdFuKWpHWwMAu9opvQ
-	(envelope-from <netdev+bounces-297692-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:04:01 +0200
+	id +7yqKghxKWrOWwMAu9opvQ
+	(envelope-from <netdev+bounces-297694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:13:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B0F366A11C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:04:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 039DB66A232
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:13:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=muv6aSst;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297692-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297692-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=secunet.com header.s=202301 header.b=OzQNX+hx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297694-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297694-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=secunet.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9101A319EED2
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 13:57:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A1D43066AB1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0AC416D1B;
-	Wed, 10 Jun 2026 13:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9994C408020;
+	Wed, 10 Jun 2026 14:08:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F1F4071CA
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 13:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DD8405C41
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 14:08:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781099840; cv=none; b=muKXleNWWweiLJLgOw+0T7KNP9b+swVaNoX2f9WhUftLz+AgVjq769X/Z6Spq4EIc5SaBIiXu/0RwhiCJbmNSkr0a559um+lfdZRvCKNUnSfaP6azMaDRddNtPxK1bqHTTPAimvw8j0r9f1RSYmq/1aBQxdsvKPwYQ6i+jDH7qw=
+	t=1781100499; cv=none; b=EbCC/DDCQ67dwLGovQ/SWTK7n5qzQRcSZmQy3kgtDaStv4LnPFjo+3Aax+/nMXuRiA1wiY9rCRFzn13jtFqsW/zrCPSgj/ZnyFTQYkcpuLrq+wAcVDN7hjAIBaAJasUFuHn3SEkn8/wPYbvXNI9G5v39I2dvUbm8MdbMyhFOdH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781099840; c=relaxed/simple;
-	bh=fzWB4kxadpLfTCMoiRfgSxMiKNXKfXfcECHeLrOiEPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rsISTHUMWSgiz2cjBnuUWdngPGsS+yoHwYxBCShSPGGIihtyXiK527hPsDvD1yx6Gj+pfrAi3IrReGosSqvLh4s4tmCgH6RzetmbugMZJ3aAEhJalxkBG6p7i/h2hRlFILnWxeC/Nkk8zwr/CGN3RJb1biz5g4aLhteGzJi+JcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muv6aSst; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99D361F00893;
-	Wed, 10 Jun 2026 13:57:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781099839;
-	bh=L5C3ussGByA9i7+3Y4M9b5bsaS5ARFq9X8h53aSoPEU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=muv6aSstXmClq7TOtm27CPmIBazyJZTdkK02DTfhLUNNvL1po573EcRUqLW5cdJde
-	 +7Em78k9lvzqGTfIjmnG42RoS4u+ZyES7+Npz7BeCm8fLyz69F7O8u7GQcrpIIb3wj
-	 GukK5mt7HhZ2roOaWEyNQwRp7DVAvQWgf7z4V7vUFBb8CoJBIgorrFFKQfzeVZDNVO
-	 goRU0GaCiE3Aqvq6WqrL/l0rQXVOKuUAwlvZkBZdW6jqsvP5qNosxOXSk+tnnpRd+G
-	 zjbhyGZm9SV5lylYDRr8zhLjVpodOippCKdBIPuyvIeZBmysfirxu+2u3l6qsSRLr1
-	 mG7Zrqcaw6x6w==
-Date: Wed, 10 Jun 2026 14:57:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Przemyslaw Korba <przemyslaw.korba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	konstantin.ilichev@intel.com, aleksander.lobakin@intel.com
-Subject: Re: [PATCH iwl-net v3] ice: fall back to SBQ when LL PHY timer
- interface times out
-Message-ID: <20260610135715.GL3920875@horms.kernel.org>
-References: <20260605120734.1462847-1-przemyslaw.korba@intel.com>
+	s=arc-20240116; t=1781100499; c=relaxed/simple;
+	bh=njgV0yDIZfMro/6yoEh9+ldS7wom6/CdkR9sVeg2JcY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AiyLxvHynkzBmOCtYJBdM7O1/OkJUMJwQXhxp/nS9K/8TSajJo/156w58LYwr17S98kYqiPCfrE1r5oLRF7Q48ijmz3277BN4Cogdk+VQhYqzFbtbWyjs84ttp+UHPEK4tqdquXsAy+PmHa5EaneNHQf63+RVg9QuHzV72FP50c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OzQNX+hx; arc=none smtp.client-ip=62.96.220.36
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 19A5E20799;
+	Wed, 10 Jun 2026 16:08:09 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3aVQEm7Kgacw; Wed, 10 Jun 2026 16:08:08 +0200 (CEST)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 7748B20758;
+	Wed, 10 Jun 2026 16:08:08 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 7748B20758
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1781100488;
+	bh=6FEN4yjrhjFNURqdOEDcHDRDH38GkJashbIterUl/Dc=;
+	h=From:To:CC:Subject:Date:From;
+	b=OzQNX+hxeBkYfD8rUYMussdFnca2lu3bXDcVq5F57qEml/vz3h9Px35JRBX2aOIX+
+	 dVLQOMJU+uzLJjaAwcLrBvlvNUiG4f1zOCocdVeIQ/JXGcjwWiFVjbrvWjWqIUE5Lo
+	 BDXd4hmlbfjiZbyLUecY3tJT9alizwlqe5N8zy/sXEwiBjoElNwHts6e/v9bV4QaBP
+	 A2B6eGlBjnR1S9AFn5rbPWuobJs8/PYV6TKXJG8MjMngXE6yx1XmphUEnL6AX4dqiK
+	 NUaBwC7YwkcI2iZ8msMRIEZms57hLpHVBPqByUaWh6kOWLsTcFd/aXV2nFOrZkqH41
+	 fwtSmZTQScFKQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 10 Jun
+ 2026 16:08:07 +0200
+Received: (nullmailer pid 2563190 invoked by uid 1000);
+	Wed, 10 Jun 2026 14:08:07 -0000
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/6] pull request (net): ipsec 2026-06-10
+Date: Wed, 10 Jun 2026 16:07:39 +0200
+Message-ID: <20260610140800.2562818-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260605120734.1462847-1-przemyslaw.korba@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297692-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:przemyslaw.korba@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:konstantin.ilichev@intel.com,m:aleksander.lobakin@intel.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297694-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:herbert@gondor.apana.org.au,m:steffen.klassert@secunet.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[secunet.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[secunet.com:dkim,secunet.com:mid,secunet.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email]
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B0F366A11C
+X-Rspamd-Queue-Id: 039DB66A232
 
-On Fri, Jun 05, 2026 at 02:06:26PM +0200, Przemyslaw Korba wrote:
-> The low-latency (LL) PHY timer interface relies on a tight, atomic poll
-> of the PF_SB_ATQBAL register with a 2ms timeout. After an NVM update /
-> EMPR, FW may need significantly longer than 2ms to start responding to
-> ATQBAL commands. The first PHY adjust or incval write issued by
-> ice_ptp_rebuild_owner() fails with -ETIMEDOUT.
-> 
-> Fix this by falling back to the existing SBQ-based PHY register write
-> path when LL times out. This makes sure PTP is initialized when FW takes
-> longer than expected to come back online.
-> 
-> Steps to reproduce:
-> ./nvmupdate64e -if devlink -f
-> Update E810 card with nvmupdate64e, and observe dmesg errors:
->   Failed to write PHC increment value, status -110
->   PTP reset failed, error: -110 (-ETIMEDOUT)
-> 
-> Fixes: ef9a64c07294 ("ice: implement low latency PHY timer updates")
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> ---
-> v3:
-> * actually add TIMEDOUT check in ice_prep_phy_adj_e810 (did do it)
-> v2:
-> * add TIMEDOUT check in ice_prep_phy_adj_e810 (did not do it)
-> https://lore.kernel.org/intel-wired-lan/20260603114904.1297713-1-przemyslaw.korba@intel.com/
-> v1:
-> https://lore.kernel.org/intel-wired-lan/20260511095830.1095984-1-przemyslaw.korba@intel.com/
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 38 +++++++++++----------
->  1 file changed, 20 insertions(+), 18 deletions(-)
+1) xfrm: iptfs: preserve shared-frag marker in iptfs_consume_frags()                                                                       
+   Propagate SKBFL_SHARED_FRAG when paged fragments are moved between                                                                      
+   skbs so ESP can decide whether in-place crypto is safe.                                                                                 
+ 
+2) xfrm: iptfs: fix use-after-free on first_skb in __input_process_payload                                                                 
+   Replace the unlocked read of xtfs->ra_newskb with a local flag so a                                                                     
+   concurrent reassembly can no longer free first_skb between                                                                              
+   spin_unlock and the post-loop check.                                                                                                    
+ 
+3) xfrm: policy: fix use-after-free on inexact bin in xfrm_policy_bysel_ctx()                                                              
+   Prune the inexact bin under xfrm_policy_lock so a concurrent                                                                            
+   xfrm_hash_rebuild() can no longer free it before xfrm_policy_kill()                                                                     
+   dereferences it.                                                                                                                        
+ 
+4) xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()                                                                                 
+   Move hrtimer_cancel() for the output and drop timers ahead of their                                                                     
+   spinlocks, breaking the softirq/lock cycle that could deadlock                                                                          
+   against the timer callbacks on SMP.                                                                                                     
+ 
+5) xfrm: espintcp: do not reuse an in-progress partial send                                                                                
+   Fail a new send when espintcp_push_msgs() returns with emsg->len                                                                        
+   still set, so a blocking caller can no longer overwrite ctx->partial                                                                    
+   while a previous transfer still owns it.                                                                                                
+ 
+6) esp: fix page frag reference leak on skb_to_sgvec failure                                                                               
+   Add a flag to esp_ssg_unref() to unconditionally unref the source                                                                       
+   scatterlist, releasing the old page references that are otherwise                                                                       
+   leaked when the second skb_to_sgvec() in esp_output_tail() fails.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Please pull or let me know if there are problems.
 
+Thanks!
+
+The following changes since commit 78ef59e7a6459b16f8102e0ee1c718443323d1af:
+
+  Merge branch 'wireguard-fixes-for-7-1-rc6' (2026-05-29 13:01:31 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2026-06-10
+
+for you to fetch changes up to 26aad08a928901296aabfbc7a33ecb951656bb98:
+
+  esp: fix page frag reference leak on skb_to_sgvec failure (2026-06-09 15:58:17 +0200)
+
+----------------------------------------------------------------
+ipsec-2026-06-10
+
+----------------------------------------------------------------
+Alessandro Schino (1):
+      esp: fix page frag reference leak on skb_to_sgvec failure
+
+Sanghyun Park (1):
+      xfrm: policy: fix use-after-free on inexact bin in xfrm_policy_bysel_ctx()
+
+Takao Sato (1):
+      xfrm: iptfs: preserve shared-frag marker in iptfs_consume_frags()
+
+Tristan Madani (1):
+      xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
+
+Wyatt Feng (1):
+      xfrm: espintcp: do not reuse an in-progress partial send
+
+Zhenghang Xiao (1):
+      xfrm: iptfs: fix use-after-free on first_skb in __input_process_payload
+
+ net/ipv4/esp4.c        | 17 +++++++++++------
+ net/ipv6/esp6.c        | 17 +++++++++++------
+ net/xfrm/espintcp.c    |  4 ++++
+ net/xfrm/xfrm_iptfs.c  | 11 +++++++----
+ net/xfrm/xfrm_policy.c | 13 ++-----------
+ 5 files changed, 35 insertions(+), 27 deletions(-)
 
