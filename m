@@ -1,200 +1,209 @@
-Return-Path: <netdev+bounces-297561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297562-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eF66D14vKWpmSAMAu9opvQ
-	(envelope-from <netdev+bounces-297561-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:33:18 +0200
+	id Et9jHgktKWr8RwMAu9opvQ
+	(envelope-from <netdev+bounces-297562-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:23:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D9F667E06
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:33:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDCF667CA0
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 11:23:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ragnatech.se header.s=fm3 header.b=hFLhApMX;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="f bPSEoq";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297561-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297561-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ragnatech.se;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=pk441WcU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297562-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297562-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D5FC332B77C
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:15:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54856302297F
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CD83BED4A;
-	Wed, 10 Jun 2026 09:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8743D9674;
+	Wed, 10 Jun 2026 09:15:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1943BCD3A;
-	Wed, 10 Jun 2026 09:14:53 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781082896; cv=none; b=YDlZ+kvL7mfV4Ytbk+ki26d+ph6yDUfQqcftFt4pphGgAKjcU2zYp8zRpegTtkpearaUF0kYf4HOkmy1tDkEhvvSVZN7QlTNcA230zpjOrUybyl6AH6vLVs01vJ63+lTjdfkMqfFKuWSPkSzPqcqGKpXAeP4J3JMXggf4c2S04M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781082896; c=relaxed/simple;
-	bh=HqIULhI3b7647nddpq6zQkDQPO1NJ/oNd3jU6sTQ44M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fFM4NFKvMadIWZV9JkfwPPug7eEocALvLCR/99A5f46jut84Fkug6SidApbUWwVJM5KGdqchOm8BlyOfMJsRxxiUnyMZ51UMbmo0uRgWADlMtT1cY4VLlxDak4LT4Yb3rsg7uk/DsaY/QMnvfbHxdycAnrQSFbZFdo4RZHHwGmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=hFLhApMX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fbPSEoqi; arc=none smtp.client-ip=202.12.124.159
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 9611D7A00E2;
-	Wed, 10 Jun 2026 05:14:52 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 10 Jun 2026 05:14:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1781082892;
-	 x=1781169292; bh=3yo/U4zdqOGiza2buRx7viS4BvrMUEv8SC3a8B6j87M=; b=
-	hFLhApMXWXSNfTuOF3aD+hMvkl/kRdi976659ghl7wtBd1R4RtbMMKDXqCeKLPSH
-	UGwtNwiM5ZI/jTnJGoXdqE2eAWpxJnLm6JO/kbu2lOZbbVpSGJZRMbWIAvLICeh9
-	5Sq/fwTSrdfV5udpWLTjP02JbReE1G6r1LHeIunsoqalDtNwxPvYYh65xb9Slc8x
-	x/o18696boM/zX8PZwGO+bhw6qKix5FWWkf7QcU5YXek1nlLJtifaYWUGbs0xv1R
-	6IYmRbTdEPJ7N2cXvGFoHl6k2hZNW7viHDHFW2v6Lfs9ksX0UAJolZSM/P4znVbn
-	2NdQ2JacgFiJMbdim3FDaw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781082892; x=
-	1781169292; bh=3yo/U4zdqOGiza2buRx7viS4BvrMUEv8SC3a8B6j87M=; b=f
-	bPSEoqiJW7mYRdAJ/0YN/xDLYzZT0+kqHnKsxu7JCJJds9IvB7xvs24d1JypnqhN
-	2Yr8hR0vEJgCL3rqdEEuzczldUe/7Y73W5yD9j9vZ5PS58d3Idk+Q8S+byuf8qMi
-	hcHDGZlTPYRHtYiQfHUVmk2A0jr/IBVX826SA0B9MOdCUpTN6s9mQlsTTxrai5+j
-	8d6APD1VgcWPKu5Te+OmSjJg6aL3U7fhhydGCskrmKgzF8QuRrRZEfdJsYw+F0FK
-	V3BnSOo1jOf6BwfAEXl/9BUl6az1UUoXl4kGJn1ckU6kpXEFa93+rWnxQvRGqhEc
-	1Yk0STi9fDFYMlYtTAV9g==
-X-ME-Sender: <xms:DCspas7o01iDubUTo5FT31CQ5VW_Ry_64WpERVOilHl_dcRyw41Yaw>
-    <xme:DCspasZx0VYsYvCGhIMg-PlTptViZuEsRuW29p1KhFLrLKXlGiWrlTFyM_wFH4a6Q
-    7jpjEs5ufWVF_fnP29gDmc4RsllInyKkq6dTlSjv2lPsRDYtUHY09s>
-X-ME-Received: <xmr:DCspaiRx6S_EnkEZr3kJFwbmYVeNHhdWMKy5yKJIHEQykoVPCGxhb5Sjky6lcPgFwJwWIGjuQQv7GuQlC149aWO5sIO6gnU3SDux>
-X-ME-Proxy-Cause: dmFkZTGs6pOpieH000WI8vwuexWh8o2R1t8h3HIWZjgnuP6wT5WtiXaBnwmkRethnSMxnd
-    YZxod+uyAtqSHF4xD1vBcVdhkhs0RtPKfH+4bP+uygCX5mZTE7NMtD37whpkpbo6AL/YiI
-    3AWwbaXeecdREQkXhD2JyRMOPrw8DtI+XeVS+LgSZDxcEpw2X89FYYvtdW4mNkauIMXECh
-    y4M2OUc10URgivQshWEQTshordWIzEbX2n/KApYJ8hPfyfHdZrgW5ffjHIeZol4UPVK1vY
-    rx4pO8XqNoA71FCdE0VgQjy5mrB7kGiBuqyF57fml1th6TUrn1fcLu0tXGOtAmA0tBsRin
-    gSHVuBkzXlVr/GU/c1wV4NzQc5OhBg+F7VVO8yL2O/DlJvtiGWPVCTDp38mWyJRtfnxRha
-    h+//alNAA0qtwVfO0dsBiRHdBTI5HVluDdBZSXH/2hzvRrwv8ye/ZdaRqD9APJikGFrV3Z
-    FbaM5vPgrcTof/IJ7By+7HM9clgb8/eInnmsF88rtjtMS60AHisKfA0Nbfp5Wr7GgttQUS
-    HpdrVFu1QCpg1iJRqrSkf0jxD+jjl1Z7/3IFgD7GIRlvTx9/GvCFGwMbaIhJQkRAnwAyLe
-    HpOhkH2KGuk8L4V+gqwNG2bHrT/tw9Io6Sa/MU4ZWQIjTyL9fmWAdjgDgKZg
-X-ME-Proxy: <xmx:DCspahLQoXgOxIy1_RX1uThey4w-4AWuf21DeXdvp4v1AgaStU9HYQ>
-    <xmx:DCspaoUBbfpnTJw-qHByqhDkHWiJcJKg8D_tZgOM3pHucPqcrRaoZQ>
-    <xmx:DCspatihm4j41yweRtBYhyarp-00SnsrqOO_oCE-HYe6PAwHJVcK0Q>
-    <xmx:DCspasv-eF9uT5FJn2Utjyo2nJOWyg9mGkGx1TaNepx8-DY_5jxkWQ>
-    <xmx:DCspaunuZxXvnOgCBbxTxV8KPPAUaiGJ8lhOIRB6pFwxkQtjUmf5FW59>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Jun 2026 05:14:51 -0400 (EDT)
-Date: Wed, 10 Jun 2026 11:14:50 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"DavidS. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [net-next 1/3] dt-bindings: ptp: renesas,rcar-gen4-gptp: Add
- binding for R-Car Gen4
-Message-ID: <20260610091450.GD2465390@ragnatech.se>
-References: <20260609215711.2960150-1-niklas.soderlund+renesas@ragnatech.se>
- <20260609215711.2960150-2-niklas.soderlund+renesas@ragnatech.se>
- <6bd0229b-4895-48a2-9e36-0ea5296c7fb5@kernel.org>
- <20260610085354.GC2465390@ragnatech.se>
- <ded0ae1a-535f-4524-9c3c-e9970bdf387a@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F094F3C1082
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 09:15:50 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781082954; cv=pass; b=M/thYjHfgptECNCnHleQHtzI+AvXZjpJkIbGpHdZd3gH9nnC8MQijbo2orXud7xXxk3W8Q3AG58ITOG/IAtF+0uhZzrY3LGApnEYw/H8oDkwUJ2WAdTUqbgUU2Wval0wsdaUgs5luznysbX9pXeA8qvzC20bKuxcFVoLLPHZJaE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781082954; c=relaxed/simple;
+	bh=dkWTevOEzDTMmxDai2XZ5/ake5l927UeEL0MaDVmHek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lgB0c7+ivOP/RfDjqAlIVRFhiVRNPyVsG7z9b9p18lbakUuj6WemKenbOzZVPAONuGp6nq+KL/8XJjbjdYp5TOh3uP/PK7fpZVHCDPMcgYym7icuy7qk289iXdxE07M/2j1uE5UFX4FeVVEj9iR7NR7O8bwCvQWjAUs/SwJQ6lY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pk441WcU; arc=pass smtp.client-ip=209.85.128.193
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-7de68222e96so60636447b3.2
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 02:15:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781082950; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Seijla8KYaC8N24U1K/b8IIBZZnrHWlJItXRR/mysV6uHK6HgEZhnQFbtmaldxvSrh
+         fgiwO+nTKLcJ5wuaNEjeJDYqwzlBSNuCjuXhNRTz9B9zYLRN2ung0qCct8+GwtBqtXic
+         q6xsgRM+LuK7Kt5MoDJYWYyD2MUCgJEFxcww6MvHhO58VOfuTgY008tLEMFkIVzYfhV1
+         rM4Sok8RxOL6mWir0eRryq5LWrzJUaA0opH/WaZB6IBcYK1anVXeyZkBpL3f/9A+Fz84
+         VcbgzX2u8TwobK5aGLdgi7S+lC+WpqNrnh4Y0KIG9Zy8vuF833ifYAFJol7/XgDZht7I
+         sXhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7Vr1lvCHUXqA8wl46L5q/dYr6UTfHd+/3UQsnP1BtFs=;
+        fh=473ofnK6QaZrjJJKdjzE3qWFq015jpZK5tyPcVTxS+E=;
+        b=D+O0lri1keS3hQcgRZ0Siun9+Ghf8vtDZVtVpp2z4Ock2AY9MFbhkovC6QAO7mqJz5
+         UFJfv7YASd0I2S8IFsE6KHc+aKojQL0vboIbCzg6AHLbbl0L7Z1Yq/q44PoNNut+GIAT
+         krLixjPpASqOXwJrrCmDzHFx2mRAfEg4VQ+xHr1G2mycPWYwzdIBJr/uC8QrfbC0rXoQ
+         7jJM3j9IUnhRpj4TLHt097dd5C+hqstjh2WEdLapG2DXub78TMHZCyiYPtuI9Nvr2d6f
+         tkQrvV1Sj9cKpG6U9RdX7J4gQIvPhx8LqHF/58umbyh0yF5pr3Kmvpn/tRgpzmM6RicL
+         dNug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781082950; x=1781687750; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Vr1lvCHUXqA8wl46L5q/dYr6UTfHd+/3UQsnP1BtFs=;
+        b=pk441WcUPLA3ma3sVTWTu/7YhEpgLBNtx+7/GOBko+KyABEYzLZY/H3foF2ZYji0gg
+         NbxuokUIf3qbHUkCe5gUrHJZ/64NyNpblhbQr7bZwxWcWCrzcfGEs2lrbtacxYpu5N4G
+         GzUzCTIaKMIvM+vlXPURZ1G4KbIi7pvhRVFn26fi47o22CW2FPAqetFdND3bc1R0KFCJ
+         xm88q8U0FHcEADMSYvoMZB1MKm4rM32a+OriS2t9PMGK081yqqvK4sA9kxEBPfhgm9Pf
+         nCbW6D5q3oiGqhb7PuOOvXyWQdKimDnMN5GIkbZRUi6VVawulEWR41cqdEOK+dUnUaFD
+         6CHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781082950; x=1781687750;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7Vr1lvCHUXqA8wl46L5q/dYr6UTfHd+/3UQsnP1BtFs=;
+        b=U42hQ8gedQVvw5xSOSmneCP7xLrfyfohDs8hP3Xp0pQU/MJAtdU2pQ4hXYvKwjVtPy
+         9Z1CM5ZYmvlJQcEUT6XWwaYQAtgZ8RixdOIffuS2Sky7BS8FC38uAMATZKuJceXFFBWF
+         altcYrbINvI+2846N/KwojZlpDUrkKQmDdr21Q/KWKARf2Wq3AvZDGNRyMkzign1MhxP
+         VRAx/TCGzwqNiGOnxSAc+JMeLdb2mAqj5uHhs7CIWtT/5pzqq5KA/Kna8NntZ+J6gQF0
+         szSzP4kEahcl9z2IaHC4TmRfJSxW+kizSiRGGeXNqwHtyuL4UQaUcNJlcqcmj9k4AD94
+         J5Ag==
+X-Forwarded-Encrypted: i=1; AFNElJ9JlA+gTEGcowLQOP3jwDwwEx6Y5QGsT+p6fFRJMPTdWLEpfPAa1RPv/0ESKO2kfQoLGQVBcng=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlO+j8SVJbZOF0DM2SxHebahj2mU4jvAiChGGTd8UI9UPtR0al
+	Wkp6G+nWxHaFJwQwoZhSnRhrMZNKqOBkEXM9ibB6RUtyB/azvfOPHJLdOaM3i4+QVDiaqK/Cb1o
+	wmxv/32uDcMnOkGJc/Elkdji+9exrl4Q=
+X-Gm-Gg: Acq92OFmfNKiqFbdS8Q12mvT4EBrInNHWMjxraTwa0+0qpT9GIyNevxbOBJITTzycT+
+	6IbT+vkO/ngfC8qne0U/Cv5Mn1m6kqmC6BNY0qyWnQkugukbWXCNuTiHCPoYiwCBZFdyobPqX6p
+	I4FvPzRFrv1kHmfnVyE8OdCHKMk++JCq2NHcInDvDJ+ebM2px7QXLWXken3uddqCbN69fUrZou+
+	QTcF8CPj3TBbwrc0xtdEvkLvMc8i5dXfZhGMvf5GiSExvQBMItb/D7c2V2qB7Xza6tmt7TDERa5
+	otaA8Msirz+mh15LHePb
+X-Received: by 2002:a05:690c:6088:b0:7b4:1ffe:f9f9 with SMTP id
+ 00721157ae682-7ed0d5c0168mr228901987b3.16.1781082949719; Wed, 10 Jun 2026
+ 02:15:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ded0ae1a-535f-4524-9c3c-e9970bdf387a@kernel.org>
+References: <20260610081648.2205711-1-dongml2@chinatelecom.cn> <CAJaqyWeYiruNosJsMTh2jQ=XCEcPg7956aqeRRpDSyynfpjNZA@mail.gmail.com>
+In-Reply-To: <CAJaqyWeYiruNosJsMTh2jQ=XCEcPg7956aqeRRpDSyynfpjNZA@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Wed, 10 Jun 2026 17:15:54 +0800
+X-Gm-Features: AVVi8CeKeNx-GTsiC8xsIcnA6meI4tsNjbFnxar3BDX9_eDtXkvFWK2nbkQsqV8
+Message-ID: <CADxym3ZVfwg7t96Ct20pnZdm9tTvpCypg_dp3f+3aj1TL2argQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] virtio-net: support xsk wake up
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, mst@redhat.com, jasowang@redhat.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
-	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm3,messagingengine.com:s=fm1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297561-lists,netdev=lfdr.de,renesas];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:eperezma@redhat.com,m:xuanzhuo@linux.alibaba.com,m:mst@redhat.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297562-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:krzk@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[menglong8dong@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[menglong8dong@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ragnatech.se:dkim,ragnatech.se:mid,ragnatech.se:from_mime,bootlin.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid,chinatelecom.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 85D9F667E06
+X-Rspamd-Queue-Id: BFDCF667CA0
 
-On 2026-06-10 11:01:27 +0200, Krzysztof Kozlowski wrote:
-> On 10/06/2026 10:53, Niklas Söderlund wrote:
-> > Hi Krzysztof,
-> > 
-> > Thanks for your comments.
-> > 
-> > On 2026-06-10 08:54:06 +0200, Krzysztof Kozlowski wrote:
-> >> On 09/06/2026 23:57, Niklas Söderlund wrote:
-> >>> Add bindings for the R-Car Gen4 gPTP timer. The timer enables accurate
-> >>> synchronization of the clock in the control system. The timer is
-> >>> system-wide and used by different Ethernet devices on each Gen4 platform.
-> >>
-> >> A nit, subject: drop second/last, redundant "binding for". The
-> >> "dt-bindings" prefix is already stating that these are bindings.
-> > 
-> > Thanks, will fix.
-> > 
-> >> See also:
-> >> https://elixir.bootlin.com/linux/v6.17-rc3/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
-> > 
-> > Not sure I follow this one, L18 reads,
-> > 
-> >   "Few subsystems, like ASoC, media, regulators and SPI, expect reverse 
-> >   order of the prefixes::"
-> > 
-> > But 'git log Documentation/devicetree/bindings/ptp/' shows all commits 
-> > in that directory use the 'dt-bindings: ptp:' prefix.
-> 
-> 5 lines below.
-> https://elixir.bootlin.com/linux/v6.17-rc3/source/Documentation/devicetree/bindings/submitting-patches.rst#L23
+On Wed, Jun 10, 2026 at 4:28=E2=80=AFPM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Wed, Jun 10, 2026 at 10:17=E2=80=AFAM Menglong Dong <menglong8.dong@gm=
+ail.com> wrote:
+> >
+> > For now, XDP_RING_NEED_WAKEUP is not supported properly by the virtio-n=
+et.
+> > Take the tx path for example, we set xsk_set_tx_need_wakeup() in
+> > virtnet_xsk_xmit(), but we didn't call xsk_clear_tx_need_wakeup()
+> > anywhere, which means the user will call send() for every packet.
+> >
+> > For the tx path, we will call xsk_set_tx_need_wakeup() after
+> > virtnet_xsk_xmit_batch() if sq->vq is empty, as we can't be wakeup by t=
+he
+> > skb_xmit_done() in this case. Otherwise, we will clear the wakeup flag.
+> >
+> > For the rx path, we will call xsk_set_rx_need_wakeup() if we have free
+> > buffers in rq->vq.
+> >
+> > Race condition is considered for both rx and tx path.
+> >
+>
+> I didn't review the code itself, but the patch message lacks a Fixes:
 
-Ahh, thanks.
+Yeah, you are right, it's better to use the Fix tag here, and I'll
+add it in the next version.
 
-> 
-> 
-> Best regards,
-> Krzysztof
+> tag. And the From and Signed-off-by emails don't match, which I'm not
+> sure is valid.
 
--- 
-Kind Regards,
-Niklas Söderlund
+Sorry about that. I use my company email in the SOB. I used
+my company email for the From too. However, my company
+email system can trigger "Delivery failure" messages sometimes,
+and Alexei said it is annoying. So I didn't use it for the From
+and removed it from the CC since then :/
+
+Thanks!
+Menglong Dong
+
+>
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> >  drivers/net/virtio_net.c | 52 ++++++++++++++++++++++++++++++++++------
+> >  1 file changed, 45 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 9b3da9f9786c..25e895b849a6 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+[...]
+> >
+> > --
+> > 2.54.0
+> >
+>
 
