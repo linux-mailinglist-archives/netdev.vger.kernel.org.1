@@ -1,210 +1,168 @@
-Return-Path: <netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BpT3CrHhKGrxLQMAu9opvQ
-	(envelope-from <netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:01:53 +0200
+	id GmzIOk7iKGqPLgMAu9opvQ
+	(envelope-from <netdev+bounces-297426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:04:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F93665B13
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:01:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8130D665B1A
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 06:04:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=jvosburgh.net header.s=fm2 header.b=h64zDGnf;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="P WA+vF9";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297425-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=jvosburgh.net;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b="e/+gZdUF";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297426-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297426-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5A59307AE52
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 04:01:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B5246302293D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 04:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE31337B87;
-	Wed, 10 Jun 2026 04:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79872342514;
+	Wed, 10 Jun 2026 04:04:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DDB7E792
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 04:01:47 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781064110; cv=none; b=nlZozxdE62w/q+ox7Fgx3aw5Z7rbVwe6Q/yj/BaWv4KsFg4T8My9lyRLNJIo7OHh93WHB64Zzdq1UHm+OSgf6FQ2vn9mctAkCw64FsACWv2jGHJMNna/Dlh178SpfxQU5/PPNzSXhqSgStrIGpnko8KPMbnbdziBdOMw6315NOY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781064110; c=relaxed/simple;
-	bh=kJItE6LCRQHYsVfmrfj/JgBGeugjj9/2SeijFcHgysA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=TEQKQTh1PopJAIoBnB9XCrIw+tQ9t8/K6lNgvhnwxuJhGU6BrSrs+xIEgqfXnSM9spDy7Tm83SlJ83Np/hDlP9By+lkaOfIaNWI6cywEVdzWDbhLEPxrIEAJACEX2VCe3OA+SBNWEnjC5A+yCchRBc/LgIYtpaE1EISWVAvBsaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=h64zDGnf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PWA+vF9b; arc=none smtp.client-ip=103.168.172.159
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 4036C140010E;
-	Wed, 10 Jun 2026 00:01:47 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 10 Jun 2026 00:01:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
-	 t=1781064107; x=1781150507; bh=rtkq9QeQyqsoW7C8ybhLaXi9M4w1EIPd
-	lMEVK7HHaug=; b=h64zDGnfaFSzVfXz27Kg8++5KPcv1ucteG9xf1f5oElTmv0a
-	U7+y+rY/T9SLPmV3Mi78zK3fQNS3CyclT9In4hGTRsBk6YA3GCuZK0BK1mL6aBet
-	PCsUYXs8Y4pHLPnTS8edQLvLJMBN7u709t6xpWR/ZrurIWWrYVCARRF2RzXl+BAe
-	H8/6Abyemp91iSO+PKJcDLE1FU/vUgD9QgxDq3b6Do690aM6Hcxqi5BAT5Gj0faX
-	CDOxA008vJEUQ03f2GrspK2J2p6OTn5rMdvyc2rpLUqgftJobc1c56vKPcB9v2U/
-	Ae8hDPNK2LCx2NLb1iHBesYytZU9xkRc+3n1pA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781064107; x=
-	1781150507; bh=rtkq9QeQyqsoW7C8ybhLaXi9M4w1EIPdlMEVK7HHaug=; b=P
-	WA+vF9bfNcwA9phxl9h8TOVobwxGRayH3cmVSfExm/NnaT5nAz2yQmHeQWyqiA4+
-	7bFowR/K70Hq23gmg9j9Ka69qM0ZYExSInD5K7pf8BdJlC62mzqitgSzFtu846Yw
-	ivBzo9ktiH9neEwKFv9VxdoX4KrDgCLxHeJrUnutIS0SJ92Cpxx++Jz4WO2mtmZr
-	5ipEaSik6eJlmehs+nlXtpI2abn7eqj39fZsYq+QjowUQ5hCa38VpNp8shdz474e
-	DzMwk3kMbXiEfHONtb/rrUo8NpvlwBPzKEGZ1tADYhNC8wIw8MULkPx0O81n0BOB
-	vfJ2tjjk65boToxNFOhGg==
-X-ME-Sender: <xms:quEoauq5i48l4Taab3t6nvNfkViqo52800DUuCAn7V1zLhHsu_Y-OQ>
-    <xme:quEoaofPb7S-iJ9qTGnnji1v_s-GSquBwdMJAy_iF7WsHHHeoEDyzWPXd59ZE_ZQl
-    vBOcIuyCryU9arUfq_aaD1q3WXsMenbi2MJGLERcGDCOotVEQo2Suw>
-X-ME-Received: <xmr:quEoaunf03JmIWiPzTEERFyFWq0eOqcJXCF1osq-5m6ZRp5vCF2KcKGXFMDWlDqMpJSuCw>
-X-ME-Proxy-Cause: dmFkZTFtdog3ahJS6oblJc6KfiKoQcQn9TZC3+osVPA6IIFp0zKzXPxPLDat0JBdaXhTuQ
-    uTze0MgNaJgM+UX/f7mT85+RJVimKd9OaakZkO5moOIvfQMV1h6vgYZTGXX19GIQI1HyPm
-    b9tHb5pIoN4O2wqcwt16csxBrCBcgwl+ckO7ZAtYGOCee8vIbHFDShkwzL2aDKY9XTGSdb
-    n4k2LI/jLJ8HrmpOnwzIdM4Sd4hAr//78/Z1iFWpNXZFGrR2SJmdmSWLiY97P1w5Px3xzG
-    OhegtvuYFFe5sqZ0rb+zwuPiOl2esjxH1NNzVJ6J5/OvbrMMOCXyHV5zGUR/JwVNxF/UV1
-    x4meYa+SbT1RWzQaOUzpH/4AuEa2I87HXa/h1Lw9HKXkXLI6qUqBcxGFwzeVz34dN2sYuE
-    ADmhVAZ4YyNzmX72jw7TYlJ4Y8+kHpzkNDkXWjamsRAWR1HkO8WRFYBYyBlKY3i3MMkeq6
-    Z1xKdvvQytmeaFX1EbjKwigVaELL06W4paJq3Y2b0u/2mKdFxNwAfvHyht9M2BhlLitf8P
-    fP9Eei2+bJTbyaUaptyXkbqUXUg0DVrYjdaMtd8PePvJ697Ekj3VnN0EQC79c3jevfKLjP
-    raCTsieN1Mb6eJm3aSFiQrR1nWEoHQ0MryjNpue5Hov+xs3nQGjHICn2ETeA
-X-ME-Proxy: <xmx:quEoanbp2-rbrlvZddcvAak9eCdmavD1I-IdEkqoY4EMtuCz9ME0gw>
-    <xmx:quEoar4BtWbnOXgfzp3NWbQfVAdF3mpsPrXl5F3QPw8O_-Gba4I28A>
-    <xmx:quEoapBDyeQboJfYILe51kidny2h0LVCG4thJuhUo_6xL1UdFdAdCg>
-    <xmx:quEoah8yvi7YCSf_uqfCUdl6gnqvf6qMc0_8MYe40RRPrnmla7fFsA>
-    <xmx:q-EoarIURfKFImFqgTheYZ8m5fHL9VAqegmhlHM43wxIMpRC2TUsLrH_>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Jun 2026 00:01:46 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 497349FC5D; Tue,  9 Jun 2026 21:01:45 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 487E59FC59;
-	Tue,  9 Jun 2026 21:01:45 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Paolo Abeni <pabeni@redhat.com>
-cc: Louis Scalbert <louis.scalbert@6wind.com>, netdev@vger.kernel.org,
-    andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-    fbl@redhat.com, andy@greyhouse.net, shemminger@vyatta.com,
-    maheshb@google.com, jonas.gorski@gmail.com, horms@kernel.org
-Subject: Re: [PATCH net v8 4/6] bonding: 3ad: fix carrier when no usable slaves
-In-reply-to: <377b117a-b29a-4761-aae0-3236be1f0b49@redhat.com>
-References: <20260603150331.1919611-1-louis.scalbert@6wind.com> <20260603150331.1919611-5-louis.scalbert@6wind.com> <1041444.1780954642@famine> <CAJ5u_Of1+eEL4iVe-sWzhOOva6xx3gPCeXeRP4Y3yCqny8=gOg@mail.gmail.com> <377b117a-b29a-4761-aae0-3236be1f0b49@redhat.com>
-Comments: In-reply-to Paolo Abeni <pabeni@redhat.com>
-   message dated "Tue, 09 Jun 2026 10:54:01 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D288337B87
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 04:04:27 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781064268; cv=pass; b=JBRnO+ZYZK44GQ8uDoqC66meDcvI8SXs1ojDyaCyoJkvP9X0WyB2Dbaw7nXQQekgcRo5XeBKlQuNs8lLcDpeFCeqmQRRcLF6z8Iz87PkTmdyGHugaYBWwk5JYqsYcE+YIaoRIUQn/2+ZPWcdX/D2rAf6OMo8cP2/aXEKP6B1mpk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781064268; c=relaxed/simple;
+	bh=ziLSvpDPefhMh1YLhfgYvQRoU+jpwrEU6vRhvYQI4WQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h+zfyFm7Lup4IbH49+KCkO7z1rBgUKbx1kKUsW19DxWLgg0Du9w1TCDltELR7IAC1ZGfulfhmt1+EgrdL9MhdTlvRldCu4xBtsCalvZbbJknC9wB9lEEm4/3o9g3XwOlULQeJ77NckREZ1wffe271NDBjPb+rFOQHgh9ri60alY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e/+gZdUF; arc=pass smtp.client-ip=209.85.160.172
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-517a5cafc3dso42808021cf.3
+        for <netdev@vger.kernel.org>; Tue, 09 Jun 2026 21:04:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781064266; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GsIts/t+qkKU8eAIGt7KZNsnCGllb17UfZbCpRdaFwO7c9boGy89cGFPN2X4IW0NeQ
+         UgLGhYxT1LC23ScWR/PJcs9vMy9P5BfXePxbb0yHo+3tBkEVBtkYsOTABjcZTSLScvc1
+         U5rGhGkH4mMaPrdI/r3DaHBGzj6CBUIrANfUEwrl5XUPqgipU2ZNo2xe537SzSe46Htq
+         Z/XR6ANqi1yF8/BP4zsRhjKPSizF115IpeBst6w6FOgObG2uetX9z1mLbfjCjyWBtLWC
+         7q+p584FGSXCRqrM/91CY+SuNxIJUAQrk5bSPqgSchaw7vM0pt/Ev0mkMQmJTK5Q6zwS
+         Ml6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ziLSvpDPefhMh1YLhfgYvQRoU+jpwrEU6vRhvYQI4WQ=;
+        fh=tzt+XJCgZgvvHtv6KnbSXVLIEujONp4s+cUXaRggsAQ=;
+        b=infRbFXrda1p6ELPYyfEvlE1Or+Sb8ltuRPIJbkPFpL86N/bFd/1yk4Lrkj5BrI2/P
+         UFy1+iap9HICi8bXxkggfhyJTOqiLbYdf1NDzvY8UnlaKel7uUAN+BlsvRSwgTYHGbcA
+         NZwTVlB8ZOjzydkWRpBQQvHwTDE99jW9mbh2Ce821qAHLK1XAkcA/XCADF+9cSOAlP6C
+         TZdEz2FfpK5AvHrc1WX6lBlGj8I9fWpa4PtI0Cxrvq9DMzQabJHFS4kpWNp5Vrl/sL5J
+         aPV3QMefq2ITfZi8ErSY6TWEUfljz15MNRRXVIEItsAoUw94KwNdznlNY2XmqZYfE25J
+         uX8A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781064266; x=1781669066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ziLSvpDPefhMh1YLhfgYvQRoU+jpwrEU6vRhvYQI4WQ=;
+        b=e/+gZdUFaSnYmq+oa3A8g0IHAdWnnrm4k1lg2BBvufen+jX5O8Qe44w/lIh0z4ws2l
+         sVX8WCXZNxZlYxY0RuopKeMJ03BpnOPdzHfTL5CHlzw7gbvVeDaAUWEbDCXjguRJkttP
+         tNHkTjt4EXmPpZvBOdzJBRhwB8jwOl2HvSTsHr3UNGuVQRYeVnuakye5XQ/3Awe0eODY
+         ylyTxOh+Srh4UIEIWOnqdJsAQtP6aVpALRMzfr2rGvkQctpTuXi6O9Y8SmrFKmGIkqH3
+         JNSXGiclPUwwwwLO/097LDZAD+l8Rx1eDx6a4gsM/t71gJ6g3Dg5J0K8WlzSZ2g1TnKm
+         /nzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781064266; x=1781669066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ziLSvpDPefhMh1YLhfgYvQRoU+jpwrEU6vRhvYQI4WQ=;
+        b=MDoVSSxOeiTuQFCPFBukkl644pTpykqRYEXJCTufWDz2eNB8QW9hpz+2mguyreDo4I
+         EVC0CypsVYu3dEWAg0Q69JEYKg1BT2yPi6dievHfrUzCyVM9CFAQyjKCGQnAuCv7UYNf
+         gMvdnwXa3rP5nDH8gPXStmAvU0MGyjYzy6GXSF7qC08KfIIu4ERU76+yJcajRubLWdqT
+         hKxyVQBznN+fJWe/coVJmYREYty23qnajY98pk7IyKl90va6wih4VgO+3EYyBy5VmtJn
+         xmotDvOB8Ja4JP59ChnLefBAl6QtuJCcCN+VN6XHasy5zgbnCQlo2h/qbnEOHq0j18an
+         Z2ZQ==
+X-Gm-Message-State: AOJu0Yym3BH1QMCSqYwPQyOAQiya+H30zmzKX0crVjK+3Yr0KVD/jK3j
+	agZb+eUMp4dnf3P7zElX2ZJyMaY9IqMXmB2Ex8s8g40c6dqW2CbBMVV+MEm52GIfAsSmLiFqz4Z
+	S8zXKhLJYeL5V1SpihqLQnVD0vBe+DEl+xW/HrQKN
+X-Gm-Gg: Acq92OGXLtYBu21hekG1Xz9AB9zGUJS+THr1Ydxk+cUTHaw13GwrhpMc6UtDzj6WIeK
+	AKpzADeJVbnJRq6SLBIQPsiZ4rQSLbOtugktOcfga64YSsGvyI0sRY66oNKrcVPVr6aZfmHMreK
+	qMSlIrrxt0AvqmRJAIygbKEtsw4f5YrhS89fQ66HJeoljKS7zQXjrlOYpNSNGV8Oo+xTCArbk1p
+	szuVZo+NTItiNp4D2kRS3JKjtxSsXleOCGe7A6tlf9EYrVaUIYGuBbzSh77n4DhZZIzRB+SuxwA
+	gmFWdQFGwm00FJXx2wf0xKtglaca1OBIFtzUpDbO26CB21yKqg8+6eNgU2tr8ydNVSHgVJZqg6d
+	gsmr/iM01ZvXpVbFnrLrHGRk8wdVUpGdb+qs1RnYG
+X-Received: by 2002:a05:622a:251a:b0:516:dcbd:aaa3 with SMTP id
+ d75a77b69052e-51795afe9f8mr282610471cf.26.1781064265597; Tue, 09 Jun 2026
+ 21:04:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <cover.1781013810.git.sd@queasysnail.net> <c3c9ae09580a5c1d36b32b5ab3a5db398feddfe3.1781013810.git.sd@queasysnail.net>
+In-Reply-To: <c3c9ae09580a5c1d36b32b5ab3a5db398feddfe3.1781013810.git.sd@queasysnail.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Jun 2026 21:04:14 -0700
+X-Gm-Features: AVVi8CfyMQNdfBxuCedY0XLw0cG0g593wzGRzIZOYWbRpG2SfiMV52ctWCjxjrg
+Message-ID: <CANn89iKy=kzfyRKtGt+dY8Fe-ScD95cD=uuy=Gkq79K0kcCdvw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tls: remove tls_toe and the related driver
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Jun 2026 21:01:45 -0700
-Message-ID: <1120239.1781064105@famine>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[jvosburgh.net,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[jvosburgh.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297425-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-297426-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url,famine:mid];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:louis.scalbert@6wind.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:netdev@vger.kernel.org,m:ayush.sawal@chelsio.com,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:agordeev@linux.ibm.com,m:andrew+netdev@lunn.ch,m:borntraeger@linux.ibm.com,m:hca@linux.ibm.com,m:pabeni@redhat.com,m:horms@kernel.org,m:svens@linux.ibm.com,m:gor@linux.ibm.com,m:linux-s390@vger.kernel.org,m:linux-doc@vger.kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:johnfastabend@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[6wind.com,vger.kernel.org,lunn.ch,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jv@jvosburgh.net,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[jvosburgh.net:+,messagingengine.com:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,chelsio.com,gmail.com,kernel.org,davemloft.net,linux.ibm.com,lunn.ch,redhat.com,lwn.net,linuxfoundation.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 25F93665B13
+X-Rspamd-Queue-Id: 8130D665B1A
 
-Paolo Abeni <pabeni@redhat.com> wrote:
-
->On 6/9/26 9:56 AM, Louis Scalbert wrote:
->> Le lun. 8 juin 2026 =C3=A0 23:37, Jay Vosburgh <jv@jvosburgh.net> a =C3=
-=A9crit :
->>>> @@ -1179,10 +1194,10 @@ static void ad_mux_machine(struct port *port, =
-bool *update_slave_arr)
->>>>               switch (port->sm_mux_state) {
->>>>               case AD_MUX_DETACHED:
->>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_SYN=
-CHRONIZATION;
->>>> -                      ad_disable_collecting_distributing(port,
->>>> -                                                         update_slave=
-_arr);
->>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_COL=
-LECTING;
->>>>                       port->actor_oper_port_state &=3D ~LACP_STATE_DIS=
-TRIBUTING;
->>>> +                      ad_disable_collecting_distributing(port,
->>>> +                                                         update_slave=
-_arr);
->>>
->>>         Is there a functional reason to move this?  I don't see anything
->>> obvious in ad_disable_collecting_distributing() that depends on the
->>> actor_oper_port_state.  Since you want this to be backported via stable,
->>> fewer actual changes reduce the chances of an issue applying the patch
->>> to an older version.
->>=20
->> The path is ad_disable_collecting_distributing() ->
->> bond_3ad_set_carrier() -> __agg_usable_ports(). __agg_usable_ports()
->> reads port->actor_oper_port_state
->>=20
->> It was found by
->> https://sashiko.dev/#/message/20260526084048.1696544-5-louis.scalbert%40=
-6wind.com
+On Tue, Jun 9, 2026 at 7:21=E2=80=AFAM Sabrina Dubroca <sd@queasysnail.net>=
+ wrote:
 >
->@Jay: it's not clear to me if you are ok with the series in the current
->shape, could you please clarify?
-
-	This was the last question I had; everything in this version
-seems reasonable.
-
-	For the series:
-
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
-
-	-J
-
-
->Thanks,
+> The tls_toe feature and its single user (chelsio chtls) have been
+> unmaintained for multiple years. It also hooks into the core of the
+> TCP implementation, and bypasses most of the networking stack.
 >
->Paolo
->
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+Nice!
 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
