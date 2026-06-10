@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-297697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297693-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QZVXMjdxKWrVWwMAu9opvQ
-	(envelope-from <netdev+bounces-297697-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:14:15 +0200
+	id SXnhFgRxKWrNWwMAu9opvQ
+	(envelope-from <netdev+bounces-297693-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:13:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F02166A240
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC41066A22D
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 16:13:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=secunet.com header.s=202301 header.b=WJoDJccT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297697-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297697-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=secunet.com header.s=202301 header.b=PybWfLv1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297693-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297693-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=secunet.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D81253111288
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:08:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 38AF330512A4
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 14:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADFB410D1E;
-	Wed, 10 Jun 2026 14:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98497408017;
+	Wed, 10 Jun 2026 14:08:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E690D3EDE48
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 14:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C90B3EDE48
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 14:08:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781100502; cv=none; b=XpQrZfgDNViaS6PE7AKg2mbbx+OwZeU6Eoho4V4X9IIFzZ3rtlliroHQBS7djGXBYyCaHuKJwKKprP9lO/Bc4O+tNU3Hp4ogbzrnHWLj98c6AdFoXeOwSyyD/J2UEUOaUcqNEym2IZHuqKi3owfmyVlXReiiTvKGmXUfBO4vPnw=
+	t=1781100499; cv=none; b=GP8FQi4BTgZfokbT02cZ0P3JlSXaOCCz/JhYgV9hhho/9idtWrPQ1PB5gpYkiFLSUzhLw1NoXkKgemBgPUIUKe45pUjqNXp0lYObZ4jcP4YdoLqHJp3V2SPEAgYSSv/jNI4flSJDQex9YpCP+5ADi2f4vX0RjZJKCn0vMZJUAp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781100502; c=relaxed/simple;
-	bh=DP+GolRHB1T7jNChIk4s8bco8i3Z40NUxuuAwc18iHE=;
+	s=arc-20240116; t=1781100499; c=relaxed/simple;
+	bh=SprnDYzFdEoZvE5U46+dSuGuGxBqXlRpvvJrLWwHQlk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VK7TBkXt977C448NYAHgR7lh7t5ZaaTEEBdC/0YHk1YFD1CpAAIRfsPQxgB+o8GnEX9MoFgF+8E7uUQiD+EakYACACCAQ/9VHr1Ao3c7zWCFafNRnBi2MsRyUFWoAYayIHhj7viTxbA/IF3aENX1+3LMBCZ28MXG8/FWUQdOvr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=WJoDJccT; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=bmlL4YKH5DTxAUq2pa+8OfWCRjkrF5N9BM2uviGaBH/WqQ3fGgA9tvI+hsrqbE/ab8HaSE3b25ar8DsyI59TmnlhCdsJNkpkANKRwD0vzR6zW4yoFmvlj0ERFKuh3GfvbBOqZQrAXkUKtTdJQHcMRXXSBS++cTtL506Fgq31UjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=PybWfLv1; arc=none smtp.client-ip=62.96.220.36
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 8903D207D8;
-	Wed, 10 Jun 2026 16:08:15 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 5CFEE20764;
+	Wed, 10 Jun 2026 16:08:10 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mZMqkkerLqcT; Wed, 10 Jun 2026 16:08:15 +0200 (CEST)
+ with ESMTP id veUIgNgZZ9P3; Wed, 10 Jun 2026 16:08:09 +0200 (CEST)
 Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id E1C8120758;
-	Wed, 10 Jun 2026 16:08:14 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E1C8120758
+	by mx1.secunet.com (Postfix) with ESMTPS id B2ABB20758;
+	Wed, 10 Jun 2026 16:08:09 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B2ABB20758
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1781100494;
-	bh=1f4MeDP/ypBGZr4FGe856IS9x0kUL9G4fD4gnTfI6x0=;
+	s=202301; t=1781100489;
+	bh=BxjVpY+HQNhdLt1UlKyAEhcHoMpuOb5+M1ZGj2E2yRw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=WJoDJccTMUNByNo0qbbnaIuA/owZBV7iA3BBylGIf2iAwghQpFJt9END4VvpCE780
-	 p3/deMPJ5cAKxPyKnKg/0R7XTQzXXsX6PQqf1VAnsK+w5O3+pl6GSb+tliD3b4hYz/
-	 iYj93/wy/z5yLBb7tAhYCcshR/IbnrxMMxVZZTSEPX8cobkagGtcnM3U/BB660k/En
-	 fuf5fdovtsAr28hNA5rk8Augfn8MwflG2YszJ8W6ef5n5vGEu/eOXTBt4aciq/7Dbt
-	 v06/64y1l3lq8o5v2ygr+xXlncxnsjPLWtRybIhirVxDoni7tz19ZEzq1lTv0g67rz
-	 hr2CbLLKKArPg==
+	b=PybWfLv1sLgiAxsCHbW2PIWZ1eLwi6KPmvTrks8NLxCF45MUiVoPhZCRZ0O/uTNT1
+	 7Pj8f7V8wk93atCmlnl5HGSIOGb89MU3HwMq7RRY8rVy/RozR+5t7NAUpXjKoNtyZy
+	 4vdrbMTi73bdSDTqYAxo4h0BruSN4yQFFFQYDiqq9OjqhojUTx4P2DrpMrjSQG1sSv
+	 z60wbR+3F5QhUbRtLUf0PisGyFbKQTC6OdqfW9RiwhHiz+J5dRWwjplKwcGRYhFklf
+	 CK8rYqsNZ4LNH+DdAQY+t72KgHkUHPqWyG5GvGQXHnnKdLiv3QGsHC56FlYCHnb2A1
+	 zEmWa3rrKCvGQ==
 Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 10 Jun
- 2026 16:08:14 +0200
-Received: (nullmailer pid 2563200 invoked by uid 1000);
+ 2026 16:08:09 +0200
+Received: (nullmailer pid 2563203 invoked by uid 1000);
 	Wed, 10 Jun 2026 14:08:07 -0000
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 3/6] xfrm: policy: fix use-after-free on inexact bin in xfrm_policy_bysel_ctx()
-Date: Wed, 10 Jun 2026 16:07:42 +0200
-Message-ID: <20260610140800.2562818-4-steffen.klassert@secunet.com>
+Subject: [PATCH 4/6] xfrm: iptfs: fix ABBA deadlock in iptfs_destroy_state()
+Date: Wed, 10 Jun 2026 16:07:43 +0200
+Message-ID: <20260610140800.2562818-5-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260610140800.2562818-1-steffen.klassert@secunet.com>
 References: <20260610140800.2562818-1-steffen.klassert@secunet.com>
@@ -81,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-01.secunet.de
+X-ClientProxiedBy: EXCH-03.secunet.de (10.32.0.183) To EXCH-01.secunet.de
  (10.32.0.171)
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297697-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297693-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -110,83 +110,84 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[secunet.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:dkim,secunet.com:email,secunet.com:mid,secunet.com:from_mime];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,secunet.com:dkim,secunet.com:email,secunet.com:mid,secunet.com:from_mime,labn.net:email,talencesecurity.com:email];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F02166A240
+X-Rspamd-Queue-Id: BC41066A22D
 
-From: Sanghyun Park <sanghyun.park.cnu@gmail.com>
+From: Tristan Madani <tristmd@gmail.com>
 
-Fix the race by pruning the bin while still holding xfrm_policy_lock,
-before dropping it. Use __xfrm_policy_inexact_prune_bin() directly since
-the lock is already held. The wrapper xfrm_policy_inexact_prune_bin()
-becomes unused and is removed.
+iptfs_destroy_state() calls hrtimer_cancel() while holding a spinlock
+that the timer callback also acquires, leading to an ABBA deadlock on
+SMP systems.
 
-Race:
+For the output timer (iptfs_timer):
+  - iptfs_destroy_state() holds x->lock, calls hrtimer_cancel()
+  - iptfs_delay_timer() callback takes x->lock
 
-  CPU0 (XFRM_MSG_DELPOLICY)           CPU1 (XFRM_MSG_NEWSPDINFO)
-  ==========================          ==========================
-  xfrm_policy_bysel_ctx():
-    spin_lock_bh(xfrm_policy_lock)
-    bin = xfrm_policy_inexact_lookup()
-    __xfrm_policy_unlink(pol)
-    spin_unlock_bh(xfrm_policy_lock)
-    xfrm_policy_kill(ret)
-    // wide window, lock not held
-                                       xfrm_hash_rebuild():
-                                         spin_lock_bh(xfrm_policy_lock)
-                                         __xfrm_policy_inexact_flush():
-                                           kfree_rcu(bin)  // bin freed
-                                         spin_unlock_bh(xfrm_policy_lock)
-    xfrm_policy_inexact_prune_bin(bin)
-    // UAF: bin is freed
+For the drop timer (drop_timer):
+  - iptfs_destroy_state() holds drop_lock, calls hrtimer_cancel()
+  - iptfs_drop_timer() callback takes drop_lock
 
-Fixes: 6be3b0db6db8 ("xfrm: policy: add inexact policy search tree infrastructure")
-Signed-off-by: Sanghyun Park <sanghyun.park.cnu@gmail.com>
+Both timers use HRTIMER_MODE_REL_SOFT, so their callbacks run in softirq
+context.  When hrtimer_cancel() is called for a soft timer that is
+currently executing on another CPU, hrtimer_cancel_wait_running() spins
+on softirq_expiry_lock -- the same lock held by the softirq running the
+callback.  If the callback is blocked waiting for the spinlock held by
+the caller of hrtimer_cancel(), a circular dependency forms:
+
+  CPU 0: holds lock_A -> waits for softirq_expiry_lock
+  CPU 1: holds softirq_expiry_lock -> waits for lock_A
+
+Fix by calling hrtimer_cancel() before acquiring the respective locks.
+hrtimer_cancel() is safe to call without holding any lock and will wait
+for any in-progress callback to complete.  For the output timer, the
+lock is still acquired afterwards to drain the packet queue.  For the
+drop timer, the lock/unlock pair is removed entirely since it only
+existed to serialize with the timer callback, which hrtimer_cancel()
+already guarantees.
+
+Found by source code audit.
+
+Fixes: 4b3faf610cc6 ("xfrm: iptfs: add new iptfs xfrm mode impl")
+Cc: Christian Hopps <chopps@labn.net>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_policy.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+ net/xfrm/xfrm_iptfs.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index dd09d2063da2..959544425692 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -1156,15 +1156,6 @@ static void __xfrm_policy_inexact_prune_bin(struct xfrm_pol_inexact_bin *b, bool
- 	}
- }
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index aea63a000d1d..ad810d1f97c0 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2730,8 +2730,9 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	if (!xtfs)
+ 		return;
  
--static void xfrm_policy_inexact_prune_bin(struct xfrm_pol_inexact_bin *b)
--{
--	struct net *net = read_pnet(&b->k.net);
--
--	spin_lock_bh(&net->xfrm.xfrm_policy_lock);
--	__xfrm_policy_inexact_prune_bin(b, false);
--	spin_unlock_bh(&net->xfrm.xfrm_policy_lock);
--}
--
- static void __xfrm_policy_inexact_flush(struct net *net)
- {
- 	struct xfrm_pol_inexact_bin *bin, *t;
-@@ -1707,12 +1698,12 @@ xfrm_policy_bysel_ctx(struct net *net, const struct xfrm_mark *mark, u32 if_id,
- 		}
- 		ret = pol;
- 	}
-+	if (bin && delete)
-+		__xfrm_policy_inexact_prune_bin(bin, false);
- 	spin_unlock_bh(&net->xfrm.xfrm_policy_lock);
+-	spin_lock_bh(&xtfs->x->lock);
+ 	hrtimer_cancel(&xtfs->iptfs_timer);
++
++	spin_lock_bh(&xtfs->x->lock);
+ 	__skb_queue_head_init(&list);
+ 	skb_queue_splice_init(&xtfs->queue, &list);
+ 	spin_unlock_bh(&xtfs->x->lock);
+@@ -2739,9 +2740,7 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+ 	while ((skb = __skb_dequeue(&list)))
+ 		kfree_skb(skb);
  
- 	if (ret && delete)
- 		xfrm_policy_kill(ret);
--	if (bin && delete)
--		xfrm_policy_inexact_prune_bin(bin);
- 	return ret;
- }
- EXPORT_SYMBOL(xfrm_policy_bysel_ctx);
+-	spin_lock_bh(&xtfs->drop_lock);
+ 	hrtimer_cancel(&xtfs->drop_timer);
+-	spin_unlock_bh(&xtfs->drop_lock);
+ 
+ 	if (xtfs->ra_newskb)
+ 		kfree_skb(xtfs->ra_newskb);
 -- 
 2.43.0
 
