@@ -1,250 +1,124 @@
-Return-Path: <netdev+bounces-297525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297526-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id l2z3EV8fKWogRAMAu9opvQ
-	(envelope-from <netdev+bounces-297525-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:25:03 +0200
+	id CVGwLbYfKWo+RAMAu9opvQ
+	(envelope-from <netdev+bounces-297526-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:26:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6EFE6671F7
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:25:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0FAC667239
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:26:29 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=RGawjTvh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297525-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297525-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=TPA2mTk3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297526-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297526-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8282331F9368
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:17:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A88432023F6
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBEA394780;
-	Wed, 10 Jun 2026 08:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72EA385D69;
+	Wed, 10 Jun 2026 08:17:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262A43A5422
-	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 08:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DD73A5427;
+	Wed, 10 Jun 2026 08:17:35 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781079446; cv=none; b=Qqmr4p09Ovdr+hiraPQQJ4Fa0EmWV4o7nNLRQy16UazSOGrJGn1C5KMGiE0V3E8bor+TKCq21xKnpzI46x/kjLWc+9ojhnyC2d47BEYHZAYFAKuIRb5CRg8l9NopkMumoYp3FEUNNVBAle2RPca6WdkALLBdL7CepM6cld2gM8M=
+	t=1781079457; cv=none; b=In4iRGBD9NDl21dhs7KVzrRnwwqMMicLSQpCfIhguxdk9IqBqnmgvtEQIFYbAVsNqZcoZNQ8cIz8CUfjm/NE12s+4yr1uOjjD0fxaDWRCkAwhntNJX9izcg4LwKRCZ2OL/VesARioTowH4QFLDVqhwSF2w9RhwFuT+qLvuw+3CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781079446; c=relaxed/simple;
-	bh=/1WlT6A0jrrBng2OsyVNSwYFBDu7D3Fdbm/ZHj0eyik=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jMO3fhV2yL1OvDMCE1MM562WTgwNT2u25c3ICzCq9e5DlA8G4guya7IzN12GEx0kY4cpjgBl3O2iivnpMA94ScLZKxClBVeWd/NDGiiUkd64SXV7e1g3f/P9pq9Zo3zfZjsO2mw/MmQNa7aLcFzLaL3KZWQYrUZTgTFVrVhc9OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RGawjTvh; arc=none smtp.client-ip=209.85.210.170
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-84275887a3fso4648880b3a.1
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 01:17:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781079442; x=1781684242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a6XIekyaK7oSHiR1vFLaniVYpHryv3YEOxStMQ5ewHw=;
-        b=RGawjTvhdqfeEmQSZxSWUQwxpuwqWf1QYu+q9CQNyVw1hypoTE3jEgkkJW60mb1FhS
-         8ptQyOjBtul5xknaLekBLSgCxMGDRDN7yhGBFkdxOeIYrB+IJ7H7LWhnKDG+5EvA9Tds
-         spXASutOS05sNAVjCXX6mmmhrsmwgJP9rO++5qmGGGUb/fmHaqJ/vbCg5lYwjG+Wc2h2
-         Wi6IyieuK/C5nLaLONT2hac+qtaj2ckzdvLNwnQWL8gTZHIBUt3FPocwRDn62kElcJH9
-         k8JVcwCL5BBPGW/Lm0X0xzc4k64JzqoqO4tSwgLyVQz0GCb+X9PqZ7475XT2s44kwiez
-         5nrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781079442; x=1781684242;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a6XIekyaK7oSHiR1vFLaniVYpHryv3YEOxStMQ5ewHw=;
-        b=kAsC6ekGrAsgw4Ky6IzRrnviaMWtL3yCVwIEDaKdb93VS7e3sq6C4eRVwWhC1c68t/
-         IQTUEep5rCFdus/HfP01CXFXBQ3VPJYKXTvb+DzpBQYQHi8pcrDlDZvM950a5qa7Xsh2
-         Y2jaMIW8liNVw/03vle2SCAEgjE/jJID0azHkFkEwScuch+wYNzLqWlAtQDZ1MvbpQ9o
-         JvGcNJGenJpQKJ99xwsbkpW8IlKkEoSFw4+t1qGec6pjwvRjCpSFFmSOXL/FI6p4u+Nz
-         YODe7EIL7tCW/BEfiA931Y9bikxMvaRqasPbNJu1lBSLYKtsOXopE3x49cK6hCLeUAU2
-         jICA==
-X-Forwarded-Encrypted: i=1; AFNElJ8LbCqtMpZ6XAXtVsj42eHLSqcvO85Qp8TwjtyaRNYWCy6EcMuEwCtpB13jqysYSL7R0YpnRWg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNgUHOZmXpIrFrDNnIGIRRHMbbye7DNDGXM8hoEcA0UFIMSRFl
-	Or5WNaWavLKzDbPuXpzySoLi2LF5ICJP8BSl4LvxaKZknU9npBUIAJW6
-X-Gm-Gg: Acq92OFsyIhhAZNhST2+FMP+ml9E1Ja0WbuXV3SotfGhf6A1C2PLkRTbBxGm6AjX7hQ
-	Fmw2KohCYEhXZlUhUk3vk8VRDN3UJOnw7S2QG6XV4QjNnlf8lL9vceKlV5ImTzUWgvQdSoqqRe/
-	o1LmgQqYBWQEe4121NLrKEPMkE0QTMy9ucA/RevwFSH4Xg3RoucUuJWLMTbQhap+/pwFTbzVqyq
-	kq51Bj8OacS96jxS+KctQAtt51//XeWhIZZXhmBtdPbcD4efHARRZiukByHKyb8r/EnTIyhfekL
-	/6dLnRkashWqQYo78nP0qxCoKxooDlYzALe9AB9iRQEKUIuwyTDxG2tmumpbXP/ebOR0PYes7NB
-	sdVT7WGEkyN1hFeaIaZIIliHGdXZDJJjdHNw0zAxzr4Prgj5enqW0fc6fYOf2yx69TYAXeJ6Z2Q
-	XsUQDwHsrsAKxd+4cMUp+OX0bqEZe/k6wfsqsK2lB5cKRY7gy1da+a3jt55eghpp4q1+DJj4zeg
-	qUlJY8VGF2IYbJm8g9iBZcCJ9LuA55PRziL
-X-Received: by 2002:a05:6a00:138c:b0:842:3d8d:babb with SMTP id d2e1a72fcca58-842b6660648mr19475903b3a.2.1781079442078;
-        Wed, 10 Jun 2026 01:17:22 -0700 (PDT)
-Received: from secrnd-cstp.tailb7f510.ts.net ([125.131.91.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84282916b10sm23929773b3a.58.2026.06.10.01.17.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 01:17:21 -0700 (PDT)
-From: Sanghyun Park <sanghyun.park.cnu@gmail.com>
-To: krzk@kernel.org
-Cc: Sanghyun Park <sanghyun.park.cnu@gmail.com>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	681739313@139.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] nfc: nci: Fix use-after-free on conn_info in nci_tx_work()
-Date: Wed, 10 Jun 2026 17:16:57 +0900
-Message-ID: <20260610081657.686636-1-sanghyun.park.cnu@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1781079457; c=relaxed/simple;
+	bh=jWe340fNu+mPd/pF10NYauyAvpo+Hc4PmS7vOqcVrBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bfR1RXK7azbkvwpuPurulQ5tbQp+fnonRDQOjB/vgY80idYr+TdAjWmHYF06zsWqCn9oPlksI+Ky+Ka6n2deL617YZYIazHClhqZ7rTC8ZTleyS7Y3bYvUTk3JJ4cjAM8TcBHPNeTAbKIWfDpa9NSBQZI810d5TGBz3CigVZNUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TPA2mTk3; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3p/mMmW7IHJvVRznabZjU91tH/WM3JQEEXniHthnqsE=; b=TPA2mTk3Z6Mok+U8o2EzBxLQec
+	0Q5za7ynJfnPUyOwFd1fYa0vvAxTWBD6t++4NcQbkB/FjYSowdI7RgUHR8ElC36qIGJR+bqGifEKF
+	x+V2LtXUAdDqLny1ax/Go3SI32WnT2U+rprKXqCRoBgsZ5y2KsYj5rY7feWmNageTvWA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wXE7g-006whT-JB; Wed, 10 Jun 2026 10:17:16 +0200
+Date: Wed, 10 Jun 2026 10:17:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next v1 1/6] dt-bindings: net: dwmac: Add snps,use-ncsi
+ property
+Message-ID: <a542aee0-cc4a-4bed-85fa-1ec6fdfe87d9@lunn.ch>
+References: <20260610072420.64699-1-minda.chen@starfivetech.com>
+ <20260610072420.64699-2-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260610072420.64699-2-minda.chen@starfivetech.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,139.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297525-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:krzk@kernel.org,m:sanghyun.park.cnu@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:681739313@139.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sanghyunparkcnu@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sanghyunparkcnu@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297526-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sanghyunparkcnu@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_RECIPIENTS(0.00)[m:minda.chen@starfivetech.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:joabreu@synopsys.com,m:mcoquelin.stm32@gmail.com,m:linux@armlinux.org.uk,m:peppe.cavallaro@st.com,m:alexandre.torgue@foss.st.com,m:robh+dt@kernel.org,m:krzk+dt@kernel.org,m:conor@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:robh@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,synopsys.com,gmail.com,armlinux.org.uk,st.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B6EFE6671F7
+X-Rspamd-Queue-Id: F0FAC667239
 
-nci_tx_work() looks up conn_info from conn_info_list and keeps using
-that pointer while sending queued data. nci_core_conn_close_rsp_packet()
-runs on the separate rx_wq and can remove and free the same conn_info,
-so the tx worker can dereference freed memory.
+On Wed, Jun 10, 2026 at 03:24:15PM +0800, Minda Chen wrote:
+> Add snps,use-ncsi dts bindings property for Synopsys designware
 
-Race:
+Is there anything SNPS specific in how NCSI is implemented? Should
+this be a generic option which any Ethernet interface can use?
 
-  CPU0 (tx_wq)                         CPU1 (rx_wq)
-  ============                         ============
-  nci_tx_work()
-    conn_info = nci_get_conn_info_by_conn_id()
-                                       nci_core_conn_close_rsp_packet()
-                                         list_del(&conn_info->list)
-                                         devm_kfree(conn_info)
-    atomic_read(&conn_info->credits_cnt)
-    // UAF: conn_info was freed by CPU1
-
-Protect conn_info_list with a dedicated conn_lock while nci_tx_work()
-uses conn_info and while nci_core_conn_close_rsp_packet() removes and
-frees it. This makes close wait for any in-flight tx worker before
-freeing the entry, and makes later tx workers observe that the entry is
-already gone.
-
-Signed-off-by: Sanghyun Park <sanghyun.park.cnu@gmail.com>
----
-v2:
-  - Replace flush-only fix with conn_lock protection
-v1: https://patchwork.kernel.org/project/netdevbpf/patch/CAOrxSK5UmFFfzdRG+P89+E+Rvg_1DmOvTs+M7353Q8=hkPXmSg@mail.gmail.com/
-
- include/net/nfc/nci_core.h | 1 +
- net/nfc/nci/core.c         | 9 +++++++--
- net/nfc/nci/rsp.c          | 2 ++
- 3 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/nfc/nci_core.h b/include/net/nfc/nci_core.h
-index e066bdbc807..22b245bc17c 100644
---- a/include/net/nfc/nci_core.h
-+++ b/include/net/nfc/nci_core.h
-@@ -227,6 +227,7 @@ struct nci_dev {
- 	struct sk_buff_head	tx_q;
- 
- 	struct mutex		req_lock;
-+	struct mutex		conn_lock;
- 	struct completion	req_completion;
- 	__u32			req_status;
- 	__u32			req_result;
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index 058d4eb530f..a24b9703115 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -1277,6 +1277,7 @@ int nci_register_device(struct nci_dev *ndev)
- 	timer_setup(&ndev->data_timer, nci_data_timer, 0);
- 
- 	mutex_init(&ndev->req_lock);
-+	mutex_init(&ndev->conn_lock);
- 	INIT_LIST_HEAD(&ndev->conn_info_list);
- 
- 	rc = nfc_register_device(ndev->nfc_dev);
-@@ -1512,9 +1513,10 @@ static void nci_tx_work(struct work_struct *work)
- 	struct nci_conn_info *conn_info;
- 	struct sk_buff *skb;
- 
-+	mutex_lock(&ndev->conn_lock);
- 	conn_info = nci_get_conn_info_by_conn_id(ndev, ndev->cur_conn_id);
- 	if (!conn_info)
--		return;
-+		goto unlock;
- 
- 	pr_debug("credits_cnt %d\n", atomic_read(&conn_info->credits_cnt));
- 
-@@ -1522,7 +1524,7 @@ static void nci_tx_work(struct work_struct *work)
- 	while (atomic_read(&conn_info->credits_cnt)) {
- 		skb = skb_dequeue(&ndev->tx_q);
- 		if (!skb)
--			return;
-+			goto unlock;
- 		kcov_remote_start_common(skb_get_kcov_handle(skb));
- 
- 		/* Check if data flow control is used */
-@@ -1541,6 +1543,9 @@ static void nci_tx_work(struct work_struct *work)
- 			  jiffies + msecs_to_jiffies(NCI_DATA_TIMEOUT));
- 		kcov_remote_stop();
- 	}
-+
-+unlock:
-+	mutex_unlock(&ndev->conn_lock);
- }
- 
- /* ----- NCI RX worker thread (data & control) ----- */
-diff --git a/net/nfc/nci/rsp.c b/net/nfc/nci/rsp.c
-index b911ab78bed..dfebf1ed945 100644
---- a/net/nfc/nci/rsp.c
-+++ b/net/nfc/nci/rsp.c
-@@ -330,6 +330,7 @@ static void nci_core_conn_close_rsp_packet(struct nci_dev *ndev,
- 
- 	pr_debug("status 0x%x\n", status);
- 	if (status == NCI_STATUS_OK) {
-+		mutex_lock(&ndev->conn_lock);
- 		conn_info = nci_get_conn_info_by_conn_id(ndev,
- 							 ndev->cur_conn_id);
- 		if (conn_info) {
-@@ -338,6 +339,7 @@ static void nci_core_conn_close_rsp_packet(struct nci_dev *ndev,
- 				ndev->rf_conn_info = NULL;
- 			devm_kfree(&ndev->nfc_dev->dev, conn_info);
- 		}
-+		mutex_unlock(&ndev->conn_lock);
- 	}
- 	nci_req_complete(ndev, status);
- }
--- 
-2.48.1
+     Andrew
 
