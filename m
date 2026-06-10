@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-297828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297829-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BZsoN4TCKWqIcwMAu9opvQ
-	(envelope-from <netdev+bounces-297828-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:01:08 +0200
+	id ZCFJA3TCKWqEcwMAu9opvQ
+	(envelope-from <netdev+bounces-297829-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:00:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5368766CA94
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:01:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECBF866CA8C
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 22:00:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297828-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297828-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297829-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297829-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EED2930E5ECD
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:57:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 24FC43029859
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 19:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC7A37BE9F;
-	Wed, 10 Jun 2026 19:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676CC37C90B;
+	Wed, 10 Jun 2026 19:57:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68902376BC1;
-	Wed, 10 Jun 2026 19:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175BC37C11F;
+	Wed, 10 Jun 2026 19:57:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781121419; cv=none; b=AbXUF07bSZtMFEgP0rroeU0IbOXy9ADaihA/DiILKBQl9Nlj65MNJ895k/YstQvgIrtw4b2Eln48m22DSdhxH4FX1yojHyeMIVa/Y9zeoKGg7i+gfhZzDWxsWeCiU3tdCaSkuUQfaFPpYQgVqLrHWmkeePF/s1tQVXQulwxFmpw=
+	t=1781121426; cv=none; b=opjSGs1xDehDgQXVJelLyx5zG8MhCr0wBtS0GYciRN8r1BfVMLeupucKD1G3eZwH0Foii3mMHTCE2/Y8PAN/wnDHgwsHTjLswZXjUonoMlYm2p+Aqcp+r3KpUtPu473tZbr/MjCm4/6aklh3KMPRyV/74rVeMrJpi2dGMisHe4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781121419; c=relaxed/simple;
-	bh=3yDym32A6vie6G0HBbsY6ZSEd1Xu9R/v4xgVZoM5ZuU=;
+	s=arc-20240116; t=1781121426; c=relaxed/simple;
+	bh=0rULhtLOQ6kE489d15yhm5Kk8h/qqJMigJrUrtTahgw=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0CkiNt13ZWct9zSvCEDVGZf55QSBkwuy8ac6nR7TboowDvDE8J8LpsXsmkxjRrMvaQeF0Df1mN5Yyh8wL1DPdSWoq9oZ0vGbofe+iFt5Oj95AFiXVLszi6An6oB3bplTH6uTpDqIUWJ8lg0GN20eYFQhO6EwMiXSaW/9dx056Q=
+	 Content-Type:Content-Disposition:In-Reply-To; b=WSxGtNIo0bz2RrN8t7SaXzt5O8Mhl8Qzy48nSLq+QQOrxibxcPbDObXNOgJJ85tBB2RjbZYfWVruoOT8gEzdPLFzwS1Tlr4hxlF7a+g7xcA6/T9iQ8W1DkVo5OM+7Elsz9c8SSXspYB8Qgf6JZyt37U4A4afTNTVdSB8Z0cU7bk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wXP2j-000000000Hk-0R87;
-	Wed, 10 Jun 2026 19:56:53 +0000
-Date: Wed, 10 Jun 2026 20:56:50 +0100
+	id 1wXP2p-000000000IG-3tQu;
+	Wed, 10 Jun 2026 19:57:00 +0000
+Date: Wed, 10 Jun 2026 20:56:57 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
 	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
@@ -53,8 +53,9 @@ To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next 7/8] net: dsa: mt7530: implement port_fast_age
-Message-ID: <5de707c22f924b0f9eec85b1869f66b4ffd9b300.1781119435.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 8/8] net: dsa: mt7530: implement port_change_conduit
+ op
+Message-ID: <91ae0f87a6ca2cce3d072dba548545e02347bf13.1781119435.git.daniel@makrotopia.org>
 References: <cover.1781119435.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,15 +71,15 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297828-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297829-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	DMARC_NA(0.00)[makrotopia.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[arinc9.com,makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
@@ -97,70 +98,67 @@ X-Spamd-Result: default: False [1.04 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5368766CA94
+X-Rspamd-Queue-Id: ECBF866CA8C
 
-Implement the .port_fast_age DSA operation by flushing all non-static
-(dynamically learned) MAC address entries from the address table.
-
-The switch does not offer a combined "non-static AND per-port" match
-mode, so flush all dynamic entries globally. This is consistent with
-what other DSA drivers do (b53, realtek) and relearning is fast.
+Allow changing the CPU port affinity of user ports at runtime via
+the IFLA_DSA_CONDUIT netlink attribute. This updates the port matrix
+to forward to the new CPU port instead of the old one.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/mt7530.c | 16 ++++++++++++++++
- drivers/net/dsa/mt7530.h |  1 +
- 2 files changed, 17 insertions(+)
+ drivers/net/dsa/mt7530.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index dcf72ab0cd66..c96420c291d5 100644
+index c96420c291d5..2f3e734b9f53 100644
 --- a/drivers/net/dsa/mt7530.c
 +++ b/drivers/net/dsa/mt7530.c
-@@ -193,6 +193,21 @@ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
+@@ -3206,6 +3206,34 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
  	return 0;
  }
  
-+static void mt7530_port_fast_age(struct dsa_switch *ds, int port)
++static int
++mt753x_port_change_conduit(struct dsa_switch *ds, int port,
++			   struct net_device *conduit,
++			   struct netlink_ext_ack *extack)
 +{
++	struct dsa_port *new_cpu_dp = conduit->dsa_ptr;
++	struct dsa_port *dp = dsa_to_port(ds, port);
 +	struct mt7530_priv *priv = ds->priv;
-+	struct mt7530_dummy_poll p;
-+	u32 val;
 +
-+	/* Flush all non-static MAC address entries */
-+	val = ATC_BUSY | ATC_MAT_NON_STATIC_MAC | MT7530_FDB_FLUSH;
-+	regmap_write(priv->regmap, MT7530_ATC, val);
++	if (priv->id != ID_MT7531)
++		return -EOPNOTSUPP;
 +
-+	INIT_MT7530_DUMMY_POLL(&p, priv, MT7530_ATC);
-+	readx_poll_timeout(mt7530_mii_poll, &p, val,
-+			   !(val & ATC_BUSY), 20, 20000);
++	mutex_lock(&priv->reg_mutex);
++
++	/* dp->cpu_dp still points to the old CPU port */
++	priv->ports[port].pm &= ~PCR_MATRIX(BIT(dp->cpu_dp->index));
++	priv->ports[port].pm |= PCR_MATRIX(BIT(new_cpu_dp->index));
++	if (priv->ports[port].enable)
++		regmap_update_bits(priv->regmap, MT7530_PCR_P(port),
++				   PCR_MATRIX_MASK, priv->ports[port].pm);
++
++	mutex_unlock(&priv->reg_mutex);
++
++	mt7530_port_fast_age(ds, port);
++
++	return 0;
 +}
 +
  static void
- mt7530_fdb_read(struct mt7530_priv *priv, struct mt7530_fdb *fdb)
- {
-@@ -3319,6 +3334,7 @@ static const struct dsa_switch_ops mt7530_switch_ops = {
- 	.port_bridge_flags	= mt7530_port_bridge_flags,
- 	.port_bridge_join	= mt7530_port_bridge_join,
- 	.port_bridge_leave	= mt7530_port_bridge_leave,
-+	.port_fast_age		= mt7530_port_fast_age,
- 	.port_fdb_add		= mt7530_port_fdb_add,
- 	.port_fdb_del		= mt7530_port_fdb_del,
- 	.port_fdb_dump		= mt7530_port_fdb_dump,
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index abf19aa69520..decad7a93dbd 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -165,6 +165,7 @@ enum mt753x_to_cpu_fw {
- #define  ATC_MAT_MASK			GENMASK(11, 8)
- #define  ATC_MAT(x)			FIELD_PREP(ATC_MAT_MASK, x)
- #define  ATC_MAT_MACTAB			ATC_MAT(0)
-+#define  ATC_MAT_NON_STATIC_MAC	ATC_MAT(4)
- 
- enum mt7530_fdb_cmd {
- 	MT7530_FDB_READ	= 0,
+ mt753x_conduit_state_change(struct dsa_switch *ds,
+ 			    const struct net_device *conduit,
+@@ -3317,6 +3345,7 @@ static const struct dsa_switch_ops mt7530_switch_ops = {
+ 	.setup			= mt753x_setup,
+ 	.teardown		= mt753x_teardown,
+ 	.preferred_default_local_cpu_port = mt753x_preferred_default_local_cpu_port,
++	.port_change_conduit	= mt753x_port_change_conduit,
+ 	.get_strings		= mt7530_get_strings,
+ 	.get_ethtool_stats	= mt7530_get_ethtool_stats,
+ 	.get_sset_count		= mt7530_get_sset_count,
 -- 
 2.54.0
 
