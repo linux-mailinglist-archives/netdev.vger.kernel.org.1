@@ -1,132 +1,232 @@
-Return-Path: <netdev+bounces-297505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297513-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vBszBU8YKWopQgMAu9opvQ
-	(envelope-from <netdev+bounces-297505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:54:55 +0200
+	id XkzJM2EaKWqzQgMAu9opvQ
+	(envelope-from <netdev+bounces-297513-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:03:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E4D666D0F
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:54:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4511E666E50
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 10:03:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FK0bOpYz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297505-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297505-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=realtek.com header.s=dkim header.b=mrRbiJ3J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297513-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297513-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realtek.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1562D31E94BE
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:48:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9F21C30143D8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 08:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A135F3939B0;
-	Wed, 10 Jun 2026 07:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34DD339EF24;
+	Wed, 10 Jun 2026 08:00:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0ACE30C60C;
-	Wed, 10 Jun 2026 07:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C7F39E9CB;
+	Wed, 10 Jun 2026 08:00:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781077708; cv=none; b=dL5utnP3sQ4WCEDdcrgX333+Wilk2Fat5TCeW1vfebUt4iPLw162WH/haZtFFbi40Bs8g3mUCJHLpQYo9d13qUqVScCDCWy4GC4cY5y2ACsBdgt3fNu94L2h1U+yQTjqebBqYTO0FfRRRNDvVmkI4D8r24y9dkUeLXRrhplGmcY=
+	t=1781078429; cv=none; b=qAkFxWzz01KjMPX5T6zaV88Km/4fhjQbsbGts7ooHpNvpz4h3+XxtnSl34zo/eOPOwZ37+iRrPQZHjCoZ8nHgjKeEOeURjOZ06Z3f3rJ4jLRU1Etf2sxeK1XQ61jqJ6u3kYquSCQh/U/nMd9wobIDqjZKNeIhIZLjIZ2mcnvPvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781077708; c=relaxed/simple;
-	bh=AP0KvO7FRfIaPrQuLAGpmKUfEUalxOS01TFwrGE3Jww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cHQrUoZX021DQK3nTUR30wajQRPCVBrgeZOu0OX65SGqGBtT7/y6H66hIWj6m9cb0tLhdedBlrajiuqqvFkwAxGlTcuSb6WojjweF/DP6rr/U16vpRws1U9wmIHDRmVK0czIg1Hagt4XjnbyYwdmtYTJ1RL9hw1PXgDrUh3V+6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FK0bOpYz; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 638011F00893;
-	Wed, 10 Jun 2026 07:48:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781077707;
-	bh=BpByu+4r0Jil7SYcQMOmxaSrcuGydaoH1G97vA7TyoU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FK0bOpYzoKJfCd+JrVcWYUAIFZoIBh4UCnTtHQCKR4logrCAnDloZBixOMfssTwe7
-	 g+LWVyrPK9AYBKWe1wnFVgfnjdOy9s6JpAK7L7E3LC4Y2+IjqXY0iQP0RTP0Mngybu
-	 JEl6eBIX2Koz3bm0VnYqi7LvTZ09aWkdz5kAzQbLt20ZJmIydbIx81Ss7+3VWKUWkx
-	 aR/Q+lQsxDzk7BlmNB+9OQYITyG8SmsYoue7CN4g3NZPaJyETnsb9hTAth7WfTnGPf
-	 GIfLdSdU0RarWauHvFD4y4p73vExRvAphu1LaPhWc8p8JcSPL5jvLGtlKYVxEDUEGL
-	 l/LQIljbn7N8g==
-Date: Wed, 10 Jun 2026 09:48:23 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Markus Stockhausen <markus.stockhausen@gmx.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, chris.packham@alliedtelesis.co.nz, daniel@makrotopia.org, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/5] dt-bindings: net: realtek,rtl9301-mdio:
- Add RTL931x series
-Message-ID: <20260610-prompt-aquatic-bison-ceedd8@quoll>
-References: <20260609052856.3142922-1-markus.stockhausen@gmx.de>
- <20260609052856.3142922-2-markus.stockhausen@gmx.de>
+	s=arc-20240116; t=1781078429; c=relaxed/simple;
+	bh=UFE+ldR7lcXNh3SHD18rE+16XwFTkitXv7hvr/QWd50=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kYPelQFYfSoBOIrEVVu7NA7PaFqeKgF12Kp3BPt3C1cAorHniMzlUyf4LL6Bk30cVMC6nMxbdc5FLMiazhVNGRY34jeOeOU4M/P38mnxOifBQyeTKVIU737yJ8HJR+2DHekvDo6woXXHLYeLyjuHFViA7L0M8DzMBfphNdZtiNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=mrRbiJ3J; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65A7o1uB5976202, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1781077801; bh=7v47yqvVpZTp5S18TprUYuBRl8n7DAHP9QsHUvLllDA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=mrRbiJ3Ja9ennWwONqzm/oUr0n7DGTAC3wx8+66r7a5Pc5foxUZXrBUGcImi27/35
+	 jYuVB3Z3jeBhkcc5YotMXnAUl0mZe1xv1Wt31RAwy03uEK8lQv0RyxWF/mLpz8afyg
+	 LpRU6ZhHHH75MknYKd+h4PXI2ok3bIxw+Sowv8b1tZtjEMjQwyKtD6WOANUBaK1nSA
+	 RiHIJzvOfsmunbSECiB6N1CeMsyQ5pdOw83sJKommvwpLadkXd0jW9Nfl15FbBPTv0
+	 nzN7lPqMYLPkW7Jt7UgL6mzVZIGtOXNx7ph3rsdN52leBx9MGltu3o1JADNyrLlxtN
+	 ZB0MNcvpsg/9g==
+Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65A7o1uB5976202
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 10 Jun 2026 15:50:01 +0800
+Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
+ RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Wed, 10 Jun 2026 15:50:01 +0800
+Received: from RTKEXHMBS04.realtek.com.tw ([::1]) by
+ RTKEXHMBS04.realtek.com.tw ([fe80::552f:8b32:656c:c395%6]) with mapi id
+ 15.02.2562.017; Wed, 10 Jun 2026 15:50:01 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: David Laight <david.laight.linux@gmail.com>
+CC: Simon Horman <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "aleksander.lobakin@intel.com"
+	<aleksander.lobakin@intel.com>, Ping-Ke Shih <pkshih@realtek.com>, Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net v2] rtase: Workaround for IP fragmented UDP packet
+ hardware bug
+Thread-Topic: [PATCH net v2] rtase: Workaround for IP fragmented UDP packet
+ hardware bug
+Thread-Index: AQHc9ArcvLfvYqn0fkOKy9pKm3m4Q7Y0hZ8AgAEzauD///PvAIABntKg
+Date: Wed, 10 Jun 2026 07:50:00 +0000
+Message-ID: <d662f59d9be04d9897fbd5b9b2ab3d48@realtek.com>
+References: <20260604101356.15611-1-justinlai0215@realtek.com>
+	<20260608190627.182292-2-horms@kernel.org>
+	<1340406ab190498ab857ad9017529722@realtek.com>
+ <20260609134334.3225b076@pumpkin>
+In-Reply-To: <20260609134334.3225b076@pumpkin>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260609052856.3142922-2-markus.stockhausen@gmx.de>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:markus.stockhausen@gmx.de,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:chris.packham@alliedtelesis.co.nz,m:daniel@makrotopia.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_TO(0.00)[gmx.de];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-297505-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297513-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,m:richardcochran@gmail.com,m:aleksander.lobakin@intel.com,m:pkshih@realtek.com,m:larry.chiu@realtek.com,m:davidlaightlinux@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,vger.kernel.org,gmail.com,intel.com,realtek.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,alliedtelesis.co.nz,makrotopia.org];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,gmx.de:email]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,realtek.com:dkim,realtek.com:email,realtek.com:mid,realtek.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 57E4D666D0F
+X-Rspamd-Queue-Id: 4511E666E50
 
-On Tue, Jun 09, 2026 at 07:28:52AM +0200, Markus Stockhausen wrote:
-> The 10G Realtek Otto switches are divided into two series
-> 
-> - Longan: RTL930x up to 28 ports
-> - Mango : RTL931x up to 56 ports
-> 
-> The Mango based devices have 3 different SoCs RTL9311, RTL9312 and RTL9313.
-> The MDIO controller of these switches works like the existing RTL930x
-> logic but has different characteristics and different registers. Add new
-> compatibles in the device tree.
-> 
-> Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-> ---
->  .../devicetree/bindings/net/realtek,rtl9301-mdio.yaml    | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+David Laight <david.laight.linux@gmail.com> wrote:
+>=20
+> On Tue, 9 Jun 2026 08:20:10 +0000
+> Justin Lai <justinlai0215@realtek.com> wrote:
+>=20
+> > Simon Horman <horms@kernel.org> wrote:
+> > >
+> > > From: 'Simon Horman' <horms@kernel.org>
+> > >
+> > > This is an AI-generated review of your patch. The human sending this
+> > > email has considered the AI review valid, or at least plausible.
+> > > Full review at: https://sashiko.dev
+> > > ---
+> > > rtase: Workaround for IP fragmented UDP packet hardware bug
+> > >
+> > > The hardware parser incorrectly interprets 319/320 in a short IP
+> > > fragmented UDP packet payload as standard PTP destination ports and
+> > > treats the fragment as a PTP packet for further parsing. Pad these
+> > > packets so the transport data reaches RTASE_MIN_PAD_LEN before
+> > > transmitting to avoid triggering the hardware issue.
+> > >
+> > > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > index ef13109c49cff..b686b84e15fe2 100644
+> > > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > >
+> > > [ ... ]
+> > >
+> > > > @@ -1247,6 +1248,52 @@ static u32 rtase_tx_csum(struct sk_buff
+> > > > *skb,
+> > > const struct net_device *dev)
+> > > >       return csum_cmd;
+> > > >  }
+> > > >
+> > > > +static bool rtase_skb_is_udp(struct sk_buff *skb) {
+> > > > +     int no =3D skb_network_offset(skb);
+> > > > +     struct ipv6hdr *i6h, _i6h;
+> > > > +     struct iphdr *ih, _ih;
+> > > > +
+> > > > +     switch (vlan_get_protocol(skb)) {
+> > > > +     case htons(ETH_P_IP):
+> > > > +             ih =3D skb_header_pointer(skb, no, sizeof(_ih), &_ih)=
+;
+> > > > +             return ih && ih->protocol =3D=3D IPPROTO_UDP;
+> > > > +     case htons(ETH_P_IPV6):
+> > > > +             i6h =3D skb_header_pointer(skb, no, sizeof(_i6h), &_i=
+6h);
+> > > > +             return i6h && i6h->nexthdr =3D=3D IPPROTO_UDP;
+> > >
+> > > [Severity: High]
+> > > Does this check fail to traverse IPv6 extension headers?
+> > >
+> > > If an IPv6 packet contains extension headers, such as an IPv6
+> > > fragment (IPPROTO_FRAGMENT), the nexthdr field will contain the
+> > > extension header's protocol number instead of UDP.
+> > >
+> > > Doesn't this bypass the workaround for the exact fragmented packets
+> > > it is intended to fix?
+> > >
+> > Thanks for the review.
+> >
+> > Unlike IPv4, IPv6 does not require extension header parsing for this
+> > workaround. The hardware only treats IPv6 packets without extension
+> > headers as PTP packets for further parsing.
+> >
+> > Therefore, IPv6 packets carrying extension headers, including
+> > fragments, do not enter this parsing path and are not affected by the
+> > hardware issue addressed by this workaround.
+> >
+> > Skipping such packets is intentional.
+>=20
+> I thought you said that the problem only arose with packets that are
+> fragmented by IPv[46], in particular short final fragments.
+> If your hardware checks for extension headers then doesn't that mean that=
+ you
+> never have a problem with IPv6 packets.
+>=20
+> -- David
+>=20
+Thanks for the review.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+To clarify, the issue is not specific to fragmentation.
 
-Best regards,
-Krzysztof
+The hardware performs additional parsing on packets identified as
+PTP. The issue is triggered when the packet is shorter than expected,
+i.e. UDP header and payload < 47, and the parser attempts to access
+data beyond what is present in the packet.
 
+For IPv6, the hardware only enters this parsing path when the IPv6
+Next Header field directly indicates UDP. Therefore, packets carrying
+IPv6 extension headers never reach the affected parser, so traversing
+extension headers is not required for this workaround.
+
+I'll update the commit message in the next version to make this
+behavior clearer.
+
+Thanks,
+Justin
+> ...
 
