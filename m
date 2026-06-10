@@ -1,198 +1,133 @@
-Return-Path: <netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297508-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0VKyEWgXKWrdQQMAu9opvQ
-	(envelope-from <netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:51:04 +0200
+	id a5csGlYZKWp+QgMAu9opvQ
+	(envelope-from <netdev+bounces-297508-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:59:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A61B666C80
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:51:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEEF666DF1
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 09:59:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="iT2MTn/J";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297507-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=fail ("headers rsa verify failed") header.d=c127.dev header.s=mail header.b=cRCEfBUy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297508-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297508-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9AB91302029B
-	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:51:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 742A231609F8
+	for <lists+netdev@lfdr.de>; Wed, 10 Jun 2026 07:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED34386C12;
-	Wed, 10 Jun 2026 07:51:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EC83939C8;
+	Wed, 10 Jun 2026 07:54:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ie.d.sender-sib.com (ie.d.sender-sib.com [77.32.148.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758C6309EF2;
-	Wed, 10 Jun 2026 07:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA663939B1
+	for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 07:54:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781077862; cv=none; b=hfoUsqrXzRPTHdVe36RG3sJscbkA/qUP/9kMYFFrFOJh4kpne5JW1Kh0KWRShUw8jvUzTmCMU+Ebf0vBiMDkcd4fbiYpA8Calbj5aJEAFUuqPy2UV6rqdZjO5GXiRVRKylQ7FylfpXg+8VzOSukaMLltRswU+JJMPESeC05a8Mw=
+	t=1781078055; cv=none; b=k21VxJBadHSiCYu7g07PPGid7g10lAe98uLhm6h4pR2MTm4nehuTUEuZ0+qkGNKfL4tZW/WY43Xkwopjyywg/Ns/xdPGfJJD9x1fMRM8fFKCpWOhTdSsiIyAOgMs0O1akuw32p5wzNHDFvIB26aPDZj5CuCuP63qOqFZ92LWmnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781077862; c=relaxed/simple;
-	bh=8bMQ+GGjH9oHEUku+aOkeCwNMq/gZ+jlMvBKtsGY4yU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=izgLoIRhzG82PFsL6GBNx+rNz9BVXa7NhELr0qzKZYXd0gws8B4X8DwlLmOx/Fa4qTzzw+rPcXZYbd5+D4X8sQtW2oHWS5QLmNxB2sdVX0QKVLD5mxcJAxXoZ/AXedd8AUzryUG7Kdh8WctsvHxAwRWJfgHhpUFK0evXHUXh+Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iT2MTn/J; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D30871F00898;
-	Wed, 10 Jun 2026 07:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781077861;
-	bh=C21ioqc9Ezeu5eXyHoB4EfMIkqcwZ9bWBdHRNGhqoAI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=iT2MTn/JWnxi2uQCiTFl2WC5fYsuDJTfLmvXRMfHWh47xkzyaqWj5sfiMoq3xt30F
-	 7o0ity6LDLCuyoWm5KEj5NryxeIFkSGgz8I98My65kLukNnyFG0HKLknRIa6i1B2nX
-	 uTWBrOiA/J1d+FbaULtiVJEyM9yacbCTzytYl7EY3gW7+RLDbmMRSZdeeiDNI8UYms
-	 qyPVpASXvqnsjIhkqCr1cBtnTgdK2mC4UEtByv8rVb7L7S3XivwEZWXq2bZ+WjrcyP
-	 I2IE6YEg2/uMfkSy0SFsUKCU4N2N8xT6SVs6mp82k2UXIPNB+xndg/iVPnujrrez9V
-	 XIFpulbUjEm0A==
-Message-ID: <210184c2-6b62-4a8a-aa2d-ecc8e539f747@kernel.org>
-Date: Wed, 10 Jun 2026 09:50:52 +0200
+	s=arc-20240116; t=1781078055; c=relaxed/simple;
+	bh=5I53mNF9nzwXieU+o5PlacM2NY9F72faQbDq4+lNRJE=;
+	h=To:Date:Subject:Message-Id:From:Cc:Mime-Version; b=AIGI4h+Y8AyuYEj27MP80kfh53QdrZppWY2IoKehSR2A85OpYBFxZc57NrxFz9I96Jiz8yzPOeHb1M95n1Tyqbp0aijNKascQlSUsfrWRFuA/1psEzqg6P2OHrnk1+YEjoE0NdIJRYh30pWlwG1HnRhwv9OzWvWHjzXhpUuim5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=ie.d.sender-sib.com; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=cRCEfBUy; arc=none smtp.client-ip=77.32.148.57
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c127.dev;
+ q=dns/txt; s=mail; bh=ZMlke4zIy3SDTUd0vYpvrY9kR6n+0uS3IfBGC8mmI1Q=;
+ h=from:subject:date:to:cc:mime-version:content-transfer-encoding:list-unsubscribe:x-csa-complaints:list-unsubscribe-post:message-id:x-sib-id:feedback-id;
+        b=cRCEfBUyqWLjaBOuUbMljOzqWz4RGPyVGYLQ9mAFdWzcdXzHCDTPxkaSodB6OpywSl/8yj1edQZX
+        HLp5lMAu/eRPd6eD482boyNQnbYx7OSTv5bEy13nR+0GD+febw6ch1f9ktALk+D6h9fYarLcfNcE
+        ejv//0PJNDplIDyH2SI=
+To: <netdev@vger.kernel.org>
+Date: Wed, 10 Jun 2026 02:52:39 -0500
+Subject: [PATCH net-next v1 0/2] net: dsa: realtek: rtl8365mb: add SGMII/HSGMII support for RTL8367S
+Message-Id: <aebccaad-eca3-4ea4-99dd-ae7edbc8981b@smtp-relay.sendinblue.com>
+Origin-messageId: <20260610075241.1069370-1-contact@c127.dev>
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+From: "Johan Alvarado" <contact@c127.dev>
+X-CSA-Complaints: csa-complaints@eco.de
+X-sib-id: OLhFG0WHinseFFRYmSSqi45eFrLTKT1U4l7BBv3VJ1ICq-3m5r9Lk_nbLk-yv4gg0Pg6ockIm64iZs6X0ZAK2vj88DVUkGOhTf5eEGDP7gN9PRVk47uJAq4v4BBtcfyof5bIu8FyZ-lQEP2JI2H4kpi1pg14sVReHrvYtljOZuQ-F9kL
+Cc: "Linus Walleij" <linusw@kernel.org>,  Alvin Šipraga <alsi@bang-olufsen.dk>,  "Andrew Lunn" <andrew@lunn.ch>,  "Vladimir Oltean" <olteanv@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  "Eric Dumazet" <edumazet@google.com>,  "Jakub Kicinski" <kuba@kernel.org>,  "Paolo Abeni" <pabeni@redhat.com>,  "Russell King" <linux@armlinux.org.uk>,  <linux-kernel@vger.kernel.org>,  "Johan Alvarado" <contact@c127.dev>
+Feedback-ID: 77.32.148.57:6940426_-1:6940426:Sendinblue
+X-Mailin-EID: MjQyODY3MzE0fm5ldGRldkB2Z2VyLmtlcm5lbC5vcmd%2BPDIwMjYwNjEwMDc1MjQxLjEwNjkzNzAtMS1jb250YWN0QGMxMjcuZGV2Pn5pZS5kLnNlbmRlci1zaWIuY29t
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v1 1/6] dt-bindings: net: dwmac: Add snps,use-ncsi
- property
-To: Minda Chen <minda.chen@starfivetech.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- devicetree@vger.kernel.org
-References: <20260610072420.64699-1-minda.chen@starfivetech.com>
- <20260610072420.64699-2-minda.chen@starfivetech.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <20260610072420.64699-2-minda.chen@starfivetech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	R_DKIM_REJECT(1.00)[c127.dev:s=mail];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MV_CASE(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_NA(0.00)[c127.dev];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:minda.chen@starfivetech.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:joabreu@synopsys.com,m:mcoquelin.stm32@gmail.com,m:linux@armlinux.org.uk,m:peppe.cavallaro@st.com,m:alexandre.torgue@foss.st.com,m:robh+dt@kernel.org,m:krzk+dt@kernel.org,m:conor@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:devicetree@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:robh@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_TO(0.00)[starfivetech.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,synopsys.com,gmail.com,armlinux.org.uk,st.com,foss.st.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:linux-kernel@vger.kernel.org,m:contact@c127.dev,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-297508-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297507-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[c127.dev:-];
+	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org,c127.dev];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,starfivetech.com:email]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,smtp-relay.sendinblue.com:mid,c127.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2A61B666C80
+X-Rspamd-Queue-Id: BEEEF666DF1
 
-On 10/06/2026 09:24, Minda Chen wrote:
-> Add snps,use-ncsi dts bindings property for Synopsys designware
-> ethernet MAC with RMII interface and used as sideband interface
-> network controller(NCSI).
 
-Please use standard email subjects, so with the PATCH keyword in the
-title. `git format-patch -vX` helps here to create proper versioned
-patches. Another useful tool is b4. Skipping the PATCH keyword makes
-filtering of emails more difficult thus making the review process less
-convenient.
+The RTL8367S is a 5+2 port switch from the same family as the
+RTL8365MB-VC already supported by this driver. Its chip info table
+entry declares SGMII and HSGMII on external interface 1, but the
+driver so far only implements RGMII, leaving boards that wire the
+switch to the CPU over the SerDes without a working CPU port.
 
-> 
-> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-> ---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 2449311c6d28..05b1d8428f65 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -545,6 +545,13 @@ properties:
->        Enables the TSO feature otherwise it will be managed by MAC HW capability
->        register.
->  
-> +  snps,use-ncsi:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      Use the NC-SI stack instead of an MDIO PHY. Currently assumes
+This series implements both modes. The configuration sequence and the
+SerDes tuning parameters are derived from the GPL-licensed Realtek
+rtl8367c vendor driver, as distributed in the Mercusys MR80X GPL code
+drop. The SerDes bring-up requires firmware running on the switch's
+embedded DW8051 microcontroller; the firmware blob from the vendor
+driver will be submitted to linux-firmware separately as
+realtek/rtl8367s-sgmii.bin, and is loaded via the firmware API.
 
-You described the desired Linux feature or behavior, not the actual
-hardware. The bindings are about the latter, so instead you need to
-rephrase the property and its description to match actual hardware
-capabilities/features/configuration etc.
+Patch 1 adds the SerDes indirect access helpers, the DW8051 firmware
+loading and SGMII (1 Gbps) support. Patch 2 extends this to HSGMII
+(2.5 Gbps), which phylink represents as 2500base-x.
 
-Best regards,
-Krzysztof
+Tested on a Mercusys MR80X v2.20 (RTL8367S connected to the SoC via
+the SerDes), in both SGMII and HSGMII modes, with a fixed-link device
+tree description.
+
+Johan Alvarado (2):
+  net: dsa: realtek: rtl8365mb: add SGMII support for RTL8367S
+  net: dsa: realtek: rtl8365mb: add HSGMII support for RTL8367S
+
+ drivers/net/dsa/realtek/rtl8365mb.c | 394 +++++++++++++++++++++++++++-
+ 1 file changed, 390 insertions(+), 4 deletions(-)
+
+--=20
+2.54.0
+
+
+
 
