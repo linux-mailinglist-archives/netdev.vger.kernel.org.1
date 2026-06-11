@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-298387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298386-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OpxqOp43K2rD4QMAu9opvQ
-	(envelope-from <netdev+bounces-298387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:33:02 +0200
+	id Z1XlKw43K2qj4QMAu9opvQ
+	(envelope-from <netdev+bounces-298386-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:30:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C556675A53
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:33:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4A4675A2D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:30:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=f95h+ajN;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298387-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298387-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=J4Gnt94I;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298386-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298386-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC8F5331E59E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:30:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2208D3024FA4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D53C43D50D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59252429814;
 	Thu, 11 Jun 2026 22:30:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94D63CDBC0
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 22:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B943B3C5542
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 22:30:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781217034; cv=none; b=ahniGLwQ4O87kq7XDNqsU0MuJqB36rt6pkyBeby9+grmsel9WI2J6C6bA9j1PIeGcM3hKLjb0VJyz1xqffXXT8HcQxK8KzoplEVE9BHg7DMMS2gycZ35/Esy7VPtVv07pfli9tzjH0IuHOHAXRtEzcXu0QNR9Ga52s0dAhFtLkk=
+	t=1781217034; cv=none; b=H4yv/b2ibWqxcdwKyOkt3pGOo7LNt1sfYEQ3BfJRiTLcDpLiHlVnAyFawjpYtqJ8aoEwQiFRNo1JSPPdoq6Vuy/aIi4GcHfV6efMphaqIc89MtpWCiOPHLfjpUT1WQblH5z/TSbRn0fPT/ywsT6JeWKb/q6Pn0SiY8SW6JTesck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781217034; c=relaxed/simple;
-	bh=jBqoSpW7+0NhvOMqR/GomQMJswaD59B4Vt5XhZoNHDE=;
+	bh=XHfYT3sF+zyRiGrqTN9Wi90kuUcJFZELzAJqJ9mQgQI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EwLrY4l8jZyTLBzsvhMD0ZT4Ccdqiyg7e5n5TvHOYCgux1yOOGXDPC4lgGWRZQn0Mli4tPzvAg/sK73DflxkQQbGvSi/dJFPKvsyKQzNtMQpGOyXhApGx5K9lzMsuRVm2q5rcjBEsQqZh67M+MaXvfJZkqV0BTziJr6kQuX6aWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f95h+ajN; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F911F000E9;
-	Thu, 11 Jun 2026 22:30:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QyuCeWnqBcHDg1CysEv0e0DjV6Ap+eqFT3TAxY54ss2HuxMtn6M2k52wvtz2sjDPw4qClPN7ljxc3gxvM8M4atihbiv8X2vQMk7M9lVsQWXUtClwCrb/4X16PmxK436ir+Z1KMNnqWVVRxIBvnveaRIrQQGWzDufeqBjHf8hr0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4Gnt94I; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F691F00A3A;
+	Thu, 11 Jun 2026 22:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781217028;
-	bh=4Wcf7phm+5zW58xmIIN/R67av8KlnEeqYbMlrcD2Tak=;
+	s=k20260515; t=1781217030;
+	bh=Yj5EYUYxN4J6y+/HXSIACdpOV4ojowLmt/wqo3CXtNE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=f95h+ajNjZNo3xEEyX/XOHSgtZiNH1s3cW8bi5v/dxt0yK41xMPvPqdphnnpp3GgZ
-	 T+YfHUNKqpeXhX5DHKRw2BSUsTtW9Z5neIc2FD9A6YFfvl+c0EdcyHLKIbrIjoXvqt
-	 1kdDdZDrCyJt+rtRjHOoTE1UaLZm9lVoFqcnNAPvrA/n646jwJLSOQBwovIxpnNrqQ
-	 ykC0amak0VYg5ryWYNzOegXveEVd7HugQV7XThGM2o/vcrUR8yaZHx9a9yAuZrMkcE
-	 giF+WVrDuNr3mqPSjfaJW8OGcRe/W3xntK3178+rSVCLq6hjdNAeMM646bykuVsfKI
-	 OugrplI8toxRQ==
+	b=J4Gnt94IqiaxBQKaQHjylYlZgYD9mwJ33aX/7JypGk5Ip6DZhe8DyLPAUlhzi5psv
+	 ivyqFEX4wdUW1gAzTeFEiyC8uqIkn/q0uu7q6j9mj5MN/lQkd9IGMbIlktJ3yzexeJ
+	 wj2szOmjJN/17HX3zAb+BZrDtwXcx6kYbzwqhVYr5AhnSCpahxBozqXMJTRO7eGd05
+	 UmBW1hGmo0qa07AHMMExFnaa6cTZYcE1aQY3nBwqW0bf6k/QLaoiWDUDnu1OnqBqui
+	 AAiaZcjMZTfqOSAHWCoKSULwH2a5Muk4eXs992KdYPlN/d7Qa5DvrYKSbmBR1qWs3V
+	 Ulxr4zZDXkQ8w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 569053930FAD;
-	Thu, 11 Jun 2026 22:30:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09913930FAD;
+	Thu, 11 Jun 2026 22:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,76 +57,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: fec: remove reference to nonexistent
- CONFIG_GILBARCONAP
- option
+Subject: Re: [PATCH v1 net-next] ipmr: Convert
+ mr_table.cache_resolve_queue_len to
+ u32.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178121702588.389578.15203265198914114198.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 22:30:25 +0000
-References: <20260609045200.32606-1-enelsonmoore@gmail.com>
-In-Reply-To: <20260609045200.32606-1-enelsonmoore@gmail.com>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, wei.fang@nxp.com, frank.li@nxp.com,
- shenwei.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+ <178121702738.389578.12063239753161596176.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jun 2026 22:30:27 +0000
+References: <20260609222013.1550355-1-kuniyu@google.com>
+In-Reply-To: <20260609222013.1550355-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298386-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298387-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:enelsonmoore@gmail.com,m:netdev@vger.kernel.org,m:wei.fang@nxp.com,m:frank.li@nxp.com,m:shenwei.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3C556675A53
+X-Rspamd-Queue-Id: 5C4A4675A2D
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  8 Jun 2026 21:52:00 -0700 you wrote:
-> The CONFIG_GILBARCONAP option has never been defined by the kernel, but
-> is referred to by drivers/net/ethernet/freescale/fec_main.c. Remove this
-> reference to eliminate dead code.
+On Tue,  9 Jun 2026 22:20:04 +0000 you wrote:
+> mr_table.cache_resolve_queue_len is always updated under
+> spin_lock_bh(&mfc_unres_lock).
 > 
-> Discovered while searching for CONFIG_* symbols referenced in code but
-> not defined in any Kconfig file.
+> Let's convert it to u32.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - net: fec: remove reference to nonexistent CONFIG_GILBARCONAP option
-    https://git.kernel.org/netdev/net-next/c/f8142f5578b4
+  - [v1,net-next] ipmr: Convert mr_table.cache_resolve_queue_len to u32.
+    https://git.kernel.org/netdev/net-next/c/65440a8ce42d
 
 You are awesome, thank you!
 -- 
