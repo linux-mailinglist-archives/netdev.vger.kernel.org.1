@@ -1,196 +1,178 @@
-Return-Path: <netdev+bounces-298014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5dzONd52KmpkpwMAu9opvQ
-	(envelope-from <netdev+bounces-298014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:50:38 +0200
+	id voftAht3KmqKpwMAu9opvQ
+	(envelope-from <netdev+bounces-298015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:51:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691A067003B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:50:38 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE80067006E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:51:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=e2OBe6Ow;
-	dkim=pass header.d=redhat.com header.s=google header.b=iXCp4n5k;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298014-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298014-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=ISCmgUN1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298015-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298015-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8C66B300D614
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:50:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0C9EC300F762
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2202D369D54;
-	Thu, 11 Jun 2026 08:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346F23BB112;
+	Thu, 11 Jun 2026 08:51:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC536212D
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 08:50:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781167834; cv=none; b=kvfgR0IHEXVHDq5IhVq9+swY3lNqiPbV2xPonQCYbt3zKAOkdNCjBS32ltOaf82aAXsPaBdki3AtzLAyYBOfO8kyNh+r5zxuR66Tv6xm4igFXUTOBNA/0GDRTE+WCxLnxRpfatPn+tuqNJtncZAMl79dgcTH1ZdcivwGJysJ//4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781167834; c=relaxed/simple;
-	bh=hScv+/Dg2XQbBeFR+q7U/xKDIGWAPmkZJFNTNr4VW+4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K7NPjct6/0Q126SyRko2hUi+CL1BMVrvoJGRZ3UD/Rx3aFedJMbRIlrlDOqATthAeFVPrBu3+5RzlTFYsY7+k8/Yee727o8iENC9HNEiwyO4LE3iASOxraxPUSL6tYi6qFni0hrl4U52otT2OtWvQxVFFvbkp+5N1EN4grde8PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2OBe6Ow; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=iXCp4n5k; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781167831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=05L3jrJVlFcQn4GVsQrHr7saBG8RDpkpSs796Rei0Dg=;
-	b=e2OBe6OwVkNn1Ui8VH5KrJDerb5JbJKanSqJbjl35xU9fZGr1oemzuWNrPknDJ8B536Ou5
-	uFEwoktXDY4AxhNQGt3zBbQaHSoV+cy+SgWZmxTQhbkwhF0+2dKlihipjf7PrPXyoAMsqu
-	rMeOs6s2dwu3vIqugVLgL/RY9Xnl+cE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-318-m0Dgz_Z7PHW4fFS1e9MWfQ-1; Thu, 11 Jun 2026 04:50:30 -0400
-X-MC-Unique: m0Dgz_Z7PHW4fFS1e9MWfQ-1
-X-Mimecast-MFC-AGG-ID: m0Dgz_Z7PHW4fFS1e9MWfQ_1781167829
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-beefe797002so394732766b.2
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 01:50:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF13B2DCBFA
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 08:51:26 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781167888; cv=pass; b=RPbQgPgm6nq6jbTAIPqjnrrgvG5/vLiNOiAqyJPI/BpQy/xSbmTqmDMW5GoVdhej1NfyEG5A3M1LO92+VmH+RyUZUlqaiVNhxAzhBM/q2/orjnKY8Gj1kQ5kDmIOYNBynJmlp3vD9dN48X/a7ojgMQ77XzPEi+F2ZqVbrf2uUV0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781167888; c=relaxed/simple;
+	bh=Gu6SXLCI0/eC/AnJZSyIbfVO8bAqJ5On3y51xTlO4vw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GK5txF6KukvJRqB1UK0rpr2k5nly3VOgFBfYB4iXOekkKEc6FNRd4M1xtTTwnRsQEgbV0qhXvfHvyjHw21AVwZZnvbp997O5wHuYOvakThKqC/VILkxC4U+kGulQqGiYAklzz5qFdbh9MeATlzz7F+hUw4iWz7b6Ve60zr/qUNE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ISCmgUN1; arc=pass smtp.client-ip=74.125.82.172
+Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-304f8e80b7eso592176eec.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 01:51:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781167886; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DjcUoHyqBpXWI7VEh8T402AghYr1R+4oM3LRpaQpB8Dr2JHMh9hWW6fwqcnciPhapg
+         B2nhyyZlns4+R1rR4y+FvSENO4saVJmNV2xuXMR/OmT4U3PaL2Y1eSZVYGFjZ5YHrazU
+         sYZEFVWi/0YnjukONpUv+4Yds8eg5R8fa4mDC/3ivQyN8g1e1GaF4fuIL4rkSAJPEXtj
+         zxVaDZqb1ZvGwkzFWnI/pcl6EO9hNfyIW6TfSIy6nn+Y67GGxLZ88pmVV3cFhy5/c46L
+         94aLOffCSd3dYmpwlZzubIB3g0WyAkj1D6UvnWtR+ZBcnO3cgI3jB1COtCKeMgLNyM9O
+         ax4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Gu6SXLCI0/eC/AnJZSyIbfVO8bAqJ5On3y51xTlO4vw=;
+        fh=LVnluWFonX6/0ueVZxsWhvJZ9l4CxRJi8ASN8lojZ9o=;
+        b=Hpo3CWs7xyL6PC5khhGqLx9PiSPux0sgeqATk8+LI6F1iqebwgif5MR9CVRp8V+Nih
+         o1lGOhC3GVw06lU7vOFJ/P/PM0R3mVK+mz4HSRe8genA6lHEZXFN7r4TE0QY4WYiVuKx
+         hUOhuqCgZvgqxDSLLmc7l9zt9YI5KVcfAcW3wXktz6LV77DQ+NgWmrWZ5hIheTLTwhXP
+         hzx/F67a+p/DpyU5Ruvxm44GTPWBWSuLFyiEP4nBA2VFmghPwkMxUVNUEYRsznxkDbnt
+         ZW5LmjTdSnSu4qT+2b/1h8jVl8OJRwOHq25aFQsW/aTZzO8gHXE4oKvNhb/Ufmv+IUo6
+         +wmg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781167829; x=1781772629; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=05L3jrJVlFcQn4GVsQrHr7saBG8RDpkpSs796Rei0Dg=;
-        b=iXCp4n5kVCvG+4rhgO3o9on6fXwHcwNUXNnlp1vq0ffTDMrETcUzlEzs69DW5l7S57
-         OTWusUGzECXgKjY4SkC8n+JLcTz5ZnqyX4fW11Lkc1NPpJJ4ejM3/8Ftzofk8SvSM/LN
-         DUC7Zka8JQ2ow0cKfOffwAX4K72xl8GwOVQ92QiAsSvef+RBlkiYDIFDrSpH8UX/xlHm
-         zbONGwfpr04jY3YID9nNP89ChTRTUbeasWaeniS+C26iXmpv0mFSC4wOnIHiL/20Izep
-         hAa0uTvN2sEQkCTfM3gmRAoyC1LTn74NWqdhD617ECfLtYGCzW/8XAusaFHKOjcWfS5I
-         rFMw==
+        d=gmail.com; s=20251104; t=1781167886; x=1781772686; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gu6SXLCI0/eC/AnJZSyIbfVO8bAqJ5On3y51xTlO4vw=;
+        b=ISCmgUN127MnDQmZvuNvPua5E2Z3wejAYTONuNCTVxFJsgyvuoJa6RUjQdsaDOAcju
+         sh2ui9Me9SP3L/dG4+Bvjoikthl3LxcUTCn3TNbexIIcMHXX1iSfQr8K4aTSpjVXLo44
+         Ji7/nuwDdqtang3hiKJySGY1m3pmdlzPhCLJZFsRE0hQUGKD+O4i1xlEWF/l0Htra1QH
+         Qj6DvqL9DewNlJI533GII9Ag2qrdtIE9nvyGz6bq1jWjaDWSwZR1lrBZIr/MfB+W/0QD
+         hLvF0S1KstRi0ZgrIDgzP9JQaGl+72ez7/KNOLWQL9JKLBTu8zAvAsWmg28PaFXswxtU
+         ciIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781167829; x=1781772629;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=05L3jrJVlFcQn4GVsQrHr7saBG8RDpkpSs796Rei0Dg=;
-        b=tRwIncyv7/G0bsqJCKSKAftHG8paZwdRcCRXiAmf5c40fUQjByHh7Sh7gZ0dJ5auHt
-         1/4te2cCJrtvyYUyOorpqaLwt39lKvlZKqqOmAlHxIL4ue31AgqFIroRqlez92PQ34/E
-         sriFnK1Bdljj6257NgewuHx9f3ffvaZAd9U9JzwO2IYATOPC03F0V7rCOEved3Uyej84
-         KzeqdfCbRMnv7b1d4y09ytOyIu9c+5LrI3BwyVYXFj6gIHIeUjuY7MRM6KSXPCvnlcGm
-         TUiP1Fb+L+Lvv0N/1Kyp8pw6U5BYrLYVAnU60xwzr9qIQy9IPtp6/ZwLl4YGfAeXvlFT
-         3PjA==
-X-Forwarded-Encrypted: i=1; AFNElJ+6cxVlOitHIf8kTQh2lY3gEyDTv6K/dQv2QrPF52DA5gvhK6EXs0NS6NgI+DMayXZJpsttwLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcLzM1nFpBLnv4Q6kizsGlap3ZedYjehiw7Ye1oPBLVk611JZU
-	/ulBz9Ue+kaDRlZs0mrcFT0uxtnzMWCT1Sm6+R3D6lu6ukI+i9luw1A5qFcYwCE53o0b1wNnEo2
-	/M5Nj0VZauJ8Te/rz6It96D5gAs7rCdSZHam/+2eNzrO2z1X5+4YOQPovSw==
-X-Gm-Gg: Acq92OEc6jGvn548nqkkshfi66SqQj1Y5DrdXMJSu4Bzi366fQnTJeztXoHzpLfzsPj
-	P4M6HewNitc/eg9w1GimPWmyVFziMsBWPavHqvInLyqCIFIFadnj+21ImRpskyKL+s1GGop2u3k
-	V5MOdk618MROAVKJi8eI4qEjDqeeauJ5br4z2wWsIydmwvkcyxOdC5qLQ5x4xcvzG9ccZuFUU8q
-	Ml+sSSZwiXvZN/k/SGU9mzNLnLuUE7eOhw2L0AGhxXs70XARNyJIwau02VKdaEt8v3Xj+ik7JEm
-	w0RgGUhuNpm5BLg/kRFjdpNGp6LmYTA3luE+WUXH+MKJ221P3OUyKis46CSk0z3MK7jjAhthd0Y
-	vbsDOKVQIeIoTJM3CbA75uIBd7t5HfZoU6tRPzgUtN8MKpbb9ahjf1N6vYfx4agbmcA==
-X-Received: by 2002:a17:907:a04:b0:bf7:a616:cafa with SMTP id a640c23a62f3a-bfc880e7160mr73166166b.34.1781167829371;
-        Thu, 11 Jun 2026 01:50:29 -0700 (PDT)
-X-Received: by 2002:a17:907:a04:b0:bf7:a616:cafa with SMTP id a640c23a62f3a-bfc880e7160mr73159566b.34.1781167827875;
-        Thu, 11 Jun 2026 01:50:27 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.93.44])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfcb1607631sm34291566b.14.2026.06.11.01.50.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 01:50:27 -0700 (PDT)
-Message-ID: <5ad977af-9bbb-4376-b0a6-2b1867223145@redhat.com>
-Date: Thu, 11 Jun 2026 10:50:25 +0200
+        d=1e100.net; s=20251104; t=1781167886; x=1781772686;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Gu6SXLCI0/eC/AnJZSyIbfVO8bAqJ5On3y51xTlO4vw=;
+        b=FSOiFokKpsLY5wOuRBVKmV9vHWv64ZG+UtGNeOdf+766eSTxPXvWr0SSaCo4vOlKNw
+         jopMTpj7Bd3gmrHj8dSmJ09+84O+Emae6ULOcWo6/vgDe17bKJPwYUl3UAi97+krkg9C
+         J4fflDdgx4UZnF8igWHd4VvbOW6Ddo8+599XWe+RLRe0ww7u06vduoEa2PKnWa60wwxm
+         1RPpYSFjUrWAtWZnMDVxxqdasoSNqd8WYWZEwRGwuA/NBnUCHSRitO0aQ9hPJLcoqbUq
+         yYFO6NTEfgxjZ61WUMqbofbRrTk8rEfA8lmcDuG5pPspsGHuzsaZP62hxYCoTQcpxsiE
+         27LA==
+X-Forwarded-Encrypted: i=1; AFNElJ/VGqudnq9OYdAkgGgLCfEi8InhAZvGnLaASf9bdDGL6BmEpWKMMeljkCtYAaGyqnv8MVpgcc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYothK7HtDZ+ydPHL2YD2Al7pO/9MrnWL7LY64+TNUJCtBz9zu
+	SYH7aQ97+NEBzfk2nGSMNiMiKlxNnYif+5MNg1WW2G0OEGYiYs4tQ9Mz9vMsLMKjZsp4Cu0K6/T
+	n56lztXM9Gj5BBFNeMOkosWALxf4y1zk=
+X-Gm-Gg: Acq92OG/SNYYWyXeqxoDVQWvazJxhQtwG46XCDRQn/QHc57VyrMlSeQoiYybFxbCltM
+	eHJ43f3wFQPhY4/FIaH9f6/0rSG+3lB2Vhs0lQ9kjzppkyyXJ5y1j4c1XZbd+pUfeRkWbWtoVjQ
+	ugGkzvuIX2enZGgeVFVlKx3BEqHh971h8ANpS/84oyaUdZMQCiNqL8ussnKa+jprrClb9D6Q4h+
+	wcYo5m0T2V330cfGanEljBKCCZFpx9SGHFR99n6c7SFkWciJt1csAiUaWkpUalBFb0o5hC+fAGy
+	wuoYAn3uegzTbJSx5fNVsntz8g+Nl7E6q866NXSSqbM0frY8gmxNSoonABd/lT/r/ZqlaCE8SZ5
+	aCqJSA/PIryoHgBNzA3EY+tCM4VLD5GXAEQ==
+X-Received: by 2002:a05:7300:8184:b0:2da:b05a:5a7d with SMTP id
+ 5a478bee46e88-3080410050emr652555eec.0.1781167885763; Thu, 11 Jun 2026
+ 01:51:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 net-next 03/13] dpll: fix stale iteration in
- dpll_pin_on_pin_unregister()
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- poros@redhat.com, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
- Prathosh.Satish@microchip.com, ivecera@redhat.com, jiri@resnulli.us,
- arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
- donald.hunter@gmail.com, horms@kernel.org, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com
-References: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
- <20260607183045.1213735-4-grzegorz.nitka@intel.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260607183045.1213735-4-grzegorz.nitka@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <DJ4Q5J5OILOX.1KCPFIVUFN2VV@garyguo.net> <20260610072947.338278-1-ojeda@kernel.org>
+ <DJ5A6AM2FDGQ.19T1Y9N1T6JST@garyguo.net>
+In-Reply-To: <DJ5A6AM2FDGQ.19T1Y9N1T6JST@garyguo.net>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 11 Jun 2026 10:51:12 +0200
+X-Gm-Features: AVVi8CeZqdEWXPdGh8thUTK4-wo6B8DARvooPGXEOY6tr17NX-f1ZHtJHf1zMrU
+Message-ID: <CANiq72khOCLC5kG5vWhDeXpHv6n7Yo9Nv=PewNS0D73AxUDB4Q@mail.gmail.com>
+Subject: Re: [PATCH v4] rust: make `build_assert` module the home of related macros
+To: Gary Guo <gary@garyguo.net>
+Cc: Miguel Ojeda <ojeda@kernel.org>, a.hindborg@kernel.org, acourbot@nvidia.com, 
+	airlied@gmail.com, aliceryhl@google.com, bjorn3_gh@protonmail.com, 
+	boqun@kernel.org, dakr@kernel.org, daniel.almeida@collabora.com, 
+	dri-devel@lists.freedesktop.org, driver-core@lists.linux.dev, 
+	fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org, longman@redhat.com, 
+	lossin@kernel.org, mark.rutland@arm.com, mingo@redhat.com, 
+	netdev@vger.kernel.org, nova-gpu@lists.linux.dev, peterz@infradead.org, 
+	rust-for-linux@vger.kernel.org, simona@ffwll.ch, tamird@kernel.org, 
+	tmgross@umich.edu, will@kernel.org, yury.norov@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-298014-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:gary@garyguo.net,m:ojeda@kernel.org,m:a.hindborg@kernel.org,m:acourbot@nvidia.com,m:airlied@gmail.com,m:aliceryhl@google.com,m:bjorn3_gh@protonmail.com,m:boqun@kernel.org,m:dakr@kernel.org,m:daniel.almeida@collabora.com,m:dri-devel@lists.freedesktop.org,m:driver-core@lists.linux.dev,m:fujita.tomonori@gmail.com,m:linux-kernel@vger.kernel.org,m:longman@redhat.com,m:lossin@kernel.org,m:mark.rutland@arm.com,m:mingo@redhat.com,m:netdev@vger.kernel.org,m:nova-gpu@lists.linux.dev,m:peterz@infradead.org,m:rust-for-linux@vger.kernel.org,m:simona@ffwll.ch,m:tamird@kernel.org,m:tmgross@umich.edu,m:will@kernel.org,m:yury.norov@gmail.com,m:fujitatomonori@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298015-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[miguelojedasandonis@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,gmail.com,google.com,protonmail.com,collabora.com,lists.freedesktop.org,lists.linux.dev,vger.kernel.org,redhat.com,arm.com,infradead.org,ffwll.ch,umich.edu];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,intel.com:email,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 691A067003B
+X-Rspamd-Queue-Id: BE80067006E
 
-On 6/7/26 8:30 PM, Grzegorz Nitka wrote:
-> Neither parent->dpll_refs nor pin->dpll_refs on its own is a correct
-> iteration target at unregister time:
-> 
->   - pin->dpll_refs includes DPLLs the child was registered against
->     via a different parent or directly; blind unregister WARNs on
->     the cookie miss in dpll_xa_ref_pin_del().
->   - parent->dpll_refs reflects the parent's current attachments, not
->     those at child-register time. Another driver may have (un)reg'd
->     the parent against additional DPLLs in the meantime, so we miss
->     registrations that exist and visit DPLLs that have none.
-> 
-> Walk pin->dpll_refs and use dpll_pin_registration_find() to filter
-> to entries whose cookie is this parent. Symmetric with
-> dpll_pin_on_pin_register(), correct under any subsequent change to
-> parent->dpll_refs.
-> 
-> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+On Wed, Jun 10, 2026 at 2:28=E2=80=AFPM Gary Guo <gary@garyguo.net> wrote:
+>
+> I think if the re-export is of form "use crate::build_assert::*" then it =
+will
+> still be the same semantics but would be appearing now?
 
-The current guidance is to avoid the Fixes tag for net-next patches,
-when such tag refers to code already into Linus's tree.
+If you mean a glob import (within or outside the existing `use` --
+same behavior), then that makes the glob import appear in the list at
+least, which is an improvement because at least people have a link to
+the module (i.e. but not the individual ones).
 
-If it's a real user-visible issue, the patch should target net.
-Otherwise if the intended target is really net-next, no fixes tag please.
+Or do you mean something else?
 
-Unrelated important node: sashiko (gemini) still has some comments, some
-of them looks new and relevant to me i.e. the possible divide by zero
-bug in patch 11, see:
+Good first issue?
 
-https://sashiko.dev/#/patchset/20260607183045.1213735-1-grzegorz.nitka%40intel.com
-
-/P
-
+Cheers,
+Miguel
 
