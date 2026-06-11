@@ -1,229 +1,194 @@
-Return-Path: <netdev+bounces-298222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3CUEE5jmKmpBzAMAu9opvQ
-	(envelope-from <netdev+bounces-298222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:47:20 +0200
+	id H+SoB6/kKmrRywMAu9opvQ
+	(envelope-from <netdev+bounces-298223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:39:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38CFB673AC6
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC096739AA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:39:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=ZRdybbqo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298222-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298222-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=intel.com header.s=Intel header.b=Lu6dPLx6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298223-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298223-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19EC833E4EE8
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:28:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E327C351F93B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227594279E3;
-	Thu, 11 Jun 2026 16:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174D944D014;
+	Thu, 11 Jun 2026 16:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5B5201278
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 16:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134FF44D011;
+	Thu, 11 Jun 2026 16:28:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781195264; cv=none; b=KFG192jJBJsnXuw+ng1AJ6e5LyKY1HOQHvHHu8tBrv4cUaOQiEvdhY932e68fO1wfkSIdLOYM8NeZlj/UlHplTtv7ZQX78hFgp8shIbu9KkL8gxt4zl2MoxbKOl9U1q88vaabQEb7dZU7TgnK2j+SzuHiDcGxzcKPgoOo2nTbJ8=
+	t=1781195321; cv=none; b=qMfpaJnu50MB8ImwTcGyzdpj0CL1NHcYy7BzEf+WGxH7hafBDmJaYr5MPtvwSq8HDPxvqtBgIY65c16AxxUWHQnasKUrd7GXVaErh8jeAO5da6FH1VGW70fp0i0E2v057HSz5HnrKSHW8HvYU3IeSEpuy98Mz31wPHM4XF+yizY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781195264; c=relaxed/simple;
-	bh=o6+f15UBh3/yTDV9eUcXAhmyyH3yJMXjUp0vK+0tjRo=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=nL8d/0hb2qqRkRcz3aEAC7ufrTDGFdDEWpZiniQA0PID7eIIul8/mwegcVyIcXiZoUvHbrM99QM/3nbzo2dbs35KEtpSiQ7VbwZiG9SO2H8UJ3I+mPnY6o2XPyyQrYFhE9KXXq09m1bNBFVRSyxFq8i1cOO1h9qGja2I2lhN+Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=ZRdybbqo; arc=none smtp.client-ip=74.125.82.53
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-1382533d428so58270c88.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 09:27:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781195261; x=1781800061; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yHOgJn/4y6N8Z6nRlIY4TDWtqDPGGDCIQEUNbW0Y9Ng=;
-        b=ZRdybbqol5AdhTR0qOBDpYqif3qwT0nKMSbxUWBx89q5/fO5PpOCMsZkcLfD9dZxkv
-         1HTW57Divqu5vCbcrSlmQWq4/N7k1g8FoTi/cKdn2PUlJK7zjp1LxV/TI0mVTz6Dug48
-         Yym0XhMxlX/wLyOqAnGD56obI/tp6bys5v2D2P2kpWzv+sxV1GH6qcNduDZgTAra8/ay
-         YOjVm/5AVJuXTYM1i+6ChGkG8NVaWFrMlvIqQFF3ctYVUFAwPT+AGxZxPceMQW72iVyy
-         rFy8U1/xQGmtpEpn/DDY+A9LoKfTEsQKpk2wRA9w8R2HFY12/x6p112HEimbLz8F3wi2
-         BNXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781195261; x=1781800061;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yHOgJn/4y6N8Z6nRlIY4TDWtqDPGGDCIQEUNbW0Y9Ng=;
-        b=Tvyr4tWopjQ4UD6ZHdAzdfTiftYmst7D7oUINOyMJmJOzzIO86mw7NDNUoxZ+r5+jP
-         pwKEDtc6IDbt3/JkYkd81ytFkun+fI7QhywPZj7IoRwj//wMvcLiOmM4tojM1VfljG6G
-         QrMkInU4brkJJ0Eh4MAoNgM/l9o4+2wzEHb9L0ROjKx4zRMRqELJQVeBouKWhmHQJOqc
-         tjJqR6dvVxIjSeIIyJSvCDB/b5GwesGcdJRoyzR0nlCFc5u33M2DGf6w+syPBv+rBS1X
-         lqiMzvBhBl3sw+mqydGElB7oysr+/3t1jr52/5ltXOfnp2TcEPUykXOAKwW+iDKlwHPo
-         tbIA==
-X-Forwarded-Encrypted: i=1; AFNElJ/CUCfxYD6FJ2RXfQk6M/x4t+R0U+pFdaCWMlhgchXNTnRgx6ac0peKADBG5lXZNQI91bqTK5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxKbnT5nmGxITVuNKKLpKbnfx213VWVXQ7lGCG1TaXCS9hKe3G
-	O9tIdPLyRc7dipgYOKojWg4leOWe8X/PA7/wla17p26chYhgRqC7oVNRCDNWqCuBWKQ=
-X-Gm-Gg: Acq92OH1dZeINsEToUq5AW/md9eqLj0tVfFkMTpSecdW8tTC0+NQDpCXzG5oAEyAb7p
-	h6/YwONggU+S0U9FTxdqQtn7MyltUfGgLgO5bO6o4zlpqW9h3KHvljK4HmOvzsdB4EibzR4iyqh
-	+y5ckqPVz7CmwQTFc68w81RNtDX9vn5oG0AJ3HtGhnq2G2ke9XjT99AC5SZSHo+xdXOQ9QPpJ7A
-	nMrrGIgDHqxudUviEKfblb+G/Mb5xzuxoPceHVeQKSE4QU6Vb8OFUa/AAC2BRtHTxBhnfDEwNg7
-	Q1NDiPqsFbFpW5wburjX3ZYkVlQ/FWtf1VO+YsQb3UNqYecUW2s/I9f+Ld5OyEf0rARAJulOMRX
-	lNBgCSiWhHLEn/QVFeTOWvMG+EhmWvx5dicceWrxxN655ONhohDgTTSqOKqqqOc28GCEH9PDxlk
-	buR4kl
-X-Received: by 2002:a05:7023:a56:20b0:138:576:fd with SMTP id a92af1059eb24-138421833f5mr1484959c88.2.1781195260827;
-        Thu, 11 Jun 2026 09:27:40 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::9f35])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1384303a312sm2857258c88.12.2026.06.11.09.27.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 09:27:40 -0700 (PDT)
+	s=arc-20240116; t=1781195321; c=relaxed/simple;
+	bh=C0oszD8SAqpd1jfUd3Z9NcqatEKo9eoDC7luL7OG+UU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SHZSGIo8RX9ogf9/UI9VwW5XdQSUAA4e6wKe4hd2gbrwuPKHdhqnKayMnkDqPzKOlY2J8minCEiHnmt3AD0KBse30Dn+OXdbWhlmiQyJ0/RkZ9/mWU3iCst49idbE7zp2BPD1y5VPgHjYjDlatMxlHgTAekLkvWmpuSFmhsnbqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lu6dPLx6; arc=none smtp.client-ip=198.175.65.19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781195319; x=1812731319;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=C0oszD8SAqpd1jfUd3Z9NcqatEKo9eoDC7luL7OG+UU=;
+  b=Lu6dPLx6GcyFI+MLZIt7SrYpATlCl8CyyLH36uDziriGefqKR4Eg3YuO
+   WV+NlIrXIH22RvVyDiuoohu7c43vCMkBePr3FzfTOLIEUDGMdOnvQ0hRp
+   MowzqfD4GyRNjKfsaYcnZpAPzoIhVMnjYP2Xn87BVEn3c5WcMfjmjWzKA
+   3cVgZ+zulYc/Hhk9/+swMYfsJwP64gAAmx9TRuFD1GYOy0ob5lrhKKHAE
+   +F1ccr+qLS1znpsBY0E9cYEpgebNo5uhaFrLfnIVRrK7uu1mEmwvhy5G8
+   SC6xL7qE/Kad291euXvoN67/nJQd80t+qx+75VwZpLihUqRH19PuLTi4x
+   g==;
+X-CSE-ConnectionGUID: 4HHPueiWSzGhDvIrfrNpYA==
+X-CSE-MsgGUID: Tl65XeZPT4Oxz5EatgLTEg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="81997700"
+X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
+   d="scan'208";a="81997700"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 09:28:38 -0700
+X-CSE-ConnectionGUID: uzMx9dBpTBG2E2LPhIiqaQ==
+X-CSE-MsgGUID: qud89/ILT0GMkTpBqsxf3g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
+   d="scan'208";a="276720633"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.20.168]) ([10.246.20.168])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 09:28:35 -0700
+Message-ID: <8d96249e-1492-4111-83e7-b84914e6dc90@linux.intel.com>
+Date: Thu, 11 Jun 2026 18:28:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v2] ice: fix memory leak in
+ ice_lbtest_prepare_rings()
+To: Dawei Feng <dawei.feng@seu.edu.cn>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zilin@seu.edu.cn, stable@vger.kernel.org
+References: <20260611161204.605962-1-dawei.feng@seu.edu.cn>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20260611161204.605962-1-dawei.feng@seu.edu.cn>
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 11 Jun 2026 12:27:37 -0400
-Message-Id: <DJ6D0SSBHB0K.3B83F5Z3EBQWN@etsalapatis.com>
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, <bpf@vger.kernel.org>
-Cc: "Weiming Shi" <bestswngs@gmail.com>, "Xiang Mei" <xmei5@asu.edu>, "Xinyu
- Ma" <mmmxny@gmail.com>, "Alexei Starovoitov" <ast@kernel.org>, "Daniel
- Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko" <andrii@kernel.org>,
- "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Song Liu"
- <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa"
- <jolsa@kernel.org>, "Emil Tsalapatis" <emil@etsalapatis.com>, "John
- Fastabend" <john.fastabend@gmail.com>, "Stanislav Fomichev"
- <sdf@fomichev.me>, "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Jakub Sitnicki"
- <jakub@cloudflare.com>, "Shuah Khan" <shuah@kernel.org>, "Jesper Dangaard
- Brouer" <hawk@kernel.org>, "Sechang Lim" <rhkrqnwk98@gmail.com>, "Ihor
- Solodrai" <ihor.solodrai@linux.dev>, "Cong Wang" <cong.wang@bytedance.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH bpf v2 1/7] bpf, sockmap: reject overflowing copy + len
- in bpf_msg_push_data()
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
- <20260611123538.156005-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20260611123538.156005-2-jiayuan.chen@linux.dev>
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298222-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:bpf@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:mmmxny@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DMARC_NA(0.00)[etsalapatis.com];
+	TAGGED_FROM(0.00)[bounces-298223-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zilin@seu.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,asu.edu,kernel.org,iogearbox.net,linux.dev,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	FROM_NEQ_ENVFROM(0.00)[marcin.szycik@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,etsalapatis.com:email,etsalapatis.com:mid,etsalapatis.com:from_mime,vger.kernel.org:from_smtp,asu.edu:email,etsalapatis-com.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,seu.edu.cn:email,linux.intel.com:mid,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 38CFB673AC6
+X-Rspamd-Queue-Id: 6AC096739AA
 
-On Thu Jun 11, 2026 at 8:34 AM EDT, Jiayuan Chen wrote:
-> From: Weiming Shi <bestswngs@gmail.com>
->
-> When the scatterlist ring is full or nearly full, bpf_msg_push_data()
-> enters a copy fallback path and computes copy + len for the page
-> allocation size. Since len comes from BPF with arg3_type =3D ARG_ANYTHING
-> and both are u32, a crafted len can wrap the sum to a small value,
-> causing an undersized allocation followed by an out-of-bounds memcpy.
->
->  BUG: unable to handle page fault for address: ffffed104089a402
->  Oops: Oops: 0000 [#1] SMP KASAN NOPTI
->  Call Trace:
->   __asan_memcpy (mm/kasan/shadow.c:105)
->   bpf_msg_push_data (net/core/filter.c:2852 net/core/filter.c:2788)
->   bpf_prog_9ed8b5711920a7d7+0x2e/0x36
->   sk_psock_msg_verdict (net/core/skmsg.c:934)
->   tcp_bpf_sendmsg (net/ipv4/tcp_bpf.c:421 net/ipv4/tcp_bpf.c:584)
->   __sys_sendto (net/socket.c:2206)
->   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
->   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
->
-> Add an overflow check before the allocation.
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 
->
-> Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.=
-org
-> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-> Tested-by: Xiang Mei <xmei5@asu.edu>
-> Tested-by: Xinyu Ma <mmmxny@gmail.com>
-> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+On 11.06.2026 18:12, Dawei Feng wrote:
+> ice_lbtest_prepare_rings() frees Rx rings only when
+> ice_vsi_start_all_rx_rings() fails. If ice_vsi_setup_rx_rings() fails
+> after allocating some descriptors, or if ice_vsi_cfg_lan() fails after
+> the Rx rings were prepared, the function reaches the Tx cleanup path
+> without releasing the initialized Rx resources.
+> 
+> Fix this by adding separate unwind paths for Rx setup failure and LAN
+> configuration failure. The Rx setup failure path releases the partially
+> prepared Rx rings before freeing Tx rings, while later failures first
+> undo the LAN Tx configuration and then release the Rx rings in reverse
+> setup order.
+> 
+> The bug was first flagged by an experimental analysis tool we are
+> developing for kernel memory-management bugs while analyzing
+> v6.13-rc1. The tool is still under development and is not yet publicly
+> available. Manual inspection confirms that the bug is still
+> present in v7.1-rc5.
+> 
+> An x86_64 allyesconfig build showed no new warnings. As we do not have an
+> Intel E800 Series adapter available to run the ethtool offline loopback
+> selftest, no runtime testing was able to be performed.
+> 
+> Fixes: 0e674aeb0b77 ("ice: Add handler for ethtool selftest")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
+
+LGTM
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+
 > ---
-> To sashiko:
->
-> Regarding bpf_msg_push_data() reading "copy =3D msg->sg.data[i].length" w=
-ith
-> i =3D=3D msg->sg.end (appending at the very end of a full/near-full ring)=
-:
->
-> This is pre-existing code, not touched by this series, and reproducing it=
- needs
-> a narrow combination -- a pure append at the end so the loop exits with
-> i =3D=3D msg->sg.end, a full/near-full ring, plus a prior push/pop histor=
-y that
-> leaves a stale length in the otherwise-unused end slot. A freshly built r=
-ing
-> zeroes that slot, so copy stays 0. We don't consider it practically repro=
-ducible.
->
-> Even then it's already covered: the overflow check in patch 1 ("copy + le=
-n <
-> copy") rejects the dangerous case, and __GFP_ZERO in patch 3 prevents any=
- data
-> exposure. Not worth fixing here.
-> ---
->  net/core/filter.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 9590877b0714f..3c8f1cedb217f 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2829,6 +2829,9 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg,=
- u32, start,
->  	if (!space || (space =3D=3D 1 && start !=3D offset))
->  		copy =3D msg->sg.data[i].length;
-> =20
-> +	if (unlikely(copy + len < copy))
-> +		return -EINVAL;
-> +
->  	page =3D alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
->  			   get_order(copy + len));
->  	if (unlikely(!page))
+> Changes in v2:
+> - Fix cleanup order
+> 
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> index f28416a707d7..10a4abc66974 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> @@ -1069,18 +1069,18 @@ static int ice_lbtest_prepare_rings(struct ice_vsi *vsi)
+>  
+>  	status = ice_vsi_cfg_lan(vsi);
+>  	if (status)
+> -		goto err_setup_rx_ring;
+> +		goto err_cfg_lan;
+>  
+>  	status = ice_vsi_start_all_rx_rings(vsi);
+>  	if (status)
+> -		goto err_start_rx_ring;
+> +		goto err_cfg_lan;
+>  
+>  	return 0;
+>  
+> -err_start_rx_ring:
+> -	ice_vsi_free_rx_rings(vsi);
+> -err_setup_rx_ring:
+> +err_cfg_lan:
+>  	ice_vsi_stop_lan_tx_rings(vsi, ICE_NO_RESET, 0);
+> +err_setup_rx_ring:
+> +	ice_vsi_free_rx_rings(vsi);
+>  err_setup_tx_ring:
+>  	ice_vsi_free_tx_rings(vsi);
+>  
 
 
