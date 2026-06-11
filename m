@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7fZ7BQauKmqAuwMAu9opvQ
-	(envelope-from <netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:58 +0200
+	id eN3RMOKtKmpzuwMAu9opvQ
+	(envelope-from <netdev+bounces-298124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79741671FE8
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF2F671FB1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=I144PC0u;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=qmvRuGwX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298124-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298124-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 07C373073426
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:39:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19A9B312970B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735553F7874;
-	Thu, 11 Jun 2026 12:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100993F822F;
+	Thu, 11 Jun 2026 12:39:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002202F28FC
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EF8309F1C
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:39:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781181553; cv=none; b=tcQeiR4pqCFuEVoisOTsy8vn45anO5EeV3HYcEmksfLzPTr4u9CA6lkMUVoJvVq0BKoCoJjG4155VBMARGc7rzABenetL+5SnVdu+KB1/8kuAmf/+t1pyyAHhyN7gOEzcRdP8ZwOlg6/aWiHkcKAuV1pABulxh0w73IR3DoVJgw=
+	t=1781181571; cv=none; b=dx//KTzo9UI9311//X9d66ZRSrz82j3JXpAygTrSQgx5ZJrXjuU9olLJVOQefUxCne1vCguCZeqabYLxm4Sc1ot2dbNWuwYzrJFKr+J08UpmsPtWFi4jXtof7vMINzUoz5wXSQCwU27olMA2/mQ74o1elMtRqwYaZAPcYSSIFlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781181553; c=relaxed/simple;
-	bh=c2g8WkNZdy9SmxdKoIzElNcy39kSDQgaBCXoxEeNlN4=;
+	s=arc-20240116; t=1781181571; c=relaxed/simple;
+	bh=pRtqG6/YYml7TewVQ54ndwbUiRexd6hDkd4T1hgF+jU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LNPMwA6p8CJhO7QD3CxQd45RYJbmVR1o8PiYY1Mc/bW2hWs+0cvyOCbw/W63YnyLOocal025oktknATRLbyYf0vC54bpVFCzuvaoTj+DKQIUWYvlj7vGULNfQ3Q7GwSF1dwYHsWwPz47hctxa7bjpdT5ibf3goqbhmwCiocgXvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I144PC0u; arc=none smtp.client-ip=91.218.175.182
+	 MIME-Version; b=pvFhgl2oh35LzNghjTDO6JrX5CWBabscyDlmw67SyTY3OGVTjHPclVgPtFVYHNTnYsMC07slS6l/Z65AeD8kju6qbUbM8aF0QoJF8dJS69ZSZKXE/C2fX7+QqG/xHLAjc/jGLNjpAoatiAwchw471+yXKA35jp81cE2KAL08aHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qmvRuGwX; arc=none smtp.client-ip=91.218.175.188
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781181549;
+	t=1781181567;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=htxaBRqgJJwIgSGsPQlozFytcsGKySwMz0N5LwBygaI=;
-	b=I144PC0u/OG52044NrqyKOQ2uxXsP3BaHF9MuGxxfNcDSkfdbY9Q8cZRxpDx4zwTegF9gz
-	kMwFLeiL2qmC9p/3DTnryNbKZAfKIHtGbPm0LmqpBjfqx6FirBchb7WXgII7hnPw7MhRyj
-	9fh4YSGl7RwwTvTasJYE1cJWf2M0Q2g=
+	bh=6YFIoeIzyt0t348Z/qDx0TQhneuz7fpI7arWDgaFBqM=;
+	b=qmvRuGwXY4pQaTal/zgNDUk/jzkpZ1ITd2WDeFchTT07v0hgJOVKhhGZSfXaaD3tfCvFCi
+	GaFaoAz8WO2QtBuduTONyXdDm32D3urGl6NztN9vHLwFAq+U8v8qIN3J8p9EDocnBu6zm+
+	jgPvvGx/kdNFhaaTcTqRjGflGBYQr/Y=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Sechang Lim <rhkrqnwk98@gmail.com>,
 	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Jiri Olsa <jolsa@kernel.org>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -74,9 +74,9 @@ Cc: Sechang Lim <rhkrqnwk98@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v2 6/7] bpf, sockmap: fix integer overflow in bpf_msg_pop_data() bounds check
-Date: Thu, 11 Jun 2026 20:34:14 +0800
-Message-ID: <20260611123538.156005-7-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v2 7/7] selftests/bpf: add test for bpf_msg_pop_data() overflow
+Date: Thu, 11 Jun 2026 20:34:15 +0800
+Message-ID: <20260611123538.156005-8-jiayuan.chen@linux.dev>
 In-Reply-To: <20260611123538.156005-1-jiayuan.chen@linux.dev>
 References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -95,16 +95,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-298123-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298124-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:rhkrqnwk98@gmail.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:rhkrqnwk98@gmail.com,m:jiayuan.chen@linux.dev,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
@@ -114,81 +114,137 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,iogearbox.net,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,iogearbox.net,fomichev.me,kernel.org,etsalapatis.com,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 79741671FE8
+X-Rspamd-Queue-Id: 3FF2F671FB1
 
 From: Sechang Lim <rhkrqnwk98@gmail.com>
 
-start and len are u32, so
+Add a test in sockmap_basic.c that calls bpf_msg_pop_data() with a length
+close to U32_MAX, which overflows the start + len bounds check. The sk_msg
+program records the return value over a sendmsg and the test checks that
+the call is rejected with -EINVAL.
 
-	u64 last = start + len;
-
-evaluates start + len in 32-bit and wraps before storing it in last.
-The bounds check
-
-	if (start >= offset + l || last > msg->sg.size)
-		return -EINVAL;
-
-can then be passed with an out-of-range start/len, after which the pop
-loop runs off the end of the scatterlist and sk_msg_shift_left() calls
-put_page() on the empty msg->sg.end slot:
-
-  Oops: general protection fault, probably for non-canonical address
-  0xdffffc0000000001: 0000 [#1] SMP KASAN PTI
-  KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-  RIP: 0010:sk_msg_shift_left net/core/filter.c:2957 [inline]
-  RIP: 0010:____bpf_msg_pop_data net/core/filter.c:3103 [inline]
-  RIP: 0010:bpf_msg_pop_data+0x753/0x1a10 net/core/filter.c:2984
-  Call Trace:
-   <TASK>
-   bpf_prog_4cc92c278f4d5d56+0x1b1/0x1e8
-   bpf_prog_run_pin_on_cpu+0x107/0x320 include/linux/filter.h:746
-   sk_psock_msg_verdict+0x357/0x7f0 net/core/skmsg.c:934
-   tcp_bpf_send_verdict net/ipv4/tcp_bpf.c:420 [inline]
-   tcp_bpf_sendmsg+0x766/0x1ae0 net/ipv4/tcp_bpf.c:583
-   __sock_sendmsg+0x153/0x1c0 net/socket.c:802
-   __sys_sendto+0x326/0x430 net/socket.c:2265
-   __x64_sys_sendto+0xe3/0x100 net/socket.c:2268
-   do_syscall_64+0x14c/0x480
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
-
-Widen the addition with a (u64) cast so the bound is evaluated in
-64-bit and a len near U32_MAX no longer wraps below msg->sg.size.
-
-While here, change pop from int to u32. It counts bytes against the
-unsigned scatterlist lengths and can never be negative, so the signed
-type only invites sign-confusion in the pop loop.
-
-Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
 Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 ---
- net/core/filter.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 48 +++++++++++++++++++
+ .../bpf/progs/test_sockmap_msg_pop_data.c     | 27 +++++++++++
+ 2 files changed, 75 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index e35e681a15dca..742aeeea13c26 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3048,8 +3048,8 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
- 	   u32, len, u64, flags)
- {
- 	u32 i = 0, l = 0, space, offset = 0;
--	u64 last = start + len;
--	int pop;
-+	u64 last = (u64)start + len;
-+	u32 pop;
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+index d2846579285f2..cb3229711f93a 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+@@ -14,6 +14,7 @@
+ #include "test_sockmap_pass_prog.skel.h"
+ #include "test_sockmap_drop_prog.skel.h"
+ #include "test_sockmap_change_tail.skel.h"
++#include "test_sockmap_msg_pop_data.skel.h"
+ #include "bpf_iter_sockmap.skel.h"
  
- 	if (unlikely(flags))
- 		return -EINVAL;
+ #include "sockmap_helpers.h"
+@@ -666,6 +667,51 @@ static void test_sockmap_skb_verdict_change_tail(void)
+ 	test_sockmap_change_tail__destroy(skel);
+ }
+ 
++static void test_sockmap_msg_verdict_pop_data(void)
++{
++	struct test_sockmap_msg_pop_data *skel;
++	int err, map, verdict;
++	int c1 = -1, p1 = -1, sent;
++	int zero = 0;
++	char *buf;
++	const size_t len = 32 * 1024;
++
++	skel = test_sockmap_msg_pop_data__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open_and_load"))
++		return;
++
++	verdict = bpf_program__fd(skel->progs.prog_msg_pop_data);
++	map = bpf_map__fd(skel->maps.sock_map);
++
++	err = bpf_prog_attach(verdict, map, BPF_SK_MSG_VERDICT, 0);
++	if (!ASSERT_OK(err, "bpf_prog_attach"))
++		goto out;
++
++	err = create_pair(AF_INET, SOCK_STREAM, &c1, &p1);
++	if (!ASSERT_OK(err, "create_pair"))
++		goto out;
++
++	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
++	if (!ASSERT_OK(err, "bpf_map_update_elem"))
++		goto out_close;
++
++	buf = calloc(len, 1);
++	if (!ASSERT_OK_PTR(buf, "calloc"))
++		goto out_close;
++
++	sent = xsend(c1, buf, len, 0);
++	ASSERT_EQ(sent, (ssize_t)len, "xsend");
++	ASSERT_EQ(skel->data->pop_data_ret, -EINVAL, "pop_data_rejects overflow");
++
++	free(buf);
++
++out_close:
++	close(c1);
++	close(p1);
++out:
++	test_sockmap_msg_pop_data__destroy(skel);
++}
++
+ static void test_sockmap_skb_verdict_peek_helper(int map)
+ {
+ 	int err, c1, p1, zero = 0, sent, recvd, avail;
+@@ -1373,6 +1419,8 @@ void test_sockmap_basic(void)
+ 		test_sockmap_skb_verdict_fionread(false);
+ 	if (test__start_subtest("sockmap skb_verdict change tail"))
+ 		test_sockmap_skb_verdict_change_tail();
++	if (test__start_subtest("sockmap msg_verdict pop_data overflow"))
++		test_sockmap_msg_verdict_pop_data();
+ 	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
+ 		test_sockmap_skb_verdict_peek();
+ 	if (test__start_subtest("sockmap skb_verdict msg_f_peek with link"))
+diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c b/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
+new file mode 100644
+index 0000000000000..301e65b95256c
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++
++struct {
++	__uint(type, BPF_MAP_TYPE_SOCKMAP);
++	__uint(max_entries, 1);
++	__type(key, int);
++	__type(value, int);
++} sock_map SEC(".maps");
++
++#define POP_START 0x48a3
++#define POP_LEN   0xfffffffd
++
++long pop_data_ret = 1;
++
++SEC("sk_msg")
++int prog_msg_pop_data(struct sk_msg_md *msg)
++{
++	if (msg->size <= POP_START)
++		return SK_PASS;
++
++	pop_data_ret = bpf_msg_pop_data(msg, POP_START, POP_LEN, 0);
++	return SK_PASS;
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.43.0
 
