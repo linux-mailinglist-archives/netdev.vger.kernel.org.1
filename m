@@ -1,194 +1,158 @@
-Return-Path: <netdev+bounces-297875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297876-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NZzJJ8oMKmqPhwMAu9opvQ
-	(envelope-from <netdev+bounces-297875-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:18:02 +0200
+	id u0b0FLESKmoaiQMAu9opvQ
+	(envelope-from <netdev+bounces-297876-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:43:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0EE66D9DB
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:18:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C16D66DAAB
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:43:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=k1DPFvIV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297875-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297875-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=gSrkfHLx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297876-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297876-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7BFCD3011EA8
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 01:18:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4ACA030B1219
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 01:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364781E9B37;
-	Thu, 11 Jun 2026 01:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783C72367CF;
+	Thu, 11 Jun 2026 01:43:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5531C15E5DC
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 01:17:56 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781140678; cv=pass; b=udLnr4ZfTwHx5IBUmXUdV2CYoAtaqgH9RaS9qBJYY9aKKAaIAWEN9+e1wKMw/LxWbYEV+v7MPsRx2V4onOtWB6XaP65m1uwP4JbYV/2Rx0djhqlUbjSYU13yW5xlCKf14Y4jq09uhEl3hwLabGk1KGv7qoMpRQ6zx//9YmTwzgU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781140678; c=relaxed/simple;
-	bh=y6kzzG3ct0h6IoHvAD4R7WtfG1tsXtsc+74I95kF+5I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HQn7HllgEOvMqa/OIY41lOttuhvSAuLufz5nmEPz9zcTlBdXeY0sm3RtCFt5NHisdtiWeoFYiq2tqReiIdWt2uhfhxVu6hpugNXA6A9F5q1LZhA57dKZSgmfKIUSXg4YoujSM4xL2Nhgo+nA5bfvnQNkFVO11C95dyRQ5R3s6NU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1DPFvIV; arc=pass smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-7dfceeaf168so70634937b3.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 18:17:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781140675; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gVSM/urfmFJgl74w4UaR0ZqLj5pExsb6T6k3Ks4qeRdInx5f2Tx/2Jq/N6ebOXtB+n
-         thB+8kQ9JPOUNEduWWFSu/YLjqdZg3ix5zG+7BKyBQFWDYlmHJwk2WLoFDbDUYneEEWR
-         JWsgZE8UW3JzSlzP2PB8JtYSLZOviFmHDhfRsJOeYPcYd7MxirfG3gDr/gFfZAEp4sWM
-         yOE18Xx+GvzoMNUdnAN51oa3mZwANcieBWASeeeqLHNRY4tNGgvE9MdX9BGOWfx2FkLm
-         xOuplaQTMWAXqlyaEGmQiFx+pXKaYCFWTaaBSJdZQE2ltVZ83Gwtl01dZOjRMTxUTUhU
-         Cq+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cwpdyNCQVE9Z0vBjg+vKg/1VB56zfLGyeI5CigKesGI=;
-        fh=hE/1WYjjF6v102qI9jvsA3sIrI8JdTwt43npZnXjVOE=;
-        b=fr2dUVn3RbzIoyuDdD1pezDLM5ksJBXOjOfVjgIb8SdyNEj3sEWDWcED71KOHQ4Z7f
-         MPZEPzYCu8fycoREm+z+aK7890bwiYxBGktOP9vBsoNMn8PJf5LhVc1rZO1azpaPK5LI
-         WdrdouQgYVNcKdr1/uq5OapmcwgdMuTMbiDdUF3xqzTWl1KYryTOnlo9JctaoYzNAAZD
-         3mY3XXv5+hOuPVF5YW7UIf2RQLbEh07nmWrEzfQ0euykcRMR0C+FniCnZYOgQaZiAhTu
-         vCwA7Q1ikbo1RgNfG+tk6xNExzfj5oUCFj/mvjP5NVQz88CWWC0uaS5gar/etjOt6IA0
-         zuDw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63011E555
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 01:43:09 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781142190; cv=none; b=fai5ePqZu2YSPKp1quxVZXLCBTlax+FiBByQvt4bpuxgehE5cqkx5ei9ZaDbzEnKTuGx66VxOOT9yKwTgxjGKO3EDp+0DKlZr7elA3izYD39yNHwwDYenWCZcOp32Udsgx9Z/pf2Iq597rwHy7OU5s30QVB/BXiSH15Xl5ZTIgw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781142190; c=relaxed/simple;
+	bh=+n513kDZ3TcIR4W2QVHnQqu/cInucM+9o9ze9SW7VLw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DWzcPD9OaWwnoGuFi4L3Ya4wHtMfMPPffg0vHnzMfIgcYzJx2miYIu/IUADGpQGgsgqtnfg8KlTS8KrzKEVvTexIWozXvNlMxGvgrCkBTXXXD08p4mkIVlQsbz5NmnG97HUmvTphAsELp1cmw12CbcZsCFX4lzlrofN0aLINFyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSrkfHLx; arc=none smtp.client-ip=209.85.214.179
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bf1cda2b17so3328965ad.1
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 18:43:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781140675; x=1781745475; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1781142189; x=1781746989; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cwpdyNCQVE9Z0vBjg+vKg/1VB56zfLGyeI5CigKesGI=;
-        b=k1DPFvIVaJUG0nOCozFMPM7VTT1VRTdz6b/erSM0D6FJdFyzsu8I9bkzXbRDvldUVR
-         o7EmWMu/u1ZqsrsPzmr4oj1slHt0VURPq5WDlsGMJbk6rXhKkp7ATlxhpoNenKZGEsGl
-         Cx7hgBJQ5sYtzvmRZAPUMwwSCnu8mU6dqFr4hmaqswcRdT1fj9EqNohlAyGcOUYg16EB
-         T4qUyin8OQ6elJ9d9MZnNWkslxZXl3d5eanQ5StrgGbMvOsjHr/R+ZdtkMt7dVDk/0NN
-         3MD/jFHPy0Q0UbLbLBGX2b9K6qZ5Ad2N025qBEhBuS72QN4QG9hbyzNLvTHdXb5jiE+t
-         LNEw==
+        bh=+n513kDZ3TcIR4W2QVHnQqu/cInucM+9o9ze9SW7VLw=;
+        b=gSrkfHLx0/sm5xF0dE9ugXREgvgnUgTHn9r2qRvHxlwqC3DEtOm7x8J07wsffXgUij
+         65gj9SBrRbdOQR79pNHdLSGL24QuaA/5HGG8YWXydBInr17TlirAjn6W+EOtSw8bma7u
+         aRo7xXqRPdV/lMKSGT1IBt9en0jn8S81u4Q9xe8owCAky9I/OuSXklZMLMmqq8nfLp9A
+         agZmjfAGN/pX0Bbj0XMACxE4qcmEBPBltDC3S1BzwMZhzLyGyZYLlA8PKXz/jGpVdq9D
+         QOH1uz76J6ugoX46YNdgYBrU1MSqnqmar4TSlObpbPO8aJd849eHchbczM4Mle4KDyV6
+         3Uyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781140675; x=1781745475;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1781142189; x=1781746989;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=cwpdyNCQVE9Z0vBjg+vKg/1VB56zfLGyeI5CigKesGI=;
-        b=dwRyj6vyvJEZOCaFlOxwxMmCjs+Wn40PSs+Iwj1ICG7UjPdC4QEcJM8wxVyBj8M9ga
-         H4KZm/uzt+q+s/LN6oNAsiUoQeXIjEvo/NU0MLCFMoIA5ZoGC8UGhXEJk2S3Ltpz8OKa
-         vlSeVh9uQOLcjvUvCRf3Zgv6J1wAF59oeUTumsGtLlHvF9tUkAGECAOMDe8GYWZ0HTc7
-         Y7yiTC/ok2c87BEzm+tLpXDVkqntkwMsSBcDioMK98wbUpPt6eWWz1Br3Hz43UpoZpEH
-         75nv1jg7tGSdLFzd9JOTIrX8SCZGUmWpWKTfh9ULHWh4gIXwV/HIscn2T98+PaleZ6CD
-         L6+w==
-X-Forwarded-Encrypted: i=1; AFNElJ/Mm5hsCM84oJu+z91KkmJ8Ph02w1akyU2OZwvNsTuCXnsYbAejH9sJnX9r9RlB/pVr2neC0nE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy591l75y5y22yCUrrQYUUosWn3zmAp3uSmisUnMBWxPeIM9/p3
-	UlkxhBceI7tct+D9CXgHqsMUx2sTT3SiDAiOAPFDO8jhT78bM3HvY9vGtLehxjwagtpKWk44lqN
-	5PappfyB3Qg2DArVaTeb5IM3cr6gNbUw=
-X-Gm-Gg: Acq92OHJIQlcJvOIVf02vG1c8MGkaNrYeUAXHj4EfZo1EiUuCpRLYkepDZ3dDR9Nb2u
-	kxx67PdAK7/kROg9jCetOegVoRlTvIuobBHDhtPk5Bb2IUjl/nTbK/UP65sp1G4FhmiZrKBo8m2
-	rl4FsIIjiiBeUEX/FraHwmGa/X5IbU7sAxd9HDTridSD7ndZ++4oOH1WKC1XU/P1uE2lVqYO26L
-	dhx1mFAZ6g2nPiX+veiFcvKLKSSBt4yGrhGT8AotLVqcaYqMVIWSDHwIUlkSfXNQG1Pr3k/urtD
-	NriHz1po/CsE9Lkju4aGxXrG0X0UtiXzh35ipKPiziqKQzR7Zz47Rb/3fxhOR6rZ/m7Yiw==
-X-Received: by 2002:a05:690c:3392:b0:7f4:fad5:2084 with SMTP id
- 00721157ae682-7f6559e6bf8mr8454907b3.13.1781140675216; Wed, 10 Jun 2026
- 18:17:55 -0700 (PDT)
+        bh=+n513kDZ3TcIR4W2QVHnQqu/cInucM+9o9ze9SW7VLw=;
+        b=P/ca61kNm3zC2wx9FR0bJaeRkWBn4g1FJ7pgDVC+7nWfNcjerw94F9X9SwbKvvg5aq
+         Kj+l1V2vdgRGm3HFU/qx8BOJuyPaXJg2rWVT0GKFS8xcC50IQWeov0ZwTZ3q1UfvnX2r
+         ffF5X2Odbus2sWfMTAweSrto5shrMH4hoSrj3hgnxjH/oOwfQY4eypv6iuvPRcnDBaJB
+         hhwDFBwg9MtU9xku6HBO6swwBwbeYWxL47kGq+KUr3uGA/ra0t8zOQqlG4gS1wLcFwD7
+         7zXJkqYX2YlRl/YxnOLyqqRDYZAqUTLdMeklkPoosHQi+MC1b2xgSj9YdaeXqVpB83Uu
+         gXpw==
+X-Gm-Message-State: AOJu0YzugwWOAevsxj/ZfS9tJYyj+XDXhkcCTKtWHmbiDXGgSgKljX1m
+	I5zA5DongIDAQp+AS4c2uDgXI4sqrhCJx1wIq6ejT0A0INEcyp8k3Ds=
+X-Gm-Gg: Acq92OHJGxGhbkHDpB5fhXwGpNCtgnAw3quYEj42CBy7790zZIJFCL3WEH+VynBpq8m
+	iq3NK613DJ28kgRKV8D2Rjgr6Hqt+P0mjbSV3JiDg//ZTKg54EewWDUBa2Xdy1Q3bGfruhWkroH
+	Rawzpmj8FZ55UGfOQjLFo1fxOfEdA4jTuo6BGmbCjD5HY1UiN6uuGoJSP9bWQ4xfep2O49eZn6B
+	wIKoEIMgoDYwElm5PAztBt4rHPuTSBtybMY/fgV0JXs2NAP4XKm16VzUvwubiZPhPvlPfHCv+DQ
+	PeGF3fHdiQYhx2gcPqcnIhs7+FiGyLworZN8PVQ20ilaTMUxplKKfVcysAT1O5ib96UPZNeFjt3
+	GOqKzUSI911xypVmIrgmNBGrkoJ94H3hMPy7moJbgQ35PAGIc9sZGNzkoTl+zeZ/dzHTU45C19h
+	0s6eWJf2DgY5WoTYZEZcDygvTzPMc744JLRTfV4NYMRaadlPt+djux7b1IchlRL4P4iP2pih+5m
+	nTtVg==
+X-Received: by 2002:a17:903:320e:b0:2c0:c262:b924 with SMTP id d9443c01a7336-2c2f7203258mr5001395ad.13.1781142188609;
+        Wed, 10 Jun 2026 18:43:08 -0700 (PDT)
+Received: from raf.tailb4a862.ts.net ([153.124.163.116])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16609e636sm260924895ad.51.2026.06.10.18.43.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jun 2026 18:43:08 -0700 (PDT)
+From: Raf Dickson <rafdog35@gmail.com>
+To: bobbyeshleman@gmail.com
+Cc: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	bryan-bt.tan@broadcom.com,
+	vishnu.dasa@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next 1/2] vsock: fold sk_acceptq_added() into vsock_enqueue_accept()
+Date: Thu, 11 Jun 2026 01:43:01 +0000
+Message-ID: <20260611014301.22599-1-rafdog35@gmail.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <ainvZQppoc7LfPRs@devvm29614.prn0.facebook.com>
+References: <ainvZQppoc7LfPRs@devvm29614.prn0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260610102850.483291-1-sun.jian.kdev@gmail.com>
- <871peeacre.fsf@toke.dk> <20260610075018.6162cec7@kernel.org>
-In-Reply-To: <20260610075018.6162cec7@kernel.org>
-From: sun jian <sun.jian.kdev@gmail.com>
-Date: Thu, 11 Jun 2026 09:17:45 +0800
-X-Gm-Features: AVVi8CfDR3TXqyYOHmrrylWsHkJhrNSrybKrnHMejG_1zq7GSb6GOaAcLezoD7U
-Message-ID: <CABFUUZEKS9P8=hsboyBj_f_9W8ycZHVG3GwqmtcnUoiRgh8iVw@mail.gmail.com>
-Subject: Re: [PATCH bpf v2] bpf: Run generic devmap egress prog on private skb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	bpf@vger.kernel.org, Menglong Dong <menglong.dong@linux.dev>, 
-	Emil Tsalapatis <emil@etsalapatis.com>, Jiayuan Chen <jiayuan.chen@linux.dev>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:toke@redhat.com,m:bpf@vger.kernel.org,m:menglong.dong@linux.dev,m:emil@etsalapatis.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:davem@davemloft.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:liuhangbin@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-297875-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,linux.dev,etsalapatis.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-297876-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:pabeni@redhat.com,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[rafdog35@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rafdog35@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2F0EE66D9DB
+X-Rspamd-Queue-Id: 9C16D66DAAB
 
-On Wed, Jun 10, 2026 at 10:50=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On Wed, Jun 10, 2026 at 16:12:37 -0700, Bobby Eshleman wrote:
+> It looks like vmci might be an odd duck here, where sk_acceptq_added
+> actually pairs with vsock_add_pending(), instead of
+> vsock_enqueue_accept()...
 >
-> On Wed, 10 Jun 2026 12:52:21 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote=
-:
-> > > @@ -700,12 +700,22 @@ int dev_map_enqueue_multi(struct xdp_frame *xdp=
-f, struct net_device *dev_rx,
-> > >  int dev_map_generic_redirect(struct bpf_dtab_netdev *dst, struct sk_=
-buff *skb,
-> > >                          const struct bpf_prog *xdp_prog)
-> > >  {
-> > > +   struct sk_buff *nskb;
-> >
-> > nit: this definition could go inside the if statement block below, to
-> > make it obvious that nskb is not used outside that branch.
->
-> Or maybe move the copy inside dev_map_bpf_prog_run_skb() since it only
-> has one caller and already checks if prog is NULL?
+> For example, if the pending work timer below fires, vsock_pending_work()
+> will see vsock_is_pending() is true, and then hit sk_acceptq_removed()
+> and underflow the zero backlog counter?
 
-Hi Toke, Jakub, Jiayuan,
+You're right, thank you for catching that. In vmci sk_acceptq_added()
+pairs with vsock_add_pending(), not vsock_enqueue_accept(), so moving
+it would cause an underflow when the pending work timer fires without
+a successful connection. Patch 2/2 is unaffected.
 
-Thanks for the reviews and suggestions.
+I'll send a v2 that keeps the vmci call site as-is and only folds
+the virtio and hyperv sites into vsock_enqueue_accept().
 
-I'll prepare a v3 that splits the selftest into a separate patch, makes the
-DEVMAP_HASH keys deterministic in the last-destination test, and fixes the
-Fixes tag to point at the generic devmap egress-program support commit.
-
-I'll also look at moving the private-copy step closer to
-dev_map_bpf_prog_run_skb(), as Jakub suggested.
-
-Thanks,
-Sun Jian
+Raf
 
