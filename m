@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-298178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NrdUHzfVKmoYxwMAu9opvQ
-	(envelope-from <netdev+bounces-298178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:33:11 +0200
+	id 5A2FBbDXKmrIxwMAu9opvQ
+	(envelope-from <netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:43:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFAF767317F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:33:10 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 078EB67329D
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:43:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HbvcFqpJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298178-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298178-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=0FLVvb99;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1542D3140914
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:33:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 244043002F59
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BCF421A12;
-	Thu, 11 Jun 2026 15:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC79B3F7898;
+	Thu, 11 Jun 2026 15:43:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F1B421EF4;
-	Thu, 11 Jun 2026 15:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEFE3AA4EF
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 15:43:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781191986; cv=none; b=EpQMy3AXlxSalCUoqR/LJVtzZ6bl74K1YihroGjoVZzm0t0SzULbOEQmj9WLE+EIh+ZhPKwhSHGnvMZ3CgJfBxkMOyGdakfqc47i50GI6H698VpxpKiJ2E/3ZpQ/vrUkYWvyH9QEndvZDtjYgCV8HNAZ8P63llI644FjLf4M2hM=
+	t=1781192617; cv=none; b=Fha+HV6OlMu4ZYjFo4nHfzlP+3kScTzfMCn/sxQgDtnAvdj/OENo2uIRZwKHCZNO+27iVFJ+Lv+8MB3q3TzbK/lsC5lh3aEHskaXZQqDOhk05JsCFaiybzsrMA9Y3LMfVWU4AQ4wQKHxafTHXwd2ur9w5D8VF/t2dOk+B1XTx4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781191986; c=relaxed/simple;
-	bh=7/YFbY3zowh1b4sKJyknvz851OqdJ/w6QrAkwX9nCMQ=;
+	s=arc-20240116; t=1781192617; c=relaxed/simple;
+	bh=A0QPOoI1QIRAP6SkKhJ9Cz/S+rKbby6RT2vbilreIG0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nEhWAXUn3jfsLOo20R4FSgqnFAG9L5AVyhJvkPpgCIU5VnBmcrVach9qxEJltj6vNqj4+QX41VCG79XpJEpxz7gRnEyq3Kr4uA1100i9bT61l9SRDvEIc7blQe6TPwZZXpqMucY5EFEre/SFXnJ+GwTx5xk5IgBbntakE+J320c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HbvcFqpJ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C171F1F00893;
-	Thu, 11 Jun 2026 15:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781191981;
-	bh=FWR4YQsKWyjiXkMJgVoUFcd5HDuSNQC8Of5ssdgCtSs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HbvcFqpJ/xMq4GgdTJTSBJ3xs6f8/Rb2i7rsJ5OofAoKunbLTuYk7EdGcRaQo3jBZ
-	 J6lXDai7CWhZfla9S8fD/LUzXr8BkbaijfCjn4eGq/Zobc+AqHWlYJkzAJ7XE1YUFo
-	 ujzsvrizFZbyMrX3/N+gAV5fiNdvweplcQtJuEi9nAaduk2f6ptet05V9Oz7zryXv2
-	 pJ/3uKAPxNqrcMCMoV0YmDqG5Ie9O6hOfAT2D/WxVZHfjAokQUTSh0qXGkATcYOHam
-	 7CkyBTHGGww/HVmRm4SrsxPbRyQAaUnv8hoYlWP/CpgphwtadF/U++BxAUvucOae2p
-	 BD24yvSks350g==
-Date: Thu, 11 Jun 2026 16:32:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-Cc: skalluru@marvell.com, manishc@marvell.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ariele@broadcom.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] bnx2x: fix resource leaks in bnx2x_init_one() error
- paths
-Message-ID: <20260611153256.GU3920875@horms.kernel.org>
-References: <20260609074610.1968721-1-lihaoxiang@isrc.iscas.ac.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A/Qt50s3xe2OctMp7mRD417V88m3gwWE5urM938ruDew8IxypPELOGY/Iru3cxyAJP94GaBfxE/FZ1JmItH0+PwRUNc+THO2g2MzFM7z8uTHjzU8tp288DOrKlWsU0AR0i94UjiVhJ4iHS4tgrOoQ4D5N5Y3xDHr5HRmRVXGbMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0FLVvb99; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4jiIEDw7ibC7pr1Oeixmred4ucoxw5g1PQU4U2G4UIA=; b=0FLVvb992wP0UbYkxzBAQg+rF+
+	7DgZenEaKoCAZH++pqTkqRzVtiq54R3HiJjD2uRYOgHK8KRFE7CbpRCjxbb0r7uJZWGaeVjVKCTXr
+	YR8Z5Kr+6Pzc0XkgyJ95lu42fXu6CZlyPiHvEM6CdK06DDqR+1EJ4l3Oun1izaxaQxoo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wXhZ7-007BII-AL; Thu, 11 Jun 2026 17:43:33 +0200
+Date: Thu, 11 Jun 2026 17:43:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Das, Shubham" <shubham.das@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"D H, Siddaraju" <siddaraju.dh@intel.com>,
+	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>
+Subject: Re: Ethtool : PRBS feature
+Message-ID: <f4a3e4ad-91e2-4844-a29b-81f70151228e@lunn.ch>
+References: <SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,73 +63,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260609074610.1968721-1-lihaoxiang@isrc.iscas.ac.cn>
+In-Reply-To: <SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:shubham.das@intel.com,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-298178-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:lihaoxiang@isrc.iscas.ac.cn,m:skalluru@marvell.com,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ariele@broadcom.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298179-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,horms.kernel.org:mid,vger.kernel.org:from_smtp,iscas.ac.cn:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BFAF767317F
+X-Rspamd-Queue-Id: 078EB67329D
 
-On Tue, Jun 09, 2026 at 03:46:10PM +0800, Haoxiang Li wrote:
-> bnx2x_init_one() falls through to the common memory cleanup path for
-> several failures after probe has already acquired additional resources.
-> 
-> If register_netdev() fails after bnx2x_set_int_mode(), MSI/MSI-X remains
-> enabled. If later failures happen after bnx2x_iov_init_one(), PF SR-IOV
-> state can be left allocated. Also, failures after bnx2x_vfpf_acquire()
-> must release the PF resources before freeing the VF-PF mailbox allocated
-> by bnx2x_vf_pci_alloc().
-> 
-> Add error labels matching the resource acquisition order so probe failure
-> disables MSI/MSI-X, removes SR-IOV state, releases VF-PF resources,
-> deallocates VF PCI resources, and then frees the common driver memory.
-> Also clear PCI drvdata before freeing the netdev on probe failure.
-> 
-> Fixes: 6411280ac94d ("bnx2x: Segregate SR-IOV code")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-> ---
-> Changes in v2:
->  - Unwind all resources acquired by bnx2x_init_one() on failure
->  - Clear PCI drvdata before freeing the netdev on probe failure.
->  - Modify the commit title and message.
+> 2. Whether similar work has been proposed previously.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+There was a presentation at netdev conf last year about this topic,
+and how you use it to configure SERDES eyes. And then a long
+discussion on the netdev mailing afterwards. You should read the
+discussion, and incorporate the ideas. There was a couple of points
+raised:
 
-FTR, there is an AI-generated review of this patch available on sashiko.dev.
-However, I believe the issue flagged there can be looked at in the context
-of possible follow-up and should not impede the progress of this patch.
+SERDES are also used for PCIe, USB, SATA, and they have similar
+capabilities to a SERDES used for networking. Do we want a networking
+specific solution, or something more generic?
 
+You need to include lane information, since there can be 1, 2 or 4
+lanes involved, and you need to specify which lane you want to test.
+
+      Andrew
 
