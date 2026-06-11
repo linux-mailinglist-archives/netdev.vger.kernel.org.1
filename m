@@ -1,280 +1,190 @@
-Return-Path: <netdev+bounces-297988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297989-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YdoTOGZqKmoJpAMAu9opvQ
-	(envelope-from <netdev+bounces-297988-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:57:26 +0200
+	id bGK6F9prKmptpAMAu9opvQ
+	(envelope-from <netdev+bounces-297989-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:03:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3413F66F9ED
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:57:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1858066FAC1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:03:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b="MSicNUD/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297988-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297988-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=RGxh6ZjI;
+	dkim=pass header.d=redhat.com header.s=google header.b=b06r2i0n;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297989-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297989-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 229FA3082E66
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:53:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07D3331EBDA2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0F9368296;
-	Thu, 11 Jun 2026 07:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D933B370D7D;
+	Thu, 11 Jun 2026 07:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CA630146C
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 07:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA2334D4F9
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 07:58:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781164425; cv=none; b=VGVLwcQbonM8EHFxV6IGtE0sclA9fppRHBL52XUYvUj0L27UMvq1raQuwvC8tk2sRsQl+94mkD/f+JN62XIxSgqIRUpOncVTSotbvqYKajDoDLD8CFZajyvEv9n7NmUXXllIziptA6pqcNs1wwQAx4VE3CdYiWxM8F4q6fULYy0=
+	t=1781164709; cv=none; b=s5GT2aRIWzzPYSq3jiKJudC44/8Nl8lwMFWPifWduRlPfK48RFyp9FVKc6f12NMYvwo770DmXfQEeD7aBkHHtvzH4OW8oX8jEHJbrVYe9h90ibe7k8LfV10Zw+wZnHVKk13M00LxwfPXjyl8bA4LsA2vWQq86AuMbRksrfncIWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781164425; c=relaxed/simple;
-	bh=gISp69wTpH2WDrbD33HcQvd5g7lEfMZB4LsfOXLMD70=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nnNg+Pme4C6d8SH26Ju3wzsKOORBkPT1m5LI2vs6C3XZf/XOpLKxTz7A/jWXVANCRA6sK2QrldHS9AMX5q1BMQub5iKnzwQQSEpTp2Qzc+65+0hb1ldJ/scTh7MckO2FtvPuUMQ2QbcwAgTYBfhqkTFQBTed4bKgPHjUbEWAYNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MSicNUD/; arc=none smtp.client-ip=209.85.128.74
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-490a767c7dcso60845425e9.2
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 00:53:43 -0700 (PDT)
+	s=arc-20240116; t=1781164709; c=relaxed/simple;
+	bh=ZEy+ssPgj7fd9v3cExsjBXsdFe2eDfx6ZME1ev+0piQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUW9SiT2RaGZh5c8EFT+izmS9t2E59eELqrpT+Ff4svLzHnmqgJYD38rP8AWQX0laVxfkYJ/xVqeImRIeRsl2N2spBrKE1F1FAt5bnp34BP0X22hliFy+0PKY2y9dAkVCDcL0uxK+H4bZ6mQb6DW7wFHfRiWSkWoQ44eflhxexU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RGxh6ZjI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=b06r2i0n; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781164707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f9weTyP7JI1bIVxhUTkM93LkL12ISvR/eoJ6k3ozVeI=;
+	b=RGxh6ZjIrSIml2pV9UjBi9b0dKwnwUCxc2e3tuba2SYBfaDFo3Ok3kV5Cs7D02eZCUTgOL
+	79UD69q9BXVAdLJcGmIAGoKgoHRPqO7hq1+LVnYqBVpxKhrTB7wwW35xZsEiHV57t4vZlW
+	5NZS0Sw6FwW1unvuSMcmoNPx3iWK0Ps=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-147-8bQ-v2dsPr6aoceuZYSS7A-1; Thu, 11 Jun 2026 03:58:26 -0400
+X-MC-Unique: 8bQ-v2dsPr6aoceuZYSS7A-1
+X-Mimecast-MFC-AGG-ID: 8bQ-v2dsPr6aoceuZYSS7A_1781164705
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45ef2bd566bso4309299f8f.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 00:58:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781164422; x=1781769222; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1JSnnESFuG4rV7GM7o/iJXwkWustj1ziUDEWbZsW2C4=;
-        b=MSicNUD/UB2+W69d+BBpmOqwkEZYvlZQGSAw51FXyMxFzpHjlPKJlTBXlI+jBv49rB
-         QJE5sgMgcJWYl6D1QmIF8BuqbArFSwy1NrqXYyNgqGUy6/zbdXw9dJWiQOD0pK3f7FNR
-         Uvy5soRD0g3q906ik1QikdMLOKMr+Oxp3wOB2qL7xiJbNb5Qu+YUFGCzanlbziHHxDZy
-         qupEuBzm0bL+0Bc/DuAlJ+JqlbIaw/ON1/44Wds2dcpXvl0vxYLm5OIiCqvmRtyoGXUU
-         KpDgvi195T7sdmxSy86O2Qz9elRmEfuNxAhzVOkahCVyQzU33KWkUNys7piO4tJLvAGG
-         f8TQ==
+        d=redhat.com; s=google; t=1781164705; x=1781769505; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f9weTyP7JI1bIVxhUTkM93LkL12ISvR/eoJ6k3ozVeI=;
+        b=b06r2i0nLtjInGwgX0GoRDhkJNUJ2xiy3On7lXrC1w4O8s4+IMrSRvRbUvdqcksg3T
+         ShyRfvOvqiG8vP9Gr/gqtKVJokQYhwoAfKKEcL8xWxUgsrDpuZYohcd0fuxldZzSjykZ
+         u4NduGjEYPAtduJHGLlUtfOAgaVMeNcZRj6c8dIWgmU+K7tHYvcVALP/9GprDVs1qXGg
+         i1nNyR16uxd31gH+AJU0B9Q0gCk97UFZE37jpEEBxbCguQIdny8g0PSYbjsbpMGgXO4d
+         cdeOE9lwdFvqcy3QLabduJFaVO3yldynZTWes8s+c1kl3QLBNHGo1YgBhQwYimiq5fVP
+         ncZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781164422; x=1781769222;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1JSnnESFuG4rV7GM7o/iJXwkWustj1ziUDEWbZsW2C4=;
-        b=ENXJInTIEG9Py2XWPS8x3st8cW+SLoV1+ZhUIKaDmmUq3aqyI9j39AIYyKgk8tkFcz
-         pURURzGZ79WDu34ejJCyWNnUSuuvFDIaiN1P4nVpmWgyiybghphJVvm5pVwzWHJCc8mo
-         aIeq746kIimpBVtq5iRQBC+c1hR3l+au/omZ0Hj6PhIy7zwXdKIFtiRriXMwH8aG4Xz6
-         Ww5UBWlKGzX2XFNtxT05NaGYkgAw2ZpeuvnZEtGw43HPeLpbCKRtNBItnYb1sUotcAI0
-         ag4alHzj9/VPAzLHLotjOOdMEWPr2lA1A1TgpCM765/P9AAsUs1fIDS7Hpy5thQOd7rd
-         OA3w==
-X-Forwarded-Encrypted: i=1; AFNElJ9kMav63ynRZV4ff9NzXw/IYlLTo5voope9Rq/It+p8BCpkLBrLYYliEA9Mi10zse0be7LKaEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzuvkfORY3lipGa1ZxXH+yfIpAdAhQrIn6lJEAkxNAvwIe4xUY
-	dU2F088crck60M4iaS4mAK7+j+sMbgkjTRI0pwEIQjJeV5/J6T9RLev78aGFjPNTkZH2iNO4scU
-	5AZawXVaHDeVQwy6QQg==
-X-Received: from wrbdw5.prod.google.com ([2002:a05:6000:dc5:b0:45e:7588:ecd9])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b07:b0:490:bb45:79ef with SMTP id 5b1f17b1804b1-490e534a723mr19329395e9.0.1781164422412;
- Thu, 11 Jun 2026 00:53:42 -0700 (PDT)
-Date: Thu, 11 Jun 2026 07:53:41 +0000
-In-Reply-To: <20260610230413.D68967BC@davehans-spike.ostc.intel.com>
+        d=1e100.net; s=20251104; t=1781164705; x=1781769505;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f9weTyP7JI1bIVxhUTkM93LkL12ISvR/eoJ6k3ozVeI=;
+        b=OwvwpE4LEO65moB1QMmPLqRyPOF2FpG5ZeEfwMI5TqjaXwiNnb6kjC4tzHr1FEatfG
+         R2tZJrRjacfWt+e1YMt4RvP6tmu4wGVPbnmfoltNksHuojiU20/t8XPZImUyeRj/PWsU
+         SyoSbGV+Ztx8Q1ir9/wC252gdtjt6FfuTMz/tKHGYrV/F4/2YbkIaq9lyhetp849H4SH
+         0CVrXrUtE5kjjREqQpP3lLz/zr3yFhxp/4CHP/1aURjoLIRmw7gQXFFubWcwYAsxMK5K
+         rFa1p9afzU3ZNIkbmfuciP1v7TMyC0VdJeLTLPJFgKSA4qNLaeE0uhg83806AV8FEObP
+         lfxg==
+X-Gm-Message-State: AOJu0Yzapo1belE3Ko3BjmtmdsQRffj4Lcdp3XFH6zzBEbhRPWng6R9/
+	UGFmezDeXOfkSND552H/KWXlNyH2zktz48RFf4fRc3vHhTBtzMVXZg8FDXbp+0gBZSg3qNR/dep
+	/4wK2BxfakPMv3O78VJkWelazbpjjoRFTvHMnAANq2lcuXFyMJqj7/S9F7A==
+X-Gm-Gg: Acq92OEyur9r+fhqAeOZJI1EZ/SmXIJGj8BNAlr9eBF9eLJsLU02QKoVl+WMm/CFVqa
+	61rLIqa6a3hNy1UeWe71R5QHdbqvJ6MP/V/q45klWdEBAeZ6d9erX1W88IhuIWaPXsJNrm/8XP+
+	IUmYRPm2OHrBGw58GBkG/bDz5M+wb96pBK49gvowPlZV6f4hBvp7aqdqwWIc3Te/kTtQ0D9HuBE
+	JchvoZD0yc83M1Oc2zLv2aHOoVZUxUFwDE5dajCd56oDJ0h6Hf4v8BWMyLwzYZzIZMujiJN2cUg
+	kKPFnSiXhM6r6lRXN5l3W42YD7V957EXTGBO5yAVi9SluNr9tT+IFf8qKp8awDklbF/sWFD1dpi
+	WGr94H2ruUcjMMovGncHTU2ZvWgPFohJR2FC/qMiSXGSDZ4rY4nQe/uakC+oh0Sf0AySDxQ==
+X-Received: by 2002:a5d:5e08:0:b0:43d:77a8:3baf with SMTP id ffacd0b85a97d-460677d03dbmr2238677f8f.32.1781164705332;
+        Thu, 11 Jun 2026 00:58:25 -0700 (PDT)
+X-Received: by 2002:a5d:5e08:0:b0:43d:77a8:3baf with SMTP id ffacd0b85a97d-460677d03dbmr2238634f8f.32.1781164704969;
+        Thu, 11 Jun 2026 00:58:24 -0700 (PDT)
+Received: from leonardi-redhat ([176.206.19.176])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3446aesm86374521f8f.24.2026.06.11.00.58.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 00:58:24 -0700 (PDT)
+Date: Thu, 11 Jun 2026 09:58:22 +0200
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Raf Dickson <rafdog35@gmail.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com, 
+	bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com, bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next] vsock/vmci: use sk_acceptq_is_full() helper
+Message-ID: <aippcmlliXpO0BXM@leonardi-redhat>
+References: <20260611023830.106259-1-rafdog35@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com> <20260610230413.D68967BC@davehans-spike.ostc.intel.com>
-Message-ID: <aipphZ5iCnbXVNSR@google.com>
-Subject: Re: [PATCH v2 2/5] binder: Make shrinker rely solely on per-VMA lock
-From: Alice Ryhl <aliceryhl@google.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Carlos Llamas <cmllamas@google.com>, 
-	Christian Brauner <christian@brauner.io>, David Ahern <dsahern@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org, 
-	Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan <surenb@google.com>, 
-	Todd Kjos <tkjos@android.com>, Vlastimil Babka <vbabka@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260611023830.106259-1-rafdog35@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-297989-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297988-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:dave.hansen@linux.intel.com,m:linux-kernel@vger.kernel.org,m:akpm@linux-foundation.org,m:arve@android.com,m:cmllamas@google.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:surenb@google.com,m:tkjos@android.com,m:vbabka@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:rafdog35@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:pabeni@redhat.com,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3413F66F9ED
+X-Rspamd-Queue-Id: 1858066FAC1
 
-On Wed, Jun 10, 2026 at 04:04:13PM -0700, Dave Hansen wrote:
->=20
-> From: Dave Hansen <dave.hansen@linux.intel.com>
->=20
-> tl;dr: lock_vma_under_rcu() is already a trylock. No need to do both
-> it and mmap_read_trylock().
->=20
-> Long Version:
->=20
-> =3D=3D Background =3D=3D
->=20
-> Historically, binder used an mmap_read_trylock() in its shrinker code.
-> This ensures that reclaim is not blocked on an mmap_lock. Commit
-> 95bc2d4a9020 ("binder: use per-vma lock in page reclaiming") added
-> support for the per-VMA lock, but left mmap_read_trylock() as a
-> fallback.
->=20
-> This was presumably because the per-VMA locking can fail for several
-> reasons and most (all?) lock_vma_under_rcu() callers have a fallback
-> to mmap_read_trylock().
->=20
-> =3D=3D Problem =3D=3D
->=20
-> The fallback is not worth the complexity here. lock_vma_under_rcu() is
-> essentially already a non-blocking trylock. The main reason it fails
-> is also the reason mmap_read_trylock() fails: something is holding
-> mmap_write_lock().
->=20
-> The only remedy for a collision with mmap_write_lock() is to wait,
-> which this code can not do. So the "fallback" after
-> lock_vma_under_rcu() failure is not really a fallback: it is really
-> likely to just be retrying in vain. That retry in an of itself isn't
-> horrible. But it adds complexity.
->=20
-> =3D=3D Solution =3D=3D
->=20
-> Now that per-VMA locks are universally available, lock_vma_under_rcu()
-> will not persistently fail. Rely on it alone and simplify the code.
->=20
-> Full disclosure: I originally tried to do this with
-> lock_vma_under_rcu_wait(), but it did not fit well with the mmap_lock
-> trylock semantics. Claude caught this in a review and suggested the
-> approach in this path. It seemed sane to me. So, Suggesed-by: Claude,
-> I guess.
->=20
-> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Reviewed-by: Suren Baghdasaryan <surenb@google.com>
-> Acked-by: Lorenzo Stoakes <ljs@kernel.org>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-> Cc: Vlastimil Babka <vbabka@kernel.org>
-> Cc: Shakeel Butt <shakeel.butt@linux.dev>
-> Cc: linux-mm@kvack.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Arve Hj=C3=B8nnev=C3=A5g <arve@android.com>
-> Cc: Todd Kjos <tkjos@android.com>
-> Cc: Christian Brauner <christian@brauner.io>
-> Cc: Carlos Llamas <cmllamas@google.com>
-> Cc: Alice Ryhl <aliceryhl@google.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: netdev@vger.kernel.org
->=20
-> --
->=20
-> Changes from v1:
->  * Move forward even if 'vma' is NULL in binder_alloc_free_page().
->    This can happen if the VMA is unmapped (Sashiko).
->  * Rename goto label to be more accurate for new lock scheme
->=20
->=20
-> ---
+On Thu, Jun 11, 2026 at 02:38:30AM +0000, Raf Dickson wrote:
+>Replace the open-coded backlog check with sk_acceptq_is_full().
+>The helper uses > instead of >=, which is the correct comparison
+>per commit 64a146513f8f ("[NET]: Revert incorrect accept queue
+>backlog changes."), and adds READ_ONCE() for proper memory ordering.
+>
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>
 
-This seems to include the list of changes in the commit message instead
-of under the --- line.
+this blank line should be dropped
+>Signed-off-by: Raf Dickson <rafdog35@gmail.com>
+>---
+> net/vmw_vsock/vmci_transport.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+>index 91516488a7..56503bee31 100644
+>--- a/net/vmw_vsock/vmci_transport.c
+>+++ b/net/vmw_vsock/vmci_transport.c
+>@@ -1010,7 +1010,7 @@ static int vmci_transport_recv_listen(struct sock *sk,
+> 	 * reset.  Otherwise we create and initialize a child socket and reply
+> 	 * with a connection negotiation.
+> 	 */
+>-	if (sk->sk_ack_backlog >= sk->sk_max_ack_backlog) {
+>+	if (sk_acceptq_is_full(sk)) {
+> 		vmci_transport_reply_reset(pkt);
+> 		return -ECONNREFUSED;
+> 	}
+>-- 
+>2.54.0
+>
 
->  b/drivers/android/binder_alloc.c |   26 +++++++++-----------------
->  1 file changed, 9 insertions(+), 17 deletions(-)
->=20
-> diff -puN drivers/android/binder_alloc.c~binder-try-vma-lock drivers/andr=
-oid/binder_alloc.c
-> --- a/drivers/android/binder_alloc.c~binder-try-vma-lock	2026-06-10 15:57=
-:55.274412018 -0700
-> +++ b/drivers/android/binder_alloc.c	2026-06-10 15:57:55.277412124 -0700
-> @@ -1142,7 +1142,6 @@ enum lru_status binder_alloc_free_page(s
->  	struct vm_area_struct *vma;
->  	struct page *page_to_free;
->  	unsigned long page_addr;
-> -	int mm_locked =3D 0;
->  	size_t index;
-> =20
->  	if (!mmget_not_zero(mm))
-> @@ -1151,15 +1150,12 @@ enum lru_status binder_alloc_free_page(s
->  	index =3D mdata->page_index;
->  	page_addr =3D alloc->vm_start + index * PAGE_SIZE;
-> =20
-> -	/* attempt per-vma lock first */
-> +	/*
-> +	 * Attempt per-vma lock. This is essentially a
-> +	 * "trylock". It can fail even if the VMA exists
-> +	 * for 'page_addr'.
-> +	 */
->  	vma =3D lock_vma_under_rcu(mm, page_addr);
-> -	if (!vma) {
-> -		/* fall back to mmap_lock */
-> -		if (!mmap_read_trylock(mm))
-> -			goto err_mmap_read_lock_failed;
-> -		mm_locked =3D 1;
-> -		vma =3D vma_lookup(mm, page_addr);
-> -	}
-> =20
->  	if (!mutex_trylock(&alloc->mutex))
->  		goto err_get_alloc_mutex_failed;
-> @@ -1188,13 +1184,11 @@ enum lru_status binder_alloc_free_page(s
->  		zap_vma_range(vma, page_addr, PAGE_SIZE);
-> =20
->  		trace_binder_unmap_user_end(alloc, index);
-> +
-> +		vma_end_read(vma);
->  	}
-> =20
->  	mutex_unlock(&alloc->mutex);
-> -	if (mm_locked)
-> -		mmap_read_unlock(mm);
-> -	else
-> -		vma_end_read(vma);
->  	mmput_async(mm);
->  	binder_free_page(page_to_free);
-> =20
-> @@ -1203,11 +1197,9 @@ enum lru_status binder_alloc_free_page(s
->  err_invalid_vma:
->  	mutex_unlock(&alloc->mutex);
->  err_get_alloc_mutex_failed:
-> -	if (mm_locked)
-> -		mmap_read_unlock(mm);
-> -	else
-> +	if (vma)
->  		vma_end_read(vma);
-> -err_mmap_read_lock_failed:
-> +err_vma_lock_failed:
->  	mmput_async(mm);
+Thanks for the patch!
 
-If the vma lookup fails because the mmap write lock is held, but the vma
-actually exists (has not been unmapped), then this code might "successfully=
-"
-remove the page without invoking zap_vma_range(). This means that the
-page does not actually get freed and will just hang around forever until
-the process owning the vma exits or Binder needs this page and maps a
-new page on top of the page.
+note: according to patchwork [1] you forgot to CC some maintainers,
+please be more careful next time :)
 
-Alice
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/20260611023830.106259-1-rafdog35@gmail.com/
+
 
