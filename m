@@ -1,243 +1,276 @@
-Return-Path: <netdev+bounces-297942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297943-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id erJHMBZGKmoxlgMAu9opvQ
-	(envelope-from <netdev+bounces-297942-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:22:30 +0200
+	id BE2ZEgxJKmpVlwMAu9opvQ
+	(envelope-from <netdev+bounces-297943-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:35:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D4F566E819
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:22:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B338466EA33
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:35:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=kK6IufH6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297942-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297942-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b="kxH//JZX";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297943-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297943-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0DFBC300C0F4
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:22:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FA33302BEB3
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581FC231842;
-	Thu, 11 Jun 2026 05:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD08305673;
+	Thu, 11 Jun 2026 05:25:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C4D33B6E3
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 05:22:20 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781155344; cv=none; b=dz0rMapEEv/WLDoVdOErCo9QpSt95utxBC5Gk2RHUv7ryFrpcejUNFDYXZa7zN/ChanrNrU34m6yZLywmhFNdyBPYFbQbB3rV7AwIuYiMAJU3KCUpGYsojwSGeBrixCwV4YX9zpkyt3H0IoYkYrffi7G5nBjlk3R0rCLLcSwaDc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781155344; c=relaxed/simple;
-	bh=t3zvNv+leaSHeP4XnPmfSdHy0QtwpWefKN8AGkNk9N4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UOa1ducRphXpXAnQ4sOEpIoynLu2LC3qOGrQlB2T6LRqE1MEVWgVqZjmkTReAEWmUmk0nmP6D2h6k5MMCvub8Jk8Yl/3MS9KkzwSPNOfaIfJCxPI2xAlihYK/0FtkhYlzAqqSjDVFnuf/7V4j7YRTn65YsFXywYEvgpFGD2zJEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kK6IufH6; arc=none smtp.client-ip=192.198.163.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781155340; x=1812691340;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=t3zvNv+leaSHeP4XnPmfSdHy0QtwpWefKN8AGkNk9N4=;
-  b=kK6IufH6sW751aGR2p98176SO/7vSLcFfCHtSNaLpbussS44Fmf9Iu5y
-   mTOjbvnDtG0hbC89wAKQQ2tQEuT8oQM9zT+4bxVRJJsbPZeN7/tl16GUk
-   PYYMqTuh7qN7VsMP5t/P9q9o8GGthS/OmbTdsgBUDh9WSfTY+fIxGbrIH
-   w1l4Fy0sXI3aYgJwAexfd4/BkhW+ErIeE/Jr2LNH6YNPD1oAaQjMS+r0m
-   1/okq/t5pkzsYmx5P+xe0283KLRveoCkbOM044w08goTCvKJoydHpD51v
-   PHb/Zp5wlPmyzcvcFzxlsJVCqB3cTAvP03pRtgAfKzcr+kyo5e9CiD1Ek
-   g==;
-X-CSE-ConnectionGUID: Ph/z7V93RM+wP48aCfbutQ==
-X-CSE-MsgGUID: onyceBOST7inv6THHfMxPQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="82069855"
-X-IronPort-AV: E=Sophos;i="6.24,198,1774335600"; 
-   d="scan'208";a="82069855"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 22:22:20 -0700
-X-CSE-ConnectionGUID: UDRgWn1pTzyXar8rZ6XNsw==
-X-CSE-MsgGUID: We3keqfCRHmUo1DzKdc13Q==
-X-ExtLoop1: 1
-Received: from rtauro-desk.iind.intel.com ([10.190.238.50])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 22:22:15 -0700
-From: Riana Tauro <riana.tauro@intel.com>
-To: intel-xe@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org
-Cc: aravind.iddamsetty@linux.intel.com,
-	anshuman.gupta@intel.com,
-	rodrigo.vivi@intel.com,
-	joonas.lahtinen@linux.intel.com,
-	kuba@kernel.org,
-	simona.vetter@ffwll.ch,
-	airlied@gmail.com,
-	pratik.bari@intel.com,
-	joshua.santosh.ranjan@intel.com,
-	ashwin.kumar.kulkarni@intel.com,
-	shubham.kumar@intel.com,
-	ravi.kishore.koppuravuri@intel.com,
-	raag.jadav@intel.com,
-	maarten.lankhorst@linux.intel.com,
-	mallesh.koujalagi@intel.com,
-	soham.purkait@intel.com,
-	Riana Tauro <riana.tauro@intel.com>
-Subject: [PATCH v2 2/2] drm/xe/xe_drm_ras: Add error-event support in XE drm_ras
-Date: Thu, 11 Jun 2026 10:51:47 +0530
-Message-ID: <20260611052144.784969-6-riana.tauro@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260611052144.784969-4-riana.tauro@intel.com>
-References: <20260611052144.784969-4-riana.tauro@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C061634DCC8
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 05:25:34 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781155540; cv=pass; b=PQBOWrnXli6LYPfrjBmjYoFw3MKdpBUIzwhGvO3aYCaCP0sicH12n6kdM+8ojsQ4DVXdUnjR/otFKcT6MDhVxFuNltgf1t6OgI6DFGtB/7SyrgwyyWZHhWeUDJ6dbqIfEvcqHsN/CORoGxexYzIK1jUDYzfmtEB3JfYKXEBjKSc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781155540; c=relaxed/simple;
+	bh=doUH9A5FJeHhSpLTZvYVSKYZvkUfrZzvjQ6bRoxSw9Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FGrjoFLcs8noWb/iAQRUn+HUCHRGyMPexbF+v3Vce1LZTM8MpeOzDhqSj3dfsUQl7hOreTiMDMHm4U6ePXG6klOp9CkQegfPCplXuCdFiEM9zaTVQhcZHXpeIgJX0++kjOrWsdaP6wZRs6MFGhAPxxaWkAAaVCCkgrgyt2D7EU8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kxH//JZX; arc=pass smtp.client-ip=74.125.82.49
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-137ec563a95so9294957c88.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 22:25:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781155533; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lWx3KI9tzU3/R4BShI0WlVAfSaMuaijsRTYiyJB0Yzkgz3sq2gu+w35BVs8PXAwLON
+         ixm5vD7C9dVUBuNHMmJ0xl3LNOzmVBMp2uKibm2tvxco8omu5seKlyoGdZsJSsSIH/X4
+         TItdff0o29VTElMqapdu2lN/Qlrpzh1IqMxLu/XhWW17fzO2Q0vJfPTpwov//Ak92YCB
+         g6jZ5L1lwl8X3AV5g6nqE2q4OoKHMXSvHxbIHQQ5W0+pjHqDok1wT4elSwewJcs94X8a
+         wB0D3kPhRaIKb8Qnp1A/JWhuKvUEUEptcVe0dG8pV9Wlkf5tmTVabmXh50GbRP2RbVcQ
+         Sh+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bsXPQ0eSPRjGxPvV6S9kXwYJJ8AOokCaHBCHCpNZoVI=;
+        fh=pq0MkGENV4Jd4E9KhoDAtop/S1pOUlKYaONR8uouUz0=;
+        b=KzznGK3OKAMRgfTgBUZqcfwyhu/UunYAWT61qura34U6hw3u0Gf++p9rnO/0agsAsV
+         gGtVirrDASjZyJZoXaOqRWyHVycLra7jWf9Z3JJovfdkYsepCUd3POTpAB0/AqwljyMN
+         P8qieDj/7/Jin6cY//s217S/VytvVJbbmcmzSsjU7J0HYMVw9oMwfPfl7UkiNrUcfvs6
+         YLpLu2BNzhQBOPVEdceMQ0Czgjx6d0EYUvGXd5hCCbXhyEff7fnLQEtdH0bSJeffDM3r
+         NNcJp3jzOLJvir6Ewhps5oebdKQBB03qaCkXKzlQ0DtQWZq3Ww9nLQ+VbqVEFNta77nd
+         W08w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781155533; x=1781760333; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bsXPQ0eSPRjGxPvV6S9kXwYJJ8AOokCaHBCHCpNZoVI=;
+        b=kxH//JZXSfZITF8DuxQ/71UBi7IfevT5VexptsvFppd552u5EQWCvDV4fhj1txugw8
+         MveE71rjZ4ApYdzdGX9hCGjzJy9lmatcV7sg3HEHq6MH7sIwILVDMgkw0XuJxH/6Eov4
+         vvG3NkW1OAf0PVMd1HFkUIITBdoLtlMRK4afTXVKccY9Zj1RvfJOnkFl3qxhQrVYAUIE
+         pY2kt6rkJ0z/sBRE1k4NuPVjsOmgUPK4uNUeF0b0Sj82fbAuJuyTTvpyG6MS5hvp3mXY
+         qh36eeetkBGxvF7PdeNT3ciDdk6mu/xGU9FFPJ0lb7LcaP2gS+/+VnI/kXm4MK8Anber
+         ZQnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781155533; x=1781760333;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bsXPQ0eSPRjGxPvV6S9kXwYJJ8AOokCaHBCHCpNZoVI=;
+        b=S/UsjpQ3DPmFuJnCj8zEjmK47NzOxeKaBdUErqsdJpXHuJDKyZmMUmRwS4ZdGga56o
+         p6jO6Ciz0Uvws4kv3GV7FbdPStYdrpfPm1h98Lhe1vlshnqN6aQ9xqAu3yhRWI8sRrt6
+         OB/vDsRa2OkGN7teZYhVxwsAhl4S+kb5Le3ntX02U6IDs6qXEbfmz4JYqIBDRZ4PDOu6
+         QHr+jbIZ8YDVxm2W38MNbec2Dhkh/ruy+gbRtOf6SmcdezZShUyhrT8YCd5O+5ZNg34T
+         Ks37QLnJJnNfrgEpfM1phza6eOoz+ZrWmO/3PSc/F79PfJ8SWvcn6qHhyJwtHf+WXxcs
+         hhwA==
+X-Forwarded-Encrypted: i=1; AFNElJ9DNfMb203B0ayXF/NLL62rwwNt6duiVyh3yY+imHawF9XbtYXoBEL1ICUMmpqwfVwxvLp8z0o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXoQK/KcNdWZH73qyWNQFFrfnO0MNfvEWe3WtAY4A8MFT35U/9
+	SawgweYJcsOCfx5lPIplwd3xtqP7hyWy3Y8s4h+hrOpSb/FentDqLcakV7/knVCHHXetfDr+4Ly
+	/OT8CCAaf7twiPxQOYWZP+6TK07lw/xFt9zIonBhn
+X-Gm-Gg: Acq92OHCreUkmhSMCKYMc3ZvSXe8LMjfjAZiTAQDa61pS0uMD2t9T0eNx0cKOTKhrNS
+	a5AHdYO0jvXc6Yu6IwiXVZUSpN0hC8echCly8cZfTIq/hddTKXyQdo0IvjYtEa/4VQ1Um68BsWb
+	UJ/nXGYjpQ3NN7BlApQlHncTZkoMkk3g85lKtoRWcyPB10j95bepDiLEShu5gXdVrY4OwALFxGa
+	cgwWjexHOn7sutFZNFRNCUoH3e42YkEJeC/jO5l6R/r9aKZvAO29ozbP8WMF/etVbob5wxYkb+I
+	E7550U3wF1c4BUq7U6/r/16KUxtdkQ95MXlbP73oQVFzu+85IDnZrnCJuRdUhjnGOuwmexFKAdO
+	RwdRChQDkLCBPoI1gINBAkjnek+p0rFcNFGjHxa0H7n2YKnV6i19itXMVxIfSrXk=
+X-Received: by 2002:a05:7022:fd04:b0:138:243e:ce97 with SMTP id
+ a92af1059eb24-1384211ed0amr814067c88.4.1781155532797; Wed, 10 Jun 2026
+ 22:25:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260609163110.1717419-1-maoyixie.tju@gmail.com> <20260609163110.1717419-2-maoyixie.tju@gmail.com>
+In-Reply-To: <20260609163110.1717419-2-maoyixie.tju@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 10 Jun 2026 22:25:21 -0700
+X-Gm-Features: AVVi8Cfeeen7lsi6FYsubpu0yMJSyRS-lpOJ_IEl5eZUW7gNg_gtEJK7dUFJJ50
+Message-ID: <CAAVpQUAzWFyif353QDyOXCw9BHCFasbWHh+gKKz=EF9Ot_ODBQ@mail.gmail.com>
+Subject: Re: [PATCH net v4 1/7] net: ip_gre: require CAP_NET_ADMIN in the
+ device netns for changelink
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Xiao Liang <shaw.leon@gmail.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:dsahern@kernel.org,m:shaw.leon@gmail.com,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,m:shawleon@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297942-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,kernel.org,ffwll.ch,gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,m:aravind.iddamsetty@linux.intel.com,m:anshuman.gupta@intel.com,m:rodrigo.vivi@intel.com,m:joonas.lahtinen@linux.intel.com,m:kuba@kernel.org,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:pratik.bari@intel.com,m:joshua.santosh.ranjan@intel.com,m:ashwin.kumar.kulkarni@intel.com,m:shubham.kumar@intel.com,m:ravi.kishore.koppuravuri@intel.com,m:raag.jadav@intel.com,m:maarten.lankhorst@linux.intel.com,m:mallesh.koujalagi@intel.com,m:soham.purkait@intel.com,m:riana.tauro@intel.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-297943-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[riana.tauro@intel.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,secunet.com,gondor.apana.org.au,vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ip6_tnl.net:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9D4F566E819
+X-Rspamd-Queue-Id: B338466EA33
 
-Add error-event support in XE drm_ras to notify userspace
-when an error occurs.
+On Tue, Jun 9, 2026 at 9:31=E2=80=AFAM Maoyi Xie <maoyixie.tju@gmail.com> w=
+rote:
+>
+> A tunnel changelink rewrites the tunnel in its creation netns. After an
+> IFLA_NET_NS_FD migration that netns is not the caller's. The rtnl
+> changelink path only checks CAP_NET_ADMIN against the caller's netns. A
+> caller with caps only in its current netns can then rewrite a tunnel
+> that lives in another netns, and it picks the endpoint addresses.
 
-$ sudo ynl --family drm_ras --output-json --subscribe error-notify
+nit: This paragraph is not precise (e.g. even without netns migration
+a device can use two netns w/ IFLA_LINK_NETNSID, "current netns"
+sounds like current->nsproxy->net_ns but not w/ IFLA_NET_NS_PID
+etc, also I don't get the last sentence after "it picks...").
 
-{
-    "name": "error-event",
-     "msg": {
-         "device-name": "0000:03:00.0",
-         "node-id": 1,
-         "node-name": "uncorrectable-errors",
-         "error-id": 1,
-         "error-name": "core-compute",
-         "error-value": 1
-     }
-}
+Simply state that changelink() operates on at most two netns,
+dev_net() and link_net.
 
-Signed-off-by: Riana Tauro <riana.tauro@intel.com>
----
-v2: use ynl (Raag)
-    use value as function parameter
-    move error event call to hw_error_source_handler 
----
- drivers/gpu/drm/xe/xe_drm_ras.c  | 26 ++++++++++++++++++++++++++
- drivers/gpu/drm/xe/xe_drm_ras.h  |  3 +++
- drivers/gpu/drm/xe/xe_hw_error.c |  5 ++++-
- 3 files changed, 33 insertions(+), 1 deletion(-)
+>
+> Add net_admin_capable(). It requires CAP_NET_ADMIN in the tunnel's netns
+> and is skipped when that netns is the device's current netns, where the
+> rtnl path already checked the cap. The other patches in this series use
+> the same helper.
+>
+> Gate ipgre_changelink() and erspan_changelink() with it. The check is at
+> the top of the op, before any attribute is parsed, because the parsers
+> update live tunnel fields first. ipgre_netlink_parms() sets
+> t->collect_md before ip_tunnel_changelink() runs.
+>
+> Commit 8b484efd5cb4 ("ip6: vti: Use ip6_tnl.net in
+> vti6_siocdevprivate().") added the same check on the ioctl path. This
+> adds it on RTM_NEWLINK.
+>
+> Reported-by: Xiao Liang <shaw.leon@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CABAhCOSzP1vaThGV35_VnsRCb=3D87_CP=
+jPVsTHbq905k8A+BuUg@mail.gmail.com/
+> Fixes: d0f418516022 ("net, ip_tunnel: fix namespaces move")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+> ---
+>  include/net/net_namespace.h | 18 ++++++++++++++++++
+>  net/ipv4/ip_gre.c           |  6 ++++++
+>  2 files changed, 24 insertions(+)
+>
+> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+> index 80de5e98a66d..17fb71a78cb6 100644
+> --- a/include/net/net_namespace.h
+> +++ b/include/net/net_namespace.h
 
-diff --git a/drivers/gpu/drm/xe/xe_drm_ras.c b/drivers/gpu/drm/xe/xe_drm_ras.c
-index cd236f53699e..09588e3fd984 100644
---- a/drivers/gpu/drm/xe/xe_drm_ras.c
-+++ b/drivers/gpu/drm/xe/xe_drm_ras.c
-@@ -174,6 +174,32 @@ static int register_nodes(struct xe_device *xe)
- 	return ret;
- }
- 
-+/**
-+ * xe_drm_ras_event() - Notify userspace of an error event
-+ * @xe: xe device structure
-+ * @component: error component (see &enum drm_xe_ras_error_component)
-+ * @severity: error severity (see &enum drm_xe_ras_error_severity)
-+ * @value: value of error counter
-+ * @flags: flags for allocation
-+ *
-+ * Notifies userspace of an error.
-+ */
-+void xe_drm_ras_event(struct xe_device *xe, u32 component, u32 severity, u32 value, gfp_t flags)
-+{
-+	struct xe_drm_ras *ras = &xe->ras;
-+	struct xe_drm_ras_counter *info = ras->info[severity];
-+	struct drm_ras_node *node = &ras->node[severity];
-+	int ret;
-+
-+	if (!info || !info[component].name)
-+		return;
-+
-+	ret = drm_ras_nl_error_event(node, component, info[component].name, value, flags);
-+	if (ret)
-+		drm_err(&xe->drm, "RAS error-event failed: %d for %s %s\n", ret,
-+			info[component].name, error_severity[severity]);
-+}
-+
- /**
-  * xe_drm_ras_init() - Initialize DRM RAS
-  * @xe: xe device instance
-diff --git a/drivers/gpu/drm/xe/xe_drm_ras.h b/drivers/gpu/drm/xe/xe_drm_ras.h
-index 365c70e93e82..2a694bf69478 100644
---- a/drivers/gpu/drm/xe/xe_drm_ras.h
-+++ b/drivers/gpu/drm/xe/xe_drm_ras.h
-@@ -5,11 +5,14 @@
- #ifndef _XE_DRM_RAS_H_
- #define _XE_DRM_RAS_H_
- 
-+#include <linux/types.h>
-+
- struct xe_device;
- 
- #define for_each_error_severity(i)	\
- 	for (i = 0; i < DRM_XE_RAS_ERR_SEV_MAX; i++)
- 
- int xe_drm_ras_init(struct xe_device *xe);
-+void xe_drm_ras_event(struct xe_device *xe, u32 component, u32 severity, u32 value, gfp_t flags);
- 
- #endif
-diff --git a/drivers/gpu/drm/xe/xe_hw_error.c b/drivers/gpu/drm/xe/xe_hw_error.c
-index 4b72959b2276..6e3306dedb24 100644
---- a/drivers/gpu/drm/xe/xe_hw_error.c
-+++ b/drivers/gpu/drm/xe/xe_hw_error.c
-@@ -432,7 +432,7 @@ static void hw_error_source_handler(struct xe_tile *tile, const enum hardware_er
- 	struct xe_drm_ras *ras = &xe->ras;
- 	struct xe_drm_ras_counter *info = ras->info[severity];
- 	unsigned long flags, err_src;
--	u32 err_bit;
-+	u32 err_bit, value;
- 
- 	if (!IS_DGFX(xe))
- 		return;
-@@ -485,6 +485,9 @@ static void hw_error_source_handler(struct xe_tile *tile, const enum hardware_er
- 			gt_hw_error_handler(tile, hw_err, error_id);
- 		if (err_bit == XE_SOC_ERROR)
- 			soc_hw_error_handler(tile, hw_err, error_id);
-+
-+		value = atomic_read(&info[error_id].counter);
-+		xe_drm_ras_event(xe, error_id, severity, value, GFP_ATOMIC);
- 	}
- 
- clear_reg:
--- 
-2.47.1
+net/core/rtnetlink.c is a better fit.
+It has rtnl_get_net_ns_capable().
 
+
+> @@ -358,6 +358,24 @@ static inline bool net_initialized(const struct net =
+*net)
+>         return READ_ONCE(net->list.next);
+>  }
+>
+> +/**
+> + * net_admin_capable - test for CAP_NET_ADMIN over a network namespace
+> + * @net: namespace whose state the operation would change
+> + * @cur: namespace the operation runs in, e.g. dev_net(dev)
+> + *
+> + * Returns true when @net is @cur, where CAP_NET_ADMIN was already
+> + * checked for the running namespace,
+> or when the caller holds
+> + * CAP_NET_ADMIN over @net. rtnl changelink paths use this: a device can
+> + * be moved so its state lives in a namespace other than the one the
+> + * request runs in, and the cap must then be held over that namespace.
+> + */
+> +static inline bool net_admin_capable(const struct net *net,
+> +                                    const struct net *cur)
+
+Rename the helper and change args to
+
+rtnl_dev_link_net_capable(const struct net_device *dev, const struct
+net *link_net)
+
+since the netns we care about here is rtnl_newlink_params.link_net
+(if specified) and dev_net() is redundant in all callers.
+
+Also remove kdoc, it just reiterates the two conditions below.
+
+
+> +{
+> +       return net_eq(net, cur) ||
+> +              ns_capable(net->user_ns, CAP_NET_ADMIN);
+> +}
+> +
+>  static inline void __netns_tracker_alloc(struct net *net,
+>                                          netns_tracker *tracker,
+>                                          bool refcounted,
+> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+> index 169e2921a851..040a0ef95184 100644
+> --- a/net/ipv4/ip_gre.c
+> +++ b/net/ipv4/ip_gre.c
+> @@ -1457,6 +1457,9 @@ static int ipgre_changelink(struct net_device *dev,=
+ struct nlattr *tb[],
+>         __u32 fwmark =3D t->fwmark;
+>         int err;
+>
+> +       if (!net_admin_capable(t->net, dev_net(dev)))
+> +               return -EPERM;
+> +
+>         err =3D ipgre_newlink_encap_setup(dev, data);
+>         if (err)
+>                 return err;
+> @@ -1486,6 +1489,9 @@ static int erspan_changelink(struct net_device *dev=
+, struct nlattr *tb[],
+>         __u32 fwmark =3D t->fwmark;
+>         int err;
+>
+> +       if (!net_admin_capable(t->net, dev_net(dev)))
+> +               return -EPERM;
+> +
+>         err =3D ipgre_newlink_encap_setup(dev, data);
+>         if (err)
+>                 return err;
+> --
+> 2.34.1
+>
 
