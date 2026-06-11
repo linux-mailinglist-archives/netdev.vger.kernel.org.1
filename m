@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-298340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tOveGVYcK2pI2wMAu9opvQ
-	(envelope-from <netdev+bounces-298340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:36:38 +0200
+	id R+SANGMcK2pM2wMAu9opvQ
+	(envelope-from <netdev+bounces-298341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:36:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59D067533F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6B5675343
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:36:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=i5RCYL5a;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298340-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298340-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=ZlTDgtZb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298341-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298341-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E96813396930
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:35:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E8E633A9092
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AF43AB292;
-	Thu, 11 Jun 2026 20:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D88436AB4D;
+	Thu, 11 Jun 2026 20:35:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3F1366DA3
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 20:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6798368D5E
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 20:35:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781210100; cv=none; b=HhbdiVYH0wwgiWmywZUT84Rgj62BneZ5nUqxSf9bfEhg9J9U5VrTA8NjngxnsJd2oapEV3NKv5Ru7S0HZoO4Z13Hz67iI8QM2pSm5JZr6kapYHRP6GjGtiOPLAUlb5Rw0ua8ytXHDryu4BP1KlAvZsl7qDoooMLPDb8bWi039BE=
+	t=1781210102; cv=none; b=pi3/ouvEA3fwGZmhppxYFyHCAGP8BecRekDvWK03shLPNbnYt/fJacymgFMf8ibnvfA/8qYyXeRIXVITcmIjhRHJXbGAYIeFNnIuVrA4otiMByS0QVdLKlV9a+JU7aytgnUZ6OgyKxc6ySlRZG9sqaO1bGgo6IwZ7FlUqD2Oa5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781210100; c=relaxed/simple;
-	bh=x7a03Gc9vw9i8Ku3llVRmtESmRhe9DOjaGr/3KnfCWM=;
+	s=arc-20240116; t=1781210102; c=relaxed/simple;
+	bh=mmJlKNbzKJjKW3rO4PC0k0wJ4AbEx/NNjtPJotvDy28=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RqBPSEQQtHVQuAU7l+zSgxxPhsnJMWwjE4y3+I1t5G+PCWS10UGiIrTQA8jYCYC8T+bhbKVX1CXAwGCCABwTwbYtFtnZ+ZLH9UbVqCstpEF+1CuRLHkdjYCoU9vFH0x/b8eUmP65tR+Xjj41h5vLTzosjrqvZP3JaUlc87KNca4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i5RCYL5a; arc=none smtp.client-ip=209.85.219.73
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-8cec2c6b821so5646666d6.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 13:34:59 -0700 (PDT)
+	 To:Cc:Content-Type; b=F+BUHqXWN4jP0GokYTZIcABf6hOrTelqvievOB7L+7L4n1BRdtYSQLq5L3RoMn7md7XUnRlmOBQxpoGl6T48oXLHq3fOQhRrTmxOv/T51Qd+WbPGGvCZJBbW05pTSm2kJbJOY67vAUxhiI/g+7iuXJEVxU7yB6+CGunLo8LAw5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZlTDgtZb; arc=none smtp.client-ip=209.85.219.74
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-8ccd5491db4so2324066d6.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 13:35:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781210098; x=1781814898; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1781210100; x=1781814900; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h/QFyfjXw3n87JG9bfd2LhPET1TQiuubzBf1WnNtO7o=;
-        b=i5RCYL5aHX+Hzpl4LnqbAoCY23aAf1dNJvyU29aHYqyHmss3Qk6UPgFHEiTEKXcxoK
-         zsNMSe0bsQuNywv1gJv/Ajr9IXi10nzq3vwXIIakiSGKmeKUkdUPfJPXfTAWKrXdsAOp
-         kQkvvzWHco5LnV/h1yOiNGXOJt14Pv3grPGH6fsVyi91ed0EyhNmwH06wuKNLilNQKPH
-         T4q1R7UQVJ0Cztfvn2iDkE/bm0jkd8+naKzYKw6YFb35J16L4LVN6W/3L899WLVXM9h1
-         OHXUFBIfe+Z5sBZppKpWBjlC1mqUNn8XhfrxY5zo8+yhPNAYDtgxVsS6O/uJ+sO6hzcR
-         CCUg==
+        bh=tqj3eNjPz835i7keeVkJPWJ4RLjYDfv8wQBER7Prezc=;
+        b=ZlTDgtZbyl/yjp1Kb46FT41PeoEzHiYxol3663Cbl0peOsmmZF0niFPDsyZjfmCt+b
+         jrOfwEXy0PRZOotBTfduDeL8NVS9LLiLRFOba+dfb29is4cl34nbkZzzHbsr0WKoaGiO
+         3q4BlXNN1I9VuJkyy201Hsby//3PLy6CQTS1yz2NqsbdCO5TaC7UFDXFPGxoK7mokQZt
+         Ba+1JhKqTl95O8pyujbU4xCM/vi9smB+thLwFm/2jr0a/akQauM5ZlQCOWjpF1JgtijU
+         3JD4pIC7uJl+mA8vbUSrNmVttW3Wmk/5dF7iehL4QsVHsbmM5l1W/IPKbEzvORlyv6CB
+         Nkjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781210098; x=1781814898;
+        d=1e100.net; s=20251104; t=1781210100; x=1781814900;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h/QFyfjXw3n87JG9bfd2LhPET1TQiuubzBf1WnNtO7o=;
-        b=opNYljCsKlyAadpycJgpfsd596fBS0D3yMU0Qou5e1L86jesS3tN6cbhPC2M34N8rp
-         afKdE5q+jM/M6C/0/1Fact+JJAJGbQWZKT08bXJzpemimeiPnCLJbLO+1CCn4gurypiq
-         AOzpX/7HvARPglnfr50Tlyulbn/Sz9K4oF7t7Wn5xVFOXHiFzOKoYwUoZY575kaEG6yJ
-         MKLms2V7Jfg3g7g70tEUaxxuGXMIC7m7lMNy7aQP2rMXaF6exFLaBK7uwjBIF0HJMxOi
-         yUIUz/gBOsatQKXw2GRz56m06c8eGwcLJX6orjzlq6LbGV3KeHABXniASrrQVTcO/A6W
-         eH3w==
-X-Forwarded-Encrypted: i=1; AFNElJ8hR9oZefzRcEQG+Lg+WlJnKguHNYCWznTSgbz+4AC8wofLk3Nl5R/lxUq1IR02S1PFFfmg/Ks=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWxkIOxU2cw0MblSvqcjfrdNVXDBPKI9ziMS2sYtpIL732ICNr
-	wMACoMV1X58NObhz8s7DYDKIjzxj0bAZsAAktlfiPkD8dJ4Wt3/2VKHtrhpZ37E9USQiU4wP0oy
-	poxNS98pH7jHxDw==
-X-Received: from qvae28.prod.google.com ([2002:a05:6214:621c:b0:8cc:eb4b:3535])
+        bh=tqj3eNjPz835i7keeVkJPWJ4RLjYDfv8wQBER7Prezc=;
+        b=r+1Dd3dVFLUu17MEVxNYlFpBaTPBcKCNDVKxRAF5A/huqHqmnmi13GgUPiwsFN6za1
+         H4JvXqRgU0Xsa0RDBpiyrfuS+12xpdeE42N6efWKTZj2J3aUTEMLpRRj+jDyJ53zHdOs
+         zVXwuGBQL6yuHAcsQFG0H3TPKRQKf2exZmFUC7Bm3PDZfODdng85VdP4FF1inATzNNGG
+         Wkk8C5Uk4uDHjqkFenM3MaHZrR4jL8kLXU9Iwers4fe14s/IvFEKG/Vx0LsaA4MsTO3s
+         iPhBDoV/qiX3G9QCHfTSuqCRKmKxfQvsc6EKOQooqPUCmYqqH9Q8qV8mqnR6O5MtaJT2
+         8jOQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8MeoFT3X4L/6QTM6dG4PAd9ZPUo2xnwiFZfJDCyoaYSF2xJsif3klFnZ8qFu+0OdTJxtAOAvs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz0zC/FsOjf1N4s0tRfOKSmIkwZVqb7LLzvFnX56iiJaye8bTk
+	cbG3edvInoGHejwSzi8EHrW+TYoS4cy38xzb1mYnE8+uC7YirPwh8B+c/w5p+QXOtXd9GWRIJa5
+	lHadI0XZ7y+xdLg==
+X-Received: from qvbld24.prod.google.com ([2002:a05:6214:4198:b0:8ce:aa0f:74aa])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:621:b0:8d1:5830:6666 with SMTP id 6a1803df08f44-8d32b47a72bmr276986d6.1.1781210097845;
- Thu, 11 Jun 2026 13:34:57 -0700 (PDT)
-Date: Thu, 11 Jun 2026 20:34:50 +0000
+ 2002:ad4:5c4a:0:b0:8ca:1cee:7c38 with SMTP id 6a1803df08f44-8d1da56165emr76604356d6.24.1781210099301;
+ Thu, 11 Jun 2026 13:34:59 -0700 (PDT)
+Date: Thu, 11 Jun 2026 20:34:51 +0000
 In-Reply-To: <20260611203453.3067462-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260611203453.3067462-1-edumazet@google.com>
 X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260611203453.3067462-3-edumazet@google.com>
-Subject: [PATCH v3 net-next 2/5] bridge: use atomic ops to read/change
- p->flags in br_netlink.c
+Message-ID: <20260611203453.3067462-4-edumazet@google.com>
+Subject: [PATCH v3 net-next 3/5] net: bridge: use atomic ops to read/change
+ p->flags (I)
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298340-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298341-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
@@ -119,164 +119,155 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,blackwall.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B59D067533F
+X-Rspamd-Queue-Id: 4E6B5675343
 
-Change net/bridge/br_netlink.c to use atomic operations
-to read/change bits in p->flags.
+Use test_bit() in net/bridge/br_arp_nd_proxy.c,
+net/bridge/br_fdb.c and net/bridge/br_forward.c.
+
+Use READ_ONCE(p->flags) in br_recalculate_neigh_suppress_enabled()
+as we test two bits at once.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- net/bridge/br_netlink.c | 91 +++++++++++++++++++++++------------------
- 1 file changed, 51 insertions(+), 40 deletions(-)
+ net/bridge/br_arp_nd_proxy.c | 22 +++++++---------------
+ net/bridge/br_fdb.c          |  2 +-
+ net/bridge/br_forward.c      | 15 ++++++++-------
+ 3 files changed, 16 insertions(+), 23 deletions(-)
 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 7cb24de9c77d3d15892723f77288c27a15a6a0ad..2178eb20475c36acc44890cc8384270d376febc3 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -113,7 +113,7 @@ static size_t br_get_link_af_size_filtered(const struct net_device *dev,
- 	num_vlan_infos = br_get_num_vlan_infos(vg, filter_mask);
- 	rcu_read_unlock();
+diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+index 5263232278b4fe95775cfcbba71615197e2f5311..23eb6931a2b4ad9137ef20735d8333f376fd49f2 100644
+--- a/net/bridge/br_arp_nd_proxy.c
++++ b/net/bridge/br_arp_nd_proxy.c
+@@ -29,7 +29,7 @@ void br_recalculate_neigh_suppress_enabled(struct net_bridge *br)
+ 	bool neigh_suppress = false;
  
--	if (p && (p->flags & BR_VLAN_TUNNEL))
-+	if (p && test_bit(BR_VLAN_TUNNEL_BIT, &p->flags))
- 		vinfo_sz += br_get_vlan_tunnel_info_size(vg);
+ 	list_for_each_entry(p, &br->port_list, list) {
+-		if (p->flags & (BR_NEIGH_SUPPRESS | BR_NEIGH_VLAN_SUPPRESS)) {
++		if (READ_ONCE(p->flags) & (BR_NEIGH_SUPPRESS | BR_NEIGH_VLAN_SUPPRESS)) {
+ 			neigh_suppress = true;
+ 			break;
+ 		}
+@@ -206,8 +206,8 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+ 			const struct net_bridge_port *dst = READ_ONCE(f->dst);
+ 			bool replied = false;
  
- 	/* Each VLAN is returned in bridge_vlan_info along with flags */
-@@ -823,7 +823,7 @@ static int br_afspec(struct net_bridge *br,
- 		err = 0;
- 		switch (nla_type(attr)) {
- 		case IFLA_BRIDGE_VLAN_TUNNEL_INFO:
--			if (!p || !(p->flags & BR_VLAN_TUNNEL))
-+			if (!p || !test_bit(BR_VLAN_TUNNEL_BIT, &p->flags))
- 				return -EINVAL;
- 			err = br_parse_vlan_tunnel_info(attr, &tinfo_curr);
- 			if (err)
-@@ -934,58 +934,67 @@ static int br_set_port_state(struct net_bridge_port *p, u8 state)
- }
+-			if ((p && (p->flags & BR_PROXYARP)) ||
+-			    (dst && (dst->flags & BR_PROXYARP_WIFI)) ||
++			if ((p && test_bit(BR_PROXYARP_BIT, &p->flags)) ||
++			    (dst && test_bit(BR_PROXYARP_WIFI_BIT, &dst->flags)) ||
+ 			    br_is_neigh_suppress_enabled(dst, vid)) {
+ 				if (!vid)
+ 					br_arp_send(br, p, skb->dev, sip, tip,
+@@ -511,10 +511,7 @@ bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid)
+ 	if (!p)
+ 		return false;
  
- /* Set/clear or port flags based on attribute */
--static void br_set_port_flag(struct net_bridge_port *p, struct nlattr *tb[],
-+static void br_set_port_flag(unsigned long *set_flags,
-+			     unsigned long *clear_flags,
-+			     struct nlattr *tb[],
- 			     int attrtype, unsigned long mask)
- {
--	if (!tb[attrtype])
--		return;
+-	if (!vid)
+-		return !!(p->flags & BR_NEIGH_SUPPRESS);
 -
--	if (nla_get_u8(tb[attrtype]))
--		p->flags |= mask;
--	else
--		p->flags &= ~mask;
-+	if (tb[attrtype]) {
-+		if (nla_get_u8(tb[attrtype]))
-+			*set_flags |= mask;
-+		else
-+			*clear_flags |= mask;
-+	}
+-	if (p->flags & BR_NEIGH_VLAN_SUPPRESS) {
++	if (vid && test_bit(BR_NEIGH_VLAN_SUPPRESS_BIT, &p->flags)) {
+ 		struct net_bridge_vlan_group *vg = nbp_vlan_group_rcu(p);
+ 		struct net_bridge_vlan *v;
+ 
+@@ -522,17 +519,13 @@ bool br_is_neigh_suppress_enabled(const struct net_bridge_port *p, u16 vid)
+ 		if (!v)
+ 			return false;
+ 		return !!(v->priv_flags & BR_VLFLAG_NEIGH_SUPPRESS_ENABLED);
+-	} else {
+-		return !!(p->flags & BR_NEIGH_SUPPRESS);
+ 	}
++	return test_bit(BR_NEIGH_SUPPRESS_BIT, &p->flags);
  }
  
- /* Process bridge protocol info on port */
- static int br_setport(struct net_bridge_port *p, struct nlattr *tb[],
- 		      struct netlink_ext_ack *extack)
+ bool br_is_neigh_forward_grat_enabled(const struct net_bridge_port *p, u16 vid)
  {
--	unsigned long old_flags, changed_mask;
-+	unsigned long old_flags, flags, changed_mask;
-+	unsigned long set = 0, clear = 0;
- 	bool br_vlan_tunnel_old;
- 	int err;
+-	if (!vid)
+-		return !!(p->flags & BR_NEIGH_FORWARD_GRAT);
+-
+-	if (p->flags & BR_NEIGH_VLAN_SUPPRESS) {
++	if (vid && test_bit(BR_NEIGH_VLAN_SUPPRESS_BIT, &p->flags)) {
+ 		struct net_bridge_vlan_group *vg = nbp_vlan_group_rcu(p);
+ 		struct net_bridge_vlan *v;
  
--	old_flags = p->flags;
-+	old_flags = READ_ONCE(p->flags);
- 	br_vlan_tunnel_old = (old_flags & BR_VLAN_TUNNEL) ? true : false;
- 
--	br_set_port_flag(p, tb, IFLA_BRPORT_MODE, BR_HAIRPIN_MODE);
--	br_set_port_flag(p, tb, IFLA_BRPORT_GUARD, BR_BPDU_GUARD);
--	br_set_port_flag(p, tb, IFLA_BRPORT_FAST_LEAVE,
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_MODE, BR_HAIRPIN_MODE);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_GUARD, BR_BPDU_GUARD);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_FAST_LEAVE,
- 			 BR_MULTICAST_FAST_LEAVE);
--	br_set_port_flag(p, tb, IFLA_BRPORT_PROTECT, BR_ROOT_BLOCK);
--	br_set_port_flag(p, tb, IFLA_BRPORT_LEARNING, BR_LEARNING);
--	br_set_port_flag(p, tb, IFLA_BRPORT_UNICAST_FLOOD, BR_FLOOD);
--	br_set_port_flag(p, tb, IFLA_BRPORT_MCAST_FLOOD, BR_MCAST_FLOOD);
--	br_set_port_flag(p, tb, IFLA_BRPORT_MCAST_TO_UCAST,
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_PROTECT, BR_ROOT_BLOCK);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_LEARNING, BR_LEARNING);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_UNICAST_FLOOD, BR_FLOOD);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_MCAST_FLOOD,
-+			 BR_MCAST_FLOOD);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_MCAST_TO_UCAST,
- 			 BR_MULTICAST_TO_UNICAST);
--	br_set_port_flag(p, tb, IFLA_BRPORT_BCAST_FLOOD, BR_BCAST_FLOOD);
--	br_set_port_flag(p, tb, IFLA_BRPORT_PROXYARP, BR_PROXYARP);
--	br_set_port_flag(p, tb, IFLA_BRPORT_PROXYARP_WIFI, BR_PROXYARP_WIFI);
--	br_set_port_flag(p, tb, IFLA_BRPORT_VLAN_TUNNEL, BR_VLAN_TUNNEL);
--	br_set_port_flag(p, tb, IFLA_BRPORT_NEIGH_SUPPRESS, BR_NEIGH_SUPPRESS);
--	br_set_port_flag(p, tb, IFLA_BRPORT_ISOLATED, BR_ISOLATED);
--	br_set_port_flag(p, tb, IFLA_BRPORT_LOCKED, BR_PORT_LOCKED);
--	br_set_port_flag(p, tb, IFLA_BRPORT_MAB, BR_PORT_MAB);
--	br_set_port_flag(p, tb, IFLA_BRPORT_NEIGH_VLAN_SUPPRESS,
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_BCAST_FLOOD,
-+			 BR_BCAST_FLOOD);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_PROXYARP, BR_PROXYARP);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_PROXYARP_WIFI,
-+			 BR_PROXYARP_WIFI);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_VLAN_TUNNEL,
-+			 BR_VLAN_TUNNEL);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_NEIGH_SUPPRESS,
-+			 BR_NEIGH_SUPPRESS);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_ISOLATED, BR_ISOLATED);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_LOCKED, BR_PORT_LOCKED);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_MAB, BR_PORT_MAB);
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_NEIGH_VLAN_SUPPRESS,
- 			 BR_NEIGH_VLAN_SUPPRESS);
--	br_set_port_flag(p, tb, IFLA_BRPORT_NEIGH_FORWARD_GRAT,
-+	br_set_port_flag(&set, &clear, tb, IFLA_BRPORT_NEIGH_FORWARD_GRAT,
- 			 BR_NEIGH_FORWARD_GRAT);
- 
--	if ((p->flags & BR_PORT_MAB) &&
--	    (!(p->flags & BR_PORT_LOCKED) || !(p->flags & BR_LEARNING))) {
-+	flags = (old_flags | set) & ~clear;
-+
-+	if ((flags & BR_PORT_MAB) &&
-+	    (!(flags & BR_PORT_LOCKED) || !(flags & BR_LEARNING))) {
- 		NL_SET_ERR_MSG(extack, "Bridge port must be locked and have learning enabled when MAB is enabled");
--		p->flags = old_flags;
- 		return -EINVAL;
--	} else if (!(p->flags & BR_PORT_MAB) && (old_flags & BR_PORT_MAB)) {
-+	}
-+	if (!(flags & BR_PORT_MAB) && (old_flags & BR_PORT_MAB)) {
- 		struct net_bridge_fdb_flush_desc desc = {
- 			.flags = BIT(BR_FDB_LOCKED),
- 			.flags_mask = BIT(BR_FDB_LOCKED),
-@@ -995,15 +1004,17 @@ static int br_setport(struct net_bridge_port *p, struct nlattr *tb[],
- 		br_fdb_flush(p->br, &desc);
+@@ -540,7 +533,6 @@ bool br_is_neigh_forward_grat_enabled(const struct net_bridge_port *p, u16 vid)
+ 		if (!v)
+ 			return false;
+ 		return !!(v->priv_flags & BR_VLFLAG_NEIGH_FORWARD_GRAT_ENABLED);
+-	} else {
+-		return !!(p->flags & BR_NEIGH_FORWARD_GRAT);
  	}
++	return test_bit(BR_NEIGH_FORWARD_GRAT_BIT, &p->flags);
+ }
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index a114373c98163d1e81b090b9c799adcb1bfeed77..e4570bbed85445bcda08537b81c78bacd163f28d 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -1514,7 +1514,7 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
  
--	changed_mask = old_flags ^ p->flags;
-+	changed_mask = old_flags ^ flags;
+ 	trace_br_fdb_external_learn_add(br, p, addr, vid);
  
--	err = br_switchdev_set_port_flag(p, p->flags, changed_mask, extack);
--	if (err) {
--		p->flags = old_flags;
-+	err = br_switchdev_set_port_flag(p, flags, changed_mask, extack);
-+	if (err)
- 		return err;
--	}
+-	if (locked && (!p || !(p->flags & BR_PORT_MAB)))
++	if (locked && (!p || !test_bit(BR_PORT_MAB_BIT, &p->flags)))
+ 		return -EINVAL;
  
--	if (br_vlan_tunnel_old && !(p->flags & BR_VLAN_TUNNEL))
-+	do {
-+		flags = (old_flags | set) & ~clear;
-+	} while (!try_cmpxchg(&p->flags, &old_flags, flags));
-+
-+	if (br_vlan_tunnel_old && !(flags & BR_VLAN_TUNNEL))
- 		nbp_vlan_tunnel_info_flush(p);
+ 	spin_lock_bh(&br->hash_lock);
+diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+index 4a77d07433745152241789818949bd228aa95be0..46c762ca5177e5ffb8bc21077cdb14ca25a4a453 100644
+--- a/net/bridge/br_forward.c
++++ b/net/bridge/br_forward.c
+@@ -24,7 +24,7 @@ static inline int should_deliver(const struct net_bridge_port *p,
+ 	struct net_bridge_vlan_group *vg;
  
- 	br_port_flags_change(p, changed_mask);
+ 	vg = nbp_vlan_group_rcu(p);
+-	return ((p->flags & BR_HAIRPIN_MODE) || skb->dev != p->dev) &&
++	return (test_bit(BR_HAIRPIN_MODE_BIT, &p->flags) || skb->dev != p->dev) &&
+ 		(br_mst_is_enabled(p) || p->state == BR_STATE_FORWARDING) &&
+ 		br_allowed_egress(vg, skb) && nbp_switchdev_allowed_egress(p, skb) &&
+ 		!br_skb_isolated(p, skb);
+@@ -214,24 +214,24 @@ void br_flood(struct net_bridge *br, struct sk_buff *skb,
+ 		 */
+ 		switch (pkt_type) {
+ 		case BR_PKT_UNICAST:
+-			if (!(p->flags & BR_FLOOD))
++			if (!test_bit(BR_FLOOD_BIT, &p->flags))
+ 				continue;
+ 			break;
+ 		case BR_PKT_MULTICAST:
+-			if (!(p->flags & BR_MCAST_FLOOD) && skb->dev != br->dev)
++			if (!test_bit(BR_MCAST_FLOOD_BIT, &p->flags) && skb->dev != br->dev)
+ 				continue;
+ 			break;
+ 		case BR_PKT_BROADCAST:
+-			if (!(p->flags & BR_BCAST_FLOOD) && skb->dev != br->dev)
++			if (!test_bit(BR_BCAST_FLOOD_BIT, &p->flags) && skb->dev != br->dev)
+ 				continue;
+ 			break;
+ 		}
+ 
+ 		/* Do not flood to ports that enable proxy ARP */
+-		if (p->flags & BR_PROXYARP)
++		if (test_bit(BR_PROXYARP_BIT, &p->flags))
+ 			continue;
+ 		if (BR_INPUT_SKB_CB(skb)->proxyarp_replied) {
+-			if (p->flags & BR_PROXYARP_WIFI)
++			if (test_bit(BR_PROXYARP_WIFI_BIT, &p->flags))
+ 				continue;
+ 			/* For gratuitous ARPs/NAs, check neigh_forward_grat.
+ 			 * For regular ARPs/NDs, check only neigh_suppress.
+@@ -328,7 +328,8 @@ void br_multicast_flood(struct net_bridge_mdb_entry *mdst,
+ 		if ((unsigned long)lport > (unsigned long)rport) {
+ 			port = lport;
+ 
+-			if (port->flags & BR_MULTICAST_TO_UNICAST) {
++			if (test_bit(BR_MULTICAST_TO_UNICAST_BIT,
++				     &port->flags)) {
+ 				maybe_deliver_addr(lport, skb, p->eth_addr,
+ 						   local_orig);
+ 				goto delivered;
 -- 
 2.54.0.1136.gdb2ca164c4-goog
 
