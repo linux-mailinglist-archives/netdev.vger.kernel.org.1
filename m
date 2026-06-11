@@ -1,333 +1,232 @@
-Return-Path: <netdev+bounces-298374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298375-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tZgMGHsvK2pW3wMAu9opvQ
-	(envelope-from <netdev+bounces-298374-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:58:19 +0200
+	id pqekBOIwK2r43wMAu9opvQ
+	(envelope-from <netdev+bounces-298375-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:04:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B200467584A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:58:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56152675892
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:04:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=UacGkicw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298374-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298374-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=onsemi.com header.s=mimecast20250127 header.b=gYzW+rWz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298375-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298375-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=onsemi.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93A2B310E57F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:58:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFA4633D9D71
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D866938AC8C;
-	Thu, 11 Jun 2026 21:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAA838A73C;
+	Thu, 11 Jun 2026 21:59:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from usb-smtp-delivery-120.mimecast.com (usb-smtp-delivery-120.mimecast.com [170.10.153.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F643806A1
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 21:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACEF389E05
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 21:59:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781215095; cv=none; b=QleryHrsqlhD6ZB7AATPvaYoBroRQFv43XFyctvNl/ie5C8OLTj1t3UQD1kUw7QEHWHRjRdX+LTRyri8mRx8Przv5WI4AdqU5OfNbbXkZ3FgNpQ5DNLp6F8qzitKvyK//ckpmhyUgPbUe60K3ZqalvS4kaD/eDsR2z97a0kE5vs=
+	t=1781215195; cv=none; b=jOh/RS8677eU0Kp3QCn5rY+fXRHf6SZ4a0Y3bSQEK9EbenpJnHB4Jlp+V4DxAWpMCAV0BYyrm+VdL52NB9Ls9shZe8QBkqso1JHVtgNtdo05TQ/0r8V9uSEaCsL6t+eKWFqaVgkxtXw14ByArL0tIVb6/DnyLtDj2lvV1vAkfLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781215095; c=relaxed/simple;
-	bh=WTmYiCljJrOBi/BJCgoXELeKtejWqYZNFbSiafJn5Ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jkpWQkvTZIAMqtzyBr4RNgYBaNg3rDEnBlLSi5IOFIiUY0kRJQem5j74kEp+n1jDBDDx24qlAfsah1bCre8v3fHhfLzj06GcuOzytdVF2HlyRJ9C05VOTnCVvTHLFNp8C9y+e8e794UTM1xaCT/hJ92ZfCqgCC+qN2JUT14B0vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UacGkicw; arc=none smtp.client-ip=209.85.216.46
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-36dd65b95f2so311005a91.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 14:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781215093; x=1781819893; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=058Dub1D8Mo8YvUnluCsrCmQe9OxK3zbzQpkHf2iTGc=;
-        b=UacGkicwZdSQADbTsLBpKodZvKCdFBgsXKO/l0t7vKJCs9OTyIcocMZHVznAyh6m77
-         fb8XhMjzzVs7KlOJvnIq9abUDg9HL0xEqV0Bh45gqrnyH37jC8d1eekddKFqFxf7Srk5
-         bzdXOh5nGJyvcqMIfPuzHOkrLt4Ib8BTHty9A6+ZR+De4db7vLdExO5hhwKL24xjJPJG
-         DIQAxO6uo35uuDWkjvYl44hQx7hdCkCQe0F0H4UtLfKQrE6uQvlU13C8DYMF7tmF1+NK
-         9tMBzTE6mDu+UBJGiyG0zPEiN8zbU0CMCRcJFUNcWxt2Q8kpQTpFpjs+HrwDd0T8SAcf
-         C1cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781215093; x=1781819893;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=058Dub1D8Mo8YvUnluCsrCmQe9OxK3zbzQpkHf2iTGc=;
-        b=GCrPqkrZR2sjTLLt1gHy6HjyL3RYc5ySZy0ag1Nuy2utuEj7OYuLhUEsQw7zMdwkhe
-         +ZWmXGyKvalvTwPo1ZYjNSe1gixnIO+6Ifr7Y9xGbRQEAyv7nK1VjDtJYgZGhzPJUEwE
-         cmRjT+roBy89bHiDBIrbZ2RxV3hbSbJD6T5VQNxzX/C04ntknFpv1AF50k9AUa5+QU7Y
-         6a3R8woGnVRlKtc19dNwnS7fQDNmgfnjHhLWTSog3KkHswfbMp33UBxkxoD5M+p8CKdt
-         JPL/SmMLGJ1pE/Ci3YzQC1Ojh2DhpuxFAckHgs0+AcAiAiX8SByWjdWp003g3XF3Dg0O
-         OtwQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9X9tMkc+BNpy0YPCS6vCM0X0pNHr5fL5U5ghbQEyrUZYQgqN5RUpf7zWYcyGgNJv+joV5bHx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCT/TE6li8fIBMgdQnmvhO15NqpbEl892Ci7O3soxwQWh7IfGa
-	4S50HP+Q6b2eLd9chz5wftetHBkqHKjihCYPVpOVSBiKEzkipAzigkJn
-X-Gm-Gg: Acq92OF2gUWiw2f4MVZMb888c8nv1fTiIQCoY9pUy+rk5SaYwlntVS5Nvp1osi0IGvs
-	c50bpiXYgMOLgC8FUzwsktgKFRzqoDgq2thCgS1g+nIyNHH1agqyXW0n5qiGJY4URe2PGFLMLXS
-	hOelk/4884Y3Cqwdky3GH06FPpuZZ/yPW/SEwf1zcq5d0OTh7O06YmzL3TOiRj/dDT9aQJr8iSL
-	ewLt3Frvkl7k3Rl5l7zk81gYNHJUf7DkquWeu18fn2R5Sy3dvmoZ8NZCGGJEzQBAniyuFR3M1PG
-	Y/q58JY4hYEFeMrgEtxhr2vfYeCQEMD+81AYruUZGqJiyeIMDzkZWVyPnpHr5Ht+n1ik1bBEjKD
-	T9OpaNtRNqQmlKz+qDAsEZtQQCUvmkyMUg9SZbPsJtNM0ysxpjHbG3NjFRhVTQcI1TBH8ws89XV
-	ponNntSOwwaQ9zK6fnDKZ+lXemSvL9as2DBUcnZKCjBEY=
-X-Received: by 2002:a17:90b:2cc3:b0:36b:de66:92c3 with SMTP id 98e67ed59e1d1-379ef747839mr387023a91.10.1781215092780;
-        Thu, 11 Jun 2026 14:58:12 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:8::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-379c3240b5esm327367a91.0.2026.06.11.14.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 14:58:12 -0700 (PDT)
-Date: Thu, 11 Jun 2026 14:58:10 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stanislav Fomichev <sdf.kernel@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-kselftest@vger.kernel.org, sdf@fomichev.me,
-	razor@blackwall.org, daniel@iogearbox.net, almasrymina@google.com,
-	matttbe@kernel.org, skhawaja@google.com, dw@davidwei.uk,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v2 3/4] selftests/net: ncdevmem: add -b option
- to set rx-buf-size on bind
-Message-ID: <aisvcqQp37rnfK5d@devvm29614.prn0.facebook.com>
-References: <20260611-tcpdm-large-niovs-v2-0-ee2bf15e7523@meta.com>
- <20260611-tcpdm-large-niovs-v2-3-ee2bf15e7523@meta.com>
- <aislm0fS2MSDMzKf@devvm7509.cco0.facebook.com>
+	s=arc-20240116; t=1781215195; c=relaxed/simple;
+	bh=gti61QZk/gY458cZr7mD3GeQ5aNwvVOT+BJDap7mnS8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=JwJiQ51Kycq5LuX3xu5GvKxcgfYXYr0mrWC1IUoM8OJC8I42+Sv1wm0JT78j2JBSiYBCSZNaiP9Xg80RJybyclqsWrOBX/czBThIifDo30Od14sXwQ7n4trpTSNBGevd+4W7rzrDpr3ayclPONY5FjhYkuEXSKX+D0DTOoANcCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=onsemi.com; spf=pass smtp.mailfrom=onsemi.com; dkim=pass (2048-bit key) header.d=onsemi.com header.i=@onsemi.com header.b=gYzW+rWz; arc=none smtp.client-ip=170.10.153.120
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onsemi.com;
+	s=mimecast20250127; t=1781215189;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gti61QZk/gY458cZr7mD3GeQ5aNwvVOT+BJDap7mnS8=;
+	b=gYzW+rWzsBkjbyqXYsZIUb/6Opwtvlpq70BgLzC2g5cDb7GcDDsOLABsV0yBlzm6UmxM5e
+	dnDFpQgxAo3lg43aoipc/AJIj8o1/vDb7KH27+nF/tB/ce4FdNg+2vkiHLLPhF1Gl2taEM
+	Z/XawX41f+MZxkQI1S/Pv3KQwZ6J9x04LQL7VHcHVfWYGyRw3MQzNlVgNY4QFH4pZ98R3V
+	JE/J5adTwPZPPbmHxss8naOoVrCsa2+/WvgNMG8SCvKF8UjksXc9szzngNYS4DHIHpBVN3
+	d/bFWoCh8HDbb711A34ZIH9XdVZGUcGoTqczyt4OkoDzPqOud8YAZedYoMbMFw==
+Received: from SJ2PR03CU001.outbound.protection.outlook.com
+ (mail-westusazon11012014.outbound.protection.outlook.com [52.101.43.14]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id usb-mta-40-na8apAWeM8a9Vshx6ZxeTQ-1; Thu,
+ 11 Jun 2026 14:59:44 -0700
+X-MC-Unique: na8apAWeM8a9Vshx6ZxeTQ-1
+X-Mimecast-MFC-AGG-ID: na8apAWeM8a9Vshx6ZxeTQ_1781215181
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com (2603:10b6:930:b8::20)
+ by DM4PR02MB9238.namprd02.prod.outlook.com (2603:10b6:8:106::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Thu, 11 Jun
+ 2026 21:59:33 +0000
+Received: from CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca]) by CYYPR02MB9828.namprd02.prod.outlook.com
+ ([fe80::2767:f7d2:778c:8dca%4]) with mapi id 15.21.0092.016; Thu, 11 Jun 2026
+ 21:59:33 +0000
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+To: "Parthiban.Veerasooran@microchip.com"
+	<Parthiban.Veerasooran@microchip.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"conor@kernel.org" <conor@kernel.org>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Conor.Dooley@microchip.com"
+	<Conor.Dooley@microchip.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>
+Subject: RE: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type to be
+ active low, level triggered
+Thread-Topic: [PATCH net v3 2/2] dt-bindings: net: updated interrupt type to
+ be active low, level triggered
+Thread-Index: AQHc8eDLvWzkHnbXI0KmrY/VvMfuDrYrecyAgAALlpCAAm25gIAAkU0wgAAYXICAAAajgIAFcz6AgAAGt5CAAd//gIAAaviwgABI9uCAAq+yAIAAFbtQgACAaNA=
+Date: Thu, 11 Jun 2026 21:59:33 +0000
+Message-ID: <CYYPR02MB98285C570F545729D3ECFB35831B2@CYYPR02MB9828.namprd02.prod.outlook.com>
+References: <20260601-level-trigger-v3-0-da73e7010532@onsemi.com>
+ <20260601-level-trigger-v3-2-da73e7010532@onsemi.com>
+ <20260602-rebel-snide-5036c97e410d@spud>
+ <CY8PR02MB92493D2E5491AAE5416C05A283122@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <a5abb9b8-6ebf-4f95-a684-fc889b98acea@microchip.com>
+ <CY8PR02MB9249E607ACBF3A05AB83ABF683102@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <20260604-swimwear-garnet-3eb092e6fda7@spud>
+ <4df9882b-3426-4c36-8048-0c76d0f11c74@lunn.ch>
+ <7c68173a-ebff-42cc-8519-95e8365805b5@microchip.com>
+ <DM4PR02MB926317F64B5A3827009B66A9831C2@DM4PR02MB9263.namprd02.prod.outlook.com>
+ <a02cd86e-a5b8-481c-a07e-7243ee537b24@microchip.com>
+ <CY8PR02MB9249EC4F3896121911D0FF3C831D2@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <CY8PR02MB9249B913E28E285EB46EC59C831D2@CY8PR02MB9249.namprd02.prod.outlook.com>
+ <56e6c9ea-2e2a-406d-b7d0-ec484e3170e6@microchip.com>
+ <CY8PR02MB92498B8CC2E0A3B50908C510831B2@CY8PR02MB9249.namprd02.prod.outlook.com>
+In-Reply-To: <CY8PR02MB92498B8CC2E0A3B50908C510831B2@CY8PR02MB9249.namprd02.prod.outlook.com>
+Accept-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR02MB9828:EE_|DM4PR02MB9238:EE_
+x-ms-office365-filtering-correlation-id: 1a6ee0ef-3952-4007-6a83-08dec804b894
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|23010399003|38070700021|6133799003|4143699003|11063799006|56012099006|18002099003|22082099003
+x-microsoft-antispam-message-info: rnm6UCkmymTAECRo28EqfOwkyMCst0vN0wZnjD7gPt+0n3kjQgUvaHxf/6Y5SUhuo86Ox3v5ft9GMxEiuht16AQaJ6kW2vCbG0aFfoIdq2gjwG+Avqbgq6hGwuKkCYjsfeRY5nEcs2T8txphH70ryzLSCZM4p0VlTRLoCuVAzmm4lujVbytWVeKySrIDB29eS7ixPb5zR7WiMF3sOqhzgyV1Kv9ljIa4ocSr4eVvpk6962XrLisWjqMv4NsanHRrNu0duAQu2TmwQyAiXuCbLd6kUgyhy4VzNbhz+/RwHewsRI/R/6yCpdOYEuSCz9q/GYZG5PPoFMBUfEq3r1kK0zOA3LjMGP2pHgzcM2xzVH4i+g/DqcqN/FrI3awHewQJnuXRYUcr2iPFvQoR/7eOHNOYspt4bBahpMspqgbLsDqiC14QI/vaUooS2wqAQUOd+N4FrxZtplsre64spnvhhNmibh6BQ9DXVUkt+S5o+9KGY+ZEntOSHxXKzma/pgDSQu9FDhNkOCfPGJMN3hMJAwkKcTVNhcslu7qoxkQ17y+sLxhcRwT4thZ4tBRj0/hfs/NcU0jOejR+y7fRBQYuYAc9RE42jlV2r68hZkTro049MV3qUeEu38PGrzcKLp2PqATkQmTjI1U97wG3dH8LZs1+guaggdxNbl2hV7BEKB5P9vOqrWGy5y/5wzkXoKkiuJyGc22MieaThzyv4xeh6E5Krheh52uN3utZflj60cubHHSgkNiGz9IBxureyKmn
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR02MB9828.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(23010399003)(38070700021)(6133799003)(4143699003)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RXVBQnZhMnlHRFk4Wm5jbFBtL29tWXdKSENaUWgzYUY0WWtsVDBZYVEyZmdz?=
+ =?utf-8?B?d3RFU1lKczJLVTdpR3ZWVWJDQmU3RDcrZi91eko0WlBFZ3oxbHpaWVRYMlhE?=
+ =?utf-8?B?aDlLZ1lGeFN2OS9ReXdKdGJNRk1rS243SUtpU0VwZmxQY3FLMjQ5d3RoaWJC?=
+ =?utf-8?B?b1YvYkY4blRUU1J5eG0zS0IyWmZ6cTI1UHN3OStISitDWmNHNnIxWkdlcXM0?=
+ =?utf-8?B?MkJ5V1JQbnRFMHV3N3dnb2ZGVHJBczlRbTk1eWVWM3QyWU00QXlkcWlTL3VX?=
+ =?utf-8?B?TEtyNGZDaXFrT2tuQmdNYk5vYVp3SkdBaU9ndXZXRzZ5Y2tHM0k0K0FETG5l?=
+ =?utf-8?B?RmhMeWVNRHcvdkpUeGs4L2FNd2dGZVNxN2I3alNFbytZNHlXbHdPRVdDVmZR?=
+ =?utf-8?B?VHAwbE0xNHduRzNoaTNob0FzMEZha2svbHI4U1FsNWRQVExoRFdSVVVlVU9o?=
+ =?utf-8?B?MXZtWFo3ZWhGb3JUQmNXRjNadjltNWpESDlGdVp2U0RnREdudXhVMGFLS21i?=
+ =?utf-8?B?c1A2a0N5azlhWWtuZnViQnUxTFk2WGZldHF1WEVpRmtLamo3bVhsVXdibWo4?=
+ =?utf-8?B?dXBlUVZCNjBWc2prSXl1L1kzcmpPc3lrVWdGQjd1SXlNQTEyZHZTQU12WlRK?=
+ =?utf-8?B?d1JKbXg4QkMzbEthczZISnRtSjZPTHJiOVQ1cWt0WjhXaTM1OExLU0ozUXV1?=
+ =?utf-8?B?VnhGUmcycTVFSTFRdWNLWm9YYmcyaUl6Q0M2bHZncG81Q1F1ZUxyanAyOWNq?=
+ =?utf-8?B?TnhNNnZYYXlFVGdaL3Jaa05JaHdrb3I2M2RPN3c3dElOUHRWQnZCNU52dm9O?=
+ =?utf-8?B?aCtHVkZlMUMyaTEyZkgrS28rV1FyMkdsaE41amNQd2c3QzdSUXZDUWNYOGR1?=
+ =?utf-8?B?LytzQVpIVGkzajlWMDYveW5FdE1IdUFicVBBY2FyOE5tNWpDeWlLRzNjdlNH?=
+ =?utf-8?B?TjYzT1ZGRmdlbnlXbGdrTGhVNnUvUGphdGpzUzQ1WUd1Wjd0YmlXaEVYekc3?=
+ =?utf-8?B?YjN6QkFCSkFLdm5YbmF1RFVpU2JuMkhVUklna2FFQXdCRUJNSHZRT2ovMFZS?=
+ =?utf-8?B?NXl2MVR1NlJPS05OYmxtakNpZDRrZ1JISHhWRWZ6bnMxelFCWFZtTGtEMHB2?=
+ =?utf-8?B?aTdiRkd4c1l0bHB5aXduMDhCekVJR09WYnRJYzJPQ3ZBN3F5VUJDWDQzUHBq?=
+ =?utf-8?B?QldTVmNvM0JQcmRxNXZnZnFOd3lvVi9CNEVjTnhXUWp6eklOdDFQUWRaRy9v?=
+ =?utf-8?B?RUNtVHAwY1dxc1lzV01ub2VMQmFyNExSV3BYZVpweCtQVldkc3dMMlRoM2Fm?=
+ =?utf-8?B?bzhlVGw1R0RIQW54UHJmN0VBVGNoM0JweW1RWGlmTjNoNXhtZFNHa3BoMXdn?=
+ =?utf-8?B?Mk1rRlRueExuRUljcTRrNVlkdURaZFJYVnl3cTF6c2JqQXpCNm9GMkNsQWdM?=
+ =?utf-8?B?d21rZjJ3ajJmU2UrOFMyQk94NTdFUElPL0Vpd1pXK0gxaUpkQzdML2dRWGUv?=
+ =?utf-8?B?M01XNTdyUWtQWGRuRWNYUmhzSHk1bWlZSzY2K2l5Zno5bWM0V21OTmhKRVJ2?=
+ =?utf-8?B?NEdZRURIbkxOTXB6U1E3YXVSZEVNVkZOeWF2dUpqUW1EeGxIL0tXRnBqbjI1?=
+ =?utf-8?B?aU1HcDQ4elR5RzZnT3FlYWNwVkdkVnI1WEppdGhpNERlUGVXYU5wU2JLTXFr?=
+ =?utf-8?B?bEtsazE2LzkvWEl4akhVT1lGVmZ6UngwNlJwZ25zSkR2b3lObjZKNk9iM2N0?=
+ =?utf-8?B?TlhiSFRTemNrYk14NEdqMkc4YVBPeDI3WVA0bTZyR0RTbUJESVoyYS81K1JF?=
+ =?utf-8?B?L1lxRzA2anBDU1d4M3pWUU1WYVczelBOYW1Xd1UybHE2RlZyREFxc0grRE1y?=
+ =?utf-8?B?dTU3MVFaaVJSK3VIb0x5cTdOYXBEanA1cE5RUnFEU3NQMTZJS0hkR3AxU2to?=
+ =?utf-8?B?UVlFUE0vTFMzY3VvSW1wL01FdG02YUhYcHJOeEh2Q0RwOVdUUHY4ZXZuTU1v?=
+ =?utf-8?B?bmtVaE9BWUZ0c2t0MXY2RzlRV25abWx6dC81R00xK285SDdTUjY4Q1pPWEtF?=
+ =?utf-8?B?NEErSXQzMzlmNmZWSERxK204NlRoSlFBNmtuOWgzQ3FGMlBmSTlnZERsbkxK?=
+ =?utf-8?B?QjQ2d2tLdmxiRThpVnQ3VldneVhlL1NzZUdzcnlzVkNmUjEwdVVicU5SNFpQ?=
+ =?utf-8?B?YjlHWUw4Wml1dks1QlFjc2JGM1phVWNsaDBzeTRBSUR4aldTanFFeHhkSEx2?=
+ =?utf-8?B?VXhnTEozWFE2TG05V2htMXNpRFJuVUd6bDdWUWVSQXNoanVQRUMvazIwWEgz?=
+ =?utf-8?B?ODM0ZjN5QWZiNWRzaHBDUEZnbC9LVGloVGE4dm5lWFpiWXBEb2R1WkkvOEFv?=
+ =?utf-8?Q?fbech8rJy3TfPu40=3D?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aislm0fS2MSDMzKf@devvm7509.cco0.facebook.com>
+X-Exchange-RoutingPolicyChecked: Dv23SSL/XAYHTGCHu6OFFoMFJoS/k0dlN5aIceS/C2euWRkcGSQa67i9uV232YaZfh+jcw/Ip3hOI5w3iwbdbwmCNS9XrfFlnXZijQb4mbP/AeNfhLWdcBNPoKKFVrC+ZpzXnZrmGLcPzV76UAoUt5dkSpYtXguwbYOReWQnZvFZcwyOcLKBUJke2P46V9IEMwE7wdhlbmJcZuNYLRISJzjiEPSDvNQxrYPGrmC98PTONtf+jgMvfx3yJ764MFwk9xEYg3GRlJeXQPDB8aWs+aThO7n5zxWW62JvsNQQyQzAP3gEfajHy9bxLuTbXwk8nfVRAlyf1i66fr2ymf9moQ==
+X-OriginatorOrg: onsemi.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR02MB9828.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a6ee0ef-3952-4007-6a83-08dec804b894
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2026 21:59:33.5219
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 04e1674b-7af5-4d13-a082-64fc6e42384c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nSUHLU5+uG7/Bzir78vsXzJfk4M50k2Ql9WKaBouK7E4tyGJVygIQzk8yeNpVznNTU4vwU/XRitIP3bIDNJuhSqkMV5zhqZcx4F2JZ6OdPQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR02MB9238
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: WfW-XBmubmWR1WRc5gyzsoFVLgDae-Smoeh8JyeYdfw_1781215181
+X-Mimecast-Originator: onsemi.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.44 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[onsemi.com,reject];
+	R_DKIM_ALLOW(-0.20)[onsemi.com:s=mimecast20250127];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:sdfkernel@gmail.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298374-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298375-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,intel.com,linaro.org,amd.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:Parthiban.Veerasooran@microchip.com,m:andrew@lunn.ch,m:conor@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:Pier.Beruto@onsemi.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:Conor.Dooley@microchip.com,m:devicetree@vger.kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Selvamani.Rajagopal@onsemi.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[onsemi.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,devvm29614.prn0.facebook.com:mid]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[onsemi.com:dkim,onsemi.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,CYYPR02MB9828.namprd02.prod.outlook.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B200467584A
+X-Rspamd-Queue-Id: 56152675892
 
-On Thu, Jun 11, 2026 at 02:22:54PM -0700, Stanislav Fomichev wrote:
-> On 06/11, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add -b <bytes> to request a non-default niov size via
-> > NETDEV_A_DMABUF_RX_BUF_SIZE. When the value exceeds PAGE_SIZE,
-> > udmabuf_alloc() switches to an MFD_HUGETLB-backed memfd so each 2 MB
-> > hugepage produces one naturally-aligned sg entry.
-> > 
-> > Reject values > 2 MB up front: MFD_HUGETLB + udmabuf can only guarantee
-> > 2 MB per sg entry (one hugepage), so a larger rx_buf_size would fail the
-> > per-sg length/alignment check.
-> > 
-> > Add CONFIG_HUGETLBFS=y to drivers/net/hw/config so the new path is
-> > reachable in the CI kernels built for these tests.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> >  tools/testing/selftests/drivers/net/hw/config     |  1 +
-> >  tools/testing/selftests/drivers/net/hw/ncdevmem.c | 49 +++++++++++++++++++++--
-> >  2 files changed, 47 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-> > index cd20024218cd..ed8642b68094 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/config
-> > +++ b/tools/testing/selftests/drivers/net/hw/config
-> > @@ -3,6 +3,7 @@ CONFIG_FAIL_FUNCTION=y
-> >  CONFIG_FAULT_INJECTION=y
-> >  CONFIG_FAULT_INJECTION_DEBUG_FS=y
-> >  CONFIG_FUNCTION_ERROR_INJECTION=y
-> > +CONFIG_HUGETLBFS=y
-> >  CONFIG_INET6_ESP=y
-> >  CONFIG_INET6_ESP_OFFLOAD=y
-> >  CONFIG_INET_ESP=y
-> > diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > index d96e8a3b5a65..325c128191e2 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > @@ -61,6 +61,7 @@
-> >  #include <sys/time.h>
-> >  
-> >  #include <linux/memfd.h>
-> > +#include <sys/param.h>
-> >  #include <linux/dma-buf.h>
-> >  #include <linux/errqueue.h>
-> >  #include <linux/udmabuf.h>
-> > @@ -79,6 +80,7 @@
-> >  #define PAGE_SHIFT 12
-> >  #define TEST_PREFIX "ncdevmem"
-> >  #define NUM_PAGES 16000
-> > +#define MB(x) ((x) << 20)
-> >  
-> >  #ifndef MSG_SOCK_DEVMEM
-> >  #define MSG_SOCK_DEVMEM 0x2000000
-> > @@ -100,6 +102,7 @@ static unsigned int dmabuf_id;
-> >  static uint32_t tx_dmabuf_id;
-> >  static int waittime_ms = 500;
-> >  static bool fail_on_linear;
-> > +static uint32_t rx_buf_size;
-> >  
-> >  /* System state loaded by current_config_load() */
-> >  #define MAX_FLOWS	8
-> > @@ -142,6 +145,7 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
-> >  {
-> >  	struct udmabuf_create create;
-> >  	struct memory_buffer *ctx;
-> > +	unsigned int memfd_flags;
-> >  	int ret;
-> >  
-> >  	ctx = malloc(sizeof(*ctx));
-> > @@ -156,9 +160,14 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
-> >  		goto err_free_ctx;
-> >  	}
-> >  
-> > -	ctx->memfd = memfd_create("udmabuf-test", MFD_ALLOW_SEALING);
-> > +	memfd_flags = MFD_ALLOW_SEALING;
-> 
-> [..]
-> 
-> > +	if (rx_buf_size > (uint32_t)getpagesize())
-> 
-> What's the logic behind explicit (uint32_t) cast? uint vs int
-> comparisons should promote the int to uint automatically?
+PiBTdWJqZWN0OiBSRTogW1BBVENIIG5ldCB2MyAyLzJdIGR0LWJpbmRpbmdzOiBuZXQ6IHVwZGF0
+ZWQgaW50ZXJydXB0IHR5cGUgdG8gYmUgYWN0aXZlIGxvdywgbGV2ZWwgdHJpZ2dlcmVkDQo+IA0K
+PiA+DQo+ID4gT24gMTAvMDYvMjYgMTozMiBhbSwgU2VsdmFtYW5pIFJhamFnb3BhbCB3cm90ZToN
+Cj4gPg0KPiA+IFRoYW5rIHlvdSBmb3IgdGhlIHVwZGF0ZS4gSSB3aWxsIHRlc3QgeW91ciB2NCBz
+dWJtaXNzaW9uIGFuZCBzaGFyZSB0aGUNCj4gPiBmZWVkYmFjayBhcyBzb29uIGFzIHBvc3NpYmxl
+Lg0KPiANCj4gUGFydGhpYmFuLA0KPiANCj4gSSB0aGluayBpdCBpcyBiZXR0ZXIgdG8gd2FpdCBm
+b3IgdjUgdG8gdGVzdC4gdjQgZmFpbGVkIGluIEFJIGNvZGUgcmV2aWV3LiBJdCByYWlzZWQgc29t
+ZQ0KPiBpbXBvcnRhbnQgcmFjZSBjb25kaXRpb25zIHJlbGF0ZWQNCj4gcXVlc3Rpb25zLiBJIGhh
+dmUgc29tZSBtb3JlIGNoYW5nZXMgdG8gYWRkcmVzcyB0aG9zZS4gV2lsbCBzdWJtaXQgdjUgc29v
+bi4gWW91IHdpbGwNCj4gaGF2ZSBpdCBieSBNb25kYXksIGlmIG5vdCB0b2RheS4NCj4gDQoNCg0K
+SSBqdXN0IHN1Ym1pdHRlZCB2NS4gUGxlYXNlIHZlcmlmeSB3aGVuIHlvdSBoYXZlIHRpbWUsIHVu
+bGVzcyB5b3Ugd2FudCB0byANCndhaXQgZm9yIEFJIGNvZGUgcmV2aWV3IHRvIGJlIGRvbmUsIHdo
+aWNoIGlzIGZpbmUgdG9vLg0KDQpodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3Qv
+bmV0ZGV2YnBmL2xpc3QvP3Nlcmllcz0xMTEwMzA5DQoNCg0KPiA+DQo+ID4gQmVzdCByZWdhcmRz
+LA0KPiA+IFBhcnRoaWJhbiBWDQo+ID4gPg0KDQo=
 
-Right, it's actually not needed. Avoids -Wsign-compare, but we don't use
-it anyway.
-
-> 
-> > +		memfd_flags |= MFD_HUGETLB | MFD_HUGE_2MB;
-> > +
-> > +	ctx->memfd = memfd_create("udmabuf-test", memfd_flags);
-> >  	if (ctx->memfd < 0) {
-> > -		pr_err("[skip,no-memfd]");
-> > +		pr_err("[skip,no-memfd%s]",
-> > +		       (memfd_flags & MFD_HUGETLB) ? " (need hugepages)" : "");
-> >  		goto err_close_dev;
-> >  	}
-> >  
-> > @@ -168,6 +177,11 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
-> >  		goto err_close_memfd;
-> >  	}
-> >  
-> > +	if (memfd_flags & MFD_HUGETLB) {
-> > +		size = roundup(size, MB(2));
-> > +		ctx->size = size;
-> > +	}
-> > +
-> >  	ret = ftruncate(ctx->memfd, size);
-> >  	if (ret == -1) {
-> >  		pr_err("[FAIL,memfd-truncate]");
-> > @@ -699,6 +713,8 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-> >  	netdev_bind_rx_req_set_ifindex(req, ifindex);
-> >  	netdev_bind_rx_req_set_fd(req, dmabuf_fd);
-> >  	__netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
-> > +	if (rx_buf_size)
-> > +		netdev_bind_rx_req_set_rx_buf_size(req, rx_buf_size);
-> >  
-> >  	rsp = netdev_bind_rx(*ys, req);
-> >  	if (!rsp) {
-> > @@ -1411,7 +1427,7 @@ int main(int argc, char *argv[])
-> >  	int is_server = 0, opt;
-> >  	int ret, err = 1;
-> >  
-> > -	while ((opt = getopt(argc, argv, "Lls:c:p:v:q:t:f:z:n")) != -1) {
-> > +	while ((opt = getopt(argc, argv, "Lls:c:p:v:q:t:f:z:nb:")) != -1) {
-> >  		switch (opt) {
-> >  		case 'L':
-> >  			fail_on_linear = true;
-> > @@ -1446,6 +1462,33 @@ int main(int argc, char *argv[])
-> >  		case 'n':
-> >  			skip_config = 1;
-> >  			break;
-> > +		case 'b': {
-> > +			char *endp;
-> > +			unsigned long val;
-> 
-> Christmas tree here as well?
-
-Ah right, don't know how I missed that. Thank you.
-
-> 
-> > +
-> > +			errno = 0;
-> > +			val = strtoul(optarg, &endp, 0);
-> 
-> [..]
-> 
-> > +			if (errno || endp == optarg || *endp || val == 0 ||
-> > +			    val > UINT32_MAX) {
-> > +				pr_err("invalid rx_buf_size: %s", optarg);
-> > +				return 1;
-> > +			}
-> 
-> This is too sophisticated :-/ Just (if val == UINT32_MAX && errno == ERANGE) ?
-> (you're looking for an overflow here supposedly?)
-
-yes, sounds good!
-
-> 
-> [..]
-> 
-> > +			if (val & (val - 1)) {
-> > +				pr_err("rx_buf_size must be a power of 2");
-> > +				return 1;
-> > +			}
-> > +			if (val < (unsigned long)getpagesize()) {
-> > +				pr_err("rx_buf_size must be >= PAGE_SIZE (%d)",
-> > +				       getpagesize());
-> > +				return 1;
-> > +			}
-> > +			if (val > MB(2)) {
-> > +				pr_err("rx_buf_size > 2 MB not supported");
-> > +				return 1;
-> > +			}
-> 
-> We already check these on the kernel size, so should be ok to drop? 
-
-True, that works.
-
-Best,
-Bobby
 
