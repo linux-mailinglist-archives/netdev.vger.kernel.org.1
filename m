@@ -1,145 +1,240 @@
-Return-Path: <netdev+bounces-298150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id C19ND+m7KmrCvwMAu9opvQ
-	(envelope-from <netdev+bounces-298150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:45:13 +0200
+	id z3NkDNa8Kmr4vwMAu9opvQ
+	(envelope-from <netdev+bounces-298151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:49:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736CA6726D0
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:45:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E86B672742
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:49:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=HGHswiMy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298150-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298150-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oo2h4jTa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298151-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298151-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8DB813004D9F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:45:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 857CB31CB86B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FEB2848BE;
-	Thu, 11 Jun 2026 13:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FCE22A4E1;
+	Thu, 11 Jun 2026 13:45:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DB9409121
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 13:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95B520DD51;
+	Thu, 11 Jun 2026 13:45:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781185508; cv=none; b=DjzNVsLQf2l2DM67G5QnBgBpsdE0Oh2XmsR+3/rt3RYTrGs7Ach3/0xS64UwVLX1R28XpzFAYRENj7lQ0e8ZwJoXjMRl/hzhSMjQGIbqxaLcRdOfvFSVDr8Y2k4Ay/1WIUJ8yfbkvNhe9saBHkqzXuAsb1lQdeWsNlzmaiRhDFY=
+	t=1781185540; cv=none; b=TF8qAxjAA0fBmOQaVWqtqFyrK1afu8kKC+RfOhaoUHl53j+QzlaQXDPfnLsRpIXrsDjn0ElUvMhRy2HeblEY55LtcGCCZzro5gZXsvA8Hvq3Q1CIjqQeLaOpVoSQHs1XtGewXW+kwr1iDxv33qTLjajCMACEThXIcashVPvLLYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781185508; c=relaxed/simple;
-	bh=9I660twNq07kzK95bE4HEQ5h/eHeVHsC0f/zvk3pQRI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kIjBdsU0gfpZXS5P/DNutu5jkqsxUctO8ZidQ2CwEdroIZ+izbutWMyw8bKPQiQcJkh0U5ZjDWlUHDyu6/BLg5eUYm3MVAm2A+rW+l0qaaHZNUlevzIf2cLyFSRqxdMqdibtOBtWYeXUcorVjlRZVjEgAcJVRXdHcXGqt1SQlhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HGHswiMy; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781185506;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9I660twNq07kzK95bE4HEQ5h/eHeVHsC0f/zvk3pQRI=;
-	b=HGHswiMy+RpfgSw/0xz2MiuubomKxH9ySzNtDpHWUT8WAQLyomuVGqke2UzjDdTT4DhouV
-	Kc+tNM6wlCsnsRuQbwcuMIzAyLVM2J3DnJ0KvwMaN/kiiCtdmxfiqxLYz0kYL5sk/sOuk+
-	fQIXSFaI6pdMDNc0D8+ze887g4tGpwo=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-374-A2omzyn1P2qbUPNxtcVxRg-1; Thu,
- 11 Jun 2026 09:45:03 -0400
-X-MC-Unique: A2omzyn1P2qbUPNxtcVxRg-1
-X-Mimecast-MFC-AGG-ID: A2omzyn1P2qbUPNxtcVxRg_1781185501
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3616219560B8;
-	Thu, 11 Jun 2026 13:45:01 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.94])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D457C3008B37;
-	Thu, 11 Jun 2026 13:44:58 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Minxi Hou <houminxi@gmail.com>
-Cc: netdev@vger.kernel.org,  echaudro@redhat.com,  i.maximets@ovn.org,
-  davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
-  pabeni@redhat.com,  horms@kernel.org,  shuah@kernel.org,
-  dev@openvswitch.org,  linux-kselftest@vger.kernel.org,
-  amorenoz@redhat.com
-Subject: Re: [PATCH net-next v2] selftests/net/openvswitch: add flow modify
- test
-In-Reply-To: <20260609165725.107484-1-houminxi@gmail.com> (Minxi Hou's message
-	of "Wed, 10 Jun 2026 00:57:25 +0800")
-References: <20260609165725.107484-1-houminxi@gmail.com>
-Date: Thu, 11 Jun 2026 09:44:57 -0400
-Message-ID: <f7t33ytfaxy.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1781185540; c=relaxed/simple;
+	bh=qudR4YOBjm4BjqJXpfuUPuDMGJQMgBi1fMXDfAiSiMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=joegxpgYYmQh5wOVakTs3R5/DSBDsmAc1kt1xtxERcQhpMgrudHS1xD+OuNvGj5XAptkhf9GcrA0lA+og5Ve8XIOo5M1RxhjtDsqwci7A7QKa2L9KFNcbTwrLSYlqOBRjJg7mWLZUS2j8mWEbdQSiIYBh6oRwKvDjJJt4XOS13U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oo2h4jTa; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B5A1F00898;
+	Thu, 11 Jun 2026 13:45:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781185539;
+	bh=BWFiD8Jh2uypsKglnxEKkvz9+2QdqGDxExTLoDKZmv0=;
+	h=Date:From:To:Cc:Subject;
+	b=oo2h4jTa3cQgJUjJa/E+d/IY646O4T/wfsttMjPOCDfOvOTrRFsOBEgC0S6aSLKQ6
+	 fm6rCOfaZvU/Rj6ExLoWNE9RQ0XGKMjYFCaxDnNAw2wg2JeRC1LWETXoItVK+5PkKm
+	 +dPQcBBq48FHhkJ+z/jTfHx8TZIxaE91qHZNu60K6OXu8UBwg48mHFQBtgfCsmvZUD
+	 WwzfHkcxA5daXolVB6uedJqWZx5Slt8qkiRRjBYDclgnStaG/Buhws6zzc1SuRzhZ+
+	 8HC5gWHYsfTaK5WF5I9HZKj9DGNh0hJkebs0xt47SmJn7hqLVbR+WK+mgoSQEwGDbb
+	 YYNgKPfKmha0w==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id CA6361AC56C6; Thu, 11 Jun 2026 14:45:36 +0100 (BST)
+Date: Thu, 11 Jun 2026 14:45:36 +0100
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <aiq8AHf4_SythYxR@sirena.co.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CjMwuXzXB/ALh7bF"
+Content-Disposition: inline
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-7.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298151-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298150-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:houminxi@gmail.com,m:netdev@vger.kernel.org,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:amorenoz@redhat.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:linux-kernel@vger.kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aconole@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sirena.co.uk:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 736CA6726D0
+X-Rspamd-Queue-Id: 7E86B672742
 
-Minxi Hou <houminxi@gmail.com> writes:
 
-> Add mod_flow() and the mod-flow CLI command to ovs-dpctl.py, exercising
-> OVS_FLOW_CMD_SET. Add test_flow_set which first modifies an existing
-> flow with new actions and verifies the change via traffic, then modifies
-> the same flow without actions and verifies the kernel handles the
-> no-actions case gracefully.
->
-> The no-actions path is unreachable from userspace OVS tools (dpctl
-> mod-flow requires actions) but reachable via raw netlink. This is the
-> code path where Adrian Moreno found a possible kfree_skb of ERR_PTR
-> when reply allocation fails after locking.
->
-> Make parse() skip OVS_FLOW_ATTR_ACTIONS when actstr is None so the
-> kernel enters the post-lock allocation branch in ovs_flow_cmd_set().
-> After the no-actions set, verify via dump-flows that the flow retained
-> its drop action.
->
-> Suggested-by: Aaron Conole <aconole@redhat.com>
-> Signed-off-by: Minxi Hou <houminxi@gmail.com>
-> ---
+--CjMwuXzXB/ALh7bF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Aaron Conole <aconole@redhat.com>
+Hi all,
 
+Today's linux-next merge of the net-next tree got a conflict in:
+
+  drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+
+between commit:
+
+  f2df54ddbfb04a ("net: txgbe: distinguish module types by checking identif=
+ier")
+
+=66rom the net tree and commit:
+
+  f67aead16e85f7 ("net: txgbe: rework service event handling")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --combined drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+index 8fc32df8e49a44,72712cee1ab834..00000000000000
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+@@@ -186,25 -186,21 +186,21 @@@ static void txgbe_get_mac_link(struct w
+  		*speed =3D SPEED_UNKNOWN;
+  }
+ =20
+- int txgbe_set_phy_link(struct wx *wx)
++ void txgbe_set_phy_link(struct wx *wx)
+  {
+  	int speed, autoneg, duplex, err;
+ =20
+  	txgbe_get_link_capabilities(wx, &speed, &autoneg, &duplex);
+ =20
+  	err =3D txgbe_set_phy_link_hostif(wx, speed, autoneg, duplex);
+- 	if (err) {
++ 	if (err)
+  		wx_err(wx, "Failed to setup link\n");
+- 		return err;
+- 	}
+-=20
+- 	return 0;
+  }
+ =20
+  static int txgbe_sfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
+  {
+  	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes) =3D { 0, };
+ -	DECLARE_PHY_INTERFACE_MASK(interfaces);
+ +	DECLARE_PHY_INTERFACE_MASK_ZERO(interfaces);
+  	struct txgbe *txgbe =3D wx->priv;
+ =20
+  	if (id->cable_tech & TXGBE_SFF_DA_PASSIVE_CABLE) {
+@@@ -271,7 -267,7 +267,7 @@@
+  static int txgbe_qsfp_to_linkmodes(struct wx *wx, struct txgbe_sff_id *id)
+  {
+  	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes) =3D { 0, };
+ -	DECLARE_PHY_INTERFACE_MASK(interfaces);
+ +	DECLARE_PHY_INTERFACE_MASK_ZERO(interfaces);
+  	struct txgbe *txgbe =3D wx->priv;
+ =20
+  	if (id->transceiver_type & TXGBE_SFF_ETHERNET_40G_CR4) {
+@@@ -335,7 -331,7 +331,7 @@@
+ =20
+  int txgbe_identify_module(struct wx *wx)
+  {
+ -	struct txgbe_hic_get_module_info buffer;
+ +	struct txgbe_hic_get_module_info buffer =3D { 0 };
+  	struct txgbe_sff_id *id;
+  	int err =3D 0;
+  	u32 mod_abs;
+@@@ -357,16 -353,18 +353,16 @@@
+  	}
+ =20
+  	id =3D &buffer.id;
+ -	if (id->identifier !=3D TXGBE_SFF_IDENTIFIER_SFP &&
+ -	    id->identifier !=3D TXGBE_SFF_IDENTIFIER_QSFP &&
+ -	    id->identifier !=3D TXGBE_SFF_IDENTIFIER_QSFP_PLUS &&
+ -	    id->identifier !=3D TXGBE_SFF_IDENTIFIER_QSFP28) {
+ -		wx_err(wx, "Invalid module\n");
+ -		return -EINVAL;
+ -	}
+ -
+ -	if (id->transceiver_type =3D=3D 0xFF)
+ +	if (id->identifier =3D=3D TXGBE_SFF_IDENTIFIER_SFP)
+  		return txgbe_sfp_to_linkmodes(wx, id);
+ =20
+ -	return txgbe_qsfp_to_linkmodes(wx, id);
+ +	if (id->identifier =3D=3D TXGBE_SFF_IDENTIFIER_QSFP ||
+ +	    id->identifier =3D=3D TXGBE_SFF_IDENTIFIER_QSFP_PLUS ||
+ +	    id->identifier =3D=3D TXGBE_SFF_IDENTIFIER_QSFP28)
+ +		return txgbe_qsfp_to_linkmodes(wx, id);
+ +
+ +	wx_err(wx, "Invalid module\n");
+ +	return -EINVAL;
+  }
+ =20
+  void txgbe_setup_link(struct wx *wx)
+@@@ -519,6 -517,7 +515,7 @@@ int txgbe_phylink_init_aml(struct txgb
+  	err =3D phylink_set_fixed_link(phylink, &state);
+  	if (err) {
+  		wx_err(wx, "Failed to set fixed link\n");
++ 		phylink_destroy(phylink);
+  		return err;
+  	}
+ =20
+
+--CjMwuXzXB/ALh7bF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoqvAAACgkQJNaLcl1U
+h9Catwf/WNKXkugbbavvlvBd5Ln993Appm77Ur2DmtvQLVxj8zVGNQwF8JD3P2RU
+tlNvLVfywV8gbCsyhVprYoNDQcB/zI1iUL1nUo3fBwdV0Ycnb77XvFgNVvy+KwBu
+qnQxHoxp2Z34iWa0qPs1zjc+XCUm6QM8kHwfZNBod6U/mTO3yzD+z7NxLQRYCnQC
+b4y3UCekkYPmnKwq8vU6uWmQaj3n4Qy5NS1N76OebffkpvG6Hrp6QlVFCF2QHS91
+RzHFPTJ4IiimznNIj+R/z7AfuQ6ePRp57737I2sN9ezkiDpqGZM6YKqLSunvXev/
+wncQVWVuGbY5ac8YDIKjg1DeKZVI7g==
+=dgus
+-----END PGP SIGNATURE-----
+
+--CjMwuXzXB/ALh7bF--
 
