@@ -1,91 +1,103 @@
-Return-Path: <netdev+bounces-298051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298052-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SBKpM4+GKmoFrwMAu9opvQ
-	(envelope-from <netdev+bounces-298051-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:57:35 +0200
+	id dqr6DayGKmoLrwMAu9opvQ
+	(envelope-from <netdev+bounces-298052-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:58:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2142C670A07
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 874F4670A0C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:58:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ti.com header.s=selector1 header.b=xYV1EY0D;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298051-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298051-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=ti.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=TGmri1T2;
+	dkim=pass header.d=redhat.com header.s=google header.b=Vh5hTEfg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298052-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298052-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B13413045473
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:52:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D8243044131
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D681A3BCD07;
-	Thu, 11 Jun 2026 09:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4A13BE15D;
+	Thu, 11 Jun 2026 09:53:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010059.outbound.protection.outlook.com [52.101.85.59])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E97D371D16;
-	Thu, 11 Jun 2026 09:52:12 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781171533; cv=fail; b=AqbWQCGncqCX/a9RMOBJa3UCaB0YGFDEwVoMcv046ynHYXO9IN+s2vjmOrkiaFnOko7tXhkZ21x/9vzb1BKXzAtQAXsrva164+sV5jETIeuH0iL0ladcDHxyqAM4PIS7ysGO6nVtP9KoriruxF+5aNTrirVAETLspgpGMcdqH2U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781171533; c=relaxed/simple;
-	bh=iv242MlifAJ1cph5FO5KLVbjY0qvk/Vqj0FVJHvrUac=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=prhraR3nNMWncVgM0JftdH/g6m74iG/hUhDooaeoMy4U5OFxrTcUro82Ssg3BVM7z6O2tcuHz2KOCeyMCeTJoZ9JUAUrp1MrBlV8F41RzWw572rEfl6FK9ic/cOhGdFQl5gNLuULW8geJeAy7HAoqxeEm/iltzry4ajsIT9QvJg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=xYV1EY0D; arc=fail smtp.client-ip=52.101.85.59
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MvZxCl9cJ8A+Xa0S1aVYO0ZONrYXnNMreweqJeDRq/YWGSmzrAu9bSahmZjhFq2Evr4fMziECwKHchYumabLX1vQemnJL2Q04xMFEidYTfMfyvlH6I8tgtpeDJ9a7cqBcNl6mSu6Kj1drbXeFkXGnq7v1DlxWe0McsRsc+UV4NAfV/Cdxx66OWuhiDlA4pSjjWJ3J00GY5HbSnAzpFpt25HrS1Ez/xxVr3n+0UvIYll71GymR+6oviJS1PaX/ImJWBi1pfwsMX8N+cI9KKaeOs1vgm3QewOivlqgz/LRvyi/0k9vERRvJkj/M5HWMmcHYmCODys92SgUYAqATlnRHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JG9GkbmZWeHeIenYh+zVZ413zV3V+oqy0gR1VcVBX1A=;
- b=oqxVCj48Wr5dmxTYrqZg1cfml3zenW1qPuoZsQHnSwtiq/vqC7jzLERAsx+JcS+8yNIMC2d93+iqwopBm+JXrPbOrdTmuajme2Z4k7WlNvT+NYbw9riB8WziE6tk4ol17+I6Ckq4xlmlJ4zVvX+VDL+2hwO5ethFJ4y2+J+gY89IJnkOJP1cIRaEZaXk+cp9YggRwgxPZvWcaPqePgnY5i3R7Oby8Z5pQYtfdqXhOhGr6vrpwqkx960pRMrQzKm2bZjets04GOubTsrE501/B07F/+wniaZlVfQrjHdRZWrnAFME7zkZUJbgJ7hlN6aS3J1gn/Q/Og5I0ouER2dlaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JG9GkbmZWeHeIenYh+zVZ413zV3V+oqy0gR1VcVBX1A=;
- b=xYV1EY0DBC/ZaA0jLntmUn2q6IKn5H+fgYGPZCS359iiQa+Z0vXx9PdRWunm0QIGLv7+IgiIODXhaEljv3jlT54iDliUOzrRyfociIAlR6eHmH+z3/HMj+DCUnRPq2Tn18ggiH5/6GSY+9Saug9iNgRM/xR3EycgONTgF9llmRo=
-Received: from BN9PR03CA0437.namprd03.prod.outlook.com (2603:10b6:408:113::22)
- by DS0PR10MB6079.namprd10.prod.outlook.com (2603:10b6:8:c9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Thu, 11 Jun
- 2026 09:52:08 +0000
-Received: from BN1PEPF00004686.namprd03.prod.outlook.com
- (2603:10b6:408:113:cafe::1c) by BN9PR03CA0437.outlook.office365.com
- (2603:10b6:408:113::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.11 via Frontend Transport; Thu,
- 11 Jun 2026 09:52:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
-Received: from lewvzet200.ext.ti.com (198.47.23.194) by
- BN1PEPF00004686.mail.protection.outlook.com (10.167.243.91) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.113.7 via Frontend Transport; Thu, 11 Jun 2026 09:52:08 +0000
-Received: from DLEE210.ent.ti.com (157.170.170.112) by lewvzet200.ext.ti.com
- (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Thu, 11 Jun
- 2026 04:52:07 -0500
-Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE210.ent.ti.com
- (157.170.170.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Thu, 11 Jun
- 2026 04:52:03 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE207.ent.ti.com
- (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
- Transport; Thu, 11 Jun 2026 04:52:03 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 65B9puqs1627783;
-	Thu, 11 Jun 2026 04:51:57 -0500
-Message-ID: <6367ffa0-5faf-4deb-8a4b-18b53ef53c56@ti.com>
-Date: Thu, 11 Jun 2026 15:21:56 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5783A1681
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 09:53:31 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781171612; cv=none; b=BxWM9OWbD6aMlWGSPIkniDskBfQTpCsY6SwT85yNW6K7yAZes6SGSXtWpLeQ0AR9VDqbUZfoqb/kCI79pOcHHnEguUffr8i79oGrCPUk6ikbW6bgF/mQr6WxXHXD+kOW26J8GX0f5yn3ypTAkG8H3CebdKFvDAWQHq1G9uKKnww=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781171612; c=relaxed/simple;
+	bh=2bnwAtJ2JBPzDaUa7HVCgHnsqqXgYo0Vr7O5jEGrYEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NP1DVA8GBvxam2VPQ/bqYchVmQVl3bYE/CI2z4We+ODZfZIWwXgBzdQOxAuhZRHuq9Tx8Zj8ZnHld/WjX8DAZft6vRrNOiragWqiTvR4xr59GyZMJV217MJN9ctOuuMb4z56OgarQRHC+/YSgnbvu6NDOrW5Q6dHcibCmJdF8Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGmri1T2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vh5hTEfg; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781171610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DpIAvaC9YlejOVcqjv2Fkrd3r+oiisU7g3ldjkjJ8jc=;
+	b=TGmri1T2WgmPtjTBrsLAoVKJBOtHwr2Zb+vtrnrWq9W0K4yjkXlEnjTiaZg4xPoASgdsWQ
+	jlpxaOiG7z1qo9ku1bYepm3/hvI9iwRCCfViDn4WhaaDOSQxCv/1AE8hGGeFa79ae09d+s
+	7yL7QnxZ6HpWQVey2oDUb+bTOBbLUNA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-53-o_PZpW1jPTeZTXTxjbAZJA-1; Thu, 11 Jun 2026 05:53:29 -0400
+X-MC-Unique: o_PZpW1jPTeZTXTxjbAZJA-1
+X-Mimecast-MFC-AGG-ID: o_PZpW1jPTeZTXTxjbAZJA_1781171608
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-45efb6e60e4so6622376f8f.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 02:53:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1781171608; x=1781776408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DpIAvaC9YlejOVcqjv2Fkrd3r+oiisU7g3ldjkjJ8jc=;
+        b=Vh5hTEfgNmqLPmRqWC2fivFVDWqCvYfj6rctrhZnIKfs1IYAsrsVTOuX3q4gs0jnhR
+         GzPdrMQ1ziQL6PeoYJYsf0sXhbVh6hSxvKRVqFkcwG8vOnH03JR1HcMBqyLf/vlK6uFq
+         Jf4RxFnY1Od48L+iRxiH/Dgqjwe7agV2IXiKLJL8RDBK2RLAWs2WDdI1jmNTR/IFtjTy
+         0J8j6AzptoNMX0Ho95JzKzyoJtN+v3imMLD3GA8di7LGgkqOaivErzBCYwERWKeHavnG
+         hli5ZqCXxZRLPYQCTXVx+alkN/t4cbn9khd50iOTopfPIPGcCIWKRtpYc5/XjvHlefHM
+         ArXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781171608; x=1781776408;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DpIAvaC9YlejOVcqjv2Fkrd3r+oiisU7g3ldjkjJ8jc=;
+        b=X8j//KkDEvZidoAmbE4hBVQII9182wLGQxMmr/McBjGOX7/FsRLEdr4EMcyvfbpTx6
+         +RTRiCc6UtIi4b/uhZV/Meg2gKVoiHhQumFmXtDBN2RCStEr/kLrK8tYHBWXe4/MYfC4
+         cP/d4U2UTOlqYP5W4AtwBjSUfph1QlRsODXNKn+4p7QWp0LDw0h/XagNBHYXI0UvmaDt
+         tp3QDzeZCLxgIHOXM94JbXdr0BHBzOhFh3Xg5UtODcpQeYza/J6gNDtTkJOTLifeDLoV
+         B+kYYU149poOWs82HdZ3ZF+iyaSULdbjfUBfF0Y4vOfyoEhnSHUZamuwLTkB2CES8Pr2
+         rGaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/SYTafTu/tAMO4tooElXy2K8muASlUeSLbzFaOfH/akeSK+wF/LvbaAPg3mt/xD/ZYvifI0r8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWRSi3gXcJqjLidsaFeINqoh80klxDCdIRMGeT/CsP0A9quJ9X
+	5GAsXXgA6WGHIkz9VeX6qnDU4IeJV8oAibzY7mu7AxmvBqWxwy1SczMgZ8LpQzQn9XUjqJPEQcL
+	48oYQQFbt4bQREZoCb0GL2kEuRlvHeycqT4MwIEgxdaJ39bhYuCP76/XQjA==
+X-Gm-Gg: Acq92OErNG8s2yjgWK6ME18F5t4Ty3d26phnZluRO7tm3YRjSj9JMWlal88Uo6dq3Kj
+	9iGBiuf5+mRFeT6tm0s0DnWMRDZK+fT/avGwhbp+PcdA57wbOK108Lq6taF6kXsGOgGO8tYbolP
+	/xf22VaK+2KnylLIR/H+rJgZEoOxedp299zEYhPSldl7GW3nmtWFi5CJIVgZOW0lpTjH8zzKcUr
+	HK7ga2tbPJY1rt48Ul/BD+pDchhblgPh0oizHjk5rmdnbEUPj4AmJv1M3QzLS3XH6OLXKw+dYOg
+	/SZBJFR5xZVzAkNT2p3rjVzFd6uHPn64MvmV1DGVGz8EF4sMZvLOFVB7dcTatyHtdXxZiQJUh4g
+	+iZK1nr41jHoTt/DKdpzTY7OD99aVlKqvnwg4eEWvCHqMxRqZFbtdEOm1kKjEJ73n5g==
+X-Received: by 2002:a05:600c:4e04:b0:490:b9d3:a9ce with SMTP id 5b1f17b1804b1-490e5640aa8mr27826875e9.30.1781171608321;
+        Thu, 11 Jun 2026 02:53:28 -0700 (PDT)
+X-Received: by 2002:a05:600c:4e04:b0:490:b9d3:a9ce with SMTP id 5b1f17b1804b1-490e5640aa8mr27826445e9.30.1781171607871;
+        Thu, 11 Jun 2026 02:53:27 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.93.44])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46059346676sm17802230f8f.26.2026.06.11.02.53.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jun 2026 02:53:27 -0700 (PDT)
+Message-ID: <27897949-2991-4963-96d4-6d011183cce9@redhat.com>
+Date: Thu, 11 Jun 2026 11:53:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,127 +105,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/3] Add standard stats for HSR/PRP
-To: Simon Horman <horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>, Roger Quadros <rogerq@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Jacob Keller <jacob.e.keller@intel.com>, "Meghana
- Malladi" <m-malladi@ti.com>, David Carlier <devnexen@gmail.com>, "Vadim
- Fedorenko" <vadim.fedorenko@linux.dev>, Kevin Hao <haokexin@gmail.com>,
-	Himanshu Mittal <h-mittal1@ti.com>, Hangbin Liu <liuhangbin@gmail.com>,
-	Markus Elfring <elfring@users.sourceforge.net>, Fernando Fernandez Mancera
-	<fmancera@suse.de>, Jan Vaclav <jvaclav@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	"Felix Maurer" <fmaurer@redhat.com>, Luka Gejak <luka.gejak@linux.dev>
-References: <20260608100930.210149-1-danishanwar@ti.com>
- <20260610184737.GO3920875@horms.kernel.org>
+Subject: Re: [PATCH net] ip6_tunnel: do not use dst6_mtu() in ip4ip6_err() and
+ ip6erspan_tunnel_xmit()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20260609091337.2672441-1-edumazet@google.com>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20260610184737.GO3920875@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20260609091337.2672441-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004686:EE_|DS0PR10MB6079:EE_
-X-MS-Office365-Filtering-Correlation-Id: 197ada4a-04d3-4bd7-7eed-08dec79f1a0b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|36860700016|376014|1800799024|23010399003|82310400026|4143699003|56012099006|5023799004|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	xCx0xotw808SdLy7DgzzQJJcweyZh2tuN1htQTIw6vBGVQBZq3Oe9Ve7l3lXiqxbXhVIl1LU8jCMVTmxH1k7hfHOU/b3q1qQN7lFtRiR+uiBGozYZoQE7SecOSjLJZXVBc0aBVghTLHA6ej/CkYbYd6AIJOXLMTUbm1E4lxK4OUzk6AJVi5kUI5xuci2WOtW+8w8sYLvheNUamhqGHiH9bNkj7cnzZ7JePvJ0Ao0DAXNuvCWLLPtuJwsMZseBMHLVdhp2VanAf0CjK4aPtD8M+A2KMw+SLcXpGv3BRZ2bHwUHpxofGq5hFNT3Wzp9+Vd0mZVRBLQ2ONWQHfO9sydcszIGIHwNY2zkiBloluXGLmBBqLKkHsVRLQxV5UkcHUUu7AON0N6+8eCePuP5dFKtL3jbHfRTH8cJfaGAad1BJYmzpZ6r3UVifGvLSvYIWEROGAlyCcbw28IAsyfdEFmeRS2gP3aK8AY+feQUK4WVgFjNVDIsm86BXPILHxDlqNQZOhoUGCm15z2csqCY+ufLzbJ1vAeDdy7DYYdbuKcN1vW3o83TAyMFCd/ZWXIXmXhrP7YJR+5iMdYdntR5WwqcFqkSu+dqm6ueiRfJ9IF68GCGfAu+6p0BqnfsrPtNdpiizhIbdiUycGOGu1WMyLyF96kvDiyKIy+VTiXCsI5lcnEkSeGlttXbDjJ88FU51MS
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(36860700016)(376014)(1800799024)(23010399003)(82310400026)(4143699003)(56012099006)(5023799004)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	4DiNlO7ygQZDrVs8Qo58TcdL2FHUhfrHAVlpfUprD/4ma3RS9OB8OaTAZz0QbtjmbEFPBjuBvd6aHg7TgxmaB7gx+65uhMApFdMCWpiXeu+I6jhqfqCN1QJRa9yg4z9WjJc0cVW4ysVpVL/DRfP1D5lkpUuyHzdoFdib12qzf9gZBjA4lWBvdQgo+nQXrZy+p9wbzRT6ud2i4jVe/fa8mHF+VYWuC5DrFiUhWl7nwSBPOSccRpq3CIbab4F3iEhTzsKOmd883glCg2MX0t3fB9Wtc0IE604uNLFQVhAV5FW0Q/3J8TqmQzZo6yw6/MUc+7GzcJHdExJ5ITJFkrDHwyE3mXoVBjhiyzfhn5JFhGp8dmTNTXHMNvVDqS4/Cmrh5+/RKtr2X9R9IJWdwkMk1f3yqNMvSwaOy1BHQJGzILet7ty/z28PJTzq9Jyolkw+
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2026 09:52:08.2605
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 197ada4a-04d3-4bd7-7eed-08dec79f1a0b
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004686.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6079
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298051-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-298052-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,linux.dev:email,vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ti.com:dkim,ti.com:mid,ti.com:from_mime];
-	FORGED_SENDER(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:rogerq@kernel.org,m:andrew+netdev@lunn.ch,m:jacob.e.keller@intel.com,m:m-malladi@ti.com,m:devnexen@gmail.com,m:vadim.fedorenko@linux.dev,m:haokexin@gmail.com,m:h-mittal1@ti.com,m:liuhangbin@gmail.com,m:elfring@users.sourceforge.net,m:fmancera@suse.de,m:jvaclav@redhat.com,m:netdev@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:fmaurer@redhat.com,m:luka.gejak@linux.dev,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,lunn.ch,intel.com,ti.com,gmail.com,linux.dev,users.sourceforge.net,suse.de,vger.kernel.org,lists.infradead.org];
-	DKIM_TRACE(0.00)[ti.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danishanwar@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2142C670A07
+X-Rspamd-Queue-Id: 874F4670A0C
 
-Hi Simon,
-
-On 11/06/26 12:17 am, Simon Horman wrote:
-> On Mon, Jun 08, 2026 at 03:39:27PM +0530, MD Danish Anwar wrote:
->> Add standard stats for HSR / PRP. This series was initially adding HSR/PRP
->> related stats for ICSSG driver. Based on maintainers' comments on v2 I am
->> now adding support to dump standard stats for HSR/PRP.
->>
->> The drivers which support offload can populate these standard stats.
->>
->> This series only implements offloaded stats. For software-only interfaces
->> Felix Maurer had said he will do it later [1]
->>
->> v2 https://lore.kernel.org/all/20260514075605.850674-1-danishanwar@ti.com/
->> [1] https://lore.kernel.org/all/ag87pBZfOyccPZTc@thinkpad/
->>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Felix Maurer <fmaurer@redhat.com>
->> Cc: Luka Gejak <luka.gejak@linux.dev>
+On 6/9/26 11:13 AM, Eric Dumazet wrote:
+> This is a minor performance / conceptual fix.
 > 
-> Hi MD,
+> 1) ip6erspan_tunnel_xmit()
 > 
-> There is AI-generated review of this patch-set available on both
-> https://sashiko.dev and https://netdev-ai.bots.linux.dev/sashiko/
-> I would appreciate it if you could look over that with a view
-> to addressing any issues that directly affect this patch-set.
+>   ERSPAN tunnel can mirror both IPv4 and IPv6 traffic, skb
+>   (the packet being mirrored) can be an IPv4 packet,
+>   and thus dst can be an IPv4 destination entry
+> 
+>   Use dst_mtu() which contains generic logic for both families.
+> 
+> 2) ip4ip6_err()
+> 
+>   skb2 has been prepared as an IPv4 packet, and its destination
+>   is an IPv4 route.
+> 
+>   dst6_mtu() is optimized for IPv6 destinations and uses INDIRECT_CALL_1
+>   to call ip6_mtu() directly if the ops match.
+> 
+>   We should use dst4_mtu() instead.
+> 
+> Fixes: b40f0130a23b ("ipv6: use dst6_mtu() instead of dst_mtu()")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I did look at the AI-generated reviews. The review on Patch 1/3 and 3/3
-seems like a real issue to me which I have fixed. The reviews on patch
-2/2 is not related to the series.
+Any strong opinon vs redirecting this one to the net-next tree? We are
+trying (with limited success :( to keep the amount of changes in net
+under control, and this looks like a minor performance optimization to me.
 
-I have posted v4 with this fix
-https://lore.kernel.org/all/20260611095035.852370-1-danishanwar@ti.com/
+If there is agreement, I can apply the patch there stripping the fixes
+tag without a repost.
 
--- 
-Thanks and Regards,
-Danish
+Thanks,
+
+Paolo
 
 
