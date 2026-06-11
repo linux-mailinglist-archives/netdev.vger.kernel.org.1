@@ -1,447 +1,199 @@
-Return-Path: <netdev+bounces-298295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NjJvN3sBK2p91AMAu9opvQ
-	(envelope-from <netdev+bounces-298295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:42:03 +0200
+	id 3NeTEBQDK2rs1AMAu9opvQ
+	(envelope-from <netdev+bounces-298296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:48:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F70674883
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:42:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A17A67490C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:48:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=p9yJaWXM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298295-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298295-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=ixit.cz header.s=dkim header.b="j/IJ8Y6d";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298296-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298296-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=ixit.cz;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E646B3009E25
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:41:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8055D33D3CE3
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2E74D2EF6;
-	Thu, 11 Jun 2026 18:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ADA4D8D84;
+	Thu, 11 Jun 2026 18:44:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ixit.cz (ixit.cz [185.100.197.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09054D2EC1
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BFC4D2EEE;
+	Thu, 11 Jun 2026 18:44:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781203318; cv=none; b=pj4UnvFochvt6gpVCESPwOVGfJ9Ig9jHGmUgpq2EMDEhFqOmA0rYaY2BTcvplHF5lBmvMcPCXHJWhwfPOYALN4Le0AzzjEnbxk3sAOEQ7SgC8ww6qTnOnVFuB6+6gWG9cz5ODJk+dNBDwxs/Grc82+YkZmLhU5qr9tfqjrsi09A=
+	t=1781203486; cv=none; b=U5K2571lAjtpRmYIpr4IqVUrZXnDWQCR4q+NiAQ6AqWOXRzQgKvdSnoWmEApybdft3uH24I2LtSYGU6MYbOI80tX2bXJ8QVaAXsLZzIHErZbLMnQSDYpnnLjTIqSAiYbfg8zOBS59oF1WRHhNZRwm9pz0IKYZrT+DnXQIWw4c88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781203318; c=relaxed/simple;
-	bh=IkEHZPSDtCkUJmB9jlcPSk6gUtKj+1tZjpR+VAgd3ss=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=BfB06EcfUJLZQYp4Q3a81RRA+FWAV/y+tOcqgn6uzPRbtMB4Yx0wwOOdy1zlIYDZJ52YDTB8S+/wMaN3FqvqpZguOChIen7GDSj5doczVvZ56RpCAI1wvY2X/R/s/PzVTCY2BUDdQX0Vz1l1o8sunNK5j+whv8YVW8IxbpOjAxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=p9yJaWXM; arc=none smtp.client-ip=74.125.82.175
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-304c520fe9aso464256eec.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 11:41:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781203316; x=1781808116; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F7QM0qmxmtR/YrFr0aJ+thth8ELg/lCSgHx9ugycN6k=;
-        b=p9yJaWXMDd3WP1Cb4U5SZU9NgtNRsl/G/EZ0l8KOhMuETmjCdg0olBowjrDxmpNkXi
-         fvxENa5uPfRyidx/Fm3oFDnsZWQqB7IBY1sneQ4na2v9H4592QND9C7z3ofI2W3zvTlZ
-         /MzaC9QaGzs6LKjKblop0m7lFXI/l3hZvl5+aqL8pXzmSv2hD7bt9vxwQRnsCfs52+dB
-         RAyw1ggrftHM/lmA4qLft4PVabqLXUjYB0PVHig7QIk36U6mAeYQP/KuDJAvLfpyP3tP
-         KOL/SoLmd7jzeTkBZ9dAez0sxCvC/3qTfTL994vV3ypcsZOQdLKlerugSAWF9aOt/6EG
-         aJvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781203316; x=1781808116;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F7QM0qmxmtR/YrFr0aJ+thth8ELg/lCSgHx9ugycN6k=;
-        b=Zy0G4kFJddruIpHzRGpfPOjQ9oYQg/BofvpkAzgPT2L15wmDyUBjZuezM38iQ7JaJI
-         4V42vLHazgfN0/JYtOtbyss55k/KLmMvsJaV4+YHFOAPfwdhkQmKd0oS1s3kOo22BWSK
-         JMho9xgQhSdLgTJJYeUYGAhMAVqmM09t97lADCd/0MVPiE7K+5sPNFpjBcWmIAWUMbM+
-         uaPvU6qhP2OGSXDaVYWEpoOrOBSiIjwVJRT5wnNY82hPIAEsZTdHZO1jKq9ZV6BPOXEr
-         J0JKe6UJxAiwuEC5Aehvr0lMVAXCzxYbmjdwFL3wl7wSdRzU1KR1kUgczd4E8S5LXyUX
-         dZnw==
-X-Forwarded-Encrypted: i=1; AFNElJ+yWSPqSeDJKNZMEgxbVVY2b2Hl+7kBYMVvqZCNHp6fTVazQjzX9YNvVhL0A+nA0rxtODrnmnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7ZTVNWhLYwZbEn+hqJadhaHXTzVGPnjgzqeH2uv5eajF6joZ6
-	QcguzKgwXp4p7yHJ522Qo4iCFoyV4deJELAp/6KD9LRdBe/RUhE7dwrL6ExcHloHPqI=
-X-Gm-Gg: Acq92OGDCaK5gIvuHO3gfzg1ZnAFtAXz0c2jWEmEMSaq6zxhg6G0esZC9bKQtF2qPkc
-	ciFmTSK4KcIPELjctJEIZuV8NbExp697d133gEPch7ay2dSEAvijxVKllplt/igyOFWtnku4vuH
-	33U05yz36pQzoYJ4dIZ9JjLycE5jFRiT65ZWwZ6TxHMJZm4t9N6Za2c3n+2j/Eqbta6UD8boYQy
-	y+eqwU09z8HwLsDLeYuLAQdeQF9CnZuHUQPGtPO/dDp4UHi2ib/+yL1iHCjCUp/RKpzfsF1NVDN
-	Z9nDxik9hrPz9NVLD5bdpHb7jGYc5q8Wy6QiCBG6ODhiMz5NxRsn/BQacxd4d0N2/iroehv6uun
-	xzhiI2ob8wq3rWfRituNx5WqWCGT1WM+CvDQXZ54CxRyQ4AG8Zm30CcG6jr2AAwgvxDXVvReAE0
-	4RfOvM
-X-Received: by 2002:a05:7300:2146:b0:307:26a3:75e4 with SMTP id 5a478bee46e88-3080461f82cmr3319194eec.4.1781203315661;
-        Thu, 11 Jun 2026 11:41:55 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:600::9f35])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30806c2f420sm2775011eec.6.2026.06.11.11.41.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 11:41:55 -0700 (PDT)
+	s=arc-20240116; t=1781203486; c=relaxed/simple;
+	bh=vpYeocyGmRFiHaNqwSQP/+Q2Os/MyYEsFV8J3j1LZcY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=HcUVQuB4VUjr5Cbx85iAwPFXs6Ow3NpNEjAFKk7pLv66SjxZHL/LlHJPq8G2b4Ks2E92GGACd00EKGzU94/P79W8vT0KGg/m2wsiXYoydNuFEUjXv27rRsrNIY9TZuHKCUaqWOk/ICdaeWQKYkGl/AzSyNNM7b/EVfgcVme5lPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=j/IJ8Y6d; arc=none smtp.client-ip=185.100.197.86
+Received: from [10.0.0.200] (unknown [10.88.125.21])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 0C6DE5340A5A;
+	Thu, 11 Jun 2026 20:44:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1781203475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+	bh=y1XobBV70r67Ig1mkengsSuY3Jawxb6BXAEw0Sl2cGo=;
+	b=j/IJ8Y6dQH/GRMEdOxOteP9Xjx4nD89a2OksKEVbcsnTR8cUw6WCe8bxdR9RIJCuDSpkKt
+	owl9x00SNWidXmKBHmBwdZ+MKef5LGUD3EwcPnxKK+wO6ua2qVcmZ9LYvHujbVpHWZDrty
+	Yu7obr97BR791zvrvU05ickhz/mc8BI=
+Message-ID: <1aed7555-3d24-413c-b284-bc85fdd33055@ixit.cz>
+Date: Thu, 11 Jun 2026 20:44:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 11 Jun 2026 14:41:52 -0400
-Message-Id: <DJ6FVL7EYA5O.2ZU3PP948P777@etsalapatis.com>
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, <bpf@vger.kernel.org>
-Cc: "Zhang Cen" <rollkingzzc@gmail.com>, <stable@vger.kernel.org>, "Han
- Guidong" <2045gemini@gmail.com>, "John Fastabend"
- <john.fastabend@gmail.com>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Martin KaFai Lau"
- <martin.lau@linux.dev>, "Alexei Starovoitov" <ast@kernel.org>, "Andrii
- Nakryiko" <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>,
- "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Song Liu" <song@kernel.org>,
- "Yonghong Song" <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>,
- "Emil Tsalapatis" <emil@etsalapatis.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Jakub Sitnicki" <jakub@cloudflare.com>, "Shuah
- Khan" <shuah@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Sechang Lim" <rhkrqnwk98@gmail.com>, "Ihor Solodrai"
- <ihor.solodrai@linux.dev>, "Cong Wang" <cong.wang@bytedance.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH bpf v2 4/7] bpf, sockmap: keep sk_msg copy state in sync
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
- <20260611123538.156005-5-jiayuan.chen@linux.dev>
-In-Reply-To: <20260611123538.156005-5-jiayuan.chen@linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ oe-linux-nfc@lists.linux.dev
+From: David Heidelberg <david@ixit.cz>
+Subject: [pull-request] NFC updates for net-next 2026-06-11
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[ixit.cz,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[ixit.cz:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:bpf@vger.kernel.org,m:rollkingzzc@gmail.com,m:stable@vger.kernel.org,m:2045gemini@gmail.com,m:john.fastabend@gmail.com,m:daniel@iogearbox.net,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298295-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	DMARC_NA(0.00)[etsalapatis.com];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:oe-linux-nfc@lists.linux.dev,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[david@ixit.cz,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298296-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,iogearbox.net,fomichev.me,linux.dev,kernel.org,etsalapatis.com,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@ixit.cz,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ixit.cz:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:email,etsalapatis-com.20251104.gappssmtp.com:dkim]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,codeberg.org:url,ixit.cz:dkim,ixit.cz:mid,ixit.cz:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8F70674883
+X-Rspamd-Queue-Id: 8A17A67490C
 
-On Thu Jun 11, 2026 at 8:34 AM EDT, Jiayuan Chen wrote:
-> From: Zhang Cen <rollkingzzc@gmail.com>
->
-> SK_MSG uses msg->sg.copy as per-scatterlist-entry provenance. Entries
-> with this bit set are copied before data/data_end are exposed to SK_MSG
-> BPF programs for direct packet access.
->
-> bpf_msg_pull_data(), bpf_msg_push_data(), and bpf_msg_pop_data()
-> rewrite the sk_msg scatterlist ring by collapsing, splitting, and
-> shifting entries. These operations move msg->sg.data[] entries, but the
-> parallel copy bitmap can be left behind on the old slot. A copied entry
-> can then return to msg->sg.start with its copy bit clear and be exposed
-> as directly writable packet data.
->
-> This corruption path requires an attached SK_MSG BPF program that calls
-> the mutating helpers; ordinary sockmap/TLS traffic that never runs
-> push/pop/pull helper sequences is not affected.
->
-> Keep msg->sg.copy synchronized with scatterlist entry moves, preserve
-> the copy bit when an entry is split, clear it when a helper replaces an
-> entry with a private page, and clear slots vacated by pull-data
-> compaction.
->
-> Fixes: 015632bb30da ("bpf: sk_msg program helper bpf_sk_msg_pull_data")
-> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-> Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
-> Cc: stable@vger.kernel.org
-> Co-developed-by: Han Guidong <2045gemini@gmail.com>
-> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
-> Signed-off-by: Han Guidong <2045gemini@gmail.com>
-> Signed-off-by: Zhang Cen <rollkingzzc@gmail.com>
+The following changes since commit 518d8d0199538a4d6d5e51064044ece71e0c42e7:
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+   net: sched: avoid printing uninitialized link speed (2026-06-11 15:44:55 +0200)
 
-There's a bunch of nits here in terms of complexity but the fix is correct
-and considering how many reports are flying around for the same helpers
-it's iom better to just get them fixed asap.
+are available in the Git repository at:
 
-> ---
->  net/core/filter.c | 88 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 83 insertions(+), 5 deletions(-)
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 6e345ca65ca14..e35e681a15dca 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2654,6 +2654,38 @@ static void sk_msg_reset_curr(struct sk_msg *msg)
->  	}
->  }
-> =20
-> +static bool sk_msg_elem_is_copy(const struct sk_msg *msg, u32 i)
-> +{
-> +	return test_bit(i, msg->sg.copy);
-> +}
-> +
-> +static void sk_msg_clear_elem_copy(struct sk_msg *msg, u32 i)
-> +{
-> +	__clear_bit(i, msg->sg.copy);
-> +}
-> +
-> +static void sk_msg_set_elem_copy(struct sk_msg *msg, u32 i)
-> +{
-> +	__set_bit(i, msg->sg.copy);
-> +}
-> +
-> +static void sk_msg_clear_copy_range(struct sk_msg *msg, u32 start, u32 e=
-nd)
-> +{
-> +	while (start !=3D end) {
-> +		sk_msg_clear_elem_copy(msg, start);
-> +		sk_msg_iter_var_next(start);
-> +	}
-> +}
-> +
-> +static void sk_msg_sg_move(struct sk_msg *msg, u32 dst, u32 src)
-> +{
-> +	msg->sg.data[dst] =3D msg->sg.data[src];
-> +	if (sk_msg_elem_is_copy(msg, src))
-> +		sk_msg_set_elem_copy(msg, dst);
-> +	else
-> +		sk_msg_clear_elem_copy(msg, dst);
-> +}
-> +
->  static const struct bpf_func_proto bpf_msg_cork_bytes_proto =3D {
->  	.func           =3D bpf_msg_cork_bytes,
->  	.gpl_only       =3D false,
-> @@ -2692,7 +2724,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg,=
- u32, start,
->  	 * account for the headroom.
->  	 */
->  	bytes_sg_total =3D start - offset + bytes;
-> -	if (!test_bit(i, msg->sg.copy) && bytes_sg_total <=3D len)
-> +	if (!sk_msg_elem_is_copy(msg, i) && bytes_sg_total <=3D len)
->  		goto out;
-> =20
->  	/* At this point we need to linearize multiple scatterlist
-> @@ -2738,6 +2770,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg,=
- u32, start,
->  	} while (i !=3D last_sge);
-> =20
->  	sg_set_page(&msg->sg.data[first_sge], page, copy, 0);
-> +	sk_msg_clear_elem_copy(msg, first_sge);
-> =20
->  	/* To repair sg ring we need to shift entries. If we only
->  	 * had a single entry though we can just replace it and
-> @@ -2747,8 +2780,14 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg=
-, u32, start,
->  	shift =3D last_sge > first_sge ?
->  		last_sge - first_sge - 1 :
->  		NR_MSG_FRAG_IDS - first_sge + last_sge - 1;
-> -	if (!shift)
-> +	if (!shift) {
-> +		sk_msg_clear_elem_copy(msg, msg->sg.end);
->  		goto out;
-> +	}
-> +
-> +	i =3D first_sge;
-> +	sk_msg_iter_var_next(i);
-> +	sk_msg_clear_copy_range(msg, i, last_sge);
-> =20
->  	i =3D first_sge;
->  	sk_msg_iter_var_next(i);
-> @@ -2762,16 +2801,18 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, ms=
-g, u32, start,
->  		if (move_from =3D=3D msg->sg.end)
->  			break;
-> =20
-> -		msg->sg.data[i] =3D msg->sg.data[move_from];
-> +		sk_msg_sg_move(msg, i, move_from);
->  		msg->sg.data[move_from].length =3D 0;
->  		msg->sg.data[move_from].page_link =3D 0;
->  		msg->sg.data[move_from].offset =3D 0;
-> +		sk_msg_clear_elem_copy(msg, move_from);
->  		sk_msg_iter_var_next(i);
->  	} while (1);
-> =20
->  	msg->sg.end =3D msg->sg.end - shift > msg->sg.end ?
->  		      msg->sg.end - shift + NR_MSG_FRAG_IDS :
->  		      msg->sg.end - shift;
-> +	sk_msg_clear_elem_copy(msg, msg->sg.end);
->  out:
->  	sk_msg_reset_curr(msg);
->  	msg->data =3D sg_virt(&msg->sg.data[first_sge]) + start - offset;
-> @@ -2794,6 +2835,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg,=
- u32, start,
->  {
->  	struct scatterlist sge, nsge, nnsge, rsge =3D {0}, *psge;
->  	u32 new, i =3D 0, l =3D 0, space, copy =3D 0, offset =3D 0;
-> +	bool sge_copy =3D false, nsge_copy =3D false, nnsge_copy =3D false;
-> +	bool rsge_copy =3D false;
->  	u8 *raw, *to, *from;
->  	struct page *page;
-> =20
-> @@ -2869,6 +2912,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg,=
- u32, start,
->  			sk_msg_iter_var_prev(i);
->  		psge =3D sk_msg_elem(msg, i);
->  		rsge =3D sk_msg_elem_cpy(msg, i);
-> +		rsge_copy =3D sk_msg_elem_is_copy(msg, i);
-> =20
->  		psge->length =3D start - offset;
->  		rsge.length -=3D psge->length;
-> @@ -2894,23 +2938,34 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, ms=
-g, u32, start,
->  	/* Shift one or two slots as needed */
->  	sge =3D sk_msg_elem_cpy(msg, new);
->  	sg_unmark_end(&sge);
-> +	sge_copy =3D sk_msg_elem_is_copy(msg, new);
-> =20
->  	nsge =3D sk_msg_elem_cpy(msg, i);
-> +	nsge_copy =3D sk_msg_elem_is_copy(msg, i);
->  	if (rsge.length) {
->  		sk_msg_iter_var_next(i);
->  		nnsge =3D sk_msg_elem_cpy(msg, i);
-> +		nnsge_copy =3D sk_msg_elem_is_copy(msg, i);
->  		sk_msg_iter_next(msg, end);
->  	}
-> =20
->  	while (i !=3D msg->sg.end) {
->  		msg->sg.data[i] =3D sge;
-> +		if (sge_copy)
-> +			sk_msg_set_elem_copy(msg, i);
-> +		else
-> +			sk_msg_clear_elem_copy(msg, i);
->  		sge =3D nsge;
-> +		sge_copy =3D nsge_copy;
->  		sk_msg_iter_var_next(i);
->  		if (rsge.length) {
->  			nsge =3D nnsge;
-> +			nsge_copy =3D nnsge_copy;
->  			nnsge =3D sk_msg_elem_cpy(msg, i);
-> +			nnsge_copy =3D sk_msg_elem_is_copy(msg, i);
->  		} else {
->  			nsge =3D sk_msg_elem_cpy(msg, i);
-> +			nsge_copy =3D sk_msg_elem_is_copy(msg, i);
->  		}
->  	}
-> =20
-> @@ -2918,13 +2973,18 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, ms=
-g, u32, start,
->  	/* Place newly allocated data buffer */
->  	sk_mem_charge(msg->sk, len);
->  	msg->sg.size +=3D len;
-> -	__clear_bit(new, msg->sg.copy);
-> +	sk_msg_clear_elem_copy(msg, new);
->  	sg_set_page(&msg->sg.data[new], page, len + copy, 0);
->  	if (rsge.length) {
->  		get_page(sg_page(&rsge));
->  		sk_msg_iter_var_next(new);
->  		msg->sg.data[new] =3D rsge;
-> +		if (rsge_copy)
-> +			sk_msg_set_elem_copy(msg, new);
-> +		else
-> +			sk_msg_clear_elem_copy(msg, new);
->  	}
-> +	sk_msg_clear_elem_copy(msg, msg->sg.end);
-> =20
->  	sk_msg_reset_curr(msg);
->  	sk_msg_compute_data_pointers(msg);
-> @@ -2950,27 +3010,38 @@ static void sk_msg_shift_left(struct sk_msg *msg,=
- int i)
->  	do {
->  		prev =3D i;
->  		sk_msg_iter_var_next(i);
-> -		msg->sg.data[prev] =3D msg->sg.data[i];
-> +		sk_msg_sg_move(msg, prev, i);
->  	} while (i !=3D msg->sg.end);
-> =20
->  	sk_msg_iter_prev(msg, end);
-> +	sk_msg_clear_elem_copy(msg, msg->sg.end);
->  }
-> =20
->  static void sk_msg_shift_right(struct sk_msg *msg, int i)
->  {
->  	struct scatterlist tmp, sge;
-> +	bool tmp_copy, sge_copy;
-> =20
->  	sk_msg_iter_next(msg, end);
->  	sge =3D sk_msg_elem_cpy(msg, i);
-> +	sge_copy =3D sk_msg_elem_is_copy(msg, i);
->  	sk_msg_iter_var_next(i);
->  	tmp =3D sk_msg_elem_cpy(msg, i);
-> +	tmp_copy =3D sk_msg_elem_is_copy(msg, i);
-> =20
->  	while (i !=3D msg->sg.end) {
->  		msg->sg.data[i] =3D sge;
-> +		if (sge_copy)
-> +			sk_msg_set_elem_copy(msg, i);
-> +		else
-> +			sk_msg_clear_elem_copy(msg, i);
->  		sk_msg_iter_var_next(i);
->  		sge =3D tmp;
-> +		sge_copy =3D tmp_copy;
->  		tmp =3D sk_msg_elem_cpy(msg, i);
-> +		tmp_copy =3D sk_msg_elem_is_copy(msg, i);
->  	}
-> +	sk_msg_clear_elem_copy(msg, msg->sg.end);
->  }
-> =20
->  BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
-> @@ -3027,8 +3098,10 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg,=
- u32, start,
->  	 */
->  	if (start !=3D offset) {
->  		struct scatterlist *nsge, *sge =3D sk_msg_elem(msg, i);
-> +		u32 sge_idx =3D i;
->  		int a =3D start - offset;
->  		int b =3D sge->length - pop - a;
-> +		bool sge_copy =3D sk_msg_elem_is_copy(msg, sge_idx);
-> =20
->  		sk_msg_iter_var_next(i);
-> =20
-> @@ -3041,6 +3114,10 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg,=
- u32, start,
->  				sg_set_page(nsge,
->  					    sg_page(sge),
->  					    b, sge->offset + pop + a);
-> +				if (sge_copy)
-> +					sk_msg_set_elem_copy(msg, i);
-> +				else
-> +					sk_msg_clear_elem_copy(msg, i);
->  			} else {
->  				struct page *page, *orig;
->  				u8 *to, *from;
-> @@ -3057,6 +3134,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, =
-u32, start,
->  				memcpy(to, from, a);
->  				memcpy(to + a, from + a + pop, b);
->  				sg_set_page(sge, page, a + b, 0);
-> +				sk_msg_clear_elem_copy(msg, sge_idx);
->  				put_page(orig);
->  			}
->  			pop =3D 0;
+   https://codeberg.org/linux-nfc/linux.git tags/nfc-net-next-20260611
 
+for you to fetch changes up to 1b92c1f6d6d87f9ec3c2bef3c68b99b097712f9a:
+
+   MAINTAINERS: Update address for David Heidelberg (2026-06-11 20:24:47 +0200)
+
+----------------------------------------------------------------
+NFC updates for net-next 20260611
+
+  - nxp-nci: Add ISO15693 support
+  - nxp-nci: treat -ENXIO in IRQ thread as no data available
+  - nci: uart: Constify struct tty_ldisc_ops
+  - trf7970a: fix comment typos
+  - Use named initializers for struct i2c_device_id
+  - MAINTAINERS: Update address for David Heidelberg
+
+----------------------------------------------------------------
+Carl Lee (2):
+       nfc: nxp-nci: Add ISO15693 support
+       nfc: nxp-nci: treat -ENXIO in IRQ thread as no data available
+
+Christophe JAILLET (1):
+       nfc: nci: uart: Constify struct tty_ldisc_ops
+
+David Heidelberg (1):
+       MAINTAINERS: Update address for David Heidelberg
+
+Miles Krause (1):
+       nfc: trf7970a: fix comment typos
+
+Uwe Kleine-König (The Capable Hub) (1):
+       nfc: Use named initializers for struct i2c_device_id
+
+  MAINTAINERS                 |  2 +-
+  drivers/nfc/microread/i2c.c |  2 +-
+  drivers/nfc/nfcmrvl/i2c.c   |  4 ++--
+  drivers/nfc/nxp-nci/core.c  |  1 +
+  drivers/nfc/nxp-nci/i2c.c   | 12 ++++++++++--
+  drivers/nfc/pn533/i2c.c     |  4 ++--
+  drivers/nfc/pn544/i2c.c     |  4 ++--
+  drivers/nfc/s3fwrn5/i2c.c   |  4 ++--
+  drivers/nfc/st-nci/i2c.c    |  4 ++--
+  drivers/nfc/st21nfca/i2c.c  |  4 ++--
+  drivers/nfc/trf7970a.c      |  6 +++---
+  net/nfc/nci/uart.c          |  2 +-
+  12 files changed, 29 insertions(+), 20 deletions(-)
 
