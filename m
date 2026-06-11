@@ -1,169 +1,183 @@
-Return-Path: <netdev+bounces-298250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bBSNLobuKmp8zgMAu9opvQ
-	(envelope-from <netdev+bounces-298250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:21:10 +0200
+	id aez1FnXxKmo2zwMAu9opvQ
+	(envelope-from <netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:33:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718F3673EED
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:21:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F6C674045
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:33:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=I793zi1X;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298250-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298250-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=rHFYjUZJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7F01F3112F27
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:19:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2486D3572DB1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339F4496901;
-	Thu, 11 Jun 2026 17:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5666E4BCACA;
+	Thu, 11 Jun 2026 17:18:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34C4408034;
-	Thu, 11 Jun 2026 17:18:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7C847A0DC
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 17:18:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781198305; cv=none; b=WhTQHw9F/3sHRueVQxkTtJ8BYxg1A7hldIz4ypJX3yro1tev2xZiUWXfgPqINeP/lDF66fkBgwsaHped7EXhJVvD7xkNDR5fIQBCG4HdEvvdTcpeFcajEidadiSmTVXaBy7F2YPHrQ42acC8WAbtdeZJ90JrUNQglDtf70xFBko=
+	t=1781198313; cv=none; b=MtR+Y1dcTGcR3ECGFW0979GPegpBeai4Lnxn9ZYEVsAuhhTYyXXf8WuvyZQ6Qh2XvN4VlPqOmhVjPUoRnkM5oHFHsqD1L7YobxKuA9udxM8Zg/To26idXoT6S9WNrKbJqexP21V7o38IbTJ1EV01mOgief8abCqbOH83iHnaiqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781198305; c=relaxed/simple;
-	bh=2/4YhDGk8rS1eb9x1UZCiSNZtGtVwrSNHMRRH8/d9gA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RAj9brY7a9HNyT/0YGRFR2DQ6QUsv1/Z1DAne4cLkv0JLU2xCpf1uzzFB3FBkumrmN8odvZjjjJVrAtR+0N+rBYTKAYgaHzMpKJJUqWII5FT+0ixmIjPVzm3BRfCXT6GHaCupK/8j3A+QseZMrULrjXT9/N2xeOtTb0i7VV7t74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I793zi1X; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F384E1F00899;
-	Thu, 11 Jun 2026 17:18:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781198298;
-	bh=4ftVrlKfxNBZ5L1qsZ1tyjka8GLPo2zlURIhpvXfdyQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=I793zi1XTUiKfGJris+A1lqSuFB+TAYeOfOnqQoP590A4ZtsKdFN47EAGe9dqDFOx
-	 3XJfyWN5clsNSrgKpGDwhbXXYaosyPtcrKwX7x5SDkHSlrvj0i4r9L5OAo6G069HTt
-	 gu1QUveYay+06rM2IXCcp5+wQ+n+R/z4KgPk8EzS5tOjUjQ9TkrOHoa+Zsi2sq7OXO
-	 IO1L2c3nA46BNPQgAHkMOkvPAFNmmmWaOC/4mssqd8ERkTom3wZIIWor4ndqQnAMYN
-	 Zt6DUhDo+weFEaHt4temC2C5ASR6HudLCJGAPEen7MWbBg0auYtcb78zonoQ+/doro
-	 Qffh/ooXQ+V9w==
-Date: Thu, 11 Jun 2026 10:18:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- linux-doc@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
- skhan@linuxfoundation.org
-Subject: Re: [PATCH net-next 2/3] docs: net: tls-offload: document
- tls_dev_del, tls_dev_resync, and rekey
-Message-ID: <20260611101817.18964bd9@kernel.org>
-In-Reply-To: <ainR5GAK8LaHJYMP@krikkit>
-References: <20260609201224.1191391-1-kuba@kernel.org>
-	<20260609201224.1191391-3-kuba@kernel.org>
-	<ainR5GAK8LaHJYMP@krikkit>
+	s=arc-20240116; t=1781198313; c=relaxed/simple;
+	bh=kAobYEkJDMjkUITJUMNyBriLzXiAe6UXFHqVuVHGqxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jE83Q93KH2sR/9RFLce7zUFPKSz2M+LEB2+EiHosIL5fmY1HpZSJWaZKM82WfU/yxVx1SbqkABnOSYZF/15IOMPCtg0yCA28X3CUoeyZmyjJPi/MijOTvwj4eI/JbO2Y0T5h5h9+rL/hkMYJhvf1tx+A5jpB6fohAta1B6Ish4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rHFYjUZJ; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490b8a97b11so803795e9.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 10:18:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781198305; x=1781803105; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AoP+cy2ffp1XgHOvwchIi8ndfKfAxNydtkxTWle4y9Q=;
+        b=rHFYjUZJM3ER+3l1P5F7c0asHSesLMxBRreOo5xHxWaSpz5JFbBzSMheMvRwtGY00C
+         ED6S7FFQjyxwzgtkdjR88vGS7XIYkOVT0KpYt/z51EXpm28ub6yH6PD0bybk7sWq8I2M
+         ecwjpl6yPxPt6/rxsk1GR3LilFiqDQxP9zC19aT99jlOAbRqai6b19Q90bac7pHJLq0D
+         trRjI1vV50CL7W94D7Wh/+97+eft9R2v1yhMg9dq0GIW0MiTfbt0PjPyyru+aMKNKqg7
+         YxxXM2IwzCEpfz6NQ6rAs/eD+CfEpnQjTJB70WgYyVMfSXQvQYIJ07IakbCQ2hr+c4to
+         mVwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781198305; x=1781803105;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AoP+cy2ffp1XgHOvwchIi8ndfKfAxNydtkxTWle4y9Q=;
+        b=hud2B7TxHDWCMLZ4D32/DNBaLhIk8tF/T0m31nUICwQgPwyYdWZC8KbKgjgcKw8eYy
+         Sl3A8s3M2RKaEi8j19VX4S/GqmZJJGZ5Jvqt2FO9pJG9QFqw9O404NoIStZKNLzYPshk
+         wDjxT/lf2yrrCFIarWSziWl1u8y9tLhQVQkd1ee+MYJCrIRemlnDaTQMMJXzuviG7kbl
+         evNcU/AKaZRNQ5t9OM6CATv8A3Z137gWYXrGClUZZLt+FiEbPBDZ2ycAWnc8wNr57rI/
+         zi3OzluDVm+mQgNlOtefD9gAJx1Zc+8bGvRzQIAs2osnOyhEaDHbbnmVmzGEy4LCeEp+
+         NsaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+udw/Ud/YRVVQX+h1LIwdcf1Q7YImblMyKvOY8t0XGidvO8BpwN2eh/5lDdBDUF983pCkfxnY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX15K8KEJGIHDBncqFlXhgu1bWZoLfI8qOvo/u7G0js5VZoQxZ
+	N5dmD4MPEpVWrc3BAVmIMJS3jMGsWEvXvkOdjChwWlLndo81Z4RUrV7eYmRdeHmE
+X-Gm-Gg: Acq92OFhVUBd9c1wTtthWnn7J+MtcvAC7085YTnX6dLpwNEMDZB6Gjyd2Ovl4lLaqW4
+	scqJmXovIpNRw0DKEXtOz9mM78+hhqgkt791S7bTnONugUQ+AqeMoyydhkdqG/HTbGyf0wD9Y3k
+	JeIuukbx3+sAFHw0dre4EBx2RW3foFzM52azTIEmX539CMRgwQjmzSNtxMhHioimF4rMRFPpE4S
+	vvTFhSKtRFn2PXsgkmCe3vdvJLnlGP4HzJ2L505l/kgJDc5gk3Ix+WrKI91gWflt7w9wwdAtmea
+	tGS77+ckbaJt+309lIPy3EyLdaQXED+jAq89Dykwwb3UYlCMqGPytKWAqWB/Sn901d5A4q7MhHb
+	E0L0L0Anu47vzuVqOT4Lqp27rV6KmbKavGH8cYLUGndZVsBurvYDiFfpglMGWk8IoPNPier6uSl
+	8hHLAy/HaQ43942YXAyMVTr1WEYj/TK0bIthbpFYiaW4Uto2s9mFcKNKgaJ7o=
+X-Received: by 2002:a05:600c:4e04:b0:490:b9d3:a9ce with SMTP id 5b1f17b1804b1-490e5640aa8mr56905655e9.30.1781198305135;
+        Thu, 11 Jun 2026 10:18:25 -0700 (PDT)
+Received: from gandalf.schnuecks.de (p5b2e2404.dip0.t-ipconnect.de. [91.46.36.4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606c10435dsm335137f8f.35.2026.06.11.10.18.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 10:18:24 -0700 (PDT)
+Received: by gandalf.schnuecks.de (Postfix, from userid 500)
+	id 0C018319F7E6; Thu, 11 Jun 2026 19:18:24 +0200 (CEST)
+Date: Thu, 11 Jun 2026 19:18:23 +0200
+From: Simon Baatz <gmbnomis@gmail.com>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Subject: Re: [PATCH net-next v2 05/15] tcp: allow mptcp to drop TS for some
+ packets
+Message-ID: <airt3_dPSfV54Aph@gandalf.schnuecks.de>
+References: <20260605-net-next-mptcp-add-addr6-port-ts-v2-0-758e7ca73f4d@kernel.org>
+ <20260605-net-next-mptcp-add-addr6-port-ts-v2-5-758e7ca73f4d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260605-net-next-mptcp-add-addr6-port-ts-v2-5-758e7ca73f4d@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298250-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298251-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:sd@queasysnail.net,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:linux-doc@vger.kernel.org,m:bpf@vger.kernel.org,m:john.fastabend@gmail.com,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,gmail.com,linuxfoundation.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 718F3673EED
+X-Rspamd-Queue-Id: A8F6C674045
 
-On Wed, 10 Jun 2026 23:06:44 +0200 Sabrina Dubroca wrote:
-> > +The third TLS device callback is :c:member:`tls_dev_resync`, called by the core
-> > +to synchronize the TCP stream with the record boundaries:
-> > +
-> > +.. code-block:: c
-> > +
-> > +	int (*tls_dev_resync)(struct net_device *netdev,
-> > +			      struct sock *sk, u32 seq, u8 *rcd_sn,
-> > +			      enum tls_offload_ctx_dir direction);
-> > +
-> > +See the `Resync handling`_ section for details.  
+Hi Matt,
+
+On Fri, Jun 05, 2026 at 07:21:49PM +1000, Matthieu Baerts (NGI0) wrote:
+> With TCP-timestamps (padded) taking 12 bytes and ADD_ADDR IPv6 + port
+> taking 30 bytes, the 40-byte limit for the TCP options is reached. In
+> this case, it is then not possible to send the address signal.
 > 
-> Hmm, this callback is not mentioned at all in the "Resync handling"
-> section. I think it'd be good to add at least a quick note there about
-> how/when it's invoked, and what the arguments mean (at least the two
-> types of sequence numbers, since the rest is identical to the other
-> driver CBs).
+> The idea is to let MPTCP dropping the TCP-timestamps option for some
+> specific packets, to be able to send some specific pure ACK carrying >28
+> bytes of MPTCP options, like with this specific ADD_ADDR. A new
+> parameter is passed from tcp_established_options to the MPTCP side to
+> indicate if the TCP TS option is used, and if it should be dropped. The
+> next commit implements the part on MPTCP side, but split into two
+> patches to help TCP maintainers to identify the modifications on TCP
+> side. This feature will be controlled by a new add_addr_v6_port_drop_ts
+> MPTCP sysctl knob.
+> 
+> It is important to keep in mind that dropping the TCP timestamps option
+> for one packet of the connection could eventually disrupt some
+> middleboxes: even if it should be unlikely, they could drop the packet
+> or even block the connection. That's why this new feature will be
+> controlled by a sysctl knob.
 
-Something like this, you mean?
+RFC 7323 (which obsoletes RFC 1323) specifies an "all or nothing"
+approach for the TS option.  Section 3.2 states:
 
---- a/Documentation/networking/tls-offload.rst
-+++ b/Documentation/networking/tls-offload.rst
-@@ -278,9 +278,9 @@ sequence number (as it will be updated from a different context).
-   bool tls_offload_tx_resync_pending(struct sock *sk)
+   Once TSopt has been successfully negotiated, that is both <SYN> and
+   <SYN,ACK> contain TSopt, the TSopt MUST be sent in every non-<RST>
+   segment for the duration of the connection, [...] If a
+   non-<RST> segment is received without a TSopt, a TCP SHOULD silently
+   drop the segment.
+
+So, selectively omitting the TS option on established subflows
+appears to go against RFC 7323 at the TCP level.  Do we consider that
+an acceptable deviation for MPTCP subflows?
+
+(Maybe I am missing something obvious here, but I couldn't find any
+prior discussion on this aspect.)
+
  
- Next time ``ktls`` pushes a record it will first send its TCP sequence number
--and TLS record number to the driver. Stack will also make sure that
--the new record will start on a segment boundary (like it does when
--the connection is initially added).
-+and TLS record number to the driver via the ``tls_dev_resync`` callback.
-+Stack will also make sure that the new record will start on a segment boundary
-+(like it does when the connection is initially added).
- 
- RX
- --
-@@ -372,9 +372,10 @@ all TLS record headers that have been logged since the resync request
- started.
- 
- The kernel confirms the guessed location was correct and tells the device
--the record sequence number. Meanwhile, the device had been parsing
--and counting all records since the just-confirmed one, it adds the number
--of records it had seen to the record number provided by the kernel.
-+the record sequence number via the ``tls_dev_resync`` callback. Meanwhile,
-+the device had been parsing and counting all records since the just-confirmed
-+one, it adds the number of records it had seen to the record number provided
-+by the kernel.
- At this point the device is in sync and can resume decryption at next
- segment boundary.
- 
-@@ -398,7 +399,8 @@ schedules resynchronization after it has received two completely encrypted
- records.
- 
- The stack waits for the socket to drain and informs the device about
--the next expected record number and its TCP sequence number. If the
-+the next expected record number and its TCP sequence number via the
-+``tls_dev_resync`` callback. If the
- records continue to be received fully encrypted stack retries the
- synchronization with an exponential back off (first after 2 encrypted
- records, then after 4 records, after 8, after 16... up until every
+-- 
+Simon Baatz <gmbnomis@gmail.com>
 
