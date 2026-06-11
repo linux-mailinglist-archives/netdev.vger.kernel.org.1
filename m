@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-298368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298366-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mCl1IvMuK2oy3wMAu9opvQ
-	(envelope-from <netdev+bounces-298368-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:56:03 +0200
+	id BhkDJe4uK2ou3wMAu9opvQ
+	(envelope-from <netdev+bounces-298366-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:55:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD6A67581C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:56:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29CD367580C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:55:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=fYVkFY5g;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298368-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298368-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=qD6BZNbr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298366-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298366-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EF0732F9EDE
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:55:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9120132DA192
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8409F38A722;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD66389471;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55174382393;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550553803FD;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781214953; cv=none; b=PbVIx+xYC76T48uTHd8/f65HmKAn6Aggd4bB+gXlzsC1eVABGc42+cTL6a+hUmc/Tcrm0uJFOvM4HdhYk9W1Gsl9LBgf84y7aVQAqx9piptKgWmGc+UzsQEqdVusC+ugGKjPzTCjHzhFYiruA27t7fARatPcph8XACWj06uIZFg=
+	t=1781214953; cv=none; b=dSehoXgIla6L1mh6RHiZzMN53Ini0qqDZRai9oAdpzrRkvumGGwp7V7UvbotBRy02Fh8lhVhd7PXgzj5yWfIdX2a/bQcCt/ClYOturQU2E/CTW/dlOMS8MuZsCN6ePd+s+flimMIs1Wm+MaDQmMdVMXcRSH999BL7owOOuO/Sew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781214953; c=relaxed/simple;
-	bh=G8O/fgkg40yzWQsZV7+qSg2DX9SUdeFeRtf+xvaV66c=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JGHFg0z4c/Hi/qb/gEO2oT+gHE9N4Hu96pvRM+p+veWvIzvPDKxAcGrwft1BwbdYynbnusE8i4gTTwrt1K0ujv/fU26810uIXwoTqT4X2Z69CoRCR4lpAQNLB2iMH1yS4XcK2tKuPci2KGXFUtXjQLzMigiQNO7fRv5GVbeciXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYVkFY5g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E1B6DC2BCB9;
-	Thu, 11 Jun 2026 21:55:52 +0000 (UTC)
+	bh=hKax7yR2WI09guw84khIQBCbLRT7TjWaQRDaCF6tIhg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=q/oADuFTscPJM44n50yRBXXDhwWKc7g23/362ZVVKjronC+lh8sMcr7/q2BeaYtPKYm+bVNoh/2Yt7Y8k0LMpFkcnSzTq7IWdpCA2Gsk5phJPyxSHLQ5Z3gMuvmwMu9aZ6AVe2SJZlmJRCOR5KsKDxQyVeIfL6MHXO04Og/sVVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qD6BZNbr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 00861C2BCB0;
+	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1781214953;
-	bh=G8O/fgkg40yzWQsZV7+qSg2DX9SUdeFeRtf+xvaV66c=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=fYVkFY5ghFjUVtNKLogRoNOMEobOvXQn1CFFGTlwIqHPE4zmKfkdnn45ChQTezzSI
-	 +QvyE8p9cGYXMAaULInwTOFZqdMzhY4Xii0ykasbMC8gf7xdR1LS1wAZ9ZiFy3qrzf
-	 H4F+6igkWb8Tr7T7afFMqRWzPoQ84v0cC9nBR1zzOjFvMSq81Fuk/vA0AJaGuk1Ncn
-	 rs80PAA8Lav8gHJet1Vh0xtMq4yinCkrqzDt8M2eBGWaiIkB7yNCOStkoOOVbUW3+9
-	 QrPVt0K4j3m3ctcgXgtWuQQdENye0boZC653AYNsC6KIfL2FGLRKW9SQ3SXwjEG6SO
-	 G26tnBE7gN7RA==
+	bh=hKax7yR2WI09guw84khIQBCbLRT7TjWaQRDaCF6tIhg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=qD6BZNbr+TYemo0Ezk+upuKwykdrQwpdJvDFZcBPxf2kenhxKwZOOK+bs2N7uMFa/
+	 FEtQmSgG0e+3lJIZgBQO31xPNhWpahwdl2+eL0AFaj3siNUh3vACwkA/5vnVburXz6
+	 7tI+fUCsG+p3/PgVtGoLeI8uxraOqDO9kMu1DtZ8ZS3k10uTejzKTthHCbXIzO7Gf3
+	 p5jO80Vq5PJKTOZtth+d5c3g+2ETAjdU0Vm2J2zHGEzIOf3qpt37U8l0yXA59Lg6tL
+	 y179aV6OAbs0XI4ZeHzfwNmYgITm+oHplPKkUdLJOKYZaqYd5VST/telfMcmw69OMD
+	 k1rW4LjEk49TA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7621CD98CC;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD4ACD8C9D;
 	Thu, 11 Jun 2026 21:55:52 +0000 (UTC)
 From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Subject: [PATCH net v5 0/4] MAC-PHY interrupt changed to level triggered
- interrupt
-Date: Thu, 11 Jun 2026 14:55:37 -0700
-Message-Id: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
+Date: Thu, 11 Jun 2026 14:55:38 -0700
+Subject: [PATCH net v5 1/4] net: ethernet: oa_tc6: Interrupt is active low,
+ level triggered.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +61,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANouK2oC/12NywqDMBREf0Xuuil5+Oyq/1G6iOaqFzQpiYQW8
- d8bsmpdzgznzA4BPWGAW7GDx0iBnE2huhQwzNpOyMikDJLLmldKsAUjLmzzNE3oWTv0QrdKj1y
- VkJiXx5He2fcAixs8UzlT2Jz/5I+o8pR1NT/romKcGd0obLhId/LubMCVroNbsyqWv3h3xsuE1
- 6NqO90bI7p//DiOLwZj3WLvAAAA
-X-Change-ID: 20260531-level-trigger-8cb1a83af034
+Message-Id: <20260611-level-trigger-v5-1-4533a9e85ce2@onsemi.com>
+References: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
+In-Reply-To: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
 To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -79,11 +77,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
  Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
  Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781214947; l=2947;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781214947; l=8533;
  i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=G8O/fgkg40yzWQsZV7+qSg2DX9SUdeFeRtf+xvaV66c=;
- b=Q7Ins9Yrrl0dk8bb2U2sSVW/lnT974k5lqVNm7Gn8eZR3FMWqKX/E4xuR37i5FbXrecRpOjzT
- K6VyCS9kQOEDM+fBFTje55mc0+k3LiF1fY4xnZ4vLq3z+V1LREywOWH
+ bh=9HwCbl6zOyvNSgQO+oQ9VSxChq2l6gUszgrx3m8o6yc=;
+ b=md+lgI3clDb1X3/dudIQ+fXv8ivDvpMNtxXFSwhjlS84X3LMRECQWpi0yel/APnjtk72SpidN
+ XWsLsgIdjRIC7XcoKyhc6um+DOa1JY8LPnTpR76Ut2Fz+wAj26ueV+7
 X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
  pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
 X-Endpoint-Received: by B4 Relay for
@@ -101,7 +99,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298368-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
+	TAGGED_FROM(0.00)[bounces-298366-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
 	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:pier.beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:Parthiban.Veerasooran@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -126,77 +124,274 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0CD6A67581C
+X-Rspamd-Queue-Id: 29CD367580C
 
-According to OPEN Alliance 10BASE-T1x MAC-PHY Serial Interface
-specification, MAC-PHY interrupt is "active low, level triggered".
-The specification mentions about the conditions in which the IRQ
-is asserted and deasserted.
+From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
-Bug is inadvertently introduced by treating the IRQ in the OA TC6
-framework driver and in dt-binding YAML file as edge triggered.
+According OPEN Alliance 10BASET1x MAC-PHY Serial Interface
+specification, interrupt is active low, level triggered.
 
-With the changes to use level triggered interrupt, use of threaded
-irq is more efficient than the current method that has interrupt hander
-working with work queue.
+Code used edge triggered interrupt which has the risk of losing an
+interrupt on instances like when interrupt is disabled. Level
+triggered interrupt won't be deasserted unless handler runs and
+clear the interrupting conditions.
 
-This change of interrupt handler mechanism exposed couple of race
-conditions due to the fact that interrupts were not masked on protocol
-error. And pointers were not initialized with null after skbs are freed.
+Interrupt handler mechanism is changed to threaded irq from
+interrupt handler and kernel thread waiting on work queue.
+Threaded irq mechanism is best suited for level triggered interrupt
+as it disables the interrupt until handler is run in thread level,
+while giving us an ability to have interrupt context handler to
+signal the threaded irq handler.
 
-Changes are done in two files
- - OA TC6 framework Ethernet driver
- - YAML file for the vendor that already uses OA TC6 framework.
+Introduced a logic to disable the device interrupt on error. Error
+could be due in data chunk's header and footer or SPI interface itself.
+This will avoid having repeated interrupts, in case the driver couldn't
+recover from the error condition with the available recovery mechanism.
 
-Maintainer for this driver is already informed and aware of these
-changes. Testing for these changes was done in onsemi's setup and
-found to be working.
-
-Changes in v5:
-  - Removed the extraneous FCS that came with the frame before passing
-    to the stack
-  - Base commit was upadted on few patches to ensure that it is pointing
-    to the correct commit ID.
-  - Commit messages have been updated to be more descriptive and
-    gives more detail now.
-  - Couple of race conditions pointed out by AI review is fixed.
-
-- Link to v4: https://lore.kernel.org/r/20260609-level-trigger-v4-0-6f389abdd192@onsemi.com
-
-Changes in v4:
-
-- IRQ handler is changed to interrupt handler + wake up thread
-  to interrupt handler + threaded irq. Threaded irq mechanism
-  is better suited for level triggered interrupt. Because it can
-  keep the interrupt disabled until interrupting conditions are 
-  handled by a handler thread.
-- SPI data handling function is called again on EAGAIN error code
-  as it indicates RX buffer overflow error, which requires draining
-  the bad data chunks.
- 
-  - Changed wakeup thread to threaded IRQ 
-  - RX buffer overflow is handled before threaded irq returns
-
-- Link to v3: https://lore.kernel.org/r/20260601-level-trigger-v3-0-da73e7010532@onsemi.com
-
+Fixes: 2c6ce5354453 ("net: ethernet: oa_tc6: implement mac-phy interrupt")
 Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
----
-Selvamani Rajagopal (4):
-      net: ethernet: oa_tc6: Interrupt is active low, level triggered.
-      net: ethernet: oa_tc6: mdiobus->parent initialized with NULL
-      net: ethernet: oa_tc6: Remove FCS size in RX frame
-      dt-bindings: net: updated interrupt type to be active low, level triggered
 
- .../devicetree/bindings/net/microchip,lan8650.yaml |   2 +-
- drivers/net/ethernet/oa_tc6.c                      | 140 +++++++++++++--------
- 2 files changed, 89 insertions(+), 53 deletions(-)
 ---
-base-commit: 22e2036479cb77df6281ebbd376ae6c330774790
-change-id: 20260531-level-trigger-8cb1a83af034
+changes in v5:
+  - Updated the commit message to be more descriptive
+  - Fixed the race condition between interrupt event and threaded
+    irq to avoid interrupt storm and accessing skb after freed.
+changes in v4:
+  Interrupt handling mechanism changed to threaded irq
+changes in v3:
+ interrupt registered as level triggerred
+---
+ drivers/net/ethernet/oa_tc6.c | 126 +++++++++++++++++++++++++-----------------
+ 1 file changed, 76 insertions(+), 50 deletions(-)
 
-Best regards,
---  
-Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+index 91a906a7918a..f3ac2875adfb 100644
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/bitfield.h>
+ #include <linux/iopoll.h>
++#include <linux/interrupt.h>
+ #include <linux/mdio.h>
+ #include <linux/phy.h>
+ #include <linux/oa_tc6.h>
+@@ -44,6 +45,8 @@
+ #define INT_MASK0_LOSS_OF_FRAME_ERR_MASK	BIT(4)
+ #define INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK	BIT(3)
+ #define INT_MASK0_TX_PROTOCOL_ERR_MASK		BIT(0)
++#define INT_MASK0_ALL_INTERRUPTS                (GENMASK(5, 0) | \
++						 GENMASK(12, 7))
+ 
+ /* PHY Clause 22 registers base address and mask */
+ #define OA_TC6_PHY_STD_REG_ADDR_BASE		0xFF00
+@@ -121,14 +124,13 @@ struct oa_tc6 {
+ 	struct sk_buff *ongoing_tx_skb;
+ 	struct sk_buff *waiting_tx_skb;
+ 	struct sk_buff *rx_skb;
+-	struct task_struct *spi_thread;
+-	wait_queue_head_t spi_wq;
+ 	u16 tx_skb_offset;
+ 	u16 spi_data_tx_buf_offset;
+ 	u16 tx_credits;
+ 	u8 rx_chunks_available;
+ 	bool rx_buf_overflow;
+ 	bool int_flag;
++	bool disable_traffic;
+ };
+ 
+ enum oa_tc6_header_type {
+@@ -669,6 +671,38 @@ static void oa_tc6_cleanup_ongoing_tx_skb(struct oa_tc6 *tc6)
+ 	}
+ }
+ 
++static void oa_tc6_cleanup_waiting_tx_skb(struct oa_tc6 *tc6)
++{
++	if (tc6->waiting_tx_skb) {
++		tc6->netdev->stats.tx_dropped++;
++		kfree_skb(tc6->waiting_tx_skb);
++		tc6->waiting_tx_skb = NULL;
++	}
++}
++
++static void oa_tc6_free_pending_skbs(struct oa_tc6 *tc6)
++{
++	oa_tc6_cleanup_ongoing_tx_skb(tc6);
++	oa_tc6_cleanup_ongoing_rx_skb(tc6);
++	oa_tc6_cleanup_waiting_tx_skb(tc6);
++}
++
++/* If the failure is at SPI interface level, masking and clearing
++ * the interrupt of the device won't work. Since SPI interrupt is
++ * disabled, it should stop the repeated interrupts.
++ */
++static void oa_tc6_disable_traffic(struct oa_tc6 *tc6)
++{
++	u32 regval = INT_MASK0_ALL_INTERRUPTS;
++
++	tc6->disable_traffic = true;
++	oa_tc6_free_pending_skbs(tc6);
++	oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
++	oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &regval);
++	oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
++	dev_err(&tc6->spi->dev, "Device interrupt disabled to avoid interrupt storm");
++}
++
+ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
+ {
+ 	u32 value;
+@@ -1105,29 +1139,29 @@ static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
+ 	return 0;
+ }
+ 
+-static int oa_tc6_spi_thread_handler(void *data)
++static irqreturn_t oa_tc6_macphy_threaded_irq(int irq, void *data)
+ {
+ 	struct oa_tc6 *tc6 = data;
+-	int ret;
+-
+-	while (likely(!kthread_should_stop())) {
+-		/* This kthread will be waken up if there is a tx skb or mac-phy
+-		 * interrupt to perform spi transfer with tx chunks.
+-		 */
+-		wait_event_interruptible(tc6->spi_wq, tc6->int_flag ||
+-					 (tc6->waiting_tx_skb &&
+-					 tc6->tx_credits) ||
+-					 kthread_should_stop());
+-
+-		if (kthread_should_stop())
+-			break;
++	int ret = 0;
+ 
+-		ret = oa_tc6_try_spi_transfer(tc6);
+-		if (ret)
+-			return ret;
++	/* It is possible that interrupt woke the thread before it is
++	 * disabled. Until we come up with good recovery mechanism,
++	 * no need to attempt spi transfer, once it fails. Pending skbs
++	 * are already freed.
++	 */
++	if (!tc6->disable_traffic) {
++		while (tc6->int_flag ||
++		       (tc6->waiting_tx_skb && tc6->tx_credits)) {
++			ret = oa_tc6_try_spi_transfer(tc6);
++			if (ret) {
++				disable_irq_nosync(tc6->spi->irq);
++				oa_tc6_disable_traffic(tc6);
++				break;
++			}
++		}
+ 	}
+ 
+-	return 0;
++	return IRQ_HANDLED;
+ }
+ 
+ static int oa_tc6_update_buffer_status_from_register(struct oa_tc6 *tc6)
+@@ -1161,11 +1195,15 @@ static irqreturn_t oa_tc6_macphy_isr(int irq, void *data)
+ 	 *   the previous rx footer.
+ 	 * - extended status event not reported in the previous rx footer.
+ 	 */
+-	tc6->int_flag = true;
+-	/* Wake spi kthread to perform spi transfer */
+-	wake_up_interruptible(&tc6->spi_wq);
+-
+-	return IRQ_HANDLED;
++	if (tc6->disable_traffic)
++		disable_irq_nosync(tc6->spi->irq);
++	else
++		tc6->int_flag = true;
++	/* Wake IRQ thread to perform spi transfer . In case
++	 * disable_traffic is set, threaded irq may run again
++	 * one more time.
++	 */
++	return IRQ_WAKE_THREAD;
+ }
+ 
+ /**
+@@ -1202,7 +1240,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_zero_align_receive_frame_enable);
+  */
+ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb)
+ {
+-	if (tc6->waiting_tx_skb) {
++	if (tc6->disable_traffic || tc6->waiting_tx_skb) {
+ 		netif_stop_queue(tc6->netdev);
+ 		return NETDEV_TX_BUSY;
+ 	}
+@@ -1217,8 +1255,8 @@ netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, struct sk_buff *skb)
+ 	tc6->waiting_tx_skb = skb;
+ 	spin_unlock_bh(&tc6->tx_skb_lock);
+ 
+-	/* Wake spi kthread to perform spi transfer */
+-	wake_up_interruptible(&tc6->spi_wq);
++	/* Wake the threaded IRQ to perform spi transfer. */
++	irq_wake_thread(tc6->spi->irq, tc6);
+ 
+ 	return NETDEV_TX_OK;
+ }
+@@ -1311,24 +1349,15 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+ 		goto phy_exit;
+ 	}
+ 
+-	init_waitqueue_head(&tc6->spi_wq);
+-
+-	tc6->spi_thread = kthread_run(oa_tc6_spi_thread_handler, tc6,
+-				      "oa-tc6-spi-thread");
+-	if (IS_ERR(tc6->spi_thread)) {
+-		dev_err(&tc6->spi->dev, "Failed to create SPI thread\n");
+-		goto phy_exit;
+-	}
+-
+-	sched_set_fifo(tc6->spi_thread);
+-
+-	ret = devm_request_irq(&tc6->spi->dev, tc6->spi->irq, oa_tc6_macphy_isr,
+-			       IRQF_TRIGGER_FALLING, dev_name(&tc6->spi->dev),
+-			       tc6);
++	ret = devm_request_threaded_irq(&tc6->spi->dev, tc6->spi->irq,
++					oa_tc6_macphy_isr,
++					oa_tc6_macphy_threaded_irq,
++					IRQF_TRIGGER_LOW | IRQF_ONESHOT,
++					dev_name(&tc6->spi->dev), tc6);
+ 	if (ret) {
+ 		dev_err(&tc6->spi->dev, "Failed to request macphy isr %d\n",
+ 			ret);
+-		goto kthread_stop;
++		goto phy_exit;
+ 	}
+ 
+ 	/* oa_tc6_sw_reset_macphy() function resets and clears the MAC-PHY reset
+@@ -1338,12 +1367,10 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+ 	 * 7.7 and 9.2.8.8 in the OPEN Alliance specification for more details.
+ 	 */
+ 	tc6->int_flag = true;
+-	wake_up_interruptible(&tc6->spi_wq);
++	irq_wake_thread(tc6->spi->irq, tc6);
+ 
+ 	return tc6;
+ 
+-kthread_stop:
+-	kthread_stop(tc6->spi_thread);
+ phy_exit:
+ 	oa_tc6_phy_exit(tc6);
+ 	return NULL;
+@@ -1356,11 +1383,10 @@ EXPORT_SYMBOL_GPL(oa_tc6_init);
+  */
+ void oa_tc6_exit(struct oa_tc6 *tc6)
+ {
++	tc6->disable_traffic = true;
++	disable_irq(tc6->spi->irq);
+ 	oa_tc6_phy_exit(tc6);
+-	kthread_stop(tc6->spi_thread);
+-	dev_kfree_skb_any(tc6->ongoing_tx_skb);
+-	dev_kfree_skb_any(tc6->waiting_tx_skb);
+-	dev_kfree_skb_any(tc6->rx_skb);
++	oa_tc6_free_pending_skbs(tc6);
+ }
+ EXPORT_SYMBOL_GPL(oa_tc6_exit);
+ 
+
+-- 
+2.43.0
 
 
 
