@@ -1,163 +1,310 @@
-Return-Path: <netdev+bounces-298359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jBnMJH8mK2of3QMAu9opvQ
-	(envelope-from <netdev+bounces-298359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:19:59 +0200
+	id lI/oMXQnK2pE3QMAu9opvQ
+	(envelope-from <netdev+bounces-298361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:24:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFDEA675688
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E27E6756D2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:24:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=multikernel-io.20251104.gappssmtp.com header.s=20251104 header.b="hBa5pHA/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298359-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298359-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=H6dG2yl2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298361-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298361-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1124E3071D9A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:19:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6EC2531A2DA1
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F8B37417B;
-	Thu, 11 Jun 2026 21:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7F3380FD4;
+	Thu, 11 Jun 2026 21:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444303672A9
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 21:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886E9369D59
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 21:23:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781212789; cv=none; b=d+K89zf/F82To5g1QRfgMFWamddW5bj9Bzi3Q9tZA0Y3AxCFUxHGrKPPn1nMApMmtLpOOR+Up3MOLimghBBsBlEezCI54WamRtb/3KoYZlqufiEFanYUI+xw+4FaGJTUGmCEkHGrncpA2W/DtlJouxfM27tHWC0PNFmDXBfWtcw=
+	t=1781213018; cv=none; b=fVkeRYHKlBkCTa6w4bo4mirl7BVO7JgP/ZL03nbaC3EwON9RhewyFe7OD5XhZgCks1b3HVNAfWVKdsQJccDuuObc+F6LAdi6xrIWuMRIwEU5keuAJ/c5i9UkmQNsCIRdM5MYP82NsAHcx0yQbB8795BFX21bAAMqpjAnmY5OubI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781212789; c=relaxed/simple;
-	bh=ZtJX3WQMMA9mK+XaCcfLnc35EMB865YOIgWqBlRERPc=;
+	s=arc-20240116; t=1781213018; c=relaxed/simple;
+	bh=oW4BQVUMFiOSZ6wG+yY+yDEPmzWrRE0msdDCfL+5TSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j9SIsRVcf5zNL425gd5XlPbz/PJSYo1cPSjr8lpIdXEoO2+h32/LAUr4eEujFvSMxC8/vZ3/z8xOooLaDvELJGHIbPvNcfLDzsrNK9lrX1VuHm6kXMVMGHILLrX9GFqm1ubi/H7Vxjv73x7H1Hnp8GeTumFudmKVctwLDa+bDVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=multikernel.io; spf=pass smtp.mailfrom=multikernel.io; dkim=pass (2048-bit key) header.d=multikernel-io.20251104.gappssmtp.com header.i=@multikernel-io.20251104.gappssmtp.com header.b=hBa5pHA/; arc=none smtp.client-ip=74.125.82.43
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-138129a622dso563561c88.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 14:19:48 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HA3bXPL1StCv5VzGKtS+pNBIATiji/eFtBtfy8bQqcxRMbUQuNbcSrUFgrOEfpzAgnj7VyMd5CsenIga5JKXA7dXTBJznvtu66X4glhZy7fA9E7tIKmOH4BHbI31KqWG+jeROIBpmQNPQMrlNpR3+BYpFyJ0JEWKH3Hagr7bW7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6dG2yl2; arc=none smtp.client-ip=209.85.216.66
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-36bcf3d2565so292834a91.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 14:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=multikernel-io.20251104.gappssmtp.com; s=20251104; t=1781212787; x=1781817587; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781213016; x=1781817816; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qf+EMuGOGT252QVdKS/7NYWLP675aIpiwNn6fsk89tw=;
-        b=hBa5pHA/lCT+/3vsW+QBm+9mOfu0xy8Uxv8H5EHDrjvowK4cur50bmrpY0hHgNhJYt
-         3N3p79AooLfwpGwocaeJXBs1nuJfOBlbvl25IjbFxzFflpXP5xUWVOLQhjR0MplrenjE
-         K3uVcYQABYhYSkKoKMP41dfithK7laoAZKa6OqFfUzLqhbz/jjdb4cvh/ZAOm9pUiMv6
-         9OjAGeLhFl0P9uRAt4ZYvI4UGCUQusyxhjcbMn8kP5nL3vPiC3DIrOHh1dMslYXjaqb5
-         QIX2ZLTqobVjsfH2DpALdKeqQ20v9KB+wspFH/2KA74h7rIucYmDqlKYz0RZqjY/DkA6
-         pRGg==
+        bh=SYDMbx/NSE1Ez69WzG00jvFaSdDUPkagmOI6dnx+MPA=;
+        b=H6dG2yl2zJV/oKbbYQu6GCcipBPkFdU0M68TUvQ+4rx9XybSeI9BJAXpBU2r1Y8Bhx
+         JEaawpzprqlLju87kM56ITzt9zRv9vjRL2nXeSY2adcsPsLaTrvLjp7BEuUNzyWRe2sI
+         C59Qzk3EUF0uOJ0iseAeGFQYGYnVO9UlF1vpdXsTFTSDeY1L4tArl3CGZGC70uhQHfZ9
+         DJmL5kiCn55IVQ3mhMvolHfzns9+IYocS58XvL6dD0znBsMxC6O3qoiu5VexSful6n53
+         NrZ0rzuA7lBn3bA9XI1oZDj/rry8cvGrRNlhPW6vv0x57gu8JR5qTbRu8kyRz916ke6k
+         I4zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781212787; x=1781817587;
+        d=1e100.net; s=20251104; t=1781213016; x=1781817816;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qf+EMuGOGT252QVdKS/7NYWLP675aIpiwNn6fsk89tw=;
-        b=tWxWIYrfpKDhhfeE3AbkAstYCnxwQN1ultDMeqSXJKPr42Mj5idVq8gzEzXMw5uDCk
-         +6EY6YrJwRsX/aLsV/5fr/u8Ppnh+cfgkkcr9lIJS8JioV0gqLLFbPKBAEXEo11StpYt
-         IiV875xLdyDp4YFybGKi8fOhhYN+Y5JIuK6MQFsJmmracImcf44VPCk8VWPZ+FUAzWX8
-         Hj0nLFKFgEgq0I1BSijvvTKmAckbCok0U81sxxCHKsuWZkXtaRGM3ll4w3eRJvqSpP4i
-         CO7MC0zRQI+IHLgML6FNZZElUt3rYSLB/MoNgAWsJDLqkn/WtDk+WeZpoWmnUAiJf6eZ
-         BRzg==
-X-Forwarded-Encrypted: i=1; AFNElJ+BnaTIusRY9AgTmM63JO4m6PJ8ouhHtfNUeXhP5XwpuPV4fOLd5jV6Bj2WXryF76u99c9M4fk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRKXgl9JDxnj1TbkI4yNoQ/lpcaPanXFaO8ZcLqwlRllB9krqc
-	iKd+dR35kWkFezUUu9h32dH+UC/vZBwLV9mkLAI1Oq9XyfMhBatY3nLZ2Kr2UTAfcQA=
-X-Gm-Gg: Acq92OFSS+V+Ex6XNifJjqJDXfgVY4LbEfLxnviZpqDMmu/dr/9hsjLob3RrzJFNw5f
-	tUBTa+eL4Ty1KlqRBIlHU44P7LDVDHxy8Mca+SF7m0Kxz+cURuyMMU/1lIm0aHPNLYaIkpkN3X0
-	xUaQ0pxxLRA1Cj8WLgf8IcS5V1+1yeU/iHq2aNhECXgI0BRkvfnhubzwMrj6fH865Y0D1/mS3Qk
-	qwAgoqyIXG6btTuNaeSENK8QA/oxYltDvK8zKvlN/xM5kb9UhUhOv+PY6HRIBEyVk3gUq8qxXhs
-	fHaxbw2APJEMMcOrxuVTYtUr/epsX+CQEXDixRC+hQmt6Kr7Co7fGjUc2vMUTsY0NMMQYIFUmAC
-	ZaOzHwCI0ftXiNh+mWhkjv7Xx1cXIkSxGWAZTdRkJQUQItIQpyq4H2LR9UNH6OXY91EDxIBgxds
-	eGubBIG1Bfixiwi9PMT4em5MLuo9mollzP7bXsuhSPVkv/NHILF5GlLg==
-X-Received: by 2002:a05:7022:6ba8:b0:137:fea7:ed19 with SMTP id a92af1059eb24-1384bb1c373mr26757c88.3.1781212787304;
-        Thu, 11 Jun 2026 14:19:47 -0700 (PDT)
-Received: from localhost ([129.210.115.107])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1384b919ef9sm84787c88.7.2026.06.11.14.19.46
+        bh=SYDMbx/NSE1Ez69WzG00jvFaSdDUPkagmOI6dnx+MPA=;
+        b=Cc4J0Y9+3avVJkCdL5L6lLubf9pjIzHhaIxPJ5bvIqVokXRUbPBwUJTu7Gu9s9hMjl
+         cd/SrhKaQSNDQrm+Abm80Cs7ZpsG/o5VY8jm6zRahGzibjpzpqxWD6MHU7bz6UDDhuV1
+         jN5EV+zXsbxW+h0nvq4dQyC8C7f0htUvkxvxgKTRzRFkNTc4O1Ls9U+G/T4HlwfqQZFH
+         gJ8h1Lol5hxqUKDzdkHeFZR2jEmtnzzcG8bTMxuEF13uJl1z4KsHT1dIEMuEuYxi57VD
+         Ge6zBGriZm+z0MYdV/Z5vIbyIU5OwB98sVoKyK/y/2a4ENp3Wch2uuKHbNfNE9yoJaQL
+         3+LQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9swAKLfqYbeDypt2W8PTKPjht6TvwtOJwelLYmLy5C0ioLpbWakVA2Oa6mXmYCE+gHNICSPAQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb+ZlqYOSZSsqQxJ8EWsDz3C7x2mhknKgFE+eNOOr+EYiojtl7
+	DBZw8/Vgie0TArym0OoDNynMkGFgJc4A56MrW0sArWHLIYYddygE1I2T
+X-Gm-Gg: Acq92OFLD4gDDcLjxjFXAkaz18BB8llDKlzkBNA7s/g8A3YBN754wuWSpwiDb7cT4WY
+	ynueHxH+Qntd1RwxH4r8SLTkD5zHP/VXde51IFuejzHtQTGfDuMEQBcMOx/n694mURxWrGVGRpw
+	PloPNhPNfIHOnjIIrQ8hOVbIrHELsp79pqiW15knHXTd5Firjf5AJiszdfvtL/rFsF+NbWg9dr9
+	P80GwUdG3lt2c6FF9uBBOkPpUUppcqI54tZxGKkKA5eQT8LezOxWipRKkuOtYmnlXXRO0sBy3Il
+	nceTMsTJ3NPCzDbWDNWu2f4hwWUW3kMmZ80+Av5/kJSNMPF6lbQUb0u09LVOWuC453YEDjs7XdQ
+	ORGhofXZTx4JA/Oy1WcWyYWwU4URnzzwiRWLAOBSfnA3iNG/NU3qMVqdfO8IEivWRLMMsmt4DED
+	rjfpW8Q9rFggPOOnM=
+X-Received: by 2002:a17:90b:2c8d:b0:36b:91a3:6af3 with SMTP id 98e67ed59e1d1-37a01c350c5mr145061a91.7.1781213015970;
+        Thu, 11 Jun 2026 14:23:35 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:9::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3774f99cf24sm3481176a91.0.2026.06.11.14.23.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 14:19:46 -0700 (PDT)
-Date: Thu, 11 Jun 2026 14:19:45 -0700
-From: Cong Wang <cwang@multikernel.io>
-To: Sechang Lim <rhkrqnwk98@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Cong Wang <cong.wang@bytedance.com>,
-	Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf] bpf, sockmap: take the socket lock in
- udp_bpf_recvmsg()
-Message-ID: <aismcTr30ORVXQhW@pop-os.localdomain>
-References: <20260610175922.1103871-1-rhkrqnwk98@gmail.com>
+        Thu, 11 Jun 2026 14:23:35 -0700 (PDT)
+Date: Thu, 11 Jun 2026 14:22:54 -0700
+From: Stanislav Fomichev <sdf.kernel@gmail.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Vivek Kasireddy <vivek.kasireddy@intel.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org, sdf@fomichev.me, 
+	razor@blackwall.org, daniel@iogearbox.net, almasrymina@google.com, matttbe@kernel.org, 
+	skhawaja@google.com, dw@davidwei.uk, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v2 3/4] selftests/net: ncdevmem: add -b option
+ to set rx-buf-size on bind
+Message-ID: <aislm0fS2MSDMzKf@devvm7509.cco0.facebook.com>
+References: <20260611-tcpdm-large-niovs-v2-0-ee2bf15e7523@meta.com>
+ <20260611-tcpdm-large-niovs-v2-3-ee2bf15e7523@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260610175922.1103871-1-rhkrqnwk98@gmail.com>
+In-Reply-To: <20260611-tcpdm-large-niovs-v2-3-ee2bf15e7523@meta.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[multikernel-io.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:cong.wang@bytedance.com,m:ast@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[multikernel.io];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-298359-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298361-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[multikernel-io.20251104.gappssmtp.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,bytedance.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,intel.com,linaro.org,amd.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,pop-os.localdomain:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,multikernel.io:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm7509.cco0.facebook.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EFDEA675688
+X-Rspamd-Queue-Id: 1E27E6756D2
 
-On Wed, Jun 10, 2026 at 05:59:17PM +0000, Sechang Lim wrote:
-> diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
-> index 9f33b07b1481..8dd73e9ee1ea 100644
-> --- a/net/ipv4/udp_bpf.c
-> +++ b/net/ipv4/udp_bpf.c
-> @@ -80,7 +80,9 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+On 06/11, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
+> 
+> Add -b <bytes> to request a non-default niov size via
+> NETDEV_A_DMABUF_RX_BUF_SIZE. When the value exceeds PAGE_SIZE,
+> udmabuf_alloc() switches to an MFD_HUGETLB-backed memfd so each 2 MB
+> hugepage produces one naturally-aligned sg entry.
+> 
+> Reject values > 2 MB up front: MFD_HUGETLB + udmabuf can only guarantee
+> 2 MB per sg entry (one hugepage), so a larger rx_buf_size would fail the
+> per-sg length/alignment check.
+> 
+> Add CONFIG_HUGETLBFS=y to drivers/net/hw/config so the new path is
+> reachable in the CI kernels built for these tests.
+> 
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> ---
+>  tools/testing/selftests/drivers/net/hw/config     |  1 +
+>  tools/testing/selftests/drivers/net/hw/ncdevmem.c | 49 +++++++++++++++++++++--
+>  2 files changed, 47 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
+> index cd20024218cd..ed8642b68094 100644
+> --- a/tools/testing/selftests/drivers/net/hw/config
+> +++ b/tools/testing/selftests/drivers/net/hw/config
+> @@ -3,6 +3,7 @@ CONFIG_FAIL_FUNCTION=y
+>  CONFIG_FAULT_INJECTION=y
+>  CONFIG_FAULT_INJECTION_DEBUG_FS=y
+>  CONFIG_FUNCTION_ERROR_INJECTION=y
+> +CONFIG_HUGETLBFS=y
+>  CONFIG_INET6_ESP=y
+>  CONFIG_INET6_ESP_OFFLOAD=y
+>  CONFIG_INET_ESP=y
+> diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> index d96e8a3b5a65..325c128191e2 100644
+> --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> @@ -61,6 +61,7 @@
+>  #include <sys/time.h>
+>  
+>  #include <linux/memfd.h>
+> +#include <sys/param.h>
+>  #include <linux/dma-buf.h>
+>  #include <linux/errqueue.h>
+>  #include <linux/udmabuf.h>
+> @@ -79,6 +80,7 @@
+>  #define PAGE_SHIFT 12
+>  #define TEST_PREFIX "ncdevmem"
+>  #define NUM_PAGES 16000
+> +#define MB(x) ((x) << 20)
+>  
+>  #ifndef MSG_SOCK_DEVMEM
+>  #define MSG_SOCK_DEVMEM 0x2000000
+> @@ -100,6 +102,7 @@ static unsigned int dmabuf_id;
+>  static uint32_t tx_dmabuf_id;
+>  static int waittime_ms = 500;
+>  static bool fail_on_linear;
+> +static uint32_t rx_buf_size;
+>  
+>  /* System state loaded by current_config_load() */
+>  #define MAX_FLOWS	8
+> @@ -142,6 +145,7 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
+>  {
+>  	struct udmabuf_create create;
+>  	struct memory_buffer *ctx;
+> +	unsigned int memfd_flags;
+>  	int ret;
+>  
+>  	ctx = malloc(sizeof(*ctx));
+> @@ -156,9 +160,14 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
+>  		goto err_free_ctx;
 >  	}
 >  
->  msg_bytes_ready:
-> +	lock_sock(sk);
->  	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
-> +	release_sock(sk);
->  	if (!copied) {
->  		long timeo;
->  		int data;
+> -	ctx->memfd = memfd_create("udmabuf-test", MFD_ALLOW_SEALING);
+> +	memfd_flags = MFD_ALLOW_SEALING;
 
-It seems Kuniyuki's fix covers more than yours:
-https://lore.kernel.org/bpf/20260221233234.3814768-4-kuniyu@google.com/
+[..]
 
-Regards,
-Cong
+> +	if (rx_buf_size > (uint32_t)getpagesize())
+
+What's the logic behind explicit (uint32_t) cast? uint vs int
+comparisons should promote the int to uint automatically?
+
+> +		memfd_flags |= MFD_HUGETLB | MFD_HUGE_2MB;
+> +
+> +	ctx->memfd = memfd_create("udmabuf-test", memfd_flags);
+>  	if (ctx->memfd < 0) {
+> -		pr_err("[skip,no-memfd]");
+> +		pr_err("[skip,no-memfd%s]",
+> +		       (memfd_flags & MFD_HUGETLB) ? " (need hugepages)" : "");
+>  		goto err_close_dev;
+>  	}
+>  
+> @@ -168,6 +177,11 @@ static struct memory_buffer *udmabuf_alloc(size_t size)
+>  		goto err_close_memfd;
+>  	}
+>  
+> +	if (memfd_flags & MFD_HUGETLB) {
+> +		size = roundup(size, MB(2));
+> +		ctx->size = size;
+> +	}
+> +
+>  	ret = ftruncate(ctx->memfd, size);
+>  	if (ret == -1) {
+>  		pr_err("[FAIL,memfd-truncate]");
+> @@ -699,6 +713,8 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+>  	netdev_bind_rx_req_set_ifindex(req, ifindex);
+>  	netdev_bind_rx_req_set_fd(req, dmabuf_fd);
+>  	__netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
+> +	if (rx_buf_size)
+> +		netdev_bind_rx_req_set_rx_buf_size(req, rx_buf_size);
+>  
+>  	rsp = netdev_bind_rx(*ys, req);
+>  	if (!rsp) {
+> @@ -1411,7 +1427,7 @@ int main(int argc, char *argv[])
+>  	int is_server = 0, opt;
+>  	int ret, err = 1;
+>  
+> -	while ((opt = getopt(argc, argv, "Lls:c:p:v:q:t:f:z:n")) != -1) {
+> +	while ((opt = getopt(argc, argv, "Lls:c:p:v:q:t:f:z:nb:")) != -1) {
+>  		switch (opt) {
+>  		case 'L':
+>  			fail_on_linear = true;
+> @@ -1446,6 +1462,33 @@ int main(int argc, char *argv[])
+>  		case 'n':
+>  			skip_config = 1;
+>  			break;
+> +		case 'b': {
+> +			char *endp;
+> +			unsigned long val;
+
+Christmas tree here as well?
+
+> +
+> +			errno = 0;
+> +			val = strtoul(optarg, &endp, 0);
+
+[..]
+
+> +			if (errno || endp == optarg || *endp || val == 0 ||
+> +			    val > UINT32_MAX) {
+> +				pr_err("invalid rx_buf_size: %s", optarg);
+> +				return 1;
+> +			}
+
+This is too sophisticated :-/ Just (if val == UINT32_MAX && errno == ERANGE) ?
+(you're looking for an overflow here supposedly?)
+
+[..]
+
+> +			if (val & (val - 1)) {
+> +				pr_err("rx_buf_size must be a power of 2");
+> +				return 1;
+> +			}
+> +			if (val < (unsigned long)getpagesize()) {
+> +				pr_err("rx_buf_size must be >= PAGE_SIZE (%d)",
+> +				       getpagesize());
+> +				return 1;
+> +			}
+> +			if (val > MB(2)) {
+> +				pr_err("rx_buf_size > 2 MB not supported");
+> +				return 1;
+> +			}
+
+We already check these on the kernel size, so should be ok to drop? 
 
