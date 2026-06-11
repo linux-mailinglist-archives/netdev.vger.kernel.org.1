@@ -1,119 +1,168 @@
-Return-Path: <netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5A2FBbDXKmrIxwMAu9opvQ
-	(envelope-from <netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:43:44 +0200
+	id TGMhCHTYKmoHyAMAu9opvQ
+	(envelope-from <netdev+bounces-298180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:47:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078EB67329D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:43:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711E86732D2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:46:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=0FLVvb99;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298179-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=YaY7LoFa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298180-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298180-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 244043002F59
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:43:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4E3F3422AA9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC79B3F7898;
-	Thu, 11 Jun 2026 15:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C302D0C89;
+	Thu, 11 Jun 2026 15:44:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEFE3AA4EF
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 15:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867673AA4EF;
+	Thu, 11 Jun 2026 15:44:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781192617; cv=none; b=Fha+HV6OlMu4ZYjFo4nHfzlP+3kScTzfMCn/sxQgDtnAvdj/OENo2uIRZwKHCZNO+27iVFJ+Lv+8MB3q3TzbK/lsC5lh3aEHskaXZQqDOhk05JsCFaiybzsrMA9Y3LMfVWU4AQ4wQKHxafTHXwd2ur9w5D8VF/t2dOk+B1XTx4Q=
+	t=1781192651; cv=none; b=gVdppmIn3sTOpGDJjw5lyIhCnTM1SeSu7FRy6SrClBZQSa7RR11GkH7kb4itkJIvssAnSXRB5r94UtdAoO4SfK7APXOO2B6YRkqH0DXNwFa7ZkmsQPPmJwQaiLNHecxYX6PGRwvK2xmGVx84tOEPSexTq+5N1x/e//C7p3NTqF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781192617; c=relaxed/simple;
-	bh=A0QPOoI1QIRAP6SkKhJ9Cz/S+rKbby6RT2vbilreIG0=;
+	s=arc-20240116; t=1781192651; c=relaxed/simple;
+	bh=h4jvRN4E19dkpQ5yFK5n2JakFhO2aBg/U/ArfFskC4c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/Qt50s3xe2OctMp7mRD417V88m3gwWE5urM938ruDew8IxypPELOGY/Iru3cxyAJP94GaBfxE/FZ1JmItH0+PwRUNc+THO2g2MzFM7z8uTHjzU8tp288DOrKlWsU0AR0i94UjiVhJ4iHS4tgrOoQ4D5N5Y3xDHr5HRmRVXGbMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0FLVvb99; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4jiIEDw7ibC7pr1Oeixmred4ucoxw5g1PQU4U2G4UIA=; b=0FLVvb992wP0UbYkxzBAQg+rF+
-	7DgZenEaKoCAZH++pqTkqRzVtiq54R3HiJjD2uRYOgHK8KRFE7CbpRCjxbb0r7uJZWGaeVjVKCTXr
-	YR8Z5Kr+6Pzc0XkgyJ95lu42fXu6CZlyPiHvEM6CdK06DDqR+1EJ4l3Oun1izaxaQxoo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wXhZ7-007BII-AL; Thu, 11 Jun 2026 17:43:33 +0200
-Date: Thu, 11 Jun 2026 17:43:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Das, Shubham" <shubham.das@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"mkubecek@suse.cz" <mkubecek@suse.cz>,
-	"D H, Siddaraju" <siddaraju.dh@intel.com>,
-	"Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>
-Subject: Re: Ethtool : PRBS feature
-Message-ID: <f4a3e4ad-91e2-4844-a29b-81f70151228e@lunn.ch>
-References: <SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDid4+Le9lJ3b6CFU3o/y1YSiG0/0beJTnF4FEXuYdJ7XOSyi8VT1Ax37H3eBYJI7mwYFzEZO92V04WAB2dd/ThTEwSniHFjoixhoApEddZW4fbTIOVAHCyCwAml/QWrMJcZCNYrAGVcWtQFL+mQTeeLVtDO2XxnYArGENsTDZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YaY7LoFa; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D871F1F00893;
+	Thu, 11 Jun 2026 15:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781192650;
+	bh=pmsBVymF0RW9AqgzB2dQja46aWO5BZy9eGdHvQpD6ek=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=YaY7LoFaeAUVz9gq9ORvzSAqAeLeuR/CxFTi6xjrHFXmJbXd3lydvX41hXg1wR22o
+	 isLmPS/+YZA+NapMuA/f5wryeKj82fKhibKJJydc18pUa5xPRkJxENudaoQxX1lGWh
+	 dWWf8wqsrvbtBakrfVvbphsuWEpLzxm8stkQ+IretBeNylcXMUvr+6Enbo8WLnm9ql
+	 IMNPtiEcpMJ4moID7tLnWgMsgfeeH3nglCbIOBgXPzCllWOoc8XAwVD47e7c5FMVQy
+	 lIFgOUwraZYeNutL3iQ9LGosIqvBVpNBm8U0TH9ejug6YIcf4aG/LnXMknoitgcWk/
+	 BNWJbVjB4rgdg==
+Date: Thu, 11 Jun 2026 11:44:08 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Simon Liebold <lieboldsimonpaul@gmail.com>
+Cc: Qi Tang <tpluszz77@gmail.com>, Florian Westphal <fw@strlen.de>,
+	Simon Liebold <simonlie@amazon.de>
+Subject: Re: [PATCH 6.12.y v2] xfrm: hold dev ref until after
+ transport_finish NF_HOOK
+Message-ID: <airXyC2CaS0kO84h@laps>
+References: <20260611121127.3908131-1-simonlie@amazon.de>
+ <20260611-stable-reply-0102@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
+In-Reply-To: <20260611-stable-reply-0102@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-4.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:shubham.das@intel.com,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298179-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298180-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,strlen.de,amazon.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,laps:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 078EB67329D
+X-Rspamd-Queue-Id: 711E86732D2
 
-> 2. Whether similar work has been proposed previously.
+On Thu, Jun 11, 2026 at 11:26:20AM -0400, Sasha Levin wrote:
+>On Thu, Jun 11, 2026 at 12:11:27PM +0000, Simon Liebold wrote:
+>> [ Upstream commit 1c428b03840094410c5fb6a5db30640486bbbfcb ]
+>>
+>> After async crypto completes, xfrm_input_resume() calls dev_put()
+>> immediately on re-entry before the skb reaches transport_finish.
+>
+>Queued for 6.12, thanks.
 
-There was a presentation at netdev conf last year about this topic,
-and how you use it to configure SERDES eyes. And then a long
-discussion on the netdev mailing afterwards. You should read the
-discussion, and incorporate the ideas. There was a couple of points
-raised:
+Ugh... Looking at it again, I've dropped it.
 
-SERDES are also used for PCIe, USB, SATA, and they have similar
-capabilities to a SERDES used for networking. Do we want a networking
-specific solution, or something more generic?
+The problem is the assumption that "the dev_put in the encap_type == -1
+async-resumption block does not exist" in 6.12.y. It's true there is no dev_put
+inside the 'if (encap_type == -1)' block, but that is only because the early
+drop lives somewhere else here: it's the dev_put right at the 'resume:' label.
 
-You need to include lane information, since there can be 1, 2 or 4
-lanes involved, and you need to specify which lane you want to test.
+Look at where 'resume:' sits relative to the per-iteration dev_put:
 
-      Andrew
+   mainline (post-fix):              6.12.y:
+         dev_hold(skb->dev);               dev_hold(skb->dev);
+         nexthdr = ...input(x, skb);       nexthdr = ...input(x, skb);
+         if (nexthdr == -EINPROGRESS) {    if (nexthdr == -EINPROGRESS)
+                 if (async)                        return 0;
+                         dev_put(...);     resume:
+                 return 0;                         dev_put(skb->dev);   <-- early drop
+         }
+         dev_put(skb->dev);
+   resume:                                 [async re-entry does goto resume,
+         ...                                so this dev_put runs immediately]
+
+In mainline the fix works because 'resume:' is *after* the per-iteration
+dev_put, so when xfrm_input_resume() re-enters and does 'goto resume', the
+async ref taken at the loop-top dev_hold is *not* dropped - it is held
+continuously until after the NF_HOOK (plus the inline 'if (async) dev_put()' it
+adds at the decaps/gro/drop/secondary-EINPROGRESS exits).
+
+In 6.12.y 'resume:' is *before* that dev_put, so the async 'goto resume' hits
+'dev_put(skb->dev)' straight away and drops the ref at the very start of resume
+processing. The fresh 'dev_hold(skb->dev)' added before transport_finish does
+not save it:
+
+   - between the early dev_put and the re-hold, skb->dev is held by no
+     xfrm reference at all - the exact window device teardown can race; and
+   - 'dev_hold(skb->dev)' itself dereferences skb->dev to bump the
+     refcount, so if the device was already freed in that window the
+     re-hold is itself a use-after-free.
+
+So this is a lifetime bug, not a refcount-balance bug: every hold still has a
+matching put, but the reference no longer covers the critical window.
+
+-- 
+Thanks,
+Sasha
 
