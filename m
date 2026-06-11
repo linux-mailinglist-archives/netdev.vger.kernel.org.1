@@ -1,150 +1,213 @@
-Return-Path: <netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PJI1FcrmKmpOzAMAu9opvQ
-	(envelope-from <netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:48:10 +0200
+	id lBkyAlXoKmrDzAMAu9opvQ
+	(envelope-from <netdev+bounces-298238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:54:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E9A673AE9
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:48:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65853673BEA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:54:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=JSC3wNNW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298238-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298238-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AA1153104015
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:45:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7086C3027327
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABECD37C929;
-	Thu, 11 Jun 2026 16:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33A240BCB3;
+	Thu, 11 Jun 2026 16:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2076A2D94BA;
-	Thu, 11 Jun 2026 16:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8CE377574
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 16:52:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781196357; cv=none; b=HG2IMaKwI8Zaz1lNF+QnUbNqhF8JH2ISjnZbkDAeZf9kks42tRwmworxAPQqQ4hmU9cKnwPdCC2pr9oD+yQmgb90ZDlKO/fzP3bs5j8fx0HbQUQ1x1366x8/oIsNmtIAXwmDdjbrPRRRrlvSQXSxFrBJPRrNpnK6D73rW6EPTmI=
+	t=1781196770; cv=none; b=TRIMhtMYpUm+ufis07Ikt9ffEDH1iLk/xP32pTUchSFUMG/RRPbmYy4mPY/17VB1PYVH1+SCVl5DMM+lQXYr3fHpZ1rAWRViK8c0aPCaiwTrKxBQyUZ8nRNVeUvvrb9Cr+9PFtuvATN7hAV7qxo70NReA5guyOiT+E5hywjaei0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781196357; c=relaxed/simple;
-	bh=CEd1ITtNJ1dtQfGGL+BtTaRF/mDIRvk8WQFomVTCwcE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=co3TrWygIJypkeDgRmpvrkhxkBB0DTgJOLcETIDZP4ethOz8kmzeE1xQcJrQB/wdJv6urzrHhCnEuvxM4czaT8RMAi6th0RYWPZd6XcUgcs9dnnln8VuzGaHcSzZMeiLOjkIs6pUo0or4XxFVWk1lZzIiXbUqrL6fNKjJyPZgEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Received: from localhost.localdomain (unknown [117.182.75.76])
-	by APP-05 (Coremail) with SMTP id zQCowABnvhE35ipqz20aEw--.26018S2;
-	Fri, 12 Jun 2026 00:45:44 +0800 (CST)
-From: WenTao Liang <vulab@iscas.ac.cn>
-To: jchapman@katalix.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	WenTao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: l2tp: fix refcount leak in pppol2tp_tunnel_get()
-Date: Fri, 12 Jun 2026 00:45:42 +0800
-Message-ID: <20260611164542.1031-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1781196770; c=relaxed/simple;
+	bh=PljbtlMV0PxgV8WmxnGh8eH+H2eTTVSdELrNKYqe7uc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZdVE7x/ARCqa0vz/uTKakyks4Er2i860jzZBUPZ0VT1R8AEB3XF+4MgxFuSYwbL93drxGZhFMRPlOwbqa+iQeSAoiKHGmnJFBw/M5JdRDDNst/fU45tVDmjMzp5IrzageS3oaqLF3dJWr7H5CtUVPzggbAIL7bVGsrH7E2Qj/i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JSC3wNNW; arc=none smtp.client-ip=209.85.160.201
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-517615db531so209657131cf.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 09:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781196768; x=1781801568; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=R7+SYFPrX06dNXHN4QC5CuvRliXsRDhq8JTa5eT8fXQ=;
+        b=JSC3wNNWvr64vq/lk/wNqRvkxVACghZx6evIGdn/oBy0C88w1cOoHP79TF2EjNI3+d
+         iNZgyyFJx22ww7F+7QRcd9eJvs6TKMyHYImudK4xgfADAyhgJmTWgFcsZshMtfOHIjTS
+         aVIxHmJFP459TdjhgD/q7sLg3aMTY8DX85lgBW6vUkO7E4cnX0BsEda9Y4DZIIBvJaCd
+         i+39Xz4lYLH+xq4LeWfXBB13UtxxRxNkrhWlasasMdQlrty+ZbqdB0Y0kXXrh7I7+j1Z
+         EANeZxiM3yzz0Kq7wgBfOt0RtY8ofi9+yATzNQ+DtIFMqiYqETjJ3Cwm+U92uvlLoPnv
+         5QqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781196768; x=1781801568;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R7+SYFPrX06dNXHN4QC5CuvRliXsRDhq8JTa5eT8fXQ=;
+        b=GWhUvA43h53MNNElbIGQ6d2WDUp7UkOUzfTfLgRt3Ib5oTqyjYsm0Ri2ospTXRJnx2
+         /ZRv0gYF8FKIMNzb07cOwlKBI4Fb5mfYgsWN3en4/6Com9K/9HoYFQLLtyJUmY3SFSf+
+         Jf5WrV7BFP66R5JmCu0hZ1OspnGi8F/MQICCSSWvYjqWU/ua0aZoedBhiVDoH7vawedn
+         5KkO6LI6ZcJpzpdKdqTzTtoXVlmV5OFe3prEgAX8EHsNtpSBZhnVRTbKwcEWt/gaAjZz
+         eAZRUIMpNUbtqFg8hifOy0/K7OKI9fIB6A+JBTduR5sdKD9PfCyXdi6RWyH41GprF7/J
+         ON1A==
+X-Forwarded-Encrypted: i=1; AFNElJ+NvrkBmQXRE/BYnhnHtZEJKWApuGkFIzBG9UyqgtAfqFiph/2J8RmbaoNEgIM7G3QWYED1Cjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXfMAtbE4JlShVMehOokR+aOdiAJ3DD47XRb+xvFN0vLFaOhFU
+	N1r2MyQptAqyXL77cAJqC8NJvL5nqduFURBMhhLcKeI1EUBstif9WK1XFOWvvTu/O8S5dLygH4G
+	qPe1RxyGD/3Yxwg==
+X-Received: from qvzm6.prod.google.com ([2002:ad4:4a06:0:b0:8cc:e8f7:c262])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:6103:b0:517:7188:c47a with SMTP id d75a77b69052e-517edd3738cmr58751451cf.2.1781196768272;
+ Thu, 11 Jun 2026 09:52:48 -0700 (PDT)
+Date: Thu, 11 Jun 2026 16:52:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABnvhE35ipqz20aEw--.26018S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF1kJr48urWrtw47Cr4UJwb_yoW8Gw18pr
-	15Cw4kWFWktF93Aws0va1kXa43urZayayrGFyDGw12vw1rX3yxC3y5WFyxWF1UGFWktw1Y
-	vr1jgry8Z3WDJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoPA2oqzu5B1wAAs3
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260611165247.2710257-1-edumazet@google.com>
+Subject: [PATCH net] ip_tunnel: annotate data-races around t->err_count and t->err_time
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298231-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	FORGED_RECIPIENTS(0.00)[m:jchapman@katalix.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298238-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:dsahern@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com,google.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 70E9A673AE9
+X-Rspamd-Queue-Id: 65853673BEA
 
-pppol2tp_tunnel_get() increments the tunnel's refcount via
-refcount_inc() on the tunnel returned from l2tp_tunnel_create(). If
-l2tp_tunnel_register() subsequently fails, the error path frees the
-tunnel via kfree(), bypassing the refcount entirely. At that point the
-refcount is 2 (one from l2tp_tunnel_create() and one from the
-refcount_inc()), so the reference counts leak and the memory is freed
-while still referenced, creating use-after-free potential.
+ip_tunnel_xmit() runs locklessly (dev->lltx == true).
 
-Fix this by using the standard reference counting API: replace the
-kfree() with two l2tp_tunnel_put() calls to properly release both
-references. This mirrors the cleanup used in other error paths within
-the same function.
+ipgre_err() and ipip_err() also run locklessly.
 
-Cc: stable@vger.kernel.org
-Fixes: 6b9f34239b00 ("l2tp: fix races in tunnel creation")
-Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+We need to add READ_ONCE() and WRITE_ONCE() annotations
+around t->err_count and t->err_time.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/l2tp/l2tp_ppp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/ipv4/ip_gre.c    |  8 ++++----
+ net/ipv4/ip_tunnel.c | 13 ++++++++-----
+ net/ipv4/ipip.c      |  8 ++++----
+ 3 files changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index e0b1915be1a6..0ddfc1893121 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -661,7 +661,8 @@ static struct l2tp_tunnel *pppol2tp_tunnel_get(struct net *net,
- 			refcount_inc(&tunnel->ref_count);
- 			error = l2tp_tunnel_register(tunnel, net, &tcfg);
- 			if (error < 0) {
--				kfree(tunnel);
-+				l2tp_tunnel_put(tunnel);
-+				l2tp_tunnel_put(tunnel);
- 				return ERR_PTR(error);
- 			}
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 169e2921a851d55bb67f5a7cf3f005ded1ed2655..208dd48012d963b9df0eddbdda73dd319930e48f 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -207,11 +207,11 @@ static int ipgre_err(struct sk_buff *skb, u32 info,
+ 	if (t->parms.iph.ttl == 0 && type == ICMP_TIME_EXCEEDED)
+ 		return 0;
  
+-	if (time_before(jiffies, t->err_time + IPTUNNEL_ERR_TIMEO))
+-		t->err_count++;
++	if (time_before(jiffies, READ_ONCE(t->err_time) + IPTUNNEL_ERR_TIMEO))
++		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
+ 	else
+-		t->err_count = 1;
+-	t->err_time = jiffies;
++		WRITE_ONCE(t->err_count, 1);
++	WRITE_ONCE(t->err_time, jiffies);
+ 
+ 	return 0;
+ }
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index 50d0f5fe4e4c6d83ef18cdea3ca25aed582839f0..9d114bd575f928b0ab46ef3007e456692d82b497 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -679,6 +679,7 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 	struct flowi4 fl4;
+ 	bool md = false;
+ 	bool connected;
++	int err_count;
+ 	u8 tos, ttl;
+ 	__be32 dst;
+ 	__be16 df;
+@@ -807,14 +808,16 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 		goto tx_error;
+ 	}
+ 
+-	if (tunnel->err_count > 0) {
++	err_count = READ_ONCE(tunnel->err_count);
++	if (err_count > 0) {
+ 		if (time_before(jiffies,
+-				tunnel->err_time + IPTUNNEL_ERR_TIMEO)) {
+-			tunnel->err_count--;
++				READ_ONCE(tunnel->err_time) + IPTUNNEL_ERR_TIMEO)) {
++			WRITE_ONCE(tunnel->err_count, err_count - 1);
+ 
+ 			dst_link_failure(skb);
+-		} else
+-			tunnel->err_count = 0;
++		} else {
++			WRITE_ONCE(tunnel->err_count, 0);
++		}
+ 	}
+ 
+ 	tos = ip_tunnel_ecn_encap(tos, inner_iph, skb);
+diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
+index ff95b1b9908e9f4ba4bff207a5bd2c5d5670215a..4f89a03e0b49b8fb328077a68fb72d7e4f5768ca 100644
+--- a/net/ipv4/ipip.c
++++ b/net/ipv4/ipip.c
+@@ -190,11 +190,11 @@ static int ipip_err(struct sk_buff *skb, u32 info)
+ 	if (t->parms.iph.ttl == 0 && type == ICMP_TIME_EXCEEDED)
+ 		goto out;
+ 
+-	if (time_before(jiffies, t->err_time + IPTUNNEL_ERR_TIMEO))
+-		t->err_count++;
++	if (time_before(jiffies, READ_ONCE(t->err_time) + IPTUNNEL_ERR_TIMEO))
++		WRITE_ONCE(t->err_count, READ_ONCE(t->err_count) + 1);
+ 	else
+-		t->err_count = 1;
+-	t->err_time = jiffies;
++		WRITE_ONCE(t->err_count, 1);
++	WRITE_ONCE(t->err_time, jiffies);
+ 
+ out:
+ 	return err;
 -- 
-2.50.1 (Apple Git-155)
+2.54.0.1136.gdb2ca164c4-goog
 
 
