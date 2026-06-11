@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-298395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298396-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id akpTAxA+K2r34wMAu9opvQ
-	(envelope-from <netdev+bounces-298395-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:00:32 +0200
+	id BGhgKjQ+K2r94wMAu9opvQ
+	(envelope-from <netdev+bounces-298396-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:01:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54EC0675BD7
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:00:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFFF3675BE5
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:01:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MsfJ40Nl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298395-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298395-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nkqEHVmw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298396-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298396-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC5C5301C89D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:00:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C81003231C96
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26867345724;
-	Thu, 11 Jun 2026 23:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA903C8C69;
+	Thu, 11 Jun 2026 23:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEDB21CC59;
-	Thu, 11 Jun 2026 23:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF963803D9;
+	Thu, 11 Jun 2026 23:00:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781218821; cv=none; b=WY60yeVE28M0VDUmCLf47C2eofsIftE7XFYX55l99hLXZsgOoJpLUVisQOf1ZhSq+OUunMyI757YDVSy/5HoxHBdM09YVOn4mvrzTCtyfJMe5wB43l+tOGPWoCsSLY8TrqXJwFfyD2TK/McgpWOsizb3dIpnH3ec3fKw17MMp5g=
+	t=1781218822; cv=none; b=bGDky6bVkMI2SI7i+OBYerKUCQotklRLLI2SxvS7Rs6EYv+cWOVhKwHwVpO3VTs+0ASXiP3CE70k6NyWgY2VnXR9faXnjbyUkB5Wu8lvVuYRPqwB4UTV8xRtIK3zRbtV8K5wV+PJZtLCGaNeLgckUMV0Nr5XxYDodvxRo8PH2FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781218821; c=relaxed/simple;
-	bh=VoCsTSoTByRBFLT58EhugOdy0Lh/UeFOVyiiUgZHmxg=;
+	s=arc-20240116; t=1781218822; c=relaxed/simple;
+	bh=wl0QIuKggj8Rvf3hNU5aOtP6Jx6G53FKrBCQYHZ2EDE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jmo5MKlPMQh2qf8iW1yj4IbttUN+jWfb+QiV5uPqET+pLC8DGjsJ+nebBXTomz2Df8A9pOo/ntidYyuf/PWRe3rd5j07gttD4fvxRn4yYrQO/t+gxTLL3bWtmAZ2FCATpDGX+I/Odv7bzqNBb1A+U0z4mEWODysz1HAGKjr9Bzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsfJ40Nl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC7CD1F000E9;
-	Thu, 11 Jun 2026 23:00:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=UC7AZf74/QKVhi0iLLCOa/Khaj2pYqh9VF5L/uHGNQcS9DQJzg9NwkENXhrbmzVfWpkRF0YR1OnQWZtfoEfWVntnY0ru/6NGBFBvCLeaWzZLyMbOqQFqVlS2w1rcYEtwx66dAH7jzPDcl0dzdQek4xUTT5X7zGnqMN+aHP1xZ8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkqEHVmw; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1481F000E9;
+	Thu, 11 Jun 2026 23:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781218819;
-	bh=jDGfFn2KEiiONblxjqElyzZGfZI1fC5PCDvVnAfxoJM=;
+	s=k20260515; t=1781218821;
+	bh=wtGa6+1BtelsAGDuuKGrfoq5Ahdw17vFw8gqBmiODD4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=MsfJ40NlwSgaCTcuD+B5ADH94U6UHEsxzkqMs9lB13smGiyDuVv2MQtCp0ReywmnU
-	 uSbFL/YkIlWZsx0DE6PD6S5v6zYgbMAujZZtyDobQnYtN2isZbej645Ew2BHCHxLvg
-	 h2k3YNuSwGo38WqIdx0g5A2CsjNTQprs74LraOt40qcGSkNXsA3Qz1Tzp1KaZuLutG
-	 SVJN2G9fXPwSspFJjrme6Y4OuWpTHF4p21YUQFe2bnDqhG0Gm9xBTJARyKNlO0Gn/q
-	 OQlZaWJerb0OZFxfH7cqxiZr73QEy8HKBZL8xpyRi0QWZwdDfsAQ9TW/14R9tfXh1k
-	 gQ0AY05FWdm+Q==
+	b=nkqEHVmwtibwZ1xAJNvjkWlVbjT/NvmsodglpYkPiZoki6ZR+zKJz0wwch92Lo/w0
+	 VrKQJVlFWWmXw49nHWcs9Fa8dfHFrWq+cT+eEXB+LejirTyC7s+g+nZRPH9i9a8EXP
+	 7kvGmJMLM0s8TunUpkJIAG4BIUu2vH2+4KUbts3yl4/k4MGmrg32o33EIDH7GS9kvA
+	 /BRKVoivPrGiE7ubjKquW+QrH6CbK+gopmNJR7kvRlGDWjMmYx9MVEFIQPlnvHEtKR
+	 l5/6315J13qrw7gReuTMOWpvPtOontrMH1QdHjf88Rb3t+yL2vh8/5QOVRNMyQYZ9t
+	 5+gnqTKlx27tw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197F43930FB3;
-	Thu, 11 Jun 2026 23:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9383B3930FB3;
+	Thu, 11 Jun 2026 23:00:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,87 +57,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v10 0/3] ksz87xx: add support for low-loss cable
- equalizer errata
+Subject: Re: [PATCH] mlxsw: fix refcount leak in mlxsw_sp_port_lag_join()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178121881663.398116.1095367021130351842.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 23:00:16 +0000
-References: 
- <20260609-ksz87xx_errata_low_loss_connections-v10-0-9ba4418cf3db@exotec.com>
-In-Reply-To: 
- <20260609-ksz87xx_errata_low_loss_connections-v10-0-9ba4418cf3db@exotec.com>
-To: Fidelio Lawson <lawson.fidelio@gmail.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, marex@denx.de, maxime.chevallier@bootlin.com,
- horms@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
- Tristram.Ha@microchip.com, Woojung.Huh@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, nb@tipi-net.de, fidelio.lawson@exotec.com,
- marex@nabladev.com
+ <178121881813.398116.915603452601810782.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jun 2026 23:00:18 +0000
+References: <20260609083709.209743-1-vulab@iscas.ac.cn>
+In-Reply-To: <20260609083709.209743-1-vulab@iscas.ac.cn>
+To: WenTao Liang <vulab@iscas.ac.cn>
+Cc: idosch@nvidia.com, petrm@nvidia.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,armlinux.org.uk,vger.kernel.org,tipi-net.de,exotec.com,nabladev.com];
+	TAGGED_FROM(0.00)[bounces-298396-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298395-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lawson.fidelio@gmail.com,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:marex@denx.de,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:Tristram.Ha@microchip.com,m:Woojung.Huh@microchip.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nb@tipi-net.de,m:fidelio.lawson@exotec.com,m:marex@nabladev.com,m:lawsonfidelio@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:idosch@nvidia.com,m:petrm@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,microchip.com:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 54EC0675BD7
+X-Rspamd-Queue-Id: EFFF3675BE5
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 09 Jun 2026 18:19:54 +0200 you wrote:
-> Hello,
+On Tue,  9 Jun 2026 08:37:09 +0000 you wrote:
+> When mlxsw_sp_port_lag_index_get() fails, mlxsw_sp_port_lag_join()
+> returns an error without releasing the lag reference obtained by
+> the earlier mlxsw_sp_lag_get().  All other error paths in the
+> function jump to the cleanup label that ends with
+> mlxsw_sp_lag_put(), so this is a single missed release.
 > 
-> This patch implements the KSZ87xx short cable erratum
-> described in Microchip document DS80000687C for KSZ87xx switches
-> and the following support article:
-> 
-> Link: https://support.microchip.com/s/article/Solution-for-Using-CAT-5E-or-CAT-6-Short-Cable-with-a-Link-Issue-for-the-KSZ8795-Family
+> Fix the leak by replacing the bare 'return err' with a goto to the
+> existing error cleanup label, which will drop the reference safely.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v10,1/3] net: dsa: microchip: implement KSZ87xx Module 3 low-loss cable errata
-    https://git.kernel.org/netdev/net-next/c/014f0c98cf1d
-  - [net-next,v10,2/3] net: ethtool: add KSZ87xx low-loss cable PHY tunables
-    https://git.kernel.org/netdev/net-next/c/13655144ddca
-  - [net-next,v10,3/3] net: phy: micrel: expose KSZ87xx low-loss cable tunables
-    https://git.kernel.org/netdev/net-next/c/a1ee1b9beb7d
+  - mlxsw: fix refcount leak in mlxsw_sp_port_lag_join()
+    https://git.kernel.org/netdev/net-next/c/41c8c1d65b32
 
 You are awesome, thank you!
 -- 
