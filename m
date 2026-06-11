@@ -1,84 +1,82 @@
-Return-Path: <netdev+bounces-298122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UG1yC7etKmpsuwMAu9opvQ
-	(envelope-from <netdev+bounces-298122-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:44:39 +0200
+	id 7fZ7BQauKmqAuwMAu9opvQ
+	(envelope-from <netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2F4671F9D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:44:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79741671FE8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:45:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=tY+XM1Da;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298122-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298122-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=I144PC0u;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298123-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67E2F348FF68
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:38:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07C373073426
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148D435AC33;
-	Thu, 11 Jun 2026 12:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735553F7874;
+	Thu, 11 Jun 2026 12:39:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602182D5940
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002202F28FC
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:39:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781181536; cv=none; b=BEz61fzVUAVI7yDs3HvkFVGxAK2WOzILftEVeJMHdMLA2pgjCK/pGSKbsapQ0nqsLcfqFnP2IY+huxLS9mhCBYJ1g3W207kEvJSgQJtHL/M0fWMEdgaOtYgH4n79f8leINthm62ATjKPNGp352Qeq7iPwe4b0TKAgEPo3xccyUU=
+	t=1781181553; cv=none; b=tcQeiR4pqCFuEVoisOTsy8vn45anO5EeV3HYcEmksfLzPTr4u9CA6lkMUVoJvVq0BKoCoJjG4155VBMARGc7rzABenetL+5SnVdu+KB1/8kuAmf/+t1pyyAHhyN7gOEzcRdP8ZwOlg6/aWiHkcKAuV1pABulxh0w73IR3DoVJgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781181536; c=relaxed/simple;
-	bh=JQn3iSKFkTdINnSrYQfvXENCDQqM0n+AA/x11hisdJo=;
+	s=arc-20240116; t=1781181553; c=relaxed/simple;
+	bh=c2g8WkNZdy9SmxdKoIzElNcy39kSDQgaBCXoxEeNlN4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DsoZrW6QVXoGudRzsFsoVEc0kVUU1kQekPAzEu2ZvzadabdWnxGBn/rrpuHRrJHuVgc0aek83XVw9pIeCj9MY31UzuPK4OGM4vM5Kih2GSQLUbP8e29yLxAwlAZkA2ArBCtaxmeWI7wPtkdvZ5O0mAkR1RNkcf+oDNTAFGufz30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tY+XM1Da; arc=none smtp.client-ip=91.218.175.182
+	 MIME-Version; b=LNPMwA6p8CJhO7QD3CxQd45RYJbmVR1o8PiYY1Mc/bW2hWs+0cvyOCbw/W63YnyLOocal025oktknATRLbyYf0vC54bpVFCzuvaoTj+DKQIUWYvlj7vGULNfQ3Q7GwSF1dwYHsWwPz47hctxa7bjpdT5ibf3goqbhmwCiocgXvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I144PC0u; arc=none smtp.client-ip=91.218.175.182
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781181532;
+	t=1781181549;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yMCEmEs8+vY8J24Sw1c5CtRWjYPoYXQ935GcjZmWP7w=;
-	b=tY+XM1Damxe+cnRvEBKfDistwE27ewnHd2+3X5lI4IG5/8UE9qqkTrlhLzTIv5nIqJuUy/
-	mtyzRsI68ESEnTYE91ba6oUgfHXdqrELQHDfC8JmOCtE2971MujcIxVaHam34O1K87mu8P
-	p38JtEg3COvn/LNrJtvUpqiaSeThqI4=
+	bh=htxaBRqgJJwIgSGsPQlozFytcsGKySwMz0N5LwBygaI=;
+	b=I144PC0u/OG52044NrqyKOQ2uxXsP3BaHF9MuGxxfNcDSkfdbY9Q8cZRxpDx4zwTegF9gz
+	kMwFLeiL2qmC9p/3DTnryNbKZAfKIHtGbPm0LmqpBjfqx6FirBchb7WXgII7hnPw7MhRyj
+	9fh4YSGl7RwwTvTasJYE1cJWf2M0Q2g=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@google.com>,
-	syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com,
+Cc: Sechang Lim <rhkrqnwk98@gmail.com>,
 	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
 	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Jiri Olsa <jolsa@kernel.org>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
 	Shuah Khan <shuah@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Sechang Lim <rhkrqnwk98@gmail.com>,
 	Ihor Solodrai <ihor.solodrai@linux.dev>,
 	Cong Wang <cong.wang@bytedance.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v2 5/7] sockmap: Fix use-after-free in udp_bpf_recvmsg()
-Date: Thu, 11 Jun 2026 20:34:13 +0800
-Message-ID: <20260611123538.156005-6-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v2 6/7] bpf, sockmap: fix integer overflow in bpf_msg_pop_data() bounds check
+Date: Thu, 11 Jun 2026 20:34:14 +0800
+Message-ID: <20260611123538.156005-7-jiayuan.chen@linux.dev>
 In-Reply-To: <20260611123538.156005-1-jiayuan.chen@linux.dev>
 References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -97,16 +95,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	TAGGED_FROM(0.00)[bounces-298122-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-298123-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:kuniyu@google.com,m:syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com,m:jiayuan.chen@linux.dev,m:jakub@cloudflare.com,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:syzbot@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:rhkrqnwk98@gmail.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
@@ -116,197 +114,81 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[google.com,syzkaller.appspotmail.com,linux.dev,cloudflare.com,iogearbox.net,gmail.com,fomichev.me,kernel.org,etsalapatis.com,davemloft.net,redhat.com,bytedance.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,iogearbox.net,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,9307c991a6d07ce6e6d8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B2F4671F9D
+X-Rspamd-Queue-Id: 79741671FE8
 
-From: Kuniyuki Iwashima <kuniyu@google.com>
+From: Sechang Lim <rhkrqnwk98@gmail.com>
 
-syzbot reported use-after-free of struct sk_msg in sk_msg_recvmsg(). [0]
+start and len are u32, so
 
-sk_msg_recvmsg() peeks sk_msg from psock->ingress_msg under a lock,
-but its processing is lockless.
+	u64 last = start + len;
 
-Thus, sk_msg_recvmsg() must be serialised by callers, otherwise
-multiple threads could touch the same sk_msg.
+evaluates start + len in 32-bit and wraps before storing it in last.
+The bounds check
 
-For example, TCP uses lock_sock(), and AF_UNIX uses unix_sk(sk)->iolock.
+	if (start >= offset + l || last > msg->sg.size)
+		return -EINVAL;
 
-Initially, udp_bpf_recvmsg() had used lock_sock(), but the cited
-commit accidentally removed it.
+can then be passed with an out-of-range start/len, after which the pop
+loop runs off the end of the scatterlist and sk_msg_shift_left() calls
+put_page() on the empty msg->sg.end slot:
 
-Let's serialise sk_msg_recvmsg() with lock_sock() in udp_bpf_recvmsg().
+  Oops: general protection fault, probably for non-canonical address
+  0xdffffc0000000001: 0000 [#1] SMP KASAN PTI
+  KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+  RIP: 0010:sk_msg_shift_left net/core/filter.c:2957 [inline]
+  RIP: 0010:____bpf_msg_pop_data net/core/filter.c:3103 [inline]
+  RIP: 0010:bpf_msg_pop_data+0x753/0x1a10 net/core/filter.c:2984
+  Call Trace:
+   <TASK>
+   bpf_prog_4cc92c278f4d5d56+0x1b1/0x1e8
+   bpf_prog_run_pin_on_cpu+0x107/0x320 include/linux/filter.h:746
+   sk_psock_msg_verdict+0x357/0x7f0 net/core/skmsg.c:934
+   tcp_bpf_send_verdict net/ipv4/tcp_bpf.c:420 [inline]
+   tcp_bpf_sendmsg+0x766/0x1ae0 net/ipv4/tcp_bpf.c:583
+   __sock_sendmsg+0x153/0x1c0 net/socket.c:802
+   __sys_sendto+0x326/0x430 net/socket.c:2265
+   __x64_sys_sendto+0xe3/0x100 net/socket.c:2268
+   do_syscall_64+0x14c/0x480
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
 
-Note that holding spin_lock_bh(&sk->sk_receive_queue.lock) is not
-an option due to copy_page_to_iter() in sk_msg_recvmsg().
+Widen the addition with a (u64) cast so the bound is evaluated in
+64-bit and a len near U32_MAX no longer wraps below msg->sg.size.
 
-[0]:
-BUG: KASAN: slab-use-after-free in sk_msg_recvmsg+0xb54/0xc30 net/core/skmsg.c:428
-Read of size 4 at addr ffff88814cdcf000 by task syz.0.24/6020
+While here, change pop from int to u32. It counts bytes against the
+unsigned scatterlist lengths and can never be negative, so the signed
+type only invites sign-confusion in the pop loop.
 
-CPU: 1 UID: 0 PID: 6020 Comm: syz.0.24 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xba/0x230 mm/kasan/report.c:482
- kasan_report+0x117/0x150 mm/kasan/report.c:595
- sk_msg_recvmsg+0xb54/0xc30 net/core/skmsg.c:428
- udp_bpf_recvmsg+0x4bd/0xe00 net/ipv4/udp_bpf.c:84
- inet_recvmsg+0x260/0x270 net/ipv4/af_inet.c:891
- sock_recvmsg_nosec net/socket.c:1078 [inline]
- sock_recvmsg+0x1a8/0x270 net/socket.c:1100
- ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2812
- ___sys_recvmsg+0x215/0x590 net/socket.c:2854
- do_recvmmsg+0x334/0x800 net/socket.c:2949
- __sys_recvmmsg net/socket.c:3023 [inline]
- __do_sys_recvmmsg net/socket.c:3046 [inline]
- __se_sys_recvmmsg net/socket.c:3039 [inline]
- __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3039
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb319f9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fb31ad97028 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 00007fb31a216090 RCX: 00007fb319f9aeb9
-RDX: 0000000000000001 RSI: 0000200000000400 RDI: 0000000000000004
-RBP: 00007fb31a008c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000040000021 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fb31a216128 R14: 00007fb31a216090 R15: 00007ffe21dd0a98
- </TASK>
-
-Allocated by task 6019:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x3d1/0x6e0 mm/slub.c:5780
- kmalloc_noprof include/linux/slab.h:957 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- alloc_sk_msg net/core/skmsg.c:510 [inline]
- sk_psock_skb_ingress_self+0x60/0x350 net/core/skmsg.c:612
- sk_psock_verdict_apply net/core/skmsg.c:1038 [inline]
- sk_psock_verdict_recv+0x7d9/0x8d0 net/core/skmsg.c:1236
- udp_read_skb+0x73e/0x7e0 net/ipv4/udp.c:2045
- sk_psock_verdict_data_ready+0x12d/0x550 net/core/skmsg.c:1257
- __udp_enqueue_schedule_skb+0xc54/0x10b0 net/ipv4/udp.c:1789
- __udp_queue_rcv_skb net/ipv4/udp.c:2346 [inline]
- udp_queue_rcv_one_skb+0xac5/0x19c0 net/ipv4/udp.c:2475
- __udp4_lib_mcast_deliver+0xc06/0xcf0 net/ipv4/udp.c:2585
- __udp4_lib_rcv+0x10f6/0x2620 net/ipv4/udp.c:2724
- ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
- ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
- NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
- dst_input include/net/dst.h:474 [inline]
- ip_sublist_rcv_finish+0x221/0x2a0 net/ipv4/ip_input.c:584
- ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
- ip_sublist_rcv+0x5c6/0xa70 net/ipv4/ip_input.c:644
- ip_list_rcv+0x3f1/0x450 net/ipv4/ip_input.c:678
- __netif_receive_skb_list_ptype net/core/dev.c:6195 [inline]
- __netif_receive_skb_list_core+0x7e5/0x810 net/core/dev.c:6242
- __netif_receive_skb_list net/core/dev.c:6294 [inline]
- netif_receive_skb_list_internal+0x995/0xcf0 net/core/dev.c:6385
- netif_receive_skb_list+0x54/0x410 net/core/dev.c:6437
- xdp_recv_frames net/bpf/test_run.c:269 [inline]
- xdp_test_run_batch net/bpf/test_run.c:350 [inline]
- bpf_test_run_xdp_live+0x1946/0x1cf0 net/bpf/test_run.c:379
- bpf_prog_test_run_xdp+0x81c/0x1160 net/bpf/test_run.c:1396
- bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703
- __sys_bpf+0x5cb/0x920 kernel/bpf/syscall.c:6182
- __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6021:
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2540 [inline]
- slab_free mm/slub.c:6674 [inline]
- kfree+0x1be/0x650 mm/slub.c:6882
- kfree_sk_msg include/linux/skmsg.h:385 [inline]
- sk_msg_recvmsg+0xaa8/0xc30 net/core/skmsg.c:483
- udp_bpf_recvmsg+0x4bd/0xe00 net/ipv4/udp_bpf.c:84
- inet_recvmsg+0x260/0x270 net/ipv4/af_inet.c:891
- sock_recvmsg_nosec net/socket.c:1078 [inline]
- sock_recvmsg+0x1a8/0x270 net/socket.c:1100
- ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2812
- ___sys_recvmsg+0x215/0x590 net/socket.c:2854
- do_recvmmsg+0x334/0x800 net/socket.c:2949
- __sys_recvmmsg net/socket.c:3023 [inline]
- __do_sys_recvmmsg net/socket.c:3046 [inline]
- __se_sys_recvmmsg net/socket.c:3039 [inline]
- __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3039
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 9f2470fbc4cb ("skmsg: Improve udp_bpf_recvmsg() accuracy")
-Reported-by: syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/69922ac9.a70a0220.2c38d7.00e0.GAE@google.com/
+Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
 Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 ---
- net/ipv4/udp_bpf.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/core/filter.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
-index 9f33b07b14813..ad57c4c9eaab6 100644
---- a/net/ipv4/udp_bpf.c
-+++ b/net/ipv4/udp_bpf.c
-@@ -50,7 +50,9 @@ static int udp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
- 	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
- 	ret = udp_msg_has_data(sk, psock);
- 	if (!ret) {
-+		release_sock(sk);
- 		wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
-+		lock_sock(sk);
- 		ret = udp_msg_has_data(sk, psock);
- 	}
- 	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
-@@ -79,6 +81,7 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		goto out;
- 	}
+diff --git a/net/core/filter.c b/net/core/filter.c
+index e35e681a15dca..742aeeea13c26 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -3048,8 +3048,8 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 	   u32, len, u64, flags)
+ {
+ 	u32 i = 0, l = 0, space, offset = 0;
+-	u64 last = start + len;
+-	int pop;
++	u64 last = (u64)start + len;
++	u32 pop;
  
-+	lock_sock(sk);
- msg_bytes_ready:
- 	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
- 	if (!copied) {
-@@ -90,11 +93,17 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		if (data) {
- 			if (psock_has_data(psock))
- 				goto msg_bytes_ready;
-+
-+			release_sock(sk);
-+
- 			ret = sk_udp_recvmsg(sk, msg, len, flags);
- 			goto out;
- 		}
- 		copied = -EAGAIN;
- 	}
-+
-+	release_sock(sk);
-+
- 	ret = copied;
- out:
- 	sk_psock_put(sk, psock);
+ 	if (unlikely(flags))
+ 		return -EINVAL;
 -- 
 2.43.0
 
