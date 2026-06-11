@@ -1,247 +1,150 @@
-Return-Path: <netdev+bounces-298230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zSH0JHjmKmo4zAMAu9opvQ
-	(envelope-from <netdev+bounces-298230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:46:48 +0200
+	id PJI1FcrmKmpOzAMAu9opvQ
+	(envelope-from <netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:48:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEBF673AB0
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:46:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E9A673AE9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:48:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Cj1fokFh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298230-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298230-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298231-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D130309085C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:45:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA1153104015
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3673A872B;
-	Thu, 11 Jun 2026 16:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABECD37C929;
+	Thu, 11 Jun 2026 16:45:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F32134040E
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 16:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2076A2D94BA;
+	Thu, 11 Jun 2026 16:45:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781196316; cv=none; b=tfSAB9x34ASb+Xfsj3/F4LUv2YJh/oLdrn9i/I8qw41m1r6dV8zRCp0zgzRLzvvG122pFy3qJMARwGma2ubcOUn5iedBwuKqz7AlcrxOnCCpzQljhrtC0dgSmk6IkmWuZ0exNhFtkl+ZCUADbWbiE/MXP2FvhEK7TUlnv5rNWDw=
+	t=1781196357; cv=none; b=HG2IMaKwI8Zaz1lNF+QnUbNqhF8JH2ISjnZbkDAeZf9kks42tRwmworxAPQqQ4hmU9cKnwPdCC2pr9oD+yQmgb90ZDlKO/fzP3bs5j8fx0HbQUQ1x1366x8/oIsNmtIAXwmDdjbrPRRRrlvSQXSxFrBJPRrNpnK6D73rW6EPTmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781196316; c=relaxed/simple;
-	bh=eoDaWDBXYJeLcDF9mSfKTCRaUJsOMqahefPGRT0/AGU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=V9bi1skgRPNW8E0m9xWAJVodrP94aeerHPuwrdDx1ZOJEp/T2ANh5sStGe9LtQF6adpwHmYyR7kfVCdAXTWBR76FvICpoT5nLdQ1RTPIk92hl2oCD6O2mvsqiaGYkol+S5Nxed0aiKG9OrxFt8VXP+oWBTTiDZn04goG8xC8dmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cj1fokFh; arc=none smtp.client-ip=74.125.82.51
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-137ec563a95so25795c88.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 09:45:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781196313; x=1781801113; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kvWDNY3Gjw9OYKYBFLQFihLG0PJK2utsvZ3byDHLtuI=;
-        b=Cj1fokFhVhgPQJ3RcWu5jnBJDmj1TApQnI28qnXEbJgWRVZvAZxVndqz2x+Tljsa4A
-         Q2IW2rpe+rCCEf8+sZBFRBoQuSudzSfQJktD0X7fYp/V24l2riQIz+MZlrySR4BmKFOZ
-         0iZfrJPzwdqOJqKZOzfh7PWOsD3S80opcKrW6a+kt8/xok2AjvljoSy2vcHydHK/TqkI
-         /r9rIPTq6IRATerP1IVnISBP4R5/U0U7iPeJqLsTa2l7ITIupVjcpQlGfF79WH8UheC4
-         SiWEZyIhoBaMCotyJD881qXTsDdIAQtB2VvVR6XdkGULINGklV+ZdLli5CmKwec6ho4K
-         LGUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781196313; x=1781801113;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kvWDNY3Gjw9OYKYBFLQFihLG0PJK2utsvZ3byDHLtuI=;
-        b=eWKLlW7O9e4S+4o7U0AVXEtg91HLR6bE4M9Gi9sqdyxN8p5Mxh+9qGBpM4fPPvSK4i
-         DsueCahiqWLuERl8hMeVDaJ7fP2M6LHEdY1EOQn+Lhsn89Zlc3RF+BSGVAdcGXsoPFVU
-         t+QJLX0oZALGmRulCqBNf+8ZrKob4Krb2DDb+xYNoGuuTbxO78pLZCYtwqWzb7hJoJ8n
-         jsDZpwWoLIHWJdhnTkTyG4KEa0WCjYd5+6OS0LDCpQxskjvaJK6mJoGQBa2yaStPs2wl
-         8+FLSt1dBDxYeLbeR+KFSCtz+ekOWsQnHfzXqP084DePZOAZAZKfYNJ1wSdJeAIFdDCF
-         wBHg==
-X-Forwarded-Encrypted: i=1; AFNElJ8cbNFHuAfL4U6WJ0ySTpXVziqLnNUClZphNTERkku8Y3NDEvGXw3CYxUz0ez3uF94MnW9N/qM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIxYRRxPbFGCI33pfUvmW/0yU04FGQg0ReA5mEjM+ePo0hQoR1
-	htuewUE7y8P0q2YapIcpThCc571hCYlGYEONZiBHDRimR7lW5VYPnTjP
-X-Gm-Gg: Acq92OHJFCYlOFmSJd1QfizM5WpM1c8ZfTtzrcMMi43/v57Mx/KDVvjAWJiQr3X6mXg
-	DkJr0JMrfTL48G/QRxqx3lWxhOFR8VJB/t8AmYOxboRVa8bXVWDHIbi77LmJlHL96BYpABHLUL0
-	Z1uQPO0rLM/7gIWR2yePJ4fNDOzj8F8cwDGT4B8St6NCp5Ei0DYugQab+1YxVJxN+hWOkbhPEa6
-	nzQphKSC1swuo7VmU9GGTCePWyPnQZQoCv+yU+uXWOUXtkITCcWcxR2nB1TahOYxeE2Q6ejYPNp
-	yyba3bt+WnsT2svI0Uhp/A++lTwoaYexOzNW0MirDZfUMPbROYCVD8fKd7BUa4iRqzpR+qNL2ju
-	28rLItTjEJpL+MwMqt+XUkc68h+4iczF7eWVMHCNV1CfEveawM8Y+5z4B3rMmQMsnksBt+I38Gj
-	3WdlmF6PPwkW1gxcOm4TnqkIa+GKEej90QKFAV+36lIvhCcsBzBTs=
-X-Received: by 2002:a05:7022:fd04:b0:138:1569:6f1 with SMTP id a92af1059eb24-13842164222mr2295767c88.11.1781196312961;
-        Thu, 11 Jun 2026 09:45:12 -0700 (PDT)
-Received: from localhost ([198.176.50.157])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-138430452a2sm2324929c88.14.2026.06.11.09.45.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2026 09:45:11 -0700 (PDT)
+	s=arc-20240116; t=1781196357; c=relaxed/simple;
+	bh=CEd1ITtNJ1dtQfGGL+BtTaRF/mDIRvk8WQFomVTCwcE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=co3TrWygIJypkeDgRmpvrkhxkBB0DTgJOLcETIDZP4ethOz8kmzeE1xQcJrQB/wdJv6urzrHhCnEuvxM4czaT8RMAi6th0RYWPZd6XcUgcs9dnnln8VuzGaHcSzZMeiLOjkIs6pUo0or4XxFVWk1lZzIiXbUqrL6fNKjJyPZgEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Received: from localhost.localdomain (unknown [117.182.75.76])
+	by APP-05 (Coremail) with SMTP id zQCowABnvhE35ipqz20aEw--.26018S2;
+	Fri, 12 Jun 2026 00:45:44 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: jchapman@katalix.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: l2tp: fix refcount leak in pppol2tp_tunnel_get()
+Date: Fri, 12 Jun 2026 00:45:42 +0800
+Message-ID: <20260611164542.1031-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 12 Jun 2026 00:45:07 +0800
-Message-Id: <DJ6DE76H4G9V.YMAE26Y0O3DM@gmail.com>
-Subject: Re: [PATCH net] net: atm: fix use-after-free in sigd_put_skb()
-From: "Weiming Shi" <bestswngs@gmail.com>
-To: "Weiming Shi" <bestswngs@gmail.com>, "Paolo Abeni" <pabeni@redhat.com>
-Cc: <3chas3@gmail.com>, <netdev@vger.kernel.org>, <davem@davemloft.net>,
- <kuba@kernel.org>, <edumazet@google.com>, <horms@kernel.org>,
- <linux-atm-general@lists.sourceforge.net>, <linux-kernel@vger.kernel.org>,
- <xmei5@asu.edu>
-X-Mailer: aerc 0.21.0
-References: <20260604164916.2681964-2-bestswngs@gmail.com>
- <20260609110615.196819-1-pabeni@redhat.com> <aigrk5B3VzaWgKIF@Air.local>
-In-Reply-To: <aigrk5B3VzaWgKIF@Air.local>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABnvhE35ipqz20aEw--.26018S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF1kJr48urWrtw47Cr4UJwb_yoW8Gw18pr
+	15Cw4kWFWktF93Aws0va1kXa43urZayayrGFyDGw12vw1rX3yxC3y5WFyxWF1UGFWktw1Y
+	vr1jgry8Z3WDJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoPA2oqzu5B1wAAs3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298230-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298231-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:jchapman@katalix.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,redhat.com];
-	FORGED_SENDER(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:pabeni@redhat.com,m:3chas3@gmail.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:linux-atm-general@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,davemloft.net,kernel.org,google.com,lists.sourceforge.net,asu.edu];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0FEBF673AB0
+X-Rspamd-Queue-Id: 70E9A673AE9
 
-On Tue Jun 9, 2026 at 11:49 PM CST, Weiming Shi wrote:
-> On 26-06-09 13:06, Paolo Abeni wrote:
->> From: AI Reviewer <ai@example.com>
->>=20
->> This is an AI-generated review of your patch. The human sending this
->> email has considered the AI review valid, or at least plausible.
->> Full review at: https://sashiko.dev/
->> ---
->> net: atm: fix use-after-free in sigd_put_skb()
->>=20
->> This commit addresses a use-after-free in sigd_put_skb() by pinning the
->> socket with find_get_vcc() and checking if it is marked SOCK_DEAD under
->> the callback lock.
->>=20
->> > diff --git a/net/atm/signaling.c b/net/atm/signaling.c
->> > index b991d937205af..3dbe8e0fdc9af 100644
->> > --- a/net/atm/signaling.c
->> > +++ b/net/atm/signaling.c
->> > @@ -54,14 +54,31 @@ static struct atm_vcc *find_get_vcc(struct atm_vcc=
- *vcc)
->> > =20
->> >  static void sigd_put_skb(struct sk_buff *skb)
->> >  {
->> > -	if (!sigd) {
->> > +	struct atm_vcc *vcc;
->> > +	struct sock *sk;
->> > +
->> > +	vcc =3D find_get_vcc(READ_ONCE(sigd));
->>=20
->> [Severity: Critical]
->> Does this introduce a regression where an ABA vulnerability allows a KAS=
-LR
->> bypass if the daemon socket is freed and reallocated?
->>=20
->> If the signaling daemon is closed, sigd is cleared and the socket freed,=
- but
->> an unprivileged thread in sigd_put_skb() might have already latched the =
-old
->> sigd pointer.
->>=20
->> If an unprivileged user subsequently creates a new ATM socket, couldn't =
-the
->> slab allocator reuse the exact same memory address? In this case, find_g=
-et_vcc()
->> would match the raw pointer and return the attacker's new socket.
->>=20
->> Since the attacker's socket isn't marked SOCK_DEAD, sigd_put_skb() would=
- blindly
->> enqueue the signaling message to the attacker's receive queue.
->>=20
->> Because the message contains literal kernel pointers (vcc, listen_vcc),
->> wouldn't this allow an unprivileged KASLR bypass and message injection?
->>=20
->> [ ... ]
->>=20
->> [Severity: High]
->> This is a pre-existing issue, but does sigd_send() leak memory when queu=
-ing
->> SKBs to a closing listening socket?
->>=20
->> When processing an as_indicate message, sigd_send() resolves the listeni=
-ng
->> socket via msg->listen_vcc, acquires lock_sock(), and appends an SKB:
->>=20
->> net/atm/signaling.c:sigd_send() {
->>     ...
->>     lock_sock(sk);
->>     if (sk_acceptq_is_full(sk)) {
->>         ...
->>     }
->>     sk_acceptq_added(sk);
->>     skb_queue_tail(&sk->sk_receive_queue, skb);
->>     ...
->> }
->>=20
->> Does this code blindly queue an SKB without checking if the socket has b=
-een
->> marked closed (ATM_VF_CLOSE) and already purged?
->>=20
->> If the listening socket is concurrently closed, vcc_release() will lock =
-the
->> socket, purge its receive queue, mark it closed, and release the lock.
->>=20
->> Could sigd_send() then acquire the lock and append the new SKB to the de=
-ad
->> socket's receive queue? Since sk_free() expects an empty queue and does =
-not
->> purge it during memory free, would this permanently leak the SKB and all=
-ow
->> an attacker to exhaust kernel memory?
->> --=20
->> This is an AI-generated review.
->>=20
->
-> Thanks. The find_get_vcc() issue will be fixed in v2; the sigd_send()
-> leak will be sent as a separate patch.
+pppol2tp_tunnel_get() increments the tunnel's refcount via
+refcount_inc() on the tunnel returned from l2tp_tunnel_create(). If
+l2tp_tunnel_register() subsequently fails, the error path frees the
+tunnel via kfree(), bypassing the refcount entirely. At that point the
+refcount is 2 (one from l2tp_tunnel_create() and one from the
+refcount_inc()), so the reference counts leak and the memory is freed
+while still referenced, creating use-after-free potential.
 
-Hi Paolo,
+Fix this by using the standard reference counting API: replace the
+kfree() with two l2tp_tunnel_put() calls to properly release both
+references. This mirrors the cleanup used in other error paths within
+the same function.
 
-This is the link to the fix for the above bug.
+Cc: stable@vger.kernel.org
+Fixes: 6b9f34239b00 ("l2tp: fix races in tunnel creation")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ net/l2tp/l2tp_ppp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v2: https://lore.kernel.org/all/DJ6D0B3KSMYU.1KE7UIQCA7K2N@gmail.com/
-leak memory fix: https://lore.kernel.org/all/20260611163805.2151734-2-bests=
-wngs@gmail.com/
+diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
+index e0b1915be1a6..0ddfc1893121 100644
+--- a/net/l2tp/l2tp_ppp.c
++++ b/net/l2tp/l2tp_ppp.c
+@@ -661,7 +661,8 @@ static struct l2tp_tunnel *pppol2tp_tunnel_get(struct net *net,
+ 			refcount_inc(&tunnel->ref_count);
+ 			error = l2tp_tunnel_register(tunnel, net, &tcfg);
+ 			if (error < 0) {
+-				kfree(tunnel);
++				l2tp_tunnel_put(tunnel);
++				l2tp_tunnel_put(tunnel);
+ 				return ERR_PTR(error);
+ 			}
+ 
+-- 
+2.50.1 (Apple Git-155)
 
-Best,
-Weiming Shi
 
