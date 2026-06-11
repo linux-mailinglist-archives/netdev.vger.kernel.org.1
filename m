@@ -1,63 +1,68 @@
-Return-Path: <netdev+bounces-298113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298115-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id BQd6CBKsKmoRuwMAu9opvQ
-	(envelope-from <netdev+bounces-298113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:37:38 +0200
+	id ehQjKDusKmoauwMAu9opvQ
+	(envelope-from <netdev+bounces-298115-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:38:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A33E671EA1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 925E5671EAC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:38:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=lZj32ePO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298113-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298113-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=sL7cfOWN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298115-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298115-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0D7E0300693D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:37:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CC2F1300D561
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9D23F7A8C;
-	Thu, 11 Jun 2026 12:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960553F7AAD;
+	Thu, 11 Jun 2026 12:37:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D4F3F6C3A
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E427F3F822F
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:37:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781181453; cv=none; b=syxWOa6SRfE+Mxv9wLm1q0QJNTNwKTOSM8WDjqW1gys5oLXHS6zxRMbd9/0QoCXgJr0GLTB4b9zOV2Tozpbx+525opOq45YxM37oesqF1jIBL0h5ae2Fv9/fCFNFCOcMxVstYMtuWOnTDTxoC70v3DtA94D/idrnzJUoRix4K0o=
+	t=1781181461; cv=none; b=C4a0MaovGhtwDYImHhbh3yDr91lifXdYp06AIexLnyEMWzzZYHNPnN7ZlMSs/aYjbGTEZ5ipbkX+WNtWCcspTHY4zWjfj0ljSFKz/tTmgSVKpDXXfJBTtgGfcydqC+bzEOwhWy94AZCeZRZqClyPvIC29F4x5I4n0ojt8kPXWJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781181453; c=relaxed/simple;
-	bh=8b/7eQFjT+UITLfSGtnmzyLGSOXLDyFeawmU0GSKuxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WaI6uOXSaKNeNyK13tRGXCiqci65ynb1P9fRcU4xX3r0TA16bod0/NGR7wHWGrg8VMyGz5Tv7VdX/VWdYaV8+aGt8tkEr6oo7HVOHZJuGBmApQ2nmIV94vrnqb511yMhhvKSiw1CKUyzt0K/mvFt4JW5h8yK9Q3aqRbYsgnoIoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lZj32ePO; arc=none smtp.client-ip=91.218.175.182
+	s=arc-20240116; t=1781181461; c=relaxed/simple;
+	bh=fb6F9NbHGOOkl1ukNjB3RxWEVAw93TVPUsKKFrWd/cc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ObHQES7jFr33XvbWUP+bwYrdk8mXigetRoSO9NcvGIa6tOQFzKV2fwmGAv99cuRLulekjo+ECIYZPrqh7XwJ3oDi472HDO7hvwX4AFQr/DPJPrLO/kqQAw7up4lBhdDUJ8RJzGjeJoLzGgF84wu8NQ7BxYM4bJHk+1UX5Ebm/fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sL7cfOWN; arc=none smtp.client-ip=91.218.175.172
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781181439;
+	t=1781181457;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YYHg5dkLLTur5IAmFlDfUGRLb6K3EKX9VBpaTCIihkU=;
-	b=lZj32ePOnIe61cEiX71wq5QJaaiIJUG4Ri/naMj9N5/IWHFQyjNNAjZ1s+nWJP9xyuV/3A
-	T0MhotjaoV31MmhwDsuhbPrhEtBIVkQrnOuG/+LfH32nUErO3IL9As3scKofyMPbjqrrDy
-	mAfHn1nJc16IJQk1d2ZrwHeIRiJ0Qc8=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SnKin/8QWY0K4/Ln1YsJgi/WrSjXVk81XeuZsV2Spuk=;
+	b=sL7cfOWNlpxWOn/oUGwIVG8app5HtUvEJj/lQTzVWuzYrFJaXFDPVfF2f+iqEWDOxxZp5w
+	uE16w9wh7ntuRvVf1alSi7C+2JLxbkg8L0ZihroPYBH/5CtEesTNdQlnSLB0XSLUG0+y4t
+	SfjCqr4Y4rgLcIFWVuc+k7uK88X7Z+E=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
+Cc: Weiming Shi <bestswngs@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>,
+	Xinyu Ma <mmmxny@gmail.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Jiri Olsa <jolsa@kernel.org>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -66,15 +71,17 @@ Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Jakub Sitnicki <jakub@cloudflare.com>,
 	Shuah Khan <shuah@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
 	Sechang Lim <rhkrqnwk98@gmail.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
 	Cong Wang <cong.wang@bytedance.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v2 0/7] bpf, skmsg: some fixes for skmsg
-Date: Thu, 11 Jun 2026 20:34:08 +0800
-Message-ID: <20260611123538.156005-1-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v2 1/7] bpf, sockmap: reject overflowing copy + len in bpf_msg_push_data()
+Date: Thu, 11 Jun 2026 20:34:09 +0800
+Message-ID: <20260611123538.156005-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260611123538.156005-1-jiayuan.chen@linux.dev>
+References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,21 +103,21 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	TAGGED_FROM(0.00)[bounces-298113-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_FROM(0.00)[bounces-298115-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:jiayuan.chen@linux.dev,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:rhkrqnwk98@gmail.com,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:mmmxny@gmail.com,m:jiayuan.chen@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,etsalapatis.com,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,asu.edu,linux.dev,kernel.org,iogearbox.net,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
@@ -118,55 +125,70 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0A33E671EA1
+X-Rspamd-Queue-Id: 925E5671EAC
 
+From: Weiming Shi <bestswngs@gmail.com>
 
-All fixes are from previous patches sent by Weiming Shi, Zhang Cen,
-Kuniyuki and Sechang Lim, which have already been reviewed by me and John and Jakub.
+When the scatterlist ring is full or nearly full, bpf_msg_push_data()
+enters a copy fallback path and computes copy + len for the page
+allocation size. Since len comes from BPF with arg3_type = ARG_ANYTHING
+and both are u32, a crafted len can wrap the sum to a small value,
+causing an undersized allocation followed by an out-of-bounds memcpy.
 
-https://lore.kernel.org/bpf/20260610081218.506709-2-rhkrqnwk98@gmail.com/
-https://lore.kernel.org/bpf/20260520102715.3033936-1-rollkingzzc@gmail.com/
-https://lore.kernel.org/bpf/20260424190310.1520555-2-bestswngs@gmail.com/
-https://lore.kernel.org/bpf/20260424191602.1522411-3-bestswngs@gmail.com/
-https://lore.kernel.org/bpf/20260423155807.1245644-2-bestswngs@gmail.com/
-https://lore.kernel.org/bpf/20260221233234.3814768-4-kuniyu@google.com/
+ BUG: unable to handle page fault for address: ffffed104089a402
+ Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+ Call Trace:
+  __asan_memcpy (mm/kasan/shadow.c:105)
+  bpf_msg_push_data (net/core/filter.c:2852 net/core/filter.c:2788)
+  bpf_prog_9ed8b5711920a7d7+0x2e/0x36
+  sk_psock_msg_verdict (net/core/skmsg.c:934)
+  tcp_bpf_sendmsg (net/ipv4/tcp_bpf.c:421 net/ipv4/tcp_bpf.c:584)
+  __sys_sendto (net/socket.c:2206)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
 
-The automated reviewer (sashiko) may still flag a few other potential
-issues on top of this series. After looking into them, they are either
-already covered by the patches here, or only reachable under very narrow
-conditions that require a specially crafted BPF program and an unusual
-sk_msg ring state, so they are not practical to trigger and are left out
-of this series. I'm collecting these fixes together because the same
-problems have been re-sent many times in slightly different forms, and I
-hope this series can be prioritized for merging so the duplicates can
-finally settle. With so many AI-generated patches floating around for
-these spots, leaving them unmerged just keeps wasting maintainer review
-cycles on the same issues.
+Add an overflow check before the allocation.
 
-v1->v2: fix problem when fix the conflict.
+Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
+Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
+Tested-by: Xiang Mei <xmei5@asu.edu>
+Tested-by: Xinyu Ma <mmmxny@gmail.com>
+Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+To sashiko:
 
-Kuniyuki Iwashima (1):
-  sockmap: Fix use-after-free in udp_bpf_recvmsg()
+Regarding bpf_msg_push_data() reading "copy = msg->sg.data[i].length" with
+i == msg->sg.end (appending at the very end of a full/near-full ring):
 
-Sechang Lim (2):
-  bpf, sockmap: fix integer overflow in bpf_msg_pop_data() bounds check
-  selftests/bpf: add test for bpf_msg_pop_data() overflow
+This is pre-existing code, not touched by this series, and reproducing it needs
+a narrow combination -- a pure append at the end so the loop exits with
+i == msg->sg.end, a full/near-full ring, plus a prior push/pop history that
+leaves a stale length in the otherwise-unused end slot. A freshly built ring
+zeroes that slot, so copy stays 0. We don't consider it practically reproducible.
 
-Weiming Shi (3):
-  bpf, sockmap: reject overflowing copy + len in bpf_msg_push_data()
-  bpf, sockmap: Fix wrong rsge offset in bpf_msg_push_data()
-  bpf, sockmap: zero-initialize pages allocated in bpf_msg_push_data
+Even then it's already covered: the overflow check in patch 1 ("copy + len <
+copy") rejects the dangerous case, and __GFP_ZERO in patch 3 prevents any data
+exposure. Not worth fixing here.
+---
+ net/core/filter.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Zhang Cen (1):
-  bpf, sockmap: keep sk_msg copy state in sync
-
- net/core/filter.c                             | 99 +++++++++++++++++--
- net/ipv4/udp_bpf.c                            |  9 ++
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 48 +++++++++
- .../bpf/progs/test_sockmap_msg_pop_data.c     | 27 +++++
- 4 files changed, 174 insertions(+), 9 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
-
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 9590877b0714f..3c8f1cedb217f 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2829,6 +2829,9 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 	if (!space || (space == 1 && start != offset))
+ 		copy = msg->sg.data[i].length;
+ 
++	if (unlikely(copy + len < copy))
++		return -EINVAL;
++
+ 	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
+ 			   get_order(copy + len));
+ 	if (unlikely(!page))
 -- 
 2.43.0
 
