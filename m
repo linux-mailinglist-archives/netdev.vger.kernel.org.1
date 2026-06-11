@@ -1,204 +1,175 @@
-Return-Path: <netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id M5kvCGhaKmrOnwMAu9opvQ
-	(envelope-from <netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:12 +0200
+	id A6UUCy5fKmpGoQMAu9opvQ
+	(envelope-from <netdev+bounces-297971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:09:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A74966F257
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBEF66F412
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 09:09:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PTGog5xY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=NdXMx9Zq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297971-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297971-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02A983037DCF
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:49:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85650309EBE4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BEC36E48D;
-	Thu, 11 Jun 2026 06:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1983B3BE5;
+	Thu, 11 Jun 2026 07:09:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6F737104F
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 06:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD2C31E845
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 07:09:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781160547; cv=none; b=I5hNIX7yFZMwhtmxH9GgoSlDRX+0gC6hPnU4mnVlGGcvgtay/1xUuhzXGqF5f7f6TLOXsNCEC9OXJIqjvLqoB1nzb8l2hKz3w/+54TpZiN7fHwXHTDEejtiuoFORSP0LvHFFLyiwcYfgC+Oc32yTmIF8mfz1+pfdp/DlBviJu5k=
+	t=1781161763; cv=none; b=agRUTHjok26Et6B2MPOOOq5E5j5il1qET2JMbj4nuO35r7Wrj4fktFRPARA+/b4BtTX1gpfRDfnKiUumB4fYa2IY/UTnccaNqQQQ8W3Py3WW2gYUxf/nePms+aT+zqUzahwkh0M0YvroRtWdQ1N+xnp1oALTq1xbned/2mlrQgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781160547; c=relaxed/simple;
-	bh=+XP8tEVnmKGDIlRNdwA5ZPi1qKIvI1uWuJPoitDumiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MH4x2NJjZwV+o2SNKJ8c2OT3UAOO9+B3f+MCtgNowlq68SPJe0KA3ytaSbk5autIvAqnnx4qNThFXbD3Q+Kp9uTli54aME4E58rsbXNWIp/gdFnOfWbmxavL76G9SYrOHph10+24bFeLvaym3a/NSkuxvztpWoVYGi5XJIzie7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTGog5xY; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2B01F00893;
-	Thu, 11 Jun 2026 06:49:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781160543;
-	bh=+w9/seJnUe5JMvKcI6Bs57ZCa4X7FEAtLxTLu5bsTYU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PTGog5xYokcTJmuWqKfUOJHM/t76U6pBF7t5SXX6RvO0/hjA9WG09eA40g8HPtDKx
-	 RXnMFJmxGfI1P8bX1G15i2zZ8zenqruiUQtEus8oXreo7xNI06ax4DQlxWtDAVaDIe
-	 /vyyc6jdioPmf8W672QOcG8dw4J+7T98D13kCqX21um3PbFsviKSpoZbeuFsXrUj0m
-	 jEm6b2ScVfCkiHonzTWyetTOxZT4+JSjJVxdgQj/Pk+BpllhDsCAynn3hZlsRCvVMk
-	 N/vy5cSFyfum0oIRcAwoXlNgPMpXkpC+VQ7tVtpWh9OO1H0r8ajPsCJEJ7SOozSDb2
-	 Xs70BcHI3oJqA==
-Date: Thu, 11 Jun 2026 07:48:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com, kuba@kernel.org
-Subject: Re: [PATCH net-next v4 3/3] net: libwx: support vf per-queue
- statistics via ethtool -S
-Message-ID: <20260611064859.GP3920875@horms.kernel.org>
-References: <20260608103946.25786-1-mengyuanlou@net-swift.com>
- <20260608103946.25786-4-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1781161763; c=relaxed/simple;
+	bh=paMrpVaqkxNR7VYdDxSVGRSSUoSLVwMg5mLCIJSQAgk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cZgxGgBgEDqcxQrWium4YtZkD2Hk4yWH2rwJ4Av0vYJiALlW+ccrm2fY2MOwPoBt+ypstntRDL5OYNbTsSDWUvpdmbCoqyHEaqz4rrLam9QadDTOBxfmcHY8WA6+OLr5AMUefktWSrEJzQCOiNL1IVmmwSRS4LjVwgh8AlHGFAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NdXMx9Zq; arc=none smtp.client-ip=209.85.214.174
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2c0c2c7e0c5so50578175ad.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 00:09:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781161760; x=1781766560; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=buXxhkPyI/DNtCn1fhuFu52950bMmTofVQXIfRtoi64=;
+        b=NdXMx9ZqjzyZLxdo9P4LYhQ4b3Twll/Sa2bS0zVX9cTXb1j2UhDdKvgJ0pTiBjFGLV
+         bcgmdzdzjRMOgjeTUqF54csxScDRJ4MCLoYWvXBVw1AYI7xPtjN6N+oqmtXp1866OMFV
+         KUkfmUley6wzSsDBYSHtfwZiTkfIuGUifXiHe+o2p6VULEOdJj+JcYqGW7qQo1urqlYX
+         INlhf1LC7h2dMvrZ9xM955J7fvIE4TAZGIv85tpNyCGwrkwVCpZrCGXfRlAgbe/tOQ1O
+         H1FPBFoFaezuf78CNBUun7wYgRSBd0OSBIw849S0FU1jCVUexZOnyiWhOo3yt6WDY5Du
+         5mfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781161760; x=1781766560;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=buXxhkPyI/DNtCn1fhuFu52950bMmTofVQXIfRtoi64=;
+        b=owHx8lv3K/AuCXAth5PU0I7z2/hUZi9mR7rj9Q6Sx/MFBkKvwPLGEk2qQiVvEIGXa/
+         rQjyWheIjmcdgrXvEN6GEchE94MXLh58rNdoPP8X1s7vU7egTB62GM2/ppLf0QUMC/0V
+         WSbjeiMAY4s91C/iybT7SMZ2ZrlnlEXTtIMOvC5OSYavm7eu93eNFxN4hobPFPfUjn2X
+         F09QZtpu5qXDv59RsLj9HHfDameKWJ5/+R+YmiJuVZ5AuAi91so+3Elfqa4RNIEb9P6g
+         YeadKObARVY3Qjp1W41UBWkhAUUxfmzy1123VKF7X7IIhZeZHrNAmWNNgay4V4TSw3Y9
+         NCag==
+X-Gm-Message-State: AOJu0YwJPS0w/LgUKxYdJBh0AoktDq/9hylUY+36iSAl+sR5gvV3ZAn9
+	oWR+1sSS8mCxXCvOIEsGQtGu8ecXZZucEcmgLnHZqGnm7nc3kaZNOKuuU/TQsBMN
+X-Gm-Gg: Acq92OGDA/UKVmE32grqO81yeD9Hy/BzDTaWhmlXyd9TYisGIISZqW84QANbX19X3HE
+	RTRsQTZcYW8r37JJaOfvfcjhGED+S9iEsJMQ6EcK26XIvNnhwXVFEr9OvmMYqJwtFBuaKMK6T2s
+	7R2py1D+YVD4GW9D6iJBOUmcNMGvUgLM53hWeOFVlY+iENzO7EHAQPai5594Nav3W5HtzWysods
+	2nprSsr4vbnQBSfKWPd+sOZwH6eKjW4TkIA+lJc4t3AP6PaVaBBgLrl+6We1n12Hbj2iMY294CG
+	Mq5qFYmskJegoZ+y9zWya0hBzplNVHunU/szmvuEKMVeStqsmYNHvhYGCCRKUl3W7T8/kk54GCV
+	oOms3QnDcrIzuEQwrrOOgoHfrFFsHbkShRTWmGJ4VHOnW8tWYIC8f3N6JgtiIGZCJvNJUJ/OYAz
+	pKmmTyGY3KGTp7hYnYjfxPF5uwtVSYLh/PRXyIeY0smd5PizlXR+MWaSxHE7BX
+X-Received: by 2002:a17:903:1aab:b0:2c0:b5c1:8e22 with SMTP id d9443c01a7336-2c2f0447703mr17696665ad.12.1781161760291;
+        Thu, 11 Jun 2026 00:09:20 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([2a09:bac5:661d:3046::4cf:39])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c2d9bb2199sm18818975ad.77.2026.06.11.00.09.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 00:09:19 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/5] devlink: Warn on resource ID collision with PARENT_TOP
+Date: Thu, 11 Jun 2026 15:08:46 +0800
+Message-ID: <20260611070856.889700-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260608103946.25786-4-mengyuanlou@net-swift.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:mengyuanlou@net-swift.com,m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:kuba@kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297971-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,resnulli.us,vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-297970-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:mmyangfl@gmail.com,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kurt@linutronix.de,m:jiri@resnulli.us,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:jonasgorski@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,vger.kernel.org:from_smtp,sashiko.dev:url,net-swift.com:email,horms.kernel.org:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A74966F257
+X-Rspamd-Queue-Id: 9FBEF66F412
 
-On Mon, Jun 08, 2026 at 06:39:46PM +0800, Mengyuan Lou wrote:
-> Add per-queue TX/RX packet and byte counters to the VF ethtool stats
-> table.
-> The stats length is now dynamically determined based on whether the
-> device is a VF or PF via wx_stats_len().
-> 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
-> ---
->  .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 48 +++++++++++++++----
->  drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  4 ++
->  .../net/ethernet/wangxun/libwx/wx_vf_common.c |  2 +
->  3 files changed, 44 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> index 30c6ef6103ac..86f6ac63acf7 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> @@ -48,6 +48,10 @@ static const struct wx_stats wx_gstrings_stats[] = {
->  	WX_STAT("rx_hwtstamp_cleared", rx_hwtstamp_cleared),
->  };
->  
-> +static const struct wx_stats wx_gstrings_stats_vf[] = {
-> +	WX_STAT("non_eop_descs", non_eop_descs),
-> +};
-> +
+Filter out the ambiguous case of
 
-The AI-generated review available at https://netdev-ai.bots.linux.dev/sashiko/
-flags that this is user-exposed and probably could benefit from a bit
-more explanation in the patch description.
+enum {
+    MY_RESOURCE_ID_A,  /* == DEVLINK_RESOURCE_ID_PARENT_TOP ! */
+    MY_RESOURCE_ID_B,
+    ...
+};
 
->  static const struct wx_stats wx_gstrings_fdir_stats[] = {
->  	WX_STAT("fdir_match", stats.fdirmatch),
->  	WX_STAT("fdir_miss", stats.fdirmiss),
-> @@ -69,15 +73,26 @@ static const struct wx_stats wx_gstrings_rsc_stats[] = {
->  #define WX_QUEUE_STATS_LEN ( \
->  		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
->  		(sizeof(struct wx_queue_stats) / sizeof(u64)))
-> -#define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
->  #define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
->  #define WX_RSC_STATS_LEN  ARRAY_SIZE(wx_gstrings_rsc_stats)
-> -#define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
-> +
-> +static inline unsigned int wx_global_stats_len(const struct wx *wx)
-> +{
-> +	return wx->pdev->is_virtfn ?
-> +	       ARRAY_SIZE(wx_gstrings_stats_vf) : ARRAY_SIZE(wx_gstrings_stats);
-> +}
+register(..., MY_RESOURCE_ID_A, DEVLINK_RESOURCE_ID_PARENT_TOP, ...);
+register(..., MY_RESOURCE_ID_B, MY_RESOURCE_ID_A, ...);
 
-Please don't use the inline keyword in .c files unless there is a
-demonstrable - usually performance - reason to do so. Rather, please
-let the compiler inline code (or not).
+v1: https://lore.kernel.org/r/20260610062554.769892-1-mmyangfl@gmail.com
+  - make a patchset
 
-It is of course fine to use the inline keyword in .h files.
+David Yang (5):
+  net: dsa: dsa_loop: avoid devlink resource IDs collision with
+    PARENT_TOP
+  net: dsa: b53: avoid devlink resource IDs collision with PARENT_TOP
+  net: dsa: hellcreek: avoid devlink resource IDs collision with
+    PARENT_TOP
+  net: dsa: mv88e6xxx: Avoid devlink resource IDs collision with
+    PARENT_TOP
+  devlink: Warn on resource ID collision with PARENT_TOP
 
-> +
-> +static inline unsigned int wx_stats_len(const struct wx *wx)
-> +{
-> +	struct net_device *netdev = wx->netdev;
+ drivers/net/dsa/b53/b53_common.c       | 1 +
+ drivers/net/dsa/dsa_loop.c             | 1 +
+ drivers/net/dsa/hirschmann/hellcreek.h | 1 +
+ drivers/net/dsa/mv88e6xxx/devlink.c    | 9 +++++----
+ net/devlink/resource.c                 | 2 ++
+ 5 files changed, 10 insertions(+), 4 deletions(-)
 
-netdev seems unused.
+-- 
+2.53.0
 
-Flagged by AI-generated review on sashiko.dev 
-
-> +
-> +	return wx_global_stats_len(wx) + WX_QUEUE_STATS_LEN;
-> +}
->  
->  int wx_get_sset_count(struct net_device *netdev, int sset)
->  {
->  	struct wx *wx = netdev_priv(netdev);
-> -	int len = WX_STATS_LEN;
-> +	int len = wx_stats_len(wx);
->  
->  	switch (sset) {
->  	case ETH_SS_STATS:
-> @@ -100,8 +115,11 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
->  
->  	switch (stringset) {
->  	case ETH_SS_STATS:
-> -		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
-> -			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
-> +		for (i = 0; i < wx_global_stats_len(wx); i++)
-> +			if (wx->pdev->is_virtfn)
-> +				ethtool_puts(&p, wx_gstrings_stats_vf[i].stat_string);
-> +			else
-> +				ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
-
-The AI-generated review at https://netdev-ai.bots.linux.dev/sashiko/ also
-flags that these seem to cover statistics that can be exposed via
-netdev_stat_ops, which is preferred.
-
-If consistency with the PF stats is desired for VF stats, then perhaps
-netdev_stat_ops can also be implemented for PF queues.
-
->  		if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
->  			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
->  				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
-
-...
 
