@@ -1,138 +1,348 @@
-Return-Path: <netdev+bounces-298378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ECECN7E0K2r74AMAu9opvQ
-	(envelope-from <netdev+bounces-298378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:20:33 +0200
+	id gI+gDzE1K2od4QMAu9opvQ
+	(envelope-from <netdev+bounces-298379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:22:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9E0675956
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:20:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E85675987
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 00:22:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=MsWiQCa0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298378-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298378-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=etsalapatis-com.20251104.gappssmtp.com header.s=20251104 header.b=lC9XW+bq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298379-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298379-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 789B13196AAE
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:20:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 665DD3180FDD
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAE935DA76;
-	Thu, 11 Jun 2026 22:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBFA37DE8A;
+	Thu, 11 Jun 2026 22:21:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10352F549F;
-	Thu, 11 Jun 2026 22:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BAC36403B
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 22:21:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781216413; cv=none; b=cctZ/+7Y/GDSM8UavzHExpSi9ma23ijrHUWWmlLLtsUN+Nqx2wdVZBMX2xZYGrCBCWR77V7ghaHEbuidsJ8T6MQ4vj6fTAxsj/h0nioA67VmHlUtmf/U+C/XqQH0TKvSaxdgzXKowipkUUbLb1JCR44jxUMsPF4SHWfcoalSFZE=
+	t=1781216507; cv=none; b=F3OEwn0h5ZIOkAGYRdxQL+G8e6t+a9Sn0JcjXUAoEY2P6o8v2SUuJYjZ8fc04aohl0lNiY0Ki3k/Csbfv7sZjka8mHuyCkr/VuV/4lObvFJPEbiYTsN2sFeyNxepeiqVzZwFe5yM35U5rDq7cwQj6KehofWlMQMVLeL1a2shCog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781216413; c=relaxed/simple;
-	bh=wjYLPNMgwXIe942a/D6Rh7N+qvKWaLydMg/rZsocfsI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EKbsD/VvRXUaYOsJ8vUqrVpgHwAeDIq3Sm64nVXYjqWCtXoCh3mDjD4j4t6mNhFZ3xHwPWYl7EHcaHpi5yCfcjf5fJyivzTDSb36TC/volGki+DaLZIalTAK1IZVjuDL9WQZ3XZscSxZE8cEYKX6JAMuZDrdi+7boZdi//j/Kuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsWiQCa0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B3A1F000E9;
-	Thu, 11 Jun 2026 22:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781216412;
-	bh=bwKO20aIj6Z1fgQW2J2GQV0+X9nndAyXDu+Xqu+HI4o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=MsWiQCa0Br76RkRigHK0t8ZR/79wXVymmTTo8lOAo+NHanGloK9uS09gxePMb5gZP
-	 20FqsgpZ5hVybuGCJpzZVo994QcqmOdYtBoqM9ULrbyaN5oEvf6ZPy/XEqWPZb3Mqa
-	 qOMUofP6E0DoQw/s6kRiM5v0rJFEj9IEqZogFGfABIp9Ji4Bc/c31gBdc8qSwF0JTH
-	 Dc/z19bw0Tw5ekP+Uc0femzoxXh3MF1q9X52ZXhNrnynEW/MVHjjXbwfPz/64AMaUN
-	 qrjCB4crw09UqbiXi3N2fn+6iR+/pSD9gMCG6hZakXXs1VcxbAoEP7H5oJgruy746g
-	 AbaxOn5wHBezw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09653930FAD;
-	Thu, 11 Jun 2026 22:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781216507; c=relaxed/simple;
+	bh=03zOrgILckneEiMyuAdOeRem4RM/lLOfEanNgT8gOrU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=hzoV3kcd7gE3G+GA5LkEDauYBwBKDp3mtpXSkD/L4xkwdc4RI8U7i3j0Mp86gRzrTPIPBvL9WWp2V7Msgcr95Zo2gPH3IG09nHGFZEFmH1eBu7HetnyQJTk3afLpi9eoG9mDchxttgvQwi+USLfWnyefXopjuDeo7gXieamiIOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=lC9XW+bq; arc=none smtp.client-ip=74.125.82.169
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-304d8362a58so306242eec.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 15:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1781216505; x=1781821305; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tCnO02eYeJt2uyHOY/DCYVdDPKyN1BpC+esypIRAZjg=;
+        b=lC9XW+bqW6mK582x2dJ7ekMLaWB9jorFeJz5Hg8XafGzeiAzF+NbJ2fwSbW2bKhO9m
+         qKExLmR046Qd2UFp+DT8w63fdS1FzJ0CGvK96TzyqUDYwHMnNb+B3saRh/d6FzXIlN6e
+         pYOdA/ojcfZfp0hLj3qO2P7Ollz6YHrQVpcB2MX2IpSobjb7AFwT81WgjEJO3c4N9IZF
+         7acd6zcI0XwHLe2ru0UaYfA69ky3qinSaFVx/025++Cyq0KA7bois6+NCFRLxHk4avOK
+         442cry2tqR0SNTXXpitS6xydCm9+I103OMiL3/9znWkmCT77L+/0bby9ClJSBB/aIDfl
+         f+vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781216505; x=1781821305;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tCnO02eYeJt2uyHOY/DCYVdDPKyN1BpC+esypIRAZjg=;
+        b=eTQtXZbEDhDF9nfzhkNgKCHMwDtnIHMgDKQZnvgBySpIkdvg0qIWXuWegFfhDNjlFw
+         qNXdmHqArz0GgXx3pWxuI0nauHK8QGj5Bm3/S7htIaC/uv0G6UKUYUdpFR6p+4JnZC1a
+         hL5L9Otpdwi+dtDByUKExk5XpDGPZdK8qFWFXSnke8VusQ8mDkNeQC2+wHd3OP39LamO
+         beiEHNopFHftsc2PECWhT1z8hpVSQgInnw8elip0VT+MVoXbjl7WexRHV7ErfpaSq2YI
+         VVjp8iHNPZBLKbU16tvMSjQUm/c1InTR/UXUneZta28/wVbD7RRBcaPm/1denkBm+x15
+         vHEQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9FAINCRTuZsYTJno3B5YNEnxTq2QLqSllBiOFPGneyxTErFYCBz4ta71RuhPHWrerGxbc3m9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEAa+rDL+yZsd27ALwetY1Ckq+OxzZnP/ZpYR/WWlAWNYohh/Z
+	jFGm0slLHnxnC/doX/qvjpDsB5QmY93QbIsMmoDoLlUzaxyyYlM0BSkwSS0D3q/siV4=
+X-Gm-Gg: Acq92OGs99t9mEItfCt8mhQiGLQHxsUIqyLIhEWCO+cE5CJjt8C6qRj/SbPyJrbOI8H
+	/gNt8/MFhHFELXl3SzzWI30U9UAaVa43MIuQCyujF+W0xQ0FfzRZfVRdbO9TPcTTqFUpUix32km
+	bVtXgDppSVk6UAyxO1pyqMMmxpHERnaC4SpfzUUJb0a9WNphl6B+HHptazzg0XjQi71wD9f6rH+
+	4tYQ0861edbPhzQzyjuWmao/BdGLkdXuLtBvvPvhF+I5WMKj2PjUDDlNnMA0bmaexJjmJ4ZSo2p
+	r7Zi3BhTiAvF/0aDKZOnMkKS1YpaLWGzsVBPx+uWv3t+X9MAqZX/Q/AQtYcFdC5WhH7v0m0OoEd
+	nppOzGJ5YnMJRmPiYi2x8kyR4qZA7B4dr8+nCOcb94f7gvaMiaRr7nBG6WWAB4SHmV8taDsMjgM
+	QFiDhV
+X-Received: by 2002:a05:7300:dc05:b0:304:d600:8731 with SMTP id 5a478bee46e88-3081f046f4emr360989eec.15.1781216505333;
+        Thu, 11 Jun 2026 15:21:45 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:600::3c95])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e489536sm667389eec.2.2026.06.11.15.21.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jun 2026 15:21:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] bnx2x: fix resource leaks in bnx2x_init_one() error
- paths
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178121640938.386394.3435821664297211443.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 22:20:09 +0000
-References: <20260609074610.1968721-1-lihaoxiang@isrc.iscas.ac.cn>
-In-Reply-To: <20260609074610.1968721-1-lihaoxiang@isrc.iscas.ac.cn>
-To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-Cc: skalluru@marvell.com, manishc@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ariele@broadcom.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 11 Jun 2026 18:21:42 -0400
+Message-Id: <DJ6KJWQZ3GYR.162GLFN364ELE@etsalapatis.com>
+Subject: Re: [PATCH bpf v2 5/7] sockmap: Fix use-after-free in
+ udp_bpf_recvmsg()
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, <bpf@vger.kernel.org>
+Cc: "Kuniyuki Iwashima" <kuniyu@google.com>,
+ <syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com>, "Jakub Sitnicki"
+ <jakub@cloudflare.com>, "Daniel Borkmann" <daniel@iogearbox.net>, "John
+ Fastabend" <john.fastabend@gmail.com>, "Stanislav Fomichev"
+ <sdf@fomichev.me>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
+ <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "Emil
+ Tsalapatis" <emil@etsalapatis.com>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, "Sechang Lim" <rhkrqnwk98@gmail.com>,
+ "Ihor Solodrai" <ihor.solodrai@linux.dev>, "Cong Wang"
+ <cong.wang@bytedance.com>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260611123538.156005-1-jiayuan.chen@linux.dev>
+ <20260611123538.156005-6-jiayuan.chen@linux.dev>
+In-Reply-To: <20260611123538.156005-6-jiayuan.chen@linux.dev>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298378-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:lihaoxiang@isrc.iscas.ac.cn,m:skalluru@marvell.com,m:manishc@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ariele@broadcom.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298379-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:bpf@vger.kernel.org,m:kuniyu@google.com,m:syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com,m:jakub@cloudflare.com,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:syzbot@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	DMARC_NA(0.00)[etsalapatis.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,syzkaller.appspotmail.com,cloudflare.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,kernel.org,etsalapatis.com,davemloft.net,redhat.com,bytedance.com,vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,9307c991a6d07ce6e6d8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email,vger.kernel.org:from_smtp,appspotmail.com:email,etsalapatis-com.20251104.gappssmtp.com:dkim,etsalapatis.com:email,etsalapatis.com:mid,etsalapatis.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F9E0675956
+X-Rspamd-Queue-Id: 89E85675987
 
-Hello:
+On Thu Jun 11, 2026 at 8:34 AM EDT, Jiayuan Chen wrote:
+> From: Kuniyuki Iwashima <kuniyu@google.com>
+>
+> syzbot reported use-after-free of struct sk_msg in sk_msg_recvmsg(). [0]
+>
+> sk_msg_recvmsg() peeks sk_msg from psock->ingress_msg under a lock,
+> but its processing is lockless.
+>
+> Thus, sk_msg_recvmsg() must be serialised by callers, otherwise
+> multiple threads could touch the same sk_msg.
+>
+> For example, TCP uses lock_sock(), and AF_UNIX uses unix_sk(sk)->iolock.
+>
+> Initially, udp_bpf_recvmsg() had used lock_sock(), but the cited
+> commit accidentally removed it.
+>
+> Let's serialise sk_msg_recvmsg() with lock_sock() in udp_bpf_recvmsg().
+>
+> Note that holding spin_lock_bh(&sk->sk_receive_queue.lock) is not
+> an option due to copy_page_to_iter() in sk_msg_recvmsg().
+>
+> [0]:
+> BUG: KASAN: slab-use-after-free in sk_msg_recvmsg+0xb54/0xc30 net/core/sk=
+msg.c:428
+> Read of size 4 at addr ffff88814cdcf000 by task syz.0.24/6020
+>
+> CPU: 1 UID: 0 PID: 6020 Comm: syz.0.24 Not tainted syzkaller #0 PREEMPT(f=
+ull)
+> Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 0=
+1/13/2026
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+>  print_address_description mm/kasan/report.c:378 [inline]
+>  print_report+0xba/0x230 mm/kasan/report.c:482
+>  kasan_report+0x117/0x150 mm/kasan/report.c:595
+>  sk_msg_recvmsg+0xb54/0xc30 net/core/skmsg.c:428
+>  udp_bpf_recvmsg+0x4bd/0xe00 net/ipv4/udp_bpf.c:84
+>  inet_recvmsg+0x260/0x270 net/ipv4/af_inet.c:891
+>  sock_recvmsg_nosec net/socket.c:1078 [inline]
+>  sock_recvmsg+0x1a8/0x270 net/socket.c:1100
+>  ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2812
+>  ___sys_recvmsg+0x215/0x590 net/socket.c:2854
+>  do_recvmmsg+0x334/0x800 net/socket.c:2949
+>  __sys_recvmmsg net/socket.c:3023 [inline]
+>  __do_sys_recvmmsg net/socket.c:3046 [inline]
+>  __se_sys_recvmmsg net/socket.c:3039 [inline]
+>  __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3039
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fb319f9aeb9
+> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fb31ad97028 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
+> RAX: ffffffffffffffda RBX: 00007fb31a216090 RCX: 00007fb319f9aeb9
+> RDX: 0000000000000001 RSI: 0000200000000400 RDI: 0000000000000004
+> RBP: 00007fb31a008c1f R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000040000021 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007fb31a216128 R14: 00007fb31a216090 R15: 00007ffe21dd0a98
+>  </TASK>
+>
+> Allocated by task 6019:
+>  kasan_save_stack mm/kasan/common.c:57 [inline]
+>  kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+>  poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+>  __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+>  kasan_kmalloc include/linux/kasan.h:263 [inline]
+>  __kmalloc_cache_noprof+0x3d1/0x6e0 mm/slub.c:5780
+>  kmalloc_noprof include/linux/slab.h:957 [inline]
+>  kzalloc_noprof include/linux/slab.h:1094 [inline]
+>  alloc_sk_msg net/core/skmsg.c:510 [inline]
+>  sk_psock_skb_ingress_self+0x60/0x350 net/core/skmsg.c:612
+>  sk_psock_verdict_apply net/core/skmsg.c:1038 [inline]
+>  sk_psock_verdict_recv+0x7d9/0x8d0 net/core/skmsg.c:1236
+>  udp_read_skb+0x73e/0x7e0 net/ipv4/udp.c:2045
+>  sk_psock_verdict_data_ready+0x12d/0x550 net/core/skmsg.c:1257
+>  __udp_enqueue_schedule_skb+0xc54/0x10b0 net/ipv4/udp.c:1789
+>  __udp_queue_rcv_skb net/ipv4/udp.c:2346 [inline]
+>  udp_queue_rcv_one_skb+0xac5/0x19c0 net/ipv4/udp.c:2475
+>  __udp4_lib_mcast_deliver+0xc06/0xcf0 net/ipv4/udp.c:2585
+>  __udp4_lib_rcv+0x10f6/0x2620 net/ipv4/udp.c:2724
+>  ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
+>  ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
+>  NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
+>  dst_input include/net/dst.h:474 [inline]
+>  ip_sublist_rcv_finish+0x221/0x2a0 net/ipv4/ip_input.c:584
+>  ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
+>  ip_sublist_rcv+0x5c6/0xa70 net/ipv4/ip_input.c:644
+>  ip_list_rcv+0x3f1/0x450 net/ipv4/ip_input.c:678
+>  __netif_receive_skb_list_ptype net/core/dev.c:6195 [inline]
+>  __netif_receive_skb_list_core+0x7e5/0x810 net/core/dev.c:6242
+>  __netif_receive_skb_list net/core/dev.c:6294 [inline]
+>  netif_receive_skb_list_internal+0x995/0xcf0 net/core/dev.c:6385
+>  netif_receive_skb_list+0x54/0x410 net/core/dev.c:6437
+>  xdp_recv_frames net/bpf/test_run.c:269 [inline]
+>  xdp_test_run_batch net/bpf/test_run.c:350 [inline]
+>  bpf_test_run_xdp_live+0x1946/0x1cf0 net/bpf/test_run.c:379
+>  bpf_prog_test_run_xdp+0x81c/0x1160 net/bpf/test_run.c:1396
+>  bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703
+>  __sys_bpf+0x5cb/0x920 kernel/bpf/syscall.c:6182
+>  __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
+>  __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
+>  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Freed by task 6021:
+>  kasan_save_stack mm/kasan/common.c:57 [inline]
+>  kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+>  kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+>  poison_slab_object mm/kasan/common.c:253 [inline]
+>  __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+>  kasan_slab_free include/linux/kasan.h:235 [inline]
+>  slab_free_hook mm/slub.c:2540 [inline]
+>  slab_free mm/slub.c:6674 [inline]
+>  kfree+0x1be/0x650 mm/slub.c:6882
+>  kfree_sk_msg include/linux/skmsg.h:385 [inline]
+>  sk_msg_recvmsg+0xaa8/0xc30 net/core/skmsg.c:483
+>  udp_bpf_recvmsg+0x4bd/0xe00 net/ipv4/udp_bpf.c:84
+>  inet_recvmsg+0x260/0x270 net/ipv4/af_inet.c:891
+>  sock_recvmsg_nosec net/socket.c:1078 [inline]
+>  sock_recvmsg+0x1a8/0x270 net/socket.c:1100
+>  ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2812
+>  ___sys_recvmsg+0x215/0x590 net/socket.c:2854
+>  do_recvmmsg+0x334/0x800 net/socket.c:2949
+>  __sys_recvmmsg net/socket.c:3023 [inline]
+>  __do_sys_recvmmsg net/socket.c:3046 [inline]
+>  __se_sys_recvmmsg net/socket.c:3039 [inline]
+>  __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3039
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Fixes: 9f2470fbc4cb ("skmsg: Improve udp_bpf_recvmsg() accuracy")
+> Reported-by: syzbot+9307c991a6d07ce6e6d8@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/69922ac9.a70a0220.2c38d7.00e0.GAE@=
+google.com/
+> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 
-On Tue,  9 Jun 2026 15:46:10 +0800 you wrote:
-> bnx2x_init_one() falls through to the common memory cleanup path for
-> several failures after probe has already acquired additional resources.
-> 
-> If register_netdev() fails after bnx2x_set_int_mode(), MSI/MSI-X remains
-> enabled. If later failures happen after bnx2x_iov_init_one(), PF SR-IOV
-> state can be left allocated. Also, failures after bnx2x_vfpf_acquire()
-> must release the PF resources before freeing the VF-PF mailbox allocated
-> by bnx2x_vf_pci_alloc().
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] bnx2x: fix resource leaks in bnx2x_init_one() error paths
-    https://git.kernel.org/netdev/net-next/c/034b95cf69e0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>  net/ipv4/udp_bpf.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+> index 9f33b07b14813..ad57c4c9eaab6 100644
+> --- a/net/ipv4/udp_bpf.c
+> +++ b/net/ipv4/udp_bpf.c
+> @@ -50,7 +50,9 @@ static int udp_msg_wait_data(struct sock *sk, struct sk=
+_psock *psock,
+>  	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+>  	ret =3D udp_msg_has_data(sk, psock);
+>  	if (!ret) {
+> +		release_sock(sk);
+>  		wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
+> +		lock_sock(sk);
+>  		ret =3D udp_msg_has_data(sk, psock);
+>  	}
+>  	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+> @@ -79,6 +81,7 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msgh=
+dr *msg, size_t len,
+>  		goto out;
+>  	}
+> =20
+> +	lock_sock(sk);
+>  msg_bytes_ready:
+>  	copied =3D sk_msg_recvmsg(sk, psock, msg, len, flags);
+>  	if (!copied) {
+> @@ -90,11 +93,17 @@ static int udp_bpf_recvmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len,
+>  		if (data) {
+>  			if (psock_has_data(psock))
+>  				goto msg_bytes_ready;
+> +
+> +			release_sock(sk);
+> +
+>  			ret =3D sk_udp_recvmsg(sk, msg, len, flags);
+>  			goto out;
+>  		}
+>  		copied =3D -EAGAIN;
+>  	}
+> +
+> +	release_sock(sk);
+> +
+>  	ret =3D copied;
+>  out:
+>  	sk_psock_put(sk, psock);
 
 
