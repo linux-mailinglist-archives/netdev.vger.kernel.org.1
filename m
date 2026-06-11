@@ -1,163 +1,194 @@
-Return-Path: <netdev+bounces-297899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 38HXJOcfKmoojAMAu9opvQ
-	(envelope-from <netdev+bounces-297899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:39:35 +0200
+	id wt2fGUcgKmorjAMAu9opvQ
+	(envelope-from <netdev+bounces-297900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:41:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69BC66DD88
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:39:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B433A66DD92
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:41:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ne4aPDqE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297899-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297899-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linux.alibaba.com header.s=default header.b=mXPemDZl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297900-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297900-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.alibaba.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8C80307AE54
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 02:39:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C7C830DC55B
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 02:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20E82D3ED1;
-	Thu, 11 Jun 2026 02:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615C12EB5CD;
+	Thu, 11 Jun 2026 02:41:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965DE2641FC
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 02:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAAB1FF7C8;
+	Thu, 11 Jun 2026 02:41:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781145572; cv=none; b=j9UF6ARDnCKlEHyRUssrhxQrW73mcl3YA4MBZizemxCijJddM4AMXu7/49bMaB8ECH2nmxiGtO549vagjG33eV2FspBuAoEjxmxBIwhwIokZ3gKfpJbjcaW9pOYDgMW7Vx7u2uRR1DYx4DuzSk5ssGAaEOiQG98It5SPfJrCYXQ=
+	t=1781145666; cv=none; b=c4OEQMSSfPuvoEGZX8/18srYNny1oweZ8t2W6FFCmb/4Xhgr4z4l/KGljbE14y3HGRQ6hBkumWIzlH+lAuu6tZy0nTVin7TQwoHbhUbAqfVIDiEjyxRnwO5NPeQW3/Lw4q+0HoAXtLlT2PqvhYcRar42rTnJv0y6ixJXitoqhkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781145572; c=relaxed/simple;
-	bh=leDRZNtVDPP9d73vCCeklctQ8XYsvdkvPUlIE06AW54=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jHWrPjdrdRpJnkhvTmvwbL0M34U73NgIEqPbC9V65qm02urLzaMT3ECgAaR5fT8TzApRCo3KNXgaq6WC6JJ3yGI5yNwg/Jd60XmeA34emrYxg/yuIsueLBp7UL0Dwq5PGdE9DBTOJ/nM8lz1CyCpimxtxCA5nXJaXj+7e2qKezs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ne4aPDqE; arc=none smtp.client-ip=209.85.210.180
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8421f0e9c5bso3447818b3a.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 19:39:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781145571; x=1781750371; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zvAByViDtXG7wGWE+kqFWIG/+s+7WeIZBftsduJx00w=;
-        b=ne4aPDqEoy2JEPV+lgY436z+BtGQORY42dogdOwaFD4rX0Ldsdr6GNwPxJfpC3qFi1
-         F3P4m5Sui7K/WLqDnqL6PS8yzVsqkBiYgfqr5v4E7tDVO6d/hDXWIO+uPKbfqt5XnVeC
-         1aSppgjI+XQcpi1/wa0IKvRuqLFp4T4/8jCsUf5L30plCF3gGXcWKcrTw3W94RRv7dQ5
-         863YGtoFK1fpRqcx3L3cNvFjAl8PTYHNP7FBY9YAGLAZX4RCkfRjzL/vCOT8fF+oYGTe
-         o8gziAclt3GELQ4J5xIc4NU7BACxuWwbjtN92dkbwpd0+boeDddVjk9CyVQQHpyOaPtv
-         udrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781145571; x=1781750371;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zvAByViDtXG7wGWE+kqFWIG/+s+7WeIZBftsduJx00w=;
-        b=TEWR7SGrbWks6SOAbZu0ehaMrU1KddEGQcyxgKbuZXamHwdRIXygOkOtPriygZuouq
-         UwTtDVkgwmDTQVJ86vAGhPvdPsA56OBb0WDf/mR0cSGg9EbyLaqR58qXLQDnDf/pYg8F
-         uAm+TNhXf64aiJVavkVKXnCGfmhrns4LxNjOA5j93FGePdksWkj6/kx8fy7R+QNn5L8k
-         j+U2+eECskNfnh/yEh9agHVfaS0olKW54H5jaCJ2aFbUIpTfwDZ/zvvj5H2g3QG2nU9C
-         +jZcyN+zRUggwUwKO/VaK3ahbHX1YEztfdsqjefax3wGiOKZjka8uwxJsPzNAhOJxW54
-         3mGA==
-X-Gm-Message-State: AOJu0YxntFEouDaspWfg9zOKnquahlgpgwniFfg6wOvps+9r32fGYjtI
-	lm4ZOs6bQuqwljERUNSNnLbO3A98FX18crzh6M4uYwRmPZySC20TWuQQGkO9FA7oPw==
-X-Gm-Gg: Acq92OExK7W7eJ9JL0rdqCWcLefCWTucYIEvwgvtCvJPQPeYjxD8Cmh/9QfT02SX6WL
-	T2wnAgRLeDFCyzCuaxdf+MbL35vOKK2YWCPu5q4WWdDYVWHWeVg4DPiU7R7FvZh2qLA+/1WGUz4
-	QSubnjAJ8CWk3EOzzw2kqc854HKgU+zE/LUfpdql/9f9PZb85edQc/St8I9EJwsKuEuXg0wYvsS
-	HKlQutGvz770kpf5Xvwkz+2AJROAxkpFXeXakSxzqCK3jw4S5mwRNe8GqXyMdNX978ziWxVsc44
-	/goxMoJzbDjrrB9cJ3KVa6lNev1plSV21XJtpf9qxNZirloHmm9TFPdOV/6yNArco0sqRpKawzP
-	A0LG0mJHzoa9wXmh4CwphN+R2WhIu+OVoqp6GdWZm4QLOQ6rGPdZuqgCEFP9nhsjzBjcrJAERUd
-	9WZPr7uIC8JCsA/v57fYBGpBtutAio9Ea+gb0SNUpAcacqhIyfHctJB/LI9b/OHjs73jeXM49oW
-	bWWHw==
-X-Received: by 2002:a05:6a00:3e2a:b0:842:51af:b3af with SMTP id d2e1a72fcca58-843367eba81mr752476b3a.3.1781145570906;
-        Wed, 10 Jun 2026 19:39:30 -0700 (PDT)
-Received: from raf.tailb4a862.ts.net ([153.124.163.116])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-843382e60ebsm202392b3a.45.2026.06.10.19.39.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 19:39:29 -0700 (PDT)
-From: Raf Dickson <rafdog35@gmail.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	bryan-bt.tan@broadcom.com,
-	vishnu.dasa@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	Raf Dickson <rafdog35@gmail.com>
-Subject: [PATCH net-next] vsock/vmci: use sk_acceptq_is_full() helper
-Date: Thu, 11 Jun 2026 02:38:30 +0000
-Message-ID: <20260611023830.106259-1-rafdog35@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1781145666; c=relaxed/simple;
+	bh=XMxl21juqOwu7ovEl6DADowLJ/SLFMJx0DTc2rKq0Gc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=brJlDEafy6DwAKePx8CK13aPJOQGTiMRQ+8qQR0zBjHhwTOLzOslTqN2r6NA2OcsdJRa0HUxVcG5QWr/dnQYIOz7ImWyar1YA/na5+AfKKtWaUqbIcbGOF2/L4qHIf3McagaVGmBrpnM0T7eWe0gLLQkaNp2AhmKjNvXDyypNcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mXPemDZl; arc=none smtp.client-ip=115.124.30.97
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1781145661; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=ha7BkfjaCY9/CYZC5+QJ/MJxoyTlbQ4TVcB5ZstAvSA=;
+	b=mXPemDZlQW+0Ud9foG4/x+rMtjn910aw+avtsgqCg3jrmAN1gEjPVyszlKQlPUyuwieGCk2sp6vp0SSgznYFj788cqXOTDRuKH6F/CQ9Cul5VguuuEmXhXyEzdE91c+MZNcKGFp0A8NjdUCmfR3Mhc8V1zkjmdlrnNR24P4k9AQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X4cF-VI_1781145660;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X4cF-VI_1781145660 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 11 Jun 2026 10:41:00 +0800
+Message-ID: <1781145615.903036-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v2 2/2] virtio-net: harden page_to_skb() big-packet frag loop
+Date: Thu, 11 Jun 2026 10:40:15 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ minhquangbui99@gmail.com,
+ bestswngs@gmail.com,
+ mst@redhat.com,
+ jasowang@redhat.com,
+ eperezma@redhat.com
+References: <20260610232936.1176094-1-xmei5@asu.edu>
+ <20260610232936.1176094-2-xmei5@asu.edu>
+ <1781144329.8069873-2-xuanzhuo@linux.alibaba.com>
+ <CAPpSM+RApuYf3-ui15E+01fWEzUzfh6mgijQyT_+KjusMVxMfw@mail.gmail.com>
+In-Reply-To: <CAPpSM+RApuYf3-ui15E+01fWEzUzfh6mgijQyT_+KjusMVxMfw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+	MISSING_MIME_VERSION(2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297899-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,broadcom.com,gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER(0.00)[rafdog35@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-297900-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:pabeni@redhat.com,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:rafdog35@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:mst@redhat.com,m:jasowang@redhat.com,m:eperezma@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rafdog35@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev,gmail.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D69BC66DD88
+X-Rspamd-Queue-Id: B433A66DD92
 
-Replace the open-coded backlog check with sk_acceptq_is_full().
-The helper uses > instead of >=, which is the correct comparison
-per commit 64a146513f8f ("[NET]: Revert incorrect accept queue
-backlog changes."), and adds READ_ONCE() for proper memory ordering.
+On Wed, 10 Jun 2026 19:24:03 -0700, Xiang Mei <xmei5@asu.edu> wrote:
+> Thanks for the review. I agree with that as I replied at the end of
+> v1. If we obsolete 2/2 but keep 1/2, is it okay to just leave it as
+> is?
 
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+You should post a new version.
 
-Signed-off-by: Raf Dickson <rafdog35@gmail.com>
----
- net/vmw_vsock/vmci_transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-index 91516488a7..56503bee31 100644
---- a/net/vmw_vsock/vmci_transport.c
-+++ b/net/vmw_vsock/vmci_transport.c
-@@ -1010,7 +1010,7 @@ static int vmci_transport_recv_listen(struct sock *sk,
- 	 * reset.  Otherwise we create and initialize a child socket and reply
- 	 * with a connection negotiation.
- 	 */
--	if (sk->sk_ack_backlog >= sk->sk_max_ack_backlog) {
-+	if (sk_acceptq_is_full(sk)) {
- 		vmci_transport_reply_reset(pkt);
- 		return -ECONNREFUSED;
- 	}
--- 
-2.54.0
-
+>
+> Xiang
+>
+> On Wed, Jun 10, 2026 at 7:19=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > On Wed, 10 Jun 2026 16:29:36 -0700, Xiang Mei <xmei5@asu.edu> wrote:
+> > > This is a robustness hardening patch. The slow-path frag loop in
+> > > page_to_skb() walks the page chain via page->private until the
+> > > device-reported len is consumed, implicitly trusting that len fits the
+> > > chain. It does not stop when the chain is exhausted (page becomes NULL
+> > > at the tail), nor when nr_frags reaches the end of the static
+> > > skb_shinfo()->frags[MAX_SKB_FRAGS] array.
+> > >
+> > > Both bounds are needed: the chain length is big_packets_num_skbfrags =
++ 1
+> > > pages, which for an MTU-driven configuration can be well below
+> > > MAX_SKB_FRAGS, so neither guard implies the other.
+> > >
+> > > Make the loop self-defending so it no longer relies on the caller hav=
+ing
+> > > validated len: stop once the chain is exhausted, and never index past
+> > > MAX_SKB_FRAGS. No functional change for well-formed input.
+> >
+> > At this point, we are assuming that len represents the correct packet l=
+ength. If
+> > there is a bug in the validation, it can be fixed, just like in your pr=
+evious
+> > patch. Indeed, not checking nr_frags is also based on the overall desig=
+n.
+> > However, I do not recommend adding this kind of enhancement. If we foll=
+ow
+> > this logic, we would end up adding similar code in many other places, w=
+hich
+> > doesn't make much sense.
+> >
+> > Thanks.
+> >
+> > >
+> > > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> > > ---
+> > > v2: robustness patch
+> > >
+> > >  drivers/net/virtio_net.c | 5 ++++-
+> > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > index afe73eda1491..518c22fa1b68 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -906,8 +906,11 @@ static struct sk_buff *page_to_skb(struct virtne=
+t_info *vi,
+> > >       }
+> > >
+> > >       BUG_ON(offset >=3D PAGE_SIZE);
+> > > -     while (len) {
+> > > +     while (len && page) {
+> > >               unsigned int frag_size =3D min((unsigned)PAGE_SIZE - of=
+fset, len);
+> > > +
+> > > +             if (unlikely(skb_shinfo(skb)->nr_frags >=3D MAX_SKB_FRA=
+GS))
+> > > +                     break;
+> > >               skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page, o=
+ffset,
+> > >                               frag_size, truesize);
+> > >               len -=3D frag_size;
+> > > --
+> > > 2.43.0
+> > >
 
