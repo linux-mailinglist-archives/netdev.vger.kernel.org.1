@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-298270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XheLEzD6KmqC0QMAu9opvQ
-	(envelope-from <netdev+bounces-298270-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:10:56 +0200
+	id Il+QIGv6Kmqh0QMAu9opvQ
+	(envelope-from <netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:11:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91CF1674569
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:10:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83F9674580
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:11:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nCv4DoU8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298270-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298270-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=BF+AGrv1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B34A7350498C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:58:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3CB3E351B986
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41124472789;
-	Thu, 11 Jun 2026 17:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67CE48BD57;
+	Thu, 11 Jun 2026 17:58:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB7248BD57;
-	Thu, 11 Jun 2026 17:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA174ADDBB;
+	Thu, 11 Jun 2026 17:58:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781200694; cv=none; b=ZVzKThu6oSf630VTZvCHcPK1D8/Hfa9Ws3Za67pdNJSIZZX91LaXn1jg86jLJIEjSazIcx2jNWOH5FSKwxJl1g9F1XKr5LkfgTTqExePw5rQb13TK1J7cni7nxNPq1mKASfgKFgt/E/G8R4rXSSnbycpWt8zQ+sZnoiT/kBd16A=
+	t=1781200695; cv=none; b=b9cmTq6WjieXPF8Vjn6Om3jKTSgBRTaDIT18X7ddZgiF0LFbWlLQFwYMlwS+JE3wSPGkptpDeQmZwM8HD/nB6XBCnO498XmkTF2f5EdUDUcf+FldgRww4cQd3KoXXAv7/FLjAEGZ0FpjtzJEHyBnMINM+Ip53TT2zBwQXmZvpeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781200694; c=relaxed/simple;
-	bh=O02mcBcBOjj6KGKql2GDOPMaM82nZWPNMghaDwSrs90=;
+	s=arc-20240116; t=1781200695; c=relaxed/simple;
+	bh=Y4ma1t4mV6fGFpz6DA9EaywC1/aJFJTHbDAAVJFMOAc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kqimw4AFZg3x3j+0KwoCTi3iH7aT+9AbkA/4BkA43kHHda1fUUkn+CiZswmGkRr62CHUgE00FHl9HlMJLdoa+DAVQdj78QN0bp/I3NPRSVxcme9fvoqrp3UFToNsKvZFJZmZ8IJoRKX0cvuWYGZBqNvxHiyV+uwq21TaS1yntxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCv4DoU8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 134E51F00893;
-	Thu, 11 Jun 2026 17:58:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NYe0qQVgkvzPAZi844QirLPNaPClXyRDk1Dkhxd65vocHE1O+TA7LlQ+UFvd2CuaTnBAa6z8ceEUAoFjc1V6odoIMdPcHf5g9kMtc6t6r/LNA9MUqSoD7OkyyE6btHasY1maW1X9TDO/tiWjE4wOHpDjIg8r8D/jtQY0p9YNkZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF+AGrv1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9274D1F00893;
+	Thu, 11 Jun 2026 17:58:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781200693;
-	bh=ALz+9GrPdiEVtpRLkIHlem/iZAxX+7lBScDgDqNoHVg=;
+	s=k20260515; t=1781200694;
+	bh=h3ijUhmsVqibSQPWDJ4t0liY8RZOgaSkRxCWi+HbDko=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=nCv4DoU8Di0XIquePQxAP2kdOsn154otuLP43X4N9vBGV8SpWG/CThJebZgmXAxDX
-	 1lS/6WBqxttNtGmWR9vmXa4+4ePNSWAnbvLyQ7IoUynNOwoUWoVamu8NP+iGGVoGgc
-	 yGq6xko07BW3EY+7nicaEw5Vhx3nxY/rps+su7PHe1NjzPulGRo/gneEUuLRNxRfE+
-	 s+fGT/YlxnZXjRFtPrWHSWDuedRkTOGTw4mHlpmWqOAOyt/MzlRLdkuHcTVUCGglAM
-	 As5LkYwYB162uj1GjZG7nkD+ZWKdrBTVPnjVjlwUIf34C+k8vtHcibRcx+wSvnUhPb
-	 XSwCRTLV62XcA==
+	b=BF+AGrv1xouiPAXCy1bNNOOyuYDrtOzA53Phy5G4Q0rBCdTQU8u3KzHiiQhXWCwFa
+	 6eT8Z+QS+I4L2QPtuzM/kMKpncVARhDgayyqUijIyjfFvmwH4Ya3cfNNdgY+zbANxo
+	 GSyZcqjPtbY44Z3R7E/SIzwPb7P1V/DCCNahvGa1VPQqumgjjmeGeJ/YdGWBYr68gF
+	 GxIKsZMGa5B9pbv1OL0/ggs6mFanAZU0aiQaT00/uXj/ohkg6bWLx9REEIZrO07B4L
+	 utyrE366eEzX55fjhiuzyl65NfgyL5uWfmqefjnpBXglqKLnjX0cETgDFpjfpTrpld
+	 Mq2HU3xr+KHTg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938D33930F87;
-	Thu, 11 Jun 2026 17:58:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198173930F87;
+	Thu, 11 Jun 2026 17:58:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,13 +57,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-05-20
+Subject: Re: [GIT PULL] bluetooth 2026-06-03
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178120069013.286318.14387798672720633781.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 17:58:10 +0000
-References: <20260520204959.2902497-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260520204959.2902497-1-luiz.dentz@gmail.com>
+ <178120069163.286318.11448683421315459798.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jun 2026 17:58:11 +0000
+References: <20260603162714.342496-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260603162714.342496-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
  netdev@vger.kernel.org
@@ -73,7 +73,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -81,7 +81,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298270-lists,netdev=lfdr.de,bluetooth];
+	TAGGED_FROM(0.00)[bounces-298271-lists,netdev=lfdr.de,bluetooth];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -101,30 +101,30 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 91CF1674569
+X-Rspamd-Queue-Id: D83F9674580
 
 Hello:
 
 This pull request was applied to bluetooth/bluetooth-next.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 20 May 2026 16:49:58 -0400 you wrote:
-> The following changes since commit 375ba7484132662a4a8c7547d088fb6275c00282:
+On Wed,  3 Jun 2026 12:27:14 -0400 you wrote:
+> The following changes since commit cdf88b35e06f1b385f7f6228060ae541d44fbb72:
 > 
->   Bluetooth: hci_qca: Convert timeout from jiffies to ms (2026-05-14 09:58:08 -0400)
+>   Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-28 08:52:21 -0400)
 > 
 > are available in the Git repository at:
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-20
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-06-03
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-05-20
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5027c886e26c
+  - [GIT,PULL] bluetooth 2026-06-03
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d20da9130830
 
 You are awesome, thank you!
 -- 
