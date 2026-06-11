@@ -1,95 +1,61 @@
-Return-Path: <netdev+bounces-297969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k0oJO31aKmrUnwMAu9opvQ
-	(envelope-from <netdev+bounces-297969-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:33 +0200
+	id M5kvCGhaKmrOnwMAu9opvQ
+	(envelope-from <netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C6C66F25C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A74966F257
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:49:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=FLcDG9Cr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297969-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297969-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=suse.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PTGog5xY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297970-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C82653051A82
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:48:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02A983037DCF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E01363C61;
-	Thu, 11 Jun 2026 06:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BEC36E48D;
+	Thu, 11 Jun 2026 06:49:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577D8361675
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 06:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6F737104F
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 06:49:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781160486; cv=none; b=sN0CBzOnC45m58enURx3qxoySckq+S2LcUXK6HzGO99H7kK5LA4RrQHq5psc8Xujyt95AgQf93jrFvaT4Q2nGCZCOm1h2qwYQxSCtt63wU+oDvC1pQShkCn3YkCYs2ZFaJ3s+Njm1dKaxjRzXMBup9NeAyaNVvuZzhLlxb8Zw+I=
+	t=1781160547; cv=none; b=I5hNIX7yFZMwhtmxH9GgoSlDRX+0gC6hPnU4mnVlGGcvgtay/1xUuhzXGqF5f7f6TLOXsNCEC9OXJIqjvLqoB1nzb8l2hKz3w/+54TpZiN7fHwXHTDEejtiuoFORSP0LvHFFLyiwcYfgC+Oc32yTmIF8mfz1+pfdp/DlBviJu5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781160486; c=relaxed/simple;
-	bh=ta/gSKNvGoanoIlYiNOUoI1vgzNbOnFIlXHsHy7guYE=;
+	s=arc-20240116; t=1781160547; c=relaxed/simple;
+	bh=+XP8tEVnmKGDIlRNdwA5ZPi1qKIvI1uWuJPoitDumiw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0RqLc9i4GDOjnpsv+gYZeY1zW/yMGw4f6DXOuCljLYb4SGSsctSr9TB5ZQrzH4OJohWv4S3OovBF4jJexbBVo/Rz+3zvuzXAf1uHPIj36h78vGt6fxEtDrQEDm4I/sGYw0qa/QLr6M7x+94NI15FAtfl9c4/XhJKIVQR4ck3Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FLcDG9Cr; arc=none smtp.client-ip=209.85.128.46
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490b43e2b95so62085515e9.0
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 23:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1781160484; x=1781765284; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fAKTHXTGuL4/wSXAiskSC+BGLHaNjyNvdmJF1qOpYQQ=;
-        b=FLcDG9CrgtP22lbv+GPacljZ4jk+JmpEwrIpiiQehpTGXE3RWGNmM3OHHdwdju9+JD
-         mUP1Ek4PSOXazw7MOk66I4yOR1twi48Map7j6nXueFy2E90ZLkP0mSuUql8cu3iouP3k
-         wkRpvX5igByT+ZIyE37wk2YTiODrS8UgnC8zZVhB+Cvmxj8lRKOVm6l9Yeaq1MmWGxcf
-         xVXHdz7KJGpq6TmIgaJSWpx8RfHeLFXxydf8xbbc71HX0j5fB997/DZryt3o+mBy5O1I
-         5TqDOKpQiTwI+/RuHSNvHsbm5vCjz5z11LA1lmnB8mUN2PRDn17YcWAE9vWdfMU7P2lG
-         og4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781160484; x=1781765284;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fAKTHXTGuL4/wSXAiskSC+BGLHaNjyNvdmJF1qOpYQQ=;
-        b=d6wc/Y2+3tnLMn3MHncl3WAUSNnFr9ZnhSVFl7/+im2FDu90PGnY46CTHuJtcI3DzJ
-         WIarmqHJRcyb7YIhImz6dm9XJMg9l0TbADxFoTIcVld8X67mZw1rt8Uk0yDLEWcPyih9
-         xoUhdQ6fepunKHCWuKH1DbwW3/u7RyeuCl+i7IHvJ9HVhRCRlezsAxm4icVk9maOMt5m
-         q2BhuD8zHT5nP/SGaJSxAqCX0NRWOm4g+I7YaR/YK8bmCeTEzDQHP+Vk0QCM3RlFCG1P
-         z+aPYuPZIegjAXXjoMQqNvmp/DIpWmAI5q+BqheExO300mto+NLNvLUKEdR5gK5mpHGr
-         SOsg==
-X-Forwarded-Encrypted: i=1; AFNElJ/6Al2Ib8cyD8BDiNq/Iaf65dRrkVBCe3eOo6w3mGKn70BG1eEYWJ7gSI7coWSVc265cEkHOqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPEvsH5Ea7KZb2+Xprv1h1193JRUkDvs401Z1R51CpFpMPNV8Y
-	WZkuR5sjS13FukKWtV8dVpfprIRt/PYISoj8A22m1+7yuDwPLjthJfj9XGBTBYJNGs0=
-X-Gm-Gg: Acq92OEYAAepVLxkccxp4ior0MUXd4yls9e2RWgQomNDvS3DaTSB5HoR/46GdDwhu6c
-	FKQRwlnSnGH60w5GhT7GYzLSSLR0OrvPO3QxXhvliG9rdg4P7STTFaAkyD9zjy7k66XC2Kk+1wL
-	2ii+vNeTYkX+kDtGaz2SazsgxbhnB8+5NmrUEkdyvur1+1T58Aw5UtUgxdhKLUl9AhGaru3jxXz
-	K7fmCvAhUHwVoDiWbsZM3VPl6ttyVub3MjcJELUW+tqS6yo6oMuuIGqmkRnhF/R9gwpZmCeV74Q
-	vSWFIKQnMmNZHqrdkAmgtcFp0Y+XKLE8t3upicgDmBDG3W2hUmAVdi5EuEAqpieEqsXlYfayPVv
-	EqbJ8ihwAnq9Ppyb1CVBHqG/t5Z4KYta+AAiECCwb8gNo5v2NF1o/rz5H6LkDXuIXKf59rSr72a
-	/fDvUyIYs0UrRePD4yybFEDVza4OvGQq4Xci2P3IWQYt2maKcWleqqA80Ou03V5e6C
-X-Received: by 2002:a05:600d:6447:20b0:490:c7dd:7cc2 with SMTP id 5b1f17b1804b1-490e561edccmr10410125e9.24.1781160482422;
-        Wed, 10 Jun 2026 23:48:02 -0700 (PDT)
-Received: from u94a (27-51-16-188.adsl.fetnet.net. [27.51.16.188])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c164fa404fsm263800475ad.37.2026.06.10.23.47.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 23:48:01 -0700 (PDT)
-Date: Thu, 11 Jun 2026 14:47:48 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Zhenzhong Wu <jt26wzz@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	menglong8.dong@gmail.com, eddyz87@gmail.com, stable@vger.kernel.org, mykolal@fb.com, 
-	tamird@kernel.org
-Subject: Re: [PATCH stable 6.6.y v2 0/3] bpf: backport scalar not-equal
- tracking fixes
-Message-ID: <aipWPPxNu_dELdd0@u94a>
-References: <20260607170959.823755-1-jt26wzz@gmail.com>
- <aiaTZCQLWy-96M9O@u94a>
- <CALgi0X=aCS0kxLgqkoOXzwLh_2eNP14BvDk3TCciQP1bFpH5xw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MH4x2NJjZwV+o2SNKJ8c2OT3UAOO9+B3f+MCtgNowlq68SPJe0KA3ytaSbk5autIvAqnnx4qNThFXbD3Q+Kp9uTli54aME4E58rsbXNWIp/gdFnOfWbmxavL76G9SYrOHph10+24bFeLvaym3a/NSkuxvztpWoVYGi5XJIzie7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTGog5xY; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2B01F00893;
+	Thu, 11 Jun 2026 06:49:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781160543;
+	bh=+w9/seJnUe5JMvKcI6Bs57ZCa4X7FEAtLxTLu5bsTYU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=PTGog5xYokcTJmuWqKfUOJHM/t76U6pBF7t5SXX6RvO0/hjA9WG09eA40g8HPtDKx
+	 RXnMFJmxGfI1P8bX1G15i2zZ8zenqruiUQtEus8oXreo7xNI06ax4DQlxWtDAVaDIe
+	 /vyyc6jdioPmf8W672QOcG8dw4J+7T98D13kCqX21um3PbFsviKSpoZbeuFsXrUj0m
+	 jEm6b2ScVfCkiHonzTWyetTOxZT4+JSjJVxdgQj/Pk+BpllhDsCAynn3hZlsRCvVMk
+	 N/vy5cSFyfum0oIRcAwoXlNgPMpXkpC+VQ7tVtpWh9OO1H0r8ajPsCJEJ7SOozSDb2
+	 Xs70BcHI3oJqA==
+Date: Thu, 11 Jun 2026 07:48:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com, kuba@kernel.org
+Subject: Re: [PATCH net-next v4 3/3] net: libwx: support vf per-queue
+ statistics via ethtool -S
+Message-ID: <20260611064859.GP3920875@horms.kernel.org>
+References: <20260608103946.25786-1-mengyuanlou@net-swift.com>
+ <20260608103946.25786-4-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,105 +64,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALgi0X=aCS0kxLgqkoOXzwLh_2eNP14BvDk3TCciQP1bFpH5xw@mail.gmail.com>
+In-Reply-To: <20260608103946.25786-4-mengyuanlou@net-swift.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-297969-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:jt26wzz@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:sdf@google.com,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:mengyuanlou@net-swift.com,m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:kuba@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,fb.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-297970-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:from_mime,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,vger.kernel.org:from_smtp,sashiko.dev:url,net-swift.com:email,horms.kernel.org:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64C6C66F25C
+X-Rspamd-Queue-Id: 6A74966F257
 
-On Wed, Jun 10, 2026 at 11:46:18PM +0800, Zhenzhong Wu wrote:
-> > More importantly, 'bpf: make the verifier tracks the "not equal" for
-> > regs' does not address root cause of the issue, it merely mask the issue
-> > by making the two states different enough that the two is no longer
-> > equal, which works for the Rust specific case you have, but won't work
-> > if the value was slightly different (e.g. "r0 == 1" followed by "r0 !=
-> > 1").
+On Mon, Jun 08, 2026 at 06:39:46PM +0800, Mengyuan Lou wrote:
+> Add per-queue TX/RX packet and byte counters to the VF ethtool stats
+> table.
+> The stats length is now dynamically determined based on whether the
+> device is a VF or PF via wx_stats_len().
 > 
-> Thanks for spelling this out. I now see that I did not fully
-> understand the point behind your suggested bpf-next-with-d028-reverted
-> check.
+> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+> ---
+>  .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 48 +++++++++++++++----
+>  drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  4 ++
+>  .../net/ethernet/wangxun/libwx/wx_vf_common.c |  2 +
+>  3 files changed, 44 insertions(+), 10 deletions(-)
 > 
-> I was treating the not-equal refinement and the linked-scalar precision
-> issue as two ways to break the same failure chain, and chose the
-> d028-based path because it was smaller and easier for me to reason
-> about. With the `r0 == 1` variant, it became clear to me that this only
-> fixes the zero-valued branch shape from my original reproducer, while
-> the underlying linked-scalar pruning issue remains.
-> 
-> > Could you give backporting the full "bpf: track find_equal_scalars history on
-> > per-instruction level" series[3] a try? For 6.6 it should be doable, and
-> > hopefully for 6.1, too, but not too sure about earlier ones. If you prefer I
-> > work on it I can also give it a try later this week.
-> 
-> Sure, I will prepare v3 based on that series for 6.6.y, and then work
-> on the 6.1.y adaptation separately.
-> 
-> I tried applying the series starting from 6.1.y and still hit some
-> issues that need adaptation. 5.15.y and 5.10.y appear to need more
-> surrounding verifier changes, so they may be harder, but I will still
-> try to work through them. If I run into anything I am unsure about, I
-> will raise it earlier.
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> index 30c6ef6103ac..86f6ac63acf7 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> @@ -48,6 +48,10 @@ static const struct wx_stats wx_gstrings_stats[] = {
+>  	WX_STAT("rx_hwtstamp_cleared", rx_hwtstamp_cleared),
+>  };
+>  
+> +static const struct wx_stats wx_gstrings_stats_vf[] = {
+> +	WX_STAT("non_eop_descs", non_eop_descs),
+> +};
+> +
 
-Thanks. Yeah besides the requirement of having to backport 6.6 before the same
-patch will be accepted in 6.1, personally I find it much eaiser to backport to
-newer stable to build understanding, before moving on to older ones; hopefully
-you'll should find starting with 6.6 first helps, too.
+The AI-generated review available at https://netdev-ai.bots.linux.dev/sashiko/
+flags that this is user-exposed and probably could benefit from a bit
+more explanation in the patch description.
 
-> > As for the selftest, it would need to be send separately and by itself
-> > to bpf-next, and picked up there, before it can be backported to stable.
-> > I suggest you look at [4] and have your test placed similarly, and
-> > mention that your test specifically test a Rust/Aya pattern.
-> 
-> Thanks, I will send the selftest to bpf-next separately. I will also
-> change the test to use the `r0 == 1` / `r0 != 1` shape, so it covers
-> the broader linked-scalar pruning issue instead of only the original
-> zero-valued case.
+>  static const struct wx_stats wx_gstrings_fdir_stats[] = {
+>  	WX_STAT("fdir_match", stats.fdirmatch),
+>  	WX_STAT("fdir_miss", stats.fdirmiss),
+> @@ -69,15 +73,26 @@ static const struct wx_stats wx_gstrings_rsc_stats[] = {
+>  #define WX_QUEUE_STATS_LEN ( \
+>  		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
+>  		(sizeof(struct wx_queue_stats) / sizeof(u64)))
+> -#define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
+>  #define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
+>  #define WX_RSC_STATS_LEN  ARRAY_SIZE(wx_gstrings_rsc_stats)
+> -#define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
+> +
+> +static inline unsigned int wx_global_stats_len(const struct wx *wx)
+> +{
+> +	return wx->pdev->is_virtfn ?
+> +	       ARRAY_SIZE(wx_gstrings_stats_vf) : ARRAY_SIZE(wx_gstrings_stats);
+> +}
 
-Actually I thought it is better that you keep the `r0 == 0` / `r0 != 0` shape,
-the reason is that it seems to be the pattern produced by the compiler. But now
-that I think about it, using that shape in bpf-next means that impossible path
-will get min=1 due to the not-equal refinement, and thus precision won't matter.
+Please don't use the inline keyword in .c files unless there is a
+demonstrable - usually performance - reason to do so. Rather, please
+let the compiler inline code (or not).
 
-In that case using the `r0 == 1` / `r0 != 1` shape is probably better indeed.
+It is of course fine to use the inline keyword in .h files.
 
-> Thanks again for the detailed explanation. I have only recently started
-> digging into the verifier implementation details, so this was very helpful!
+> +
+> +static inline unsigned int wx_stats_len(const struct wx *wx)
+> +{
+> +	struct net_device *netdev = wx->netdev;
+
+netdev seems unused.
+
+Flagged by AI-generated review on sashiko.dev 
+
+> +
+> +	return wx_global_stats_len(wx) + WX_QUEUE_STATS_LEN;
+> +}
+>  
+>  int wx_get_sset_count(struct net_device *netdev, int sset)
+>  {
+>  	struct wx *wx = netdev_priv(netdev);
+> -	int len = WX_STATS_LEN;
+> +	int len = wx_stats_len(wx);
+>  
+>  	switch (sset) {
+>  	case ETH_SS_STATS:
+> @@ -100,8 +115,11 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+>  
+>  	switch (stringset) {
+>  	case ETH_SS_STATS:
+> -		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
+> -			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
+> +		for (i = 0; i < wx_global_stats_len(wx); i++)
+> +			if (wx->pdev->is_virtfn)
+> +				ethtool_puts(&p, wx_gstrings_stats_vf[i].stat_string);
+> +			else
+> +				ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
+
+The AI-generated review at https://netdev-ai.bots.linux.dev/sashiko/ also
+flags that these seem to cover statistics that can be exposed via
+netdev_stat_ops, which is preferred.
+
+If consistency with the PF stats is desired for VF stats, then perhaps
+netdev_stat_ops can also be implemented for PF queues.
+
+>  		if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
+>  			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
+>  				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
+
 ...
-
-Happy to help!
-Shung-Hsi
 
