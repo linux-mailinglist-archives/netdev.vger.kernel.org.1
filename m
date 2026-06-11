@@ -1,142 +1,241 @@
-Return-Path: <netdev+bounces-298102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298103-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VU0jGLygKmq6twMAu9opvQ
-	(envelope-from <netdev+bounces-298102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:49:16 +0200
+	id i6jCDy+iKmpEuAMAu9opvQ
+	(envelope-from <netdev+bounces-298103-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:55:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F7767185A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 837AB6718F4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 13:55:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=RORblfg7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298102-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298102-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=Vs1+TR8u;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=TQvpyBwB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298103-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298103-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38513329D660
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:48:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 303B831052CC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 11:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F6E3AE1A3;
-	Thu, 11 Jun 2026 11:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DF63C1092;
+	Thu, 11 Jun 2026 11:54:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD36F38C40E
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 11:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903DA3C109C
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 11:54:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781178489; cv=none; b=Y10Q7/Piy+kPdn84Ml7e7xv6FzxWADvH03UCybN5QQTiRnqOakuvG6SfxYillAW5MEEVWhx1TKBOqVc/d7k6uj9OqNv7sYoUVOKoq/geNkJuhH7npPcD50iDoD7Y97+HK4PBhcAPR/bAiiVzTTkXezQxOTP2+sO0rz4oLUudkf0=
+	t=1781178887; cv=none; b=f5964JDwAHuj5I9AtICSANOo5T8qjwRJV+uB4RK2ieMGFgxvuYnIUEP7m0LL6VmA5DXa8BMFewDlNBLKpW4NQ6qXqU9ukJDdP/MzeHtyOl2sFdIFDpgjOragADRtNgWG+zq1EEdQyuydoFtURNHtpv1PgJJAwZ0Xquec0MuTnu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781178489; c=relaxed/simple;
-	bh=XoJJqz/Vzlhe5uQ13vjg3VCYz0+nnya2oNA5rEu2MFI=;
+	s=arc-20240116; t=1781178887; c=relaxed/simple;
+	bh=aGzMDiq3cXRRQ/rhHELbsPnJZmxLWFamWZhd4QjjA7s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EyMrvMThX5Afpp/BAZ89ibduaVe88fDweSCq85pb5eleKrOYeJk4z2cB/IR5LY+U+5YpNF7kdSoHWmNsoy3tcYzO99dEVk/E/pwvl1bWHaOZ+gsMBg8s5sDke+rjcz8WX6FiSaefTxg7uOCF1oYXUAfpxgmiR76E58uL44aafsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RORblfg7; arc=none smtp.client-ip=95.215.58.177
-Message-ID: <ee8eb9dc-3692-44eb-b807-3699201ddc49@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781178475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KQnWBNAsCzAJ3HZFLh8gKD/BTcTn+ZltOUCQYwic1XA=;
-	b=RORblfg7meoiuNtp/4rapSWxIbyQ3GSD56k+VHAHqBL8MYQlHZlZ8AwsPmqEN/U1lUg5xC
-	2TkMpkl7U1+iTVWyuEPZSZNb6SJAm00yHNu1vXY1DlG/NXb3xMs4wKQHraPF7QMXm8y1S3
-	pxg1RJ3/urOmVLrfdS3obkRRcKbX5Hs=
-Date: Thu, 11 Jun 2026 19:47:32 +0800
+	 In-Reply-To:Content-Type; b=tvfdN8wX5e0vv31ur0ikLFRg2EI8JqF4mYh9fvfDBbxsM10zMV3OaKBqAqhX21HzbQSAeQI2RTjlu8ZnO9zlUAF2Z7D+i1N9BPnhNnvshm1GAQb1sE+pGHCIe5rJ03vDAN4DgsLQo73auhpunSmBLSzvcy0KN935F2Vr2NFb/WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Vs1+TR8u; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=TQvpyBwB; arc=none smtp.client-ip=205.220.168.131
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65B9xLp5284195
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 11:54:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jW5HT6ZuExf9aRitTp/TQw7gkO8riJN2NQLF5cnnH/8=; b=Vs1+TR8uABKi9vdf
+	EaNT3+3T3+ivWOG518iWwjstcT4N/16Ogs2Q6NeLReXD27OBBtcAI3Xq35M5ogH5
+	p7baLPTsZlpUnTHyNKmgpCRTWr1XTC38e7gscqeFk7Cz6mFWaCZicobTdQj7YtZ4
+	UWMAIaBI+x6jySlIt5TSHVHT4yMsTv0E6eLw9pIruBDsUg2AP06luMK3I2mcStxT
+	+/Esz/eCMPjhOaGw/50ArjckxNZTea4LNhwgu6M/XzOXHqJNMNpNGbV5jKatcCd5
+	mKNqj1p3ijlVbRbxaf8v447s02XjMRmeQAnBscDQebqcWggdRy8CxR2iMtPdpgjg
+	glfxiw==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eqe6tk8ym-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 11:54:45 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-9156dc90fdaso191578785a.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 04:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1781178885; x=1781783685; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jW5HT6ZuExf9aRitTp/TQw7gkO8riJN2NQLF5cnnH/8=;
+        b=TQvpyBwBeDCTdjxAIEmheNYBKBdHt//+tB+d6FbWRnSp0HLZraIte3FVk58Z5sHwzE
+         qeva+QzDXck6CVhyuPE7ZvZz5g9KQ86/ZxnruEUSGAO9UHRR6xzCvQ6uzewWf+WlvygJ
+         9nbEBEg5AhcqMzNwzR0Ibgs22pO7s6twQZSRHFWtgVjWECfF8S22GvhIyAe0xyhFinkH
+         F/UASn3YgF8A+CvmYkJVhzfjoNgALUGR6xg2FNDT/s3SIh0D64UljQgYkuj+7KmksiBs
+         UtSDpxYf5/O5+6eMg9ksmHIxiExARAmgljjIcshMNhdZfC3kK7/k1Xqyjw8l4S4LdCkX
+         r+BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781178885; x=1781783685;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jW5HT6ZuExf9aRitTp/TQw7gkO8riJN2NQLF5cnnH/8=;
+        b=Zg/C7PDcPNHjfkwJDxjliAvDElU6e4IYetxiDQc4r+3kVoR1gy+hStfCeFnYee+UzG
+         zuQTXV1qmDdFVV3Pf5z/ujhMxQHd6LTqUxnSUFcxSSXpEtRWMOObU2yD3pmY5RVGvcGX
+         UnbRMrhuhm4ph6bj9sE1hMTf8oPzE06CFU4hfm9ZoZyhx/TeYfjrflvtZRy4+9og1acZ
+         5f2nb7axURbu7mc3UrhsyaudhrE5wqIvLmm697e3ZQFdeKK/D+JVsmvS93rkNZXkdcs/
+         w5cUrQbaTdNh4b93MzQ0TvBD7+NHden1guJ93J+53ZK/MGZYu7NhWC+LOSRKmFOsI/bW
+         dMHw==
+X-Forwarded-Encrypted: i=1; AFNElJ/95FIVNvkFddpKhil+Abx2Emfy8mZZwPc8ZRETue8utm6A9gvl7wnxvC/uqNVuuJA5QT5zpvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzctXABBRifTv4HaI/4ajL+pkyASh/TaArOhGCfT1pbPuSF3O9U
+	xFnyhVhNkpXslbbg41vJOQdGRLrqcjIMPYWwUbQFFEBzP3cwa2tL4dV7YwzzRqzyzL+cX0OKccY
+	p1uVNmuePNxE+gBX1Po6WXQ2GQ64mUL8dbkeccXojsATyd3ZMuIphKKBZvpw=
+X-Gm-Gg: Acq92OF3rCwcQjI2igN/6HFEeQL5BHWXHqYno2r4WzTfhj78ldbs39ft7hC2m3vZZ19
+	NeFyWc6c1as3tBHGbylJbBjg7XAO4pWCJ3l3zt5DsYkWI9J8xbNTo2dRiJQKnaYuG/SrAjay1sp
+	1qOkuhi8kTc+JgaDl5nIJ9jJO3+qjts3Nv44qOIMM9fqeSBJw/Avucp+c9hLzx4ysb7iHWrUzSE
+	MIT5IO2c4xF6B/C6S6+z8V3UISdiTBLetnT/UyCkvhXS8lbpHnpnAZVW68Oc2xng6MiF6gPukPZ
+	b3EY4c4jakj50OveoVPZtIGzRFI0TdtjVG+U097yzJZrdcR1IbplBdujmQrna2R9hYFDEy/F6rS
+	NqT9Sc2gzqHEQy5fwwGy8y6qI1FDoOPi2DQlMNxmZuZjVXyCx5XNPzLs2
+X-Received: by 2002:a05:620a:4553:b0:8f1:9e59:2208 with SMTP id af79cd13be357-9160acc6f24mr198782185a.4.1781178884869;
+        Thu, 11 Jun 2026 04:54:44 -0700 (PDT)
+X-Received: by 2002:a05:620a:4553:b0:8f1:9e59:2208 with SMTP id af79cd13be357-9160acc6f24mr198780185a.4.1781178884422;
+        Thu, 11 Jun 2026 04:54:44 -0700 (PDT)
+Received: from [192.168.120.170] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfcb5abe4a9sm55098666b.46.2026.06.11.04.54.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jun 2026 04:54:43 -0700 (PDT)
+Message-ID: <f492327c-7ee1-443f-bb11-b78af0eda207@oss.qualcomm.com>
+Date: Thu, 11 Jun 2026 13:54:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] tcp: clear sock_ops cb flags before force-closing
- a child socket
-To: Sechang Lim <rhkrqnwk98@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>,
- Lawrence Brakmo <brakmo@fb.com>, Alexei Starovoitov <ast@kernel.org>,
- Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20260611092923.1895982-1-rhkrqnwk98@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <20260611092923.1895982-1-rhkrqnwk98@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/4] net: phy: at803x: add RX and TX clock management
+ for IPQ5018 PHY
+To: Andrew Lunn <andrew@lunn.ch>,
+        George Moussalem <george.moussalem@outlook.com>,
+        Kathiravan Thirumoorthy <kathiravan.thirumoorthy@oss.qualcomm.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+References: <20260605-ipq5018-gephy-clocks-v3-0-f232d9ca0966@outlook.com>
+ <20260605-ipq5018-gephy-clocks-v3-4-f232d9ca0966@outlook.com>
+ <36cd63f4-749e-4b09-b8a6-cbf6924dea88@lunn.ch>
+ <SN7PR19MB673634FEEF98FB8BCBBB15979D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+ <471a21f2-7ab0-410c-861d-5722a94b127d@lunn.ch>
+ <SN7PR19MB67363B4F852FB37071637A299D112@SN7PR19MB6736.namprd19.prod.outlook.com>
+ <afdced5b-73b9-4214-a94a-c13fadd39dce@lunn.ch>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <afdced5b-73b9-4214-a94a-c13fadd39dce@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjExMDEyMCBTYWx0ZWRfX4sakPxaxc0p+
+ PXQA76UgVoDrNC2Vd8V5F5Fktc3b7fwZf9evB2PWsiNrT+enJTSY0J/5vePcWsRAD+i6u10gsge
+ ShFS1zKdBKT51lFBqtYoVandWMUqXOPcr7w5+OuMLNyGHOPHdPxP2G1aKWG8gM7kLVXVUr9x1bZ
+ KMJdvYD9cxgnM4GdyuFKdtQW7ryj4NgyU7Q8790ANr3D7/rD4e48GCBQkM5Q0HvX0sJLlPAdyS8
+ DZhnfwFS6OD+jN0cKgZfmVLL74WJiqF0sBBeNp4xystDMrJWBemCB85K6Rjl+ZfZYpYRcZ0drbz
+ RZefbLMh/Tnpt6CnM4cBJsWwbBBBGsK23GXYPHqudxK+cfszffAGZGjRbujlTGNa8TrVTwdsBWs
+ Ea3rI85Sh66xzBpbFq27XvOJ1yek3qqDgM2Y0H8UR/5f4dag7cKp50937CM4TJF0sFyvHG+dr3v
+ EAZ1kPfJP8XWIuLe71g==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjExMDEyMCBTYWx0ZWRfX9DcxCy0uhjHY
+ e/ODZhPkXVtf6wDFLK489FRDevCYNYtrfVUQ5qREslA/GmsRNwbvrI+TBpH45JYiLQE2FqIoghb
+ qVqEKZRQUW3qxliE7ZKgsLu1Myua7Vk=
+X-Authority-Analysis: v=2.4 cv=AaiB2XXG c=1 sm=1 tr=0 ts=6a2aa205 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=C1GzXxPXE202J-4HI-EA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
+X-Proofpoint-ORIG-GUID: Ceauwab4lqzHYuZbfu4lDCnEVgJOzquM
+X-Proofpoint-GUID: Ceauwab4lqzHYuZbfu4lDCnEVgJOzquM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-11_02,2026-06-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1015 adultscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606110120
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298103-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:edumazet@google.com,m:ncardwell@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:brakmo@fb.com,m:ast@kernel.org,m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com,google.com,davemloft.net,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:george.moussalem@outlook.com,m:kathiravan.thirumoorthy@oss.qualcomm.com,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:f.fainelli@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,m:ffainelli@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[lunn.ch,outlook.com,oss.qualcomm.com];
+	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-298102-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:dkim,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D3F7767185A
+X-Rspamd-Queue-Id: 837AB6718F4
 
+On 6/5/26 8:14 PM, Andrew Lunn wrote:
+>>>> This PHY is integrated into the IPQ5018 SoC, connected to the first GMAC
+>>>> (GMAC0) and probed upon boot. However, this PHY is not used on all
+>>>> boards because an external PHY or switch can be wired to the SoC's
+>>>> second GMAC instead (through a PCS). So from a power management
+>>>> perspective, it would be better if we can disable the clocks if there's
+>>>> no link detected.
+>>>
+>>> Humm, is link the correct criteria? If the PHY is not used,
+>>> .config_aneg should not be called. Why not have the probe method get
+>>> the optional clocks, but leave them off. When .config_aneg is called
+>>> for the first time, enable the clocks?
+>>
+>> Will check if config_aneg is called and test accordingly.
+>>
+>> ip link set eth0 up/down and cable (un)plug do trigger
+>> link_change_notify, and based on the link state the RX/TX clocks are
+>> turned off/on properly.
+> 
+> You are talking about something else here. You say the device is not
+> used. If it is not used, .config_aneg should not be called.
+> 
+> This is a second use case, the device is used, and you want to limit
+> the power it consumes, when there is no link. Do you have any numbers?
+> How much power is actually saved?
 
-On 6/11/26 5:29 PM, Sechang Lim wrote:
-> A child socket inherits the listener's bpf_sock_ops_cb_flags via
-> sk_clone_lock(). If its setup fails in tcp_v4_syn_recv_sock() /
-> tcp_v6_syn_recv_sock(), the child is freed through put_and_exit, where
-> inet_csk_prepare_forced_close() drops the socket lock and tcp_done() runs
-> without it.
->
-> If BPF_SOCK_OPS_STATE_CB_FLAG was inherited, tcp_done() -> tcp_set_state()
-> calls tcp_call_bpf(), which expects the lock and trips sock_owned_by_me():
->
->    WARNING: include/net/sock.h:1799 at tcp_set_state+0x433/0x550
->    RIP: 0010:tcp_set_state+0x433/0x550 include/net/sock.h:1799
->    Call Trace:
->     <IRQ>
->     tcp_done+0xba/0x250 net/ipv4/tcp.c:5095
->     tcp_v4_syn_recv_sock+0x850/0xa50 net/ipv4/tcp_ipv4.c:1787
->     tcp_check_req+0xf30/0x1360 net/ipv4/tcp_minisocks.c:926
->     tcp_v4_rcv+0x1047/0x1b50 net/ipv4/tcp_ipv4.c:2164
->     </IRQ>
->
-> The child is freed before it is ever established, so it should run no
-> sock_ops callback. Clear its cb flags in inet_csk_prepare_for_destroy_sock(),
-> the common point for the IPv4, IPv6 and chtls forced-close paths and for the
-> MPTCP ->syn_recv_sock() failure path (dispose_child), which reaches tcp_done()
-> on a child that was never established too.
->
-> Suggested-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Fixes: d44874910a26 ("bpf: Add BPF_SOCK_OPS_STATE_CB")
-> Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
+If the PHY is part of the SoC, keeping it online would require some
+more hw to be online, so it probably sums up.. I don't know for sure,
+I don't really work with the router SoCs
 
+Is there any prior art wrt enabling/disabling the PHYs (not necessarily
+clocks specifically, but say power supplies) at runtime?
+A quick grep only points to this very driver, which gets the regulator
+during probe, enables it and never turns it off
 
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Maybe +Kathiravan knows more?
 
-
+Konrad
 
