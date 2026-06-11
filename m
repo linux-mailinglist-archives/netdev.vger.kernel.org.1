@@ -1,368 +1,262 @@
-Return-Path: <netdev+bounces-297917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297918-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RvlcGvM6KmoukwMAu9opvQ
-	(envelope-from <netdev+bounces-297917-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:34:59 +0200
+	id Auu0CL89KmpplAMAu9opvQ
+	(envelope-from <netdev+bounces-297918-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:46:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E877366E35F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:34:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAD4966E482
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:46:54 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=VhEmMOMf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297917-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297917-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=blackwall.org header.s=google header.b=hOENDNdr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297918-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297918-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DA98A3025885
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:33:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B891301067F
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5948F349AF5;
-	Thu, 11 Jun 2026 04:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C201F3093D3;
+	Thu, 11 Jun 2026 04:46:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2248349CF6
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 04:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D9D2E7623
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 04:46:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781152429; cv=none; b=kog2J4TXd1zybiYhE634gQYRjFpMUXwX8C43z/r8xzC7qAPEjHCGugzq/VyuCwftaKuODkOt1tPUka1bdga/2HsQKYOKlnsyDQh6zmm5ohIzxCvNOB+wTnBoAjb7nr2RktJ0zURrXRYUnTjLSNL/3cL+0KCZsZduD/3w5mJluFY=
+	t=1781153211; cv=none; b=fvAVPm83Km99/+SiCForzp2OcIzlfC/IKwPbEw0xByV2X8y0U5Emh/nO9qBybg+z/afB5XtpZ/3YaMjIH9Cjw96qtvMWSPMjsNbzFTZc5P1LWy3xIoxZF3Nxv68+kr16jznYRgeKyJb1XMj2UfK/5MeTC63IuZg0uWFlDY5kZxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781152429; c=relaxed/simple;
-	bh=icBrsN59mHgz4NxH0sJu+pk9mpLQ/NXvFDcrs3OpjGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t0KGCoc2pPXg+8W2oyEt8ZSBpSUm+BwpgJqFdhtyKQULXdLhBnyk8NG9UcdCNioRQo9d0ala75kEUrs93pXlxgIR17s3q20IH637dO+XZ20Euo+zGmmeq+AFQ1ZaZpQWje8y6Eb8A+l5djUWxxNgjjOSbgK8cnybPLEqkH9raeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VhEmMOMf; arc=none smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c0c3546924so50236495ad.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 21:33:47 -0700 (PDT)
+	s=arc-20240116; t=1781153211; c=relaxed/simple;
+	bh=v6Tvsh4WYQfv31HxAc9Dde933o1JqCaSfCB4614y+tY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SY0A+3OKLiBwMlj2HRgKlJ02NvUdCq9COUD7/I9yxy1So4I3B3cPwRMv3pDlXyDNb1v3GBiOAjayYefG1n01YIqIjTmQyx+lCnNu0VhPVPJwFZlmMTGYymUONWnoPO9IzKRKI74iJRCOdrGp3mMMIUKZXZ4xSIn1zRyPsiJJk20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=hOENDNdr; arc=none smtp.client-ip=209.85.128.44
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490b8ac62baso3438295e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 21:46:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781152427; x=1781757227; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o7z92KAWUhWwB4qQw1v/v0SOnEZwf5l4UXEOMjS0mEk=;
-        b=VhEmMOMfLoZdO+jIL7cHugqDXYll8aaira6k7DColedgGvlTQQUMeu6cnO2s7EcLWM
-         VHfYA8PyzBYq7owmKez9/+dSPtKo+/Wv2zmx6TH8Jsb2AYRBuppV7B36yVw0sXrc4g/E
-         qBEa7/I2HowIDLYY7fEUIFta5X9Oz1l4V+UnCfEJVRRT8XqV3L9WLnbNlCkVrziUckZe
-         f1iA6xNzEC0jsdd7Jd+N70FJJaJei1WJwcxU97CG2NzFzQFgzMDH1w+LPEcNVGZP8uME
-         UrEeud8lj/aYhM0AntD+a2qA/Zueo/NE2NKjT+BK+suXFicCCPSbBRgMw3wevK3/MrX9
-         Igfg==
+        d=blackwall.org; s=google; t=1781153208; x=1781758008; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/k2kYVMaetFly35gQsfQES2TDyE0H4E8pL9hUBctpN4=;
+        b=hOENDNdrwWyF+k5JFn6ajcOxapXN/asg9I5PkmuQ/5711PXvCp+7yujgOikHZVMmhq
+         GhUSpIrzehEwWrAKdynDs8RqfoVyHmUZ+Zb4BChNCz5KRjClAklo1qmTPowK2Ru5YShS
+         YLz7i6C28OgI5KpU9NeCBFUPT0mG9VpUUYytWXnpzl+Tw3aXyWOmUD/QW9tVUv/UZNuV
+         HQ7UZaZWb3Y04tKGZtRRz2ARvSGvH4vGILJ24vjgcES/Xwnm3A3y9oMa8ohtPtGKZsaW
+         3b7QcwfYq0W8lJhEhmWBJtXMXpOcbZahlqMNavIStF+tAgMpr+9y3g1ud5FnCuQlBs8H
+         TfbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781152427; x=1781757227;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=o7z92KAWUhWwB4qQw1v/v0SOnEZwf5l4UXEOMjS0mEk=;
-        b=ezDB24C26nXVi9UIwUg1tw+9SwtYU4vBv3lGSQdRhK3e4xAtEEuR5jtBjw3eivtuu8
-         An+wA8gk3C7HyxeaElmeEwctfMurxvCfGD4YRHfWXq/v9dXdZQeHTpEGmobw8yCN+lav
-         knVv2g1rLI7S7UZWAROPopHmpio1eA5E9Oa60st8ywGRoQiHyZk9TKm3LpdmSavgj9zQ
-         IdgWi8P/b5sK3p1EpE2/12BTKyGpm4G62QKmflzYL8aPuQMAJNwvYym2SJa1ouzmtPZ1
-         2HtNbNrhliPCiAAH0KVZZwy8ALWYmBAa39odikQtkTo05eJA3iaDNzkpKqqktZZRzLdJ
-         uHRg==
-X-Gm-Message-State: AOJu0YzW1QhwumLgmT2KIKMC1V9UE52YFF49Z9LuPYehAzmWQ1FxVOok
-	xwg74y8VNyGezi7cbeiKaZ+7FCUlK6i5atzro67zvZB2B7MB7jTp4KkZ
-X-Gm-Gg: Acq92OGuUWPS15Ja3mwtcHsIrRaSHtHcWY0bczHanum5PXIo9D6MNc4GQyAndOw2QqT
-	7nMY8/6h2oCqkynQAnZ1TIDqdEruWXAwjnqF2X90OvAbz7A4Lb7TEiDX16ocJ5GARDAimhS1TNe
-	N9B+OiRXyRaFgjqndw6PjBy1mdGXDhgPLLjzrMRE6e49Y0XMYOxqQswpfJw9+cWM5SvmJhHkdnv
-	cyz9YCx+ECBhwa5yTkpUYUI2CNHQ3ztkkqvW9n9FbAs2ZIQaMkCnY/k/VUszu454ezSYbKF1bhn
-	h+FR+jhd1REAjxmeOlX8fmgz9CtU8phqwVVldbPm9rXHJ68AProt0RG/bCe4u8pSKYdJ5evpL4g
-	bIIbm34ytdhWHTpN94TYKpfmEayRY+yqw1aHjMfWWjU+ccpLR0vEMi5GwI+f55t3f4z+bFfLUqs
-	SuxAYW/9irGRj4I/lGm9PUlIB7v+c4HbUb9NscAYW97Ns0U8sOqgt9WNtGHPvHE2lMacYQBEPST
-	ZOLbyRJkjL6zF50JF1zvQf1fU8r
-X-Received: by 2002:a17:903:2b03:b0:2c0:aef8:23eb with SMTP id d9443c01a7336-2c2f24a19abmr13489805ad.25.1781152427145;
-        Wed, 10 Jun 2026 21:33:47 -0700 (PDT)
-Received: from u2404-VMware-Virtual-Platform.localdomain ([2a12:a304:100::109f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c16609e05fsm270794455ad.54.2026.06.10.21.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 21:33:46 -0700 (PDT)
-From: Sun Jian <sun.jian.kdev@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	shuah@kernel.org,
-	jiayuan.chen@linux.dev,
-	toke@redhat.com,
-	menglong.dong@linux.dev,
-	emil@etsalapatis.com,
-	Sun Jian <sun.jian.kdev@gmail.com>
-Subject: [PATCH bpf v3 2/2] selftests/bpf: Cover generic devmap egress last-dst rewrite
-Date: Thu, 11 Jun 2026 12:33:17 +0800
-Message-ID: <20260611043317.512843-3-sun.jian.kdev@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260611043317.512843-1-sun.jian.kdev@gmail.com>
-References: <20260611043317.512843-1-sun.jian.kdev@gmail.com>
+        d=1e100.net; s=20251104; t=1781153208; x=1781758008;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/k2kYVMaetFly35gQsfQES2TDyE0H4E8pL9hUBctpN4=;
+        b=jDQ+E+KwD153UtBR3Lof4F7LfPtRdPHjocVk3qFQZ355RwSseA7zR0Fj6QoGrOadu+
+         sZkdc6YQUvYaEXLROXkySQwbt8X5PZ/OJbMHRfj7QnlOzVsXAHl3J+9V7GTRY1qIxyu/
+         LwxRtHUUUjbKzLHDF8JZ+sGfIq+yoAORiCGH7p5THOLJGHC1LtmB/S8QH2O12CW5AoTp
+         6Zf0itnCD19nqrQIJQff/v8We9T8K8fRjQ4MMhkP9G3T/Ar2zEEo/R1fQMtGuvj+QbVd
+         PxRe4BM8r6Eg5aAR8KrpV3xAOmujx2ePXTA1DjgnOb3K7NoPQD//R1ib6dRIO5XARogG
+         Ai8A==
+X-Forwarded-Encrypted: i=1; AFNElJ+sZp297JHHiYiGszhwv1DCzJlrN96WwyYcX6mBmDi7vnTZTAhO+5bOUAaXv8f+Ik01rCfs4iI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3k/jFpQWVhllpVCvULXlee7gnm9aWf8NQUj0q4gFT2JlWStwK
+	Y9hhIQisxxHVke0TIqdJkyZtW65q32phUYTC3teB5tboTcxoebqivX2cYCpLk8pAVqA=
+X-Gm-Gg: Acq92OG5MCkWUitOwz+DHmgrtBE5+Z+ULPdJwg7OoGq1T+uWPwIyXXDVz6vnzMc/Jh5
+	x6iyCnJG2hd/bCxipXbL3YS7HvwrRWD1ChmNze/5SEzVu/IdsW/gPtW2DW6qjgLnF+7xyF8S9K3
+	fFvOz7iwei6LPHCRDcWfFrdWtcii9Az5oyGTKI5vsZIjOVIGd3PVpQQJaEMKeO7+6Mu7DOnF3UW
+	KMrCwP4bWRfnLAenxZHjDmtu7GoWc4Dx5SxZ4PJLVHTbC5RR948xrg/3gMht5VMPeX78IY/lhjv
+	2ZP3CRc7YCCKn1QxzcFSbRjj8L3M9DUzkNY5FMWmnXCN8rHIZmShpHdKP0d2wwT7DxAJPmV3FjQ
+	/4fD5muaa3VLJ9A03NGEv+pRl2EUNwxGtcpl/yhJbFRNRcvJq3Z+lsxcWfVIFkX4ohlqg3AJ5nl
+	GLtiHmPmTbvavlHNDxBRo60rq/htP6er4n81rBV1dpVUrwrg6GERljLskZ8GJv5Ptj
+X-Received: by 2002:a05:600c:b93:b0:490:ad1e:1846 with SMTP id 5b1f17b1804b1-490e52e5240mr9028395e9.9.1781153207928;
+        Wed, 10 Jun 2026 21:46:47 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-182.ip.btc-net.bg. [78.154.15.182])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490e2d0fb23sm30509405e9.15.2026.06.10.21.46.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2026 21:46:47 -0700 (PDT)
+Message-ID: <da4de983-99cc-435f-b00c-3321444626ea@blackwall.org>
+Date: Thu, 11 Jun 2026 07:46:46 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 1/5] bridge: use atomic ops to read/change
+ p->flags in sysfs
+Content-Language: en-US, bg
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20260610161836.1275531-1-edumazet@google.com>
+ <20260610161836.1275531-2-edumazet@google.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260610161836.1275531-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-297917-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-297918-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:jiayuan.chen@linux.dev,m:toke@redhat.com,m:menglong.dong@linux.dev,m:emil@etsalapatis.com,m:sun.jian.kdev@gmail.com,m:johnfastabend@gmail.com,m:sunjiankdev@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,davemloft.net,gmail.com,fomichev.me,redhat.com,etsalapatis.com];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,vger.kernel.org,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,blackwall.org:dkim,blackwall.org:email,blackwall.org:mid,blackwall.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E877366E35F
+X-Rspamd-Queue-Id: AAD4966E482
 
-Strengthen xdp_veth_egress to check that each destination observes the
-MAC selected for its own egress ifindex, instead of only checking that
-the observed MAC differs from a single magic value.
+On 10/06/2026 19:18, Eric Dumazet wrote:
+> Change net/bridge/br_sysfs_if.c to use atomic operations
+> to read/change bits n p->flags.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>   net/bridge/br_sysfs_if.c | 61 ++++++++++++++++++++++------------------
+>   1 file changed, 33 insertions(+), 28 deletions(-)
+> 
 
-Add a generic XDP last-destination test where earlier destinations do
-not have a devmap egress program while the final destination does. This
-covers the case where the final destination runs on the original skb and
-could otherwise rewrite packet data still shared with earlier cloned
-skbs.
+One minor nit below if there's another version, otherwise:
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Use deterministic DEVMAP_HASH keys for the egress map so the intended
-last destination is stable.
+> diff --git a/net/bridge/br_sysfs_if.c b/net/bridge/br_sysfs_if.c
+> index 1923c004f0d2b746902f5b6de1bbb72f7f824125..738544901563f570355554f49b2b80cf962f8e71 100644
+> --- a/net/bridge/br_sysfs_if.c
+> +++ b/net/bridge/br_sysfs_if.c
+> @@ -44,40 +44,45 @@ const struct brport_attribute brport_attr_##_name = { 	        \
+>   	.store	= _store,					\
+>   };
+>   
+> -#define BRPORT_ATTR_FLAG(_name, _mask)				\
+> +#define BRPORT_ATTR_FLAG(_name, _bitnr)				\
+>   static ssize_t show_##_name(struct net_bridge_port *p, char *buf) \
+>   {								\
+> -	return sysfs_emit(buf, "%d\n", !!(p->flags & _mask));	\
+> +	return sysfs_emit(buf, "%d\n", test_bit(_bitnr, &p->flags));	\
+>   }								\
+>   static int store_##_name(struct net_bridge_port *p, unsigned long v) \
+>   {								\
+> -	return store_flag(p, v, _mask);				\
+> +	return store_flag(p, v, _bitnr);				\
+>   }								\
+>   static BRPORT_ATTR(_name, 0644,					\
+>   		   show_##_name, store_##_name)
+>   
+>   static int store_flag(struct net_bridge_port *p, unsigned long v,
+> -		      unsigned long mask)
+> +		      unsigned long bitnr)
+>   {
+> +	unsigned long oflags, flags = READ_ONCE(p->flags);
+>   	struct netlink_ext_ack extack = {0};
+> -	unsigned long flags = p->flags;
+>   	int err;
+>   
+> +
 
-Suggested-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
----
- .../selftests/bpf/prog_tests/test_xdp_veth.c  | 152 +++++++++++++++++-
- 1 file changed, 149 insertions(+), 3 deletions(-)
+this extra new line seems unnecessary, there's already one
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-index 3e98a1665936..681415cacb75 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-@@ -456,7 +456,11 @@ static void xdp_veth_egress(u32 flags)
- 			.remote_flags = flags,
- 		}
- 	};
--	const char magic_mac[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
-+	const unsigned char egress_macs[VETH_PAIRS_COUNT][ETH_ALEN] = {
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x03 },
-+	};
- 	struct xdp_redirect_multi_kern *xdp_redirect_multi_kern;
- 	struct bpf_object *bpf_objs[VETH_EGRESS_SKEL_NB];
- 	struct xdp_redirect_map *xdp_redirect_map;
-@@ -512,7 +516,7 @@ static void xdp_veth_egress(u32 flags)
- 						 &net_config, prog_cfg, i))
- 			goto destroy_xdp_redirect_map;
- 
--		err = bpf_map_update_elem(mac_map, &ifindex, magic_mac, 0);
-+		err = bpf_map_update_elem(mac_map, &ifindex, egress_macs[i], 0);
- 		if (!ASSERT_OK(err, "bpf_map_update_elem"))
- 			goto destroy_xdp_redirect_map;
- 
-@@ -531,13 +535,16 @@ static void xdp_veth_egress(u32 flags)
- 
- 	for (i = 0; i < 2; i++) {
- 		u32 key = i;
-+		__be64 expected = 0;
- 		u64 res;
- 
- 		err = bpf_map_lookup_elem(res_map, &key, &res);
- 		if (!ASSERT_OK(err, "get MAC res"))
- 			goto destroy_xdp_redirect_map;
- 
--		ASSERT_STRNEQ((const char *)&res, magic_mac, ETH_ALEN, "compare mac");
-+		/* store_mac_1/2 run on the second/third remote veths. */
-+		memcpy(&expected, egress_macs[i + 1], ETH_ALEN);
-+		ASSERT_EQ(res, expected, "compare mac");
- 	}
- 
- destroy_xdp_redirect_map:
-@@ -551,6 +558,142 @@ static void xdp_veth_egress(u32 flags)
- 	cleanup_network(&net_config);
- }
- 
-+static void xdp_veth_egress_last_dst(u32 flags)
-+{
-+	struct prog_configuration prog_cfg[VETH_PAIRS_COUNT] = {
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "store_mac_1",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		},
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "store_mac_2",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		},
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "xdp_dummy_prog",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		}
-+	};
-+	const unsigned char egress_macs[VETH_PAIRS_COUNT][ETH_ALEN] = {
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x03 },
-+	};
-+	struct xdp_redirect_multi_kern *xdp_redirect_multi_kern;
-+	struct bpf_object *bpf_objs[VETH_EGRESS_SKEL_NB];
-+	struct xdp_redirect_map *xdp_redirect_map;
-+	struct net_configuration net_config;
-+	int mac_map, egress_map, res_map;
-+	struct nstoken *nstoken = NULL;
-+	struct xdp_dummy *xdp_dummy;
-+	__be64 last_mac = 0;
-+	bool found = false;
-+	int err;
-+	int i;
-+
-+	xdp_dummy = xdp_dummy__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_dummy, "xdp_dummy__open_and_load"))
-+		return;
-+
-+	xdp_redirect_multi_kern = xdp_redirect_multi_kern__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_redirect_multi_kern, "xdp_redirect_multi_kern__open_and_load"))
-+		goto destroy_xdp_dummy;
-+
-+	xdp_redirect_map = xdp_redirect_map__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_redirect_map, "xdp_redirect_map__open_and_load"))
-+		goto destroy_xdp_redirect_multi_kern;
-+
-+	if (!ASSERT_OK(create_network(&net_config), "create network"))
-+		goto destroy_xdp_redirect_map;
-+
-+	mac_map = bpf_map__fd(xdp_redirect_multi_kern->maps.mac_map);
-+	if (!ASSERT_OK_FD(mac_map, "open mac_map"))
-+		goto destroy_xdp_redirect_map;
-+
-+	egress_map = bpf_map__fd(xdp_redirect_multi_kern->maps.map_egress);
-+	if (!ASSERT_OK_FD(egress_map, "open map_egress"))
-+		goto destroy_xdp_redirect_map;
-+
-+	bpf_objs[0] = xdp_dummy->obj;
-+	bpf_objs[1] = xdp_redirect_multi_kern->obj;
-+	bpf_objs[2] = xdp_redirect_map->obj;
-+
-+	nstoken = open_netns(net_config.ns0_name);
-+	if (!ASSERT_OK_PTR(nstoken, "open NS0"))
-+		goto destroy_xdp_redirect_map;
-+
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		struct bpf_devmap_val devmap_val = {};
-+		int ifindex = if_nametoindex(net_config.veth_cfg[i].local_veth);
-+		u32 key = i;
-+
-+		SYS(destroy_xdp_redirect_map,
-+		    "ip -n %s neigh add %s lladdr 00:00:00:00:00:01 dev %s",
-+		    net_config.veth_cfg[i].namespace, IP_NEIGH,
-+		    net_config.veth_cfg[i].remote_veth);
-+
-+		if (attach_programs_to_veth_pair(bpf_objs, VETH_EGRESS_SKEL_NB,
-+						 &net_config, prog_cfg, i))
-+			goto destroy_xdp_redirect_map;
-+
-+		err = bpf_map_update_elem(mac_map, &ifindex, egress_macs[i], 0);
-+		if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+			goto destroy_xdp_redirect_map;
-+
-+		devmap_val.ifindex = ifindex;
-+		devmap_val.bpf_prog.fd = -1;
-+
-+		if (i == VETH_PAIRS_COUNT - 1)
-+			devmap_val.bpf_prog.fd =
-+				bpf_program__fd(xdp_redirect_multi_kern->progs.xdp_devmap_prog);
-+
-+		err = bpf_map_update_elem(egress_map, &key, &devmap_val, 0);
-+		if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+			goto destroy_xdp_redirect_map;
-+	}
-+
-+	SYS_NOFAIL("ip netns exec %s ping %s -i 0.1 -c 4 -W1 > /dev/null ",
-+		   net_config.veth_cfg[0].namespace, IP_NEIGH);
-+
-+	res_map = bpf_map__fd(xdp_redirect_map->maps.rx_mac);
-+	if (!ASSERT_OK_FD(res_map, "open rx_map"))
-+		goto destroy_xdp_redirect_map;
-+
-+	memcpy(&last_mac, egress_macs[VETH_PAIRS_COUNT - 1], ETH_ALEN);
-+
-+	for (i = 0; i < VETH_PAIRS_COUNT - 1; i++) {
-+		u32 key = i;
-+		u64 res;
-+
-+		err = bpf_map_lookup_elem(res_map, &key, &res);
-+		if (err == -ENOENT)
-+			continue;
-+		if (!ASSERT_OK(err, "get MAC res"))
-+			goto destroy_xdp_redirect_map;
-+
-+		found = true;
-+		ASSERT_NEQ(res, last_mac, "compare last dst mac");
-+	}
-+
-+	ASSERT_TRUE(found, "found earlier dst mac");
-+
-+destroy_xdp_redirect_map:
-+	close_netns(nstoken);
-+	xdp_redirect_map__destroy(xdp_redirect_map);
-+destroy_xdp_redirect_multi_kern:
-+	xdp_redirect_multi_kern__destroy(xdp_redirect_multi_kern);
-+destroy_xdp_dummy:
-+	xdp_dummy__destroy(xdp_dummy);
-+
-+	cleanup_network(&net_config);
-+}
-+
- void test_xdp_veth_redirect(void)
- {
- 	if (test__start_subtest("0"))
-@@ -596,4 +739,7 @@ void test_xdp_veth_egress(void)
- 
- 	if (test__start_subtest("SKB_MODE/egress"))
- 		xdp_veth_egress(XDP_FLAGS_SKB_MODE);
-+
-+	if (test__start_subtest("SKB_MODE/egress_last_dst"))
-+		xdp_veth_egress_last_dst(XDP_FLAGS_SKB_MODE);
- }
--- 
-2.43.0
+> +	oflags = flags;
+>   	if (v)
+> -		flags |= mask;
+> +		__set_bit(bitnr, &flags);
+>   	else
+> -		flags &= ~mask;
+> +		__clear_bit(bitnr, &flags);
+>   
+> -	if (flags != p->flags) {
+> -		err = br_switchdev_set_port_flag(p, flags, mask, &extack);
+> -		if (err) {
+> -			netdev_err(p->dev, "%s\n", extack._msg);
+> -			return err;
+> -		}
+> +	if (flags == oflags)
+> +		return 0;
+>   
+> -		p->flags = flags;
+> -		br_port_flags_change(p, mask);
+> +	err = br_switchdev_set_port_flag(p, flags, BIT(bitnr), &extack);
+> +	if (err) {
+> +		netdev_err(p->dev, "%s\n", extack._msg);
+> +		return err;
+>   	}
+> +	if (v)
+> +		set_bit(bitnr, &p->flags);
+> +	else
+> +		clear_bit(bitnr, &p->flags);
+> +	br_port_flags_change(p, BIT(bitnr));
+>   	return 0;
+>   }
+>   
+> @@ -247,17 +252,17 @@ static int store_backup_port(struct net_bridge_port *p, char *buf)
+>   }
+>   static BRPORT_ATTR_RAW(backup_port, 0644, show_backup_port, store_backup_port);
+>   
+> -BRPORT_ATTR_FLAG(hairpin_mode, BR_HAIRPIN_MODE);
+> -BRPORT_ATTR_FLAG(bpdu_guard, BR_BPDU_GUARD);
+> -BRPORT_ATTR_FLAG(root_block, BR_ROOT_BLOCK);
+> -BRPORT_ATTR_FLAG(learning, BR_LEARNING);
+> -BRPORT_ATTR_FLAG(unicast_flood, BR_FLOOD);
+> -BRPORT_ATTR_FLAG(proxyarp, BR_PROXYARP);
+> -BRPORT_ATTR_FLAG(proxyarp_wifi, BR_PROXYARP_WIFI);
+> -BRPORT_ATTR_FLAG(multicast_flood, BR_MCAST_FLOOD);
+> -BRPORT_ATTR_FLAG(broadcast_flood, BR_BCAST_FLOOD);
+> -BRPORT_ATTR_FLAG(neigh_suppress, BR_NEIGH_SUPPRESS);
+> -BRPORT_ATTR_FLAG(isolated, BR_ISOLATED);
+> +BRPORT_ATTR_FLAG(hairpin_mode, BR_HAIRPIN_MODE_BIT);
+> +BRPORT_ATTR_FLAG(bpdu_guard, BR_BPDU_GUARD_BIT);
+> +BRPORT_ATTR_FLAG(root_block, BR_ROOT_BLOCK_BIT);
+> +BRPORT_ATTR_FLAG(learning, BR_LEARNING_BIT);
+> +BRPORT_ATTR_FLAG(unicast_flood, BR_FLOOD_BIT);
+> +BRPORT_ATTR_FLAG(proxyarp, BR_PROXYARP_BIT);
+> +BRPORT_ATTR_FLAG(proxyarp_wifi, BR_PROXYARP_WIFI_BIT);
+> +BRPORT_ATTR_FLAG(multicast_flood, BR_MCAST_FLOOD_BIT);
+> +BRPORT_ATTR_FLAG(broadcast_flood, BR_BCAST_FLOOD_BIT);
+> +BRPORT_ATTR_FLAG(neigh_suppress, BR_NEIGH_SUPPRESS_BIT);
+> +BRPORT_ATTR_FLAG(isolated, BR_ISOLATED_BIT);
+>   
+>   #ifdef CONFIG_BRIDGE_IGMP_SNOOPING
+>   static ssize_t show_multicast_router(struct net_bridge_port *p, char *buf)
+> @@ -273,8 +278,8 @@ static int store_multicast_router(struct net_bridge_port *p,
+>   static BRPORT_ATTR(multicast_router, 0644, show_multicast_router,
+>   		   store_multicast_router);
+>   
+> -BRPORT_ATTR_FLAG(multicast_fast_leave, BR_MULTICAST_FAST_LEAVE);
+> -BRPORT_ATTR_FLAG(multicast_to_unicast, BR_MULTICAST_TO_UNICAST);
+> +BRPORT_ATTR_FLAG(multicast_fast_leave, BR_MULTICAST_FAST_LEAVE_BIT);
+> +BRPORT_ATTR_FLAG(multicast_to_unicast, BR_MULTICAST_TO_UNICAST_BIT);
+>   #endif
+>   
+>   static const struct brport_attribute *brport_attrs[] = {
 
 
