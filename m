@@ -1,301 +1,259 @@
-Return-Path: <netdev+bounces-298105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4ApWHMWmKmqquQMAu9opvQ
-	(envelope-from <netdev+bounces-298105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:15:01 +0200
+	id jtcJEUumKmqDuQMAu9opvQ
+	(envelope-from <netdev+bounces-298106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:12:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69108671BA6
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:15:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73F6671B6C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:12:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=j+q4BITW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298105-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298105-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=koTTg7Zv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298106-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298106-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amazon.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 092373030502
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:09:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85A7D30DA86D
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73C43EFD05;
-	Thu, 11 Jun 2026 12:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812923F1AD1;
+	Thu, 11 Jun 2026 12:12:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.68.102])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1540F3D5C0C
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 12:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AFA3EFD03;
+	Thu, 11 Jun 2026 12:12:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781179789; cv=none; b=YT+LWlwK7j32uqgfnA+vexcs0WDBkM/ywI4SRofhO3fbjbNf/BVpV9/sJeHPlU8Sk5lFPdlKiTEFIkqTi6HwTesdeXmu2wcqhsG6Y698Wji91TsS98B6Yqvbhl++N8qz5h8+SGTeXelZlavTvZxCpVLUGvPc704CMkuOV9XVUyI=
+	t=1781179944; cv=none; b=A940OMD2SQhBs17k59/K9FRs4SM4bYrA2M9RfRM91PH56/qpWdVFBgDOnEQHIIf/7q9B1wTecWNxfvQTlgOC7AvmaY9INfnHVb+EiisL8Q2jEcX9pwyHDnbpVDU/mv8jHUxlTsOO/LEt38X8JJClInuwrTPpK5KcLpGosYnDZsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781179789; c=relaxed/simple;
-	bh=ZjK56lQ40XRSCfovrLM16CvDySf903CFFII4+zH6ckI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sdDOm5O30siSPMId2wrIZ0Eljn2ui9AKP8PxrwD0u31JSUZlze03T/fKRy8FNPFwnMqV794QVVe3abw1wdQfMROXE9AV+Irrr1Htz7vjPIBOjHDkkw796XtQz/uhhuO5SMy5rzfFGep9CCERIfKd38ZWAQCqxdQtqkwyY1kwaN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=j+q4BITW; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490cf322ed0so37747755e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 05:09:45 -0700 (PDT)
+	s=arc-20240116; t=1781179944; c=relaxed/simple;
+	bh=UiGAIjlI8TKekyKYZJpkgKTjkOCxn66W0nCQRqWVw70=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XK0ev+oGTKOkgmdN8vaSlFSleEmNdp74jBDMRgBh9/32ebn/f6mZbePJy709QKX17Zb5zPtIQzRgZf8KHbZNpTLTBE2HnjczWwAkrPR+tjpefEDKlx2k84zuYa5KABANoItfDZu2RFxFich1VxKE0J0E6PiiS6iGQiJcu8+yMog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=koTTg7Zv; arc=none smtp.client-ip=44.246.68.102
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1781179784; x=1781784584; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OgtDqbm68IM5KDrf7YAIfuu2gtjEHLe1UjPl7Bx4Kfs=;
-        b=j+q4BITWzjb8AZQbtHkzqdkXr2ptzSogU8G0b/m2hr/NXI4xRJfW5b//NigFjLM7Yt
-         B3CVLNA2j9+WtNaeR+iNUkirmtCD3T91YqWmSoyhUycvWAyhScbOg/qd3JA0GVDpNLn8
-         rIIn2PJO5rodhVEFRq4FlpUya5YTd2181p5Oiqcnl9b7acBCRHUSSJzVWOR0PyUXou6P
-         r/zZDa/cJQNsdWA5r37tiTjdcNJ+2VkSMciqSHu7WKzfuUYbnuSwCVHOaMTTJ9yuuf1I
-         iXypoumc2cYep9aXi+KAiFpDd7FLEhBXPeLI+YujKSUn+FAn2VAOjEktioxBjJcjbSo8
-         Q3bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781179784; x=1781784584;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OgtDqbm68IM5KDrf7YAIfuu2gtjEHLe1UjPl7Bx4Kfs=;
-        b=PR1WciyqRv1vyhNkDSP2FD4CT8iZq4R8LZKgPt2SC4DjI/ZdBQLiqTL/nS5Q+farsz
-         mk/0NKib0YWKnYz3qk7jlLtARK3tqYQwSZjJzSA6mCimUI55F7Ia54CR0B/oeAv+evEw
-         Ye4rTPxdGhpv6tKDCLM1/SsxRph5n4fzkJhYT4KNjaXg7XL6uIVyCdjClXvbC6E6KeKX
-         cufV2ur6Ozo20pedR0xnenS6yKrYntqkUxLS8c0WIg/XPTLnzom9O1FL/X41OyLI4nxj
-         vBpqsmw6cIyc0XYGX/fTy89Q5o+ZOjEq9/zYFSJjsdrkCbxnCey7twsQ7JJJHe4a81jR
-         Jx4w==
-X-Forwarded-Encrypted: i=1; AFNElJ+12E9fKmnxvhIdL9ieI0nTuTdX+prty2vPkITZ6Nwgv4APP9Y0SDghR7Gk4lfiifZNVQ5DaRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmTOlZ7x770rBp6hxgZuZDw58ZIz9dl9xarqJdv98O27XsIHdg
-	VxH6tKtrwgveZSxnc8PNY0d0Tq5RbNocUZYiDeIakUczFdkc2+h1TkqEkpXBERLrF0M=
-X-Gm-Gg: Acq92OFhfdS3/1qPqnj+DJWI/IyEQ122oCjNFaDWYhKBR6SODOCzAAqLd4YSLenq3VE
-	Y/u2SBFoO4+dm1+X/tcmA7zSDozlCTSvEWqYom9Ma9jEna1v/bclqcBEkxTRmTFeM7S3lAqL2qD
-	5LF2jATE5BjZ2MPSa499HfbLep1EsInHIwuO1UT/Rvo9SQ11wrcFuTWq6ntJLJf8tPiCUVWRE+X
-	jwadkTUVM51qEM5wv9LsZsnBuoRL+xPHwPk61KglvkjjbcXa1g8MtnvDjr8XkAbuLBLPNFxeFF4
-	jC7ccwO6RhPq+dCWuoMVJ9zqhN+5T6xzq0y7cWHpWp/F4lULgjP1vr8HJBwX55HpseKEfI8R3S+
-	HpxNMjU+KNgJDEJaMgs0at5yRKOPF82UzGAHJSQe01jRB+bEgpfyh9JMKIchqdLoM2BQXKgOOKK
-	PfM/clwQUOH8kfCn9mLrORqdTU6VhXazQVAyxFGdqzupc=
-X-Received: by 2002:a05:600c:8b25:b0:490:5e2a:f924 with SMTP id 5b1f17b1804b1-490e55b96b0mr35436165e9.7.1781179784256;
-        Thu, 11 Jun 2026 05:09:44 -0700 (PDT)
-Received: from localhost ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2f5612sm78603105f8f.15.2026.06.11.05.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 05:09:43 -0700 (PDT)
-Date: Thu, 11 Jun 2026 14:09:39 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Schmidt, Michal" <mschmidt@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
-	"Vaananen, Pasi" <pvaanane@redhat.com>, "Oros, Petr" <poros@redhat.com>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Simon Horman <horms@kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
-Message-ID: <aiqkZhNdt-WhglDg@FV6GYCPJ69>
-References: <20260531194423.383366-1-ivecera@redhat.com>
- <20260531194423.383366-2-ivecera@redhat.com>
- <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
- <CH0PR11MB53941698BDF5C3B8298CC0679B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <aifTFMZtWBgLzhCS@FV6GYCPJ69>
- <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
- <BN9PR11MB5401F6BA29CBA6F0C78FDB119B1A2@BN9PR11MB5401.namprd11.prod.outlook.com>
- <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1781179943; x=1812715943;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w5MwL8kRBcBy1n8l2oBZ5lJdvZejzvbfTlUbkMGKbSg=;
+  b=koTTg7ZvoF3cwx7FEawZXDKw1Ovk1oos0vw712DBMM3oJaB9vz9HS6VF
+   ye+LS4uXdoDjRDKX+j2RCDqucrxzV6aX/2S7h2CsHm+lgpWKVoFhfMPQq
+   /LPdwwHOIQV543kXJvbCFMrtsjcwOufQiebeOU2oN/LvSkIAT2hUMDDAC
+   LEfGaqrRM3b7j/z8Znj1/p0Sn8xCGPF7WgrpXWrbGhbnACqN1CTYNi7aO
+   OynWOHbtjhfOorxkmc+Qemd9wNPufzYuxUc7QjmZahC5nQVp5nllcPKNv
+   mzbnXGM9Ph4U7KagLxQJqvDa5rSHOZ6NHn+kwkv/K0htegjdp9D4euu4s
+   Q==;
+X-CSE-ConnectionGUID: cctrzFtNQlCyDn/O4+8rJg==
+X-CSE-MsgGUID: tjSXLc9nSbKEJij/nrVWaA==
+X-IronPort-AV: E=Sophos;i="6.24,198,1774310400"; 
+   d="scan'208";a="21574024"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 12:12:20 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:11366]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.226:2525] with esmtp (Farcaster)
+ id fcebbe3f-c75d-46a5-9f8f-7fb65b987b1b; Thu, 11 Jun 2026 12:12:20 +0000 (UTC)
+X-Farcaster-Flow-ID: fcebbe3f-c75d-46a5-9f8f-7fb65b987b1b
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 11 Jun 2026 12:12:19 +0000
+Received: from dev-dsk-simonlie-1b-ad174abf.eu-west-1.amazon.com
+ (172.19.78.185) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Thu, 11 Jun 2026
+ 12:12:17 +0000
+From: Simon Liebold <simonlie@amazon.de>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, Simon Liebold <lieboldsimonpaul@gmail.com>
+CC: Qi Tang <tpluszz77@gmail.com>, Florian Westphal <fw@strlen.de>, "Simon
+ Liebold" <simonlie@amazon.de>
+Subject: [PATCH 6.12.y v2] xfrm: hold dev ref until after transport_finish NF_HOOK
+Date: Thu, 11 Jun 2026 12:11:27 +0000
+Message-ID: <20260611121127.3908131-1-simonlie@amazon.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
+X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-4.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[amazon.de:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:lieboldsimonpaul@gmail.com,m:tpluszz77@gmail.com,m:fw@strlen.de,m:simonlie@amazon.de,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298105-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ivecera@redhat.com,m:arkadiusz.kubalewski@intel.com,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:kuba@kernel.org,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,gmail.com];
+	FORGED_SENDER(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,kernel.org,redhat.com,microchip.com,linux.dev];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298106-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simonlie@amazon.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,strlen.de,amazon.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[amazon.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 69108671BA6
+X-Rspamd-Queue-Id: A73F6671B6C
 
-Wed, Jun 10, 2026 at 05:45:46PM +0200, ivecera@redhat.com wrote:
->On 6/10/26 3:04 PM, Kubalewski, Arkadiusz wrote:
->> > From: Ivan Vecera <ivecera@redhat.com>
->> > Sent: Tuesday, June 9, 2026 4:59 PM
->> > 
->> > On 6/9/26 4:00 PM, Kubalewski, Arkadiusz wrote:
->> > > > From: Jiri Pirko <jiri@resnulli.us>
->> > > > Sent: Tuesday, June 9, 2026 10:51 AM
->> > > > 
->> > > > Mon, Jun 08, 2026 at 07:03:46PM +0200, arkadiusz.kubalewski@intel.com
->> > > > wrote:
->> > > > > > From: Ivan Vecera <ivecera@redhat.com>
->> > > > > > Sent: Monday, June 8, 2026 5:48 PM
->> > > > > > 
->> > > > > > On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
->> > > > > > > > From: Ivan Vecera <ivecera@redhat.com>
->> > > > > > > > Sent: Sunday, May 31, 2026 9:44 PM ...
->> > > > > > > >          -
->> > > > > > > >            name: gnss
->> > > > > > > >            doc: GNSS recovered clock
->> > > > > > > > +      -
->> > > > > > > > +        name: int-nco
->> > > > > > > > +        doc: |
->> > > > > > > > +          Device internal numerically controlled oscillator.
->> > > > > > > > +          When connected as a DPLL input, the DPLL enters NCO mode
->> > > > > > > > +          where the output frequency is adjusted by the host via
->> > > > > > > > +          the PTP clock interface.
->> > > > > > > 
->> > > > > > > Hi Ivan!
->> > > > > > > 
->> > > > > > > How would you control this in case of automatic mode dpll?
->> > > > > > > Automatic mode DPLL shall be controlled on HW level, such pin
->> > > > > > > brakes that rule and requires some driver magic to show it is
->> > > > > > > higher priority then the rest of the pins?
->> > > > > > 
->> > > > > > The NCO pin can be connected only in manual mode. In other words a
->> > > > > > DPLL in automatic mode cannot select NCO pin (switch to NCO mode) by
->> > > > > > its own.
->> > > > > > 
->> > > > > 
->> > > > > Being picky on DPLL_MODE for enabling feature is not something we
->> > > > > can allow if it is not related to HW limitation, is it?
->> > > > > Could you please elaborate why it is not possible for AUTOMATIC mode?
->> > > > 
->> > > > In automatic mode, the pin selection logic is defined upon prio. I
->> > > > can imagine that if NCO pin has the highest prio of the available
->> > > > ones, it gets picked. I would be aligned 100% with automatic mode
->> > > > behaviour.
->> > > > Is there a real usecase for it?
->> > > > 
->> > > > [..]
->> > > 
->> > > This is not true. AUTOMATIC mode is HW solution, SW driver ONLY
->> > > configures priorities on the inputs, not manages the active inputs.
->> > > This brakes that behavior, the SW driver would have to manually
->> > > override the AUTMATIC mode to be fed from such NCO pin as it doesn't
->> > > exists on it's priority list, HW cannot pick or use it.
->> > 
->> > Correct, AUTO mode is hardware feature and it should not be emulated by a
->> > driver. If the hardware does not support it then the switching between
->> > input references should be done by userspace (by monitoring ffo,
->> > phase_offset, operstate).
->> > 
->> 
->> Yes, exactly, so for AUTOMATIC mode HW it will not be possible to create
->> such pin, which means that NCO pin would serve only a MANUAL mode
->> implementation.
->> Basically this is something we shall not allow to happen. DPLL API
->> should be designed to cover the case where AUTO mode is able to implement
->> all features consistently.
->
->If you don't like the proposal from Jiri (NCO switch driven by NCO pin
->priority -> highest==enter_nco else leave_nco) then it could be possible
->to handle the switching by allowing the state 'connected' in AUTO mode
->for the NCO pin type. Then the implementation will be the same for both
->selection modes.
->
->Only difference would be that a user does not need to switch the device
->from the AUTO to MANUAL mode.
->
->> > > The real use case is that any DPLL can switch the mode to this one
->> > > instead of implementing MANUAL mode just to use the feature with a
->> > > 'virtual' pin.
->> > 
->> > I don't expect this... but it is up to a driver. I don't plan such
->> > functionality in zl3073x as the NCO pin does not expose prio_get() and
->> > prio_set() callbacks - so it is clear that this pin cannot be part of the
->> > automatic selection.
->> > 
->> > Ivan
->> 
->> There is a difference between particular HW and API capabilities, with the
->> proposed API we would disallow the possibility of such implementation for
->> existing HW variants.
->> 
->> DPLL NCO MODE would allow that but as pointed here by Ivan and by Jiri in
->> the other email it would also require the extra implementation for some
->> configuration - device level phase/ffo handling.
->> 
->> To summarize it all, I don't have such simple solution for it.
->> 
->> First thing that comes to my mind is to combine both approaches.
->> Make it possible for AUTMATIC mode to also set "CONNECTED" state
->> on certain kind of "OVERRIDE" pins, where it could be determined by
->> the type of PIN and embed that logic into the DPLL subsystem.
->
->The possible states for particual pins are now handled at a driver level
->so the driver decides if the requested state is correct or not. So it
->could be easy to implement this.
->
->For auto mode allowed states:
->- input references: selectable / disconnected
->- nco pin: connected / disconnected
->
->> Basically, if driver registers such NCO pin it would be always selected
->> manually, and in such case all the other pins are going to disconnected
->> state while DPLL mode is also a "OVERRIDE" or something like it.
->
->I would leave this decision on the driver level... Imagine the potential
->HW that would allow to switch NCO mode if there is no valid input
->reference.
->
->Example:
->
->REF0 (prio 0) -> +------+ -> OUT0
->REF1 (prio 1) -> | DPLL | -> ...
->NCO  (prio 2) -> +------+ -> OUTn
->
->Such HW would prefer REF0 or REF1 and lock to one of them if they are
->qualified. But if they are NOT, then it switches to NCO mode.
->
->In this situation the relevant driver would allow to configure priority
->and state 'selectable' for this NCO pin.
->
->> Perhaps the pin type could include OVERRIDE in it's name to make it less
->> confusing and needs some extra documentation.
->> 
->> Thoughts?
->I think _INT_ is ok. In the case of TYPE_INT_OSCILLATOR it is also
->obvious that it is not a standard input reference.
->
->Jiri, Vadim, Arek, thoughts?
+From: Qi Tang <tpluszz77@gmail.com>
 
-I agree with you, the driver should have the flexibility to implement
-this according to his/hw's needs/capabilities. If it implements prio
-selection in AUTO mode, let it have it. If it implements manual NCO pin
-selection in AUTO mode using connected/disconnected override, let it
-have it.
+[ Upstream commit 1c428b03840094410c5fb6a5db30640486bbbfcb ]
 
-Moreover, I actually like the "override" capability for pins in AUTO
-mode in general. It may be handy for other usecases as well.
+After async crypto completes, xfrm_input_resume() calls dev_put()
+immediately on re-entry before the skb reaches transport_finish.
+The skb->dev pointer is then used inside NF_HOOK and its okfn,
+which can race with device teardown.
+
+Remove the dev_put from the async resumption entry and instead
+drop the reference after the NF_HOOK call in transport_finish,
+using a saved device pointer since NF_HOOK may consume the skb.
+This covers NF_DROP, NF_QUEUE and NF_STOLEN paths that skip
+the okfn.
+
+For non-transport exits (decaps, gro, drop) and secondary
+async return points, release the reference inline when
+async is set.
+
+Suggested-by: Florian Westphal <fw@strlen.de>
+Fixes: acf568ee859f ("xfrm: Reinject transport-mode packets through tasklet")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qi Tang <tpluszz77@gmail.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+[ net/xfrm/xfrm_input.c: dev_hold/dev_put are unconditional here rather
+than inside !crypto_done as in mainline, and the dev_put in the
+encap_type == -1 async-resumption block does not exist. Adapted by
+taking a fresh dev_hold (when async && !xfrm_gro) immediately before
+transport_finish, which releases it after NF_HOOK. The per-iteration
+dev_hold/dev_put pair at loop-top/resume: is left unchanged.]
+Signed-off-by: Simon Liebold <simonlie@amazon.de>
+---
+
+Notes:
+    v2: Restore unconditional dev_put at resume: and instead take a fresh (commits)
+    dev_hold immediately before transport_finish (when async && !xfrm_gro),
+    avoiding the reference leak on nested transport-mode that v1's
+    suppressed resume: dev_put caused.
+    
+    Prerequisite b05d42eefac7 ("xfrm: hold device only for the asynchronous
+    decryption") was not backported as it restructures the lock ordering and
+    resume: label semantics of the decryption loop, requiring non-trivial
+    adaptation beyond what a minimal stable fix warrants.
+    
+    I will send patches for 5.10.y -> 6.6.y once we concluded on this patch.
+
+ net/ipv4/xfrm4_input.c | 5 ++++-
+ net/ipv6/xfrm6_input.c | 5 ++++-
+ net/xfrm/xfrm_input.c  | 5 ++++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index 12a1a0f421956..adf21d6b6076c 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -50,6 +50,7 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
+ {
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
+ 	struct iphdr *iph = ip_hdr(skb);
++	struct net_device *dev = skb->dev;
+ 
+ 	iph->protocol = XFRM_MODE_SKB_CB(skb)->protocol;
+ 
+@@ -73,8 +74,10 @@ int xfrm4_transport_finish(struct sk_buff *skb, int async)
+ 	}
+ 
+ 	NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING,
+-		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
++		dev_net(dev), NULL, skb, dev, NULL,
+ 		xfrm4_rcv_encap_finish);
++	if (async)
++		dev_put(dev);
+ 	return 0;
+ }
+ 
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index 9005fc156a20e..699a001ac1662 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -43,6 +43,7 @@ static int xfrm6_transport_finish2(struct net *net, struct sock *sk,
+ int xfrm6_transport_finish(struct sk_buff *skb, int async)
+ {
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
++	struct net_device *dev = skb->dev;
+ 	int nhlen = -skb_network_offset(skb);
+ 
+ 	skb_network_header(skb)[IP6CB(skb)->nhoff] =
+@@ -68,8 +69,10 @@ int xfrm6_transport_finish(struct sk_buff *skb, int async)
+ 	}
+ 
+ 	NF_HOOK(NFPROTO_IPV6, NF_INET_PRE_ROUTING,
+-		dev_net(skb->dev), NULL, skb, skb->dev, NULL,
++		dev_net(dev), NULL, skb, dev, NULL,
+ 		xfrm6_transport_finish2);
++	if (async)
++		dev_put(dev);
+ 	return 0;
+ }
+ 
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index 8edcb32735e59..0288d98e66ee4 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -726,8 +726,11 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 		err = -EAFNOSUPPORT;
+ 		rcu_read_lock();
+ 		afinfo = xfrm_state_afinfo_get_rcu(x->props.family);
+-		if (likely(afinfo))
++		if (likely(afinfo)) {
++			if (async && !xfrm_gro)
++				dev_hold(skb->dev);
+ 			err = afinfo->transport_finish(skb, xfrm_gro || async);
++		}
+ 		rcu_read_unlock();
+ 		if (xfrm_gro) {
+ 			sp = skb_sec_path(skb);
+
+base-commit: 1d3a00d3bacff25652c96e1527610c69e91f7c38
+-- 
+2.50.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
