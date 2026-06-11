@@ -1,75 +1,57 @@
-Return-Path: <netdev+bounces-297909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297913-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E+7RGpIpKmrSjQMAu9opvQ
-	(envelope-from <netdev+bounces-297909-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:20:50 +0200
+	id kwB3HqoyKmrIjwMAu9opvQ
+	(envelope-from <netdev+bounces-297913-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:59:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BFC66DF5F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:20:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA2A66E1A9
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:59:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=aBivyDaQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297909-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-297909-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=seu.edu.cn header.s=default header.b="Y/T9eeIl";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297913-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297913-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 972013004DC6
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:20:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88FCC3055C0A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 03:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C509330FC0F;
-	Thu, 11 Jun 2026 03:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D903314B7;
+	Thu, 11 Jun 2026 03:59:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69992EEE76;
-	Thu, 11 Jun 2026 03:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1C925A2BB;
+	Thu, 11 Jun 2026 03:59:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781148045; cv=none; b=FjbanFQrJ08eM+oJDNwgtZGRS7lMkHu1sFYH2SF6hHvWHOxmlj5GI3GpAqhM6/bKnlg9LVWZKNRqq/aTj3fWXp2DPiPBkmYTT4HG1pxT8+Sw+90BDNbApftsIsfKCosaMEUy48JKYjokiTOCPS7KyJdRjLNCNdMoNe0WBrZ+th4=
+	t=1781150349; cv=none; b=EO/Fa0BNZVH/PcnYvBRGs4CGubiG7nlL9RRSde9jo+fr40YqSrQnjwzLMCA/ml36Rv0E1dxllb/WbvjUrcGXJ+Lvmtx8yVVPBFLBcDMkP6NuyIAI5/lTHiutfnASog6B5JJDeAIBPsSS4mprIw7ADM7mfqvTaF5vPQslTJk3/F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781148045; c=relaxed/simple;
-	bh=1qJm+bsG6JjgyeWWWuE6f9xEMXqj9w8+JumJgqnQAx0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ifXwR0TML2p+oxRMH8w9Dt4vFpr2bNXq62/MbIFLTfAaUF8N4Vth4Y8CbVVZce8e4ckRz64Wqk7AHxBxZB9gZjk9BPhLgYRGhqwkwZF9dnhzvUoR8ONroi27itML6xULVYZ6X/uUmYO49R+rO/XUkoRFQybOMxCtqJE0fxVrxko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=aBivyDaQ; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65B3JVlC41578242, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1781147971;
-	bh=NhLgEHyCGINgpoQu/CkRqnDHyrO270BUN4apj7a7YjM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=aBivyDaQGI0pywRfUWoNeRrUAvPSxRdclvRhO4Fn4lNg7yt4oVCQbVcFmCBygnujc
-	 pF66aUeHXGur0enq2/cMiwARqx0UVGwysvem4ZupK8/g5nVFx3ERb81ddX9BEBN1wI
-	 q799uVmyNeGi2LdpgpbRfdZdNbxVuyzyZaaTG22uKnKeBkKs5n0iCGnlSS90aF8FpT
-	 WkDCQjYYLbXEd5oXBpjGabsEkLZjzcvac3sBc/iRM9Esi6WMXEQRpja91s1oJVcbmC
-	 2YUWNImFomV8Sw4wDpbTsze+XWfYirUpFj/bR6LmjJ5iZC0CvAelz5/CFm2fAlkWFV
-	 HUleTO5f0S31A==
-Received: from RS-EX-MBS1.realsil.com.cn ([172.29.17.101])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65B3JVlC41578242
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 11 Jun 2026 11:19:31 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS1.realsil.com.cn (172.29.17.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Thu, 11 Jun 2026 11:19:30 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 11 Jun 2026 11:19:30 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>, <nb@tipi-net.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v5 4/4] net: phy: realtek: load firmware for RTL8261C_CG
-Date: Thu, 11 Jun 2026 11:18:39 +0800
-Message-ID: <20260611031839.568-5-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260611031839.568-1-javen_xu@realsil.com.cn>
-References: <20260611031839.568-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1781150349; c=relaxed/simple;
+	bh=0c1biHXE2JVfF7C4Sk/Ryd7cx9+Z4ltauuZtj6sHRgI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DhbQMYtd5IkzdDTAKN33k4kHpVkpZCbohXHjvY4wjxT+y89AyZWTV9JXGhPWTdU9Mn0PT/KwGiRkIpjHkRhRaIZpdfnE0OnP1jW9Y6q9rQSykofECs1xL12q/6bITSmyDGXsGK32S3KHuXNQ+26SPfPa/Q+oMwcU+UXJnCHU6i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=Y/T9eeIl; arc=none smtp.client-ip=45.254.49.198
+Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 41f0e5d6d;
+	Thu, 11 Jun 2026 11:53:41 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	maze@google.com,
+	kuniyu@google.com,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>
+Subject: [PATCH net v3] raw: annotate lockless match fields in raw_v4_match()
+Date: Thu, 11 Jun 2026 11:53:18 +0800
+Message-Id: <20260611035318.1091442-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,372 +59,175 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-HM-Tid: 0a9eb4d0763c03a1kunmcd53f94414d5d5
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZGBlMVh0aGUlJSB5KSU5JGFYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSE
+	pPSExVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=Y/T9eeIlrXKWjxmki4HajpgKU3S0U+O4qO/RrsQdQtgbKVedwqeAjSxkiMge0waUxG5zTmYLbN34mDpkGA0vZjznqoGw1Nl2eWmhR3yDPc7+GVdwQ7D4l21UVROWw5T2D5gygWUJLPnxrSeDIvmZkLZpqf83clCDyoy3h3proZA=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=d2RJFk+EYT38DLr2YOS+FWKWboEV0TPNsT/ueO1shyg=;
+	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297909-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-297913-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:maze@google.com,m:kuniyu@google.com,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:runyu.xiao@seu.edu.cn,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[seu.edu.cn:+];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 23BFC66DF5F
+X-Rspamd-Queue-Id: 6BA2A66E1A9
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+raw_v4_match() is a lockless match helper under sk_for_each_rcu(). It
+still reads inet->inet_daddr, inet->inet_rcv_saddr and
+sk->sk_bound_dev_if with plain loads while bind, connect and disconnect
+paths can update the same match fields concurrently.
 
-This patch adds support for loading firmware. Download some parameters
-for RTL8261C_CG.
+Annotate only those mutable match fields in raw_v4_match(), and do so
+at the point of use instead of hoisting the bound-device read before
+the earlier short-circuit tests.
 
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+Also annotate the corresponding IPv4 writers so the read side matches
+explicit WRITE_ONCE() updates when those same fields are modified.
+
+Fixes: 0daf07e52709 ("raw: convert raw sockets to RCU")
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
 ---
-Changes in v2:
- - remove __pack, struct rtl8261x_fw_header and rtl8261x_fw_entry will not pad
- - reverse xmas tree for some definition
- - add explanation on rtl_phy_write_mmd_bits()
+v3:
+- drop the inet_num annotation for raw sockets
+- cover inet_daddr as well
+- avoid hoisting sk_bound_dev_if into a temporary variable
+- annotate the matching IPv4 writer paths
 
-Changes in v3:
- - add struct rtl8261x_priv
+v2:
+- note that inet_num and sk_bound_dev_if already have WRITE_ONCE() writers
+- add WRITE_ONCE() in raw_bind() for inet_rcv_saddr
+- previous version: https://lore.kernel.org/r/20260601073937.1137673-1-runyu.xiao@seu.edu.cn
 
-Changes in v4:
- - add struct device *dev
+ include/net/ip.h    |  3 ++-
+ net/ipv4/datagram.c |  4 ++--
+ net/ipv4/raw.c      | 23 ++++++++++++++++-------
+ net/ipv4/udp.c      |  4 ++--
+ 4 files changed, 22 insertions(+), 12 deletions(-)
 
-Changes in v5:
- - no changes
----
- drivers/net/phy/realtek/realtek_main.c | 241 +++++++++++++++++++++++++
- 1 file changed, 241 insertions(+)
-
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 623c4e1a6645..760ddd4ecc16 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -8,7 +8,9 @@
-  * Copyright (c) 2004 Freescale Semiconductor, Inc.
-  */
- #include <linux/bitops.h>
-+#include <linux/crc32.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/firmware.h>
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/pm_wakeirq.h>
-@@ -281,6 +283,42 @@
- 					 RTL8261X_INT_ALDPS_CHG | \
- 					 RTL8261X_INT_JABBER)
+diff --git a/include/net/ip.h b/include/net/ip.h
+index 7f2fe1a8401b..3902e8b58699 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -679,7 +679,8 @@ static inline void ip_ipgre_mc_map(__be32 naddr, const unsigned char *broadcast,
  
-+#define FW_MAIN_MAGIC			0x52544C38
-+#define FW_SUB_MAGIC_8261C		0x32363143
-+#define RTL8261X_POLL_TIMEOUT_MS	100
-+
-+#define RTL8261C_CE_FW_NAME	"rtl_nic/rtl8261c.bin"
-+MODULE_FIRMWARE(RTL8261C_CE_FW_NAME);
-+
-+enum rtl8261x_fw_op {
-+	OP_WRITE = 0x00,	/* Write */
-+	OP_POLL  = 0x02,	/* Polling */
-+};
-+
-+struct rtl8261x_fw_header {
-+	__le32 main_magic;	/* Main magic number 0x52544C38 ("RTL8") */
-+	__le32 sub_magic;	/* Sub magic number */
-+	__le16 version_major;	/* Major version */
-+	__le16 version_minor;	/* Minor version */
-+	__le16 num_entries;	/* Number of entries */
-+	__le16 reserved;	/* Reserved */
-+	__le32 crc32;		/* CRC32 checksum */
-+};
-+
-+struct rtl8261x_fw_entry {
-+	__u8  type;		/* Operation type (OP_*) */
-+	__u8  dev;		/* MMD device */
-+	__le16 addr;		/* Register address */
-+	__u8  msb;		/* MSB bit position */
-+	__u8  lsb;		/* LSB bit position */
-+	__le16 value;		/* Value to write/compare */
-+	__le16 timeout_ms;	/* Poll timeout in milliseconds */
-+	__u8  poll_set;		/* Poll for set (1) or clear (0) */
-+	__u8  reserved;		/* Reserved */
-+};
-+
-+#define FW_HEADER_SIZE		sizeof(struct rtl8261x_fw_header)
-+#define FW_ENTRY_SIZE		sizeof(struct rtl8261x_fw_entry)
- 
- /* RTL8211E and RTL8211F support up to three LEDs */
- #define RTL8211x_LED_COUNT			3
-@@ -300,6 +338,11 @@ struct rtl821x_priv {
- 	u16 iner;
- };
- 
-+struct rtl8261x_priv {
-+	const char *fw_name;
-+	bool fw_loaded;
-+};
-+
- static int rtl821x_read_page(struct phy_device *phydev)
+ static __inline__ void inet_reset_saddr(struct sock *sk)
  {
- 	return __phy_read(phydev, RTL821x_PAGE_SELECT);
-@@ -342,8 +385,16 @@ static int rtl821x_modify_ext_page(struct phy_device *phydev, u16 ext_page,
+-	inet_sk(sk)->inet_rcv_saddr = inet_sk(sk)->inet_saddr = 0;
++	inet_sk(sk)->inet_saddr = 0;
++	WRITE_ONCE(inet_sk(sk)->inet_rcv_saddr, 0);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	if (sk->sk_family == PF_INET6) {
+ 		struct ipv6_pinfo *np = inet6_sk(sk);
+diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
+index 1614593b6d72..7d25519a6cdd 100644
+--- a/net/ipv4/datagram.c
++++ b/net/ipv4/datagram.c
+@@ -63,12 +63,12 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr_unsized *uaddr, int
+ 	}
  
- static int rtl8261x_probe(struct phy_device *phydev)
+ 	/* Update addresses before rehashing */
+-	inet->inet_daddr = fl4->daddr;
++	WRITE_ONCE(inet->inet_daddr, fl4->daddr);
+ 	inet->inet_dport = usin->sin_port;
+ 	if (!inet->inet_saddr)
+ 		inet->inet_saddr = fl4->saddr;
+ 	if (!inet->inet_rcv_saddr) {
+-		inet->inet_rcv_saddr = fl4->saddr;
++		WRITE_ONCE(inet->inet_rcv_saddr, fl4->saddr);
+ 		if (sk->sk_prot->rehash)
+ 			sk->sk_prot->rehash(sk);
+ 	}
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 5aaf9c62c8e1..dfb294b5c794 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -120,13 +120,21 @@ bool raw_v4_match(struct net *net, const struct sock *sk, unsigned short num,
+ 		  __be32 raddr, __be32 laddr, int dif, int sdif)
  {
-+	struct device *dev = &phydev->mdio.dev;
-+	struct rtl8261x_priv *priv;
- 	int sub_phy_id, ret;
+ 	const struct inet_sock *inet = inet_sk(sk);
++	__be32 daddr, rcv_saddr;
  
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
+-	if (net_eq(sock_net(sk), net) && inet->inet_num == num	&&
+-	    !(inet->inet_daddr && inet->inet_daddr != raddr) 	&&
+-	    !(inet->inet_rcv_saddr && inet->inet_rcv_saddr != laddr) &&
+-	    raw_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
+-		return true;
+-	return false;
++	if (!net_eq(sock_net(sk), net) || inet->inet_num != num)
++		return false;
 +
-+	phydev->priv = priv;
++	daddr = READ_ONCE(inet->inet_daddr);
++	if (daddr && daddr != raddr)
++		return false;
 +
- 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
- 			    RTL_8261X_SUB_PHY_ID_ADDR);
- 	if (ret < 0)
-@@ -357,6 +408,7 @@ static int rtl8261x_probe(struct phy_device *phydev)
- 
- 	switch (sub_phy_id) {
- 	case RTL8261C_CE_MODEL:
-+		priv->fw_name = RTL8261C_CE_FW_NAME;
- 		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", sub_phy_id);
- 		break;
- 
-@@ -387,6 +439,178 @@ static int rtl8261x_get_features(struct phy_device *phydev)
- 	return 0;
++	rcv_saddr = READ_ONCE(inet->inet_rcv_saddr);
++	if (rcv_saddr && rcv_saddr != laddr)
++		return false;
++
++	return raw_sk_bound_dev_eq(net, READ_ONCE(sk->sk_bound_dev_if),
++				   dif, sdif);
  }
+ EXPORT_SYMBOL_GPL(raw_v4_match);
  
-+static int rtl8261x_verify_firmware(struct phy_device *phydev, const struct firmware *fw)
-+{
-+	const struct rtl8261x_fw_header *hdr;
-+	u32 main_magic, sub_magic;
-+	u32 calc_crc, file_crc;
-+	size_t data_len;
-+	u16 num_entries;
-+
-+	if (fw->size < FW_HEADER_SIZE) {
-+		phydev_err(phydev, "Firmware too small: %zu bytes\n", fw->size);
-+		return -EINVAL;
-+	}
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	main_magic = le32_to_cpu(hdr->main_magic);
-+	if (main_magic != FW_MAIN_MAGIC) {
-+		phydev_err(phydev, "Invalid firmware magic: 0x%08x\n", main_magic);
-+		return -EINVAL;
-+	}
-+
-+	sub_magic = le32_to_cpu(hdr->sub_magic);
-+	if (sub_magic != FW_SUB_MAGIC_8261C) {
-+		phydev_err(phydev, "Invalid sub magic: 0x%08x\n", sub_magic);
-+		return -EINVAL;
-+	}
-+
-+	num_entries = le16_to_cpu(hdr->num_entries);
-+	data_len = num_entries * FW_ENTRY_SIZE;
-+
-+	if (fw->size != sizeof(*hdr) + data_len) {
-+		phydev_err(phydev, "Firmware size mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	calc_crc = crc32(~0, fw->data + FW_HEADER_SIZE, data_len) ^ ~0;
-+	file_crc = le32_to_cpu(hdr->crc32);
-+
-+	if (calc_crc != file_crc) {
-+		phydev_err(phydev, "CRC32 mismatch: calculated=0x%08x file=0x%08x\n",
-+			   calc_crc, file_crc);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * rtl_phy_write_mmd_bits - Write a bitfield in an MMD register
-+ * @phydev: PHY device structure
-+ * @devnum: MMD device number
-+ * @reg:    MMD register address
-+ * @msb:    Most significant bit of the field (inclusive)
-+ * @lsb:    Least significant bit of the field (inclusive)
-+ * @val:    Value to write into the field (right-aligned)
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+static int rtl_phy_write_mmd_bits(struct phy_device *phydev, int devnum,
-+				  u16 reg, u8 msb, u8 lsb, u16 val)
-+{
-+	u32 reg_val;
-+	int ret;
-+
-+	if (msb > 15 || lsb > msb)
-+		return -EINVAL;
-+
-+	ret = phy_read_mmd(phydev, devnum, reg);
-+	if (ret < 0)
-+		return ret;
-+	reg_val = ret;
-+
-+	reg_val &= ~GENMASK(msb, lsb);
-+	reg_val |= (val << lsb) & GENMASK(msb, lsb);
-+
-+	return phy_write_mmd(phydev, devnum, reg, reg_val);
-+}
-+
-+static int rtl8261x_fw_execute_entry(struct phy_device *phydev,
-+				     const struct rtl8261x_fw_entry *entry)
-+{
-+	u16 addr, value, timeout_ms;
-+	u8 dev, msb, lsb, poll_set;
-+	u32 bits, expect_val;
-+	int ret = 0;
-+	int val;
-+
-+	dev = entry->dev;
-+	addr = le16_to_cpu(entry->addr);
-+	msb = entry->msb;
-+	lsb = entry->lsb;
-+	value = le16_to_cpu(entry->value);
-+	timeout_ms = le16_to_cpu(entry->timeout_ms);
-+	poll_set = entry->poll_set;
-+
-+	if (timeout_ms == 0)
-+		timeout_ms = RTL8261X_POLL_TIMEOUT_MS;
-+
-+	switch (entry->type) {
-+	case OP_WRITE:
-+		ret = rtl_phy_write_mmd_bits(phydev, dev, addr, msb, lsb, value);
-+		if (ret) {
-+			phydev_err(phydev, "WRITE failed: dev=%d addr=0x%04x\n", dev, addr);
-+			return ret;
-+		}
-+		break;
-+
-+	case OP_POLL: {
-+		bits = GENMASK(msb, lsb);
-+		expect_val = (value << lsb) & bits;
-+
-+		if (poll_set)
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) == expect_val,
-+							1000, timeout_ms * 1000, false);
-+		else
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) != expect_val,
-+							1000, timeout_ms * 1000, false);
-+		if (ret)
-+			phydev_err(phydev, "POLL timeout: dev=%d addr=0x%04x\n",
-+				   dev, addr);
-+		break;
-+	}
-+	default:
-+		phydev_err(phydev, "Unknown firmware operation: %d\n", entry->type);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static int rtl8261x_fw_load(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	const struct rtl8261x_fw_entry *entry;
-+	const struct rtl8261x_fw_header *hdr;
-+	const struct firmware *fw;
-+	int ret, i;
-+
-+	if (!priv->fw_name)
-+		return 0;
-+
-+	ret = request_firmware(&fw, priv->fw_name, &phydev->mdio.dev);
-+	if (ret) {
-+		phydev_err(phydev, "Failed to load firmware %s: %d\n", priv->fw_name, ret);
-+		return ret;
-+	}
-+
-+	ret = rtl8261x_verify_firmware(phydev, fw);
-+	if (ret)
-+		goto release_fw;
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	entry = (const struct rtl8261x_fw_entry *)(fw->data + FW_HEADER_SIZE);
-+	for (i = 0; i < le16_to_cpu(hdr->num_entries); i++, entry++) {
-+		ret = rtl8261x_fw_execute_entry(phydev, entry);
-+		if (ret) {
-+			phydev_err(phydev, "Entry %d failed: %d\n", i, ret);
-+			goto release_fw;
-+		}
-+	}
-+
-+	priv->fw_loaded = true;
-+
-+release_fw:
-+	release_firmware(fw);
-+	return ret;
-+}
-+
- static int rtl8261x_config_intr(struct phy_device *phydev)
- {
- 	int ret;
-@@ -453,6 +677,22 @@ static int rtl8261x_config_aneg(struct phy_device *phydev)
- 	return 0;
- }
+@@ -724,7 +732,8 @@ static int raw_bind(struct sock *sk, struct sockaddr_unsized *uaddr,
+ 					 chk_addr_ret))
+ 		goto out;
  
-+static int rtl8261x_config_init(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	int ret = 0;
-+
-+	if (priv->fw_name && !priv->fw_loaded) {
-+		ret = rtl8261x_fw_load(phydev);
-+		if (ret) {
-+			phydev_err(phydev, "Firmware loading failed: %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
- static int rtl821x_probe(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -3148,6 +3388,7 @@ static struct phy_driver realtek_drvs[] = {
- 		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
- 		.name			= "Realtek RTL8261C 10Gbps PHY",
- 		.probe			= rtl8261x_probe,
-+		.config_init		= rtl8261x_config_init,
- 		.get_features		= rtl8261x_get_features,
- 		.config_aneg		= rtl8261x_config_aneg,
- 		.read_status		= genphy_c45_read_status,
+-	inet->inet_rcv_saddr = inet->inet_saddr = addr->sin_addr.s_addr;
++	inet->inet_saddr = addr->sin_addr.s_addr;
++	WRITE_ONCE(inet->inet_rcv_saddr, addr->sin_addr.s_addr);
+ 	if (chk_addr_ret == RTN_MULTICAST || chk_addr_ret == RTN_BROADCAST)
+ 		inet->inet_saddr = 0;  /* Use device */
+ 	sk_dst_reset(sk);
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 0ac2bf4f8759..5d3e07f3ac27 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2156,10 +2156,10 @@ int __udp_disconnect(struct sock *sk, int flags)
+ 	 */
+ 
+ 	sk->sk_state = TCP_CLOSE;
+-	inet->inet_daddr = 0;
++	WRITE_ONCE(inet->inet_daddr, 0);
+ 	inet->inet_dport = 0;
+ 	sock_rps_reset_rxhash(sk);
+-	sk->sk_bound_dev_if = 0;
++	WRITE_ONCE(sk->sk_bound_dev_if, 0);
+ 	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
+ 		inet_reset_saddr(sk);
+ 		if (sk->sk_prot->rehash &&
 -- 
-2.43.0
-
+2.34.1
 
