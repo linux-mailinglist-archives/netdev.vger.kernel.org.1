@@ -1,62 +1,77 @@
-Return-Path: <netdev+bounces-298156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bx1WM7W/KmqowAMAu9opvQ
-	(envelope-from <netdev+bounces-298156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:01:25 +0200
+	id fJALIj3EKmoZwgMAu9opvQ
+	(envelope-from <netdev+bounces-298157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:20:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F296C67285D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:01:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158B0672A82
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:20:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QVl2JW8b;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298156-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298156-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HvoK8CcD;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298157-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298157-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EB3ED3006234
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:01:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84E17301573C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 14:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466D63ACA4D;
-	Thu, 11 Jun 2026 14:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6CFD406811;
+	Thu, 11 Jun 2026 14:20:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3331B3EDE61;
-	Thu, 11 Jun 2026 14:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96F818FC97;
+	Thu, 11 Jun 2026 14:20:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781186474; cv=none; b=c/oPEZJN1qu8SycUrS+BekUPmopY09kG64oDGUChFaccA4eJ1PCs87pm4SHP1HtpTtVbvYOLeDm4tMmWt0jb70/KNR00/VcWAEiA2v8KwPV1PU3zWwao7WTYuUUgPlEZu7AgptAvNoITdjF292+JwJzq1h98bVq8a2EGD1ACc88=
+	t=1781187640; cv=none; b=hB4bE8phstSevKraMwcg2gg1/FBF2MoGcmopP47g4iRFRiIY4LnKf1p8I97WKu6GJFOevd8NJwsqxqibiS+GfRnnpY3ZKxJdoqsqLE9eZ6W/3hB0kMKck70oF6guCfkS4TAkqbJ62zPAyE8FFCtHnoMfwNgLpp+39yNg9HnLPrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781186474; c=relaxed/simple;
-	bh=TVWPiGxrSgezWlwbj60FVQeK7nFLbzLjvGXBQ5/tZlA=;
+	s=arc-20240116; t=1781187640; c=relaxed/simple;
+	bh=ADQz79wsdx0K9pSTvhRv4OP57hiPtzgG1Gdz9YO0Smk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZ2tXA8SYAyMjNlsPmjj8IYJYUdFzMoe+RlHXLCSEQ5CcJLJkIMvUeRqkCGEhVwn8o9v19+CGw7DS3NGAT/m1VxLo3iIlUWqb+DsC0VJNko3glggCBhRI41U741Hb26EbDVHl6ZhgyR7xYgM6CTC1q4RfFeM3XrWL9Tx7uMMrr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVl2JW8b; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DF941F00893;
-	Thu, 11 Jun 2026 14:01:10 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=XSCjOq9hLO7S14XDApyTWpG8PDq0axnj9qoKUfezkZyh577bLOXy9xNxXsvITr7am+PLXQJ2c41XyNkxvHtBqxX6lKc+cms9E6RIX8P155vmfXBTaHVEjTZLv8SY++vWgjPKrbcr9mA0K9W+M841iuOzCXcxEGPmRYatlNGPl+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HvoK8CcD; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 428251F00893;
+	Thu, 11 Jun 2026 14:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781186473;
-	bh=M5bIcWhv/OWdGZjF2z3Jaxz5u3oE53odG++5eqZWP9U=;
+	s=k20260515; t=1781187639;
+	bh=v2gjtL3A5CRGLr5EDM+cgnB3UKQPGTOj7Fa8nWv3OBA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QVl2JW8bAclirz3a1EYtL3eblzB/KT7URc+EG/pG3GhHuMfuiyqM+xogm1KIRTcMF
-	 MI5eBiGdHSGJDOHXvGMk1fRzRaTaJ8kl2gPUVwEH6q+SL9g3anFWpLdD+eZai3KvKl
-	 4vPvKIMxEdi0skJvZnqlnmIfr/rptL2WExpm6byiTYKNFdC0e6Pnre6r3O4SXzB9g9
-	 GYR0gAE0pf/5OrDVd69LpE2WkW9Fbwl51V3dSpSirJncNMVRoudB9xtOMye400L4ph
-	 I2V25P6MFmEI/WrcZYs/OOwTtHHxAmOeFybuUAAFS0TVhhP6A30keNaxjCESo3pMzO
-	 +PY+kHKwSBZdA==
-Date: Thu, 11 Jun 2026 15:01:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: olteanv@gmail.com, andrew@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: sja1105: fix refcount leak in
- sja1105_setup_tc_taprio()
-Message-ID: <20260611140108.GR3920875@horms.kernel.org>
-References: <20260609074002.204113-1-vulab@iscas.ac.cn>
+	b=HvoK8CcD/1QEh/SAWVVdiKVHVlLEUy0sEBvE0xhESVAAiWhUMY7rUDoOD6EFWOTZ4
+	 sBQt8RtWPJhw3PrpxD7jq13kw+wQ+b62TUcbKqTwQbKGK9rUkPwQq1ePj0cLq5TzIQ
+	 fIZG3NNkFvs/0S7+pNFxm22FnFAl7u2YNy+VMhlRGHIOCEt7yt0RkZTC8SCYMV81c6
+	 25oWhFQG4H9RXQjXk69vNbF6uH2aaBG/gtLvPQuAPGx/0KIIU00mHEA5yXS24NfHFg
+	 6ipWUo4W3o06kYqXWr0gmhVFuw8hMnAqABuwiGEQ46aURJiOxGuc9TEbq7PwOfQ18S
+	 S9f8wukwH7A4g==
+Date: Thu, 11 Jun 2026 15:20:32 +0100
+From: Lee Jones <lee@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: mike.marciniszyn@gmail.com, Pavel Machek <pavel@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>, Kees Cook <kees@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Alok Tiwari <alok.a.tiwari@oracle.com>,
+	Chengfeng Ye <dg573847474@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] leds: trigger: netdev: Extend speeds up to
+ 100G
+Message-ID: <20260611142032.GA1127823@google.com>
+References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
+ <20260520200337.204431-2-mike.marciniszyn@gmail.com>
+ <d2faba3d-68ed-492f-a914-d513e9f8b34f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,67 +80,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260609074002.204113-1-vulab@iscas.ac.cn>
+In-Reply-To: <d2faba3d-68ed-492f-a914-d513e9f8b34f@lunn.ch>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298157-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:mike.marciniszyn@gmail.com,m:pavel@kernel.org,m:alexanderduyck@fb.com,m:kuba@kernel.org,m:kernel-team@meta.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:daniel@makrotopia.org,m:kees@kernel.org,m:horms@kernel.org,m:dimitri.daskalakis1@gmail.com,m:jacob.e.keller@intel.com,m:lee@trager.us,m:mohsin.bashr@gmail.com,m:alok.a.tiwari@oracle.com,m:dg573847474@gmail.com,m:andriy.shevchenko@linux.intel.com,m:linux-kernel@vger.kernel.org,m:linux-leds@vger.kernel.org,m:netdev@vger.kernel.org,m:mikemarciniszyn@gmail.com,m:dimitridaskalakis1@gmail.com,m:mohsinbashr@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298156-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:vulab@iscas.ac.cn,m:olteanv@gmail.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[sashiko.dev:query timed out];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[lee@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,intel.com,trager.us,oracle.com,linux.intel.com,vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp,linux.dev:url,iscas.ac.cn:email]
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F296C67285D
+X-Rspamd-Queue-Id: 158B0672A82
 
-On Tue, Jun 09, 2026 at 07:40:02AM +0000, Wentao Liang wrote:
-> In sja1105_setup_tc_taprio(), taprio_offload_get() acquires a
-> reference on the new offload and stores it in
-> tas_data->offload[port]. If sja1105_init_scheduling() or
-> sja1105_static_config_reload() later fails, the function returns
-> without releasing the reference via taprio_offload_free(). The
-> stored pointer is thus leaked, as the driver will not clean it up
-> unless a subsequent TAPRIO_CMD_DESTROY is received, which may
-> never happen.
+On Wed, 20 May 2026, Andrew Lunn wrote:
+
+> On Wed, May 20, 2026 at 04:03:35PM -0400, mike.marciniszyn@gmail.com wrote:
+> > From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
+> > 
+> > Add 25G, 40G, 50G, and 100G as available speeds to the netdev LED trigger.
+> > 
+> > Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
 > 
-> Fix the leak by calling taprio_offload_free() and resetting
-> tas_data->offload[port] to NULL on both error paths.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 317ab5b86c8e ("net: dsa: sja1105: Configure the Time-Aware Scheduler via tc-taprio offload")
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Hi Wentao,
+Should I wait until the net reviews are satisfied or take this right away?
 
-There is AI-generated review of this patch-set available on both
-https://sashiko.dev and https://netdev-ai.bots.linux.dev/sashiko/
-I would appreciate it if you could look over that with a view
-to addressing any issues that directly affect this patch.
+-- 
+Lee Jones
 
