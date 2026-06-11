@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298272-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Il+QIGv6Kmqh0QMAu9opvQ
-	(envelope-from <netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:11:55 +0200
+	id m02wEwv6Kmp00QMAu9opvQ
+	(envelope-from <netdev+bounces-298272-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:10:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83F9674580
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93405674539
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:10:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=BF+AGrv1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298271-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="VsTtew/1";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298272-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298272-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CB3E351B986
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:58:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 769C235460FA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67CE48BD57;
-	Thu, 11 Jun 2026 17:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98824BCAC9;
+	Thu, 11 Jun 2026 17:58:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA174ADDBB;
-	Thu, 11 Jun 2026 17:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D614BCADF;
+	Thu, 11 Jun 2026 17:58:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781200695; cv=none; b=b9cmTq6WjieXPF8Vjn6Om3jKTSgBRTaDIT18X7ddZgiF0LFbWlLQFwYMlwS+JE3wSPGkptpDeQmZwM8HD/nB6XBCnO498XmkTF2f5EdUDUcf+FldgRww4cQd3KoXXAv7/FLjAEGZ0FpjtzJEHyBnMINM+Ip53TT2zBwQXmZvpeA=
+	t=1781200701; cv=none; b=gg1FH41265oU8fQh8u4arq/CAYCCiEtGGCSuqy55IM1f+n3LFeNTA9a9OaOUSHeWbYdSQ37mHAaOoU1YDDq7Dynl2vOZKVkB9SIAMGF+Paka5Il4dJXYnAfJgmGeNqwKX0uvldULFI39puh5jnDo8kaPjZLzz7Ft7SK3ru4UxMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781200695; c=relaxed/simple;
-	bh=Y4ma1t4mV6fGFpz6DA9EaywC1/aJFJTHbDAAVJFMOAc=;
+	s=arc-20240116; t=1781200701; c=relaxed/simple;
+	bh=SbCfoXT3sO39K9UJu/jBoWwPE3dZy1Z5QCBZ6cTDriQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NYe0qQVgkvzPAZi844QirLPNaPClXyRDk1Dkhxd65vocHE1O+TA7LlQ+UFvd2CuaTnBAa6z8ceEUAoFjc1V6odoIMdPcHf5g9kMtc6t6r/LNA9MUqSoD7OkyyE6btHasY1maW1X9TDO/tiWjE4wOHpDjIg8r8D/jtQY0p9YNkZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF+AGrv1; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9274D1F00893;
-	Thu, 11 Jun 2026 17:58:14 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=R8o5gPb/CUMTY6cjuZmvLJ/IfU76dW34rBqNUA3QwwaRI0olhwjjaSwQbvXfYqvwBVO4HN+b+iwURYZ9ujJ+9rv6LIKG2zqVzG1flH/hmnpF13KO1y3hbCSJy3Emk66dqu86PbTtQMDQ3JUoXEidi2g7eBa7Lldt0tGbgRApX5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VsTtew/1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E8621F00893;
+	Thu, 11 Jun 2026 17:58:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781200694;
-	bh=h3ijUhmsVqibSQPWDJ4t0liY8RZOgaSkRxCWi+HbDko=;
+	s=k20260515; t=1781200700;
+	bh=Q4hb/jEOmarujMO7ucxZSbYZcGK1M1TjtG2sdKUQk8g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=BF+AGrv1xouiPAXCy1bNNOOyuYDrtOzA53Phy5G4Q0rBCdTQU8u3KzHiiQhXWCwFa
-	 6eT8Z+QS+I4L2QPtuzM/kMKpncVARhDgayyqUijIyjfFvmwH4Ya3cfNNdgY+zbANxo
-	 GSyZcqjPtbY44Z3R7E/SIzwPb7P1V/DCCNahvGa1VPQqumgjjmeGeJ/YdGWBYr68gF
-	 GxIKsZMGa5B9pbv1OL0/ggs6mFanAZU0aiQaT00/uXj/ohkg6bWLx9REEIZrO07B4L
-	 utyrE366eEzX55fjhiuzyl65NfgyL5uWfmqefjnpBXglqKLnjX0cETgDFpjfpTrpld
-	 Mq2HU3xr+KHTg==
+	b=VsTtew/1D56T9hY9YrJcud5hCmRiEkVaqXWaepdJDvwsoJnfmxAuSwlmmr/PLujSM
+	 klBkOITqjV+CORgqQ0fYnA4Wq3/eaH5NVmzdHTB8O5NpeT02PMWwOiHyUi+j3UyKhW
+	 uvHIWYin+eUGZPrr1OLh6YGIfgUQyMs/1+ipxYWxa6ClnAMULebPHwvytV8MA6ca1K
+	 04vmBvnfcIu+fCcSDLZ+KlhqoX7FCjLso5DVKQvqPIITdo3SPzLst90DF/r4ajuChV
+	 XOJtK66YqQkjgPxQgFtso7mzfNsHiTxU1DG/KiaNuspzVQoYGIEG9f0jf9eQIU96XC
+	 8c0/o04o5z8WA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198173930F87;
-	Thu, 11 Jun 2026 17:58:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199E43930F87;
+	Thu, 11 Jun 2026 17:58:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,13 +57,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-06-03
+Subject: Re: [GIT PULL] bluetooth 2026-05-28
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <178120069163.286318.11448683421315459798.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 17:58:11 +0000
-References: <20260603162714.342496-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260603162714.342496-1-luiz.dentz@gmail.com>
+ <178120069763.286318.14177936524394824410.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jun 2026 17:58:17 +0000
+References: <20260528131839.462344-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260528131839.462344-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
  netdev@vger.kernel.org
@@ -81,7 +81,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298271-lists,netdev=lfdr.de,bluetooth];
+	TAGGED_FROM(0.00)[bounces-298272-lists,netdev=lfdr.de,bluetooth];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -102,29 +102,29 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D83F9674580
+X-Rspamd-Queue-Id: 93405674539
 
 Hello:
 
 This pull request was applied to bluetooth/bluetooth-next.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  3 Jun 2026 12:27:14 -0400 you wrote:
-> The following changes since commit cdf88b35e06f1b385f7f6228060ae541d44fbb72:
+On Thu, 28 May 2026 09:18:39 -0400 you wrote:
+> The following changes since commit ab1513597c6cf17cd1ad2a21e3b045421b48e022:
 > 
->   Bluetooth: hci_sync: Reset device counters in hci_dev_close_sync() (2026-05-28 08:52:21 -0400)
+>   Bluetooth: fix UAF in l2cap_sock_cleanup_listen() vs l2cap_conn_del() (2026-05-20 16:35:47 -0400)
 > 
 > are available in the Git repository at:
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-06-03
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-05-28
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-06-03
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d20da9130830
+  - [GIT,PULL] bluetooth 2026-05-28
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2412591cfe66
 
 You are awesome, thank you!
 -- 
