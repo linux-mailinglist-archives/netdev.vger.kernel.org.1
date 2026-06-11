@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-298367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298369-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7B97Lu8uK2ov3wMAu9opvQ
-	(envelope-from <netdev+bounces-298367-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:55:59 +0200
+	id vO8VMPUuK2o13wMAu9opvQ
+	(envelope-from <netdev+bounces-298369-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:56:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F9567580F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:55:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 552C5675827
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 23:56:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=nWnrCgGg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298367-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298367-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=jcWMQbxT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298369-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298369-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B848432E7861
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:55:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 411463305046
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 21:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815E8389E05;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B4038A73F;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550E33806A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5C238239D;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781214953; cv=none; b=nuZRyxdu5dMzKdS7KfoAPHplUath6FCgTX8baXHv+/zTkwLQ3Oxpxjy/74vJe06B8eGb2ktniewCaU8rom21a+oQdM1taqqiRkbir59DlMf6UTE5yoPGhblQ0uROTPSuSZhF8/SNQxwvm8XuU1easBpKm6UDW+T+O1k8Dh0zdKI=
+	t=1781214953; cv=none; b=sUEGt7nqHVQnhfJKO4ULIitRsdc1DlxCQgK3SLrWKNJmeiohif7vtKfssDEoAZuV6uWXTDCPzbrSfcJVuLK88o71V983Cnm6cDmgs9ksUpiyxfeXXA4LPzCPhAiQUH4ZS4ikwqk3vOtoIY6JpOHqTeugL9plZRMN3VbopUUN4Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781214953; c=relaxed/simple;
-	bh=Mx5f6xZMrf4AEZMl2qB5kpZYfcH4Mh0IHXybydzATbc=;
+	bh=J4zi4tXjUZtUGAVBSR73fRqvzi6ztjy0FqBNM5dOqX4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oVZjGzS7h1UTsO5hXtV3L8vlgLdvU+nJ7z0eFvSAVqdiMjMqBjxa9ctzzXRO5ZB43rLiCdlf+Vcecdi4cBbKS2QWHs/S/uR3NKd8SFoTfBiro7XnW4k/9QxL6cZ6fr3z5ctCGoT/jq7qX2ENxuJC7KqGLgHeL07j8XbwrLw0wBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWnrCgGg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24CABC4AF14;
+	 In-Reply-To:To:Cc; b=pUaEEEteiXuRBTUQ4MoNClCnnxzEb3rLtnWNiAOzo21oUrLPQoab/uTTWzvPUkUwLt6AFqwRc7UNpSwrhcHg4KLYRzbTd8ZlCQTwBoiRl/VFinXiK6D0E9T4fteMuQ3CB8mIuPcCtyM2rbjLxeQZbZbwYAQD2Vow5mNGKQl5PZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcWMQbxT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 353C6C4AF15;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1781214953;
-	bh=Mx5f6xZMrf4AEZMl2qB5kpZYfcH4Mh0IHXybydzATbc=;
+	bh=J4zi4tXjUZtUGAVBSR73fRqvzi6ztjy0FqBNM5dOqX4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=nWnrCgGgvXn/y5NuFB712CZdR/pnwhv3JeoMG+Bkw4UM3vfrAOYouQuc4YwFRhx8+
-	 33/1UPjt7BCU75EEYQwB6r8+Grbmx6RL0oRzZxsEFiNowLYOWEbGuoDu6Y1TBa+SBT
-	 H9yYj5YTKu0wRA+R4kuOlHtmDduZcUNyqz8VFDHRSgLuTE6qwqsKtDaajYDfv7V23Y
-	 IYTeZoNsn0gAHqzkvUKc6NVds/5L/TLd0w8JM+HPEoT+/sS68Wv5lGPFEZ9p5GwGsH
-	 QDTlbk8zFIx2V4RY5sa4uFxa76i9ko5OYQ1jCqgojnanJ6M1upr7j7YW+xfFJGNcw5
-	 yu9re3urX96NQ==
+	b=jcWMQbxTLJBgLhk6SIT3B4zOjwNyuqglBi1jO10+Dl5G9umgX4OmQCffkJCpK0YOk
+	 Rc1YhzIRQVQcPr24JtrCrC+64qIznZXczfRZ+qIxgCdUCXq44THItag6IILKSBgZ1+
+	 53GoTLhB7adENC9PWv8OdfFGtOHDl2bPH3sOI/AhlxOaevIdSYfyh2/o8wKQ4KRhyJ
+	 pEYryoy3mtG+ZFGCG+LX6Fzs/oCB5X4wGoto4m5jBJdEwdlHNdeDSJ3j6h8nTZIKhv
+	 DlhLQ7hOL3dEZoxicFlBOyW7bbtSUrmW1lJz4IY/Bb9Ji1xemL0gjbNTPUUVoDCFjp
+	 t1umiymQ8E5sw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8A2CD98D6;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C109CD98CC;
 	Thu, 11 Jun 2026 21:55:53 +0000 (UTC)
 From: Selvamani Rajagopal via B4 Relay <devnull+Selvamani.Rajagopal.onsemi.com@kernel.org>
-Date: Thu, 11 Jun 2026 14:55:40 -0700
-Subject: [PATCH net v5 3/4] net: ethernet: oa_tc6: Remove FCS size in RX
- frame
+Date: Thu, 11 Jun 2026 14:55:41 -0700
+Subject: [PATCH net v5 4/4] dt-bindings: net: updated interrupt type to be
+ active low, level triggered
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,7 +61,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260611-level-trigger-v5-3-4533a9e85ce2@onsemi.com>
+Message-Id: <20260611-level-trigger-v5-4-4533a9e85ce2@onsemi.com>
 References: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
 In-Reply-To: <20260611-level-trigger-v5-0-4533a9e85ce2@onsemi.com>
 To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>, 
@@ -77,11 +77,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
  Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>, 
  Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781214947; l=1897;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781214947; l=1648;
  i=Selvamani.Rajagopal@onsemi.com; s=20260531; h=from:subject:message-id;
- bh=YZshO9vJiupuwF8u2s55Iy23XRYxDayecyVSa8eiy20=;
- b=UpSME0oOCYqxWCD3IkDDk6YqIiDW9UbcinlWaws8ptJWT3MI53GJpjSZRJBoA+TIa5JosNOcq
- VOciggEh+NDBc6So4IKCVhZQ05xrhAiD2XSK4/vbOSoL89whQr0k5UX
+ bh=5m7Zn2IB4XfdT3/7b+9FZgcVrhjA695d6nE+ghg/fkM=;
+ b=DlhK1Ndf40Cd6zkXYQ59FA6gg0g6OXNGMlAKRSka+sCuQWUoP4QnExeAkjHibxRa4TovKMg4w
+ ilT57mFnE5oAtFREgF6RrGNjjh2VHAPx3OOXreE8oYAOJ12xuMgHzrx
 X-Developer-Key: i=Selvamani.Rajagopal@onsemi.com; a=ed25519;
  pk=5QRdM0HS/LGWWcUZZ9hVfZ+qbPQGZCumcTXOiN7Fyug=
 X-Endpoint-Received: by B4 Relay for
@@ -99,7 +99,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298367-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
+	TAGGED_FROM(0.00)[bounces-298369-lists,netdev=lfdr.de,Selvamani.Rajagopal.onsemi.com];
 	FORGED_RECIPIENTS(0.00)[m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:pier.beruto@onsemi.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:conor.dooley@microchip.com,m:devicetree@vger.kernel.org,m:Parthiban.Veerasooran@microchip.com,m:Selvamani.Rajagopal@onsemi.com,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
@@ -124,55 +124,48 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,onsemi.com:replyto,onsemi.com:email,onsemi.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 58F9567580F
+X-Rspamd-Queue-Id: 552C5675827
 
 From: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
-OA TC6 MAC-PHY appends FCS to the incoming frame. It must be
-removed from the frame before being passed to the stack.
+According to OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6)
+specification, interrupt type is active low, level triggered interrupt.
 
-With FCS in the frame, many applications, like ping or any
-application that uses IP layer may work as they may
-carry the packet size information in the protocol.
+Specification calls for when interrupt level will be asserted and what
+condition it is de-asserted. By using edge triggered interrupt, there is a
+potential chance to miss it, particularly if it is asserted when interrupt
+is disabled.
 
-Application like ptp4l, particularly if it uses layer 2
-for its communication, it will fail with "bad message" due to
-the extra 4 bytes added by the presence of FCS.
+Level triggered interrupt can't be missed as it gets de-asserted only on
+interrupt handler taking actions on interrupting conditions.
 
-Fixes: d70a0d8f2f2d ("net: ethernet: oa_tc6: implement receive path to receive rx ethernet frames")
+Fixes: ac49b950bea9 ("dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY")
 Signed-off-by: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
 
 ---
 changes in v5
-  - Removed FCS present at the end of the MAC frame before being
-    passed to the stack.
-  - new patch
+  Added better, descriptive commit message
+changes in v4
+  no change
+changes in v3
+  interrupts entry changed to level triggered from edge triggered
 ---
- drivers/net/ethernet/oa_tc6.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ Documentation/devicetree/bindings/net/microchip,lan8650.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 477ceefde2c5..0727d53345a3 100644
---- a/drivers/net/ethernet/oa_tc6.c
-+++ b/drivers/net/ethernet/oa_tc6.c
-@@ -785,6 +785,17 @@ static int oa_tc6_process_rx_chunk_footer(struct oa_tc6 *tc6, u32 footer)
- 
- static void oa_tc6_submit_rx_skb(struct oa_tc6 *tc6)
- {
-+	/* MAC-PHY delivers each frame with its Ethernet FCS attached.
-+	 * Strip it before handing over to the stack, unless the user
-+	 * has asked to keep it via NETIF_F_RXFCS. Keeping the FCS
-+	 * in the frame is harmless for IP traffic, but is parsed as
-+	 * a (malformed) suffix TLV by PTP, which makes ptp4l reject
-+	 * every message with "bad message" error.
-+	 */
-+	if (!(tc6->netdev->features & NETIF_F_RXFCS) &&
-+	    tc6->rx_skb->len > ETH_FCS_LEN)
-+		skb_trim(tc6->rx_skb, tc6->rx_skb->len - ETH_FCS_LEN);
-+
- 	tc6->rx_skb->protocol = eth_type_trans(tc6->rx_skb, tc6->netdev);
- 	tc6->netdev->stats.rx_packets++;
- 	tc6->netdev->stats.rx_bytes += tc6->rx_skb->len;
+diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+index 61e11d4a07c4..766ff58147ae 100644
+--- a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
++++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+@@ -67,7 +67,7 @@ examples:
+         pinctrl-names = "default";
+         pinctrl-0 = <&eth0_pins>;
+         interrupt-parent = <&gpio>;
+-        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
++        interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
+         local-mac-address = [04 05 06 01 02 03];
+         spi-max-frequency = <15000000>;
+       };
 
 -- 
 2.43.0
