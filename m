@@ -1,77 +1,64 @@
-Return-Path: <netdev+bounces-298173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298174-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rWdcJUHSKmopxgMAu9opvQ
-	(envelope-from <netdev+bounces-298173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:20:33 +0200
+	id 4p8DIHbSKmo5xgMAu9opvQ
+	(envelope-from <netdev+bounces-298174-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:21:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18709673055
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:20:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C2C67307A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:21:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=1DxwRBuT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298173-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298173-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=osYG+Qey;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298174-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298174-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50C83300AEE7
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:19:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C45693097167
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD3D3E6DD8;
-	Thu, 11 Jun 2026 15:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116343FC5CA;
+	Thu, 11 Jun 2026 15:21:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1883BB117;
-	Thu, 11 Jun 2026 15:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F118F3E6DD8;
+	Thu, 11 Jun 2026 15:21:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781191187; cv=none; b=dEev6eRZXNVDBegN1iyFXJCaabSALKqPnaLurjhfE+5rv/fF/kD5MtQRg3dakGsHD+pSmsssTQ2gLA+XVnia4Bqf4MZbmPW5XCIm5Yhqe5Bve5psC6c5m+s/eQ7FEnMbSJNgrqiMJyBTQPHCtBghfjKz9glLPQ0SZF2rgWaIk3A=
+	t=1781191269; cv=none; b=QGWXUywmwSLPnvQ11ciCg1xXvv64ujy0Ptcigyw/AsLKFwT+/YbyWaHCsvUz3yyRF2pxgDJh/Wb6QZgJX4byfrabvMEoWs7C+FbNAyNUGe0TgEkP47kN1KYuJjRriIh6w+JlRtno1nHc485FFx8ZndpYST2C05Iioi+i6uXk0qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781191187; c=relaxed/simple;
-	bh=g0j5kM2+dWRBDaBxQMPzIpkd8P9s0+184WoorrF5rm4=;
+	s=arc-20240116; t=1781191269; c=relaxed/simple;
+	bh=wrj4lalTc3AYDvqQq7xQg/8gITXDClmdh93VbzRtEiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eQn+sYGq/v3TbTD/ZFLmi6OeR7SCoSMU6jtfKjBKhmtW5z+VZymxvbu7Iigd7hRHVmOdzp02E1tCpBzlbvoUODxKOOObLwbUCvDKdnYq9kuMfdZWyH8um5f/1eb1OrOjKzkkWmkObxvZHhP6ZQYFkUeIFtc8uFpJavnxzQKGKXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1DxwRBuT; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=A8565lvtNHBzjTCVx5zEc6Kacc1WY5y9OqG0mhhu3FM=; b=1DxwRBuTj1XXGDxcfwXvdccpkN
-	XG88qvNl9KZ9zGOaDZN/AytLazr44xrMd02D7R1tO5UrYlH43Kj1sJtDqASdTdv0tXGo+ZjsoQUSy
-	KkrnBSJRbbRjrxGma7OSnFvgb7HzG+o9S9JJnmscMiNfrlwmyUyOdS8ptHVGvi8nu1N4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wXhBe-007B3U-Rb; Thu, 11 Jun 2026 17:19:18 +0200
-Date: Thu, 11 Jun 2026 17:19:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lee Jones <lee@kernel.org>
-Cc: mike.marciniszyn@gmail.com, Pavel Machek <pavel@kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, Kees Cook <kees@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, Lee Trager <lee@trager.us>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Chengfeng Ye <dg573847474@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=nlR6sW7bMgO5W4lcvitjLcLnZITdTk74CLVJ8hOaJ7ZkfbZo8cGxHQwqs5HttqL1V37u50IRA1oy6k3RZEMpkmoPbT5WOWbfHwbzpnS45faQX25aYpmKr16u5yj2efmBr0dWCGbKU/RX8GCGk8qONF40N/UMbRppqEIzDL8M1zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osYG+Qey; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F521F00893;
+	Thu, 11 Jun 2026 15:21:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781191267;
+	bh=ohLurThQc3Ri47VzFPST5IsrbVqmfEKuH6/7JIkAFaM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=osYG+Qeymn/FEPZ6LGvNn1TDlJ+i2ZYRXhnU7MnpeQfaDwjT8L4DY/D61d2bByThg
+	 L1Q+HjdyORR1AYHgFbLntplxQgGwkBUfRBG6b4pn/degX/6hof5cCtjrC0xgv6064U
+	 4wKxjVh6pcHgyHTBRdyXzf2rhjUmS+OnI3aDo1KFLlQlMT5FIBQM9PDnyiOq/eFx+K
+	 QuEi0ivBwHUnn/stFV4UelRkXQyK9BQYPDp/yGg0sdfQBdbBUjey8v8sV9SLwYMQjg
+	 4Qa8/Wat8uQXaF2+rS56f/b/e/ADS9RzLweYxG864e/UZlgRioUeTnpggb2sbVHnc3
+	 Tij1o2CzoMjWA==
+Date: Thu, 11 Jun 2026 16:21:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] leds: trigger: netdev: Extend speeds up to
- 100G
-Message-ID: <6a935882-31e2-4953-af9a-0e9791fe5d30@lunn.ch>
-References: <20260520200337.204431-1-mike.marciniszyn@gmail.com>
- <20260520200337.204431-2-mike.marciniszyn@gmail.com>
- <d2faba3d-68ed-492f-a914-d513e9f8b34f@lunn.ch>
- <20260611142032.GA1127823@google.com>
+Subject: Re: [PATCH net-next v5 2/4] net: dsa: mxl862xx: move phylink stubs
+ to mxl862xx-phylink.c
+Message-ID: <20260611152103.GT3920875@horms.kernel.org>
+References: <f551d90bf2f6820ed6785f5f8e6548d4fc3bd598.1780968180.git.daniel@makrotopia.org>
+ <20260611130750.575946-2-horms@kernel.org>
+ <aiq4GEDlCok3B2lT@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,60 +67,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260611142032.GA1127823@google.com>
+In-Reply-To: <aiq4GEDlCok3B2lT@makrotopia.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298173-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298174-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	FORGED_RECIPIENTS(0.00)[m:lee@kernel.org,m:mike.marciniszyn@gmail.com,m:pavel@kernel.org,m:alexanderduyck@fb.com,m:kuba@kernel.org,m:kernel-team@meta.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:daniel@makrotopia.org,m:kees@kernel.org,m:horms@kernel.org,m:dimitri.daskalakis1@gmail.com,m:jacob.e.keller@intel.com,m:lee@trager.us,m:mohsin.bashr@gmail.com,m:alok.a.tiwari@oracle.com,m:dg573847474@gmail.com,m:andriy.shevchenko@linux.intel.com,m:linux-kernel@vger.kernel.org,m:linux-leds@vger.kernel.org,m:netdev@vger.kernel.org,m:mikemarciniszyn@gmail.com,m:andrew@lunn.ch,m:dimitridaskalakis1@gmail.com,m:mohsinbashr@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,fb.com,meta.com,lunn.ch,davemloft.net,google.com,redhat.com,armlinux.org.uk,makrotopia.org,intel.com,trager.us,oracle.com,linux.intel.com,vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url,horms.kernel.org:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 18709673055
+X-Rspamd-Queue-Id: E3C2C67307A
 
-On Thu, Jun 11, 2026 at 03:20:32PM +0100, Lee Jones wrote:
-> On Wed, 20 May 2026, Andrew Lunn wrote:
-> 
-> > On Wed, May 20, 2026 at 04:03:35PM -0400, mike.marciniszyn@gmail.com wrote:
-> > > From: "Mike Marciniszyn (Meta)" <mike.marciniszyn@gmail.com>
-> > > 
-> > > Add 25G, 40G, 50G, and 100G as available speeds to the netdev LED trigger.
-> > > 
-> > > Signed-off-by: Mike Marciniszyn (Meta) <mike.marciniszyn@gmail.com>
+On Thu, Jun 11, 2026 at 02:28:56PM +0100, Daniel Golle wrote:
+> On Thu, Jun 11, 2026 at 02:07:51PM +0100, Simon Horman wrote:
+> > This is an AI-generated review of your patch. The human sending this
+> > email has considered the AI review valid, or at least plausible.
+> > Full review at: https://sashiko.dev
+> > ---
+> > net: dsa: mxl862xx: move phylink stubs to mxl862xx-phylink.c
 > > 
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > Move the phylink MAC operations and get_caps callback from mxl862xx.c
+> > into a dedicated mxl862xx-phylink.c file. This prepares for the SerDes
+> > PCS implementation which adds substantial phylink/PCS code.
+> > 
+> > > diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
+> > > index 2f22adedfbf67..a193f3c07d359 100644
+> > > --- a/drivers/net/dsa/mxl862xx/mxl862xx.c
+> > > +++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
+> > 
+> > [ ... ]
+> > 
+> > [Severity: Critical]
+> > This is a pre-existing issue, but the crc_err_work can execute after
+> > dsa_unregister_switch(), leading to a use-after-free of ds->dst and
+> > dsa_port structures.
+> > 
+> > In mxl862xx_remove(), dsa_unregister_switch() is called before the
+> > asynchronous crc_err_work is cancelled via mxl862xx_host_shutdown():
+> > 
+> > drivers/net/dsa/mxl862xx/mxl862xx.c:mxl862xx_remove() {
+> > 	...
+> > 	dsa_unregister_switch(ds);
+> > 
+> > 	mxl862xx_host_shutdown(priv);
+> > 	...
+> > }
+> > 
+> > dsa_unregister_switch() tears down the DSA tree, frees all dsa_port
+> > objects, and drops the reference to ds->dst.
+> > 
+> > If mxl862xx_crc_err_work_fn executes concurrently or after
+> > dsa_unregister_switch() has returned, it traverses already freed
+> > dsa_port entries:
+> > 
+> > drivers/net/dsa/mxl862xx/mxl862xx-host.c:mxl862xx_crc_err_work_fn() {
+> > 	...
+> > 	dsa_switch_for_each_cpu_port(dp, priv->ds)
+> > 		dev_close(dp->conduit);
+> > 	...
+> > }
+> > 
+> > Could this order in mxl862xx_remove() result in a use-after-free, and
+> > should mxl862xx_host_shutdown() be called before dsa_unregister_switch()?
 > 
-> Should I wait until the net reviews are satisfied or take this right away?
+> To really address this a guard in mxl862xx_host_shutdown() will be
+> needed. I'd rather do this in a separate Fixes:-patch targetting 'net'
+> rather than in this series targetting 'net-next', right?
 
-This one can be merged any time. The speeds are generic, so even if
-they are not used now, they can be in future.
-
-     Andrew
+Yes, that sounds like a good approach to me.
 
