@@ -1,84 +1,121 @@
-Return-Path: <netdev+bounces-298184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SmQrG63ZKmpTyAMAu9opvQ
-	(envelope-from <netdev+bounces-298184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:52:13 +0200
+	id POBFAdDYKmoXyAMAu9opvQ
+	(envelope-from <netdev+bounces-298185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:48:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5F5673363
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:52:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E86673301
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:48:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=qvPGqynw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298184-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298184-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=agqrByK6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298185-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298185-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BBECD34D4D38
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:47:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A82D3011EA8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 15:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3551E3939D7;
-	Thu, 11 Jun 2026 15:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75A0344DA8;
+	Thu, 11 Jun 2026 15:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013018.outbound.protection.outlook.com [40.107.201.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC97A2D593E
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 15:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968F72D593E;
+	Thu, 11 Jun 2026 15:48:26 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781192857; cv=fail; b=mp4PAWu4hbRZbK3RBgeScsIjDJClmzjsZcdhsHSIa5ePgQqgZlibZR5g6DTfZrkN368ytDbwaEDXO9wYu0GKbONqW2Ds1Dv/VOIqQ33NpZKiIqhxNBNYKZFgvKIlsgFo5YP/NsSu8xJvaCUAXSnsSllqMNptjdRTK9hvysW1mP8=
+	t=1781192907; cv=fail; b=cdbIxSvAI3wJtonyiOJ0GVxSqtjctXEbSNYIuAqHgHvOVAGza8pbLc22D/Q67Zi5UoLGin4DspU33X26ZDssqI6oQ/4AoAQUwNTlDhPbo4Hfwai3F2EitVdG5nCuAsdZPCOYFOk4UuzksmAzBiB6h5latdV8LsxAx950rVvFAEA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781192857; c=relaxed/simple;
-	bh=7QXewm78Tstp+9cdZNGoLUHYbxd8JycOKudeqsGeLB0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XoAxinjPuB+B1Tc7F8/ERAXEAjI0+mAgYzxgxljGLF9aO5fVve6paHr8eb6+gseaXetf87fOM2jLMuf7+dgYpyaBFbGkq0O0HWpPQ9/f+tC4HQg/PPBgiWJnxMEOpVune6g14Knn+OS4Aj6/Jz9cCke/wssaQoPiI2qKlCTwrQI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qvPGqynw; arc=fail smtp.client-ip=40.107.201.18
+	s=arc-20240116; t=1781192907; c=relaxed/simple;
+	bh=VwNEBjg27GLR9FsxNfdpOdBBL0Ca85PFJPDPcNEePSQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I40pwCAscxcvMslgdrn/HKogK24syaK2IykaZ3aEvTwmsLlVgOeA8/25ZtM0lAN9EzTI9QqTshjidFrSd+v4XRDegSUG83Is0jQVpQSpHaFnoBwrrr8MfCBjkO9sNrNqMdhw4GDpSlRn1TbCJksG+RT2dBy8O0uBtnhChMunJiU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=agqrByK6; arc=fail smtp.client-ip=192.198.163.10
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781192907; x=1812728907;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VwNEBjg27GLR9FsxNfdpOdBBL0Ca85PFJPDPcNEePSQ=;
+  b=agqrByK6+yNIUylm323GmNbql718uXvtdxkRDy9+nyYUTQarq07CtexR
+   5g/2qoWusTceZFQPh/hQa7DuMUHYWq2zrdnb+uVw6j5DbqlxRqauVlZFI
+   f2KtuWtrdEgKbikMMoGa7SolJcxWZJjxQ1I7unIjDf3EhrtCCBoBpNAiN
+   NnbzAJGfDA+y9Mp4S/kcr+Sb6pSMDZ/ITeXIegxIp63dIugZLmi39BDDx
+   3LxLOCxJkPmp+xU1igsyT458uvkyoybQeCLPIQZJY12MAlN/+ixlkxNbE
+   ndKY4q+YFkZtCyaV/OEr4rv4pg/dksqC5dw85LvylWFx7AOQs4VQTjozH
+   A==;
+X-CSE-ConnectionGUID: UyUctFoCTVu26ENnAk3fJw==
+X-CSE-MsgGUID: Og8vLC1hQbqK1Yv808JD/Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="93399027"
+X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
+   d="scan'208";a="93399027"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 08:48:26 -0700
+X-CSE-ConnectionGUID: lQtyCeLCQfS5ce3EBfcmqQ==
+X-CSE-MsgGUID: OQRk3oMZR5OGVGa2I2aVTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,199,1774335600"; 
+   d="scan'208";a="251608067"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 08:48:26 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 11 Jun 2026 08:48:25 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 11 Jun 2026 08:48:25 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.18) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 11 Jun 2026 08:48:24 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UxubdhoWw0H+oJWYxsMF9lSj8cNwp4LK3GNq2TvF/ZUN2O2MSYfTnnc/avGGFEHHy9jesWHXXmGINh4m/0G8nZ3BME6XhsZcd6RTR19EAvc+5LAnuMX7NWEhnl/K6Q1JI3gk8OSRiXRxX/xgGXHwv1az9BHgOzEfVAxK4n9tFoSUWJ2K4JBhB46C9jUsOxKoiXacmeXf7AYn4zpU+ovxFQ3B16ucvbjFjhNZ5AM1EU2iBxHPWY9ENquG/hP1IMhIdXq5JsEC4CMeEDxRkjAWEBeDrzGUbTKLTpM+xem3ObWA0TybZA3il9bXQ77Ihs9H0ncS7fjL7z121TIVrh3ofQ==
+ b=H11q1dTQhSDR2TONqH/pAWs7y4OF+2gY2Sidx1SzF43lcZQuPz9UxPGzEjS5/TM6Hy0b7PT9roLxDtSowz5JqtUaI3ilVk4v3aLH8qvGTOZTZ/qvWHRiIA/a47aq7VszQl5b8tZ29jz1/1ehc3AmaLg0mqxgXNJeSfX6huc55B+G0LYE4ObYs2QNbEyR3gTsbqWAAc46Ga/tkgUY8MvFE3CUr7/gteqkRCgOuKHjICfOnKR30wXHyQwkNLaKbZEk/DkpRpsZ9NUmwlyzQPznsU1F4Xw6K8q5e3JdHouTcZPesUPl+xMgG2majJJEGSD+jCqg5QQRDgKLUggpN8dbew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IINMGwiY45dl0CpufeX+PmSnNBD00oEsfd4f3IEZ+os=;
- b=T/hWxRlbuPkfHtXEVCkdsE9FHC+oLpOYCVvpphvY4uHXPRT7OGzohO/U4DVv/oIX3o/RH4vs0aa3K58vGpCLlWaBx2ov/rJdyL1jBN/UifasoOBFLxIFlbwcSz9h4U4c+QaaVw1g/Eh4aw8cScP0Nvqw7M7Nve9QPgRfwQL6BcLvsnqvo+OEb4Kq+tYwkEVY3TLsvbA07/zMp0Hq0NUuCSMNoTBv4WhTzoo2i0mHK9q0eGE2YLXjZswtZ6jIUjTkLkdhY4kmZ1I1QLOH2WDJzo8Uq6kc/SL8vl1v7pZK6/RPoIFQL6SgD053V7nPJPt6Sv8XUXpN6u07Al8/CwOFRg==
+ bh=1iHJfcfv5uhaEhLc+w0r+n1VzXsQn67TLvF9gsX1HJs=;
+ b=wWOuBdhMWTy6gs/OAABUVw4qLmUsHLtzQXN55gXq5DTwOXcBjuA/LdKt+ynp0F+ZIML0EMWmxYYQQT2ACXb4EB9tzHS+ThWPsXtDvsNZPSaU+GPxkK/9Hi1TTRVq/AlWXR8gQK+GeupT4RQFdbSGBASUJzoD2YwcxkPDBLqmfTqbrxXw9Qu7hfPGbKrWAo3gGeK00reoYHlBty4i6SVupOp/BGx2bvt8cjMH421T5Uc4ETxw4oNnHkl58m7PbBiKrMLQiM0au9OsV+LAsnZUOONLKUD+SkJu5Fa5lLNuzM2mBELYSQAP7mI82HxU/rNHMwi2UA7v1LLCtne07xTagQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IINMGwiY45dl0CpufeX+PmSnNBD00oEsfd4f3IEZ+os=;
- b=qvPGqynwX5Fn5/XgMKUt9DeSUl2lSmEnUEBbxOnP9+771leBUdbOQKpW8BrrCq5nzj8zahVWR68Zs2qBjikQtoCUhu0cBcLDDaf8ZReJNsGLwQZikhp5loycZnJFBlv/Y0YGeXkRLasiHfaWLbOg0PUvcNxrOs/gBUWildbKl70pdbG+B06cF1kgzK4tLYm1aXRmZ0DfbgAW/95+cuVnTc26ews2oAElBzKS4ktkUVw6ySvql2q2E/9Py2RWTq04tUVuE2X0/Q7ZeIT+SGsYSXFsa5iJ9FLEhCmoic/FAjh0hfzSfEV/gWvnKOx0vNF2rNmFHBcH1WBDqPVjOx/3dA==
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by SA3PR12MB9157.namprd12.prod.outlook.com (2603:10b6:806:39a::21) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MN0PR11MB6134.namprd11.prod.outlook.com (2603:10b6:208:3ca::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.14; Thu, 11 Jun
- 2026 15:47:27 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.21.0092.010; Thu, 11 Jun 2026
- 15:47:27 +0000
-From: Ido Schimmel <idosch@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	horms@kernel.org,
-	willemb@google.com,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next v3 3/3] selftests: fib_tests: Add test cases for route lookup with oif
-Date: Thu, 11 Jun 2026 18:46:05 +0300
-Message-ID: <20260611154605.992528-4-idosch@nvidia.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611154605.992528-1-idosch@nvidia.com>
-References: <20260611154605.992528-1-idosch@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TLZP290CA0001.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::14) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Thu, 11 Jun
+ 2026 15:48:22 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%4]) with mapi id 15.21.0092.017; Thu, 11 Jun 2026
+ 15:48:21 +0000
+Message-ID: <e7ad343c-0d78-4d0c-9533-52a61afc8214@intel.com>
+Date: Thu, 11 Jun 2026 17:48:14 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Check max_macs devlink param value against
+ max capability
+To: Tariq Toukan <tariqt@nvidia.com>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, Moshe Shemesh
+	<moshe@nvidia.com>, Shay Drory <shayd@nvidia.com>, Parav Pandit
+	<parav@nvidia.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Yael Chemla <ychemla@nvidia.com>, Carolina Jubran
+	<cjubran@nvidia.com>
+References: <20260611135230.534513-1-tariqt@nvidia.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20260611135230.534513-1-tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0046.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::15) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,468 +123,135 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA3PR12MB9157:EE_
-X-MS-Office365-Filtering-Correlation-Id: da8c1a13-2c70-4a74-b5e8-08dec7d0bcee
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN0PR11MB6134:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd602768-483f-42c8-4139-08dec7d0dd47
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|22082099003|18002099003|3023799007|6133799003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	XFgjnLAMlzBTjoF58ubsNjcg9MlwkyxPmQdaZczQ1ZZCXI1I1Yg5GwpvuapkdyyaKZMhIkVtSQzaHNLfvJQ7j0/1QqO+bHyQaha3iD3VE6IdlKwXLAWnmxs7gBgrqecx5Bgqf4ZdXLhLYaJjPdak35r7NTo8X7M99pT20FIbwl2KVMTOP1UyBZ/Qq2jBQJRqnE+MXxICYkHVgZXS+AIU8inspDCCQEca1nwQeAR+Yspi9SKcxo6hRJwkPa+gF8gPPFs9PoWyTlX0kpDuZynDZjaea63ECHGWFER++MA5EJCWWaoBfeiOpQHBY89ShJgoeLCs8jXnz0Fy6cPzSRIum/1dPET1P3x7goaOPxpSGFMZtoqfDZwriJi3gPaqj3oHsihozQrCa+uCu1qqtOau4Hpl+BiJ3rSUiMtg7yrXtfJxOc529vKW8mJbg3d6AyODusHmfqBJxRV2PmLPmer24FyfGgLzKYZKmvVNRfG/qH+XvoH8bOecACGfhOuTN8gAkf3zGwHZusY/R4c4Ehlo463Wp3Q0T5MuNkQgjqYKW9Bn5O3O5LHJpcGImN9KEQF+fanXgLXNID1rz9XTIJkE/gwtKxd5dUVCa2u8ait6ktEx31p8Xv3YfZaF8+fOcVDyYAeM5fgFHR1nSDcN7uzHO/nsRadFhRzZK9fR+zO3b2QToyiHRAo3Y3G5aqVGZFhS
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(22082099003)(18002099003)(3023799007)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|23010399003|366016|7416014|1800799024|11063799006|5023799004|56012099006|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info: JymKVW6EA3ERRhUSdNC2BsnCao5HuXrJHahpgq4ZXV751S9ZhBe+2ZY9l7XBr63vsa5oETekTe6OlUYYSJYxTLHmRwkivb1HnR3Y1egrU5WMAX/AQc2sfKl1xF9khgbwzhL/8zNOesEUAesBu6hh1Esl5iuhEd4aaT5fYzTaUeklHEs88OBOnSmpZR1e83NCGW9nHkWTX2GuDnvdBPNvVLztOipPuhmCxKkkOju8oWMBT9GyqtuPaN9a3w8CuLIaOuGtABo/+H8ZjK8qKbnmhnI1WIcIZdNvmMZmtic8FaADOEwrutbKuXbl5BkAKnSIy3QLAxp4B3iv/ka/s/NUPlkGsLxDbyIQ7WRShMzKRlQIl1xBekc153VN9kphLgFi61qJK0l9ZtIHXqUDWgbouPoYCHsfB3uXjtQ+1FfRUx0gkQJZBiA9R4t+fCFSm4W/115RnNPMD9n46ON+ZMFgZF8hbDvO2zSuJavkW/uxsPRGiiyLPMy74ySytw7fZpVvcovcTm8YfKMB5Je6fhB9xhi0eRXynDyUR+5twFSYQY6UjYvfNN1dhDChHwUawx8SOazNCqkvQXoJk8OmEQrD+4mPTegci7TOfD3r+TWyQsHW12VI83zRWlS0fWxNJBfJbPr7THQPlKBkTDRq4L5XV+gKHuK5/t1nnvYmew/iBXlBDVMfrl7Btrym0F5S/WAX
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(366016)(7416014)(1800799024)(11063799006)(5023799004)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?79wMTonTGNX6SPjA+VcGe9QOz7SH/JQNSnZCglqCkzg3aylm2Uo+7Jfpu4bx?=
- =?us-ascii?Q?QUjmxxkwxTl5CHQHjesiZ7/wa0QJpdusDDbltWPegYcl4x1bUp0NwFxn9pGk?=
- =?us-ascii?Q?65iKoL9aGfE0X6qvDDgHhh8FNSs02eQviArwdm1PqZ1j1kbg9NzjNiiHytOt?=
- =?us-ascii?Q?mcQO8NbvoOJqDIXn03qiB4iCZFBdz32U+lNa0CA0DnO4wRPqOAszYvzSjbCX?=
- =?us-ascii?Q?8Wen/VgV789D+YDHj7yHVCIZsbpfbpZ7wT7Tqkc2pk35T/chyQeyPwhpcSFp?=
- =?us-ascii?Q?ovNKW3fplMnyrwDcmjYhnl0TtkLxAkT7+EP6FgTw41NEmHFkmalhJl47kRPV?=
- =?us-ascii?Q?Om5wOhjnzFPASnISUEnV4DK0/Rh/hFZyjkx8G9t8qRSGAnmwwzo0VBvqSoLh?=
- =?us-ascii?Q?ZpzCf0Ehd6jZBpZK6UYwST5stFIF+lH42hn4HpmvfS2kvWHFYZ96iItK/guM?=
- =?us-ascii?Q?REvcBkO0yn2LQFuBjCUdwoev27olAUm/stGH5s/12J+n0wZlIMV0al+HOERz?=
- =?us-ascii?Q?+Jem3wBuwI10+P2RNr+X2QGpkST5H96mqc6YWehDaXXds4/GrHUjoXWvy1Xt?=
- =?us-ascii?Q?mpRnCq3tE6de4Cl6UW/LEDt1QuFA+BkYVbOFQKlSCwyVG5hL7XRB9ohdHncp?=
- =?us-ascii?Q?y1cz4oGnaFqq6upGMqxG1YzdvD94RqWr8JtF2f+iuz9GN3IbZzHY2/5qYh+5?=
- =?us-ascii?Q?67WrGOzbmzoiHk+GcWGZrXyHO49wT5BOM4m7FgvBTAke7xi/EyuiuKrPfg7s?=
- =?us-ascii?Q?9vxw+f6FXOma9lN/korMDAnNBvCgK13EbvCTApEn38Jfc+CBytNPk5/pfjk9?=
- =?us-ascii?Q?unDJIBLkI73u9CUs1LttAqxPY5YE0KBzkRHO64sP4pedfJIX+7nU/Dk+1gNf?=
- =?us-ascii?Q?ReSQsphx4XjcA3kmasUfvb9hmcEcgnbPUxMCqmJoiP6il0UWofVDCR5SnUr9?=
- =?us-ascii?Q?zMo2+FhdjLp3uDVhV/roTrAdy3JGeDgXHryLtuWvrJnqGkKV4OU7eQyWPH0i?=
- =?us-ascii?Q?3LsiUXhHsRBamH0mplHzUk7xL8WWjWR2UsW7NZurBFE6KTvJEF9iXU8aSBE7?=
- =?us-ascii?Q?pPxiCKxYSoyJGF3F8erEeQnIYCH31MCUBtkRX7RTFZQFMKDEJs4SkrzBDDuG?=
- =?us-ascii?Q?A0g46aCs347fDq+S9bWYSYTI2rkO4+xXnWF32Zc/kNqWnSYejaMPgISH4yQn?=
- =?us-ascii?Q?GRNDi9E9H+nzXUkKuHCA1wkByjpfxY//z8YPoPFWaN4jFkdbTHayl0Ars8vI?=
- =?us-ascii?Q?Yw9Ax2kYWEexnmwJLoZbxrINa9HVtnbAOMOCG7o0LfVzh6VntIe5LwkTQQXR?=
- =?us-ascii?Q?14lTKiop2SxrHp+SJobv8X2nADRdnqd2DT/qJNU/0Bvcj4wz8dc/URPVm1zM?=
- =?us-ascii?Q?1R8MjR8YDLL8AAgnmJxzQk+FhfJtxu6NytDbdhuTcJGec6bJbvvMpa9KUBd8?=
- =?us-ascii?Q?aCuZFiwjTRwEmCSSytXldJ9ABVlog163BxshgfMXyTXbK/1ldIFALAa5dGTH?=
- =?us-ascii?Q?P/F8lphjxEYKSWqH/V9BHQf1FZbPNVLAVM46LbXn74d7oeT973C/Y3bYuNCq?=
- =?us-ascii?Q?/UiGde0WpCzKJ89Ie+k6fje9uk4VghYSuafP1uPP5Yg++R46D3hbfK2gbFPq?=
- =?us-ascii?Q?/tChV723dMUTX+CwMFQ2s2UbETWfYoboIHObWwqGl/VjxTdqKyA16r5FLfM+?=
- =?us-ascii?Q?T1fVcACpzJl50XgG5Wjoyf4eRCtos/8D/tqDAtYnvmj6k4Px?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da8c1a13-2c70-4a74-b5e8-08dec7d0bcee
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TytDajRFRFRJT0JTWW1wbytJTUJkWjVjNUE0dm5hMjBOMXVxYTloaDdmbllw?=
+ =?utf-8?B?YWM4eksycmRnZTNTQ1MwZGxONjl3MmZhdWZJMlZLQWVFSzd4VUdNTmVhbkZ3?=
+ =?utf-8?B?L1V0Mk5EZ0dMRytwWVFvcDExaFo1dnRPR3kxRmx6Mmo1OTMvNEtvT0grMjYx?=
+ =?utf-8?B?eHZrNkhsRGxUd1hrWnV0TnUyZUJsL0pvYjNoRUVYTHo4YktTdE55M1ZpOTJ1?=
+ =?utf-8?B?cEs2Rk9UbGdzczNPM3Q1WmVEWWRueWVFeFgxamM3TUl0N2c3UDI3TzFlVGdV?=
+ =?utf-8?B?dkNDb0xnTkRnMXF5a3VFZTNBeXJPbFdoUTMyUVRqV0MzOFd4OURsaTlkazdy?=
+ =?utf-8?B?Yi9XOStCUUQreFBmZmU4S3UxcGdmVVV3ck5SdHQzazNLbWxzaDNQcWdwSS81?=
+ =?utf-8?B?TU5RVHdRakMxcU9oSVgrYlVEa1I5bmdtK0tjaWFlRVBKYlMzU3N6QlJhdTJP?=
+ =?utf-8?B?RXc0L2hkUnZ3cUE4d2UxRG4zTmQxbktkNS9XdU5yZkxPem56ZlpNcytsc25i?=
+ =?utf-8?B?OVp3ZlkyVmFXV29leTRhYXRRT1RHWHdsbUcvd29EWkhmRERodDlJUWRvdFFq?=
+ =?utf-8?B?aW5lQ09LdW4ra0hKcmdMS0p5ZXRMYmRvTFZsV3JGdGFqbVpBMnl3TUNPQkU2?=
+ =?utf-8?B?cXNhSTdybHpnWU1mQnVid3AxSHVmNTE2YWVTcnk2UUh1Z0dzNDR2QzZYL2xC?=
+ =?utf-8?B?c0J2M3Z4cVFIYUF1TjJUYUJFUUF5T2Uya3pxeloveDRPWFZieU5xam1hUjVY?=
+ =?utf-8?B?TnVjUVNIMmdnZzB6ZTNpY3VSVU1hYSt2Vk16T3J5aE1HZHJta2RKR0ptVkJV?=
+ =?utf-8?B?b25HUkF1NUNzL2orU3lId0dvRXVxc2pYUFRhZ1pZVWFCdG85TmhYdHY0K0w3?=
+ =?utf-8?B?aU1lUitldDNhcHFza3JDUkRoaDRGbGZGOXhQR0pJMmNRKzRuWlZHKzhYMllj?=
+ =?utf-8?B?a2dEcUZGRytWWmdrbzJBNSt5R1JoVStTdkdMei9jNnU5d243ZmNyS202ZW1v?=
+ =?utf-8?B?VjBlL25ya1N5Q0dzRU45TU5kS1BaMWpLajY0NWU4MjZ1VmZ3bW8xb1hTR3Zu?=
+ =?utf-8?B?ajJIa0JOY3VJRzczRUN1ZXJWTjdEL2FuUGNPMDN5Wm1icTkvMGRIelZCemxp?=
+ =?utf-8?B?ejdYYXFrZTVIaC9DYjdDMkhZRFZOUWpBWUV1YXBNTGE1ZTArYkxwYkpscWxo?=
+ =?utf-8?B?YU1vZ1N1elVqdDA2Y3B3dU1kem5CQXd2U0NNN25RaGxhM0t0MERySk9tSlNZ?=
+ =?utf-8?B?em1ZZ2x5Z3ZNQlZrRDBzRk5yTHIyQm1UTGx1WC9xWGxSMUk3c2w0b3BvNE9u?=
+ =?utf-8?B?cGo4cG9uK2FTbGZNVlpjV21NTXVqYkwvaldQNVQzQmkvcXhRRVBkcmIvNU9B?=
+ =?utf-8?B?YnFmRyt4UldHRlZ4QkpGYVk1dDZ6YUtyM0NvRnh3VnJaNm1tQ3V1ZXhWMEEx?=
+ =?utf-8?B?dTZvVG5QelM3NGVUSFRPRlV0N2hpTCtZWTN0a2hwUG1QNExQWURYb1QwOXJG?=
+ =?utf-8?B?WmtCWkdWSnNIRUhndkxSL2RtR0t4UERVS3dtZFRxTkdoMTNrQzNMV2o2ZzZB?=
+ =?utf-8?B?V0NLWnBzVHNtRWt2UFFtU05hUVR2bU03Z0dJdytMY2MvTTFMMERvSDB6K3hO?=
+ =?utf-8?B?blVrZ3JISmRxeU9yZDRoUW1PWDJqcm1wQlFwWGg1bkE5dFZaWldIZlNRVGFi?=
+ =?utf-8?B?N1FFa04zSXl5aERWT3cyNHBKSmVVeFRWUVV3aXJDYytCVWRvNHltRjFHcnVN?=
+ =?utf-8?B?WG9KOXlhV0I1NUVZeDVXczJ5RUE2ZytVSXc2MW9NT1BUSDhrMG40VzRrRXVI?=
+ =?utf-8?B?S0tvamNzU1gwMXVNeTlyUVJ0b1o3cDN2Sk1QbjlOeDZpSTdtTW9QNU5nNm1B?=
+ =?utf-8?B?VVpEQmdkMTN6SGJSU0MwUEZaSER5TVFKbGl4TkF2b3h6Q2RWOFZPWUsvRXFn?=
+ =?utf-8?B?Z2crM0p1Z2RuWFV5QWZGdmhBUnNvWFhzU2xQVTQzYUFMNThxQUFidlVIeGp0?=
+ =?utf-8?B?bzZ4cU5jVzRNb3F1R1hkclc4TnVuTTBVUFNGNjExTlNhM0EycHNqMVdkRnR0?=
+ =?utf-8?B?b1RPeUI2MEtsc1lTVDY1ZHlDRVJXY2xHb1IxYm1SZG1va2F6SXhodzFkcUFV?=
+ =?utf-8?B?Wi9IVEc5RFlaOGUySXdPcmcyblUwZmNwdElJd3poTmhIZy9KU0NkTjdaYVFp?=
+ =?utf-8?B?WVNDK3FHNFE0NURUdDdhVk0wWE56RTgwcTNpTmNRM3JibnY5QTNoMFZSL28w?=
+ =?utf-8?B?NWp5ZHZCamJHczQ2ZDhreEw3UityWnBxSW9TRXJRa1RDQUJWMWdRUFRmUlF3?=
+ =?utf-8?B?YjBSRUF4d1RRbzNMOS9ucTRLc0dKcGIvK3BPLzk0VXcwOERLMG9UL0xmblB0?=
+ =?utf-8?Q?qVjSY8wqD9qM+jnw=3D?=
+X-Exchange-RoutingPolicyChecked: NW8pWGFrf7vN5whKkeZ4vKvqJqcpwEqI13f4xF1hTtncmjwlvBU/aLGf8WX5ZwOmspC8aKwF3mj9R5l2kQ5mWcyYDSw80jfh13PkP99WLK4k6OH1AK36mmC9//dBIvyVwyKnC3MGKm9J43EuVoAkNaAZ7OmU0ipYVD2nRFx55X6E6AOyP5jPXM8lOjzdIJS+ByH06ilCsCIjUrmd+fmBb0Llwd8GsJ44ur/Z9UGgw21etWR0oYFXueA2Z51WQw4lAmtWWYRbuoHtLveKmRomWMHn0gBFIHrUzhSpXJSOv9Mh3tD3wyyuYvV3RC/8bL3UXqLJG1Cp3JQScb5oXPoVPw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd602768-483f-42c8-4139-08dec7d0dd47
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2026 15:47:27.1086
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2026 15:48:21.7902
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aw1iBhFpU0tA7Tp9/svkvgo/PSLrBUerm1787FzUbcOosSFZiqwn4eYqjeop1N1MzXFiaQokuWOugV0RQGOBBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9157
+X-MS-Exchange-CrossTenant-UserPrincipalName: KTFaTyyQfVH3m5cTf2xccKapsl/xIooS8I7CdgGTYJkSHu20pYDscgiWoouOSNwPuksURTeaaHNHVT/wjTIaz0Dqr2IOtvYBLrfoZm+ULgw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6134
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298185-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:moshe@nvidia.com,m:shayd@nvidia.com,m:parav@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:dtatulea@nvidia.com,m:ychemla@nvidia.com,m:cjubran@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298184-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dsahern@kernel.org,m:horms@kernel.org,m:willemb@google.com,m:idosch@nvidia.com,s:lists@lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,nvidia.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksander.lobakin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,Nvidia.com:dkim]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: BC5F5673363
+X-Rspamd-Queue-Id: 90E86673301
 
-Test that both address families respect the oif parameter when a
-matching multipath route is found, regardless of the presence of a
-source address.
+From: Tariq Toukan <tariqt@nvidia.com>
+Date: Thu, 11 Jun 2026 16:52:30 +0300
 
-Output without "ipv6: Select best matching nexthop object in
-fib6_table_lookup()" and "ipv6: Honor oif when choosing nexthop for
-locally generated traffic":
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> The max_macs devlink param is checked against the FW max value only at
+> param register time (driver load) and inside the validate callback
+> (devlink param set). The stored DRIVERINIT value persists across FW
+> resets and devlink reloads without any further checks against the max.
+> 
+> If the FW link type changes from Ethernet to IB and a FW reset happens,
+> the MAX cap for log_max_current_uc_list will become zero, but the
+> previously stored max_macs value remains and is unconditionally
+> programmed into the HCA caps in handle_hca_cap(). FW will then return a
+> syndrome during SET_HCA_CAP:
+> 
+>  mlx5_cmd_out_err:839:(pid 3831): SET_HCA_CAP(0x109) op_mod(0x0) failed,
+>  status bad parameter(0x3), syndrome (0x537801), err(-22)
+>  set_hca_cap:907:(pid 3831): handle_hca_cap failed
+> 
+> This results in a failure to register the RDMA device.
+> 
+> This patch skips programming log_max_current_uc_list when the MAX
+> capability is 0 (in case of IB).
+> 
+> Fixes: 8680a60fc1fc ("net/mlx5: Let user configure max_macs generic param")
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
- # ./fib_tests.sh -t "ipv4_mpath_oif ipv4_mpath_oif_nh ipv4_mpath_oif_vrf ipv6_mpath_oif ipv6_mpath_oif_nh ipv6_mpath_oif_vrf"
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
- IPv4 multipath oif test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv4 multipath oif with nexthop object test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv4 multipath oif with VRF test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv6 multipath oif test
-     TEST: IPv6 multipath via first nexthop                              [ OK ]
-     TEST: IPv6 multipath via second nexthop                             [ OK ]
-     TEST: IPv6 multipath via first nexthop with source address          [FAIL]
-     TEST: IPv6 multipath via second nexthop with source address         [FAIL]
-
- IPv6 multipath oif with nexthop object test
-     TEST: IPv6 multipath via first nexthop                              [FAIL]
-     TEST: IPv6 multipath via second nexthop                             [FAIL]
-     TEST: IPv6 multipath via first nexthop with source address          [FAIL]
-     TEST: IPv6 multipath via second nexthop with source address         [FAIL]
-
- IPv6 multipath oif with VRF test
-     TEST: IPv6 multipath via first nexthop                              [ OK ]
-     TEST: IPv6 multipath via second nexthop                             [ OK ]
-     TEST: IPv6 multipath via first nexthop with source address          [FAIL]
-     TEST: IPv6 multipath via second nexthop with source address         [FAIL]
-
- Tests passed:  16
- Tests failed:   8
-
-Output with the patches:
-
- # ./fib_tests.sh -t "ipv4_mpath_oif ipv4_mpath_oif_nh ipv4_mpath_oif_vrf ipv6_mpath_oif ipv6_mpath_oif_nh ipv6_mpath_oif_vrf"
-
- IPv4 multipath oif test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv4 multipath oif with nexthop object test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv4 multipath oif with VRF test
-     TEST: IPv4 multipath via first nexthop                              [ OK ]
-     TEST: IPv4 multipath via second nexthop                             [ OK ]
-     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-
- IPv6 multipath oif test
-     TEST: IPv6 multipath via first nexthop                              [ OK ]
-     TEST: IPv6 multipath via second nexthop                             [ OK ]
-     TEST: IPv6 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv6 multipath via second nexthop with source address         [ OK ]
-
- IPv6 multipath oif with nexthop object test
-     TEST: IPv6 multipath via first nexthop                              [ OK ]
-     TEST: IPv6 multipath via second nexthop                             [ OK ]
-     TEST: IPv6 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv6 multipath via second nexthop with source address         [ OK ]
-
- IPv6 multipath oif with VRF test
-     TEST: IPv6 multipath via first nexthop                              [ OK ]
-     TEST: IPv6 multipath via second nexthop                             [ OK ]
-     TEST: IPv6 multipath via first nexthop with source address          [ OK ]
-     TEST: IPv6 multipath via second nexthop with source address         [ OK ]
-
- Tests passed:  24
- Tests failed:   0
-
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- tools/testing/selftests/net/fib_tests.sh | 251 ++++++++++++++++++++++-
- 1 file changed, 250 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index 8f10de0eb985..b338bfb196a2 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -12,7 +12,9 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
-        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
-        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
--       ipv4_mpath_balance_preferred fib6_ra_to_static fib6_temp_addr_renewal"
-+       ipv4_mpath_balance_preferred ipv4_mpath_oif ipv4_mpath_oif_nh \
-+       ipv4_mpath_oif_vrf ipv6_mpath_oif ipv6_mpath_oif_nh ipv6_mpath_oif_vrf \
-+       fib6_ra_to_static fib6_temp_addr_renewal"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -2971,6 +2973,247 @@ ipv6_mpath_balance_test()
- 	forwarding_cleanup
- }
- 
-+ipv4_mpath_oif_test_common()
-+{
-+	local get_param=$1; shift
-+	local expected_oif=$1; shift
-+	local test_name=$1; shift
-+	local tmp_file
-+
-+	tmp_file=$(mktemp)
-+
-+	for i in {1..100}; do
-+		$IP route get 203.0.113.${i} $get_param >> "$tmp_file"
-+	done
-+
-+	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
-+	log_test $? 0 "$test_name"
-+
-+	rm "$tmp_file"
-+}
-+
-+ipv4_mpath_oif_test()
-+{
-+	echo
-+	echo "IPv4 multipath oif test"
-+
-+	setup
-+
-+	set -e
-+	$IP link add dummy1 up type dummy
-+	$IP address add 192.0.2.1/28 dev dummy1
-+	$IP address add 192.0.2.17/32 dev lo
-+
-+	$IP route add 203.0.113.0/24 \
-+		nexthop via 198.51.100.2 dev dummy0 \
-+		nexthop via 192.0.2.2 dev dummy1
-+	set +e
-+
-+	ipv4_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv4 multipath via first nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv4 multipath via second nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy0 from 192.0.2.17" "dummy0" \
-+		"IPv4 multipath via first nexthop with source address"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1 from 192.0.2.17" "dummy1" \
-+		"IPv4 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
-+ipv4_mpath_oif_nh_test()
-+{
-+	echo
-+	echo "IPv4 multipath oif with nexthop object test"
-+
-+	setup
-+
-+	set -e
-+	$IP link add dummy1 up type dummy
-+	$IP address add 192.0.2.1/28 dev dummy1
-+	$IP address add 192.0.2.17/32 dev lo
-+
-+	$IP nexthop add id 1 via 198.51.100.2 dev dummy0
-+	$IP nexthop add id 2 via 192.0.2.2 dev dummy1
-+	$IP nexthop add id 3 group 1/2
-+	$IP route add 203.0.113.0/24 nhid 3
-+	set +e
-+
-+	ipv4_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv4 multipath via first nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv4 multipath via second nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy0 from 192.0.2.17" "dummy0" \
-+		"IPv4 multipath via first nexthop with source address"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1 from 192.0.2.17" "dummy1" \
-+		"IPv4 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
-+ipv4_mpath_oif_vrf_test()
-+{
-+	echo
-+	echo "IPv4 multipath oif with VRF test"
-+
-+	setup
-+
-+	set -e
-+	$IP -4 rule add pref 32765 table local
-+	$IP -4 rule del pref 0
-+	$IP link add name vrf-123 up type vrf table 123
-+	$IP link set dev dummy0 master vrf-123
-+	$IP link add dummy1 up master vrf-123 type dummy
-+	$IP address add 192.0.2.1/28 dev dummy1
-+	$IP address add 192.0.2.17/32 dev vrf-123
-+
-+	$IP route add 203.0.113.0/24 vrf vrf-123 \
-+		nexthop via 198.51.100.2 dev dummy0 \
-+		nexthop via 192.0.2.2 dev dummy1
-+	set +e
-+
-+	ipv4_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv4 multipath via first nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv4 multipath via second nexthop"
-+
-+	ipv4_mpath_oif_test_common "oif dummy0 from 192.0.2.17" "dummy0" \
-+		"IPv4 multipath via first nexthop with source address"
-+
-+	ipv4_mpath_oif_test_common "oif dummy1 from 192.0.2.17" "dummy1" \
-+		"IPv4 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
-+ipv6_mpath_oif_test_common()
-+{
-+	local get_param=$1; shift
-+	local expected_oif=$1; shift
-+	local test_name=$1; shift
-+	local tmp_file
-+
-+	tmp_file=$(mktemp)
-+
-+	for i in {1..100}; do
-+		$IP route get 2001:db8:10::${i} $get_param >> "$tmp_file"
-+	done
-+
-+	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
-+	log_test $? 0 "$test_name"
-+
-+	rm "$tmp_file"
-+}
-+
-+ipv6_mpath_oif_test()
-+{
-+	echo
-+	echo "IPv6 multipath oif test"
-+
-+	setup
-+
-+	set -e
-+	$IP link add dummy1 up type dummy
-+	$IP address add 2001:db8:2::1/64 dev dummy1
-+	$IP address add 2001:db8:100::1/128 dev lo
-+
-+	$IP route add 2001:db8:10::/64 \
-+		nexthop via 2001:db8:1::2 dev dummy0 \
-+		nexthop via 2001:db8:2::2 dev dummy1
-+	set +e
-+
-+	ipv6_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv6 multipath via first nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv6 multipath via second nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy0 from 2001:db8:100::1" "dummy0" \
-+		"IPv6 multipath via first nexthop with source address"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1 from 2001:db8:100::1" "dummy1" \
-+		"IPv6 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
-+ipv6_mpath_oif_nh_test()
-+{
-+	echo
-+	echo "IPv6 multipath oif with nexthop object test"
-+
-+	setup
-+
-+	set -e
-+	$IP link add dummy1 up type dummy
-+	$IP address add 2001:db8:2::1/64 dev dummy1
-+	$IP address add 2001:db8:100::1/128 dev lo
-+
-+	$IP nexthop add id 1 via 2001:db8:1::2 dev dummy0
-+	$IP nexthop add id 2 via 2001:db8:2::2 dev dummy1
-+	$IP nexthop add id 3 group 1/2
-+	$IP route add 2001:db8:10::/64 nhid 3
-+	set +e
-+
-+	ipv6_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv6 multipath via first nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv6 multipath via second nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy0 from 2001:db8:100::1" "dummy0" \
-+		"IPv6 multipath via first nexthop with source address"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1 from 2001:db8:100::1" "dummy1" \
-+		"IPv6 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
-+ipv6_mpath_oif_vrf_test()
-+{
-+	echo
-+	echo "IPv6 multipath oif with VRF test"
-+
-+	setup
-+
-+	set -e
-+	$NS_EXEC sysctl -qw net.ipv6.conf.all.keep_addr_on_down=1
-+	$IP -6 rule add pref 32765 table local
-+	$IP -6 rule del pref 0
-+	$IP link add name vrf-123 up type vrf table 123
-+	$IP link set dev dummy0 master vrf-123
-+	$IP link add dummy1 up master vrf-123 type dummy
-+	$IP address add 2001:db8:2::1/64 dev dummy1
-+	$IP address add 2001:db8:100::1/128 dev vrf-123
-+
-+	$IP route add 2001:db8:10::/64 vrf vrf-123 \
-+		nexthop via 2001:db8:1::2 dev dummy0 \
-+		nexthop via 2001:db8:2::2 dev dummy1
-+	set +e
-+
-+	ipv6_mpath_oif_test_common "oif dummy0" "dummy0" \
-+		"IPv6 multipath via first nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1" "dummy1" \
-+		"IPv6 multipath via second nexthop"
-+
-+	ipv6_mpath_oif_test_common "oif dummy0 from 2001:db8:100::1" "dummy0" \
-+		"IPv6 multipath via first nexthop with source address"
-+
-+	ipv6_mpath_oif_test_common "oif dummy1 from 2001:db8:100::1" "dummy1" \
-+		"IPv6 multipath via second nexthop with source address"
-+
-+	cleanup
-+}
-+
- ################################################################################
- # usage
- 
-@@ -3057,6 +3300,12 @@ do
- 	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
- 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
- 	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
-+	ipv4_mpath_oif)			ipv4_mpath_oif_test;;
-+	ipv4_mpath_oif_nh)		ipv4_mpath_oif_nh_test;;
-+	ipv4_mpath_oif_vrf)		ipv4_mpath_oif_vrf_test;;
-+	ipv6_mpath_oif)			ipv6_mpath_oif_test;;
-+	ipv6_mpath_oif_nh)		ipv6_mpath_oif_nh_test;;
-+	ipv6_mpath_oif_vrf)		ipv6_mpath_oif_vrf_test;;
- 	fib6_ra_to_static)		fib6_ra_to_static;;
- 	fib6_temp_addr_renewal)		fib6_temp_addr_renewal;;
- 
--- 
-2.54.0
-
+Thanks,
+Olek
 
