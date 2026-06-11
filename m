@@ -1,981 +1,292 @@
-Return-Path: <netdev+bounces-298060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298063-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id npDVMWeHKmo9rwMAu9opvQ
-	(envelope-from <netdev+bounces-298060-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:01:11 +0200
+	id tZCgK72HKmpcrwMAu9opvQ
+	(envelope-from <netdev+bounces-298063-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:02:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A52670A4E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:01:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6E5670A82
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 12:02:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298060-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298060-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=L9yhHHyB;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298063-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298063-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6A078300AC85
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:01:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E184303CC54
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875D33CA4AD;
-	Thu, 11 Jun 2026 10:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50173CA4AD;
+	Thu, 11 Jun 2026 10:02:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CE73CA493
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 10:01:04 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781172068; cv=none; b=QyMAAElaPHqcJ9GpIa9GdiQMB9fwtGFRg/++MAv+DdZbJNCLGWnNETgCowxDRvs55JMRqth+AVQUAtRISYuznzxzOzEQVIm43r+qItFRrVXfL8X/O2cSuQzGyFp2OucHf72BVLGvTXafTSIWqPC01FLT6MUF9MkclRmQLOnYRXc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781172068; c=relaxed/simple;
-	bh=iUCXHXblqzubuq5o31xTSqcMxMtMrvd3NvuIq6rfXrE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kAgJmQmCEIcA3OXRsdG6uIUcgWUxPrduNX2DGvNVdZllk+T9Re5JWQAV9twgt+nWgAVQWDi6xdhiXt+fqvE8b+a0GFzpz+3J8g9ZUfo3XkesvSzgYXHl2iL+5nEaNfR9hcmO4kERoy8fLcUoFAPfLIn0USYzB6zp0EW3MOR/JOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.16.166
-X-QQ-mid: esmtpgz14t1781172055tfd40f794
-X-QQ-Originating-IP: 9w/XWB7FgM0o8h5F7B1N4xd2JiMrSkGagaMPp82hovA=
-Received: from localhost.localdomain ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 11 Jun 2026 18:00:53 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8327279277224714227
-EX-QQ-RecipientCnt: 13
-From: Dong Yibo <dong100@mucse.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	danishanwar@ti.com,
-	vadim.fedorenko@linux.dev,
-	horms@kernel.org,
-	u.kleine-koenig@baylibre.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dong100@mucse.com,
-	yaojun@mucse.com
-Subject: [PATCH net-next v7 4/4] net: rnpgbe: Add link status handling support
-Date: Thu, 11 Jun 2026 18:00:36 +0800
-Message-Id: <20260611100036.36370-5-dong100@mucse.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260611100036.36370-1-dong100@mucse.com>
-References: <20260611100036.36370-1-dong100@mucse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042A33CB2DA;
+	Thu, 11 Jun 2026 10:02:04 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781172127; cv=fail; b=qiAQIKVZgmGp++tytQx723yqbtLTmAzeM1yOC4N1yipu4mF4YZhTo+GU1EzHEfrg7wsKiA2fy0AzTGPKnD/myjTfESBEan0C7YzwhdBjbrHp/rXw65f9sK2wAq7BTRCalrSxQvZWtpHt/vYdBFJQprnrdmiJmWJ1hkvLtr60a6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781172127; c=relaxed/simple;
+	bh=JJapscJ0Ylf8i+TSVjy4g8hJ4p3+eVNzbAFHOpU1dzI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gWQs3/IGQjZpSgPWmkaQgdNmHXf6EP2ZpVLfaVg/DRnQb/jiGHZ89PN4jQ0DUxNULESQZi/F1Phe8pJUq4rhWjcj5VMqJgQwvlg94ciGGXAcFaIumiNT7zEhjxhKPnaQq/ZRPbzVHP6sdk7m8y4hXAEY8fC9UnaKQfGwdf+/Ito=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L9yhHHyB; arc=fail smtp.client-ip=198.175.65.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781172126; x=1812708126;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JJapscJ0Ylf8i+TSVjy4g8hJ4p3+eVNzbAFHOpU1dzI=;
+  b=L9yhHHyB6gYYxEizt6lHozvDkE0QqWdHk35i7a8YzJ77FEFlLAFkGNqV
+   +woXv1JWT2CayWk4nJjtCzd+sti2i1Y7qZwIqRXp4CApjRoX0wO+gHQ4c
+   LqOQ29Xm6H6R6z54GfBMET9w9RmjAKZo26mP+roOtfgei3gFpqIFtubie
+   IfjhT4AKcQ3Eqfarc78g9xGPDr/PeSnBS26pd/oilB5qE2sXsHT7OK1P7
+   HoDCC3bW42eNnYOkJ7OHM2qj4bW67Lyl9saZxvMjwlPq+rw/adJku51RN
+   W81P9uCndr2mOcGPoWUmWMTvIdwR5bevS8/0ZNV/Rs2cnsVQT2Fu6PDZg
+   A==;
+X-CSE-ConnectionGUID: pf2SCfd/SGyBbI+k6oKMmg==
+X-CSE-MsgGUID: 4kLdCYBoQAqc1tNZyiEAHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="81986386"
+X-IronPort-AV: E=Sophos;i="6.24,198,1774335600"; 
+   d="scan'208";a="81986386"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 03:02:05 -0700
+X-CSE-ConnectionGUID: dE7udHqsQx224E/negNftg==
+X-CSE-MsgGUID: fkogibYwR8C6Z5kvBCnrzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,198,1774335600"; 
+   d="scan'208";a="246513796"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 03:02:04 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 11 Jun 2026 03:02:02 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 11 Jun 2026 03:02:02 -0700
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.8) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 11 Jun 2026 03:01:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cSnR8OMr7lND90cx3VELXumZxbk3nfPr3uS9Z22E1mdthWI3jbi6GUuQ2O2G3fA7LOG/JetdqyRopXWoFso0Mjq4eAfV0FltnL0x3lbY0qIzNmR+j7tj1UTDfFio2EhxkndJY9T5wDEgokmKtikDehGNyK7dXTSIECNkAEev5G1wR7j4I9YnK5WBo2/i10I6ws8eYcM0UxIZy5931RBrrWQP93AV0CXrOpHG9dPaItQ4IQ4sdKKYZPhn8f6NSg/Yi/bc2jAuiGTzgKgKLfKRy/ofT8ujHgT10OgO4HWq5qms7O1vBcykS7uPtNrfHZW36oIcfk9wwdbhQxyOohukGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JJapscJ0Ylf8i+TSVjy4g8hJ4p3+eVNzbAFHOpU1dzI=;
+ b=qbRYL8y11hfn5AGyzmW1tvsTBC5N7qzB2L7Q0IKrbCVOGCwcR3RRcJDDklEbvHnMW43mZUQAXS32T+NzNCaV7Q489XusPaCVE80nnn4hkgFyOBjH88HXI0sQeRYSvmJGUhNkWYgn8/BH/0JUayZnak5fCcSYTsp29aqCNi6Xdoo83qe28mldfy5zsbCnSVvbPxXBXOOpKxvbDnkjJ9RkV0hU839i4HrXjbj/HuAJb9A+WUXNUSfq2oIXakAs+UUj/mLUrdevPxtWiOErK4gSld/l2NZAJy2IfUZaaFush9Y7cabfoIpmZpkPVIu2I+7MTJt9coYribCY5l2nTmQxSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
+ by CY5PR11MB6137.namprd11.prod.outlook.com (2603:10b6:930:2b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Thu, 11 Jun
+ 2026 10:01:21 +0000
+Received: from IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31]) by IA1PR11MB6219.namprd11.prod.outlook.com
+ ([fe80::a2b9:8e8:c48b:ea31%5]) with mapi id 15.21.0092.011; Thu, 11 Jun 2026
+ 10:01:21 +0000
+From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Oros,
+ Petr" <poros@redhat.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Prathosh.Satish@microchip.com"
+	<Prathosh.Satish@microchip.com>, "Vecera, Ivan" <ivecera@redhat.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>
+Subject: RE: [PATCH v14 net-next 03/13] dpll: fix stale iteration in
+ dpll_pin_on_pin_unregister()
+Thread-Topic: [PATCH v14 net-next 03/13] dpll: fix stale iteration in
+ dpll_pin_on_pin_unregister()
+Thread-Index: AQHc9qxzOSWGh7NPvUubHfjHiXtPNrY5EVeAgAAM3xA=
+Date: Thu, 11 Jun 2026 10:01:21 +0000
+Message-ID: <IA1PR11MB6219E71E2581AE3A4C91F870921B2@IA1PR11MB6219.namprd11.prod.outlook.com>
+References: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
+ <20260607183045.1213735-4-grzegorz.nitka@intel.com>
+ <5ad977af-9bbb-4376-b0a6-2b1867223145@redhat.com>
+In-Reply-To: <5ad977af-9bbb-4376-b0a6-2b1867223145@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|CY5PR11MB6137:EE_
+x-ms-office365-filtering-correlation-id: ff7569f9-5378-4000-4bb2-08dec7a06380
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|23010399003|4143699003|6133799003|11063799006|56012099006|5023799004|22082099003|38070700021|18002099003;
+x-microsoft-antispam-message-info: hwonu4b6xaLEZqbXPQf4cimJdMRyX44heO3ju/gSUt+d68fwKBVvy7PDEmxzVpPgRzpYGGL7z3ivAplcnqq5pccv3G9CWitGYnm00x8QPRfFsTqEf84wD/THeRTk0JgMdZWuuRisT9MwqRjYcuvgXDFWgsUirUid7xYYi13jrepWOaLH7OgwJ4EOcGFUndIZN1P5cDdNCxS+2N2/n/3QfCh+PtJ+e+SrmXcXlTFr6nffQDjTjTvShqI5BBy2jxZMNgIgyyOcmpMDs19Q+24ItDHrQhQnmfsWXOBo8k0H9zhsebuLK/TTjaumLyFAlJHHOvO0uFbI4pL3Mo6sW1k668i8d8EaJGpExbza80Fn2r9T5CuNBdnU34d6w9PzlO7Dn/qXC1DxfpvXGYbv6vDqJkzZ2h6NgBgs2j1SKSp6hIO1H2jOKcRj/hr1k1l+p5ywLtFEMweGmBrRpD8bra3FXuBy6OzFE7xl9aU1csYC4p7khcaqbraFRcoyHSmwsbHOAanoHfnq7+uo0LX6dDU7XM+eHV1tsWw/ZYA7276pweI2qqfAm82yV+f/y1RBW9tdFtjZdsbOumxIDxgT1RGQUaj4TT+x4hPhzO+3MSKMqVTJIYDFWdYpYmL6wfHvCeXMdNBLegBgi8+UFmMRFwVpCNEBAmquka2HGriMWgT5bjm8UWlsO4SuR+y1W5pUMM8seP39dSpYr2pcMBcnAlPaCg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(23010399003)(4143699003)(6133799003)(11063799006)(56012099006)(5023799004)(22082099003)(38070700021)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Uk5iNy9EUFZ6c09nejBNQnhLVFlEUDBhOXlnVHFCWVhuZWFncXVvdHpaVWtr?=
+ =?utf-8?B?YXpTaVlUSHZuZThBeG5XZW5zZExaQmxaYldiall2eElkWEdNNmZPaVlxQWY3?=
+ =?utf-8?B?eDBXZU1venFhVncydEZxWXl0b2VTL0NGbC83STRnSXI3elkzU0VVV0FtTFFv?=
+ =?utf-8?B?TEwvTk8wckxDeEdHVXZqdUErdmp5aEhoSTJ2TmhaSTBnUjRiQkZZWTE2aFNl?=
+ =?utf-8?B?ZUswMFB2a2o3K0pKUW9CSU5MdUMxeXREMGo5bktETTByTGFETnFMUkYwMkVx?=
+ =?utf-8?B?TkcrRld0b1BvblA0RitONGlNT3FNbjZmZ0VobXk4Mmk1UnlrOVBDaWExeGl3?=
+ =?utf-8?B?T2RRaFppYXRXYlM4bVpZcDZNbVhkNFBqdGIrN1NFV3IrYnpaWWNTNTJnUXpH?=
+ =?utf-8?B?aDdjYXNxajBqMXJsbFNyVTFXZnVWTUF2QzZqaVM3YTNMM0t3bHl2cDhuU0pH?=
+ =?utf-8?B?R01SWGZ6WWdQQnVuWC8yQTZTd3JreG9Ga24wa1plMmtZS1FDdzU4eWFaY1JZ?=
+ =?utf-8?B?cW1oN0NveUpIaU11MUJhQXd3NlJSajV6SU1OaUpKcFZYVDQvdGNVSHBCKzRU?=
+ =?utf-8?B?TXU0Vk5FeW4xU3BmNEVBM1RkVGoxZ2EydFZwMGE0SC9xeGNNNWwzc1FoR05B?=
+ =?utf-8?B?RHZFc0NRSXFlVWM3U2djQVBMdkJKekhlOUNoVi92Q3FYUUNEQ1RvcWNSaFBM?=
+ =?utf-8?B?a1Y1Q3dxZkpFL1VvMW1YNmhQY3dZQk5tYlFIQ2QzakNTNVNNTlVMRURuTnRa?=
+ =?utf-8?B?M1k1bjZpQTRDcWdQR0p4dUVrWE83empGM2o3bXJuYUN6aWhYcVVjSk5iUlRZ?=
+ =?utf-8?B?TEIwZXpJb3lneGw0TnI5aFZjVXpiWUtUNVczK0lKckpUNDFpVDVsYURPTE1j?=
+ =?utf-8?B?UXR4NVNmV1BZazlaeTAvTUVldjNEY2FuSUlreTAzSEUyVW1sSUhZbjhlQjhY?=
+ =?utf-8?B?SzFzNWJseVphbUVWT3h5YS91MTVKOUEyMmdYKzFOcjlrZ1hSMFY0VUdCeGUy?=
+ =?utf-8?B?NzQrbTU2OEhDMFBUWjlJU3ZoemhqbVZLc3lla2poMDk4OVZsTVVhdjZZb1Rp?=
+ =?utf-8?B?bVJMS2RzM1F2RHd4L0FHNG5MRTBwYVIxSjFPeHVSNmhQeUsva3NBR2lJbElv?=
+ =?utf-8?B?aEpxUU5qVmxTWVpsR1B0NktYVXhXMkR0K1Q5V0VJdC9xd0owRzdEVjBTY3Qv?=
+ =?utf-8?B?ZnVCZHRZcStnZi9xU0daRSsraUE2VXlIckRJc1FHN2tXNERtbDI4ZWlTQnh4?=
+ =?utf-8?B?NjBTRmIyeG9LQWk3aHNNWTZFenhzaHhGWU0xdDJWNllmZVU2SlpzVnI5eDJK?=
+ =?utf-8?B?TE1OUzdCWDdOSHExa3BnSE1KZThVb1lqbmVueXRncmRILzluaDJzdWpkODVq?=
+ =?utf-8?B?QmxLWDE5YzFyVE9pRW40d3lnaVA2WkpjcnZLb3FhbXcrS1hxOStnb0MxZ3Jl?=
+ =?utf-8?B?VlVpZTFuNXFjeGNNUUswb3pobjdmeDh6c1BwcldvWVYvTm9vd2djQVZWRGRK?=
+ =?utf-8?B?VmtJeHk2djZpa1lsNldkN0FUUUJ0MjFDZi8zUkpyNDQxanh6bERpZGczb1Mw?=
+ =?utf-8?B?SXJtc2xCWTF1VCtjQ3ZKZTJlNlJRMkIrNFQyRW83UUpZRWFYMmNYdWlFM2lK?=
+ =?utf-8?B?UXAzdFhldjUwcWdFWEJsY1F2N1pra0tkTHg4bnNJK3MvMWZMdGZGSXdxSzNT?=
+ =?utf-8?B?M2h5UnExNVRCQWg2Z3J1SVRmRldLZ3M0TjRaa2RDcFdObFRlQ09ndGVjTjlp?=
+ =?utf-8?B?UkVOSDE2RVJrNFpVYnA1QXlkU2FVcVpaODdkaEhKdWdMZi80V0xpQlcwVERJ?=
+ =?utf-8?B?UndMMncrc1Q2SnpBL0lqSE0zcW91UmRURHNGeWs1NkdKRWJvemdpZWQwL2Nq?=
+ =?utf-8?B?OG9lak9Kd3VZVC9Vcjkrd3p1WU1VRjNlampzdllIK010MzhadUZPcnNkZWUr?=
+ =?utf-8?B?RGcxUHhabTd3MEUwNWM2eS9qTmw2SFJXV0NXaVdYVHFEWllaWk1mbEZpSkJR?=
+ =?utf-8?B?eUNxTjNOMnpiVEE1TW80dDB2WVhaVW1pRnZza1VPQXJGQWZXaXRQcEpqN1ht?=
+ =?utf-8?B?UjlFaWRIalMycXJmSzJGUjZEMy90WVVuVXg4YkZnakRieGI5VjRBbE4wVG41?=
+ =?utf-8?B?YjZmNmJMWlp4T3FRV1QrNmdGN0V2SExvSDdsZDFxTmJ6YWJqcHZqTmx0b2Fl?=
+ =?utf-8?B?dWQ1c1JYWjVuNGZ3bzNRWm9GQmJ6Y2ptV01TQllGSC9jSytxNEdkK2l3TjJ2?=
+ =?utf-8?B?SndoK3ZlVk9uVXpRTXRQRG9yaVQ2TWdieTZUVEgxTHJrRnJEREJyNjRkSUkw?=
+ =?utf-8?B?TzgwczJRTE5mN3dYTXc1TFQ0SGlrYVU3Wnc3bVZOUVVTL0dDZXlMQT09?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: MJaTj6odSZT1xE/hSLwfMXgFP9U9q0Owdw2fh2IrY46s4Mbe4rwsl2zl
-	nH7ojJYNQpOt550fK+4QLA6NF0uXAz2mpm0/Qb10mDMVqkGzDPPDzRmSDfL4Qm4RCRKZ1jv
-	DJXIJmK4OwtZVRfZjJh7TLuCDqaEdaJ7MYk1sMC4cmfUPFbUS0wetudy60/FQLnpqws/wZ0
-	epTzBDvPDEjlIVbzN6dRK3mjcsi9181TYOv+n3Vu7KpRAEZInO/hZJjTqvcI/RLJ31Y7YHC
-	1vQxsH/PwVAvX4uqDvAIij3XkLfJ1QjhMGJAS7Fvl8ZkM0+9hg9lU6f09PweblOigLNavdY
-	2e+g7Yt0wsf9dWmXe4NYPtbmWZaZUP5Ht9/nrrRbNwz7OWjEAivFEwO8n+IHFOxHhSnWKi+
-	aJ1fUq9eiza7Vp6hz8xL6FZH435V3Wk3TE4+//bV2wOdb8gy1+6CSnnpZs5VqY1VPbEcuw5
-	uMZrpexb00oqo5nPGKxxVAUHTPD52Clma8Ptavn6m/5v+Gm1QZy5mWohL1hXK0EaTmsH+uK
-	2hFAbdCBthJa6EVsCCivbT8Miivw1OaYq4AR/c9f6sS0GAzBji8WJqYQRoPOScTq6VnxFxk
-	J9y0NlqV+zFu9NBKB52yxBpPlceK+K786YIpTzVBWOQA1eMsvmKCEYU2ycWqY7WucwdpO3c
-	TqTmQhoV8PaxaUEcbWGJKZ4LRx2NmAEUaJxov4g0qybp/rwWB0GpoXGJp8LKevuI5HCk66T
-	MsbHZXIHyCW1bCtwLhi+Cy2iJP1DIytsJruQH575XhsruXXpPxa2SsPUUr/YyU9MKAlx2Ir
-	NjIMcDmzvdHtxKij2OGZszA78O7MZVCAnDND9Brw5V9Ar7IIc9AHjnkYYuuStU0EDRErVJC
-	P6JU9Ik9zBwz9bE9FXcQOwrOb655fkAvfByhsWL5PBdkiOy2lR1QQgk+EsldClW2HDopLap
-	ysh4w/tGClf6ynP+DqbWQ6ujiJ9VvdK7yxfqhletGbbBU+Cgt0u+ITE6pPCFQ3pjb/S9s30
-	moIXSRA/JLpWhDBE29xUERnQjCwvP4qqspv8zme+D/z7meMS38a3/n06Rt5GVefbFb5ZUWi
-	5G/qgswr7ZVUZGJwX2cE44O40ZhWV5PyYVG9q6iyRYRVCSZ8G0DHmw=
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
+X-Exchange-RoutingPolicyChecked: Uba5bEu3wXIz0HZIg5E+va1l2Fp2xy7il/S8T1TTZLgu++4yg8SSftIPs5gVvm6ouAJ6LNCGlx3qaihzZcSd50RWWpEdVpD+m3wr6Ro6/tiZyuFeNLh4LV5/x6rL/AzNX5MzYcSo7Pk0TI9HWI6rI3Q8v+VcCVkYphKRm5zVvHqVft3AcghbhnnEkgAwb42kiWSleD51p/DmAaihvs2GQuPH1tKro7vfzetw6gcKBmRzYEtsdfY7ZyGvDt1rwnurtz93T8NYJVy2PudyWF9gLnW7nVYb1Feb64CedCa06cRBuMJxddAcHRmQCL3WiXUD3TmSjMuCrxAigc+lm29nhw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff7569f9-5378-4000-4bb2-08dec7a06380
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2026 10:01:21.1178
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vBBNSlPocyYAM0Gx7EM7PMgVCNuWUSW4cUUTt22tttkOiHyINZSOsRYax4r1Xb3ju9DrUY7YISupa49OmbEmEybKGwOajGrsOebryg8EFJg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6137
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
+X-Spamd-Result: default: False [-0.56 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298060-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[mucse.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-298063-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_SENDER(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:vadim.fedorenko@linux.dev,m:horms@kernel.org,m:u.kleine-koenig@baylibre.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:dong100@mucse.com,m:yaojun@mucse.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[grzegorz.nitka@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mucse.com:email,mucse.com:mid,mucse.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 24A52670A4E
+X-Rspamd-Queue-Id: BF6E5670A82
 
-Add link status management infrastructure to the rnpgbe driver:
-- Add link status related data structures (speed, duplex, link state)
-- Implement firmware link event handling via mailboxa
-  (fw controls link states, don't support phylink)
-- Add service task for periodic link status monitoring
-- Implement carrier status management (netif_carrier_on/off)
-- Add port up/down notification to firmware
-
-This enables the driver to properly track and report link status changes.
-
-Signed-off-by: Dong Yibo <dong100@mucse.com>
----
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  22 +-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  37 ++-
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  13 ++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.c    | 174 +++++++++++++-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_lib.h    |   1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   |   5 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    |  24 ++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |   1 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 220 +++++++++++++++++-
- .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h |  38 +++
- 10 files changed, 521 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-index 5982fb975642..894d82371dbd 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -17,25 +17,34 @@ enum rnpgbe_boards {
- 	board_n210
- };
- 
-+struct mbx_req_cookie {
-+	int timeout;
-+	struct completion comp;
-+	spinlock_t lock; /* serializes cmd access (IRQ vs process context) */
-+	/* must match sizeof(struct mbx_fw_cmd_reply) */
-+	u8 cmd[56];
-+};
-+
- struct mucse_mbx_info {
- 	u32 timeout_us;
- 	u32 delay_us;
- 	u16 fw_req;
- 	u16 fw_ack;
-+	struct mbx_req_cookie cookie;
- 	/* lock for only one use mbx */
- 	struct mutex lock;
- 	/* fw <--> pf mbx */
-+	bool irq_en;
- 	u32 fwpf_shm_base;
- 	u32 pf2fw_mbx_ctrl;
- 	u32 fwpf_mbx_mask;
- 	u32 fwpf_ctrl_base;
- };
- 
--/* Enum for firmware notification modes,
-- * more modes (e.g., portup, link_report) will be added in future
-- **/
- enum {
- 	mucse_fw_powerup,
-+	mucse_fw_portup,
-+	mucse_fw_link_report_en,
- };
- 
- struct mucse_hw {
-@@ -44,8 +53,11 @@ struct mucse_hw {
- 	struct pci_dev *pdev;
- 	struct mucse_mbx_info mbx;
- 	int port;
-+	int speed;
-+	bool link;
- 	u16 cycles_per_us;
- 	u8 pfvfnum;
-+	u8 duplex;
- };
- 
- struct rnpgbe_tx_desc {
-@@ -210,6 +222,7 @@ struct mucse {
- #define M_FLAG_MSI_EN              BIT(0)
- #define M_FLAG_MSIX_SINGLE_EN      BIT(1)
- #define M_FLAG_MSIX_EN             BIT(2)
-+#define M_FLAG_NEED_LINK_UPDATE    BIT(3)
- 	u32 flags;
- 	struct mucse_ring *tx_ring[RNPGBE_MAX_QUEUES]
- 		____cacheline_aligned_in_smp;
-@@ -224,6 +237,8 @@ struct mucse {
- 	int num_rx_queues;
- 	char mbx_name[32];
- 	unsigned long state;
-+	struct delayed_work serv_task;
-+	spinlock_t link_lock; /* spinlock for link update */
- };
- 
- int rnpgbe_get_permanent_mac(struct mucse_hw *hw, u8 *perm_addr);
-@@ -232,6 +247,7 @@ int rnpgbe_send_notify(struct mucse_hw *hw,
- 		       bool enable,
- 		       int mode);
- int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
-+void rnpgbe_set_link(struct mucse_hw *hw, bool linkup);
- 
- /* Device IDs */
- #define PCI_VENDOR_ID_MUCSE               0x8848
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-index 291e77d573fe..98c7c1492f6a 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-@@ -66,11 +66,17 @@ int rnpgbe_send_notify(struct mucse_hw *hw,
- 		       int mode)
- {
- 	int err;
--	/* Keep switch struct to support more modes in the future */
-+
- 	switch (mode) {
- 	case mucse_fw_powerup:
- 		err = mucse_mbx_powerup(hw, enable);
- 		break;
-+	case mucse_fw_portup:
-+		err = mucse_mbx_phyup(hw, enable);
-+		break;
-+	case mucse_fw_link_report_en:
-+		err = mucse_mbx_link_report(hw, enable);
-+		break;
- 	default:
- 		err = -EINVAL;
- 	}
-@@ -149,3 +155,32 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type)
- 
- 	return 0;
- }
-+
-+/**
-+ * rnpgbe_set_link - Setup link state
-+ * @hw: hw information structure
-+ * @linkup: link on or not
-+ *
-+ * rnpgbe_set_link setup link status
-+ *
-+ **/
-+void rnpgbe_set_link(struct mucse_hw *hw, bool linkup)
-+{
-+	u32 value = mucse_hw_rd32(hw, GMAC_CONTROL);
-+
-+	if (linkup)
-+		value |= GMAC_CONTROL_RE;
-+	else
-+		value &= ~GMAC_CONTROL_RE;
-+
-+	mucse_hw_wr32(hw, GMAC_CONTROL, value);
-+
-+	/* RX_ALL always be set when link is up -- the GMAC requires it
-+	 * for passing all packet.  Promiscuous/unicast filtering is
-+	 * handled by other separate chip-level register.
-+	 */
-+	if (linkup)
-+		mucse_hw_wr32(hw, GMAC_FRAME_FILTER, GMAC_RX_ALL);
-+	else
-+		mucse_hw_wr32(hw, GMAC_FRAME_FILTER, 0);
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-index 03688586b447..4d1a9a386e9d 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-@@ -17,7 +17,20 @@
- 
- #define TX_AXI_RW_EN                   0xc
- #define RX_AXI_RW_EN                   0x03
-+/* mask all valid info */
-+#define M_ST_MASK                      0xff000f11
-+/* 31:28 set 0xa to valid it is a driver set info */
-+#define M_DEFAULT_ST                   0xa0000000
-+/* driver setup this by own info */
-+/*bit:   25:24   |  11:8   |     4   | 0       */
-+/*fun:   pause   |  speed  |  duplex | up/down */
-+#define RNPGBE_LINK_ST                 0x000c
- #define RNPGBE_DMA_AXI_EN              0x0010
- 
-+#define MUCSE_GMAC_OFF(_n)             (0x20000 + (_n))
-+#define GMAC_CONTROL_RE                0x00000004
-+#define GMAC_CONTROL                   MUCSE_GMAC_OFF(0)
-+#define GMAC_RX_ALL                    (BIT(31) | BIT(0))
-+#define GMAC_FRAME_FILTER              MUCSE_GMAC_OFF(0x4)
- #define RNPGBE_MAX_QUEUES 8
- #endif /* _RNPGBE_HW_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-index 79cbac7cd28d..8c68d9879b93 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c
-@@ -645,11 +645,16 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
- 			clean_complete = false;
- 	}
- 
-+	if (test_bit(__MUCSE_DOWN, &q_vector->mucse->state))
-+		clean_complete = true;
-+
- 	if (!clean_complete)
- 		return budget;
- 
--	if (likely(napi_complete_done(napi, work_done)))
--		rnpgbe_irq_enable_queues(q_vector);
-+	if (likely(napi_complete_done(napi, work_done))) {
-+		if (!test_bit(__MUCSE_DOWN, &q_vector->mucse->state))
-+			rnpgbe_irq_enable_queues(q_vector);
-+	}
- 
- 	return work_done;
- }
-@@ -667,6 +672,7 @@ static int rnpgbe_poll(struct napi_struct *napi, int budget)
- int rnpgbe_request_mbx_irq(struct mucse *mucse)
- {
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 	int err = 0;
- 
- 	snprintf(mucse->mbx_name, sizeof(mucse->mbx_name),
-@@ -682,6 +688,9 @@ int rnpgbe_request_mbx_irq(struct mucse *mucse)
- 				  mucse);
- 	}
- 
-+	if (!err)
-+		hw->mbx.irq_en = true;
-+
- 	return err;
- }
- 
-@@ -692,8 +701,10 @@ int rnpgbe_request_mbx_irq(struct mucse *mucse)
- void rnpgbe_free_mbx_irq(struct mucse *mucse)
- {
- 	struct pci_dev *pdev = mucse->pdev;
-+	struct mucse_hw *hw = &mucse->hw;
- 
- 	free_irq(pci_irq_vector(pdev, 0), mucse);
-+	hw->mbx.irq_en = false;
- }
- 
- /**
-@@ -1299,8 +1310,35 @@ static void rnpgbe_clean_all_rx_rings(struct mucse *mucse)
- void rnpgbe_down(struct mucse *mucse)
- {
- 	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+	int err;
- 
- 	set_bit(__MUCSE_DOWN, &mucse->state);
-+	cancel_delayed_work_sync(&mucse->serv_task);
-+
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+	hw->link = false;
-+	hw->speed = 0;
-+	hw->duplex = 0;
-+	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+	rnpgbe_set_link(hw, false);
-+
-+	err = rnpgbe_send_notify(hw, false, mucse_fw_link_report_en);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send link report to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Fw will still report link event\n");
-+	}
-+
-+	err = rnpgbe_send_notify(hw, false, mucse_fw_portup);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send port down to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Port is not truly down\n");
-+	}
-+	netif_carrier_off(netdev);
- 	netif_tx_stop_all_queues(netdev);
- 	netif_tx_disable(netdev);
- 	rnpgbe_napi_disable_all(mucse);
-@@ -1316,6 +1354,9 @@ void rnpgbe_down(struct mucse *mucse)
- void rnpgbe_up_complete(struct mucse *mucse)
- {
- 	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+	int err;
- 
- 	if (mucse->flags & (M_FLAG_MSIX_EN | M_FLAG_MSIX_SINGLE_EN))
- 		rnpgbe_configure_msix(mucse);
-@@ -1328,6 +1369,31 @@ void rnpgbe_up_complete(struct mucse *mucse)
- 	netif_tx_start_all_queues(netdev);
- 	for (int i = 0; i < mucse->num_rx_queues; i++)
- 		mucse_ring_wr32(mucse->rx_ring[i], RNPGBE_RX_START, 1);
-+
-+	err = rnpgbe_send_notify(hw, true, mucse_fw_portup);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send portup to hw failed %d\n", err);
-+		dev_warn(&hw->pdev->dev, "Port is not truly up\n");
-+	}
-+
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+	hw->link = false;
-+	hw->speed = 0;
-+	hw->duplex = 0;
-+	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	/* echo driver down to hw */
-+	mucse_hw_wr32(hw, RNPGBE_LINK_ST, M_DEFAULT_ST);
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+
-+	err = rnpgbe_send_notify(hw, true, mucse_fw_link_report_en);
-+	if (err) {
-+		dev_warn(&hw->pdev->dev, "Send link report to hw failed %d\n",
-+			 err);
-+		dev_warn(&hw->pdev->dev, "Fw will not report link event\n");
-+	}
-+
-+	queue_delayed_work(system_wq, &mucse->serv_task,
-+			   msecs_to_jiffies(500));
- }
- 
- /**
-@@ -1984,3 +2050,107 @@ void rnpgbe_configure_rx(struct mucse *mucse)
- 	dma_axi_ctl |= RX_AXI_RW_EN;
- 	mucse_hw_wr32(hw, RNPGBE_DMA_AXI_EN, dma_axi_ctl);
- }
-+
-+/**
-+ * rnpgbe_process_link_event - Update the link status
-+ * @mucse: pointer to the device private structure
-+ *
-+ * @return: link status
-+ **/
-+static int rnpgbe_process_link_event(struct mucse *mucse)
-+{
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+	bool link;
-+
-+	/* lockless fast-path ,serv_task retry handles race */
-+	if (!(mucse->flags & M_FLAG_NEED_LINK_UPDATE))
-+		return hw->link;
-+
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+
-+	link = hw->link;
-+
-+	mucse->flags &= ~M_FLAG_NEED_LINK_UPDATE;
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+
-+	return link;
-+}
-+
-+/**
-+ * rnpgbe_link_is_up - Update netif_carrier status and
-+ * print link up message
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_link_is_up(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+	unsigned long flags;
-+
-+	/* Only continue if link was previously down */
-+	if (netif_carrier_ok(netdev))
-+		return;
-+	spin_lock_irqsave(&mucse->link_lock, flags);
-+	netdev_info(netdev, "NIC Link is Up %d Mbps, %s Duplex\n",
-+		    hw->speed, hw->duplex ? "Full" : "Half");
-+	spin_unlock_irqrestore(&mucse->link_lock, flags);
-+	rnpgbe_set_link(hw, true);
-+	netif_carrier_on(netdev);
-+}
-+
-+/**
-+ * rnpgbe_link_is_down - Update netif_carrier status and
-+ * print link down message
-+ * @mucse: pointer to the private structure
-+ **/
-+static void rnpgbe_link_is_down(struct mucse *mucse)
-+{
-+	struct net_device *netdev = mucse->netdev;
-+	struct mucse_hw *hw = &mucse->hw;
-+
-+	/* Only continue if link was up previously */
-+	if (!netif_carrier_ok(netdev))
-+		return;
-+	netdev_info(netdev, "NIC Link is Down\n");
-+	rnpgbe_set_link(hw, false);
-+	netif_carrier_off(netdev);
-+}
-+
-+/**
-+ * rnpgbe_process_link_subtask - Check and bring link up
-+ * @mucse: pointer to the device private structure
-+ **/
-+static void rnpgbe_process_link_subtask(struct mucse *mucse)
-+{
-+	/* if interface is down do nothing */
-+	if (test_bit(__MUCSE_DOWN, &mucse->state))
-+		return;
-+
-+	if (rnpgbe_process_link_event(mucse))
-+		rnpgbe_link_is_up(mucse);
-+	else
-+		rnpgbe_link_is_down(mucse);
-+}
-+
-+/**
-+ * rnpgbe_service_task - Manages and runs subtasks
-+ * @work: pointer to work_struct containing our data
-+ **/
-+void rnpgbe_service_task(struct work_struct *work)
-+{
-+	struct mucse *mucse = container_of(work, struct mucse, serv_task.work);
-+
-+	if (test_bit(__MUCSE_DOWN, &mucse->state))
-+		return;
-+
-+	rnpgbe_process_link_subtask(mucse);
-+
-+	/* Periodic requeue is intentional: future patches will add
-+	 * statistics polling and other housekeeping tasks beyond
-+	 * link state handling.
-+	 */
-+	if (!test_bit(__MUCSE_DOWN, &mucse->state))
-+		queue_delayed_work(system_wq, &mucse->serv_task,
-+				   msecs_to_jiffies(500));
-+}
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-index 29fa6cd56e21..9511f4c96457 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.h
-@@ -83,4 +83,5 @@ void rnpgbe_get_stats64(struct net_device *netdev,
- void rnpgbe_clean_rx_ring(struct mucse_ring *rx_ring);
- int rnpgbe_setup_all_rx_resources(struct mucse *mucse);
- void rnpgbe_free_all_rx_resources(struct mucse *mucse);
-+void rnpgbe_service_task(struct work_struct *work);
- #endif
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-index cfb2328bfb75..5d7cb51fcb0b 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-@@ -52,6 +52,7 @@ static int rnpgbe_open(struct net_device *netdev)
- 	struct mucse *mucse = netdev_priv(netdev);
- 	int err;
- 
-+	netif_carrier_off(netdev);
- 	err = rnpgbe_request_irq(mucse);
- 	if (err)
- 		return err;
-@@ -181,6 +182,7 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
- 		dev_err(&pdev->dev, "Init hw err %d\n", err);
- 		goto err_free_net;
- 	}
-+
- 	/* Step 1: Send power-up notification to firmware (no response expected)
- 	 * This informs firmware to initialize hardware power state, but
- 	 * firmware only acknowledges receipt without returning data. Must be
-@@ -223,6 +225,9 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
- 		goto err_powerdown;
- 	}
- 
-+	INIT_DELAYED_WORK(&mucse->serv_task, rnpgbe_service_task);
-+	spin_lock_init(&mucse->link_lock);
-+
- 	err = rnpgbe_init_interrupt_scheme(mucse);
- 	if (err) {
- 		dev_err(&pdev->dev, "init interrupt failed %d\n", err);
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-index de5e29230b3c..74919c668b99 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
-@@ -247,6 +247,26 @@ int mucse_poll_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
- 	return mucse_read_mbx_pf(hw, msg, size);
- }
- 
-+/**
-+ * mucse_check_and_read_mbx - check if there is notification and receive message
-+ * @hw: pointer to the HW structure
-+ * @msg: the message buffer
-+ * @size: length of buffer
-+ *
-+ * Return: 0 if it successfully received a message notification and
-+ * copied it into the receive buffer, negative errno on failure
-+ **/
-+int mucse_check_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
-+{
-+	int err;
-+
-+	err = mucse_check_for_msg_pf(hw);
-+	if (err)
-+		return err;
-+
-+	return mucse_read_mbx_pf(hw, msg, size);
-+}
-+
- /**
-  * mucse_mbx_get_fwack - Read fw ack from reg
-  * @mbx: pointer to the MBX structure
-@@ -402,5 +422,9 @@ void mucse_init_mbx_params_pf(struct mucse_hw *hw)
- 	mbx->delay_us = 100;
- 	mbx->timeout_us = 4 * USEC_PER_SEC;
- 	mutex_init(&mbx->lock);
-+	init_completion(&mbx->cookie.comp);
-+	spin_lock_init(&mbx->cookie.lock);
-+	mbx->cookie.timeout = 5 * HZ;
-+	mbx->irq_en = false;
- 	mucse_mbx_reset(hw);
- }
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-index e6fcc8d1d3ca..cba54a07a7fa 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
-@@ -17,4 +17,5 @@
- int mucse_write_and_wait_ack_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
- void mucse_init_mbx_params_pf(struct mucse_hw *hw);
- int mucse_poll_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
-+int mucse_check_and_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size);
- #endif /* _RNPGBE_MBX_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-index 05684d716792..e46dbf7d8d80 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/if_ether.h>
- #include <linux/bitfield.h>
-+#include <linux/ethtool.h>
- 
- #include "rnpgbe.h"
- #include "rnpgbe_mbx.h"
-@@ -23,23 +24,47 @@ static int mucse_fw_send_cmd_wait_resp(struct mucse_hw *hw,
- 				       struct mbx_fw_cmd_req *req,
- 				       struct mbx_fw_cmd_reply *reply)
- {
-+	struct mbx_req_cookie *cookie = &hw->mbx.cookie;
- 	int len = le16_to_cpu(req->datalen);
- 	int retry_cnt = 3;
- 	int err;
- 
-+	BUILD_BUG_ON(sizeof(struct mbx_fw_cmd_reply) != 56);
-+
- 	mutex_lock(&hw->mbx.lock);
-+
-+	if (hw->mbx.irq_en)
-+		reinit_completion(&cookie->comp);
-+
- 	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)req, len);
- 	if (err)
- 		goto out;
-+
- 	do {
--		err = mucse_poll_and_read_mbx(hw, (u32 *)reply,
--					      sizeof(*reply));
--		if (err)
--			goto out;
--		/* mucse_write_and_wait_ack_mbx return 0 means fw has
--		 * received request, wait for the expect opcode
--		 * reply with 'retry_cnt' times.
--		 */
-+		if (hw->mbx.irq_en) {
-+			unsigned long flags;
-+
-+			err = wait_for_completion_timeout(&cookie->comp,
-+							  cookie->timeout);
-+			if (!err) {
-+				err = -ETIMEDOUT;
-+				goto out;
-+			}
-+
-+			spin_lock_irqsave(&cookie->lock, flags);
-+			memcpy((u8 *)reply, cookie->cmd, sizeof(*reply));
-+			spin_unlock_irqrestore(&cookie->lock, flags);
-+			err = 0;
-+		} else {
-+			err = mucse_poll_and_read_mbx(hw, (u32 *)reply,
-+						      sizeof(*reply));
-+			if (err)
-+				goto out;
-+			/* mucse_write_and_wait_ack_mbx return 0 means fw has
-+			 * received request, wait for the expect opcode
-+			 * reply with 'retry_cnt' times.
-+			 */
-+		}
- 	} while (--retry_cnt >= 0 && reply->opcode != req->opcode);
- out:
- 	mutex_unlock(&hw->mbx.lock);
-@@ -190,10 +215,189 @@ int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
- 	return 0;
- }
- 
-+/**
-+ * mucse_mbx_phyup - Echo fw let the phy up
-+ * @hw: pointer to the HW structure
-+ * @is_phyup: true for up, false for down
-+ *
-+ * mucse_mbx_phyup echo fw to change phy status
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int mucse_mbx_phyup(struct mucse_hw *hw, bool is_phyup)
-+{
-+	struct mbx_fw_cmd_req req = {
-+		.datalen = cpu_to_le16(sizeof(req.phy_status) +
-+				       MUCSE_MBX_REQ_HDR_LEN),
-+		.opcode  = cpu_to_le16(SET_PHY_UP),
-+		.phy_status = {
-+			.port_mask = cpu_to_le32(BIT(hw->port)),
-+			.status  = cpu_to_le32(is_phyup ? 1 : 0),
-+		},
-+	};
-+	int len, err;
-+
-+	len = le16_to_cpu(req.datalen);
-+	mutex_lock(&hw->mbx.lock);
-+	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)&req, len);
-+	mutex_unlock(&hw->mbx.lock);
-+
-+	return err;
-+}
-+
-+/**
-+ * mucse_mbx_link_report - Echo fw report link change event or not
-+ * @hw: pointer to the HW structure
-+ * @is_report: true for report, false for no
-+ *
-+ * mucse_mbx_link_eventup echo fw to change event report state
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int mucse_mbx_link_report(struct mucse_hw *hw, bool is_report)
-+{
-+	struct mbx_fw_cmd_req req = {
-+		.datalen = cpu_to_le16(sizeof(req.report_status) +
-+				       MUCSE_MBX_REQ_HDR_LEN),
-+		.opcode  = cpu_to_le16(LINK_REPORT_EN),
-+		.report_status = {
-+			.port_mask = cpu_to_le16(BIT(hw->port)),
-+			.status  = cpu_to_le16(is_report ? 1 : 0),
-+		},
-+	};
-+	int len, err;
-+
-+	len = le16_to_cpu(req.datalen);
-+	mutex_lock(&hw->mbx.lock);
-+	err = mucse_write_and_wait_ack_mbx(hw, (u32 *)&req, len);
-+	mutex_unlock(&hw->mbx.lock);
-+
-+	return err;
-+}
-+
-+/**
-+ * mucse_update_link_status_reg - update driver speed inf to reg
-+ * @hw: pointer to the HW structure
-+ * @req: pointer to req data
-+ *
-+ * mucse_update_link_status_reg update reg according to driver info,
-+ * fw will send irq if status is differ with reg
-+ *
-+ **/
-+static void mucse_update_link_status_reg(struct mucse_hw *hw,
-+					 struct mbx_fw_cmd_req *req)
-+{
-+	u16 status = le16_to_cpu(req->link_stat.st.status);
-+	u32 value;
-+
-+	value = mucse_hw_rd32(hw, RNPGBE_LINK_ST);
-+	value &= ~M_ST_MASK;
-+	value |= M_DEFAULT_ST;
-+
-+	if (le16_to_cpu(req->link_stat.port_status)) {
-+		value |= BIT(0);
-+		switch (hw->speed) {
-+		case 10:
-+			value |= (mucse_speed_10 << 8);
-+			break;
-+		case 100:
-+			value |= (mucse_speed_100 << 8);
-+			break;
-+		case 1000:
-+			value |= (mucse_speed_1000 << 8);
-+			break;
-+		default:
-+			/* invalid speed do nothing */
-+			break;
-+		}
-+
-+		value |= FIELD_PREP(BIT(4), !!hw->duplex);
-+		value |= FIELD_PREP(GENMASK_U32(25, 24),
-+				    status & GENMASK(1, 0));
-+	} else {
-+		value &= ~BIT(0);
-+	}
-+
-+	if (status & ST_STATUS_LLDP_STATUS_MASK)
-+		value |= BIT(6);
-+	else
-+		value &= ~BIT(6);
-+
-+	mucse_hw_wr32(hw, RNPGBE_LINK_ST, value);
-+}
-+
-+/**
-+ * mucse_mbx_fw_req_handler - Handle fw req
-+ * @hw: pointer to the HW structure
-+ * @req: pointer to req data
-+ *
-+ * rnpgbe_mbx_fw_req_handler handler fw req, such as a link event req.
-+ *
-+ * @return: 0 on success, negative on failure
-+ **/
-+static void mucse_mbx_fw_req_handler(struct mucse_hw *hw,
-+				     struct mbx_fw_cmd_req *req)
-+{
-+	struct mucse *mucse = container_of(hw, struct mucse, hw);
-+	u32 magic = le32_to_cpu(req->link_stat.port_magic);
-+	unsigned long flags;
-+
-+	if (le16_to_cpu(req->opcode) == LINK_CHANGE_EVT) {
-+		spin_lock_irqsave(&mucse->link_lock, flags);
-+
-+		if (le16_to_cpu(req->link_stat.port_status))
-+			hw->link = true;
-+		else
-+			hw->link = false;
-+
-+		if (magic == ST_VALID_MAGIC) {
-+			hw->speed = le16_to_cpu(req->link_stat.st.speed);
-+			hw->duplex = req->link_stat.st.flags & DUPLEX_BIT;
-+			/* update regs to notify link info is received */
-+			mucse_update_link_status_reg(hw, req);
-+		} else {
-+			hw->speed = 0;
-+			hw->duplex = 0;
-+			mucse_hw_wr32(hw, RNPGBE_LINK_ST, M_DEFAULT_ST);
-+		}
-+		mucse->flags |= M_FLAG_NEED_LINK_UPDATE;
-+		spin_unlock_irqrestore(&mucse->link_lock, flags);
-+	}
-+}
-+
-+static void mucse_mbx_fw_reply_handler(struct mucse_hw *hw,
-+				       struct mbx_fw_cmd_reply *reply)
-+{
-+	struct mbx_req_cookie *cookie = &hw->mbx.cookie;
-+
-+	BUILD_BUG_ON(sizeof(struct mbx_fw_cmd_reply) != 56);
-+
-+	spin_lock(&cookie->lock);
-+	/* avoid splice fields from two different replies */
-+	if (completion_done(&cookie->comp)) {
-+		spin_unlock(&cookie->lock);
-+		return;
-+	}
-+
-+	memcpy(cookie->cmd, (u8 *)reply, sizeof(*reply));
-+	spin_unlock(&cookie->lock);
-+	complete(&cookie->comp);
-+}
-+
- /**
-  * mucse_fw_irq_handler - Try to handle a req from hw
-  * @hw: pointer to the HW structure
-  **/
- void mucse_fw_irq_handler(struct mucse_hw *hw)
- {
-+	struct mbx_fw_cmd_reply reply = {};
-+
-+	/* try to check and read fw req */
-+	if (mucse_check_and_read_mbx(hw, (u32 *)&reply, sizeof(reply)))
-+		return;
-+
-+	if (le16_to_cpu(reply.flags) & FLAGS_REPLY)
-+		mucse_mbx_fw_reply_handler(hw, &reply);
-+	else
-+		mucse_mbx_fw_req_handler(hw, (struct mbx_fw_cmd_req *)&reply);
- }
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-index aa26c729588c..044d8dfd2c2b 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
-@@ -14,6 +14,9 @@ enum MUCSE_FW_CMD {
- 	GET_HW_INFO     = 0x0601,
- 	GET_MAC_ADDRESS = 0x0602,
- 	RESET_HW        = 0x0603,
-+	LINK_CHANGE_EVT = 0x0608,
-+	LINK_REPORT_EN  = 0x0613,
-+	SET_PHY_UP      = 0x0800,
- 	POWER_UP        = 0x0803,
- };
- 
-@@ -36,6 +39,16 @@ struct mucse_hw_info {
- 	__le32 ext_info;
- } __packed;
- 
-+#define ST_STATUS_LLDP_STATUS_MASK        BIT(12)
-+
-+#define DUPLEX_BIT                        BIT(0)
-+struct st_status {
-+	u8 phyid;
-+	u8 flags;
-+	__le16 speed;
-+	__le16 status;
-+} __packed;
-+
- struct mbx_fw_cmd_req {
- 	__le16 flags;
- 	__le16 opcode;
-@@ -55,10 +68,27 @@ struct mbx_fw_cmd_req {
- 			__le32 port_mask;
- 			__le32 pfvf_num;
- 		} get_mac_addr;
-+		struct {
-+			__le32 port_mask;
-+			__le32 status;
-+		} phy_status;
-+		struct {
-+			__le16 status;
-+			__le16 port_mask;
-+		} report_status;
-+		struct {
-+			__le16 changed_lanes;
-+			__le16 port_status;
-+			__le32 port_magic;
-+#define ST_VALID_MAGIC 0xa4a6a8a9
-+			struct st_status st;
-+		} link_stat;
- 	};
- } __packed;
- 
- struct mbx_fw_cmd_reply {
-+#define FLAGS_REPLY       BIT(0)
-+#define FLAGS_ERR         BIT(2)
- 	__le16 flags;
- 	__le16 opcode;
- 	__le16 error_code;
-@@ -80,10 +110,18 @@ struct mbx_fw_cmd_reply {
- 	};
- } __packed;
- 
-+enum mucse_speed {
-+	mucse_speed_10,
-+	mucse_speed_100,
-+	mucse_speed_1000,
-+};
-+
- int mucse_mbx_sync_fw(struct mucse_hw *hw);
- int mucse_mbx_powerup(struct mucse_hw *hw, bool is_powerup);
- int mucse_mbx_reset_hw(struct mucse_hw *hw);
- int mucse_mbx_get_macaddr(struct mucse_hw *hw, int pfvfnum,
- 			  u8 *mac_addr, int port);
-+int mucse_mbx_phyup(struct mucse_hw *hw, bool is_phyup);
-+int mucse_mbx_link_report(struct mucse_hw *hw, bool is_report);
- void mucse_fw_irq_handler(struct mucse_hw *hw);
- #endif /* _RNPGBE_MBX_FW_H */
--- 
-2.25.1
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQWJlbmkgPHBh
+YmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUaHVyc2RheSwgSnVuZSAxMSwgMjAyNiAxMDo1MCBB
+TQ0KPiBUbzogTml0a2EsIEdyemVnb3J6IDxncnplZ29yei5uaXRrYUBpbnRlbC5jb20+OyBuZXRk
+ZXZAdmdlci5rZXJuZWwub3JnDQo+IENjOiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBp
+bnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZzsgT3JvcywgUGV0cg0KPiA8cG9yb3NAcmVk
+aGF0LmNvbT47IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsNCj4gYW5kcmV3K25ldGRldkBsdW5u
+LmNoOyBLaXRzemVsLCBQcnplbXlzbGF3DQo+IDxwcnplbXlzbGF3LmtpdHN6ZWxAaW50ZWwuY29t
+PjsgTmd1eWVuLCBBbnRob255IEwNCj4gPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgUHJh
+dGhvc2guU2F0aXNoQG1pY3JvY2hpcC5jb207IFZlY2VyYSwNCj4gSXZhbiA8aXZlY2VyYUByZWRo
+YXQuY29tPjsgamlyaUByZXNudWxsaS51czsgS3ViYWxld3NraSwgQXJrYWRpdXN6DQo+IDxhcmth
+ZGl1c3oua3ViYWxld3NraUBpbnRlbC5jb20+OyB2YWRpbS5mZWRvcmVua29AbGludXguZGV2Ow0K
+PiBkb25hbGQuaHVudGVyQGdtYWlsLmNvbTsgaG9ybXNAa2VybmVsLm9yZzsga3ViYUBrZXJuZWwu
+b3JnOw0KPiBkYXZlbUBkYXZlbWxvZnQubmV0OyBlZHVtYXpldEBnb29nbGUuY29tDQo+IFN1Ympl
+Y3Q6IFJlOiBbUEFUQ0ggdjE0IG5ldC1uZXh0IDAzLzEzXSBkcGxsOiBmaXggc3RhbGUgaXRlcmF0
+aW9uIGluDQo+IGRwbGxfcGluX29uX3Bpbl91bnJlZ2lzdGVyKCkNCj4gDQo+IE9uIDYvNy8yNiA4
+OjMwIFBNLCBHcnplZ29yeiBOaXRrYSB3cm90ZToNCj4gPiBOZWl0aGVyIHBhcmVudC0+ZHBsbF9y
+ZWZzIG5vciBwaW4tPmRwbGxfcmVmcyBvbiBpdHMgb3duIGlzIGEgY29ycmVjdA0KPiA+IGl0ZXJh
+dGlvbiB0YXJnZXQgYXQgdW5yZWdpc3RlciB0aW1lOg0KPiA+DQo+ID4gICAtIHBpbi0+ZHBsbF9y
+ZWZzIGluY2x1ZGVzIERQTExzIHRoZSBjaGlsZCB3YXMgcmVnaXN0ZXJlZCBhZ2FpbnN0DQo+ID4g
+ICAgIHZpYSBhIGRpZmZlcmVudCBwYXJlbnQgb3IgZGlyZWN0bHk7IGJsaW5kIHVucmVnaXN0ZXIg
+V0FSTnMgb24NCj4gPiAgICAgdGhlIGNvb2tpZSBtaXNzIGluIGRwbGxfeGFfcmVmX3Bpbl9kZWwo
+KS4NCj4gPiAgIC0gcGFyZW50LT5kcGxsX3JlZnMgcmVmbGVjdHMgdGhlIHBhcmVudCdzIGN1cnJl
+bnQgYXR0YWNobWVudHMsIG5vdA0KPiA+ICAgICB0aG9zZSBhdCBjaGlsZC1yZWdpc3RlciB0aW1l
+LiBBbm90aGVyIGRyaXZlciBtYXkgaGF2ZSAodW4pcmVnJ2QNCj4gPiAgICAgdGhlIHBhcmVudCBh
+Z2FpbnN0IGFkZGl0aW9uYWwgRFBMTHMgaW4gdGhlIG1lYW50aW1lLCBzbyB3ZSBtaXNzDQo+ID4g
+ICAgIHJlZ2lzdHJhdGlvbnMgdGhhdCBleGlzdCBhbmQgdmlzaXQgRFBMTHMgdGhhdCBoYXZlIG5v
+bmUuDQo+ID4NCj4gPiBXYWxrIHBpbi0+ZHBsbF9yZWZzIGFuZCB1c2UgZHBsbF9waW5fcmVnaXN0
+cmF0aW9uX2ZpbmQoKSB0byBmaWx0ZXINCj4gPiB0byBlbnRyaWVzIHdob3NlIGNvb2tpZSBpcyB0
+aGlzIHBhcmVudC4gU3ltbWV0cmljIHdpdGgNCj4gPiBkcGxsX3Bpbl9vbl9waW5fcmVnaXN0ZXIo
+KSwgY29ycmVjdCB1bmRlciBhbnkgc3Vic2VxdWVudCBjaGFuZ2UgdG8NCj4gPiBwYXJlbnQtPmRw
+bGxfcmVmcy4NCj4gPg0KPiA+IEZpeGVzOiA5NDMxMDYzYWQzMjMgKCJkcGxsOiBjb3JlOiBBZGQg
+RFBMTCBmcmFtZXdvcmsgYmFzZSBmdW5jdGlvbnMiKQ0KPiA+IFNpZ25lZC1vZmYtYnk6IEdyemVn
+b3J6IE5pdGthIDxncnplZ29yei5uaXRrYUBpbnRlbC5jb20+DQo+IA0KPiBUaGUgY3VycmVudCBn
+dWlkYW5jZSBpcyB0byBhdm9pZCB0aGUgRml4ZXMgdGFnIGZvciBuZXQtbmV4dCBwYXRjaGVzLA0K
+PiB3aGVuIHN1Y2ggdGFnIHJlZmVycyB0byBjb2RlIGFscmVhZHkgaW50byBMaW51cydzIHRyZWUu
+DQo+IA0KPiBJZiBpdCdzIGEgcmVhbCB1c2VyLXZpc2libGUgaXNzdWUsIHRoZSBwYXRjaCBzaG91
+bGQgdGFyZ2V0IG5ldC4NCj4gT3RoZXJ3aXNlIGlmIHRoZSBpbnRlbmRlZCB0YXJnZXQgaXMgcmVh
+bGx5IG5ldC1uZXh0LCBubyBmaXhlcyB0YWcgcGxlYXNlLg0KPiANCj4gVW5yZWxhdGVkIGltcG9y
+dGFudCBub2RlOiBzYXNoaWtvIChnZW1pbmkpIHN0aWxsIGhhcyBzb21lIGNvbW1lbnRzLCBzb21l
+DQo+IG9mIHRoZW0gbG9va3MgbmV3IGFuZCByZWxldmFudCB0byBtZSBpLmUuIHRoZSBwb3NzaWJs
+ZSBkaXZpZGUgYnkgemVybw0KPiBidWcgaW4gcGF0Y2ggMTEsIHNlZToNCj4gDQo+IGh0dHBzOi8v
+c2FzaGlrby5kZXYvIy9wYXRjaHNldC8yMDI2MDYwNzE4MzA0NS4xMjEzNzM1LTEtDQo+IGdyemVn
+b3J6Lm5pdGthJTQwaW50ZWwuY29tDQo+IA0KPiAvUA0KDQpIaSBQYW9sbw0KDQpUaGFua3MgZm9y
+IHlvdXIgZmVlZGJhY2suDQpSZWdhcmRpbmcgcGF0Y2hlcyB3aXRoICdGaXhlcycgdGFnIC4uLg0K
+QWN0dWFsbHkgcGF0Y2hlcyBmcm9tIDMgdG8gNyBpbiB0aGlzIHNlcmllcyBhcmUgaW5kZWVkIGZp
+eCBwYXRjaGVzIGZvciB0aGUgZXhpc3RpbmcgY29kZS4NCkl0IHdhcyByZXBvcnRlZCBieSBTYXNo
+aWtvIGVhcmxpZXIgZm9yIHRoaXMgc2VyaWVzIGFzIHByZS1leGlzdGluZyBpc3N1ZXMuDQpLdWJh
+IHN1Z2dlc3RlZCwgYXQgbGVhc3QgdGhpcyBpcyBob3cgSSB1bmRlcnN0b29kIGl0LCB0byBpbmNs
+dWRlIGl0IGluIHRoZSBzZXJpZXMgdG8gc2VlDQphIGNsZWFuIEFJIHNjYW4uIA0KU28gcGxlYXNl
+IGFkdmlzZSBvbiB0aGUgbmV4dCBzdGVwcyAuLi4NClNob3VsZCBJIHNpbXBseSByZW1vdmUgJ0Zp
+eGVzJyB0YWcgZnJvbSB0aGUgY29tbWl0cyBhbmQga2VlcCB0aG9zZSBwYXRjaGVzIGluIHRoZSBz
+ZXJpZXM/DQpPciAuLi4gIHRvIHJlbW92ZSB0aGVtIGZyb20gdGhlIHNlcmllcyBhbmQgcmUtc2Vu
+ZCBhcyByZWd1bGFyIGZpeCBwYXRjaGVzIG9uICduZXQnPw0KDQpSZWdhcmRpbmcgdGhlIGxhdGVz
+dCBTYWhpa28gY29tbWVudHMgLi4gdGhpcyBzcGVjaWZpYyBvbmUgYWJvdXQgZGl2aWRlLWJ5LXpl
+cm8gcGFuaWMNCmlzIGZhbHNlLXBvc2l0aXZlLiBJdCB3YXMgZml4ZWQgd2l0aCB0aGUgbGF0ZXN0
+IHJldmlzaW9uLg0KSSdsbCByZXNwb25kIGluIGEgc2VwYXJhdGUgbWVzc2FnZSB3aXRoIG15IHZp
+ZXcgb24gdGhlIG90aGVyIGhpZ2ggb25lcy4NCg0KUmVnYXJkcw0KDQpHcnplZ29yeg0K
 
