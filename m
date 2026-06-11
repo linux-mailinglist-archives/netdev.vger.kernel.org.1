@@ -1,237 +1,242 @@
-Return-Path: <netdev+bounces-297947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id KFQhIRpOKmrlmgMAu9opvQ
-	(envelope-from <netdev+bounces-297947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:56:42 +0200
+	id GX5ANnFPKmrKmwMAu9opvQ
+	(envelope-from <netdev+bounces-297948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:02:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA0AA66ED60
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 07:56:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C678666EDE4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:02:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="FJ0b9/Rs";
-	dkim=pass header.d=redhat.com header.s=google header.b="TH/8dh9T";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297947-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-297947-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=I4418Jbq;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297948-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-297948-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 91508301A28A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 05:56:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 94A463001A5E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 06:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F469344DA8;
-	Thu, 11 Jun 2026 05:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594232DB7B9;
+	Thu, 11 Jun 2026 06:02:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011042.outbound.protection.outlook.com [40.107.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31292305E28
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 05:56:34 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781157397; cv=none; b=qE+ACbkdCgnpATRsMkTbnuc2O2M0OwS1GECuyntc054MwvVIAuTA7XT1dDBJXP/23lxkxqdk3GGIa9Tnu6Ulkol4hHaQEemulm27bEfVQUoPaP4WVsA4RIWyZGhhzJ9ggORgMGnUI0BjLLVatJqJpPrLcLmAbkaF/PWGaN/u9Wk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781157397; c=relaxed/simple;
-	bh=8RgB4L/mtyXUigOfElNRhYNFAjXq4m+NZ5s58y2e468=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L8mA2EKPirPOp+2jXL3lMXK3UY011Se2WRaShNJsbOvVPkhISGuTUSZvPoVo5cjoRQtG+dzAkSHY2+wxTUC+wseeWmzQru/U+JVe+R0fsxV2gy5BN58a9954lbnG7ZqhV7qC43T5IiJ0/w89Gckyk9723U3ClYCulFUOttMPK84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FJ0b9/Rs; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TH/8dh9T; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781157393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2NVtvAee8olyH9I5i9y9HtNMlvI+nO9nnsWLj7hlmuk=;
-	b=FJ0b9/Rsm6IZ54JvweCSjDeZuESR0up/Z9WsQqqeRFBBwgPtRvYI2Bpol4RBKrhEcgkpuG
-	m8AHqHwLbY6FTOitrcPO3ChlCN+4jWmIntVqXKeaMABheWWTiDqDJO0rQLEg/iAPXH3pH6
-	IH7eFvBcspsWl29j9nXdjN9hl9/Tzg4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-3Y55nBq8MkWBg9-tPCbIEg-1; Thu, 11 Jun 2026 01:56:32 -0400
-X-MC-Unique: 3Y55nBq8MkWBg9-tPCbIEg-1
-X-Mimecast-MFC-AGG-ID: 3Y55nBq8MkWBg9-tPCbIEg_1781157391
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-46010bc0f1eso4455667f8f.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 22:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781157391; x=1781762191; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2NVtvAee8olyH9I5i9y9HtNMlvI+nO9nnsWLj7hlmuk=;
-        b=TH/8dh9TC2JoXleK+EI8iv4YMFyhBrHbjMRXgfUJCJpEwFQSvtCAj8xc6GkYHCBOdH
-         mizdIZXHX2Y5wKoZUzIVmxfNKTk5qJ3sXksPfPMfGrvEu2w7JEnmVz5fAPgr9NgG7lW6
-         Mendqi7THUuayUfGhgzXFmGOnrFCN2FmmZpvKfAjKI8AOngJYQ8lBTvQ302rITejFOdx
-         rbLFHIxkechN1M96mXtbLwqfxANj0vQnDhtGI4Ew+A2cyzLMqp9rAlJ2VArzlytE3i0A
-         RnZSQLQSIilwLZCXVy6ADCNKla3LM096K0KLJgeiFQcubroXShk9aqTFc2t07tqvUR+f
-         TWgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781157391; x=1781762191;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2NVtvAee8olyH9I5i9y9HtNMlvI+nO9nnsWLj7hlmuk=;
-        b=Qs3f0i+TumQYqiNJaeeVyk3uS1Raqi5zIm46GV4jCAYDzcmpdiItlx5A/FfgBfCDM/
-         JHbnCmzX0X4DtkZNrF+yNFJV7u4NRUCyVlesSaixf20gUlzQL+44AzDNf5RO1a3HiSog
-         gyM2Y0lfs50EmG99kvF5ypd9rpW5r+CLiCaN0EHi8EyPu1ZUs0oigwEs0fphglWG8bOh
-         eQSuNOq5ACZ0bSLwOnkYuy9RXRBrplffdJq1AJSAMHHbFXnVOVClMkbLyOX1yoN8Dkia
-         pPk+JfHHr34dMTdJh1nnnRgjBb+CmfjUibn+7mfGPt9ivooUJ2cd2VIosbYJYyr2/lTH
-         vWmA==
-X-Forwarded-Encrypted: i=1; AFNElJ9Ddh2mLAs6kJ2U5gNpnwI2qipcRcpWy2Lh+kTEBe+X1LdY+MI1av9AaxyegmVFSwKWEYwnNt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgWX8cERc+eSSl9HMaJmO64a+eDdV9nCHedgcGZP2ZhNA18Js5
-	V53ChO6XN5zRckvglleI/k81H+qIxJlC92tjvzHbODBm/7VX8U54bAbpGb5kTr6AujHKHiSYWQv
-	EM7JZ2SvtamKRu85/qLPvRdaB7p8iRUZhdgRoEfmoEtB1fEVr+Ejs4VWLYA==
-X-Gm-Gg: Acq92OG+PUMJRos1saVOELWyfTvcq0vGDFhKHMLF8hESOfz9C+To7ikWLwXojJHyoIf
-	pAjq6P/uxYPJxq84JF5rjSfH7/rfDlYdG/h6xGmEYJTtzjRYCa04Um5Dyc771wjLLYXg8Wfgi6v
-	SSJ8JAijyyJN1QIBaF7tpGLmL1f9RUWp1UXImXJcZ0+sIUpB9VtkkYabKU3gB219RBooI/Nv6hR
-	/hXuukH1ng0N/k7YaxZv+WgeAjYJT1eGlN4ST/sITkZE9mfFzl428c6eHJ0vt1Gx+bkV6PCzOuv
-	Ei4+i02AuZz5xEF++Y1Gfq6fgYnoforPs4kPt+1ImYjQaQdiKLLk+XP972Lkt7NzMyDJCNUJQ0o
-	u1ySs+tE4CVJaE2UEWfDzAhvcZC5FpdXwrCgnnrRdSm76uf9QQ3rRQQ==
-X-Received: by 2002:a05:6000:490c:b0:45e:f52b:f4b7 with SMTP id ffacd0b85a97d-46067593598mr1505315f8f.17.1781157390704;
-        Wed, 10 Jun 2026 22:56:30 -0700 (PDT)
-X-Received: by 2002:a05:6000:490c:b0:45e:f52b:f4b7 with SMTP id ffacd0b85a97d-46067593598mr1505285f8f.17.1781157390190;
-        Wed, 10 Jun 2026 22:56:30 -0700 (PDT)
-Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3446aesm85429628f8f.24.2026.06.10.22.56.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 22:56:29 -0700 (PDT)
-Date: Thu, 11 Jun 2026 01:56:26 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	minhquangbui99@gmail.com, bestswngs@gmail.com
-Subject: Re: [PATCH net v3] virtio-net: fix len check in receive_big()
-Message-ID: <20260611014519-mutt-send-email-mst@kernel.org>
-References: <20260611024616.1408317-1-xmei5@asu.edu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008EA35893;
+	Thu, 11 Jun 2026 06:02:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781157739; cv=fail; b=SbcMICFdf6Q3qIFvScXvVKpi8tiUu9+qONkOeOVVVFp5L1fcYa1SMPyHa9Kn63P5aP9yxhotcmLuFrBb8xkihOFsm7WPw4L7BpRZOCI0qqGz2wcEZojVxSJ4yW7NH3JZ8h1z7kruE1gzxbv745sVdgkByvbW3cfSwJskzsr0ufg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781157739; c=relaxed/simple;
+	bh=AGaMfx6qymL4aYRm7Y6DAZzkjgnOo+T85oPoEcFCFQw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=IT3gAx6WdGGqkqxvYDIdB36ZfKN5/U4Tg9VubVj6kJdI8daD0zH+sZmm9HA8LqA1WdadIyVIjwWME8l6sORFS1xo7K5ZxThyOx7bMFM5PJZq/MF8N6JInDHQoUi5jhNy/KqVhLqgiosHE83hXlVAQSHv4/bTN451yZCrBBjXz8Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=I4418Jbq; arc=fail smtp.client-ip=40.107.208.42
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JBbUpJ6q0Em/vCl0kscqzzPoqT9d/zXf7OK/77gx03gT1pcWLKecJlAmm4rAC4nlGhaZHD0eqglsxOc9lMNsWdRms/lw4A6nB34o5CYcDkIv4QqPdoJwWp8N1+T8cTlfR8wfEe0U6vHMlv4wNW/9irsC897IdbKBWCn61j0ZsoIbB38GguFnKQrT+SfyQoG2ED93ttSRoS7egTEITLY4UaLlBATIM7klUE/aCFtJgEVQpMVtPIcn1SLCt1qUNTByyG+KFAXEPtJq6Yr3S3UloovYGEjERV36cxcWkppviNPVYQp7ON94YLhpebhhoHlnTfWpjgUM/ey3vG2mbKB6+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e11iZ0panKsnFkGIcpX3mcy5MycWQCrZuYFBqnfOio8=;
+ b=UmTxrusdBp3A+KErdB+8UAwaorzI0to30NctbuahHVSo0MHYpKuTZfp0+SJrtLnsw9bG4y7DJO77fQuA2/GTSu9hZbDstPBaTJmXMrx+vSqzCXJ/YPJG18nIBbwANdjESg7OU2082SXSYoXEdBqQjvqb/CtYqcbB0VnAdmBq3K0CuroooMMMDxj+UpJRXZO1XM39bcLfHckaN57AeN5CWq5ECMYmj+sM6IJGkiYSqPPtUcspYcT9FHy0+aZTdidTy1bOUnyGFdWWukDG+Rs1bSoSOLlkYKcSSW35lUpKIoT4MkNUP4b+1+GPZoP4h7WlZ2trDSGzqrnzStFdA0ElTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e11iZ0panKsnFkGIcpX3mcy5MycWQCrZuYFBqnfOio8=;
+ b=I4418JbqefIMb8Qz63l/AMTb8+FURcEKQ87rfCd0yevc7J+C0SqHcABXFMqBrtmHfqBGu8C83zfX3vGulNJaI7O+OkdLLKbMx+vGuQKXnmoiKzGH9r3FkkjtAaSM8zE4jfA+No0HYibKFpAdLDl7tEqYNhnKsEAt14zq+A12RFsbyjuwBDkMkparhT9S7TKl2ruUwM7mLlo2xgTxiB3vjA2Mp7psNmKMTYoSL6ezUq0rgln46PqzkNnHLqpJpVigh1Pc04RHfYGGLF+WouKahEJ+piy8Tjz5CwWiWDfINKHt98j8EynEOG4Ugi9W9JcPotjjXSAhWQX13yVdc3+M5w==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by PH8PR12MB7026.namprd12.prod.outlook.com (2603:10b6:510:1bd::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.13; Thu, 11 Jun
+ 2026 06:02:13 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de%6]) with mapi id 15.21.0092.014; Thu, 11 Jun 2026
+ 06:02:13 +0000
+Message-ID: <eb525345-da07-414c-9d05-7e00e3eb472f@nvidia.com>
+Date: Thu, 11 Jun 2026 09:02:03 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V3 2/7] netdevsim: Register devlink after device
+ init
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Sunil Goutham <sgoutham@marvell.com>,
+ Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Ethan Nelson-Moore <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20260605181030.3486619-1-mbloch@nvidia.com>
+ <20260605181030.3486619-3-mbloch@nvidia.com>
+ <20260610165053.7c91f331@kernel.org>
+Content-Language: en-US
+From: Mark Bloch <mbloch@nvidia.com>
+In-Reply-To: <20260610165053.7c91f331@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0099.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a9::17) To CH3PR12MB7548.namprd12.prod.outlook.com
+ (2603:10b6:610:144::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260611024616.1408317-1-xmei5@asu.edu>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|PH8PR12MB7026:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f5f4b18-b485-4ec3-2633-08dec77efb41
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|366016|7416014|376014|1800799024|6133799003|5023799004|4143699003|56012099006|18002099003|11063799006|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	lVSDK/bCpLS3XB1H55aK20A2Z0xqWJtAzbXlmm6nOw8Fdvl3r4B3u7tc2jMuUxLhQlpKvcvRD+rdoRu0qkMk4z3eoN8WR2pprzVOBD5uYprCk9b2le9vmM0J8R20vvHEtF3gxwxTSB1AW1FNSXkx76vrJG8WDRXCliv2zRbXzv6KPW+jhJ0PnEY2O0MvcnTwM/v0/aDxuDp+p7f0GKuoNS+5cbTCUcYwvlExVUOiwYwk4RxLhd5pIwNnEBDPXhXbNKpGc03RYW1eMLM2O60yJvLZvv7KDoQYUFbicw4O3fce505DEfdx60MNgai9rm5qM3m/gHtaUaqKATUe5blrLii/Lq88cwTfLESxqmZei7qANzSlG8HDaYtet8jFWjBizUY6phe/YgID9Zi5RyB+hsOS9KZrruCvoj0zOvbBSEl9o0HrNv+MOLrBZAVoP1u1XvaY/b22L2/MS96TmtUBeLEk154+swgnN0oWYDDL6uedj6vDe5U7gepJ5QPAIgFlH6iVp6u92nCvQE3YIFc4ssxH/wULmaIz1wM3JAeHXnErJj6P6lNayohv/0P1MjePjOn3YJdFaYdj4VH8aySU6GsiqMDlWDAVFlDs+MmbBmwJQEU0PJXpZCksRjqV+fDWHhOCp0xxFfWveAy4vjHQTURfMcO2OA5GJvXHfEVmkEp/WMZgNuunTkudXxSZjfGO
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(7416014)(376014)(1800799024)(6133799003)(5023799004)(4143699003)(56012099006)(18002099003)(11063799006)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WGR0TnJSVTAxRkVWVnNVU3NZUFJvOUVuOU1jQmVoUnkzMktJRDdjQ0dNSDdm?=
+ =?utf-8?B?b0ZQMlBOWFMxRHBBNitFUVZyWHJKWnZqL2xsRTExY3cwZUk0RzF6S01EQXRu?=
+ =?utf-8?B?Ulg5UEtENnFpWlZyUExZYzk3c1BhYXFYb1h5R1FkNElVYkZVOFdIWTgvY2o3?=
+ =?utf-8?B?TGtxVFVlUnN3OHV0dHVONXJ0b2hLWWgvM2FuLzlqR1lhbzVWTW5wdjZmSjBy?=
+ =?utf-8?B?ZGFqYkFxRHdaT1g1ZmJTU01EN2ViOEpLRkVFbDNscS8rVndKR0V3MjIwdXFl?=
+ =?utf-8?B?K1VzZnlzV1ZQRVFQajZSVEJUV3dBQnZPUkxGSk5vQm9qdVRjWW1jQXhuczV6?=
+ =?utf-8?B?aGhzdmtteUUxWktQUU9vQ0xEaEY5NlFYUWNZNUsxaHlKMi8yMXVrS0I2UUZM?=
+ =?utf-8?B?U3NwK2NTV0dNbm5YS2EvTjhuMWVZbHltbXZVZkhQUTVIQlVtQ3RmbmlQMGYy?=
+ =?utf-8?B?WWtuV0c3c3l5UVF4UU85czExRk5CQnhERVpaY3VKaFl5c3RDVXNIc1kzQTM3?=
+ =?utf-8?B?VjZ2TkkyMXZ2SmpHWGxITXRkcFA5ejZ1ZklFUFJoSVhUN3RjSzZ2V2EyUlly?=
+ =?utf-8?B?RzVzdmk0eVZvUSsrZE5zTjAyWlhvSkFOVVd1clpkRWxBc2d2c0RYdTRQVVMx?=
+ =?utf-8?B?WFI1RzRhMFJ4a3RxOGs2SVE0bURJWWg0MTd2cXFMV2gySlcrRmV5eFZoSldu?=
+ =?utf-8?B?QzQ4QXdZQTh6N1pCQzBrcXRRMjNITUVUODYzSmRmSzZ6cGJRZERYMjFIcWVi?=
+ =?utf-8?B?dWtZa0d5cDRuSUtLRUJmTG9kRzZlekw1TjVvaFd3UFppVVdqRjN3emV5ajNG?=
+ =?utf-8?B?V3ZyakxjQ0l6aEVFdEQwNHBkbUNEY3FUelpuNXp4blNqUWxVY3VvMS9BVEN6?=
+ =?utf-8?B?UEZtNi9XTWVabi85OWJZSElmaTl0dVJReW9RQk1PS0FzWGZmb09Mb0VJbC9y?=
+ =?utf-8?B?SHAvcWZWcHBKT2U2c3dUUDZUTEY3c1VXS0k3dVlSRERZQkpPNmx2aytCMVpG?=
+ =?utf-8?B?YzgrVG5VMzRTVWJycHFJcXFJRzVOZnZmNG5WNldTMkVBbTkwYVZvd0E4NHV2?=
+ =?utf-8?B?YU5pRllqS2twSTErUDFJQ3dYOUVuRW1OWVVuSzVxSWxlUjFkcE13bGdlVUVB?=
+ =?utf-8?B?a2ZSYlh4WlEzWkk3eUdSdU1XdnAxaVRUV1VvYmtJeDMzcFAzM0xXaEthb3hC?=
+ =?utf-8?B?TDdHNTdmNTJTMkJKT0cxZ3JLY0Q3bHdrQ2RrblZwWHJMVHNpWEFWNFlWeWlS?=
+ =?utf-8?B?eS9LQ0R5L1UyeVlONTZPamZzdWxHd1lZUjNwMXQ4akZWcFpaTndOaSsrcHg0?=
+ =?utf-8?B?ZDlpUGpDdDBmYUpyN1ZMU3FXSEw1Yy9naVcwSTNObWhUZER3S0Z0cVpSNE9S?=
+ =?utf-8?B?b0drMEFTVEtZVG52SVNwZ0xHWmw4VHZmZ1lJQ0lNelVuR2pZNmduOThRRmVh?=
+ =?utf-8?B?UjZQNUVvb1FZV1YvRGhwRU1LOGw3bElYUXhlK2JvRUJTek4yZms2NWdDMklH?=
+ =?utf-8?B?SFVTNnFrZjNvaFBxcTl0azZxZTZtZWI5bVNhN2FWb05MYm9ROEpROFJPZTJ0?=
+ =?utf-8?B?MDRUei9QYmZLeUJCR2wvUXlOOUdXMTk1MTVvNXhpYnNKbFFsQnM3d2RvNVRv?=
+ =?utf-8?B?eGdKUjdVRWovd3NMd0tscUxtNDlDOEMwUDB6bzR0ZUpKVFIrUm5iRThYbGtB?=
+ =?utf-8?B?Z2VIbDlaTmFUVnhvN0I1WmNWa0lSSnZxSk1zU2p5TUZreEtkNDFmMDI1d2JU?=
+ =?utf-8?B?c01Hak1nQTB3TGJYZW1pdTRUVm9VTitwV2ZwbWNPRUYxc2l1UW1jUnc1S0pD?=
+ =?utf-8?B?WmxDY09PK1VJS2c5cEo0MGlQNmJyQ0lwRVpTNjAyMlp0R3dTS0xiODdLYnZD?=
+ =?utf-8?B?U1FFak15VElST3hlVWNUdzl4OFFqL09vYnVHdmxmTlQ0UlE2eG45RmIyaDhj?=
+ =?utf-8?B?VXlEblZCWkxkeXlGNUtyOUJwZkY5OHp5Q0hZVmtNTGFKUk1YVXFWWERBWWdP?=
+ =?utf-8?B?THRGc2M0aHlNaXhhUWt1Sk9SWTNncXdRVjhKbjhGVmtWYlE2SXd1VVJmY0J6?=
+ =?utf-8?B?RWZqRCtvazZrbWxNZ2RkVUNFR2xNbm9FYWYxVWV2R1BVN29xT0krWkMwNkJs?=
+ =?utf-8?B?bEc1RDdRSVF6ZDluUnRrNVlsSTFtOXVHNWZvMXk0VFYzeGllOWM5QW1IWHJM?=
+ =?utf-8?B?RVNTM2JQYmNDQjIzZ0doWUx4OE9xTUo2WmVYWGZtR0FWYzltSm1TWll5em5u?=
+ =?utf-8?B?ZFp3ZnBFbHJQVDBlVHdEWGFYYnRiajVPWGhqQXJPT0ptZk9Ra3hUckFIY0s4?=
+ =?utf-8?B?ZFRFZzJRZ2t2dnpKSm1iVjJsQmtPQmFlQ1hrK1VjVWNpMnJpWENNdz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f5f4b18-b485-4ec3-2633-08dec77efb41
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2026 06:02:12.9755
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BsHITia8B78tQWo5mT54NS+yvgprIuGhNTIGWC7SKDLSMUXs0tAWsvF2XlpxQoo6SCxtl3JMWl+BIpvTwLcycg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7026
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-5.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-297947-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,kernel.org,vger.kernel.org,lists.linux.dev,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-297948-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:jiri@resnulli.us,m:horms@kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:bbhushan2@marvell.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:enelsonmoore@gmail.com,m:linux-doc@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_SENDER(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,lunn.ch,davemloft.net,lwn.net,linuxfoundation.org,resnulli.us,kernel.org,marvell.com,nvidia.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mbloch@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,alibaba.com:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,Nvidia.com:dkim,nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EA0AA66ED60
+X-Rspamd-Queue-Id: C678666EDE4
 
-On Wed, Jun 10, 2026 at 07:46:16PM -0700, Xiang Mei wrote:
-> receive_big() bounds the device-announced length by
-> (big_packets_num_skbfrags + 1) * PAGE_SIZE.  That is still too loose:
-> add_recvbuf_big() sets sg[1] to start at offset
-> sizeof(struct padded_vnet_hdr) into the first page, so the chain
-> actually carries hdr_len + (PAGE_SIZE - sizeof(padded_vnet_hdr)) +
-> big_packets_num_skbfrags * PAGE_SIZE bytes -- 20 bytes less than the
-> check allows for the common hdr_len == 12 case.
+
+
+On 11/06/2026 2:50, Jakub Kicinski wrote:
+> On Fri, 5 Jun 2026 21:10:25 +0300 Mark Bloch wrote:
+>> devl_register() makes the devlink instance visible to userspace. A later
+>> patch also makes registration the point where devlink core may call
+>> eswitch_mode_set() to apply a boot-time default eswitch mode.
+>>
+>> Move netdevsim registration after all objects (resources, params, regions,
+>> traps, debugfs etc) are initialized, and after the initial eswitch mode is
+>> set to legacy.
+>>
+>> Move devl_unregister() to the beginning of nsim_drv_remove(), before those
+>> devlink objects are torn down. This keeps devlink register/unregister as
+>> the notification barrier and makes the later object teardown paths run
+>> after devlink is no longer registered, so they do not emit their own
+>> netlink DEL notifications.
 > 
-> A malicious virtio backend can announce a len in that gap.  page_to_skb()
-> then walks one frag past the page chain, storing a NULL page->private
-> into skb_shinfo()->frags[MAX_SKB_FRAGS], which is both an out-of-bounds
-> write past the static frag array and a NULL frag handed up the rx path.
-> 
-> Bound len by the size add_recvbuf_big() actually advertised.
-> 
-> Fixes: 0c716703965f ("virtio-net: fix received length check in big packets")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> This is going backwards. At some point someone from nVidia thought that
+> we can order our way out of locking, so mlx5 is likely ordered this way,
+> but this must not be required, or in any way normalized.
+> We (syzbot) quickly discovered that it doesn't cover all corner cases.
+> devl_lock() is exposed specifically to allow the driver to finish
+> whatever init it needs without letting user space invoke callbacks, yet.
+> Almost (?) all driver callbacks hold devl_lock(), so maybe the devlink
+> instance is "visible" to user space but that should not matter.
 
-Thanks for the patch! Something small to improve:
+Let me clarify.
 
-> ---
-> v3: revoke 2/2 and add Xuan Zhuo's Reviewed-by tag
-> 
->  drivers/net/virtio_net.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index f4adcfee7a80..afe73eda1491 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1999,15 +1999,17 @@ static struct sk_buff *receive_big(struct net_device *dev,
->  				   struct virtnet_rq_stats *stats)
->  {
->  	struct page *page = buf;
-> +	unsigned long max_len;
+No locking is changed here, and I don't want to make register/unregister
+ordering a substitute for devl_lock().
 
-Assignment can happen here?
+The only requirement I have for this series is that devl_register() is called
+only once the driver is ready for devlink core to call eswitch_mode_set().
+That follows from the earlier direction to have the core apply the default
+mode from devl_register() instead of adding an explicit driver call.
 
->  	struct sk_buff *skb;
->  
->  	/* Make sure that len does not exceed the size allocated in
->  	 * add_recvbuf_big.
->  	 */
-> -	if (unlikely(len > (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE)) {
-> +	max_len = vi->hdr_len + (PAGE_SIZE - sizeof(struct padded_vnet_hdr)) +
-> +		  vi->big_packets_num_skbfrags * PAGE_SIZE;
+So if the objection is to the commit message wording, I can fix that and drop
+the "notification barrier" language.
 
-Took me a while to figure out what is going on, but I finally
-understand:
+For unregister, I can probably leave the old ordering as-is. I moved it only
+to mirror the register path, which felt cleaner, but it is not required for
+the default-mode change and as the lock is held I see no issue with doing
+that.
 
-
-Reducing
-(vi->big_packets_num_skbfrags + 1) * PAGE_SIZE 
-
-(what we allocated)
-
-by sizeof(struct padded_vnet_hdr) - vi->hdr_len
-
-
-right?
-
-So clearer as:
-
-
-	unsigned long max_len = (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE -
-	sizeof(struct padded_vnet_hdr) + vi->hdr_len;
-
-
-
-
-> +	if (unlikely(len > max_len)) {
->  		pr_debug("%s: rx error: len %u exceeds allocated size %lu\n",
-> -			 dev->name, len,
-> -			 (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE);
-> +			 dev->name, len, max_len);
->  		goto err;
->  	}
->  
-> -- 
-> 2.43.0
+Mark
 
 
