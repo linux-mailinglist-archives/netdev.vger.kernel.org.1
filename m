@@ -1,225 +1,279 @@
-Return-Path: <netdev+bounces-297896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XY5/B1wcKmrCiwMAu9opvQ
-	(envelope-from <netdev+bounces-297896-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:24:28 +0200
+	id O8jbHmQeKmr1iwMAu9opvQ
+	(envelope-from <netdev+bounces-297897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:33:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FEED66DD13
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:24:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BD966DD58
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 04:33:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=lxJmUiMF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297896-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297896-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=yeah.net header.s=s110527 header.b=f73FPpF6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297897-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297897-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=yeah.net;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A348B301947C
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 02:24:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B559430C8D13
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 02:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EF4304BCB;
-	Thu, 11 Jun 2026 02:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D2522A4EE;
+	Thu, 11 Jun 2026 02:32:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [1.95.21.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3766C2FD681
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 02:24:17 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781144659; cv=pass; b=QAGfkktzkoStCN3+Kt8Y4ywO0RFsTv3qNWQkOQHUuI+LHKF8gmxOJpGXQ+9bQJXIULXZTpPTh/oxgWTewOcQqxaMuoApnh8Uh2Xu3nVyM7FRWn7xtu+bzFxNgs7So2mWX5TkjTxO7hYTuOfsTznme9Chte/XBJWXv3l0pjcisFo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781144659; c=relaxed/simple;
-	bh=HFuA9XjGPSoO0vDqba9U3w0/WoqIFHP7dSHWuV0v9bo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XIK/nrlJ/7ESiUjnNwRHbRIhXVnhwqj4PcdP54O8tQv1F2LdlGrWVAmQVM3mjZkO6FRBTDypLuQ6YEZ8XMoHA7a25oaPAi+Qf4rswnYMCrqBgQgxlRQvASun2P8necgnJWYvD+4DV8NmIX6xmGD2WytRo1yKkvcpQ9Syr3kEdxY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=lxJmUiMF; arc=pass smtp.client-ip=209.85.215.175
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c85c531d4a9so3014104a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Jun 2026 19:24:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781144656; cv=none;
-        d=google.com; s=arc-20240605;
-        b=a+DAye7hBZUEsZNY6kchD0qNfqgsfyngoGPL8sG6nQjAtom0Tz7KHxU8Rm2JWbpLsN
-         a83QJctA4e6ruXC9iqFHCd38CO6hIE6heQlsQyVNFmSNHUXF51rM7s7VcOVx/WtU3RRp
-         hPANjrUqGtIvZQ/zKWb/uYnWfxHsYwS3jiJl0jsoH3geZJiEl3JffWciUmqTUIb9Nx4y
-         xBvkLL+Rwp6TGgGKluP3hW8tSZVg7RWz1ZUTwIBgut2CJBpdbOKZrE+fsZNqfyM6syQP
-         dRZ0m5zZDmzPmd6VCG/jiDZ0mcSMkvbGlMcqguF9olTSuSIM0Dn1VaUI4MYVhcHI7jHa
-         udZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NdBrEBlpAfFK5nSacNcDPGDMq8EZhUqxapMEX5SFjbw=;
-        fh=U3/xbcMxzIpcODjaL5JrXjqFGdZbPFlOMCNsXSHMZQY=;
-        b=QTC1Cf+5/4wIRId0QYpIpXtYdYhRh1ba4M2kQ5hUtyDhq62mvFjO1fAFAXB0ltVvDT
-         S+H7vgVOxQyKJ280zCn6T27PnBCasvUdfCN+1k+Z5aukuOoQMKtFheo54CraSA9IG8m6
-         V9WBX7aJ0lfgY5sutFLMq53neiTghvH+RpAVpKKyb0eiugEsF1v+qnEDO5KLShmagqrr
-         1fAwdS9SEE3zSxauaNd+WEkwn68dbGbTWupppQK4B8BFKk+n3ZOJkm8RCu2mU/mIS8/N
-         it0vKTwCWlxUPjJbxXFs/9I1AAVJGH34px7aUy1y+rRv+fdB4g6+WtbpAmQ3EbEPuZ5m
-         T+vQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1781144656; x=1781749456; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NdBrEBlpAfFK5nSacNcDPGDMq8EZhUqxapMEX5SFjbw=;
-        b=lxJmUiMFNKXtL641PBTjCIIdvELHhZu9bpHbp5WWuLA5kgcoKx63WXbBeL42tv2+RV
-         18aDRdLXuSYC2xK6MGtwTVzgfwwgflxuh0d9Kn2VkORdWYpvuEk+JQcd+1JbxgcywIvd
-         MydiUeQ/lTQ9tVIPcZSOG6143zAWeQ/MIuTXQ6yKGCfvqubQ0rZgy0CSw+CY0mnQ4MNI
-         f3cESCqWb9oER9e5Et92V5IH5np33cOqHRjZ/VsphUJscT1Mbo0C3D+ptG5HB1zZqO1/
-         Y/rbhV0HX+6VtAuVvSqOiBr65PaRhcMw7tZSKJNCzoRfh1WfuCAGulR5t9E8RIP47ZTA
-         7wAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781144656; x=1781749456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NdBrEBlpAfFK5nSacNcDPGDMq8EZhUqxapMEX5SFjbw=;
-        b=eWx48dYh7Kvi0DKq8SkO8YOk0aY60Bcx7yga1rEPjpgzOY4fQvhzdWCBCoWr06xdkJ
-         vPqjkOTpQbGdohrMCmqn6J0Ok/D+BS70fKWGgvCc1VKSZ+SeoeBe6GKujqSfiHnwV8LN
-         6KvpHMbfSBDUPxhWMqYF7oFo9bgBBCed3dsdA5yie6JyRPF8QIsJNr9yfGZ174E3iiat
-         e4C/I4F8TacUttyl2IZBojRhYxpKfnAgSni01uIWeEpuuV9m5za5NWqmYbYpzUIs/bOb
-         4URQCcJeIWsdT63NvNGIdoORDpsSNCsAlK3Bcsgfu6nt7aU4MC4Q4MSIl5LyH/TvtXaF
-         kwDw==
-X-Forwarded-Encrypted: i=1; AFNElJ+lyG/QKcdnPwyCwyyDXYw4++R1nnu5lNhShi25h4L8W6fEKdzFI7aCDPCrkF8HA/ZC9gNybso=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK31M5f2LSy9bOB7X4TNg1rkm7QHEEC8hNyzvHIwEZIOjDPHvT
-	S2LrMPPzr0XhYtx6eK5Mqxk5oisxPIoiYSXXgMYstlt+Swmqd8F4OZxDfaLNipNoZuPZb3SbYwv
-	uHQA0KisJl8tdnQ+4IHSJ7yL49uskdlKv35VeEFck
-X-Gm-Gg: Acq92OFCbCh3ojJeeqc44Rc18PKhaVfcBbKN06OPFxehyojPWHXSsOW6I6aYxh+nSaG
-	mhbVh7XrQsQvEiE884nLPjlMcj91RYwIYVsyQg7msOpW9rci2xyVtaE3oS1Jmy+INxQq7nzRMY8
-	rc/zv3w7gyk//XzU13Tw9Ur2Hr8jLVQ0vefWLqMJmnNC9rdPLnOVNiYc6PhU2vaB5DxP0S+IOwP
-	T0SKAvHi+RFQl4xm1yX+mxMJSdnBQiUzew+Hdw6QKM/4AgpZw6JEWLtIOaHB9OTsASDwij5H5uO
-	i/G9jpBbqld5DhbdHQ==
-X-Received: by 2002:a05:6a20:9151:b0:3b4:9027:712 with SMTP id
- adf61e73a8af0-3b5e323684amr594770637.20.1781144656567; Wed, 10 Jun 2026
- 19:24:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B58E1799F
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 02:32:06 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781145131; cv=none; b=Cp1w9mb8KemecEXJJYWUAy3YSU+Hh5v0udqStRuZouv/7LAJXV9uw+qXEWypIrr7xmxTCUNudT1kezPRVf6fdoReyWAQy77Dox7tJkk5LX6CaBbDS8NWKz+BSALP/ogp7ln7lLNV9H9HxpgU6x93ivyumLsA+v4DUVrTmtpkh3s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781145131; c=relaxed/simple;
+	bh=OOGdPaAKxe83CY8p6rMk+739TREsOTY/EfRFF0i0uDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qVqeT2sOwv0q9RudzdHslCDo9aW3ofaZQpF2kMUxmq0OwTKWSJYXGXDuKzeU0Lw1W+4iNlYU+8B4AQ8gk/xMUCiRv8zdYYQY8yucIbuHlbnsSjn8kthSo2WKMAZWkeY8WrKmGLZhK7//OTqwk3jjbxLccT3bKZQnBH7G3iGEY4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=f73FPpF6; arc=none smtp.client-ip=1.95.21.15
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=PZnwqos67DlFuI5bHh0M36Ub1Y0ZW/i+pDDuk4H36NI=;
+	b=f73FPpF6r7Dn56WI9SBVnUloaXIhU3Bqx8lSir2ndVJScsXXSK4g28b9Iawjx5
+	F8JPV2rsVPiO7DZ6Sag6zhAuGySPRappffACpNPe9/bPvY7LLiUcuNNq3ezzPsVI
+	Utrm0ckWCw2PkoXi97OvA+0igcXmm57mpZ42lTI056K1c=
+Received: from [100.70.221.233] (unknown [])
+	by gzsmtp1 (Coremail) with UTF8SMTPA id Mc8vCgBX9kKoHSpqyXwyAA--.294S2;
+	Thu, 11 Jun 2026 10:30:01 +0800 (CST)
+Message-ID: <92935c00-e0be-4591-ac44-5978c7804d57@yeah.net>
+Date: Thu, 11 Jun 2026 10:29:59 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260610232936.1176094-1-xmei5@asu.edu> <20260610232936.1176094-2-xmei5@asu.edu>
- <1781144329.8069873-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1781144329.8069873-2-xuanzhuo@linux.alibaba.com>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Wed, 10 Jun 2026 19:24:03 -0700
-X-Gm-Features: AVVi8Cff_FTIcsVHrr9aJqW72B1wQaebfIj61Efw6O15tCwyDyH1oC3aMziYxOA
-Message-ID: <CAPpSM+RApuYf3-ui15E+01fWEzUzfh6mgijQyT_+KjusMVxMfw@mail.gmail.com>
-Subject: Re: [PATCH net v2 2/2] virtio-net: harden page_to_skb() big-packet
- frag loop
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	minhquangbui99@gmail.com, bestswngs@gmail.com, mst@redhat.com, 
-	jasowang@redhat.com, eperezma@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: secure_seq: add back ports to TS offset
+To: Willy Tarreau <w@1wt.eu>, Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: Eric Dumazet <edumazet@google.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Zhouyan Deng <dengzhouyan_nwpu@163.com>, Florian Westphal <fw@strlen.de>
+References: <20260302205527.1982836-1-edumazet@google.com>
+ <99caeafd-edf5-44a4-8742-4eada5d0f5d1@yeah.net>
+ <CANn89iK8GcY3GHCRs-8EVrDoBPhdw1iY4mBjZKe8gx58+ko73Q@mail.gmail.com>
+ <aiaOor1JLLu5Xn75@1wt.eu> <90cb7e92-2451-4c67-9f35-6ff96b7efd77@yeah.net>
+ <0e89ceb5-a2ae-4e7c-8fe2-5b6a89ba6ac5@linux.dev> <aibaZyz4MT8Ixt0N@1wt.eu>
+From: xietangxin <xietangxin@yeah.net>
+In-Reply-To: <aibaZyz4MT8Ixt0N@1wt.eu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Mc8vCgBX9kKoHSpqyXwyAA--.294S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3JFWxWFWfWr4DArWUArWUurg_yoW3Xw4DpF
+	WrKFnrtrWkJry3twn2k3WUWF1YvrZ3XrWDWrn5K3srA3s09ry2qF48tr4j9ayjkr4kCrW2
+	qayjqrnrt3s8ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRUUUUUUUUU=
+X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiIgqWymoqHar8wQAA3+
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	URL_NUMERIC_IP(1.50)[10.0.0.1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-297897-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297896-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:xuanzhuo@linux.alibaba.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:mst@redhat.com,m:jasowang@redhat.com,m:eperezma@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:w@1wt.eu,m:jiayuan.chen@linux.dev,m:edumazet@google.com,m:pablo@netfilter.org,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:dengzhouyan_nwpu@163.com,m:fw@strlen.de,m:ericdumazet@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[yeah.net:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,netfilter.org,davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,163.com,strlen.de];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[yeah.net];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7FEED66DD13
+X-Rspamd-Queue-Id: 37BD966DD58
 
-Thanks for the review. I agree with that as I replied at the end of
-v1. If we obsolete 2/2 but keep 1/2, is it okay to just leave it as
-is?
 
-Xiang
 
-On Wed, Jun 10, 2026 at 7:19=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Wed, 10 Jun 2026 16:29:36 -0700, Xiang Mei <xmei5@asu.edu> wrote:
-> > This is a robustness hardening patch. The slow-path frag loop in
-> > page_to_skb() walks the page chain via page->private until the
-> > device-reported len is consumed, implicitly trusting that len fits the
-> > chain. It does not stop when the chain is exhausted (page becomes NULL
-> > at the tail), nor when nr_frags reaches the end of the static
-> > skb_shinfo()->frags[MAX_SKB_FRAGS] array.
-> >
-> > Both bounds are needed: the chain length is big_packets_num_skbfrags + =
-1
-> > pages, which for an MTU-driven configuration can be well below
-> > MAX_SKB_FRAGS, so neither guard implies the other.
-> >
-> > Make the loop self-defending so it no longer relies on the caller havin=
-g
-> > validated len: stop once the chain is exhausted, and never index past
-> > MAX_SKB_FRAGS. No functional change for well-formed input.
->
-> At this point, we are assuming that len represents the correct packet len=
-gth. If
-> there is a bug in the validation, it can be fixed, just like in your prev=
-ious
-> patch. Indeed, not checking nr_frags is also based on the overall design.
-> However, I do not recommend adding this kind of enhancement. If we follow
-> this logic, we would end up adding similar code in many other places, whi=
-ch
-> doesn't make much sense.
->
-> Thanks.
->
-> >
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > ---
-> > v2: robustness patch
-> >
-> >  drivers/net/virtio_net.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index afe73eda1491..518c22fa1b68 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -906,8 +906,11 @@ static struct sk_buff *page_to_skb(struct virtnet_=
-info *vi,
-> >       }
-> >
-> >       BUG_ON(offset >=3D PAGE_SIZE);
-> > -     while (len) {
-> > +     while (len && page) {
-> >               unsigned int frag_size =3D min((unsigned)PAGE_SIZE - offs=
-et, len);
-> > +
-> > +             if (unlikely(skb_shinfo(skb)->nr_frags >=3D MAX_SKB_FRAGS=
-))
-> > +                     break;
-> >               skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, page, off=
-set,
-> >                               frag_size, truesize);
-> >               len -=3D frag_size;
-> > --
-> > 2.43.0
-> >
+On 6/8/2026 11:06 PM, Willy Tarreau wrote:
+> On Mon, Jun 08, 2026 at 09:14:26PM +0800, Jiayuan Chen wrote:
+>>
+>> On 6/8/26 8:51 PM, xietangxin wrote:
+>>>
+>>> On 6/8/2026 5:42 PM, Willy Tarreau wrote:
+>>>> On Mon, Jun 08, 2026 at 01:51:49AM -0700, Eric Dumazet wrote:
+>>>>> On Sat, Jun 6, 2026 at 4:06 AM xietangxin <xietangxin@yeah.net> wrote:
+>>>>>>
+>>>>>> Hi Eric and netdev,
+>>>>>>
+>>>>>> I noticed a significant TCP performance regression (QPS drop) when using
+>>>>>> iptables MASQUERADE with the `--random-fully` option, and I have bisected
+>>>>>> it down to commit 165573e41f2f66ef98940cf65f838b2cb575d9d1
+>>>>>> (tcp: secure_seq: add back ports to TS offset).
+>>>>>>
+>>>>>> Here is the benchmark environment and test results.
+>>>>>> Environment:
+>>>>>> - Client & Server: 2 VMs
+>>>>>> - Server: Nginx listening on port 80 (HTTP), and ip 10.0.0.1
+>>>>>> - Benchmark tool: wrk (short-lived connections with "Connection: close")
+>>>>>>
+>>>>>> Test Commands
+>>>>>> 1. With random-fully:
+>>>>>>     # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE --random-fully
+>>>>>>     # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+>>>>>> 2. Without random-fully:
+>>>>>>     # iptables -t nat -A POSTROUTING -d 10.0.0.1 -p tcp --dport 80 -j MASQUERADE
+>>>>>>     # wrk -t8 -c200 -H "Connection: close" -d10s --latency http://10.0.0.1:80
+>>>>>>
+>>>>>> Test Results (QPS):
+>>>>>> 1. Parent Commit (7f083faf59d14c04e01ec05a7507f036c965acf8):
+>>>>>>     - with random-fully:    18145.74, 15006.39, 15716.67
+>>>>>>     - without random-fully: 18556.36, 16339.22, 21506.02
+>>>>>>
+>>>>>> 2. Bad Commit (165573e41f2f66ef98940cf65f838b2cb575d9d1):
+>>>>>>     - with random-fully:    11074.76, 10383.20, 10164.81  <-- (~35% drop)
+>>>>>>     - without random-fully: 17310.75, 20279.85, 18399.48
+>>>>>>
+>>>>>> Is this performance degradation an expected side-effect of the security fix,
+>>>>>> or is there any sysctl param we should tune when `--random-fully` is
+>>>>>> required for high-concurrency short connections?
+>>>>> Hi Tangxin
+>>>>>
+>>>>> I do not know why that patch would affect MASQUERADE performance.
+>>>>>
+>>>>> Pablo, Florian, do you have an idea?
+>>>> I suspect it's because MASQUERADE can shuffle the ports around and
+>>>> break the end-to-end mapping. With host-based ISN the increments
+>>>> remain positive regardless of the ports, while with port-based
+>>>> increments if you shuffle ports around, two consecutive uses of
+>>>> the same port can end up showing a decreasing ISN, and some
+>>>> outgoing SYN will get an ACK instead of a SYN-ACK, then send an
+>>>> RST, and a SYN again, causing a degradation.
+>>>>
+>>>> I'm not saying this is necessarily what happens here but based on the
+>>>> commit message description I suspect that this is what's happening
+>>>> here. There's always a tradeoff between ISN secrecy and reliability
+>>>> unfortunately.
+>>>>
+>>>> Willy
+>>> Hi,
+>>>
+>>> Willy, your hypothesis is 100% correct!
+>>> I captured the packets during the benchmark on the bad commit,
+>>> and the trace perfectly shows the "SYN -> ACK -> RST".
+>>>
+>>> Here is the key snippet of the packet trace (Client: 10.0.0.2, Server: 10.0.0.1):
+>>>
+>>> // 1. First connection closes, Server sends last ACK(410615916), entering TIME_WAIT.
+>>> 12105 08:54:39.128861 10.0.0.1 -> 10.0.0.2 TCP 80 -> 47824 [ACK] Seq=3315216203 Ack=410615916 TSval=273827652 TSecr=370383870
+>>>
+>>> // 2. ~200ms later, next short-conn reuses port 47824 via MASQUERADE --random-fully
+>>> 47637 08:54:39.332281 10.0.0.2 -> 10.0.0.1 TCP 47824 -> 80 [SYN] Seq=559739866 TSval=4137539723 TSecr=0
+>>>
+>>> // 3. Server is sends a ACK with the old connection's expected ACK(410615916).
+>>> 48591 08:54:39.337692 10.0.0.1 -> 10.0.0.2 TCP 80 -> 47824 [ACK] Seq=3315216203 Ack=410615916 TSval=273827858 TSecr=370383870
+>>>
+>>> // 4. Client receives the unexpected old ACK, responds with RST, and has to retry the connection.
+>>> 48600 08:54:39.337799 10.0.0.2 -> 10.0.0.1 TCP 47824 -> 80 [RST] Seq=410615916 Win=0
+>>>
+>>>
+>>> Are there any architectural recommendations we should consider here,
+>>> or is this considered an acceptable trade-off for security?
+>>
+>>
+>> It's classic PAWS problem when packets go through NAT/Gateway.
+>>
+>> Can you test the performance with following different two configs (client) ?
+>>
+>>     sysctl -w net.ipv4.tcp_timestamps=2
+>>
+>>     sysctl -w net.ipv4.tcp_timestamps=0
+> 
+> The thing is, nothing forces a server to use PAWS to distinguish SYNs,
+> and some OSes only apply the spec to the letter (at least Solaris in
+> my experience). The spec basically says that PAWS protects against
+> duplicate non-SYN segments, and duplicate SYNs while there is a
+> connection. So while Linux (and other OSes) nicely covers the case
+> of the transition from TIME_WAIT to SYN_RECV, others do not always do
+> it.
+> 
+> Regardless, while I hate it when we play borderline games with TCP for
+> the sake of supposed security issues that can only be demonstrated in
+> a lab, we must admit that masquerading remains an issue when the same
+> port range is shared between multiple hosts, even with PAWS since there
+> is no reason for multiple hosts to have the same clock.
+> 
+> Willy
+Hi Willy, Jiayuan and all,
+
+Thanks for the excellent analysis. I have verified the suggestions
+and captured detailed traces.
+
+- using `tcp_timestamps=2` on the client completely restores performance
+  because it sets `ts_offset = 0`.
+- we found that recalculating the `ts_offset` in Netfilter
+after NAT port allocation also completely fixes the regression.
+
+Here are the detailed test results, packet analysis, and a potential fix:
+
+1. Test Results with different tcp_timestamps (on commit 165573e41f2f)
+- With net.ipv4.tcp_timestamps=2 (ts_offset = 0):
+  * with random-fully:    21198.8,  20754.97, 21598.64 (Performance recovered)
+  * without random-fully: 21561.6,  22531.71, 23119.88
+
+- With net.ipv4.tcp_timestamps=0 (Timestamps disabled):
+  * with random-fully:    12018.82, 10098.1,  10714.86 (Still suffers)
+  * without random-fully: 18409.88, 20951.87, 24635.95
+
+2. Packet Analysis: PAWS Failure due to Non-monotonic TSval
+I captured the traffic during the regression. The majority of the "SYN -> ACK -> RST"
+cases occur because the new SYN's TSval is smaller than the TIME_WAIT socket's TSval
+(confirmed via the TSecr in the ACK).
+
+Client -> Server 24870 → 80 [SYN] Seq=3540240581 TSval=2294041168 TSecr=0
+Server -> Client 80 → 24870 [ACK] Seq=2293248269 Ack=855605690 TSecr=2846236456
+Client -> Server 24870 → 80 [RST] Seq=855605690
+
+When Conn1 (local sport 10000) and Conn2 (local sport 20000) are both mapped to the
+same external sport 30000 via `--random-fully`, their TS offsets are calculated
+as `ts_offset1(10000)` and `ts_offset2(20000)`.
+
+If Conn2 reuses the TIME_WAIT slot of Conn1 on the server, there is a chance that
+`ts_offset2 < ts_offset1`, which breaks the TSval monotonicity for the same 4-tuple.
+
+
+3. A Potential Fix: Recalculating ts_offset in Netfilter
+I wrote a quick demo patch to update the `ts_offset` inside `tcp_manip_pkt` using
+the newly mapped port. The results show that performance is completely restored:
+
+- With Netfilter Demo Patch:
+  * with random-fully:    21966.86, 21113.68, 20763.9 (Performance recovered!)
+  * without random-fully: 19306.86, 20018.69, 20288.24
+
+Since I am not an expert in netfilter internals, I am wondering if recalculating
+the `ts_offset` during the NAT mangling phase is an acceptable approach?
+-- 
+Best regards,
+Tangxin Xie
+
 
