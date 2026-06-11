@@ -1,144 +1,174 @@
-Return-Path: <netdev+bounces-297994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-297995-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7uknCL1tKmrcpAMAu9opvQ
-	(envelope-from <netdev+bounces-297994-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:11:41 +0200
+	id Sq3KJehuKmoSpQMAu9opvQ
+	(envelope-from <netdev+bounces-297995-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:16:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8604866FBDA
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:11:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F2F66FC31
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 10:16:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="nkf/C2ds";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297994-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-297994-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=b3PCSOT+;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=I009MTCc;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=b3PCSOT+;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=I009MTCc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-297995-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-297995-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD1E930234C4
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:10:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 602EC3038B98
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 08:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6DF371893;
-	Thu, 11 Jun 2026 08:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9565372EFA;
+	Thu, 11 Jun 2026 08:16:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AD376A11;
-	Thu, 11 Jun 2026 08:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6943B3659E8
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 08:16:09 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781165415; cv=none; b=bFWDvT6ILIJAg1K+WbjNjbOy5UGOK2fGRRBv2owLlTo54c7DuB1iuIHq0OYkVBUzMt4RDTsN++vCVWvRthv7G5ByeC8kX1GEKcaHlBQ3DKX8Zp8cQmYWgXzP73mCvWqZRdvF2HpQYAGPmBn3GQrhS9mMy7nJPkhucg4GS8GVcGA=
+	t=1781165770; cv=none; b=Tf63mPxOaEbuWOqGj1V5zWHNDKe19Y4yDum33biiPD7nk+0uDp1KeqJLL3J+yVgFOlKltaXR/IPu5RWpPLvQYKZifPx/54Oyd57eM1hW5xGfDxI+IRGinrESSip+2r51gPvwMx/ao5K5O7niWGREJhVQKJ0CREFLokgbH36qE0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781165415; c=relaxed/simple;
-	bh=YJ0fAnSRnIsFy1zVnT27GeLkaCz2frpAJKhwSdua/uE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nyjqn5FUu6cpWpbpYv3LldcTf4Uw6Ec6Lz8QAHhu81XcB6gt1uzj1vkE213QGJc85Fyf+1EIGxq5ivsyCw92f9cEosjKKOszJ95qk80g3yLFZQ2B9gcy1WnrP1klI/Q92EnCPmPj9GaTEOQ+VhW7GApC8kIqRMx0r8Xl4BH/A4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkf/C2ds; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE601F00893;
-	Thu, 11 Jun 2026 08:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781165413;
-	bh=uCT//8qwRZJv/4U5lHEeXtQTx0gUMrOIJ1wQ0T6xN+w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=nkf/C2dsGJEmKDXBm8QoKfJS445nrzAxGRtcgUP02h4Jx37cIPdZqEdVy5hQLsWpW
-	 +ULc7TqPuDH/CYJ2BEdmntXm6H96dixmmLloACkpSdQHPsxZZ5CveHUkVs9+uQzI4h
-	 EB/n3n5P7F4iOTVUAfy1/j25KdEhDl7S+cqCtdZ8qEfuEtAghrdhAD6rqYBSP+Cf9i
-	 uVcBSAgdb7ja3LSQWPcTy2fhrwIzZ6rUfYxKuE2bC6F7sd4xy6HoKNjcjfuR/7B/+A
-	 eYmrC9gPy7Wft6MpBaS5nj4AO3NkVOrm0jisUeCYUQ4Ty4c7HT3Ai/ez16mPxD72gc
-	 JZ/PP0E6ZTbrw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199763930E1D;
-	Thu, 11 Jun 2026 08:10:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781165770; c=relaxed/simple;
+	bh=GsAsWH7Obyh0geglZxdMwxsQoAaOAICrWVm/HuGFqXA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m8PludFdYZQi5z+q4dA0O4Wlq3dG0wwd94gLAsFMDRlotJetMaP5524o0QN6FehheoPuxqBdpqiRORhnivMOaE9Fcvju73m3PJCp8YdjJ6LmIXE8JmTDB5q/nCIvZ6UXNNzQ5QpG/Ga9hFif4ikx18ceM5UeHHCjb88jU4/Th1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b3PCSOT+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=I009MTCc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b3PCSOT+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=I009MTCc; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 890A5759C6;
+	Thu, 11 Jun 2026 08:16:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781165767; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/YB2hfZCVNELaWXKYsnHKv8h0J4pz/MGzEWfST5VSEc=;
+	b=b3PCSOT+XQZcd+AS7CfXm/xYlEpTNp5kTWlC14T/PQans/tIknDT3+MqVpJuiCkKS+w8+t
+	ICwE+w7RuKdlXe+irT9qpx1va0RV6x1gLoVph6pQ/T8cN2l3fp3MqGOlFy/fdNEyQTFAam
+	Eyz5iA2Rz7q0zzoea/UFghc7tUYwZCo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781165767;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/YB2hfZCVNELaWXKYsnHKv8h0J4pz/MGzEWfST5VSEc=;
+	b=I009MTCcDvYP/TVlr3fP+WG8Jj0k/HLlozFie54XadXQkCVZ4gyPP3Jn8NFrbdVle65oRv
+	5YzL2urUTER7EpCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781165767; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/YB2hfZCVNELaWXKYsnHKv8h0J4pz/MGzEWfST5VSEc=;
+	b=b3PCSOT+XQZcd+AS7CfXm/xYlEpTNp5kTWlC14T/PQans/tIknDT3+MqVpJuiCkKS+w8+t
+	ICwE+w7RuKdlXe+irT9qpx1va0RV6x1gLoVph6pQ/T8cN2l3fp3MqGOlFy/fdNEyQTFAam
+	Eyz5iA2Rz7q0zzoea/UFghc7tUYwZCo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781165767;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/YB2hfZCVNELaWXKYsnHKv8h0J4pz/MGzEWfST5VSEc=;
+	b=I009MTCcDvYP/TVlr3fP+WG8Jj0k/HLlozFie54XadXQkCVZ4gyPP3Jn8NFrbdVle65oRv
+	5YzL2urUTER7EpCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 53636779A7;
+	Thu, 11 Jun 2026 08:16:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 02LYE8duKmrEXAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 11 Jun 2026 08:16:07 +0000
+Message-ID: <7e1453b1-09bb-4590-8dda-ed0647e4da77@suse.de>
+Date: Thu, 11 Jun 2026 10:15:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 0/4] net: mvpp2: fix XDP RX buffer handling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178116541089.3821943.18053203843069098515.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 08:10:10 +0000
-References: <20260607134943.21996-1-mail@tk154.de>
-In-Reply-To: <20260607134943.21996-1-mail@tk154.de>
-To: Til Kaiser <mail@tk154.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, marcin.s.wojtas@gmail.com,
- linux@armlinux.org.uk, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, mcroce@redhat.com, sven.auhagen@voleatech.de,
- lorenzo@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netfilter: nft_synproxy: stop bypassing the
+ priv->info snapshot
+To: Runyu Xiao <runyu.xiao@seu.edu.cn>, pablo@netfilter.org, fw@strlen.de,
+ netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org, phil@nwl.cc, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ ffmancera@riseup.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, jianhao.xu@seu.edu.cn
+References: <20260611042120.1462249-1-runyu.xiao@seu.edu.cn>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260611042120.1462249-1-runyu.xiao@seu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,armlinux.org.uk,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,fomichev.me,voleatech.de];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-297994-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-297995-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:runyu.xiao@seu.edu.cn,m:pablo@netfilter.org,m:fw@strlen.de,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ffmancera@riseup.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jianhao.xu@seu.edu.cn,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mail@tk154.de,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:marcin.s.wojtas@gmail.com,m:linux@armlinux.org.uk,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:mcroce@redhat.com,m:sven.auhagen@voleatech.de,m:lorenzo@kernel.org,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,seu.edu.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8604866FBDA
+X-Rspamd-Queue-Id: E4F2F66FC31
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun,  7 Jun 2026 15:49:39 +0200 you wrote:
-> This is v5 of the earlier XDP_PASS fix. The XDP_PASS change is
-> retained, and the series also fixes related RX/XDP buffer handling
-> issues found during review.
+On 6/11/26 6:21 AM, Runyu Xiao wrote:
+> nft_synproxy_eval_v4() and nft_synproxy_eval_v6() already take a
+> whole-object READ_ONCE() snapshot of the shared priv->info state before
+> building the SYNACK reply, but nft_synproxy_tcp_options() still masks
+> opts->options with priv->info.options from the live shared object.
 > 
-> Tested with tools/testing/selftests/drivers/net/xdp.py on mvpp2
-> hardware.
+> When a named synproxy object is updated concurrently with SYN traffic,
+> the eval path can then mix mss and timestamp handling from the local
+> snapshot with an options mask taken from a newer configuration, so one
+> SYNACK no longer reflects a coherent synproxy configuration.
 > 
-> [...]
+> Use info->options so nft_synproxy_tcp_options() stays on the same local
+> snapshot that the eval path already copied from priv->info.
+> 
+> Fixes: ee394f96ad75 ("netfilter: nft_synproxy: add synproxy stateful object support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
 
-Here is the summary with links:
-  - [net,v5,1/4] net: mvpp2: sync RX data at the hardware packet offset
-    https://git.kernel.org/netdev/net/c/180235600934
-  - [net,v5,2/4] net: mvpp2: limit XDP frame size to the RX buffer
-    https://git.kernel.org/netdev/net/c/f3c6aa078927
-  - [net,v5,3/4] net: mvpp2: refill RX buffers before XDP or skb use
-    https://git.kernel.org/netdev/net/c/5e8e2a9624df
-  - [net,v5,4/4] net: mvpp2: build skb from XDP-adjusted data on XDP_PASS
-    https://git.kernel.org/netdev/net/c/77a6b90ce56b
+Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks!
 
