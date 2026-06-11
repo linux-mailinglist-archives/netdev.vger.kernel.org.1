@@ -1,266 +1,318 @@
-Return-Path: <netdev+bounces-298343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rsncHYAcK2pY2wMAu9opvQ
-	(envelope-from <netdev+bounces-298343-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:37:20 +0200
+	id fCoWJq4cK2pl2wMAu9opvQ
+	(envelope-from <netdev+bounces-298344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:38:06 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C376A67535E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C4C675388
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 22:38:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=EIp1oMeB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298343-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298343-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=p8wyuvTr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298344-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298344-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FD7032E6E23
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:35:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62263336CE17
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 20:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE48E368D5E;
-	Thu, 11 Jun 2026 20:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CC8408617;
+	Thu, 11 Jun 2026 20:35:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492C536AB4D
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 20:35:04 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781210105; cv=none; b=BmKTeT3iObXTBUL6mRt7/pgo5l92R5n5lReFJ9FtlYMoPQXsr6zQGS72DcCEWQLO8CpkI/NuXKQn1vU8LlGMatjYMQNKm+OwPeMXrva0O2qYhfX+09PkxS/erP0QW4z1qWvjEe4CGX/86KYDQQKaHiaabQ1HwfRE02DbdOD8Gkc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781210105; c=relaxed/simple;
-	bh=5aZG9TPfrvsOgFpj/4zxSGvhIXkHde6j+ZwBUuJChxQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SFUScwpeRgGO0fgcJhv5ArgzkbNfn4o3Ajk4wflHDDhpaO5uCXvuSoEIbR8jD0edVMEHdToqGthm6zCDIl8gR1o4x4hzARDoFL9gSpxFr8YZPD505YOol5CN2ayqkyL6FxF3fb0e6NAlRHr0sEzrseOF7TiP87oO2J4lUdr7lCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EIp1oMeB; arc=none smtp.client-ip=209.85.222.202
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-915767b341eso29725885a.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 13:35:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82F635675A
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 20:35:43 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781210148; cv=pass; b=HA53zcsipBBc9ElRp0rXrMxbmVg6hCR015Mrcho8FizlALXJqS1zbbeM73ol7MIuJHnB+qzCLgS0Zpru+8k6UTTHM1PuKk0GSHr4AgAARcZ2S+Rj1spFs9E+mT7rpUPWVeikTemIl+uE3OPj92t5kCjjxtt7Rhh9/ZnJdCHGnmc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781210148; c=relaxed/simple;
+	bh=26I/E0jqclwBNbMJrzETQh1RkPAD+xcgw5219s0GtO4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qjzw2jBIXE0/y/+3RNdpJ7HsE1lseK01hV8tN3ADBLNHFbMi7Zq95T0VzAYovMadCbosAaTqt5Oc7pdsiZ3VPSw1u92tHrBnZhHbmE/i2mvhaDarQ6+h70FR0bkOR9bVvjmJ2zlpeBU2ZgNeKXgKdn6e9S6teVzfG9OhlAMus18=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p8wyuvTr; arc=pass smtp.client-ip=209.85.160.172
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-51765331535so33761cf.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 13:35:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781210143; cv=none;
+        d=google.com; s=arc-20240605;
+        b=AN8Mx8E53ePTUDe6Okamoq9F7LhRVb4AX9TBEq3aFlzZFfuprxY8qKmmrs6JrVJPVQ
+         cQ0li4v3gboH5pwjoAMxIp9K4HNxVMaFn+1gaQy5csMPjefSOypHZz1LFgiNBw1IaDjq
+         GTp8E8COldCIXTfMJd8hhFpLvGRLymSLVRbL9rOJVle4/aaAisdlLhuqiNsuvoIMzbfE
+         4eqZft5Ry2Uf9h9JYF/BDhnIoMKhvO6etUkAOUedi6emUHkbG30T10Z/t64d97CQs5Xv
+         xcury8FODnFTunki8JMz7kJykYOgSb3lX00QErbAJUpYlMiu5Xs/bwLemC9AuD1mfQeh
+         CKhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rTG2eVgH5EFpBrpxCMtRpc9OUYBRrWqg91YAZm7sJjo=;
+        fh=W28MWSJi/EE32J/gFiuARbKHWYvDZUpWgA7sjYLzthE=;
+        b=Gssg3MnILjjOTvnrM1+xzE7tVSCrj0v2iurVBeVe1KiCbLojL8STrQdFnF/s9ul0y8
+         xiTSNmYPyZubfxQTyp0I1ZYpVtd2JYWPMsyhZdSwX8Ko/Bk6mYjeMIaFjR3prcKDi8IM
+         Ks2mxGleuyVrucqT+P6Agm9H+/x873a1mIC3z9xxo4ZnL+N9FjI9pB/aVnIhnhlYSFoS
+         Zu5+ehD3L2w+ZKChojMJyCH58dZ5URV8VuLVfZqZTvqfoUa1hzn884DpPp7qubjcFd+o
+         QFymB/5UE1hs2k281j4dLbUSzHtrvOGuP4Us2BQrIrno0cMxCJSNxwKbuLmyko1nJhsc
+         m9nQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781210103; x=1781814903; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDdWudcUIh5DLGDXZNkcyOF930y0GsBnL+hW0SmcsS4=;
-        b=EIp1oMeBPFExSxcbRCSYdP2Ip+bUT9ZPu27z+B0ut+KqmSEhocY1EBr0a5oqqOPbc2
-         ZI7Vqxoy6SKCet/wHbWcffBBMBq5KVfewbVybTQ7JMsCFFUCikNB1wGrtAzB7Zr45ax4
-         0V+k68lUgSVspcx63GisDkWH3rc/AkftbAGOvPCRais2ACk++dm6yP6YHYVBzgzBniph
-         mppHZLrdwwnv/ltyGFKjyzlHpoSFctMTfPMsHblWT7qp68b+QNtjVqrRyCdATubhi1dr
-         j6XQ0IfTaeMrfpD9TMYLQVmYGjPEf3lM1XxZAFbO6R4+rp8xJ8Nt8F8s38ImyYPdTjj8
-         n3Tw==
+        d=google.com; s=20251104; t=1781210143; x=1781814943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rTG2eVgH5EFpBrpxCMtRpc9OUYBRrWqg91YAZm7sJjo=;
+        b=p8wyuvTrqhLx0NJXBhlHlMdiv6cwCTZgAZAR4N9f8wKLdJYJizCLPSZhumL6EvoywA
+         ztkEBf/QeE9h2X6oyqdaM2n5ZEbUxT19gVck2x7bl9dTS3EKdzAvQ0Oe0DhdG69cCajk
+         0Ji6qGD+1WMvDNMWDbcnVlaCWHMttF21DLi7Zh0TkLmOObmfErH9WwKtWa3JA/b5kp9+
+         fKZP9tWtCernPFBQHlDdh0pu/X5YzPm3MkJwB7VI3Lpz6vApFQz0D2PIL3lsh9UsmmHi
+         MP6JpKxfq/6nWUsjPtXNDlntOeUTe6HLcYv9M3axoz64EUSxSjVcy8Aj8j9U3xuKAKBZ
+         vcKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781210103; x=1781814903;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDdWudcUIh5DLGDXZNkcyOF930y0GsBnL+hW0SmcsS4=;
-        b=DczjMsVo+mHKTgx8T2QVsHey4nCR3fQEuw78ysDgixqCjb59dJIZhhSYnCju+19LCx
-         fTSt/wUly6S4Ydiy/m/OOXf9P8wTa7zj4M0KgqFO7zOPV8Du5hQYL7Sn3S4nw7XGnhku
-         uq6dHcPkLk6+XwNqIL7h0tSTy8RVIyYdyS1lTopsCd24q1Lxe8NDcZfEm2UUQwuy/pUW
-         OLExR1k7nL7og76TE8jiTtm06IFhfAkB+L3xWVIrycCjFxy6Pj2b1daJNb0Es5yhgEzc
-         T5yt7XKlaR1sm5vY/mTTMEgICvIFNL60eRn62TYK/3aWRv8viqao/FjoU1+pyYfMl+wQ
-         05Uw==
-X-Forwarded-Encrypted: i=1; AFNElJ/5/GRL2Kj8R9QZL27bdGaEmUj21btTiRWyIIGHfo3U1xY9VeFcuFv2w31xZlwh4C3ex8hm0Mc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yycj4R9orT0zC4sfRRhsOrCDyjJYZQwzQPU4q4+6FeCHvS7jG/g
-	xP5uQekt2dBAte36qO0rEALDvbmP9Yx743DKq6fDzIFmcuqt1zZSviBVSDj1bSxt42pfGO8UrEr
-	goqZICEhb8gxz8A==
-X-Received: from qkjw26.prod.google.com ([2002:a05:620a:149a:b0:915:7402:46e0])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:d8a:b0:914:bb8e:915c with SMTP id af79cd13be357-9160ab36cb1mr735507185a.22.1781210102847;
- Thu, 11 Jun 2026 13:35:02 -0700 (PDT)
-Date: Thu, 11 Jun 2026 20:34:53 +0000
-In-Reply-To: <20260611203453.3067462-1-edumazet@google.com>
+        d=1e100.net; s=20251104; t=1781210143; x=1781814943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rTG2eVgH5EFpBrpxCMtRpc9OUYBRrWqg91YAZm7sJjo=;
+        b=HVwngLhneLebJkG6qk6OhYos21G3/aiMfiCuLlyI5KMtchEaLz+M2FMtX2T5J/e4J0
+         8xwDqiGX50ad/UwFUMj6sChWK4moxNlX/4sG2d2tJRs2T+60oABUoKDTuZ+o96kZWFmP
+         XHxhclUF+sAb6imUkeo5nS3hho87xe6qL3UOA5chamFA6CFQbG76jXSy+bBZaCKNSyZu
+         AfLsyjwW3X5PG5T0sD8LhOFnPlJRZTn208dGbT/rkd5GXPH3bkcyaic0IzyJDr2AxUvC
+         3fbBJUc0ac7w/IGljL8QiWbkBCzmh98VUDYwrN8RnGLlhazxfr7/71OeYOG3vNoQgVOL
+         uisg==
+X-Forwarded-Encrypted: i=1; AFNElJ96d8fXAPqYAwYtOkrne4LVV2j8RDAAg7ay5PAtBvIBP1qfTCCqhViGB5yUNL8amAh+bMO9qEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyABS8wnjh8uqxN1ZGghBRleDxr/v77kYr+edBSqaftbhBtzL+e
+	a7Wcvs/Ca9ZQuzgx0EZJ1rHFFZBv/PR0eEcFvM2KDRj/pvaicrhGDDa4ccj0G0hm9LYQFGR7yIb
+	Du2F6MlknquVz1Kp8EZ/KeHqGeUqIPG23/b2XJfy3
+X-Gm-Gg: Acq92OF9SLDslb9+y1xTlXCYx8zAjJR19b0a5GqiNFRrf4oZ2My3t9RBN8od/7CBfMS
+	IVSk/s5AyXQzkuxZ5BKGVlzLMfyM1B27m2T/DJBTLR3b+d5TtN0NM4/Za/g5HZWJtQIjrtEeyX0
+	hLa5rGrL2uXuJCAigoVx3Pt1cXDTkPn/5DBRpRg+VBJue0M56V7IJ5g7jlfB1iz0f2qcCHfLdUw
+	dmaBcUZ5zCwJSkZqJfY041a9Lx21Sg9Q/DKgWCLABm1KTSFkiX7MHpPRCH0jFsTElcy3/BoaYjP
+	hMJpjnX4EXe4zW5ksHo3wQPp4PVjp4DYDRMp
+X-Received: by 2002:ac8:5a48:0:b0:517:5f1d:9f7 with SMTP id
+ d75a77b69052e-517fc506a8dmr436611cf.7.1781210141994; Thu, 11 Jun 2026
+ 13:35:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260611203453.3067462-1-edumazet@google.com>
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260611203453.3067462-6-edumazet@google.com>
-Subject: [PATCH v3 net-next 5/5] net: bridge: use atomic ops to read/change
- p->flags (III)
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com> <20260610230415.C0521C88@davehans-spike.ostc.intel.com>
+In-Reply-To: <20260610230415.C0521C88@davehans-spike.ostc.intel.com>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Thu, 11 Jun 2026 13:35:29 -0700
+X-Gm-Features: AVVi8CdN4TFi21bTDduKLyadU8rWfGxctdFy54TtZGcrA-1-JxHz0WBnpM-4hE8
+Message-ID: <CAJuCfpEu4HfUOVd1dTGdDNxq91Ts59ab_LiVPQEnxRUWUi3WaQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] mm: Add RCU-based VMA lookup helper that waits for writers
+To: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Carlos Llamas <cmllamas@google.com>, Christian Brauner <christian@brauner.io>, 
+	David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org, 
+	Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Todd Kjos <tkjos@android.com>, 
+	Vlastimil Babka <vbabka@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298343-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:idosch@nvidia.com,m:razor@blackwall.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:edumazet@google.com,m:ericdumazet@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:dave.hansen@linux.intel.com,m:linux-kernel@vger.kernel.org,m:aliceryhl@google.com,m:akpm@linux-foundation.org,m:arve@android.com,m:cmllamas@google.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:tkjos@android.com,m:vbabka@kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[surenb@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,blackwall.org,vger.kernel.org,gmail.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-298344-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[surenb@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,blackwall.org:email]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C376A67535E
+X-Rspamd-Queue-Id: E2C4C675388
 
-Use test_bit(), clear_bit(), set_bit() in:
+On Wed, Jun 10, 2026 at 4:04=E2=80=AFPM Dave Hansen <dave.hansen@linux.inte=
+l.com> wrote:
+>
+>
+> From: Dave Hansen <dave.hansen@linux.intel.com>
+>
+> =3D=3D Background =3D=3D
+>
+> There are basically two parallel ways to look up a VMA: the
+> traditional way, which is protected by mmap_lock, and the RCU-based
 
-   net/bridge/br_multicast.c
-   net/bridge/br_netlink.c
-   net/bridge/br_stp.c
-   net/bridge/br_stp_bpdu.c
-   net/bridge/br_switchdev.c
-   net/bridge/br_vlan_options.c
+"which is protected by mmap_lock" better be more specific "which is
+protected by mmap_read_lock".
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
----
- net/bridge/br_multicast.c    | 5 +++--
- net/bridge/br_netlink.c      | 2 +-
- net/bridge/br_stp.c          | 4 ++--
- net/bridge/br_stp_bpdu.c     | 2 +-
- net/bridge/br_switchdev.c    | 8 ++++----
- net/bridge/br_vlan_options.c | 2 +-
- 6 files changed, 12 insertions(+), 11 deletions(-)
+> per-VMA lock way which is based on RCU and refcounts.
+>
+> =3D=3D Problem =3D=3D
+>
+> The mmap_lock one is more straightforward to use but it has a big
+> disadvantage in that it can not be mixed with page faults since those
+> can take mmap_lock for read, which can deadlock when mixed with page
+> faults.
 
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index c2c93c7404151dcf02e59eb8b868ec3e39dfd5bd..6b3ac473fd228b65d1479963e032a63a9f9210ee 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -281,7 +281,7 @@ static bool br_port_group_equal(struct net_bridge_port_group *p,
- 	if (p->key.port != port)
- 		return false;
- 
--	if (!(port->flags & BR_MULTICAST_TO_UNICAST))
-+	if (!test_bit(BR_MULTICAST_TO_UNICAST_BIT, &port->flags))
- 		return true;
- 
- 	return ether_addr_equal(src, p->eth_addr);
-@@ -3672,7 +3672,8 @@ br_multicast_leave_group(struct net_bridge_mcast *brmctx,
- 	if (!mp)
- 		goto out;
- 
--	if (pmctx && (pmctx->port->flags & BR_MULTICAST_FAST_LEAVE)) {
-+	if (pmctx &&
-+	    test_bit(BR_MULTICAST_FAST_LEAVE_BIT, &pmctx->port->flags)) {
- 		struct net_bridge_port_group __rcu **pp;
- 
- 		for (pp = &mp->ports;
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 2178eb20475c36acc44890cc8384270d376febc3..b2cd4e39326d0634652afee09998b8ad6cef962c 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -540,7 +540,7 @@ static int br_fill_ifinfo(struct sk_buff *skb,
- 		else
- 			err = br_fill_ifvlaninfo(skb, vg);
- 
--		if (port && (port->flags & BR_VLAN_TUNNEL))
-+		if (port && test_bit(BR_VLAN_TUNNEL_BIT, &port->flags))
- 			err = br_fill_vlan_tunnel_info(skb, vg);
- 		rcu_read_unlock();
- 		if (err)
-diff --git a/net/bridge/br_stp.c b/net/bridge/br_stp.c
-index b33eb085d9b6cb4cd4f3aff2aa4793d027bbc0f8..46919d73d42f98ad92ad0c4ddd2396a0cdd90c02 100644
---- a/net/bridge/br_stp.c
-+++ b/net/bridge/br_stp.c
-@@ -39,7 +39,7 @@ void br_set_state(struct net_bridge_port *p, unsigned int state)
- 	/* Don't change the state of the ports if they are driven by a different
- 	 * protocol.
- 	 */
--	if (p->flags & BR_MRP_AWARE)
-+	if (test_bit(BR_MRP_AWARE_BIT, &p->flags))
- 		return;
- 
- 	p->state = state;
-@@ -179,7 +179,7 @@ static void br_root_selection(struct net_bridge *br)
- 		if (!br_should_become_root_port(p, root_port))
- 			continue;
- 
--		if (p->flags & BR_ROOT_BLOCK)
-+		if (test_bit(BR_ROOT_BLOCK_BIT, &p->flags))
- 			br_root_port_block(br, p);
- 		else
- 			root_port = p->port_no;
-diff --git a/net/bridge/br_stp_bpdu.c b/net/bridge/br_stp_bpdu.c
-index 7895489ac6fe7ca47cf001c0fea267d5dcbd4371..74ec42ba1e7d086cbfde608c93f5fa24d6b4ed7b 100644
---- a/net/bridge/br_stp_bpdu.c
-+++ b/net/bridge/br_stp_bpdu.c
-@@ -178,7 +178,7 @@ void br_stp_rcv(const struct stp_proto *proto, struct sk_buff *skb,
- 	if (!ether_addr_equal(eth_hdr(skb)->h_dest, br->group_addr))
- 		goto out;
- 
--	if (p->flags & BR_BPDU_GUARD) {
-+	if (test_bit(BR_BPDU_GUARD_BIT, &p->flags)) {
- 		br_notice(br, "BPDU received on blocked port %u(%s)\n",
- 			  (unsigned int) p->port_no, p->dev->name);
- 		br_stp_disable_port(p);
-diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-index ee3ad9dfbab99597ab06d5e6e008519d4e17fd6a..990c6b38fd397ad364297b130b0f3736ac7b13a7 100644
---- a/net/bridge/br_switchdev.c
-+++ b/net/bridge/br_switchdev.c
-@@ -20,7 +20,7 @@ static bool nbp_switchdev_can_offload_tx_fwd(const struct net_bridge_port *p,
- 	if (br_multicast_igmp_type(skb))
- 		return false;
- 
--	return (p->flags & BR_TX_FWD_OFFLOAD) &&
-+	return test_bit(BR_TX_FWD_OFFLOAD_BIT, &p->flags) &&
- 	       (p->hwdom != BR_INPUT_SKB_CB(skb)->src_hwdom);
- }
- 
-@@ -287,7 +287,7 @@ static int nbp_switchdev_add(struct net_bridge_port *p,
- 		return err;
- 
- 	if (tx_fwd_offload) {
--		p->flags |= BR_TX_FWD_OFFLOAD;
-+		set_bit(BR_TX_FWD_OFFLOAD_BIT, &p->flags);
- 		static_branch_inc(&br_switchdev_tx_fwd_offload);
- 	}
- 
-@@ -307,8 +307,8 @@ static void nbp_switchdev_del(struct net_bridge_port *p)
- 	if (p->hwdom)
- 		nbp_switchdev_hwdom_put(p);
- 
--	if (p->flags & BR_TX_FWD_OFFLOAD) {
--		p->flags &= ~BR_TX_FWD_OFFLOAD;
-+	if (test_bit(BR_TX_FWD_OFFLOAD_BIT, &p->flags)) {
-+		clear_bit(BR_TX_FWD_OFFLOAD_BIT, &p->flags);
- 		static_branch_dec(&br_switchdev_tx_fwd_offload);
- 	}
- }
-diff --git a/net/bridge/br_vlan_options.c b/net/bridge/br_vlan_options.c
-index 92af1e558fda886301f167463ddf43f14afd2702..fcc200c3e3da260465f9eb8ab1c8c87e2d3f7588 100644
---- a/net/bridge/br_vlan_options.c
-+++ b/net/bridge/br_vlan_options.c
-@@ -172,7 +172,7 @@ static int br_vlan_modify_tunnel(const struct net_bridge_port *p,
- 		NL_SET_ERR_MSG_MOD(extack, "Can't modify tunnel mapping of non-port vlans");
- 		return -EINVAL;
- 	}
--	if (!(p->flags & BR_VLAN_TUNNEL)) {
-+	if (!test_bit(BR_VLAN_TUNNEL_BIT, &p->flags)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Port doesn't have tunnel flag set");
- 		return -EINVAL;
- 	}
--- 
-2.54.0.1136.gdb2ca164c4-goog
+"when mixed with page faults" or "when mixed with address space
+modifiers that take mmap_write_lock"? I think that's what your example
+shows.
 
+> For example:
+>
+>         mmap_read_lock(mm);
+>         // Another thread does mmap_write_lock().
+>         // New mmap_lock readers are blocked.
+>         vma =3D vma_lookup(mm, address);
+>         // This deadlocks on mmap_read_lock() if it faults:
+>         copy_from_user(address);
+>         mmap_read_unlock(mm);
+
+Ultimately the problem here is calling something that might require
+mmap_read_lock(mm) (in this case copy_from_user()) while already
+holding mmap_read_lock(mm). Normally that works up until you throw an
+mmap_write_lock(mm) in the mix.
+
+>
+> The RCU one can be mixed with faults, but it is not available in all
+> configs, so all RCU users need to be able to fall back to the
+> traditional way.
+>
+> =3D=3D Solution =3D=3D
+>
+> Add a variant of the RCU-based lookup that waits for writers. This is
+> basically the same as the existing RCU-based lookup, but it also takes
+> mmap_lock for read and waits for writers to finish before returning
+> the VMA. This has some advantages:
+>
+>  1. Callers do not need to have a fallback path for when they
+>     collide with writers.
+>  2. It can be used in contexts where page faults can happen because
+>     it can take the mmap_lock for read but never *holds* it.
+>  3. Its fast path does not require taking mmap_lock for read.
+>
+> Basically, when applied correctly, this approach results in faster
+> *and* simpler code.
+>
+> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Suren Baghdasaryan <surenb@google.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+> Cc: Lorenzo Stoakes <ljs@kernel.org>
+> Cc: Vlastimil Babka <vbabka@kernel.org>
+> Cc: Shakeel Butt <shakeel.butt@linux.dev>
+> Cc: linux-mm@kvack.org
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Arve Hj=C3=B8nnev=C3=A5g <arve@android.com>
+> Cc: Todd Kjos <tkjos@android.com>
+> Cc: Christian Brauner <christian@brauner.io>
+> Cc: Carlos Llamas <cmllamas@google.com>
+> Cc: Alice Ryhl <aliceryhl@google.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: netdev@vger.kernel.org
+>
+> --
+>
+> Changes from v1:
+>  * Add a comment explaining that this can not be mixed with other
+>    per-VMA lock or mmap_lock users. It is prone to deadlocks if so.
+>  * Add a FIXME about making the mmap_read_lock() killable
+>  * Add more chaneglog bits about the possibility for an infinite goto
+>    loop.
+>  * Adopt vma_start_read_unlocked() implementation from Lorenzo
+> ---
+>
+>  b/include/linux/mmap_lock.h |    3 +++
+>  b/mm/mmap_lock.c            |   27 +++++++++++++++++++++++++++
+>  2 files changed, 30 insertions(+)
+>
+> diff -puN include/linux/mmap_lock.h~lock-vma-under-rcu-wait include/linux=
+/mmap_lock.h
+> --- a/include/linux/mmap_lock.h~lock-vma-under-rcu-wait 2026-06-10 15:57:=
+55.828431712 -0700
+> +++ b/include/linux/mmap_lock.h 2026-06-10 15:57:55.834431925 -0700
+> @@ -257,6 +257,9 @@ static inline bool vma_start_read_locked
+>         return vma_start_read_locked_nested(vma, 0);
+>  }
+>
+> +struct vm_area_struct *vma_start_read_unlocked(struct mm_struct *mm,
+> +                                              unsigned long address);
+> +
+>  static inline void vma_end_read(struct vm_area_struct *vma)
+>  {
+>         vma_refcount_put(vma);
+> diff -puN mm/mmap_lock.c~lock-vma-under-rcu-wait mm/mmap_lock.c
+> --- a/mm/mmap_lock.c~lock-vma-under-rcu-wait    2026-06-10 15:57:55.83143=
+1819 -0700
+> +++ b/mm/mmap_lock.c    2026-06-10 16:02:50.723860779 -0700
+> @@ -338,6 +338,33 @@ inval:
+>         return NULL;
+>  }
+>
+> +/*
+> + * Find the VMA covering 'address' and lock it for reading. Waits for wr=
+iters to
+> + * finish if the VMA is being modified. Returns NULL if there is no VMA =
+covering
+> + * 'address'.
+> + *
+> + * Use only in code paths where no mmap_lock and no VMA lock is held.
+> + *
+> + * The fast path does not take mmap_lock.
+> + */
+> +struct vm_area_struct *vma_start_read_unlocked(struct mm_struct *mm,
+> +                                              unsigned long address)
+
+It's harder to review a function without a user but I guess users will
+be added later in this patchset.
+
+> +{
+> +       struct vm_area_struct *vma;
+> +
+> +       /* Fast path: return stable VMA covering 'address': */
+> +       vma =3D lock_vma_under_rcu(mm, address);
+> +       if (vma)
+> +               return vma;
+> +
+> +       /* Slow path: preclude VMA writers by getting mmap read lock. */
+> +       guard(rwsem_read)(&mm->mmap_lock);
+
+guard() is nice but mmap_read_{lock|unlock} has those
+__mmap_lock_trace_* traces which we lose with guard(). Not sure if
+that's a good enough reason to keep using older primitives.
+
+> +       if (!vma_start_read_locked(vma))
+> +               return NULL;
+> +
+> +       return vma;
+> +}
+> +
+>  static struct vm_area_struct *lock_next_vma_under_mmap_lock(struct mm_st=
+ruct *mm,
+>                                                             struct vma_it=
+erator *vmi,
+>                                                             unsigned long=
+ from_addr)
+> _
 
