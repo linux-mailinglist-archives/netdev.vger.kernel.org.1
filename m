@@ -1,183 +1,243 @@
-Return-Path: <netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298252-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aez1FnXxKmo2zwMAu9opvQ
-	(envelope-from <netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:33:41 +0200
+	id 0YGxDSHvKmqazgMAu9opvQ
+	(envelope-from <netdev+bounces-298252-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:23:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F6C674045
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:33:40 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBC6673F19
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 19:23:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=rHFYjUZJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298251-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=ukhLLI00;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298252-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298252-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2486D3572DB1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:20:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8716D30FA083
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 17:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5666E4BCACA;
-	Thu, 11 Jun 2026 17:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2F44C77D0;
+	Thu, 11 Jun 2026 17:18:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7C847A0DC
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 17:18:27 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781198313; cv=none; b=MtR+Y1dcTGcR3ECGFW0979GPegpBeai4Lnxn9ZYEVsAuhhTYyXXf8WuvyZQ6Qh2XvN4VlPqOmhVjPUoRnkM5oHFHsqD1L7YobxKuA9udxM8Zg/To26idXoT6S9WNrKbJqexP21V7o38IbTJ1EV01mOgief8abCqbOH83iHnaiqE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781198313; c=relaxed/simple;
-	bh=kAobYEkJDMjkUITJUMNyBriLzXiAe6UXFHqVuVHGqxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jE83Q93KH2sR/9RFLce7zUFPKSz2M+LEB2+EiHosIL5fmY1HpZSJWaZKM82WfU/yxVx1SbqkABnOSYZF/15IOMPCtg0yCA28X3CUoeyZmyjJPi/MijOTvwj4eI/JbO2Y0T5h5h9+rL/hkMYJhvf1tx+A5jpB6fohAta1B6Ish4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rHFYjUZJ; arc=none smtp.client-ip=209.85.128.52
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490b8a97b11so803795e9.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 10:18:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A97147A0C4
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 17:18:38 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781198327; cv=pass; b=Umv0PR9dVqzl/unhkEduGPHa0MeEi2UUa2WK5n65wGzT8QZiNk5GwPhL/BacOjqLbgDwpOeoX+jQ29SPK4/KiQ5pjdUsPwiqM8BxvwjzvvRLI1UxcidhlY5f6QMxa+9spTDG427qzULdQUn6fsoXKsiltiWGVYWZz7eSSdpmysA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781198327; c=relaxed/simple;
+	bh=RF6RnK1V6KWTJODwlSUS8mSgqzTMBaybdR5w62cvbXo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XEA2bpJqDHxmAUEmcQNlFNg0x4qw5aGS/H03knx8/sIQpc4QXH+BVJyhbSpUfqEb/3KM7UqvlBXEu/Z4vSsoeYvgZtIZ4XW/XKioRt5VJN0elzAYYOIsBlXgIH/Y7TDJSifV6czUS+h6MedHzlLeVdSD8hl3bT5404/RVb5iOmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ukhLLI00; arc=pass smtp.client-ip=209.85.128.173
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7e8833c99fcso863967b3.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 10:18:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781198317; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jE5I6acl/BAXlYZD8lrX67CuiWERK/AlbtltuXAwWKo6lD1A99mvyO+MLYM0+0Sqvy
+         IEE8nPfT8hqHKhS8W3aJ1MsZONHpbsaBkumw/6G550v9Yrv1Fqx6ZwDPUvg66I643BYu
+         rKxtqbxEuR4BIa3+U++4mnWqbGCbUPBkHERkNZ/DqcOci+gpPQVS5/FuqqcGZ79fF3Hh
+         2h4aUOA7rsMk1pDer7Uic/nEc0ZB9/VxpG/c0j7C76BIT3huW9rUdkIrnLSNQgVdL/1v
+         Tg65wQ8xa5Q3C6eiKoL9IZds/NCcq7NP+KLtL3M9CcGqJ0dbjVC6A8YivHNM6OXtFcBj
+         M01g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6yxvgmlFS8nguHYRzqj3MhrJBlnYhEzk73xvYxti+qI=;
+        fh=SN1ViyKC8N9zdjKziY3LauYF/DGJ6FkiTymiomnn6fU=;
+        b=kwa9ZD9poTAtEW0DOek7TiIHjMgKf3TWSHhw3hvLB0tlVCsDyh1+DC7SPNO2Iz50oH
+         Ce4NDIxXxW2Z/0kcWQyxjHyjPtZZl+ypDZeNqJLnJsH1BKIq5VQCjQeof/4vUYnrjgSE
+         t0XjEkt8Q+tFsWDqbvczr9kdfYeghRjhTtoCptEiiYW2n7UfGgjagnp1XN0MqL3oYPqW
+         r63jhrMy2ggo1rLNQwK9jEn8qkVr6gXFaj8k8cT6QuPKgcRHowJz1tZP3VuvxoWC8RY3
+         c2DU2CP/YxooBkaxtToanZ5dSuUu5loYXP/5uLMZL+SoHjKrBv43UkDPsHbfM5Fa9u7G
+         5PpQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781198305; x=1781803105; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AoP+cy2ffp1XgHOvwchIi8ndfKfAxNydtkxTWle4y9Q=;
-        b=rHFYjUZJM3ER+3l1P5F7c0asHSesLMxBRreOo5xHxWaSpz5JFbBzSMheMvRwtGY00C
-         ED6S7FFQjyxwzgtkdjR88vGS7XIYkOVT0KpYt/z51EXpm28ub6yH6PD0bybk7sWq8I2M
-         ecwjpl6yPxPt6/rxsk1GR3LilFiqDQxP9zC19aT99jlOAbRqai6b19Q90bac7pHJLq0D
-         trRjI1vV50CL7W94D7Wh/+97+eft9R2v1yhMg9dq0GIW0MiTfbt0PjPyyru+aMKNKqg7
-         YxxXM2IwzCEpfz6NQ6rAs/eD+CfEpnQjTJB70WgYyVMfSXQvQYIJ07IakbCQ2hr+c4to
-         mVwQ==
+        d=google.com; s=20251104; t=1781198317; x=1781803117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6yxvgmlFS8nguHYRzqj3MhrJBlnYhEzk73xvYxti+qI=;
+        b=ukhLLI003yqyqv2UcvYMW7PdV0N9EZpM1/sIFSKPUV0HL+iLbOs5ovoNokIUNoWHkm
+         kAmPutpE1yPTbkK6EgxgA8TjX8qkN9NhuUD+oUiZpQu0amyu1Z5CKMk0S0Qo8wDHaY49
+         uyhHSYGo0O6s9VPPUi7S/UMiejDHUxGBN7ZS9dgKNeiPq3Wpzs4DMcBLsi9yV5+20e2A
+         y8FNyaeD0YNE8xI2UT7DN14YmD0xHT3mlXZ+ELAQPGH7ldZc6e/xvDMp4U4SrbJoLklb
+         v8f5pWEPu9G3it7lQ2l8GYOAH4PH+6HDqcnOaK4EZ34jifGeVKwr2U9Tiuiel5XrxXy9
+         h/NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781198305; x=1781803105;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AoP+cy2ffp1XgHOvwchIi8ndfKfAxNydtkxTWle4y9Q=;
-        b=hud2B7TxHDWCMLZ4D32/DNBaLhIk8tF/T0m31nUICwQgPwyYdWZC8KbKgjgcKw8eYy
-         Sl3A8s3M2RKaEi8j19VX4S/GqmZJJGZ5Jvqt2FO9pJG9QFqw9O404NoIStZKNLzYPshk
-         wDjxT/lf2yrrCFIarWSziWl1u8y9tLhQVQkd1ee+MYJCrIRemlnDaTQMMJXzuviG7kbl
-         evNcU/AKaZRNQ5t9OM6CATv8A3Z137gWYXrGClUZZLt+FiEbPBDZ2ycAWnc8wNr57rI/
-         zi3OzluDVm+mQgNlOtefD9gAJx1Zc+8bGvRzQIAs2osnOyhEaDHbbnmVmzGEy4LCeEp+
-         NsaQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+udw/Ud/YRVVQX+h1LIwdcf1Q7YImblMyKvOY8t0XGidvO8BpwN2eh/5lDdBDUF983pCkfxnY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX15K8KEJGIHDBncqFlXhgu1bWZoLfI8qOvo/u7G0js5VZoQxZ
-	N5dmD4MPEpVWrc3BAVmIMJS3jMGsWEvXvkOdjChwWlLndo81Z4RUrV7eYmRdeHmE
-X-Gm-Gg: Acq92OFhVUBd9c1wTtthWnn7J+MtcvAC7085YTnX6dLpwNEMDZB6Gjyd2Ovl4lLaqW4
-	scqJmXovIpNRw0DKEXtOz9mM78+hhqgkt791S7bTnONugUQ+AqeMoyydhkdqG/HTbGyf0wD9Y3k
-	JeIuukbx3+sAFHw0dre4EBx2RW3foFzM52azTIEmX539CMRgwQjmzSNtxMhHioimF4rMRFPpE4S
-	vvTFhSKtRFn2PXsgkmCe3vdvJLnlGP4HzJ2L505l/kgJDc5gk3Ix+WrKI91gWflt7w9wwdAtmea
-	tGS77+ckbaJt+309lIPy3EyLdaQXED+jAq89Dykwwb3UYlCMqGPytKWAqWB/Sn901d5A4q7MhHb
-	E0L0L0Anu47vzuVqOT4Lqp27rV6KmbKavGH8cYLUGndZVsBurvYDiFfpglMGWk8IoPNPier6uSl
-	8hHLAy/HaQ43942YXAyMVTr1WEYj/TK0bIthbpFYiaW4Uto2s9mFcKNKgaJ7o=
-X-Received: by 2002:a05:600c:4e04:b0:490:b9d3:a9ce with SMTP id 5b1f17b1804b1-490e5640aa8mr56905655e9.30.1781198305135;
-        Thu, 11 Jun 2026 10:18:25 -0700 (PDT)
-Received: from gandalf.schnuecks.de (p5b2e2404.dip0.t-ipconnect.de. [91.46.36.4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606c10435dsm335137f8f.35.2026.06.11.10.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 10:18:24 -0700 (PDT)
-Received: by gandalf.schnuecks.de (Postfix, from userid 500)
-	id 0C018319F7E6; Thu, 11 Jun 2026 19:18:24 +0200 (CEST)
-Date: Thu, 11 Jun 2026 19:18:23 +0200
-From: Simon Baatz <gmbnomis@gmail.com>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH net-next v2 05/15] tcp: allow mptcp to drop TS for some
- packets
-Message-ID: <airt3_dPSfV54Aph@gandalf.schnuecks.de>
-References: <20260605-net-next-mptcp-add-addr6-port-ts-v2-0-758e7ca73f4d@kernel.org>
- <20260605-net-next-mptcp-add-addr6-port-ts-v2-5-758e7ca73f4d@kernel.org>
+        d=1e100.net; s=20251104; t=1781198317; x=1781803117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6yxvgmlFS8nguHYRzqj3MhrJBlnYhEzk73xvYxti+qI=;
+        b=sqMx3XSCKiZ59WtcGa2NBwlZZ9BCrfVto8C6pMTkorljBAgG86WLw24ok17U1tQ+v+
+         kyRb6kNs/vMli9NA6Sp1jVgJL8HqvSq3rGbpK3oo/3k6Po2AqFnpb/nnMsFJhqtkzUO3
+         4iv60lvnUkrOZc7LYCbj0ipKS50SpxXQdFq5NQd1vV/d4SLLyRETd/MAMWEV+3d1tv34
+         5J7LXFcfRRWozBlMmqKszZ7KUe+iS12dtvMo0RnXgEhiFaB+vWORPIJVjQKjGFSsxxXp
+         DtRe8VfymMlEwdBfST9gt4+CR4xXYzXgJYSh/PWFEnx+uQXQBFXjcP8vN6rC+FLq/JQZ
+         EQQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9cCP8Dv1SQDXJTv8021tdN7utkvu23UfOibueQH1R+Cm7bJSQI7+q7Yk5niGjGanb6QUqo2/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy00wHBPli3U5lzN4CFi1DhzPtsa1WBJAkNHy08gO/AVICbNXgP
+	ldXNVq1s5buXqKcCCT9d3h2Qi8GJAp+TYLJuviShCkEXqr2yyreGDWssOe76Fr8rikJ0CXRfU/n
+	TQ+DXblWib56Ui3Oyx6ij/JCrlukq7E8q1EbUoK5IssL8zo9/L688XdEp
+X-Gm-Gg: Acq92OGugfFQb0N1Yb/bODr50RWIXrY5CYXO39oTxZ6oy/T7ZAPhtXeCEiu7NnX2bkM
+	IIkO5Vyz7pXeN0auG0ribrwU3ltoFu+uRiMuWEAqKhFw5aQFwMeUBh5r2/O4jM0nbSF1sp3jmaj
+	/yiB9uH9VgWrfOU3a0XhoRdKUlts5BzikSgfYPY7LLHIAypaou3akg9ddMCRub1Py2u3ALJ+tjL
+	MGX9b1wuNKDDr+fRCookthUuD9AHwLCRwlYW28F0TePQK5mzU/IZU6GGPyTFs9ReSPtkFyAYEoV
+	WKEE3E+0yII95m3w005dh9jvymw2apIr1zv0SSX7FeObL57wGeidyT/TiUxYsZXIe2LBR7hzFwq
+	tz/SqnOVaImHXHIe5BFQ=
+X-Received: by 2002:a05:690c:4a11:b0:7e2:2c41:4f70 with SMTP id
+ 00721157ae682-7f6554f5ba0mr41694587b3.11.1781198316461; Thu, 11 Jun 2026
+ 10:18:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260605-net-next-mptcp-add-addr6-port-ts-v2-5-758e7ca73f4d@kernel.org>
+References: <cover.1780979031.git.bronzed_45_vested@icloud.com>
+ <42cd30856907350e1b3834a3338364f9828a307b.1780979031.git.bronzed_45_vested@icloud.com>
+ <CANn89iKLKNGE0aqyuCdxTBbRGWwAM0vCup+AL02u1UB-LrTvSw@mail.gmail.com> <20260611102134.5886fe04@pumpkin>
+In-Reply-To: <20260611102134.5886fe04@pumpkin>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 11 Jun 2026 10:18:24 -0700
+X-Gm-Features: AVVi8CfQV9C0jwXUGSwnP1WIRJkEKyOZcBjF7zwOzAQqmvmw5mg65JBwzz4UyY0
+Message-ID: <CANn89iJREO16p7koa+bXdkQPxzxpvYUFU6QmpLK7wwe13CU13w@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] net: ipv4: bound TCP reordering sysctl writes
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Ren Wei <n05ec@lzu.edu.cn>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	kuba@kernel.org, chia-yu.chang@nokia-bell-labs.com, ij@kernel.org, 
+	fmancera@suse.de, yuuchihsu@gmail.com, idosch@nvidia.com, 
+	herbert@gondor.apana.org.au, yuantan098@gmail.com, zcliangcn@gmail.com, 
+	bird@lzu.edu.cn, bronzed_45_vested@icloud.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:david.laight.linux@gmail.com,m:n05ec@lzu.edu.cn,m:ncardwell@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:fmancera@suse.de,m:yuuchihsu@gmail.com,m:idosch@nvidia.com,m:herbert@gondor.apana.org.au,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298251-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:martineau@kernel.org,m:geliang@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:mptcp@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-298252-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gmbnomis@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lzu.edu.cn,google.com,vger.kernel.org,redhat.com,kernel.org,nokia-bell-labs.com,suse.de,gmail.com,nvidia.com,gondor.apana.org.au,icloud.com];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,icloud.com:email,lzu.edu.cn:email,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A8F6C674045
+X-Rspamd-Queue-Id: 9BBC6673F19
 
-Hi Matt,
+On Thu, Jun 11, 2026 at 2:21=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Wed, 10 Jun 2026 10:04:06 -0700
+> Eric Dumazet <edumazet@google.com> wrote:
+>
+> > On Wed, Jun 10, 2026 at 9:18=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrot=
+e:
+> > >
+> > > From: Wyatt Feng <bronzed_45_vested@icloud.com>
+> > >
+> > > Reject invalid `net.ipv4.tcp_reordering` values before they reach TCP
+> > > socket state. The sysctl is stored as an `int` but copied into the
+> > > `u32` `tp->reordering` field for new sockets, so negative writes wrap
+> > > to large values.
+> > >
+> > > With `tcp_mtu_probing=3D2`, the wrapped value can overflow the
+> > > `tcp_mtu_probe()` size calculation and drive the MTU probing path int=
+o
+> > > an out-of-bounds read. Route `tcp_reordering` writes through
+> > > `proc_dointvec_minmax()` and clamp them to the per-netns range
+> > > `[1, tcp_max_reordering]`.
+> > >
+> ...
+> > Thanks for the patch. I think we can do better.
+> >
+> > Also I do not see a fix in tcp_mtu_probe()?
+> >
+> > What about:
+> >
+> >
+> > diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+> > index c0e85cc171aec099fd5d4897b1a623dd27eaee08..987bc87e255a81680ae5e23=
+ddd01c1f0de4425ec
+> > 100644
+> > --- a/net/ipv4/sysctl_net_ipv4.c
+> > +++ b/net/ipv4/sysctl_net_ipv4.c
+> > @@ -1058,6 +1058,9 @@ static struct ctl_table ipv4_net_table[] =3D {
+> >                 .data           =3D &init_net.ipv4.sysctl_tcp_reorderin=
+g,
+> >                 .maxlen         =3D sizeof(int),
+> >                 .mode           =3D 0644,
+> > +               .proc_handler   =3D proc_dointvec_minmax,
+> > +               .extra1         =3D SYSCTL_ONE,
+> > +               .extra2         =3D &init_net.ipv4.sysctl_tcp_max_reord=
+ering,
+> >                 .proc_handler   =3D proc_dointvec
+> >         },
+> >         {
+> > @@ -1293,7 +1296,8 @@ static struct ctl_table ipv4_net_table[] =3D {
+> >                 .data           =3D &init_net.ipv4.sysctl_tcp_max_reord=
+ering,
+> >                 .maxlen         =3D sizeof(int),
+> >                 .mode           =3D 0644,
+> > -               .proc_handler   =3D proc_dointvec
+> > +               .proc_handler   =3D proc_dointvec_minmax,
+> > +               .extra1         =3D SYSCTL_ONE,
+>
+> Would it be reasonable to put in a 'sanity' upper bound here?
 
-On Fri, Jun 05, 2026 at 07:21:49PM +1000, Matthieu Baerts (NGI0) wrote:
-> With TCP-timestamps (padded) taking 12 bytes and ADD_ADDR IPv6 + port
-> taking 30 bytes, the 40-byte limit for the TCP options is reached. In
-> this case, it is then not possible to send the address signal.
-> 
-> The idea is to let MPTCP dropping the TCP-timestamps option for some
-> specific packets, to be able to send some specific pure ACK carrying >28
-> bytes of MPTCP options, like with this specific ADD_ADDR. A new
-> parameter is passed from tcp_established_options to the MPTCP side to
-> indicate if the TCP TS option is used, and if it should be dropped. The
-> next commit implements the part on MPTCP side, but split into two
-> patches to help TCP maintainers to identify the modifications on TCP
-> side. This feature will be controlled by a new add_addr_v6_port_drop_ts
-> MPTCP sysctl knob.
-> 
-> It is important to keep in mind that dropping the TCP timestamps option
-> for one packet of the connection could eventually disrupt some
-> middleboxes: even if it should be unlikely, they could drop the packet
-> or even block the connection. That's why this new feature will be
-> controlled by a sysctl knob.
+Probably, I am not even sure we use this much with RACK anyway.
 
-RFC 7323 (which obsoletes RFC 1323) specifies an "all or nothing"
-approach for the TS option.  Section 3.2 states:
+Neal, what do you think?
 
-   Once TSopt has been successfully negotiated, that is both <SYN> and
-   <SYN,ACK> contain TSopt, the TSopt MUST be sent in every non-<RST>
-   segment for the duration of the connection, [...] If a
-   non-<RST> segment is received without a TSopt, a TCP SHOULD silently
-   drop the segment.
-
-So, selectively omitting the TS option on established subflows
-appears to go against RFC 7323 at the TCP level.  Do we consider that
-an acceptable deviation for MPTCP subflows?
-
-(Maybe I am missing something obvious here, but I couldn't find any
-prior discussion on this aspect.)
-
- 
--- 
-Simon Baatz <gmbnomis@gmail.com>
+>
+> Since tcp_max_reordering can be lowered after tcp_reordering is set
+> the bound set here isn't 'hard'.
+> So the same sanity limit for both may be enough?
+>
+> I also found this 'gem':
+> void tcp_enter_loss(struct sock *sk)
+> {
+> ...
+>         u8 reordering;
+> ...
+>         reordering =3D READ_ONCE(net->ipv4.sysctl_tcp_reordering);
+>
+> Which makes be think that someone expected these values to be small.
+>
+> I don't know what the sane bounds are for either sysctl or tp->reordering
+> itself (which is u32).
+>
+> -- David
+>
+>
 
