@@ -1,134 +1,148 @@
-Return-Path: <netdev+bounces-298225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298227-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HibzOXToKmrNzAMAu9opvQ
-	(envelope-from <netdev+bounces-298225-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:55:16 +0200
+	id MoWSHjvpKmoOzQMAu9opvQ
+	(envelope-from <netdev+bounces-298227-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:58:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F098673C05
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA71673C8E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 18:58:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Unykz7IH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298225-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298225-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298227-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298227-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF1F03400B12
-	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:37:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DB8F346CE39
+	for <lists+netdev@lfdr.de>; Thu, 11 Jun 2026 16:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542362EEE76;
-	Thu, 11 Jun 2026 16:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3315233C19E;
+	Thu, 11 Jun 2026 16:38:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3968333A711
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 16:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A810633F585;
+	Thu, 11 Jun 2026 16:37:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781195834; cv=none; b=pSkA1QMrRHqU0Ddba65Jako9PlvETNzcxEL62t6ygZ9KvSyTeaHDzc9kLJF/0DI7+bCQ0M5yRP9r6A2uccoy3zyqLOpZRYEEAxMwSFWRATA7FnnkP5yoxbzJ0yknkJ/aSh7rmToKZw5ZiXPPR/+ZfUiJRptIE51GPe03Nd9pufI=
+	t=1781195880; cv=none; b=io0VR2SoI4foscPAEErf0vnBWOABhvFbp87FSMUTZWWimGlr7kNhzpohMLHcQ4G0E8xBmNiawrLYDTC4VhV1pICIjCEbDoJJxZRCVfowoYozpV1NJhGNpxqS0zQYrU8Nuy88Guf2lrURRVB1oecthpYK0kaBs+EPpZPKiezO25o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781195834; c=relaxed/simple;
-	bh=THGFb424cSjMWDbvWIsERMcMVPYcS2mn3dgc/28swA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S75ns4ulbNggyJ4u7U2MMcvPMJpU4HTWxwvBZrdZEo7UpfSdaOZCUQCrHu7qxEetDG/c6aj3CJIlmNxYF+9BZgKUbWc58QOjpD+Ojss+ASZl9Y5H7ngNGS1Y8s+bCZ/mp+j1tuzksaa2CJKCLgiWSi8Md/y8UGbV6H5ClFz8NAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Unykz7IH; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506311F00899;
-	Thu, 11 Jun 2026 16:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781195832;
-	bh=ZSqDXVAqq24W1HC/0+seIWlfKFSSqkK6xzTjV0nilPk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Unykz7IHRlFiIyIQUMwgVXXNBrDresGjbKMH6FCnpRj4g+5vGqsdUt5cQ1AcS2AIn
-	 paE6IWek5jmwkllnm0thrm3x42CMqBjOTHcsneah+ZGFn9UM8R9SL29dOpuLHjFkdz
-	 HN2KG1LhXHIMrpdFkD/oCtxA5RDnUYmPhvNLJ8DzWVz4cSJV79/oBYeGGiHvk7ZB3K
-	 RMWPjTa70eBpUtrP1J9t0gzU6vINvueKksODRKfaqUdDPHX9PO2H52G6uIx2bsFMzG
-	 ZanAgXsO3B3aTWEzlJ5KgIBAKoU+uAOv/C8EsdcP11Rrnr8kpXxgp0MEJcdh3hxRVR
-	 XbQ6OuouRQmHw==
-Date: Thu, 11 Jun 2026 17:37:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	3chas3@gmail.com, yuantan098@gmail.com, bird@lzu.edu.cn,
-	zcliangcn@gmail.com
-Subject: Re: [PATCH net 1/1] net: atm: reject out-of-range traffic classes in
- QoS validation
-Message-ID: <20260611163709.GW3920875@horms.kernel.org>
-References: <cover.1780965530.git.zcliangcn@gmail.com>
- <58f02c6f73d9818fd5d2022e1116759fdde6116b.1780965530.git.zcliangcn@gmail.com>
+	s=arc-20240116; t=1781195880; c=relaxed/simple;
+	bh=2tj/KtXz7viCSArb/If5hec2upVXPx/kJLGbdyL42zs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SPTcHTlp+ZR6Q0Bc2iUEv63hcGgRtIVwE25yMqGhLBKIfv1bnkCFXu6zI+hhp2ULqbqb5U7hEIVbpQixqZih/zrdwQsIO67Okx7t/AUY+8iaOrPIu88eIdsvDsehTKlw4Dm8PB0vd5IPwYWOsLJQ+V4k5maI4wM3pU7tl3MRD9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Received: from localhost.localdomain (unknown [117.182.75.76])
+	by APP-05 (Coremail) with SMTP id zQCowAD3Z+tZ5Cpq+kEaEw--.26165S2;
+	Fri, 12 Jun 2026 00:37:47 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: af_key: fix refcount leak in pfkey_spdadd()
+Date: Fri, 12 Jun 2026 00:37:43 +0800
+Message-ID: <20260611163743.99526-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58f02c6f73d9818fd5d2022e1116759fdde6116b.1780965530.git.zcliangcn@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAD3Z+tZ5Cpq+kEaEw--.26165S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Wry5CF4DuF4DAw1fKFW3KFg_yoW8Jr1kpF
+	43G34YkFs8X343CFs2ka4UWF1Fyay5Gw4q9a18Cr1Sy3s5tw1ruan5tFyjkF1fC3ykJay7
+	Jry3Wr98CFyDAFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBg0PA2oqzjQ-SAAAsK
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.sourceforge.net,vger.kernel.org,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-298225-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:linux-atm-general@lists.sourceforge.net,m:netdev@vger.kernel.org,m:3chas3@gmail.com,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:zcliangcn@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298227-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,horms.kernel.org:mid,lzu.edu.cn:email]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,iscas.ac.cn:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3F098673C05
+X-Rspamd-Queue-Id: DEA71673C8E
 
-On Tue, Jun 09, 2026 at 04:34:37PM +0800, Ren Wei wrote:
-> From: Zhengchuan Liang <zcliangcn@gmail.com>
-> 
-> Reject ATM traffic classes above ATM_ANYCLASS in check_tp().
-> SO_ATMQOS stores the supplied QoS after check_qos() succeeds, so
-> accepting larger values leaves invalid traffic_class values in
-> vcc->qos.
-> 
-> That bad state later reaches pvc_info(), which indexes class_name[]
-> with vcc->qos.{rx,tp}.traffic_class. Values above ATM_ANYCLASS cause
-> an out-of-bounds read when /proc/net/atm/pvc is read.
-> 
-> Tighten the existing QoS validation so invalid traffic_class values
-> are rejected at the point where user supplied QoS is accepted.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: Codex:GPT-5.4
-> Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+In pfkey_spdadd(), an xfrm policy is allocated via xfrm_policy_alloc()
+with a refcount of 1. On the success path the policy is eventually freed
+by xfrm_pol_put(), which decrements the refcount and calls
+xfrm_policy_destroy() only when it reaches zero. However, all error
+paths directly call xfrm_policy_destroy() without releasing the initial
+reference, leaking the policy object.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fix the leak by replacing the direct xfrm_policy_destroy() call with
+xfrm_pol_put() in the error unwind. Keep the xp->walk.dead assignment
+as it is required by xfrm_policy_destroy()'s BUG_ON check.
 
-I believe the issue flagged by AI-generated review on
-https://netdev-ai.bots.linux.dev/sashiko/ is a false positive.
+Cc: stable@vger.kernel.org
+Fixes: 64c31b3f7648 ("[XFRM] xfrm_policy_destroy: Rename and relative fixes.")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ net/key/af_key.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index 9cffeef18cd9..013592086f1e 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -2370,7 +2370,7 @@ static int pfkey_spdadd(struct sock *sk, struct sk_buff *skb, const struct sadb_
+ 
+ out:
+ 	xp->walk.dead = 1;
+-	xfrm_policy_destroy(xp);
++	xfrm_pol_put(xp);
+ 	return err;
+ }
+ 
+-- 
+2.50.1 (Apple Git-155)
+
 
