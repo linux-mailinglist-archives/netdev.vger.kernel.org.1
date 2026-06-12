@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-298647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298648-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nIvNNFsCLGocJgQAu9opvQ
-	(envelope-from <netdev+bounces-298647-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:58:03 +0200
+	id TQC5LaoBLGrPJQQAu9opvQ
+	(envelope-from <netdev+bounces-298648-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:55:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A226798FD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:58:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6DA679891
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:55:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b=ghmCFP54;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298647-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298647-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b="Hx4Q/M4o";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298648-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298648-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1FE6C31EE0E4
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:53:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 723A8311611F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB047383999;
-	Fri, 12 Jun 2026 12:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5563812F2;
+	Fri, 12 Jun 2026 12:53:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CA3382298
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 12:52:54 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781268776; cv=pass; b=g0ONXeXh78wPMCniD9YXPlhL4T8UxZlRyajSrRKvgpgLRmjrVuQUBULkNQvPkxyIXCZRziq70JbbVTtBlm7mV0j1lx3TJcdpRhkZnvHzMixW8elHbsj9pw7twoVmA4lu9bGNQSk1M6TN6IrvF0wHVKBljqsD89n1z59ANKs0vZ8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781268776; c=relaxed/simple;
-	bh=86mDC7ruP/2ajWD+fSdzORJCNhBZZaQsuJ8vrIhtAIM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LW0bovwK3qk2My40UWa7qamYUOPTODs/E/EW8Nq31qAhCjt05raTbw/xkxTwtJM+Izp2elQxEg5lkjJ2tWQ9g/MLQ7BnIolZBC8QNhyt5efEV5q/nct+Kn0K3B2HBV2UHLhV4vf9afrKG1llyUmn9XBdwPSpB9c0Ju9L7AdH3Zs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=ghmCFP54; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal: i=1; a=rsa-sha256; t=1781268737; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=KdZI3vqBElFt5L+TCsFlC8P7oTvfUCyk7DSvALplRI/yZKsEfmFyOKxsN1UdaSxy1OYgH7NagMqBTjNhK7uOMfQIkMkU7OyGdOm81wb3JhQMsWWf7aLpWgVI7frf50+ufeQ4C9DFt9ZAq95QVW5KLAAIYKpZtrL2nYhp6/I1wyA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1781268737; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=cS9NSECc2+e0XAcEOI0LWPvqayQh8tYk2xJCYx044c8=; 
-	b=VsOS+rhOdrPHksZJM4FtskFX4fa9Yx6bNvpIuhbKvmF0Kxpy+iIJpZ7jHGk227cjgCs3VSm9c9fOp1W/mviBGlSJ8oaKanW2nF9+4KdgHAo0DDmUBHGaM7QifWUMGEmVPuFAyhhPYvkV5IlWzAwlM0gP0y1OdtLRX2C8FHly3vE=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=carlosgrillet.me;
-	spf=pass  smtp.mailfrom=carlos@carlosgrillet.me;
-	dmarc=pass header.from=<carlos@carlosgrillet.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781268737;
-	s=zmail; d=carlosgrillet.me; i=carlos@carlosgrillet.me;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=cS9NSECc2+e0XAcEOI0LWPvqayQh8tYk2xJCYx044c8=;
-	b=ghmCFP540ye8Vaax4NErDhertjPTiZxiwlclOuvTEI/2mlV4W2yMDEiaoNlarjm4
-	TDa8EPvHxITZ7J/xuJgBxQXQHAyzwGMWpVlJJDXWQcfkkMw6yUq7hMA8eBc9pnNOJCP
-	jldnEWgMGEeknIp6iNsjSlxvjLb8eZFprLGcAQbQ=
-Received: by mx.zoho.eu with SMTPS id 1781268735526513.0757740974964;
-	Fri, 12 Jun 2026 14:52:15 +0200 (CEST)
-From: Carlos Grillet <carlos@carlosgrillet.me>
-To: coreteam@netfilter.org (open list:NETFILTER),
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Westphal <fw@strlen.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-	netfilter-devel@vger.kernel.org (open list:NETFILTER),
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Phil Sutter <phil@nwl.cc>,
-	Simon Horman <horms@kernel.org>
-Cc: Carlos Grillet <carlos@carlosgrillet.me>
-Subject: [PATCH nf-next 0/6] netfilter: replace u_int*_t with kernel int types
-Date: Fri, 12 Jun 2026 14:51:46 +0200
-Message-ID: <20260612125146.75672-1-carlos@carlosgrillet.me>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260612123653.70510-2-carlos@carlosgrillet.me>
-References: <20260612123653.70510-2-carlos@carlosgrillet.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FD83074A1;
+	Fri, 12 Jun 2026 12:53:35 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781268818; cv=none; b=Ixz7V9ciSXnVlNletU3N6/hdEjK/kuhu4yiMNaDrz2loFJIDijoS7CgmLxC9X8bNzhpSfLyBs+qh0X5juYoIB2CrSOADbZaJuy6Gc5gJY9PLrNX88/pj2BBEPq0cPhTuUzEUF6LDiCj/h4jwKL/iC1/956IpUCuG9PhKRolSCv0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781268818; c=relaxed/simple;
+	bh=SbBbnkqFuEBxsy92e6y4Uu7nYPMd5yH16bYDCYTkukE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=Mdpob50cOTebZUW8oyDKYqkO90Gu1s7a39GAMlvkLzAs6A5Oi6xBANP2GaYXrm7CTJZRoOf6x2UMatZXcAxfd455l/aPtrK2YYTEYpGLiOjlgWMkkYxX3PkIj1ok5lUGHZtzxsDWZcjMV2+6gXYQZOJwRm7RhIwah3XpLm4o1gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Hx4Q/M4o; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5CAC9A4BFE;
+	Fri, 12 Jun 2026 14:53:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1781268813; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=5TjyvoWU4via/Ypy3GXQXVRXUREfW9VJTOTzTI4VxYM=;
+	b=Hx4Q/M4ohqBf2TdOcV9dEEIgp5SyEFEUbkkxOyS4nq9YEvFJOiVOk+e7X6ndp9XAo6gTYQ
+	OIO72FLObx3dA4FLgZqggAGNvLGkLRHNOG9phnkr7hpFOHsn8nR0t683eO4Djov0quKp0j
+	Hf1zzjllsgwriPX+wKLpBxCkuXwCpLn01wL7UWDZvZYIWNoiic7MBEPsZE29uBotEtbt+/
+	g+HPO4aRYCP8Ga4hAOyAlJisX+l05AKDF1g6+Gv8tKn2qzp6jTFG00GgOCZt8ZjaBtUMqq
+	g+hroHl+8+vFfC2VLQJw9YHmrZFTeKQSJR+hyNg19zIN9t004irbR9cNnwljxw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Fri, 12 Jun 2026 14:53:31 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: netdev@vger.kernel.org, Theo Lebrun <theo.lebrun@bootlin.com>, Nicolas
+ Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rpi-kernel@lists.infradead.org, Lukasz Raczylo <lukasz@raczylo.com>,
+ Steffen Jaeckel <sjaeckel@suse.de>
+Subject: Re: [PATCH] net: macb: add TX stall timeout callback to recover from
+ lost TSTART write
+In-Reply-To: <aiwA1dD-qXcT3hds@apocalypse>
+References: <771b8faeaee1fce4a84a5ba2661d60b35a65a6d5.1781253818.git.andrea.porta@suse.com>
+ <dbc25b24865a1ad92555bc826bef4267@tipi-net.de> <aiwA1dD-qXcT3hds@apocalypse>
+Message-ID: <85507fd0fb42fca280aca1ee02178ca9@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[carlosgrillet.me:s=zmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:coreteam@netfilter.org,m:davem@davemloft.net,m:edumazet@google.com,m:fw@strlen.de,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,m:pabeni@redhat.com,m:phil@nwl.cc,m:horms@kernel.org,m:carlos@carlosgrillet.me,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DMARC_NA(0.00)[carlosgrillet.me];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_RECIPIENTS(0.00)[m:andrea.porta@suse.com,m:netdev@vger.kernel.org,m:theo.lebrun@bootlin.com,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rpi-kernel@lists.infradead.org,m:lukasz@raczylo.com,m:sjaeckel@suse.de,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-298648-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298647-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[carlosgrillet.me:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,carlosgrillet.me:dkim,carlosgrillet.me:mid,carlosgrillet.me:from_mime]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:dkim,tipi-net.de:mid,tipi-net.de:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 43A226798FD
+X-Rspamd-Queue-Id: 0F6DA679891
 
-Hi all! This is my first patch series of many, I hope :)
-I'd like to start contributing by helping out with janitor work,
-standardizing code and cleaning up.
+Hi Andrea
 
-This patch series replaces POSIX u_int8_t/u_int16_t with the preferred
-kernel types u8/u16 across several netfilter files.
+On 12.6.2026 14:51, Andrea della Porta wrote:
 
-u_int*_t appears in many other files, 48 more to be precise, but I wanted
-to keep this series small, unless advised otherwise.
+> [...]
 
-No functional changes.
+>> 
+>> The commit message describes it as RP1 specific, but it gets applied 
+>> to all
+>> other variants?
+> 
+> I've seen this issue happening only on RaspberryPi 5, but AFAIK it
+> could affect also other MACB blocks connected through PCIe, so it
+> may be widespread (even though it should have probably already been
+> noticed in the past). In the orginal driver there's no timeout callback
+> defined and this is much like pretgending the issue causing the timeout
+> to happen to go away without doing anything (whatever the cause ot the
+> specific hw are). So in my opinion we can just extend that to all MACB.
+> Or maybe we should execute the restart conditionally on
+> .compatible = "raspberrypi,rp1-gem"?
 
-Carlos Grillet (6):
-  netfilter: nf_nat_ftp: replace u_int16_t with u16
-  netfilter: nf_nat_irc: replace u_int16_t with u16
-  netfilter: nf_sockopt: replace u_int8_t with u8
-  netfilter: xt_DSCP: replace u_int8_t with u8
-  netfilter: xt_TCPOPTSTRIP: replace u_int8_t and u_int16_t with u8 and u16
-  netfilter: nf_log: replace u_int8_t with u8
+I just observed the issue once, but other people reported it to be 
+happen more
+frequently. If we can narrow down a reproducer, it would be good to test 
+on other
+blocks too (like EyeQ at Théo's).|
 
- net/netfilter/nf_log.c         | 14 +++++++-------
- net/netfilter/nf_nat_ftp.c     |  2 +-
- net/netfilter/nf_nat_irc.c     |  2 +-
- net/netfilter/nf_sockopt.c     |  8 ++++----
- net/netfilter/xt_DSCP.c        |  8 ++++----
- net/netfilter/xt_TCPOPTSTRIP.c |  8 ++++----
- 6 files changed, 21 insertions(+), 21 deletions(-)
+So maybe you can imagine a good repro for this issue?
 
--- 
-2.54.0
-
+Thanks,
+Nicolai
 
