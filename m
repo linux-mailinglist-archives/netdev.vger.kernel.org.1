@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-298713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lWqJCOUuLGpiNAQAu9opvQ
-	(envelope-from <netdev+bounces-298713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:08:05 +0200
+	id /mIFGMgvLGrCNAQAu9opvQ
+	(envelope-from <netdev+bounces-298714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:11:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A5E67AB8D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:08:04 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5939B67AC1C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:11:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=GoFSUE26;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298713-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298713-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QjzHw5MA;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298714-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298714-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BEE2301FD70
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:07:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 781EC300AD71
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B77391822;
-	Fri, 12 Jun 2026 16:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F91A3815D0;
+	Fri, 12 Jun 2026 16:08:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B84135CBC3;
-	Fri, 12 Jun 2026 16:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6DF36A008;
+	Fri, 12 Jun 2026 16:08:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781280470; cv=none; b=s0CXXekvVv9hSIU0eIgJ9SV1cqe++MgUSxREllz7jkgv4UVEfGtAr3YB4YLnprq8PnUtq94a9Uzo1MWjen834mZPmQaQdnHhJTT5dLPnbINoqIM5vC5b66emZcCgQjPsWJRL/ObjpP3yPfwb1ILp51AfHGV4lvh/R8ZZKtIgRIg=
+	t=1781280484; cv=none; b=B6VCtDwbyhKeLtZ92DYwBwSfbBY/JVuCLZM9jt148t44COne7H2BlMqjHAUm/e41lAE7XDAqGlTzRwu+646PYW98fh6EIu69Bg5i0cHPdKMLUKa5Mlo0+vnPHIEUFgjl0M+FktQisOFS5jhyVP9h3i7HQ/rHwQQkcPsxTDyCaKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781280470; c=relaxed/simple;
-	bh=PM7ZGiMgqzvDevJ43e24iFiCX3mlYcDvWstcDsODdT0=;
+	s=arc-20240116; t=1781280484; c=relaxed/simple;
+	bh=LR2BfBZna3OkeH+hzZlO/JF17554TASaanZ9fHy0NPc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lqK/0y5SCM9LX7zFT1tKlhKcKhlIjd4x5vWizKwD+HeFob+BmQSoeWOKg9v5x8ydyxH2AGb/AIZekz7slR/Rg6MocUAChvcU9fZI24e8/lizaPVs4FJOtD+NIUvnK5Yo/XruTQVgGm+iwI9rHYUzgK0yJcZUwKuLGvbBe/fDzHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GoFSUE26; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D28621F000E9;
-	Fri, 12 Jun 2026 16:07:43 +0000 (UTC)
+	 MIME-Version; b=Z4C6Vuhu7B3g+xs+ucgGteK37olLdyVOOcM/GXjLjn+OhQWCrcJ4Q0SGOZsCjH69KaBncRQPXqxT2/Xs76szsho5AooQg0KxNYcKpz+Hw2KkYZ1vMztKQkMKjYK0X9uqe82ETQiKmMXh2/uOrJKa/qznwOSn/s5Yv7XuESr7Y6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QjzHw5MA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B412D1F000E9;
+	Fri, 12 Jun 2026 16:07:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781280467;
-	bh=F8HKmkgMfnWSpRy+B4aGMkwUWIdFXIhB0ADkhsPsHow=;
+	s=k20260515; t=1781280482;
+	bh=yz6KYSR4gT24Ep3/Nz7Y+Zry32zkNaxRVcE0WS2wn8M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GoFSUE26dIRsAC/9P56FPrymI4gJRC+ATFFDJnH89jw4DVDJVylmCR3i0mQjYJQJ/
-	 SfxVNnDYPCD68SP/yhS5qOr76wrbyPr9weSDd2qxznCS45UkYtnC+udKLstQ/Z+NdA
-	 SZIdP+Yu2R/s/kT6NxDVOvAxHaNxTg89vJ8vzTlte48tUhkCzYsvIgpZEDtffKE3wq
-	 nQo/4XWW7KUWxPUW/wVu4LVHtyRlkPLWeVONcWfW/374nVQHbfy24VjrbBO7QANUMK
-	 5Bdf5vuA/VG5cT/vra0El0LlW3KqoVksdARH513TFCB3nQ75/+O7sAizXjUGL8kpKa
-	 LGufhvmrjEIeQ==
+	b=QjzHw5MAowB7dMdWD33YX9M+vy6L/A8hsa+jsLcIHehALzVYe2F0cEVvqCRHOzp+0
+	 IHB2E4bogbhrr5b/elH3o1t/woaFhN+spbuzhUU/obxAgnnecamWzi+dyFryRRh1GQ
+	 0pm/kSlpChJQuyNutVxvdGXgvx/Iqhav29feM5dA04YqfbifrgBNrI4iQOyRjDdEh1
+	 ywnJCDRMPQrBjI6S3FpjkSibya5nQCbDEvDGxBAcba0mzup1o51BQOuO1cqVNCCPeI
+	 OceN1zyHhkh63bDxz/huBY3jZgM/HVSKe01KzabdlK72PDi9MtwE63gj1UcGQjFCio
+	 BzdBYA1kBKZmw==
 From: Simon Horman <horms@kernel.org>
 To: gongfan1@huawei.com
 Cc: Simon Horman <horms@kernel.org>,
@@ -68,12 +68,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	shijing34@huawei.com,
 	zhengjiezhen@h-partners.com,
 	maxime.chevallier@bootlin.com
-Subject: Re: [PATCH net-next v09 1/5] hinic3: Add ethtool queue ops
-Date: Fri, 12 Jun 2026 17:06:53 +0100
-Message-ID: <20260612160653.690379-1-horms@kernel.org>
+Subject: Re: [PATCH net-next v09 2/5] hinic3: Add ethtool statistic ops
+Date: Fri, 12 Jun 2026 17:07:51 +0100
+Message-ID: <20260612160751.690490-1-horms@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <02e87952a65aa268526ade2f03de6c76fbc1fe9d.1781062575.git.wudi234@huawei.com>
-References: <02e87952a65aa268526ade2f03de6c76fbc1fe9d.1781062575.git.wudi234@huawei.com>
+In-Reply-To: <d3a84fab341ec7060236a7b74709e48f622df98e.1781062575.git.wudi234@huawei.com>
+References: <d3a84fab341ec7060236a7b74709e48f622df98e.1781062575.git.wudi234@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,11 +90,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298713-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298714-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:gongfan1@huawei.com,m:horms@kernel.org,m:wudi234@huawei.com,m:tengpeisen@huawei.com,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:ioana.ciornei@nxp.com,m:mohsin.bashr@gmail.com,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:luosifu@huawei.com,m:guoxin09@huawei.com,m:zhoushuai28@huawei.com,m:wulike1@huawei.com,m:shijing34@huawei.com,m:zhengjiezhen@h-partners.com,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:mohsinbashr@gmail.com,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[21];
@@ -114,193 +114,119 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 74A5E67AB8D
+X-Rspamd-Queue-Id: 5939B67AC1C
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 Full review at: https://sashiko.dev
 ---
-hinic3: Add ethtool queue ops
+Subject: hinic3: Add ethtool statistic ops
 
-This commit implements ethtool callback functions .get_ringparam and
-.set_ringparam. These callbacks allow users to utilize ethtool for detailed
-queue depth configuration and monitoring.
+This commit adds PF/VF statistics functions for TX and RX processing in the
+hinic3 driver. It implements various ethtool callbacks to allow detailed
+netdev stats monitoring. It also adds a helper for management commands
+requiring separate I/O buffers to retrieve expanded MAC stats.
 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
-> index 90fc16288de95..be9992a235f7b 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_ethtool.c
 [ ... ]
-> @@ -409,6 +410,96 @@ hinic3_get_link_ksettings(struct net_device *netdev,
->  	return 0;
->  }
+> +static struct hinic3_stats hinic3_function_stats[] = {
+> +	HINIC3_FUNC_STAT(tx_unicast_pkts_vport),
+[ ... ]
+> +static struct hinic3_stats hinic3_port_stats[] = {
+> +	HINIC3_PORT_STAT(mac_tx_fragment_pkt_num),
+
+[Severity: Medium]
+Does this duplicate standard network counters into the private ethtool strings
+interface?
+
+The networking driver guidelines note that stats with a standard UAPI should
+not be duplicated in the private strings.
+
+The arrays for function and port stats export standard statistics like unicast
+packets or MAC errors. Could these be exposed exclusively through standard
+interfaces like rtnl_link_stats64 or ethtool_mac_stats instead?
+
+[ ... ]
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+[ ... ]
+> @@ -588,5 +643,10 @@ int hinic3_rx_poll(struct hinic3_rxq *rxq, int budget)
+>  	if (rxq->delta >= HINIC3_RX_BUFFER_WRITE)
+>  		hinic3_rx_fill_buffers(rxq);
 >  
-> +static void hinic3_get_ringparam(struct net_device *netdev,
-> +				 struct ethtool_ringparam *ring,
-> +				 struct kernel_ethtool_ringparam *kernel_ring,
-> +				 struct netlink_ext_ack *extack)
+> +	u64_stats_update_begin(&rxq->rxq_stats.syncp);
+> +	rxq->rxq_stats.packets += (u64)nr_pkts;
+> +	rxq->rxq_stats.bytes += rx_bytes;
+> +	u64_stats_update_end(&rxq->rxq_stats.syncp);
+
+[Severity: Medium]
+Does this calculation undercount the number of physical packets received when
+Large Receive Offload is active?
+
+Earlier in the loop, the code accounts for aggregated wire packets by adding
+the length of the headers for the aggregated packets to the bytes counter.
+
+However, the rxq_stats.packets update only adds the number of host SKBs,
+omitting the extra wire packets entirely.
+
+[ ... ]
+diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+--- a/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
++++ b/drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+[ ... ]
+> @@ -260,6 +267,9 @@ static int hinic3_tx_csum(struct hinic3_txq *txq, struct hinic3_sq_task *task,
+>  		if (l4_proto != IPPROTO_UDP ||
+>  		    ((struct udphdr *)skb_transport_header(skb))->dest !=
+>  		    VXLAN_OFFLOAD_PORT_LE) {
+> +			u64_stats_update_begin(&txq->txq_stats.syncp);
+> +			txq->txq_stats.unknown_tunnel_pkt++;
+> +			u64_stats_update_end(&txq->txq_stats.syncp);
+>  			/* Unsupported tunnel packet, disable csum offload */
+>  			skb_checksum_help(skb);
+>  			return 0;
+
+[Severity: High]
+This is a pre-existing issue, but does ignoring the return value of the
+software checksum fallback risk silent data corruption?
+
+If the calculation in skb_checksum_help fails, for example due to an
+allocation failure when ensuring the buffer is writable, the packet checksum
+remains uncalculated. 
+
+Since the error is ignored and 0 is returned, the driver proceeds to transmit
+the packet without hardware offload, resulting in a corrupted packet being
+sent onto the network.
+
+[ ... ]
+> +static void hinic3_get_pkt_stats(struct hinic3_txq *txq, struct sk_buff *skb)
 > +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	u32 hdr_len, tx_bytes;
+> +	unsigned short pkts;
 > +
-> +	ring->rx_max_pending = HINIC3_MAX_RX_QUEUE_DEPTH;
-> +	ring->tx_max_pending = HINIC3_MAX_TX_QUEUE_DEPTH;
-> +	ring->rx_pending = nic_dev->q_params.rq_depth;
-> +	ring->rx_pending = nic_dev->q_params.sq_depth;
+> +	if (skb_is_gso(skb)) {
+> +		hdr_len = (skb_shinfo(skb)->gso_segs - 1) *
+> +			  skb_tcp_all_headers(skb);
+> +		tx_bytes = skb->len + hdr_len;
 
 [Severity: High]
-Does this code accidentally assign rx_pending twice and omit tx_pending?
-Querying the interface will return 0 for the Tx queue depth and an
-incorrect value for the Rx queue depth, which also breaks partial
-ring updates.
+Can this sequence cause an out-of-bounds read and statistics corruption for
+UDP GSO packets?
 
-> +}
-> +
+The code assumes all GSO packets use TCP by calling a helper that reads the
+TCP header length. If the driver handles UDP-encapsulated offloads, the
+transport header is much shorter. 
+
+Reading the data offset from a TCP header location accesses bytes past the end
+of the UDP header. This could read arbitrary payload data as a header length
+multiplier, corrupting the tx_bytes statistic and potentially causing a
+page fault.
+
 [ ... ]
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-> index e7d6c2033b451..bc4d879f9be4e 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-> @@ -137,7 +137,8 @@ static int hinic3_set_interrupt_moder(struct net_device *netdev, u16 q_id,
->  	struct hinic3_interrupt_info info = {};
->  	int err;
->  
-> -	if (q_id >= nic_dev->q_params.num_qps)
-> +	if (q_id >= nic_dev->q_params.num_qps ||
-> +	    !mutex_trylock(&nic_dev->change_res_mutex))
->  		return 0;
-
-[Severity: High]
-Is it safe to silently return 0 (success) without applying the interrupt
-moderation if the mutex is contended? This appears to drop hardware
-configuration updates without informing the caller.
-
->  
->  	info.interrupt_coalesc_set = 1;
-[ ... ]
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-> index 0a888fe4c975b..c87624a5e5dcd 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-[ ... ]
-> @@ -315,6 +316,9 @@ static void hinic3_link_status_change(struct net_device *netdev,
->  {
->  	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
->  
-> +	if (!mutex_trylock(&nic_dev->change_res_mutex))
-> +		return;
-> +
-
-[Severity: High]
-Can this usage of mutex_trylock cause physical link status events to be
-discarded? If the lock is held (e.g., during an ethtool ring size change),
-the OS link state could permanently diverge from the physical link state.
-
->  	if (link_status_up) {
->  		if (netif_carrier_ok(netdev))
->  			return;
-
-[Severity: Critical]
-Does this early return path leak the mutex? We acquired change_res_mutex
-earlier, but it looks like we exit without unlocking it, which would
-cause subsequent deadlocks.
-
-> @@ -330,6 +334,8 @@ static void hinic3_link_status_change(struct net_device *netdev,
->  		netif_carrier_off(netdev);
->  		netdev_dbg(netdev, "Link is down\n");
->  	}
-> +
-> +	mutex_unlock(&nic_dev->change_res_mutex);
->  }
-
-[Severity: Critical]
-There is another early return just above this code:
-        if (!netif_carrier_ok(netdev))
-                return;
-Similarly, does this early return also forget to call mutex_unlock()?
-
->  
->  static void hinic3_port_module_event_handler(struct net_device *netdev,
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-> index da73811641a9d..047214cfc7532 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-[ ... ]
-> @@ -428,6 +439,74 @@ static void hinic3_vport_down(struct net_device *netdev)
->  	}
->  }
->  
-> +int
-> +hinic3_change_channel_settings(struct net_device *netdev,
-> +			       struct hinic3_dyna_txrxq_params *trxq_params)
-> +{
-[ ... ]
-> +	err = hinic3_vport_up(netdev);
-> +	if (err)
-> +		goto err_close_channel;
-> +
-> +	hinic3_free_channel_resources(netdev, &cur_qp_params, &cur_trxq_params);
-> +
-> +	mutex_unlock(&nic_dev->change_res_mutex);
-> +
-> +	return 0;
-> +
-> +err_close_channel:
-> +	hinic3_close_channel(netdev);
-> +err_qp_irq_reset:
-> +	nic_dev->q_params = cur_trxq_params;
-> +
-> +	if (trxq_params->num_qps > cur_trxq_params.num_qps)
-> +		hinic3_qp_irq_change(netdev, cur_trxq_params.num_qps);
-> +	hinic3_free_qp_ctxts(nic_dev);
-
-[Severity: High]
-Is hinic3_free_qp_ctxts() called twice sequentially in this error path?
-The err_close_channel block calls hinic3_close_channel(), which internally
-invokes hinic3_free_qp_ctxts(). The flow then falls through to
-err_qp_irq_reset which explicitly calls hinic3_free_qp_ctxts() again.
-
-> +err_uninit_qps:
-> +	hinic3_get_cur_qps(nic_dev, &new_qp_params);
-> +	hinic3_free_channel_resources(netdev, &new_qp_params, trxq_params);
-> +	hinic3_free_channel_resources(netdev, &cur_qp_params, &cur_trxq_params);
-
-[Severity: Critical]
-Does this error path destroy both the new and the old working channel
-resources? By calling hinic3_free_channel_resources() on cur_qp_params,
-we leave dangling pointers in nic_dev->q_params and nic_io. It seems
-subsequent packet transmissions would trigger a use-after-free, and
-closing the interface later would trigger a double-free.
-
-> +	mutex_unlock(&nic_dev->change_res_mutex);
-> +
-> +	return err;
-> +}
-> +
->  static int hinic3_open(struct net_device *netdev)
->  {
->  	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> @@ -458,6 +537,10 @@ static int hinic3_open(struct net_device *netdev)
->  
->  	hinic3_init_qps(nic_dev, &qp_params);
->  
-> +	err = hinic3_prepare_channel(netdev, &nic_dev->q_params);
-> +	if (err)
-> +		goto err_uninit_qps;
-> +
->  	err = hinic3_open_channel(netdev);
->  	if (err)
->  		goto err_uninit_qps;
-
-[Severity: High]
-Does jumping to err_uninit_qps leak the QP contexts allocated by
-hinic3_prepare_channel()?
-
-Since hinic3_prepare_channel() calls hinic3_init_qp_ctxts(), it looks like
-we bypass the cleanup that happens inside hinic3_close_channel(), which
-would permanently leak the root context configuration and associated DMA
-memory.
 
