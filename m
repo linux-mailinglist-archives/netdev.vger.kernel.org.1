@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E8jFKRwALGpQJQQAu9opvQ
-	(envelope-from <netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:48:28 +0200
+	id 1HTeNX7/K2oVJQQAu9opvQ
+	(envelope-from <netdev+bounces-298639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:45:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F20679798
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:48:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F8B67973D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:45:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b="EYf02m8/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b=Hv+PUnqi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298639-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298639-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 19130302B93A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:44:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 51EDA3315899
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3273DD857;
-	Fri, 12 Jun 2026 12:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD603E0098;
+	Fri, 12 Jun 2026 12:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17FB3E0C47
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 12:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC02C3E1D17
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 12:42:32 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781268268; cv=pass; b=teFISu2xR7d8QeowMvNXqLEmURyxKPg/aKcGqzLH5kM2R9Nl3HAfTgzQeQfQApyygSE6RJ68kAEpdRuFXqkO8xozV8ipBa7DSTAzHD/cv4GRq5gXRXS+FK6FX04f8ljK5HyK0lI2JtuH0HFIwZ97qh2taZta+T+Mg+y1JMlH2Jo=
+	t=1781268154; cv=pass; b=rFXIsEeEgn+LgTGb73OUi4nczUR23aWGQdqsPYRkNALVt+7NJ0s2eCBYj4JTyrcHSIy2msZhHZNVXS1qiMm5R4wbrHaUz89o3xdwkuXL+WXSNJUGqUYYvNOIiXv/qAkYcEM3qZq+X+OY8UsSEv+E8bStxvEITOoz1CLVliy9uGI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781268268; c=relaxed/simple;
-	bh=SuQyivReN4ocUF/994/ReylbThxSvI5liDScR7gvfDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LkGhf+grv91+Nt8fKkI8YiSYiDYSL5OKDAp0ca/EbDoXtHOiHFsJEMrUUClAnnVmt6Y0kZAuf2KGfLRDryLrMlKBbqCBmVXzcGqkX9o53TO8tDQgEnl39W7FQ9XwT69roL43vcQkpKZhJb8TkyZrGG1RCVAkL/8UwAYXdiaao4w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=EYf02m8/; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal: i=1; a=rsa-sha256; t=1781268112; cv=none; 
+	s=arc-20240116; t=1781268154; c=relaxed/simple;
+	bh=REH0d3wYoIYM1ZfwUz5WWrrGIOX6hD42sKYZ0MI/c68=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rop29pfVM4qhc+FkOGXR13jW5R65MxgZFY3xceokaJTqbTZeA+qvcyP9BMrGBxeAdRnyiCoJTnujH1E3UXfd4JruXRgq3P0FILDjAdOPdL0wWpMZQ0onMF4TTNE+cV+EdaFQjLIoYjea3g29SoEP4TXWEB7t8trSAi2WpcxQIDY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=Hv+PUnqi; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1781268118; cv=none; 
 	d=zohomail.eu; s=zohoarc; 
-	b=WHPDLLFqmxWkb79s8k8z5r9X0OslKKdlLGpzkXRijYTrmIDr9tfeRNzhPwdR/WRTwnXshHwdiUkCTb6AH/RuL6F6yFMjNulOv9pTOl9D8HE4JVT39BV4F0RvpDPHn29izU7ghfuy1Zh3NRuqIQ0fJAOIt5gqruRnBuNadaX6snM=
+	b=LHIjTJguHlxgCeXYW1H+zHHaCSwyawwWNMTCuqI9lYfmC7tsCFUmdGJ5cRScmtDHfdZI/bsac9oVksfO6Fp5D3KLwmMausEaLxN3FoEoTjC6IC2mTNBo/NkOMhecZDIIfcSdAtdMNS04kuGkC87wF0k7ajrmlHPC0Mboj5gyuKk=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1781268112; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=ryJDbbNZacr2Ip6NOvPoZRwXuX5NnvBxcXY+HY5Yl6k=; 
-	b=RSQ1VIxGDsKTMfz9JLFBA0uh2aHkoEuTrVJRUhzCGcOFCxgUEVhVn1FscvxglMFKCXqUP2pXyHgxCSmM9cEH1L8x1sOXWX4PZi+NJVBGVFq4uu+C21SEYoHVUweQn92YSKqTDiNvAYgIntI8e50s0gs48U0bD/zYcNYpaVabRV4=
+	t=1781268118; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=0KL/XF/Vvi8vAhmaVj+NFnFKfoqpckK1aQ0xkfQQy4E=; 
+	b=Ya2xtOZnJpoUGTuf9vTzHh3jUSN5WWCByXd3VFcmjLoeoswuCMDQ4RSN14oH1l+FgwUGaQ+MEz255Qsl8A0D8KbZR/Iic0yRf3LBMDAVDIrEZEFAvyp+vrcJTjs3mZRc0SuDUhaJbSj75pqgjtqKx6sTgrzb1Z9b45EkbcraZkk=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
 	dkim=pass  header.i=carlosgrillet.me;
 	spf=pass  smtp.mailfrom=carlos@carlosgrillet.me;
 	dmarc=pass header.from=<carlos@carlosgrillet.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781268112;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781268118;
 	s=zmail; d=carlosgrillet.me; i=carlos@carlosgrillet.me;
 	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=ryJDbbNZacr2Ip6NOvPoZRwXuX5NnvBxcXY+HY5Yl6k=;
-	b=EYf02m8/SayDiqCudCRjZzl7jkzV7swZjDTOxVNgEheBbWy1mQKJMEOBpOPqsmQH
-	vBFHcFJQNpX7ynGw+d6Ukh+M8mQ+zNIZUlXRD25GCHkIdcXKLnvxX/XucuBW0kT5wxQ
-	oW/Ltp7pUdB6sd3I/PFDmLCA2AQVq8jtreprTVOI=
-Received: by mx.zoho.eu with SMTPS id 1781268109853150.40384991165456;
-	Fri, 12 Jun 2026 14:41:49 +0200 (CEST)
+	bh=0KL/XF/Vvi8vAhmaVj+NFnFKfoqpckK1aQ0xkfQQy4E=;
+	b=Hv+PUnqi6GfQsT1hKzt1mEX8kR5j4JQB7oFhyqZw9t3N9o16bZ8EwtOCSLwEMeI8
+	Jh6RAF1CwswNCiX5VQ8Y1x7oamk+OUdPZt/k5fJ7ZZPZjactLVzQGlJ1VhqOUcSy7Tu
+	mW9YoN4mlOj3gb6a3oQvgZ2plqxC+T8dtcPXG6uI=
+Received: by mx.zoho.eu with SMTPS id 1781268117581167.83152173815665;
+	Fri, 12 Jun 2026 14:41:57 +0200 (CEST)
 From: Carlos Grillet <carlos@carlosgrillet.me>
 To: Pablo Neira Ayuso <pablo@netfilter.org>,
 	Florian Westphal <fw@strlen.de>,
@@ -67,9 +67,9 @@ To: Pablo Neira Ayuso <pablo@netfilter.org>,
 	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
 	linux-kernel@vger.kernel.org (open list)
 Cc: Carlos Grillet <carlos@carlosgrillet.me>
-Subject: [PATCH nf-next 1/6] netfilter: nf_nat_ftp: replace u_int16_t with u16
-Date: Fri, 12 Jun 2026 14:40:21 +0200
-Message-ID: <20260612124027.71673-2-carlos@carlosgrillet.me>
+Subject: [PATCH nf-next 2/6] netfilter: nf_nat_irc: replace u_int16_t with u16
+Date: Fri, 12 Jun 2026 14:40:22 +0200
+Message-ID: <20260612124027.71673-3-carlos@carlosgrillet.me>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,7 +85,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[carlosgrillet.me:s=zmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298645-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298639-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -108,35 +108,34 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[carlosgrillet.me:dkim,carlosgrillet.me:email,carlosgrillet.me:mid,carlosgrillet.me:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[carlosgrillet.me:dkim,carlosgrillet.me:email,carlosgrillet.me:mid,carlosgrillet.me:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 60F20679798
+X-Rspamd-Queue-Id: 76F8B67973D
 
-Use preferred kernel integer type u16 instead of the POSIX u_int16_t
-variant.
+Replace POSIX u_int16_t with preferred kernel type u16
 
-No functional change.
+No functional changes.
 
 Signed-off-by: Carlos Grillet <carlos@carlosgrillet.me>
 ---
- net/netfilter/nf_nat_ftp.c | 2 +-
+ net/netfilter/nf_nat_irc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_nat_ftp.c b/net/netfilter/nf_nat_ftp.c
-index c92a436d9c48..ab714629e2b1 100644
---- a/net/netfilter/nf_nat_ftp.c
-+++ b/net/netfilter/nf_nat_ftp.c
-@@ -69,7 +69,7 @@ static unsigned int nf_nat_ftp(struct sk_buff *skb,
- 			       struct nf_conntrack_expect *exp)
- {
+diff --git a/net/netfilter/nf_nat_irc.c b/net/netfilter/nf_nat_irc.c
+index 19c4fcc60c50..14b79cb0171b 100644
+--- a/net/netfilter/nf_nat_irc.c
++++ b/net/netfilter/nf_nat_irc.c
+@@ -39,7 +39,7 @@ static unsigned int help(struct sk_buff *skb,
+ 	char buffer[sizeof("4294967296 65635")];
+ 	struct nf_conn *ct = exp->master;
  	union nf_inet_addr newaddr;
 -	u_int16_t port;
 +	u16 port;
- 	int dir = CTINFO2DIR(ctinfo);
- 	struct nf_conn *ct = exp->master;
- 	char buffer[sizeof("|1||65535|") + INET6_ADDRSTRLEN];
+ 
+ 	/* Reply comes from server. */
+ 	newaddr = ct->tuplehash[IP_CT_DIR_REPLY].tuple.dst.u3;
 -- 
 2.54.0
 
