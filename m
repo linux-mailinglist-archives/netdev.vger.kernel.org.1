@@ -1,207 +1,251 @@
-Return-Path: <netdev+bounces-298757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298758-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PiW/HQJHLGrzOgQAu9opvQ
-	(envelope-from <netdev+bounces-298757-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:50:58 +0200
+	id fuSgJ+hGLGrtOgQAu9opvQ
+	(envelope-from <netdev+bounces-298758-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:50:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F7BE67B72E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:50:58 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FEBC67B71D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:50:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NO29Eynd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298757-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298757-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b="nr2ZHuY/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298758-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298758-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B390132F8A3D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:49:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BEC9D3004608
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874E7362153;
-	Fri, 12 Jun 2026 17:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C72636AB44;
+	Fri, 12 Jun 2026 17:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F274536A35A
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A4D367B99;
+	Fri, 12 Jun 2026 17:50:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781286598; cv=none; b=tr/C3mH3nMBB2fiJrPCx5iopq2uve0ujbMO5xV892ZIt4zUVo9GsBkivNzdzvjeHEgC1nwLStZ36WXWaIvU2eI0mqiF9aKRS8i+rQZVYA7CDhjWx62p5hBmd+eku7cNpSOEJ9xQP6la9VmGnt2rKjbt1cGd0qcDa1UwvY+I3mf0=
+	t=1781286626; cv=none; b=sUllLBh8WN4WSQC+VBJi5+rC1Use1QL9E/O5UWDTrQzoeWmtflxV+vRW12ZpQY9Ht2vYaohaONrOQzICyp55HbxKHBxRExg0iWChA7lmiPZX6lS81rn3nBgniNQ6OqrfdXXJdfXYNIykdtyNxghQmyCfZzyRluMV9yDuH2pWYvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781286598; c=relaxed/simple;
-	bh=h115VTK6dungfQ4qIdCxA3kCKtoEZBfHb83D7Vo31gU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=gMyqML6Vb8F6YvxENOR3+YlLoiTWhZ9AlOtDfHFR7NeD9qRBXNZQpKZZHz71XwyzxyRgDcgnBgNF8TB63AwUq7ZbjSLDNod+nODM76hFvqk+3j/961IN2/iIhcADucEE8KCbq38VWxEOAKtJJfmc3R6dDbpSHOd0KsM0wmX7Ziw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NO29Eynd; arc=none smtp.client-ip=209.85.128.42
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490bb83a3f6so10276765e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781286595; x=1781891395; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=C85wBIXdmOAkbGAX37TSwTaJxl8p7p/GigMbGhAuSmc=;
-        b=NO29EyndaZTP4L9bwqRYnxiwYwu3iC3bkQTJe8JVl/jCSqZDwSLYVhxRAxAAlsZnGq
-         z8ovA9kxiRPX3uNCAtCQQk/40+Vi6nSJYfNxnTHyn0BNUkMogapVhueSRGrJfmlWkluu
-         70Hv+BtE2YYQexNE03azSY4wCAmx8xs/khlZlG7yrX2zCOxYfp1PcbpXYhcH3pVxu8hE
-         1DBjU81toTHYhFse6lhVRyRKCjP4ZBwNZrmUtSNlAUItk9V8115ndCndbEM0uR8d0LFW
-         wom8KKabJYaS0GivkOV0K4ZgeDirCDMp4OqtqGEJSDg1kbnLQrYsMmpIhisaLIjwv5fU
-         hQRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781286595; x=1781891395;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C85wBIXdmOAkbGAX37TSwTaJxl8p7p/GigMbGhAuSmc=;
-        b=REXh9XefCse/59P1pUDl3oxtTYwtQ8NzAp2U6z7qQvkaoPDq4TuCzWDTJplydVmhDY
-         i0eGoiUhk/nkiIRBIykydrn9wGBHLLJzuBczVpHVzvPLEZy8IT2eXSmYjwpQCP/d4Ltd
-         Qm95AEE44TqUVBL1OSdbaH8cnJShb2EGPA7HhsiOXxupbjIdnQ65fKzSX0PEzSse1+mG
-         dYa2Vsnip7zXLK0sm/4A4ArAGrpce539Ai7kfrnk9NHUZ50XOvML3regYF57FK/V2zce
-         Y36Yvrny8buQRfkfJOUuVwpyxJfFuf2AC4qLcQr+j8HfdhiPbjeICrvNu15PnrzXqvHo
-         1BIw==
-X-Forwarded-Encrypted: i=1; AFNElJ8GT/6hCbXjfJnTnlFVGTaABmgzstyuOkMMcEq+RIep0ZZKVzo3ylqIfEjVhLQFPG0Gwojl8zQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR3gtmkUxBVmff4+reOMSrFp/JM19J7tl+6NDv7Ll8JBL7YYoZ
-	4jihnIOnNM7Op7tbV2fgBHJ6A/jW4lViy/M+s+fsSLoSB9YRcdPjg20O
-X-Gm-Gg: Acq92OH3tLeCsL+jKuT8vZ/Lorw1W9A3O80ZcKUsfgoaQK30uomEcy1NTvnkvVu9VEN
-	C4aUF83laplTTNju3MYVR6PK6C+kA2D1OmVzi0Dp3P4sMfIgcQxH6/MlvPrtGDQ8HmZKvyx7c4l
-	kVq1X4J4BXlcyFO34aReiPHcci2XzIoU2j+ToGm5h61XS7hwEeDpXIVeCl0375Tpa2Opx5vp5Dg
-	q6mZQ8f2NNJmxF1gbjoq0CZn52FZAN4/6szqI/GbO6IvorcAxZDV5RV8/0tyRqt5kJt/31hO9Lw
-	UbuvO0bE16IbKXixaHDQlynt8Pv0ETapYRZ3LPksbLrjOEFcbAKlg0zTbtJQXATgTEIbnzay6kY
-	c/OWX5I4epFMbbLShJbGp6hI2rWxnrVQpZmij/g9jl1AlOeR3r+WoVfXV0fbFTl4gFvb6pazV2d
-	fWWpXI/k2/I7vSoAt2o4wC7vwR2p1ecMe84ljJ59mIH9JGeN4E+Ncc9LOGKVyWv2kqEen+59CJ0
-	N4=
-X-Received: by 2002:a05:600c:820c:b0:48e:5d91:cfe3 with SMTP id 5b1f17b1804b1-490ec4cd08fmr53203395e9.1.1781286595100;
-        Fri, 12 Jun 2026 10:49:55 -0700 (PDT)
-Received: from ?IPV6:2a00:1fa0:742:25a:e03e:6c9c:49d8:2fee? ([2a00:1fa0:742:25a:e03e:6c9c:49d8:2fee])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f26f3basm7395809f8f.12.2026.06.12.10.49.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2026 10:49:54 -0700 (PDT)
-Message-ID: <31cb54ac-8cf7-45fe-9167-becc4cd2aea9@gmail.com>
-Date: Fri, 12 Jun 2026 20:49:51 +0300
+	s=arc-20240116; t=1781286626; c=relaxed/simple;
+	bh=GftbwVGxN5+3396T6O7JKnU2Qpkol1nyIS4+zmauKdY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WNYQmGDMVeOiU+MkNyTzV2k49VQCv24Kjj6QDK0vrJLIDhQ85/GKqOdI3lyTOOg6sOVyAvX+L1SR6QW5Cd3fV/aQqF4/dNle33UzZ+RltUpV1savqSVDHKGaNeJUqkS1LulwccHVhTl80X5hfk1ll1+l4/X3u+NmyIU8cUdMWFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nr2ZHuY/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D6638C2BCB4;
+	Fri, 12 Jun 2026 17:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1781286625;
+	bh=GftbwVGxN5+3396T6O7JKnU2Qpkol1nyIS4+zmauKdY=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=nr2ZHuY/jnnZ460Vlle1PjjEnlezr9QwQItXfhs6g2EHcUPivlpZsArAgSyD/UmlW
+	 ScxXIGPA2ENscg6GgNDL94+Xdfeq2lTbuabHdF4Tw7cHrknz5KRs6RoU4RGTsheaGI
+	 E1OqRL1OCUS2ZqSrt9JqsHmVS+xnBVUC9ra5NuNFitXLDewggJVyCl0kdaRGxdDapE
+	 37cPmnS+eJGe86gcW95aa7hZXIMUkBD4o4As5PYayZ8G0vG6oe7m+J7iDX+zt7ZJWN
+	 MyoXu3AVHLWyhURrpgf12zcj6drni/8OSYVjlJ2hcbZ0eb5rBNcunU8Ypw01SSK2C7
+	 rlqXgBtYmUCsA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9DACD98CF;
+	Fri, 12 Jun 2026 17:50:25 +0000 (UTC)
+From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
+Date: Fri, 12 Jun 2026 12:50:25 -0500
+Subject: [PATCH v3] nfc: nci: add data_len bound checks to activation
+ parameter extractors
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 3/9] net: ethernet: ravb: Simplify gPTP start and stop
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
- <niklas.soderlund+renesas@ragnatech.se>, Paul Barker <paul@pbarker.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260610102432.3538432-1-niklas.soderlund+renesas@ragnatech.se>
- <20260610102432.3538432-4-niklas.soderlund+renesas@ragnatech.se>
-Content-Language: en-US
-From: Sergey Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <20260610102432.3538432-4-niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260612-b4-disp-6d52d8b0-v3-1-e26221f8826d@proton.me>
+X-B4-Tracking: v=1; b=H4sIAOBGLGoC/x3MMQqAMAxA0auUzAbaqEW8iji0JmoWLS2IIN7d4
+ viG/x8oklUKjOaBLJcWPY+KtjGw7OHYBJWrgSx56x1h7JC1JPTcEw/RYhC3kluYhxChZinLqve
+ /nOb3/QAIYJgCYgAAAA==
+To: David Heidelberg <david@ixit.cz>
+Cc: linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, oe-linux-nfc@lists.linux.dev
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781286625; l=5384;
+ i=hexlabsecurity@proton.me; s=proton; h=from:subject:message-id;
+ bh=BcPYukihDqR5SWpAuWPZtnkwUMfhZZ+Ci4OmUYp2RgA=;
+ b=+4IkML7bYD0JoljnnfBm+g3tLOVsiqR6FAHmkAHGeKfMdG6+r2tj7NHIPRfAfn3+su2jrcGp1
+ 9tVou56eCqECJ0cziuxps8epVu+qVU0ti+yRCxnBfcSjXdBP7j32gMJ
+X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
+ pk=dmppBMZNLLoPzxHi9l8tZDzEZUunPbgsYqIZYXeUrL0=
+X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/proton with
+ auth_id=814
+X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
+Reply-To: hexlabsecurity@proton.me
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298757-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:paul@pbarker.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298758-lists,netdev=lfdr.de,hexlabsecurity.proton.me];
+	FORGED_RECIPIENTS(0.00)[m:david@ixit.cz,m:linux-kernel@vger.kernel.org,m:horms@kernel.org,m:netdev@vger.kernel.org,m:oe-linux-nfc@lists.linux.dev,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[proton.me:replyto,proton.me:email,proton.me:mid,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[ragnatech.se,pbarker.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,glider.be,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	HAS_REPLYTO(0.00)[hexlabsecurity@proton.me]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F7BE67B72E
+X-Rspamd-Queue-Id: 9FEBC67B71D
 
-On 6/10/26 1:24 PM, Niklas Söderlund wrote:
+From: Bryam Vargas <hexlabsecurity@proton.me>
 
-> For devices that do not support the gPTP clock in config mode the
-> somewhat oddly named flag gptp is set, compared to devices that do
-> support the gPTP clock in config and operation mode where the flag
-> ccc_gac is set instead. The two flags are mutually exclusive.
-> 
-> For the gptp-flag devices (Gen2) the clock is tied to the AVB-DMAC, when
-> it is stopped so is the gPTP clock. For ccc_gac-flag devices (Gen3) the
-> gPTP clock is available whenever the ndev is open.
-> 
-> Prepare to add Gen4 support which will add a third way by cleaning the
-> Gen2 and Gen3 cases up a bit.
-> 
-> Fold the gptp-flag start and stop calls into ravb_dmac_init() and
-> ravb_stop_dma(), which start and stops the AVB-DMAC. There are no
+nci_extract_activation_params_iso_dep() and
+nci_extract_activation_params_nfc_dep() read an inner length byte from
+the NCI RF_INTF_ACTIVATED_NTF payload and use it to memcpy() into fixed
+kernel buffers, but neither function receives the caller-validated
+activation_params_len.  A crafted NCI notification with
+activation_params_len=1 and an inner length byte of up to 20 (NFC-A) or
+50 (NFC-B) causes memcpy() to read that many bytes past the one valid
+byte in the activation params region -- a slab out-of-bounds read of
+kernel memory adjacent to the NCI skb.
 
-   s/stops/stop/.
+The sibling nci_extract_rf_params_*() family was given equivalent
+protection by commit 571dcbeb8e63 ("net: nfc: nci: Fix parameter
+validation for packet data"), but the two activation parameter
+extractors were not updated at that time.
 
-> functional change as all call sites to the construct,
+Add a data_len parameter to both functions, guard against an empty
+region before consuming the inner length byte, decrement the remaining
+count after consuming it, and clamp the copy length to what is actually
+available.  Update both call sites to pass ntf.activation_params_len,
+which is already validated against the skb at ntf.c:801.
 
-   s/,/:/?
+Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
+Cc: stable@vger.kernel.org
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+---
+ net/nfc/nci/ntf.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-> 
->     if (info->gptp)
->         ravb_ptp_init(ndev, priv->pdev);
-> 
-> Are always just after a call to into ravb_dmac_init() and all call sites
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index c96512bb8653..8bc3adbc5b6b 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -525,15 +525,19 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+ 
+ static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+ 						 struct nci_rf_intf_activated_ntf *ntf,
+-						 const __u8 *data)
++						 const __u8 *data, __u8 data_len)
+ {
+ 	struct activation_params_nfca_poll_iso_dep *nfca_poll;
+ 	struct activation_params_nfcb_poll_iso_dep *nfcb_poll;
+ 
+ 	switch (ntf->activation_rf_tech_and_mode) {
+ 	case NCI_NFC_A_PASSIVE_POLL_MODE:
++		if (data_len < 1)
++			return NCI_STATUS_RF_PROTOCOL_ERROR;
+ 		nfca_poll = &ntf->activation_params.nfca_poll_iso_dep;
+ 		nfca_poll->rats_res_len = min_t(__u8, *data++, NFC_ATS_MAXSIZE);
++		data_len--;
++		nfca_poll->rats_res_len = min_t(__u8, nfca_poll->rats_res_len, data_len);
+ 		pr_debug("rats_res_len %d\n", nfca_poll->rats_res_len);
+ 		if (nfca_poll->rats_res_len > 0) {
+ 			memcpy(nfca_poll->rats_res,
+@@ -542,8 +546,12 @@ static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+ 		break;
+ 
+ 	case NCI_NFC_B_PASSIVE_POLL_MODE:
++		if (data_len < 1)
++			return NCI_STATUS_RF_PROTOCOL_ERROR;
+ 		nfcb_poll = &ntf->activation_params.nfcb_poll_iso_dep;
+ 		nfcb_poll->attrib_res_len = min_t(__u8, *data++, 50);
++		data_len--;
++		nfcb_poll->attrib_res_len = min_t(__u8, nfcb_poll->attrib_res_len, data_len);
+ 		pr_debug("attrib_res_len %d\n", nfcb_poll->attrib_res_len);
+ 		if (nfcb_poll->attrib_res_len > 0) {
+ 			memcpy(nfcb_poll->attrib_res,
+@@ -562,7 +570,7 @@ static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+ 
+ static int nci_extract_activation_params_nfc_dep(struct nci_dev *ndev,
+ 						 struct nci_rf_intf_activated_ntf *ntf,
+-						 const __u8 *data)
++						 const __u8 *data, __u8 data_len)
+ {
+ 	struct activation_params_poll_nfc_dep *poll;
+ 	struct activation_params_listen_nfc_dep *listen;
+@@ -570,9 +578,13 @@ static int nci_extract_activation_params_nfc_dep(struct nci_dev *ndev,
+ 	switch (ntf->activation_rf_tech_and_mode) {
+ 	case NCI_NFC_A_PASSIVE_POLL_MODE:
+ 	case NCI_NFC_F_PASSIVE_POLL_MODE:
++		if (data_len < 1)
++			return NCI_STATUS_RF_PROTOCOL_ERROR;
+ 		poll = &ntf->activation_params.poll_nfc_dep;
+ 		poll->atr_res_len = min_t(__u8, *data++,
+ 					  NFC_ATR_RES_MAXSIZE - 2);
++		data_len--;
++		poll->atr_res_len = min_t(__u8, poll->atr_res_len, data_len);
+ 		pr_debug("atr_res_len %d\n", poll->atr_res_len);
+ 		if (poll->atr_res_len > 0)
+ 			memcpy(poll->atr_res, data, poll->atr_res_len);
+@@ -580,9 +592,13 @@ static int nci_extract_activation_params_nfc_dep(struct nci_dev *ndev,
+ 
+ 	case NCI_NFC_A_PASSIVE_LISTEN_MODE:
+ 	case NCI_NFC_F_PASSIVE_LISTEN_MODE:
++		if (data_len < 1)
++			return NCI_STATUS_RF_PROTOCOL_ERROR;
+ 		listen = &ntf->activation_params.listen_nfc_dep;
+ 		listen->atr_req_len = min_t(__u8, *data++,
+ 					    NFC_ATR_REQ_MAXSIZE - 2);
++		data_len--;
++		listen->atr_req_len = min_t(__u8, listen->atr_req_len, data_len);
+ 		pr_debug("atr_req_len %d\n", listen->atr_req_len);
+ 		if (listen->atr_req_len > 0)
+ 			memcpy(listen->atr_req, data, listen->atr_req_len);
+@@ -806,12 +822,14 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+ 		switch (ntf.rf_interface) {
+ 		case NCI_RF_INTERFACE_ISO_DEP:
+ 			err = nci_extract_activation_params_iso_dep(ndev,
+-								    &ntf, data);
++								    &ntf, data,
++								    ntf.activation_params_len);
+ 			break;
+ 
+ 		case NCI_RF_INTERFACE_NFC_DEP:
+ 			err = nci_extract_activation_params_nfc_dep(ndev,
+-								    &ntf, data);
++								    &ntf, data,
++								    ntf.activation_params_len);
+ 			break;
+ 
+ 		case NCI_RF_INTERFACE_FRAME:
 
-   s/Are/are/.
+---
+base-commit: 8e65320d91cdc3b241d4b94855c88459b91abf66
+change-id: 20260612-b4-disp-6d52d8b0-ae1f21cdd8ab
 
-> to the to the construct,
+Best regards,
+-- 
+Bryam Vargas <hexlabsecurity@proton.me>
 
-   "to the" repeated... And s/,/:/?
-
-> 
->     if (info->gptp)
->         ravb_ptp_stop(ndev);
-> 
-> Are always directly followed by a call to ravb_stop_dma().
-
-   s/Are/are/.
-
-> 
-> There are two special cases where the calling construct covers both the
-> gptp-flag and info->ccc_gac devices, one for start and one for stop. The
-> condition that it is preceded by a call to ravb_dmac_init(), or followed
-> by a call to ravb_stop_dma() are however true for them too. Reworked the
-> two special cases to drop the check of info->gptp.
-> 
-> The end result is that the gPTP clock will be started or stopped for the
-> gptp-flag devices in tandem with the AVB-DMAC, while the info->ccc_gac
-> devices will be controlled, as before, when the ndev is opened or
-> closed.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-[...]
-MBR, Sergey
 
 
