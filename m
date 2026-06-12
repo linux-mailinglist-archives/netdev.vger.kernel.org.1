@@ -1,67 +1,76 @@
-Return-Path: <netdev+bounces-298630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6BtRIgX+K2qfJAQAu9opvQ
-	(envelope-from <netdev+bounces-298630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:39:33 +0200
+	id E8jFKRwALGpQJQQAu9opvQ
+	(envelope-from <netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:48:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF11B67966A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:39:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F20679798
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:48:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RNxswPx3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298630-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298630-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b="EYf02m8/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298645-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B13DE31AF29E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:38:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 19130302B93A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1703DDDCE;
-	Fri, 12 Jun 2026 12:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3273DD857;
+	Fri, 12 Jun 2026 12:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877893DD86A
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 12:38:42 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781267923; cv=none; b=Q6jhDHEM5mgxIWjJq4IbNOdad7yf4IpdcPDi/1m4+BV2bCF7nLaEYBktgh7hDjWsdfOrNhi8GHW/EjDAPEV3t2fAxNhLk1cleHwF6JdEkTu7qWFLrzXExQOf8qzehk/39zllRWpKLSUwicDggmrMQPQ+pjkz0HAL6XrDkAIvB/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781267923; c=relaxed/simple;
-	bh=2VO3DTVvup53a8b6mtz14IR8zvNIYXKF8tMu17niY2c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=STy7jyi1GqHXiYxlu4SQ1TnppMY3IQQV3LFTem4/IJE5kpJBLa0pMw6yO8gpb4hMW1RVhd4kUkY9lg4l8ZAb5snbGSTHZOeBQWJDfSMxep59Vb9lx9eoxwF5VMolkadOQf9tC1pdszwlwyaIGsmxf7UFTl11fPPCwvXmkXEHQ2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RNxswPx3; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0D471F000E9;
-	Fri, 12 Jun 2026 12:38:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781267922;
-	bh=/iniJO3J7ejHxZqxaL7RUEVPeDd2EIiz11xjqJTsMD8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=RNxswPx3Cuh+1yCG+L0pOhCY9Cp5DENeb8BZJTTq71KIOZLJQkCPLeEMiSjncGoVQ
-	 JXv86DWfTGzgQrEQYMeJECCYHVmM5gvMWbrRw5EkozCu/hQyzfWBBBOPmd14Ocmk0/
-	 ZuzyYa7xyQQAZrN7pFqLww0RHz4paPNRjpXuf1t6MecExJ3l/yKfDHqw+JN3+ZIGlT
-	 WVIbIR2ZSyaCFp+1+qrkl9gHhnx67cTbnDzkx3EHXEQPrUoOplCB1ZEpdOBFh1CdZL
-	 0vFTMji6x33pX7dwIYJh9pKztLzfFOkXTB9+FVarnMgB+V8Li/JUXxAshVGNKlYnni
-	 ujNZDs2SeSVcg==
-From: Simon Horman <horms@kernel.org>
-To: fmancera@suse.de
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	idosch@nvidia.com,
-	davem@davemloft.net
-Subject: Re: [PATCH 2/3 net-next v6] ipv4: handle devconf post-set actions on netlink updates
-Date: Fri, 12 Jun 2026 13:38:20 +0100
-Message-ID: <20260612123820.673243-1-horms@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17FB3E0C47
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 12:44:26 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781268268; cv=pass; b=teFISu2xR7d8QeowMvNXqLEmURyxKPg/aKcGqzLH5kM2R9Nl3HAfTgzQeQfQApyygSE6RJ68kAEpdRuFXqkO8xozV8ipBa7DSTAzHD/cv4GRq5gXRXS+FK6FX04f8ljK5HyK0lI2JtuH0HFIwZ97qh2taZta+T+Mg+y1JMlH2Jo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781268268; c=relaxed/simple;
+	bh=SuQyivReN4ocUF/994/ReylbThxSvI5liDScR7gvfDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LkGhf+grv91+Nt8fKkI8YiSYiDYSL5OKDAp0ca/EbDoXtHOiHFsJEMrUUClAnnVmt6Y0kZAuf2KGfLRDryLrMlKBbqCBmVXzcGqkX9o53TO8tDQgEnl39W7FQ9XwT69roL43vcQkpKZhJb8TkyZrGG1RCVAkL/8UwAYXdiaao4w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=EYf02m8/; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1781268112; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=WHPDLLFqmxWkb79s8k8z5r9X0OslKKdlLGpzkXRijYTrmIDr9tfeRNzhPwdR/WRTwnXshHwdiUkCTb6AH/RuL6F6yFMjNulOv9pTOl9D8HE4JVT39BV4F0RvpDPHn29izU7ghfuy1Zh3NRuqIQ0fJAOIt5gqruRnBuNadaX6snM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1781268112; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ryJDbbNZacr2Ip6NOvPoZRwXuX5NnvBxcXY+HY5Yl6k=; 
+	b=RSQ1VIxGDsKTMfz9JLFBA0uh2aHkoEuTrVJRUhzCGcOFCxgUEVhVn1FscvxglMFKCXqUP2pXyHgxCSmM9cEH1L8x1sOXWX4PZi+NJVBGVFq4uu+C21SEYoHVUweQn92YSKqTDiNvAYgIntI8e50s0gs48U0bD/zYcNYpaVabRV4=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=carlosgrillet.me;
+	spf=pass  smtp.mailfrom=carlos@carlosgrillet.me;
+	dmarc=pass header.from=<carlos@carlosgrillet.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781268112;
+	s=zmail; d=carlosgrillet.me; i=carlos@carlosgrillet.me;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=ryJDbbNZacr2Ip6NOvPoZRwXuX5NnvBxcXY+HY5Yl6k=;
+	b=EYf02m8/SayDiqCudCRjZzl7jkzV7swZjDTOxVNgEheBbWy1mQKJMEOBpOPqsmQH
+	vBFHcFJQNpX7ynGw+d6Ukh+M8mQ+zNIZUlXRD25GCHkIdcXKLnvxX/XucuBW0kT5wxQ
+	oW/Ltp7pUdB6sd3I/PFDmLCA2AQVq8jtreprTVOI=
+Received: by mx.zoho.eu with SMTPS id 1781268109853150.40384991165456;
+	Fri, 12 Jun 2026 14:41:49 +0200 (CEST)
+From: Carlos Grillet <carlos@carlosgrillet.me>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org (open list:NETFILTER),
+	coreteam@netfilter.org (open list:NETFILTER),
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Carlos Grillet <carlos@carlosgrillet.me>
+Subject: [PATCH nf-next 1/6] netfilter: nf_nat_ftp: replace u_int16_t with u16
+Date: Fri, 12 Jun 2026 14:40:21 +0200
+Message-ID: <20260612124027.71673-2-carlos@carlosgrillet.me>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260609204520.4670-2-fmancera@suse.de>
-References: <20260609204520.4670-2-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,87 +78,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[carlosgrillet.me:s=zmail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:horms@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-298630-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:carlos@carlosgrillet.me,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DMARC_NA(0.00)[carlosgrillet.me];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298645-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[carlosgrillet.me:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[carlosgrillet.me:dkim,carlosgrillet.me:email,carlosgrillet.me:mid,carlosgrillet.me:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF11B67966A
+X-Rspamd-Queue-Id: 60F20679798
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+Use preferred kernel integer type u16 instead of the POSIX u_int16_t
+variant.
+
+No functional change.
+
+Signed-off-by: Carlos Grillet <carlos@carlosgrillet.me>
 ---
-ipv4: handle devconf post-set actions on netlink updates
+ net/netfilter/nf_nat_ftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This commit ensures that IPv4 device configuration parameters updated
-via netlink trigger the same post-modification actions as sysctl updates.
-It addresses the inconsistency by calling devinet_conf_post_set() inside
-inet_set_link_af() and deferring cache flushing.
+diff --git a/net/netfilter/nf_nat_ftp.c b/net/netfilter/nf_nat_ftp.c
+index c92a436d9c48..ab714629e2b1 100644
+--- a/net/netfilter/nf_nat_ftp.c
++++ b/net/netfilter/nf_nat_ftp.c
+@@ -69,7 +69,7 @@ static unsigned int nf_nat_ftp(struct sk_buff *skb,
+ 			       struct nf_conntrack_expect *exp)
+ {
+ 	union nf_inet_addr newaddr;
+-	u_int16_t port;
++	u16 port;
+ 	int dir = CTINFO2DIR(ctinfo);
+ 	struct nf_conn *ct = exp->master;
+ 	char buffer[sizeof("|1||65535|") + INET6_ADDRSTRLEN];
+-- 
+2.54.0
 
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 8300516fb38f4..a35b72662e431 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -2161,6 +2161,20 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
-[ ... ]
-> +	case IPV4_DEVCONF_FORWARDING:
-> +		if (new == 1) {
-> +			/* it is safe to use container_of() because forwarding case
-> +			 * is only used by the netlink path
-> +			 */
-> +			struct in_device *idev = container_of(cnf, struct in_device, cnf);
-> +
-> +			netif_disable_lro(idev->dev);
-
-[Severity: High]
-Does calling netif_disable_lro() directly here without acquiring the
-netdev_lock_ops mutex cause lockdep assertion failures?
-
-Since inet_set_link_af() runs only under rtnl_lock() and does not acquire
-the device ops lock, this direct invocation appears to bypass the locking
-requirements for netif_disable_lro(), which modifies dev->wanted_features
-and invokes netdev_update_features(dev).
-
-On drivers that opt-in to netdev_lock_ops, does this create a concurrent
-data race on the device features mask? Should this use dev_disable_lro()
-instead, which correctly acquires and releases netdev_lock_ops(dev) around
-the netif_disable_lro() call?
-
-> +		}
-> +
-> +		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
-> +					    NETCONFA_FORWARDING,
-> +					    ifindex, cnf);
-> +		return true;
 
