@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-298671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298672-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id J/CMHg8KLGqwKAQAu9opvQ
-	(envelope-from <netdev+bounces-298671-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:30:55 +0200
+	id 8X0BFIgLLGobKQQAu9opvQ
+	(envelope-from <netdev+bounces-298672-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:37:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B811679D91
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:30:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7E3679E42
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:37:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=VvCxJbxZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298671-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298671-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="ZndX8/jp";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298672-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298672-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8428C3029D07
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:30:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CF4423019041
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A453EDE75;
-	Fri, 12 Jun 2026 13:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677B53EEAF4;
+	Fri, 12 Jun 2026 13:30:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF37D3264D2
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18F53E1D19
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:30:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781271007; cv=none; b=AJhqI5crkaGfPqOTPrfyWVdrwzNP/fHUby4ibO8oVvuH9ujn7sy61Y5bTOIDnUNJtyCXe4uPKBHbmnjz+SvV5I8BxfE+uakzXrE1h7ASkCWC4B0+vJLZunmWsxpVQYzCCxzLph7zciUFfvvbXFIh1Qi4oQWWsYr799Nijq2Vu0Y=
+	t=1781271008; cv=none; b=TQ06Gkiq/aysDoHu/DSWAAbOunXxHyQIJdj6TtM6Gwb5seULKeE3Vi8CwUG96Ro3pduMYQWoKc1ov18wr/TrV05UbMXjGaLAf5uxHe+xIt7FG/n4YWev9gXjBrJN/fjA+bUlY7QAyIysjEiO+8nd/fxmY2MPAbZZAZ33+99ua+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781271007; c=relaxed/simple;
-	bh=D55jdz0uIc/qge56hNomD2wxxsVODJGJ5/yGkCrTFx0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JZjpkGUK6/9ehzL4AuzBIQVidpTxY1qzfcElQDWXPlxJhjgMsTmC+7Xqysw1C1Gk3ZpSnO0Pi4SBSDq3XhC/0sCXFPMjKp5D51/EzlhJV75ULGXnr6Uel/9lFWJviUvibYOwu2R1u66WtUJjsBwnJHHEyxDbvCflj0gBkJjUU5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VvCxJbxZ; arc=none smtp.client-ip=209.85.128.49
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490b8a97b11so11419385e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 06:30:04 -0700 (PDT)
+	s=arc-20240116; t=1781271008; c=relaxed/simple;
+	bh=Adlvqfy4/RiVofJyXdnjYaiEBf1qc1usUCMPJaHxVWQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ay7tgivXo496dak+0W7u6dwB8n8LLKVv4NsiYMrq9PPgswVsTYjJbV5V9oKtQhglLrBORkKqaF7/VtMiDtLoPG8rgmX+cYWrJF/ClRGhImepM+2/PtSjMODdg6uASR+p+me4XHsGB3N99h2EGkI8AS50An/e9dW0VnsHiWbIxcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZndX8/jp; arc=none smtp.client-ip=209.85.128.44
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4921e4dd62dso819025e9.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 06:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781271003; x=1781875803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=34xJfHUtfBhzidmrk3neM4lC4vDotCKUYix1d8mNaWM=;
-        b=VvCxJbxZyinFjZIbRwAT76Ybm9QNPKuLrCC+sXZHgGQkw52GXTC6qyXq+AtueQpdkD
-         F84A/9fijAq3udQ53yR826+XUZFWMIxfnaZUqlsZDHuYQDmylbu/opKYy/mGqXD7SZxA
-         YKj9jzEjKhdh1Fe8NdH9ZVR40AtFVLvSGF8lyz0L8KUc2K9Vmy87imF6JRzke5XOz/75
-         X96XUbv7jg73tqIvJXA/n2dgo8fAbP8CGJYDmx9DNzfwdSdD3TW6xalN51C+k2mRlpLJ
-         FnyV6fz348PRASrk9X6uR3Lvj3SHeZ3Q4v6Y9Q/7PDML622INfieshcpqJhmd5Ja7lCd
-         +8fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781271003; x=1781875803;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1781271004; x=1781875804; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=34xJfHUtfBhzidmrk3neM4lC4vDotCKUYix1d8mNaWM=;
-        b=dzAIwuB6fovm8PR/3dpYPWyu5iXagsMw7QRqtbCL1L3SEUv1rd0KudQUI4Pn4Rxxam
-         YcP+GjwlsJAqWOgaRXqOf0b9ORUFoVTY4M2doYNbwOuBjU2csX8Qj4+kST+yXgO/W3fv
-         Kp8Zmh4l7IQzW/rq0NhZXtCjHwXCxwABb9H+ZQQ2HRLAo9DQ9cgbdtVsEzJSFzpLvc05
-         +Qbzi/UBnTof8O6K2sJMlPZfK8ZmgF8sziiSa2e3r79KqchZEyBeZDDG//fIrrmFsD1p
-         9QrTkR4aTmjLsD1okQKZIIBfdeVvnwNbUaXbGLvBgI2RRpFZ/L5XRoAw5VPQcQm8VyEP
-         JrIQ==
-X-Gm-Message-State: AOJu0YxyXigclcCFOERnHnnpLcNGl/FPpzCoHCK+WaJxKgs9P6zi4eKL
-	8o87U7SNdsU6fNa+uEwIOTaCXtSfmiY+7LXZzP1vh/C7JogTZvt/C8u5
-X-Gm-Gg: Acq92OFVfhY7VJGJKS1nNnGGfsaDPEfisX80x9bkuP0cGd6zTIesw2HDsdtA2c+flec
-	TU4Wnut1iJVohUnxaHawGfsxnMRp+52T/CWMWTV40Kfej19yPI6+tWZwDIJshxzc/b26bKmqrNc
-	25MMYQVcOHR6ATfppZmLeTx6f2VK3eI6wq6K/BLSqoxAVHLNUJSHyvN9Q3c1HxYoJgudwsT6QPY
-	i92qxbRevFDIG7MYq1oWWWQ9uHiBUT3H0v0L+lcBTebd2+8OIYvna/7wGylHDOdMtd/c7bjlNUf
-	fNlXG69ubS6EY9uSxe77C+SKNLXjibjxlfUuHJBdR6q7Mv9y0ah5bb+YOUh2FMzZOToM4BLcPe8
-	B+jONYfZmKq7vjtG3pFmr+G9QesriUVImzW3dR7o+F/x4u9nBD4lPJRJn8TW5f/OqHMAw34LsYK
-	fZS+Y4R6W23XU4Z3OeLmAN/MwSwA==
-X-Received: by 2002:a05:600c:574c:b0:490:d354:bcef with SMTP id 5b1f17b1804b1-490ec504ab0mr30086585e9.33.1781271002915;
-        Fri, 12 Jun 2026 06:30:02 -0700 (PDT)
+        bh=F03FjO4LjSiNWn1/BhvBC+hqEK9VBACUAnKsqMGfyeQ=;
+        b=ZndX8/jpH4Uk5FVriV0hgXR5pi+FBCIS4DLp9bXSsHesKU/7jxG7z5aL0sr+rjQquP
+         rbbsDu1tRYSmQWbikIcnyiVT0MTj1Tmq0OS7cB5176wo1TCGt5WI4/DxsJlr9UagVf1a
+         UN2nk5ZG2++MunPqqb/dwqVPgLUw/cNEU+nMPEgvCpO7zTkI2EIsEZh6kh21silyvcuR
+         8moQHixrQkXT1m7l6rq54gjkMVnJ5JC3m4Bddd9yfmm0Y1Q0pyeVr3oOuvzICeytb5Ns
+         8UtFuVv6VIfRhD5gysnWkxzixSKDOby8fSMR4+OCzekJGiGMuqUcAXSGUp+HmskPClpS
+         YlvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781271004; x=1781875804;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=F03FjO4LjSiNWn1/BhvBC+hqEK9VBACUAnKsqMGfyeQ=;
+        b=k4nqVXHFVL2mNBECDhxUhw8hMppZVG9oONnrMrYopFzb8SFBJv9TbZXkI5KByL4pKH
+         fbeqou3mTFo5OLa+HLkh9F9f7rTOW6U/MpkeOVH3gyRqfQte+7oNZIxxGwXxES+ZYcno
+         FEUvyqnpyvyARYCh7geGTHqpX5FJt/UmgIie7uZVQu1dW/cSzmqo8C1FZ9zAQAVhPnHE
+         c3W2Vd/7tbKbcju+oviFnwXydiw5mEH9iXZDtnzNejv735/8VAoFBWPbYgEIIaf62pnn
+         lDLxnS0FeIh/uXFQNQPGuKZtZxkPs2V068BgUxAIsz9Dq5xT8q0vO4j+mf75VKDZmbeP
+         a6VQ==
+X-Gm-Message-State: AOJu0YyMKTZ4KhH4h7R5zZ5NbLPb2Vl6jBA6zgahvYcApgZorqkxAKRC
+	4ZBbJgixKl1WxT5UDsH8lkyvknSIoh8U/TdOUjlj9B3g6RLd1s8rjAib
+X-Gm-Gg: Acq92OFPbXCxNIWs5tlA/DmWunVmZATC2WzAfL25UqRYxAVhGODRw4LZaSi+yDmnZcO
+	ugBx09PqD52gZuHcxd38i1Ib/oKvMQSDBKrhvFSvkvpQFaSldkE9BQU/EcsrRVMe8Jmz9lg0YoQ
+	mdsGrYwY6wB3xZP70fpfRZppbXahnc5NArv2w8gZ+2TmAdBXl+OSFt6uLBj01s8MFmWl0T2sijQ
+	92SsLu0zJQ6KLOd9T5wQfY7udkJVQl9sh9faFRVlTzmIaFD0wA0F5r5aah6bzBazelHEtq0L9EZ
+	9Ya9nuHcmJz8+tQiv1Gw+eob/lrv2YxdRuxprNVxdvAw8PG8kVKC5YuJ32PXM7XZ83DnnsAypt6
+	HyPSNp9XW3C5IK+Ncu/CTv0w5c7TLVeus3LIczxUd/l69H56rMV1SIc+DxkMOUq1wX39zrj+bpg
+	x2wDO77LwapBZ3ZhEcb8pMTZWNJg==
+X-Received: by 2002:a05:600c:3542:b0:490:b4a8:e031 with SMTP id 5b1f17b1804b1-490ec480e65mr32033545e9.4.1781271003902;
+        Fri, 12 Jun 2026 06:30:03 -0700 (PDT)
 Received: from builder ([2001:9e8:f11c:fd16:be24:11ff:fe30:5d85])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490e2cf582bsm166811555e9.10.2026.06.12.06.30.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490e2cf582bsm166811555e9.10.2026.06.12.06.30.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 06:30:02 -0700 (PDT)
+        Fri, 12 Jun 2026 06:30:03 -0700 (PDT)
 From: Jonas Jelonek <jelonek.jonas@gmail.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Kory Maincent <kory.maincent@bootlin.com>,
@@ -90,39 +92,40 @@ Cc: netdev@vger.kernel.org,
 	Daniel Golle <daniel@makrotopia.org>,
 	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
 	Jonas Jelonek <jelonek.jonas@gmail.com>
-Subject: [PATCH net-next v2 0/2] net: pse-pd: add Realtek/Broadcom PSE MCU support
-Date: Fri, 12 Jun 2026 13:29:40 +0000
-Message-ID: <20260612132944.460646-1-jelonek.jonas@gmail.com>
+Subject: [PATCH net-next v2 1/2] dt-bindings: net: pse-pd: add bindings for Realtek/Broadcom PSE MCU
+Date: Fri, 12 Jun 2026 13:29:41 +0000
+Message-ID: <20260612132944.460646-2-jelonek.jonas@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260612132944.460646-1-jelonek.jonas@gmail.com>
+References: <20260612132944.460646-1-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298671-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonek.jonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,mork.no,gmail.com];
 	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-298672-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonek.jonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,makrotopia.org,mork.no,gmail.com];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -132,126 +135,206 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3B811679D91
+X-Rspamd-Queue-Id: 2D7E3679E42
 
-This series adds a PSE-PD driver for the microcontroller (MCU) that fronts
-the PSE silicon on a range of managed switches, together with its DT
-binding.
+Add a binding for the microcontroller (MCU) that fronts the PSE silicon
+on a range of managed switches. The host talks only to the MCU, over
+I2C/SMBus or UART, using a fixed message-based protocol; the PSE chips
+behind it never appear on the bus.
 
-Hardware model
-==============
+The compatible identifies the PSE-MCU protocol dialect
+(realtek,pse-mcu-rtk or realtek,pse-mcu-bcm), not a specific part: the
+node describes the MCU - whose silicon is a general-purpose
+microcontroller that varies across boards - and the 'realtek' vendor
+prefix reflects the platform these MCUs are found on (Realtek-based PoE
+switches), following the google,cros-ec-* pattern rather than naming the
+MCU silicon. The '-rtk'/'-bcm' suffix selects the Realtek or Broadcom
+dialect within that one family. The specific PSE chip is detected at
+runtime and is not described here.
 
-These boards do not expose the PSE chips to the host directly. A small
-microcontroller sits on an I2C/SMBus or UART bus and manages one or more PSE
-chips behind it; the host CPU only ever talks to that MCU, using a fixed
-12-byte request/response protocol with a trailing checksum. The PSE silicon
-never appears on the bus.
+A single compatible per dialect covers both the I2C/SMBus and UART
+attachments: the wire protocol is identical across them and the transport
+is expressed by the node's parent bus, so it is not encoded in the
+compatible.
 
-The same protocol family is used by MCUs fronting Realtek PSE chips
-(RTL8238B, RTL8239, RTL8239C) and Broadcom PSE chips (BCM59111, BCM59121),
-diverging in opcode numbering and a few response layouts. The driver
-abstracts that behind a per-dialect opcode table and parser hooks, selected
-by the compatible. The specific PSE chip behind the MCU is detected at
-runtime and only influences per-chip constants (power scaling and the
-per-port cap).
+Both dialects share one protocol family and one device tree contract, so
+they are documented in a single binding under one vendor prefix. The
+'realtek' prefix is used because this MCU front-end is found almost
+exclusively on Realtek-based switches; the Broadcom dialect is expressed
+as the realtek,pse-mcu-bcm compatible within the same family.
 
-Why the compatible names the protocol, not the chip
-===================================================
-
-The compatibles are "realtek,pse-mcu-rtk" and "realtek,pse-mcu-bcm". This is
-a deliberate choice and the part most likely to raise questions, so the
-reasoning up front.
-
-The node names the protocol dialect, not a part:
-
-  - The DT node describes the MCU, not a PSE chip: the PSE chips are behind
-    the MCU and never appear on the bus, so naming the node after one (e.g.
-    "realtek,rtl8239") would describe hardware that isn't at that address.
-
-  - The PSE chips are, in principle, usable without this MCU (host-driven
-    directly) - different hardware with a different programming model that
-    would warrant its own binding. Claiming the PSE-chip compatibles here
-    would collide with that.
-
-  - Naming the MCU silicon is equally wrong: these are ordinary
-    general-purpose microcontrollers (GigaDevice, Nuvoton, ...) that vary
-    across boards and are not dedicated to this application.
-
-  - What is fixed, and all the driver needs at DT-parse time, is the
-    protocol dialect, so the compatible encodes exactly that. The two
-    dialects share one protocol family and one binding, kept in a single
-    "realtek" vendor namespace because this MCU front-end is found almost
-    exclusively on Realtek-based switches; a "-rtk"/"-bcm" suffix selects
-    the dialect. This follows the "google,cros-ec-*" pattern: a compatible
-    for a firmware/protocol interface implemented by varying
-    microcontrollers.
-
-One compatible per dialect spans both transports:
-
-  - The 12-byte wire protocol is identical over I2C/SMBus and UART; only the
-    plumbing differs (SMBus vs native framing on I2C, baud rate on UART),
-    and the transport is already expressed structurally by the node's parent
-    bus (i2c@... vs serial@...). A "-i2c"/"-uart" suffix would only
-    duplicate that, for a protocol that does not change across transports.
-
-  - This is the multi-transport model used by e.g. "bosch,bmi160" (one
-    compatible, separate i2c and spi drivers binding it), rather than the
-    cros-ec model of per-transport compatibles - cros-ec splits because its
-    on-wire framing genuinely differs per bus, which is not the case here.
-
-The binding documents both points as well.
-
-Testing
-=======
-
- - Linksys LGS328MPCv2  (RTL8238B, I2C)
- - Zyxel GS1900-10HP A1 (BCM59121, UART)
- - Zyxel GS1900-10HP B1 (RTL8238B, UART)
- - Zyxel XMG1915-10EP   (RTL8239C, UART)
- - Zyxel XS1930-12HP    (RTL8239, SMBus)
-
+Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
 ---
-
-v1 -> v2:
- - all points flagged by Sashiko addressed:
- - uart: drop frame overflow (return count, not the stored length) so
-   serdev retains no leftover bytes that would misalign the next response
- - uart: guard rx_buf/rx_len with a spinlock to close a data race between
-   the async receive_buf callback and send/recv
- - i2c: return terminal MCU error opcodes (0xfd/0xfe) to the core
-   immediately instead of polling to the 1 s timeout
- - core: cap BCM59121 at 30 W (802.3at) — the basic 8-bit set command
-   can't program the advertised 60 W (it silently clamped to 51 W)
-v1: https://lore.kernel.org/netdev/20260608205758.1830521-1-jelonek.jonas@gmail.com/
-
----
-Jonas Jelonek (2):
-  dt-bindings: net: pse-pd: add bindings for Realtek/Broadcom PSE MCU
-  net: pse-pd: add Realtek/Broadcom PSE MCU driver
-
- .../bindings/net/pse-pd/realtek,pse-mcu.yaml  |  154 +++
- MAINTAINERS                                   |    7 +
- drivers/net/pse-pd/Kconfig                    |   28 +
- drivers/net/pse-pd/Makefile                   |    3 +
- drivers/net/pse-pd/realtek-pse-core.c         | 1007 +++++++++++++++++
- drivers/net/pse-pd/realtek-pse-i2c.c          |  164 +++
- drivers/net/pse-pd/realtek-pse-uart.c         |  156 +++
- drivers/net/pse-pd/realtek-pse.h              |   87 ++
- 8 files changed, 1606 insertions(+)
+ .../bindings/net/pse-pd/realtek,pse-mcu.yaml  | 154 ++++++++++++++++++
+ 1 file changed, 154 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
- create mode 100644 drivers/net/pse-pd/realtek-pse-core.c
- create mode 100644 drivers/net/pse-pd/realtek-pse-i2c.c
- create mode 100644 drivers/net/pse-pd/realtek-pse-uart.c
- create mode 100644 drivers/net/pse-pd/realtek-pse.h
 
-
-base-commit: f6033078a9e671e3c8b83d387b91591a6f6a54e7
+diff --git a/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml b/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
+new file mode 100644
+index 000000000000..2fb729dcb41f
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/pse-pd/realtek,pse-mcu.yaml
+@@ -0,0 +1,154 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/pse-pd/realtek,pse-mcu.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Realtek/Broadcom PSE MCU
++
++maintainers:
++  - Jonas Jelonek <jelonek.jonas@gmail.com>
++
++description: |
++  Microcontroller (MCU) that fronts the PSE hardware on switches using
++  Realtek (RTL8238B, RTL8239, RTL8239C) or Broadcom (BCM59111, BCM59121)
++  PSE chips. The MCU exposes a small message-based protocol over either
++  I2C/SMBus or UART; the actual PSE silicon is not accessed directly. The
++  Realtek and Broadcom variants share this device tree contract but use
++  different protocol opcodes, selected by the compatible.
++
++  The compatible identifies the PSE-MCU protocol dialect, not a specific
++  part. The device described here is the MCU, whose own silicon varies
++  across boards and is incidental to the protocol. The MCU is not
++  made by Realtek or Broadcom; the 'realtek' vendor prefix reflects the
++  platform these MCUs are found on (Realtek-based PoE switches) and the
++  '-rtk'/'-bcm' suffix selects the Realtek or Broadcom protocol dialect.
++  The specific PSE chip behind the MCU is not described in the device
++  tree either; it is detected at runtime by querying the MCU.
++
++  A single compatible per dialect covers both the I2C/SMBus and UART
++  attachments: the wire protocol is identical across them and the
++  transport is already expressed by the node's parent bus, so it is not
++  encoded in the compatible. Transport-specific properties differ
++  accordingly - the I2C attachment carries 'reg' (and, for Realtek,
++  'realtek,i2c-protocol'), while the UART attachment carries the serial
++  peripheral properties such as 'current-speed'.
++
++properties:
++  compatible:
++    enum:
++      - realtek,pse-mcu-rtk
++      - realtek,pse-mcu-bcm
++
++  reg:
++    maxItems: 1
++
++  power-supply:
++    description: Regulator supplying the PoE power rail.
++
++  enable-gpios:
++    maxItems: 1
++
++  realtek,i2c-protocol:
++    $ref: /schemas/types.yaml#/definitions/string
++    enum: [ i2c, smbus ]
++    description: |
++      Wire framing the MCU firmware expects on the I2C bus. "smbus" means
++      reads carry a leading command byte (0x00) and a repeated start; "i2c"
++      means bare 12-byte writes and reads with no command prefix. Only
++      applies to the Realtek I2C attachment.
++
++required:
++  - compatible
++
++allOf:
++  - $ref: pse-controller.yaml#
++  - $ref: /schemas/serial/serial-peripheral-props.yaml#
++  # The I2C attachment (identified by 'reg') cannot carry serial bus props.
++  - if:
++      required: [reg]
++    then:
++      properties:
++        current-speed: false
++        max-speed: false
++  # 'realtek,i2c-protocol' is meaningful only for the Realtek I2C attachment;
++  # the Broadcom variant and any UART attachment must not carry it.
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: realtek,pse-mcu-rtk
++      required: [reg]
++    then:
++      required:
++        - realtek,i2c-protocol
++    else:
++      properties:
++        "realtek,i2c-protocol": false
++
++unevaluatedProperties: false
++
++examples:
++  # Realtek PSE chip, I2C attachment (SMBus framing).
++  - |
++    i2c {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-pse@20 {
++            compatible = "realtek,pse-mcu-rtk";
++            reg = <0x20>;
++            realtek,i2c-protocol = "smbus";
++
++            pse-pis {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                pse-pi@0 {
++                    reg = <0>;
++                    #pse-cells = <0>;
++                };
++            };
++        };
++    };
++
++  # Broadcom PSE chip, I2C attachment.
++  - |
++    i2c {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-pse@20 {
++            compatible = "realtek,pse-mcu-bcm";
++            reg = <0x20>;
++
++            pse-pis {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                pse-pi@0 {
++                    reg = <0>;
++                    #pse-cells = <0>;
++                };
++            };
++        };
++    };
++
++  # Realtek PSE chip, UART attachment.
++  - |
++    serial {
++        ethernet-pse {
++            compatible = "realtek,pse-mcu-rtk";
++            current-speed = <115200>;
++
++            pse-pis {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                pse-pi@0 {
++                    reg = <0>;
++                    #pse-cells = <0>;
++                };
++            };
++        };
++    };
 -- 
 2.51.0
 
