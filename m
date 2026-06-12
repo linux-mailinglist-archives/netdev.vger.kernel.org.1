@@ -1,183 +1,293 @@
-Return-Path: <netdev+bounces-298518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298519-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w0fkB+LCK2oyEgQAu9opvQ
-	(envelope-from <netdev+bounces-298518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:27:14 +0200
+	id dGV4IOrEK2rGEgQAu9opvQ
+	(envelope-from <netdev+bounces-298519-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:35:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84C25677CD8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:27:13 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA016677D8C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:35:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ntVQkOQl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298518-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298518-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XJeL0jHU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298519-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298519-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D84D3301026D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:27:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A093304346C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC712381B02;
-	Fri, 12 Jun 2026 08:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE7835A3BF;
+	Fri, 12 Jun 2026 08:35:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E4381AE2;
-	Fri, 12 Jun 2026 08:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786FF221721;
+	Fri, 12 Jun 2026 08:35:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781252826; cv=none; b=Rh8sWhe7n2/GF3M0r1kgMVBskhtgbgye/wX7BmiD2MORGp70WH9No19fNToRSIq7rpwMoa+Te6OuMbYOHUqzoufg7UPuEJah3vR4Fms3TaPbntyXlurGUKyADDzON9YFFw4QNWYuSbbVEgu9Sp7r2KSlsygdXNZzPKrBqUda7zY=
+	t=1781253338; cv=none; b=ZnR/p0dzCFgzeELv1AkFw4VU/nLaon/wbu1wPW4XrrRxqucCJ3ilKQNdBzpCGRIQKKjBvQ4Ci6pdmP+gz8n8xS5u6ln8io+DLkLtj1BUKEIwPMylcn32Wda8M4d3jxlnyCP62/yg9I3pOk/h/JO6b4yA4r77gx7oAD/ZmrlvgK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781252826; c=relaxed/simple;
-	bh=gx91AU+xYWZMu1E5l78i54HZqLlcH+Ag+ScKzMTfD08=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JtWQjq6Rc85EIoMTYXI7UybtYZJ/m/F3l2qDsoeslnnaOY31F43e5JtwkHwZtMDATkS5VnqFC71TrT/hmcnG2CMyf2EBfpQWZt9THiokjgKVVUcGbz6jwZYwImzTTzyp1lE85O3sFflBh9G16RhW7mdeGoqdVtaHnDT2huJgyBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntVQkOQl; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83AA11F000E9;
-	Fri, 12 Jun 2026 08:26:56 +0000 (UTC)
+	s=arc-20240116; t=1781253338; c=relaxed/simple;
+	bh=gi+KxDQWAoE6iCQ7B/uKnweekywnkmlvpqc+6XjmUs0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GdjLUiTE5AkYTDyTsyqlmiSBKj3zYwP9GxmUS9CdCP22uUGYaoxaSxgtpkuFOouM75Ldf9Fyuo+udjgcNX1IOqDckXtL2TCdCsozne3uAxtEkMiotqWb0p8yqsan/AiyT3Py+Vf1XINxEGyfn61Z1WWN4MoHrrYcxPrOXYfHaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XJeL0jHU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B541F000E9;
+	Fri, 12 Jun 2026 08:35:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781252824;
-	bh=aCIvGGNlCn3/areAwzPGCMcZ9K6iR0m6gHQcTX8yVnU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ntVQkOQloHJp9kAqqZHkhpUCbsgEkGoJsRhrBxfhgkScFlY4Tew245Z1dp8lHFEfZ
-	 qCbsoum1ceTQtRLlo37izLtbc+kq7yO+17GgL/Pgd1ktdDvHBLy+2Py2CWuH8wmunk
-	 DpzWzU2BS0GXO+9GuzX52QyMzQmSqqs0mNKLTbQPpJ+mG50ezyENNb7dRRoKxYXs9j
-	 p7VZWBUGGtqCfD9MMA+mZo7Q2BHbWDEXxUJzGBh7H1kzifMw6yjKrgWQrrxJLL0nV9
-	 vH7Vo7wFzwujT1gn78CQBPLJmDgI0lnNt3fKuBuvx/UyceUxmyhAOAiyDA0ILY7W8V
-	 DXBoXWasjJ9kw==
-Message-ID: <ac097d05-8fac-4e93-98c0-33224cef782f@kernel.org>
-Date: Fri, 12 Jun 2026 10:26:54 +0200
+	s=k20260515; t=1781253337;
+	bh=p3uQ7PUl/XTt+QFJA86ayYU5Tjov97jDvKlT4lyYFnc=;
+	h=From:To:Cc:Subject:Date;
+	b=XJeL0jHUrbR63A12uao3iWCIUtU3f69jmUJmx010qvH7aabAfnHQiSW6k8AlGZjp1
+	 jJVouPGjhl6l1wxcxA3wc/khO/EGdk+p0GS8s1ZtJG0yR/JdG63uzMN5ODhFwP/3L2
+	 6p6nfQm5T8ronblIf0uTtFAJklgRB4Ge/7rTUxfDanlx3+mM4F3n8TzSZMXeZn0V/M
+	 AnE8AZrVMgkC4PeUbjJ4a45yWBjx4MD68BFtbVjP+gZhDcXmfCkDH5jHLzUm71bAB3
+	 fxZrl/vZiwDSwWh/dHRv8Le59DxAbVS++trq0SK8ivDcJmG6R3hxh6KQMB4mIPALvq
+	 qUiYgI/GozB1A==
+From: hawk@kernel.org
+To: netdev@vger.kernel.org
+Cc: kernel-team@cloudflare.com,
+	simon.schippers@tu-dortmund.de,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chris Arges <carges@cloudflare.com>,
+	Mike Freemon <mfreemon@cloudflare.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+	=?UTF-8?q?Jonas=20K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+	Breno Leitao <leitao@debian.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v7 0/5] veth: add Byte Queue Limits (BQL) support
+Date: Fri, 12 Jun 2026 10:35:23 +0200
+Message-ID: <20260612083530.1650245-1-hawk@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/8] dt-bindings: net: wireless: qcom,ath10k: Document
- NVMEM cells
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Johannes Berg <johannes@sipsolutions.net>, Jeff Johnson
- <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Srinivas Kandagatla <srini@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Saravana Kannan <saravanak@kernel.org>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, daniel@makrotopia.org,
- Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
- <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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
-In-Reply-To: <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:loic.poulain@oss.qualcomm.com,m:ulfh@kernel.org,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:andersson@kernel.org,m:konradybcio@kernel.org,m:axboe@kernel.dk,m:johannes@sipsolutions.net,m:jjohnson@kernel.org,m:brgl@kernel.org,m:marcel@holtmann.org,m:luiz.dentz@gmail.com,m:quic_bgodavar@quicinc.com,m:quic_rjliao@quicinc.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:srini@kernel.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:linux-mmc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:ath10k@lists.infradead.org,m:linux-bluetooth@vger.kernel.org,m:netdev@vger.kernel.org,m:daniel@makrotopia.org,m:bartosz.golaszewski@oss.qualcomm.com,m:krzk@kernel.org,m:conor@kernel.org,m:luizdentz@gmail.com,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	FREEMAIL_TO(0.00)[oss.qualcomm.com,kernel.org,kernel.dk,sipsolutions.net,holtmann.org,gmail.com,quicinc.com,davemloft.net,google.com,redhat.com,lunn.ch,armlinux.org.uk];
+	FORGED_SENDER(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298519-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:simon.schippers@tu-dortmund.de,m:hawk@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:carges@cloudflare.com,m:mfreemon@cloudflare.com,m:toke@toke.dk,m:j.koeppeler@tu-berlin.de,m:leitao@debian.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bpf@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298518-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[cloudflare.com,tu-dortmund.de,kernel.org,davemloft.net,google.com,redhat.com,toke.dk,tu-berlin.de,debian.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:email]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 84C25677CD8
+X-Rspamd-Queue-Id: CA016677D8C
 
-On 09/06/2026 09:52, Loic Poulain wrote:
-> Document the NVMEM cells supported by the ath10k driver, the
-> mac-address, pre-calibration data, and calibration data.
-> 
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
+From: Jesper Dangaard Brouer <hawk@kernel.org>
 
+This series adds BQL (Byte Queue Limits) to the veth driver, reducing
+latency by dynamically limiting in-flight packets in the ptr_ring and
+moving buffering into the qdisc where AQM algorithms can act on it.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Problem: veth's 256-entry ptr_ring acts as a "dark buffer" invisible
+to the qdisc's AQM.  Under load the ring fills, adding up to 256
+packets of unmanaged latency before the qdisc sees congestion.
 
-Best regards,
-Krzysztof
+Solution: BQL stops the queue before the ring fills, pushing excess
+packets into the qdisc where sojourn-based AQM can drop them.
+Time-based completion coalescing (ethtool tx-usecs, default 100 us)
+lets DQL converge on a limit that bounds actual queuing delay rather
+than oscillating at limit=2 with per-packet completion.
+
+Test setup: veth pair, UDP flood, 13000 iptables rules in consumer
+namespace (slows NAPI-64 cycle to ~6-7 ms).  Ping measures RTT.
+
+                   BQL off                    BQL on
+  fq_codel:  RTT ~22 ms, 4% loss        RTT ~1.3 ms, 0% loss
+  sfq:       RTT ~24 ms, 0% loss        RTT ~1.5 ms, 0% loss
+
+BQL reduces ping RTT by ~17x for both qdiscs.  Consumer throughput
+unchanged.
+
+Why BQL over configurable ring size (ethtool -G): BQL auto-tunes per
+workload via DQL; a static ring size requires per-setup manual tuning
+and a too-small ring drops XDP packets in batches of 16-64.
+
+Selftests: https://github.com/netoptimizer/veth-backpressure-performance-testing
+
+Background:
+  Mike Freemon reported the veth dark buffer problem internally at
+  Cloudflare and showed that recompiling with ptr_ring size 30 made
+  fq_codel work dramatically better -- motivating a dynamic BQL
+  solution.  Chris Arges wrote the reproducer.  Jonas Koeppeler and
+  Simon Schippers provided extensive testing and code review.
+
+  During BQL development we also fixed an unrelated 12-year-old CoDel
+  bug (stale first_above_time in empty flows), see
+  commit 815980fe6dbb ("net_sched: codel: fix stale state for empty flows in fq_codel").
+  BQL remains valuable independently.
+
+Patch overview:
+  1. net: add dev->bql flag to allow BQL sysfs for IFF_NO_QUEUE devices
+  2. veth: implement Byte Queue Limits (BQL) for latency reduction
+  3. veth: add tx_timeout watchdog as BQL safety net
+  4. net: sched: add timeout count to NETDEV WATCHDOG message
+  5. veth: time-based BQL completion coalescing via ethtool tx-usecs
+
+Jesper Dangaard Brouer (4):
+  net: add dev->bql flag to allow BQL sysfs for IFF_NO_QUEUE devices
+  veth: implement Byte Queue Limits (BQL) for latency reduction
+  veth: add tx_timeout watchdog as BQL safety net
+  net: sched: add timeout count to NETDEV WATCHDOG message
+
+Simon Schippers (1):
+  veth: time-based BQL completion coalescing via ethtool tx-usecs
+
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Chris Arges <carges@cloudflare.com>
+Cc: Mike Freemon <mfreemon@cloudflare.com>
+Cc: Toke Høiland-Jørgensen <toke@toke.dk>
+Cc: Jonas Köppeler <j.koeppeler@tu-berlin.de>
+Cc: Breno Leitao <leitao@debian.org>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: kernel-team@cloudflare.com
+
+---
+Changes since V6:
+  - Patch 2 (teardown): rework veth_napi_del_range() to drain the ptr_ring
+    and balance the peer txq's BQL/DQL by completing the outstanding charges
+    via netdev_tx_completed_queue(), instead of netdev_tx_reset_queue().
+    dql_reset() races with a concurrent producer, whereas completion is the
+    normal single-completer path and is safe once NAPI is gone
+    (synchronize_net()) and the producer has stopped charging BQL (it
+    observes rq->napi == NULL).  Fixes races reported by sashiko.  The
+    peer txq is still woken to clear any leaked DRV_XOFF.
+  - Patch 2: document the lltx/DQL locking model at the BQL charge site --
+    veth is lltx so the stack skips HARD_TX_LOCK; the ring producer_lock is
+    the single-producer lock for dql_queued() (1:1 with the peer txq) and
+    the peer NAPI in veth_xdp_rcv() is the single completer.
+  - Patch 3 (watchdog): add a VETH_WATCHDOG_TIMEOUT_MS #define for the
+    tx_timeout value instead of an inline magic number, and expand the
+    math behind the value (64-packet NAPI budget * 250 ms/pkt = 16 s)
+    in a comment (Paolo).
+  - Patches 2+5: add Co-developed-by for Jonas Koeppeler.
+  - Patch 5 (coalescing): flush when n_bql exceeds dql.limit to handle
+    BQL starvation.  Removes the empty-ring STACK_XOFF check (and its
+    smp_rmb) -- the dql.limit comparison handles it more directly.
+  - Patch 5: at teardown, also complete the coalesced bql_state.n_bql
+    pending from the last NAPI poll, on top of the patch 2 ring drain.
+  - Patch 5: mirror tx_coal_usecs onto the peer in veth_set_coalesce() so
+    a veth pair always coalesces symmetrically; the completion path reads
+    its own device's value.
+  - Patch 5: use WRITE_ONCE/READ_ONCE for tx_coal_usecs (Paolo).
+  - Patch 5: init bql_state before napi_enable() to avoid race (sashiko).
+  - Patch 5: tx-usecs=0 handled as normal path, no special case.
+  - Patch 5: n_bql type changed to uint; explicit if/++ instead of
+    implicit bool-to-int addition.
+  - Patch 5: call veth_bql_maybe_complete() on every iteration for
+    accurate completion intervals with mixed XDP/non-XDP packets.
+  - Patch 5: reject tx-usecs above half the tx_timeout watchdog in
+    veth_set_coalesce() (return -ERANGE) -- the coalescing window delays
+    BQL completions, so an over-large value could trip a false watchdog;
+    half the watchdog leaves a generous margin.
+
+Prior versions:
+  V6: https://lore.kernel.org/all/20260527135418.1166665-1-hawk@kernel.org/
+  V5: https://lore.kernel.org/all/20260505132159.241305-1-hawk@kernel.org/
+  V4: https://lore.kernel.org/all/20260501071633.644353-1-hawk@kernel.org/
+  V3: https://lore.kernel.org/all/20260429172036.1028526-1-hawk@kernel.org/
+  V2: https://lore.kernel.org/all/20260413094442.1376022-1-hawk@kernel.org/
+  V1: https://lore.kernel.org/all/20260324174719.1224337-1-hawk@kernel.org/
+
+Changes since V5:
+  - Drop patch 1 (OOB txq fix) -- applied to net tree by Paolo as
+    08f566e8f83b, already in net-next.
+  - New patch 5: time-based BQL completion coalescing via ethtool
+    tx-usecs (Simon Schippers).  Resolves the throughput regression
+    Paolo flagged on V5: per-packet completion forced DQL to limit=2,
+    causing cache-line bouncing between producer/consumer CPUs.
+    Coalescing batches completions on a configurable time threshold
+    (default 100 us), letting DQL discover a higher useful limit.
+  - Patch 2: use __ptr_ring_check_produce() instead of open-coded
+    ring-full check (Simon Schippers nit).
+
+Changes since V4:
+  - New patch 1: fix OOB txq access in veth_poll() when veth peers have
+    asymmetric RX/TX queue counts.  XDP redirect can deliver frames to
+    an RX queue index that exceeds the peer's TX queue count, causing
+    an out-of-bounds netdev_get_tx_queue() access.  Found by sashiko-bot.
+  - Patch 3 (veth BQL): wake stopped peer txqs in veth_napi_del_range()
+    to clear DRV_XOFF after NAPI teardown.  A concurrent veth_xmit()
+    can set DRV_XOFF between rcu_assign_pointer(napi, NULL) and
+    synchronize_net(); with NAPI gone, no veth_poll() clears it.
+    Guarded by netif_running() to skip during device close.
+
+Changes since V3:
+  - Drop selftest patch (patch 5 from V3) per maintainer request.
+  - Rebase on latest net-next.
+
+Changes since V2:
+  - Patch 2 (veth BQL): fix syzbot WARNING in veth_napi_del_range():
+    clamp BQL reset loop to peer's real_num_tx_queues.  The loop was
+    iterating dev->real_num_rx_queues but indexing peer's txq[], which
+    goes out of bounds when the peer has fewer TX queues (e.g. veth
+    enslaved to a bond with XDP attached).
+
+Changes since V1:
+  - Patch 1 (dev->bql flag): add kdoc entry for @bql in struct net_device.
+  - Patch 2 (veth BQL): charge fixed VETH_BQL_UNIT (1) per packet instead
+    of skb->len.  veth has no link speed; the ptr_ring is packet-indexed.
+    Byte-based charging lets small packets sneak many entries into the ring.
+    Testing: min-size packet flood causes 3.7x ping RTT degradation with
+    skb->len vs no change with fixed-unit charging.
+  - Patch 3 (tx_timeout watchdog): fix race with peer NAPI: replace
+    netdev_tx_reset_queue() with clear_bit(STACK_XOFF) + netif_tx_wake_queue()
+    to avoid dql_reset() racing with concurrent dql_completed().
+  - Cover letter: update CoDel fix reference to merged commit in net tree.
+
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ drivers/net/veth.c                            | 267 +++++++++++++++++-
+ include/linux/netdevice.h                     |   2 +
+ net/core/net-sysfs.c                          |   8 +-
+ net/sched/sch_generic.c                       |   6 +-
+ 5 files changed, 270 insertions(+), 14 deletions(-)
+
+-- 
+2.43.0
+
 
