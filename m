@@ -1,178 +1,153 @@
-Return-Path: <netdev+bounces-298570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298484-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y7McFMPYK2oaGQQAu9opvQ
-	(envelope-from <netdev+bounces-298570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:00:35 +0200
+	id MImVM3O3K2oZCwQAu9opvQ
+	(envelope-from <netdev+bounces-298484-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:38:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02E2B67886B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:00:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827056774DB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:38:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=arinc9.com header.s=hostingermail-a header.b=ZeBrpYI6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298570-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298570-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=arinc9.com;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=c0esgBag;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298484-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298484-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 71719300916F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:00:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D09BE301D02E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 07:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490A2380FCC;
-	Fri, 12 Jun 2026 10:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FAA3DDDAA;
+	Fri, 12 Jun 2026 07:38:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from shrimp.cherry.relay.mailchannels.net (shrimp.cherry.relay.mailchannels.net [23.83.223.164])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3AB1DF748;
-	Fri, 12 Jun 2026 10:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E783E3D648F;
+	Fri, 12 Jun 2026 07:37:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781258433; cv=none; b=YIcR+kl5TDiC+tPcshvtJngbdh0VR8UideshT9Jy6UPyDdMWbGyuq2X5BI4Kmy+T6J4pQFxw4bpIi+xnB5Ch6ASga8EOfpJvEh6NkxNuA6DJD2cm5Ce6kIHPox0J7nLIDNEyxJVfChQPKhFKvObaWIHvv19EZYlpnUnFfoCD5EM=
+	t=1781249883; cv=none; b=hwJuB61VqhgkUuTkLUFVHUIOpv7Ayo0PfkETYpaNoQaXZFEIBJZoxoWRk69fvVnw8FfWFH1PsY3Vs0sM+wufRi8jgUE+vaRL9nfRCtxxZdEqlix24yKO+uSiVy7UMTIuCYUIhldgl2Zkw1thhhHezD/VJIwhpma4RzH5z7ZUh3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781258433; c=relaxed/simple;
-	bh=tF/vP+WYOK9P9urz3A6JtTcCTWb+qjzpMiSJxzo9+S8=;
-	h=Message-ID:MIME-Version:Subject:To:References:From:In-Reply-To:
-	 Content-Type:Date; b=C2AtCgL4YsrQ2t1yBKWETMkE+cQqn2kscPAF11H3+maDpo32w/qn3JuglQvwMpHnaB8eWnXXxv94fjYn7H/38L8ccVS9/UuSrsYAFUMqgJP2gQIlKzwJCo3I5pdS41eCLUrtN2OVPNcBthBjhCfRMdeEhlffutMTWeSzMdnoeGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=ZeBrpYI6; arc=none smtp.client-ip=23.83.223.164
-X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 19D7C7219BE;
-	Fri, 12 Jun 2026 07:36:42 +0000 (UTC)
-Received: from fr-int-smtpout19.hostinger.io (100-116-180-119.trex-nlb.outbound.svc.cluster.local [100.116.180.119])
-	(Authenticated sender: hostingeremail)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 3CAC8721857;
-	Fri, 12 Jun 2026 07:36:39 +0000 (UTC)
-X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-X-MailChannels-Auth-Id: hostingeremail
-X-Arithmetic-Fearful: 63c5ece7276c157b_1781249802002_3456694983
-X-MC-Loop-Signature: 1781249802002:29651468
-X-MC-Ingress-Time: 1781249802001
-Received: from fr-int-smtpout19.hostinger.io (fr-int-smtpout19.hostinger.io
- [148.222.54.35])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.116.180.119 (trex/7.1.5);
-	Fri, 12 Jun 2026 07:36:42 +0000
-Received: from [10.10.10.3] (unknown [46.1.111.82])
-	(Authenticated sender: chester.a.unal@arinc9.com)
-	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4gcBCl1z9Fz1y7P;
-	Fri, 12 Jun 2026 07:36:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
-	s=hostingermail-a; t=1781249797;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WXtlwR+cKWGeAXn3H+Lf5Yv1kL7XUbUsrMYC6J2rcVc=;
-	b=ZeBrpYI6Dd/19gzwezL9s6dEWcEwXVPhMzaTBGzKwS8TIWcBSU3yoD7QKoZ3yBGWR+nrqg
-	eInFGcClna9n7prMx+FJ6b33Zm5w33wIlPL5Od2HPMHlfENdEtHhdA9Iub80OstE3yDSBX
-	UutJgFHpeovEWcFS5UQ4mqnuK9jPNPSPpEdvjU5Y+GVvL6WBRS/MGcW4H9eZ9dP/3zlI7J
-	Yt5+qrOfHH9GMLKCfCTXqVR5Zxn2FthdUHqQhQhB3CsF26zCWxvHk4CCa7ir13RtDoYNFY
-	lYAx1OuXCkt0u9l6a8Njq5H1YKm9zyPNNEijODSUqkXgsjGtusNAsoRm8S+awA==
-Message-ID: <02ad5de0-ea6a-4267-8686-72e3f98fce4e@arinc9.com>
+	s=arc-20240116; t=1781249883; c=relaxed/simple;
+	bh=mrgJ2VAuh5P273BwV2G8Wc+0omO2pHh4Muntb/vB+Qw=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=hVUAMqycsnW35JMOZDqATLXmS9AM0QS/swrcT0f9P4fv+C0NZ+kCCJ9jpzzTTnNSG+Rjrc5ZOQY21sI+vX1UMiQ8Kftk5hqcHxL7zdfwk0QAXiYu7s5Ly9akwZ1JnnPJu0UtgP4N+cz2+oIjLH4fE3oYEQoSyqsiFNs7mUrmq+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=c0esgBag; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2B1F6A4BFC;
+	Fri, 12 Jun 2026 09:37:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1781249870; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=TrOeP1rKDBqme1EicP8zK1y41xE2ImzrIlX9k96aKck=;
+	b=c0esgBag4k4MdaGFwx3QG2e4LlMTIVfYmi65wUzJPiW6ixURwmrmmnPQFEqXnmbGJU/+nm
+	6ZMCa6TMWdGrgWhsFQHkk2ihNBzbF9hzqsmIO+kZcU3dQWog/U05lb5gqlYgmgMjea1Hid
+	onstumaIWOSeYAqALxllUKlI/fYFYhHEB7cSFBhaS7sfdigv+huBzgF86hJcV6XKshpcNo
+	nRdrcoNzo4a2mxWrUhaeVmyVsxr7Rb/sueTHFzqMKt9bOWJ0cfAZwZRsxD0iL1hB1jQ5Tw
+	I5NfzNGL/4rpZZv5hN+eFVG4QyeMfiiT2ARP3f/F052nH0yDkva4c/Y7NkrJiA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 8/8] net: dsa: mt7530: implement
- port_change_conduit op
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <cover.1781119435.git.daniel@makrotopia.org>
- <91ae0f87a6ca2cce3d072dba548545e02347bf13.1781119435.git.daniel@makrotopia.org>
-Content-Language: en-GB
-From: "Chester A. Unal" <chester.a.unal@arinc9.com>
-In-Reply-To: <91ae0f87a6ca2cce3d072dba548545e02347bf13.1781119435.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Fri, 12 Jun 2026 09:37:47 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, opendmb@gmail.com,
+ florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: bcmgenet: Use weighted round-robin TX DMA
+ arbitration
+In-Reply-To: <d700f8b0-b315-468d-8681-b97653ed76e8@broadcom.com>
+References: <20260610085238.56300-1-ovidiu.panait.rb@renesas.com>
+ <2f7e70123887fcfd8bbf4ce92f73574d@tipi-net.de>
+ <d700f8b0-b315-468d-8681-b97653ed76e8@broadcom.com>
+Message-ID: <69d920a3b52cc049dc1b96a9c7d5e3b6@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Date: Fri, 12 Jun 2026 07:36:35 +0000 (UTC)
-X-CM-Analysis: v=2.4 cv=Gq4Q+V1C c=1 sm=1 tr=0 ts=6a2bb705 a=EYFf6tZZuEx+mizzmxfcTQ==:117 a=EYFf6tZZuEx+mizzmxfcTQ==:17 a=IkcTkHD0fZMA:10 a=VT4XjZGOAAAA:8 a=GvHEsTVZAAAA:8 a=FvUSNmnTzPuJ0QD-RBkA:9 a=QEXdDO2ut3YA:10 a=6CpsfURP9XNmmWg3j1mJ:22 a=aajZ2D0djhd3YR65f-bR:22
-X-CM-Envelope: MS4xfPf9YvhCURV0HNIRHewhsgeJ9lEsWOVHOYoe2NIE2lxkmBW207FzjH+NqiB3byQJ0bAloPoh1NCmG2PgAFdt/QN7hkNG2SGyAMV4XomqSKlxpCttMUy5 s+QzPUrh17I0tW90nKrdo+RS3RYeD862Ks9jmvbyoaOY/jWi8O8vrClb6WmkCVwf1j9fnM2H1XmeyqkDfAG/6iAAON8+3kZAADIG92oUX9eOrEMe5AhBOp6f fOE1xNV66pSaBNW6YjWW9aFU9Bry5FQqphNAL2qC0aQz6DpUHP2AhI66bTwRSyQFTK1m+QJBCDCKZeNdzddGf8rQiFGiyomFmTKmTeSTMdqI9eKMvR9T2G+i 2Mu/cLS28ncEvQDD3vD5K3BS33LCxkOIPqw/XLG4d6mwXRZYtg9ibcZxDgXRuDkGSFtkwJ7h6FiPPRh78EXqnQFg74I+FJ53x30cX9m818PhBvRthI9W/Fyj urnwTraN9Cex6mcdm/Z4LjaJZgE4slbLiKBKFeqpJdcgQOrYK8taV2bqkOyBLNJh50N/iUSbucRzQmNv4XjdeFkRPh4uEVB/g46MCHu6c//OIis5e5indrdj dO1vybENR3J0C4iyL7jcmsyDD7d8kF8ajC9cUWQAXcAwUmFCPrdEa2+hOr+4GDKMGcRzXSb/X8bvu1BVjZpCXXio
-X-AuthUser: chester.a.unal@arinc9.com
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[arinc9.com,none];
-	R_DKIM_ALLOW(-0.20)[arinc9.com:s=hostingermail-a];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-298570-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:justin.chen@broadcom.com,m:ovidiu.panait.rb@renesas.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[chester.a.unal@arinc9.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-298484-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,makrotopia.org:email,arinc9.com:dkim,arinc9.com:email,arinc9.com:mid,arinc9.com:from_mime];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chester.a.unal@arinc9.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[arinc9.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[renesas.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 02E2B67886B
+X-Rspamd-Queue-Id: 827056774DB
 
-On 10/06/2026 20:56, Daniel Golle wrote:
-> Allow changing the CPU port affinity of user ports at runtime via
-> the IFLA_DSA_CONDUIT netlink attribute. This updates the port matrix
-> to forward to the new CPU port instead of the old one.
+On 11.6.2026 19:27, Justin Chen wrote:
+
+> [...]
+
+>> AFAIK the existing queue mechanism dates back to the STB QoS use cases 
+>> Florian
+>> had in mind when he wrote the driver, so let's hear what he has to say 
+>> on this.
+>> 
+>> The change itself looks correct to me. My concern is the targeting. 
+>> This
+>> flips the default policy for every GENET user rather than fixing a 
+>> specific
+>> defect, and Justin's series already called the persistent timeouts a 
+>> design
+>> issue rather than a bug.
+>> 
+>> So isn't this more net-next material than net with a broad Fixes: tag?
+>> Please also add to the commit message that it drops the existing 
+>> priority
+>> handling for rings 1-4.
+>> 
 > 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> I'm ok with these changes. Internally we no longer require priority 
+> queues. It is a legacy use case we no longer have. My idea was to 
+> remove the queues entirely and have one big queue. But I figured I 
+> would wait for Nicolai's XDP changes so we do not need to remove and 
+> re-add queues for XDP. This could be a stop-gap solution until that is 
+> done.
 
-Fabulous!
+Thanks Justin. IMHO XDP could benefit from a queue-refactoring prep. It 
+gets simpler on top of a single queue, and dropping q1-4 frees up a 
+bunch of BDs for the XDP ring instead of the 32 it has atm.
 
-Acked-by: Chester A. Unal <chester.a.unal@arinc9.com>
+Happy to take it on, or leave it to you :)
 
-> ---
->   drivers/net/dsa/mt7530.c | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index c96420c291d5..2f3e734b9f53 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-> @@ -3206,6 +3206,34 @@ static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
->   	return 0;
->   }
->   
-> +static int
-> +mt753x_port_change_conduit(struct dsa_switch *ds, int port,
-> +			   struct net_device *conduit,
-> +			   struct netlink_ext_ack *extack)
-> +{
-> +	struct dsa_port *new_cpu_dp = conduit->dsa_ptr;
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
-> +	struct mt7530_priv *priv = ds->priv;
-> +
-> +	if (priv->id != ID_MT7531)
-> +		return -EOPNOTSUPP;
+> [...]
 
-Why do we limit this to MT7531 only?
-
-Chester A.
+Thanks
+Nicolai
 
