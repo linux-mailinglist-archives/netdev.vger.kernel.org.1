@@ -1,226 +1,219 @@
-Return-Path: <netdev+bounces-298556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4Pa5Jo3QK2o0FgQAu9opvQ
-	(envelope-from <netdev+bounces-298556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:25:33 +0200
+	id 3LiVH5TSK2oAFwQAu9opvQ
+	(envelope-from <netdev+bounces-298557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:34:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B526783B0
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:25:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7A5A67856D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:34:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=gn8j9diU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298556-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298556-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=ragnatech.se header.s=fm3 header.b="qpVd/0/A";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="JLmCR/aj";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298557-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298557-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ragnatech.se;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 57A7F3013A8E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:25:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7BB813170004
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BCE399346;
-	Fri, 12 Jun 2026 09:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0CC37269F;
+	Fri, 12 Jun 2026 09:29:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9712E3769EE;
-	Fri, 12 Jun 2026 09:25:08 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781256311; cv=fail; b=XQ+PGbSlLMQHMVAiWrv8zZIGF668d2vYvZKVK8fCe+Y5ZO4GsHQqbnyITVgCK1jvB75Fw9KfuIgozqPhbfHdM73ZWjFT4QcPzCOX6r/Mwy95b9CrNEx0kn7jzCwdEbkf4A2jy4ThUMKj+6w+kIArlbY0d5Er6r1sS3olw6cXFYM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781256311; c=relaxed/simple;
-	bh=iTYOKpFBlt/c3VEVSRVExoSXW2gP3YiVeVVW4wMKZYw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IAxC8s12sSzoGU2sIkw2jK7b7ATQ/hoej8rZYAHH8NPzqiovRpm5G+7JZDsMup7zizED5heVrnuhVYPI9ecw/DqdqGT2d7Ex+B9mk3oVuII2y3MtMBsFpWT5fnWKkF/40kVUTS7it8SCYvtN32mFU2Q6QYgZuxu0TXzoHSfLavU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gn8j9diU; arc=fail smtp.client-ip=198.175.65.14
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781256309; x=1812792309;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iTYOKpFBlt/c3VEVSRVExoSXW2gP3YiVeVVW4wMKZYw=;
-  b=gn8j9diU5gaQVMeB7K1j5H2BhGKUSnO2zpcPTWPxDSNIFMaQi/KqJJ76
-   wCbbA29MEXLzzdTD5zKR7aMizsMD2wWdB+MSnBo/HYWICpwLDBh6K2Vr1
-   uapY7urtE4APXZ/lHnsaJ6ecXxNByIvL6naHvJU1avJYW6GgQi/T7/p87
-   i2ZntYQSDFzGvzOpdiqlctU+F35486RmZpXWdMK7oODIFb/cqx5aFq3q7
-   u1GUucrOfI9QMQZvSSeadYlfQD96My1uVC0e6KKa7ZWs61YpYQwr/8NCU
-   fvvwyKOZjCGPQY0D3sn1ZhycCvL6cMgnV/zg4s9JV0jIwcLidfK+6UNNJ
-   A==;
-X-CSE-ConnectionGUID: dTfMaC1cSQKEgrmm/jjnrg==
-X-CSE-MsgGUID: /bnPjGDZT1OMvZaBu1srfw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="85982967"
-X-IronPort-AV: E=Sophos;i="6.24,200,1774335600"; 
-   d="scan'208";a="85982967"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2026 02:25:08 -0700
-X-CSE-ConnectionGUID: 0PqRYRt4SZmz4/O/Jl9zrA==
-X-CSE-MsgGUID: STNzxt5WSvWyBU/EKawV7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,200,1774335600"; 
-   d="scan'208";a="240422692"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2026 02:25:08 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 12 Jun 2026 02:25:07 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 12 Jun 2026 02:25:07 -0700
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.6) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 12 Jun 2026 02:25:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kubRyig/Otpv8CiKFyml52bzArbe3CPTZf07kZl6VJyn2CShhBbLKIfk4crB7q/SM0lM7UNfw7T/zm+XIEMUGa1dZSrpOLr90Gc9lKIe/mQOSIQirJK+7nIq9zTDEAmlb8B45dM+Ok9roGUkTm4JjfxC8+lXbV14lqwKjtHtAhg2Q+hnnML1BCkBcxmnBdZaJZVYcnOBtP9k1LpUAmwkptsVNyxivbQut43rDSvYgtTkpEGgSs1vgqYCiX3gkbdYSVA51dJelVzuR6wxYkaC+vcaI8te8r2FMqGLKn0ZiML41G8lrEcq7+KkQMgozFI+WPSy0Y3RFufCabgh1V6Nig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iTYOKpFBlt/c3VEVSRVExoSXW2gP3YiVeVVW4wMKZYw=;
- b=hv7/Eij525fikU/A7hV9HoEXKayRqsqoniwhvKEWQJUh8SZsk5y/RnKOwcnB0I7j7dkCTIO6B89cPqfjGU8T5x2qDFgKDGWGgCJe6ODCjGyZEi7SfeTp3FckhuvCpw62+5Q/dxxhNenmweKo+Qx9L8KtAcrR9UkTB1nY76m+OnrWkYR2QnLYaLmZzj87b+oA+pLA2rGexd1orcN9Sz+QMKEkn5nwTsgJdcX/IR2l4yHplLjpmHTIQz9roOEmrKRpiX1sYo/01cMaaLsENmqWluRrreMlwVE3qiuuMETekvgd4Jy1NbajMAAv4LQ5A6AQz5GO8TpsKuRmcuCZmF8kXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
- by DSVPR11MB9717.namprd11.prod.outlook.com (2603:10b6:8:34c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Fri, 12 Jun
- 2026 09:25:00 +0000
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37]) by PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::f95a:602a:34d3:5d37%5]) with mapi id 15.21.0113.013; Fri, 12 Jun 2026
- 09:25:00 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Wentao Guan <guanwentao@uniontech.com>, "lorenzo@kernel.org"
-	<lorenzo@kernel.org>
-CC: "nbd@nbd.name" <nbd@nbd.name>, "sujuan.chen@mediatek.com"
-	<sujuan.chen@mediatek.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "niecheng1@uniontech.com"
-	<niecheng1@uniontech.com>, "zhanjun@uniontech.com" <zhanjun@uniontech.com>
-Subject: RE: [PATCH net] net: ethernet: mtk_wed: debugfs: correct index in
- wed_amsdu_show()
-Thread-Topic: [PATCH net] net: ethernet: mtk_wed: debugfs: correct index in
- wed_amsdu_show()
-Thread-Index: AQHc+jdtzgaL5kbn5UWD3mCBccZvprY6pNTQ
-Date: Fri, 12 Jun 2026 09:24:59 +0000
-Message-ID: <PH0PR11MB5902816638ABEF8EAC1C1D48F0182@PH0PR11MB5902.namprd11.prod.outlook.com>
-References: <20260612064501.203058-1-guanwentao@uniontech.com>
-In-Reply-To: <20260612064501.203058-1-guanwentao@uniontech.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|DSVPR11MB9717:EE_
-x-ms-office365-filtering-correlation-id: 9a8608e8-3d49-4b83-0c8b-08dec86479e3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|22082099003|11063799006|56012099006|18002099003|38070700021;
-x-microsoft-antispam-message-info: NdAAxlvQV2jCWFHjfbcaQolqavDMMhgFWUW3Ugn7lpKBMvsHPvT3l7KaTRlOtuRZxUiEGC6wIrGyzU6gjwz0bO5xSWiKYP9mrGMvTmUPyswuox04DNEQCtjBINmdo9JagjK5pdniTPFz/ILZybawiQ7eYYU6nTk6KmeehM6dbZOuOUAqiR3QxynsBj9TS1hxd3MEU+3gevCpyYkePvfvkkOJtfeSpDcPWF6xV4iIEoylEQWo3WJhslAcV2trPrsOfBy2KXCDvd8nURavapM2bN5E/6efPzVX3NfAyiQKBie5/94XuIWUVldEii20xcWHq0E+C8b9NEaK2JqcMfbCDqNo39js8LGvTH2nr/tGUvnZlS3AByvs87Xv5tjdAbQPPJsZJAwCnoMWzOqt6/+wdPaFnVu1AwTxxFl/cgCh9zIhqOJtgblOQKyOfNY06MyJwZQxBTslj+fdpjzepuRtliDFkYplbU0APh26TZu6B9Qa/mN+rq3PCs03ThDPT/eDRlEXO6+NbDsbNzLWpUE9Xf5oQveLbZvU9NAEUFAjMrPvuyZqMFqGE7HUyfb9ERwPALX6WeXp0MvWyB8eljRpyILl1HUa/Boibm2UC7BYYz68HVT8Y/+B13r0Vo3MxcNDj6+t1USkbWPhRTpR6DWh8FqgxnDPfbAlEtE6AlmY+BzEUn/ROF6xd65nyjspaNA/70pxrAuDYBk1X/zadir+UYwUo1/SbKrLn8st0cI1lnZgfsFI7xdMLiUN/jGUp+b3
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(22082099003)(11063799006)(56012099006)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zBaYSUiZOphizCJXnnpR9aPr8zzdxKVy/kiQ2zfcAGS1RzoHFffnwGR8C7iL?=
- =?us-ascii?Q?kwxQuEeRkmV7LKXasiY2TJOHalVEd1lm1lq0EZK6b8qdfWFxS2SpFC/RyHHO?=
- =?us-ascii?Q?9iEhKx8V6kVbgk+XJXBtijQg51Ag3iBP9/7C3r0N8j4+J0YFOeZKK/DA0Mc4?=
- =?us-ascii?Q?2XozVwV+NjDpviBgdGjXV2W/xafVCvjOERFRU/UkYnxaFlL1U1IvdFG3xjnQ?=
- =?us-ascii?Q?P+qKGE4GSMPao23dZ5wnF0GWbJlhiF62MVVX1ZqmQys+TNfFcQLTN1jDzR6Y?=
- =?us-ascii?Q?a//g1HbThjGRoiJsoj0ksCnEypz0WArlce7KaLkABnJQFD+RbIrzesm639V9?=
- =?us-ascii?Q?mxMAJxa5QDUG3Emx4WfChPJEjD5OGAbJVH6TWcLBUI7o/u6IQMdIK4gywYx/?=
- =?us-ascii?Q?jD99TmLf/MwGY4NEKhMQM1/diDsTo3bLRIUxf6OpAK/pivmXQ8sQBlBavdyg?=
- =?us-ascii?Q?9U0rnRm+8jETbfwmDmk826awMHIJO3p54M+vq50xBT6Dz+EIkkRC+ABuUutl?=
- =?us-ascii?Q?inPe2Tknlyc7iTExdtbVRNU8/u2Y4IuCxkIeRG6HPT9KhiVeroBRzV9BZqj0?=
- =?us-ascii?Q?tE1ndSI4UYICpGzpo2KrLpulPkYrzx4KAWY+4s8PZXBcYvYiV9rhE9v/8o1A?=
- =?us-ascii?Q?BnHxsm8Kf2x0VSuVVT1nvbn2I9T9K2uyQvAtkm44Ua5bVt0UYRMUK6wnCuPQ?=
- =?us-ascii?Q?bz0qgbDghMut/fPyZ5hLLeMx37e6Ib1MOYirnuoPa2ucX8nE4O5uV8OP10+8?=
- =?us-ascii?Q?C9GTvrilxPIOQGJwfixd2kbr6XoJZTXMO12Q5M7+ObCLyvdbqUadAMVE+Ytw?=
- =?us-ascii?Q?9TLHJp4UWBOFmqzMNGN7ubsWTjGFDEMVIylllLrhOTCn0qtkU5YDm3CVnVRS?=
- =?us-ascii?Q?nOsC10+84WcTwK54QB7nPcnHelBuhGYXMLbOavAUnBueYlkO6pST/KVMJs+R?=
- =?us-ascii?Q?M8/yIW//Jlw1QaP+UdJUxlhwWCu+D5PKjd3j+cX7O6dxzzBxiujZlHbEvR5s?=
- =?us-ascii?Q?MZ+7fZplzrV1e8qbvNi7jrgpC6G0O4nnX2sf4cSxIgp2GtCCO+ihnQqFquQn?=
- =?us-ascii?Q?3hxoY9ILPxgIAiFAql4JaqhZbLvgDRwVEwuojPHt8DF2rWjN9aGH8phieYsv?=
- =?us-ascii?Q?S1fk9MViil+7ufC/H/WNKJeFGANHSBnw/58aK0A4xfKatVyWrYKINOl/8fPN?=
- =?us-ascii?Q?RCCjiyvGetuVlJhLvQjuHR6N0IwGI3re2PmOvWkoRCZmmhvhq3waJsj1Ooje?=
- =?us-ascii?Q?53MACtCUMnNNgSJQ5feAelNpJrQ0J3puPGHqPThputqsF2A0Rnq/H7GgMN6Z?=
- =?us-ascii?Q?/hNyytw3RLllyWqg/UNl68cLKSIeC3VH2Yp/kCalKk8tmCP2ZL+uDXrKIRNi?=
- =?us-ascii?Q?QWIUZCJ3bKaYvkY9+K2q61J88iFmFD+KpvdiGIr/asfd1sLQBB9298GWgman?=
- =?us-ascii?Q?6VwjKy/Xxqs2WIe9mVzoE1sHPDijIENG3NleXApQIwHd9akhqUAjbqlK8lXG?=
- =?us-ascii?Q?TGBMNlb0/3lTv2OJG3SiL39X+f2AwuALlJNh+NUKL9A7UJpwceCp+WwJgweP?=
- =?us-ascii?Q?1McrvH8yL/CJpaOpDk9uWQSrP2gzhXsLblBfQghrsVh6n2hQuz0lL9O+RH4L?=
- =?us-ascii?Q?PuvgpBhwQIkKH0wPuV9b1b1phD8ZME2Gg0F5KqIVJkOhiHPMBMixuaA+Zu8y?=
- =?us-ascii?Q?RMgD0Lvr0XihKVIv0/Y9JeIhRfvdRTkcZBr1KroEmmT1NeHbVxtDjugq7pNf?=
- =?us-ascii?Q?6bJaj9LhoA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709FB30C37E;
+	Fri, 12 Jun 2026 09:29:10 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781256552; cv=none; b=p0XpZzU9FQb3vWI5KZve2xRNJuKqLfveZPnHO0M5vQcS0Ql382+T68bC7tic+2XOeVYjtyOCUtT1XC1OztgJV9Nawtvk0TaV1DsS96yfIOREgzmkcS+VsXSh1k8Bgn7RlawUBHZhbPGMlp0UD01dcGNn2gItKxulXLRtldeHVuY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781256552; c=relaxed/simple;
+	bh=+64b1xkKPWAK2wGTqVMfh99WOftJjaCQAYpwclFZ95Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TNA9KyqduqLlVEqVcv7lbDZpcev9dPcoU9kfd2fk99WfQM87HcrXoHP2+ewW0u8BRzaL6s4ugDf3o+eNVWkXg9AnHHwQDaxWeXe0ux66SOJOVsXNLNQyIm5SqG3iUMKCnH7t9hfZ/rUuzYirup9oRbW4M0nCAM1P/95muhe/WJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qpVd/0/A; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JLmCR/aj; arc=none smtp.client-ip=103.168.172.144
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 947C4EC01CF;
+	Fri, 12 Jun 2026 05:29:09 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Fri, 12 Jun 2026 05:29:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm3; t=1781256549; x=1781342949; bh=OU
+	P+fuYeImDEZtjX+66E39B681jfCuygJRIplPq1bjI=; b=qpVd/0/AE3dgtsame0
+	h+YRLYWxASmA1eV7n/v/kw65RH0NXymtW+N320n0r1sTgsaIdBd3lkQK3U4XUH6y
+	TPOr/KWu+cXrBOK+FNQYLeH0ywRJ93L0KIHV39yOou6JXpR933lUGp0K+bhV7biJ
+	Lns0P66+vrJjNjY3AiQiNSXWveuRIthiGPlXY3c3LQEGe/F7ruMrlCNQdA7wd9z5
+	rmQ9KB0X2gbyxx1oeIJ7krEQ2s7N0l3msfO5T71w0hhW02rV0T78yZAOt8cTvvtf
+	c0s8WDLxWTvcnNarIiF2tzgvornDODse9i2EGyoVJyaX/Pm2SzA1WEkrOBCQ/yfR
+	ilAg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1781256549; x=1781342949; bh=OUP+fuYeImDEZtjX+66E39B681jf
+	CuygJRIplPq1bjI=; b=JLmCR/ajs5+IUWIvEKROt80ETn5fAi7RNyoZH1owCiXA
+	h7Mp0s0IwGE8Edc2b2afEj0ghUVRNgtA+SAz4ZPYDWB4rRJPdtzAFkm9p5gX9tcP
+	kbBW2vyfS8f2/OyrIx1V/21ZcBt86D8MCxUCKqXwxVA8LxH311jRwUeb8E2a6lW/
+	ameDeyHc4Cu7+fnhZkKVY9++eHZ9jqu15H47aO2xwonMvGZTkW7Owzvg3/CdY112
+	W7fa5GTcna6whAvZOfW10A2oasbn9L6Y4R3slIqJkj+pne1XM6+nbCRZMGFSIKy3
+	HiDDTIUfq2IQkixTY1+bPcVpyYBewPcdYKr2pSSjJQ==
+X-ME-Sender: <xms:ZdErajOsFgCaYGk4gBZHw5r15cdEY7gpRWK4ZK8WyYO4gDkKSkUl7Q>
+    <xme:ZdErasdh50BimTB3ljL6vxeLqd8PymPMrjY7xdc_yvCc8e6LpVwMM7mfOFRxesLCK
+    Q8LfBBA7dJNmoF7fI7hqNQWtXK9hHm6t_gti4XGqc7IdMcOXdwkrGB5>
+X-ME-Received: <xmr:ZdErapGHza_U4vz0rtpry-PT8BRJspafTBsaCVXGJtKX6hOFKKWpXVLcTY7MrcifBwcb8g7NK5M9W1Urqdltg-YtI47H>
+X-ME-Proxy-Cause: dmFkZTExWmTCGu6/QYF8p+rlXBBoEymTBWKT8utBsZoZ53cI0ZoH5hTR9yek0C+EKbegGF
+    QfD1aCxmtNcO9g8zL5R55C8XwC/LS2ANksB/UOraGciHOIj8i8zIcYSY2W3X9ivZmkxuE4
+    1r09Y7jzZvHEK3WCxzDES3nVW2/Bw0M8XRi4ser/1UGmVs8cF6LD1GyOB8r/DReD65cU3m
+    tCWFXFGtWRa0+jEeut7eD2gLwdDwFYVZk2t5dkA6W1mBo+BJAnPqQVlHpsGtJ4ohvphDrA
+    5pZSlnkv+AorvNQr6kNj+6TPJX2GnVARYypsJj9a0XVsZDg7QqFJR0+2G1gzhaQ0DjNaa0
+    y5Ts5CMJRJ+51AQOemFUJOX6eHGHbWul68WpMzVyM98LqqsfO3R4qF0gOPNmLNAaeavW4B
+    kwEDHPVmI8K3NcN9CrCAplGcLRJnKmEnyZJm+5JT6cYl/qVLue7D0eSHRJsoOFdCVpe9i6
+    ExOTjnyDQONZJasWqi9pjdzYmZYusXhE3srJtDu4jmM7s9UT/xuOn3y6tkhT3V7v89E0ke
+    4RSoftUcNc5oi6+iXae0E8IP/l9ohcctit6hHoIJsKOzdVjEkpbUw3vouvtd+eVHVQ00bQ
+    yos7JA1s+crdtSD+vvAXCWZ4FFCdRR6657ohNfxGzzpStmrfYFmpJK1wKCdw
+X-ME-Proxy: <xmx:ZdErantKYQsJvTIQ-QJlnYu0xQBh4l1zkPmoG9uxo_pJUygWpLYu6g>
+    <xmx:ZdErajp2umSIkWfA1egdUU6ZpGTQFCUcWpBpdzTlCJbln_-hRMFWyA>
+    <xmx:ZdEraunwTO8IlSR3jy386ByGSrDRK3PD43cbUaEAoPzI2GH_cq8tqg>
+    <xmx:ZdEragjvrAc7vh5lIBbkJTmQMOfz_RukYMpfWplqB_ChT9RX0emLrw>
+    <xmx:ZdEramrXhetWdcq19s7GfhEhEnD5C3dHrt2CvBj1CFmbyUStRnabY3eL>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 12 Jun 2026 05:29:08 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"DavidS. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [PATCH net-next v2 0/3] ptp: Add driver for R-Car Gen4 gPTP timer
+Date: Fri, 12 Jun 2026 11:28:48 +0200
+Message-ID: <20260612092851.2141782-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: MRt2/Po7YcWY7r5NhhjghKmsvILok3xlsf10tYMXy2RK+6gUKdseKGfNOBaGxgRAuZaTBOfAA0KSzT/6B+11imXto1MSIppCR9CcaYsCKDtGD2sQANw3bNrpJD/8dLQJAbrdwzxGPY91fPAZOJBufSHsw6qqn6HFUHnkkPIT6I8GVxTrz807SivAn329gSiKaY97IjC1ZJuRzNbgfH+WDUfaVtB3se8uOJ8aUH3jYXCk9VnAT8Z0sK097aoK2uVA+oKAggPSOQev9tAyOI+pmxp3r+iBObDSfM8BhJDjeLeAJYgMdHHTRu6UzMdOq9J+UdrKPMpP09seEkBv0jdGnw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a8608e8-3d49-4b83-0c8b-08dec86479e3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2026 09:25:00.0158
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6PWbuGBpGASz+jBWNaN1eNG3LE/vwdz4fTE48fzpWgQiI/Iu69AaeOC/Vh0DtuBU9iJnn9XawPit0KcpLmeMpARMLOWlhgRB4ZTrCA16pjw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSVPR11MB9717
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
+	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm3,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298556-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298557-lists,netdev=lfdr.de,renesas];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:guanwentao@uniontech.com,m:lorenzo@kernel.org,m:nbd@nbd.name,m:sujuan.chen@mediatek.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:niecheng1@uniontech.com,m:zhanjun@uniontech.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:from_mime,vger.kernel.org:from_smtp,PH0PR11MB5902.namprd11.prod.outlook.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,uniontech.com:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,glider.be,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:niklas.soderlund+renesas@ragnatech.se,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:andrew@lunn.ch,m:niklas.soderlund@ragnatech.se,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jedrzej.jagielski@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,renesas];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:dkim,ragnatech.se:mid,ragnatech.se:from_mime,messagingengine.com:dkim,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E7B526783B0
+X-Rspamd-Queue-Id: E7A5A67856D
 
-From: Wentao Guan <guanwentao@uniontech.com>=20
-Sent: Friday, June 12, 2026 8:45 AM
+Hello,
 
->WED_MON_AMSDU_ENG_CNT point to different entry by 'base+n*offect' mode,
->correct the wed amsdu entry number in wed_amsdu_show().
+This series is the first part cleaning up how PTP timer support is
+implemented on R-Car Gen4. Currently there is partial support for it in
+some of the Ethernet devices that can use it, but not all.
 
-offset?
+The partial support have been implemented by hacking the gPTP module
+directly into the first Ethernet device driver that used it, RTSN for
+V4H and RSWITCH for S4. This is understandable as earlier R-Car
+generations had a dedicated gPTP timer for each Ethernet device, but on
+Gen4 there is a single system-wide PTP timer shared by all.
 
->
->Fixes: 3f3de094e8342 ("net: ethernet: mtk_wed: debugfs: add WED 3.0 debugf=
-s entries")
->Assisted-by: Copilot:gpt-5.2
->Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+The current implementation makes it impossible for other Ethernet
+devices on the platform to use the PTP timer without messing around with
+other Ethernet device drivers.
 
+The effort to clean this up starts with this series which adds the
+system-wide gPTP timer as its own driver and device tree node.
+
+This series will then be followed by work to add proper PTP support to
+the R-Car RAVB Gen4 driver, which currently advertises to user-space it
+supports PTP but which implementation is broken and does not work.
+
+This will in turn be followed by work to the RTSN and RSWITCH drivers
+will be be switched from its current partial support by mapping the gPTP
+address space directly to instead use this driver.
+
+Having both this and RTSN/RSWITCH described and enabled (!) in device 
+tree will not work as they will try to use the same memory region. For 
+this reason this new solution will only be enabled on platforms
+after all user's of the gPTP clock have moved to only use the new
+centralized timer. But in the interim both devices will be described 
+(but not enabled) in the platforms base dtsi file.
+
+For some platforms this is straight forward, such as V4H Sparrow Hawk,
+which only have the RAVB Ethernet interface. This platform currently
+have no users of the PTP timer, but still advertise it supports it. This
+and the soon to be posted RAVB patches solves that.
+
+As the RAVB patches depends on this series the device tree node for the
+gPTP clock is added in this series but will be enabled and linked to
+consumers in the RAVB gPTP series for platforms where it will not
+conflict with RTSN and RSWITCH. And further enabled as more of this is
+cleaned up.
+
+The gPTP driver itself is heavily influence by the existing partial
+support for gPTP in the RTSN and RSWITCH drivers and the Renesas BSP.
+
+Niklas Söderlund (3):
+  dt-bindings: ptp: renesas,rcar-gen4-gptp: Add R-Car Gen4
+  ptp: Add driver for R-Car Gen4
+  arm64: dts: renesas: r8a779g0: Add gPTP node
+
+ .../bindings/ptp/renesas,rcar-gen4-gptp.yaml  |  64 +++++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/renesas/r8a779g0.dtsi     |   9 +
+ drivers/ptp/Kconfig                           |  12 +
+ drivers/ptp/Makefile                          |   1 +
+ drivers/ptp/ptp_rcar_gen4.c                   | 219 ++++++++++++++++++
+ 6 files changed, 312 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/ptp/renesas,rcar-gen4-gptp.yaml
+ create mode 100644 drivers/ptp/ptp_rcar_gen4.c
+
+-- 
+2.54.0
 
 
