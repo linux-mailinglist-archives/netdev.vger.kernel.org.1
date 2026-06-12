@@ -1,285 +1,551 @@
-Return-Path: <netdev+bounces-298512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298513-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VBl2GKy+K2rOEAQAu9opvQ
-	(envelope-from <netdev+bounces-298512-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:09:16 +0200
+	id DsvDOdO/K2ouEQQAu9opvQ
+	(envelope-from <netdev+bounces-298513-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:14:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF19B677A7D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 078CD677B44
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:14:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=PspePYk7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298512-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298512-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=Se+UWgEG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298513-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298513-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9150A3038171
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:09:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FC83304D7FA
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E02371056;
-	Fri, 12 Jun 2026 08:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C24C374E43;
+	Fri, 12 Jun 2026 08:13:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6904035AC37
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 08:09:07 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781251749; cv=fail; b=k4/VahQrsQmiO7b27Rh1u8PvTwvR39glbHXRuOQxSyTZZpoEZ9CEZopMk4rn90dcB5sPP4jzyj+6GZ+q8Mtt7wv2JHeWecDPBddFs/3MbW3loZFBYwZq57auaX9QZ9DBQJI1GfgSGfrP/gZ+mGcKAEfBo4jAQupXbnLO51j9hv4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781251749; c=relaxed/simple;
-	bh=quwMXEXFLjdjWGCnTfUfG0a39WhMZVIYi4O2tRcWm7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JIgIViNSseHDmlqj5ym5LNJxJsCTz8Uq7f8/1Zyh9+MXwok1bhULgft1L6Scbqlz8vCCYH+oUYCffJfdQZ3Hceru9pz7rsdTHmIpIdhWTdSfuEkjGyExRtXpo9KcgU7jSym/m7wiPOgP1DGVkMOOJ7sBHzVPep16qGqXL3UY5Ho=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PspePYk7; arc=fail smtp.client-ip=198.175.65.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781251748; x=1812787748;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=quwMXEXFLjdjWGCnTfUfG0a39WhMZVIYi4O2tRcWm7Q=;
-  b=PspePYk7ZHPJahrFH6kazH7VQ7SbzgeQtA8maN7F9vT2JvZtAkdr+ZKr
-   CeYw3L9K8woonUhVfZ87vTVYEelrQR1Azynpr74B5zdC67uXBUpzjLpUg
-   zWRG0KOHfqJGdoWzaF3GZ+3JYKHyWpaVIeG+oD31OZ/INfq/YFxF5y10Y
-   EiX3a/J7fuPOdWqbqwOGuzmMEPRg0QvUWq3oj5F+Ojf3HXkytak3nGcRh
-   6RpYSGMkXD2TvFPgLGp3cJksryrFl4PIuaNa85ifIvoAPnGA+qc9SnKaP
-   PPdSQgrx4kFL9XDe3Lvl8xMBzREy1WJU1dwuWxqcXaXLq2iLBZZhS0ALd
-   A==;
-X-CSE-ConnectionGUID: jVVRz++TQPCKQcV4D11tQw==
-X-CSE-MsgGUID: NWSIlNmdQ9uXhIAyWj/4tA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="85710631"
-X-IronPort-AV: E=Sophos;i="6.24,200,1774335600"; 
-   d="scan'208";a="85710631"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2026 01:09:07 -0700
-X-CSE-ConnectionGUID: xO90VxySTWm7ql8tEsIEog==
-X-CSE-MsgGUID: oBToszuvRXy2tSq26mJo+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,200,1774335600"; 
-   d="scan'208";a="248640595"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2026 01:09:06 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 12 Jun 2026 01:09:06 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 12 Jun 2026 01:09:06 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.30) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 12 Jun 2026 01:09:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XjH6mwKkBHx17KLIOGg5iqDRB2ZyzsHbbiWZwGPJW8xc3yDhu31+1brH1yaXgJvyu19QxqTJf88oxtswqL26o8+jx23tBOUmarvernB5SMrUTIsuZ65IvYV49g1jtyAayfxjURtQkkQ2kckvp+0cRqd7BiZs4gbERUt/FyoXvUmuClFw0XOUGA4o8jqHjnxNZfwLReWvpl3V3iSebrvEpn3fciObT/aTCLC1tqu+YuhaitB3ylBwQVIlcbVOidEjwGLeEaaHuYYm0an1Dd8TxB50u8qjNYW4SobP9X1VWRUwMUymU13otJsgp9ZYjfCnfxffJIkT6WuSrrBU82Nr7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=quwMXEXFLjdjWGCnTfUfG0a39WhMZVIYi4O2tRcWm7Q=;
- b=x/I0m15a5g8niI4okQySSvYBPhSrTta9V/+ANMimxaNgHbmQQKNLbRJrnff+uEnfbEzhNa38Nt6NPBXVLd16TbC67hfP4WrVwhrQTpLh/axRAM+W4UmXsU2Yv4fL7yhy3yGEvAfEQXS2KagSz8OwrzcPjz7Q4j/8+JwSc0dwTPbnpCbiyq9TlZ3CnZqpeTInehXhHOzWirMcvVKnN2o1GFjfkkNz5YiVAD6BOdUj3YCMtYDEht+2QqHmnn1P8n+DyRNRnn7kJ1T9JGrfGYUtzTeQvpfDk9vbZFjgHMronoLmmUS501Tpn7w0WUWoo1xDiIoG1Epo/zQx7sQ5LuzVpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by CH0PR11MB8165.namprd11.prod.outlook.com (2603:10b6:610:18e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Fri, 12 Jun
- 2026 08:08:57 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%5]) with mapi id 15.21.0113.013; Fri, 12 Jun 2026
- 08:08:56 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>, "Korba, Przemyslaw"
-	<przemyslaw.korba@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3] ice: support SBQ posted
- writes with non-posted support for CGU
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3] ice: support SBQ posted
- writes with non-posted support for CGU
-Thread-Index: AQHc6EaQMNQD/+6CZ0Gyp113VKIr/LY6sNZw
-Date: Fri, 12 Jun 2026 08:08:56 +0000
-Message-ID: <IA1PR11MB624133B5D16B7CE9979CE69A8B182@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20260520105311.5336-1-przemyslaw.korba@intel.com>
-In-Reply-To: <20260520105311.5336-1-przemyslaw.korba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|CH0PR11MB8165:EE_
-x-ms-office365-filtering-correlation-id: 8102defd-f8eb-4aed-7180-08dec859da0d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|23010399003|366016|1800799024|11063799006|56012099006|18002099003|22082099003|38070700021;
-x-microsoft-antispam-message-info: zEhGL8/oA99EDnpQR4WXa7KV3VTfAbXr/pH7NPcdTejjs2OwW6TwG+IkElZDB33RcLrp5/ePh9JLh/287Utvu/fOxqeDDdb/vbYP+YpoIYBvR33uygdzsGbgd978j+i3GL8uhm270aXRprOQowh4mW0ywFk1Td9q8BAfW8Mf60UiurdJjC26vi6GoeqihD6+/KEl5tFHzZOfhZetGMJZdiYENiceMtY/Joaof4QpXFu07YoitVMT5YsN+ON0X91xbHXYAD5MUQgWgTA3ckTaagF7Vypnr0tfFBn75kvFI0yk/uXno0JP95UIKr9mgeZ189c9FUoZ5dMhTGxGSKVOX5CjECm0dWyOdG+qbcm7N3abU1ZfvEUh8LUnZm7+4ny2YJSAzHzQKLP+2T5vzY5bgpMH46948PPeGMRYHoGXBN2c9UzHv/K+VFdGwyDv0ysPq7rfiHEN7op3aYC8SmBzTVNZD2+L9x2bpAgcWkmiCuokNcmRA3wYFfs+aF8SwOhCn4398tVJ9+DBbcPCJLHHnYSbJhMGDUMAQ4VIxQ065zI4am49J3WUHUxt4mlEVXHA43GjaVPl6SHTZyRcQJi6UtoSAMn1F6UWvq+N/F7BuG/FxxhwHtKoiFbLz+WHy4Se5TjvoLnH3mQr1go2iKJNZBslrv8e2051a/zpzxegNvdqkmHVz+MiwJybkLmQD6AEijmzrq9sEmJ1O8Ol3+/uDXrtuGuqe2u5szxsmAJBfJ+cbjo3SM//8KOioHizTxBN
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(366016)(1800799024)(11063799006)(56012099006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?emlIQlRDNHJZRlBTZ2txUlZRR2pKK2E3VFVUSWlzY2NsWGlaZksrR1lzd0t5?=
- =?utf-8?B?YXgvTnhqelkvOGR0bmJLQ0Y2VFlJUFJzTEdtUk5iWTFhelFEQlNGTVJjVWNN?=
- =?utf-8?B?bytMZFZPVXorMzJRMUNaQnNoa1VPOHFrVGRobkJZWTRWNWVtenJvQUdvRUZI?=
- =?utf-8?B?WU44R25CQmlHS00vZ1FWdklIZENxd2tlbktHKzZLWktiWXVkVWx3RHhDUlRx?=
- =?utf-8?B?bjMzSFd3d1I3UTVoRGZnUTQxdlQ4OUpBdHJRMzFPdjMvb21ITnEzZTMyVlMy?=
- =?utf-8?B?cWYyUDBxOW9WM2Ruc29nSENYNktpNlh1Sk5naFF4eExDOU0vMlFRMCtuTk4x?=
- =?utf-8?B?dEt3cGRBc0kvQkRscndtdE1zQ3JzOHBhNEd4Qkp3SmdNMzJvQkJmL1V3bDVR?=
- =?utf-8?B?bHhxWDRNb1ltVFVOYWROenV2RHpxbVJmck5Kc251ZmQwMUp1WSt5cWpOWXAy?=
- =?utf-8?B?aTJ2VkJNTm10dGZiTStmT2EvdEVBTjlJS0c2Y1hjMHF1OExBaUZGK1hiQzJX?=
- =?utf-8?B?NzY2N3diejk4bHBrRlJGUzJrZkZ2YUVRYWtlcnE2Rlh2S3JEZDloVm5UeDJB?=
- =?utf-8?B?Qkh3V0pMMGlXdlhvY1pUMElueWZaN003NWxVV3BEblNUQ0RlWDJITlBwWjBv?=
- =?utf-8?B?Z1lINURlV3orSURsUnhjS0dDckE2QUZtUTVkM3RNRWVleEVNeU9GMEhxak02?=
- =?utf-8?B?M1dnZkxGYTlxeklTZkxidnI3bVpzcEtJc0RiUm5BVlIwVmg4YndqQ1dneHJt?=
- =?utf-8?B?TUJDcnJpZWpvR2Z5elYvRkxadHlGN1ByMC9uM3pCWUxiVDNJdnBwcmdzRkk4?=
- =?utf-8?B?NkI4NWJiZ0V6K0pCL1pMc3RUOGFSaFRuQ0FSSjh6WEJlekpoOXpUYVhaZmZY?=
- =?utf-8?B?S3JvSWRPY002T3BPeG81VTJMWGVMMFprKzVVRi82ZEg4Z01xbzkwVTU1YVE2?=
- =?utf-8?B?akJrelZTRzhMN3ZOY2RuaVNVaW9yeWpiMEZIUHVZWE9iSVBITnJiekVKb1RF?=
- =?utf-8?B?b29XTDJGRUNiY2ZFQVpnUHc3OCtoenFyUGxPalRWUG5nRDRSUzZJeG1NNmUy?=
- =?utf-8?B?b2g1QlNqOHp4SXc3b29YSVVXWWMzK1pXT0EzdWZONUlybnZ6enJVYlVKVHR1?=
- =?utf-8?B?bWU5RXVsUlFwc2FWci9mVHpQZ0syeTZadyt0a0UwMzIrd0pJOEVpNTNtUEN2?=
- =?utf-8?B?RUIvQnZUWnhqaktEU2VSRGVJOU4yOWk2Tk9TWkd2MzFnWERZNE5GL3Q5MEdM?=
- =?utf-8?B?YXkwTjRMb1dTZHdBemZLTmRSeUtuNkhFbTRYeTFDN01XWEF5R09zNWc5ZXpK?=
- =?utf-8?B?bEkwaHJaQmZQblIvL2Y2M051VFVHSGQwWmRkNUhyd2tVemxVMnZiTytuRkgr?=
- =?utf-8?B?cG9CaUhleVJZNzUyWVBXTEUrMjM2Q2VoL1gzQ2VuRnkxK0JhM3AzSkxuYzFv?=
- =?utf-8?B?MzlvL09FL1ZoczhvbTZkZ1VBTGhXZ0NlWXZmbDR1NUNLRXdROGJuai9IZGY4?=
- =?utf-8?B?NW5hcWtiMnl4MXNKQmR0UU9kaWsrQVllMW9JSmFoYndPR2MvUTA5bk9reXFY?=
- =?utf-8?B?a0pBeDA1RXdESHc4aGJaWDhlbUhVN1BGUzZaUjVCWE1TamtQaGlxWEdwR3R2?=
- =?utf-8?B?ZCsrZkl6T1JZV0JnSVpjdmlMUmdLYk1vZmYrdEZlU2RRNTl3T2cyeEszTWpB?=
- =?utf-8?B?K09SVUZKRUp5Zytrd055cURGaHFRbEN5cFFxTDM0RDAybUZQM1RXRXEybldW?=
- =?utf-8?B?VWR6d1BjNTFQMDFtQXhsV1BGN3Nva2N0Q0J0bHhmeVhTQ3hVYlc4OUFPQmlm?=
- =?utf-8?B?RHNJcTNpMm1acnBYYWJ2TFJuZUZHZWVHSDhPSXBmTnVNUFJlVHZIeXlVUFIx?=
- =?utf-8?B?aDFzaEREbTVFYnl2YTBFYmtyYThzR1ZzU2FxYm43VkJkdFNiQWJSSlhiaGk3?=
- =?utf-8?B?WFBJb1A3cWRpYXRWN014MVNWUW9ScytlY01wdzBkN05tOEtla1FDMkUvUEFN?=
- =?utf-8?B?WmExeWg0ZDI2VmpLUmJPYkpmU1NtSWlQZk5UYUFWMXBPZ3JreVd3MUVkT1E5?=
- =?utf-8?B?TVFUUzdIVUFOeWNpNDFnSzhDcVlYVFkvUkxweGM1R05UTVc5QlNFMkx0ZHp2?=
- =?utf-8?B?S0xxY3hwbmNKa3Qva0F2S3ltS0d3S1dKa1B1dzN0K2lSUkhleUhqdTFIQWlS?=
- =?utf-8?B?SE9hQnVML3h5cys1SG5EU1dsVWJBNVJ3SnR3enNmMDlHK2FWdGN1SWQ4ZkFM?=
- =?utf-8?B?ZEhidE5RSndTUDBFeHZaS0N0cXQwVmhxVC9DNVhDVDBNb01tUHFjcjNmYjl1?=
- =?utf-8?Q?h/PELHEJ4558zeEFfp?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068B835F612;
+	Fri, 12 Jun 2026 08:13:54 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781252038; cv=none; b=Wt05o+Jk+YMVRZgcZv27bWTO0yOt7h+C3kHz0SAGAb7Php0zw3dtQl1JrQizDn7eGetcqFM37heIxuxn8zZjK/cFBtGxtUcp3xj5LnazVPfbs7LJliWTY25BIPGN9K4+QyCSMxLS9HKMWvMmcHzViH4T3EyutqxKTk1rtWu0reE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781252038; c=relaxed/simple;
+	bh=2M58W/ftMiLoQVqXaKsWItglmPCEIr2ZtBuGFTlz2Yg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=poR+EPxdAq6PpSd9dj8rFjCKgeVVi3Q8VncpKDFkVtM4Gw9h7RQHr+TnT6PNkvxOF9CND14Skd+JexUPHWYg/kUjuJH8JeFuJ9S/q7GAQctIfTMOEMdSUkh6rqv8KnbJ8RwCwVTVClauVTOKkD/IoihSJeod3bf+IOffc7S0jcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Se+UWgEG; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id EA1811A38DA;
+	Fri, 12 Jun 2026 08:13:46 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B619660012;
+	Fri, 12 Jun 2026 08:13:46 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E0241106C803C;
+	Fri, 12 Jun 2026 10:13:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781252025; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=L+32PzMm+WzQRtGh72lJJoVSfmWXyo9TbLxRNQv4k5g=;
+	b=Se+UWgEG0duiNZ9WoXbeBuxqug6nX8sUWQe1HtTmPfkRupP2xIrqD8q3JG3mtG4ScfCAPp
+	tjziiGeXTADLfFsE13l9KbD7W/YryBp+s49H7XIKvG2tYPyWMk2bV0oFVljbBzgiocx7hT
+	9asnZcvjs6ZVQC17bIvoMEeBUQuLZi8+yIca7c5yH9P0k8pSDsDFDWhILFPe0hKW/Qqmp3
+	4GklimCxZbDVjoHshxvBz9d6NUQUkf/NeapauzBARMMKULFa1hEwZRkTnv/6lukOZchZ2E
+	oyNfi+hVkpF8YH399J0Qepqz5NKFOGoCj8PFyQ9krWz0sIn53LGH2HXrSiUo+Q==
+Message-ID: <992db759-3b94-4309-8c4d-61a37b41fcce@bootlin.com>
+Date: Fri, 12 Jun 2026 10:13:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: XNGZgeG9FflFpV5p3S6LDV51y92xZxAuanReTHGJ6cWuyAPYx8uAch2jJxBu634hH2CX1nKiIBQoE3JFN8w95rsHqqJoysFIUblfW2+YIYTdmS5tTSmh/L3Qt+pY9oP8oI4ccFvoQfJCSvGz34LWBUiQJbaJcc3AFqZgIECBZryyNMQReF2xZqNUV7X9sWJPTcvMD8045qbT47k7DmmOn1lejZF2pIhvpXS/37jSXGeuqEWND5CgR/v2T20ko5O09cSihmFDSKvDW+wVRY55FViM/lppBTJpWAB1Hyt6wlhQ5ZiXHCJUvzJJsodQepiKFxAY07N2yO/T7Mb/YxNidw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8102defd-f8eb-4aed-7180-08dec859da0d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2026 08:08:56.8683
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UcsUmbqd4AHog4wvWHydnsMaIUkFzZ8qxkUrMw69mKzUHBCF7Oejk3Iosed7YcAs9EUOfy7WOA4K06pHitedJg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8165
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/6] r8169: add support for phylink
+To: javen <javen_xu@realsil.com.cn>, hkallweit1@gmail.com,
+ nic_swsd@realtek.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260611094345.880-1-javen_xu@realsil.com.cn>
+ <20260611094345.880-4-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260611094345.880-4-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.06 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298513-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298512-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:przemyslaw.korba@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:aleksandr.loktionov@intel.com,m:arkadiusz.kubalewski@intel.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,osuosl.org:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[IA1PR11MB6241.namprd11.prod.outlook.com:query timed out];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[realsil.com.cn,gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DF19B677A7D
+X-Rspamd-Queue-Id: 078CD677B44
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBJbnRlbC13aXJlZC1sYW4gPGlu
-dGVsLXdpcmVkLWxhbi1ib3VuY2VzQG9zdW9zbC5vcmc+IE9uIEJlaGFsZiBPZiBQcnplbXlzbGF3
-IEtvcmJhDQo+IFNlbnQ6IDIwIE1heSAyMDI2IDE2OjIyDQo+IFRvOiBpbnRlbC13aXJlZC1sYW5A
-bGlzdHMub3N1b3NsLm9yZw0KPiBDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgTmd1eWVuLCBB
-bnRob255IEwgPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgS2l0c3plbCwgUHJ6ZW15c2xh
-dyA8cHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNvbT47IExva3Rpb25vdiwgQWxla3NhbmRyIDxh
-bGVrc2FuZHIubG9rdGlvbm92QGludGVsLmNvbT47IEt1YmFsZXdza2ksIEFya2FkaXVzeiA8YXJr
-YWRpdXN6Lmt1YmFsZXdza2lAaW50ZWwuY29tPjsgS29yYmEsIFByemVteXNsYXcgPHByemVteXNs
-YXcua29yYmFAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBbSW50ZWwtd2lyZWQtbGFuXSBbUEFUQ0gg
-aXdsLW5ldCB2M10gaWNlOiBzdXBwb3J0IFNCUSBwb3N0ZWQgd3JpdGVzIHdpdGggbm9uLXBvc3Rl
-ZCBzdXBwb3J0IGZvciBDR1UNCj4NCj4gRnJvbTogS2Fyb2wgS29sYWNpbnNraSA8a2Fyb2wua29s
-YWNpbnNraUBpbnRlbC5jb20+DQo+DQo+IFNpZGViYW5kIHF1ZXVlIChTQlEpIGlzIGEgSFcgcXVl
-dWUgd2l0aCB2ZXJ5IHNob3J0IGNvbXBsZXRpb24gdGltZS4gQWxsIFNCUSB3cml0ZXMgd2VyZSBw
-b3N0ZWQgYnkgZGVmYXVsdCwgd2hpY2ggbWVhbnMgdGhhdCB0aGUgZHJpdmVyIGRpZCBub3QgaGF2
-ZSB0byB3YWl0IGZvciBjb21wbGV0aW9uIGZyb20gdGhlIG5laWdoYm9yIGRldmljZSwgYmVjYXVz
-ZSB0aGVyZSB3YXMgbm9uZS4gVGhpcyBpbnRyb2R1Y2VkIHVubmVjZXNzYXJ5IGRlbGF5cywgd2hl
-cmUgb25seSB0aG9zZSBkZWxheXMgd2VyZSAiZW5zdXJpbmciIHRoYXQgdGhlIGNvbW1hbmQgaXMg
-ImNvbXBsZXRlZCIgYW5kIHRoaXMgd2FzIGEgcG90ZW50aWFsIHJhY2UgY29uZGl0aW9uLg0KPg0K
-PiBBZGQgdGhlIHBvc3NpYmlsaXR5IHRvIHBlcmZvcm0gbm9uLXBvc3RlZCB3cml0ZXMgd2hlcmUg
-aXQncyBuZWNlc3NhcnkgdG8gd2FpdCBmb3IgY29tcGxldGlvbiwgaW5zdGVhZCBvZiByZWx5aW5n
-IG9uIGZha2UgY29tcGxldGlvbiBmcm9tIHRoZSBGVywgd2hlcmUgb25seSB0aGUgZGVsYXlzIGFy
-ZSBndWFyZGluZyB0aGUgd3JpdGVzLg0KPg0KPiBGbHVzaCB0aGUgU0JRIGJ5IHJlYWRpbmcgYWRk
-cmVzcyAwIGZyb20gdGhlIFBIWSAwIGJlZm9yZSBpc3N1aW5nIFNZTkMgY29tbWFuZCB0byBlbnN1
-cmUgdGhhdCB3cml0ZXMgdG8gYWxsIFBIWXMgd2VyZSBjb21wbGV0ZWQgYW5kIHNraXAgU0JRIG1l
-c3NhZ2UgY29tcGxldGlvbiBpZiBpdCdzIHBvc3RlZC4NCj4NCj4gRTgxMCBvbmx5IHN1cHBvcnRz
-IG9wY29kZSAweDAxLCBidXQgaXRzIEZXIGFsd2F5cyBzZW5kcyBjb21wbGV0aW9uIHJlc3BvbnNl
-cyBmb3IgdGhpcyBvcGNvZGUsIHNvIHRoZSBkcml2ZXIgd2FpdHMgZm9yIGVhY2ggd3JpdGUgdG8g
-Y29tcGxldGUuDQo+IFRoaXMgbWFrZXMgRTgxMCB3cml0ZXMgc3luY2hyb25vdXMgYW5kIGVsaW1p
-bmF0ZXMgdGhlIG5lZWQgZm9yIFNCUSBmbHVzaC4NCj4NCj4gVG8gYW5hbHl6ZSBpZiBkZWxheXMg
-YXJlIGdvbmUsIGxvb2sgZm9yIGFuZCBjb21wYXJlIHRpbWUgc3BlbnQgaW4gaWNlX3NxX3NlbmRf
-Y21kIOKAlCBwb3N0ZWQgd3JpdGVzIHNob3VsZCByZXR1cm4gaW1tZWRpYXRlbHkgYWZ0ZXIgdGhl
-IHdyMzIuDQo+IFRoYXQgY2FuIGJlIGRvbmUgZm9yIGV4YW1wbGUgYnkgYWRqdXN0aW5nIHBoYyB0
-aW1lIHdpdGggcGhjX2N0bCBvbiBFODMwIGRldmljZSwgZm9yIGxlc3MgdGhhbiAyIHNlY29uZHMg
-dG8gdXNlIHRoaXMgbmV3IG1lY2hhbmlzbS4gV2l0aG91dCBpdCwgY29tbWFuZCBiZWxvdyB3aWxs
-IGZhaWwuDQo+DQo+IFJlcHJvZHVjdGlvbiBzdGVwczoNCj4gcGhjX2N0bCBldGgxMyBhZGogMQ0K
-PiBwaGNfY3RsWzQ0NzgxNzAuOTk0XTogYWRqdXN0ZWQgY2xvY2sgYnkgMS4wMDAwMDAgc2Vjb25k
-cw0KPg0KPiBDaGVjayB0cmFjZSBmb3IgdGltaW5nIGZvciBjb21wYXJpc2lvbnM6DQo+IGVjaG8g
-aWNlX3NicV9zZW5kX2NtZCA+IC9zeXMva2VybmVsL2RlYnVnL3RyYWNpbmcvc2V0X2Z0cmFjZV9m
-aWx0ZXINCj4gZWNobyBmdW5jdGlvbl9ncmFwaCA+IC9zeXMva2VybmVsL2RlYnVnL3RyYWNpbmcv
-Y3VycmVudF90cmFjZXINCj4gY2F0IC9zeXMva2VybmVsL2RlYnVnL3RyYWNpbmcvdHJhY2UNCj4N
-Cj4gVGVzdGVkIG9uOg0KPiAtIEludGVsIEU4MzAgTklDIChGVyB2ZXJzaW9uIDEuMDApDQo+ICAg
-LSBLZXJuZWwgNi4xOS4wKw0KPg0KPiBGaXhlczogOGY1ZWUzYzQ3N2E4ICgiaWNlOiBhZGQgc3Vw
-cG9ydCBmb3Igc2lkZWJhbmQgbWVzc2FnZXMiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBLYXJvbCBLb2xh
-Y2luc2tpIDxrYXJvbC5rb2xhY2luc2tpQGludGVsLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogUHJ6
-ZW15c2xhdyBLb3JiYSA8cHJ6ZW15c2xhdy5rb3JiYUBpbnRlbC5jb20+DQo+IFJldmlld2VkLWJ5
-OiBBbGVrc2FuZHIgTG9rdGlvbm92IDxhbGVrc2FuZHIubG9rdGlvbm92QGludGVsLmNvbT4NCj4g
-UmV2aWV3ZWQtYnk6IEFya2FkaXVzeiBLdWJhbGV3c2tpIDxhcmthZGl1c3oua3ViYWxld3NraUBp
-bnRlbC5jb20+DQo+IC0tLQ0KPiB2MzoNCj4gLSBpbmNsdWRlIGluZm9ybWF0aW9uIGluIGNvbW1l
-bnRzIGFuZCBjb21taXQgbWVzc2FnZSBhYm91dCBkaWZmZXJlbnQNCj4gRTgxMCBiZWhhdmlvcg0K
-PiB2MjoNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvaW50ZWwtd2lyZWQtbGFuLzIwMjYwNTA4
-MTAyMjQ3LjgyNjM3NS0xLXByemVteXNsYXcua29yYmFAaW50ZWwuY29tLw0KPiAtIGZpeCBtaW5v
-ciBpc3N1ZXMgZm9yIEU4MTAgZGV2aWNlcw0KPiB2MToNCj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5v
-cmcvaW50ZWwtd2lyZWQtbGFuLzIwMjYwNTA3MTM1MTEwLjgwOTM2Ny0xLXByemVteXNsYXcua29y
-YmFAaW50ZWwuY29tLw0KPiAtLS0NCj4gZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWNlL2lj
-ZV9jb21tb24uYyAgIHwgMjYgKysrKystLQ0KPiBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9p
-Y2UvaWNlX2NvbnRyb2xxLmMgfCAgNCArKyAgZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWNl
-L2ljZV9jb250cm9scS5oIHwgIDEgKw0KPiBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pY2Uv
-aWNlX3B0cF9ody5jICAgfCA3MCArKysrKysrKysrKystLS0tLS0tDQo+IGRyaXZlcnMvbmV0L2V0
-aGVybmV0L2ludGVsL2ljZS9pY2Vfc2JxX2NtZC5oICB8ICA1ICstDQo+IDUgZmlsZXMgY2hhbmdl
-ZCwgNzMgaW5zZXJ0aW9ucygrKSwgMzMgZGVsZXRpb25zKC0pDQo+DQoNClRlc3RlZC1ieTogUmlu
-aXRoYSBTIDxzeC5yaW5pdGhhQGludGVsLmNvbT4gKEEgQ29udGluZ2VudCB3b3JrZXIgYXQgSW50
-ZWwpDQo=
+Hi,
+
+On 6/11/26 11:43, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> Transfer old framework to phylink. Phylink can support fiber mode card
+> which can not get link status or link speed from standard phy registers.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> ---
+> Changes in v2:
+>  - merge patch v1 3/6 and v1 4/6.
+>  - add helper rtl_mac_enable_tx_lpi(), rtl_mac_disable_tx_lpi()
+>    and rtl8169_get_lpi_caps()
+> ---
+>  drivers/net/ethernet/realtek/Kconfig      |   1 +
+>  drivers/net/ethernet/realtek/r8169_main.c | 249 ++++++++++++++++------
+>  2 files changed, 181 insertions(+), 69 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
+> index 9b0f4f9631db..49ac72734225 100644
+> --- a/drivers/net/ethernet/realtek/Kconfig
+> +++ b/drivers/net/ethernet/realtek/Kconfig
+> @@ -88,6 +88,7 @@ config R8169
+>  	select CRC32
+>  	select PHYLIB
+>  	select REALTEK_PHY
+> +	select PHYLINK
+>  	help
+>  	  Say Y here if you have a Realtek Ethernet adapter belonging to
+>  	  the following families:
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 560f987437b6..615bd4107359 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/dma-mapping.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/bitfield.h>
+> +#include <linux/phylink.h>
+>  #include <linux/prefetch.h>
+>  #include <linux/ipv6.h>
+>  #include <linux/unaligned.h>
+> @@ -777,6 +778,8 @@ struct rtl8169_private {
+>  	struct r8169_led_classdev *leds;
+>  
+>  	u32 ocp_base;
+> +	struct phylink *phylink;
+> +	struct phylink_config phylink_config;
+>  	struct irq_domain *phy_irq_domain;
+>  };
+>  
+> @@ -2256,7 +2259,7 @@ static int rtl8169_get_eee(struct net_device *dev, struct ethtool_keee *data)
+>  	if (!rtl_supports_eee(tp))
+>  		return -EOPNOTSUPP;
+>  
+> -	ret = phy_ethtool_get_eee(tp->phydev, data);
+> +	ret = phylink_ethtool_get_eee(tp->phylink, data);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -2272,7 +2275,7 @@ static int rtl8169_set_eee(struct net_device *dev, struct ethtool_keee *data)
+>  	if (!rtl_supports_eee(tp))
+>  		return -EOPNOTSUPP;
+>  
+> -	return phy_ethtool_set_eee(tp->phydev, data);
+> +	return phylink_ethtool_set_eee(tp->phylink, data);
+>  }
+>  
+>  static void rtl8169_get_ringparam(struct net_device *dev,
+> @@ -2303,13 +2306,8 @@ static void rtl8169_get_pauseparam(struct net_device *dev,
+>  				   struct ethtool_pauseparam *data)
+>  {
+>  	struct rtl8169_private *tp = netdev_priv(dev);
+> -	bool tx_pause, rx_pause;
+>  
+> -	phy_get_pause(tp->phydev, &tx_pause, &rx_pause);
+> -
+> -	data->autoneg = tp->phydev->autoneg;
+> -	data->tx_pause = tx_pause ? 1 : 0;
+> -	data->rx_pause = rx_pause ? 1 : 0;
+> +	phylink_ethtool_get_pauseparam(tp->phylink, data);
+>  }
+>  
+>  static int rtl8169_set_pauseparam(struct net_device *dev,
+> @@ -2320,9 +2318,7 @@ static int rtl8169_set_pauseparam(struct net_device *dev,
+>  	if (dev->mtu > ETH_DATA_LEN)
+>  		return -EOPNOTSUPP;
+>  
+> -	phy_set_asym_pause(tp->phydev, data->rx_pause, data->tx_pause);
+> -
+> -	return 0;
+> +	return phylink_ethtool_set_pauseparam(tp->phylink, data);
+>  }
+>  
+>  static void rtl8169_get_eth_mac_stats(struct net_device *dev,
+> @@ -2388,6 +2384,14 @@ static void rtl8169_get_eth_ctrl_stats(struct net_device *dev,
+>  		le32_to_cpu(tp->counters->rx_unknown_opcode);
+>  }
+>  
+> +static int rtl8169_get_link_ksettings(struct net_device *ndev,
+> +				      struct ethtool_link_ksettings *cmd)
+> +{
+> +	struct rtl8169_private *tp = netdev_priv(ndev);
+> +
+> +	return phylink_ethtool_ksettings_get(tp->phylink, cmd);
+> +}
+> +
+>  static int rtl8169_set_link_ksettings(struct net_device *ndev,
+>  				      const struct ethtool_link_ksettings *cmd)
+>  {
+> @@ -2418,6 +2422,13 @@ static int rtl8169_set_link_ksettings(struct net_device *ndev,
+>  	return 0;
+>  }
+>  
+> +static int rtl8169_nway_reset(struct net_device *dev)
+> +{
+> +	struct rtl8169_private *tp = netdev_priv(dev);
+> +
+> +	return phylink_ethtool_nway_reset(tp->phylink);
+> +}
+> +
+>  static const struct ethtool_ops rtl8169_ethtool_ops = {
+>  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>  				     ETHTOOL_COALESCE_MAX_FRAMES,
+> @@ -2433,10 +2444,10 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
+>  	.get_sset_count		= rtl8169_get_sset_count,
+>  	.get_ethtool_stats	= rtl8169_get_ethtool_stats,
+>  	.get_ts_info		= ethtool_op_get_ts_info,
+> -	.nway_reset		= phy_ethtool_nway_reset,
+> +	.nway_reset		= rtl8169_nway_reset,
+>  	.get_eee		= rtl8169_get_eee,
+>  	.set_eee		= rtl8169_set_eee,
+> -	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+> +	.get_link_ksettings	= rtl8169_get_link_ksettings,
+>  	.set_link_ksettings	= rtl8169_set_link_ksettings,
+>  	.get_ringparam		= rtl8169_get_ringparam,
+>  	.get_pause_stats	= rtl8169_get_pause_stats,
+> @@ -2661,13 +2672,10 @@ static void rtl_jumbo_config(struct rtl8169_private *tp)
+>  		pcie_set_readrq(tp->pci_dev, readrq);
+>  
+>  	/* Chip doesn't support pause in jumbo mode */
+> -	if (jumbo) {
+> -		linkmode_clear_bit(ETHTOOL_LINK_MODE_Pause_BIT,
+> -				   tp->phydev->advertising);
+> -		linkmode_clear_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+> -				   tp->phydev->advertising);
+> -		phy_start_aneg(tp->phydev);
+> -	}
+> +	if (jumbo)
+> +		tp->phylink_config.mac_capabilities &= ~(MAC_SYM_PAUSE | MAC_ASYM_PAUSE);
+> +	else
+> +		tp->phylink_config.mac_capabilities |= (MAC_SYM_PAUSE | MAC_ASYM_PAUSE);
+
+I'm wondering if this actually works. These capabilities are used at init, it's
+not really something that's supposed to be changed dynamically.
+
+I'm wondering what's the best course of action to address this. Either rejecting
+pause settings in set_pauseparams when jumbo is used, but that leaves the pause
+bits in the advertisement.
+
+Have you checked if the above code you wrote works correctly w.r.t pause advertising
+when you switch back and forth between jumbo/non jumbo ?
+
+>  }
+>  
+>  DECLARE_RTL_COND(rtl_chipcmd_cond)
+> @@ -2782,7 +2790,7 @@ static void rtl_prepare_power_down(struct rtl8169_private *tp)
+>  		rtl_ephy_write(tp, 0x19, 0xff64);
+>  
+>  	if (device_may_wakeup(tp_to_dev(tp))) {
+> -		phy_speed_down(tp->phydev, false);
+> +		phylink_speed_down(tp->phylink, false);
+>  		rtl_wol_enable_rx(tp);
+>  	}
+>  }
+> @@ -4142,11 +4150,17 @@ static int rtl8169_change_mtu(struct net_device *dev, int new_mtu)
+>  {
+>  	struct rtl8169_private *tp = netdev_priv(dev);
+>  
+> +	if (netif_running(dev))
+> +		phylink_stop(tp->phylink);
+> +
+>  	WRITE_ONCE(dev->mtu, new_mtu);
+>  	netdev_update_features(dev);
+>  	rtl_jumbo_config(tp);
+>  	rtl_set_eee_txidle_timer(tp);
+>  
+> +	if (netif_running(dev))
+> +		phylink_start(tp->phylink);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -4932,9 +4946,6 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
+>  
+>  static void rtl_enable_tx_lpi(struct rtl8169_private *tp, bool enable)
+>  {
+> -	if (!rtl_supports_eee(tp))
+> -		return;
+> -
+>  	switch (tp->mac_version) {
+>  	case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_52:
+>  		/* Adjust EEE LED frequency */
+> @@ -4965,41 +4976,15 @@ static void rtl_enable_tx_lpi(struct rtl8169_private *tp, bool enable)
+>  	}
+>  }
+>  
+> -static void r8169_phylink_handler(struct net_device *ndev)
+> -{
+> -	struct rtl8169_private *tp = netdev_priv(ndev);
+> -	struct device *d = tp_to_dev(tp);
+> -
+> -	tp->speed = tp->phydev->speed;
+> -	if (netif_carrier_ok(ndev)) {
+> -		rtl_link_chg_patch(tp, tp->speed);
+> -		rtl_enable_tx_lpi(tp, tp->phydev->enable_tx_lpi);
+> -		pm_request_resume(d);
+> -	} else {
+> -		pm_runtime_idle(d);
+> -	}
+> -
+> -	phy_print_status(tp->phydev);
+> -}
+> -
+>  static int r8169_phy_connect(struct rtl8169_private *tp)
+>  {
+> -	struct phy_device *phydev = tp->phydev;
+> -	phy_interface_t phy_mode;
+>  	int ret;
+>  
+> -	phy_mode = tp->supports_gmii ? PHY_INTERFACE_MODE_GMII :
+> -		   PHY_INTERFACE_MODE_MII;
+> -
+> -	ret = phy_connect_direct(tp->dev, phydev, r8169_phylink_handler,
+> -				 phy_mode);
+> -	if (ret)
+> +	ret = phylink_connect_phy(tp->phylink, tp->phydev);
+> +	if (ret) {
+> +		netdev_err(tp->dev, "failed to connect phy\n");
+>  		return ret;
+> -
+> -	if (!tp->supports_gmii)
+> -		phy_set_max_speed(phydev, SPEED_100);
+> -
+> -	phy_attached_info(phydev);
+> +	}
+>  
+>  	return 0;
+>  }
+> @@ -5010,7 +4995,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
+>  	/* Clear all task flags */
+>  	bitmap_zero(tp->wk.flags, RTL_FLAG_MAX);
+>  
+> -	phy_stop(tp->phydev);
+> +	phylink_stop(tp->phylink);
+>  
+>  	/* Reset SerDes PHY to bring down fiber link */
+>  	if (tp->sfp_mode)
+> @@ -5042,7 +5027,7 @@ static void rtl8169_up(struct rtl8169_private *tp)
+>  	enable_work(&tp->wk.work);
+>  	rtl_reset_work(tp);
+>  
+> -	phy_start(tp->phydev);
+> +	phylink_start(tp->phylink);
+>  }
+>  
+>  static int rtl8169_close(struct net_device *dev)
+> @@ -5058,7 +5043,7 @@ static int rtl8169_close(struct net_device *dev)
+>  
+>  	free_irq(tp->irq, tp);
+>  
+> -	phy_disconnect(tp->phydev);
+> +	phylink_disconnect_phy(tp->phylink);
+>  
+>  	dma_free_coherent(&pdev->dev, R8169_RX_RING_BYTES, tp->RxDescArray,
+>  			  tp->RxPhyAddr);
+> @@ -5291,6 +5276,8 @@ static void rtl_remove_one(struct pci_dev *pdev)
+>  		r8169_remove_leds(tp->leds);
+>  
+>  	unregister_netdev(tp->dev);
+> +	if (tp->phylink)
+> +		phylink_destroy(tp->phylink);
+>  
+>  	if (tp->dash_type != RTL_DASH_NONE)
+>  		rtl8168_driver_stop(tp);
+> @@ -5519,16 +5506,6 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+>  		return -EUNATCH;
+>  	}
+>  
+> -	tp->phydev->mac_managed_pm = true;
+> -	if (rtl_supports_eee(tp))
+> -		phy_support_eee(tp->phydev);
+> -	phy_support_asym_pause(tp->phydev);
+> -
+> -	/* mimic behavior of r8125/r8126 vendor drivers */
+> -	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
+> -		phy_disable_eee_mode(tp->phydev,
+> -				     ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
+> -
+>  	/* PHY will be woken up in rtl_open() */
+>  	phy_suspend(tp->phydev);
+>  
+> @@ -5644,6 +5621,132 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+>  	return false;
+>  }
+>  
+> +static void rtl_mac_link_down(struct phylink_config *config, unsigned int mode,
+> +			      phy_interface_t interface)
+> +{
+> +	struct rtl8169_private *tp = container_of(config, struct rtl8169_private, phylink_config);
+> +
+> +	tp->speed = SPEED_UNKNOWN;
+> +	pm_runtime_idle(tp_to_dev(tp));
+> +}
+> +
+> +static void rtl_mac_link_up(struct phylink_config *config, struct phy_device *phydev,
+> +			    unsigned int mode, phy_interface_t interface,
+> +			    int speed, int duplex, bool tx_pause, bool rx_pause)
+> +{
+> +	struct rtl8169_private *tp = container_of(config, struct rtl8169_private, phylink_config);
+> +
+> +	struct device *d = tp_to_dev(tp);
+> +
+> +	tp->speed = speed;
+> +	rtl_link_chg_patch(tp, speed);
+> +
+> +	pm_request_resume(d);
+> +}
+> +
+> +static struct phylink_pcs *rtl_mac_select_pcs(struct phylink_config *config,
+> +					      phy_interface_t interface)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static void rtl_mac_config(struct phylink_config *config, unsigned int mode,
+> +			   const struct phylink_link_state *state)
+> +{
+> +}
+> +
+> +static void rtl_mac_disable_tx_lpi(struct phylink_config *config)
+> +{
+> +	struct rtl8169_private *tp = container_of(config, struct rtl8169_private, phylink_config);
+> +
+> +	rtl_enable_tx_lpi(tp, false);
+> +}
+> +
+> +static int rtl_mac_enable_tx_lpi(struct phylink_config *config, u32 timer, bool tx_clk_stop)
+> +{
+> +	struct rtl8169_private *tp = container_of(config, struct rtl8169_private, phylink_config);
+> +
+> +	if (!rtl_supports_eee(tp))
+> +		return -EOPNOTSUPP;
+> +
+> +	rtl_enable_tx_lpi(tp, true);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct phylink_mac_ops rtl_phylink_mac_ops = {
+> +	.mac_select_pcs = rtl_mac_select_pcs,
+> +	.mac_config = rtl_mac_config,
+> +	.mac_link_down  = rtl_mac_link_down,
+> +	.mac_link_up    = rtl_mac_link_up,
+> +	.mac_disable_tx_lpi = rtl_mac_disable_tx_lpi,
+> +	.mac_enable_tx_lpi = rtl_mac_enable_tx_lpi,
+> +};
+> +
+> +static unsigned long rtl8169_get_lpi_caps(struct rtl8169_private *tp)
+> +{
+> +	unsigned long caps = 0;
+> +
+> +	if (!rtl_supports_eee(tp))
+> +		return 0;
+> +
+> +	caps |= MAC_100FD | MAC_1000FD;
+> +
+> +	/* mimic behavior of r8125/r8126 vendor drivers
+> +	 * RTL_GIGA_MAC_VER_61 doesn't support 2.5G eee
+> +	 */
+> +	if (tp->mac_version >= RTL_GIGA_MAC_VER_63)
+> +		caps |= MAC_2500FD;
+> +	if (tp->mac_version >= RTL_GIGA_MAC_VER_70)
+> +		caps |= MAC_5000FD;
+> +	if (tp->mac_version == RTL_GIGA_MAC_VER_80)
+> +		caps |= MAC_10000FD;
+> +
+> +	return caps;
+> +}
+> +
+> +static int rtl_init_phylink(struct rtl8169_private *tp)
+> +{
+> +	struct phylink *pl;
+> +	phy_interface_t phy_mode;
+
+reverse xmas tree here :)
+
+> +
+> +	tp->phylink_config.dev = &tp->dev->dev;
+> +	tp->phylink_config.type = PHYLINK_NETDEV;
+> +	tp->phylink_config.mac_managed_pm = true;
+> +	tp->phylink_config.lpi_capabilities = rtl8169_get_lpi_caps(tp);
+> +	tp->phylink_config.mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
+> +
+> +	if (tp->sfp_mode) {
+> +		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
+> +		tp->phylink_config.mac_capabilities |= MAC_10000FD;
+> +	} else {
+> +		tp->phylink_config.mac_capabilities |= MAC_10 | MAC_100;
+> +		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
+> +
+> +		if (tp->mac_version == RTL_GIGA_MAC_VER_80)
+> +			tp->phylink_config.mac_capabilities |= MAC_1000FD | MAC_2500FD |
+> +							       MAC_5000FD | MAC_10000FD;
+> +		else if (tp->mac_version == RTL_GIGA_MAC_VER_70)
+> +			tp->phylink_config.mac_capabilities |= MAC_1000FD |
+> +							       MAC_2500FD | MAC_5000FD;
+> +		else if (tp->mac_version >= RTL_GIGA_MAC_VER_61)
+> +			tp->phylink_config.mac_capabilities |= MAC_1000FD | MAC_2500FD;
+> +		else
+> +			if (tp->supports_gmii)
+> +				tp->phylink_config.mac_capabilities |= MAC_1000FD;
+> +	}
+> +
+> +	__set_bit(phy_mode, tp->phylink_config.supported_interfaces);
+
+So a few lines above in r8169_phy_connect() there's this removal : 
+
+> -	phy_mode = tp->supports_gmii ? PHY_INTERFACE_MODE_GMII :
+> -		   PHY_INTERFACE_MODE_MII;
+> -
+
+Has it always actually been an internal interface for all realtek devices ?
+
+Maxime
+
 
