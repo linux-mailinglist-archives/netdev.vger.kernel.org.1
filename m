@@ -1,168 +1,123 @@
-Return-Path: <netdev+bounces-298564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298563-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w58tDKHTK2pVFwQAu9opvQ
-	(envelope-from <netdev+bounces-298564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:38:41 +0200
+	id R0mqDvHTK2p6FwQAu9opvQ
+	(envelope-from <netdev+bounces-298563-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:40:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87EAC678604
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:38:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A654678629
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:40:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ew1GvMeP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298564-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298564-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=gmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298563-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298563-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5A9A30C4335
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:38:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2214D30046A7
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABED368282;
-	Fri, 12 Jun 2026 09:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B667E3812C2;
+	Fri, 12 Jun 2026 09:38:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BC2345731
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACAB36C598
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:38:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781257085; cv=none; b=KyoGpg4nnVfL8eOBt4avCiILBq6MhdVcMY6E7J6E3gFNImiAj9NN4hl2skvZyiM+FjJ0dJ8HRt4NH+5C3U9gzq6ILf+ytXUX7bFdazlUBwi94TSSrmXcQ3vkNuzq75qOXf9gccmLacwoKp3FWr3+CIVZkR/F4P/Ef50l6UYswsw=
+	t=1781257083; cv=none; b=TLJH1OLqXZ03LeUTrmXn9+p939h41kBVC56TrFQYOzCg0sosUY4SjZoiFybFC9FA7wJZzzt8AURyMQhMFQwQAEdGc31Zd7PaeV4NDLNY31k3yR8lc0QnHQHiGNIJEzfMLMIfz+0CChvoRg8ipQfPB9gBqnuXuzla5PBhvAQmNXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781257085; c=relaxed/simple;
-	bh=jcYu28Tlw7oEARjKeA29kcjH5C6H9evj+8Bc0QC96ZE=;
-	h=Message-ID:From:Date:Subject:To:Cc; b=cDmPFgQdY/AdQd//p5fSdUVJ0mai60992tr51TfwYzeHl2A2jMqEsw/+nOT3m0icCX+XMqZntFAJFsZp7Qnm6xUblsbxVTSrjEqA6kM6GnT+6KpJmJmQuIMsHxWr9bDEEV9rtWpkm0+gq+Wedfu8bynXMsm+L+oh2q7dt9du/L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ew1GvMeP; arc=none smtp.client-ip=209.85.210.171
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-842848fd613so770200b3a.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 02:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781257082; x=1781861882; darn=vger.kernel.org;
-        h=cc:to:subject:date:from:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mXbZalzcxo6/TsrxZQxu5oks4UtJk6D2CPv/MBaaCkM=;
-        b=ew1GvMePpZTP1cxHZYyFjdQ5YDGkAqQ/1M3OIbs+aMFF9UaPASOVRtev6X+prwijyZ
-         HTYXRzCBqomcgSmCEedF6QfcJN4UQ7tGIUivEBVACXtCyu4YZclyOG4M7Nd6ydfa6NFw
-         VeYVF8nzjSlMzBJcry5Aae8WgRCSS6+a8Uo8S0nu0Zfj9UsbsVSLcoLhsPkzDVselpph
-         rbA6Z9qbP3Gd4f9nuBs3s6CRzohLx81zozxCRAbDQ053oXywi/GE34ikFFNLnWhz59dc
-         tBXd3bv1l158Ip+9IZpYs+ADCBEM4R/92E6fScf8H6f8mwUlU5oB9ThKxMC7GcnIDmyC
-         s90A==
+	s=arc-20240116; t=1781257083; c=relaxed/simple;
+	bh=vhhjB4kXaYiuMv+eYNT4O6/zvd9PAY9mnZvz1EcCjwA=;
+	h=Message-ID:Date:From:To:Cc:Subject:Content-Type; b=NtenEV3NnC7rgU2JASxVE9M5nrALBtRsnQ6qqqIaz5DyOgZHhGiw9C+MzsLc/54x+JUcBoQM3jiLdptDFnDGfmnOYQQVnlmUTKHgBQYPgBNDjq7Z+cwVd+6ss3mB2UmTgKUILStGrM6DP7YuHi5M9L/XqNsazLsVkyqHKCE8SH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.180
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8419ab3a297so377367b3a.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 02:38:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781257082; x=1781861882;
-        h=cc:to:subject:date:from:message-id:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1781257080; x=1781861880;
+        h=subject:cc:to:from:date:message-id:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=mXbZalzcxo6/TsrxZQxu5oks4UtJk6D2CPv/MBaaCkM=;
-        b=P4r/DD9sz1Gc9NwbKa9VatcBNNJI2WLAE9vStJ8H7f2MRPLPcCR1S8AGAiOkjvvqtB
-         g7JPDXnlkB123p9+/bs99iwAjYlx8OZXfvB8nuOnpHDzhFqG7WWoiE36BvP8kyeli2By
-         xe323bdaFeE6f03zUCZwU2gUNBTqq2TqQY/uwsXOv9YC60YJcHHsNQCCjTBBEdjnWG6u
-         AP+Fm/gY0l7ERn2Jn/umbJVlxIaMDvPNe1fs9Hf/rHfzxCdyfWnhwULmmhUoIOQDoL5o
-         t+ItdvXY/j4vRag7fVpHW7Q4UWINZJKPi/s+MiLwg0H5QTXO1P83Fc/28CKuZ0Vjg+nQ
-         S9gQ==
-X-Gm-Message-State: AOJu0Yy1rrSm6tiY9FBjSub45tUW9gTKxjH2td+N+bIHGJCqKIrGFbzM
-	WfGEHt9SmQCG+ewCcHz7r2nuIh3931EUMP8n9+tFj20b3PCnhV/gOvb7hPzrDudw
-X-Gm-Gg: Acq92OGDODgFV+paCW4DF8oRf/AwdN+2MbTdQjaCNuyX9yLSkP6OVOSWH+CNmRl7v2w
-	gq1/nArSb6VsnKUC3uVFQJgL+89g3RIrOQlUAbWOfGoNIQG5wL01XdsdSCj/9cVECjpqY2uju/W
-	f5FZXOckjzSvr4GAg6wCTIoKLOoRjIc+1C2NUDVLTtBbXKDuD8O+1SNp02uKAuavOR/kyk/ntAr
-	0KKqnMjl3TopubfJKqHK260iCpSKWZLWgSCRQ0+/xJoPqhgyQLZAv8XG8SuF74P0bMSldV3Lhb0
-	3NoyLk5rxWHZsABoRyi8s6Ll6iphkcWTKpUHynl4k3Xs3Yaj1J0QtjTcoi3uPznSbxgiKA5sZOn
-	tkE8Gz20L/t8/nELvAwZcSKwZayhmzFHiMIXKINKCZLXijNIcc0t1Cs7+nu+QdyptStzDyyHDy4
-	RODHpdNfiPxVtc/bBN
-X-Received: by 2002:a05:6a00:12cd:b0:842:3801:47f with SMTP id d2e1a72fcca58-8434cec2dc3mr2271540b3a.17.1781257082521;
-        Fri, 12 Jun 2026 02:38:02 -0700 (PDT)
+        bh=vhhjB4kXaYiuMv+eYNT4O6/zvd9PAY9mnZvz1EcCjwA=;
+        b=e7lhO1Rw1vtGU8p103oi85qYmVYHD8M8cc74OiYBFouZxv5d5Wnbsnbwr/qkt2V3Ai
+         u1VuFf3jGGsTtkudxkg/AWRsNxCJXhA39WKMplNtePzAO1vkBlvVUBvEr0L0T0R1ckQf
+         R1JF1k5GYoP+HvPT5psPTaaG0B7Ltf1EST7jfLV1+V9cJPeWlCm9IfkwgVRqi26ETkOo
+         nZr8I2LhIf/N9sZtZvkRT3+HqirFY5UY4BfvVLqPJsTlJSrTYdfrGCqT7XOGSmd29d0B
+         afO9QJ0rShv2VpKGrJ7G7SfyiTItEMzeKfx8Ag6ZHute208bn5CZmD1KqZjzF2XBp1o3
+         TIPQ==
+X-Gm-Message-State: AOJu0YxYP/NXWBTV1owh7Z77MJjLM95v7FdvWFypPwdtAREXbnAwA23+
+	6CQAqCfMCOx7HH0SqycBrnZzvpt5k/Kq1zjEcb4zFrOqReRGP06bVWISmzypDme3
+X-Gm-Gg: Acq92OFrAshvEJb5DkFsiP4thwNG8A7SjpXk3JiULyDjDIeXcHLPKW705rqNK3WY1qU
+	KGnpLvgcZYlHxMd4mdp0uxkjvISK3SSBVwv3x0o9aBjuCcj6e4afqnaeje5sX4Sac4Nf8+KHq5o
+	TJSiRZfzk21cD4reeqrEEljJKv37dTQ49o6hGbNB3X4YUQ9KmIEZW7vyV2oQzKipQm/ppv0vkbk
+	ng4YwCPdgI0wVKfkdxSvagg/wNrMm/8F/hbqg54omolbaD134kqL8aqQ6/ivNtW9DV+QEOSWQ61
+	hy7lCg0bjTc2rUNtnCxYB4UyrBYj86MMfTQtpvKDaUb5oLUmRbyPNmHQbgFLpEmMpDgqwhQtzPj
+	SnqVoQdYRp0mQ2n2iSE2xRUzPec40oSIfPicXpXgXR4st8kDnRqu1YdDwc1Di39pFy5DJrZ7rBO
+	BBugQvSHiakx+8SZ04
+X-Received: by 2002:a05:6a00:450f:b0:835:3949:3c1f with SMTP id d2e1a72fcca58-8434cf0e0d0mr2169034b3a.24.1781257079689;
+        Fri, 12 Jun 2026 02:37:59 -0700 (PDT)
 Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b04b6bbsm1724054b3a.56.2026.06.12.02.38.00
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b04b6bbsm1724054b3a.56.2026.06.12.02.37.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 02:38:02 -0700 (PDT)
-Message-ID: <6a2bd37a.4034e349.1b41bb.1caf@mx.google.com>
-From: "Wayen.Yan" <win847@gmail.com>
-Date: Fri, 12 Jun 2026 17:37:00 +0800
-Subject: [PATCH v2] net: airoha: Fix error handling in
- airoha_ppe_flush_sram_entries()
+        Fri, 12 Jun 2026 02:37:59 -0700 (PDT)
+Message-ID: <6a2bd377.4034e349.1b41bb.1c18@mx.google.com>
+Date: Fri, 12 Jun 2026 02:37:59 -0700 (PDT)
+From: Wayen.Yan <win847@gmail.com>
 To: netdev@vger.kernel.org
 Cc: lorenzo@kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: airoha: Fix variable shadowing in airoha_ppe_flush_sram_entries()
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [1.64 / 15.00];
+	MISSING_MIME_VERSION(2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	FAKE_REPLY(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[gmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298564-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298563-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mx.google.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mx.google.com:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 87EAC678604
+X-Rspamd-Queue-Id: 2A654678629
 
-In airoha_ppe_flush_sram_entries(), the outer "err" variable was never
-updated when the inner loop variable shadowed it, causing the function
-to always return 0 even when airoha_ppe_foe_commit_sram_entry() fails.
+Hi Lorenzo,
 
-Drop the outer "err" variable and return directly on error, propagating
-the error code from airoha_ppe_foe_commit_sram_entry() correctly.
+Thank you for the review!
 
-Fixes: 620d7b91aadb ("net: airoha: ppe: Flush PPE SRAM table during PPE setup")
-Link: https://lore.kernel.org/netdev/6a2b40e4.4dd82583.3a5c46.e52f@mx.google.com/
-Signed-off-by: Wayen.Yan <win847@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_ppe.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+You are right, dropping the outer err variable and returning directly
+is cleaner. Updated accordingly in v2.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 5c9dff6..a124f15 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -1330,7 +1330,7 @@ static int airoha_ppe_flush_sram_entries(struct airoha_ppe *ppe)
- {
- 	u32 sram_num_entries = airoha_ppe_get_total_sram_num_entries(ppe);
- 	struct airoha_foe_entry *hwe = ppe->foe;
--	int i, err = 0;
-+	int i;
- 
- 	for (i = 0; i < sram_num_entries; i++) {
- 		int err;
-@@ -1338,10 +1338,10 @@ static int airoha_ppe_flush_sram_entries(struct airoha_ppe *ppe)
- 		memset(&hwe[i], 0, sizeof(*hwe));
- 		err = airoha_ppe_foe_commit_sram_entry(ppe, i);
- 		if (err)
--			break;
-+			return err;
- 	}
- 
--	return err;
-+	return 0;
- }
- 
- static struct airoha_npu *airoha_ppe_npu_get(struct airoha_eth *eth)
--- 
-2.51.0
-
+Regards,
+Wayen.Yan
 
 
