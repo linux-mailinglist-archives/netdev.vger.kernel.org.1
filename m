@@ -1,205 +1,164 @@
-Return-Path: <netdev+bounces-298576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OiTSMk/dK2qWGgQAu9opvQ
-	(envelope-from <netdev+bounces-298576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:19:59 +0200
+	id JXqdJEzfK2ouGwQAu9opvQ
+	(envelope-from <netdev+bounces-298578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:28:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71069678A82
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:19:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2526F678AF6
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:28:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=bBME3aOj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298576-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298576-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=suse.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DNlMkoPr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298578-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298578-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5598E30FF885
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:18:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6A249301D5B6
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77503876BD;
-	Fri, 12 Jun 2026 10:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB54A368D46;
+	Fri, 12 Jun 2026 10:28:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3580A3845D8
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D995632C94A
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:28:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781259533; cv=none; b=QBtCpyqVPjwlw9MVDTATxYCReqvH764hDKvrBDAjRzAB/jLUsNYSLlfpI/Zv8R//DOmYYWiiMbq2IW3QX47F0FXEstmz4AILpiqD4vQJIJ6247LZgeaJEQylmApCd3c55ai0AiRIBJlXNMDkbthbSKXOnGoqNzRUiawoFtztaT4=
+	t=1781260104; cv=none; b=jd7ZIvVPOYmxAz5h+xmssgS7fJWUj8Rweh8LhA0nSxclkfYvyOBDsmXAu1CZFVA/D7pvbhV8m7/HFxrtfANBGyG4e6ZYACTvdGPgBSicpOnspPHrPrwp4qT35qCQjCmNmFQOOTb4p1EW+R93fOjrl6uNhBa+ygjl1MVoPrIOQV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781259533; c=relaxed/simple;
-	bh=Iu+WsPA3d5zC/vpm66sf0PXFm63IcdCvAGgoL0vzIyI=;
+	s=arc-20240116; t=1781260104; c=relaxed/simple;
+	bh=6loFun26Zuz9Jz4BO3V8hUdqnGtht86tTt2u9oY85qE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OiwB5xuKSX5v9NXOPRz3ezuQBmVOv81h/gP2K1heFdXIm3Pf7trS3RM65IvugnaYCAEYx1q2raPjnlQTvdAJl6GB5jXPdpMT+hFrbCWlBEj+FnfzzUeshTrl6Z6p1H9o+e0xz3ZBs80Z89CWBsl/osrtrsPS6k3CVk2PdJ1QCRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bBME3aOj; arc=none smtp.client-ip=209.85.128.48
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-490b8a97b11so9319255e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 03:18:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1781259530; x=1781864330; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wZYS51t2QXr2ZWiJCJ2esfR2JgSuWZes3mVwU5icUks=;
-        b=bBME3aOjy09Ne3TOuJciwQgMQrD3QA56oZBnha0V1aiAml8vZFjlLytwRDLcbAjTfK
-         gs0paoiXwr+SoduVvkIUms0MRhDY4psKxnYztyMXaCgHdKmYEU1TrRrQrbGmf78LFKLy
-         Nb7MwXBQq6cZ5ahJc1jkRoGezwCEYiQdNVic+lM3Sq67OQ6+JDEzb5aqGGVaMTwwdG8l
-         Y1dVVIssm8yet7XPKGHJgxwSWw7e8nfefziTDbuAI1WXNifv4/FxN7bnwKl7QZznlsK+
-         /L52yU+EIT8vhOhbInFxE4932yW9o6b9QOztuVi07hqQf1r1TUk1zeLIEwTU7TKGdYaS
-         IVHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781259530; x=1781864330;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wZYS51t2QXr2ZWiJCJ2esfR2JgSuWZes3mVwU5icUks=;
-        b=Gh1Gv4Dp3P4Ej//Paw+0PE9SH6p/8uOp5PzZXEdUtvM/sK77mg397gq7/S6E/KlkQZ
-         RUPT7jqqdEp0/CHtYTD1fZN8Y6uq5H77rqO0dOvcmmJGQuaORxyhBtf5hCWtCwlvOc3G
-         /nv3qD2Gxm6EUUQE3gDrrCaxLPdNYXALKIuTwN2X/kSaFzy53mP1p7/SOHzwb9aic+wf
-         X/zVgU8wvBa+CWbNSvu1T4cJ0fYzBhyDCC72Skn8tzWYN23S6Iu48dcou4lmsYkuvF3J
-         UNj6mUTpd6uEeNlNsoDHJtsBjTTtQSz/PRpv4F3qwg/C0AvuMr1IoahyPMjgepgsZgQI
-         G34w==
-X-Forwarded-Encrypted: i=1; AFNElJ8OzjJXmfFmNiiYdAZL5TKlLdjhIBol3an6EPA2gt0tdUdPBpVLAxCjBnyvmtJSkfXtX4mXG2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7J2GeU9cDa5P3lDkM9/dA/srgn9pkDYJEAE14KVi6pPdb0dzb
-	OT608q6cWAk0wlmgz9Pdaimfw2g/AsDlNLhHvfX8xjTkWnAp5AYME2TTEMVozlU4fmw=
-X-Gm-Gg: Acq92OFbT/oI7PiwKGTtDIdsAJ+jnSLI3iCKRqBOt3P1P0r5xnRqLza+5vcsUwOdvgG
-	13Uqq03k6itM5SR/zdHr+91xeyc0ziVErdjiVQwQyNi2AYqzwERI4HOsCtKuVELyst/57z9MORJ
-	00vLjJyEpJhAerjJvXehfAmjhED7q4hGUYexwGRe3SXDyxdUeQ3pF15I9epiK4QRBtTShSBRHaI
-	ARTt6yByrYM3LCAr5ounwphmx5RrmtbnHtsXySYOBm9vJLm+0rUxdQT95j8hxiawxXpLjhZx9YB
-	7wq4R2gS7iN1wiOpdVrjMsRCSzlr9uPlYcvz79wuw4zghdJQQiTmDz9XbHZYp0eok9zCuClyPPY
-	wFcZYERwMauxZRV5p5WPNEb48O6JxvOnuLQgOYPD3HA/ec4o3BPorDmuVzrgCCpi0MA0kG51UJ8
-	m20eNisAYKo/BN9riltukwIrlBJGd8PXQVP+RRqZ+s
-X-Received: by 2002:a05:600c:5493:b0:490:3c15:7146 with SMTP id 5b1f17b1804b1-490ec4f26ecmr26968165e9.19.1781259530302;
-        Fri, 12 Jun 2026 03:18:50 -0700 (PDT)
-Received: from u94a (27-51-56-85.adsl.fetnet.net. [27.51.56.85])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081eb95342sm2857806eec.29.2026.06.12.03.18.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 03:18:48 -0700 (PDT)
-Date: Fri, 12 Jun 2026 18:18:39 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Zhenzhong Wu <jt26wzz@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org, 
-	haoluo@google.com, jolsa@kernel.org, menglong8.dong@gmail.com, eddyz87@gmail.com, 
-	stable@vger.kernel.org, mykolal@fb.com, tamird@kernel.org
-Subject: Re: [PATCH bpf-next] selftests/bpf: add helper retval linked scalar
- pruning selftest
-Message-ID: <aivZ9jYGw6QRxLQQ@u94a>
-References: <20260611160749.391279-1-jt26wzz@gmail.com>
- <DJ6DMGTPWXJN.1YKSBHULQ1PB9@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbP/5Jc2CitVpkH5dop9JjboX2xnuBWCybtHo9NGfyGqYnOVuuFbtH4VKW7P7x/QdMbIDD1aDiIipXJzxGttY5jbw0m3Lfk8iOkOTCFRDVX8u6/R3s+Wl/AxyFcU/G+aJO79CqI5951OOifI+cHAbWOAL5vadI/LIVNqvQ1U6lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DNlMkoPr; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0FE81F000E9;
+	Fri, 12 Jun 2026 10:28:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781260103;
+	bh=f/ANQU5yElXq5/4kup7qDLTunMHTYjQhDPXNkYYLT8s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=DNlMkoPrCGAq+LCan0dVbwLbdh0MdMlr+wO+V2l7NTFUTsa2psI5Q/WYBRp1mNAvw
+	 AhJL0A8M/aOoIZyDTeuFq57jMWDCfe492qHRSEOYeFRMFbPA3m10GputbpTJtvUHuX
+	 9x+n+uDJaRLx6bp9cm3g9FiOt6Awod/NZYq9tWkO3Hdsr8f+gqqWSorNmROXASnj0+
+	 yaEz93iw4p9oEROWp9JOhpfKvN4B+cbviewxLaQJ2esMsQ+BeC8bIfVH2zTgmt3PG7
+	 4Pfj2o+VtsjlFeeuTMEbLZo05dDdlN1gxR6trhPrKAtsJZNJ651sMgRmg8uz9tt26i
+	 qkLURpgeIUTgw==
+Date: Fri, 12 Jun 2026 12:28:21 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: "Wayen.Yan" <win847@gmail.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: airoha: Fix register index for Tx-fwd counter
+ configuration
+Message-ID: <aivfRSPzxRezTRta@lore-desk>
+References: <6a2b40e7.4dd82583.3a5c46.e566@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LYLKlmUwV+uWKKpP"
 Content-Disposition: inline
-In-Reply-To: <DJ6DMGTPWXJN.1YKSBHULQ1PB9@gmail.com>
+In-Reply-To: <6a2b40e7.4dd82583.3a5c46.e566@mx.google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-6.76 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298576-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_RECIPIENTS(0.00)[m:alexei.starovoitov@gmail.com,m:jt26wzz@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:alexeistarovoitov@gmail.com,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,google.com,fb.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298578-lists,netdev=lfdr.de];
+	RCPT_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shung-hsi.yu@suse.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:from_mime,r7.id:url,vger.kernel.org:from_smtp,r0.id:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 71069678A82
+X-Rspamd-Queue-Id: 2526F678AF6
 
-On Thu, Jun 11, 2026 at 09:55:55AM -0700, Alexei Starovoitov wrote:
-> On Thu Jun 11, 2026 at 9:07 AM PDT, Zhenzhong Wu wrote:
-> > Add a verifier runtime test for a branch pattern where a helper return
-> > value and a related scalar stay live across the same control-flow
-> > sequence. Rust/Aya-generated eBPF can naturally produce this shape when
-> > a match on a helper status keeps data derived before the helper call
-> > live across the same branches. Such code commonly uses the helper return
-> > value in r0, where 0 means success, producing an r0 == 0 / r0 != 0
-> > branch shape.
-[...]
-> > +SEC("tc")
-> > +__description("helper retval linked scalar pruning")
-> > +__success __retval(0)
-> > +__naked void helper_retval_linked_scalar_pruning(void)
-> > +{
-> > +	asm volatile (
-> > +	"r7 = *(u32 *)(r1 + %[__sk_buff_data_end]);"
-> > +	"r5 = *(u32 *)(r1 + %[__sk_buff_data]);"
-> > +	"r7 -= r5;"
-> > +	"r2 = 0;"
-> > +	"r3 = r10;"
-> > +	"r3 += -8;"
-> > +	"r4 = 1;"
-> > +	"call %[bpf_skb_load_bytes];"
-> > +	"r0 += 1;"
-> > +	"r6 = 1;"
-> > +	/* success path keeps r7 independent; failure path links r7 to r0. */
-> > +	"if r0 == 1 goto l0_%=;"
-> 
-> this exercises linked registers with BPF_ADD_CONST logic.
-> We already have such tests. Why do we need this one?
-> How is it different?
 
-BPF_ADD_CONST wasn't what was meant to be tested.
+--LYLKlmUwV+uWKKpP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The main logic is r7.id == r0.id only happens on "if r0 == 1 goto l0_%="
-fall through, and does not have such link otherwise. I only check tests
-added in commit c0087d59e504 ("selftests/bpf: tests for per-insn
-sync_linked_regs() precision tracking"), but it doesn't seem like such
-conditional linking was tested. 
+> In airoha_qdma_init_qos_stats(), the Tx-fwd counter configuration
+> register uses the same index (i << 1) as the Tx-cpu counter, which
+> overwrites the Tx-cpu configuration. The Tx-fwd counter value register
+> correctly uses (i << 1) + 1, so the configuration register should use
+> the same index.
+>=20
+> Fix the REG_CNTR_CFG index from (i << 1) to ((i << 1) + 1) so that
+> the Tx-fwd counter is properly configured instead of clobbering the
+> Tx-cpu counter config.
+>=20
+> Fixes: 20bf7d07c956 ("net: airoha: Add sched ETS offload support")
+> Signed-off-by: Wayen.Yan <win847@gmail.com>
 
-The other rational is that this seem like a common pattern that is
-genereated from Rust-based BPF program.
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-> > +	/* success path keeps r7 independent; failure path links r7 to r0. */
-> > +	"if r0 == 1 goto l0_%=;"
-> > +	"r7 = r0;"
-         ^^^^^^^ conditional scalar linking
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 31cdb11..329988a 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -1256,7 +1256,7 @@ static void airoha_qdma_init_qos_stats(struct airoh=
+a_qdma *qdma)
+>  			       FIELD_PREP(CNTR_CHAN_MASK, i));
+>  		/* Tx-fwd transferred count */
+>  		airoha_qdma_wr(qdma, REG_CNTR_VAL((i << 1) + 1), 0);
+> -		airoha_qdma_wr(qdma, REG_CNTR_CFG(i << 1),
+> +		airoha_qdma_wr(qdma, REG_CNTR_CFG((i << 1) + 1),
+>  			       CNTR_EN_MASK | CNTR_ALL_QUEUE_EN_MASK |
+>  			       CNTR_ALL_DSCP_RING_EN_MASK |
+>  			       FIELD_PREP(CNTR_SRC_MASK, 1) |
+> --=20
+> 2.51.0
+>=20
+>=20
 
-> > +"l0_%=: if r0 != 1 goto l1_%=;"
-> > +	"r7 <<= 32;"
-> > +	"r7 >>= 32;"
-> > +	"if r7 != %[test_data_len] goto l1_%=;"
-> > +	"r0 = 0;"
-> > +	"exit;"
-> > +"l1_%=: r0 = r6;"
-> > +	"exit;"
-> > +	:
-> > +	: __imm(bpf_skb_load_bytes),
-> > +	  __imm_const(__sk_buff_data, offsetof(struct __sk_buff, data)),
-> > +	  __imm_const(__sk_buff_data_end, offsetof(struct __sk_buff, data_end)),
-> > +	  __imm_const(test_data_len, TEST_DATA_LEN)
-> > +	: __clobber_all);
-> > +}
-[...]
+--LYLKlmUwV+uWKKpP
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaivfRQAKCRA6cBh0uS2t
+rNYfAP0XdKGR6Aiasu0qGwgQ/9xP3GhgfMeX1v4XIsmZR6d1xAEAzrpOQRsPg2BJ
+CZQkHbgBiT3lNpNkZhqrKyDk4zz+iQo=
+=PnbT
+-----END PGP SIGNATURE-----
+
+--LYLKlmUwV+uWKKpP--
 
