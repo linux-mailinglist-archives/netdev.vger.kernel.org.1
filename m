@@ -1,271 +1,480 @@
-Return-Path: <netdev+bounces-298717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kR5aGgsyLGrKNQQAu9opvQ
-	(envelope-from <netdev+bounces-298717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:21:31 +0200
+	id xLyYONsyLGoWNgQAu9opvQ
+	(envelope-from <netdev+bounces-298718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:24:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86F967AD75
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:21:30 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B4E67AE2F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:24:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298717-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298717-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=google.com header.s=20251104 header.b=emSmRPfY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298718-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298718-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D99B732F4FE2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:19:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EB33F303127E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9673B1002;
-	Fri, 12 Jun 2026 16:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D6937188B;
+	Fri, 12 Jun 2026 16:23:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22F03A75B8
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 16:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953DA33C1B7
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 16:23:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781281174; cv=none; b=e82Lj9zsmZL9YvWLDWCpn1+OcNln7QrspEv7ejAtzsntPdxwzlAG6TmwZSNKZhkR2xODj7JpK9SmGBCk2/Tp1jY/NxHLjk5/2EhNH2TVh0mkrypCyDw/nIfnMRyXLig37sAWxZuW+XlvYcs9x9piqRnrko5cEMquj7X9obqAW7g=
+	t=1781281383; cv=none; b=QfoWnd4KjSCybk41Airs5RIVs+lyfZaofjwz72HUzNSZAN27h7HCwsypsqJTSYb2OiV0R8mpmNKXJa6mFhhh4gtd0/sNTr2QcynR/ONecO4YM1kQ+reya2EBNzGmYEbpO6Yf8eqi3vZAsuHvQmPlwv/hk9dWMHZzsAZFPJ8lUYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781281174; c=relaxed/simple;
-	bh=xG1b5RA5EjTwuo0QEPDrP5P00DN3AHw4OltefDv/Zl0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TbHG6MJUTYIkObcdXavxBf9A/YJotlffSBFkqGRVlVvfrEdG325LKPhGz5Sg+iLwjGGFVEr1btYq8NIPkPboBGymhRkPfFNil/MtQZdEfmN2Sjc7yl0DACnnJFpwGNC0kOwsY2H6aJHUZ6lLZmzZWGxcwrP1n0JMTiQutreze7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
-Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-4863a0c3105so1663801b6e.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:19:32 -0700 (PDT)
+	s=arc-20240116; t=1781281383; c=relaxed/simple;
+	bh=pKfPiN1SoREaDtMVpYwx/3pzZSUnmNLg5e4nX/AEchc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k+3DJcGSY+lc5pmrgO9psrumNktKz38wG9BtjhSmuUx+xwIbG8aI8JUtXiw6ckE8REl+0V1aBvfoElzbOjDut7IS1asiFFy/DZNYQis+wm+XS8vbua2tC8H36g5nMIO5j9ulDorgCuyV0Qwo7trIgT37rUoMgx/5ofY9BSLGjrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--xur.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=emSmRPfY; arc=none smtp.client-ip=74.125.82.73
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-138156c0492so4318403c88.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:23:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781281381; x=1781886181; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jmyGTpqRWm3i/d6BFzXV54G7OiBKpqEwqVzt3Shrq+o=;
+        b=emSmRPfY1fPQh7ueUFpeiGbvQBk/CIig+CmsYgJNdAIlSmg6oz3BsC8HephMz8gf4i
+         ALLpwt3CS9YG+GRoM8JzCIM8FnkvYIFPn4dfvGipNKEkj0yuyUccpBHcycpaNytVfaul
+         4Hdx2fuw9FS8lf6YdPHiqENN8nI2fo5mFilsta7qle3VSuoPimUP/ea+1S2E0VPreQys
+         lOia0Q8fBrfX4l57MDPksW2jQfLpqqNRSVCI04Oiu8/qq+3lR7Lu0N7FIVX02ARp8al1
+         gkYEg62kR4F7W4W5xrl2i4ObKORxuIsO5nhAjP1HMZh6i7Fi5TQfuPXl1t932CYVxAaA
+         zDxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781281172; x=1781885972;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20251104; t=1781281381; x=1781886181;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=V1N2V6o2n8ONSn3aBAQVinhsAGOzj30etEFz/nPGQw8=;
-        b=Jtbn6c7B67R0ljBRzvquD0Gj4p5/RDAoMLCSYKKkdaxk/o+rVLf5Zl1YfhDHhLOiCg
-         ldC01HoTubrXnM7/HcbZX3giGmdrukuB131Ele+CYQzYvv37lbgwZqTzIbrDhPNEK+W6
-         VIzRJ+7boxvdoRaV6QCWYQ693XlReldcp8cMHoW8uxIylaHXuCmZCZq0urSX20tZYLdi
-         QGV65ZnqzSqJq3fNdoPCJYZPh8NeKNE3mhcawljuo/Km2FcDcjKYfLAz2QryGDdXI+Un
-         LIvvsiR7cLChbBQ/ejft3jwhqcFgdqrliow4si7pceUtyoO+TpGAWEpReSF6JRqrahiE
-         J+rQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+cdFcFxOs/g/EAHBvxzLBRdJBT5hOO17YR2+amiDHSdbyGy6bCjXgiVRgji8KQHC4cjwLlLw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPMOeQZ8lDAUtQc+IclIU2dYtW96aERFptEZfpbBrKjtl2jxoT
-	2nCciuEPfpoIMGL9MM/aZDouyf/GgWo8tBv2lParKtn5FbzL8Nna5oIB3/pgMuFpoY1oOhrjXXr
-	jpzL6JzFF38XQ3cNMLbq8sDiMtmFhfbbjll0Y3zm34l+RaQFf1DIg4BzBMt8=
+        bh=jmyGTpqRWm3i/d6BFzXV54G7OiBKpqEwqVzt3Shrq+o=;
+        b=EFVZ5hfL3LG/e68m18n9G3lAKL5w3alQ9R3e2sAf76QvrNqE4hNA0sLgMmgpH3DDB5
+         7h+NVvrIthHntCgAuwUxpPcDU4i2d0DCTTDZuKAG+k9SapULrin+z9W1GtIjmAvc3hwO
+         mF5zWdYN7uyOSUPu9r47fPIGm+T0XxLtYrFtBBsjoEgo+ZbaQRBGE+iPnv4DNYoWDuPE
+         muAdlbmvzHbWxvgT9EXfjPzXywTKz71t27jW2CjPvS8wsNFhg66//wLmxk8RvzP7UeHB
+         EQH7KgQOPEe6Kj01FL7IkYlMB2eJ3MiTqLAmHWMICtJlyjH5h2DLPyxwH3bvUSTivN07
+         UQXQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9o+JMZttexDROIN5e04pCd6DlLcr9AI1EhKs2u43Ye4M+sGF8Eb5D3AVc3HpBsXTuB/SLfb8Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBMarp6USBX2RCYeK74gW4Wh08Eed60/S+gpNjkCmD/w6xFtf/
+	hUrUxvKQjC3OyNGSbpkY/uOohtG8tGKrhxzvz35wHfb/DRDqoiPiVOuuhVvdSyETYFfsDA==
+X-Received: from dlww16.prod.google.com ([2002:a05:7022:ea30:b0:137:e705:d114])
+ (user=xur job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:43a9:b0:138:507b:30fd
+ with SMTP id a92af1059eb24-138507b3401mr616605c88.6.1781281380261; Fri, 12
+ Jun 2026 09:23:00 -0700 (PDT)
+Date: Fri, 12 Jun 2026 09:22:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:221c:b0:479:d779:353e with SMTP id
- 5614622812f47-4872f4a088amr2276021b6e.24.1781281171885; Fri, 12 Jun 2026
- 09:19:31 -0700 (PDT)
-Date: Fri, 12 Jun 2026 09:19:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a2c3193.8812e0fc.3c3fa4.0001.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in skb_segment (5)
-From: syzbot <syzbot+ebdb22d461c904fc3cb2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260612162257.896792-1-xur@google.com>
+Subject: [PATCH] net: correcting section tags for .init and .exit data/functions
+From: xur@google.com
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, "=?UTF-8?q?Andreas=20F=C3=A4rber?=" <afaerber@suse.de>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Yue Haibing <yuehaibing@huawei.com>, 
+	Jeff Layton <jlayton@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Fernando Fernandez Mancera <fmancera@suse.de>, Rong Xu <xur@google.com>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-actions@lists.infradead.org, llvm@lists.linux.dev
+Cc: kernel test robot <lkp@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.36 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=e3161cabe5a361ff];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[xur@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:willemdebruijn.kernel@gmail.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:afaerber@suse.de,m:mani@kernel.org,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:maze@google.com,m:yuehaibing@huawei.com,m:jlayton@kernel.org,m:kees@kernel.org,m:fmancera@suse.de,m:xur@google.com,m:gustavoars@kernel.org,m:sd@queasysnail.net,m:masahiroy@kernel.org,m:nicolas.schier@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-actions@lists.infradead.org,m:llvm@lists.linux.dev,m:lkp@intel.com,m:willemdebruijnkernel@gmail.com,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298717-lists,netdev=lfdr.de,ebdb22d461c904fc3cb2];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:kuniyu@google.com,m:linux-kernel@vger.kernel.org,m:ncardwell@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,googlegroups.com:email,goo.gl:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,storage.googleapis.com:url,appspotmail.com:email];
+	FORGED_SENDER(0.00)[xur@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,nvidia.com,suse.de,huawei.com,queasysnail.net,linux.dev,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298718-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B86F967AD75
+X-Rspamd-Queue-Id: 82B4E67AE2F
 
-Hello,
+From: Rong Xu <xur@google.com>
 
-syzbot found the following issue on:
+Fix modpost warnings that have surfaced during Clang's distributed ThinLTO
+builds.
 
-HEAD commit:    e7aa57247700 Merge tag 'spi-fix-v6.19-rc8' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10d69402580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e3161cabe5a361ff
-dashboard link: https://syzkaller.appspot.com/bug?extid=ebdb22d461c904fc3cb2
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+  WARNING: modpost: vmlinux: section mismatch in reference: tcp4_net_ops.llvm.4527429266264891517+0x8 (section: .data) -> tcp4_proc_init_net (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: udp4_net_ops.llvm.17425824324074326067+0x8 (section: .data) -> udp4_proc_init_net (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: ping_v4_net_ops.llvm.5641696707737373282+0x8 (section: .data) -> ping_v4_proc_init_net (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: if6_proc_net_ops.llvm.7870945277386035298+0x8 (section: .data) -> if6_proc_net_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: ipv6_addr_label_ops.llvm.5745897517271459135+0x8 (section: .data) -> ip6addrlbl_net_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: ndisc_net_ops.llvm.8806210167060761094+0x8 (section: .data) -> ndisc_net_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: raw6_net_ops.llvm.3743523335772203324+0x8 (section: .data) -> raw6_init_net (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: igmp6_net_ops.llvm.7071106350580158050+0x8 (section: .data) -> igmp6_net_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: tcpv6_net_ops.llvm.17505177970592326146+0x8 (section: .data) -> tcpv6_net_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: ip6_flowlabel_net_ops.llvm.6051723423336054316+0x8 (section: .data) -> ip6_flowlabel_proc_init (section: .init.text)
+  WARNING: modpost: vmlinux: section mismatch in reference: ipv6_proc_ops.llvm.7829948594772821810+0x8 (section: .data) -> ipv6_proc_init_net (section: .init.text)
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8243bfd07948/disk-e7aa5724.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/65477df56f75/vmlinux-e7aa5724.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0674f6c7c67d/bzImage-e7aa5724.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ebdb22d461c904fc3cb2@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-CPU: 0 UID: 0 PID: 21038 Comm: syz.4.3937 Tainted: G             L      syzkaller #0 PREEMPT(full) 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-RIP: 0010:skb_segment+0x2ac4/0x3f80 net/core/skbuff.c:4848
-Code: 00 00 00 8b 6c 24 58 81 7c 24 14 ff ff 00 00 0f 85 1c e1 ff ff e8 ec d1 60 f8 48 8b 44 24 20 48 8d 58 70 48 89 d8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 0f 85 14 09 00 00 8b 1b e9 21 e1 ff ff e8 c3
-RSP: 0018:ffffc90000006230 EFLAGS: 00010202
-RAX: 000000000000000e RBX: 0000000000000070 RCX: ffff88801bb88000
-RDX: 0000000000000100 RSI: ffff888049e648ee RDI: 000000000000ffff
-RBP: 0000000000000003 R08: ffff88801bb88000 R09: 0000000000000002
-R10: 000000000000a888 R11: 0000000000000100 R12: ffff888049e648e0
-R13: 00000000fffffff8 R14: 0000000000000000 R15: dffffc0000000000
-FS:  00007f1163fb46c0(0000) GS:ffff8881256f3000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000290000 CR3: 000000002805e000 CR4: 00000000003526f0
-DR0: 0000000000000008 DR1: 0000000000000002 DR2: 0000000000000404
-DR3: ffffffffefffff14 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- tcp_gso_segment+0x424/0x1a40 net/ipv4/tcp_offload.c:181
- ipv6_gso_segment+0xb80/0x2200 net/ipv6/ip6_offload.c:154
- skb_mac_gso_segment+0x325/0x650 net/core/gso.c:53
- __skb_gso_segment+0x376/0x540 net/core/gso.c:124
- skb_gso_segment include/net/gso.h:83 [inline]
- validate_xmit_skb+0xa13/0x1440 net/core/dev.c:4018
- validate_xmit_skb_list+0x84/0x120 net/core/dev.c:4068
- sch_direct_xmit+0xdf/0x4c0 net/sched/sch_generic.c:332
- qdisc_restart net/sched/sch_generic.c:412 [inline]
- __qdisc_run+0xa8d/0x1540 net/sched/sch_generic.c:420
- qdisc_run include/net/pkt_sched.h:120 [inline]
- __dev_xmit_skb net/core/dev.c:4265 [inline]
- __dev_queue_xmit+0x1bbe/0x3850 net/core/dev.c:4798
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x340/0x550 net/ipv6/ip6_output.c:247
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ip6_xmit+0x120f/0x19d0 net/ipv6/ip6_output.c:371
- inet6_csk_xmit+0x4a5/0x750 net/ipv6/inet6_connection_sock.c:120
- __tcp_transmit_skb+0x20b6/0x3ad0 net/ipv4/tcp_output.c:1631
- tcp_transmit_skb net/ipv4/tcp_output.c:1649 [inline]
- tcp_write_xmit+0x16e8/0x6980 net/ipv4/tcp_output.c:3002
- __tcp_push_pending_frames+0x97/0x380 net/ipv4/tcp_output.c:3185
- tcp_push_pending_frames include/net/tcp.h:2224 [inline]
- tcp_data_snd_check net/ipv4/tcp_input.c:5896 [inline]
- tcp_rcv_established+0xfee/0x25b0 net/ipv4/tcp_input.c:6476
- tcp_v6_do_rcv+0x8eb/0x1ba0 net/ipv6/tcp_ipv6.c:1607
- tcp_v6_rcv+0x2811/0x3110 net/ipv6/tcp_ipv6.c:1877
- ip6_protocol_deliver_rcu+0xa73/0x1600 net/ipv6/ip6_input.c:438
- ip6_input_finish+0x191/0x370 net/ipv6/ip6_input.c:489
- NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
- ip6_input+0x16a/0x270 net/ipv6/ip6_input.c:500
- NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
- __netif_receive_skb_one_core net/core/dev.c:6152 [inline]
- __netif_receive_skb net/core/dev.c:6265 [inline]
- process_backlog+0x7dd/0x1950 net/core/dev.c:6617
- __napi_poll+0xae/0x340 net/core/dev.c:7681
- napi_poll net/core/dev.c:7744 [inline]
- net_rx_action+0x627/0xf70 net/core/dev.c:7896
- handle_softirqs+0x22a/0x7c0 kernel/softirq.c:622
- do_softirq+0x76/0xd0 kernel/softirq.c:523
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xf8/0x130 kernel/softirq.c:450
- sk_wait_data+0x20e/0x4d0 net/core/sock.c:3264
- tcp_recvmsg_locked+0xd71/0x35b0 net/ipv4/tcp.c:2776
- tcp_recvmsg+0x213/0x7f0 net/ipv4/tcp.c:2927
- inet6_recvmsg+0x13e/0x6c0 net/ipv6/af_inet6.c:678
- sock_recvmsg_nosec net/socket.c:1078 [inline]
- sock_recvmsg+0x105/0x270 net/socket.c:1100
- __sys_recvfrom+0x240/0x3c0 net/socket.c:2256
- __do_sys_recvfrom net/socket.c:2271 [inline]
- __se_sys_recvfrom net/socket.c:2267 [inline]
- __x64_sys_recvfrom+0xde/0x100 net/socket.c:2267
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1165d9aeb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1163fb4028 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 00007f1166016180 RCX: 00007f1165d9aeb9
-RDX: fffffffffffffd0b RSI: 0000200000000080 RDI: 0000000000000006
-RBP: 00007f1165e08c1f R08: 0000000000000000 R09: fffffffffffffd25
-R10: 00000000c9100120 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1166016218 R14: 00007f1166016180 R15: 00007f116613fa48
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:skb_segment+0x2ac4/0x3f80 net/core/skbuff.c:4848
-Code: 00 00 00 8b 6c 24 58 81 7c 24 14 ff ff 00 00 0f 85 1c e1 ff ff e8 ec d1 60 f8 48 8b 44 24 20 48 8d 58 70 48 89 d8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 0f 85 14 09 00 00 8b 1b e9 21 e1 ff ff e8 c3
-RSP: 0018:ffffc90000006230 EFLAGS: 00010202
-RAX: 000000000000000e RBX: 0000000000000070 RCX: ffff88801bb88000
-RDX: 0000000000000100 RSI: ffff888049e648ee RDI: 000000000000ffff
-RBP: 0000000000000003 R08: ffff88801bb88000 R09: 0000000000000002
-R10: 000000000000a888 R11: 0000000000000100 R12: ffff888049e648e0
-R13: 00000000fffffff8 R14: 0000000000000000 R15: dffffc0000000000
-FS:  00007f1163fb46c0(0000) GS:ffff8881256f3000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000290000 CR3: 000000002805e000 CR4: 00000000003526f0
-DR0: 0000000000000008 DR1: 0000000000000002 DR2: 0000000000000404
-DR3: ffffffffefffff14 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 1 bytes skipped:
-   0:	00 00                	add    %al,(%rax)
-   2:	8b 6c 24 58          	mov    0x58(%rsp),%ebp
-   6:	81 7c 24 14 ff ff 00 	cmpl   $0xffff,0x14(%rsp)
-   d:	00
-   e:	0f 85 1c e1 ff ff    	jne    0xffffe130
-  14:	e8 ec d1 60 f8       	call   0xf860d205
-  19:	48 8b 44 24 20       	mov    0x20(%rsp),%rax
-  1e:	48 8d 58 70          	lea    0x70(%rax),%rbx
-  22:	48 89 d8             	mov    %rbx,%rax
-  25:	48 c1 e8 03          	shr    $0x3,%rax
-* 29:	42 0f b6 04 38       	movzbl (%rax,%r15,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	0f 85 14 09 00 00    	jne    0x94a
-  36:	8b 1b                	mov    (%rbx),%ebx
-  38:	e9 21 e1 ff ff       	jmp    0xffffe15e
-  3d:	e8                   	.byte 0xe8
-  3e:	c3                   	ret
-
-
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202606111233.kM8oo8Df-lkp@intel.com/
+Signed-off-by: Rong Xu <xur@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv4/ping.c          |  6 +++---
+ net/ipv4/tcp_ipv4.c      |  6 +++---
+ net/ipv4/udp.c           |  6 +++---
+ net/ipv6/addrconf.c      |  6 +++---
+ net/ipv6/addrlabel.c     |  6 +++---
+ net/ipv6/ip6_flowlabel.c |  6 +++---
+ net/ipv6/mcast.c         | 10 +++++-----
+ net/ipv6/ndisc.c         | 10 +++++-----
+ net/ipv6/proc.c          |  6 +++---
+ net/ipv6/raw.c           |  6 +++---
+ net/ipv6/tcp_ipv6.c      |  6 +++---
+ 11 files changed, 37 insertions(+), 37 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index d36f1e273fde..1dda6d661ad8 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -1144,17 +1144,17 @@ static void __net_exit ping_v4_proc_exit_net(struct net *net)
+ 	remove_proc_entry("icmp", net->proc_net);
+ }
+ 
+-static struct pernet_operations ping_v4_net_ops = {
++static struct pernet_operations ping_v4_net_ops __net_initdata = {
+ 	.init = ping_v4_proc_init_net,
+ 	.exit = ping_v4_proc_exit_net,
+ };
+ 
+-int __init ping_proc_init(void)
++int __net_init ping_proc_init(void)
+ {
+ 	return register_pernet_subsys(&ping_v4_net_ops);
+ }
+ 
+-void ping_proc_exit(void)
++void __net_exit ping_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&ping_v4_net_ops);
+ }
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index fdc81150ff6c..9caca5879466 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -3317,17 +3317,17 @@ static void __net_exit tcp4_proc_exit_net(struct net *net)
+ 	remove_proc_entry("tcp", net->proc_net);
+ }
+ 
+-static struct pernet_operations tcp4_net_ops = {
++static struct pernet_operations tcp4_net_ops __net_initdata = {
+ 	.init = tcp4_proc_init_net,
+ 	.exit = tcp4_proc_exit_net,
+ };
+ 
+-int __init tcp4_proc_init(void)
++int __net_init tcp4_proc_init(void)
+ {
+ 	return register_pernet_subsys(&tcp4_net_ops);
+ }
+ 
+-void tcp4_proc_exit(void)
++void __net_exit tcp4_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&tcp4_net_ops);
+ }
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 70f6cbd4ef73..87f4cced2114 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -3600,17 +3600,17 @@ static void __net_exit udp4_proc_exit_net(struct net *net)
+ 	remove_proc_entry("udp", net->proc_net);
+ }
+ 
+-static struct pernet_operations udp4_net_ops = {
++static struct pernet_operations udp4_net_ops __net_initdata = {
+ 	.init = udp4_proc_init_net,
+ 	.exit = udp4_proc_exit_net,
+ };
+ 
+-int __init udp4_proc_init(void)
++int __net_init udp4_proc_init(void)
+ {
+ 	return register_pernet_subsys(&udp4_net_ops);
+ }
+ 
+-void udp4_proc_exit(void)
++void __net_exit udp4_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&udp4_net_ops);
+ }
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index c9e5d3e48ab9..73d9439bd408 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -4527,17 +4527,17 @@ static void __net_exit if6_proc_net_exit(struct net *net)
+ 	remove_proc_entry("if_inet6", net->proc_net);
+ }
+ 
+-static struct pernet_operations if6_proc_net_ops = {
++static struct pernet_operations if6_proc_net_ops __net_initdata = {
+ 	.init = if6_proc_net_init,
+ 	.exit = if6_proc_net_exit,
+ };
+ 
+-int __init if6_proc_init(void)
++int __net_init if6_proc_init(void)
+ {
+ 	return register_pernet_subsys(&if6_proc_net_ops);
+ }
+ 
+-void if6_proc_exit(void)
++void __net_exit if6_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&if6_proc_net_ops);
+ }
+diff --git a/net/ipv6/addrlabel.c b/net/ipv6/addrlabel.c
+index f4b2618446bd..50f6c1b1edaa 100644
+--- a/net/ipv6/addrlabel.c
++++ b/net/ipv6/addrlabel.c
+@@ -340,17 +340,17 @@ static void __net_exit ip6addrlbl_net_exit(struct net *net)
+ 	spin_unlock(&net->ipv6.ip6addrlbl_table.lock);
+ }
+ 
+-static struct pernet_operations ipv6_addr_label_ops = {
++static struct pernet_operations ipv6_addr_label_ops __net_initdata = {
+ 	.init = ip6addrlbl_net_init,
+ 	.exit = ip6addrlbl_net_exit,
+ };
+ 
+-int __init ipv6_addr_label_init(void)
++int __net_init ipv6_addr_label_init(void)
+ {
+ 	return register_pernet_subsys(&ipv6_addr_label_ops);
+ }
+ 
+-void ipv6_addr_label_cleanup(void)
++void __net_exit ipv6_addr_label_cleanup(void)
+ {
+ 	unregister_pernet_subsys(&ipv6_addr_label_ops);
+ }
+diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
+index b1ccdf0dc646..f6980c403c68 100644
+--- a/net/ipv6/ip6_flowlabel.c
++++ b/net/ipv6/ip6_flowlabel.c
+@@ -903,17 +903,17 @@ static void __net_exit ip6_flowlabel_net_exit(struct net *net)
+ 	ip6_flowlabel_proc_fini(net);
+ }
+ 
+-static struct pernet_operations ip6_flowlabel_net_ops = {
++static struct pernet_operations ip6_flowlabel_net_ops __net_initdata = {
+ 	.init = ip6_flowlabel_proc_init,
+ 	.exit = ip6_flowlabel_net_exit,
+ };
+ 
+-int ip6_flowlabel_init(void)
++int __net_init ip6_flowlabel_init(void)
+ {
+ 	return register_pernet_subsys(&ip6_flowlabel_net_ops);
+ }
+ 
+-void ip6_flowlabel_cleanup(void)
++void __net_exit ip6_flowlabel_cleanup(void)
+ {
+ 	static_key_deferred_flush(&ipv6_flowlabel_exclusive);
+ 	timer_delete(&ip6_fl_gc_timer);
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index d9b855d5191b..eef5bab1ee13 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -3209,12 +3209,12 @@ static void __net_exit igmp6_net_exit(struct net *net)
+ 	igmp6_proc_exit(net);
+ }
+ 
+-static struct pernet_operations igmp6_net_ops = {
++static struct pernet_operations igmp6_net_ops __net_initdata = {
+ 	.init = igmp6_net_init,
+ 	.exit = igmp6_net_exit,
+ };
+ 
+-int __init igmp6_init(void)
++int __net_init igmp6_init(void)
+ {
+ 	int err;
+ 
+@@ -3231,18 +3231,18 @@ int __init igmp6_init(void)
+ 	return err;
+ }
+ 
+-int __init igmp6_late_init(void)
++int __net_init igmp6_late_init(void)
+ {
+ 	return register_netdevice_notifier(&igmp6_netdev_notifier);
+ }
+ 
+-void igmp6_cleanup(void)
++void __net_exit igmp6_cleanup(void)
+ {
+ 	unregister_pernet_subsys(&igmp6_net_ops);
+ 	destroy_workqueue(mld_wq);
+ }
+ 
+-void igmp6_late_cleanup(void)
++void __net_exit igmp6_late_cleanup(void)
+ {
+ 	unregister_netdevice_notifier(&igmp6_netdev_notifier);
+ }
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index e7ad13c5bd26..3a83280db29d 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -1994,12 +1994,12 @@ static void __net_exit ndisc_net_exit(struct net *net)
+ 	inet_ctl_sock_destroy(net->ipv6.ndisc_sk);
+ }
+ 
+-static struct pernet_operations ndisc_net_ops = {
++static struct pernet_operations ndisc_net_ops __net_initdata = {
+ 	.init = ndisc_net_init,
+ 	.exit = ndisc_net_exit,
+ };
+ 
+-int __init ndisc_init(void)
++int __net_init ndisc_init(void)
+ {
+ 	int err;
+ 
+@@ -2027,17 +2027,17 @@ int __init ndisc_init(void)
+ #endif
+ }
+ 
+-int __init ndisc_late_init(void)
++int __net_init ndisc_late_init(void)
+ {
+ 	return register_netdevice_notifier(&ndisc_netdev_notifier);
+ }
+ 
+-void ndisc_late_cleanup(void)
++void __net_exit ndisc_late_cleanup(void)
+ {
+ 	unregister_netdevice_notifier(&ndisc_netdev_notifier);
+ }
+ 
+-void ndisc_cleanup(void)
++void __net_exit ndisc_cleanup(void)
+ {
+ #ifdef CONFIG_SYSCTL
+ 	neigh_sysctl_unregister(&nd_tbl.parms);
+diff --git a/net/ipv6/proc.c b/net/ipv6/proc.c
+index 813013ca4e75..c59bade608cd 100644
+--- a/net/ipv6/proc.c
++++ b/net/ipv6/proc.c
+@@ -298,17 +298,17 @@ static void __net_exit ipv6_proc_exit_net(struct net *net)
+ 	remove_proc_entry("snmp6", net->proc_net);
+ }
+ 
+-static struct pernet_operations ipv6_proc_ops = {
++static struct pernet_operations ipv6_proc_ops __net_initdata = {
+ 	.init = ipv6_proc_init_net,
+ 	.exit = ipv6_proc_exit_net,
+ };
+ 
+-int __init ipv6_misc_proc_init(void)
++int __net_init ipv6_misc_proc_init(void)
+ {
+ 	return register_pernet_subsys(&ipv6_proc_ops);
+ }
+ 
+-void ipv6_misc_proc_exit(void)
++void __net_exit ipv6_misc_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&ipv6_proc_ops);
+ }
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index 3cc58698cbbd..fe399675b8fc 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -1256,17 +1256,17 @@ static void __net_exit raw6_exit_net(struct net *net)
+ 	remove_proc_entry("raw6", net->proc_net);
+ }
+ 
+-static struct pernet_operations raw6_net_ops = {
++static struct pernet_operations raw6_net_ops __net_initdata = {
+ 	.init = raw6_init_net,
+ 	.exit = raw6_exit_net,
+ };
+ 
+-int __init raw6_proc_init(void)
++int __net_init raw6_proc_init(void)
+ {
+ 	return register_pernet_subsys(&raw6_net_ops);
+ }
+ 
+-void raw6_proc_exit(void)
++void __net_exit raw6_proc_exit(void)
+ {
+ 	unregister_pernet_subsys(&raw6_net_ops);
+ }
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 36d75fb50a70..d0737f16076b 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -2335,12 +2335,12 @@ static void __net_exit tcpv6_net_exit(struct net *net)
+ 	inet_ctl_sock_destroy(net->ipv6.tcp_sk);
+ }
+ 
+-static struct pernet_operations tcpv6_net_ops = {
++static struct pernet_operations tcpv6_net_ops __net_initdata = {
+ 	.init	    = tcpv6_net_init,
+ 	.exit	    = tcpv6_net_exit,
+ };
+ 
+-int __init tcpv6_init(void)
++int __net_init tcpv6_init(void)
+ {
+ 	int ret;
+ 
+@@ -2378,7 +2378,7 @@ int __init tcpv6_init(void)
+ 	goto out;
+ }
+ 
+-void tcpv6_exit(void)
++void __net_exit tcpv6_exit(void)
+ {
+ 	unregister_pernet_subsys(&tcpv6_net_ops);
+ 	inet6_unregister_protosw(&tcpv6_protosw);
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+base-commit: 2b414a95b8f7307d42173ba9e580d6d3e2bcbfce
+-- 
+2.54.0.1136.gdb2ca164c4-goog
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
