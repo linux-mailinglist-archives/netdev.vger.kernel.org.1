@@ -1,189 +1,295 @@
-Return-Path: <netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298705-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id W/o7MxcdLGqPLgQAu9opvQ
-	(envelope-from <netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:52:07 +0200
+	id h3/bHJkeLGrzLgQAu9opvQ
+	(envelope-from <netdev+bounces-298705-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:58:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5A067A584
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:52:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4F167A5EE
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:58:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=UMmpFZDW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=rZYA9nmo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298705-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298705-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DC43B300908E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:52:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5BC4D3006201
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3972345CB2;
-	Fri, 12 Jun 2026 14:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC41C385D6E;
+	Fri, 12 Jun 2026 14:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7B231B10B
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 14:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C62383C89
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 14:58:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781275924; cv=none; b=NRoSANW0u+2h8pA24cTE4NjZ/ABqTXr0G3o4oeRVdcqvhiptaw5X0DS3M8lc7Iqp4VHD9zdZAxOzRa7gpsdOz+weq571YBcW+LrJBrE1LrqQsPiwZIkRu3OpwrMn0dm9daLz4Ajvu7X1s17etRgy9j++rLbCcgL9P1EwFORviiw=
+	t=1781276305; cv=none; b=rt6iVj5o60KB1VQ4iI8JR8SvOuJpX8maZE5CSNr7izMgFsMHghNP+6hY4NzE5CduKURSyN7YgRM+Du0bJ+8KrVxgOPQIKzT4xiZgV3KZPqISCY3aOPYW5IynNgX5ltycnRSPXc4npZ344cnKSU87Em7vSp3GJ8xqwNyRT3Ef59c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781275924; c=relaxed/simple;
-	bh=MtLXFPswneMburYu+lWG7VpR1RjssBUjozfMNoj/Av4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O6/P6cHpPoqZ4EDvXSR6QtZ8FeZQmcZzfDNYMelyf58n6jFgPjUuyB2X1upyHRU7Et0PufY6e4ImOSLiiSH5J+bkcXgd+QPaRYuS8lOsdum6lOTzGeebHSPlufkJtNncEOzVxj4eVL4Md1FyzOYKsSrbaJ1w94Lf45ENz16gi6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMmpFZDW; arc=none smtp.client-ip=209.85.214.174
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2c2da7fa321so4673845ad.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 07:52:02 -0700 (PDT)
+	s=arc-20240116; t=1781276305; c=relaxed/simple;
+	bh=k0qUAcGriL9M3ldME0Wx7uurzJb6Wq7dm2Bl1WpnN98=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Utojp2xFnRE3RVLy7CHsNUokKq4J0tP7VYrOXIUC+O3IaN3OocF8BhZ+dZ+IdrHPrKJ+RbRqCWMZ3O6btA+oHjvkyLrCBOVmx83+R2F0eLgDnsbahlx6hA1qjZQ+RlP2+OP4NhZn0vl0XVtAE0H0WSs472L5B5SC7N14ot+c1x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rZYA9nmo; arc=none smtp.client-ip=74.125.224.41
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-66039d3efcbso1202060d50.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 07:58:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781275922; x=1781880722; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JqMd8Q5yt8mAGXSVOkSVuvsH9v3zwILU1VT0pazsblM=;
-        b=UMmpFZDWec/Ueibyq22/ITPAeh5nZ0vG+6kPJCTvHSXtCxWIgfpweoWNyGXRmX9uTa
-         bjVEBNq7arP6qDkog3CKsSPpVoesSBd+vcxkMZYkwvkrud9w5aD8lua9f5RtMXB8m29D
-         GUHHToPlitoyPJqYW7vC2ljUOwZ1DmpxD6vjhixFVlxRxL9OvwY6QMd3q7Ow36Aany80
-         J7G28sI1AFnoJrAvTKrevXvxKBS8vJCi95kPidI9swkBW59w+L72P5+xs3YTgIQAsekx
-         j9T+d9CGoEEGICBFmDNsQc/P3a8x4F/MVtKmy8kfG4SF8ltMOOVGeZhLkQeqvg9UkkRt
-         /kSA==
+        d=gmail.com; s=20251104; t=1781276303; x=1781881103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3S6NHQe4ZIyWygNURSfM9i/aQz8oPyjRNWHr8uR1BO4=;
+        b=rZYA9nmoVuUTHNZk5qxpLYhI9b/2eEx4ouNkM1NXJAHHZgx1XFPvZcSYf7rdaSis4Z
+         uMkqDaNk9bQJ6xhsvDFsgFoqz4ewdKq2uUZmWqMzFd8PGEGwyNbhMXu1IyKLkWtbwUZb
+         ZlPYog4VDp9+O9OD8XVlK7Uab/JRgbyzfimL0D3AWdIWwttbh8ht8Ch78ENIbY7GPIW9
+         ijxj6tmI8JFAgfsi2b4/AITTtz/Io2rlLxSk2JrGCODfP6tPTXWNlS/u9Pc4gup9zyYd
+         UFB86r11MAP9/kg3/0vYLwAXTXCfb4BKMBBCW8+S6oeQB3iu3mnITJGesJ3G0zoYgMoB
+         iDWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781275922; x=1781880722;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JqMd8Q5yt8mAGXSVOkSVuvsH9v3zwILU1VT0pazsblM=;
-        b=VTZmz4tT3FYi4FcScDPOBOZVKbSSibYiRPFMA8C2vHKVEfxNPXcW5spELnKAYbtbmB
-         GpTyihTAXcWVQvluHwM5AvhVy7seu4/u/MXsY4giwo10VPpz7sBz46UzOF+Jvl2X8e9s
-         OyE9SmHLsoL2SIf9cc07IiKbMq8Cdrzd2tXANmJl3EspW3gs8s7IMyEB6KPqQboq/bOF
-         g39KDEKQn9MyNY5n5RSDGFJcjjzpzvUMg0jlJjwxe8uRqqYh4QOdQ20qDc4ohjPDxaoV
-         K0k12EC4amHgTIK19tCeNVkc+hOrMv4pYWkY1aUCs/1Ns2OGzhRQUs7P8xox7SEsvpPt
-         aQVQ==
-X-Gm-Message-State: AOJu0YzFKZFEeJ0bXNfJG9EPNYmQJIBio9w2Xod+NDoxraaldfUw18J0
-	i63xgyBZM02KsD75W9CIgTemj9GThlHBOTWHZ8OJCx2DSpZyzHqa6kA8
-X-Gm-Gg: Acq92OFq8ztJbIjWx72V8qB/iHxdY77lWdOQjNE/ltJapSxFrw1TvXNJmOgqMt9qIDN
-	15s9ZOfEW41fAZYmFv1lglqoJPeCbMwuNxF/Qh2hOz7l3dX6f+5U2XvlOI+AvqDotO+ajLxXv50
-	3bTfVpR7DEyDbxTqJAi8xT3BHMekAHb19Mt+cxxAWUXFYmnngxQGbcD6yPd1Ogxyun4CO8yujfu
-	6+GwryEsSWDD6n7sSnsbnj0iDmJgM4wD1Km/qNt7suXiBYJnYiCjRrFKMjl8gclRoBHvqNQofG8
-	Fz38k76S4x+5Z+/cF9oi3wHHZA7gl2ex1x3LnItQPD+KWAfcACX6R4IuPoX8EAeVD5YY4j3v28r
-	UxzktCggwENF8Ghq3VDMgYC6AnddwjgQNwQrZw0f2uc+PO7dnivUmpPdbCBrEv6WsqhTMwmRCdy
-	8rPCe5BIqOWXmPCdgcVG50yEWnaoJZVBEfZ5rGeZFk6gKk
-X-Received: by 2002:a17:903:2bcb:b0:2bc:8f9a:3642 with SMTP id d9443c01a7336-2c4114a22d3mr39476645ad.16.1781275921806;
-        Fri, 12 Jun 2026 07:52:01 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:73::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4327ac72asm25666815ad.38.2026.06.12.07.52.01
+        d=1e100.net; s=20251104; t=1781276303; x=1781881103;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3S6NHQe4ZIyWygNURSfM9i/aQz8oPyjRNWHr8uR1BO4=;
+        b=jwEjHbM2Z0QNYEuagqwOVRHgW8LCPwtFxa5Bv048CLj92zvceXxN5/tgV0mjrMS+YM
+         P0Uk7wxeRq6ITGyTksFJxrleDHtlj86hqMPwTEw1opyaxJl3jKdXkB8fbLLv/Pyt9lt5
+         6QHM7Ll6JV62wtzMftLfiyOne6zbyV31uVCzDUHm/g41RKtNqIHY7y9fSWgNiSqLx+Sg
+         H7QOT+EbPiGtcxfAr3QMXskih1S4cWlDnegrbd6DPEQQnyRFwtlcIA3tFWVdlIzxpVcO
+         PR964VlQiQpZVwHymVX1cCVETn4XVQQqKIJmcxSkspC9b4PWBe/j0Ho3IwPkGWk+e/QC
+         j0Vg==
+X-Gm-Message-State: AOJu0YzNw7t8FPz5OJ0rZLQyxSvoWoc0HB4X+nnsf+dXpWQZMIp1Qh8p
+	xIhGEKut6Bh2OPjKIh2j2pSjJ1aEDTciNlB3M3WGkmKmhgxoOpUN7q1A
+X-Gm-Gg: Acq92OGzX3e70YqvqRcoC0zcEANjvdr6Q9fRUQSERgXk4gUjH4OUhhccsI1Ras5xE24
+	ttczUCGl2q7MUZQgab5wGMKAujNVyxW7jgyTmrxnnf1n6xD79kkZ0P7G4L3EIWCfqaKsTj7wWAm
+	erx2CiDQa6p6GQfI8J1Jqj4NtH3pCMJM0yCChLgXVF9LA4TnkDq8NMxlhykrR+71DjaokqnmXwX
+	i9g+Yj4LdYnD1JznLQk3wXQvrE50Ajxl2pDdpYLRgtmw2kK9GnagA715Ee6Kfc8dB0iTkQqDA07
+	5jeTxZeJXprkGkogexlxJ4bI3Hl1HVaB19K/YoTYXulRxtMXNjnLwydgjRvKpetd7QCKXVkBk69
+	N5wC6thn8yHe7M7GdYjNsVcuQS5HrDc6BnvJP3gWVRVYONOMPqDj9QVy3OG1Yea9fdAiSez8mwd
+	vxBdoWKXyr0TCkpV9xK18Dbx3oSBKHQBGZeGRnbuGPemF7RtPqhL5X0UM90L4HIGU784eSbGCmN
+	Rq2uZs=
+X-Received: by 2002:a05:690e:144f:b0:65e:43da:a470 with SMTP id 956f58d0204a3-662782f5925mr2641422d50.30.1781276303255;
+        Fri, 12 Jun 2026 07:58:23 -0700 (PDT)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66274c4017asm1259158d50.1.2026.06.12.07.58.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 07:52:01 -0700 (PDT)
-Date: Fri, 12 Jun 2026 07:51:59 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Raf Dickson <rafdog35@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
-	bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, leonardi@redhat.com,
-	horms@kernel.org, edumazet@google.com, kuba@kernel.org
-Subject: Re: [PATCH net-next v3 4/4] vsock: fold sk_acceptq_removed() into
- vsock_remove_pending()
-Message-ID: <aiwdD5EAqxW6Xunv@devvm29614.prn0.facebook.com>
-References: <20260612045216.105796-1-rafdog35@gmail.com>
- <20260612045216.105796-5-rafdog35@gmail.com>
+        Fri, 12 Jun 2026 07:58:21 -0700 (PDT)
+Date: Fri, 12 Jun 2026 10:58:19 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ sdf.kernel@gmail.com
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+Message-ID: <willemdebruijn.kernel.26a37316bb5e2@gmail.com>
+In-Reply-To: <20260612-getsockopt_phase2-v1-2-7b01f1f5d106@debian.org>
+References: <20260612-getsockopt_phase2-v1-0-7b01f1f5d106@debian.org>
+ <20260612-getsockopt_phase2-v1-2-7b01f1f5d106@debian.org>
+Subject: Re: [PATCH net-next 2/2] udp: convert udp_lib_getsockopt to sockopt_t
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260612045216.105796-5-rafdog35@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-298705-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298704-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:rafdog35@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:pabeni@redhat.com,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:leonardi@redhat.com,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:shuah@kernel.org,m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:willemdebruijnkernel@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_TO(0.00)[debian.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6A5A067A584
+X-Rspamd-Queue-Id: 6A4F167A5EE
 
-On Fri, Jun 12, 2026 at 04:52:16AM +0000, Raf Dickson wrote:
-> Callers of vsock_remove_pending() must also call sk_acceptq_removed()
-> to keep sk_ack_backlog consistent. Move the call into
-> vsock_remove_pending() itself to make it automatic and prevent future
-> callers from forgetting it.
+Breno Leitao wrote:
+> In preparation for converting the proto-layer getsockopt callbacks to the
+> sockopt_t interface, switch udp_lib_getsockopt() to take a sockopt_t.
+
+What is the benefit of this conversion?
+
+It does add a lot more complexity and makes the code less obvious.
+ 
+> The thin udp_getsockopt()/udpv6_getsockopt() wrappers keep their __user
+> signature for now: they build a user-backed sockopt_t with
+> sockopt_init_user(), call the helper, and write the returned length back
+> to optlen. The helper uses copy_to_iter() instead of copy_to_user().
+> No functional change.
 > 
-> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-> Signed-off-by: Raf Dickson <rafdog35@gmail.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->  net/vmw_vsock/af_vsock.c       | 2 +-
->  net/vmw_vsock/vmci_transport.c | 4 +---
->  2 files changed, 2 insertions(+), 4 deletions(-)
+>  include/net/udp.h |  2 +-
+>  net/ipv4/udp.c    | 40 ++++++++++++++++++++++++++--------------
+>  net/ipv6/udp.c    | 17 ++++++++++++++---
+>  3 files changed, 41 insertions(+), 18 deletions(-)
 > 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 24916dd4e9..4a7d6d247a 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -494,6 +494,7 @@ void vsock_remove_pending(struct sock *listener, struct sock *pending)
->  	list_del_init(&vpending->pending_links);
->  	sock_put(listener);
->  	sock_put(pending);
-> +	sk_acceptq_removed(listener);
+> diff --git a/include/net/udp.h b/include/net/udp.h
+> index 8262e2b215b4e..1fee17274745f 100644
+> --- a/include/net/udp.h
+> +++ b/include/net/udp.h
+> @@ -430,7 +430,7 @@ struct sk_buff *skb_udp_tunnel_segment(struct sk_buff *skb,
+>  				       netdev_features_t features,
+>  				       bool is_ipv6);
+>  int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+> -		       char __user *optval, int __user *optlen);
+> +		       sockopt_t *opt);
+>  int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+>  		       sockptr_t optval, unsigned int optlen,
+>  		       int (*push_pending_frames)(struct sock *));
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 70f6cbd4ef73b..0691f74db2c11 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -76,6 +76,7 @@
+>  
+>  #include <linux/bpf-cgroup.h>
+>  #include <linux/uaccess.h>
+> +#include <linux/uio.h>
+>  #include <asm/ioctls.h>
+>  #include <linux/memblock.h>
+>  #include <linux/highmem.h>
+> @@ -2995,18 +2996,12 @@ static int udp_setsockopt(struct sock *sk, int level, int optname, sockptr_t opt
 >  }
->  EXPORT_SYMBOL_GPL(vsock_remove_pending);
 >  
-> @@ -773,7 +774,6 @@ static void vsock_pending_work(struct work_struct *work)
->  	if (vsock_is_pending(sk)) {
->  		vsock_remove_pending(listener, sk);
+>  int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+> -		       char __user *optval, int __user *optlen)
+> +		       sockopt_t *opt)
+>  {
+>  	struct udp_sock *up = udp_sk(sk);
+>  	int val, len;
 >  
-> -		sk_acceptq_removed(listener);
->  	} else if (!vsk->rejected) {
->  		/* We are not on the pending list and accept() did not reject
->  		 * us, so we must have been accepted by our user process.  We
-> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
-> index c2db016cca..3e6445f4e1 100644
-> --- a/net/vmw_vsock/vmci_transport.c
-> +++ b/net/vmw_vsock/vmci_transport.c
-> @@ -980,10 +980,8 @@ static int vmci_transport_recv_listen(struct sock *sk,
->  			err = -EINVAL;
->  		}
+> -	if (get_user(len, optlen))
+> -		return -EFAULT;
+> -
+> -	if (len < 0)
+> -		return -EINVAL;
+> -
+> -	len = min_t(unsigned int, len, sizeof(int));
+> +	len = min_t(unsigned int, opt->optlen, sizeof(int));
 >  
-> -		if (err < 0) {
-> +		if (err < 0)
->  			vsock_remove_pending(sk, pending);
-> -			sk_acceptq_removed(sk);
-> -		}
+>  	switch (optname) {
+>  	case UDP_CORK:
+> @@ -3037,9 +3032,8 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+>  		return -ENOPROTOOPT;
+>  	}
 >  
->  		release_sock(pending);
->  		vmci_transport_release_pending(pending);
+> -	if (put_user(len, optlen))
+> -		return -EFAULT;
+> -	if (copy_to_user(optval, &val, len))
+> +	opt->optlen = len;
+> +	if (copy_to_iter(&val, len, &opt->iter_out) != len)
+>  		return -EFAULT;
+>  	return 0;
+>  }
+> @@ -3047,9 +3041,27 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+>  static int udp_getsockopt(struct sock *sk, int level, int optname,
+>  			  char __user *optval, int __user *optlen)
+>  {
+> -	if (level == SOL_UDP)
+> -		return udp_lib_getsockopt(sk, level, optname, optval, optlen);
+> -	return ip_getsockopt(sk, level, optname, optval, optlen);
+> +	sockopt_t opt;
+> +	int err;
+> +
+> +	/*
+> +	 * keep the old __user pointers, until ip_getsockopt() moves
+> +	 * to sockopt_t
+> +	 */
+> +	if (level != SOL_UDP)
+> +		return ip_getsockopt(sk, level, optname, optval, optlen);
+> +
+> +	err = sockopt_init_user(&opt, optval, optlen);
+> +	if (err)
+> +		return err;
+> +
+> +	err = udp_lib_getsockopt(sk, level, optname, &opt);
+> +	/* indepedendent of the err, return optlen */
+
+typo
+
+> +	if (put_user(opt.optlen, optlen))
+> +		return -EFAULT;
+> +	/* Optval was updated in copy_to_iter in udp_lib_getsockopt() */
+> +
+> +	return err;
+>  }
+>  
+>  /**
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index 15e032194eccc..731122deed8a5 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -1826,9 +1826,20 @@ static int udpv6_setsockopt(struct sock *sk, int level, int optname,
+>  static int udpv6_getsockopt(struct sock *sk, int level, int optname,
+>  			    char __user *optval, int __user *optlen)
+>  {
+> -	if (level == SOL_UDP)
+> -		return udp_lib_getsockopt(sk, level, optname, optval, optlen);
+> -	return ipv6_getsockopt(sk, level, optname, optval, optlen);
+> +	sockopt_t opt;
+> +	int err;
+> +
+> +	if (level != SOL_UDP)
+> +		return ipv6_getsockopt(sk, level, optname, optval, optlen);
+> +
+> +	err = sockopt_init_user(&opt, optval, optlen);
+> +	if (err)
+> +		return err;
+> +
+> +	err = udp_lib_getsockopt(sk, level, optname, &opt);
+> +	if (put_user(opt.optlen, optlen))
+> +		return -EFAULT;
+> +	return err;
+>  }
+>  
+>  
+> 
 > -- 
-> 2.54.0
+> 2.53.0-Meta
 > 
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+
 
