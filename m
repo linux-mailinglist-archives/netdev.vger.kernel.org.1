@@ -1,208 +1,193 @@
-Return-Path: <netdev+bounces-298752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EBHlLD1DLGokOgQAu9opvQ
-	(envelope-from <netdev+bounces-298752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:34:53 +0200
+	id zGDUAdhDLGpYOgQAu9opvQ
+	(envelope-from <netdev+bounces-298753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:37:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF59867B5CA
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:34:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D80C67B63C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:37:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=c6WhmD5u;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298752-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298752-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=WyYuE+97;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298753-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298753-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 844F83007A61
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:34:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4501031AA004
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5F940628A;
-	Fri, 12 Jun 2026 17:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0C2407CCE;
+	Fri, 12 Jun 2026 17:36:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f99.google.com (mail-ua1-f99.google.com [209.85.222.99])
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDEE374E66
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E666240628A
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:36:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781285681; cv=none; b=kGtHFv91knyH8UJyGkibyTHODq6QDCEVJ5m35yXzaJBBAIlsBoycuKjDpOCkYAH6E9ifXO2swosv+ILMg4ec5dW4HcP8CuCRx27rNr5cTptPw1Rnjt5d7hOwA1UFXZRltQZ2piOnzJkaDGX65P632gmRgeweTUSF2y7HKiwelB4=
+	t=1781285811; cv=none; b=Y0VAe94lT+ZhVovwKDoVarOaGMg5Z6CT/xe2TKG2VtBbbckh6PI7SnN3d2dxEb6xRZ9cSiD9rWcdfYYYxMuSUYqtt89QH42bQrcKRLKCniKTD9nOL3vnNel1QUTXfZeylsLo/YWYlWSouoNiiZwv9hxs+zxYc3VhlA9FBHbPLIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781285681; c=relaxed/simple;
-	bh=IvywPrYtqHwOPWtPbL5ec8PVlYD1azkdeorAonyzRE0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BxR8nj8Ppl4+fs7CQrdapIsLbXOaIVFw0iB1Tvgj8p2NlQq2s3JG/HRz/X3AJzYKZEU0f9dc3BMIi5myFg9V1ewqBX0+yRi/pCOByeTQMTX4H7pssWgvl7AEso1ojm0jpXmV/tEWibeBP1OyfLb5HTYn2ME0BmmuYDVtEK/DdyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=c6WhmD5u; arc=none smtp.client-ip=209.85.222.99
-Received: by mail-ua1-f99.google.com with SMTP id a1e0cc1a2514c-9638f7e9896so1304337241.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:34:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781285679; x=1781890479;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LK+0/7C2rh+DDX++KBE74peykTPgebClJfikfMK5nUQ=;
-        b=ICmrBAJzvtn84xC99mfC9WqflM8tAjLr49MIRmUU3y10+v9uoNUTAN+o9Rb9P203oP
-         i+K7cgodR3aed30pFOxRE19nbZiIUzRctM71cz0Z2LYSVYZcI4TWBZ+B1mUuZw4pIRX4
-         dhCpP/NtMl6BltSj8QGRdWHu2o+ZQOJe70JhHh7hQwfCuBObJqeXfexn1e70Mnw3KRd6
-         mGT9P8kUYiugyygNz4XYHfYKuOEe+ppef553IOHYiEonTBdtah/TFJg2sfyDgdtl9z2N
-         Ctg662hOvM6TS3eP0BfdoLK77DsPhtN623z40kaIJuCXJA5bKNgUmRv70pk2NLdbK2LJ
-         2DcQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZIfXPtwzK7/prfXTSA/iCui/ecOIXSyDltkKbAWSQSnaChoknjBw6B7QW5/ixNivninUk+kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHpPqJoc6tLv84K0QoeOuIdSn/gzjZJwopwm1ZmEpI7A6SgoV0
-	ikWzC18sMFmVI83xoA72ZtWphfLv9Tlm9cwNX+GAKZseVIhFIXcY1fSjNxa0FJpaqF/kXkV1LeY
-	rh4w6+dxU0sGwa8SfBABHJJLuDlvuCLPBfZCGuS6tbAUUeJbPRIgbUNeSla4b7tORU0utqAz5do
-	ohkkXdpRakCrh0jtIk+eagiBEqz1mpeMAUzNCrVpaKcR8bgk2eOdpkeOOcGzwpUvbLxkUsS7I+p
-	gVz/CKPxw==
-X-Gm-Gg: Acq92OFHr5eJa4SaKR6kJkEZkKiwtFOazYjmCzYqMbnxZgK5n/X39MS/1nHxysOiplY
-	XxYdMe9W+XlFhgnSz/y9GlA+90qnwH9Af6nkK6tFap2a8OeQ1GGJzMM0VLM5dx6tu6LuhxynYQr
-	DthwrONV63UF0kPWBUnuC5vHgkQXyFsXiA2EXzJEITjIOAjaH5pXARcgGusd9iGN9diXLtv2T1B
-	nYNvvMSqpJWX+e7pVJFLXP9BumHYyA1DXLjItxdwft348zpr3v0qLQCRKOJf6hJknX9ctbOCsi/
-	dlLp4fhUS7AGnAxfnP4oxUS/r0k6SZED2Q09DGLDm1TGvA69saF9FlRFW4Rtv+yjUH6dhh9FHnz
-	9G3NeY5RnQAlTrwm3cVXAiGfFJ7rAUZz+WWEr6372quxNRdZjBSDSCqMguX/lPiMZPeJ80K8atk
-	6DIPkZwtPYLdKO98TbxpaZ94JnhuLR/565PBJlg6Bry+IaMUJfrz59u2xcyQ==
-X-Received: by 2002:a05:6102:1611:b0:633:4d1a:65f5 with SMTP id ada2fe7eead31-71e89b80a37mr1686168137.10.1781285679004;
-        Fri, 12 Jun 2026 10:34:39 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-71e889fd8f3sm143634137.21.2026.06.12.10.34.38
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jun 2026 10:34:38 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-304c652be4eso1593006eec.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:34:38 -0700 (PDT)
+	s=arc-20240116; t=1781285811; c=relaxed/simple;
+	bh=EDZfpL0WwzkQ8hq0Wdv9p5cHlrRrzU/QFy+XGloNPb0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Byzl9KnO3nyOP+vYTYpnqILc+HS/meoKBGNQwup75amJ83eoleSlfv0hDRlff3fLeM1Mhp7mihTUbmVFX6XdueWsd8d3dp0ku+THLcACg91Z8jDSD1aJALFsILQHPfqjPUflDjJf1zcnB2dsgqBMwL2FlJ5coDd1Mbiy5YGWlmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tanshuhao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WyYuE+97; arc=none smtp.client-ip=74.125.82.73
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-138acbc0e69so90518c88.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 10:36:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781285678; x=1781890478; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=google.com; s=20251104; t=1781285809; x=1781890609; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=m0AdHFT5n0KXuYQG6JAlkPd+J0hfnrhnYB6jEfLYTzA=;
+        b=WyYuE+97EJ9bsa7IhWc9y/6IJIl0afFpUBghlu8gynTlgDbeAQqzm4TgVQjEbjwTYn
+         sBGUn73BwAwBqfCeUq2SPoan8RwrSlWb86c8FJ5palTE3hiqLudeCMfps+ztW3vOHreL
+         UQi48/iNfNW9+H6Y/zdF27+ToZFJw+dZneqvZ8R3AIAB6GE2hMS8iV0s2fyuCVFbclY+
+         zJLlD0Eywmg2//4U8qH7lzrPMLrnR0zS68mGE9yIOjGLhD+N2fJEEkE4yX3fGcFSZgQO
+         avdaeG1ozxJZDxcB7ASEWN0fvi8crrP3qrYIDUPKKLJy974BRO0bS34mtXDE1Mt8QdVc
+         hpVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781285809; x=1781890609;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=LK+0/7C2rh+DDX++KBE74peykTPgebClJfikfMK5nUQ=;
-        b=c6WhmD5uZzFAHFGm8SNJFAlc/1T6QH05gfKNI2jz20E2zjgP9w6RKdZQAJvWeNvkHi
-         SV+JMbLx41DjSBKy6ypGb/Aaslag/yvG0fAsdzVJIdkAhKM1f3Mt9NTqIOtMIccFgJet
-         Ww4OE+eohqCErPwTnO8KXMEuqO8dttURploVo=
-X-Forwarded-Encrypted: i=1; AFNElJ97kufTIz7WtSJesZJqw7DuPW4yiu0/i9UgyqlZhhLzNAWJ3rbLtOsLasqMQceoXvDEOVRY78c=@vger.kernel.org
-X-Received: by 2002:a05:7300:66c7:b0:2d2:d5a3:e97c with SMTP id 5a478bee46e88-3081e46e982mr1621445eec.12.1781285677659;
-        Fri, 12 Jun 2026 10:34:37 -0700 (PDT)
-X-Received: by 2002:a05:7300:66c7:b0:2d2:d5a3:e97c with SMTP id 5a478bee46e88-3081e46e982mr1621430eec.12.1781285676963;
-        Fri, 12 Jun 2026 10:34:36 -0700 (PDT)
-Received: from [10.14.7.225] ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e48e412sm4615599eec.4.2026.06.12.10.34.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2026 10:34:36 -0700 (PDT)
-Message-ID: <0ada80c4-0ad0-4475-9a5c-173ead88a4dc@broadcom.com>
-Date: Fri, 12 Jun 2026 10:34:34 -0700
+        bh=m0AdHFT5n0KXuYQG6JAlkPd+J0hfnrhnYB6jEfLYTzA=;
+        b=YMZMf671MRc5x6ctfBrCMLgsIrxZTgiZLZPkW8XMH5WcqefZV5Kh+GVe5XN+uGfLjO
+         jE8uN9EhZ4W33nbGlpyd1PMsQF2lVzOIGgrfm36S1YoIkgGm+y08YzET9MUdFBg324HM
+         1pOG+QxVRIOGsZLYRA1v9nAVH4M5Nyo/MuzbMDMV7EauhuIV97yKnFCcvQhxThmlzZpa
+         Icjtd66ggxoBwiBhKO+pDJnaqulCqYF4KZ0Y1mNuP3zKm6HmaDerGjMgIY/yMAhqs63e
+         qHJWg57oRQuA+e+89LTBxzkjWITsG0EB8d2TJ+BMd/mLyfjdVJ+3/lYmLnyl4XRimeHE
+         5Msg==
+X-Forwarded-Encrypted: i=1; AFNElJ9bqUlCyoJq2JUi/GSEtt7j2IEXcgc76PJuGuRKaKlh3NGTLR4yz8TNwzA6+UdjSmfDBjb/Ffo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywadwq/oSdkA0C1Ng+ZYhM0RLiuBpgT9dPUvLewp5ry8NgFQni
+	kgOIt/VqK2qSwV+lrrxM5DY0G4oNzQX95aiaFw2kPzeQAwSBLhQxdZkWw1zzVeHm375QVqI4xSQ
+	2509U9naqEQjMigaz1Q==
+X-Received: from dlec6-n2.prod.google.com ([2002:a05:701b:4286:20b0:138:4e1:4728])
+ (user=tanshuhao job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:ea24:b0:128:d4be:7438 with SMTP id a92af1059eb24-1384bbc646fmr2287331c88.30.1781285808673;
+ Fri, 12 Jun 2026 10:36:48 -0700 (PDT)
+Date: Fri, 12 Jun 2026 10:36:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmgenet: Use weighted round-robin TX DMA
- arbitration
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, opendmb@gmail.com,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260610085238.56300-1-ovidiu.panait.rb@renesas.com>
- <2f7e70123887fcfd8bbf4ce92f73574d@tipi-net.de>
- <d700f8b0-b315-468d-8681-b97653ed76e8@broadcom.com>
- <69d920a3b52cc049dc1b96a9c7d5e3b6@tipi-net.de>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <69d920a3b52cc049dc1b96a9c7d5e3b6@tipi-net.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260612173644.380972-1-tanshuhao@google.com>
+Subject: [RFC net-next v1 0/2] Reuse threaded NAPI kthread across napi_del()/napi_add().
+From: Shuhao Tan <tanshuhao@google.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: Shuhao Tan <tanshuhao@google.com>, Mina Almasry <almasrymina@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298752-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:tanshuhao@google.com,m:almasrymina@google.com,m:skhawaja@google.com,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:nb@tipi-net.de,m:ovidiu.panait.rb@renesas.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[renesas.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[tanshuhao@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298753-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tanshuhao@google.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AF59867B5CA
+X-Rspamd-Queue-Id: 6D80C67B63C
 
+Currently the lifetime of the kthread of a threaded NAPI is tied to
+the napi_struct. netif_napi_del() stops the kthread when it destroys
+the NAPI struct.
 
+This patch series reuses the same kthread (thus preserving all of its
+attributes) across napi_del/napi_add. This series now tie the lifetime
+of the kthread to net_device instead of napi_struct.
 
-On 6/12/26 12:37 AM, Nicolai Buchwitz wrote:
-> On 11.6.2026 19:27, Justin Chen wrote:
-> 
->> [...]
-> 
->>> AFAIK the existing queue mechanism dates back to the STB QoS use 
->>> cases Florian
->>> had in mind when he wrote the driver, so let's hear what he has to 
->>> say on this.
->>>
->>> The change itself looks correct to me. My concern is the targeting. This
->>> flips the default policy for every GENET user rather than fixing a 
->>> specific
->>> defect, and Justin's series already called the persistent timeouts a 
->>> design
->>> issue rather than a bug.
->>>
->>> So isn't this more net-next material than net with a broad Fixes: tag?
->>> Please also add to the commit message that it drops the existing 
->>> priority
->>> handling for rings 1-4.
->>>
->>
->> I'm ok with these changes. Internally we no longer require priority 
->> queues. It is a legacy use case we no longer have. My idea was to 
->> remove the queues entirely and have one big queue. But I figured I 
->> would wait for Nicolai's XDP changes so we do not need to remove and 
->> re-add queues for XDP. This could be a stop-gap solution until that is 
->> done.
-> 
-> Thanks Justin. IMHO XDP could benefit from a queue-refactoring prep. It 
-> gets simpler on top of a single queue, and dropping q1-4 frees up a 
-> bunch of BDs for the XDP ring instead of the 32 it has atm.
-> 
-> Happy to take it on, or leave it to you :)
-> 
+A normal use case for threaded NAPI will be "enable threaded" ->
+"configure the thread". Driver reset (that can be caused by a NIC
+configuration change) often destroys the configuration and causes a
+usability issue. This series aims to solve the issue.
 
-I am not going to say no to less work! Please do.
+There is a downside of this approach: If a device reduces number of
+queues while its NAPIs are threaded. The kthread associated with
+removed queues will not be stopped. Since the mapping between the
+index passed to napi_add_config() and NAPI is an implementation
+detail of individual drivers, it is not straightfoward to perform
+a garbage collection and stop kthreads that are no longer associated
+with a queue. This patch series tries to minimize the effect by
+parking the kthread in napi_del. The kthread still shows up in
+/proc, but should not consume CPU cycles.
 
-Thanks,
-Justin
+There was a discussion
+https://lore.kernel.org/CAAywjhR0TPKZ-xzqjSP709OVmZWUisDNv2CVc_VxgOrXRtop+g@mail.gmail.com/
+around what to do with the kthread between napi_disable/napi_enable.
+It seems that there was an intention to keep user configuration for
+the kthread across NIC configuration change. This patch series extends
+the effort to cover more NIC configuration changes. Roughly tracing
+through the call hierarchy of napi_del reveals that at least the
+following drivers will not preserve the user configurations:
+- idpf: idpf_set_channels(), idpf_set_ringparam()
+- mlx4: mlx4_en_set_ringparam(), mlx4_en_set_rxfh(),
+  mlx4_en_setchannels()
+- bnx2: bnx2_set_ringparam(), bnx2_set_channels(), bnx2_change_mtu()
+- gve: gve_set_channels(), gve_set_ringparam()
+- ena2: ena_set_ringparam(), ena_set_channels()
+- (non exhaustive)
 
->> [...]
-> 
-> Thanks
-> Nicolai
+These drivers destroy and recreate queues during configuration
+changes. If a NAPI was threaded before destruction, during the
+creation, a new kthread will be spawned for the NAPI.
+
+Some drivers do not have this problem, e.g. fbnic, netdevsim. But
+these drivers and the drivers mentioned above will still lose kthread
+during link flap (ndo_stop/ndo_open).
+
+Because the kthreads before and after these configuration changes are
+different, all the attributes associated with the kthread are lost.
+These include CPU mask, priority, scheduler policy, etc.. If the
+threaded state is preserved for a NAPI, it makes sense to want to
+preserve the attributes of the thread as well.
+
+Link: https://lore.kernel.org/CAAywjhR0TPKZ-xzqjSP709OVmZWUisDNv2CVc_VxgOrXRtop+g@mail.gmail.com/
+
+Shuhao Tan (2):
+  net: Save kthread of threaded NAPI in napi_config in napi_del and
+    restore in napi_add
+  selftests: net: Add kthread preserving test in napi_threaded and
+    busy_poll_test
+
+ include/linux/netdevice.h                     |  13 +-
+ net/core/dev.c                                | 151 ++++++++++++++----
+ net/core/netdev-genl.c                        |  12 +-
+ .../selftests/drivers/net/napi_threaded.py    |  41 ++++-
+ tools/testing/selftests/net/busy_poll_test.sh |  24 +++
+ 5 files changed, 203 insertions(+), 38 deletions(-)
+
+-- 
+2.54.0.1136.gdb2ca164c4-goog
 
 
