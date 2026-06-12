@@ -1,175 +1,312 @@
-Return-Path: <netdev+bounces-298775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298776-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id I43YIqJULGoUPgQAu9opvQ
-	(envelope-from <netdev+bounces-298775-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:49:06 +0200
+	id nQXJMwRVLGoyPgQAu9opvQ
+	(envelope-from <netdev+bounces-298776-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:50:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E653D67BD86
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:49:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F8B67BD9D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:50:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=QtirE67P;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298775-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298775-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=multikernel-io.20251104.gappssmtp.com header.s=20251104 header.b=HralDdkV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298776-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298776-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21BFE30BB52D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:49:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA795308F353
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC5D36C9EB;
-	Fri, 12 Jun 2026 18:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DCF3624B2;
+	Fri, 12 Jun 2026 18:50:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33C033BBB1
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 18:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF17306764
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 18:50:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781290140; cv=none; b=ZFSocL/xGLmhiqcto5l6+0mWI7i2I6LBcaMtsSD5nFQXAkUGumyJQmLJrAZ5MA9QKVA/Rgq16h6YiJb5wPEfACG7D7ESrVDwYZM4GspYyCRgUZb+DC3tR0WSPZcbX+Ox7SAAYwsEsDqAb2pl7Y7dOt9KleDptaJsLjg3KT+M4Jg=
+	t=1781290242; cv=none; b=lSZ0Jr+JY+XVVJNpYEWmiK08hsfHMfX17zPNvB0V5p96Fm4bOi1k1I+ktAgT/1k4ZP8yKqYwcmpg1r8gJQWyuphoPkXdaBnxb0n0iA+P87YzT3u7tPQSEhaOzCkjV0e+147Yxe2TgFHx/MlqvX8OXm5lZNtnoTFtqo73HZL2AQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781290140; c=relaxed/simple;
-	bh=y+YFgf2hGWUgiLxOKrTXIYTGrKlqIDDKqbWS8HcgkYU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=CX8qVc9E/ahbvGKoSVySlP7FqmFAm2Vpwk8c7PGgo6dwkU1a/klZsphOaowWEOvqgH0ZwRkSu4OWaz+pllDitdq4iIuaRrWf3R8KuOYx6OHjsdVXfXyzdqpdfDA2coWEZdpwDHZ8RbtQaOhAPJYWpPW+Iso2kCQO+WRGhjGDdDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QtirE67P; arc=none smtp.client-ip=209.85.221.45
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-45ef56d9b67so1034442f8f.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 11:48:58 -0700 (PDT)
+	s=arc-20240116; t=1781290242; c=relaxed/simple;
+	bh=cH0sbHpGDI2zSSn4EEZ3+++ongnezOXwOw62K6eWxFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p2Q+Lq2Zi8ChLGb4zPv7xWYLpzDSADrg5VrTDxXp4MVS4h6rQdepZVXbr8qar7ExKm6I+hVfTi4z8rhJUJRIauhhJHvB3QswKdCXrA1+EKVdfNRziVQ7gb7HODBoO1unp633htUhS7Eun8F/bGUl6BpQbVmLxeR6IHUCOVN6tXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=multikernel.io; spf=pass smtp.mailfrom=multikernel.io; dkim=pass (2048-bit key) header.d=multikernel-io.20251104.gappssmtp.com header.i=@multikernel-io.20251104.gappssmtp.com header.b=HralDdkV; arc=none smtp.client-ip=74.125.82.47
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-13810b63a1aso2905663c88.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 11:50:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781290137; x=1781894937; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Jeq0BZdLYCausYeWCmY16Fj4+VhF2lVSQzlnxtNub48=;
-        b=QtirE67PxKj4QQmYf7+NBiGK7L6s4ik45OrqtM3YTB3PrBxJpXPBa9aYNtshJcM8DY
-         9r+++mAmxeAvbVc0cHgZIoc6IvfGZz1yfzFRbgQJ/+idGGdxGKIdV2ANn6SLsWByuctC
-         FlJrE8tQ/nRjw8iPXD/VQLcvXxbKGeNVsVbh0nky/A4r+yAIoTjNHQuGFDO2xg0Qfx7B
-         IxpooTZ9c+4k3/VAcnNvM3q5Q+3yK1MVXjDBfTnRs7KyMYsO6gqUSGoIljQ+dPf5XQjL
-         jPe4BcdSPcKqud+VVzdVLOWVqA/WU/l2/ZYml9jTTULwBe5Nnd247LcDRFQ+3d2+6TtT
-         AZgg==
+        d=multikernel-io.20251104.gappssmtp.com; s=20251104; t=1781290240; x=1781895040; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z5loRl3eYzvVf7VQj1JR5txRoZaeLRgFG2nXkMFwavg=;
+        b=HralDdkV9tzSH0vGsT7ivAjB6EBmUewSQnyGoZcWG73aFnHhphoz5Vdt662CrQri2k
+         65bs/jM6l7Q62qunfTK3Rzf9VIwP+YXqhI5ohUvxGYxcbhNBvG2gIGyjaclPQBbVi8Sf
+         9CFGDsRDCz4LxRggeMu6QP3GXAe+L5lJ2A05BhaBTO5pWXRr5h1f5rc+t4F7jR3UIN0O
+         NCrSU6w+eqMjCfPO8HkEZbOlVCZmSRYO7jYzzFPcS5rE+Yaax1cBc3v2PC1OXhW+Tkxe
+         YGmXbmgBspYT/9YtAojuF5R9lG3InxKNzihM/ankdHoHV29E95dzFXKBeX0RVDnQnQlB
+         +arA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781290137; x=1781894937;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jeq0BZdLYCausYeWCmY16Fj4+VhF2lVSQzlnxtNub48=;
-        b=KTti8wlY0DS+eWfNocsH1dOximYEmlndqqFTEdNE9xzB72ltIK/3sxUBCra8cdW4YZ
-         W1AnUc9THPi5PofQoh+CI4om7dE/Jo0khfoTSGB/BpA9Or6TzRxFtqqqF1PweMfUbc8E
-         D2l53KobFa1YsSDh7H3fF3rpsnUo7xyzdP1KU+TSAx4KxD96CCz62uTlNsVXy6R8KcRj
-         hTugN9ibM7AAmYE/Al0Yg7U50wShH4NAfB0Q0+GCMLnvDd/6MfwW2LukVgXI1fZtoEkc
-         mv60wQOnuZkEtEiY0/3gsjySJEBuy+U3rdsBluSuTA7ClOZ9RZ8diNAz/Dy3qWbEbNgO
-         RKIA==
-X-Forwarded-Encrypted: i=1; AFNElJ/AH3gyrRvEafd4diXfY+GAOYBdOPyLWXPW/ZrY0RQE6VwUc6ofllqcCKAtf5zcweCxFZzBMHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhflcnXuTrvTOO2ggOZUVxe1UShLmqQVApidECgB/dXQToR9Hm
-	kCQUfWCEbS4dRUOtnGG6p5tUovHjxCWxhCDCKrU4KEZWGSl280XggLQt
-X-Gm-Gg: Acq92OFlCNwMJqE9FJ4Nyku4J9fErOIovLhJUShaqiFYJO35JgQIrJPb48yaNjfGpyv
-	7E1mNk+He6IS+IuES9Yqp1LnCvfDGX9p4xVP/R+RYNC3Lax7rJMYUZ017tv35dcAxcvs0nUtlh/
-	1vc3KyzoTAznOhbl9HgmvjMTkvkrYVtHMqe6ePpTgq44wd0gS8RLSr2pLpr6Gr/zhkKZPxEaper
-	TBHgwCVT6KWMZMVTnRB2UQxvpfq9Ujw+ondPKNIXpYKG/zBMg1Mk7Yl5WC5jlRc6SISeBI96DeG
-	t61XGoNN0PsocHiadGeTTcZS+Rq+xQ+vzCLF2xfb8Uw2XslYmJz49/OTXPJLf+4lSUgXNZoA+bl
-	G+uZj95sr+vI7SwrCUR3ozUl87nZJmZnyikHw2w1ck7bb92BLAX7T0IEtnNBtCRH6AcFvCCfeCS
-	ok/9qY3EG52zg3bvT3AZ2umFIgQlN11Kyct2Ci4yExyhqOUiCS/X8YqBf+1+/9BpTbMAWCuoIpr
-	OU=
-X-Received: by 2002:a5d:5d83:0:b0:452:11f9:bc40 with SMTP id ffacd0b85a97d-46074a87c47mr532655f8f.2.1781290136967;
-        Fri, 12 Jun 2026 11:48:56 -0700 (PDT)
-Received: from ?IPV6:2a00:1fa0:742:25a:e03e:6c9c:49d8:2fee? ([2a00:1fa0:742:25a:e03e:6c9c:49d8:2fee])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2b0bbfsm8064894f8f.23.2026.06.12.11.48.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2026 11:48:56 -0700 (PDT)
-Message-ID: <edbdee99-3cfb-48e6-8fb9-bb8418c4e852@gmail.com>
-Date: Fri, 12 Jun 2026 21:48:53 +0300
+        d=1e100.net; s=20251104; t=1781290240; x=1781895040;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z5loRl3eYzvVf7VQj1JR5txRoZaeLRgFG2nXkMFwavg=;
+        b=jOtLIYL3fw9I183NumBIsu6wvYDNVGNZv+4rXkiUX212pLQKbuZlCOEeWDdwsgbzbH
+         Cv1JXdfVcG31iAL4oZcJQPmFXBifv8TuVK+bhsVUiqoIPiG9FXKc4ufx3CtiJ1PDvLVy
+         xnnpLCuifiZCL+PkvJRYXR1J3YilwmoFUJygRPA9Jmvoo/O+6l3z+AeuDpUd0hadOiK5
+         NGBp9VXmPjxqipxef6hIfx+BqeZlC74UxhPEFKe21LsGbrqS+NscVjFZGRKOSKKsXFQC
+         Vl/7U/sVZKG74DJa9qsrHb+VOoqVlMDu42SHY3PHcxaQmIDK/DdwPxODkBUoGzfA5INl
+         DzjA==
+X-Gm-Message-State: AOJu0YyZnTI3XTtE2Z/EbuCbCTwMa42qJQhvRBZ70VEJDi2bOdQwBtar
+	pAFfxug4ZcyqRCpxzwjccY6d/py2UZElkd/lmYIXJ0fnC5o9oQkJLIadGT4SrlUv+WtCI1R5KoK
+	ni9MPwwdqsg==
+X-Gm-Gg: Acq92OFOgnXzZpJmYSaFjhM+rzADV0rYFdFXCe3vpol9JaKxFIjqqsKRW9QaxuFWjPD
+	0EsqYK9pxZqrQ7wiN5oFO2wXn5KoD7LVVr2oWLFrBknia67wmUntySeK8WWQrJnn1YwD5vqEjXW
+	y7y5naYM45hFS+n4w92gfEffu74t4wya5hwTIYapQPIFngMF/PAESzfTvMAEfLYrGSX53JyKbBv
+	8HqtA2H4J9dS0u35eI26faQeXyGSbixLBzDkDoZNvqnU+jtf6Es1Pl3k6PQJtaK//84zvB1c+6O
+	XtWD4K1Zk8AJXDRdg5MzNrIpPIcb3+wFy064E1kstgWV1+Krxid9zad86R5CUZmPeKoMKHWamQ6
+	zwcwyzA3BnEF3QtI3hkooHedffareoGLSZ4W8dnqbbB3O82/gEIkfoPQCreRX/Zs3S0rLF+RJuY
+	cHYhgTFykEca6yl7jnri24SiWHcmmuBXsEfxo7hcxJDamqS0ptygXqbw==
+X-Received: by 2002:a05:7022:79f:b0:137:ea7d:a5fc with SMTP id a92af1059eb24-1384bba7dfbmr2200924c88.22.1781290239578;
+        Fri, 12 Jun 2026 11:50:39 -0700 (PDT)
+Received: from localhost ([129.210.115.107])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1384b8f9889sm3005394c88.3.2026.06.12.11.50.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2026 11:50:38 -0700 (PDT)
+Date: Fri, 12 Jun 2026 11:50:37 -0700
+From: Cong Wang <cwang@multikernel.io>
+To: John Ericson <mail@johnericson.me>
+Cc: network dev <netdev@vger.kernel.org>, Li Chen <me@linux.beauty>
+Subject: Re: [RFC] connectat()/bindat() or an alternative design
+Message-ID: <aixU_RccxS_BKhgX@pop-os.localdomain>
+References: <b1af80fc-a57c-408d-bdfe-fa6bae26eaca@app.fastmail.com>
+ <aicbyQIC2qEveNd-@pop-os.localdomain>
+ <455281ec-3ee1-4f27-989b-c239f0690d8b@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 6/9] net: ethernet: ravb: Add callback for gPTP probe
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
- <niklas.soderlund+renesas@ragnatech.se>, Paul Barker <paul@pbarker.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260610102432.3538432-1-niklas.soderlund+renesas@ragnatech.se>
- <20260610102432.3538432-7-niklas.soderlund+renesas@ragnatech.se>
-Content-Language: en-US
-From: Sergey Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <20260610102432.3538432-7-niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <455281ec-3ee1-4f27-989b-c239f0690d8b@app.fastmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[multikernel-io.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298775-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:paul@pbarker.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[ragnatech.se,pbarker.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,glider.be,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298776-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mail@johnericson.me,m:netdev@vger.kernel.org,m:me@linux.beauty,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[multikernel.io];
+	FORGED_SENDER(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[multikernel-io.20251104.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[cwang@multikernel.io,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[multikernel.io:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,pop-os.localdomain:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E653D67BD86
+X-Rspamd-Queue-Id: 26F8B67BD9D
 
-On 6/10/26 1:24 PM, Niklas Söderlund wrote:
-
-> Different generations of the RAVB IP have different needs when it probes
-> the gPTP timer clock. Add a callback in the PTP information to allow
-> each generation to probe its own way.
+On Wed, Jun 10, 2026 at 10:08:57PM -0400, John Ericson wrote:
+> Hi Cong,
 > 
-> With this the last gPTP specific flag (gptp_ref_clk) can be removed.
-> However the primary motivation for the change is to prepare for Gen4
-> support, which compared to other generations with gPTP support does not
-> have the clock as part of the IP itself.
+> On Mon, Jun 8, 2026, at 3:45 PM, Cong Wang wrote:
+> > Hi John,
+> >
+> > [...]
+> >
+> > Thanks for bringing this up.
 > 
-> Gen4 will not need to compute GTI value as it have no where to write it,
-
-   Nowhere.
-
-> as the gPTP clock is external. For this reason move the computation of
-> it into the newly gPTP probe specific callbacks for the RAVB IP's that
-> support it.
+> Sure, thanks for replying to me!
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> > I have no doubt connectat()/bindat() helps closing TOCTOU for Unix
+> > sockets. However, it would be nicer to describe your use case here,
+> > especially what the problems are without it. This would help more to
+> > jusify your proposal here than just getting aligned with openat() or
+> > BSD.
+> >
+> > Hope this helps.
+> >
+> > Regards,
+> > Cong
+> 
+> Yeah, happy to talk about that. Hope this is not too long a reply!
+> 
+> First, for some background context, I am a developer of the Nix package
+> manager. And this, plus my own personal taste, always has me thinking
+> about ways we can run processes with fewer privileges. The
+> no-ambient-authority capsicum/cloudabi/wasi/whatever dream has lived in
+> my head rent-free for many years :). Now these days, with LLMs, it feels
+> like these nice-to-have yak shaves of mine are finally worth dusting off
+> and striking off the bucket list.
+> 
+> Also in recent months, we Nix developers have been putting a bunch of
+> work into using more `openat2` and friends, and I have no doubt that we
+> will continue down this path (even on Windows!). We aim to be an
+> exemplar program for following the "always work relative to a file
+> descriptor" discipline. It's good for security, but also makes for code
+> that --- I believe --- is just more elegant and nicer to read.
+> 
+> ----
+> 
+> Nearer term use case: slightly less ugly long path socket opening in
+> Nix:
 
-Reviewed-by: Sergey Shtylyov <sergei.shtylyov@gmail.com>
+"Nix needs it" is a much better justification than "BSD already has it".
+:) So please add this to your patch description/cover letter.
 
-[...]
+> 
+> If you look at [1] you can see a PR I've asked my coworker to draft to
+> improve binding and connecting code to cope with longer file paths,
+> something which does come up in practice when we are running multiple
+> tests with multiple daemons in parallel.
+> 
+> Now, I think it is safe to say that this code was already quite complex,
+> and in this patch only gets *more* complex. The current interfaces make
+> supporting longer paths quite annoying. (Though, once we remove the
+> `open` and switch to an `*at`-style interface in the wrapper (if macOS
+> lets us), it will get less bad.)
+> 
+> So the first use case would be getting something nicer than the
+> `/proc/self/fd/<N>` dance the linked code falls back to. It is good that
+> `/proc/self/fd/<N>` exists for legacy code, but it is an unergonomic way
+> to do file-descriptor-relative paths, and should be a fallback, never
+> the first choice. A real fd parameter along with a regular path pointer
+> would buy two concrete wins:
+> 
+> 1. A clean, separate file descriptor parameter, the way `openat` has one
+>    --- rather than assembling a `/proc` path by hand.
+> 
+> 2. Normal `PATH_MAX` room for the real pathname, rather than cramming
+>    `/proc/self/fd/<N>` (plus any residual path after it) into the small
+>    `sun_path` field of `struct sockaddr_un`.
+> 
+> ----
+> 
+> Longer term use case: anonymous listening sockets, avoiding advertising
+> sockets to potential clients using ambient authority mechanisms
+> altogether:
+> 
+> Some more background: I think this whole business of listening
+> unix sockets necessarily living in the file system is a bit silly, since
+> there is nothing to put on disk --- it's just a mechanism to communicate
+> to clients where they should connect. Now ostensibly, Linux agrees ---
+> that is why Linux's *abstract* Unix domain sockets were created. But I
+> really don't like this because we have just replaced one ambient
+> authority contraption (the root filesystem) with another (the abstract
+> socket name space in the network namespace). The problems with ambient
+> authority remain all the same (and indeed, our experience with Nix has
+> been that network namespace unsharing when you do want to do some
+> outside world network access is much more work than filesystem namespace
+> unsharing).
 
-MBR, Sergey
+Indeed, it would be very hard to change since it is coded in UDS API since
+probably day 1.
 
+Just curious: any reason not to use TCP loopback here?
+
+> 
+> What I would really like to do is go further than what I proposed, and
+> separate the binding of a unix socket from the placing in the file
+> system.
+> 
+> Today, with only existing UAPIs, the closest you can get is a scratch
+> path you pin with `O_PATH` and immediately unlink:
+> 
+>     /* server */
+>     int lfd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+>     struct sockaddr_un a = { .sun_family = AF_UNIX };
+>     strcpy(a.sun_path, "/tmp/scratchXXXXXX");
+>     bind(lfd, (struct sockaddr *)&a, sizeof a);
+
+Any reason not to use abstract socket?
+
+       abstract
+              an abstract socket address is distinguished (from a
+              pathname socket) by the fact that sun_path[0] is a null
+              byte ('\0').  The socket's address in this namespace is
+              given by the additional bytes in sun_path that are covered
+              by the specified length of the address structure.  (Null
+              bytes in the name have no special significance.)  The name
+              has no connection with filesystem pathnames.  When the
+              address of an abstract socket is returned, the returned
+              addrlen is greater than sizeof(sa_family_t) (i.e., greater
+              than 2), and the name of the socket is contained in the
+              first (addrlen - sizeof(sa_family_t)) bytes of sun_path.
+
+
+>     int addrfd = open(a.sun_path, O_PATH | O_CLOEXEC); /* pin the socket inode */
+>     unlink(a.sun_path);                                /* nameless now */
+>     listen(lfd, 64);
+> 
+>     /* client, handed `addrfd` -- but still has to *name* it, via /proc magic */
+>     struct sockaddr_un c = { .sun_family = AF_UNIX };
+>     sprintf(c.sun_path, "/proc/self/fd/%d", addrfd);
+>     connect(cfd, (struct sockaddr *)&c, sizeof c);
+> 
+> So even though I hold the socket by descriptor, I still route a pathname
+> (`/proc/self/fd/...`) to reach it, and I have to deal with the
+> `/tmp/scratchXXXXXX` proper temp file usage.
+> 
+> What I'd actually want is to sidestep all those nuisances entirely.
+> 
+> The important piece is a `bind` variation: like binding an abstract unix
+> socket, except that it publishes no abstract socket name, so the *only*
+> way to connect to the socket is to be given an fd referring to it.
+> 
+> A matching `connect` variation is more of a nice-to-have: it lets a
+> client connect straight through that fd, rather than having to name it
+> via `/proc/self/fd` as above.
+> 
+> Put together:
+> 
+>     /* server */
+>     int lfd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+>     int addrfd = bind_anon(lfd, /*flags, for the future*/0);  /* proposed: no filesystem or abstract name */
+>     listen(lfd, 64);
+> 
+>     /* client, handed `addrfd` -- connect straight to the descriptor */
+>     connectat(addrfd, cfd, NULL, 0, AT_EMPTY_PATH);   /* proposed */
+> 
+> I would use this *a lot*! First of all, in our testing code, I would use
+> this, and not even bother (on Linux at least) putting the test daemon
+> socket on a (probably quite long) path; I would just rig up the test
+> harness to pass the fd to the client process with an environment
+> variable (local not global naming!) indicating to the process which file
+> descriptor it should connect to.
+> 
+> If that sounds vaguely like systemd socket activation, yes it should.
+> Socket activating *servers*, as we do today, is great, but I would also
+> modify my init system to pass these listening sockets to *client*
+> services. At that point, servers should ditch any sort of `getsockopt`
+> authentication (which they are likely to implement incorrectly or in an
+> ad-hoc manner), and instead rely on the init system to make sure only
+> services/users which are authorized to connect to a given server have
+> been given its listening socket file descriptor.
+> 
+
+Thanks,
+Cong
 
