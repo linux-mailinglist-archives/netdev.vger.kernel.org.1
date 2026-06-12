@@ -1,264 +1,153 @@
-Return-Path: <netdev+bounces-298434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298435-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5It1B35oK2oQ9AMAu9opvQ
-	(envelope-from <netdev+bounces-298434-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 04:01:34 +0200
+	id tOB/MpFoK2oV9AMAu9opvQ
+	(envelope-from <netdev+bounces-298435-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 04:01:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3D6676393
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 04:01:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD0667639A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 04:01:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=OHsH3lT0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298434-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298434-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298435-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298435-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E95E03004D82
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 02:01:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B329E3007BB2
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 02:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C9E189B84;
-	Fri, 12 Jun 2026 02:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FBC23D28C;
+	Fri, 12 Jun 2026 02:01:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411E51C68F
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 02:01:25 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781229687; cv=pass; b=ivvbKEx4e6lp00HYtt68FggZfWKhEIb6oVoRtf6ZYIitOXsdDQ3W+MayhhCaaiQJZ/BN8Mk0Tw43D1GgicLZRgur/dhEotmiMwvBoC7WCRTBhedNIUPE6Ge9rkvp6bgl01WZYPhjSWTGTa8L4CuHzcofyh8/I+lRjqthjxbuITk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781229687; c=relaxed/simple;
-	bh=9cVS4+/pTMcP4zjSNNOOJgnzi7lXmd/1/ObEp3xoFAA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CwBp0Vs8DmIgkDK448XHimt+js6LEYcPDCqVkGa0E1btiXS5YGCvVfV8ErDycDui/3H2GE395LuDSiNSsvFsVF3aQ2m1Y/p644M252bcXJ1+EwXxuOPrYuZZeOAR+P7nHfm5d4BHzNtz+1feuiWyV1mmHoJltqSp1IChr5va4ZI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OHsH3lT0; arc=pass smtp.client-ip=74.125.82.179
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-30807ba471bso1462701eec.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 19:01:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781229684; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BcELYP0ZqKBCRTZfkJEJMrFPz3v0covkemJ2OCCmUYJeg2jCgzoYMaVnqKurJWXgyz
-         PX68wuQSNhu7lxwgkDUycln4Bi2c7xV+bMVk0TG/bp9HW99rW4MRsrd7db2gmlDv8mqQ
-         DKZKPbYvkBR73P7vTIH2xZQNixuFUKt6Lb0VH/CCrXXk+DDlLUrsrnY47xU6bOAO7Hcc
-         3QWIqbRbv6TY9bMqaY+30RZr0twRUNosYCoun24ytNLqtyQ5LTYGwtS1cu/ZgHiE8tsN
-         WAiZUipMVmyiX7R+CBDf1DrYvoRE6AZqLi598cdvL8DMX2zNI/FC0thSCP609eqXqRBL
-         ymOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Ft2W5RB58Rb4Slw9wZsgp63p3M0qZU00EzOvBiQY7/8=;
-        fh=z9+Mm0lKDKjPJ1BPaXtUSjRP6TkzWYdswQGpb1+v6EQ=;
-        b=J4B57JVkXiXqwiNc6OBRGkjWhhf5pQ8PGVipJv4ktGe0Wy0hHMZK+xPGwF5GENKk76
-         khf+JmL4EU6Pt8LTow6IcHzKVtrHRCkDOZEhc5/W740wPP9/JexWFa/nnag7l0UzADP2
-         32z0TQAMdZFlU4NEqeRIyYzfNi+fWPGl7p4BRmUvZv5WfcHPmn6NWxotRFhElXkjsmdh
-         LugF7fbYlN2q4OO4J4pPkt+iDrH1fRK8H62VLbara0RS7lEq/zVx/3E1MlWKvwyvT478
-         0g5bXIy9Q7mJwZYx+WBRDfg0gJwuV/cSsBVPcGwqmPDJBu4/96KtpMBYN/HQP1l8/qvx
-         8UdA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781229684; x=1781834484; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ft2W5RB58Rb4Slw9wZsgp63p3M0qZU00EzOvBiQY7/8=;
-        b=OHsH3lT068+eoc7CEqSwQpETrdT7/YK98IJZq7cD/IgNvf9vA/OqKRcSiO3FCIjvRb
-         y3PsY4cV6wHzO26apiIgmwVv6ULf5Vbbw3DlsNW8rBqQhVC1hSnO4rf9QlyVjGSKkH1w
-         msH+fOBGkUGLvwGQ4Q6BHE6rBiVRhb3Jy7fGGt5fUgbRW/Xms3z1sMbVpOlhSALXKI1a
-         hnIwj4EzBG65fhUlekcBZo823a3T3x8EBsw2LoRHSWwBQiQ3OwO4Odr7nDJrtvM5eHNZ
-         7LTWPK6Qk+fT/D48FCC6JA1AQWspSM4mwuM8INgIpgSmFHCDZ8goTuhNd2zucFA0q2r4
-         nrJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781229684; x=1781834484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ft2W5RB58Rb4Slw9wZsgp63p3M0qZU00EzOvBiQY7/8=;
-        b=Swto+2wklrQ+QG7qNO7lwOAyRhwK3vj8wHtUw32pyKjnolp1EyljYnHu9fl7bWlRlh
-         zuE3wUEAQ0iJc1oh9vbLQuypVaL46jr1aUXojf+goTQZyGZJGA6YD0CIP986O8X/JYlK
-         NgDtFRHb6i71Esq+mySGsmPTUyYMA6TdGcYnZut/qkw1i2n3zmv5WDfUFDG6prSspu+L
-         Pzwd5KQssTHMSuhT+Xdor4H473Hz6QmqdkeFHovR1yKKsh5TFUGX/3r6yW0kAe6IodZF
-         u6vJPF3AwxF172hL/v2df8JUqAMmqFtkujtrDuSm9Ya8+6fww4eYpBPqpmpKZzu1E63o
-         mxKA==
-X-Forwarded-Encrypted: i=1; AFNElJ+c2eQBT/ke2JIdh1NpD3iRsKvDFIz0S2WtfRzblk1nVXDjqQx0P7kskE4Htdkaiw2PXpHcZ2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9YLSQIUpgq16Oks18EzBTEMqof+qXuOkvnQG4JNFaZl6abUFM
-	4ycsmeHmtkZe32Aaft0duRIwfP4ffzoG6yeHU5RotvjWxczByWr5p12kp/u2DdTXIoa02OFNyzi
-	TrCRoFHD11DZenpa62ss76nX3ssYf57VCnPrE1fBD
-X-Gm-Gg: Acq92OGgkpbOvOn4ivrKdPuwtQartucTwvuVCYiT+30dLYnOaT+hpGYzrz4iHOS1LX/
-	+2WouojpBwJ16JVNmeR8gC6OV45/00IZqC5+RHkuVZI4rL8s7J83n4J+pfm7+40ZcriLwya6b4l
-	NQ+4YiKOfHKC4yIZPr/t2GS7WBXsuyNSATPJoXC+43UQySTeEmSyyOXlWjMcn5LKotkOk5o3iof
-	VIh+ZP+NMVdpAdFbbewo69ViwR7IRnK1EbVQLqNdEu13HQ19qel/S/ScQmrh4jlnoUTPjAGBQrV
-	GzI/zIGAMzbwRx0QH/UW+sdEwpMYE0Zhx3s/niM0JRzvXuH9SH3RiEJnikxNdPoiOJLJTxDKoBR
-	UEbZrSkcQCkvF1i82l4P+pY62CNUvqeNvIZWqu6UOikoon/Udow==
-X-Received: by 2002:a05:7301:4b17:b0:2db:2089:460f with SMTP id
- 5a478bee46e88-30820054a9dmr562424eec.19.1781229683424; Thu, 11 Jun 2026
- 19:01:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095071C68F;
+	Fri, 12 Jun 2026 02:01:46 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781229709; cv=none; b=lOsJ5MQ4ADzHPdg1UocYKQDUHzHmRV77XSeJ9vay7Z7papCcQXVANVrLK1xetPwbUk5YYF+zInJgTLx1UX+vA3nrrZI6fBJWF+NZrcQhjAFc/NQPh1yqq3HNa5PTeseIqYBHiLmHjemCJUuNssFKe1j+auo0W4B8RlDz53QiOO4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781229709; c=relaxed/simple;
+	bh=He6/QblW5rhMu1qmOEpGRtr4ZWdWCzuW1bZ56CfRt2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IkwfG9nwQSgG55clz0TM01tJN8Wbv4JOg7Qpcti0TxAkGk0TFahjtT8vkZUAb5MhYV8vhUy3LebD7r2qPztOn7w+TZ89aaXLZlyXkthZToNKr9kXYQvi8D7mT1JoanzKrFdnsSnRsQ9D2xn7CWLYZ3ONaaxYP+j5ZsT3ttlkZNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Received: from localhost.localdomain (unknown [117.182.75.76])
+	by APP-01 (Coremail) with SMTP id qwCowAD3l9B_aCtqcW9bAQ--.10757S2;
+	Fri, 12 Jun 2026 10:01:37 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] tls: fix encrypt_pending refcount leak on -EBUSY error path
+Date: Fri, 12 Jun 2026 10:01:33 +0800
+Message-ID: <20260612020133.11427-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1780979031.git.bronzed_45_vested@icloud.com>
- <42cd30856907350e1b3834a3338364f9828a307b.1780979031.git.bronzed_45_vested@icloud.com>
- <CANn89iKLKNGE0aqyuCdxTBbRGWwAM0vCup+AL02u1UB-LrTvSw@mail.gmail.com>
- <20260611102134.5886fe04@pumpkin> <CANn89iLRKynhu1Qx6Tos+EKd2a5qkYL-tewXBgP+4Mx79FtzTw@mail.gmail.com>
-In-Reply-To: <CANn89iLRKynhu1Qx6Tos+EKd2a5qkYL-tewXBgP+4Mx79FtzTw@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 11 Jun 2026 19:01:12 -0700
-X-Gm-Features: AVVi8Cfwr2IZx43_oxskbRmSyJK3thHzN12IM2-RnVrHXAE8cBSuvHz7TlY6GEA
-Message-ID: <CAAVpQUAH6f0fvvmwxcTuLVzCTzq2Dz8=mzchZg_4B2AHp7y-qg@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net: ipv4: bound TCP reordering sysctl writes
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Laight <david.laight.linux@gmail.com>, Ren Wei <n05ec@lzu.edu.cn>, 
-	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, chia-yu.chang@nokia-bell-labs.com, ij@kernel.org, 
-	fmancera@suse.de, yuuchihsu@gmail.com, idosch@nvidia.com, 
-	herbert@gondor.apana.org.au, yuantan098@gmail.com, zcliangcn@gmail.com, 
-	bird@lzu.edu.cn, bronzed_45_vested@icloud.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAD3l9B_aCtqcW9bAQ--.10757S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Wry3Wr1xZw4xuF4DGw4xXrb_yoW8GFW7pr
+	1YyFnIkFZ8tr15Gryktw1fGF1rZrWrZFW3CrWDu34UWrnxJr40v34akF4jgFyUCFs5Gas7
+	ZF4vkF45CanFyrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAYQA2orLhmVVQAAsv
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:david.laight.linux@gmail.com,m:n05ec@lzu.edu.cn,m:ncardwell@google.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:fmancera@suse.de,m:yuuchihsu@gmail.com,m:idosch@nvidia.com,m:herbert@gondor.apana.org.au,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298434-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298435-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	FORGED_SENDER(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vulab@iscas.ac.cn,m:stable@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org,queasysnail.net,davemloft.net,google.com,redhat.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,lzu.edu.cn,google.com,vger.kernel.org,redhat.com,kernel.org,nokia-bell-labs.com,suse.de,nvidia.com,gondor.apana.org.au,icloud.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vulab@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,icloud.com:email,mail.gmail.com:mid,lzu.edu.cn:email]
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0F3D6676393
+X-Rspamd-Queue-Id: 5FD0667639A
 
-On Thu, Jun 11, 2026 at 10:14=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Jun 11, 2026 at 2:21=E2=80=AFAM David Laight
-> <david.laight.linux@gmail.com> wrote:
-> >
-> > On Wed, 10 Jun 2026 10:04:06 -0700
-> > Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > > On Wed, Jun 10, 2026 at 9:18=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wr=
-ote:
-> > > >
-> > > > From: Wyatt Feng <bronzed_45_vested@icloud.com>
-> > > >
-> > > > Reject invalid `net.ipv4.tcp_reordering` values before they reach T=
-CP
-> > > > socket state. The sysctl is stored as an `int` but copied into the
-> > > > `u32` `tp->reordering` field for new sockets, so negative writes wr=
-ap
-> > > > to large values.
-> > > >
-> > > > With `tcp_mtu_probing=3D2`, the wrapped value can overflow the
-> > > > `tcp_mtu_probe()` size calculation and drive the MTU probing path i=
-nto
-> > > > an out-of-bounds read. Route `tcp_reordering` writes through
-> > > > `proc_dointvec_minmax()` and clamp them to the per-netns range
-> > > > `[1, tcp_max_reordering]`.
-> > > >
-> > ...
-> > > Thanks for the patch. I think we can do better.
-> > >
-> > > Also I do not see a fix in tcp_mtu_probe()?
-> > >
-> > > What about:
-> > >
-> > >
-> > > diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-> > > index c0e85cc171aec099fd5d4897b1a623dd27eaee08..987bc87e255a81680ae5e=
-23ddd01c1f0de4425ec
-> > > 100644
-> > > --- a/net/ipv4/sysctl_net_ipv4.c
-> > > +++ b/net/ipv4/sysctl_net_ipv4.c
-> > > @@ -1058,6 +1058,9 @@ static struct ctl_table ipv4_net_table[] =3D {
-> > >                 .data           =3D &init_net.ipv4.sysctl_tcp_reorder=
-ing,
-> > >                 .maxlen         =3D sizeof(int),
-> > >                 .mode           =3D 0644,
-> > > +               .proc_handler   =3D proc_dointvec_minmax,
-> > > +               .extra1         =3D SYSCTL_ONE,
-> > > +               .extra2         =3D &init_net.ipv4.sysctl_tcp_max_reo=
-rdering,
-> > >                 .proc_handler   =3D proc_dointvec
-> > >         },
-> > >         {
-> > > @@ -1293,7 +1296,8 @@ static struct ctl_table ipv4_net_table[] =3D {
-> > >                 .data           =3D &init_net.ipv4.sysctl_tcp_max_reo=
-rdering,
-> > >                 .maxlen         =3D sizeof(int),
-> > >                 .mode           =3D 0644,
-> > > -               .proc_handler   =3D proc_dointvec
-> > > +               .proc_handler   =3D proc_dointvec_minmax,
-> > > +               .extra1         =3D SYSCTL_ONE,
-> >
-> > Would it be reasonable to put in a 'sanity' upper bound here?
-> >
-> > Since tcp_max_reordering can be lowered after tcp_reordering is set
-> > the bound set here isn't 'hard'.
-> > So the same sanity limit for both may be enough?
-> >
-> > I also found this 'gem':
-> > void tcp_enter_loss(struct sock *sk)
-> > {
-> > ...
-> >         u8 reordering;
-> > ...
-> >         reordering =3D READ_ONCE(net->ipv4.sysctl_tcp_reordering);
-> >
-> > Which makes be think that someone expected these values to be small.
-> >
-> > I don't know what the sane bounds are for either sysctl or tp->reorderi=
-ng
-> > itself (which is u32).
->
->
-> Kuniyuki, can you please send a fix ? You used u8 in your commit :/
+In tls_do_encryption(), when crypto_aead_encrypt() returns -EBUSY,
+tls_encrypt_async_wait() drains pending completions and restores
+encrypt_pending to 1, expecting the caller to issue the final
+decrement. However, if tls_encrypt_async_wait() returns an error
+(rc != -EINPROGRESS), the function returns early at the error
+cleanup block without decrementing encrypt_pending.
 
-Oh sorry, I'll change it to int.
+Since the -EBUSY path never submitted the request to the crypto
+engine, tls_encrypt_done() callback will not fire for this request,
+and the synchronous cleanup path (atomic_dec at line 599) is also
+skipped. This leaves encrypt_pending permanently elevated by 1.
 
+Fix the leak by adding atomic_dec(&ctx->encrypt_pending) before
+returning on the -EBUSY error path.
 
->
-> Default value of this sysctl is 3, but it could potentially exceed 255.
->
-> Thanks.
->
-> commit 46778cd16e6a5ad1b2e3a91f6c057c907379418e
-> Author: Kuniyuki Iwashima <kuniyu@google.com>
-> Date:   Fri Jul 15 10:17:49 2022 -0700
->
->     tcp: Fix data-races around sysctl_tcp_reordering.
->
->     While reading sysctl_tcp_reordering, it can be changed concurrently.
->     Thus, we need to add READ_ONCE() to its readers.
->
->     Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->     Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->     Signed-off-by: David S. Miller <davem@davemloft.net>
+Cc: stable@vger.kernel.org
+Fixes: a9b8b18364ff ("net/tls: fix use-after-free in -EBUSY error path of tls_do_encryption")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ net/tls/tls_sw.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 964ebc268ee4..97cfe06b1529 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -591,6 +591,7 @@ static int tls_do_encryption(struct sock *sk,
+ 		 * below on error, just remove the record and return.
+ 		 */
+ 		if (rc != -EINPROGRESS) {
++			atomic_dec(&ctx->encrypt_pending);
+ 			list_del(&rec->list);
+ 			return rc;
+ 		}
+-- 
+2.50.1 (Apple Git-155)
+
 
