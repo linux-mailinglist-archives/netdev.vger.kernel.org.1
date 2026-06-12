@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-298653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298654-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lWWAIDkFLGr2JgQAu9opvQ
-	(envelope-from <netdev+bounces-298653-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:10:17 +0200
+	id mS7xIrsFLGomJwQAu9opvQ
+	(envelope-from <netdev+bounces-298654-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:12:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7802679A64
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:10:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6EFA679AB1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:12:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=f5Vbkv83;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298653-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298653-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linux.dev header.s=key1 header.b=kihALc21;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298654-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298654-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D935302DFB3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:10:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6FA7311BE52
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DB93E5EF1;
-	Fri, 12 Jun 2026 13:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5DA3C8708;
+	Fri, 12 Jun 2026 13:10:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C1B352017
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5813630AE;
+	Fri, 12 Jun 2026 13:10:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781269814; cv=none; b=tPr2hoICycYKh63v6Nl7PBeqKVPRig4WSXQv0b9XIrLlSmwDef++OlY8fDHasklJYkqeQbdDaCAkyHAtTvYMRAFvd1MamoO5qLw8hHk6bdagKnGoFYLvvDtSHULL+RScKPLpddUoZkhbIW60onarFzbo+2A7o/pF809JgRZ9d0k=
+	t=1781269834; cv=none; b=HKFHvUTdRw2ODH8YYA0qhKp37QSQ1QcnxeV8pXyKjFlgzfd/KsAT7JQBbhXhY9GIzVMJAPLdK8Lp4tznoq1VpxHS0/Qtorf++qRtMblmlhz2WV4NupboxAfvyzI8AJzdxiLUsiEBn0Beb3tYO2SbRW3OvrXQLtszCnmP1PMOi8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781269814; c=relaxed/simple;
-	bh=XbOAUH8WytbqjJf9mEkN3aInkJAhMWRdnUnVGUdY6KU=;
+	s=arc-20240116; t=1781269834; c=relaxed/simple;
+	bh=T7WTtQncrx2W3vrD+NN+RSar96YHpVnJWI0UZ09CLNs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uxl3NFwUOjEu7Wyequi3g39tJPgrGngq93sTEdrwWF/thQVO08GSOxCsWhMF3q5EHyxhyWddsFLv9TQaiCxUX70m9SwW5NPALlv4Gf5kA6QeBRs5l+zB039LM98wSRYAx+Fw29WPDzOqj+yvcxa6ml4tXbbOf6+ZTu4o1m8Mvbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f5Vbkv83; arc=none smtp.client-ip=91.218.175.184
+	 MIME-Version; b=NPSQ8D3ijyGODx3qr5KhofUjL2a3DOG8zqlSk55mIbU8Dj46629bYAajtHUzUdKkuAXSEKfW1szHMM784t+anBmhPEv0Lu+rV5r2A+jE4XQqRPzIpvGUqr250LB4xzFMGPt+c9AtjEIN71Z1vYmOPGp9uU2peRJEtxoQrmD1tMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kihALc21; arc=none smtp.client-ip=91.218.175.177
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781269811;
+	t=1781269830;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6XXGieA2RvXVOHyZqSrDmHdDLXTrUoXN/n+L6EQb3E0=;
-	b=f5Vbkv83237tLq0igmnAYC+JxfLDO4gB1mqRF0BDy2dNoL8DuIwH8/pMD0H12f02LDsBDb
-	YRJMlyVYf/y6v8UyUjq7qFFgx1qOi1aOJjAgfh2XsbyzjH4NkrpbWIoGH823HOYwYZamib
-	lnUDIkgZqssxzl1XLt4f/jkSsNpcF1I=
+	bh=9osiR+wejlHOHqtIIsmuWrRyuWCJR1wPh5cgThKEz9s=;
+	b=kihALc21ZRiXlB+TvdergDkP8Bo9HrAsUk1ttjT9aR++pOCDMw1bIhxM/XSZTSwa3up/zx
+	ICHjlUa/kCnxRqw4v4MVBr+9DVteS4FQn/B2D3XKUWh/iIRyZ8/L8zJiya3vcEXXSB8eyw
+	WE6IvtRDW2bPdSFUObM8f7LBEHrcKnQ=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: Weiming Shi <bestswngs@gmail.com>,
 	Xiang Mei <xmei5@asu.edu>,
+	Xinyu Ma <mmmxny@gmail.com>,
 	Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -70,15 +71,15 @@ Cc: Weiming Shi <bestswngs@gmail.com>,
 	Jakub Sitnicki <jakub@cloudflare.com>,
 	Shuah Khan <shuah@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
 	Sechang Lim <rhkrqnwk98@gmail.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
 	Cong Wang <cong.wang@bytedance.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v3 2/7] bpf, sockmap: Fix wrong rsge offset in bpf_msg_push_data()
-Date: Fri, 12 Jun 2026 21:07:46 +0800
-Message-ID: <20260612130919.299124-3-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf-next v3 3/7] bpf, sockmap: zero-initialize pages allocated in bpf_msg_push_data
+Date: Fri, 12 Jun 2026 21:07:47 +0800
+Message-ID: <20260612130919.299124-4-jiayuan.chen@linux.dev>
 In-Reply-To: <20260612130919.299124-1-jiayuan.chen@linux.dev>
 References: <20260612130919.299124-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -97,16 +98,16 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298653-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298654-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:jiayuan.chen@linux.dev,m:emil@etsalapatis.com,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:rhkrqnwk98@gmail.com,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[31];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:mmmxny@gmail.com,m:jiayuan.chen@linux.dev,m:emil@etsalapatis.com,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:rhkrqnwk98@gmail.com,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -122,69 +123,52 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,etsalapatis.com:email,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,asu.edu:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[etsalapatis.com:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,asu.edu:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E7802679A64
+X-Rspamd-Queue-Id: D6EFA679AB1
 
 From: Weiming Shi <bestswngs@gmail.com>
 
-When bpf_msg_push_data() splits a scatterlist element into head and
-tail, the tail's page offset is advanced by `start` (absolute message
-byte offset) instead of `start - offset` (byte position within the
-element). This makes rsge.offset overshoot by `offset` bytes, pointing
-to the wrong location within the page or beyond its boundary. Consumers
-of the corrupted entry either silently read wrong data or trigger an
-out-of-bounds access.
+bpf_msg_push_data() allocates pages via alloc_pages() without
+__GFP_ZERO. In the non-copy path, the entire page of uninitialized
+heap content is added directly to the sk_msg scatterlist, which is
+then transmitted over TCP to userspace via tcp_bpf_push(). In the
+copy path, a gap of len bytes between the front and back memcpy
+regions is similarly left uninitialized.
 
- BUG: KASAN: slab-use-after-free in bpf_msg_pull_data (net/core/filter.c:2728)
- Read of size 32752 at addr ffff8881042f0010 by task poc/130
- Call Trace:
-  __asan_memcpy (mm/kasan/shadow.c:105)
-  bpf_msg_pull_data (net/core/filter.c:2728)
-  bpf_prog_run_pin_on_cpu (include/linux/bpf.h:1402)
-  sk_psock_msg_verdict (net/core/skmsg.c:934)
-  tcp_bpf_send_verdict (net/ipv4/tcp_bpf.c:421)
-  sock_sendmsg_nosec (net/socket.c:727)
+This leads to a kernel heap information leak: stale page content
+including kernel pointers from the direct-map and vmemmap regions
+is transmitted to userspace, which can be used to defeat KASLR.
 
+Add __GFP_ZERO to the alloc_pages() call to ensure the allocated
+page is always zeroed before it enters the scatterlist.
+
+Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
 Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-Reported-by: Xiang Mei <xmei5@asu.edu>
+Tested-by: Xiang Mei <xmei5@asu.edu>
+Tested-by: Xinyu Ma <mmmxny@gmail.com>
 Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
-To sashiko:
-
-Regarding bpf_msg_push_data() reading "copy = msg->sg.data[i].length" with
-i == msg->sg.end (appending at the very end of a full/near-full ring):
-
-This is pre-existing code, not touched by this series, and reproducing it needs
-a narrow combination -- a pure append at the end so the loop exits with
-i == msg->sg.end, a full/near-full ring, plus a prior push/pop history that
-leaves a stale length in the otherwise-unused end slot. A freshly built ring
-zeroes that slot, so copy stays 0. We don't consider it practically reproducible.
-
-Even then it's already covered: the overflow check in patch 1 ("copy + len <
-copy") rejects the dangerous case, and __GFP_ZERO in patch 3 prevents any data
-exposure. Not worth fixing here.
----
  net/core/filter.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 3c8f1cedb217f..3e555f276ba80 100644
+index 3e555f276ba80..6e345ca65ca14 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -2872,7 +2872,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+@@ -2832,7 +2832,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+ 	if (unlikely(copy + len < copy))
+ 		return -EINVAL;
  
- 		psge->length = start - offset;
- 		rsge.length -= psge->length;
--		rsge.offset += start;
-+		rsge.offset += start - offset;
- 
- 		sk_msg_iter_var_next(i);
- 		sg_unmark_end(psge);
+-	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
++	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP | __GFP_ZERO,
+ 			   get_order(copy + len));
+ 	if (unlikely(!page))
+ 		return -ENOMEM;
 -- 
 2.43.0
 
