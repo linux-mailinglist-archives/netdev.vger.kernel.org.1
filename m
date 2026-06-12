@@ -1,55 +1,60 @@
-Return-Path: <netdev+bounces-298553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298554-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LdGGEvjPK2oJFgQAu9opvQ
-	(envelope-from <netdev+bounces-298553-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:23:04 +0200
+	id hxbFK2TQK2osFgQAu9opvQ
+	(envelope-from <netdev+bounces-298554-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:24:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E8267837B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:23:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF94678399
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:24:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298553-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298553-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=fritz.com (policy=quarantine);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298554-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298554-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 71A13300F635
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:22:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ABFD33004400
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 09:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB0E396B73;
-	Fri, 12 Jun 2026 09:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C9935E1BA;
+	Fri, 12 Jun 2026 09:24:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.120])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC21E3988E1;
-	Fri, 12 Jun 2026 09:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034512DB791;
+	Fri, 12 Jun 2026 09:24:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781256156; cv=none; b=kVs+4PnJcD7Q7pWb8+eIgAXlAmWdwFRg9S4TP3YoqWWEpF34m2lJKIVNGWSLtvH2VzTsXdZuDKrJfgo7IudlI/MSxupJpbaevkeY+3GG7Hzcb+nQsp6pxk0CkcRcgLcLZUrCdfidZMRkITCPgBd6tKKReLZaTE7y3JtzH3rayWU=
+	t=1781256285; cv=none; b=LotM0dzQ26ObLC3DalF/KoiOwefL/KX2T9CNowWGEcS/qJCFKO+GwhcdUFR0ToFhej7St+fFKxFJl3VZbplpslKGwhVuAS+VHJTjCpxxj9Ip1F1dVUN/MZu+SNBFgQ6+FfcLpa7jTE9nf0XZjtQOoqVCl2m7CECTk3oi8Y6CB2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781256156; c=relaxed/simple;
-	bh=K+tYxST+ulBMxf4nKUSLyts7S0iIj1/+RRPCekN1hfg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PmNjs8Hqy16kizrPHpnj0orB8P/wiNDgeLgrGiPVAHU6fH+bc8KpzlRc/q4z4EuiEPJr2zh2QcUyOE645vfR49bm+t3HehgGELQLCyugytyCyMtlMSEeH5TzuZV5TTJ1iJhHoW6SpiAPW1cVe8TzbAqXE8nIrxKSzG2QLGUF8l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id A0D6C607E1; Fri, 12 Jun 2026 11:22:29 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1781256285; c=relaxed/simple;
+	bh=IrFLQF1aDx2NJKTYXCLYtxDdYa/7wJ+NTe+JltQynXE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jaufjvD3+Qzc6J3jS6YzlbopCL3DCMMA7UwYIAco/btlDJpH486nzU12LKyS1OEgFOBFG8HdcYq0cQlhubEvd2j6t3EPSP87KWiKyEmA8+hoIbsNC5zMOcJjQt/CPoEhj+GGWuo7Q6ehaZcRCvr56X5vA8s77AA7RO+r0GUU934=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fritz.com; spf=pass smtp.mailfrom=fritz.com; arc=none smtp.client-ip=212.42.244.120
+Received: from [212.42.244.71] (helo=mail.avm.de)
+	by mail.avm.de with ESMTP (eXpurgate 4.56.1)
+	(envelope-from <t.martitz@fritz.com>)
+	id 6a2bd051-044e-7f0000032729-7f000001baf4-1
+	for <multiple-recipients>; Fri, 12 Jun 2026 11:24:33 +0200
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Fri, 12 Jun 2026 11:24:33 +0200 (CEST)
+From: Thomas Martitz <t.martitz@fritz.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH v2 net-next 2/2] selftests: netfilter: add phony nft_offload test
-Date: Fri, 12 Jun 2026 11:22:09 +0200
-Message-ID: <20260612092209.11966-3-fw@strlen.de>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260612092209.11966-1-fw@strlen.de>
-References: <20260612092209.11966-1-fw@strlen.de>
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Thomas Martitz <t.martitz@fritz.com>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH RFC 0/1] macvlan: allow source mode devices along with passthru
+Date: Fri, 12 Jun 2026 11:23:43 +0200
+Message-ID: <20260612092345.2352255-1-t.martitz@fritz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,234 +62,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-purgate-ID: 149429::1781256273-0F7DC962-BC7AC799/0/0
+X-purgate-type: clean
+X-purgate-size: 1636
+X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
+X-purgate: clean
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [3.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	DMARC_POLICY_QUARANTINE(1.50)[fritz.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298553-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[strlen.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netfilter-devel@vger.kernel.org,m:pablo@netfilter.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:t.martitz@fritz.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298554-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[t.martitz@fritz.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[t.martitz@fritz.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,strlen.de:email,strlen.de:mid,strlen.de:from_mime,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,fritz.com:mid,fritz.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 67E8267837B
+X-Rspamd-Queue-Id: 9FF94678399
 
-... "phony", because its not testing offloads, it tests the control
-plane code.  Also test error unwind via fault injection framework.
+Hello,
 
-For a proper test, real hardware would be required given we'd have
-check if 'previously handed off to hardware' offload commands are
-properly removed again on failure or rule flush.
+we're trying to solve a use case on our devices where two SoC
+are connected on the same board, using the only available high-speed.
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- v2: sort config
-     shellcheck fixups
+One SoC runs the main Linux system including the full routing stack
+(FRITZ!OS) and the other SoC implements most of the GPON ONT side.
 
- .../testing/selftests/net/netfilter/Makefile  |   1 +
- tools/testing/selftests/net/netfilter/config  |   6 +
- .../selftests/net/netfilter/nft_offload.sh    | 132 ++++++++++++++++++
- 3 files changed, 139 insertions(+)
- create mode 100755 tools/testing/selftests/net/netfilter/nft_offload.sh
+The high-speed interface is of course also used for the user traffic.
+Therefore we must tell the inter-SoC traffic apart from the user traffic.
 
-diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
-index d953ee218c0f..f88dd4ef8d26 100644
---- a/tools/testing/selftests/net/netfilter/Makefile
-+++ b/tools/testing/selftests/net/netfilter/Makefile
-@@ -32,6 +32,7 @@ TEST_PROGS := \
- 	nft_meta.sh \
- 	nft_nat.sh \
- 	nft_nat_zones.sh \
-+	nft_offload.sh \
- 	nft_queue.sh \
- 	nft_synproxy.sh \
- 	nft_tproxy_tcp.sh \
-diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-index 979cff56e1f5..c3c121b6f300 100644
---- a/tools/testing/selftests/net/netfilter/config
-+++ b/tools/testing/selftests/net/netfilter/config
-@@ -11,7 +11,12 @@ CONFIG_BRIDGE_NF_EBTABLES_LEGACY=m
- CONFIG_BRIDGE_VLAN_FILTERING=y
- CONFIG_CGROUP_BPF=y
- CONFIG_CRYPTO_SHA1=m
-+CONFIG_DEBUG_FS=y
- CONFIG_DUMMY=m
-+CONFIG_FAIL_FUNCTION=y
-+CONFIG_FAULT_INJECTION=y
-+CONFIG_FAULT_INJECTION_DEBUG_FS=y
-+CONFIG_FUNCTION_ERROR_INJECTION=y
- CONFIG_INET_DIAG=m
- CONFIG_INET_ESP=m
- CONFIG_INET_SCTP_DIAG=m
-@@ -36,6 +41,7 @@ CONFIG_IP_VS_RR=m
- CONFIG_MACVLAN=m
- CONFIG_NAMESPACES=y
- CONFIG_NET_CLS_U32=m
-+CONFIG_NETDEVSIM=m
- CONFIG_NETFILTER=y
- CONFIG_NETFILTER_ADVANCED=y
- CONFIG_NETFILTER_NETLINK=m
-diff --git a/tools/testing/selftests/net/netfilter/nft_offload.sh b/tools/testing/selftests/net/netfilter/nft_offload.sh
-new file mode 100755
-index 000000000000..859bdedf1a51
---- /dev/null
-+++ b/tools/testing/selftests/net/netfilter/nft_offload.sh
-@@ -0,0 +1,132 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source lib.sh
-+
-+checktool "nft --version" "run test without nft tool"
-+modprobe -q netdevsim
-+
-+sysfs="/sys/kernel/debug/fail_function"
-+failname="/proc/self/make-it-fail"
-+duration=30
-+fault=0
-+ret=0
-+file_ft=""
-+file_rs=""
-+id=$((RANDOM%65536))
-+
-+read -r t < /proc/sys/kernel/tainted
-+if [ "$t" -ne 0 ];then
-+	echo SKIP: kernel is tainted
-+	exit $ksft_skip
-+fi
-+
-+cleanup() {
-+    cleanup_netdevsim "$id" "$NS"
-+    cleanup_ns "$NS"
-+    [ "$fault" -eq 1 ] && echo '!nsim_setup_tc' > "$sysfs/inject"
-+    rm -f "$file_ft" "$file_rs"
-+}
-+trap cleanup EXIT
-+
-+skip() {
-+	echo "SKIP: $*"
-+	[ $ret -eq 0 ] && exit 4
-+
-+	exit $ret
-+}
-+
-+set -e
-+setup_ns NS
-+
-+create_netdevsim "$id" "$NS" >/dev/null
-+nsim_port=$(create_netdevsim_port "$id" "$NS" 2)
-+
-+file_ft=$(mktemp)
-+cat > "$file_ft" <<EOF
-+flush ruleset
-+table inet t {
-+	flowtable f {
-+		flags offload
-+		hook ingress priority filter + 10
-+		devices = { "$nsim_port", "dummyf1" }
-+	}
-+
-+	chain cf {
-+		type filter hook forward priority 0; policy accept;
-+		ct state new meta l4proto tcp flow add @f
-+	}
-+}
-+EOF
-+
-+if ip netns exec "$NS" nft -f "$file_ft"; then
-+	echo "PASS: flowtable offload"
-+else
-+	echo "FAIL: flowtable offload"
-+	ret=1
-+fi
-+
-+file_rs=$(mktemp)
-+cat > "$file_rs" <<EOF
-+table netdev t {
-+	chain c {
-+		type filter hook ingress device $nsim_port priority 1
-+		flags offload
-+		ip saddr 10.2.1.1 ip daddr 10.2.1.2 ip protocol icmp accept
-+		ip saddr 10.2.1.1 ip daddr 10.2.1.3 ip protocol icmp drop
-+		ip saddr 10.2.1.0/24 ip daddr 10.2.1.0/24 ip protocol icmp accept
-+		ip6 saddr dead:beef::1 ip6 daddr dead:beef::2 meta l4proto ipv6-icmp accept
-+		ip6 saddr dead:beef::1 ip6 daddr dead:beef::3 meta l4proto ipv6-icmp drop
-+		ip6 saddr dead:beef::/64 ip6 daddr dead:beef::/64 meta l4proto ipv6-icmp accept
-+	}
-+}
-+EOF
-+if ip netns exec "$NS" nft -f "$file_rs"; then
-+	echo "PASS: ruleset offload"
-+else
-+	echo "FAIL: ruleset offload"
-+	ret=1
-+fi
-+
-+test -d "$sysfs" || skip "$sysfs not present"
-+grep -q nsim_setup_tc "$sysfs/injectable" || skip "nsim_setup_tc fault injection not available"
-+
-+echo Y > "$sysfs/task-filter"
-+echo 0 > "$sysfs/verbose"
-+echo "nsim_setup_tc" > "$sysfs/inject"
-+fault=1
-+
-+p=$(((RANDOM%90) + 10))
-+echo $p > "$sysfs/probability"
-+echo -1 > "$sysfs/times"
-+
-+count=0
-+ok=0
-+
-+now=$(date +%s)
-+stop=$((now+duration))
-+
-+# fault-injection enabled rule loads are expected to fail.
-+set +e
-+while [ "$now" -le "$stop" ]; do
-+	for f in "$file_ft" "$file_rs"; do
-+		if ip netns exec "$NS" bash -c "echo 1 > $failname ; ip netns exec \"$NS\" nft -f $f" 2> /dev/null;then
-+			ok=$((ok+1))
-+		fi
-+		count=$((count+1))
-+	done
-+	now=$(date +%s)
-+done
-+
-+sleep 5
-+
-+read -r t < /proc/sys/kernel/tainted
-+if [ "$t" -eq 0 ];then
-+	echo "PASS: Not tainted. $count rounds, $ok successful ruleset loads with P $p."
-+else
-+	echo "ERROR: Tainted. $count rounds, $ok successful ruleset loads with P $p."
-+	dmesg
-+	ret=1
-+fi
-+
-+exit $ret
+We achieve this by matching the well-known MAC address of the ONT SoC.
+The user traffic passes through the ONT SoC without modifying MAC headers.
+Now we would like to use macvlan (with source mode devices) on the main
+SoC side for this but our routing stack requires the rx_handler to be
+available. Therefore macvlan is currently not an option.
+
+With this patch macvlan becomes an option because the current limitation
+of either "one passthru device" or "any other configuration" is relaxed
+for the combination of passthru and any number of source mode devices.
+
+This allows us to configure a source mode device for the other SoC and
+register an rx_handler for further processing on the passthru device.
+
+The patch is still in an RFC state. I am not 100% confident that all the
+cases where the code checks "macvlan_passthru(port)" are handled
+appropriately. I hope you can guide me a little bit and provide feedback
+on the general approach.
+
+Thanks in advance!
+
+Thomas Martitz (1):
+  macvlan: allow source mode devices along with passthru
+
+ drivers/net/macvlan.c | 41 ++++++++++++++++++++++++++++-------------
+ 1 file changed, 28 insertions(+), 13 deletions(-)
+
 -- 
-2.53.0
+2.54.0
 
 
