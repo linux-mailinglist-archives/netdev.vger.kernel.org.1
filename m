@@ -1,380 +1,210 @@
-Return-Path: <netdev+bounces-298612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tYPvA9jxK2oYIQQAu9opvQ
-	(envelope-from <netdev+bounces-298612-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:47:36 +0200
+	id GkasK4TxK2roIAQAu9opvQ
+	(envelope-from <netdev+bounces-298611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:46:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3DB679148
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:47:35 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23FF1679106
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:46:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=oGweB2aj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298612-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298612-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DueXUBEF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298611-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298611-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 016EA33C3E77
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:41:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2D8AE323CFFA
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36633ECBC7;
-	Fri, 12 Jun 2026 11:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4013EB81C;
+	Fri, 12 Jun 2026 11:41:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182E53EB7FF
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 11:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5433EB118;
+	Fri, 12 Jun 2026 11:41:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781264470; cv=none; b=KRfafSGD9w6c+gPOjSvVmS5xI9gdGuK5JGNrvOTjKu4LD24zRk4YRjS+MYWhoZMhMs9dLdKbrWtNNDD4FIIwQkp1bWnQkdobVTMivw0LffACosMpliLXXDn2UmfI2KfQzBt7aW03NgMAHOZsO8abGEklthS+mR0z7ob5H6vRrTQ=
+	t=1781264469; cv=none; b=p01VVgyMCzH1u4TNI0F9ECW5ZrxWOV7FikKYZHBKuHDDEDl6PpFdFRlDOY9dvdNk2Izb5DglmJhVWf6+Lu63xwRjRZeJxp5VhbhHoXEBPb1WIfO0IDsRlC9HaOlX61qUBumpyRxkuQEOJoBVdss/gufroj4/k+E847pQB7HpDDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781264470; c=relaxed/simple;
-	bh=huaKkF4OiakemF/G5xWufP2q3bw29Ry5/D4MKYONanA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dIAann39QPPFAcYr+JBqNOZJl9wFfgeuao5xupG5Dt+g1lERNtjmDORi805xuzM5ECpAMt6m+qMTPiZIuIqtc9o/8DN6y0L4A7BqJkmpPnsu80XqxFVmR3KqTWUeHU52lIze5I+vn9MYIBy0+cFjkDO3mzG+bO2kuVX24wGF/jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oGweB2aj; arc=none smtp.client-ip=209.85.214.177
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2bf18c30bb2so7323385ad.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 04:41:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781264468; x=1781869268; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WSlICPsYDJ4jrvEuREacBilLreADCVqW54GB3CcEXOQ=;
-        b=oGweB2ajY3TcvkPOocH3D3BDZjyqR27g12SU/Zb4eGozEgyTaStJpgZHtEwTHULWZY
-         fR34Tv1rfYJR/aa0zKEd4pt+yPRKBHJKNUGm8Hdd29fey3artIt3KRgt5J7/phSpbDkT
-         UF9R3GrMVYnLT2RyoXHx3gkoH6k5wMOt2bUvur2mzV2PcwY789YveU5+tXRx66/Df8aY
-         mDU4//fE6ZgYaQCfZ0o24dqOCbALaDs6VBLjkabDuCzeEWuOLi4GYnXPLWYyPqavS2TB
-         q5tKiaYYV2VHSG8l9IaW0+dYQmdtNkXjhtspkRdc7el2qT6HK6A+qVAhzPLhNhRuf80o
-         Rc/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781264468; x=1781869268;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WSlICPsYDJ4jrvEuREacBilLreADCVqW54GB3CcEXOQ=;
-        b=JNI1vLLZBonPZiaqScI6nd1HeqWr3aTXk7zCF1u0xu2GRxyX/BXrReP1HqAsJWdxzz
-         TSBPxIDBza9aaGHzN5L0v3Ebg4JsPUnbiPHhGs9QWRo0sRUh23YMsgShfmhgtzAy54IX
-         H0K/LpIcmLYD/rdPmpNdjLPpRDrwA+RCUp/02iYgpKhkwED5serCXHD+WCi74decIvYD
-         uJaMJhGst8HqK6MZLwUj+/gIfdkyygWsVaWLSgFQmlRHWYTbQEmrVu/r8yxEksfBj3dx
-         XQbpMOdLxZd/loXq78+NdhtQS/cBESJfA7XYrJgAVmTr7wVzcRPiZ0OymCwI0ixhAdF1
-         7rgQ==
-X-Gm-Message-State: AOJu0YxoH098m3RA4krSTbz4bSjec7qXNsvdfPxQsNg3afKWSkF8u0VB
-	qmEb1I3aVTG4YWAIfFVHLjxIkQXpRik5aZFNs4h/myWyf7kFMZgsFB0T
-X-Gm-Gg: Acq92OEu1OkzNH5HBJH6JaIgMs/5zLjl9wtIIuY+IQnBVQJIPM4acH39/9UUvSoFS0a
-	vVD77aquzmh1h80UPRZwF1Z/HFWs1va7HS042mi5PhIPGkxXgKQrYckV+ABGeGyAAlco3DbVcVE
-	UaI6CPYIcJaPfSiz5ToGa2ihTlbcY95YsKB7fYH16frd5c8PJXb0QLnXmYnGuLf8xqXcWcJKd1y
-	VHVLrMIluoJiGw3/y9YVfpvNVDNclZSZV01zoaVNK0FF4GWyNnuypkS1l0BtT3rjeYTXmZk772D
-	5camXoAlkSTfH2lRzDap8Qs0sZMz44zTP1+ZXydG4wfvkpdtE+FWd7oPrlVMrB05m4m7xEvxCFD
-	z1gmRc8W8oQdY7g3Ewq57YAkAz59ULWUVS6MiMYuYlxA+XaTVy46UU9e32/QRvTQqVmr0nXWBK5
-	NE+Y+27I6X6Ecnn4bcHiqd6xxROFtyJ/loqQ/53TjyQwVH5mPpqwiZLawR0XBlS1hYK70lCeTSG
-	E4+9VyHj14S
-X-Received: by 2002:a17:903:46cc:b0:2c0:ccdb:e023 with SMTP id d9443c01a7336-2c41255db98mr29606425ad.17.1781264468386;
-        Fri, 12 Jun 2026 04:41:08 -0700 (PDT)
-Received: from localhost.localdomain ([45.142.165.58])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4327ac72asm20697455ad.38.2026.06.12.04.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 04:41:08 -0700 (PDT)
-From: Sun Jian <sun.jian.kdev@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	shuah@kernel.org,
-	jiayuan.chen@linux.dev,
-	toke@redhat.com,
-	menglong.dong@linux.dev,
-	emil@etsalapatis.com,
-	Sun Jian <sun.jian.kdev@gmail.com>
-Subject: [PATCH bpf v5 2/2] selftests/bpf: Cover generic devmap egress last-dst rewrite
-Date: Fri, 12 Jun 2026 19:40:32 +0800
-Message-ID: <20260612114032.244616-3-sun.jian.kdev@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260612114032.244616-1-sun.jian.kdev@gmail.com>
-References: <20260612114032.244616-1-sun.jian.kdev@gmail.com>
+	s=arc-20240116; t=1781264469; c=relaxed/simple;
+	bh=IXHJOU0oLy6l03pAmfv5nGYKFNT71fN5FVctAoo/kOo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MfywUnNE6TanL467BIDW7Cq0HMfQYH/BWII/iMuV0kUsNAHmBjOd6yFK+v3GT/vNv7PHEp0daQFWdJ9dtKm8k5+JbvgvsJekYFwdGgQrCaftrUr0jLTov/SsEcWMYs5DIfEFCVCGP5xBiLmuijkYKeFw/7oZUUyen2f3nHUJjAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DueXUBEF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 036751F000E9;
+	Fri, 12 Jun 2026 11:41:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781264468;
+	bh=GsP/OcYc2aQ8nhYpNO2oEoNFkMgUJ4z8n0SYStJlwzc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=DueXUBEFLOOMTmTcr7WzT0cS5vI6MeEZOQNLd3vYFbo6ttwHHajZxUHzL1oQ9JCJR
+	 ZvUTeY0K5Hi/YCgjK1IJCYjgCdixmIePj/oD2xPAqnb+DsH/dqebqMdQ2Q8QV8FM4L
+	 Z+s/US1gYUG4rSKyr/wEgK4nRpkQN6w8QhVu1pVkEAY/bDFUrLK4XrEoqTgOxyGtpR
+	 neEp9cOQeZrynheX+/DyZUe52Fbe/czpAYpfHY8NLvab14thzjB3ESjId2FszpFPlK
+	 Ydpln4w8GZ/eSB0L8eRtClF6vRYvW7auNzMlQpacZY6Gb9V14HBKWoxppU3e7TadGX
+	 FuNIrsJ/33H7A==
+Message-ID: <b91ff67e-ce74-4edf-a8b0-08be04586485@kernel.org>
+Date: Fri, 12 Jun 2026 13:41:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v3 2/2] rds: convert to getsockopt_iter: manual
+ merge
+Content-Language: fr
+To: Breno Leitao <leitao@debian.org>
+Cc: Allison Henderson <achender@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com, linux-kselftest@vger.kernel.org,
+ kernel-team@meta.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Andy Grover <andy.grover@oracle.com>,
+ Mark Brown <broonie@kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20260608-getsock_more-v3-0-706ecf2ea332@debian.org>
+ <20260608-getsock_more-v3-2-706ecf2ea332@debian.org>
+ <2e1b0534-a1a0-4eb1-a5e2-d42fcf991188@kernel.org>
+ <aivAbAIjnTeqlsdS@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <aivAbAIjnTeqlsdS@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-298612-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:jiayuan.chen@linux.dev,m:toke@redhat.com,m:menglong.dong@linux.dev,m:emil@etsalapatis.com,m:sun.jian.kdev@gmail.com,m:johnfastabend@gmail.com,m:sunjiankdev@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,davemloft.net,gmail.com,fomichev.me,redhat.com,etsalapatis.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:achender@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:andy.grover@oracle.com,m:broonie@kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298611-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7E3DB679148
+X-Rspamd-Queue-Id: 23FF1679106
 
-Strengthen xdp_veth_egress to check that each destination observes the
-MAC selected for its own egress ifindex, instead of only checking that
-the observed MAC differs from a single magic value.
+Hi Breno,
 
-Add a generic XDP last-destination test where an earlier destination does
-not have a devmap egress program while the final destination does. This
-covers the case where the final destination runs on the original skb and
-could otherwise rewrite packet data still shared with an earlier cloned
-skb.
+On 12/06/2026 10:19, Breno Leitao wrote:
+> Hello Matthieu,
+> 
+> On Thu, Jun 11, 2026 at 02:52:36PM +0200, Matthieu Baerts wrote:
+>>> +	/*
+>>> +	 * iov_iter_extract_pages() pins only user-backed (ubuf) iters;
+>>> +	 * iov_iter_extract_will_pin() reports whether an unpin is owed here.
+>>> +	 */
+>>> +	if (pages && iov_iter_extract_will_pin(&opt->iter_out))
+>>>  		unpin_user_pages(pages, nr_pages);
+>>
+>> FYI, we got a small conflict when merging 'net' in 'net-next' in the
+>> MPTCP tree due to this patch applied in 'net':
+>>
+>>   f512db8267b73 ("rds: mark snapshot pages dirty in rds_info_getsockopt()")
+>>
+>> and this one from 'net-next':
+>>
+>>   6e94eeb2a2a6 ("rds: convert to getsockopt_iter")
+> 
+> I was aware of the conflict but didn't realize a note would be helpful
+> for the merge. I should have included one.
+> 
+> Could you point me to an example commit/patch that contains such a note so I
+> can understand the expected format and procedure?
 
-Use deterministic DEVMAP_HASH keys for the egress map so the intended
-last destination is stable. Initialize the result map with a sentinel
-value and check that store_mac_1 overwrites it before checking that the
-earlier destination did not observe the MAC written by the final
-destination.
+In this particular example, I think it would have been easier to have
+waited for the fix to land in net-next -- after the weekly sync with net
+-- and then send the net-next patches.
 
-Suggested-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
----
- .../selftests/bpf/prog_tests/test_xdp_veth.c  | 166 +++++++++++++++++-
- 1 file changed, 163 insertions(+), 3 deletions(-)
+When this cannot be avoided, then you can mention the conflict, and
+ideally share a diff of the resolution, plus a description, especially
+when it is not obvious, when simply saying "take the version from X" is
+helpful, when extra modifications are needed, etc. e.g. [1]. Something
+similar to what Mark is usually doing on the linux-next ML, or what I
+did here.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-index 3e98a1665936..1675b32753a8 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-@@ -456,7 +456,11 @@ static void xdp_veth_egress(u32 flags)
- 			.remote_flags = flags,
- 		}
- 	};
--	const char magic_mac[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
-+	const unsigned char egress_macs[VETH_PAIRS_COUNT][ETH_ALEN] = {
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x03 },
-+	};
- 	struct xdp_redirect_multi_kern *xdp_redirect_multi_kern;
- 	struct bpf_object *bpf_objs[VETH_EGRESS_SKEL_NB];
- 	struct xdp_redirect_map *xdp_redirect_map;
-@@ -512,7 +516,13 @@ static void xdp_veth_egress(u32 flags)
- 						 &net_config, prog_cfg, i))
- 			goto destroy_xdp_redirect_map;
- 
--		err = bpf_map_update_elem(mac_map, &ifindex, magic_mac, 0);
-+		{
-+			__be64 mac = 0;
-+
-+			memcpy(&mac, egress_macs[i], ETH_ALEN);
-+			err = bpf_map_update_elem(mac_map, &ifindex, &mac, 0);
-+		}
-+
- 		if (!ASSERT_OK(err, "bpf_map_update_elem"))
- 			goto destroy_xdp_redirect_map;
- 
-@@ -531,15 +541,162 @@ static void xdp_veth_egress(u32 flags)
- 
- 	for (i = 0; i < 2; i++) {
- 		u32 key = i;
-+		__be64 expected = 0;
- 		u64 res;
- 
- 		err = bpf_map_lookup_elem(res_map, &key, &res);
- 		if (!ASSERT_OK(err, "get MAC res"))
- 			goto destroy_xdp_redirect_map;
- 
--		ASSERT_STRNEQ((const char *)&res, magic_mac, ETH_ALEN, "compare mac");
-+		/* store_mac_1/2 run on the second/third remote veths. */
-+		memcpy(&expected, egress_macs[i + 1], ETH_ALEN);
-+		ASSERT_EQ(res, expected, "compare mac");
-+	}
-+
-+destroy_xdp_redirect_map:
-+	close_netns(nstoken);
-+	xdp_redirect_map__destroy(xdp_redirect_map);
-+destroy_xdp_redirect_multi_kern:
-+	xdp_redirect_multi_kern__destroy(xdp_redirect_multi_kern);
-+destroy_xdp_dummy:
-+	xdp_dummy__destroy(xdp_dummy);
-+
-+	cleanup_network(&net_config);
-+}
-+
-+static void xdp_veth_egress_last_dst(u32 flags)
-+{
-+	struct prog_configuration prog_cfg[VETH_PAIRS_COUNT] = {
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "xdp_dummy_prog",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		},
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "store_mac_1",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		},
-+		{
-+			.local_name = "xdp_redirect_map_all_prog",
-+			.remote_name = "xdp_dummy_prog",
-+			.local_flags = flags,
-+			.remote_flags = flags,
-+		}
-+	};
-+	const unsigned char egress_macs[VETH_PAIRS_COUNT][ETH_ALEN] = {
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02 },
-+		{ 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x03 },
-+	};
-+	struct xdp_redirect_multi_kern *xdp_redirect_multi_kern;
-+	struct bpf_object *bpf_objs[VETH_EGRESS_SKEL_NB];
-+	struct xdp_redirect_map *xdp_redirect_map;
-+	struct net_configuration net_config = {};
-+	int mac_map, egress_map, res_map;
-+	struct nstoken *nstoken = NULL;
-+	struct xdp_dummy *xdp_dummy;
-+	__be64 sentinel_mac = 0;
-+	__be64 last_mac = 0;
-+	__be64 res;
-+	u32 key;
-+	int err;
-+	int i;
-+
-+	xdp_dummy = xdp_dummy__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_dummy, "xdp_dummy__open_and_load"))
-+		return;
-+
-+	xdp_redirect_multi_kern = xdp_redirect_multi_kern__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_redirect_multi_kern, "xdp_redirect_multi_kern__open_and_load"))
-+		goto destroy_xdp_dummy;
-+
-+	xdp_redirect_map = xdp_redirect_map__open_and_load();
-+	if (!ASSERT_OK_PTR(xdp_redirect_map, "xdp_redirect_map__open_and_load"))
-+		goto destroy_xdp_redirect_multi_kern;
-+
-+	if (!ASSERT_OK(create_network(&net_config), "create network"))
-+		goto destroy_xdp_redirect_map;
-+
-+	mac_map = bpf_map__fd(xdp_redirect_multi_kern->maps.mac_map);
-+	if (!ASSERT_OK_FD(mac_map, "open mac_map"))
-+		goto destroy_xdp_redirect_map;
-+
-+	egress_map = bpf_map__fd(xdp_redirect_multi_kern->maps.map_egress);
-+	if (!ASSERT_OK_FD(egress_map, "open map_egress"))
-+		goto destroy_xdp_redirect_map;
-+
-+	bpf_objs[0] = xdp_dummy->obj;
-+	bpf_objs[1] = xdp_redirect_multi_kern->obj;
-+	bpf_objs[2] = xdp_redirect_map->obj;
-+
-+	nstoken = open_netns(net_config.ns0_name);
-+	if (!ASSERT_OK_PTR(nstoken, "open NS0"))
-+		goto destroy_xdp_redirect_map;
-+
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		struct bpf_devmap_val devmap_val = {};
-+		int ifindex = if_nametoindex(net_config.veth_cfg[i].local_veth);
-+		u32 key = i;
-+
-+		SYS(destroy_xdp_redirect_map,
-+		    "ip -n %s neigh add %s lladdr 00:00:00:00:00:01 dev %s",
-+		    net_config.veth_cfg[i].namespace, IP_NEIGH,
-+		    net_config.veth_cfg[i].remote_veth);
-+
-+		if (attach_programs_to_veth_pair(bpf_objs, VETH_EGRESS_SKEL_NB,
-+						 &net_config, prog_cfg, i))
-+			goto destroy_xdp_redirect_map;
-+
-+		{
-+			__be64 mac = 0;
-+
-+			memcpy(&mac, egress_macs[i], ETH_ALEN);
-+			err = bpf_map_update_elem(mac_map, &ifindex, &mac, 0);
-+		}
-+
-+		if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+			goto destroy_xdp_redirect_map;
-+
-+		devmap_val.ifindex = ifindex;
-+		devmap_val.bpf_prog.fd = -1;
-+
-+		if (i == VETH_PAIRS_COUNT - 1)
-+			devmap_val.bpf_prog.fd =
-+				bpf_program__fd(xdp_redirect_multi_kern->progs.xdp_devmap_prog);
-+
-+		err = bpf_map_update_elem(egress_map, &key, &devmap_val, 0);
-+		if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+			goto destroy_xdp_redirect_map;
- 	}
- 
-+	res_map = bpf_map__fd(xdp_redirect_map->maps.rx_mac);
-+	if (!ASSERT_OK_FD(res_map, "open rx_map"))
-+		goto destroy_xdp_redirect_map;
-+
-+	memcpy(&sentinel_mac, egress_macs[VETH_PAIRS_COUNT - 1], ETH_ALEN);
-+	memcpy(&last_mac, egress_macs[VETH_PAIRS_COUNT - 1], ETH_ALEN);
-+
-+	key = 0;
-+	err = bpf_map_update_elem(res_map, &key, &sentinel_mac, 0);
-+	if (!ASSERT_OK(err, "init rx mac"))
-+		goto destroy_xdp_redirect_map;
-+
-+	SYS_NOFAIL("ip netns exec %s ping %s -i 0.1 -c 4 -W1 > /dev/null ",
-+		   net_config.veth_cfg[0].namespace, IP_NEIGH);
-+
-+	err = bpf_map_lookup_elem(res_map, &key, &res);
-+	if (!ASSERT_OK(err, "get MAC res"))
-+		goto destroy_xdp_redirect_map;
-+
-+	if (!ASSERT_NEQ(res, sentinel_mac, "rx_mac overwritten by store_mac_1"))
-+		goto destroy_xdp_redirect_map;
-+
-+	if (!ASSERT_NEQ(res, last_mac, "earlier dst not rewritten by last dst"))
-+		goto destroy_xdp_redirect_map;
-+
- destroy_xdp_redirect_map:
- 	close_netns(nstoken);
- 	xdp_redirect_map__destroy(xdp_redirect_map);
-@@ -596,4 +753,7 @@ void test_xdp_veth_egress(void)
- 
- 	if (test__start_subtest("SKB_MODE/egress"))
- 		xdp_veth_egress(XDP_FLAGS_SKB_MODE);
-+
-+	if (test__start_subtest("SKB_MODE/egress_last_dst"))
-+		xdp_veth_egress_last_dst(XDP_FLAGS_SKB_MODE);
- }
+[1]
+https://lore.kernel.org/98386125-c0bb-495e-b2ba-2765aaed19d8@oss.qualcomm.com
+
+> Apologies for the omission.
+No problem, it happens fairly regularly ;)
+
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
