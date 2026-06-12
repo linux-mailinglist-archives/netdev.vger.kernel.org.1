@@ -1,74 +1,78 @@
-Return-Path: <netdev+bounces-298821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298822-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mqEbEuOaLGrETgQAu9opvQ
-	(envelope-from <netdev+bounces-298821-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:48:51 +0200
+	id gzvwKlKbLGrcTgQAu9opvQ
+	(envelope-from <netdev+bounces-298822-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:50:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E7167D15E
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:48:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A9A67D181
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:50:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FfIAcWvA;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298821-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298821-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=cI+MbVzs;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298822-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298822-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1DABA311EAEB
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 23:48:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 198733249A1E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 23:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13672F83A0;
-	Fri, 12 Jun 2026 23:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23FA318ED2;
+	Fri, 12 Jun 2026 23:50:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADB3233920;
-	Fri, 12 Jun 2026 23:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70A5301719;
+	Fri, 12 Jun 2026 23:50:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781308126; cv=none; b=sifiiiN6b4B1tbz4y0Vt0J+FGupLco0J1zdoadociUB1KVPax+sE2OiVT221revCdzs6GWfZRWkA/Cbn/dGkZLx7H/3Gs9hfU/AHaDY8fmYhiN1aaK/aZIIYecp52+XuYZ1FmrVLIXxShvfZIEYIepeCujyucal4on3huPRU7To=
+	t=1781308213; cv=none; b=I9vxGarW0i7NcWj1Cc9D13k/gJ6m8gT9z8KGsMJpO2985qTv1LjTedNkZtolocJAua3NmbEnua0BFBf3Sloxwwa16cLuPFNMwDIKHEdxU41mlRYxY2B/k+w6GzV82P+57/J1ein0T2p0EGeSpZ3//ZNZPRuoTULfl2LpvIXK16I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781308126; c=relaxed/simple;
-	bh=jfg4PkbWjeFfksq0loUd/x+t0Yzdj6Ba/Yuoor+uKm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kba+8mg0iadPHuyBhpGyHDYrluVIBZAGZOM3RF8xwNFhTPN2a6N9BrtcWIUkmYqU/FuGQzlR6BMJen0LL1tiyOXvW827qAd7jlfN+HT+7qbLkbR2qhKy1H7a/3xJGyAmQMY6uIed7N2E/mBMNfxWN2teDPwmG0OFjUzbiYWy18k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfIAcWvA; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA83D1F000E9;
-	Fri, 12 Jun 2026 23:48:44 +0000 (UTC)
+	s=arc-20240116; t=1781308213; c=relaxed/simple;
+	bh=cT2bba7hA669/5rneFxXHLEA7soszRhZlQftku+F7Kk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dBEoO4TYJTI41YcczKkstuJ1WJucjUIeusezEMfJGe05qebggP0IAzdOyB4ml2vyYk3Mp6vG7fP5X7YnbHWjOaseDqxAS4Ul8MNxq83kL0NkdLyyL5VwS+1EkDkRhK1LQK9W8zAj1UodNdDTtOfdT0vikicy6r+d7MBi4dd25gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cI+MbVzs; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DB661F000E9;
+	Fri, 12 Jun 2026 23:50:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781308125;
-	bh=8yoUjmsgvioaKiWi9pA9SXBu3LhphwrTuMsejO5mvYo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=FfIAcWvA0WiOiXGgbpPhe1qHwiV+dPXOI6/urAsDW2rwoGq7E7k1XoQ5kVr/2ySig
-	 mXR84OZGQYEUnbyVuDgSB/qFKqNymOxHC61M8HnBlNIz4mkKB3gymJQ60d+UF4ziHb
-	 gtiSnrCn3/69sZaDDNyfbqDSM6rk+Ed8bguoNRwpm0MPTHw0WvuYHL6vpKRgOtoQCh
-	 eid6hb+Is2U51b9wkCDfc8MLoxYy+J2FpZBZ/REIIvejlty50YQ+UobjekXzo63kIf
-	 Rk0x1C2+fN8pPdUb7IRuis3K3K4WmlFPLlas4FomgW7agrtpGOUHFD+NGmHCngIVQF
-	 MTHewTBP/Yx2Q==
-Date: Fri, 12 Jun 2026 16:48:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, Li Daming
- <d4n.for.sec@gmail.com>, Ren Wei <n05ec@lzu.edu.cn>, Jeffrey Altman
- <jaltman@auristor.com>, stable@kernel.org
-Subject: Re: [PATCH net 4/5] afs: Fix netns teardown to cancel the
- preallocation charger
-Message-ID: <20260612164843.20452d5a@kernel.org>
-In-Reply-To: <20260609140911.838677-5-dhowells@redhat.com>
-References: <20260609140911.838677-1-dhowells@redhat.com>
-	<20260609140911.838677-5-dhowells@redhat.com>
+	s=k20260515; t=1781308212;
+	bh=GeQiU5lJzSA7sxR6Y50Gt+TLkWrbSjN8RcoHFYutCa8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=cI+MbVzsBaNNXfByyg2QRsQnbujnzz9NMfhls1P/65NSOAb0fPadiZ4gXfrUp76Qr
+	 ts23HZILuU3tUSiumZoQR9RKUIttjKp4mYnwYJapsd1a2OMWXITyIXvvnSjbt0O0UU
+	 fvR0uOiwwFG2qqhizFRjQQTHJDbtBtn6mcRH+QzCdRlVjKoEKvSCJFYoce+ds0DM9j
+	 hUV2Qjt+yAGOI20w8vLmyLl59agjhWwaOAXfycUwoi06hVkkddGaDVRa7XOLmpKyjt
+	 WuUEuaYPRRMdAQMkbFhlFIp0wXqYlJmq9FIeouCbTcqOnvrHDsjaobPkf4ocTUz4QH
+	 XAQ6ZibkT9axg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1980739E9602;
+	Fri, 12 Jun 2026 23:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] virtio_net: do not allow tunnel csum offload for
+ non
+ GSO packets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178130820864.1294761.17379581600716494206.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Jun 2026 23:50:08 +0000
+References: 
+ <6c3b6c47fb05c100f384630dc48f3975cf37b67a.1781195144.git.pabeni@redhat.com>
+In-Reply-To: 
+ <6c3b6c47fb05c100f384630dc48f3975cf37b67a.1781195144.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ virtualization@lists.linux.dev, g.goller@proxmox.com, f.ebner@proxmox.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -76,48 +80,61 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298821-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-298822-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:d4n.for.sec@gmail.com,m:n05ec@lzu.edu.cn,m:jaltman@auristor.com,m:stable@kernel.org,m:d4nforsec@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:virtualization@lists.linux.dev,m:g.goller@proxmox.com,m:f.ebner@proxmox.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,auristor.com,davemloft.net,google.com,redhat.com,kernel.org,lists.infradead.org,gmail.com,lzu.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A0E7167D15E
+X-Rspamd-Queue-Id: 09A9A67D181
 
-On Tue,  9 Jun 2026 15:09:08 +0100 David Howells wrote:
-> Fix the teardown of an afs network namespace to make sure it cancels the
-> work item that keeps the preallocated rxrpc call/conn/peer queue charged
-> before incoming calls are disabled (i.e. listen 0).
-> 
-> Also, if net->live is false because the afs netns is being deleted, make
-> afs_charge_preallocation() skip charging and make afs_rx_new_call() avoid
-> requeuing the charger.
-> 
-> (This was found by AI review).
+Hello:
 
-Both Sashikos think this patch is still racy FWIW but not a blocker IMO
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 11 Jun 2026 18:36:48 +0200 you wrote:
+> Fiona reports broken connectivity for virtio net setup using UDP tunnel
+> inside the guest and NIC with not UDP tunnel TSO support in the host.
+> 
+> Currently the virtio_net driver exposes csum offload for UDP-tunneled,
+> TCP non GSO packets. Such packet reach the host as CSUM_PARTIAL ones
+> with the 'encapsulation' flag cleared, as the virtio specification do
+> not support this specific kind of offload.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] virtio_net: do not allow tunnel csum offload for non GSO packets
+    https://git.kernel.org/netdev/net/c/86c51f0f2313
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
