@@ -1,141 +1,171 @@
-Return-Path: <netdev+bounces-298515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298516-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ls7THx7BK2qPEQQAu9opvQ
-	(envelope-from <netdev+bounces-298515-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:19:42 +0200
+	id BTlNB9LBK2rYEQQAu9opvQ
+	(envelope-from <netdev+bounces-298516-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:22:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8110B677BE5
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:19:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB38D677C41
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 10:22:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=U4JRN5Oz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298515-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298515-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=JDt16QBX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298516-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298516-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5B6EB300E164
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:19:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 43A803019010
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 08:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3C737AA94;
-	Fri, 12 Jun 2026 08:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C5135B63D;
+	Fri, 12 Jun 2026 08:22:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B536D30F7E8;
-	Fri, 12 Jun 2026 08:19:32 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781252374; cv=none; b=fRh9t6RRmibMZBPuf5cGQe3SvOHX+w8CPYCOZNSzFmViTL/hR9LJOLVCo8rWPoQyCIBfZX2FCZ+WEh2njyapkHo/eCbJpezU73sv1ogr/scWOl25bUfIEQzmYq43+yQyaO8Q3Kx0udOVXzUJGy0aBJNTk5dPKRFWvCLf4XEKhLs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781252374; c=relaxed/simple;
-	bh=DDb390pH86F+MDAKPh2YrcsD3VaZg2jS2rjKd2DBMYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b6stgTr3v0rIronpXt3XNZlR6iZfBxI17waNy+HCmgjhas1ebEmdV4CzoSdfhzmsyVH1mUn3PGA9a+0StcuGct0AdSolXnIkSgaWodv0HuPejVCaJa3Rfq0ftwQ1F505dBagGBv+9UoVuKtavyjCs4lQjPsxM0rJLjD5Eu/Dnvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=U4JRN5Oz; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=p3Oqjlj/auX5F9Pcu1687Su6+uFqsB+j7WxdEnNQCQg=; b=U4JRN5OzVWPkFIz8k+tXNZuqX2
-	m84pOgKMjluRHVI+0+jIhucCVfJc6M/1y2m7BW4K3eZpZp/xCf/ba/xs1Wu7qrkuzPbvL/18FPlRC
-	8q1PYPOWoh7Mukd/cilKaG16Eif4ZcFaxjbUr7amvYo9xOs4ov0ag8F9Vlv/EwnetNfepbHnKIKUc
-	1PSNGQy45UAcgg980DBjmV1NTtuJtOw86Hu+xJ9YgEdrt6qtsxcjxg1Vv2DSAPcXg0b1rHPqXi+Ke
-	OokErsv2t4k0Ye9VDkaQKLURaJccAZVyS6zBKpyQMiUU2eOtW/CAzDlUZk0I1YFdS4GHkpvixChNe
-	2uvD6fkg==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wXx6s-00AbGb-16;
-	Fri, 12 Jun 2026 08:19:26 +0000
-Date: Fri, 12 Jun 2026 01:19:21 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Allison Henderson <achender@kernel.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
-	linux-kselftest@vger.kernel.org, kernel-team@meta.com, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Andy Grover <andy.grover@oracle.com>, Mark Brown <broonie@kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 2/2] rds: convert to getsockopt_iter: manual
- merge
-Message-ID: <aivAbAIjnTeqlsdS@gmail.com>
-References: <20260608-getsock_more-v3-0-706ecf2ea332@debian.org>
- <20260608-getsock_more-v3-2-706ecf2ea332@debian.org>
- <2e1b0534-a1a0-4eb1-a5e2-d42fcf991188@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CAA379C4F
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 08:22:20 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781252545; cv=pass; b=dNAcrdAk6rn6bClZkzkVEs8KCg2Vj61eb2UZrU9eKcBA1LT8KNoD6BNtgSv5tErFsKMG5qHlsAGftaOndfIpRQ/PiFgSc3z88q/156XU8MixFz5HE9iF7M9av3CJE8T2jxIUviXRjiEjbOydumgI5r59kT/HiJmSwExE5M4W8JU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781252545; c=relaxed/simple;
+	bh=aZ2msG6bBpRSdvBS/f6pbbPMHjxvTzTeADXUE0xMIaM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eFYzwoljxhywoejeC1agWM/68oyHGNDmjFD8c7CVeF93etAFxCLsJoJN/GH85BnhrmIJosyfBy6+27oe5uYbNM/XezL2LMWKDFOd+utC7A+tZR0VkRr7yEHIOmZkPcO0y/uorbPo5mP6uoj1QeVpBFdCKS1MWSm8cP/yQ9QQEjE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JDt16QBX; arc=pass smtp.client-ip=209.85.222.176
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-9156b74006aso48429885a.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 01:22:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781252540; cv=none;
+        d=google.com; s=arc-20240605;
+        b=R1jfh5IYqfnkjkLJCPkgy8lzGdr7LYeMHZwtDQjvyR/se4TxcI4ryN6vHFew3HrTOm
+         5Gcfzj+1JYyw/Etl/k4J/ylIUUJqGoxezxpokl3rQU+LgqpBjhPzpl8AatHBRxPgSeEu
+         nEQkTuNTPXHHrsv+tWc4Jtasc+A0v5TD1DCAE4UC0RFstDFIKrq7O6WrZ7Usq32Nj7JH
+         AxF4O6MY4iIX/LVJS1DmQysQUZEtJ7eEqr+EuTmjIojK0wFNGfOhxVm1rKOB0HDOUXrE
+         5byXbBfgZQu2tae+0V5xXJ+xWH99YkqyT34HcKqUVl6O0qt2OBaIvJZeLFsFWUmDq4pz
+         gCgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aZ2msG6bBpRSdvBS/f6pbbPMHjxvTzTeADXUE0xMIaM=;
+        fh=PAp0ysuc3i837L1fCQ/mNKkwMMUoCjAwreRffKoSAtY=;
+        b=LCF4/wW5cf2tZ9O8hxXrrvov4Xeg3JPNjgCBvZc1RbhybtIyMmdDI91/ZrUu5RaUIy
+         F9yM2E+Ccf3V+8dMRIfViqZGfeD8ldo/ZBDYva9b8EKJWfdn1KFCjNmdkygGbPfpzQNJ
+         dsI+fHZXLm6f0lySUeZpj50A4OtYfigbZrgg1k1NdPytTqyADdaeD6kxVFcuS88C0oL7
+         G33crf0GKxtGbm2qB3eFP009HaAlBRTrbpPRcP5REzv4jHXFBAJLc1Q+irtC2VfuJNex
+         6zAi1RncdT6J1+czAP1iCCVP8FszV9zDOMDcmzVJC7Zenu4N8TFo8iYjwsc0NbLM+IzY
+         FUQQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781252540; x=1781857340; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aZ2msG6bBpRSdvBS/f6pbbPMHjxvTzTeADXUE0xMIaM=;
+        b=JDt16QBXUnTjMNzV1BI/6xEjTK487dzE8SGIOTbOTjGovo8X9S16Tv2tcYtnsBtxSg
+         iryGdoLDWQAkOm/TvSmIf1lq9j7whlAahkIWbocwpe7/9oJkXeFG684fdlbcI00gMzuW
+         sCuLJv77Jz1WuKwVFObEgk4vyS8qiI6EzRbpBsXUZjg9XBfDxXfLn6s6QLUIF9fjDKLo
+         CDxfRt7STizd7gfG+ZeiypLjj5hFZGLKFlWrVVrP5qvw+os+M+KgVP2CL9fTElmazF1e
+         che2Op4XGtiKXo/7h8LYuiHjLr3s5i3tuN7zJFaYWZDC9ClEyRR4iuSbWyO+PH6vMotO
+         1jaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781252540; x=1781857340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aZ2msG6bBpRSdvBS/f6pbbPMHjxvTzTeADXUE0xMIaM=;
+        b=EFRBO2YRctXqzxeehd4XYJ2YBjLgx7/ew/PLU0Ec7mvcJjiI4AsqUXiNsjNpelY9S7
+         Z+Rx/IksgwwC9pZdRLA6MaKTgKjTJF6WDqQSfGvOPqDesNC0ljdA84Xp+IJWL4msnrg+
+         TJ6Eono5sdAXnmok8aHo3i0cPM/wpTXQ4zvFwMTI8gsVxpdu4JkTAYKKC/I56AvyKDFf
+         O/cF4SG+R84YeMBxfCsvMOBh7bdf9Bvvx+w0mEjRQPBSi1gCYoIFvrETB3ir46cebSav
+         gAm5T18mZvf44dLwa45Htc7ajp+9+wBThkCi7G0xOEKKOrQyJZ6knKdOtNlilcGlU13w
+         Kaig==
+X-Forwarded-Encrypted: i=1; AFNElJ8gmyiHwyQb6wYcn+zVzaNzoTSaLIGpjPVkcbCesDvSt5edbUmqY0L//WxR1YWmFYKbvCyrrks=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp6WjyfxF85fdPGz4n/N6VYhVrs2Psi1WS8/hJt8KsbWEq6fUN
+	7ZjcmxXoDIEQPQpCj+CJEUe2T+LOhu0oWLAC0UghZ1Of8TzjrJRhr+ywfW8t0suPcyaB3My3qoS
+	wUhxBF8aJ3yiTTAxUIIFwDs3HwRK0cqkFMXFiJ/t4
+X-Gm-Gg: Acq92OF9rp2X2rW7fpx+ZeYVRmCR8mK5jEtdJ5gexLvvFhkrHjbk5V3N0m2RSQjjWd6
+	+QwjAsWuddTUes2BOCKa72obmTOybNUhjHsb5R0aCS1DHfseLHHH5qRIz2wCEny9q28NA1qetNB
+	qsOqnI8v56UbM4i8YM0Nl88PzN+xWoER3CmfMQYCsGt3d/vGAaeadI1poPWoYwgHmXEXWu2DV2E
+	nOOyWuWlNbSUxJZ29Bxb+tD9vX3/4774UYYao3kNsdM72ZMFHhVyfxUhWD5uAmLSK+aU+vgzTVs
+	Ep1wxvkSnoA5JRUVDIXIrv3+u96BJQk3sOIuclE9TsXvkgdiqTwJpEaUjgqFX+yfjCZ4xrumFEi
+	9ZO6l96MgtALPb/9X3pzX2mpBXhprJw==
+X-Received: by 2002:a05:620a:414c:b0:902:5778:d312 with SMTP id
+ af79cd13be357-9161bac73d0mr204971085a.12.1781252538914; Fri, 12 Jun 2026
+ 01:22:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2e1b0534-a1a0-4eb1-a5e2-d42fcf991188@kernel.org>
-X-Debian-User: leitao
+References: <20260611092923.1895982-1-rhkrqnwk98@gmail.com>
+In-Reply-To: <20260611092923.1895982-1-rhkrqnwk98@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 12 Jun 2026 01:22:07 -0700
+X-Gm-Features: AVVi8CdYqSuoQH3pk2Lv3uigV13KDhOSb_2-LFWlIyooPmjFJdH8rcCzSzQ1a9U
+Message-ID: <CANn89iK4Df+F-Q0AS=QR5LQz7JziM-9F1vS+U7YMMvW=FzaOCQ@mail.gmail.com>
+Subject: Re: [PATCH net v3] tcp: clear sock_ops cb flags before force-closing
+ a child socket
+To: Sechang Lim <rhkrqnwk98@gmail.com>
+Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, Lawrence Brakmo <brakmo@fb.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:achender@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:andy.grover@oracle.com,m:broonie@kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:ncardwell@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:kuniyu@google.com,m:horms@kernel.org,m:brakmo@fb.com,m:ast@kernel.org,m:jiayuan.chen@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-298515-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298516-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[debian.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8110B677BE5
+X-Rspamd-Queue-Id: EB38D677C41
 
-Hello Matthieu,
-
-On Thu, Jun 11, 2026 at 02:52:36PM +0200, Matthieu Baerts wrote:
-> > +	/*
-> > +	 * iov_iter_extract_pages() pins only user-backed (ubuf) iters;
-> > +	 * iov_iter_extract_will_pin() reports whether an unpin is owed here.
-> > +	 */
-> > +	if (pages && iov_iter_extract_will_pin(&opt->iter_out))
-> >  		unpin_user_pages(pages, nr_pages);
+On Thu, Jun 11, 2026 at 2:29=E2=80=AFAM Sechang Lim <rhkrqnwk98@gmail.com> =
+wrote:
 >
-> FYI, we got a small conflict when merging 'net' in 'net-next' in the
-> MPTCP tree due to this patch applied in 'net':
+> A child socket inherits the listener's bpf_sock_ops_cb_flags via
+> sk_clone_lock(). If its setup fails in tcp_v4_syn_recv_sock() /
+> tcp_v6_syn_recv_sock(), the child is freed through put_and_exit, where
+> inet_csk_prepare_forced_close() drops the socket lock and tcp_done() runs
+> without it.
 >
->   f512db8267b73 ("rds: mark snapshot pages dirty in rds_info_getsockopt()")
->
-> and this one from 'net-next':
->
->   6e94eeb2a2a6 ("rds: convert to getsockopt_iter")
+> If BPF_SOCK_OPS_STATE_CB_FLAG was inherited, tcp_done() -> tcp_set_state(=
+)
+> calls tcp_call_bpf(), which expects the lock and trips sock_owned_by_me()=
+:
 
-I was aware of the conflict but didn't realize a note would be helpful
-for the merge. I should have included one.
+...
 
-Could you point me to an example commit/patch that contains such a note so I
-can understand the expected format and procedure?
-
-Apologies for the omission.
---breno
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
