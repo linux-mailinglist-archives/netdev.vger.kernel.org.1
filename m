@@ -1,68 +1,72 @@
-Return-Path: <netdev+bounces-298728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aOe/Biw2LGoNNwQAu9opvQ
-	(envelope-from <netdev+bounces-298728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:39:08 +0200
+	id YooSFxc2LGoKNwQAu9opvQ
+	(envelope-from <netdev+bounces-298727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:38:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B12167B012
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:39:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDFEE67B00E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:38:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=IYF2qStP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298728-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298728-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=debian.org;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eMyYsFKV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298727-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298727-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED00332C4687
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:30:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4D1B031F1F51
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632CD3D171F;
-	Fri, 12 Jun 2026 16:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAE63955EC;
+	Fri, 12 Jun 2026 16:28:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFBE3CFF4D;
-	Fri, 12 Jun 2026 16:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F020E37F011;
+	Fri, 12 Jun 2026 16:28:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781281743; cv=none; b=liY6TRsf3AIgfZ6J26Bf75iKm866rs4MPlQjxEN0g9muuizwFmAN6G1Le8QjUq1RcPUYzIBTpsgL3fuHnxiV513HRNDxU0vQ02mR8p0nIaUFVWRPLqYQw/zikCkyQvG2JNxWQwwIzi/5AlzK8M1vAoePkUMU94voWoeQ+Y9rBjk=
+	t=1781281739; cv=none; b=AhfSkDc4jL4LnpX8BfRYamgF0BqZnK+1MVSwwTBoLqAvVTacYS7Q5KvaHzC+8XFyyJyB5MzaT2AMeOgeKaDJApK1nYz6wRezEiHqqqq1JJ4B/fOxwJg9DMldW3MQXibhmwP1oyC5dm83XuAt6Y9m0rR4tDPJmAsnHMVHhnMCbIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781281743; c=relaxed/simple;
-	bh=9eG0SjFppRiHnEy0aXqt2CnVnNSCQ3XR7nSnUtTKfQ4=;
+	s=arc-20240116; t=1781281739; c=relaxed/simple;
+	bh=PZmMTZXzRt+C99kbXOxkubEIlf4jhXp0qRPcLgjlSqI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fgQLEotiKqNAdr/G9x8vd6F+OT9VODWkyY0mEc555iYlqVJHFqQLZodIcGJc3Xq37175sc+DPhaHcKW13ogmRQyX+pAh62u08mCj2HGF6oi8pUwELjoiYS8jgcZDH/qJnabB1pnsN6fA7cGIT33NxPpYzVSZMa7jJN9/T9RzEII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IYF2qStP; arc=none smtp.client-ip=82.195.75.108
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9eG0SjFppRiHnEy0aXqt2CnVnNSCQ3XR7nSnUtTKfQ4=; b=IYF2qStPBeqFayHUIlfLp0tknT
-	I+pb2ZuqkqThXJFrSvkqpHk9W51LUE/OykPJo7brnIINbJZf53Syf4DXTuKXMLuiWniSYqSfoyVhQ
-	L7WVmlxpQ4wmE6GXcENf5CKBJxSOa74z8RH4Ta3+nXB5T3nyOLas16BHNNc3dNmTmoXOI+njd7vBC
-	SYfhLq26sLh2hzoKPFgSYm0MaOcw4YR9P0O7CIZ1VP9gJgCmeLrwa6Wdova9V+wrfRnAWXi3oHvTN
-	JsFkQa+SPcCDMCpfQaH0jdjB1WesoZbcYBHASv13WEG4PBSeSa7VYmQVf9UpLafgv5SDI5N2hV9MN
-	u9qUMyfw==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wY4kS-00Are3-0P;
-	Fri, 12 Jun 2026 16:28:48 +0000
-Date: Fri, 12 Jun 2026 09:28:42 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	sdf.kernel@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next 2/2] udp: convert udp_lib_getsockopt to sockopt_t
-Message-ID: <aiwyvEbSHLHKNXBk@gmail.com>
-References: <20260612-getsockopt_phase2-v1-0-7b01f1f5d106@debian.org>
- <20260612-getsockopt_phase2-v1-2-7b01f1f5d106@debian.org>
- <willemdebruijn.kernel.26a37316bb5e2@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dmwXAfsdvakQs11w+LWMf5Jga5WhD1fcr8xhXVFAt30pn3KuA+0EittEXAIXoSMbxC9hYzuwVUQnqiUnFS1CcqC7+GW+DjCeitFv3TO5oNZLEcyfwrMvnB0oPRMuX3okcSJMK1grML1Lg3n2BAdrwZ9GM54y4xQ0QMiub78nPh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eMyYsFKV; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721D61F00A3A;
+	Fri, 12 Jun 2026 16:28:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781281737;
+	bh=+YkxKUKI+ttSACYhasK/qyZ52eMUZtHTMnbDNaJgTnY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=eMyYsFKVUI/AjLu4yjm2YPH2WCOHHt0vmajj/lYGVjak2UUxMEoPXOfcSQd6EBfR9
+	 aOjYNII68yBM3a4I/TCiIw3bRZKAN+l6K6VvvUqD8aN53ypgvtHXwSyKJUGBj8P0S3
+	 r5Z21FsWp3P5LFTPi5nbgn4RFu1fKWS8vAqAPIT8fwAmc4Oljdi8XoSaJqg32wn65u
+	 pAfPPEonX3LBEnxBELdEb1nRhciHC6EM5SDFFzTqOLezeUD7OxvInbS7j/0U8jF45e
+	 mCHqUhc167JQC28Br+UXJfsFJpOyjYK2/yr1BZX5jRJAx8qDNiG89SIj0ROK6QV0oh
+	 2nIxjNmVpkwYA==
+Date: Fri, 12 Jun 2026 11:28:56 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: lizhi2@eswincomputing.com
+Cc: pritesh.patel@einfochips.com, linux-stm32@st-md-mailman.stormreply.com,
+	devicetree@vger.kernel.org, edumazet@google.com,
+	linux-arm-kernel@lists.infradead.org, pjw@kernel.org,
+	pabeni@redhat.com, weishangjuan@eswincomputing.com,
+	linux-riscv@lists.infradead.org, ningyu@eswincomputing.com,
+	krzk+dt@kernel.org, pinkesh.vaghela@einfochips.com,
+	linux-kernel@vger.kernel.org, alex@ghiti.fr, andrew+netdev@lunn.ch,
+	alexandre.torgue@foss.st.com, kuba@kernel.org,
+	aou@eecs.berkeley.edu, horms@kernel.org, mcoquelin.stm32@gmail.com,
+	conor+dt@kernel.org, netdev@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, palmer@dabbelt.com, lee@kernel.org,
+	maxime.chevallier@bootlin.com, linmin@eswincomputing.com,
+	davem@davemloft.net
+Subject: Re: [PATCH net-next v8 1/6] dt-bindings: ethernet: eswin: relax
+ internal delay model to range-based constraints
+Message-ID: <178128173639.1162200.4235173600332300329.robh@kernel.org>
+References: <20260610012727.848-1-lizhi2@eswincomputing.com>
+ <20260610012849.874-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,65 +75,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <willemdebruijn.kernel.26a37316bb5e2@gmail.com>
-X-Debian-User: leitao
+In-Reply-To: <20260610012849.874-1-lizhi2@eswincomputing.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-2.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_MATCH_TO(1.00)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[einfochips.com,st-md-mailman.stormreply.com,vger.kernel.org,google.com,lists.infradead.org,kernel.org,redhat.com,eswincomputing.com,ghiti.fr,lunn.ch,foss.st.com,eecs.berkeley.edu,gmail.com,armlinux.org.uk,dabbelt.com,bootlin.com,davemloft.net];
+	TAGGED_FROM(0.00)[bounces-298727-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-298728-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:willemdebruijn.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:sdf.kernel@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:willemdebruijnkernel@gmail.com,m:sdfkernel@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lizhi2@eswincomputing.com,m:pritesh.patel@einfochips.com,m:linux-stm32@st-md-mailman.stormreply.com,m:devicetree@vger.kernel.org,m:edumazet@google.com,m:linux-arm-kernel@lists.infradead.org,m:pjw@kernel.org,m:pabeni@redhat.com,m:weishangjuan@eswincomputing.com,m:linux-riscv@lists.infradead.org,m:ningyu@eswincomputing.com,m:krzk+dt@kernel.org,m:pinkesh.vaghela@einfochips.com,m:linux-kernel@vger.kernel.org,m:alex@ghiti.fr,m:andrew+netdev@lunn.ch,m:alexandre.torgue@foss.st.com,m:kuba@kernel.org,m:aou@eecs.berkeley.edu,m:horms@kernel.org,m:mcoquelin.stm32@gmail.com,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:rmk+kernel@armlinux.org.uk,m:palmer@dabbelt.com,m:lee@kernel.org,m:maxime.chevallier@bootlin.com,m:linmin@eswincomputing.com,m:davem@davemloft.net,m:krzk@kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:conor@kernel.org,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[robh@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[debian.org:+];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,meta.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[robh@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt,kernel];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,eswincomputing.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B12167B012
+X-Rspamd-Queue-Id: BDFEE67B00E
 
-Hello Willem,
 
-On Fri, Jun 12, 2026 at 10:58:19AM -0400, Willem de Bruijn wrote:
-> Breno Leitao wrote:
-> > In preparation for converting the proto-layer getsockopt callbacks to the
-> > sockopt_t interface, switch udp_lib_getsockopt() to take a sockopt_t.
->
-> What is the benefit of this conversion?
+On Wed, 10 Jun 2026 09:28:49 +0800, lizhi2@eswincomputing.com wrote:
+> From: Zhi Li <lizhi2@eswincomputing.com>
+> 
+> Relax internal delay constraints for EIC7700 Ethernet binding.
+> 
+> Replace fixed enumeration of rx-internal-delay-ps and tx-internal-delay-ps
+> with a range-based definition (0-2540 ps, 20 ps steps) to reflect actual
+> hardware capability.
+> 
+> Mark rx/tx internal delay properties as optional, as they are board-
+> specific tuning parameters rather than mandatory configuration.
+> 
+> Update the device tree example to align with the relaxed constraint model
+> and remove delay properties from the example to avoid implying they are
+> required.
+> 
+> No functional change to existing DT users.
+> 
+> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> ---
+>  .../bindings/net/eswin,eic7700-eth.yaml       | 25 ++++++++++---------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
+> 
 
-This enables kernel callers (io_uring, bpf, etc.) to invoke getsockopt
-directly. The setsockopt() conversion previously used sockptr, but
-Linus objected to that approach and suggested iov_iter instead.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-For full context, see:
-https://lore.kernel.org/all/20260408-getsockopt-v3-0-061bb9cb355d@debian.org/
-
-> It does add a lot more complexity and makes the code less obvious.
-
-I agree this adds complexity. Unfortunately, I don't see a simpler way
-to enable getsockopt to work with non-__user addresses.
 
