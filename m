@@ -1,234 +1,212 @@
-Return-Path: <netdev+bounces-298731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298747-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1BNgAyw3LGpQNwQAu9opvQ
-	(envelope-from <netdev+bounces-298731-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:43:24 +0200
+	id MP/lNZ89LGrdOAQAu9opvQ
+	(envelope-from <netdev+bounces-298747-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:10:55 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4AC67B079
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:43:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B8F67B3BF
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:10:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Uc01agrX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298731-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298731-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=O7bKAAUb;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=cvhngrHr;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=O7bKAAUb;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=cvhngrHr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298747-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298747-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=suse.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 878793054F7B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:42:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 568863013A54
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9A639184F;
-	Fri, 12 Jun 2026 16:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A8A405C45;
+	Fri, 12 Jun 2026 17:09:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF2531F998;
-	Fri, 12 Jun 2026 16:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BBE405859
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:09:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781282562; cv=none; b=rBCb1QH0pxoKTDxzG/ukbAYPgIaGECjd5hKrYgUSKX2wtfMMPFz5LW0kK11wjHEVBWXw6CbwtEQKzwVdkt6dVX626u/urIXV8u0vKiw9lECbvS4ntOb8n4xvYysR1/yGqZoXuX24xzAUdrW0WtJC6Iaftpf+j74O3QFpF2tO3vI=
+	t=1781284184; cv=none; b=odIninQBcuKefLHwzTvjV9QYbEkwMjumIajVfqfD5Ec0rUl3YYIlhDuQAIx2bjEOCsp6IN3CrXDOg5hVcTtSNq2FCN7kYqIZUJXtkvyQxpG3umosD5wn+UDN3cqsGg5gYtFr5y5cnU8SVmWazi34eC71A5zGBFi3pyH8iE9sGxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781282562; c=relaxed/simple;
-	bh=pDlJRwm2q4MtfrMGx52E5MGlwxRmk+JgAQ+BX3789jQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sEQWwfttILzJzFA0V3q31PadGfV7eGpCs9tz1LezJKXLEmS6GzpHpfTdOUxJ02+iAovi7r2cdRQH22lBV7mZUHgULdxK2+y2SqQGSn5D47IMTzTxNuo7uea+vk2Xp8e9eHu37vekEviIH3XY9gDmWDO4ZdB5S31yw0pxZJdZH04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc01agrX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50751F000E9;
-	Fri, 12 Jun 2026 16:42:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781282561;
-	bh=I99C95VSZFAqZWdmJRiXGaTYkzTe9GzY8sHQ6ZTyQlM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Uc01agrXbxRlTOO7LyCWS3kaTBbkV6SPNfqxp/j2mfJgPnSbBgHGrnHvkDxpX1d6A
-	 Qyegf7x2849XwfGcQWnTeoWN6OlMOmaNPzpl7zuqPxcj7jDO2+X2xfxjXSDlBASYNO
-	 7taYy/rFJAig2GMOECaQFxYPtkAuX1LNiZugnFwIFEZTh8vsF551waf7uBo6taDFAr
-	 fSXrnJLNrijUsYzyZfDHUHkP3QOjNENNtREqb6RUnHtulKN5oBiIFVWUlJanuA9dR2
-	 8g4TFidlSuglS3J+E2rv0buHZmUK787z0UFPs3CGqy/VbW7vY5DC3esNAFkf6drglq
-	 3/yea1CdVELdQ==
-From: Simon Horman <horms@kernel.org>
-To: angelayucode@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	dsahern@kernel.or,
-	blair.steven@alliedtelesis.co.nz,
-	carl.smith@alliedtelesis.co.nz,
-	linux-kernel@vger.kernel.org,
-	angela.yu@alliedtelesis.co.nz,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] [PATCH] l2tp: fix IPv6 xmit frag failure for oversized non-GSO packets
-Date: Fri, 12 Jun 2026 17:42:14 +0100
-Message-ID: <20260612164213.694784-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260610223557.2765487-1-angela.yu@alliedtelesis.co.nz>
-References: <20260610223557.2765487-1-angela.yu@alliedtelesis.co.nz>
+	s=arc-20240116; t=1781284184; c=relaxed/simple;
+	bh=9kB0UfTeSCkMBRmWGNDNFjdMSkwixJI8BzEiqxz9eEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fb2q347Efjv/dui//1ttq3dSwMURA+UPhOdk2oyAU2099vBDJ8P+dxPOy0PP15nH0VxlKGYeJEHslI+Ejcb3zA9Kcp12czoBy7qVljcimGoblFUWN9O8zdfVST2EAXkJFVy+1zWn1IA02DRdbXfvfeYwfru9BB5CPzonhx9lsVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=O7bKAAUb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cvhngrHr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=O7bKAAUb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cvhngrHr; arc=none smtp.client-ip=195.135.223.131
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B34984BB5;
+	Fri, 12 Jun 2026 16:44:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781282670; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VHqaOsvEfvnQhg0gJC43oq0VxUxfZokOBLkTg1vCgbs=;
+	b=O7bKAAUbjE2z4+egvHZ0PEf4EGote2/UFmRjbwCsnAy0mjsCpfwjl3QZNL6LowcLGV71OD
+	1auMsMLycCU1HMBzlqJa6L0vHfNB+75Z1h34ikJsg1e1hVN/NQuSzNG4G8CipcH57iuMaZ
+	q0ZdwAOFWbopR/ias/vXpKXN0uQYq1k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781282670;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VHqaOsvEfvnQhg0gJC43oq0VxUxfZokOBLkTg1vCgbs=;
+	b=cvhngrHrvBPrU1HLbUkrQ02naf+wR4muWkL8wfor3ZuDIBxnN+sI3PGwuxEzkUUmes6ScZ
+	9LuPAwzXuvQe/dBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1781282670; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VHqaOsvEfvnQhg0gJC43oq0VxUxfZokOBLkTg1vCgbs=;
+	b=O7bKAAUbjE2z4+egvHZ0PEf4EGote2/UFmRjbwCsnAy0mjsCpfwjl3QZNL6LowcLGV71OD
+	1auMsMLycCU1HMBzlqJa6L0vHfNB+75Z1h34ikJsg1e1hVN/NQuSzNG4G8CipcH57iuMaZ
+	q0ZdwAOFWbopR/ias/vXpKXN0uQYq1k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1781282670;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VHqaOsvEfvnQhg0gJC43oq0VxUxfZokOBLkTg1vCgbs=;
+	b=cvhngrHrvBPrU1HLbUkrQ02naf+wR4muWkL8wfor3ZuDIBxnN+sI3PGwuxEzkUUmes6ScZ
+	9LuPAwzXuvQe/dBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B33A779A7;
+	Fri, 12 Jun 2026 16:44:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id GAoxJW43LGp5IwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Fri, 12 Jun 2026 16:44:30 +0000
+Message-ID: <71af4535-96bf-422b-9177-8aa7e9666c80@suse.de>
+Date: Fri, 12 Jun 2026 18:44:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3 net-next v6] ipv4: handle devconf post-set actions on
+ netlink updates
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, dsahern@kernel.org, idosch@nvidia.com,
+ davem@davemloft.net
+References: <20260609204520.4670-2-fmancera@suse.de>
+ <20260612123820.673243-1-horms@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260612123820.673243-1-horms@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Spam-Score: -4.51
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:angelayucode@gmail.com,m:horms@kernel.org,m:dsahern@kernel.or,m:blair.steven@alliedtelesis.co.nz,m:carl.smith@alliedtelesis.co.nz,m:linux-kernel@vger.kernel.org,m:angela.yu@alliedtelesis.co.nz,m:davem@davemloft.net,m:dsahern@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298731-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-298747-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url,suse.de:dkim,suse.de:mid,suse.de:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5B4AC67B079
+X-Rspamd-Queue-Id: 59B8F67B3BF
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-l2tp: fix IPv6 xmit frag failure for oversized non-GSO packets
+On 6/12/26 2:38 PM, Simon Horman wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at: https://sashiko.dev
+> ---
+> ipv4: handle devconf post-set actions on netlink updates
+> 
+> This commit ensures that IPv4 device configuration parameters updated
+> via netlink trigger the same post-modification actions as sysctl updates.
+> It addresses the inconsistency by calling devinet_conf_post_set() inside
+> inet_set_link_af() and deferring cache flushing.
+> 
+>> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+>> index 8300516fb38f4..a35b72662e431 100644
+>> --- a/net/ipv4/devinet.c
+>> +++ b/net/ipv4/devinet.c
+>> @@ -2161,6 +2161,20 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
+> [ ... ]
+>> +	case IPV4_DEVCONF_FORWARDING:
+>> +		if (new == 1) {
+>> +			/* it is safe to use container_of() because forwarding case
+>> +			 * is only used by the netlink path
+>> +			 */
+>> +			struct in_device *idev = container_of(cnf, struct in_device, cnf);
+>> +
+>> +			netif_disable_lro(idev->dev);
+> 
+> [Severity: High]
+> Does calling netif_disable_lro() directly here without acquiring the
+> netdev_lock_ops mutex cause lockdep assertion failures?
+> 
+> Since inet_set_link_af() runs only under rtnl_lock() and does not acquire
+> the device ops lock, this direct invocation appears to bypass the locking
+> requirements for netif_disable_lro(), which modifies dev->wanted_features
+> and invokes netdev_update_features(dev).
+> 
+> On drivers that opt-in to netdev_lock_ops, does this create a concurrent
+> data race on the device features mask? Should this use dev_disable_lro()
+> instead, which correctly acquires and releases netdev_lock_ops(dev) around
+> the netif_disable_lro() call?
+> 
 
-This patch sets skb->ignore_df from ip6_sk_ignore_df(sk) inside ip6_xmit()
-so that oversized non-GSO L2TPv3-over-IPv6 outer packets follow the
-fragmentation path instead of being dropped with EMSGSIZE.
+The device operations lock is held when handling IFLA_AF_SPEC at
+net/core/rtnetlink.c. Calling netif_disable_lro() is the right thing to
+do IMHO. Keep on mind that FORWARDING case here is only triggered by
+netlink path and not sysctl.
 
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index c14adcdd4396..f5370554cfb5 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -359,6 +359,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
->  	skb->protocol = htons(ETH_P_IPV6);
->  	skb->priority = priority;
->  	skb->mark = mark;
-> +	skb->ignore_df = ip6_sk_ignore_df(sk);
+AI keeps complaining about this but it isn't right AFAICS.
 
-[High]
-Can this unconditional assignment clobber an skb->ignore_df that the
-caller deliberately set before invoking ip6_xmit()?
+Thanks,
+Fernando.
 
-For example, sctp_v6_xmit() in net/sctp/ipv6.c does:
+>> +		}
+>> +
+>> +		inet_netconf_notify_devconf(net, RTM_NEWNETCONF,
+>> +					    NETCONFA_FORWARDING,
+>> +					    ifindex, cnf);
+>> +		return true;
+> 
 
-	if (!(t->param_flags & SPP_PMTUD_ENABLE))
-		skb->ignore_df = 1;
-	...
-	res = ip6_xmit(sk, skb, fl6, sk->sk_mark,
-		       rcu_dereference(np->opt),
-		       tclass, READ_ONCE(sk->sk_priority));
-
-If the SCTP socket has pmtudisc set to IPV6_PMTUDISC_DO, _PROBE, or
-_INTERFACE via setsockopt(IPV6_MTU_DISCOVER), ip6_sk_ignore_df() returns
-false:
-
-	static inline bool ip6_sk_ignore_df(const struct sock *sk)
-	{
-		u8 pmtudisc = READ_ONCE(inet6_sk(sk)->pmtudisc);
-
-		return pmtudisc < IPV6_PMTUDISC_DO ||
-		       pmtudisc == IPV6_PMTUDISC_OMIT;
-	}
-
-In that combination, won't the new write reset ignore_df back to 0 and
-defeat the per-transport SPP_PMTUD_ENABLE-off setting, sending the
-packet down the EMSGSIZE / IPSTATS_MIB_FRAGFAILS branch that the patch
-is trying to avoid?
-
-The same concern applies to L2TP itself. l2tp_xmit_queue() in
-net/l2tp/l2tp_core.c does:
-
-	skb->ignore_df = 1;
-	skb_dst_drop(skb);
-	if (l2tp_sk_is_v6(tunnel->sock))
-		err = inet6_csk_xmit(tunnel->sock, skb, NULL);
-
-inet6_csk_xmit() does not touch skb->ignore_df before reaching
-ip6_xmit(). If the tunnel socket is configured with
-IPV6_PMTUDISC_DO, doesn't the new line in ip6_xmit() also overwrite the
-ignore_df=1 that l2tp_xmit_queue() just set?
-
-Other ip6_xmit() callers (TCP via inet6_csk_xmit/tcp_v6_send_synack/
-tcp_v6_send_response, XFRM NAT keepalive via nat_keepalive_send_ipv6)
-inherit this behaviour change too. Would an OR-merge such as
-
-	skb->ignore_df = skb->ignore_df || ip6_sk_ignore_df(sk);
-
-or fixing this in the offending L2TP path be more appropriate, so the
-contract of ip6_xmit() with its other callers is preserved?
-
-[Medium]
-The commit message says:
-
-    For oversized non-GSO packets skb->ignore_df is not set, causing the
-    packet to fail the transmit checks and hit the
-    EMSGSIZE/IPSTATS_MIB_FRAGFAILS path instead of being fragments.
-
-Is that accurate for the L2TPv3 data path? l2tp_xmit_queue() already
-unconditionally does:
-
-	skb->ignore_df = 1;
-	...
-	err = inet6_csk_xmit(tunnel->sock, skb, NULL);
-
-and inet6_csk_xmit() does not clear it before ip6_xmit(). With the
-pre-patch test
-
-	if (likely((skb->len <= mtu) || skb->ignore_df || skb_is_gso(skb)))
-
-ignore_df=1 should already short-circuit the MTU check on the data
-path. Is the failure actually coming from a different path (for
-instance an L2TPIP control-socket send that bypasses
-l2tp_xmit_queue())? Could the changelog be updated to identify the
-exact path that was hitting the EMSGSIZE branch?
-
->  	mtu = dst6_mtu(dst);
->  	if (likely((skb->len <= mtu) || skb->ignore_df || skb_is_gso(skb))) {
-
-[Low]
-After this change, ip6_xmit() and __ip_queue_xmit() have asymmetric
-semantics for skb->ignore_df. The IPv4 helper only reads it:
-
-	if (ip_dont_fragment(sk, &rt->dst) && !skb->ignore_df)
-
-while ip6_xmit() now writes it from the socket's pmtudisc, overriding
-callers. Should the two paths be aligned, or should this divergence be
-documented near ip6_xmit()?
-
-Also, two small typos in the commit message:
-
-    the packet length does not excent the MTU
-                              ^^^^^^ exceed?
-
-    instead of being fragments.
-                     ^^^^^^^^^ fragmented?
-
-    transmited as intended.
-    ^^^^^^^^^^ transmitted?
 
