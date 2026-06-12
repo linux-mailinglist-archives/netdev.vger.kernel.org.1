@@ -1,265 +1,228 @@
-Return-Path: <netdev+bounces-298710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298711-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qrAJDJAtLGrOMwQAu9opvQ
-	(envelope-from <netdev+bounces-298710-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:02:24 +0200
+	id WgHbALwtLGrqMwQAu9opvQ
+	(envelope-from <netdev+bounces-298711-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:03:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF8B67AAFA
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:02:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544F667AB04
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:03:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=pD0UlD5t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298710-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298710-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=LmayjKZf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298711-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298711-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1DA123028EED
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:01:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 728B23217E81
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001423612D5;
-	Fri, 12 Jun 2026 16:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8913838D3FE;
+	Fri, 12 Jun 2026 16:02:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE1E32570D
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 16:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF46C5C613
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 16:01:56 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781280113; cv=pass; b=CAoZZpqCmIWkluzdwGXA49xU6EnYBbYHAqRE1DEvMxbzklSZZlFLf6BLn4CyXjNozP4kBQZDWMX/UjiUDLB0PlgO6yVBsgsjpC8b+gVtV1MqKNpbG8To/MhGIv/8DLddDIHyh/gHQmGGk23aquklUlZhw5ByAwSnA27qV1ldBt0=
+	t=1781280119; cv=pass; b=TWMeD5UEQDuQvUdYme2IByvcvmusH05mK/SNTda+58DCLNdL8QNz1oU/5dhqlAM7wJqkg11A9WSgCRKakJtEDFeEnRrtOfpTDRJqH83HAL1l9nLEn50DeNCFdr+FL3yqvB1Dn2ULIcZwAwYO07qUzEwVzVBd/QnP66N7uZxR20s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781280113; c=relaxed/simple;
-	bh=Rb8FuojIiOJqGBz+6uVJ+OFzBs3jrD56uWZ1H7iBmBM=;
+	s=arc-20240116; t=1781280119; c=relaxed/simple;
+	bh=xLmT1CglDc1tRi97nwnjGAiRAUXSf/PXHXAe9jH7qa0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lBan3FOKVVqflx5E62fP8eRjarMeJtdmomOnq9Zg9eejnHSdfxn0SXwsXhd92THjV2wdiEv4Ix5SqqcP9ZZgam9b0dxkh3EryM0oR6jp5y9gNugB5cWqao7+Chh8qw7mdu1CLpyue/LAcT36xSAnFWnhmZF8SzEJY+CeueQVMuQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pD0UlD5t; arc=pass smtp.client-ip=209.85.160.172
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5177d1ff061so531321cf.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:01:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781280109; cv=none;
+	 To:Cc:Content-Type; b=dPz3H9ZWMWYT7YqvaaMqXgHG1z1SjJxsTKbcM7ElXEO3pYlnRBE9B8sV7kzjcSOjPXmuafODs549s6KWkgJ2hjUmAnK0UM/S7waM9Ty42jRqeCx/PnlG414O6Ih897gh2k7KIqtFR6kmbidTOVYc9R1xFQCFEwaeUzh/7kYiFiA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LmayjKZf; arc=pass smtp.client-ip=209.85.215.180
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c85825bbc4fso699846a12.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 09:01:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781280116; cv=none;
         d=google.com; s=arc-20240605;
-        b=cAxGTrTggKGwoKyCd/IpRVa017qrXFc4Jjsz/vdJURBCRb6mdJpZSWB2NgqQsb9TKQ
-         cMuC1WwmbsTV0cmdwfu0v7YnH1yAY9DwbOjpgep1A1V40riTaCl2rBUbNv43qEcqSWm7
-         K8iv1Ph0lmpOQy/WfcUlVZMAd9PnWPij0Cc97Nlaz0u5rUMYx0sL3BxHIa85lw/WjEHB
-         NG6hplXQ6jF/mazNCmhRs4Dk8jzMNkWzFnCQGdRhIypvCfpOKcLShkK29ujSMru3X6Pn
-         N8mfGUZ8wjD2Q8Ndgtvz8Qji7uTRX3iNo7Y9OUq6NF6MSteao2GWQjmWs0otPx+RKMFg
-         Paew==
+        b=Y2L+jEZIwn5IxFEeqd5vecefEEqEZZSgdOLArhzdbgUD25tL0t35sVzhd5fadql0Iy
+         Dp05w0Lu7xQ6QGGsUGY2+8yu+QaI8sVMsDw4DLHUWab2zKfaD3DUnv0KsuXgkfbBAor9
+         TwLcRwdVQuoy+x868A9RNSlT4+Y1bMB7lCjH7uRVO+6nOfaQVvdFyG62e+ksZUBlbFHE
+         +7g2JKIiZdxEfVnDVp848SfJB7DtfKjTZ5atWyyeXJ1HKfx0cUqRCP6L62Nnz2ZfVUw/
+         +Mmrf45VUU7VNfoMemlUx5eg/zIQHv29L/5Nr/BINggD/edhYwB/ClvZNpvzlMw+oxhS
+         eFew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=a50kyoLhVQeW3U2Ze+HGxZgYK7Tu12TilefkepaSEmg=;
-        fh=3hl0SHMMCEbsiu615maYv5coWLHkJi5Q0sNYWSZgcUM=;
-        b=G9r67E2w33ooUNpGX/C/z4OVdEYl3Zc+Lne2XqWekVnzGXZ0uV/af4HT19o0ulkEdk
-         xQ8pWjjebXoR88TNln8oxJNEWuv5fAhbSN/dNj0eKznwchGKL6OP0nVASmfRgNZmAwx7
-         Imub/JdFSIsibC0RKJUn5E7d2bE/hfvoS+FyeqZK2ZVNXKrIqi/tmLkH0n5HVKq0m9Ms
-         TTfq7zk7jwwxQZ3IDiEWwO86FBoqpPppgLZVZUwFV3lXrXv8vZ5FYadkMfLWwsgKa8Nq
-         Zp8Cno23jsH2kvHM09SuuymgpBIqpBIvx7Jkf4OeZRFLG28M7DRVE97Cp1uD7QcNdpDu
-         cQDg==;
+        bh=3NluFMG/+8oV4UqiIPnUP3waoS+zwZ5/CDcQWyg+zCA=;
+        fh=cchpIVL84HOB5TkQpFJbO+CtzxR/7Z32gY443b4semQ=;
+        b=dT97Gs4c23jSbcD/dVAWHGRupnkW8HpvZBf+xitz6hmawvkbJYsExO/Nincw3NmBSy
+         IGRsM+8kkwcfK0ruwygON8VB8i/aNoTN72suP9Eic08xLxInOv5YuWV77HGkMLpwT3bB
+         8lkbjdg9XIQarLgPNJe9tePmPpRa5GhVBge/ZtaStGSAolIllDp6Ofswky/Ee2189mbT
+         4k0Egia69GuJ5DU37k7UxmdXyUHDkRMsBsC4/4IvSbjNtSH10Ae91EfqcduM0iPUIX25
+         RC35oXfBVJMes3ZwVJwwyMXvsTJsdCZLyDMIKfYrUexqcA8RzuqnKpa/ASc090TdNV+f
+         lolw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781280109; x=1781884909; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781280116; x=1781884916; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a50kyoLhVQeW3U2Ze+HGxZgYK7Tu12TilefkepaSEmg=;
-        b=pD0UlD5tibWagAxOS8VE8seGVKoBQG1+WrxZilrKgtQTkX3kIdvbCbGJrV6YzEGOSP
-         41T38RWG/BmqDvAn/tGehvOJPuOlDcdHQ8/gTGKY+dFZLnsoF6gROjyJl2qj9tQSH1zr
-         ofeWkG8j4e7y7ctcdn/4azwDGxHANyf4ZvtHBmbxiseYuNTxZdMjelRpDGAtbm1dcMB2
-         wdFDn1/NpHkiqpUsh1IdoJk/6fCXgnZFE2xYftGGRIqv676VjsWlXS6JvxUv38PC0Jt4
-         DDODYntw61dWEUOSoT6RKhS/DnFQpbU0Ht45hrJFZWffQoevoBwM1n4A6/FaCYOMsSCu
-         W5wQ==
+        bh=3NluFMG/+8oV4UqiIPnUP3waoS+zwZ5/CDcQWyg+zCA=;
+        b=LmayjKZfXj6a0qpPllyDM4QM/G4gpUaLGmES8roRE15fVN/SSLH4vStK+sgtEvfLWT
+         9gJUB5R+symRRzxQK0nHtekVFmD7fmTRG6mjyeDLY3vMnAIdvhYTaPYpKsp2C1wA+rsR
+         dJ0ganFgAmJDcNmdQFu499jp/zSQbXykkpBDi/c3BN2Vv7tiGgWdCNadvjXBiM1oLcAu
+         FYfe2bwzRVG2AEwV84HmOPnWb57F52fDPp44jZUTtp3BEpC/xs8j3ENwasrO0yP4+h9N
+         FPkVH0Nkrw7nBENJWzjutiOF3AOO4QksPTAdL5h+nM7UjYm9co/WyB3Fe8fo8PRxBg2U
+         76cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781280109; x=1781884909;
+        d=1e100.net; s=20251104; t=1781280116; x=1781884916;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=a50kyoLhVQeW3U2Ze+HGxZgYK7Tu12TilefkepaSEmg=;
-        b=QstfJ/CKKSQTzBtSJ+WjAIBkQJYzvslg7nB3VR7m74xTo7GgJJbd2il4wfkvU6I0DX
-         cE+ySXubShmwbObHU5Mk3LMMbnRhXDP8imEVr113RMfZilOC146CUGI7C8x8XazVPedd
-         93CogTZBjcYk2NjAX11EHazxb09mlPbS9FOSkFescyMawRSHa6yiXi7+ha1gANKvS1R9
-         6kpFLweohUeTgUII96CXKjrJYA8o6KfJ/KZi9DfxpTmaGF/Xq51I2+lCA3NxwK7RvA/+
-         nwxaMEtEEEmnIcn9Kek9cGQB0sSvt7kaE0bWXMz9KUFBR3kno25ImTL5H2axCTxY0hLV
-         9Z9Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/Ifvzg4emWRSZescVQQTyiUuLJZ9mvZcPcqP/CSwj8RJ2xT/e7cVMQoDYtU9G0y5Wn3Dqaglw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSWwqA57J8g9BVKc0krFJjgn3mzx/WTDZ+rXQN3api6KCSUSY/
-	KP8TbaUE+61/msxy+aa/HlEK722eAdCHvcD7I+IdCm59Qt3sRqbfW3TzgQXtg8wuSd4anYB/wMc
-	TJH+p1Mp26frII/nasvu9HzbQIKt3o1Yx25VvtbO0ZdB8A1IA72qoUd6wJ0k=
-X-Gm-Gg: Acq92OEtPxcIC6CySzqarlCCv2QL/hJpOsLvkxLPCDKfJ8FZKpbSH441vT/1L0/erod
-	Q9zyR2qoIuF9Sdd+TGi+ZFjfj34fJKB6fm7bPJOkgUD90vCPqrfnEfspNBfv3GUO1DVd+y+nl+k
-	WngHkkXKAE5ZlSOBfUzHK+QiHGhDNUuCfhM0v4Hly2uLI6THzt14PhXHjMCU4mcnSSJ9u5/g5cG
-	0VuMslgOjHEXORX5hWg0qzzXDPg1VbX8xO5cKBrcGU0SMgXVMPCzW1RVGs4FZqtFGIPOd9ntsM5
-	l3Z9wgbqMZHAH69N
-X-Received: by 2002:a05:622a:a11:b0:4ff:bfd9:dd31 with SMTP id
- d75a77b69052e-517fc520f0bmr7637231cf.5.1781280108465; Fri, 12 Jun 2026
- 09:01:48 -0700 (PDT)
+        bh=3NluFMG/+8oV4UqiIPnUP3waoS+zwZ5/CDcQWyg+zCA=;
+        b=qi6FIy3z67Plf6swlVY9ixOsYW7TjcM2gnzvT94Bdj4pYUteDRBnJO48hRjTzUEcc8
+         1dxAvw5nYsDtnW9tjvUPjJZw5h/UATB2GcEBUir63itficVr67XKW21M+moG7le7ehFW
+         RK9ObTxiVM7jKqZSxDdDohlK5keNrL+UI4gMyJQHWy/THC3OFILqHa3MKn6FqTNINCd4
+         BIyN1pyLELI1/EXrEtBmPkzqsbOIrBD3O8SmJvomkHGqrmiwE8ePGT9FbDB7FsFcOgg9
+         9njnBVbc2U9gyOn7HZ73CjpZdgRXxWuParKmPCE/FYXJ5NefKhUK0w4mWdtOfZOa1Z+6
+         YmFw==
+X-Gm-Message-State: AOJu0YwaOQSGvMCjV+CqiJ61xGLgwfHtwJLRXJOSTCyN//3JsDj6AD6I
+	L8/NPAToS6gQ9h+qWbPcUw8jRYcJX4D/5fSMtiVkWtX2ioflEyyYFYrkp0Y05LpJbRMtGB9OJLW
+	I/M/nVRlYupAeUBuaW1UnTqBEarwTppo=
+X-Gm-Gg: Acq92OGKUH053B+wvt38rURZLw/VP9+W4Dacmh2aYIcUJWH5Ea6afQNNwJ8epuhAFSI
+	1/vDRd7ztEJO2OlsYyEwH2UiOSIzojcRNRDqh0JSKTBJqMbhCq9kE0S7sfyRpRKv2yRb6Kwfhed
+	7HHrAeWa2ixszmD+QSU9la2IqgX9jxeZMAjmHRRlMXe63/3XKzKVYnOa0Rfjjo4AfCKzdGUKf2+
+	t9I8bWWHnd85Xl8XcwHxzXXKId3ufi+thWfUi4d7RuK7G9Y7+3xFHkXSVjwB1OeN5klM1vIh7l6
+	P7ofou1fmpNr8Fk60Z8OfFPbWq1C9j8t/HrCvtp2yVqqAbPc+gkgudDpCELbQUlEjYGVG2Em1Ok
+	sNQJEPaBdQEMsjX7h8FBP/FpXpJvyrB7Dqqw=
+X-Received: by 2002:a05:6300:6708:b0:3aa:c93b:625b with SMTP id
+ adf61e73a8af0-3b783c74eadmr4367140637.3.1781280115162; Fri, 12 Jun 2026
+ 09:01:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com>
- <20260610230413.D68967BC@davehans-spike.ostc.intel.com> <aipphZ5iCnbXVNSR@google.com>
- <CAJuCfpHmem_g7mEoic7O56LVSLkbftgWYgzexPWy7VSwp7_SiA@mail.gmail.com> <131c6a49-9177-418b-a653-8f13942fb8d3@kernel.org>
-In-Reply-To: <131c6a49-9177-418b-a653-8f13942fb8d3@kernel.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Fri, 12 Jun 2026 09:01:36 -0700
-X-Gm-Features: AVVi8CctRaDJfF5OxV4HwolIWbvnZfBdGqLW9dLOQNg_q1FSz8KvD_IKdVV3A1Q
-Message-ID: <CAJuCfpEMF6QMGd=H1+Z_tFzJ8SSvUXZL62r1iijZoEseoAr9_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] binder: Make shrinker rely solely on per-VMA lock
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
-Cc: Alice Ryhl <aliceryhl@google.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	=?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Carlos Llamas <cmllamas@google.com>, Christian Brauner <christian@brauner.io>, 
-	David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org, 
-	Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Todd Kjos <tkjos@android.com>
+References: <20260612011452.134466-1-xiyou.wangcong@gmail.com>
+In-Reply-To: <20260612011452.134466-1-xiyou.wangcong@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 12 Jun 2026 09:01:43 -0700
+X-Gm-Features: AVVi8Cf3XUkYJ4-XhNrmqW9iOjgBV1BE-aGRWP1cVs3vyQnQRIzHDQ5CDQInRCg
+Message-ID: <CAADnVQ+KTNKkf_Tc-RZR-g8wEfJU4qWcOPnjDbA2=PEtZsYnYg@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 0/5] tcp: opportunistic loopback splice for
+ BPF-paired sockets
+To: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	Jiayuan Chen <jiayuan.chen@linux.dev>, Hemanth Malla <hemanthmalla@gmail.com>, 
+	zijianzhang@bytedance.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298711-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,cloudflare.com,linux.dev,bytedance.com];
+	FORGED_RECIPIENTS(0.00)[m:xiyou.wangcong@gmail.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:jiayuan.chen@linux.dev,m:hemanthmalla@gmail.com,m:zijianzhang@bytedance.com,m:xiyouwangcong@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:vbabka@kernel.org,m:aliceryhl@google.com,m:dave.hansen@linux.intel.com,m:linux-kernel@vger.kernel.org,m:akpm@linux-foundation.org,m:arve@android.com,m:cmllamas@google.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:tkjos@android.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[surenb@google.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-298710-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[surenb@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4CF8B67AAFA
+X-Rspamd-Queue-Id: 544F667AB04
 
-On Fri, Jun 12, 2026 at 8:41=E2=80=AFAM Vlastimil Babka (SUSE)
-<vbabka@kernel.org> wrote:
+On Thu, Jun 11, 2026 at 6:15=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
 >
-> On 6/11/26 21:59, Suren Baghdasaryan wrote:
-> > On Thu, Jun 11, 2026 at 12:53=E2=80=AFAM Alice Ryhl <aliceryhl@google.c=
-om> wrote:
-> >>
-> >> >  b/drivers/android/binder_alloc.c |   26 +++++++++-----------------
-> >> >  1 file changed, 9 insertions(+), 17 deletions(-)
-> >> >
-> >> > diff -puN drivers/android/binder_alloc.c~binder-try-vma-lock drivers=
-/android/binder_alloc.c
-> >> > --- a/drivers/android/binder_alloc.c~binder-try-vma-lock      2026-0=
-6-10 15:57:55.274412018 -0700
-> >> > +++ b/drivers/android/binder_alloc.c  2026-06-10 15:57:55.277412124 =
--0700
-> >> > @@ -1142,7 +1142,6 @@ enum lru_status binder_alloc_free_page(s
-> >> >       struct vm_area_struct *vma;
-> >> >       struct page *page_to_free;
-> >> >       unsigned long page_addr;
-> >> > -     int mm_locked =3D 0;
-> >> >       size_t index;
-> >> >
-> >> >       if (!mmget_not_zero(mm))
-> >> > @@ -1151,15 +1150,12 @@ enum lru_status binder_alloc_free_page(s
-> >> >       index =3D mdata->page_index;
-> >> >       page_addr =3D alloc->vm_start + index * PAGE_SIZE;
-> >> >
-> >> > -     /* attempt per-vma lock first */
-> >> > +     /*
-> >> > +      * Attempt per-vma lock. This is essentially a
-> >> > +      * "trylock". It can fail even if the VMA exists
-> >> > +      * for 'page_addr'.
-> >> > +      */
-> >> >       vma =3D lock_vma_under_rcu(mm, page_addr);
-> >> > -     if (!vma) {
-> >> > -             /* fall back to mmap_lock */
-> >> > -             if (!mmap_read_trylock(mm))
-> >> > -                     goto err_mmap_read_lock_failed;
-> >> > -             mm_locked =3D 1;
-> >> > -             vma =3D vma_lookup(mm, page_addr);
-> >> > -     }
-> >> >
-> >> >       if (!mutex_trylock(&alloc->mutex))
-> >> >               goto err_get_alloc_mutex_failed;
-> >> > @@ -1188,13 +1184,11 @@ enum lru_status binder_alloc_free_page(s
-> >> >               zap_vma_range(vma, page_addr, PAGE_SIZE);
-> >> >
-> >> >               trace_binder_unmap_user_end(alloc, index);
-> >> > +
-> >> > +             vma_end_read(vma);
-> >> >       }
-> >> >
-> >> >       mutex_unlock(&alloc->mutex);
-> >> > -     if (mm_locked)
-> >> > -             mmap_read_unlock(mm);
-> >> > -     else
-> >> > -             vma_end_read(vma);
-> >> >       mmput_async(mm);
-> >> >       binder_free_page(page_to_free);
-> >> >
-> >> > @@ -1203,11 +1197,9 @@ enum lru_status binder_alloc_free_page(s
-> >> >  err_invalid_vma:
-> >> >       mutex_unlock(&alloc->mutex);
-> >> >  err_get_alloc_mutex_failed:
-> >> > -     if (mm_locked)
-> >> > -             mmap_read_unlock(mm);
-> >> > -     else
-> >> > +     if (vma)
-> >> >               vma_end_read(vma);
-> >> > -err_mmap_read_lock_failed:
-> >> > +err_vma_lock_failed:
+> This series adds an opportunistic "loopback splice" fast path for two
+> locally-connected TCP sockets that a sock_ops BPF program pairs at
+> handshake completion. Once paired, sendmsg copies the user payload into
+> a per-direction in-kernel byte ring and recvmsg drains it on the other
+> side; both copies happen in their own task's mm, so the fast path incurs
+> no skb construction, no softirq, and no TCP protocol-state processing.
 >
-> This label is unused btw, which is related to Alice's point.
+> The underlying TCP connection stays fully real: sequence numbers are
+> frozen at post-handshake values, so FIN/RST/keepalive keep flowing
+> through the normal paths and the pair tears down via a regular close.
+> Pairing is opt-in per flow and fallback is per-message - handshake-style
+> traffic takes the TCP path, the bulk phase takes the ring, on the same
+> socket. Nothing leaves the host and applications need no changes: no new
+> address family, no LD_PRELOAD, no source modification.
 >
-> >> >       mmput_async(mm);
-> >>
-> >> If the vma lookup fails because the mmap write lock is held, but the v=
-ma
-> >> actually exists (has not been unmapped), then this code might "success=
-fully"
-> >> remove the page without invoking zap_vma_range(). This means that the
-> >> page does not actually get freed and will just hang around forever unt=
-il
-> >> the process owning the vma exits or Binder needs this page and maps a
-> >> new page on top of the page.
-> >
-> > Yeah, I think if lock_vma_under_rcu() returns NULL you just need to
-> > jump to err_mmap_read_lock_failed, like we currently do if
-> > mmap_read_trylock() fails.
+> The target use cases are co-located endpoints that speak plain TCP:
+>  - regular TCP loopback (127.0.0.1) between processes on the same host;
+>  - container sidecar deployments - e.g. a service-mesh sidecar proxy and
+>    its application in the same pod, talking over loopback or a veth pair =
+-
+>    where the per-skb veth+bridge cost is exactly what the ring sidesteps.
 >
-> I don't think that will be enough as well, as the current code AFAICS doe=
-s
-> something meaninfgul when mmap_read_trylock() suceeds but vma_lookup retu=
-rns
-> NULL because there's no vma at that address. Now we would just assume the
-> trylock failed even if the reason was that vma lookup found nothing for t=
-he
-> address. The problem is that lock_vma_under_rcu() can't distinguish those
-> two outcomes, so we would need something that does?
+> Highlights (TCP_RR, 1 KB request/response, netperf, pinned CPUs,
+> baseline TCP vs splice; full tables across message sizes and TCP_STREAM
+> in patches 1 and 2):
+>
+>   loopback (127.0.0.1):
+>     without busy-poll:   105.8k -> 235.1k tps  (2.2x)
+>     with busy-poll 50us: 106.1k -> 713.0k tps  (6.7x)
+>
+>   container (netns + veth + bridge):
+>     without busy-poll:    99.9k -> 233.9k tps  (2.3x)
+>     with busy-poll 50us: 100.4k -> 704.9k tps  (7.0x)
+>
+> Synchronous-RPC (TCP_RR) at a 1 KB message wins ~2.2x without busy
+> polling and ~6.7x with it (the win grows toward smaller messages and
+> narrows toward 64 KB), because the ring removes the per-cycle kernel TCP
+> receive-path cost and the receiver can spin on the ring directly -
+> loopback delivers via the per-CPU backlog and exposes no pollable
+> napi_id, so the generic sk_busy_loop() is a no-op there. Bulk streaming
+> is roughly neutral on bare-metal loopback but wins decisively (up to
+> ~6x) container-to-container, where per-skb veth+bridge cost dominates
+> the path the ring sidesteps.
+>
+> ---
+> Cong Wang (5):
+>   tcp_bpf: add bpf_sock_splice_pair kfunc for opportunistic loopback
+>     splice
+>   tcp_bpf: busy-poll the splice ring before parking the receiver
+>   selftests/bpf: add tcp_splice basic round-trip test
+>   bpf: allow SO_BUSY_POLL in bpf_setsockopt()
+>   selftests/bpf: set SO_BUSY_POLL from the tcp_splice sockops prog
+>
+>  include/linux/skmsg.h                         |   9 +
+>  include/net/tcp.h                             |   8 +
+>  net/core/filter.c                             |   1 +
+>  net/core/skmsg.c                              |   3 +
+>  net/ipv4/tcp_bpf.c                            | 847 +++++++++++++++++-
+>  .../selftests/bpf/prog_tests/tcp_splice.c     | 206 +++++
+>  .../selftests/bpf/progs/test_tcp_splice.c     | 125 +++
+>  7 files changed, 1198 insertions(+), 1 deletion(-)
 
-Ah, you are right. I misread the condition in that code.
-Changing lock_vma_under_rcu() to distinguish between lock failure and
-no-VMA case would require some refactoring. vma_start_read() should
-return -ESRCH if VMA was not found and then we handle that in
-lock_vma_under_rcu(). That part is not hard because vma_start_read()
-has only 2 users but then we have to propagate that error code to
-lock_vma_under_rcu() users and there are many of them. Though
-converting these users is straght forward. Instead of checking if
-(vma) they would have to check if (IS_ERR_OR_NULL(vma)).
+Just saying that the code is free nowadays, so whether it's 1k lines
+or 10 lines is irrelevant for the discussion.
+
+As far as the idea goes, I think, it would be interesting in pre-AI era,
+but today splice and friends are a prime target for bugs and more bugs.
+skmsg and tcp_bpf are reeling from unfixed bugs too,
+so my take is that we should not add any new features to skmsg
+and instead deprecate what is already there.
 
