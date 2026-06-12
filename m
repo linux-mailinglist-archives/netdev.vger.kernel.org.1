@@ -1,376 +1,222 @@
-Return-Path: <netdev+bounces-298590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298591-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Hp8DHcvnK2obHgQAu9opvQ
-	(envelope-from <netdev+bounces-298590-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:04:43 +0200
+	id OApHBErpK2p2HgQAu9opvQ
+	(envelope-from <netdev+bounces-298591-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:11:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BA2678DC4
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:04:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7822678E2F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:11:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ZQc2zl1c;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298590-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298590-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=mojatatu.com header.s=google header.b=smwD0+rm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298591-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298591-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E212316998A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:04:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3E86300381B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 11:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C676938399C;
-	Fri, 12 Jun 2026 11:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF60537BE6B;
+	Fri, 12 Jun 2026 11:11:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A27C3624A9
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 11:04:39 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781262280; cv=none; b=uTUh8bxyBl/GAFhVxPIS/INZGng47rVSyB0OnRSDVUmqgz5dIFj4CdHFTmfqYQ9kqTUHc6VQsMc/2HXB75KgZzsHEfhfJFLPI/s8sma8EpO2M0A9DpOHBl+MZ8MbzgAO2xCaky+71dOuxFPN4VyFv8ysnrt7Rmn2txbeJoeWdMc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781262280; c=relaxed/simple;
-	bh=9R/vBouwUO8u0nOStlgtm23ViLcKL64MnKAowG/iy7M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xwf1Im4zCI6sfL/LuO9Uf9674Klhsj2QgqW5H8sOWKikS3cUxh7dQQOmwzqYVunFu81wqCXCw1WeWn9n2Nwt6mlsf1zB6JsQNe4brXDSEB+CVtOFpwB7VxLQROFbZSJyi70fWAdUhGQUx1WxjolPtCcDFeo0VKEdcoKXWtC/gGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQc2zl1c; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E7931F000E9;
-	Fri, 12 Jun 2026 11:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781262279;
-	bh=yvmn6l+5BfgeLBfn+hR7JuBkqOLGnAHxhwDj3KZ2joo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZQc2zl1cfWGwAuhioyl2qL0r3TUFofpGr51Zk5trrnCIcTE/2B9U7PJRz4SzeTMUX
-	 0TLGXbsTY9zjPwAeMvKmWc8awRavghfshHZdV6hVte9VeTn1sXdm+TSy/8uakDskPa
-	 KSUgJZdU6TrBMh7rKpJRB5vVfnL9EGMyis8RSnepmbw6iEjtPRdaBd3QieZ7MPvd1J
-	 RWtp9yzYRzn17YvsSQBehTmENpiOHFJX3KKsiHUHJZSFth8g8gW9VN87GdL6biEfy8
-	 7LKrJ5wdxXN6Q6owAWVwwHXEen+EJskIXgg5A3P3hjucbc2YAldJ5vhQQUNtf+Ef3C
-	 tyuxkNW3bGZ7Q==
-Date: Fri, 12 Jun 2026 13:04:36 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH net-next] net: airoha: better handle MIBs for GDM ports
- with multiple devs attached
-Message-ID: <aivnxEi-5XOl3s5s@lore-desk>
-References: <20260611-airoha-eth-multi-serdes-stats-v1-1-42442ae42064@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D45345731
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 11:10:58 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781262660; cv=pass; b=AZuvliS3PUtVMHWObwxAhDKg3yruciBtCOUezEGyvCRjs4ficxchQC4m+U1HwzkJC/ziKltNAJf4dCUHKLNXT1CRNQ5oalTys7x/Vksl1Fy+0OdA7IIwsDPDCVk21+Hn+CTWGX6fsLhaRtw0SF1WDXRgz6huW9SR6hY92pMoocU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781262660; c=relaxed/simple;
+	bh=8LicP1czLJf2aaqoZwmEPuDV1Ar8SxP/VgwnKAq8Vr0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X9akzfoYaecYeGDiwaJ6xnMFzv7hnBHAU4SOY4Y1KLqt922rvgzIKLwvet2ypMkDD0eBNPeHDwK39ufuPTPE8gVrEcP5l41xoGENUwJR6WCGdP1ZUw4aQPTr4+FYAfXmPpM253CQzxHlyRLtQtk3bDMr4wd1m3JESro5HvW1Rk0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (1024-bit key) header.d=mojatatu.com header.i=@mojatatu.com header.b=smwD0+rm; arc=pass smtp.client-ip=209.85.210.171
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-84237c55ef9so622879b3a.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 04:10:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781262658; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NIA5m0aarpkYf1VtfhqSrnIEFZysjjzQZRUQAQdwwEfD4TGGZNv8kIeUK23j+E2lTK
+         7ihfEGge4Ecp0PvuPER3dh7gFNMBxZUaI9TAkHFmCQlfsuOgQ0Ci1oj7uzqZGrwnixjS
+         ZToZSUaBKeUAxv+hw+GehjbbQsJBq72YhQsC4KF5/SqStqdBqTPGCrMAzTNc+FQWaLZO
+         58e3KH6ViOZd0F54LHGJ999vnTex+fiPbnvAZHZnsGWtKqapYEKYtooeeqeAJYkV2dnM
+         uSGCEbIAi3v8gdMLgdxvGijQRDuch7LL9rVafDvT1YJpZ0pYXnzudSSExJxX2teC8LMC
+         fvbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ImqDBhivd0n0cIWvvDVHjeQE96Q+iiAwbS6FRSPYw9A=;
+        fh=VQi/ODdPrwpDra7zg4AK7gjYP1nM+XCZ4hKFowRKcZE=;
+        b=Qpb9fYl9E0kMX25r1bE2Nit//On87mfHpfYFXfjw/72mxOoPzf5RSW7dvoTHjVVC2f
+         bihUhuanSagRmw4yKUsDMeNqkjPLyunxQDcHqoaU1ibjJZ1J2oEtnJVVqG6JLmS3Dr2A
+         9xJyepIH4wfsk0st6dGZbzDDl0m7fjm0rukR4LGiy/TkYg5pdb6P7Xf8fjEzO+XNPRWt
+         4aLockq+lq7Wyo0Ka42+PGYe6Ce/SdKKwH/zeqJQu+NpDrxCHQPuJAxVsCkhzaamTHD3
+         2S85LgzpYJ0dxRryD/V5WTJaYUNnBHLWkW8uJH+OvK6fVTXXav1mf8tP+ScA6tfGZ44Y
+         7EuA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu.com; s=google; t=1781262658; x=1781867458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ImqDBhivd0n0cIWvvDVHjeQE96Q+iiAwbS6FRSPYw9A=;
+        b=smwD0+rmWb605UFEmEsOw9sgV4LrjbrqRwiVnB3rwz88NLO3wWH8CG1yJV4/T1w3dZ
+         z0P0U42IWVYIwORx9wdbDsDcMb0XrfIcn6YlGMxH2NSjD8qBaQu4qDP5fM2C7HB6fjfm
+         qWRMkJT52gtc6v6xucDcf4cgRpWOwH4mp8UVw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781262658; x=1781867458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ImqDBhivd0n0cIWvvDVHjeQE96Q+iiAwbS6FRSPYw9A=;
+        b=U3M9bChA23FCSvf/yg+YGvg1S45jLnq1FTLta6zWuJ4EmgJm6NhJearlo5GO+IXlj5
+         4TUEhJf4dk0qsaFxKx6eNaDNAMsCK1tcU+xU8JAaTh1ks3XSp7LTYmpGXD7HT3VIUTXg
+         Wy7sytU43pDqjID2MTIdk503i647xo2fXddMf0bdEXH0Q6oqSUqupY9TAoH5xIYmNBrF
+         DzPDBeWzrINABbznsqP93WPJHRzeGTF/cn6GbGWoAIksrp22UFv84BJ/QCjvxe78IAWW
+         ZR8IOGPA18nPExuPaSWtk4f7LoQ1Nmo1QGCicRHMzWwhEa6/WN4yOc0Ro1rpOSqbgTlz
+         LIUQ==
+X-Gm-Message-State: AOJu0YwODFyotG2ZgZzzNPVUoRGtyaISMNRPCLCO/zoyVbCeDOHVH3pe
+	m4IjQadmof6VxDxET1I+H+LAk3rVF7YwXLbNLnIVKaVV7hbHZlEYMDUTbvEqXvEgXO9uwUSAnSe
+	Fe3EI4ZKhJ1My6gWhcC7kiyh1PX638s8KgVxM0coE
+X-Gm-Gg: Acq92OEQ+hhIPUnZ5Zrzxl9JcLK8x2Sh9MvsjO9PWDpxcYj+mujcZfKQ2dvfIjGG5cd
+	PXquM0wuruIxML7NdxenQZUenwYr43cZXJtJPYpng7KNbf2KBJIZndv5hBf58RU7pnKCjzHufLc
+	snrZT+DIsVGTOWInjYjRC6/Bn/FCri51Q8SKobzseGspVdHjy9fpB4Ao6nizDjYCP4tAJXKsRiv
+	XHkoJ/QkoLr8d3M7PpHzvDtX/AJx3ax6eUZaPOVDchjsHpEfEh9Uy8QrqrLrOdXrv2oHiwfhPnc
+	4zTqGN7N
+X-Received: by 2002:a05:6a00:80e:b0:824:a22c:c6d7 with SMTP id
+ d2e1a72fcca58-8434cd47333mr2634927b3a.18.1781262658061; Fri, 12 Jun 2026
+ 04:10:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="I8ORiQGe7MIiZoZD"
-Content-Disposition: inline
-In-Reply-To: <20260611-airoha-eth-multi-serdes-stats-v1-1-42442ae42064@kernel.org>
+References: <cover.1780651977.git.xizh2024@lzu.edu.cn> <20260611154939.2615919-1-n05ec@lzu.edu.cn>
+In-Reply-To: <20260611154939.2615919-1-n05ec@lzu.edu.cn>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 12 Jun 2026 07:10:46 -0400
+X-Gm-Features: AVVi8CefXDSvjCiULoq8lshurbia4IsPa5Woc82E05HwWDFz-9PRaAnyul_i1ww
+Message-ID: <CAM0EoM=x9UXzpwWZXB=XvBazzpxQ+twfR5qw7C-_YVjkjqHzCQ@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] net/sched: act_ct: preserve tc_skb_cb across defragmentation
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, paulb@nvidia.com, 
+	kuba@kernel.org, yuantan098@gmail.com, yifanwucs@gmail.com, 
+	tomapufckgml@gmail.com, bird@lzu.edu.cn, xizh2024@lzu.edu.cn, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu.com:s=google];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298590-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:ansuelsmth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:paulb@nvidia.com,m:kuba@kernel.org,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:bird@lzu.edu.cn,m:xizh2024@lzu.edu.cn,m:victor@mojatatu.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FORGED_SENDER(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298591-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,nvidia.com,kernel.org,gmail.com,lzu.edu.cn,mojatatu.com];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C0BA2678DC4
+X-Rspamd-Queue-Id: C7822678E2F
 
-
---I8ORiQGe7MIiZoZD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> In the context of a GDM port that can have multiple net_devices attached
-> (GDM3 and GDM4), the HW counters (MIBs) are global for the GDM port.
-> This cause duplicated stats reported to the kernel for the related
-> net_device.
-> The SoC supports a split MIB feature where each counter is tracked based
-> on the relevant HW channel (NBQ) to account for this scenario and
-> provide a way to select the related counter on accessing the MIB
-> registers.
-> Enable this feature for GDM3 and GDM4 and configure the relevant HW
-> channel before updating the HW stats to report correct HW counter to the
-> kernel for the related interface.
-> Move the stats struct from port to dev since HW counter are now specific
-> to the network device instead of the GDM port. Refactor
-> airoha_update_hw_stats() to take airoha_eth and airoha_gdm_port
-> parameters since the function operates on the entire port.
->=20
-> Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-
-commenting on sashiko's report:
-https://sashiko.dev/#/patchset/20260611-airoha-eth-multi-serdes-stats-v1-1-=
-42442ae42064%40kernel.org
-
-[...]
-
-> =20
-> -	/* reset mib counters */
-> -	airoha_fe_set(eth, REG_FE_GDM_MIB_CLEAR(port->id),
-> +static void airoha_update_hw_stats(struct airoha_gdm_dev *dev)
-> +{
-> +	struct airoha_gdm_port *port =3D dev->port;
-> +	int i;
-> +
-> +	spin_lock(&port->stats_lock);
-> +
-> +	for (i =3D 0; i < ARRAY_SIZE(port->devs); i++) {
-> +		if (port->devs[i])
-> +			airoha_dev_get_hw_stats(port->devs[i]);
-> +	}
-> +
-> +	/* Reset MIB counters */
-> +	airoha_fe_set(dev->eth, REG_FE_GDM_MIB_CLEAR(port->id),
->  		      FE_GDM_MIB_RX_CLEAR_MASK | FE_GDM_MIB_TX_CLEAR_MASK);
-
--  Does clearing the MIB counters outside the device loop cause issues with=
- the
-   split MIB feature?
-   airoha_dev_get_hw_stats() modifies REG_FE_GDM_MIB_CFG to select the spec=
-ific
-   nbq channel. Since REG_FE_GDM_MIB_CLEAR is called after the loop, does i=
-t only
-   clear the hardware counters for the last selected nbq? If so, the unclea=
-red
-   counters for the other channels might accumulate in hardware, and adding=
- them
-   repeatedly to the software stats (e.g., dev->stats.tx_ok_pkts +=3D val) =
-could
-   result in exponential growth.
-   Alternatively, if REG_FE_GDM_MIB_CLEAR globally clears all nbq counters =
-for
-   the port, calling it here could drop packets that arrived for earlier de=
-vices
-   between their respective read operations and this clear.
-   - REG_FE_GDM_MIB_CLEAR is global and it clears all nbq counters for the =
-port.
-     There's a tiny window where packets arriving for dev[0] between its re=
-ad
-     and the global clear are lost, but that's microseconds of register rea=
-ds,
-     so I guess that's negligible.
-
-Regards,
-Lorenzo
-
-> =20
-> -	u64_stats_update_end(&port->stats.syncp);
-> -	spin_unlock(&port->stats.lock);
-> +	spin_unlock(&port->stats_lock);
->  }
-> =20
->  static int airoha_dev_open(struct net_device *netdev)
-> @@ -2043,23 +2071,22 @@ static void airoha_dev_get_stats64(struct net_dev=
-ice *netdev,
->  				   struct rtnl_link_stats64 *storage)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	unsigned int start;
-> =20
->  	airoha_update_hw_stats(dev);
->  	do {
-> -		start =3D u64_stats_fetch_begin(&port->stats.syncp);
-> -		storage->rx_packets =3D port->stats.rx_ok_pkts;
-> -		storage->tx_packets =3D port->stats.tx_ok_pkts;
-> -		storage->rx_bytes =3D port->stats.rx_ok_bytes;
-> -		storage->tx_bytes =3D port->stats.tx_ok_bytes;
-> -		storage->multicast =3D port->stats.rx_multicast;
-> -		storage->rx_errors =3D port->stats.rx_errors;
-> -		storage->rx_dropped =3D port->stats.rx_drops;
-> -		storage->tx_dropped =3D port->stats.tx_drops;
-> -		storage->rx_crc_errors =3D port->stats.rx_crc_error;
-> -		storage->rx_over_errors =3D port->stats.rx_over_errors;
-> -	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
-> +		start =3D u64_stats_fetch_begin(&dev->stats.syncp);
-> +		storage->rx_packets =3D dev->stats.rx_ok_pkts;
-> +		storage->tx_packets =3D dev->stats.tx_ok_pkts;
-> +		storage->rx_bytes =3D dev->stats.rx_ok_bytes;
-> +		storage->tx_bytes =3D dev->stats.tx_ok_bytes;
-> +		storage->multicast =3D dev->stats.rx_multicast;
-> +		storage->rx_errors =3D dev->stats.rx_errors;
-> +		storage->rx_dropped =3D dev->stats.rx_drops;
-> +		storage->tx_dropped =3D dev->stats.tx_drops;
-> +		storage->rx_crc_errors =3D dev->stats.rx_crc_error;
-> +		storage->rx_over_errors =3D dev->stats.rx_over_errors;
-> +	} while (u64_stats_fetch_retry(&dev->stats.syncp, start));
->  }
-> =20
->  static int airoha_dev_change_mtu(struct net_device *netdev, int mtu)
-> @@ -2310,20 +2337,19 @@ static void airoha_ethtool_get_mac_stats(struct n=
-et_device *netdev,
->  					 struct ethtool_eth_mac_stats *stats)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
->  	unsigned int start;
-> =20
->  	airoha_update_hw_stats(dev);
->  	do {
-> -		start =3D u64_stats_fetch_begin(&port->stats.syncp);
-> -		stats->FramesTransmittedOK =3D port->stats.tx_ok_pkts;
-> -		stats->OctetsTransmittedOK =3D port->stats.tx_ok_bytes;
-> -		stats->MulticastFramesXmittedOK =3D port->stats.tx_multicast;
-> -		stats->BroadcastFramesXmittedOK =3D port->stats.tx_broadcast;
-> -		stats->FramesReceivedOK =3D port->stats.rx_ok_pkts;
-> -		stats->OctetsReceivedOK =3D port->stats.rx_ok_bytes;
-> -		stats->BroadcastFramesReceivedOK =3D port->stats.rx_broadcast;
-> -	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
-> +		start =3D u64_stats_fetch_begin(&dev->stats.syncp);
-> +		stats->FramesTransmittedOK =3D dev->stats.tx_ok_pkts;
-> +		stats->OctetsTransmittedOK =3D dev->stats.tx_ok_bytes;
-> +		stats->MulticastFramesXmittedOK =3D dev->stats.tx_multicast;
-> +		stats->BroadcastFramesXmittedOK =3D dev->stats.tx_broadcast;
-> +		stats->FramesReceivedOK =3D dev->stats.rx_ok_pkts;
-> +		stats->OctetsReceivedOK =3D dev->stats.rx_ok_bytes;
-> +		stats->BroadcastFramesReceivedOK =3D dev->stats.rx_broadcast;
-> +	} while (u64_stats_fetch_retry(&dev->stats.syncp, start));
->  }
-> =20
->  static const struct ethtool_rmon_hist_range airoha_ethtool_rmon_ranges[]=
- =3D {
-> @@ -2343,8 +2369,7 @@ airoha_ethtool_get_rmon_stats(struct net_device *ne=
-tdev,
->  			      const struct ethtool_rmon_hist_range **ranges)
->  {
->  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
-> -	struct airoha_gdm_port *port =3D dev->port;
-> -	struct airoha_hw_stats *hw_stats =3D &port->stats;
-> +	struct airoha_hw_stats *hw_stats =3D &dev->stats;
->  	unsigned int start;
-> =20
->  	BUILD_BUG_ON(ARRAY_SIZE(airoha_ethtool_rmon_ranges) !=3D
-> @@ -2357,7 +2382,7 @@ airoha_ethtool_get_rmon_stats(struct net_device *ne=
-tdev,
->  	do {
->  		int i;
-> =20
-> -		start =3D u64_stats_fetch_begin(&port->stats.syncp);
-> +		start =3D u64_stats_fetch_begin(&dev->stats.syncp);
->  		stats->fragments =3D hw_stats->rx_fragment;
->  		stats->jabbers =3D hw_stats->rx_jabber;
->  		for (i =3D 0; i < ARRAY_SIZE(airoha_ethtool_rmon_ranges) - 1;
-> @@ -2365,7 +2390,7 @@ airoha_ethtool_get_rmon_stats(struct net_device *ne=
-tdev,
->  			stats->hist[i] =3D hw_stats->rx_len[i];
->  			stats->hist_tx[i] =3D hw_stats->tx_len[i];
->  		}
-> -	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
-> +	} while (u64_stats_fetch_retry(&dev->stats.syncp, start));
->  }
-> =20
->  static int airoha_qdma_set_chan_tx_sched(struct net_device *netdev,
-> @@ -3205,6 +3230,7 @@ static int airoha_alloc_gdm_device(struct airoha_et=
-h *eth,
-> =20
->  	netdev->dev.of_node =3D of_node_get(np);
->  	dev =3D netdev_priv(netdev);
-> +	u64_stats_init(&dev->stats.syncp);
->  	dev->port =3D port;
->  	dev->eth =3D eth;
->  	dev->nbq =3D nbq;
-> @@ -3244,9 +3270,8 @@ static int airoha_alloc_gdm_port(struct airoha_eth =
-*eth,
->  	if (!port)
->  		return -ENOMEM;
-> =20
-> -	u64_stats_init(&port->stats.syncp);
-> -	spin_lock_init(&port->stats.lock);
->  	port->id =3D id;
-> +	spin_lock_init(&port->stats_lock);
->  	eth->ports[p] =3D port;
-> =20
->  	err =3D airoha_metadata_dst_alloc(port);
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index 8f42973f9cf5..46b1c31939de 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -215,8 +215,6 @@ struct airoha_tx_irq_queue {
->  };
-> =20
->  struct airoha_hw_stats {
-> -	/* protect concurrent hw_stats accesses */
-> -	spinlock_t lock;
->  	struct u64_stats_sync syncp;
-> =20
->  	/* get_stats64 */
-> @@ -554,6 +552,8 @@ struct airoha_gdm_dev {
-> =20
->  	u32 flags;
->  	int nbq;
-> +
-> +	struct airoha_hw_stats stats;
->  };
-> =20
->  struct airoha_gdm_port {
-> @@ -561,7 +561,8 @@ struct airoha_gdm_port {
->  	int id;
->  	int users;
-> =20
-> -	struct airoha_hw_stats stats;
-> +	/* protect concurrent hw_stats accesses */
-> +	spinlock_t stats_lock;
-> =20
->  	struct metadata_dst *dsa_meta[AIROHA_MAX_DSA_PORTS];
->  };
->=20
+On Thu, Jun 11, 2026 at 11:49=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>
+> From: Zihan Xi <xizh2024@lzu.edu.cn>
+>
+> tcf_ct_handle_fragments() calls nf_ct_handle_fragments() without saving
+> and restoring skb->cb. The defrag helper clears IPCB/IP6CB, which aliases
+> the tc_skb_cb/qdisc_skb_cb control buffer. Fragmented traffic through
+> act_ct therefore loses qdisc metadata such as pkt_segs and can trigger
+> WARN_ON_ONCE() in qdisc_pkt_segs() when panic_on_warn is enabled.
+>
+> Save and restore the full tc_skb_cb around nf_ct_handle_fragments(),
+> matching the pattern used by ovs_ct_handle_fragments().
+>
+> Fixes: ec624fe740b4 ("net/sched: Extend qdisc control block with tc contr=
+ol block")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:gpt-5.4
+> Signed-off-by: Zihan Xi <xizh2024@lzu.edu.cn>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 > ---
-> base-commit: c8459ee2fef502d6ef6c063751c33d9ac7943eab
-> change-id: 20260611-airoha-eth-multi-serdes-stats-df2dc16c2dd6
->=20
-> Best regards,
-> --=20
-> Lorenzo Bianconi <lorenzo@kernel.org>
->=20
+>  net/sched/act_ct.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+> index 6158e13c98d3..ebd40daf05a6 100644
+> --- a/net/sched/act_ct.c
+> +++ b/net/sched/act_ct.c
+> @@ -845,10 +845,10 @@ static int tcf_ct_handle_fragments(struct net *net,=
+ struct sk_buff *skb,
+>  {
+>         enum ip_conntrack_info ctinfo;
+>         struct nf_conn *ct;
+> +       struct tc_skb_cb cb;
+>         int err =3D 0;
+>         bool frag;
+>         u8 proto;
+> -       u16 mru;
+>
+>         /* Previously seen (loopback)? Ignore. */
+>         ct =3D nf_ct_get(skb, &ctinfo);
+> @@ -862,12 +862,13 @@ static int tcf_ct_handle_fragments(struct net *net,=
+ struct sk_buff *skb,
+>         if (err || !frag)
+>                 return err;
+>
+> -       err =3D nf_ct_handle_fragments(net, skb, zone, family, &proto, &m=
+ru);
+> +       cb =3D *tc_skb_cb(skb);
+> +       err =3D nf_ct_handle_fragments(net, skb, zone, family, &proto, &c=
+b.mru);
+>         if (err)
+>                 return err;
+>
+>         *defrag =3D true;
+> -       tc_skb_cb(skb)->mru =3D mru;
+> +       *tc_skb_cb(skb) =3D cb;
+>
+>         return 0;
+>  }
 
---I8ORiQGe7MIiZoZD
-Content-Type: application/pgp-signature; name=signature.asc
 
------BEGIN PGP SIGNATURE-----
+The fix is reasonable (although i note you just added 48B on the stack)
+It is unfortunate we have this cross-layer violation of the metadata -
+the life of the tc cb should be maintained within the tc layer but
+this call into nf_ct_handle_fragments() seems to over-write it
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaivnxAAKCRA6cBh0uS2t
-rDDCAQCDSZtkkKAwKtExKS9kQ5EIq4izTOPt/msV8Da18y7ONQEAu9UNly6/ampk
-ljg0ePyUwVk/54EdjY8l1e7DTUZHYws=
-=sFY3
------END PGP SIGNATURE-----
+Can you add a tdc test case as well as patch 2?  if you dont know how
+Victor or myself can create one for you.
 
---I8ORiQGe7MIiZoZD--
+cheers,
+jamal
 
