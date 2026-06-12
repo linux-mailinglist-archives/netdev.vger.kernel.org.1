@@ -1,325 +1,308 @@
-Return-Path: <netdev+bounces-298789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IxuHCtRqLGqFQgQAu9opvQ
-	(envelope-from <netdev+bounces-298789-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 22:23:48 +0200
+	id t0wlOW5vLGpSQwQAu9opvQ
+	(envelope-from <netdev+bounces-298790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 22:43:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF6367C457
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 22:23:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8217067C5EA
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 22:43:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=ne5WEkMp;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298789-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298789-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298790-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298790-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6E96F30564A8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:23:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A8643015739
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 20:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B75389115;
-	Fri, 12 Jun 2026 20:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2384C345740;
+	Fri, 12 Jun 2026 20:43:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25361397682
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 20:23:43 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781295826; cv=pass; b=XKcDUi+rLJM84Ax9NYpvJaBqd3AlW+X7S6upluLDdPwWkHWKPPoQSRe6DMJH7Zg9YD6v+pvDgac8nHgVCf1tbrdE6Lmd75bI51sTHpXXqFYRxiQgrFPYmOngj/yovw2Ji5KXWO9zXgeJRKCOQ2HGD304SZHj+qWeKUGTZRWhhb8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781295826; c=relaxed/simple;
-	bh=j+Tw/DqvrvyTXJQnCqEunpYlqcUp4PdtpY9B1mt+aCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L/eliZz2poy00nUmuwyt6tce+C6JpVLdD4OQPOH1BaGfS7LuHErSFP6BAf6Zl1gmveB4ZR+f1f0MU6j1HJUUt3TStpPDQh6G8lBY0Kfqdk0OtSLwG27vdRUAMAahFs1WNTRE4tqjIltvz3M2q6ItrotSrWfLijyd94QxFWrYL4Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ne5WEkMp; arc=pass smtp.client-ip=209.85.210.176
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-842319576d5so848980b3a.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:23:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781295823; cv=none;
-        d=google.com; s=arc-20240605;
-        b=O2Pe329hMlHQ5WXSEqDSbWVHz49Tn1Dwku3bLVyg2ES6C/tGRjjvuIo/87cNp7TABj
-         2+kci0/NROC/Yc2vXrOsYV6fevboNnWiCpAvxcAHxKNKNYketqsxr3nYIH3D31Q8GnDg
-         9j26nLM8d/lCkOfWLgpPbyq3eqw+9Wbgzju3Hlx4vws6SQ/sntyqcdS0yznvpiRrkaam
-         +x4SinnPcfhIgnWiUuRX6rcT/LqC0xgieKaCKTgelJyV3PU6yhbqkIJ6IN94Fgq8lSTz
-         rR6R8n1IKzERKJZHAiaowdZdSCvjRIW2BFznJB9eHGfwzz8IjWdfg165/+A6kwtRtSOs
-         vLDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
-        fh=64w4Cm65Oku8tiA/A6vBrY6EXrgvRqOIY54/EI5UbYU=;
-        b=H+bMsvQNVHHBOK4EXlvs1s+sZau/MLYgL4FhGi3rT4cVaPfp1W6mcJrh40SKjnGX4/
-         OnwU3MORWVWVi1cKkdHxCT4IB92QDo2aM6BcZTaE2lY5YtviJXAqMqjlfhRBg3x2+YNQ
-         rPaU0tYZRUN9VNprnh8y31KVToPsXDV3pqCq54OrwbZEnUIc1YiephoKG1tWu36CnMhF
-         fh4xjLOjNCuQB5diEIceV/xeJJDSIVzSF0KS7vf/0zoGyaxqz4WFPBwKREDp5t+O6fd1
-         BMrYBA3tdPTbKsMeUK5UGxPvjExi5+Th7bbaH9fGphdlTOQa5VDSj6IEudvUgxIfCaNp
-         fKuw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781295823; x=1781900623; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
-        b=ne5WEkMp2kmHIGyDCQEuxCE9iJdd+2PuOpk7+knCPHt/uv11aD007VGhRwP//3d7SG
-         mtcWpN7lUABEK5Mcx56SeTdzR71MEq785NnjESNoWweMHVz1SPPUcPrtgdV71/rIFDrF
-         ddBmGvyz7KvdFXACM7Sg9S32MxsZM44nZMGdyRPy5ngHG1afwKCn5IS4YvUbhYS4yAhD
-         kjnALOAFzZPhsCUvvCR958hxN+MBK8mzBveCdxs242mBFszO7/6M1KOOU3mLeKv+ob0A
-         3lL8as5PYDzhRdDhFUGeic9OCrgUh5JUelItSJDoOz5FA6X8CFyVVgFArOsdRn3zOxrc
-         0y7Q==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C884352F85
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 20:43:23 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781297005; cv=none; b=d7buwf+5X9kCrwZ1a36paR4VnvEC6rld+SN7ZnjVTTEk84PNML8am7tu7VKhDFq9XadA1zQcCl9UYe1KKthydNGqJNu0bReRuLs81BD6MTIS1oO7QXQtgahCPyEnQgdg3qw1Bcvqe3AV5WQj3agvTeOj7N1OjRVXkrv0OiDNo7A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781297005; c=relaxed/simple;
+	bh=Mk/TzSPcB23FaFQpom3znsABAWm2xiLiQ9gVMCM3YcU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NROWX7xa5BkhJbWXEoEOU/R+sCOo1SeTXdztWBP0F6TXRjGJ0s0SSIKND9mpJk5hTKXk9N6a6AbsRVtCLMmR4zf6jIu6hO+kqT71d05MzndnOTO9hYjJLh6AM4I/G1TLEaIIhpLBu6ULJWDfEIWabSY6AyMKuTBQZbDPPGPQolA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-48679a595e2so1878984b6e.3
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:43:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781295823; x=1781900623;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
-        b=nfQDzGT+XRPklopFXNjqXbryR3LaMYCuGP3ad6SI24Kvn8zJVNaBjAKEb0qS0H2bkO
-         XvNf9+FF18c1V1vE60lRwGgQNeCUOZkrZv9ndnq+Ac+g7XVjI5RQ8Qh+g7nSs27VMHEY
-         uWlN8D6pObMnakQnfMoxipCJYyNmVsIrySfRLksyZnAGT8SjQM96RQiwCz3SzPLRydW7
-         1L1jfQ5GqE9uGIrwu0NapRjWmcwxASY+76oG1C+xDm+Q4XMKjeHSVwcCHiPYXoAJSOc6
-         j/iabVt2WE4uA3/cK/egywuJxvzEJAmiygQa91l8S0wj2YORl19hJBaqhBSn9xpEqJOM
-         bqLg==
-X-Gm-Message-State: AOJu0YxQvH7PEc+6I1m7Rl+SspfE89LiEmMxOPZzwpZOdvwNMosqt63d
-	/pG4hrdyyP0RxKVX39zVgM7CnUxtej+Ckhdq348S9UMfPKLbXF4AD/vgFl1oFOI/5fnf9WouDbD
-	jtsTg+ZXiO2MRSzo36Dm0pCWvJSg0XnI=
-X-Gm-Gg: Acq92OH9lXFx6OJN2rkFzfqggRdXBUQcDirH4ti2LYIX2NsrJ98Q0LGmDIhsMozfEvw
-	DIvwZyp/wuoO1j5T8tGP7roSTwQ2jV5morVqpG9QOxsjLge3vhD1Fs2P59pxVYNPgnfpMi/hwrf
-	chyLczt4c9SbWHpaqgYTZ2nN2+Pwu9eFTCsL+oRf8/5SX62jZTKYABAm9LxmzF52CEDjDDjwAwE
-	wzjWGnqVPGuuGYN7Wc+HA4KoXgpgioF+LDYXEwauzq4BQVLRG2/JWiDy4ID33BKWZezxgrcBVGy
-	fIMNHElGwWC2RUvWUfO21RIpjon2GE1Jmn5XXMyjyzWWnOLvUokIFjdrUE1M1WoxaOsAuvfsj40
-	JzMHFRQ8KimKEIiJa
-X-Received: by 2002:a05:6a00:94c3:b0:842:614e:cc97 with SMTP id
- d2e1a72fcca58-8434d07afcemr4940308b3a.23.1781295823460; Fri, 12 Jun 2026
- 13:23:43 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781297002; x=1781901802;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+CvRzUaL2bhKQwd3Bgdddk2TEKH/mLaPQFUWxCE4Kbs=;
+        b=bzuZ1hTYTO9SReck3jjxDTRwrSfG5ZrucO5Y74nXksAOYCoULX7vORqXlybj3i//qm
+         msfYoUa9L0AamUBrYuBOJoMTA0W0t7dpc/THKDO7JQ8J26T5u9WUPasaI3XB1g4GYfPo
+         Z5dPkOd7EgLZJ24mTW+r5aGhyK+EBqu2lrcmlBo2cEMAN+e0m/VBRhqz4ZvVoEBEh5Zq
+         qX6YVhDjhgCdt3UiEfRkHCrL3yZSB8scsN8zq4D9gh1n4XGaV05DyNgD5fN4C/XJVwx0
+         TPcJdRIWETeeDePUea7988NDCu6H7heJX78yiXcLLiUWQeuz5KRufDvInHBwhCDLQE7f
+         5ljA==
+X-Forwarded-Encrypted: i=1; AFNElJ980D49o4rc193pNoBlkYZSSMSdUzzM5rG09zsrXvqj2Y+5Hr1uYZhfefmnNmspbfx9pJ7Uw2c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw19jfOm0u+/GsXFHEB2eExAj0a4P9DScvdUboMOzUtJ1JSYxtT
+	pPdlJud7HmoN4iEbySxnVK0BnQQcTdN2dXICjbw5vABrxgRHquyFnVxhH3A91+tm8qUW5VYEoV3
+	NJzigEzM051jkUXVtUt5eao5OtnSMppfai2v7wN5W6/YRG4M5Pqjw41vDlSM=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <287e6b7dd877836e08b9bcb6727f547fe80f6459.1780855297.git.lucien.xin@gmail.com>
- <20260611081948.137325-1-pabeni@redhat.com>
-In-Reply-To: <20260611081948.137325-1-pabeni@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 12 Jun 2026 16:23:31 -0400
-X-Gm-Features: AVVi8CezbNK4UF3r3lp5uUhw4KnTH33E-BGYuPbz2M3O-qwCLN8CyhZyYdcGzpo
-Message-ID: <CADvbK_dAvqBC1j-f4Ft_HkLzVOzP-z9cwVR2B36zbxjSB44atg@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 12/15] quic: add crypto packet encryption and decryption
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, edumazet@google.com, horms@kernel.org, metze@samba.org, 
-	mbuhl@openbsd.org, tfanelli@redhat.com, hepengtao@xiaomi.com, 
-	dreibh@simula.no, linux-cifs@vger.kernel.org, smfrench@gmail.com, 
-	linkinjeon@kernel.org, tom@talpey.com, kernel-tls-handshake@lists.linux.dev, 
-	chuck.lever@oracle.com, jlayton@kernel.org, steved@redhat.com, hare@suse.de, 
-	aahringo@redhat.com, dhowells@redhat.com, matttbe@kernel.org, 
-	mail@johnericson.me, xiyou.wangcong@gmail.com, alibuda@linux.alibaba.com, 
-	jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net, 
-	marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com, 
-	mef@scarletmail.rutgers.edu, paul@jakma.org
+X-Received: by 2002:a05:6808:4fc9:b0:467:1da9:2b0f with SMTP id
+ 5614622812f47-4872f5eca26mr2902287b6e.34.1781297002501; Fri, 12 Jun 2026
+ 13:43:22 -0700 (PDT)
+Date: Fri, 12 Jun 2026 13:43:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a2c6f6a.be3f099c.2836ae.0004.GAE@google.com>
+Subject: [syzbot] [mm?] KASAN: invalid-free in rcu_free_sheaf
+From: syzbot <syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=2c40e3284434c6f1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:quic@lists.linux.dev,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:horms@kernel.org,m:metze@samba.org,m:mbuhl@openbsd.org,m:tfanelli@redhat.com,m:hepengtao@xiaomi.com,m:dreibh@simula.no,m:linux-cifs@vger.kernel.org,m:smfrench@gmail.com,m:linkinjeon@kernel.org,m:tom@talpey.com,m:kernel-tls-handshake@lists.linux.dev,m:chuck.lever@oracle.com,m:jlayton@kernel.org,m:steved@redhat.com,m:hare@suse.de,m:aahringo@redhat.com,m:dhowells@redhat.com,m:matttbe@kernel.org,m:mail@johnericson.me,m:xiyou.wangcong@gmail.com,m:alibuda@linux.alibaba.com,m:jbaron@akamai.com,m:illiliti@protonmail.com,m:sd@queasysnail.net,m:marcelo.leitner@gmail.com,m:daniel@haxx.se,m:andrew.gospodarek@broadcom.com,m:mef@scarletmail.rutgers.edu,m:paul@jakma.org,m:xiyouwangcong@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-298789-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298790-lists,netdev=lfdr.de,60332fd095f8bb2946ad];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,storage.googleapis.com:url,googlegroups.com:email,syzkaller.appspotmail.com:from_mime,syzkaller.appspot.com:url];
+	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:netdev@vger.kernel.org,m:peterz@infradead.org,m:syzkaller-bugs@googlegroups.com,m:tglx@kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,davemloft.net,kernel.org,google.com,samba.org,openbsd.org,redhat.com,xiaomi.com,simula.no,gmail.com,talpey.com,oracle.com,suse.de,johnericson.me,linux.alibaba.com,akamai.com,protonmail.com,queasysnail.net,haxx.se,broadcom.com,scarletmail.rutgers.edu,jakma.org];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:url]
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	TAGGED_RCPT(0.00)[netdev];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8BF6367C457
+X-Rspamd-Queue-Id: 8217067C5EA
 
-On Thu, Jun 11, 2026 at 4:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> From: AI Reviewer <ai@example.com>
->
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://netdev-ai.bots.linux.dev/sashiko/
-> ---
-> quic: add crypto packet encryption and decryption
->
-> This patch adds AEAD-based packet encryption/decryption helpers, QUIC
-> header protection, and Retry/address-validation token generation and
-> verification primitives.
->
-> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> > index c68a0b570c72..77e633096c2a 100644
-> > --- a/net/quic/crypto.c
-> > +++ b/net/quic/crypto.c
->
-> [ ... ]
->
-> > +/* Retry Packet Integrity. */
-> > +int quic_crypto_get_retry_tag(struct quic_crypto *crypto, struct sk_bu=
-ff *skb,
-> > +                           struct quic_conn_id *odcid, u32 version, u8=
- *tag)
-> > +{
-> > +     /* Reuse RX AEAD (phase 1) in Initial crypto. */
-> > +     struct crypto_aead *tfm =3D crypto->rx_tfm[1];
-> > +     u8 *pseudo_retry, *p, *iv, *key;
-> > +     DECLARE_CRYPTO_WAIT(wait);
-> > +     struct aead_request *req;
-> > +     struct scatterlist *sg;
-> > +     u32 plen;
-> > +     int err;
-> > +
-> > +     if (skb->len < QUIC_TAG_LEN)
-> > +             return -EINVAL;
->
-> [Low]
-> The guard rejects skb->len < QUIC_TAG_LEN, but a later comment in the
-> same function says:
->
-> > +     /* The caller must ensure skb->len > QUIC_TAG_LEN. */
-> > +     plen =3D 1 + odcid->len + skb->len - QUIC_TAG_LEN;
->
-> Should the check be <=3D QUIC_TAG_LEN, or should the comment say >=3D to
-> match the strict-less-than test?
->
-> In the boundary case where skb->len =3D=3D QUIC_TAG_LEN, plen becomes
-> 1 + odcid->len, and quic_put_data(p, skb->data, skb->len - QUIC_TAG_LEN)
-> copies zero bytes, so the integrity tag would be computed over a
-> pseudo-packet containing only the ODCID length and ODCID with no actual
-> Retry header bytes.  Is that intended?
->
-The callers will make sure skb->len > QUIC_TAG_LEN, and the check
-(skb->len < QUIC_TAG_LEN) was added to make the last AI happy.
+Hello,
 
-I will change (skb->len <=3D QUIC_TAG_LEN) to match the comment.
+syzbot found the following issue on:
+
+HEAD commit:    0ce346bf2f68 Merge branch 'net-shaper-follow-ups-to-recent..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15a50986580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2c40e3284434c6f1
+dashboard link: https://syzkaller.appspot.com/bug?extid=60332fd095f8bb2946ad
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fcb2184c91a0/disk-0ce346bf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/44a7baa2dfdd/vmlinux-0ce346bf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8ef85b3aefe3/bzImage-0ce346bf.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: double-free in rcu_free_sheaf+0x31/0x200 mm/slub.c:5850
+Free of addr ffff888026c2d380 by task ksoftirqd/0/15
+
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report_invalid_free+0xea/0x110 mm/kasan/report.c:557
+ check_slab_allocation mm/kasan/common.c:-1 [inline]
+ __kasan_slab_pre_free+0x104/0x120 mm/kasan/common.c:261
+ kasan_slab_pre_free include/linux/kasan.h:199 [inline]
+ slab_free_hook mm/slub.c:2634 [inline]
+ __rcu_free_sheaf_prepare+0x10a/0x2a0 mm/slub.c:2940
+ rcu_free_sheaf+0x31/0x200 mm/slub.c:5850
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 5613:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x31c/0x660 mm/slub.c:5420
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ hwsim_update_pib+0x88/0x450 drivers/net/ieee802154/mac802154_hwsim.c:101
+ hwsim_set_promiscuous_mode+0x196/0x2e0 drivers/net/ieee802154/mac802154_hwsim.c:323
+ drv_set_promiscuous_mode+0x159/0x2e0 net/mac802154/driver-ops.h:127
+ drv_start net/mac802154/driver-ops.h:195 [inline]
+ mac802154_slave_open net/mac802154/iface.c:196 [inline]
+ mac802154_wpan_open+0x19b3/0x2a70 net/mac802154/iface.c:295
+ __dev_open+0x44d/0x830 net/core/dev.c:1702
+ __dev_change_flags+0x2fa/0x7e0 net/core/dev.c:9752
+ netif_change_flags+0x88/0x1a0 net/core/dev.c:9815
+ do_setlink+0xfa5/0x45a0 net/core/rtnetlink.c:3207
+ rtnl_changelink net/core/rtnetlink.c:3841 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:4014 [inline]
+ rtnl_newlink+0x15ad/0x1bb0 net/core/rtnetlink.c:4151
+ rtnetlink_rcv_msg+0x7d5/0xbe0 net/core/rtnetlink.c:7068
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2556
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ __sys_sendto+0x672/0x710 net/socket.c:2265
+ __do_sys_sendto net/socket.c:2272 [inline]
+ __se_sys_sendto net/socket.c:2268 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2268
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 15:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2689 [inline]
+ __rcu_free_sheaf_prepare+0x12d/0x2a0 mm/slub.c:2940
+ rcu_free_sheaf+0x31/0x200 mm/slub.c:5850
+ rcu_do_batch kernel/rcu/tree.c:2617 [inline]
+ rcu_core+0x7cd/0x1070 kernel/rcu/tree.c:2869
+ handle_softirqs+0x22a/0x840 kernel/softirq.c:622
+ run_ksoftirqd+0x36/0x60 kernel/softirq.c:1076
+ smpboot_thread_fn+0x541/0xa50 kernel/smpboot.c:160
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+The buggy address belongs to the object at ffff888026c2d380
+ which belongs to the cache kmalloc-64 of size 64
+The buggy address is located 0 bytes inside of
+ 64-byte region [ffff888026c2d380, ffff888026c2d3c0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888026c2d780 pfn:0x26c2d
+flags: 0xfff00000000200(workingset|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000200 ffff88813fe1a8c0 ffffea0000d74490 ffffea0001fcda50
+raw: ffff888026c2d780 0000000800200010 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0xd2cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 137, tgid 137 (kworker/u8:5), ts 5542876120, free_ts 5542851482
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x22d/0x280 mm/page_alloc.c:1853
+ prep_new_page mm/page_alloc.c:1861 [inline]
+ get_page_from_freelist+0x2593/0x2610 mm/page_alloc.c:3941
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5221
+ alloc_slab_page mm/slub.c:3278 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3467
+ new_slab mm/slub.c:3525 [inline]
+ refill_objects+0x339/0x3d0 mm/slub.c:7272
+ refill_sheaf mm/slub.c:2816 [inline]
+ __pcs_replace_empty_main+0x321/0x720 mm/slub.c:4652
+ alloc_from_pcs mm/slub.c:4750 [inline]
+ slab_alloc_node mm/slub.c:4884 [inline]
+ __do_kmalloc_node mm/slub.c:5295 [inline]
+ __kmalloc_node_noprof+0x577/0x7c0 mm/slub.c:5302
+ kmalloc_node_noprof include/linux/slab.h:1081 [inline]
+ __vmalloc_area_node mm/vmalloc.c:3857 [inline]
+ __vmalloc_node_range_noprof+0x5ef/0x1750 mm/vmalloc.c:4064
+ __vmalloc_node_noprof+0xc2/0x100 mm/vmalloc.c:4124
+ alloc_thread_stack_node kernel/fork.c:357 [inline]
+ dup_task_struct+0x298/0x840 kernel/fork.c:926
+ copy_process+0x89b/0x4440 kernel/fork.c:2090
+ kernel_clone+0x2d7/0x940 kernel/fork.c:2722
+ user_mode_thread+0x110/0x180 kernel/fork.c:2798
+ call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:171
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+page last free pid 137 tgid 137 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1397 [inline]
+ __free_frozen_pages+0xc1c/0xd30 mm/page_alloc.c:2938
+ __kasan_populate_vmalloc_do mm/kasan/shadow.c:393 [inline]
+ __kasan_populate_vmalloc+0x1b2/0x1d0 mm/kasan/shadow.c:424
+ kasan_populate_vmalloc include/linux/kasan.h:580 [inline]
+ alloc_vmap_area+0xd47/0x1480 mm/vmalloc.c:2123
+ __get_vm_area_node+0x1f8/0x300 mm/vmalloc.c:3226
+ __vmalloc_node_range_noprof+0x36a/0x1750 mm/vmalloc.c:4024
+ __vmalloc_node_noprof+0xc2/0x100 mm/vmalloc.c:4124
+ alloc_thread_stack_node kernel/fork.c:357 [inline]
+ dup_task_struct+0x298/0x840 kernel/fork.c:926
+ copy_process+0x89b/0x4440 kernel/fork.c:2090
+ kernel_clone+0x2d7/0x940 kernel/fork.c:2722
+ user_mode_thread+0x110/0x180 kernel/fork.c:2798
+ call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:171
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff888026c2d280: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888026c2d300: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>ffff888026c2d380: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                   ^
+ ffff888026c2d400: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888026c2d480: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
 
 
-> [ ... ]
->
-> > +/* Derives a key and IV using HKDF, configures the AEAD transform and =
-performs
-> > + * AEAD encryption/decryption for the provided token.
-> > + */
-> > +static int quic_crypto_token_protect(struct quic_crypto *crypto, u8 *t=
-oken,
-> > +                                  u32 len, u32 adlen, bool enc)
-> > +{
-> > +     u8 key[TLS_CIPHER_AES_GCM_128_KEY_SIZE], iv[QUIC_IV_LEN], *tiv;
-> > +     /* Reuse TX AEAD (phase 1) in Initial crypto. */
-> > +     struct crypto_aead *tfm =3D crypto->tx_tfm[1];
-> > +     u32 extra =3D enc ? QUIC_TAG_LEN : 0;
-> > +     struct quic_data srt =3D {}, k, i;
-> > +     DECLARE_CRYPTO_WAIT(wait);
-> > +     struct aead_request *req;
-> > +     struct scatterlist *sg;
-> > +     void *ctx =3D NULL;
-> > +     int err;
-> > +
-> > +     quic_data(&srt, quic_random_data, QUIC_RANDOM_DATA_LEN);
-> > +     quic_data(&k, key, TLS_CIPHER_AES_GCM_128_KEY_SIZE);
-> > +     quic_data(&i, iv, QUIC_IV_LEN);
-> > +     err =3D quic_crypto_keys_derive(crypto->secret_tfm, &srt, &k, &i,=
- NULL,
-> > +                                   QUIC_VERSION_V1);
->
-> [Critical]
-> Can this lead to AES-GCM nonce reuse across all generated tokens?
->
-> quic_random_data is a module-global buffer initialized once in
-> quic_crypto_init() via get_random_bytes() and never refreshed:
->
->     static u8 quic_random_data[QUIC_RANDOM_DATA_LEN] __read_mostly;
->
-> quic_crypto_keys_derive() runs HKDF-Expand-Label over that constant
-> secret with constant labels "quic key" and "quic iv", so both the
-> derived key and the derived IV are deterministic and identical on every
-> invocation of quic_crypto_token_protect().
->
-> > +     if (err)
-> > +             goto out;
-> > +     err =3D crypto_aead_setauthsize(tfm, QUIC_TAG_LEN);
-> > +     if (err)
-> > +             goto out;
-> > +     err =3D crypto_aead_setkey(tfm, key, TLS_CIPHER_AES_GCM_128_KEY_S=
-IZE);
-> > +     if (err)
-> > +             goto out;
-> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &tiv, &req, &sg, 1);
-> > +     if (!ctx) {
-> > +             err =3D -ENOMEM;
-> > +             goto out;
-> > +     }
-> > +     memcpy(tiv, iv, QUIC_IV_LEN);
-> > +
-> > +     sg_init_one(sg, token, len);
-> > +     aead_request_set_tfm(req, tfm);
-> > +     aead_request_set_ad(req, adlen);
-> > +     aead_request_set_crypt(req, sg, sg, len - adlen - extra, tiv);
->
-> Every call ends up using the same (K, N) pair under AES-GCM, with no
-> per-token random prefix and no packet-number XOR like
-> quic_crypto_payload_protect() does via cb->number.
->
-> NIST SP 800-38D forbids reuse of (K, N) under GCM; from two valid
-> ciphertexts an attacker can recover the GHASH authentication subkey H
-> and forge tokens for arbitrary client addresses, which would defeat
-> the address validation in quic_crypto_verify_token() and the
-> anti-amplification protections in RFC 9000 section 8.
->
-> Could a unique per-token nonce be derived (for example from a random
-> prefix stored in the token itself), or a nonce-misuse-resistant AEAD
-> be used here instead?
->
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I currently don't have a better solution for this. we can't have it in the
-socket, as even after the socket closes, this quic_random_data is still
-needed to validate tokens.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Thanks.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> > +     aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> > +                               crypto_req_done, &wait);
-> > +     err =3D enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req)=
-;
-> > +     if (err =3D=3D -EINPROGRESS || err =3D=3D -EBUSY)
-> > +             err =3D crypto_wait_req(err, &wait);
-> > +
-> > +out:
-> > +     memzero_explicit(key, sizeof(key));
-> > +     memzero_explicit(iv, sizeof(iv));
-> > +     kfree_sensitive(ctx);
-> > +     return err;
-> > +}
->
-> [ ... ]
-> --
-> This is an AI-generated review.
->
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
