@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-298740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RO5uOdw6LGo2OAQAu9opvQ
-	(envelope-from <netdev+bounces-298740-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:59:08 +0200
+	id mclCGK46LGosOAQAu9opvQ
+	(envelope-from <netdev+bounces-298739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:58:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD4667B239
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:59:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBD467B223
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 18:58:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=virtuozzo.com header.s=selector2 header.b=hqBvvFAh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298740-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298740-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=virtuozzo.com header.s=selector2 header.b="Iqh/9VjA";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298739-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298739-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=virtuozzo.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 48C9931BCE23
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:57:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A43253144999
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35E440627D;
-	Fri, 12 Jun 2026 16:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60F74048A7;
+	Fri, 12 Jun 2026 16:57:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021127.outbound.protection.outlook.com [52.101.65.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FB9404BD7;
-	Fri, 12 Jun 2026 16:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD79403156;
+	Fri, 12 Jun 2026 16:57:34 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781283457; cv=fail; b=tZUqfaUYCXpiollboE9uFFLAU++mNuO91vtx9E+0eUUiBnItF/Yi8t2FLhgVyDApznqAZFEDs71ANZZU2G1Dnl/vI5zBEGmGEuanyRzki7DZphGuBYOOMICeVn+4aETbctx21yij6UlecWaxxEArbVZYG9sqvhhW+GUDbT1qlNY=
+	t=1781283455; cv=fail; b=Hn5mUQE27lyW3ad0IjOvytfew+CC9BqiMN/tVd/ME9488trawPGQang4gHYb7ZoPqsH3bltTZxClf2pDy8q5gh7NpjX9gRLShktl8whoQ985pBlhjEDK+B+UnceK0nQNORLgWh4UZU+98joay9MkVF/XKmi432ERAA7du7cHCL8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781283457; c=relaxed/simple;
-	bh=hUC/KShmbN+6yoieJbYxc9dNyQEv3s5BD6TpqCmjS9M=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=mOtlQSEzNfUSHkBJZtJ7vnT5CHY98XJrMw5VqwkmOJH2poIGV0rzyekPxmIQtSegfMhYFnNhWf8bWGjzV0rRLZjIjSwd/tdCyCb59HNd6VMUx2MY1C+DRruqCYXHqKwjdK4m7ERM8xMbW409z1JY2iN/MbXQ4oCHuuP7VU4ibuQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=hqBvvFAh; arc=fail smtp.client-ip=52.101.65.127
+	s=arc-20240116; t=1781283455; c=relaxed/simple;
+	bh=Xq4Vq052e6S1lGduiAwXcv1O/7WPSYNm7rkTQW0OWL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tvL/dQyKAiaFz+d96XI5ljFWf/TKDIGa5Cbu1a2Bkgi28wBrrZGouqftk4zC0XHBVV5dLxtcwFNq3Rnnc05eDAavYLdXniB7VPiVDg44/l/lkOtgYv9SIdY7NYBW0tD/FvW9VPAJEZwLLkbYczKoyvtucQnlr63lBhEG9hAzLFw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=Iqh/9VjA; arc=fail smtp.client-ip=52.101.65.127
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Qq0HmvO+L0Jt2ec1EBo6D+u6a07o1s3MUvHaVJJSbPPXaDDIVQ0haB/O6tuloBXv30R962Y8v0WmIHj/fmvO19MbDmVgFIr6aM+JEMclpxgSApZ79nZb82TL2ICOgMKCyNE8AYyY96w4bxXVRmkuMyLK1goxqPOZFnQmizQx6cWe9OZXH2k6TPppdW/W5PCdVfqT7pbW3bFAp/nFzRGMgp56MWmdhkWsbHg9SrQBhZARTWi/V8z8iqPzdPAJZorTph9nQ3HyVSLi7jdqc+aL8yRUYeNuH9HGKeEH1hT/SiFMrFpo5cz6Dk1g85zgnStfLlc4iOARy0N1MFRVpZiRrw==
+ b=UFFs2KDHDbds8CODA+Hzl608h1zodgYCQY6/DLZ4gyojsVd4jVDByE0DzN18fA5f+d5zRPGURg3dHoVwUYd3h8VTlh6r6qfF2SGdNkT9ZzK52JxBaCSVeCU3rxCJo9xgD7hUXOxLA7vTL2b1pwurILXwpbQJUOdWVqw0SAbKebaRugcv9mXUTOyYSyDE8w9LQWz8DW4c4Xqde/645/cA++1i5cXzOIoFWfDmbYLcYeCcMYvGq2SedbOQxtVsQUBmfkcpPSMZ1aXnoC+LM3u0Neo0kqTAaWVM/+XlIDMaaCh26P600b108nQl297RZl6D3XBu8DYE4MTddTycAAmalA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gySx8ma+VlhEk8MCLNl2Ow7Mqs2pdkDHVchqNvcKSlg=;
- b=A5dxoInRyjTf4/+ARLdXW/A31Szj8J/olzuEcUWC5IiRvPjrV3hAb4IN76HSgG1bur2bZ65PH8Ga5gPnYdjV5ZI2HpDu3HCPb5loEQF+pkZ20gsCs72JEjPcTQ7INNvgjrFd7f2YRcooYCQT+VUrRjBd7Y9k2HQLRyXyN1yw7s0n0CTEJe7EbS4QZ5RRHAussj+1hmFz7bW2yeh51n2Q5OpKPtViQ+qtbqB8nTCGPgOw2zR/w4qJMPQeZa9//Uq2fCcG3S0gMpPnYBaSfH3IELdGc3turRsB56cKLYJp4IazYqA0k3gaBOqj7e2m43dfOKkarFEodX5AP6J95SoQYw==
+ bh=5xbRwYmjyOaHwGQQMlD5kdLcB6p8wIxYQT0w054OLyE=;
+ b=l+Uc53daGVPdgpich+WXrKtT0hit7CLRGVvct00da2ac+2ubHzRKXmmbpy7bESAqwerwQKy84dxSbgOgJ3nfiBJdCgdf8sxehRzuFgx8qrlMYAyTE8+4A0lbaygdkDM9OVarW7Ni307qyplgAapaqj2QAs9nl8AAbQ4FJ94LeBQR1QSc33M0wF7HGX89qSUu303+CXMEKkzMxPt+LnJ+/CE91/J8q1nnvMnxAV+ET6r8/0n/nmFRTpnLs3Xbmst/MPP3UpCrEJBYgzrFaVdIkqgnB00UFOG8pSU7JY1t8xI8FWkuxM8yleVNa8zmP+QA0rNhY/9roezfu+6kZfFpeA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gySx8ma+VlhEk8MCLNl2Ow7Mqs2pdkDHVchqNvcKSlg=;
- b=hqBvvFAh2OEnPLFdzsUgpkARY2z19sV3j3M1DkFETCfCp0yecDM65XuNioHZx1iQiQToZe/DtHvCckgG6FakU+wyizZnkGoLHuluekc+A73iWKoJW4UkNLA8eZxSlfuOcoFS9Cavu5b0uC6hfygedKqov6Ux9jeBRFM+87xysjQA72I+w7ulD3AMBRP0j/gFofWgN+Us3Qc2LyfdZ0eGoGNxNljFT+LiXDAfU8xJKCN/KsPbxXjf3++iMNUUH34WJ7DOcSml0gA18UgQ/0+uX1EbyzZE4T8PAbpykibzdk2USMiTTfRodrM/QrvVZd083EHfx2RMHNkIgbdcANoyoA==
+ bh=5xbRwYmjyOaHwGQQMlD5kdLcB6p8wIxYQT0w054OLyE=;
+ b=Iqh/9VjAzEdWjCjC+22PiBFtcb0tPSajtO4ASLz4SZ2AyD4aVOCUzXGK0mgyv2+s+uv6FI9+Ak7CEKZsE5mJYYkTt6AIt8LgVDloxIJWJ9B2ZBruMNWjXoba5Hfagk/1ygClKHWNqx/31ULhl+31BwvWLskdeODZbFZH+09ZPB/dJVYFVVwKc4oaFZneYpctgayCrMHcegKH1TBqnC/ViGIgkjEP65zRy0+k28ZmM2BsEivA8npgjQZ6NKuT61TQOb3NypPBfzzBJ8SYu5Rkx1m/UsLz/qng/y75vkZHuLXo/18/a0q5E2dT0ZOOY1Tp1Y489J4x8/qHt2iwQpf1nA==
 Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
  (2603:10a6:800:20a::12) by AS2PR08MB9416.eurprd08.prod.outlook.com
  (2603:10a6:20b:594::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Fri, 12 Jun
- 2026 16:57:28 +0000
+ 2026 16:57:29 +0000
 Received: from VI0PR08MB10656.eurprd08.prod.outlook.com
  ([fe80::4e37:b189:ddcd:3dd8]) by VI0PR08MB10656.eurprd08.prod.outlook.com
  ([fe80::4e37:b189:ddcd:3dd8%5]) with mapi id 15.21.0113.013; Fri, 12 Jun 2026
- 16:57:25 +0000
+ 16:57:29 +0000
 From: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
 To: linux-kernel@vger.kernel.org
 Cc: kvm@vger.kernel.org,
@@ -71,10 +72,12 @@ Cc: kvm@vger.kernel.org,
 	ptikhomirov@virtuozzo.com,
 	den@openvz.org,
 	andrey.drobyshev@virtuozzo.com
-Subject: [PATCH 0/4] vhost/vsock: add support for VHOST_RESET_OWNER and CPR migration
-Date: Fri, 12 Jun 2026 19:57:14 +0300
-Message-ID: <20260612165718.433546-1-andrey.drobyshev@virtuozzo.com>
+Subject: [PATCH 1/4] vhost/vsock: split out vhost_vsock_drop_backends helper
+Date: Fri, 12 Jun 2026 19:57:15 +0300
+Message-ID: <20260612165718.433546-2-andrey.drobyshev@virtuozzo.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20260612165718.433546-1-andrey.drobyshev@virtuozzo.com>
+References: <20260612165718.433546-1-andrey.drobyshev@virtuozzo.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: VI1P189CA0021.EURP189.PROD.OUTLOOK.COM
@@ -88,57 +91,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI0PR08MB10656:EE_|AS2PR08MB9416:EE_
-X-MS-Office365-Filtering-Correlation-Id: e940afe5-db04-4dfa-09ae-08dec8a3adf4
+X-MS-Office365-Filtering-Correlation-Id: 1527e209-4322-4855-f481-08dec8a3ae4f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|366016|376014|1800799024|23010399003|56012099006|18002099003|38350700014;
+	BCL:0;ARA:13230040|52116014|7416014|366016|376014|1800799024|23010399003|56012099006|22082099003|18002099003|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	IcLrER33xHye1r89PM/tP2Ar8odAANj5nqTf0gmimNDNN7csEa9anQEE2S/6e4D4TJNsoHVgLc+QWpF7pWus0e/V2N7qav56QrdPTxR1BONQdBj7vaWNycwzRife1bGjHC9JQ+CJomRu6qp7FQ+yRqdWYZXiCC3tTEATq2ZLn4ob1kp2Dq295IDHE1T7O5SYWc1thBe3nfflzeM/Ed69Sh1RgaSvNbcP6Yl9mRwwETlqPgb7fWi/NmAUGTJfjQE9icgYD4yuFOr1W2n5fC33YtcQEBUjijWApx6sH7bXbaHFAaAx7lf+DLWUI9qMFwe9Qc1Z5RNXGgO3LecN5o7Yqesz9rL0yFWRKUkkf86AQMMc0TAmLGz2zaoT0ShF3/8X9qzQ0OA6GfoZt6HtDRdunx/ugcrzlR24VOEgWPIexIHhDFHkX/KfaZcZqPiGYpzKPxuyiGmXnIMPLQPfGI7jm8WZ3tnL2j1+jGt2446lwh9mTm0a/48NfoIqj3fqNYtt0Uz/Y2iwwr1GIWR7jw8ehun2JTlTtnYq8ep9VLU9XwyD6hcZTNOoIhs+rfC37ImSrA8bl63YNtO5gvaZsfZvK7VoWKXDPW/8vGtsHu/XY9MgTT/gLB1FdJOmn2ZQKf7aljzpai+oq610tM2tK8LFYAyWWISw6zFfj70GspE1k/5bm67yPhxSX1X0YQs8xQA4WjxywE+4zGS0qo7bW6VoXD3My501y+3enWjTCyRrWBE+A8GGBYYF1o5zZLbhziu2
+	MOOu4E8AvezAaKDpMyph8BnxyZaaNAdmyX9zZzYEOiV7RbFxASH+U8R7o/g6/Qihv3cx3TshnXSUBETvhMb+y0UT8xJFQp48itwHfyPrSUWq0AnVcK4KmtVe99m27M3Jm/g81TS2PaGCQIdFcFYLuGrT6h2g2j6yygaN7qB2ASvX2gDho6F/bdd545G930eysxdyhuD99apsa3VGgF/wYz05ITpo5SrukaU8+HHCXRnSTk74VeAHwrVAQHEYaSugMwOpiFPXE9L6S30tquzO5JDyLo79t3SyugPeBxmkXQHj0QAOVhPhvnQw++ZFfAfA3hNIfUtKhERsURsGsYPm19/fECKcd4DZGTsN6zHeOGrjS5gtifh6utcQuyUpmVfTuyr28r1VfiIODogEof8JFRaHzBeQDNDN+MRd3CCEn88h/1RaTlnVwHiGqqkS3KfrWGGNTueqMjgR6Jx4hKxHs00sO8J2pfGukuUZ1pXjGNC+zmapSMeNKoBGnOTs48zOEVAZf/tvfPKYOCT+M85YewGb1TEIomTsi9qmKXM903Gc49NFLZWwJLKOCgDU/+2WsaEqeVSLbh66t7xcBNJPfsmgiLh7g1jPW1NHdu+cyYv6CyFP1lHJhRjtkADhf727g8y4ToXiFSuoLvIuoA89vGcLk/9rWpAcEI6HyJINYTuuUbBf/ubbA8fDn+//+NLt4qJaYhWq+ayA6TKRH9OigGtfkKt/pnGgtNnJcC8u2JQoxJnoZpwyIxMoILk3mOL5
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10656.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(366016)(376014)(1800799024)(23010399003)(56012099006)(18002099003)(38350700014);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI0PR08MB10656.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(366016)(376014)(1800799024)(23010399003)(56012099006)(22082099003)(18002099003)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Ay5Ub8xs+ns8HliYEA5aoYYFc3msQKZlAfyeGm3B+m1wOKY6oF1qgvn0ce85?=
- =?us-ascii?Q?k0Ds6GoWQJCpFEosPQgl6QH8b6um5yAHaogkJKtXgLhII3JdzsDQWwVkVOl7?=
- =?us-ascii?Q?KcFlxRS1QNYBR6FSxm1ALZqmYzDG5IirQs2qat4GYbOCuRbLMx3lyxKFXjr9?=
- =?us-ascii?Q?uC4J8tBAQYH1YyDGZHHT9oQQqP3pI8JksKnGzT1u3TTplIBBfmQO6pO197Hv?=
- =?us-ascii?Q?v5yoBbVpRYWynaD2U5cyVsgYRCoDyGhQ/Rfxy64XYmnjGHzmHKJBzDNLP0aZ?=
- =?us-ascii?Q?EVbZlt//y7MLXslY4cS8h5ipWYrRCNcNpaFzqEydF8B7WVc8sg1AmbvSihQr?=
- =?us-ascii?Q?EdPFsy7UbrlL+/bqrwvabGze/tOVU1XadDeGUUMptSomWCIjuwuL8OSqHjG6?=
- =?us-ascii?Q?oQFM1IiCihToYxrbz7Er3tpWTqjWkiytL95jy1BwhNFKpYFfKZGriZ2sR7qC?=
- =?us-ascii?Q?GzomEKTlYhN03rL0inGnP9e+Ov/Fq0XBfLGJbJf3R2XXm3h/iZy0teyRB71B?=
- =?us-ascii?Q?6Rz+x4XhjRMYTGDZl4yuoqOaHr5i8WwSGJK0obUvAILG+JQ+TVAIY1L6bHfh?=
- =?us-ascii?Q?3NIKXdKRnfyVfQUr0mEq45KX2l1t5hYc/1kKx7UgIhKnh9k3xY91cGw2knAN?=
- =?us-ascii?Q?zwMgWu1bvvOuQdBNSPKSN6OU6lAM17Ruz52TbGauIw8tubc8KLpR6mjwEJgT?=
- =?us-ascii?Q?mnYmzZVhk7Tv+BNxBKx+Q/64Kpis3I0e8uLKknLMqE9H5IYj+lJob1+GoI4z?=
- =?us-ascii?Q?QjktCsghImWIoUAumDBuwA+xBfPPiPhV2Jog5tg0FjIkXlV28eOg4Xx4d3tm?=
- =?us-ascii?Q?x+7azGmVIHWhhXyoqyCiwKUMnk0SI8T3lkdBsxfeo0L8ANpKThSkCgeF3zlL?=
- =?us-ascii?Q?8LjRGHixtlcBdlTaB4Tpouj9GMOajOxRhlLj1xLMfFNfH+sI0tBywXvFcZ2K?=
- =?us-ascii?Q?vyK5Re9KsM/I7hu005ZN4t+Xw2hIqpnDqPQtRonXxTc1Q1sZrEPQ8QpquwbA?=
- =?us-ascii?Q?fWDqjjezxn8nZcq+g9ac7sRB6ColQRD/ndJLjTtFTSdzG3f6jfx6d1Ee6PoH?=
- =?us-ascii?Q?DGq3/l2jLDAbc5PFt+bj0SOhUL9gj/+/saJIuVO6zy/MaZL9sKHYqBQqmxiQ?=
- =?us-ascii?Q?gYwAPoamWmoYwAkkM4K5tpFMMpoZdX93bVL7hWUvjZIjcsHwuNGeRRCp9V/z?=
- =?us-ascii?Q?UPto5zW6DjEaY3gGutX8c4nBYLyYryx6nZ3k1akF+RXdnJdxae6Rf7TH2TGs?=
- =?us-ascii?Q?G7Qqnjl0cuDzy22UitsylVmoxG5leS2AcgYAkvhKDpyOXBW3UoHrZGO93kw9?=
- =?us-ascii?Q?Gp2bo+lo7mMsKG0X+D1A59BF0Q9kZr+q4fbGH1Mld5VlvWCIrajBed45m7t9?=
- =?us-ascii?Q?aOLDnUx6c7Vmhs2wrJ4IQcx9wm8YUq8GwNp9BwcLtqu6QWvqx2zh18u6JPtb?=
- =?us-ascii?Q?zZvosESKPAespdAM+YcyD3eYPNEvC6FHHZxK6Z1577QtX0qD8jSZ0Cwd7CfX?=
- =?us-ascii?Q?xBREkAZGgYTzJtk9IDbjKL2tF7MTXn6G/1hgPEq0gKrcs8fFD9ve+pTzKbCA?=
- =?us-ascii?Q?Tg6mD4lEwjvgmgKqn8Smwont9RlTpGxDBpIvC9F9uw1P6k4hNqfNowXn0kIj?=
- =?us-ascii?Q?broylMHyMG/t2dJKXl8hBHchqMkxV58CabCXVzE5vqcwlDThvL4F3lLlWFJE?=
- =?us-ascii?Q?+UDYSki9ja6b+3M/hRRlko4ChL8tcA9U6m6WYJ1pME/BMotrWPUVpcmuL92M?=
- =?us-ascii?Q?4hoqxmiAs3u4giaY5gV7lLefNWeOj+g=3D?=
+	=?us-ascii?Q?lxTuX3Cr5SrcjGjgPQbUfw+LjG4Ml4VrwjXrqwKjSZU4ASVQYPYhQtc3dLxV?=
+ =?us-ascii?Q?wcbe/gH+5jN7K5ZInD9OpEmk1wphJUqx9bqZRDpwatO/abKDW0cDsFIM2DLY?=
+ =?us-ascii?Q?kGUnzNellbCYt2j8wopOyIuin4IXq2bYhI0h10bdKyTS+O0wCuLN/P1RcHgo?=
+ =?us-ascii?Q?GAp8X5mrtIKs4J4gFQM1jQYGbg6HfWKDScKBYYngTBz8EHKByrgfOCDEU56y?=
+ =?us-ascii?Q?bdzRaSCtx6WES4PfNRCc5FaW9XHiQaAG7qAR/a5HxMY5Gbce+96N2mxsOkVx?=
+ =?us-ascii?Q?ggXGWvw23YIaJ7IbMf4ekhu+i4kfPeoKPBoi9dXSIjBn/iQdJeoseLN0v1yI?=
+ =?us-ascii?Q?xDCx2uGJzBdTjoM1AuKk3HTkthHaBv+8Az0aus1Lqqhg9DS+j3sBWWBAs+y1?=
+ =?us-ascii?Q?YHLx8RO4GHVoBWTH1tH0lNCp3xWmzT5CiPLOLhdfr178y3oHOHWK2GFBksPI?=
+ =?us-ascii?Q?PvpDPJea0c7AL/ZkW04So/h6DEa4ukkQr/1Vxnvb1MSv88hEODywfSpe+19p?=
+ =?us-ascii?Q?9DR1wkZdlwMJ4TdPdCLsehppJkk1QqF5FtauvSmMH7jr92RyXTwyDUi1mJ4D?=
+ =?us-ascii?Q?QSnofaflD0JVNvHAfjx2lkPNPfEKzV/rVSX9s1vXE8iQc33KKKVH7ebL7CyL?=
+ =?us-ascii?Q?hAu6T8d7AJH9wbd0HcpBFCNtxbyUTZQoYcRQarSCP6xDfAiVBo6pidq9/cWP?=
+ =?us-ascii?Q?FfNXrnSOZ5BTLpzITmGBkFoL41PiyrruQVyE4mc7pulFbYcOkwgSWPG7eGDU?=
+ =?us-ascii?Q?Sbp9utLa1cysNrshB+0rhlX5aST/G5gBGSW+64o8lqRLkn7ISO8ub0R2JouG?=
+ =?us-ascii?Q?GgnLuzrygROOD1z35rZHlP39GR7uWs0wTo1lcz9nr8WpiMPtR31d+DMc9JPq?=
+ =?us-ascii?Q?Mojx1ymRUg6wTzirikWqx3R3Kvezgv7QGXqgKvhh2rbx7cjEWVjwb2VxuMRJ?=
+ =?us-ascii?Q?MjwMImDFlE7wzuyVTl50x6WnQdDx38DaIe2BnYF/HBC2fT45aNpABQyqsg2N?=
+ =?us-ascii?Q?bAwphWfdIdxW0e/nESZ5N0Z2LyivDCXIYlSWXSmZTnC8RojE+Yq3/sNpJYoA?=
+ =?us-ascii?Q?q/sHyD+r5kUFVm/6Ng0IpW6JMugtQ6rs8rDTI2OSdx1faOV611/+i/vQGUSB?=
+ =?us-ascii?Q?c47/2mg+xdOwjogFGtxxTSvpZrg/pl/5VHBbyFI2EXPWvDEMdEwmwQ5+smVw?=
+ =?us-ascii?Q?z9AzTj1e4S4T7Hv2TsBMN6pUyHhryOyN1LFVU2BmeLSzEHJeltThdqwBIkb/?=
+ =?us-ascii?Q?r74HndVSiOJsBZR5H9YmdChHBc9Wx3ZajE4O7+6I8pBPM9Th56UPH2+L873c?=
+ =?us-ascii?Q?6d49zfuuqV7uM3UvFVbbTVTLUiPKSAteRhUNHfRqTZWV9TlCFW9MLUP/JzS6?=
+ =?us-ascii?Q?YhoJRJdAMRqipx7xBtV7NaGMAHjLi9NQNKpuJFsPIHT/gMAF4sB/ekGDMjeg?=
+ =?us-ascii?Q?H8xmv7SRfJl95pZHHR2cII33syf7Q4t8NED2RUKNJdeVeqw7IUSpGajB1srr?=
+ =?us-ascii?Q?xl22Cm5bkR2/5H3OeXD1JT8XwCl3LjCkeOosrtcse92zwupzt8/dqdfgsVvr?=
+ =?us-ascii?Q?sPORMNYDgzfcGyQ9myxIMlszkmWhKM1BAjss0ExDLIBOOtU+4fzLTF7gj36l?=
+ =?us-ascii?Q?Gtw5ufmpIqBpm5ARZW9Ikk7B1xOx48UbincWqLiwrjsiblvCCTF2nqOMbZ5E?=
+ =?us-ascii?Q?ao/5Fc6UoHutuluTT4HBuwcb4144mAT1fvauNEq2HJUUvjYItn/mXCAsBgrX?=
+ =?us-ascii?Q?WotIwWzIqnPJs64ZfHVgWq7fDv1ftY4=3D?=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e940afe5-db04-4dfa-09ae-08dec8a3adf4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1527e209-4322-4855-f481-08dec8a3ae4f
 X-MS-Exchange-CrossTenant-AuthSource: VI0PR08MB10656.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2026 16:57:25.8121
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2026 16:57:26.4025
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WEC+h+Juxs67KAR2lccGsmaE3SafJ1IVFWe51oagjAwjHkHns4GVBrmxykmiAynaBnRTBZRv162g3QYZoKzMaZpkUoQn7khebKLM5YgkcPA=
+X-MS-Exchange-CrossTenant-UserPrincipalName: O5tySfwg6fAyF+cLwd2Wtg5jqZb8g8B5xHNqeaVO6c3tY4ctihL/bMV44f/K9HiIFnDEOUyMF/aTKeLY8i/5ys82b0VvPFfZ4ZtteASkeZQ=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB9416
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
@@ -147,7 +150,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -156,10 +159,10 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FORGED_RECIPIENTS(0.00)[m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:sgarzare@redhat.com,m:mst@redhat.com,m:stefanha@redhat.com,m:maciej.szmigiero@oracle.com,m:bchaney@akamai.com,m:mark.kanda@oracle.com,m:ptikhomirov@virtuozzo.com,m:den@openvz.org,m:andrey.drobyshev@virtuozzo.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER(0.00)[andrey.drobyshev@virtuozzo.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-298740-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298739-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[virtuozzo.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -171,58 +174,68 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:dkim,virtuozzo.com:mid,virtuozzo.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid,virtuozzo.com:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5BD4667B239
+X-Rspamd-Queue-Id: CCBD467B223
 
-Host<-->guest connections via AF_VSOCK sockets aren't supposed to
-outlive VM migration, since VM is moving to another host.  However
-there's a special case, which is QEMU live-update, or CPR
-(checkpoint-restore) migration.  In this case, VM remains on the same
-host, and we'd like such connections to persist.
+From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
 
-For this to work, we need to be able to transfer device ownership from
-source QEMU to dest QEMU.  Namely, source needs to reset ownership by
-issuing VHOST_RESET_OWNER ioctl, and then target has to claim it by
-calling VHOST_SET_OWNER.
+Split the actual backend dropping part from vhost_vsock_stop.  We're
+going to need it for the VHOST_RESET_OWNER implementation in the
+following patch, when vsock->dev.mutex is already taken and owner is
+checked.
 
-Since VHOST_RESET_OWNER isn't yet implemented for vhost-vsock, let's add
-such implementation (patches 1-2).  Also fix regression introduced by
-the earlier commit [1] (patch 3), and fix the deadlock bug (commit 4).
+Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+---
+ drivers/vhost/vsock.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-There's a complementary series for QEMU [0] adding support of vhost-vsock
-devices during CPR migration.
-
-NOTE: this series needs to be applied on top of Michael's vhost/linux-next
-tree as it contains relevant commit [1], not yet present in master branch.
-
-I've tested this (patched QEMU + patched kernel) approximately as follows:
-
-  * Run listener in the guest:
-  socat -u VSOCK-LISTEN:9999 - >/tmp/recv.bin
-
-  * Run data transfer from host to guest:
-  socat -u FILE:/root/bigfile.bin VSOCK-CONNECT:CID:9999
-
-  * Perform CPR migration during transfer (either cpr-exec or cpr-transfer)
-  * Check that file hash sum matches
-
-[0] https://lore.kernel.org/qemu-devel/20260612165110.431376-1-andrey.drobyshev@virtuozzo.com
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=bb26ed5f3a8b
-
-Andrey Drobyshev (1):
-  vhost/vsock: re-scan TX virtqueue on device start
-
-Denis V. Lunev (1):
-  vhost/vsock: suppress EHOSTUNREACH fast-fail during CPR pause
-
-Pavel Tikhomirov (2):
-  vhost/vsock: split out vhost_vsock_drop_backends helper
-  vhost/vsock: add VHOST_RESET_OWNER ioctl
-
- drivers/vhost/vsock.c | 80 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 69 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 9aaab6bb8061..b12221ce6faf 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -664,9 +664,24 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
+ 	return ret;
+ }
+ 
+-static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
++static void vhost_vsock_drop_backends(struct vhost_vsock *vsock)
+ {
++	struct vhost_virtqueue *vq;
+ 	size_t i;
++
++	lockdep_assert_held(&vsock->dev.mutex);
++
++	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
++		vq = &vsock->vqs[i];
++
++		mutex_lock(&vq->mutex);
++		vhost_vq_set_backend(vq, NULL);
++		mutex_unlock(&vq->mutex);
++	}
++}
++
++static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
++{
+ 	int ret = 0;
+ 
+ 	mutex_lock(&vsock->dev.mutex);
+@@ -677,14 +692,7 @@ static int vhost_vsock_stop(struct vhost_vsock *vsock, bool check_owner)
+ 			goto err;
+ 	}
+ 
+-	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+-		struct vhost_virtqueue *vq = &vsock->vqs[i];
+-
+-		mutex_lock(&vq->mutex);
+-		vhost_vq_set_backend(vq, NULL);
+-		mutex_unlock(&vq->mutex);
+-	}
+-
++	vhost_vsock_drop_backends(vsock);
+ err:
+ 	mutex_unlock(&vsock->dev.mutex);
+ 	return ret;
 -- 
 2.47.1
 
