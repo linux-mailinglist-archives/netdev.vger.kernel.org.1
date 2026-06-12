@@ -1,84 +1,64 @@
-Return-Path: <netdev+bounces-298658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ock+EAUHLGqMJwQAu9opvQ
-	(envelope-from <netdev+bounces-298658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:17:57 +0200
+	id 4Uz4JHkHLGqjJwQAu9opvQ
+	(envelope-from <netdev+bounces-298659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:19:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB42679B36
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:17:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08992679B67
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 15:19:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=WotCd8T6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298658-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298658-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=b4BVk191;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298659-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298659-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82E783223995
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:11:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6ABB430DAE8F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 13:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE853E95BD;
-	Fri, 12 Jun 2026 13:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB1F3ED3B4;
+	Fri, 12 Jun 2026 13:19:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C7838F233
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 13:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC64F153BE9;
+	Fri, 12 Jun 2026 13:19:45 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781269907; cv=none; b=o9sqWPEXAwERybySMaeaphg2IOrqlDEd2FP/EzE5ZWfml9hKh5K+3pfkPDxZq7Tr9s8EPFTTu8ASE2wtLP8NqzbnqD6R8ESxP8kFePD3LcG94TA8wiauDulP7CgDGAezVaSwe7Ill0lX5lj+YoTHSmmqbk8r8wccXyAHOt1kcqE=
+	t=1781270386; cv=none; b=H7ymIDFJUkSDBM0azwrI/VxHtE122kZ9E59/RxWArdHTheudEtlOFBmPLOQyQiMDSTZsAMtm0lSEfE58cstXXeCnZyxZlTsjXs9s4t8mZI/Nbk1hiGO5R4LXJY6Q6Q7AVBZVgHtg7EdMMeQpK5Jm9py+9zsGjkX9/nIgoPQzJxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781269907; c=relaxed/simple;
-	bh=KCraM+EOKKtEb873qQFCwAKytsR15+WPPZ/s6qIBlbE=;
+	s=arc-20240116; t=1781270386; c=relaxed/simple;
+	bh=lB/VZDEXwZgo61e9YOFfO5LUxisQb83oF5X9fTKXBug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YJr1oL9iK4bLd7cYkf/oSVDoQbkB0HWBDc/ZXv4xmIOI4Z5qpnotAlzqcEkNn8hWQ2Xngp5+mFxHk7SWgp8jpmtlQ9K8VbQNnv1u0KZW7WT9GDGtLKTC8rS9/gunWLpVqoooP8UskvgRnESk4lxnW3Z1X+8cJS2Arl4bZwHXqAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WotCd8T6; arc=none smtp.client-ip=91.218.175.182
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781269904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oh5du0PbUOJ2GCFr1/FdoSkmCPgoB9UDf0M/aVUSOIg=;
-	b=WotCd8T6xhakfQS10jEkOBFsEtnhX0jhGy/njNitf+TPhmjVoN5W+tsO8IQcvS3SJh7KlB
-	+dGlnwkO3/5PXldwWe0uIYgCX8wqRBxuD4wRvih6PPJjdIKuJ4k/DeaRKueV/Rc+uc9D2v
-	XR6875vUTWJi9EUtCWbzlnxU4HWJb+M=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Sechang Lim <rhkrqnwk98@gmail.com>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	Cong Wang <cong.wang@bytedance.com>,
-	linux-kernel@vger.kernel.org,
+	 MIME-Version; b=WDC3NjTxHRytMtE8xQ3dzV7Jm+LvKVZQfjk787AFIAwMQMj709tCjBx1ZRc6BxjfDFbb5aD+hiaggtJk6BbHmELBTpJHRBmzLZ2gtYm+TXTgAUFTuqEBUo9e1tO9SQ/jiByVAnblmMQOzibLd5XxNl4tBWvgMDgxN587a5ABjVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4BVk191; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 072A61F000E9;
+	Fri, 12 Jun 2026 13:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781270385;
+	bh=l2FkAmVGkxh4UCL4UyctSxXoA/a+FkT+bqwYQo5vk9I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=b4BVk1915ssqV0k2g+jbmv4AJgxxYOuzWM4y79qOVqvpX2UczWEenkW5ZIkMRyYBt
+	 3X2OM46P3rVTetfOvz0rE9joSDY2ZbtTF9iANrzrqCQtQCbkHyQiBh6i7IC/Jmcz0q
+	 +Eq96cjVa5S/E5teK2fzPA+GZFI8CMLapdqjIEEhwZIrm7Zb38RUs0rzBtPs9WnpUw
+	 z/6h2w4quLqgXD/otOav3H+Qq5BlknTuZd322OvNg5kRh/BYLeGvUZGMSX/ok6gO0e
+	 vIHm2S6VyZ3vBxseA2cVjTewxLPzjRIs4UBNpu+cb5RUpy4OOVO84XKlqWbLBMChcb
+	 LswRka3Tgt2JQ==
+From: Simon Horman <horms@kernel.org>
+To: hexlabsecurity@proton.me
+Cc: Simon Horman <horms@kernel.org>,
+	david@ixit.cz,
+	oe-linux-nfc@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next v3 7/7] selftests/bpf: add test for bpf_msg_pop_data() overflow
-Date: Fri, 12 Jun 2026 21:07:51 +0800
-Message-ID: <20260612130919.299124-8-jiayuan.chen@linux.dev>
-In-Reply-To: <20260612130919.299124-1-jiayuan.chen@linux.dev>
-References: <20260612130919.299124-1-jiayuan.chen@linux.dev>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] nfc: nci: add data_len bound checks to activation parameter extractors
+Date: Fri, 12 Jun 2026 14:18:15 +0100
+Message-ID: <20260612131813.674622-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260610064104.143042-1-hexlabsecurity@proton.me>
+References: <20260610064104.143042-1-hexlabsecurity@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,169 +66,183 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298658-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:rhkrqnwk98@gmail.com,m:jiayuan.chen@linux.dev,m:emil@etsalapatis.com,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:martin.lau@linux.dev,m:ast@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jakub@cloudflare.com,m:shuah@kernel.org,m:hawk@kernel.org,m:ihor.solodrai@linux.dev,m:cong.wang@bytedance.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298659-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:horms@kernel.org,m:david@ixit.cz,m:oe-linux-nfc@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,etsalapatis.com,iogearbox.net,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,cloudflare.com,bytedance.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,linux.dev:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,etsalapatis.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AEB42679B36
+X-Rspamd-Queue-Id: 08992679B67
 
-From: Sechang Lim <rhkrqnwk98@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 
-Add a test in sockmap_basic.c that calls bpf_msg_pop_data() with a length
-close to U32_MAX, which overflows the start + len bounds check. The sk_msg
-program records the return value over a sendmsg and the test checks that
-the call is rejected with -EINVAL.
+Simon says:
 
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+The error type issue below - the first issue - does seem of
+concern in the context of this patch.
+
+While I think the other issues, which are flagged as pre-existing,
+can be considered in the context of possible follow-up.
+
 ---
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 48 +++++++++++++++++++
- .../bpf/progs/test_sockmap_msg_pop_data.c     | 27 +++++++++++
- 2 files changed, 75 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
+nfc: nci: add data_len bound checks to activation parameter extractors
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index d2846579285f2..cb3229711f93a 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -14,6 +14,7 @@
- #include "test_sockmap_pass_prog.skel.h"
- #include "test_sockmap_drop_prog.skel.h"
- #include "test_sockmap_change_tail.skel.h"
-+#include "test_sockmap_msg_pop_data.skel.h"
- #include "bpf_iter_sockmap.skel.h"
- 
- #include "sockmap_helpers.h"
-@@ -666,6 +667,51 @@ static void test_sockmap_skb_verdict_change_tail(void)
- 	test_sockmap_change_tail__destroy(skel);
- }
- 
-+static void test_sockmap_msg_verdict_pop_data(void)
-+{
-+	struct test_sockmap_msg_pop_data *skel;
-+	int err, map, verdict;
-+	int c1 = -1, p1 = -1, sent;
-+	int zero = 0;
-+	char *buf;
-+	const size_t len = 32 * 1024;
-+
-+	skel = test_sockmap_msg_pop_data__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	verdict = bpf_program__fd(skel->progs.prog_msg_pop_data);
-+	map = bpf_map__fd(skel->maps.sock_map);
-+
-+	err = bpf_prog_attach(verdict, map, BPF_SK_MSG_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach"))
-+		goto out;
-+
-+	err = create_pair(AF_INET, SOCK_STREAM, &c1, &p1);
-+	if (!ASSERT_OK(err, "create_pair"))
-+		goto out;
-+
-+	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto out_close;
-+
-+	buf = calloc(len, 1);
-+	if (!ASSERT_OK_PTR(buf, "calloc"))
-+		goto out_close;
-+
-+	sent = xsend(c1, buf, len, 0);
-+	ASSERT_EQ(sent, (ssize_t)len, "xsend");
-+	ASSERT_EQ(skel->data->pop_data_ret, -EINVAL, "pop_data_rejects overflow");
-+
-+	free(buf);
-+
-+out_close:
-+	close(c1);
-+	close(p1);
-+out:
-+	test_sockmap_msg_pop_data__destroy(skel);
-+}
-+
- static void test_sockmap_skb_verdict_peek_helper(int map)
- {
- 	int err, c1, p1, zero = 0, sent, recvd, avail;
-@@ -1373,6 +1419,8 @@ void test_sockmap_basic(void)
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap skb_verdict change tail"))
- 		test_sockmap_skb_verdict_change_tail();
-+	if (test__start_subtest("sockmap msg_verdict pop_data overflow"))
-+		test_sockmap_msg_verdict_pop_data();
- 	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
- 		test_sockmap_skb_verdict_peek();
- 	if (test__start_subtest("sockmap skb_verdict msg_f_peek with link"))
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c b/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
-new file mode 100644
-index 0000000000000..301e65b95256c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_msg_pop_data.c
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-+	__uint(max_entries, 1);
-+	__type(key, int);
-+	__type(value, int);
-+} sock_map SEC(".maps");
-+
-+#define POP_START 0x48a3
-+#define POP_LEN   0xfffffffd
-+
-+long pop_data_ret = 1;
-+
-+SEC("sk_msg")
-+int prog_msg_pop_data(struct sk_msg_md *msg)
-+{
-+	if (msg->size <= POP_START)
-+		return SK_PASS;
-+
-+	pop_data_ret = bpf_msg_pop_data(msg, POP_START, POP_LEN, 0);
-+	return SK_PASS;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+This patch adds data_len bounds checking to the NCI activation parameter
+extractors to prevent slab out-of-bounds reads. It introduces a data_len
+parameter to guard against empty regions before consuming inner length
+bytes.
 
+> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+> index c96512bb86531..753f4cf087489 100644
+> --- a/net/nfc/nci/ntf.c
+> +++ b/net/nfc/nci/ntf.c
+> @@ -525,15 +525,19 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+>  
+>  static int nci_extract_activation_params_iso_dep(struct nci_dev *ndev,
+>  						 struct nci_rf_intf_activated_ntf *ntf,
+> -						 const __u8 *data)
+> +						 const __u8 *data, __u8 data_len)
+>  {
+>  	struct activation_params_nfca_poll_iso_dep *nfca_poll;
+>  	struct activation_params_nfcb_poll_iso_dep *nfcb_poll;
+>  
+>  	switch (ntf->activation_rf_tech_and_mode) {
+>  	case NCI_NFC_A_PASSIVE_POLL_MODE:
+> +		if (data_len < 1)
+> +			return -EINVAL;
+
+[Severity: Medium]
+Is the correct error type being returned here?
+
+nci_extract_activation_params_iso_dep() is called by
+nci_rf_intf_activated_ntf_packet() and its return value is assigned to err,
+which is later passed to nci_req_complete(ndev, err).
+
+nci_req_complete() expects an NCI_STATUS_* positive integer constant.
+If the POSIX error code -EINVAL (-22) is returned, nci_to_errno() will
+truncate it to 234. It will then be incorrectly translated to -ENOSYS
+through the default case of its switch statement.
+
+Should a valid NCI status code like NCI_STATUS_INVALID_PARAM or
+NCI_STATUS_RF_PROTOCOL_ERROR be used instead? The same behavior appears
+in the updated nci_extract_activation_params_nfc_dep() below.
+
+>  		nfca_poll = &ntf->activation_params.nfca_poll_iso_dep;
+>  		nfca_poll->rats_res_len = min_t(__u8, *data++, NFC_ATS_MAXSIZE);
+
+[ ... ]
+
+> @@ -806,12 +822,14 @@ static int nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
+>  		switch (ntf.rf_interface) {
+>  		case NCI_RF_INTERFACE_ISO_DEP:
+>  			err = nci_extract_activation_params_iso_dep(ndev,
+> -								    &ntf, data);
+> +								    &ntf, data,
+> +								    ntf.activation_params_len);
+
+[Severity: Critical]
+This isn't a bug introduced by this patch, but could the parsing of
+atr_res_len allow for a stack memory disclosure?
+
+In nci_rf_intf_activated_ntf_packet(), the ntf structure is allocated on
+the stack without zero-initialization.
+
+If a malformed packet specifies an activation_params_len >= 1 but the inner
+atr_res_len is clamped to less than 15 (NFC_ATR_RES_GT_OFFSET), would this
+cause an integer underflow?
+
+net/nfc/nci/ntf.c:nci_store_general_bytes_nfc_dep() {
+    ...
+    ndev->remote_gb_len = min_t(__u8,
+        (ntf->activation_params.poll_nfc_dep.atr_res_len
+            - NFC_ATR_RES_GT_OFFSET),
+        NFC_ATR_RES_GB_MAXSIZE);
+    ...
+    memcpy(ndev->remote_gb,
+           (ntf->activation_params.poll_nfc_dep.atr_res
+            + NFC_ATR_RES_GT_OFFSET),
+           ndev->remote_gb_len);
+}
+
+Because __u8 is unsigned, a negative result from the subtraction underflows
+to a large positive value, which min_t() then clamps to
+NFC_ATR_RES_GB_MAXSIZE (47).
+
+Could this result in copying up to 47 uninitialized stack bytes into
+ndev->remote_gb, which might later be broadcast to userspace?
+
+[Severity: High]
+This is a pre-existing issue, but is there also a 1-byte stack disclosure
+in the NFC-A passive poll parameter parsing?
+
+In nci_extract_rf_params_nfca_passive_poll(), sel_res is only initialized
+if sel_res_len != 0:
+
+net/nfc/nci/ntf.c:nci_extract_rf_params_nfca_passive_poll() {
+    if (nfca_poll->sel_res_len != 0) {
+        if (data_len < 1)
+            return ERR_PTR(-EINVAL);
+        nfca_poll->sel_res = *data++;
+    }
+}
+
+If sel_res_len is 0, nfca_poll->sel_res remains uninitialized. Because
+nfca_poll points into the local uninitialized ntf stack variable in
+nci_rf_intf_activated_ntf_packet(), it retains whatever garbage was on
+the stack.
+
+Later, nci_add_new_protocol() unconditionally copies this uninitialized byte:
+
+net/nfc/nci/ntf.c:nci_add_new_protocol() {
+    ...
+    target->sel_res = nfca_poll->sel_res;
+    ...
+}
+
+When userspace queries the targets, this byte is sent out unconditionally:
+
+net/nfc/netlink.c:nfc_genl_send_target() {
+    ...
+    if (nla_put_u8(msg, NFC_ATTR_TARGET_SEL_RES, target->sel_res))
+    ...
+}
+
+Would it be safer to zero-initialize the ntf structure at the start of
+nci_rf_intf_activated_ntf_packet(), or set sel_res to 0 when sel_res_len
+is 0?
+
+>  			break;
+>  
+>  		case NCI_RF_INTERFACE_NFC_DEP:
 
