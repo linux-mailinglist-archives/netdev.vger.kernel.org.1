@@ -1,138 +1,191 @@
-Return-Path: <netdev+bounces-298750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Z7RIEPA9LGryOAQAu9opvQ
-	(envelope-from <netdev+bounces-298750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:12:16 +0200
+	id 7gTHGzdALGp/OQQAu9opvQ
+	(envelope-from <netdev+bounces-298751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:21:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A412B67B3E1
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:12:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E5E67B4BE
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 19:21:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gfQdzHZm;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298750-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298750-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=tu-berlin.de header.s=dkim-tub26 header.b=UVfhknRg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298751-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298751-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=tu-berlin.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8474A30166F2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:12:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27531312A93F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 17:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462903DBD54;
-	Fri, 12 Jun 2026 17:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFC2403E8B;
+	Fri, 12 Jun 2026 17:21:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D563603C2;
-	Fri, 12 Jun 2026 17:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25434405C4D;
+	Fri, 12 Jun 2026 17:21:44 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781284330; cv=none; b=r4qUcbCFZ6ohaecJFCxyz/l8BsryT9gZRoGdCWNwjep6ypW4lSWIFQhRKS77YS06qlGVLJvt0GVmD90AI43+cukVft3DoyCQ8vlTEty+OALtqNm6F1UoBa6d7/TKwKjKY52kILd/m6u87hlJu2BHQQqn+ez8iDWk1orMc3cbGBY=
+	t=1781284910; cv=none; b=hMEzBLwdGXTlEp8d9ZSRoMDfL8aH26t6qfLqbegAZxod4KlIwS7vW3cQI1UiekjRjwhNoMBbNY6qFIvDKsnOoXGrFznejYVa3WrAasupRecWPViUhaaWI/Dmrm7v8kzWP4BupcC53YhgJyb7zwPFG2YMU6I0K7DqbRO86OAH1Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781284330; c=relaxed/simple;
-	bh=bc18bAhS36XRAYC7QXisQiDCW1+OxMc13lXuzWt/c2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sXb2FuupgitotqLau7zSvg/heNce4YcABx3Tb8wFLZJa7RF9Z9+slkg067+vDwGoxtY0FUAwHebkoQ6sTvrBjRN3oOhTfAChJkxTod1IXiamh39XhryIqYlfxUaFdDV3E9yCgpLs6pmIlnpEDF/r6D7D7rvf9W9YShVw9yPoSAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfQdzHZm; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26E601F000E9;
-	Fri, 12 Jun 2026 17:12:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781284329;
-	bh=wxd21VZqQeGRt+phJQqIcHHa+IBS41s3vD59iytiz7o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gfQdzHZmmtGbA4HG0Zl8teTV1U48VvfwbdR6UQ5kyDlq6woHLjA/nxXh71Q4rzJF4
-	 Lqf6UHMgqavS/2KXqi/5U2yfSGGK1E1b+NzUgQHuYU2Rc0YfE7tQjdsW0wxzEouiko
-	 GiR9eMMR7Q5rdifJkk9fUW2Xemm2mSi2MIntN5uVb82QsJxYAe3B8lvcA/QM5/Hpg0
-	 /BYqzulauAF6h6PtdFwypafhx7jJXVkaGoOWmiIsZbgbW6io+pBg38gskIMK0q2AW2
-	 k0sip6ycuLmSy5+PZLws8dvowu0MqU+vXC39ecTB9jj3ARAU1I0S38N0DoULVXahRu
-	 dKl7XLFA5FNAA==
-Date: Fri, 12 Jun 2026 18:12:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: qrtr: fix 32-bit integer overflow in
- qrtr_endpoint_post()
-Message-ID: <20260612171204.GK671640@horms.kernel.org>
-References: <20260611125455.2352279-1-michael.bommarito@gmail.com>
+	s=arc-20240116; t=1781284910; c=relaxed/simple;
+	bh=7HAYKMd+/celBV+WiTjQDc9z3dQLsE8U64chPNnjc2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=M3iY8Ajkj9D8pZjtb7rCMhMDnW+eviLlw2yhtEF0JuoRTfdJmTPNeoj8MmYJ5DEy0MdtkHR0TX2lCgDxEn6s4MuD1TgjXqitx8bvokb6o+qZtRKmgG1x9iDDoxCk/kZl4OETP5PN/wW9GT3/vBCQ+im0+lu4ZbE8eFyH/rBNAaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (2048-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=UVfhknRg; arc=none smtp.client-ip=130.149.7.70
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+  d=tu-berlin.de; s=dkim-tub26; t=1781284905;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OV1+Rqtca2bNABQo0c5sCFhOHb8swb/BaM75V70D7kY=;
+  b=UVfhknRgpb6m2LcWFfUf+yOVAMZ6A6ZaKF1lWk6B6kHVPFvQ0vuwx+i/
+   A7bucdv2dNGRjCsxTWGQ0NO9GtcnNnKhHjDzQicwYFynXZYlE60v8IF1X
+   JjXNFTbQcr90pLw517pwBokUPc9vasKGDQGIltW7m4CLJA3Zz07I8OTRz
+   uiq2mpoFQtqbVVwol2cqxcgHtxCAnAvaJBMaDXzz3LZTdwb/1WTZ6/iL4
+   8GBBjUHypeRDGxTUUDAK8ONNj+IxpEShnwTvCk9FG3OC2xCjo8yyN7os1
+   OgKAb5J8gCDA9r/+wbY6V2Q/qaGve1Ve+e/DySD+Ioc4E5tXha9vhG1pR
+   A==;
+X-CSE-ConnectionGUID: Co7ywSanTKqBgyUi/m5VUQ==
+X-CSE-MsgGUID: N7qmqRnERK2hk9xgbm/myg==
+X-IronPort-AV: E=Sophos;i="6.24,201,1774306800"; 
+   d="scan'208";a="48673396"
+Received: from postcard.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.142])
+  by mailrelay.tu-berlin.de with ESMTP; 12 Jun 2026 19:21:37 +0200
+Message-ID: <4ddf3bcb-db5d-4821-ab32-577de93973a7@tu-berlin.de>
+Date: Fri, 12 Jun 2026 19:21:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260611125455.2352279-1-michael.bommarito@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 0/5] veth: add Byte Queue Limits (BQL) support
+To: Simon Schippers <simon.schippers@tu-dortmund.de>, <hawk@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: <kernel-team@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Chris Arges
+	<carges@cloudflare.com>, Mike Freemon <mfreemon@cloudflare.com>,
+	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, Breno Leitao
+	<leitao@debian.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, <bpf@vger.kernel.org>
+References: <20260612083530.1650245-1-hawk@kernel.org>
+ <5c326cb0-9b7c-4d67-8f80-0c9be1e8fcba@tu-dortmund.de>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
+Autocrypt: addr=j.koeppeler@tu-berlin.de; keydata=
+ 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
+In-Reply-To: <5c326cb0-9b7c-4d67-8f80-0c9be1e8fcba@tu-dortmund.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[tu-berlin.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[tu-berlin.de:s=dkim-tub26];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298750-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:michael.bommarito@gmail.com,m:mani@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:michaelbommarito@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298751-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:simon.schippers@tu-dortmund.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:carges@cloudflare.com,m:mfreemon@cloudflare.com,m:toke@toke.dk,m:leitao@debian.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bpf@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[tu-berlin.de:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[j.koeppeler@tu-berlin.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,debian.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tu-berlin.de:dkim,tu-berlin.de:mid,tu-berlin.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A412B67B3E1
+X-Rspamd-Queue-Id: C1E5E67B4BE
 
-On Thu, Jun 11, 2026 at 08:54:55AM -0400, Michael Bommarito wrote:
-> qrtr_endpoint_post() validates an incoming packet with
+On 6/12/26 16:10, Simon Schippers wrote:
+> On 6/12/26 10:35, hawk@kernel.org wrote:
+>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>
+>> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
+>> latency by dynamically limiting in-flight packets in the ptr_ring and
+>> moving buffering into the qdisc where AQM algorithms can act on it.
 > 
-> 	if (!size || len != ALIGN(size, 4) + hdrlen)
-> 		goto err;
+> LGTM, thanks for the detailed changelog :)
 > 
-> where size comes from the wire. On 32-bit, size_t is 32 bits and
-> ALIGN(size, 4) wraps to 0 for size >= 0xfffffffd, so the check
-> passes and skb_put_data(skb, data + hdrlen, size) writes past the
-> hdrlen-sized skb and oopses the kernel. 64-bit is unaffected.
-> 
-> This is the 32-bit residual of ad9d24c9429e2 ("net: qrtr: fix OOB
-> Read in qrtr_endpoint_post"), which fixed only the 64-bit case.
-> 
-> Reject any size that cannot fit the buffer before the ALIGN.
-> 
-> Fixes: ad9d24c9429e2 ("net: qrtr: fix OOB Read in qrtr_endpoint_post")
-> Cc: stable@vger.kernel.org
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
-> 32-bit only; reachable via /dev/qrtr-tun (CONFIG_QRTR_TUN) or a QMI modem.
-> Reproduced on i386 (a 32-byte write with size 0xfffffffd faults; well-formed
-> writes are unaffected).  QRTR mostly runs on 64-bit now, so this is a
-> correctness fix completing ad9d24c9429e2, not a high-severity bug.
+> Maybe we should stop searching for the perfect tx-usecs value.
+> 100us is probably fine for most hardware to not have a performance
+> regression. And lowering it does not really improve the RTT anyways.
+> Do you agree?
+I agree, I already thought that it just might be a very lucky case when 
+using 50us where something accidentally aligns nicely. Interestingly, I 
+could also reproduce that 50us was consistently a little better compared 
+to 100us on an Intel CPU. Maybe if I get the time, I'll have another 
+look at it, but in general I think 50us or 100us does not really matter.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> Nevertheless, I will compile and run the benchmarks again.
+> 
+> I will go on vacation from 15th to 24th of June, so I will not be able
+> to contribute code or run benchmarks then.
+> 
+> Thanks,
+> Simon
+> 
 
 
