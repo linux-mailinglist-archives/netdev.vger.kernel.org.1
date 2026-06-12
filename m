@@ -1,164 +1,233 @@
-Return-Path: <netdev+bounces-298461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298462-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FXWUKASYK2pwAAQAu9opvQ
-	(envelope-from <netdev+bounces-298461-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 07:24:20 +0200
+	id 4yUoBZqeK2prAQQAu9opvQ
+	(envelope-from <netdev+bounces-298462-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 07:52:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB18D676BB3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 07:24:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A304D676CEB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 07:52:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=c127.dev header.s=resend header.b=DxOs6hXL;
-	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=bRKbSB6s;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298461-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298461-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298462-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298462-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 419143057D66
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 05:23:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0261D3003D3E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 05:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E783A2572;
-	Fri, 12 Jun 2026 05:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD66637E310;
+	Fri, 12 Jun 2026 05:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a9-17.smtp-out.amazonses.com (a9-17.smtp-out.amazonses.com [54.240.9.17])
-	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EAD3A5422;
-	Fri, 12 Jun 2026 05:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2D13793A9
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 05:52:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781241806; cv=none; b=lRnU2ixXNF7YAG3HdAQV86IfAz3Xhi7bXkRmV8O4vlwEdHKHd1efYX4CKZnpxwE1QZ2EVxqH0bQCtY3usaUyxmoTuPXWYdyIjd7v5ibAcHD6Qa1ZkA8AzdcQxlJ7zfokfwnLVPjH5T4CNPrtpukSjiRAMHl63Hk2oyfJeeWebnM=
+	t=1781243544; cv=none; b=loJbIy/Rttp15P1fh2qry/48sDnuSH47ehQ2FnwzSCvb+lUbEXSHTmTKeFLMxl6YvSIBm9INHKBxUQAgv35HzqiiMvUgwHazfd+MChsOoR1UhGpSKw6p0PPa8Z6HoXBpdGUp3nNQTtKufPIfnh7fGgYm1+9Kxt7dMIgju/CYWEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781241806; c=relaxed/simple;
-	bh=KzBx4wrcZ9SM6utbGxEvn9CH5rMlJG9zYDQO6DRDtek=;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
-	 Content-Type; b=F33WS7MO6axdTg+lXzOiokGJmkXnqHMITK3NJdYyuyP0Cr+UZwS8a9vfsp2mGlSpLK9DWpJe0b+r9AqsBhwG5EtW3s1LoN8k08XvNAA4exeP1zOGIfuNRPlXb+JCHq2cGg6c3Mqm1mkqs9pGXuaR4kJh+SsP1lb+dKtPbVy46C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=DxOs6hXL; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=bRKbSB6s; arc=none smtp.client-ip=54.240.9.17
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
-	d=c127.dev; t=1781241803;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
-	bh=KzBx4wrcZ9SM6utbGxEvn9CH5rMlJG9zYDQO6DRDtek=;
-	b=DxOs6hXLGP3YBW3Z7oJDGdp8DtnE/yBVGxwxOzQVhlE7tL+tTw0y1O6i5KLDFyP2
-	cwqE8rnZOO8nRt+ftfKCIMxi3+/YI5+HNtvH82MDUe1Q+EDjXv9wyhsp9ZRnJQJM2Dh
-	jvNh1H0zLu/39GoJ3O49g9CPKj64LQYLluo3BvgU=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1781241803;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
-	bh=KzBx4wrcZ9SM6utbGxEvn9CH5rMlJG9zYDQO6DRDtek=;
-	b=bRKbSB6skJeQ915CpLQeOcP0YGVOLH3mu+ZzSMvoNUK4oCV5W837Vrxwy5zfVu+M
-	XJeI7J4MrXQ5RRzhol14TYaRYG9sW82GPE212TmpLaXFuXapr3K2CPfhe2wtMXdYEU7
-	ZCzenN/RrHRa5i0Qzhg3fmH55iMMrSUreSquAChg=
-In-Reply-To:
- <CAJq09z4B_P7D0khof-e0hxu=A+UQYAH_anJYt8ppaFcjHCdBCw@mail.gmail.com>
-From: Johan Alvarado <contact@c127.dev>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linusw@kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux@armlinux.org.uk, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net: dsa: realtek: rtl8365mb: add
- SGMII support for RTL8367S
-Message-ID: <0100019eba48f14d-299bc369-1ba5-4262-a913-caefd96166de-000000@email.amazonses.com>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Jun 2026 05:23:23 +0000
+	s=arc-20240116; t=1781243544; c=relaxed/simple;
+	bh=oJIJaa+O4wOVvyYdQH6BqJuHIPEKaAXPQ/R22GOt//s=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CXLRxGZnnFTDzXyn/MKt5/Al4OFY5SbIQaYSkTLhYB66/raHA/hbsb+q+psaOpl5Yiyyn3i0Y6zDlCtW9Ms9qiPIaIPiH4qzChZaFXijjhI6DYXqy15KjI8vVzQh0HfOg+GSAVoZqIwf73Pfn5BqE/dCa+Msfs205dgwGkhrLww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-43d197b99b8so1212135fac.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 22:52:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781243542; x=1781848342;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7sDv0jgw8CQFtr8pABadNiCnrd2MCCO5azBbnZKTICs=;
+        b=DG8Q+IebnPwavkXmEWIl/9ckk/xYe9545xrnvCcoC9BfyBZy4ycO0sVYvsRPwoqL0z
+         C97KtxzTPlCeQI8m15GOwQG74bkOVkN5F6mdZjpDZr/z/zduq3wTHK1o623eQEz0kvwo
+         UqIohzWctXxYNafkWx79RWf1QQ+eSUFARo1KBJeq1CXrQjs2t3Yy4ShLgujrPIAYoeKG
+         1LpAgHIJV9c1NAVwXHh+skVN/Btcyv4EYsILaWMO09771qKgB5LCUePyp4qIouQq3My9
+         YmNHgb+0LzRj/Bazv0/Il7DALKRG51GvgZ7949KTzpzDkUTbJTxWSBcGi0av2xciCFio
+         stqw==
+X-Forwarded-Encrypted: i=1; AFNElJ/5tun4bTLFJ/PgDSH0GP065hgSViAsCbIZbNOxZumATHQ/hJrY/rXXMAoRn6SLGqHdTxB68fc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzf+GWgG4t84dcp26xQa7bhLBS3JSaf0CtjxVriTOjlrciytR62
+	ODoCw0mgx0scH2wTC7y/ntqGo0IbC9FtzFTSIIjRfsQYu2w6C1nqpEVTMYvaRy57ceANldF1z55
+	jx/hKoYQvB2eXLuXrICIAMuZERGgFErHHRKBmSARd0Bhi8Yj3DoZ8KBCv3E8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
-X-SES-Outgoing: 2026.06.12-54.240.9.17
+X-Received: by 2002:a05:6820:603:b0:696:6f52:95f8 with SMTP id
+ 006d021491bc7-69edc5d46e9mr1022071eaf.3.1781243542111; Thu, 11 Jun 2026
+ 22:52:22 -0700 (PDT)
+Date: Thu, 11 Jun 2026 22:52:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a2b9e96.99669fcc.12a77b.0006.GAE@google.com>
+Subject: [syzbot] [net?] KCSAN: data-race in xfrm_lookup_with_ifid / xfrm_policy_delete
+From: syzbot <syzbot+d85ba1c732720b9a4097@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f571f22917457cd8];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[c127.dev];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS(0.00)[m:luizluca@gmail.com,m:netdev@vger.kernel.org,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298461-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:herbert@gondor.apana.org.au,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:steffen.klassert@secunet.com,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298462-lists,netdev=lfdr.de,d85ba1c732720b9a4097];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[email.amazonses.com:mid,c127.dev:dkim,c127.dev:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amazonses.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,storage.googleapis.com:url,googlegroups.com:email,goo.gl:url,appspotmail.com:email];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EB18D676BB3
+X-Rspamd-Queue-Id: A304D676CEB
 
-> I think we don't need the firmware at all. Requesting a proprietary
-> binary that we don't control to do things phylink already does is
-> unnecessary and adds a burden to linux-firmware.
-> I strongly suggest =
-dropping rtl8365mb_dw8051_load_firmware() entirely,
-> porting the BMCR reset sequence above directly into the driver, and
-> keeping the 8051 disabled.
+Hello,
 
-I tested exactly this on the MR80X v2: =
-dropped the firmware loading,
-ported the 0x1401/0x1403 BMCR sequence right =
-after the SerDes reset
-deassert, and kept the DW8051 permanently disabled =
-(also removing the
-re-enable at the end of the SGMII config path).
+syzbot found the following issue on:
 
-Results in both SGMII and HSGMII modes:
+HEAD commit:    2b414a95b8f7 Merge tag 's390-7.1-5' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1085b3d2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f571f22917457cd8
+dashboard link: https://syzkaller.appspot.com/bug?extid=d85ba1c732720b9a4097
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
- - Link bring-up: 10/10 cold boots=
- (power drained), 10/10 warm
-   reboots, 10/10 module reload cycles =
-(rmmod/insmod), and repeated
-   ip link down/up =E2=80=94 link came up =
-cleanly every time.
+Unfortunately, I don't have any reproducer for this issue yet.
 
- - Sustained traffic, CPU-generated (iperf3 on the =
-router, 30 min
-   each direction): ~750 Mbit/s in both modes, CPU-bound. =
-Zero
-   CRC/symbol errors in the port MIB counters.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a2bc12f628f8/disk-2b414a95.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/97ba8f79b58e/vmlinux-2b414a95.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b78d4c1c5145/bzImage-2b414a95.xz
 
- - NAT forwarding LAN->WAN (iperf3 between external hosts, 10-30 min
-   runs): ~800-820 Mbit/s sustained, PHY-bound (1G user ports), again
-   with zero CRC/symbol errors. A small number of buffer discards
-   under sustained load (~0.07%), consistent with congestion rather
-   than link-level corruption.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d85ba1c732720b9a4097@syzkaller.appspotmail.com
 
-So I can confirm your analysis. v3 will =
-drop the firmware entirely
-and carry this with your Suggested-by.
+==================================================================
+BUG: KCSAN: data-race in xfrm_lookup_with_ifid / xfrm_policy_delete
 
-> If we intend to support non-fixed links in the future (where in-band
-> AN is required), we would need to implement phylink_pcs and
-> pcs_get_state instead of just forcing the MAC. For fixed-link it is
-> fine, but we should plan accordingly.
+read-write to 0xffff888134a45934 of 4 bytes by interrupt on cpu 0:
+ __xfrm_policy_unlink net/xfrm/xfrm_policy.c:2340 [inline]
+ xfrm_policy_delete+0x1f7/0x240 net/xfrm/xfrm_policy.c:2360
+ xfrm_policy_timer+0x280/0x4d0 net/xfrm/xfrm_policy.c:419
+ call_timer_fn+0x3b/0x240 kernel/time/timer.c:1748
+ expire_timers kernel/time/timer.c:1799 [inline]
+ __run_timers kernel/time/timer.c:2374 [inline]
+ __run_timer_base+0x415/0x5f0 kernel/time/timer.c:2386
+ run_timer_base kernel/time/timer.c:2395 [inline]
+ run_timer_softirq+0x31/0x70 kernel/time/timer.c:2405
+ handle_softirqs+0xb9/0x280 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0x42/0xd0 kernel/softirq.c:735
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1061 [inline]
+ sysvec_apic_timer_interrupt+0x74/0x80 arch/x86/kernel/apic/apic.c:1061
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+ kcsan_setup_watchpoint+0x404/0x410 kernel/kcsan/core.c:705
+ instrument_read_write include/linux/instrumented.h:56 [inline]
+ atomic_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:1301 [inline]
+ queued_spin_lock include/asm-generic/qspinlock.h:111 [inline]
+ do_raw_spin_lock include/linux/spinlock.h:187 [inline]
+ __raw_spin_lock include/linux/spinlock_api_smp.h:159 [inline]
+ _raw_spin_lock+0x4a/0xa0 kernel/locking/spinlock.c:158
+ spin_lock include/linux/spinlock.h:342 [inline]
+ d_alloc_parallel+0xab/0xce0 fs/dcache.c:2679
+ __lookup_slow+0x96/0x260 fs/namei.c:1900
+ lookup_slow+0x3c/0x60 fs/namei.c:1932
+ walk_component fs/namei.c:2278 [inline]
+ lookup_last fs/namei.c:2785 [inline]
+ path_lookupat+0x2f7/0x500 fs/namei.c:2809
+ filename_lookup+0x190/0x390 fs/namei.c:2838
+ vfs_statx+0x96/0x170 fs/stat.c:353
+ vfs_fstatat+0x118/0x170 fs/stat.c:373
+ __do_sys_newfstatat fs/stat.c:538 [inline]
+ __se_sys_newfstatat+0x55/0x3e0 fs/stat.c:532
+ __x64_sys_newfstatat+0x55/0x70 fs/stat.c:532
+ x64_sys_call+0x2c64/0x3020 arch/x86/include/generated/asm/syscalls_64.h:263
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Agreed. I'd prefer to keep v3 =
-scoped to fixed-link (matching what
-RGMII supports today) and leave the =
-phylink_pcs conversion for a
-follow-up series.
+read to 0xffff888134a45934 of 4 bytes by task 9151 on cpu 1:
+ xfrm_lookup_with_ifid+0x5b4/0x1590 net/xfrm/xfrm_policy.c:3225
+ xfrm_lookup+0x38/0x50 net/xfrm/xfrm_policy.c:3327
+ icmpv6_route_lookup+0x10b/0x3e0 net/ipv6/icmp.c:381
+ icmp6_send+0xc63/0x1100 net/ipv6/icmp.c:793
+ icmpv6_param_prob_reason+0x32/0x50 net/ipv6/icmp.c:848
+ ip6_tlvopt_unknown net/ipv6/exthdrs.c:94 [inline]
+ ip6_parse_tlv+0xf70/0x1080 net/ipv6/exthdrs.c:-1
+ ipv6_parse_hopopts+0x1e5/0x320 net/ipv6/exthdrs.c:1084
+ ip6_rcv_core+0x8e9/0xab0 net/ipv6/ip6_input.c:321
+ ipv6_list_rcv+0x11f/0x2a0 net/ipv6/ip6_input.c:378
+ __netif_receive_skb_list_ptype net/core/dev.c:6245 [inline]
+ __netif_receive_skb_list_core+0x3b0/0x500 net/core/dev.c:6292
+ __netif_receive_skb_list net/core/dev.c:6344 [inline]
+ netif_receive_skb_list_internal+0x47d/0x5f0 net/core/dev.c:6435
+ netif_receive_skb_list+0x33/0x1c0 net/core/dev.c:6487
+ xdp_recv_frames net/bpf/test_run.c:269 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:350 [inline]
+ bpf_test_run_xdp_live+0x104c/0x1360 net/bpf/test_run.c:379
+ bpf_prog_test_run_xdp+0x57b/0xa10 net/bpf/test_run.c:1430
+ bpf_prog_test_run+0x204/0x340 kernel/bpf/syscall.c:4742
+ __sys_bpf+0x52e/0x7e0 kernel/bpf/syscall.c:6292
+ __do_sys_bpf kernel/bpf/syscall.c:6387 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6385 [inline]
+ __x64_sys_bpf+0x41/0x50 kernel/bpf/syscall.c:6385
+ x64_sys_call+0x10cb/0x3020 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Best regards,
-Johan
+value changed: 0x00000001 -> 0x00000000
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 UID: 0 PID: 9151 Comm: syz.7.9538 Not tainted syzkaller #0 PREEMPT(lazy) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
