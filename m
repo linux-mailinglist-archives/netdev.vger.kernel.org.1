@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-298703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id v2iKLvwcLGqHLgQAu9opvQ
-	(envelope-from <netdev+bounces-298703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:51:40 +0200
+	id W/o7MxcdLGqPLgQAu9opvQ
+	(envelope-from <netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:52:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B087867A576
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:51:39 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5A067A584
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 16:52:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=M3WOkHFX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298703-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298703-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UMmpFZDW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298704-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D0257300292D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:51:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DC43B300908E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034AC31B10B;
-	Fri, 12 Jun 2026 14:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3972345CB2;
+	Fri, 12 Jun 2026 14:52:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E97283FDD
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 14:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7B231B10B
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 14:52:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781275894; cv=none; b=OWGZx/nQ7PcmeGD7dZVDCMwHqg09oZfqCQGvhxaGa992P7E82G2Cm4wzYLihjcZu6tJJJEPfUq5wgCKzRGMMRIXFppUDpRp/G5Ec5gTRZGJvzOVVKE7ZsqY8a3GKGAUHCBZWNrJKJyYungyY1dbr6uH0F1WxAP16vRJl4whFVA8=
+	t=1781275924; cv=none; b=NRoSANW0u+2h8pA24cTE4NjZ/ABqTXr0G3o4oeRVdcqvhiptaw5X0DS3M8lc7Iqp4VHD9zdZAxOzRa7gpsdOz+weq571YBcW+LrJBrE1LrqQsPiwZIkRu3OpwrMn0dm9daLz4Ajvu7X1s17etRgy9j++rLbCcgL9P1EwFORviiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781275894; c=relaxed/simple;
-	bh=7oTdwQB7busn3pIYd7uITFnQgXBQs1X1Bba/eQqqVE4=;
+	s=arc-20240116; t=1781275924; c=relaxed/simple;
+	bh=MtLXFPswneMburYu+lWG7VpR1RjssBUjozfMNoj/Av4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PKpsxyS/NKsHG9hP+ZthF4gNyEegjJsGrhy7cOvCMevCrY5yKXinAx8bB5bWM58T0Twk1LrU3KluJZcnkKl33RX9DMEXGlJP9caZmwm6HFdgDqdlEfu91n6FYenkzv7eMdS3+J6tjT0HKiw2maFaG29ChgKrr00WXRwX9b54KbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3WOkHFX; arc=none smtp.client-ip=209.85.216.49
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-36b9ec98144so800199a91.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 07:51:33 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=O6/P6cHpPoqZ4EDvXSR6QtZ8FeZQmcZzfDNYMelyf58n6jFgPjUuyB2X1upyHRU7Et0PufY6e4ImOSLiiSH5J+bkcXgd+QPaRYuS8lOsdum6lOTzGeebHSPlufkJtNncEOzVxj4eVL4Md1FyzOYKsSrbaJ1w94Lf45ENz16gi6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMmpFZDW; arc=none smtp.client-ip=209.85.214.174
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2c2da7fa321so4673845ad.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 07:52:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781275893; x=1781880693; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781275922; x=1781880722; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vFB+L8FiAJWrQfjsmsxH8l7zj4U3yueBuDW7xXAiJHQ=;
-        b=M3WOkHFXvlj8EbFk2lzl8R33lJj6caKn5G738v1XG0tOiZATPSxR63HjY3miXO6nkV
-         OUY5CeT26RFLOpbYwmNyLinnIBgL4RIne6x0xft9OpDAQglSidpAr6hsIWgzVXWMyro5
-         wHmAcZowI8bngsisSPRzO/Hcu7h9tCy4f1YctoqosM8G1Nq8YNvpGqqNxZNqcOzzwG7J
-         JoF40G61BeIYZTGsDfhdWi4LgxQC9Mb9jYcckTbwoNFcxl/DSDRIN42SzpgdApUe603D
-         ignxJEQFLXGAZZAZNtBgpz9b85jXHaREKgjP3QHVl1PnR0P1Q2UZwP44nUVDosNouhZN
-         KliQ==
+        bh=JqMd8Q5yt8mAGXSVOkSVuvsH9v3zwILU1VT0pazsblM=;
+        b=UMmpFZDWec/Ueibyq22/ITPAeh5nZ0vG+6kPJCTvHSXtCxWIgfpweoWNyGXRmX9uTa
+         bjVEBNq7arP6qDkog3CKsSPpVoesSBd+vcxkMZYkwvkrud9w5aD8lua9f5RtMXB8m29D
+         GUHHToPlitoyPJqYW7vC2ljUOwZ1DmpxD6vjhixFVlxRxL9OvwY6QMd3q7Ow36Aany80
+         J7G28sI1AFnoJrAvTKrevXvxKBS8vJCi95kPidI9swkBW59w+L72P5+xs3YTgIQAsekx
+         j9T+d9CGoEEGICBFmDNsQc/P3a8x4F/MVtKmy8kfG4SF8ltMOOVGeZhLkQeqvg9UkkRt
+         /kSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781275893; x=1781880693;
+        d=1e100.net; s=20251104; t=1781275922; x=1781880722;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vFB+L8FiAJWrQfjsmsxH8l7zj4U3yueBuDW7xXAiJHQ=;
-        b=HGZACGpeB7Hww0K/n+65OCgXcYyMM0ORB0ablAtEDl/S2Iqa+2JdfJE/3E58Y9jMQg
-         rycu8rlbS5y83LvIqHIFNWCNDRbQ32KQGuvdSql652Xyj719+TSU4HMT2W4GBfmSWJmv
-         G9cwj1m8TCYZywKt8hxiF/cBF/FJglmQzcczrrTXLaB2BDrAT0FyPrpuqiNWlLDiqkem
-         5IgOuv6ZXfUEB69R0YNI5Ft6MTedAP72ZSdaJOXCUuiZ0sZVibhGyjcOtbhwyWiddwiW
-         8RadnHrUGSHs0VU+p5NwmizzDdQyo3HEbXKkT54oXPkhO2so9NvkSuvtgqC1SjoPRzv7
-         2IIg==
-X-Gm-Message-State: AOJu0YyUalzJypt8eVye/cINMIYb4NqpMzO9y3LecJ7Ayds6siZN9pWv
-	SQEPo1hphigysxI+QaILnyGX8TZ71Ai49vOUI0yT5Xgo0130AnlkGNty
-X-Gm-Gg: Acq92OFYNP6UMhg6mwd4UEXy0GAM9Yb9qDuhb2zbGorVwCbXCF5BG1JAQcF79Bh3ZlG
-	SZGUDgvDz/wlTIL6azJPMfIgaM6d95fF2jwi6HKV4Cd9/i4sxXRRpVCjmFW+Hx6Ya3Cm40LV3PU
-	cFjJZNHUUb7D6/CoKi0782zg77GX1e3DG3v8lwiTcxVmQOAblvEdLtx2XsjAEOUHqZyXkiKx12f
-	AZlAKaTbDJzUE04HVVnSaHlpJjaCvzN7R03pcd4xrsFWh+7Jg7/FX5Ka6f92leIzQqgURS015LL
-	jsaHU7wwM1vBdBVYER8dTSbOAqhtb6cn8Uf8Ing+vCO7ETSkhni9XO2F0qfrli9oeXJu9u5veSI
-	8F+AbsWqanyLUIxqCPCLcItrxMACEt8ZoI7Dke1MI9Mi5o9BagD8zcBZiZCRMeQ8Xr2LJdTxHyk
-	sfBNb7H5S2kSufbkH028sjodL/5uyRjDZIIVMx7W7mNkAa
-X-Received: by 2002:a17:90b:4d08:b0:368:b01c:85a0 with SMTP id 98e67ed59e1d1-37a035ed628mr3288310a91.14.1781275893159;
-        Fri, 12 Jun 2026 07:51:33 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:53::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37a20dbd301sm2453885a91.10.2026.06.12.07.51.32
+        bh=JqMd8Q5yt8mAGXSVOkSVuvsH9v3zwILU1VT0pazsblM=;
+        b=VTZmz4tT3FYi4FcScDPOBOZVKbSSibYiRPFMA8C2vHKVEfxNPXcW5spELnKAYbtbmB
+         GpTyihTAXcWVQvluHwM5AvhVy7seu4/u/MXsY4giwo10VPpz7sBz46UzOF+Jvl2X8e9s
+         OyE9SmHLsoL2SIf9cc07IiKbMq8Cdrzd2tXANmJl3EspW3gs8s7IMyEB6KPqQboq/bOF
+         g39KDEKQn9MyNY5n5RSDGFJcjjzpzvUMg0jlJjwxe8uRqqYh4QOdQ20qDc4ohjPDxaoV
+         K0k12EC4amHgTIK19tCeNVkc+hOrMv4pYWkY1aUCs/1Ns2OGzhRQUs7P8xox7SEsvpPt
+         aQVQ==
+X-Gm-Message-State: AOJu0YzFKZFEeJ0bXNfJG9EPNYmQJIBio9w2Xod+NDoxraaldfUw18J0
+	i63xgyBZM02KsD75W9CIgTemj9GThlHBOTWHZ8OJCx2DSpZyzHqa6kA8
+X-Gm-Gg: Acq92OFq8ztJbIjWx72V8qB/iHxdY77lWdOQjNE/ltJapSxFrw1TvXNJmOgqMt9qIDN
+	15s9ZOfEW41fAZYmFv1lglqoJPeCbMwuNxF/Qh2hOz7l3dX6f+5U2XvlOI+AvqDotO+ajLxXv50
+	3bTfVpR7DEyDbxTqJAi8xT3BHMekAHb19Mt+cxxAWUXFYmnngxQGbcD6yPd1Ogxyun4CO8yujfu
+	6+GwryEsSWDD6n7sSnsbnj0iDmJgM4wD1Km/qNt7suXiBYJnYiCjRrFKMjl8gclRoBHvqNQofG8
+	Fz38k76S4x+5Z+/cF9oi3wHHZA7gl2ex1x3LnItQPD+KWAfcACX6R4IuPoX8EAeVD5YY4j3v28r
+	UxzktCggwENF8Ghq3VDMgYC6AnddwjgQNwQrZw0f2uc+PO7dnivUmpPdbCBrEv6WsqhTMwmRCdy
+	8rPCe5BIqOWXmPCdgcVG50yEWnaoJZVBEfZ5rGeZFk6gKk
+X-Received: by 2002:a17:903:2bcb:b0:2bc:8f9a:3642 with SMTP id d9443c01a7336-2c4114a22d3mr39476645ad.16.1781275921806;
+        Fri, 12 Jun 2026 07:52:01 -0700 (PDT)
+Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:73::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4327ac72asm25666815ad.38.2026.06.12.07.52.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 07:51:32 -0700 (PDT)
-Date: Fri, 12 Jun 2026 07:51:31 -0700
+        Fri, 12 Jun 2026 07:52:01 -0700 (PDT)
+Date: Fri, 12 Jun 2026 07:51:59 -0700
 From: Bobby Eshleman <bobbyeshleman@gmail.com>
 To: Raf Dickson <rafdog35@gmail.com>
 Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
@@ -82,11 +82,11 @@ Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
 	bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com,
 	bcm-kernel-feedback-list@broadcom.com, leonardi@redhat.com,
 	horms@kernel.org, edumazet@google.com, kuba@kernel.org
-Subject: Re: [PATCH net-next v3 3/4] vsock: fold sk_acceptq_added() into
- vsock_enqueue_accept()
-Message-ID: <aiwc87mKwAWu2eJS@devvm29614.prn0.facebook.com>
+Subject: Re: [PATCH net-next v3 4/4] vsock: fold sk_acceptq_removed() into
+ vsock_remove_pending()
+Message-ID: <aiwdD5EAqxW6Xunv@devvm29614.prn0.facebook.com>
 References: <20260612045216.105796-1-rafdog35@gmail.com>
- <20260612045216.105796-4-rafdog35@gmail.com>
+ <20260612045216.105796-5-rafdog35@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,18 +95,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260612045216.105796-4-rafdog35@gmail.com>
+In-Reply-To: <20260612045216.105796-5-rafdog35@gmail.com>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298703-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298704-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:rafdog35@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:pabeni@redhat.com,m:sgarzare@redhat.com,m:stefanha@redhat.com,m:bryan-bt.tan@broadcom.com,m:vishnu.dasa@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:leonardi@redhat.com,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
@@ -126,62 +126,61 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B087867A576
+X-Rspamd-Queue-Id: 6A5A067A584
 
-On Fri, Jun 12, 2026 at 04:52:15AM +0000, Raf Dickson wrote:
-> virtio and hyperv call sk_acceptq_added() immediately before
-> vsock_enqueue_accept(). Move the call into vsock_enqueue_accept()
-> itself so callers cannot forget it and the accounting is consistent.
+On Fri, Jun 12, 2026 at 04:52:16AM +0000, Raf Dickson wrote:
+> Callers of vsock_remove_pending() must also call sk_acceptq_removed()
+> to keep sk_ack_backlog consistent. Move the call into
+> vsock_remove_pending() itself to make it automatic and prevent future
+> callers from forgetting it.
 > 
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
 > Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 > Signed-off-by: Raf Dickson <rafdog35@gmail.com>
 > ---
->  net/vmw_vsock/af_vsock.c                | 1 +
->  net/vmw_vsock/hyperv_transport.c        | 1 -
->  net/vmw_vsock/virtio_transport_common.c | 1 -
->  3 files changed, 1 insertion(+), 2 deletions(-)
+>  net/vmw_vsock/af_vsock.c       | 2 +-
+>  net/vmw_vsock/vmci_transport.c | 4 +---
+>  2 files changed, 2 insertions(+), 4 deletions(-)
 > 
 > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 6cfa89b6f3..24916dd4e9 100644
+> index 24916dd4e9..4a7d6d247a 100644
 > --- a/net/vmw_vsock/af_vsock.c
 > +++ b/net/vmw_vsock/af_vsock.c
-> @@ -518,6 +518,7 @@ void vsock_enqueue_accept(struct sock *listener, struct sock *connected)
->  	sock_hold(connected);
->  	sock_hold(listener);
->  	list_add_tail(&vconnected->accept_queue, &vlistener->accept_queue);
-> +	sk_acceptq_added(listener);
+> @@ -494,6 +494,7 @@ void vsock_remove_pending(struct sock *listener, struct sock *pending)
+>  	list_del_init(&vpending->pending_links);
+>  	sock_put(listener);
+>  	sock_put(pending);
+> +	sk_acceptq_removed(listener);
 >  }
->  EXPORT_SYMBOL_GPL(vsock_enqueue_accept);
+>  EXPORT_SYMBOL_GPL(vsock_remove_pending);
 >  
-> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> index b3394946b2..0de8148877 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -410,7 +410,6 @@ static void hvs_open_connection(struct vmbus_channel *chan)
+> @@ -773,7 +774,6 @@ static void vsock_pending_work(struct work_struct *work)
+>  	if (vsock_is_pending(sk)) {
+>  		vsock_remove_pending(listener, sk);
 >  
->  	if (conn_from_host) {
->  		new->sk_state = TCP_ESTABLISHED;
-> -		sk_acceptq_added(sk);
+> -		sk_acceptq_removed(listener);
+>  	} else if (!vsk->rejected) {
+>  		/* We are not on the pending list and accept() did not reject
+>  		 * us, so we must have been accepted by our user process.  We
+> diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+> index c2db016cca..3e6445f4e1 100644
+> --- a/net/vmw_vsock/vmci_transport.c
+> +++ b/net/vmw_vsock/vmci_transport.c
+> @@ -980,10 +980,8 @@ static int vmci_transport_recv_listen(struct sock *sk,
+>  			err = -EINVAL;
+>  		}
 >  
->  		hvs_new->vm_srv_id = *if_type;
->  		hvs_new->host_srv_id = *if_instance;
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index b10666937c..4a39d48db9 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1582,7 +1582,6 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
->  		return ret;
->  	}
+> -		if (err < 0) {
+> +		if (err < 0)
+>  			vsock_remove_pending(sk, pending);
+> -			sk_acceptq_removed(sk);
+> -		}
 >  
-> -	sk_acceptq_added(sk);
->  	if (virtio_transport_space_update(child, skb))
->  		child->sk_write_space(child);
->  
+>  		release_sock(pending);
+>  		vmci_transport_release_pending(pending);
 > -- 
 > 2.54.0
 > 
