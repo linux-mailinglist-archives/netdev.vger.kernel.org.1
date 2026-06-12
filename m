@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-298629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y4v5I+H9K2qUJAQAu9opvQ
-	(envelope-from <netdev+bounces-298629-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:38:57 +0200
+	id 1oc7NfX9K2qXJAQAu9opvQ
+	(envelope-from <netdev+bounces-298631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:39:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71259679657
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:38:57 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6877A67965B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 14:39:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b="vN/L2t12";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298629-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298629-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=microchip.com header.s=mchp header.b="Leo/L/kZ";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298631-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298631-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=microchip.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 92527300D347
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:38:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 93D2A300D37F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 12:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BF23E16AD;
-	Fri, 12 Jun 2026 12:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942CB3E2763;
+	Fri, 12 Jun 2026 12:38:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CD23E0098;
-	Fri, 12 Jun 2026 12:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B15D3E1D19;
+	Fri, 12 Jun 2026 12:38:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781267921; cv=none; b=qCA+XN13EUDxv2TbeCBMvgCNpsoRI9UVLY+DjZT6WjRa/rAEvYCoWehZcMbvZx14k5LC5f7ra+i7QIXv98SgxTRepxEOkUBfgm5f+U7nvrLBmkKvFtLDb4rTSoYsuufrOaFkOb2mPMkRAq41TZDCnpyfvxdICaUNQCj5Z/7pzjI=
+	t=1781267925; cv=none; b=lcfXOUybPUVccwUB3rKIJq6PR0v54/d4peSBrvBBvJ3+TRanFeEclVLx0Lh667kLU4CY6SU1RbukMayWA6HXDdx8RQFIZSioqb4XMgweMDgWjljF1TSWQ99NgZ3Z8MviBk2uS66l6fRBLAc3GJjI/48cVo3ACU8kW8f88yIQUD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781267921; c=relaxed/simple;
-	bh=IgGqUBZjEIGGw39Bto0aYqXBNI28GTbplPNY/xcUd5g=;
+	s=arc-20240116; t=1781267925; c=relaxed/simple;
+	bh=Nn2DOQcfRMeVSJAePSj9gemQ1U/m2ZgFI/VZ3VyW07U=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=g97SpjGtj0TsTrsBzp+4A2lKEAO9btxSnsEEek2r8fyOcY8EYgwrievUXoI4fsDBhoNOcdXSpsxgUF92VOAUerrBLyA4a3KnOGy98jKusS3SN3ahtnNLUmHJbV10jHan86GmitDZe4U5sLXZfkbM7w2bIIcNImJR6NMg8OTiNpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vN/L2t12; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:To:CC; b=ebZLCFBlluIwpD7YtHls80psRRn1ph/JOPeOFXic7ao5Wte4pxXYIUXclrG5R9f5xONBASQoZJXH5BYEB81uxO5oHPx2Dq2Q697EUKtNT5/gzVo2X/hnkvqyfDPzgmKvIj3Jy3rTMeo2+Z70Ry+YY+3OmupU0l8TSmLPnyymXI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Leo/L/kZ; arc=none smtp.client-ip=68.232.154.123
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1781267919; x=1812803919;
+  t=1781267922; x=1812803922;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=IgGqUBZjEIGGw39Bto0aYqXBNI28GTbplPNY/xcUd5g=;
-  b=vN/L2t12Tg05oyGSFMBuzuSJPUso2F/QsehpVIxOxuKH9+Zb9HJAVV2Z
-   AKGEk4IfT+t6I/bi/a8zmcKwiyPadoMGeCtfqRPO7P4pTJHvrvQdx5cJJ
-   tTuDKlO19JUvhUe3oJsNApm+VhyHTcVgoBNvs212Llqwtl2pSp12nKWZy
-   yVrAMM3j4Wno+wyibKNIyncrqBJGkioojw7oHNPzV20R6qVSsOse7su45
-   EB53a8TzToiPEMVVckELBdW4iWVjZY6zA8N058HT2BJo7mMoF1n3eBfUV
-   f/rWNOTUQdWKrJi7zcIt0hdjLSCEancaks9hymTBaqp/LdHqQu3xZygvL
-   w==;
-X-CSE-ConnectionGUID: biWOJ6pnSv6QV8cPpDhLEw==
-X-CSE-MsgGUID: r5ARXr0ERLWrn4t+kBjprA==
+  bh=Nn2DOQcfRMeVSJAePSj9gemQ1U/m2ZgFI/VZ3VyW07U=;
+  b=Leo/L/kZZFoVCJNXOvgRD/BDlop4V8kV5RKY+7o11eXVqziKTuXZMY+Y
+   wEd8spwDfL2RqRItsA7ANFFVR4sPD3jV5LnvQm2DBbawlJ8TDDXGuV9fo
+   Oe8zkxCoCdiafnDZ95TjVjIWhBMyh3IWX1P8h9BRctE2jmVXP0Ng6IaYO
+   cZ6ek+yqYIL6lzc3t3TGyAjLl341PqEjZ1AX7Hy3qwGZRpSBAV0uD8dDv
+   Q8IikywP4EAbXIpu5AM84ys/eIQqSuh0cHCHkfrFjsIWQzXz2HpwH9Tex
+   E/8fpaHjEiz5ZWqgck5Tybwa842oax/DDQdM0TiM60qcqgqstN62Ol5jj
+   Q==;
+X-CSE-ConnectionGUID: se6h7meMQ3G7ytxgB+zeiw==
+X-CSE-MsgGUID: r0ZZLPdOSYupvGQfVchyBQ==
 X-IronPort-AV: E=Sophos;i="6.24,200,1774335600"; 
-   d="scan'208";a="68073237"
+   d="scan'208";a="59410169"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jun 2026 05:38:38 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jun 2026 05:38:41 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Fri, 12 Jun 2026 05:38:37 -0700
+ 15.1.2507.58; Fri, 12 Jun 2026 05:38:40 -0700
 Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex03.mchp-main.com
  (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Fri, 12 Jun 2026 05:38:34 -0700
+ Transport; Fri, 12 Jun 2026 05:38:38 -0700
 From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
 	<jensemil.schulzostergaard@microchip.com>
-Date: Fri, 12 Jun 2026 14:37:10 +0200
-Subject: [PATCH net-next 1/9] net: microchip: vcap: fix rule move for rules
- of coprime size
+Date: Fri, 12 Jun 2026 14:37:11 +0200
+Subject: [PATCH net-next 2/9] net: microchip: vcap: add lpm vcap to autogen
+ vcap api
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20260612-sparx5_l3_routing-v1-1-fc3c10160f49@microchip.com>
+Message-ID: <20260612-sparx5_l3_routing-v1-2-fc3c10160f49@microchip.com>
 References: <20260612-sparx5_l3_routing-v1-0-fc3c10160f49@microchip.com>
 In-Reply-To: <20260612-sparx5_l3_routing-v1-0-fc3c10160f49@microchip.com>
 To: Horatiu Vultur <horatiu.vultur@microchip.com>,
@@ -94,12 +94,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-298629-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298631-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
@@ -118,649 +118,1463 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,microchip.com:dkim,microchip.com:email,microchip.com:mid,microchip.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 71259679657
+X-Rspamd-Queue-Id: 6877A67965B
 
-Fix a discrepancy between how software and hardware moves rule
-addresses on insert and delete. Hardware moves a block of addresses by a
-uniform offset. The software representation stores the addresses of
-rules. These are updated individually by computing a space-optimal
-address relative to its neighbor.
+Add autogenerated VCAP rule encoding metadata, and VCAP parameters for
+the LPM VCAP used for L3 routing.
 
-This worked when all rule sizes in a VCAP formed a divisibility
-chain (e.g. 1, 2, 6, 12), because any valid offset for the largest
-rule was also valid for all smaller rules. At the moment all clients of
-the VCAP library only uses rules for which this is true.
-
-But the LPM VCAP, necessary for l3 routing, will introduce rule types of
-coprime size, so the algorithm must be fixed. This is in preparation for
-adding support for L3 routing to sparx5 and lan969x, which requires the
-LPM VCAP with rules of size 2 and 3. This patch fixes the issue by
-making sure the software representation is updated in the same way as
-the hardware.
-
-The VCAP rule model has the following properties:
-
-- A rule has keyset size K and actionset size M; rule size N =
-  max(K, M).
-- Rules are naturally aligned to their size (start_addr % N == 0).
-- Rules are sorted by size with larger rules at higher addresses.
-- HW moves a contiguous block of addresses by a uniform offset.
-
-Introducing rules of coprime size 2 and 3 exposes these four bugs:
-
-1) Move count on insert includes addresses beyond the moved block.
-   When padding exists between rules of different sizes, the count
-   overshoots, corrupting the rule above.
-
-2) Move offset does not preserve alignment for the entire block.
-   Per-rule optimal offsets differ from the uniform HW offset,
-   causing HW/SW desync and misaligned rules.
-
-3) On deletion, HW memory at the removed rule's addresses is not
-   initialized. The moved block may not fully cover them due to
-   padding, leaving stale data.
-
-4) On deletion, padding between rules is not reclaimed.
-
-Example for issue 1, insert corrupts rule above:
-
-Starting state (X6 rule followed by X2):
-
-  Addr  Rule
-    35  X6
-    34  X6
-    33  X6
-    32  X6
-    31  X6
-    30  X6
-    29  X2
-    28  X2
-    27
-
-Insert X3 between X6 and X2. SW places rules optimally, X2 needs
-padding:
-
-  Addr  Rule (SW)
-    35  X6
-    34  X6
-    33  X6
-    32  X6
-    31  X6
-    30  X6
-    29  X3
-    28  X3
-    27  X3
-    26       (pad)
-    25  X2
-    24  X2
-
-Move count = X3.addr - X2.addr = 27 - 24 = 3. HW moves 3 addresses
-starting at 28: addrs {28, 29, 30}. But addr 30 is the base of X6,
-so the move corrupts it:
-
-  Addr  Rule (HW)
-    35  X6
-    34  X6
-    33  X6
-    32  X6
-    31  X6
-    30  ??   <- corrupted, was base of X6
-    ...
-    26  X6   <- stale copy of addr 30
-    25  X2
-    24  X2
-
-Example for issue 2, delete misaligns rule:
-
-Starting state:
-
-  Addr  Rule
-    38       <- LAST_VALID_ADDR
-    35  X6
-    34  X6
-    33  X6
-    32  X6
-    31  X6
-    30  X6
-    29  X3
-    28  X3
-    27  X3
-    26       (pad)
-    25  X2
-    24  X2
-
-Delete X6. Old code computes: offset = 39 - 30 - 6 = 3, gap = 0,
-each rule moves by 6 + 0 + 3 = 9:
-
-  X3: 27 + 9 = 36   (36 % 3 == 0, OK)
-  X2: 24 + 9 = 33   (33 % 2 == 1, MISALIGNED)
-
-Offset 9 is not a multiple of LCM(3, 2) = 6, breaking X2 alignment.
-
-Example for issues 1 + 2, insert desyncs HW/SW and misaligns:
-
-Starting state:
-
-  Addr  Rule
-    26  X3   <- LAST_VALID_ADDR
-    25  X3
-    24  X3
-    23  X2
-    22  X2
-
-Insert X6. SW calculates different per-rule offsets:
-
-  X3 needs offset  9 (to addr 15)
-  X2 needs offset 10 (to addr 12)
-
-Old code computes: count = 18 - 12 = 6 (should be 5), offset = 10.
-HW applies uniform offset 10 to 6 addresses:
-
-  Addr  Rule (SW)     Addr  Rule (HW)
-    17  X3              17
-    16  X3              16  X3
-    15  X3              15  X3
-    14                  14  X3  <- misaligned (14 % 3 != 0)
-    13  X2              13  X2
-    12  X2              12  X2
-
-HW and SW are out of sync, and X3 is misaligned in HW.
-
-The new move algorithm computes a single uniform offset for the
-entire block, aligned to the LCM of all rule sizes in that block.
-This guarantees that every rule lands on a naturally aligned address
-after the HW move, and that HW and SW stay in sync.
-
-On insert:
-
-1. Determine the move block: all rules below the insertion point.
-2. Compute the LCM of all rule sizes in the block
-   (vcap_find_move_block_lcm).
-3. Compute the move offset as the inserted rule's size rounded up
-   to the next LCM multiple (vcap_move_from_block). This is the
-   uniform offset applied to the entire block.
-4. Move count is exactly the number of addresses occupied by the
-   block (no overshoot into the rule above).
-5. Issue a single HW move, then update all SW rule addresses by
-   the same uniform offset (vcap_move_rules_sw).
-6. Place the new rule in the gap created by the move.
-
-On delete:
-
-1. Initialize HW memory at the deleted rule's addresses before
-   moving, since the moved block may not fully cover them due to
-   padding.
-2. Reclaim any padding between rules in the block.
-3. Compute the LCM-aligned uniform offset and move count as above.
-4. Issue a single HW move and update SW addresses uniformly.
-
-No VCAP api client uses rules of coprime size today, so the bug does not
-fire in any existing configuration. The LPM VCAP for sparx5 and lan969x,
-added later in this series, is the first instance with rules of coprime
-sizes (2 and 3), and therefore the first to reach this bug.
-
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 ---
- drivers/net/ethernet/microchip/vcap/vcap_api.c     | 178 +++++++++++++--------
- .../net/ethernet/microchip/vcap/vcap_api_kunit.c   |  81 ++++++----
- 2 files changed, 164 insertions(+), 95 deletions(-)
+ .../microchip/sparx5/lan969x/lan969x_vcap_ag_api.c | 373 ++++++++++++++++++++-
+ .../ethernet/microchip/sparx5/sparx5_vcap_ag_api.c | 373 ++++++++++++++++++++-
+ .../ethernet/microchip/sparx5/sparx5_vcap_ag_api.h |   6 +-
+ drivers/net/ethernet/microchip/vcap/vcap_ag_api.h  |  94 +++++-
+ .../net/ethernet/microchip/vcap/vcap_model_kunit.c |   6 +-
+ 5 files changed, 832 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.c b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-index 0fdb5e363bad..6946fd738458 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-@@ -4,7 +4,9 @@
-  * Copyright (c) 2022 Microchip Technology Inc. and its subsidiaries.
+diff --git a/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_vcap_ag_api.c b/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_vcap_ag_api.c
+index 7acc5bcf337a..e623b1dbe9cb 100644
+--- a/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_vcap_ag_api.c
++++ b/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_vcap_ag_api.c
+@@ -1,10 +1,10 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+-/* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
++/* Copyright (C) 2026 Microchip Technology Inc. and its subsidiaries.
+  * Microchip VCAP API
   */
  
-+#include <linux/lcm.h>
+-/* This file is autogenerated by cml-utils 2024-10-07 11:10:56 +0200.
+- * Commit ID: b5ddc8e244eb2481a9524f1ddc630a8b41e7c391
++/* This file is autogenerated by cml-utils 2026-04-28 13:55:50 +0200.
++ * Commit ID: cd2494df16a1d3b14f650f720f6a8126b88b553a
+  */
+ 
  #include <linux/types.h>
-+#include <linux/minmax.h>
+@@ -1380,6 +1380,83 @@ static const struct vcap_field es0_isdx_keyfield[] = {
+ 	},
+ };
  
- #include "vcap_api_private.h"
- 
-@@ -2096,12 +2098,63 @@ static u32 vcap_set_rule_id(struct vcap_rule_internal *ri)
- 	return ri->data.id;
- }
- 
-+static void vcap_move_from_block(u32 base_addr,
-+				 struct vcap_rule_internal *block_first,
-+				 struct vcap_rule_internal *block_last,
-+				 int block_lcm, struct vcap_rule_move *move)
-+{
-+	int unaligned_offset;
++static const struct vcap_field lpm_sgl_ip4_keyfield[] = {
++	[VCAP_KF_DST_FLAG] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP4_XIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 11,
++		.width = 32,
++	},
++};
 +
-+	if (!block_first || !block_last)
-+		return;
++static const struct vcap_field lpm_dbl_ip4_keyfield[] = {
++	[VCAP_KF_TYPE] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP4_SIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 11,
++		.width = 32,
++	},
++	[VCAP_KF_IP4_DIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 43,
++		.width = 32,
++	},
++};
 +
-+	move->addr = block_last->addr;
-+	move->count = block_first->addr + block_first->size - block_last->addr;
-+	/* Integer division rounds toward zero. We want to round toward +inf
-+	 * for the positive case (insertion) to ensure enough room.
-+	 */
-+	unaligned_offset = (block_first->addr + block_first->size) - base_addr;
-+	if (unaligned_offset > 0)
-+		move->offset =
-+			((unaligned_offset + (block_lcm - 1)) / block_lcm) *
-+			block_lcm;
-+	else
-+		move->offset = (unaligned_offset / block_lcm) * block_lcm;
-+}
++static const struct vcap_field lpm_sgl_ip6_keyfield[] = {
++	[VCAP_KF_DST_FLAG] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP6_XIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 11,
++		.width = 128,
++	},
++};
 +
-+static void vcap_move_rules_sw(struct vcap_admin *admin,
-+			       struct vcap_rule_internal *pos,
-+			       struct vcap_rule_move const *move)
-+{
-+	if (move->count == 0 || move->offset == 0)
-+		return;
++static const struct vcap_field lpm_dbl_ip6_keyfield[] = {
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 10,
++	},
++	[VCAP_KF_IP6_SIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 10,
++		.width = 128,
++	},
++	[VCAP_KF_IP6_DIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 138,
++		.width = 128,
++	},
++};
 +
-+	list_for_each_entry_continue(pos, &admin->rules, list)
-+		pos->addr -= move->offset;
-+}
+ static const struct vcap_field es2_mac_etype_keyfield[] = {
+ 	[VCAP_KF_TYPE] = {
+ 		.type = VCAP_FIELD_U32,
+@@ -2338,6 +2415,29 @@ static const struct vcap_set es0_keyfield_set[] = {
+ 	},
+ };
+ 
++static const struct vcap_set lpm_keyfield_set[] = {
++	[VCAP_KFS_SGL_IP4] = {
++		.type_id = -1,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++	[VCAP_KFS_DBL_IP4] = {
++		.type_id = 0,
++		.sw_per_item = 2,
++		.sw_cnt = 6,
++	},
++	[VCAP_KFS_SGL_IP6] = {
++		.type_id = -1,
++		.sw_per_item = 3,
++		.sw_cnt = 4,
++	},
++	[VCAP_KFS_DBL_IP6] = {
++		.type_id = -1,
++		.sw_per_item = 6,
++		.sw_cnt = 2,
++	},
++};
 +
-+static int vcap_find_move_block_lcm(struct vcap_admin *admin,
-+				    struct vcap_rule_internal *pos)
-+{
-+	int block_lcm = 1;
+ static const struct vcap_set es2_keyfield_set[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = {
+ 		.type_id = 0,
+@@ -2390,6 +2490,13 @@ static const struct vcap_field *es0_keyfield_set_map[] = {
+ 	[VCAP_KFS_ISDX] = es0_isdx_keyfield,
+ };
+ 
++static const struct vcap_field *lpm_keyfield_set_map[] = {
++	[VCAP_KFS_SGL_IP4] = lpm_sgl_ip4_keyfield,
++	[VCAP_KFS_DBL_IP4] = lpm_dbl_ip4_keyfield,
++	[VCAP_KFS_SGL_IP6] = lpm_sgl_ip6_keyfield,
++	[VCAP_KFS_DBL_IP6] = lpm_dbl_ip6_keyfield,
++};
 +
-+	list_for_each_entry_continue(pos, &admin->rules, list) {
-+		block_lcm = lcm(block_lcm, pos->size);
-+		if (pos->size <= 2)
-+			break;
-+	}
+ static const struct vcap_field *es2_keyfield_set_map[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = es2_mac_etype_keyfield,
+ 	[VCAP_KFS_ARP] = es2_arp_keyfield,
+@@ -2418,6 +2525,13 @@ static int es0_keyfield_set_map_size[] = {
+ 	[VCAP_KFS_ISDX] = ARRAY_SIZE(es0_isdx_keyfield),
+ };
+ 
++static int lpm_keyfield_set_map_size[] = {
++	[VCAP_KFS_SGL_IP4] = ARRAY_SIZE(lpm_sgl_ip4_keyfield),
++	[VCAP_KFS_DBL_IP4] = ARRAY_SIZE(lpm_dbl_ip4_keyfield),
++	[VCAP_KFS_SGL_IP6] = ARRAY_SIZE(lpm_sgl_ip6_keyfield),
++	[VCAP_KFS_DBL_IP6] = ARRAY_SIZE(lpm_dbl_ip6_keyfield),
++};
 +
-+	return block_lcm;
-+}
+ static int es2_keyfield_set_map_size[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = ARRAY_SIZE(es2_mac_etype_keyfield),
+ 	[VCAP_KFS_ARP] = ARRAY_SIZE(es2_arp_keyfield),
+@@ -2993,6 +3107,92 @@ static const struct vcap_field es0_es0_actionfield[] = {
+ 	},
+ };
+ 
++static const struct vcap_field lpm_arp_ptr_actionfield[] = {
++	[VCAP_AF_TYPE] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 2,
++	},
++	[VCAP_AF_ARP_PTR] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 2,
++		.width = 10,
++	},
++	[VCAP_AF_ARP_PTR_REMAP_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 12,
++		.width = 1,
++	},
++	[VCAP_AF_ECMP_CNT] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 13,
++		.width = 4,
++	},
++	[VCAP_AF_RGID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 17,
++		.width = 3,
++	},
++};
 +
- static int vcap_insert_rule(struct vcap_rule_internal *ri,
- 			    struct vcap_rule_move *move)
- {
-+	struct vcap_rule_internal *duprule, *iter, *block_first = NULL,
-+						   *block_last;
- 	int sw_count = ri->vctrl->vcaps[ri->admin->vtype].sw_count;
--	struct vcap_rule_internal *duprule, *iter, *elem = NULL;
- 	struct vcap_admin *admin = ri->admin;
-+	int block_lcm;
- 	u32 addr;
- 
- 	ri->sort_key = vcap_sort_key(sw_count, ri->size, ri->data.user,
-@@ -2114,12 +2167,12 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
- 	 */
- 	list_for_each_entry(iter, &admin->rules, list) {
- 		if (ri->sort_key < iter->sort_key) {
--			elem = iter;
-+			block_first = iter;
- 			break;
- 		}
- 	}
- 
--	if (!elem) {
-+	if (!block_first) {
- 		ri->addr = vcap_next_rule_addr(admin->last_used_addr, ri);
- 		admin->last_used_addr = ri->addr;
- 
-@@ -2132,10 +2185,13 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
- 		return 0;
- 	}
- 
--	/* Reuse the space of the current rule */
--	addr = elem->addr + elem->size;
-+	block_last = list_last_entry(&admin->rules, typeof(*ri), list);
++static const struct vcap_field lpm_arp_entry_actionfield[] = {
++	[VCAP_AF_TYPE] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 2,
++	},
++	[VCAP_AF_MAC_MSB] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 2,
++		.width = 16,
++	},
++	[VCAP_AF_MAC_LSB] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 18,
++		.width = 32,
++	},
++	[VCAP_AF_ARP_VMID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 50,
++		.width = 7,
++	},
++	[VCAP_AF_ZERO_DMAC_CPU_QU] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 57,
++		.width = 3,
++	},
++	[VCAP_AF_SIP_RPF_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 60,
++		.width = 1,
++	},
++	[VCAP_AF_SECUR_MATCH_VMID_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 61,
++		.width = 1,
++	},
++	[VCAP_AF_SECUR_MATCH_MAC_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 62,
++		.width = 1,
++	},
++	[VCAP_AF_ARP_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 63,
++		.width = 1,
++	},
++	[VCAP_AF_ENCAP_ID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 64,
++		.width = 8,
++	},
++	[VCAP_AF_RSDX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 72,
++		.width = 10,
++	},
++};
 +
-+	/* Reuse the space and padding of the current rule */
-+	addr = admin->last_valid_addr + 1;
-+	if (!list_is_first(&block_first->list, &admin->rules))
-+		addr = list_prev_entry(block_first, list)->addr;
- 	ri->addr = vcap_next_rule_addr(addr, ri);
--	addr = ri->addr;
+ static const struct vcap_field es2_base_type_actionfield[] = {
+ 	[VCAP_AF_HIT_ME_ONCE] = {
+ 		.type = VCAP_FIELD_BIT,
+@@ -3101,6 +3301,19 @@ static const struct vcap_set es0_actionfield_set[] = {
+ 	},
+ };
  
- 	/* Add a copy of the rule to the VCAP list */
- 	duprule = vcap_dup_rule(ri, ri->state == VCAP_RS_DISABLED);
-@@ -2143,29 +2199,34 @@ static int vcap_insert_rule(struct vcap_rule_internal *ri,
- 		return PTR_ERR(duprule);
- 
- 	/* Add before the current entry */
--	list_add_tail(&duprule->list, &elem->list);
-+	list_add_tail(&duprule->list, &block_first->list);
- 
--	/* Update the current rule */
--	elem->addr = vcap_next_rule_addr(addr, elem);
--	addr = elem->addr;
-+	/* Collect block move info in struct move, to update VCAP HW later */
-+	block_lcm = vcap_find_move_block_lcm(admin, duprule);
-+	vcap_move_from_block(ri->addr, block_first, block_last, block_lcm,
-+			     move);
- 
--	/* Update the address in the remaining rules in the list */
--	list_for_each_entry_continue(elem, &admin->rules, list) {
--		elem->addr = vcap_next_rule_addr(addr, elem);
--		addr = elem->addr;
-+	if ((int)block_last->addr - move->offset < admin->first_valid_addr) {
-+		pr_err("%s:%d: No room for rule size: %u, %u\n", __func__,
-+		       __LINE__, duprule->size, admin->first_valid_addr);
-+		list_del(&duprule->list);
-+		vcap_free_rule(&duprule->data);
-+		return -ENOSPC;
- 	}
- 
--	/* Update the move info */
--	move->addr = admin->last_used_addr;
--	move->count = ri->addr - addr;
--	move->offset = admin->last_used_addr - addr;
--	admin->last_used_addr = addr;
-+	/* Apply move to SW */
-+	vcap_move_rules_sw(admin, duprule, move);
-+	admin->last_used_addr =
-+		list_last_entry(&admin->rules, typeof(*ri), list)->addr;
- 	return 0;
- }
- 
- static void vcap_move_rules(struct vcap_rule_internal *ri,
- 			    struct vcap_rule_move *move)
- {
-+	if (move->count == 0 || move->offset == 0)
-+		return;
++static const struct vcap_set lpm_actionfield_set[] = {
++	[VCAP_AFS_ARP_PTR] = {
++		.type_id = 0,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++	[VCAP_AFS_ARP_ENTRY] = {
++		.type_id = 2,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++};
 +
- 	ri->vctrl->ops->move(ri->ndev, ri->admin, move->addr,
- 			 move->offset, move->count);
- }
-@@ -2275,8 +2336,7 @@ int vcap_add_rule(struct vcap_rule *rule)
- 		       __func__, __LINE__, ret);
- 		goto out;
- 	}
--	if (move.count > 0)
--		vcap_move_rules(ri, &move);
-+	vcap_move_rules(ri, &move);
+ static const struct vcap_set es2_actionfield_set[] = {
+ 	[VCAP_AFS_BASE_TYPE] = {
+ 		.type_id = -1,
+@@ -3124,6 +3337,11 @@ static const struct vcap_field *es0_actionfield_set_map[] = {
+ 	[VCAP_AFS_ES0] = es0_es0_actionfield,
+ };
  
- 	/* Set the counter to zero */
- 	ret = vcap_write_counter(ri, &ctr);
-@@ -2488,59 +2548,52 @@ int vcap_mod_rule(struct vcap_rule *rule)
- }
- EXPORT_SYMBOL_GPL(vcap_mod_rule);
- 
--/* Return the alignment offset for a new rule address */
--static int vcap_valid_rule_move(struct vcap_rule_internal *el, int offset)
--{
--	return (el->addr + offset) % el->size;
--}
--
--/* Update the rule address with an offset */
--static void vcap_adjust_rule_addr(struct vcap_rule_internal *el, int offset)
--{
--	el->addr += offset;
--}
--
- /* Rules needs to be moved to fill the gap of the deleted rule */
- static int vcap_fill_rule_gap(struct vcap_rule_internal *ri)
- {
-+	struct vcap_rule_internal *block_first = NULL, *block_last = NULL;
- 	struct vcap_admin *admin = ri->admin;
--	struct vcap_rule_internal *elem;
--	struct vcap_rule_move move;
--	int gap = 0, offset = 0;
-+	struct net_device *ndev = ri->ndev;
-+	struct vcap_rule_move move = {};
-+	int block_lcm, addr;
- 
--	/* If the first rule is deleted: Move other rules to the top */
--	if (list_is_first(&ri->list, &admin->rules))
--		offset = admin->last_valid_addr + 1 - ri->addr - ri->size;
-+	if (!list_is_last(&ri->list, &admin->rules)) {
-+		block_first = list_next_entry(ri, list);
-+		block_last = list_last_entry(&admin->rules, typeof(*ri), list);
-+	}
- 
--	/* Locate gaps between odd size rules and adjust the move */
--	elem = ri;
--	list_for_each_entry_continue(elem, &admin->rules, list)
--		gap += vcap_valid_rule_move(elem, ri->size);
-+	addr = admin->last_valid_addr + 1;
-+	if (!list_is_first(&ri->list, &admin->rules))
-+		addr = list_prev_entry(ri, list)->addr;
- 
--	/* Update the address in the remaining rules in the list */
--	elem = ri;
--	list_for_each_entry_continue(elem, &admin->rules, list)
--		vcap_adjust_rule_addr(elem, ri->size + gap + offset);
-+	block_lcm = vcap_find_move_block_lcm(admin, ri);
-+	vcap_move_from_block(addr, block_first, block_last, block_lcm, &move);
- 
--	/* Update the move info */
--	move.addr = admin->last_used_addr;
--	move.count = ri->addr - admin->last_used_addr - gap;
--	move.offset = -(ri->size + gap + offset);
-+	/* Apply move to SW representation */
-+	vcap_move_rules_sw(admin, ri, &move);
- 
--	/* Do the actual move operation */
-+	/* Initialize space used by ri, as it may not be overwritten by move */
-+	ri->vctrl->ops->init(ndev, admin, ri->addr, ri->size);
++static const struct vcap_field *lpm_actionfield_set_map[] = {
++	[VCAP_AFS_ARP_PTR] = lpm_arp_ptr_actionfield,
++	[VCAP_AFS_ARP_ENTRY] = lpm_arp_entry_actionfield,
++};
 +
-+	/* Apply move to HW. The VCAP move command automatically disables
-+	 * (initializes) the source addresses, so no separate init is needed
-+	 * for the vacated positions.
-+	 */
- 	vcap_move_rules(ri, &move);
+ static const struct vcap_field *es2_actionfield_set_map[] = {
+ 	[VCAP_AFS_BASE_TYPE] = es2_base_type_actionfield,
+ };
+@@ -3143,6 +3361,11 @@ static int es0_actionfield_set_map_size[] = {
+ 	[VCAP_AFS_ES0] = ARRAY_SIZE(es0_es0_actionfield),
+ };
  
--	return gap + offset;
-+	if (block_last)
-+		return block_last->addr;
++static int lpm_actionfield_set_map_size[] = {
++	[VCAP_AFS_ARP_PTR] = ARRAY_SIZE(lpm_arp_ptr_actionfield),
++	[VCAP_AFS_ARP_ENTRY] = ARRAY_SIZE(lpm_arp_entry_actionfield),
++};
 +
-+	return addr;
- }
+ static int es2_actionfield_set_map_size[] = {
+ 	[VCAP_AFS_BASE_TYPE] = ARRAY_SIZE(es2_base_type_actionfield),
+ };
+@@ -3308,6 +3531,82 @@ static const struct vcap_typegroup es0_x1_keyfield_set_typegroups[] = {
+ 	{}
+ };
  
- /* Delete rule in a VCAP instance */
- int vcap_del_rule(struct vcap_control *vctrl, struct net_device *ndev, u32 id)
- {
--	struct vcap_rule_internal *ri, *elem;
-+	struct vcap_rule_internal *ri;
- 	struct vcap_admin *admin;
--	int gap = 0, err;
-+	int err;
- 
--	/* This will later also handle rule moving */
- 	if (!ndev)
- 		return -ENODEV;
- 	err = vcap_api_check(vctrl);
-@@ -2553,23 +2606,12 @@ int vcap_del_rule(struct vcap_control *vctrl, struct net_device *ndev, u32 id)
- 
- 	admin = ri->admin;
- 
--	if (ri->addr > admin->last_used_addr)
--		gap = vcap_fill_rule_gap(ri);
-+	admin->last_used_addr = vcap_fill_rule_gap(ri);
- 
- 	/* Delete the rule from the list of rules and the cache */
- 	list_del(&ri->list);
--	vctrl->ops->init(ndev, admin, admin->last_used_addr, ri->size + gap);
- 	vcap_free_rule(&ri->data);
- 
--	/* Update the last used address, set to default when no rules */
--	if (list_empty(&admin->rules)) {
--		admin->last_used_addr = admin->last_valid_addr + 1;
--	} else {
--		elem = list_last_entry(&admin->rules, struct vcap_rule_internal,
--				       list);
--		admin->last_used_addr = elem->addr;
--	}
--
- 	mutex_unlock(&admin->lock);
- 	return err;
- }
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-index ce26ccbdccdf..cec818938ec9 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-@@ -1575,7 +1575,7 @@ static void vcap_api_rule_insert_in_order_test(struct kunit *test)
- 		.lookups = 4,
- 		.last_valid_addr = 3071,
- 		.first_valid_addr = 0,
--		.last_used_addr = 800,
-+		.last_used_addr = 804,
- 		.cache = {
- 			.keystream = keydata,
- 			.maskstream = mskdata,
-@@ -1583,15 +1583,28 @@ static void vcap_api_rule_insert_in_order_test(struct kunit *test)
- 		},
- 	};
- 
-+	struct vcap_rule_internal ri0 = {
-+		.data = {
-+			.id = 2001,
-+		},
-+		.addr = 804,
-+		.size = 12,
-+		.sort_key = vcap_sort_key(12, 12, 0, 0),
-+		.admin = &admin,
-+		.counter_id = 2002,
-+		.vctrl = &test_vctrl,
-+	};
++static const struct vcap_typegroup lpm_x6_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 4,
++		.value = 8,
++	},
++	{
++		.offset = 52,
++		.width = 1,
++		.value = 0,
++	},
++	{
++		.offset = 104,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 156,
++		.width = 3,
++		.value = 0,
++	},
++	{
++		.offset = 208,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 260,
++		.width = 1,
++		.value = 0,
++	},
++	{}
++};
 +
- 	vcap_test_api_init(&admin);
-+	list_add_tail(&ri0.list, &admin.rules);
- 
- 	/* Create rules with different sizes and check that they are placed
- 	 * at the correct address in the VCAP according to size
- 	 */
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 10, 500, 12, 780);
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 774);
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 771);
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 200, 2, 768);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 10, 500, 12, 792);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 786);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 783);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 200, 2, 780);
- 
- 	vcap_del_rule(&test_vctrl, &test_netdev, 200);
- 	vcap_del_rule(&test_vctrl, &test_netdev, 300);
-@@ -1613,7 +1626,7 @@ static void vcap_api_rule_insert_reverse_order_test(struct kunit *test)
- 		.lookups = 4,
- 		.last_valid_addr = 3071,
- 		.first_valid_addr = 0,
--		.last_used_addr = 800,
-+		.last_used_addr = 804,
- 		.cache = {
- 			.keystream = keydata,
- 			.maskstream = mskdata,
-@@ -1621,40 +1634,54 @@ static void vcap_api_rule_insert_reverse_order_test(struct kunit *test)
- 		},
- 	};
- 	struct vcap_rule_internal *elem;
--	u32 exp_addr[] = {780, 774, 771, 768, 767};
-+	u32 exp_addr[] = {804, 792, 786, 783, 780};
- 	int idx;
- 
-+	/* Existing X12 rule at last_used_addr */
-+	struct vcap_rule_internal ri0 = {
-+		.data = {
-+			.id = 2001,
-+		},
-+		.addr = 804,
-+		.size = 12,
-+		.sort_key = vcap_sort_key(12, 12, 0, 0),
-+		.admin = &admin,
-+		.counter_id = 2002,
-+		.vctrl = &test_vctrl,
-+	};
++static const struct vcap_typegroup lpm_x3_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 3,
++		.value = 4,
++	},
++	{
++		.offset = 52,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 104,
++		.width = 2,
++		.value = 0,
++	},
++	{}
++};
 +
- 	vcap_test_api_init(&admin);
-+	list_add_tail(&ri0.list, &admin.rules);
++static const struct vcap_typegroup lpm_x2_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 2,
++		.value = 2,
++	},
++	{
++		.offset = 52,
++		.width = 1,
++		.value = 0,
++	},
++	{}
++};
++
++static const struct vcap_typegroup lpm_x1_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 1,
++		.value = 1,
++	},
++	{}
++};
++
+ static const struct vcap_typegroup es2_x12_keyfield_set_typegroups[] = {
+ 	{
+ 		.offset = 0,
+@@ -3376,6 +3675,14 @@ static const struct vcap_typegroup *es0_keyfield_set_typegroups[] = {
+ 	[2] = NULL,
+ };
  
- 	/* Create rules with different sizes and check that they are placed
- 	 * at the correct address in the VCAP according to size
- 	 */
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 200, 2, 798);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 200, 2, 802);
- 	KUNIT_EXPECT_EQ(test, 0, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 0, test_move_count);
- 	KUNIT_EXPECT_EQ(test, 0, test_move_addr);
++static const struct vcap_typegroup *lpm_keyfield_set_typegroups[] = {
++	[6] = lpm_x6_keyfield_set_typegroups,
++	[3] = lpm_x3_keyfield_set_typegroups,
++	[2] = lpm_x2_keyfield_set_typegroups,
++	[1] = lpm_x1_keyfield_set_typegroups,
++	[13] = NULL,
++};
++
+ static const struct vcap_typegroup *es2_keyfield_set_typegroups[] = {
+ 	[12] = es2_x12_keyfield_set_typegroups,
+ 	[6] = es2_x6_keyfield_set_typegroups,
+@@ -3453,6 +3760,10 @@ static const struct vcap_typegroup es0_x1_actionfield_set_typegroups[] = {
+ 	{}
+ };
  
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 795);
--	KUNIT_EXPECT_EQ(test, 6, test_move_offset);
--	KUNIT_EXPECT_EQ(test, 3, test_move_count);
--	KUNIT_EXPECT_EQ(test, 798, test_move_addr);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 801);
-+	KUNIT_EXPECT_EQ(test, 4, test_move_offset);
-+	KUNIT_EXPECT_EQ(test, 2, test_move_count);
-+	KUNIT_EXPECT_EQ(test, 802, test_move_addr);
++static const struct vcap_typegroup lpm_x1_actionfield_set_typegroups[] = {
++	{}
++};
++
+ static const struct vcap_typegroup es2_x3_actionfield_set_typegroups[] = {
+ 	{
+ 		.offset = 0,
+@@ -3494,6 +3805,11 @@ static const struct vcap_typegroup *es0_actionfield_set_typegroups[] = {
+ 	[2] = NULL,
+ };
  
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 400, 6, 792);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 400, 6, 798);
- 	KUNIT_EXPECT_EQ(test, 6, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 6, test_move_count);
--	KUNIT_EXPECT_EQ(test, 792, test_move_addr);
-+	KUNIT_EXPECT_EQ(test, 798, test_move_addr);
++static const struct vcap_typegroup *lpm_actionfield_set_typegroups[] = {
++	[1] = lpm_x1_actionfield_set_typegroups,
++	[13] = NULL,
++};
++
+ static const struct vcap_typegroup *es2_actionfield_set_typegroups[] = {
+ 	[3] = es2_x3_actionfield_set_typegroups,
+ 	[1] = es2_x1_actionfield_set_typegroups,
+@@ -3504,6 +3820,8 @@ static const struct vcap_typegroup *es2_actionfield_set_typegroups[] = {
+ static const char * const vcap_keyfield_set_names[] = {
+ 	[VCAP_KFS_NO_VALUE]                      =  "(None)",
+ 	[VCAP_KFS_ARP]                           =  "VCAP_KFS_ARP",
++	[VCAP_KFS_DBL_IP4]                       =  "VCAP_KFS_DBL_IP4",
++	[VCAP_KFS_DBL_IP6]                       =  "VCAP_KFS_DBL_IP6",
+ 	[VCAP_KFS_ETAG]                          =  "VCAP_KFS_ETAG",
+ 	[VCAP_KFS_IP4_OTHER]                     =  "VCAP_KFS_IP4_OTHER",
+ 	[VCAP_KFS_IP4_TCP_UDP]                   =  "VCAP_KFS_IP4_TCP_UDP",
+@@ -3522,6 +3840,8 @@ static const char * const vcap_keyfield_set_names[] = {
+ 	[VCAP_KFS_NORMAL_7TUPLE]                 =  "VCAP_KFS_NORMAL_7TUPLE",
+ 	[VCAP_KFS_OAM]                           =  "VCAP_KFS_OAM",
+ 	[VCAP_KFS_PURE_5TUPLE_IP4]               =  "VCAP_KFS_PURE_5TUPLE_IP4",
++	[VCAP_KFS_SGL_IP4]                       =  "VCAP_KFS_SGL_IP4",
++	[VCAP_KFS_SGL_IP6]                       =  "VCAP_KFS_SGL_IP6",
+ 	[VCAP_KFS_SMAC_SIP4]                     =  "VCAP_KFS_SMAC_SIP4",
+ 	[VCAP_KFS_SMAC_SIP6]                     =  "VCAP_KFS_SMAC_SIP6",
+ };
+@@ -3529,6 +3849,8 @@ static const char * const vcap_keyfield_set_names[] = {
+ /* Actionfieldset names */
+ static const char * const vcap_actionfield_set_names[] = {
+ 	[VCAP_AFS_NO_VALUE]                      =  "(None)",
++	[VCAP_AFS_ARP_ENTRY]                     =  "VCAP_AFS_ARP_ENTRY",
++	[VCAP_AFS_ARP_PTR]                       =  "VCAP_AFS_ARP_PTR",
+ 	[VCAP_AFS_BASE_TYPE]                     =  "VCAP_AFS_BASE_TYPE",
+ 	[VCAP_AFS_CLASSIFICATION]                =  "VCAP_AFS_CLASSIFICATION",
+ 	[VCAP_AFS_CLASS_REDUCED]                 =  "VCAP_AFS_CLASS_REDUCED",
+@@ -3565,6 +3887,7 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_8021Q_VLAN_TAGGED_IS]           =  "8021Q_VLAN_TAGGED_IS",
+ 	[VCAP_KF_8021Q_VLAN_TAGS]                =  "8021Q_VLAN_TAGS",
+ 	[VCAP_KF_ACL_GRP_ID]                     =  "ACL_GRP_ID",
++	[VCAP_KF_AFFIX]                          =  "AFFIX",
+ 	[VCAP_KF_ARP_ADDR_SPACE_OK_IS]           =  "ARP_ADDR_SPACE_OK_IS",
+ 	[VCAP_KF_ARP_LEN_OK_IS]                  =  "ARP_LEN_OK_IS",
+ 	[VCAP_KF_ARP_OPCODE]                     =  "ARP_OPCODE",
+@@ -3573,6 +3896,7 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_ARP_SENDER_MATCH_IS]            =  "ARP_SENDER_MATCH_IS",
+ 	[VCAP_KF_ARP_TGT_MATCH_IS]               =  "ARP_TGT_MATCH_IS",
+ 	[VCAP_KF_COSID_CLS]                      =  "COSID_CLS",
++	[VCAP_KF_DST_FLAG]                       =  "DST_FLAG",
+ 	[VCAP_KF_ES0_ISDX_KEY_ENA]               =  "ES0_ISDX_KEY_ENA",
+ 	[VCAP_KF_ETYPE]                          =  "ETYPE",
+ 	[VCAP_KF_ETYPE_LEN_IS]                   =  "ETYPE_LEN_IS",
+@@ -3586,7 +3910,13 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_IF_IGR_PORT_MASK_RNG]           =  "IF_IGR_PORT_MASK_RNG",
+ 	[VCAP_KF_IF_IGR_PORT_MASK_SEL]           =  "IF_IGR_PORT_MASK_SEL",
+ 	[VCAP_KF_IF_IGR_PORT_SEL]                =  "IF_IGR_PORT_SEL",
++	[VCAP_KF_IP4_DIP]                        =  "IP4_DIP",
+ 	[VCAP_KF_IP4_IS]                         =  "IP4_IS",
++	[VCAP_KF_IP4_SIP]                        =  "IP4_SIP",
++	[VCAP_KF_IP4_XIP]                        =  "IP4_XIP",
++	[VCAP_KF_IP6_DIP]                        =  "IP6_DIP",
++	[VCAP_KF_IP6_SIP]                        =  "IP6_SIP",
++	[VCAP_KF_IP6_XIP]                        =  "IP6_XIP",
+ 	[VCAP_KF_IP_MC_IS]                       =  "IP_MC_IS",
+ 	[VCAP_KF_IP_PAYLOAD_5TUPLE]              =  "IP_PAYLOAD_5TUPLE",
+ 	[VCAP_KF_IP_SNAP_IS]                     =  "IP_SNAP_IS",
+@@ -3659,6 +3989,10 @@ static const char * const vcap_keyfield_names[] = {
+ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_NO_VALUE]                       =  "(None)",
+ 	[VCAP_AF_ACL_ID]                         =  "ACL_ID",
++	[VCAP_AF_ARP_ENA]                        =  "ARP_ENA",
++	[VCAP_AF_ARP_PTR]                        =  "ARP_PTR",
++	[VCAP_AF_ARP_PTR_REMAP_ENA]              =  "ARP_PTR_REMAP_ENA",
++	[VCAP_AF_ARP_VMID]                       =  "ARP_VMID",
+ 	[VCAP_AF_CLS_VID_SEL]                    =  "CLS_VID_SEL",
+ 	[VCAP_AF_CNT_ID]                         =  "CNT_ID",
+ 	[VCAP_AF_COPY_PORT_NUM]                  =  "COPY_PORT_NUM",
+@@ -3676,6 +4010,8 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_DSCP_ENA]                       =  "DSCP_ENA",
+ 	[VCAP_AF_DSCP_SEL]                       =  "DSCP_SEL",
+ 	[VCAP_AF_DSCP_VAL]                       =  "DSCP_VAL",
++	[VCAP_AF_ECMP_CNT]                       =  "ECMP_CNT",
++	[VCAP_AF_ENCAP_ID]                       =  "ENCAP_ID",
+ 	[VCAP_AF_ES2_REW_CMD]                    =  "ES2_REW_CMD",
+ 	[VCAP_AF_ESDX]                           =  "ESDX",
+ 	[VCAP_AF_FWD_KILL_ENA]                   =  "FWD_KILL_ENA",
+@@ -3690,6 +4026,8 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_ISDX_VAL]                       =  "ISDX_VAL",
+ 	[VCAP_AF_LOOP_ENA]                       =  "LOOP_ENA",
+ 	[VCAP_AF_LRN_DIS]                        =  "LRN_DIS",
++	[VCAP_AF_MAC_LSB]                        =  "MAC_LSB",
++	[VCAP_AF_MAC_MSB]                        =  "MAC_MSB",
+ 	[VCAP_AF_MAP_IDX]                        =  "MAP_IDX",
+ 	[VCAP_AF_MAP_KEY]                        =  "MAP_KEY",
+ 	[VCAP_AF_MAP_LOOKUP_SEL]                 =  "MAP_LOOKUP_SEL",
+@@ -3723,7 +4061,12 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_QOS_ENA]                        =  "QOS_ENA",
+ 	[VCAP_AF_QOS_VAL]                        =  "QOS_VAL",
+ 	[VCAP_AF_REW_OP]                         =  "REW_OP",
++	[VCAP_AF_RGID]                           =  "RGID",
++	[VCAP_AF_RSDX]                           =  "RSDX",
+ 	[VCAP_AF_RT_DIS]                         =  "RT_DIS",
++	[VCAP_AF_SECUR_MATCH_MAC_ENA]            =  "SECUR_MATCH_MAC_ENA",
++	[VCAP_AF_SECUR_MATCH_VMID_ENA]           =  "SECUR_MATCH_VMID_ENA",
++	[VCAP_AF_SIP_RPF_ENA]                    =  "SIP_RPF_ENA",
+ 	[VCAP_AF_SWAP_MACS_ENA]                  =  "SWAP_MACS_ENA",
+ 	[VCAP_AF_TAG_A_DEI_SEL]                  =  "TAG_A_DEI_SEL",
+ 	[VCAP_AF_TAG_A_PCP_SEL]                  =  "TAG_A_PCP_SEL",
+@@ -3743,6 +4086,7 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_VID_B_VAL]                      =  "VID_B_VAL",
+ 	[VCAP_AF_VID_C_VAL]                      =  "VID_C_VAL",
+ 	[VCAP_AF_VID_VAL]                        =  "VID_VAL",
++	[VCAP_AF_ZERO_DMAC_CPU_QU]               =  "ZERO_DMAC_CPU_QU",
+ };
  
--	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 50, 500, 12, 780);
--	KUNIT_EXPECT_EQ(test, 18, test_move_offset);
-+	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 50, 500, 12, 792);
-+	KUNIT_EXPECT_EQ(test, 12, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 12, test_move_count);
--	KUNIT_EXPECT_EQ(test, 786, test_move_addr);
-+	KUNIT_EXPECT_EQ(test, 792, test_move_addr);
+ /* VCAPs */
+@@ -3810,6 +4154,27 @@ const struct vcap_info lan969x_vcaps[] = {
+ 		.keyfield_set_typegroups = es0_keyfield_set_typegroups,
+ 		.actionfield_set_typegroups = es0_actionfield_set_typegroups,
+ 	},
++	[VCAP_TYPE_LPM] = {
++		.name = "lpm",
++		.rows = 512,
++		.sw_count = 12,
++		.sw_width = 52,
++		.sticky_width = 1,
++		.act_width = 83,
++		.default_cnt = 0,
++		.require_cnt_dis = 0,
++		.version = 1,
++		.keyfield_set = lpm_keyfield_set,
++		.keyfield_set_size = ARRAY_SIZE(lpm_keyfield_set),
++		.actionfield_set = lpm_actionfield_set,
++		.actionfield_set_size = ARRAY_SIZE(lpm_actionfield_set),
++		.keyfield_set_map = lpm_keyfield_set_map,
++		.keyfield_set_map_size = lpm_keyfield_set_map_size,
++		.actionfield_set_map = lpm_actionfield_set_map,
++		.actionfield_set_map_size = lpm_actionfield_set_map_size,
++		.keyfield_set_typegroups = lpm_keyfield_set_typegroups,
++		.actionfield_set_typegroups = lpm_actionfield_set_typegroups,
++	},
+ 	[VCAP_TYPE_ES2] = {
+ 		.name = "es2",
+ 		.rows = 256,
+@@ -3835,7 +4200,7 @@ const struct vcap_info lan969x_vcaps[] = {
  
- 	idx = 0;
- 	list_for_each_entry(elem, &admin.rules, list) {
- 		KUNIT_EXPECT_EQ(test, exp_addr[idx], elem->addr);
- 		++idx;
- 	}
--	KUNIT_EXPECT_EQ(test, 768, admin.last_used_addr);
-+	KUNIT_EXPECT_EQ(test, 780, admin.last_used_addr);
+ const struct vcap_statistics lan969x_vcap_stats = {
+ 	.name = "lan969x",
+-	.count = 4,
++	.count = 5,
+ 	.keyfield_set_names = vcap_keyfield_set_names,
+ 	.actionfield_set_names = vcap_actionfield_set_names,
+ 	.keyfield_names = vcap_keyfield_names,
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.c
+index 556d6ea0acd1..7bc8b29757b1 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.c
+@@ -1,10 +1,10 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+-/* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
++/* Copyright (C) 2026 Microchip Technology Inc. and its subsidiaries.
+  * Microchip VCAP API
+  */
  
- 	vcap_del_rule(&test_vctrl, &test_netdev, 500);
- 	vcap_del_rule(&test_vctrl, &test_netdev, 400);
-@@ -1774,7 +1801,7 @@ static void vcap_api_rule_remove_in_middle_test(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, 768, test_move_addr);
- 	KUNIT_EXPECT_EQ(test, -6, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 6, test_move_count);
--	KUNIT_EXPECT_EQ(test, 768, test_init_start);
-+	KUNIT_EXPECT_EQ(test, 774, test_init_start);
- 	KUNIT_EXPECT_EQ(test, 6, test_init_count);
- 	KUNIT_EXPECT_EQ(test, 774, admin.last_used_addr);
+-/* This file is autogenerated by cml-utils 2023-02-10 11:15:56 +0100.
+- * Commit ID: c30fb4bf0281cd4a7133bdab6682f9e43c872ada
++/* This file is autogenerated by cml-utils 2026-04-28 13:55:50 +0200.
++ * Commit ID: cd2494df16a1d3b14f650f720f6a8126b88b553a
+  */
  
-@@ -1784,8 +1811,8 @@ static void vcap_api_rule_remove_in_middle_test(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, 774, test_move_addr);
- 	KUNIT_EXPECT_EQ(test, -4, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 2, test_move_count);
--	KUNIT_EXPECT_EQ(test, 774, test_init_start);
--	KUNIT_EXPECT_EQ(test, 4, test_init_count);
-+	KUNIT_EXPECT_EQ(test, 777, test_init_start);
-+	KUNIT_EXPECT_EQ(test, 3, test_init_count);
- 	KUNIT_EXPECT_EQ(test, 778, admin.last_used_addr);
+ #include <linux/types.h>
+@@ -1381,6 +1381,83 @@ static const struct vcap_field es0_isdx_keyfield[] = {
+ 	},
+ };
  
- 	test_init_rule_deletion();
-@@ -1794,8 +1821,8 @@ static void vcap_api_rule_remove_in_middle_test(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, 778, test_move_addr);
- 	KUNIT_EXPECT_EQ(test, -20, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 2, test_move_count);
--	KUNIT_EXPECT_EQ(test, 778, test_init_start);
--	KUNIT_EXPECT_EQ(test, 20, test_init_count);
-+	KUNIT_EXPECT_EQ(test, 780, test_init_start);
-+	KUNIT_EXPECT_EQ(test, 12, test_init_count);
- 	KUNIT_EXPECT_EQ(test, 798, admin.last_used_addr);
++static const struct vcap_field lpm_sgl_ip4_keyfield[] = {
++	[VCAP_KF_DST_FLAG] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP4_XIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 11,
++		.width = 32,
++	},
++};
++
++static const struct vcap_field lpm_dbl_ip4_keyfield[] = {
++	[VCAP_KF_TYPE] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP4_SIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 11,
++		.width = 32,
++	},
++	[VCAP_KF_IP4_DIP] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 43,
++		.width = 32,
++	},
++};
++
++static const struct vcap_field lpm_sgl_ip6_keyfield[] = {
++	[VCAP_KF_DST_FLAG] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 0,
++		.width = 1,
++	},
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 1,
++		.width = 10,
++	},
++	[VCAP_KF_IP6_XIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 11,
++		.width = 128,
++	},
++};
++
++static const struct vcap_field lpm_dbl_ip6_keyfield[] = {
++	[VCAP_KF_AFFIX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 10,
++	},
++	[VCAP_KF_IP6_SIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 10,
++		.width = 128,
++	},
++	[VCAP_KF_IP6_DIP] = {
++		.type = VCAP_FIELD_U128,
++		.offset = 138,
++		.width = 128,
++	},
++};
++
+ static const struct vcap_field es2_mac_etype_keyfield[] = {
+ 	[VCAP_KF_TYPE] = {
+ 		.type = VCAP_FIELD_U32,
+@@ -2339,6 +2416,29 @@ static const struct vcap_set es0_keyfield_set[] = {
+ 	},
+ };
  
- 	test_init_rule_deletion();
-@@ -1855,11 +1882,11 @@ static void vcap_api_rule_remove_in_front_test(struct kunit *test)
- 	ret = vcap_del_rule(&test_vctrl, &test_netdev, 400);
- 	KUNIT_EXPECT_EQ(test, 0, ret);
- 	KUNIT_EXPECT_EQ(test, 786, test_move_addr);
--	KUNIT_EXPECT_EQ(test, -8, test_move_offset);
-+	KUNIT_EXPECT_EQ(test, -6, test_move_offset);
- 	KUNIT_EXPECT_EQ(test, 6, test_move_count);
--	KUNIT_EXPECT_EQ(test, 786, test_init_start);
--	KUNIT_EXPECT_EQ(test, 8, test_init_count);
--	KUNIT_EXPECT_EQ(test, 794, admin.last_used_addr);
-+	KUNIT_EXPECT_EQ(test, 792, test_init_start);
-+	KUNIT_EXPECT_EQ(test, 6, test_init_count);
-+	KUNIT_EXPECT_EQ(test, 792, admin.last_used_addr);
++static const struct vcap_set lpm_keyfield_set[] = {
++	[VCAP_KFS_SGL_IP4] = {
++		.type_id = -1,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++	[VCAP_KFS_DBL_IP4] = {
++		.type_id = 0,
++		.sw_per_item = 2,
++		.sw_cnt = 6,
++	},
++	[VCAP_KFS_SGL_IP6] = {
++		.type_id = -1,
++		.sw_per_item = 3,
++		.sw_cnt = 4,
++	},
++	[VCAP_KFS_DBL_IP6] = {
++		.type_id = -1,
++		.sw_per_item = 6,
++		.sw_cnt = 2,
++	},
++};
++
+ static const struct vcap_set es2_keyfield_set[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = {
+ 		.type_id = 0,
+@@ -2391,6 +2491,13 @@ static const struct vcap_field *es0_keyfield_set_map[] = {
+ 	[VCAP_KFS_ISDX] = es0_isdx_keyfield,
+ };
  
- 	vcap_del_rule(&test_vctrl, &test_netdev, 200);
- 	vcap_del_rule(&test_vctrl, &test_netdev, 300);
++static const struct vcap_field *lpm_keyfield_set_map[] = {
++	[VCAP_KFS_SGL_IP4] = lpm_sgl_ip4_keyfield,
++	[VCAP_KFS_DBL_IP4] = lpm_dbl_ip4_keyfield,
++	[VCAP_KFS_SGL_IP6] = lpm_sgl_ip6_keyfield,
++	[VCAP_KFS_DBL_IP6] = lpm_dbl_ip6_keyfield,
++};
++
+ static const struct vcap_field *es2_keyfield_set_map[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = es2_mac_etype_keyfield,
+ 	[VCAP_KFS_ARP] = es2_arp_keyfield,
+@@ -2419,6 +2526,13 @@ static int es0_keyfield_set_map_size[] = {
+ 	[VCAP_KFS_ISDX] = ARRAY_SIZE(es0_isdx_keyfield),
+ };
+ 
++static int lpm_keyfield_set_map_size[] = {
++	[VCAP_KFS_SGL_IP4] = ARRAY_SIZE(lpm_sgl_ip4_keyfield),
++	[VCAP_KFS_DBL_IP4] = ARRAY_SIZE(lpm_dbl_ip4_keyfield),
++	[VCAP_KFS_SGL_IP6] = ARRAY_SIZE(lpm_sgl_ip6_keyfield),
++	[VCAP_KFS_DBL_IP6] = ARRAY_SIZE(lpm_dbl_ip6_keyfield),
++};
++
+ static int es2_keyfield_set_map_size[] = {
+ 	[VCAP_KFS_MAC_ETYPE] = ARRAY_SIZE(es2_mac_etype_keyfield),
+ 	[VCAP_KFS_ARP] = ARRAY_SIZE(es2_arp_keyfield),
+@@ -2994,6 +3108,92 @@ static const struct vcap_field es0_es0_actionfield[] = {
+ 	},
+ };
+ 
++static const struct vcap_field lpm_arp_ptr_actionfield[] = {
++	[VCAP_AF_TYPE] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 2,
++	},
++	[VCAP_AF_ARP_PTR] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 2,
++		.width = 11,
++	},
++	[VCAP_AF_ARP_PTR_REMAP_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 13,
++		.width = 1,
++	},
++	[VCAP_AF_ECMP_CNT] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 14,
++		.width = 4,
++	},
++	[VCAP_AF_RGID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 18,
++		.width = 3,
++	},
++};
++
++static const struct vcap_field lpm_arp_entry_actionfield[] = {
++	[VCAP_AF_TYPE] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 0,
++		.width = 2,
++	},
++	[VCAP_AF_MAC_MSB] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 2,
++		.width = 16,
++	},
++	[VCAP_AF_MAC_LSB] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 18,
++		.width = 32,
++	},
++	[VCAP_AF_ARP_VMID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 50,
++		.width = 9,
++	},
++	[VCAP_AF_ZERO_DMAC_CPU_QU] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 59,
++		.width = 3,
++	},
++	[VCAP_AF_SIP_RPF_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 62,
++		.width = 1,
++	},
++	[VCAP_AF_SECUR_MATCH_VMID_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 63,
++		.width = 1,
++	},
++	[VCAP_AF_SECUR_MATCH_MAC_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 64,
++		.width = 1,
++	},
++	[VCAP_AF_ARP_ENA] = {
++		.type = VCAP_FIELD_BIT,
++		.offset = 65,
++		.width = 1,
++	},
++	[VCAP_AF_ENCAP_ID] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 66,
++		.width = 10,
++	},
++	[VCAP_AF_RSDX] = {
++		.type = VCAP_FIELD_U32,
++		.offset = 76,
++		.width = 12,
++	},
++};
++
+ static const struct vcap_field es2_base_type_actionfield[] = {
+ 	[VCAP_AF_HIT_ME_ONCE] = {
+ 		.type = VCAP_FIELD_BIT,
+@@ -3102,6 +3302,19 @@ static const struct vcap_set es0_actionfield_set[] = {
+ 	},
+ };
+ 
++static const struct vcap_set lpm_actionfield_set[] = {
++	[VCAP_AFS_ARP_PTR] = {
++		.type_id = 0,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++	[VCAP_AFS_ARP_ENTRY] = {
++		.type_id = 2,
++		.sw_per_item = 1,
++		.sw_cnt = 12,
++	},
++};
++
+ static const struct vcap_set es2_actionfield_set[] = {
+ 	[VCAP_AFS_BASE_TYPE] = {
+ 		.type_id = -1,
+@@ -3125,6 +3338,11 @@ static const struct vcap_field *es0_actionfield_set_map[] = {
+ 	[VCAP_AFS_ES0] = es0_es0_actionfield,
+ };
+ 
++static const struct vcap_field *lpm_actionfield_set_map[] = {
++	[VCAP_AFS_ARP_PTR] = lpm_arp_ptr_actionfield,
++	[VCAP_AFS_ARP_ENTRY] = lpm_arp_entry_actionfield,
++};
++
+ static const struct vcap_field *es2_actionfield_set_map[] = {
+ 	[VCAP_AFS_BASE_TYPE] = es2_base_type_actionfield,
+ };
+@@ -3144,6 +3362,11 @@ static int es0_actionfield_set_map_size[] = {
+ 	[VCAP_AFS_ES0] = ARRAY_SIZE(es0_es0_actionfield),
+ };
+ 
++static int lpm_actionfield_set_map_size[] = {
++	[VCAP_AFS_ARP_PTR] = ARRAY_SIZE(lpm_arp_ptr_actionfield),
++	[VCAP_AFS_ARP_ENTRY] = ARRAY_SIZE(lpm_arp_entry_actionfield),
++};
++
+ static int es2_actionfield_set_map_size[] = {
+ 	[VCAP_AFS_BASE_TYPE] = ARRAY_SIZE(es2_base_type_actionfield),
+ };
+@@ -3334,6 +3557,82 @@ static const struct vcap_typegroup es0_x1_keyfield_set_typegroups[] = {
+ 	{}
+ };
+ 
++static const struct vcap_typegroup lpm_x6_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 4,
++		.value = 8,
++	},
++	{
++		.offset = 52,
++		.width = 1,
++		.value = 0,
++	},
++	{
++		.offset = 104,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 156,
++		.width = 3,
++		.value = 0,
++	},
++	{
++		.offset = 208,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 260,
++		.width = 1,
++		.value = 0,
++	},
++	{}
++};
++
++static const struct vcap_typegroup lpm_x3_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 3,
++		.value = 4,
++	},
++	{
++		.offset = 52,
++		.width = 2,
++		.value = 0,
++	},
++	{
++		.offset = 104,
++		.width = 2,
++		.value = 0,
++	},
++	{}
++};
++
++static const struct vcap_typegroup lpm_x2_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 2,
++		.value = 2,
++	},
++	{
++		.offset = 52,
++		.width = 1,
++		.value = 0,
++	},
++	{}
++};
++
++static const struct vcap_typegroup lpm_x1_keyfield_set_typegroups[] = {
++	{
++		.offset = 0,
++		.width = 1,
++		.value = 1,
++	},
++	{}
++};
++
+ static const struct vcap_typegroup es2_x12_keyfield_set_typegroups[] = {
+ 	{
+ 		.offset = 0,
+@@ -3407,6 +3706,14 @@ static const struct vcap_typegroup *es0_keyfield_set_typegroups[] = {
+ 	[2] = NULL,
+ };
+ 
++static const struct vcap_typegroup *lpm_keyfield_set_typegroups[] = {
++	[6] = lpm_x6_keyfield_set_typegroups,
++	[3] = lpm_x3_keyfield_set_typegroups,
++	[2] = lpm_x2_keyfield_set_typegroups,
++	[1] = lpm_x1_keyfield_set_typegroups,
++	[13] = NULL,
++};
++
+ static const struct vcap_typegroup *es2_keyfield_set_typegroups[] = {
+ 	[12] = es2_x12_keyfield_set_typegroups,
+ 	[6] = es2_x6_keyfield_set_typegroups,
+@@ -3484,6 +3791,10 @@ static const struct vcap_typegroup es0_x1_actionfield_set_typegroups[] = {
+ 	{}
+ };
+ 
++static const struct vcap_typegroup lpm_x1_actionfield_set_typegroups[] = {
++	{}
++};
++
+ static const struct vcap_typegroup es2_x3_actionfield_set_typegroups[] = {
+ 	{
+ 		.offset = 0,
+@@ -3525,6 +3836,11 @@ static const struct vcap_typegroup *es0_actionfield_set_typegroups[] = {
+ 	[2] = NULL,
+ };
+ 
++static const struct vcap_typegroup *lpm_actionfield_set_typegroups[] = {
++	[1] = lpm_x1_actionfield_set_typegroups,
++	[13] = NULL,
++};
++
+ static const struct vcap_typegroup *es2_actionfield_set_typegroups[] = {
+ 	[3] = es2_x3_actionfield_set_typegroups,
+ 	[1] = es2_x1_actionfield_set_typegroups,
+@@ -3535,6 +3851,8 @@ static const struct vcap_typegroup *es2_actionfield_set_typegroups[] = {
+ static const char * const vcap_keyfield_set_names[] = {
+ 	[VCAP_KFS_NO_VALUE]                      =  "(None)",
+ 	[VCAP_KFS_ARP]                           =  "VCAP_KFS_ARP",
++	[VCAP_KFS_DBL_IP4]                       =  "VCAP_KFS_DBL_IP4",
++	[VCAP_KFS_DBL_IP6]                       =  "VCAP_KFS_DBL_IP6",
+ 	[VCAP_KFS_ETAG]                          =  "VCAP_KFS_ETAG",
+ 	[VCAP_KFS_IP4_OTHER]                     =  "VCAP_KFS_IP4_OTHER",
+ 	[VCAP_KFS_IP4_TCP_UDP]                   =  "VCAP_KFS_IP4_TCP_UDP",
+@@ -3553,6 +3871,8 @@ static const char * const vcap_keyfield_set_names[] = {
+ 	[VCAP_KFS_NORMAL_7TUPLE]                 =  "VCAP_KFS_NORMAL_7TUPLE",
+ 	[VCAP_KFS_OAM]                           =  "VCAP_KFS_OAM",
+ 	[VCAP_KFS_PURE_5TUPLE_IP4]               =  "VCAP_KFS_PURE_5TUPLE_IP4",
++	[VCAP_KFS_SGL_IP4]                       =  "VCAP_KFS_SGL_IP4",
++	[VCAP_KFS_SGL_IP6]                       =  "VCAP_KFS_SGL_IP6",
+ 	[VCAP_KFS_SMAC_SIP4]                     =  "VCAP_KFS_SMAC_SIP4",
+ 	[VCAP_KFS_SMAC_SIP6]                     =  "VCAP_KFS_SMAC_SIP6",
+ };
+@@ -3560,6 +3880,8 @@ static const char * const vcap_keyfield_set_names[] = {
+ /* Actionfieldset names */
+ static const char * const vcap_actionfield_set_names[] = {
+ 	[VCAP_AFS_NO_VALUE]                      =  "(None)",
++	[VCAP_AFS_ARP_ENTRY]                     =  "VCAP_AFS_ARP_ENTRY",
++	[VCAP_AFS_ARP_PTR]                       =  "VCAP_AFS_ARP_PTR",
+ 	[VCAP_AFS_BASE_TYPE]                     =  "VCAP_AFS_BASE_TYPE",
+ 	[VCAP_AFS_CLASSIFICATION]                =  "VCAP_AFS_CLASSIFICATION",
+ 	[VCAP_AFS_CLASS_REDUCED]                 =  "VCAP_AFS_CLASS_REDUCED",
+@@ -3596,6 +3918,7 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_8021Q_VLAN_TAGGED_IS]           =  "8021Q_VLAN_TAGGED_IS",
+ 	[VCAP_KF_8021Q_VLAN_TAGS]                =  "8021Q_VLAN_TAGS",
+ 	[VCAP_KF_ACL_GRP_ID]                     =  "ACL_GRP_ID",
++	[VCAP_KF_AFFIX]                          =  "AFFIX",
+ 	[VCAP_KF_ARP_ADDR_SPACE_OK_IS]           =  "ARP_ADDR_SPACE_OK_IS",
+ 	[VCAP_KF_ARP_LEN_OK_IS]                  =  "ARP_LEN_OK_IS",
+ 	[VCAP_KF_ARP_OPCODE]                     =  "ARP_OPCODE",
+@@ -3604,6 +3927,7 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_ARP_SENDER_MATCH_IS]            =  "ARP_SENDER_MATCH_IS",
+ 	[VCAP_KF_ARP_TGT_MATCH_IS]               =  "ARP_TGT_MATCH_IS",
+ 	[VCAP_KF_COSID_CLS]                      =  "COSID_CLS",
++	[VCAP_KF_DST_FLAG]                       =  "DST_FLAG",
+ 	[VCAP_KF_ES0_ISDX_KEY_ENA]               =  "ES0_ISDX_KEY_ENA",
+ 	[VCAP_KF_ETYPE]                          =  "ETYPE",
+ 	[VCAP_KF_ETYPE_LEN_IS]                   =  "ETYPE_LEN_IS",
+@@ -3617,7 +3941,13 @@ static const char * const vcap_keyfield_names[] = {
+ 	[VCAP_KF_IF_IGR_PORT_MASK_RNG]           =  "IF_IGR_PORT_MASK_RNG",
+ 	[VCAP_KF_IF_IGR_PORT_MASK_SEL]           =  "IF_IGR_PORT_MASK_SEL",
+ 	[VCAP_KF_IF_IGR_PORT_SEL]                =  "IF_IGR_PORT_SEL",
++	[VCAP_KF_IP4_DIP]                        =  "IP4_DIP",
+ 	[VCAP_KF_IP4_IS]                         =  "IP4_IS",
++	[VCAP_KF_IP4_SIP]                        =  "IP4_SIP",
++	[VCAP_KF_IP4_XIP]                        =  "IP4_XIP",
++	[VCAP_KF_IP6_DIP]                        =  "IP6_DIP",
++	[VCAP_KF_IP6_SIP]                        =  "IP6_SIP",
++	[VCAP_KF_IP6_XIP]                        =  "IP6_XIP",
+ 	[VCAP_KF_IP_MC_IS]                       =  "IP_MC_IS",
+ 	[VCAP_KF_IP_PAYLOAD_5TUPLE]              =  "IP_PAYLOAD_5TUPLE",
+ 	[VCAP_KF_IP_SNAP_IS]                     =  "IP_SNAP_IS",
+@@ -3690,6 +4020,10 @@ static const char * const vcap_keyfield_names[] = {
+ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_NO_VALUE]                       =  "(None)",
+ 	[VCAP_AF_ACL_ID]                         =  "ACL_ID",
++	[VCAP_AF_ARP_ENA]                        =  "ARP_ENA",
++	[VCAP_AF_ARP_PTR]                        =  "ARP_PTR",
++	[VCAP_AF_ARP_PTR_REMAP_ENA]              =  "ARP_PTR_REMAP_ENA",
++	[VCAP_AF_ARP_VMID]                       =  "ARP_VMID",
+ 	[VCAP_AF_CLS_VID_SEL]                    =  "CLS_VID_SEL",
+ 	[VCAP_AF_CNT_ID]                         =  "CNT_ID",
+ 	[VCAP_AF_COPY_PORT_NUM]                  =  "COPY_PORT_NUM",
+@@ -3707,6 +4041,8 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_DSCP_ENA]                       =  "DSCP_ENA",
+ 	[VCAP_AF_DSCP_SEL]                       =  "DSCP_SEL",
+ 	[VCAP_AF_DSCP_VAL]                       =  "DSCP_VAL",
++	[VCAP_AF_ECMP_CNT]                       =  "ECMP_CNT",
++	[VCAP_AF_ENCAP_ID]                       =  "ENCAP_ID",
+ 	[VCAP_AF_ES2_REW_CMD]                    =  "ES2_REW_CMD",
+ 	[VCAP_AF_ESDX]                           =  "ESDX",
+ 	[VCAP_AF_FWD_KILL_ENA]                   =  "FWD_KILL_ENA",
+@@ -3721,6 +4057,8 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_ISDX_VAL]                       =  "ISDX_VAL",
+ 	[VCAP_AF_LOOP_ENA]                       =  "LOOP_ENA",
+ 	[VCAP_AF_LRN_DIS]                        =  "LRN_DIS",
++	[VCAP_AF_MAC_LSB]                        =  "MAC_LSB",
++	[VCAP_AF_MAC_MSB]                        =  "MAC_MSB",
+ 	[VCAP_AF_MAP_IDX]                        =  "MAP_IDX",
+ 	[VCAP_AF_MAP_KEY]                        =  "MAP_KEY",
+ 	[VCAP_AF_MAP_LOOKUP_SEL]                 =  "MAP_LOOKUP_SEL",
+@@ -3754,7 +4092,12 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_QOS_ENA]                        =  "QOS_ENA",
+ 	[VCAP_AF_QOS_VAL]                        =  "QOS_VAL",
+ 	[VCAP_AF_REW_OP]                         =  "REW_OP",
++	[VCAP_AF_RGID]                           =  "RGID",
++	[VCAP_AF_RSDX]                           =  "RSDX",
+ 	[VCAP_AF_RT_DIS]                         =  "RT_DIS",
++	[VCAP_AF_SECUR_MATCH_MAC_ENA]            =  "SECUR_MATCH_MAC_ENA",
++	[VCAP_AF_SECUR_MATCH_VMID_ENA]           =  "SECUR_MATCH_VMID_ENA",
++	[VCAP_AF_SIP_RPF_ENA]                    =  "SIP_RPF_ENA",
+ 	[VCAP_AF_SWAP_MACS_ENA]                  =  "SWAP_MACS_ENA",
+ 	[VCAP_AF_TAG_A_DEI_SEL]                  =  "TAG_A_DEI_SEL",
+ 	[VCAP_AF_TAG_A_PCP_SEL]                  =  "TAG_A_PCP_SEL",
+@@ -3774,6 +4117,7 @@ static const char * const vcap_actionfield_names[] = {
+ 	[VCAP_AF_VID_B_VAL]                      =  "VID_B_VAL",
+ 	[VCAP_AF_VID_C_VAL]                      =  "VID_C_VAL",
+ 	[VCAP_AF_VID_VAL]                        =  "VID_VAL",
++	[VCAP_AF_ZERO_DMAC_CPU_QU]               =  "ZERO_DMAC_CPU_QU",
+ };
+ 
+ /* VCAPs */
+@@ -3841,6 +4185,27 @@ const struct vcap_info sparx5_vcaps[] = {
+ 		.keyfield_set_typegroups = es0_keyfield_set_typegroups,
+ 		.actionfield_set_typegroups = es0_actionfield_set_typegroups,
+ 	},
++	[VCAP_TYPE_LPM] = {
++		.name = "lpm",
++		.rows = 512,
++		.sw_count = 12,
++		.sw_width = 52,
++		.sticky_width = 1,
++		.act_width = 89,
++		.default_cnt = 0,
++		.require_cnt_dis = 0,
++		.version = 1,
++		.keyfield_set = lpm_keyfield_set,
++		.keyfield_set_size = ARRAY_SIZE(lpm_keyfield_set),
++		.actionfield_set = lpm_actionfield_set,
++		.actionfield_set_size = ARRAY_SIZE(lpm_actionfield_set),
++		.keyfield_set_map = lpm_keyfield_set_map,
++		.keyfield_set_map_size = lpm_keyfield_set_map_size,
++		.actionfield_set_map = lpm_actionfield_set_map,
++		.actionfield_set_map_size = lpm_actionfield_set_map_size,
++		.keyfield_set_typegroups = lpm_keyfield_set_typegroups,
++		.actionfield_set_typegroups = lpm_actionfield_set_typegroups,
++	},
+ 	[VCAP_TYPE_ES2] = {
+ 		.name = "es2",
+ 		.rows = 1024,
+@@ -3866,7 +4231,7 @@ const struct vcap_info sparx5_vcaps[] = {
+ 
+ const struct vcap_statistics sparx5_vcap_stats = {
+ 	.name = "sparx5",
+-	.count = 4,
++	.count = 5,
+ 	.keyfield_set_names = vcap_keyfield_set_names,
+ 	.actionfield_set_names = vcap_actionfield_set_names,
+ 	.keyfield_names = vcap_keyfield_names,
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.h b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.h
+index e68f5639a40a..22bb416f433d 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_ag_api.h
+@@ -1,10 +1,10 @@
+ /* SPDX-License-Identifier: BSD-3-Clause */
+-/* Copyright (C) 2022 Microchip Technology Inc. and its subsidiaries.
++/* Copyright (C) 2026 Microchip Technology Inc. and its subsidiaries.
+  * Microchip VCAP API
+  */
+ 
+-/* This file is autogenerated by cml-utils 2022-10-13 10:04:41 +0200.
+- * Commit ID: fd7cafd175899f0672c73afb3a30fc872500ae86
++/* This file is autogenerated by cml-utils 2026-04-28 13:55:50 +0200.
++ * Commit ID: cd2494df16a1d3b14f650f720f6a8126b88b553a
+  */
+ 
+ #ifndef __SPARX5_VCAP_AG_API_H__
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
+index 4735fad05708..487d56440936 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
++++ b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
+@@ -1,10 +1,10 @@
+ /* SPDX-License-Identifier: BSD-3-Clause */
+-/* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
++/* Copyright (C) 2026 Microchip Technology Inc. and its subsidiaries.
+  * Microchip VCAP API
+  */
+ 
+-/* This file is autogenerated by cml-utils 2023-03-13 10:16:42 +0100.
+- * Commit ID: 259f0efd6d6d91bfbf62858de153cc757b6bffa3 (dirty)
++/* This file is autogenerated by cml-utils 2026-04-28 13:55:50 +0200.
++ * Commit ID: cd2494df16a1d3b14f650f720f6a8126b88b553a
+  */
+ 
+ #ifndef __VCAP_AG_API__
+@@ -16,6 +16,7 @@ enum vcap_type {
+ 	VCAP_TYPE_IS0,
+ 	VCAP_TYPE_IS1,
+ 	VCAP_TYPE_IS2,
++	VCAP_TYPE_LPM,
+ 	VCAP_TYPE_MAX
+ };
+ 
+@@ -26,6 +27,8 @@ enum vcap_keyfield_set {
+ 	VCAP_KFS_5TUPLE_IP6,        /* lan966x is1 X4 */
+ 	VCAP_KFS_7TUPLE,            /* lan966x is1 X4 */
+ 	VCAP_KFS_ARP,               /* sparx5 is2 X6, sparx5 es2 X6, lan966x is2 X2 */
++	VCAP_KFS_DBL_IP4,           /* sparx5 lpm X2 */
++	VCAP_KFS_DBL_IP6,           /* sparx5 lpm X6 */
+ 	VCAP_KFS_DBL_VID,           /* lan966x is1 X1 */
+ 	VCAP_KFS_DMAC_VID,          /* lan966x is1 X1 */
+ 	VCAP_KFS_ETAG,              /* sparx5 is0 X2 */
+@@ -49,6 +52,8 @@ enum vcap_keyfield_set {
+ 	VCAP_KFS_OAM,               /* lan966x is2 X2 */
+ 	VCAP_KFS_PURE_5TUPLE_IP4,   /* sparx5 is0 X3 */
+ 	VCAP_KFS_RT,                /* lan966x is1 X1 */
++	VCAP_KFS_SGL_IP4,           /* sparx5 lpm X1 */
++	VCAP_KFS_SGL_IP6,           /* sparx5 lpm X3 */
+ 	VCAP_KFS_SMAC_SIP4,         /* lan966x is2 X1 */
+ 	VCAP_KFS_SMAC_SIP6,         /* lan966x is2 X2 */
+ 	VCAP_KFS_VID,               /* lan966x es0 X1 */
+@@ -117,6 +122,10 @@ enum vcap_keyfield_set {
+  *   tagged, 7: Triple tagged
+  * VCAP_KF_ACL_GRP_ID: W8, sparx5: es2
+  *   Used in interface map table
++ * VCAP_KF_AFFIX: W10, sparx5: lpm
++ *   LPM affix. Defaults to 0. Using the LPM affix, the VCAP LPM can be split into
++ *   multiple logically separate routing tables, e.g. to support features such as
++ *   VRF-lite.
+  * VCAP_KF_ARP_ADDR_SPACE_OK_IS: W1, sparx5: is2/es2, lan966x: is2
+  *   Set if hardware address is Ethernet
+  * VCAP_KF_ARP_LEN_OK_IS: W1, sparx5: is2/es2, lan966x: is2
+@@ -133,6 +142,9 @@ enum vcap_keyfield_set {
+  *   Target Hardware Address = SMAC (RARP)
+  * VCAP_KF_COSID_CLS: W3, sparx5: es0/es2
+  *   Class of service
++ * VCAP_KF_DST_FLAG: W1, sparx5: lpm
++ *   0: IP4_XIP/IP6_XIP is only to be used for SIP matching, 1: IP4_XIP/IP6_XIP is
++ *   only to be used for DIP matching
+  * VCAP_KF_ES0_ISDX_KEY_ENA: W1, sparx5: es2
+  *   The value taken from the IFH .FWD.ES0_ISDX_KEY_ENA
+  * VCAP_KF_ETYPE: W16, sparx5: is0/is2/es2, lan966x: is1/is2
+@@ -167,8 +179,22 @@ enum vcap_keyfield_set {
+  *   Mapping: 0: DEFAULT 1: LOOPBACK 2: MASQUERADE 3: CPU_VD
+  * VCAP_KF_IF_IGR_PORT_SEL: W1, sparx5: es2
+  *   Selector for IF_IGR_PORT: physical port number or ERLEG
++ * VCAP_KF_IP4_DIP: W32, sparx5: lpm
++ *   IPv4 destination address. Used for IPv4 MC routing.
+  * VCAP_KF_IP4_IS: W1, sparx5: is0/is2/es2, lan966x: is1/is2
+  *   Set if frame has EtherType = 0x800 and IP version = 4
++ * VCAP_KF_IP4_SIP: W32, sparx5: lpm
++ *   IPv4 source address. Used for IPv4 MC routing.
++ * VCAP_KF_IP4_XIP: W32, sparx5: lpm
++ *   IPv4 address. Used for IPv4 UC routing as well as IPv4 Source/Destination
++ *   Guard.
++ * VCAP_KF_IP6_DIP: W128, sparx5: lpm
++ *   IPv6 destination address. Used for IPv6 MC routing.
++ * VCAP_KF_IP6_SIP: W128, sparx5: lpm
++ *   IPv6 source address. Used for IPv6 MC routing.
++ * VCAP_KF_IP6_XIP: W128, sparx5: lpm
++ *   IPv6 address. Used for IPv6 UC routing as well as IPv6 Source/Destination
++ *   Guard.
+  * VCAP_KF_IP_MC_IS: W1, sparx5: is0, lan966x: is1
+  *   Set if frame is IPv4 frame and frame's destination MAC address is an IPv4
+  *   multicast address (0x01005E0 /25). Set if frame is IPv6 frame and frame's
+@@ -352,8 +378,8 @@ enum vcap_keyfield_set {
+  *   Set if frame is IPv4/IPv6 TCP or UDP frame (IP protocol/next header equals 6
+  *   or 17)
+  * VCAP_KF_TYPE: sparx5 is0 W2, sparx5 is0 W1, sparx5 is2 W4, sparx5 is2 W2,
+- *   sparx5 es0 W1, sparx5 es2 W3, lan966x is1 W1, lan966x is1 W2, lan966x is2 W4,
+- *   lan966x is2 W2
++ *   sparx5 es0 W1, sparx5 lpm W1, sparx5 es2 W3, lan966x is1 W1, lan966x is1 W2,
++ *   lan966x is2 W4, lan966x is2 W2
+  *   Keyset type id - set by the API
+  */
+ 
+@@ -387,6 +413,7 @@ enum vcap_key_field {
+ 	VCAP_KF_8021Q_VLAN_TAGGED_IS,
+ 	VCAP_KF_8021Q_VLAN_TAGS,
+ 	VCAP_KF_ACL_GRP_ID,
++	VCAP_KF_AFFIX,
+ 	VCAP_KF_ARP_ADDR_SPACE_OK_IS,
+ 	VCAP_KF_ARP_LEN_OK_IS,
+ 	VCAP_KF_ARP_OPCODE,
+@@ -395,6 +422,7 @@ enum vcap_key_field {
+ 	VCAP_KF_ARP_SENDER_MATCH_IS,
+ 	VCAP_KF_ARP_TGT_MATCH_IS,
+ 	VCAP_KF_COSID_CLS,
++	VCAP_KF_DST_FLAG,
+ 	VCAP_KF_ES0_ISDX_KEY_ENA,
+ 	VCAP_KF_ETYPE,
+ 	VCAP_KF_ETYPE_LEN_IS,
+@@ -408,7 +436,13 @@ enum vcap_key_field {
+ 	VCAP_KF_IF_IGR_PORT_MASK_RNG,
+ 	VCAP_KF_IF_IGR_PORT_MASK_SEL,
+ 	VCAP_KF_IF_IGR_PORT_SEL,
++	VCAP_KF_IP4_DIP,
+ 	VCAP_KF_IP4_IS,
++	VCAP_KF_IP4_SIP,
++	VCAP_KF_IP4_XIP,
++	VCAP_KF_IP6_DIP,
++	VCAP_KF_IP6_SIP,
++	VCAP_KF_IP6_XIP,
+ 	VCAP_KF_IP_MC_IS,
+ 	VCAP_KF_IP_PAYLOAD_5TUPLE,
+ 	VCAP_KF_IP_PAYLOAD_S1_IP6,
+@@ -490,6 +524,8 @@ enum vcap_key_field {
+ /* Actionset names with origin information */
+ enum vcap_actionfield_set {
+ 	VCAP_AFS_NO_VALUE,          /* initial value */
++	VCAP_AFS_ARP_ENTRY,         /* sparx5 lpm X1 */
++	VCAP_AFS_ARP_PTR,           /* sparx5 lpm X1 */
+ 	VCAP_AFS_BASE_TYPE,         /* sparx5 is2 X3, sparx5 es2 X3, lan966x is2 X2 */
+ 	VCAP_AFS_CLASSIFICATION,    /* sparx5 is0 X2 */
+ 	VCAP_AFS_CLASS_REDUCED,     /* sparx5 is0 X1 */
+@@ -506,6 +542,15 @@ enum vcap_actionfield_set {
+  *   Logical ID for the entry. This ID is extracted together with the frame in the
+  *   CPU extraction header. Only applicable to actions with CPU_COPY_ENA or
+  *   HIT_ME_ONCE set.
++ * VCAP_AF_ARP_ENA: W1, sparx5: lpm
++ *   Enable entry for address resolution usage.
++ * VCAP_AF_ARP_PTR: W11, sparx5: lpm
++ *   Pointer to entry in ARP Table.
++ * VCAP_AF_ARP_PTR_REMAP_ENA: W1, sparx5: lpm
++ *   If this bit is set, ARP_PTR is used to point to an entry in the ARP pointer
++ *   remap table.
++ * VCAP_AF_ARP_VMID: W9, sparx5: lpm
++ *   Routing lookup. Egress router leg (EVMID).
+  * VCAP_AF_CLS_VID_SEL: W3, sparx5: is0
+  *   Controls the classified VID: 0: VID_NONE: No action. 1: VID_ADD: New VID =
+  *   old VID + VID_VAL. 2: VID_REPLACE: New VID = VID_VAL. 3: VID_FIRST_TAG: New
+@@ -562,6 +607,11 @@ enum vcap_actionfield_set {
+  *   7: Mapped using mapping table 3, otherwise use mapping table 2
+  * VCAP_AF_DSCP_VAL: W6, sparx5: is0/es0, lan966x: is1
+  *   See DSCP_ENA.
++ * VCAP_AF_ECMP_CNT: W4, sparx5: lpm
++ *   Number of equal cost, multiple paths routes to DIP.
++ * VCAP_AF_ENCAP_ID: W10, sparx5: lpm
++ *   Index into REW:ENCAP_IP4 when encapsulating IP packet in IPv4. Disabled when
++ *   set to 0.
+  * VCAP_AF_ES2_REW_CMD: W3, sparx5: es2
+  *   Command forwarded to REW: 0: No action. 1: SWAP MAC addresses. 2: Do L2CP
+  *   DMAC translation when entering or leaving a tunnel.
+@@ -610,6 +660,12 @@ enum vcap_actionfield_set {
+  *   0: Forward based on PIPELINE_PT and FWD_SEL
+  * VCAP_AF_LRN_DIS: W1, sparx5: is2, lan966x: is2
+  *   Setting this bit to 1 disables learning of frames hitting this action.
++ * VCAP_AF_MAC_LSB: W32, sparx5: lpm
++ *   32 least significant bits of MAC address. Used for ARP entry and/or
++ *   (SMAC,SIP)/(DMAC,DIP) check.
++ * VCAP_AF_MAC_MSB: W16, sparx5: lpm
++ *   16 most significant bits of MAC address. Used for ARP entry and/or
++ *   (SMAC,SIP)/(DMAC,DIP) check.
+  * VCAP_AF_MAP_IDX: W9, sparx5: is0
+  *   Index for QoS mapping table lookup
+  * VCAP_AF_MAP_KEY: W3, sparx5: is0
+@@ -715,9 +771,17 @@ enum vcap_actionfield_set {
+  *   See QOS_ENA.
+  * VCAP_AF_REW_OP: W16, lan966x: is2
+  *   Rewriter operation command.
++ * VCAP_AF_RGID: W3, sparx5: lpm
++ *   Route Group ID. Used for SIP RPF check.
++ * VCAP_AF_RSDX: W12, sparx5: lpm
++ *   Router Leg Service Index for ARP table entry.
+  * VCAP_AF_RT_DIS: W1, sparx5: is2
+  *   If set, routing is disallowed. Only applies when IS_INNER_ACL is 0. See also
+  *   IGR_ACL_ENA, EGR_ACL_ENA, and RLEG_STAT_IDX.
++ * VCAP_AF_SECUR_MATCH_MAC_ENA: W1, sparx5: lpm
++ *   Enable Security MAC check.
++ * VCAP_AF_SECUR_MATCH_VMID_ENA: W1, sparx5: lpm
++ *   Enable Security VMID check.
+  * VCAP_AF_SFID_ENA: W1, lan966x: is1
+  *   If set, SFID_VAL is used to lookup ANA::SFID.
+  * VCAP_AF_SFID_VAL: W8, lan966x: is1
+@@ -726,6 +790,8 @@ enum vcap_actionfield_set {
+  *   If set, SGID_VAL is used to lookup ANA::SGID.
+  * VCAP_AF_SGID_VAL: W8, lan966x: is1
+  *   Stream gate identifier.
++ * VCAP_AF_SIP_RPF_ENA: W1, sparx5: lpm
++ *   Enable use for SIP RPF check.
+  * VCAP_AF_SWAP_MACS_ENA: W1, sparx5: es0
+  *   This setting is only active when FWD_SEL = 1 or FWD_SEL = 2 and PIPELINE_ACT
+  *   = LBK_ASM. 0: No action. 1: Swap MACs and clear bit 40 in new SMAC.
+@@ -774,7 +840,7 @@ enum vcap_actionfield_set {
+  * VCAP_AF_TAG_C_VID_SEL: W2, sparx5: es0
+  *   Selects VID for ES0 tag C. The resulting VID is termed C-TAG.VID. 0:
+  *   Classified VID. 1: VID_C_VAL. 2: IFH.ENCAP.GVID. 3: Reserved.
+- * VCAP_AF_TYPE: W1, sparx5: is0, lan966x: is1
++ * VCAP_AF_TYPE: sparx5 is0 W1, sparx5 lpm W2, lan966x is1 W1
+  *   Actionset type id - Set by the API
+  * VCAP_AF_UNTAG_VID_ENA: W1, sparx5: es0
+  *   Controls insertion of tag C. Untag or insert mode can be selected. See
+@@ -798,12 +864,18 @@ enum vcap_actionfield_set {
+  *   If set, use VLAN_POP_CNT as the number of VLAN tags to pop from the incoming
+  *   frame. This number is used by the Rewriter. Otherwise, VLAN_POP_CNT from
+  *   ANA:PORT:VLAN_CFG.VLAN_POP_CNT is used
++ * VCAP_AF_ZERO_DMAC_CPU_QU: W3, sparx5: lpm
++ *   CPU queue used for CPU redirect if MAC address in ARP entry is all-zeros.
+  */
+ 
+ /* Actionfield names */
+ enum vcap_action_field {
+ 	VCAP_AF_NO_VALUE,  /* initial value */
+ 	VCAP_AF_ACL_ID,
++	VCAP_AF_ARP_ENA,
++	VCAP_AF_ARP_PTR,
++	VCAP_AF_ARP_PTR_REMAP_ENA,
++	VCAP_AF_ARP_VMID,
+ 	VCAP_AF_CLS_VID_SEL,
+ 	VCAP_AF_CNT_ID,
+ 	VCAP_AF_COPY_PORT_NUM,
+@@ -823,6 +895,8 @@ enum vcap_action_field {
+ 	VCAP_AF_DSCP_ENA,
+ 	VCAP_AF_DSCP_SEL,
+ 	VCAP_AF_DSCP_VAL,
++	VCAP_AF_ECMP_CNT,
++	VCAP_AF_ENCAP_ID,
+ 	VCAP_AF_ES2_REW_CMD,
+ 	VCAP_AF_ESDX,
+ 	VCAP_AF_FWD_KILL_ENA,
+@@ -839,6 +913,8 @@ enum vcap_action_field {
+ 	VCAP_AF_ISDX_VAL,
+ 	VCAP_AF_LOOP_ENA,
+ 	VCAP_AF_LRN_DIS,
++	VCAP_AF_MAC_LSB,
++	VCAP_AF_MAC_MSB,
+ 	VCAP_AF_MAP_IDX,
+ 	VCAP_AF_MAP_KEY,
+ 	VCAP_AF_MAP_LOOKUP_SEL,
+@@ -874,11 +950,16 @@ enum vcap_action_field {
+ 	VCAP_AF_QOS_ENA,
+ 	VCAP_AF_QOS_VAL,
+ 	VCAP_AF_REW_OP,
++	VCAP_AF_RGID,
++	VCAP_AF_RSDX,
+ 	VCAP_AF_RT_DIS,
++	VCAP_AF_SECUR_MATCH_MAC_ENA,
++	VCAP_AF_SECUR_MATCH_VMID_ENA,
+ 	VCAP_AF_SFID_ENA,
+ 	VCAP_AF_SFID_VAL,
+ 	VCAP_AF_SGID_ENA,
+ 	VCAP_AF_SGID_VAL,
++	VCAP_AF_SIP_RPF_ENA,
+ 	VCAP_AF_SWAP_MACS_ENA,
+ 	VCAP_AF_TAG_A_DEI_SEL,
+ 	VCAP_AF_TAG_A_PCP_SEL,
+@@ -901,6 +982,7 @@ enum vcap_action_field {
+ 	VCAP_AF_VID_VAL,
+ 	VCAP_AF_VLAN_POP_CNT,
+ 	VCAP_AF_VLAN_POP_CNT_ENA,
++	VCAP_AF_ZERO_DMAC_CPU_QU,
+ };
+ 
+ #endif /* __VCAP_AG_API__ */
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_model_kunit.c b/drivers/net/ethernet/microchip/vcap/vcap_model_kunit.c
+index 5dbfc0d0c369..75819b49e110 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_model_kunit.c
++++ b/drivers/net/ethernet/microchip/vcap/vcap_model_kunit.c
+@@ -1,10 +1,10 @@
+ // SPDX-License-Identifier: BSD-3-Clause
+-/* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
++/* Copyright (C) 2026 Microchip Technology Inc. and its subsidiaries.
+  * Microchip VCAP test model interface for kunit testing
+  */
+ 
+-/* This file is autogenerated by cml-utils 2023-02-10 11:16:00 +0100.
+- * Commit ID: c30fb4bf0281cd4a7133bdab6682f9e43c872ada
++/* This file is autogenerated by cml-utils 2026-04-28 13:55:50 +0200.
++ * Commit ID: cd2494df16a1d3b14f650f720f6a8126b88b553a
+  */
+ 
+ #include <linux/types.h>
 
 -- 
 2.52.0
