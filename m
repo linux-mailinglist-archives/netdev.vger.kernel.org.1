@@ -1,86 +1,88 @@
-Return-Path: <netdev+bounces-298419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298420-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /9MhJE9aK2r07gMAu9opvQ
-	(envelope-from <netdev+bounces-298419-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 03:01:03 +0200
+	id d5i8ImFaK2oE7wMAu9opvQ
+	(envelope-from <netdev+bounces-298420-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 03:01:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C84D67607C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 03:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE316676086
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 03:01:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b=HG1HyNyj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298419-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298419-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b=mJ7FF2EI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298420-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298420-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=meta.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8F88326A6D1
-	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:00:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F60A320CA34
+	for <lists+netdev@lfdr.de>; Fri, 12 Jun 2026 01:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97B42BE051;
-	Fri, 12 Jun 2026 01:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE153043CE;
+	Fri, 12 Jun 2026 01:00:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A6425228C
-	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 01:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36265257423
+	for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 01:00:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781226055; cv=none; b=fX5q9quI9euMsMhKDvumn/51Tghz6HlAIm1VKlCHqC6E7jLVUBvqf+d9BJznNk95WzDpeVwsonqDT9/bZxDie/UOmt6VrqNfbOOD56g9YlL3zwYDhAvDF3yswEPrL2VgNjY73FwyLBGgfTQ2CPFmh7qpi56bArBUm979mHqyHxc=
+	t=1781226057; cv=none; b=utXbNrfxUiYOI4FTVDCsi2IjPZbsFam2IXD5S+F0tjYg27wbjBfADpaeaBYUKVuHSyywCM2YjtqwRByUmIilLfJ5I7lf1Y/Dy1OyRr5Q/wAu8sLGjeZ0fpEau4+8eOJup0J/2RboergoXrtMka/QH0HuGcC2tRZDo4E19/fttYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781226055; c=relaxed/simple;
-	bh=mm7lhGurzpH5S1D4K03Qa3k5Ics0Cd5OlZOIs6VTP1U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mTnWLdAfF1gaJv8+ufN0hndy/0eNJElKHODaTABdOG3H3if43yjGFVIqdI6KYrL3RjbFt3PIcHFGTpw1AeMb3/iu9iZsTAZKQwG4BCa6DJXZPRoTnH3Dv4U7I7zu69wzx2MhL/6ZX/YDngk6+bZBvuFDWKDnTg+2mFMABqbHyAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=HG1HyNyj; arc=none smtp.client-ip=67.231.153.30
+	s=arc-20240116; t=1781226057; c=relaxed/simple;
+	bh=4vFfd7p6BMFshFrovLRbt98ou0OiJ6mGAYdAldrrwyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Nms0DdZVKhmL3+f+oOSeoX4ZJjBtSA5LOZrWxbaomhzNSp2Si3OU2Fx8FHqXqxl22CrdnHCdPh7SMfUJBUYs5OVpQwBFkh8ozeA6ECVi09nK08iOnNi1bOXHYxZT/pgQN7oVtEpGT8oupZjoxPk8M/eKZkE3HzQ439N94O4M36k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=mJ7FF2EI; arc=none smtp.client-ip=67.231.153.30
 Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65BEvHnf2261822
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:51 -0700
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65BLJJFq3485128
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:54 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=s2048-2025-q2; bh=zFDj2IOT/JWpaH+VD8OkJUPInevQlFQ
-	dH2RzPJRh3Qk=; b=HG1HyNyj+U73SKLwM4GsJrV9X3AOr0Aze0Ckd32xiLQR85R
-	TPIC1lgy8EM7sfXNAYysf/6QNrWy92NuFQPAQfaB61+XaM8rCU5cCcSjEcsTy+f3
-	1Ng3RmrIyEsZi6kZd0ERzEMVkQUYqPA5mnaUOSi3id/WHbKQ14tkh7+jcihLS+1p
-	YtCkl46kLygTNxlOliCHqJt2uKStRL6D4EzDzRzrlVQNYpRc/KzsF0K7cVaa9jdX
-	xNhikC5b1RYQ2U3XVMzIEwsnHuM7rl4BreajsHLImbTpi9KJh4hhNK6YbRRz3Z3u
-	If+IXOJYHTW1WWuxoNbrZ6cWDCZrESwJwJhmWFg==
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4eqe7ba2mw-1
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=s2048-2025-q2; bh=P3nFYd6
+	OJee37pFzLOMCfyo5J2r5kcVCZE+bwDaSWwA=; b=mJ7FF2EIVYeR6OZc0cTXunK
+	ZRwj7FAt9ElkO7bYTMj01zIKQEHuOO0pDmJnTJBRdkLDjDIZo2CjSFaiLBfJKEvN
+	FaB1N1pP7GQfUHjUtwgHw2ZluGj2mrltBMXTQiD+FDZvWf2uhFk9k4bVK6Ss+EXo
+	JcKZ8I+RqkaX7MQR8Yu68pS3DJzibchD9W3COowE5B7oTTcD4bAbSBMNxVAc9phO
+	2Wvi6tUME4uQk+xXX6FskKbN+c+zREMYiPAY8GSho80oohuJV6R9nLdV+Q2LlqEc
+	4NYS/6RM1512g6WQVfrScCuDd676dJBr1yK6FImM2Vy3ykI4TK86lJtJWRE9Cng=
+	=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4eqe7ba2na-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:51 -0700 (PDT)
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7e71adbb398so877087a34.3
-        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:51 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:54 -0700 (PDT)
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e6ed99d4dbso616812a34.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jun 2026 18:00:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781226050; x=1781830850;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zFDj2IOT/JWpaH+VD8OkJUPInevQlFQdH2RzPJRh3Qk=;
-        b=Sffmiq8SpGTn6LO9VCILVKh5OKMdCJ0kzJr9q2MuAMS0sACzIEAXUDh3iET5ZiS2pS
-         zYTWM6YCfv90GA3IooXUbcKBzj4s1W+gIklEzgIoObZOgNLviInPJoXdfMYeHjPzSY2q
-         t9YvnhXK6dOY8CLDwXXhs02sdfqzSXPXI/O3Mytki0JnCgI8h0mwgagNv3UdDwj+5kqh
-         kFEITYfQRQVDZJRGAe6Ka6x/VPgW1qTkS/LKVbY4i4AwNZyEJv14swCJdZv9hIAz897R
-         Wfrj5t0wnHnTtr8g4A7kTNVZRyCrCvir/+tG7VWwyhHPjFHVomNruUXGMXnmBVIz21SA
-         0oVw==
-X-Gm-Message-State: AOJu0YyTpI44g62/nphmirWQFDvIO69I/cYoWed5dVqADQDqnKEbq//M
-	rf/0bJSeI+ISCwvpIqBTLufDQ31Eh87jpyLo2yQV6VAoJjlzF2lM++FxGen+UG2m6U2CCC396Zd
-	ShdUYmpqvwj1BO8yqBONcn4MDEz5u1IoFh6LD0xcs/3f1PBcZWfVMJvR1259+o1OXCAB5B3NQtV
-	QJ3JXUMYb6OBTGHynTC2JUcetf4onf0cl+K+0X
-X-Gm-Gg: Acq92OFjFTdnVPwPu4NVhOyYC4C8yWTEcOY2ylZGNTUuU5jUBilNSVRPiDkLLweeyPr
-	qC/1SUrXXV5KADNLS6LTmqq/WWk6ZOmlUZWzs5+r69jNQ/jDM1QZDQeFts3IgM0pNtxY9jb9f0S
-	T6YrIhw2hpuauhm+HBWnf4w9jBm0wXhFc0a7UqMSX4s8KV47lwCBh1nLKPW4RSQpAYP2xbI5Njk
-	oThZUuIoWFTTLtNODGE3sQv2Dn1tJEywMhANbn8yQRLcjrZibSMgm8jZHinFb4k/jleapltAItd
-	6U3ZFDUlCIRYxYGd6yUADD87xCDNPQPhUMrVGt2syjv42C+4vXJX5mL9haa4Dsgh8Bx5agadonL
-	IUMay1SHKnw==
-X-Received: by 2002:a05:6830:7007:b0:7e6:fdea:7aee with SMTP id 46e09a7af769-7e7847b6cf6mr381237a34.24.1781226050318;
-        Thu, 11 Jun 2026 18:00:50 -0700 (PDT)
-X-Received: by 2002:a05:6830:7007:b0:7e6:fdea:7aee with SMTP id 46e09a7af769-7e7847b6cf6mr381196a34.24.1781226049731;
-        Thu, 11 Jun 2026 18:00:49 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:4::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e78144823asm751251a34.5.2026.06.11.18.00.48
+        d=1e100.net; s=20251104; t=1781226053; x=1781830853;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=P3nFYd6OJee37pFzLOMCfyo5J2r5kcVCZE+bwDaSWwA=;
+        b=lcw6ZY59uXqIBCKmEjTwfioDkQ1NPkrJeMN/n7gM++EcJzAnEhFd9ZlzuE/WYfDA0B
+         7xS3pYYhdfGiYdXJH3bG2O2pvOAbHwFcxgZEPgqVZphhATD9L0AK1R3OYH8CKn+7R43o
+         xqEsO7C4s1rmSGrjUA7Qu9IeA+5iB1yvi7LNA5JgCgY1l7pcvuDq908TPf00fRMPDhMx
+         ec9S/llitiXJxXa0GU4qbYJOYwIhWBsZEVsCrRLAVU0QMN+AmEXsvqbG6k0D9iQMGB4h
+         q6AmWlwznmj631YU0knpnpqt7vXBkNDG/n6mylD4fUojKx1KGdg+qzf7rlJh7p30g4Pr
+         hUGg==
+X-Gm-Message-State: AOJu0YwIDQBouuK7pCBVj9FqaXED3r+FiIjMumR8vMlF54rgGugEvQiO
+	AeQxMSUBBR9EH2X0Q1KDt+RXUfos37Bjt6Wwltg0flBagumhAUioWL44PSpLw6dY0Lfdm1geLfV
+	PIvgYMrL0y68IPzTapFDmJ6JB9ptLdV0JDz5qBj4bcdyB61KEg6nXk5Gisb4+yUTHbqG4G3sMe6
+	qTGEfTDt/sm0Ku74dxlwXf4BWev4dA+IdC4MXL
+X-Gm-Gg: Acq92OHOaboKrr3dEJ/vHJlIzSy0bRbxb9wtFJc6p1v51K3wg31DiaAPIBa2rL2lMbt
+	v5ocfVj93UC80xYRfAWosLNpIiLQeWIpSKv2/6zD52nyqr9u8FN5LqDKJ5T6cEGIuLyHiOwZK+G
+	xqnWTjC1cAVb0y3FXQxPTLk1Fj2WrsyxIm35qpa0c1kDHwCi+71XrZcImKN3B+HeSbsAjWLh4na
+	aULoz5J5B7+VWZfMlnQ862v1vhd3tMttC+Xk7BIQmkJ0M2jqwBZyTzkuz6cAvWFdFKJ+qXwBcQj
+	sSaam65bU8xHoAo2ooho6qB5gb6ZkrwzvQkLk0o8kEi5CwqxX5VwxGXqdsHnb4TZ+iSs39hvPG8
+	08yCzax0=
+X-Received: by 2002:a05:6820:4b88:b0:696:1cb2:20d6 with SMTP id 006d021491bc7-69edc73dfb8mr542194eaf.30.1781226053024;
+        Thu, 11 Jun 2026 18:00:53 -0700 (PDT)
+X-Received: by 2002:a05:6820:4b88:b0:696:1cb2:20d6 with SMTP id 006d021491bc7-69edc73dfb8mr542156eaf.30.1781226052303;
+        Thu, 11 Jun 2026 18:00:52 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4426ab0f03bsm523241fac.4.2026.06.11.18.00.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 18:00:49 -0700 (PDT)
+        Thu, 11 Jun 2026 18:00:51 -0700 (PDT)
 From: Neil Spring <ntspring@meta.com>
 To: netdev@vger.kernel.org
 Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
@@ -88,10 +90,12 @@ Cc: edumazet@google.com, ncardwell@google.com, kuniyu@google.com,
         pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
         linux-kselftest@vger.kernel.org, ntspring@meta.com,
         bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net
-Subject: [PATCH net-next v13 0/2] tcp: rehash onto different local ECMP path on retransmit timeout
-Date: Thu, 11 Jun 2026 18:00:45 -0700
-Message-ID: <20260612010047.1377331-1-ntspring@meta.com>
+Subject: [PATCH net-next v13 1/2] tcp: rehash onto different local ECMP path on retransmit timeout
+Date: Thu, 11 Jun 2026 18:00:46 -0700
+Message-ID: <20260612010047.1377331-2-ntspring@meta.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260612010047.1377331-1-ntspring@meta.com>
+References: <20260612010047.1377331-1-ntspring@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,24 +103,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDAwNiBTYWx0ZWRfX5/uTAGuQ4qCb
- pAqfbWTedgwxORdJf2Nj/RkYdc6Vu2SD9WzQVVFE7LCxxISNwMS7wK7n7pEbr09FIn8gEZ2xUn1
- nb3YezQIXwcTk3ZiHDIGXj3r5OePHg8=
-X-Proofpoint-GUID: KA6VagU7bhYDEmwBy6CakhEgE_5Cjl79
-X-Proofpoint-ORIG-GUID: KA6VagU7bhYDEmwBy6CakhEgE_5Cjl79
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDAwNiBTYWx0ZWRfX0CeOfGXyleSK
- Kqc0RXmtL5g/AI3h3UOudlHYb3LiWiC3rF0f0zbDVqJxcTYs1AzKqZ2U7s/Rd00tvNvaiP3GViO
- kQ1eohkVQm5x0rZnMiFHUwPFYO170gRn/QRyIw+6imlvrrOKCF9I/pAYXtg0ftVK3YsuCzalCEf
- leu1oYzOTc6kVeTRmtx7CbOPcgg681txJ6WVtfB+2SuiT13N/KtFHxKQGMDZJflMlhL3IulYPi7
- HyemYloCRqVcPjB8U0NcpiKNICW+Ycttux/UUlJQpW0GRg1GSAFl8/rhreulqwGCGBPpFqiwzfo
- tDVh0eLaEDmltO3pkjH/GXxlatqBjWxpSK1ua4EA9XdGvkzuB2LjO7h7irRT7zNllKOlET/G+f+
- 1JKeNEujAY+QCpFkrPqVETrBQbdCyTI0jy7iqo6+SeQoMBU0DfiuWgR0ulI5EgzDzPsFuKmVsRS
- fZR5Np8mKSmXby56cFA==
-X-Authority-Analysis: v=2.4 cv=C8nZDwP+ c=1 sm=1 tr=0 ts=6a2b5a43 cx=c_pps
- a=z9lCQkyTxNhZyzAvolXo/A==:117 a=xqWC_Br6kY4A:10 a=FelO9ux0wxsA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEyMDAwNiBTYWx0ZWRfX6UB7u8edRMjI
+ 9KtZirvwJctQv5PPD/bniV0iU+NZYi2Fb8fvrUQlwpVIkx+gL+NpvGkFRbXgElLk72YrNMGuq+f
+ sThWKdUJw6j4HJtR8j4reQeXFRSdA5k=
+X-Proofpoint-GUID: ihGW0On4c3iWcX17aMBABD8MLuMEgiDw
+X-Proofpoint-ORIG-GUID: ihGW0On4c3iWcX17aMBABD8MLuMEgiDw
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEyMDAwNiBTYWx0ZWRfX9ffPbPCrWySX
+ xa0ygZWcBK35fvmKAuRWNCMh04g3ORArnmJYFwxgbk0aG2wA25mwoiO6pERDgATU6uksTct/Hfl
+ h//fgF36nnz/OKieDHbzpgmWNnavBWOkpACOJB3QbhY71VZap9+wB6y2SKORNdzqVcu/+wrZEpi
+ dgNhgU8l8lcWwNj9lbVhmuUgW02so1khb7z51ZzA2aQNt6DP1thQ/DuJBw0SZtpjNpbCX+6tr/6
+ Gafv51rUimzXbUfIKnjig1Npb9SVWnanMwuNYem2Gcbv33NBH+KJ+5DcpHl2sV8f1DqUmcKUkNk
+ p+ZRpmzRerGJ8b3qBqUx9EI18HzuTTDS5swLj509/p6DIv35HoYz/f7LYjeP7OxIguz/dam+TjO
+ 55SKdrhFOusVUHEIPyMxrkDTIR35Or2/bQSu9ZEqcdaMgUdPGhaqZGExHvqeXHVl2Nqs5sI5K3s
+ iUkjB8m/8YeLG+Rtygw==
+X-Authority-Analysis: v=2.4 cv=C8nZDwP+ c=1 sm=1 tr=0 ts=6a2b5a46 cx=c_pps
+ a=+3WqYijBVYhDct2f5Fivkw==:117 a=xqWC_Br6kY4A:10 a=FelO9ux0wxsA:10
  a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=xtH7KyWI9dI7BmFOsl-x:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
- a=FMVIpMHTegAHNGUTmSsA:9 a=EyFUmsFV_t8cxB2kMr4A:22 a=gKebqoRLp9LExxC7YDUY:22
+ a=xtH7KyWI9dI7BmFOsl-x:22 a=VabnemYjAAAA:8 a=lg01szkEsf34iIS5_2gA:9
+ a=eYe2g0i6gJ5uXG_o6N4q:22 a=gKebqoRLp9LExxC7YDUY:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-11_05,2026-06-11_01,2025-10-01_01
@@ -133,7 +137,7 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298419-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298420-lists,netdev=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
@@ -156,228 +160,435 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7C84D67607C
+X-Rspamd-Queue-Id: DE316676086
 
-Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO,
-PLB, and spurious-retransmission events, but the new hash is not
-propagated into the IPv6 ECMP path selection.  The cached
-route is reused and fib6_select_path() is never re-invoked, so
-the connection uses the same local ECMP decision.
+Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO, PLB,
+and spurious-retransmission events, but the cached route is reused and
+the new hash is not propagated into the ECMP path selection logic.  Two
+changes are needed to make rehash select a different local ECMP path:
 
-This series adds the two missing pieces:
+1. Add __sk_dst_reset() alongside sk_rethink_txhash() in
+   tcp_write_timeout(), tcp_rcv_spurious_retrans(), and
+   tcp_plb_check_rehash() so the cached dst is invalidated and the
+   next transmit triggers a fresh route lookup.
 
-1. __sk_dst_reset() alongside sk_rethink_txhash() so the cached dst
-   is invalidated and the next transmit triggers a fresh route lookup.
+2. Set fl6->mp_hash from sk_txhash (or tcp_rsk(req)->txhash for
+   SYN/ACK retransmits and syncookies) in tcp_v6_connect(),
+   inet6_sk_rebuild_header(), inet6_csk_route_req(),
+   inet6_csk_route_socket(), tcp_v6_send_response(), and
+   cookie_v6_check() so fib6_select_path() picks a path based on the
+   new hash.
 
-2. fl6->mp_hash set from sk_txhash before each route lookup so
-   fib6_select_path() picks a path from the (potentially re-rolled) hash.
+The mp_hash override only applies to fib_multipath_hash_policy 0 (the
+default L3 policy).  Its hash includes the flow label, but that is 0 by
+default -- np->flow_label is unset, and auto_flowlabels only computes
+the on-wire label later, per packet -- so flows to the same peer share
+one local path.  Keying the hash on sk_txhash makes the local path
+per-connection and lets a rehash re-select it.  Policies 1-3 are left
+unchanged.
 
-The override applies only to fib_multipath_hash_policy 0 (the default L3
-policy).  Its hash includes the flow label, but that is 0 by default
-(np->flow_label is unset; auto_flowlabels computes the on-wire label
-later, per packet), so flows to the same peer share one local path.
-Keying it on sk_txhash makes that local path per-connection and lets a
-rehash re-select it; even when a flow label is present (reflected REPFLOW
-or explicitly set) only local path selection changes -- the on-wire flow
-label is unaffected.  Policies 1-3 are left unchanged.
+The mp_hash assignment is factored into a small helper,
+ip6_ecmp_set_mp_hash(), shared by inet6_csk_route_req(),
+inet6_csk_route_socket(), tcp_v6_connect(), inet6_sk_rebuild_header(),
+tcp_v6_send_response(), and cookie_v6_check().  It applies
+(txhash >> 1) ?: 1 for policy 0 (the >> 1 keeps mp_hash in the 31-bit
+range; ?: 1 keeps it non-zero, since 0 would fall back to
+rt6_multipath_hash()).  inet6_csk_route_socket() calls it only for
+sk_protocol == IPPROTO_TCP so that non-TCP callers (e.g., L2TP via
+inet6_csk_xmit) fall through to rt6_multipath_hash() and retain their
+existing flow-key-based ECMP behavior.
 
-Patch 1 is the kernel change; patch 2 adds selftests covering SYN
-rehash, SYN/ACK rehash, midstream RTO rehash, midstream ACK rehash
-(spurious retransmission), PLB rehash, a policy 1 negative test,
-a flowlabel leak regression test, two dst rebuild consistency
-tests (normal and syncookie) verifying that natural route
-invalidation does not cause unintended path changes, and a
-syncookie server path consistency test verifying that the SYN-ACK
-and post-cookie ACKs use the same ECMP nexthop.
+tcp_v6_send_response() also sets mp_hash from the response txhash so
+that a control packet (a RST from the full socket, or an ACK from a
+time-wait socket) selects the same local ECMP nexthop as the
+connection's txhash rather than falling back to the flow hash.  The
+time-wait socket's tw_txhash is copied from sk_txhash when the
+connection enters TIME_WAIT, so it reflects any rehash that occurred.
 
-Changes since v12: https://lore.kernel.org/netdev/20260604212246.265079-1-ntspring@meta.com/
-Patch 1:
-- Factor the repeated policy-0 IPv6 mp_hash assignment into a shared
-  ip6_ecmp_set_mp_hash() helper (Paolo Abeni)
-- Replace the open-coded txhash reroll + dst reset at the three rehash
-  sites with a __sk_rethink_txhash_reset_dst() helper, kept separate
-  from sk_rethink_txhash() so dst_negative_advice()'s dst op still runs
-  (Paolo Abeni)
-Patch 2:
-- Check the first rehash attempt's exit status directly instead of via
-  $? (shellcheck SC2181), and drop the redundant fail_reason capture on
-  the tolerated first attempt (Paolo Abeni)
-- Redirect the remaining slowwait stdout to /dev/null so loopy_wait's
-  counter output cannot leak into the captured failure message
-  (Sashiko AI review)
+Setting mp_hash explicitly is necessary because the default ECMP hash
+derives from fl6->flowlabel via np->flow_label, which is not updated
+from sk_txhash (REPFLOW is off by default).  ip6_make_flowlabel()
+cannot help either, as it runs after the route lookup.
 
-Changes since v11: https://lore.kernel.org/netdev/20260602181428.2318919-1-ntspring@meta.com/
-Patch 1:
-- Fix the IPv6-only rule to exclude IPv4-mapped connections: key the
-  cookie txhash on skb->protocol, not sk->sk_family (Sashiko AI review)
-- Set fl6->mp_hash in tcp_v6_send_response() so RSTs and time-wait
-  ACKs use the connection's ECMP path (Sashiko AI review)
-- Remove the bpf_sk_assign_tcp_reqsk() txhash init added in v7; it is
-  redundant, as cookie_tcp_reqsk_init() always sets txhash before the
-  request socket is routed (verified by poisoning txhash and running
-  the tcp_custom_syncookie BPF selftest: the route lookup never saw
-  the poison)
-- Document that policy 0 IPv6 TCP ECMP selection follows txhash over a
-  reflected/explicit flow label (on-wire flow label unchanged)
-Patch 2:
-- Drain TCP teardown between rounds so late FIN/RST packets do not
-  pollute the next round's tc filter counters (bot+bpf-ci)
-- Skip the syncookie tests when CONFIG_SYN_COOKIES is unavailable;
-  select it in selftests/net/config
+As a consequence, for policy 0 the local ECMP path of an IPv6 TCP
+flow follows sk_txhash even when fl6->flowlabel is non-zero, e.g. a
+reflected (REPFLOW) or explicitly set (IPV6_FLOWLABEL_MGR) flow
+label.  This is intentional: only local path selection changes, so
+rehash can recover from a failed path; the on-wire flow label is
+unchanged.
 
-Changes since v10: https://lore.kernel.org/netdev/20260529160136.1010064-1-ntspring@meta.com/
-Patch 1:
-- Fix build without CONFIG_SYN_COOKIES
-- Leave IPv4 syncookie txhash unmodified (`net_tx_rndhash()`)
-- Document the IPv6 TCP policy 0 behavior change in ip-sysctl.rst
-Patch 2:
-- Correct runtime estimate from ~15s to ~60s
-- Build DCTCP as `=y` instead of `=m` to avoid module load races
-- Fix false failure of the midstream ACK test by limiting the send
-  buffer to avoid a closed receive window; window probes do not
-  cause rehash
+sk_set_txhash() is moved before ip6_dst_lookup_flow() in
+tcp_v6_connect() so the initial ECMP path is selected by the same
+txhash that subsequent route rebuilds will use.  This avoids
+unintended path changes when the cached dst is naturally invalidated
+(e.g., by PMTU discovery or route changes).
 
-Changes since v9: https://lore.kernel.org/netdev/20260526203403.3517607-1-ntspring@meta.com/
-Patch 1:
-- Split cookie_init_sequence() into pure computation and a new
-  cookie_record_sent() helper for the side effects; call
-  cookie_record_sent() after route_req() succeeds so the overflow
-  timestamp and SYNCOOKIESSENT counter are not bumped when no
-  SYN-ACK is sent
-Patch 2:
-- Make midstream ACK rehash test more reliable by blocking the unused
-  path first
-- Fix port overlap when ECMP_REBUILD_ROUNDS exceeds the default
+The rehash sites (tcp_write_timeout(), tcp_plb_check_rehash(), and
+tcp_rcv_spurious_retrans()) call __sk_rethink_txhash_reset_dst(),
+which re-rolls the txhash and, when it changed, drops the cached dst
+so the next transmit re-runs route selection.  The dst reset is
+guarded by sk->sk_family == AF_INET6 since IPv4 ECMP does not
+currently use sk_txhash for path selection.  For IPv4-mapped IPv6
+sockets this produces a redundant dst reset on a cold path
+(RTO/PLB); the subsequent IPv4 route lookup returns the same result.
+The helper is deliberately separate from sk_rethink_txhash() itself:
+dst_negative_advice() calls sk_rethink_txhash() before its own dst op,
+so resetting the dst inside sk_rethink_txhash() would skip that op
+(e.g. rt6_remove_exception_rt()).
 
-Changes since v8: https://lore.kernel.org/netdev/20260522215733.929238-1-ntspring@meta.com/
-Patch 1:
-- Fix REPFLOW flowlabel reflection for syncookie SYN-ACKs: pass 0 as
-  tw_isn to route_req() so tcp_v6_init_req() saves ireq->pktopts
-Patch 2:
-- Give midstream and ACK rehash attempt helpers distinct failure
-  messages (no TX activity vs no data on alternate path vs counter
-  not incrementing) instead of a single generic error
-- Drop unused ns_server parameter from ecmp_dst_rebuild_check()
-- Clean up server socat before break on setup failure in the dst
-  rebuild loop
+For syncookies, cookie_init_sequence() computes the cookie value
+before route_req() and sets txhash so the SYN-ACK selects the same
+ECMP path that cookie_v6_check() will use when the full socket is
+created.  cookie_tcp_reqsk_init() derives txhash from the cookie so
+the full socket's ECMP path matches the SYN-ACK.  Both the SYN-ACK
+assignment in tcp_conn_request() and the full-socket assignment in
+cookie_tcp_reqsk_init() are keyed on the packet family
+(skb->protocol == ETH_P_IPV6), not sk->sk_family: a dual-stack
+AF_INET6 listener also serves IPv4 connections, and the v4 cookie has
+mssind bits that would bias TX queue distribution if used as txhash.
+IPv4 connections retain net_tx_rndhash().
 
-Changes since v7: https://lore.kernel.org/netdev/20260520064310.4154268-1-ntspring@meta.com/
-Patch 1:
-- Remove #if IS_ENABLED(CONFIG_IPV6) guards around __sk_dst_reset()
-  in tcp_plb.c and tcp_timer.c (Eric Dumazet)
-- Guard mp_hash in inet6_csk_route_socket() on sk_protocol == IPPROTO_TCP
-  instead of txhash != 0, since non-TCP callers like L2TP set sk_txhash
-  in __ip6_datagram_connect() and should retain flow-key-based ECMP
-- Use the syncookie (ISN) as txhash for both the SYN-ACK route lookup
-  and cookie_v6_check() socket creation, so the server's ECMP selection is
-  consistent across the stateless SYN-ACK and the subsequent full socket.
-  Move cookie_init_sequence() before route_req() in tcp_conn_request()
-  so the SYN-ACK dst is computed with the cookie-derived txhash; derive
-  txhash from snt_isn in cookie_tcp_reqsk_init() to match
-Patch 2:
-- Invalidate dst via dummy route add/del instead of route replace to
-  avoid a transient single-nexthop state during multipath replacement
-- Add syncookie server path consistency test verifying the SYN-ACK and
-  post-cookie ACKs use the same ECMP path
-- Strengthen policy 1 negative test to wait for multiple rehash attempts
-  and verify SYNs landed on exactly one interface
+cookie_init_sequence() is split from the former version that also
+called tcp_synq_overflow() and incremented SYNCOOKIESSENT; those
+side effects are now in cookie_record_sent(), called after
+route_req() succeeds so they are not bumped when route_req() fails.
+cookie_record_sent() is guarded by CONFIG_SYN_COOKIES to
+match the guard on tcp_synq_overflow().  route_req() receives 0 as
+tw_isn for the syncookie path so that tcp_v6_init_req() still saves
+ireq->pktopts for REPFLOW flowlabel reflection and IPv6 cmsg
+options.  The ecn_ok clear for syncookies without timestamps stays
+after tcp_ecn_create_request() so it takes precedence.
 
-Changes since v6: https://lore.kernel.org/netdev/20260517174522.2232057-1-ntspring@meta.com/
-- Guard mp_hash assignment so that non-TCP callers of
-  inet6_csk_route_socket() fall through to rt6_multipath_hash()
-  (superseded in v8 by sk_protocol == IPPROTO_TCP guard)
-- Initialize txhash in bpf_sk_assign_tcp_reqsk() to avoid reading
-  uninitialized slab memory in inet6_csk_route_req() (reverted in v12
-  as redundant)
-- Check post-rebuild busywait return status to avoid silent false pass
+Signed-off-by: Neil Spring <ntspring@meta.com>
+---
+ Documentation/networking/ip-sysctl.rst |  6 +++++-
+ include/net/ipv6.h                     | 12 ++++++++++++
+ include/net/sock.h                     | 14 ++++++++++++++
+ include/net/tcp.h                      | 20 ++++++++++++++------
+ net/ipv4/syncookies.c                  | 11 ++++++++++-
+ net/ipv4/tcp_input.c                   | 18 ++++++++++++++----
+ net/ipv4/tcp_plb.c                     |  2 +-
+ net/ipv4/tcp_timer.c                   |  2 +-
+ net/ipv6/af_inet6.c                    |  2 ++
+ net/ipv6/inet6_connection_sock.c       |  5 +++++
+ net/ipv6/syncookies.c                  |  2 ++
+ net/ipv6/tcp_ipv6.c                    | 19 +++++++++++++++++--
+ 12 files changed, 97 insertions(+), 16 deletions(-)
 
-Changes since v5: https://lore.kernel.org/netdev/20260513204048.2721843-1-ntspring@meta.com/
-- Improve selftest reliability: suppress __dst_negative_advice() via
-  tcp_retries1=255 in dst rebuild tests so a real RTO cannot trigger
-  an unintended rehash; add internal retry to midstream and ACK
-  rehash tests to tolerate probabilistic ECMP path selection; fix
-  midstream baseline capture to account for packets that bypass tc
-  filters during the prio qdisc's TCQ_F_CAN_BYPASS window
-- Increase ECMP_REBUILD_ROUNDS default to 10 for reliable regression
-  detection with 2-way ECMP; replace sleep with busywait
-- Use tcp_allowed_congestion_control instead of changing the host's
-  default congestion control for PLB test
-- Use (txhash >> 1) ?: 1 to guarantee non-zero mp_hash, since zero
-  falls back to rt6_multipath_hash()
-
-Changes since v4: https://lore.kernel.org/netdev/20260507171319.1259115-1-ntspring@meta.com/
-- Condition fl6->mp_hash on fib_multipath_hash_policy == 0 to preserve
-  deterministic hash policies 1-3 (e.g., symmetric 5-tuple for policy 1)
-- Set fl6->mp_hash in tcp_v6_connect() and cookie_v6_check() for
-  initial route lookup consistency; move sk_set_txhash() earlier
-  (Jakub Kicinski)
-- Add policy 1 negative test; improve sysctl save/restore
-- Add flowlabel leak test confirming mp_hash does not alter the
-  on-wire IPv6 flow label
-- Add dst rebuild consistency tests (normal and syncookie) verifying
-  that route table changes do not cause unintended ECMP path changes
-
-Changes since v3: https://lore.kernel.org/netdev/20260505193824.2791642-1-ntspring@meta.com/
-- Use __sk_dst_reset() instead of sk_dst_reset() since the socket lock
-  is held in all three call sites (Eric Dumazet)
-- Guard __sk_dst_reset() with sk->sk_family == AF_INET6 since IPv4 ECMP
-  does not use sk_txhash for path selection
-- Guard __sk_dst_reset() in tcp_plb_check_rehash() with the return value
-  of sk_rethink_txhash()
-- Move tcp_rsk(req)->txhash initialization before route_req() in
-  tcp_conn_request() to avoid reading uninitialized memory
-- Add CONFIG_TCP_CONG_DCTCP=m to selftests/net/config for PLB test
-- Skip PLB test gracefully if DCTCP is not available
-- Save and restore original congestion control algorithm in PLB test
-- Default get_netstat_counter() to 0 when counter is not found
-- Skip all tests if tcp_syn_linear_timeouts is not available
-- Replace bash/pipe data sources with socat OPEN:/dev/zero for
-  cleaner process cleanup
-- Fix shellcheck warnings
-
-Changes since v2: https://lore.kernel.org/netdev/20260408070514.1840227-1-ntspring@meta.com/
-- Retitle "ECMP" to "local ECMP" to distinguish from remote ECMP
-  (Neal Cardwell)
-- Add fl6->mp_hash propagation in inet6_sk_rebuild_header() (af_inet6.c),
-  covering the dst rebuild path used on established sockets
-- Remove incorrect ir_iif update from tcp_check_req() in tcp_minisocks.c;
-  the SYN/ACK rehash is already handled by tcp_rtx_synack() re-rolling
-  txhash which feeds into inet6_csk_route_req()'s mp_hash
-  (Eric Dumazet)
-- Add ACK rehash and PLB rehash selftests
-- Improve selftest reliability
-
-Changes since v1: https://lore.kernel.org/netdev/20260408002802.2448424-1-ntspring@meta.com/
-- Use tcp_rsk(req)->txhash instead of jhash_1word(req->num_retrans, ...)
-  for ECMP path selection in inet6_csk_route_req(), making the request
-  socket path consistent with the established socket path (Eric Dumazet)
-- Add comments explaining the >> 1 shift for 31-bit mp_hash range
-- Use socat -u (unidirectional) in selftest to avoid SIGPIPE race
-- Increase tcp_syn_retries and tcp_syn_linear_timeouts to 25 for
-  better rehash coverage
-
-Neil Spring (2):
-  tcp: rehash onto different local ECMP path on retransmit timeout
-  selftests: net: add local ECMP rehash test
-
- Documentation/networking/ip-sysctl.rst     |    6 +-
- include/net/ipv6.h                         |   11 +
- include/net/sock.h                         |   14 +
- include/net/tcp.h                          |   20 +-
- net/ipv4/syncookies.c                      |   11 +-
- net/ipv4/tcp_input.c                       |   18 +-
- net/ipv4/tcp_plb.c                         |    2 +-
- net/ipv4/tcp_timer.c                       |    2 +-
- net/ipv6/af_inet6.c                        |    2 +
- net/ipv6/inet6_connection_sock.c           |    5 +
- net/ipv6/syncookies.c                      |    2 +
- net/ipv6/tcp_ipv6.c                        |   19 +-
- tools/testing/selftests/net/Makefile       |    1 +
- tools/testing/selftests/net/config         |    2 +
- tools/testing/selftests/net/ecmp_rehash.sh | 1112 ++++++++++++++++++++
- 15 files changed, 1211 insertions(+), 16 deletions(-)
- create mode 100755 tools/testing/selftests/net/ecmp_rehash.sh
-
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 2e3a746fcc6d..9905f5aa2427 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2444,7 +2444,11 @@ fib_multipath_hash_policy - INTEGER
+ 
+ 	Possible values:
+ 
+-	- 0 - Layer 3 (source and destination addresses plus flow label)
++	- 0 - Layer 3 (source and destination addresses plus flow label).
++	  For IPv6 TCP, the local ECMP path is selected from the socket
++	  txhash rather than the flow label, and may change after a TCP
++	  rehash event (such as a retransmission timeout) to recover from
++	  path failure.  The on-wire flow label is unaffected.
+ 	- 1 - Layer 4 (standard 5-tuple)
+ 	- 2 - Layer 3 or inner Layer 3 if present
+ 	- 3 - Custom multipath hash. Fields used for multipath hash calculation
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index d042afe7a245..8a8eb30e2980 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -952,6 +952,18 @@ static inline u32 ip6_multipath_hash_fields(const struct net *net)
+ }
+ #endif
+ 
++/* Derive the IPv6 ECMP hash from txhash so a rehash may pick a different path;
++ * policy 0 only, and only when txhash is set.  >> 1 clears the top bit
++ * (fib6_select_path() uses mp_hash as a signed 31-bit value); ?: 1 keeps the
++ * result non-zero, since mp_hash 0 falls back to rt6_multipath_hash().
++ */
++static inline void ip6_ecmp_set_mp_hash(const struct net *net,
++					struct flowi6 *fl6, u32 txhash)
++{
++	if (ip6_multipath_hash_policy(net) == 0 && txhash)
++		fl6->mp_hash = (txhash >> 1) ?: 1;
++}
++
+ /*
+  *	Header manipulation
+  */
+diff --git a/include/net/sock.h b/include/net/sock.h
+index dccd3738c368..6ea7daab7660 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2252,6 +2252,20 @@ sk_dst_reset(struct sock *sk)
+ 	sk_dst_set(sk, NULL);
+ }
+ 
++/* Re-roll the socket txhash.  On a rehash, IPv6 also drops the cached route
++ * so the next transmit re-selects an ECMP path; IPv4 keeps its route, since
++ * IPv4 ECMP path selection does not use sk_txhash.
++ */
++static inline bool __sk_rethink_txhash_reset_dst(struct sock *sk)
++{
++	if (sk_rethink_txhash(sk)) {
++		if (sk->sk_family == AF_INET6)
++			__sk_dst_reset(sk);
++		return true;
++	}
++	return false;
++}
++
+ struct dst_entry *__sk_dst_check(struct sock *sk, u32 cookie);
+ 
+ struct dst_entry *sk_dst_check(struct sock *sk, u32 cookie);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 3c4e6adb0dbd..75d265d19bce 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2540,22 +2540,30 @@ extern const struct tcp_request_sock_ops tcp_request_sock_ipv6_ops;
+ 
+ #ifdef CONFIG_SYN_COOKIES
+ static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
+-					 const struct sock *sk, struct sk_buff *skb,
+-					 __u16 *mss)
++					 struct sk_buff *skb, __u16 *mss)
+ {
+-	tcp_synq_overflow(sk);
+-	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESSENT);
+ 	return ops->cookie_init_seq(skb, mss);
+ }
+ #else
+ static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
+-					 const struct sock *sk, struct sk_buff *skb,
+-					 __u16 *mss)
++					 struct sk_buff *skb, __u16 *mss)
+ {
+ 	return 0;
+ }
+ #endif
+ 
++#ifdef CONFIG_SYN_COOKIES
++static inline void cookie_record_sent(const struct sock *sk)
++{
++	tcp_synq_overflow(sk);
++	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESSENT);
++}
++#else
++static inline void cookie_record_sent(const struct sock *sk)
++{
++}
++#endif
++
+ struct tcp_key {
+ 	union {
+ 		struct {
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index df479277fb80..cc71d84df42b 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -280,9 +280,18 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+ 	treq->snt_synack = 0;
+ 	treq->snt_tsval_first = 0;
+ 	treq->tfo_listener = false;
+-	treq->txhash = net_tx_rndhash();
+ 	treq->rcv_isn = ntohl(th->seq) - 1;
+ 	treq->snt_isn = ntohl(th->ack_seq) - 1;
++	if (skb->protocol == htons(ETH_P_IPV6)) {
++		/* Use the cookie as txhash so the ECMP path matches
++		 * the SYN-ACK, where txhash was also set to the
++		 * cookie.  The original request socket (and its
++		 * txhash) was freed after sending the SYN-ACK.
++		 */
++		treq->txhash = treq->snt_isn;
++	} else {
++		treq->txhash = net_tx_rndhash();
++	}
+ 	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
+ 
+ #if IS_ENABLED(CONFIG_MPTCP)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 7995a89bafc9..f194faeac166 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -5020,8 +5020,9 @@ static void tcp_rcv_spurious_retrans(struct sock *sk,
+ 	    skb->protocol == htons(ETH_P_IPV6) &&
+ 	    (tcp_sk(sk)->inet_conn.icsk_ack.lrcv_flowlabel !=
+ 	     ntohl(ip6_flowlabel(ipv6_hdr(skb)))) &&
+-	    sk_rethink_txhash(sk))
++	    __sk_rethink_txhash_reset_dst(sk)) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAREHASH);
++	}
+ 
+ 	/* Save last flowlabel after a spurious retrans. */
+ 	tcp_save_lrcv_flowlabel(sk, skb);
+@@ -7636,6 +7637,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	tcp_rsk(req)->af_specific = af_ops;
+ 	tcp_rsk(req)->ts_off = 0;
+ 	tcp_rsk(req)->req_usec_ts = false;
++	tcp_rsk(req)->txhash = net_tx_rndhash();
+ #if IS_ENABLED(CONFIG_MPTCP)
+ 	tcp_rsk(req)->is_mptcp = 0;
+ #endif
+@@ -7659,7 +7661,16 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	/* Note: tcp_v6_init_req() might override ir_iif for link locals */
+ 	inet_rsk(req)->ir_iif = inet_request_bound_dev_if(sk, skb);
+ 
+-	dst = af_ops->route_req(sk, skb, &fl, req, isn);
++	if (want_cookie) {
++		isn = cookie_init_sequence(af_ops, skb, &req->mss);
++		/* Use the cookie as txhash so the SYN-ACK and the later
++		 * full socket select the same IPv6 ECMP path.
++		 */
++		if (skb->protocol == htons(ETH_P_IPV6))
++			tcp_rsk(req)->txhash = isn;
++	}
++
++	dst = af_ops->route_req(sk, skb, &fl, req, want_cookie ? 0 : isn);
+ 	if (!dst)
+ 		goto drop_and_free;
+ 
+@@ -7699,7 +7710,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	tcp_ecn_create_request(req, skb, sk, dst);
+ 
+ 	if (want_cookie) {
+-		isn = cookie_init_sequence(af_ops, sk, skb, &req->mss);
++		cookie_record_sent(sk);
+ 		if (!tmp_opt.tstamp_ok)
+ 			inet_rsk(req)->ecn_ok = 0;
+ 	}
+@@ -7717,7 +7728,6 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	}
+ #endif
+ 	tcp_rsk(req)->snt_isn = isn;
+-	tcp_rsk(req)->txhash = net_tx_rndhash();
+ 	tcp_rsk(req)->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
+ 	tcp_openreq_init_rwin(req, sk, dst);
+ 	sk_rx_queue_set(req_to_sk(req), skb);
+diff --git a/net/ipv4/tcp_plb.c b/net/ipv4/tcp_plb.c
+index c11a0cd3f8fe..bcc2f0add6af 100644
+--- a/net/ipv4/tcp_plb.c
++++ b/net/ipv4/tcp_plb.c
+@@ -78,7 +78,7 @@ void tcp_plb_check_rehash(struct sock *sk, struct tcp_plb_state *plb)
+ 	if (plb->pause_until)
+ 		return;
+ 
+-	sk_rethink_txhash(sk);
++	__sk_rethink_txhash_reset_dst(sk);
+ 	plb->consec_cong_rounds = 0;
+ 	WRITE_ONCE(tcp_sk(sk)->plb_rehash, tcp_sk(sk)->plb_rehash + 1);
+ 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPPLBREHASH);
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 322db13333c7..bf171b5e1eb3 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -297,7 +297,7 @@ static int tcp_write_timeout(struct sock *sk)
+ 		return 1;
+ 	}
+ 
+-	if (sk_rethink_txhash(sk)) {
++	if (__sk_rethink_txhash_reset_dst(sk)) {
+ 		WRITE_ONCE(tp->timeout_rehash, tp->timeout_rehash + 1);
+ 		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPTIMEOUTREHASH);
+ 	}
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 0a88b376141d..a5f3327d9f7d 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -823,6 +823,8 @@ int inet6_sk_rebuild_header(struct sock *sk)
+ 	fl6->flowi6_uid = sk_uid(sk);
+ 	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
+ 
++	ip6_ecmp_set_mp_hash(sock_net(sk), fl6, sk->sk_txhash);
++
+ 	rcu_read_lock();
+ 	final_p = fl6_update_dst(fl6, rcu_dereference(np->opt), &np->final);
+ 	rcu_read_unlock();
+diff --git a/net/ipv6/inet6_connection_sock.c b/net/ipv6/inet6_connection_sock.c
+index 37534e116899..fbdb8c8b9ba1 100644
+--- a/net/ipv6/inet6_connection_sock.c
++++ b/net/ipv6/inet6_connection_sock.c
+@@ -48,6 +48,8 @@ struct dst_entry *inet6_csk_route_req(const struct sock *sk,
+ 	fl6->flowi6_uid = sk_uid(sk);
+ 	security_req_classify_flow(req, flowi6_to_flowi_common(fl6));
+ 
++	ip6_ecmp_set_mp_hash(sock_net(sk), fl6, tcp_rsk(req)->txhash);
++
+ 	if (!dst) {
+ 		dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, final_p);
+ 		if (IS_ERR(dst))
+@@ -70,6 +72,9 @@ struct dst_entry *inet6_csk_route_socket(struct sock *sk,
+ 	fl6->saddr = np->saddr;
+ 	fl6->flowlabel = np->flow_label;
+ 	IP6_ECN_flow_xmit(sk, fl6->flowlabel);
++
++	if (sk->sk_protocol == IPPROTO_TCP)
++		ip6_ecmp_set_mp_hash(sock_net(sk), fl6, sk->sk_txhash);
+ 	fl6->flowi6_oif = sk->sk_bound_dev_if;
+ 	fl6->flowi6_mark = sk->sk_mark;
+ 	fl6->fl6_sport = inet->inet_sport;
+diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+index 4f6f0d751d6c..b581cb1ee2e8 100644
+--- a/net/ipv6/syncookies.c
++++ b/net/ipv6/syncookies.c
+@@ -245,6 +245,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+ 		fl6.flowi6_uid = sk_uid(sk);
+ 		security_req_classify_flow(req, flowi6_to_flowi_common(&fl6));
+ 
++		ip6_ecmp_set_mp_hash(net, &fl6, tcp_rsk(req)->txhash);
++
+ 		dst = ip6_dst_lookup_flow(net, sk, &fl6, final_p);
+ 		if (IS_ERR(dst)) {
+ 			SKB_DR_SET(reason, IP_OUTNOROUTES);
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 2c3f7a739709..e3a99f88cb6c 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -258,6 +258,8 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr_unsized *uaddr,
+ 	if (!ipv6_addr_any(&sk->sk_v6_rcv_saddr))
+ 		saddr = &sk->sk_v6_rcv_saddr;
+ 
++	sk_set_txhash(sk);
++
+ 	fl6->flowi6_proto = IPPROTO_TCP;
+ 	fl6->daddr = sk->sk_v6_daddr;
+ 	fl6->saddr = saddr ? *saddr : np->saddr;
+@@ -275,6 +277,14 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr_unsized *uaddr,
+ 
+ 	security_sk_classify_flow(sk, flowi6_to_flowi_common(fl6));
+ 
++	/* Non-zero mp_hash bypasses rt6_multipath_hash() in
++	 * fib6_select_path(), letting txhash control ECMP path
++	 * selection so that sk_rethink_txhash() rehashes onto a
++	 * different path.  Policies 1-3 derive a deterministic
++	 * hash from the flow keys and must not be overridden.
++	 */
++	ip6_ecmp_set_mp_hash(net, fl6, sk->sk_txhash);
++
+ 	dst = ip6_dst_lookup_flow(net, sk, fl6, final_p);
+ 	if (IS_ERR(dst)) {
+ 		err = PTR_ERR(dst);
+@@ -313,8 +323,6 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr_unsized *uaddr,
+ 	if (err)
+ 		goto late_failure;
+ 
+-	sk_set_txhash(sk);
+-
+ 	if (likely(!tp->repair)) {
+ 		union tcp_seq_and_ts_off st;
+ 
+@@ -955,6 +963,13 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 	if (txhash) {
+ 		/* autoflowlabel/skb_get_hash_flowi6 rely on buff->hash */
+ 		skb_set_hash(buff, txhash, PKT_HASH_TYPE_L4);
++
++		/* Select the local ECMP path from the connection's txhash,
++		 * so a control packet (RST, or ACK from a time-wait socket)
++		 * uses the same nexthop as the data.  Only policy 0 uses
++		 * mp_hash; policies 1-3 derive a deterministic hash.
++		 */
++		ip6_ecmp_set_mp_hash(net, &fl6, txhash);
+ 	}
+ 	fl6.flowi6_mark = IP6_REPLY_MARK(net, skb->mark) ?: mark;
+ 	fl6.fl6_dport = t1->dest;
 -- 
 2.53.0-Meta
 
