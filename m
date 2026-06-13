@@ -1,85 +1,103 @@
-Return-Path: <netdev+bounces-298922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298923-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2cSqHs8RLWrjagQAu9opvQ
-	(envelope-from <netdev+bounces-298922-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:16:15 +0200
+	id RGxYDy0SLWomawQAu9opvQ
+	(envelope-from <netdev+bounces-298923-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:17:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA44B67E1A8
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:16:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D385467E1B4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:17:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=T2+02RrX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298922-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298922-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=DGOCDLCF;
+	dkim=pass header.d=redhat.com header.s=google header.b=pDqkIWkg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298923-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298923-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F0A33306B7B3
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:16:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 177F03059939
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54310345CBE;
-	Sat, 13 Jun 2026 08:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9430A368D6C;
+	Sat, 13 Jun 2026 08:17:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4C51D5160
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 08:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3789B345CBE
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 08:17:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781338571; cv=none; b=ZkpG+tqw0LzUMZwrrQ0i7LqEv7UjizOGCqVtbNAfdVLO4z+OAIQj5orCpgUy29VeB1zrXvwfyVmThZ4j7N/SzCoV1n/isXN/c0tOW1e4Mrh9OZqLBQ9oGdfowOCif1Zbl0zY/FiEkbpC/5oxmJhFKZXfN7K6/fJ+s2NaPYr4OIM=
+	t=1781338638; cv=none; b=qa89O86660aJZ0sd/jQt/l3anueMj1WQhEXVivFrE4SCqxt1H0CrsvRY+YiSrLx7pqTkuD4J8Y4uWyfOZUNlo0i3LsTiNbBfZ/XmJmT0cNzJnC2Xm4ZlTdOXeH3iJOwylItgUa59aaqerVWhiG+ANjhD4uPYv0fsskexEKuyfUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781338571; c=relaxed/simple;
-	bh=gxXIQs4fOYo7UxbFqDXGSyWElu5qYAeUnrJUD0vklmg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hyvdqdz6ia9hIpZrjAx1Xy6/IEPQlbNh38bW3Qt7gO3IIefM5yxafFZsR0Simh54G4pbInsvGI1lEQy3LfojNoXP0QgkcABgqh3IEtf20FXBxDrmYj9Zy7FCpfscYn3DzdvDF4gXpFJgifsEW2ZrZidHV8u2IV6fh83nhqwwFPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2+02RrX; arc=none smtp.client-ip=209.85.167.47
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5aa69131836so1588121e87.3
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:16:09 -0700 (PDT)
+	s=arc-20240116; t=1781338638; c=relaxed/simple;
+	bh=G4vZBc8ZLUPUE5upL5hARAo5Vznl/2YxfVZfkWN3zUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DviWSlKMTmnEUtNrNmKR1i+9cPMibePDR3komOMXzchCDIytbFBrgEtfLI5uwVZRcYG1iQUYlpcn23oHHwzARAbzWKxjofY/5ukqfZazm6Zp8xIeNXPg5VGGS74kbhl709Tl751yWGManjJJllzYtluiBcxnO9Y5lQd3IzOaHJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DGOCDLCF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pDqkIWkg; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781338636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YS0zNMZBIRupuxM8vXWdAOrpg+vXBR7TRgikpV9JDpU=;
+	b=DGOCDLCFQpU7fx7ZeuSH/6Cy5esZfBfQw+GIy+fRY2dOWxJnaxPH5z0QPtqDfy7ItFnMTL
+	RWEpBlB53JomGAIrEQ71xmoTzxPfXbluzNcRXrmSHb1GXbM7qCQ4eBmh5t309WdYMsEG9O
+	MhbiM6D4FcyzNhtfgE5wXPajuXJEORo=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-sm5w1txQMLC8K9PrWSyOcQ-1; Sat, 13 Jun 2026 04:17:14 -0400
+X-MC-Unique: sm5w1txQMLC8K9PrWSyOcQ-1
+X-Mimecast-MFC-AGG-ID: sm5w1txQMLC8K9PrWSyOcQ_1781338633
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8ccd3213beaso35588296d6.0
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781338568; x=1781943368; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0iXLstte6ButgpYOzogymHuOexokA1uZth6v7/qqcCo=;
-        b=T2+02RrXMtMJCfwDyutG9OtBlzhRtcAQ00UNE81YQm+J0vWjlCsAZ5fEmKaUrPHWpX
-         w9Heg/Vl3x60KBWHMFhkMVareUkFw8OdZhhVsykUpbgjyz2WL0nxrKLziYhAiTHxLoUG
-         wYaKf7p4+iOG6UXbjV8X+lpNkmFvNGEh+d9TiblbGWZ1cz7TMwZJCkAvXCNQbJja6g7x
-         A+swLSGRoQPkPnf4TXaIO+Ajo4xCEI7KCgj3RHC660LeH3+WQjuLZ+UytDGOeITK6sHK
-         0VPtn2dDCQ6/aGyyTw+9zBrCQ8UsAX68IoLHvSrJp3mdOC/hKPJ8yv4W7YBlCHiSU/WW
-         P61w==
+        d=redhat.com; s=google; t=1781338633; x=1781943433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YS0zNMZBIRupuxM8vXWdAOrpg+vXBR7TRgikpV9JDpU=;
+        b=pDqkIWkg1NbqVcicFBMP/cJfkI2Qx/a3zqVY4rtz6wpoZnBI8PuM27B9vYBI4fuVEU
+         LFNHQ19RUZsBywSSFM1OHjHQYd47YB8TOwISpt4OH66YGa2dVJQp8si1Pvvty03ARgJM
+         JMciWvPTGawbOnLUGQUHXAfDrtdTC36kORDyCNivMpBUkt21gMqGCldPkPBrO4HemKmX
+         qMprhvrBDkxzSb/3gpu8NS356phlEogt+V56Pmj3wqGvafZr0WSY82K/SXG/6Zoj470N
+         WvmX36CrIDyjDEYcQZFSqMLl6pKKLfnk3IrhISAG72jMFaUG53cm3JpIMpVQxqISY+z9
+         sqxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781338568; x=1781943368;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20251104; t=1781338633; x=1781943433;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0iXLstte6ButgpYOzogymHuOexokA1uZth6v7/qqcCo=;
-        b=TGgFiV/0MitzzP7pN9DpuOUFXcTPZSKuMCJ/rhBaJxkEbwyIj6OYIRXvWJCWMEvGsJ
-         LSbvdFXs2hq6koZFesJ4JPu46COzKf+0GAJN5FudkflJ+nCK+geYLubECRnqj9uvX8Kb
-         gk7ENpnvUpR6f9is7Up1RUgnfZ962cflLNOa43/yeo8HoJs08g4+HtNNkyw954Md9Y8B
-         fMpT9YIi5Dzg1Yfo3UCqqp/J/iPngPaIgQHNLL715CrxRXo59brZ5R89LWsIYz9wG4ok
-         wJWKkf30GL666OxyRAYOlF9twK9sV0+xqDmySXseOea0IF73S61ZckNPwapux61cbQMq
-         tuYg==
-X-Forwarded-Encrypted: i=1; AFNElJ/L6WF9nbcEYw7pGXwCyUrukH/xOgI8ufWtup6iwfPLwvMDHCATwQO6fEbgagSGDdU+6pIl+sU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyeNUb8YDw/lvveh9w+ifHH5bXtu/bsIVeRBjO9L/HOWuSMmzu
-	OF9tm73tnxtA1qKGWTU5y+JN008YcTqTxHdigltppVzPwxCRbL8nepkk
-X-Gm-Gg: Acq92OEIX4EUKouUQLc/3/GaDKMGO8aVfPhefVpSz6NSO+QwcVZqvQ+bj7/+8Udm/Zy
-	nh2i2+UNq1IJ4sHXQnP8l0uh4V34Q+HBHlfGTpqjOjiaIJS52nw//ui4lAIxWM7Bnf8NvXYrXwN
-	eVfYLqT8A3NRX/uWcKYSqJT1O/YMdY+JPUS4lV1rP9laZwkD20Ew2VX45nK0XNg+PVNxVC6t1a0
-	jCyr9nNgXEdT+nostNFzbGtvAVjkvWat6k5HzymHIG5VO/IxLoDFerOUxTcxWEt+FI8S1cJklo7
-	zMTS/IgukWPcKzQyu79Jjk6QhixpSLC1DPRYvw65PDNgZYPyNHPqms2ybwEO2jLB9304DSG+u5v
-	8D6ogHPyx0HO/qBAVC3ABSa2qq29ILtTU32jPVt/urQXqUJ7BXybNM3fY4ZIbGdFfGU/m48genZ
-	84rO35/P01D9HfmLNS4Sj+kT8tp12XQ+lfr4xRZhNh5gH66wCHXyreVCAgWBrzfpNOaAC10HGYu
-	aXqoQ==
-X-Received: by 2002:a05:6512:4608:b0:5aa:5a89:c80b with SMTP id 2adb3069b0e04-5ad30dc08a1mr583841e87.30.1781338567680;
-        Sat, 13 Jun 2026 01:16:07 -0700 (PDT)
-Received: from ?IPV6:2a00:1fa0:856:c6e8:742c:af09:78ba:8005? ([2a00:1fa0:856:c6e8:742c:af09:78ba:8005])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e16935esm1124202e87.25.2026.06.13.01.16.05
+        bh=YS0zNMZBIRupuxM8vXWdAOrpg+vXBR7TRgikpV9JDpU=;
+        b=KJ2NQw5FsLMiM/LF6fG4RJ3Xq22nMdKn4RtdaqsRoAwOCQHQoge8/DcQH7meaYWnbF
+         laGE2Sx506sYjhOFy5ZOfDo3eeSGtsiJN8H+cPI4iILQa3uT3GgJjRvoUJO1nwilIVD5
+         AfFKeTgFJwxS2RQLBfBj7A64mmG+Molojzm0IRFbkn+bYasXSZKf2g47g4HG7m8zRqTa
+         +wxCtCBm6/rPb53P8uqjYSRlgoIE+lwPVnegiLarQb8dXx3fj509sphagH0ivasOvzMG
+         A+LpwZmS3T4Fh6Xlzs4x0y8cPfVNZks4b0Q1ElgT1RMxWr1h5Y+h/SdPo0PdrwP0ypzo
+         caFA==
+X-Forwarded-Encrypted: i=1; AFNElJ/a5MXIKlO/Jksz7ENVpGOePYkjLcgAmTHQkfLJJlqzDVU72up6N/HJS/1EXaOne7bw+5Jcl08=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwdTCjDIXzE+viSLUVx+g62EtTk6UaecDGJIybN7RBiCn3ZkdZ
+	nMLscgf9UX14VnkfgsBA4q7C3t2F3y8jLOFyW3J9M+5EfYxCljz4gDuNEw3e2jwyFen2qeYAU2F
+	7cxeqhpmrmNFFN0jMYKrll/BFQXpfrWE7dPbDQU1GIo6Fv4wPNvOT+yhRGw==
+X-Gm-Gg: Acq92OFmTeYsOyyz/3sdHiSOI79px4aCW4JZOEwCvb8UvGInxUXSji9Lj2fM3yCjURi
+	96a9fVjATUIrvQqtWi3srLQeBHQwG4ze6hwh60hnL6qxSJ0rc7KcjBG+ddCUc/6rgJ+St62CYlK
+	u8B+u26U9AXeDjmQ45mSrnM7YCeZefz1VX9dkalHpB7NsAMNMmmmtLEQ4cANVvMOjWYoT9KJfjE
+	hgEsdSRNiscwmUiyo0CsGM2lJ9kgepNDiooHNe1twPYpcZ/3rWsX7ygDIcWsaNV5hJ8/h/ujDIg
+	zSl/8wndMXYuQIGXbI+w/7UsmF2bHpWe3aTEOcBONztgXKzRtIEyrFIcPV2S5Fmlw14GlcDe8Lk
+	HfuBy7vf1dXZ+NW9OgyRXopI3DP+WZ2ibXLCQvSwXYP7Ylm3LHqv3B2E=
+X-Received: by 2002:a05:6214:2249:b0:8b9:3907:166a with SMTP id 6a1803df08f44-8d32c8ce11cmr102409616d6.17.1781338633473;
+        Sat, 13 Jun 2026 01:17:13 -0700 (PDT)
+X-Received: by 2002:a05:6214:2249:b0:8b9:3907:166a with SMTP id 6a1803df08f44-8d32c8ce11cmr102409346d6.17.1781338632991;
+        Sat, 13 Jun 2026 01:17:12 -0700 (PDT)
+Received: from [192.168.88.32] ([150.228.25.72])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8d301b2d004sm47099976d6.15.2026.06.13.01.17.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Jun 2026 01:16:06 -0700 (PDT)
-Message-ID: <39720384-28da-4157-8613-8f02ab890abf@gmail.com>
-Date: Sat, 13 Jun 2026 11:16:04 +0300
+        Sat, 13 Jun 2026 01:17:12 -0700 (PDT)
+Message-ID: <9166857f-880d-4324-9300-9cb1da600aed@redhat.com>
+Date: Sat, 13 Jun 2026 10:17:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,109 +105,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 9/9] net: ethernet: ravb: Add gPTP support for Gen4
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
- <niklas.soderlund+renesas@ragnatech.se>, Paul Barker <paul@pbarker.dev>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260610102432.3538432-1-niklas.soderlund+renesas@ragnatech.se>
- <20260610102432.3538432-10-niklas.soderlund+renesas@ragnatech.se>
+Subject: Re: [PATCH v3 5/6] pds_core: add host backed memory support for
+ firmware
+To: "Nikhil P. Rao" <nikhil.rao@amd.com>, netdev@vger.kernel.org
+Cc: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-kernel@vger.kernel.org, Eric Joyner <eric.joyner@amd.com>,
+ Vamsi Atluri <Vamsi.Atluri@amd.com>
+References: <20260608223256.12357-1-nikhil.rao@amd.com>
+ <20260608223256.12357-6-nikhil.rao@amd.com>
+From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-From: Sergey Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <20260610102432.3538432-10-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20260608223256.12357-6-nikhil.rao@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-298922-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[ragnatech.se,pbarker.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,glider.be,vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:niklas.soderlund+renesas@ragnatech.se,m:paul@pbarker.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:niklas.soderlund@ragnatech.se,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298923-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:nikhil.rao@amd.com,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:eric.joyner@amd.com,m:Vamsi.Atluri@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergeishtylyov@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,renesas,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CA44B67E1A8
+X-Rspamd-Queue-Id: D385467E1B4
 
-On 6/10/26 1:24 PM, Niklas Söderlund wrote:
+On 6/9/26 12:32 AM, Nikhil P. Rao wrote:
+> +static int pdsc_host_mem_add_one(struct pdsc *pdsc, int index)
+> +{
+> +	struct pdsc_host_mem *hm = &pdsc->host_mem_reqs[index];
+> +	union pds_core_dev_comp comp = {};
+> +	union pds_core_dev_cmd cmd = {};
+> +	int err;
+> +
+> +	memset(hm, 0, sizeof(*hm));
 
-> While driver advertise gPTP support on Gen4 platforms it is in fact
+Minor nit: the buffer is kzmalloced() no need to zero it again.
 
-   Advertises.
+> +	cmd.host_mem.opcode = PDS_CORE_CMD_HOST_MEM;
+> +	cmd.host_mem.oper = PDS_CORE_HOST_MEM_QUERY;
+> +	cmd.host_mem.index = cpu_to_le16(index);
+> +	dev_dbg(pdsc->dev, "Sending devcmd for mem query index %d\n", index);
+> +	err = pdsc_devcmd(pdsc, &cmd, &comp, pdsc->devcmd_timeout);
+> +	if (err || comp.status != PDS_RC_SUCCESS) {
+> +		dev_err(pdsc->dev, "mem query failed err %d status %d\n",
+> +			err, comp.status);
+> +		return err ? err : -EIO;
+> +	}
+> +	hm->size = le32_to_cpu(comp.host_mem.size);
+> +	hm->tag = le16_to_cpu(comp.host_mem.tag);
+> +	dev_dbg(pdsc->dev, "mem query returned size %d tag %d\n",
+> +		hm->size, hm->tag);
+> +
+> +	if (!hm->size || hm->size > PDSC_HOST_MEM_MAX_CONTIG) {
+> +		dev_err(pdsc->dev, "invalid size %d for tag %d\n",
+> +			hm->size, hm->tag);
+> +		err = -EINVAL;
+> +		goto err_del;
+> +	}
+> +
+> +	hm->order = get_order(hm->size);
+> +	hm->pg = alloc_pages(GFP_KERNEL | __GFP_ZERO | __GFP_NOWARN, hm->order);
+> +	if (!hm->pg) {
+> +		dev_err(pdsc->dev, "alloc order %d failed for tag %d\n",
+> +			hm->order, hm->tag);
 
-> completely broken. On R-Car Gen4 devices the RAVB module have no
-> internal gPTP clock as generations before it. Instead it utilizes a
-> system wide gPTP clock.
-> 
-> This change utilizes the refactoring of the RAVB gPTP code to add
-> support for a system wide clock and stops the Gen4 devices trying to use
-
-   System-wide?
-
-> the non-existing internal gPTP clock.
-> 
-> To remain backward compatible the device tree property needed
-> (renesas,gptp) to get hold of the system gPTP clock is optional. If the
-
-   Can't parse this statement...
-
-> property is not present, or not enabled, the RAVB driver will no longer
-> advertise gPTP support to user-space.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
-Reviewed-by: Sergey Shtylyov <sergei.shtylyov@gmail.com>
+Minor nit: as this is a gracefully handled failure, possibly dev_warn()
+is more suited and the message itself should be less alarming.
 
 [...]
+> +void pdsc_host_mem_add(struct pdsc *pdsc)
+> +{
+> +	union pds_core_dev_comp comp = {};
+> +	union pds_core_dev_cmd cmd = {};
+> +	u16 count;
+> +	int err;
+> +	int i;
+> +
+> +	if (!(pdsc->dev_ident.capabilities &
+> +	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
+> +		return;
+> +
+> +	cmd.host_mem.opcode = PDS_CORE_CMD_HOST_MEM;
+> +	cmd.host_mem.oper = PDS_CORE_HOST_MEM_GET_COUNT;
+> +	cmd.host_mem.index = cpu_to_le16(PDSC_HOST_MEM_MAX_COUNT);
+> +	cmd.host_mem.max_contig = cpu_to_le32(PDSC_HOST_MEM_MAX_CONTIG);
+> +	dev_dbg(pdsc->dev, "Sending devcmd for mem get count max_contig %u\n",
+> +		PDSC_HOST_MEM_MAX_CONTIG);
+> +	err = pdsc_devcmd(pdsc, &cmd, &comp, pdsc->devcmd_timeout);
+> +	if (err || comp.status != PDS_RC_SUCCESS) {
+> +		dev_err(pdsc->dev, "mem get count failed err %d status %d\n",
+> +			err, comp.status);
+> +		return;
+> +	}
+> +
+> +	count = min(le16_to_cpu(comp.host_mem.count),
+> +		    PDSC_HOST_MEM_MAX_COUNT);
+> +	dev_dbg(pdsc->dev, "mem get count returned count %d\n", count);
+> +	if (count == 0)
+> +		return;
+> +
+> +	pdsc->host_mem_reqs = kzalloc_objs(*pdsc->host_mem_reqs, count,
+> +					   GFP_KERNEL);
+> +	if (!pdsc->host_mem_reqs) {
+> +		dev_err(pdsc->dev, "failed to alloc host_mem_reqs array\n");
+> +		return;
+> +	}
+> +
+> +	for (i = 0; i < count; i++) {
+> +		err = pdsc_host_mem_add_one(pdsc, i);
+> +		if (err)
+> +			break;
 
-> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-> index caad95a9c3c5..acdfb56bb135 100644
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-> @@ -249,6 +249,8 @@ enum APSR_BIT {
->  	APSR_RDM	= 0x00002000,
->  	APSR_TDM	= 0x00004000,
->  	APSR_MIISELECT	= 0x01000000,	/* R-Car V4M only */
-> +	APSR_GPTPTIMER_SOURCE = BIT(25), /* Gen4 */
-> +	APSR_GPTPCLOCK	= BIT(29),	/* Gen4 */
+When pdsc_host_mem_add_one() returns an error, pdsc->host_mem_reqs[i].pg
+will be zero. Errors are not propagate to the caller...
 
-   Hum, the other *enum* entries don't use BIT()...
+> +	}
+> +}
+> +
+> +void pdsc_host_mem_free(struct pdsc *pdsc)
+> +{
+> +	int i;
+> +
+> +	if (!pdsc->host_mem_reqs)
+> +		return;
 
-[...]
+... and this function will be unconditionally called on shutdown with
+non zero host_mem_reqs.
 
-MBR, Sergey
+> +
+> +	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
+> +		dma_unmap_page(pdsc->dev, pdsc->host_mem_reqs[i].pa,
+> +			       pdsc->host_mem_reqs[i].size,
+> +			       DMA_BIDIRECTIONAL);
+> +		__free_pages(pdsc->host_mem_reqs[i].pg,
+
+so  pdsc->host_mem_reqs[i].pg can be zero here. AFAICS at least
+__free_pages() -> ___free_pages -> put_page_testzero ->
+page_ref_count(0) will oops.
+
+I find strange AI did not catch the above, so I'm possibly missing
+something?!?
+
+/P
 
 
