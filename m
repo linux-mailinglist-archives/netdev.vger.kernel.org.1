@@ -1,187 +1,149 @@
-Return-Path: <netdev+bounces-298837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id v62LBlukLGrtUAQAu9opvQ
-	(envelope-from <netdev+bounces-298837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:29:15 +0200
+	id pFPIH52kLGr4UAQAu9opvQ
+	(envelope-from <netdev+bounces-298838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:30:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F21A467D4C7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:29:13 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7606767D4E2
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:30:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=GgfahnZQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298837-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298837-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Db2przDl;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298838-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298838-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DDD1030074ED
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 00:29:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7AD613007A64
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 00:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB1E1FF5E3;
-	Sat, 13 Jun 2026 00:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A9D1A681E;
+	Sat, 13 Jun 2026 00:30:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F9E1F3BA4
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 00:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621ED1A4F2F
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 00:30:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781310549; cv=none; b=hClQ3Dq6Cuq9PsGaBbPOu1OeAdatGsNWDpZeNm5lYzwI4VvICpWQM5e3bgsBprtyqZ9Obd6GTyCrwKw9l/m0ruXgxlvDuojDwqNYZXLjwuPThKtaWQiMNsy9HQuqZX0gh7zXWX/HngzRC5mOylkjt48l4btJLcJSNsXE3k60KI4=
+	t=1781310616; cv=none; b=YyFl9bdbROci+Zp7BLwkDcAKcd3ODVLCfTxfR7wzx8QyQpAh8uZskL2vYF8MPminLs94PHld6PwyrxG5QS8ICeV8sZz+Y2uqC8cNWIVAOp6ruqkIO76+nUHbqVuZxGZDdVdkUF9hf8DtLqHmMKh0C4iV3beptqjS2I37LOYEJPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781310549; c=relaxed/simple;
-	bh=QgXc4ODljJhWTTpaw445TVamF/nyBWaAo/I/wBG/rxw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YP/jBQ5WnaI7loB4BCVNW7WYEorAx1EOyOdkltQRHFgVusmisQc1lvbN3cB5c4h8kliJ7gS77j5zy6jSadJkZK7sRqdi+IKgOlJnH1zcx2m6FD+0n7k6OZgroDCw9hluIOlUg5DedcNymUW1xdj10nYUPvyBeeugXQNg/5SmrHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GgfahnZQ; arc=none smtp.client-ip=209.85.214.202
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2c2a4babe45so8803705ad.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:29:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781310548; x=1781915348; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUh6D4rBcGOJpXdbW9cjRObx5ZfnYBi6zdUUzwINyao=;
-        b=GgfahnZQrDLbK9ff4h7onSM3J8k8edLC0IeZsMQ3zTs5hIgSLN33JCo0G5hnVRPAxI
-         yI6hhCsAOFWhLQWph7JAtLchoGGadyXAigHE6ktPTnaaqz8MVKNp/aG6tf1y+k8IcXrr
-         aVdCYn4H4xGMV+EZd2tvnjosIPW1I5pmMSaf9agrPjKTjKP/dnP6SnDDLq2Z1sKGQ8hQ
-         WyZQNb9VXzm77534zFmH77B/P82tH0F6YK+qkI4wRqKBaVD9kojNaaQ5egLJNuPJ75er
-         d3YTaM+NZWQ31AfMvFWD7pIXbxOyxGno0gtrHkdDRBdNn+GLUl4WBy4lGk2jmcBsQwaa
-         Y8nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781310548; x=1781915348;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUh6D4rBcGOJpXdbW9cjRObx5ZfnYBi6zdUUzwINyao=;
-        b=C2pnlfeDc/WjUtHwE6cIYuZsAE/3JY04TLJ5EPS5MpijUVnYbC0u7Q10R9ZgrfMroI
-         GjQPSfkA3k/H+H/gvLCAjgHIFBU/kY3ZdCmarP6xPBfq6PHz7rRpulLAg7W2PI/89hs3
-         +OHkjTjazdrJL+bZ6gEKf76mTSHXADu81s0kLjdxxNyNzfvIFR8OnixYO6TsZNpDuCUo
-         ZbVNG+XD0s2tQ6SAe5zYgv9bReYK0B9SLpO4w70XKugVOjkx1E4W2xLLM7SXx4iyIwQg
-         SnWzrNvpc1Ar325vMo7q8msTH7DgOC4KcyRw76S0hCVO8RZsgKFdOoYNzjyCd51esez7
-         nixw==
-X-Forwarded-Encrypted: i=1; AFNElJ/aQmcCJLdXP8dK/srXDDMYdxFAizPdCJTMDuGmTSFvZZe8k5+Do9BezlgBJo2kqCrT4z4rRFo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhG2QTC6fJWDwNstNLs5zg79BAUdQnjW8L1c2K7hwFxgoRFKDl
-	rxFWUDL4e0PLaUULPIyu0LV8ENfQPuUXw6iWGBrKDHcj35ki9tqUJrYpFV74BNH0edYBuwST5d6
-	3gC1xWw==
-X-Received: from plbjx9.prod.google.com ([2002:a17:903:1389:b0:2bd:9bd8:749b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cec7:b0:2c1:f29a:b554
- with SMTP id d9443c01a7336-2c664271df6mr18671095ad.21.1781310547424; Fri, 12
- Jun 2026 17:29:07 -0700 (PDT)
-Date: Sat, 13 Jun 2026 00:28:38 +0000
-In-Reply-To: <20260612130919.299124-4-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1781310616; c=relaxed/simple;
+	bh=HocRj9BP97CVRe+akO0HmhDSKet9YHxE/MFa8S9bIQY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FBUHO+hlFEMq6YWH0QHJHW4vjTKLhEhWTfcCxVRNQ89vzJW57zmhPmW00zAcfW+yUn8ZMIyrOlFzBBQeZQEqvqZHngGqBoreEOIoHkMibPEgZ6ge+UtrVL2GokeL7kg6hPnbNwLn6MDDYxcv6y8TwEHeBvMCCa810NYaP7VXrtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Db2przDl; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05AA41F000E9;
+	Sat, 13 Jun 2026 00:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781310615;
+	bh=yutcQ84uAQv/SA13tcZeL6VzdiuI3G2zwMIpkziCw74=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Db2przDlQAXJFgWcoMW/oRczInpyATZXXPwMq+4msEyNOr0kOyGwXJgVVyW0izjT4
+	 E1swEXxnDmejtQOJjSCyEJ9wwH6tkxnDOMQfSZDmDpIQvO+IcXWlbzPiz4kMoPzhY9
+	 PyFcJuW78949xT4oLB5kByhwvIrvgvyccWxHkGCqKJZndueqRF5UiUyhesXgu/gwps
+	 lht+lzAUicIVNuk9pA+IlLfufWe6mM4gwL1lTGgrazCGQA0KfNMubYjaxMqu/Oaemn
+	 oMs4MDcjYKhb5vaAlgpx5uVY9u5fFBUnpbduzSifwqlyFrM7cMIvi2+HKS3GTTHqDq
+	 yJ3L/YJE/SovQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09A539E9607;
+	Sat, 13 Jun 2026 00:30:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260612130919.299124-4-jiayuan.chen@linux.dev>
-X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
-Message-ID: <20260613002906.1336958-1-kuniyu@google.com>
-Subject: Re: [PATCH bpf-next v3 3/7] bpf, sockmap: zero-initialize pages
- allocated in bpf_msg_push_data
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: jiayuan.chen@linux.dev
-Cc: andrii@kernel.org, ast@kernel.org, bestswngs@gmail.com, 
-	bpf@vger.kernel.org, cong.wang@bytedance.com, daniel@iogearbox.net, 
-	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com, 
-	emil@etsalapatis.com, hawk@kernel.org, horms@kernel.org, 
-	ihor.solodrai@linux.dev, jakub@cloudflare.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, martin.lau@linux.dev, memxor@gmail.com, 
-	mmmxny@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	rhkrqnwk98@gmail.com, sdf@fomichev.me, shuah@kernel.org, song@kernel.org, 
-	xmei5@asu.edu, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/4] Avoid mistaken parent class deactivation during
+ peek
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178131061139.1306549.5056558403294785324.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Jun 2026 00:30:11 +0000
+References: <20260610192855.3121513-1-victor@mojatatu.com>
+In-Reply-To: <20260610192855.3121513-1-victor@mojatatu.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ netdev@vger.kernel.org, anirudhrudr@gmail.com, pctammela@mojatatu.com,
+ ij@kernel.org, henrist@henrist.net, chia-yu.chang@nokia-bell-labs.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298837-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298838-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,vger.kernel.org,gmail.com,henrist.net,nokia-bell-labs.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:andrii@kernel.org,m:ast@kernel.org,m:bestswngs@gmail.com,m:bpf@vger.kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:emil@etsalapatis.com,m:hawk@kernel.org,m:horms@kernel.org,m:ihor.solodrai@linux.dev,m:jakub@cloudflare.com,m:john.fastabend@gmail.com,m:jolsa@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:mmmxny@gmail.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:rhkrqnwk98@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:song@kernel.org,m:xmei5@asu.edu,m:yonghong.song@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:victor@mojatatu.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:anirudhrudr@gmail.com,m:pctammela@mojatatu.com,m:ij@kernel.org,m:henrist@henrist.net,m:chia-yu.chang@nokia-bell-labs.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,bytedance.com,iogearbox.net,davemloft.net,google.com,etsalapatis.com,linux.dev,cloudflare.com,redhat.com,fomichev.me,asu.edu];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,asu.edu:email,vger.kernel.org:from_smtp,etsalapatis.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F21A467D4C7
+X-Rspamd-Queue-Id: 7606767D4E2
 
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-Date: Fri, 12 Jun 2026 21:07:47 +0800
-> From: Weiming Shi <bestswngs@gmail.com>
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 10 Jun 2026 16:28:51 -0300 you wrote:
+> Several qdiscs (fq_codel, codel and dualpi2) may drop packets while
+> peeking at their queue. When that happens they call
+> qdisc_tree_reduce_backlog() to notify the parent of the backlog/qlen
+> change. The problem is that they do so *before* reincrementing the qlen
+> that peek had temporarily decremented.
 > 
-> bpf_msg_push_data() allocates pages via alloc_pages() without
-> __GFP_ZERO. In the non-copy path, the entire page of uninitialized
-> heap content is added directly to the sk_msg scatterlist, which is
-> then transmitted over TCP to userspace via tcp_bpf_push(). In the
-> copy path, a gap of len bytes between the front and back memcpy
-> regions is similarly left uninitialized.
+> If the qlen momentarily drops to zero while peek still has an skb to
+> return, qdisc_tree_reduce_backlog() ends up invoking the parent's
+> qlen_notify() callback even though the child is not actually empty. The
+> parent then deactivates the class, while the child still holds a packet.
+> For parents such as QFQ this desync corrupts the active class list and
+> leads to wild memory accesses and NULL pointer dereferences (see the
+> per-patch splats). For HFSC it might lead to stalls [1].
 > 
-> This leads to a kernel heap information leak: stale page content
-> including kernel pointers from the direct-map and vmemmap regions
-> is transmitted to userspace, which can be used to defeat KASLR.
-> 
-> Add __GFP_ZERO to the alloc_pages() call to ensure the allocated
-> page is always zeroed before it enters the scatterlist.
-> 
-> Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
-> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
-> Tested-by: Xiang Mei <xmei5@asu.edu>
-> Tested-by: Xinyu Ma <mmmxny@gmail.com>
-> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->  net/core/filter.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 3e555f276ba80..6e345ca65ca14 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2832,7 +2832,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
->  	if (unlikely(copy + len < copy))
->  		return -EINVAL;
->  
-> -	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
-> +	page = alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP | __GFP_ZERO,
+> [...]
 
-This is a red flag.
+Here is the summary with links:
+  - [net,1/4] net/sched: sch_fq_codel: Do not call qdisc_tree_reduce_backlog during peek before restoring qlen
+    https://git.kernel.org/netdev/net/c/097f6fc7b1ae
+  - [net,2/4] net/sched: sch_codel: Do not call qdisc_tree_reduce_backlog during peek before restoring qlen
+    https://git.kernel.org/netdev/net/c/52f1da34c9f4
+  - [net,3/4] net/sched: sch_dualpi2: Do not call qdisc_tree_reduce_backlog during peek before restoring qlen
+    https://git.kernel.org/netdev/net/c/15cd0c93bf4f
+  - [net,4/4] selftests/tc-testing: Verify child qdisc will not mistakenly deactivate QFQ parent
+    https://git.kernel.org/netdev/net/c/101f1047c2f6
 
-We have a bunch of KMSAN reports due to raw/packet sockets,
-which requires CAP_NET_ADMIN, and leave them unfixed although
-some people attempted to "fix" them by adding __GFP_ZERO to
-__alloc_skb().
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
->  			   get_order(copy + len));
->  	if (unlikely(!page))
->  		return -ENOMEM;
-> -- 
-> 2.43.0
 
