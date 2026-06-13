@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-298986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id uEpUJXSMLWqEhQQAu9opvQ
-	(envelope-from <netdev+bounces-298986-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:32 +0200
+	id dZThEXaMLWqGhQQAu9opvQ
+	(envelope-from <netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD6CB67F1A2
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF5567F1A8
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=izerWIml;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298986-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298986-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="kiZmX/FA";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B96563011123
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:59:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0F450300D70B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C47324B22;
-	Sat, 13 Jun 2026 16:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4A9396B84;
+	Sat, 13 Jun 2026 16:59:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6232741B6;
-	Sat, 13 Jun 2026 16:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDE72EA73D;
+	Sat, 13 Jun 2026 16:59:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781369969; cv=none; b=fEMcTBBF3eisCwmYlCuvT4Mml7TC79GRA9HL0ODmeWlMsgYwTk47ZPOdbDq0GLSAwDcRmNyEddGh/tTTLdWwGc/OJkJlPJTdRafS8v/tX5Yc0xl9IjBAbLkH4KqRsn/BcYO65p/zHUIgpHHXS22ywNEBiOlxnQB4iEoFZ74qRW8=
+	t=1781369970; cv=none; b=cZjEtxsBdheqLFLut5zsXrbyxDnHfXV8zPYy/ru9VkDw0StvANQaeXv/ntAPjQJRFsWmoFHN95OsqJMvtEC3pjxCPiD7BCW9TvHJopUwVRik+doNqDz7uZP6I5IG7naKXHnQJ9NKf/Ol1iZ1nFEnqyNIvsrj1XaZ/KVA04+KzCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781369969; c=relaxed/simple;
-	bh=4a3q9ydzCsI+mJ+XHypy7eVRmpYtzzBfYD+oHnzQqpU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ryfoNi4RylOxC5VICjbxuIFb8F5W+15gbVJYwPMQOkpoM5l9oF4YjFUyLmUztXfZi64PQ/EvfesWwGp1OUpNuvjVb1+X5rZXYvCNFagQpkRhJry0tlBfeVzlLnb3PA4WA3o1ZyiZSsNQF3oHZlL65S0fSUQUsLdek3BX/HJgISU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=izerWIml; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1261E1F000E9;
+	s=arc-20240116; t=1781369970; c=relaxed/simple;
+	bh=JXGGKycIp+fSCFoqr7xrpnm2CWfjCbgyn3e9PVlFSdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UBF7OavqYhAC1cl60z/HwCBVgmv1oMsxwrJ4JW/m4qSxqWa/exvdyz+5t/tIdZUdG+M3DxtVURuLbyz1o69dvcDPrjjkJbfPiLUhW4S6Qoyzz+tbdg1k9960nn/Cv4JcY4RBbCfDxRtxNmma93nzqJ7OZb7jqw3v2Xr7aCX/dc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiZmX/FA; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51E71F00A3A;
 	Sat, 13 Jun 2026 16:59:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781369968;
-	bh=I2NFA2mXsonOx3IjoKjZ4grfhjDTs5aTYbYOrdpQ7+0=;
-	h=From:To:Cc:Subject:Date;
-	b=izerWImlTBo6nmI/r5c9bNc3t5Fl0BsCoZgXiQjzGJceGQHSQoEOv1mbquGNoLB0r
-	 23MA8d9al1UGj6MHB8WItrNj4E5DxBaBilLlCGK/R7QI6Sejjyeuqwn0nKV+Z9w85U
-	 tvXMIZYvGxv0YUkpmIEPBhYgAsGMA0mSZVBV53WB9wcDlDnHibiXIa5qLXrODGj/1U
-	 lizByype+4Wrf/tLafdtF6NXz3n6B+zm4qF0ArFs+5FLIMnMe7Vsg/8AvHApd7EG+I
-	 XGgVx/5ZkyvDkewpfHQ+vN4idxubR9Q7JVSTE4TlVyIBSaayrZc/mnxWSxvWecXIjV
-	 qfFjvg3E9n3Dg==
+	s=k20260515; t=1781369969;
+	bh=djlY0cH0+5l0szO48FBrkZeaHrTwq7y36rd6PX9HsBA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=kiZmX/FAKMbqpEGDNjmZmx0VkmigA4u3rQ+JqT8bLRXR/Fa/aGiOTeRp+aXBNTeHd
+	 rhPT0Em8kADLsKePhLGKHUDeVlUTceieJNcNJfjAnE3Ros7RJFw++hkV2UxFcVSBbl
+	 PTs3B1JCkoECItzVM1T7qNQaoytXhj/5s+jnDzKLbqbgyEKtqMs+SmnW+N7A1KS/cR
+	 os4bi7k4nghWgYb0cEP2k/ga1yvOXtq5ltHIldUKiwukq5Uoa7+7ocPj/c/8wz4NJa
+	 H5eHOP1zQvPFetqU3J+iEso2kySxttP4pSdZK9MJ3Hr8m3t/mPiSNfUIXeLqf9OhJ9
+	 NVfN9/+C5m3mg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -57,11 +58,14 @@ Cc: netdev@vger.kernel.org,
 	john.fastabend@gmail.com,
 	sd@queasysnail.net,
 	jiri@resnulli.us,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 0/3] docs: net: more adjustments to docs
-Date: Sat, 13 Jun 2026 09:58:43 -0700
-Message-ID: <20260613165846.2913092-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	skhan@linuxfoundation.org
+Subject: [PATCH net-next v2 1/3] docs: net: tls-offload: document tls_dev_del, tls_dev_resync, and rekey
+Date: Sat, 13 Jun 2026 09:58:44 -0700
+Message-ID: <20260613165846.2913092-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260613165846.2913092-1-kuba@kernel.org>
+References: <20260613165846.2913092-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,14 +82,14 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298986-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298987-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:linux-doc@vger.kernel.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:jiri@resnulli.us,m:kuba@kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:linux-doc@vger.kernel.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:jiri@resnulli.us,m:kuba@kernel.org,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -97,41 +101,120 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,gmail.com,queasysnail.net,resnulli.us];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,lwn.net,gmail.com,queasysnail.net,resnulli.us,linuxfoundation.org];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lwn.net:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DD6CB67F1A2
+X-Rspamd-Queue-Id: 9FF5567F1A8
 
-A few small updates to the docs.
-This is trying to prepare docs for getting fed directly
-into AI reviews.
+Fill in some gaps in the TLS offload doc:
 
+- describe the tls_dev_del and tls_dev_resync callbacks
+- add a mention of rekeying being out of scope for now
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
 v2:
- - fixes in the tls offload patch
- - add the strparser patch in place of the already applied XDP md one
+ - add mentions of the callback in resync text
+ - Stack -> The stack
 v1: https://lore.kernel.org/20260609201224.1191391-1-kuba@kernel.org
 
-Jakub Kicinski (3):
-  docs: net: tls-offload: document tls_dev_del, tls_dev_resync, and
-    rekey
-  docs: net: fix minor issues with devlink docs
-  docs: net: fix minor issues with strparser docs
+CC: john.fastabend@gmail.com
+CC: sd@queasysnail.net
+CC: corbet@lwn.net
+CC: skhan@linuxfoundation.org
+CC: linux-doc@vger.kernel.org
+---
+ Documentation/networking/tls-offload.rst | 45 ++++++++++++++++++++----
+ 1 file changed, 38 insertions(+), 7 deletions(-)
 
- .../networking/devlink/devlink-health.rst     | 12 +++--
- .../networking/devlink/devlink-params.rst     |  2 +-
- .../networking/devlink/devlink-port.rst       |  5 ++-
- .../networking/devlink/devlink-trap.rst       |  8 ++--
- Documentation/networking/devlink/index.rst    | 10 ++---
- Documentation/networking/strparser.rst        | 22 ++++-----
- Documentation/networking/tls-offload.rst      | 45 ++++++++++++++++---
- 7 files changed, 72 insertions(+), 32 deletions(-)
-
+diff --git a/Documentation/networking/tls-offload.rst b/Documentation/networking/tls-offload.rst
+index 25ee8d9f12c9..e5802bcd4d22 100644
+--- a/Documentation/networking/tls-offload.rst
++++ b/Documentation/networking/tls-offload.rst
+@@ -99,6 +99,29 @@ at the end of kernel structures (see :c:member:`driver_state` members
+ in ``include/net/tls.h``) to avoid additional allocations and pointer
+ dereferences.
+ 
++When the offloaded connection is destroyed the core calls
++the :c:member:`tls_dev_del` callback so the driver can release per-direction
++state:
++
++.. code-block:: c
++
++	void (*tls_dev_del)(struct net_device *netdev,
++			    struct tls_context *ctx,
++			    enum tls_offload_ctx_dir direction);
++
++``tls_dev_del`` is mandatory whenever ``tls_dev_add`` is provided.
++
++The third TLS device callback is :c:member:`tls_dev_resync`, called by the core
++to synchronize the TCP stream with the record boundaries:
++
++.. code-block:: c
++
++	int (*tls_dev_resync)(struct net_device *netdev,
++			      struct sock *sk, u32 seq, u8 *rcd_sn,
++			      enum tls_offload_ctx_dir direction);
++
++See the `Resync handling`_ section for details.
++
+ TX
+ --
+ 
+@@ -250,9 +273,9 @@ sequence number (as it will be updated from a different context).
+   bool tls_offload_tx_resync_pending(struct sock *sk)
+ 
+ Next time ``ktls`` pushes a record it will first send its TCP sequence number
+-and TLS record number to the driver. Stack will also make sure that
+-the new record will start on a segment boundary (like it does when
+-the connection is initially added).
++and TLS record number to the driver via the ``tls_dev_resync`` callback.
++The stack will also make sure that the new record will start on a segment
++boundary (like it does when the connection is initially added).
+ 
+ RX
+ --
+@@ -344,9 +367,10 @@ all TLS record headers that have been logged since the resync request
+ started.
+ 
+ The kernel confirms the guessed location was correct and tells the device
+-the record sequence number. Meanwhile, the device had been parsing
+-and counting all records since the just-confirmed one, it adds the number
+-of records it had seen to the record number provided by the kernel.
++the record sequence number via the ``tls_dev_resync`` callback. Meanwhile,
++the device had been parsing and counting all records since the just-confirmed
++one, it adds the number of records it had seen to the record number provided
++by the kernel.
+ At this point the device is in sync and can resume decryption at next
+ segment boundary.
+ 
+@@ -370,12 +394,19 @@ schedules resynchronization after it has received two completely encrypted
+ records.
+ 
+ The stack waits for the socket to drain and informs the device about
+-the next expected record number and its TCP sequence number. If the
++the next expected record number and its TCP sequence number via the
++``tls_dev_resync`` callback. If the
+ records continue to be received fully encrypted stack retries the
+ synchronization with an exponential back off (first after 2 encrypted
+ records, then after 4 records, after 8, after 16... up until every
+ 128 records).
+ 
++Rekey
++=====
++
++Offload does not currently support TLS 1.3, therefore key rotation
++is not a concern for offloaded connections at this point.
++
+ Error handling
+ ==============
+ 
 -- 
 2.54.0
 
