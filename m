@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id G748EF65LWpjjAQAu9opvQ
-	(envelope-from <netdev+bounces-299032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:11:10 +0200
+	id /oXPKoi5LWpzjAQAu9opvQ
+	(envelope-from <netdev+bounces-299033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:11:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24E367F957
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:11:09 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F7567F993
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:11:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PGGLc6ix;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299032-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299032-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VaRhxf46;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299033-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299033-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 250CE300559D
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:11:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 309F93003495
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D463A2E39;
-	Sat, 13 Jun 2026 20:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D803A59A3;
+	Sat, 13 Jun 2026 20:10:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7389E39280D
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317793A2572
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:10:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781381447; cv=none; b=sFxvorF5P54pe/lkcvcSJDq8Ya4BNqt8+CHuDPXS9Fxywmaptni6kJnh72xgjN8Qtyl6eBuIM6pDLp4FHqv4xBAXwBWQP2J4tzFi+/AipxWVc/hQV/W1LtxdOEpbKDWpbdi7w3b0JxfMyhpBM0falI6XPCI19r64lE73Pf2ZVQo=
+	t=1781381448; cv=none; b=IEjNuamdN957EJM0f19krpqg5Lm9UtFzenNl9HsGVW9EaeOw4GyX7Cag3sxZvUnVqKh+O1eAGAzv+XyzUOCMTXGrbIneq177RbJsjxfr5e60+HOQ+F1F2gj4RwVL78B54uoK5fJbxF9tkOUpJ+0haICg3UKJuh/TjJ7+5phQ6uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781381447; c=relaxed/simple;
-	bh=lsnQbP08v2He5GZptCkD5vProN6YUlhl+6oEVt4jRWk=;
+	s=arc-20240116; t=1781381448; c=relaxed/simple;
+	bh=x8LXk1Sd3z0hl2u/VwR9hVjdDj6ditCOiDC/qGh0xMM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sdCUaDBQ8MkEe8a//XmVm0mMrv+h8xGw0Bkxq4O68PaGwAY6301ewa5qNlW2NrNjcyiO3r7eRw9VSh/gniEUpyCNPZs6BZidFtKldM3P4mPPe8DF7ODdj5SvnuLSnt2y3HDGuXX0GO/DH/TIeWX+wC+/VM80oab/ISS0WFR2vHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGGLc6ix; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE5BA1F00A3A;
-	Sat, 13 Jun 2026 20:10:45 +0000 (UTC)
+	 MIME-Version; b=HGV0t41/5Qoe1IDC4bZMST8VP7KwYxctFrALBKEwGDM4uOmEYTh17nYh9pZ60ACyKpStNfay8alxwqgdroxsIVIZXwkI3h6v3OfnFyEJILOrcJV0mGVkvMfyyKpnJ5e0t1i53GUpqbXhqjSlPC9JrzwluLwiKdiWtxfqdAa5AX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaRhxf46; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89FFE1F00A3F;
+	Sat, 13 Jun 2026 20:10:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781381446;
-	bh=6HgOp3TeKVWJZWSzUpcYmBXo3cvKi00BBAOH8MRDuxg=;
+	s=k20260515; t=1781381447;
+	bh=cCmQiRhDSYCQUJo9/sX7/16xgSXRVSkf5cnOyoNJVKs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PGGLc6ixuaXc62OgANMzXG+Uj5nin1brk8rfxf3y6p55CN3xAPQh844+Ob6q+Sw0z
-	 RYDm9LmDDaLQz1bvywc4zrlFKM9YM2mAspykycqViKX5JrSlFwtqQvrFL36ogI/B+J
-	 hTnj6pVLnjGLz2QDomNgsNAPwGI8ByaorR+vWRDQJj6T5WMu9lqmHgHujQRMdXYw/T
-	 re/hdnH/EO/JsgnnMqtx20MFah8hiQeeAJIWBPAkVvViFeUvmYRa8Ov7nN1SDcsS4w
-	 ZZZNXWIrSzMPnHVrUHjQDF/Pw7QhvmRSseLSyKDAertniqjvPHmaXJJM6E+/F9DDO0
-	 F9ZRnwC6QFy3A==
+	b=VaRhxf469man3PNwS1oepYD4ObTOVJLSipt3K8p8p++pla4Kd/AcJGVBg1xj1XoAH
+	 2Q9t8Z6oBUDI6aaifRznlhuhmfZl8Gz6CTqvKk3Jub4z8nJ7npl5UCqsm3oILFf/i0
+	 FCr6jFsNASSkCLZsXO4Lz8LIz8xnBD+vtUANEhjBU0UFv6pcVB61Su1pWeMs9nUri5
+	 jgNYn7oXHgY5XR/NsQFnde77pL0IbMFhZ7Z8rIT8QV3erJAarC+YG3wEM2buCnHN2p
+	 xWNNVRuCCRyrHlLd8HfyOHqPSmRkP8zoGlDEr+wshA5xZ+9J5Nw0BJCJjgQOz7YbSs
+	 TaZAuu+J54EJg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	linux-atm-general@lists.sourceforge.net,
 	dwmw2@infradead.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 6/9] atm: remove the unused change_qos device operation
-Date: Sat, 13 Jun 2026 13:10:29 -0700
-Message-ID: <20260613201032.77274-7-kuba@kernel.org>
+Subject: [PATCH net-next 7/9] atm: remove the unused pre_send and send_bh device operations
+Date: Sat, 13 Jun 2026 13:10:30 -0700
+Message-ID: <20260613201032.77274-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260613201032.77274-1-kuba@kernel.org>
 References: <20260613201032.77274-1-kuba@kernel.org>
@@ -79,7 +79,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,sfgoth.com,lists.sourceforge.net,infradead.org];
-	TAGGED_FROM(0.00)[bounces-299032-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299033-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -102,97 +102,86 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D24E367F957
+X-Rspamd-Queue-Id: 96F7567F993
 
-atmdev_ops::change_qos() was the hook for renegotiating the traffic
-parameters of an already-connected VCC, driven from SO_ATMQOS on a
-connected socket (and previously from the SVC as_modify path, now gone).
-None of the ATM drivers left in tree implement it - solos-pci only listed
-change_qos = NULL - so atm_change_qos() always returned -EOPNOTSUPP.
+atmdev_ops::pre_send (a TX pre-processing hook) and ::send_bh (a
+bottom-half capable send variant) have no implementation behind them:
+no remaining ATM driver sets either, so vcc_sendmsg() always skipped
+pre_send and the raw AAL0/AAL5 paths always fell back to ->send().
+The drivers that used these hooks were removed with the legacy ATM
+adapters.
 
-Drop the operation and return -EOPNOTSUPP directly.
+Drop both operations and the dead branches that tested for them.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/atmdev.h  |  1 -
- drivers/atm/solos-pci.c |  1 -
- net/atm/common.c        | 25 ++-----------------------
- 3 files changed, 2 insertions(+), 25 deletions(-)
+ include/linux/atmdev.h | 2 --
+ net/atm/common.c       | 6 ------
+ net/atm/raw.c          | 7 +------
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
 diff --git a/include/linux/atmdev.h b/include/linux/atmdev.h
-index 59477676063c..218c05f2ec54 100644
+index 218c05f2ec54..96ce36e02247 100644
 --- a/include/linux/atmdev.h
 +++ b/include/linux/atmdev.h
-@@ -143,7 +143,6 @@ struct atmdev_ops { /* only send is required */
+@@ -137,9 +137,7 @@ struct atmdev_ops { /* only send is required */
+ 	int (*compat_ioctl)(struct atm_dev *dev,unsigned int cmd,
+ 			    void __user *arg);
+ #endif
+-	int (*pre_send)(struct atm_vcc *vcc, struct sk_buff *skb);
+ 	int (*send)(struct atm_vcc *vcc,struct sk_buff *skb);
+-	int (*send_bh)(struct atm_vcc *vcc, struct sk_buff *skb);
  	void (*phy_put)(struct atm_dev *dev,unsigned char value,
  	    unsigned long addr);
  	unsigned char (*phy_get)(struct atm_dev *dev,unsigned long addr);
--	int (*change_qos)(struct atm_vcc *vcc,struct atm_qos *qos,int flags);
- 	int (*proc_read)(struct atm_dev *dev,loff_t *pos,char *page);
- 	struct module *owner;
- };
-diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
-index 4ad170a858ee..9c246b956c30 100644
---- a/drivers/atm/solos-pci.c
-+++ b/drivers/atm/solos-pci.c
-@@ -1182,7 +1182,6 @@ static const struct atmdev_ops fpga_ops = {
- 	.send =		psend,
- 	.phy_put =	NULL,
- 	.phy_get =	NULL,
--	.change_qos =	NULL,
- 	.proc_read =	NULL,
- 	.owner =	THIS_MODULE
- };
 diff --git a/net/atm/common.c b/net/atm/common.c
-index 650814d0a56c..44a0179d4586 100644
+index 44a0179d4586..654cbe3c855e 100644
 --- a/net/atm/common.c
 +++ b/net/atm/common.c
-@@ -673,28 +673,6 @@ __poll_t vcc_poll(struct file *file, struct socket *sock, poll_table *wait)
- 	return mask;
+@@ -626,12 +626,6 @@ int vcc_sendmsg(struct socket *sock, struct msghdr *m, size_t size)
+ 	if (eff != size)
+ 		memset(skb->data + size, 0, eff-size);
+ 
+-	if (vcc->dev->ops->pre_send) {
+-		error = vcc->dev->ops->pre_send(vcc, skb);
+-		if (error)
+-			goto free_skb;
+-	}
+-
+ 	error = vcc->dev->ops->send(vcc, skb);
+ 	error = error ? error : size;
+ out:
+diff --git a/net/atm/raw.c b/net/atm/raw.c
+index 1d6ac7b0c4e5..87d136c7554b 100644
+--- a/net/atm/raw.c
++++ b/net/atm/raw.c
+@@ -54,8 +54,6 @@ static int atm_send_aal0(struct atm_vcc *vcc, struct sk_buff *skb)
+ 		kfree_skb(skb);
+ 		return -EADDRNOTAVAIL;
+ 	}
+-	if (vcc->dev->ops->send_bh)
+-		return vcc->dev->ops->send_bh(vcc, skb);
+ 	return vcc->dev->ops->send(vcc, skb);
  }
  
--static int atm_change_qos(struct atm_vcc *vcc, struct atm_qos *qos)
--{
--	int error;
--
--	/*
--	 * Don't let the QoS change the already connected AAL type nor the
--	 * traffic class.
--	 */
--	if (qos->aal != vcc->qos.aal ||
--	    qos->rxtp.traffic_class != vcc->qos.rxtp.traffic_class ||
--	    qos->txtp.traffic_class != vcc->qos.txtp.traffic_class)
--		return -EINVAL;
--	error = adjust_tp(&qos->txtp, qos->aal);
--	if (!error)
--		error = adjust_tp(&qos->rxtp, qos->aal);
--	if (error)
--		return error;
--	if (!vcc->dev->ops->change_qos)
--		return -EOPNOTSUPP;
--	return vcc->dev->ops->change_qos(vcc, qos, ATM_MF_SET);
--}
--
- static int check_tp(const struct atm_trafprm *tp)
+@@ -71,10 +69,7 @@ int atm_init_aal5(struct atm_vcc *vcc)
  {
- 	/* @@@ Should be merged with adjust_tp */
-@@ -753,8 +731,9 @@ int vcc_setsockopt(struct socket *sock, int level, int optname,
- 		error = check_qos(&qos);
- 		if (error)
- 			return error;
-+		/* QoS cannot be renegotiated on an already connected VCC. */
- 		if (sock->state == SS_CONNECTED)
--			return atm_change_qos(vcc, &qos);
-+			return -EOPNOTSUPP;
- 		if (sock->state != SS_UNCONNECTED)
- 			return -EBADFD;
- 		vcc->qos = qos;
+ 	vcc->push = atm_push_raw;
+ 	vcc->pop = atm_pop_raw;
+-	if (vcc->dev->ops->send_bh)
+-		vcc->send = vcc->dev->ops->send_bh;
+-	else
+-		vcc->send = vcc->dev->ops->send;
++	vcc->send = vcc->dev->ops->send;
+ 	return 0;
+ }
+ EXPORT_SYMBOL(atm_init_aal5);
 -- 
 2.54.0
 
