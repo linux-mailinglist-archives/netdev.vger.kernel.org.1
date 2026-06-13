@@ -1,221 +1,21663 @@
-Return-Path: <netdev+bounces-298895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dqrjIAvPLGpdWgQAu9opvQ
-	(envelope-from <netdev+bounces-298895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:31:23 +0200
+	id cC2bHUjPLGpvWgQAu9opvQ
+	(envelope-from <netdev+bounces-298897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:32:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B0467D9BD
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:31:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B52D67D9D4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:32:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=PmrNqNSR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298895-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298895-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=d+gKZ5cP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298897-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298897-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DFC83100605
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:31:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0DE9E301136A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2C3349B15;
-	Sat, 13 Jun 2026 03:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C385D38333F;
+	Sat, 13 Jun 2026 03:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BE21B983F
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 03:31:17 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781321478; cv=pass; b=BhrjnlJ2Cwq1uJvz5IL5cA6hzBEjKzJYieWba0gdX0Z5r1czjZWRRdQvhGcsx79UXxcPAi9kCRq9cLynZKb/Epo9Hukk81GHPSSHAFhTE3yBisl2WmIZ0KbMxZiUehI4n8hlcMASc/tYYJeUPnAOFH6bKyUCWLg/rozSLARoEc0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781321478; c=relaxed/simple;
-	bh=ZXDZnM97lD4Z3x1nQ8IPpOO2DiE1spKw7zbCMMKqgBk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TTokhE+W86ySMQGVkw+wZC8apbo5DLkU+VIMxeGFeSrI3m3ZrkHWP0FQcgQgi4yb/7QRH1bHn3OWQVNtnSLstVibGmXkC+cxvs8diXaSB/2CnhQ6T+pRMelGhsJXhCZqsBJGqHcxMlNDZcBKNRGIBOMA9uUoDkqP3JCXNpbnHQQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PmrNqNSR; arc=pass smtp.client-ip=209.85.219.47
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8ce9ddeddefso18525456d6.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 20:31:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781321476; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TH6siHzdvwlV7FLOVHli4Nwhy0o3Evo+cOSXuLp4HPwgmgNnrlfeDr5SVvUzc4a0Ba
-         8GmqR/yPOKWgP8p2xZJyhNTb5gRw5eQbUanC9HVVZXJnMFOh9sXLtBbabOut9/6VRNcU
-         NQyB0aYhHOjMCUCUkpA8xV/pKQvJjZiPui19dq22tnJzRZg6RNkzcoZssmG/e0cGILz8
-         H7resnd6RUzHo62JMc6C8A+rgvH8FMfqKrpQ/0s1VHU3F1bt+GxNMJFDyASkLYrfUzsz
-         83MCZH0xopwYDh1zgbRtQ0og+r4TQN43sVJFTkbjv0YfQRlCb4ergOJ0VyqMfEY3EdNo
-         qRAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1N+Y4+Ebz5eq2rs04g2NhF5lcNLQs+3vWd6IbiqVT5U=;
-        fh=cOIVU7FCbEG6jgIXAa32HljQQVGeA/iLsj++8gScUEI=;
-        b=UQnFxw412YZwwAcSwVOnxQ8FwHF7hBBLRZ3EvfZr7WkOmve9+Kr+LgLnGqP2/odWQy
-         ZIY6Qm4ytUP9oQ5cweFqlX07bFw0xG5OA9qxpO1flP/pgGnlBElN12+5wu26kFFp0UAs
-         N08ssYtSpkcBNn8+e5SMVTrj3yc0YBaOliKhVjxuX5dhrVfSV5mwS3Fg59TDrOudD+8d
-         LEFKEwdHMVr7p1vEKqLBjVe8rFbiXZdlfAz7huOWvAlwa013XQiRwmlC1grAoYRplKdZ
-         5bid66xGilCYq7zdX65/a6ISFe/wQ6VQQC/l2NjBwqf9dRukYyLkdAu337XLY3H7xZoK
-         6l9g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6438D368D7E
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 03:31:55 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781321540; cv=none; b=lF1pFLR2gzKLrdSczenF0mvJJP0EB0hAi7p/nU1lyGuQHvRaHePvIWoPi45cLv5HZzo78iryc86lfczZC4xHLEiGJHEWSwAsz2HJegv6M1J1rXc0BjKK5ULtGNvvhuyMRdUW73f9KISKsdP+zAG2Rw/VMYi3N83is29KPUIimXk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781321540; c=relaxed/simple;
+	bh=LpjxSCyybHuUwxPP8jIgQ1W3mytgIGzJxNQ4zgO6x5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OVdasOw6ZQE7NhyeGXQ49OHgkyJtIm8zPO1VnmZiW9tjvgUALq7uy5OsvOOcs0+BXzpWwTVN4IZELzh/zd76C+rYvfv9JB2FyzaPb9DngQAU3WUZUu8DYgeblPcEtbS2S2IydjVhNYoeNkF8vTilxcndBj9ZaDzLqLU2EGehX7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+gKZ5cP; arc=none smtp.client-ip=74.125.82.174
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-30749947917so4971306eec.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 20:31:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781321476; x=1781926276; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1N+Y4+Ebz5eq2rs04g2NhF5lcNLQs+3vWd6IbiqVT5U=;
-        b=PmrNqNSR2PCKf2RzWrqXOrxTHQ3OXM3K4H/B4iRNIpGUgrCb/WzfOw5R+8rk1Bes9A
-         ZpE9TU5bvVAZe5BmZQeS9fPlfHoM9VWbMzyrV2qNpptAJl+NwSnnVStBIkT1ZJdav5ER
-         h6kp7yX0kGxO2rhP3MdmrEZr+Sr4Wml4QA9UrXKHgsBqYfN1gKgEUrRVEi9oXAU8Q1Xo
-         kLVLymOjHW3g9LCznUZ+5FmA49PM9NlFaO20I4qcJLSL1LJmpRSkMBSeoAsyF/rtbSmz
-         MGgqpYp7zQAwEdIEYwg3zxAv251q+x7sZ7dRXKf+u/SqyVw9FI97HfBwqtQ2g5yGOMe9
-         J5hg==
+        d=gmail.com; s=20251104; t=1781321514; x=1781926314; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hKsR/Jax/LaDXMnwXkLNmuhaJ4Xdt1LBmNtMeC044wA=;
+        b=d+gKZ5cPcxIW03Q+c31evwxXSpjpt9B2wgJFlAGfY5A2BWVCl92ZboFnlm40pz8cio
+         4+K7JtTe0tJsJqX6jRn1a5SEw81QS5yDQRtACT1c6ecvY3vzzFhqKynmM2h2BOb/syUv
+         19WbSLB38mm7Y8lI5VhcUHHTCAu5VesiVPtBmLfPQpxubobmici32QgnnGyTDkv/SeiU
+         uFItxYEQ2hUGDjr8pdPLuYaZgS9aL7O7mNSCsuvU/gGCPsdHzu0+XT09NMmMZbYDx14z
+         WjuOO+4jUAf2N58oMNsQr1xwmskGC/2eGXDlTjvo+VDNfVUBVYFPqPdTX1JUDWTP7nj4
+         x6WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781321476; x=1781926276;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1N+Y4+Ebz5eq2rs04g2NhF5lcNLQs+3vWd6IbiqVT5U=;
-        b=GXNIJePNrWFyPj+MaycA1kOHj0Rx6hKzORkFRkgNn3waeII6Gy0r2byDz6L4YO3MCH
-         pMFpwIKzWSvvIidrAxLf2LLXniEd1aFQf70lZTnKFZCD6bPm9kD7Zn/jmpreahuE+Dc4
-         bkX5aPAyxILYqVEn5kSC+UkbEg/JZOvxZvLC6JsNOtLfB8/RlNzurJ79FYC0ZlP9w0gf
-         ruQmD4z/+X3t/NnDQuN5XU8rOFYiv5k5OXNp5ns8ycK/M97qmyGTCxbuIzqivPQ/A4I+
-         SIq7f1wFL0w4ES94xGpgHbAk0h50C2P699bQ0liJ9uLj8NBN1YesfSxoG3o5cECI9cC5
-         TqkA==
-X-Forwarded-Encrypted: i=1; AFNElJ/hg4isZv4S6puWm24Y+0UdWQGWMNXLJCuXOE8WSmmtTxabgbW/pjTYTHDFsssh410/ok8o0gM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYujc/Mi8xlKHBUzTc57E1YoH6zy8+7YnZ5VtR9k2hazyzLYoR
-	uFocCoFKfNYs0KymOfNPcHyGZa48qnjFK5mny3CW2Py+jGBMdF4GNZ/xDMtJjBxCYzdWbn1O7Ta
-	uiYnyl07m0g9AQ2PY+uoVkehJZzhNgAm1X8TrWN63
-X-Gm-Gg: Acq92OE4XwtOzcovC9MBeive2RxkXbl+VC66Bi5lYONJiW1yi0FIFxVzmuz874ptMv0
-	GSKUulQCpKCRMNjQotiUTv4bCvqkzZvGdsfYwYo/jUn9sLuxVXrful4WwSwlEO5yxf1iduyo5O7
-	l0GvoW3Fc3QZChC1fXrRZlem+/HuKP4e2FzbpkOACJNF654p+Q5xNBFB/oA2oJ4AlkknXyP+5ZC
-	0hijR0eaArDGFI0ca6FLtEgfRT8eElPTQdEuQP1azpwhFX+J07tgB/Dsspd1BHfEvBsQAdD4MAc
-	rniz/enu9k/6FCEFnFr8FgRl43s6kMECoAaAKujeML9rhvz/fsabuHl8PsEqW7Wkpv52mYECkQo
-	WBmsbHL1MSSQlct9E2RI=
-X-Received: by 2002:a05:622a:6207:b0:516:d955:ea2 with SMTP id
- d75a77b69052e-517fddcb3a8mr88521351cf.0.1781321475703; Fri, 12 Jun 2026
- 20:31:15 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781321514; x=1781926314;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hKsR/Jax/LaDXMnwXkLNmuhaJ4Xdt1LBmNtMeC044wA=;
+        b=oj/u7oua8NgZdsiiLpoYgNDdyt7QdOPmU904yfKrQ+afFJzgyBoem3zqGZWJUk097c
+         sdtluduTXI8GTIaBdRM2QWAzAPyGRHkduMYjPFV2ZOp2UqWDmcymb5Erffc42wGUbQ79
+         99PQr0n+Ve+BEH3NyCuQw++R4E6/UfGWzlTxIGTxx20Eg7x3XBZcXie69TFLhBqVZUcq
+         ebW3Lytck9zyp7YG7WVGHIU7NGOLeRvJkjHT+H1CHYoMk6557yrqQQOBFZMKgN7bv3G8
+         oyhTgDU4SDKCL8LT1yZPYS0A1oVlx/MGglFv3fLQ876bVoqurbXb0Qw7uC1xqCTYhJk2
+         374g==
+X-Gm-Message-State: AOJu0YyP8mQ3HY18L5EdjwLseJiAytTCgWYdlPLXiczAgdaU3eReHXLY
+	MccgqYT4iGzBCsx+YvESaKRZE7kS7I7HN3NM1o8bNMetjSiObsQhXCEl
+X-Gm-Gg: Acq92OGDonV87e8HCMgJgsl/BfwB8ChqO8RwItI1IkRbAa/yeisx5iA6AABzhF41ops
+	kOPYztiKf91pmfeboC8DtAjPYyDpEhCaFYKdNkEgwomqyvPXjtH7VwqA2FSFY/0pjsVeLef64ot
+	n5sLxqqKbaUr+j7JNDWtRZKH+yBSg7k+VrOWyf3JqDcNKeLgFATkvdtpuWz7YxiynJjefNY+sRv
+	C6eToDOtmXCIsJ6KcPYxXr20sdDr1/JIGLOXl6tjZ4f43k/lx1ihJfaODgI+kaJDOB+SiEL4t1r
+	y1FdgmpJw83rzi+tZ63JWZWOPeghpcofZKmRK0xMuMAPHuZTWL+77Ysunc3878MyrjVkRYs6CPv
+	PotTRlhRD/Dc4DMk25W3c9epikWnrESyyznMtCFc4Zm/H3/QkvqLogHt/29bUzI2YqzxUGGI94t
+	A61Px5ekf9NX2U9vDtxzVdBw==
+X-Received: by 2002:a05:7301:5f02:b0:304:ab8:f899 with SMTP id 5a478bee46e88-309395a7d3bmr1207666eec.8.1781321511263;
+        Fri, 12 Jun 2026 20:31:51 -0700 (PDT)
+Received: from 192.168.1.17 ([179.63.13.36])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e5d810fsm6136001eec.12.2026.06.12.20.31.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jun 2026 20:31:49 -0700 (PDT)
+From: Gabriel Ramos Barbosa Mota <maguraa53@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	deller@gmx.de,
+	fero@drama.obuda.kando.hu
+Cc: netdev@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	Gabriel Ramos Barbosa Mota <maguraa53@gmail.com>
+Subject: [PATCH] drivers: net and video: remove legacy 16-bit and non-x86 hardware drivers
+Date: Sat, 13 Jun 2026 00:31:30 -0300
+Message-ID: <20260613033138.601841-1-maguraa53@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260612135949.4010482-1-edumazet@google.com> <GV1P189MB1988A0E785BF302589C9AE42C6192@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-In-Reply-To: <GV1P189MB1988A0E785BF302589C9AE42C6192@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 12 Jun 2026 20:31:04 -0700
-X-Gm-Features: AVVi8CeThQtBBgXWv8O_Z4xhJRfnyhNeL294dlY0rv1WIkggI0_XNWOQRDYAp84
-Message-ID: <CANn89i+=e3ZNDTXkB7pxYnbiaw50Y=WgGbw2WJM5__1XjSxU6A@mail.gmail.com>
-Subject: Re: [PATCH net] tipc: fix UAF in tipc_l2_send_msg()
-To: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-Cc: Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, 
-	"syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com" <syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com>, 
-	Jon Maloy <jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298895-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tung.quang.nguyen@est.tech,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com,m:jmaloy@redhat.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298897-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,gmx.de,drama.obuda.kando.hu];
+	FORGED_SENDER(0.00)[maguraa53@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:deller@gmx.de,m:fero@drama.obuda.kando.hu,m:netdev@vger.kernel.org,m:linux-fbdev@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-kernel@vger.kernel.org,m:maguraa53@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,redhat.com,davemloft.net];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev,64ec81389cbad56a8c35];
+	FROM_NEQ_ENVFROM(0.00)[maguraa53@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,appspotmail.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8B0467D9BD
+X-Rspamd-Queue-Id: 9B52D67D9D4
 
-On Fri, Jun 12, 2026 at 7:50=E2=80=AFPM Tung Quang Nguyen
-<tung.quang.nguyen@est.tech> wrote:
->
-> >Subject: [PATCH net] tipc: fix UAF in tipc_l2_send_msg()
-> >
-> >Syzbot reported a slab-use-after-free in ipvlan_hard_header() when calle=
-d
-> >from tipc_l2_send_msg().
-> >
-> >The root cause is that tipc_disable_l2_media() calls synchronize_net() w=
-hile b-
-> >>media_ptr is still valid. This allows concurrent RCU readers to obtain =
-the
-> >device pointer after synchronize_net() has finished.
-> >The pointer is cleared later in bearer_disable(), but without any subseq=
-uent
-> >synchronization, allowing the device to be freed while still in use by r=
-eaders.
-> >
-> >Fix this by clearing b->media_ptr in tipc_disable_l2_media() before call=
-ing
-> >synchronize_net().
-> >
-> >This is safe to do now because the call order in bearer_disable() was re=
-versed
-> >in 0d051bf93c06 ("tipc: make bearer packet filtering generic") to call
-> >tipc_node_delete_links() (which needs the pointer) before disable_media(=
-).
-> >
-> >Fixes: 282b3a056225 ("tipc: send out RESET immediately when link goes
-> >down")
-> >https://lore.kernel.org/netdev/6a2c1007.428ffe26.258b27.015d.GAE@google.=
-c
-> >om/T/#u
-> >Reported-by: syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com
-> >Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >Cc: Jon Maloy <jmaloy@redhat.com>
-> >---
-> > net/tipc/bearer.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> >
-> >diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c index
-> >a3bd1ef17558a37787bb92f2c3805c0fda874d8a..05dcd2f9e887a6e5ca6665ab4
-> >1e4d5b5107f158c 100644
-> >--- a/net/tipc/bearer.c
-> >+++ b/net/tipc/bearer.c
-> >@@ -482,6 +482,7 @@ void tipc_disable_l2_media(struct tipc_bearer *b)
-> >       dev =3D (struct net_device *)rtnl_dereference(b->media_ptr);
-> >       dev_remove_pack(&b->pt);
-> >       RCU_INIT_POINTER(dev->tipc_ptr, NULL);
-> >+      RCU_INIT_POINTER(b->media_ptr, NULL);
->
-> Since 'b->media_ptr' is reset here, Should the same reset be removed in b=
-earer_disable() ?
-> bearer_disable()
-> {
-> ...
-> RCU_INIT_POINTER(b->media_ptr, NULL);
-> ...
-> }
+---
+ drivers/net/ethernet/3com/3c509.c       | 1543 ---------
+ drivers/net/ethernet/3com/Makefile      |    1 -
+ drivers/net/ethernet/3com/Makefile.save |    7 +
+ drivers/net/ethernet/8390/Makefile      |   14 +-
+ drivers/net/ethernet/8390/apne.c        |  614 ----
+ drivers/net/ethernet/8390/ax88796.c     | 1022 ------
+ drivers/net/ethernet/8390/etherh.c      |  858 -----
+ drivers/net/ethernet/8390/hydra.c       |  274 --
+ drivers/net/ethernet/8390/mac8390.c     |  848 -----
+ drivers/net/ethernet/8390/mcf8390.c     |  468 ---
+ drivers/net/ethernet/8390/ne.c          |  992 ------
+ drivers/net/ethernet/8390/pcnet_cs.c    | 1717 ----------
+ drivers/net/ethernet/8390/stnic.c       |  300 --
+ drivers/net/ethernet/8390/xsurf100.c    |  377 ---
+ drivers/net/ethernet/8390/zorro8390.c   |  447 ---
+ drivers/video/fbdev/Makefile            |   10 +-
+ drivers/video/fbdev/acornfb.c           | 1102 -------
+ drivers/video/fbdev/acornfb.h           |  166 -
+ drivers/video/fbdev/amifb.c             | 3787 -----------------------
+ drivers/video/fbdev/atafb.c             | 3188 -------------------
+ drivers/video/fbdev/atafb.h             |   37 -
+ drivers/video/fbdev/atafb_iplan2p2.c    |  270 --
+ drivers/video/fbdev/atafb_iplan2p4.c    |  285 --
+ drivers/video/fbdev/atafb_iplan2p8.c    |  322 --
+ drivers/video/fbdev/atafb_mfb.c         |   89 -
+ drivers/video/fbdev/atafb_utils.h       |  401 ---
+ drivers/video/fbdev/hgafb.c             |  685 ----
+ drivers/video/fbdev/vga16fb.c           | 1442 ---------
+ 28 files changed, 19 insertions(+), 21247 deletions(-)
+ delete mode 100644 drivers/net/ethernet/3com/3c509.c
+ create mode 100644 drivers/net/ethernet/3com/Makefile.save
+ delete mode 100644 drivers/net/ethernet/8390/apne.c
+ delete mode 100644 drivers/net/ethernet/8390/ax88796.c
+ delete mode 100644 drivers/net/ethernet/8390/etherh.c
+ delete mode 100644 drivers/net/ethernet/8390/hydra.c
+ delete mode 100644 drivers/net/ethernet/8390/mac8390.c
+ delete mode 100644 drivers/net/ethernet/8390/mcf8390.c
+ delete mode 100644 drivers/net/ethernet/8390/ne.c
+ delete mode 100644 drivers/net/ethernet/8390/pcnet_cs.c
+ delete mode 100644 drivers/net/ethernet/8390/stnic.c
+ delete mode 100644 drivers/net/ethernet/8390/xsurf100.c
+ delete mode 100644 drivers/net/ethernet/8390/zorro8390.c
+ delete mode 100644 drivers/video/fbdev/acornfb.c
+ delete mode 100644 drivers/video/fbdev/acornfb.h
+ delete mode 100644 drivers/video/fbdev/amifb.c
+ delete mode 100644 drivers/video/fbdev/atafb.c
+ delete mode 100644 drivers/video/fbdev/atafb.h
+ delete mode 100644 drivers/video/fbdev/atafb_iplan2p2.c
+ delete mode 100644 drivers/video/fbdev/atafb_iplan2p4.c
+ delete mode 100644 drivers/video/fbdev/atafb_iplan2p8.c
+ delete mode 100644 drivers/video/fbdev/atafb_mfb.c
+ delete mode 100644 drivers/video/fbdev/atafb_utils.h
+ delete mode 100644 drivers/video/fbdev/hgafb.c
+ delete mode 100644 drivers/video/fbdev/vga16fb.c
 
-We could, but we would have to add a reset in tipc_udp_disable().
+diff --git a/drivers/net/ethernet/3com/3c509.c b/drivers/net/ethernet/3com/3c509.c
+deleted file mode 100644
+index f23be7425..000000000
+--- a/drivers/net/ethernet/3com/3c509.c
++++ /dev/null
+@@ -1,1543 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/* 3c509.c: A 3c509 EtherLink3 ethernet driver for linux. */
+-/*
+- *	Written 1993-2000 by Donald Becker.
+- *
+- *	Copyright 1994-2000 by Donald Becker.
+- *	Copyright 1993 United States Government as represented by the
+- *	Director, National Security Agency.	 This software may be used and
+- *	distributed according to the terms of the GNU General Public License,
+- *	incorporated herein by reference.
+- *
+- *	This driver is for the 3Com EtherLinkIII series.
+- *
+- *	The author may be reached as becker@scyld.com, or C/O
+- *	Scyld Computing Corporation
+- *	410 Severn Ave., Suite 210
+- *	Annapolis MD 21403
+- *
+- *	Known limitations:
+- *	Because of the way 3c509 ISA detection works it's difficult to predict
+- *	a priori which of several ISA-mode cards will be detected first.
+- *
+- *	This driver does not use predictive interrupt mode, resulting in higher
+- *	packet latency but lower overhead.  If interrupts are disabled for an
+- *	unusually long time it could also result in missed packets, but in
+- *	practice this rarely happens.
+- *
+- *
+- *	FIXES:
+- *		Alan Cox:	Removed the 'Unexpected interrupt' bug.
+- *		Michael Meskes:	Upgraded to Donald Becker's version 1.07.
+- *		Alan Cox:	Increased the eeprom delay. Regardless of
+- *				what the docs say some people definitely
+- *				get problems with lower (but in card spec)
+- *				delays.
+- *		v1.10 4/21/97	Fixed module code so that multiple cards may be
+- *				detected, other cleanups.  -djb
+- *		Andrea Arcangeli: Upgraded to Donald Becker's version 1.12.
+- *		Rick Payne:	Fixed SMP race condition.
+- *		v1.13 9/8/97	Made 'max_interrupt_work' an insmod-settable
+- *				variable. -djb
+- *		v1.14 10/15/97	Avoided waiting..discard message for fast
+- *				machines. -djb
+- *		v1.15 1/31/98	Faster recovery for Tx errors. -djb
+- *		v1.16 2/3/98	Different ID port handling to avoid sound
+- *				cards. -djb
+- *		v1.18 12Mar2001 Andrew Morton
+- *			- Avoid bogus detect of 3c590's (Andrzej Krzysztofowicz)
+- *			- Reviewed against 1.18 from scyld.com
+- *		v1.18a 17Nov2001 Jeff Garzik <jgarzik@pobox.com>
+- *			- ethtool support.
+- *		v1.18b 1Mar2002 Zwane Mwaikambo <zwane@commfireservices.com>
+- *			- Power Management support.
+- *		v1.18c 1Mar2002 David Ruggiero <jdr@farfalle.com>
+- *			- Full duplex support.
+- *		v1.19  16Oct2002 Zwane Mwaikambo <zwane@linuxpower.ca>
+- *			- Additional ethtool features.
+- *		v1.19a 28Oct2002 David Ruggiero <jdr@farfalle.com>
+- *			- Increase *read_eeprom udelay to workaround oops with
+- *			  2 cards.
+- *		v1.19b 08Nov2002 Marc Zyngier <maz@wild-wind.fr.eu.org>
+- *			- Introduce driver model for EISA cards.
+- *		v1.20  04Feb2008 Ondrej Zary <linux@rainbow-software.org>
+- *			- convert to isa_driver and pnp_driver and some
+- *			  cleanups.
+- */
+-
+-#define DRV_NAME	"3c509"
+-
+-/* A few values that may be tweaked. */
+-
+-/* Time in jiffies before concluding the transmitter is hung. */
+-#define TX_TIMEOUT  (400 * HZ / 1000)
+-
+-#include <linux/bitops.h>
+-#include <linux/delay.h>	/* for udelay() */
+-#include <linux/device.h>
+-#include <linux/eisa.h>
+-#include <linux/errno.h>
+-#include <linux/etherdevice.h>
+-#include <linux/ethtool.h>
+-#include <linux/in.h>
+-#include <linux/init.h>
+-#include <linux/interrupt.h>
+-#include <linux/io.h>
+-#include <linux/ioport.h>
+-#include <linux/isa.h>
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/pm.h>
+-#include <linux/pnp.h>
+-#include <linux/skbuff.h>
+-#include <linux/spinlock.h>
+-#include <linux/string.h>
+-#include <linux/uaccess.h>
+-
+-#include <asm/irq.h>
+-
+-#ifdef EL3_DEBUG
+-static int el3_debug = EL3_DEBUG;
+-#else
+-static int el3_debug = 2;
+-#endif
+-
+-/* Used to do a global count of all the cards in the system.  Must be
+- * a global variable so that the eisa probe routines can increment it.
+- */
+-static int el3_cards;
+-#define EL3_MAX_CARDS 8
+-
+-/* To minimize the size of the driver source I only define operating
+- * constants if they are used several times.  You'll need the manual
+- * anyway if you want to understand driver details.
+- */
+-/* Offsets from base I/O address. */
+-#define EL3_DATA 0x00
+-#define EL3_CMD 0x0e
+-#define EL3_STATUS 0x0e
+-#define	EEPROM_READ 0x80
+-
+-#define EL3_IO_EXTENT	16
+-
+-#define EL3WINDOW(win_num) outw(SELECT_WINDOW + (win_num), ioaddr + EL3_CMD)
+-
+-/* The top five bits written to EL3_CMD are a command, the lower
+- * 11 bits are the parameter, if applicable.
+- */
+-enum c509cmd {
+-	TOTAL_RESET =		 0 << 11,
+-	SELECT_WINDOW =		 1 << 11,
+-	START_COAX =		 2 << 11,
+-	RX_DISABLE =		 3 << 11,
+-	RX_ENABLE =		 4 << 11,
+-	RX_RESET =		 5 << 11,
+-	RX_DISCARD =		 8 << 11,
+-	TX_ENABLE =		 9 << 11,
+-	TX_DISABLE =		10 << 11,
+-	TX_RESET =		11 << 11,
+-	FAKE_INTR =		12 << 11,
+-	ACK_INTR =		13 << 11,
+-	SET_INTR_ENB =		14 << 11,
+-	SET_STATUS_ENB =	15 << 11,
+-	SET_RX_FILTER =		16 << 11,
+-	SET_RX_THRESHOLD =	17 << 11,
+-	SET_TX_THRESHOLD =	18 << 11,
+-	SET_TX_START =		19 << 11,
+-	STATS_ENABLE =		21 << 11,
+-	STATS_DISABLE =		22 << 11,
+-	STOP_COAX =		23 << 11,
+-	POWER_UP =		27 << 11,
+-	POWER_DOWN =		28 << 11,
+-	POWER_AUTO =		29 << 11,
+-};
+-
+-enum c509status {
+-	INT_LATCH =		0x0001,
+-	ADAPTER_FAILURE =	0x0002,
+-	TX_COMPLETE =		0x0004,
+-	TX_AVAILABLE =		0x0008,
+-	RX_COMPLETE =		0x0010,
+-	RX_EARLY =		0x0020,
+-	INT_REQ =		0x0040,
+-	STATS_FULL =		0x0080,
+-	CMD_BUSY =		0x1000,
+-};
+-
+-/* The SET_RX_FILTER command accepts the following classes: */
+-enum rx_filter {
+-	RX_STATION =	1,
+-	RX_MULTICAST =	2,
+-	RX_BROADCAST =	4,
+-	RX_PROM =	8,
+-};
+-
+-/* Register window 1 offsets, the window used in normal operation. */
+-#define TX_FIFO		0x00
+-#define RX_FIFO		0x00
+-#define RX_STATUS	0x08
+-#define TX_STATUS	0x0B
+-#define TX_FREE		0x0C	/* Remaining free bytes in Tx buffer. */
+-
+-#define WN0_CONF_CTRL	0x04	/* Window 0: Configuration control register. */
+-#define WN0_ADDR_CONF	0x06	/* Window 0: Address configuration register. */
+-#define WN0_IRQ		0x08	/* Window 0: Set IRQ line in bits 12-15. */
+-#define WN4_MEDIA	0x0A	/* Window 4: Various transcvr/media bits. */
+-#define	MEDIA_TP	0x00C0	/* Enable link beat and jabber for 10baseT. */
+-#define WN4_NETDIAG	0x06	/* Window 4: Net diagnostic. */
+-#define FD_ENABLE	0x8000	/* Enable full-duplex ("external loopback"). */
+-
+-/*
+- * Must be a power of two (we use a binary and in the
+- * circular queue).
+- */
+-#define SKB_QUEUE_SIZE	64
+-
+-enum el3_cardtype { EL3_ISA, EL3_PNP, EL3_EISA };
+-
+-struct el3_private {
+-	/* for device access */
+-	spinlock_t lock;
+-	/* skb send-queue */
+-	int head, size;
+-	struct sk_buff *queue[SKB_QUEUE_SIZE];
+-	enum el3_cardtype type;
+-};
+-
+-static int id_port;
+-static int current_tag;
+-static struct net_device *el3_devs[EL3_MAX_CARDS];
+-
+-/* Parameters that may be passed into the module. */
+-static int debug = -1;
+-static int irq[] = {-1, -1, -1, -1, -1, -1, -1, -1};
+-/* Maximum events (Rx packets, etc.) to handle at each interrupt. */
+-static int max_interrupt_work = 10;
+-#ifdef CONFIG_PNP
+-static int nopnp;
+-#endif
+-
+-static int el3_common_init(struct net_device *dev);
+-static void el3_common_remove(struct net_device *dev);
+-static ushort id_read_eeprom(int index);
+-static ushort read_eeprom(int ioaddr, int index);
+-static int el3_open(struct net_device *dev);
+-static netdev_tx_t el3_start_xmit(struct sk_buff *skb, struct net_device *dev);
+-static irqreturn_t el3_interrupt(int irq, void *dev_id);
+-static void update_stats(struct net_device *dev);
+-static struct net_device_stats *el3_get_stats(struct net_device *dev);
+-static int el3_rx(struct net_device *dev);
+-static int el3_close(struct net_device *dev);
+-static void set_multicast_list(struct net_device *dev);
+-static void el3_tx_timeout(struct net_device *dev, unsigned int txqueue);
+-static void el3_down(struct net_device *dev);
+-static void el3_up(struct net_device *dev);
+-static const struct ethtool_ops ethtool_ops;
+-#ifdef CONFIG_PM
+-static int el3_suspend(struct device *, pm_message_t);
+-static int el3_resume(struct device *);
+-#else
+-#define el3_suspend NULL
+-#define el3_resume NULL
+-#endif
+-
+-/* Generic device remove for all device types. */
+-static int el3_device_remove(struct device *device);
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-static void el3_poll_controller(struct net_device *dev);
+-#endif
+-
+-/* Return 0 on success, 1 on error, 2 when found already detected PnP card. */
+-static int el3_isa_id_sequence(__be16 *phys_addr)
+-{
+-	short lrs_state = 0xff;
+-	int i;
+-
+-	/* ISA boards are detected by sending the ID sequence to the
+-	 * ID_PORT.  We find cards past the first by setting the 'current_tag'
+-	 * on cards as they are found.  Cards with their tag set will not
+-	 * respond to subsequent ID sequences.
+-	 */
+-	outb(0x00, id_port);
+-	outb(0x00, id_port);
+-	for (i = 0; i < 255; i++) {
+-		outb(lrs_state, id_port);
+-		lrs_state <<= 1;
+-		lrs_state = lrs_state & 0x100 ? lrs_state ^ 0xcf : lrs_state;
+-	}
+-	/* For the first probe, clear all board's tag registers. */
+-	if (current_tag == 0)
+-		outb(0xd0, id_port);
+-	else			/* Otherwise kill off already-found boards. */
+-		outb(0xd8, id_port);
+-	if (id_read_eeprom(7) != 0x6d50)
+-		return 1;
+-	/* Read in EEPROM data, which does contention-select.
+-	 * Only the lowest address board will stay "on-line".
+-	 * 3Com got the byte order backwards.
+-	 */
+-	for (i = 0; i < 3; i++)
+-		phys_addr[i] = htons(id_read_eeprom(i));
+-#ifdef CONFIG_PNP
+-	if (!nopnp) {
+-		/* The ISA PnP 3c509 cards respond to the ID sequence too.
+-		 * This check is needed in order not to register them twice.
+-		 */
+-		for (i = 0; i < el3_cards; i++) {
+-			struct el3_private *lp = netdev_priv(el3_devs[i]);
+-
+-			if (lp->type == EL3_PNP &&
+-			    ether_addr_equal((u8 *)phys_addr,
+-					     el3_devs[i]->dev_addr)) {
+-				if (el3_debug > 3)
+-					pr_debug("3c509 with address %02x %02x %02x %02x %02x %02x was found by ISAPnP\n",
+-						 phys_addr[0] & 0xff,
+-						 phys_addr[0] >> 8,
+-						 phys_addr[1] & 0xff,
+-						 phys_addr[1] >> 8,
+-						 phys_addr[2] & 0xff,
+-						 phys_addr[2] >> 8);
+-				/* Set the adaptor tag so that the next card
+-				 * can be found.
+-				 */
+-				outb(0xd0 + ++current_tag, id_port);
+-				return 2;
+-			}
+-		}
+-	}
+-#endif /* CONFIG_PNP */
+-	return 0;
+-}
+-
+-static void el3_dev_fill(struct net_device *dev, __be16 *phys_addr, int ioaddr,
+-			 int irq, int if_port, enum el3_cardtype type)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-
+-	eth_hw_addr_set(dev, (u8 *)phys_addr);
+-	dev->base_addr = ioaddr;
+-	dev->irq = irq;
+-	dev->if_port = if_port;
+-	lp->type = type;
+-}
+-
+-static int el3_isa_match(struct device *pdev, unsigned int ndev)
+-{
+-	int ioaddr, isa_irq, if_port, err;
+-	struct net_device *dev;
+-	unsigned int iobase;
+-	__be16 phys_addr[3];
+-
+-	while ((err = el3_isa_id_sequence(phys_addr)) == 2)
+-		;	/* Skip to next card when PnP card found */
+-	if (err == 1)
+-		return 0;
+-
+-	iobase = id_read_eeprom(8);
+-	if_port = iobase >> 14;
+-	ioaddr = 0x200 + ((iobase & 0x1f) << 4);
+-	if (irq[el3_cards] > 1 && irq[el3_cards] < 16)
+-		isa_irq = irq[el3_cards];
+-	else
+-		isa_irq = id_read_eeprom(9) >> 12;
+-
+-	dev = alloc_etherdev(sizeof(struct el3_private));
+-	if (!dev)
+-		return -ENOMEM;
+-
+-	SET_NETDEV_DEV(dev, pdev);
+-
+-	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c509-isa")) {
+-		free_netdev(dev);
+-		return 0;
+-	}
+-
+-	/* Set the adaptor tag so that the next card can be found. */
+-	outb(0xd0 + ++current_tag, id_port);
+-
+-	/* Activate the adaptor at the EEPROM location. */
+-	outb((ioaddr >> 4) | 0xe0, id_port);
+-
+-	EL3WINDOW(0);
+-	if (inw(ioaddr) != 0x6d50) {
+-		free_netdev(dev);
+-		return 0;
+-	}
+-
+-	/* Free the interrupt so that some other card can use it. */
+-	outw(0x0f00, ioaddr + WN0_IRQ);
+-
+-	el3_dev_fill(dev, phys_addr, ioaddr, isa_irq, if_port, EL3_ISA);
+-	dev_set_drvdata(pdev, dev);
+-	if (el3_common_init(dev)) {
+-		free_netdev(dev);
+-		return 0;
+-	}
+-
+-	el3_devs[el3_cards++] = dev;
+-	return 1;
+-}
+-
+-static void el3_isa_remove(struct device *pdev, unsigned int ndev)
+-{
+-	el3_device_remove(pdev);
+-	dev_set_drvdata(pdev, NULL);
+-}
+-
+-#ifdef CONFIG_PM
+-static int el3_isa_suspend(struct device *dev, unsigned int n,
+-			   pm_message_t state)
+-{
+-	current_tag = 0;
+-	return el3_suspend(dev, state);
+-}
+-
+-static int el3_isa_resume(struct device *dev, unsigned int n)
+-{
+-	struct net_device *ndev = dev_get_drvdata(dev);
+-	int ioaddr = ndev->base_addr, err;
+-	__be16 phys_addr[3];
+-
+-	while ((err = el3_isa_id_sequence(phys_addr)) == 2)
+-		;	/* Skip to next card when PnP card found */
+-	if (err == 1)
+-		return 0;
+-	/* Set the adaptor tag so that the next card can be found. */
+-	outb(0xd0 + ++current_tag, id_port);
+-	/* Enable the card */
+-	outb((ioaddr >> 4) | 0xe0, id_port);
+-	EL3WINDOW(0);
+-	if (inw(ioaddr) != 0x6d50)
+-		return 1;
+-	/* Free the interrupt so that some other card can use it. */
+-	outw(0x0f00, ioaddr + WN0_IRQ);
+-	return el3_resume(dev);
+-}
+-#endif
+-
+-static struct isa_driver el3_isa_driver = {
+-	.match		= el3_isa_match,
+-	.remove		= el3_isa_remove,
+-#ifdef CONFIG_PM
+-	.suspend	= el3_isa_suspend,
+-	.resume		= el3_isa_resume,
+-#endif
+-	.driver		= {
+-		.name	= "3c509"
+-	},
+-};
+-
+-static int isa_registered;
+-
+-#ifdef CONFIG_PNP
+-static const struct pnp_device_id el3_pnp_ids[] = {
+-	{ .id = "TCM5090" }, /* 3Com Etherlink III (TP) */
+-	{ .id = "TCM5091" }, /* 3Com Etherlink III */
+-	{ .id = "TCM5094" }, /* 3Com Etherlink III (combo) */
+-	{ .id = "TCM5095" }, /* 3Com Etherlink III (TPO) */
+-	{ .id = "TCM5098" }, /* 3Com Etherlink III (TPC) */
+-	{ .id = "PNP80f7" }, /* 3Com Etherlink III compatible */
+-	{ .id = "PNP80f8" }, /* 3Com Etherlink III compatible */
+-	{ .id = "" }
+-};
+-MODULE_DEVICE_TABLE(pnp, el3_pnp_ids);
+-
+-static int el3_pnp_probe(struct pnp_dev *pdev, const struct pnp_device_id *id)
+-{
+-	struct net_device *dev = NULL;
+-	int ioaddr, irq, if_port;
+-	__be16 phys_addr[3];
+-	short i;
+-	int err;
+-
+-	ioaddr = pnp_port_start(pdev, 0);
+-	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c509-pnp"))
+-		return -EBUSY;
+-	irq = pnp_irq(pdev, 0);
+-	EL3WINDOW(0);
+-	for (i = 0; i < 3; i++)
+-		phys_addr[i] = htons(read_eeprom(ioaddr, i));
+-	if_port = read_eeprom(ioaddr, 8) >> 14;
+-	dev = alloc_etherdev(sizeof(struct el3_private));
+-	if (!dev) {
+-		release_region(ioaddr, EL3_IO_EXTENT);
+-		return -ENOMEM;
+-	}
+-	SET_NETDEV_DEV(dev, &pdev->dev);
+-
+-	el3_dev_fill(dev, phys_addr, ioaddr, irq, if_port, EL3_PNP);
+-	pnp_set_drvdata(pdev, dev);
+-	err = el3_common_init(dev);
+-
+-	if (err) {
+-		pnp_set_drvdata(pdev, NULL);
+-		free_netdev(dev);
+-		return err;
+-	}
+-
+-	el3_devs[el3_cards++] = dev;
+-	return 0;
+-}
+-
+-static void el3_pnp_remove(struct pnp_dev *pdev)
+-{
+-	el3_common_remove(pnp_get_drvdata(pdev));
+-	pnp_set_drvdata(pdev, NULL);
+-}
+-
+-#ifdef CONFIG_PM
+-static int el3_pnp_suspend(struct pnp_dev *pdev, pm_message_t state)
+-{
+-	return el3_suspend(&pdev->dev, state);
+-}
+-
+-static int el3_pnp_resume(struct pnp_dev *pdev)
+-{
+-	return el3_resume(&pdev->dev);
+-}
+-#endif
+-
+-static struct pnp_driver el3_pnp_driver = {
+-	.name		= "3c509",
+-	.id_table	= el3_pnp_ids,
+-	.probe		= el3_pnp_probe,
+-	.remove		= el3_pnp_remove,
+-#ifdef CONFIG_PM
+-	.suspend	= el3_pnp_suspend,
+-	.resume		= el3_pnp_resume,
+-#endif
+-};
+-
+-static int pnp_registered;
+-#endif /* CONFIG_PNP */
+-
+-#ifdef CONFIG_EISA
+-static const struct eisa_device_id el3_eisa_ids[] = {
+-		{ "TCM5090" },
+-		{ "TCM5091" },
+-		{ "TCM5092" },
+-		{ "TCM5093" },
+-		{ "TCM5094" },
+-		{ "TCM5095" },
+-		{ "TCM5098" },
+-		{ "" }
+-};
+-MODULE_DEVICE_TABLE(eisa, el3_eisa_ids);
+-
+-static int el3_eisa_probe(struct device *device);
+-
+-static struct eisa_driver el3_eisa_driver = {
+-		.id_table = el3_eisa_ids,
+-		.driver   = {
+-				.name    = "3c579",
+-				.probe   = el3_eisa_probe,
+-				.remove  = el3_device_remove,
+-				.suspend = el3_suspend,
+-				.resume  = el3_resume,
+-		}
+-};
+-
+-static int eisa_registered;
+-#endif
+-
+-static const struct net_device_ops netdev_ops = {
+-	.ndo_open		= el3_open,
+-	.ndo_stop		= el3_close,
+-	.ndo_start_xmit		= el3_start_xmit,
+-	.ndo_get_stats		= el3_get_stats,
+-	.ndo_set_rx_mode	= set_multicast_list,
+-	.ndo_tx_timeout		= el3_tx_timeout,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-	.ndo_validate_addr	= eth_validate_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= el3_poll_controller,
+-#endif
+-};
+-
+-static int el3_common_init(struct net_device *dev)
+-{
+-	static const char *const if_names[] = {
+-		"10baseT", "AUI", "undefined", "BNC"
+-	};
+-	struct el3_private *lp = netdev_priv(dev);
+-	int err;
+-
+-	spin_lock_init(&lp->lock);
+-
+-	if (dev->mem_start & 0x05) { /* xcvr codes 1/3/4/12 */
+-		dev->if_port = (dev->mem_start & 0x0f);
+-	} else { /* xcvr codes 0/8 */
+-		/* use eeprom value, but save user's full-duplex selection */
+-		dev->if_port |= (dev->mem_start & 0x08);
+-	}
+-
+-	/* The EL3-specific entries in the device structure. */
+-	dev->netdev_ops = &netdev_ops;
+-	dev->watchdog_timeo = TX_TIMEOUT;
+-	dev->ethtool_ops = &ethtool_ops;
+-
+-	err = register_netdev(dev);
+-	if (err) {
+-		pr_err("Failed to register 3c5x9 at %#3.3lx, IRQ %d.\n",
+-		       dev->base_addr, dev->irq);
+-		release_region(dev->base_addr, EL3_IO_EXTENT);
+-		return err;
+-	}
+-
+-	pr_info("%s: 3c5x9 found at %#3.3lx, %s port, address %pM, IRQ %d.\n",
+-		dev->name, dev->base_addr, if_names[(dev->if_port & 0x03)],
+-		dev->dev_addr, dev->irq);
+-
+-	return 0;
+-}
+-
+-static void el3_common_remove(struct net_device *dev)
+-{
+-	unregister_netdev(dev);
+-	release_region(dev->base_addr, EL3_IO_EXTENT);
+-	free_netdev(dev);
+-}
+-
+-#ifdef CONFIG_EISA
+-static int el3_eisa_probe(struct device *device)
+-{
+-	struct net_device *dev = NULL;
+-	struct eisa_device *edev;
+-	int ioaddr, irq, if_port;
+-	__be16 phys_addr[3];
+-	short i;
+-	int err;
+-
+-	/* Yeepee, The driver framework is calling us ! */
+-	edev = to_eisa_device(device);
+-	ioaddr = edev->base_addr;
+-
+-	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c579-eisa"))
+-		return -EBUSY;
+-
+-	/* Change the register set to the configuration window 0. */
+-	outw(SELECT_WINDOW | 0, ioaddr + 0xC80 + EL3_CMD);
+-
+-	irq = inw(ioaddr + WN0_IRQ) >> 12;
+-	if_port = inw(ioaddr + 6) >> 14;
+-	for (i = 0; i < 3; i++)
+-		phys_addr[i] = htons(read_eeprom(ioaddr, i));
+-
+-	/* Restore the "Product ID" to the EEPROM read register. */
+-	read_eeprom(ioaddr, 3);
+-
+-	dev = alloc_etherdev(sizeof(struct el3_private));
+-	if (!dev) {
+-		release_region(ioaddr, EL3_IO_EXTENT);
+-		return -ENOMEM;
+-	}
+-
+-	SET_NETDEV_DEV(dev, device);
+-
+-	el3_dev_fill(dev, phys_addr, ioaddr, irq, if_port, EL3_EISA);
+-	eisa_set_drvdata(edev, dev);
+-	err = el3_common_init(dev);
+-
+-	if (err) {
+-		eisa_set_drvdata(edev, NULL);
+-		free_netdev(dev);
+-		return err;
+-	}
+-
+-	el3_devs[el3_cards++] = dev;
+-	return 0;
+-}
+-#endif
+-
+-/* This remove works for all device types.
+- *
+- * The net dev must be stored in the driver data field.
+- */
+-static int el3_device_remove(struct device *device)
+-{
+-	struct net_device *dev;
+-
+-	dev = dev_get_drvdata(device);
+-
+-	el3_common_remove(dev);
+-	return 0;
+-}
+-
+-/* Read a word from the EEPROM using the regular EEPROM access register.
+- * Assume that we are in register window zero.
+- */
+-static ushort read_eeprom(int ioaddr, int index)
+-{
+-	outw(EEPROM_READ + index, ioaddr + 10);
+-	/* Pause for at least 162 us for the read to take place.
+-	 * Some chips seem to require much longer.
+-	 */
+-	mdelay(2);
+-	return inw(ioaddr + 12);
+-}
+-
+-/* Read a word from the EEPROM when in the ISA ID probe state. */
+-static ushort id_read_eeprom(int index)
+-{
+-	int bit, word = 0;
+-
+-	/* Issue read command, and pause for at least 162 us for it to
+-	 * complete. Assume extra-fast 16MHz bus.
+-	 */
+-	outb(EEPROM_READ + index, id_port);
+-
+-	/* Pause for at least 162 us for the read to take place.
+-	 * Some chips seem to require much longer.
+-	 */
+-	mdelay(4);
+-
+-	for (bit = 15; bit >= 0; bit--)
+-		word = (word << 1) + (inb(id_port) & 0x01);
+-
+-	if (el3_debug > 3)
+-		pr_debug("  3c509 EEPROM word %d %#4.4x.\n", index, word);
+-
+-	return word;
+-}
+-
+-static int el3_open(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-	int i;
+-
+-	outw(TX_RESET, ioaddr + EL3_CMD);
+-	outw(RX_RESET, ioaddr + EL3_CMD);
+-	outw(SET_STATUS_ENB | 0x00, ioaddr + EL3_CMD);
+-
+-	i = request_irq(dev->irq, el3_interrupt, 0, dev->name, dev);
+-	if (i)
+-		return i;
+-
+-	EL3WINDOW(0);
+-	if (el3_debug > 3)
+-		pr_debug("%s: Opening, IRQ %d	 status@%x %4.4x.\n",
+-			 dev->name, dev->irq,
+-			 ioaddr + EL3_STATUS, inw(ioaddr + EL3_STATUS));
+-
+-	el3_up(dev);
+-
+-	if (el3_debug > 3)
+-		pr_debug("%s: Opened 3c509  IRQ %d  status %4.4x.\n",
+-			 dev->name, dev->irq, inw(ioaddr + EL3_STATUS));
+-
+-	return 0;
+-}
+-
+-static void el3_tx_timeout(struct net_device *dev, unsigned int txqueue)
+-{
+-	int ioaddr = dev->base_addr;
+-
+-	/* Transmitter timeout, serious problems. */
+-	pr_warn("%s: transmit timed out, Tx_status %2.2x status %4.4x Tx FIFO room %d\n",
+-		dev->name, inb(ioaddr + TX_STATUS), inw(ioaddr + EL3_STATUS),
+-		inw(ioaddr + TX_FREE));
+-	dev->stats.tx_errors++;
+-	netif_trans_update(dev); /* prevent tx timeout */
+-	/* Issue TX_RESET and TX_START commands. */
+-	outw(TX_RESET, ioaddr + EL3_CMD);
+-	outw(TX_ENABLE, ioaddr + EL3_CMD);
+-	netif_wake_queue(dev);
+-}
+-
+-static netdev_tx_t el3_start_xmit(struct sk_buff *skb, struct net_device *dev)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	int ioaddr = dev->base_addr;
+-	unsigned long flags;
+-
+-	netif_stop_queue(dev);
+-
+-	dev->stats.tx_bytes += skb->len;
+-
+-	if (el3_debug > 4) {
+-		pr_debug("%s: el3_start_xmit(length = %u) called, status %4.4x.\n",
+-			 dev->name, skb->len, inw(ioaddr + EL3_STATUS));
+-	}
+-	/*
+-	 *	We lock the driver against other processors. Note
+-	 *	we don't need to lock versus the IRQ as we suspended
+-	 *	that. This means that we lose the ability to take
+-	 *	an RX during a TX upload. That sucks a bit with SMP
+-	 *	on an original 3c509 (2K buffer).
+-	 *
+-	 *	Using disable_irq stops us crapping on other
+-	 *	time sensitive devices.
+-	 */
+-
+-	spin_lock_irqsave(&lp->lock, flags);
+-
+-	/* Put out the doubleword header... */
+-	outw(skb->len, ioaddr + TX_FIFO);
+-	outw(0x00, ioaddr + TX_FIFO);
+-	/* ... and the packet rounded to a doubleword. */
+-	outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
+-
+-	if (inw(ioaddr + TX_FREE) > 1536) {
+-		netif_start_queue(dev);
+-	} else {
+-		/* Interrupt us when the FIFO has room for max-sized packet. */
+-		outw(SET_TX_THRESHOLD + 1536, ioaddr + EL3_CMD);
+-	}
+-
+-	spin_unlock_irqrestore(&lp->lock, flags);
+-
+-	dev_consume_skb_any(skb);
+-
+-	/* Clear the Tx status stack. */
+-	{
+-		short tx_status;
+-		int i = 4;
+-
+-		while (--i > 0 && (tx_status = inb(ioaddr + TX_STATUS)) > 0) {
+-			if (tx_status & 0x38)
+-				dev->stats.tx_aborted_errors++;
+-			if (tx_status & 0x30)
+-				outw(TX_RESET, ioaddr + EL3_CMD);
+-			if (tx_status & 0x3C)
+-				outw(TX_ENABLE, ioaddr + EL3_CMD);
+-			/* Pop the status stack. */
+-			outb(0x00, ioaddr + TX_STATUS);
+-		}
+-	}
+-	return NETDEV_TX_OK;
+-}
+-
+-/* The EL3 interrupt handler. */
+-static irqreturn_t el3_interrupt(int irq, void *dev_id)
+-{
+-	struct net_device *dev = dev_id;
+-	int i = max_interrupt_work;
+-	struct el3_private *lp;
+-	int ioaddr, status;
+-
+-	lp = netdev_priv(dev);
+-	spin_lock(&lp->lock);
+-
+-	ioaddr = dev->base_addr;
+-
+-	if (el3_debug > 4) {
+-		status = inw(ioaddr + EL3_STATUS);
+-		pr_debug("%s: interrupt, status %4.4x.\n", dev->name, status);
+-	}
+-
+-	while ((status = inw(ioaddr + EL3_STATUS)) &
+-	       (INT_LATCH | RX_COMPLETE | STATS_FULL)) {
+-
+-		if (status & RX_COMPLETE)
+-			el3_rx(dev);
+-
+-		if (status & TX_AVAILABLE) {
+-			if (el3_debug > 5)
+-				pr_debug("	TX room bit was handled.\n");
+-			/* There's room in the FIFO for a full-sized packet. */
+-			outw(ACK_INTR | TX_AVAILABLE, ioaddr + EL3_CMD);
+-			netif_wake_queue(dev);
+-		}
+-		if (status &
+-		    (ADAPTER_FAILURE | RX_EARLY | STATS_FULL | TX_COMPLETE)) {
+-			/* Handle all uncommon interrupts. */
+-			if (status & STATS_FULL) {
+-				/* Empty statistics. */
+-				update_stats(dev);
+-			}
+-			if (status & RX_EARLY) {
+-				/* Rx early is unused. */
+-				el3_rx(dev);
+-				outw(ACK_INTR | RX_EARLY, ioaddr + EL3_CMD);
+-			}
+-			if (status & TX_COMPLETE) {
+-				/* Really Tx error. */
+-				short tx_status;
+-				int i = 4;
+-
+-				while (--i > 0 &&
+-				       ((tx_status = inb(ioaddr + TX_STATUS))
+-					> 0)) {
+-					if (tx_status & 0x38)
+-						dev->stats.tx_aborted_errors++;
+-					if (tx_status & 0x30)
+-						outw(TX_RESET,
+-						     ioaddr + EL3_CMD);
+-					if (tx_status & 0x3C)
+-						outw(TX_ENABLE,
+-						     ioaddr + EL3_CMD);
+-					/* Pop the status stack. */
+-					outb(0x00, ioaddr + TX_STATUS);
+-				}
+-			}
+-			if (status & ADAPTER_FAILURE) {
+-				/* Adapter failure requires Rx reset
+-				 * and reinit.
+-				 */
+-				outw(RX_RESET, ioaddr + EL3_CMD);
+-				/* Set the Rx filter to the current state. */
+-				outw((SET_RX_FILTER | RX_STATION |
+-				      RX_BROADCAST |
+-				      (dev->flags & IFF_ALLMULTI ?
+-				       RX_MULTICAST : 0) |
+-				      (dev->flags & IFF_PROMISC ?
+-				       RX_PROM : 0)),
+-				     ioaddr + EL3_CMD);
+-				/* Re-enable the receiver. */
+-				outw(RX_ENABLE, ioaddr + EL3_CMD);
+-				outw(ACK_INTR | ADAPTER_FAILURE,
+-				     ioaddr + EL3_CMD);
+-			}
+-		}
+-
+-		if (--i < 0) {
+-			pr_err("%s: Infinite loop in interrupt, status %4.4x.\n",
+-			       dev->name, status);
+-			/* Clear all interrupts. */
+-			outw(ACK_INTR | 0xFF, ioaddr + EL3_CMD);
+-			break;
+-		}
+-		/* Acknowledge the IRQ. */
+-		outw(ACK_INTR | INT_REQ | INT_LATCH, ioaddr + EL3_CMD);
+-	}
+-
+-	if (el3_debug > 4) {
+-		pr_debug("%s: exiting interrupt, status %4.4x.\n", dev->name,
+-			 inw(ioaddr + EL3_STATUS));
+-	}
+-	spin_unlock(&lp->lock);
+-	return IRQ_HANDLED;
+-}
+-
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-/*
+- * Polling receive - used by netconsole and other diagnostic tools
+- * to allow network i/o with interrupts disabled.
+- */
+-static void el3_poll_controller(struct net_device *dev)
+-{
+-	disable_irq(dev->irq);
+-	el3_interrupt(dev->irq, dev);
+-	enable_irq(dev->irq);
+-}
+-#endif
+-
+-static struct net_device_stats *el3_get_stats(struct net_device *dev)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	unsigned long flags;
+-
+-	/* This is fast enough not to bother with disable IRQ stuff. */
+-	spin_lock_irqsave(&lp->lock, flags);
+-	update_stats(dev);
+-	spin_unlock_irqrestore(&lp->lock, flags);
+-	return &dev->stats;
+-}
+-
+-/* Update statistics.  We change to register window 6, so this should be run
+- * single-threaded if the device is active. This is expected to be a rare
+- * operation, and it's simpler for the rest of the driver to assume that
+- * window 1 is always valid rather than use a special window-state variable.
+- */
+-static void update_stats(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-
+-	if (el3_debug > 5)
+-		pr_debug("   Updating the statistics.\n");
+-	/* Turn off statistics updates while reading. */
+-	outw(STATS_DISABLE, ioaddr + EL3_CMD);
+-	/* Switch to the stats window, and read everything. */
+-	EL3WINDOW(6);
+-	dev->stats.tx_carrier_errors	+= inb(ioaddr + 0);
+-	dev->stats.tx_heartbeat_errors	+= inb(ioaddr + 1);
+-	/* Multiple collisions. */	   inb(ioaddr + 2);
+-	dev->stats.collisions		+= inb(ioaddr + 3);
+-	dev->stats.tx_window_errors	+= inb(ioaddr + 4);
+-	dev->stats.rx_fifo_errors	+= inb(ioaddr + 5);
+-	dev->stats.tx_packets		+= inb(ioaddr + 6);
+-	/* Rx packets	*/		   inb(ioaddr + 7);
+-	/* Tx deferrals */		   inb(ioaddr + 8);
+-	inw(ioaddr + 10);	/* Total Rx and Tx octets. */
+-	inw(ioaddr + 12);
+-
+-	/* Back to window 1, and turn statistics back on. */
+-	EL3WINDOW(1);
+-	outw(STATS_ENABLE, ioaddr + EL3_CMD);
+-}
+-
+-static int el3_rx(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-	short rx_status;
+-
+-	if (el3_debug > 5)
+-		pr_debug("   In rx_packet(), status %4.4x, rx_status %4.4x.\n",
+-			 inw(ioaddr + EL3_STATUS), inw(ioaddr + RX_STATUS));
+-	while ((rx_status = inw(ioaddr + RX_STATUS)) > 0) {
+-		if (rx_status & 0x4000) {
+-			/* Error, update stats. */
+-			short error = rx_status & 0x3800;
+-
+-			outw(RX_DISCARD, ioaddr + EL3_CMD);
+-			dev->stats.rx_errors++;
+-			switch (error) {
+-			case 0x0000:
+-				dev->stats.rx_over_errors++;
+-				break;
+-			case 0x0800:
+-				dev->stats.rx_length_errors++;
+-				break;
+-			case 0x1000:
+-				dev->stats.rx_frame_errors++;
+-				break;
+-			case 0x1800:
+-				dev->stats.rx_length_errors++;
+-				break;
+-			case 0x2000:
+-				dev->stats.rx_frame_errors++;
+-				break;
+-			case 0x2800:
+-				dev->stats.rx_crc_errors++; break;
+-			}
+-		} else {
+-			short pkt_len = rx_status & 0x7ff;
+-			struct sk_buff *skb;
+-
+-			skb = netdev_alloc_skb(dev, pkt_len + 5);
+-			if (el3_debug > 4)
+-				pr_debug("Receiving packet size %d status %4.4x.\n",
+-					 pkt_len, rx_status);
+-			if (skb) {
+-				/* Align IP on 16 byte. */
+-				skb_reserve(skb, 2);
+-
+-				/* 'skb->data' points to the start of sk_buff
+-				 * data area.
+-				 */
+-				insl(ioaddr + RX_FIFO, skb_put(skb, pkt_len),
+-				     (pkt_len + 3) >> 2);
+-
+-				/* Pop top Rx packet. */
+-				outw(RX_DISCARD, ioaddr + EL3_CMD);
+-				skb->protocol = eth_type_trans(skb, dev);
+-				netif_rx(skb);
+-				dev->stats.rx_bytes += pkt_len;
+-				dev->stats.rx_packets++;
+-				continue;
+-			}
+-			outw(RX_DISCARD, ioaddr + EL3_CMD);
+-			dev->stats.rx_dropped++;
+-			if (el3_debug)
+-				pr_debug("%s: Couldn't allocate a sk_buff of size %d.\n",
+-					 dev->name, pkt_len);
+-		}
+-		inw(ioaddr + EL3_STATUS);			/* Delay. */
+-		while (inw(ioaddr + EL3_STATUS) & 0x1000)
+-			pr_debug("	Waiting for 3c509 to discard packet, status %x.\n",
+-				 inw(ioaddr + EL3_STATUS));
+-	}
+-
+-	return 0;
+-}
+-
+-/* Set or clear the multicast filter for this adaptor. */
+-static void set_multicast_list(struct net_device *dev)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	int ioaddr = dev->base_addr;
+-	int mc_count = netdev_mc_count(dev);
+-	unsigned long flags;
+-
+-	if (el3_debug > 1) {
+-		static int old;
+-
+-		if (old != mc_count) {
+-			old = mc_count;
+-			pr_debug("%s: Setting Rx mode to %d addresses.\n",
+-				 dev->name, mc_count);
+-		}
+-	}
+-	spin_lock_irqsave(&lp->lock, flags);
+-	if (dev->flags & IFF_PROMISC) {
+-		outw((SET_RX_FILTER | RX_STATION | RX_MULTICAST |
+-		      RX_BROADCAST | RX_PROM),
+-		     ioaddr + EL3_CMD);
+-	} else if (mc_count || (dev->flags & IFF_ALLMULTI)) {
+-		outw(SET_RX_FILTER | RX_STATION | RX_MULTICAST | RX_BROADCAST,
+-		     ioaddr + EL3_CMD);
+-	} else {
+-		outw(SET_RX_FILTER | RX_STATION | RX_BROADCAST,
+-		     ioaddr + EL3_CMD);
+-	}
+-	spin_unlock_irqrestore(&lp->lock, flags);
+-}
+-
+-static int el3_close(struct net_device *dev)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	int ioaddr = dev->base_addr;
+-
+-	if (el3_debug > 2)
+-		pr_debug("%s: Shutting down ethercard.\n", dev->name);
+-
+-	el3_down(dev);
+-
+-	free_irq(dev->irq, dev);
+-	/* Switching back to window 0 disables the IRQ. */
+-	EL3WINDOW(0);
+-	if (lp->type != EL3_EISA) {
+-		/* But we explicitly zero the IRQ line select anyway. Don't do
+-		 * it on EISA cards, it prevents the module from getting an
+-		 * IRQ after unload+reload...
+-		 */
+-		outw(0x0f00, ioaddr + WN0_IRQ);
+-	}
+-
+-	return 0;
+-}
+-
+-static int el3_link_ok(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-	u16 tmp;
+-
+-	EL3WINDOW(4);
+-	tmp = inw(ioaddr + WN4_MEDIA);
+-	EL3WINDOW(1);
+-	return tmp & (1 << 11);
+-}
+-
+-static void el3_netdev_get_ecmd(struct net_device *dev,
+-				struct ethtool_link_ksettings *cmd)
+-{
+-	int ioaddr = dev->base_addr;
+-	u32 supported;
+-	u16 tmp;
+-
+-	EL3WINDOW(0);
+-	/* Obtain current transceiver via WN4_MEDIA? */
+-	tmp = inw(ioaddr + WN0_ADDR_CONF);
+-	switch (tmp >> 14) {
+-	case 0:
+-		cmd->base.port = PORT_TP;
+-		break;
+-	case 1:
+-		cmd->base.port = PORT_AUI;
+-		break;
+-	case 3:
+-		cmd->base.port = PORT_BNC;
+-		break;
+-	default:
+-		break;
+-	}
+-
+-	cmd->base.duplex = DUPLEX_HALF;
+-	supported = 0;
+-	tmp = inw(ioaddr + WN0_CONF_CTRL);
+-	if (tmp & (1 << 13))
+-		supported |= SUPPORTED_AUI;
+-	if (tmp & (1 << 12))
+-		supported |= SUPPORTED_BNC;
+-	if (tmp & (1 << 9)) {
+-		supported |= SUPPORTED_TP | SUPPORTED_10baseT_Half |
+-			     SUPPORTED_10baseT_Full;	/* hmm... */
+-		EL3WINDOW(4);
+-		tmp = inw(ioaddr + WN4_NETDIAG);
+-		if (tmp & FD_ENABLE)
+-			cmd->base.duplex = DUPLEX_FULL;
+-	}
+-
+-	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
+-						supported);
+-	cmd->base.speed = SPEED_10;
+-	EL3WINDOW(1);
+-}
+-
+-static int el3_netdev_set_ecmd(struct net_device *dev,
+-			       const struct ethtool_link_ksettings *cmd)
+-{
+-	int ioaddr = dev->base_addr;
+-	u16 tmp;
+-
+-	if (cmd->base.speed != SPEED_10)
+-		return -EINVAL;
+-	if (cmd->base.duplex != DUPLEX_HALF && cmd->base.duplex != DUPLEX_FULL)
+-		return -EINVAL;
+-
+-	/* change XCVR type */
+-	EL3WINDOW(0);
+-	tmp = inw(ioaddr + WN0_ADDR_CONF);
+-	switch (cmd->base.port) {
+-	case PORT_TP:
+-		tmp &= ~(3 << 14);
+-		dev->if_port = 0;
+-		break;
+-	case PORT_AUI:
+-		tmp &= ~(3 << 14);
+-		tmp |= 1 << 14;
+-		dev->if_port = 1;
+-		break;
+-	case PORT_BNC:
+-		tmp |= 3 << 14;
+-		dev->if_port = 3;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	outw(tmp, ioaddr + WN0_ADDR_CONF);
+-	if (dev->if_port == 3) {
+-		/* Fire up the DC-DC converter if BNC gets enabled. */
+-		tmp = inw(ioaddr + WN0_ADDR_CONF);
+-		if (tmp & (3 << 14)) {
+-			outw(START_COAX, ioaddr + EL3_CMD);
+-			udelay(800);
+-		} else {
+-			return -EIO;
+-		}
+-	}
+-
+-	EL3WINDOW(4);
+-	tmp = inw(ioaddr + WN4_NETDIAG);
+-	if (cmd->base.duplex == DUPLEX_FULL)
+-		tmp |= FD_ENABLE;
+-	else
+-		tmp &= ~FD_ENABLE;
+-	outw(tmp, ioaddr + WN4_NETDIAG);
+-	EL3WINDOW(1);
+-
+-	return 0;
+-}
+-
+-static void el3_get_drvinfo(struct net_device *dev,
+-			    struct ethtool_drvinfo *info)
+-{
+-	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+-}
+-
+-static int el3_get_link_ksettings(struct net_device *dev,
+-				  struct ethtool_link_ksettings *cmd)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-
+-	spin_lock_irq(&lp->lock);
+-	el3_netdev_get_ecmd(dev, cmd);
+-	spin_unlock_irq(&lp->lock);
+-	return 0;
+-}
+-
+-static int el3_set_link_ksettings(struct net_device *dev,
+-				  const struct ethtool_link_ksettings *cmd)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	int ret;
+-
+-	spin_lock_irq(&lp->lock);
+-	ret = el3_netdev_set_ecmd(dev, cmd);
+-	spin_unlock_irq(&lp->lock);
+-	return ret;
+-}
+-
+-static u32 el3_get_link(struct net_device *dev)
+-{
+-	struct el3_private *lp = netdev_priv(dev);
+-	u32 ret;
+-
+-	spin_lock_irq(&lp->lock);
+-	ret = el3_link_ok(dev);
+-	spin_unlock_irq(&lp->lock);
+-	return ret;
+-}
+-
+-static u32 el3_get_msglevel(struct net_device *dev)
+-{
+-	return el3_debug;
+-}
+-
+-static void el3_set_msglevel(struct net_device *dev, u32 v)
+-{
+-	el3_debug = v;
+-}
+-
+-static const struct ethtool_ops ethtool_ops = {
+-	.get_drvinfo = el3_get_drvinfo,
+-	.get_link = el3_get_link,
+-	.get_msglevel = el3_get_msglevel,
+-	.set_msglevel = el3_set_msglevel,
+-	.get_link_ksettings = el3_get_link_ksettings,
+-	.set_link_ksettings = el3_set_link_ksettings,
+-};
+-
+-static void el3_down(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-
+-	netif_stop_queue(dev);
+-
+-	/* Turn off statistics ASAP.  We update lp->stats below. */
+-	outw(STATS_DISABLE, ioaddr + EL3_CMD);
+-
+-	/* Disable the receiver and transmitter. */
+-	outw(RX_DISABLE, ioaddr + EL3_CMD);
+-	outw(TX_DISABLE, ioaddr + EL3_CMD);
+-
+-	if (dev->if_port == 3) {
+-		/* Turn off thinnet power.  Green! */
+-		outw(STOP_COAX, ioaddr + EL3_CMD);
+-	} else if (dev->if_port == 0) {
+-		/* Disable link beat and jabber, if_port may change here next
+-		 * open().
+-		 */
+-		EL3WINDOW(4);
+-		outw(inw(ioaddr + WN4_MEDIA) & ~MEDIA_TP, ioaddr + WN4_MEDIA);
+-	}
+-
+-	outw(SET_INTR_ENB | 0x0000, ioaddr + EL3_CMD);
+-
+-	update_stats(dev);
+-}
+-
+-static void el3_up(struct net_device *dev)
+-{
+-	int ioaddr = dev->base_addr;
+-	int i, sw_info, net_diag;
+-
+-	/* Activating the board required and does no harm otherwise. */
+-	outw(0x0001, ioaddr + 4);
+-
+-	/* Set the IRQ line. */
+-	outw((dev->irq << 12) | 0x0f00, ioaddr + WN0_IRQ);
+-
+-	/* Set the station address in window 2 each time opened. */
+-	EL3WINDOW(2);
+-
+-	for (i = 0; i < 6; i++)
+-		outb(dev->dev_addr[i], ioaddr + i);
+-
+-	if ((dev->if_port & 0x03) == 3) {
+-		/* BNC interface */
+-
+-		/* Start the thinnet transceiver. We should really wait
+-		 * 50ms...
+-		 */
+-		outw(START_COAX, ioaddr + EL3_CMD);
+-	} else if ((dev->if_port & 0x03) == 0) {
+-		/* 10baseT interface */
+-
+-		/* Combine secondary sw_info word (the adapter level) and
+-		 * primary sw_info word (duplex setting plus other useless
+-		 * bits).
+-		 */
+-		EL3WINDOW(0);
+-		sw_info = (read_eeprom(ioaddr, 0x14) & 0x400f) |
+-			  (read_eeprom(ioaddr, 0x0d) & 0xBff0);
+-
+-		EL3WINDOW(4);
+-		net_diag = inw(ioaddr + WN4_NETDIAG);
+-		/* Temporarily assume full-duplex will be set. */
+-		net_diag = (net_diag | FD_ENABLE);
+-		pr_info("%s: ", dev->name);
+-		switch (dev->if_port & 0x0c) {
+-		case 12:
+-			/* Force full-duplex mode if 3c5x9b. */
+-			if (sw_info & 0x000f) {
+-				pr_cont("Forcing 3c5x9b full-duplex mode");
+-				break;
+-			}
+-			fallthrough;
+-		case 8:
+-			/* Set full-duplex mode based on eeprom config
+-			 * setting.
+-			 */
+-			if ((sw_info & 0x000f) && (sw_info & 0x8000)) {
+-				pr_cont("Setting 3c5x9b full-duplex mode (from EEPROM configuration bit)");
+-				break;
+-			}
+-			fallthrough;
+-		default:
+-			/* xcvr = (0 || 4) OR user has an old 3c5x9 non "B"
+-			 * model.
+-			 */
+-			pr_cont("Setting 3c5x9/3c5x9B half-duplex mode");
+-			/* Disable full duplex. */
+-			net_diag = (net_diag & ~FD_ENABLE);
+-		}
+-
+-		outw(net_diag, ioaddr + WN4_NETDIAG);
+-		pr_cont(" if_port: %d, sw_info: %4.4x\n",
+-			dev->if_port, sw_info);
+-		if (el3_debug > 3)
+-			pr_debug("%s: 3c5x9 net diag word is now: %4.4x.\n",
+-				 dev->name, net_diag);
+-		/* Enable link beat and jabber check. */
+-		outw(inw(ioaddr + WN4_MEDIA) | MEDIA_TP, ioaddr + WN4_MEDIA);
+-	}
+-
+-	/* Switch to the stats window, and clear all stats by reading. */
+-	outw(STATS_DISABLE, ioaddr + EL3_CMD);
+-	EL3WINDOW(6);
+-	for (i = 0; i < 9; i++)
+-		inb(ioaddr + i);
+-	inw(ioaddr + 10);
+-	inw(ioaddr + 12);
+-
+-	/* Switch to register set 1 for normal use. */
+-	EL3WINDOW(1);
+-
+-	/* Accept b-case and phys addr only. */
+-	outw(SET_RX_FILTER | RX_STATION | RX_BROADCAST, ioaddr + EL3_CMD);
+-	/* Turn on statistics. */
+-	outw(STATS_ENABLE, ioaddr + EL3_CMD);
+-
+-	/* Enable the receiver. */
+-	outw(RX_ENABLE, ioaddr + EL3_CMD);
+-	/* Enable transmitter. */
+-	outw(TX_ENABLE, ioaddr + EL3_CMD);
+-	/* Allow status bits to be seen. */
+-	outw(SET_STATUS_ENB | 0xff, ioaddr + EL3_CMD);
+-	/* Ack all pending events, and set active indicator mask. */
+-	outw(ACK_INTR | INT_LATCH | TX_AVAILABLE | RX_EARLY | INT_REQ,
+-	     ioaddr + EL3_CMD);
+-	outw((SET_INTR_ENB | INT_LATCH | TX_AVAILABLE | TX_COMPLETE |
+-	      RX_COMPLETE | STATS_FULL),
+-	     ioaddr + EL3_CMD);
+-
+-	netif_start_queue(dev);
+-}
+-
+-/* Power Management support functions */
+-#ifdef CONFIG_PM
+-
+-static int el3_suspend(struct device *pdev, pm_message_t state)
+-{
+-	struct net_device *dev;
+-	struct el3_private *lp;
+-	unsigned long flags;
+-	int ioaddr;
+-
+-	dev = dev_get_drvdata(pdev);
+-	lp = netdev_priv(dev);
+-	ioaddr = dev->base_addr;
+-
+-	spin_lock_irqsave(&lp->lock, flags);
+-
+-	if (netif_running(dev))
+-		netif_device_detach(dev);
+-
+-	el3_down(dev);
+-	outw(POWER_DOWN, ioaddr + EL3_CMD);
+-
+-	spin_unlock_irqrestore(&lp->lock, flags);
+-	return 0;
+-}
+-
+-static int el3_resume(struct device *pdev)
+-{
+-	struct net_device *dev;
+-	struct el3_private *lp;
+-	unsigned long flags;
+-	int ioaddr;
+-
+-	dev = dev_get_drvdata(pdev);
+-	lp = netdev_priv(dev);
+-	ioaddr = dev->base_addr;
+-
+-	spin_lock_irqsave(&lp->lock, flags);
+-
+-	outw(POWER_UP, ioaddr + EL3_CMD);
+-	EL3WINDOW(0);
+-	el3_up(dev);
+-
+-	if (netif_running(dev))
+-		netif_device_attach(dev);
+-
+-	spin_unlock_irqrestore(&lp->lock, flags);
+-	return 0;
+-}
+-
+-#endif /* CONFIG_PM */
+-
+-module_param(debug, int, 0);
+-module_param_hw_array(irq, int, irq, NULL, 0);
+-module_param(max_interrupt_work, int, 0);
+-MODULE_PARM_DESC(debug, "debug level (0-6)");
+-MODULE_PARM_DESC(irq, "IRQ number(s) (assigned)");
+-MODULE_PARM_DESC(max_interrupt_work, "maximum events handled per interrupt");
+-#ifdef CONFIG_PNP
+-module_param(nopnp, int, 0);
+-MODULE_PARM_DESC(nopnp, "disable ISA PnP support (0-1)");
+-#endif	/* CONFIG_PNP */
+-MODULE_DESCRIPTION("3Com Etherlink III (3c509, 3c509B, 3c529, 3c579) ethernet driver");
+-MODULE_LICENSE("GPL");
+-
+-static int __init el3_init_module(void)
+-{
+-	int ret = 0;
+-
+-	if (debug >= 0)
+-		el3_debug = debug;
+-
+-#ifdef CONFIG_PNP
+-	if (!nopnp) {
+-		ret = pnp_register_driver(&el3_pnp_driver);
+-		if (!ret)
+-			pnp_registered = 1;
+-	}
+-#endif
+-	/* Select an open I/O location at 0x1*0 to do ISA contention select. */
+-	/* Start with 0x110 to avoid some sound cards.*/
+-	for (id_port = 0x110; id_port < 0x200; id_port += 0x10) {
+-		if (!request_region(id_port, 1, "3c509-control"))
+-			continue;
+-		outb(0x00, id_port);
+-		outb(0xff, id_port);
+-		if (inb(id_port) & 0x01)
+-			break;
+-		release_region(id_port, 1);
+-	}
+-	if (id_port >= 0x200) {
+-		id_port = 0;
+-		pr_err("No I/O port available for 3c509 activation.\n");
+-	} else {
+-		ret = isa_register_driver(&el3_isa_driver, EL3_MAX_CARDS);
+-		if (!ret)
+-			isa_registered = 1;
+-	}
+-#ifdef CONFIG_EISA
+-	ret = eisa_driver_register(&el3_eisa_driver);
+-	if (!ret)
+-		eisa_registered = 1;
+-#endif
+-
+-#ifdef CONFIG_PNP
+-	if (pnp_registered)
+-		ret = 0;
+-#endif
+-	if (isa_registered)
+-		ret = 0;
+-#ifdef CONFIG_EISA
+-	if (eisa_registered)
+-		ret = 0;
+-#endif
+-	return ret;
+-}
+-
+-static void __exit el3_cleanup_module(void)
+-{
+-#ifdef CONFIG_PNP
+-	if (pnp_registered)
+-		pnp_unregister_driver(&el3_pnp_driver);
+-#endif
+-	if (isa_registered)
+-		isa_unregister_driver(&el3_isa_driver);
+-	if (id_port)
+-		release_region(id_port, 1);
+-#ifdef CONFIG_EISA
+-	if (eisa_registered)
+-		eisa_driver_unregister(&el3_eisa_driver);
+-#endif
+-}
+-
+-module_init(el3_init_module);
+-module_exit(el3_cleanup_module);
+diff --git a/drivers/net/ethernet/3com/Makefile b/drivers/net/ethernet/3com/Makefile
+index 2c65e4721..5c4d07f1d 100644
+--- a/drivers/net/ethernet/3com/Makefile
++++ b/drivers/net/ethernet/3com/Makefile
+@@ -3,6 +3,5 @@
+ # Makefile for the 3Com Ethernet device drivers
+ #
+ 
+-obj-$(CONFIG_EL3) += 3c509.o
+ obj-$(CONFIG_VORTEX) += 3c59x.o
+ obj-$(CONFIG_TYPHOON) += typhoon.o
+diff --git a/drivers/net/ethernet/3com/Makefile.save b/drivers/net/ethernet/3com/Makefile.save
+new file mode 100644
+index 000000000..5c4d07f1d
+--- /dev/null
++++ b/drivers/net/ethernet/3com/Makefile.save
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for the 3Com Ethernet device drivers
++#
++
++obj-$(CONFIG_VORTEX) += 3c59x.o
++obj-$(CONFIG_TYPHOON) += typhoon.o
+diff --git a/drivers/net/ethernet/8390/Makefile b/drivers/net/ethernet/8390/Makefile
+index bca5babda..0e199848f 100644
+--- a/drivers/net/ethernet/8390/Makefile
++++ b/drivers/net/ethernet/8390/Makefile
+@@ -3,15 +3,15 @@
+ # Makefile for the 8390 network device drivers.
+ #
+ 
+-obj-$(CONFIG_MAC8390) += mac8390.o
+-obj-$(CONFIG_APNE) += apne.o 8390.o
++# obj-$(CONFIG_MAC8390) += mac8390.o
++# obj-$(CONFIG_APNE) += apne.o 8390.o
+ obj-$(CONFIG_ARM_ETHERH) += etherh.o
+-obj-$(CONFIG_AX88796) += ax88796.o
+-obj-$(CONFIG_HYDRA) += hydra.o
++# obj-$(CONFIG_AX88796) += ax88796.o
++# obj-$(CONFIG_HYDRA) += hydra.o
+ obj-$(CONFIG_MCF8390) += mcf8390.o
+-obj-$(CONFIG_NE2000) += ne.o 8390p.o
++# obj-$(CONFIG_NE2000) += ne.o 8390p.o
+ obj-$(CONFIG_NE2K_PCI) += ne2k-pci.o 8390.o
+ obj-$(CONFIG_PCMCIA_PCNET) += pcnet_cs.o 8390.o
+-obj-$(CONFIG_STNIC) += stnic.o 8390.o
++# obj-$(CONFIG_STNIC) += stnic.o 8390.o
+ obj-$(CONFIG_XSURF100) += xsurf100.o
+-obj-$(CONFIG_ZORRO8390) += zorro8390.o
++# obj-$(CONFIG_ZORRO8390) += zorro8390.o
+diff --git a/drivers/net/ethernet/8390/apne.c b/drivers/net/ethernet/8390/apne.c
+deleted file mode 100644
+index 828edca8d..000000000
+--- a/drivers/net/ethernet/8390/apne.c
++++ /dev/null
+@@ -1,614 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Amiga Linux/68k 8390 based PCMCIA Ethernet Driver for the Amiga 1200
+- *
+- * (C) Copyright 1997 Alain Malek
+- *                    (Alain.Malek@cryogen.com)
+- *
+- * ----------------------------------------------------------------------------
+- *
+- * This program is based on
+- *
+- * ne.c:       A general non-shared-memory NS8390 ethernet driver for linux
+- *             Written 1992-94 by Donald Becker.
+- *
+- * 8390.c:     A general NS8390 ethernet driver core for linux.
+- *             Written 1992-94 by Donald Becker.
+- *
+- * cnetdevice: A Sana-II ethernet driver for AmigaOS
+- *             Written by Bruce Abbott (bhabbott@inhb.co.nz)
+- *
+- * ----------------------------------------------------------------------------
+- *
+- */
+-
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/pci.h>
+-#include <linux/init.h>
+-#include <linux/delay.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/interrupt.h>
+-#include <linux/jiffies.h>
+-
+-#include <asm/io.h>
+-#include <asm/setup.h>
+-#include <asm/amigaints.h>
+-#include <asm/amigahw.h>
+-#include <asm/amigayle.h>
+-#include <asm/amipcmcia.h>
+-
+-#include "8390.h"
+-
+-/* ---- No user-serviceable parts below ---- */
+-
+-#define DRV_NAME "apne"
+-
+-#define NE_BASE	 (dev->base_addr)
+-#define NE_CMD	 		0x00
+-#define NE_DATAPORT		0x10            /* NatSemi-defined port window offset. */
+-#define NE_RESET		0x1f            /* Issue a read to reset, a write to clear. */
+-#define NE_IO_EXTENT	        0x20
+-
+-#define NE_EN0_ISR		0x07
+-#define NE_EN0_DCFG		0x0e
+-
+-#define NE_EN0_RSARLO	        0x08
+-#define NE_EN0_RSARHI	        0x09
+-#define NE_EN0_RCNTLO	        0x0a
+-#define NE_EN0_RXCR		0x0c
+-#define NE_EN0_TXCR		0x0d
+-#define NE_EN0_RCNTHI	        0x0b
+-#define NE_EN0_IMR		0x0f
+-
+-#define NE1SM_START_PG	0x20	/* First page of TX buffer */
+-#define NE1SM_STOP_PG 	0x40	/* Last page +1 of RX ring */
+-#define NESM_START_PG	0x40	/* First page of TX buffer */
+-#define NESM_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-
+-static int apne_probe1(struct net_device *dev, int ioaddr);
+-
+-static void apne_reset_8390(struct net_device *dev);
+-static void apne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-			  int ring_page);
+-static void apne_block_input(struct net_device *dev, int count,
+-								struct sk_buff *skb, int ring_offset);
+-static void apne_block_output(struct net_device *dev, const int count,
+-							const unsigned char *buf, const int start_page);
+-static irqreturn_t apne_interrupt(int irq, void *dev_id);
+-
+-static int init_pcmcia(void);
+-
+-/* IO base address used for nic */
+-
+-#define IOBASE 0x300
+-
+-/*
+-   use MANUAL_CONFIG and MANUAL_OFFSET for enabling IO by hand
+-   you can find the values to use by looking at the cnet.device
+-   config file example (the default values are for the CNET40BC card)
+-*/
+-
+-/*
+-#define MANUAL_CONFIG 0x20
+-#define MANUAL_OFFSET 0x3f8
+-
+-#define MANUAL_HWADDR0 0x00
+-#define MANUAL_HWADDR1 0x12
+-#define MANUAL_HWADDR2 0x34
+-#define MANUAL_HWADDR3 0x56
+-#define MANUAL_HWADDR4 0x78
+-#define MANUAL_HWADDR5 0x9a
+-*/
+-
+-static const char version[] =
+-    "apne.c:v1.1 7/10/98 Alain Malek (Alain.Malek@cryogen.ch)\n";
+-
+-static int apne_owned;	/* signal if card already owned */
+-
+-static u32 apne_msg_enable;
+-module_param_named(msg_enable, apne_msg_enable, uint, 0444);
+-MODULE_PARM_DESC(msg_enable, "Debug message level (see linux/netdevice.h for bitmap)");
+-
+-static struct net_device * __init apne_probe(void)
+-{
+-	struct net_device *dev;
+-	struct ei_device *ei_local;
+-
+-#ifndef MANUAL_CONFIG
+-	char tuple[8];
+-#endif
+-	int err;
+-
+-	if (!MACH_IS_AMIGA)
+-		return ERR_PTR(-ENODEV);
+-
+-	if (apne_owned)
+-		return ERR_PTR(-ENODEV);
+-
+-	if ( !(AMIGAHW_PRESENT(PCMCIA)) )
+-		return ERR_PTR(-ENODEV);
+-
+-	pr_info("Looking for PCMCIA ethernet card : ");
+-
+-	/* check if a card is inserted */
+-	if (!(PCMCIA_INSERTED)) {
+-		pr_cont("NO PCMCIA card inserted\n");
+-		return ERR_PTR(-ENODEV);
+-	}
+-
+-	dev = alloc_ei_netdev();
+-	if (!dev)
+-		return ERR_PTR(-ENOMEM);
+-	ei_local = netdev_priv(dev);
+-	ei_local->msg_enable = apne_msg_enable;
+-
+-	/* disable pcmcia irq for readtuple */
+-	pcmcia_disable_irq();
+-
+-#ifndef MANUAL_CONFIG
+-	if ((pcmcia_copy_tuple(CISTPL_FUNCID, tuple, 8) < 3) ||
+-		(tuple[2] != CISTPL_FUNCID_NETWORK)) {
+-		pr_cont("not an ethernet card\n");
+-		/* XXX: shouldn't we re-enable irq here? */
+-		free_netdev(dev);
+-		return ERR_PTR(-ENODEV);
+-	}
+-#endif
+-
+-	pr_cont("ethernet PCMCIA card inserted\n");
+-
+-	if (!init_pcmcia()) {
+-		/* XXX: shouldn't we re-enable irq here? */
+-		free_netdev(dev);
+-		return ERR_PTR(-ENODEV);
+-	}
+-
+-	if (!request_region(IOBASE, 0x20, DRV_NAME)) {
+-		free_netdev(dev);
+-		return ERR_PTR(-EBUSY);
+-	}
+-
+-	err = apne_probe1(dev, IOBASE);
+-	if (err) {
+-		release_region(IOBASE, 0x20);
+-		free_netdev(dev);
+-		return ERR_PTR(err);
+-	}
+-	err = register_netdev(dev);
+-	if (!err)
+-		return dev;
+-
+-	pcmcia_disable_irq();
+-	free_irq(IRQ_AMIGA_PORTS, dev);
+-	pcmcia_reset();
+-	release_region(IOBASE, 0x20);
+-	free_netdev(dev);
+-	return ERR_PTR(err);
+-}
+-
+-static int __init apne_probe1(struct net_device *dev, int ioaddr)
+-{
+-    int i;
+-    unsigned char SA_prom[32];
+-    int wordlength = 2;
+-    const char *name = NULL;
+-    int start_page, stop_page;
+-#ifndef MANUAL_HWADDR0
+-    int neX000, ctron;
+-#endif
+-    static unsigned version_printed;
+-
+-    if ((apne_msg_enable & NETIF_MSG_DRV) && (version_printed++ == 0))
+-		netdev_info(dev, version);
+-
+-    netdev_info(dev, "PCMCIA NE*000 ethercard probe");
+-
+-    /* Reset card. Who knows what dain-bramaged state it was left in. */
+-    {	unsigned long reset_start_time = jiffies;
+-
+-	outb(inb(ioaddr + NE_RESET), ioaddr + NE_RESET);
+-
+-	while ((inb(ioaddr + NE_EN0_ISR) & ENISR_RESET) == 0)
+-		if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
+-			pr_cont(" not found (no reset ack).\n");
+-			return -ENODEV;
+-		}
+-
+-	outb(0xff, ioaddr + NE_EN0_ISR);		/* Ack all intr. */
+-    }
+-
+-#ifndef MANUAL_HWADDR0
+-
+-    /* Read the 16 bytes of station address PROM.
+-       We must first initialize registers, similar to NS8390_init(eifdev, 0).
+-       We can't reliably read the SAPROM address without this.
+-       (I learned the hard way!). */
+-    {
+-	struct {unsigned long value, offset; } program_seq[] = {
+-	    {E8390_NODMA+E8390_PAGE0+E8390_STOP, NE_CMD}, /* Select page 0*/
+-	    {0x48,	NE_EN0_DCFG},	/* Set byte-wide (0x48) access. */
+-	    {0x00,	NE_EN0_RCNTLO},	/* Clear the count regs. */
+-	    {0x00,	NE_EN0_RCNTHI},
+-	    {0x00,	NE_EN0_IMR},	/* Mask completion irq. */
+-	    {0xFF,	NE_EN0_ISR},
+-	    {E8390_RXOFF, NE_EN0_RXCR},	/* 0x20  Set to monitor */
+-	    {E8390_TXOFF, NE_EN0_TXCR},	/* 0x02  and loopback mode. */
+-	    {32,	NE_EN0_RCNTLO},
+-	    {0x00,	NE_EN0_RCNTHI},
+-	    {0x00,	NE_EN0_RSARLO},	/* DMA starting at 0x0000. */
+-	    {0x00,	NE_EN0_RSARHI},
+-	    {E8390_RREAD+E8390_START, NE_CMD},
+-	};
+-	for (i = 0; i < ARRAY_SIZE(program_seq); i++) {
+-	    outb(program_seq[i].value, ioaddr + program_seq[i].offset);
+-	}
+-
+-    }
+-    for(i = 0; i < 32 /*sizeof(SA_prom)*/; i+=2) {
+-	SA_prom[i] = inb(ioaddr + NE_DATAPORT);
+-	SA_prom[i+1] = inb(ioaddr + NE_DATAPORT);
+-	if (SA_prom[i] != SA_prom[i+1])
+-	    wordlength = 1;
+-    }
+-
+-    /*	At this point, wordlength *only* tells us if the SA_prom is doubled
+-	up or not because some broken PCI cards don't respect the byte-wide
+-	request in program_seq above, and hence don't have doubled up values.
+-	These broken cards would otherwise be detected as an ne1000.  */
+-
+-    if (wordlength == 2)
+-	for (i = 0; i < 16; i++)
+-		SA_prom[i] = SA_prom[i+i];
+-
+-    if (wordlength == 2) {
+-	/* We must set the 8390 for word mode. */
+-	outb(0x49, ioaddr + NE_EN0_DCFG);
+-	start_page = NESM_START_PG;
+-	stop_page = NESM_STOP_PG;
+-    } else {
+-	start_page = NE1SM_START_PG;
+-	stop_page = NE1SM_STOP_PG;
+-    }
+-
+-    neX000 = (SA_prom[14] == 0x57  &&  SA_prom[15] == 0x57);
+-    ctron =  (SA_prom[0] == 0x00 && SA_prom[1] == 0x00 && SA_prom[2] == 0x1d);
+-
+-    /* Set up the rest of the parameters. */
+-    if (neX000) {
+-	name = (wordlength == 2) ? "NE2000" : "NE1000";
+-    } else if (ctron) {
+-	name = (wordlength == 2) ? "Ctron-8" : "Ctron-16";
+-	start_page = 0x01;
+-	stop_page = (wordlength == 2) ? 0x40 : 0x20;
+-    } else {
+-	pr_cont(" not found.\n");
+-	return -ENXIO;
+-
+-    }
+-
+-#else
+-    wordlength = 2;
+-    /* We must set the 8390 for word mode. */
+-    outb(0x49, ioaddr + NE_EN0_DCFG);
+-    start_page = NESM_START_PG;
+-    stop_page = NESM_STOP_PG;
+-
+-    SA_prom[0] = MANUAL_HWADDR0;
+-    SA_prom[1] = MANUAL_HWADDR1;
+-    SA_prom[2] = MANUAL_HWADDR2;
+-    SA_prom[3] = MANUAL_HWADDR3;
+-    SA_prom[4] = MANUAL_HWADDR4;
+-    SA_prom[5] = MANUAL_HWADDR5;
+-    name = "NE2000";
+-#endif
+-
+-    dev->base_addr = ioaddr;
+-    dev->irq = IRQ_AMIGA_PORTS;
+-    dev->netdev_ops = &ei_netdev_ops;
+-
+-    /* Install the Interrupt handler */
+-    i = request_irq(dev->irq, apne_interrupt, IRQF_SHARED, DRV_NAME, dev);
+-    if (i) return i;
+-
+-    eth_hw_addr_set(dev, SA_prom);
+-
+-    pr_cont(" %pM\n", dev->dev_addr);
+-
+-    netdev_info(dev, "%s found.\n", name);
+-
+-    ei_status.name = name;
+-    ei_status.tx_start_page = start_page;
+-    ei_status.stop_page = stop_page;
+-    ei_status.word16 = (wordlength == 2);
+-
+-    ei_status.rx_start_page = start_page + TX_PAGES;
+-
+-    ei_status.reset_8390 = &apne_reset_8390;
+-    ei_status.block_input = &apne_block_input;
+-    ei_status.block_output = &apne_block_output;
+-    ei_status.get_8390_hdr = &apne_get_8390_hdr;
+-
+-    NS8390_init(dev, 0);
+-
+-    pcmcia_ack_int(pcmcia_get_intreq());		/* ack PCMCIA int req */
+-    pcmcia_enable_irq();
+-
+-    apne_owned = 1;
+-
+-    return 0;
+-}
+-
+-/* Hard reset the card.  This used to pause for the same period that a
+-   8390 reset command required, but that shouldn't be necessary. */
+-static void
+-apne_reset_8390(struct net_device *dev)
+-{
+-    unsigned long reset_start_time = jiffies;
+-    struct ei_device *ei_local = netdev_priv(dev);
+-
+-    init_pcmcia();
+-
+-    netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+-
+-    outb(inb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
+-
+-    ei_status.txing = 0;
+-    ei_status.dmaing = 0;
+-
+-    /* This check _should_not_ be necessary, omit eventually. */
+-    while ((inb(NE_BASE+NE_EN0_ISR) & ENISR_RESET) == 0)
+-	if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
+-		netdev_err(dev, "ne_reset_8390() did not complete.\n");
+-		break;
+-	}
+-    outb(ENISR_RESET, NE_BASE + NE_EN0_ISR);	/* Ack intr. */
+-}
+-
+-/* Grab the 8390 specific header. Similar to the block_input routine, but
+-   we don't need to be concerned with ring wrap as the header will be at
+-   the start of a page, so we optimize accordingly. */
+-
+-static void
+-apne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-
+-    int nic_base = dev->base_addr;
+-    int cnt;
+-    char *ptrc;
+-    short *ptrs;
+-
+-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-    if (ei_status.dmaing) {
+-	netdev_err(dev, "DMAing conflict in ne_get_8390_hdr "
+-		   "[DMAstat:%d][irqlock:%d][intr:%d].\n",
+-		   ei_status.dmaing, ei_status.irqlock, dev->irq);
+-	return;
+-    }
+-
+-    ei_status.dmaing |= 0x01;
+-    outb(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base+ NE_CMD);
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-    outb(sizeof(struct e8390_pkt_hdr), nic_base + NE_EN0_RCNTLO);
+-    outb(0, nic_base + NE_EN0_RCNTHI);
+-    outb(0, nic_base + NE_EN0_RSARLO);		/* On page boundary */
+-    outb(ring_page, nic_base + NE_EN0_RSARHI);
+-    outb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-
+-    if (ei_status.word16) {
+-        ptrs = (short*)hdr;
+-        for(cnt = 0; cnt < (sizeof(struct e8390_pkt_hdr)>>1); cnt++)
+-            *ptrs++ = inw(NE_BASE + NE_DATAPORT);
+-    } else {
+-        ptrc = (char*)hdr;
+-        for(cnt = 0; cnt < sizeof(struct e8390_pkt_hdr); cnt++)
+-            *ptrc++ = inb(NE_BASE + NE_DATAPORT);
+-    }
+-
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr. */
+-    ei_status.dmaing &= ~0x01;
+-
+-    le16_to_cpus(&hdr->count);
+-}
+-
+-/* Block input and output, similar to the Crynwr packet driver.  If you
+-   are porting to a new ethercard, look at the packet driver source for hints.
+-   The NEx000 doesn't share the on-board packet memory -- you have to put
+-   the packet out through the "remote DMA" dataport using outb. */
+-
+-static void
+-apne_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
+-{
+-    int nic_base = dev->base_addr;
+-    char *buf = skb->data;
+-    char *ptrc;
+-    short *ptrs;
+-    int cnt;
+-
+-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-    if (ei_status.dmaing) {
+-		netdev_err(dev, "DMAing conflict in ne_block_input "
+-			   "[DMAstat:%d][irqlock:%d][intr:%d].\n",
+-			   ei_status.dmaing, ei_status.irqlock, dev->irq);
+-	return;
+-    }
+-    ei_status.dmaing |= 0x01;
+-    outb(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base+ NE_CMD);
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-    outb(count & 0xff, nic_base + NE_EN0_RCNTLO);
+-    outb(count >> 8, nic_base + NE_EN0_RCNTHI);
+-    outb(ring_offset & 0xff, nic_base + NE_EN0_RSARLO);
+-    outb(ring_offset >> 8, nic_base + NE_EN0_RSARHI);
+-    outb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-    if (ei_status.word16) {
+-      ptrs = (short*)buf;
+-      for (cnt = 0; cnt < (count>>1); cnt++)
+-        *ptrs++ = inw(NE_BASE + NE_DATAPORT);
+-      if (count & 0x01) {
+-	buf[count-1] = inb(NE_BASE + NE_DATAPORT);
+-      }
+-    } else {
+-      ptrc = buf;
+-      for (cnt = 0; cnt < count; cnt++)
+-        *ptrc++ = inb(NE_BASE + NE_DATAPORT);
+-    }
+-
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr. */
+-    ei_status.dmaing &= ~0x01;
+-}
+-
+-static void
+-apne_block_output(struct net_device *dev, int count,
+-		const unsigned char *buf, const int start_page)
+-{
+-    int nic_base = NE_BASE;
+-    unsigned long dma_start;
+-    char *ptrc;
+-    short *ptrs;
+-    int cnt;
+-
+-    /* Round the count up for word writes.  Do we need to do this?
+-       What effect will an odd byte count have on the 8390?
+-       I should check someday. */
+-    if (ei_status.word16 && (count & 0x01))
+-      count++;
+-
+-    /* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-    if (ei_status.dmaing) {
+-		netdev_err(dev, "DMAing conflict in ne_block_output."
+-			   "[DMAstat:%d][irqlock:%d][intr:%d]\n",
+-			   ei_status.dmaing, ei_status.irqlock, dev->irq);
+-	return;
+-    }
+-    ei_status.dmaing |= 0x01;
+-    /* We should already be in page 0, but to be safe... */
+-    outb(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base + NE_CMD);
+-
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-
+-   /* Now the normal output. */
+-    outb(count & 0xff, nic_base + NE_EN0_RCNTLO);
+-    outb(count >> 8,   nic_base + NE_EN0_RCNTHI);
+-    outb(0x00, nic_base + NE_EN0_RSARLO);
+-    outb(start_page, nic_base + NE_EN0_RSARHI);
+-
+-    outb(E8390_RWRITE+E8390_START, nic_base + NE_CMD);
+-    if (ei_status.word16) {
+-        ptrs = (short*)buf;
+-        for (cnt = 0; cnt < count>>1; cnt++)
+-            outw(*ptrs++, NE_BASE+NE_DATAPORT);
+-    } else {
+-        ptrc = (char*)buf;
+-        for (cnt = 0; cnt < count; cnt++)
+-	    outb(*ptrc++, NE_BASE + NE_DATAPORT);
+-    }
+-
+-    dma_start = jiffies;
+-
+-    while ((inb(NE_BASE + NE_EN0_ISR) & ENISR_RDC) == 0)
+-	if (time_after(jiffies, dma_start + 2*HZ/100)) {	/* 20ms */
+-		netdev_warn(dev, "timeout waiting for Tx RDC.\n");
+-		apne_reset_8390(dev);
+-		NS8390_init(dev,1);
+-		break;
+-	}
+-
+-    outb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr. */
+-    ei_status.dmaing &= ~0x01;
+-}
+-
+-static irqreturn_t apne_interrupt(int irq, void *dev_id)
+-{
+-    unsigned char pcmcia_intreq;
+-
+-    if (!(gayle.inten & GAYLE_IRQ_IRQ))
+-        return IRQ_NONE;
+-
+-    pcmcia_intreq = pcmcia_get_intreq();
+-
+-    if (!(pcmcia_intreq & GAYLE_IRQ_IRQ)) {
+-        pcmcia_ack_int(pcmcia_intreq);
+-        return IRQ_NONE;
+-    }
+-    if (apne_msg_enable & NETIF_MSG_INTR)
+-	pr_debug("pcmcia intreq = %x\n", pcmcia_intreq);
+-    pcmcia_disable_irq();			/* to get rid of the sti() within ei_interrupt */
+-    ei_interrupt(irq, dev_id);
+-    pcmcia_ack_int(pcmcia_get_intreq());
+-    pcmcia_enable_irq();
+-    return IRQ_HANDLED;
+-}
+-
+-static struct net_device *apne_dev;
+-
+-static int __init apne_module_init(void)
+-{
+-	apne_dev = apne_probe();
+-	return PTR_ERR_OR_ZERO(apne_dev);
+-}
+-
+-static void __exit apne_module_exit(void)
+-{
+-	unregister_netdev(apne_dev);
+-
+-	pcmcia_disable_irq();
+-
+-	free_irq(IRQ_AMIGA_PORTS, apne_dev);
+-
+-	pcmcia_reset();
+-
+-	release_region(IOBASE, 0x20);
+-
+-	free_netdev(apne_dev);
+-}
+-module_init(apne_module_init);
+-module_exit(apne_module_exit);
+-
+-static int init_pcmcia(void)
+-{
+-	u_char config;
+-#ifndef MANUAL_CONFIG
+-	u_char tuple[32];
+-	int offset_len;
+-#endif
+-	u_long offset;
+-
+-	pcmcia_reset();
+-	pcmcia_program_voltage(PCMCIA_0V);
+-	pcmcia_access_speed(PCMCIA_SPEED_250NS);
+-	pcmcia_write_enable();
+-
+-#ifdef MANUAL_CONFIG
+-	config = MANUAL_CONFIG;
+-#else
+-	/* get and write config byte to enable IO port */
+-
+-	if (pcmcia_copy_tuple(CISTPL_CFTABLE_ENTRY, tuple, 32) < 3)
+-		return 0;
+-
+-	config = tuple[2] & 0x3f;
+-#endif
+-#ifdef MANUAL_OFFSET
+-	offset = MANUAL_OFFSET;
+-#else
+-	if (pcmcia_copy_tuple(CISTPL_CONFIG, tuple, 32) < 6)
+-		return 0;
+-
+-	offset_len = (tuple[2] & 0x3) + 1;
+-	offset = 0;
+-	while(offset_len--) {
+-		offset = (offset << 8) | tuple[4+offset_len];
+-	}
+-#endif
+-
+-	out_8(GAYLE_ATTRIBUTE+offset, config);
+-
+-	return 1;
+-}
+-
+-MODULE_DESCRIPTION("National Semiconductor 8390 Amiga PCMCIA ethernet driver");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/ax88796.c b/drivers/net/ethernet/8390/ax88796.c
+deleted file mode 100644
+index e1695d0fb..000000000
+--- a/drivers/net/ethernet/8390/ax88796.c
++++ /dev/null
+@@ -1,1022 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* drivers/net/ethernet/8390/ax88796.c
+- *
+- * Copyright 2005,2007 Simtec Electronics
+- *	Ben Dooks <ben@simtec.co.uk>
+- *
+- * Asix AX88796 10/100 Ethernet controller support
+- *	Based on ne.c, by Donald Becker, et-al.
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/isapnp.h>
+-#include <linux/interrupt.h>
+-#include <linux/io.h>
+-#include <linux/platform_device.h>
+-#include <linux/delay.h>
+-#include <linux/timer.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/ethtool.h>
+-#include <linux/mdio-bitbang.h>
+-#include <linux/phy.h>
+-#include <linux/eeprom_93cx6.h>
+-#include <linux/slab.h>
+-
+-#include <net/ax88796.h>
+-
+-
+-/* Rename the lib8390.c functions to show that they are in this driver */
+-#define __ei_open ax_ei_open
+-#define __ei_close ax_ei_close
+-#define __ei_poll ax_ei_poll
+-#define __ei_start_xmit ax_ei_start_xmit
+-#define __ei_tx_timeout ax_ei_tx_timeout
+-#define __ei_get_stats ax_ei_get_stats
+-#define __ei_set_multicast_list ax_ei_set_multicast_list
+-#define __ei_interrupt ax_ei_interrupt
+-#define ____alloc_ei_netdev ax__alloc_ei_netdev
+-#define __NS8390_init ax_NS8390_init
+-
+-/* force unsigned long back to 'void __iomem *' */
+-#define ax_convert_addr(_a) ((void __force __iomem *)(_a))
+-
+-#define ei_inb(_a) readb(ax_convert_addr(_a))
+-#define ei_outb(_v, _a) writeb(_v, ax_convert_addr(_a))
+-
+-#define ei_inb_p(_a) ei_inb(_a)
+-#define ei_outb_p(_v, _a) ei_outb(_v, _a)
+-
+-/* define EI_SHIFT() to take into account our register offsets */
+-#define EI_SHIFT(x) (ei_local->reg_offset[(x)])
+-
+-/* Ensure we have our RCR base value */
+-#define AX88796_PLATFORM
+-
+-static unsigned char version[] = "ax88796.c: Copyright 2005,2007 Simtec Electronics\n";
+-
+-#include "lib8390.c"
+-
+-#define DRV_NAME "ax88796"
+-#define DRV_VERSION "1.00"
+-
+-/* from ne.c */
+-#define NE_CMD		EI_SHIFT(0x00)
+-#define NE_RESET	EI_SHIFT(0x1f)
+-#define NE_DATAPORT	EI_SHIFT(0x10)
+-
+-#define NE1SM_START_PG	0x20	/* First page of TX buffer */
+-#define NE1SM_STOP_PG	0x40	/* Last page +1 of RX ring */
+-#define NESM_START_PG	0x40	/* First page of TX buffer */
+-#define NESM_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-#define AX_GPOC_PPDSET	BIT(6)
+-
+-/* device private data */
+-
+-struct ax_device {
+-	struct mii_bus *mii_bus;
+-	struct mdiobb_ctrl bb_ctrl;
+-	void __iomem *addr_memr;
+-	u8 reg_memr;
+-	int link;
+-	int speed;
+-	int duplex;
+-
+-	void __iomem *map2;
+-	const struct ax_plat_data *plat;
+-
+-	unsigned char running;
+-	unsigned char resume_open;
+-	unsigned int irqflags;
+-
+-	u32 reg_offsets[0x20];
+-};
+-
+-static inline struct ax_device *to_ax_dev(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	return (struct ax_device *)(ei_local + 1);
+-}
+-
+-void ax_NS8390_reinit(struct net_device *dev)
+-{
+-	ax_NS8390_init(dev, 1);
+-}
+-
+-EXPORT_SYMBOL_GPL(ax_NS8390_reinit);
+-
+-/*
+- * ax_initial_check
+- *
+- * do an initial probe for the card to check whether it exists
+- * and is functional
+- */
+-static int ax_initial_check(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *ioaddr = ei_local->mem;
+-	int reg0;
+-	int regd;
+-
+-	reg0 = ei_inb(ioaddr);
+-	if (reg0 == 0xFF)
+-		return -ENODEV;
+-
+-	ei_outb(E8390_NODMA + E8390_PAGE1 + E8390_STOP, ioaddr + E8390_CMD);
+-	regd = ei_inb(ioaddr + 0x0d);
+-	ei_outb(0xff, ioaddr + 0x0d);
+-	ei_outb(E8390_NODMA + E8390_PAGE0, ioaddr + E8390_CMD);
+-	ei_inb(ioaddr + EN0_COUNTER0); /* Clear the counter by reading. */
+-	if (ei_inb(ioaddr + EN0_COUNTER0) != 0) {
+-		ei_outb(reg0, ioaddr);
+-		ei_outb(regd, ioaddr + 0x0d);	/* Restore the old values. */
+-		return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+-/*
+- * Hard reset the card. This used to pause for the same period that a
+- * 8390 reset command required, but that shouldn't be necessary.
+- */
+-static void ax_reset_8390(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned long reset_start_time = jiffies;
+-	void __iomem *addr = (void __iomem *)dev->base_addr;
+-
+-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+-
+-	ei_outb(ei_inb(addr + NE_RESET), addr + NE_RESET);
+-
+-	ei_local->txing = 0;
+-	ei_local->dmaing = 0;
+-
+-	/* This check _should_not_ be necessary, omit eventually. */
+-	while ((ei_inb(addr + EN0_ISR) & ENISR_RESET) == 0) {
+-		if (time_after(jiffies, reset_start_time + 2 * HZ / 100)) {
+-			netdev_warn(dev, "%s: did not complete.\n", __func__);
+-			break;
+-		}
+-	}
+-
+-	ei_outb(ENISR_RESET, addr + EN0_ISR);	/* Ack intr. */
+-}
+-
+-/* Wrapper for __ei_interrupt for platforms that have a platform-specific
+- * way to find out whether the interrupt request might be caused by
+- * the ax88796 chip.
+- */
+-static irqreturn_t ax_ei_interrupt_filtered(int irq, void *dev_id)
+-{
+-	struct net_device *dev = dev_id;
+-	struct ax_device *ax = to_ax_dev(dev);
+-	struct platform_device *pdev = to_platform_device(dev->dev.parent);
+-
+-	if (!ax->plat->check_irq(pdev))
+-		return IRQ_NONE;
+-
+-	return ax_ei_interrupt(irq, dev_id);
+-}
+-
+-static void ax_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-			    int ring_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *nic_base = ei_local->mem;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-	if (ei_local->dmaing) {
+-		netdev_err(dev, "DMAing conflict in %s "
+-			"[DMAstat:%d][irqlock:%d].\n",
+-			__func__,
+-			ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	ei_outb(E8390_NODMA + E8390_PAGE0 + E8390_START, nic_base + NE_CMD);
+-	ei_outb(sizeof(struct e8390_pkt_hdr), nic_base + EN0_RCNTLO);
+-	ei_outb(0, nic_base + EN0_RCNTHI);
+-	ei_outb(0, nic_base + EN0_RSARLO);		/* On page boundary */
+-	ei_outb(ring_page, nic_base + EN0_RSARHI);
+-	ei_outb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-
+-	if (ei_local->word16)
+-		ioread16_rep(nic_base + NE_DATAPORT, hdr,
+-			     sizeof(struct e8390_pkt_hdr) >> 1);
+-	else
+-		ioread8_rep(nic_base + NE_DATAPORT, hdr,
+-			    sizeof(struct e8390_pkt_hdr));
+-
+-	ei_outb(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_local->dmaing &= ~0x01;
+-
+-	le16_to_cpus(&hdr->count);
+-}
+-
+-
+-/*
+- * Block input and output, similar to the Crynwr packet driver. If
+- * you are porting to a new ethercard, look at the packet driver
+- * source for hints. The NEx000 doesn't share the on-board packet
+- * memory -- you have to put the packet out through the "remote DMA"
+- * dataport using ei_outb.
+- */
+-static void ax_block_input(struct net_device *dev, int count,
+-			   struct sk_buff *skb, int ring_offset)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *nic_base = ei_local->mem;
+-	char *buf = skb->data;
+-
+-	if (ei_local->dmaing) {
+-		netdev_err(dev,
+-			"DMAing conflict in %s "
+-			"[DMAstat:%d][irqlock:%d].\n",
+-			__func__,
+-			ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-
+-	ei_outb(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base + NE_CMD);
+-	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
+-	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
+-	ei_outb(ring_offset & 0xff, nic_base + EN0_RSARLO);
+-	ei_outb(ring_offset >> 8, nic_base + EN0_RSARHI);
+-	ei_outb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-
+-	if (ei_local->word16) {
+-		ioread16_rep(nic_base + NE_DATAPORT, buf, count >> 1);
+-		if (count & 0x01)
+-			buf[count-1] = ei_inb(nic_base + NE_DATAPORT);
+-
+-	} else {
+-		ioread8_rep(nic_base + NE_DATAPORT, buf, count);
+-	}
+-
+-	ei_local->dmaing &= ~1;
+-}
+-
+-static void ax_block_output(struct net_device *dev, int count,
+-			    const unsigned char *buf, const int start_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *nic_base = ei_local->mem;
+-	unsigned long dma_start;
+-
+-	/*
+-	 * Round the count up for word writes. Do we need to do this?
+-	 * What effect will an odd byte count have on the 8390?  I
+-	 * should check someday.
+-	 */
+-	if (ei_local->word16 && (count & 0x01))
+-		count++;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-	if (ei_local->dmaing) {
+-		netdev_err(dev, "DMAing conflict in %s."
+-			"[DMAstat:%d][irqlock:%d]\n",
+-			__func__,
+-		       ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	/* We should already be in page 0, but to be safe... */
+-	ei_outb(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base + NE_CMD);
+-
+-	ei_outb(ENISR_RDC, nic_base + EN0_ISR);
+-
+-	/* Now the normal output. */
+-	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
+-	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
+-	ei_outb(0x00, nic_base + EN0_RSARLO);
+-	ei_outb(start_page, nic_base + EN0_RSARHI);
+-
+-	ei_outb(E8390_RWRITE+E8390_START, nic_base + NE_CMD);
+-	if (ei_local->word16)
+-		iowrite16_rep(nic_base + NE_DATAPORT, buf, count >> 1);
+-	else
+-		iowrite8_rep(nic_base + NE_DATAPORT, buf, count);
+-
+-	dma_start = jiffies;
+-
+-	while ((ei_inb(nic_base + EN0_ISR) & ENISR_RDC) == 0) {
+-		if (time_after(jiffies, dma_start + 2 * HZ / 100)) { /* 20ms */
+-			netdev_warn(dev, "timeout waiting for Tx RDC.\n");
+-			ax_reset_8390(dev);
+-			ax_NS8390_init(dev, 1);
+-			break;
+-		}
+-	}
+-
+-	ei_outb(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_local->dmaing &= ~0x01;
+-}
+-
+-/* definitions for accessing MII/EEPROM interface */
+-
+-#define AX_MEMR			EI_SHIFT(0x14)
+-#define AX_MEMR_MDC		BIT(0)
+-#define AX_MEMR_MDIR		BIT(1)
+-#define AX_MEMR_MDI		BIT(2)
+-#define AX_MEMR_MDO		BIT(3)
+-#define AX_MEMR_EECS		BIT(4)
+-#define AX_MEMR_EEI		BIT(5)
+-#define AX_MEMR_EEO		BIT(6)
+-#define AX_MEMR_EECLK		BIT(7)
+-
+-static void ax_handle_link_change(struct net_device *dev)
+-{
+-	struct ax_device  *ax = to_ax_dev(dev);
+-	struct phy_device *phy_dev = dev->phydev;
+-	int status_change = 0;
+-
+-	if (phy_dev->link && ((ax->speed != phy_dev->speed) ||
+-			     (ax->duplex != phy_dev->duplex))) {
+-
+-		ax->speed = phy_dev->speed;
+-		ax->duplex = phy_dev->duplex;
+-		status_change = 1;
+-	}
+-
+-	if (phy_dev->link != ax->link) {
+-		if (!phy_dev->link) {
+-			ax->speed = 0;
+-			ax->duplex = -1;
+-		}
+-		ax->link = phy_dev->link;
+-
+-		status_change = 1;
+-	}
+-
+-	if (status_change)
+-		phy_print_status(phy_dev);
+-}
+-
+-static int ax_mii_probe(struct net_device *dev)
+-{
+-	struct ax_device  *ax = to_ax_dev(dev);
+-	struct phy_device *phy_dev = NULL;
+-	int ret;
+-
+-	/* find the first phy */
+-	phy_dev = phy_find_first(ax->mii_bus);
+-	if (!phy_dev) {
+-		netdev_err(dev, "no PHY found\n");
+-		return -ENODEV;
+-	}
+-
+-	ret = phy_connect_direct(dev, phy_dev, ax_handle_link_change,
+-				 PHY_INTERFACE_MODE_MII);
+-	if (ret) {
+-		netdev_err(dev, "Could not attach to PHY\n");
+-		return ret;
+-	}
+-
+-	phy_set_max_speed(phy_dev, SPEED_100);
+-
+-	netdev_info(dev, "PHY driver [%s] (mii_bus:phy_addr=%s, irq=%d)\n",
+-		    phy_dev->drv->name, phydev_name(phy_dev), phy_dev->irq);
+-
+-	return 0;
+-}
+-
+-static void ax_phy_switch(struct net_device *dev, int on)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct ax_device *ax = to_ax_dev(dev);
+-
+-	u8 reg_gpoc =  ax->plat->gpoc_val;
+-
+-	if (!!on)
+-		reg_gpoc &= ~AX_GPOC_PPDSET;
+-	else
+-		reg_gpoc |= AX_GPOC_PPDSET;
+-
+-	ei_outb(reg_gpoc, ei_local->mem + EI_SHIFT(0x17));
+-}
+-
+-static void ax_bb_mdc(struct mdiobb_ctrl *ctrl, int level)
+-{
+-	struct ax_device *ax = container_of(ctrl, struct ax_device, bb_ctrl);
+-
+-	if (level)
+-		ax->reg_memr |= AX_MEMR_MDC;
+-	else
+-		ax->reg_memr &= ~AX_MEMR_MDC;
+-
+-	ei_outb(ax->reg_memr, ax->addr_memr);
+-}
+-
+-static void ax_bb_dir(struct mdiobb_ctrl *ctrl, int output)
+-{
+-	struct ax_device *ax = container_of(ctrl, struct ax_device, bb_ctrl);
+-
+-	if (output)
+-		ax->reg_memr &= ~AX_MEMR_MDIR;
+-	else
+-		ax->reg_memr |= AX_MEMR_MDIR;
+-
+-	ei_outb(ax->reg_memr, ax->addr_memr);
+-}
+-
+-static void ax_bb_set_data(struct mdiobb_ctrl *ctrl, int value)
+-{
+-	struct ax_device *ax = container_of(ctrl, struct ax_device, bb_ctrl);
+-
+-	if (value)
+-		ax->reg_memr |= AX_MEMR_MDO;
+-	else
+-		ax->reg_memr &= ~AX_MEMR_MDO;
+-
+-	ei_outb(ax->reg_memr, ax->addr_memr);
+-}
+-
+-static int ax_bb_get_data(struct mdiobb_ctrl *ctrl)
+-{
+-	struct ax_device *ax = container_of(ctrl, struct ax_device, bb_ctrl);
+-	int reg_memr = ei_inb(ax->addr_memr);
+-
+-	return reg_memr & AX_MEMR_MDI ? 1 : 0;
+-}
+-
+-static const struct mdiobb_ops bb_ops = {
+-	.owner = THIS_MODULE,
+-	.set_mdc = ax_bb_mdc,
+-	.set_mdio_dir = ax_bb_dir,
+-	.set_mdio_data = ax_bb_set_data,
+-	.get_mdio_data = ax_bb_get_data,
+-};
+-
+-static int ax_mii_init(struct net_device *dev)
+-{
+-	struct platform_device *pdev = to_platform_device(dev->dev.parent);
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct ax_device *ax = to_ax_dev(dev);
+-	int err;
+-
+-	ax->bb_ctrl.ops = &bb_ops;
+-	ax->addr_memr = ei_local->mem + AX_MEMR;
+-	ax->mii_bus = alloc_mdio_bitbang(&ax->bb_ctrl);
+-	if (!ax->mii_bus) {
+-		err = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ax->mii_bus->name = "ax88796_mii_bus";
+-	ax->mii_bus->parent = dev->dev.parent;
+-	snprintf(ax->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
+-		 pdev->name, pdev->id);
+-
+-	err = mdiobus_register(ax->mii_bus);
+-	if (err)
+-		goto out_free_mdio_bitbang;
+-
+-	return 0;
+-
+- out_free_mdio_bitbang:
+-	free_mdio_bitbang(ax->mii_bus);
+- out:
+-	return err;
+-}
+-
+-static int ax_open(struct net_device *dev)
+-{
+-	struct ax_device *ax = to_ax_dev(dev);
+-	int ret;
+-
+-	netdev_dbg(dev, "open\n");
+-
+-	ret = ax_mii_init(dev);
+-	if (ret)
+-		goto failed_mii;
+-
+-	if (ax->plat->check_irq)
+-		ret = request_irq(dev->irq, ax_ei_interrupt_filtered,
+-				  ax->irqflags, dev->name, dev);
+-	else
+-		ret = request_irq(dev->irq, ax_ei_interrupt, ax->irqflags,
+-				  dev->name, dev);
+-	if (ret)
+-		goto failed_request_irq;
+-
+-	/* turn the phy on (if turned off) */
+-	ax_phy_switch(dev, 1);
+-
+-	ret = ax_mii_probe(dev);
+-	if (ret)
+-		goto failed_mii_probe;
+-	phy_start(dev->phydev);
+-
+-	ret = ax_ei_open(dev);
+-	if (ret)
+-		goto failed_ax_ei_open;
+-
+-	ax->running = 1;
+-
+-	return 0;
+-
+- failed_ax_ei_open:
+-	phy_disconnect(dev->phydev);
+- failed_mii_probe:
+-	ax_phy_switch(dev, 0);
+-	free_irq(dev->irq, dev);
+- failed_request_irq:
+-	/* unregister mdiobus */
+-	mdiobus_unregister(ax->mii_bus);
+-	free_mdio_bitbang(ax->mii_bus);
+- failed_mii:
+-	return ret;
+-}
+-
+-static int ax_close(struct net_device *dev)
+-{
+-	struct ax_device *ax = to_ax_dev(dev);
+-
+-	netdev_dbg(dev, "close\n");
+-
+-	ax->running = 0;
+-	wmb();
+-
+-	ax_ei_close(dev);
+-
+-	/* turn the phy off */
+-	ax_phy_switch(dev, 0);
+-	phy_disconnect(dev->phydev);
+-
+-	free_irq(dev->irq, dev);
+-
+-	mdiobus_unregister(ax->mii_bus);
+-	free_mdio_bitbang(ax->mii_bus);
+-	return 0;
+-}
+-
+-static int ax_ioctl(struct net_device *dev, struct ifreq *req, int cmd)
+-{
+-	struct phy_device *phy_dev = dev->phydev;
+-
+-	if (!netif_running(dev))
+-		return -EINVAL;
+-
+-	if (!phy_dev)
+-		return -ENODEV;
+-
+-	return phy_mii_ioctl(phy_dev, req, cmd);
+-}
+-
+-/* ethtool ops */
+-
+-static void ax_get_drvinfo(struct net_device *dev,
+-			   struct ethtool_drvinfo *info)
+-{
+-	struct platform_device *pdev = to_platform_device(dev->dev.parent);
+-
+-	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+-	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+-	strscpy(info->bus_info, pdev->name, sizeof(info->bus_info));
+-}
+-
+-static u32 ax_get_msglevel(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	return ei_local->msg_enable;
+-}
+-
+-static void ax_set_msglevel(struct net_device *dev, u32 v)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	ei_local->msg_enable = v;
+-}
+-
+-static const struct ethtool_ops ax_ethtool_ops = {
+-	.get_drvinfo		= ax_get_drvinfo,
+-	.get_link		= ethtool_op_get_link,
+-	.get_ts_info		= ethtool_op_get_ts_info,
+-	.get_msglevel		= ax_get_msglevel,
+-	.set_msglevel		= ax_set_msglevel,
+-	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+-	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+-};
+-
+-#ifdef CONFIG_AX88796_93CX6
+-static void ax_eeprom_register_read(struct eeprom_93cx6 *eeprom)
+-{
+-	struct ei_device *ei_local = eeprom->data;
+-	u8 reg = ei_inb(ei_local->mem + AX_MEMR);
+-
+-	eeprom->reg_data_in = reg & AX_MEMR_EEI;
+-	eeprom->reg_data_out = reg & AX_MEMR_EEO; /* Input pin */
+-	eeprom->reg_data_clock = reg & AX_MEMR_EECLK;
+-	eeprom->reg_chip_select = reg & AX_MEMR_EECS;
+-}
+-
+-static void ax_eeprom_register_write(struct eeprom_93cx6 *eeprom)
+-{
+-	struct ei_device *ei_local = eeprom->data;
+-	u8 reg = ei_inb(ei_local->mem + AX_MEMR);
+-
+-	reg &= ~(AX_MEMR_EEI | AX_MEMR_EECLK | AX_MEMR_EECS);
+-
+-	if (eeprom->reg_data_in)
+-		reg |= AX_MEMR_EEI;
+-	if (eeprom->reg_data_clock)
+-		reg |= AX_MEMR_EECLK;
+-	if (eeprom->reg_chip_select)
+-		reg |= AX_MEMR_EECS;
+-
+-	ei_outb(reg, ei_local->mem + AX_MEMR);
+-	udelay(10);
+-}
+-#endif
+-
+-static const struct net_device_ops ax_netdev_ops = {
+-	.ndo_open		= ax_open,
+-	.ndo_stop		= ax_close,
+-	.ndo_eth_ioctl		= ax_ioctl,
+-
+-	.ndo_start_xmit		= ax_ei_start_xmit,
+-	.ndo_tx_timeout		= ax_ei_tx_timeout,
+-	.ndo_get_stats		= ax_ei_get_stats,
+-	.ndo_set_rx_mode	= ax_ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= ax_ei_poll,
+-#endif
+-};
+-
+-/* setup code */
+-
+-static void ax_initial_setup(struct net_device *dev, struct ei_device *ei_local)
+-{
+-	void __iomem *ioaddr = ei_local->mem;
+-	struct ax_device *ax = to_ax_dev(dev);
+-
+-	/* Select page 0 */
+-	ei_outb(E8390_NODMA + E8390_PAGE0 + E8390_STOP, ioaddr + E8390_CMD);
+-
+-	/* set to byte access */
+-	ei_outb(ax->plat->dcr_val & ~1, ioaddr + EN0_DCFG);
+-	ei_outb(ax->plat->gpoc_val, ioaddr + EI_SHIFT(0x17));
+-}
+-
+-/*
+- * ax_init_dev
+- *
+- * initialise the specified device, taking care to note the MAC
+- * address it may already have (if configured), ensure
+- * the device is ready to be used by lib8390.c and registerd with
+- * the network layer.
+- */
+-static int ax_init_dev(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct ax_device *ax = to_ax_dev(dev);
+-	void __iomem *ioaddr = ei_local->mem;
+-	unsigned int start_page;
+-	unsigned int stop_page;
+-	int ret;
+-	int i;
+-
+-	ret = ax_initial_check(dev);
+-	if (ret)
+-		goto err_out;
+-
+-	/* setup goes here */
+-
+-	ax_initial_setup(dev, ei_local);
+-
+-	/* read the mac from the card prom if we need it */
+-
+-	if (ax->plat->flags & AXFLG_HAS_EEPROM) {
+-		unsigned char SA_prom[32];
+-
+-		ei_outb(6, ioaddr + EN0_RCNTLO);
+-		ei_outb(0, ioaddr + EN0_RCNTHI);
+-		ei_outb(0, ioaddr + EN0_RSARLO);
+-		ei_outb(0, ioaddr + EN0_RSARHI);
+-		ei_outb(E8390_RREAD + E8390_START, ioaddr + NE_CMD);
+-		for (i = 0; i < sizeof(SA_prom); i += 2) {
+-			SA_prom[i] = ei_inb(ioaddr + NE_DATAPORT);
+-			SA_prom[i + 1] = ei_inb(ioaddr + NE_DATAPORT);
+-		}
+-		ei_outb(ENISR_RDC, ioaddr + EN0_ISR);	/* Ack intr. */
+-
+-		if (ax->plat->wordlength == 2)
+-			for (i = 0; i < 16; i++)
+-				SA_prom[i] = SA_prom[i+i];
+-
+-		eth_hw_addr_set(dev, SA_prom);
+-	}
+-
+-#ifdef CONFIG_AX88796_93CX6
+-	if (ax->plat->flags & AXFLG_HAS_93CX6) {
+-		unsigned char mac_addr[ETH_ALEN];
+-		struct eeprom_93cx6 eeprom;
+-
+-		eeprom.data = ei_local;
+-		eeprom.register_read = ax_eeprom_register_read;
+-		eeprom.register_write = ax_eeprom_register_write;
+-		eeprom.width = PCI_EEPROM_WIDTH_93C56;
+-
+-		eeprom_93cx6_multiread(&eeprom, 0,
+-				       (__le16 __force *)mac_addr,
+-				       sizeof(mac_addr) >> 1);
+-
+-		eth_hw_addr_set(dev, mac_addr);
+-	}
+-#endif
+-	if (ax->plat->wordlength == 2) {
+-		/* We must set the 8390 for word mode. */
+-		ei_outb(ax->plat->dcr_val, ei_local->mem + EN0_DCFG);
+-		start_page = NESM_START_PG;
+-		stop_page = NESM_STOP_PG;
+-	} else {
+-		start_page = NE1SM_START_PG;
+-		stop_page = NE1SM_STOP_PG;
+-	}
+-
+-	/* load the mac-address from the device */
+-	if (ax->plat->flags & AXFLG_MAC_FROMDEV) {
+-		u8 addr[ETH_ALEN];
+-
+-		ei_outb(E8390_NODMA + E8390_PAGE1 + E8390_STOP,
+-			ei_local->mem + E8390_CMD); /* 0x61 */
+-		for (i = 0; i < ETH_ALEN; i++)
+-			addr[i] = ei_inb(ioaddr + EN1_PHYS_SHIFT(i));
+-		eth_hw_addr_set(dev, addr);
+-	}
+-
+-	if ((ax->plat->flags & AXFLG_MAC_FROMPLATFORM) &&
+-	    ax->plat->mac_addr)
+-		eth_hw_addr_set(dev, ax->plat->mac_addr);
+-
+-	if (!is_valid_ether_addr(dev->dev_addr)) {
+-		eth_hw_addr_random(dev);
+-		dev_info(&dev->dev, "Using random MAC address: %pM\n",
+-			 dev->dev_addr);
+-	}
+-
+-	ax_reset_8390(dev);
+-
+-	ei_local->name = "AX88796";
+-	ei_local->tx_start_page = start_page;
+-	ei_local->stop_page = stop_page;
+-	ei_local->word16 = (ax->plat->wordlength == 2);
+-	ei_local->rx_start_page = start_page + TX_PAGES;
+-
+-#ifdef PACKETBUF_MEMSIZE
+-	/* Allow the packet buffer size to be overridden by know-it-alls. */
+-	ei_local->stop_page = ei_local->tx_start_page + PACKETBUF_MEMSIZE;
+-#endif
+-
+-	ei_local->reset_8390 = &ax_reset_8390;
+-	if (ax->plat->block_input)
+-		ei_local->block_input = ax->plat->block_input;
+-	else
+-		ei_local->block_input = &ax_block_input;
+-	if (ax->plat->block_output)
+-		ei_local->block_output = ax->plat->block_output;
+-	else
+-		ei_local->block_output = &ax_block_output;
+-	ei_local->get_8390_hdr = &ax_get_8390_hdr;
+-	ei_local->priv = 0;
+-
+-	dev->netdev_ops = &ax_netdev_ops;
+-	dev->ethtool_ops = &ax_ethtool_ops;
+-
+-	ax_NS8390_init(dev, 0);
+-
+-	ret = register_netdev(dev);
+-	if (ret)
+-		goto err_out;
+-
+-	netdev_info(dev, "%dbit, irq %d, %lx, MAC: %pM\n",
+-		    ei_local->word16 ? 16 : 8, dev->irq, dev->base_addr,
+-		    dev->dev_addr);
+-
+-	return 0;
+-
+- err_out:
+-	return ret;
+-}
+-
+-static void ax_remove(struct platform_device *pdev)
+-{
+-	struct net_device *dev = platform_get_drvdata(pdev);
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct ax_device *ax = to_ax_dev(dev);
+-	struct resource *mem;
+-
+-	unregister_netdev(dev);
+-
+-	iounmap(ei_local->mem);
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	release_mem_region(mem->start, resource_size(mem));
+-
+-	if (ax->map2) {
+-		iounmap(ax->map2);
+-		mem = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+-		release_mem_region(mem->start, resource_size(mem));
+-	}
+-
+-	platform_set_drvdata(pdev, NULL);
+-	free_netdev(dev);
+-}
+-
+-/*
+- * ax_probe
+- *
+- * This is the entry point when the platform device system uses to
+- * notify us of a new device to attach to. Allocate memory, find the
+- * resources and information passed, and map the necessary registers.
+- */
+-static int ax_probe(struct platform_device *pdev)
+-{
+-	struct net_device *dev;
+-	struct ei_device *ei_local;
+-	struct ax_device *ax;
+-	struct resource *irq, *mem, *mem2;
+-	unsigned long mem_size, mem2_size = 0;
+-	int ret = 0;
+-
+-	dev = ax__alloc_ei_netdev(sizeof(struct ax_device));
+-	if (dev == NULL)
+-		return -ENOMEM;
+-
+-	/* ok, let's setup our device */
+-	SET_NETDEV_DEV(dev, &pdev->dev);
+-	ei_local = netdev_priv(dev);
+-	ax = to_ax_dev(dev);
+-
+-	ax->plat = dev_get_platdata(&pdev->dev);
+-	platform_set_drvdata(pdev, dev);
+-
+-	ei_local->rxcr_base = ax->plat->rcr_val;
+-
+-	/* find the platform resources */
+-	irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+-	if (!irq) {
+-		dev_err(&pdev->dev, "no IRQ specified\n");
+-		ret = -ENXIO;
+-		goto exit_mem;
+-	}
+-
+-	dev->irq = irq->start;
+-	ax->irqflags = irq->flags & IRQF_TRIGGER_MASK;
+-
+-	if (irq->flags &  IORESOURCE_IRQ_SHAREABLE)
+-		ax->irqflags |= IRQF_SHARED;
+-
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!mem) {
+-		dev_err(&pdev->dev, "no MEM specified\n");
+-		ret = -ENXIO;
+-		goto exit_mem;
+-	}
+-
+-	mem_size = resource_size(mem);
+-
+-	/*
+-	 * setup the register offsets from either the platform data or
+-	 * by using the size of the resource provided
+-	 */
+-	if (ax->plat->reg_offsets)
+-		ei_local->reg_offset = ax->plat->reg_offsets;
+-	else {
+-		ei_local->reg_offset = ax->reg_offsets;
+-		for (ret = 0; ret < 0x18; ret++)
+-			ax->reg_offsets[ret] = (mem_size / 0x18) * ret;
+-	}
+-
+-	if (!request_mem_region(mem->start, mem_size, pdev->name)) {
+-		dev_err(&pdev->dev, "cannot reserve registers\n");
+-		ret = -ENXIO;
+-		goto exit_mem;
+-	}
+-
+-	ei_local->mem = ioremap(mem->start, mem_size);
+-	dev->base_addr = (unsigned long)ei_local->mem;
+-
+-	if (ei_local->mem == NULL) {
+-		dev_err(&pdev->dev, "Cannot ioremap area %pR\n", mem);
+-
+-		ret = -ENXIO;
+-		goto exit_req;
+-	}
+-
+-	/* look for reset area */
+-	mem2 = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+-	if (!mem2) {
+-		if (!ax->plat->reg_offsets) {
+-			for (ret = 0; ret < 0x20; ret++)
+-				ax->reg_offsets[ret] = (mem_size / 0x20) * ret;
+-		}
+-	} else {
+-		mem2_size = resource_size(mem2);
+-
+-		if (!request_mem_region(mem2->start, mem2_size, pdev->name)) {
+-			dev_err(&pdev->dev, "cannot reserve registers\n");
+-			ret = -ENXIO;
+-			goto exit_mem1;
+-		}
+-
+-		ax->map2 = ioremap(mem2->start, mem2_size);
+-		if (!ax->map2) {
+-			dev_err(&pdev->dev, "cannot map reset register\n");
+-			ret = -ENXIO;
+-			goto exit_mem2;
+-		}
+-
+-		ei_local->reg_offset[0x1f] = ax->map2 - ei_local->mem;
+-	}
+-
+-	/* got resources, now initialise and register device */
+-	ret = ax_init_dev(dev);
+-	if (!ret)
+-		return 0;
+-
+-	if (!ax->map2)
+-		goto exit_mem1;
+-
+-	iounmap(ax->map2);
+-
+- exit_mem2:
+-	if (mem2)
+-		release_mem_region(mem2->start, mem2_size);
+-
+- exit_mem1:
+-	iounmap(ei_local->mem);
+-
+- exit_req:
+-	release_mem_region(mem->start, mem_size);
+-
+- exit_mem:
+-	platform_set_drvdata(pdev, NULL);
+-	free_netdev(dev);
+-
+-	return ret;
+-}
+-
+-/* suspend and resume */
+-
+-#ifdef CONFIG_PM
+-static int ax_suspend(struct platform_device *dev, pm_message_t state)
+-{
+-	struct net_device *ndev = platform_get_drvdata(dev);
+-	struct ax_device *ax = to_ax_dev(ndev);
+-
+-	ax->resume_open = ax->running;
+-
+-	netif_device_detach(ndev);
+-	ax_close(ndev);
+-
+-	return 0;
+-}
+-
+-static int ax_resume(struct platform_device *pdev)
+-{
+-	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct ax_device *ax = to_ax_dev(ndev);
+-
+-	ax_initial_setup(ndev, netdev_priv(ndev));
+-	ax_NS8390_init(ndev, ax->resume_open);
+-	netif_device_attach(ndev);
+-
+-	if (ax->resume_open)
+-		ax_open(ndev);
+-
+-	return 0;
+-}
+-
+-#else
+-#define ax_suspend NULL
+-#define ax_resume NULL
+-#endif
+-
+-static struct platform_driver axdrv = {
+-	.driver	= {
+-		.name		= "ax88796",
+-	},
+-	.probe		= ax_probe,
+-	.remove		= ax_remove,
+-	.suspend	= ax_suspend,
+-	.resume		= ax_resume,
+-};
+-
+-module_platform_driver(axdrv);
+-
+-MODULE_DESCRIPTION("AX88796 10/100 Ethernet platform driver");
+-MODULE_AUTHOR("Ben Dooks, <ben@simtec.co.uk>");
+-MODULE_LICENSE("GPL v2");
+-MODULE_ALIAS("platform:ax88796");
+diff --git a/drivers/net/ethernet/8390/etherh.c b/drivers/net/ethernet/8390/etherh.c
+deleted file mode 100644
+index e876fe523..000000000
+--- a/drivers/net/ethernet/8390/etherh.c
++++ /dev/null
+@@ -1,858 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- *  linux/drivers/acorn/net/etherh.c
+- *
+- *  Copyright (C) 2000-2002 Russell King
+- *
+- * NS8390 I-cubed EtherH and ANT EtherM specific driver
+- * Thanks to I-Cubed for information on their cards.
+- * EtherM conversion (C) 1999 Chris Kemp and Tim Watterton
+- * EtherM integration (C) 2000 Aleph One Ltd (Tak-Shing Chan)
+- * EtherM integration re-engineered by Russell King.
+- *
+- * Changelog:
+- *  08-12-1996	RMK	1.00	Created
+- *		RMK	1.03	Added support for EtherLan500 cards
+- *  23-11-1997	RMK	1.04	Added media autodetection
+- *  16-04-1998	RMK	1.05	Improved media autodetection
+- *  10-02-2000	RMK	1.06	Updated for 2.3.43
+- *  13-05-2000	RMK	1.07	Updated for 2.3.99-pre8
+- *  12-10-1999  CK/TEW		EtherM driver first release
+- *  21-12-2000	TTC		EtherH/EtherM integration
+- *  25-12-2000	RMK	1.08	Clean integration of EtherM into this driver.
+- *  03-01-2002	RMK	1.09	Always enable IRQs if we're in the nic slot.
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/types.h>
+-#include <linux/fcntl.h>
+-#include <linux/interrupt.h>
+-#include <linux/ioport.h>
+-#include <linux/in.h>
+-#include <linux/string.h>
+-#include <linux/errno.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/ethtool.h>
+-#include <linux/skbuff.h>
+-#include <linux/delay.h>
+-#include <linux/device.h>
+-#include <linux/init.h>
+-#include <linux/bitops.h>
+-#include <linux/jiffies.h>
+-
+-#include <asm/ecard.h>
+-#include <asm/io.h>
+-#include <asm/system_info.h>
+-
+-#define EI_SHIFT(x)	(ei_local->reg_offset[x])
+-
+-#define ei_inb(_p)	 readb((void __iomem *)_p)
+-#define ei_outb(_v,_p)	 writeb(_v,(void __iomem *)_p)
+-#define ei_inb_p(_p)	 readb((void __iomem *)_p)
+-#define ei_outb_p(_v,_p) writeb(_v,(void __iomem *)_p)
+-
+-#define DRV_NAME	"etherh"
+-#define DRV_VERSION	"1.11"
+-
+-static char version[] =
+-	"EtherH/EtherM Driver (c) 2002-2004 Russell King " DRV_VERSION "\n";
+-
+-#include "lib8390.c"
+-
+-struct etherh_priv {
+-	void __iomem	*ioc_fast;
+-	void __iomem	*memc;
+-	void __iomem	*dma_base;
+-	unsigned int	id;
+-	void __iomem	*ctrl_port;
+-	unsigned char	ctrl;
+-	u32		supported;
+-};
+-
+-struct etherh_data {
+-	unsigned long	ns8390_offset;
+-	unsigned long	dataport_offset;
+-	unsigned long	ctrlport_offset;
+-	int		ctrl_ioc;
+-	const char	name[16];
+-	u32		supported;
+-	unsigned char	tx_start_page;
+-	unsigned char	stop_page;
+-};
+-
+-MODULE_AUTHOR("Russell King");
+-MODULE_DESCRIPTION("EtherH/EtherM driver");
+-MODULE_LICENSE("GPL");
+-
+-#define ETHERH500_DATAPORT	0x800	/* MEMC */
+-#define ETHERH500_NS8390	0x000	/* MEMC */
+-#define ETHERH500_CTRLPORT	0x800	/* IOC  */
+-
+-#define ETHERH600_DATAPORT	0x040	/* MEMC */
+-#define ETHERH600_NS8390	0x800	/* MEMC */
+-#define ETHERH600_CTRLPORT	0x200	/* MEMC */
+-
+-#define ETHERH_CP_IE		1
+-#define ETHERH_CP_IF		2
+-#define ETHERH_CP_HEARTBEAT	2
+-
+-#define ETHERH_TX_START_PAGE	1
+-#define ETHERH_STOP_PAGE	127
+-
+-/*
+- * These came from CK/TEW
+- */
+-#define ETHERM_DATAPORT		0x200	/* MEMC */
+-#define ETHERM_NS8390		0x800	/* MEMC */
+-#define ETHERM_CTRLPORT		0x23c	/* MEMC */
+-
+-#define ETHERM_TX_START_PAGE	64
+-#define ETHERM_STOP_PAGE	127
+-
+-/* ------------------------------------------------------------------------ */
+-
+-#define etherh_priv(dev) \
+- ((struct etherh_priv *)(((char *)netdev_priv(dev)) + sizeof(struct ei_device)))
+-
+-static inline void etherh_set_ctrl(struct etherh_priv *eh, unsigned char mask)
+-{
+-	unsigned char ctrl = eh->ctrl | mask;
+-	eh->ctrl = ctrl;
+-	writeb(ctrl, eh->ctrl_port);
+-}
+-
+-static inline void etherh_clr_ctrl(struct etherh_priv *eh, unsigned char mask)
+-{
+-	unsigned char ctrl = eh->ctrl & ~mask;
+-	eh->ctrl = ctrl;
+-	writeb(ctrl, eh->ctrl_port);
+-}
+-
+-static inline unsigned int etherh_get_stat(struct etherh_priv *eh)
+-{
+-	return readb(eh->ctrl_port);
+-}
+-
+-
+-
+-
+-static void etherh_irq_enable(ecard_t *ec, int irqnr)
+-{
+-	struct etherh_priv *eh = ec->irq_data;
+-
+-	etherh_set_ctrl(eh, ETHERH_CP_IE);
+-}
+-
+-static void etherh_irq_disable(ecard_t *ec, int irqnr)
+-{
+-	struct etherh_priv *eh = ec->irq_data;
+-
+-	etherh_clr_ctrl(eh, ETHERH_CP_IE);
+-}
+-
+-static expansioncard_ops_t etherh_ops = {
+-	.irqenable	= etherh_irq_enable,
+-	.irqdisable	= etherh_irq_disable,
+-};
+-
+-
+-
+-
+-static void
+-etherh_setif(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned long flags;
+-	void __iomem *addr;
+-
+-	local_irq_save(flags);
+-
+-	/* set the interface type */
+-	switch (etherh_priv(dev)->id) {
+-	case PROD_I3_ETHERLAN600:
+-	case PROD_I3_ETHERLAN600A:
+-		addr = (void __iomem *)dev->base_addr + EN0_RCNTHI;
+-
+-		switch (dev->if_port) {
+-		case IF_PORT_10BASE2:
+-			writeb((readb(addr) & 0xf8) | 1, addr);
+-			break;
+-		case IF_PORT_10BASET:
+-			writeb((readb(addr) & 0xf8), addr);
+-			break;
+-		}
+-		break;
+-
+-	case PROD_I3_ETHERLAN500:
+-		switch (dev->if_port) {
+-		case IF_PORT_10BASE2:
+-			etherh_clr_ctrl(etherh_priv(dev), ETHERH_CP_IF);
+-			break;
+-
+-		case IF_PORT_10BASET:
+-			etherh_set_ctrl(etherh_priv(dev), ETHERH_CP_IF);
+-			break;
+-		}
+-		break;
+-
+-	default:
+-		break;
+-	}
+-
+-	local_irq_restore(flags);
+-}
+-
+-static int
+-etherh_getifstat(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *addr;
+-	int stat = 0;
+-
+-	switch (etherh_priv(dev)->id) {
+-	case PROD_I3_ETHERLAN600:
+-	case PROD_I3_ETHERLAN600A:
+-		addr = (void __iomem *)dev->base_addr + EN0_RCNTHI;
+-		switch (dev->if_port) {
+-		case IF_PORT_10BASE2:
+-			stat = 1;
+-			break;
+-		case IF_PORT_10BASET:
+-			stat = readb(addr) & 4;
+-			break;
+-		}
+-		break;
+-
+-	case PROD_I3_ETHERLAN500:
+-		switch (dev->if_port) {
+-		case IF_PORT_10BASE2:
+-			stat = 1;
+-			break;
+-		case IF_PORT_10BASET:
+-			stat = etherh_get_stat(etherh_priv(dev)) & ETHERH_CP_HEARTBEAT;
+-			break;
+-		}
+-		break;
+-
+-	default:
+-		stat = 0;
+-		break;
+-	}
+-
+-	return stat != 0;
+-}
+-
+-/*
+- * Configure the interface.  Note that we ignore the other
+- * parts of ifmap, since its mostly meaningless for this driver.
+- */
+-static int etherh_set_config(struct net_device *dev, struct ifmap *map)
+-{
+-	switch (map->port) {
+-	case IF_PORT_10BASE2:
+-	case IF_PORT_10BASET:
+-		/*
+-		 * If the user explicitly sets the interface
+-		 * media type, turn off automedia detection.
+-		 */
+-		dev->flags &= ~IFF_AUTOMEDIA;
+-		WRITE_ONCE(dev->if_port, map->port);
+-		break;
+-
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	etherh_setif(dev);
+-
+-	return 0;
+-}
+-
+-/*
+- * Reset the 8390 (hard reset).  Note that we can't actually do this.
+- */
+-static void
+-etherh_reset(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *addr = (void __iomem *)dev->base_addr;
+-
+-	writeb(E8390_NODMA+E8390_PAGE0+E8390_STOP, addr);
+-
+-	/*
+-	 * See if we need to change the interface type.
+-	 * Note that we use 'interface_num' as a flag
+-	 * to indicate that we need to change the media.
+-	 */
+-	if (dev->flags & IFF_AUTOMEDIA && ei_local->interface_num) {
+-		ei_local->interface_num = 0;
+-
+-		if (dev->if_port == IF_PORT_10BASET)
+-			dev->if_port = IF_PORT_10BASE2;
+-		else
+-			dev->if_port = IF_PORT_10BASET;
+-
+-		etherh_setif(dev);
+-	}
+-}
+-
+-/*
+- * Write a block of data out to the 8390
+- */
+-static void
+-etherh_block_output (struct net_device *dev, int count, const unsigned char *buf, int start_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned long dma_start;
+-	void __iomem *dma_base, *addr;
+-
+-	if (ei_local->dmaing) {
+-		netdev_err(dev, "DMAing conflict in etherh_block_input: "
+-			   " DMAstat %d irqlock %d\n",
+-			   ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	/*
+-	 * Make sure we have a round number of bytes if we're in word mode.
+-	 */
+-	if (count & 1 && ei_local->word16)
+-		count++;
+-
+-	ei_local->dmaing = 1;
+-
+-	addr = (void __iomem *)dev->base_addr;
+-	dma_base = etherh_priv(dev)->dma_base;
+-
+-	count = (count + 1) & ~1;
+-	writeb (E8390_NODMA | E8390_PAGE0 | E8390_START, addr + E8390_CMD);
+-
+-	writeb (0x42, addr + EN0_RCNTLO);
+-	writeb (0x00, addr + EN0_RCNTHI);
+-	writeb (0x42, addr + EN0_RSARLO);
+-	writeb (0x00, addr + EN0_RSARHI);
+-	writeb (E8390_RREAD | E8390_START, addr + E8390_CMD);
+-
+-	udelay (1);
+-
+-	writeb (ENISR_RDC, addr + EN0_ISR);
+-	writeb (count, addr + EN0_RCNTLO);
+-	writeb (count >> 8, addr + EN0_RCNTHI);
+-	writeb (0, addr + EN0_RSARLO);
+-	writeb (start_page, addr + EN0_RSARHI);
+-	writeb (E8390_RWRITE | E8390_START, addr + E8390_CMD);
+-
+-	if (ei_local->word16)
+-		writesw (dma_base, buf, count >> 1);
+-	else
+-		writesb (dma_base, buf, count);
+-
+-	dma_start = jiffies;
+-
+-	while ((readb (addr + EN0_ISR) & ENISR_RDC) == 0)
+-		if (time_after(jiffies, dma_start + 2*HZ/100)) { /* 20ms */
+-			netdev_warn(dev, "timeout waiting for TX RDC\n");
+-			etherh_reset (dev);
+-			__NS8390_init (dev, 1);
+-			break;
+-		}
+-
+-	writeb (ENISR_RDC, addr + EN0_ISR);
+-	ei_local->dmaing = 0;
+-}
+-
+-/*
+- * Read a block of data from the 8390
+- */
+-static void
+-etherh_block_input (struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned char *buf;
+-	void __iomem *dma_base, *addr;
+-
+-	if (ei_local->dmaing) {
+-		netdev_err(dev, "DMAing conflict in etherh_block_input: "
+-			   " DMAstat %d irqlock %d\n",
+-			   ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing = 1;
+-
+-	addr = (void __iomem *)dev->base_addr;
+-	dma_base = etherh_priv(dev)->dma_base;
+-
+-	buf = skb->data;
+-	writeb (E8390_NODMA | E8390_PAGE0 | E8390_START, addr + E8390_CMD);
+-	writeb (count, addr + EN0_RCNTLO);
+-	writeb (count >> 8, addr + EN0_RCNTHI);
+-	writeb (ring_offset, addr + EN0_RSARLO);
+-	writeb (ring_offset >> 8, addr + EN0_RSARHI);
+-	writeb (E8390_RREAD | E8390_START, addr + E8390_CMD);
+-
+-	if (ei_local->word16) {
+-		readsw (dma_base, buf, count >> 1);
+-		if (count & 1)
+-			buf[count - 1] = readb (dma_base);
+-	} else
+-		readsb (dma_base, buf, count);
+-
+-	writeb (ENISR_RDC, addr + EN0_ISR);
+-	ei_local->dmaing = 0;
+-}
+-
+-/*
+- * Read a header from the 8390
+- */
+-static void
+-etherh_get_header (struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *dma_base, *addr;
+-
+-	if (ei_local->dmaing) {
+-		netdev_err(dev, "DMAing conflict in etherh_get_header: "
+-			   " DMAstat %d irqlock %d\n",
+-			   ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing = 1;
+-
+-	addr = (void __iomem *)dev->base_addr;
+-	dma_base = etherh_priv(dev)->dma_base;
+-
+-	writeb (E8390_NODMA | E8390_PAGE0 | E8390_START, addr + E8390_CMD);
+-	writeb (sizeof (*hdr), addr + EN0_RCNTLO);
+-	writeb (0, addr + EN0_RCNTHI);
+-	writeb (0, addr + EN0_RSARLO);
+-	writeb (ring_page, addr + EN0_RSARHI);
+-	writeb (E8390_RREAD | E8390_START, addr + E8390_CMD);
+-
+-	if (ei_local->word16)
+-		readsw (dma_base, hdr, sizeof (*hdr) >> 1);
+-	else
+-		readsb (dma_base, hdr, sizeof (*hdr));
+-
+-	writeb (ENISR_RDC, addr + EN0_ISR);
+-	ei_local->dmaing = 0;
+-}
+-
+-/*
+- * Open/initialize the board.  This is called (in the current kernel)
+- * sometime after booting when the 'ifconfig' program is run.
+- *
+- * This routine should set everything up anew at each open, even
+- * registers that "should" only need to be set once at boot, so that
+- * there is non-reboot way to recover if something goes wrong.
+- */
+-static int
+-etherh_open(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	if (request_irq(dev->irq, __ei_interrupt, 0, dev->name, dev))
+-		return -EAGAIN;
+-
+-	/*
+-	 * Make sure that we aren't going to change the
+-	 * media type on the next reset - we are about to
+-	 * do automedia manually now.
+-	 */
+-	ei_local->interface_num = 0;
+-
+-	/*
+-	 * If we are doing automedia detection, do it now.
+-	 * This is more reliable than the 8390's detection.
+-	 */
+-	if (dev->flags & IFF_AUTOMEDIA) {
+-		dev->if_port = IF_PORT_10BASET;
+-		etherh_setif(dev);
+-		mdelay(1);
+-		if (!etherh_getifstat(dev)) {
+-			dev->if_port = IF_PORT_10BASE2;
+-			etherh_setif(dev);
+-		}
+-	} else
+-		etherh_setif(dev);
+-
+-	etherh_reset(dev);
+-	__ei_open(dev);
+-
+-	return 0;
+-}
+-
+-/*
+- * The inverse routine to etherh_open().
+- */
+-static int
+-etherh_close(struct net_device *dev)
+-{
+-	__ei_close (dev);
+-	free_irq (dev->irq, dev);
+-	return 0;
+-}
+-
+-/*
+- * Read the ethernet address string from the on board rom.
+- * This is an ascii string...
+- */
+-static int etherh_addr(char *addr, struct expansion_card *ec)
+-{
+-	struct in_chunk_dir cd;
+-	char *s;
+-	
+-	if (!ecard_readchunk(&cd, ec, 0xf5, 0)) {
+-		printk(KERN_ERR "%s: unable to read module description string\n",
+-		       dev_name(&ec->dev));
+-		goto no_addr;
+-	}
+-
+-	s = strchr(cd.d.string, '(');
+-	if (s) {
+-		int i;
+-
+-		for (i = 0; i < 6; i++) {
+-			addr[i] = simple_strtoul(s + 1, &s, 0x10);
+-			if (*s != (i == 5? ')' : ':'))
+-				break;
+-		}
+-
+-		if (i == 6)
+-			return 0;
+-	}
+-
+-	printk(KERN_ERR "%s: unable to parse MAC address: %s\n",
+-	       dev_name(&ec->dev), cd.d.string);
+-
+- no_addr:
+-	return -ENODEV;
+-}
+-
+-/*
+- * Create an ethernet address from the system serial number.
+- */
+-static int __init etherm_addr(char *addr)
+-{
+-	unsigned int serial;
+-
+-	if (system_serial_low == 0 && system_serial_high == 0)
+-		return -ENODEV;
+-
+-	serial = system_serial_low | system_serial_high;
+-
+-	addr[0] = 0;
+-	addr[1] = 0;
+-	addr[2] = 0xa4;
+-	addr[3] = 0x10 + (serial >> 24);
+-	addr[4] = serial >> 16;
+-	addr[5] = serial >> 8;
+-	return 0;
+-}
+-
+-static void etherh_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *info)
+-{
+-	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+-	strscpy(info->version, DRV_VERSION, sizeof(info->version));
+-	strscpy(info->bus_info, dev_name(dev->dev.parent),
+-		sizeof(info->bus_info));
+-}
+-
+-static int etherh_get_link_ksettings(struct net_device *dev,
+-				     struct ethtool_link_ksettings *cmd)
+-{
+-	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
+-						etherh_priv(dev)->supported);
+-	cmd->base.speed = SPEED_10;
+-	cmd->base.duplex = DUPLEX_HALF;
+-	cmd->base.port = dev->if_port == IF_PORT_10BASET ? PORT_TP : PORT_BNC;
+-	cmd->base.autoneg = (dev->flags & IFF_AUTOMEDIA ? AUTONEG_ENABLE :
+-							  AUTONEG_DISABLE);
+-	return 0;
+-}
+-
+-static int etherh_set_link_ksettings(struct net_device *dev,
+-				     const struct ethtool_link_ksettings *cmd)
+-{
+-	switch (cmd->base.autoneg) {
+-	case AUTONEG_ENABLE:
+-		dev->flags |= IFF_AUTOMEDIA;
+-		break;
+-
+-	case AUTONEG_DISABLE:
+-		switch (cmd->base.port) {
+-		case PORT_TP:
+-			dev->if_port = IF_PORT_10BASET;
+-			break;
+-
+-		case PORT_BNC:
+-			dev->if_port = IF_PORT_10BASE2;
+-			break;
+-
+-		default:
+-			return -EINVAL;
+-		}
+-		dev->flags &= ~IFF_AUTOMEDIA;
+-		break;
+-
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	etherh_setif(dev);
+-
+-	return 0;
+-}
+-
+-static u32 etherh_get_msglevel(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	return ei_local->msg_enable;
+-}
+-
+-static void etherh_set_msglevel(struct net_device *dev, u32 v)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	ei_local->msg_enable = v;
+-}
+-
+-static const struct ethtool_ops etherh_ethtool_ops = {
+-	.get_drvinfo		= etherh_get_drvinfo,
+-	.get_ts_info		= ethtool_op_get_ts_info,
+-	.get_msglevel		= etherh_get_msglevel,
+-	.set_msglevel		= etherh_set_msglevel,
+-	.get_link_ksettings	= etherh_get_link_ksettings,
+-	.set_link_ksettings	= etherh_set_link_ksettings,
+-};
+-
+-static const struct net_device_ops etherh_netdev_ops = {
+-	.ndo_open		= etherh_open,
+-	.ndo_stop		= etherh_close,
+-	.ndo_set_config		= etherh_set_config,
+-	.ndo_start_xmit		= __ei_start_xmit,
+-	.ndo_tx_timeout		= __ei_tx_timeout,
+-	.ndo_get_stats		= __ei_get_stats,
+-	.ndo_set_rx_mode	= __ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= __ei_poll,
+-#endif
+-};
+-
+-static u32 etherh_regoffsets[16];
+-static u32 etherm_regoffsets[16];
+-
+-static int
+-etherh_probe(struct expansion_card *ec, const struct ecard_id *id)
+-{
+-	const struct etherh_data *data = id->data;
+-	struct ei_device *ei_local;
+-	struct net_device *dev;
+-	struct etherh_priv *eh;
+-	u8 addr[ETH_ALEN];
+-	int ret;
+-
+-	ret = ecard_request_resources(ec);
+-	if (ret)
+-		goto out;
+-
+-	dev = ____alloc_ei_netdev(sizeof(struct etherh_priv));
+-	if (!dev) {
+-		ret = -ENOMEM;
+-		goto release;
+-	}
+-
+-	SET_NETDEV_DEV(dev, &ec->dev);
+-
+-	dev->netdev_ops		= &etherh_netdev_ops;
+-	dev->irq		= ec->irq;
+-	dev->ethtool_ops	= &etherh_ethtool_ops;
+-
+-	if (data->supported & SUPPORTED_Autoneg)
+-		dev->flags |= IFF_AUTOMEDIA;
+-	if (data->supported & SUPPORTED_TP) {
+-		dev->flags |= IFF_PORTSEL;
+-		dev->if_port = IF_PORT_10BASET;
+-	} else if (data->supported & SUPPORTED_BNC) {
+-		dev->flags |= IFF_PORTSEL;
+-		dev->if_port = IF_PORT_10BASE2;
+-	} else
+-		dev->if_port = IF_PORT_UNKNOWN;
+-
+-	eh = etherh_priv(dev);
+-	eh->supported		= data->supported;
+-	eh->ctrl		= 0;
+-	eh->id			= ec->cid.product;
+-	eh->memc		= ecardm_iomap(ec, ECARD_RES_MEMC, 0, PAGE_SIZE);
+-	if (!eh->memc) {
+-		ret = -ENOMEM;
+-		goto free;
+-	}
+-
+-	eh->ctrl_port = eh->memc;
+-	if (data->ctrl_ioc) {
+-		eh->ioc_fast = ecardm_iomap(ec, ECARD_RES_IOCFAST, 0, PAGE_SIZE);
+-		if (!eh->ioc_fast) {
+-			ret = -ENOMEM;
+-			goto free;
+-		}
+-		eh->ctrl_port = eh->ioc_fast;
+-	}
+-
+-	dev->base_addr = (unsigned long)eh->memc + data->ns8390_offset;
+-	eh->dma_base = eh->memc + data->dataport_offset;
+-	eh->ctrl_port += data->ctrlport_offset;
+-
+-	/*
+-	 * IRQ and control port handling - only for non-NIC slot cards.
+-	 */
+-	if (ec->slot_no != 8) {
+-		ecard_setirq(ec, &etherh_ops, eh);
+-	} else {
+-		/*
+-		 * If we're in the NIC slot, make sure the IRQ is enabled
+-		 */
+-		etherh_set_ctrl(eh, ETHERH_CP_IE);
+-	}
+-
+-	ei_local = netdev_priv(dev);
+-	spin_lock_init(&ei_local->page_lock);
+-
+-	if (ec->cid.product == PROD_ANT_ETHERM) {
+-		etherm_addr(addr);
+-		ei_local->reg_offset = etherm_regoffsets;
+-	} else {
+-		etherh_addr(addr, ec);
+-		ei_local->reg_offset = etherh_regoffsets;
+-	}
+-	eth_hw_addr_set(dev, addr);
+-
+-	ei_local->name          = dev->name;
+-	ei_local->word16        = 1;
+-	ei_local->tx_start_page = data->tx_start_page;
+-	ei_local->rx_start_page = ei_local->tx_start_page + TX_PAGES;
+-	ei_local->stop_page     = data->stop_page;
+-	ei_local->reset_8390    = etherh_reset;
+-	ei_local->block_input   = etherh_block_input;
+-	ei_local->block_output  = etherh_block_output;
+-	ei_local->get_8390_hdr  = etherh_get_header;
+-	ei_local->interface_num = 0;
+-
+-	etherh_reset(dev);
+-	__NS8390_init(dev, 0);
+-
+-	ret = register_netdev(dev);
+-	if (ret)
+-		goto free;
+-
+-	netdev_info(dev, "%s in slot %d, %pM\n",
+-		    data->name, ec->slot_no, dev->dev_addr);
+-
+-	ecard_set_drvdata(ec, dev);
+-
+-	return 0;
+-
+- free:
+-	free_netdev(dev);
+- release:
+-	ecard_release_resources(ec);
+- out:
+-	return ret;
+-}
+-
+-static void etherh_remove(struct expansion_card *ec)
+-{
+-	struct net_device *dev = ecard_get_drvdata(ec);
+-
+-	ecard_set_drvdata(ec, NULL);
+-
+-	unregister_netdev(dev);
+-
+-	free_netdev(dev);
+-
+-	ecard_release_resources(ec);
+-}
+-
+-static struct etherh_data etherm_data = {
+-	.ns8390_offset		= ETHERM_NS8390,
+-	.dataport_offset	= ETHERM_NS8390 + ETHERM_DATAPORT,
+-	.ctrlport_offset	= ETHERM_NS8390 + ETHERM_CTRLPORT,
+-	.name			= "ANT EtherM",
+-	.supported		= SUPPORTED_10baseT_Half,
+-	.tx_start_page		= ETHERM_TX_START_PAGE,
+-	.stop_page		= ETHERM_STOP_PAGE,
+-};
+-
+-static struct etherh_data etherlan500_data = {
+-	.ns8390_offset		= ETHERH500_NS8390,
+-	.dataport_offset	= ETHERH500_NS8390 + ETHERH500_DATAPORT,
+-	.ctrlport_offset	= ETHERH500_CTRLPORT,
+-	.ctrl_ioc		= 1,
+-	.name			= "i3 EtherH 500",
+-	.supported		= SUPPORTED_10baseT_Half,
+-	.tx_start_page		= ETHERH_TX_START_PAGE,
+-	.stop_page		= ETHERH_STOP_PAGE,
+-};
+-
+-static struct etherh_data etherlan600_data = {
+-	.ns8390_offset		= ETHERH600_NS8390,
+-	.dataport_offset	= ETHERH600_NS8390 + ETHERH600_DATAPORT,
+-	.ctrlport_offset	= ETHERH600_NS8390 + ETHERH600_CTRLPORT,
+-	.name			= "i3 EtherH 600",
+-	.supported		= SUPPORTED_10baseT_Half | SUPPORTED_TP | SUPPORTED_BNC | SUPPORTED_Autoneg,
+-	.tx_start_page		= ETHERH_TX_START_PAGE,
+-	.stop_page		= ETHERH_STOP_PAGE,
+-};
+-
+-static struct etherh_data etherlan600a_data = {
+-	.ns8390_offset		= ETHERH600_NS8390,
+-	.dataport_offset	= ETHERH600_NS8390 + ETHERH600_DATAPORT,
+-	.ctrlport_offset	= ETHERH600_NS8390 + ETHERH600_CTRLPORT,
+-	.name			= "i3 EtherH 600A",
+-	.supported		= SUPPORTED_10baseT_Half | SUPPORTED_TP | SUPPORTED_BNC | SUPPORTED_Autoneg,
+-	.tx_start_page		= ETHERH_TX_START_PAGE,
+-	.stop_page		= ETHERH_STOP_PAGE,
+-};
+-
+-static const struct ecard_id etherh_ids[] = {
+-	{ MANU_ANT, PROD_ANT_ETHERM,      &etherm_data       },
+-	{ MANU_I3,  PROD_I3_ETHERLAN500,  &etherlan500_data  },
+-	{ MANU_I3,  PROD_I3_ETHERLAN600,  &etherlan600_data  },
+-	{ MANU_I3,  PROD_I3_ETHERLAN600A, &etherlan600a_data },
+-	{ 0xffff,   0xffff }
+-};
+-
+-static struct ecard_driver etherh_driver = {
+-	.probe		= etherh_probe,
+-	.remove		= etherh_remove,
+-	.id_table	= etherh_ids,
+-	.drv = {
+-		.name	= DRV_NAME,
+-	},
+-};
+-
+-static int __init etherh_init(void)
+-{
+-	int i;
+-
+-	for (i = 0; i < 16; i++) {
+-		etherh_regoffsets[i] = i << 2;
+-		etherm_regoffsets[i] = i << 5;
+-	}
+-
+-	return ecard_register_driver(&etherh_driver);
+-}
+-
+-static void __exit etherh_exit(void)
+-{
+-	ecard_remove_driver(&etherh_driver);
+-}
+-
+-module_init(etherh_init);
+-module_exit(etherh_exit);
+diff --git a/drivers/net/ethernet/8390/hydra.c b/drivers/net/ethernet/8390/hydra.c
+deleted file mode 100644
+index fd9dcdc35..000000000
+--- a/drivers/net/ethernet/8390/hydra.c
++++ /dev/null
+@@ -1,274 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-
+-/* New Hydra driver using generic 8390 core */
+-/* Based on old hydra driver by Topi Kanerva (topi@susanna.oulu.fi) */
+-
+-/* Peter De Schrijver (p2@mind.be) */
+-/* Oldenburg 2000 */
+-
+-/* The Amiganet is a Zorro-II board made by Hydra Systems. It contains a    */
+-/* NS8390 NIC (network interface controller) clone, 16 or 64K on-board RAM  */
+-/* and 10BASE-2 (thin coax) and AUI connectors.                             */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/string.h>
+-#include <linux/errno.h>
+-#include <linux/ioport.h>
+-#include <linux/interrupt.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/skbuff.h>
+-#include <linux/init.h>
+-#include <linux/bitops.h>
+-
+-#include <asm/io.h>
+-#include <asm/irq.h>
+-#include <asm/amigaints.h>
+-#include <asm/amigahw.h>
+-#include <linux/zorro.h>
+-
+-#define EI_SHIFT(x)	(ei_local->reg_offset[x])
+-#define ei_inb(port)   in_8(port)
+-#define ei_outb(val,port)  out_8(port,val)
+-#define ei_inb_p(port)   in_8(port)
+-#define ei_outb_p(val,port)  out_8(port,val)
+-
+-static const char version[] =
+-    "8390.c:v1.10cvs 9/23/94 Donald Becker (becker@cesdis.gsfc.nasa.gov)\n";
+-
+-#include "lib8390.c"
+-
+-#define NE_EN0_DCFG     (0x0e*2)
+-
+-#define NESM_START_PG   0x0    /* First page of TX buffer */
+-#define NESM_STOP_PG    0x40    /* Last page +1 of RX ring */
+-
+-#define HYDRA_NIC_BASE 0xffe1
+-#define HYDRA_ADDRPROM 0xffc0
+-#define HYDRA_VERSION "v3.0alpha"
+-
+-#define WORDSWAP(a)     ((((a)>>8)&0xff) | ((a)<<8))
+-
+-
+-static int hydra_init_one(struct zorro_dev *z,
+-				    const struct zorro_device_id *ent);
+-static int hydra_init(struct zorro_dev *z);
+-static int hydra_open(struct net_device *dev);
+-static int hydra_close(struct net_device *dev);
+-static void hydra_reset_8390(struct net_device *dev);
+-static void hydra_get_8390_hdr(struct net_device *dev,
+-			       struct e8390_pkt_hdr *hdr, int ring_page);
+-static void hydra_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset);
+-static void hydra_block_output(struct net_device *dev, int count,
+-			       const unsigned char *buf, int start_page);
+-static void hydra_remove_one(struct zorro_dev *z);
+-
+-static struct zorro_device_id hydra_zorro_tbl[] = {
+-    { ZORRO_PROD_HYDRA_SYSTEMS_AMIGANET },
+-    { 0 }
+-};
+-MODULE_DEVICE_TABLE(zorro, hydra_zorro_tbl);
+-
+-static struct zorro_driver hydra_driver = {
+-    .name	= "hydra",
+-    .id_table	= hydra_zorro_tbl,
+-    .probe	= hydra_init_one,
+-    .remove	= hydra_remove_one,
+-};
+-
+-static int hydra_init_one(struct zorro_dev *z,
+-			  const struct zorro_device_id *ent)
+-{
+-    int err;
+-
+-    if (!request_mem_region(z->resource.start, 0x10000, "Hydra"))
+-	return -EBUSY;
+-    if ((err = hydra_init(z))) {
+-	release_mem_region(z->resource.start, 0x10000);
+-	return -EBUSY;
+-    }
+-    return 0;
+-}
+-
+-static const struct net_device_ops hydra_netdev_ops = {
+-	.ndo_open		= hydra_open,
+-	.ndo_stop		= hydra_close,
+-
+-	.ndo_start_xmit		= __ei_start_xmit,
+-	.ndo_tx_timeout		= __ei_tx_timeout,
+-	.ndo_get_stats		= __ei_get_stats,
+-	.ndo_set_rx_mode	= __ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= __ei_poll,
+-#endif
+-};
+-
+-static int hydra_init(struct zorro_dev *z)
+-{
+-    struct net_device *dev;
+-    unsigned long board = (unsigned long)ZTWO_VADDR(z->resource.start);
+-    unsigned long ioaddr = board+HYDRA_NIC_BASE;
+-    const char name[] = "NE2000";
+-    int start_page, stop_page;
+-    u8 macaddr[ETH_ALEN];
+-    int j;
+-    int err;
+-
+-    static u32 hydra_offsets[16] = {
+-	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
+-	0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,
+-    };
+-
+-    dev = ____alloc_ei_netdev(0);
+-    if (!dev)
+-	return -ENOMEM;
+-
+-    for (j = 0; j < ETH_ALEN; j++)
+-	macaddr[j] = *((u8 *)(board + HYDRA_ADDRPROM + 2*j));
+-    eth_hw_addr_set(dev, macaddr);
+-
+-    /* We must set the 8390 for word mode. */
+-    z_writeb(0x4b, ioaddr + NE_EN0_DCFG);
+-    start_page = NESM_START_PG;
+-    stop_page = NESM_STOP_PG;
+-
+-    dev->base_addr = ioaddr;
+-    dev->irq = IRQ_AMIGA_PORTS;
+-
+-    /* Install the Interrupt handler */
+-    if (request_irq(IRQ_AMIGA_PORTS, __ei_interrupt, IRQF_SHARED, "Hydra Ethernet",
+-		    dev)) {
+-	free_netdev(dev);
+-	return -EAGAIN;
+-    }
+-
+-    ei_status.name = name;
+-    ei_status.tx_start_page = start_page;
+-    ei_status.stop_page = stop_page;
+-    ei_status.word16 = 1;
+-    ei_status.bigendian = 1;
+-
+-    ei_status.rx_start_page = start_page + TX_PAGES;
+-
+-    ei_status.reset_8390 = hydra_reset_8390;
+-    ei_status.block_input = hydra_block_input;
+-    ei_status.block_output = hydra_block_output;
+-    ei_status.get_8390_hdr = hydra_get_8390_hdr;
+-    ei_status.reg_offset = hydra_offsets;
+-
+-    dev->netdev_ops = &hydra_netdev_ops;
+-    __NS8390_init(dev, 0);
+-
+-    err = register_netdev(dev);
+-    if (err) {
+-	free_irq(IRQ_AMIGA_PORTS, dev);
+-	free_netdev(dev);
+-	return err;
+-    }
+-
+-    zorro_set_drvdata(z, dev);
+-
+-    pr_info("%s: Hydra at %pR, address %pM (hydra.c " HYDRA_VERSION ")\n",
+-	    dev->name, &z->resource, dev->dev_addr);
+-
+-    return 0;
+-}
+-
+-static int hydra_open(struct net_device *dev)
+-{
+-    __ei_open(dev);
+-    return 0;
+-}
+-
+-static int hydra_close(struct net_device *dev)
+-{
+-    struct ei_device *ei_local = netdev_priv(dev);
+-
+-    netif_dbg(ei_local, ifdown, dev, "Shutting down ethercard.\n");
+-    __ei_close(dev);
+-    return 0;
+-}
+-
+-static void hydra_reset_8390(struct net_device *dev)
+-{
+-    netdev_info(dev, "Hydra hw reset not there\n");
+-}
+-
+-static void hydra_get_8390_hdr(struct net_device *dev,
+-			       struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-    int nic_base = dev->base_addr;
+-    short *ptrs;
+-    unsigned long hdr_start= (nic_base-HYDRA_NIC_BASE) +
+-			     ((ring_page - NESM_START_PG)<<8);
+-    ptrs = (short *)hdr;
+-
+-    *(ptrs++) = z_readw(hdr_start);
+-    *((short *)hdr) = WORDSWAP(*((short *)hdr));
+-    hdr_start += 2;
+-    *(ptrs++) = z_readw(hdr_start);
+-    *((short *)hdr+1) = WORDSWAP(*((short *)hdr+1));
+-}
+-
+-static void hydra_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset)
+-{
+-    unsigned long nic_base = dev->base_addr;
+-    unsigned long mem_base = nic_base - HYDRA_NIC_BASE;
+-    unsigned long xfer_start = mem_base + ring_offset - (NESM_START_PG<<8);
+-
+-    if (count&1)
+-	count++;
+-
+-    if (xfer_start+count >  mem_base + (NESM_STOP_PG<<8)) {
+-	int semi_count = (mem_base + (NESM_STOP_PG<<8)) - xfer_start;
+-
+-	z_memcpy_fromio(skb->data,xfer_start,semi_count);
+-	count -= semi_count;
+-	z_memcpy_fromio(skb->data+semi_count, mem_base, count);
+-    } else
+-	z_memcpy_fromio(skb->data, xfer_start,count);
+-
+-}
+-
+-static void hydra_block_output(struct net_device *dev, int count,
+-			       const unsigned char *buf, int start_page)
+-{
+-    unsigned long nic_base = dev->base_addr;
+-    unsigned long mem_base = nic_base - HYDRA_NIC_BASE;
+-
+-    if (count&1)
+-	count++;
+-
+-    z_memcpy_toio(mem_base+((start_page - NESM_START_PG)<<8), buf, count);
+-}
+-
+-static void hydra_remove_one(struct zorro_dev *z)
+-{
+-    struct net_device *dev = zorro_get_drvdata(z);
+-
+-    unregister_netdev(dev);
+-    free_irq(IRQ_AMIGA_PORTS, dev);
+-    release_mem_region(ZTWO_PADDR(dev->base_addr)-HYDRA_NIC_BASE, 0x10000);
+-    free_netdev(dev);
+-}
+-
+-static int __init hydra_init_module(void)
+-{
+-    return zorro_register_driver(&hydra_driver);
+-}
+-
+-static void __exit hydra_cleanup_module(void)
+-{
+-    zorro_unregister_driver(&hydra_driver);
+-}
+-
+-module_init(hydra_init_module);
+-module_exit(hydra_cleanup_module);
+-
+-MODULE_DESCRIPTION("Zorro-II Hydra 8390 ethernet driver");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/mac8390.c b/drivers/net/ethernet/8390/mac8390.c
+deleted file mode 100644
+index 4a0a095a1..000000000
+--- a/drivers/net/ethernet/8390/mac8390.c
++++ /dev/null
+@@ -1,848 +0,0 @@
+-// SPDX-License-Identifier: GPL-1.0+
+-/* mac8390.c: New driver for 8390-based Nubus (or Nubus-alike)
+-   Ethernet cards on Linux */
+-/* Based on the former daynaport.c driver, by Alan Cox.  Some code
+-   taken from or inspired by skeleton.c by Donald Becker, acenic.c by
+-   Jes Sorensen, and ne2k-pci.c by Donald Becker and Paul Gortmaker. */
+-
+-/* 2000-02-28: support added for Dayna and Kinetics cards by
+-   A.G.deWijn@phys.uu.nl */
+-/* 2000-04-04: support added for Dayna2 by bart@etpmod.phys.tue.nl */
+-/* 2001-04-18: support for DaynaPort E/LC-M by rayk@knightsmanor.org */
+-/* 2001-05-15: support for Cabletron ported from old daynaport driver
+- * and fixed access to Sonic Sys card which masquerades as a Farallon
+- * by rayk@knightsmanor.org */
+-/* 2002-12-30: Try to support more cards, some clues from NetBSD driver */
+-/* 2003-12-26: Make sure Asante cards always work. */
+-
+-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/types.h>
+-#include <linux/fcntl.h>
+-#include <linux/interrupt.h>
+-#include <linux/ptrace.h>
+-#include <linux/ioport.h>
+-#include <linux/nubus.h>
+-#include <linux/in.h>
+-#include <linux/string.h>
+-#include <linux/errno.h>
+-#include <linux/init.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/skbuff.h>
+-#include <linux/bitops.h>
+-#include <linux/io.h>
+-
+-#include <asm/dma.h>
+-#include <asm/hwtest.h>
+-#include <asm/macints.h>
+-
+-static char version[] =
+-	"v0.4 2001-05-15 David Huggins-Daines <dhd@debian.org> and others\n";
+-
+-#define EI_SHIFT(x)	(ei_local->reg_offset[x])
+-#define ei_inb(port)	in_8(port)
+-#define ei_outb(val, port)	out_8(port, val)
+-#define ei_inb_p(port)	in_8(port)
+-#define ei_outb_p(val, port)	out_8(port, val)
+-
+-#include "lib8390.c"
+-
+-#define WD_START_PG			0x00	/* First page of TX buffer */
+-#define CABLETRON_RX_START_PG		0x00    /* First page of RX buffer */
+-#define CABLETRON_RX_STOP_PG		0x30    /* Last page +1 of RX ring */
+-#define CABLETRON_TX_START_PG		CABLETRON_RX_STOP_PG
+-						/* First page of TX buffer */
+-
+-/*
+- * Unfortunately it seems we have to hardcode these for the moment
+- * Shouldn't the card know about this?
+- * Does anyone know where to read it off the card?
+- * Do we trust the data provided by the card?
+- */
+-
+-#define DAYNA_8390_BASE		0x80000
+-#define DAYNA_8390_MEM		0x00000
+-
+-#define CABLETRON_8390_BASE	0x90000
+-#define CABLETRON_8390_MEM	0x00000
+-
+-#define INTERLAN_8390_BASE	0xE0000
+-#define INTERLAN_8390_MEM	0xD0000
+-
+-enum mac8390_type {
+-	MAC8390_NONE = -1,
+-	MAC8390_APPLE,
+-	MAC8390_ASANTE,
+-	MAC8390_FARALLON,
+-	MAC8390_CABLETRON,
+-	MAC8390_DAYNA,
+-	MAC8390_INTERLAN,
+-	MAC8390_KINETICS,
+-};
+-
+-static const char *cardname[] = {
+-	"apple",
+-	"asante",
+-	"farallon",
+-	"cabletron",
+-	"dayna",
+-	"interlan",
+-	"kinetics",
+-};
+-
+-static const int word16[] = {
+-	1, /* apple */
+-	1, /* asante */
+-	1, /* farallon */
+-	1, /* cabletron */
+-	0, /* dayna */
+-	1, /* interlan */
+-	0, /* kinetics */
+-};
+-
+-/* on which cards do we use NuBus resources? */
+-static const int useresources[] = {
+-	1, /* apple */
+-	1, /* asante */
+-	1, /* farallon */
+-	0, /* cabletron */
+-	0, /* dayna */
+-	0, /* interlan */
+-	0, /* kinetics */
+-};
+-
+-enum mac8390_access {
+-	ACCESS_UNKNOWN = 0,
+-	ACCESS_32,
+-	ACCESS_16,
+-};
+-
+-extern int mac8390_memtest(struct net_device *dev);
+-static int mac8390_initdev(struct net_device *dev, struct nubus_board *board,
+-			   enum mac8390_type type);
+-
+-static int mac8390_open(struct net_device *dev);
+-static int mac8390_close(struct net_device *dev);
+-static void mac8390_no_reset(struct net_device *dev);
+-static void interlan_reset(struct net_device *dev);
+-
+-/* Sane (32-bit chunk memory read/write) - Some Farallon and Apple do this*/
+-static void sane_get_8390_hdr(struct net_device *dev,
+-			      struct e8390_pkt_hdr *hdr, int ring_page);
+-static void sane_block_input(struct net_device *dev, int count,
+-			     struct sk_buff *skb, int ring_offset);
+-static void sane_block_output(struct net_device *dev, int count,
+-			      const unsigned char *buf, const int start_page);
+-
+-/* dayna_memcpy to and from card */
+-static void dayna_memcpy_fromcard(struct net_device *dev, void *to,
+-				int from, int count);
+-static void dayna_memcpy_tocard(struct net_device *dev, int to,
+-			      const void *from, int count);
+-
+-/* Dayna - Dayna/Kinetics use this */
+-static void dayna_get_8390_hdr(struct net_device *dev,
+-			       struct e8390_pkt_hdr *hdr, int ring_page);
+-static void dayna_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset);
+-static void dayna_block_output(struct net_device *dev, int count,
+-			       const unsigned char *buf, int start_page);
+-
+-/* Slow Sane (16-bit chunk memory read/write) Cabletron uses this */
+-static void slow_sane_get_8390_hdr(struct net_device *dev,
+-				   struct e8390_pkt_hdr *hdr, int ring_page);
+-static void slow_sane_block_input(struct net_device *dev, int count,
+-				  struct sk_buff *skb, int ring_offset);
+-static void slow_sane_block_output(struct net_device *dev, int count,
+-				   const unsigned char *buf, int start_page);
+-static void word_memcpy_tocard(unsigned long tp, const void *fp, int count);
+-static void word_memcpy_fromcard(void *tp, unsigned long fp, int count);
+-
+-static enum mac8390_type mac8390_ident(struct nubus_rsrc *fres)
+-{
+-	switch (fres->dr_sw) {
+-	case NUBUS_DRSW_3COM:
+-		switch (fres->dr_hw) {
+-		case NUBUS_DRHW_APPLE_SONIC_NB:
+-		case NUBUS_DRHW_APPLE_SONIC_LC:
+-		case NUBUS_DRHW_SONNET:
+-			return MAC8390_NONE;
+-		default:
+-			return MAC8390_APPLE;
+-		}
+-
+-	case NUBUS_DRSW_APPLE:
+-		switch (fres->dr_hw) {
+-		case NUBUS_DRHW_ASANTE_LC:
+-			return MAC8390_NONE;
+-		case NUBUS_DRHW_CABLETRON:
+-			return MAC8390_CABLETRON;
+-		default:
+-			return MAC8390_APPLE;
+-		}
+-
+-	case NUBUS_DRSW_ASANTE:
+-		return MAC8390_ASANTE;
+-
+-	case NUBUS_DRSW_TECHWORKS:
+-	case NUBUS_DRSW_DAYNA2:
+-	case NUBUS_DRSW_DAYNA_LC:
+-		if (fres->dr_hw == NUBUS_DRHW_CABLETRON)
+-			return MAC8390_CABLETRON;
+-		else
+-			return MAC8390_APPLE;
+-
+-	case NUBUS_DRSW_FARALLON:
+-		return MAC8390_FARALLON;
+-
+-	case NUBUS_DRSW_KINETICS:
+-		switch (fres->dr_hw) {
+-		case NUBUS_DRHW_INTERLAN:
+-			return MAC8390_INTERLAN;
+-		default:
+-			return MAC8390_KINETICS;
+-		}
+-
+-	case NUBUS_DRSW_DAYNA:
+-		/*
+-		 * These correspond to Dayna Sonic cards
+-		 * which use the macsonic driver
+-		 */
+-		if (fres->dr_hw == NUBUS_DRHW_SMC9194 ||
+-		    fres->dr_hw == NUBUS_DRHW_INTERLAN)
+-			return MAC8390_NONE;
+-		else
+-			return MAC8390_DAYNA;
+-	}
+-	return MAC8390_NONE;
+-}
+-
+-static enum mac8390_access mac8390_testio(unsigned long membase)
+-{
+-	u32 outdata = 0xA5A0B5B0;
+-	u32 indata = 0;
+-
+-	/* Try writing 32 bits */
+-	nubus_writel(outdata, membase);
+-	/* Now read it back */
+-	indata = nubus_readl(membase);
+-	if (outdata == indata)
+-		return ACCESS_32;
+-
+-	outdata = 0xC5C0D5D0;
+-	indata = 0;
+-
+-	/* Write 16 bit output */
+-	word_memcpy_tocard(membase, &outdata, 4);
+-	/* Now read it back */
+-	word_memcpy_fromcard(&indata, membase, 4);
+-	if (outdata == indata)
+-		return ACCESS_16;
+-
+-	return ACCESS_UNKNOWN;
+-}
+-
+-static int mac8390_memsize(unsigned long membase)
+-{
+-	unsigned long flags;
+-	int i, j;
+-
+-	local_irq_save(flags);
+-	/* Check up to 32K in 4K increments */
+-	for (i = 0; i < 8; i++) {
+-		volatile unsigned short *m = (unsigned short *)(membase + (i * 0x1000));
+-
+-		/* Unwriteable - we have a fully decoded card and the
+-		   RAM end located */
+-		if (hwreg_present(m) == 0)
+-			break;
+-
+-		/* write a distinctive byte */
+-		*m = 0xA5A0 | i;
+-		/* check that we read back what we wrote */
+-		if (*m != (0xA5A0 | i))
+-			break;
+-
+-		/* check for partial decode and wrap */
+-		for (j = 0; j < i; j++) {
+-			volatile unsigned short *p = (unsigned short *)(membase + (j * 0x1000));
+-			if (*p != (0xA5A0 | j))
+-				break;
+-		}
+-	}
+-	local_irq_restore(flags);
+-	/*
+-	 * in any case, we stopped once we tried one block too many,
+-	 * or once we reached 32K
+-	 */
+-	return i * 0x1000;
+-}
+-
+-static bool mac8390_rsrc_init(struct net_device *dev,
+-			      struct nubus_rsrc *fres,
+-			      enum mac8390_type cardtype)
+-{
+-	struct nubus_board *board = fres->board;
+-	struct nubus_dir dir;
+-	struct nubus_dirent ent;
+-	int offset;
+-	volatile unsigned short *i;
+-	u8 addr[ETH_ALEN];
+-
+-	dev->irq = SLOT2IRQ(board->slot);
+-	/* This is getting to be a habit */
+-	dev->base_addr = board->slot_addr | ((board->slot & 0xf) << 20);
+-
+-	/*
+-	 * Get some Nubus info - we will trust the card's idea
+-	 * of where its memory and registers are.
+-	 */
+-
+-	if (nubus_get_func_dir(fres, &dir) == -1) {
+-		dev_err(&board->dev,
+-			"Unable to get Nubus functional directory\n");
+-		return false;
+-	}
+-
+-	/* Get the MAC address */
+-	if (nubus_find_rsrc(&dir, NUBUS_RESID_MAC_ADDRESS, &ent) == -1) {
+-		dev_info(&board->dev, "MAC address resource not found\n");
+-		return false;
+-	}
+-
+-	nubus_get_rsrc_mem(addr, &ent, 6);
+-	eth_hw_addr_set(dev, addr);
+-
+-	if (useresources[cardtype] == 1) {
+-		nubus_rewinddir(&dir);
+-		if (nubus_find_rsrc(&dir, NUBUS_RESID_MINOR_BASEOS,
+-				    &ent) == -1) {
+-			dev_err(&board->dev,
+-				"Memory offset resource not found\n");
+-			return false;
+-		}
+-		nubus_get_rsrc_mem(&offset, &ent, 4);
+-		dev->mem_start = dev->base_addr + offset;
+-		/* yes, this is how the Apple driver does it */
+-		dev->base_addr = dev->mem_start + 0x10000;
+-		nubus_rewinddir(&dir);
+-		if (nubus_find_rsrc(&dir, NUBUS_RESID_MINOR_LENGTH,
+-				    &ent) == -1) {
+-			dev_info(&board->dev,
+-				 "Memory length resource not found, probing\n");
+-			offset = mac8390_memsize(dev->mem_start);
+-		} else {
+-			nubus_get_rsrc_mem(&offset, &ent, 4);
+-		}
+-		dev->mem_end = dev->mem_start + offset;
+-	} else {
+-		switch (cardtype) {
+-		case MAC8390_KINETICS:
+-		case MAC8390_DAYNA: /* it's the same */
+-			dev->base_addr = (int)(board->slot_addr +
+-					       DAYNA_8390_BASE);
+-			dev->mem_start = (int)(board->slot_addr +
+-					       DAYNA_8390_MEM);
+-			dev->mem_end = dev->mem_start +
+-				       mac8390_memsize(dev->mem_start);
+-			break;
+-		case MAC8390_INTERLAN:
+-			dev->base_addr = (int)(board->slot_addr +
+-					       INTERLAN_8390_BASE);
+-			dev->mem_start = (int)(board->slot_addr +
+-					       INTERLAN_8390_MEM);
+-			dev->mem_end = dev->mem_start +
+-				       mac8390_memsize(dev->mem_start);
+-			break;
+-		case MAC8390_CABLETRON:
+-			dev->base_addr = (int)(board->slot_addr +
+-					       CABLETRON_8390_BASE);
+-			dev->mem_start = (int)(board->slot_addr +
+-					       CABLETRON_8390_MEM);
+-			/* The base address is unreadable if 0x00
+-			 * has been written to the command register
+-			 * Reset the chip by writing E8390_NODMA +
+-			 *   E8390_PAGE0 + E8390_STOP just to be
+-			 *   sure
+-			 */
+-			i = (void *)dev->base_addr;
+-			*i = 0x21;
+-			dev->mem_end = dev->mem_start +
+-				       mac8390_memsize(dev->mem_start);
+-			break;
+-
+-		default:
+-			dev_err(&board->dev,
+-				"No known base address for card type\n");
+-			return false;
+-		}
+-	}
+-
+-	return true;
+-}
+-
+-static int mac8390_device_probe(struct nubus_board *board)
+-{
+-	struct net_device *dev;
+-	int err = -ENODEV;
+-	struct nubus_rsrc *fres;
+-	enum mac8390_type cardtype = MAC8390_NONE;
+-
+-	dev = ____alloc_ei_netdev(0);
+-	if (!dev)
+-		return -ENOMEM;
+-
+-	SET_NETDEV_DEV(dev, &board->dev);
+-
+-	for_each_board_func_rsrc(board, fres) {
+-		if (fres->category != NUBUS_CAT_NETWORK ||
+-		    fres->type != NUBUS_TYPE_ETHERNET)
+-			continue;
+-
+-		cardtype = mac8390_ident(fres);
+-		if (cardtype == MAC8390_NONE)
+-			continue;
+-
+-		if (mac8390_rsrc_init(dev, fres, cardtype))
+-			break;
+-	}
+-	if (!fres)
+-		goto out;
+-
+-	err = mac8390_initdev(dev, board, cardtype);
+-	if (err)
+-		goto out;
+-
+-	err = register_netdev(dev);
+-	if (err)
+-		goto out;
+-
+-	nubus_set_drvdata(board, dev);
+-	return 0;
+-
+-out:
+-	free_netdev(dev);
+-	return err;
+-}
+-
+-static void mac8390_device_remove(struct nubus_board *board)
+-{
+-	struct net_device *dev = nubus_get_drvdata(board);
+-
+-	unregister_netdev(dev);
+-	free_netdev(dev);
+-}
+-
+-static struct nubus_driver mac8390_driver = {
+-	.probe = mac8390_device_probe,
+-	.remove = mac8390_device_remove,
+-	.driver = {
+-		.name = KBUILD_MODNAME,
+-		.owner = THIS_MODULE,
+-	}
+-};
+-
+-MODULE_AUTHOR("David Huggins-Daines <dhd@debian.org> and others");
+-MODULE_DESCRIPTION("Macintosh NS8390-based Nubus Ethernet driver");
+-MODULE_LICENSE("GPL");
+-
+-static int __init mac8390_init(void)
+-{
+-	return nubus_driver_register(&mac8390_driver);
+-}
+-module_init(mac8390_init);
+-
+-static void __exit mac8390_exit(void)
+-{
+-	nubus_driver_unregister(&mac8390_driver);
+-}
+-module_exit(mac8390_exit);
+-
+-static const struct net_device_ops mac8390_netdev_ops = {
+-	.ndo_open 		= mac8390_open,
+-	.ndo_stop		= mac8390_close,
+-	.ndo_start_xmit		= __ei_start_xmit,
+-	.ndo_tx_timeout		= __ei_tx_timeout,
+-	.ndo_get_stats		= __ei_get_stats,
+-	.ndo_set_rx_mode	= __ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address 	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= __ei_poll,
+-#endif
+-};
+-
+-static int mac8390_initdev(struct net_device *dev, struct nubus_board *board,
+-			   enum mac8390_type type)
+-{
+-	static u32 fwrd4_offsets[16] = {
+-		0,      4,      8,      12,
+-		16,     20,     24,     28,
+-		32,     36,     40,     44,
+-		48,     52,     56,     60
+-	};
+-	static u32 back4_offsets[16] = {
+-		60,     56,     52,     48,
+-		44,     40,     36,     32,
+-		28,     24,     20,     16,
+-		12,     8,      4,      0
+-	};
+-	static u32 fwrd2_offsets[16] = {
+-		0,      2,      4,      6,
+-		8,     10,     12,     14,
+-		16,    18,     20,     22,
+-		24,    26,     28,     30
+-	};
+-
+-	int access_bitmode = 0;
+-
+-	/* Now fill in our stuff */
+-	dev->netdev_ops = &mac8390_netdev_ops;
+-
+-	/* GAR, ei_status is actually a macro even though it looks global */
+-	ei_status.name = cardname[type];
+-	ei_status.word16 = word16[type];
+-
+-	/* Cabletron's TX/RX buffers are backwards */
+-	if (type == MAC8390_CABLETRON) {
+-		ei_status.tx_start_page = CABLETRON_TX_START_PG;
+-		ei_status.rx_start_page = CABLETRON_RX_START_PG;
+-		ei_status.stop_page = CABLETRON_RX_STOP_PG;
+-		ei_status.rmem_start = dev->mem_start;
+-		ei_status.rmem_end = dev->mem_start + CABLETRON_RX_STOP_PG*256;
+-	} else {
+-		ei_status.tx_start_page = WD_START_PG;
+-		ei_status.rx_start_page = WD_START_PG + TX_PAGES;
+-		ei_status.stop_page = (dev->mem_end - dev->mem_start)/256;
+-		ei_status.rmem_start = dev->mem_start + TX_PAGES*256;
+-		ei_status.rmem_end = dev->mem_end;
+-	}
+-
+-	/* Fill in model-specific information and functions */
+-	switch (type) {
+-	case MAC8390_FARALLON:
+-	case MAC8390_APPLE:
+-		switch (mac8390_testio(dev->mem_start)) {
+-		case ACCESS_UNKNOWN:
+-			dev_err(&board->dev,
+-				"Don't know how to access card memory\n");
+-			return -ENODEV;
+-
+-		case ACCESS_16:
+-			/* 16 bit card, register map is reversed */
+-			ei_status.reset_8390 = mac8390_no_reset;
+-			ei_status.block_input = slow_sane_block_input;
+-			ei_status.block_output = slow_sane_block_output;
+-			ei_status.get_8390_hdr = slow_sane_get_8390_hdr;
+-			ei_status.reg_offset = back4_offsets;
+-			break;
+-
+-		case ACCESS_32:
+-			/* 32 bit card, register map is reversed */
+-			ei_status.reset_8390 = mac8390_no_reset;
+-			ei_status.block_input = sane_block_input;
+-			ei_status.block_output = sane_block_output;
+-			ei_status.get_8390_hdr = sane_get_8390_hdr;
+-			ei_status.reg_offset = back4_offsets;
+-			access_bitmode = 1;
+-			break;
+-		}
+-		break;
+-
+-	case MAC8390_ASANTE:
+-		/* Some Asante cards pass the 32 bit test
+-		 * but overwrite system memory when run at 32 bit.
+-		 * so we run them all at 16 bit.
+-		 */
+-		ei_status.reset_8390 = mac8390_no_reset;
+-		ei_status.block_input = slow_sane_block_input;
+-		ei_status.block_output = slow_sane_block_output;
+-		ei_status.get_8390_hdr = slow_sane_get_8390_hdr;
+-		ei_status.reg_offset = back4_offsets;
+-		break;
+-
+-	case MAC8390_CABLETRON:
+-		/* 16 bit card, register map is short forward */
+-		ei_status.reset_8390 = mac8390_no_reset;
+-		ei_status.block_input = slow_sane_block_input;
+-		ei_status.block_output = slow_sane_block_output;
+-		ei_status.get_8390_hdr = slow_sane_get_8390_hdr;
+-		ei_status.reg_offset = fwrd2_offsets;
+-		break;
+-
+-	case MAC8390_DAYNA:
+-	case MAC8390_KINETICS:
+-		/* 16 bit memory, register map is forward */
+-		/* dayna and similar */
+-		ei_status.reset_8390 = mac8390_no_reset;
+-		ei_status.block_input = dayna_block_input;
+-		ei_status.block_output = dayna_block_output;
+-		ei_status.get_8390_hdr = dayna_get_8390_hdr;
+-		ei_status.reg_offset = fwrd4_offsets;
+-		break;
+-
+-	case MAC8390_INTERLAN:
+-		/* 16 bit memory, register map is forward */
+-		ei_status.reset_8390 = interlan_reset;
+-		ei_status.block_input = slow_sane_block_input;
+-		ei_status.block_output = slow_sane_block_output;
+-		ei_status.get_8390_hdr = slow_sane_get_8390_hdr;
+-		ei_status.reg_offset = fwrd4_offsets;
+-		break;
+-
+-	default:
+-		dev_err(&board->dev, "Unsupported card type\n");
+-		return -ENODEV;
+-	}
+-
+-	__NS8390_init(dev, 0);
+-
+-	/* Good, done, now spit out some messages */
+-	dev_info(&board->dev, "%s (type %s)\n", board->name, cardname[type]);
+-	dev_info(&board->dev, "MAC %pM, IRQ %d, %d KB shared memory at %#lx, %d-bit access.\n",
+-		 dev->dev_addr, dev->irq,
+-		 (unsigned int)(dev->mem_end - dev->mem_start) >> 10,
+-		 dev->mem_start, access_bitmode ? 32 : 16);
+-	return 0;
+-}
+-
+-static int mac8390_open(struct net_device *dev)
+-{
+-	int err;
+-
+-	__ei_open(dev);
+-	err = request_irq(dev->irq, __ei_interrupt, 0, "8390 Ethernet", dev);
+-	if (err)
+-		pr_err("%s: unable to get IRQ %d\n", dev->name, dev->irq);
+-	return err;
+-}
+-
+-static int mac8390_close(struct net_device *dev)
+-{
+-	free_irq(dev->irq, dev);
+-	__ei_close(dev);
+-	return 0;
+-}
+-
+-static void mac8390_no_reset(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	ei_status.txing = 0;
+-	netif_info(ei_local, hw, dev, "reset not supported\n");
+-}
+-
+-static void interlan_reset(struct net_device *dev)
+-{
+-	unsigned char *target = nubus_slot_addr(IRQ2SLOT(dev->irq));
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	netif_info(ei_local, hw, dev, "Need to reset the NS8390 t=%lu...",
+-		   jiffies);
+-	ei_status.txing = 0;
+-	target[0xC0000] = 0;
+-	if (netif_msg_hw(ei_local))
+-		pr_cont("reset complete\n");
+-}
+-
+-/* dayna_memcpy_fromio/dayna_memcpy_toio */
+-/* directly from daynaport.c by Alan Cox */
+-static void dayna_memcpy_fromcard(struct net_device *dev, void *to, int from,
+-				  int count)
+-{
+-	volatile unsigned char *ptr;
+-	unsigned char *target = to;
+-	from <<= 1;	/* word, skip overhead */
+-	ptr = (unsigned char *)(dev->mem_start+from);
+-	/* Leading byte? */
+-	if (from & 2) {
+-		*target++ = ptr[-1];
+-		ptr += 2;
+-		count--;
+-	}
+-	while (count >= 2) {
+-		*(unsigned short *)target = *(unsigned short volatile *)ptr;
+-		ptr += 4;			/* skip cruft */
+-		target += 2;
+-		count -= 2;
+-	}
+-	/* Trailing byte? */
+-	if (count)
+-		*target = *ptr;
+-}
+-
+-static void dayna_memcpy_tocard(struct net_device *dev, int to,
+-				const void *from, int count)
+-{
+-	volatile unsigned short *ptr;
+-	const unsigned char *src = from;
+-	to <<= 1;	/* word, skip overhead */
+-	ptr = (unsigned short *)(dev->mem_start+to);
+-	/* Leading byte? */
+-	if (to & 2) {		/* avoid a byte write (stomps on other data) */
+-		ptr[-1] = (ptr[-1]&0xFF00)|*src++;
+-		ptr++;
+-		count--;
+-	}
+-	while (count >= 2) {
+-		*ptr++ = *(unsigned short *)src;	/* Copy and */
+-		ptr++;			/* skip cruft */
+-		src += 2;
+-		count -= 2;
+-	}
+-	/* Trailing byte? */
+-	if (count) {
+-		/* card doesn't like byte writes */
+-		*ptr = (*ptr & 0x00FF) | (*src << 8);
+-	}
+-}
+-
+-/* sane block input/output */
+-static void sane_get_8390_hdr(struct net_device *dev,
+-			      struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	unsigned long hdr_start = (ring_page - WD_START_PG)<<8;
+-	memcpy_fromio(hdr, (void __iomem *)dev->mem_start + hdr_start, 4);
+-	/* Fix endianness */
+-	hdr->count = swab16(hdr->count);
+-}
+-
+-static void sane_block_input(struct net_device *dev, int count,
+-			     struct sk_buff *skb, int ring_offset)
+-{
+-	unsigned long xfer_base = ring_offset - (WD_START_PG<<8);
+-	unsigned long xfer_start = xfer_base + dev->mem_start;
+-
+-	if (xfer_start + count > ei_status.rmem_end) {
+-		/* We must wrap the input move. */
+-		int semi_count = ei_status.rmem_end - xfer_start;
+-		memcpy_fromio(skb->data,
+-			      (void __iomem *)dev->mem_start + xfer_base,
+-			      semi_count);
+-		count -= semi_count;
+-		memcpy_fromio(skb->data + semi_count,
+-			      (void __iomem *)ei_status.rmem_start, count);
+-	} else {
+-		memcpy_fromio(skb->data,
+-			      (void __iomem *)dev->mem_start + xfer_base,
+-			      count);
+-	}
+-}
+-
+-static void sane_block_output(struct net_device *dev, int count,
+-			      const unsigned char *buf, int start_page)
+-{
+-	long shmem = (start_page - WD_START_PG)<<8;
+-
+-	memcpy_toio((void __iomem *)dev->mem_start + shmem, buf, count);
+-}
+-
+-/* dayna block input/output */
+-static void dayna_get_8390_hdr(struct net_device *dev,
+-			       struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	unsigned long hdr_start = (ring_page - WD_START_PG)<<8;
+-
+-	dayna_memcpy_fromcard(dev, hdr, hdr_start, 4);
+-	/* Fix endianness */
+-	hdr->count = (hdr->count & 0xFF) << 8 | (hdr->count >> 8);
+-}
+-
+-static void dayna_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset)
+-{
+-	unsigned long xfer_base = ring_offset - (WD_START_PG<<8);
+-	unsigned long xfer_start = xfer_base+dev->mem_start;
+-
+-	/* Note the offset math is done in card memory space which is word
+-	   per long onto our space. */
+-
+-	if (xfer_start + count > ei_status.rmem_end) {
+-		/* We must wrap the input move. */
+-		int semi_count = ei_status.rmem_end - xfer_start;
+-		dayna_memcpy_fromcard(dev, skb->data, xfer_base, semi_count);
+-		count -= semi_count;
+-		dayna_memcpy_fromcard(dev, skb->data + semi_count,
+-				      ei_status.rmem_start - dev->mem_start,
+-				      count);
+-	} else {
+-		dayna_memcpy_fromcard(dev, skb->data, xfer_base, count);
+-	}
+-}
+-
+-static void dayna_block_output(struct net_device *dev, int count,
+-			       const unsigned char *buf,
+-			       int start_page)
+-{
+-	long shmem = (start_page - WD_START_PG)<<8;
+-
+-	dayna_memcpy_tocard(dev, shmem, buf, count);
+-}
+-
+-/* Cabletron block I/O */
+-static void slow_sane_get_8390_hdr(struct net_device *dev,
+-				   struct e8390_pkt_hdr *hdr,
+-				   int ring_page)
+-{
+-	unsigned long hdr_start = (ring_page - WD_START_PG)<<8;
+-	word_memcpy_fromcard(hdr, dev->mem_start + hdr_start, 4);
+-	/* Register endianism - fix here rather than 8390.c */
+-	hdr->count = (hdr->count&0xFF)<<8|(hdr->count>>8);
+-}
+-
+-static void slow_sane_block_input(struct net_device *dev, int count,
+-				  struct sk_buff *skb, int ring_offset)
+-{
+-	unsigned long xfer_base = ring_offset - (WD_START_PG<<8);
+-	unsigned long xfer_start = xfer_base+dev->mem_start;
+-
+-	if (xfer_start + count > ei_status.rmem_end) {
+-		/* We must wrap the input move. */
+-		int semi_count = ei_status.rmem_end - xfer_start;
+-		word_memcpy_fromcard(skb->data, dev->mem_start + xfer_base,
+-				     semi_count);
+-		count -= semi_count;
+-		word_memcpy_fromcard(skb->data + semi_count,
+-				     ei_status.rmem_start, count);
+-	} else {
+-		word_memcpy_fromcard(skb->data, dev->mem_start + xfer_base,
+-				     count);
+-	}
+-}
+-
+-static void slow_sane_block_output(struct net_device *dev, int count,
+-				   const unsigned char *buf, int start_page)
+-{
+-	long shmem = (start_page - WD_START_PG)<<8;
+-
+-	word_memcpy_tocard(dev->mem_start + shmem, buf, count);
+-}
+-
+-static void word_memcpy_tocard(unsigned long tp, const void *fp, int count)
+-{
+-	volatile unsigned short *to = (void *)tp;
+-	const unsigned short *from = fp;
+-
+-	count++;
+-	count /= 2;
+-
+-	while (count--)
+-		*to++ = *from++;
+-}
+-
+-static void word_memcpy_fromcard(void *tp, unsigned long fp, int count)
+-{
+-	unsigned short *to = tp;
+-	const volatile unsigned short *from = (const void *)fp;
+-
+-	count++;
+-	count /= 2;
+-
+-	while (count--)
+-		*to++ = *from++;
+-}
+-
+-
+diff --git a/drivers/net/ethernet/8390/mcf8390.c b/drivers/net/ethernet/8390/mcf8390.c
+deleted file mode 100644
+index 94ff8364c..000000000
+--- a/drivers/net/ethernet/8390/mcf8390.c
++++ /dev/null
+@@ -1,468 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- *  Support for ColdFire CPU based boards using a NS8390 Ethernet device.
+- *
+- *  Derived from the many other 8390 drivers.
+- *
+- *  (C) Copyright 2012,  Greg Ungerer <gerg@uclinux.org>
+- *
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/platform_device.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/jiffies.h>
+-#include <linux/io.h>
+-#include <asm/mcf8390.h>
+-
+-static const char version[] =
+-	"mcf8390.c: (15-06-2012) Greg Ungerer <gerg@uclinux.org>";
+-
+-#define NE_CMD		0x00
+-#define NE_DATAPORT	0x10	/* NatSemi-defined port window offset */
+-#define NE_RESET	0x1f	/* Issue a read to reset ,a write to clear */
+-#define NE_EN0_ISR	0x07
+-#define NE_EN0_DCFG	0x0e
+-#define NE_EN0_RSARLO	0x08
+-#define NE_EN0_RSARHI	0x09
+-#define NE_EN0_RCNTLO	0x0a
+-#define NE_EN0_RXCR	0x0c
+-#define NE_EN0_TXCR	0x0d
+-#define NE_EN0_RCNTHI	0x0b
+-#define NE_EN0_IMR	0x0f
+-
+-#define NESM_START_PG	0x40	/* First page of TX buffer */
+-#define NESM_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-#ifdef NE2000_ODDOFFSET
+-/*
+- * A lot of the ColdFire boards use a separate address region for odd offset
+- * register addresses. The following functions convert and map as required.
+- * Note that the data port accesses are treated a little differently, and
+- * always accessed via the insX/outsX functions.
+- */
+-static inline u32 NE_PTR(u32 addr)
+-{
+-	if (addr & 1)
+-		return addr - 1 + NE2000_ODDOFFSET;
+-	return addr;
+-}
+-
+-static inline u32 NE_DATA_PTR(u32 addr)
+-{
+-	return addr;
+-}
+-
+-void ei_outb(u32 val, u32 addr)
+-{
+-	NE2000_BYTE *rp;
+-
+-	rp = (NE2000_BYTE *) NE_PTR(addr);
+-	*rp = RSWAP(val);
+-}
+-
+-#define	ei_inb	ei_inb
+-u8 ei_inb(u32 addr)
+-{
+-	NE2000_BYTE *rp, val;
+-
+-	rp = (NE2000_BYTE *) NE_PTR(addr);
+-	val = *rp;
+-	return (u8) (RSWAP(val) & 0xff);
+-}
+-
+-void ei_insb(u32 addr, void *vbuf, int len)
+-{
+-	NE2000_BYTE *rp, val;
+-	u8 *buf;
+-
+-	buf = (u8 *) vbuf;
+-	rp = (NE2000_BYTE *) NE_DATA_PTR(addr);
+-	for (; (len > 0); len--) {
+-		val = *rp;
+-		*buf++ = RSWAP(val);
+-	}
+-}
+-
+-void ei_insw(u32 addr, void *vbuf, int len)
+-{
+-	volatile u16 *rp;
+-	u16 w, *buf;
+-
+-	buf = (u16 *) vbuf;
+-	rp = (volatile u16 *) NE_DATA_PTR(addr);
+-	for (; (len > 0); len--) {
+-		w = *rp;
+-		*buf++ = BSWAP(w);
+-	}
+-}
+-
+-void ei_outsb(u32 addr, const void *vbuf, int len)
+-{
+-	NE2000_BYTE *rp, val;
+-	u8 *buf;
+-
+-	buf = (u8 *) vbuf;
+-	rp = (NE2000_BYTE *) NE_DATA_PTR(addr);
+-	for (; (len > 0); len--) {
+-		val = *buf++;
+-		*rp = RSWAP(val);
+-	}
+-}
+-
+-void ei_outsw(u32 addr, const void *vbuf, int len)
+-{
+-	volatile u16 *rp;
+-	u16 w, *buf;
+-
+-	buf = (u16 *) vbuf;
+-	rp = (volatile u16 *) NE_DATA_PTR(addr);
+-	for (; (len > 0); len--) {
+-		w = *buf++;
+-		*rp = BSWAP(w);
+-	}
+-}
+-
+-#else /* !NE2000_ODDOFFSET */
+-
+-#define	ei_inb		inb
+-#define	ei_outb		outb
+-#define	ei_insb		insb
+-#define	ei_insw		insw
+-#define	ei_outsb	outsb
+-#define	ei_outsw	outsw
+-
+-#endif /* !NE2000_ODDOFFSET */
+-
+-#define	ei_inb_p	ei_inb
+-#define	ei_outb_p	ei_outb
+-
+-#include "lib8390.c"
+-
+-/*
+- * Hard reset the card. This used to pause for the same period that a
+- * 8390 reset command required, but that shouldn't be necessary.
+- */
+-static void mcf8390_reset_8390(struct net_device *dev)
+-{
+-	unsigned long reset_start_time = jiffies;
+-	u32 addr = dev->base_addr;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+-
+-	ei_outb(ei_inb(addr + NE_RESET), addr + NE_RESET);
+-
+-	ei_status.txing = 0;
+-	ei_status.dmaing = 0;
+-
+-	/* This check _should_not_ be necessary, omit eventually. */
+-	while ((ei_inb(addr + NE_EN0_ISR) & ENISR_RESET) == 0) {
+-		if (time_after(jiffies, reset_start_time + 2 * HZ / 100)) {
+-			netdev_warn(dev, "%s: did not complete\n", __func__);
+-			break;
+-		}
+-	}
+-
+-	ei_outb(ENISR_RESET, addr + NE_EN0_ISR);
+-}
+-
+-/*
+- * This *shouldn't* happen.
+- * If it does, it's the last thing you'll see
+- */
+-static void mcf8390_dmaing_err(const char *func, struct net_device *dev,
+-			       struct ei_device *ei_local)
+-{
+-	netdev_err(dev, "%s: DMAing conflict [DMAstat:%d][irqlock:%d]\n",
+-		func, ei_local->dmaing, ei_local->irqlock);
+-}
+-
+-/*
+- * Grab the 8390 specific header. Similar to the block_input routine, but
+- * we don't need to be concerned with ring wrap as the header will be at
+- * the start of a page, so we optimize accordingly.
+- */
+-static void mcf8390_get_8390_hdr(struct net_device *dev,
+-				 struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
+-
+-	if (ei_local->dmaing) {
+-		mcf8390_dmaing_err(__func__, dev, ei_local);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	ei_outb(E8390_NODMA + E8390_PAGE0 + E8390_START, addr + NE_CMD);
+-	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);
+-	ei_outb(sizeof(struct e8390_pkt_hdr), addr + NE_EN0_RCNTLO);
+-	ei_outb(0, addr + NE_EN0_RCNTHI);
+-	ei_outb(0, addr + NE_EN0_RSARLO);		/* On page boundary */
+-	ei_outb(ring_page, addr + NE_EN0_RSARHI);
+-	ei_outb(E8390_RREAD + E8390_START, addr + NE_CMD);
+-
+-	ei_insw(addr + NE_DATAPORT, hdr, sizeof(struct e8390_pkt_hdr) >> 1);
+-
+-	outb(ENISR_RDC, addr + NE_EN0_ISR);	/* Ack intr */
+-	ei_local->dmaing &= ~0x01;
+-
+-	hdr->count = cpu_to_le16(hdr->count);
+-}
+-
+-/*
+- * Block input and output, similar to the Crynwr packet driver.
+- * If you are porting to a new ethercard, look at the packet driver source
+- * for hints. The NEx000 doesn't share the on-board packet memory --
+- * you have to put the packet out through the "remote DMA" dataport
+- * using z_writeb.
+- */
+-static void mcf8390_block_input(struct net_device *dev, int count,
+-				struct sk_buff *skb, int ring_offset)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
+-	char *buf = skb->data;
+-
+-	if (ei_local->dmaing) {
+-		mcf8390_dmaing_err(__func__, dev, ei_local);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	ei_outb(E8390_NODMA + E8390_PAGE0 + E8390_START, addr + NE_CMD);
+-	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);
+-	ei_outb(count & 0xff, addr + NE_EN0_RCNTLO);
+-	ei_outb(count >> 8, addr + NE_EN0_RCNTHI);
+-	ei_outb(ring_offset & 0xff, addr + NE_EN0_RSARLO);
+-	ei_outb(ring_offset >> 8, addr + NE_EN0_RSARHI);
+-	ei_outb(E8390_RREAD + E8390_START, addr + NE_CMD);
+-
+-	ei_insw(addr + NE_DATAPORT, buf, count >> 1);
+-	if (count & 1)
+-		buf[count - 1] = ei_inb(addr + NE_DATAPORT);
+-
+-	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);	/* Ack intr */
+-	ei_local->dmaing &= ~0x01;
+-}
+-
+-static void mcf8390_block_output(struct net_device *dev, int count,
+-				 const unsigned char *buf,
+-				 const int start_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	u32 addr = dev->base_addr;
+-	unsigned long dma_start;
+-
+-	/* Make sure we transfer all bytes if 16bit IO writes */
+-	if (count & 0x1)
+-		count++;
+-
+-	if (ei_local->dmaing) {
+-		mcf8390_dmaing_err(__func__, dev, ei_local);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	/* We should already be in page 0, but to be safe... */
+-	ei_outb(E8390_PAGE0 + E8390_START + E8390_NODMA, addr + NE_CMD);
+-
+-	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);
+-
+-	/* Now the normal output. */
+-	ei_outb(count & 0xff, addr + NE_EN0_RCNTLO);
+-	ei_outb(count >> 8, addr + NE_EN0_RCNTHI);
+-	ei_outb(0x00, addr + NE_EN0_RSARLO);
+-	ei_outb(start_page, addr + NE_EN0_RSARHI);
+-	ei_outb(E8390_RWRITE + E8390_START, addr + NE_CMD);
+-
+-	ei_outsw(addr + NE_DATAPORT, buf, count >> 1);
+-
+-	dma_start = jiffies;
+-	while ((ei_inb(addr + NE_EN0_ISR) & ENISR_RDC) == 0) {
+-		if (time_after(jiffies, dma_start + 2 * HZ / 100)) { /* 20ms */
+-			netdev_warn(dev, "timeout waiting for Tx RDC\n");
+-			mcf8390_reset_8390(dev);
+-			__NS8390_init(dev, 1);
+-			break;
+-		}
+-	}
+-
+-	ei_outb(ENISR_RDC, addr + NE_EN0_ISR);	/* Ack intr */
+-	ei_local->dmaing &= ~0x01;
+-}
+-
+-static const struct net_device_ops mcf8390_netdev_ops = {
+-	.ndo_open		= __ei_open,
+-	.ndo_stop		= __ei_close,
+-	.ndo_start_xmit		= __ei_start_xmit,
+-	.ndo_tx_timeout		= __ei_tx_timeout,
+-	.ndo_get_stats		= __ei_get_stats,
+-	.ndo_set_rx_mode	= __ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= __ei_poll,
+-#endif
+-};
+-
+-static int mcf8390_init(struct net_device *dev)
+-{
+-	static u32 offsets[] = {
+-		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+-		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+-	};
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	unsigned char SA_prom[32];
+-	u32 addr = dev->base_addr;
+-	int start_page, stop_page;
+-	int i, ret;
+-
+-	mcf8390_reset_8390(dev);
+-
+-	/*
+-	 * Read the 16 bytes of station address PROM.
+-	 * We must first initialize registers,
+-	 * similar to NS8390_init(eifdev, 0).
+-	 * We can't reliably read the SAPROM address without this.
+-	 * (I learned the hard way!).
+-	 */
+-	{
+-		static const struct {
+-			u32 value;
+-			u32 offset;
+-		} program_seq[] = {
+-			{E8390_NODMA + E8390_PAGE0 + E8390_STOP, NE_CMD},
+-						/* Select page 0 */
+-			{0x48,	NE_EN0_DCFG},	/* 0x48: Set byte-wide access */
+-			{0x00,	NE_EN0_RCNTLO},	/* Clear the count regs */
+-			{0x00,	NE_EN0_RCNTHI},
+-			{0x00,	NE_EN0_IMR},	/* Mask completion irq */
+-			{0xFF,	NE_EN0_ISR},
+-			{E8390_RXOFF, NE_EN0_RXCR}, /* 0x20 Set to monitor */
+-			{E8390_TXOFF, NE_EN0_TXCR}, /* 0x02 and loopback mode */
+-			{32,	NE_EN0_RCNTLO},
+-			{0x00,	NE_EN0_RCNTHI},
+-			{0x00,	NE_EN0_RSARLO},	/* DMA starting at 0x0000 */
+-			{0x00,	NE_EN0_RSARHI},
+-			{E8390_RREAD + E8390_START, NE_CMD},
+-		};
+-		for (i = 0; i < ARRAY_SIZE(program_seq); i++) {
+-			ei_outb(program_seq[i].value,
+-				 addr + program_seq[i].offset);
+-		}
+-	}
+-
+-	for (i = 0; i < 16; i++) {
+-		SA_prom[i] = ei_inb(addr + NE_DATAPORT);
+-		ei_inb(addr + NE_DATAPORT);
+-	}
+-
+-	/* We must set the 8390 for word mode. */
+-	ei_outb(0x49, addr + NE_EN0_DCFG);
+-	start_page = NESM_START_PG;
+-	stop_page = NESM_STOP_PG;
+-
+-	/* Install the Interrupt handler */
+-	ret = request_irq(dev->irq, __ei_interrupt, 0, dev->name, dev);
+-	if (ret)
+-		return ret;
+-
+-	eth_hw_addr_set(dev, SA_prom);
+-
+-	netdev_dbg(dev, "Found ethernet address: %pM\n", dev->dev_addr);
+-
+-	ei_local->name = "mcf8390";
+-	ei_local->tx_start_page = start_page;
+-	ei_local->stop_page = stop_page;
+-	ei_local->word16 = 1;
+-	ei_local->rx_start_page = start_page + TX_PAGES;
+-	ei_local->reset_8390 = mcf8390_reset_8390;
+-	ei_local->block_input = mcf8390_block_input;
+-	ei_local->block_output = mcf8390_block_output;
+-	ei_local->get_8390_hdr = mcf8390_get_8390_hdr;
+-	ei_local->reg_offset = offsets;
+-
+-	dev->netdev_ops = &mcf8390_netdev_ops;
+-	__NS8390_init(dev, 0);
+-	ret = register_netdev(dev);
+-	if (ret) {
+-		free_irq(dev->irq, dev);
+-		return ret;
+-	}
+-
+-	netdev_info(dev, "addr=0x%08x irq=%d, Ethernet Address %pM\n",
+-		addr, dev->irq, dev->dev_addr);
+-	return 0;
+-}
+-
+-static int mcf8390_probe(struct platform_device *pdev)
+-{
+-	struct net_device *dev;
+-	struct resource *mem;
+-	resource_size_t msize;
+-	int ret, irq;
+-
+-	irq = platform_get_irq(pdev, 0);
+-	if (irq < 0)
+-		return -ENXIO;
+-
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (mem == NULL) {
+-		dev_err(&pdev->dev, "no memory address specified?\n");
+-		return -ENXIO;
+-	}
+-	msize = resource_size(mem);
+-	if (!request_mem_region(mem->start, msize, pdev->name))
+-		return -EBUSY;
+-
+-	dev = ____alloc_ei_netdev(0);
+-	if (dev == NULL) {
+-		release_mem_region(mem->start, msize);
+-		return -ENOMEM;
+-	}
+-
+-	SET_NETDEV_DEV(dev, &pdev->dev);
+-	platform_set_drvdata(pdev, dev);
+-
+-	dev->irq = irq;
+-	dev->base_addr = mem->start;
+-
+-	ret = mcf8390_init(dev);
+-	if (ret) {
+-		release_mem_region(mem->start, msize);
+-		free_netdev(dev);
+-		return ret;
+-	}
+-	return 0;
+-}
+-
+-static void mcf8390_remove(struct platform_device *pdev)
+-{
+-	struct net_device *dev = platform_get_drvdata(pdev);
+-	struct resource *mem;
+-
+-	unregister_netdev(dev);
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	release_mem_region(mem->start, resource_size(mem));
+-	free_netdev(dev);
+-}
+-
+-static struct platform_driver mcf8390_drv = {
+-	.driver = {
+-		.name	= "mcf8390",
+-	},
+-	.probe		= mcf8390_probe,
+-	.remove		= mcf8390_remove,
+-};
+-
+-module_platform_driver(mcf8390_drv);
+-
+-MODULE_DESCRIPTION("MCF8390 ColdFire NS8390 driver");
+-MODULE_AUTHOR("Greg Ungerer <gerg@uclinux.org>");
+-MODULE_LICENSE("GPL");
+-MODULE_ALIAS("platform:mcf8390");
+diff --git a/drivers/net/ethernet/8390/ne.c b/drivers/net/ethernet/8390/ne.c
+deleted file mode 100644
+index 961019c32..000000000
+--- a/drivers/net/ethernet/8390/ne.c
++++ /dev/null
+@@ -1,992 +0,0 @@
+-// SPDX-License-Identifier: GPL-1.0+
+-/* ne.c: A general non-shared-memory NS8390 ethernet driver for linux. */
+-/*
+-    Written 1992-94 by Donald Becker.
+-
+-    Copyright 1993 United States Government as represented by the
+-    Director, National Security Agency.
+-
+-    The author may be reached as becker@scyld.com, or C/O
+-    Scyld Computing Corporation, 410 Severn Ave., Suite 210, Annapolis MD 21403
+-
+-    This driver should work with many programmed-I/O 8390-based ethernet
+-    boards.  Currently it supports the NE1000, NE2000, many clones,
+-    and some Cabletron products.
+-
+-    Changelog:
+-
+-    Paul Gortmaker	: use ENISR_RDC to monitor Tx PIO uploads, made
+-			  sanity checks and bad clone support optional.
+-    Paul Gortmaker	: new reset code, reset card after probe at boot.
+-    Paul Gortmaker	: multiple card support for module users.
+-    Paul Gortmaker	: Support for PCI ne2k clones, similar to lance.c
+-    Paul Gortmaker	: Allow users with bad cards to avoid full probe.
+-    Paul Gortmaker	: PCI probe changes, more PCI cards supported.
+-    rjohnson@analogic.com : Changed init order so an interrupt will only
+-    occur after memory is allocated for dev->priv. Deallocated memory
+-    last in cleanup_modue()
+-    Richard Guenther    : Added support for ISAPnP cards
+-    Paul Gortmaker	: Discontinued PCI support - use ne2k-pci.c instead.
+-    Hayato Fujiwara	: Add m32r support.
+-
+-*/
+-
+-/* Routines for the NatSemi-based designs (NE[12]000). */
+-
+-static const char version1[] =
+-"ne.c:v1.10 9/23/94 Donald Becker (becker@scyld.com)\n";
+-static const char version2[] =
+-"Last modified Nov 1, 2000 by Paul Gortmaker\n";
+-
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/isapnp.h>
+-#include <linux/init.h>
+-#include <linux/interrupt.h>
+-#include <linux/delay.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/jiffies.h>
+-#include <linux/platform_device.h>
+-#include <net/Space.h>
+-
+-#include <asm/io.h>
+-
+-#include "8390.h"
+-
+-#define DRV_NAME "ne"
+-
+-/* Some defines that people can play with if so inclined. */
+-
+-/* Do we support clones that don't adhere to 14,15 of the SAprom ? */
+-#define SUPPORT_NE_BAD_CLONES
+-/* 0xbad = bad sig or no reset ack */
+-#define BAD 0xbad
+-
+-#define MAX_NE_CARDS	4	/* Max number of NE cards per module */
+-static struct platform_device *pdev_ne[MAX_NE_CARDS];
+-static int io[MAX_NE_CARDS];
+-static int irq[MAX_NE_CARDS];
+-static int bad[MAX_NE_CARDS];
+-static u32 ne_msg_enable;
+-
+-#ifdef MODULE
+-module_param_hw_array(io, int, ioport, NULL, 0);
+-module_param_hw_array(irq, int, irq, NULL, 0);
+-module_param_array(bad, int, NULL, 0);
+-module_param_named(msg_enable, ne_msg_enable, uint, 0444);
+-MODULE_PARM_DESC(io, "I/O base address(es),required");
+-MODULE_PARM_DESC(irq, "IRQ number(s)");
+-MODULE_PARM_DESC(bad, "Accept card(s) with bad signatures");
+-MODULE_PARM_DESC(msg_enable, "Debug message level (see linux/netdevice.h for bitmap)");
+-MODULE_DESCRIPTION("NE1000/NE2000 ISA/PnP Ethernet driver");
+-MODULE_LICENSE("GPL");
+-#endif /* MODULE */
+-
+-/* Do we perform extra sanity checks on stuff ? */
+-/* #define NE_SANITY_CHECK */
+-
+-/* Do we implement the read before write bugfix ? */
+-/* #define NE_RW_BUGFIX */
+-
+-/* Do we have a non std. amount of memory? (in units of 256 byte pages) */
+-/* #define PACKETBUF_MEMSIZE	0x40 */
+-
+-/* This is set up so that no ISA autoprobe takes place. We can't guarantee
+-that the ne2k probe is the last 8390 based probe to take place (as it
+-is at boot) and so the probe will get confused by any other 8390 cards.
+-ISA device autoprobes on a running machine are not recommended anyway. */
+-#if !defined(MODULE) && defined(CONFIG_ISA)
+-/* Do we need a portlist for the ISA auto-probe ? */
+-#define NEEDS_PORTLIST
+-#endif
+-
+-/* A zero-terminated list of I/O addresses to be probed at boot. */
+-#ifdef NEEDS_PORTLIST
+-static unsigned int netcard_portlist[] __initdata = {
+-	0x300, 0x280, 0x320, 0x340, 0x360, 0x380, 0
+-};
+-#endif
+-
+-static struct isapnp_device_id isapnp_clone_list[] __initdata = {
+-	{	ISAPNP_CARD_ID('A','X','E',0x2011),
+-		ISAPNP_VENDOR('A','X','E'), ISAPNP_FUNCTION(0x2011),
+-		(long) "NetGear EA201" },
+-	{	ISAPNP_ANY_ID, ISAPNP_ANY_ID,
+-		ISAPNP_VENDOR('E','D','I'), ISAPNP_FUNCTION(0x0216),
+-		(long) "NN NE2000" },
+-	{	ISAPNP_ANY_ID, ISAPNP_ANY_ID,
+-		ISAPNP_VENDOR('P','N','P'), ISAPNP_FUNCTION(0x80d6),
+-		(long) "Generic PNP" },
+-	{ }	/* terminate list */
+-};
+-
+-MODULE_DEVICE_TABLE(isapnp, isapnp_clone_list);
+-
+-#ifdef SUPPORT_NE_BAD_CLONES
+-/* A list of bad clones that we none-the-less recognize. */
+-static struct { const char *name8, *name16; unsigned char SAprefix[4];}
+-bad_clone_list[] __initdata = {
+-    {"DE100", "DE200", {0x00, 0xDE, 0x01,}},
+-    {"DE120", "DE220", {0x00, 0x80, 0xc8,}},
+-    {"DFI1000", "DFI2000", {'D', 'F', 'I',}}, /* Original, eh?  */
+-    {"EtherNext UTP8", "EtherNext UTP16", {0x00, 0x00, 0x79}},
+-    {"NE1000","NE2000-invalid", {0x00, 0x00, 0xd8}}, /* Ancient real NE1000. */
+-    {"NN1000", "NN2000",  {0x08, 0x03, 0x08}}, /* Outlaw no-name clone. */
+-    {"4-DIM8","4-DIM16", {0x00,0x00,0x4d,}},  /* Outlaw 4-Dimension cards. */
+-    {"Con-Intl_8", "Con-Intl_16", {0x00, 0x00, 0x24}}, /* Connect Int'nl */
+-    {"ET-100","ET-200", {0x00, 0x45, 0x54}}, /* YANG and YA clone */
+-    {"COMPEX","COMPEX16",{0x00,0x80,0x48}}, /* Broken ISA Compex cards */
+-    {"E-LAN100", "E-LAN200", {0x00, 0x00, 0x5d}}, /* Broken ne1000 clones */
+-    {"PCM-4823", "PCM-4823", {0x00, 0xc0, 0x6c}}, /* Broken Advantech MoBo */
+-    {"REALTEK", "RTL8019", {0x00, 0x00, 0xe8}}, /* no-name with Realtek chip */
+-#ifdef CONFIG_MACH_TX49XX
+-    {"RBHMA4X00-RTL8019", "RBHMA4X00-RTL8019", {0x00, 0x60, 0x0a}},  /* Toshiba built-in */
+-#endif
+-    {"LCS-8834", "LCS-8836", {0x04, 0x04, 0x37}}, /* ShinyNet (SET) */
+-    {NULL,}
+-};
+-#endif
+-
+-/* ---- No user-serviceable parts below ---- */
+-
+-#define NE_BASE	 (dev->base_addr)
+-#define NE_CMD	 	0x00
+-#define NE_DATAPORT	0x10	/* NatSemi-defined port window offset. */
+-#define NE_RESET	0x1f	/* Issue a read to reset, a write to clear. */
+-#define NE_IO_EXTENT	0x20
+-
+-#define NE1SM_START_PG	0x20	/* First page of TX buffer */
+-#define NE1SM_STOP_PG 	0x40	/* Last page +1 of RX ring */
+-#define NESM_START_PG	0x40	/* First page of TX buffer */
+-#define NESM_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-#if defined(CONFIG_MACH_TX49XX)
+-#  define DCR_VAL 0x48		/* 8-bit mode */
+-#elif defined(CONFIG_ATARI)	/* 8-bit mode on Atari, normal on Q40 */
+-#  define DCR_VAL (MACH_IS_ATARI ? 0x48 : 0x49)
+-#else
+-#  define DCR_VAL 0x49
+-#endif
+-
+-static int ne_probe1(struct net_device *dev, unsigned long ioaddr);
+-static int ne_probe_isapnp(struct net_device *dev);
+-
+-static void ne_reset_8390(struct net_device *dev);
+-static void ne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-			  int ring_page);
+-static void ne_block_input(struct net_device *dev, int count,
+-			  struct sk_buff *skb, int ring_offset);
+-static void ne_block_output(struct net_device *dev, const int count,
+-		const unsigned char *buf, const int start_page);
+-
+-
+-/*  Probe for various non-shared-memory ethercards.
+-
+-   NEx000-clone boards have a Station Address PROM (SAPROM) in the packet
+-   buffer memory space.  NE2000 clones have 0x57,0x57 in bytes 0x0e,0x0f of
+-   the SAPROM, while other supposed NE2000 clones must be detected by their
+-   SA prefix.
+-
+-   Reading the SAPROM from a word-wide card with the 8390 set in byte-wide
+-   mode results in doubled values, which can be detected and compensated for.
+-
+-   The probe is also responsible for initializing the card and filling
+-   in the 'dev' and 'ei_status' structures.
+-
+-   We use the minimum memory size for some ethercard product lines, iff we can't
+-   distinguish models.  You can increase the packet buffer size by setting
+-   PACKETBUF_MEMSIZE.  Reported Cabletron packet buffer locations are:
+-	E1010   starts at 0x100 and ends at 0x2000.
+-	E1010-x starts at 0x100 and ends at 0x8000. ("-x" means "more memory")
+-	E2010	 starts at 0x100 and ends at 0x4000.
+-	E2010-x starts at 0x100 and ends at 0xffff.  */
+-
+-static int __init do_ne_probe(struct net_device *dev)
+-{
+-	unsigned long base_addr = dev->base_addr;
+-#ifdef NEEDS_PORTLIST
+-	int orig_irq = dev->irq;
+-#endif
+-
+-	/* First check any supplied i/o locations. User knows best. <cough> */
+-	if (base_addr > 0x1ff) {	/* Check a single specified location. */
+-		int ret = ne_probe1(dev, base_addr);
+-		if (ret)
+-			netdev_warn(dev, "ne.c: No NE*000 card found at "
+-				    "i/o = %#lx\n", base_addr);
+-		return ret;
+-	}
+-	else if (base_addr != 0)	/* Don't probe at all. */
+-		return -ENXIO;
+-
+-	/* Then look for any installed ISAPnP clones */
+-	if (isapnp_present() && (ne_probe_isapnp(dev) == 0))
+-		return 0;
+-
+-#ifdef NEEDS_PORTLIST
+-	/* Last resort. The semi-risky ISA auto-probe. */
+-	for (base_addr = 0; netcard_portlist[base_addr] != 0; base_addr++) {
+-		int ioaddr = netcard_portlist[base_addr];
+-		dev->irq = orig_irq;
+-		if (ne_probe1(dev, ioaddr) == 0)
+-			return 0;
+-	}
+-#endif
+-
+-	return -ENODEV;
+-}
+-
+-static int __init ne_probe_isapnp(struct net_device *dev)
+-{
+-	int i;
+-
+-	for (i = 0; isapnp_clone_list[i].vendor != 0; i++) {
+-		struct pnp_dev *idev = NULL;
+-
+-		while ((idev = pnp_find_dev(NULL,
+-					    isapnp_clone_list[i].vendor,
+-					    isapnp_clone_list[i].function,
+-					    idev))) {
+-			/* Avoid already found cards from previous calls */
+-			if (pnp_device_attach(idev) < 0)
+-				continue;
+-			if (pnp_activate_dev(idev) < 0) {
+-			      	pnp_device_detach(idev);
+-			      	continue;
+-			}
+-			/* if no io and irq, search for next */
+-			if (!pnp_port_valid(idev, 0) || !pnp_irq_valid(idev, 0)) {
+-				pnp_device_detach(idev);
+-				continue;
+-			}
+-			/* found it */
+-			dev->base_addr = pnp_port_start(idev, 0);
+-			dev->irq = pnp_irq(idev, 0);
+-			netdev_info(dev,
+-				    "ne.c: ISAPnP reports %s at i/o %#lx, irq %d.\n",
+-				    (char *) isapnp_clone_list[i].driver_data,
+-				    dev->base_addr, dev->irq);
+-			if (ne_probe1(dev, dev->base_addr) != 0) {	/* Shouldn't happen. */
+-				netdev_err(dev,
+-					   "ne.c: Probe of ISAPnP card at %#lx failed.\n",
+-					   dev->base_addr);
+-				pnp_device_detach(idev);
+-				return -ENXIO;
+-			}
+-			ei_status.priv = (unsigned long)idev;
+-			break;
+-		}
+-		if (!idev)
+-			continue;
+-		return 0;
+-	}
+-
+-	return -ENODEV;
+-}
+-
+-static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
+-{
+-	int i;
+-	unsigned char SA_prom[32];
+-	int wordlength = 2;
+-	const char *name = NULL;
+-	int start_page, stop_page;
+-	int neX000, ctron, copam, bad_card;
+-	int reg0, ret;
+-	static unsigned version_printed;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	if (!request_region(ioaddr, NE_IO_EXTENT, DRV_NAME))
+-		return -EBUSY;
+-
+-	reg0 = inb_p(ioaddr);
+-	if (reg0 == 0xFF) {
+-		ret = -ENODEV;
+-		goto err_out;
+-	}
+-
+-	/* Do a preliminary verification that we have a 8390. */
+-	{
+-		int regd;
+-		outb_p(E8390_NODMA+E8390_PAGE1+E8390_STOP, ioaddr + E8390_CMD);
+-		regd = inb_p(ioaddr + 0x0d);
+-		outb_p(0xff, ioaddr + 0x0d);
+-		outb_p(E8390_NODMA+E8390_PAGE0, ioaddr + E8390_CMD);
+-		inb_p(ioaddr + EN0_COUNTER0); /* Clear the counter by reading. */
+-		if (inb_p(ioaddr + EN0_COUNTER0) != 0) {
+-			outb_p(reg0, ioaddr);
+-			outb_p(regd, ioaddr + 0x0d);	/* Restore the old values. */
+-			ret = -ENODEV;
+-			goto err_out;
+-		}
+-	}
+-
+-	if ((ne_msg_enable & NETIF_MSG_DRV) && (version_printed++ == 0))
+-		netdev_info(dev, "%s%s", version1, version2);
+-
+-	netdev_info(dev, "NE*000 ethercard probe at %#3lx:", ioaddr);
+-
+-	/* A user with a poor card that fails to ack the reset, or that
+-	   does not have a valid 0x57,0x57 signature can still use this
+-	   without having to recompile. Specifying an i/o address along
+-	   with an otherwise unused dev->mem_end value of "0xBAD" will
+-	   cause the driver to skip these parts of the probe. */
+-
+-	bad_card = ((dev->base_addr != 0) && (dev->mem_end == BAD));
+-
+-	/* Reset card. Who knows what dain-bramaged state it was left in. */
+-
+-	{
+-		unsigned long reset_start_time = jiffies;
+-
+-		/* DON'T change these to inb_p/outb_p or reset will fail on clones. */
+-		outb(inb(ioaddr + NE_RESET), ioaddr + NE_RESET);
+-
+-		while ((inb_p(ioaddr + EN0_ISR) & ENISR_RESET) == 0)
+-		if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
+-			if (bad_card) {
+-				pr_cont(" (warning: no reset ack)");
+-				break;
+-			} else {
+-				pr_cont(" not found (no reset ack).\n");
+-				ret = -ENODEV;
+-				goto err_out;
+-			}
+-		}
+-
+-		outb_p(0xff, ioaddr + EN0_ISR);		/* Ack all intr. */
+-	}
+-
+-	/* Read the 16 bytes of station address PROM.
+-	   We must first initialize registers, similar to NS8390p_init(eifdev, 0).
+-	   We can't reliably read the SAPROM address without this.
+-	   (I learned the hard way!). */
+-	{
+-		struct {unsigned char value, offset; } program_seq[] =
+-		{
+-			{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
+-			{0x48,	EN0_DCFG},	/* Set byte-wide (0x48) access. */
+-			{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+-			{0x00,	EN0_RCNTHI},
+-			{0x00,	EN0_IMR},	/* Mask completion irq. */
+-			{0xFF,	EN0_ISR},
+-			{E8390_RXOFF, EN0_RXCR},	/* 0x20  Set to monitor */
+-			{E8390_TXOFF, EN0_TXCR},	/* 0x02  and loopback mode. */
+-			{32,	EN0_RCNTLO},
+-			{0x00,	EN0_RCNTHI},
+-			{0x00,	EN0_RSARLO},	/* DMA starting at 0x0000. */
+-			{0x00,	EN0_RSARHI},
+-			{E8390_RREAD+E8390_START, E8390_CMD},
+-		};
+-
+-		for (i = 0; i < ARRAY_SIZE(program_seq); i++)
+-			outb_p(program_seq[i].value, ioaddr + program_seq[i].offset);
+-
+-	}
+-	for(i = 0; i < 32 /*sizeof(SA_prom)*/; i+=2) {
+-		SA_prom[i] = inb(ioaddr + NE_DATAPORT);
+-		SA_prom[i+1] = inb(ioaddr + NE_DATAPORT);
+-		if (SA_prom[i] != SA_prom[i+1])
+-			wordlength = 1;
+-	}
+-
+-	if (wordlength == 2)
+-	{
+-		for (i = 0; i < 16; i++)
+-			SA_prom[i] = SA_prom[i+i];
+-		/* We must set the 8390 for word mode. */
+-		outb_p(DCR_VAL, ioaddr + EN0_DCFG);
+-		start_page = NESM_START_PG;
+-
+-		/*
+-		 * Realtek RTL8019AS datasheet says that the PSTOP register
+-		 * shouldn't exceed 0x60 in 8-bit mode.
+-		 * This chip can be identified by reading the signature from
+-		 * the  remote byte count registers (otherwise write-only)...
+-		 */
+-		if ((DCR_VAL & 0x01) == 0 &&		/* 8-bit mode */
+-		    inb(ioaddr + EN0_RCNTLO) == 0x50 &&
+-		    inb(ioaddr + EN0_RCNTHI) == 0x70)
+-			stop_page = 0x60;
+-		else
+-			stop_page = NESM_STOP_PG;
+-	} else {
+-		start_page = NE1SM_START_PG;
+-		stop_page  = NE1SM_STOP_PG;
+-	}
+-
+-	neX000 = (SA_prom[14] == 0x57  &&  SA_prom[15] == 0x57);
+-	ctron =  (SA_prom[0] == 0x00 && SA_prom[1] == 0x00 && SA_prom[2] == 0x1d);
+-	copam =  (SA_prom[14] == 0x49 && SA_prom[15] == 0x00);
+-
+-	/* Set up the rest of the parameters. */
+-	if (neX000 || bad_card || copam) {
+-		name = (wordlength == 2) ? "NE2000" : "NE1000";
+-	}
+-	else if (ctron)
+-	{
+-		name = (wordlength == 2) ? "Ctron-8" : "Ctron-16";
+-		start_page = 0x01;
+-		stop_page = (wordlength == 2) ? 0x40 : 0x20;
+-	}
+-	else
+-	{
+-#ifdef SUPPORT_NE_BAD_CLONES
+-		/* Ack!  Well, there might be a *bad* NE*000 clone there.
+-		   Check for total bogus addresses. */
+-		for (i = 0; bad_clone_list[i].name8; i++)
+-		{
+-			if (SA_prom[0] == bad_clone_list[i].SAprefix[0] &&
+-				SA_prom[1] == bad_clone_list[i].SAprefix[1] &&
+-				SA_prom[2] == bad_clone_list[i].SAprefix[2])
+-			{
+-				if (wordlength == 2)
+-				{
+-					name = bad_clone_list[i].name16;
+-				} else {
+-					name = bad_clone_list[i].name8;
+-				}
+-				break;
+-			}
+-		}
+-		if (bad_clone_list[i].name8 == NULL)
+-		{
+-			pr_cont(" not found (invalid signature %2.2x %2.2x).\n",
+-				SA_prom[14], SA_prom[15]);
+-			ret = -ENXIO;
+-			goto err_out;
+-		}
+-#else
+-		pr_cont(" not found.\n");
+-		ret = -ENXIO;
+-		goto err_out;
+-#endif
+-	}
+-
+-	if (dev->irq < 2)
+-	{
+-		unsigned long cookie = probe_irq_on();
+-		outb_p(0x50, ioaddr + EN0_IMR);	/* Enable one interrupt. */
+-		outb_p(0x00, ioaddr + EN0_RCNTLO);
+-		outb_p(0x00, ioaddr + EN0_RCNTHI);
+-		outb_p(E8390_RREAD+E8390_START, ioaddr); /* Trigger it... */
+-		mdelay(10);		/* wait 10ms for interrupt to propagate */
+-		outb_p(0x00, ioaddr + EN0_IMR); 		/* Mask it again. */
+-		dev->irq = probe_irq_off(cookie);
+-		if (ne_msg_enable & NETIF_MSG_PROBE)
+-			pr_cont(" autoirq is %d", dev->irq);
+-	} else if (dev->irq == 2)
+-		/* Fixup for users that don't know that IRQ 2 is really IRQ 9,
+-		   or don't know which one to set. */
+-		dev->irq = 9;
+-
+-	if (! dev->irq) {
+-		pr_cont(" failed to detect IRQ line.\n");
+-		ret = -EAGAIN;
+-		goto err_out;
+-	}
+-
+-	/* Snarf the interrupt now.  There's no point in waiting since we cannot
+-	   share and the board will usually be enabled. */
+-	ret = request_irq(dev->irq, eip_interrupt, 0, name, dev);
+-	if (ret) {
+-		pr_cont(" unable to get IRQ %d (errno=%d).\n", dev->irq, ret);
+-		goto err_out;
+-	}
+-
+-	dev->base_addr = ioaddr;
+-
+-	eth_hw_addr_set(dev, SA_prom);
+-
+-	pr_cont("%pM\n", dev->dev_addr);
+-
+-	ei_status.name = name;
+-	ei_status.tx_start_page = start_page;
+-	ei_status.stop_page = stop_page;
+-
+-	/* Use 16-bit mode only if this wasn't overridden by DCR_VAL */
+-	ei_status.word16 = (wordlength == 2 && (DCR_VAL & 0x01));
+-
+-	ei_status.rx_start_page = start_page + TX_PAGES;
+-#ifdef PACKETBUF_MEMSIZE
+-	 /* Allow the packet buffer size to be overridden by know-it-alls. */
+-	ei_status.stop_page = ei_status.tx_start_page + PACKETBUF_MEMSIZE;
+-#endif
+-
+-	ei_status.reset_8390 = &ne_reset_8390;
+-	ei_status.block_input = &ne_block_input;
+-	ei_status.block_output = &ne_block_output;
+-	ei_status.get_8390_hdr = &ne_get_8390_hdr;
+-	ei_status.priv = 0;
+-
+-	dev->netdev_ops = &eip_netdev_ops;
+-	NS8390p_init(dev, 0);
+-
+-	ei_local->msg_enable = ne_msg_enable;
+-	ret = register_netdev(dev);
+-	if (ret)
+-		goto out_irq;
+-	netdev_info(dev, "%s found at %#lx, using IRQ %d.\n",
+-		    name, ioaddr, dev->irq);
+-	return 0;
+-
+-out_irq:
+-	free_irq(dev->irq, dev);
+-err_out:
+-	release_region(ioaddr, NE_IO_EXTENT);
+-	return ret;
+-}
+-
+-/* Hard reset the card.  This used to pause for the same period that a
+-   8390 reset command required, but that shouldn't be necessary. */
+-
+-static void ne_reset_8390(struct net_device *dev)
+-{
+-	unsigned long reset_start_time = jiffies;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+-
+-	/* DON'T change these to inb_p/outb_p or reset will fail on clones. */
+-	outb(inb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
+-
+-	ei_status.txing = 0;
+-	ei_status.dmaing = 0;
+-
+-	/* This check _should_not_ be necessary, omit eventually. */
+-	while ((inb_p(NE_BASE+EN0_ISR) & ENISR_RESET) == 0)
+-		if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
+-			netdev_err(dev, "ne_reset_8390() did not complete.\n");
+-			break;
+-		}
+-	outb_p(ENISR_RESET, NE_BASE + EN0_ISR);	/* Ack intr. */
+-}
+-
+-/* Grab the 8390 specific header. Similar to the block_input routine, but
+-   we don't need to be concerned with ring wrap as the header will be at
+-   the start of a page, so we optimize accordingly. */
+-
+-static void ne_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	int nic_base = dev->base_addr;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-
+-	if (ei_status.dmaing)
+-	{
+-		netdev_err(dev, "DMAing conflict in ne_get_8390_hdr "
+-			   "[DMAstat:%d][irqlock:%d].\n",
+-			   ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-
+-	ei_status.dmaing |= 0x01;
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base+ NE_CMD);
+-	outb_p(sizeof(struct e8390_pkt_hdr), nic_base + EN0_RCNTLO);
+-	outb_p(0, nic_base + EN0_RCNTHI);
+-	outb_p(0, nic_base + EN0_RSARLO);		/* On page boundary */
+-	outb_p(ring_page, nic_base + EN0_RSARHI);
+-	outb_p(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-
+-	if (ei_status.word16)
+-		insw(NE_BASE + NE_DATAPORT, hdr, sizeof(struct e8390_pkt_hdr)>>1);
+-	else
+-		insb(NE_BASE + NE_DATAPORT, hdr, sizeof(struct e8390_pkt_hdr));
+-
+-	outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_status.dmaing &= ~0x01;
+-
+-	le16_to_cpus(&hdr->count);
+-}
+-
+-/* Block input and output, similar to the Crynwr packet driver.  If you
+-   are porting to a new ethercard, look at the packet driver source for hints.
+-   The NEx000 doesn't share the on-board packet memory -- you have to put
+-   the packet out through the "remote DMA" dataport using outb. */
+-
+-static void ne_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_offset)
+-{
+-#ifdef NE_SANITY_CHECK
+-	int xfer_count = count;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-#endif
+-	int nic_base = dev->base_addr;
+-	char *buf = skb->data;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-	if (ei_status.dmaing)
+-	{
+-		netdev_err(dev, "DMAing conflict in ne_block_input "
+-			   "[DMAstat:%d][irqlock:%d].\n",
+-			   ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-	ei_status.dmaing |= 0x01;
+-	outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base+ NE_CMD);
+-	outb_p(count & 0xff, nic_base + EN0_RCNTLO);
+-	outb_p(count >> 8, nic_base + EN0_RCNTHI);
+-	outb_p(ring_offset & 0xff, nic_base + EN0_RSARLO);
+-	outb_p(ring_offset >> 8, nic_base + EN0_RSARHI);
+-	outb_p(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-	if (ei_status.word16)
+-	{
+-		insw(NE_BASE + NE_DATAPORT,buf,count>>1);
+-		if (count & 0x01)
+-		{
+-			buf[count-1] = inb(NE_BASE + NE_DATAPORT);
+-#ifdef NE_SANITY_CHECK
+-			xfer_count++;
+-#endif
+-		}
+-	} else {
+-		insb(NE_BASE + NE_DATAPORT, buf, count);
+-	}
+-
+-#ifdef NE_SANITY_CHECK
+-	/* This was for the ALPHA version only, but enough people have
+-	   been encountering problems so it is still here.  If you see
+-	   this message you either 1) have a slightly incompatible clone
+-	   or 2) have noise/speed problems with your bus. */
+-
+-	if (netif_msg_rx_status(ei_local))
+-	{
+-		/* DMA termination address check... */
+-		int addr, tries = 20;
+-		do {
+-			/* DON'T check for 'inb_p(EN0_ISR) & ENISR_RDC' here
+-			   -- it's broken for Rx on some cards! */
+-			int high = inb_p(nic_base + EN0_RSARHI);
+-			int low = inb_p(nic_base + EN0_RSARLO);
+-			addr = (high << 8) + low;
+-			if (((ring_offset + xfer_count) & 0xff) == low)
+-				break;
+-		} while (--tries > 0);
+-	 	if (tries <= 0)
+-			netdev_warn(dev, "RX transfer address mismatch,"
+-				    "%#4.4x (expected) vs. %#4.4x (actual).\n",
+-				    ring_offset + xfer_count, addr);
+-	}
+-#endif
+-	outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_status.dmaing &= ~0x01;
+-}
+-
+-static void ne_block_output(struct net_device *dev, int count,
+-		const unsigned char *buf, const int start_page)
+-{
+-	int nic_base = NE_BASE;
+-	unsigned long dma_start;
+-#ifdef NE_SANITY_CHECK
+-	int retries = 0;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-#endif
+-
+-	/* Round the count up for word writes.  Do we need to do this?
+-	   What effect will an odd byte count have on the 8390?
+-	   I should check someday. */
+-
+-	if (ei_status.word16 && (count & 0x01))
+-		count++;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+-	if (ei_status.dmaing)
+-	{
+-		netdev_err(dev, "DMAing conflict in ne_block_output."
+-			   "[DMAstat:%d][irqlock:%d]\n",
+-			   ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-	ei_status.dmaing |= 0x01;
+-	/* We should already be in page 0, but to be safe... */
+-	outb_p(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base + NE_CMD);
+-
+-#ifdef NE_SANITY_CHECK
+-retry:
+-#endif
+-
+-#ifdef NE_RW_BUGFIX
+-	/* Handle the read-before-write bug the same way as the
+-	   Crynwr packet driver -- the NatSemi method doesn't work.
+-	   Actually this doesn't always work either, but if you have
+-	   problems with your NEx000 this is better than nothing! */
+-
+-	outb_p(0x42, nic_base + EN0_RCNTLO);
+-	outb_p(0x00,   nic_base + EN0_RCNTHI);
+-	outb_p(0x42, nic_base + EN0_RSARLO);
+-	outb_p(0x00, nic_base + EN0_RSARHI);
+-	outb_p(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-	/* Make certain that the dummy read has occurred. */
+-	udelay(6);
+-#endif
+-
+-	outb_p(ENISR_RDC, nic_base + EN0_ISR);
+-
+-	/* Now the normal output. */
+-	outb_p(count & 0xff, nic_base + EN0_RCNTLO);
+-	outb_p(count >> 8,   nic_base + EN0_RCNTHI);
+-	outb_p(0x00, nic_base + EN0_RSARLO);
+-	outb_p(start_page, nic_base + EN0_RSARHI);
+-
+-	outb_p(E8390_RWRITE+E8390_START, nic_base + NE_CMD);
+-	if (ei_status.word16) {
+-		outsw(NE_BASE + NE_DATAPORT, buf, count>>1);
+-	} else {
+-		outsb(NE_BASE + NE_DATAPORT, buf, count);
+-	}
+-
+-	dma_start = jiffies;
+-
+-#ifdef NE_SANITY_CHECK
+-	/* This was for the ALPHA version only, but enough people have
+-	   been encountering problems so it is still here. */
+-
+-	if (netif_msg_tx_queued(ei_local))
+-	{
+-		/* DMA termination address check... */
+-		int addr, tries = 20;
+-		do {
+-			int high = inb_p(nic_base + EN0_RSARHI);
+-			int low = inb_p(nic_base + EN0_RSARLO);
+-			addr = (high << 8) + low;
+-			if ((start_page << 8) + count == addr)
+-				break;
+-		} while (--tries > 0);
+-
+-		if (tries <= 0)
+-		{
+-			netdev_warn(dev, "Tx packet transfer address mismatch,"
+-				    "%#4.4x (expected) vs. %#4.4x (actual).\n",
+-				    (start_page << 8) + count, addr);
+-			if (retries++ == 0)
+-				goto retry;
+-		}
+-	}
+-#endif
+-
+-	while ((inb_p(nic_base + EN0_ISR) & ENISR_RDC) == 0)
+-		if (time_after(jiffies, dma_start + 2*HZ/100)) {		/* 20ms */
+-			netdev_warn(dev, "timeout waiting for Tx RDC.\n");
+-			ne_reset_8390(dev);
+-			NS8390p_init(dev, 1);
+-			break;
+-		}
+-
+-	outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_status.dmaing &= ~0x01;
+-}
+-
+-static int __init ne_drv_probe(struct platform_device *pdev)
+-{
+-	struct net_device *dev;
+-	int err, this_dev = pdev->id;
+-	struct resource *res;
+-
+-	dev = alloc_eip_netdev();
+-	if (!dev)
+-		return -ENOMEM;
+-
+-	/* ne.c doesn't populate resources in platform_device, but
+-	 * rbtx4927_ne_init and rbtx4938_ne_init do register devices
+-	 * with resources.
+-	 */
+-	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
+-	if (res) {
+-		dev->base_addr = res->start;
+-		dev->irq = platform_get_irq(pdev, 0);
+-	} else {
+-		if (this_dev < 0 || this_dev >= MAX_NE_CARDS) {
+-			free_netdev(dev);
+-			return -EINVAL;
+-		}
+-		dev->base_addr = io[this_dev];
+-		dev->irq = irq[this_dev];
+-		dev->mem_end = bad[this_dev];
+-	}
+-	SET_NETDEV_DEV(dev, &pdev->dev);
+-	err = do_ne_probe(dev);
+-	if (err) {
+-		free_netdev(dev);
+-		return err;
+-	}
+-	platform_set_drvdata(pdev, dev);
+-
+-	/* Update with any values found by probing, don't update if
+-	 * resources were specified.
+-	 */
+-	if (!res) {
+-		io[this_dev] = dev->base_addr;
+-		irq[this_dev] = dev->irq;
+-	}
+-	return 0;
+-}
+-
+-static void ne_drv_remove(struct platform_device *pdev)
+-{
+-	struct net_device *dev = platform_get_drvdata(pdev);
+-
+-	if (dev) {
+-		struct pnp_dev *idev = (struct pnp_dev *)ei_status.priv;
+-		netif_device_detach(dev);
+-		unregister_netdev(dev);
+-		if (idev)
+-			pnp_device_detach(idev);
+-		/* Careful ne_drv_remove can be called twice, once from
+-		 * the platform_driver.remove and again when the
+-		 * platform_device is being removed.
+-		 */
+-		ei_status.priv = 0;
+-		free_irq(dev->irq, dev);
+-		release_region(dev->base_addr, NE_IO_EXTENT);
+-		free_netdev(dev);
+-	}
+-}
+-
+-/* Remove unused devices or all if true. */
+-static void ne_loop_rm_unreg(int all)
+-{
+-	int this_dev;
+-	struct platform_device *pdev;
+-	for (this_dev = 0; this_dev < MAX_NE_CARDS; this_dev++) {
+-		pdev = pdev_ne[this_dev];
+-		/* No network device == unused */
+-		if (pdev && (!platform_get_drvdata(pdev) || all)) {
+-			ne_drv_remove(pdev);
+-			platform_device_unregister(pdev);
+-			pdev_ne[this_dev] = NULL;
+-		}
+-	}
+-}
+-
+-#ifdef CONFIG_PM
+-static int ne_drv_suspend(struct platform_device *pdev, pm_message_t state)
+-{
+-	struct net_device *dev = platform_get_drvdata(pdev);
+-
+-	if (netif_running(dev)) {
+-		struct pnp_dev *idev = (struct pnp_dev *)ei_status.priv;
+-		netif_device_detach(dev);
+-		if (idev)
+-			pnp_stop_dev(idev);
+-	}
+-	return 0;
+-}
+-
+-static int ne_drv_resume(struct platform_device *pdev)
+-{
+-	struct net_device *dev = platform_get_drvdata(pdev);
+-
+-	if (netif_running(dev)) {
+-		struct pnp_dev *idev = (struct pnp_dev *)ei_status.priv;
+-		if (idev)
+-			pnp_start_dev(idev);
+-		ne_reset_8390(dev);
+-		NS8390p_init(dev, 1);
+-		netif_device_attach(dev);
+-	}
+-	return 0;
+-}
+-#else
+-#define ne_drv_suspend NULL
+-#define ne_drv_resume NULL
+-#endif
+-
+-static struct platform_driver ne_driver = {
+-	.remove		= ne_drv_remove,
+-	.suspend	= ne_drv_suspend,
+-	.resume		= ne_drv_resume,
+-	.driver		= {
+-		.name	= DRV_NAME,
+-	},
+-};
+-
+-static void __init ne_add_devices(void)
+-{
+-	int this_dev;
+-	struct platform_device *pdev;
+-
+-	for (this_dev = 0; this_dev < MAX_NE_CARDS; this_dev++) {
+-		if (pdev_ne[this_dev])
+-			continue;
+-		pdev = platform_device_register_simple(
+-			DRV_NAME, this_dev, NULL, 0);
+-		if (IS_ERR(pdev))
+-			continue;
+-		pdev_ne[this_dev] = pdev;
+-	}
+-}
+-
+-static int __init ne_init(void)
+-{
+-	int retval;
+-
+-	if (IS_MODULE(CONFIG_NE2000))
+-		ne_add_devices();
+-
+-	retval = platform_driver_probe(&ne_driver, ne_drv_probe);
+-
+-	if (IS_MODULE(CONFIG_NE2000) && retval) {
+-		if (io[0] == 0)
+-			pr_notice("ne.c: You must supply \"io=0xNNN\""
+-			       " value(s) for ISA cards.\n");
+-		ne_loop_rm_unreg(1);
+-		return retval;
+-	}
+-
+-	/* Unregister unused platform_devices. */
+-	ne_loop_rm_unreg(0);
+-	return retval;
+-}
+-module_init(ne_init);
+-
+-#if !defined(MODULE) && defined(CONFIG_NETDEV_LEGACY_INIT)
+-struct net_device * __init ne_probe(int unit)
+-{
+-	int this_dev;
+-	struct net_device *dev;
+-
+-	/* Find an empty slot, that is no net_device and zero io port. */
+-	this_dev = 0;
+-	while ((pdev_ne[this_dev] && platform_get_drvdata(pdev_ne[this_dev])) ||
+-		io[this_dev]) {
+-		if (++this_dev == MAX_NE_CARDS)
+-			return ERR_PTR(-ENOMEM);
+-	}
+-
+-	/* Get irq, io from kernel command line */
+-	dev = alloc_eip_netdev();
+-	if (!dev)
+-		return ERR_PTR(-ENOMEM);
+-
+-	sprintf(dev->name, "eth%d", unit);
+-	netdev_boot_setup_check(dev);
+-
+-	io[this_dev] = dev->base_addr;
+-	irq[this_dev] = dev->irq;
+-	bad[this_dev] = dev->mem_end;
+-
+-	free_netdev(dev);
+-
+-	ne_add_devices();
+-
+-	/* return the first device found */
+-	for (this_dev = 0; this_dev < MAX_NE_CARDS; this_dev++) {
+-		if (pdev_ne[this_dev]) {
+-			dev = platform_get_drvdata(pdev_ne[this_dev]);
+-			if (dev)
+-				return dev;
+-		}
+-	}
+-
+-	return ERR_PTR(-ENODEV);
+-}
+-#endif
+-
+-static void __exit ne_exit(void)
+-{
+-	platform_driver_unregister(&ne_driver);
+-	ne_loop_rm_unreg(1);
+-}
+-module_exit(ne_exit);
+diff --git a/drivers/net/ethernet/8390/pcnet_cs.c b/drivers/net/ethernet/8390/pcnet_cs.c
+deleted file mode 100644
+index 19f9c5db3..000000000
+--- a/drivers/net/ethernet/8390/pcnet_cs.c
++++ /dev/null
+@@ -1,1717 +0,0 @@
+-// SPDX-License-Identifier: GPL-1.0+
+-/*======================================================================
+-
+-    A PCMCIA ethernet driver for NS8390-based cards
+-
+-    This driver supports the D-Link DE-650 and Linksys EthernetCard
+-    cards, the newer D-Link and Linksys combo cards, Accton EN2212
+-    cards, the RPTI EP400, and the PreMax PE-200 in non-shared-memory
+-    mode, and the IBM Credit Card Adapter, the NE4100, the Thomas
+-    Conrad ethernet card, and the Kingston KNE-PCM/x in shared-memory
+-    mode.  It will also handle the Socket EA card in either mode.
+-
+-    Copyright (C) 1999 David A. Hinds -- dahinds@users.sourceforge.net
+-
+-    pcnet_cs.c 1.153 2003/11/09 18:53:09
+-
+-    The network driver code is based on Donald Becker's NE2000 code:
+-
+-    Written 1992,1993 by Donald Becker.
+-    Copyright 1993 United States Government as represented by the
+-    Director, National Security Agency.
+-    Donald Becker may be reached at becker@scyld.com
+-
+-    Based also on Keith Moore's changes to Don Becker's code, for IBM
+-    CCAE support.  Drivers merged back together, and shared-memory
+-    Socket EA support added, by Ken Raeburn, September 1995.
+-
+-======================================================================*/
+-
+-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/ptrace.h>
+-#include <linux/string.h>
+-#include <linux/timer.h>
+-#include <linux/delay.h>
+-#include <linux/netdevice.h>
+-#include <linux/log2.h>
+-#include <linux/etherdevice.h>
+-#include <linux/mii.h>
+-#include "8390.h"
+-
+-#include <pcmcia/cistpl.h>
+-#include <pcmcia/ciscode.h>
+-#include <pcmcia/ds.h>
+-#include <pcmcia/cisreg.h>
+-
+-#include <asm/io.h>
+-#include <asm/byteorder.h>
+-#include <linux/uaccess.h>
+-
+-#define PCNET_CMD	0x00
+-#define PCNET_DATAPORT	0x10	/* NatSemi-defined port window offset. */
+-#define PCNET_RESET	0x1f	/* Issue a read to reset, a write to clear. */
+-#define PCNET_MISC	0x18	/* For IBM CCAE and Socket EA cards */
+-
+-#define PCNET_START_PG	0x40	/* First page of TX buffer */
+-#define PCNET_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-/* Socket EA cards have a larger packet buffer */
+-#define SOCKET_START_PG	0x01
+-#define SOCKET_STOP_PG	0xff
+-
+-#define PCNET_RDC_TIMEOUT (2*HZ/100)	/* Max wait in jiffies for Tx RDC */
+-
+-static const char *if_names[] = { "auto", "10baseT", "10base2"};
+-
+-/*====================================================================*/
+-
+-/* Module parameters */
+-
+-MODULE_AUTHOR("David Hinds <dahinds@users.sourceforge.net>");
+-MODULE_DESCRIPTION("NE2000 compatible PCMCIA ethernet driver");
+-MODULE_LICENSE("GPL");
+-
+-#define INT_MODULE_PARM(n, v) static int n = v; module_param(n, int, 0)
+-
+-INT_MODULE_PARM(if_port,	1);	/* Transceiver type */
+-INT_MODULE_PARM(use_big_buf,	1);	/* use 64K packet buffer? */
+-INT_MODULE_PARM(mem_speed,	0);	/* shared mem speed, in ns */
+-INT_MODULE_PARM(delay_output,	0);	/* pause after xmit? */
+-INT_MODULE_PARM(delay_time,	4);	/* in usec */
+-INT_MODULE_PARM(use_shmem,	-1);	/* use shared memory? */
+-INT_MODULE_PARM(full_duplex,	0);	/* full duplex? */
+-
+-/* Ugh!  Let the user hardwire the hardware address for queer cards */
+-static int hw_addr[6] = { 0, /* ... */ };
+-module_param_array(hw_addr, int, NULL, 0);
+-
+-/*====================================================================*/
+-
+-static void mii_phy_probe(struct net_device *dev);
+-static int pcnet_config(struct pcmcia_device *link);
+-static void pcnet_release(struct pcmcia_device *link);
+-static int pcnet_open(struct net_device *dev);
+-static int pcnet_close(struct net_device *dev);
+-static int ei_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
+-static irqreturn_t ei_irq_wrapper(int irq, void *dev_id);
+-static void ei_watchdog(struct timer_list *t);
+-static void pcnet_reset_8390(struct net_device *dev);
+-static int set_config(struct net_device *dev, struct ifmap *map);
+-static int setup_shmem_window(struct pcmcia_device *link, int start_pg,
+-			      int stop_pg, int cm_offset);
+-static int setup_dma_config(struct pcmcia_device *link, int start_pg,
+-			    int stop_pg);
+-
+-static void pcnet_detach(struct pcmcia_device *p_dev);
+-
+-/*====================================================================*/
+-
+-struct hw_info {
+-    u_int	offset;
+-    u_char	a0, a1, a2;
+-    u_int	flags;
+-};
+-
+-#define DELAY_OUTPUT	0x01
+-#define HAS_MISC_REG	0x02
+-#define USE_BIG_BUF	0x04
+-#define HAS_IBM_MISC	0x08
+-#define IS_DL10019	0x10
+-#define IS_DL10022	0x20
+-#define HAS_MII		0x40
+-#define USE_SHMEM	0x80	/* autodetected */
+-
+-#define AM79C9XX_HOME_PHY	0x00006B90  /* HomePNA PHY */
+-#define AM79C9XX_ETH_PHY	0x00006B70  /* 10baseT PHY */
+-#define MII_PHYID_REV_MASK	0xfffffff0
+-#define MII_PHYID_REG1		0x02
+-#define MII_PHYID_REG2		0x03
+-
+-static struct hw_info hw_info[] = {
+-    { /* Accton EN2212 */ 0x0ff0, 0x00, 0x00, 0xe8, DELAY_OUTPUT },
+-    { /* Allied Telesis LA-PCM */ 0x0ff0, 0x00, 0x00, 0xf4, 0 },
+-    { /* APEX MultiCard */ 0x03f4, 0x00, 0x20, 0xe5, 0 },
+-    { /* ASANTE FriendlyNet */ 0x4910, 0x00, 0x00, 0x94,
+-      DELAY_OUTPUT | HAS_IBM_MISC },
+-    { /* Danpex EN-6200P2 */ 0x0110, 0x00, 0x40, 0xc7, 0 },
+-    { /* DataTrek NetCard */ 0x0ff0, 0x00, 0x20, 0xe8, 0 },
+-    { /* Dayna CommuniCard E */ 0x0110, 0x00, 0x80, 0x19, 0 },
+-    { /* D-Link DE-650 */ 0x0040, 0x00, 0x80, 0xc8, 0 },
+-    { /* EP-210 Ethernet */ 0x0110, 0x00, 0x40, 0x33, 0 },
+-    { /* EP4000 Ethernet */ 0x01c0, 0x00, 0x00, 0xb4, 0 },
+-    { /* Epson EEN10B */ 0x0ff0, 0x00, 0x00, 0x48,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* ELECOM Laneed LD-CDWA */ 0xb8, 0x08, 0x00, 0x42, 0 },
+-    { /* Hypertec Ethernet */ 0x01c0, 0x00, 0x40, 0x4c, 0 },
+-    { /* IBM CCAE */ 0x0ff0, 0x08, 0x00, 0x5a,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* IBM CCAE */ 0x0ff0, 0x00, 0x04, 0xac,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* IBM CCAE */ 0x0ff0, 0x00, 0x06, 0x29,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* IBM FME */ 0x0374, 0x08, 0x00, 0x5a,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* IBM FME */ 0x0374, 0x00, 0x04, 0xac,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* Kansai KLA-PCM/T */ 0x0ff0, 0x00, 0x60, 0x87,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* NSC DP83903 */ 0x0374, 0x08, 0x00, 0x17,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* NSC DP83903 */ 0x0374, 0x00, 0xc0, 0xa8,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* NSC DP83903 */ 0x0374, 0x00, 0xa0, 0xb0,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* NSC DP83903 */ 0x0198, 0x00, 0x20, 0xe0,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* I-O DATA PCLA/T */ 0x0ff0, 0x00, 0xa0, 0xb0, 0 },
+-    { /* Katron PE-520 */ 0x0110, 0x00, 0x40, 0xf6, 0 },
+-    { /* Kingston KNE-PCM/x */ 0x0ff0, 0x00, 0xc0, 0xf0,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* Kingston KNE-PCM/x */ 0x0ff0, 0xe2, 0x0c, 0x0f,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* Kingston KNE-PC2 */ 0x0180, 0x00, 0xc0, 0xf0, 0 },
+-    { /* Maxtech PCN2000 */ 0x5000, 0x00, 0x00, 0xe8, 0 },
+-    { /* NDC Instant-Link */ 0x003a, 0x00, 0x80, 0xc6, 0 },
+-    { /* NE2000 Compatible */ 0x0ff0, 0x00, 0xa0, 0x0c, 0 },
+-    { /* Network General Sniffer */ 0x0ff0, 0x00, 0x00, 0x65,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* Panasonic VEL211 */ 0x0ff0, 0x00, 0x80, 0x45,
+-      HAS_MISC_REG | HAS_IBM_MISC },
+-    { /* PreMax PE-200 */ 0x07f0, 0x00, 0x20, 0xe0, 0 },
+-    { /* RPTI EP400 */ 0x0110, 0x00, 0x40, 0x95, 0 },
+-    { /* SCM Ethernet */ 0x0ff0, 0x00, 0x20, 0xcb, 0 },
+-    { /* Socket EA */ 0x4000, 0x00, 0xc0, 0x1b,
+-      DELAY_OUTPUT | HAS_MISC_REG | USE_BIG_BUF },
+-    { /* Socket LP-E CF+ */ 0x01c0, 0x00, 0xc0, 0x1b, 0 },
+-    { /* SuperSocket RE450T */ 0x0110, 0x00, 0xe0, 0x98, 0 },
+-    { /* Volktek NPL-402CT */ 0x0060, 0x00, 0x40, 0x05, 0 },
+-    { /* NEC PC-9801N-J12 */ 0x0ff0, 0x00, 0x00, 0x4c, 0 },
+-    { /* PCMCIA Technology OEM */ 0x01c8, 0x00, 0xa0, 0x0c, 0 }
+-};
+-
+-#define NR_INFO		ARRAY_SIZE(hw_info)
+-
+-static struct hw_info default_info = { 0, 0, 0, 0, 0 };
+-static struct hw_info dl10019_info = { 0, 0, 0, 0, IS_DL10019|HAS_MII };
+-static struct hw_info dl10022_info = { 0, 0, 0, 0, IS_DL10022|HAS_MII };
+-
+-struct pcnet_dev {
+-	struct pcmcia_device	*p_dev;
+-    u_int		flags;
+-    void		__iomem *base;
+-    struct timer_list	watchdog;
+-    int			stale, fast_poll;
+-    u_char		phy_id;
+-    u_char		eth_phy, pna_phy;
+-    u_short		link_status;
+-    u_long		mii_reset;
+-};
+-
+-static inline struct pcnet_dev *PRIV(struct net_device *dev)
+-{
+-	char *p = netdev_priv(dev);
+-	return (struct pcnet_dev *)(p + sizeof(struct ei_device));
+-}
+-
+-static const struct net_device_ops pcnet_netdev_ops = {
+-	.ndo_open		= pcnet_open,
+-	.ndo_stop		= pcnet_close,
+-	.ndo_set_config		= set_config,
+-	.ndo_start_xmit 	= ei_start_xmit,
+-	.ndo_get_stats		= ei_get_stats,
+-	.ndo_eth_ioctl		= ei_ioctl,
+-	.ndo_set_rx_mode	= ei_set_multicast_list,
+-	.ndo_tx_timeout 	= ei_tx_timeout,
+-	.ndo_set_mac_address 	= eth_mac_addr,
+-	.ndo_validate_addr	= eth_validate_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller 	= ei_poll,
+-#endif
+-};
+-
+-static int pcnet_probe(struct pcmcia_device *link)
+-{
+-    struct pcnet_dev *info;
+-    struct net_device *dev;
+-
+-    dev_dbg(&link->dev, "pcnet_attach()\n");
+-
+-    /* Create new ethernet device */
+-    dev = __alloc_ei_netdev(sizeof(struct pcnet_dev));
+-    if (!dev) return -ENOMEM;
+-    info = PRIV(dev);
+-    info->p_dev = link;
+-    link->priv = dev;
+-
+-    link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_IO;
+-
+-    dev->netdev_ops = &pcnet_netdev_ops;
+-
+-    return pcnet_config(link);
+-} /* pcnet_attach */
+-
+-static void pcnet_detach(struct pcmcia_device *link)
+-{
+-	struct net_device *dev = link->priv;
+-
+-	dev_dbg(&link->dev, "pcnet_detach\n");
+-
+-	unregister_netdev(dev);
+-
+-	pcnet_release(link);
+-
+-	free_netdev(dev);
+-} /* pcnet_detach */
+-
+-/*======================================================================
+-
+-    This probes for a card's hardware address, for card types that
+-    encode this information in their CIS.
+-
+-======================================================================*/
+-
+-static struct hw_info *get_hwinfo(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    u_char __iomem *base, *virt;
+-    u8 addr[ETH_ALEN];
+-    int i, j;
+-
+-    /* Allocate a small memory window */
+-    link->resource[2]->flags |= WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
+-    link->resource[2]->start = 0; link->resource[2]->end = 0;
+-    i = pcmcia_request_window(link, link->resource[2], 0);
+-    if (i != 0)
+-	return NULL;
+-
+-    virt = ioremap(link->resource[2]->start,
+-	    resource_size(link->resource[2]));
+-    if (unlikely(!virt)) {
+-	    pcmcia_release_window(link, link->resource[2]);
+-	    return NULL;
+-    }
+-
+-    for (i = 0; i < NR_INFO; i++) {
+-	pcmcia_map_mem_page(link, link->resource[2],
+-		hw_info[i].offset & ~(resource_size(link->resource[2])-1));
+-	base = &virt[hw_info[i].offset & (resource_size(link->resource[2])-1)];
+-	if ((readb(base+0) == hw_info[i].a0) &&
+-	    (readb(base+2) == hw_info[i].a1) &&
+-	    (readb(base+4) == hw_info[i].a2)) {
+-		for (j = 0; j < 6; j++)
+-			addr[j] = readb(base + (j<<1));
+-		eth_hw_addr_set(dev, addr);
+-		break;
+-	}
+-    }
+-
+-    iounmap(virt);
+-    j = pcmcia_release_window(link, link->resource[2]);
+-    return (i < NR_INFO) ? hw_info+i : NULL;
+-} /* get_hwinfo */
+-
+-/*======================================================================
+-
+-    This probes for a card's hardware address by reading the PROM.
+-    It checks the address against a list of known types, then falls
+-    back to a simple NE2000 clone signature check.
+-
+-======================================================================*/
+-
+-static struct hw_info *get_prom(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    unsigned int ioaddr = dev->base_addr;
+-    u8 addr[ETH_ALEN];
+-    u_char prom[32];
+-    int i, j;
+-
+-    /* This is lifted straight from drivers/net/ethernet/8390/ne.c */
+-    struct {
+-	u_char value, offset;
+-    } program_seq[] = {
+-	{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
+-	{0x48,	EN0_DCFG},	/* Set byte-wide (0x48) access. */
+-	{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+-	{0x00,	EN0_RCNTHI},
+-	{0x00,	EN0_IMR},	/* Mask completion irq. */
+-	{0xFF,	EN0_ISR},
+-	{E8390_RXOFF, EN0_RXCR},	/* 0x20  Set to monitor */
+-	{E8390_TXOFF, EN0_TXCR},	/* 0x02  and loopback mode. */
+-	{32,	EN0_RCNTLO},
+-	{0x00,	EN0_RCNTHI},
+-	{0x00,	EN0_RSARLO},	/* DMA starting at 0x0000. */
+-	{0x00,	EN0_RSARHI},
+-	{E8390_RREAD+E8390_START, E8390_CMD},
+-    };
+-
+-    pcnet_reset_8390(dev);
+-    mdelay(10);
+-
+-    for (i = 0; i < ARRAY_SIZE(program_seq); i++)
+-	outb_p(program_seq[i].value, ioaddr + program_seq[i].offset);
+-
+-    for (i = 0; i < 32; i++)
+-	prom[i] = inb(ioaddr + PCNET_DATAPORT);
+-    for (i = 0; i < NR_INFO; i++) {
+-	if ((prom[0] == hw_info[i].a0) &&
+-	    (prom[2] == hw_info[i].a1) &&
+-	    (prom[4] == hw_info[i].a2))
+-	    break;
+-    }
+-    if ((i < NR_INFO) || ((prom[28] == 0x57) && (prom[30] == 0x57))) {
+-	for (j = 0; j < 6; j++)
+-	    addr[j] = prom[j<<1];
+-	eth_hw_addr_set(dev, addr);
+-	return (i < NR_INFO) ? hw_info+i : &default_info;
+-    }
+-    return NULL;
+-} /* get_prom */
+-
+-/*======================================================================
+-
+-    For DL10019 based cards, like the Linksys EtherFast
+-
+-======================================================================*/
+-
+-static struct hw_info *get_dl10019(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    u8 addr[ETH_ALEN];
+-    int i;
+-    u_char sum;
+-
+-    for (sum = 0, i = 0x14; i < 0x1c; i++)
+-	sum += inb_p(dev->base_addr + i);
+-    if (sum != 0xff)
+-	return NULL;
+-    for (i = 0; i < 6; i++)
+-	addr[i] = inb_p(dev->base_addr + 0x14 + i);
+-    eth_hw_addr_set(dev, addr);
+-    i = inb(dev->base_addr + 0x1f);
+-    return ((i == 0x91)||(i == 0x99)) ? &dl10022_info : &dl10019_info;
+-}
+-
+-/*======================================================================
+-
+-    For Asix AX88190 based cards
+-
+-======================================================================*/
+-
+-static struct hw_info *get_ax88190(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    unsigned int ioaddr = dev->base_addr;
+-    u8 addr[ETH_ALEN];
+-    int i, j;
+-
+-    /* Not much of a test, but the alternatives are messy */
+-    if (link->config_base != 0x03c0)
+-	return NULL;
+-
+-    outb_p(0x01, ioaddr + EN0_DCFG);	/* Set word-wide access. */
+-    outb_p(0x00, ioaddr + EN0_RSARLO);	/* DMA starting at 0x0400. */
+-    outb_p(0x04, ioaddr + EN0_RSARHI);
+-    outb_p(E8390_RREAD+E8390_START, ioaddr + E8390_CMD);
+-
+-    for (i = 0; i < 6; i += 2) {
+-	j = inw(ioaddr + PCNET_DATAPORT);
+-	addr[i] = j & 0xff;
+-	addr[i+1] = j >> 8;
+-    }
+-    eth_hw_addr_set(dev, addr);
+-    return NULL;
+-}
+-
+-/*======================================================================
+-
+-    This should be totally unnecessary... but when we can't figure
+-    out the hardware address any other way, we'll let the user hard
+-    wire it when the module is initialized.
+-
+-======================================================================*/
+-
+-static struct hw_info *get_hwired(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    u8 addr[ETH_ALEN];
+-    int i;
+-
+-    for (i = 0; i < 6; i++)
+-	if (hw_addr[i] != 0) break;
+-    if (i == 6)
+-	return NULL;
+-
+-    for (i = 0; i < 6; i++)
+-	addr[i] = hw_addr[i];
+-    eth_hw_addr_set(dev, addr);
+-
+-    return &default_info;
+-} /* get_hwired */
+-
+-static int try_io_port(struct pcmcia_device *link)
+-{
+-    int j, ret;
+-    link->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-    link->resource[1]->flags &= ~IO_DATA_PATH_WIDTH;
+-    if (link->resource[0]->end == 32) {
+-	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_AUTO;
+-	if (link->resource[1]->end > 0) {
+-	    /* for master/slave multifunction cards */
+-	    link->resource[1]->flags |= IO_DATA_PATH_WIDTH_8;
+-	}
+-    } else {
+-	/* This should be two 16-port windows */
+-	link->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-	link->resource[1]->flags |= IO_DATA_PATH_WIDTH_16;
+-    }
+-    if (link->resource[0]->start == 0) {
+-	for (j = 0; j < 0x400; j += 0x20) {
+-	    link->resource[0]->start = j ^ 0x300;
+-	    link->resource[1]->start = (j ^ 0x300) + 0x10;
+-	    link->io_lines = 16;
+-	    ret = pcmcia_request_io(link);
+-	    if (ret == 0)
+-		    return ret;
+-	}
+-	return ret;
+-    } else {
+-	return pcmcia_request_io(link);
+-    }
+-}
+-
+-static int pcnet_confcheck(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	int *priv = priv_data;
+-	int try = (*priv & 0x1);
+-
+-	*priv &= (p_dev->resource[2]->end >= 0x4000) ? 0x10 : ~0x10;
+-
+-	if (p_dev->config_index == 0)
+-		return -EINVAL;
+-
+-	if (p_dev->resource[0]->end + p_dev->resource[1]->end < 32)
+-		return -EINVAL;
+-
+-	if (try)
+-		p_dev->io_lines = 16;
+-	return try_io_port(p_dev);
+-}
+-
+-static struct hw_info *pcnet_try_config(struct pcmcia_device *link,
+-					int *has_shmem, int try)
+-{
+-	struct net_device *dev = link->priv;
+-	struct hw_info *local_hw_info;
+-	struct pcnet_dev *info = PRIV(dev);
+-	int priv = try;
+-	int ret;
+-
+-	ret = pcmcia_loop_config(link, pcnet_confcheck, &priv);
+-	if (ret) {
+-		dev_warn(&link->dev, "no useable port range found\n");
+-		return NULL;
+-	}
+-	*has_shmem = (priv & 0x10);
+-
+-	if (!link->irq)
+-		return NULL;
+-
+-	if (resource_size(link->resource[1]) == 8)
+-		link->config_flags |= CONF_ENABLE_SPKR;
+-
+-	if ((link->manf_id == MANFID_IBM) &&
+-	    (link->card_id == PRODID_IBM_HOME_AND_AWAY))
+-		link->config_index |= 0x10;
+-
+-	ret = pcmcia_enable_device(link);
+-	if (ret)
+-		return NULL;
+-
+-	dev->irq = link->irq;
+-	dev->base_addr = link->resource[0]->start;
+-
+-	if (info->flags & HAS_MISC_REG) {
+-		if ((if_port == 1) || (if_port == 2))
+-			dev->if_port = if_port;
+-		else
+-			dev_notice(&link->dev, "invalid if_port requested\n");
+-	} else
+-		dev->if_port = 0;
+-
+-	if ((link->config_base == 0x03c0) &&
+-	    (link->manf_id == 0x149) && (link->card_id == 0xc1ab)) {
+-		dev_info(&link->dev,
+-			"this is an AX88190 card - use axnet_cs instead.\n");
+-		return NULL;
+-	}
+-
+-	local_hw_info = get_hwinfo(link);
+-	if (!local_hw_info)
+-		local_hw_info = get_prom(link);
+-	if (!local_hw_info)
+-		local_hw_info = get_dl10019(link);
+-	if (!local_hw_info)
+-		local_hw_info = get_ax88190(link);
+-	if (!local_hw_info)
+-		local_hw_info = get_hwired(link);
+-
+-	return local_hw_info;
+-}
+-
+-static int pcnet_config(struct pcmcia_device *link)
+-{
+-    struct net_device *dev = link->priv;
+-    struct pcnet_dev *info = PRIV(dev);
+-    int start_pg, stop_pg, cm_offset;
+-    int has_shmem = 0;
+-    struct hw_info *local_hw_info;
+-
+-    dev_dbg(&link->dev, "pcnet_config\n");
+-
+-    local_hw_info = pcnet_try_config(link, &has_shmem, 0);
+-    if (!local_hw_info) {
+-	    /* check whether forcing io_lines to 16 helps... */
+-	    pcmcia_disable_device(link);
+-	    local_hw_info = pcnet_try_config(link, &has_shmem, 1);
+-	    if (local_hw_info == NULL) {
+-		    dev_notice(&link->dev, "unable to read hardware net"
+-			    " address for io base %#3lx\n", dev->base_addr);
+-		    goto failed;
+-	    }
+-    }
+-
+-    info->flags = local_hw_info->flags;
+-    /* Check for user overrides */
+-    info->flags |= (delay_output) ? DELAY_OUTPUT : 0;
+-    if ((link->manf_id == MANFID_SOCKET) &&
+-	((link->card_id == PRODID_SOCKET_LPE) ||
+-	 (link->card_id == PRODID_SOCKET_LPE_CF) ||
+-	 (link->card_id == PRODID_SOCKET_EIO)))
+-	info->flags &= ~USE_BIG_BUF;
+-    if (!use_big_buf)
+-	info->flags &= ~USE_BIG_BUF;
+-
+-    if (info->flags & USE_BIG_BUF) {
+-	start_pg = SOCKET_START_PG;
+-	stop_pg = SOCKET_STOP_PG;
+-	cm_offset = 0x10000;
+-    } else {
+-	start_pg = PCNET_START_PG;
+-	stop_pg = PCNET_STOP_PG;
+-	cm_offset = 0;
+-    }
+-
+-    /* has_shmem is ignored if use_shmem != -1 */
+-    if ((use_shmem == 0) || (!has_shmem && (use_shmem == -1)) ||
+-	(setup_shmem_window(link, start_pg, stop_pg, cm_offset) != 0))
+-	setup_dma_config(link, start_pg, stop_pg);
+-
+-    ei_status.name = "NE2000";
+-    ei_status.word16 = 1;
+-    ei_status.reset_8390 = pcnet_reset_8390;
+-
+-    if (info->flags & (IS_DL10019|IS_DL10022))
+-	mii_phy_probe(dev);
+-
+-    SET_NETDEV_DEV(dev, &link->dev);
+-
+-    if (register_netdev(dev) != 0) {
+-	pr_notice("register_netdev() failed\n");
+-	goto failed;
+-    }
+-
+-    if (info->flags & (IS_DL10019|IS_DL10022)) {
+-	u_char id = inb(dev->base_addr + 0x1a);
+-	netdev_info(dev, "NE2000 (DL100%d rev %02x): ",
+-		    (info->flags & IS_DL10022) ? 22 : 19, id);
+-	if (info->pna_phy)
+-	    pr_cont("PNA, ");
+-    } else {
+-	netdev_info(dev, "NE2000 Compatible: ");
+-    }
+-    pr_cont("io %#3lx, irq %d,", dev->base_addr, dev->irq);
+-    if (info->flags & USE_SHMEM)
+-	pr_cont(" mem %#5lx,", dev->mem_start);
+-    if (info->flags & HAS_MISC_REG)
+-	pr_cont(" %s xcvr,", if_names[dev->if_port]);
+-    pr_cont(" hw_addr %pM\n", dev->dev_addr);
+-    return 0;
+-
+-failed:
+-    pcnet_release(link);
+-    return -ENODEV;
+-} /* pcnet_config */
+-
+-static void pcnet_release(struct pcmcia_device *link)
+-{
+-	struct pcnet_dev *info = PRIV(link->priv);
+-
+-	dev_dbg(&link->dev, "pcnet_release\n");
+-
+-	if (info->flags & USE_SHMEM)
+-		iounmap(info->base);
+-
+-	pcmcia_disable_device(link);
+-}
+-
+-static int pcnet_suspend(struct pcmcia_device *link)
+-{
+-	struct net_device *dev = link->priv;
+-
+-	if (link->open)
+-		netif_device_detach(dev);
+-
+-	return 0;
+-}
+-
+-static int pcnet_resume(struct pcmcia_device *link)
+-{
+-	struct net_device *dev = link->priv;
+-
+-	if (link->open) {
+-		pcnet_reset_8390(dev);
+-		NS8390_init(dev, 1);
+-		netif_device_attach(dev);
+-	}
+-
+-	return 0;
+-}
+-
+-
+-/*======================================================================
+-
+-    MII interface support for DL10019 and DL10022 based cards
+-
+-    On the DL10019, the MII IO direction bit is 0x10; on the DL10022
+-    it is 0x20.  Setting both bits seems to work on both card types.
+-
+-======================================================================*/
+-
+-#define DLINK_GPIO		0x1c
+-#define DLINK_DIAG		0x1d
+-#define DLINK_EEPROM		0x1e
+-
+-#define MDIO_SHIFT_CLK		0x80
+-#define MDIO_DATA_OUT		0x40
+-#define MDIO_DIR_WRITE		0x30
+-#define MDIO_DATA_WRITE0	(MDIO_DIR_WRITE)
+-#define MDIO_DATA_WRITE1	(MDIO_DIR_WRITE | MDIO_DATA_OUT)
+-#define MDIO_DATA_READ		0x10
+-#define MDIO_MASK		0x0f
+-
+-static void mdio_sync(unsigned int addr)
+-{
+-    int bits, mask = inb(addr) & MDIO_MASK;
+-    for (bits = 0; bits < 32; bits++) {
+-	outb(mask | MDIO_DATA_WRITE1, addr);
+-	outb(mask | MDIO_DATA_WRITE1 | MDIO_SHIFT_CLK, addr);
+-    }
+-}
+-
+-static int mdio_read(unsigned int addr, int phy_id, int loc)
+-{
+-    u_int cmd = (0x06<<10)|(phy_id<<5)|loc;
+-    int i, retval = 0, mask = inb(addr) & MDIO_MASK;
+-
+-    mdio_sync(addr);
+-    for (i = 13; i >= 0; i--) {
+-	int dat = (cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
+-	outb(mask | dat, addr);
+-	outb(mask | dat | MDIO_SHIFT_CLK, addr);
+-    }
+-    for (i = 19; i > 0; i--) {
+-	outb(mask, addr);
+-	retval = (retval << 1) | ((inb(addr) & MDIO_DATA_READ) != 0);
+-	outb(mask | MDIO_SHIFT_CLK, addr);
+-    }
+-    return (retval>>1) & 0xffff;
+-}
+-
+-static void mdio_write(unsigned int addr, int phy_id, int loc, int value)
+-{
+-    u_int cmd = (0x05<<28)|(phy_id<<23)|(loc<<18)|(1<<17)|value;
+-    int i, mask = inb(addr) & MDIO_MASK;
+-
+-    mdio_sync(addr);
+-    for (i = 31; i >= 0; i--) {
+-	int dat = (cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
+-	outb(mask | dat, addr);
+-	outb(mask | dat | MDIO_SHIFT_CLK, addr);
+-    }
+-    for (i = 1; i >= 0; i--) {
+-	outb(mask, addr);
+-	outb(mask | MDIO_SHIFT_CLK, addr);
+-    }
+-}
+-
+-/*======================================================================
+-
+-    EEPROM access routines for DL10019 and DL10022 based cards
+-
+-======================================================================*/
+-
+-#define EE_EEP		0x40
+-#define EE_ASIC		0x10
+-#define EE_CS		0x08
+-#define EE_CK		0x04
+-#define EE_DO		0x02
+-#define EE_DI		0x01
+-#define EE_ADOT		0x01	/* DataOut for ASIC */
+-#define EE_READ_CMD	0x06
+-
+-#define DL19FDUPLX	0x0400	/* DL10019 Full duplex mode */
+-
+-static int read_eeprom(unsigned int ioaddr, int location)
+-{
+-    int i, retval = 0;
+-    unsigned int ee_addr = ioaddr + DLINK_EEPROM;
+-    int read_cmd = location | (EE_READ_CMD << 8);
+-
+-    outb(0, ee_addr);
+-    outb(EE_EEP|EE_CS, ee_addr);
+-
+-    /* Shift the read command bits out. */
+-    for (i = 10; i >= 0; i--) {
+-	short dataval = (read_cmd & (1 << i)) ? EE_DO : 0;
+-	outb_p(EE_EEP|EE_CS|dataval, ee_addr);
+-	outb_p(EE_EEP|EE_CS|dataval|EE_CK, ee_addr);
+-    }
+-    outb(EE_EEP|EE_CS, ee_addr);
+-
+-    for (i = 16; i > 0; i--) {
+-	outb_p(EE_EEP|EE_CS | EE_CK, ee_addr);
+-	retval = (retval << 1) | ((inb(ee_addr) & EE_DI) ? 1 : 0);
+-	outb_p(EE_EEP|EE_CS, ee_addr);
+-    }
+-
+-    /* Terminate the EEPROM access. */
+-    outb(0, ee_addr);
+-    return retval;
+-}
+-
+-/*
+-    The internal ASIC registers can be changed by EEPROM READ access
+-    with EE_ASIC bit set.
+-    In ASIC mode, EE_ADOT is used to output the data to the ASIC.
+-*/
+-
+-static void write_asic(unsigned int ioaddr, int location, short asic_data)
+-{
+-	int i;
+-	unsigned int ee_addr = ioaddr + DLINK_EEPROM;
+-	short dataval;
+-	int read_cmd = location | (EE_READ_CMD << 8);
+-
+-	asic_data |= read_eeprom(ioaddr, location);
+-
+-	outb(0, ee_addr);
+-	outb(EE_ASIC|EE_CS|EE_DI, ee_addr);
+-
+-	read_cmd = read_cmd >> 1;
+-
+-	/* Shift the read command bits out. */
+-	for (i = 9; i >= 0; i--) {
+-		dataval = (read_cmd & (1 << i)) ? EE_DO : 0;
+-		outb_p(EE_ASIC|EE_CS|EE_DI|dataval, ee_addr);
+-		outb_p(EE_ASIC|EE_CS|EE_DI|dataval|EE_CK, ee_addr);
+-		outb_p(EE_ASIC|EE_CS|EE_DI|dataval, ee_addr);
+-	}
+-	// sync
+-	outb(EE_ASIC|EE_CS, ee_addr);
+-	outb(EE_ASIC|EE_CS|EE_CK, ee_addr);
+-	outb(EE_ASIC|EE_CS, ee_addr);
+-
+-	for (i = 15; i >= 0; i--) {
+-		dataval = (asic_data & (1 << i)) ? EE_ADOT : 0;
+-		outb_p(EE_ASIC|EE_CS|dataval, ee_addr);
+-		outb_p(EE_ASIC|EE_CS|dataval|EE_CK, ee_addr);
+-		outb_p(EE_ASIC|EE_CS|dataval, ee_addr);
+-	}
+-
+-	/* Terminate the ASIC access. */
+-	outb(EE_ASIC|EE_DI, ee_addr);
+-	outb(EE_ASIC|EE_DI| EE_CK, ee_addr);
+-	outb(EE_ASIC|EE_DI, ee_addr);
+-
+-	outb(0, ee_addr);
+-}
+-
+-/*====================================================================*/
+-
+-static void set_misc_reg(struct net_device *dev)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-    struct pcnet_dev *info = PRIV(dev);
+-    u_char tmp;
+-
+-    if (info->flags & HAS_MISC_REG) {
+-	tmp = inb_p(nic_base + PCNET_MISC) & ~3;
+-	if (dev->if_port == 2)
+-	    tmp |= 1;
+-	if (info->flags & USE_BIG_BUF)
+-	    tmp |= 2;
+-	if (info->flags & HAS_IBM_MISC)
+-	    tmp |= 8;
+-	outb_p(tmp, nic_base + PCNET_MISC);
+-    }
+-    if (info->flags & IS_DL10022) {
+-	if (info->flags & HAS_MII) {
+-	    /* Advertise 100F, 100H, 10F, 10H */
+-	    mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 4, 0x01e1);
+-	    /* Restart MII autonegotiation */
+-	    mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 0, 0x0000);
+-	    mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 0, 0x1200);
+-	    info->mii_reset = jiffies;
+-	} else {
+-	    outb(full_duplex ? 4 : 0, nic_base + DLINK_DIAG);
+-	}
+-    } else if (info->flags & IS_DL10019) {
+-	/* Advertise 100F, 100H, 10F, 10H */
+-	mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 4, 0x01e1);
+-	/* Restart MII autonegotiation */
+-	mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 0, 0x0000);
+-	mdio_write(nic_base + DLINK_GPIO, info->eth_phy, 0, 0x1200);
+-    }
+-}
+-
+-/*====================================================================*/
+-
+-static void mii_phy_probe(struct net_device *dev)
+-{
+-    struct pcnet_dev *info = PRIV(dev);
+-    unsigned int mii_addr = dev->base_addr + DLINK_GPIO;
+-    int i;
+-    u_int tmp, phyid;
+-
+-    for (i = 31; i >= 0; i--) {
+-	tmp = mdio_read(mii_addr, i, 1);
+-	if ((tmp == 0) || (tmp == 0xffff))
+-	    continue;
+-	tmp = mdio_read(mii_addr, i, MII_PHYID_REG1);
+-	phyid = tmp << 16;
+-	phyid |= mdio_read(mii_addr, i, MII_PHYID_REG2);
+-	phyid &= MII_PHYID_REV_MASK;
+-	netdev_dbg(dev, "MII at %d is 0x%08x\n", i, phyid);
+-	if (phyid == AM79C9XX_HOME_PHY) {
+-	    info->pna_phy = i;
+-	} else if (phyid != AM79C9XX_ETH_PHY) {
+-	    info->eth_phy = i;
+-	}
+-    }
+-}
+-
+-static int pcnet_open(struct net_device *dev)
+-{
+-    int ret;
+-    struct pcnet_dev *info = PRIV(dev);
+-    struct pcmcia_device *link = info->p_dev;
+-    unsigned int nic_base = dev->base_addr;
+-
+-    dev_dbg(&link->dev, "pcnet_open('%s')\n", dev->name);
+-
+-    if (!pcmcia_dev_present(link))
+-	return -ENODEV;
+-
+-    set_misc_reg(dev);
+-
+-    outb_p(0xFF, nic_base + EN0_ISR); /* Clear bogus intr. */
+-    ret = request_irq(dev->irq, ei_irq_wrapper, IRQF_SHARED, dev->name, dev);
+-    if (ret)
+-	    return ret;
+-
+-    link->open++;
+-
+-    info->phy_id = info->eth_phy;
+-    info->link_status = 0x00;
+-    timer_setup(&info->watchdog, ei_watchdog, 0);
+-    mod_timer(&info->watchdog, jiffies + HZ);
+-
+-    return ei_open(dev);
+-} /* pcnet_open */
+-
+-/*====================================================================*/
+-
+-static int pcnet_close(struct net_device *dev)
+-{
+-    struct pcnet_dev *info = PRIV(dev);
+-    struct pcmcia_device *link = info->p_dev;
+-
+-    dev_dbg(&link->dev, "pcnet_close('%s')\n", dev->name);
+-
+-    ei_close(dev);
+-    free_irq(dev->irq, dev);
+-
+-    link->open--;
+-    netif_stop_queue(dev);
+-    timer_delete_sync(&info->watchdog);
+-
+-    return 0;
+-} /* pcnet_close */
+-
+-/*======================================================================
+-
+-    Hard reset the card.  This used to pause for the same period that
+-    a 8390 reset command required, but that shouldn't be necessary.
+-
+-======================================================================*/
+-
+-static void pcnet_reset_8390(struct net_device *dev)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-    int i;
+-
+-    ei_status.txing = ei_status.dmaing = 0;
+-
+-    outb_p(E8390_NODMA+E8390_PAGE0+E8390_STOP, nic_base + E8390_CMD);
+-
+-    outb(inb(nic_base + PCNET_RESET), nic_base + PCNET_RESET);
+-
+-    for (i = 0; i < 100; i++) {
+-	if ((inb_p(nic_base+EN0_ISR) & ENISR_RESET) != 0)
+-	    break;
+-	udelay(100);
+-    }
+-    outb_p(ENISR_RESET, nic_base + EN0_ISR); /* Ack intr. */
+-
+-    if (i == 100)
+-	netdev_err(dev, "pcnet_reset_8390() did not complete.\n");
+-
+-    set_misc_reg(dev);
+-
+-} /* pcnet_reset_8390 */
+-
+-/*====================================================================*/
+-
+-static int set_config(struct net_device *dev, struct ifmap *map)
+-{
+-    struct pcnet_dev *info = PRIV(dev);
+-    if ((map->port != (u_char)(-1)) && (map->port != dev->if_port)) {
+-	if (!(info->flags & HAS_MISC_REG))
+-	    return -EOPNOTSUPP;
+-	else if ((map->port < 1) || (map->port > 2))
+-	    return -EINVAL;
+-	WRITE_ONCE(dev->if_port, map->port);
+-	netdev_info(dev, "switched to %s port\n", if_names[dev->if_port]);
+-	NS8390_init(dev, 1);
+-    }
+-    return 0;
+-}
+-
+-/*====================================================================*/
+-
+-static irqreturn_t ei_irq_wrapper(int irq, void *dev_id)
+-{
+-    struct net_device *dev = dev_id;
+-    struct pcnet_dev *info;
+-    irqreturn_t ret = ei_interrupt(irq, dev_id);
+-
+-    if (ret == IRQ_HANDLED) {
+-	    info = PRIV(dev);
+-	    info->stale = 0;
+-    }
+-    return ret;
+-}
+-
+-static void ei_watchdog(struct timer_list *t)
+-{
+-    struct pcnet_dev *info = timer_container_of(info, t, watchdog);
+-    struct net_device *dev = info->p_dev->priv;
+-    unsigned int nic_base = dev->base_addr;
+-    unsigned int mii_addr = nic_base + DLINK_GPIO;
+-    u_short link;
+-
+-    if (!netif_device_present(dev)) goto reschedule;
+-
+-    /* Check for pending interrupt with expired latency timer: with
+-       this, we can limp along even if the interrupt is blocked */
+-    if (info->stale++ && (inb_p(nic_base + EN0_ISR) & ENISR_ALL)) {
+-	if (!info->fast_poll)
+-	    netdev_info(dev, "interrupt(s) dropped!\n");
+-	ei_irq_wrapper(dev->irq, dev);
+-	info->fast_poll = HZ;
+-    }
+-    if (info->fast_poll) {
+-	info->fast_poll--;
+-	info->watchdog.expires = jiffies + 1;
+-	add_timer(&info->watchdog);
+-	return;
+-    }
+-
+-    if (!(info->flags & HAS_MII))
+-	goto reschedule;
+-
+-    mdio_read(mii_addr, info->phy_id, 1);
+-    link = mdio_read(mii_addr, info->phy_id, 1);
+-    if (!link || (link == 0xffff)) {
+-	if (info->eth_phy) {
+-	    info->phy_id = info->eth_phy = 0;
+-	} else {
+-	    netdev_info(dev, "MII is missing!\n");
+-	    info->flags &= ~HAS_MII;
+-	}
+-	goto reschedule;
+-    }
+-
+-    link &= 0x0004;
+-    if (link != info->link_status) {
+-	u_short p = mdio_read(mii_addr, info->phy_id, 5);
+-	netdev_info(dev, "%s link beat\n", link ? "found" : "lost");
+-	if (link && (info->flags & IS_DL10022)) {
+-	    /* Disable collision detection on full duplex links */
+-	    outb((p & 0x0140) ? 4 : 0, nic_base + DLINK_DIAG);
+-	} else if (link && (info->flags & IS_DL10019)) {
+-	    /* Disable collision detection on full duplex links */
+-	    write_asic(dev->base_addr, 4, (p & 0x140) ? DL19FDUPLX : 0);
+-	}
+-	if (link) {
+-	    if (info->phy_id == info->eth_phy) {
+-		if (p)
+-		    netdev_info(dev, "autonegotiation complete: "
+-				"%sbaseT-%cD selected\n",
+-				((p & 0x0180) ? "100" : "10"),
+-				((p & 0x0140) ? 'F' : 'H'));
+-		else
+-		    netdev_info(dev, "link partner did not autonegotiate\n");
+-	    }
+-	    NS8390_init(dev, 1);
+-	}
+-	info->link_status = link;
+-    }
+-    if (info->pna_phy && time_after(jiffies, info->mii_reset + 6*HZ)) {
+-	link = mdio_read(mii_addr, info->eth_phy, 1) & 0x0004;
+-	if (((info->phy_id == info->pna_phy) && link) ||
+-	    ((info->phy_id != info->pna_phy) && !link)) {
+-	    /* isolate this MII and try flipping to the other one */
+-	    mdio_write(mii_addr, info->phy_id, 0, 0x0400);
+-	    info->phy_id ^= info->pna_phy ^ info->eth_phy;
+-	    netdev_info(dev, "switched to %s transceiver\n",
+-			(info->phy_id == info->eth_phy) ? "ethernet" : "PNA");
+-	    mdio_write(mii_addr, info->phy_id, 0,
+-		       (info->phy_id == info->eth_phy) ? 0x1000 : 0);
+-	    info->link_status = 0;
+-	    info->mii_reset = jiffies;
+-	}
+-    }
+-
+-reschedule:
+-    info->watchdog.expires = jiffies + HZ;
+-    add_timer(&info->watchdog);
+-}
+-
+-/*====================================================================*/
+-
+-
+-static int ei_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+-{
+-    struct pcnet_dev *info = PRIV(dev);
+-    struct mii_ioctl_data *data = if_mii(rq);
+-    unsigned int mii_addr = dev->base_addr + DLINK_GPIO;
+-
+-    if (!(info->flags & (IS_DL10019|IS_DL10022)))
+-	return -EINVAL;
+-
+-    switch (cmd) {
+-    case SIOCGMIIPHY:
+-	data->phy_id = info->phy_id;
+-	fallthrough;
+-    case SIOCGMIIREG:		/* Read MII PHY register. */
+-	data->val_out = mdio_read(mii_addr, data->phy_id, data->reg_num & 0x1f);
+-	return 0;
+-    case SIOCSMIIREG:		/* Write MII PHY register. */
+-	mdio_write(mii_addr, data->phy_id, data->reg_num & 0x1f, data->val_in);
+-	return 0;
+-    }
+-    return -EOPNOTSUPP;
+-}
+-
+-/*====================================================================*/
+-
+-static void dma_get_8390_hdr(struct net_device *dev,
+-			     struct e8390_pkt_hdr *hdr,
+-			     int ring_page)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-
+-    if (ei_status.dmaing) {
+-	netdev_err(dev, "DMAing conflict in dma_block_input."
+-		   "[DMAstat:%1x][irqlock:%1x]\n",
+-		   ei_status.dmaing, ei_status.irqlock);
+-	return;
+-    }
+-
+-    ei_status.dmaing |= 0x01;
+-    outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base + PCNET_CMD);
+-    outb_p(sizeof(struct e8390_pkt_hdr), nic_base + EN0_RCNTLO);
+-    outb_p(0, nic_base + EN0_RCNTHI);
+-    outb_p(0, nic_base + EN0_RSARLO);		/* On page boundary */
+-    outb_p(ring_page, nic_base + EN0_RSARHI);
+-    outb_p(E8390_RREAD+E8390_START, nic_base + PCNET_CMD);
+-
+-    insw(nic_base + PCNET_DATAPORT, hdr,
+-	    sizeof(struct e8390_pkt_hdr)>>1);
+-    /* Fix for big endian systems */
+-    hdr->count = le16_to_cpu(hdr->count);
+-
+-    outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-    ei_status.dmaing &= ~0x01;
+-}
+-
+-/*====================================================================*/
+-
+-static void dma_block_input(struct net_device *dev, int count,
+-			    struct sk_buff *skb, int ring_offset)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-    int xfer_count = count;
+-    char *buf = skb->data;
+-    struct ei_device *ei_local = netdev_priv(dev);
+-
+-    if ((netif_msg_rx_status(ei_local)) && (count != 4))
+-	netdev_dbg(dev, "[bi=%d]\n", count+4);
+-    if (ei_status.dmaing) {
+-	netdev_err(dev, "DMAing conflict in dma_block_input."
+-		   "[DMAstat:%1x][irqlock:%1x]\n",
+-		   ei_status.dmaing, ei_status.irqlock);
+-	return;
+-    }
+-    ei_status.dmaing |= 0x01;
+-    outb_p(E8390_NODMA+E8390_PAGE0+E8390_START, nic_base + PCNET_CMD);
+-    outb_p(count & 0xff, nic_base + EN0_RCNTLO);
+-    outb_p(count >> 8, nic_base + EN0_RCNTHI);
+-    outb_p(ring_offset & 0xff, nic_base + EN0_RSARLO);
+-    outb_p(ring_offset >> 8, nic_base + EN0_RSARHI);
+-    outb_p(E8390_RREAD+E8390_START, nic_base + PCNET_CMD);
+-
+-    insw(nic_base + PCNET_DATAPORT,buf,count>>1);
+-    if (count & 0x01) {
+-	buf[count-1] = inb(nic_base + PCNET_DATAPORT);
+-	xfer_count++;
+-    }
+-
+-    /* This was for the ALPHA version only, but enough people have been
+-       encountering problems that it is still here. */
+-#ifdef PCMCIA_DEBUG
+-      /* DMA termination address check... */
+-    if (netif_msg_rx_status(ei_local)) {
+-	int addr, tries = 20;
+-	do {
+-	    /* DON'T check for 'inb_p(EN0_ISR) & ENISR_RDC' here
+-	       -- it's broken for Rx on some cards! */
+-	    int high = inb_p(nic_base + EN0_RSARHI);
+-	    int low = inb_p(nic_base + EN0_RSARLO);
+-	    addr = (high << 8) + low;
+-	    if (((ring_offset + xfer_count) & 0xff) == (addr & 0xff))
+-		break;
+-	} while (--tries > 0);
+-	if (tries <= 0)
+-	    netdev_notice(dev, "RX transfer address mismatch,"
+-			  "%#4.4x (expected) vs. %#4.4x (actual).\n",
+-			  ring_offset + xfer_count, addr);
+-    }
+-#endif
+-    outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-    ei_status.dmaing &= ~0x01;
+-} /* dma_block_input */
+-
+-/*====================================================================*/
+-
+-static void dma_block_output(struct net_device *dev, int count,
+-			     const u_char *buf, const int start_page)
+-{
+-    unsigned int nic_base = dev->base_addr;
+-    struct pcnet_dev *info = PRIV(dev);
+-#ifdef PCMCIA_DEBUG
+-    int retries = 0;
+-    struct ei_device *ei_local = netdev_priv(dev);
+-#endif
+-    u_long dma_start;
+-
+-#ifdef PCMCIA_DEBUG
+-    netif_dbg(ei_local, tx_queued, dev, "[bo=%d]\n", count);
+-#endif
+-
+-    /* Round the count up for word writes.  Do we need to do this?
+-       What effect will an odd byte count have on the 8390?
+-       I should check someday. */
+-    if (count & 0x01)
+-	count++;
+-    if (ei_status.dmaing) {
+-	netdev_err(dev, "DMAing conflict in dma_block_output."
+-		   "[DMAstat:%1x][irqlock:%1x]\n",
+-		   ei_status.dmaing, ei_status.irqlock);
+-	return;
+-    }
+-    ei_status.dmaing |= 0x01;
+-    /* We should already be in page 0, but to be safe... */
+-    outb_p(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base+PCNET_CMD);
+-
+-#ifdef PCMCIA_DEBUG
+-  retry:
+-#endif
+-
+-    outb_p(ENISR_RDC, nic_base + EN0_ISR);
+-
+-    /* Now the normal output. */
+-    outb_p(count & 0xff, nic_base + EN0_RCNTLO);
+-    outb_p(count >> 8,   nic_base + EN0_RCNTHI);
+-    outb_p(0x00, nic_base + EN0_RSARLO);
+-    outb_p(start_page, nic_base + EN0_RSARHI);
+-
+-    outb_p(E8390_RWRITE+E8390_START, nic_base + PCNET_CMD);
+-    outsw(nic_base + PCNET_DATAPORT, buf, count>>1);
+-
+-    dma_start = jiffies;
+-
+-#ifdef PCMCIA_DEBUG
+-    /* This was for the ALPHA version only, but enough people have been
+-       encountering problems that it is still here. */
+-    /* DMA termination address check... */
+-    if (netif_msg_tx_queued(ei_local)) {
+-	int addr, tries = 20;
+-	do {
+-	    int high = inb_p(nic_base + EN0_RSARHI);
+-	    int low = inb_p(nic_base + EN0_RSARLO);
+-	    addr = (high << 8) + low;
+-	    if ((start_page << 8) + count == addr)
+-		break;
+-	} while (--tries > 0);
+-	if (tries <= 0) {
+-	    netdev_notice(dev, "Tx packet transfer address mismatch,"
+-			  "%#4.4x (expected) vs. %#4.4x (actual).\n",
+-			  (start_page << 8) + count, addr);
+-	    if (retries++ == 0)
+-		goto retry;
+-	}
+-    }
+-#endif
+-
+-    while ((inb_p(nic_base + EN0_ISR) & ENISR_RDC) == 0)
+-	if (time_after(jiffies, dma_start + PCNET_RDC_TIMEOUT)) {
+-		netdev_warn(dev, "timeout waiting for Tx RDC.\n");
+-		pcnet_reset_8390(dev);
+-		NS8390_init(dev, 1);
+-		break;
+-	}
+-
+-    outb_p(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-    if (info->flags & DELAY_OUTPUT)
+-	udelay((long)delay_time);
+-    ei_status.dmaing &= ~0x01;
+-}
+-
+-/*====================================================================*/
+-
+-static int setup_dma_config(struct pcmcia_device *link, int start_pg,
+-			    int stop_pg)
+-{
+-    struct net_device *dev = link->priv;
+-
+-    ei_status.tx_start_page = start_pg;
+-    ei_status.rx_start_page = start_pg + TX_PAGES;
+-    ei_status.stop_page = stop_pg;
+-
+-    /* set up block i/o functions */
+-    ei_status.get_8390_hdr = dma_get_8390_hdr;
+-    ei_status.block_input = dma_block_input;
+-    ei_status.block_output = dma_block_output;
+-
+-    return 0;
+-}
+-
+-/*====================================================================*/
+-
+-static void copyin(void *dest, void __iomem *src, int c)
+-{
+-    u_short *d = dest;
+-    u_short __iomem *s = src;
+-    int odd;
+-
+-    if (c <= 0)
+-	return;
+-    odd = (c & 1); c >>= 1;
+-
+-    if (c) {
+-	do { *d++ = __raw_readw(s++); } while (--c);
+-    }
+-    /* get last byte by fetching a word and masking */
+-    if (odd)
+-	*((u_char *)d) = readw(s) & 0xff;
+-}
+-
+-static void copyout(void __iomem *dest, const void *src, int c)
+-{
+-    u_short __iomem *d = dest;
+-    const u_short *s = src;
+-    int odd;
+-
+-    if (c <= 0)
+-	return;
+-    odd = (c & 1); c >>= 1;
+-
+-    if (c) {
+-	do { __raw_writew(*s++, d++); } while (--c);
+-    }
+-    /* copy last byte doing a read-modify-write */
+-    if (odd)
+-	writew((readw(d) & 0xff00) | *(u_char *)s, d);
+-}
+-
+-/*====================================================================*/
+-
+-static void shmem_get_8390_hdr(struct net_device *dev,
+-			       struct e8390_pkt_hdr *hdr,
+-			       int ring_page)
+-{
+-    void __iomem *xfer_start = ei_status.mem + (TX_PAGES<<8)
+-				+ (ring_page << 8)
+-				- (ei_status.rx_start_page << 8);
+-
+-    copyin(hdr, xfer_start, sizeof(struct e8390_pkt_hdr));
+-    /* Fix for big endian systems */
+-    hdr->count = le16_to_cpu(hdr->count);
+-}
+-
+-/*====================================================================*/
+-
+-static void shmem_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset)
+-{
+-    void __iomem *base = ei_status.mem;
+-    unsigned long offset = (TX_PAGES<<8) + ring_offset
+-				- (ei_status.rx_start_page << 8);
+-    char *buf = skb->data;
+-
+-    if (offset + count > ei_status.priv) {
+-	/* We must wrap the input move. */
+-	int semi_count = ei_status.priv - offset;
+-	copyin(buf, base + offset, semi_count);
+-	buf += semi_count;
+-	offset = TX_PAGES<<8;
+-	count -= semi_count;
+-    }
+-    copyin(buf, base + offset, count);
+-}
+-
+-/*====================================================================*/
+-
+-static void shmem_block_output(struct net_device *dev, int count,
+-			       const u_char *buf, const int start_page)
+-{
+-    void __iomem *shmem = ei_status.mem + (start_page << 8);
+-    shmem -= ei_status.tx_start_page << 8;
+-    copyout(shmem, buf, count);
+-}
+-
+-/*====================================================================*/
+-
+-static int setup_shmem_window(struct pcmcia_device *link, int start_pg,
+-			      int stop_pg, int cm_offset)
+-{
+-    struct net_device *dev = link->priv;
+-    struct pcnet_dev *info = PRIV(dev);
+-    int i, window_size, offset, ret;
+-
+-    window_size = (stop_pg - start_pg) << 8;
+-    if (window_size > 32 * 1024)
+-	window_size = 32 * 1024;
+-
+-    /* Make sure it's a power of two.  */
+-    window_size = roundup_pow_of_two(window_size);
+-
+-    /* Allocate a memory window */
+-    link->resource[3]->flags |= WIN_DATA_WIDTH_16|WIN_MEMORY_TYPE_CM|WIN_ENABLE;
+-    link->resource[3]->flags |= WIN_USE_WAIT;
+-    link->resource[3]->start = 0; link->resource[3]->end = window_size;
+-    ret = pcmcia_request_window(link, link->resource[3], mem_speed);
+-    if (ret)
+-	    goto failed;
+-
+-    offset = (start_pg << 8) + cm_offset;
+-    offset -= offset % window_size;
+-    ret = pcmcia_map_mem_page(link, link->resource[3], offset);
+-    if (ret)
+-	    goto failed;
+-
+-    /* Try scribbling on the buffer */
+-    info->base = ioremap(link->resource[3]->start,
+-			resource_size(link->resource[3]));
+-    if (unlikely(!info->base)) {
+-	    ret = -ENOMEM;
+-	    goto failed;
+-    }
+-
+-    for (i = 0; i < (TX_PAGES<<8); i += 2)
+-	__raw_writew((i>>1), info->base+offset+i);
+-    udelay(100);
+-    for (i = 0; i < (TX_PAGES<<8); i += 2)
+-	if (__raw_readw(info->base+offset+i) != (i>>1)) break;
+-    pcnet_reset_8390(dev);
+-    if (i != (TX_PAGES<<8)) {
+-	iounmap(info->base);
+-	pcmcia_release_window(link, link->resource[3]);
+-	info->base = NULL;
+-	goto failed;
+-    }
+-
+-    ei_status.mem = info->base + offset;
+-    ei_status.priv = resource_size(link->resource[3]);
+-    dev->mem_start = (u_long)ei_status.mem;
+-    dev->mem_end = dev->mem_start + resource_size(link->resource[3]);
+-
+-    ei_status.tx_start_page = start_pg;
+-    ei_status.rx_start_page = start_pg + TX_PAGES;
+-    ei_status.stop_page = start_pg + (
+-	    (resource_size(link->resource[3]) - offset) >> 8);
+-
+-    /* set up block i/o functions */
+-    ei_status.get_8390_hdr = shmem_get_8390_hdr;
+-    ei_status.block_input = shmem_block_input;
+-    ei_status.block_output = shmem_block_output;
+-
+-    info->flags |= USE_SHMEM;
+-    return 0;
+-
+-failed:
+-    return 1;
+-}
+-
+-/*====================================================================*/
+-
+-static const struct pcmcia_device_id pcnet_ids[] = {
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0057, 0x0021),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0104, 0x000a),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0105, 0xea15),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0143, 0x3341),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x0143, 0xc0ab),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x021b, 0x0101),
+-	PCMCIA_PFC_DEVICE_MANF_CARD(0, 0x08a1, 0xc0ab),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "AnyCom", "Fast Ethernet + 56K COMBO", 0x578ba6e7, 0xb0ac62c4),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "ATKK", "LM33-PCM-T", 0xba9eb7e2, 0x077c174e),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "D-Link", "DME336T", 0x1a424a1c, 0xb23897ff),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "Grey Cell", "GCS3000", 0x2a151fac, 0x48b932ae),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "Linksys", "EtherFast 10&100 + 56K PC Card (PCMLM56)", 0x0733cc81, 0xb3765033),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "LINKSYS", "PCMLM336", 0xf7cb0b07, 0x7a821b58),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "MICRO RESEARCH", "COMBO-L/M-336", 0xb2ced065, 0x3ced0555),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "PCMCIAs", "ComboCard", 0xdcfe12d3, 0xcd8906cc),
+-	PCMCIA_PFC_DEVICE_PROD_ID12(0, "PCMCIAs", "LanModem", 0xdcfe12d3, 0xc67c648f),
+-	PCMCIA_MFC_DEVICE_PROD_ID12(0, "IBM", "Home and Away 28.8 PC Card       ", 0xb569a6e5, 0x5bd4ff2c),
+-	PCMCIA_MFC_DEVICE_PROD_ID12(0, "IBM", "Home and Away Credit Card Adapter", 0xb569a6e5, 0x4bdf15c3),
+-	PCMCIA_MFC_DEVICE_PROD_ID12(0, "IBM", "w95 Home and Away Credit Card ", 0xb569a6e5, 0xae911c15),
+-	PCMCIA_MFC_DEVICE_PROD_ID123(0, "APEX DATA", "MULTICARD", "ETHERNET-MODEM", 0x11c2da09, 0x7289dc5d, 0xaad95e1f),
+-	PCMCIA_MFC_DEVICE_PROD_ID2(0, "FAX/Modem/Ethernet Combo Card ", 0x1ed59302),
+-	PCMCIA_DEVICE_MANF_CARD(0x0057, 0x1004),
+-	PCMCIA_DEVICE_MANF_CARD(0x0104, 0x000d),
+-	PCMCIA_DEVICE_MANF_CARD(0x0104, 0x0075),
+-	PCMCIA_DEVICE_MANF_CARD(0x0104, 0x0145),
+-	PCMCIA_DEVICE_MANF_CARD(0x0149, 0x0230),
+-	PCMCIA_DEVICE_MANF_CARD(0x0149, 0x4530),
+-	PCMCIA_DEVICE_MANF_CARD(0x0149, 0xc1ab),
+-	PCMCIA_DEVICE_MANF_CARD(0x0186, 0x0110),
+-	PCMCIA_DEVICE_MANF_CARD(0x01bf, 0x8041),
+-	PCMCIA_DEVICE_MANF_CARD(0x0213, 0x2452),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x0300),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x0307),
+-	PCMCIA_DEVICE_MANF_CARD(0x026f, 0x030a),
+-	PCMCIA_DEVICE_MANF_CARD(0x0274, 0x1103),
+-	PCMCIA_DEVICE_MANF_CARD(0x0274, 0x1121),
+-	PCMCIA_DEVICE_MANF_CARD(0xc001, 0x0009),
+-	PCMCIA_DEVICE_PROD_ID12("2408LAN", "Ethernet", 0x352fff7f, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID1234("Socket", "CF 10/100 Ethernet Card", "Revision B", "05/11/06", 0xb38bcc2e, 0x4de88352, 0xeaca6c8d, 0x7e57c22e),
+-	PCMCIA_DEVICE_PROD_ID123("Cardwell", "PCMCIA", "ETHERNET", 0x9533672e, 0x281f1c5d, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID123("CNet  ", "CN30BC", "ETHERNET", 0x9fe55d3d, 0x85601198, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID123("Digital", "Ethernet", "Adapter", 0x9999ab35, 0x00b2e941, 0x4b0d829e),
+-	PCMCIA_DEVICE_PROD_ID123("Edimax Technology Inc.", "PCMCIA", "Ethernet Card", 0x738a0019, 0x281f1c5d, 0x5e9d92c0),
+-	PCMCIA_DEVICE_PROD_ID123("EFA   ", "EFA207", "ETHERNET", 0x3d294be4, 0xeb9aab6c, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID123("I-O DATA", "PCLA", "ETHERNET", 0x1d55d7ec, 0xe4c64d34, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID123("IO DATA", "PCLATE", "ETHERNET", 0x547e66dc, 0x6b260753, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID123("KingMax Technology Inc.", "EN10-T2", "PCMCIA Ethernet Card", 0x932b7189, 0x699e4436, 0x6f6652e0),
+-	PCMCIA_DEVICE_PROD_ID123("PCMCIA", "PCMCIA-ETHERNET-CARD", "UE2216", 0x281f1c5d, 0xd4cd2f20, 0xb87add82),
+-	PCMCIA_DEVICE_PROD_ID123("PCMCIA", "PCMCIA-ETHERNET-CARD", "UE2620", 0x281f1c5d, 0xd4cd2f20, 0x7d3d83a8),
+-	PCMCIA_DEVICE_PROD_ID1("2412LAN", 0x67f236ab),
+-	PCMCIA_DEVICE_PROD_ID12("ACCTON", "EN2212", 0xdfc6b5b2, 0xcb112a11),
+-	PCMCIA_DEVICE_PROD_ID12("ACCTON", "EN2216-PCMCIA-ETHERNET", 0xdfc6b5b2, 0x5542bfff),
+-	PCMCIA_DEVICE_PROD_ID12("Allied Telesis, K.K.", "CentreCOM LA100-PCM-T V2 100/10M LAN PC Card", 0xbb7fbdd7, 0xcd91cc68),
+-	PCMCIA_DEVICE_PROD_ID12("Allied Telesis K.K.", "LA100-PCM V2", 0x36634a66, 0xc6d05997),
+-	PCMCIA_DEVICE_PROD_ID12("Allied Telesis, K.K.", "CentreCOM LA-PCM_V2", 0xbb7fBdd7, 0x28e299f8),
+-	PCMCIA_DEVICE_PROD_ID12("Allied Telesis K.K.", "LA-PCM V3", 0x36634a66, 0x62241d96),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom", "AMB8010", 0x5070a7f9, 0x82f96e96),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom", "AMB8610", 0x5070a7f9, 0x86741224),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom Inc", "AMB8002", 0x93b15570, 0x75ec3efb),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom Inc", "AMB8002T", 0x93b15570, 0x461c5247),
+-	PCMCIA_DEVICE_PROD_ID12("AmbiCom Inc", "AMB8010", 0x93b15570, 0x82f96e96),
+-	PCMCIA_DEVICE_PROD_ID12("AnyCom", "ECO Ethernet", 0x578ba6e7, 0x0a9888c1),
+-	PCMCIA_DEVICE_PROD_ID12("AnyCom", "ECO Ethernet 10/100", 0x578ba6e7, 0x939fedbd),
+-	PCMCIA_DEVICE_PROD_ID12("AROWANA", "PCMCIA Ethernet LAN Card", 0x313adbc8, 0x08d9f190),
+-	PCMCIA_DEVICE_PROD_ID12("ASANTE", "FriendlyNet PC Card", 0x3a7ade0f, 0x41c64504),
+-	PCMCIA_DEVICE_PROD_ID12("Billionton", "LNT-10TB", 0x552ab682, 0xeeb1ba6a),
+-	PCMCIA_DEVICE_PROD_ID12("CF", "10Base-Ethernet", 0x44ebf863, 0x93ae4d79),
+-	PCMCIA_DEVICE_PROD_ID12("CNet", "CN40BC Ethernet", 0xbc477dde, 0xfba775a7),
+-	PCMCIA_DEVICE_PROD_ID12("COMPU-SHACK", "BASEline PCMCIA 10 MBit Ethernetadapter", 0xfa2e424d, 0xe9190d8a),
+-	PCMCIA_DEVICE_PROD_ID12("COMPU-SHACK", "FASTline PCMCIA 10/100 Fast-Ethernet", 0xfa2e424d, 0x3953d9b9),
+-	PCMCIA_DEVICE_PROD_ID12("CONTEC", "C-NET(PC)C-10L", 0x21cab552, 0xf6f90722),
+-	PCMCIA_DEVICE_PROD_ID12("corega", "FEther PCC-TXF", 0x0a21501a, 0xa51564a2),
+-	PCMCIA_DEVICE_PROD_ID12("corega", "Ether CF-TD", 0x0a21501a, 0x6589340a),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega Ether CF-TD LAN Card", 0x5261440f, 0x8797663b),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega EtherII PCC-T", 0x5261440f, 0xfa9d85bd),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega EtherII PCC-TD", 0x5261440f, 0xc49bd73d),
+-	PCMCIA_DEVICE_PROD_ID12("Corega K.K.", "corega EtherII PCC-TD", 0xd4fdcbd8, 0xc49bd73d),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega Ether PCC-T", 0x5261440f, 0x6705fcaa),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega Ether PCC-TD", 0x5261440f, 0x47d5ca83),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "corega FastEther PCC-TX", 0x5261440f, 0x485e85d9),
+-	PCMCIA_DEVICE_PROD_ID12("Corega,K.K.", "Ethernet LAN Card", 0x110d26d9, 0x9fd2f0a2),
+-	PCMCIA_DEVICE_PROD_ID12("corega,K.K.", "Ethernet LAN Card", 0x9791a90e, 0x9fd2f0a2),
+-	PCMCIA_DEVICE_PROD_ID12("corega K.K.", "(CG-LAPCCTXD)", 0x5261440f, 0x73ec0d88),
+-	PCMCIA_DEVICE_PROD_ID12("CouplerlessPCMCIA", "100BASE", 0xee5af0ad, 0x7c2add04),
+-	PCMCIA_DEVICE_PROD_ID12("CyQ've", "ELA-010", 0x77008979, 0x9d8d445d),
+-	PCMCIA_DEVICE_PROD_ID12("CyQ've", "ELA-110E 10/100M LAN Card", 0x77008979, 0xfd184814),
+-	PCMCIA_DEVICE_PROD_ID12("DataTrek.", "NetCard ", 0x5cd66d9d, 0x84697ce0),
+-	PCMCIA_DEVICE_PROD_ID12("Dayna Communications, Inc.", "CommuniCard E", 0x0c629325, 0xb4e7dbaf),
+-	PCMCIA_DEVICE_PROD_ID12("Digicom", "Palladio LAN 10/100", 0x697403d8, 0xe160b995),
+-	PCMCIA_DEVICE_PROD_ID12("Digicom", "Palladio LAN 10/100 Dongless", 0x697403d8, 0xa6d3b233),
+-	PCMCIA_DEVICE_PROD_ID12("DIGITAL", "DEPCM-XX", 0x69616cb3, 0xe600e76e),
+-	PCMCIA_DEVICE_PROD_ID12("D-Link", "DE-650", 0x1a424a1c, 0xf28c8398),
+-	PCMCIA_DEVICE_PROD_ID12("D-Link", "DE-660", 0x1a424a1c, 0xd9a1d05b),
+-	PCMCIA_DEVICE_PROD_ID12("D-Link", "DE-660+", 0x1a424a1c, 0x50dcd0ec),
+-	PCMCIA_DEVICE_PROD_ID12("D-Link", "DFE-650", 0x1a424a1c, 0x0f0073f9),
+-	PCMCIA_DEVICE_PROD_ID12("Dual Speed", "10/100 PC Card", 0x725b842d, 0xf1efee84),
+-	PCMCIA_DEVICE_PROD_ID12("Dual Speed", "10/100 Port Attached PC Card", 0x725b842d, 0x2db1f8e9),
+-	PCMCIA_DEVICE_PROD_ID12("Dynalink", "L10BC", 0x55632fd5, 0xdc65f2b1),
+-	PCMCIA_DEVICE_PROD_ID12("DYNALINK", "L10BC", 0x6a26d1cf, 0xdc65f2b1),
+-	PCMCIA_DEVICE_PROD_ID12("DYNALINK", "L10C", 0x6a26d1cf, 0xc4f84efb),
+-	PCMCIA_DEVICE_PROD_ID12("E-CARD", "E-CARD", 0x6701da11, 0x6701da11),
+-	PCMCIA_DEVICE_PROD_ID12("EIGER Labs Inc.", "Ethernet 10BaseT card", 0x53c864c6, 0xedd059f6),
+-	PCMCIA_DEVICE_PROD_ID12("EIGER Labs Inc.", "Ethernet Combo card", 0x53c864c6, 0x929c486c),
+-	PCMCIA_DEVICE_PROD_ID12("Ethernet", "Adapter", 0x00b2e941, 0x4b0d829e),
+-	PCMCIA_DEVICE_PROD_ID12("Ethernet Adapter", "E2000 PCMCIA Ethernet", 0x96767301, 0x71fbbc61),
+-	PCMCIA_DEVICE_PROD_ID12("Ethernet PCMCIA adapter", "EP-210", 0x8dd86181, 0xf2b52517),
+-	PCMCIA_DEVICE_PROD_ID12("Fast Ethernet", "Adapter", 0xb4be14e3, 0x4b0d829e),
+-	PCMCIA_DEVICE_PROD_ID12("Grey Cell", "GCS2000", 0x2a151fac, 0xf00555cb),
+-	PCMCIA_DEVICE_PROD_ID12("Grey Cell", "GCS2220", 0x2a151fac, 0xc1b7e327),
+-	PCMCIA_DEVICE_PROD_ID12("GVC", "NIC-2000p", 0x76e171bd, 0x6eb1c947),
+-	PCMCIA_DEVICE_PROD_ID12("IBM Corp.", "Ethernet", 0xe3736c88, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID12("IC-CARD", "IC-CARD", 0x60cb09a6, 0x60cb09a6),
+-	PCMCIA_DEVICE_PROD_ID12("IC-CARD+", "IC-CARD+", 0x93693494, 0x93693494),
+-	PCMCIA_DEVICE_PROD_ID12("IO DATA", "PCETTX", 0x547e66dc, 0x6fc5459b),
+-	PCMCIA_DEVICE_PROD_ID12("iPort", "10/100 Ethernet Card", 0x56c538d2, 0x11b0ffc0),
+-	PCMCIA_DEVICE_PROD_ID12("KANSAI ELECTRIC CO.,LTD", "KLA-PCM/T", 0xb18dc3b4, 0xcc51a956),
+-	PCMCIA_DEVICE_PROD_ID12("KENTRONICS", "KEP-230", 0xaf8144c9, 0x868f6616),
+-	PCMCIA_DEVICE_PROD_ID12("KCI", "PE520 PCMCIA Ethernet Adapter", 0xa89b87d3, 0x1eb88e64),
+-	PCMCIA_DEVICE_PROD_ID12("KINGMAX", "EN10T2T", 0x7bcb459a, 0xa5c81fa5),
+-	PCMCIA_DEVICE_PROD_ID12("Kingston", "KNE-PC2", 0x1128e633, 0xce2a89b3),
+-	PCMCIA_DEVICE_PROD_ID12("Kingston Technology Corp.", "EtheRx PC Card Ethernet Adapter", 0x313c7be3, 0x0afb54a2),
+-	PCMCIA_DEVICE_PROD_ID12("Laneed", "LD-10/100CD", 0x1b7827b2, 0xcda71d1c),
+-	PCMCIA_DEVICE_PROD_ID12("Laneed", "LD-CDF", 0x1b7827b2, 0xfec71e40),
+-	PCMCIA_DEVICE_PROD_ID12("Laneed", "LD-CDL/T", 0x1b7827b2, 0x79fba4f7),
+-	PCMCIA_DEVICE_PROD_ID12("Laneed", "LD-CDS", 0x1b7827b2, 0x931afaab),
+-	PCMCIA_DEVICE_PROD_ID12("LEMEL", "LM-N89TX PRO", 0xbbefb52f, 0xd2897a97),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "Combo PCMCIA EthernetCard (EC2T)", 0x0733cc81, 0x32ee8c78),
+-	PCMCIA_DEVICE_PROD_ID12("LINKSYS", "E-CARD", 0xf7cb0b07, 0x6701da11),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "EtherFast 10/100 Integrated PC Card (PCM100)", 0x0733cc81, 0x453c3f9d),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "EtherFast 10/100 PC Card (PCMPC100)", 0x0733cc81, 0x66c5a389),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "EtherFast 10/100 PC Card (PCMPC100 V2)", 0x0733cc81, 0x3a3b28e9),
+-	PCMCIA_DEVICE_PROD_ID12("Linksys", "HomeLink Phoneline + 10/100 Network PC Card (PCM100H1)", 0x733cc81, 0x7a3e5c3a),
+-	PCMCIA_DEVICE_PROD_ID12("Logitec", "LPM-LN100TX", 0x88fcdeda, 0x6d772737),
+-	PCMCIA_DEVICE_PROD_ID12("Logitec", "LPM-LN100TE", 0x88fcdeda, 0x0e714bee),
+-	PCMCIA_DEVICE_PROD_ID12("Logitec", "LPM-LN20T", 0x88fcdeda, 0x81090922),
+-	PCMCIA_DEVICE_PROD_ID12("Logitec", "LPM-LN10TE", 0x88fcdeda, 0xc1e2521c),
+-	PCMCIA_DEVICE_PROD_ID12("LONGSHINE", "PCMCIA Ethernet Card", 0xf866b0b0, 0x6f6652e0),
+-	PCMCIA_DEVICE_PROD_ID12("MACNICA", "ME1-JEIDA", 0x20841b68, 0xaf8a3578),
+-	PCMCIA_DEVICE_PROD_ID12("Macsense", "MPC-10", 0xd830297f, 0xd265c307),
+-	PCMCIA_DEVICE_PROD_ID12("Matsushita Electric Industrial Co.,LTD.", "CF-VEL211", 0x44445376, 0x8ded41d4),
+-	PCMCIA_DEVICE_PROD_ID12("MAXTECH", "PCN2000", 0x78d64bc0, 0xca0ca4b8),
+-	PCMCIA_DEVICE_PROD_ID12("MELCO", "LPC2-T", 0x481e0094, 0xa2eb0cf3),
+-	PCMCIA_DEVICE_PROD_ID12("MELCO", "LPC2-TX", 0x481e0094, 0x41a6916c),
+-	PCMCIA_DEVICE_PROD_ID12("Microcom C.E.", "Travel Card LAN 10/100", 0x4b91cec7, 0xe70220d6),
+-	PCMCIA_DEVICE_PROD_ID12("Microdyne", "NE4200", 0x2e6da59b, 0x0478e472),
+-	PCMCIA_DEVICE_PROD_ID12("MIDORI ELEC.", "LT-PCMT", 0x648d55c1, 0xbde526c7),
+-	PCMCIA_DEVICE_PROD_ID12("National Semiconductor", "InfoMover 4100", 0x36e1191f, 0x60c229b9),
+-	PCMCIA_DEVICE_PROD_ID12("National Semiconductor", "InfoMover NE4100", 0x36e1191f, 0xa6617ec8),
+-	PCMCIA_DEVICE_PROD_ID12("NEC", "PC-9801N-J12", 0x18df0ba0, 0xbc912d76),
+-	PCMCIA_DEVICE_PROD_ID12("NETGEAR", "FA410TX", 0x9aa79dc3, 0x60e5bc0e),
+-	PCMCIA_DEVICE_PROD_ID12("Network Everywhere", "Fast Ethernet 10/100 PC Card", 0x820a67b6, 0x31ed1a5f),
+-	PCMCIA_DEVICE_PROD_ID12("NextCom K.K.", "Next Hawk", 0xaedaec74, 0xad050ef1),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "10/100Mbps Ethernet Card", 0x281f1c5d, 0x6e41773b),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "Ethernet", 0x281f1c5d, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "ETHERNET", 0x281f1c5d, 0x3ff7175b),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "Ethernet 10BaseT Card", 0x281f1c5d, 0x4de2f6c8),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "Ethernet Card", 0x281f1c5d, 0x5e9d92c0),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "Ethernet Combo card", 0x281f1c5d, 0x929c486c),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "ETHERNET V1.0", 0x281f1c5d, 0x4d8817c8),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "FastEthernet", 0x281f1c5d, 0xfe871eeb),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "Fast-Ethernet", 0x281f1c5d, 0x45f1f3b4),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "FAST ETHERNET CARD", 0x281f1c5d, 0xec5dbca7),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA LAN", "Ethernet", 0x7500e246, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "LNT-10TN", 0x281f1c5d, 0xe707f641),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIAs", "ComboCard", 0xdcfe12d3, 0xcd8906cc),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "UE2212", 0x281f1c5d, 0xbf17199b),
+-	PCMCIA_DEVICE_PROD_ID12("PCMCIA", "    Ethernet NE2000 Compatible", 0x281f1c5d, 0x42d5d7e1),
+-	PCMCIA_DEVICE_PROD_ID12("PRETEC", "Ethernet CompactLAN 10baseT 3.3V", 0xebf91155, 0x30074c80),
+-	PCMCIA_DEVICE_PROD_ID12("PRETEC", "Ethernet CompactLAN 10BaseT 3.3V", 0xebf91155, 0x7f5a4f50),
+-	PCMCIA_DEVICE_PROD_ID12("Psion Dacom", "Gold Card Ethernet", 0xf5f025c2, 0x3a30e110),
+-	PCMCIA_DEVICE_PROD_ID12("=RELIA==", "Ethernet", 0xcdd0644a, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID12("RIOS Systems Co.", "PC CARD3 ETHERNET", 0x7dd33481, 0x10b41826),
+-	PCMCIA_DEVICE_PROD_ID12("RP", "1625B Ethernet NE2000 Compatible", 0xe3e66e22, 0xb96150df),
+-	PCMCIA_DEVICE_PROD_ID12("RPTI", "EP400 Ethernet NE2000 Compatible", 0xdc6f88fd, 0x4a7e2ae0),
+-	PCMCIA_DEVICE_PROD_ID12("RPTI", "EP401 Ethernet NE2000 Compatible", 0xdc6f88fd, 0x4bcbd7fd),
+-	PCMCIA_DEVICE_PROD_ID12("RPTI LTD.", "EP400", 0xc53ac515, 0x81e39388),
+-	PCMCIA_DEVICE_PROD_ID12("SCM", "Ethernet Combo card", 0xbdc3b102, 0x929c486c),
+-	PCMCIA_DEVICE_PROD_ID12("Seiko Epson Corp.", "Ethernet", 0x09928730, 0x00b2e941),
+-	PCMCIA_DEVICE_PROD_ID12("SMC", "EZCard-10-PCMCIA", 0xc4f8b18b, 0xfb21d265),
+-	PCMCIA_DEVICE_PROD_ID12("Socket Communications Inc", "Socket EA PCMCIA LAN Adapter Revision D", 0xc70a4760, 0x2ade483e),
+-	PCMCIA_DEVICE_PROD_ID12("Socket Communications Inc", "Socket EA PCMCIA LAN Adapter Revision E", 0xc70a4760, 0x5dd978a8),
+-	PCMCIA_DEVICE_PROD_ID12("TDK", "LAK-CD031 for PCMCIA", 0x1eae9475, 0x0ed386fa),
+-	PCMCIA_DEVICE_PROD_ID12("Telecom Device K.K.", "SuperSocket RE450T", 0x466b05f0, 0x8b74bc4f),
+-	PCMCIA_DEVICE_PROD_ID12("Telecom Device K.K.", "SuperSocket RE550T", 0x466b05f0, 0x33c8db2a),
+-	PCMCIA_DEVICE_PROD_ID13("Hypertec",  "EP401", 0x8787bec7, 0xf6e4a31e),
+-	PCMCIA_DEVICE_PROD_ID13("KingMax Technology Inc.", "Ethernet Card", 0x932b7189, 0x5e9d92c0),
+-	PCMCIA_DEVICE_PROD_ID13("LONGSHINE", "EP401", 0xf866b0b0, 0xf6e4a31e),
+-	PCMCIA_DEVICE_PROD_ID13("Xircom", "CFE-10", 0x2e3ee845, 0x22a49f89),
+-	PCMCIA_DEVICE_PROD_ID1("CyQ've 10 Base-T LAN CARD", 0x94faf360),
+-	PCMCIA_DEVICE_PROD_ID1("EP-210 PCMCIA LAN CARD.", 0x8850b4de),
+-	PCMCIA_DEVICE_PROD_ID1("ETHER-C16", 0x06a8514f),
+-	PCMCIA_DEVICE_PROD_ID1("NE2000 Compatible", 0x75b8ad5a),
+-	PCMCIA_DEVICE_PROD_ID2("EN-6200P2", 0xa996d078),
+-	/* too generic! */
+-	/* PCMCIA_DEVICE_PROD_ID12("PCMCIA", "10/100 Ethernet Card", 0x281f1c5d, 0x11b0ffc0), */
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "PCMCIA", "EN2218-LAN/MODEM", 0x281f1c5d, 0x570f348e, "cis/PCMLM28.cis"),
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "PCMCIA", "UE2218-LAN/MODEM", 0x281f1c5d, 0x6fdcacee, "cis/PCMLM28.cis"),
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "Psion Dacom", "Gold Card V34 Ethernet", 0xf5f025c2, 0x338e8155, "cis/PCMLM28.cis"),
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "Psion Dacom", "Gold Card V34 Ethernet GSM", 0xf5f025c2, 0x4ae85d35, "cis/PCMLM28.cis"),
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "LINKSYS", "PCMLM28", 0xf7cb0b07, 0x66881874, "cis/PCMLM28.cis"),
+-	PCMCIA_PFC_DEVICE_CIS_PROD_ID12(0, "TOSHIBA", "Modem/LAN Card", 0xb4585a1a, 0x53f922f8, "cis/PCMLM28.cis"),
+-	PCMCIA_MFC_DEVICE_CIS_PROD_ID12(0, "DAYNA COMMUNICATIONS", "LAN AND MODEM MULTIFUNCTION", 0x8fdf8f89, 0xdd5ed9e8, "cis/DP83903.cis"),
+-	PCMCIA_MFC_DEVICE_CIS_PROD_ID4(0, "NSC MF LAN/Modem", 0x58fc6056, "cis/DP83903.cis"),
+-	PCMCIA_MFC_DEVICE_CIS_MANF_CARD(0, 0x0175, 0x0000, "cis/DP83903.cis"),
+-	PCMCIA_DEVICE_CIS_PROD_ID12("Allied Telesis,K.K", "Ethernet LAN Card", 0x2ad62f3c, 0x9fd2f0a2, "cis/LA-PCM.cis"),
+-	PCMCIA_DEVICE_CIS_PROD_ID12("KTI", "PE520 PLUS", 0xad180345, 0x9d58d392, "cis/PE520.cis"),
+-	PCMCIA_DEVICE_CIS_PROD_ID12("NDC", "Ethernet", 0x01c43ae1, 0x00b2e941, "cis/NE2K.cis"),
+-	PCMCIA_DEVICE_CIS_PROD_ID12("PMX   ", "PE-200", 0x34f3f1c8, 0x10b59f8c, "cis/PE-200.cis"),
+-	PCMCIA_DEVICE_CIS_PROD_ID12("TAMARACK", "Ethernet", 0xcf434fba, 0x00b2e941, "cis/tamarack.cis"),
+-	PCMCIA_DEVICE_PROD_ID12("Ethernet", "CF Size PC Card", 0x00b2e941, 0x43ac239b),
+-	PCMCIA_DEVICE_PROD_ID123("Fast Ethernet", "CF Size PC Card", "1.0",
+-		0xb4be14e3, 0x43ac239b, 0x0877b627),
+-	PCMCIA_DEVICE_NULL
+-};
+-MODULE_DEVICE_TABLE(pcmcia, pcnet_ids);
+-MODULE_FIRMWARE("cis/PCMLM28.cis");
+-MODULE_FIRMWARE("cis/DP83903.cis");
+-MODULE_FIRMWARE("cis/LA-PCM.cis");
+-MODULE_FIRMWARE("cis/PE520.cis");
+-MODULE_FIRMWARE("cis/NE2K.cis");
+-MODULE_FIRMWARE("cis/PE-200.cis");
+-MODULE_FIRMWARE("cis/tamarack.cis");
+-
+-static struct pcmcia_driver pcnet_driver = {
+-	.name		= "pcnet_cs",
+-	.probe		= pcnet_probe,
+-	.remove		= pcnet_detach,
+-	.owner		= THIS_MODULE,
+-	.id_table	= pcnet_ids,
+-	.suspend	= pcnet_suspend,
+-	.resume		= pcnet_resume,
+-};
+-module_pcmcia_driver(pcnet_driver);
+diff --git a/drivers/net/ethernet/8390/stnic.c b/drivers/net/ethernet/8390/stnic.c
+deleted file mode 100644
+index 6cc0e190a..000000000
+--- a/drivers/net/ethernet/8390/stnic.c
++++ /dev/null
+@@ -1,300 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* stnic.c : A SH7750 specific part of driver for NS DP83902A ST-NIC.
+- *
+- * Copyright (C) 1999 kaz Kojima
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/interrupt.h>
+-#include <linux/ioport.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/init.h>
+-#include <linux/delay.h>
+-
+-#include <asm/io.h>
+-#include <mach-se/mach/se.h>
+-#include <asm/machvec.h>
+-#ifdef CONFIG_SH_STANDARD_BIOS
+-#include <asm/sh_bios.h>
+-#endif
+-
+-#include "8390.h"
+-
+-#define DRV_NAME "stnic"
+-
+-#define byte	unsigned char
+-#define half	unsigned short
+-#define word	unsigned int
+-#define vbyte	volatile unsigned char
+-#define vhalf	volatile unsigned short
+-#define vword	volatile unsigned int
+-
+-#define STNIC_RUN	0x01	/* 1 == Run, 0 == reset. */
+-
+-#define START_PG	0	/* First page of TX buffer */
+-#define STOP_PG		128	/* Last page +1 of RX ring */
+-
+-/* Alias */
+-#define STNIC_CR	E8390_CMD
+-#define PG0_RSAR0	EN0_RSARLO
+-#define PG0_RSAR1	EN0_RSARHI
+-#define PG0_RBCR0	EN0_RCNTLO
+-#define PG0_RBCR1	EN0_RCNTHI
+-
+-#define CR_RRD		E8390_RREAD
+-#define CR_RWR		E8390_RWRITE
+-#define CR_PG0		E8390_PAGE0
+-#define CR_STA		E8390_START
+-#define CR_RDMA		E8390_NODMA
+-
+-/* FIXME! YOU MUST SET YOUR OWN ETHER ADDRESS.  */
+-static byte stnic_eadr[6] =
+-{0x00, 0xc0, 0x6e, 0x00, 0x00, 0x07};
+-
+-static struct net_device *stnic_dev;
+-
+-static void stnic_reset (struct net_device *dev);
+-static void stnic_get_hdr (struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-			   int ring_page);
+-static void stnic_block_input (struct net_device *dev, int count,
+-			       struct sk_buff *skb , int ring_offset);
+-static void stnic_block_output (struct net_device *dev, int count,
+-				const unsigned char *buf, int start_page);
+-
+-static void stnic_init (struct net_device *dev);
+-
+-static u32 stnic_msg_enable;
+-
+-module_param_named(msg_enable, stnic_msg_enable, uint, 0444);
+-MODULE_PARM_DESC(msg_enable, "Debug message level (see linux/netdevice.h for bitmap)");
+-
+-/* SH7750 specific read/write io. */
+-static inline void
+-STNIC_DELAY (void)
+-{
+-  vword trash;
+-  trash = *(vword *) 0xa0000000;
+-  trash = *(vword *) 0xa0000000;
+-  trash = *(vword *) 0xa0000000;
+-}
+-
+-static inline byte
+-STNIC_READ (int reg)
+-{
+-  byte val;
+-
+-  val = (*(vhalf *) (PA_83902 + ((reg) << 1)) >> 8) & 0xff;
+-  STNIC_DELAY ();
+-  return val;
+-}
+-
+-static inline void
+-STNIC_WRITE (int reg, byte val)
+-{
+-  *(vhalf *) (PA_83902 + ((reg) << 1)) = ((half) (val) << 8);
+-  STNIC_DELAY ();
+-}
+-
+-static int __init stnic_probe(void)
+-{
+-  struct net_device *dev;
+-  struct ei_device *ei_local;
+-  int err;
+-
+-  /* If we are not running on a SolutionEngine, give up now */
+-  if (! MACH_SE)
+-    return -ENODEV;
+-
+-  /* New style probing API */
+-  dev = alloc_ei_netdev();
+-  if (!dev)
+-	return -ENOMEM;
+-
+-#ifdef CONFIG_SH_STANDARD_BIOS
+-  sh_bios_get_node_addr (stnic_eadr);
+-#endif
+-  eth_hw_addr_set(dev, stnic_eadr);
+-
+-  /* Set the base address to point to the NIC, not the "real" base! */
+-  dev->base_addr = 0x1000;
+-  dev->irq = IRQ_STNIC;
+-  dev->netdev_ops = &ei_netdev_ops;
+-
+-  /* Snarf the interrupt now.  There's no point in waiting since we cannot
+-     share and the board will usually be enabled. */
+-  err = request_irq (dev->irq, ei_interrupt, 0, DRV_NAME, dev);
+-  if (err)  {
+-	netdev_emerg(dev, " unable to get IRQ %d.\n", dev->irq);
+-	free_netdev(dev);
+-	return err;
+-  }
+-
+-  ei_status.name = dev->name;
+-  ei_status.word16 = 1;
+-#ifdef __LITTLE_ENDIAN__
+-  ei_status.bigendian = 0;
+-#else
+-  ei_status.bigendian = 1;
+-#endif
+-  ei_status.tx_start_page = START_PG;
+-  ei_status.rx_start_page = START_PG + TX_PAGES;
+-  ei_status.stop_page = STOP_PG;
+-
+-  ei_status.reset_8390 = &stnic_reset;
+-  ei_status.get_8390_hdr = &stnic_get_hdr;
+-  ei_status.block_input = &stnic_block_input;
+-  ei_status.block_output = &stnic_block_output;
+-
+-  stnic_init (dev);
+-  ei_local = netdev_priv(dev);
+-  ei_local->msg_enable = stnic_msg_enable;
+-
+-  err = register_netdev(dev);
+-  if (err) {
+-    free_irq(dev->irq, dev);
+-    free_netdev(dev);
+-    return err;
+-  }
+-  stnic_dev = dev;
+-
+-  netdev_info(dev, "NS ST-NIC 83902A\n");
+-
+-  return 0;
+-}
+-
+-static void
+-stnic_reset (struct net_device *dev)
+-{
+-  struct ei_device *ei_local = netdev_priv(dev);
+-
+-  *(vhalf *) PA_83902_RST = 0;
+-  udelay (5);
+-  netif_warn(ei_local, hw, dev, "8390 reset done (%ld).\n", jiffies);
+-  *(vhalf *) PA_83902_RST = ~0;
+-  udelay (5);
+-}
+-
+-static void
+-stnic_get_hdr (struct net_device *dev, struct e8390_pkt_hdr *hdr,
+-	       int ring_page)
+-{
+-  struct ei_device *ei_local = netdev_priv(dev);
+-
+-  half buf[2];
+-
+-  STNIC_WRITE (PG0_RSAR0, 0);
+-  STNIC_WRITE (PG0_RSAR1, ring_page);
+-  STNIC_WRITE (PG0_RBCR0, 4);
+-  STNIC_WRITE (PG0_RBCR1, 0);
+-  STNIC_WRITE (STNIC_CR, CR_RRD | CR_PG0 | CR_STA);
+-
+-  buf[0] = *(vhalf *) PA_83902_IF;
+-  STNIC_DELAY ();
+-  buf[1] = *(vhalf *) PA_83902_IF;
+-  STNIC_DELAY ();
+-  hdr->next = buf[0] >> 8;
+-  hdr->status = buf[0] & 0xff;
+-#ifdef __LITTLE_ENDIAN__
+-  hdr->count = buf[1];
+-#else
+-  hdr->count = ((buf[1] >> 8) & 0xff) | (buf[1] << 8);
+-#endif
+-
+-  netif_dbg(ei_local, probe, dev, "ring %x status %02x next %02x count %04x.\n",
+-	    ring_page, hdr->status, hdr->next, hdr->count);
+-
+-  STNIC_WRITE (STNIC_CR, CR_RDMA | CR_PG0 | CR_STA);
+-}
+-
+-/* Block input and output, similar to the Crynwr packet driver. If you are
+-   porting to a new ethercard look at the packet driver source for hints.
+-   The HP LAN doesn't use shared memory -- we put the packet
+-   out through the "remote DMA" dataport. */
+-
+-static void
+-stnic_block_input (struct net_device *dev, int length, struct sk_buff *skb,
+-		   int offset)
+-{
+-  char *buf = skb->data;
+-  half val;
+-
+-  STNIC_WRITE (PG0_RSAR0, offset & 0xff);
+-  STNIC_WRITE (PG0_RSAR1, offset >> 8);
+-  STNIC_WRITE (PG0_RBCR0, length & 0xff);
+-  STNIC_WRITE (PG0_RBCR1, length >> 8);
+-  STNIC_WRITE (STNIC_CR, CR_RRD | CR_PG0 | CR_STA);
+-
+-  if (length & 1)
+-    length++;
+-
+-  while (length > 0)
+-    {
+-      val = *(vhalf *) PA_83902_IF;
+-#ifdef __LITTLE_ENDIAN__
+-      *buf++ = val & 0xff;
+-      *buf++ = val >> 8;
+-#else
+-      *buf++ = val >> 8;
+-      *buf++ = val & 0xff;
+-#endif
+-      STNIC_DELAY ();
+-      length -= sizeof (half);
+-    }
+-
+-  STNIC_WRITE (STNIC_CR, CR_RDMA | CR_PG0 | CR_STA);
+-}
+-
+-static void
+-stnic_block_output (struct net_device *dev, int length,
+-		    const unsigned char *buf, int output_page)
+-{
+-  STNIC_WRITE (PG0_RBCR0, 1);	/* Write non-zero value */
+-  STNIC_WRITE (STNIC_CR, CR_RRD | CR_PG0 | CR_STA);
+-  STNIC_DELAY ();
+-
+-  STNIC_WRITE (PG0_RBCR0, length & 0xff);
+-  STNIC_WRITE (PG0_RBCR1, length >> 8);
+-  STNIC_WRITE (PG0_RSAR0, 0);
+-  STNIC_WRITE (PG0_RSAR1, output_page);
+-  STNIC_WRITE (STNIC_CR, CR_RWR | CR_PG0 | CR_STA);
+-
+-  if (length & 1)
+-    length++;
+-
+-  while (length > 0)
+-    {
+-#ifdef __LITTLE_ENDIAN__
+-      *(vhalf *) PA_83902_IF = ((half) buf[1] << 8) | buf[0];
+-#else
+-      *(vhalf *) PA_83902_IF = ((half) buf[0] << 8) | buf[1];
+-#endif
+-      STNIC_DELAY ();
+-      buf += sizeof (half);
+-      length -= sizeof (half);
+-    }
+-
+-  STNIC_WRITE (STNIC_CR, CR_RDMA | CR_PG0 | CR_STA);
+-}
+-
+-/* This function resets the STNIC if something screws up.  */
+-static void
+-stnic_init (struct net_device *dev)
+-{
+-  stnic_reset (dev);
+-  NS8390_init (dev, 0);
+-}
+-
+-static void __exit stnic_cleanup(void)
+-{
+-	unregister_netdev(stnic_dev);
+-	free_irq(stnic_dev->irq, stnic_dev);
+-	free_netdev(stnic_dev);
+-}
+-
+-module_init(stnic_probe);
+-module_exit(stnic_cleanup);
+-MODULE_DESCRIPTION("National Semiconductor DP83902AV ethernet driver");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/xsurf100.c b/drivers/net/ethernet/8390/xsurf100.c
+deleted file mode 100644
+index fe7a74707..000000000
+--- a/drivers/net/ethernet/8390/xsurf100.c
++++ /dev/null
+@@ -1,377 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/platform_device.h>
+-#include <linux/zorro.h>
+-#include <net/ax88796.h>
+-#include <asm/amigaints.h>
+-
+-#define ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF100 \
+-		ZORRO_ID(INDIVIDUAL_COMPUTERS, 0x64, 0)
+-
+-#define XS100_IRQSTATUS_BASE 0x40
+-#define XS100_8390_BASE 0x800
+-
+-/* Longword-access area. Translated to 2 16-bit access cycles by the
+- * X-Surf 100 FPGA
+- */
+-#define XS100_8390_DATA32_BASE 0x8000
+-#define XS100_8390_DATA32_SIZE 0x2000
+-/* Sub-Areas for fast data register access; addresses relative to area begin */
+-#define XS100_8390_DATA_READ32_BASE 0x0880
+-#define XS100_8390_DATA_WRITE32_BASE 0x0C80
+-#define XS100_8390_DATA_AREA_SIZE 0x80
+-
+-/* force unsigned long back to 'void __iomem *' */
+-#define ax_convert_addr(_a) ((void __force __iomem *)(_a))
+-
+-#define ei_inb(_a) z_readb(ax_convert_addr(_a))
+-#define ei_outb(_v, _a) z_writeb(_v, ax_convert_addr(_a))
+-
+-#define ei_inw(_a) z_readw(ax_convert_addr(_a))
+-#define ei_outw(_v, _a) z_writew(_v, ax_convert_addr(_a))
+-
+-#define ei_inb_p(_a) ei_inb(_a)
+-#define ei_outb_p(_v, _a) ei_outb(_v, _a)
+-
+-/* define EI_SHIFT() to take into account our register offsets */
+-#define EI_SHIFT(x) (ei_local->reg_offset[(x)])
+-
+-/* Ensure we have our RCR base value */
+-#define AX88796_PLATFORM
+-
+-#include "8390.h"
+-
+-/* from ne.c */
+-#define NE_CMD		EI_SHIFT(0x00)
+-#define NE_RESET	EI_SHIFT(0x1f)
+-#define NE_DATAPORT	EI_SHIFT(0x10)
+-
+-struct xsurf100_ax_plat_data {
+-	struct ax_plat_data ax;
+-	void __iomem *base_regs;
+-	void __iomem *data_area;
+-};
+-
+-static int is_xsurf100_network_irq(struct platform_device *pdev)
+-{
+-	struct xsurf100_ax_plat_data *xs100 = dev_get_platdata(&pdev->dev);
+-
+-	return (readw(xs100->base_regs + XS100_IRQSTATUS_BASE) & 0xaaaa) != 0;
+-}
+-
+-/* These functions guarantee that the iomem is accessed with 32 bit
+- * cycles only. z_memcpy_fromio / z_memcpy_toio don't
+- */
+-static void z_memcpy_fromio32(void *dst, const void __iomem *src, size_t bytes)
+-{
+-	while (bytes > 32) {
+-		asm __volatile__
+-		   ("movem.l (%0)+,%%d0-%%d7\n"
+-		    "movem.l %%d0-%%d7,(%1)\n"
+-		    "adda.l #32,%1" : "=a"(src), "=a"(dst)
+-		    : "0"(src), "1"(dst) : "d0", "d1", "d2", "d3", "d4",
+-					   "d5", "d6", "d7", "memory");
+-		bytes -= 32;
+-	}
+-	while (bytes) {
+-		*(uint32_t *)dst = z_readl(src);
+-		src += 4;
+-		dst += 4;
+-		bytes -= 4;
+-	}
+-}
+-
+-static void z_memcpy_toio32(void __iomem *dst, const void *src, size_t bytes)
+-{
+-	while (bytes) {
+-		z_writel(*(const uint32_t *)src, dst);
+-		src += 4;
+-		dst += 4;
+-		bytes -= 4;
+-	}
+-}
+-
+-static void xs100_write(struct net_device *dev, const void *src,
+-			unsigned int count)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct platform_device *pdev = to_platform_device(dev->dev.parent);
+-	struct xsurf100_ax_plat_data *xs100 = dev_get_platdata(&pdev->dev);
+-
+-	/* copy whole blocks */
+-	while (count > XS100_8390_DATA_AREA_SIZE) {
+-		z_memcpy_toio32(xs100->data_area +
+-				XS100_8390_DATA_WRITE32_BASE, src,
+-				XS100_8390_DATA_AREA_SIZE);
+-		src += XS100_8390_DATA_AREA_SIZE;
+-		count -= XS100_8390_DATA_AREA_SIZE;
+-	}
+-	/* copy whole dwords */
+-	z_memcpy_toio32(xs100->data_area + XS100_8390_DATA_WRITE32_BASE,
+-			src, count & ~3);
+-	src += count & ~3;
+-	if (count & 2) {
+-		ei_outw(*(uint16_t *)src, ei_local->mem + NE_DATAPORT);
+-		src += 2;
+-	}
+-	if (count & 1)
+-		ei_outb(*(uint8_t *)src, ei_local->mem + NE_DATAPORT);
+-}
+-
+-static void xs100_read(struct net_device *dev, void *dst, unsigned int count)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	struct platform_device *pdev = to_platform_device(dev->dev.parent);
+-	struct xsurf100_ax_plat_data *xs100 = dev_get_platdata(&pdev->dev);
+-
+-	/* copy whole blocks */
+-	while (count > XS100_8390_DATA_AREA_SIZE) {
+-		z_memcpy_fromio32(dst, xs100->data_area +
+-				  XS100_8390_DATA_READ32_BASE,
+-				  XS100_8390_DATA_AREA_SIZE);
+-		dst += XS100_8390_DATA_AREA_SIZE;
+-		count -= XS100_8390_DATA_AREA_SIZE;
+-	}
+-	/* copy whole dwords */
+-	z_memcpy_fromio32(dst, xs100->data_area + XS100_8390_DATA_READ32_BASE,
+-			  count & ~3);
+-	dst += count & ~3;
+-	if (count & 2) {
+-		*(uint16_t *)dst = ei_inw(ei_local->mem + NE_DATAPORT);
+-		dst += 2;
+-	}
+-	if (count & 1)
+-		*(uint8_t *)dst = ei_inb(ei_local->mem + NE_DATAPORT);
+-}
+-
+-/* Block input and output, similar to the Crynwr packet driver. If
+- * you are porting to a new ethercard, look at the packet driver
+- * source for hints. The NEx000 doesn't share the on-board packet
+- * memory -- you have to put the packet out through the "remote DMA"
+- * dataport using ei_outb.
+- */
+-static void xs100_block_input(struct net_device *dev, int count,
+-			      struct sk_buff *skb, int ring_offset)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *nic_base = ei_local->mem;
+-	char *buf = skb->data;
+-
+-	if (ei_local->dmaing) {
+-		netdev_err(dev,
+-			   "DMAing conflict in %s [DMAstat:%d][irqlock:%d]\n",
+-			   __func__,
+-			   ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-
+-	ei_outb(E8390_NODMA + E8390_PAGE0 + E8390_START, nic_base + NE_CMD);
+-	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
+-	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
+-	ei_outb(ring_offset & 0xff, nic_base + EN0_RSARLO);
+-	ei_outb(ring_offset >> 8, nic_base + EN0_RSARHI);
+-	ei_outb(E8390_RREAD + E8390_START, nic_base + NE_CMD);
+-
+-	xs100_read(dev, buf, count);
+-
+-	ei_local->dmaing &= ~1;
+-}
+-
+-static void xs100_block_output(struct net_device *dev, int count,
+-			       const unsigned char *buf, const int start_page)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-	void __iomem *nic_base = ei_local->mem;
+-	unsigned long dma_start;
+-
+-	/* Round the count up for word writes. Do we need to do this?
+-	 * What effect will an odd byte count have on the 8390?  I
+-	 * should check someday.
+-	 */
+-	if (ei_local->word16 && (count & 0x01))
+-		count++;
+-
+-	/* This *shouldn't* happen. If it does, it's the last thing
+-	 * you'll see
+-	 */
+-	if (ei_local->dmaing) {
+-		netdev_err(dev,
+-			   "DMAing conflict in %s [DMAstat:%d][irqlock:%d]\n",
+-			   __func__,
+-			   ei_local->dmaing, ei_local->irqlock);
+-		return;
+-	}
+-
+-	ei_local->dmaing |= 0x01;
+-	/* We should already be in page 0, but to be safe... */
+-	ei_outb(E8390_PAGE0 + E8390_START + E8390_NODMA, nic_base + NE_CMD);
+-
+-	ei_outb(ENISR_RDC, nic_base + EN0_ISR);
+-
+-	/* Now the normal output. */
+-	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
+-	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
+-	ei_outb(0x00, nic_base + EN0_RSARLO);
+-	ei_outb(start_page, nic_base + EN0_RSARHI);
+-
+-	ei_outb(E8390_RWRITE + E8390_START, nic_base + NE_CMD);
+-
+-	xs100_write(dev, buf, count);
+-
+-	dma_start = jiffies;
+-
+-	while ((ei_inb(nic_base + EN0_ISR) & ENISR_RDC) == 0) {
+-		if (jiffies - dma_start > 2 * HZ / 100) {	/* 20ms */
+-			netdev_warn(dev, "timeout waiting for Tx RDC.\n");
+-			ei_local->reset_8390(dev);
+-			ax_NS8390_reinit(dev);
+-			break;
+-		}
+-	}
+-
+-	ei_outb(ENISR_RDC, nic_base + EN0_ISR);	/* Ack intr. */
+-	ei_local->dmaing &= ~0x01;
+-}
+-
+-static int xsurf100_probe(struct zorro_dev *zdev,
+-			  const struct zorro_device_id *ent)
+-{
+-	struct platform_device *pdev;
+-	struct xsurf100_ax_plat_data ax88796_data;
+-	struct resource res[2] = {
+-		DEFINE_RES_NAMED(IRQ_AMIGA_PORTS, 1, NULL,
+-				 IORESOURCE_IRQ | IORESOURCE_IRQ_SHAREABLE),
+-		DEFINE_RES_MEM(zdev->resource.start + XS100_8390_BASE,
+-			       4 * 0x20)
+-	};
+-	int reg;
+-	/* This table is referenced in the device structure, so it must
+-	 * outlive the scope of xsurf100_probe.
+-	 */
+-	static u32 reg_offsets[32];
+-	int ret = 0;
+-
+-	/* X-Surf 100 control and 32 bit ring buffer data access areas.
+-	 * These resources are not used by the ax88796 driver, so must
+-	 * be requested here and passed via platform data.
+-	 */
+-
+-	if (!request_mem_region(zdev->resource.start, 0x100, zdev->name)) {
+-		dev_err(&zdev->dev, "cannot reserve X-Surf 100 control registers\n");
+-		return -ENXIO;
+-	}
+-
+-	if (!request_mem_region(zdev->resource.start +
+-				XS100_8390_DATA32_BASE,
+-				XS100_8390_DATA32_SIZE,
+-				"X-Surf 100 32-bit data access")) {
+-		dev_err(&zdev->dev, "cannot reserve 32-bit area\n");
+-		ret = -ENXIO;
+-		goto exit_req;
+-	}
+-
+-	for (reg = 0; reg < 0x20; reg++)
+-		reg_offsets[reg] = 4 * reg;
+-
+-	memset(&ax88796_data, 0, sizeof(ax88796_data));
+-	ax88796_data.ax.flags = AXFLG_HAS_EEPROM;
+-	ax88796_data.ax.wordlength = 2;
+-	ax88796_data.ax.dcr_val = 0x48;
+-	ax88796_data.ax.rcr_val = 0x40;
+-	ax88796_data.ax.reg_offsets = reg_offsets;
+-	ax88796_data.ax.check_irq = is_xsurf100_network_irq;
+-	ax88796_data.base_regs = ioremap(zdev->resource.start, 0x100);
+-
+-	/* error handling for ioremap regs */
+-	if (!ax88796_data.base_regs) {
+-		dev_err(&zdev->dev, "Cannot ioremap area %pR (registers)\n",
+-			&zdev->resource);
+-
+-		ret = -ENXIO;
+-		goto exit_req2;
+-	}
+-
+-	ax88796_data.data_area = ioremap(zdev->resource.start +
+-			XS100_8390_DATA32_BASE, XS100_8390_DATA32_SIZE);
+-
+-	/* error handling for ioremap data */
+-	if (!ax88796_data.data_area) {
+-		dev_err(&zdev->dev,
+-			"Cannot ioremap area %pR offset %x (32-bit access)\n",
+-			&zdev->resource,  XS100_8390_DATA32_BASE);
+-
+-		ret = -ENXIO;
+-		goto exit_mem;
+-	}
+-
+-	ax88796_data.ax.block_output = xs100_block_output;
+-	ax88796_data.ax.block_input = xs100_block_input;
+-
+-	pdev = platform_device_register_resndata(&zdev->dev, "ax88796",
+-						 zdev->slotaddr, res, 2,
+-						 &ax88796_data,
+-						 sizeof(ax88796_data));
+-
+-	if (IS_ERR(pdev)) {
+-		dev_err(&zdev->dev, "cannot register platform device\n");
+-		ret = -ENXIO;
+-		goto exit_mem2;
+-	}
+-
+-	zorro_set_drvdata(zdev, pdev);
+-
+-	if (!ret)
+-		return 0;
+-
+- exit_mem2:
+-	iounmap(ax88796_data.data_area);
+-
+- exit_mem:
+-	iounmap(ax88796_data.base_regs);
+-
+- exit_req2:
+-	release_mem_region(zdev->resource.start + XS100_8390_DATA32_BASE,
+-			   XS100_8390_DATA32_SIZE);
+-
+- exit_req:
+-	release_mem_region(zdev->resource.start, 0x100);
+-
+-	return ret;
+-}
+-
+-static void xsurf100_remove(struct zorro_dev *zdev)
+-{
+-	struct platform_device *pdev = zorro_get_drvdata(zdev);
+-	struct xsurf100_ax_plat_data *xs100 = dev_get_platdata(&pdev->dev);
+-
+-	platform_device_unregister(pdev);
+-
+-	iounmap(xs100->base_regs);
+-	release_mem_region(zdev->resource.start, 0x100);
+-	iounmap(xs100->data_area);
+-	release_mem_region(zdev->resource.start + XS100_8390_DATA32_BASE,
+-			   XS100_8390_DATA32_SIZE);
+-}
+-
+-static const struct zorro_device_id xsurf100_zorro_tbl[] = {
+-	{ ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF100, },
+-	{ 0 }
+-};
+-
+-MODULE_DEVICE_TABLE(zorro, xsurf100_zorro_tbl);
+-
+-static struct zorro_driver xsurf100_driver = {
+-	.name           = "xsurf100",
+-	.id_table       = xsurf100_zorro_tbl,
+-	.probe          = xsurf100_probe,
+-	.remove         = xsurf100_remove,
+-};
+-
+-module_driver(xsurf100_driver, zorro_register_driver, zorro_unregister_driver);
+-
+-MODULE_DESCRIPTION("X-Surf 100 driver");
+-MODULE_AUTHOR("Michael Karcher <kernel@mkarcher.dialup.fu-berlin.de>");
+-MODULE_LICENSE("GPL v2");
+diff --git a/drivers/net/ethernet/8390/zorro8390.c b/drivers/net/ethernet/8390/zorro8390.c
+deleted file mode 100644
+index c24dd4fe7..000000000
+--- a/drivers/net/ethernet/8390/zorro8390.c
++++ /dev/null
+@@ -1,447 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- *  Amiga Linux/m68k and Linux/PPC Zorro NS8390 Ethernet Driver
+- *
+- *  (C) Copyright 1998-2000 by some Elitist 680x0 Users(TM)
+- *
+- *  ---------------------------------------------------------------------------
+- *
+- *  This program is based on all the other NE2000 drivers for Linux
+- *
+- *  ---------------------------------------------------------------------------
+- *
+- *  The Ariadne II and X-Surf are Zorro-II boards containing Realtek RTL8019AS
+- *  Ethernet Controllers.
+- */
+-
+-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/init.h>
+-#include <linux/delay.h>
+-#include <linux/netdevice.h>
+-#include <linux/etherdevice.h>
+-#include <linux/zorro.h>
+-#include <linux/jiffies.h>
+-
+-#include <asm/irq.h>
+-#include <asm/amigaints.h>
+-#include <asm/amigahw.h>
+-
+-#define EI_SHIFT(x)		(ei_local->reg_offset[x])
+-#define ei_inb(port)		in_8(port)
+-#define ei_outb(val, port)	out_8(port, val)
+-#define ei_inb_p(port)		in_8(port)
+-#define ei_outb_p(val, port)	out_8(port, val)
+-
+-static const char version[] =
+-	"8390.c:v1.10cvs 9/23/94 Donald Becker (becker@cesdis.gsfc.nasa.gov)\n";
+-
+-#include "lib8390.c"
+-
+-#define DRV_NAME	"zorro8390"
+-
+-#define NE_BASE		(dev->base_addr)
+-#define NE_CMD		(0x00 * 2)
+-#define NE_DATAPORT	(0x10 * 2)	/* NatSemi-defined port window offset */
+-#define NE_RESET	(0x1f * 2)	/* Issue a read to reset,
+-					 * a write to clear. */
+-#define NE_IO_EXTENT	(0x20 * 2)
+-
+-#define NE_EN0_ISR	(0x07 * 2)
+-#define NE_EN0_DCFG	(0x0e * 2)
+-
+-#define NE_EN0_RSARLO	(0x08 * 2)
+-#define NE_EN0_RSARHI	(0x09 * 2)
+-#define NE_EN0_RCNTLO	(0x0a * 2)
+-#define NE_EN0_RXCR	(0x0c * 2)
+-#define NE_EN0_TXCR	(0x0d * 2)
+-#define NE_EN0_RCNTHI	(0x0b * 2)
+-#define NE_EN0_IMR	(0x0f * 2)
+-
+-#define NESM_START_PG	0x40	/* First page of TX buffer */
+-#define NESM_STOP_PG	0x80	/* Last page +1 of RX ring */
+-
+-#define WORDSWAP(a)	((((a) >> 8) & 0xff) | ((a) << 8))
+-
+-static struct card_info {
+-	zorro_id id;
+-	const char *name;
+-	unsigned int offset;
+-} cards[] = {
+-	{ ZORRO_PROD_VILLAGE_TRONIC_ARIADNE2, "Ariadne II", 0x0600 },
+-	{ ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF, "X-Surf", 0x8600 },
+-};
+-
+-/* Hard reset the card.  This used to pause for the same period that a
+- * 8390 reset command required, but that shouldn't be necessary.
+- */
+-static void zorro8390_reset_8390(struct net_device *dev)
+-{
+-	unsigned long reset_start_time = jiffies;
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	netif_dbg(ei_local, hw, dev, "resetting - t=%ld...\n", jiffies);
+-
+-	z_writeb(z_readb(NE_BASE + NE_RESET), NE_BASE + NE_RESET);
+-
+-	ei_status.txing = 0;
+-	ei_status.dmaing = 0;
+-
+-	/* This check _should_not_ be necessary, omit eventually. */
+-	while ((z_readb(NE_BASE + NE_EN0_ISR) & ENISR_RESET) == 0)
+-		if (time_after(jiffies, reset_start_time + 2 * HZ / 100)) {
+-			netdev_warn(dev, "%s: did not complete\n", __func__);
+-			break;
+-		}
+-	z_writeb(ENISR_RESET, NE_BASE + NE_EN0_ISR);	/* Ack intr */
+-}
+-
+-/* Grab the 8390 specific header. Similar to the block_input routine, but
+- * we don't need to be concerned with ring wrap as the header will be at
+- * the start of a page, so we optimize accordingly.
+- */
+-static void zorro8390_get_8390_hdr(struct net_device *dev,
+-				   struct e8390_pkt_hdr *hdr, int ring_page)
+-{
+-	int nic_base = dev->base_addr;
+-	int cnt;
+-	short *ptrs;
+-
+-	/* This *shouldn't* happen.
+-	 * If it does, it's the last thing you'll see
+-	 */
+-	if (ei_status.dmaing) {
+-		netdev_warn(dev,
+-			    "%s: DMAing conflict [DMAstat:%d][irqlock:%d]\n",
+-			    __func__, ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-
+-	ei_status.dmaing |= 0x01;
+-	z_writeb(E8390_NODMA + E8390_PAGE0 + E8390_START, nic_base + NE_CMD);
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-	z_writeb(sizeof(struct e8390_pkt_hdr), nic_base + NE_EN0_RCNTLO);
+-	z_writeb(0, nic_base + NE_EN0_RCNTHI);
+-	z_writeb(0, nic_base + NE_EN0_RSARLO);		/* On page boundary */
+-	z_writeb(ring_page, nic_base + NE_EN0_RSARHI);
+-	z_writeb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-
+-	ptrs = (short *)hdr;
+-	for (cnt = 0; cnt < sizeof(struct e8390_pkt_hdr) >> 1; cnt++)
+-		*ptrs++ = z_readw(NE_BASE + NE_DATAPORT);
+-
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr */
+-
+-	hdr->count = WORDSWAP(hdr->count);
+-
+-	ei_status.dmaing &= ~0x01;
+-}
+-
+-/* Block input and output, similar to the Crynwr packet driver.
+- * If you are porting to a new ethercard, look at the packet driver source
+- * for hints. The NEx000 doesn't share the on-board packet memory --
+- * you have to put the packet out through the "remote DMA" dataport
+- * using z_writeb.
+- */
+-static void zorro8390_block_input(struct net_device *dev, int count,
+-				  struct sk_buff *skb, int ring_offset)
+-{
+-	int nic_base = dev->base_addr;
+-	char *buf = skb->data;
+-	short *ptrs;
+-	int cnt;
+-
+-	/* This *shouldn't* happen.
+-	 * If it does, it's the last thing you'll see
+-	 */
+-	if (ei_status.dmaing) {
+-		netdev_err(dev, "%s: DMAing conflict [DMAstat:%d][irqlock:%d]\n",
+-			   __func__, ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-	ei_status.dmaing |= 0x01;
+-	z_writeb(E8390_NODMA + E8390_PAGE0 + E8390_START, nic_base + NE_CMD);
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-	z_writeb(count & 0xff, nic_base + NE_EN0_RCNTLO);
+-	z_writeb(count >> 8, nic_base + NE_EN0_RCNTHI);
+-	z_writeb(ring_offset & 0xff, nic_base + NE_EN0_RSARLO);
+-	z_writeb(ring_offset >> 8, nic_base + NE_EN0_RSARHI);
+-	z_writeb(E8390_RREAD+E8390_START, nic_base + NE_CMD);
+-	ptrs = (short *)buf;
+-	for (cnt = 0; cnt < count >> 1; cnt++)
+-		*ptrs++ = z_readw(NE_BASE + NE_DATAPORT);
+-	if (count & 0x01)
+-		buf[count - 1] = z_readb(NE_BASE + NE_DATAPORT);
+-
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr */
+-	ei_status.dmaing &= ~0x01;
+-}
+-
+-static void zorro8390_block_output(struct net_device *dev, int count,
+-				   const unsigned char *buf,
+-				   const int start_page)
+-{
+-	int nic_base = NE_BASE;
+-	unsigned long dma_start;
+-	short *ptrs;
+-	int cnt;
+-
+-	/* Round the count up for word writes.  Do we need to do this?
+-	 * What effect will an odd byte count have on the 8390?
+-	 * I should check someday.
+-	 */
+-	if (count & 0x01)
+-		count++;
+-
+-	/* This *shouldn't* happen.
+-	 * If it does, it's the last thing you'll see
+-	 */
+-	if (ei_status.dmaing) {
+-		netdev_err(dev, "%s: DMAing conflict [DMAstat:%d][irqlock:%d]\n",
+-			   __func__, ei_status.dmaing, ei_status.irqlock);
+-		return;
+-	}
+-	ei_status.dmaing |= 0x01;
+-	/* We should already be in page 0, but to be safe... */
+-	z_writeb(E8390_PAGE0+E8390_START+E8390_NODMA, nic_base + NE_CMD);
+-
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);
+-
+-	/* Now the normal output. */
+-	z_writeb(count & 0xff, nic_base + NE_EN0_RCNTLO);
+-	z_writeb(count >> 8,   nic_base + NE_EN0_RCNTHI);
+-	z_writeb(0x00, nic_base + NE_EN0_RSARLO);
+-	z_writeb(start_page, nic_base + NE_EN0_RSARHI);
+-
+-	z_writeb(E8390_RWRITE + E8390_START, nic_base + NE_CMD);
+-	ptrs = (short *)buf;
+-	for (cnt = 0; cnt < count >> 1; cnt++)
+-		z_writew(*ptrs++, NE_BASE + NE_DATAPORT);
+-
+-	dma_start = jiffies;
+-
+-	while ((z_readb(NE_BASE + NE_EN0_ISR) & ENISR_RDC) == 0)
+-		if (time_after(jiffies, dma_start + 2 * HZ / 100)) {
+-					/* 20ms */
+-			netdev_warn(dev, "timeout waiting for Tx RDC\n");
+-			zorro8390_reset_8390(dev);
+-			__NS8390_init(dev, 1);
+-			break;
+-		}
+-
+-	z_writeb(ENISR_RDC, nic_base + NE_EN0_ISR);	/* Ack intr */
+-	ei_status.dmaing &= ~0x01;
+-}
+-
+-static int zorro8390_open(struct net_device *dev)
+-{
+-	__ei_open(dev);
+-	return 0;
+-}
+-
+-static int zorro8390_close(struct net_device *dev)
+-{
+-	struct ei_device *ei_local = netdev_priv(dev);
+-
+-	netif_dbg(ei_local, ifdown, dev, "Shutting down ethercard\n");
+-	__ei_close(dev);
+-	return 0;
+-}
+-
+-static void zorro8390_remove_one(struct zorro_dev *z)
+-{
+-	struct net_device *dev = zorro_get_drvdata(z);
+-
+-	unregister_netdev(dev);
+-	free_irq(IRQ_AMIGA_PORTS, dev);
+-	release_mem_region(ZTWO_PADDR(dev->base_addr), NE_IO_EXTENT * 2);
+-	free_netdev(dev);
+-}
+-
+-static struct zorro_device_id zorro8390_zorro_tbl[] = {
+-	{ ZORRO_PROD_VILLAGE_TRONIC_ARIADNE2, },
+-	{ ZORRO_PROD_INDIVIDUAL_COMPUTERS_X_SURF, },
+-	{ 0 }
+-};
+-MODULE_DEVICE_TABLE(zorro, zorro8390_zorro_tbl);
+-
+-static const struct net_device_ops zorro8390_netdev_ops = {
+-	.ndo_open		= zorro8390_open,
+-	.ndo_stop		= zorro8390_close,
+-	.ndo_start_xmit		= __ei_start_xmit,
+-	.ndo_tx_timeout		= __ei_tx_timeout,
+-	.ndo_get_stats		= __ei_get_stats,
+-	.ndo_set_rx_mode	= __ei_set_multicast_list,
+-	.ndo_validate_addr	= eth_validate_addr,
+-	.ndo_set_mac_address	= eth_mac_addr,
+-#ifdef CONFIG_NET_POLL_CONTROLLER
+-	.ndo_poll_controller	= __ei_poll,
+-#endif
+-};
+-
+-static int zorro8390_init(struct net_device *dev, unsigned long board,
+-			  const char *name, void __iomem *ioaddr)
+-{
+-	int i;
+-	int err;
+-	unsigned char SA_prom[32];
+-	int start_page, stop_page;
+-	static u32 zorro8390_offsets[16] = {
+-		0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
+-		0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,
+-	};
+-
+-	/* Reset card. Who knows what dain-bramaged state it was left in. */
+-	{
+-		unsigned long reset_start_time = jiffies;
+-
+-		z_writeb(z_readb(ioaddr + NE_RESET), ioaddr + NE_RESET);
+-
+-		while ((z_readb(ioaddr + NE_EN0_ISR) & ENISR_RESET) == 0)
+-			if (time_after(jiffies,
+-				       reset_start_time + 2 * HZ / 100)) {
+-				netdev_warn(dev, "not found (no reset ack)\n");
+-				return -ENODEV;
+-			}
+-
+-		z_writeb(0xff, ioaddr + NE_EN0_ISR);	/* Ack all intr. */
+-	}
+-
+-	/* Read the 16 bytes of station address PROM.
+-	 * We must first initialize registers,
+-	 * similar to NS8390_init(eifdev, 0).
+-	 * We can't reliably read the SAPROM address without this.
+-	 * (I learned the hard way!).
+-	 */
+-	{
+-		static const struct {
+-			u32 value;
+-			u32 offset;
+-		} program_seq[] = {
+-			{E8390_NODMA + E8390_PAGE0 + E8390_STOP, NE_CMD},
+-						/* Select page 0 */
+-			{0x48,	NE_EN0_DCFG},	/* 0x48: Set byte-wide access */
+-			{0x00,	NE_EN0_RCNTLO},	/* Clear the count regs */
+-			{0x00,	NE_EN0_RCNTHI},
+-			{0x00,	NE_EN0_IMR},	/* Mask completion irq */
+-			{0xFF,	NE_EN0_ISR},
+-			{E8390_RXOFF, NE_EN0_RXCR}, /* 0x20 Set to monitor */
+-			{E8390_TXOFF, NE_EN0_TXCR}, /* 0x02 and loopback mode */
+-			{32,	NE_EN0_RCNTLO},
+-			{0x00,	NE_EN0_RCNTHI},
+-			{0x00,	NE_EN0_RSARLO},	/* DMA starting at 0x0000 */
+-			{0x00,	NE_EN0_RSARHI},
+-			{E8390_RREAD + E8390_START, NE_CMD},
+-		};
+-		for (i = 0; i < ARRAY_SIZE(program_seq); i++)
+-			z_writeb(program_seq[i].value,
+-				 ioaddr + program_seq[i].offset);
+-	}
+-	for (i = 0; i < 16; i++) {
+-		SA_prom[i] = z_readb(ioaddr + NE_DATAPORT);
+-		(void)z_readb(ioaddr + NE_DATAPORT);
+-	}
+-
+-	/* We must set the 8390 for word mode. */
+-	z_writeb(0x49, ioaddr + NE_EN0_DCFG);
+-	start_page = NESM_START_PG;
+-	stop_page = NESM_STOP_PG;
+-
+-	dev->base_addr = (unsigned long)ioaddr;
+-	dev->irq = IRQ_AMIGA_PORTS;
+-
+-	/* Install the Interrupt handler */
+-	i = request_irq(IRQ_AMIGA_PORTS, __ei_interrupt,
+-			IRQF_SHARED, DRV_NAME, dev);
+-	if (i)
+-		return i;
+-
+-	eth_hw_addr_set(dev, SA_prom);
+-
+-	pr_debug("Found ethernet address: %pM\n", dev->dev_addr);
+-
+-	ei_status.name = name;
+-	ei_status.tx_start_page = start_page;
+-	ei_status.stop_page = stop_page;
+-	ei_status.word16 = 1;
+-
+-	ei_status.rx_start_page = start_page + TX_PAGES;
+-
+-	ei_status.reset_8390 = zorro8390_reset_8390;
+-	ei_status.block_input = zorro8390_block_input;
+-	ei_status.block_output = zorro8390_block_output;
+-	ei_status.get_8390_hdr = zorro8390_get_8390_hdr;
+-	ei_status.reg_offset = zorro8390_offsets;
+-
+-	dev->netdev_ops = &zorro8390_netdev_ops;
+-	__NS8390_init(dev, 0);
+-
+-	err = register_netdev(dev);
+-	if (err) {
+-		free_irq(IRQ_AMIGA_PORTS, dev);
+-		return err;
+-	}
+-
+-	netdev_info(dev, "%s at 0x%08lx, Ethernet Address %pM\n",
+-		    name, board, dev->dev_addr);
+-
+-	return 0;
+-}
+-
+-static int zorro8390_init_one(struct zorro_dev *z,
+-			      const struct zorro_device_id *ent)
+-{
+-	struct net_device *dev;
+-	unsigned long board, ioaddr;
+-	int err, i;
+-
+-	for (i = ARRAY_SIZE(cards) - 1; i >= 0; i--)
+-		if (z->id == cards[i].id)
+-			break;
+-	if (i < 0)
+-		return -ENODEV;
+-
+-	board = z->resource.start;
+-	ioaddr = board + cards[i].offset;
+-	dev = ____alloc_ei_netdev(0);
+-	if (!dev)
+-		return -ENOMEM;
+-	if (!request_mem_region(ioaddr, NE_IO_EXTENT * 2, DRV_NAME)) {
+-		free_netdev(dev);
+-		return -EBUSY;
+-	}
+-	err = zorro8390_init(dev, board, cards[i].name, ZTWO_VADDR(ioaddr));
+-	if (err) {
+-		release_mem_region(ioaddr, NE_IO_EXTENT * 2);
+-		free_netdev(dev);
+-		return err;
+-	}
+-	zorro_set_drvdata(z, dev);
+-	return 0;
+-}
+-
+-static struct zorro_driver zorro8390_driver = {
+-	.name		= "zorro8390",
+-	.id_table	= zorro8390_zorro_tbl,
+-	.probe		= zorro8390_init_one,
+-	.remove		= zorro8390_remove_one,
+-};
+-
+-static int __init zorro8390_init_module(void)
+-{
+-	return zorro_register_driver(&zorro8390_driver);
+-}
+-
+-static void __exit zorro8390_cleanup_module(void)
+-{
+-	zorro_unregister_driver(&zorro8390_driver);
+-}
+-
+-module_init(zorro8390_init_module);
+-module_exit(zorro8390_cleanup_module);
+-
+-MODULE_DESCRIPTION("Zorro NS8390-based ethernet driver");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/video/fbdev/Makefile b/drivers/video/fbdev/Makefile
+index 36a18d958..6eb89c305 100644
+--- a/drivers/video/fbdev/Makefile
++++ b/drivers/video/fbdev/Makefile
+@@ -12,7 +12,7 @@ obj-$(CONFIG_FB_SBUS)          += sbuslib.o
+ obj-$(CONFIG_FB_WMT_GE_ROPS)   += wmt_ge_rops.o
+ 
+ # Hardware specific drivers go first
+-obj-$(CONFIG_FB_AMIGA)            += amifb.o c2p_planar.o
++# obj-$(CONFIG_FB_AMIGA)            += amifb.o c2p_planar.o
+ obj-$(CONFIG_FB_ARC)              += arcfb.o
+ obj-$(CONFIG_FB_CLPS711X)	  += clps711x-fb.o
+ obj-$(CONFIG_FB_CYBER2000)        += cyber2000fb.o
+@@ -53,13 +53,13 @@ obj-$(CONFIG_FB_CG14)             += cg14.o
+ obj-$(CONFIG_FB_P9100)            += p9100.o
+ obj-$(CONFIG_FB_TCX)              += tcx.o
+ obj-$(CONFIG_FB_LEO)              += leo.o
+-obj-$(CONFIG_FB_ACORN)            += acornfb.o
+-obj-$(CONFIG_FB_ATARI)            += atafb.o c2p_iplan2.o atafb_mfb.o \
++# obj-$(CONFIG_FB_ACORN)            += acornfb.o
++# obj-$(CONFIG_FB_ATARI)            += atafb.o c2p_iplan2.o atafb_mfb.o \
+                                      atafb_iplan2p2.o atafb_iplan2p4.o atafb_iplan2p8.o
+ obj-$(CONFIG_FB_MAC)              += macfb.o
+ obj-$(CONFIG_FB_HECUBA)           += hecubafb.o
+ obj-$(CONFIG_FB_N411)             += n411.o
+-obj-$(CONFIG_FB_HGA)              += hgafb.o
++# obj-$(CONFIG_FB_HGA)              += hgafb.o
+ obj-$(CONFIG_FB_XVR500)           += sunxvr500.o
+ obj-$(CONFIG_FB_XVR2500)          += sunxvr2500.o
+ obj-$(CONFIG_FB_XVR1000)          += sunxvr1000.o
+@@ -118,7 +118,7 @@ obj-$(CONFIG_FB_SM712)		  += sm712fb.o
+ obj-$(CONFIG_FB_UVESA)            += uvesafb.o
+ obj-$(CONFIG_FB_VESA)             += vesafb.o
+ obj-$(CONFIG_FB_EFI)              += efifb.o
+-obj-$(CONFIG_FB_VGA16)            += vga16fb.o
++# obj-$(CONFIG_FB_VGA16)            += vga16fb.o
+ obj-$(CONFIG_FB_OF)               += offb.o
+ obj-$(CONFIG_FB_SSD1307)	  += ssd1307fb.o
+ obj-$(CONFIG_FB_SIMPLE)           += simplefb.o
+diff --git a/drivers/video/fbdev/acornfb.c b/drivers/video/fbdev/acornfb.c
+deleted file mode 100644
+index f0600f6ca..000000000
+--- a/drivers/video/fbdev/acornfb.c
++++ /dev/null
+@@ -1,1102 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- *  linux/drivers/video/acornfb.c
+- *
+- *  Copyright (C) 1998-2001 Russell King
+- *
+- * Frame buffer code for Acorn platforms
+- *
+- * NOTE: Most of the modes with X!=640 will disappear shortly.
+- * NOTE: Startup setting of HS & VS polarity not supported.
+- *       (do we need to support it if we're coming up in 640x480?)
+- *
+- * FIXME: (things broken by the "new improved" FBCON API)
+- *  - Blanking 8bpp displays with VIDC
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/string.h>
+-#include <linux/ctype.h>
+-#include <linux/mm.h>
+-#include <linux/init.h>
+-#include <linux/fb.h>
+-#include <linux/platform_device.h>
+-#include <linux/dma-mapping.h>
+-#include <linux/io.h>
+-#include <linux/gfp.h>
+-
+-#include <mach/hardware.h>
+-#include <asm/irq.h>
+-#include <asm/mach-types.h>
+-
+-#include "acornfb.h"
+-
+-/*
+- * Default resolution.
+- * NOTE that it has to be supported in the table towards
+- * the end of this file.
+- */
+-#define DEFAULT_XRES	640
+-#define DEFAULT_YRES	480
+-#define DEFAULT_BPP	4
+-
+-/*
+- * define this to debug the video mode selection
+- */
+-#undef DEBUG_MODE_SELECTION
+-
+-/*
+- * Translation from RISC OS monitor types to actual
+- * HSYNC and VSYNC frequency ranges.  These are
+- * probably not right, but they're the best info I
+- * have.  Allow 1% either way on the nominal for TVs.
+- */
+-#define NR_MONTYPES	6
+-static struct fb_monspecs monspecs[NR_MONTYPES] = {
+-	{	/* TV		*/
+-		.hfmin	= 15469,
+-		.hfmax	= 15781,
+-		.vfmin	= 49,
+-		.vfmax	= 51,
+-	}, {	/* Multi Freq	*/
+-		.hfmin	= 0,
+-		.hfmax	= 99999,
+-		.vfmin	= 0,
+-		.vfmax	= 199,
+-	}, {	/* Hi-res mono	*/
+-		.hfmin	= 58608,
+-		.hfmax	= 58608,
+-		.vfmin	= 64,
+-		.vfmax	= 64,
+-	}, {	/* VGA		*/
+-		.hfmin	= 30000,
+-		.hfmax	= 70000,
+-		.vfmin	= 60,
+-		.vfmax	= 60,
+-	}, {	/* SVGA		*/
+-		.hfmin	= 30000,
+-		.hfmax	= 70000,
+-		.vfmin	= 56,
+-		.vfmax	= 75,
+-	}, {
+-		.hfmin	= 30000,
+-		.hfmax	= 70000,
+-		.vfmin	= 60,
+-		.vfmax	= 60,
+-	}
+-};
+-
+-static struct fb_info fb_info;
+-static struct acornfb_par current_par;
+-static struct vidc_timing current_vidc;
+-
+-extern unsigned int vram_size;	/* set by setup.c */
+-
+-#ifdef HAS_VIDC20
+-#include <mach/acornfb.h>
+-
+-#define MAX_SIZE	(2*1024*1024)
+-
+-/* VIDC20 has a different set of rules from the VIDC:
+- *  hcr  : must be multiple of 4
+- *  hswr : must be even
+- *  hdsr : must be even
+- *  hder : must be even
+- *  vcr  : >= 2, (interlace, must be odd)
+- *  vswr : >= 1
+- *  vdsr : >= 1
+- *  vder : >= vdsr
+- */
+-static void acornfb_set_timing(struct fb_info *info)
+-{
+-	struct fb_var_screeninfo *var = &info->var;
+-	struct vidc_timing vidc;
+-	u_int vcr, fsize;
+-	u_int ext_ctl, dat_ctl;
+-	u_int words_per_line;
+-
+-	memset(&vidc, 0, sizeof(vidc));
+-
+-	vidc.h_sync_width	= var->hsync_len - 8;
+-	vidc.h_border_start	= vidc.h_sync_width + var->left_margin + 8 - 12;
+-	vidc.h_display_start	= vidc.h_border_start + 12 - 18;
+-	vidc.h_display_end	= vidc.h_display_start + var->xres;
+-	vidc.h_border_end	= vidc.h_display_end + 18 - 12;
+-	vidc.h_cycle		= vidc.h_border_end + var->right_margin + 12 - 8;
+-	vidc.h_interlace	= vidc.h_cycle / 2;
+-	vidc.v_sync_width	= var->vsync_len - 1;
+-	vidc.v_border_start	= vidc.v_sync_width + var->upper_margin;
+-	vidc.v_display_start	= vidc.v_border_start;
+-	vidc.v_display_end	= vidc.v_display_start + var->yres;
+-	vidc.v_border_end	= vidc.v_display_end;
+-	vidc.control		= acornfb_default_control();
+-
+-	vcr = var->vsync_len + var->upper_margin + var->yres +
+-	      var->lower_margin;
+-
+-	if ((var->vmode & FB_VMODE_MASK) == FB_VMODE_INTERLACED) {
+-		vidc.v_cycle = (vcr - 3) / 2;
+-		vidc.control |= VIDC20_CTRL_INT;
+-	} else
+-		vidc.v_cycle = vcr - 2;
+-
+-	switch (var->bits_per_pixel) {
+-	case  1: vidc.control |= VIDC20_CTRL_1BPP;	break;
+-	case  2: vidc.control |= VIDC20_CTRL_2BPP;	break;
+-	case  4: vidc.control |= VIDC20_CTRL_4BPP;	break;
+-	default:
+-	case  8: vidc.control |= VIDC20_CTRL_8BPP;	break;
+-	case 16: vidc.control |= VIDC20_CTRL_16BPP;	break;
+-	case 32: vidc.control |= VIDC20_CTRL_32BPP;	break;
+-	}
+-
+-	acornfb_vidc20_find_rates(&vidc, var);
+-	fsize = var->vsync_len + var->upper_margin + var->lower_margin - 1;
+-
+-	if (memcmp(&current_vidc, &vidc, sizeof(vidc))) {
+-		current_vidc = vidc;
+-
+-		vidc_writel(VIDC20_CTRL | vidc.control);
+-		vidc_writel(0xd0000000 | vidc.pll_ctl);
+-		vidc_writel(0x80000000 | vidc.h_cycle);
+-		vidc_writel(0x81000000 | vidc.h_sync_width);
+-		vidc_writel(0x82000000 | vidc.h_border_start);
+-		vidc_writel(0x83000000 | vidc.h_display_start);
+-		vidc_writel(0x84000000 | vidc.h_display_end);
+-		vidc_writel(0x85000000 | vidc.h_border_end);
+-		vidc_writel(0x86000000);
+-		vidc_writel(0x87000000 | vidc.h_interlace);
+-		vidc_writel(0x90000000 | vidc.v_cycle);
+-		vidc_writel(0x91000000 | vidc.v_sync_width);
+-		vidc_writel(0x92000000 | vidc.v_border_start);
+-		vidc_writel(0x93000000 | vidc.v_display_start);
+-		vidc_writel(0x94000000 | vidc.v_display_end);
+-		vidc_writel(0x95000000 | vidc.v_border_end);
+-		vidc_writel(0x96000000);
+-		vidc_writel(0x97000000);
+-	}
+-
+-	iomd_writel(fsize, IOMD_FSIZE);
+-
+-	ext_ctl = acornfb_default_econtrol();
+-
+-	if (var->sync & FB_SYNC_COMP_HIGH_ACT) /* should be FB_SYNC_COMP */
+-		ext_ctl |= VIDC20_ECTL_HS_NCSYNC | VIDC20_ECTL_VS_NCSYNC;
+-	else {
+-		if (var->sync & FB_SYNC_HOR_HIGH_ACT)
+-			ext_ctl |= VIDC20_ECTL_HS_HSYNC;
+-		else
+-			ext_ctl |= VIDC20_ECTL_HS_NHSYNC;
+-
+-		if (var->sync & FB_SYNC_VERT_HIGH_ACT)
+-			ext_ctl |= VIDC20_ECTL_VS_VSYNC;
+-		else
+-			ext_ctl |= VIDC20_ECTL_VS_NVSYNC;
+-	}
+-
+-	vidc_writel(VIDC20_ECTL | ext_ctl);
+-
+-	words_per_line = var->xres * var->bits_per_pixel / 32;
+-
+-	if (current_par.using_vram && info->fix.smem_len == 2048*1024)
+-		words_per_line /= 2;
+-
+-	/* RiscPC doesn't use the VIDC's VRAM control. */
+-	dat_ctl = VIDC20_DCTL_VRAM_DIS | VIDC20_DCTL_SNA | words_per_line;
+-
+-	/* The data bus width is dependent on both the type
+-	 * and amount of video memory.
+-	 *     DRAM	32bit low
+-	 * 1MB VRAM	32bit
+-	 * 2MB VRAM	64bit
+-	 */
+-	if (current_par.using_vram && current_par.vram_half_sam == 2048)
+-		dat_ctl |= VIDC20_DCTL_BUS_D63_0;
+-	else
+-		dat_ctl |= VIDC20_DCTL_BUS_D31_0;
+-
+-	vidc_writel(VIDC20_DCTL | dat_ctl);
+-
+-#ifdef DEBUG_MODE_SELECTION
+-	printk(KERN_DEBUG "VIDC registers for %dx%dx%d:\n", var->xres,
+-	       var->yres, var->bits_per_pixel);
+-	printk(KERN_DEBUG " H-cycle          : %d\n", vidc.h_cycle);
+-	printk(KERN_DEBUG " H-sync-width     : %d\n", vidc.h_sync_width);
+-	printk(KERN_DEBUG " H-border-start   : %d\n", vidc.h_border_start);
+-	printk(KERN_DEBUG " H-display-start  : %d\n", vidc.h_display_start);
+-	printk(KERN_DEBUG " H-display-end    : %d\n", vidc.h_display_end);
+-	printk(KERN_DEBUG " H-border-end     : %d\n", vidc.h_border_end);
+-	printk(KERN_DEBUG " H-interlace      : %d\n", vidc.h_interlace);
+-	printk(KERN_DEBUG " V-cycle          : %d\n", vidc.v_cycle);
+-	printk(KERN_DEBUG " V-sync-width     : %d\n", vidc.v_sync_width);
+-	printk(KERN_DEBUG " V-border-start   : %d\n", vidc.v_border_start);
+-	printk(KERN_DEBUG " V-display-start  : %d\n", vidc.v_display_start);
+-	printk(KERN_DEBUG " V-display-end    : %d\n", vidc.v_display_end);
+-	printk(KERN_DEBUG " V-border-end     : %d\n", vidc.v_border_end);
+-	printk(KERN_DEBUG " Ext Ctrl  (C)    : 0x%08X\n", ext_ctl);
+-	printk(KERN_DEBUG " PLL Ctrl  (D)    : 0x%08X\n", vidc.pll_ctl);
+-	printk(KERN_DEBUG " Ctrl      (E)    : 0x%08X\n", vidc.control);
+-	printk(KERN_DEBUG " Data Ctrl (F)    : 0x%08X\n", dat_ctl);
+-	printk(KERN_DEBUG " Fsize            : 0x%08X\n", fsize);
+-#endif
+-}
+-
+-/*
+- * We have to take note of the VIDC20's 16-bit palette here.
+- * The VIDC20 looks up a 16 bit pixel as follows:
+- *
+- *   bits   111111
+- *          5432109876543210
+- *   red            ++++++++  (8 bits,  7 to 0)
+- *  green       ++++++++      (8 bits, 11 to 4)
+- *   blue   ++++++++          (8 bits, 15 to 8)
+- *
+- * We use a pixel which looks like:
+- *
+- *   bits   111111
+- *          5432109876543210
+- *   red               +++++  (5 bits,  4 to  0)
+- *  green         +++++       (5 bits,  9 to  5)
+- *   blue    +++++            (5 bits, 14 to 10)
+- */
+-static int
+-acornfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
+-		  u_int trans, struct fb_info *info)
+-{
+-	union palette pal;
+-
+-	if (regno >= current_par.palette_size)
+-		return 1;
+-
+-	if (regno < 16 && info->fix.visual == FB_VISUAL_DIRECTCOLOR) {
+-		u32 pseudo_val;
+-
+-		pseudo_val  = regno << info->var.red.offset;
+-		pseudo_val |= regno << info->var.green.offset;
+-		pseudo_val |= regno << info->var.blue.offset;
+-
+-		((u32 *)info->pseudo_palette)[regno] = pseudo_val;
+-	}
+-
+-	pal.p = 0;
+-	pal.vidc20.red   = red >> 8;
+-	pal.vidc20.green = green >> 8;
+-	pal.vidc20.blue  = blue >> 8;
+-
+-	current_par.palette[regno] = pal;
+-
+-	if (info->var.bits_per_pixel == 16) {
+-		int i;
+-
+-		pal.p = 0;
+-		vidc_writel(0x10000000);
+-		for (i = 0; i < 256; i += 1) {
+-			pal.vidc20.red   = current_par.palette[i       & 31].vidc20.red;
+-			pal.vidc20.green = current_par.palette[(i >> 1) & 31].vidc20.green;
+-			pal.vidc20.blue  = current_par.palette[(i >> 2) & 31].vidc20.blue;
+-			vidc_writel(pal.p);
+-			/* Palette register pointer auto-increments */
+-		}
+-	} else {
+-		vidc_writel(0x10000000 | regno);
+-		vidc_writel(pal.p);
+-	}
+-
+-	return 0;
+-}
+-#endif
+-
+-/*
+- * Before selecting the timing parameters, adjust
+- * the resolution to fit the rules.
+- */
+-static int
+-acornfb_adjust_timing(struct fb_info *info, struct fb_var_screeninfo *var, u_int fontht)
+-{
+-	u_int font_line_len, sam_size, min_size, size, nr_y;
+-
+-	/* xres must be even */
+-	var->xres = (var->xres + 1) & ~1;
+-
+-	/*
+-	 * We don't allow xres_virtual to differ from xres
+-	 */
+-	var->xres_virtual = var->xres;
+-	var->xoffset = 0;
+-
+-	if (current_par.using_vram)
+-		sam_size = current_par.vram_half_sam * 2;
+-	else
+-		sam_size = 16;
+-
+-	/*
+-	 * Now, find a value for yres_virtual which allows
+-	 * us to do ywrap scrolling.  The value of
+-	 * yres_virtual must be such that the end of the
+-	 * displayable frame buffer must be aligned with
+-	 * the start of a font line.
+-	 */
+-	font_line_len = var->xres * var->bits_per_pixel * fontht / 8;
+-	min_size = var->xres * var->yres * var->bits_per_pixel / 8;
+-
+-	/*
+-	 * If minimum screen size is greater than that we have
+-	 * available, reject it.
+-	 */
+-	if (min_size > info->fix.smem_len)
+-		return -EINVAL;
+-
+-	/* Find int 'y', such that y * fll == s * sam < maxsize
+-	 * y = s * sam / fll; s = maxsize / sam
+-	 */
+-	for (size = info->fix.smem_len;
+-	     nr_y = size / font_line_len, min_size <= size;
+-	     size -= sam_size) {
+-		if (nr_y * font_line_len == size)
+-			break;
+-	}
+-	nr_y *= fontht;
+-
+-	if (var->accel_flags & FB_ACCELF_TEXT) {
+-		if (min_size > size) {
+-			/*
+-			 * failed, use ypan
+-			 */
+-			size = info->fix.smem_len;
+-			var->yres_virtual = size / (font_line_len / fontht);
+-		} else
+-			var->yres_virtual = nr_y;
+-	} else if (var->yres_virtual > nr_y)
+-		var->yres_virtual = nr_y;
+-
+-	current_par.screen_end = info->fix.smem_start + size;
+-
+-	/*
+-	 * Fix yres & yoffset if needed.
+-	 */
+-	if (var->yres > var->yres_virtual)
+-		var->yres = var->yres_virtual;
+-
+-	if (var->vmode & FB_VMODE_YWRAP) {
+-		if (var->yoffset > var->yres_virtual)
+-			var->yoffset = var->yres_virtual;
+-	} else {
+-		if (var->yoffset + var->yres > var->yres_virtual)
+-			var->yoffset = var->yres_virtual - var->yres;
+-	}
+-
+-	/* hsync_len must be even */
+-	var->hsync_len = (var->hsync_len + 1) & ~1;
+-
+-#if defined(HAS_VIDC20)
+-	/* left_margin must be even */
+-	if (var->left_margin & 1) {
+-		var->left_margin += 1;
+-		var->right_margin -= 1;
+-	}
+-
+-	/* right_margin must be even */
+-	if (var->right_margin & 1)
+-		var->right_margin += 1;
+-#endif
+-
+-	if (var->vsync_len < 1)
+-		var->vsync_len = 1;
+-
+-	return 0;
+-}
+-
+-static int
+-acornfb_validate_timing(struct fb_var_screeninfo *var,
+-			struct fb_monspecs *monspecs)
+-{
+-	unsigned long hs, vs;
+-
+-	/*
+-	 * hs(Hz) = 10^12 / (pixclock * xtotal)
+-	 * vs(Hz) = hs(Hz) / ytotal
+-	 *
+-	 * No need to do long long divisions or anything
+-	 * like that if you factor it correctly
+-	 */
+-	hs = 1953125000 / var->pixclock;
+-	hs = hs * 512 /
+-	     (var->xres + var->left_margin + var->right_margin + var->hsync_len);
+-	vs = hs /
+-	     (var->yres + var->upper_margin + var->lower_margin + var->vsync_len);
+-
+-	return (vs >= monspecs->vfmin && vs <= monspecs->vfmax &&
+-		hs >= monspecs->hfmin && hs <= monspecs->hfmax) ? 0 : -EINVAL;
+-}
+-
+-static inline void
+-acornfb_update_dma(struct fb_info *info, struct fb_var_screeninfo *var)
+-{
+-	u_int off = var->yoffset * info->fix.line_length;
+-
+-#if defined(HAS_MEMC)
+-	memc_write(VDMA_INIT, off >> 2);
+-#elif defined(HAS_IOMD)
+-	iomd_writel(info->fix.smem_start + off, IOMD_VIDINIT);
+-#endif
+-}
+-
+-static int
+-acornfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	u_int fontht;
+-	int err;
+-
+-	/*
+-	 * FIXME: Find the font height
+-	 */
+-	fontht = 8;
+-
+-	var->red.msb_right = 0;
+-	var->green.msb_right = 0;
+-	var->blue.msb_right = 0;
+-	var->transp.msb_right = 0;
+-
+-	switch (var->bits_per_pixel) {
+-	case 1:	case 2:	case 4:	case 8:
+-		var->red.offset    = 0;
+-		var->red.length    = var->bits_per_pixel;
+-		var->green         = var->red;
+-		var->blue          = var->red;
+-		var->transp.offset = 0;
+-		var->transp.length = 0;
+-		break;
+-
+-#ifdef HAS_VIDC20
+-	case 16:
+-		var->red.offset    = 0;
+-		var->red.length    = 5;
+-		var->green.offset  = 5;
+-		var->green.length  = 5;
+-		var->blue.offset   = 10;
+-		var->blue.length   = 5;
+-		var->transp.offset = 15;
+-		var->transp.length = 1;
+-		break;
+-
+-	case 32:
+-		var->red.offset    = 0;
+-		var->red.length    = 8;
+-		var->green.offset  = 8;
+-		var->green.length  = 8;
+-		var->blue.offset   = 16;
+-		var->blue.length   = 8;
+-		var->transp.offset = 24;
+-		var->transp.length = 4;
+-		break;
+-#endif
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	/*
+-	 * Check to see if the pixel rate is valid.
+-	 */
+-	if (!acornfb_valid_pixrate(var))
+-		return -EINVAL;
+-
+-	/*
+-	 * Validate and adjust the resolution to
+-	 * match the video generator hardware.
+-	 */
+-	err = acornfb_adjust_timing(info, var, fontht);
+-	if (err)
+-		return err;
+-
+-	/*
+-	 * Validate the timing against the
+-	 * monitor hardware.
+-	 */
+-	return acornfb_validate_timing(var, &info->monspecs);
+-}
+-
+-static int acornfb_set_par(struct fb_info *info)
+-{
+-	switch (info->var.bits_per_pixel) {
+-	case 1:
+-		current_par.palette_size = 2;
+-		info->fix.visual = FB_VISUAL_MONO10;
+-		break;
+-	case 2:
+-		current_par.palette_size = 4;
+-		info->fix.visual = FB_VISUAL_PSEUDOCOLOR;
+-		break;
+-	case 4:
+-		current_par.palette_size = 16;
+-		info->fix.visual = FB_VISUAL_PSEUDOCOLOR;
+-		break;
+-	case 8:
+-		current_par.palette_size = VIDC_PALETTE_SIZE;
+-		info->fix.visual = FB_VISUAL_PSEUDOCOLOR;
+-		break;
+-#ifdef HAS_VIDC20
+-	case 16:
+-		current_par.palette_size = 32;
+-		info->fix.visual = FB_VISUAL_DIRECTCOLOR;
+-		break;
+-	case 32:
+-		current_par.palette_size = VIDC_PALETTE_SIZE;
+-		info->fix.visual = FB_VISUAL_DIRECTCOLOR;
+-		break;
+-#endif
+-	default:
+-		BUG();
+-	}
+-
+-	info->fix.line_length	= (info->var.xres * info->var.bits_per_pixel) / 8;
+-
+-#if defined(HAS_MEMC)
+-	{
+-		unsigned long size = info->fix.smem_len - VDMA_XFERSIZE;
+-
+-		memc_write(VDMA_START, 0);
+-		memc_write(VDMA_END, size >> 2);
+-	}
+-#elif defined(HAS_IOMD)
+-	{
+-		unsigned long start, size;
+-		u_int control;
+-
+-		start = info->fix.smem_start;
+-		size  = current_par.screen_end;
+-
+-		if (current_par.using_vram) {
+-			size -= current_par.vram_half_sam;
+-			control = DMA_CR_E | (current_par.vram_half_sam / 256);
+-		} else {
+-			size -= 16;
+-			control = DMA_CR_E | DMA_CR_D | 16;
+-		}
+-
+-		iomd_writel(start,   IOMD_VIDSTART);
+-		iomd_writel(size,    IOMD_VIDEND);
+-		iomd_writel(control, IOMD_VIDCR);
+-	}
+-#endif
+-
+-	acornfb_update_dma(info, &info->var);
+-	acornfb_set_timing(info);
+-
+-	return 0;
+-}
+-
+-static int
+-acornfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	u_int y_bottom = var->yoffset;
+-
+-	if (!(var->vmode & FB_VMODE_YWRAP))
+-		y_bottom += info->var.yres;
+-
+-	if (y_bottom > info->var.yres_virtual)
+-		return -EINVAL;
+-
+-	acornfb_update_dma(info, var);
+-
+-	return 0;
+-}
+-
+-static const struct fb_ops acornfb_ops = {
+-	.owner		= THIS_MODULE,
+-	FB_DEFAULT_IOMEM_OPS,
+-	.fb_check_var	= acornfb_check_var,
+-	.fb_set_par	= acornfb_set_par,
+-	.fb_setcolreg	= acornfb_setcolreg,
+-	.fb_pan_display	= acornfb_pan_display,
+-};
+-
+-/*
+- * Everything after here is initialisation!!!
+- */
+-static struct fb_videomode modedb[] = {
+-	{	/* 320x256 @ 50Hz */
+-		NULL, 50,  320,  256, 125000,  92,  62,  35, 19,  38, 2,
+-		FB_SYNC_COMP_HIGH_ACT,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x250 @ 50Hz, 15.6 kHz hsync */
+-		NULL, 50,  640,  250,  62500, 185, 123,  38, 21,  76, 3,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x256 @ 50Hz, 15.6 kHz hsync */
+-		NULL, 50,  640,  256,  62500, 185, 123,  35, 18,  76, 3,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x512 @ 50Hz, 26.8 kHz hsync */
+-		NULL, 50,  640,  512,  41667, 113,  87,  18,  1,  56, 3,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x250 @ 70Hz, 31.5 kHz hsync */
+-		NULL, 70,  640,  250,  39722,  48,  16, 109, 88,  96, 2,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x256 @ 70Hz, 31.5 kHz hsync */
+-		NULL, 70,  640,  256,  39722,  48,  16, 106, 85,  96, 2,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x352 @ 70Hz, 31.5 kHz hsync */
+-		NULL, 70,  640,  352,  39722,  48,  16,  58, 37,  96, 2,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 640x480 @ 60Hz, 31.5 kHz hsync */
+-		NULL, 60,  640,  480,  39722,  48,  16,  32, 11,  96, 2,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 800x600 @ 56Hz, 35.2 kHz hsync */
+-		NULL, 56,  800,  600,  27778, 101,  23,  22,  1, 100, 2,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 896x352 @ 60Hz, 21.8 kHz hsync */
+-		NULL, 60,  896,  352,  41667,  59,  27,   9,  0, 118, 3,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 1024x 768 @ 60Hz, 48.4 kHz hsync */
+-		NULL, 60, 1024,  768,  15385, 160,  24,  29,  3, 136, 6,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}, {	/* 1280x1024 @ 60Hz, 63.8 kHz hsync */
+-		NULL, 60, 1280, 1024,   9090, 186,  96,  38,  1, 160, 3,
+-		0,
+-		FB_VMODE_NONINTERLACED
+-	}
+-};
+-
+-static struct fb_videomode acornfb_default_mode = {
+-	.name =		NULL,
+-	.refresh =	60,
+-	.xres =		640,
+-	.yres =		480,
+-	.pixclock =	39722,
+-	.left_margin =	56,
+-	.right_margin =	16,
+-	.upper_margin =	34,
+-	.lower_margin =	9,
+-	.hsync_len =	88,
+-	.vsync_len =	2,
+-	.sync =		0,
+-	.vmode =	FB_VMODE_NONINTERLACED
+-};
+-
+-static void acornfb_init_fbinfo(void)
+-{
+-	static int first = 1;
+-
+-	if (!first)
+-		return;
+-	first = 0;
+-
+-	fb_info.fbops		= &acornfb_ops;
+-	fb_info.flags		= FBINFO_HWACCEL_YPAN;
+-	fb_info.pseudo_palette	= current_par.pseudo_palette;
+-
+-	strcpy(fb_info.fix.id, "Acorn");
+-	fb_info.fix.type	= FB_TYPE_PACKED_PIXELS;
+-	fb_info.fix.type_aux	= 0;
+-	fb_info.fix.xpanstep	= 0;
+-	fb_info.fix.ypanstep	= 1;
+-	fb_info.fix.ywrapstep	= 1;
+-	fb_info.fix.line_length	= 0;
+-	fb_info.fix.accel	= FB_ACCEL_NONE;
+-
+-	/*
+-	 * setup initial parameters
+-	 */
+-	memset(&fb_info.var, 0, sizeof(fb_info.var));
+-
+-#if defined(HAS_VIDC20)
+-	fb_info.var.red.length	   = 8;
+-	fb_info.var.transp.length  = 4;
+-#endif
+-	fb_info.var.green	   = fb_info.var.red;
+-	fb_info.var.blue	   = fb_info.var.red;
+-	fb_info.var.nonstd	   = 0;
+-	fb_info.var.activate	   = FB_ACTIVATE_NOW;
+-	fb_info.var.height	   = -1;
+-	fb_info.var.width	   = -1;
+-	fb_info.var.vmode	   = FB_VMODE_NONINTERLACED;
+-	fb_info.var.accel_flags	   = FB_ACCELF_TEXT;
+-
+-	current_par.dram_size	   = 0;
+-	current_par.montype	   = -1;
+-	current_par.dpms	   = 0;
+-}
+-
+-/*
+- * setup acornfb options:
+- *
+- *  mon:hmin-hmax:vmin-vmax:dpms:width:height
+- *	Set monitor parameters:
+- *		hmin   = horizontal minimum frequency (Hz)
+- *		hmax   = horizontal maximum frequency (Hz)	(optional)
+- *		vmin   = vertical minimum frequency (Hz)
+- *		vmax   = vertical maximum frequency (Hz)	(optional)
+- *		dpms   = DPMS supported?			(optional)
+- *		width  = width of picture in mm.		(optional)
+- *		height = height of picture in mm.		(optional)
+- *
+- * montype:type
+- *	Set RISC-OS style monitor type:
+- *		0 (or tv)	- TV frequency
+- *		1 (or multi)	- Multi frequency
+- *		2 (or hires)	- Hi-res monochrome
+- *		3 (or vga)	- VGA
+- *		4 (or svga)	- SVGA
+- *		auto, or option missing
+- *				- try hardware detect
+- *
+- * dram:size
+- *	Set the amount of DRAM to use for the frame buffer
+- *	(even if you have VRAM).
+- *	size can optionally be followed by 'M' or 'K' for
+- *	MB or KB respectively.
+- */
+-static void acornfb_parse_mon(char *opt)
+-{
+-	char *p = opt;
+-
+-	current_par.montype = -2;
+-
+-	fb_info.monspecs.hfmin = simple_strtoul(p, &p, 0);
+-	if (*p == '-')
+-		fb_info.monspecs.hfmax = simple_strtoul(p + 1, &p, 0);
+-	else
+-		fb_info.monspecs.hfmax = fb_info.monspecs.hfmin;
+-
+-	if (*p != ':')
+-		goto bad;
+-
+-	fb_info.monspecs.vfmin = simple_strtoul(p + 1, &p, 0);
+-	if (*p == '-')
+-		fb_info.monspecs.vfmax = simple_strtoul(p + 1, &p, 0);
+-	else
+-		fb_info.monspecs.vfmax = fb_info.monspecs.vfmin;
+-
+-	if (*p != ':')
+-		goto check_values;
+-
+-	fb_info.monspecs.dpms = simple_strtoul(p + 1, &p, 0);
+-
+-	if (*p != ':')
+-		goto check_values;
+-
+-	fb_info.var.width = simple_strtoul(p + 1, &p, 0);
+-
+-	if (*p != ':')
+-		goto check_values;
+-
+-	fb_info.var.height = simple_strtoul(p + 1, NULL, 0);
+-
+-check_values:
+-	if (fb_info.monspecs.hfmax < fb_info.monspecs.hfmin ||
+-	    fb_info.monspecs.vfmax < fb_info.monspecs.vfmin)
+-		goto bad;
+-	return;
+-
+-bad:
+-	printk(KERN_ERR "Acornfb: bad monitor settings: %s\n", opt);
+-	current_par.montype = -1;
+-}
+-
+-static void acornfb_parse_montype(char *opt)
+-{
+-	current_par.montype = -2;
+-
+-	if (strncmp(opt, "tv", 2) == 0) {
+-		opt += 2;
+-		current_par.montype = 0;
+-	} else if (strncmp(opt, "multi", 5) == 0) {
+-		opt += 5;
+-		current_par.montype = 1;
+-	} else if (strncmp(opt, "hires", 5) == 0) {
+-		opt += 5;
+-		current_par.montype = 2;
+-	} else if (strncmp(opt, "vga", 3) == 0) {
+-		opt += 3;
+-		current_par.montype = 3;
+-	} else if (strncmp(opt, "svga", 4) == 0) {
+-		opt += 4;
+-		current_par.montype = 4;
+-	} else if (strncmp(opt, "auto", 4) == 0) {
+-		opt += 4;
+-		current_par.montype = -1;
+-	} else if (isdigit(*opt))
+-		current_par.montype = simple_strtoul(opt, &opt, 0);
+-
+-	if (current_par.montype == -2 ||
+-	    current_par.montype > NR_MONTYPES) {
+-		printk(KERN_ERR "acornfb: unknown monitor type: %s\n",
+-			opt);
+-		current_par.montype = -1;
+-	} else
+-	if (opt && *opt) {
+-		if (strcmp(opt, ",dpms") == 0)
+-			current_par.dpms = 1;
+-		else
+-			printk(KERN_ERR
+-			       "acornfb: unknown monitor option: %s\n",
+-			       opt);
+-	}
+-}
+-
+-static void acornfb_parse_dram(char *opt)
+-{
+-	unsigned int size;
+-
+-	size = simple_strtoul(opt, &opt, 0);
+-
+-	if (opt) {
+-		switch (*opt) {
+-		case 'M':
+-		case 'm':
+-			size *= 1024;
+-			fallthrough;
+-		case 'K':
+-		case 'k':
+-			size *= 1024;
+-		default:
+-			break;
+-		}
+-	}
+-
+-	current_par.dram_size = size;
+-}
+-
+-static struct options {
+-	char *name;
+-	void (*parse)(char *opt);
+-} opt_table[] = {
+-	{ "mon",     acornfb_parse_mon     },
+-	{ "montype", acornfb_parse_montype },
+-	{ "dram",    acornfb_parse_dram    },
+-	{ NULL, NULL }
+-};
+-
+-static int acornfb_setup(char *options)
+-{
+-	struct options *optp;
+-	char *opt;
+-
+-	if (!options || !*options)
+-		return 0;
+-
+-	acornfb_init_fbinfo();
+-
+-	while ((opt = strsep(&options, ",")) != NULL) {
+-		if (!*opt)
+-			continue;
+-
+-		for (optp = opt_table; optp->name; optp++) {
+-			int optlen;
+-
+-			optlen = strlen(optp->name);
+-
+-			if (strncmp(opt, optp->name, optlen) == 0 &&
+-			    opt[optlen] == ':') {
+-				optp->parse(opt + optlen + 1);
+-				break;
+-			}
+-		}
+-
+-		if (!optp->name)
+-			printk(KERN_ERR "acornfb: unknown parameter: %s\n",
+-			       opt);
+-	}
+-	return 0;
+-}
+-
+-/*
+- * Detect type of monitor connected
+- *  For now, we just assume SVGA
+- */
+-static int acornfb_detect_monitortype(void)
+-{
+-	return 4;
+-}
+-
+-static int acornfb_probe(struct platform_device *dev)
+-{
+-	unsigned long size;
+-	u_int h_sync, v_sync;
+-	int rc, i;
+-	char *option = NULL;
+-
+-	if (fb_get_options("acornfb", &option))
+-		return -ENODEV;
+-	acornfb_setup(option);
+-
+-	acornfb_init_fbinfo();
+-
+-	current_par.dev = &dev->dev;
+-
+-	if (current_par.montype == -1)
+-		current_par.montype = acornfb_detect_monitortype();
+-
+-	if (current_par.montype == -1 || current_par.montype > NR_MONTYPES)
+-		current_par.montype = 4;
+-
+-	if (current_par.montype >= 0) {
+-		fb_info.monspecs = monspecs[current_par.montype];
+-		fb_info.monspecs.dpms = current_par.dpms;
+-	}
+-
+-	/*
+-	 * Try to select a suitable default mode
+-	 */
+-	for (i = 0; i < ARRAY_SIZE(modedb); i++) {
+-		unsigned long hs;
+-
+-		hs = modedb[i].refresh *
+-		     (modedb[i].yres + modedb[i].upper_margin +
+-		      modedb[i].lower_margin + modedb[i].vsync_len);
+-		if (modedb[i].xres == DEFAULT_XRES &&
+-		    modedb[i].yres == DEFAULT_YRES &&
+-		    modedb[i].refresh >= fb_info.monspecs.vfmin &&
+-		    modedb[i].refresh <= fb_info.monspecs.vfmax &&
+-		    hs                >= fb_info.monspecs.hfmin &&
+-		    hs                <= fb_info.monspecs.hfmax) {
+-			acornfb_default_mode = modedb[i];
+-			break;
+-		}
+-	}
+-
+-	fb_info.screen_base    = (char *)SCREEN_BASE;
+-	fb_info.fix.smem_start = SCREEN_START;
+-	current_par.using_vram = 0;
+-
+-	/*
+-	 * If vram_size is set, we are using VRAM in
+-	 * a Risc PC.  However, if the user has specified
+-	 * an amount of DRAM then use that instead.
+-	 */
+-	if (vram_size && !current_par.dram_size) {
+-		size = vram_size;
+-		current_par.vram_half_sam = vram_size / 1024;
+-		current_par.using_vram = 1;
+-	} else if (current_par.dram_size)
+-		size = current_par.dram_size;
+-	else
+-		size = MAX_SIZE;
+-
+-	/*
+-	 * Limit maximum screen size.
+-	 */
+-	if (size > MAX_SIZE)
+-		size = MAX_SIZE;
+-
+-	size = PAGE_ALIGN(size);
+-
+-#if defined(HAS_VIDC20)
+-	if (!current_par.using_vram) {
+-		dma_addr_t handle;
+-		void *base;
+-
+-		/*
+-		 * RiscPC needs to allocate the DRAM memory
+-		 * for the framebuffer if we are not using
+-		 * VRAM.
+-		 */
+-		base = dma_alloc_wc(current_par.dev, size, &handle,
+-				    GFP_KERNEL);
+-		if (base == NULL) {
+-			printk(KERN_ERR "acornfb: unable to allocate screen memory\n");
+-			return -ENOMEM;
+-		}
+-
+-		fb_info.screen_base = base;
+-		fb_info.fix.smem_start = handle;
+-	}
+-#endif
+-	fb_info.fix.smem_len = size;
+-	current_par.palette_size   = VIDC_PALETTE_SIZE;
+-
+-	/*
+-	 * Lookup the timing for this resolution.  If we can't
+-	 * find it, then we can't restore it if we change
+-	 * the resolution, so we disable this feature.
+-	 */
+-	do {
+-		rc = fb_find_mode(&fb_info.var, &fb_info, NULL, modedb,
+-				 ARRAY_SIZE(modedb),
+-				 &acornfb_default_mode, DEFAULT_BPP);
+-		/*
+-		 * If we found an exact match, all ok.
+-		 */
+-		if (rc == 1)
+-			break;
+-
+-		rc = fb_find_mode(&fb_info.var, &fb_info, NULL, NULL, 0,
+-				  &acornfb_default_mode, DEFAULT_BPP);
+-		/*
+-		 * If we found an exact match, all ok.
+-		 */
+-		if (rc == 1)
+-			break;
+-
+-		rc = fb_find_mode(&fb_info.var, &fb_info, NULL, modedb,
+-				 ARRAY_SIZE(modedb),
+-				 &acornfb_default_mode, DEFAULT_BPP);
+-		if (rc)
+-			break;
+-
+-		rc = fb_find_mode(&fb_info.var, &fb_info, NULL, NULL, 0,
+-				  &acornfb_default_mode, DEFAULT_BPP);
+-	} while (0);
+-
+-	/*
+-	 * If we didn't find an exact match, try the
+-	 * generic database.
+-	 */
+-	if (rc == 0) {
+-		printk("Acornfb: no valid mode found\n");
+-		return -EINVAL;
+-	}
+-
+-	h_sync = 1953125000 / fb_info.var.pixclock;
+-	h_sync = h_sync * 512 / (fb_info.var.xres + fb_info.var.left_margin +
+-		 fb_info.var.right_margin + fb_info.var.hsync_len);
+-	v_sync = h_sync / (fb_info.var.yres + fb_info.var.upper_margin +
+-		 fb_info.var.lower_margin + fb_info.var.vsync_len);
+-
+-	printk(KERN_INFO "Acornfb: %dkB %cRAM, %s, using %dx%d, %d.%03dkHz, %dHz\n",
+-		fb_info.fix.smem_len / 1024,
+-		current_par.using_vram ? 'V' : 'D',
+-		VIDC_NAME, fb_info.var.xres, fb_info.var.yres,
+-		h_sync / 1000, h_sync % 1000, v_sync);
+-
+-	printk(KERN_INFO "Acornfb: Monitor: %d.%03d-%d.%03dkHz, %d-%dHz%s\n",
+-		fb_info.monspecs.hfmin / 1000, fb_info.monspecs.hfmin % 1000,
+-		fb_info.monspecs.hfmax / 1000, fb_info.monspecs.hfmax % 1000,
+-		fb_info.monspecs.vfmin, fb_info.monspecs.vfmax,
+-		fb_info.monspecs.dpms ? ", DPMS" : "");
+-
+-	if (fb_set_var(&fb_info, &fb_info.var))
+-		printk(KERN_ERR "Acornfb: unable to set display parameters\n");
+-
+-	if (register_framebuffer(&fb_info) < 0)
+-		return -EINVAL;
+-	return 0;
+-}
+-
+-static struct platform_driver acornfb_driver = {
+-	.probe	= acornfb_probe,
+-	.driver	= {
+-		.name	= "acornfb",
+-	},
+-};
+-
+-static int __init acornfb_init(void)
+-{
+-	return platform_driver_register(&acornfb_driver);
+-}
+-
+-module_init(acornfb_init);
+-
+-MODULE_AUTHOR("Russell King");
+-MODULE_DESCRIPTION("VIDC 1/1a/20 framebuffer driver");
+-MODULE_LICENSE("GPL");
+diff --git a/drivers/video/fbdev/acornfb.h b/drivers/video/fbdev/acornfb.h
+deleted file mode 100644
+index f8df4ecb4..000000000
+--- a/drivers/video/fbdev/acornfb.h
++++ /dev/null
+@@ -1,166 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- *  linux/drivers/video/acornfb.h
+- *
+- *  Copyright (C) 1998,1999 Russell King
+- *
+- *  Frame buffer code for Acorn platforms
+- */
+-#if defined(HAS_VIDC20)
+-#include <asm/hardware/iomd.h>
+-#define VIDC_PALETTE_SIZE	256
+-#define VIDC_NAME		"VIDC20"
+-#endif
+-
+-#define EXTEND8(x) ((x)|(x)<<8)
+-#define EXTEND4(x) ((x)|(x)<<4|(x)<<8|(x)<<12)
+-
+-struct vidc20_palette {
+-	u_int red:8;
+-	u_int green:8;
+-	u_int blue:8;
+-	u_int ext:4;
+-	u_int unused:4;
+-};
+-
+-struct vidc_palette {
+-	u_int red:4;
+-	u_int green:4;
+-	u_int blue:4;
+-	u_int trans:1;
+-	u_int sbz1:13;
+-	u_int reg:4;
+-	u_int sbz2:2;
+-};
+-
+-union palette {
+-	struct vidc20_palette	vidc20;
+-	struct vidc_palette	vidc;
+-	u_int	p;
+-};
+-
+-struct acornfb_par {
+-	struct device	*dev;
+-	unsigned long	screen_end;
+-	unsigned int	dram_size;
+-	unsigned int	vram_half_sam;
+-	unsigned int	palette_size;
+-	  signed int	montype;
+-	unsigned int	using_vram	: 1;
+-	unsigned int	dpms		: 1;
+-
+-	union palette palette[VIDC_PALETTE_SIZE];
+-
+-	u32		pseudo_palette[16];
+-};
+-
+-struct vidc_timing {
+-	u_int	h_cycle;
+-	u_int	h_sync_width;
+-	u_int	h_border_start;
+-	u_int	h_display_start;
+-	u_int	h_display_end;
+-	u_int	h_border_end;
+-	u_int	h_interlace;
+-
+-	u_int	v_cycle;
+-	u_int	v_sync_width;
+-	u_int	v_border_start;
+-	u_int	v_display_start;
+-	u_int	v_display_end;
+-	u_int	v_border_end;
+-
+-	u_int	control;
+-
+-	/* VIDC20 only */
+-	u_int	pll_ctl;
+-};
+-
+-struct modey_params {
+-	u_int	y_res;
+-	u_int	u_margin;
+-	u_int	b_margin;
+-	u_int	vsync_len;
+-	u_int	vf;
+-};
+-
+-struct modex_params {
+-	u_int	x_res;
+-	u_int	l_margin;
+-	u_int	r_margin;
+-	u_int	hsync_len;
+-	u_int	clock;
+-	u_int	hf;
+-	const struct modey_params *modey;
+-};
+-
+-#ifdef HAS_VIDC20
+-/*
+- * VIDC20 registers
+- */
+-#define VIDC20_CTRL		0xe0000000
+-#define VIDC20_CTRL_PIX_VCLK	(0 << 0)
+-#define VIDC20_CTRL_PIX_HCLK	(1 << 0)
+-#define VIDC20_CTRL_PIX_RCLK	(2 << 0)
+-#define VIDC20_CTRL_PIX_CK	(0 << 2)
+-#define VIDC20_CTRL_PIX_CK2	(1 << 2)
+-#define VIDC20_CTRL_PIX_CK3	(2 << 2)
+-#define VIDC20_CTRL_PIX_CK4	(3 << 2)
+-#define VIDC20_CTRL_PIX_CK5	(4 << 2)
+-#define VIDC20_CTRL_PIX_CK6	(5 << 2)
+-#define VIDC20_CTRL_PIX_CK7	(6 << 2)
+-#define VIDC20_CTRL_PIX_CK8	(7 << 2)
+-#define VIDC20_CTRL_1BPP	(0 << 5)
+-#define VIDC20_CTRL_2BPP	(1 << 5)
+-#define VIDC20_CTRL_4BPP	(2 << 5)
+-#define VIDC20_CTRL_8BPP	(3 << 5)
+-#define VIDC20_CTRL_16BPP	(4 << 5)
+-#define VIDC20_CTRL_32BPP	(6 << 5)
+-#define VIDC20_CTRL_FIFO_NS	(0 << 8)
+-#define VIDC20_CTRL_FIFO_4	(1 << 8)
+-#define VIDC20_CTRL_FIFO_8	(2 << 8)
+-#define VIDC20_CTRL_FIFO_12	(3 << 8)
+-#define VIDC20_CTRL_FIFO_16	(4 << 8)
+-#define VIDC20_CTRL_FIFO_20	(5 << 8)
+-#define VIDC20_CTRL_FIFO_24	(6 << 8)
+-#define VIDC20_CTRL_FIFO_28	(7 << 8)
+-#define VIDC20_CTRL_INT		(1 << 12)
+-#define VIDC20_CTRL_DUP		(1 << 13)
+-#define VIDC20_CTRL_PDOWN	(1 << 14)
+-
+-#define VIDC20_ECTL		0xc0000000
+-#define VIDC20_ECTL_REG(x)	((x) & 0xf3)
+-#define VIDC20_ECTL_ECK		(1 << 2)
+-#define VIDC20_ECTL_REDPED	(1 << 8)
+-#define VIDC20_ECTL_GREENPED	(1 << 9)
+-#define VIDC20_ECTL_BLUEPED	(1 << 10)
+-#define VIDC20_ECTL_DAC		(1 << 12)
+-#define VIDC20_ECTL_LCDGS	(1 << 13)
+-#define VIDC20_ECTL_HRM		(1 << 14)
+-
+-#define VIDC20_ECTL_HS_MASK	(3 << 16)
+-#define VIDC20_ECTL_HS_HSYNC	(0 << 16)
+-#define VIDC20_ECTL_HS_NHSYNC	(1 << 16)
+-#define VIDC20_ECTL_HS_CSYNC	(2 << 16)
+-#define VIDC20_ECTL_HS_NCSYNC	(3 << 16)
+-
+-#define VIDC20_ECTL_VS_MASK	(3 << 18)
+-#define VIDC20_ECTL_VS_VSYNC	(0 << 18)
+-#define VIDC20_ECTL_VS_NVSYNC	(1 << 18)
+-#define VIDC20_ECTL_VS_CSYNC	(2 << 18)
+-#define VIDC20_ECTL_VS_NCSYNC	(3 << 18)
+-
+-#define VIDC20_DCTL		0xf0000000
+-/* 0-9 = number of words in scanline */
+-#define VIDC20_DCTL_SNA		(1 << 12)
+-#define VIDC20_DCTL_HDIS	(1 << 13)
+-#define VIDC20_DCTL_BUS_NS	(0 << 16)
+-#define VIDC20_DCTL_BUS_D31_0	(1 << 16)
+-#define VIDC20_DCTL_BUS_D63_32	(2 << 16)
+-#define VIDC20_DCTL_BUS_D63_0	(3 << 16)
+-#define VIDC20_DCTL_VRAM_DIS	(0 << 18)
+-#define VIDC20_DCTL_VRAM_PXCLK	(1 << 18)
+-#define VIDC20_DCTL_VRAM_PXCLK2	(2 << 18)
+-#define VIDC20_DCTL_VRAM_PXCLK4	(3 << 18)
+-
+-#endif
+diff --git a/drivers/video/fbdev/amifb.c b/drivers/video/fbdev/amifb.c
+deleted file mode 100644
+index 1116a0789..000000000
+--- a/drivers/video/fbdev/amifb.c
++++ /dev/null
+@@ -1,3787 +0,0 @@
+-/*
+- * linux/drivers/video/amifb.c -- Amiga builtin chipset frame buffer device
+- *
+- *    Copyright (C) 1995-2003 Geert Uytterhoeven
+- *
+- *          with work by Roman Zippel
+- *
+- *
+- * This file is based on the Atari frame buffer device (atafb.c):
+- *
+- *    Copyright (C) 1994 Martin Schaller
+- *                       Roman Hodek
+- *
+- *          with work by Andreas Schwab
+- *                       Guenther Kelleter
+- *
+- * and on the original Amiga console driver (amicon.c):
+- *
+- *    Copyright (C) 1993 Hamish Macdonald
+- *                       Greg Harp
+- *    Copyright (C) 1994 David Carter [carter@compsci.bristol.ac.uk]
+- *
+- *          with work by William Rucklidge (wjr@cs.cornell.edu)
+- *                       Geert Uytterhoeven
+- *                       Jes Sorensen (jds@kom.auc.dk)
+- *
+- *
+- * History:
+- *
+- *   - 24 Jul 96: Copper generates now vblank interrupt and
+- *                VESA Power Saving Protocol is fully implemented
+- *   - 14 Jul 96: Rework and hopefully last ECS bugs fixed
+- *   -  7 Mar 96: Hardware sprite support by Roman Zippel
+- *   - 18 Feb 96: OCS and ECS support by Roman Zippel
+- *                Hardware functions completely rewritten
+- *   -  2 Dec 95: AGA version by Geert Uytterhoeven
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License. See the file COPYING in the main directory of this archive
+- * for more details.
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/string.h>
+-#include <linux/mm.h>
+-#include <linux/delay.h>
+-#include <linux/interrupt.h>
+-#include <linux/fb.h>
+-#include <linux/init.h>
+-#include <linux/ioport.h>
+-#include <linux/platform_device.h>
+-#include <linux/uaccess.h>
+-
+-#include <asm/irq.h>
+-#include <asm/amigahw.h>
+-#include <asm/amigaints.h>
+-#include <asm/setup.h>
+-
+-#include "c2p.h"
+-
+-
+-#define DEBUG
+-
+-#if !defined(CONFIG_FB_AMIGA_OCS) && !defined(CONFIG_FB_AMIGA_ECS) && !defined(CONFIG_FB_AMIGA_AGA)
+-#define CONFIG_FB_AMIGA_OCS   /* define at least one fb driver, this will change later */
+-#endif
+-
+-#if !defined(CONFIG_FB_AMIGA_OCS)
+-#  define IS_OCS (0)
+-#elif defined(CONFIG_FB_AMIGA_ECS) || defined(CONFIG_FB_AMIGA_AGA)
+-#  define IS_OCS (chipset == TAG_OCS)
+-#else
+-#  define CONFIG_FB_AMIGA_OCS_ONLY
+-#  define IS_OCS (1)
+-#endif
+-
+-#if !defined(CONFIG_FB_AMIGA_ECS)
+-#  define IS_ECS (0)
+-#elif defined(CONFIG_FB_AMIGA_OCS) || defined(CONFIG_FB_AMIGA_AGA)
+-#  define IS_ECS (chipset == TAG_ECS)
+-#else
+-#  define CONFIG_FB_AMIGA_ECS_ONLY
+-#  define IS_ECS (1)
+-#endif
+-
+-#if !defined(CONFIG_FB_AMIGA_AGA)
+-#  define IS_AGA (0)
+-#elif defined(CONFIG_FB_AMIGA_OCS) || defined(CONFIG_FB_AMIGA_ECS)
+-#  define IS_AGA (chipset == TAG_AGA)
+-#else
+-#  define CONFIG_FB_AMIGA_AGA_ONLY
+-#  define IS_AGA (1)
+-#endif
+-
+-#ifdef DEBUG
+-#  define DPRINTK(fmt, args...)	printk(KERN_DEBUG "%s: " fmt, __func__ , ## args)
+-#else
+-#  define DPRINTK(fmt, args...)
+-#endif
+-
+-/*******************************************************************************
+-
+-
+-   Generic video timings
+-   ---------------------
+-
+-   Timings used by the frame buffer interface:
+-
+-   +----------+---------------------------------------------+----------+-------+
+-   |          |                ^                            |          |       |
+-   |          |                |upper_margin                |          |       |
+-   |          |                v                            |          |       |
+-   +----------###############################################----------+-------+
+-   |          #                ^                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |   left   #                |                            #  right   | hsync |
+-   |  margin  #                |       xres                 #  margin  |  len  |
+-   |<-------->#<---------------+--------------------------->#<-------->|<----->|
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |yres                        #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                |                            #          |       |
+-   |          #                v                            #          |       |
+-   +----------###############################################----------+-------+
+-   |          |                ^                            |          |       |
+-   |          |                |lower_margin                |          |       |
+-   |          |                v                            |          |       |
+-   +----------+---------------------------------------------+----------+-------+
+-   |          |                ^                            |          |       |
+-   |          |                |vsync_len                   |          |       |
+-   |          |                v                            |          |       |
+-   +----------+---------------------------------------------+----------+-------+
+-
+-
+-   Amiga video timings
+-   -------------------
+-
+-   The Amiga native chipsets uses another timing scheme:
+-
+-      - hsstrt:   Start of horizontal synchronization pulse
+-      - hsstop:   End of horizontal synchronization pulse
+-      - htotal:   Last value on the line (i.e. line length = htotal + 1)
+-      - vsstrt:   Start of vertical synchronization pulse
+-      - vsstop:   End of vertical synchronization pulse
+-      - vtotal:   Last line value (i.e. number of lines = vtotal + 1)
+-      - hcenter:  Start of vertical retrace for interlace
+-
+-   You can specify the blanking timings independently. Currently I just set
+-   them equal to the respective synchronization values:
+-
+-      - hbstrt:   Start of horizontal blank
+-      - hbstop:   End of horizontal blank
+-      - vbstrt:   Start of vertical blank
+-      - vbstop:   End of vertical blank
+-
+-   Horizontal values are in color clock cycles (280 ns), vertical values are in
+-   scanlines.
+-
+-   (0, 0) is somewhere in the upper-left corner :-)
+-
+-
+-   Amiga visible window definitions
+-   --------------------------------
+-
+-   Currently I only have values for AGA, SHRES (28 MHz dotclock). Feel free to
+-   make corrections and/or additions.
+-
+-   Within the above synchronization specifications, the visible window is
+-   defined by the following parameters (actual register resolutions may be
+-   different; all horizontal values are normalized with respect to the pixel
+-   clock):
+-
+-      - diwstrt_h:   Horizontal start of the visible window
+-      - diwstop_h:   Horizontal stop + 1(*) of the visible window
+-      - diwstrt_v:   Vertical start of the visible window
+-      - diwstop_v:   Vertical stop of the visible window
+-      - ddfstrt:     Horizontal start of display DMA
+-      - ddfstop:     Horizontal stop of display DMA
+-      - hscroll:     Horizontal display output delay
+-
+-   Sprite positioning:
+-
+-      - sprstrt_h:   Horizontal start - 4 of sprite
+-      - sprstrt_v:   Vertical start of sprite
+-
+-   (*) Even Commodore did it wrong in the AGA monitor drivers by not adding 1.
+-
+-   Horizontal values are in dotclock cycles (35 ns), vertical values are in
+-   scanlines.
+-
+-   (0, 0) is somewhere in the upper-left corner :-)
+-
+-
+-   Dependencies (AGA, SHRES (35 ns dotclock))
+-   -------------------------------------------
+-
+-   Since there are much more parameters for the Amiga display than for the
+-   frame buffer interface, there must be some dependencies among the Amiga
+-   display parameters. Here's what I found out:
+-
+-      - ddfstrt and ddfstop are best aligned to 64 pixels.
+-      - the chipset needs 64 + 4 horizontal pixels after the DMA start before
+-	the first pixel is output, so diwstrt_h = ddfstrt + 64 + 4 if you want
+-	to display the first pixel on the line too. Increase diwstrt_h for
+-	virtual screen panning.
+-      - the display DMA always fetches 64 pixels at a time (fmode = 3).
+-      - ddfstop is ddfstrt+#pixels - 64.
+-      - diwstop_h = diwstrt_h + xres + 1. Because of the additional 1 this can
+-	be 1 more than htotal.
+-      - hscroll simply adds a delay to the display output. Smooth horizontal
+-	panning needs an extra 64 pixels on the left to prefetch the pixels that
+-	`fall off' on the left.
+-      - if ddfstrt < 192, the sprite DMA cycles are all stolen by the bitplane
+-	DMA, so it's best to make the DMA start as late as possible.
+-      - you really don't want to make ddfstrt < 128, since this will steal DMA
+-	cycles from the other DMA channels (audio, floppy and Chip RAM refresh).
+-      - I make diwstop_h and diwstop_v as large as possible.
+-
+-   General dependencies
+-   --------------------
+-
+-      - all values are SHRES pixel (35ns)
+-
+-		  table 1:fetchstart  table 2:prefetch    table 3:fetchsize
+-		  ------------------  ----------------    -----------------
+-   Pixclock     # SHRES|HIRES|LORES # SHRES|HIRES|LORES # SHRES|HIRES|LORES
+-   -------------#------+-----+------#------+-----+------#------+-----+------
+-   Bus width 1x #   16 |  32 |  64  #   16 |  32 |  64  #   64 |  64 |  64
+-   Bus width 2x #   32 |  64 | 128  #   32 |  64 |  64  #   64 |  64 | 128
+-   Bus width 4x #   64 | 128 | 256  #   64 |  64 |  64  #   64 | 128 | 256
+-
+-      - chipset needs 4 pixels before the first pixel is output
+-      - ddfstrt must be aligned to fetchstart (table 1)
+-      - chipset needs also prefetch (table 2) to get first pixel data, so
+-	ddfstrt = ((diwstrt_h - 4) & -fetchstart) - prefetch
+-      - for horizontal panning decrease diwstrt_h
+-      - the length of a fetchline must be aligned to fetchsize (table 3)
+-      - if fetchstart is smaller than fetchsize, then ddfstrt can a little bit
+-	moved to optimize use of dma (useful for OCS/ECS overscan displays)
+-      - ddfstop is ddfstrt + ddfsize - fetchsize
+-      - If C= didn't change anything for AGA, then at following positions the
+-	dma bus is already used:
+-	ddfstrt <  48 -> memory refresh
+-		<  96 -> disk dma
+-		< 160 -> audio dma
+-		< 192 -> sprite 0 dma
+-		< 416 -> sprite dma (32 per sprite)
+-      - in accordance with the hardware reference manual a hardware stop is at
+-	192, but AGA (ECS?) can go below this.
+-
+-   DMA priorities
+-   --------------
+-
+-   Since there are limits on the earliest start value for display DMA and the
+-   display of sprites, I use the following policy on horizontal panning and
+-   the hardware cursor:
+-
+-      - if you want to start display DMA too early, you lose the ability to
+-	do smooth horizontal panning (xpanstep 1 -> 64).
+-      - if you want to go even further, you lose the hardware cursor too.
+-
+-   IMHO a hardware cursor is more important for X than horizontal scrolling,
+-   so that's my motivation.
+-
+-
+-   Implementation
+-   --------------
+-
+-   ami_decode_var() converts the frame buffer values to the Amiga values. It's
+-   just a `straightforward' implementation of the above rules.
+-
+-
+-   Standard VGA timings
+-   --------------------
+-
+-	       xres  yres    left  right  upper  lower    hsync    vsync
+-	       ----  ----    ----  -----  -----  -----    -----    -----
+-      80x25     720   400      27     45     35     12      108        2
+-      80x30     720   480      27     45     30      9      108        2
+-
+-   These were taken from a XFree86 configuration file, recalculated for a 28 MHz
+-   dotclock (Amigas don't have a 25 MHz dotclock) and converted to frame buffer
+-   generic timings.
+-
+-   As a comparison, graphics/monitor.h suggests the following:
+-
+-	       xres  yres    left  right  upper  lower    hsync    vsync
+-	       ----  ----    ----  -----  -----  -----    -----    -----
+-
+-      VGA       640   480      52    112     24     19    112 -      2 +
+-      VGA70     640   400      52    112     27     21    112 -      2 -
+-
+-
+-   Sync polarities
+-   ---------------
+-
+-      VSYNC    HSYNC    Vertical size    Vertical total
+-      -----    -----    -------------    --------------
+-	+        +           Reserved          Reserved
+-	+        -                400               414
+-	-        +                350               362
+-	-        -                480               496
+-
+-   Source: CL-GD542X Technical Reference Manual, Cirrus Logic, Oct 1992
+-
+-
+-   Broadcast video timings
+-   -----------------------
+-
+-   According to the CCIR and RETMA specifications, we have the following values:
+-
+-   CCIR -> PAL
+-   -----------
+-
+-      - a scanline is 64 µs long, of which 52.48 µs are visible. This is about
+-	736 visible 70 ns pixels per line.
+-      - we have 625 scanlines, of which 575 are visible (interlaced); after
+-	rounding this becomes 576.
+-
+-   RETMA -> NTSC
+-   -------------
+-
+-      - a scanline is 63.5 µs long, of which 53.5 µs are visible.  This is about
+-	736 visible 70 ns pixels per line.
+-      - we have 525 scanlines, of which 485 are visible (interlaced); after
+-	rounding this becomes 484.
+-
+-   Thus if you want a PAL compatible display, you have to do the following:
+-
+-      - set the FB_SYNC_BROADCAST flag to indicate that standard broadcast
+-	timings are to be used.
+-      - make sure upper_margin + yres + lower_margin + vsync_len = 625 for an
+-	interlaced, 312 for a non-interlaced and 156 for a doublescanned
+-	display.
+-      - make sure left_margin + xres + right_margin + hsync_len = 1816 for a
+-	SHRES, 908 for a HIRES and 454 for a LORES display.
+-      - the left visible part begins at 360 (SHRES; HIRES:180, LORES:90),
+-	left_margin + 2 * hsync_len must be greater or equal.
+-      - the upper visible part begins at 48 (interlaced; non-interlaced:24,
+-	doublescanned:12), upper_margin + 2 * vsync_len must be greater or
+-	equal.
+-      - ami_encode_var() calculates margins with a hsync of 5320 ns and a vsync
+-	of 4 scanlines
+-
+-   The settings for a NTSC compatible display are straightforward.
+-
+-   Note that in a strict sense the PAL and NTSC standards only define the
+-   encoding of the color part (chrominance) of the video signal and don't say
+-   anything about horizontal/vertical synchronization nor refresh rates.
+-
+-
+-							    -- Geert --
+-
+-*******************************************************************************/
+-
+-
+-	/*
+-	 * Custom Chipset Definitions
+-	 */
+-
+-#define CUSTOM_OFS(fld) ((long)&((struct CUSTOM*)0)->fld)
+-
+-	/*
+-	 * BPLCON0 -- Bitplane Control Register 0
+-	 */
+-
+-#define BPC0_HIRES	(0x8000)
+-#define BPC0_BPU2	(0x4000) /* Bit plane used count */
+-#define BPC0_BPU1	(0x2000)
+-#define BPC0_BPU0	(0x1000)
+-#define BPC0_HAM	(0x0800) /* HAM mode */
+-#define BPC0_DPF	(0x0400) /* Double playfield */
+-#define BPC0_COLOR	(0x0200) /* Enable colorburst */
+-#define BPC0_GAUD	(0x0100) /* Genlock audio enable */
+-#define BPC0_UHRES	(0x0080) /* Ultrahi res enable */
+-#define BPC0_SHRES	(0x0040) /* Super hi res mode */
+-#define BPC0_BYPASS	(0x0020) /* Bypass LUT - AGA */
+-#define BPC0_BPU3	(0x0010) /* AGA */
+-#define BPC0_LPEN	(0x0008) /* Light pen enable */
+-#define BPC0_LACE	(0x0004) /* Interlace */
+-#define BPC0_ERSY	(0x0002) /* External resync */
+-#define BPC0_ECSENA	(0x0001) /* ECS enable */
+-
+-	/*
+-	 * BPLCON2 -- Bitplane Control Register 2
+-	 */
+-
+-#define BPC2_ZDBPSEL2	(0x4000) /* Bitplane to be used for ZD - AGA */
+-#define BPC2_ZDBPSEL1	(0x2000)
+-#define BPC2_ZDBPSEL0	(0x1000)
+-#define BPC2_ZDBPEN	(0x0800) /* Enable ZD with ZDBPSELx - AGA */
+-#define BPC2_ZDCTEN	(0x0400) /* Enable ZD with palette bit #31 - AGA */
+-#define BPC2_KILLEHB	(0x0200) /* Kill EHB mode - AGA */
+-#define BPC2_RDRAM	(0x0100) /* Color table accesses read, not write - AGA */
+-#define BPC2_SOGEN	(0x0080) /* SOG output pin high - AGA */
+-#define BPC2_PF2PRI	(0x0040) /* PF2 priority over PF1 */
+-#define BPC2_PF2P2	(0x0020) /* PF2 priority wrt sprites */
+-#define BPC2_PF2P1	(0x0010)
+-#define BPC2_PF2P0	(0x0008)
+-#define BPC2_PF1P2	(0x0004) /* ditto PF1 */
+-#define BPC2_PF1P1	(0x0002)
+-#define BPC2_PF1P0	(0x0001)
+-
+-	/*
+-	 * BPLCON3 -- Bitplane Control Register 3 (AGA)
+-	 */
+-
+-#define BPC3_BANK2	(0x8000) /* Bits to select color register bank */
+-#define BPC3_BANK1	(0x4000)
+-#define BPC3_BANK0	(0x2000)
+-#define BPC3_PF2OF2	(0x1000) /* Bits for color table offset when PF2 */
+-#define BPC3_PF2OF1	(0x0800)
+-#define BPC3_PF2OF0	(0x0400)
+-#define BPC3_LOCT	(0x0200) /* Color register writes go to low bits */
+-#define BPC3_SPRES1	(0x0080) /* Sprite resolution bits */
+-#define BPC3_SPRES0	(0x0040)
+-#define BPC3_BRDRBLNK	(0x0020) /* Border blanked? */
+-#define BPC3_BRDRTRAN	(0x0010) /* Border transparent? */
+-#define BPC3_ZDCLKEN	(0x0004) /* ZD pin is 14 MHz (HIRES) clock output */
+-#define BPC3_BRDRSPRT	(0x0002) /* Sprites in border? */
+-#define BPC3_EXTBLKEN	(0x0001) /* BLANK programmable */
+-
+-	/*
+-	 * BPLCON4 -- Bitplane Control Register 4 (AGA)
+-	 */
+-
+-#define BPC4_BPLAM7	(0x8000) /* bitplane color XOR field */
+-#define BPC4_BPLAM6	(0x4000)
+-#define BPC4_BPLAM5	(0x2000)
+-#define BPC4_BPLAM4	(0x1000)
+-#define BPC4_BPLAM3	(0x0800)
+-#define BPC4_BPLAM2	(0x0400)
+-#define BPC4_BPLAM1	(0x0200)
+-#define BPC4_BPLAM0	(0x0100)
+-#define BPC4_ESPRM7	(0x0080) /* 4 high bits for even sprite colors */
+-#define BPC4_ESPRM6	(0x0040)
+-#define BPC4_ESPRM5	(0x0020)
+-#define BPC4_ESPRM4	(0x0010)
+-#define BPC4_OSPRM7	(0x0008) /* 4 high bits for odd sprite colors */
+-#define BPC4_OSPRM6	(0x0004)
+-#define BPC4_OSPRM5	(0x0002)
+-#define BPC4_OSPRM4	(0x0001)
+-
+-	/*
+-	 * BEAMCON0 -- Beam Control Register
+-	 */
+-
+-#define BMC0_HARDDIS	(0x4000) /* Disable hardware limits */
+-#define BMC0_LPENDIS	(0x2000) /* Disable light pen latch */
+-#define BMC0_VARVBEN	(0x1000) /* Enable variable vertical blank */
+-#define BMC0_LOLDIS	(0x0800) /* Disable long/short line toggle */
+-#define BMC0_CSCBEN	(0x0400) /* Composite sync/blank */
+-#define BMC0_VARVSYEN	(0x0200) /* Enable variable vertical sync */
+-#define BMC0_VARHSYEN	(0x0100) /* Enable variable horizontal sync */
+-#define BMC0_VARBEAMEN	(0x0080) /* Enable variable beam counters */
+-#define BMC0_DUAL	(0x0040) /* Enable alternate horizontal beam counter */
+-#define BMC0_PAL	(0x0020) /* Set decodes for PAL */
+-#define BMC0_VARCSYEN	(0x0010) /* Enable variable composite sync */
+-#define BMC0_BLANKEN	(0x0008) /* Blank enable (no longer used on AGA) */
+-#define BMC0_CSYTRUE	(0x0004) /* CSY polarity */
+-#define BMC0_VSYTRUE	(0x0002) /* VSY polarity */
+-#define BMC0_HSYTRUE	(0x0001) /* HSY polarity */
+-
+-
+-	/*
+-	 * FMODE -- Fetch Mode Control Register (AGA)
+-	 */
+-
+-#define FMODE_SSCAN2	(0x8000) /* Sprite scan-doubling */
+-#define FMODE_BSCAN2	(0x4000) /* Use PF2 modulus every other line */
+-#define FMODE_SPAGEM	(0x0008) /* Sprite page mode */
+-#define FMODE_SPR32	(0x0004) /* Sprite 32 bit fetch */
+-#define FMODE_BPAGEM	(0x0002) /* Bitplane page mode */
+-#define FMODE_BPL32	(0x0001) /* Bitplane 32 bit fetch */
+-
+-	/*
+-	 * Tags used to indicate a specific Pixel Clock
+-	 *
+-	 * clk_shift is the shift value to get the timings in 35 ns units
+-	 */
+-
+-enum { TAG_SHRES, TAG_HIRES, TAG_LORES };
+-
+-	/*
+-	 * Tags used to indicate the specific chipset
+-	 */
+-
+-enum { TAG_OCS, TAG_ECS, TAG_AGA };
+-
+-	/*
+-	 * Tags used to indicate the memory bandwidth
+-	 */
+-
+-enum { TAG_FMODE_1, TAG_FMODE_2, TAG_FMODE_4 };
+-
+-
+-	/*
+-	 * Clock Definitions, Maximum Display Depth
+-	 *
+-	 * These depend on the E-Clock or the Chipset, so they are filled in
+-	 * dynamically
+-	 */
+-
+-static u_long pixclock[3];	/* SHRES/HIRES/LORES: index = clk_shift */
+-static u_short maxdepth[3];	/* SHRES/HIRES/LORES: index = clk_shift */
+-static u_short maxfmode, chipset;
+-
+-
+-	/*
+-	 * Broadcast Video Timings
+-	 *
+-	 * Horizontal values are in 35 ns (SHRES) units
+-	 * Vertical values are in interlaced scanlines
+-	 */
+-
+-#define PAL_DIWSTRT_H	(360)	/* PAL Window Limits */
+-#define PAL_DIWSTRT_V	(48)
+-#define PAL_HTOTAL	(1816)
+-#define PAL_VTOTAL	(625)
+-
+-#define NTSC_DIWSTRT_H	(360)	/* NTSC Window Limits */
+-#define NTSC_DIWSTRT_V	(40)
+-#define NTSC_HTOTAL	(1816)
+-#define NTSC_VTOTAL	(525)
+-
+-
+-	/*
+-	 * Various macros
+-	 */
+-
+-#define up2(v)		(((v) + 1) & -2)
+-#define down2(v)	((v) & -2)
+-#define div2(v)		((v)>>1)
+-#define mod2(v)		((v) & 1)
+-
+-#define up4(v)		(((v) + 3) & -4)
+-#define down4(v)	((v) & -4)
+-#define mul4(v)		((v) << 2)
+-#define div4(v)		((v)>>2)
+-#define mod4(v)		((v) & 3)
+-
+-#define up8(v)		(((v) + 7) & -8)
+-#define down8(v)	((v) & -8)
+-#define div8(v)		((v)>>3)
+-#define mod8(v)		((v) & 7)
+-
+-#define up16(v)		(((v) + 15) & -16)
+-#define down16(v)	((v) & -16)
+-#define div16(v)	((v)>>4)
+-#define mod16(v)	((v) & 15)
+-
+-#define up32(v)		(((v) + 31) & -32)
+-#define down32(v)	((v) & -32)
+-#define div32(v)	((v)>>5)
+-#define mod32(v)	((v) & 31)
+-
+-#define up64(v)		(((v) + 63) & -64)
+-#define down64(v)	((v) & -64)
+-#define div64(v)	((v)>>6)
+-#define mod64(v)	((v) & 63)
+-
+-#define upx(x, v)	(((v) + (x) - 1) & -(x))
+-#define downx(x, v)	((v) & -(x))
+-#define modx(x, v)	((v) & ((x) - 1))
+-
+-/*
+- * FIXME: Use C variants of the code marked with #ifdef __mc68000__
+- * in the driver. It shouldn't negatively affect the performance and
+- * is required for APUS support (once it is re-added to the kernel).
+- * Needs to be tested on the hardware though..
+- */
+-/* if x1 is not a constant, this macro won't make real sense :-) */
+-#ifdef __mc68000__
+-#define DIVUL(x1, x2) ({int res; asm("divul %1,%2,%3": "=d" (res): \
+-	"d" (x2), "d" ((long)((x1) / 0x100000000ULL)), "0" ((long)(x1))); res;})
+-#else
+-/* We know a bit about the numbers, so we can do it this way */
+-#define DIVUL(x1, x2) ((((long)((unsigned long long)x1 >> 8) / x2) << 8) + \
+-	((((long)((unsigned long long)x1 >> 8) % x2) << 8) / x2))
+-#endif
+-
+-#define highw(x)	((u_long)(x)>>16 & 0xffff)
+-#define loww(x)		((u_long)(x) & 0xffff)
+-
+-#define custom		amiga_custom
+-
+-#define VBlankOn()	custom.intena = IF_SETCLR|IF_COPER
+-#define VBlankOff()	custom.intena = IF_COPER
+-
+-
+-	/*
+-	 * Chip RAM we reserve for the Frame Buffer
+-	 *
+-	 * This defines the Maximum Virtual Screen Size
+-	 * (Setable per kernel options?)
+-	 */
+-
+-#define VIDEOMEMSIZE_AGA_2M	(1310720) /* AGA (2MB) : max 1280*1024*256  */
+-#define VIDEOMEMSIZE_AGA_1M	(786432)  /* AGA (1MB) : max 1024*768*256   */
+-#define VIDEOMEMSIZE_ECS_2M	(655360)  /* ECS (2MB) : max 1280*1024*16   */
+-#define VIDEOMEMSIZE_ECS_1M	(393216)  /* ECS (1MB) : max 1024*768*16    */
+-#define VIDEOMEMSIZE_OCS	(262144)  /* OCS       : max ca. 800*600*16 */
+-
+-#define SPRITEMEMSIZE		(64 * 64 / 4) /* max 64*64*4 */
+-#define DUMMYSPRITEMEMSIZE	(8)
+-static u_long spritememory;
+-
+-#define CHIPRAM_SAFETY_LIMIT	(16384)
+-
+-static u_long videomemory;
+-
+-	/*
+-	 * This is the earliest allowed start of fetching display data.
+-	 * Only if you really want no hardware cursor and audio,
+-	 * set this to 128, but let it better at 192
+-	 */
+-
+-static u_long min_fstrt = 192;
+-
+-#define assignchunk(name, type, ptr, size) \
+-{ \
+-	(name) = (type)(ptr); \
+-	ptr += size; \
+-}
+-
+-
+-	/*
+-	 * Copper Instructions
+-	 */
+-
+-#define CMOVE(val, reg)		(CUSTOM_OFS(reg) << 16 | (val))
+-#define CMOVE2(val, reg)	((CUSTOM_OFS(reg) + 2) << 16 | (val))
+-#define CWAIT(x, y)		(((y) & 0x1fe) << 23 | ((x) & 0x7f0) << 13 | 0x0001fffe)
+-#define CEND			(0xfffffffe)
+-
+-
+-typedef union {
+-	u_long l;
+-	u_short w[2];
+-} copins;
+-
+-static struct copdisplay {
+-	copins *init;
+-	copins *wait;
+-	copins *list[2][2];
+-	copins *rebuild[2];
+-} copdisplay;
+-
+-static u_short currentcop = 0;
+-
+-	/*
+-	 * Hardware Cursor API Definitions
+-	 * These used to be in linux/fb.h, but were preliminary and used by
+-	 * amifb only anyway
+-	 */
+-
+-#define FBIOGET_FCURSORINFO     0x4607
+-#define FBIOGET_VCURSORINFO     0x4608
+-#define FBIOPUT_VCURSORINFO     0x4609
+-#define FBIOGET_CURSORSTATE     0x460A
+-#define FBIOPUT_CURSORSTATE     0x460B
+-
+-
+-struct fb_fix_cursorinfo {
+-	__u16 crsr_width;		/* width and height of the cursor in */
+-	__u16 crsr_height;		/* pixels (zero if no cursor)	*/
+-	__u16 crsr_xsize;		/* cursor size in display pixels */
+-	__u16 crsr_ysize;
+-	__u16 crsr_color1;		/* colormap entry for cursor color1 */
+-	__u16 crsr_color2;		/* colormap entry for cursor color2 */
+-};
+-
+-struct fb_var_cursorinfo {
+-	__u16 width;
+-	__u16 height;
+-	__u16 xspot;
+-	__u16 yspot;
+-	DECLARE_FLEX_ARRAY(__u8, data);	/* field with [height][width]        */
+-};
+-
+-struct fb_cursorstate {
+-	__s16 xoffset;
+-	__s16 yoffset;
+-	__u16 mode;
+-};
+-
+-#define FB_CURSOR_OFF		0
+-#define FB_CURSOR_ON		1
+-#define FB_CURSOR_FLASH		2
+-
+-
+-	/*
+-	 * Hardware Cursor
+-	 */
+-
+-static int cursorrate = 20;	/* Number of frames/flash toggle */
+-static u_short cursorstate = -1;
+-static u_short cursormode = FB_CURSOR_OFF;
+-
+-static u_short *lofsprite, *shfsprite, *dummysprite;
+-
+-	/*
+-	 * Current Video Mode
+-	 */
+-
+-struct amifb_par {
+-
+-	/* General Values */
+-
+-	int xres;		/* vmode */
+-	int yres;		/* vmode */
+-	int vxres;		/* vmode */
+-	int vyres;		/* vmode */
+-	int xoffset;		/* vmode */
+-	int yoffset;		/* vmode */
+-	u_short bpp;		/* vmode */
+-	u_short clk_shift;	/* vmode */
+-	u_short line_shift;	/* vmode */
+-	int vmode;		/* vmode */
+-	u_short diwstrt_h;	/* vmode */
+-	u_short diwstop_h;	/* vmode */
+-	u_short diwstrt_v;	/* vmode */
+-	u_short diwstop_v;	/* vmode */
+-	u_long next_line;	/* modulo for next line */
+-	u_long next_plane;	/* modulo for next plane */
+-
+-	/* Cursor Values */
+-
+-	struct {
+-		short crsr_x;	/* movecursor */
+-		short crsr_y;	/* movecursor */
+-		short spot_x;
+-		short spot_y;
+-		u_short height;
+-		u_short width;
+-		u_short fmode;
+-	} crsr;
+-
+-	/* OCS Hardware Registers */
+-
+-	u_long bplpt0;		/* vmode, pan (Note: physical address) */
+-	u_long bplpt0wrap;	/* vmode, pan (Note: physical address) */
+-	u_short ddfstrt;
+-	u_short ddfstop;
+-	u_short bpl1mod;
+-	u_short bpl2mod;
+-	u_short bplcon0;	/* vmode */
+-	u_short bplcon1;	/* vmode */
+-	u_short htotal;		/* vmode */
+-	u_short vtotal;		/* vmode */
+-
+-	/* Additional ECS Hardware Registers */
+-
+-	u_short bplcon3;	/* vmode */
+-	u_short beamcon0;	/* vmode */
+-	u_short hsstrt;		/* vmode */
+-	u_short hsstop;		/* vmode */
+-	u_short hbstrt;		/* vmode */
+-	u_short hbstop;		/* vmode */
+-	u_short vsstrt;		/* vmode */
+-	u_short vsstop;		/* vmode */
+-	u_short vbstrt;		/* vmode */
+-	u_short vbstop;		/* vmode */
+-	u_short hcenter;	/* vmode */
+-
+-	/* Additional AGA Hardware Registers */
+-
+-	u_short fmode;		/* vmode */
+-};
+-
+-
+-	/*
+-	 *  Saved color entry 0 so we can restore it when unblanking
+-	 */
+-
+-static u_char red0, green0, blue0;
+-
+-
+-#if defined(CONFIG_FB_AMIGA_ECS)
+-static u_short ecs_palette[32];
+-#endif
+-
+-
+-	/*
+-	 * Latches for Display Changes during VBlank
+-	 */
+-
+-static u_short do_vmode_full = 0;	/* Change the Video Mode */
+-static u_short do_vmode_pan = 0;	/* Update the Video Mode */
+-static short do_blank = 0;		/* (Un)Blank the Screen (±1) */
+-static u_short do_cursor = 0;		/* Move the Cursor */
+-
+-
+-	/*
+-	 * Various Flags
+-	 */
+-
+-static u_short is_blanked = 0;		/* Screen is Blanked */
+-static u_short is_lace = 0;		/* Screen is laced */
+-
+-	/*
+-	 * Predefined Video Modes
+-	 *
+-	 */
+-
+-static struct fb_videomode ami_modedb[] __initdata = {
+-
+-	/*
+-	 *  AmigaOS Video Modes
+-	 *
+-	 *  If you change these, make sure to update DEFMODE_* as well!
+-	 */
+-
+-	{
+-		/* 640x200, 15 kHz, 60 Hz (NTSC) */
+-		"ntsc", 60, 640, 200, TAG_HIRES, 106, 86, 44, 16, 76, 2,
+-		FB_SYNC_BROADCAST, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x400, 15 kHz, 60 Hz interlaced (NTSC) */
+-		"ntsc-lace", 60, 640, 400, TAG_HIRES, 106, 86, 88, 33, 76, 4,
+-		FB_SYNC_BROADCAST, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x256, 15 kHz, 50 Hz (PAL) */
+-		"pal", 50, 640, 256, TAG_HIRES, 106, 86, 40, 14, 76, 2,
+-		FB_SYNC_BROADCAST, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x512, 15 kHz, 50 Hz interlaced (PAL) */
+-		"pal-lace", 50, 640, 512, TAG_HIRES, 106, 86, 80, 29, 76, 4,
+-		FB_SYNC_BROADCAST, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x480, 29 kHz, 57 Hz */
+-		"multiscan", 57, 640, 480, TAG_SHRES, 96, 112, 29, 8, 72, 8,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x960, 29 kHz, 57 Hz interlaced */
+-		"multiscan-lace", 57, 640, 960, TAG_SHRES, 96, 112, 58, 16, 72,
+-		16,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x200, 15 kHz, 72 Hz */
+-		"euro36", 72, 640, 200, TAG_HIRES, 92, 124, 6, 6, 52, 5,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x400, 15 kHz, 72 Hz interlaced */
+-		"euro36-lace", 72, 640, 400, TAG_HIRES, 92, 124, 12, 12, 52,
+-		10,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x400, 29 kHz, 68 Hz */
+-		"euro72", 68, 640, 400, TAG_SHRES, 164, 92, 9, 9, 80, 8,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x800, 29 kHz, 68 Hz interlaced */
+-		"euro72-lace", 68, 640, 800, TAG_SHRES, 164, 92, 18, 18, 80,
+-		16,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 800x300, 23 kHz, 70 Hz */
+-		"super72", 70, 800, 300, TAG_SHRES, 212, 140, 10, 11, 80, 7,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 800x600, 23 kHz, 70 Hz interlaced */
+-		"super72-lace", 70, 800, 600, TAG_SHRES, 212, 140, 20, 22, 80,
+-		14,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x200, 27 kHz, 57 Hz doublescan */
+-		"dblntsc", 57, 640, 200, TAG_SHRES, 196, 124, 18, 17, 80, 4,
+-		0, FB_VMODE_DOUBLE | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x400, 27 kHz, 57 Hz */
+-		"dblntsc-ff", 57, 640, 400, TAG_SHRES, 196, 124, 36, 35, 80, 7,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x800, 27 kHz, 57 Hz interlaced */
+-		"dblntsc-lace", 57, 640, 800, TAG_SHRES, 196, 124, 72, 70, 80,
+-		14,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x256, 27 kHz, 47 Hz doublescan */
+-		"dblpal", 47, 640, 256, TAG_SHRES, 196, 124, 14, 13, 80, 4,
+-		0, FB_VMODE_DOUBLE | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x512, 27 kHz, 47 Hz */
+-		"dblpal-ff", 47, 640, 512, TAG_SHRES, 196, 124, 28, 27, 80, 7,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x1024, 27 kHz, 47 Hz interlaced */
+-		"dblpal-lace", 47, 640, 1024, TAG_SHRES, 196, 124, 56, 54, 80,
+-		14,
+-		0, FB_VMODE_INTERLACED | FB_VMODE_YWRAP
+-	},
+-
+-	/*
+-	 *  VGA Video Modes
+-	 */
+-
+-	{
+-		/* 640x480, 31 kHz, 60 Hz (VGA) */
+-		"vga", 60, 640, 480, TAG_SHRES, 64, 96, 30, 9, 112, 2,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 640x400, 31 kHz, 70 Hz (VGA) */
+-		"vga70", 70, 640, 400, TAG_SHRES, 64, 96, 35, 12, 112, 2,
+-		FB_SYNC_VERT_HIGH_ACT | FB_SYNC_COMP_HIGH_ACT,
+-		FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	},
+-
+-#if 0
+-
+-	/*
+-	 *  A2024 video modes
+-	 *  These modes don't work yet because there's no A2024 driver.
+-	 */
+-
+-	{
+-		/* 1024x800, 10 Hz */
+-		"a2024-10", 10, 1024, 800, TAG_HIRES, 0, 0, 0, 0, 0, 0,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}, {
+-		/* 1024x800, 15 Hz */
+-		"a2024-15", 15, 1024, 800, TAG_HIRES, 0, 0, 0, 0, 0, 0,
+-		0, FB_VMODE_NONINTERLACED | FB_VMODE_YWRAP
+-	}
+-#endif
+-};
+-
+-#define NUM_TOTAL_MODES  ARRAY_SIZE(ami_modedb)
+-
+-static char *mode_option __initdata = NULL;
+-static int round_down_bpp = 1;	/* for mode probing */
+-
+-	/*
+-	 * Some default modes
+-	 */
+-
+-
+-#define DEFMODE_PAL	    2	/* "pal" for PAL OCS/ECS */
+-#define DEFMODE_NTSC	    0	/* "ntsc" for NTSC OCS/ECS */
+-#define DEFMODE_AMBER_PAL   3	/* "pal-lace" for flicker fixed PAL (A3000) */
+-#define DEFMODE_AMBER_NTSC  1	/* "ntsc-lace" for flicker fixed NTSC (A3000) */
+-#define DEFMODE_AGA	    19	/* "vga70" for AGA */
+-
+-
+-static int amifb_ilbm = 0;	/* interleaved or normal bitplanes */
+-
+-static u32 amifb_hfmin __initdata;	/* monitor hfreq lower limit (Hz) */
+-static u32 amifb_hfmax __initdata;	/* monitor hfreq upper limit (Hz) */
+-static u16 amifb_vfmin __initdata;	/* monitor vfreq lower limit (Hz) */
+-static u16 amifb_vfmax __initdata;	/* monitor vfreq upper limit (Hz) */
+-
+-
+-	/*
+-	 * Macros for the conversion from real world values to hardware register
+-	 * values
+-	 *
+-	 * This helps us to keep our attention on the real stuff...
+-	 *
+-	 * Hardware limits for AGA:
+-	 *
+-	 *	parameter  min    max  step
+-	 *	---------  ---   ----  ----
+-	 *	diwstrt_h    0   2047     1
+-	 *	diwstrt_v    0   2047     1
+-	 *	diwstop_h    0   4095     1
+-	 *	diwstop_v    0   4095     1
+-	 *
+-	 *	ddfstrt      0   2032    16
+-	 *	ddfstop      0   2032    16
+-	 *
+-	 *	htotal       8   2048     8
+-	 *	hsstrt       0   2040     8
+-	 *	hsstop       0   2040     8
+-	 *	vtotal       1   4096     1
+-	 *	vsstrt       0   4095     1
+-	 *	vsstop       0   4095     1
+-	 *	hcenter      0   2040     8
+-	 *
+-	 *	hbstrt       0   2047     1
+-	 *	hbstop       0   2047     1
+-	 *	vbstrt       0   4095     1
+-	 *	vbstop       0   4095     1
+-	 *
+-	 * Horizontal values are in 35 ns (SHRES) pixels
+-	 * Vertical values are in half scanlines
+-	 */
+-
+-/* bplcon1 (smooth scrolling) */
+-
+-#define hscroll2hw(hscroll) \
+-	(((hscroll) << 12 & 0x3000) | ((hscroll) << 8 & 0xc300) | \
+-	 ((hscroll) << 4 & 0x0c00) | ((hscroll) << 2 & 0x00f0) | \
+-	 ((hscroll)>>2 & 0x000f))
+-
+-/* diwstrt/diwstop/diwhigh (visible display window) */
+-
+-#define diwstrt2hw(diwstrt_h, diwstrt_v) \
+-	(((diwstrt_v) << 7 & 0xff00) | ((diwstrt_h)>>2 & 0x00ff))
+-#define diwstop2hw(diwstop_h, diwstop_v) \
+-	(((diwstop_v) << 7 & 0xff00) | ((diwstop_h)>>2 & 0x00ff))
+-#define diwhigh2hw(diwstrt_h, diwstrt_v, diwstop_h, diwstop_v) \
+-	(((diwstop_h) << 3 & 0x2000) | ((diwstop_h) << 11 & 0x1800) | \
+-	 ((diwstop_v)>>1 & 0x0700) | ((diwstrt_h)>>5 & 0x0020) | \
+-	 ((diwstrt_h) << 3 & 0x0018) | ((diwstrt_v)>>9 & 0x0007))
+-
+-/* ddfstrt/ddfstop (display DMA) */
+-
+-#define ddfstrt2hw(ddfstrt)	div8(ddfstrt)
+-#define ddfstop2hw(ddfstop)	div8(ddfstop)
+-
+-/* hsstrt/hsstop/htotal/vsstrt/vsstop/vtotal/hcenter (sync timings) */
+-
+-#define hsstrt2hw(hsstrt)	(div8(hsstrt))
+-#define hsstop2hw(hsstop)	(div8(hsstop))
+-#define htotal2hw(htotal)	(div8(htotal) - 1)
+-#define vsstrt2hw(vsstrt)	(div2(vsstrt))
+-#define vsstop2hw(vsstop)	(div2(vsstop))
+-#define vtotal2hw(vtotal)	(div2(vtotal) - 1)
+-#define hcenter2hw(htotal)	(div8(htotal))
+-
+-/* hbstrt/hbstop/vbstrt/vbstop (blanking timings) */
+-
+-#define hbstrt2hw(hbstrt)	(((hbstrt) << 8 & 0x0700) | ((hbstrt)>>3 & 0x00ff))
+-#define hbstop2hw(hbstop)	(((hbstop) << 8 & 0x0700) | ((hbstop)>>3 & 0x00ff))
+-#define vbstrt2hw(vbstrt)	(div2(vbstrt))
+-#define vbstop2hw(vbstop)	(div2(vbstop))
+-
+-/* colour */
+-
+-#define rgb2hw8_high(red, green, blue) \
+-	(((red & 0xf0) << 4) | (green & 0xf0) | ((blue & 0xf0)>>4))
+-#define rgb2hw8_low(red, green, blue) \
+-	(((red & 0x0f) << 8) | ((green & 0x0f) << 4) | (blue & 0x0f))
+-#define rgb2hw4(red, green, blue) \
+-	(((red & 0xf0) << 4) | (green & 0xf0) | ((blue & 0xf0)>>4))
+-#define rgb2hw2(red, green, blue) \
+-	(((red & 0xc0) << 4) | (green & 0xc0) | ((blue & 0xc0)>>4))
+-
+-/* sprpos/sprctl (sprite positioning) */
+-
+-#define spr2hw_pos(start_v, start_h) \
+-	(((start_v) << 7 & 0xff00) | ((start_h)>>3 & 0x00ff))
+-#define spr2hw_ctl(start_v, start_h, stop_v) \
+-	(((stop_v) << 7 & 0xff00) | ((start_v)>>4 & 0x0040) | \
+-	 ((stop_v)>>5 & 0x0020) | ((start_h) << 3 & 0x0018) | \
+-	 ((start_v)>>7 & 0x0004) | ((stop_v)>>8 & 0x0002) | \
+-	 ((start_h)>>2 & 0x0001))
+-
+-/* get current vertical position of beam */
+-#define get_vbpos()	((u_short)((*(u_long volatile *)&custom.vposr >> 7) & 0xffe))
+-
+-	/*
+-	 * Copper Initialisation List
+-	 */
+-
+-#define COPINITSIZE (sizeof(copins) * 40)
+-
+-enum {
+-	cip_bplcon0
+-};
+-
+-	/*
+-	 * Long Frame/Short Frame Copper List
+-	 * Don't change the order, build_copper()/rebuild_copper() rely on this
+-	 */
+-
+-#define COPLISTSIZE (sizeof(copins) * 64)
+-
+-enum {
+-	cop_wait, cop_bplcon0,
+-	cop_spr0ptrh, cop_spr0ptrl,
+-	cop_diwstrt, cop_diwstop,
+-	cop_diwhigh,
+-};
+-
+-	/*
+-	 * Pixel modes for Bitplanes and Sprites
+-	 */
+-
+-static u_short bplpixmode[3] = {
+-	BPC0_SHRES,			/*  35 ns */
+-	BPC0_HIRES,			/*  70 ns */
+-	0				/* 140 ns */
+-};
+-
+-static u_short sprpixmode[3] = {
+-	BPC3_SPRES1 | BPC3_SPRES0,	/*  35 ns */
+-	BPC3_SPRES1,			/*  70 ns */
+-	BPC3_SPRES0			/* 140 ns */
+-};
+-
+-	/*
+-	 * Fetch modes for Bitplanes and Sprites
+-	 */
+-
+-static u_short bplfetchmode[3] = {
+-	0,				/* 1x */
+-	FMODE_BPL32,			/* 2x */
+-	FMODE_BPAGEM | FMODE_BPL32	/* 4x */
+-};
+-
+-static u_short sprfetchmode[3] = {
+-	0,				/* 1x */
+-	FMODE_SPR32,			/* 2x */
+-	FMODE_SPAGEM | FMODE_SPR32	/* 4x */
+-};
+-
+-
+-/* --------------------------- Hardware routines --------------------------- */
+-
+-	/*
+-	 * Get the video params out of `var'. If a value doesn't fit, round
+-	 * it up, if it's too big, return -EINVAL.
+-	 */
+-
+-static int ami_decode_var(struct fb_var_screeninfo *var, struct amifb_par *par,
+-			  const struct fb_info *info)
+-{
+-	u_short clk_shift, line_shift;
+-	u_long maxfetchstop, fstrt, fsize, fconst, xres_n, yres_n;
+-	u_int htotal, vtotal;
+-
+-	/*
+-	 * Find a matching Pixel Clock
+-	 */
+-
+-	for (clk_shift = TAG_SHRES; clk_shift <= TAG_LORES; clk_shift++)
+-		if (var->pixclock <= pixclock[clk_shift])
+-			break;
+-	if (clk_shift > TAG_LORES) {
+-		DPRINTK("pixclock too high\n");
+-		return -EINVAL;
+-	}
+-	par->clk_shift = clk_shift;
+-
+-	/*
+-	 * Check the Geometry Values
+-	 */
+-
+-	if ((par->xres = var->xres) < 64)
+-		par->xres = 64;
+-	if ((par->yres = var->yres) < 64)
+-		par->yres = 64;
+-	if ((par->vxres = var->xres_virtual) < par->xres)
+-		par->vxres = par->xres;
+-	if ((par->vyres = var->yres_virtual) < par->yres)
+-		par->vyres = par->yres;
+-
+-	par->bpp = var->bits_per_pixel;
+-	if (!var->nonstd) {
+-		if (par->bpp < 1)
+-			par->bpp = 1;
+-		if (par->bpp > maxdepth[clk_shift]) {
+-			if (round_down_bpp && maxdepth[clk_shift])
+-				par->bpp = maxdepth[clk_shift];
+-			else {
+-				DPRINTK("invalid bpp\n");
+-				return -EINVAL;
+-			}
+-		}
+-	} else if (var->nonstd == FB_NONSTD_HAM) {
+-		if (par->bpp < 6)
+-			par->bpp = 6;
+-		if (par->bpp != 6) {
+-			if (par->bpp < 8)
+-				par->bpp = 8;
+-			if (par->bpp != 8 || !IS_AGA) {
+-				DPRINTK("invalid bpp for ham mode\n");
+-				return -EINVAL;
+-			}
+-		}
+-	} else {
+-		DPRINTK("unknown nonstd mode\n");
+-		return -EINVAL;
+-	}
+-
+-	/*
+-	 * FB_VMODE_SMOOTH_XPAN will be cleared, if one of the following
+-	 * checks failed and smooth scrolling is not possible
+-	 */
+-
+-	par->vmode = var->vmode | FB_VMODE_SMOOTH_XPAN;
+-	switch (par->vmode & FB_VMODE_MASK) {
+-	case FB_VMODE_INTERLACED:
+-		line_shift = 0;
+-		break;
+-	case FB_VMODE_NONINTERLACED:
+-		line_shift = 1;
+-		break;
+-	case FB_VMODE_DOUBLE:
+-		if (!IS_AGA) {
+-			DPRINTK("double mode only possible with aga\n");
+-			return -EINVAL;
+-		}
+-		line_shift = 2;
+-		break;
+-	default:
+-		DPRINTK("unknown video mode\n");
+-		return -EINVAL;
+-		break;
+-	}
+-	par->line_shift = line_shift;
+-
+-	/*
+-	 * Vertical and Horizontal Timings
+-	 */
+-
+-	xres_n = par->xres << clk_shift;
+-	yres_n = par->yres << line_shift;
+-	par->htotal = down8((var->left_margin + par->xres + var->right_margin +
+-			     var->hsync_len) << clk_shift);
+-	par->vtotal =
+-		down2(((var->upper_margin + par->yres + var->lower_margin +
+-			var->vsync_len) << line_shift) + 1);
+-
+-	if (IS_AGA)
+-		par->bplcon3 = sprpixmode[clk_shift];
+-	else
+-		par->bplcon3 = 0;
+-	if (var->sync & FB_SYNC_BROADCAST) {
+-		par->diwstop_h = par->htotal -
+-			((var->right_margin - var->hsync_len) << clk_shift);
+-		if (IS_AGA)
+-			par->diwstop_h += mod4(var->hsync_len);
+-		else
+-			par->diwstop_h = down4(par->diwstop_h);
+-
+-		par->diwstrt_h = par->diwstop_h - xres_n;
+-		par->diwstop_v = par->vtotal -
+-			((var->lower_margin - var->vsync_len) << line_shift);
+-		par->diwstrt_v = par->diwstop_v - yres_n;
+-		if (par->diwstop_h >= par->htotal + 8) {
+-			DPRINTK("invalid diwstop_h\n");
+-			return -EINVAL;
+-		}
+-		if (par->diwstop_v > par->vtotal) {
+-			DPRINTK("invalid diwstop_v\n");
+-			return -EINVAL;
+-		}
+-
+-		if (!IS_OCS) {
+-			/* Initialize sync with some reasonable values for pwrsave */
+-			par->hsstrt = 160;
+-			par->hsstop = 320;
+-			par->vsstrt = 30;
+-			par->vsstop = 34;
+-		} else {
+-			par->hsstrt = 0;
+-			par->hsstop = 0;
+-			par->vsstrt = 0;
+-			par->vsstop = 0;
+-		}
+-		if (par->vtotal > (PAL_VTOTAL + NTSC_VTOTAL) / 2) {
+-			/* PAL video mode */
+-			if (par->htotal != PAL_HTOTAL) {
+-				DPRINTK("htotal invalid for pal\n");
+-				return -EINVAL;
+-			}
+-			if (par->diwstrt_h < PAL_DIWSTRT_H) {
+-				DPRINTK("diwstrt_h too low for pal\n");
+-				return -EINVAL;
+-			}
+-			if (par->diwstrt_v < PAL_DIWSTRT_V) {
+-				DPRINTK("diwstrt_v too low for pal\n");
+-				return -EINVAL;
+-			}
+-			htotal = PAL_HTOTAL>>clk_shift;
+-			vtotal = PAL_VTOTAL>>1;
+-			if (!IS_OCS) {
+-				par->beamcon0 = BMC0_PAL;
+-				par->bplcon3 |= BPC3_BRDRBLNK;
+-			} else if (AMIGAHW_PRESENT(AGNUS_HR_PAL) ||
+-				   AMIGAHW_PRESENT(AGNUS_HR_NTSC)) {
+-				par->beamcon0 = BMC0_PAL;
+-				par->hsstop = 1;
+-			} else if (amiga_vblank != 50) {
+-				DPRINTK("pal not supported by this chipset\n");
+-				return -EINVAL;
+-			}
+-		} else {
+-			/* NTSC video mode
+-			 * In the AGA chipset seems to be hardware bug with BPC3_BRDRBLNK
+-			 * and NTSC activated, so than better let diwstop_h <= 1812
+-			 */
+-			if (par->htotal != NTSC_HTOTAL) {
+-				DPRINTK("htotal invalid for ntsc\n");
+-				return -EINVAL;
+-			}
+-			if (par->diwstrt_h < NTSC_DIWSTRT_H) {
+-				DPRINTK("diwstrt_h too low for ntsc\n");
+-				return -EINVAL;
+-			}
+-			if (par->diwstrt_v < NTSC_DIWSTRT_V) {
+-				DPRINTK("diwstrt_v too low for ntsc\n");
+-				return -EINVAL;
+-			}
+-			htotal = NTSC_HTOTAL>>clk_shift;
+-			vtotal = NTSC_VTOTAL>>1;
+-			if (!IS_OCS) {
+-				par->beamcon0 = 0;
+-				par->bplcon3 |= BPC3_BRDRBLNK;
+-			} else if (AMIGAHW_PRESENT(AGNUS_HR_PAL) ||
+-				   AMIGAHW_PRESENT(AGNUS_HR_NTSC)) {
+-				par->beamcon0 = 0;
+-				par->hsstop = 1;
+-			} else if (amiga_vblank != 60) {
+-				DPRINTK("ntsc not supported by this chipset\n");
+-				return -EINVAL;
+-			}
+-		}
+-		if (IS_OCS) {
+-			if (par->diwstrt_h >= 1024 || par->diwstop_h < 1024 ||
+-			    par->diwstrt_v >=  512 || par->diwstop_v <  256) {
+-				DPRINTK("invalid position for display on ocs\n");
+-				return -EINVAL;
+-			}
+-		}
+-	} else if (!IS_OCS) {
+-		/* Programmable video mode */
+-		par->hsstrt = var->right_margin << clk_shift;
+-		par->hsstop = (var->right_margin + var->hsync_len) << clk_shift;
+-		par->diwstop_h = par->htotal - mod8(par->hsstrt) + 8 - (1 << clk_shift);
+-		if (!IS_AGA)
+-			par->diwstop_h = down4(par->diwstop_h) - 16;
+-		par->diwstrt_h = par->diwstop_h - xres_n;
+-		par->hbstop = par->diwstrt_h + 4;
+-		par->hbstrt = par->diwstop_h + 4;
+-		if (par->hbstrt >= par->htotal + 8)
+-			par->hbstrt -= par->htotal;
+-		par->hcenter = par->hsstrt + (par->htotal >> 1);
+-		par->vsstrt = var->lower_margin << line_shift;
+-		par->vsstop = (var->lower_margin + var->vsync_len) << line_shift;
+-		par->diwstop_v = par->vtotal;
+-		if ((par->vmode & FB_VMODE_MASK) == FB_VMODE_INTERLACED)
+-			par->diwstop_v -= 2;
+-		par->diwstrt_v = par->diwstop_v - yres_n;
+-		par->vbstop = par->diwstrt_v - 2;
+-		par->vbstrt = par->diwstop_v - 2;
+-		if (par->vtotal > 2048) {
+-			DPRINTK("vtotal too high\n");
+-			return -EINVAL;
+-		}
+-		if (par->htotal > 2048) {
+-			DPRINTK("htotal too high\n");
+-			return -EINVAL;
+-		}
+-		par->bplcon3 |= BPC3_EXTBLKEN;
+-		par->beamcon0 = BMC0_HARDDIS | BMC0_VARVBEN | BMC0_LOLDIS |
+-				BMC0_VARVSYEN | BMC0_VARHSYEN | BMC0_VARBEAMEN |
+-				BMC0_PAL | BMC0_VARCSYEN;
+-		if (var->sync & FB_SYNC_HOR_HIGH_ACT)
+-			par->beamcon0 |= BMC0_HSYTRUE;
+-		if (var->sync & FB_SYNC_VERT_HIGH_ACT)
+-			par->beamcon0 |= BMC0_VSYTRUE;
+-		if (var->sync & FB_SYNC_COMP_HIGH_ACT)
+-			par->beamcon0 |= BMC0_CSYTRUE;
+-		htotal = par->htotal>>clk_shift;
+-		vtotal = par->vtotal>>1;
+-	} else {
+-		DPRINTK("only broadcast modes possible for ocs\n");
+-		return -EINVAL;
+-	}
+-
+-	/*
+-	 * Checking the DMA timing
+-	 */
+-
+-	fconst = 16 << maxfmode << clk_shift;
+-
+-	/*
+-	 * smallest window start value without turn off other dma cycles
+-	 * than sprite1-7, unless you change min_fstrt
+-	 */
+-
+-
+-	fsize = ((maxfmode + clk_shift <= 1) ? fconst : 64);
+-	fstrt = downx(fconst, par->diwstrt_h - 4) - fsize;
+-	if (fstrt < min_fstrt) {
+-		DPRINTK("fetch start too low\n");
+-		return -EINVAL;
+-	}
+-
+-	/*
+-	 * smallest window start value where smooth scrolling is possible
+-	 */
+-
+-	fstrt = downx(fconst, par->diwstrt_h - fconst + (1 << clk_shift) - 4) -
+-		fsize;
+-	if (fstrt < min_fstrt)
+-		par->vmode &= ~FB_VMODE_SMOOTH_XPAN;
+-
+-	maxfetchstop = down16(par->htotal - 80);
+-
+-	fstrt = downx(fconst, par->diwstrt_h - 4) - 64 - fconst;
+-	fsize = upx(fconst, xres_n +
+-		    modx(fconst, downx(1 << clk_shift, par->diwstrt_h - 4)));
+-	if (fstrt + fsize > maxfetchstop)
+-		par->vmode &= ~FB_VMODE_SMOOTH_XPAN;
+-
+-	fsize = upx(fconst, xres_n);
+-	if (fstrt + fsize > maxfetchstop) {
+-		DPRINTK("fetch stop too high\n");
+-		return -EINVAL;
+-	}
+-
+-	if (maxfmode + clk_shift <= 1) {
+-		fsize = up64(xres_n + fconst - 1);
+-		if (min_fstrt + fsize - 64 > maxfetchstop)
+-			par->vmode &= ~FB_VMODE_SMOOTH_XPAN;
+-
+-		fsize = up64(xres_n);
+-		if (min_fstrt + fsize - 64 > maxfetchstop) {
+-			DPRINTK("fetch size too high\n");
+-			return -EINVAL;
+-		}
+-
+-		fsize -= 64;
+-	} else
+-		fsize -= fconst;
+-
+-	/*
+-	 * Check if there is enough time to update the bitplane pointers for ywrap
+-	 */
+-
+-	if (par->htotal - fsize - 64 < par->bpp * 64)
+-		par->vmode &= ~FB_VMODE_YWRAP;
+-
+-	/*
+-	 * Bitplane calculations and check the Memory Requirements
+-	 */
+-
+-	if (amifb_ilbm) {
+-		par->next_plane = div8(upx(16 << maxfmode, par->vxres));
+-		par->next_line = par->bpp * par->next_plane;
+-		if (par->next_line * par->vyres > info->fix.smem_len) {
+-			DPRINTK("too few video mem\n");
+-			return -EINVAL;
+-		}
+-	} else {
+-		par->next_line = div8(upx(16 << maxfmode, par->vxres));
+-		par->next_plane = par->vyres * par->next_line;
+-		if (par->next_plane * par->bpp > info->fix.smem_len) {
+-			DPRINTK("too few video mem\n");
+-			return -EINVAL;
+-		}
+-	}
+-
+-	/*
+-	 * Hardware Register Values
+-	 */
+-
+-	par->bplcon0 = BPC0_COLOR | bplpixmode[clk_shift];
+-	if (!IS_OCS)
+-		par->bplcon0 |= BPC0_ECSENA;
+-	if (par->bpp == 8)
+-		par->bplcon0 |= BPC0_BPU3;
+-	else
+-		par->bplcon0 |= par->bpp << 12;
+-	if (var->nonstd == FB_NONSTD_HAM)
+-		par->bplcon0 |= BPC0_HAM;
+-	if (var->sync & FB_SYNC_EXT)
+-		par->bplcon0 |= BPC0_ERSY;
+-
+-	if (IS_AGA)
+-		par->fmode = bplfetchmode[maxfmode];
+-
+-	switch (par->vmode & FB_VMODE_MASK) {
+-	case FB_VMODE_INTERLACED:
+-		par->bplcon0 |= BPC0_LACE;
+-		break;
+-	case FB_VMODE_DOUBLE:
+-		if (IS_AGA)
+-			par->fmode |= FMODE_SSCAN2 | FMODE_BSCAN2;
+-		break;
+-	}
+-
+-	if (!((par->vmode ^ var->vmode) & FB_VMODE_YWRAP)) {
+-		par->xoffset = var->xoffset;
+-		par->yoffset = var->yoffset;
+-		if (par->vmode & FB_VMODE_YWRAP) {
+-			if (par->yoffset >= par->vyres)
+-				par->xoffset = par->yoffset = 0;
+-		} else {
+-			if (par->xoffset > upx(16 << maxfmode, par->vxres - par->xres) ||
+-			    par->yoffset > par->vyres - par->yres)
+-				par->xoffset = par->yoffset = 0;
+-		}
+-	} else
+-		par->xoffset = par->yoffset = 0;
+-
+-	par->crsr.crsr_x = par->crsr.crsr_y = 0;
+-	par->crsr.spot_x = par->crsr.spot_y = 0;
+-	par->crsr.height = par->crsr.width = 0;
+-
+-	return 0;
+-}
+-
+-	/*
+-	 * Fill the `var' structure based on the values in `par' and maybe
+-	 * other values read out of the hardware.
+-	 */
+-
+-static void ami_encode_var(struct fb_var_screeninfo *var,
+-			   struct amifb_par *par)
+-{
+-	u_short clk_shift, line_shift;
+-
+-	memset(var, 0, sizeof(struct fb_var_screeninfo));
+-
+-	clk_shift = par->clk_shift;
+-	line_shift = par->line_shift;
+-
+-	var->xres = par->xres;
+-	var->yres = par->yres;
+-	var->xres_virtual = par->vxres;
+-	var->yres_virtual = par->vyres;
+-	var->xoffset = par->xoffset;
+-	var->yoffset = par->yoffset;
+-
+-	var->bits_per_pixel = par->bpp;
+-	var->grayscale = 0;
+-
+-	var->red.offset = 0;
+-	var->red.msb_right = 0;
+-	var->red.length = par->bpp;
+-	if (par->bplcon0 & BPC0_HAM)
+-		var->red.length -= 2;
+-	var->blue = var->green = var->red;
+-	var->transp.offset = 0;
+-	var->transp.length = 0;
+-	var->transp.msb_right = 0;
+-
+-	if (par->bplcon0 & BPC0_HAM)
+-		var->nonstd = FB_NONSTD_HAM;
+-	else
+-		var->nonstd = 0;
+-	var->activate = 0;
+-
+-	var->height = -1;
+-	var->width = -1;
+-
+-	var->pixclock = pixclock[clk_shift];
+-
+-	if (IS_AGA && par->fmode & FMODE_BSCAN2)
+-		var->vmode = FB_VMODE_DOUBLE;
+-	else if (par->bplcon0 & BPC0_LACE)
+-		var->vmode = FB_VMODE_INTERLACED;
+-	else
+-		var->vmode = FB_VMODE_NONINTERLACED;
+-
+-	if (!IS_OCS && par->beamcon0 & BMC0_VARBEAMEN) {
+-		var->hsync_len = (par->hsstop - par->hsstrt)>>clk_shift;
+-		var->right_margin = par->hsstrt>>clk_shift;
+-		var->left_margin = (par->htotal>>clk_shift) - var->xres - var->right_margin - var->hsync_len;
+-		var->vsync_len = (par->vsstop - par->vsstrt)>>line_shift;
+-		var->lower_margin = par->vsstrt>>line_shift;
+-		var->upper_margin = (par->vtotal>>line_shift) - var->yres - var->lower_margin - var->vsync_len;
+-		var->sync = 0;
+-		if (par->beamcon0 & BMC0_HSYTRUE)
+-			var->sync |= FB_SYNC_HOR_HIGH_ACT;
+-		if (par->beamcon0 & BMC0_VSYTRUE)
+-			var->sync |= FB_SYNC_VERT_HIGH_ACT;
+-		if (par->beamcon0 & BMC0_CSYTRUE)
+-			var->sync |= FB_SYNC_COMP_HIGH_ACT;
+-	} else {
+-		var->sync = FB_SYNC_BROADCAST;
+-		var->hsync_len = (152>>clk_shift) + mod4(par->diwstop_h);
+-		var->right_margin = ((par->htotal - down4(par->diwstop_h))>>clk_shift) + var->hsync_len;
+-		var->left_margin = (par->htotal>>clk_shift) - var->xres - var->right_margin - var->hsync_len;
+-		var->vsync_len = 4>>line_shift;
+-		var->lower_margin = ((par->vtotal - par->diwstop_v)>>line_shift) + var->vsync_len;
+-		var->upper_margin = (((par->vtotal - 2)>>line_shift) + 1) - var->yres -
+-				    var->lower_margin - var->vsync_len;
+-	}
+-
+-	if (par->bplcon0 & BPC0_ERSY)
+-		var->sync |= FB_SYNC_EXT;
+-	if (par->vmode & FB_VMODE_YWRAP)
+-		var->vmode |= FB_VMODE_YWRAP;
+-}
+-
+-
+-	/*
+-	 * Update hardware
+-	 */
+-
+-static void ami_update_par(struct fb_info *info)
+-{
+-	struct amifb_par *par = info->par;
+-	short clk_shift, vshift, fstrt, fsize, fstop, fconst,  shift, move, mod;
+-
+-	clk_shift = par->clk_shift;
+-
+-	if (!(par->vmode & FB_VMODE_SMOOTH_XPAN))
+-		par->xoffset = upx(16 << maxfmode, par->xoffset);
+-
+-	fconst = 16 << maxfmode << clk_shift;
+-	vshift = modx(16 << maxfmode, par->xoffset);
+-	fstrt = par->diwstrt_h - (vshift << clk_shift) - 4;
+-	fsize = (par->xres + vshift) << clk_shift;
+-	shift = modx(fconst, fstrt);
+-	move = downx(2 << maxfmode, div8(par->xoffset));
+-	if (maxfmode + clk_shift > 1) {
+-		fstrt = downx(fconst, fstrt) - 64;
+-		fsize = upx(fconst, fsize);
+-		fstop = fstrt + fsize - fconst;
+-	} else {
+-		mod = fstrt = downx(fconst, fstrt) - fconst;
+-		fstop = fstrt + upx(fconst, fsize) - 64;
+-		fsize = up64(fsize);
+-		fstrt = fstop - fsize + 64;
+-		if (fstrt < min_fstrt) {
+-			fstop += min_fstrt - fstrt;
+-			fstrt = min_fstrt;
+-		}
+-		move = move - div8((mod - fstrt)>>clk_shift);
+-	}
+-	mod = par->next_line - div8(fsize>>clk_shift);
+-	par->ddfstrt = fstrt;
+-	par->ddfstop = fstop;
+-	par->bplcon1 = hscroll2hw(shift);
+-	par->bpl2mod = mod;
+-	if (par->bplcon0 & BPC0_LACE)
+-		par->bpl2mod += par->next_line;
+-	if (IS_AGA && (par->fmode & FMODE_BSCAN2))
+-		par->bpl1mod = -div8(fsize>>clk_shift);
+-	else
+-		par->bpl1mod = par->bpl2mod;
+-
+-	if (par->yoffset) {
+-		par->bplpt0 = info->fix.smem_start +
+-			      par->next_line * par->yoffset + move;
+-		if (par->vmode & FB_VMODE_YWRAP) {
+-			if (par->yoffset > par->vyres - par->yres) {
+-				par->bplpt0wrap = info->fix.smem_start + move;
+-				if (par->bplcon0 & BPC0_LACE &&
+-				    mod2(par->diwstrt_v + par->vyres -
+-					 par->yoffset))
+-					par->bplpt0wrap += par->next_line;
+-			}
+-		}
+-	} else
+-		par->bplpt0 = info->fix.smem_start + move;
+-
+-	if (par->bplcon0 & BPC0_LACE && mod2(par->diwstrt_v))
+-		par->bplpt0 += par->next_line;
+-}
+-
+-
+-	/*
+-	 * Pan or Wrap the Display
+-	 *
+-	 * This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+-	 * in `var'.
+-	 */
+-
+-static void ami_pan_var(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	struct amifb_par *par = info->par;
+-
+-	par->xoffset = var->xoffset;
+-	par->yoffset = var->yoffset;
+-	if (var->vmode & FB_VMODE_YWRAP)
+-		par->vmode |= FB_VMODE_YWRAP;
+-	else
+-		par->vmode &= ~FB_VMODE_YWRAP;
+-
+-	do_vmode_pan = 0;
+-	ami_update_par(info);
+-	do_vmode_pan = 1;
+-}
+-
+-
+-static void ami_update_display(const struct amifb_par *par)
+-{
+-	custom.bplcon1 = par->bplcon1;
+-	custom.bpl1mod = par->bpl1mod;
+-	custom.bpl2mod = par->bpl2mod;
+-	custom.ddfstrt = ddfstrt2hw(par->ddfstrt);
+-	custom.ddfstop = ddfstop2hw(par->ddfstop);
+-}
+-
+-	/*
+-	 * Change the video mode (called by VBlank interrupt)
+-	 */
+-
+-static void ami_init_display(const struct amifb_par *par)
+-{
+-	int i;
+-
+-	custom.bplcon0 = par->bplcon0 & ~BPC0_LACE;
+-	custom.bplcon2 = (IS_OCS ? 0 : BPC2_KILLEHB) | BPC2_PF2P2 | BPC2_PF1P2;
+-	if (!IS_OCS) {
+-		custom.bplcon3 = par->bplcon3;
+-		if (IS_AGA)
+-			custom.bplcon4 = BPC4_ESPRM4 | BPC4_OSPRM4;
+-		if (par->beamcon0 & BMC0_VARBEAMEN) {
+-			custom.htotal = htotal2hw(par->htotal);
+-			custom.hbstrt = hbstrt2hw(par->hbstrt);
+-			custom.hbstop = hbstop2hw(par->hbstop);
+-			custom.hsstrt = hsstrt2hw(par->hsstrt);
+-			custom.hsstop = hsstop2hw(par->hsstop);
+-			custom.hcenter = hcenter2hw(par->hcenter);
+-			custom.vtotal = vtotal2hw(par->vtotal);
+-			custom.vbstrt = vbstrt2hw(par->vbstrt);
+-			custom.vbstop = vbstop2hw(par->vbstop);
+-			custom.vsstrt = vsstrt2hw(par->vsstrt);
+-			custom.vsstop = vsstop2hw(par->vsstop);
+-		}
+-	}
+-	if (!IS_OCS || par->hsstop)
+-		custom.beamcon0 = par->beamcon0;
+-	if (IS_AGA)
+-		custom.fmode = par->fmode;
+-
+-	/*
+-	 * The minimum period for audio depends on htotal
+-	 */
+-
+-	amiga_audio_min_period = div16(par->htotal);
+-
+-	is_lace = par->bplcon0 & BPC0_LACE ? 1 : 0;
+-#if 1
+-	if (is_lace) {
+-		i = custom.vposr >> 15;
+-	} else {
+-		custom.vposw = custom.vposr | 0x8000;
+-		i = 1;
+-	}
+-#else
+-	i = 1;
+-	custom.vposw = custom.vposr | 0x8000;
+-#endif
+-	custom.cop2lc = (u_short *)ZTWO_PADDR(copdisplay.list[currentcop][i]);
+-}
+-
+-	/*
+-	 * (Un)Blank the screen (called by VBlank interrupt)
+-	 */
+-
+-static void ami_do_blank(const struct amifb_par *par)
+-{
+-#if defined(CONFIG_FB_AMIGA_AGA)
+-	u_short bplcon3 = par->bplcon3;
+-#endif
+-	u_char red, green, blue;
+-
+-	if (do_blank > 0) {
+-		custom.dmacon = DMAF_RASTER | DMAF_SPRITE;
+-		red = green = blue = 0;
+-		if (!IS_OCS && do_blank > 1) {
+-			switch (do_blank) {
+-			case FB_BLANK_VSYNC_SUSPEND:
+-				custom.hsstrt = hsstrt2hw(par->hsstrt);
+-				custom.hsstop = hsstop2hw(par->hsstop);
+-				custom.vsstrt = vsstrt2hw(par->vtotal + 4);
+-				custom.vsstop = vsstop2hw(par->vtotal + 4);
+-				break;
+-			case FB_BLANK_HSYNC_SUSPEND:
+-				custom.hsstrt = hsstrt2hw(par->htotal + 16);
+-				custom.hsstop = hsstop2hw(par->htotal + 16);
+-				custom.vsstrt = vsstrt2hw(par->vsstrt);
+-				custom.vsstop = vsstrt2hw(par->vsstop);
+-				break;
+-			case FB_BLANK_POWERDOWN:
+-				custom.hsstrt = hsstrt2hw(par->htotal + 16);
+-				custom.hsstop = hsstop2hw(par->htotal + 16);
+-				custom.vsstrt = vsstrt2hw(par->vtotal + 4);
+-				custom.vsstop = vsstop2hw(par->vtotal + 4);
+-				break;
+-			}
+-			if (!(par->beamcon0 & BMC0_VARBEAMEN)) {
+-				custom.htotal = htotal2hw(par->htotal);
+-				custom.vtotal = vtotal2hw(par->vtotal);
+-				custom.beamcon0 = BMC0_HARDDIS | BMC0_VARBEAMEN |
+-						  BMC0_VARVSYEN | BMC0_VARHSYEN | BMC0_VARCSYEN;
+-			}
+-		}
+-	} else {
+-		custom.dmacon = DMAF_SETCLR | DMAF_RASTER | DMAF_SPRITE;
+-		red = red0;
+-		green = green0;
+-		blue = blue0;
+-		if (!IS_OCS) {
+-			custom.hsstrt = hsstrt2hw(par->hsstrt);
+-			custom.hsstop = hsstop2hw(par->hsstop);
+-			custom.vsstrt = vsstrt2hw(par->vsstrt);
+-			custom.vsstop = vsstop2hw(par->vsstop);
+-			custom.beamcon0 = par->beamcon0;
+-		}
+-	}
+-#if defined(CONFIG_FB_AMIGA_AGA)
+-	if (IS_AGA) {
+-		custom.bplcon3 = bplcon3;
+-		custom.color[0] = rgb2hw8_high(red, green, blue);
+-		custom.bplcon3 = bplcon3 | BPC3_LOCT;
+-		custom.color[0] = rgb2hw8_low(red, green, blue);
+-		custom.bplcon3 = bplcon3;
+-	} else
+-#endif
+-#if defined(CONFIG_FB_AMIGA_ECS)
+-	if (par->bplcon0 & BPC0_SHRES) {
+-		u_short color, mask;
+-		int i;
+-
+-		mask = 0x3333;
+-		color = rgb2hw2(red, green, blue);
+-		for (i = 12; i >= 0; i -= 4)
+-			custom.color[i] = ecs_palette[i] = (ecs_palette[i] & mask) | color;
+-		mask <<= 2; color >>= 2;
+-		for (i = 3; i >= 0; i--)
+-			custom.color[i] = ecs_palette[i] = (ecs_palette[i] & mask) | color;
+-	} else
+-#endif
+-		custom.color[0] = rgb2hw4(red, green, blue);
+-	is_blanked = do_blank > 0 ? do_blank : 0;
+-}
+-
+-static int ami_get_fix_cursorinfo(struct fb_fix_cursorinfo *fix,
+-				  const struct amifb_par *par)
+-{
+-	fix->crsr_width = fix->crsr_xsize = par->crsr.width;
+-	fix->crsr_height = fix->crsr_ysize = par->crsr.height;
+-	fix->crsr_color1 = 17;
+-	fix->crsr_color2 = 18;
+-	return 0;
+-}
+-
+-static int ami_get_var_cursorinfo(struct fb_var_cursorinfo *var,
+-				  u_char __user *data,
+-				  const struct amifb_par *par)
+-{
+-	register u_short *lspr, *sspr;
+-#ifdef __mc68000__
+-	register u_long datawords asm ("d2");
+-#else
+-	register u_long datawords;
+-#endif
+-	register short delta;
+-	register u_char color;
+-	short height, width, bits, words;
+-	int size, alloc;
+-
+-	size = par->crsr.height * par->crsr.width;
+-	alloc = var->height * var->width;
+-	var->height = par->crsr.height;
+-	var->width = par->crsr.width;
+-	var->xspot = par->crsr.spot_x;
+-	var->yspot = par->crsr.spot_y;
+-	if (size > var->height * var->width)
+-		return -ENAMETOOLONG;
+-	delta = 1 << par->crsr.fmode;
+-	lspr = lofsprite + (delta << 1);
+-	if (par->bplcon0 & BPC0_LACE)
+-		sspr = shfsprite + (delta << 1);
+-	else
+-		sspr = NULL;
+-	for (height = (short)var->height - 1; height >= 0; height--) {
+-		bits = 0; words = delta; datawords = 0;
+-		for (width = (short)var->width - 1; width >= 0; width--) {
+-			if (bits == 0) {
+-				bits = 16; --words;
+-#ifdef __mc68000__
+-				asm volatile ("movew %1@(%3:w:2),%0 ; swap %0 ; movew %1@+,%0"
+-					: "=d" (datawords), "=a" (lspr) : "1" (lspr), "d" (delta));
+-#else
+-				datawords = (*(lspr + delta) << 16) | (*lspr++);
+-#endif
+-			}
+-			--bits;
+-#ifdef __mc68000__
+-			asm volatile (
+-				"clrb %0 ; swap %1 ; lslw #1,%1 ; roxlb #1,%0 ; "
+-				"swap %1 ; lslw #1,%1 ; roxlb #1,%0"
+-				: "=d" (color), "=d" (datawords) : "1" (datawords));
+-#else
+-			color = (((datawords >> 30) & 2)
+-				 | ((datawords >> 15) & 1));
+-			datawords <<= 1;
+-#endif
+-			/* FIXME: check the return value + test the change */
+-			put_user(color, data++);
+-		}
+-		if (bits > 0) {
+-			--words; ++lspr;
+-		}
+-		while (--words >= 0)
+-			++lspr;
+-#ifdef __mc68000__
+-		asm volatile ("lea %0@(%4:w:2),%0 ; tstl %1 ; jeq 1f ; exg %0,%1\n1:"
+-			: "=a" (lspr), "=a" (sspr) : "0" (lspr), "1" (sspr), "d" (delta));
+-#else
+-		lspr += delta;
+-		if (sspr) {
+-			u_short *tmp = lspr;
+-			lspr = sspr;
+-			sspr = tmp;
+-		}
+-#endif
+-	}
+-	return 0;
+-}
+-
+-static int ami_set_var_cursorinfo(struct fb_var_cursorinfo *var,
+-				  u_char __user *data, struct amifb_par *par)
+-{
+-	register u_short *lspr, *sspr;
+-#ifdef __mc68000__
+-	register u_long datawords asm ("d2");
+-#else
+-	register u_long datawords;
+-#endif
+-	register short delta;
+-	u_short fmode;
+-	short height, width, bits, words;
+-
+-	if (!var->width)
+-		return -EINVAL;
+-	else if (var->width <= 16)
+-		fmode = TAG_FMODE_1;
+-	else if (var->width <= 32)
+-		fmode = TAG_FMODE_2;
+-	else if (var->width <= 64)
+-		fmode = TAG_FMODE_4;
+-	else
+-		return -EINVAL;
+-	if (fmode > maxfmode)
+-		return -EINVAL;
+-	if (!var->height)
+-		return -EINVAL;
+-	delta = 1 << fmode;
+-	lofsprite = shfsprite = (u_short *)spritememory;
+-	lspr = lofsprite + (delta << 1);
+-	if (par->bplcon0 & BPC0_LACE) {
+-		if (((var->height + 4) << fmode << 2) > SPRITEMEMSIZE)
+-			return -EINVAL;
+-		memset(lspr, 0, (var->height + 4) << fmode << 2);
+-		shfsprite += ((var->height + 5)&-2) << fmode;
+-		sspr = shfsprite + (delta << 1);
+-	} else {
+-		if (((var->height + 2) << fmode << 2) > SPRITEMEMSIZE)
+-			return -EINVAL;
+-		memset(lspr, 0, (var->height + 2) << fmode << 2);
+-		sspr = NULL;
+-	}
+-	for (height = (short)var->height - 1; height >= 0; height--) {
+-		bits = 16; words = delta; datawords = 0;
+-		for (width = (short)var->width - 1; width >= 0; width--) {
+-			unsigned long tdata = 0;
+-			/* FIXME: check the return value + test the change */
+-			get_user(tdata, data);
+-			data++;
+-#ifdef __mc68000__
+-			asm volatile (
+-				"lsrb #1,%2 ; roxlw #1,%0 ; swap %0 ; "
+-				"lsrb #1,%2 ; roxlw #1,%0 ; swap %0"
+-				: "=d" (datawords)
+-				: "0" (datawords), "d" (tdata));
+-#else
+-			datawords = ((datawords << 1) & 0xfffefffe);
+-			datawords |= tdata & 1;
+-			datawords |= (tdata & 2) << (16 - 1);
+-#endif
+-			if (--bits == 0) {
+-				bits = 16; --words;
+-#ifdef __mc68000__
+-				asm volatile ("swap %2 ; movew %2,%0@(%3:w:2) ; swap %2 ; movew %2,%0@+"
+-					: "=a" (lspr) : "0" (lspr), "d" (datawords), "d" (delta));
+-#else
+-				*(lspr + delta) = (u_short) (datawords >> 16);
+-				*lspr++ = (u_short) (datawords & 0xffff);
+-#endif
+-			}
+-		}
+-		if (bits < 16) {
+-			--words;
+-#ifdef __mc68000__
+-			asm volatile (
+-				"swap %2 ; lslw %4,%2 ; movew %2,%0@(%3:w:2) ; "
+-				"swap %2 ; lslw %4,%2 ; movew %2,%0@+"
+-				: "=a" (lspr) : "0" (lspr), "d" (datawords), "d" (delta), "d" (bits));
+-#else
+-			*(lspr + delta) = (u_short) (datawords >> (16 + bits));
+-			*lspr++ = (u_short) ((datawords & 0x0000ffff) >> bits);
+-#endif
+-		}
+-		while (--words >= 0) {
+-#ifdef __mc68000__
+-			asm volatile ("moveql #0,%%d0 ; movew %%d0,%0@(%2:w:2) ; movew %%d0,%0@+"
+-				: "=a" (lspr) : "0" (lspr), "d" (delta) : "d0");
+-#else
+-			*(lspr + delta) = 0;
+-			*lspr++ = 0;
+-#endif
+-		}
+-#ifdef __mc68000__
+-		asm volatile ("lea %0@(%4:w:2),%0 ; tstl %1 ; jeq 1f ; exg %0,%1\n1:"
+-			: "=a" (lspr), "=a" (sspr) : "0" (lspr), "1" (sspr), "d" (delta));
+-#else
+-		lspr += delta;
+-		if (sspr) {
+-			u_short *tmp = lspr;
+-			lspr = sspr;
+-			sspr = tmp;
+-		}
+-#endif
+-	}
+-	par->crsr.height = var->height;
+-	par->crsr.width = var->width;
+-	par->crsr.spot_x = var->xspot;
+-	par->crsr.spot_y = var->yspot;
+-	par->crsr.fmode = fmode;
+-	if (IS_AGA) {
+-		par->fmode &= ~(FMODE_SPAGEM | FMODE_SPR32);
+-		par->fmode |= sprfetchmode[fmode];
+-		custom.fmode = par->fmode;
+-	}
+-	return 0;
+-}
+-
+-static int ami_get_cursorstate(struct fb_cursorstate *state,
+-			       const struct amifb_par *par)
+-{
+-	state->xoffset = par->crsr.crsr_x;
+-	state->yoffset = par->crsr.crsr_y;
+-	state->mode = cursormode;
+-	return 0;
+-}
+-
+-static int ami_set_cursorstate(struct fb_cursorstate *state,
+-			       struct amifb_par *par)
+-{
+-	par->crsr.crsr_x = state->xoffset;
+-	par->crsr.crsr_y = state->yoffset;
+-	if ((cursormode = state->mode) == FB_CURSOR_OFF)
+-		cursorstate = -1;
+-	do_cursor = 1;
+-	return 0;
+-}
+-
+-static void ami_set_sprite(const struct amifb_par *par)
+-{
+-	copins *copl, *cops;
+-	u_short hs, vs, ve;
+-	u_long pl, ps;
+-	short mx, my;
+-
+-	cops = copdisplay.list[currentcop][0];
+-	copl = copdisplay.list[currentcop][1];
+-	ps = pl = ZTWO_PADDR(dummysprite);
+-	mx = par->crsr.crsr_x - par->crsr.spot_x;
+-	my = par->crsr.crsr_y - par->crsr.spot_y;
+-	if (!(par->vmode & FB_VMODE_YWRAP)) {
+-		mx -= par->xoffset;
+-		my -= par->yoffset;
+-	}
+-	if (!is_blanked && cursorstate > 0 && par->crsr.height > 0 &&
+-	    mx > -(short)par->crsr.width && mx < par->xres &&
+-	    my > -(short)par->crsr.height && my < par->yres) {
+-		pl = ZTWO_PADDR(lofsprite);
+-		hs = par->diwstrt_h + (mx << par->clk_shift) - 4;
+-		vs = par->diwstrt_v + (my << par->line_shift);
+-		ve = vs + (par->crsr.height << par->line_shift);
+-		if (par->bplcon0 & BPC0_LACE) {
+-			ps = ZTWO_PADDR(shfsprite);
+-			lofsprite[0] = spr2hw_pos(vs, hs);
+-			shfsprite[0] = spr2hw_pos(vs + 1, hs);
+-			if (mod2(vs)) {
+-				lofsprite[1 << par->crsr.fmode] = spr2hw_ctl(vs, hs, ve);
+-				shfsprite[1 << par->crsr.fmode] = spr2hw_ctl(vs + 1, hs, ve + 1);
+-				swap(pl, ps);
+-			} else {
+-				lofsprite[1 << par->crsr.fmode] = spr2hw_ctl(vs, hs, ve + 1);
+-				shfsprite[1 << par->crsr.fmode] = spr2hw_ctl(vs + 1, hs, ve);
+-			}
+-		} else {
+-			lofsprite[0] = spr2hw_pos(vs, hs) | (IS_AGA && (par->fmode & FMODE_BSCAN2) ? 0x80 : 0);
+-			lofsprite[1 << par->crsr.fmode] = spr2hw_ctl(vs, hs, ve);
+-		}
+-	}
+-	copl[cop_spr0ptrh].w[1] = highw(pl);
+-	copl[cop_spr0ptrl].w[1] = loww(pl);
+-	if (par->bplcon0 & BPC0_LACE) {
+-		cops[cop_spr0ptrh].w[1] = highw(ps);
+-		cops[cop_spr0ptrl].w[1] = loww(ps);
+-	}
+-}
+-
+-
+-	/*
+-	 * Initialise the Copper Initialisation List
+-	 */
+-
+-static void __init ami_init_copper(void)
+-{
+-	copins *cop = copdisplay.init;
+-	u_long p;
+-	int i;
+-
+-	if (!IS_OCS) {
+-		(cop++)->l = CMOVE(BPC0_COLOR | BPC0_SHRES | BPC0_ECSENA, bplcon0);
+-		(cop++)->l = CMOVE(0x0181, diwstrt);
+-		(cop++)->l = CMOVE(0x0281, diwstop);
+-		(cop++)->l = CMOVE(0x0000, diwhigh);
+-	} else
+-		(cop++)->l = CMOVE(BPC0_COLOR, bplcon0);
+-	p = ZTWO_PADDR(dummysprite);
+-	for (i = 0; i < 8; i++) {
+-		(cop++)->l = CMOVE(0, spr[i].pos);
+-		(cop++)->l = CMOVE(highw(p), sprpt[i]);
+-		(cop++)->l = CMOVE2(loww(p), sprpt[i]);
+-	}
+-
+-	(cop++)->l = CMOVE(IF_SETCLR | IF_COPER, intreq);
+-	copdisplay.wait = cop;
+-	(cop++)->l = CEND;
+-	(cop++)->l = CMOVE(0, copjmp2);
+-	cop->l = CEND;
+-
+-	custom.cop1lc = (u_short *)ZTWO_PADDR(copdisplay.init);
+-	custom.copjmp1 = 0;
+-}
+-
+-static void ami_reinit_copper(const struct amifb_par *par)
+-{
+-	copdisplay.init[cip_bplcon0].w[1] = ~(BPC0_BPU3 | BPC0_BPU2 | BPC0_BPU1 | BPC0_BPU0) & par->bplcon0;
+-	copdisplay.wait->l = CWAIT(32, par->diwstrt_v - 4);
+-}
+-
+-
+-	/*
+-	 * Rebuild the Copper List
+-	 *
+-	 * We only change the things that are not static
+-	 */
+-
+-static void ami_rebuild_copper(const struct amifb_par *par)
+-{
+-	copins *copl, *cops;
+-	u_short line, h_end1, h_end2;
+-	short i;
+-	u_long p;
+-
+-	if (IS_AGA && maxfmode + par->clk_shift == 0)
+-		h_end1 = par->diwstrt_h - 64;
+-	else
+-		h_end1 = par->htotal - 32;
+-	h_end2 = par->ddfstop + 64;
+-
+-	ami_set_sprite(par);
+-
+-	copl = copdisplay.rebuild[1];
+-	p = par->bplpt0;
+-	if (par->vmode & FB_VMODE_YWRAP) {
+-		if ((par->vyres - par->yoffset) != 1 || !mod2(par->diwstrt_v)) {
+-			if (par->yoffset > par->vyres - par->yres) {
+-				for (i = 0; i < (short)par->bpp; i++, p += par->next_plane) {
+-					(copl++)->l = CMOVE(highw(p), bplpt[i]);
+-					(copl++)->l = CMOVE2(loww(p), bplpt[i]);
+-				}
+-				line = par->diwstrt_v + ((par->vyres - par->yoffset) << par->line_shift) - 1;
+-				while (line >= 512) {
+-					(copl++)->l = CWAIT(h_end1, 510);
+-					line -= 512;
+-				}
+-				if (line >= 510 && IS_AGA && maxfmode + par->clk_shift == 0)
+-					(copl++)->l = CWAIT(h_end1, line);
+-				else
+-					(copl++)->l = CWAIT(h_end2, line);
+-				p = par->bplpt0wrap;
+-			}
+-		} else
+-			p = par->bplpt0wrap;
+-	}
+-	for (i = 0; i < (short)par->bpp; i++, p += par->next_plane) {
+-		(copl++)->l = CMOVE(highw(p), bplpt[i]);
+-		(copl++)->l = CMOVE2(loww(p), bplpt[i]);
+-	}
+-	copl->l = CEND;
+-
+-	if (par->bplcon0 & BPC0_LACE) {
+-		cops = copdisplay.rebuild[0];
+-		p = par->bplpt0;
+-		if (mod2(par->diwstrt_v))
+-			p -= par->next_line;
+-		else
+-			p += par->next_line;
+-		if (par->vmode & FB_VMODE_YWRAP) {
+-			if ((par->vyres - par->yoffset) != 1 || mod2(par->diwstrt_v)) {
+-				if (par->yoffset > par->vyres - par->yres + 1) {
+-					for (i = 0; i < (short)par->bpp; i++, p += par->next_plane) {
+-						(cops++)->l = CMOVE(highw(p), bplpt[i]);
+-						(cops++)->l = CMOVE2(loww(p), bplpt[i]);
+-					}
+-					line = par->diwstrt_v + ((par->vyres - par->yoffset) << par->line_shift) - 2;
+-					while (line >= 512) {
+-						(cops++)->l = CWAIT(h_end1, 510);
+-						line -= 512;
+-					}
+-					if (line > 510 && IS_AGA && maxfmode + par->clk_shift == 0)
+-						(cops++)->l = CWAIT(h_end1, line);
+-					else
+-						(cops++)->l = CWAIT(h_end2, line);
+-					p = par->bplpt0wrap;
+-					if (mod2(par->diwstrt_v + par->vyres -
+-					    par->yoffset))
+-						p -= par->next_line;
+-					else
+-						p += par->next_line;
+-				}
+-			} else
+-				p = par->bplpt0wrap - par->next_line;
+-		}
+-		for (i = 0; i < (short)par->bpp; i++, p += par->next_plane) {
+-			(cops++)->l = CMOVE(highw(p), bplpt[i]);
+-			(cops++)->l = CMOVE2(loww(p), bplpt[i]);
+-		}
+-		cops->l = CEND;
+-	}
+-}
+-
+-
+-	/*
+-	 * Build the Copper List
+-	 */
+-
+-static void ami_build_copper(struct fb_info *info)
+-{
+-	struct amifb_par *par = info->par;
+-	copins *copl, *cops;
+-	u_long p;
+-
+-	currentcop = 1 - currentcop;
+-
+-	copl = copdisplay.list[currentcop][1];
+-
+-	(copl++)->l = CWAIT(0, 10);
+-	(copl++)->l = CMOVE(par->bplcon0, bplcon0);
+-	(copl++)->l = CMOVE(0, sprpt[0]);
+-	(copl++)->l = CMOVE2(0, sprpt[0]);
+-
+-	if (par->bplcon0 & BPC0_LACE) {
+-		cops = copdisplay.list[currentcop][0];
+-
+-		(cops++)->l = CWAIT(0, 10);
+-		(cops++)->l = CMOVE(par->bplcon0, bplcon0);
+-		(cops++)->l = CMOVE(0, sprpt[0]);
+-		(cops++)->l = CMOVE2(0, sprpt[0]);
+-
+-		(copl++)->l = CMOVE(diwstrt2hw(par->diwstrt_h, par->diwstrt_v + 1), diwstrt);
+-		(copl++)->l = CMOVE(diwstop2hw(par->diwstop_h, par->diwstop_v + 1), diwstop);
+-		(cops++)->l = CMOVE(diwstrt2hw(par->diwstrt_h, par->diwstrt_v), diwstrt);
+-		(cops++)->l = CMOVE(diwstop2hw(par->diwstop_h, par->diwstop_v), diwstop);
+-		if (!IS_OCS) {
+-			(copl++)->l = CMOVE(diwhigh2hw(par->diwstrt_h, par->diwstrt_v + 1,
+-					    par->diwstop_h, par->diwstop_v + 1), diwhigh);
+-			(cops++)->l = CMOVE(diwhigh2hw(par->diwstrt_h, par->diwstrt_v,
+-					    par->diwstop_h, par->diwstop_v), diwhigh);
+-#if 0
+-			if (par->beamcon0 & BMC0_VARBEAMEN) {
+-				(copl++)->l = CMOVE(vtotal2hw(par->vtotal), vtotal);
+-				(copl++)->l = CMOVE(vbstrt2hw(par->vbstrt + 1), vbstrt);
+-				(copl++)->l = CMOVE(vbstop2hw(par->vbstop + 1), vbstop);
+-				(cops++)->l = CMOVE(vtotal2hw(par->vtotal), vtotal);
+-				(cops++)->l = CMOVE(vbstrt2hw(par->vbstrt), vbstrt);
+-				(cops++)->l = CMOVE(vbstop2hw(par->vbstop), vbstop);
+-			}
+-#endif
+-		}
+-		p = ZTWO_PADDR(copdisplay.list[currentcop][0]);
+-		(copl++)->l = CMOVE(highw(p), cop2lc);
+-		(copl++)->l = CMOVE2(loww(p), cop2lc);
+-		p = ZTWO_PADDR(copdisplay.list[currentcop][1]);
+-		(cops++)->l = CMOVE(highw(p), cop2lc);
+-		(cops++)->l = CMOVE2(loww(p), cop2lc);
+-		copdisplay.rebuild[0] = cops;
+-	} else {
+-		(copl++)->l = CMOVE(diwstrt2hw(par->diwstrt_h, par->diwstrt_v), diwstrt);
+-		(copl++)->l = CMOVE(diwstop2hw(par->diwstop_h, par->diwstop_v), diwstop);
+-		if (!IS_OCS) {
+-			(copl++)->l = CMOVE(diwhigh2hw(par->diwstrt_h, par->diwstrt_v,
+-					    par->diwstop_h, par->diwstop_v), diwhigh);
+-#if 0
+-			if (par->beamcon0 & BMC0_VARBEAMEN) {
+-				(copl++)->l = CMOVE(vtotal2hw(par->vtotal), vtotal);
+-				(copl++)->l = CMOVE(vbstrt2hw(par->vbstrt), vbstrt);
+-				(copl++)->l = CMOVE(vbstop2hw(par->vbstop), vbstop);
+-			}
+-#endif
+-		}
+-	}
+-	copdisplay.rebuild[1] = copl;
+-
+-	ami_update_par(info);
+-	ami_rebuild_copper(info->par);
+-}
+-
+-#ifndef MODULE
+-static void __init amifb_setup_mcap(char *spec)
+-{
+-	char *p;
+-	int vmin, vmax, hmin, hmax;
+-
+-	/* Format for monitor capabilities is: <Vmin>;<Vmax>;<Hmin>;<Hmax>
+-	 * <V*> vertical freq. in Hz
+-	 * <H*> horizontal freq. in kHz
+-	 */
+-
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	vmin = simple_strtoul(p, NULL, 10);
+-	if (vmin <= 0)
+-		return;
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	vmax = simple_strtoul(p, NULL, 10);
+-	if (vmax <= 0 || vmax <= vmin)
+-		return;
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	hmin = 1000 * simple_strtoul(p, NULL, 10);
+-	if (hmin <= 0)
+-		return;
+-	if (!(p = strsep(&spec, "")) || !*p)
+-		return;
+-	hmax = 1000 * simple_strtoul(p, NULL, 10);
+-	if (hmax <= 0 || hmax <= hmin)
+-		return;
+-
+-	amifb_hfmin = hmin;
+-	amifb_hfmax = hmax;
+-	amifb_vfmin = vmin;
+-	amifb_vfmax = vmax;
+-}
+-
+-static int __init amifb_setup(char *options)
+-{
+-	char *this_opt;
+-
+-	if (!options || !*options)
+-		return 0;
+-
+-	while ((this_opt = strsep(&options, ",")) != NULL) {
+-		if (!*this_opt)
+-			continue;
+-		if (!strcmp(this_opt, "inverse")) {
+-			fb_invert_cmaps();
+-		} else if (!strcmp(this_opt, "ilbm"))
+-			amifb_ilbm = 1;
+-		else if (!strncmp(this_opt, "monitorcap:", 11))
+-			amifb_setup_mcap(this_opt + 11);
+-		else if (!strncmp(this_opt, "fstart:", 7))
+-			min_fstrt = simple_strtoul(this_opt + 7, NULL, 0);
+-		else
+-			mode_option = this_opt;
+-	}
+-
+-	if (min_fstrt < 48)
+-		min_fstrt = 48;
+-
+-	return 0;
+-}
+-#endif
+-
+-static int amifb_check_var(struct fb_var_screeninfo *var,
+-			   struct fb_info *info)
+-{
+-	int err;
+-	struct amifb_par par;
+-
+-	/* Validate wanted screen parameters */
+-	err = ami_decode_var(var, &par, info);
+-	if (err)
+-		return err;
+-
+-	/* Encode (possibly rounded) screen parameters */
+-	ami_encode_var(var, &par);
+-	return 0;
+-}
+-
+-
+-static int amifb_set_par(struct fb_info *info)
+-{
+-	struct amifb_par *par = info->par;
+-	int error;
+-
+-	do_vmode_pan = 0;
+-	do_vmode_full = 0;
+-
+-	/* Decode wanted screen parameters */
+-	error = ami_decode_var(&info->var, par, info);
+-	if (error)
+-		return error;
+-
+-	/* Set new videomode */
+-	ami_build_copper(info);
+-
+-	/* Set VBlank trigger */
+-	do_vmode_full = 1;
+-
+-	/* Update fix for new screen parameters */
+-	if (par->bpp == 1) {
+-		info->fix.type = FB_TYPE_PACKED_PIXELS;
+-		info->fix.type_aux = 0;
+-	} else if (amifb_ilbm) {
+-		info->fix.type = FB_TYPE_INTERLEAVED_PLANES;
+-		info->fix.type_aux = par->next_line;
+-	} else {
+-		info->fix.type = FB_TYPE_PLANES;
+-		info->fix.type_aux = 0;
+-	}
+-	info->fix.line_length = div8(upx(16 << maxfmode, par->vxres));
+-
+-	if (par->vmode & FB_VMODE_YWRAP) {
+-		info->fix.ywrapstep = 1;
+-		info->fix.xpanstep = 0;
+-		info->fix.ypanstep = 0;
+-		info->flags = FBINFO_HWACCEL_YWRAP |
+-			FBINFO_READS_FAST; /* override SCROLL_REDRAW */
+-	} else {
+-		info->fix.ywrapstep = 0;
+-		if (par->vmode & FB_VMODE_SMOOTH_XPAN)
+-			info->fix.xpanstep = 1;
+-		else
+-			info->fix.xpanstep = 16 << maxfmode;
+-		info->fix.ypanstep = 1;
+-		info->flags = FBINFO_HWACCEL_YPAN;
+-	}
+-	return 0;
+-}
+-
+-
+-	/*
+-	 * Set a single color register. The values supplied are already
+-	 * rounded down to the hardware's capabilities (according to the
+-	 * entries in the var structure). Return != 0 for invalid regno.
+-	 */
+-
+-static int amifb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
+-			   u_int transp, struct fb_info *info)
+-{
+-	const struct amifb_par *par = info->par;
+-
+-	if (IS_AGA) {
+-		if (regno > 255)
+-			return 1;
+-	} else if (par->bplcon0 & BPC0_SHRES) {
+-		if (regno > 3)
+-			return 1;
+-	} else {
+-		if (regno > 31)
+-			return 1;
+-	}
+-	red >>= 8;
+-	green >>= 8;
+-	blue >>= 8;
+-	if (!regno) {
+-		red0 = red;
+-		green0 = green;
+-		blue0 = blue;
+-	}
+-
+-	/*
+-	 * Update the corresponding Hardware Color Register, unless it's Color
+-	 * Register 0 and the screen is blanked.
+-	 *
+-	 * VBlank is switched off to protect bplcon3 or ecs_palette[] from
+-	 * being changed by ami_do_blank() during the VBlank.
+-	 */
+-
+-	if (regno || !is_blanked) {
+-#if defined(CONFIG_FB_AMIGA_AGA)
+-		if (IS_AGA) {
+-			u_short bplcon3 = par->bplcon3;
+-			VBlankOff();
+-			custom.bplcon3 = bplcon3 | (regno << 8 & 0xe000);
+-			custom.color[regno & 31] = rgb2hw8_high(red, green,
+-								blue);
+-			custom.bplcon3 = bplcon3 | (regno << 8 & 0xe000) |
+-					 BPC3_LOCT;
+-			custom.color[regno & 31] = rgb2hw8_low(red, green,
+-							       blue);
+-			custom.bplcon3 = bplcon3;
+-			VBlankOn();
+-		} else
+-#endif
+-#if defined(CONFIG_FB_AMIGA_ECS)
+-		if (par->bplcon0 & BPC0_SHRES) {
+-			u_short color, mask;
+-			int i;
+-
+-			mask = 0x3333;
+-			color = rgb2hw2(red, green, blue);
+-			VBlankOff();
+-			for (i = regno + 12; i >= (int)regno; i -= 4)
+-				custom.color[i] = ecs_palette[i] = (ecs_palette[i] & mask) | color;
+-			mask <<= 2; color >>= 2;
+-			regno = down16(regno) + mul4(mod4(regno));
+-			for (i = regno + 3; i >= (int)regno; i--)
+-				custom.color[i] = ecs_palette[i] = (ecs_palette[i] & mask) | color;
+-			VBlankOn();
+-		} else
+-#endif
+-			custom.color[regno] = rgb2hw4(red, green, blue);
+-	}
+-	return 0;
+-}
+-
+-
+-	/*
+-	 * Blank the display.
+-	 */
+-
+-static int amifb_blank(int blank, struct fb_info *info)
+-{
+-	do_blank = blank ? blank : -1;
+-
+-	return 0;
+-}
+-
+-
+-	/*
+-	 * Pan or Wrap the Display
+-	 *
+-	 * This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+-	 */
+-
+-static int amifb_pan_display(struct fb_var_screeninfo *var,
+-			     struct fb_info *info)
+-{
+-	if (!(var->vmode & FB_VMODE_YWRAP)) {
+-		/*
+-		 * TODO: There will be problems when xpan!=1, so some columns
+-		 * on the right side will never be seen
+-		 */
+-		if (var->xoffset + info->var.xres >
+-		    upx(16 << maxfmode, info->var.xres_virtual))
+-			return -EINVAL;
+-	}
+-	ami_pan_var(var, info);
+-	return 0;
+-}
+-
+-
+-#if BITS_PER_LONG == 32
+-#define BYTES_PER_LONG	4
+-#define SHIFT_PER_LONG	5
+-#elif BITS_PER_LONG == 64
+-#define BYTES_PER_LONG	8
+-#define SHIFT_PER_LONG	6
+-#else
+-#define Please update me
+-#endif
+-
+-
+-	/*
+-	 *  Compose two values, using a bitmask as decision value
+-	 *  This is equivalent to (a & mask) | (b & ~mask)
+-	 */
+-
+-static inline unsigned long comp(unsigned long a, unsigned long b,
+-				 unsigned long mask)
+-{
+-	return ((a ^ b) & mask) ^ b;
+-}
+-
+-
+-static inline unsigned long xor(unsigned long a, unsigned long b,
+-				unsigned long mask)
+-{
+-	return (a & mask) ^ b;
+-}
+-
+-
+-	/*
+-	 *  Unaligned forward bit copy using 32-bit or 64-bit memory accesses
+-	 */
+-
+-static void bitcpy(unsigned long *dst, int dst_idx, const unsigned long *src,
+-		   int src_idx, u32 n)
+-{
+-	unsigned long first, last;
+-	int shift = dst_idx - src_idx, left, right;
+-	unsigned long d0, d1;
+-	int m;
+-
+-	if (!n)
+-		return;
+-
+-	shift = dst_idx - src_idx;
+-	first = ~0UL >> dst_idx;
+-	last = ~(~0UL >> ((dst_idx + n) % BITS_PER_LONG));
+-
+-	if (!shift) {
+-		// Same alignment for source and dest
+-
+-		if (dst_idx + n <= BITS_PER_LONG) {
+-			// Single word
+-			if (last)
+-				first &= last;
+-			*dst = comp(*src, *dst, first);
+-		} else {
+-			// Multiple destination words
+-			// Leading bits
+-			if (first) {
+-				*dst = comp(*src, *dst, first);
+-				dst++;
+-				src++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			}
+-
+-			// Main chunk
+-			n /= BITS_PER_LONG;
+-			while (n >= 8) {
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				*dst++ = *src++;
+-				n -= 8;
+-			}
+-			while (n--)
+-				*dst++ = *src++;
+-
+-			// Trailing bits
+-			if (last)
+-				*dst = comp(*src, *dst, last);
+-		}
+-	} else {
+-		// Different alignment for source and dest
+-
+-		right = shift & (BITS_PER_LONG - 1);
+-		left = -shift & (BITS_PER_LONG - 1);
+-
+-		if (dst_idx + n <= BITS_PER_LONG) {
+-			// Single destination word
+-			if (last)
+-				first &= last;
+-			if (shift > 0) {
+-				// Single source word
+-				*dst = comp(*src >> right, *dst, first);
+-			} else if (src_idx + n <= BITS_PER_LONG) {
+-				// Single source word
+-				*dst = comp(*src << left, *dst, first);
+-			} else {
+-				// 2 source words
+-				d0 = *src++;
+-				d1 = *src;
+-				*dst = comp(d0 << left | d1 >> right, *dst,
+-					    first);
+-			}
+-		} else {
+-			// Multiple destination words
+-			d0 = *src++;
+-			// Leading bits
+-			if (shift > 0) {
+-				// Single source word
+-				*dst = comp(d0 >> right, *dst, first);
+-				dst++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			} else {
+-				// 2 source words
+-				d1 = *src++;
+-				*dst = comp(d0 << left | d1 >> right, *dst,
+-					    first);
+-				d0 = d1;
+-				dst++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			}
+-
+-			// Main chunk
+-			m = n % BITS_PER_LONG;
+-			n /= BITS_PER_LONG;
+-			while (n >= 4) {
+-				d1 = *src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = *src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = *src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = *src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				n -= 4;
+-			}
+-			while (n--) {
+-				d1 = *src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-			}
+-
+-			// Trailing bits
+-			if (last) {
+-				if (m <= right) {
+-					// Single source word
+-					*dst = comp(d0 << left, *dst, last);
+-				} else {
+-					// 2 source words
+-					d1 = *src;
+-					*dst = comp(d0 << left | d1 >> right,
+-						    *dst, last);
+-				}
+-			}
+-		}
+-	}
+-}
+-
+-
+-	/*
+-	 *  Unaligned reverse bit copy using 32-bit or 64-bit memory accesses
+-	 */
+-
+-static void bitcpy_rev(unsigned long *dst, int dst_idx,
+-		       const unsigned long *src, int src_idx, u32 n)
+-{
+-	unsigned long first, last;
+-	int shift = dst_idx - src_idx, left, right;
+-	unsigned long d0, d1;
+-	int m;
+-
+-	if (!n)
+-		return;
+-
+-	dst += (n - 1) / BITS_PER_LONG;
+-	src += (n - 1) / BITS_PER_LONG;
+-	if ((n - 1) % BITS_PER_LONG) {
+-		dst_idx += (n - 1) % BITS_PER_LONG;
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= BITS_PER_LONG - 1;
+-		src_idx += (n - 1) % BITS_PER_LONG;
+-		src += src_idx >> SHIFT_PER_LONG;
+-		src_idx &= BITS_PER_LONG - 1;
+-	}
+-
+-	shift = dst_idx - src_idx;
+-	first = ~0UL << (BITS_PER_LONG - 1 - dst_idx);
+-	last = ~(~0UL << (BITS_PER_LONG - 1 - ((dst_idx - n) % BITS_PER_LONG)));
+-
+-	if (!shift) {
+-		// Same alignment for source and dest
+-
+-		if ((unsigned long)dst_idx + 1 >= n) {
+-			// Single word
+-			if (last)
+-				first &= last;
+-			*dst = comp(*src, *dst, first);
+-		} else {
+-			// Multiple destination words
+-			// Leading bits
+-			if (first) {
+-				*dst = comp(*src, *dst, first);
+-				dst--;
+-				src--;
+-				n -= dst_idx + 1;
+-			}
+-
+-			// Main chunk
+-			n /= BITS_PER_LONG;
+-			while (n >= 8) {
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				*dst-- = *src--;
+-				n -= 8;
+-			}
+-			while (n--)
+-				*dst-- = *src--;
+-
+-			// Trailing bits
+-			if (last)
+-				*dst = comp(*src, *dst, last);
+-		}
+-	} else {
+-		// Different alignment for source and dest
+-
+-		right = shift & (BITS_PER_LONG - 1);
+-		left = -shift & (BITS_PER_LONG - 1);
+-
+-		if ((unsigned long)dst_idx + 1 >= n) {
+-			// Single destination word
+-			if (last)
+-				first &= last;
+-			if (shift < 0) {
+-				// Single source word
+-				*dst = comp(*src << left, *dst, first);
+-			} else if (1 + (unsigned long)src_idx >= n) {
+-				// Single source word
+-				*dst = comp(*src >> right, *dst, first);
+-			} else {
+-				// 2 source words
+-				d0 = *src--;
+-				d1 = *src;
+-				*dst = comp(d0 >> right | d1 << left, *dst,
+-					    first);
+-			}
+-		} else {
+-			// Multiple destination words
+-			d0 = *src--;
+-			// Leading bits
+-			if (shift < 0) {
+-				// Single source word
+-				*dst = comp(d0 << left, *dst, first);
+-				dst--;
+-				n -= dst_idx + 1;
+-			} else {
+-				// 2 source words
+-				d1 = *src--;
+-				*dst = comp(d0 >> right | d1 << left, *dst,
+-					    first);
+-				d0 = d1;
+-				dst--;
+-				n -= dst_idx + 1;
+-			}
+-
+-			// Main chunk
+-			m = n % BITS_PER_LONG;
+-			n /= BITS_PER_LONG;
+-			while (n >= 4) {
+-				d1 = *src--;
+-				*dst-- = d0 >> right | d1 << left;
+-				d0 = d1;
+-				d1 = *src--;
+-				*dst-- = d0 >> right | d1 << left;
+-				d0 = d1;
+-				d1 = *src--;
+-				*dst-- = d0 >> right | d1 << left;
+-				d0 = d1;
+-				d1 = *src--;
+-				*dst-- = d0 >> right | d1 << left;
+-				d0 = d1;
+-				n -= 4;
+-			}
+-			while (n--) {
+-				d1 = *src--;
+-				*dst-- = d0 >> right | d1 << left;
+-				d0 = d1;
+-			}
+-
+-			// Trailing bits
+-			if (last) {
+-				if (m <= left) {
+-					// Single source word
+-					*dst = comp(d0 >> right, *dst, last);
+-				} else {
+-					// 2 source words
+-					d1 = *src;
+-					*dst = comp(d0 >> right | d1 << left,
+-						    *dst, last);
+-				}
+-			}
+-		}
+-	}
+-}
+-
+-
+-	/*
+-	 *  Unaligned forward inverting bit copy using 32-bit or 64-bit memory
+-	 *  accesses
+-	 */
+-
+-static void bitcpy_not(unsigned long *dst, int dst_idx,
+-		       const unsigned long *src, int src_idx, u32 n)
+-{
+-	unsigned long first, last;
+-	int shift = dst_idx - src_idx, left, right;
+-	unsigned long d0, d1;
+-	int m;
+-
+-	if (!n)
+-		return;
+-
+-	shift = dst_idx - src_idx;
+-	first = ~0UL >> dst_idx;
+-	last = ~(~0UL >> ((dst_idx + n) % BITS_PER_LONG));
+-
+-	if (!shift) {
+-		// Same alignment for source and dest
+-
+-		if (dst_idx + n <= BITS_PER_LONG) {
+-			// Single word
+-			if (last)
+-				first &= last;
+-			*dst = comp(~*src, *dst, first);
+-		} else {
+-			// Multiple destination words
+-			// Leading bits
+-			if (first) {
+-				*dst = comp(~*src, *dst, first);
+-				dst++;
+-				src++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			}
+-
+-			// Main chunk
+-			n /= BITS_PER_LONG;
+-			while (n >= 8) {
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				*dst++ = ~*src++;
+-				n -= 8;
+-			}
+-			while (n--)
+-				*dst++ = ~*src++;
+-
+-			// Trailing bits
+-			if (last)
+-				*dst = comp(~*src, *dst, last);
+-		}
+-	} else {
+-		// Different alignment for source and dest
+-
+-		right = shift & (BITS_PER_LONG - 1);
+-		left = -shift & (BITS_PER_LONG - 1);
+-
+-		if (dst_idx + n <= BITS_PER_LONG) {
+-			// Single destination word
+-			if (last)
+-				first &= last;
+-			if (shift > 0) {
+-				// Single source word
+-				*dst = comp(~*src >> right, *dst, first);
+-			} else if (src_idx + n <= BITS_PER_LONG) {
+-				// Single source word
+-				*dst = comp(~*src << left, *dst, first);
+-			} else {
+-				// 2 source words
+-				d0 = ~*src++;
+-				d1 = ~*src;
+-				*dst = comp(d0 << left | d1 >> right, *dst,
+-					    first);
+-			}
+-		} else {
+-			// Multiple destination words
+-			d0 = ~*src++;
+-			// Leading bits
+-			if (shift > 0) {
+-				// Single source word
+-				*dst = comp(d0 >> right, *dst, first);
+-				dst++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			} else {
+-				// 2 source words
+-				d1 = ~*src++;
+-				*dst = comp(d0 << left | d1 >> right, *dst,
+-					    first);
+-				d0 = d1;
+-				dst++;
+-				n -= BITS_PER_LONG - dst_idx;
+-			}
+-
+-			// Main chunk
+-			m = n % BITS_PER_LONG;
+-			n /= BITS_PER_LONG;
+-			while (n >= 4) {
+-				d1 = ~*src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = ~*src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = ~*src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				d1 = ~*src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-				n -= 4;
+-			}
+-			while (n--) {
+-				d1 = ~*src++;
+-				*dst++ = d0 << left | d1 >> right;
+-				d0 = d1;
+-			}
+-
+-			// Trailing bits
+-			if (last) {
+-				if (m <= right) {
+-					// Single source word
+-					*dst = comp(d0 << left, *dst, last);
+-				} else {
+-					// 2 source words
+-					d1 = ~*src;
+-					*dst = comp(d0 << left | d1 >> right,
+-						    *dst, last);
+-				}
+-			}
+-		}
+-	}
+-}
+-
+-
+-	/*
+-	 *  Unaligned 32-bit pattern fill using 32/64-bit memory accesses
+-	 */
+-
+-static void bitfill32(unsigned long *dst, int dst_idx, u32 pat, u32 n)
+-{
+-	unsigned long val = pat;
+-	unsigned long first, last;
+-
+-	if (!n)
+-		return;
+-
+-#if BITS_PER_LONG == 64
+-	val |= val << 32;
+-#endif
+-
+-	first = ~0UL >> dst_idx;
+-	last = ~(~0UL >> ((dst_idx + n) % BITS_PER_LONG));
+-
+-	if (dst_idx + n <= BITS_PER_LONG) {
+-		// Single word
+-		if (last)
+-			first &= last;
+-		*dst = comp(val, *dst, first);
+-	} else {
+-		// Multiple destination words
+-		// Leading bits
+-		if (first) {
+-			*dst = comp(val, *dst, first);
+-			dst++;
+-			n -= BITS_PER_LONG - dst_idx;
+-		}
+-
+-		// Main chunk
+-		n /= BITS_PER_LONG;
+-		while (n >= 8) {
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			*dst++ = val;
+-			n -= 8;
+-		}
+-		while (n--)
+-			*dst++ = val;
+-
+-		// Trailing bits
+-		if (last)
+-			*dst = comp(val, *dst, last);
+-	}
+-}
+-
+-
+-	/*
+-	 *  Unaligned 32-bit pattern xor using 32/64-bit memory accesses
+-	 */
+-
+-static void bitxor32(unsigned long *dst, int dst_idx, u32 pat, u32 n)
+-{
+-	unsigned long val = pat;
+-	unsigned long first, last;
+-
+-	if (!n)
+-		return;
+-
+-#if BITS_PER_LONG == 64
+-	val |= val << 32;
+-#endif
+-
+-	first = ~0UL >> dst_idx;
+-	last = ~(~0UL >> ((dst_idx + n) % BITS_PER_LONG));
+-
+-	if (dst_idx + n <= BITS_PER_LONG) {
+-		// Single word
+-		if (last)
+-			first &= last;
+-		*dst = xor(val, *dst, first);
+-	} else {
+-		// Multiple destination words
+-		// Leading bits
+-		if (first) {
+-			*dst = xor(val, *dst, first);
+-			dst++;
+-			n -= BITS_PER_LONG - dst_idx;
+-		}
+-
+-		// Main chunk
+-		n /= BITS_PER_LONG;
+-		while (n >= 4) {
+-			*dst++ ^= val;
+-			*dst++ ^= val;
+-			*dst++ ^= val;
+-			*dst++ ^= val;
+-			n -= 4;
+-		}
+-		while (n--)
+-			*dst++ ^= val;
+-
+-		// Trailing bits
+-		if (last)
+-			*dst = xor(val, *dst, last);
+-	}
+-}
+-
+-static inline void fill_one_line(int bpp, unsigned long next_plane,
+-				 unsigned long *dst, int dst_idx, u32 n,
+-				 u32 color)
+-{
+-	while (1) {
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= (BITS_PER_LONG - 1);
+-		bitfill32(dst, dst_idx, color & 1 ? ~0 : 0, n);
+-		if (!--bpp)
+-			break;
+-		color >>= 1;
+-		dst_idx += next_plane * 8;
+-	}
+-}
+-
+-static inline void xor_one_line(int bpp, unsigned long next_plane,
+-				unsigned long *dst, int dst_idx, u32 n,
+-				u32 color)
+-{
+-	while (color) {
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= (BITS_PER_LONG - 1);
+-		bitxor32(dst, dst_idx, color & 1 ? ~0 : 0, n);
+-		if (!--bpp)
+-			break;
+-		color >>= 1;
+-		dst_idx += next_plane * 8;
+-	}
+-}
+-
+-
+-static void amifb_fillrect(struct fb_info *info,
+-			   const struct fb_fillrect *rect)
+-{
+-	struct amifb_par *par = info->par;
+-	int dst_idx, x2, y2;
+-	unsigned long *dst;
+-	u32 width, height;
+-
+-	if (!rect->width || !rect->height)
+-		return;
+-
+-	/*
+-	 * We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly.
+-	 * */
+-	x2 = rect->dx + rect->width;
+-	y2 = rect->dy + rect->height;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width = x2 - rect->dx;
+-	height = y2 - rect->dy;
+-
+-	dst = (unsigned long *)
+-		((unsigned long)info->screen_base & ~(BYTES_PER_LONG - 1));
+-	dst_idx = ((unsigned long)info->screen_base & (BYTES_PER_LONG - 1)) * 8;
+-	dst_idx += rect->dy * par->next_line * 8 + rect->dx;
+-	while (height--) {
+-		switch (rect->rop) {
+-		case ROP_COPY:
+-			fill_one_line(info->var.bits_per_pixel,
+-				      par->next_plane, dst, dst_idx, width,
+-				      rect->color);
+-			break;
+-
+-		case ROP_XOR:
+-			xor_one_line(info->var.bits_per_pixel, par->next_plane,
+-				     dst, dst_idx, width, rect->color);
+-			break;
+-		}
+-		dst_idx += par->next_line * 8;
+-	}
+-}
+-
+-static inline void copy_one_line(int bpp, unsigned long next_plane,
+-				 unsigned long *dst, int dst_idx,
+-				 unsigned long *src, int src_idx, u32 n)
+-{
+-	while (1) {
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= (BITS_PER_LONG - 1);
+-		src += src_idx >> SHIFT_PER_LONG;
+-		src_idx &= (BITS_PER_LONG - 1);
+-		bitcpy(dst, dst_idx, src, src_idx, n);
+-		if (!--bpp)
+-			break;
+-		dst_idx += next_plane * 8;
+-		src_idx += next_plane * 8;
+-	}
+-}
+-
+-static inline void copy_one_line_rev(int bpp, unsigned long next_plane,
+-				     unsigned long *dst, int dst_idx,
+-				     unsigned long *src, int src_idx, u32 n)
+-{
+-	while (1) {
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= (BITS_PER_LONG - 1);
+-		src += src_idx >> SHIFT_PER_LONG;
+-		src_idx &= (BITS_PER_LONG - 1);
+-		bitcpy_rev(dst, dst_idx, src, src_idx, n);
+-		if (!--bpp)
+-			break;
+-		dst_idx += next_plane * 8;
+-		src_idx += next_plane * 8;
+-	}
+-}
+-
+-
+-static void amifb_copyarea(struct fb_info *info,
+-			   const struct fb_copyarea *area)
+-{
+-	struct amifb_par *par = info->par;
+-	int x2, y2;
+-	u32 dx, dy, sx, sy, width, height;
+-	unsigned long *dst, *src;
+-	int dst_idx, src_idx;
+-	int rev_copy = 0;
+-
+-	/* clip the destination */
+-	x2 = area->dx + area->width;
+-	y2 = area->dy + area->height;
+-	dx = area->dx > 0 ? area->dx : 0;
+-	dy = area->dy > 0 ? area->dy : 0;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width = x2 - dx;
+-	height = y2 - dy;
+-
+-	if (area->sx + dx < area->dx || area->sy + dy < area->dy)
+-		return;
+-
+-	/* update sx,sy */
+-	sx = area->sx + (dx - area->dx);
+-	sy = area->sy + (dy - area->dy);
+-
+-	/* the source must be completely inside the virtual screen */
+-	if (sx + width > info->var.xres_virtual ||
+-			sy + height > info->var.yres_virtual)
+-		return;
+-
+-	if (dy > sy || (dy == sy && dx > sx)) {
+-		dy += height;
+-		sy += height;
+-		rev_copy = 1;
+-	}
+-	dst = (unsigned long *)
+-		((unsigned long)info->screen_base & ~(BYTES_PER_LONG - 1));
+-	src = dst;
+-	dst_idx = ((unsigned long)info->screen_base & (BYTES_PER_LONG - 1)) * 8;
+-	src_idx = dst_idx;
+-	dst_idx += dy * par->next_line * 8 + dx;
+-	src_idx += sy * par->next_line * 8 + sx;
+-	if (rev_copy) {
+-		while (height--) {
+-			dst_idx -= par->next_line * 8;
+-			src_idx -= par->next_line * 8;
+-			copy_one_line_rev(info->var.bits_per_pixel,
+-					  par->next_plane, dst, dst_idx, src,
+-					  src_idx, width);
+-		}
+-	} else {
+-		while (height--) {
+-			copy_one_line(info->var.bits_per_pixel,
+-				      par->next_plane, dst, dst_idx, src,
+-				      src_idx, width);
+-			dst_idx += par->next_line * 8;
+-			src_idx += par->next_line * 8;
+-		}
+-	}
+-}
+-
+-
+-static inline void expand_one_line(int bpp, unsigned long next_plane,
+-				   unsigned long *dst, int dst_idx, u32 n,
+-				   const u8 *data, u32 bgcolor, u32 fgcolor)
+-{
+-	const unsigned long *src;
+-	int src_idx;
+-
+-	while (1) {
+-		dst += dst_idx >> SHIFT_PER_LONG;
+-		dst_idx &= (BITS_PER_LONG - 1);
+-		if ((bgcolor ^ fgcolor) & 1) {
+-			src = (unsigned long *)
+-				((unsigned long)data & ~(BYTES_PER_LONG - 1));
+-			src_idx = ((unsigned long)data & (BYTES_PER_LONG - 1)) * 8;
+-			if (fgcolor & 1)
+-				bitcpy(dst, dst_idx, src, src_idx, n);
+-			else
+-				bitcpy_not(dst, dst_idx, src, src_idx, n);
+-			/* set or clear */
+-		} else
+-			bitfill32(dst, dst_idx, fgcolor & 1 ? ~0 : 0, n);
+-		if (!--bpp)
+-			break;
+-		bgcolor >>= 1;
+-		fgcolor >>= 1;
+-		dst_idx += next_plane * 8;
+-	}
+-}
+-
+-
+-static void amifb_imageblit(struct fb_info *info, const struct fb_image *image)
+-{
+-	struct amifb_par *par = info->par;
+-	int x2, y2;
+-	unsigned long *dst;
+-	int dst_idx;
+-	const char *src;
+-	u32 dx, dy, width, height, pitch;
+-
+-	/*
+-	 * We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly like we are
+-	 * doing here.
+-	 */
+-	x2 = image->dx + image->width;
+-	y2 = image->dy + image->height;
+-	dx = image->dx;
+-	dy = image->dy;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width  = x2 - dx;
+-	height = y2 - dy;
+-
+-	if (image->depth == 1) {
+-		dst = (unsigned long *)
+-			((unsigned long)info->screen_base & ~(BYTES_PER_LONG - 1));
+-		dst_idx = ((unsigned long)info->screen_base & (BYTES_PER_LONG - 1)) * 8;
+-		dst_idx += dy * par->next_line * 8 + dx;
+-		src = image->data;
+-		pitch = (image->width + 7) / 8;
+-		while (height--) {
+-			expand_one_line(info->var.bits_per_pixel,
+-					par->next_plane, dst, dst_idx, width,
+-					src, image->bg_color,
+-					image->fg_color);
+-			dst_idx += par->next_line * 8;
+-			src += pitch;
+-		}
+-	} else {
+-		c2p_planar(info->screen_base, image->data, dx, dy, width,
+-			   height, par->next_line, par->next_plane,
+-			   image->width, info->var.bits_per_pixel);
+-	}
+-}
+-
+-
+-	/*
+-	 * Amiga Frame Buffer Specific ioctls
+-	 */
+-
+-static int amifb_ioctl(struct fb_info *info,
+-		       unsigned int cmd, unsigned long arg)
+-{
+-	union {
+-		struct fb_fix_cursorinfo fix;
+-		struct fb_var_cursorinfo var;
+-		struct fb_cursorstate state;
+-	} crsr;
+-	void __user *argp = (void __user *)arg;
+-	int i;
+-
+-	switch (cmd) {
+-	case FBIOGET_FCURSORINFO:
+-		i = ami_get_fix_cursorinfo(&crsr.fix, info->par);
+-		if (i)
+-			return i;
+-		return copy_to_user(argp, &crsr.fix,
+-				    sizeof(crsr.fix)) ? -EFAULT : 0;
+-
+-	case FBIOGET_VCURSORINFO:
+-		i = ami_get_var_cursorinfo(&crsr.var,
+-			((struct fb_var_cursorinfo __user *)arg)->data,
+-			info->par);
+-		if (i)
+-			return i;
+-		return copy_to_user(argp, &crsr.var,
+-				    sizeof(crsr.var)) ? -EFAULT : 0;
+-
+-	case FBIOPUT_VCURSORINFO:
+-		if (copy_from_user(&crsr.var, argp, sizeof(crsr.var)))
+-			return -EFAULT;
+-		return ami_set_var_cursorinfo(&crsr.var,
+-			((struct fb_var_cursorinfo __user *)arg)->data,
+-			info->par);
+-
+-	case FBIOGET_CURSORSTATE:
+-		i = ami_get_cursorstate(&crsr.state, info->par);
+-		if (i)
+-			return i;
+-		return copy_to_user(argp, &crsr.state,
+-				    sizeof(crsr.state)) ? -EFAULT : 0;
+-
+-	case FBIOPUT_CURSORSTATE:
+-		if (copy_from_user(&crsr.state, argp, sizeof(crsr.state)))
+-			return -EFAULT;
+-		return ami_set_cursorstate(&crsr.state, info->par);
+-	}
+-	return -EINVAL;
+-}
+-
+-
+-	/*
+-	 * Flash the cursor (called by VBlank interrupt)
+-	 */
+-
+-static int flash_cursor(void)
+-{
+-	static int cursorcount = 1;
+-
+-	if (cursormode == FB_CURSOR_FLASH) {
+-		if (!--cursorcount) {
+-			cursorstate = -cursorstate;
+-			cursorcount = cursorrate;
+-			if (!is_blanked)
+-				return 1;
+-		}
+-	}
+-	return 0;
+-}
+-
+-	/*
+-	 * VBlank Display Interrupt
+-	 */
+-
+-static irqreturn_t amifb_interrupt(int irq, void *dev_id)
+-{
+-	struct amifb_par *par = dev_id;
+-
+-	if (do_vmode_pan || do_vmode_full)
+-		ami_update_display(par);
+-
+-	if (do_vmode_full)
+-		ami_init_display(par);
+-
+-	if (do_vmode_pan) {
+-		flash_cursor();
+-		ami_rebuild_copper(par);
+-		do_cursor = do_vmode_pan = 0;
+-	} else if (do_cursor) {
+-		flash_cursor();
+-		ami_set_sprite(par);
+-		do_cursor = 0;
+-	} else {
+-		if (flash_cursor())
+-			ami_set_sprite(par);
+-	}
+-
+-	if (do_blank) {
+-		ami_do_blank(par);
+-		do_blank = 0;
+-	}
+-
+-	if (do_vmode_full) {
+-		ami_reinit_copper(par);
+-		do_vmode_full = 0;
+-	}
+-	return IRQ_HANDLED;
+-}
+-
+-
+-static const struct fb_ops amifb_ops = {
+-	.owner		= THIS_MODULE,
+-	__FB_DEFAULT_IOMEM_OPS_RDWR,
+-	.fb_check_var	= amifb_check_var,
+-	.fb_set_par	= amifb_set_par,
+-	.fb_setcolreg	= amifb_setcolreg,
+-	.fb_blank	= amifb_blank,
+-	.fb_pan_display	= amifb_pan_display,
+-	.fb_fillrect	= amifb_fillrect,
+-	.fb_copyarea	= amifb_copyarea,
+-	.fb_imageblit	= amifb_imageblit,
+-	.fb_ioctl	= amifb_ioctl,
+-	__FB_DEFAULT_IOMEM_OPS_MMAP,
+-};
+-
+-
+-	/*
+-	 * Allocate, Clear and Align a Block of Chip Memory
+-	 */
+-
+-static void *aligned_chipptr;
+-
+-static inline u_long __init chipalloc(u_long size)
+-{
+-	aligned_chipptr = amiga_chip_alloc(size, "amifb [RAM]");
+-	if (!aligned_chipptr) {
+-		pr_err("amifb: No Chip RAM for frame buffer");
+-		return 0;
+-	}
+-	memset(aligned_chipptr, 0, size);
+-	return (u_long)aligned_chipptr;
+-}
+-
+-static inline void chipfree(void)
+-{
+-	if (aligned_chipptr)
+-		amiga_chip_free(aligned_chipptr);
+-}
+-
+-
+-	/*
+-	 * Initialisation
+-	 */
+-
+-static int __init amifb_probe(struct platform_device *pdev)
+-{
+-	struct fb_info *info;
+-	int tag, i, err = 0;
+-	u_long chipptr;
+-	u_int defmode;
+-
+-#ifndef MODULE
+-	char *option = NULL;
+-
+-	if (fb_get_options("amifb", &option)) {
+-		amifb_video_off();
+-		return -ENODEV;
+-	}
+-	amifb_setup(option);
+-#endif
+-	custom.dmacon = DMAF_ALL | DMAF_MASTER;
+-
+-	info = framebuffer_alloc(sizeof(struct amifb_par), &pdev->dev);
+-	if (!info)
+-		return -ENOMEM;
+-
+-	strcpy(info->fix.id, "Amiga ");
+-	info->fix.visual = FB_VISUAL_PSEUDOCOLOR;
+-	info->fix.accel = FB_ACCEL_AMIGABLITT;
+-
+-	switch (amiga_chipset) {
+-#ifdef CONFIG_FB_AMIGA_OCS
+-	case CS_OCS:
+-		strcat(info->fix.id, "OCS");
+-default_chipset:
+-		chipset = TAG_OCS;
+-		maxdepth[TAG_SHRES] = 0;	/* OCS means no SHRES */
+-		maxdepth[TAG_HIRES] = 4;
+-		maxdepth[TAG_LORES] = 6;
+-		maxfmode = TAG_FMODE_1;
+-		defmode = amiga_vblank == 50 ? DEFMODE_PAL : DEFMODE_NTSC;
+-		info->fix.smem_len = VIDEOMEMSIZE_OCS;
+-		break;
+-#endif /* CONFIG_FB_AMIGA_OCS */
+-
+-#ifdef CONFIG_FB_AMIGA_ECS
+-	case CS_ECS:
+-		strcat(info->fix.id, "ECS");
+-		chipset = TAG_ECS;
+-		maxdepth[TAG_SHRES] = 2;
+-		maxdepth[TAG_HIRES] = 4;
+-		maxdepth[TAG_LORES] = 6;
+-		maxfmode = TAG_FMODE_1;
+-		if (AMIGAHW_PRESENT(AMBER_FF))
+-			defmode = amiga_vblank == 50 ? DEFMODE_AMBER_PAL
+-						     : DEFMODE_AMBER_NTSC;
+-		else
+-			defmode = amiga_vblank == 50 ? DEFMODE_PAL
+-						     : DEFMODE_NTSC;
+-		if (amiga_chip_avail() - CHIPRAM_SAFETY_LIMIT >
+-		    VIDEOMEMSIZE_ECS_2M)
+-			info->fix.smem_len = VIDEOMEMSIZE_ECS_2M;
+-		else
+-			info->fix.smem_len = VIDEOMEMSIZE_ECS_1M;
+-		break;
+-#endif /* CONFIG_FB_AMIGA_ECS */
+-
+-#ifdef CONFIG_FB_AMIGA_AGA
+-	case CS_AGA:
+-		strcat(info->fix.id, "AGA");
+-		chipset = TAG_AGA;
+-		maxdepth[TAG_SHRES] = 8;
+-		maxdepth[TAG_HIRES] = 8;
+-		maxdepth[TAG_LORES] = 8;
+-		maxfmode = TAG_FMODE_4;
+-		defmode = DEFMODE_AGA;
+-		if (amiga_chip_avail() - CHIPRAM_SAFETY_LIMIT >
+-		    VIDEOMEMSIZE_AGA_2M)
+-			info->fix.smem_len = VIDEOMEMSIZE_AGA_2M;
+-		else
+-			info->fix.smem_len = VIDEOMEMSIZE_AGA_1M;
+-		break;
+-#endif /* CONFIG_FB_AMIGA_AGA */
+-
+-	default:
+-#ifdef CONFIG_FB_AMIGA_OCS
+-		printk("Unknown graphics chipset, defaulting to OCS\n");
+-		strcat(info->fix.id, "Unknown");
+-		goto default_chipset;
+-#else /* CONFIG_FB_AMIGA_OCS */
+-		err = -ENODEV;
+-		goto release;
+-#endif /* CONFIG_FB_AMIGA_OCS */
+-		break;
+-	}
+-
+-	/*
+-	 * Calculate the Pixel Clock Values for this Machine
+-	 */
+-
+-	{
+-	u_long tmp = DIVUL(200000000000ULL, amiga_eclock);
+-
+-	pixclock[TAG_SHRES] = (tmp + 4) / 8;	/* SHRES:  35 ns / 28 MHz */
+-	pixclock[TAG_HIRES] = (tmp + 2) / 4;	/* HIRES:  70 ns / 14 MHz */
+-	pixclock[TAG_LORES] = (tmp + 1) / 2;	/* LORES: 140 ns /  7 MHz */
+-	}
+-
+-	/*
+-	 * Replace the Tag Values with the Real Pixel Clock Values
+-	 */
+-
+-	for (i = 0; i < NUM_TOTAL_MODES; i++) {
+-		struct fb_videomode *mode = &ami_modedb[i];
+-		tag = mode->pixclock;
+-		if (tag == TAG_SHRES || tag == TAG_HIRES || tag == TAG_LORES) {
+-			mode->pixclock = pixclock[tag];
+-		}
+-	}
+-
+-	if (amifb_hfmin) {
+-		info->monspecs.hfmin = amifb_hfmin;
+-		info->monspecs.hfmax = amifb_hfmax;
+-		info->monspecs.vfmin = amifb_vfmin;
+-		info->monspecs.vfmax = amifb_vfmax;
+-	} else {
+-		/*
+-		 *  These are for a typical Amiga monitor (e.g. A1960)
+-		 */
+-		info->monspecs.hfmin = 15000;
+-		info->monspecs.hfmax = 38000;
+-		info->monspecs.vfmin = 49;
+-		info->monspecs.vfmax = 90;
+-	}
+-
+-	info->fbops = &amifb_ops;
+-	info->device = &pdev->dev;
+-
+-	if (!fb_find_mode(&info->var, info, mode_option, ami_modedb,
+-			  NUM_TOTAL_MODES, &ami_modedb[defmode], 4)) {
+-		err = -EINVAL;
+-		goto release;
+-	}
+-
+-	fb_videomode_to_modelist(ami_modedb, NUM_TOTAL_MODES,
+-				 &info->modelist);
+-
+-	round_down_bpp = 0;
+-	chipptr = chipalloc(info->fix.smem_len + SPRITEMEMSIZE +
+-			    DUMMYSPRITEMEMSIZE + COPINITSIZE +
+-			    4 * COPLISTSIZE);
+-	if (!chipptr) {
+-		err = -ENOMEM;
+-		goto release;
+-	}
+-
+-	assignchunk(videomemory, u_long, chipptr, info->fix.smem_len);
+-	assignchunk(spritememory, u_long, chipptr, SPRITEMEMSIZE);
+-	assignchunk(dummysprite, u_short *, chipptr, DUMMYSPRITEMEMSIZE);
+-	assignchunk(copdisplay.init, copins *, chipptr, COPINITSIZE);
+-	assignchunk(copdisplay.list[0][0], copins *, chipptr, COPLISTSIZE);
+-	assignchunk(copdisplay.list[0][1], copins *, chipptr, COPLISTSIZE);
+-	assignchunk(copdisplay.list[1][0], copins *, chipptr, COPLISTSIZE);
+-	assignchunk(copdisplay.list[1][1], copins *, chipptr, COPLISTSIZE);
+-
+-	/*
+-	 * access the videomem with writethrough cache
+-	 */
+-	info->fix.smem_start = (u_long)ZTWO_PADDR(videomemory);
+-	videomemory = (u_long)ioremap_wt(info->fix.smem_start,
+-					 info->fix.smem_len);
+-	if (!videomemory) {
+-		dev_warn(&pdev->dev,
+-			 "Unable to map videomem cached writethrough\n");
+-		info->screen_base = ZTWO_VADDR(info->fix.smem_start);
+-	} else
+-		info->screen_base = (char *)videomemory;
+-
+-	memset(dummysprite, 0, DUMMYSPRITEMEMSIZE);
+-
+-	/*
+-	 * Make sure the Copper has something to do
+-	 */
+-	ami_init_copper();
+-
+-	/*
+-	 * Enable Display DMA
+-	 */
+-	custom.dmacon = DMAF_SETCLR | DMAF_MASTER | DMAF_RASTER | DMAF_COPPER |
+-			DMAF_BLITTER | DMAF_SPRITE;
+-
+-	err = request_irq(IRQ_AMIGA_COPPER, amifb_interrupt, 0,
+-			  "fb vertb handler", info->par);
+-	if (err)
+-		goto disable_dma;
+-
+-	err = fb_alloc_cmap(&info->cmap, 1 << info->var.bits_per_pixel, 0);
+-	if (err)
+-		goto free_irq;
+-
+-	platform_set_drvdata(pdev, info);
+-
+-	err = register_framebuffer(info);
+-	if (err)
+-		goto unset_drvdata;
+-
+-	fb_info(info, "%s frame buffer device, using %dK of video memory\n",
+-		info->fix.id, info->fix.smem_len>>10);
+-
+-	return 0;
+-
+-unset_drvdata:
+-	fb_dealloc_cmap(&info->cmap);
+-free_irq:
+-	free_irq(IRQ_AMIGA_COPPER, info->par);
+-disable_dma:
+-	custom.dmacon = DMAF_ALL | DMAF_MASTER;
+-	if (videomemory)
+-		iounmap((void *)videomemory);
+-	chipfree();
+-release:
+-	framebuffer_release(info);
+-	return err;
+-}
+-
+-
+-static void __exit amifb_remove(struct platform_device *pdev)
+-{
+-	struct fb_info *info = platform_get_drvdata(pdev);
+-
+-	unregister_framebuffer(info);
+-	fb_dealloc_cmap(&info->cmap);
+-	free_irq(IRQ_AMIGA_COPPER, info->par);
+-	custom.dmacon = DMAF_ALL | DMAF_MASTER;
+-	if (videomemory)
+-		iounmap((void *)videomemory);
+-	chipfree();
+-	framebuffer_release(info);
+-	amifb_video_off();
+-}
+-
+-/*
+- * amifb_remove() lives in .exit.text. For drivers registered via
+- * module_platform_driver_probe() this ok because they cannot get unboud at
+- * runtime. The driver needs to be marked with __refdata, otherwise modpost
+- * triggers a section mismatch warning.
+- */
+-static struct platform_driver amifb_driver __refdata = {
+-	.remove = __exit_p(amifb_remove),
+-	.driver = {
+-		.name	= "amiga-video",
+-	},
+-};
+-
+-module_platform_driver_probe(amifb_driver, amifb_probe);
+-
+-MODULE_DESCRIPTION("Amiga builtin chipset frame buffer driver");
+-MODULE_LICENSE("GPL");
+-MODULE_ALIAS("platform:amiga-video");
+diff --git a/drivers/video/fbdev/atafb.c b/drivers/video/fbdev/atafb.c
+deleted file mode 100644
+index b8ed1c537..000000000
+--- a/drivers/video/fbdev/atafb.c
++++ /dev/null
+@@ -1,3188 +0,0 @@
+-/*
+- * linux/drivers/video/atafb.c -- Atari builtin chipset frame buffer device
+- *
+- *  Copyright (C) 1994 Martin Schaller & Roman Hodek
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file COPYING in the main directory of this archive
+- * for more details.
+- *
+- * History:
+- *   - 03 Jan 95: Original version by Martin Schaller: The TT driver and
+- *                all the device independent stuff
+- *   - 09 Jan 95: Roman: I've added the hardware abstraction (hw_switch)
+- *                and wrote the Falcon, ST(E), and External drivers
+- *                based on the original TT driver.
+- *   - 07 May 95: Martin: Added colormap operations for the external driver
+- *   - 21 May 95: Martin: Added support for overscan
+- *		  Andreas: some bug fixes for this
+- *   -    Jul 95: Guenther Kelleter <guenther@pool.informatik.rwth-aachen.de>:
+- *                Programmable Falcon video modes
+- *                (thanks to Christian Cartus for documentation
+- *                of VIDEL registers).
+- *   - 27 Dec 95: Guenther: Implemented user definable video modes "user[0-7]"
+- *                on minor 24...31. "user0" may be set on commandline by
+- *                "R<x>;<y>;<depth>". (Makes sense only on Falcon)
+- *                Video mode switch on Falcon now done at next VBL interrupt
+- *                to avoid the annoying right shift of the screen.
+- *   - 23 Sep 97: Juergen: added xres_virtual for cards like ProMST
+- *                The external-part is legacy, therefore hardware-specific
+- *                functions like panning/hardwarescrolling/blanking isn't
+- *				  supported.
+- *   - 29 Sep 97: Juergen: added Romans suggestion for pan_display
+- *				  (var->xoffset was changed even if no set_screen_base avail.)
+- *	 - 05 Oct 97: Juergen: extfb (PACKED_PIXEL) is FB_PSEUDOCOLOR 'cause
+- *				  we know how to set the colors
+- *				  ext_*palette: read from ext_colors (former MV300_colors)
+- *							    write to ext_colors and RAMDAC
+- *
+- * To do:
+- *   - For the Falcon it is not possible to set random video modes on
+- *     SM124 and SC/TV, only the bootup resolution is supported.
+- *
+- */
+-
+-#define ATAFB_TT
+-#define ATAFB_STE
+-#define ATAFB_EXT
+-#define ATAFB_FALCON
+-
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/string.h>
+-#include <linux/mm.h>
+-#include <linux/delay.h>
+-#include <linux/init.h>
+-#include <linux/interrupt.h>
+-#include <linux/platform_device.h>
+-
+-#include <asm/setup.h>
+-#include <linux/uaccess.h>
+-#include <asm/irq.h>
+-#include <asm/io.h>
+-
+-#include <asm/atarihw.h>
+-#include <asm/atariints.h>
+-#include <asm/atari_stram.h>
+-
+-#include <linux/fb.h>
+-#include <asm/atarikb.h>
+-
+-#include "c2p.h"
+-#include "atafb.h"
+-
+-#define SWITCH_ACIA 0x01		/* modes for switch on OverScan */
+-#define SWITCH_SND6 0x40
+-#define SWITCH_SND7 0x80
+-#define SWITCH_NONE 0x00
+-
+-
+-static int default_par;		/* default resolution (0=none) */
+-
+-static unsigned long default_mem_req;
+-
+-static int hwscroll = -1;
+-
+-static int use_hwscroll = 1;
+-
+-static int sttt_xres = 640, st_yres = 400, tt_yres = 480;
+-static int sttt_xres_virtual = 640, sttt_yres_virtual = 400;
+-static int ovsc_offset, ovsc_addlen;
+-
+-	/*
+-	 * Hardware parameters for current mode
+-	 */
+-
+-static struct atafb_par {
+-	void *screen_base;
+-	int yres_virtual;
+-	u_long next_line;
+-#if defined ATAFB_TT || defined ATAFB_STE
+-	union {
+-		struct {
+-			int mode;
+-			int sync;
+-		} tt, st;
+-#endif
+-#ifdef ATAFB_FALCON
+-		struct falcon_hw {
+-			/* Here are fields for storing a video mode, as direct
+-			 * parameters for the hardware.
+-			 */
+-			short sync;
+-			short line_width;
+-			short line_offset;
+-			short st_shift;
+-			short f_shift;
+-			short vid_control;
+-			short vid_mode;
+-			short xoffset;
+-			short hht, hbb, hbe, hdb, hde, hss;
+-			short vft, vbb, vbe, vdb, vde, vss;
+-			/* auxiliary information */
+-			short mono;
+-			short ste_mode;
+-			short bpp;
+-			u32 pseudo_palette[16];
+-		} falcon;
+-#endif
+-		/* Nothing needed for external mode */
+-	} hw;
+-} current_par;
+-
+-/* Don't calculate an own resolution, and thus don't change the one found when
+- * booting (currently used for the Falcon to keep settings for internal video
+- * hardware extensions (e.g. ScreenBlaster)  */
+-static int DontCalcRes = 0;
+-
+-#ifdef ATAFB_FALCON
+-#define HHT hw.falcon.hht
+-#define HBB hw.falcon.hbb
+-#define HBE hw.falcon.hbe
+-#define HDB hw.falcon.hdb
+-#define HDE hw.falcon.hde
+-#define HSS hw.falcon.hss
+-#define VFT hw.falcon.vft
+-#define VBB hw.falcon.vbb
+-#define VBE hw.falcon.vbe
+-#define VDB hw.falcon.vdb
+-#define VDE hw.falcon.vde
+-#define VSS hw.falcon.vss
+-#define VCO_CLOCK25		0x04
+-#define VCO_CSYPOS		0x10
+-#define VCO_VSYPOS		0x20
+-#define VCO_HSYPOS		0x40
+-#define VCO_SHORTOFFS	0x100
+-#define VMO_DOUBLE		0x01
+-#define VMO_INTER		0x02
+-#define VMO_PREMASK		0x0c
+-#endif
+-
+-static struct fb_info fb_info = {
+-	.fix = {
+-		.id	= "Atari ",
+-		.visual	= FB_VISUAL_PSEUDOCOLOR,
+-		.accel	= FB_ACCEL_NONE,
+-	}
+-};
+-
+-static void *screen_base;	/* base address of screen */
+-static unsigned long phys_screen_base;	/* (only for Overscan) */
+-
+-static int screen_len;
+-
+-static int current_par_valid;
+-
+-static int mono_moni;
+-
+-
+-#ifdef ATAFB_EXT
+-
+-/* external video handling */
+-static unsigned int external_xres;
+-static unsigned int external_xres_virtual;
+-static unsigned int external_yres;
+-
+-/*
+- * not needed - atafb will never support panning/hardwarescroll with external
+- * static unsigned int external_yres_virtual;
+- */
+-static unsigned int external_depth;
+-static int external_pmode;
+-static void *external_screen_base;
+-static unsigned long external_addr;
+-static unsigned long external_len;
+-static unsigned long external_vgaiobase;
+-static unsigned int external_bitspercol = 6;
+-
+-/*
+- * JOE <joe@amber.dinoco.de>:
+- * added card type for external driver, is only needed for
+- * colormap handling.
+- */
+-enum cardtype { IS_VGA, IS_MV300 };
+-static enum cardtype external_card_type = IS_VGA;
+-
+-/*
+- * The MV300 mixes the color registers. So we need an array of munged
+- * indices in order to access the correct reg.
+- */
+-static int MV300_reg_1bit[2] = {
+-	0, 1
+-};
+-static int MV300_reg_4bit[16] = {
+-	0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15
+-};
+-static int MV300_reg_8bit[256] = {
+-	0, 128, 64, 192, 32, 160, 96, 224, 16, 144, 80, 208, 48, 176, 112, 240,
+-	8, 136, 72, 200, 40, 168, 104, 232, 24, 152, 88, 216, 56, 184, 120, 248,
+-	4, 132, 68, 196, 36, 164, 100, 228, 20, 148, 84, 212, 52, 180, 116, 244,
+-	12, 140, 76, 204, 44, 172, 108, 236, 28, 156, 92, 220, 60, 188, 124, 252,
+-	2, 130, 66, 194, 34, 162, 98, 226, 18, 146, 82, 210, 50, 178, 114, 242,
+-	10, 138, 74, 202, 42, 170, 106, 234, 26, 154, 90, 218, 58, 186, 122, 250,
+-	6, 134, 70, 198, 38, 166, 102, 230, 22, 150, 86, 214, 54, 182, 118, 246,
+-	14, 142, 78, 206, 46, 174, 110, 238, 30, 158, 94, 222, 62, 190, 126, 254,
+-	1, 129, 65, 193, 33, 161, 97, 225, 17, 145, 81, 209, 49, 177, 113, 241,
+-	9, 137, 73, 201, 41, 169, 105, 233, 25, 153, 89, 217, 57, 185, 121, 249,
+-	5, 133, 69, 197, 37, 165, 101, 229, 21, 149, 85, 213, 53, 181, 117, 245,
+-	13, 141, 77, 205, 45, 173, 109, 237, 29, 157, 93, 221, 61, 189, 125, 253,
+-	3, 131, 67, 195, 35, 163, 99, 227, 19, 147, 83, 211, 51, 179, 115, 243,
+-	11, 139, 75, 203, 43, 171, 107, 235, 27, 155, 91, 219, 59, 187, 123, 251,
+-	7, 135, 71, 199, 39, 167, 103, 231, 23, 151, 87, 215, 55, 183, 119, 247,
+-	15, 143, 79, 207, 47, 175, 111, 239, 31, 159, 95, 223, 63, 191, 127, 255
+-};
+-
+-static int *MV300_reg = MV300_reg_8bit;
+-#endif /* ATAFB_EXT */
+-
+-
+-/*
+- * struct fb_ops {
+- *	* open/release and usage marking
+- *	struct module *owner;
+- *	int (*fb_open)(struct fb_info *info, int user);
+- *	int (*fb_release)(struct fb_info *info, int user);
+- *
+- *	* For framebuffers with strange non linear layouts or that do not
+- *	* work with normal memory mapped access
+- *	ssize_t (*fb_read)(struct file *file, char __user *buf, size_t count, loff_t *ppos);
+- *	ssize_t (*fb_write)(struct file *file, const char __user *buf, size_t count, loff_t *ppos);
+- *
+- *	* checks var and eventually tweaks it to something supported,
+- *	* DOES NOT MODIFY PAR *
+- *	int (*fb_check_var)(struct fb_var_screeninfo *var, struct fb_info *info);
+- *
+- *	* set the video mode according to info->var *
+- *	int (*fb_set_par)(struct fb_info *info);
+- *
+- *	* set color register *
+- *	int (*fb_setcolreg)(unsigned int regno, unsigned int red, unsigned int green,
+- *			    unsigned int blue, unsigned int transp, struct fb_info *info);
+- *
+- *	* set color registers in batch *
+- *	int (*fb_setcmap)(struct fb_cmap *cmap, struct fb_info *info);
+- *
+- *	* blank display *
+- *	int (*fb_blank)(int blank, struct fb_info *info);
+- *
+- *	* pan display *
+- *	int (*fb_pan_display)(struct fb_var_screeninfo *var, struct fb_info *info);
+- *
+- *	*** The meat of the drawing engine ***
+- *	* Draws a rectangle *
+- *	void (*fb_fillrect) (struct fb_info *info, const struct fb_fillrect *rect);
+- *	* Copy data from area to another *
+- *	void (*fb_copyarea) (struct fb_info *info, const struct fb_copyarea *region);
+- *	* Draws a image to the display *
+- *	void (*fb_imageblit) (struct fb_info *info, const struct fb_image *image);
+- *
+- *	* Draws cursor *
+- *	int (*fb_cursor) (struct fb_info *info, struct fb_cursor *cursor);
+- *
+- *	* wait for blit idle, optional *
+- *	int (*fb_sync)(struct fb_info *info);
+- *
+- *	* perform fb specific ioctl (optional) *
+- *	int (*fb_ioctl)(struct fb_info *info, unsigned int cmd,
+- *			unsigned long arg);
+- *
+- *	* Handle 32bit compat ioctl (optional) *
+- *	int (*fb_compat_ioctl)(struct fb_info *info, unsigned int cmd,
+- *			unsigned long arg);
+- *
+- *	* perform fb specific mmap *
+- *	int (*fb_mmap)(struct fb_info *info, struct vm_area_struct *vma);
+- * } ;
+- */
+-
+-
+-/* ++roman: This structure abstracts from the underlying hardware (ST(e),
+- * TT, or Falcon.
+- *
+- * int (*detect)(void)
+- *   This function should detect the current video mode settings and
+- *   store them in atafb_predefined[0] for later reference by the
+- *   user. Return the index+1 of an equivalent predefined mode or 0
+- *   if there is no such.
+- *
+- * int (*encode_fix)(struct fb_fix_screeninfo *fix,
+- *                   struct atafb_par *par)
+- *   This function should fill in the 'fix' structure based on the
+- *   values in the 'par' structure.
+- * !!! Obsolete, perhaps !!!
+- *
+- * int (*decode_var)(struct fb_var_screeninfo *var,
+- *                   struct atafb_par *par)
+- *   Get the video params out of 'var'. If a value doesn't fit, round
+- *   it up, if it's too big, return EINVAL.
+- *   Round up in the following order: bits_per_pixel, xres, yres,
+- *   xres_virtual, yres_virtual, xoffset, yoffset, grayscale, bitfields,
+- *   horizontal timing, vertical timing.
+- *
+- * int (*encode_var)(struct fb_var_screeninfo *var,
+- *                   struct atafb_par *par);
+- *   Fill the 'var' structure based on the values in 'par' and maybe
+- *   other values read out of the hardware.
+- *
+- * void (*get_par)(struct atafb_par *par)
+- *   Fill the hardware's 'par' structure.
+- *   !!! Used only by detect() !!!
+- *
+- * void (*set_par)(struct atafb_par *par)
+- *   Set the hardware according to 'par'.
+- *
+- * void (*set_screen_base)(void *s_base)
+- *   Set the base address of the displayed frame buffer. Only called
+- *   if yres_virtual > yres or xres_virtual > xres.
+- *
+- * int (*blank)(int blank_mode)
+- *   Blank the screen if blank_mode != 0, else unblank. If blank == NULL then
+- *   the caller blanks by setting the CLUT to all black. Return 0 if blanking
+- *   succeeded, !=0 if un-/blanking failed due to e.g. a video mode which
+- *   doesn't support it. Implements VESA suspend and powerdown modes on
+- *   hardware that supports disabling hsync/vsync:
+- *       blank_mode == 2: suspend vsync, 3:suspend hsync, 4: powerdown.
+- */
+-
+-static struct fb_hwswitch {
+-	int (*detect)(void);
+-	int (*encode_fix)(struct fb_fix_screeninfo *fix,
+-			  struct atafb_par *par);
+-	int (*decode_var)(struct fb_var_screeninfo *var,
+-			  struct atafb_par *par);
+-	int (*encode_var)(struct fb_var_screeninfo *var,
+-			  struct atafb_par *par);
+-	void (*get_par)(struct atafb_par *par);
+-	void (*set_par)(struct atafb_par *par);
+-	void (*set_screen_base)(void *s_base);
+-	int (*blank)(int blank_mode);
+-	int (*pan_display)(struct fb_var_screeninfo *var,
+-			   struct fb_info *info);
+-} *fbhw;
+-
+-static char *autodetect_names[] = { "autodetect", NULL };
+-static char *stlow_names[] = { "stlow", NULL };
+-static char *stmid_names[] = { "stmid", "default5", NULL };
+-static char *sthigh_names[] = { "sthigh", "default4", NULL };
+-static char *ttlow_names[] = { "ttlow", NULL };
+-static char *ttmid_names[] = { "ttmid", "default1", NULL };
+-static char *tthigh_names[] = { "tthigh", "default2", NULL };
+-static char *vga2_names[] = { "vga2", NULL };
+-static char *vga4_names[] = { "vga4", NULL };
+-static char *vga16_names[] = { "vga16", "default3", NULL };
+-static char *vga256_names[] = { "vga256", NULL };
+-static char *falh2_names[] = { "falh2", NULL };
+-static char *falh16_names[] = { "falh16", NULL };
+-
+-static char **fb_var_names[] = {
+-	autodetect_names,
+-	stlow_names,
+-	stmid_names,
+-	sthigh_names,
+-	ttlow_names,
+-	ttmid_names,
+-	tthigh_names,
+-	vga2_names,
+-	vga4_names,
+-	vga16_names,
+-	vga256_names,
+-	falh2_names,
+-	falh16_names,
+-	NULL
+-};
+-
+-static struct fb_var_screeninfo atafb_predefined[] = {
+-	/*
+-	 * yres_virtual == 0 means use hw-scrolling if possible, else yres
+-	 */
+-	{ /* autodetect */
+-	  0, 0, 0, 0, 0, 0, 0, 0,		/* xres-grayscale */
+-	  {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0},	/* red green blue tran*/
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* st low */
+-	  320, 200, 320, 0, 0, 0, 4, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* st mid */
+-	  640, 200, 640, 0, 0, 0, 2, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* st high */
+-	  640, 400, 640, 0, 0, 0, 1, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* tt low */
+-	  320, 480, 320, 0, 0, 0, 8, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* tt mid */
+-	  640, 480, 640, 0, 0, 0, 4, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* tt high */
+-	  1280, 960, 1280, 0, 0, 0, 1, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* vga2 */
+-	  640, 480, 640, 0, 0, 0, 1, 0,
+-	  {0, 6, 0}, {0, 6, 0}, {0, 6, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* vga4 */
+-	  640, 480, 640, 0, 0, 0, 2, 0,
+-	  {0, 4, 0}, {0, 4, 0}, {0, 4, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* vga16 */
+-	  640, 480, 640, 0, 0, 0, 4, 0,
+-	  {0, 6, 0}, {0, 6, 0}, {0, 6, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* vga256 */
+-	  640, 480, 640, 0, 0, 0, 8, 0,
+-	  {0, 6, 0}, {0, 6, 0}, {0, 6, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* falh2 */
+-	  896, 608, 896, 0, 0, 0, 1, 0,
+-	  {0, 6, 0}, {0, 6, 0}, {0, 6, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-	{ /* falh16 */
+-	  896, 608, 896, 0, 0, 0, 4, 0,
+-	  {0, 6, 0}, {0, 6, 0}, {0, 6, 0}, {0, 0, 0},
+-	  0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0 },
+-};
+-
+-static int num_atafb_predefined = ARRAY_SIZE(atafb_predefined);
+-
+-static struct fb_videomode atafb_modedb[] __initdata = {
+-	/*
+-	 *  Atari Video Modes
+-	 *
+-	 *  If you change these, make sure to update DEFMODE_* as well!
+-	 */
+-
+-	/*
+-	 *  ST/TT Video Modes
+-	 */
+-
+-	{
+-		/* 320x200, 15 kHz, 60 Hz (ST low) */
+-		"st-low", 60, 320, 200, 32000, 32, 16, 31, 14, 96, 4,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 640x200, 15 kHz, 60 Hz (ST medium) */
+-		"st-mid", 60, 640, 200, 32000, 32, 16, 31, 14, 96, 4,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 640x400, 30.25 kHz, 63.5 Hz (ST high) */
+-		"st-high", 63, 640, 400, 32000, 128, 0, 40, 14, 128, 4,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 320x480, 15 kHz, 60 Hz (TT low) */
+-		"tt-low", 60, 320, 480, 31041, 120, 100, 8, 16, 140, 30,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 640x480, 29 kHz, 57 Hz (TT medium) */
+-		"tt-mid", 60, 640, 480, 31041, 120, 100, 8, 16, 140, 30,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 1280x960, 72 kHz, 72 Hz (TT high) */
+-		"tt-high", 72, 1280, 960, 7760, 260, 60, 36, 4, 192, 4,
+-		0, FB_VMODE_NONINTERLACED
+-	},
+-
+-	/*
+-	 *  VGA Video Modes
+-	 */
+-
+-	{
+-		/* 640x480, 31 kHz, 60 Hz (VGA) */
+-		"vga", 60, 640, 480, 39721, 42, 18, 31, 11, 100, 3,
+-		0, FB_VMODE_NONINTERLACED
+-	}, {
+-		/* 640x400, 31 kHz, 70 Hz (VGA) */
+-		"vga70", 70, 640, 400, 39721, 42, 18, 31, 11, 100, 3,
+-		FB_SYNC_VERT_HIGH_ACT | FB_SYNC_COMP_HIGH_ACT, FB_VMODE_NONINTERLACED
+-	},
+-
+-	/*
+-	 *  Falcon HiRes Video Modes
+-	 */
+-
+-	{
+-		/* 896x608, 31 kHz, 60 Hz (Falcon High) */
+-		"falh", 60, 896, 608, 32000, 18, 42, 31, 1, 96,3,
+-		0, FB_VMODE_NONINTERLACED
+-	},
+-};
+-
+-#define NUM_TOTAL_MODES  ARRAY_SIZE(atafb_modedb)
+-
+-static char *mode_option __initdata = NULL;
+-
+- /* default modes */
+-
+-#define DEFMODE_TT	5		/* "tt-high" for TT */
+-#define DEFMODE_F30	7		/* "vga70" for Falcon */
+-#define DEFMODE_STE	2		/* "st-high" for ST/E */
+-#define DEFMODE_EXT	6		/* "vga" for external */
+-
+-
+-static int get_video_mode(char *vname)
+-{
+-	char ***name_list;
+-	char **name;
+-	int i;
+-
+-	name_list = fb_var_names;
+-	for (i = 0; i < num_atafb_predefined; i++) {
+-		name = *name_list++;
+-		if (!name || !*name)
+-			break;
+-		while (*name) {
+-			if (!strcmp(vname, *name))
+-				return i + 1;
+-			name++;
+-		}
+-	}
+-	return 0;
+-}
+-
+-
+-
+-/* ------------------- TT specific functions ---------------------- */
+-
+-#ifdef ATAFB_TT
+-
+-static int tt_encode_fix(struct fb_fix_screeninfo *fix, struct atafb_par *par)
+-{
+-	int mode;
+-
+-	strcpy(fix->id, "Atari Builtin");
+-	fix->smem_start = phys_screen_base;
+-	fix->smem_len = screen_len;
+-	fix->type = FB_TYPE_INTERLEAVED_PLANES;
+-	fix->type_aux = 2;
+-	fix->visual = FB_VISUAL_PSEUDOCOLOR;
+-	mode = par->hw.tt.mode & TT_SHIFTER_MODEMASK;
+-	if (mode == TT_SHIFTER_TTHIGH || mode == TT_SHIFTER_STHIGH) {
+-		fix->type = FB_TYPE_PACKED_PIXELS;
+-		fix->type_aux = 0;
+-		if (mode == TT_SHIFTER_TTHIGH)
+-			fix->visual = FB_VISUAL_MONO01;
+-	}
+-	fix->xpanstep = 0;
+-	fix->ypanstep = 1;
+-	fix->ywrapstep = 0;
+-	fix->line_length = par->next_line;
+-	fix->accel = FB_ACCEL_ATARIBLITT;
+-	return 0;
+-}
+-
+-static int tt_decode_var(struct fb_var_screeninfo *var, struct atafb_par *par)
+-{
+-	int xres = var->xres;
+-	int yres = var->yres;
+-	int bpp = var->bits_per_pixel;
+-	int linelen;
+-	int yres_virtual = var->yres_virtual;
+-
+-	if (mono_moni) {
+-		if (bpp > 1 || xres > sttt_xres * 2 || yres > tt_yres * 2)
+-			return -EINVAL;
+-		par->hw.tt.mode = TT_SHIFTER_TTHIGH;
+-		xres = sttt_xres * 2;
+-		yres = tt_yres * 2;
+-		bpp = 1;
+-	} else {
+-		if (bpp > 8 || xres > sttt_xres || yres > tt_yres)
+-			return -EINVAL;
+-		if (bpp > 4) {
+-			if (xres > sttt_xres / 2 || yres > tt_yres)
+-				return -EINVAL;
+-			par->hw.tt.mode = TT_SHIFTER_TTLOW;
+-			xres = sttt_xres / 2;
+-			yres = tt_yres;
+-			bpp = 8;
+-		} else if (bpp > 2) {
+-			if (xres > sttt_xres || yres > tt_yres)
+-				return -EINVAL;
+-			if (xres > sttt_xres / 2 || yres > st_yres / 2) {
+-				par->hw.tt.mode = TT_SHIFTER_TTMID;
+-				xres = sttt_xres;
+-				yres = tt_yres;
+-				bpp = 4;
+-			} else {
+-				par->hw.tt.mode = TT_SHIFTER_STLOW;
+-				xres = sttt_xres / 2;
+-				yres = st_yres / 2;
+-				bpp = 4;
+-			}
+-		} else if (bpp > 1) {
+-			if (xres > sttt_xres || yres > st_yres / 2)
+-				return -EINVAL;
+-			par->hw.tt.mode = TT_SHIFTER_STMID;
+-			xres = sttt_xres;
+-			yres = st_yres / 2;
+-			bpp = 2;
+-		} else if (var->xres > sttt_xres || var->yres > st_yres) {
+-			return -EINVAL;
+-		} else {
+-			par->hw.tt.mode = TT_SHIFTER_STHIGH;
+-			xres = sttt_xres;
+-			yres = st_yres;
+-			bpp = 1;
+-		}
+-	}
+-	if (yres_virtual <= 0)
+-		yres_virtual = 0;
+-	else if (yres_virtual < yres)
+-		yres_virtual = yres;
+-	if (var->sync & FB_SYNC_EXT)
+-		par->hw.tt.sync = 0;
+-	else
+-		par->hw.tt.sync = 1;
+-	linelen = xres * bpp / 8;
+-	if (yres_virtual * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (yres * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (var->yoffset + yres > yres_virtual && yres_virtual)
+-		return -EINVAL;
+-	par->yres_virtual = yres_virtual;
+-	par->screen_base = screen_base + var->yoffset * linelen;
+-	par->next_line = linelen;
+-	return 0;
+-}
+-
+-static int tt_encode_var(struct fb_var_screeninfo *var, struct atafb_par *par)
+-{
+-	int linelen;
+-	memset(var, 0, sizeof(struct fb_var_screeninfo));
+-	var->red.offset = 0;
+-	var->red.length = 4;
+-	var->red.msb_right = 0;
+-	var->grayscale = 0;
+-
+-	var->pixclock = 31041;
+-	var->left_margin = 120;		/* these may be incorrect */
+-	var->right_margin = 100;
+-	var->upper_margin = 8;
+-	var->lower_margin = 16;
+-	var->hsync_len = 140;
+-	var->vsync_len = 30;
+-
+-	var->height = -1;
+-	var->width = -1;
+-
+-	if (par->hw.tt.sync & 1)
+-		var->sync = 0;
+-	else
+-		var->sync = FB_SYNC_EXT;
+-
+-	switch (par->hw.tt.mode & TT_SHIFTER_MODEMASK) {
+-	case TT_SHIFTER_STLOW:
+-		var->xres = sttt_xres / 2;
+-		var->xres_virtual = sttt_xres_virtual / 2;
+-		var->yres = st_yres / 2;
+-		var->bits_per_pixel = 4;
+-		break;
+-	case TT_SHIFTER_STMID:
+-		var->xres = sttt_xres;
+-		var->xres_virtual = sttt_xres_virtual;
+-		var->yres = st_yres / 2;
+-		var->bits_per_pixel = 2;
+-		break;
+-	case TT_SHIFTER_STHIGH:
+-		var->xres = sttt_xres;
+-		var->xres_virtual = sttt_xres_virtual;
+-		var->yres = st_yres;
+-		var->bits_per_pixel = 1;
+-		break;
+-	case TT_SHIFTER_TTLOW:
+-		var->xres = sttt_xres / 2;
+-		var->xres_virtual = sttt_xres_virtual / 2;
+-		var->yres = tt_yres;
+-		var->bits_per_pixel = 8;
+-		break;
+-	case TT_SHIFTER_TTMID:
+-		var->xres = sttt_xres;
+-		var->xres_virtual = sttt_xres_virtual;
+-		var->yres = tt_yres;
+-		var->bits_per_pixel = 4;
+-		break;
+-	case TT_SHIFTER_TTHIGH:
+-		var->red.length = 0;
+-		var->xres = sttt_xres * 2;
+-		var->xres_virtual = sttt_xres_virtual * 2;
+-		var->yres = tt_yres * 2;
+-		var->bits_per_pixel = 1;
+-		break;
+-	}
+-	var->blue = var->green = var->red;
+-	var->transp.offset = 0;
+-	var->transp.length = 0;
+-	var->transp.msb_right = 0;
+-	linelen = var->xres_virtual * var->bits_per_pixel / 8;
+-	if (!use_hwscroll)
+-		var->yres_virtual = var->yres;
+-	else if (screen_len) {
+-		if (par->yres_virtual)
+-			var->yres_virtual = par->yres_virtual;
+-		else
+-			/* yres_virtual == 0 means use maximum */
+-			var->yres_virtual = screen_len / linelen;
+-	} else {
+-		if (hwscroll < 0)
+-			var->yres_virtual = 2 * var->yres;
+-		else
+-			var->yres_virtual = var->yres + hwscroll * 16;
+-	}
+-	var->xoffset = 0;
+-	if (screen_base)
+-		var->yoffset = (par->screen_base - screen_base) / linelen;
+-	else
+-		var->yoffset = 0;
+-	var->nonstd = 0;
+-	var->activate = 0;
+-	var->vmode = FB_VMODE_NONINTERLACED;
+-	return 0;
+-}
+-
+-static void tt_get_par(struct atafb_par *par)
+-{
+-	unsigned long addr;
+-	par->hw.tt.mode = shifter_tt.tt_shiftmode;
+-	par->hw.tt.sync = shifter_st.syncmode;
+-	addr = ((shifter_st.bas_hi & 0xff) << 16) |
+-	       ((shifter_st.bas_md & 0xff) << 8)  |
+-	       ((shifter_st.bas_lo & 0xff));
+-	par->screen_base = atari_stram_to_virt(addr);
+-}
+-
+-static void tt_set_par(struct atafb_par *par)
+-{
+-	shifter_tt.tt_shiftmode = par->hw.tt.mode;
+-	shifter_st.syncmode = par->hw.tt.sync;
+-	/* only set screen_base if really necessary */
+-	if (current_par.screen_base != par->screen_base)
+-		fbhw->set_screen_base(par->screen_base);
+-}
+-
+-static int tt_setcolreg(unsigned int regno, unsigned int red,
+-			unsigned int green, unsigned int blue,
+-			unsigned int transp, struct fb_info *info)
+-{
+-	if ((shifter_tt.tt_shiftmode & TT_SHIFTER_MODEMASK) == TT_SHIFTER_STHIGH)
+-		regno += 254;
+-	if (regno > 255)
+-		return 1;
+-	tt_palette[regno] = (((red >> 12) << 8) | ((green >> 12) << 4) |
+-			     (blue >> 12));
+-	if ((shifter_tt.tt_shiftmode & TT_SHIFTER_MODEMASK) ==
+-	    TT_SHIFTER_STHIGH && regno == 254)
+-		tt_palette[0] = 0;
+-	return 0;
+-}
+-
+-static int tt_detect(void)
+-{
+-	struct atafb_par par;
+-
+-	/* Determine the connected monitor: The DMA sound must be
+-	 * disabled before reading the MFP GPIP, because the Sound
+-	 * Done Signal and the Monochrome Detect are XORed together!
+-	 *
+-	 * Even on a TT, we should look if there is a DMA sound. It was
+-	 * announced that the Eagle is TT compatible, but only the PCM is
+-	 * missing...
+-	 */
+-	if (ATARIHW_PRESENT(PCM_8BIT)) {
+-		tt_dmasnd.ctrl = DMASND_CTRL_OFF;
+-		udelay(20);		/* wait a while for things to settle down */
+-	}
+-	mono_moni = (st_mfp.par_dt_reg & 0x80) == 0;
+-
+-	tt_get_par(&par);
+-	tt_encode_var(&atafb_predefined[0], &par);
+-
+-	return 1;
+-}
+-
+-#endif /* ATAFB_TT */
+-
+-/* ------------------- Falcon specific functions ---------------------- */
+-
+-#ifdef ATAFB_FALCON
+-
+-static int mon_type;		/* Falcon connected monitor */
+-static int f030_bus_width;	/* Falcon ram bus width (for vid_control) */
+-#define F_MON_SM	0
+-#define F_MON_SC	1
+-#define F_MON_VGA	2
+-#define F_MON_TV	3
+-
+-static struct pixel_clock {
+-	unsigned long f;	/* f/[Hz] */
+-	unsigned long t;	/* t/[ps] (=1/f) */
+-	int right, hsync, left;	/* standard timing in clock cycles, not pixel */
+-	/* hsync initialized in falcon_detect() */
+-	int sync_mask;		/* or-mask for hw.falcon.sync to set this clock */
+-	int control_mask;	/* ditto, for hw.falcon.vid_control */
+-} f25 = {
+-	25175000, 39721, 18, 0, 42, 0x0, VCO_CLOCK25
+-}, f32 = {
+-	32000000, 31250, 18, 0, 42, 0x0, 0
+-}, fext = {
+-	0, 0, 18, 0, 42, 0x1, 0
+-};
+-
+-/* VIDEL-prescale values [mon_type][pixel_length from VCO] */
+-static int vdl_prescale[4][3] = {
+-	{ 4,2,1 }, { 4,2,1 }, { 4,2,2 }, { 4,2,1 }
+-};
+-
+-/* Default hsync timing [mon_type] in picoseconds */
+-static long h_syncs[4] = { 3000000, 4875000, 4000000, 4875000 };
+-
+-static inline int hxx_prescale(struct falcon_hw *hw)
+-{
+-	return hw->ste_mode ? 16
+-			    : vdl_prescale[mon_type][hw->vid_mode >> 2 & 0x3];
+-}
+-
+-static int falcon_encode_fix(struct fb_fix_screeninfo *fix,
+-			     struct atafb_par *par)
+-{
+-	strcpy(fix->id, "Atari Builtin");
+-	fix->smem_start = phys_screen_base;
+-	fix->smem_len = screen_len;
+-	fix->type = FB_TYPE_INTERLEAVED_PLANES;
+-	fix->type_aux = 2;
+-	fix->visual = FB_VISUAL_PSEUDOCOLOR;
+-	fix->xpanstep = 1;
+-	fix->ypanstep = 1;
+-	fix->ywrapstep = 0;
+-	if (par->hw.falcon.mono) {
+-		fix->type = FB_TYPE_PACKED_PIXELS;
+-		fix->type_aux = 0;
+-		/* no smooth scrolling with longword aligned video mem */
+-		fix->xpanstep = 32;
+-	} else if (par->hw.falcon.f_shift & 0x100) {
+-		fix->type = FB_TYPE_PACKED_PIXELS;
+-		fix->type_aux = 0;
+-		/* Is this ok or should it be DIRECTCOLOR? */
+-		fix->visual = FB_VISUAL_TRUECOLOR;
+-		fix->xpanstep = 2;
+-	}
+-	fix->line_length = par->next_line;
+-	fix->accel = FB_ACCEL_ATARIBLITT;
+-	return 0;
+-}
+-
+-static int falcon_decode_var(struct fb_var_screeninfo *var,
+-			     struct atafb_par *par)
+-{
+-	int bpp = var->bits_per_pixel;
+-	int xres = var->xres;
+-	int yres = var->yres;
+-	int xres_virtual = var->xres_virtual;
+-	int yres_virtual = var->yres_virtual;
+-	int left_margin, right_margin, hsync_len;
+-	int upper_margin, lower_margin, vsync_len;
+-	int linelen;
+-	int interlace = 0, doubleline = 0;
+-	struct pixel_clock *pclock;
+-	int plen;			/* width of pixel in clock cycles */
+-	int xstretch;
+-	int prescale;
+-	int longoffset = 0;
+-	int hfreq, vfreq;
+-	int hdb_off, hde_off, base_off;
+-	int gstart, gend1, gend2, align;
+-
+-/*
+-	Get the video params out of 'var'. If a value doesn't fit, round
+-	it up, if it's too big, return EINVAL.
+-	Round up in the following order: bits_per_pixel, xres, yres,
+-	xres_virtual, yres_virtual, xoffset, yoffset, grayscale, bitfields,
+-	horizontal timing, vertical timing.
+-
+-	There is a maximum of screen resolution determined by pixelclock
+-	and minimum frame rate -- (X+hmarg.)*(Y+vmarg.)*vfmin <= pixelclock.
+-	In interlace mode this is     "     *    "     *vfmin <= pixelclock.
+-	Additional constraints: hfreq.
+-	Frequency range for multisync monitors is given via command line.
+-	For TV and SM124 both frequencies are fixed.
+-
+-	X % 16 == 0 to fit 8x?? font (except 1 bitplane modes must use X%32 == 0)
+-	Y % 16 == 0 to fit 8x16 font
+-	Y % 8 == 0 if Y<400
+-
+-	Currently interlace and doubleline mode in var are ignored.
+-	On SM124 and TV only the standard resolutions can be used.
+-*/
+-
+-	/* Reject uninitialized mode */
+-	if (!xres || !yres || !bpp)
+-		return -EINVAL;
+-
+-	if (mon_type == F_MON_SM && bpp != 1)
+-		return -EINVAL;
+-
+-	if (bpp <= 1) {
+-		bpp = 1;
+-		par->hw.falcon.f_shift = 0x400;
+-		par->hw.falcon.st_shift = 0x200;
+-	} else if (bpp <= 2) {
+-		bpp = 2;
+-		par->hw.falcon.f_shift = 0x000;
+-		par->hw.falcon.st_shift = 0x100;
+-	} else if (bpp <= 4) {
+-		bpp = 4;
+-		par->hw.falcon.f_shift = 0x000;
+-		par->hw.falcon.st_shift = 0x000;
+-	} else if (bpp <= 8) {
+-		bpp = 8;
+-		par->hw.falcon.f_shift = 0x010;
+-	} else if (bpp <= 16) {
+-		bpp = 16;		/* packed pixel mode */
+-		par->hw.falcon.f_shift = 0x100;	/* hicolor, no overlay */
+-	} else
+-		return -EINVAL;
+-	par->hw.falcon.bpp = bpp;
+-
+-	if (mon_type == F_MON_SM || DontCalcRes) {
+-		/* Skip all calculations. VGA/TV/SC1224 only supported. */
+-		struct fb_var_screeninfo *myvar = &atafb_predefined[0];
+-
+-		if (bpp > myvar->bits_per_pixel ||
+-		    var->xres > myvar->xres ||
+-		    var->yres > myvar->yres)
+-			return -EINVAL;
+-		fbhw->get_par(par);	/* Current par will be new par */
+-		goto set_screen_base;	/* Don't forget this */
+-	}
+-
+-	/* Only some fixed resolutions < 640x400 */
+-	if (xres <= 320)
+-		xres = 320;
+-	else if (xres <= 640 && bpp != 16)
+-		xres = 640;
+-	if (yres <= 200)
+-		yres = 200;
+-	else if (yres <= 240)
+-		yres = 240;
+-	else if (yres <= 400)
+-		yres = 400;
+-
+-	/* 2 planes must use STE compatibility mode */
+-	par->hw.falcon.ste_mode = bpp == 2;
+-	par->hw.falcon.mono = bpp == 1;
+-
+-	/* Total and visible scanline length must be a multiple of one longword,
+-	 * this and the console fontwidth yields the alignment for xres and
+-	 * xres_virtual.
+-	 * TODO: this way "odd" fontheights are not supported
+-	 *
+-	 * Special case in STE mode: blank and graphic positions don't align,
+-	 * avoid trash at right margin
+-	 */
+-	if (par->hw.falcon.ste_mode)
+-		xres = (xres + 63) & ~63;
+-	else if (bpp == 1)
+-		xres = (xres + 31) & ~31;
+-	else
+-		xres = (xres + 15) & ~15;
+-	if (yres >= 400)
+-		yres = (yres + 15) & ~15;
+-	else
+-		yres = (yres + 7) & ~7;
+-
+-	if (xres_virtual < xres)
+-		xres_virtual = xres;
+-	else if (bpp == 1)
+-		xres_virtual = (xres_virtual + 31) & ~31;
+-	else
+-		xres_virtual = (xres_virtual + 15) & ~15;
+-
+-	if (yres_virtual <= 0)
+-		yres_virtual = 0;
+-	else if (yres_virtual < yres)
+-		yres_virtual = yres;
+-
+-	par->hw.falcon.line_width = bpp * xres / 16;
+-	par->hw.falcon.line_offset = bpp * (xres_virtual - xres) / 16;
+-
+-	/* single or double pixel width */
+-	xstretch = (xres < 640) ? 2 : 1;
+-
+-#if 0 /* SM124 supports only 640x400, this is rejected above */
+-	if (mon_type == F_MON_SM) {
+-		if (xres != 640 && yres != 400)
+-			return -EINVAL;
+-		plen = 1;
+-		pclock = &f32;
+-		/* SM124-mode is special */
+-		par->hw.falcon.ste_mode = 1;
+-		par->hw.falcon.f_shift = 0x000;
+-		par->hw.falcon.st_shift = 0x200;
+-		left_margin = hsync_len = 128 / plen;
+-		right_margin = 0;
+-		/* TODO set all margins */
+-	} else
+-#endif
+-	if (mon_type == F_MON_SC || mon_type == F_MON_TV) {
+-		plen = 2 * xstretch;
+-		if (var->pixclock > f32.t * plen)
+-			return -EINVAL;
+-		pclock = &f32;
+-		if (yres > 240)
+-			interlace = 1;
+-		if (var->pixclock == 0) {
+-			/* set some minimal margins which center the screen */
+-			left_margin = 32;
+-			right_margin = 18;
+-			hsync_len = pclock->hsync / plen;
+-			upper_margin = 31;
+-			lower_margin = 14;
+-			vsync_len = interlace ? 3 : 4;
+-		} else {
+-			left_margin = var->left_margin;
+-			right_margin = var->right_margin;
+-			hsync_len = var->hsync_len;
+-			upper_margin = var->upper_margin;
+-			lower_margin = var->lower_margin;
+-			vsync_len = var->vsync_len;
+-			if (var->vmode & FB_VMODE_INTERLACED) {
+-				upper_margin = (upper_margin + 1) / 2;
+-				lower_margin = (lower_margin + 1) / 2;
+-				vsync_len = (vsync_len + 1) / 2;
+-			} else if (var->vmode & FB_VMODE_DOUBLE) {
+-				upper_margin *= 2;
+-				lower_margin *= 2;
+-				vsync_len *= 2;
+-			}
+-		}
+-	} else {			/* F_MON_VGA */
+-		if (bpp == 16)
+-			xstretch = 2;	/* Double pixel width only for hicolor */
+-		/* Default values are used for vert./hor. timing if no pixelclock given. */
+-		if (var->pixclock == 0) {
+-			/* Choose master pixelclock depending on hor. timing */
+-			plen = 1 * xstretch;
+-			if ((plen * xres + f25.right + f25.hsync + f25.left) *
+-			    fb_info.monspecs.hfmin < f25.f)
+-				pclock = &f25;
+-			else if ((plen * xres + f32.right + f32.hsync +
+-				  f32.left) * fb_info.monspecs.hfmin < f32.f)
+-				pclock = &f32;
+-			else if ((plen * xres + fext.right + fext.hsync +
+-				  fext.left) * fb_info.monspecs.hfmin < fext.f &&
+-			         fext.f)
+-				pclock = &fext;
+-			else
+-				return -EINVAL;
+-
+-			left_margin = pclock->left / plen;
+-			right_margin = pclock->right / plen;
+-			hsync_len = pclock->hsync / plen;
+-			upper_margin = 31;
+-			lower_margin = 11;
+-			vsync_len = 3;
+-		} else {
+-			/* Choose largest pixelclock <= wanted clock */
+-			int i;
+-			unsigned long pcl = ULONG_MAX;
+-			pclock = 0;
+-			for (i = 1; i <= 4; i *= 2) {
+-				if (f25.t * i >= var->pixclock &&
+-				    f25.t * i < pcl) {
+-					pcl = f25.t * i;
+-					pclock = &f25;
+-				}
+-				if (f32.t * i >= var->pixclock &&
+-				    f32.t * i < pcl) {
+-					pcl = f32.t * i;
+-					pclock = &f32;
+-				}
+-				if (fext.t && fext.t * i >= var->pixclock &&
+-				    fext.t * i < pcl) {
+-					pcl = fext.t * i;
+-					pclock = &fext;
+-				}
+-			}
+-			if (!pclock)
+-				return -EINVAL;
+-			plen = pcl / pclock->t;
+-
+-			left_margin = var->left_margin;
+-			right_margin = var->right_margin;
+-			hsync_len = var->hsync_len;
+-			upper_margin = var->upper_margin;
+-			lower_margin = var->lower_margin;
+-			vsync_len = var->vsync_len;
+-			/* Internal unit is [single lines per (half-)frame] */
+-			if (var->vmode & FB_VMODE_INTERLACED) {
+-				/* # lines in half frame */
+-				/* External unit is [lines per full frame] */
+-				upper_margin = (upper_margin + 1) / 2;
+-				lower_margin = (lower_margin + 1) / 2;
+-				vsync_len = (vsync_len + 1) / 2;
+-			} else if (var->vmode & FB_VMODE_DOUBLE) {
+-				/* External unit is [double lines per frame] */
+-				upper_margin *= 2;
+-				lower_margin *= 2;
+-				vsync_len *= 2;
+-			}
+-		}
+-		if (pclock == &fext)
+-			longoffset = 1;	/* VIDEL doesn't synchronize on short offset */
+-	}
+-	/* Is video bus bandwidth (32MB/s) too low for this resolution? */
+-	/* this is definitely wrong if bus clock != 32MHz */
+-	if (pclock->f / plen / 8 * bpp > 32000000L)
+-		return -EINVAL;
+-
+-	if (vsync_len < 1)
+-		vsync_len = 1;
+-
+-	/* include sync lengths in right/lower margin for all calculations */
+-	right_margin += hsync_len;
+-	lower_margin += vsync_len;
+-
+-	/* ! In all calculations of margins we use # of lines in half frame
+-	 * (which is a full frame in non-interlace mode), so we can switch
+-	 * between interlace and non-interlace without messing around
+-	 * with these.
+-	 */
+-again:
+-	/* Set base_offset 128 and video bus width */
+-	par->hw.falcon.vid_control = mon_type | f030_bus_width;
+-	if (!longoffset)
+-		par->hw.falcon.vid_control |= VCO_SHORTOFFS;	/* base_offset 64 */
+-	if (var->sync & FB_SYNC_HOR_HIGH_ACT)
+-		par->hw.falcon.vid_control |= VCO_HSYPOS;
+-	if (var->sync & FB_SYNC_VERT_HIGH_ACT)
+-		par->hw.falcon.vid_control |= VCO_VSYPOS;
+-	/* Pixelclock */
+-	par->hw.falcon.vid_control |= pclock->control_mask;
+-	/* External or internal clock */
+-	par->hw.falcon.sync = pclock->sync_mask | 0x2;
+-	/* Pixellength and prescale */
+-	par->hw.falcon.vid_mode = (2 / plen) << 2;
+-	if (doubleline)
+-		par->hw.falcon.vid_mode |= VMO_DOUBLE;
+-	if (interlace)
+-		par->hw.falcon.vid_mode |= VMO_INTER;
+-
+-	/*********************
+-	 * Horizontal timing: unit = [master clock cycles]
+-	 * unit of hxx-registers: [master clock cycles * prescale]
+-	 * Hxx-registers are 9 bit wide
+-	 *
+-	 * 1 line = ((hht + 2) * 2 * prescale) clock cycles
+-	 *
+-	 * graphic output = hdb & 0x200 ?
+-	 *        ((hht + 2) * 2 - hdb + hde) * prescale - hdboff + hdeoff:
+-	 *        (hht + 2  - hdb + hde) * prescale - hdboff + hdeoff
+-	 * (this must be a multiple of plen*128/bpp, on VGA pixels
+-	 *  to the right may be cut off with a bigger right margin)
+-	 *
+-	 * start of graphics relative to start of 1st halfline = hdb & 0x200 ?
+-	 *        (hdb - hht - 2) * prescale + hdboff :
+-	 *        hdb * prescale + hdboff
+-	 *
+-	 * end of graphics relative to start of 1st halfline =
+-	 *        (hde + hht + 2) * prescale + hdeoff
+-	 *********************/
+-	/* Calculate VIDEL registers */
+-{
+-	prescale = hxx_prescale(&par->hw.falcon);
+-	base_off = par->hw.falcon.vid_control & VCO_SHORTOFFS ? 64 : 128;
+-
+-	/* Offsets depend on video mode */
+-	/* Offsets are in clock cycles, divide by prescale to
+-	 * calculate hd[be]-registers
+-	 */
+-	if (par->hw.falcon.f_shift & 0x100) {
+-		align = 1;
+-		hde_off = 0;
+-		hdb_off = (base_off + 16 * plen) + prescale;
+-	} else {
+-		align = 128 / bpp;
+-		hde_off = ((128 / bpp + 2) * plen);
+-		if (par->hw.falcon.ste_mode)
+-			hdb_off = (64 + base_off + (128 / bpp + 2) * plen) + prescale;
+-		else
+-			hdb_off = (base_off + (128 / bpp + 18) * plen) + prescale;
+-	}
+-
+-	gstart = (prescale / 2 + plen * left_margin) / prescale;
+-	/* gend1 is for hde (gend-gstart multiple of align), shifter's xres */
+-	gend1 = gstart + roundup(xres, align) * plen / prescale;
+-	/* gend2 is for hbb, visible xres (rest to gend1 is cut off by hblank) */
+-	gend2 = gstart + xres * plen / prescale;
+-	par->HHT = plen * (left_margin + xres + right_margin) /
+-			   (2 * prescale) - 2;
+-/*	par->HHT = (gend2 + plen * right_margin / prescale) / 2 - 2;*/
+-
+-	par->HDB = gstart - hdb_off / prescale;
+-	par->HBE = gstart;
+-	if (par->HDB < 0)
+-		par->HDB += par->HHT + 2 + 0x200;
+-	par->HDE = gend1 - par->HHT - 2 - hde_off / prescale;
+-	par->HBB = gend2 - par->HHT - 2;
+-#if 0
+-	/* One more Videl constraint: data fetch of two lines must not overlap */
+-	if ((par->HDB & 0x200) && (par->HDB & ~0x200) - par->HDE <= 5) {
+-		/* if this happens increase margins, decrease hfreq. */
+-	}
+-#endif
+-	if (hde_off % prescale)
+-		par->HBB++;		/* compensate for non matching hde and hbb */
+-	par->HSS = par->HHT + 2 - plen * hsync_len / prescale;
+-	if (par->HSS < par->HBB)
+-		par->HSS = par->HBB;
+-}
+-
+-	/*  check hor. frequency */
+-	hfreq = pclock->f / ((par->HHT + 2) * prescale * 2);
+-	if (hfreq > fb_info.monspecs.hfmax && mon_type != F_MON_VGA) {
+-		/* ++guenther:   ^^^^^^^^^^^^^^^^^^^ can't remember why I did this */
+-		/* Too high -> enlarge margin */
+-		left_margin += 1;
+-		right_margin += 1;
+-		goto again;
+-	}
+-	if (hfreq > fb_info.monspecs.hfmax || hfreq < fb_info.monspecs.hfmin)
+-		return -EINVAL;
+-
+-	/* Vxx-registers */
+-	/* All Vxx must be odd in non-interlace, since frame starts in the middle
+-	 * of the first displayed line!
+-	 * One frame consists of VFT+1 half lines. VFT+1 must be even in
+-	 * non-interlace, odd in interlace mode for synchronisation.
+-	 * Vxx-registers are 11 bit wide
+-	 */
+-	par->VBE = (upper_margin * 2 + 1); /* must begin on odd halfline */
+-	par->VDB = par->VBE;
+-	par->VDE = yres;
+-	if (!interlace)
+-		par->VDE <<= 1;
+-	if (doubleline)
+-		par->VDE <<= 1;		/* VDE now half lines per (half-)frame */
+-	par->VDE += par->VDB;
+-	par->VBB = par->VDE;
+-	par->VFT = par->VBB + (lower_margin * 2 - 1) - 1;
+-	par->VSS = par->VFT + 1 - (vsync_len * 2 - 1);
+-	/* vbb,vss,vft must be even in interlace mode */
+-	if (interlace) {
+-		par->VBB++;
+-		par->VSS++;
+-		par->VFT++;
+-	}
+-
+-	/* V-frequency check, hope I didn't create any loop here. */
+-	/* Interlace and doubleline are mutually exclusive. */
+-	vfreq = (hfreq * 2) / (par->VFT + 1);
+-	if (vfreq > fb_info.monspecs.vfmax && !doubleline && !interlace) {
+-		/* Too high -> try again with doubleline */
+-		doubleline = 1;
+-		goto again;
+-	} else if (vfreq < fb_info.monspecs.vfmin && !interlace && !doubleline) {
+-		/* Too low -> try again with interlace */
+-		interlace = 1;
+-		goto again;
+-	} else if (vfreq < fb_info.monspecs.vfmin && doubleline) {
+-		/* Doubleline too low -> clear doubleline and enlarge margins */
+-		int lines;
+-		doubleline = 0;
+-		for (lines = 0;
+-		     (hfreq * 2) / (par->VFT + 1 + 4 * lines - 2 * yres) >
+-		     fb_info.monspecs.vfmax;
+-		     lines++)
+-			;
+-		upper_margin += lines;
+-		lower_margin += lines;
+-		goto again;
+-	} else if (vfreq > fb_info.monspecs.vfmax && doubleline) {
+-		/* Doubleline too high -> enlarge margins */
+-		int lines;
+-		for (lines = 0;
+-		     (hfreq * 2) / (par->VFT + 1 + 4 * lines) >
+-		     fb_info.monspecs.vfmax;
+-		     lines += 2)
+-			;
+-		upper_margin += lines;
+-		lower_margin += lines;
+-		goto again;
+-	} else if (vfreq > fb_info.monspecs.vfmax && interlace) {
+-		/* Interlace, too high -> enlarge margins */
+-		int lines;
+-		for (lines = 0;
+-		     (hfreq * 2) / (par->VFT + 1 + 4 * lines) >
+-		     fb_info.monspecs.vfmax;
+-		     lines++)
+-			;
+-		upper_margin += lines;
+-		lower_margin += lines;
+-		goto again;
+-	} else if (vfreq < fb_info.monspecs.vfmin ||
+-		   vfreq > fb_info.monspecs.vfmax)
+-		return -EINVAL;
+-
+-set_screen_base:
+-	linelen = xres_virtual * bpp / 8;
+-	if (yres_virtual * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (yres * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (var->yoffset + yres > yres_virtual && yres_virtual)
+-		return -EINVAL;
+-	par->yres_virtual = yres_virtual;
+-	par->screen_base = screen_base + var->yoffset * linelen;
+-	par->hw.falcon.xoffset = 0;
+-
+-	par->next_line = linelen;
+-
+-	return 0;
+-}
+-
+-static int falcon_encode_var(struct fb_var_screeninfo *var,
+-			     struct atafb_par *par)
+-{
+-/* !!! only for VGA !!! */
+-	int linelen;
+-	int prescale, plen;
+-	int hdb_off, hde_off, base_off;
+-	struct falcon_hw *hw = &par->hw.falcon;
+-
+-	memset(var, 0, sizeof(struct fb_var_screeninfo));
+-	/* possible frequencies: 25.175 or 32MHz */
+-	var->pixclock = hw->sync & 0x1 ? fext.t :
+-	                hw->vid_control & VCO_CLOCK25 ? f25.t : f32.t;
+-
+-	var->height = -1;
+-	var->width = -1;
+-
+-	var->sync = 0;
+-	if (hw->vid_control & VCO_HSYPOS)
+-		var->sync |= FB_SYNC_HOR_HIGH_ACT;
+-	if (hw->vid_control & VCO_VSYPOS)
+-		var->sync |= FB_SYNC_VERT_HIGH_ACT;
+-
+-	var->vmode = FB_VMODE_NONINTERLACED;
+-	if (hw->vid_mode & VMO_INTER)
+-		var->vmode |= FB_VMODE_INTERLACED;
+-	if (hw->vid_mode & VMO_DOUBLE)
+-		var->vmode |= FB_VMODE_DOUBLE;
+-
+-	/* visible y resolution:
+-	 * Graphics display starts at line VDB and ends at line
+-	 * VDE. If interlace mode off unit of VC-registers is
+-	 * half lines, else lines.
+-	 */
+-	var->yres = hw->vde - hw->vdb;
+-	if (!(var->vmode & FB_VMODE_INTERLACED))
+-		var->yres >>= 1;
+-	if (var->vmode & FB_VMODE_DOUBLE)
+-		var->yres >>= 1;
+-
+-	/*
+-	 * to get bpp, we must examine f_shift and st_shift.
+-	 * f_shift is valid if any of bits no. 10, 8 or 4
+-	 * is set. Priority in f_shift is: 10 ">" 8 ">" 4, i.e.
+-	 * if bit 10 set then bit 8 and bit 4 don't care...
+-	 * If all these bits are 0 get display depth from st_shift
+-	 * (as for ST and STE)
+-	 */
+-	if (hw->f_shift & 0x400)	/* 2 colors */
+-		var->bits_per_pixel = 1;
+-	else if (hw->f_shift & 0x100)	/* hicolor */
+-		var->bits_per_pixel = 16;
+-	else if (hw->f_shift & 0x010)	/* 8 bitplanes */
+-		var->bits_per_pixel = 8;
+-	else if (hw->st_shift == 0)
+-		var->bits_per_pixel = 4;
+-	else if (hw->st_shift == 0x100)
+-		var->bits_per_pixel = 2;
+-	else				/* if (hw->st_shift == 0x200) */
+-		var->bits_per_pixel = 1;
+-
+-	var->xres = hw->line_width * 16 / var->bits_per_pixel;
+-	var->xres_virtual = var->xres + hw->line_offset * 16 / var->bits_per_pixel;
+-	if (hw->xoffset)
+-		var->xres_virtual += 16;
+-
+-	if (var->bits_per_pixel == 16) {
+-		var->red.offset = 11;
+-		var->red.length = 5;
+-		var->red.msb_right = 0;
+-		var->green.offset = 5;
+-		var->green.length = 6;
+-		var->green.msb_right = 0;
+-		var->blue.offset = 0;
+-		var->blue.length = 5;
+-		var->blue.msb_right = 0;
+-	} else {
+-		var->red.offset = 0;
+-		var->red.length = hw->ste_mode ? 4 : 6;
+-		if (var->red.length > var->bits_per_pixel)
+-			var->red.length = var->bits_per_pixel;
+-		var->red.msb_right = 0;
+-		var->grayscale = 0;
+-		var->blue = var->green = var->red;
+-	}
+-	var->transp.offset = 0;
+-	var->transp.length = 0;
+-	var->transp.msb_right = 0;
+-
+-	linelen = var->xres_virtual * var->bits_per_pixel / 8;
+-	if (screen_len) {
+-		if (par->yres_virtual)
+-			var->yres_virtual = par->yres_virtual;
+-		else
+-			/* yres_virtual == 0 means use maximum */
+-			var->yres_virtual = screen_len / linelen;
+-	} else {
+-		if (hwscroll < 0)
+-			var->yres_virtual = 2 * var->yres;
+-		else
+-			var->yres_virtual = var->yres + hwscroll * 16;
+-	}
+-	var->xoffset = 0;		/* TODO change this */
+-
+-	/* hdX-offsets */
+-	prescale = hxx_prescale(hw);
+-	plen = 4 >> (hw->vid_mode >> 2 & 0x3);
+-	base_off = hw->vid_control & VCO_SHORTOFFS ? 64 : 128;
+-	if (hw->f_shift & 0x100) {
+-		hde_off = 0;
+-		hdb_off = (base_off + 16 * plen) + prescale;
+-	} else {
+-		hde_off = ((128 / var->bits_per_pixel + 2) * plen);
+-		if (hw->ste_mode)
+-			hdb_off = (64 + base_off + (128 / var->bits_per_pixel + 2) * plen)
+-					 + prescale;
+-		else
+-			hdb_off = (base_off + (128 / var->bits_per_pixel + 18) * plen)
+-					 + prescale;
+-	}
+-
+-	/* Right margin includes hsync */
+-	var->left_margin = hdb_off + prescale * ((hw->hdb & 0x1ff) -
+-					   (hw->hdb & 0x200 ? 2 + hw->hht : 0));
+-	if (hw->ste_mode || mon_type != F_MON_VGA)
+-		var->right_margin = prescale * (hw->hht + 2 - hw->hde) - hde_off;
+-	else
+-		/* can't use this in ste_mode, because hbb is +1 off */
+-		var->right_margin = prescale * (hw->hht + 2 - hw->hbb);
+-	var->hsync_len = prescale * (hw->hht + 2 - hw->hss);
+-
+-	/* Lower margin includes vsync */
+-	var->upper_margin = hw->vdb / 2;	/* round down to full lines */
+-	var->lower_margin = (hw->vft + 1 - hw->vde + 1) / 2;	/* round up */
+-	var->vsync_len = (hw->vft + 1 - hw->vss + 1) / 2;	/* round up */
+-	if (var->vmode & FB_VMODE_INTERLACED) {
+-		var->upper_margin *= 2;
+-		var->lower_margin *= 2;
+-		var->vsync_len *= 2;
+-	} else if (var->vmode & FB_VMODE_DOUBLE) {
+-		var->upper_margin = (var->upper_margin + 1) / 2;
+-		var->lower_margin = (var->lower_margin + 1) / 2;
+-		var->vsync_len = (var->vsync_len + 1) / 2;
+-	}
+-
+-	var->pixclock *= plen;
+-	var->left_margin /= plen;
+-	var->right_margin /= plen;
+-	var->hsync_len /= plen;
+-
+-	var->right_margin -= var->hsync_len;
+-	var->lower_margin -= var->vsync_len;
+-
+-	if (screen_base)
+-		var->yoffset = (par->screen_base - screen_base) / linelen;
+-	else
+-		var->yoffset = 0;
+-	var->nonstd = 0;		/* what is this for? */
+-	var->activate = 0;
+-	return 0;
+-}
+-
+-static int f_change_mode;
+-static struct falcon_hw f_new_mode;
+-static int f_pan_display;
+-
+-static void falcon_get_par(struct atafb_par *par)
+-{
+-	unsigned long addr;
+-	struct falcon_hw *hw = &par->hw.falcon;
+-
+-	hw->line_width = shifter_f030.scn_width;
+-	hw->line_offset = shifter_f030.off_next;
+-	hw->st_shift = videl.st_shift & 0x300;
+-	hw->f_shift = videl.f_shift;
+-	hw->vid_control = videl.control;
+-	hw->vid_mode = videl.mode;
+-	hw->sync = shifter_st.syncmode & 0x1;
+-	hw->xoffset = videl.xoffset & 0xf;
+-	hw->hht = videl.hht;
+-	hw->hbb = videl.hbb;
+-	hw->hbe = videl.hbe;
+-	hw->hdb = videl.hdb;
+-	hw->hde = videl.hde;
+-	hw->hss = videl.hss;
+-	hw->vft = videl.vft;
+-	hw->vbb = videl.vbb;
+-	hw->vbe = videl.vbe;
+-	hw->vdb = videl.vdb;
+-	hw->vde = videl.vde;
+-	hw->vss = videl.vss;
+-
+-	addr = (shifter_st.bas_hi & 0xff) << 16 |
+-	       (shifter_st.bas_md & 0xff) << 8  |
+-	       (shifter_st.bas_lo & 0xff);
+-	par->screen_base = atari_stram_to_virt(addr);
+-
+-	/* derived parameters */
+-	hw->ste_mode = (hw->f_shift & 0x510) == 0 && hw->st_shift == 0x100;
+-	hw->mono = (hw->f_shift & 0x400) ||
+-	           ((hw->f_shift & 0x510) == 0 && hw->st_shift == 0x200);
+-}
+-
+-static void falcon_set_par(struct atafb_par *par)
+-{
+-	f_change_mode = 0;
+-
+-	/* only set screen_base if really necessary */
+-	if (current_par.screen_base != par->screen_base)
+-		fbhw->set_screen_base(par->screen_base);
+-
+-	/* Don't touch any other registers if we keep the default resolution */
+-	if (DontCalcRes)
+-		return;
+-
+-	/* Tell vbl-handler to change video mode.
+-	 * We change modes only on next VBL, to avoid desynchronisation
+-	 * (a shift to the right and wrap around by a random number of pixels
+-	 * in all monochrome modes).
+-	 * This seems to work on my Falcon.
+-	 */
+-	f_new_mode = par->hw.falcon;
+-	f_change_mode = 1;
+-}
+-
+-static irqreturn_t falcon_vbl_switcher(int irq, void *dummy)
+-{
+-	struct falcon_hw *hw = &f_new_mode;
+-
+-	if (f_change_mode) {
+-		f_change_mode = 0;
+-
+-		if (hw->sync & 0x1) {
+-			/* Enable external pixelclock. This code only for ScreenWonder */
+-			*(volatile unsigned short *)0xffff9202 = 0xffbf;
+-		} else {
+-			/* Turn off external clocks. Read sets all output bits to 1. */
+-			*(volatile unsigned short *)0xffff9202;
+-		}
+-		shifter_st.syncmode = hw->sync;
+-
+-		videl.hht = hw->hht;
+-		videl.hbb = hw->hbb;
+-		videl.hbe = hw->hbe;
+-		videl.hdb = hw->hdb;
+-		videl.hde = hw->hde;
+-		videl.hss = hw->hss;
+-		videl.vft = hw->vft;
+-		videl.vbb = hw->vbb;
+-		videl.vbe = hw->vbe;
+-		videl.vdb = hw->vdb;
+-		videl.vde = hw->vde;
+-		videl.vss = hw->vss;
+-
+-		videl.f_shift = 0;	/* write enables Falcon palette, 0: 4 planes */
+-		if (hw->ste_mode) {
+-			videl.st_shift = hw->st_shift;	/* write enables STE palette */
+-		} else {
+-			/* IMPORTANT:
+-			 * set st_shift 0, so we can tell the screen-depth if f_shift == 0.
+-			 * Writing 0 to f_shift enables 4 plane Falcon mode but
+-			 * doesn't set st_shift. st_shift != 0 (!= 4planes) is impossible
+-			 * with Falcon palette.
+-			 */
+-			videl.st_shift = 0;
+-			/* now back to Falcon palette mode */
+-			videl.f_shift = hw->f_shift;
+-		}
+-		/* writing to st_shift changed scn_width and vid_mode */
+-		videl.xoffset = hw->xoffset;
+-		shifter_f030.scn_width = hw->line_width;
+-		shifter_f030.off_next = hw->line_offset;
+-		videl.control = hw->vid_control;
+-		videl.mode = hw->vid_mode;
+-	}
+-	if (f_pan_display) {
+-		f_pan_display = 0;
+-		videl.xoffset = current_par.hw.falcon.xoffset;
+-		shifter_f030.off_next = current_par.hw.falcon.line_offset;
+-	}
+-	return IRQ_HANDLED;
+-}
+-
+-static int falcon_pan_display(struct fb_var_screeninfo *var,
+-			      struct fb_info *info)
+-{
+-	struct atafb_par *par = info->par;
+-
+-	int xoffset;
+-	int bpp = info->var.bits_per_pixel;
+-
+-	if (bpp == 1)
+-		var->xoffset = round_up(var->xoffset, 32);
+-	if (bpp != 16)
+-		par->hw.falcon.xoffset = var->xoffset & 15;
+-	else {
+-		par->hw.falcon.xoffset = 0;
+-		var->xoffset = round_up(var->xoffset, 2);
+-	}
+-	par->hw.falcon.line_offset = bpp *
+-		(info->var.xres_virtual - info->var.xres) / 16;
+-	if (par->hw.falcon.xoffset)
+-		par->hw.falcon.line_offset -= bpp;
+-	xoffset = var->xoffset - par->hw.falcon.xoffset;
+-
+-	par->screen_base = screen_base +
+-	        (var->yoffset * info->var.xres_virtual + xoffset) * bpp / 8;
+-	if (fbhw->set_screen_base)
+-		fbhw->set_screen_base(par->screen_base);
+-	else
+-		return -EINVAL;		/* shouldn't happen */
+-	f_pan_display = 1;
+-	return 0;
+-}
+-
+-static int falcon_setcolreg(unsigned int regno, unsigned int red,
+-			    unsigned int green, unsigned int blue,
+-			    unsigned int transp, struct fb_info *info)
+-{
+-	if (regno > 255)
+-		return 1;
+-	f030_col[regno] = (((red & 0xfc00) << 16) |
+-			   ((green & 0xfc00) << 8) |
+-			   ((blue & 0xfc00) >> 8));
+-	if (regno < 16) {
+-		shifter_tt.color_reg[regno] =
+-			((((red & 0xe000) >> 13)   | ((red & 0x1000) >> 12)) << 8)   |
+-			((((green & 0xe000) >> 13) | ((green & 0x1000) >> 12)) << 4) |
+-			   ((blue & 0xe000) >> 13) | ((blue & 0x1000) >> 12);
+-		((u32 *)info->pseudo_palette)[regno] = ((red & 0xf800) |
+-						       ((green & 0xfc00) >> 5) |
+-						       ((blue & 0xf800) >> 11));
+-	}
+-	return 0;
+-}
+-
+-static int falcon_blank(int blank_mode)
+-{
+-	/* ++guenther: we can switch off graphics by changing VDB and VDE,
+-	 * so VIDEL doesn't hog the bus while saving.
+-	 * (this may affect usleep()).
+-	 */
+-	int vdb, vss, hbe, hss;
+-
+-	if (mon_type == F_MON_SM)	/* this doesn't work on SM124 */
+-		return 1;
+-
+-	vdb = current_par.VDB;
+-	vss = current_par.VSS;
+-	hbe = current_par.HBE;
+-	hss = current_par.HSS;
+-
+-	if (blank_mode >= 1) {
+-		/* disable graphics output (this speeds up the CPU) ... */
+-		vdb = current_par.VFT + 1;
+-		/* ... and blank all lines */
+-		hbe = current_par.HHT + 2;
+-	}
+-	/* use VESA suspend modes on VGA monitors */
+-	if (mon_type == F_MON_VGA) {
+-		if (blank_mode == 2 || blank_mode == 4)
+-			vss = current_par.VFT + 1;
+-		if (blank_mode == 3 || blank_mode == 4)
+-			hss = current_par.HHT + 2;
+-	}
+-
+-	videl.vdb = vdb;
+-	videl.vss = vss;
+-	videl.hbe = hbe;
+-	videl.hss = hss;
+-
+-	return 0;
+-}
+-
+-static int falcon_detect(void)
+-{
+-	struct atafb_par par;
+-	unsigned char fhw;
+-
+-	/* Determine connected monitor and set monitor parameters */
+-	fhw = *(unsigned char *)0xffff8006;
+-	mon_type = fhw >> 6 & 0x3;
+-	/* bit 1 of fhw: 1=32 bit ram bus, 0=16 bit */
+-	f030_bus_width = fhw << 6 & 0x80;
+-	switch (mon_type) {
+-	case F_MON_SM:
+-		fb_info.monspecs.vfmin = 70;
+-		fb_info.monspecs.vfmax = 72;
+-		fb_info.monspecs.hfmin = 35713;
+-		fb_info.monspecs.hfmax = 35715;
+-		break;
+-	case F_MON_SC:
+-	case F_MON_TV:
+-		/* PAL...NTSC */
+-		fb_info.monspecs.vfmin = 49;	/* not 50, since TOS defaults to 49.9x Hz */
+-		fb_info.monspecs.vfmax = 60;
+-		fb_info.monspecs.hfmin = 15620;
+-		fb_info.monspecs.hfmax = 15755;
+-		break;
+-	}
+-	/* initialize hsync-len */
+-	f25.hsync = h_syncs[mon_type] / f25.t;
+-	f32.hsync = h_syncs[mon_type] / f32.t;
+-	if (fext.t)
+-		fext.hsync = h_syncs[mon_type] / fext.t;
+-
+-	falcon_get_par(&par);
+-	falcon_encode_var(&atafb_predefined[0], &par);
+-
+-	/* Detected mode is always the "autodetect" slot */
+-	return 1;
+-}
+-
+-#endif /* ATAFB_FALCON */
+-
+-/* ------------------- ST(E) specific functions ---------------------- */
+-
+-#ifdef ATAFB_STE
+-
+-static int stste_encode_fix(struct fb_fix_screeninfo *fix,
+-			    struct atafb_par *par)
+-{
+-	int mode;
+-
+-	strcpy(fix->id, "Atari Builtin");
+-	fix->smem_start = phys_screen_base;
+-	fix->smem_len = screen_len;
+-	fix->type = FB_TYPE_INTERLEAVED_PLANES;
+-	fix->type_aux = 2;
+-	fix->visual = FB_VISUAL_PSEUDOCOLOR;
+-	mode = par->hw.st.mode & 3;
+-	if (mode == ST_HIGH) {
+-		fix->type = FB_TYPE_PACKED_PIXELS;
+-		fix->type_aux = 0;
+-		fix->visual = FB_VISUAL_MONO10;
+-	}
+-	if (ATARIHW_PRESENT(EXTD_SHIFTER)) {
+-		fix->xpanstep = 16;
+-		fix->ypanstep = 1;
+-	} else {
+-		fix->xpanstep = 0;
+-		fix->ypanstep = 0;
+-	}
+-	fix->ywrapstep = 0;
+-	fix->line_length = par->next_line;
+-	fix->accel = FB_ACCEL_ATARIBLITT;
+-	return 0;
+-}
+-
+-static int stste_decode_var(struct fb_var_screeninfo *var,
+-			    struct atafb_par *par)
+-{
+-	int xres = var->xres;
+-	int yres = var->yres;
+-	int bpp = var->bits_per_pixel;
+-	int linelen;
+-	int yres_virtual = var->yres_virtual;
+-
+-	if (mono_moni) {
+-		if (bpp > 1 || xres > sttt_xres || yres > st_yres)
+-			return -EINVAL;
+-		par->hw.st.mode = ST_HIGH;
+-		xres = sttt_xres;
+-		yres = st_yres;
+-		bpp = 1;
+-	} else {
+-		if (bpp > 4 || xres > sttt_xres || yres > st_yres)
+-			return -EINVAL;
+-		if (bpp > 2) {
+-			if (xres > sttt_xres / 2 || yres > st_yres / 2)
+-				return -EINVAL;
+-			par->hw.st.mode = ST_LOW;
+-			xres = sttt_xres / 2;
+-			yres = st_yres / 2;
+-			bpp = 4;
+-		} else if (bpp > 1) {
+-			if (xres > sttt_xres || yres > st_yres / 2)
+-				return -EINVAL;
+-			par->hw.st.mode = ST_MID;
+-			xres = sttt_xres;
+-			yres = st_yres / 2;
+-			bpp = 2;
+-		} else
+-			return -EINVAL;
+-	}
+-	if (yres_virtual <= 0)
+-		yres_virtual = 0;
+-	else if (yres_virtual < yres)
+-		yres_virtual = yres;
+-	if (var->sync & FB_SYNC_EXT)
+-		par->hw.st.sync = (par->hw.st.sync & ~1) | 1;
+-	else
+-		par->hw.st.sync = (par->hw.st.sync & ~1);
+-	linelen = xres * bpp / 8;
+-	if (yres_virtual * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (yres * linelen > screen_len && screen_len)
+-		return -EINVAL;
+-	if (var->yoffset + yres > yres_virtual && yres_virtual)
+-		return -EINVAL;
+-	par->yres_virtual = yres_virtual;
+-	par->screen_base = screen_base + var->yoffset * linelen;
+-	par->next_line = linelen;
+-	return 0;
+-}
+-
+-static int stste_encode_var(struct fb_var_screeninfo *var,
+-			    struct atafb_par *par)
+-{
+-	int linelen;
+-	memset(var, 0, sizeof(struct fb_var_screeninfo));
+-	var->red.offset = 0;
+-	var->red.length = ATARIHW_PRESENT(EXTD_SHIFTER) ? 4 : 3;
+-	var->red.msb_right = 0;
+-	var->grayscale = 0;
+-
+-	var->pixclock = 31041;
+-	var->left_margin = 120;		/* these are incorrect */
+-	var->right_margin = 100;
+-	var->upper_margin = 8;
+-	var->lower_margin = 16;
+-	var->hsync_len = 140;
+-	var->vsync_len = 30;
+-
+-	var->height = -1;
+-	var->width = -1;
+-
+-	if (!(par->hw.st.sync & 1))
+-		var->sync = 0;
+-	else
+-		var->sync = FB_SYNC_EXT;
+-
+-	switch (par->hw.st.mode & 3) {
+-	case ST_LOW:
+-		var->xres = sttt_xres / 2;
+-		var->yres = st_yres / 2;
+-		var->bits_per_pixel = 4;
+-		break;
+-	case ST_MID:
+-		var->xres = sttt_xres;
+-		var->yres = st_yres / 2;
+-		var->bits_per_pixel = 2;
+-		break;
+-	case ST_HIGH:
+-		var->xres = sttt_xres;
+-		var->yres = st_yres;
+-		var->bits_per_pixel = 1;
+-		break;
+-	}
+-	var->blue = var->green = var->red;
+-	var->transp.offset = 0;
+-	var->transp.length = 0;
+-	var->transp.msb_right = 0;
+-	var->xres_virtual = sttt_xres_virtual;
+-	linelen = var->xres_virtual * var->bits_per_pixel / 8;
+-	ovsc_addlen = linelen * (sttt_yres_virtual - st_yres);
+-
+-	if (!use_hwscroll)
+-		var->yres_virtual = var->yres;
+-	else if (screen_len) {
+-		if (par->yres_virtual)
+-			var->yres_virtual = par->yres_virtual;
+-		else
+-			/* yres_virtual == 0 means use maximum */
+-			var->yres_virtual = screen_len / linelen;
+-	} else {
+-		if (hwscroll < 0)
+-			var->yres_virtual = 2 * var->yres;
+-		else
+-			var->yres_virtual = var->yres + hwscroll * 16;
+-	}
+-	var->xoffset = 0;
+-	if (screen_base)
+-		var->yoffset = (par->screen_base - screen_base) / linelen;
+-	else
+-		var->yoffset = 0;
+-	var->nonstd = 0;
+-	var->activate = 0;
+-	var->vmode = FB_VMODE_NONINTERLACED;
+-	return 0;
+-}
+-
+-static void stste_get_par(struct atafb_par *par)
+-{
+-	unsigned long addr;
+-	par->hw.st.mode = shifter_tt.st_shiftmode;
+-	par->hw.st.sync = shifter_st.syncmode;
+-	addr = ((shifter_st.bas_hi & 0xff) << 16) |
+-	       ((shifter_st.bas_md & 0xff) << 8);
+-	if (ATARIHW_PRESENT(EXTD_SHIFTER))
+-		addr |= (shifter_st.bas_lo & 0xff);
+-	par->screen_base = atari_stram_to_virt(addr);
+-}
+-
+-static void stste_set_par(struct atafb_par *par)
+-{
+-	shifter_tt.st_shiftmode = par->hw.st.mode;
+-	shifter_st.syncmode = par->hw.st.sync;
+-	/* only set screen_base if really necessary */
+-	if (current_par.screen_base != par->screen_base)
+-		fbhw->set_screen_base(par->screen_base);
+-}
+-
+-static int stste_setcolreg(unsigned int regno, unsigned int red,
+-			   unsigned int green, unsigned int blue,
+-			   unsigned int transp, struct fb_info *info)
+-{
+-	if (regno > 15)
+-		return 1;
+-	red >>= 12;
+-	blue >>= 12;
+-	green >>= 12;
+-	if (ATARIHW_PRESENT(EXTD_SHIFTER))
+-		shifter_tt.color_reg[regno] =
+-			((((red & 0xe)   >> 1) | ((red & 1)   << 3)) << 8) |
+-			((((green & 0xe) >> 1) | ((green & 1) << 3)) << 4) |
+-			  ((blue & 0xe)  >> 1) | ((blue & 1)  << 3);
+-	else
+-		shifter_tt.color_reg[regno] =
+-			((red & 0xe) << 7) |
+-			((green & 0xe) << 3) |
+-			((blue & 0xe) >> 1);
+-	return 0;
+-}
+-
+-static int stste_detect(void)
+-{
+-	struct atafb_par par;
+-
+-	/* Determine the connected monitor: The DMA sound must be
+-	 * disabled before reading the MFP GPIP, because the Sound
+-	 * Done Signal and the Monochrome Detect are XORed together!
+-	 */
+-	if (ATARIHW_PRESENT(PCM_8BIT)) {
+-		tt_dmasnd.ctrl = DMASND_CTRL_OFF;
+-		udelay(20);		/* wait a while for things to settle down */
+-	}
+-	mono_moni = (st_mfp.par_dt_reg & 0x80) == 0;
+-
+-	stste_get_par(&par);
+-	stste_encode_var(&atafb_predefined[0], &par);
+-
+-	if (!ATARIHW_PRESENT(EXTD_SHIFTER))
+-		use_hwscroll = 0;
+-	return 1;
+-}
+-
+-static void stste_set_screen_base(void *s_base)
+-{
+-	unsigned long addr;
+-	addr = atari_stram_to_phys(s_base);
+-	/* Setup Screen Memory */
+-	shifter_st.bas_hi = (unsigned char)((addr & 0xff0000) >> 16);
+-	shifter_st.bas_md = (unsigned char)((addr & 0x00ff00) >> 8);
+-	if (ATARIHW_PRESENT(EXTD_SHIFTER))
+-		shifter_st.bas_lo = (unsigned char)(addr & 0x0000ff);
+-}
+-
+-#endif /* ATAFB_STE */
+-
+-/* Switching the screen size should be done during vsync, otherwise
+- * the margins may get messed up. This is a well known problem of
+- * the ST's video system.
+- *
+- * Unfortunately there is hardly any way to find the vsync, as the
+- * vertical blank interrupt is no longer in time on machines with
+- * overscan type modifications.
+- *
+- * We can, however, use Timer B to safely detect the black shoulder,
+- * but then we've got to guess an appropriate delay to find the vsync.
+- * This might not work on every machine.
+- *
+- * martin_rogge @ ki.maus.de, 8th Aug 1995
+- */
+-
+-#define LINE_DELAY  (mono_moni ? 30 : 70)
+-#define SYNC_DELAY  (mono_moni ? 1500 : 2000)
+-
+-/* SWITCH_ACIA may be used for Falcon (ScreenBlaster III internal!) */
+-static void st_ovsc_switch(void)
+-{
+-	unsigned long flags;
+-	register unsigned char old, new;
+-
+-	if (!(atari_switches & ATARI_SWITCH_OVSC_MASK))
+-		return;
+-	local_irq_save(flags);
+-
+-	st_mfp.tim_ct_b = 0x10;
+-	st_mfp.active_edge |= 8;
+-	st_mfp.tim_ct_b = 0;
+-	st_mfp.tim_dt_b = 0xf0;
+-	st_mfp.tim_ct_b = 8;
+-	while (st_mfp.tim_dt_b > 1)	/* TOS does it this way, don't ask why */
+-		;
+-	new = st_mfp.tim_dt_b;
+-	do {
+-		udelay(LINE_DELAY);
+-		old = new;
+-		new = st_mfp.tim_dt_b;
+-	} while (old != new);
+-	st_mfp.tim_ct_b = 0x10;
+-	udelay(SYNC_DELAY);
+-
+-	if (atari_switches & ATARI_SWITCH_OVSC_IKBD)
+-		acia.key_ctrl = ACIA_DIV64 | ACIA_D8N1S | ACIA_RHTID | ACIA_RIE;
+-	if (atari_switches & ATARI_SWITCH_OVSC_MIDI)
+-		acia.mid_ctrl = ACIA_DIV16 | ACIA_D8N1S | ACIA_RHTID;
+-	if (atari_switches & (ATARI_SWITCH_OVSC_SND6|ATARI_SWITCH_OVSC_SND7)) {
+-		sound_ym.rd_data_reg_sel = 14;
+-		sound_ym.wd_data = sound_ym.rd_data_reg_sel |
+-				   ((atari_switches & ATARI_SWITCH_OVSC_SND6) ? 0x40:0) |
+-				   ((atari_switches & ATARI_SWITCH_OVSC_SND7) ? 0x80:0);
+-	}
+-	local_irq_restore(flags);
+-}
+-
+-/* ------------------- External Video ---------------------- */
+-
+-#ifdef ATAFB_EXT
+-
+-static int ext_encode_fix(struct fb_fix_screeninfo *fix, struct atafb_par *par)
+-{
+-	strcpy(fix->id, "Unknown Extern");
+-	fix->smem_start = external_addr;
+-	fix->smem_len = PAGE_ALIGN(external_len);
+-	if (external_depth == 1) {
+-		fix->type = FB_TYPE_PACKED_PIXELS;
+-		/* The letters 'n' and 'i' in the "atavideo=external:" stand
+-		 * for "normal" and "inverted", rsp., in the monochrome case */
+-		fix->visual =
+-			(external_pmode == FB_TYPE_INTERLEAVED_PLANES ||
+-			 external_pmode == FB_TYPE_PACKED_PIXELS) ?
+-				FB_VISUAL_MONO10 : FB_VISUAL_MONO01;
+-	} else {
+-		/* Use STATIC if we don't know how to access color registers */
+-		int visual = external_vgaiobase ?
+-					 FB_VISUAL_PSEUDOCOLOR :
+-					 FB_VISUAL_STATIC_PSEUDOCOLOR;
+-		switch (external_pmode) {
+-		case -1:		/* truecolor */
+-			fix->type = FB_TYPE_PACKED_PIXELS;
+-			fix->visual = FB_VISUAL_TRUECOLOR;
+-			break;
+-		case FB_TYPE_PACKED_PIXELS:
+-			fix->type = FB_TYPE_PACKED_PIXELS;
+-			fix->visual = visual;
+-			break;
+-		case FB_TYPE_PLANES:
+-			fix->type = FB_TYPE_PLANES;
+-			fix->visual = visual;
+-			break;
+-		case FB_TYPE_INTERLEAVED_PLANES:
+-			fix->type = FB_TYPE_INTERLEAVED_PLANES;
+-			fix->type_aux = 2;
+-			fix->visual = visual;
+-			break;
+-		}
+-	}
+-	fix->xpanstep = 0;
+-	fix->ypanstep = 0;
+-	fix->ywrapstep = 0;
+-	fix->line_length = par->next_line;
+-	return 0;
+-}
+-
+-static int ext_decode_var(struct fb_var_screeninfo *var, struct atafb_par *par)
+-{
+-	struct fb_var_screeninfo *myvar = &atafb_predefined[0];
+-
+-	if (var->bits_per_pixel > myvar->bits_per_pixel ||
+-	    var->xres > myvar->xres ||
+-	    var->xres_virtual > myvar->xres_virtual ||
+-	    var->yres > myvar->yres ||
+-	    var->xoffset > 0 ||
+-	    var->yoffset > 0)
+-		return -EINVAL;
+-
+-	par->next_line = external_xres_virtual * external_depth / 8;
+-	return 0;
+-}
+-
+-static int ext_encode_var(struct fb_var_screeninfo *var, struct atafb_par *par)
+-{
+-	memset(var, 0, sizeof(struct fb_var_screeninfo));
+-	var->red.offset = 0;
+-	var->red.length = (external_pmode == -1) ? external_depth / 3 :
+-			(external_vgaiobase ? external_bitspercol : 0);
+-	var->red.msb_right = 0;
+-	var->grayscale = 0;
+-
+-	var->pixclock = 31041;
+-	var->left_margin = 120;		/* these are surely incorrect */
+-	var->right_margin = 100;
+-	var->upper_margin = 8;
+-	var->lower_margin = 16;
+-	var->hsync_len = 140;
+-	var->vsync_len = 30;
+-
+-	var->height = -1;
+-	var->width = -1;
+-
+-	var->sync = 0;
+-
+-	var->xres = external_xres;
+-	var->yres = external_yres;
+-	var->xres_virtual = external_xres_virtual;
+-	var->bits_per_pixel = external_depth;
+-
+-	var->blue = var->green = var->red;
+-	var->transp.offset = 0;
+-	var->transp.length = 0;
+-	var->transp.msb_right = 0;
+-	var->yres_virtual = var->yres;
+-	var->xoffset = 0;
+-	var->yoffset = 0;
+-	var->nonstd = 0;
+-	var->activate = 0;
+-	var->vmode = FB_VMODE_NONINTERLACED;
+-	return 0;
+-}
+-
+-static void ext_get_par(struct atafb_par *par)
+-{
+-	par->screen_base = external_screen_base;
+-}
+-
+-static void ext_set_par(struct atafb_par *par)
+-{
+-}
+-
+-#define OUTB(port,val) \
+-	*((unsigned volatile char *) ((port)+external_vgaiobase)) = (val)
+-#define INB(port) \
+-	(*((unsigned volatile char *) ((port)+external_vgaiobase)))
+-#define DACDelay				\
+-	do {					\
+-		unsigned char tmp = INB(0x3da);	\
+-		tmp = INB(0x3da);			\
+-	} while (0)
+-
+-static int ext_setcolreg(unsigned int regno, unsigned int red,
+-			 unsigned int green, unsigned int blue,
+-			 unsigned int transp, struct fb_info *info)
+-{
+-	unsigned char colmask = (1 << external_bitspercol) - 1;
+-
+-	if (!external_vgaiobase)
+-		return 1;
+-
+-	if (regno > 255)
+-		return 1;
+-
+-	red >>= 8;
+-	green >>= 8;
+-	blue >>= 8;
+-
+-	switch (external_card_type) {
+-	case IS_VGA:
+-		OUTB(0x3c8, regno);
+-		DACDelay;
+-		OUTB(0x3c9, red & colmask);
+-		DACDelay;
+-		OUTB(0x3c9, green & colmask);
+-		DACDelay;
+-		OUTB(0x3c9, blue & colmask);
+-		DACDelay;
+-		return 0;
+-
+-	case IS_MV300:
+-		OUTB((MV300_reg[regno] << 2) + 1, red);
+-		OUTB((MV300_reg[regno] << 2) + 1, green);
+-		OUTB((MV300_reg[regno] << 2) + 1, blue);
+-		return 0;
+-
+-	default:
+-		return 1;
+-	}
+-}
+-
+-static int ext_detect(void)
+-{
+-	struct fb_var_screeninfo *myvar = &atafb_predefined[0];
+-	struct atafb_par dummy_par;
+-
+-	myvar->xres = external_xres;
+-	myvar->xres_virtual = external_xres_virtual;
+-	myvar->yres = external_yres;
+-	myvar->bits_per_pixel = external_depth;
+-	ext_encode_var(myvar, &dummy_par);
+-	return 1;
+-}
+-
+-#endif /* ATAFB_EXT */
+-
+-/* ------ This is the same for most hardware types -------- */
+-
+-static void set_screen_base(void *s_base)
+-{
+-	unsigned long addr;
+-
+-	addr = atari_stram_to_phys(s_base);
+-	/* Setup Screen Memory */
+-	shifter_st.bas_hi = (unsigned char)((addr & 0xff0000) >> 16);
+-	shifter_st.bas_md = (unsigned char)((addr & 0x00ff00) >> 8);
+-	shifter_st.bas_lo = (unsigned char)(addr & 0x0000ff);
+-}
+-
+-static int pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	struct atafb_par *par = info->par;
+-
+-	if (!fbhw->set_screen_base ||
+-	    (!ATARIHW_PRESENT(EXTD_SHIFTER) && var->xoffset))
+-		return -EINVAL;
+-	var->xoffset = round_up(var->xoffset, 16);
+-	par->screen_base = screen_base +
+-	        (var->yoffset * info->var.xres_virtual + var->xoffset)
+-	        * info->var.bits_per_pixel / 8;
+-	fbhw->set_screen_base(par->screen_base);
+-	return 0;
+-}
+-
+-/* ------------ Interfaces to hardware functions ------------ */
+-
+-#ifdef ATAFB_TT
+-static struct fb_hwswitch tt_switch = {
+-	.detect		= tt_detect,
+-	.encode_fix	= tt_encode_fix,
+-	.decode_var	= tt_decode_var,
+-	.encode_var	= tt_encode_var,
+-	.get_par	= tt_get_par,
+-	.set_par	= tt_set_par,
+-	.set_screen_base = set_screen_base,
+-	.pan_display	= pan_display,
+-};
+-#endif
+-
+-#ifdef ATAFB_FALCON
+-static struct fb_hwswitch falcon_switch = {
+-	.detect		= falcon_detect,
+-	.encode_fix	= falcon_encode_fix,
+-	.decode_var	= falcon_decode_var,
+-	.encode_var	= falcon_encode_var,
+-	.get_par	= falcon_get_par,
+-	.set_par	= falcon_set_par,
+-	.set_screen_base = set_screen_base,
+-	.blank		= falcon_blank,
+-	.pan_display	= falcon_pan_display,
+-};
+-#endif
+-
+-#ifdef ATAFB_STE
+-static struct fb_hwswitch st_switch = {
+-	.detect		= stste_detect,
+-	.encode_fix	= stste_encode_fix,
+-	.decode_var	= stste_decode_var,
+-	.encode_var	= stste_encode_var,
+-	.get_par	= stste_get_par,
+-	.set_par	= stste_set_par,
+-	.set_screen_base = stste_set_screen_base,
+-	.pan_display	= pan_display
+-};
+-#endif
+-
+-#ifdef ATAFB_EXT
+-static struct fb_hwswitch ext_switch = {
+-	.detect		= ext_detect,
+-	.encode_fix	= ext_encode_fix,
+-	.decode_var	= ext_decode_var,
+-	.encode_var	= ext_encode_var,
+-	.get_par	= ext_get_par,
+-	.set_par	= ext_set_par,
+-};
+-#endif
+-
+-static void ata_get_par(struct atafb_par *par)
+-{
+-	if (current_par_valid)
+-		*par = current_par;
+-	else
+-		fbhw->get_par(par);
+-}
+-
+-static void ata_set_par(struct atafb_par *par)
+-{
+-	fbhw->set_par(par);
+-	current_par = *par;
+-	current_par_valid = 1;
+-}
+-
+-
+-/* =========================================================== */
+-/* ============== Hardware Independent Functions ============= */
+-/* =========================================================== */
+-
+-/* used for hardware scrolling */
+-
+-static int do_fb_set_var(struct fb_var_screeninfo *var, int isactive)
+-{
+-	int err, activate;
+-	struct atafb_par par;
+-
+-	err = fbhw->decode_var(var, &par);
+-	if (err)
+-		return err;
+-	activate = var->activate;
+-	if (((var->activate & FB_ACTIVATE_MASK) == FB_ACTIVATE_NOW) && isactive)
+-		ata_set_par(&par);
+-	fbhw->encode_var(var, &par);
+-	var->activate = activate;
+-	return 0;
+-}
+-
+-/* fbhw->encode_fix() must be called with fb_info->mm_lock held
+- * if it is called after the register_framebuffer() - not a case here
+- */
+-static int atafb_get_fix(struct fb_fix_screeninfo *fix, struct fb_info *info)
+-{
+-	struct atafb_par par;
+-	int err;
+-	// Get fix directly (case con == -1 before)??
+-	err = fbhw->decode_var(&info->var, &par);
+-	if (err)
+-		return err;
+-	memset(fix, 0, sizeof(struct fb_fix_screeninfo));
+-	err = fbhw->encode_fix(fix, &par);
+-	return err;
+-}
+-
+-static int atafb_get_var(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	struct atafb_par par;
+-
+-	ata_get_par(&par);
+-	fbhw->encode_var(var, &par);
+-
+-	return 0;
+-}
+-
+-// No longer called by fbcon!
+-// Still called by set_var internally
+-
+-static void atafb_set_disp(struct fb_info *info)
+-{
+-	atafb_get_var(&info->var, info);
+-	atafb_get_fix(&info->fix, info);
+-
+-	/* Note: smem_start derives from phys_screen_base, not screen_base! */
+-	info->screen_base = (external_addr ? external_screen_base :
+-				atari_stram_to_virt(info->fix.smem_start));
+-}
+-
+-static int
+-atafb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	if (!fbhw->pan_display)
+-		return -EINVAL;
+-
+-	return fbhw->pan_display(var, info);
+-}
+-
+-/*
+- * generic drawing routines; imageblit needs updating for image depth > 1
+- */
+-
+-static void atafb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+-{
+-	struct atafb_par *par = info->par;
+-	int x2, y2;
+-	u32 width, height;
+-
+-	if (!rect->width || !rect->height)
+-		return;
+-
+-#ifdef ATAFB_FALCON
+-	if (info->var.bits_per_pixel == 16) {
+-		cfb_fillrect(info, rect);
+-		return;
+-	}
+-#endif
+-
+-	/*
+-	 * We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly.
+-	 * */
+-	x2 = rect->dx + rect->width;
+-	y2 = rect->dy + rect->height;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width = x2 - rect->dx;
+-	height = y2 - rect->dy;
+-
+-	if (info->var.bits_per_pixel == 1)
+-		atafb_mfb_fillrect(info, par->next_line, rect->color,
+-				   rect->dy, rect->dx, height, width);
+-	else if (info->var.bits_per_pixel == 2)
+-		atafb_iplan2p2_fillrect(info, par->next_line, rect->color,
+-					rect->dy, rect->dx, height, width);
+-	else if (info->var.bits_per_pixel == 4)
+-		atafb_iplan2p4_fillrect(info, par->next_line, rect->color,
+-					rect->dy, rect->dx, height, width);
+-	else
+-		atafb_iplan2p8_fillrect(info, par->next_line, rect->color,
+-					rect->dy, rect->dx, height, width);
+-
+-	return;
+-}
+-
+-static void atafb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+-{
+-	struct atafb_par *par = info->par;
+-	int x2, y2;
+-	u32 dx, dy, sx, sy, width, height;
+-	int rev_copy = 0;
+-
+-#ifdef ATAFB_FALCON
+-	if (info->var.bits_per_pixel == 16) {
+-		cfb_copyarea(info, area);
+-		return;
+-	}
+-#endif
+-
+-	/* clip the destination */
+-	x2 = area->dx + area->width;
+-	y2 = area->dy + area->height;
+-	dx = area->dx > 0 ? area->dx : 0;
+-	dy = area->dy > 0 ? area->dy : 0;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width = x2 - dx;
+-	height = y2 - dy;
+-
+-	if (area->sx + dx < area->dx || area->sy + dy < area->dy)
+-		return;
+-
+-	/* update sx,sy */
+-	sx = area->sx + (dx - area->dx);
+-	sy = area->sy + (dy - area->dy);
+-
+-	/* the source must be completely inside the virtual screen */
+-	if (sx + width > info->var.xres_virtual ||
+-			sy + height > info->var.yres_virtual)
+-		return;
+-
+-	if (dy > sy || (dy == sy && dx > sx)) {
+-		dy += height;
+-		sy += height;
+-		rev_copy = 1;
+-	}
+-
+-	if (info->var.bits_per_pixel == 1)
+-		atafb_mfb_copyarea(info, par->next_line, sy, sx, dy, dx, height, width);
+-	else if (info->var.bits_per_pixel == 2)
+-		atafb_iplan2p2_copyarea(info, par->next_line, sy, sx, dy, dx, height, width);
+-	else if (info->var.bits_per_pixel == 4)
+-		atafb_iplan2p4_copyarea(info, par->next_line, sy, sx, dy, dx, height, width);
+-	else
+-		atafb_iplan2p8_copyarea(info, par->next_line, sy, sx, dy, dx, height, width);
+-
+-	return;
+-}
+-
+-static void atafb_imageblit(struct fb_info *info, const struct fb_image *image)
+-{
+-	struct atafb_par *par = info->par;
+-	int x2, y2;
+-	const char *src;
+-	u32 dx, dy, width, height, pitch;
+-
+-#ifdef ATAFB_FALCON
+-	if (info->var.bits_per_pixel == 16) {
+-		cfb_imageblit(info, image);
+-		return;
+-	}
+-#endif
+-
+-	/*
+-	 * We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly like we are
+-	 * doing here.
+-	 */
+-	x2 = image->dx + image->width;
+-	y2 = image->dy + image->height;
+-	dx = image->dx;
+-	dy = image->dy;
+-	x2 = x2 < info->var.xres_virtual ? x2 : info->var.xres_virtual;
+-	y2 = y2 < info->var.yres_virtual ? y2 : info->var.yres_virtual;
+-	width = x2 - dx;
+-	height = y2 - dy;
+-
+-	if (image->depth == 1) {
+-		// used for font data
+-		src = image->data;
+-		pitch = (image->width + 7) / 8;
+-		while (height--) {
+-
+-			if (info->var.bits_per_pixel == 1)
+-				atafb_mfb_linefill(info, par->next_line,
+-						   dy, dx, width, src,
+-						   image->bg_color, image->fg_color);
+-			else if (info->var.bits_per_pixel == 2)
+-				atafb_iplan2p2_linefill(info, par->next_line,
+-							dy, dx, width, src,
+-							image->bg_color, image->fg_color);
+-			else if (info->var.bits_per_pixel == 4)
+-				atafb_iplan2p4_linefill(info, par->next_line,
+-							dy, dx, width, src,
+-							image->bg_color, image->fg_color);
+-			else
+-				atafb_iplan2p8_linefill(info, par->next_line,
+-							dy, dx, width, src,
+-							image->bg_color, image->fg_color);
+-			dy++;
+-			src += pitch;
+-		}
+-	} else {
+-		c2p_iplan2(info->screen_base, image->data, dx, dy, width,
+-			   height, par->next_line, image->width,
+-			   info->var.bits_per_pixel);
+-	}
+-}
+-
+-static int
+-atafb_ioctl(struct fb_info *info, unsigned int cmd, unsigned long arg)
+-{
+-	switch (cmd) {
+-#ifdef FBCMD_GET_CURRENTPAR
+-	case FBCMD_GET_CURRENTPAR:
+-		if (copy_to_user((void *)arg, &current_par,
+-				 sizeof(struct atafb_par)))
+-			return -EFAULT;
+-		return 0;
+-#endif
+-#ifdef FBCMD_SET_CURRENTPAR
+-	case FBCMD_SET_CURRENTPAR:
+-		if (copy_from_user(&current_par, (void *)arg,
+-				   sizeof(struct atafb_par)))
+-			return -EFAULT;
+-		ata_set_par(&current_par);
+-		return 0;
+-#endif
+-	}
+-	return -EINVAL;
+-}
+-
+-/* (un)blank/poweroff
+- * 0 = unblank
+- * 1 = blank
+- * 2 = suspend vsync
+- * 3 = suspend hsync
+- * 4 = off
+- */
+-static int atafb_blank(int blank, struct fb_info *info)
+-{
+-	unsigned short black[16];
+-	struct fb_cmap cmap;
+-	if (fbhw->blank && !fbhw->blank(blank))
+-		return 1;
+-	if (blank) {
+-		memset(black, 0, 16 * sizeof(unsigned short));
+-		cmap.red = black;
+-		cmap.green = black;
+-		cmap.blue = black;
+-		cmap.transp = NULL;
+-		cmap.start = 0;
+-		cmap.len = 16;
+-		fb_set_cmap(&cmap, info);
+-	}
+-#if 0
+-	else
+-		do_install_cmap(info);
+-#endif
+-	return 0;
+-}
+-
+-	/*
+-	 * New fbcon interface ...
+-	 */
+-
+-	 /* check var by decoding var into hw par, rounding if necessary,
+-	  * then encoding hw par back into new, validated var */
+-static int atafb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
+-{
+-	int err;
+-	struct atafb_par par;
+-
+-	/* Validate wanted screen parameters */
+-	// if ((err = ata_decode_var(var, &par)))
+-	err = fbhw->decode_var(var, &par);
+-	if (err)
+-		return err;
+-
+-	/* Encode (possibly rounded) screen parameters */
+-	fbhw->encode_var(var, &par);
+-	return 0;
+-}
+-
+-	/* actually set hw par by decoding var, then setting hardware from
+-	 * hw par just decoded */
+-static int atafb_set_par(struct fb_info *info)
+-{
+-	struct atafb_par *par = info->par;
+-
+-	/* Decode wanted screen parameters */
+-	fbhw->decode_var(&info->var, par);
+-	mutex_lock(&info->mm_lock);
+-	fbhw->encode_fix(&info->fix, par);
+-	mutex_unlock(&info->mm_lock);
+-
+-	/* Set new videomode */
+-	ata_set_par(par);
+-
+-	return 0;
+-}
+-
+-
+-static struct fb_ops atafb_ops = {
+-	.owner =	THIS_MODULE,
+-	__FB_DEFAULT_IOMEM_OPS_RDWR,
+-	.fb_check_var	= atafb_check_var,
+-	.fb_set_par	= atafb_set_par,
+-	.fb_blank =	atafb_blank,
+-	.fb_pan_display	= atafb_pan_display,
+-	.fb_fillrect	= atafb_fillrect,
+-	.fb_copyarea	= atafb_copyarea,
+-	.fb_imageblit	= atafb_imageblit,
+-	.fb_ioctl =	atafb_ioctl,
+-	__FB_DEFAULT_IOMEM_OPS_MMAP,
+-};
+-
+-static void check_default_par(int detected_mode)
+-{
+-	char default_name[10];
+-	int i;
+-	struct fb_var_screeninfo var;
+-	unsigned long min_mem;
+-
+-	/* First try the user supplied mode */
+-	if (default_par) {
+-		var = atafb_predefined[default_par - 1];
+-		var.activate = FB_ACTIVATE_TEST;
+-		if (do_fb_set_var(&var, 1))
+-			default_par = 0;	/* failed */
+-	}
+-	/* Next is the autodetected one */
+-	if (!default_par) {
+-		var = atafb_predefined[detected_mode - 1]; /* autodetect */
+-		var.activate = FB_ACTIVATE_TEST;
+-		if (!do_fb_set_var(&var, 1))
+-			default_par = detected_mode;
+-	}
+-	/* If that also failed, try some default modes... */
+-	if (!default_par) {
+-		/* try default1, default2... */
+-		for (i = 1; i < 10; i++) {
+-			sprintf(default_name,"default%d", i);
+-			default_par = get_video_mode(default_name);
+-			if (!default_par)
+-				panic("can't set default video mode");
+-			var = atafb_predefined[default_par - 1];
+-			var.activate = FB_ACTIVATE_TEST;
+-			if (!do_fb_set_var(&var,1))
+-				break;	/* ok */
+-		}
+-	}
+-	min_mem = var.xres_virtual * var.yres_virtual * var.bits_per_pixel / 8;
+-	if (default_mem_req < min_mem)
+-		default_mem_req = min_mem;
+-}
+-
+-#ifdef ATAFB_EXT
+-static void __init atafb_setup_ext(char *spec)
+-{
+-	int xres, xres_virtual, yres, depth, planes;
+-	unsigned long addr, len;
+-	char *p;
+-
+-	/* Format is: <xres>;<yres>;<depth>;<plane organ.>;
+-	 *            <screen mem addr>
+-	 *	      [;<screen mem length>[;<vgaiobase>[;<bits-per-col>[;<colorreg-type>
+-	 *	      [;<xres-virtual>]]]]]
+-	 *
+-	 * 09/23/97	Juergen
+-	 * <xres_virtual>:	hardware's x-resolution (f.e. ProMST)
+-	 *
+-	 * Even xres_virtual is available, we neither support panning nor hw-scrolling!
+-	 */
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	xres_virtual = xres = simple_strtoul(p, NULL, 10);
+-	if (xres <= 0)
+-		return;
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	yres = simple_strtoul(p, NULL, 10);
+-	if (yres <= 0)
+-		return;
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	depth = simple_strtoul(p, NULL, 10);
+-	if (depth != 1 && depth != 2 && depth != 4 && depth != 8 &&
+-	    depth != 16 && depth != 24)
+-		return;
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	if (*p == 'i')
+-		planes = FB_TYPE_INTERLEAVED_PLANES;
+-	else if (*p == 'p')
+-		planes = FB_TYPE_PACKED_PIXELS;
+-	else if (*p == 'n')
+-		planes = FB_TYPE_PLANES;
+-	else if (*p == 't')
+-		planes = -1;		/* true color */
+-	else
+-		return;
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	addr = simple_strtoul(p, NULL, 0);
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		len = xres * yres * depth / 8;
+-	else
+-		len = simple_strtoul(p, NULL, 0);
+-
+-	p = strsep(&spec, ";");
+-	if (p && *p)
+-		external_vgaiobase = simple_strtoul(p, NULL, 0);
+-
+-	p = strsep(&spec, ";");
+-	if (p && *p) {
+-		external_bitspercol = simple_strtoul(p, NULL, 0);
+-		if (external_bitspercol > 8)
+-			external_bitspercol = 8;
+-		else if (external_bitspercol < 1)
+-			external_bitspercol = 1;
+-	}
+-
+-	p = strsep(&spec, ";");
+-	if (p && *p) {
+-		if (!strcmp(p, "vga"))
+-			external_card_type = IS_VGA;
+-		if (!strcmp(p, "mv300"))
+-			external_card_type = IS_MV300;
+-	}
+-
+-	p = strsep(&spec, ";");
+-	if (p && *p) {
+-		xres_virtual = simple_strtoul(p, NULL, 10);
+-		if (xres_virtual < xres)
+-			xres_virtual = xres;
+-		if (xres_virtual * yres * depth / 8 > len)
+-			len = xres_virtual * yres * depth / 8;
+-	}
+-
+-	external_xres = xres;
+-	external_xres_virtual = xres_virtual;
+-	external_yres = yres;
+-	external_depth = depth;
+-	external_pmode = planes;
+-	external_addr = addr;
+-	external_len = len;
+-
+-	if (external_card_type == IS_MV300) {
+-		switch (external_depth) {
+-		case 1:
+-			MV300_reg = MV300_reg_1bit;
+-			break;
+-		case 4:
+-			MV300_reg = MV300_reg_4bit;
+-			break;
+-		case 8:
+-			MV300_reg = MV300_reg_8bit;
+-			break;
+-		}
+-	}
+-}
+-#endif /* ATAFB_EXT */
+-
+-static void __init atafb_setup_int(char *spec)
+-{
+-	/* Format to config extended internal video hardware like OverScan:
+-	 * "internal:<xres>;<yres>;<xres_max>;<yres_max>;<offset>"
+-	 * Explanation:
+-	 * <xres>: x-resolution
+-	 * <yres>: y-resolution
+-	 * The following are only needed if you have an overscan which
+-	 * needs a black border:
+-	 * <xres_max>: max. length of a line in pixels your OverScan hardware would allow
+-	 * <yres_max>: max. number of lines your OverScan hardware would allow
+-	 * <offset>: Offset from physical beginning to visible beginning
+-	 *	  of screen in bytes
+-	 */
+-	int xres;
+-	char *p;
+-
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	xres = simple_strtoul(p, NULL, 10);
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	sttt_xres = xres;
+-	tt_yres = st_yres = simple_strtoul(p, NULL, 10);
+-	if ((p = strsep(&spec, ";")) && *p)
+-		sttt_xres_virtual = simple_strtoul(p, NULL, 10);
+-	if ((p = strsep(&spec, ";")) && *p)
+-		sttt_yres_virtual = simple_strtoul(p, NULL, 0);
+-	if ((p = strsep(&spec, ";")) && *p)
+-		ovsc_offset = simple_strtoul(p, NULL, 0);
+-
+-	if (ovsc_offset || (sttt_yres_virtual != st_yres))
+-		use_hwscroll = 0;
+-}
+-
+-#ifdef ATAFB_FALCON
+-static void __init atafb_setup_mcap(char *spec)
+-{
+-	char *p;
+-	int vmin, vmax, hmin, hmax;
+-
+-	/* Format for monitor capabilities is: <Vmin>;<Vmax>;<Hmin>;<Hmax>
+-	 * <V*> vertical freq. in Hz
+-	 * <H*> horizontal freq. in kHz
+-	 */
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	vmin = simple_strtoul(p, NULL, 10);
+-	if (vmin <= 0)
+-		return;
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	vmax = simple_strtoul(p, NULL, 10);
+-	if (vmax <= 0 || vmax <= vmin)
+-		return;
+-	if (!(p = strsep(&spec, ";")) || !*p)
+-		return;
+-	hmin = 1000 * simple_strtoul(p, NULL, 10);
+-	if (hmin <= 0)
+-		return;
+-	if (!(p = strsep(&spec, "")) || !*p)
+-		return;
+-	hmax = 1000 * simple_strtoul(p, NULL, 10);
+-	if (hmax <= 0 || hmax <= hmin)
+-		return;
+-
+-	fb_info.monspecs.vfmin = vmin;
+-	fb_info.monspecs.vfmax = vmax;
+-	fb_info.monspecs.hfmin = hmin;
+-	fb_info.monspecs.hfmax = hmax;
+-}
+-#endif /* ATAFB_FALCON */
+-
+-static void __init atafb_setup_user(char *spec)
+-{
+-	/* Format of user defined video mode is: <xres>;<yres>;<depth>
+-	 */
+-	char *p;
+-	int xres, yres, depth, temp;
+-
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	xres = simple_strtoul(p, NULL, 10);
+-	p = strsep(&spec, ";");
+-	if (!p || !*p)
+-		return;
+-	yres = simple_strtoul(p, NULL, 10);
+-	p = strsep(&spec, "");
+-	if (!p || !*p)
+-		return;
+-	depth = simple_strtoul(p, NULL, 10);
+-	temp = get_video_mode("user0");
+-	if (temp) {
+-		default_par = temp;
+-		atafb_predefined[default_par - 1].xres = xres;
+-		atafb_predefined[default_par - 1].yres = yres;
+-		atafb_predefined[default_par - 1].bits_per_pixel = depth;
+-	}
+-}
+-
+-static int __init atafb_setup(char *options)
+-{
+-	char *this_opt;
+-	int temp;
+-
+-	if (!options || !*options)
+-		return 0;
+-
+-	while ((this_opt = strsep(&options, ",")) != NULL) {
+-		if (!*this_opt)
+-			continue;
+-		if ((temp = get_video_mode(this_opt))) {
+-			default_par = temp;
+-			mode_option = this_opt;
+-		} else if (!strcmp(this_opt, "inverse"))
+-			fb_invert_cmaps();
+-		else if (!strncmp(this_opt, "hwscroll_", 9)) {
+-			hwscroll = simple_strtoul(this_opt + 9, NULL, 10);
+-			if (hwscroll < 0)
+-				hwscroll = 0;
+-			if (hwscroll > 200)
+-				hwscroll = 200;
+-		}
+-#ifdef ATAFB_EXT
+-		else if (!strcmp(this_opt, "mv300")) {
+-			external_bitspercol = 8;
+-			external_card_type = IS_MV300;
+-		} else if (!strncmp(this_opt, "external:", 9))
+-			atafb_setup_ext(this_opt + 9);
+-#endif
+-		else if (!strncmp(this_opt, "internal:", 9))
+-			atafb_setup_int(this_opt + 9);
+-#ifdef ATAFB_FALCON
+-		else if (!strncmp(this_opt, "eclock:", 7)) {
+-			fext.f = simple_strtoul(this_opt + 7, NULL, 10);
+-			/* external pixelclock in kHz --> ps */
+-			fext.t = 1000000000 / fext.f;
+-			fext.f *= 1000;
+-		} else if (!strncmp(this_opt, "monitorcap:", 11))
+-			atafb_setup_mcap(this_opt + 11);
+-#endif
+-		else if (!strcmp(this_opt, "keep"))
+-			DontCalcRes = 1;
+-		else if (!strncmp(this_opt, "R", 1))
+-			atafb_setup_user(this_opt + 1);
+-	}
+-	return 0;
+-}
+-
+-static int __init atafb_probe(struct platform_device *pdev)
+-{
+-	int pad, detected_mode, error;
+-	unsigned int defmode = 0;
+-	unsigned long mem_req;
+-	char *option = NULL;
+-
+-	if (fb_get_options("atafb", &option))
+-		return -ENODEV;
+-	atafb_setup(option);
+-	dev_dbg(&pdev->dev, "%s: start\n", __func__);
+-
+-	do {
+-#ifdef ATAFB_EXT
+-		if (external_addr) {
+-			dev_dbg(&pdev->dev, "initializing external hw\n");
+-			fbhw = &ext_switch;
+-			atafb_ops.fb_setcolreg = &ext_setcolreg;
+-			defmode = DEFMODE_EXT;
+-			break;
+-		}
+-#endif
+-#ifdef ATAFB_TT
+-		if (ATARIHW_PRESENT(TT_SHIFTER)) {
+-			dev_dbg(&pdev->dev, "initializing TT hw\n");
+-			fbhw = &tt_switch;
+-			atafb_ops.fb_setcolreg = &tt_setcolreg;
+-			defmode = DEFMODE_TT;
+-			break;
+-		}
+-#endif
+-#ifdef ATAFB_FALCON
+-		if (ATARIHW_PRESENT(VIDEL_SHIFTER)) {
+-			dev_dbg(&pdev->dev, "initializing Falcon hw\n");
+-			fbhw = &falcon_switch;
+-			atafb_ops.fb_setcolreg = &falcon_setcolreg;
+-			error = request_irq(IRQ_AUTO_4, falcon_vbl_switcher, 0,
+-					    "framebuffer:modeswitch",
+-					    falcon_vbl_switcher);
+-			if (error)
+-				return error;
+-			defmode = DEFMODE_F30;
+-			break;
+-		}
+-#endif
+-#ifdef ATAFB_STE
+-		if (ATARIHW_PRESENT(STND_SHIFTER) ||
+-		    ATARIHW_PRESENT(EXTD_SHIFTER)) {
+-			dev_dbg(&pdev->dev, "initializing ST/E hw\n");
+-			fbhw = &st_switch;
+-			atafb_ops.fb_setcolreg = &stste_setcolreg;
+-			defmode = DEFMODE_STE;
+-			break;
+-		}
+-		fbhw = &st_switch;
+-		atafb_ops.fb_setcolreg = &stste_setcolreg;
+-		dev_warn(&pdev->dev,
+-			 "Cannot determine video hardware; defaulting to ST(e)\n");
+-#else /* ATAFB_STE */
+-		/* no default driver included */
+-		/* Nobody will ever see this message :-) */
+-		panic("Cannot initialize video hardware");
+-#endif
+-	} while (0);
+-
+-	/* Multisync monitor capabilities */
+-	/* Atari-TOS defaults if no boot option present */
+-	if (fb_info.monspecs.hfmin == 0) {
+-		fb_info.monspecs.hfmin = 31000;
+-		fb_info.monspecs.hfmax = 32000;
+-		fb_info.monspecs.vfmin = 58;
+-		fb_info.monspecs.vfmax = 62;
+-	}
+-
+-	detected_mode = fbhw->detect();
+-	check_default_par(detected_mode);
+-#ifdef ATAFB_EXT
+-	if (!external_addr) {
+-#endif /* ATAFB_EXT */
+-		mem_req = default_mem_req + ovsc_offset + ovsc_addlen;
+-		mem_req = PAGE_ALIGN(mem_req) + PAGE_SIZE;
+-		screen_base = atari_stram_alloc(mem_req, "atafb");
+-		if (!screen_base)
+-			panic("Cannot allocate screen memory");
+-		memset(screen_base, 0, mem_req);
+-		pad = -(unsigned long)screen_base & (PAGE_SIZE - 1);
+-		screen_base += pad;
+-		phys_screen_base = atari_stram_to_phys(screen_base + ovsc_offset);
+-		screen_len = (mem_req - pad - ovsc_offset) & PAGE_MASK;
+-		st_ovsc_switch();
+-		if (CPU_IS_040_OR_060) {
+-			/* On a '040+, the cache mode of video RAM must be set to
+-			 * write-through also for internal video hardware! */
+-			cache_push(atari_stram_to_phys(screen_base), screen_len);
+-			kernel_set_cachemode(screen_base, screen_len,
+-					     IOMAP_WRITETHROUGH);
+-		}
+-		dev_info(&pdev->dev, "phys_screen_base %lx screen_len %d\n",
+-			 phys_screen_base, screen_len);
+-#ifdef ATAFB_EXT
+-	} else {
+-		/* Map the video memory (physical address given) to somewhere
+-		 * in the kernel address space.
+-		 */
+-		external_screen_base = ioremap_wt(external_addr, external_len);
+-		if (external_vgaiobase)
+-			external_vgaiobase =
+-			  (unsigned long)ioremap(external_vgaiobase, 0x10000);
+-		screen_base = external_screen_base;
+-		phys_screen_base = external_addr;
+-		screen_len = external_len & PAGE_MASK;
+-		memset (screen_base, 0, external_len);
+-	}
+-#endif /* ATAFB_EXT */
+-
+-//	strcpy(fb_info.mode->name, "Atari Builtin ");
+-	fb_info.fbops = &atafb_ops;
+-	// try to set default (detected; requested) var
+-	do_fb_set_var(&atafb_predefined[default_par - 1], 1);
+-	// reads hw state into current par, which may not be sane yet
+-	ata_get_par(&current_par);
+-	fb_info.par = &current_par;
+-	// tries to read from HW which may not be initialized yet
+-	// so set sane var first, then call atafb_set_par
+-	atafb_get_var(&fb_info.var, &fb_info);
+-
+-#ifdef ATAFB_FALCON
+-	fb_info.pseudo_palette = current_par.hw.falcon.pseudo_palette;
+-#endif
+-
+-	if (!fb_find_mode(&fb_info.var, &fb_info, mode_option, atafb_modedb,
+-			  NUM_TOTAL_MODES, &atafb_modedb[defmode],
+-			  fb_info.var.bits_per_pixel)) {
+-		return -EINVAL;
+-	}
+-
+-	fb_videomode_to_modelist(atafb_modedb, NUM_TOTAL_MODES,
+-				 &fb_info.modelist);
+-
+-	atafb_set_disp(&fb_info);
+-
+-	fb_alloc_cmap(&(fb_info.cmap), 1 << fb_info.var.bits_per_pixel, 0);
+-
+-
+-	dev_info(&pdev->dev, "Determined %dx%d, depth %d\n", fb_info.var.xres,
+-		 fb_info.var.yres, fb_info.var.bits_per_pixel);
+-	if ((fb_info.var.xres != fb_info.var.xres_virtual) ||
+-	    (fb_info.var.yres != fb_info.var.yres_virtual))
+-		dev_info(&pdev->dev, "   virtual %dx%d\n",
+-			 fb_info.var.xres_virtual, fb_info.var.yres_virtual);
+-
+-	if (register_framebuffer(&fb_info) < 0) {
+-#ifdef ATAFB_EXT
+-		if (external_addr) {
+-			iounmap(external_screen_base);
+-			external_addr = 0;
+-		}
+-		if (external_vgaiobase) {
+-			iounmap((void*)external_vgaiobase);
+-			external_vgaiobase = 0;
+-		}
+-#endif
+-		return -EINVAL;
+-	}
+-
+-	fb_info(&fb_info, "frame buffer device, using %dK of video memory\n",
+-		screen_len >> 10);
+-
+-	/* TODO: This driver cannot be unloaded yet */
+-	return 0;
+-}
+-
+-static void atafb_shutdown(struct platform_device *pdev)
+-{
+-	/* Unblank before kexec */
+-	if (fbhw->blank)
+-		fbhw->blank(0);
+-}
+-
+-static struct platform_driver atafb_driver = {
+-	.shutdown	= atafb_shutdown,
+-	.driver	= {
+-		.name	= "atafb",
+-	},
+-};
+-
+-static int __init atafb_init(void)
+-{
+-	struct platform_device *pdev;
+-
+-	if (!MACH_IS_ATARI)
+-		return -ENODEV;
+-
+-	pdev = platform_device_register_simple("atafb", -1, NULL, 0);
+-	if (IS_ERR(pdev))
+-		return PTR_ERR(pdev);
+-
+-	return platform_driver_probe(&atafb_driver, atafb_probe);
+-}
+-
+-device_initcall(atafb_init);
+diff --git a/drivers/video/fbdev/atafb.h b/drivers/video/fbdev/atafb.h
+deleted file mode 100644
+index 2b2675980..000000000
+--- a/drivers/video/fbdev/atafb.h
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _VIDEO_ATAFB_H
+-#define _VIDEO_ATAFB_H
+-
+-void atafb_mfb_copyarea(struct fb_info *info, u_long next_line, int sy, int sx, int dy,
+-			int dx, int height, int width);
+-void atafb_mfb_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-			int sy, int sx, int height, int width);
+-void atafb_mfb_linefill(struct fb_info *info, u_long next_line,
+-			int dy, int dx, u32 width,
+-			const u8 *data, u32 bgcolor, u32 fgcolor);
+-
+-void atafb_iplan2p2_copyarea(struct fb_info *info, u_long next_line, int sy, int sx, int dy,
+-			     int dx, int height, int width);
+-void atafb_iplan2p2_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-			     int sy, int sx, int height, int width);
+-void atafb_iplan2p2_linefill(struct fb_info *info, u_long next_line,
+-			     int dy, int dx, u32 width,
+-			     const u8 *data, u32 bgcolor, u32 fgcolor);
+-
+-void atafb_iplan2p4_copyarea(struct fb_info *info, u_long next_line, int sy, int sx, int dy,
+-			     int dx, int height, int width);
+-void atafb_iplan2p4_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-			     int sy, int sx, int height, int width);
+-void atafb_iplan2p4_linefill(struct fb_info *info, u_long next_line,
+-			     int dy, int dx, u32 width,
+-			     const u8 *data, u32 bgcolor, u32 fgcolor);
+-
+-void atafb_iplan2p8_copyarea(struct fb_info *info, u_long next_line, int sy, int sx, int dy,
+-			     int dx, int height, int width);
+-void atafb_iplan2p8_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-			     int sy, int sx, int height, int width);
+-void atafb_iplan2p8_linefill(struct fb_info *info, u_long next_line,
+-			     int dy, int dx, u32 width,
+-			     const u8 *data, u32 bgcolor, u32 fgcolor);
+-
+-#endif /* _VIDEO_ATAFB_H */
+diff --git a/drivers/video/fbdev/atafb_iplan2p2.c b/drivers/video/fbdev/atafb_iplan2p2.c
+deleted file mode 100644
+index a1660c24b..000000000
+--- a/drivers/video/fbdev/atafb_iplan2p2.c
++++ /dev/null
+@@ -1,270 +0,0 @@
+-/*
+- *  linux/drivers/video/iplan2p2.c -- Low level frame buffer operations for
+- *				      interleaved bitplanes à la Atari (2
+- *				      planes, 2 bytes interleave)
+- *
+- *	Created 5 Apr 1997 by Geert Uytterhoeven
+- *
+- *  This file is subject to the terms and conditions of the GNU General Public
+- *  License.  See the file COPYING in the main directory of this archive for
+- *  more details.
+- */
+-
+-#include <linux/string.h>
+-#include <linux/fb.h>
+-
+-#include <asm/setup.h>
+-
+-#include "atafb.h"
+-
+-#define BPL	2
+-#include "atafb_utils.h"
+-
+-void atafb_iplan2p2_copyarea(struct fb_info *info, u_long next_line,
+-			     int sy, int sx, int dy, int dx,
+-			     int height, int width)
+-{
+-	/*  bmove() has to distinguish two major cases: If both, source and
+-	 *  destination, start at even addresses or both are at odd
+-	 *  addresses, just the first odd and last even column (if present)
+-	 *  require special treatment (memmove_col()). The rest between
+-	 *  then can be copied by normal operations, because all adjacent
+-	 *  bytes are affected and are to be stored in the same order.
+-	 *    The pathological case is when the move should go from an odd
+-	 *  address to an even or vice versa. Since the bytes in the plane
+-	 *  words must be assembled in new order, it seems wisest to make
+-	 *  all movements by memmove_col().
+-	 */
+-
+-	u8 *src, *dst;
+-	u32 *s, *d;
+-	int w, l , i, j;
+-	u_int colsize;
+-	u_int upwards = (dy < sy) || (dy == sy && dx < sx);
+-
+-	colsize = height;
+-	if (!((sx ^ dx) & 15)) {
+-		/* odd->odd or even->even */
+-
+-		if (upwards) {
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-			if (sx & 15) {
+-				memmove32_col(dst, src, 0xff00ff, height, next_line - BPL * 2);
+-				src += BPL * 2;
+-				dst += BPL * 2;
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*d++ = *s++;
+-					s = (u32 *)((u8 *)s + l);
+-					d = (u32 *)((u8 *)d + l);
+-				}
+-			}
+-			if (width & 15)
+-				memmove32_col(dst + width / (8 / BPL), src + width / (8 / BPL),
+-					      0xff00ff00, height, next_line - BPL * 2);
+-		} else {
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			if ((sx + width) & 15) {
+-				src -= BPL * 2;
+-				dst -= BPL * 2;
+-				memmove32_col(dst, src, 0xff00ff00, colsize, -next_line - BPL * 2);
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*--d = *--s;
+-					s = (u32 *)((u8 *)s - l);
+-					d = (u32 *)((u8 *)d - l);
+-				}
+-			}
+-			if (sx & 15)
+-				memmove32_col(dst - (width - 16) / (8 / BPL),
+-					      src - (width - 16) / (8 / BPL),
+-					      0xff00ff, colsize, -next_line - BPL * 2);
+-		}
+-	} else {
+-		/* odd->even or even->odd */
+-		if (upwards) {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff00;
+-			f = 0;
+-			w = width;
+-			if (sx & 15) {
+-				f = 1;
+-				w += 8;
+-			}
+-			if ((sx + width) & 15)
+-				f |= 2;
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = (*src32++ << 8) & mask;
+-				} else {
+-					pval[0] = dst32[0] & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[0] | (v1 >> 8);
+-					pval[0] = (v ^ v1) << 8;
+-				}
+-
+-				if (f & 2) {
+-					dst32[0] = (dst32[0] & mask) | pval[0];
+-				}
+-
+-				src += next_line;
+-				dst += next_line;
+-			}
+-		} else {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff;
+-			f = 0;
+-			w = width;
+-			if ((dx + width) & 15)
+-				f = 1;
+-			if (sx & 15) {
+-				f |= 2;
+-				w += 8;
+-			}
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = dst32[-1] & mask;
+-				} else {
+-					pval[0] = (*--src32 >> 8) & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[0] | (v1 << 8);
+-					pval[0] = (v ^ v1) >> 8;
+-				}
+-
+-				if (!(f & 2)) {
+-					dst32[-1] = (dst32[-1] & mask) | pval[0];
+-				}
+-
+-				src -= next_line;
+-				dst -= next_line;
+-			}
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p2_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-                             int sy, int sx, int height, int width)
+-{
+-	u32 *dest;
+-	int rows, i;
+-	u32 cval[4];
+-
+-	dest = (u32 *)(info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL));
+-	if (sx & 15) {
+-		u8 *dest8 = (u8 *)dest + 1;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	expand16_col2mask(color, cval);
+-	rows = width >> 4;
+-	if (rows) {
+-		u32 *d = dest;
+-		u32 off = next_line - rows * BPL * 2;
+-		for (i = height; i; i--) {
+-			d = fill16_col(d, rows, cval);
+-			d = (u32 *)((long)d + off);
+-		}
+-		dest += rows * BPL / 2;
+-		width &= 15;
+-	}
+-
+-	if (width) {
+-		u8 *dest8 = (u8 *)dest;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p2_linefill(struct fb_info *info, u_long next_line,
+-                             int dy, int dx, u32 width,
+-                             const u8 *data, u32 bgcolor, u32 fgcolor)
+-{
+-	u32 *dest;
+-	const u16 *data16;
+-	int rows;
+-	u32 fgm[4], bgm[4], m;
+-
+-	dest = (u32 *)(info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL));
+-	if (dx & 15) {
+-		fill8_2col((u8 *)dest + 1, fgcolor, bgcolor, *data++);
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	if (width >= 16) {
+-		data16 = (const u16 *)data;
+-		expand16_2col2mask(fgcolor, bgcolor, fgm, bgm);
+-
+-		for (rows = width / 16; rows; rows--) {
+-			u16 d = *data16++;
+-			m = d | ((u32)d << 16);
+-			*dest++ = (m & fgm[0]) ^ bgm[0];
+-		}
+-
+-		data = (const u8 *)data16;
+-		width &= 15;
+-	}
+-
+-	if (width)
+-		fill8_2col((u8 *)dest, fgcolor, bgcolor, *data);
+-}
+diff --git a/drivers/video/fbdev/atafb_iplan2p4.c b/drivers/video/fbdev/atafb_iplan2p4.c
+deleted file mode 100644
+index 663d66582..000000000
+--- a/drivers/video/fbdev/atafb_iplan2p4.c
++++ /dev/null
+@@ -1,285 +0,0 @@
+-/*
+- *  linux/drivers/video/iplan2p4.c -- Low level frame buffer operations for
+- *				      interleaved bitplanes à la Atari (4
+- *				      planes, 2 bytes interleave)
+- *
+- *	Created 5 Apr 1997 by Geert Uytterhoeven
+- *
+- *  This file is subject to the terms and conditions of the GNU General Public
+- *  License.  See the file COPYING in the main directory of this archive for
+- *  more details.
+- */
+-
+-#include <linux/string.h>
+-#include <linux/fb.h>
+-
+-#include <asm/setup.h>
+-
+-#include "atafb.h"
+-
+-#define BPL	4
+-#include "atafb_utils.h"
+-
+-void atafb_iplan2p4_copyarea(struct fb_info *info, u_long next_line,
+-			     int sy, int sx, int dy, int dx,
+-			     int height, int width)
+-{
+-	/*  bmove() has to distinguish two major cases: If both, source and
+-	 *  destination, start at even addresses or both are at odd
+-	 *  addresses, just the first odd and last even column (if present)
+-	 *  require special treatment (memmove_col()). The rest between
+-	 *  then can be copied by normal operations, because all adjacent
+-	 *  bytes are affected and are to be stored in the same order.
+-	 *    The pathological case is when the move should go from an odd
+-	 *  address to an even or vice versa. Since the bytes in the plane
+-	 *  words must be assembled in new order, it seems wisest to make
+-	 *  all movements by memmove_col().
+-	 */
+-
+-	u8 *src, *dst;
+-	u32 *s, *d;
+-	int w, l , i, j;
+-	u_int colsize;
+-	u_int upwards = (dy < sy) || (dy == sy && dx < sx);
+-
+-	colsize = height;
+-	if (!((sx ^ dx) & 15)) {
+-		/* odd->odd or even->even */
+-
+-		if (upwards) {
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-			if (sx & 15) {
+-				memmove32_col(dst, src, 0xff00ff, height, next_line - BPL * 2);
+-				src += BPL * 2;
+-				dst += BPL * 2;
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*d++ = *s++;
+-					s = (u32 *)((u8 *)s + l);
+-					d = (u32 *)((u8 *)d + l);
+-				}
+-			}
+-			if (width & 15)
+-				memmove32_col(dst + width / (8 / BPL), src + width / (8 / BPL),
+-					      0xff00ff00, height, next_line - BPL * 2);
+-		} else {
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			if ((sx + width) & 15) {
+-				src -= BPL * 2;
+-				dst -= BPL * 2;
+-				memmove32_col(dst, src, 0xff00ff00, colsize, -next_line - BPL * 2);
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*--d = *--s;
+-					s = (u32 *)((u8 *)s - l);
+-					d = (u32 *)((u8 *)d - l);
+-				}
+-			}
+-			if (sx & 15)
+-				memmove32_col(dst - (width - 16) / (8 / BPL),
+-					      src - (width - 16) / (8 / BPL),
+-					      0xff00ff, colsize, -next_line - BPL * 2);
+-		}
+-	} else {
+-		/* odd->even or even->odd */
+-		if (upwards) {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff00;
+-			f = 0;
+-			w = width;
+-			if (sx & 15) {
+-				f = 1;
+-				w += 8;
+-			}
+-			if ((sx + width) & 15)
+-				f |= 2;
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = (*src32++ << 8) & mask;
+-					pval[1] = (*src32++ << 8) & mask;
+-				} else {
+-					pval[0] = dst32[0] & mask;
+-					pval[1] = dst32[1] & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[0] | (v1 >> 8);
+-					pval[0] = (v ^ v1) << 8;
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[1] | (v1 >> 8);
+-					pval[1] = (v ^ v1) << 8;
+-				}
+-
+-				if (f & 2) {
+-					dst32[0] = (dst32[0] & mask) | pval[0];
+-					dst32[1] = (dst32[1] & mask) | pval[1];
+-				}
+-
+-				src += next_line;
+-				dst += next_line;
+-			}
+-		} else {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff;
+-			f = 0;
+-			w = width;
+-			if ((dx + width) & 15)
+-				f = 1;
+-			if (sx & 15) {
+-				f |= 2;
+-				w += 8;
+-			}
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = dst32[-1] & mask;
+-					pval[1] = dst32[-2] & mask;
+-				} else {
+-					pval[0] = (*--src32 >> 8) & mask;
+-					pval[1] = (*--src32 >> 8) & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[0] | (v1 << 8);
+-					pval[0] = (v ^ v1) >> 8;
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[1] | (v1 << 8);
+-					pval[1] = (v ^ v1) >> 8;
+-				}
+-
+-				if (!(f & 2)) {
+-					dst32[-1] = (dst32[-1] & mask) | pval[0];
+-					dst32[-2] = (dst32[-2] & mask) | pval[1];
+-				}
+-
+-				src -= next_line;
+-				dst -= next_line;
+-			}
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p4_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-                             int sy, int sx, int height, int width)
+-{
+-	u32 *dest;
+-	int rows, i;
+-	u32 cval[4];
+-
+-	dest = (u32 *)(info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL));
+-	if (sx & 15) {
+-		u8 *dest8 = (u8 *)dest + 1;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	expand16_col2mask(color, cval);
+-	rows = width >> 4;
+-	if (rows) {
+-		u32 *d = dest;
+-		u32 off = next_line - rows * BPL * 2;
+-		for (i = height; i; i--) {
+-			d = fill16_col(d, rows, cval);
+-			d = (u32 *)((long)d + off);
+-		}
+-		dest += rows * BPL / 2;
+-		width &= 15;
+-	}
+-
+-	if (width) {
+-		u8 *dest8 = (u8 *)dest;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p4_linefill(struct fb_info *info, u_long next_line,
+-                             int dy, int dx, u32 width,
+-                             const u8 *data, u32 bgcolor, u32 fgcolor)
+-{
+-	u32 *dest;
+-	const u16 *data16;
+-	int rows;
+-	u32 fgm[4], bgm[4], m;
+-
+-	dest = (u32 *)(info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL));
+-	if (dx & 15) {
+-		fill8_2col((u8 *)dest + 1, fgcolor, bgcolor, *data++);
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	if (width >= 16) {
+-		data16 = (const u16 *)data;
+-		expand16_2col2mask(fgcolor, bgcolor, fgm, bgm);
+-
+-		for (rows = width / 16; rows; rows--) {
+-			u16 d = *data16++;
+-			m = d | ((u32)d << 16);
+-			*dest++ = (m & fgm[0]) ^ bgm[0];
+-			*dest++ = (m & fgm[1]) ^ bgm[1];
+-		}
+-
+-		data = (const u8 *)data16;
+-		width &= 15;
+-	}
+-
+-	if (width)
+-		fill8_2col((u8 *)dest, fgcolor, bgcolor, *data);
+-}
+diff --git a/drivers/video/fbdev/atafb_iplan2p8.c b/drivers/video/fbdev/atafb_iplan2p8.c
+deleted file mode 100644
+index 39a6cbbb6..000000000
+--- a/drivers/video/fbdev/atafb_iplan2p8.c
++++ /dev/null
+@@ -1,322 +0,0 @@
+-/*
+- *  linux/drivers/video/iplan2p8.c -- Low level frame buffer operations for
+- *				      interleaved bitplanes à la Atari (8
+- *				      planes, 2 bytes interleave)
+- *
+- *	Created 5 Apr 1997 by Geert Uytterhoeven
+- *
+- *  This file is subject to the terms and conditions of the GNU General Public
+- *  License.  See the file COPYING in the main directory of this archive for
+- *  more details.
+- */
+-
+-#include <linux/string.h>
+-#include <linux/fb.h>
+-
+-#include <asm/setup.h>
+-
+-#include "atafb.h"
+-
+-#define BPL	8
+-#include "atafb_utils.h"
+-
+-
+-/* Copies a 8 plane column from 's', height 'h', to 'd'. */
+-
+-/* This expands a 8 bit color into two longs for two movepl (8 plane)
+- * operations.
+- */
+-
+-void atafb_iplan2p8_copyarea(struct fb_info *info, u_long next_line,
+-			     int sy, int sx, int dy, int dx,
+-			     int height, int width)
+-{
+-	/*  bmove() has to distinguish two major cases: If both, source and
+-	 *  destination, start at even addresses or both are at odd
+-	 *  addresses, just the first odd and last even column (if present)
+-	 *  require special treatment (memmove_col()). The rest between
+-	 *  then can be copied by normal operations, because all adjacent
+-	 *  bytes are affected and are to be stored in the same order.
+-	 *    The pathological case is when the move should go from an odd
+-	 *  address to an even or vice versa. Since the bytes in the plane
+-	 *  words must be assembled in new order, it seems wisest to make
+-	 *  all movements by memmove_col().
+-	 */
+-
+-	u8 *src, *dst;
+-	u32 *s, *d;
+-	int w, l , i, j;
+-	u_int colsize;
+-	u_int upwards = (dy < sy) || (dy == sy && dx < sx);
+-
+-	colsize = height;
+-	if (!((sx ^ dx) & 15)) {
+-		/* odd->odd or even->even */
+-
+-		if (upwards) {
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-			if (sx & 15) {
+-				memmove32_col(dst, src, 0xff00ff, height, next_line - BPL * 2);
+-				src += BPL * 2;
+-				dst += BPL * 2;
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*d++ = *s++;
+-					s = (u32 *)((u8 *)s + l);
+-					d = (u32 *)((u8 *)d + l);
+-				}
+-			}
+-			if (width & 15)
+-				memmove32_col(dst + width / (8 / BPL), src + width / (8 / BPL),
+-					      0xff00ff00, height, next_line - BPL * 2);
+-		} else {
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			if ((sx + width) & 15) {
+-				src -= BPL * 2;
+-				dst -= BPL * 2;
+-				memmove32_col(dst, src, 0xff00ff00, colsize, -next_line - BPL * 2);
+-				width -= 8;
+-			}
+-			w = width >> 4;
+-			if (w) {
+-				s = (u32 *)src;
+-				d = (u32 *)dst;
+-				w *= BPL / 2;
+-				l = next_line - w * 4;
+-				for (j = height; j > 0; j--) {
+-					for (i = w; i > 0; i--)
+-						*--d = *--s;
+-					s = (u32 *)((u8 *)s - l);
+-					d = (u32 *)((u8 *)d - l);
+-				}
+-			}
+-			if (sx & 15)
+-				memmove32_col(dst - (width - 16) / (8 / BPL),
+-					      src - (width - 16) / (8 / BPL),
+-					      0xff00ff, colsize, -next_line - BPL * 2);
+-		}
+-	} else {
+-		/* odd->even or even->odd */
+-		if (upwards) {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff00;
+-			f = 0;
+-			w = width;
+-			if (sx & 15) {
+-				f = 1;
+-				w += 8;
+-			}
+-			if ((sx + width) & 15)
+-				f |= 2;
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = (*src32++ << 8) & mask;
+-					pval[1] = (*src32++ << 8) & mask;
+-					pval[2] = (*src32++ << 8) & mask;
+-					pval[3] = (*src32++ << 8) & mask;
+-				} else {
+-					pval[0] = dst32[0] & mask;
+-					pval[1] = dst32[1] & mask;
+-					pval[2] = dst32[2] & mask;
+-					pval[3] = dst32[3] & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[0] | (v1 >> 8);
+-					pval[0] = (v ^ v1) << 8;
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[1] | (v1 >> 8);
+-					pval[1] = (v ^ v1) << 8;
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[2] | (v1 >> 8);
+-					pval[2] = (v ^ v1) << 8;
+-					v = *src32++;
+-					v1 = v & mask;
+-					*dst32++ = pval[3] | (v1 >> 8);
+-					pval[3] = (v ^ v1) << 8;
+-				}
+-
+-				if (f & 2) {
+-					dst32[0] = (dst32[0] & mask) | pval[0];
+-					dst32[1] = (dst32[1] & mask) | pval[1];
+-					dst32[2] = (dst32[2] & mask) | pval[2];
+-					dst32[3] = (dst32[3] & mask) | pval[3];
+-				}
+-
+-				src += next_line;
+-				dst += next_line;
+-			}
+-		} else {
+-			u32 *src32, *dst32;
+-			u32 pval[4], v, v1, mask;
+-			int i, j, w, f;
+-
+-			src = (u8 *)info->screen_base + (sy - 1) * next_line + ((sx + width + 8) & ~15) / (8 / BPL);
+-			dst = (u8 *)info->screen_base + (dy - 1) * next_line + ((dx + width + 8) & ~15) / (8 / BPL);
+-
+-			mask = 0xff00ff;
+-			f = 0;
+-			w = width;
+-			if ((dx + width) & 15)
+-				f = 1;
+-			if (sx & 15) {
+-				f |= 2;
+-				w += 8;
+-			}
+-			w >>= 4;
+-			for (i = height; i; i--) {
+-				src32 = (u32 *)src;
+-				dst32 = (u32 *)dst;
+-
+-				if (f & 1) {
+-					pval[0] = dst32[-1] & mask;
+-					pval[1] = dst32[-2] & mask;
+-					pval[2] = dst32[-3] & mask;
+-					pval[3] = dst32[-4] & mask;
+-				} else {
+-					pval[0] = (*--src32 >> 8) & mask;
+-					pval[1] = (*--src32 >> 8) & mask;
+-					pval[2] = (*--src32 >> 8) & mask;
+-					pval[3] = (*--src32 >> 8) & mask;
+-				}
+-
+-				for (j = w; j > 0; j--) {
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[0] | (v1 << 8);
+-					pval[0] = (v ^ v1) >> 8;
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[1] | (v1 << 8);
+-					pval[1] = (v ^ v1) >> 8;
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[2] | (v1 << 8);
+-					pval[2] = (v ^ v1) >> 8;
+-					v = *--src32;
+-					v1 = v & mask;
+-					*--dst32 = pval[3] | (v1 << 8);
+-					pval[3] = (v ^ v1) >> 8;
+-				}
+-
+-				if (!(f & 2)) {
+-					dst32[-1] = (dst32[-1] & mask) | pval[0];
+-					dst32[-2] = (dst32[-2] & mask) | pval[1];
+-					dst32[-3] = (dst32[-3] & mask) | pval[2];
+-					dst32[-4] = (dst32[-4] & mask) | pval[3];
+-				}
+-
+-				src -= next_line;
+-				dst -= next_line;
+-			}
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p8_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-                             int sy, int sx, int height, int width)
+-{
+-	u32 *dest;
+-	int rows, i;
+-	u32 cval[4];
+-
+-	dest = (u32 *)(info->screen_base + sy * next_line + (sx & ~15) / (8 / BPL));
+-	if (sx & 15) {
+-		u8 *dest8 = (u8 *)dest + 1;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	expand16_col2mask(color, cval);
+-	rows = width >> 4;
+-	if (rows) {
+-		u32 *d = dest;
+-		u32 off = next_line - rows * BPL * 2;
+-		for (i = height; i; i--) {
+-			d = fill16_col(d, rows, cval);
+-			d = (u32 *)((long)d + off);
+-		}
+-		dest += rows * BPL / 2;
+-		width &= 15;
+-	}
+-
+-	if (width) {
+-		u8 *dest8 = (u8 *)dest;
+-
+-		expand8_col2mask(color, cval);
+-
+-		for (i = height; i; i--) {
+-			fill8_col(dest8, cval);
+-			dest8 += next_line;
+-		}
+-	}
+-}
+-
+-void atafb_iplan2p8_linefill(struct fb_info *info, u_long next_line,
+-			     int dy, int dx, u32 width,
+-			     const u8 *data, u32 bgcolor, u32 fgcolor)
+-{
+-	u32 *dest;
+-	const u16 *data16;
+-	int rows;
+-	u32 fgm[4], bgm[4], m;
+-
+-	dest = (u32 *)(info->screen_base + dy * next_line + (dx & ~15) / (8 / BPL));
+-	if (dx & 15) {
+-		fill8_2col((u8 *)dest + 1, fgcolor, bgcolor, *data++);
+-		dest += BPL / 2;
+-		width -= 8;
+-	}
+-
+-	if (width >= 16) {
+-		data16 = (const u16 *)data;
+-		expand16_2col2mask(fgcolor, bgcolor, fgm, bgm);
+-
+-		for (rows = width / 16; rows; rows--) {
+-			u16 d = *data16++;
+-			m = d | ((u32)d << 16);
+-			*dest++ = (m & fgm[0]) ^ bgm[0];
+-			*dest++ = (m & fgm[1]) ^ bgm[1];
+-			*dest++ = (m & fgm[2]) ^ bgm[2];
+-			*dest++ = (m & fgm[3]) ^ bgm[3];
+-		}
+-
+-		data = (const u8 *)data16;
+-		width &= 15;
+-	}
+-
+-	if (width)
+-		fill8_2col((u8 *)dest, fgcolor, bgcolor, *data);
+-}
+diff --git a/drivers/video/fbdev/atafb_mfb.c b/drivers/video/fbdev/atafb_mfb.c
+deleted file mode 100644
+index 384fd3e4d..000000000
+--- a/drivers/video/fbdev/atafb_mfb.c
++++ /dev/null
+@@ -1,89 +0,0 @@
+-/*
+- *  linux/drivers/video/mfb.c -- Low level frame buffer operations for
+- *				 monochrome
+- *
+- *	Created 5 Apr 1997 by Geert Uytterhoeven
+- *
+- *  This file is subject to the terms and conditions of the GNU General Public
+- *  License.  See the file COPYING in the main directory of this archive for
+- *  more details.
+- */
+-
+-#include <linux/string.h>
+-#include <linux/fb.h>
+-
+-#include "atafb.h"
+-#include "atafb_utils.h"
+-
+-
+-    /*
+-     *  Monochrome
+-     */
+-
+-void atafb_mfb_copyarea(struct fb_info *info, u_long next_line,
+-			int sy, int sx, int dy, int dx,
+-			int height, int width)
+-{
+-	u8 *src, *dest;
+-	u_int rows;
+-
+-	if (sx == 0 && dx == 0 && width == next_line) {
+-		src = (u8 *)info->screen_base + sy * (width >> 3);
+-		dest = (u8 *)info->screen_base + dy * (width >> 3);
+-		fb_memmove(dest, src, height * (width >> 3));
+-	} else if (dy <= sy) {
+-		src = (u8 *)info->screen_base + sy * next_line + (sx >> 3);
+-		dest = (u8 *)info->screen_base + dy * next_line + (dx >> 3);
+-		for (rows = height; rows--;) {
+-			fb_memmove(dest, src, width >> 3);
+-			src += next_line;
+-			dest += next_line;
+-		}
+-	} else {
+-		src = (u8 *)info->screen_base + (sy + height - 1) * next_line + (sx >> 3);
+-		dest = (u8 *)info->screen_base + (dy + height - 1) * next_line + (dx >> 3);
+-		for (rows = height; rows--;) {
+-			fb_memmove(dest, src, width >> 3);
+-			src -= next_line;
+-			dest -= next_line;
+-		}
+-	}
+-}
+-
+-void atafb_mfb_fillrect(struct fb_info *info, u_long next_line, u32 color,
+-			int sy, int sx, int height, int width)
+-{
+-	u8 *dest;
+-	u_int rows;
+-
+-	dest = (u8 *)info->screen_base + sy * next_line + (sx >> 3);
+-
+-	if (sx == 0 && width == next_line) {
+-		if (color)
+-			fb_memset255(dest, height * (width >> 3));
+-		else
+-			fb_memclear(dest, height * (width >> 3));
+-	} else {
+-		for (rows = height; rows--; dest += next_line) {
+-			if (color)
+-				fb_memset255(dest, width >> 3);
+-			else
+-				fb_memclear_small(dest, width >> 3);
+-		}
+-	}
+-}
+-
+-void atafb_mfb_linefill(struct fb_info *info, u_long next_line,
+-			int dy, int dx, u32 width,
+-			const u8 *data, u32 bgcolor, u32 fgcolor)
+-{
+-	u8 *dest;
+-	u_int rows;
+-
+-	dest = (u8 *)info->screen_base + dy * next_line + (dx >> 3);
+-
+-	for (rows = width / 8; rows--; /* check margins */ ) {
+-		// use fast_memmove or fb_memmove
+-		*dest++ = *data++;
+-	}
+-}
+diff --git a/drivers/video/fbdev/atafb_utils.h b/drivers/video/fbdev/atafb_utils.h
+deleted file mode 100644
+index 8f3396ea8..000000000
+--- a/drivers/video/fbdev/atafb_utils.h
++++ /dev/null
+@@ -1,401 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _VIDEO_ATAFB_UTILS_H
+-#define _VIDEO_ATAFB_UTILS_H
+-
+-/* ================================================================= */
+-/*                      Utility Assembler Functions                  */
+-/* ================================================================= */
+-
+-/* ====================================================================== */
+-
+-/* Those of a delicate disposition might like to skip the next couple of
+- * pages.
+- *
+- * These functions are drop in replacements for memmove and
+- * memset(_, 0, _). However their five instances add at least a kilobyte
+- * to the object file. You have been warned.
+- *
+- * Not a great fan of assembler for the sake of it, but I think
+- * that these routines are at least 10 times faster than their C
+- * equivalents for large blits, and that's important to the lowest level of
+- * a graphics driver. Question is whether some scheme with the blitter
+- * would be faster. I suspect not for simple text system - not much
+- * asynchrony.
+- *
+- * Code is very simple, just gruesome expansion. Basic strategy is to
+- * increase data moved/cleared at each step to 16 bytes to reduce
+- * instruction per data move overhead. movem might be faster still
+- * For more than 15 bytes, we try to align the write direction on a
+- * longword boundary to get maximum speed. This is even more gruesome.
+- * Unaligned read/write used requires 68020+ - think this is a problem?
+- *
+- * Sorry!
+- */
+-
+-
+-/* ++roman: I've optimized Robert's original versions in some minor
+- * aspects, e.g. moveq instead of movel, let gcc choose the registers,
+- * use movem in some places...
+- * For other modes than 1 plane, lots of more such assembler functions
+- * were needed (e.g. the ones using movep or expanding color values).
+- */
+-
+-/* ++andreas: more optimizations:
+-   subl #65536,d0 replaced by clrw d0; subql #1,d0 for dbcc
+-   addal is faster than addaw
+-   movep is rather expensive compared to ordinary move's
+-   some functions rewritten in C for clarity, no speed loss */
+-
+-static inline void *fb_memclear_small(void *s, size_t count)
+-{
+-	if (!count)
+-		return 0;
+-
+-	asm volatile ("\n"
+-		"	lsr.l	#1,%1 ; jcc 1f ; move.b %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.w %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.l %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.l %2,-(%0) ; move.l %2,-(%0)\n"
+-		"1:"
+-		: "=a" (s), "=d" (count)
+-		: "d" (0), "0" ((char *)s + count), "1" (count));
+-	asm volatile ("\n"
+-		"	subq.l  #1,%1\n"
+-		"	jcs	3f\n"
+-		"	move.l	%2,%%d4; move.l %2,%%d5; move.l %2,%%d6\n"
+-		"2:	movem.l	%2/%%d4/%%d5/%%d6,-(%0)\n"
+-		"	dbra	%1,2b\n"
+-		"3:"
+-		: "=a" (s), "=d" (count)
+-		: "d" (0), "0" (s), "1" (count)
+-		: "d4", "d5", "d6"
+-		);
+-
+-	return 0;
+-}
+-
+-
+-static inline void *fb_memclear(void *s, size_t count)
+-{
+-	if (!count)
+-		return 0;
+-
+-	if (count < 16) {
+-		asm volatile ("\n"
+-			"	lsr.l	#1,%1 ; jcc 1f ; clr.b (%0)+\n"
+-			"1:	lsr.l	#1,%1 ; jcc 1f ; clr.w (%0)+\n"
+-			"1:	lsr.l	#1,%1 ; jcc 1f ; clr.l (%0)+\n"
+-			"1:	lsr.l	#1,%1 ; jcc 1f ; clr.l (%0)+ ; clr.l (%0)+\n"
+-			"1:"
+-			: "=a" (s), "=d" (count)
+-			: "0" (s), "1" (count));
+-	} else {
+-		long tmp;
+-		asm volatile ("\n"
+-			"	move.l	%1,%2\n"
+-			"	lsr.l	#1,%2 ; jcc 1f ; clr.b (%0)+ ; subq.w #1,%1\n"
+-			"	lsr.l	#1,%2 ; jcs 2f\n"  /* %0 increased=>bit 2 switched*/
+-			"	clr.w	(%0)+  ; subq.w  #2,%1 ; jra 2f\n"
+-			"1:	lsr.l	#1,%2 ; jcc 2f\n"
+-			"	clr.w	(%0)+  ; subq.w  #2,%1\n"
+-			"2:	move.w	%1,%2; lsr.l #2,%1 ; jeq 6f\n"
+-			"	lsr.l	#1,%1 ; jcc 3f ; clr.l (%0)+\n"
+-			"3:	lsr.l	#1,%1 ; jcc 4f ; clr.l (%0)+ ; clr.l (%0)+\n"
+-			"4:	subq.l	#1,%1 ; jcs 6f\n"
+-			"5:	clr.l	(%0)+; clr.l (%0)+ ; clr.l (%0)+ ; clr.l (%0)+\n"
+-			"	dbra	%1,5b ; clr.w %1; subq.l #1,%1; jcc 5b\n"
+-			"6:	move.w	%2,%1; btst #1,%1 ; jeq 7f ; clr.w (%0)+\n"
+-			"7:	btst	#0,%1 ; jeq 8f ; clr.b (%0)+\n"
+-			"8:"
+-			: "=a" (s), "=d" (count), "=d" (tmp)
+-			: "0" (s), "1" (count));
+-	}
+-
+-	return 0;
+-}
+-
+-
+-static inline void *fb_memset255(void *s, size_t count)
+-{
+-	if (!count)
+-		return 0;
+-
+-	asm volatile ("\n"
+-		"	lsr.l	#1,%1 ; jcc 1f ; move.b %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.w %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.l %2,-(%0)\n"
+-		"1:	lsr.l	#1,%1 ; jcc 1f ; move.l %2,-(%0) ; move.l %2,-(%0)\n"
+-		"1:"
+-		: "=a" (s), "=d" (count)
+-		: "d" (-1), "0" ((char *)s+count), "1" (count));
+-	asm volatile ("\n"
+-		"	subq.l	#1,%1 ; jcs 3f\n"
+-		"	move.l	%2,%%d4; move.l %2,%%d5; move.l %2,%%d6\n"
+-		"2:	movem.l	%2/%%d4/%%d5/%%d6,-(%0)\n"
+-		"	dbra	%1,2b\n"
+-		"3:"
+-		: "=a" (s), "=d" (count)
+-		: "d" (-1), "0" (s), "1" (count)
+-		: "d4", "d5", "d6");
+-
+-	return 0;
+-}
+-
+-
+-static inline void *fb_memmove(void *d, const void *s, size_t count)
+-{
+-	if (d < s) {
+-		if (count < 16) {
+-			asm volatile ("\n"
+-				"	lsr.l	#1,%2 ; jcc 1f ; move.b (%1)+,(%0)+\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.w (%1)+,(%0)+\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.l (%1)+,(%0)+\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.l (%1)+,(%0)+ ; move.l (%1)+,(%0)+\n"
+-				"1:"
+-				: "=a" (d), "=a" (s), "=d" (count)
+-				: "0" (d), "1" (s), "2" (count));
+-		} else {
+-			long tmp;
+-			asm volatile ("\n"
+-				"	move.l	%0,%3\n"
+-				"	lsr.l	#1,%3 ; jcc 1f ; move.b (%1)+,(%0)+ ; subqw #1,%2\n"
+-				"	lsr.l	#1,%3 ; jcs 2f\n"  /* %0 increased=>bit 2 switched*/
+-				"	move.w	(%1)+,(%0)+  ; subqw  #2,%2 ; jra 2f\n"
+-				"1:	lsr.l   #1,%3 ; jcc 2f\n"
+-				"	move.w	(%1)+,(%0)+  ; subqw  #2,%2\n"
+-				"2:	move.w	%2,%-; lsr.l #2,%2 ; jeq 6f\n"
+-				"	lsr.l	#1,%2 ; jcc 3f ; move.l (%1)+,(%0)+\n"
+-				"3:	lsr.l	#1,%2 ; jcc 4f ; move.l (%1)+,(%0)+ ; move.l (%1)+,(%0)+\n"
+-				"4:	subq.l	#1,%2 ; jcs 6f\n"
+-				"5:	move.l	(%1)+,(%0)+; move.l (%1)+,(%0)+\n"
+-				"	move.l	(%1)+,(%0)+; move.l (%1)+,(%0)+\n"
+-				"	dbra	%2,5b ; clr.w %2; subq.l #1,%2; jcc 5b\n"
+-				"6:	move.w	%+,%2; btst #1,%2 ; jeq 7f ; move.w (%1)+,(%0)+\n"
+-				"7:	btst	#0,%2 ; jeq 8f ; move.b (%1)+,(%0)+\n"
+-				"8:"
+-				: "=a" (d), "=a" (s), "=d" (count), "=d" (tmp)
+-				: "0" (d), "1" (s), "2" (count));
+-		}
+-	} else {
+-		if (count < 16) {
+-			asm volatile ("\n"
+-				"	lsr.l	#1,%2 ; jcc 1f ; move.b -(%1),-(%0)\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.w -(%1),-(%0)\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.l -(%1),-(%0)\n"
+-				"1:	lsr.l	#1,%2 ; jcc 1f ; move.l -(%1),-(%0) ; move.l -(%1),-(%0)\n"
+-				"1:"
+-				: "=a" (d), "=a" (s), "=d" (count)
+-				: "0" ((char *) d + count), "1" ((char *) s + count), "2" (count));
+-		} else {
+-			long tmp;
+-
+-			asm volatile ("\n"
+-				"	move.l	%0,%3\n"
+-				"	lsr.l	#1,%3 ; jcc 1f ; move.b -(%1),-(%0) ; subqw #1,%2\n"
+-				"	lsr.l	#1,%3 ; jcs 2f\n"  /* %0 increased=>bit 2 switched*/
+-				"	move.w	-(%1),-(%0) ; subqw  #2,%2 ; jra 2f\n"
+-				"1:	lsr.l	#1,%3 ; jcc 2f\n"
+-				"	move.w	-(%1),-(%0) ; subqw  #2,%2\n"
+-				"2:	move.w	%2,%-; lsr.l #2,%2 ; jeq 6f\n"
+-				"	lsr.l	#1,%2 ; jcc 3f ; move.l -(%1),-(%0)\n"
+-				"3:	lsr.l	#1,%2 ; jcc 4f ; move.l -(%1),-(%0) ; move.l -(%1),-(%0)\n"
+-				"4:	subq.l	#1,%2 ; jcs 6f\n"
+-				"5:	move.l	-(%1),-(%0); move.l -(%1),-(%0)\n"
+-				"	move.l	-(%1),-(%0); move.l -(%1),-(%0)\n"
+-				"	dbra	%2,5b ; clr.w %2; subq.l #1,%2; jcc 5b\n"
+-				"6:	move.w	%+,%2; btst #1,%2 ; jeq 7f ; move.w -(%1),-(%0)\n"
+-				"7:	btst	#0,%2 ; jeq 8f ; move.b -(%1),-(%0)\n"
+-				"8:"
+-				: "=a" (d), "=a" (s), "=d" (count), "=d" (tmp)
+-				: "0" ((char *) d + count), "1" ((char *) s + count), "2" (count));
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+-
+-/* ++andreas: Simple and fast version of memmove, assumes size is
+-   divisible by 16, suitable for moving the whole screen bitplane */
+-static inline void fast_memmove(char *dst, const char *src, size_t size)
+-{
+-	if (!size)
+-		return;
+-	if (dst < src)
+-		asm volatile ("\n"
+-			"1:	movem.l	(%0)+,%%d0/%%d1/%%a0/%%a1\n"
+-			"	movem.l	%%d0/%%d1/%%a0/%%a1,%1@\n"
+-			"	addq.l	#8,%1; addq.l #8,%1\n"
+-			"	dbra	%2,1b\n"
+-			"	clr.w	%2; subq.l #1,%2\n"
+-			"	jcc	1b"
+-			: "=a" (src), "=a" (dst), "=d" (size)
+-			: "0" (src), "1" (dst), "2" (size / 16 - 1)
+-			: "d0", "d1", "a0", "a1", "memory");
+-	else
+-		asm volatile ("\n"
+-			"1:	subq.l	#8,%0; subq.l #8,%0\n"
+-			"	movem.l	%0@,%%d0/%%d1/%%a0/%%a1\n"
+-			"	movem.l	%%d0/%%d1/%%a0/%%a1,-(%1)\n"
+-			"	dbra	%2,1b\n"
+-			"	clr.w	%2; subq.l #1,%2\n"
+-			"	jcc 1b"
+-			: "=a" (src), "=a" (dst), "=d" (size)
+-			: "0" (src + size), "1" (dst + size), "2" (size / 16 - 1)
+-			: "d0", "d1", "a0", "a1", "memory");
+-}
+-
+-#ifdef BPL
+-
+-/*
+- * This expands a up to 8 bit color into two longs
+- * for movel operations.
+- */
+-static const u32 four2long[] = {
+-	0x00000000, 0x000000ff, 0x0000ff00, 0x0000ffff,
+-	0x00ff0000, 0x00ff00ff, 0x00ffff00, 0x00ffffff,
+-	0xff000000, 0xff0000ff, 0xff00ff00, 0xff00ffff,
+-	0xffff0000, 0xffff00ff, 0xffffff00, 0xffffffff,
+-};
+-
+-static inline void expand8_col2mask(u8 c, u32 m[])
+-{
+-	m[0] = four2long[c & 15];
+-#if BPL > 4
+-	m[1] = four2long[c >> 4];
+-#endif
+-}
+-
+-static inline void expand8_2col2mask(u8 fg, u8 bg, u32 fgm[], u32 bgm[])
+-{
+-	fgm[0] = four2long[fg & 15] ^ (bgm[0] = four2long[bg & 15]);
+-#if BPL > 4
+-	fgm[1] = four2long[fg >> 4] ^ (bgm[1] = four2long[bg >> 4]);
+-#endif
+-}
+-
+-/*
+- * set an 8bit value to a color
+- */
+-static inline void fill8_col(u8 *dst, u32 m[])
+-{
+-	u32 tmp = m[0];
+-	dst[0] = tmp;
+-	dst[2] = (tmp >>= 8);
+-#if BPL > 2
+-	dst[4] = (tmp >>= 8);
+-	dst[6] = tmp >> 8;
+-#endif
+-#if BPL > 4
+-	tmp = m[1];
+-	dst[8] = tmp;
+-	dst[10] = (tmp >>= 8);
+-	dst[12] = (tmp >>= 8);
+-	dst[14] = tmp >> 8;
+-#endif
+-}
+-
+-/*
+- * set an 8bit value according to foreground/background color
+- */
+-static inline void fill8_2col(u8 *dst, u8 fg, u8 bg, u32 mask)
+-{
+-	u32 fgm[2], bgm[2], tmp;
+-
+-	expand8_2col2mask(fg, bg, fgm, bgm);
+-
+-	mask |= mask << 8;
+-#if BPL > 2
+-	mask |= mask << 16;
+-#endif
+-	tmp = (mask & fgm[0]) ^ bgm[0];
+-	dst[0] = tmp;
+-	dst[2] = (tmp >>= 8);
+-#if BPL > 2
+-	dst[4] = (tmp >>= 8);
+-	dst[6] = tmp >> 8;
+-#endif
+-#if BPL > 4
+-	tmp = (mask & fgm[1]) ^ bgm[1];
+-	dst[8] = tmp;
+-	dst[10] = (tmp >>= 8);
+-	dst[12] = (tmp >>= 8);
+-	dst[14] = tmp >> 8;
+-#endif
+-}
+-
+-static const u32 two2word[] = {
+-	0x00000000, 0xffff0000, 0x0000ffff, 0xffffffff
+-};
+-
+-static inline void expand16_col2mask(u8 c, u32 m[])
+-{
+-	m[0] = two2word[c & 3];
+-#if BPL > 2
+-	m[1] = two2word[(c >> 2) & 3];
+-#endif
+-#if BPL > 4
+-	m[2] = two2word[(c >> 4) & 3];
+-	m[3] = two2word[c >> 6];
+-#endif
+-}
+-
+-static inline void expand16_2col2mask(u8 fg, u8 bg, u32 fgm[], u32 bgm[])
+-{
+-	bgm[0] = two2word[bg & 3];
+-	fgm[0] = two2word[fg & 3] ^ bgm[0];
+-#if BPL > 2
+-	bgm[1] = two2word[(bg >> 2) & 3];
+-	fgm[1] = two2word[(fg >> 2) & 3] ^ bgm[1];
+-#endif
+-#if BPL > 4
+-	bgm[2] = two2word[(bg >> 4) & 3];
+-	fgm[2] = two2word[(fg >> 4) & 3] ^ bgm[2];
+-	bgm[3] = two2word[bg >> 6];
+-	fgm[3] = two2word[fg >> 6] ^ bgm[3];
+-#endif
+-}
+-
+-static inline u32 *fill16_col(u32 *dst, int rows, u32 m[])
+-{
+-	while (rows) {
+-		*dst++ = m[0];
+-#if BPL > 2
+-		*dst++ = m[1];
+-#endif
+-#if BPL > 4
+-		*dst++ = m[2];
+-		*dst++ = m[3];
+-#endif
+-		rows--;
+-	}
+-	return dst;
+-}
+-
+-static inline void memmove32_col(void *dst, void *src, u32 mask, u32 h, u32 bytes)
+-{
+-	u32 *s, *d, v;
+-
+-        s = src;
+-        d = dst;
+-        do {
+-                v = (*s++ & mask) | (*d  & ~mask);
+-                *d++ = v;
+-#if BPL > 2
+-                v = (*s++ & mask) | (*d  & ~mask);
+-                *d++ = v;
+-#endif
+-#if BPL > 4
+-                v = (*s++ & mask) | (*d  & ~mask);
+-                *d++ = v;
+-                v = (*s++ & mask) | (*d  & ~mask);
+-                *d++ = v;
+-#endif
+-                d = (u32 *)((u8 *)d + bytes);
+-                s = (u32 *)((u8 *)s + bytes);
+-        } while (--h);
+-}
+-
+-#endif
+-
+-#endif /* _VIDEO_ATAFB_UTILS_H */
+diff --git a/drivers/video/fbdev/hgafb.c b/drivers/video/fbdev/hgafb.c
+deleted file mode 100644
+index d32fd1c52..000000000
+--- a/drivers/video/fbdev/hgafb.c
++++ /dev/null
+@@ -1,685 +0,0 @@
+-/*
+- * linux/drivers/video/hgafb.c -- Hercules graphics adaptor frame buffer device
+- *
+- *      Created 25 Nov 1999 by Ferenc Bakonyi (fero@drama.obuda.kando.hu)
+- *      Based on skeletonfb.c by Geert Uytterhoeven and
+- *               mdacon.c by Andrew Apted
+- *
+- * History:
+- *
+- * - Revision 0.1.8 (23 Oct 2002): Ported to new framebuffer api.
+- *
+- * - Revision 0.1.7 (23 Jan 2001): fix crash resulting from MDA only cards
+- *				   being detected as Hercules.	 (Paul G.)
+- * - Revision 0.1.6 (17 Aug 2000): new style structs
+- *                                 documentation
+- * - Revision 0.1.5 (13 Mar 2000): spinlocks instead of saveflags();cli();etc
+- *                                 minor fixes
+- * - Revision 0.1.4 (24 Jan 2000): fixed a bug in hga_card_detect() for
+- *                                  HGA-only systems
+- * - Revision 0.1.3 (22 Jan 2000): modified for the new fb_info structure
+- *                                 screen is cleared after rmmod
+- *                                 virtual resolutions
+- *                                 module parameter 'nologo={0|1}'
+- *                                 the most important: boot logo :)
+- * - Revision 0.1.0  (6 Dec 1999): faster scrolling and minor fixes
+- * - First release  (25 Nov 1999)
+- *
+- * This file is subject to the terms and conditions of the GNU General Public
+- * License.  See the file COPYING in the main directory of this archive
+- * for more details.
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/spinlock.h>
+-#include <linux/string.h>
+-#include <linux/mm.h>
+-#include <linux/delay.h>
+-#include <linux/fb.h>
+-#include <linux/init.h>
+-#include <linux/ioport.h>
+-#include <linux/platform_device.h>
+-#include <asm/io.h>
+-#include <asm/vga.h>
+-
+-#if 0
+-#define DPRINTK(args...) printk(KERN_DEBUG __FILE__": " ##args)
+-#else
+-#define DPRINTK(args...)
+-#endif
+-
+-#if 0
+-#define CHKINFO(ret) if (info != &fb_info) { printk(KERN_DEBUG __FILE__": This should never happen, line:%d \n", __LINE__); return ret; }
+-#else
+-#define CHKINFO(ret)
+-#endif
+-
+-/* Description of the hardware layout */
+-
+-static void __iomem *hga_vram;			/* Base of video memory */
+-static unsigned long hga_vram_len;		/* Size of video memory */
+-
+-#define HGA_ROWADDR(row) ((row%4)*8192 + (row>>2)*90)
+-#define HGA_TXT			0
+-#define HGA_GFX			1
+-
+-static inline u8 __iomem * rowaddr(struct fb_info *info, u_int row)
+-{
+-	return info->screen_base + HGA_ROWADDR(row);
+-}
+-
+-static int hga_mode = -1;			/* 0 = txt, 1 = gfx mode */
+-
+-static enum { TYPE_HERC, TYPE_HERCPLUS, TYPE_HERCCOLOR } hga_type;
+-static char *hga_type_name;
+-
+-#define HGA_INDEX_PORT		0x3b4		/* Register select port */
+-#define HGA_VALUE_PORT		0x3b5		/* Register value port */
+-#define HGA_MODE_PORT		0x3b8		/* Mode control port */
+-#define HGA_STATUS_PORT		0x3ba		/* Status and Config port */
+-#define HGA_GFX_PORT		0x3bf		/* Graphics control port */
+-
+-/* HGA register values */
+-
+-#define HGA_CURSOR_BLINKING	0x00
+-#define HGA_CURSOR_OFF		0x20
+-#define HGA_CURSOR_SLOWBLINK	0x60
+-
+-#define HGA_MODE_GRAPHICS	0x02
+-#define HGA_MODE_VIDEO_EN	0x08
+-#define HGA_MODE_BLINK_EN	0x20
+-#define HGA_MODE_GFX_PAGE1	0x80
+-
+-#define HGA_STATUS_HSYNC	0x01
+-#define HGA_STATUS_VSYNC	0x80
+-#define HGA_STATUS_VIDEO	0x08
+-
+-#define HGA_CONFIG_COL132	0x08
+-#define HGA_GFX_MODE_EN		0x01
+-#define HGA_GFX_PAGE_EN		0x02
+-
+-/* Global locks */
+-
+-static DEFINE_SPINLOCK(hga_reg_lock);
+-
+-/* Framebuffer driver structures */
+-
+-static const struct fb_var_screeninfo hga_default_var = {
+-	.xres		= 720,
+-	.yres 		= 348,
+-	.xres_virtual 	= 720,
+-	.yres_virtual	= 348,
+-	.bits_per_pixel = 1,
+-	.red 		= {0, 1, 0},
+-	.green 		= {0, 1, 0},
+-	.blue 		= {0, 1, 0},
+-	.transp 	= {0, 0, 0},
+-	.height 	= -1,
+-	.width 		= -1,
+-};
+-
+-static struct fb_fix_screeninfo hga_fix = {
+-	.id 		= "HGA",
+-	.type 		= FB_TYPE_PACKED_PIXELS,	/* (not sure) */
+-	.visual 	= FB_VISUAL_MONO10,
+-	.xpanstep 	= 8,
+-	.ypanstep 	= 8,
+-	.line_length 	= 90,
+-	.accel 		= FB_ACCEL_NONE
+-};
+-
+-/* Don't assume that tty1 will be the initial current console. */
+-static int release_io_port = 0;
+-static int release_io_ports = 0;
+-static bool nologo = 0;
+-
+-/* -------------------------------------------------------------------------
+- *
+- * Low level hardware functions
+- *
+- * ------------------------------------------------------------------------- */
+-
+-static void write_hga_b(unsigned int val, unsigned char reg)
+-{
+-	outb_p(reg, HGA_INDEX_PORT);
+-	outb_p(val, HGA_VALUE_PORT);
+-}
+-
+-static void write_hga_w(unsigned int val, unsigned char reg)
+-{
+-	outb_p(reg,   HGA_INDEX_PORT); outb_p(val >> 8,   HGA_VALUE_PORT);
+-	outb_p(reg+1, HGA_INDEX_PORT); outb_p(val & 0xff, HGA_VALUE_PORT);
+-}
+-
+-static int test_hga_b(unsigned char val, unsigned char reg)
+-{
+-	outb_p(reg, HGA_INDEX_PORT);
+-	outb  (val, HGA_VALUE_PORT);
+-	udelay(20); val = (inb_p(HGA_VALUE_PORT) == val);
+-	return val;
+-}
+-
+-static void hga_clear_screen(void)
+-{
+-	unsigned char fillchar = 0xbf; /* magic */
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&hga_reg_lock, flags);
+-	if (hga_mode == HGA_TXT)
+-		fillchar = ' ';
+-	else if (hga_mode == HGA_GFX)
+-		fillchar = 0x00;
+-	spin_unlock_irqrestore(&hga_reg_lock, flags);
+-	if (fillchar != 0xbf)
+-		memset_io(hga_vram, fillchar, hga_vram_len);
+-}
+-
+-static void hga_txt_mode(void)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&hga_reg_lock, flags);
+-	outb_p(HGA_MODE_VIDEO_EN | HGA_MODE_BLINK_EN, HGA_MODE_PORT);
+-	outb_p(0x00, HGA_GFX_PORT);
+-	outb_p(0x00, HGA_STATUS_PORT);
+-
+-	write_hga_b(0x61, 0x00);	/* horizontal total */
+-	write_hga_b(0x50, 0x01);	/* horizontal displayed */
+-	write_hga_b(0x52, 0x02);	/* horizontal sync pos */
+-	write_hga_b(0x0f, 0x03);	/* horizontal sync width */
+-
+-	write_hga_b(0x19, 0x04);	/* vertical total */
+-	write_hga_b(0x06, 0x05);	/* vertical total adjust */
+-	write_hga_b(0x19, 0x06);	/* vertical displayed */
+-	write_hga_b(0x19, 0x07);	/* vertical sync pos */
+-
+-	write_hga_b(0x02, 0x08);	/* interlace mode */
+-	write_hga_b(0x0d, 0x09);	/* maximum scanline */
+-	write_hga_b(0x0c, 0x0a);	/* cursor start */
+-	write_hga_b(0x0d, 0x0b);	/* cursor end */
+-
+-	write_hga_w(0x0000, 0x0c);	/* start address */
+-	write_hga_w(0x0000, 0x0e);	/* cursor location */
+-
+-	hga_mode = HGA_TXT;
+-	spin_unlock_irqrestore(&hga_reg_lock, flags);
+-}
+-
+-static void hga_gfx_mode(void)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&hga_reg_lock, flags);
+-	outb_p(0x00, HGA_STATUS_PORT);
+-	outb_p(HGA_GFX_MODE_EN, HGA_GFX_PORT);
+-	outb_p(HGA_MODE_VIDEO_EN | HGA_MODE_GRAPHICS, HGA_MODE_PORT);
+-
+-	write_hga_b(0x35, 0x00);	/* horizontal total */
+-	write_hga_b(0x2d, 0x01);	/* horizontal displayed */
+-	write_hga_b(0x2e, 0x02);	/* horizontal sync pos */
+-	write_hga_b(0x07, 0x03);	/* horizontal sync width */
+-
+-	write_hga_b(0x5b, 0x04);	/* vertical total */
+-	write_hga_b(0x02, 0x05);	/* vertical total adjust */
+-	write_hga_b(0x57, 0x06);	/* vertical displayed */
+-	write_hga_b(0x57, 0x07);	/* vertical sync pos */
+-
+-	write_hga_b(0x02, 0x08);	/* interlace mode */
+-	write_hga_b(0x03, 0x09);	/* maximum scanline */
+-	write_hga_b(0x00, 0x0a);	/* cursor start */
+-	write_hga_b(0x00, 0x0b);	/* cursor end */
+-
+-	write_hga_w(0x0000, 0x0c);	/* start address */
+-	write_hga_w(0x0000, 0x0e);	/* cursor location */
+-
+-	hga_mode = HGA_GFX;
+-	spin_unlock_irqrestore(&hga_reg_lock, flags);
+-}
+-
+-static void hga_show_logo(struct fb_info *info)
+-{
+-/*
+-	void __iomem *dest = hga_vram;
+-	char *logo = linux_logo_bw;
+-	int x, y;
+-
+-	for (y = 134; y < 134 + 80 ; y++) * this needs some cleanup *
+-		for (x = 0; x < 10 ; x++)
+-			writeb(~*(logo++),(dest + HGA_ROWADDR(y) + x + 40));
+-*/
+-}
+-
+-static void hga_pan(unsigned int xoffset, unsigned int yoffset)
+-{
+-	unsigned int base;
+-	unsigned long flags;
+-
+-	base = (yoffset / 8) * 90 + xoffset;
+-	spin_lock_irqsave(&hga_reg_lock, flags);
+-	write_hga_w(base, 0x0c);	/* start address */
+-	spin_unlock_irqrestore(&hga_reg_lock, flags);
+-	DPRINTK("hga_pan: base:%d\n", base);
+-}
+-
+-static void hga_blank(int blank_mode)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&hga_reg_lock, flags);
+-	if (blank_mode) {
+-		outb_p(0x00, HGA_MODE_PORT);	/* disable video */
+-	} else {
+-		outb_p(HGA_MODE_VIDEO_EN | HGA_MODE_GRAPHICS, HGA_MODE_PORT);
+-	}
+-	spin_unlock_irqrestore(&hga_reg_lock, flags);
+-}
+-
+-static int hga_card_detect(struct platform_device *pdev)
+-{
+-	int count = 0;
+-	void __iomem *p, *q;
+-	unsigned short p_save, q_save;
+-
+-	hga_vram_len  = 0x08000;
+-
+-	if (!devm_request_mem_region(&pdev->dev, 0xb0000, hga_vram_len, "hgafb")) {
+-		dev_err(&pdev->dev, "cannot reserve video memory at 0xb0000\n");
+-		return -EBUSY;
+-	}
+-
+-	hga_vram = ioremap(0xb0000, hga_vram_len);
+-	if (!hga_vram)
+-		return -ENOMEM;
+-
+-	if (request_region(0x3b0, 12, "hgafb"))
+-		release_io_ports = 1;
+-	if (request_region(0x3bf, 1, "hgafb"))
+-		release_io_port = 1;
+-
+-	/* do a memory check */
+-
+-	p = hga_vram;
+-	q = hga_vram + 0x01000;
+-
+-	p_save = readw(p); q_save = readw(q);
+-
+-	writew(0xaa55, p); if (readw(p) == 0xaa55) count++;
+-	writew(0x55aa, p); if (readw(p) == 0x55aa) count++;
+-	writew(p_save, p);
+-
+-	if (count != 2)
+-		goto error;
+-
+-	/* Ok, there is definitely a card registering at the correct
+-	 * memory location, so now we do an I/O port test.
+-	 */
+-
+-	if (!test_hga_b(0x66, 0x0f))	    /* cursor low register */
+-		goto error;
+-
+-	if (!test_hga_b(0x99, 0x0f))     /* cursor low register */
+-		goto error;
+-
+-	/* See if the card is a Hercules, by checking whether the vsync
+-	 * bit of the status register is changing.  This test lasts for
+-	 * approximately 1/10th of a second.
+-	 */
+-
+-	p_save = q_save = inb_p(HGA_STATUS_PORT) & HGA_STATUS_VSYNC;
+-
+-	for (count=0; count < 50000 && p_save == q_save; count++) {
+-		q_save = inb(HGA_STATUS_PORT) & HGA_STATUS_VSYNC;
+-		udelay(2);
+-	}
+-
+-	if (p_save == q_save)
+-		goto error;
+-
+-	switch (inb_p(HGA_STATUS_PORT) & 0x70) {
+-		case 0x10:
+-			hga_type = TYPE_HERCPLUS;
+-			hga_type_name = "HerculesPlus";
+-			break;
+-		case 0x50:
+-			hga_type = TYPE_HERCCOLOR;
+-			hga_type_name = "HerculesColor";
+-			break;
+-		default:
+-			hga_type = TYPE_HERC;
+-			hga_type_name = "Hercules";
+-			break;
+-	}
+-	return 0;
+-error:
+-	if (release_io_ports)
+-		release_region(0x3b0, 12);
+-	if (release_io_port)
+-		release_region(0x3bf, 1);
+-
+-	iounmap(hga_vram);
+-
+-	pr_err("hgafb: HGA card not detected.\n");
+-
+-	return -EINVAL;
+-}
+-
+-/**
+- *	hgafb_open - open the framebuffer device
+- *	@info: pointer to fb_info object containing info for current hga board
+- *	@init: open by console system or userland.
+- *
+- *	Returns: %0
+- */
+-
+-static int hgafb_open(struct fb_info *info, int init)
+-{
+-	hga_gfx_mode();
+-	hga_clear_screen();
+-	if (!nologo) hga_show_logo(info);
+-	return 0;
+-}
+-
+-/**
+- *	hgafb_release - open the framebuffer device
+- *	@info: pointer to fb_info object containing info for current hga board
+- *	@init: open by console system or userland.
+- *
+- *	Returns: %0
+- */
+-
+-static int hgafb_release(struct fb_info *info, int init)
+-{
+-	hga_txt_mode();
+-	hga_clear_screen();
+-	return 0;
+-}
+-
+-/**
+- *	hgafb_setcolreg - set color registers
+- *	@regno:register index to set
+- *	@red:red value, unused
+- *	@green:green value, unused
+- *	@blue:blue value, unused
+- *	@transp:transparency value, unused
+- *	@info:unused
+- *
+- *	This callback function is used to set the color registers of a HGA
+- *	board. Since we have only two fixed colors only @regno is checked.
+- *	A zero is returned on success and 1 for failure.
+- *
+- *	Returns: %0
+- */
+-
+-static int hgafb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
+-			   u_int transp, struct fb_info *info)
+-{
+-	if (regno > 1)
+-		return 1;
+-	return 0;
+-}
+-
+-/**
+- *	hgafb_pan_display - pan or wrap the display
+- *	@var:contains new xoffset, yoffset and vmode values
+- *	@info:pointer to fb_info object containing info for current hga board
+- *
+- *	This function looks only at xoffset, yoffset and the %FB_VMODE_YWRAP
+- *	flag in @var. If input parameters are correct it calls hga_pan() to
+- *	program the hardware. @info->var is updated to the new values.
+- *
+- *	Returns: %0 on success or %-EINVAL for failure.
+- */
+-
+-static int hgafb_pan_display(struct fb_var_screeninfo *var,
+-			     struct fb_info *info)
+-{
+-	if (var->vmode & FB_VMODE_YWRAP) {
+-		if (var->yoffset >= info->var.yres_virtual ||
+-		    var->xoffset)
+-			return -EINVAL;
+-	} else {
+-		if (var->xoffset + info->var.xres > info->var.xres_virtual
+-		 || var->yoffset + info->var.yres > info->var.yres_virtual
+-		 || var->yoffset % 8)
+-			return -EINVAL;
+-	}
+-
+-	hga_pan(var->xoffset, var->yoffset);
+-	return 0;
+-}
+-
+-/**
+- *	hgafb_blank - (un)blank the screen
+- *	@blank_mode:blanking method to use
+- *	@info:unused
+- *
+- *	Blank the screen if blank_mode != 0, else unblank.
+- *	Implements VESA suspend and powerdown modes on hardware that supports
+- *	disabling hsync/vsync:
+- *		@blank_mode == 2 means suspend vsync,
+- *		@blank_mode == 3 means suspend hsync,
+- *		@blank_mode == 4 means powerdown.
+- *
+- * Returns: %0
+- */
+-
+-static int hgafb_blank(int blank_mode, struct fb_info *info)
+-{
+-	hga_blank(blank_mode);
+-	return 0;
+-}
+-
+-/*
+- * Accel functions
+- */
+-static void hgafb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+-{
+-	u_int rows, y;
+-	u8 __iomem *dest;
+-
+-	y = rect->dy;
+-
+-	for (rows = rect->height; rows--; y++) {
+-		dest = rowaddr(info, y) + (rect->dx >> 3);
+-		switch (rect->rop) {
+-		case ROP_COPY:
+-			memset_io(dest, rect->color, (rect->width >> 3));
+-			break;
+-		case ROP_XOR:
+-			fb_writeb(~(fb_readb(dest)), dest);
+-			break;
+-		}
+-	}
+-}
+-
+-static void hgafb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+-{
+-	u_int rows, y1, y2;
+-	u8 __iomem *src;
+-	u8 __iomem *dest;
+-
+-	if (area->dy <= area->sy) {
+-		y1 = area->sy;
+-		y2 = area->dy;
+-
+-		for (rows = area->height; rows--; ) {
+-			src = rowaddr(info, y1) + (area->sx >> 3);
+-			dest = rowaddr(info, y2) + (area->dx >> 3);
+-			memmove(dest, src, (area->width >> 3));
+-			y1++;
+-			y2++;
+-		}
+-	} else {
+-		y1 = area->sy + area->height - 1;
+-		y2 = area->dy + area->height - 1;
+-
+-		for (rows = area->height; rows--;) {
+-			src = rowaddr(info, y1) + (area->sx >> 3);
+-			dest = rowaddr(info, y2) + (area->dx >> 3);
+-			memmove(dest, src, (area->width >> 3));
+-			y1--;
+-			y2--;
+-		}
+-	}
+-}
+-
+-static void hgafb_imageblit(struct fb_info *info, const struct fb_image *image)
+-{
+-	u8 __iomem *dest;
+-	u8 *cdat = (u8 *) image->data;
+-	u_int rows, y = image->dy;
+-	u_int x;
+-	u8 d;
+-
+-	for (rows = image->height; rows--; y++) {
+-		for (x = 0; x < image->width; x+= 8) {
+-			d = *cdat++;
+-			dest = rowaddr(info, y) + ((image->dx + x)>> 3);
+-			fb_writeb(d, dest);
+-		}
+-	}
+-}
+-
+-static const struct fb_ops hgafb_ops = {
+-	.owner		= THIS_MODULE,
+-	.fb_open	= hgafb_open,
+-	.fb_release	= hgafb_release,
+-	__FB_DEFAULT_IOMEM_OPS_RDWR,
+-	.fb_setcolreg	= hgafb_setcolreg,
+-	.fb_pan_display	= hgafb_pan_display,
+-	.fb_blank	= hgafb_blank,
+-	.fb_fillrect	= hgafb_fillrect,
+-	.fb_copyarea	= hgafb_copyarea,
+-	.fb_imageblit	= hgafb_imageblit,
+-	__FB_DEFAULT_IOMEM_OPS_MMAP,
+-};
+-
+-/* ------------------------------------------------------------------------- *
+- *
+- * Functions in fb_info
+- *
+- * ------------------------------------------------------------------------- */
+-
+-/* ------------------------------------------------------------------------- */
+-
+-	/*
+-	 *  Initialization
+-	 */
+-
+-static int hgafb_probe(struct platform_device *pdev)
+-{
+-	struct fb_info *info;
+-	int ret;
+-
+-	ret = hga_card_detect(pdev);
+-	if (ret)
+-		return ret;
+-
+-	printk(KERN_INFO "hgafb: %s with %ldK of memory detected.\n",
+-		hga_type_name, hga_vram_len/1024);
+-
+-	info = framebuffer_alloc(0, &pdev->dev);
+-	if (!info) {
+-		iounmap(hga_vram);
+-		return -ENOMEM;
+-	}
+-
+-	hga_fix.smem_start = (unsigned long)hga_vram;
+-	hga_fix.smem_len = hga_vram_len;
+-
+-	info->flags = FBINFO_HWACCEL_YPAN;
+-	info->var = hga_default_var;
+-	info->fix = hga_fix;
+-	info->monspecs.hfmin = 0;
+-	info->monspecs.hfmax = 0;
+-	info->monspecs.vfmin = 10000;
+-	info->monspecs.vfmax = 10000;
+-	info->monspecs.dpms = 0;
+-	info->fbops = &hgafb_ops;
+-	info->screen_base = hga_vram;
+-
+-        if (register_framebuffer(info) < 0) {
+-		framebuffer_release(info);
+-		iounmap(hga_vram);
+-		return -EINVAL;
+-	}
+-
+-	fb_info(info, "%s frame buffer device\n", info->fix.id);
+-	platform_set_drvdata(pdev, info);
+-	return 0;
+-}
+-
+-static void hgafb_remove(struct platform_device *pdev)
+-{
+-	struct fb_info *info = platform_get_drvdata(pdev);
+-
+-	hga_txt_mode();
+-	hga_clear_screen();
+-
+-	if (info) {
+-		unregister_framebuffer(info);
+-		framebuffer_release(info);
+-	}
+-
+-	iounmap(hga_vram);
+-
+-	if (release_io_ports)
+-		release_region(0x3b0, 12);
+-
+-	if (release_io_port)
+-		release_region(0x3bf, 1);
+-}
+-
+-static struct platform_driver hgafb_driver = {
+-	.probe = hgafb_probe,
+-	.remove = hgafb_remove,
+-	.driver = {
+-		.name = "hgafb",
+-	},
+-};
+-
+-static struct platform_device *hgafb_device;
+-
+-static int __init hgafb_init(void)
+-{
+-	int ret;
+-
+-	if (fb_get_options("hgafb", NULL))
+-		return -ENODEV;
+-
+-	ret = platform_driver_register(&hgafb_driver);
+-
+-	if (!ret) {
+-		hgafb_device = platform_device_register_simple("hgafb", 0, NULL, 0);
+-
+-		if (IS_ERR(hgafb_device)) {
+-			platform_driver_unregister(&hgafb_driver);
+-			ret = PTR_ERR(hgafb_device);
+-		}
+-	}
+-
+-	return ret;
+-}
+-
+-static void __exit hgafb_exit(void)
+-{
+-	platform_device_unregister(hgafb_device);
+-	platform_driver_unregister(&hgafb_driver);
+-}
+-
+-/* -------------------------------------------------------------------------
+- *
+- *  Modularization
+- *
+- * ------------------------------------------------------------------------- */
+-
+-MODULE_AUTHOR("Ferenc Bakonyi <fero@drama.obuda.kando.hu>");
+-MODULE_DESCRIPTION("FBDev driver for Hercules Graphics Adaptor");
+-MODULE_LICENSE("GPL");
+-
+-module_param(nologo, bool, 0);
+-MODULE_PARM_DESC(nologo, "Disables startup logo if != 0 (default=0)");
+-module_init(hgafb_init);
+-module_exit(hgafb_exit);
+diff --git a/drivers/video/fbdev/vga16fb.c b/drivers/video/fbdev/vga16fb.c
+deleted file mode 100644
+index 22085d366..000000000
+--- a/drivers/video/fbdev/vga16fb.c
++++ /dev/null
+@@ -1,1442 +0,0 @@
+-/*
+- * linux/drivers/video/vga16.c -- VGA 16-color framebuffer driver
+- *
+- * Copyright 1999 Ben Pfaff <pfaffben@debian.org> and Petr Vandrovec <VANDROVE@vc.cvut.cz>
+- * Based on VGA info at http://www.goodnet.com/~tinara/FreeVGA/home.htm
+- * Based on VESA framebuffer (c) 1998 Gerd Knorr <kraxel@goldbach.in-berlin.de>
+- *
+- * This file is subject to the terms and conditions of the GNU General
+- * Public License.  See the file COPYING in the main directory of this
+- * archive for more details.
+- */
+-
+-#include <linux/aperture.h>
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/errno.h>
+-#include <linux/string.h>
+-#include <linux/mm.h>
+-#include <linux/delay.h>
+-#include <linux/fb.h>
+-#include <linux/ioport.h>
+-#include <linux/init.h>
+-#include <linux/platform_device.h>
+-#include <linux/sysfb.h>
+-
+-#include <asm/io.h>
+-#include <video/vga.h>
+-
+-#define MODE_SKIP4	1
+-#define MODE_8BPP	2
+-#define MODE_CFB	4
+-#define MODE_TEXT	8
+-
+-/* --------------------------------------------------------------------- */
+-
+-/*
+- * card parameters
+- */
+-
+-struct vga16fb_par {
+-	/* structure holding original VGA register settings when the
+-           screen is blanked */
+-	struct {
+-		unsigned char	SeqCtrlIndex;	  /* Sequencer Index reg.   */
+-		unsigned char	CrtCtrlIndex;	  /* CRT-Contr. Index reg.  */
+-		unsigned char	CrtMiscIO;	  /* Miscellaneous register */
+-		unsigned char	HorizontalTotal;  /* CRT-Controller:00h */
+-		unsigned char	HorizDisplayEnd;  /* CRT-Controller:01h */
+-		unsigned char	StartHorizRetrace;/* CRT-Controller:04h */
+-		unsigned char	EndHorizRetrace;  /* CRT-Controller:05h */
+-		unsigned char	Overflow;	  /* CRT-Controller:07h */
+-		unsigned char	StartVertRetrace; /* CRT-Controller:10h */
+-		unsigned char	EndVertRetrace;	  /* CRT-Controller:11h */
+-		unsigned char	ModeControl;	  /* CRT-Controller:17h */
+-		unsigned char	ClockingMode;	  /* Seq-Controller:01h */
+-	} vga_state;
+-	struct vgastate state;
+-	unsigned int ref_count;
+-	int palette_blanked, vesa_blanked, mode, isVGA;
+-	u8 misc, pel_msk, vss, clkdiv;
+-	u8 crtc[VGA_CRT_C];
+-};
+-
+-/* --------------------------------------------------------------------- */
+-
+-static struct fb_var_screeninfo vga16fb_defined = {
+-	.xres		= 640,
+-	.yres		= 480,
+-	.xres_virtual	= 640,
+-	.yres_virtual	= 480,
+-	.bits_per_pixel	= 4,
+-	.activate	= FB_ACTIVATE_TEST,
+-	.height		= -1,
+-	.width		= -1,
+-	.pixclock	= 39721,
+-	.left_margin	= 48,
+-	.right_margin	= 16,
+-	.upper_margin	= 33,
+-	.lower_margin	= 10,
+-	.hsync_len 	= 96,
+-	.vsync_len	= 2,
+-	.vmode		= FB_VMODE_NONINTERLACED,
+-};
+-
+-/* name should not depend on EGA/VGA */
+-static const struct fb_fix_screeninfo vga16fb_fix = {
+-	.id		= "VGA16 VGA",
+-	.smem_start	= VGA_FB_PHYS_BASE,
+-	.smem_len	= VGA_FB_PHYS_SIZE,
+-	.type		= FB_TYPE_VGA_PLANES,
+-	.type_aux	= FB_AUX_VGA_PLANES_VGA4,
+-	.visual		= FB_VISUAL_PSEUDOCOLOR,
+-	.xpanstep	= 8,
+-	.ypanstep	= 1,
+-	.line_length	= 640 / 8,
+-	.accel		= FB_ACCEL_NONE
+-};
+-
+-/* The VGA's weird architecture often requires that we read a byte and
+-   write a byte to the same location.  It doesn't matter *what* byte
+-   we write, however.  This is because all the action goes on behind
+-   the scenes in the VGA's 32-bit latch register, and reading and writing
+-   video memory just invokes latch behavior.
+-
+-   To avoid race conditions (is this necessary?), reading and writing
+-   the memory byte should be done with a single instruction.  One
+-   suitable instruction is the x86 bitwise OR.  The following
+-   read-modify-write routine should optimize to one such bitwise
+-   OR. */
+-static inline void rmw(volatile char __iomem *p)
+-{
+-	readb(p);
+-	writeb(1, p);
+-}
+-
+-/* Set the Graphics Mode Register, and return its previous value.
+-   Bits 0-1 are write mode, bit 3 is read mode. */
+-static inline int setmode(int mode)
+-{
+-	int oldmode;
+-
+-	oldmode = vga_io_rgfx(VGA_GFX_MODE);
+-	vga_io_w(VGA_GFX_D, mode);
+-	return oldmode;
+-}
+-
+-/* Select the Bit Mask Register and return its value. */
+-static inline int selectmask(void)
+-{
+-	return vga_io_rgfx(VGA_GFX_BIT_MASK);
+-}
+-
+-/* Set the value of the Bit Mask Register.  It must already have been
+-   selected with selectmask(). */
+-static inline void setmask(int mask)
+-{
+-	vga_io_w(VGA_GFX_D, mask);
+-}
+-
+-/* Set the Data Rotate Register and return its old value.
+-   Bits 0-2 are rotate count, bits 3-4 are logical operation
+-   (0=NOP, 1=AND, 2=OR, 3=XOR). */
+-static inline int setop(int op)
+-{
+-	int oldop;
+-
+-	oldop = vga_io_rgfx(VGA_GFX_DATA_ROTATE);
+-	vga_io_w(VGA_GFX_D, op);
+-	return oldop;
+-}
+-
+-/* Set the Enable Set/Reset Register and return its old value.
+-   The code here always uses value 0xf for this register. */
+-static inline int setsr(int sr)
+-{
+-	int oldsr;
+-
+-	oldsr = vga_io_rgfx(VGA_GFX_SR_ENABLE);
+-	vga_io_w(VGA_GFX_D, sr);
+-	return oldsr;
+-}
+-
+-/* Set the Set/Reset Register and return its old value. */
+-static inline int setcolor(int color)
+-{
+-	int oldcolor;
+-
+-	oldcolor = vga_io_rgfx(VGA_GFX_SR_VALUE);
+-	vga_io_w(VGA_GFX_D, color);
+-	return oldcolor;
+-}
+-
+-/* Return the value in the Graphics Address Register. */
+-static inline int getindex(void)
+-{
+-	return vga_io_r(VGA_GFX_I);
+-}
+-
+-/* Set the value in the Graphics Address Register. */
+-static inline void setindex(int index)
+-{
+-	vga_io_w(VGA_GFX_I, index);
+-}
+-
+-/* Check if the video mode is supported by the driver */
+-static inline int check_mode_supported(const struct screen_info *si)
+-{
+-	unsigned int type = screen_info_video_type(si);
+-
+-	/* only EGA and VGA in 16 color graphic mode are supported */
+-	if (type != VIDEO_TYPE_EGAC && type != VIDEO_TYPE_VGAC)
+-		return -ENODEV;
+-
+-	if (si->orig_video_mode != 0x0D &&	/* 320x200/4 (EGA) */
+-	    si->orig_video_mode != 0x0E &&	/* 640x200/4 (EGA) */
+-	    si->orig_video_mode != 0x10 &&	/* 640x350/4 (EGA) */
+-	    si->orig_video_mode != 0x12)	/* 640x480/4 (VGA) */
+-		return -ENODEV;
+-
+-	return 0;
+-}
+-
+-static void vga16fb_pan_var(struct fb_info *info,
+-			    struct fb_var_screeninfo *var)
+-{
+-	struct vga16fb_par *par = info->par;
+-	u32 xoffset, pos;
+-
+-	xoffset = var->xoffset;
+-	if (info->var.bits_per_pixel == 8) {
+-		pos = (info->var.xres_virtual * var->yoffset + xoffset) >> 2;
+-	} else if (par->mode & MODE_TEXT) {
+-		int fh = 16; // FIXME !!! font height. Fugde for now.
+-		pos = (info->var.xres_virtual * (var->yoffset / fh) + xoffset) >> 3;
+-	} else {
+-		if (info->var.nonstd)
+-			xoffset--;
+-		pos = (info->var.xres_virtual * var->yoffset + xoffset) >> 3;
+-	}
+-	vga_io_wcrt(VGA_CRTC_START_HI, pos >> 8);
+-	vga_io_wcrt(VGA_CRTC_START_LO, pos & 0xFF);
+-	/* if we support CFB4, then we must! support xoffset with pixel
+-	 * granularity if someone supports xoffset in bit resolution */
+-	vga_io_r(VGA_IS1_RC);		/* reset flip-flop */
+-	vga_io_w(VGA_ATT_IW, VGA_ATC_PEL);
+-	if (info->var.bits_per_pixel == 8)
+-		vga_io_w(VGA_ATT_IW, (xoffset & 3) << 1);
+-	else
+-		vga_io_w(VGA_ATT_IW, xoffset & 7);
+-	vga_io_r(VGA_IS1_RC);
+-	vga_io_w(VGA_ATT_IW, 0x20);
+-}
+-
+-static void vga16fb_update_fix(struct fb_info *info)
+-{
+-	if (info->var.bits_per_pixel == 4) {
+-		if (info->var.nonstd) {
+-			info->fix.type = FB_TYPE_PACKED_PIXELS;
+-			info->fix.line_length = info->var.xres_virtual / 2;
+-		} else {
+-			info->fix.type = FB_TYPE_VGA_PLANES;
+-			info->fix.type_aux = FB_AUX_VGA_PLANES_VGA4;
+-			info->fix.line_length = info->var.xres_virtual / 8;
+-		}
+-	} else if (info->var.bits_per_pixel == 0) {
+-		info->fix.type = FB_TYPE_TEXT;
+-		info->fix.type_aux = FB_AUX_TEXT_CGA;
+-		info->fix.line_length = info->var.xres_virtual / 4;
+-	} else {	/* 8bpp */
+-		if (info->var.nonstd) {
+-			info->fix.type = FB_TYPE_VGA_PLANES;
+-			info->fix.type_aux = FB_AUX_VGA_PLANES_CFB8;
+-			info->fix.line_length = info->var.xres_virtual / 4;
+-		} else {
+-			info->fix.type = FB_TYPE_PACKED_PIXELS;
+-			info->fix.line_length = info->var.xres_virtual;
+-		}
+-	}
+-}
+-
+-static void vga16fb_clock_chip(struct vga16fb_par *par,
+-			       unsigned int *pixclock,
+-			       const struct fb_info *info,
+-			       int mul, int div)
+-{
+-	static const struct {
+-		u32 pixclock;
+-		u8  misc;
+-		u8  seq_clock_mode;
+-	} *ptr, *best, vgaclocks[] = {
+-		{ 79442 /* 12.587 */, 0x00, 0x08},
+-		{ 70616 /* 14.161 */, 0x04, 0x08},
+-		{ 39721 /* 25.175 */, 0x00, 0x00},
+-		{ 35308 /* 28.322 */, 0x04, 0x00},
+-		{     0 /* bad */,    0x00, 0x00}};
+-	int err;
+-
+-	*pixclock = (*pixclock * mul) / div;
+-	best = vgaclocks;
+-	err = *pixclock - best->pixclock;
+-	if (err < 0) err = -err;
+-	for (ptr = vgaclocks + 1; ptr->pixclock; ptr++) {
+-		int tmp;
+-
+-		tmp = *pixclock - ptr->pixclock;
+-		if (tmp < 0) tmp = -tmp;
+-		if (tmp < err) {
+-			err = tmp;
+-			best = ptr;
+-		}
+-	}
+-	par->misc |= best->misc;
+-	par->clkdiv = best->seq_clock_mode;
+-	*pixclock = (best->pixclock * div) / mul;
+-}
+-
+-#define FAIL(X) return -EINVAL
+-
+-static int vga16fb_open(struct fb_info *info, int user)
+-{
+-	struct vga16fb_par *par = info->par;
+-
+-	if (!par->ref_count) {
+-		memset(&par->state, 0, sizeof(struct vgastate));
+-		par->state.flags = VGA_SAVE_FONTS | VGA_SAVE_MODE |
+-			VGA_SAVE_CMAP;
+-		save_vga(&par->state);
+-	}
+-	par->ref_count++;
+-
+-	return 0;
+-}
+-
+-static int vga16fb_release(struct fb_info *info, int user)
+-{
+-	struct vga16fb_par *par = info->par;
+-
+-	if (!par->ref_count)
+-		return -EINVAL;
+-
+-	if (par->ref_count == 1)
+-		restore_vga(&par->state);
+-	par->ref_count--;
+-
+-	return 0;
+-}
+-
+-static int vga16fb_check_var(struct fb_var_screeninfo *var,
+-			     struct fb_info *info)
+-{
+-	struct vga16fb_par *par = info->par;
+-	u32 xres, right, hslen, left, xtotal;
+-	u32 yres, lower, vslen, upper, ytotal;
+-	u32 vxres, xoffset, vyres, yoffset;
+-	u32 pos;
+-	u8 r7, rMode;
+-	int shift;
+-	int mode;
+-	u32 maxmem;
+-
+-	par->pel_msk = 0xFF;
+-
+-	if (var->bits_per_pixel == 4) {
+-		if (var->nonstd) {
+-			if (!par->isVGA)
+-				return -EINVAL;
+-			shift = 3;
+-			mode = MODE_SKIP4 | MODE_CFB;
+-			maxmem = 16384;
+-			par->pel_msk = 0x0F;
+-		} else {
+-			shift = 3;
+-			mode = 0;
+-			maxmem = 65536;
+-		}
+-	} else if (var->bits_per_pixel == 8) {
+-		if (!par->isVGA)
+-			return -EINVAL;	/* no support on EGA */
+-		shift = 2;
+-		if (var->nonstd) {
+-			mode = MODE_8BPP | MODE_CFB;
+-			maxmem = 65536;
+-		} else {
+-			mode = MODE_SKIP4 | MODE_8BPP | MODE_CFB;
+-			maxmem = 16384;
+-		}
+-	} else
+-		return -EINVAL;
+-
+-	xres = (var->xres + 7) & ~7;
+-	vxres = (var->xres_virtual + 0xF) & ~0xF;
+-	xoffset = (var->xoffset + 7) & ~7;
+-	left = (var->left_margin + 7) & ~7;
+-	right = (var->right_margin + 7) & ~7;
+-	hslen = (var->hsync_len + 7) & ~7;
+-
+-	if (vxres < xres)
+-		vxres = xres;
+-	if (xres + xoffset > vxres)
+-		xoffset = vxres - xres;
+-
+-	var->xres = xres;
+-	var->right_margin = right;
+-	var->hsync_len = hslen;
+-	var->left_margin = left;
+-	var->xres_virtual = vxres;
+-	var->xoffset = xoffset;
+-
+-	xres >>= shift;
+-	right >>= shift;
+-	hslen >>= shift;
+-	left >>= shift;
+-	vxres >>= shift;
+-	xtotal = xres + right + hslen + left;
+-	if (xtotal >= 256)
+-		FAIL("xtotal too big");
+-	if (hslen > 32)
+-		FAIL("hslen too big");
+-	if (right + hslen + left > 64)
+-		FAIL("hblank too big");
+-	par->crtc[VGA_CRTC_H_TOTAL] = xtotal - 5;
+-	par->crtc[VGA_CRTC_H_BLANK_START] = xres - 1;
+-	par->crtc[VGA_CRTC_H_DISP] = xres - 1;
+-	pos = xres + right;
+-	par->crtc[VGA_CRTC_H_SYNC_START] = pos;
+-	pos += hslen;
+-	par->crtc[VGA_CRTC_H_SYNC_END] = pos & 0x1F;
+-	pos += left - 2; /* blank_end + 2 <= total + 5 */
+-	par->crtc[VGA_CRTC_H_BLANK_END] = (pos & 0x1F) | 0x80;
+-	if (pos & 0x20)
+-		par->crtc[VGA_CRTC_H_SYNC_END] |= 0x80;
+-
+-	yres = var->yres;
+-	lower = var->lower_margin;
+-	vslen = var->vsync_len;
+-	upper = var->upper_margin;
+-	vyres = var->yres_virtual;
+-	yoffset = var->yoffset;
+-
+-	if (yres > vyres)
+-		vyres = yres;
+-	if (vxres * vyres > maxmem) {
+-		vyres = maxmem / vxres;
+-		if (vyres < yres)
+-			return -ENOMEM;
+-	}
+-	if (yoffset + yres > vyres)
+-		yoffset = vyres - yres;
+-	var->yres = yres;
+-	var->lower_margin = lower;
+-	var->vsync_len = vslen;
+-	var->upper_margin = upper;
+-	var->yres_virtual = vyres;
+-	var->yoffset = yoffset;
+-
+-	if (var->vmode & FB_VMODE_DOUBLE) {
+-		yres <<= 1;
+-		lower <<= 1;
+-		vslen <<= 1;
+-		upper <<= 1;
+-	}
+-	ytotal = yres + lower + vslen + upper;
+-	if (ytotal > 1024) {
+-		ytotal >>= 1;
+-		yres >>= 1;
+-		lower >>= 1;
+-		vslen >>= 1;
+-		upper >>= 1;
+-		rMode = 0x04;
+-	} else
+-		rMode = 0x00;
+-	if (ytotal > 1024)
+-		FAIL("ytotal too big");
+-	if (vslen > 16)
+-		FAIL("vslen too big");
+-	par->crtc[VGA_CRTC_V_TOTAL] = ytotal - 2;
+-	r7 = 0x10;	/* disable linecompare */
+-	if (ytotal & 0x100) r7 |= 0x01;
+-	if (ytotal & 0x200) r7 |= 0x20;
+-	par->crtc[VGA_CRTC_PRESET_ROW] = 0;
+-	par->crtc[VGA_CRTC_MAX_SCAN] = 0x40;	/* 1 scanline, no linecmp */
+-	if (var->vmode & FB_VMODE_DOUBLE)
+-		par->crtc[VGA_CRTC_MAX_SCAN] |= 0x80;
+-	par->crtc[VGA_CRTC_CURSOR_START] = 0x20;
+-	par->crtc[VGA_CRTC_CURSOR_END]   = 0x00;
+-	if ((mode & (MODE_CFB | MODE_8BPP)) == MODE_CFB)
+-		xoffset--;
+-	pos = yoffset * vxres + (xoffset >> shift);
+-	par->crtc[VGA_CRTC_START_HI]     = pos >> 8;
+-	par->crtc[VGA_CRTC_START_LO]     = pos & 0xFF;
+-	par->crtc[VGA_CRTC_CURSOR_HI]    = 0x00;
+-	par->crtc[VGA_CRTC_CURSOR_LO]    = 0x00;
+-	pos = yres - 1;
+-	par->crtc[VGA_CRTC_V_DISP_END] = pos & 0xFF;
+-	par->crtc[VGA_CRTC_V_BLANK_START] = pos & 0xFF;
+-	if (pos & 0x100)
+-		r7 |= 0x0A;	/* 0x02 -> DISP_END, 0x08 -> BLANK_START */
+-	if (pos & 0x200) {
+-		r7 |= 0x40;	/* 0x40 -> DISP_END */
+-		par->crtc[VGA_CRTC_MAX_SCAN] |= 0x20; /* BLANK_START */
+-	}
+-	pos += lower;
+-	par->crtc[VGA_CRTC_V_SYNC_START] = pos & 0xFF;
+-	if (pos & 0x100)
+-		r7 |= 0x04;
+-	if (pos & 0x200)
+-		r7 |= 0x80;
+-	pos += vslen;
+-	par->crtc[VGA_CRTC_V_SYNC_END] = (pos & 0x0F) & ~0x10; /* disabled IRQ */
+-	pos += upper - 1; /* blank_end + 1 <= ytotal + 2 */
+-	par->crtc[VGA_CRTC_V_BLANK_END] = pos & 0xFF; /* 0x7F for original VGA,
+-                     but some SVGA chips requires all 8 bits to set */
+-	if (vxres >= 512)
+-		FAIL("vxres too long");
+-	par->crtc[VGA_CRTC_OFFSET] = vxres >> 1;
+-	if (mode & MODE_SKIP4)
+-		par->crtc[VGA_CRTC_UNDERLINE] = 0x5F;	/* 256, cfb8 */
+-	else
+-		par->crtc[VGA_CRTC_UNDERLINE] = 0x1F;	/* 16, vgap */
+-	par->crtc[VGA_CRTC_MODE] = rMode | ((mode & MODE_TEXT) ? 0xA3 : 0xE3);
+-	par->crtc[VGA_CRTC_LINE_COMPARE] = 0xFF;
+-	par->crtc[VGA_CRTC_OVERFLOW] = r7;
+-
+-	par->vss = 0x00;	/* 3DA */
+-
+-	par->misc = 0xE3;	/* enable CPU, ports 0x3Dx, positive sync */
+-	if (var->sync & FB_SYNC_HOR_HIGH_ACT)
+-		par->misc &= ~0x40;
+-	if (var->sync & FB_SYNC_VERT_HIGH_ACT)
+-		par->misc &= ~0x80;
+-
+-	par->mode = mode;
+-
+-	if (mode & MODE_8BPP)
+-		/* pixel clock == vga clock / 2 */
+-		vga16fb_clock_chip(par, &var->pixclock, info, 1, 2);
+-	else
+-		/* pixel clock == vga clock */
+-		vga16fb_clock_chip(par, &var->pixclock, info, 1, 1);
+-
+-	var->red.offset = var->green.offset = var->blue.offset =
+-	var->transp.offset = 0;
+-	var->red.length = var->green.length = var->blue.length =
+-		(par->isVGA) ? 6 : 2;
+-	var->transp.length = 0;
+-	var->activate = FB_ACTIVATE_NOW;
+-	var->height = -1;
+-	var->width = -1;
+-	var->accel_flags = 0;
+-	return 0;
+-}
+-#undef FAIL
+-
+-static int vga16fb_set_par(struct fb_info *info)
+-{
+-	struct vga16fb_par *par = info->par;
+-	u8 gdc[VGA_GFX_C];
+-	u8 seq[VGA_SEQ_C];
+-	u8 atc[VGA_ATT_C];
+-	int fh, i;
+-
+-	seq[VGA_SEQ_CLOCK_MODE] = 0x01 | par->clkdiv;
+-	if (par->mode & MODE_TEXT)
+-		seq[VGA_SEQ_PLANE_WRITE] = 0x03;
+-	else
+-		seq[VGA_SEQ_PLANE_WRITE] = 0x0F;
+-	seq[VGA_SEQ_CHARACTER_MAP] = 0x00;
+-	if (par->mode & MODE_TEXT)
+-		seq[VGA_SEQ_MEMORY_MODE] = 0x03;
+-	else if (par->mode & MODE_SKIP4)
+-		seq[VGA_SEQ_MEMORY_MODE] = 0x0E;
+-	else
+-		seq[VGA_SEQ_MEMORY_MODE] = 0x06;
+-
+-	gdc[VGA_GFX_SR_VALUE] = 0x00;
+-	gdc[VGA_GFX_SR_ENABLE] = 0x00;
+-	gdc[VGA_GFX_COMPARE_VALUE] = 0x00;
+-	gdc[VGA_GFX_DATA_ROTATE] = 0x00;
+-	gdc[VGA_GFX_PLANE_READ] = 0;
+-	if (par->mode & MODE_TEXT) {
+-		gdc[VGA_GFX_MODE] = 0x10;
+-		gdc[VGA_GFX_MISC] = 0x06;
+-	} else {
+-		if (par->mode & MODE_CFB)
+-			gdc[VGA_GFX_MODE] = 0x40;
+-		else
+-			gdc[VGA_GFX_MODE] = 0x00;
+-		gdc[VGA_GFX_MISC] = 0x05;
+-	}
+-	gdc[VGA_GFX_COMPARE_MASK] = 0x0F;
+-	gdc[VGA_GFX_BIT_MASK] = 0xFF;
+-
+-	for (i = 0x00; i < 0x10; i++)
+-		atc[i] = i;
+-	if (par->mode & MODE_TEXT)
+-		atc[VGA_ATC_MODE] = 0x04;
+-	else if (par->mode & MODE_8BPP)
+-		atc[VGA_ATC_MODE] = 0x41;
+-	else
+-		atc[VGA_ATC_MODE] = 0x81;
+-	atc[VGA_ATC_OVERSCAN] = 0x00;	/* 0 for EGA, 0xFF for VGA */
+-	atc[VGA_ATC_PLANE_ENABLE] = 0x0F;
+-	if (par->mode & MODE_8BPP)
+-		atc[VGA_ATC_PEL] = (info->var.xoffset & 3) << 1;
+-	else
+-		atc[VGA_ATC_PEL] = info->var.xoffset & 7;
+-	atc[VGA_ATC_COLOR_PAGE] = 0x00;
+-
+-	if (par->mode & MODE_TEXT) {
+-		fh = 16; // FIXME !!! Fudge font height.
+-		par->crtc[VGA_CRTC_MAX_SCAN] = (par->crtc[VGA_CRTC_MAX_SCAN]
+-					       & ~0x1F) | (fh - 1);
+-	}
+-
+-	vga_io_w(VGA_MIS_W, vga_io_r(VGA_MIS_R) | 0x01);
+-
+-	/* Enable graphics register modification */
+-	if (!par->isVGA) {
+-		vga_io_w(EGA_GFX_E0, 0x00);
+-		vga_io_w(EGA_GFX_E1, 0x01);
+-	}
+-
+-	/* update misc output register */
+-	vga_io_w(VGA_MIS_W, par->misc);
+-
+-	/* synchronous reset on */
+-	vga_io_wseq(0x00, 0x01);
+-
+-	if (par->isVGA)
+-		vga_io_w(VGA_PEL_MSK, par->pel_msk);
+-
+-	/* write sequencer registers */
+-	vga_io_wseq(VGA_SEQ_CLOCK_MODE, seq[VGA_SEQ_CLOCK_MODE] | 0x20);
+-	for (i = 2; i < VGA_SEQ_C; i++) {
+-		vga_io_wseq(i, seq[i]);
+-	}
+-
+-	/* synchronous reset off */
+-	vga_io_wseq(0x00, 0x03);
+-
+-	/* deprotect CRT registers 0-7 */
+-	vga_io_wcrt(VGA_CRTC_V_SYNC_END, par->crtc[VGA_CRTC_V_SYNC_END]);
+-
+-	/* write CRT registers */
+-	for (i = 0; i < VGA_CRTC_REGS; i++) {
+-		vga_io_wcrt(i, par->crtc[i]);
+-	}
+-
+-	/* write graphics controller registers */
+-	for (i = 0; i < VGA_GFX_C; i++) {
+-		vga_io_wgfx(i, gdc[i]);
+-	}
+-
+-	/* write attribute controller registers */
+-	for (i = 0; i < VGA_ATT_C; i++) {
+-		vga_io_r(VGA_IS1_RC);		/* reset flip-flop */
+-		vga_io_wattr(i, atc[i]);
+-	}
+-
+-	/* Wait for screen to stabilize. */
+-	mdelay(50);
+-
+-	vga_io_wseq(VGA_SEQ_CLOCK_MODE, seq[VGA_SEQ_CLOCK_MODE]);
+-
+-	vga_io_r(VGA_IS1_RC);
+-	vga_io_w(VGA_ATT_IW, 0x20);
+-
+-	vga16fb_update_fix(info);
+-	return 0;
+-}
+-
+-static void ega16_setpalette(int regno, unsigned red, unsigned green, unsigned blue)
+-{
+-	static const unsigned char map[] = { 000, 001, 010, 011 };
+-	int val;
+-
+-	if (regno >= 16)
+-		return;
+-	val = map[red>>14] | ((map[green>>14]) << 1) | ((map[blue>>14]) << 2);
+-	vga_io_r(VGA_IS1_RC);   /* ! 0x3BA */
+-	vga_io_wattr(regno, val);
+-	vga_io_r(VGA_IS1_RC);   /* some clones need it */
+-	vga_io_w(VGA_ATT_IW, 0x20); /* unblank screen */
+-}
+-
+-static void vga16_setpalette(int regno, unsigned red, unsigned green, unsigned blue)
+-{
+-	outb(regno,       VGA_PEL_IW);
+-	outb(red   >> 10, VGA_PEL_D);
+-	outb(green >> 10, VGA_PEL_D);
+-	outb(blue  >> 10, VGA_PEL_D);
+-}
+-
+-static int vga16fb_setcolreg(unsigned regno, unsigned red, unsigned green,
+-			     unsigned blue, unsigned transp,
+-			     struct fb_info *info)
+-{
+-	struct vga16fb_par *par = info->par;
+-	int gray;
+-
+-	/*
+-	 *  Set a single color register. The values supplied are
+-	 *  already rounded down to the hardware's capabilities
+-	 *  (according to the entries in the `var' structure). Return
+-	 *  != 0 for invalid regno.
+-	 */
+-
+-	if (regno >= 256)
+-		return 1;
+-
+-	gray = info->var.grayscale;
+-
+-	if (gray) {
+-		/* gray = 0.30*R + 0.59*G + 0.11*B */
+-		red = green = blue = (red * 77 + green * 151 + blue * 28) >> 8;
+-	}
+-	if (par->isVGA)
+-		vga16_setpalette(regno,red,green,blue);
+-	else
+-		ega16_setpalette(regno,red,green,blue);
+-	return 0;
+-}
+-
+-static int vga16fb_pan_display(struct fb_var_screeninfo *var,
+-			       struct fb_info *info)
+-{
+-	vga16fb_pan_var(info, var);
+-	return 0;
+-}
+-
+-/* The following VESA blanking code is taken from vgacon.c.  The VGA
+-   blanking code was originally by Huang shi chao, and modified by
+-   Christoph Rimek (chrimek@toppoint.de) and todd j. derr
+-   (tjd@barefoot.org) for Linux. */
+-
+-static void vga_vesa_blank(struct vga16fb_par *par, int mode)
+-{
+-	unsigned char SeqCtrlIndex = vga_io_r(VGA_SEQ_I);
+-	unsigned char CrtCtrlIndex = vga_io_r(VGA_CRT_IC);
+-
+-	/* save original values of VGA controller registers */
+-	if(!par->vesa_blanked) {
+-		par->vga_state.CrtMiscIO = vga_io_r(VGA_MIS_R);
+-		//sti();
+-
+-		par->vga_state.HorizontalTotal = vga_io_rcrt(0x00);	/* HorizontalTotal */
+-		par->vga_state.HorizDisplayEnd = vga_io_rcrt(0x01);	/* HorizDisplayEnd */
+-		par->vga_state.StartHorizRetrace = vga_io_rcrt(0x04);	/* StartHorizRetrace */
+-		par->vga_state.EndHorizRetrace = vga_io_rcrt(0x05);	/* EndHorizRetrace */
+-		par->vga_state.Overflow = vga_io_rcrt(0x07);		/* Overflow */
+-		par->vga_state.StartVertRetrace = vga_io_rcrt(0x10);	/* StartVertRetrace */
+-		par->vga_state.EndVertRetrace = vga_io_rcrt(0x11);	/* EndVertRetrace */
+-		par->vga_state.ModeControl = vga_io_rcrt(0x17);	/* ModeControl */
+-		par->vga_state.ClockingMode = vga_io_rseq(0x01);	/* ClockingMode */
+-	}
+-
+-	/* assure that video is enabled */
+-	/* "0x20" is VIDEO_ENABLE_bit in register 01 of sequencer */
+-	vga_io_wseq(0x01, par->vga_state.ClockingMode | 0x20);
+-
+-	/* test for vertical retrace in process.... */
+-	if ((par->vga_state.CrtMiscIO & 0x80) == 0x80)
+-		vga_io_w(VGA_MIS_W, par->vga_state.CrtMiscIO & 0xef);
+-
+-	/*
+-	 * Set <End of vertical retrace> to minimum (0) and
+-	 * <Start of vertical Retrace> to maximum (incl. overflow)
+-	 * Result: turn off vertical sync (VSync) pulse.
+-	 */
+-	if (mode & FB_BLANK_VSYNC_SUSPEND) {
+-		vga_io_wcrt(VGA_CRTC_V_SYNC_START, 0xff);
+-		vga_io_wcrt(VGA_CRTC_V_SYNC_END, 0x40);
+-		/* bits 9,10 of vert. retrace */
+-		vga_io_wcrt(VGA_CRTC_OVERFLOW, par->vga_state.Overflow | 0x84);
+-	}
+-
+-	if (mode & FB_BLANK_HSYNC_SUSPEND) {
+-		/*
+-		 * Set <End of horizontal retrace> to minimum (0) and
+-		 *  <Start of horizontal Retrace> to maximum
+-		 * Result: turn off horizontal sync (HSync) pulse.
+-		 */
+-		vga_io_wcrt(VGA_CRTC_H_SYNC_START, 0xff);
+-		vga_io_wcrt(VGA_CRTC_H_SYNC_END, 0x00);
+-	}
+-
+-	/* restore both index registers */
+-	outb_p(SeqCtrlIndex, VGA_SEQ_I);
+-	outb_p(CrtCtrlIndex, VGA_CRT_IC);
+-}
+-
+-static void vga_vesa_unblank(struct vga16fb_par *par)
+-{
+-	unsigned char SeqCtrlIndex = vga_io_r(VGA_SEQ_I);
+-	unsigned char CrtCtrlIndex = vga_io_r(VGA_CRT_IC);
+-
+-	/* restore original values of VGA controller registers */
+-	vga_io_w(VGA_MIS_W, par->vga_state.CrtMiscIO);
+-
+-	/* HorizontalTotal */
+-	vga_io_wcrt(0x00, par->vga_state.HorizontalTotal);
+-	/* HorizDisplayEnd */
+-	vga_io_wcrt(0x01, par->vga_state.HorizDisplayEnd);
+-	/* StartHorizRetrace */
+-	vga_io_wcrt(0x04, par->vga_state.StartHorizRetrace);
+-	/* EndHorizRetrace */
+-	vga_io_wcrt(0x05, par->vga_state.EndHorizRetrace);
+-	/* Overflow */
+-	vga_io_wcrt(0x07, par->vga_state.Overflow);
+-	/* StartVertRetrace */
+-	vga_io_wcrt(0x10, par->vga_state.StartVertRetrace);
+-	/* EndVertRetrace */
+-	vga_io_wcrt(0x11, par->vga_state.EndVertRetrace);
+-	/* ModeControl */
+-	vga_io_wcrt(0x17, par->vga_state.ModeControl);
+-	/* ClockingMode */
+-	vga_io_wseq(0x01, par->vga_state.ClockingMode);
+-
+-	/* restore index/control registers */
+-	vga_io_w(VGA_SEQ_I, SeqCtrlIndex);
+-	vga_io_w(VGA_CRT_IC, CrtCtrlIndex);
+-}
+-
+-static void vga_pal_blank(void)
+-{
+-	int i;
+-
+-	for (i=0; i<16; i++) {
+-		outb_p(i, VGA_PEL_IW);
+-		outb_p(0, VGA_PEL_D);
+-		outb_p(0, VGA_PEL_D);
+-		outb_p(0, VGA_PEL_D);
+-	}
+-}
+-
+-/* 0 unblank, 1 blank, 2 no vsync, 3 no hsync, 4 off */
+-static int vga16fb_blank(int blank, struct fb_info *info)
+-{
+-	struct vga16fb_par *par = info->par;
+-
+-	switch (blank) {
+-	case FB_BLANK_UNBLANK:				/* Unblank */
+-		if (par->vesa_blanked) {
+-			vga_vesa_unblank(par);
+-			par->vesa_blanked = 0;
+-		}
+-		if (par->palette_blanked) {
+-			par->palette_blanked = 0;
+-		}
+-		break;
+-	case FB_BLANK_NORMAL:				/* blank */
+-		vga_pal_blank();
+-		par->palette_blanked = 1;
+-		break;
+-	default:			/* VESA blanking */
+-		vga_vesa_blank(par, blank);
+-		par->vesa_blanked = 1;
+-		break;
+-	}
+-	return 0;
+-}
+-
+-static void vga_8planes_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+-{
+-	u32 dx = rect->dx, width = rect->width;
+-        char oldindex = getindex();
+-        char oldmode = setmode(0x40);
+-        char oldmask = selectmask();
+-        int line_ofs, height;
+-        char oldop, oldsr;
+-        char __iomem *where;
+-
+-        dx /= 4;
+-        where = info->screen_base + dx + rect->dy * info->fix.line_length;
+-
+-        if (rect->rop == ROP_COPY) {
+-                oldop = setop(0);
+-                oldsr = setsr(0);
+-
+-                width /= 4;
+-                line_ofs = info->fix.line_length - width;
+-                setmask(0xff);
+-
+-                height = rect->height;
+-
+-                while (height--) {
+-                        int x;
+-
+-                        /* we can do memset... */
+-                        for (x = width; x > 0; --x) {
+-                                writeb(rect->color, where);
+-                                where++;
+-                        }
+-                        where += line_ofs;
+-                }
+-        } else {
+-                char oldcolor = setcolor(0xf);
+-                int y;
+-
+-                oldop = setop(0x18);
+-                oldsr = setsr(0xf);
+-                setmask(0x0F);
+-                for (y = 0; y < rect->height; y++) {
+-                        rmw(where);
+-                        rmw(where+1);
+-                        where += info->fix.line_length;
+-                }
+-                setcolor(oldcolor);
+-        }
+-        setmask(oldmask);
+-        setsr(oldsr);
+-        setop(oldop);
+-        setmode(oldmode);
+-        setindex(oldindex);
+-}
+-
+-static void vga16fb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
+-{
+-	int x, x2, y2, vxres, vyres, width, height, line_ofs;
+-	char __iomem *dst;
+-
+-	vxres = info->var.xres_virtual;
+-	vyres = info->var.yres_virtual;
+-
+-	if (!rect->width || !rect->height || rect->dx > vxres || rect->dy > vyres)
+-		return;
+-
+-	/* We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly. */
+-
+-	x2 = rect->dx + rect->width;
+-	y2 = rect->dy + rect->height;
+-	x2 = x2 < vxres ? x2 : vxres;
+-	y2 = y2 < vyres ? y2 : vyres;
+-	width = x2 - rect->dx;
+-
+-	switch (info->fix.type) {
+-	case FB_TYPE_VGA_PLANES:
+-		if (info->fix.type_aux == FB_AUX_VGA_PLANES_VGA4) {
+-
+-			height = y2 - rect->dy;
+-			width = rect->width/8;
+-
+-			line_ofs = info->fix.line_length - width;
+-			dst = info->screen_base + (rect->dx/8) + rect->dy * info->fix.line_length;
+-
+-			switch (rect->rop) {
+-			case ROP_COPY:
+-				setmode(0);
+-				setop(0);
+-				setsr(0xf);
+-				setcolor(rect->color);
+-				selectmask();
+-
+-				setmask(0xff);
+-
+-				while (height--) {
+-					for (x = 0; x < width; x++) {
+-						writeb(0, dst);
+-						dst++;
+-					}
+-					dst += line_ofs;
+-				}
+-				break;
+-			case ROP_XOR:
+-				setmode(0);
+-				setop(0x18);
+-				setsr(0xf);
+-				setcolor(0xf);
+-				selectmask();
+-
+-				setmask(0xff);
+-				while (height--) {
+-					for (x = 0; x < width; x++) {
+-						rmw(dst);
+-						dst++;
+-					}
+-					dst += line_ofs;
+-				}
+-				break;
+-			}
+-		} else
+-			vga_8planes_fillrect(info, rect);
+-		break;
+-	case FB_TYPE_PACKED_PIXELS:
+-	default:
+-		cfb_fillrect(info, rect);
+-		break;
+-	}
+-}
+-
+-static void vga_8planes_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+-{
+-        char oldindex = getindex();
+-        char oldmode = setmode(0x41);
+-        char oldop = setop(0);
+-        char oldsr = setsr(0xf);
+-        int height, line_ofs, x;
+-	u32 sx, dx, width;
+-	char __iomem *dest;
+-	char __iomem *src;
+-
+-        height = area->height;
+-
+-        sx = area->sx / 4;
+-        dx = area->dx / 4;
+-        width = area->width / 4;
+-
+-        if (area->dy < area->sy || (area->dy == area->sy && dx < sx)) {
+-                line_ofs = info->fix.line_length - width;
+-                dest = info->screen_base + dx + area->dy * info->fix.line_length;
+-                src = info->screen_base + sx + area->sy * info->fix.line_length;
+-                while (height--) {
+-                        for (x = 0; x < width; x++) {
+-                                readb(src);
+-                                writeb(0, dest);
+-                                src++;
+-                                dest++;
+-                        }
+-                        src += line_ofs;
+-                        dest += line_ofs;
+-                }
+-        } else {
+-                line_ofs = info->fix.line_length - width;
+-                dest = info->screen_base + dx + width +
+-			(area->dy + height - 1) * info->fix.line_length;
+-                src = info->screen_base + sx + width +
+-			(area->sy + height - 1) * info->fix.line_length;
+-                while (height--) {
+-                        for (x = 0; x < width; x++) {
+-                                --src;
+-                                --dest;
+-                                readb(src);
+-                                writeb(0, dest);
+-                        }
+-                        src -= line_ofs;
+-                        dest -= line_ofs;
+-                }
+-        }
+-
+-        setsr(oldsr);
+-        setop(oldop);
+-        setmode(oldmode);
+-        setindex(oldindex);
+-}
+-
+-static void vga16fb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
+-{
+-	u32 dx = area->dx, dy = area->dy, sx = area->sx, sy = area->sy;
+-	int x, x2, y2, old_dx, old_dy, vxres, vyres;
+-	int height, width, line_ofs;
+-	char __iomem *dst = NULL;
+-	char __iomem *src = NULL;
+-
+-	vxres = info->var.xres_virtual;
+-	vyres = info->var.yres_virtual;
+-
+-	if (area->dx > vxres || area->sx > vxres || area->dy > vyres ||
+-	    area->sy > vyres)
+-		return;
+-
+-	/* clip the destination */
+-	old_dx = area->dx;
+-	old_dy = area->dy;
+-
+-	/*
+-	 * We could use hardware clipping but on many cards you get around
+-	 * hardware clipping by writing to framebuffer directly.
+-	 */
+-	x2 = area->dx + area->width;
+-	y2 = area->dy + area->height;
+-	dx = area->dx > 0 ? area->dx : 0;
+-	dy = area->dy > 0 ? area->dy : 0;
+-	x2 = x2 < vxres ? x2 : vxres;
+-	y2 = y2 < vyres ? y2 : vyres;
+-	width = x2 - dx;
+-	height = y2 - dy;
+-
+-	if (sx + dx < old_dx || sy + dy < old_dy)
+-		return;
+-
+-	/* update sx1,sy1 */
+-	sx += (dx - old_dx);
+-	sy += (dy - old_dy);
+-
+-	/* the source must be completely inside the virtual screen */
+-	if (sx + width > vxres || sy + height > vyres)
+-		return;
+-
+-	switch (info->fix.type) {
+-	case FB_TYPE_VGA_PLANES:
+-		if (info->fix.type_aux == FB_AUX_VGA_PLANES_VGA4) {
+-			width = width/8;
+-			line_ofs = info->fix.line_length - width;
+-
+-			setmode(1);
+-			setop(0);
+-			setsr(0xf);
+-
+-			if (dy < sy || (dy == sy && dx < sx)) {
+-				dst = info->screen_base + (dx/8) + dy * info->fix.line_length;
+-				src = info->screen_base + (sx/8) + sy * info->fix.line_length;
+-				while (height--) {
+-					for (x = 0; x < width; x++) {
+-						readb(src);
+-						writeb(0, dst);
+-						dst++;
+-						src++;
+-					}
+-					src += line_ofs;
+-					dst += line_ofs;
+-				}
+-			} else {
+-				dst = info->screen_base + (dx/8) + width +
+-					(dy + height - 1) * info->fix.line_length;
+-				src = info->screen_base + (sx/8) + width +
+-					(sy + height  - 1) * info->fix.line_length;
+-				while (height--) {
+-					for (x = 0; x < width; x++) {
+-						dst--;
+-						src--;
+-						readb(src);
+-						writeb(0, dst);
+-					}
+-					src -= line_ofs;
+-					dst -= line_ofs;
+-				}
+-			}
+-		} else
+-			vga_8planes_copyarea(info, area);
+-		break;
+-	case FB_TYPE_PACKED_PIXELS:
+-	default:
+-		cfb_copyarea(info, area);
+-		break;
+-	}
+-}
+-
+-#define TRANS_MASK_LOW  {0x0,0x8,0x4,0xC,0x2,0xA,0x6,0xE,0x1,0x9,0x5,0xD,0x3,0xB,0x7,0xF}
+-#define TRANS_MASK_HIGH {0x000, 0x800, 0x400, 0xC00, 0x200, 0xA00, 0x600, 0xE00, \
+-			 0x100, 0x900, 0x500, 0xD00, 0x300, 0xB00, 0x700, 0xF00}
+-
+-#if defined(__LITTLE_ENDIAN)
+-static const u16 transl_l[] = TRANS_MASK_LOW;
+-static const u16 transl_h[] = TRANS_MASK_HIGH;
+-#elif defined(__BIG_ENDIAN)
+-static const u16 transl_l[] = TRANS_MASK_HIGH;
+-static const u16 transl_h[] = TRANS_MASK_LOW;
+-#else
+-#error "Only __BIG_ENDIAN and __LITTLE_ENDIAN are supported in vga-planes"
+-#endif
+-
+-static void vga_8planes_imageblit(struct fb_info *info, const struct fb_image *image)
+-{
+-        char oldindex = getindex();
+-        char oldmode = setmode(0x40);
+-        char oldop = setop(0);
+-        char oldsr = setsr(0);
+-        char oldmask = selectmask();
+-	const unsigned char *cdat = image->data;
+-	u32 dx = image->dx;
+-        char __iomem *where;
+-        int y;
+-
+-        dx /= 4;
+-        where = info->screen_base + dx + image->dy * info->fix.line_length;
+-
+-        setmask(0xff);
+-        writeb(image->bg_color, where);
+-        readb(where);
+-        selectmask();
+-        setmask(image->fg_color ^ image->bg_color);
+-        setmode(0x42);
+-        setop(0x18);
+-        for (y = 0; y < image->height; y++, where += info->fix.line_length)
+-                writew(transl_h[cdat[y]&0xF] | transl_l[cdat[y] >> 4], where);
+-        setmask(oldmask);
+-        setsr(oldsr);
+-        setop(oldop);
+-        setmode(oldmode);
+-        setindex(oldindex);
+-}
+-
+-static void vga_imageblit_expand(struct fb_info *info, const struct fb_image *image)
+-{
+-	char __iomem *where = info->screen_base + (image->dx/8) +
+-		image->dy * info->fix.line_length;
+-	struct vga16fb_par *par = info->par;
+-	char *cdat = (char *) image->data;
+-	char __iomem *dst;
+-	int x, y;
+-
+-	switch (info->fix.type) {
+-	case FB_TYPE_VGA_PLANES:
+-		if (info->fix.type_aux == FB_AUX_VGA_PLANES_VGA4) {
+-			if (par->isVGA) {
+-				setmode(2);
+-				setop(0);
+-				setsr(0xf);
+-				setcolor(image->fg_color);
+-				selectmask();
+-
+-				setmask(0xff);
+-				writeb(image->bg_color, where);
+-				rmb();
+-				readb(where); /* fill latches */
+-				setmode(3);
+-				wmb();
+-				for (y = 0; y < image->height; y++) {
+-					dst = where;
+-					for (x = image->width/8; x--;)
+-						writeb(*cdat++, dst++);
+-					where += info->fix.line_length;
+-				}
+-				wmb();
+-			} else {
+-				setmode(0);
+-				setop(0);
+-				setsr(0xf);
+-				setcolor(image->bg_color);
+-				selectmask();
+-
+-				setmask(0xff);
+-				for (y = 0; y < image->height; y++) {
+-					dst = where;
+-					for (x=image->width/8; x--;){
+-						rmw(dst);
+-						setcolor(image->fg_color);
+-						selectmask();
+-						if (*cdat) {
+-							setmask(*cdat++);
+-							rmw(dst++);
+-						}
+-					}
+-					where += info->fix.line_length;
+-				}
+-			}
+-		} else
+-			vga_8planes_imageblit(info, image);
+-		break;
+-	case FB_TYPE_PACKED_PIXELS:
+-	default:
+-		cfb_imageblit(info, image);
+-		break;
+-	}
+-}
+-
+-static void vga_imageblit_color(struct fb_info *info, const struct fb_image *image)
+-{
+-	/*
+-	 * Draw logo
+-	 */
+-	struct vga16fb_par *par = info->par;
+-	char __iomem *where =
+-		info->screen_base + image->dy * info->fix.line_length +
+-		image->dx/8;
+-	const char *cdat = image->data;
+-	char __iomem *dst;
+-	int x, y;
+-
+-	switch (info->fix.type) {
+-	case FB_TYPE_VGA_PLANES:
+-		if (info->fix.type_aux == FB_AUX_VGA_PLANES_VGA4 &&
+-		    par->isVGA) {
+-			setsr(0xf);
+-			setop(0);
+-			setmode(0);
+-
+-			for (y = 0; y < image->height; y++) {
+-				for (x = 0; x < image->width; x++) {
+-					dst = where + x/8;
+-
+-					setcolor(*cdat);
+-					selectmask();
+-					setmask(1 << (7 - (x % 8)));
+-					fb_readb(dst);
+-					fb_writeb(0, dst);
+-
+-					cdat++;
+-				}
+-				where += info->fix.line_length;
+-			}
+-		}
+-		break;
+-	case FB_TYPE_PACKED_PIXELS:
+-		cfb_imageblit(info, image);
+-		break;
+-	default:
+-		break;
+-	}
+-}
+-
+-static void vga16fb_imageblit(struct fb_info *info, const struct fb_image *image)
+-{
+-	if (image->depth == 1)
+-		vga_imageblit_expand(info, image);
+-	else
+-		vga_imageblit_color(info, image);
+-}
+-
+-static void vga16fb_destroy(struct fb_info *info)
+-{
+-	iounmap(info->screen_base);
+-	fb_dealloc_cmap(&info->cmap);
+-	/* XXX unshare VGA regions */
+-	framebuffer_release(info);
+-}
+-
+-static const struct fb_ops vga16fb_ops = {
+-	.owner		= THIS_MODULE,
+-	.fb_open        = vga16fb_open,
+-	.fb_release     = vga16fb_release,
+-	__FB_DEFAULT_IOMEM_OPS_RDWR,
+-	.fb_destroy	= vga16fb_destroy,
+-	.fb_check_var	= vga16fb_check_var,
+-	.fb_set_par	= vga16fb_set_par,
+-	.fb_setcolreg 	= vga16fb_setcolreg,
+-	.fb_pan_display = vga16fb_pan_display,
+-	.fb_blank 	= vga16fb_blank,
+-	.fb_fillrect	= vga16fb_fillrect,
+-	.fb_copyarea	= vga16fb_copyarea,
+-	.fb_imageblit	= vga16fb_imageblit,
+-	__FB_DEFAULT_IOMEM_OPS_MMAP,
+-};
+-
+-static int vga16fb_probe(struct platform_device *dev)
+-{
+-	struct sysfb_display_info *dpy;
+-	struct screen_info *si;
+-	struct fb_info *info;
+-	struct vga16fb_par *par;
+-	int i;
+-	int ret = 0;
+-
+-	dpy = dev_get_platdata(&dev->dev);
+-	if (!dpy)
+-		return -ENODEV;
+-	si = &dpy->screen;
+-
+-	ret = check_mode_supported(si);
+-	if (ret)
+-		return ret;
+-
+-	dev_dbg(&dev->dev, "initializing\n");
+-	if (!request_mem_region(vga16fb_fix.smem_start, vga16fb_fix.smem_len,
+-				"vga16b")) {
+-		dev_err(&dev->dev, "cannot reserve video memory at 0x%lx\n",
+-		       vga16fb_fix.smem_start);
+-	}
+-	info = framebuffer_alloc(sizeof(struct vga16fb_par), &dev->dev);
+-
+-	if (!info) {
+-		ret = -ENOMEM;
+-		goto err_fb_alloc;
+-	}
+-
+-	/* XXX share VGA_FB_PHYS_BASE and I/O region with vgacon and others */
+-	info->screen_base = (void __iomem *)VGA_MAP_MEM(VGA_FB_PHYS_BASE, 0);
+-
+-	if (!info->screen_base) {
+-		dev_err(&dev->dev, "unable to map device\n");
+-		ret = -ENOMEM;
+-		goto err_ioremap;
+-	}
+-
+-	dev_info(&dev->dev, "mapped to 0x%p\n", info->screen_base);
+-	par = info->par;
+-
+-	par->isVGA = screen_info_video_type(si) == VIDEO_TYPE_VGAC;
+-	par->palette_blanked = 0;
+-	par->vesa_blanked = 0;
+-
+-	i = par->isVGA? 6 : 2;
+-
+-	vga16fb_defined.red.length   = i;
+-	vga16fb_defined.green.length = i;
+-	vga16fb_defined.blue.length  = i;
+-
+-	/* name should not depend on EGA/VGA */
+-	info->fbops = &vga16fb_ops;
+-	info->var = vga16fb_defined;
+-	info->fix = vga16fb_fix;
+-	/* supports rectangles with widths of multiples of 8 */
+-	bitmap_zero(info->pixmap.blit_x, FB_MAX_BLIT_WIDTH);
+-	set_bit(8 - 1, info->pixmap.blit_x);
+-	set_bit(16 - 1, info->pixmap.blit_x);
+-	set_bit(24 - 1, info->pixmap.blit_x);
+-	set_bit(32 - 1, info->pixmap.blit_x);
+-	info->flags = FBINFO_HWACCEL_YPAN;
+-
+-	i = (info->var.bits_per_pixel == 8) ? 256 : 16;
+-	ret = fb_alloc_cmap(&info->cmap, i, 0);
+-	if (ret) {
+-		dev_err(&dev->dev, "unable to allocate colormap\n");
+-		ret = -ENOMEM;
+-		goto err_alloc_cmap;
+-	}
+-
+-	if (vga16fb_check_var(&info->var, info)) {
+-		dev_err(&dev->dev, "unable to validate variable\n");
+-		ret = -EINVAL;
+-		goto err_check_var;
+-	}
+-
+-	vga16fb_update_fix(info);
+-
+-	ret = devm_aperture_acquire_for_platform_device(dev, VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
+-	if (ret)
+-		goto err_check_var;
+-	if (register_framebuffer(info) < 0) {
+-		dev_err(&dev->dev, "unable to register framebuffer\n");
+-		ret = -EINVAL;
+-		goto err_check_var;
+-	}
+-
+-	fb_info(info, "%s frame buffer device\n", info->fix.id);
+-	platform_set_drvdata(dev, info);
+-
+-	return 0;
+-
+- err_check_var:
+-	fb_dealloc_cmap(&info->cmap);
+- err_alloc_cmap:
+-	iounmap(info->screen_base);
+- err_ioremap:
+-	framebuffer_release(info);
+- err_fb_alloc:
+-	release_mem_region(vga16fb_fix.smem_start,
+-		    vga16fb_fix.smem_len);
+-	return ret;
+-}
+-
+-static void vga16fb_remove(struct platform_device *dev)
+-{
+-	struct fb_info *info = platform_get_drvdata(dev);
+-
+-	if (info)
+-		unregister_framebuffer(info);
+-	release_mem_region(vga16fb_fix.smem_start,
+-		    vga16fb_fix.smem_len);
+-}
+-
+-static const struct platform_device_id vga16fb_driver_id_table[] = {
+-	{"ega-framebuffer", 0},
+-	{"vga-framebuffer", 0},
+-	{ }
+-};
+-MODULE_DEVICE_TABLE(platform, vga16fb_driver_id_table);
+-
+-static struct platform_driver vga16fb_driver = {
+-	.probe = vga16fb_probe,
+-	.remove = vga16fb_remove,
+-	.driver = {
+-		.name = "vga16fb",
+-	},
+-	.id_table = vga16fb_driver_id_table,
+-};
+-
+-module_platform_driver(vga16fb_driver);
+-
+-MODULE_DESCRIPTION("Legacy VGA framebuffer device driver");
+-MODULE_LICENSE("GPL");
+-- 
+2.54.0
 
-I thoght it was a bit clearer (and less risky given bearer_disable()
-is called from many points)
-to focus only on tipc_disable_l2_media()
 
