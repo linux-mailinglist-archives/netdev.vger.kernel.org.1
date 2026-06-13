@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-298893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298894-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lvczNqHJLGpuWQQAu9opvQ
-	(envelope-from <netdev+bounces-298893-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:08:17 +0200
+	id EgfOK7/JLGpwWQQAu9opvQ
+	(envelope-from <netdev+bounces-298894-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:08:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7719A67D962
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:08:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4DC67D967
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 05:08:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
 	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298893-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298893-lists+netdev=lfdr.de@vger.kernel.org";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298894-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298894-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF6053017E6B
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:08:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 187253129717
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D00A3A7F41;
-	Sat, 13 Jun 2026 03:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2196A3A3E72;
+	Sat, 13 Jun 2026 03:07:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6F73A6B8D;
-	Sat, 13 Jun 2026 03:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C8B239E9B;
+	Sat, 13 Jun 2026 03:07:37 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781320055; cv=none; b=EqZscVgERAk4XQ+lGRSugKcv0UGEi8/t647N1U1ltwNNbdhenxvYfa96oYvrKXNdsFXUrZy6U4srUVdSTm9Hoa62cYsHP9NtH7SZQy9z6LfSFUIo/nXzyAXg3196vib0iyedFwzhtofWIplHtsBaZ+IAtSzp20hyksKIPMXfmG0=
+	t=1781320069; cv=none; b=Nnta5++BeQ7L2PB9/7MvhwUBI8Bzy1e+g3iHpwe7etQd0LquAZMbk2DZOzg7GjN831Iim/j/4a6MgTPEphlXeGfJiryWPERcEUSJEwDL+KgHX5JEnzkBjnWblYe7BHzjlXakCi7yqbZqNPyvDcGG8Xtn46RQ4ON+w8JLDglXtsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781320055; c=relaxed/simple;
-	bh=wx48HIbY2SsknzDftVqq0zsp760P8dHgoDmf/DwV/W8=;
+	s=arc-20240116; t=1781320069; c=relaxed/simple;
+	bh=qUGyM2fyJV1LutcLiBbqJMmVY1L73ex3nGq5csXCPew=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ic04KXOdhKeWDCYLlL2ieuEAvQ7rz0j0r0NyzKaNevUaKUjcHBBd83TqlI/g9RfgTFbBrwulbNeeeUTJZPlPFr3Kb5FiHNruSrn1xpm+scYereoRqnfYEDU37unwmEkl1ouaRkZ+FcigS0XiC2VgL0ougWAwx9jaEnUlvzJzloE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxlaFmnyU015yWugjTqu5LKSbwHYFRvm/GLBBKLQFacqs2jx/LEAPHYeOKoBpe+KBN3A6atzvw/yHeNghvI0CLtcjPcVbXniWydT9F9ejaxtg7KbZELvOhrbgzH0BKupDjBebbGssji05mW4WcPevNJT07kmDFCJ9m89k7RSb9U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wYEiT-000000007kE-31tR;
-	Sat, 13 Jun 2026 03:07:25 +0000
-Date: Sat, 13 Jun 2026 04:07:23 +0100
+	id 1wYEia-000000007ki-0iDf;
+	Sat, 13 Jun 2026 03:07:32 +0000
+Date: Sat, 13 Jun 2026 04:07:29 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -49,9 +49,9 @@ To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v6 3/4] net: dsa: mxl862xx: move API macros to
- mxl862xx-host.h
-Message-ID: <914f57931e79cc3932a9f32813465c08d29cf4bf.1781319534.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v6 4/4] net: dsa: mxl862xx: add support for SerDes
+ ports
+Message-ID: <736e4df02e4cb8c530c1670cbe7efac20b5d696d.1781319534.git.daniel@makrotopia.org>
 References: <cover.1781319534.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -66,16 +66,16 @@ X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DMARC_NA(0.00)[makrotopia.org];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298893-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298894-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
@@ -92,71 +92,883 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:email,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7719A67D962
+X-Rspamd-Queue-Id: 1D4DC67D967
 
-Move the MXL862XX_API_WRITE, MXL862XX_API_READ and
-MXL862XX_API_READ_QUIET convenience macros from mxl862xx.c to
-mxl862xx-host.h next to the mxl862xx_api_wrap() prototype they wrap.
-This makes them available to other compilation units that include
-mxl862xx-host.h, which is needed once the SerDes PCS code in
-mxl862xx-phylink.c also calls firmware commands.
+The MxL862xx has two XPCS/SerDes interfaces (XPCS0 for ports 9-12,
+XPCS1 for ports 13-16). Each can operate in various single-lane modes
+(SGMII, 1000Base-X, 2500Base-X, 10GBase-R, 10GBase-KR, USXGMII) or as
+QSGMII or 10G_QXGMII providing four sub-ports per interface.
 
-No functional change.
+Implement phylink PCS operations using the firmware's XPCS API:
+
+  - pcs_enable/pcs_disable: refcount the sub-ports sharing an XPCS
+    and power it down once the last sub-port is released.
+  - pcs_config: configure negotiation mode and CL37/SGMII advertising.
+  - pcs_get_state: read link state and the link-partner ability word
+    from firmware and decode using phylink's standard CL37, SGMII, and
+    USXGMII decoders.
+  - pcs_an_restart: restart CL37 or CL73 auto-negotiation.
+  - pcs_link_up: force speed/duplex for SGMII.
+  - pcs_inband_caps: report per-mode in-band status capabilities.
+
+Register a PCS instance for each SerDes interface and
+QSGMII/10G_QXGMII sub-ports during setup. Advertise the supported
+interface modes in phylink_get_caps based on port number.
+
+Firmware older than 1.0.84 lacks the XPCS API and instead configures
+the SerDes itself, using defaults stored in flash. mac_select_pcs()
+returns NULL in that case while the single-lane interface modes stay
+advertised, so a CPU port keeps working in the firmware-configured
+mode.
+
+Lacking support for expressing PHY-side role modes in Linux only the
+MAC-side of SGMII, QSGMII, USXGMII and 10G_QXGMII are implemented for
+now.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-v6: no changes
-v5: no changes
-v4: no changes
-v3: no changes
-v2: no changes
+v6:
+ * clear state->link on the pcs_get_state early-return error paths
+ * document in phylink_get_caps and in the commit message why the
+   single-lane SerDes modes stay advertised on old firmware
+ * document why pcs_config does not need to take serdes_lock
 
- drivers/net/dsa/mxl862xx/mxl862xx-host.h | 8 ++++++++
- drivers/net/dsa/mxl862xx/mxl862xx.c      | 7 -------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+v5:
+ * use FIELD_GET/FIELD_PREP and macro definitions for the bitfields
+   instead of endian-aware structs with bit-sized members
+ * do not error out on old firmware, so driver at least probes and
+   CPU port keeps working in firmware-configured mode. Issue a
+   warning instead.
 
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-host.h b/drivers/net/dsa/mxl862xx/mxl862xx-host.h
-index 84512a30bc18..66d6ae198aff 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx-host.h
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-host.h
-@@ -9,6 +9,14 @@ void mxl862xx_host_init(struct mxl862xx_priv *priv);
- void mxl862xx_host_shutdown(struct mxl862xx_priv *priv);
- int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *data, u16 size,
- 		      bool read, bool quiet);
-+
-+#define MXL862XX_API_WRITE(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false, false)
-+#define MXL862XX_API_READ(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, false)
-+#define MXL862XX_API_READ_QUIET(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, true)
-+
- int mxl862xx_reset(struct mxl862xx_priv *priv);
+v4:
+ * replace atomic_t serdes_refcount with a plain int guarded by a new
+   serdes_lock mutex; pcs_disable now holds the lock across the count
+   and the XPCS power-down so a sibling sub-port enable cannot race the
+   transition to zero (the atomic only made the counter safe, not the
+   decision-and-act)
+
+v3:
+ * replace serdes_active bitmap with atomic_t serdes_refcount
+ * defer mpcs->interface assignment until after firmware ack
+ * handle firmware error codes in pcs_config
+ * set st.usx_lane_mode in pcs_get_state
+ * set lu.usx_subport and lu.usx_lane_mode in pcs_link_up
+ * use phylink_mii_c22_pcs_encode_advertisement() in CL37 adv
+ * rework commit message
+
+v2:
+ * add __{LE,BE}_BITFIELD layouts to ABI structs
+ * per-sub-port QSGMII AN restart via usx_subport / usx_lane_mode
+ * shared-SerDes refcount in pcs_disable via per-XPCS slot bitmap
+ * let every sub-port call pcs_config
+ * cache phy_interface_t instead of firmware type
+ * skip pcs_link_up when inband-AN enabled
+ * gate phylink_get_caps SerDes modes on same FW version as select_pcs
+ * interpret xpcs_pcs_cfg.result as signed (s16)
+ * drop dead MXL862XX_PCS_PORT macro
+ * drop misleading "downshift detection" line from commit message
+
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h     | 215 +++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h     |   9 +
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.c | 399 +++++++++++++++++++-
+ drivers/net/dsa/mxl862xx/mxl862xx-phylink.h |   7 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c         |   7 +-
+ drivers/net/dsa/mxl862xx/mxl862xx.h         |  34 ++
+ 6 files changed, 668 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-api.h b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
+index fb21ddc1bf1c..a180a5decffc 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx-api.h
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
+@@ -1366,4 +1366,219 @@ struct mxl862xx_rmon_port_cnt {
+ 	__le64 tx_good_bytes;
+ } __packed;
  
- #endif /* __MXL862XX_HOST_H */
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
-index a193f3c07d35..0b1a23364eb5 100644
---- a/drivers/net/dsa/mxl862xx/mxl862xx.c
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
-@@ -24,13 +24,6 @@
- #include "mxl862xx-host.h"
++/* XPCS interface mode, MXL862XX_XPCS_*_INTERFACE field values */
++#define MXL862XX_XPCS_IF_SGMII		0
++#define MXL862XX_XPCS_IF_1000BASEX	1
++#define MXL862XX_XPCS_IF_2500BASEX	2
++#define MXL862XX_XPCS_IF_USXGMII	3	/* single or quad */
++#define MXL862XX_XPCS_IF_10GBASER	4
++#define MXL862XX_XPCS_IF_10GKR		5	/* 10GBASE-KR */
++#define MXL862XX_XPCS_IF_5GBASER	6
++#define MXL862XX_XPCS_IF_QSGMII		7
++
++/* PCS negotiation mode, MXL862XX_XPCS_CFG_NEG_MODE field values */
++#define MXL862XX_XPCS_NEG_NONE		0	/* no inband negotiation */
++#define MXL862XX_XPCS_NEG_INBAND_AN_OFF	1	/* inband, AN disabled */
++#define MXL862XX_XPCS_NEG_INBAND_AN_ON	2	/* inband, AN enabled */
++
++/*
++ * PCS protocol role, MXL862XX_XPCS_CFG_ROLE field value. Selects the role
++ * the XPCS plays in protocols with an asymmetric AN code word (Cisco SGMII
++ * / QSGMII / USXGMII), driving VR_MII_AN_CTRL.TX_CONFIG: MAC means the
++ * local end receives the partner's AN word, PHY means it sources one.
++ * Ignored for symmetric protocols (1000BASE-X, 2500BASE-X, 10GBASE-R/KR).
++ */
++#define MXL862XX_XPCS_ROLE_MAC		0	/* local end is MAC side */
++#define MXL862XX_XPCS_ROLE_PHY		1	/* local end is PHY side */
++
++/* USXGMII lane mode, MXL862XX_XPCS_*_USX_LANE_MODE field values */
++#define MXL862XX_XPCS_USX_SINGLE	0	/* single USXGMII lane */
++#define MXL862XX_XPCS_USX_QUAD		1	/* quad USXGMII, 4 ports/lane */
++
++/**
++ * union mxl862xx_xpcs_an_word - XPCS AN code word, tagged by interface mode
++ * @cl37: 16-bit base-page word exchanged over the CL37 hardware AN path
++ *        (SR_MII_AN_ADV on write, SR_MII_LP_BABL on read). Carries the
++ *        802.3 CL37 base page for 1000BASE-X/2500BASE-X and the Cisco
++ *        SGMII config word for SGMII/QSGMII.
++ * @usx: USXGMII 16-bit AN code word, MDIO_USXGMII_* layout
++ * @cl73: CL73 48-bit base page (10GBASE-KR), three 16-bit registers per
++ *        802.3 Annex 28C
++ * @cl73.adv1: CL73 SR_AN_ADV1 / SR_AN_LP_ABL1
++ * @cl73.adv2: CL73 SR_AN_ADV2 / SR_AN_LP_ABL2
++ * @cl73.adv3: CL73 SR_AN_ADV3 / SR_AN_LP_ABL3
++ *
++ * The host picks the right member based on the interface field of the
++ * surrounding struct (and, for the asymmetric protocols, on the role).
++ */
++union mxl862xx_xpcs_an_word {
++	__le16 cl37;
++	__le16 usx;
++	struct {
++		__le16 adv1;
++		__le16 adv2;
++		__le16 adv3;
++	} cl73;
++} __packed;
++
++/* PCS duplex mode, MXL862XX_XPCS_*_DUPLEX field values */
++#define MXL862XX_XPCS_DUPLEX_HALF	0
++#define MXL862XX_XPCS_DUPLEX_FULL	1
++
++/**
++ * enum mxl862xx_xpcs_loopback_mode - XPCS loopback mode
++ * @MXL862XX_XPCS_LB_DISABLE: disable all loopback
++ * @MXL862XX_XPCS_LB_PCS_SERIAL: PCS TX-to-RX serial loopback
++ * @MXL862XX_XPCS_LB_PCS_PARALLEL: PCS RX-to-TX parallel loopback
++ * @MXL862XX_XPCS_LB_PMA_SERIAL: PMA TX-to-RX serial loopback
++ * @MXL862XX_XPCS_LB_PMA_PARALLEL: PMA RX-to-TX parallel loopback
++ */
++enum mxl862xx_xpcs_loopback_mode {
++	MXL862XX_XPCS_LB_DISABLE = 0,
++	MXL862XX_XPCS_LB_PCS_SERIAL = 1,
++	MXL862XX_XPCS_LB_PCS_PARALLEL = 2,
++	MXL862XX_XPCS_LB_PMA_SERIAL = 3,
++	MXL862XX_XPCS_LB_PMA_PARALLEL = 4,
++};
++
++/* Fields of mxl862xx_xpcs_pcs_cfg.mode */
++#define MXL862XX_XPCS_CFG_PORT_ID	GENMASK(1, 0)
++#define MXL862XX_XPCS_CFG_INTERFACE	GENMASK(7, 2)
++#define MXL862XX_XPCS_CFG_NEG_MODE	GENMASK(9, 8)
++#define MXL862XX_XPCS_CFG_PERMIT_PAUSE	BIT(10)
++#define MXL862XX_XPCS_CFG_USX_LANE_MODE	GENMASK(12, 11)
++#define MXL862XX_XPCS_CFG_ROLE		BIT(13)
++#define MXL862XX_XPCS_CFG_USX_SUBPORT	GENMASK(15, 14)
++
++/**
++ * struct mxl862xx_xpcs_pcs_cfg - PCS configuration parameters
++ * @mode: Packed interface and negotiation parameters, see
++ *        MXL862XX_XPCS_CFG_*. port_id is the XPCS port index (0-3);
++ *        interface is the PCS interface mode (MXL862XX_XPCS_IF_*);
++ *        neg_mode is the negotiation mode (MXL862XX_XPCS_NEG_*);
++ *        permit_pause allows pause to MAC; usx_lane_mode is the USXGMII
++ *        lane mode (MXL862XX_XPCS_USX_*); role is the protocol role
++ *        (MXL862XX_XPCS_ROLE_*); usx_subport is the sub-port (0-3) within
++ *        the XPCS -- despite the name it also identifies the QSGMII
++ *        sub-port -- used by the firmware to set MAC pause per sub-port
++ *        and ignored for the XPCS-wide bringup, which is idempotent across
++ *        slots.
++ * @advertising: AN code word the local end transmits. The active union
++ *               member is selected by the interface field (and, for the
++ *               asymmetric protocols, by role). Ignored when the local end
++ *               does not transmit an AN word (role=MAC for SGMII/QSGMII/
++ *               USXGMII, 10GBASE-R, 5GBASE-R) or when neg_mode is not
++ *               INBAND_AN_ON. Pass all-zero to keep the firmware default
++ *               advertisement.
++ * @result: Firmware result. >0 means the host must follow with an AN
++ *          restart, 0 means no host follow-up is needed, <0 is an errno.
++ */
++struct mxl862xx_xpcs_pcs_cfg {
++	__le16 mode;
++	union mxl862xx_xpcs_an_word advertising;
++	__le16 result;
++} __packed;
++
++/* Fields of mxl862xx_xpcs_pcs_state.mode */
++#define MXL862XX_XPCS_ST_PORT_ID	GENMASK(1, 0)
++#define MXL862XX_XPCS_ST_INTERFACE	GENMASK(7, 2)
++#define MXL862XX_XPCS_ST_USX_LANE_MODE	GENMASK(9, 8)
++#define MXL862XX_XPCS_ST_USX_SUBPORT	GENMASK(11, 10)
++#define MXL862XX_XPCS_ST_LINK		BIT(12)
++#define MXL862XX_XPCS_ST_AN_COMPLETE	BIT(13)
++#define MXL862XX_XPCS_ST_DUPLEX		BIT(14)
++#define MXL862XX_XPCS_ST_PCS_FAULT	BIT(15)
++#define MXL862XX_XPCS_ST_PAUSE		GENMASK(17, 16)
++#define MXL862XX_XPCS_ST_LP_EEE_CAP	BIT(18)
++#define MXL862XX_XPCS_ST_LP_EEE_CS_CAP	BIT(19)
++
++/**
++ * struct mxl862xx_xpcs_pcs_state - PCS link state
++ * @mode: Packed input parameters and firmware status, see
++ *        MXL862XX_XPCS_ST_*. The host writes port_id (XPCS port index 0-3),
++ *        interface (MXL862XX_XPCS_IF_*), usx_lane_mode
++ *        (MXL862XX_XPCS_USX_*) and usx_subport (0-3); the firmware fills in
++ *        link, an_complete, duplex (MXL862XX_XPCS_DUPLEX_*), pcs_fault,
++ *        pause (bit 0 symmetric, bit 1 asymmetric), lp_eee_cap and
++ *        lp_eee_cs_cap.
++ * @speed: Resolved speed in Mbit/s (output)
++ * @lpa: Link partner ability word (output). Same union as
++ *       &union mxl862xx_xpcs_an_word; the host picks the member based on
++ *       the interface field.
++ */
++struct mxl862xx_xpcs_pcs_state {
++	__le32 mode;
++	__le16 speed; /* Mbit/s */
++	union mxl862xx_xpcs_an_word lpa;
++} __packed;
++
++/**
++ * struct mxl862xx_xpcs_pcs_disable - PCS disable parameters
++ * @port_id: XPCS port index
++ * @__pad: padding
++ * @result: Firmware result. 0 on success, <0 on error.
++ *
++ * Asserts IDDQ + PHY + XPCS resets to power down the SERDES when the
++ * port is admin-down or no module is plugged in. The next PCS config
++ * implicitly powers it back up and reprograms the desired interface.
++ */
++struct mxl862xx_xpcs_pcs_disable {
++	u8 port_id;
++	u8 __pad;
++	__le16 result;
++} __packed;
++
++/* Fields of mxl862xx_xpcs_an_restart.mode */
++#define MXL862XX_XPCS_ANR_PORT_ID	GENMASK(1, 0)
++#define MXL862XX_XPCS_ANR_INTERFACE	GENMASK(7, 2)
++#define MXL862XX_XPCS_ANR_USX_LANE_MODE	GENMASK(9, 8)
++#define MXL862XX_XPCS_ANR_USX_SUBPORT	GENMASK(11, 10)
++
++/**
++ * struct mxl862xx_xpcs_an_restart - AN restart parameters
++ * @mode: Packed input parameters, see MXL862XX_XPCS_ANR_*. port_id is the
++ *        XPCS port index (0-3); interface is the PCS interface mode
++ *        (MXL862XX_XPCS_IF_*); usx_lane_mode is the USX lane mode
++ *        (MXL862XX_XPCS_USX_*); usx_subport (0-3) selects the lane whose
++ *        AN is restarted for QSGMII and QUSXGMII and is ignored by
++ *        single-lane modes.
++ * @result: Firmware result. 0 on success, <0 on error.
++ *
++ * Restarts auto-negotiation on a single sub-port of the XPCS. The
++ * SERDES must already be configured.
++ */
++struct mxl862xx_xpcs_an_restart {
++	__le16 mode;
++	__le16 result;
++} __packed;
++
++/* Fields of mxl862xx_xpcs_pcs_link_up.mode */
++#define MXL862XX_XPCS_LU_PORT_ID	GENMASK(1, 0)
++#define MXL862XX_XPCS_LU_INTERFACE	GENMASK(7, 2)
++#define MXL862XX_XPCS_LU_DUPLEX		BIT(8)
++#define MXL862XX_XPCS_LU_USX_LANE_MODE	GENMASK(10, 9)
++#define MXL862XX_XPCS_LU_USX_SUBPORT	GENMASK(12, 11)
++
++/**
++ * struct mxl862xx_xpcs_pcs_link_up - PCS link-up parameters
++ * @mode: Packed input parameters, see MXL862XX_XPCS_LU_*. port_id is the
++ *        XPCS port index (0-3); interface is the PCS interface mode
++ *        (MXL862XX_XPCS_IF_*); duplex is the duplex mode
++ *        (MXL862XX_XPCS_DUPLEX_*); usx_lane_mode is the USX lane mode
++ *        (USXGMII only, ignored otherwise, MXL862XX_XPCS_USX_*);
++ *        usx_subport (0-3) selects the sub-port for QUSXGMII and QSGMII
++ *        (despite the name) and is ignored otherwise.
++ * @speed: Resolved speed in Mbit/s
++ * @result: Firmware result. 0 on success, <0 is errno.
++ *
++ * Called once per link-up event after the host has resolved the
++ * line-side speed/duplex (from the PHY's read_status, from a preceding
++ * PCS get-state, or from a fixed-link description).
++ */
++struct mxl862xx_xpcs_pcs_link_up {
++	__le16 mode;
++	__le16 speed; /* Mbit/s */
++	__le16 result;
++} __packed;
++
+ #endif /* __MXL862XX_API_H */
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
+index f1ea40aa7ea0..c87a955c13c4 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
+@@ -24,6 +24,7 @@
+ #define MXL862XX_SS_MAGIC		0x1600
+ #define GPY_GPY2XX_MAGIC		0x1800
+ #define SYS_MISC_MAGIC			0x1900
++#define MXL862XX_XPCS_MAGIC		0x1a00
+ 
+ #define MXL862XX_COMMON_CFGGET		(MXL862XX_COMMON_MAGIC + 0x9)
+ #define MXL862XX_COMMON_CFGSET		(MXL862XX_COMMON_MAGIC + 0xa)
+@@ -71,6 +72,14 @@
+ 
+ #define SYS_MISC_FW_VERSION		(SYS_MISC_MAGIC + 0x2)
+ 
++#define MXL862XX_XPCS_PCS_CONFIG	(MXL862XX_XPCS_MAGIC + 0x1)
++#define MXL862XX_XPCS_PCS_GET_STATE	(MXL862XX_XPCS_MAGIC + 0x2)
++#define MXL862XX_XPCS_PCS_DISABLE	(MXL862XX_XPCS_MAGIC + 0x4)
++#define MXL862XX_XPCS_AN_RESTART	(MXL862XX_XPCS_MAGIC + 0x5)
++#define MXL862XX_XPCS_PCS_LINK_UP	(MXL862XX_XPCS_MAGIC + 0x7)
++#define MXL862XX_XPCS_LOOPBACK		(MXL862XX_XPCS_MAGIC + 0x8)
++#define MXL862XX_XPCS_RESET		(MXL862XX_XPCS_MAGIC + 0x9)
++
+ #define MMD_API_MAXIMUM_ID		0x7fff
+ 
+ #endif /* __MXL862XX_CMD_H */
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+index f17c429d1f1d..b689652aa9b9 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.c
+@@ -7,20 +7,414 @@
+  * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
+  */
+ 
++#include <linux/bitfield.h>
++#include <linux/mutex.h>
+ #include <linux/phylink.h>
+ #include <net/dsa.h>
+ 
+ #include "mxl862xx.h"
++#include "mxl862xx-api.h"
++#include "mxl862xx-cmd.h"
++#include "mxl862xx-host.h"
  #include "mxl862xx-phylink.h"
  
--#define MXL862XX_API_WRITE(dev, cmd, data) \
--	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false, false)
--#define MXL862XX_API_READ(dev, cmd, data) \
--	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, false)
--#define MXL862XX_API_READ_QUIET(dev, cmd, data) \
--	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, true)
--
- /* Polling interval for RMON counter accumulation. At 2.5 Gbps with
-  * minimum-size (64-byte) frames, a 32-bit packet counter wraps in ~880s.
-  * 2s gives a comfortable margin.
+ void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
+ 			       struct phylink_config *config)
+ {
++	struct mxl862xx_priv *priv = ds->priv;
++
+ 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
+ 				   MAC_100 | MAC_1000 | MAC_2500FD;
+ 
+-	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+-		  config->supported_interfaces);
++	switch (port) {
++	case 1 ... 8:
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++			  config->supported_interfaces);
++		break;
++	case 9:
++	case 13:
++		/* Advertised also on old firmware lacking the XPCS API:
++		 * there the SerDes runs in its flash-configured mode
++		 * without host control (mac_select_pcs returns NULL),
++		 * keeping the CPU port working.
++		 */
++		__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_10GKR, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_USXGMII, config->supported_interfaces);
++		fallthrough;
++	case 10 ... 12:
++	case 14 ... 16:
++		if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84))
++			break;
++		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->supported_interfaces);
++
++		break;
++	default:
++		break;
++	}
++
++	if (port == 9 || port == 13)
++		config->mac_capabilities |= MAC_10000FD | MAC_5000FD;
++}
++
++static struct mxl862xx_pcs *pcs_to_mxl862xx_pcs(struct phylink_pcs *pcs)
++{
++	return container_of(pcs, struct mxl862xx_pcs, pcs);
++}
++
++static int mxl862xx_xpcs_if_mode(phy_interface_t interface)
++{
++	switch (interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++		return MXL862XX_XPCS_IF_SGMII;
++	case PHY_INTERFACE_MODE_QSGMII:
++		return MXL862XX_XPCS_IF_QSGMII;
++	case PHY_INTERFACE_MODE_1000BASEX:
++		return MXL862XX_XPCS_IF_1000BASEX;
++	case PHY_INTERFACE_MODE_2500BASEX:
++		return MXL862XX_XPCS_IF_2500BASEX;
++	case PHY_INTERFACE_MODE_USXGMII:
++	case PHY_INTERFACE_MODE_10G_QXGMII:
++		return MXL862XX_XPCS_IF_USXGMII;
++	case PHY_INTERFACE_MODE_10GBASER:
++		return MXL862XX_XPCS_IF_10GBASER;
++	case PHY_INTERFACE_MODE_10GKR:
++		return MXL862XX_XPCS_IF_10GKR;
++	default:
++		return -EINVAL;
++	}
++}
++
++static int mxl862xx_xpcs_neg_mode(unsigned int neg_mode)
++{
++	if (!(neg_mode & PHYLINK_PCS_NEG_INBAND))
++		return MXL862XX_XPCS_NEG_NONE;
++	if (neg_mode & PHYLINK_PCS_NEG_ENABLED)
++		return MXL862XX_XPCS_NEG_INBAND_AN_ON;
++	return MXL862XX_XPCS_NEG_INBAND_AN_OFF;
++}
++
++static int mxl862xx_pcs_enable(struct phylink_pcs *pcs)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++
++	/* Bringup is done idempotently by pcs_config; just account this
++	 * sub-port so pcs_disable powers the shared XPCS down only after
++	 * the last sub-port has been released.
++	 */
++	mutex_lock(&mpcs->priv->serdes_lock);
++	mpcs->priv->serdes_refcount[mpcs->serdes_id]++;
++	mutex_unlock(&mpcs->priv->serdes_lock);
++
++	return 0;
++}
++
++static void mxl862xx_pcs_disable(struct phylink_pcs *pcs)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++	struct mxl862xx_xpcs_pcs_disable dis = {};
++	struct mxl862xx_priv *priv = mpcs->priv;
++
++	dis.port_id = mpcs->serdes_id;
++
++	/* The SerDes is shared across QSGMII/QUSXGMII sub-ports; only
++	 * power it down once the last active sub-port goes away. Hold
++	 * serdes_lock across the count and the power-down so a sibling
++	 * sub-port enable cannot race the transition to zero.
++	 */
++	mutex_lock(&priv->serdes_lock);
++	if (--priv->serdes_refcount[mpcs->serdes_id] == 0)
++		MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_DISABLE, dis);
++	mutex_unlock(&priv->serdes_lock);
++}
++
++/* The XPCS firmware reports failures in the result field using its own
++ * libc errno values; ENOTSUP (134) in particular has no kernel errno.
++ * Translate the codes the firmware can actually return.
++ */
++static int mxl862xx_xpcs_errno(int result)
++{
++	switch (result) {
++	case -5:	/* firmware -EIO */
++		return -EIO;
++	case -134:	/* firmware -ENOTSUP */
++		return -EOPNOTSUPP;
++	default:	/* firmware -EINVAL and anything unexpected */
++		return -EINVAL;
++	}
++}
++
++static int mxl862xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
++			       phy_interface_t interface,
++			       const unsigned long *advertising,
++			       bool permit_pause_to_mac)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++	struct mxl862xx_priv *priv = mpcs->priv;
++	struct mxl862xx_xpcs_pcs_cfg cfg = {};
++	int if_mode, lane, ret, adv;
++
++	if_mode = mxl862xx_xpcs_if_mode(interface);
++	if (if_mode < 0) {
++		dev_err(priv->ds->dev, "unsupported interface: %s\n",
++			phy_modes(interface));
++		return if_mode;
++	}
++
++	/* The XPCS bringup is per-instance and idempotent in the
++	 * firmware: every QSGMII/QUSXGMII sub-port may call pcs_config
++	 * and the firmware will skip the bringup if the requested mode
++	 * matches the cached one, then update MAC pause for the
++	 * sub-port indicated by @usx_subport. No serdes_lock is needed
++	 * here: the refcount held since pcs_enable keeps a sibling
++	 * pcs_disable from powering the XPCS down, and pcs_disable
++	 * invalidates the firmware's cached mode so the next pcs_config
++	 * redoes the bringup.
++	 */
++	lane = (interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
++	       MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
++
++	cfg.mode = cpu_to_le16(FIELD_PREP(MXL862XX_XPCS_CFG_PORT_ID,
++					  mpcs->serdes_id) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_USX_SUBPORT,
++					  mpcs->slot) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_USX_LANE_MODE, lane) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_INTERFACE, if_mode) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_NEG_MODE,
++					  mxl862xx_xpcs_neg_mode(neg_mode)) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_ROLE,
++					  MXL862XX_XPCS_ROLE_MAC) |
++			       FIELD_PREP(MXL862XX_XPCS_CFG_PERMIT_PAUSE,
++					  permit_pause_to_mac));
++
++	if (neg_mode & PHYLINK_PCS_NEG_INBAND) {
++		adv = phylink_mii_c22_pcs_encode_advertisement(interface,
++							       advertising);
++		if (adv >= 0)
++			cfg.advertising.cl37 = cpu_to_le16(adv);
++	}
++
++	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_CONFIG, cfg);
++	if (ret)
++		return ret;
++
++	ret = (s16)le16_to_cpu(cfg.result);
++	if (ret < 0)
++		return mxl862xx_xpcs_errno(ret);
++
++	mpcs->interface = interface;
++	return ret > 0 ? 1 : 0;
++}
++
++static void mxl862xx_pcs_get_state(struct phylink_pcs *pcs,
++				   unsigned int neg_mode,
++				   struct phylink_link_state *state)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++	struct mxl862xx_priv *priv = mpcs->priv;
++	struct mxl862xx_xpcs_pcs_state st = {};
++	int if_mode, lane, ret;
++	u32 mode;
++	u16 bmsr;
++
++	if_mode = mxl862xx_xpcs_if_mode(state->interface);
++	if (if_mode < 0) {
++		state->link = false;
++		return;
++	}
++
++	lane = (state->interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
++	       MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
++
++	st.mode = cpu_to_le32(FIELD_PREP(MXL862XX_XPCS_ST_PORT_ID,
++					 mpcs->serdes_id) |
++			      FIELD_PREP(MXL862XX_XPCS_ST_INTERFACE, if_mode) |
++			      FIELD_PREP(MXL862XX_XPCS_ST_USX_SUBPORT,
++					 mpcs->slot) |
++			      FIELD_PREP(MXL862XX_XPCS_ST_USX_LANE_MODE, lane));
++
++	ret = MXL862XX_API_READ(priv, MXL862XX_XPCS_PCS_GET_STATE, st);
++	if (ret) {
++		state->link = false;
++		return;
++	}
++
++	mode = le32_to_cpu(st.mode);
++	state->link = FIELD_GET(MXL862XX_XPCS_ST_LINK, mode) &&
++		      !FIELD_GET(MXL862XX_XPCS_ST_PCS_FAULT, mode);
++	state->an_complete = FIELD_GET(MXL862XX_XPCS_ST_AN_COMPLETE, mode);
++
++	switch (state->interface) {
++	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_QSGMII:
++		bmsr = (state->link ? BMSR_LSTATUS : 0) |
++		       (state->an_complete ? BMSR_ANEGCOMPLETE : 0);
++		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr,
++						 le16_to_cpu(st.lpa.cl37));
++		break;
++
++	case PHY_INTERFACE_MODE_USXGMII:
++	case PHY_INTERFACE_MODE_10G_QXGMII:
++		if (state->link)
++			phylink_decode_usxgmii_word(state,
++						    le16_to_cpu(st.lpa.usx));
++		break;
++
++	case PHY_INTERFACE_MODE_10GBASER:
++	case PHY_INTERFACE_MODE_10GKR:
++		if (state->link) {
++			state->speed = SPEED_10000;
++			state->duplex = DUPLEX_FULL;
++		}
++		break;
++
++	default:
++		state->link = false;
++		break;
++	}
++}
++
++static void mxl862xx_pcs_an_restart(struct phylink_pcs *pcs)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++	struct mxl862xx_priv *priv = mpcs->priv;
++	struct mxl862xx_xpcs_an_restart an = {};
++	int if_mode, lane;
++
++	if_mode = mxl862xx_xpcs_if_mode(mpcs->interface);
++	if (if_mode < 0)
++		return;
++
++	lane = (mpcs->interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
++	       MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
++
++	an.mode = cpu_to_le16(FIELD_PREP(MXL862XX_XPCS_ANR_PORT_ID,
++					 mpcs->serdes_id) |
++			      FIELD_PREP(MXL862XX_XPCS_ANR_INTERFACE, if_mode) |
++			      FIELD_PREP(MXL862XX_XPCS_ANR_USX_SUBPORT,
++					 mpcs->slot) |
++			      FIELD_PREP(MXL862XX_XPCS_ANR_USX_LANE_MODE, lane));
++
++	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_AN_RESTART, an);
++}
++
++static void mxl862xx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
++				 phy_interface_t interface, int speed,
++				 int duplex)
++{
++	struct mxl862xx_pcs *mpcs = pcs_to_mxl862xx_pcs(pcs);
++	struct mxl862xx_xpcs_pcs_link_up lu = {};
++	struct mxl862xx_priv *priv = mpcs->priv;
++	int if_mode, lane, dup;
++
++	/* With inband-AN enabled (role=MAC), the XPCS auto-resolves
++	 * speed/duplex from the partner's AN word and the firmware
++	 * short-circuits link_up. Skip the firmware round-trip, same
++	 * as pcs-mtk-lynxi.
++	 */
++	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++		return;
++
++	if_mode = mxl862xx_xpcs_if_mode(interface);
++	if (if_mode < 0)
++		return;
++
++	lane = (interface == PHY_INTERFACE_MODE_10G_QXGMII) ?
++	       MXL862XX_XPCS_USX_QUAD : MXL862XX_XPCS_USX_SINGLE;
++	dup = (duplex == DUPLEX_FULL) ? MXL862XX_XPCS_DUPLEX_FULL :
++					MXL862XX_XPCS_DUPLEX_HALF;
++
++	lu.mode = cpu_to_le16(FIELD_PREP(MXL862XX_XPCS_LU_PORT_ID,
++					 mpcs->serdes_id) |
++			      FIELD_PREP(MXL862XX_XPCS_LU_INTERFACE, if_mode) |
++			      FIELD_PREP(MXL862XX_XPCS_LU_USX_SUBPORT,
++					 mpcs->slot) |
++			      FIELD_PREP(MXL862XX_XPCS_LU_USX_LANE_MODE, lane) |
++			      FIELD_PREP(MXL862XX_XPCS_LU_DUPLEX, dup));
++	lu.speed = cpu_to_le16(speed);
++
++	MXL862XX_API_WRITE(priv, MXL862XX_XPCS_PCS_LINK_UP, lu);
++}
++
++static unsigned int mxl862xx_pcs_inband_caps(struct phylink_pcs *pcs,
++					     phy_interface_t interface)
++{
++	switch (interface) {
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_QSGMII:
++	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
++		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
++	case PHY_INTERFACE_MODE_USXGMII:
++	case PHY_INTERFACE_MODE_10G_QXGMII:
++	case PHY_INTERFACE_MODE_10GKR:
++		return LINK_INBAND_ENABLE;
++	case PHY_INTERFACE_MODE_10GBASER:
++		return LINK_INBAND_DISABLE;
++	default:
++		return 0;
++	}
++}
++
++static const struct phylink_pcs_ops mxl862xx_pcs_ops = {
++	.pcs_enable = mxl862xx_pcs_enable,
++	.pcs_disable = mxl862xx_pcs_disable,
++	.pcs_config = mxl862xx_pcs_config,
++	.pcs_get_state = mxl862xx_pcs_get_state,
++	.pcs_an_restart = mxl862xx_pcs_an_restart,
++	.pcs_link_up = mxl862xx_pcs_link_up,
++	.pcs_inband_caps = mxl862xx_pcs_inband_caps,
++};
++
++void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
++			int port)
++{
++	pcs->priv = priv;
++	pcs->serdes_id = MXL862XX_SERDES_PORT_ID(port);
++	pcs->slot = MXL862XX_SERDES_SLOT(port);
++	pcs->interface = PHY_INTERFACE_MODE_NA;
++
++	pcs->pcs.ops = &mxl862xx_pcs_ops;
++	pcs->pcs.poll = true;
++
++	__set_bit(PHY_INTERFACE_MODE_QSGMII, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, pcs->pcs.supported_interfaces);
++	if (pcs->slot != 0)
++		return;
++
++	__set_bit(PHY_INTERFACE_MODE_SGMII, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_2500BASEX, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_10GBASER, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_10GKR, pcs->pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_USXGMII, pcs->pcs.supported_interfaces);
++}
++
++static struct phylink_pcs *
++mxl862xx_phylink_mac_select_pcs(struct phylink_config *config,
++				phy_interface_t interface)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct mxl862xx_priv *priv = dp->ds->priv;
++	int port = dp->index;
++
++	switch (port) {
++	case 9 ... 16:
++		if (!MXL862XX_FW_VER_MIN(priv, 1, 0, 84)) {
++			dev_warn_once(dp->ds->dev,
++				      "SerDes PCS unsupported on old firmware.\n");
++			return NULL;
++		}
++		return &priv->serdes_ports[port - 9].pcs;
++	default:
++		return NULL;
++	}
+ }
+ 
+ static void mxl862xx_phylink_mac_config(struct phylink_config *config,
+@@ -48,4 +442,5 @@ const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
+ 	.mac_config = mxl862xx_phylink_mac_config,
+ 	.mac_link_down = mxl862xx_phylink_mac_link_down,
+ 	.mac_link_up = mxl862xx_phylink_mac_link_up,
++	.mac_select_pcs = mxl862xx_phylink_mac_select_pcs,
+ };
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
+index c3d5215bdf60..03bb9caad9aa 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
++++ b/drivers/net/dsa/mxl862xx/mxl862xx-phylink.h
+@@ -7,8 +7,15 @@
+ 
+ #include "mxl862xx.h"
+ 
++#define MXL862XX_SERDES_SLOT(port) \
++	(((port) - MXL862XX_FIRST_SERDES_PORT) % MXL862XX_SERDES_SLOTS)
++#define MXL862XX_SERDES_PORT_ID(port) \
++	(((port) - MXL862XX_FIRST_SERDES_PORT) / MXL862XX_SERDES_SLOTS)
++
+ extern const struct phylink_mac_ops mxl862xx_phylink_mac_ops;
+ void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
+ 			       struct phylink_config *config);
++void mxl862xx_setup_pcs(struct mxl862xx_priv *priv, struct mxl862xx_pcs *pcs,
++			int port);
+ 
+ #endif /* __MXL862XX_PHYLINK_H */
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
+index 0b1a23364eb5..45d237b3a40f 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx.c
++++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
+@@ -622,7 +622,7 @@ static int mxl862xx_setup(struct dsa_switch *ds)
+ 	int n_user_ports = 0, max_vlans;
+ 	int ingress_finals, vid_rules;
+ 	struct dsa_port *dp;
+-	int ret;
++	int ret, i;
+ 
+ 	ret = mxl862xx_reset(priv);
+ 	if (ret)
+@@ -632,6 +632,11 @@ static int mxl862xx_setup(struct dsa_switch *ds)
+ 	if (ret)
+ 		return ret;
+ 
++	mutex_init(&priv->serdes_lock);
++	for (i = 0; i < ARRAY_SIZE(priv->serdes_ports); i++)
++		mxl862xx_setup_pcs(priv, &priv->serdes_ports[i],
++				   i + MXL862XX_FIRST_SERDES_PORT);
++
+ 	/* Calculate Extended VLAN block sizes.
+ 	 * With VLAN Filter handling VID membership checks:
+ 	 *   Ingress: only final catchall rules (PVID insertion, 802.1Q
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
+index e3db3711b245..432a5f3f2e08 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx.h
++++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
+@@ -11,6 +11,9 @@
+ struct mxl862xx_priv;
+ 
+ #define MXL862XX_MAX_PORTS		17
++#define MXL862XX_FIRST_SERDES_PORT	9
++#define MXL862XX_SERDES_SLOTS		4
++
+ #define MXL862XX_DEFAULT_BRIDGE		0
+ #define MXL862XX_MAX_BRIDGES		48
+ #define MXL862XX_MAX_BRIDGE_PORTS	128
+@@ -242,6 +245,26 @@ struct mxl862xx_port {
+ 	spinlock_t stats_lock; /* protects stats accumulators */
+ };
+ 
++/**
++ * struct mxl862xx_pcs - link SerDes interfaces to bridge ports
++ * @pcs:       &struct phylink_pcs instance
++ * @priv:      pointer to &struct mxl862xx_priv
++ * @serdes_id: SerDes instance index (0 or 1)
++ * @slot:      slot within the SerDes (0-3 for QSGMII/QUSXGMII, 0 otherwise)
++ * @interface: cached PHY interface, last value passed to pcs_config().
++ *             %PHY_INTERFACE_MODE_NA before the first successful
++ *             pcs_config().  Used by pcs_an_restart() to populate the
++ *             firmware command and by pcs_disable() to skip the
++ *             firmware power-down for shared (QSGMII/QUSXGMII) modes.
++ */
++struct mxl862xx_pcs {
++	struct phylink_pcs pcs;
++	struct mxl862xx_priv *priv;
++	int serdes_id;
++	int slot;
++	phy_interface_t interface;
++};
++
+ /**
+  * struct mxl862xx_fw_version - firmware version for comparison and display
+  * @major: firmware major version
+@@ -280,6 +303,14 @@ struct mxl862xx_fw_version {
+  *                      flooding)
+  * @fw_version:         cached firmware version, populated at probe and
+  *                      compared with MXL862XX_FW_VER_MIN()
++ * @serdes_ports:       SerDes interfaces incl. sub-interfaces in case of
++ *                      10G_QXGMII or QSGMII
++ * @serdes_refcount:    per-XPCS count of sub-ports enabled by phylink;
++ *                      pcs_disable powers an XPCS down when the count
++ *                      reaches zero. Protected by @serdes_lock.
++ * @serdes_lock:        serializes the @serdes_refcount transitions with
++ *                      the XPCS power-down so a sibling sub-port enable
++ *                      cannot race a power-down to zero
+  * @ports:              per-port state, indexed by switch port number
+  * @bridges:            maps DSA bridge number to firmware bridge ID;
+  *                      zero means no firmware bridge allocated for that
+@@ -298,6 +329,9 @@ struct mxl862xx_priv {
+ 	unsigned long flags;
+ 	u16 drop_meter;
+ 	struct mxl862xx_fw_version fw_version;
++	struct mxl862xx_pcs serdes_ports[8];
++	int serdes_refcount[2];
++	struct mutex serdes_lock;
+ 	struct mxl862xx_port ports[MXL862XX_MAX_PORTS];
+ 	u16 bridges[MXL862XX_MAX_BRIDGES + 1];
+ 	u16 evlan_ingress_size;
 -- 
 2.54.0
 
