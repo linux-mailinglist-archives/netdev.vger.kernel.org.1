@@ -1,299 +1,285 @@
-Return-Path: <netdev+bounces-298886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298888-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FMxQL5nALGpCWAQAu9opvQ
-	(envelope-from <netdev+bounces-298886-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 04:29:45 +0200
+	id LtV0F8HBLGpoWAQAu9opvQ
+	(envelope-from <netdev+bounces-298888-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 04:34:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1401667D889
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 04:29:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A530E67D8A2
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 04:34:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=dL9+XcOX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298886-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298886-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=pS66Ov96;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298888-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298888-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA74D305CBB4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:29:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53E39314FE9E
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4693382F4;
-	Sat, 13 Jun 2026 02:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B593132863D;
+	Sat, 13 Jun 2026 02:34:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010052.outbound.protection.outlook.com [52.101.69.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D59F2459DC
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 02:29:41 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781317782; cv=none; b=thnu8CV0P3HLJGXqZXQQSJXHicX4nui1qYEcBVFya0x2IfEL4jUXWw3Ryv98aDSH3hrHSQJAff7RL1oUUJvscaes2gE2NjFXkUWF6EZH/WZ7DY6/cAr+ASE7eseGL+X7MGCSlNlHoEXNT9AkzR49ixNN+tjhuD1LH5w8iAETDCM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781317782; c=relaxed/simple;
-	bh=dO7bHnvCcWblriPTzxTRRLmz8AyNXl0KCbbNGSuNRVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MJxpxekjkiUR7tt6WaZrT3jhQkSmKt09bTL5LH61WbhFEhFEuRsj8fTzN6EQ394oGkWq7bhGMWteJGTDeFczIbEW/dKYu9QhgMTqLXZE8+I7DU+MDs+lF+r1AllAV03Y+uBHaMhj38s4dvyUX/gXaT8/pmoFB7NxyvOrOpp1g6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=dL9+XcOX; arc=none smtp.client-ip=74.125.82.171
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-307263ad0cbso2541378eec.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 19:29:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1781317780; x=1781922580; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lKeL9TUZLvcDPQWGX7hcJbikOJBTTmxpJSMcgrb+zxY=;
-        b=dL9+XcOXk9NbnjBBttKO/SOFe1BPAQsHm2WQKQOO1gIzPqxPl75Rgsps4+b7VgDJSf
-         dWC/KU6gvsaawrj+n0/bmlbpsFDX40ArYwznKlCH1QDCsrW1BGywjNdeyFVgYUmfjiWl
-         aArxHlF/Upu9SbvFQU/+H3N69ij+HYTo8JpVRjG7CA4jN2mOmPiqE6eNRMRaOkxPnY03
-         P3WKtCXeqNaKJZmVF8DsKWgpWELP4yrRa9yAaFJ1Md7XL4xvgriTSjgUy4l91pOnq6TI
-         4tmXs8jg3v77CfZVqRDM8EnqRG0F3cnO3I72JL9SUyBvSUxSa8ar94eNMlNZQkDSyXbJ
-         j/iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781317780; x=1781922580;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lKeL9TUZLvcDPQWGX7hcJbikOJBTTmxpJSMcgrb+zxY=;
-        b=jt+lST8DAj5X/vkPUWuTr1geO9VOjdV6IqqccKqVCsw7nKISMl9B8ysyr4THIE2ite
-         TeGPOWAGzPlkaLffeLe1NV81JbVTJLD7N2BiqlBad/HulLuItMfyUXxh+3d+gin/2XIs
-         KpLQ/ORBAh+jhgthI8EI3C+l64Nlhuhz2/xZVuTN82dpV7nmgOAb9OWda4hbzhF1Xyqw
-         ATLY2VtxnNzXQlvqqPQZmo1gP6wx3Dp1etHj4C4zKuTH6JIbuILlRMO7J03B6hr6Rxj5
-         eeHo9wxJtU+7GDSqctxStOMCYpCfToZ8iJo37gDvbD5DU2rmTqHxanCaIALzThcTZ53d
-         rCaQ==
-X-Gm-Message-State: AOJu0YztgGsb3ETnxCLfN7xhSy/tZsTaC+vF2fB+ej1kLS9UtAQV+ODS
-	cvsmyTJa0Nzm3FGTFiV0Bn+S7omrPLH/p/cr4jnH2sFqI4xktWboWNunkGwh731IFWQ=
-X-Gm-Gg: Acq92OF6Ox9pGriJLRvOOWqlMTHFKVNTgi4ANK3LA9Q3Lk8XUli9yb9FRrcrDeXa854
-	gueJtjY3FBr/IGZgLLVWaByq1yVBnU6Eb+NmZYazrMfcdseNOraiex5IX5SwsKfs+XsReLu9u0q
-	qCCt0k+R+jLY3FBe2DasHd9b2gxmrMlugcF9DWN0S/8oZX+BpghxTcI79P0DjarUjCU/R7rq+fr
-	ILv4KTEYKqdG4RlliammQb/5rsE/E/L84T7dlxwaVn9Cf8VOmVz5QPFEj+fs4XRQYVpQy/oM9/l
-	MDZv5K2FFbyuhjuWsyQXvgtBk6Jic8uF0yKO6+u8/X9l6ts/J8n3iVklIFgqvIQGWWIEcAUhzKn
-	mkxGkjwvsGqG1wBPkK41pRnxIYuj9MP7A6BfvRXAU6CJ6h9N7fXJVC6oDp8PPnYjk+UdIWCjFSV
-	dfb7ZrKE24b+0kvaPN3FOqf/GrzxDcUVKefAJErE2lbt8hfgY911sOS9rbDCB/jwYs
-X-Received: by 2002:a05:7022:30d:b0:136:5c88:d928 with SMTP id a92af1059eb24-1386f392043mr835491c88.19.1781317780160;
-        Fri, 12 Jun 2026 19:29:40 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e91fb97sm6123109eec.14.2026.06.12.19.29.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 19:29:39 -0700 (PDT)
-Date: Fri, 12 Jun 2026 19:29:36 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH iproute2-next] ipaddress: add support for showing IPv4
- devconf attributes
-Message-ID: <20260612192936.61c23f85@phoenix.local>
-In-Reply-To: <20260612231722.30579-1-fmancera@suse.de>
-References: <20260612231722.30579-1-fmancera@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE37514AD20;
+	Sat, 13 Jun 2026 02:34:36 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781318078; cv=fail; b=lmc+02I+91qwiJhrLM8BL98PDBZMTbZC2OPoBGNX9pJ3HbqFx7898MGolh+cBLkTNEq3oYt2TNUsfD8JtdYCnBOwjwrDmc18mw3ZRu0w6aSAyo0IDTo0TFenRolocL/oKSnE5S+QclK20rNPd5k1f9yBLKeqiZH8+XudSJv3OKM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781318078; c=relaxed/simple;
+	bh=aGqqYTGQkihmPQVC0P9NodRVQRLJrHw9eRJdEWurwwE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Gamh8Wgn/83kZAFel2lvgyzL1R5KA3AmrUgZ5no7UZd4ILqXVnRhqAbSgY5MtKTpNHhNsFJxRMH8MvWIVkPmdzwSMJtbeIF/r0fkXlKht0AM4TOVijJrKIkhhJ57de5N++WBtiBqZblLdSfWOlQ8+lGO/KAs6gmP+0glJnQKrv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=pS66Ov96; arc=fail smtp.client-ip=52.101.69.52
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VZmk5SKOSb6tZywp4pFA8eYoqfhnwkxHDM0Qzb4+wrsP0Z+JF+cK1iiGyqJ2lVceghOHDy1hK1GZc4N6txwHyUT4RP+zSIpYMYvAxXRZFgnFEIRASJOPitAvIn4bA1fIvkcygpp3Z2ZLpOtFcPUTZRBvG3mEjqCOHC2S0xdZCB6xor9bQ7gEUFJd850xwTWgTpysG6tVOtA8Xm4+HDZo+5YVwlBMJKRvweMkZMElINt5X5ujH2meJORDDypBxm+o81D/zl0IJfZJ8EkSBG7JHTrYHCoIGBhQt0f/7WR/hpdsCljDmFAshXr5D3cvFYEfclDJQKvNJ/tq3R/5XJgNYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hr+YmFJMCRpwN97KtwskfzBteMfxMYxeFe7eRuHCubQ=;
+ b=sMzZy3HWYQSugIV+pXPnY8T+ghbRXwiUVaZusL1fVq8PNZ8ZaPYMk3Vqw3BEBngK3LhMiUgOUChRfHDfxX1zMYRGdjV1U2wzpFlkoiHC9H+rqATttlH7EXJVa42r6t3+N/5PmP+MwkRcCBLmZPwZPHznhV9ztjilr4YaohFf0gDBnnC5IIlhTDTkJO62ZezhJ6wwve0FghiyND8K9epfg4tt4cBqtVf5KHg3DdPlJyFSIRe3PiW+TOw3spBUVIY5VE0MVf61U0KELu8l9sgNT7X2Ejw0L+NMONBTlcPzUs/XES5qr+ovZJVIxIg92FMKZ/3vB9BXoqLoWq9w0Xn7WQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hr+YmFJMCRpwN97KtwskfzBteMfxMYxeFe7eRuHCubQ=;
+ b=pS66Ov96qj+biRATL/fS+usEqRKrLL8A+APTZOt9nS+jXw9oHuopvcW2xlGatQ5cKzzy3hGQKzNRcRlIJZjPrNXgTfvN8WncQ811oIdvXtuqaQHjO1wdhLANjXHq8FgFS68QBC+MVfvm557fFVNZstAgzrHAbjOMWhEAwsRTUNFktqGewW695pnefeOF0ArVlKv3PzahKcRAzkRV0qUjuXBqyPrq3pN3VHBr0+v/OS5f0uDk9UuI10ctOhDUdqbJKDbSI06hR8Lg25tqGSjdZa+mjjt9a8ItiY2rzR0++W67ommVZJ3e+8BPXnCrYGanWCI8R6JSQcuSTSKIs8zq9g==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ DBBP189MB1276.EURP189.PROD.OUTLOOK.COM (2603:10a6:10:1e1::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.113.15; Sat, 13 Jun 2026 02:34:33 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0113.014; Sat, 13 Jun 2026
+ 02:34:32 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Li Xiasong <lixiasong1@huawei.com>
+CC: "stable@vger.kernel.org" <stable@vger.kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "yuehaibing@huawei.com"
+	<yuehaibing@huawei.com>, "zhangchangzhong@huawei.com"
+	<zhangchangzhong@huawei.com>, "weiyongjun1@huawei.com"
+	<weiyongjun1@huawei.com>, Jon Maloy <jmaloy@redhat.com>
+Subject: RE: [PATCH net] tipc: restrict socket queue dumps in enqueue
+ tracepoints
+Thread-Topic: [PATCH net] tipc: restrict socket queue dumps in enqueue
+ tracepoints
+Thread-Index: AQHc+abxTKPu+3qx0UydtlT8bC9OBbY7xn/Q
+Date: Sat, 13 Jun 2026 02:34:32 +0000
+Message-ID:
+ <GV1P189MB19888A1485EEA4CD4F36CBCEC6192@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260611135647.3666727-1-lixiasong1@huawei.com>
+In-Reply-To: <20260611135647.3666727-1-lixiasong1@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DBBP189MB1276:EE_
+x-ms-office365-filtering-correlation-id: 5ab358d7-2cbe-4b5d-befd-08dec8f44d57
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|7416014|366016|376014|1800799024|11063799006|56012099006|22082099003|18002099003|6133799003|38070700021;
+x-microsoft-antispam-message-info:
+ sPR7bS6vNt/n6uJOPn402vJend3icAWz2jtbO8Q/45aHIf97antgjAcoJi1/zvUInkEZgEwNmEGlqu22WeKIUyJlXIarCYxSDxR+wGj4tnMp2p7yy/d1Jm2wwYb6SF3pXkSdqS/Ued9z7JE3CiPVKsho7EbEt0CjixgCMhBPa0RbqUX6RadMFfpOMSYWDNVZldqXpyNFmyU5y+maxxXJ/bynNJeQzUBzR8tveS/dhk5uTmpX2spojWOhoqOSDKh7BGS032vCznRL0JSfGoWo5qq7EH4TM2sAjCsf19lRlBgjVADWl6qdi02qQMr6yVDZRDNMotVBzyiXc4WnZrlH12IlLJb2vpNgoVmsQCsNMCBGizHKRxwcokjeZTO2C+KKTsAcMUElFLy30FxP+76grpTyMLuiBc+la1BZBLLtG0Ly0ey+OKZMyQxQlw+4/Fh0ya15x41puuPCY3r6LgPd/iAZMpI7zW+ZAaO8k9xiB/7SmAB7t1DJs7ggDETfzilJsq6Q0KcvbHQx8xT5ofutT7muHwia+nr9NMvskOtYbYCmTvyJ0CTeBuLrNL/fFrQCCoPqg261FNTd7m3t0lRGOUGX5zCeNiKBjItVzZYkqzEog98k/XxiiqVykiAV8M0XpF4hQTblu9nUkxzsRLEm0AFdsiJcnenh4SVGpKSTDLK1LYAt5F4J+YvGLQMlZUuygTz8x/AM/biDPCfFS6gGcjh/WZ97cwDaVIY8ZRbOtWBIFWwL3yaRA2ywSJuAUrVB
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(366016)(376014)(1800799024)(11063799006)(56012099006)(22082099003)(18002099003)(6133799003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?3ktlhmqzQ4accv6elNe/18xmGzab0nbn6ZuOqCHVOFSsYd5+EC0Tc++2/uzq?=
+ =?us-ascii?Q?Sj3jKGop0jMkAi7DoF05inSTc2eXBMMyAfYabKhOeujNzGprR4jCsDhtIK2+?=
+ =?us-ascii?Q?o+bJhg/4cAUiOPDe7QcUWiNldfKOjiqoL6aUilW39/JmqC/DPRLWn11HWcMQ?=
+ =?us-ascii?Q?sLfGKIHfGBlX6IRPp0jOnN/DN6VrYdlw9JovOmULKCXloeIrZIgEdnJbori8?=
+ =?us-ascii?Q?NiHtEhvgT7Ymk2uMWrjEf2NFOyOC1Upv1WrQ56mqaWDIpgOIjzHwXhlh64Wm?=
+ =?us-ascii?Q?IndWYO6WxsUt6H+x+5MVMurkNb/qhFGHGCM+TqGI1IsbA0Go5ROQj0sqf/6g?=
+ =?us-ascii?Q?IzsRcztvULjy8/omDBUvBQoUYHDkT4fY0JArMgIvNXVP5iQvQiqtKBvARbek?=
+ =?us-ascii?Q?jeD9Kc7XPMgZFG7/aOm5yZsVw/mrYHavHgZIUY4D/NoF4E8SVB5tcN1/ZO+8?=
+ =?us-ascii?Q?iS8St76jvTY7wGhJTZEB4ayBFfwC1xnoT89qUM8k0qu0Hm3+TnJfMvTCqB7C?=
+ =?us-ascii?Q?yQZi1RyfnJfyTjR7ivZ0JfXOKyRVE+BurFKqRk+L8dVrczvQBPxqUaPiNaVp?=
+ =?us-ascii?Q?YpO4Fm8fI5UStZBKdGW3UALCdIeC38qIAVXp7zYVjYdXdIupJB1duauql3bB?=
+ =?us-ascii?Q?npac3RZnlNNSZKTXM4CCZqtTNbjfuW54qtxMTOV63a9mcTiFVLGSkEfYqYUP?=
+ =?us-ascii?Q?HBfo/qbha1AllLPsWoi0bMIjkGDsJYxVAhZZ/F6fjMqk7+hQd0qho3vrbhJo?=
+ =?us-ascii?Q?P2+mynjgElDvrD/hw4UvsUFiFVh8bSvGMlSa1idnqShAGnlfsqi6i/84LLat?=
+ =?us-ascii?Q?jGErz/LT7soe4LfTk5Um0vYvoZ2OHL8L5XpbRM9mGJhK63x+cAwXZiW8jmZu?=
+ =?us-ascii?Q?JyYqe5dluhttHphl5utFJJ2ImAkSMFe8TxGyvzEfjXUbyAcA6ct2jb5IQv94?=
+ =?us-ascii?Q?sAKj8jPALF/3LOU5V/RSvORhKKFz/+muV4/TaF540PbOrR7/jk6PdKIvq3ab?=
+ =?us-ascii?Q?CbNdg3VxGFk15jfn69dlO1IclU7TDJAKcigrbOAXYjTwGzSsdGudwrml8Kqb?=
+ =?us-ascii?Q?31sfzUBrj5LD9qcr3V+0XuavbdgAMoDcIn/QuhSIn7pQzeQG5Zdv4vBFU338?=
+ =?us-ascii?Q?WjRVixclp8Oc1CkUnbXcYBoznlsjYVqLBh0FS9ITdWMvmV0EV9lZbl7T1LtM?=
+ =?us-ascii?Q?FJ+iYdpgSPYP6on+c2UynlVPs88HhxN3xH+49i7yB3kl6+UfHVIr9fiUSmqo?=
+ =?us-ascii?Q?P/kJxCis8/I6Ctn8EKBxdAuaYrjB5BDsrcxkzac+BHifX6aIwxtX7QFj+rEq?=
+ =?us-ascii?Q?b9krCeLazMcTmRjVir3yBSnLEWj4s1lZEyLXhtQdzn2kn/vwW7fON2MmDJXs?=
+ =?us-ascii?Q?rpTb1P8qgG6iKhmsYXJCAajCdCZC1xb5NobalZlPP2ZWnHftDQODQDsEIWtX?=
+ =?us-ascii?Q?4ZJBjn3c1XvTCnJl7DMYNxTNhJRbzoqipZzXQQZ7oQ55YRlvpwFmYIOlmcq/?=
+ =?us-ascii?Q?GqVQs3thiI/GiSjSvmkVQL9zZl1WRdxKq+37xWTRkz7UZyRBpBM2cztMmTJY?=
+ =?us-ascii?Q?9wCTZ0sfafy27t/4UO0LHlICPuMcwaBlID+8cajW+j5TXGEH4alL9gfUU+CH?=
+ =?us-ascii?Q?9+QFy3EevHnrAf1CKDvjX/wsnFIR+5qFufu1ukLl5HsgGq2jKKDKoGUaaV9l?=
+ =?us-ascii?Q?OpmkS6TcM+2emeGnoi2+JR8IIs4s2ple+sMeEcA33SIyG4DhwdCun9RNV/Rp?=
+ =?us-ascii?Q?J/v5e5LDpA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ab358d7-2cbe-4b5d-befd-08dec8f44d57
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2026 02:34:32.7920
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AX6Fyskkdgn04kByGQG1GU/502NwIH+JqgIzlBHr4wzpFelqcbrv+jMHOnyOM3W1WqS8wgbE6v30lxWssdYtH9ah7frSqpEpvyliePJKOfo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBP189MB1276
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298886-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298888-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:lixiasong1@huawei.com,m:stable@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:yuehaibing@huawei.com,m:zhangchangzhong@huawei.com,m:weiyongjun1@huawei.com,m:jmaloy@redhat.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[est.tech:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,networkplumber.org:from_mime,suse.de:email,networkplumber-org.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,est.tech:dkim,est.tech:email,est.tech:from_mime,huawei.com:email,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1401667D889
+X-Rspamd-Queue-Id: A530E67D8A2
 
-On Sat, 13 Jun 2026 01:17:22 +0200
-Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-
-> tatic void print_inet(FILE *fp, struct rtattr *inet_attr)
-> +{
-> +	struct rtattr *tb[IFLA_INET_MAX + 1];
-> +
-> +	parse_rtattr_nested(tb, IFLA_INET_MAX, inet_attr);
-> +
-> +	if (tb[IFLA_INET_CONF] && show_details) {
-> +		int *conf = RTA_DATA(tb[IFLA_INET_CONF]);
-> +		int max_elements = RTA_PAYLOAD(tb[IFLA_INET_CONF]) / sizeof(int);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_FORWARDING)
-> +			print_string(PRINT_ANY, "forwarding", "forwarding %s ",
-> +				     conf[IPV4_DEVCONF_FORWARDING - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_MC_FORWARDING)
-> +			print_string(PRINT_ANY, "mc_forwarding", "mc_forwarding %s ",
-> +				     conf[IPV4_DEVCONF_MC_FORWARDING - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_PROXY_ARP)
-> +			print_string(PRINT_ANY, "proxy_arp", "proxy_arp %s ",
-> +				     conf[IPV4_DEVCONF_PROXY_ARP - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ACCEPT_REDIRECTS)
-> +			print_string(PRINT_ANY, "accept_redirects",
-> +				     "accept_redirects %s ",
-> +				     conf[IPV4_DEVCONF_ACCEPT_REDIRECTS - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_SECURE_REDIRECTS)
-> +			print_string(PRINT_ANY, "secure_redirects",
-> +				     "secure_redirects %s ",
-> +				     conf[IPV4_DEVCONF_SECURE_REDIRECTS - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_SEND_REDIRECTS)
-> +			print_string(PRINT_ANY, "send_redirects", "send_redirects %s ",
-> +				     conf[IPV4_DEVCONF_SEND_REDIRECTS - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_SHARED_MEDIA)
-> +			print_string(PRINT_ANY, "shared_media", "shared_media %s ",
-> +				     conf[IPV4_DEVCONF_SHARED_MEDIA - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_RP_FILTER)
-> +			print_int(PRINT_ANY, "rp_filter", "rp_filter %d ",
-> +				  conf[IPV4_DEVCONF_RP_FILTER - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE)
-> +			print_string(PRINT_ANY, "accept_source_route",
-> +				     "accept_source_route %s ",
-> +				     conf[IPV4_DEVCONF_ACCEPT_SOURCE_ROUTE - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_BOOTP_RELAY)
-> +			print_string(PRINT_ANY, "bootp_relay", "bootp_relay %s ",
-> +				     conf[IPV4_DEVCONF_BOOTP_RELAY - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_LOG_MARTIANS)
-> +			print_string(PRINT_ANY, "log_martians", "log_martians %s ",
-> +				     conf[IPV4_DEVCONF_LOG_MARTIANS - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_TAG)
-> +			print_int(PRINT_ANY, "tag", "tag %d ",
-> +				  conf[IPV4_DEVCONF_TAG - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARPFILTER)
-> +			print_string(PRINT_ANY, "arpfilter", "arpfilter %s ",
-> +				     conf[IPV4_DEVCONF_ARPFILTER - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_MEDIUM_ID)
-> +			print_int(PRINT_ANY, "medium_id", "medium_id %d ",
-> +				  conf[IPV4_DEVCONF_MEDIUM_ID - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_NOXFRM)
-> +			print_string(PRINT_ANY, "noxfrm", "noxfrm %s ",
-> +				     conf[IPV4_DEVCONF_NOXFRM - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_NOPOLICY)
-> +			print_string(PRINT_ANY, "nopolicy", "nopolicy %s ",
-> +				     conf[IPV4_DEVCONF_NOPOLICY - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_FORCE_IGMP_VERSION)
-> +			print_int(PRINT_ANY, "force_igmp_version", "force_igmp_version %d ",
-> +				  conf[IPV4_DEVCONF_FORCE_IGMP_VERSION - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARP_ANNOUNCE)
-> +			print_int(PRINT_ANY, "arp_announce", "arp_announce %d ",
-> +				  conf[IPV4_DEVCONF_ARP_ANNOUNCE - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARP_IGNORE)
-> +			print_int(PRINT_ANY, "arp_ignore", "arp_ignore %d ",
-> +				  conf[IPV4_DEVCONF_ARP_IGNORE - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_PROMOTE_SECONDARIES)
-> +			print_string(PRINT_ANY, "promote_secondaries",
-> +				     "promote_secondaries %s ",
-> +				     conf[IPV4_DEVCONF_PROMOTE_SECONDARIES - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARP_ACCEPT)
-> +			print_int(PRINT_ANY, "arp_accept", "arp_accept %d ",
-> +				  conf[IPV4_DEVCONF_ARP_ACCEPT - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARP_NOTIFY)
-> +			print_string(PRINT_ANY, "arp_notify", "arp_notify %s ",
-> +				     conf[IPV4_DEVCONF_ARP_NOTIFY - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ACCEPT_LOCAL)
-> +			print_string(PRINT_ANY, "accept_local", "accept_local %s ",
-> +				     conf[IPV4_DEVCONF_ACCEPT_LOCAL - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_SRC_VMARK)
-> +			print_string(PRINT_ANY, "src_vmark", " src_vmark %s",
-> +				     conf[IPV4_DEVCONF_SRC_VMARK - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_PROXY_ARP_PVLAN)
-> +			print_string(PRINT_ANY, "proxy_arp_pvlan", "proxy_arp_pvlan %s ",
-> +				     conf[IPV4_DEVCONF_PROXY_ARP_PVLAN - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ROUTE_LOCALNET)
-> +			print_string(PRINT_ANY, "route_localnet", "route_localnet %s ",
-> +				     conf[IPV4_DEVCONF_ROUTE_LOCALNET - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_BC_FORWARDING)
-> +			print_string(PRINT_ANY, "bc_forwarding", "bc_forwarding %s ",
-> +				     conf[IPV4_DEVCONF_BC_FORWARDING - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL)
-> +			print_int(PRINT_ANY, "igmpv2_unsolicited_report_interval",
-> +				  "igmpv2_unsolicited_report_interval %d ",
-> +				  conf[IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL)
-> +			print_int(PRINT_ANY, "igmpv3_unsolicited_report_interval",
-> +				  "igmpv3_unsolicited_report_interval %d ",
-> +				  conf[IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL - 1]);
-> +
-> +		if (max_elements >= IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN)
-> +			print_string(PRINT_ANY, "ignore_routes_with_linkdown",
-> +				     "ignore_routes_with_linkdown %s ",
-> +				     conf[IPV4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN - 1] ?
-> +				     "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST)
-> +			print_string(PRINT_ANY, "drop_unicast_in_l2_multicast",
-> +				     "drop_unicast_in_l2_multicast %s ",
-> +				     conf[IPV4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST - 1] ?
-> +				     "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_DROP_GRATUITOUS_ARP)
-> +			print_string(PRINT_ANY, "drop_gratuitous_arp",
-> +				     "drop_gratuitous_arp %s ",
-> +				     conf[IPV4_DEVCONF_DROP_GRATUITOUS_ARP - 1] ? "on" : "off");
-> +
-> +		if (max_elements >= IPV4_DEVCONF_ARP_EVICT_NOCARRIER)
-> +			print_string(PRINT_ANY, "arp_evict_nocarrier",
-> +				     "arp_evict_nocarrier %s ",
-> +				     conf[IPV4_DEVCONF_ARP_EVICT_NOCARRIER - 1] ? "on" : "off");
-> +	}
-> +}
-> +
-There are three different ways to display a flag value in JSON used in iproute2.
-This one is my least favorite.
-
-The three ways are:
-   - print_bool
-   - print_null (only if on) 
-   - print_string
-
-I would use the print_null pattern but print_bool would also be ok.
+>Subject: [PATCH net] tipc: restrict socket queue dumps in enqueue tracepoi=
+nts
+>
+>tipc_sk_enqueue() runs with sk->sk_lock.slock held while the socket is own=
+ed
+>by user context. The spinlock protects the backlog queue in this path, but=
+ it
+>does not serialize against the socket owner consuming or purging
+>sk_receive_queue.
+>
+>KASAN reported:
+>
+>  CPU: 14 UID: 0 PID: 1050 Comm: tipc3 Not tainted 7.1.0-rc6+ #126
+>PREEMPT(lazy)
+>  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
+>04/01/2014
+>  Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x76/0xa0 lib/dump_stack.c:123
+>    print_report+0xce/0x5b0 mm/kasan/report.c:482
+>    kasan_report+0xc6/0x100 mm/kasan/report.c:597
+>    __asan_report_load4_noabort+0x14/0x30 mm/kasan/report_generic.c:380
+>    tipc_skb_dump+0x1327/0x16f0 net/tipc/trace.c:73
+>    tipc_list_dump+0x208/0x2e0 net/tipc/trace.c:187
+>    tipc_sk_dump+0xaf6/0xd60 net/tipc/socket.c:3996
+>    trace_event_raw_event_tipc_sk_class+0x312/0x5a0 net/tipc/trace.h:188
+>    tipc_sk_rcv+0xb1d/0x1d50 net/tipc/socket.c:2497
+>    tipc_node_xmit+0x1c3/0x1440 net/tipc/node.c:1689
+>    __tipc_sendmsg+0x97a/0x1440 net/tipc/socket.c:1512
+>    tipc_sendmsg+0x52/0x80 net/tipc/socket.c:1400
+>    sock_sendmsg+0x2f6/0x3e0 net/socket.c:825
+>    splice_to_socket+0x7f9/0x1010 fs/splice.c:884
+>    do_splice+0xe21/0x2330 fs/splice.c:936
+>    __do_splice+0x153/0x260 fs/splice.c:1431
+>    __x64_sys_splice+0x150/0x230 fs/splice.c:1616
+>    x64_sys_call+0xeb5/0x2790 arch/x86/entry/syscall_64.c:41
+>    do_syscall_64+0xf3/0x620 arch/x86/entry/syscall_64.c:63
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>arch/x86/entry/entry_64.S:130
+>  RIP: 0033:0x71624e8aafe2
+>  Code: 08 0f 85 71 3a ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 =
+4d 89 ca
+>4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 =
+00 00
+>00 00 66 2e 0f 1f 84 00 00 00 00 00 66
+>  RSP: 002b:0000716157ffed68 EFLAGS: 00000246 ORIG_RAX:
+>0000000000000113
+>  RAX: ffffffffffffffda RBX: 0000716157fff6c0 RCX: 000071624e8aafe2
+>  RDX: 000000000000005f RSI: 0000000000000000 RDI: 0000000000000066
+>  RBP: 0000716157ffed90 R08: 0000000000008000 R09: 0000000000000001
+>  R10: 0000000000000000 R11: 0000000000000246 R12: ffffffffffffff00
+>  R13: 0000000000000021 R14: 0000000000000000 R15: 00007fff89799c40
+>    </TASK>
+>
+>The TIPC_DUMP_ALL tracepoints in tipc_sk_enqueue() also dump
+>sk_receive_queue and can therefore dereference skbs that the socket owner
+>has already dequeued or freed. Restrict these dumps to
+>TIPC_DUMP_SK_BKLGQ, which matches the queue protected by the held
+>spinlock.
+>
+>Keep the change limited to the enqueue path, where the unsafe queue dump
+>is reachable while the socket is owned by user context.
+>
+>Fixes: 01e661ebfbad ("tipc: add trace_events for tipc socket")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+>---
+> net/tipc/socket.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+>diff --git a/net/tipc/socket.c b/net/tipc/socket.c index
+>9329919fb07f..6b761003bcd1 100644
+>--- a/net/tipc/socket.c
+>+++ b/net/tipc/socket.c
+>@@ -2452,17 +2452,17 @@ static void tipc_sk_enqueue(struct sk_buff_head
+>*inputq, struct sock *sk,
+> 			atomic_set(dcnt, 0);
+> 		lim =3D rcvbuf_limit(sk, skb) + atomic_read(dcnt);
+> 		if (likely(!sk_add_backlog(sk, skb, lim))) {
+>-			trace_tipc_sk_overlimit1(sk, skb, TIPC_DUMP_ALL,
+>+			trace_tipc_sk_overlimit1(sk, skb,
+>TIPC_DUMP_SK_BKLGQ,
+> 						 "bklg & rcvq >90%
+>allocated!");
+> 			continue;
+> 		}
+>
+>-		trace_tipc_sk_dump(sk, skb, TIPC_DUMP_ALL,
+>"err_overload!");
+>+		trace_tipc_sk_dump(sk, skb, TIPC_DUMP_SK_BKLGQ,
+>"err_overload!");
+> 		/* Overload =3D> reject message back to sender */
+> 		onode =3D tipc_own_addr(sock_net(sk));
+> 		sk_drops_inc(sk);
+> 		if (tipc_msg_reverse(onode, &skb, TIPC_ERR_OVERLOAD)) {
+>-			trace_tipc_sk_rej_msg(sk, skb, TIPC_DUMP_ALL,
+>+			trace_tipc_sk_rej_msg(sk, skb, TIPC_DUMP_SK_BKLGQ,
+> 					      "@sk_enqueue!");
+> 			__skb_queue_tail(xmitq, skb);
+> 		}
+>--
+>2.34.1
+>
+Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
 
