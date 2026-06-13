@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aAUGN7XULWqokwQAu9opvQ
-	(envelope-from <netdev+bounces-299065-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:07:49 +0200
+	id NXAPEt/ULWrBkwQAu9opvQ
+	(envelope-from <netdev+bounces-299066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:08:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48C6367FDD0
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:07:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B092D67FDEC
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:08:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eCVD3ULw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299065-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299065-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=K94pHjga;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299066-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299066-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B825B304B28E
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:06:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E10E23053DC2
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4F83A785A;
-	Sat, 13 Jun 2026 22:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3603859DE;
+	Sat, 13 Jun 2026 22:06:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5383A75A2;
-	Sat, 13 Jun 2026 22:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D2A30DED5;
+	Sat, 13 Jun 2026 22:06:05 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781388365; cv=none; b=g7r987wbwQoXLPwTPRUwdexIs+svhKh5Mq0Qw5NJgvzlxYc4AC85kp9FCblKMSeQc59O54XtBXqe+aXIjddh/v721KwMb75MIiAPEsLcBTX9YYZWsVm9Ux6iX71oO6IoLVV7jDYQr82xnFdyHd53poWU2b3VvrMBOfxVIQkITCE=
+	t=1781388370; cv=none; b=N9J20F8i57V8T5MQf+ZrSPdfPqpEIXjgniMnF/f32lnwx87aXaDSa3J+MBu7vcpgRWU/DfgB0akm7ZAI6mOS65GvZWEw3O+hgfz64WSE/XjuoFLery7jUiPm0AXCP2Y5aeQHE/4aBd6AjVgyTfT9W6lezWQA60xR5XVXGR37Ds0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781388365; c=relaxed/simple;
-	bh=fVoIX8fGUd/mxcBV+RP+xkM94q8/1XqbACF5z4t81tc=;
+	s=arc-20240116; t=1781388370; c=relaxed/simple;
+	bh=/hAcVRG4OiAxYuGPCQOTR88/XoL62QAPkEM8enyd3do=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wu9D5g4H6wh670RQR5ljdo9MJiLhq7xAPobTJGx6WQ0V/KegUleUq9uTdn89LeQT2tWwkfxQXrkrzMkruEtJ6z1aEiGyhxVW4IjxTcyp1BAb8rOZNFm8kpG2KX2XVv5iPzx6bwuQpB3cdLgDimWUfz9t+u+SEibNsq6Zh1qWk94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCVD3ULw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 313D81F00A3A;
-	Sat, 13 Jun 2026 22:06:03 +0000 (UTC)
+	 MIME-Version; b=U8o3fFFtV2xPj1C3ZIEiJGvBUnaYDl00Ak/ZrnDsMlXBjER9p+L0CYvihkN8mUn0Sa1+DkPN6xgfz+tLo7C7AMpBIw7CCg/VWcRzoULSoAVTm8Ns0Nb8J1XhGPrw17It11F7ywHWFJ0dXZbZ/+LYudCZOuF7n5cGsjisCOtNyfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K94pHjga; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E2351F000E9;
+	Sat, 13 Jun 2026 22:06:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781388363;
-	bh=ZNBuc9LO0TVPernc1+y9mCATM6GnjcypbVL+xZWKplI=;
+	s=k20260515; t=1781388365;
+	bh=BxFDB+Dbp29fvUO8SbkuSPDqEh4Rx58zetJfg6hIPuM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eCVD3ULwoqYi1ASR48UudXHUazG4rRUZgs/CcpVMTwParn4fIOCv7NmYgMVDNfuil
-	 yPtbLXnt3Q3d6w/hHgP8um7V7Da1LSskaZu7PuggG5oNw0y8wtGfYsK+Lop2ogSHlh
-	 Snx1xCTkWq+4nrHobDP82NZ6KYMNVEdXtCrFenjrPNX2u19cdxiPX68kYxMqAmnWEX
-	 UPhAFAnRcJiRpCj6C7DnqLQC3O0vJ+9sZPtL51WftKjTXIUPMELt+SU67ZWGp3ssij
-	 a7oJo/mIlgZa0M1zOuv613FlWLbGRCO8DCEsGYygmTYrtZ1W7qUxu16kYKoTOtwpWQ
-	 Jrxuar2rkb3jQ==
+	b=K94pHjgaUIvip9HyBF77Uq4Fxi+Q7Flc4Lqjm3/fD96AL8qnUQsRta4lCGs9jBogm
+	 lJuNtp56uUPD6BpBpFhG+IANrYLb9jJpfbt9QDTjNeCCh+JIH46KfyvQKnSK/emuMD
+	 COa42WhoqrhV6LyEumZj52umVg2kq479+MXCwo9Y2JE6ZzLS+7E7JuiXe1VMw7kmI4
+	 NLo83Hv70oOZydBWCbYAHmb/AfNhUN8oh1zs75t+IVEycOw5+AvM5bv6wZDLW9bje5
+	 4VDYb9LcDETBc+y9fFB6LTVgMnYmUh5qehPR8Q6NVMmH2sxurAmTs2PzLXFAYeYcnM
+	 pz+tM85vyiUQQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: javen_xu@realsil.com.cn
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	horms@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] r8169: add ltr support for RTL8116af
-Date: Sat, 13 Jun 2026 15:06:02 -0700
-Message-ID: <20260613220602.219782-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 6/6] r8169: fix RTL8116af can not enter s0idle and c10
+Date: Sat, 13 Jun 2026 15:06:04 -0700
+Message-ID: <20260613220604.219837-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611094345.880-6-javen_xu@realsil.com.cn>
-References: <20260611094345.880-6-javen_xu@realsil.com.cn>
+In-Reply-To: <20260611094345.880-7-javen_xu@realsil.com.cn>
+References: <20260611094345.880-7-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,11 +81,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299065-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299066-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:kuba@kernel.org,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
@@ -105,107 +105,111 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 48C6367FDD0
+X-Rspamd-Queue-Id: B092D67FDEC
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-r8169: add ltr support for RTL8116af
+r8169: fix RTL8116af can not enter s0idle and c10
 
-This patch adds ltr support for RTL8116af, enables RTL8116af enter l1.2
-state. This makes sense for the system to enter c10 state.
+RTL8116AF is a multi-function device where functions 2 to 7 are hidden from
+the PCI core. This commit puts these hidden functions into D3hot and enables
+ASPM on their PCIe link control register by writing to their configuration
+spaces.
 
 > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index a73c0215b2407..a49e7a8d8f4da 100644
+> index a49e7a8d8f4da..bc00cdc3add65 100644
 > --- a/drivers/net/ethernet/realtek/r8169_main.c
 > +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -356,6 +356,9 @@ enum rtl_registers {
+>  #define LINK_SPEED_CHANGE_EN		BIT(14)
+>  #define LTR_SNOOP_EN			GENMASK(15, 14)
+>  #define LTR_MSG_EN			BIT(0)
+> +#define RTL8116AF_FUNC_PM_CSR		0x80
+> +#define RTL8116AF_FUNC_EXP_LNKCTL	0x44
+
+[Severity: High]
+Are these offsets swapped?
+
+In typical Realtek PCIe configuration space, the PM capability is at 0x40
+(making PM_CSR offset 0x44) and the PCIe capability is at 0x70 (making Link
+Control offset 0x80).
+
+Because these definitions might be swapped, the code later reads 0x80 (Link
+Control) and applies PCI_PM_CTRL_PME_ENABLE, and reads 0x44 (PM_CSR) and
+applies PCI_EXP_LNKCTL_ASPMC. Could this cross-wiring fail to set PME_ENABLE
+in the PM_CSR register as intended?
+
+> +#define RTL_PM_D3HOT			GENMASK(1, 0)
+>  };
+>  
 [ ... ]
-> @@ -3153,8 +3155,22 @@ static void rtl_enable_ltr(struct rtl8169_private *tp)
->  		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
->  		r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0000, LINK_SPEED_CHANGE_EN);
->  		break;
-> -	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
->  	case RTL_GIGA_MAC_VER_52:
-> +		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-> +		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
-> +		r8168_mac_ocp_write(tp, 0xe02c, 0x1880);
-> +		r8168_mac_ocp_write(tp, 0xe02e, 0x4880);
-
-[Severity: High]
-Does this completely redefine the LTR enable sequence for all devices using
-RTL_GIGA_MAC_VER_52? Since older devices like RTL8117 also use this MAC
-version, could this cause regressions for them by replacing the previous
-fallthrough behavior? Should there be a check to ensure this only runs for
-the newly added RTL8116af?
-
-> +		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
-> +		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-> +		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-> +		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-> +		r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);
-> +		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);
-> +		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-> +		r8168_mac_ocp_write(tp, 0xe0a6, 0x9003);
-> +		r8168_mac_ocp_write(tp, 0xe0a8, 0x9003);
-> +		break;
-> +	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
->  		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
->  		RTL_W8(tp, COMBO_LTR_EXTEND, RTL_R8(tp, COMBO_LTR_EXTEND) | COMBO_LTR_EXTEND_EN);
->  		fallthrough;
-> @@ -3174,6 +3190,7 @@ static void rtl_enable_ltr(struct rtl8169_private *tp)
->  	}
->  	/* chip can trigger LTR */
->  	r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0003, LTR_OBFF_LOCK_EN);
-> +	r8168_mac_ocp_modify(tp, SEND_LTR_MSG, 0x0000, LTR_MSG_EN);
-
-[Severity: High]
-This unconditionally modifies SEND_LTR_MSG at the end of rtl_enable_ltr(),
-which is called for multiple MAC versions. Was it intended to apply globally
-to all chips, or should this change also be restricted to RTL8116af?
-
+> @@ -3731,6 +3734,33 @@ static void rtl_hw_start_8168ep_3(struct rtl8169_private *tp)
+>  	r8168_mac_ocp_modify(tp, 0xe860, 0x0000, 0x0080);
 >  }
 >  
->  static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
-[ ... ]
-> @@ -3732,7 +3751,9 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
->  
->  	rtl_eri_set_bits(tp, 0xd4, 0x0010);
->  
-> -	rtl_eri_write(tp, 0x5f0, ERIAR_MASK_0011, 0x4f87);
-> +	rtl_eri_write(tp, 0x5f0, ERIAR_MASK_0011, 0x4000);
+> +static void rtl_disable_hidden_function(struct pci_dev *pdev)
+> +{
+> +	unsigned int slot = PCI_SLOT(pdev->devfn);
+> +	struct pci_bus *bus = pdev->bus;
+> +	unsigned int devfn;
+> +	int func;
+> +	int ret;
+> +	u32 val;
 > +
-> +	r8168_mac_ocp_write(tp, 0xe098, 0xc302);
+> +	for (func = 2; func < 8; func++) {
+> +		devfn = PCI_DEVFN(slot, func);
+> +
+> +		ret = pci_bus_read_config_dword(bus, devfn, RTL8116AF_FUNC_PM_CSR, &val);
+> +		if (!ret && !PCI_POSSIBLE_ERROR(val)) {
 
 [Severity: High]
-Since older devices also use rtl_hw_start_8117(), will applying these register
-changes unconditionally to all RTL_GIGA_MAC_VER_52 devices affect the hardware
-initialization of existing devices? Could we add a check to restrict these
-tweaks specifically to RTL8116af?
+Is it possible to verify that the function is the intended hidden device
+before proceeding?
 
->  
->  	rtl_disable_rxdvgate(tp);
->  
-> @@ -3759,9 +3780,9 @@ static void rtl_hw_start_8117(struct rtl8169_private *tp)
->  	}
->  
->  	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0000);
-> -	r8168_mac_ocp_write(tp, 0xea80, 0x0003);
-> -	r8168_mac_ocp_modify(tp, 0xe052, 0x0000, 0x0009);
-> -	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x047f);
-> +	r8168_mac_ocp_write(tp, 0xea80, 0x0000);
-> +	r8168_mac_ocp_modify(tp, 0xe052, 0x0009, 0x0000);
-> +	r8168_mac_ocp_modify(tp, 0xd420, 0x0fff, 0x045f);
+The commit message notes that the hidden functions return an all-ones
+response when their vendor ID is read. However, this code reads offset 0x80
+and checks that it did not return 0xFFFFFFFF. If a legitimate, OS-enumerated
+function exists at any of these indices (e.g., a secondary NIC, Wi-Fi, or SD
+card reader), the read will succeed with valid register data and the driver
+will overwrite its registers at 0x80 and 0x44.
+
+Should the loop read the Vendor ID (offset 0x00) and verify it returns
+0xFFFFFFFF to ensure the function is truly hidden before mutating its
+configuration space?
+
+> +			val &= ~(PCI_PM_CTRL_STATE_MASK | PCI_PM_CTRL_PME_ENABLE);
+> +			val |= (RTL_PM_D3HOT | PCI_PM_CTRL_PME_ENABLE);
+> +			pci_bus_write_config_dword(bus, devfn, RTL8116AF_FUNC_PM_CSR, val);
 
 [Severity: High]
-Like the changes above in rtl_hw_start_8117(), these magic register updates
-will be applied to RTL8117 as well. Can this break link stability or ASPM
-for existing devices by replacing their expected register values?
+Can these 32-bit read-modify-write operations on natively 16-bit registers
+unintentionally clear adjacent Write-1-to-Clear (W1C) status bits?
 
->  
->  	r8168_mac_ocp_write(tp, 0xe63e, 0x0001);
->  	r8168_mac_ocp_write(tp, 0xe63e, 0x0000);
+Reading a 32-bit value from offset 0x80 fetches both the Link Control (lower
+16 bits) and Link Status (upper 16 bits) registers. Link Status contains W1C
+bits. Writing the unmodified 32-bit value back writes 1s to any W1C bits
+that were set, clearing them.
+
+The same applies to the 16-bit PM_CSR register, where writing back the 32-bit
+value might clear the W1C PME_Status bit (bit 15) if it was set, and
+needlessly overwrite the adjacent 8-bit PM_Data and PM_Bridge_Ext registers.
+
+Would it be safer to use pci_bus_read_config_word() and
+pci_bus_write_config_word(), and explicitly mask out the PME_Status bit when
+writing PM_CSR?
+
+> +		}
+> +
+> +		ret = pci_bus_read_config_dword(bus, devfn, RTL8116AF_FUNC_EXP_LNKCTL, &val);
+> +		if (!ret && !PCI_POSSIBLE_ERROR(val)) {
+> +			val |= PCI_EXP_LNKCTL_ASPMC;
+> +			pci_bus_write_config_dword(bus, devfn, RTL8116AF_FUNC_EXP_LNKCTL, val);
+> +		}
+> +	}
+> +}
 
