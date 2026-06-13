@@ -1,204 +1,300 @@
-Return-Path: <netdev+bounces-298966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3XDJKYxkLWrsfgQAu9opvQ
-	(envelope-from <netdev+bounces-298966-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:09:16 +0200
+	id 1adMItNlLWpFfwQAu9opvQ
+	(envelope-from <netdev+bounces-298967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:14:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EF6B67EB93
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:09:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D498D67EBBA
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:14:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=lmLqYVS9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298966-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298966-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=nb02RR0i;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298967-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298967-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F9683013008
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 14:09:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 801133038F5A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 14:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399AD30C172;
-	Sat, 13 Jun 2026 14:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEC230CDBC;
+	Sat, 13 Jun 2026 14:14:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010035.outbound.protection.outlook.com [52.101.56.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C8830569B;
-	Sat, 13 Jun 2026 14:09:12 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781359754; cv=fail; b=au/mr6H3XIbpVvuHyCQPIjG+XZ5CA+YRyoFmJGM5zu5A6Dddd/SUmzNMXVIp8r/cJEdjzalHlxjimQLezS3sZcgbeMI8bhXj9LmzV0NwZ5em/MwoaXLtlm/Arar/G+DHybxBcUeDJJMqWTHf7mwsoNqIJp6z51Y/DH8n+I8OXWg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781359754; c=relaxed/simple;
-	bh=vp7gvYy3w/uBLVdElypfV9pyAnK2OvcG/LBFnLUR1Mw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=G0dShpItagDIV/MoSGDAHF+y0otR5GNSOmKLVNrsfAVBGFn4fxsOUM1q0/kFRhGdvtu/KKPCcKUPEmtbV2O+eB/2GykIWQXT9NjGZMazfCRDb9hNF9dprEUSD12DVj3hGsa8tR91lul+fM/HfZ8LceOj1GFz93Od86YV0Ctje+w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lmLqYVS9; arc=fail smtp.client-ip=52.101.56.35
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BJqfuJGA61LuEdFSOjCiHxDvbspZdR9r0Vy8MybrHRwm6uyxlGNHT49I28eDFnQY2Za28Pxh0gIY2KTob5jr5lH+QqwqxNBFKD2jD8Z/qhwAHStSCj3KJz14L4AWPKgEqi/LXKW8r+XzHlwTVxlVouRQJlTnWEFxBwpylwdIaEAA/p439Hod1w6cyRdJQtJee63+zZs+AkfCXLHksF2aUEqToHopIaIHNdm/BoADmHRxAM19SuVjLbJvnQiwNvrDpsluxQx450w1KLPhSANFT9Pda5n84cZgISIjks0bFOurLd+HNf2QnXICvKbVikEqLoai5CP8GKAJCtFxM74Ppg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q2NsWITpygup/SU3igAg9H/sO7AuWweu/pR/vMvjOJU=;
- b=xyApkK19KbEnzFdB1gPfp9fXScsW8RC0dELg2DD5vg+NK5ig9fhewu7brt9sgtdzWntTNtjzt4LUQpnq1KbspIT11yme+ZBPlNAqfI5gMM3/5885nTnmIZP+mVqDBVaBzvRKCKiILwzYaXhcb3RzpZEj+0UJOV2uZPzNyuNdInuWc65YhjpsZ87KxgVljHjG4HSM4sh8Sf4dv9BhMN9HTpbvXiGiZRTfpVlIVzFFahcEsFfgTXDTa8VetGzRUD13e2QDCjGA8yWuJquRRWWaGJjMMasVVBh7TWZGZdPiLctIbft1UfsNg5UdbgULA6nWKL6wwv/jULgu4zIXP59HLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q2NsWITpygup/SU3igAg9H/sO7AuWweu/pR/vMvjOJU=;
- b=lmLqYVS9SG9DUgLn69Kmn+H7UmTynAAvAJEeluFF5uIEPLuo5Bsgr0XJLmOxKa8tZIGT71Wrv8xmaRXV2VJv6sdCNNkUfU+r6+9iOu0g0R5dSsxFP4gPS1HnAZmaFzNIGHX28ragjkK1lrVWPXD3jk8xkmZlTFIS1m2Vk5tR2IsFuyaIu6bZC8yedDxcP8vz3DWwpjg8mdgO887EGKIRcu5s0S4Ptny6D1/SpMIW1WdwFMw67jqU4tGrAPjaxWhZ/3V2I/wFHt1TM7rBmz9p2tdCO7LiRkQ8T2FaJmQQ/mncVVPI+VbqUDp9R+upuxbahc08pA0THY1+ymBAn90HmA==
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by BN5PR12MB9509.namprd12.prod.outlook.com (2603:10b6:408:2a8::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.16; Sat, 13 Jun
- 2026 14:09:08 +0000
-Received: from CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7]) by CH3PR12MB8728.namprd12.prod.outlook.com
- ([fe80::2641:1046:bdf3:93d7%6]) with mapi id 15.21.0113.011; Sat, 13 Jun 2026
- 14:09:08 +0000
-Message-ID: <b581d253-135b-4c75-a50d-2049c6d6e249@nvidia.com>
-Date: Sat, 13 Jun 2026 16:09:03 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] netdev: expose io_uring rx_page_order
- order via netlink
-To: Pavel Begunkov <asml.silence@gmail.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jens Axboe <axboe@kernel.dk>
-Cc: Yael Chemla <ychemla@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org
-References: <20260612211709.1456966-2-dtatulea@nvidia.com>
- <20260612211709.1456966-3-dtatulea@nvidia.com>
- <d0401fab-61c5-43e7-93ae-d4757433eb7a@gmail.com>
-Content-Language: en-US
-From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <d0401fab-61c5-43e7-93ae-d4757433eb7a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0160.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b3::14) To CH3PR12MB8728.namprd12.prod.outlook.com
- (2603:10b6:610:171::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E50281532
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 14:14:39 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781360080; cv=none; b=tEhE+/ELgM7oGF2uGrjrBoQCL+fT51Fw2R7V6CAxu6t7PGzrww0v2wlYf6mNUYgaTWuQ+WeoGVi12lyI55Yi1ZAg5VUfzuPToJZVjPL7gnyIhhEZxCqFrvJRoi8dHIc1TYcHB0uyp8m9Mx6yXiwEaYotOvXDq3iQP5f4SCOTvuQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781360080; c=relaxed/simple;
+	bh=wzwdF4M/UpXu4aQQwBuQUMYn7Bkhoxn804AI+JjangA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GzyHY8Wr0kEq6At4kAiooV8McBN+dlDSnDBeddUCQHNcoPBHu18s3uShpJq6KxYI5QttZc2WjoishvifhrK5uGxbbscwxXaaibR8rKOP4HXMnQvIjOzyFdrfXqCdKFtN2Yp0TtXJRHKBwDh/CtzNKRSh5WQjx80ewJoMX8s1Tjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nb02RR0i; arc=none smtp.client-ip=209.85.160.181
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-51764768c36so27104811cf.0
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 07:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781360078; x=1781964878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=siocUVnVf3eM8EdFHeQGn4LtXIWh8zfDsTIVT1+wz7M=;
+        b=nb02RR0iNviiW379xNy9MKJ6MyZ79j0saEGXNOsLi0dARhrfGzKnOKD7p32QfP1dFH
+         j4fCLT9UzogLVtyiFpRx03mMKMxoRaQx/KDmFI0e4NmRmzdUM9WnpUFPChzVRn/Al1Pj
+         ggJjTcwYPWnylSpLB6mIIpUB/ZID28cJXNMIMUIX8lx5TkkVYwlDL2g0+K9NQ6xrVhda
+         0qnYWu/CaPrdzYVICNG+whsrVQW3Me8CN45iwTOy8bCzIjktOVuLYFYlOhTcqgz0+tPs
+         6bPiZ4FKnYcJZbYt3RbQeIYv+ET44mB//9X+UyKzOrrKD7n/VfF0XgJEWK2e7lVYNR+2
+         sHqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781360078; x=1781964878;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=siocUVnVf3eM8EdFHeQGn4LtXIWh8zfDsTIVT1+wz7M=;
+        b=nwYzsIZ4avX40llX4XQcOySKs366jaetFILEHRUT7H0ARLDDS2mwpDJTZJFLrO00Zp
+         cR+/TR8Q+jjm09ylM5nOIKgjHNZ3JL2DtnKw5ttXKpfDDUn7H80aS2VTBDNr9DPCB7SW
+         fuUhVSCEg9pAaAoH8vPetB73bfi8fV4caibR5HRaA40ZX4BrKVs1+r6+E0sW61nDNDlL
+         AkPQd3ywYMT6EgcUZhIi/o7fX9qPKk9x4PWje8/e94HoT4Kqt6+B2bjfAJqIiT2hWNeH
+         Xe4A34RLiQ6BzJKoBpLanx3nkfCejVzgLPeo3eYhW2C1aSAUZOOEIf255almp0gL2xhc
+         LmLA==
+X-Gm-Message-State: AOJu0YwJVT9/9o+pm7N1B48Ws8dgWC1fBNN2w1Y6EMIuiq/5QdefVnEK
+	HgiRDumUZNmKZ4OIUYqdHI+9a8GnlfkoMS8QBFF8oZgniC1SxLJJd/k93d5lKMJ5LdU=
+X-Gm-Gg: Acq92OEJZvRqG5Yz0SK+QfggNWMMEEHNfVnBorjeXbHBy95Zw0mglCFW9fIGJqQGDCW
+	Qf3WVutP6WlfnWGoBDb+1YtkRfC9s8BhnMS3KT1wiFS4x6BIGLQF4f0eF8mqC2chld7sLx2rMlm
+	y7dcJd+p+LRA49WiDPvuWLeoAyPZiPwKZn2ATnjDl25FSqJjg6ZbFDMTmv8LWdcbNzjCKPERst2
+	hSGa+8sELhfM1DnVTxBGxiCNSXcBFXk8uGDUuh+mtWhmXfXAUY+OxrLWK4r/3q8CkaA2cpcw9sP
+	Ayln6VdfRFxhab1H+Di6nFD0THHsjv/zoDOuEGezE/laWoDhR6FrNOTfcfTsnWjOTp292E+LqI7
+	n6OwmtnbHooTo0kiAkRoUzudepcnP51v+HrTWBLE+nU/goVTvF9EHqc1YdsLicMrN7TuO/ChNuG
+	Mz8q1dV5OAAM9PvS0ENA==
+X-Received: by 2002:ac8:7fcb:0:b0:516:dcfc:ebc3 with SMTP id d75a77b69052e-5195359cdc0mr61668861cf.30.1781360078433;
+        Sat, 13 Jun 2026 07:14:38 -0700 (PDT)
+Received: from houminxi ([163.123.141.225])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-517fb83db58sm48910991cf.27.2026.06.13.07.14.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2026 07:14:37 -0700 (PDT)
+From: Minxi Hou <houminxi@gmail.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	echaudro@redhat.com,
+	i.maximets@ovn.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	Minxi Hou <houminxi@gmail.com>
+Subject: [PATCH net-next] selftests/net/openvswitch: add ICMPv6 echo type match test
+Date: Sat, 13 Jun 2026 22:14:29 +0800
+Message-ID: <20260613141429.3084962-1-houminxi@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|BN5PR12MB9509:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9da9e508-71a0-4427-e437-08dec955559b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|23010399003|366016|22082099003|18002099003|4143699003|11063799006|6133799003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	0ejoQjHFk75aBSPZmZlBd6Tt/s4YqVPlXkHjXRohZD4E92UPgjcdD5ZPjMDpuV89/cfgTzdiptM/kvDKy7KD9IZepceSqVw9V2UCRcb1BZFS1Qx8IDRmRG0n5FMstKR0aQTH2UHwB+3uEbLgrHysqZtKsalB/9wygINVE1e0eYtjz3wNQJF6yubDP8YH+KUSc1ycp1vlVnyik0ZWPWSe/rYrA4EWD9IeG3scJC29Ct3F6z7lzbb0HtkGtUiLbmS91ObEeKYZ8PnfZRGPWxUdOkC9uxL3P40i1ReUebIIdCO8hrr8Wt7+oFep5HD1MC8y6qAUY6usW8o/hOJrg/SkCR4/U2zJwi3w4UGlnxWmJQJnnOKWXkxj0+gHzSJrY0J3GtvjL0wsLlxKy7JMUj9QlryGIQ1o9S33tI++IzgvDA6FdQMfPMb4EJxPAiZgcKAN7BpdxLpn0snqbAfqhDnAAp2RMUM/TPByfv+mwl0qd7LZ+nhL589Hguy/SmHjJRmO6VIVhX30AREkU/4amyZBmfF3vCz2G9H6PN3Bzoy7oQE0ed6uFrg4H8+FydYcIcC+v2Qxr8kMgPz/ivHFqK5Cxpt2LJV/9b9rDkyJqKpwSc71xe4ewSO+zrZT0pr2woaeaH8Rr7DoTsECGHim1SXO5FwN3Aq2f+xxjfVxpNTKA9I6IZ36+EN7AMX2i8+rGaCt
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(23010399003)(366016)(22082099003)(18002099003)(4143699003)(11063799006)(6133799003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UjRYc3MySkdyMkxRQlp1YXRLYUVKVGZFVk95QTdXc0h5Q0RSa0FER1VBWE93?=
- =?utf-8?B?MDFWL0pMby9IZkI4aWluVjAxOFpLWEN6bFpMOXRuVEh2MjgwdXdDeVJDVVZx?=
- =?utf-8?B?Q1ptek5vT3pNZURTU3J5ekdsR3B1cHdncDREaHczbk53TzdjOHVOYnJybEZu?=
- =?utf-8?B?d2NYRG5lT3FvdmxHLy8wYXA0RDhwWm9ieVpRaEdVUU5tQmxSMDB2TzYwWXI0?=
- =?utf-8?B?SVMxUWc2TW9FaWxyT2JVNTRaWXdNa0tJRjhmTldGbXd3RXkya0lHbHBLQm5Z?=
- =?utf-8?B?TDQrdmZablF2TWdOYnRzdEJkdUU3ZVpGU0RVdVFXK3Y3T3djMzRRS0tnVy9U?=
- =?utf-8?B?a0dLTjZrTmlibDRNMGxWMDRjMGszeUEwa29YMU9WeVBtd3NQVW5CU05MT2FK?=
- =?utf-8?B?eFZ3YWovbndmN3hLY3VYUENkU1Q3Y3JaUE1JNGI2Q2dsaHZ6UXZpdEd6MjNF?=
- =?utf-8?B?cUEvVzFTUll0TjlWOU9UZXd3NlpvdTVKcGxGYktyQ21acUpHSm4zZ0NkVVJS?=
- =?utf-8?B?NTdXUGZ2dWhnWnVJNnVoZkNuSkFoTE9ESmkxZ0xiUEh0MHIrb2ZZSlE5dktG?=
- =?utf-8?B?M3R3MENpUmlvU0gwSVNwODlnWjVBWGxjNWxybnc0VmpmOFlUeC9IWG5ScDJU?=
- =?utf-8?B?QWhXZEVEVmlUeGQrL1hJOUFNWTJYMHJuRy9tYXlrb2FWV2Q1Y0NjUzNHZC9P?=
- =?utf-8?B?TDhabmhQNUJSQVNmM2o0Y1hnRTFnbzZYdTc4U3FRS2tuQytGeUxGTWJObGdM?=
- =?utf-8?B?cHgvN09VRDRYL2k5TW1sOEsydDlJYmNBYm9uNktLSTBnQlp4WWFBQXNjZklQ?=
- =?utf-8?B?YUN1cG12SzFTaENTbWQ1cjhkWUtrenUreVFmOEhadDZHVGxZUG5OTnkvWGhP?=
- =?utf-8?B?a1dDanJTSDJ2MzVTaVRZWkFBYmUyUUhyTjhVNGJVOFo4TDVQZWJEbTNqNHJK?=
- =?utf-8?B?d0Y2bnpoUmRIZjErWXkycEFoNXBjVHN1MkRwSGhzNk5qSFczN2RGRkI5Y2tU?=
- =?utf-8?B?Q3NEMys2NXl1ZG1abnVJYkIvRnF4b1Q5WFFGUlZ5OU05bjVZNVVjSnYrczJa?=
- =?utf-8?B?OG9mOEtGRUtQcmxQWE9rdG0zeHdyRmtiUm1nRHcvVnp4cEI2NS80WS9udFRn?=
- =?utf-8?B?QjBYb3cwcjUwSFJmUTFuaXlPNTdIUEN2ZXA4YzV3bk5KTFdibGVOS0dYMWlm?=
- =?utf-8?B?aitseVh6bCtyQTEyYmpBa29ObDB6WS9IYWc3YW5XNmVLVzI2d09zUUg1MHBq?=
- =?utf-8?B?elZFZktyZkpXSUl5aFY1aElGMjNIcFIwMzBXRFZYalNiSzlSdkR5VXZ0RXJX?=
- =?utf-8?B?aEZLNEhSRTI0MWtiWEdZa1RFSXBxTzJXd2V2eXRoUGI4U0NzdmRlbEYrTDdy?=
- =?utf-8?B?TGhzdDN3ZWg3K1RmN25oeDMzZEFsREhYZkh0RUp1M2hjUHpVVnd4WTFnOGti?=
- =?utf-8?B?SkRvcEd2SmhRajVSdSs2VExYVEZqRllHYUhVeDdGeU8xZFBWWWFBdmo2ODRI?=
- =?utf-8?B?RkZ2RVpxcm9JY2w1T013eW1DTHR1MXkwQjVoQUpGT1JlRm5kbmRrY1J1QTQw?=
- =?utf-8?B?VFB2cXZNR0gzVWpTeTFzeVQxZkxqUXd4ckg1YzZpVjRlOHFNZm8xK0p1VGJM?=
- =?utf-8?B?TkNsMkRRUW9oV00vRGhCWTIwZGJGS3Vib1NSSU9WbWtYaXpsbmpGb2tRTnVV?=
- =?utf-8?B?Vm5ZNTNrNy9CWFN5NXQ2MlB0YW8vY29MaHpvQXlNSHFSOTkvSEJsZlpaWXlB?=
- =?utf-8?B?QURjaGFpVFVsN0lYWXZvNHUrb2xCdElXWkl0Sjk2RmVYM0tuQlo0d0NJWW5J?=
- =?utf-8?B?L2l2VTF5MWx0QjA3Nk9XdFJrT1RsTUw3NkVaTHhpMEtYd0w3N2RHTXlQY2I4?=
- =?utf-8?B?aVJlNDhyM0VZYStza01HQm16WVZtTTlzVFlFdjJEWGQyeWR3eVVLR1lqSS8z?=
- =?utf-8?B?UUxFeU5HU0JuOGswcFJWRmk1T1MxZXZHTThLQjZZYzVweDZoL3d2T3VIbWox?=
- =?utf-8?B?MytLWmgrbEVnQ3RhZU5qTDBKanluQ1VwZERwbzM4UU9iUENEOTExSXByaVNw?=
- =?utf-8?B?MUdHa2ltakowWDhaVU52UUdQQ0hDcU5vdzNaNWh2YTc1S1MzZXNwOE05OGQx?=
- =?utf-8?B?SFRWZE95T2pZMjdVSjdQMTZuc0NMRmJGeEZzZW5vRGM4YTZ1K1NFclV4Ry8v?=
- =?utf-8?B?QUxhaHYrUWN0N0VpVkYvSEV6S1liczZ5REt0VkZoS1pBeG1nRGlKT0lYK2ow?=
- =?utf-8?B?cldPS0wrSFFsekxEOUFNZDhxRUFlZTVzRkIvN3c1SmUzQWdTZUR0NCtFS3ZU?=
- =?utf-8?B?VnF4dnQ5K0tZQlVLZUp6cmQxam5IS0RzOXZxU3FERWUrV1pFaVlCdz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9da9e508-71a0-4427-e437-08dec955559b
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2026 14:09:08.1457
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kb/6/1HrnZKUvh2rhbG3rNbpehT01Ken5Jzl0fxKS1bUOo/g4hfI3srjZMrVKeJWw1PLFCJp1bp8NQqO2y768g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9509
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298966-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,kernel.dk];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:asml.silence@gmail.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:axboe@kernel.dk,m:ychemla@nvidia.com,m:tariqt@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:io-uring@vger.kernel.org,m:asmlsilence@gmail.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298967-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:houminxi@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dtatulea@nvidia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1EF6B67EB93
+X-Rspamd-Queue-Id: D498D67EBBA
 
+Register OVS_KEY_ATTR_ICMPV6 in the flow key parser so that
+icmpv6(type=...) can be used in flow specifications. Without this
+registration the parser silently drops the token and the kernel
+rejects the flow with EINVAL because the expected ICMPv6 key
+attribute is missing.
 
+While here, add convert_int() to the ovs_key_ipv6 and ovs_key_icmp
+fields_map entries so that specifying a field value produces the
+correct wildcard mask (0xff for bytes, 0xffffffff for the label)
+instead of using the value itself as the mask. The ipv4 counterpart
+already does this via convert_int(); the ipv6 and icmp classes were
+simply missing the fifth tuple element. Existing callers that pass
+empty parentheses are unaffected because convert_int("") returns
+(0, 0).
 
-On 13.06.26 11:53, Pavel Begunkov wrote:
-> On 6/12/26 22:17, Dragos Tatulea wrote:
->> This adds observability for the io_uring zcrx rx-buf-len configuration.
-> 
-> It might be nicer to look it up in the queue, e.g. rxq->mp_params,
-> and make it a queue attribute instead of zcrx specific one. In either
-> case, no objections.
-> 
-In io_pp_nl_fill() or in page_pool_nl_fill() as it was done in v1 for order?
+Add test_icmpv6 exercising the ICMPv6 echo flow key. The test uses
+static neighbour entries to bypass NDP, then verifies in three steps:
+install icmpv6(type=128) and icmpv6(type=129) flows and confirm ping
+works, remove the flows and confirm ping fails, reinstall and confirm
+recovery.
 
-Thanks,
-Dragos
+Signed-off-by: Minxi Hou <houminxi@gmail.com>
+---
+ .../selftests/net/openvswitch/openvswitch.sh  | 63 +++++++++++++++++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 26 +++++---
+ 2 files changed, 82 insertions(+), 7 deletions(-)
+
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index d533decca5c1..8923224fa88e 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -31,6 +31,7 @@ tests="
+ 	pop_vlan				vlan: POP_VLAN action strips tag
+ 	dec_ttl					ttl: dec_ttl decrements IP TTL
+ 	flow_set				flow-set: Flow modify
++	icmpv6					icmpv6: ICMPv6 echo type match
+ 	psample					psample: Sampling packets with psample"
+ 
+ info() {
+@@ -377,6 +378,68 @@ test_flow_set() {
+ 	return 0
+ }
+ 
++test_icmpv6() {
++	sbx_add "test_icmpv6" || return $?
++	ovs_add_dp "test_icmpv6" icmpv6 || return 1
++
++	info "create namespaces"
++	for ns in client server; do
++		ovs_add_netns_and_veths "test_icmpv6" "icmpv6" \
++			"$ns" "${ns:0:1}0" "${ns:0:1}1" || return 1
++	done
++
++	ip netns exec client ip addr add fd00::1/64 dev c1 nodad
++	ip netns exec client ip link set c1 up
++	ip netns exec server ip addr add fd00::2/64 dev s1 nodad
++	ip netns exec server ip link set s1 up
++
++	local cl_mac sl_mac
++	cl_mac=$(ip netns exec client \
++		ip link show c1 | awk '/link\/ether/ {print $2}')
++	[ -z "$cl_mac" ] && \
++		{ info "failed to get c1 hwaddr"; return 1; }
++	sl_mac=$(ip netns exec server \
++		ip link show s1 | awk '/link\/ether/ {print $2}')
++	[ -z "$sl_mac" ] && \
++		{ info "failed to get s1 hwaddr"; return 1; }
++	ip netns exec client \
++		ip -6 neigh add fd00::2 lladdr "$sl_mac" dev c1
++	ip netns exec server \
++		ip -6 neigh add fd00::1 lladdr "$cl_mac" dev s1
++
++	ovs_add_flow "test_icmpv6" icmpv6 \
++	  'in_port(1),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=128)' \
++	  '2' || return 1
++	ovs_add_flow "test_icmpv6" icmpv6 \
++	  'in_port(2),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=129)' \
++	  '1' || return 1
++
++	info "verify ICMPv6 echo with type-specific flows"
++	ovs_sbx "test_icmpv6" ip netns exec client \
++		ping -6 -c 1 -W 2 fd00::2 || return 1
++
++	ovs_del_flows "test_icmpv6" icmpv6
++
++	info "verify ping fails without echo flows"
++	ovs_sbx "test_icmpv6" ip netns exec client \
++		ping -6 -c 1 -W 2 fd00::2 >/dev/null 2>&1 \
++		&& { info "FAIL: ping should fail without flows"
++		     return 1; }
++
++	ovs_add_flow "test_icmpv6" icmpv6 \
++	  'in_port(1),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=128)' \
++	  '2' || return 1
++	ovs_add_flow "test_icmpv6" icmpv6 \
++	  'in_port(2),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=129)' \
++	  '1' || return 1
++
++	info "verify connectivity restored"
++	ovs_sbx "test_icmpv6" ip netns exec client \
++		ping -6 -c 1 -W 2 fd00::2 || return 1
++
++	return 0
++}
++
+ # psample test
+ # - use psample to observe packets
+ test_psample() {
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index e1ecfad2c03e..049791b2573b 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -1255,11 +1255,16 @@ class ovskey(nla):
+                 lambda x: ipaddress.IPv6Address(x).packed if x else 0,
+                 convert_ipv6,
+             ),
+-            ("label", "label", "%d", lambda x: int(x) if x else 0),
+-            ("proto", "proto", "%d", lambda x: int(x) if x else 0),
+-            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0),
+-            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0),
+-            ("frag", "frag", "%d", lambda x: int(x) if x else 0),
++            ("label", "label", "%d", lambda x: int(x) if x else 0,
++                convert_int(32)),
++            ("proto", "proto", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("frag", "frag", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
+         )
+ 
+         def __init__(
+@@ -1344,8 +1349,10 @@ class ovskey(nla):
+         )
+ 
+         fields_map = (
+-            ("type", "type", "%d", lambda x: int(x) if x else 0),
+-            ("code", "code", "%d", lambda x: int(x) if x else 0),
++            ("type", "type", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
++            ("code", "code", "%d", lambda x: int(x) if x else 0,
++                convert_int(8)),
+         )
+ 
+         def __init__(
+@@ -1982,6 +1989,11 @@ class ovskey(nla):
+                 "icmp",
+                 ovskey.ovs_key_icmp,
+             ),
++            (
++                "OVS_KEY_ATTR_ICMPV6",
++                "icmpv6",
++                ovskey.ovs_key_icmpv6,
++            ),
+             (
+                 "OVS_KEY_ATTR_TCP_FLAGS",
+                 "tcp_flags",
+-- 
+2.54.0
+
 
