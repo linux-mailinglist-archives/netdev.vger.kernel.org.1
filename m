@@ -1,225 +1,201 @@
-Return-Path: <netdev+bounces-298829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3QomO62dLGpjTwQAu9opvQ
-	(envelope-from <netdev+bounces-298829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:00:45 +0200
+	id BD9lFyegLGr2TwQAu9opvQ
+	(envelope-from <netdev+bounces-298833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:11:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004D067D1E7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:00:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1AB67D30C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:11:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b=QTsa7Z4i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298829-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298829-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
+	dkim=pass header.d=google.com header.s=20251104 header.b=neJDuHKN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298833-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298833-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3043030011A1
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 00:00:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6059B301E57B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 00:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD682AD10;
-	Sat, 13 Jun 2026 00:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360D5E571;
+	Sat, 13 Jun 2026 00:10:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941D0125AA
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 00:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09CF1C01
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 00:10:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781308841; cv=none; b=dWdnLKMZOR52kw28R4cA5vvRzYa2zd155u63Omo/cR4Ma8tdUm06daAqdnvHOKpNBQus7NSFX2/ZqdWqNEJYw7OLJ6iJKYo57C7u+ur3qgAm0mvw/IJ3RSfq+CG6q/OguG9oKYFvMgaB4RDn+vMy0Ft1L/Np4omMjQrulp3JO98=
+	t=1781309438; cv=none; b=qCLL4w2lBGdG2gQ9I81oE7xsbkIUftGgqknNsn0RdHRIBh6HgIl9L55B86iV/68g2C1AlT8swRg+foOon6P23UYHsP038dA8Xtzi8tyTnmnCwHSUTCgy91QUye7aBUtXzP3iSO7Br5h+bjc3Q/0Urcf6n5hFn4WkYV5MHFQxWh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781308841; c=relaxed/simple;
-	bh=J0WzJpD/x+q+vxJv2njAkDDF3911Tp1Td3ILzRFuhFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHr9kPyG0H3NSE7GDLwB8U+4LN5zeD6BACiv4XeTi9JdZDSCETQj5Zxt+uoW8+uaN7UXFe8y8BUFuYgWI1dwKUeA5UrESFjDucRNImdxh+I6nDfyeS7HLrR6bTJB0LOIoC5QWnfGJrZyd9EvFYvCu8PcykbRxTUzB3MkMYvVtpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=QTsa7Z4i; arc=none smtp.client-ip=209.85.210.181
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-84275887a3fso1852020b3a.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:00:39 -0700 (PDT)
+	s=arc-20240116; t=1781309438; c=relaxed/simple;
+	bh=bNMsgYGyF4Tc6YjEZ9ElAv1ahEqg8OKorBlOU3Fmhfs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Nj4su/B4IwNX4RjAfy7GdIOO3sUbDDV++8M6fcQsRf41zDFb9u7eSANvCiqv8sJ9fdv5OGdSlPXOq9BHp37qvpCxruvSSO9JYoJ9TE0sBHlH77pmGfWAeEOF2cXBYpSOulyoCWBmNzq8NOMG0P7OfSZQWgPweh9yGscxdzie1TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=neJDuHKN; arc=none smtp.client-ip=209.85.214.202
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2bfdd99f6b7so25054545ad.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 17:10:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1781308839; x=1781913639; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4w1/sjBs167L+wbRQHAYtjy5PaFRFJl/qC08ynozT8=;
-        b=QTsa7Z4iNJ67/wuvxzBkiGd3+K0hWlIRPlr2Y7GlkyxvC7n6BOeYlF/adlDDMKnmKL
-         b2uLAnwHyp5EjA2fIaSoDW7c1N0xNflE1plrDcBpz1L5r6TpdkwLEdP3iCi8rVphmtZZ
-         h3xIPpX197I1GqcHjR0BUOoEpJ0ljysMbF7pYRrO2K0gIZ/vHb3o/d9bkeLs6esG10T7
-         QCHqQvhvBHGz/7sf2v+clSprxEra7XHsLvDguytMZTltpWsZdcdaRX9DsjzbBTTebJvx
-         l78YubcVFAt+cGoMLW/NEH2Vg6Rddh7xE/SOmZSulIsBLLOoYPicSKiUEKybYaQJh79v
-         xvcg==
+        d=google.com; s=20251104; t=1781309436; x=1781914236; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kyks4UFOUwCvj/2wr5bJ0bF+lU7UlWavCSZG1GuENqE=;
+        b=neJDuHKNODfH4YLs8X5yESc74jXRcypOMa4MlCO0H3J0GADKfHQVrWxGqXrRx+nsKt
+         2mjhbayTupb/EYmvEQzgVD8HzGEnUIfK4w4IlelsqUm5uuagIbpi5R8Cx54MIv1Zjqi+
+         gh1LooHxi+sd7smSQSZbOWA8JzA/auc5k/eTucyFKO2XQv+lOVWOdCjaDe6Aw9Z9tZwr
+         EpElC3P3VWDdzJAeEhFln5+++w/dYNwKFYoQ97Dgxx23elc30PKD8i9+r6w+OHRIPAv6
+         1kLkksUi+LfqYt7mLfVLNF6R/APHhw+rcZAxsGyG2NR77XbzgScbytsXJNVglAah5dqs
+         ADew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781308839; x=1781913639;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W4w1/sjBs167L+wbRQHAYtjy5PaFRFJl/qC08ynozT8=;
-        b=NhYcLhwKJrnfrr2hNoF9ZfWtWgq2q+5oAaaAHs5P6QbVRBWIEesm8JqIUuXz65AJoe
-         f31OvZKr6ZkAmB4EJ2QX3wEaErSC/5I25GTwWdlAtEUU0VQsBLlPcUvKI0BuTNjzkU7S
-         inD8nj70b6uJfXf8VRjHV3VnAWjml7e5kBaCV+WYrFsH0YehmGOY2QgZTwWF8TvEFwMI
-         xm0uzmaJyDvg2XmLmH7ltH+avglXiypgFKu3wwnRfL9e9pn8j01Bjz6YGp3TLE/fPXtf
-         /Ew+eahymPpALttjOIsJttFZ3exHB3ujimHLn6ib8C1+zxfqcjWoTDUkBl1kAics5s2w
-         VyUw==
-X-Gm-Message-State: AOJu0Yz8Hn772s8CKttxeV59T89MKit02RTVHlXT/ozHfU8vaVHMpc7Q
-	LGh8PH1C2MQz2iibvNkyhlzWh2fPgYTPX8JA1/LsZZWNo6Rf5VMMCxJOB+TVzdZ5oA==
-X-Gm-Gg: Acq92OHlC3biBkWZV1YPOZRAHPdgoimOOw7i+gkLENFcdVrRvSQsdnrsZQQ11aIOepA
-	pL0zeLfHuKDuvemndpV6I5Nq7d7F+pt1cBMNRpSxeTqR78Rih8jjqujMYi5b4R7rnW4fmPVDfhl
-	ElSm/2+s0ZYunk8eUBX98q9gRiziWNW/2CXOLK+hpyzeR+ZiPUyab7CJ9tjBq9yBS6Vi3Q12Ea/
-	eHqYPyFpGkar8DljqtQLfyU9jfxJ5PWNrd7UcW23aQt1BY2NUV3MAfhun8XM6oA4gxs4zK+vocw
-	jWUwqkV14E65x3FvU3t1df7CTXdowgylRqRAb4o5yLDDdR4CtJ99ecP4Bmd+p+TOSr7tbE4rQSY
-	+pXgp+JqaDvJMdtOeJK2fElKkDECTQodFzDB08LeKdCh4/X24E4u3aj35qQQNlEEjY9N3Tmdt1s
-	xie7Tmug==
-X-Received: by 2002:a05:6a00:3a08:b0:837:735b:826f with SMTP id d2e1a72fcca58-843497ca6d9mr4673044b3a.32.1781308838671;
-        Fri, 12 Jun 2026 17:00:38 -0700 (PDT)
-Received: from p1 ([2607:fb90:ec99:429b:a889:f485:dd02:b10c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b0226acsm3392301b3a.48.2026.06.12.17.00.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 17:00:38 -0700 (PDT)
-Date: Fri, 12 Jun 2026 17:00:35 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Weiming Shi <bestswngs@gmail.com>, 
-	Kyle Zeng <kylebot@openai.com>
-Subject: Re: [PATCH net v2 2/2] geneve: validate inner network offset in
- geneve_gro_complete()
-Message-ID: <2dgmazkbys3g3wjkxfh62tgg5ru2pchhegoavf33zzh4d7lhpb@pdqyz2dcypbj>
-References: <20260609041334.2506153-1-xmei5@asu.edu>
- <20260609041334.2506153-2-xmei5@asu.edu>
- <fcc21647-d7ac-4b9b-ac61-42fec517cb99@redhat.com>
+        d=1e100.net; s=20251104; t=1781309436; x=1781914236;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kyks4UFOUwCvj/2wr5bJ0bF+lU7UlWavCSZG1GuENqE=;
+        b=RMmhKg3x4k0oyEQ0KzcAhFVBJDusn6LOMs2TBOE6gfNrqwk91c1lDTfh9IUSom7U+t
+         oDmZVFMwbisdsDs5HylW6Ep0qfSqVQso+6C3ky6zJvlf0AHcAiM7C8whyQ6OksLyrUR3
+         gj4j3h5hm3BuCjqOsvwlWcLiYJTyLz294PHeNTjGMR7sYjrNetzC1Ao8JbgS4MTOovnZ
+         pE08f7ZQ6Rmp7gTF6bB6RIhSOSdPocLsc2lr8s0fqVGljZ1kDX0vk/1KWnOQRzfVYdO3
+         fFmI4X6VGdcp9FlX/pT8M/EN3zZmSmcchHQcz0Gx1BWP9VieCpvQEmEwtPk2GKkJTFXN
+         l+OA==
+X-Forwarded-Encrypted: i=1; AFNElJ9Qw9Z6P9+4wi9MiFDjpoYtKRuzB+kpMko6ujdyFsfTrCQ2AL51pvd/oO9opFJ1BL35pcecsj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy0igzegeJ4+J1i55xv8v5RV4Du+8bSHZIuigLob6qWocy+6A8
+	O/22PZ0bUrJV+N2b7cKbuQAY7T2YuLSXVj9rWC770LMeeQ2Tqrk+dPoKhhsZeZNifqKJSAfvaAZ
+	6evZpQg==
+X-Received: from plpn16.prod.google.com ([2002:a17:902:9690:b0:2bc:bb0f:91a1])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4587:b0:2bf:2e93:c624
+ with SMTP id d9443c01a7336-2c41284101amr59144935ad.27.1781309435945; Fri, 12
+ Jun 2026 17:10:35 -0700 (PDT)
+Date: Sat, 13 Jun 2026 00:09:38 +0000
+In-Reply-To: <20260612130919.299124-2-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcc21647-d7ac-4b9b-ac61-42fec517cb99@redhat.com>
+Mime-Version: 1.0
+References: <20260612130919.299124-2-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260613001033.1323846-1-kuniyu@google.com>
+Subject: Re: [PATCH bpf-next v3 1/7] bpf, sockmap: reject overflowing copy +
+ len in bpf_msg_push_data()
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: jiayuan.chen@linux.dev
+Cc: andrii@kernel.org, ast@kernel.org, bestswngs@gmail.com, 
+	bpf@vger.kernel.org, cong.wang@bytedance.com, daniel@iogearbox.net, 
+	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com, 
+	emil@etsalapatis.com, hawk@kernel.org, horms@kernel.org, 
+	ihor.solodrai@linux.dev, jakub@cloudflare.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, martin.lau@linux.dev, memxor@gmail.com, 
+	mmmxny@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	rhkrqnwk98@gmail.com, sdf@fomichev.me, shuah@kernel.org, song@kernel.org, 
+	xmei5@asu.edu, yonghong.song@linux.dev, Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,google.com,lunn.ch,davemloft.net,gmail.com,openai.com];
-	TAGGED_FROM(0.00)[bounces-298829-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiayuan.chen@linux.dev,m:andrii@kernel.org,m:ast@kernel.org,m:bestswngs@gmail.com,m:bpf@vger.kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:emil@etsalapatis.com,m:hawk@kernel.org,m:horms@kernel.org,m:ihor.solodrai@linux.dev,m:jakub@cloudflare.com,m:john.fastabend@gmail.com,m:jolsa@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:mmmxny@gmail.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:rhkrqnwk98@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:song@kernel.org,m:xmei5@asu.edu,m:yonghong.song@linux.dev,m:kuniyu@google.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298833-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:bestswngs@gmail.com,m:kylebot@openai.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,bytedance.com,iogearbox.net,davemloft.net,google.com,etsalapatis.com,linux.dev,cloudflare.com,redhat.com,fomichev.me,asu.edu];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:dkim,asu.edu:email,asu.edu:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,asu.edu:email,vger.kernel.org:from_smtp,etsalapatis.com:email,ebpf.io:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 004D067D1E7
+X-Rspamd-Queue-Id: EF1AB67D30C
 
-On Thu, Jun 11, 2026 at 12:47:52PM +0200, Paolo Abeni wrote:
-> On 6/9/26 6:13 AM, Xiang Mei wrote:
-> > Even with both paths gated on gs->gro_hint, geneve_gro_complete()
-> > re-derives the inner dispatch type and length from the packet and the
-> > current gs->gro_hint, independently of geneve_gro_receive(). The two can
-> > disagree if gs->gro_hint flips under a concurrent geneve_quiesce()/
-> > geneve_unquiesce() (sk_user_data is NULL across a synchronize_net()), or if
-> > the re-read option bytes differ from the ones receive parsed.
-> > 
-> > geneve_gro_receive() already records the inner network header position in
-> > NAPI_GRO_CB()->inner_network_offset. Have geneve_gro_complete() check the
-> > offset it is about to dispatch at against that value, adding ETH_HLEN in
-> > the ETH_P_TEB case where eth_gro_complete() steps over the inner MAC
-> > header, and bail out on mismatch instead of trusting the re-derivation.
-> > 
-> > Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
-> > Assisted-by: Claude:claude-opus-4-8
-> > Tested-by: Weiming Shi <bestswngs@gmail.com>
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > ---
-> > v2: Add patch for race condition found by Sashiko
-> > 
-> >  drivers/net/geneve.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> > index d0dc5d6c46df..028740e97740 100644
-> > --- a/drivers/net/geneve.c
-> > +++ b/drivers/net/geneve.c
-> > @@ -956,6 +956,19 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
-> >  	type = gh->proto_type;
-> >  	geneve_sk_gro_hint_off(sk, gh, &type, &gh_len);
-> >  
-> > +	/* Bail out if our inner network offset disagrees with gro_receive().
-> > +	 * ETH_P_TEB adds ETH_HLEN for the inner MAC header.
-> > +	 */
-> > +	if (skb->encapsulation) {
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+Date: Fri, 12 Jun 2026 21:07:45 +0800
+> From: Weiming Shi <bestswngs@gmail.com>
 > 
-> I think the disagreement could happen even in the opposite direction,
-> i.e. gro_receives does not see hints available, but gro_complete does.
+> When the scatterlist ring is full or nearly full, bpf_msg_push_data()
+> enters a copy fallback path and computes copy + len for the page
+> allocation size. Since len comes from BPF with arg3_type = ARG_ANYTHING
+> and both are u32, a crafted len can wrap the sum to a small value,
+> causing an undersized allocation followed by an out-of-bounds memcpy.
 > 
-> > +		unsigned int inner_nh = nhoff + gh_len;
-> > +
-> > +		if (type == htons(ETH_P_TEB))
-> > +			inner_nh += ETH_HLEN;
+>  BUG: unable to handle page fault for address: ffffed104089a402
+>  Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+>  Call Trace:
+>   __asan_memcpy (mm/kasan/shadow.c:105)
+>   bpf_msg_push_data (net/core/filter.c:2852 net/core/filter.c:2788)
+>   bpf_prog_9ed8b5711920a7d7+0x2e/0x36
+>   sk_psock_msg_verdict (net/core/skmsg.c:934)
+>   tcp_bpf_sendmsg (net/ipv4/tcp_bpf.c:421 net/ipv4/tcp_bpf.c:584)
+>   __sys_sendto (net/socket.c:2206)
+>   do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+>   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
 > 
-> This does not work in when the innermost headers carry a vlan tag.
-
-Yes, you're right. the check is wrong.
-
-
-inner_network_offset is the inner L3 offset recorded by gro_receive. For a
-tagged inner frame eth_gro_receive hands off to vlan_gro_receive, which
-pulls the VLAN tag before the inner ip*_gro_receive records it, so it ends
-up at nhoff + gh_len + ETH_HLEN + n*VLAN_HLEN. We only add ETH_HLEN, so
-'!=' drops a valid frame.
-
-Do you think a lower bound works?
-
-For example:
-
-	if (skb->encapsulation) {
-		unsigned int inner_nh = nhoff + gh_len;
-
-		if (type == htons(ETH_P_TEB))
-			inner_nh += ETH_HLEN;
-
-		if (unlikely(inner_nh > NAPI_GRO_CB(skb)->inner_network_offset))
-			return -EINVAL;
-	}
-
-A VLAN tag only pushes inner_network_offset later, so a valid packet has
-inner_nh <= inner_network_offset and passes. The opposite direction you
-mentioned (receive does not see the hint, complete does) inflates gh_len
-in complete, so inner_nh goes past inner_network_offset and is rejected.
-
-The only case this does not reject is the reverse (receive uses the hint,
-complete does not), where inner_nh lands before inner_network_offset.
-That is in bounds and only reachable across a concurrent
-geneve_changelink() quiesce/unquiesce, so not attacker reachable. If you
-want that too, we need to record the offset gro_receive used in
-napi_gro_cb and compare by '=='.
-
-Xiang
-
+> Add an overflow check before the allocation.
 > 
-> /P
+> Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel.org
+> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
+> Tested-by: Xiang Mei <xmei5@asu.edu>
+> Tested-by: Xinyu Ma <mmmxny@gmail.com>
+> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+> To sashiko:
 > 
+> Regarding bpf_msg_push_data() reading "copy = msg->sg.data[i].length" with
+> i == msg->sg.end (appending at the very end of a full/near-full ring):
+> 
+> This is pre-existing code, not touched by this series, and reproducing it needs
+> a narrow combination -- a pure append at the end so the loop exits with
+> i == msg->sg.end, a full/near-full ring, plus a prior push/pop history that
+> leaves a stale length in the otherwise-unused end slot. A freshly built ring
+> zeroes that slot, so copy stays 0. We don't consider it practically reproducible.
+> 
+> Even then it's already covered: the overflow check in patch 1 ("copy + len <
+> copy") rejects the dangerous case, and __GFP_ZERO in patch 3 prevents any data
+> exposure. Not worth fixing here.
+> ---
+>  net/core/filter.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 9590877b0714f..3c8f1cedb217f 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -2829,6 +2829,9 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+>  	if (!space || (space == 1 && start != offset))
+>  		copy = msg->sg.data[i].length;
+>  
+> +	if (unlikely(copy + len < copy))
+> +		return -EINVAL;
+
+Who wants to push E2BIG "metadata or option" ? :(
+https://docs.ebpf.io/linux/helper-function/bpf_msg_push_data/
+
+I feel this is the same class of "bug" we discussed recently,
+but given the change is just small validation,
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
