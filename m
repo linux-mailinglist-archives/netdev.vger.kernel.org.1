@@ -1,55 +1,53 @@
-Return-Path: <netdev+bounces-298931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U8yvHyQcLWrdbgQAu9opvQ
-	(envelope-from <netdev+bounces-298931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:00:20 +0200
+	id W0cOGvIcLWodbwQAu9opvQ
+	(envelope-from <netdev+bounces-298932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:03:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D4F67E2FB
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:00:20 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F31967E30E
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:03:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=S6kd7MIJ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298931-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298931-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298932-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-298932-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6CC2F300F442
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 09:00:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09A1F300372F
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 09:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AEF3AD512;
-	Sat, 13 Jun 2026 09:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CE12EA731;
+	Sat, 13 Jun 2026 09:03:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out198-6.us.a.mail.aliyun.com (out198-6.us.a.mail.aliyun.com [47.90.198.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AEA3AD52E;
-	Sat, 13 Jun 2026 09:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1EC34A78E;
+	Sat, 13 Jun 2026 09:03:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781341211; cv=none; b=Ulm1FIyNboEfC7Z6r7l5OnVGx6jTnSEzl2Rg1fNPM2DxiRkBvLsq0F5hNn9u6RsTVA2GUo6bxjotIlrbARkCFwL24/ybWafkiZfDbVdKKj+lLYvSvfgVxJJKRwKuOsZks76Bow+V5s9Rm79oNk/Q1HKYwHqKNupreZtuGmO7PrU=
+	t=1781341418; cv=none; b=mflq/gb+powO1j6p2e8ukQ31qC9MaATHmWxBvbdw9WzR1x6MTG5V5sqH9CyXtrUAWMYvU6P+XFzX8scX3Pnu3AX4ThGpbyWQ1eQSEDXMx8W6LzBsmi98+UIhzJ/9yW2hSN0nj38kh3X3ro3svty2J9B5bUcHAete5uauQPCceU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781341211; c=relaxed/simple;
-	bh=TjaYOgF3wr8ZhOE+5WZgHdlDnkPKF41xWLjlfnvrJEI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R3zSK2x7yZT9tye5WPTIwLP0njll63gHBxNHXAcF0gXKonAwT/YYC+8GvARV5u9t5Ze+oTcyW/RGokoMAAruxJnQhGwFkoryP2WNjW8BGt28qq8S0mGNsDxpHWFsoWKDmUo5lJn1SGR/4vldJ7HiMF19Z+N+MbR/NrMtXjypDiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S6kd7MIJ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B01F41F000E9;
-	Sat, 13 Jun 2026 09:00:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781341208;
-	bh=f3EVXaidWBUDBukOfSvwu19nYqgtoWvs1fRjIR5kA3I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=S6kd7MIJmG8gTopL6j0WlEFnHWaWCJCNPN+wbc1IYxBuhIlB2Zs202F7h8EbTjeAP
-	 VuWHP95nn4d3cWJpvHKf2K1xLNnUw5APnSbTm3Is43Om/fXuF9hy3Es05VhCbuInKk
-	 BvYe2Mz/dl58dByFiQz/5ULNqwP3ytWmI7IjHRHRi7zFjEgu93A9siIfmahGlYx+YU
-	 786TPi65oxSLkW6M2Tiw5LXSlzd401RvfvGreY76yuAGKq5RXAHHuvjt+uHbioRteS
-	 NTl2p3pYXXz81rIsUcOlrkNUgz/fF+IPbhAQF6Rn634t/1Y/5pkzuAzJWLefAvwbql
-	 A1RNN51wBPEdQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568DB39EDE30;
-	Sat, 13 Jun 2026 09:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781341418; c=relaxed/simple;
+	bh=+1DA1L0d0ZQaUEn6MpFfOibUMXgSZQsBcriR6mki+vQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eP8wNUtBgAYDqKIWMz6sDFIJwvBzvEZSRAV6Cn/A6kfuMBnqz4WEoW+KyVMUo50SK10jWIt80Q6GwrXk/rZi4H9tCW+9re0BohdaXDjI0Dp95mF9Q4jE0g0LRXRew0FlllfSfhLaaMhGKCsDx+6OhItCx218BVso5PgxWiFMngc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=edatec.cn; spf=pass smtp.mailfrom=edatec.cn; arc=none smtp.client-ip=47.90.198.6
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.4962601|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.176659-0.00160023-0.82174;FP=7628090403777439464|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037006180;MF=zjzhao@edatec.cn;NM=1;PH=DS;RN=6;RT=6;SR=0;TI=SMTPD_---.hxCTUHx_1781341318;
+Received: from lists.debian.org(mailfrom:zjzhao@edatec.cn fp:SMTPD_---.hxCTUHx_1781341318 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Sat, 13 Jun 2026 17:03:12 +0800
+From: zjzhao@edatec.cn
+To: hayeswang@realtek.com
+Cc: andrew+netdev@lunn.ch,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zjzhao-eda <zjzhao@edatec.cn>
+Subject: [PATCH] r8152: add vendor/device ID for CoreChips SR9900
+Date: Sat, 13 Jun 2026 17:01:54 +0800
+Message-Id: <20260613090154.1975753-1-zjzhao@edatec.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,79 +55,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] octeontx2-af: npc: Fix size of entry2cntr_map
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178134120489.1430056.8164436490843173619.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Jun 2026 09:00:04 +0000
-References: <20260610022344.969774-1-rkannoth@marvell.com>
-In-Reply-To: <20260610022344.969774-1-rkannoth@marvell.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: kuba@kernel.org, linux-kernel@vger.kernel.org, naveenm@marvell.com,
- netdev@vger.kernel.org, sbhatta@marvell.com, sgoutham@marvell.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298931-lists,netdev=lfdr.de,netdevbpf];
+	FORGED_RECIPIENTS(0.00)[m:hayeswang@realtek.com,m:andrew+netdev@lunn.ch,m:linux-usb@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zjzhao@edatec.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298932-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[edatec.cn];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:naveenm@marvell.com,m:netdev@vger.kernel.org,m:sbhatta@marvell.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[zjzhao@edatec.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[zjzhao@edatec.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
 	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,edatec.cn:email,edatec.cn:mid,edatec.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 03D4F67E2FB
+X-Rspamd-Queue-Id: 5F31967E30E
 
-Hello:
+From: zjzhao-eda <zjzhao@edatec.cn>
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The CoreChips SR9900 (0x0fe6:0x9900) is a USB 2.0 10/100
+Ethernet adapter. Testing shows it works correctly with the
+r8152 driver, reaching wire speed (94 Mbps) with zero packet
+loss on both TCP and UDP.
 
-On Wed, 10 Jun 2026 07:53:44 +0530 you wrote:
-> KASAN prints below splat. This is caused by allocating counter for
-> reserved mcam entry for cpt 2nd pass entry. But mcam->entry2cntr_map
-> is not allocated for reserved entries.
-> 
-> BUG: KASAN: slab-out-of-bounds in npc_map_mcam_entry_and_cntr+0xb0/0x1a0
-> Write of size 2 at addr ffff0001033e7ffe by task kworker/0:1/14
-> 
-> [...]
+Tested on Raspberry Pi, including hotplug and extended data
+transfer.
 
-Here is the summary with links:
-  - [v2,net] octeontx2-af: npc: Fix size of entry2cntr_map
-    https://git.kernel.org/netdev/net/c/f9cd6fabe0e7
+Signed-off-by: zjzhao-eda <zjzhao@edatec.cn>
+---
+ drivers/net/usb/r8152.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index d61074178279..ea1733e3619c 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10062,6 +10062,7 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
+ 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
+ 	{ USB_DEVICE(VENDOR_ID_TRENDNET, 0xe02b) },
++	{ USB_DEVICE(0x0fe6, 0x9900) },
+ 	{}
+ };
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
