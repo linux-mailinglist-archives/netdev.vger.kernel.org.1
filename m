@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298988-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id dZThEXaMLWqGhQQAu9opvQ
-	(envelope-from <netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:34 +0200
+	id 3pJzNpGMLWqPhQQAu9opvQ
+	(envelope-from <netdev+bounces-298988-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 19:00:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF5567F1A8
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:59:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFC667F1BC
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 19:00:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="kiZmX/FA";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-298987-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=kDCArR1M;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298988-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298988-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0F450300D70B
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB3413048575
 	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4A9396B84;
-	Sat, 13 Jun 2026 16:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2825E3FF88C;
+	Sat, 13 Jun 2026 16:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDE72EA73D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D278F30DECE;
 	Sat, 13 Jun 2026 16:59:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781369970; cv=none; b=cZjEtxsBdheqLFLut5zsXrbyxDnHfXV8zPYy/ru9VkDw0StvANQaeXv/ntAPjQJRFsWmoFHN95OsqJMvtEC3pjxCPiD7BCW9TvHJopUwVRik+doNqDz7uZP6I5IG7naKXHnQJ9NKf/Ol1iZ1nFEnqyNIvsrj1XaZ/KVA04+KzCw=
+	t=1781369971; cv=none; b=MzYXjwH+rbh79OcaWFy91kASHe7pXDoBR1gcfZqnH+4zefVPrHkxAKstZCDfNl/obrt+pUzA2Ysvip1pPZPsUUg+LUlwBgml3jnqaKnmFdY2xHfaJjlEWEI8xDbD1JnL38DL/j68U94uQgVmGuVJWqRVUuQqHsvF/NeGZIIBhxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781369970; c=relaxed/simple;
-	bh=JXGGKycIp+fSCFoqr7xrpnm2CWfjCbgyn3e9PVlFSdc=;
+	s=arc-20240116; t=1781369971; c=relaxed/simple;
+	bh=D7/Mzo5e+5VWLEtVYVgkwc3DygrunrzHZAWo1Yrfk4c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UBF7OavqYhAC1cl60z/HwCBVgmv1oMsxwrJ4JW/m4qSxqWa/exvdyz+5t/tIdZUdG+M3DxtVURuLbyz1o69dvcDPrjjkJbfPiLUhW4S6Qoyzz+tbdg1k9960nn/Cv4JcY4RBbCfDxRtxNmma93nzqJ7OZb7jqw3v2Xr7aCX/dc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiZmX/FA; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51E71F00A3A;
-	Sat, 13 Jun 2026 16:59:28 +0000 (UTC)
+	 MIME-Version; b=H8VYxLBXkoiwd8WCCEXVZ/MBXLvS1LYovcFgGMetdhrb+9S9Rco12gPLik1vKJVmUCNl1ql2LjgEbkC0kuZ0EWYXM+0PUK1WdAqFmy025B+aR0/7vi9t8mPKF98g+0yp7KG9SJb64vH11xQrWMmpSlBtVJZdMzHV11DXxSjs9bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kDCArR1M; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48BC51F00A3D;
+	Sat, 13 Jun 2026 16:59:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1781369969;
-	bh=djlY0cH0+5l0szO48FBrkZeaHrTwq7y36rd6PX9HsBA=;
+	bh=MpH5v7DVv18T+ddYArDGKMK3ROzq6Z3ud0/C2F8Yez4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kiZmX/FAKMbqpEGDNjmZmx0VkmigA4u3rQ+JqT8bLRXR/Fa/aGiOTeRp+aXBNTeHd
-	 rhPT0Em8kADLsKePhLGKHUDeVlUTceieJNcNJfjAnE3Ros7RJFw++hkV2UxFcVSBbl
-	 PTs3B1JCkoECItzVM1T7qNQaoytXhj/5s+jnDzKLbqbgyEKtqMs+SmnW+N7A1KS/cR
-	 os4bi7k4nghWgYb0cEP2k/ga1yvOXtq5ltHIldUKiwukq5Uoa7+7ocPj/c/8wz4NJa
-	 H5eHOP1zQvPFetqU3J+iEso2kySxttP4pSdZK9MJ3Hr8m3t/mPiSNfUIXeLqf9OhJ9
-	 NVfN9/+C5m3mg==
+	b=kDCArR1M61CuVcEEkROnooeMI1Nr+It/tBL55MdCW3h5D2a+1DKRkOH0iYkbobc8V
+	 FLix2xEbA1vQTHONFFpnb0Cbhdf/kQ32kf9SL7SlufFvzeQnkL9aqVWMZzyug7BC7W
+	 Qf1QC+zJvf8UWQlwf+FPDG2udQiVKzi6MYVnNUDiolNomgWaz+9BVKsXocf1+8bb6V
+	 r61sbSY0VxqWFMX+a01HSmo89gUPSv1XurYs/x63WH5snew/zYdFYYqntnPwdXRwK3
+	 OkivSWoT0VGZyxC4cKLp1mIQ633mjoqneZz2KtZieSZByxfqb22JtnL9mO59Uo58U8
+	 wXJbEtPlvW0IA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	Jakub Kicinski <kuba@kernel.org>,
 	skhan@linuxfoundation.org
-Subject: [PATCH net-next v2 1/3] docs: net: tls-offload: document tls_dev_del, tls_dev_resync, and rekey
-Date: Sat, 13 Jun 2026 09:58:44 -0700
-Message-ID: <20260613165846.2913092-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/3] docs: net: fix minor issues with devlink docs
+Date: Sat, 13 Jun 2026 09:58:45 -0700
+Message-ID: <20260613165846.2913092-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260613165846.2913092-1-kuba@kernel.org>
 References: <20260613165846.2913092-1-kuba@kernel.org>
@@ -82,11 +82,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298987-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298988-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:corbet@lwn.net,m:linux-doc@vger.kernel.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:jiri@resnulli.us,m:kuba@kernel.org,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[13];
@@ -106,115 +106,155 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lwn.net:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lwn.net:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9FF5567F1A8
+X-Rspamd-Queue-Id: 7EFC667F1BC
 
-Fill in some gaps in the TLS offload doc:
+Update devlink documentation to match current code:
 
-- describe the tls_dev_del and tls_dev_resync callbacks
-- add a mention of rekeying being out of scope for now
+- describe health reporter defaults (it's currently under "callbacks"),
+  best-effort auto-dump, and port-scoped reporters
+- fix generic parameter names and values
+- fix nested devlink setup wording and registration ordering
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - add mentions of the callback in resync text
- - Stack -> The stack
-v1: https://lore.kernel.org/20260609201224.1191391-1-kuba@kernel.org
-
-CC: john.fastabend@gmail.com
-CC: sd@queasysnail.net
+CC: jiri@resnulli.us
 CC: corbet@lwn.net
 CC: skhan@linuxfoundation.org
 CC: linux-doc@vger.kernel.org
 ---
- Documentation/networking/tls-offload.rst | 45 ++++++++++++++++++++----
- 1 file changed, 38 insertions(+), 7 deletions(-)
+ Documentation/networking/devlink/devlink-health.rst | 12 ++++++++----
+ Documentation/networking/devlink/devlink-params.rst |  2 +-
+ Documentation/networking/devlink/devlink-port.rst   |  5 ++++-
+ Documentation/networking/devlink/devlink-trap.rst   |  8 +++++---
+ Documentation/networking/devlink/index.rst          | 10 +++++-----
+ 5 files changed, 23 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/networking/tls-offload.rst b/Documentation/networking/tls-offload.rst
-index 25ee8d9f12c9..e5802bcd4d22 100644
---- a/Documentation/networking/tls-offload.rst
-+++ b/Documentation/networking/tls-offload.rst
-@@ -99,6 +99,29 @@ at the end of kernel structures (see :c:member:`driver_state` members
- in ``include/net/tls.h``) to avoid additional allocations and pointer
- dereferences.
+diff --git a/Documentation/networking/devlink/devlink-health.rst b/Documentation/networking/devlink/devlink-health.rst
+index 4d10536377ab..bedac58a2f36 100644
+--- a/Documentation/networking/devlink/devlink-health.rst
++++ b/Documentation/networking/devlink/devlink-health.rst
+@@ -33,7 +33,9 @@ asynchronously. All health reports handling is done by ``devlink``.
+   * Recovery procedures
+   * Diagnostics procedures
+   * Object dump procedures
+-  * Out Of Box initial parameters
++
++Drivers also provide default values for generic reporter parameters when
++creating a health reporter.
  
-+When the offloaded connection is destroyed the core calls
-+the :c:member:`tls_dev_del` callback so the driver can release per-direction
-+state:
-+
-+.. code-block:: c
-+
-+	void (*tls_dev_del)(struct net_device *netdev,
-+			    struct tls_context *ctx,
-+			    enum tls_offload_ctx_dir direction);
-+
-+``tls_dev_del`` is mandatory whenever ``tls_dev_add`` is provided.
-+
-+The third TLS device callback is :c:member:`tls_dev_resync`, called by the core
-+to synchronize the TCP stream with the record boundaries:
-+
-+.. code-block:: c
-+
-+	int (*tls_dev_resync)(struct net_device *netdev,
-+			      struct sock *sk, u32 seq, u8 *rcd_sn,
-+			      enum tls_offload_ctx_dir direction);
-+
-+See the `Resync handling`_ section for details.
-+
- TX
- --
+ Different parts of the driver can register different types of health reporters
+ with different handlers.
+@@ -45,8 +47,9 @@ Actions
  
-@@ -250,9 +273,9 @@ sequence number (as it will be updated from a different context).
-   bool tls_offload_tx_resync_pending(struct sock *sk)
+   * A log is being send to the kernel trace events buffer
+   * Health status and statistics are being updated for the reporter instance
+-  * Object dump is being taken and saved at the reporter instance (as long as
+-    auto-dump is set and there is no other dump which is already stored)
++  * Object dump is being taken and saved at the reporter instance. This is
++    best effort and skipped when recovery is aborted, auto-dump is disabled,
++    no dump callback is registered, or a dump is already stored.
+   * Auto recovery attempt is being done. Depends on:
  
- Next time ``ktls`` pushes a record it will first send its TCP sequence number
--and TLS record number to the driver. Stack will also make sure that
--the new record will start on a segment boundary (like it does when
--the connection is initially added).
-+and TLS record number to the driver via the ``tls_dev_resync`` callback.
-+The stack will also make sure that the new record will start on a segment
-+boundary (like it does when the connection is initially added).
- 
- RX
- --
-@@ -344,9 +367,10 @@ all TLS record headers that have been logged since the resync request
- started.
- 
- The kernel confirms the guessed location was correct and tells the device
--the record sequence number. Meanwhile, the device had been parsing
--and counting all records since the just-confirmed one, it adds the number
--of records it had seen to the record number provided by the kernel.
-+the record sequence number via the ``tls_dev_resync`` callback. Meanwhile,
-+the device had been parsing and counting all records since the just-confirmed
-+one, it adds the number of records it had seen to the record number provided
-+by the kernel.
- At this point the device is in sync and can resume decryption at next
- segment boundary.
- 
-@@ -370,12 +394,19 @@ schedules resynchronization after it has received two completely encrypted
- records.
- 
- The stack waits for the socket to drain and informs the device about
--the next expected record number and its TCP sequence number. If the
-+the next expected record number and its TCP sequence number via the
-+``tls_dev_resync`` callback. If the
- records continue to be received fully encrypted stack retries the
- synchronization with an exponential back off (first after 2 encrypted
- records, then after 4 records, after 8, after 16... up until every
- 128 records).
- 
-+Rekey
-+=====
-+
-+Offload does not currently support TLS 1.3, therefore key rotation
-+is not a concern for offloaded connections at this point.
-+
- Error handling
+     - Auto-recovery configuration
+@@ -75,7 +78,8 @@ User Interface
  ==============
  
+ User can access/change each reporter's parameters and driver specific callbacks
+-via ``devlink``, e.g per error type (per health reporter):
++via ``devlink``, e.g. per error type (per health reporter). Reporters may be
++registered for the whole devlink instance or for a specific devlink port.
+ 
+   * Configure reporter's generic parameters (like: disable/enable auto recovery)
+   * Invoke recovery procedure
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index ea17756dcda6..ca19ee3e63c8 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -122,7 +122,7 @@ own name.
+    * - ``enable_iwarp``
+      - Boolean
+      - Enable handling of iWARP traffic in the device.
+-   * - ``internal_err_reset``
++   * - ``internal_error_reset``
+      - Boolean
+      - When enabled, the device driver will reset the device on internal
+        errors.
+diff --git a/Documentation/networking/devlink/devlink-port.rst b/Documentation/networking/devlink/devlink-port.rst
+index 5e397798a402..9374ebe70f48 100644
+--- a/Documentation/networking/devlink/devlink-port.rst
++++ b/Documentation/networking/devlink/devlink-port.rst
+@@ -38,7 +38,7 @@ Devlink port flavours are described below.
+      - This indicates an eswitch port representing a port of PCI
+        subfunction (SF).
+    * - ``DEVLINK_PORT_FLAVOUR_VIRTUAL``
+-     - This indicates a virtual port for the PCI virtual function.
++     - Any virtual port facing the user.
+ 
+ Devlink port can have a different type based on the link layer described below.
+ 
+@@ -134,6 +134,9 @@ Users may also set the IPsec crypto capability of the function using
+ Users may also set the IPsec packet capability of the function using
+ `devlink port function set ipsec_packet` command.
+ 
++The ``migratable`` attribute may be set only on ports with
++``DEVLINK_PORT_FLAVOUR_PCI_VF``.
++
+ Users may also set the maximum IO event queues of the function
+ using `devlink port function set max_io_eqs` command.
+ 
+diff --git a/Documentation/networking/devlink/devlink-trap.rst b/Documentation/networking/devlink/devlink-trap.rst
+index 5885e21e2212..ac5bf9337198 100644
+--- a/Documentation/networking/devlink/devlink-trap.rst
++++ b/Documentation/networking/devlink/devlink-trap.rst
+@@ -516,9 +516,11 @@ Generic Packet Trap Groups
+ 
+ Generic packet trap groups are used to aggregate logically related packet
+ traps. These groups allow the user to batch operations such as setting the trap
+-action of all member traps. In addition, ``devlink-trap`` can report aggregated
+-per-group packets and bytes statistics, in case per-trap statistics are too
+-narrow. The description of these groups must be added to the following table:
++action of all member drop traps whose action may legally change. Exception and
++control traps remain unchanged. In addition, ``devlink-trap`` can report
++aggregated per-group packets and bytes statistics, in case per-trap statistics
++are too narrow. The description of these groups must be added to the following
++table:
+ 
+ .. list-table:: List of Generic Packet Trap Groups
+    :widths: 10 90
+diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
+index f7ba7dcf477d..32f70879ddd0 100644
+--- a/Documentation/networking/devlink/index.rst
++++ b/Documentation/networking/devlink/index.rst
+@@ -13,8 +13,8 @@ new APIs prefixed by ``devl_*``. The older APIs handle all the locking
+ in devlink core, but don't allow registration of most sub-objects once
+ the main devlink object is itself registered. The newer ``devl_*`` APIs assume
+ the devlink instance lock is already held. Drivers can take the instance
+-lock by calling ``devl_lock()``. It is also held all callbacks of devlink
+-netlink commands.
++lock by calling ``devl_lock()``. It is also held across all callbacks of
++devlink netlink commands.
+ 
+ Drivers are encouraged to use the devlink instance lock for their own needs.
+ 
+@@ -33,11 +33,11 @@ devlink instances created underneath. In that case, drivers should make
+    lock of both nested and parent instances at the same time, devlink
+    instance lock of the parent instance should be taken first, only then
+    instance lock of the nested instance could be taken.
+- - Driver should use object-specific helpers to setup the
+-   nested relationship:
++ - Driver should use object-specific helpers to setup the nested relationship
++   before registering the nested devlink instance:
+ 
+    - ``devl_nested_devlink_set()`` - called to setup devlink -> nested
+-     devlink relationship (could be user for multiple nested instances.
++     devlink relationship (could be used for multiple nested instances).
+    - ``devl_port_fn_devlink_set()`` - called to setup port function ->
+      nested devlink relationship.
+    - ``devlink_linecard_nested_dl_set()`` - called to setup linecard ->
 -- 
 2.54.0
 
