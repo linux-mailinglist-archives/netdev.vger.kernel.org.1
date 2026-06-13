@@ -1,82 +1,97 @@
-Return-Path: <netdev+bounces-298924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VK7jOtgSLWqyawQAu9opvQ
-	(envelope-from <netdev+bounces-298924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:20:40 +0200
+	id iRE6CPETLWprbAQAu9opvQ
+	(envelope-from <netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:25:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC7267E1D4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:20:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FB667E20D
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:25:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=JF1NCZZE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298924-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298924-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Y6fdZcCU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 433DA309C0DB
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D707230CC10A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675B33B2FCE;
-	Sat, 13 Jun 2026 08:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB17A3D6664;
+	Sat, 13 Jun 2026 08:25:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C82229AAEA;
-	Sat, 13 Jun 2026 08:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883813D5C15
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 08:24:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781338836; cv=none; b=owMBegMQSXtpf5Q2X3ZVkKR+meB8rfh51yd7loqeDsm2P456FShZq6pCzhhXSqqJ0MT5C9Lw24m+bCoucaMmP2bqTRqz2KXNMb435C5MFY4GIrb6+Qzf41AYY9eDFpLOWgdc4lU6IT6typ9KsvypKGAjA1GRJGbD9oFRFpB7mNQ=
+	t=1781339105; cv=none; b=JtAUZX+o8HkIOc1zxA5MUgcOQstvid7pKNwXRgh07Iv7Dld3I5Sr1buKFxrMM5H4ii4E9/RJsBxLMsomRWzagJym2pqXxugfq9i274mP1onXGt8ef1tydU6AuUZv8082RyPz9HaXXeisNuaMPnJ7yfQm7jCamIJFpeFzXo28zFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781338836; c=relaxed/simple;
-	bh=DE25FeJIR3eJbEyPjqnpV0gPCOu3SN4ATSHKVunPjeM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hISBRXa3BI608Z3QRiC4idcfEtQXwynQqz9z9ycetQ8NKYplk9isFMhvHTkdKrWHm2+5cHYcKjuLY2nA7sgZNcX2AF1DsiP4LGVsCgWbHL6uwxfx37cNjKUh+qrJKpvTZTR8DsjKgVep0HSbsjq316pPZbzxlEOHoEkwW9FRYN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JF1NCZZE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE641F000E9;
-	Sat, 13 Jun 2026 08:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781338833;
-	bh=owuCffPj0B6/q5HMfLZveBGQe9ejC5DkgaoaNYPwlyI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JF1NCZZEzUhUrypMbf9whwV19dOYhpu6tusXQeZiMlKEqECpkpXhLH+/nsu2WUwOt
-	 YfOBVV0Yx9s3cxTHnShBEdDGeeqHF5kqNKiGDDVwKUvnIpq3wpC32HBQ887rzgDQHg
-	 pJ7IC4tByuRnDqVHCPAnr6fPDqiNCTqC3I14Eoivwv49V1sRXjypQfqtXmOgFhxQWA
-	 I5fM5n/Koel+q1i8GG19VrifHGq3x9VnhY/t5bN4Z1Tbk3J3kK9HumX1bTvphHRM9g
-	 o88ldYXMp5ZkVIjo1vwJOqiI5oCV6ZtYgU02tyHzdy9LzghUbqstWYrWqxC7rQeY/j
-	 68jhso09zMCVg==
-From: Simon Horman <horms@kernel.org>
-To: haiyangz@linux.microsoft.com
+	s=arc-20240116; t=1781339105; c=relaxed/simple;
+	bh=uNZREjdTngEAW+wmgiqIS/P1uka5G/KGrFlcH/PgfwY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNGuE66vKp7krk8CwFnxBYA0Zfb1Phno9cjCYYQCFWSzRgkw/9EtDjV1qoPv3y+nAbuwBAHQl6HS+Pt8k++RaZz51JshACUE4pEwar24bLQcK4J5srxtvMjdzqDnP9/JOSfMQXaCn7vQfX8nfpR4v3KBw5yUe0wBUGth9e8O510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6fdZcCU; arc=none smtp.client-ip=209.85.216.51
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-36b903567fdso2114467a91.1
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781339096; x=1781943896; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SAVQv8WjEXijxzfisDbV6w9rhix2ecFSLNzXIn6EOaY=;
+        b=Y6fdZcCUBd/J8Sl7J/ue523hT9ZrKEo6h0wdQJl+zQ53csFyWAWbJv4wZOvIHPZI+/
+         T17ePuWoX2W9ApWIjpoldzrrbioO7wxxy5jdRCzvZ7+Zb0ugwDaRw2QLVsuBMHPNoptT
+         jbDjFnLYMgP0uYxOAvffzlIDK2ZYshVYQ3KZO0w7o8WwnhQzyzuTajTRINd3KtidoePB
+         DcgKleCQ4/9kX+jek33taf823iN40yezN4ttsr/8McvGFwMC4nCUFBOcPh41OiUV0Hzy
+         YtglMYhSGjcYkLf9BcPOVWOevO92Do6CAhm/XAmrl5Ajwcx9HKiXyhjDU4wZZBgOGdJd
+         Vt+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781339096; x=1781943896;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SAVQv8WjEXijxzfisDbV6w9rhix2ecFSLNzXIn6EOaY=;
+        b=hYbcg1EEiJtlcnIzPHGhMenEjhWEYFYo6rYFaejTprQpiloNLIBcp0FuzgQmR0N9JS
+         itO1Xl9DW8Djcdd1CoIQ/qDejjYA+2eNNtX34/fHighQ4WunVJ78S7uXvGSKw9HMV3Io
+         BqlYmEmVLNxoR7vrBazy64KmJuy0AONG6GmUgzroTf/tKo8cKoE71x2sNXNXZyG0uRlF
+         gEN+r8GpSoPzZ9fPnFbZOv609VhJIlLsVZFqbduSf/EG/g/MsKwwFgTP0BstXvvdNyNc
+         xMdxEpiL6oMgNOWRLZmmnpYJHf+mJZnUCq6w/Ww8fqxRuMi4VlX4IXXT1Y5yLA67VLQi
+         JU0w==
+X-Forwarded-Encrypted: i=1; AFNElJ86/nL0ftipDdN0wTkaAfezwhCze8n1mFEGESXSzMtr7eKQjOd+jXP0wAsc5i4BI+s4uEVHREs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlmcrL3214mtnFRStMDw8l8sxKagYzvz86/Pi6oMs0HNjtawNn
+	RKAfDSeq2eCnt6+84mwhkDjmgOb/TBeJZ2Xn2jWTPTh30Qr17oH3cx7M
+X-Gm-Gg: Acq92OESMdDPRAF56d7ikANDDiYpqMjLZraVWqqgY7HYFsEnOCZkmk6+ur74gSYljDN
+	zD+gJCzoheDzUGpoKoFkxQb8f1LcnFawqyblyf1dNFo8fdvqoF1bwXiLMlqFgLnBcOcTYBmhfHI
+	3bwTE5LGkefEqmF6h6QHattt/WbY3OHovwxqw22VA8AF7dRbomu/oDFxWo0gheiSgdtSXU7GFCx
+	04CkkYaVfxRN9gzbOJk6Pr2ZN91UYmx5JUUvDODfoQzSTyEQepoZK+4PmF2B2oNplLWFf5i9DGD
+	A4+g9oKN3upDXHtrX9lzi226DbnOX170sJ/SZgyfwSqH7KkbsP0LXPOsMuPcu4U0up9DOgB28Ab
+	OINeJFfo5rLSLClHS8JIOEMR2+fD9Ybrsk1G14q+iPXrxgTFA6DqmFgD31m3Um4sMBpVVEvChzf
+	cC/+kgMmCFZRsY3p18xC7eE2B2vVemh+Wd5oEC4SQ/gG3mBIeIQoIh6lG6cOHWFQ==
+X-Received: by 2002:a17:90a:d44e:b0:36d:b424:4f17 with SMTP id 98e67ed59e1d1-37a01847870mr6803728a91.1.1781339096450;
+        Sat, 13 Jun 2026 01:24:56 -0700 (PDT)
+Received: from cps-manycore-1.. ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37a25ecd5f4sm5070360a91.11.2026.06.13.01.24.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2026 01:24:56 -0700 (PDT)
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>,
-	linux-hyperv@vger.kernel.org,
+	Liu Jian <liujian56@huawei.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Cong Wang <cwang@multikernel.io>,
 	netdev@vger.kernel.org,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	kees@kernel.org,
-	leitao@debian.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	paulros@microsoft.com
-Subject: Re: [PATCH net-next v3] net: mana: Add Interrupt Moderation support
-Date: Sat, 13 Jun 2026 09:20:14 +0100
-Message-ID: <20260613082014.715350-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611190239.2532429-1-haiyangz@linux.microsoft.com>
-References: <20260611190239.2532429-1-haiyangz@linux.microsoft.com>
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf] bpf, sockmap: fix BUG_ON in skb_to_sgvec() on a resized ingress skb
+Date: Sat, 13 Jun 2026 08:24:31 +0000
+Message-ID: <20260613082442.3252576-1-rhkrqnwk98@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,182 +100,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298925-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:liujian56@huawei.com,m:daniel@iogearbox.net,m:cwang@multikernel.io,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:haiyangz@linux.microsoft.com,m:horms@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:shradhagupta@linux.microsoft.com,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:kees@kernel.org,m:leitao@debian.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:paulros@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-298924-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4FC7267E1D4
+X-Rspamd-Queue-Id: 71FB667E20D
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+sk_psock_skb_ingress_enqueue() maps a received message into a scatterlist
+with skb_to_sgvec(skb, sg, off, len). On the SK_SKB strparser path off and
+len come from the message's strp_msg (stm->offset and stm->full_len), set
+by the stream parser. strparser does not trim the skb, so normally
+skb->len - off >= full_len and len is within the skb.
+
+An SK_SKB verdict (or parser) program may call bpf_skb_change_tail() and
+shrink the skb after full_len was recorded. len then covers more bytes than
+the skb holds, __skb_to_sgvec() walks past the data and trips BUG_ON(len):
+
+  kernel BUG at net/core/skbuff.c:5286!
+  RIP: 0010:__skb_to_sgvec+0x78c/0x790
+  Call Trace:
+   <IRQ>
+   skb_to_sgvec+0x32/0x90
+   sk_psock_skb_ingress_enqueue+0x42/0x370
+   sk_psock_skb_ingress_self+0x1a8/0x200
+   sk_psock_verdict_apply+0x33c/0x360
+   sk_psock_strp_read+0x24a/0x370
+   __strp_recv+0x66d/0xda0
+   __tcp_read_sock+0x13d/0x590
+   tcp_bpf_strp_read_sock+0x195/0x320
+   strp_data_ready+0x267/0x340
+   sk_psock_strp_data_ready+0x1ce/0x350
+   tcp_data_queue+0x1364/0x2fd0
+   </IRQ>
+
+Clamp len to skb->len - off, and drop the message if off is already past
+the skb. sk_psock_skb_ingress_enqueue() is the only skb_to_sgvec() caller
+and both ingress paths (verdict SK_PASS and the backlog worker) reach it.
+The clamp is a no-op unless the skb was shrunk.
+
+Fixes: 7303524e04af ("skmsg: Lose offset info in sk_psock_skb_ingress")
+Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 ---
-Date:   Thu Jun 11 19:02:22 2026 +0000
+ net/core/skmsg.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-    net: mana: Add Interrupt Moderation support
-    
-    This commit adds Static and Dynamic Interrupt Moderation (DIM) support for
-    Rx and Tx. It updates the queue creation procedure, adds functions to
-    collect stats for DIM, and provides ethtool handler support to get/set
-    the moderation settings.
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index e1850caf1a71..2961178ebd1e 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -550,6 +550,10 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
+ {
+ 	int num_sge, copied;
+ 
++	if (off >= skb->len)
++		return -EINVAL;
++	len = min_t(u32, len, skb->len - off);
++
+ 	/* skb_to_sgvec will fail when the total number of fragments in
+ 	 * frag_list and frags exceeds MAX_MSG_FRAGS. For example, the
+ 	 * caller may aggregate multiple skbs.
+-- 
+2.43.0
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 26aef21c6c2c8..d92e022d8533c 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -1579,6 +1579,9 @@ int mana_create_wq_obj(struct mana_port_context *apc,
->  
->  	mana_gd_init_req_hdr(&req.hdr, MANA_CREATE_WQ_OBJ,
->  			     sizeof(req), sizeof(resp));
-> +
-> +	req.hdr.req.msg_version = GDMA_MESSAGE_V3;
-> +	req.hdr.resp.msg_version = GDMA_MESSAGE_V2;
->  	req.vport = vport;
->  	req.wq_type = wq_type;
->  	req.wq_gdma_region = wq_spec->gdma_region;
-> @@ -1587,6 +1590,9 @@ int mana_create_wq_obj(struct mana_port_context *apc,
->  	req.cq_size = cq_spec->queue_size;
->  	req.cq_moderation_ctx_id = cq_spec->modr_ctx_id;
->  	req.cq_parent_qid = cq_spec->attached_eq;
-> +	req.req_cq_moderation = cq_spec->req_cq_moderation;
-> +	req.cq_moderation_comp = cq_spec->cq_moderation_comp;
-> +	req.cq_moderation_usec = cq_spec->cq_moderation_usec;
-
-[Severity: High]
-Does this break queue creation on older Azure host firmwares?
-
-The code unconditionally bumps the WQ object creation request to use
-GDMA_MESSAGE_V3 and passes the req_cq_moderation flag. If the firmware does
-not support GDMA_PF_CAP_FLAG_1_DYN_INTERRUPT_MODERATION, could the firmware
-reject the queue creation request and break device initialization entirely?
-
-[ ... ]
-
-> +static void mana_update_tx_dim(struct mana_cq *cq)
-> +{
-> +	struct mana_port_context *apc = netdev_priv(cq->txq->ndev);
-> +	struct dim_sample dim_sample = {};
-> +	struct mana_txq *txq = cq->txq;
-> +
-> +	if (!apc->tx_dim_enabled)
-> +		return;
-> +
-> +	dim_update_sample(READ_ONCE(cq->dim_event_ctr), txq->stats.packets,
-> +			  txq->stats.bytes, &dim_sample);
-> +	net_dim(&cq->dim, &dim_sample);
-> +}
-
-[Severity: High]
-Does this measure the CPU enqueue rate rather than the hardware completion
-rate?
-
-It appears that txq->stats.packets is incremented in mana_start_xmit()
-upon enqueue, not during completion in mana_poll_tx_cq(). Dynamic interrupt
-moderation relies on measuring the actual hardware completion rate to
-function correctly.
-
-Additionally, is it safe to read txq->stats.packets here without the
-u64_stats_fetch_begin() retry loop? Reading a 64-bit statistic locklessly
-without the synchronization primitives could result in torn reads on 32-bit
-systems.
-
-[ ... ]
-
-> @@ -2324,7 +2434,13 @@ static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
->  	if (w < cq->budget) {
->  		mana_gd_ring_cq(gdma_queue, SET_ARM_BIT);
->  		cq->work_done_since_doorbell = 0;
-> -		napi_complete_done(&cq->napi, w);
-> +
-> +		if (napi_complete_done(&cq->napi, w)) {
-> +			if (cq->type == MANA_CQ_TYPE_RX)
-> +				mana_update_rx_dim(cq);
-> +			else
-> +				mana_update_tx_dim(cq);
-> +		}
-
-[Severity: High]
-Is it safe to call mana_update_rx_dim() and mana_update_tx_dim() after
-napi_complete_done()?
-
-Since napi_complete_done() ends the NAPI polling cycle and relinquishes
-mutual exclusion, and the hardware interrupt was already re-armed by
-mana_gd_ring_cq() right before this, couldn't a new packet trigger an
-interrupt immediately? This could allow NAPI to be scheduled on another CPU
-concurrently while this CPU is still running the DIM update, potentially
-corrupting the non-thread-safe net_dim() state machine.
-
-[ ... ]
-
-> @@ -2562,6 +2685,9 @@ static int mana_create_txq(struct mana_port_context *apc,
->  		napi_enable_locked(&cq->napi);
->  		txq->napi_initialized = true;
->  
-> +		INIT_WORK(&cq->dim.work, mana_tx_dim_work);
-> +		cq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-
-[Severity: High]
-Could this allow NAPI to schedule an uninitialized work_struct?
-
-napi_enable_locked() is called right before INIT_WORK(). Once NAPI is
-enabled, it can be scheduled to run immediately (for example, via netpoll).
-If NAPI executes before INIT_WORK completes, mana_update_tx_dim() would
-pass the uninitialized cq->dim to net_dim(), which could cause a kernel
-panic when it attempts to call schedule_work().
-
-This pattern also occurs in mana_create_rxq().
-
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 94e658d07a27e..67a2b282ff4da 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-
-[ ... ]
-
-> @@ -440,18 +474,123 @@ static int mana_set_coalesce(struct net_device *ndev,
-> +		if (enable_rx_dim)
-> +			apc->rx_dim_enabled = true;
-> +		if (enable_tx_dim)
-> +			apc->tx_dim_enabled = true;
-
-[Severity: High]
-Could the lack of memory barriers here expose uninitialized DIM structures
-to NAPI?
-
-The driver initializes DIM via mana_dim_change() and then sets
-apc->rx_dim_enabled to true. Without an smp_store_release() here and a
-corresponding smp_load_acquire() in mana_update_rx_dim(), weakly-ordered
-CPUs like ARM64 might reorder the stores. Concurrently, NAPI polling might
-observe the flag as true before the initialization is fully visible in memory,
-potentially invoking net_dim() on garbage memory.
 
