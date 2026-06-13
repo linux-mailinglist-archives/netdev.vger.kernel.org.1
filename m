@@ -1,210 +1,189 @@
-Return-Path: <netdev+bounces-298946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WAiFBlEtLWqOdgQAu9opvQ
-	(envelope-from <netdev+bounces-298946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:13:37 +0200
+	id MiHCDMktLWqedgQAu9opvQ
+	(envelope-from <netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:15:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6451067E569
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:13:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8430267E582
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:15:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ragnatech.se header.s=fm3 header.b=qEVpVVFw;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b="F w6eJfe";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298946-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298946-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ragnatech.se;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=rWq5wC4a;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DD913049702
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:13:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55E9A301AF49
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503173B9610;
-	Sat, 13 Jun 2026 10:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB06344DBD;
+	Sat, 13 Jun 2026 10:15:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790EA3A784A;
-	Sat, 13 Jun 2026 10:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A795C2135B8
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 10:15:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781345601; cv=none; b=bv78urhqAvN7JVdPyMnu7YU7B/BrvD+AK0g7b1t4dd7JKBBhFULr7IckuUum11PIroh6r9NkYLVyXZEFJ66MTRePQqaCftn6J/Ugvfwnf7xKD1RdLM3YG3hamcmPyhNuxzvV/D7tiCsCP+6hhQ4ekrafCv6euBu2eP9UBL/Kby0=
+	t=1781345733; cv=none; b=glNxsmZ5tJ+PtuXXa5YpBG0IQn/to5F+nT1J0d2tRDkPk7qy4N7bbyaPZfVT+Xw6c5/yvMUOEj+nvG7hVUdEQdGClJZnfqG4HxcgowjZcNHGrQRJjOV7QF21Mv7Q7RgCNQRuvY/vPTNTFmkp3CoyOsjPW1Kfcf9YppkkTZXfslA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781345601; c=relaxed/simple;
-	bh=XWr2ViDxG+5b0tX4u/PVJgO0R0GtLLd7knuotpex0Tc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V+Ox0pt+sV/J4tpFCdzDLqQdzkQvXju5ht+EMGOmIOqltYuyvFi3qeQeqUQJ75nr17/Y3oP1fjCv8Xu/sID1SsPBq+yHEQKpz051RXKlA10DBkRAHOABXIQlPHG8+DyVP3X63gPdzEne+s/ksL7f+7scgGl1PLdApeLKczgN7Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qEVpVVFw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Fw6eJfeQ; arc=none smtp.client-ip=103.168.172.159
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 533D614000E7;
-	Sat, 13 Jun 2026 06:13:15 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Sat, 13 Jun 2026 06:13:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1781345595;
-	 x=1781431995; bh=oJWNqi8YiDM3/qkksN3NwWVH+hMA0LUQBNi9uZMiqtM=; b=
-	qEVpVVFwlrsXa5jHCRnN7ZqKIstXvt73TY5a/PrdcHn9Mcnf8qclvCVutW2URftU
-	/7dxz4LFFA+lzpPto1DhfiadvWabgU8yRm6y1WDImW58y0VUmBl5urWJ6lC25AG2
-	FxUlFF5WA1Mc0oWpwqZuqijQOKEtxBfQW46kDvJsDltho0Tgz0xuy3kCcMk5dtqT
-	Ho4E6bGLt6B1OhCcuOEf91cizDVsN1mPqtvP4WS1Qn5grIMJeeELawLsvhmBHuAE
-	kmikoHxUOL9YD8m9Zd4kDV8AgKWpZwt9ScNJ2wRC8bgH5yePgGL/OJLjxa/zlpHz
-	p+YzkM+UX0cvF0qRDH0EWg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1781345595; x=
-	1781431995; bh=oJWNqi8YiDM3/qkksN3NwWVH+hMA0LUQBNi9uZMiqtM=; b=F
-	w6eJfeQWlRTXXI5beqZS1mS6FJglDyC4ZOnMWuzuNZvJwgrP9eCtqHgH8WnpxEJl
-	wYq7EN4/W/Opu65PAAx61kAoHrCmAOg9DHG2vIIhgC3bD6iyBUZC37SzRiz4ow+F
-	byyjofh2Hzl2kElwCxSnZTcKN8pF2lVC4bnNgu7gXf2CSd31nd5xwUq7vHR5u2FU
-	CtpyOVXKlRhgTWdVXvTNF1p1in1n6lOM2a0SEm8qe6++A2+elsyLmonpDnoUiHiL
-	uQs+9Poc9ERWy7SYsb1499LFpdm5qjsNjTUzoqLHylOMBIye9E8V0SPrd1Jo82KN
-	7TvRNfi6oPGD1B3s1O9pQ==
-X-ME-Sender: <xms:Oi0tagWPtgkBiDlIfbSqQ_i1cj-qcHmV2mRJIcnQ0wZXQK7Z19kTPA>
-    <xme:Oi0tatX-_fLsqDoM2hx4-ZtPdpfFjzJBb6-BIV47A675GapskgFLy7skDPzFBik2n
-    fktjewKF9GTOunqC_uWJ0giChMbMV_ROsaXfMO8X5UCfSukEUlPc28>
-X-ME-Received: <xmr:Oi0tajH-E5Yo0_kOPrk5Zoa1uFmtnAf1cq-RpBe8GvLgQjULbP5Uw2UkN7AEKNHctq2gkMiKhM37CC7qprZAOhszll1U>
-X-ME-Proxy-Cause: dmFkZTFPjz2AtWzaPdwb3DBOUAu0g1TCZlT/a3Ha3DQQrXQlWVlfBgKGnWb3yo0sLUizn1
-    g4M7BuwLK4dc5vDFjroS4x5WNEPOkUG7TMWODTPZQt+ap09VRJtA++ENhDmtJ0n0Wed37Z
-    DPZPPA8105U/m+nQ6wjtt/CijwTMBswxACyELkXeX93JQCpdwmwl3zeWow+6VtS1IN1zAy
-    c+1d0F3j8tdUM/FCcA2pCtOq7/KtGIe40Ra2auAteRTF11JH8JxDLOgT5yPFlhUco3jTu3
-    Xq4fgb/gnJf66rREfKSMsEf/00ERDcQytMpE8sI91DJdKbM35xbH3sZ6OY2Fo+Op+EqGmm
-    pop+z5roqVvDLKfn7T8eJU8N75tKAE39Ok9Kpq3J1NO5g+293uD1gRLCwqKccLH8VJoxn3
-    WeMbVKx65h2In8hge6AGt8ZLVc368hdjT0osPXQ0BaIoFepGYjmnwcB4/t5BkGa8g4W0Wn
-    Hp6wt5GGhBnRHTelndHWiZ72sh/CPQouvwb8ovFhHjCqO2QT/faZ7WELPSK+UfHPR14+G4
-    JGv5OnklXp+7mdQkU1VuPdleIRvCOS6HKTmvWedaMJpESgxoMZVFNTak6BUsunj3bgikY9
-    LAyYFKNMFU4AX6uz8uGik2lqgvUDh9DIZbVrQWvxlOCfpEBNcaP1v0IxJeoA
-X-ME-Proxy: <xmx:Oi0tahvYKRI6h6MnZ0cbPLkjE4B0RVL6oR1wSFpQkQObSqQykOXl9A>
-    <xmx:Oi0tauYElJIQBXtkUGriUIotMhD02DZTkb5A3RVMyN8kLPa5NDJWBQ>
-    <xmx:Oi0tapVwa2Gi4YCJw409-NSUXzambu5sYZrHdaOctYVV9CiAXMTbRQ>
-    <xmx:Oi0tagLX5hYc4UxXMnBFbFnni9v3YrfbR_qxuWYaTNHuQQMoU0jLOQ>
-    <xmx:Oy0tar44QcaWM0rar-WgeGsh-kqZuvvuNHgb7Yax3D9haLuqNnkE1Tst>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 13 Jun 2026 06:13:14 -0400 (EDT)
-Date: Sat, 13 Jun 2026 12:13:12 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next 8/9] dt-bindings: net: renesas,etheravb: Add optional
- gPTP phandle for Gen4
-Message-ID: <20260613101312.GB1113977@ragnatech.se>
-References: <20260610102432.3538432-1-niklas.soderlund+renesas@ragnatech.se>
- <20260610102432.3538432-9-niklas.soderlund+renesas@ragnatech.se>
- <20260613-caped-ferret-of-philosophy-acae13@quoll>
+	s=arc-20240116; t=1781345733; c=relaxed/simple;
+	bh=/hUK1IZcn042JbW4LmirwRqdQLa12bkk8Cn0mJDvbUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fvt1smd2lMcc3rplEuBQlxmijEFkRPqPERGNUS1RT7TFzB5tB4H4ZhPbj8qNWkqYmqIULCuO5Zvsj9Dufp/ndCAykUM5BujcIpd2vjGduACES4TM0WkNyCFjyEZdtqaAV6MawB45cJqYkP1P/m7snepjfR3cSD7by4R1dnjK2oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rWq5wC4a; arc=none smtp.client-ip=209.85.218.43
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bed2195323cso268431366b.1
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 03:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781345731; x=1781950531; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2n7ubYPUbw2d5bbeL3JfwCvMX4qY0mWyFpI+QwTZQf8=;
+        b=rWq5wC4aQa8OIGyeOvx1J0SmFbIYS7QfpuIt7XG2c0PKf2rzWAqALqSz+K/P16/M19
+         IYcNqOvjdz22ytIsviafMiPIVHBIvj0IDtOohCDnSr1JaU01b2zB+3z17y3OJ7G6wmMX
+         La8KqKCfhU7McVGGUXFG8DyfeofrPnDVuaj4mU6KfYgs9QUmYSOWwTj5rvKwiUKfaGls
+         GMQbfWw+oaEOHKyi157NBtGUTb/4j46kqrHEqZM9BZAngWcpIyah1bd4jqP0uO3DDnTK
+         3DSRnKD+owyIBRAd7h1u36jJMD1D35+PCwddg6YBN4Fk/jVl1yvy5t7307GzUGofKYbj
+         IaQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781345731; x=1781950531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2n7ubYPUbw2d5bbeL3JfwCvMX4qY0mWyFpI+QwTZQf8=;
+        b=lq5tXdIRsv/iPDxDwyLAK6jV432PtW7lIAUVlxYweLmUagio/LitxkX+0q/D/M0Onj
+         cjRvYwY7Q2OxjTMyI3tmFTdZyOWHk2/QlDIsYofceXB+JSXkyNRPs8sYaL8jUDuzg+pQ
+         xV1xn7blXnkFbEkgs/VWYplqmpfnsd1FkiVoYquK/HlxeO8XuBvHkTpcuyyO++G9RZ57
+         b2wH8u2zoxNmN1uWmm34hdGStz6vj3IlaSqfM6uREHOok7ZYlh+Qt4nG72hMz8Ii0R2f
+         +m8r8MCvuV3gsWdZ7LSuQ3/ErxY+qspIot4YZztOJ2jApTfa/T7jnK1+n1vnXENAAAmF
+         cKnQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/MmgeH8H130yoK2KMIEV4mTQFXrG01aNPkJRg5GIWUKEOsmVC2Bv3VOrCJZ5sxc7T7/4M5Rok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr5jSUENMjhby4GIAj+KLCZ3pn3eZwqbkwn1F6Hl7AGNjhS3Yl
+	bnM1tkoBlu67rmZTaFlZnmm1Z1Ka/+j40yUCM1cMZB89piVmdUm9Dm2+Cj9DMn4hnEac
+X-Gm-Gg: Acq92OFvh5vj58Lu4tGjJ3aR7r+0HSoAZsl6d4qAVEGeZis8MqLUBRplzcKh0W3TxyC
+	DR8+3IJJwEyQOvcEaL5YuKDpS1RMyIZdSP6mdEKGeWCGnC68vpPyV1jjT2jOE1k6Tjx5aY2N8HV
+	Dp1gjOVx8JmzQoHJUwX5+kW7qXsqUZ5X3dgAKJFdVxcEBt1adwXS8PLCj3O+wg/xC4rbiB6AjAD
+	q3yRyYRhJ9u5buOBYSGHy+Fhk7mGYADqnWw/VMj59S9axIfGIcYH461Dr7qZbLVCJq88fMrhTAR
+	pHkk9bh8vd7YO/5Tvm6eqd1dApwSv9dKdhPTM4DoDsCD9ecMMEW63ztOMXFC3E/IB0kQB37mn0B
+	tqzNEf4XTQc8r/mYUN5HsmCMpJZXyOIN9RM8Gxecw41vvcY2MIunlB/MWzjExhirKNz46kSKKqM
+	hqTNr/vpSyH8J5q/+c3le4s0Bw5lOO/ZrfA+M3eKywOHz3
+X-Received: by 2002:a17:907:3e94:b0:bd3:6ec5:f141 with SMTP id a640c23a62f3a-bfe28e1ce2dmr369247566b.30.1781345730843;
+        Sat, 13 Jun 2026 03:15:30 -0700 (PDT)
+Received: from archlinux ([2.26.254.81])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb9113103sm200076366b.63.2026.06.13.03.15.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2026 03:15:29 -0700 (PDT)
+From: NeKon69 <nobodqwe@gmail.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	victor.raj@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	NeKon69 <nobodqwe@gmail.com>
+Subject: [PATCH net] ice: Fix use-after-scope in ice_sched_add_nodes_to_layer()
+Date: Sat, 13 Jun 2026 13:14:40 +0300
+Message-ID: <20260613101440.80190-1-nobodqwe@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260613-caped-ferret-of-philosophy-acae13@quoll>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ragnatech.se,none];
-	R_DKIM_ALLOW(-0.20)[ragnatech.se:s=fm3,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[pbarker.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,glider.be,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-298946-lists,netdev=lfdr.de,renesas];
+	TAGGED_FROM(0.00)[bounces-298947-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,lists.osuosl.org,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:krzk@kernel.org,m:paul@pbarker.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:geert+renesas@glider.be,m:magnus.damm@gmail.com,m:sergei.shtylyov@gmail.com,m:netdev@vger.kernel.org,m:linux-renesas-soc@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:conor@kernel.org,m:geert@glider.be,m:magnusdamm@gmail.com,m:sergeishtylyov@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:victor.raj@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nobodqwe@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[ragnatech.se:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[niklas.soderlund@ragnatech.se,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,renesas];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:dkim,ragnatech.se:email,ragnatech.se:mid,ragnatech.se:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,messagingengine.com:dkim]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6451067E569
+X-Rspamd-Queue-Id: 8430267E582
 
-On 2026-06-13 12:04:09 +0200, Krzysztof Kozlowski wrote:
-> On Wed, Jun 10, 2026 at 12:24:31PM +0200, Niklas Söderlund wrote:
-> > The RAVB module on Gen4 have no gPTP clock as part of the RAVB module
-> > itself, instead it relies on an external system wide gPTP clock. The
-> > gPTP clock is shared with RTSN on V4H and RSWITCH on S4.
-> > 
-> > Add an optional phandle so that the RAVB driver can find and use the
-> > gPTP clock. Ideally this should have been an mandatory property but for
-> > backward compatible it is optional. The RAVB module is capable of
-> > functioning without it, but can in such cases not provided PTP
-> > functionality.
-> > 
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> > ---
-> >  .../bindings/net/renesas,etheravb.yaml           | 16 ++++++++++++++++
-> >  1 file changed, 16 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-> > index 1e00ef5b3acd..7bc910ab3ae0 100644
-> > --- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-> > +++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-> > @@ -122,6 +122,13 @@ properties:
-> >        Specify when the AVB_LINK signal is active-low instead of normal
-> >        active-high.
-> >  
-> > +  renesas,gptp:
-> 
-> Aren't you duplicating existing timestamper property? Aren't purpose of
-> both the same?
+Commit 7fb09a737536 ("ice: Modify recursive way of adding nodes")
+changed ice_sched_add_nodes_to_layer() from recursive control flow to an
+iterative loop.
 
-Yes I am. I will switch to using the existing ptp-timer property. Thank 
-you.
+Inside the loop, first_teid_ptr may be set to the address of a
+block-local variable:
 
-> 
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      A phandle to an external gPTP clock for Gen4 platforms. The property is
-> 
-> Explain the purpose of this in the hardware.
-> 
-> > +      optional for backwards compatibility, but without it gPTP timestamps are
-> > +      disabled as Gen4 have no gPTP as part of the RAVB module itself.
-> > +
-> 
-> Best regards,
-> Krzysztof
-> 
+	u32 temp;
+	...
+	if (num_added)
+		first_teid_ptr = &temp;
 
+On the next loop iteration, first_teid_ptr may be passed to
+ice_sched_add_nodes_to_hw_layer(), after temp from the previous
+iteration has gone out of scope.
+
+Move temp outside the loop so the pointer remains valid for the lifetime
+of ice_sched_add_nodes_to_layer().
+
+This was found by Clang with LifetimeSafety enabled while testing C
+language support on a Linux allmodconfig build.
+
+Fixes: 7fb09a737536 ("ice: Modify recursive way of adding nodes")
+Link: https://github.com/llvm/llvm-project/pull/203270
+Signed-off-by: NeKon69 <nobodqwe@gmail.com>
+---
+ drivers/net/ethernet/intel/ice/ice_sched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index fff0c1afdb41..089ad3967be5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -1074,11 +1074,11 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
+ 	u32 *first_teid_ptr = first_node_teid;
+ 	u16 new_num_nodes = num_nodes;
+ 	int status = 0;
++	u32 temp;
+ 
+ 	*num_nodes_added = 0;
+ 	while (*num_nodes_added < num_nodes) {
+ 		u16 max_child_nodes, num_added = 0;
+-		u32 temp;
+ 
+ 		status = ice_sched_add_nodes_to_hw_layer(pi, tc_node, parent,
+ 							 layer,	new_num_nodes,
 -- 
-Kind Regards,
-Niklas Söderlund
+2.54.0
+
 
