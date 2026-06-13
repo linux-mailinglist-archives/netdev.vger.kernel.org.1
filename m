@@ -1,212 +1,241 @@
-Return-Path: <netdev+bounces-299087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5Ur9BjrkLWoLmQQAu9opvQ
-	(envelope-from <netdev+bounces-299087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:14:02 +0200
+	id CUzFEkzlLWpKmQQAu9opvQ
+	(envelope-from <netdev+bounces-299088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:18:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64503680041
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:14:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95374680059
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:18:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20201202 header.b=FvFF4iGR;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299087-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299087-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=k1RVJlSe;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299088-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299088-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 03538300C5A8
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 23:14:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6B4E300D68C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 23:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2210D39D6EE;
-	Sat, 13 Jun 2026 23:13:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA1A3290C8;
+	Sat, 13 Jun 2026 23:18:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2931262A6;
-	Sat, 13 Jun 2026 23:13:58 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781392439; cv=none; b=shlNla3/n2A9lFPInZV7nLfhiLgimAIP20QguCWVsUzVb9DlwBQS7zh9ZBL6PjAvOTlSLb4Vrl0lYogYhcp9OaiH4mN+hYqW5D6r01H0GQ882AZ2besULMluyz6tXLaXnrAPxfggoldkNIgqmNSo26A+xhKrGCSfsYL0dcUS0Xo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781392439; c=relaxed/simple;
-	bh=PMtUPP0yXZwUyEO+zjCge9NNGoyni3AmruZmcpMXyQU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=spPpFSE8fGBMrbo4M/MwB0G1GpwgAe8hIm0CIYtCnkfd1QygaNGO9z+szWJIIFOYlLLnFnl8et+OqR2N53Lmvbco5Iz36VKtplrVeNRlZKfplE0QmulrJWLFtVplXW2oINnZo5mA6YF73vo8WjRYlAnVUBvwBYpcbVZQFCDsaxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FvFF4iGR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B479C19425;
-	Sat, 13 Jun 2026 23:13:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1781392438;
-	bh=PMtUPP0yXZwUyEO+zjCge9NNGoyni3AmruZmcpMXyQU=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=FvFF4iGR0LR/utW+llniePeCxi/25dj8HIfWAMVt/K2rvlkHHuWrIOJD/gB5iNQZz
-	 vfPI7JRThBd1Qfuqry6VdUpiMFTnylAgnnKil4j/nxGoryTkvVT+ez82Cqix2gK05n
-	 nwHnMZw75vcGIdSTHls3Eusu9KF97PJOjZ5LprWFhCsiYq7I++ifMz9fsg94z+ViOU
-	 qGlbqgg0qn7PH4xI5lgQPoSIyIN5CTFpe74O+CnWVex4ReoCcvLLYgy7gLAcj3cKJw
-	 NpSFvX/tqOFS3DuQJ3b7qGLRAdoNrhEQiqrPA4sFNbtT1laES5R0j8wemR2Q7sam8h
-	 MDgj8NXYeuscA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C3DCD98CF;
-	Sat, 13 Jun 2026 23:13:58 +0000 (UTC)
-From: Laika Price via B4 Relay <devnull+laikabcprice.gmail.com@kernel.org>
-Date: Sun, 14 Jun 2026 00:13:57 +0100
-Subject: [PATCH net v3] ip_tunnel: drop stale dst from generated PMTU ICMP
- replies
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8925D23C4FF
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 23:18:31 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781392712; cv=pass; b=lIPoVrwaR3f/ZoONBgOjzrH4yPNOxbIwKTw/8F2Uo19H/9YniBxdjyf7wY6dV5oWcepyfzIiYl9FgB1NbIY8BK4WAYyVa+jqhsirYMBfJBS9vZcI/CdYEAFegYcXXJ9fRYEoGVHhliLQNFdUbHZu7uWzcwqJMqXeSsYlV9K1Bto=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781392712; c=relaxed/simple;
+	bh=ZR6CRlm+kjUynyI/TJRUEnDkvMkUBO9Ysvtfa/jLYNs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AyEFMA0Z18QSDOqWgjAm0XKjCUWplj3HIgd8qrgE8XVpjtxNm7VQ2TStY6g47pS3VMUf+5l+RcPB3fn9t4CKQesJuG1MBsi9oZet0ruQhLveasLzZz8ja3rOjsB8UAk1CKo1/XUGD5F5pzGq9aF4AS2jGh9M6cdAIVKd2E8cd5o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k1RVJlSe; arc=pass smtp.client-ip=74.125.82.46
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1384ebe7a10so1864953c88.1
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 16:18:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781392711; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Olb1O8kA1W9MW17+fg5toN88E056dsVk4+rT1k5lq4bvdqdOjleT+7HzRlvhZjwDMR
+         JwFz6K/rt0kcq1vH/j/Nmn9h2c2/q89xuar7DqaalTgz+5Q08lOT5BBN3+kCm2Dwmgcr
+         aoLm1TykTMSYIZb4vFrL8r1tDT2cLgyX/JyXdh2wTEM0Dwdwd1FQGF3ZAZJooUPm/cnZ
+         nDBomwfYJix20WKR4rA3rHiok9Wau8kDwxcHM+tkMedf0blDpRZSzdtaQhhYhcQQfnmK
+         kApePOnoNVheIBwzlGwpZ4t8zor2eNSmEU6mnUYrMWVJ6OCfWslOL0eK9TByf9rLUAL+
+         B1YQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hrh3mtw21uDqAv+fInBxgdwwmlvcEY/ppShhIMRJqV8=;
+        fh=q1xxoMfkOASrZ+gGYar5igC/9r99u1ZBytQQ7mDoRSQ=;
+        b=a2dQ3MAmpbtLrAg4Zj+nIrXdGnJHlCqpQULK48LR+mIZOBXUoLUBP0ZChImerdD6fM
+         EXmTiU8hRicFy6ON05v1kt4/jR4GwVoNhxE2GX4UAKznFyANcFFJ7AOjWXmgxqLGcXR3
+         A0p8rleEQMDrYrLD8di32LKMYg7fmNMXzw2zWewa2PbJOX0be5XsJCXKo2fchvEaXbu4
+         Ey88KmgtrsxkPP1vI/8tiUr4+Dq5wiRe25ue60dDsHSlRGF9MnFzNk8fsX10/VQJR7tJ
+         a/7OhYRLAP8hl4blUhBdVIjd10db9ri2/WttuvYfWTDwWxJsn8mWzV9bWIhdqdyUSOaH
+         j+Zw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781392711; x=1781997511; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hrh3mtw21uDqAv+fInBxgdwwmlvcEY/ppShhIMRJqV8=;
+        b=k1RVJlSeqUhRHAWLeR5bCLHief97nYMl+zbIqJBKCpn3asDCW/ooMhqoY6bxTr2mXU
+         hHzd0j+Vgovum/i24MivwBymcjy8OswC2vPHkSzW8rdk2Bq/n7vzupAHpQK/nvm6CG55
+         V2vplDHZjo0nsrRhRe+odo84tBi/Hoqvqjn0hpN+s+BcJZNNiweyK7xw6F6GSi8xe8Rz
+         qzF/SzIqhzfFCBVUpZpfeK5RM+zvX6XOkRHk16Ajhiq80ZuBR9MNgh2jbvwdBDIBwhIZ
+         zoqyGNRVP3FXOlxlgD6TOaV3md7cQgySn7b2bCcqnuqRCPN9uiO1MZ02TAEIcL6qDspr
+         4eOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781392711; x=1781997511;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hrh3mtw21uDqAv+fInBxgdwwmlvcEY/ppShhIMRJqV8=;
+        b=cT/7O61FqhA1FLIhHljueaHLTTMfsqd7XF3UiHifv6vLYcZ+eW3rAinFTx/RBe024+
+         SvLlbDDbGzUbMayGT+jNSPHGdU/DwGqRBH/oEMDvFi9p6U+OsdIoUddC1+inaWkb0vui
+         QHf9NYSgJOlzpxI+oQusnkEQbDKWrZr5jM59Hk3n8pvrQ7kAvlAsDSwrctFN1x2VxKAq
+         R8Wa7MBl2sImsYQltYlG+ncYqb4Qzny8vmeWbaTVa/3hmQS9+xpt9KfVPCNSD6prPqyd
+         i1/aj6o1EWSWlmGdlFSgJhbD4Osf2I/xGZJX5ZhHSpwyklR67cmlZpwKMXkTPGukzJKr
+         TO3g==
+X-Forwarded-Encrypted: i=1; AFNElJ8MJdXsFgV4QPHH2Tjfx3cZODXeoLQ4VX/qCsCkBm/EKgXDJtCF7kbyY7AwNstjJTspjV24dSA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbfldPgbCg4LJYhcT/euqzoAmM4VZQtwmdVuE+h05LHGL0Rzd7
+	GRihCvMDYzk9iEmTyp8/ui949JUFimY9/b7leJBcu/ou3m4r6D09gwl5o/7/DLnTcx5nUjp/6xu
+	ReOunuc23BlMHffNds8Xr4QOSGalcV3Oc2AYpxgTz
+X-Gm-Gg: Acq92OGru57KE/ud6JBOlvIgA//SRPXEoPiCZoSQNjNKQjNTvkE9uCqMSBPKc/f5hxG
+	JhNpJaRyrAPE9eONNlXnBPr8YiODbajXmuY9VT5fvL9s6ZWYkkqcI0JbxKO+ybNIh0v1UPtEfhV
+	ZdoSJ6VEoWWSVoGpf72RlK0Jx7efn4cUNovqyuJWlWvSnZKIJ8rsDtcPMxQOqvPea4p2QXTM/nn
+	lc1hmKS/tyyU5Y208+JaKp+G+QK3UK4nLLCh2tXa5NF/26OLNtrjZgDWX928xPXaubAFkG+pzhe
+	Cs8HnjXviZ3+ihHW2R5yz1nA28BYz2C/1cdsUrSfl7mdxvA9j9C/0oa1UT073ol8Z1PjnsaLPrQ
+	ui4zjkcm3u+EKM+k/mSgMLVZl8kxP/N7IN9+pUr7jhFhDMOOFKAsk
+X-Received: by 2002:a05:7022:4394:b0:138:33cc:d886 with SMTP id
+ a92af1059eb24-1384bb1c329mr3810295c88.3.1781392709721; Sat, 13 Jun 2026
+ 16:18:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260614-master-v3-1-9f5060ba1ed1@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXM2wpAQBSF4VfRvjblLF5FLsZY2Mqh2UjJuxtcf
- vWvdZHAMoRK7yKLg4WX2SH2PTKDnnsobp0pCqIsyMJYTVo2WNXkSdF2GimMIRevFh2f31FV/5a
- 9GWG2d033/QDp2htLagAAAA==
-X-Change-ID: 20260613-master-b749dfae5ecc
-To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Laika Price <laikabcprice@gmail.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781392437; l=3515;
- i=laikabcprice@gmail.com; s=20260613; h=from:subject:message-id;
- bh=4R3bk96Acva4pjmtLVNfzqZPE4VBDyqBTO1OdJW0m54=;
- b=46a8YD2fqzTW1iLw1iw6oWYzRsLwrI0LRffoyWRfjrGozZINh2hNQsSyWlSEGSIjcQepVi19k
- 9FYN5oBNvUsBnMA4PwpKjqTFmLEKTnzUSekvP4Zep10Umtl5XH91/Hv
-X-Developer-Key: i=laikabcprice@gmail.com; a=ed25519;
- pk=mFSMw2odvyxt1H4QHAdwZVuwHduNzUMDKbWFOcwhDCg=
-X-Endpoint-Received: by B4 Relay for laikabcprice@gmail.com/20260613 with
- auth_id=819
-X-Original-From: Laika Price <laikabcprice@gmail.com>
-Reply-To: laikabcprice@gmail.com
+References: <20260613010039.1362312-1-kuniyu@google.com> <20260613102041.55e3b50e@kernel.org>
+ <CAAVpQUBP_21b5MB8MS-wFwg9BUdcgMoNxi8s479YQHH9g5ahCw@mail.gmail.com> <20260613154750.0a2355a4@kernel.org>
+In-Reply-To: <20260613154750.0a2355a4@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sat, 13 Jun 2026 16:18:18 -0700
+X-Gm-Features: AVVi8CfWRjua43N5R25Ec3lhUHEDNvyeW-Rh2Ag46NdaoqpMNy3Y7Ggc1m-MHFQ
+Message-ID: <CAAVpQUA0hA8DmR3Yaww-KjbdmoFK2b25hqec5zz9tdnKHjYJCw@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next/net 0/5] bpf: Support RX/TX HW timestamp proxy.
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	FREEMAIL_REPLYTO_NEQ_FROM(2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:laikabcprice@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-299088-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299087-lists,netdev=lfdr.de,laikabcprice.gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_REPLYTO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:martin.lau@linux.dev,m:sdf@fomichev.me,m:andrii@kernel.org,m:john.fastabend@gmail.com,m:memxor@gmail.com,m:eddyz87@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:willemb@google.com,m:kuni1840@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
-	HAS_REPLYTO(0.00)[laikabcprice@gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,linux.dev,fomichev.me,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64503680041
+X-Rspamd-Queue-Id: 95374680059
 
-From: Laika Price <laikabcprice@gmail.com>
+On Sat, Jun 13, 2026 at 3:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 13 Jun 2026 14:43:46 -0700 Kuniyuki Iwashima wrote:
+> > On Sat, Jun 13, 2026 at 10:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+> > > On Sat, 13 Jun 2026 00:59:57 +0000 Kuniyuki Iwashima wrote:
+> > > > When standard socket applications are run on these hosts,
+> > > > a userspace proxy is required to mediate traffic between the
+> > > > hardware and the applications.
+> > > >
+> > > >             +---------+                 +----------------------+
+> > > >             |  proxy  |                 |  socket application  |
+> > > >             +---------+                 +----------------------+
+> > > >               ^     ^                               ^
+> > > >   userspace   |     |                               |
+> > > >   -----------| |-----------------------------------------------
+> > > >              | |    |    +---------------------+    | skb
+> > > >              | |    `--->|  virtual interface  |<---'
+> > > >   kernel     | |   skb   +---------------------+
+> > > >   -----------| |-----------------------------------------------
+> > > >               |
+> > > >               v
+> > > >        +------------+
+> > > >        |  hardware  |
+> > > >        +------------+
+> > >
+> > > The first patch looks kinda nonsensical but then I saw this diagram.
+> > > Looks like you're vibe coding an integration that makes it easier to
+> > > treat netdev as a slow path for a user networking stack.
+> > > Please tell me if I'm missing anything otherwise add my nack if you
+> > > repost.
+> >
+> > Hmm, what would be a better way to tell users that HW TS is
+> > available on tunnel devices ?
+> >
+> > Other options were 1) add attribute to tie the tunnel to a physical
+> > device and use its ndo_hwtstamp_set/get, or 2) add bpf retval
+> > hook in the path like update_socket_protocol().
+>
+> Can you explain the use case for HW timestamps on tunnels?
+> I see you have some diagrams in patches 3 and 4 but the motivation
+> isn't really explained, and we have 250 patches in the queue still.
+> Not much time to play detective right now :/
 
-iptunnel_pmtud_build_icmp(...) and iptunnel_pmtud_build_icmpv6(...) take
-in an sk_buff, modify it to create a PMTU ICMP error reply, and return it.
-As part of these modifications, the source/destination ethernet and IP
-addresses are swapped around which makes the sk_buff's current dst invalid.
+To be clear, this series is not related to Swift.
 
-If the stale dst is left, the packet can skip input routing and be
-forwarded using the original output device. This was observed when sending
-packets to a VXLAN over a WireGuard tunnel - the ICMP reply was generated
-but it was sent over the VXLAN instead of to the WireGuard tunnel.
+Our RPC library capture timestamps as many places as possible
+so that we can visualise the RPC calls and know/debug where the
+latency comes from: application, library, kernel, network.
 
-This patch drops the stale dst after building the PMTU reply so that the
-packet is routed using its new headers when it is reinjected.
-
-The pmtu_ipv4_br_vxlan4_exception test generates PMTU exceptions by
-pinging an IP on the other side of a tunnel. This was incorrect as it
-would return upon the first ICMP Fragmentation Needed due to the -w flag
-being used in conjunction with || return 1.
-
-This patch updates pmtu_ipv4_br_vxlan4_exception to be in line with how
-PMTU exceptions are generated in other tests such as in test_pmtu_ipvX
-
-    run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst1}
-    run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s 1800 ${dst2}
-
-Signed-off-by: Laika Price <laikabcprice@gmail.com>
----
-Changes in v3:
-- Squashed the selftest update into the ip_tunnel fix so the patch remains
-  bisectable.
-- Link to v2: https://patch.msgid.link/20260613-master-v2-0-061b70fd45dd@gmail.com
-
-Changes in v2:
-- Fixed incorrect PMTU exception generation in the selftest.
-- Link to v1: https://patch.msgid.link/20260613-master-v1-1-df796e8e2d74@gmail.com
----
- net/ipv4/ip_tunnel_core.c           | 2 ++
- tools/testing/selftests/net/pmtu.sh | 4 ++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index d3c677e9b..949150e43 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -267,6 +267,7 @@ static int iptunnel_pmtud_build_icmp(struct sk_buff *skb, int mtu)
- 
- 	eth_header(skb, skb->dev, ntohs(eh.h_proto), eh.h_source, eh.h_dest, 0);
- 	skb_reset_mac_header(skb);
-+	skb_dst_drop(skb);
- 
- 	return skb->len;
- }
-@@ -370,6 +371,7 @@ static int iptunnel_pmtud_build_icmpv6(struct sk_buff *skb, int mtu)
- 
- 	eth_header(skb, skb->dev, ntohs(eh.h_proto), eh.h_source, eh.h_dest, 0);
- 	skb_reset_mac_header(skb);
-+	skb_dst_drop(skb);
- 
- 	return skb->len;
- }
-diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-index a3323c21f..9498d9f53 100755
---- a/tools/testing/selftests/net/pmtu.sh
-+++ b/tools/testing/selftests/net/pmtu.sh
-@@ -1456,8 +1456,8 @@ test_pmtu_ipvX_over_bridged_vxlanY_or_geneveY_exception() {
- 	mtu "${ns_a}" ${type}_a $((${ll_mtu} + 1000))
- 	mtu "${ns_b}" ${type}_b $((${ll_mtu} + 1000))
- 
--	run_cmd ${ns_c} ${ping} -q -M want -i 0.1 -c 10 -s $((${ll_mtu} + 500)) ${dst} || return 1
--	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1  -s $((${ll_mtu} + 500)) ${dst} || return 1
-+	run_cmd ${ns_c} ${ping} -q -M want -i 0.1 -w 1 -s $((${ll_mtu} + 500)) ${dst}
-+	run_cmd ${ns_a} ${ping} -q -M want -i 0.1 -w 1 -s $((${ll_mtu} + 500)) ${dst}
- 
- 	# Check that exceptions were created
- 	pmtu="$(route_get_dst_pmtu_from_exception "${ns_c}" ${dst})"
-
----
-base-commit: 2a2974b5145cdf2f4db134be1a2157e9ca4a1cf0
-change-id: 20260613-master-b749dfae5ecc
-
-Best regards,
---  
-Laika Price <laikabcprice@gmail.com>
+This is not specific to tunnels and applied to all workloads running
+on container w/ virtual devices and init_net w/ physical devices.
 
 
+>
+> > Or do you think applications should handle ENOTSUP by ioctl
+> > as soft error and always set SOF_TIMESTAMPING_XXX_HARDWARE
+> > since the underlying physical device may support it ?
+>
+> And explain the deployment model and API semantics you have in mind.
+
+The application first calls ioctl(SIOCSHWTSTAMP) and only when
+hwtstamp is supported, it uses SOF_TIMESTAMPING_XXX_HARDARE.
+
+The doc mentions ioctl(SIOCSHWTSTAMP) may overwrite the
+configuration and ioctl(SIOCGHWTSTAMP) is not always implemented.
+https://docs.kernel.org/networking/timestamping.html
+
+But it does not say ioctl(SIOCSHWTSTAMP) may fail although
+SOF_TIMESTAMPING_XXX_HARDARE could be supported.
+
+
+>
+> > Anyway, I'm happy to drop patch 1 for now and explore options.
+>
+> Not patch 1, all of it. I get the feeling y'all are sitting on a pile
+> of Swift related code that needs to be made upstreamable. Odd series
+> like this make me think it's never going to happen.
+>
+> > (Believe it or not, I haven't let AI write code because I don't
+> >  want AI to take over the most fun part.)
 
