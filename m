@@ -1,135 +1,141 @@
-Return-Path: <netdev+bounces-298977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id zK9IF1V5LWoOgwQAu9opvQ
-	(envelope-from <netdev+bounces-298977-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 17:37:57 +0200
+	id ldelHdmALWoThAQAu9opvQ
+	(envelope-from <netdev+bounces-298979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:10:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF9A67EFA0
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 17:37:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 547FF67F082
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 18:10:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baidu.com header.s=selector1 header.b=MbooNwmE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298977-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298977-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=baidu.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298979-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298979-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2BF9D3001FBF
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 15:37:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C28903018D78
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 16:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814493FA5D5;
-	Sat, 13 Jun 2026 15:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A522FE042;
+	Sat, 13 Jun 2026 16:09:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.baidu.com (mx24.baidu.com [111.206.215.185])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id CB189331A6E;
-	Sat, 13 Jun 2026 15:37:41 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEAF2765E2;
+	Sat, 13 Jun 2026 16:09:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781365067; cv=none; b=IQLCD5o6XSVxmZ7x/+tK+Gg7Z5Qla9I9Kcu+4icSTQKj9RXqm7TWenzUYTvOj+9FoITbcjbBcdPR4JsE9uCVqZEPmc7gOuHHPyn7LVVRcSsCF1Cg8iGCxzlw0NTaE2wdg+OvheN/UFVd3/DPUdyBDPHXtJ4CiSbhQEUuHLiqLAY=
+	t=1781366996; cv=none; b=QSN+zF9I7DhWz/0fhtfbZH5tENTPsR3n7nMB7shij0XjLjlSMR5dyQTYNTQvaMCp5D2eLr+6mKZza5LS/tKQYXcXtfEy/TEha0gvBgWz/3B3V7NthSK+DqN4Tu+CC7M0zybAah9EgozzmiDKe8ihTKBuESAOAwvM8V+f8hFleSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781365067; c=relaxed/simple;
-	bh=hB4utEcg5DjrWCXgLLzL3q7GXevMHduXCwAN7h7N4oU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KtJLc1tFjVzIqOB9SZr5G4nf/hxCUSPiPpe18kWIwcq48GcLBTJD4qVZ52nIIaPhZ2nAPzN4Fgjq4d7G8AKtdeKIEsFvVTPZKksGWQnrYvxFsNoI3xizoDppAGIg/DFCFiazsLN+HD6PDfdq4/2TqiXJiHUVxpqPUxNmN+racyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=MbooNwmE; arc=none smtp.client-ip=111.206.215.185
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] net/mlx5: Free steering tag data on release
-Date: Sat, 13 Jun 2026 23:37:25 +0800
-Message-ID: <20260613153725.1874-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1781366996; c=relaxed/simple;
+	bh=QOJNy3fk4tqXbe57IEudcI2M43CdJjDbj69X0pe3VgQ=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mTATbKi49JqFXlU3QI6KrQ4P+iUA1Wf8WLwxsL0fG60Gr+XofIwlyfqtZ79A2mzNKJ8QuwNhtIW0iCYzGn7rzo5PdRQf+8+WLAdIFbtADm2t4m0oZ0IsfJbWYrVPQj2NPffFt4s8dC+6MepHhzVvXAODHAnPJvNuN1iSr/OZ5TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wYQvO-000000001t5-42FX;
+	Sat, 13 Jun 2026 16:09:35 +0000
+Date: Sat, 13 Jun 2026 17:09:31 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 8/8] net: dsa: mt7530: implement
+ port_change_conduit op
+Message-ID: <ai2Au6DuxYcE-bH9@makrotopia.org>
+References: <cover.1781312667.git.daniel@makrotopia.org>
+ <8dd8cfe32bc8e38b92c49e30a6255090fb0998fb.1781312667.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc11.internal.baidu.com (172.31.3.21) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1781365053;
-	bh=IixFVhPxXR+ixIEBOuwRXxrJCVJP5M7SH9DCvrv4WrA=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=MbooNwmEUjyEi4E/o1HYiSCntd+oe/60efzWdnvC+uqhK03w1G8DPqZWnStE3ELbg
-	 LSBSQQOIZWx2iaGLNAhPsN8d3MYB6GS9ooYQlH3QbCTSlY8cF7UCOLz0kXfdwXqM+B
-	 Tga43t3CvsVqkr/+duadII7mcuf0Kxl3QlYBK9xw7puhFC+cFM2i293+kYRHhZh82/
-	 i/PPSuHqYmiMIQgZ3wKDYukijIVf3UYoSi1HtDPxP84EZtYFy04eLYmZgoQbglJlU6
-	 67+hqGIUg6HJp/OF4DYhCIC5Bmq1EtG8oPKqj905ebq7dKo83hdUAQLigCGYftO5kN
-	 mNMXcj/g1wV/w==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8dd8cfe32bc8e38b92c49e30a6255090fb0998fb.1781312667.git.daniel@makrotopia.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[baidu.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[baidu.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lirongqing@baidu.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-298977-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[makrotopia.org];
+	FORGED_RECIPIENTS(0.00)[m:chester.a.unal@arinc9.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[arinc9.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,armlinux.org.uk,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-298979-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[baidu.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,makrotopia.org:email,makrotopia.org:mid,makrotopia.org:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,arinc9.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3CF9A67EFA0
+X-Rspamd-Queue-Id: 547FF67F082
 
-From: Li RongQing <lirongqing@baidu.com>
+On Sat, Jun 13, 2026 at 02:11:45AM +0100, Daniel Golle wrote:
+> Allow changing the CPU port affinity of user ports at runtime via the
+> IFLA_DSA_CONDUIT netlink attribute. This updates the port matrix to
+> forward to the new CPU port instead of the old one.
+> 
+> Limit the operation to MT7531. There, trapped link-local frames follow
+> the per-port affinity, as the MT7531_CPU_PMAP destination mask is
+> further restricted by the port matrix. A conduit change is hence fully
+> honoured by the hardware, for regular traffic as well as for trapped
+> frames.
+> 
+> The MT7530 switch, including the variant embedded in the MT7621 SoC,
+> instead traps frames to the single CPU port set in the CPU_PORT field
+> of the MFC register, regardless of the affinity of the inbound user
+> port. With user ports affine to different CPU ports there is no
+> correct value for that field, so per-port CPU affinity cannot be fully
+> implemented for trapped frames. Routing a WAN port via the second SoC
+> GMAC is conventionally covered by the PHY muxing feature on these
+> switches, which bypasses the switch fabric and does not involve a CPU
+> port at all.
+> 
+> The switches on the MT7988, EN7581 and AN7583 SoCs only have a
+> single CPU port, leaving no other conduit to change to.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-mlx5_st_alloc_index() allocates an mlx5_st_idx_data object for
-each new steering tag table index and stores it in the xarray.
-When the last user releases the index, mlx5_st_dealloc_index()
-removes the entry from the xarray but did not free the backing
-object, leaking memory.
+I forgot to include the previously received
 
-Free idx_data after erasing the xarray entry once the refcount
-reaches zero.
+Acked-by: Chester A. Unal <chester.a.unal@arinc9.com>
 
-Fixes: 888a7776f4fb0 ("net/mlx5: Add support for device steering tag")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/st.c | 1 +
- 1 file changed, 1 insertion(+)
+See also:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-index 997be91..7cedc34 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-@@ -175,6 +175,7 @@ int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, u16 st_index)
- 
- 	if (refcount_dec_and_test(&idx_data->usecount)) {
- 		xa_erase(&st->idx_xa, st_index);
-+		kfree(idx_data);
- 		/* We leave PCI config space as was before, no mkey will refer to it */
- 	}
- 
--- 
-2.9.4
+https://patchwork.kernel.org/comment/27003848/
 
+https://lore.kernel.org/all/02ad5de0-ea6a-4267-8686-72e3f98fce4e@arinc9.com/
 
