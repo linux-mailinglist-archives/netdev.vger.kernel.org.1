@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id biJaJkq5LWpcjAQAu9opvQ
-	(envelope-from <netdev+bounces-299028-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:10:50 +0200
+	id 6l4HBE65LWpejAQAu9opvQ
+	(envelope-from <netdev+bounces-299029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:10:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4E867F947
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:10:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A0967F94F
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:10:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=KI5PQtIf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299028-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299028-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HHmmuftg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299029-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299029-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0B37B3004DEE
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:10:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1BBB43003D33
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D3E38837D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36793955FF;
 	Sat, 13 Jun 2026 20:10:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CB02DB791
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D3034B1A3
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:10:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781381444; cv=none; b=gvQiiZex2sq0MDyjwS34OILSAUrgClMaqbWSospnNPYLWwMtNPOYrn+/+fRYcQDaI99YuU0cRR0evY82oHT5j7KJtMOPocXPfBcm47Tbj51gHN6kRgJlaXA+DQx531yZZPF4lUgQ0ajC57h/AErLt8eB/2AcLhG9kh2TTXWOaQU=
+	t=1781381444; cv=none; b=rXqe7aKA+1VRa9GsgdVnNqnehor0AEnnIBRJsiAwOs97fKq+C3SF1K2LrsW+2D65jkWpP2z/KTK7MgnYlEhSSfYAmAMwhdwA9EvqY90O4x02tM5OkVFnMRAmfeRim9F6L8WO+6dLsf2aVvMP5Va+cSJZsCgfcY/tnEGc+qXBaIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781381444; c=relaxed/simple;
-	bh=8YSR6CFEUKgEVbak/RzJf66YHaU4HqZ018p3ZNUz3NI=;
+	bh=PDEWNmhQWCvGdMCu7E6cEINtfqKVBANG6PfpYYhSj40=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pHE/g2kY6xWe2tqyncYKUAgiK1k3dMxqSsavavl1BzXkpCd9Q91ugWdRXel7zTHdTWe22iA94lyWDaZv01/DK7XskltHUsUOB51ln0ysYXI50CH6OeI8p4aIEcHroEMzK5R5KKG/ssmSl9deWb57NvJRLgsasnMVBAGpZ4I5Wg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KI5PQtIf; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6418E1F00A3D;
-	Sat, 13 Jun 2026 20:10:42 +0000 (UTC)
+	 MIME-Version; b=IHC5rTkFh9m7pKnNkvUL2qLKSeUdYhFNmewvGU7ZnNx3IHgstX2gbbwoQ22uotTQPw4VAZXZkgkUF2e8q2sxAv00px0/6dVI/3HDriRDgZ6pWbs1OeTX0Fb6z84iq8uKWILV5QHoY2C4y3ubxksbWCQ7N5sEwSf2UfV438P7M30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HHmmuftg; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 112331F00A3A;
+	Sat, 13 Jun 2026 20:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781381442;
-	bh=O0u0Y5M06QrMQh3ALmuEJ2zJI1febqpd9gcTIM54ds4=;
+	s=k20260515; t=1781381443;
+	bh=4i1sj49Uq/9paJvXs5fVbG9vgxXdAKmcH+RVsk+ldfI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=KI5PQtIfkpZqzp9TR+xmm0tIAP/KBs8Ce1xbeNfTd18MViIScsvCCVNFU4XURtNUA
-	 /qp5YqCXgEoCrpVYJrOXZculzR3v3QW+SbDiAXDqpZ9Hvw6MmVZH/qzHX8qeAyJ6cF
-	 CaXp+/M+hwn5nQ1mOe1kw8F6ikJ6eYFv40JJL0dhw8IAoCT9G1PJJQvUvWPYYQYm3r
-	 m8jliGbbHg771DoeqquBlXr/EvHijnN0tV3qniENrn6a6/MZkqt0HjALSl2/lkZ8zK
-	 G3vdgFsRzNAP/6PMnKJaYpKF9gN6lbIJ26LzyK0e49nbu449ru1LO60LJiLqYpg+Bb
-	 x5aIUcEjFS6pg==
+	b=HHmmuftgzia7nHa+F0E1rkxVCc+2RK3oUJev+N8PRkvXY03xgvwHeR0wqfA+jy651
+	 m3gNjUXhYr2bOmET0TqwRaAMaL6F5a6NsLCqINt2RjT0ylN7f/uPwTIiImiEDZxo7y
+	 6LaMOjbyK/v7pROUMzQeIp1XJkjw53qXx/RuKWTK+hbcJrt2Bq0FN8my1dWmRNJom9
+	 3Eb77fMGJL5KCAWU01O3YNMTzbwtfD/xdoKXRCz2jSXtmBNQio+xXng19WAJAAXzIu
+	 TlFTTgiBynQdwfI5b4Lr9by372DM45xgZcX1DUl8rih8kN++68gj1sMex0k+kY/6qT
+	 YPIxW1HlHx8Mw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	linux-atm-general@lists.sourceforge.net,
 	dwmw2@infradead.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/9] atm: remove AAL3/4 transport support
-Date: Sat, 13 Jun 2026 13:10:24 -0700
-Message-ID: <20260613201032.77274-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/9] atm: remove the unused send_oam / push_oam callbacks
+Date: Sat, 13 Jun 2026 13:10:25 -0700
+Message-ID: <20260613201032.77274-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260613201032.77274-1-kuba@kernel.org>
 References: <20260613201032.77274-1-kuba@kernel.org>
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,sfgoth.com,lists.sourceforge.net,infradead.org];
-	TAGGED_FROM(0.00)[bounces-299028-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299029-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -108,86 +108,103 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2B4E867F947
+X-Rspamd-Queue-Id: E5A0967F94F
 
-AAL3/4 is an obsolete connection-oriented ATM adaptation layer that has
-seen no real use since the SMDS-era hardware it was designed for (90s?).
-We are only maintaining ATM support in-tree to keep PPPoATM running,
-and PPPoATM runs over AAL5.
+The atmdev_ops::send_oam device operation and the atm_vcc::push_oam
+callback were the kernel's interface for raw F4/F5 OAM cell exchange.
+Nothing assigns them a non-NULL value and nothing ever invokes them:
+the core only ever initialises push_oam to NULL (in vcc_create() and the
+AAL init helpers) and the Solos driver only lists send_oam = NULL for
+documentation. The drivers that actually drove OAM through these hooks
+were removed along with the legacy ATM adapters.
 
-Drop the "raw" AAL3/4 transport (atm_init_aal34()) and the ATM_AAL34
-cases in the connect and traffic-parameter paths. A vcc_connect() with
-qos.aal == ATM_AAL34 now fails with -EPROTOTYPE.
-
-uAPI cleanup is performed later, separately.
+Drop both callbacks and the NULL initialisers.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/atm/protocols.h |  1 -
- net/atm/common.c    |  7 -------
- net/atm/raw.c       | 12 ------------
- 3 files changed, 20 deletions(-)
+ include/linux/atmdev.h  | 8 --------
+ drivers/atm/solos-pci.c | 1 -
+ net/atm/common.c        | 1 -
+ net/atm/raw.c           | 2 --
+ 4 files changed, 12 deletions(-)
 
-diff --git a/net/atm/protocols.h b/net/atm/protocols.h
-index 18d4d008bac3..30158efb5e1a 100644
---- a/net/atm/protocols.h
-+++ b/net/atm/protocols.h
-@@ -8,7 +8,6 @@
- #define NET_ATM_PROTOCOLS_H
+diff --git a/include/linux/atmdev.h b/include/linux/atmdev.h
+index 82a32526df64..71c5bf6950e3 100644
+--- a/include/linux/atmdev.h
++++ b/include/linux/atmdev.h
+@@ -104,7 +104,6 @@ struct atm_vcc {
+ 	void (*release_cb)(struct atm_vcc *vcc); /* release_sock callback */
+ 	void (*push)(struct atm_vcc *vcc,struct sk_buff *skb);
+ 	void (*pop)(struct atm_vcc *vcc,struct sk_buff *skb); /* optional */
+-	int (*push_oam)(struct atm_vcc *vcc,void *cell);
+ 	int (*send)(struct atm_vcc *vcc,struct sk_buff *skb);
+ 	void		*dev_data;	/* per-device data */
+ 	void		*proto_data;	/* per-protocol data */
+@@ -170,12 +169,6 @@ struct atm_dev {
+ 	struct list_head dev_list;	/* linkage */
+ };
  
- int atm_init_aal0(struct atm_vcc *vcc);	/* "raw" AAL0 */
--int atm_init_aal34(struct atm_vcc *vcc);/* "raw" AAL3/4 transport */
- int atm_init_aal5(struct atm_vcc *vcc);	/* "raw" AAL5 transport */
- 
- #endif
+- 
+-/* OF: send_Oam Flags */
+-
+-#define ATM_OF_IMMED  1		/* Attempt immediate delivery */
+-#define ATM_OF_INRATE 2		/* Attempt in-rate delivery */
+-
+ struct atmdev_ops { /* only send is required */
+ 	void (*dev_close)(struct atm_dev *dev);
+ 	int (*open)(struct atm_vcc *vcc);
+@@ -188,7 +181,6 @@ struct atmdev_ops { /* only send is required */
+ 	int (*pre_send)(struct atm_vcc *vcc, struct sk_buff *skb);
+ 	int (*send)(struct atm_vcc *vcc,struct sk_buff *skb);
+ 	int (*send_bh)(struct atm_vcc *vcc, struct sk_buff *skb);
+-	int (*send_oam)(struct atm_vcc *vcc,void *cell,int flags);
+ 	void (*phy_put)(struct atm_dev *dev,unsigned char value,
+ 	    unsigned long addr);
+ 	unsigned char (*phy_get)(struct atm_dev *dev,unsigned long addr);
+diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
+index bcb1353877e4..4ad170a858ee 100644
+--- a/drivers/atm/solos-pci.c
++++ b/drivers/atm/solos-pci.c
+@@ -1180,7 +1180,6 @@ static const struct atmdev_ops fpga_ops = {
+ 	.close =	pclose,
+ 	.ioctl =	NULL,
+ 	.send =		psend,
+-	.send_oam =	NULL,
+ 	.phy_put =	NULL,
+ 	.phy_get =	NULL,
+ 	.change_qos =	NULL,
 diff --git a/net/atm/common.c b/net/atm/common.c
-index 60132de4eebe..913f7e32ce41 100644
+index 913f7e32ce41..c6e87fc9bbfc 100644
 --- a/net/atm/common.c
 +++ b/net/atm/common.c
-@@ -293,9 +293,6 @@ static int adjust_tp(struct atm_trafprm *tp, unsigned char aal)
- 	case ATM_AAL0:
- 		max_sdu = ATM_CELL_SIZE-1;
- 		break;
--	case ATM_AAL34:
--		max_sdu = ATM_MAX_AAL34_PDU;
--		break;
- 	default:
- 		pr_warn("AAL problems ... (%d)\n", aal);
- 		fallthrough;
-@@ -411,10 +408,6 @@ static int __vcc_connect(struct atm_vcc *vcc, struct atm_dev *dev, short vpi,
- 		error = atm_init_aal0(vcc);
- 		vcc->stats = &dev->stats.aal0;
- 		break;
--	case ATM_AAL34:
--		error = atm_init_aal34(vcc);
--		vcc->stats = &dev->stats.aal34;
--		break;
- 	case ATM_NO_AAL:
- 		/* ATM_AAL5 is also used in the "0 for default" case */
- 		vcc->qos.aal = ATM_AAL5;
+@@ -163,7 +163,6 @@ int vcc_create(struct net *net, struct socket *sock, int protocol, int family, i
+ 	vcc->push = NULL;
+ 	vcc->pop = NULL;
+ 	vcc->owner = NULL;
+-	vcc->push_oam = NULL;
+ 	vcc->release_cb = NULL;
+ 	vcc->vpi = vcc->vci = 0; /* no VCI/VPI yet */
+ 	vcc->atm_options = vcc->aal_options = 0;
 diff --git a/net/atm/raw.c b/net/atm/raw.c
-index 1e6511ec842c..0d36aeb3671b 100644
+index 0d36aeb3671b..1d6ac7b0c4e5 100644
 --- a/net/atm/raw.c
 +++ b/net/atm/raw.c
-@@ -68,18 +68,6 @@ int atm_init_aal0(struct atm_vcc *vcc)
- 	return 0;
- }
- 
--int atm_init_aal34(struct atm_vcc *vcc)
--{
--	vcc->push = atm_push_raw;
--	vcc->pop = atm_pop_raw;
--	vcc->push_oam = NULL;
--	if (vcc->dev->ops->send_bh)
--		vcc->send = vcc->dev->ops->send_bh;
--	else
--		vcc->send = vcc->dev->ops->send;
--	return 0;
--}
--
- int atm_init_aal5(struct atm_vcc *vcc)
+@@ -63,7 +63,6 @@ int atm_init_aal0(struct atm_vcc *vcc)
  {
  	vcc->push = atm_push_raw;
+ 	vcc->pop = atm_pop_raw;
+-	vcc->push_oam = NULL;
+ 	vcc->send = atm_send_aal0;
+ 	return 0;
+ }
+@@ -72,7 +71,6 @@ int atm_init_aal5(struct atm_vcc *vcc)
+ {
+ 	vcc->push = atm_push_raw;
+ 	vcc->pop = atm_pop_raw;
+-	vcc->push_oam = NULL;
+ 	if (vcc->dev->ops->send_bh)
+ 		vcc->send = vcc->dev->ops->send_bh;
+ 	else
 -- 
 2.54.0
 
