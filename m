@@ -1,166 +1,418 @@
-Return-Path: <netdev+bounces-299046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299047-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id E0AuNG7ALWrojQQAu9opvQ
-	(envelope-from <netdev+bounces-299046-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:41:18 +0200
+	id fv7pNxzCLWpvjgQAu9opvQ
+	(envelope-from <netdev+bounces-299047-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:48:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5521367FAE4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:41:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B83767FBBF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:48:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RumzhwMC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299046-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299046-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=microsoft.com header.s=selector2 header.b=FuurhuFV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299047-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299047-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=microsoft.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38C67301E3CC
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:41:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B85BB300492A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1CCF26ED3D;
-	Sat, 13 Jun 2026 20:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1C430F7F2;
+	Sat, 13 Jun 2026 20:48:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020092.outbound.protection.outlook.com [52.101.46.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0113D39A047
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:41:01 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781383264; cv=none; b=Gu3aI6T7CuFsdRSaiFoZFpMM1MeqEXNFilCKMJGkgYOhUPjxFK1vOTGq0VK30x+gYNefQNPecaJmbG/p3L1dFrrsb4AAD/zAl3Wr/5OHY0EoiRd5uwO2AK5rm9r+Q/rdDIrHbMnynTxV40SQNrCbArC3JjmvZFcgL1Fh0g87Epo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781383264; c=relaxed/simple;
-	bh=Z27F1MiJkR32NPyBd4Ylnk4mhWs7vLOaMk243A09ARY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rfhKYV3pg007gCedyRmyYFUG3/onlh+e+NzEGkiFVtI62Qi+FDXteWrSX6a2yS4KsHSdgfMp9EYf+5VwDXmxpK9lq2TDPyE/B3VElQgbsAcAvS0QjtOiaDzG6rl7AHuzI5gGdbvGJ1SSUR15EzqnSGck4A1N5CX4gMrGQym1dns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RumzhwMC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 743131F00A3A;
-	Sat, 13 Jun 2026 20:41:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781383261;
-	bh=NoxqJnJ3RXrNXSb1yIxmyyOMj/xIz9bqOPmPdO5z7GQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RumzhwMC0ge9T4xB51E3rTTCa6Kwoxigd4r00GmQYcKhw6uB6hUXtFPJPTSl5KDAW
-	 juSO/ZxzXsEU95NHn7+J8MRedzEqnA6qGOrbkbkTbB3R4MRJ/IpCW+qsXRvGTG9IxY
-	 qJ+3h7qWXeAF3j+dr/tPTbzPiKiG5WjLtsKogodnuCLGEoarZVWHGe8aIEwXkU1xZQ
-	 jkD4ji41SNqQm/1Xei3nFOAfYdwfJX7qAXjri91GGxwABWUNDN7fSsooi3DVMiKb6/
-	 DqsRIHmLHX2oBd8PzsKsv7GISVcVMA0huBFhyvfDZjbTEpeL2gMlN8e8mVEwgigtXw
-	 EYOLluAN5gg1w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AA73A54A32;
-	Sat, 13 Jun 2026 20:40:58 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23AA1E9B37;
+	Sat, 13 Jun 2026 20:48:22 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781383704; cv=fail; b=sdFj3T1/rpToA0jKGZqrdn58z0CkW1KWWrXnSpNsbaJad7baVbfnFMGJtnbA58tECStRlxJzpY5UmrWPOPVAIauNWhQGkGTotLT0HbTdWKTMbWOPiEXDoDiWzivuTe0V/zbi7iWfwdOGeNiSgG6TOiFZ0JFJJMIc+qkkKen1Gy8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781383704; c=relaxed/simple;
+	bh=TfKWvwYrH5yHfoyUG06TpMTU8BZ+fQP+Kwl++GS7A/4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qwYUcsoU+qZNO0Qhx9/jPGuo3JU+12dhG10ypPNWEUB5h0iitWES1MZES+14rYOkbOOASXC5RVpm7nzhntiL2YhE0GYXqmWMRHeMaATMsA2S7B3K2Dh4AtIrx3x581mGVFOU0W8/+dfnsiNPGNcqcomWydZkeY0eAVVwWBoScU0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=FuurhuFV; arc=fail smtp.client-ip=52.101.46.92
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f14MSLRQGr6nsyCQTBm/x+nglPCvHdTHzpWz3DkxkdcG8msoiyJWdLpz0LDNJbkG0L+j/4Ifg4nphuF1WdVClXMLcAboN9HjuhwTimHaBy5FFRDlOcMhKDbVg0Hd8uR6FF+A6zlrVMUz2DhB1Ibi4uGSb/ipPnkUF+AYY4c+kFT5F/0mwWKJML1WWB/m1qmffHCpiOsVIYu4qBIl26+JhnM8yqueE2tZcJCjliFaYTKIe31EfJnLOON4PPuVcWei5Z+nEiTqGQ2fTDyy469dljsUlGj7btZ+DInjQC82560V2MuLWxKp183HKrbmZnL+yVKYKcgxeyqczKpYMZrCBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e8ynJsWPc+SplKEdeqfTjkConnrNe4J8VQk8HIe1JmM=;
+ b=Sr0xJ6j3rk+eGZBnL/wI+8Lxcp8C9HqBnXFhz+iMzZ9TcidYIYRSvTUtqeupGCw/lDqGPj07ZEY7jb35a6CZg3OmZY2ZcUdoY72eMBUxIo3dK0hZk3V5WbxMi0B11k9VmABZ4maZHSPBA94jw8Z/4xQexBiYDgvNbxfzOEgDAGwmiby5Or4tkuAj59dk6iuUcH8CJzHDkCF01FVbwqwcVKU8L9OUkcpE041C0OuQ7iZ1OqWYHM8BsGXRWAgIUjbE8HqkEfx1Q02RumfqYqVDlUMIvHiYKrdqhDN0yOvHJYKL7d/VNjkT0mHox+u0yK5FTNAXvgOmcahtEmRJVGdn/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e8ynJsWPc+SplKEdeqfTjkConnrNe4J8VQk8HIe1JmM=;
+ b=FuurhuFVywSbpBySLi3Td9LRd6K8GPxjWOCe1rfNKDTNad+iiCRuARuzl2mCvpYsrfogEMDoBHbokn50JRd8uoeB9Xl9LwbsnUqRNGhGzftG690IqGE6ehkugDC/sdOXUhX/ZOzXHN7jdbJl0xeGQXzp4e2w9IUeCc+GQdW/swI=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by SA1PR21MB5937.namprd21.prod.outlook.com (2603:10b6:806:4a5::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Sat, 13 Jun
+ 2026 20:48:19 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::d8ab:5f37:de73:8e6]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::d8ab:5f37:de73:8e6%5]) with mapi id 15.21.0139.005; Sat, 13 Jun 2026
+ 20:48:18 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Simon Horman <horms@kernel.org>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>,
+	"dipayanroy@linux.microsoft.com" <dipayanroy@linux.microsoft.com>,
+	"gargaditya@linux.microsoft.com" <gargaditya@linux.microsoft.com>,
+	"kees@kernel.org" <kees@kernel.org>, "leitao@debian.org" <leitao@debian.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Paul Rosswurm
+	<paulros@microsoft.com>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next v3] net: mana: Add Interrupt
+ Moderation support
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next v3] net: mana: Add Interrupt
+ Moderation support
+Thread-Index: AQHc+dT0MmNj+txjpUG1Qor5J83NQbY8J0EAgADOfmA=
+Date: Sat, 13 Jun 2026 20:48:18 +0000
+Message-ID:
+ <SA3PR21MB38675970B36ECABDA7E9C72DCA192@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <20260611190239.2532429-1-haiyangz@linux.microsoft.com>
+ <20260613082014.715350-1-horms@kernel.org>
+In-Reply-To: <20260613082014.715350-1-horms@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a8a1479e-2569-4f0f-a4ca-7854f4e2483e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-06-13T20:39:18Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB5937:EE_
+x-ms-office365-filtering-correlation-id: 3d63e690-4b1b-4563-52b4-08dec98d1969
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|23010399003|18002099003|22082099003|6133799003|38070700021|4143699003|56012099006|11063799006|4133799003|5023799004;
+x-microsoft-antispam-message-info:
+ swGShTvEQijOUMI/3oK7LRM0S8yvE3EE6LW213ia3IdUBalm3HtBqE4mcwjq8R7MpNaEA4KCWQSjl9jl8HFL10GtypsFUepY7D/ar2Xk3S4I/LB0QiA4JlM23wx4N+TYURzkyOam6TabtNdNgzLaH0iHaPhrtoCFGha2DhBFRX6HZGy/Ak/AqLm/CPOglChJSEQuoCCEntt6jYLdaiFloOy4hoYgy9IFILyjlRRj6XIMEFKPRrqpWEsjfamv0yidTaib7xqOFFZIxSqOIX+OABzz+FSeW6oJzpENnxU69cguVTYPv1t0QQyicAsfpghNwN/g6CZ8fef0tXqymoIkvbFm9Wp8mREjKtdKC0ngMu1w0x9qliYKxVNqyuXIxBTb4rpgZsz7H/ro6BAJAfz9SEdV0jdjZnNlu8Usih9BbQBeTOTNHAk9PBft3nEouj6Xxmorn6E7Ln3pjQC77WczMcryO4wq9ffcgvqqlOlUtaVH2MmNHSiiYjKUggV0MAwvFQtf2MK9BsDy/tKLvQlgGtlnRuoufGDEE8nJmncD5o2Ymk7ogEB1meSEFCYCJIlJHtfZgnXsLoxE7341NWBNKZMhqvbCKzVpRUh6Ks59CXYL2TUAhFiEv0kQzmom8a+Cz0+g3QXjpururSwTCNr+lMc5szEwSPlcwsbAkE+3XmQvV+3OIh5pCudzlO+Br7GBjcUcs5kbwB8/RhL6/XbEaVNAoYCOOc1o/nCKayHKVLy3RVBRX1pll66vxHwZQSsF
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(23010399003)(18002099003)(22082099003)(6133799003)(38070700021)(4143699003)(56012099006)(11063799006)(4133799003)(5023799004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?qtWUhmajZ0ZnVG6jfDNjzqkhX1dLH4iO+GW/1jwEtMmvXfbIOMW3kPy1rkgV?=
+ =?us-ascii?Q?xyGM1X5/ZKI7gJW35LmhU/6R3xBIy4+JBBjKnz7k+4cXX08cBZQt7G4lKS/0?=
+ =?us-ascii?Q?PNa/s7Y1xxMtSqo1QcnP2opDIwhX4q4sBvnU7mthHtL8LyU/0CgNXq66ARYF?=
+ =?us-ascii?Q?GLZHkyQ99lzUwc7jCA9NBSxJY9vxUooTHfRas/Sp1yiNak/12fXzAd0tE/+E?=
+ =?us-ascii?Q?a0XMpsxix7nIaJHAtnrjcQXay5b6Fl1CSVWJm2k2a4/vv8mfaIjdGMjF7Vq7?=
+ =?us-ascii?Q?SgOoAWz3uEdFao+o5H4KIHIL/+R154OPd/toGN3wVandTmsBTz4s7NfYCF/M?=
+ =?us-ascii?Q?aMcdv12oqmUlXxe+wSxU5BBkwnF0dy99Nhvym7ht32iUJXJ6IchUvQcAmoJk?=
+ =?us-ascii?Q?AoDWLPWW7VxTrPmLgPmCODJ0+CkSHE5CaYUZ+vyHP1H8ub21UILWoAVlYG2U?=
+ =?us-ascii?Q?Yn1TMWA0q8qQyHbZ5gO/PxPlVc2j0vfdxTsLt2DUL6WnEF42IeIDiP1ZSMaY?=
+ =?us-ascii?Q?05h7DptyDafZOavRiDPrraLoJ9gXIlxvuCtR53CmWxu79u4SEM/3HxiMyoUS?=
+ =?us-ascii?Q?9Jskoh+Wp0Is050+wdrFJeGjarI8ZUv7F7QVd2Lw455A/sEK/xI9a+xwyMaj?=
+ =?us-ascii?Q?isvl4ZWr9Mlswnf6509/g82x0l/PjD4bzFTykade6mxxQRUc3XT49fO7FvjD?=
+ =?us-ascii?Q?sphi8LwiGc4cV+1OV8hCXF5fYodMNPqZUcasre1YBfPbncTb9WxaMige5eak?=
+ =?us-ascii?Q?VjRKbjBZcOF6DjChFqkGr9Gss0ncfwJlGh3S/t9nUmx9In1NW9BZVQCBcjDF?=
+ =?us-ascii?Q?rBH8XtWt5CIp/TxPjgHWdl4CLxFQeDul5yzlE+nGgLlZgJ/N5Q6pK6B/1n6/?=
+ =?us-ascii?Q?opn06gnx6a5yNUlLFjXQTGRL9cSy9ZtniL4cBD9eHOIkuzC+kAU68nXYeCji?=
+ =?us-ascii?Q?PC06lSqTsY64V+dPr5FbqVgm2fpwjvlji/zgGt3vQThPo59xwQ9wv0+OOAmb?=
+ =?us-ascii?Q?GgxbN49ew3f3lAPy+kL9qf6+KD8MymY7kCvbTc6zqSnGrj0LiQoaFR2KaTZm?=
+ =?us-ascii?Q?8F2cmyR3B2R8tr4bhK58pExQNSNxEH9ojV4dw75EK/Yk30wr97AT4blERc0E?=
+ =?us-ascii?Q?vTJGaYqXDGCiALDEA3F2G5mNhzSXXmCemrsq9Q9066tCJyN0YYRB6ZRDDGCO?=
+ =?us-ascii?Q?ixTk5zPOZWwbd06ef6eewrj3LDVsOIeYpNqO1DXzI5O5u5gDIQ+7cX8Ui7cr?=
+ =?us-ascii?Q?pGMB/OWiZwXK9hiAton4UwguDqzo7oZFvgcmW9aqi6XofcrkHV2B9k+1NFfe?=
+ =?us-ascii?Q?WrMCHW3cRqxFLcMrGiYU83ITlkmCJibot+3cXzmfliBuw8v+sXVveVKNb95T?=
+ =?us-ascii?Q?LxoEiBXsiPMnP4tdgJCPzChCK7io9JPMxnPkOjspRZY5OMSuXxHV9IB2eI2l?=
+ =?us-ascii?Q?xGDTRYw8FvgCP+fSd5iABIlkKXM05WF2k7iRX1R8rBGfFNd3pdpk+B0PONiF?=
+ =?us-ascii?Q?rqYxhtME217VJc9CitIe8xOmjJZ1CfYYEAdErN1S9iheS2Zbk1MYyS5F3Z2I?=
+ =?us-ascii?Q?O+qOkmc5lv50Ys53xrl2t6Bo1hE8maXqmmIi/wxRDu1cbA7Nt0PEOn00R9w9?=
+ =?us-ascii?Q?ttF83IZdB+5JyeTrgAFH79ZDLLlmnIIkHE3fipmse9ZkgMsHCnxStnOT5rEj?=
+ =?us-ascii?Q?omx8fKcE7itNJEOCrZ+WWzoXEAfb90BG2nYh714+B3WSMEzIUj8EF80es2xV?=
+ =?us-ascii?Q?40uh9Ay+jA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 01/18] xfrm: cleanup error path in xfrm_add_policy()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178138325738.1587607.4411330476742685465.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Jun 2026 20:40:57 +0000
-References: <20260612074725.1760473-2-steffen.klassert@secunet.com>
-In-Reply-To: <20260612074725.1760473-2-steffen.klassert@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
- netdev@vger.kernel.org
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d63e690-4b1b-4563-52b4-08dec98d1969
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2026 20:48:18.6662
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: M517nlUbQF6h4SmCdX6mRyQYf6fASFGyELAzalbL+0AZMracwLXHJXNVnWv6PNpet3KUmocBIflhHPmY7y+b3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB5937
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[microsoft.com:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299046-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:steffen.klassert@secunet.com,m:davem@davemloft.net,m:kuba@kernel.org,m:herbert@gondor.apana.org.au,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299047-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_SENDER(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:kys@microsoft.com,m:wei.liu@kernel.org,m:DECUI@microsoft.com,m:longli@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kotaranov@microsoft.com,m:shradhagupta@linux.microsoft.com,m:ernis@linux.microsoft.com,m:dipayanroy@linux.microsoft.com,m:gargaditya@linux.microsoft.com,m:kees@kernel.org,m:leitao@debian.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:paulros@microsoft.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[microsoft.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5521367FAE4
+X-Rspamd-Queue-Id: 7B83767FBBF
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Steffen Klassert <steffen.klassert@secunet.com>:
 
-On Fri, 12 Jun 2026 09:46:17 +0200 you wrote:
-> From: Deepanshu Kartikey <kartikey406@gmail.com>
-> 
-> Replace the open-coded manual cleanup in the error path of
-> xfrm_add_policy() with xfrm_policy_destroy(), which already
-> handles all the necessary cleanup internally. This is consistent
-> with how xfrm_policy_construct() handles its own error paths.
-> 
-> [...]
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Saturday, June 13, 2026 4:20 AM
+> To: haiyangz@linux.microsoft.com
+> Cc: Simon Horman <horms@kernel.org>; linux-hyperv@vger.kernel.org;
+> netdev@vger.kernel.org; KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>;
+> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; Konstantin Taranov
+> <kotaranov@microsoft.com>; shradhagupta@linux.microsoft.com;
+> ernis@linux.microsoft.com; dipayanroy@linux.microsoft.com;
+> gargaditya@linux.microsoft.com; kees@kernel.org; leitao@debian.org; linux=
+-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org; Paul Rosswurm
+> <paulros@microsoft.com>
+> Subject: [EXTERNAL] Re: [PATCH net-next v3] net: mana: Add Interrupt
+> Moderation support
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> Full review at:
+> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fsashi=
+ko.
+> dev%2F&data=3D05%7C02%7Chaiyangz%40microsoft.com%7Ccbca53cce3d24759006708=
+dec
+> 924a556%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C639169356403391033%7=
+C
+> Unknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJ=
+X
+> aW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DD2ZPGJ5XznE=
+kcL
+> uH3Cxtze0FYOL3xxDIY%2Bg2DP508Q8%3D&reserved=3D0
+> ---
+> Date:   Thu Jun 11 19:02:22 2026 +0000
+>=20
+>     net: mana: Add Interrupt Moderation support
+>=20
+>     This commit adds Static and Dynamic Interrupt Moderation (DIM) suppor=
+t
+> for
+>     Rx and Tx. It updates the queue creation procedure, adds functions to
+>     collect stats for DIM, and provides ethtool handler support to get/se=
+t
+>     the moderation settings.
+>=20
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index 26aef21c6c2c8..d92e022d8533c 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -1579,6 +1579,9 @@ int mana_create_wq_obj(struct mana_port_context
+> *apc,
+> >
+> >  	mana_gd_init_req_hdr(&req.hdr, MANA_CREATE_WQ_OBJ,
+> >  			     sizeof(req), sizeof(resp));
+> > +
+> > +	req.hdr.req.msg_version =3D GDMA_MESSAGE_V3;
+> > +	req.hdr.resp.msg_version =3D GDMA_MESSAGE_V2;
+> >  	req.vport =3D vport;
+> >  	req.wq_type =3D wq_type;
+> >  	req.wq_gdma_region =3D wq_spec->gdma_region;
+> > @@ -1587,6 +1590,9 @@ int mana_create_wq_obj(struct mana_port_context
+> *apc,
+> >  	req.cq_size =3D cq_spec->queue_size;
+> >  	req.cq_moderation_ctx_id =3D cq_spec->modr_ctx_id;
+> >  	req.cq_parent_qid =3D cq_spec->attached_eq;
+> > +	req.req_cq_moderation =3D cq_spec->req_cq_moderation;
+> > +	req.cq_moderation_comp =3D cq_spec->cq_moderation_comp;
+> > +	req.cq_moderation_usec =3D cq_spec->cq_moderation_usec;
+>=20
+> [Severity: High]
+> Does this break queue creation on older Azure host firmwares?
+>=20
+> The code unconditionally bumps the WQ object creation request to use
+> GDMA_MESSAGE_V3 and passes the req_cq_moderation flag. If the firmware
+> does
+> not support GDMA_PF_CAP_FLAG_1_DYN_INTERRUPT_MODERATION, could the
+> firmware
+> reject the queue creation request and break device initialization
+> entirely?
 
-Here is the summary with links:
-  - [01/18] xfrm: cleanup error path in xfrm_add_policy()
-    https://git.kernel.org/netdev/net-next/c/a77d172177f3
-  - [02/18] xfrm: Reject excessive values for XFRMA_TFCPAD
-    https://git.kernel.org/netdev/net-next/c/41c4d3b26f5e
-  - [03/18] xfrm: remove redundant assignments
-    https://git.kernel.org/netdev/net-next/c/440bf355d32e
-  - [04/18] xfrm: add extack to xfrm_init_state
-    https://git.kernel.org/netdev/net-next/c/231a1744dc43
-  - [05/18] xfrm: allow migration from UDP encapsulated to non-encapsulated ESP
-    https://git.kernel.org/netdev/net-next/c/b8addb8884f2
-  - [06/18] xfrm: fix NAT-related field inheritance in SA migration
-    https://git.kernel.org/netdev/net-next/c/364e165e0b63
-  - [07/18] xfrm: rename reqid in xfrm_migrate
-    https://git.kernel.org/netdev/net-next/c/e2e92714d081
-  - [08/18] xfrm: split xfrm_state_migrate into create and install functions
-    https://git.kernel.org/netdev/net-next/c/8de53883a4bf
-  - [09/18] xfrm: check family before comparing addresses in migrate
-    https://git.kernel.org/netdev/net-next/c/b2cb192b95e5
-  - [10/18] xfrm: add state synchronization after migration
-    https://git.kernel.org/netdev/net-next/c/bac7a60e2678
-  - [11/18] xfrm: add error messages to state migration
-    https://git.kernel.org/netdev/net-next/c/15e5d32de6bf
-  - [12/18] xfrm: move encap and xuo into struct xfrm_migrate
-    https://git.kernel.org/netdev/net-next/c/1d97daee3038
-  - [13/18] xfrm: refactor XFRMA_MTIMER_THRESH validation into a helper
-    https://git.kernel.org/netdev/net-next/c/92550d30c69b
-  - [14/18] xfrm: extract address family and selector validation helpers
-    https://git.kernel.org/netdev/net-next/c/38d400e5d0fd
-  - [15/18] xfrm: make xfrm_dev_state_add xuo parameter const
-    https://git.kernel.org/netdev/net-next/c/8eed5ba25734
-  - [16/18] xfrm: add XFRM_MSG_MIGRATE_STATE for single SA migration
-    https://git.kernel.org/netdev/net-next/c/a9d155ea9b44
-  - [17/18] xfrm: restrict netlink attributes for XFRM_MSG_MIGRATE_STATE
-    https://git.kernel.org/netdev/net-next/c/c4460171d78a
-  - [18/18] xfrm: add documentation for XFRM_MSG_MIGRATE_STATE
-    https://git.kernel.org/netdev/net-next/c/c13c0cc6f52e
+Our firmware is forward compatible with newer message versions, so the=20
+old firmware still properly handles this message, just the new feature=20
+fields are ignored, and queue creation will be successful.
+And if the DIM capability bit is zero from FW, driver will keep the DIM
+feature to be off and unchangeable.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>=20
+> [ ... ]
+>=20
+> > +static void mana_update_tx_dim(struct mana_cq *cq)
+> > +{
+> > +	struct mana_port_context *apc =3D netdev_priv(cq->txq->ndev);
+> > +	struct dim_sample dim_sample =3D {};
+> > +	struct mana_txq *txq =3D cq->txq;
+> > +
+> > +	if (!apc->tx_dim_enabled)
+> > +		return;
+> > +
+> > +	dim_update_sample(READ_ONCE(cq->dim_event_ctr), txq->stats.packets,
+> > +			  txq->stats.bytes, &dim_sample);
+> > +	net_dim(&cq->dim, &dim_sample);
+> > +}
+>=20
+> [Severity: High]
+> Does this measure the CPU enqueue rate rather than the hardware completio=
+n
+> rate?
+>=20
+> It appears that txq->stats.packets is incremented in mana_start_xmit()
+> upon enqueue, not during completion in mana_poll_tx_cq(). Dynamic
+> interrupt
+> moderation relies on measuring the actual hardware completion rate to
+> function correctly.
+>=20
+> Additionally, is it safe to read txq->stats.packets here without the
+> u64_stats_fetch_begin() retry loop? Reading a 64-bit statistic locklessly
+> without the synchronization primitives could result in torn reads on 32-
+> bit
+> systems.
+In the next patch version, I added counters to cq, and track the HW comp ra=
+te,
+And the reader is in the same NAPI thread to prevent any torn reads.
 
+>=20
+> [ ... ]
+>=20
+> > @@ -2324,7 +2434,13 @@ static int mana_cq_handler(void *context, struct
+> gdma_queue *gdma_queue)
+> >  	if (w < cq->budget) {
+> >  		mana_gd_ring_cq(gdma_queue, SET_ARM_BIT);
+> >  		cq->work_done_since_doorbell =3D 0;
+> > -		napi_complete_done(&cq->napi, w);
+> > +
+> > +		if (napi_complete_done(&cq->napi, w)) {
+> > +			if (cq->type =3D=3D MANA_CQ_TYPE_RX)
+> > +				mana_update_rx_dim(cq);
+> > +			else
+> > +				mana_update_tx_dim(cq);
+> > +		}
+>=20
+> [Severity: High]
+> Is it safe to call mana_update_rx_dim() and mana_update_tx_dim() after
+> napi_complete_done()?
+>=20
+> Since napi_complete_done() ends the NAPI polling cycle and relinquishes
+> mutual exclusion, and the hardware interrupt was already re-armed by
+> mana_gd_ring_cq() right before this, couldn't a new packet trigger an
+> interrupt immediately? This could allow NAPI to be scheduled on another
+> CPU
+> concurrently while this CPU is still running the DIM update, potentially
+> corrupting the non-thread-safe net_dim() state machine.
+
+Thanks, I moved the dim update before the napi_complete_done() to avoid
+concurrently running it.
+
+>=20
+> [ ... ]
+>=20
+> > @@ -2562,6 +2685,9 @@ static int mana_create_txq(struct
+> mana_port_context *apc,
+> >  		napi_enable_locked(&cq->napi);
+> >  		txq->napi_initialized =3D true;
+> >
+> > +		INIT_WORK(&cq->dim.work, mana_tx_dim_work);
+> > +		cq->dim.mode =3D DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+>=20
+> [Severity: High]
+> Could this allow NAPI to schedule an uninitialized work_struct?
+>=20
+> napi_enable_locked() is called right before INIT_WORK(). Once NAPI is
+> enabled, it can be scheduled to run immediately (for example, via
+> netpoll).
+> If NAPI executes before INIT_WORK completes, mana_update_tx_dim() would
+> pass the uninitialized cq->dim to net_dim(), which could cause a kernel
+> panic when it attempts to call schedule_work().
+>=20
+> This pattern also occurs in mana_create_rxq().
+
+I have updated the init order in the new version.
+
+>=20
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > index 94e658d07a27e..67a2b282ff4da 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+>=20
+> [ ... ]
+>=20
+> > @@ -440,18 +474,123 @@ static int mana_set_coalesce(struct net_device
+> *ndev,
+> > +		if (enable_rx_dim)
+> > +			apc->rx_dim_enabled =3D true;
+> > +		if (enable_tx_dim)
+> > +			apc->tx_dim_enabled =3D true;
+>=20
+> [Severity: High]
+> Could the lack of memory barriers here expose uninitialized DIM structure=
+s
+> to NAPI?
+>=20
+> The driver initializes DIM via mana_dim_change() and then sets
+> apc->rx_dim_enabled to true. Without an smp_store_release() here and a
+> corresponding smp_load_acquire() in mana_update_rx_dim(), weakly-ordered
+> CPUs like ARM64 might reorder the stores. Concurrently, NAPI polling migh=
+t
+> observe the flag as true before the initialization is fully visible in
+> memory,
+> potentially invoking net_dim() on garbage memory.
+
+I added smp_store_release() & smp_load_acquire() to fix it in the next vers=
+ion.
+
+And, I will submit the next version soon.
+
+Thanks,
+- Haiyang
 
 
