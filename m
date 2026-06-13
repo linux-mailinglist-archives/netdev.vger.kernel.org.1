@@ -1,526 +1,473 @@
-Return-Path: <netdev+bounces-298936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id VNZwF4EiLWr5cAQAu9opvQ
-	(envelope-from <netdev+bounces-298936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:27:29 +0200
+	id YKyNJYIlLWrecgQAu9opvQ
+	(envelope-from <netdev+bounces-298937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:40:18 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C095867E3A5
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:27:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D93A467E419
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:40:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LsB75swd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298936-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298936-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dCLmM7a9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298937-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298937-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 459DF308552A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 09:27:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB17230817BF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 09:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D177638F25E;
-	Sat, 13 Jun 2026 09:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1173E30FC1B;
+	Sat, 13 Jun 2026 09:39:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7E3368AB
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 09:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB5A30FC1E
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 09:39:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781342835; cv=none; b=Jwh1vyim47hwRflatKQIb6y2WtYSRmIr1EMMTdq4T6gN2opBQkqx/G7GERHfMTOpacZUJ4PJcrxCpNb3jUnDGJIWdRHkUp1K/3ZccVg3PGhSx90yp/qmXmwP6ZE0Rxp2+GP32eIEpTt3UUmWpMCU6eMw2tAzgtFN8sVcd247+S4=
+	t=1781343592; cv=none; b=B9NKX5aV5E+aVOH3GfWBX6KZIJitybI0YmxpXzgyjdGkPzp2jiN6JKF1/pD3XV143usHy0hYw0r3lJi3ZaN48bdukmbi2k8s+YEMAcwcU57wFF7jGsWQNxZ8Rsr2V3ek6b8qgSYwyLtiiOwXLzq+Uh2btds1GWbwCFLt21KKDdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781342835; c=relaxed/simple;
-	bh=a2Z6Ady4K0H23tACMTBtTlfiHsqAoRQkWObnL6Grihw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=orLEHKKyoph8DWEZpFRAV0DNOLTsrf00dFQnJumVnPIjipt3y8bM7BY7jESwtW6SoUpLT2io02r/6raeQJayhwIKmc4JI56BS5q0dkSzFceMxknv0WTjG3DIQzJXxr3oZprYfSE2BOEjrcex8dVzkGvowagAd7hJVgVoAeqxFUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LsB75swd; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781342832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zZ+pUo5K2YdLgPNo6Ciwj2KiVz343QZRMZTnIquFAlY=;
-	b=LsB75swdcxve+5jkw2rrBdlBppWM5hEqZQDfFN7MidWcyxt5ozU1HhbCzf0smz7G/fMUdb
-	wwNIx7l2LRZrKNcbVdSs5aAijIplh1UO3cpK/iQX2LXH9lgTYInjyJe3RkSm0CjcTCPnRZ
-	RHMP1fTHvr7hy3iJNrzQaS6UFOWEzRc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-O2T34K-6O1qeQKGd4YhaOQ-1; Sat,
- 13 Jun 2026 05:27:08 -0400
-X-MC-Unique: O2T34K-6O1qeQKGd4YhaOQ-1
-X-Mimecast-MFC-AGG-ID: O2T34K-6O1qeQKGd4YhaOQ_1781342825
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07B6519560B6;
-	Sat, 13 Jun 2026 09:27:05 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.22.88.28])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1ACE51955BC2;
-	Sat, 13 Jun 2026 09:26:58 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: ciprian.regus@analog.com
-Cc: parthiban.veerasooran@microchip.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 13/13] net: ethernet: adi: Add a driver for the ADIN1140 MACPHY
-Date: Sat, 13 Jun 2026 11:26:45 +0200
-Message-ID: <20260613092645.123432-1-pabeni@redhat.com>
-In-Reply-To: <20260609-adin1140-driver-v4-13-0753e28ee004@analog.com>
-References: <20260609-adin1140-driver-v4-13-0753e28ee004@analog.com>
+	s=arc-20240116; t=1781343592; c=relaxed/simple;
+	bh=QAPWRPtYD3cJdcLkU8ak8PMauQJXnECUXT1Vr3TZ/fc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mZkh2WQwt/uFT7NomJ39sOpYfbojlxRhHRhJJq+Jn3vMXrvhXmwHA1RJXRESZBBx4FByfTzIO9RNkSOV1npeBEdiaXibvmLsHq0QuKeZwztRtn8sBhqxbjyJv0Ab8nqTO2guNU/RDl+NP60OFYG0PBrFtA8lVEotAxEGhEadXP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCLmM7a9; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D2DF1F000E9;
+	Sat, 13 Jun 2026 09:39:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781343590;
+	bh=c/E5Fca0jxyWWWjjsZ9luEgmIKmaLIRLdokARXgYoFI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dCLmM7a9xXuV2+9irYXtJAzq5FYBSGnBPVnzTGaBOLjBoVpjF1gZo46HM5ZJQDYu+
+	 kiaOoXIGCi93RdmNGcJwo4dcGma51C82Q/QcZlglwJiQo+Y1h0oUxVJz+hlz604bXR
+	 Ly8DAhHZmynDHEHrNL2qN1IkLdANsR0sqzcfh7J6EMNwQeMkPk2EaD1JO+hVn8VqR5
+	 jxJ2xvy+I6ore/mBBTuLoPjr0qfXx0ZNA+4LIIDB8MFiFeioFu5TnFCpew99yJ3FFB
+	 U/7g7qTqpXRM/sKK9ejx5lkYDyHXA3dRgyl49A/fXkyM3MGWoiAV0bbuSpaQMeYMZL
+	 J73wL+ZOxnmWg==
+Date: Sat, 13 Jun 2026 11:39:46 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Madhur Agrawal <madhur.agrawal@airoha.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH net-next v5 3/3] net: airoha: defer GDM3/GDM4 WAN mode
+ and GDM2 loopback to QoS offload
+Message-ID: <ai0lYuZeduHZV_Ts@lore-rh-laptop>
+References: <20260611-airoha-ethtool-priv_flags-v5-0-c11de08486d1@kernel.org>
+ <20260611-airoha-ethtool-priv_flags-v5-3-c11de08486d1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QJnbX3YQODwBY7ap"
+Content-Disposition: inline
+In-Reply-To: <20260611-airoha-ethtool-priv_flags-v5-3-c11de08486d1@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-298936-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ciprian.regus@analog.com,m:parthiban.veerasooran@microchip.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:devicetree@vger.kernel.org,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298937-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:netdev@vger.kernel.org,m:madhur.agrawal@airoha.com,m:aleksander.lobakin@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url,analog.com:url,analog.com:email]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lore-rh-laptop:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C095867E3A5
+X-Rspamd-Queue-Id: D93A467E419
 
-From: AI Reviewer <ai@example.com>
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://netdev-ai.bots.linux.dev/sashiko/
----
-net: ethernet: adi: Add a driver for the ADIN1140 MACPHY
+--QJnbX3YQODwBY7ap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds a driver for the ADIN1140 10BASE-T1S MAC-PHY which talks
-to the host over SPI using the OA TC6 protocol. It introduces a custom
-mii_bus to work around two hardware issues, and exposes both rtnl link
-stats and ethtool MAC stats from periodically polled hardware counters.
+Commenting on sashiko's report:
+https://sashiko.dev/#/patchset/20260611-airoha-ethtool-priv_flags-v5-0-c11d=
+e08486d1%40kernel.org
 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 50f795dfa880..c3cab8f7b9ef 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1858,6 +1858,14 @@ S:	Supported
->  W:	https://ez.analog.com/linux-software-drivers
->  F:	drivers/dma/dma-axi-dmac.c
->  
-> +ANALOG DEVICES INC ETHERNET DRIVERS
-> +M:	Ciprian Regus <ciprian.regus@analog.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Maintained
-> +W:	https://ez.analog.com/linux-software-drivers
-> +F:	Documentation/devicetree/bindings/net/adi,ad3306.yaml
-> +F:	drivers/net/ethernet/adi/adin1140.c
 
-[Medium]
-The MAINTAINERS entry references
-Documentation/devicetree/bindings/net/adi,ad3306.yaml, but that file is
-not added by this patch and does not appear elsewhere in the tree.
-
-The driver also introduces two new of compatibles:
-
-	{ .compatible = "adi,ad3306" },
-	{ .compatible = "adi,adin1140" },
-
-with no YAML schema. Should the binding document be added in this same
-series so that the F: line resolves and dt_binding_check can validate
-the new compatibles?
-
-> diff --git a/drivers/net/ethernet/adi/adin1140.c b/drivers/net/ethernet/adi/adin1140.c
-> new file mode 100644
-> index 000000000000..306e5de6faa5
-> --- /dev/null
-> +++ b/drivers/net/ethernet/adi/adin1140.c
-
-[ ... ]
-
-> +static int adin1140_mac_filter_set(struct adin1140_priv *priv,
-> +				   const u8 *addr, const u8 *mask,
-> +				   u8 slot)
-> +{
-> +	u32 reg_address;
-> +	u32 val;
-> +	int ret;
+[...]
+>  static void airoha_dev_set_qdma(struct airoha_gdm_dev *dev)
+>  {
+>  	struct net_device *netdev =3D netdev_from_priv(dev);
+> +	struct airoha_qdma *cur_qdma, *qdma;
+>  	struct airoha_eth *eth =3D dev->eth;
+>  	int ppe_id;
+> =20
+>  	/* QDMA0 is used for lan ports while QDMA1 is used for WAN ports */
+> -	dev->qdma =3D &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
+> -	netdev->irq =3D dev->qdma->irq_banks[0].irq;
+> +	qdma =3D &eth->qdma[!airoha_is_lan_gdm_dev(dev)];
+> +	cur_qdma =3D airoha_qdma_deref(dev);
+> +	if (netif_running(netdev))
+> +		airoha_qdma_start(qdma);
 > +
-> +	if (slot >= ADIN1140_MAC_FILT_MAX_SLOT)
-> +		return -ENOSPC;
+> +	rcu_assign_pointer(dev->qdma, qdma);
+> +	netdev->irq =3D qdma->irq_banks[0].irq;
+> =20
+>  	ppe_id =3D !airoha_is_lan_gdm_dev(dev) && airoha_ppe_is_enabled(eth, 1);
+>  	airoha_ppe_set_cpu_port(dev, ppe_id, airoha_get_fe_port(dev));
 > +
-> +	reg_address = ADIN1140_MAC_ADDR_FILT_UPR_REG + 2 * slot;
-> +
-> +	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-> +					reg_address,
-> +					get_unaligned_be16(&addr[0]) |
-> +					ADIN1140_MAC_ADDR_FILT_APPLY2PORT1 |
-> +					ADIN1140_MAC_ADDR_FILT_TO_HOST);
-> +	if (ret)
-> +		return ret;
-> +
-> +	reg_address = ADIN1140_MAC_ADDR_FILT_LWR_REG + 2 * slot;
-> +	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-> +					reg_address,
-> +					get_unaligned_be32(&addr[2]));
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Only the first 2 destination MAC filter slots support masking.
-> +	 * For the other entries, the destination address in the received
-> +	 * frame must match exactly.
-> +	 */
-> +	if (slot >= ADIN1140_MAC_FILT_MASK_LIMIT)
-> +		return 0;
-> +
-> +	val = get_unaligned_be16(&mask[0]);
-> +	reg_address = ADIN1140_MAC_ADDR_MASK_UPR_REG + (2 * slot);
-> +
-> +	ret = oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-> +					reg_address, val);
-> +	if (ret)
-> +		return ret;
-> +
-> +	val = get_unaligned_be32(&mask[2]);
-> +	reg_address = ADIN1140_MAC_ADDR_MASK_LWR_REG + (2 * slot);
-> +
-> +	return oa_tc6_write_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-> +					 reg_address, val);
-> +}
-
-[Medium]
-adin1140_mac_filter_set() performs up to four sequential
-oa_tc6_write_register_mms() calls (filter upper, filter lower, mask
-upper, mask lower) and returns at the first error without rolling back
-the writes that already succeeded.
-
-If the upper-half write of a new MAC succeeds and the lower-half write
-fails, the slot is left programmed with (new high | old low). Callers
-treat this as single-shot:
-
-	ret = adin1140_mac_filter_set(priv, address->sa_data, mask,
-				      ADIN1140_MAC_FILT_UC_SLOT);
-	if (ret)
-		return ret;
-
-	eth_commit_mac_addr_change(netdev, addr);
-
-so adin1140_set_mac_address() leaves netdev->dev_addr at the old value
-while the hardware filter now matches a third, hybrid address. The same
-applies to adin1140_rx_mode_work() which just returns on the first
-error and leaves the dynamic filter table inconsistent with
-netdev->uc/mc.
-
-Should this function stage the writes (or perform a rollback / clear of
-the affected slot) so a partial failure cannot leave the hardware
-filter in a state that does not match the driver's view?
-
-[ ... ]
-
-> +static void adin1140_rx_mode_work(struct work_struct *work)
-> +{
-> +	struct adin1140_priv *priv = container_of(work, struct adin1140_priv,
-> +						  rx_mode_work);
-> +	struct netdev_hw_addr *ha;
-> +	bool all_multi, promisc;
-> +	u8 mask[ETH_ALEN];
-> +	u8 start, end;
-> +	u32 mac_addrs;
-> +	u8 slot, i;
-> +	int ret;
-> +
-> +	/* The ADIN1140 has 16 dest MAC address filter slots:
-> +	 * 0 - reserved for all multicast filter.
-> +	 * 1 - reserved for broadcast filter.
-> +	 * 2 - reserved for the device's own unicast MAC.
-> +	 * 3 -> 15 - available for other unicast/multicast filters.
-> +	 */
-> +
-> +	mac_addrs = netdev_uc_count(priv->netdev) +
-> +		    netdev_mc_count(priv->netdev);
-> +
-> +	if (priv->netdev->flags & IFF_PROMISC) {
-> +		promisc = true;
-> +		all_multi = false;
-> +	} else if (priv->netdev->flags & IFF_ALLMULTI) {
-> +		promisc = false;
-> +		all_multi = true;
-> +	} else if (mac_addrs <= ADIN1140_MAC_FILT_AVAIL) {
-> +		promisc = false;
-> +		all_multi = false;
-> +
-> +		slot = ADIN1140_MAC_FILT_UC_SLOT + 1;
-> +		memset(mask, 0xFF, ETH_ALEN);
-> +
-> +		netdev_for_each_uc_addr(ha, priv->netdev) {
-> +			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-> +						      slot);
-> +			if (ret)
-> +				return;
-> +
-> +			slot++;
-> +		}
-> +
-> +		netdev_for_each_mc_addr(ha, priv->netdev) {
-> +			ret = adin1140_mac_filter_set(priv, ha->addr, mask,
-> +						      slot);
-> +			if (ret)
-> +				return;
-> +
-> +			slot++;
-> +		}
-> +
-> +		for (i = slot; i < ADIN1140_MAC_FILT_MAX_SLOT; i++) {
-> +			ret = adin1140_mac_filter_clear(priv, i);
-> +			if (ret)
-> +				return;
-> +		}
-> +
-> +	} else {
-> +		/* The filter table is full. Enable promisc mode. */
-> +		promisc = true;
-> +		all_multi = false;
-> +
-> +		start = ADIN1140_MAC_FILT_UC_SLOT + 1;
-> +		end = ADIN1140_MAC_FILT_MAX_SLOT;
-> +		for (i = start; i < end; i++) {
-> +			ret = adin1140_mac_filter_clear(priv, i);
-> +			if (ret)
-> +				return;
-> +		}
-> +	}
-> +
-> +	ret = adin1140_promiscuous_mode(priv, promisc);
-> +	if (ret)
+> +	if (!cur_qdma)
 > +		return;
 > +
-> +	adin1140_filter_all_multicast(priv, all_multi);
-> +}
+> +	synchronize_rcu();
+> +	netif_tx_wake_all_queues(netdev);
+> +
+> +	if (netif_running(netdev))
+> +		airoha_qdma_stop(cur_qdma);
+>  }
 
-[High]
-This work iterates priv->netdev->uc and ->mc with no synchronization:
+- When we switch the QDMA of a running device, airoha_qdma_stop() might
+  free pending SKBs via dev_kfree_skb_any() in airoha_qdma_cleanup_tx_queue=
+().
+  Are these SKBs freed without calling netdev_tx_completed_queue() to
+  update Byte Queue Limits (BQL)?
+  Since the device is running, could the BQL counters leak and cause the
+  TX queue to permanently hang once the limit is reached?
 
-	netdev_for_each_uc_addr(ha, priv->netdev) {
-		ret = adin1140_mac_filter_set(priv, ha->addr, mask, slot);
-		...
-	}
+  - As pointed out in path 1/3, this is a pre-existing issue since we have =
+the
+    same problem running airoha_dev_stop() for a QDMA single-user device
+    (airoha_qdma_cleanup_tx_queue() can run before the pending TX NAPI).
+    I will fix the problem with a dedicated patch.
 
-	netdev_for_each_mc_addr(ha, priv->netdev) {
-		...
-	}
+> =20
+>  static int airoha_dev_init(struct net_device *netdev)
+> @@ -2180,9 +2244,9 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
+skb,
+>  				   struct net_device *netdev)
+>  {
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> -	struct airoha_qdma *qdma =3D dev->qdma;
+>  	u32 nr_frags, tag, msg0, msg1, len;
+>  	struct airoha_queue_entry *e;
+> +	struct airoha_qdma *qdma;
+>  	struct netdev_queue *txq;
 
-netdev_for_each_uc_addr() and netdev_for_each_mc_addr() expand to
-plain list_for_each_entry() over dev->uc.list / dev->mc.list. Callers
-are required to hold netif_addr_lock_bh() (or rtnl) because dev_uc_add
-/ dev_uc_del / dev_mc_add / dev_mc_del can mutate those lists from
-user-space ip address/maddr changes.
+- This is a pre-existing issue, but does the TX path modify the TCP header
+  directly without ensuring it is in the linear region?
 
-Inside the loop ha->addr is then handed to adin1140_mac_filter_set(),
-which performs SPI register writes that can sleep, so taking
-netif_addr_lock_bh() across the iteration is not directly viable.
+  - This issue (not introduced by this patch) has been already reported in =
+the
+    past and we already agreed that it can't occur.
 
-Can this race with a concurrent dev_uc_del() / dev_mc_del() and
-dereference freed list entries (or skip / duplicate filter slots)?
-Other ethernet drivers that need to issue sleeping ops while syncing
-the address lists use __dev_uc_sync() / __dev_mc_sync() which copy
-state under netif_addr_lock; would that pattern be more appropriate
-here?
 
-[Medium]
-In the IFF_PROMISC and IFF_ALLMULTI branches, slots 3..15 are not
-cleared:
+>  	struct airoha_queue *q;
+>  	LIST_HEAD(tx_list);
+> @@ -2191,6 +2255,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *=
+skb,
+>  	u16 index;
+>  	u8 fport;
+> =20
 
-	if (priv->netdev->flags & IFF_PROMISC) {
-		promisc = true;
-		all_multi = false;
-	} else if (priv->netdev->flags & IFF_ALLMULTI) {
-		promisc = false;
-		all_multi = true;
-	} else if (mac_addrs <= ADIN1140_MAC_FILT_AVAIL) {
-		...
-		for (i = slot; i < ADIN1140_MAC_FILT_MAX_SLOT; i++) {
-			ret = adin1140_mac_filter_clear(priv, i);
-			...
-		}
-	} else {
-		...
-		for (i = start; i < end; i++) {
-			ret = adin1140_mac_filter_clear(priv, i);
-			...
-		}
-	}
+[...]
 
-If a previous invocation populated slots 3..N with extra unicast or
-multicast filters and the user then enables IFF_ALLMULTI, those
-previously installed unicast filters remain active in hardware
-(carrying APPLY2PORT1 | TO_HOST). Should the IFF_ALLMULTI path also
-clear slots 3..15 so traffic for addresses no longer in netdev->uc/mc
-is not still forwarded to the host?
+> @@ -2793,11 +2869,12 @@ static int airoha_tc_htb_alloc_leaf_queue(struct =
+net_device *netdev,
+>  	u32 channel =3D TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
+>  	int err, num_tx_queues =3D netdev->real_num_tx_queues;
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> -	struct airoha_qdma *qdma =3D dev->qdma;
+> +	struct airoha_qdma *qdma;
+> =20
+>  	/* Here we need to check the requested QDMA channel is not already
+>  	 * in use by another net_device running on the same QDMA block.
+>  	 */
+> +	qdma =3D airoha_qdma_deref(dev);
 
-[ ... ]
+- This is a pre-existing issue, but does modifying real_num_tx_queues
+  as a dense counter cause problems when QoS leaf queues are allocated
+  with sparse IDs?
 
-> +static void adin1140_stats_work(struct work_struct *work)
+  - I have already a fix for this issue I need to post.
+
+>  	if (test_and_set_bit(channel, qdma->qos_channel_map)) {
+>  		NL_SET_ERR_MSG_MOD(opt->extack,
+>  				   "qdma qos channel already in use");
+> @@ -2831,7 +2908,7 @@ static int airoha_qdma_set_rx_meter(struct airoha_g=
+dm_dev *dev,
+>  				    u32 rate, u32 bucket_size,
+
+[...]
+
+> +
+> +static int airoha_enable_qos_for_gdm34(struct net_device *netdev,
+> +				       struct netlink_ext_ack *extack)
 > +{
-> +	struct delayed_work *dwork = to_delayed_work(work);
-> +	u64 stat_buff[ADIN1140_STATS_CNT] = {};
-> +	struct adin1140_priv *priv;
-> +	u32 reg_val;
-> +	int ret;
-> +	u32 i;
+> +	struct airoha_gdm_dev *wan_dev, *dev =3D netdev_priv(netdev);
+> +	struct airoha_gdm_port *port =3D dev->port;
+> +	struct airoha_eth *eth =3D dev->eth;
+> +	int err =3D -EBUSY;
 > +
-> +	priv = container_of(dwork, struct adin1140_priv, stats_work);
-> +
-> +	for (i = 0; i < ARRAY_SIZE(adin1140_stat_regs); i++) {
-> +		ret = oa_tc6_read_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-> +					       adin1140_stat_regs[i],
-> +					       &reg_val);
-> +		if (ret)
-> +			break;
-> +
-> +		stat_buff[i] = reg_val;
+> +	if (port->id !=3D AIROHA_GDM3_IDX &&
+> +	    port->id !=3D AIROHA_GDM4_IDX) {
+> +		/* HW QoS is always supported by GDM1 and GDM2 */
+> +		return 0;
 > +	}
 > +
-> +	scoped_guard(spinlock, &priv->stat_lock)
-> +		memcpy(&priv->stats, stat_buff, sizeof(priv->stats));
+> +	if (!airoha_is_lan_gdm_dev(dev)) /* Already enabled */
+> +		return 0;
 > +
-> +	schedule_delayed_work(dwork, ADIN1140_STATS_CHECK_DELAY);
-> +}
-
-[Medium]
-stat_buff is zero-initialized and the loop break on a read error is
-followed unconditionally by:
-
-	scoped_guard(spinlock, &priv->stat_lock)
-		memcpy(&priv->stats, stat_buff, sizeof(priv->stats));
-
-If oa_tc6_read_register_mms() fails partway through, every entry from
-the failing index onwards is still zero, and that all-zero tail is
-copied over the previously valid u64 counters. Since priv->stats[] is
-read directly by adin1140_ndo_get_stats64(),
-adin1140_get_eth_mac_stats() and adin1140_get_ethtool_stats(), a
-single transient SPI/TC6 hiccup makes the rtnl_link_stats64 and
-ethtool_eth_mac_stats counters drop to zero before climbing again.
-Should the memcpy be skipped on error, or should partial updates be
-merged into priv->stats[] only for the indices that were read
-successfully?
-
-[Medium]
-The hardware counters at MMS1 0xA1..0xBA are read into u32 reg_val and
-then stored as-is into the u64 stat_buff[i]:
-
-	ret = oa_tc6_read_register_mms(priv->tc6, OA_TC6_MAC_MMS1,
-				       adin1140_stat_regs[i],
-				       &reg_val);
-	...
-	stat_buff[i] = reg_val;
-
-priv->stats[] feeds rtnl_link_stats64 and ethtool_eth_mac_stats, both
-of which document monotonic u64 counters. On 32-bit hardware register
-wrap (0xFFFFFFFF -> 0) the user-visible u64 value will go backwards,
-and with a 3-second poll interval a fast counter (e.g.
-FramesReceivedOK on a busy 10BASE-T1S segment) can wrap entirely
-between samples. Should the driver compute deltas with 32-bit wrap
-handling and accumulate them into a software u64 counter rather than
-overwriting?
-
-[ ... ]
-
-> +static void adin1140_get_ethtool_stats(struct net_device *netdev,
-> +				       struct ethtool_stats *stats, u64 *data)
-> +{
-> +	struct adin1140_priv *priv = netdev_priv(netdev);
-> +	u32 i;
+> +	mutex_lock(&flow_offload_mutex);
 > +
-> +	scoped_guard(spinlock, &priv->stat_lock) {
-> +		for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-> +			data[i] = priv->stats[adin1140_stats[i].idx];
+> +	wan_dev =3D airoha_get_wan_gdm_dev(eth);
+> +	if (wan_dev) {
+> +		if ((wan_dev->flags & AIROHA_PRIV_F_QOS) ||
+> +		    wan_dev->port->id =3D=3D AIROHA_GDM2_IDX) {
+> +			NL_SET_ERR_MSG_MOD(extack,
+> +					   "QoS configured for WAN device");
+> +			goto error_unlock;
+> +		}
+> +		airoha_disable_qos_for_gdm34(netdev_from_priv(wan_dev));
 > +	}
-> +}
 > +
-> +static void adin1140_get_ethtool_strings(struct net_device *netdev, u32 sset,
-> +					 u8 *p)
-> +{
-> +	u32 i;
+> +	dev->flags |=3D AIROHA_PRIV_F_WAN;
+> +	airoha_dev_set_qdma(dev);
+> +	err =3D airoha_enable_gdm2_loopback(dev);
+> +	if (err)
+> +		goto error_disable_wan;
 > +
-> +	switch (sset) {
-> +	case ETH_SS_STATS:
-> +		for (i = 0; i < ARRAY_SIZE(adin1140_stats); i++)
-> +			ethtool_puts(&p, adin1140_stats[i].name);
+> +	err =3D airoha_set_macaddr(dev, netdev->dev_addr);
+> +	if (err)
+> +		goto error_disable_loopback;
 > +
-> +		break;
+> +	if (netif_running(netdev)) {
+> +		u32 pse_port;
+> +
+> +		pse_port =3D airoha_ppe_is_enabled(eth, 1) ? FE_PSE_PORT_PPE2
+> +							 : FE_PSE_PORT_PPE1;
+> +		airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(port->id),
+> +					    pse_port);
 > +	}
+> +
+> +	mutex_unlock(&flow_offload_mutex);
+> +
+> +	return 0;
+> +
+> +error_disable_loopback:
+> +	airoha_disable_gdm2_loopback(dev);
+> +error_disable_wan:
+> +	dev->flags &=3D ~AIROHA_PRIV_F_WAN;
+> +	airoha_dev_set_qdma(dev);
+> +error_unlock:
+> +	mutex_unlock(&flow_offload_mutex);
+> +
+> +	return err;
 > +}
 
-[Medium]
-The driver implements both .ndo_get_stats64 and .get_eth_mac_stats,
-yet adin1140_stats[] adds private ethtool -S strings whose values are
-already exposed (or trivially derivable) through those standard uAPIs:
+- If airoha_set_macaddr() fails and we jump to error_disable_loopback,
+  the original wan_dev was preemptively demoted to LAN mode, but the error
+  path doesn't restore it.
+  Since the requesting device is also rolled back to LAN, does this leave
+  the system entirely without a WAN device? Would this permanently break
+  routing on the original WAN interface until manually reconfigured?
 
-	{.name = "rx_unicast_frames", .idx = rx_uc_frames},
-	{.name = "rx_preamble_errors", .idx = rx_preamble_errors},
-	{.name = "rx_ifg_errors", .idx = rx_ifg_errors},
-	{.name = "rx_addr_filter_dropped", .idx = rx_addr_filter_dropped},
-	{.name = "tx_unicast_frames", .idx = tx_uc_frames},
+  - If airoha_enable_qos_for_gdm34() fails, the system will continue routing
+    packets and, even if we re-promote the original interface to WAN, the u=
+ser
+    will need to re-apply the same configuration to offload the intended
+    Qdisc on the new interface.
+    Moreover, please note this corner case occurs just if the original
+    interface has no Qdisc already configured on it. In the common case, the
+    user has previously removed the configured Qdisc on the original interf=
+ace
+    and so, the roll-back process will still be partial.
+    In the end, airoha_set_macaddr() can fail just if the device is not
+    well-configured.
+    For the reasons above, I guess it does not worth to reset the original
+    interface to WAN if airoha_set_macaddr() fails.
 
-rx_addr_filter_dropped is already aggregated into
-rtnl_link_stats64.rx_dropped by this same driver:
+Regards,
+Lorenzo
 
-	storage->rx_dropped = priv->stats[rx_fifo_full_dropped] +
-			      priv->stats[rx_addr_filter_dropped];
+> +
+>  static int airoha_tc_htb_destroy(struct net_device *netdev)
+>  {
+>  	struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> @@ -3038,6 +3205,8 @@ static int airoha_tc_htb_destroy(struct net_device =
+*netdev)
+>  	for_each_set_bit(q, dev->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
+>  		airoha_tc_remove_htb_queue(netdev, q);
+> =20
+> +	dev->flags &=3D ~AIROHA_PRIV_F_QOS;
+> +
+>  	return 0;
+>  }
+> =20
+> @@ -3057,24 +3226,33 @@ static int airoha_tc_get_htb_get_leaf_queue(struc=
+t net_device *netdev,
+>  	return 0;
+>  }
+> =20
+> -static int airoha_tc_setup_qdisc_htb(struct net_device *dev,
+> +static int airoha_tc_setup_qdisc_htb(struct net_device *netdev,
+>  				     struct tc_htb_qopt_offload *opt)
+>  {
+>  	switch (opt->command) {
+> -	case TC_HTB_CREATE:
+> +	case TC_HTB_CREATE: {
+> +		struct airoha_gdm_dev *dev =3D netdev_priv(netdev);
+> +		int err;
+> +
+> +		err =3D airoha_enable_qos_for_gdm34(netdev, opt->extack);
+> +		if (err)
+> +			return err;
+> +
+> +		dev->flags |=3D AIROHA_PRIV_F_QOS;
+>  		break;
+> +	}
+>  	case TC_HTB_DESTROY:
+> -		return airoha_tc_htb_destroy(dev);
+> +		return airoha_tc_htb_destroy(netdev);
+>  	case TC_HTB_NODE_MODIFY:
+> -		return airoha_tc_htb_modify_queue(dev, opt);
+> +		return airoha_tc_htb_modify_queue(netdev, opt);
+>  	case TC_HTB_LEAF_ALLOC_QUEUE:
+> -		return airoha_tc_htb_alloc_leaf_queue(dev, opt);
+> +		return airoha_tc_htb_alloc_leaf_queue(netdev, opt);
+>  	case TC_HTB_LEAF_DEL:
+>  	case TC_HTB_LEAF_DEL_LAST:
+>  	case TC_HTB_LEAF_DEL_LAST_FORCE:
+> -		return airoha_tc_htb_delete_leaf_queue(dev, opt);
+> +		return airoha_tc_htb_delete_leaf_queue(netdev, opt);
+>  	case TC_HTB_LEAF_QUERY_QUEUE:
+> -		return airoha_tc_get_htb_get_leaf_queue(dev, opt);
+> +		return airoha_tc_get_htb_get_leaf_queue(netdev, opt);
+>  	default:
+>  		return -EOPNOTSUPP;
+>  	}
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index 24fd8dcf7fca..d1390ffcea7c 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -540,11 +540,12 @@ struct airoha_qdma {
+> =20
+>  enum airoha_priv_flags {
+>  	AIROHA_PRIV_F_WAN =3D BIT(0),
+> +	AIROHA_PRIV_F_QOS =3D BIT(1),
+>  };
+> =20
+>  struct airoha_gdm_dev {
+> +	struct airoha_qdma __rcu *qdma;
+>  	struct airoha_gdm_port *port;
+> -	struct airoha_qdma *qdma;
+>  	struct airoha_eth *eth;
+> =20
+>  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+> @@ -676,6 +677,16 @@ int airoha_get_fe_port(struct airoha_gdm_dev *dev);
+>  bool airoha_is_valid_gdm_dev(struct airoha_eth *eth,
+>  			     struct airoha_gdm_dev *dev);
+> =20
+> +extern struct mutex flow_offload_mutex;
+> +
+> +static inline struct airoha_qdma *
+> +airoha_qdma_deref(struct airoha_gdm_dev *dev)
+> +{
+> +	return rcu_dereference_protected(dev->qdma,
+> +					 lockdep_rtnl_is_held() ||
+> +					 lockdep_is_held(&flow_offload_mutex));
+> +}
+> +
+>  void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *dev, u8 ppe_id, u8 f=
+port);
+>  bool airoha_ppe_is_enabled(struct airoha_eth *eth, int index);
+>  void airoha_ppe_check_skb(struct airoha_ppe_dev *dev, struct sk_buff *sk=
+b,
+> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
+net/airoha/airoha_ppe.c
+> index 91bcc55a6ac6..1d1b1a57d795 100644
+> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> @@ -15,7 +15,10 @@
+>  #include "airoha_regs.h"
+>  #include "airoha_eth.h"
+> =20
+> -static DEFINE_MUTEX(flow_offload_mutex);
+> +/* Serialize airoha_gdm_dev flags, QDMA pointer and PPE CPU port
+> + * configuration.
+> + */
+> +DEFINE_MUTEX(flow_offload_mutex);
+>  static DEFINE_SPINLOCK(ppe_lock);
+> =20
+>  static const struct rhashtable_params airoha_flow_table_params =3D {
+> @@ -86,8 +89,8 @@ static u32 airoha_ppe_get_timestamp(struct airoha_ppe *=
+ppe)
+> =20
+>  void airoha_ppe_set_cpu_port(struct airoha_gdm_dev *dev, u8 ppe_id, u8 f=
+port)
+>  {
+> -	struct airoha_qdma *qdma =3D dev->qdma;
+> -	struct airoha_eth *eth =3D qdma->eth;
+> +	struct airoha_qdma *qdma =3D airoha_qdma_deref(dev);
+> +	struct airoha_eth *eth =3D dev->eth;
+>  	u8 qdma_id =3D qdma - &eth->qdma[0];
+>  	u32 fe_cpu_port;
+> =20
+> diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethe=
+rnet/airoha/airoha_regs.h
+> index 436f3c8779c1..4e17dfbcf2b8 100644
+> --- a/drivers/net/ethernet/airoha/airoha_regs.h
+> +++ b/drivers/net/ethernet/airoha/airoha_regs.h
+> @@ -376,6 +376,7 @@
+> =20
+>  #define REG_SRC_PORT_FC_MAP6		0x2298
+>  #define FC_ID_OF_SRC_PORT_MASK(_n)	GENMASK(4 + ((_n) << 3), ((_n) << 3))
+> +#define FC_MAP6_DEF_VALUE		0x1b1a1918
+> =20
+>  #define REG_CDM5_RX_OQ1_DROP_CNT	0x29d4
+> =20
+>=20
+> --=20
+> 2.54.0
+>=20
 
-rx_unicast_frames and tx_unicast_frames are derivable from
-ethtool_eth_mac_stats (FramesReceivedOK minus broadcast minus
-multicast, and the Xmitted equivalents) which are populated in
-__adin1140_eth_mac_stats.
+--QJnbX3YQODwBY7ap
+Content-Type: application/pgp-signature; name=signature.asc
 
-Per Documentation/networking/statistics.rst, should these counters be
-left out of ethtool -S since standard uAPIs already cover them?
--- 
-This is an AI-generated review.
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCai0lXgAKCRA6cBh0uS2t
+rIqDAP95n/73PDuBIgAeHKOPxVIFXuPzIB8KQfH9F4my2ifE+QD+NcqVpFgcSDjp
+tmBsD6K8VzxtjNJLmY3Rn+YaGxoT9gU=
+=RAW6
+-----END PGP SIGNATURE-----
+
+--QJnbX3YQODwBY7ap--
 
