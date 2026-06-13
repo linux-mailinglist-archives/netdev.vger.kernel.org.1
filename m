@@ -1,140 +1,227 @@
-Return-Path: <netdev+bounces-298845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298855-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id k4QYHx+oLGptUgQAu9opvQ
-	(envelope-from <netdev+bounces-298845-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:45:19 +0200
+	id 6sR4BYGsLGq2VAQAu9opvQ
+	(envelope-from <netdev+bounces-298855-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:04:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D225D67D589
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 02:45:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE6867D633
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:04:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gpv9Es7L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298845-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298845-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=google.com header.s=20251104 header.b=IjSeLpfY;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298855-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298855-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DB2A318E418
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 00:44:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2289348645C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61981233149;
-	Sat, 13 Jun 2026 00:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229BC25A321;
+	Sat, 13 Jun 2026 01:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549091F09A5;
-	Sat, 13 Jun 2026 00:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8859120ADF8
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:00:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781311485; cv=none; b=K7jD+9IgWpO3vgxfjLjy+l+JTrfAfOjL/zvROED1Hmyn2QGgVKYAlxEUl2ORisRRkRS5KKhZrP36qHhcFNQ47IvDmGfwE5lVzB9prP5jhEpScP06GZjmZOcmHo7jkw4dOqCAImd9CE/s01ielI8Hovm1ondirmodXL+0RPXeoe8=
+	t=1781312445; cv=none; b=shUuieuIA0ueNv8YNQ7p+EXD72tjvJL+GFP/K/yz5g69CN3O/vU7bsEbcuJc3M1crA92gETHIpgKFUSxwQhHfUdNNNBRoCqTSKuPzidGAeyBOcrzlnIdh6tgFPgIz+ioHTmghjpi+3c10D/9zt2GjapvakvjwKYRQkfczMzayRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781311485; c=relaxed/simple;
-	bh=c1HPFZsU0eRnti37RMqtFvZSiXq6k8XdGi4re0c8Tvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gvfxTbzQmHcQBx/oApc209EWmd74jF+0gzKzZuiGCunJRMar2IapTrI6XbvRCf4s0bxM8hqj+WwigpptSBkhLQYPy3aAV3vsnWEwWtmr5C7GCS+CC1zmdr3WkyVX6K5roxsX3CgAM814CWn8VvDbdyoA3duJ6k24k9qdOyrbVIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpv9Es7L; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 380611F000E9;
-	Sat, 13 Jun 2026 00:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781311484;
-	bh=OEt29oeVnp0fgMWbhtQ94bxVYk/Oo9ifrXVMeaXuFzE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gpv9Es7L/BeqibIroIT8p3V1n1+Gt1mbGSw1xvwrzNHD6OPA7YN0OfyDJkCpAaFSb
-	 iKHkLydxyWt506995rgIfgy9VFtTp3xIuQQMnXKfUI/zxpKUzj4NWE3B0rBRca5SlZ
-	 fGShz+S0CZoYZJlXde3e/30gkMc7dRDL1iF8jw9VLuy+M+gVbhmhD89wpU8PNH5iz9
-	 /Joc5xaLRYgqXPiTDTZ3bPJ19O+eASLINo1H/tErCzMsD7skHuF8JlqzZ7ngXMe+66
-	 1ZoQ8ZMhDHycHQiz5KNpO/ashtahKg22+px+FuGlPZpieM02vWjaE3xkoWUUGQlzfe
-	 UoB0dvnIxAZRw==
-Date: Fri, 12 Jun 2026 17:44:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Allison Henderson
- <achender@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-kselftest@vger.kernel.org,
- kernel-team@meta.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Andy Grover
- <andy.grover@oracle.com>, Mark Brown <broonie@kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 2/2] rds: convert to getsockopt_iter: manual
- merge
-Message-ID: <20260612174442.5fe54656@kernel.org>
-In-Reply-To: <b91ff67e-ce74-4edf-a8b0-08be04586485@kernel.org>
-References: <20260608-getsock_more-v3-0-706ecf2ea332@debian.org>
-	<20260608-getsock_more-v3-2-706ecf2ea332@debian.org>
-	<2e1b0534-a1a0-4eb1-a5e2-d42fcf991188@kernel.org>
-	<aivAbAIjnTeqlsdS@gmail.com>
-	<b91ff67e-ce74-4edf-a8b0-08be04586485@kernel.org>
+	s=arc-20240116; t=1781312445; c=relaxed/simple;
+	bh=JcOgNfYX5Fr+NIiNpGfDBLZGynCBhQ9Kevw5R9SUXOI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=id9Zi/VVinmPWkjZ3pIQK1BPpZSFTSylFQRdLTc/d/4ZQ33M+y+gY9LkgLLkZnrmvFRq01LKR5N+844+Z8dFhPQSrPrPv071kRs6Nbnu8Zz0IIAIlQJIuxJoecSui/HdrDWOZZunbKfaHWXzcWyqJBUfY6QQ2qHqFJGvTN0sFAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IjSeLpfY; arc=none smtp.client-ip=209.85.214.201
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2bfdd99f6b7so25472245ad.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 18:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781312442; x=1781917242; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rfnHQTzprvfZIViqMRRKupB/GjOqKriHJyW+HN00hFg=;
+        b=IjSeLpfY32buFZ58u0xA9jovQllopEI9dytbx8tDtAb7LkX1ajd48WvT/P8U2MxclI
+         /80n/PLTcfrPa7ZEa9X32Rc3BxJp5V+e4pqQ+fzcKOBZeLZBxtwatYnWjqDz1NW8pX9k
+         qjarmiykamtTTxLBjPsOUHRnaoQB1ptD8MHz8I+0MkRWwTWHFwrMqKAVpXbh1HMFEX8K
+         x00WiBpPJ1TA1JhQAJ9vYU3GeRNkUHpIndD8oYMKvFkGu01YHBzhxXDvPcGCGc021uQK
+         UYf6agJLkz2SEVoOX9kex2WjNRSMzLOIOgg6u4zyVgvnAnGI1HL5wFfH92Nyx74v3q4k
+         F3Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781312442; x=1781917242;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rfnHQTzprvfZIViqMRRKupB/GjOqKriHJyW+HN00hFg=;
+        b=jBXXU5yH5CbmmNVdBRuffQoUQyugWuFjMacgZ4wzdXfdMb0WYUpYmdHlkcsrYaEX9t
+         Urx+m9WsR12zsUz9gVL01k379cuNKQdj69DYK4hX3ttjEzU2TIFLgWevmW4EMAZFDZu6
+         pw2/3/h/PLpdkAIEzdp75b8cSXzCRaFmDIfSf8e+HWEPyg5wbf4qdrLmTHWwmrTZfsRv
+         6AQ/Ww6nUjbkf31iRazeba8+T64z5b5D6pNjG/FhEn5La45OUg1+Px0K1x/zCutj+Ao/
+         C0mzHjRGW4O/9oeHtvIKZPien88vcWeWMmwV7o2GEPUlAXLCp0dbSf9LxO35dgjDpVYj
+         jgSw==
+X-Forwarded-Encrypted: i=1; AFNElJ+1KDmuTcpwRh9m5YfYpEdQJV5g617P44Fi0UWp0cAkx+6iruyofFIfToQxy1HdOjgGZytgi1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDlqr+BLRndhTnUKykYKe712XREr8BGet1AHk5iF+cWn/P6/Vp
+	Fzl+GgtA0/B86Aaup3E5CGFT6m4hmyozVxEKjYLst/ChhWk9dBFfdNs02KpsiVDoY4ww391V57U
+	N1CvwLQ==
+X-Received: from plbjx8.prod.google.com ([2002:a17:903:1388:b0:2bc:c1af:322f])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b47:b0:2c1:98b7:ecf3
+ with SMTP id d9443c01a7336-2c41235e35cmr60019365ad.23.1781312441612; Fri, 12
+ Jun 2026 18:00:41 -0700 (PDT)
+Date: Sat, 13 Jun 2026 00:59:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260613010039.1362312-1-kuniyu@google.com>
+Subject: [PATCH v2 bpf-next/net 0/5] bpf: Support RX/TX HW timestamp proxy.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Eduard Zingerman <eddyz87@gmail.com>
+Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	Jiri Olsa <jolsa@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:matttbe@kernel.org,m:leitao@debian.org,m:achender@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:rds-devel@oss.oracle.com,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:andy.grover@oracle.com,m:broonie@kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-298845-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:ast@kernel.org,m:daniel@iogearbox.net,m:martin.lau@linux.dev,m:sdf@fomichev.me,m:andrii@kernel.org,m:john.fastabend@gmail.com,m:memxor@gmail.com,m:eddyz87@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemb@google.com,m:kuniyu@google.com,m:kuni1840@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-298855-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[kernel.org,iogearbox.net,linux.dev,fomichev.me,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,linux.dev,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D225D67D589
+X-Rspamd-Queue-Id: ACE6867D633
 
-On Fri, 12 Jun 2026 13:41:00 +0200 Matthieu Baerts wrote:
-> > I was aware of the conflict but didn't realize a note would be helpful
-> > for the merge. I should have included one.
-> > 
-> > Could you point me to an example commit/patch that contains such a note so I
-> > can understand the expected format and procedure?  
-> 
-> In this particular example, I think it would have been easier to have
-> waited for the fix to land in net-next -- after the weekly sync with net
-> -- and then send the net-next patches.
-> 
-> When this cannot be avoided, then you can mention the conflict, and
-> ideally share a diff of the resolution, plus a description, especially
-> when it is not obvious, when simply saying "take the version from X" is
-> helpful, when extra modifications are needed, etc. e.g. [1]. Something
-> similar to what Mark is usually doing on the linux-next ML, or what I
-> did here.
+We have some hosts where packets come from special hardware
+and are provided directly to userspace, bypassing the kernel
+networking stack.
 
-Thanks for explaining! This conflict was avoidable but I didn't find
-the appropriately polite explanation within me :)
+When standard socket applications are run on these hosts,
+a userspace proxy is required to mediate traffic between the
+hardware and the applications.
 
-When conflicting code is _already committed_ to net-next we can deal
-with the conflict. If there's a patch only posted but not commited and
-we notice a bug - the net-next patch should be explicitly withdrawn and
-reposted once the fix has propagated.
+            +---------+                 +----------------------+
+            |  proxy  |                 |  socket application  |
+            +---------+                 +----------------------+
+              ^     ^                               ^
+  userspace   |     |                               |
+  -----------| |-----------------------------------------------
+             | |    |    +---------------------+    | skb
+             | |    `--->|  virtual interface  |<---'
+  kernel     | |   skb   +---------------------+
+  -----------| |-----------------------------------------------
+              |
+              v
+       +------------+
+       |  hardware  |
+       +------------+
+
+However, even though the hardware fully supports timestamping,
+the HW timestamps are not directly accessible to the socket
+applications because the skb is consumed/injected by the proxy.
+
+This series extends ethtool and adds BPF kfuncs to transparently
+support HW timestamp on such a setup.
+
+Patch 1 is pure net-next patch to advertise fake timestamping
+capability on virtual interfaces (e.g. ipvlan, geneve, etc).
+
+Patch 2 is misc cleanup.
+
+Patch 3 & 4 add kfunc to proxy RX/TX hwtstamp.
+
+Patch 5 is selftest to demonstrate how it works.
+
+Note the test requires this iproute2 commit:
+https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=c9a9f12aa619288fd3d4e16bc4b3c73b655a4efe
+
+
+Changes:
+  v2:
+    * Patch 3:
+      * Remove __packed and use unnamed bit-field in struct bpf_hwtstamp (Alexei Starovoitov)
+      * Use skb_unclone() instead of skb_heaeder_clone() (Sashiko)
+
+    * Patch 4
+      * Remove __packed and use unnamed bit-field in struct bpf_tx_tstamp_cmpl (Alexei Starovoitov)
+      * Check !skb_at_tc_ingress() in bpf_skb_complete_tx_tstamp() (Sashiko)
+      * Use skb_unclone() instead of skb_heaeder_clone() (Sashiko)
+
+    * Patch 5
+      * Use scm_timestamping64 (Sashiko)
+      * Correct saw_tskey check (Sashiko)
+      * Fix retval check for bpf_skb_get_tunnel_opt() with (int) cast (Sashiko)
+      * bpf-style comment
+
+  v1: https://lore.kernel.org/bpf/20260612001803.23341-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (5):
+  ethtool: Introduce ETHTOOL_MSG_TSINFO_SET for virtual interfaces.
+  bpf: Rename bpf_kfunc_set_tcp_reqsk to bpf_kfunc_set_sched_cls.
+  bpf: Add bpf_skb_set_hwtstamp().
+  bpf: Add kfunc to proxy TX HW Timestamp.
+  selftest: bpf: Add test for hwtstamp proxy.
+
+ Documentation/netlink/specs/ethtool.yaml      |  13 +
+ include/linux/filter.h                        |   2 +
+ include/linux/netdevice.h                     |  11 +
+ include/linux/skbuff.h                        |  13 +
+ include/net/tcx.h                             |   1 +
+ include/uapi/linux/bpf.h                      |   1 +
+ .../uapi/linux/ethtool_netlink_generated.h    |   1 +
+ include/uapi/linux/pkt_cls.h                  |   3 +-
+ kernel/bpf/verifier.c                         |  13 +-
+ net/core/dev.c                                |  39 ++
+ net/core/dev_ioctl.c                          |  31 +-
+ net/core/filter.c                             |  98 ++-
+ net/ethtool/common.c                          |   4 +
+ net/ethtool/netlink.c                         |   8 +
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/tsconfig.c                        |   7 +-
+ net/ethtool/tsinfo.c                          | 123 +++-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |  10 +
+ .../selftests/bpf/prog_tests/proxy_hwtstamp.c | 588 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/proxy_hwtstamp.c      | 236 +++++++
+ 21 files changed, 1186 insertions(+), 18 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/proxy_hwtstamp.c
+ create mode 100644 tools/testing/selftests/bpf/progs/proxy_hwtstamp.c
+
+-- 
+2.54.0.1136.gdb2ca164c4-goog
+
 
