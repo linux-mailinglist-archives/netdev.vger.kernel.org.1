@@ -1,298 +1,153 @@
-Return-Path: <netdev+bounces-298964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298965-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id sRpfIytaLWrpfAQAu9opvQ
-	(envelope-from <netdev+bounces-298964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 15:24:59 +0200
+	id Ja0hCPdhLWo0fgQAu9opvQ
+	(envelope-from <netdev+bounces-298965-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 15:58:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF23767EAB3
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 15:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6010067EB4C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 15:58:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mandelbit.com header.s=MBO0001 header.b=grBG0Lj9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298964-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298964-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=tu-dortmund.de header.s=unimail header.b="f6D5Q1/d";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298965-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298965-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=tu-dortmund.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F03E30252B1
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 13:24:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3067A30252AA
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 13:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719BD39C00F;
-	Sat, 13 Jun 2026 13:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF1D2EEE6D;
+	Sat, 13 Jun 2026 13:58:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-b-106.mailbox.org (mout-b-106.mailbox.org [195.10.208.46])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C8A1547C0;
-	Sat, 13 Jun 2026 13:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B7C63B9;
+	Sat, 13 Jun 2026 13:58:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781357095; cv=none; b=b5Zi4fQDgkjwlhJZ0LhXyI2Qh1R7Dxp4McVMPIF7i+E49Ow2Y+ZI/lJtKbxbeIb9WWvclGluv7izyh8n1edrATCvppKU1Ys0aRHs4n1YGRY7xV1ROmado6nFT9W0wDtx+vXSty1zpUb69LWhjpTwBVurMwHm/jTTz7YV1GHe2I4=
+	t=1781359091; cv=none; b=u35mYmWIb7N1z8K/88GSGFA0X9jXBNMdtgkOwzgJqomG2/xQvFCm7LgOJsy8d4P3h77mMqoHacNOMiMhJlnXyZrZdQ7ekE/tZzlQdVUWtMceSktRpxh3a/klutaykhiahsXpeSJ8fA1OC10+xRfzNq4/5PUyEy8dtQ2oRqIeXbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781357095; c=relaxed/simple;
-	bh=tgD9nPZkqA72gwF3WI70oFKSopYHCgNOQHp5knzFuO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gb2CGhc9G3WjEU9olKC6kDaV/pTuRg/Wn3KMmgk/gX+by2S0Xnh2l3T7y0x/s3ybhrrugVzsKB25t8WZUUMaBd1IBQFt1+siKYNjAbQTte2FKjELGxcnqRjgHUgIsTVdMtCkiVuz8J25yDN9P63KDAnBaTyMc9E4eQ2wj92JVpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=grBG0Lj9; arc=none smtp.client-ip=195.10.208.46
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-106.mailbox.org (Postfix) with ESMTPS id 4gcxkk2k79zDsNV;
-	Sat, 13 Jun 2026 15:17:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1781356654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KwUQc5Mm3QSbVGMnXY9Z1okMH71TGy+fY+XanYcVZ9E=;
-	b=grBG0Lj9NrpmxIk1kNYJdnuT/ZFdsHJoI6vA+TEmdzpAThKkqF/SRq/3gR2h+6Hqv/AN0z
-	tDn2qJs8Lqagu42kKBqn1ZVh3+Y4w4nhU0r44brhRgymdnuWQvSGctKHRE2R/PYjVzk2bV
-	gswQLNRPDmToS2omQ6wkq812mfFwugJNaAeTkf3+bXaFuF5nd8hJCGMZq07KbJcJXmpY5+
-	+G2k+RsIa+b2x4T70JFtmM8oLjhH0VMSG8Lb0xfVxu/uw0eRX1X2nnmyHtXCZfUceJ94bW
-	LXemFxxfmR7V3ct6X3MuQn3DouCnUM6LL+9NW7Ird/COpDEmTgtvJ/VuraGUJA==
-From: Ralf Lici <ralf@mandelbit.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next 08/15] ipxlat: add translation engine and dispatch core
-Date: Sat, 13 Jun 2026 15:17:17 +0200
-Message-ID: <20260613131720.253936-1-ralf@mandelbit.com>
-In-Reply-To: <87y0gm8x5k.fsf@toke.dk>
-References: <87y0gm8x5k.fsf@toke.dk>
+	s=arc-20240116; t=1781359091; c=relaxed/simple;
+	bh=MGHTiIUOviutCRVwxnnDgRYWU2f8IfdfRQ1F5rszzU0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ix3PcUptbns+EF88KOaByNmGeIsXNhRSNm2aKOO4uN27X+XgUROmPR+Yl5m++q8RPYdaULRVdsIyRtM2jZHsTWiuh9N8Z7KotnCvUqpGoYdon2VIvN5zFnxCOSydtT6l1Tt2qCst/NbjNCk1w7tC/5VCnQiHlKAvCte+L1Pg+TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=f6D5Q1/d; arc=none smtp.client-ip=129.217.128.51
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1781359053;
+	bh=MGHTiIUOviutCRVwxnnDgRYWU2f8IfdfRQ1F5rszzU0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=f6D5Q1/d50W4n8SSgF7rG2bLxSNoEGdr9bdFJ+EOXRNWggjl4kn1KceBDsXVmAp6c
+	 OYalAEuVWUg/uWmIIGdKGvTReB38XuvjjpnCViuG9l0MgmTIaC1B8QDXDvGpguTiJ4
+	 5TDjEkiSvSxKe04LZQcul3jrXqJBgEvOsAe2TED8=
+Received: from [192.168.178.68] (pd9eaa69d.dip0.t-ipconnect.de [217.234.166.157])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.19.0.1/8.19.0.1) with ESMTPSA id 65DDvVHv018453
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sat, 13 Jun 2026 15:57:31 +0200 (CEST)
+Message-ID: <74a6b90c-7d67-4047-8467-3757cd1f91a6@tu-dortmund.de>
+Date: Sat, 13 Jun 2026 15:57:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 0/5] veth: add Byte Queue Limits (BQL) support
+To: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+        hawk@kernel.org, netdev@vger.kernel.org
+Cc: kernel-team@cloudflare.com, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Chris Arges <carges@cloudflare.com>,
+        Mike Freemon <mfreemon@cloudflare.com>,
+        =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+        Breno Leitao <leitao@debian.org>, Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Stanislav Fomichev <sdf@fomichev.me>, bpf@vger.kernel.org
+References: <20260612083530.1650245-1-hawk@kernel.org>
+ <5c326cb0-9b7c-4d67-8f80-0c9be1e8fcba@tu-dortmund.de>
+ <4ddf3bcb-db5d-4821-ab32-577de93973a7@tu-berlin.de>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <4ddf3bcb-db5d-4821-ab32-577de93973a7@tu-berlin.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mandelbit.com:s=MBO0001];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298964-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-298965-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:j.koeppeler@tu-berlin.de,m:hawk@kernel.org,m:netdev@vger.kernel.org,m:kernel-team@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:carges@cloudflare.com,m:mfreemon@cloudflare.com,m:toke@toke.dk,m:leitao@debian.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:bpf@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com,toke.dk,debian.org,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mandelbit.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:toke@kernel.org,m:netdev@vger.kernel.org,m:dxld@darkboxed.org,m:antonio@mandelbit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ralf@mandelbit.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mandelbit.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CF23767EAB3
+X-Rspamd-Queue-Id: 6010067EB4C
 
-On Wed, 10 Jun 2026 13:14:47 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
-> Ralf Lici <ralf@mandelbit.com> writes:
->
-> > Hi Toke,
-> >
-> > On Thu, 04 Jun 2026 20:23:51 +0200, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
-> >> Ralf Lici <ralf@mandelbit.com> writes:
-> >>
-> >> > This commit introduces the core start_xmit processing flow: validate,
-> >> > select action, translate, and forward. It centralizes action resolution
-> >> > in the dispatch layer and keeps per-direction translation logic separate
-> >> > from device glue. The result is a single data-path entry point with
-> >> > explicit control over drop/forward/emit behavior.
-> >> >
-> >> > Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-> >>
-> >> This is very cool! Going quickly through the series, this seems like
-> >> thorough work that will be cool to have available in the kernel, so
-> >> thanks for doing this! I'll be quite happy to retire my barebones
-> >> BPF-based implementation once this lands :)
-> >>
-> >
-> > Thanks, glad to hear this looks useful. I have not had much time to work
-> > on ipxlat lately, but I hope to respin the RFC soon.
-> >
-> >> One comment on the device model below (which is also why I chose this
-> >> patch to reply to):
-> >>
-> >> > +static void ipxlat_forward_pkt(struct ipxlat_priv *ipxlat, struct sk_buff *skb)
-> >> > +{
-> >> > +	const unsigned int len = skb->len;
-> >> > +	int err;
-> >> > +
-> >> > +	/* reinject as a fresh packet with scrubbed metadata */
-> >> > +	skb_set_queue_mapping(skb, 0);
-> >> > +	skb_scrub_packet(skb, false);
-> >> > +
-> >> > +	err = gro_cells_receive(&ipxlat->gro_cells, skb);
-> >>
-> >> So given that you're not resetting skb->dev here, IIUC, this means that
-> >> the translated packet will magically re-appear as if it arrived on the
-> >> interface it first came in on, right?
-> >>
-> >> That seems... a bit too magical? Sending a packet to one device making
-> >> it suddenly reappear on a different, unrelated, device seems like it
-> >> will just create confusion. It's like the ipxlat device can't really
-> >> device if it's a device or a tunnel? :)
-> >>
-> >
-> > That's not quite what happens in the routed xmit path. There the stack
-> > sets skb->dev to the selected output device before handing the skb to
-> > the device. For IPv4 and IPv6 this happens in ip_output/ip6_output,
-> > where the output device is taken from the skb dst. So when the route
-> > selects the ipxlat device, the skb reaches ndo_start_xmit with skb->dev
-> > already pointing at the ipxlat device, not at the original ingress
-> > device.
-> >
-> > The internal 4-to-6 pre-fragmentation path should preserve the same
-> > property as well: ip_do_fragment copies the skb metadata to the
-> > generated fragments, including skb->dev, and the temporary dst used for
-> > that path also points at the ipxlat device. The fragment callback then
-> > feeds those fragments back into the same ipxlat processing path.
-> >
-> > That said, I agree that relying on this implicitly is not great.
-> > gro_cells_receive uses skb->dev directly, and the intended receive-side
-> > re-injection model should be obvious at the call site. I will set
-> > skb->dev = ipxlat->dev explicitly before gro_cells_receive in the next
-> > version.
->
-> Right, sounds good. I'm also wondering if you actually need the gro_cells
-> infrastructure at all? IIUC, the purpose of that is to allow tunnels to
-> create GRO superframes of packets after they are decapsulated (and thus
-> their l4 commonality becomes apparent). But you're not decapsulating
-> anything, you're just translating between protocols the kernel already
-> understands. So presumably any opportunity to coalesce GRO packets would
-> already have happened pre-translation? So any reason why you can't just
-> do what loopback.c does, and do a straight __netif_rx() call in the
-> transmit function?
->
+On 6/12/26 19:21, Jonas Köppeler wrote:
+> On 6/12/26 16:10, Simon Schippers wrote:
+>> On 6/12/26 10:35, hawk@kernel.org wrote:
+>>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>
+>>> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
+>>> latency by dynamically limiting in-flight packets in the ptr_ring and
+>>> moving buffering into the qdisc where AQM algorithms can act on it.
+>>
+>> LGTM, thanks for the detailed changelog :)
+>>
+>> Maybe we should stop searching for the perfect tx-usecs value.
+>> 100us is probably fine for most hardware to not have a performance
+>> regression. And lowering it does not really improve the RTT anyways.
+>> Do you agree?
+> I agree, I already thought that it just might be a very lucky case when using 50us where something accidentally aligns nicely. Interestingly, I could also reproduce that 50us was consistently a little better compared to 100us on an Intel CPU. Maybe if I get the time, I'll have another look at it, but in general I think 50us or 100us does not really matter.
+> 
 
-No, I think you're right that gro_cells is not justified here, I was
-probably biased by my work on tunnel interfaces. Unlike a tunnel decap
-path, ipxlat does not reveal a new same-family L4 flow after
-decapsulation, so I don't see a translation-specific GRO opportunity
-there, and a loopback-style receive handoff would be the simpler version
-of that design.
+Interesting.
 
-That said, after thinking more about the rest of your feedback, I think
-the right fix is probably not just replacing gro_cells with __netif_rx.
-The deeper issue is the netdevice/RX-reinjection model itself.
+I ran the benchmarks again, the results are at [1].
+I tested values between 0-9us, 10-90us, 100, 500, 1000, 5000 and 10000us.
 
-> >> I think a better model is to treat the device as basically a loopback
-> >> device that translates packets before looping them back (so when they
-> >> come back they appear to be coming from that device).
-> >>
-> >> Any reason why that wouldn't work?
-> >>
-> >
-> > That's indeed the intended model for the ipxlat netdevice: route packets
-> > to it, translate them, then loop them back into the stack as packets
-> > received from that same device. That seemed like the simplest model and
-> > the one that exposes the translation point most clearly.
->
-> Right. I think this could be made a bit more explicit in the
-> documentation as well, since it's a bit of an unusual model.
->
-> And, well, taking a step back: is it really the right model? Regular NAT
-> lives in netfilter, why can't this be a netfilter module as well? Seems
-> to me you could have something like:
->
-> table ip xlat4 {
-> 	chain postrouting {
-> 		type nat hook postrouting priority srcnat; policy accept;
-> 		ip daddr 0.0.0.0/0 oifname "eth0" xlat to 64:ff9b::/96
-> 	}
-> }
-> table ip6 xlat6 {
-> 	chain prerouting {
-> 		type nat hook prerouting priority dstnat; policy accept;
-> 		ip6 saddr 64::ff0b::/96 iifname "eth0" xlat from 64::ff9b::/96
-> 	}
-> }
->
-> and that would provide the functionality without having to implement a
-> new interface type and the associated multiple traversals through the
-> stack? Did you consider this as an alternative to the new device type?
->
+TLDR: Throughput is fine for everything > 0us. RTT only improves
+      slightly for < 100us. So 100us is fine.
 
-We did consider netfilter, and your example is syntactically attractive,
-but I am no longer convinced it is the cleanest model for SIIT.
+[1] https://github.com/simoschip2000/veth-backpressure-performance-testing/blob/v7/results/tx-usecs/text_sweep.txt
 
-An nft expression cannot simply rewrite ETH_P_IP <-> ETH_P_IPV6 and
-return ACCEPT as if this were normal NAT because the current hook
-invocation, dst, and conntrack-related state were established for the
-packet as it entered that hook. A cross-family translator would need to
-consume the skb, clear or rebuild route and ct metadata as appropriate,
-do an other-family route lookup, and resume at a well-defined point in
-that family. That seems possible, but it would be a new stateless
-cross-family action, not just a new mode of the existing nft nat
-expression (which is built around nf_nat_setup_info and assumes the
-packet's L3 family does not change AFAICT).
-
-My second concern is that the SIIT boundary would be a property of rule
-and hook placement. That gives flexibility, but it also means the
-translation point has to be constrained and documented very carefully to
-avoid ambiguous TTL/Hop Limit, PMTU/ICMP, and hook-order behavior. For
-this use case I would rather have the route that matches the translation
-prefix also be the object that says: leave this family here and continue
-in the other one.
-
-After looking at the available kernel mechanisms again, I think the
-better model is probably LWT: routes carry an ipxlat encap referencing a
-named translator domain configured over netlink. That should represent
-the stateless, prefix-based and symmetric nature of ipxlat.
-
-Very roughly, userspace could look like:
-
-    ip xlat add siit0 prefix6 64:ff9b::/96
-    ip route add ... encap ipxlat id siit0
-    ip -6 route add ... encap ipxlat id siit0
-
-There are some useful precedents for this: ILA is stateless address
-translation as LWT, seg6_local already has cross-family LWT actions, and
-ioam6 has a similar split between separately configured objects and
-route attachments.
-
-The invariant I would like v2 to follow is that the original-family
-route lookup selects translation as its terminal route action. The
-translated skb then gets a fresh lookup in the other family. From that
-point on, TTL/Hop Limit where applicable, PMTU, ICMP errors, and
-netfilter visibility belong to the translated family.
-
-So I think your question addresses the core design issue in this RFC. My
-current preference is to rework the next version around an LWT/domain
-model instead of the virtual netdevice model, unless prototyping shows a
-fundamental problem with that approach.
-
-Does that model make sense to you?
-
-Thanks for pushing on this.
-
--- 
-Ralf Lici
-Mandelbit Srl
+>>
+>> Nevertheless, I will compile and run the benchmarks again.
+>>
+>> I will go on vacation from 15th to 24th of June, so I will not be able
+>> to contribute code or run benchmarks then.
+>>
+>> Thanks,
+>> Simon
+>>
+> 
 
