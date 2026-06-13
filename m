@@ -1,96 +1,75 @@
-Return-Path: <netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298948-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id MiHCDMktLWqedgQAu9opvQ
-	(envelope-from <netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:15:37 +0200
+	id hUxWFbA4LWpgeAQAu9opvQ
+	(envelope-from <netdev+bounces-298948-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 13:02:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8430267E582
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 12:15:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804F667E668
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 13:02:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=rWq5wC4a;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298947-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=windriver.com header.s=PPS06212021 header.b=NvR1ZPA+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298948-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298948-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=windriver.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55E9A301AF49
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:15:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D8F5E300789A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 11:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB06344DBD;
-	Sat, 13 Jun 2026 10:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B533C3C07;
+	Sat, 13 Jun 2026 11:02:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A795C2135B8
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 10:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EC43C76B8;
+	Sat, 13 Jun 2026 11:02:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781345733; cv=none; b=glNxsmZ5tJ+PtuXXa5YpBG0IQn/to5F+nT1J0d2tRDkPk7qy4N7bbyaPZfVT+Xw6c5/yvMUOEj+nvG7hVUdEQdGClJZnfqG4HxcgowjZcNHGrQRJjOV7QF21Mv7Q7RgCNQRuvY/vPTNTFmkp3CoyOsjPW1Kfcf9YppkkTZXfslA=
+	t=1781348523; cv=none; b=qtS8G8jQpFQqzvSKGnZDgRs5wWl0QLzE6WQ+gAOxr2u9i6V80bZNZpV8i4rNqUr/LIjPH58LmSgsDe24IRxZnBPbHJm6EdlPL5KJ9OTgbSRjXj6pPPEdpVkbRljwBJDEQylcNP/1lvZ0oF2RyFkRJ4DXVjw8UuG/dh2ZL2Miw0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781345733; c=relaxed/simple;
-	bh=/hUK1IZcn042JbW4LmirwRqdQLa12bkk8Cn0mJDvbUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fvt1smd2lMcc3rplEuBQlxmijEFkRPqPERGNUS1RT7TFzB5tB4H4ZhPbj8qNWkqYmqIULCuO5Zvsj9Dufp/ndCAykUM5BujcIpd2vjGduACES4TM0WkNyCFjyEZdtqaAV6MawB45cJqYkP1P/m7snepjfR3cSD7by4R1dnjK2oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rWq5wC4a; arc=none smtp.client-ip=209.85.218.43
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bed2195323cso268431366b.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 03:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781345731; x=1781950531; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2n7ubYPUbw2d5bbeL3JfwCvMX4qY0mWyFpI+QwTZQf8=;
-        b=rWq5wC4aQa8OIGyeOvx1J0SmFbIYS7QfpuIt7XG2c0PKf2rzWAqALqSz+K/P16/M19
-         IYcNqOvjdz22ytIsviafMiPIVHBIvj0IDtOohCDnSr1JaU01b2zB+3z17y3OJ7G6wmMX
-         La8KqKCfhU7McVGGUXFG8DyfeofrPnDVuaj4mU6KfYgs9QUmYSOWwTj5rvKwiUKfaGls
-         GMQbfWw+oaEOHKyi157NBtGUTb/4j46kqrHEqZM9BZAngWcpIyah1bd4jqP0uO3DDnTK
-         3DSRnKD+owyIBRAd7h1u36jJMD1D35+PCwddg6YBN4Fk/jVl1yvy5t7307GzUGofKYbj
-         IaQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781345731; x=1781950531;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2n7ubYPUbw2d5bbeL3JfwCvMX4qY0mWyFpI+QwTZQf8=;
-        b=lq5tXdIRsv/iPDxDwyLAK6jV432PtW7lIAUVlxYweLmUagio/LitxkX+0q/D/M0Onj
-         cjRvYwY7Q2OxjTMyI3tmFTdZyOWHk2/QlDIsYofceXB+JSXkyNRPs8sYaL8jUDuzg+pQ
-         xV1xn7blXnkFbEkgs/VWYplqmpfnsd1FkiVoYquK/HlxeO8XuBvHkTpcuyyO++G9RZ57
-         b2wH8u2zoxNmN1uWmm34hdGStz6vj3IlaSqfM6uREHOok7ZYlh+Qt4nG72hMz8Ii0R2f
-         +m8r8MCvuV3gsWdZ7LSuQ3/ErxY+qspIot4YZztOJ2jApTfa/T7jnK1+n1vnXENAAAmF
-         cKnQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/MmgeH8H130yoK2KMIEV4mTQFXrG01aNPkJRg5GIWUKEOsmVC2Bv3VOrCJZ5sxc7T7/4M5Rok=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr5jSUENMjhby4GIAj+KLCZ3pn3eZwqbkwn1F6Hl7AGNjhS3Yl
-	bnM1tkoBlu67rmZTaFlZnmm1Z1Ka/+j40yUCM1cMZB89piVmdUm9Dm2+Cj9DMn4hnEac
-X-Gm-Gg: Acq92OFvh5vj58Lu4tGjJ3aR7r+0HSoAZsl6d4qAVEGeZis8MqLUBRplzcKh0W3TxyC
-	DR8+3IJJwEyQOvcEaL5YuKDpS1RMyIZdSP6mdEKGeWCGnC68vpPyV1jjT2jOE1k6Tjx5aY2N8HV
-	Dp1gjOVx8JmzQoHJUwX5+kW7qXsqUZ5X3dgAKJFdVxcEBt1adwXS8PLCj3O+wg/xC4rbiB6AjAD
-	q3yRyYRhJ9u5buOBYSGHy+Fhk7mGYADqnWw/VMj59S9axIfGIcYH461Dr7qZbLVCJq88fMrhTAR
-	pHkk9bh8vd7YO/5Tvm6eqd1dApwSv9dKdhPTM4DoDsCD9ecMMEW63ztOMXFC3E/IB0kQB37mn0B
-	tqzNEf4XTQc8r/mYUN5HsmCMpJZXyOIN9RM8Gxecw41vvcY2MIunlB/MWzjExhirKNz46kSKKqM
-	hqTNr/vpSyH8J5q/+c3le4s0Bw5lOO/ZrfA+M3eKywOHz3
-X-Received: by 2002:a17:907:3e94:b0:bd3:6ec5:f141 with SMTP id a640c23a62f3a-bfe28e1ce2dmr369247566b.30.1781345730843;
-        Sat, 13 Jun 2026 03:15:30 -0700 (PDT)
-Received: from archlinux ([2.26.254.81])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb9113103sm200076366b.63.2026.06.13.03.15.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jun 2026 03:15:29 -0700 (PDT)
-From: NeKon69 <nobodqwe@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	victor.raj@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	NeKon69 <nobodqwe@gmail.com>
-Subject: [PATCH net] ice: Fix use-after-scope in ice_sched_add_nodes_to_layer()
-Date: Sat, 13 Jun 2026 13:14:40 +0300
-Message-ID: <20260613101440.80190-1-nobodqwe@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1781348523; c=relaxed/simple;
+	bh=HW3pTJwO4RJ6zuUfrZ7jfvSLwOxOYXsdIGhg6Slp8EQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G+0aIIhxspNI+hTqiHhcHxDUuQOCFB79CanMme3Gwtv+HhRmcq2c0gHuxEUWkD5tEf5UXPpfaxmXpGhOcbM2dQ3pfTrF0fBKYkABTXqAbtJmtuZqiKyYqkAd/4vj5dKC+umD3rYQsl7rXIn5B4c0xGcqtpLjpBr7eXhaWsj0ZyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=NvR1ZPA+; arc=none smtp.client-ip=205.220.166.238
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65DAtWmg172328;
+	Sat, 13 Jun 2026 04:00:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=3w27mQHgCYp3ZLBrBbJrDMh8cjmCK8zeyg+YIAs8c6o=; b=
+	NvR1ZPA+RAWVFmDlScoNEwKjyAiVXBQGTs2RUI4ncH3NUM+lOVW8dJFwGUSc8LnC
+	ZXmRqkfwHAf4P3TEV/CHP/feCibZGTEMhKekn2Yc/KI9XgdRTD7IHWd2M8wCow1S
+	coX2LBiBT+g6N30EF7z+P/dH0SB5DJU6dQ96TiuVDuO5RjMB01iaeBiPAHZ62CFp
+	ZJhKgilZVV77N6YQsujD8Umc1U9b91OJkJCQh+x8iAwiOnSXtbrDnAVORc41Bsnz
+	PUlxAet1pAhVKaNoDpfDrBOIGY27kI+J0ERTTIvHymwoUv9nqZ4SB06Fp1dthhny
+	Ctj5jil80zZofFLkijxKLQ==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [128.224.246.36])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4es2g0865k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sat, 13 Jun 2026 04:00:59 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Sat, 13 Jun 2026 04:00:58 -0700
+Received: from pek-yzhou-d3.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Sat, 13 Jun 2026 04:00:56 -0700
+From: Yun Zhou <yun.zhou@windriver.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <qingfang.deng@linux.dev>,
+        <jiri@resnulli.us>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yun.zhou@windriver.com>
+Subject: [PATCH v3] flow_dissector: fix uninit-value in __skb_flow_dissect() for ETH_ADDRS
+Date: Sat, 13 Jun 2026 19:00:55 +0800
+Message-ID: <20260613110055.2318264-1-yun.zhou@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260609023752.1245848-1-yun.zhou@windriver.com>
+References: <20260609023752.1245848-1-yun.zhou@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,92 +77,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=ZJ/nX37b c=1 sm=1 tr=0 ts=6a2d386b cx=c_pps
+ a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
+ a=HK-ge7EqtdluswH-FwHe:22 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
+ a=vesAdP9fBmeZQYaB-p4A:9 a=DcSpbTIhAlouE1Uv7lRv:22 a=cQPPKAXgyycSBL8etih5:22
+ a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEzMDExMCBTYWx0ZWRfX2e/TwwfB5vWH
+ W9psfsk6zbu+kZFWWMxugXFSTJh5CJ7l50BjJi1dy9M+3PJDHTx3gMsghel820LV9eSFD6r8ke9
+ P2NJN0VHLH168DeB+IQQCJT4+SC8ndERQAHKLRY/nqKKldp63O5Gx3778KlI7fvLM4o0SBrHJH2
+ AGrHa/410BA512xY3eCKI3eNFEpaw+XobDc9TksCV3et6iSOB21weL/I+VHdL0/DlTQfkoZqXmx
+ bhkMyeR530ZKcyXIyaTaIe0qc33BUtPAxB+B+dVmMICkVDOLtOrjjroRiTMJRspLNHYid66BT1H
+ YBpIryqmbJ80rIs0o+OPTUbSvvf+dWMJFicn4pHifk9YnBtXbUD3XhQCrqUlTLXR0WLtOcezjJ5
+ y1dzmuVM7xuUlCOblYaq5MiHa11hLulxXwo8dJVvhZ+qhRuiXPpw7AdYaDZoJxAR/9iuBTUxF8F
+ 0k3QySkQMw/yL2D/Sxw==
+X-Proofpoint-ORIG-GUID: mjPkkr0OXS1QJei-msV_adGYkTBsUGrK
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjEzMDExMCBTYWx0ZWRfXy1531xnE+7Of
+ TqAN+SLIhJJyj4BgVom3ebCbmHEGConZqpSTL1Aigp6h3NorAXQvf6Qu5SYxtX1acEOo6Yv6HYh
+ 75lMiENybrHVY6K68SPTcFDN7MO8KM5unwehaDeK8ppB/ztsYLsZ
+X-Proofpoint-GUID: mjPkkr0OXS1QJei-msV_adGYkTBsUGrK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-13_02,2026-06-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 adultscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606040000
+ definitions=main-2606130110
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[windriver.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[windriver.com:s=PPS06212021];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298947-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,lists.osuosl.org,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:victor.raj@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nobodqwe@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-298948-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:qingfang.deng@linux.dev,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yun.zhou@windriver.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[windriver.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,windriver.com:dkim,windriver.com:email,windriver.com:mid,windriver.com:from_mime,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8430267E582
+X-Rspamd-Queue-Id: 804F667E668
 
-Commit 7fb09a737536 ("ice: Modify recursive way of adding nodes")
-changed ice_sched_add_nodes_to_layer() from recursive control flow to an
-iterative loop.
+__skb_flow_dissect() unconditionally reads 12 bytes from eth_hdr(skb)
+when FLOW_DISSECTOR_KEY_ETH_ADDRS is requested. This assumes the skb
+has a valid Ethernet header at mac_header, which is not always the case.
 
-Inside the loop, first_teid_ptr may be set to the address of a
-block-local variable:
+The problem can be triggered by:
+ 1. Creating a TUN device in L3 mode (IFF_TUN, hard_header_len=0)
+ 2. Attaching a multiq qdisc with a flower filter matching on eth_src
+ 3. Sending a packet through AF_PACKET
 
-	u32 temp;
-	...
-	if (num_added)
-		first_teid_ptr = &temp;
+Since TUN in L3 mode has no link-layer header, mac_header points to
+the L3 data area. The flow dissector reads 12 bytes of uninitialized
+skb memory, which then propagates through fl_set_masked_key() and is
+used as a rhashtable lookup key in __fl_lookup(), as reported by KMSAN.
 
-On the next loop iteration, first_teid_ptr may be passed to
-ice_sched_add_nodes_to_hw_layer(), after temp from the previous
-iteration has gone out of scope.
+Rejecting the filter in the control path (at tc filter add time) is
+not feasible because TC filter blocks can be shared between arbitrary
+devices -- a filter installed on an Ethernet device may later classify
+packets on a headerless device through a shared block. The device
+association is not fixed at filter creation time.
 
-Move temp outside the loop so the pointer remains valid for the lifetime
-of ice_sched_add_nodes_to_layer().
+Fix this in the data path by checking skb->dev->hard_header_len before
+reading. If the device does not have a link-layer header large enough
+to contain the Ethernet addresses, zero the key so the filter will not
+match.
 
-This was found by Clang with LifetimeSafety enabled while testing C
-language support on a Linux allmodconfig build.
-
-Fixes: 7fb09a737536 ("ice: Modify recursive way of adding nodes")
-Link: https://github.com/llvm/llvm-project/pull/203270
-Signed-off-by: NeKon69 <nobodqwe@gmail.com>
+Reported-by: syzbot+fa2f5b1fb06147be5e16@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fa2f5b1fb06147be5e16
+Fixes: 67a900cc0436 ("flow_dissector: introduce support for Ethernet addresses")
+Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
 ---
- drivers/net/ethernet/intel/ice/ice_sched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v3: Replace skb_tail_pointer() - skb_mac_header() length check with
+    skb->dev->hard_header_len check.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index fff0c1afdb41..089ad3967be5 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -1074,11 +1074,11 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
- 	u32 *first_teid_ptr = first_node_teid;
- 	u16 new_num_nodes = num_nodes;
- 	int status = 0;
-+	u32 temp;
+v2: Adjust commit message and comment.
+
+ net/core/flow_dissector.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 2a98f5fa74eb..0b235ec0743f 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -1173,13 +1173,20 @@ bool __skb_flow_dissect(const struct net *net,
  
- 	*num_nodes_added = 0;
- 	while (*num_nodes_added < num_nodes) {
- 		u16 max_child_nodes, num_added = 0;
--		u32 temp;
+ 	if (dissector_uses_key(flow_dissector,
+ 			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+-		struct ethhdr *eth = eth_hdr(skb);
+ 		struct flow_dissector_key_eth_addrs *key_eth_addrs;
  
- 		status = ice_sched_add_nodes_to_hw_layer(pi, tc_node, parent,
- 							 layer,	new_num_nodes,
+ 		key_eth_addrs = skb_flow_dissector_target(flow_dissector,
+ 							  FLOW_DISSECTOR_KEY_ETH_ADDRS,
+ 							  target_container);
+-		memcpy(key_eth_addrs, eth, sizeof(*key_eth_addrs));
++		/* TC filter blocks can be shared across devices with
++		 * different header lengths, so we cannot validate this
++		 * when the filter is installed -- check at dissect time.
++		 */
++		if (skb->dev &&
++		    skb->dev->hard_header_len >= sizeof(*key_eth_addrs))
++			memcpy(key_eth_addrs, eth_hdr(skb), sizeof(*key_eth_addrs));
++		else
++			memset(key_eth_addrs, 0, sizeof(*key_eth_addrs));
+ 	}
+ 
+ 	if (dissector_uses_key(flow_dissector,
 -- 
-2.54.0
+2.43.0
 
 
