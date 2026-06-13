@@ -1,145 +1,166 @@
-Return-Path: <netdev+bounces-299044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299045-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1GRmMPO/LWq8jQQAu9opvQ
-	(envelope-from <netdev+bounces-299044-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:39:15 +0200
+	id AGVfAmbALWrgjQQAu9opvQ
+	(envelope-from <netdev+bounces-299045-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:41:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1A267FAA2
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:39:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B2467FADA
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:41:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=UaNVDPLs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299044-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299044-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=fail ("headers rsa verify failed") header.d=kernel.org header.s=k20260515 header.b=ZZU1Vs6W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299045-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299045-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04BBF3007F53
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:38:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 85A35300253D
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 20:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF77342509;
-	Sat, 13 Jun 2026 20:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F013A3E77;
+	Sat, 13 Jun 2026 20:41:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8532C11DF;
-	Sat, 13 Jun 2026 20:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3E33A3835;
+	Sat, 13 Jun 2026 20:41:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781383122; cv=none; b=OIjBJ3befYtU8g/C9ORXo7Mjqv6X69jx2KwBStTKQ5Dt1F4Kz0R/Vz2Qo2DKFJv24FC6/0nszfS+TDOYeInivpItNTFUD0s4+kMdGt4eEnJu++S3JwfcyI/+89TA7gjtFrSC5fC4TkliIQNOdVoA+OoTSYjMEZ9lDLpBTc4KTOs=
+	t=1781383262; cv=none; b=XCnVfHZcqHgoBDMBh0dKXDdKlR333M4XqRNf8S8kxFGkjGAeFXAgSeonz4j/0vrPJWIP/ou6dzxIjd60tLFSOMk/wMgu2+KUsvKCJ0fzMr4QMwqM/Q866J4yo7wSii4Gm59pnkKdYlpUhtKFJwpC9OyTZOHDpwVmCDZYn4SVdqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781383122; c=relaxed/simple;
-	bh=TMcFnPdnw3SYsADReoQJoyHz6z0B0k3u/pVjFIqAqkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D1f3ihFpalCWXH6kS2DBNxgmGMYQQKlIvbw1HXnURXQQb2YdTVFJWcQAenZMCNOQVU9acFx5rALsBY3KrP2QoAuiknys9KxKWV6Ff53BsQplMQamH6HVYaEdrl0cwY4qtRjyoFZSNkAOse7A+HQe2wkPxgvaY9ToM/YTIyfeexY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UaNVDPLs; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 125EB1F000E9;
-	Sat, 13 Jun 2026 20:38:40 +0000 (UTC)
+	s=arc-20240116; t=1781383262; c=relaxed/simple;
+	bh=LGjMpl24hv4sSycw3BeisDB+ryaNa8HgiEpDupNNaO0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CiSgaqT0vkD4W9OLVDdxTOIIrGurYPP/yKsUZfIU7izdBrmtrYA1kA5Fh3z5z8gzheoe6PODNfAnHnVabUVTSEOvjlUnRQEaxRvan6wM+cz3ORjqUG14AkQQ6PKhrqoNU9B0CbT+Mzn3Oz1pv7ilkZdcjgnmAEg0z3ywASg/yg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZZU1Vs6W; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED9601F000E9;
+	Sat, 13 Jun 2026 20:40:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781383120;
-	bh=yAfmC+aX1bZveUBO4giQMJshYhR58JyfWmxpjWM75Pk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=UaNVDPLs4S38PEJb5MaNt4CnxQRTtN2wwd0/OCh0ncEbnLndlZPylw9trPIMeB8F0
-	 qC9rmwN8Kzt+R8znR8mg5D9lA5dTxmvkEj5opmF/DZ3sS22SctVfzrMZO8Tt26ccH0
-	 hjsYIWSHBbCpnvKp1QeGciz+8Hh+jHgeOgvJySOv0AIcZqwYGKzahjrLGVtT0R17G/
-	 MpYAKpw6b2eCzJtslGWfDox38Lfz7dRFBeOwgOUiIPYhYkNDUniZahBKgxs6kUHDrZ
-	 WMATMM+M9rOep8AS0PFpgn3L1fTMXiNgTbEAKGpiEIjpTFzIrtt4cIZJ40i9R1Ez3J
-	 cnJjSwBdUTxdA==
-Date: Sat, 13 Jun 2026 13:38:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Walleij <linusw@kernel.org>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, marex@denx.de, horms@kernel.org,
- linux@armlinux.org.uk, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- nb@tipi-net.de
-Subject: Re: [PATCH net-next v6 3/5] net: dsa: tag_ks8995: Add the KS8995
- tag handling
-Message-ID: <20260613133839.6877ed3e@kernel.org>
-In-Reply-To: <CAD++jLnuBv97nUW-EdZXiLmgsUSiVLgkB0R=gKB0zYtr8JN7xg@mail.gmail.com>
-References: <20260608-ks8995-to-ksz8-v6-3-d91eb43edcc5@kernel.org>
-	<20260610153952.1685895-1-kuba@kernel.org>
-	<CAD++jLnuBv97nUW-EdZXiLmgsUSiVLgkB0R=gKB0zYtr8JN7xg@mail.gmail.com>
+	s=k20260515; t=1781383260;
+	bh=7KvCpdXomycTSlNZCr6JrFjKv4URbtC8VTq1VyYP0YE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ZZU1Vs6Wq2VR+A+giCsV4fvBNE98FEYmqEOamQGIwgpPERz0TMofOQerE/OuCuKnh
+	 xpfqEZ9Cz77qb55Z5sPYA3I6vslXBt5hGTse1aiX5GN+E5yTLFPMSCAaggpqZxHwKE
+	 JEsD96247qq7K45+qtHvVCOpI9Yjf9vsfjR06HmT8dt8U9k/ESR8KlcTMfS/N2HtWS
+	 DDgpWaV1dDUuSj/Oqc+aU9ovSU8P7YSQ5FDttiabSWux/YVR+Kagn3rA2iDCNjwoyQ
+	 7sNFrdb9zlbm2LYvPXd+vnun4YcbAYcz9IZ2KnVxRBxF0Sk6SdG2r6Xxn0GFXyzdiz
+	 YVaBWpmB9zLdg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568F83A54A32;
+	Sat, 13 Jun 2026 20:40:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v14 net-next 00/13] dpll/ice: Add generic DPLL type and
+ full
+ TX reference clock control for E825
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178138325589.1587607.11012960354687352250.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Jun 2026 20:40:55 +0000
+References: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
+In-Reply-To: <20260607183045.1213735-1-grzegorz.nitka@intel.com>
+To: Nitka@codeaurora.org, Grzegorz <grzegorz.nitka@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, poros@redhat.com, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, przemyslaw.kitszel@intel.com,
+ anthony.l.nguyen@intel.com, Prathosh.Satish@microchip.com,
+ ivecera@redhat.com, jiri@resnulli.us, arkadiusz.kubalewski@intel.com,
+ vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net, edumazet@google.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299044-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20260515];
+	TAGGED_FROM(0.00)[bounces-299045-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:marex@denx.de,m:horms@kernel.org,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:nb@tipi-net.de,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:Nitka@codeaurora.org,m:grzegorz.nitka@intel.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:poros@redhat.com,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:przemyslaw.kitszel@intel.com,m:anthony.l.nguyen@intel.com,m:Prathosh.Satish@microchip.com,m:ivecera@redhat.com,m:jiri@resnulli.us,m:arkadiusz.kubalewski@intel.com,m:vadim.fedorenko@linux.dev,m:donald.hunter@gmail.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,denx.de,armlinux.org.uk,vger.kernel.org,tipi-net.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5A1A267FAA2
+X-Rspamd-Queue-Id: 03B2467FADA
 
-On Sat, 13 Jun 2026 18:56:03 +0200 Linus Walleij wrote:
-> Which is what I do.
-> 
-> So yeah. skb_free() will be free:ed twice. The code in tag_8021q.c will
-> also do that. But what do you expect ->xmit() to return on error if
-> not NULL?
-> 
-> When user.c does this:
-> 
->     /* Transmit function may have to reallocate the original SKB,
->      * in which case it must have freed it. Only free it here on error.
->      */
->     nskb = p->xmit(skb, dev);
->     if (!nskb) {
->         kfree_skb(skb);
->         return NETDEV_TX_OK;
->     }
-> 
->     return dsa_enqueue_skb(nskb, dev);
-> 
-> The only way to get clean out of this branch if you run
-> into an error in ->xmit() is to return NULL!
+Hello:
 
-Yes, maybe DSA experts remember the background here, and can guide us
-But from a fresh look this and ->rcv have very odd semantics.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  nskb = func(skb);
+On Sun,  7 Jun 2026 20:30:32 +0200 you wrote:
+> NOTE: This series is intentionally submitted on net-next (not
+> intel-wired-lan) as early feedback of DPLL subsystem changes is
+> welcomed. In the past possible approaches were discussed in [1].
+> 
+> This series adds TX reference clock support for E825 devices and exposes
+> TX clock selection and synchronization status via the Linux DPLL
+> subsystem.
+> 
+> [...]
 
-should assume skb is either freed or returned. Freeing the input param
-on failure of func() is a rather strange pattern.
+Here is the summary with links:
+  - [v14,net-next,01/13] dpll: add generic DPLL type
+    https://git.kernel.org/netdev/net-next/c/9375487c0c78
+  - [v14,net-next,02/13] dpll: allow registering FW-identified pin with a different DPLL
+    https://git.kernel.org/netdev/net-next/c/c191b319f208
+  - [v14,net-next,03/13] dpll: fix stale iteration in dpll_pin_on_pin_unregister()
+    https://git.kernel.org/netdev/net-next/c/32239d600236
+  - [v14,net-next,04/13] dpll: send delete notification before unregister in on-pin rollback
+    https://git.kernel.org/netdev/net-next/c/e83b403eb142
+  - [v14,net-next,05/13] dpll: emit per-dpll delete notifications in dpll_pin_on_pin_unregister()
+    https://git.kernel.org/netdev/net-next/c/df0ba51ccf87
+  - [v14,net-next,06/13] dpll: guard sync-pair removal on full pin unregister
+    https://git.kernel.org/netdev/net-next/c/0a5c720a7d57
+  - [v14,net-next,07/13] dpll: balance create/delete notifications in __dpll_pin_(un)register
+    https://git.kernel.org/netdev/net-next/c/1a2292101c0d
+  - [v14,net-next,08/13] dpll: extend pin notifier with notification source ID
+    https://git.kernel.org/netdev/net-next/c/0bf47f722fa9
+  - [v14,net-next,09/13] dpll: allow fwnode pins to attempt state change without capability bit
+    https://git.kernel.org/netdev/net-next/c/521b6d5de08d
+  - [v14,net-next,10/13] ice: introduce TXC DPLL device and TX ref clock pin framework for E825
+    https://git.kernel.org/netdev/net-next/c/5db36ee62849
+  - [v14,net-next,11/13] ice: implement CPI support for E825C
+    https://git.kernel.org/netdev/net-next/c/fff4ed70ca9b
+  - [v14,net-next,12/13] ice: add Tx reference clock index handling to AN restart command
+    https://git.kernel.org/netdev/net-next/c/4128bda8fc1d
+  - [v14,net-next,13/13] ice: implement E825 TX ref clock control and TXC hardware sync status
+    https://git.kernel.org/netdev/net-next/c/e075d7768386
 
-I vote we drop these kfree_skb()s (both xmit and rcv) and fix up any
-driver that depended on them (if any)?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
