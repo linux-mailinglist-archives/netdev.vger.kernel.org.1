@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299063-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Ap04IkvULWqAkwQAu9opvQ
-	(envelope-from <netdev+bounces-299062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:06:03 +0200
+	id ZVa5NXPULWqMkwQAu9opvQ
+	(envelope-from <netdev+bounces-299063-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:06:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F4267FD9A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:06:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2F767FDAE
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:06:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=lO4zedIv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299062-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299062-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=oUVMOl1D;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299063-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299063-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9F49300DA45
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:06:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 024CE303E4C6
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 22:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898703358B9;
-	Sat, 13 Jun 2026 22:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781773A6EE6;
+	Sat, 13 Jun 2026 22:06:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8041C30DED5;
-	Sat, 13 Jun 2026 22:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5E83911AA;
+	Sat, 13 Jun 2026 22:06:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781388360; cv=none; b=AJuMrB0rPXWehn6EEwA1cEZ5RHBL3oIHLH15kAkJhd7lIxPiKbopr9nQOrus1fW5rpNmfkXUe3PtZgcLPU2GY5w6WbfXDuJaQjMg2hPf8z+KDy6s2C1N3/0cf56DrjIez2uil9xuwaIbUIYGN9HQ+BwBkK/ClfYoUnoWuDhIOec=
+	t=1781388362; cv=none; b=Qchh27on+T5LiP2msQMenmrZPyot7/c9A6pk29VaK9AP85N980186gYJMv6rytKV22I0J1ragcIvq2ZCKYsOqEejYfB2SkyBm8vYjRgaawL8aDCFSMt3CE+5TAZsXJVBm6EJFRw9Yoh/s8pnasttf0HsMz9LF3vKvIapvimYI0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781388360; c=relaxed/simple;
-	bh=sHeMVUuCSd4K7SEBAUJeFEQVfiZQImCaAuHgnkpTaNY=;
+	s=arc-20240116; t=1781388362; c=relaxed/simple;
+	bh=3nQBGzuQdCssSRx+UZk8Wlt7YmuQmPlcWTseaOCVuKk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OPLqO/L7QBdK7/GpTx8hcaKMNtZE8L2KRpRcD4iyG4B/zW9UgolMYxx8481gKt3c49SRF+Ywj0CdoDvYa6YYDXJEmbZvbI8upKqvv8aNTNZ0PEgj5YcxruK/K3x9olm1xG/mnJv52F47QpKPHjHvamjYcvpvIrqqYir/RPRdBQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lO4zedIv; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A7291F000E9;
-	Sat, 13 Jun 2026 22:05:58 +0000 (UTC)
+	 MIME-Version; b=R0JSLPW4y1fRxdNCrzHKKKklls/gRKVKsNY0B+y62dErPL13S53XyhB1YM7IpCbEFm9RRANF6BKcZLj/HwPc0i6FPbiLlaPzVuPmKDflR0dZHYoudaVEQ3juYHdiASdV+Ns/KYGu8jnApj91503Qt/3Gzhu11riSuVu87nFCCZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUVMOl1D; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D3C1F00A3A;
+	Sat, 13 Jun 2026 22:06:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781388359;
-	bh=siC0/PmhcyZls+NjWW5qI6UPxpnq2ntQtriOMSz0A/w=;
+	s=k20260515; t=1781388360;
+	bh=eh3E9tbLJK6r2YQL7zhyUJJeEaI2GkjBaTkRJyhcxZg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lO4zedIvli8iRcvDwC1SRkgRodkTwFbtXy22SkerB8dg0RdkBcgT6auM7Sj6vh1AJ
-	 0mL6Rdc5WVQgaMZSG9fYxo4YQTdC73wiwH9vU/4XE5iPqILzofIHzxZJCn+1+yn81+
-	 d+4LS9DDnXMUcOcDCFI76CN6IlaOKj1UO34HU6yGRY8MZ4KTh3hYJuDCPxwqbXDRD0
-	 ZBQMix62QXSbuTbSuy6Kb2dx8at+tThy3mhGIWJ3ddlQdpFJqrwA08/9kt4oQcdYWw
-	 XWAX9OIFP1DGeOYOMbFR3fuaTEa1g/wkFnEsmnbYTGZ6V70A0fP6f/oObdjOQD2EBK
-	 SHMqW0AnUATiw==
+	b=oUVMOl1D+40ylftuLx3UQYMO33RGElh+6FuqNgxzfRKe1Ee17PBLsZGKa7rKHHyA9
+	 IxjW5/sXOJTPSh1CgESY+JkXyyPMy1b+U+TP6Ygp39Hx3brRyYaEjjGU3oNxasJxDz
+	 v/ZALUQnJy7kkaEHO/0cVpz6XSuNRrZJ32P3MUsiwCstfw91Z01coL+TBKkmQaanAW
+	 7UCVCPdlgcj0R7avjhA/Wm8yg2RhuRAnFGmDx/hlx8TCl4yh3qTB2BNSm3df8gxUNu
+	 NxCnyqjLqo0njWC6qtq2H44X7wReIoNBHx7cwyl/HQJteWRkoJvOHyTbMs/hQKPovM
+	 VG2A7Uwsnswag==
 From: Jakub Kicinski <kuba@kernel.org>
 To: javen_xu@realsil.com.cn
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -59,12 +59,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	horms@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/6] r8169: create a virtual interrupt for linkchg
-Date: Sat, 13 Jun 2026 15:05:56 -0700
-Message-ID: <20260613220556.219558-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 3/6] r8169: add support for phylink
+Date: Sat, 13 Jun 2026 15:05:59 -0700
+Message-ID: <20260613220559.219642-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611094345.880-3-javen_xu@realsil.com.cn>
-References: <20260611094345.880-3-javen_xu@realsil.com.cn>
+In-Reply-To: <20260611094345.880-4-javen_xu@realsil.com.cn>
+References: <20260611094345.880-4-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,11 +81,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299062-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299063-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:kuba@kernel.org,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[12];
@@ -105,66 +105,100 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E0F4267FD9A
+X-Rspamd-Queue-Id: 3E2F767FDAE
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-r8169: create a virtual interrupt for linkchg
+r8169: add support for phylink
 
-Creates a virtual interrupt for linkchg. To support phylink, we should try
-to decouple most of tp->phydev, so we add virtual interrupt for mac
-interrupt to inform the change of link status.
+Transfer old framework to phylink. Phylink can support fiber mode card
+which can not get link status or link speed from standard phy registers.
 
 > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index c60710f9bd21f..560f987437b63 100644
+> index 560f987437b63..615bd4107359a 100644
 > --- a/drivers/net/ethernet/realtek/r8169_main.c
 > +++ b/drivers/net/ethernet/realtek/r8169_main.c
 [ ... ]
-> @@ -4869,7 +4872,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  	}
+> @@ -2661,13 +2672,10 @@ static void rtl_jumbo_config(struct rtl8169_private *tp)
+>  		pcie_set_readrq(tp->pci_dev, readrq);
 >  
->  	if (status & LinkChg)
-> -		phy_mac_interrupt(tp->phydev);
-> +		generic_handle_domain_irq(tp->phy_irq_domain, 0);
+>  	/* Chip doesn't support pause in jumbo mode */
+> -	if (jumbo) {
+> -		linkmode_clear_bit(ETHTOOL_LINK_MODE_Pause_BIT,
+> -				   tp->phydev->advertising);
+> -		linkmode_clear_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+> -				   tp->phydev->advertising);
+> -		phy_start_aneg(tp->phydev);
+> -	}
+> +	if (jumbo)
+> +		tp->phylink_config.mac_capabilities &= ~(MAC_SYM_PAUSE | MAC_ASYM_PAUSE);
+> +	else
+> +		tp->phylink_config.mac_capabilities |= (MAC_SYM_PAUSE | MAC_ASYM_PAUSE);
+>  }
 
 [Severity: High]
-Does this actually work as intended without the PHY driver implementing the
-interrupt callbacks?
+Does phylink re-read mac_capabilities on start?
 
-Because the Realtek PHY drivers don't implement .config_intr and
-.handle_interrupt, phy_drv_supports_irq() will return false, causing
-phy_probe() to force phydev->irq to PHY_POLL.
+It looks like dynamic bitwise modifications to tp->phylink_config.mac_capabilities
+made here are ignored by phylink. Since phylink does not update the pl->supported
+link mode mask during phylink_start(), won't the PHY continue to incorrectly
+advertise pause capabilities to the link partner when jumbo frames are enabled?
 
-Will this cause the virtual interrupt to be unhandled by phylib, meaning
-link state detection degrades from an immediate event-driven notification to
-1-second polling?
-
->  	rtl_irq_disable(tp);
->  	napi_schedule(&tp->napi);
 [ ... ]
-> @@ -5458,6 +5488,21 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+> @@ -4142,11 +4150,17 @@ static int rtl8169_change_mtu(struct net_device *dev, int new_mtu)
+>  {
+>  	struct rtl8169_private *tp = netdev_priv(dev);
+>  
+> +	if (netif_running(dev))
+> +		phylink_stop(tp->phylink);
+> +
+>  	WRITE_ONCE(dev->mtu, new_mtu);
+>  	netdev_update_features(dev);
+>  	rtl_jumbo_config(tp);
+>  	rtl_set_eee_txidle_timer(tp);
+>  
+> +	if (netif_running(dev))
+> +		phylink_start(tp->phylink);
+> +
+>  	return 0;
+>  }
+
 [ ... ]
-> +	virq = irq_create_mapping(tp->phy_irq_domain, 0);
-> +	if (!virq)
-> +		ret = -EINVAL;
+> +static int rtl_init_phylink(struct rtl8169_private *tp)
+> +{
+> +	struct phylink *pl;
+> +	phy_interface_t phy_mode;
 > +
-> +	new_bus->irq[0] = virq;
+> +	tp->phylink_config.dev = &tp->dev->dev;
+> +	tp->phylink_config.type = PHYLINK_NETDEV;
+> +	tp->phylink_config.mac_managed_pm = true;
+> +	tp->phylink_config.lpi_capabilities = rtl8169_get_lpi_caps(tp);
+> +	tp->phylink_config.mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
 > +
->  	ret = devm_mdiobus_register(&pdev->dev, new_bus);
+> +	if (tp->sfp_mode) {
+> +		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
+> +		tp->phylink_config.mac_capabilities |= MAC_10000FD;
+> +	} else {
+> +		tp->phylink_config.mac_capabilities |= MAC_10 | MAC_100;
+> +		phy_mode = PHY_INTERFACE_MODE_INTERNAL;
 
-[Severity: Medium]
-If irq_create_mapping() fails, ret is set to -EINVAL, but does this
-assignment get immediately overwritten by the return value of
-devm_mdiobus_register()?
+[Severity: High]
+Does hardcoding phy_mode to PHY_INTERFACE_MODE_INTERNAL here break older
+adapters that use discrete PHYs over GMII or MII?
 
-This would cause the IRQ mapping failure to be silently ignored, leaving
-the bus with an invalid IRQ of 0 without aborting the driver initialization.
+Prior to this patch, the driver dynamically checked tp->supports_gmii to set
+either PHY_INTERFACE_MODE_GMII or PHY_INTERFACE_MODE_MII. Forcing INTERNAL
+might tell the PHY driver that the PHY is integrated into the MAC, which could
+cause discrete PHY drivers to skip necessary initializations, fail validation
+checks, or misconfigure interface delays.
 
->  	if (ret)
->  		return ret;
+> +
+> +		if (tp->mac_version == RTL_GIGA_MAC_VER_80)
+> +			tp->phylink_config.mac_capabilities |= MAC_1000FD | MAC_2500FD |
+> +							       MAC_5000FD | MAC_10000FD;
 
