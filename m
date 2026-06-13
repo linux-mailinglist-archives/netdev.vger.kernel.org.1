@@ -1,197 +1,165 @@
-Return-Path: <netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298926-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iRE6CPETLWprbAQAu9opvQ
-	(envelope-from <netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:25:21 +0200
+	id CSUhB5IULWqrbAQAu9opvQ
+	(envelope-from <netdev+bounces-298926-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:28:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71FB667E20D
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:25:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A629067E22E
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 10:28:01 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Y6fdZcCU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298925-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=VPUfJw2n;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298926-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-298926-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D707230CC10A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:25:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 239C63009CC4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 08:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB17A3D6664;
-	Sat, 13 Jun 2026 08:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41924374A04;
+	Sat, 13 Jun 2026 08:27:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883813D5C15
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 08:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434F7378811
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 08:27:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781339105; cv=none; b=JtAUZX+o8HkIOc1zxA5MUgcOQstvid7pKNwXRgh07Iv7Dld3I5Sr1buKFxrMM5H4ii4E9/RJsBxLMsomRWzagJym2pqXxugfq9i274mP1onXGt8ef1tydU6AuUZv8082RyPz9HaXXeisNuaMPnJ7yfQm7jCamIJFpeFzXo28zFM=
+	t=1781339278; cv=none; b=nHqnLdbQf5bNiIB5T6dlcjANzLfrplv68b4+/DE4sJ1Sx21SySqs/0Z9lxFCRUlkkqkCsvbWDlu19vcH+TqIXqsTNlJI6jVM6vldVEyq4dm7jeGat/jHEI3UNmRhQ7KuCkBYudBo4cNAhE0GJx608Ca19fjBFduxsFdpTI/BqKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781339105; c=relaxed/simple;
-	bh=uNZREjdTngEAW+wmgiqIS/P1uka5G/KGrFlcH/PgfwY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNGuE66vKp7krk8CwFnxBYA0Zfb1Phno9cjCYYQCFWSzRgkw/9EtDjV1qoPv3y+nAbuwBAHQl6HS+Pt8k++RaZz51JshACUE4pEwar24bLQcK4J5srxtvMjdzqDnP9/JOSfMQXaCn7vQfX8nfpR4v3KBw5yUe0wBUGth9e8O510=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6fdZcCU; arc=none smtp.client-ip=209.85.216.51
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-36b903567fdso2114467a91.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:24:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781339096; x=1781943896; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SAVQv8WjEXijxzfisDbV6w9rhix2ecFSLNzXIn6EOaY=;
-        b=Y6fdZcCUBd/J8Sl7J/ue523hT9ZrKEo6h0wdQJl+zQ53csFyWAWbJv4wZOvIHPZI+/
-         T17ePuWoX2W9ApWIjpoldzrrbioO7wxxy5jdRCzvZ7+Zb0ugwDaRw2QLVsuBMHPNoptT
-         jbDjFnLYMgP0uYxOAvffzlIDK2ZYshVYQ3KZO0w7o8WwnhQzyzuTajTRINd3KtidoePB
-         DcgKleCQ4/9kX+jek33taf823iN40yezN4ttsr/8McvGFwMC4nCUFBOcPh41OiUV0Hzy
-         YtglMYhSGjcYkLf9BcPOVWOevO92Do6CAhm/XAmrl5Ajwcx9HKiXyhjDU4wZZBgOGdJd
-         Vt+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781339096; x=1781943896;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SAVQv8WjEXijxzfisDbV6w9rhix2ecFSLNzXIn6EOaY=;
-        b=hYbcg1EEiJtlcnIzPHGhMenEjhWEYFYo6rYFaejTprQpiloNLIBcp0FuzgQmR0N9JS
-         itO1Xl9DW8Djcdd1CoIQ/qDejjYA+2eNNtX34/fHighQ4WunVJ78S7uXvGSKw9HMV3Io
-         BqlYmEmVLNxoR7vrBazy64KmJuy0AONG6GmUgzroTf/tKo8cKoE71x2sNXNXZyG0uRlF
-         gEN+r8GpSoPzZ9fPnFbZOv609VhJIlLsVZFqbduSf/EG/g/MsKwwFgTP0BstXvvdNyNc
-         xMdxEpiL6oMgNOWRLZmmnpYJHf+mJZnUCq6w/Ww8fqxRuMi4VlX4IXXT1Y5yLA67VLQi
-         JU0w==
-X-Forwarded-Encrypted: i=1; AFNElJ86/nL0ftipDdN0wTkaAfezwhCze8n1mFEGESXSzMtr7eKQjOd+jXP0wAsc5i4BI+s4uEVHREs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlmcrL3214mtnFRStMDw8l8sxKagYzvz86/Pi6oMs0HNjtawNn
-	RKAfDSeq2eCnt6+84mwhkDjmgOb/TBeJZ2Xn2jWTPTh30Qr17oH3cx7M
-X-Gm-Gg: Acq92OESMdDPRAF56d7ikANDDiYpqMjLZraVWqqgY7HYFsEnOCZkmk6+ur74gSYljDN
-	zD+gJCzoheDzUGpoKoFkxQb8f1LcnFawqyblyf1dNFo8fdvqoF1bwXiLMlqFgLnBcOcTYBmhfHI
-	3bwTE5LGkefEqmF6h6QHattt/WbY3OHovwxqw22VA8AF7dRbomu/oDFxWo0gheiSgdtSXU7GFCx
-	04CkkYaVfxRN9gzbOJk6Pr2ZN91UYmx5JUUvDODfoQzSTyEQepoZK+4PmF2B2oNplLWFf5i9DGD
-	A4+g9oKN3upDXHtrX9lzi226DbnOX170sJ/SZgyfwSqH7KkbsP0LXPOsMuPcu4U0up9DOgB28Ab
-	OINeJFfo5rLSLClHS8JIOEMR2+fD9Ybrsk1G14q+iPXrxgTFA6DqmFgD31m3Um4sMBpVVEvChzf
-	cC/+kgMmCFZRsY3p18xC7eE2B2vVemh+Wd5oEC4SQ/gG3mBIeIQoIh6lG6cOHWFQ==
-X-Received: by 2002:a17:90a:d44e:b0:36d:b424:4f17 with SMTP id 98e67ed59e1d1-37a01847870mr6803728a91.1.1781339096450;
-        Sat, 13 Jun 2026 01:24:56 -0700 (PDT)
-Received: from cps-manycore-1.. ([147.46.174.222])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37a25ecd5f4sm5070360a91.11.2026.06.13.01.24.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jun 2026 01:24:56 -0700 (PDT)
-From: Sechang Lim <rhkrqnwk98@gmail.com>
-To: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Liu Jian <liujian56@huawei.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Cong Wang <cwang@multikernel.io>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf] bpf, sockmap: fix BUG_ON in skb_to_sgvec() on a resized ingress skb
-Date: Sat, 13 Jun 2026 08:24:31 +0000
-Message-ID: <20260613082442.3252576-1-rhkrqnwk98@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1781339278; c=relaxed/simple;
+	bh=OvTtEVws/PfB5yNawbfKPabYTLkOEdbbM14biaFPXN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WH91KurNf79fCGOTtchGeY9Lx6WRRgLyPelC6g16mWkjRcP0fIg9MxUXr47mEekteIyuIT11EOZ8gi8/5ntBCWxw9tYHXx8v3b9r5HCd0bD5rN1hI5egUvFRLjPBcM6lQo76Et+al60Em192e8WyIO7kbsutbWfwqqnI9wE91Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VPUfJw2n; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EAD21F000E9;
+	Sat, 13 Jun 2026 08:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781339276;
+	bh=B5AB2GnAjTYfAqDEhgce6z9wXEJuX9EVNcWGLGsHedI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VPUfJw2niWvJCDCYWoaFJyYlv9SaqAO9eWb2G60hRXV7i/b0tY/OuOQaRFGq41l/y
+	 fWFuvnyreKsMzxa5M69Lmk+RobO1Zu5qX69c+zNcLs5vFuNQZKPN8Fdk/b/pvdd2fO
+	 8FZLb9mnEthvfsYLByFXZU0dMPYDJA4a9Kj4C5UL4BHb4g8o6TinLZG8McJNxTqKfD
+	 cYVYeI8yJ+0n2y1bK0Sx36ybpsh9cW4bh4sQZEfkDSqmDh7RYO2I6cUmmTVAn+m1MQ
+	 TO0uTQv6bA2vj4FNHAMAS54kMWwphV1qiZrmfoSku+7Bsis4+nusXM+M5v+wHFcfPO
+	 bee50gIjJ/Luw==
+Date: Sat, 13 Jun 2026 10:27:52 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: "Wayen.Yan" <win847@gmail.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: airoha: Fix non-standard return value in
+ airoha_ppe_get_wdma_info()
+Message-ID: <ai0UiG4epd96KVtZ@lore-rh-laptop>
+References: <6a2ca3d9.ad59c0a6.147df9.2a62@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yzHzCNJj3DNq8pfX"
+Content-Disposition: inline
+In-Reply-To: <6a2ca3d9.ad59c0a6.147df9.2a62@mx.google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-298926-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-298925-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:liujian56@huawei.com,m:daniel@iogearbox.net,m:cwang@multikernel.io,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 71FB667E20D
+X-Rspamd-Queue-Id: A629067E22E
 
-sk_psock_skb_ingress_enqueue() maps a received message into a scatterlist
-with skb_to_sgvec(skb, sg, off, len). On the SK_SKB strparser path off and
-len come from the message's strp_msg (stm->offset and stm->full_len), set
-by the stream parser. strparser does not trim the skb, so normally
-skb->len - off >= full_len and len is within the skb.
 
-An SK_SKB verdict (or parser) program may call bpf_skb_change_tail() and
-shrink the skb after full_len was recorded. len then covers more bytes than
-the skb holds, __skb_to_sgvec() walks past the data and trips BUG_ON(len):
+--yzHzCNJj3DNq8pfX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  kernel BUG at net/core/skbuff.c:5286!
-  RIP: 0010:__skb_to_sgvec+0x78c/0x790
-  Call Trace:
-   <IRQ>
-   skb_to_sgvec+0x32/0x90
-   sk_psock_skb_ingress_enqueue+0x42/0x370
-   sk_psock_skb_ingress_self+0x1a8/0x200
-   sk_psock_verdict_apply+0x33c/0x360
-   sk_psock_strp_read+0x24a/0x370
-   __strp_recv+0x66d/0xda0
-   __tcp_read_sock+0x13d/0x590
-   tcp_bpf_strp_read_sock+0x195/0x320
-   strp_data_ready+0x267/0x340
-   sk_psock_strp_data_ready+0x1ce/0x350
-   tcp_data_queue+0x1364/0x2fd0
-   </IRQ>
+> airoha_ppe_get_wdma_info() returns -1 when the last path in the
+> forwarding path stack is not of type DEV_PATH_MTK_WDMA. This is not
+> a standard kernel error code. Replace it with -EINVAL since the
+> input path type is invalid from the caller's perspective.
 
-Clamp len to skb->len - off, and drop the message if off is already past
-the skb. sk_psock_skb_ingress_enqueue() is the only skb_to_sgvec() caller
-and both ingress paths (verdict SK_PASS and the backlog worker) reach it.
-The clamp is a no-op unless the skb was shrunk.
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Fixes: 7303524e04af ("skmsg: Lose offset info in sk_psock_skb_ingress")
-Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
----
- net/core/skmsg.c | 4 ++++
- 1 file changed, 4 insertions(+)
+>=20
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 =
+SoC")
+> Signed-off-by: Wayen.Yan <win847@gmail.com>
+> ---
+>  drivers/net/ethernet/airoha/airoha_ppe.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
+net/airoha/airoha_ppe.c
+> index 5c9dff6..7260177 100644
+> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> @@ -264,7 +264,7 @@ static int airoha_ppe_get_wdma_info(struct net_device=
+ *dev, const u8 *addr,
+> =20
+>  	path =3D &stack.path[stack.num_paths - 1];
+>  	if (path->type !=3D DEV_PATH_MTK_WDMA)
+> -		return -1;
+> +		return -EINVAL;
+> =20
+>  	info->idx =3D path->mtk_wdma.wdma_idx;
+>  	info->bss =3D path->mtk_wdma.bss;
+> --=20
+> 2.51.0
+>=20
+>=20
 
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index e1850caf1a71..2961178ebd1e 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -550,6 +550,10 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
- {
- 	int num_sge, copied;
- 
-+	if (off >= skb->len)
-+		return -EINVAL;
-+	len = min_t(u32, len, skb->len - off);
-+
- 	/* skb_to_sgvec will fail when the total number of fragments in
- 	 * frag_list and frags exceeds MAX_MSG_FRAGS. For example, the
- 	 * caller may aggregate multiple skbs.
--- 
-2.43.0
+--yzHzCNJj3DNq8pfX
+Content-Type: application/pgp-signature; name=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCai0UhQAKCRA6cBh0uS2t
+rKlAAP4lFZjCFbxB2FvByROyzvrQUQJJbLpoX3MKp329SHp0iQD+P6mXCtbkeoi9
+sZmQ+rhyoeWSzKSJ1zr4GUWnEgXsGws=
+=quVv
+-----END PGP SIGNATURE-----
+
+--yzHzCNJj3DNq8pfX--
 
