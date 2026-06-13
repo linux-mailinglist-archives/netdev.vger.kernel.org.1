@@ -1,172 +1,115 @@
-Return-Path: <netdev+bounces-299101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /TOyFWLtLWqPmwQAu9opvQ
-	(envelope-from <netdev+bounces-299101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:53:06 +0200
+	id GQqVDITtLWqdmwQAu9opvQ
+	(envelope-from <netdev+bounces-299102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:53:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EAE2680104
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:53:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E61A5680110
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:53:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=NeUpxtOa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299101-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299101-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="HB3TbE/3";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299102-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299102-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 34AE63001CF4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 23:53:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CBB97301BEF6
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 23:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DD0375AD0;
-	Sat, 13 Jun 2026 23:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8985F384258;
+	Sat, 13 Jun 2026 23:53:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D622C279329
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 23:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F4E1917FB
+	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 23:53:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781394779; cv=none; b=BrJPYEePtF0gZ3v94keCBAFO8B9plUeJ1IK8Kk9yKbodLpPr0a/whr8Gc4LY4DZ5eA/F5Q31wHpVPxbUxc7PhrcVwhWQQ2UOIYfQaHHgJ9U806JqT6fnkxoiqBL8Z+1VLcoGqfSxt/PG+bDjS8f0PT2IWbLdJHcU6C7WP7SBjZo=
+	t=1781394805; cv=none; b=ckM9H4mA1BMtpyU2yl75/E/lqjGTl6l4CmHfUN+/ppzVnXn5JKxszWLJKEr0vnajJ59W5zvbF1yWXrS+kjam5o8JORkKq4PLpxzj6F3sm+GdY0hXMhRrzAhRIZP0v9Wvws1XPLThze1xAQUnDP5ZTUFJApzL8DH5Bd7PrAIOn8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781394779; c=relaxed/simple;
-	bh=CFQoP88oa6bYc0ibzkJ82qFNDHK4L8olyb1eOcPbRmo=;
-	h=Message-ID:From:Date:Subject:To:Cc; b=W4E4/nwm4AXViIGEBMPGzIeuTYvLRRHFvGgPzwarXhV1gah1DxFyS+c8OsfiL9L5nK3pF6VJ0yVNsfy0EFqDqfTRwvDHmZ0M+EqdBb1qoCOetMDgCrDil+OI/Qi7Dzi2qqNuxjZmIv74Dal0BRdUVLS5ELIAOIX61sndOy7n9E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeUpxtOa; arc=none smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2c0c1e0b0faso13326065ad.0
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 16:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781394778; x=1781999578; darn=vger.kernel.org;
-        h=cc:to:subject:date:from:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zK4mML80EwVGL6lWczcuu1KIJZUvXPEYaU6eVFtltBg=;
-        b=NeUpxtOa1Lt1eNeVHZrx8cjAg+f0gSUyxEfngUkIi8oJdt/8ReZSvlwTWzpuXEDLJN
-         TWjrpZaTlM8aUYdXUIH3Ch1l2i1ClC5LpoyXGH081/C7OISmtYI3TcsKEybeQRiwGPBP
-         7t79BmKI4/4KNPKQIn8FolvaqVshBiqZbeH5ybFWQK/fd48gye2R1D1ibqJSR8HVix5x
-         ZrP1DdGa45yNBiuFBAKdiStxqII0ZevGCSHp25QttJwx6/FPgOSypI+WYMOKK5MioN46
-         V2MBEPiydlihCqpwkX0oU4fZ94hx72jcBOB4E9CoT2g9Ssiqw8gLOppDrTlTUc01gXye
-         ozag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781394778; x=1781999578;
-        h=cc:to:subject:date:from:message-id:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zK4mML80EwVGL6lWczcuu1KIJZUvXPEYaU6eVFtltBg=;
-        b=hFK81ukoYREvLBNUrr31nl6jQy+ny5rQuryvAoABGKI00SZc+G51plh4m3LCmfpyJG
-         rYXJwxFGJgaVbS0iyuhGpAuwE9QNo3Uk+eplizWSBnJa3C2dCp7W8re1w/GcEm5op7/y
-         BdltUgq3lfOM8sDSLtqYbqlRnlBa4/c0FjvepnhBY5EQC29CgWurXlh1XVnAU9sHbBFP
-         2FpVeQnLX+cXnsQVSw5WxiN9GNlkYdzcEzJEgKnbFm67jS1Tb7/LTyFrDTPUr7Sm+nGt
-         Gh8SQmF74cO1lcU5j5Dy9hl+OHJBLSGi/GWkZppe3UmQEh9pFVx6OMS52vuPkSq4jRIi
-         EErQ==
-X-Gm-Message-State: AOJu0YwaakPB3DB/kazNH0yuW6bLgbQf3RPJaPZuhkoQZKuH0YMY69ZF
-	b9HiD7U+sZ3iM+IXVPR/G83ho2+8esnUjmGFhykDaj6e5Xz/8uW6dqCCo1p1lPYFkzQ=
-X-Gm-Gg: Acq92OHh2LTzuI8qKrKWe9hGiQDVgpCjTdWOo9rquBDGHVhLttlfzgSpwL2BA4iJW8u
-	ertlSonFZk8bpawpu29i/UclqL8TBsFv07lYRkmr/IfElAvvd5pMYf/4tBwnX8xWoaOgdG1vNWY
-	VTR84IKu7FHFTlrxWsA/qLkH75U8HhIVs+117lLeAaucsxlHLbXNqwIH3hjjJI9to6eOdYSV4mN
-	OGe6Z4sREuK6dy2T2fcvLDbfiPaKH1y9shEXF7FaHoVazbrx0JTVu/l/gPjq2dOzdM6CCaFA+Br
-	HufzhTLdWKSf7Q7EBL5SStBKszfxJokQFJ9r4zn1H7IS4Q/yrzRBnBtiykO5SMfmEYorJZWd5n7
-	DmOon1nvfwJm7VkxL5hawAi1w5YrygvBIRsgr8K4Z84ujNjNp9XSGUs+RIynBTZCl8SHpIdTBZm
-	baJI7x/sriQ/moYGr0
-X-Received: by 2002:a17:902:da2d:b0:2c4:d55:eb88 with SMTP id d9443c01a7336-2c410cd169dmr91771305ad.4.1781394778226;
-        Sat, 13 Jun 2026 16:52:58 -0700 (PDT)
-Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4328a4c1fsm58185565ad.53.2026.06.13.16.52.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jun 2026 16:52:57 -0700 (PDT)
-Message-ID: <6a2ded59.63d39acb.391892.7632@mx.google.com>
-From: "Wayen.Yan" <win847@gmail.com>
-Date: Sun, 14 Jun 2026 07:52:39 +0800
-Subject: [PATCH] net: airoha: Fix MODULE_LICENSE to match SPDX GPL-2.0-only
- identifier
-To: netdev@vger.kernel.org
-Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+	s=arc-20240116; t=1781394805; c=relaxed/simple;
+	bh=Gh/jgUs+VSs3ksPkSIYzMYQdtzDG9rr/+VyGVEGOXcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oWtkkH34T8WBgzOfILFD2z//SnM7EM7Te92eEbidrtfFfMiHEKYcLFA5xv9xOoF/ztyNsXRVwlW4T/jhb9qeEWad9QdrYov7Qyiv9aZnu/5G+CP5l4zop1Flt+on86Gs727kjJzqNsIBvgcSsAkaBjG175/EHcDktEoMrVWMntM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HB3TbE/3; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D194E1F000E9;
+	Sat, 13 Jun 2026 23:53:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781394804;
+	bh=w2ko9AYxQoG17RUdqQXRwY0WOC069bpCBJrTG6aiGn4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=HB3TbE/3Uu4s7h70MrJE5pm0nYJS/yY9C9sAJRPSF7bZUNsL0m4sfLSscNihSFMg1
+	 m8qkjLDEaZXv375mkKM0vJTEAh75HFtaayxTbJV4JnVfVZWQ0qDw4s+R+AHU6UM52n
+	 O028U26JgMfG1ED81y36ppHQkpOSQA4yPa/tiot2Iy2s1KLxg4QLMWciWq2NYGn4Gg
+	 GFMGaP5brk1/cEK9HZzOwWhw75rbmAjfJwtKoZBibypnxxMHEKIOUukqft3L5VPlIP
+	 KfvAMRjFtG1H9aHKRoH0wULhnsci3HMXsVNeJKD2CQbedmZiO68zGwhxnH3i8qLIwR
+	 qEQ4DFaLfU9Ag==
+Date: Sat, 13 Jun 2026 16:53:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Joyner <eric.joyner@amd.com>
+Cc: <netdev@vger.kernel.org>, Brett Creeley <brett.creeley@amd.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v4 0/5] ionic: Expose more port stats to
+ ethtool
+Message-ID: <20260613165323.4df246d9@kernel.org>
+In-Reply-To: <20260610061830.51037-1-eric.joyner@amd.com>
+References: <20260610061830.51037-1-eric.joyner@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299102-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-299101-lists,netdev=lfdr.de];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:eric.joyner@amd.com,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mx.google.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3EAE2680104
+X-Rspamd-Queue-Id: E61A5680110
 
-Both airoha_eth.c and airoha_npu.c declare SPDX-License-Identifier:
-GPL-2.0-only but use MODULE_LICENSE("GPL"), which the kernel module
-loader interprets as GPL-2.0+ (any GPL version). This mismatch causes
-license compliance tools (FOSSology, ScanCode, etc.) to misidentify
-the effective license as more permissive than intended.
+On Tue, 9 Jun 2026 23:18:25 -0700 Eric Joyner wrote:
+> - The link_down_count from firmware mentioned in v2 was moved back to an
+>   entry in the general ethtool statistics; the existing driver-calculated
+>   value for the ethtool ext link is more appropriate due to the firmware
+>   value being a small size and not resetting between driver loads.
 
-Replace MODULE_LICENSE("GPL") with MODULE_LICENSE("GPL v2") to
-align with the GPL-2.0-only SPDX identifier. Per include/linux/module.h,
-"GPL v2" maps to GPL-2.0-only, matching the source files' declared
-license.
-
-Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-Signed-off-by: Wayen <win847@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- drivers/net/ethernet/airoha/airoha_npu.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 31cdb11cd7..960727957e 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -3333,6 +3333,6 @@ static struct platform_driver airoha_driver = {
- };
- module_platform_driver(airoha_driver);
- 
--MODULE_LICENSE("GPL");
-+MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Lorenzo Bianconi <lorenzo@kernel.org>");
- MODULE_DESCRIPTION("Ethernet driver for Airoha SoC");
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 17dbdc8325..870d61fdd9 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -826,6 +826,6 @@ MODULE_FIRMWARE(NPU_EN7581_7996_FIRMWARE_DATA);
- MODULE_FIRMWARE(NPU_EN7581_7996_FIRMWARE_RV32);
- MODULE_FIRMWARE(NPU_AN7583_FIRMWARE_DATA);
- MODULE_FIRMWARE(NPU_AN7583_FIRMWARE_RV32);
--MODULE_LICENSE("GPL");
-+MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Lorenzo Bianconi <lorenzo@kernel.org>");
- MODULE_DESCRIPTION("Airoha Network Processor Unit driver");
--- 
-2.51.0
-
-
+There's a uAPI stat defined for something but you don't use it because
+you can't be bothered to handle overflow and reset? What am I missing :/
 
