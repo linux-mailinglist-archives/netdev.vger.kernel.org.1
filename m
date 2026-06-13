@@ -1,205 +1,188 @@
-Return-Path: <netdev+bounces-298876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-298877-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 5V5SFT+0LGp4VgQAu9opvQ
-	(envelope-from <netdev+bounces-298876-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:37:03 +0200
+	id evLBMoK1LGqlVgQAu9opvQ
+	(envelope-from <netdev+bounces-298877-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:42:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBEEE67D742
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:37:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259D667D75C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 03:42:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=CpY886Fr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298876-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-298876-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=eoM7JN0E;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-298877-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-298877-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D8B0F3017E4E
-	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:37:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAD9E313A95B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jun 2026 01:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F307A381B00;
-	Sat, 13 Jun 2026 01:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2673A1D0C;
+	Sat, 13 Jun 2026 01:42:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B6E39A7F5
-	for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 01:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACFD39FCCD;
+	Sat, 13 Jun 2026 01:42:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781314618; cv=none; b=NRnoFDN6ak1CMNQ/8DL40FHvzkJPV7qHXNJHftPbuSBxqXs/kt554tmK/mpS88jAhASQkHH4WP5RAHJHYc0YikRQkHs8lcDgF4w5cP6It7G5IEzoSf5MgZJWmT3Olw/Zdgc7dpNW1sy3wZAj1E9AMCvaOCb58HIltQb6fwPhW+Q=
+	t=1781314942; cv=none; b=BnK5tKWDroBub4iJUqRskmPmZojHdHQbbUNeHkp8e00R0SFnuCv56UNUNIzUngkWJ67QQCb+/YMIRy9XQ+HFEs5bWT6RcRZwACGg1fLdx9HNAKJAbYoUtUvhP1YtaUZTqOxQB5zdiEZP4dhjHU01GD1NGEeeewyfnArBH81jw7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781314618; c=relaxed/simple;
-	bh=ATCD8YWcyycCwAf5daRrjVD1RP8gGZsuumqpfm7uutY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=U+Y+m7DIu+f3XpYleJExAioV9PZ5sCNO4NHsAfAh2cXH4ZhczaZjkoyJRolSE/NHDriHe8TmWTAiNP67ff1vw9DvM/JFwNZu7FPl8cTEamAq0i+dOe2tVuUw24eW95L2w0esaYSkEHr1cSuQ6HSKzluXWhcOu2zx/mgUC45pthI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpY886Fr; arc=none smtp.client-ip=209.85.210.44
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7e6deacafa8so1646325a34.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jun 2026 18:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781314617; x=1781919417; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvfgZCv77btIU2CurjCFxTmu/1bI2beZuVQe8JJi27c=;
-        b=CpY886FrNj4EQww+vVk87tNbyjOoMjx5GMiDePF0Y5cfPIi/mYw+Z5j18KHqIZZEbg
-         FcDVvF609q7lA5/qi9oCQWCW/F0JTLseILy9f1ltPgHuI+ERjGzNq4trVID7nckeTiEB
-         lcKYy7CuOQtxw0uLSNFJtBBqYZhraCvIM0i2GpgkCGt3IMvKQZhG5pmOwRGoFDizFjrC
-         0j5mLhEc8kclUYhZE5PWjZLar0R1iPaX0IzytiUn2tQUaz5KdiQ18c6McNxBWis8E8zg
-         ocTy7QMIm5+h12O4CGNre7BV46gPOqf+3Jng+FbkUF/Gr+3vBXrpw2cD9ivkz806XQEi
-         c7Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781314617; x=1781919417;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uvfgZCv77btIU2CurjCFxTmu/1bI2beZuVQe8JJi27c=;
-        b=eTlxpBk/WymiR3llTWEswcIZIGUG43kNOxHEE/0er9uVWHrLR3lRGBAEW3ytU2XVhG
-         bI/4CDRb9DZwADU8rjxYAn1zjlNKdmkcQkwINhVUB4xIRXPMHncSb68/4s2chRPxx7P5
-         W1rNSOPmX/deJ0yyEgp8MCNri/apxB7pQ/FRboa/I7LZjA0nXh1rLilP8Jjw2fARecLv
-         a3FTRjndv77hFP3eoo4WgMfsaerX9FCDy06ZSE/sASASyAYnbHOruoD2l6Ne85+PNI88
-         Er0lr24FAYYACeB1YAsvA7DjB4NUQMc3FNJ1ufRadmCERkJcahuh49GeefyVDP01h6fG
-         y1YQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9ejunkzJMwScfg7JAcTvMGK1cYRA6wLpXQG5TVGE6DkSw8ebzM5AMaCq9qu4zcWHhOXn0ITCs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOpqR33FhqCcdeoGt8SCZ3s0kNAh2LVHw4heGLM+3GfbJsuISn
-	Zb9hO7bwuRJWqNk94JIkJS4/b6u9ZvUXW0P4z8DU09iEDbi/77vXu6WV
-X-Gm-Gg: Acq92OH1VScPiW1S9K1o/xSMRz8FQRs4jawi2RMVMj26U3thXSvRP5PUWq1RHJqyeF6
-	HAr4Gk8RsZrNnHSFEb4bae1wQ0GyWMI3qz7x1al7+EUft2XieqvECiA09NsZTtJBQma91CjFpt0
-	NWNorC6zERKxAH7WVBKP4EpD53Pb7csbw7N7DFmYIAHo8CpHDnvoBehXyfwan1Erul8OFg+LtV/
-	//lunSd8V7iYF0uX+CKBJ4wzYcZTvyiU2ZGIOQhUH4FrE81Vwa2fe8n4rfVq23xjzCZKFFyfDgM
-	CQywzrdSqjTkTAU7UWJBpUNyxiYm5y7B8Uc5Qf/RotF6oSL5RJHQ152LOpz5a1wv4PAunW6g1qp
-	JJBsjIgzrlrtts/Oa3ElBM5lR4Fg6u8dSiivUB1JZn5aTWK56WRr3ZToe0+36HvxR61PWfXjEbs
-	QRRIk886V7ZJUETHE46SniWjuRBzx9fdG1GBSAcJU0PPxOyyv7Pk2wldS37llYdu+/XgKOz0xnL
-	YH/eKe4BFlKV4Or
-X-Received: by 2002:a05:6808:159c:b0:486:cab8:cb7e with SMTP id 5614622812f47-4872dd9f213mr3099133b6e.1.1781314616544;
-        Fri, 12 Jun 2026 18:36:56 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:6::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-487315b016csm2006539b6e.18.2026.06.12.18.36.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2026 18:36:56 -0700 (PDT)
+	s=arc-20240116; t=1781314942; c=relaxed/simple;
+	bh=bqb3LM0D/JpOKMHF6rodJMPFtBaH/MwufcJA6Zk47xo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e3+hhjjgGF6em7Lamcm6wAaueV4ISRURrCoeHuQi1dfMy/BtuE+s7R/C5AFSPafddMSF5WH2vqO4iUX1I78z8Sit4nLh7VV0KdY08oTORctC4ZtekE501j1zunm9Mnht83gMrg/N+rQDcZfv9fG/x0J+0gmWy4l34erw7e0QE+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoM7JN0E; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCFF1F000E9;
+	Sat, 13 Jun 2026 01:42:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781314938;
+	bh=fDBHk68G0pC/YyoOUjQpa4Baza1QBFeBgxY8euxgm2w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eoM7JN0EdCHRIx5JeR+KUvjOdDlcbTdn7YPNAG6m0FAgpwWQxT/5pDQ6itbJbZ+gZ
+	 Wfb/Z4Ujd/08mUBBt/VzS6jTvTOemMQ8rFEwPWgll6ytWVi4ED/V2WuDXqM+0ZYidb
+	 Pv6lmA/gItv3Xv4ZasVKzNK+58iSzzN0PP1cvMXmMp0YTST95pheD2yx3yJR9Rgu64
+	 Flrb7Da1gs5aFSepFdihNa4WEF4le8Z/RIXVed3gHGj85Gc5cwsqvIxEKcm+0L7Jta
+	 Id8OzB24xJU2Ou0C2tiaxo1Nj4OBre1K6sDUvRCCtoQ4PIyE02rSo042pQ4bHssgEn
+	 hMk12Zl4SZa2g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: tariqt@nvidia.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	saeedm@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	vladbu@nvidia.com,
+	paulb@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gal@nvidia.com,
+	lkayal@nvidia.com,
+	cratiu@nvidia.com
+Subject: Re: [PATCH net] net/mlx5e: Fix oops from ERR_PTR in act-miss restore teardown
+Date: Fri, 12 Jun 2026 18:42:16 -0700
+Message-ID: <20260613014216.2828397-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260611134836.534015-1-tariqt@nvidia.com>
+References: <20260611134836.534015-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 12 Jun 2026 18:36:54 -0700
-Message-Id: <DJ7JBWTVOBVX.1YKW7ULLZC9Z4@gmail.com>
-Cc: <andrii@kernel.org>, <ast@kernel.org>, <bestswngs@gmail.com>,
- <bpf@vger.kernel.org>, <cong.wang@bytedance.com>, <daniel@iogearbox.net>,
- <davem@davemloft.net>, <eddyz87@gmail.com>, <edumazet@google.com>,
- <emil@etsalapatis.com>, <hawk@kernel.org>, <horms@kernel.org>,
- <ihor.solodrai@linux.dev>, <jakub@cloudflare.com>,
- <john.fastabend@gmail.com>, <jolsa@kernel.org>, <kuba@kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <martin.lau@linux.dev>, <memxor@gmail.com>, <mmmxny@gmail.com>,
- <netdev@vger.kernel.org>, <pabeni@redhat.com>, <rhkrqnwk98@gmail.com>,
- <sdf@fomichev.me>, <shuah@kernel.org>, <song@kernel.org>, <xmei5@asu.edu>,
- <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next v3 3/7] bpf, sockmap: zero-initialize pages
- allocated in bpf_msg_push_data
-From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
-To: "Kuniyuki Iwashima" <kuniyu@google.com>, <jiayuan.chen@linux.dev>
-X-Mailer: aerc
-References: <20260612130919.299124-4-jiayuan.chen@linux.dev>
- <20260613002906.1336958-1-kuniyu@google.com>
-In-Reply-To: <20260613002906.1336958-1-kuniyu@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.15 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-298876-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-298877-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:andrii@kernel.org,m:ast@kernel.org,m:bestswngs@gmail.com,m:bpf@vger.kernel.org,m:cong.wang@bytedance.com,m:daniel@iogearbox.net,m:davem@davemloft.net,m:eddyz87@gmail.com,m:edumazet@google.com,m:emil@etsalapatis.com,m:hawk@kernel.org,m:horms@kernel.org,m:ihor.solodrai@linux.dev,m:jakub@cloudflare.com,m:john.fastabend@gmail.com,m:jolsa@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:martin.lau@linux.dev,m:memxor@gmail.com,m:mmmxny@gmail.com,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:rhkrqnwk98@gmail.com,m:sdf@fomichev.me,m:shuah@kernel.org,m:song@kernel.org,m:xmei5@asu.edu,m:yonghong.song@linux.dev,m:kuniyu@google.com,m:jiayuan.chen@linux.dev,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:vladbu@nvidia.com,m:paulb@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:lkayal@nvidia.com,m:cratiu@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,bytedance.com,iogearbox.net,davemloft.net,google.com,etsalapatis.com,linux.dev,cloudflare.com,redhat.com,fomichev.me,asu.edu];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CBEEE67D742
+X-Rspamd-Queue-Id: 259D667D75C
 
-On Fri Jun 12, 2026 at 5:28 PM PDT, Kuniyuki Iwashima wrote:
-> From: Jiayuan Chen <jiayuan.chen@linux.dev>
-> Date: Fri, 12 Jun 2026 21:07:47 +0800
->> From: Weiming Shi <bestswngs@gmail.com>
->>=20
->> bpf_msg_push_data() allocates pages via alloc_pages() without
->> __GFP_ZERO. In the non-copy path, the entire page of uninitialized
->> heap content is added directly to the sk_msg scatterlist, which is
->> then transmitted over TCP to userspace via tcp_bpf_push(). In the
->> copy path, a gap of len bytes between the front and back memcpy
->> regions is similarly left uninitialized.
->>=20
->> This leads to a kernel heap information leak: stale page content
->> including kernel pointers from the direct-map and vmemmap regions
->> is transmitted to userspace, which can be used to defeat KASLR.
->>=20
->> Add __GFP_ZERO to the alloc_pages() call to ensure the allocated
->> page is always zeroed before it enters the scatterlist.
->>=20
->> Link: https://lore.kernel.org/all/20260424155913.A19FDC19425@smtp.kernel=
-.org
->> Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
->> Tested-by: Xiang Mei <xmei5@asu.edu>
->> Tested-by: Xinyu Ma <mmmxny@gmail.com>
->> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
->> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
->> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
->> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
->> ---
->>  net/core/filter.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/net/core/filter.c b/net/core/filter.c
->> index 3e555f276ba80..6e345ca65ca14 100644
->> --- a/net/core/filter.c
->> +++ b/net/core/filter.c
->> @@ -2832,7 +2832,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg=
-, u32, start,
->>  	if (unlikely(copy + len < copy))
->>  		return -EINVAL;
->> =20
->> -	page =3D alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP,
->> +	page =3D alloc_pages(__GFP_NOWARN | GFP_ATOMIC | __GFP_COMP | __GFP_ZE=
-RO,
->
-> This is a red flag.
->
-> We have a bunch of KMSAN reports due to raw/packet sockets,
-> which requires CAP_NET_ADMIN, and leave them unfixed although
-> some people attempted to "fix" them by adding __GFP_ZERO to
-> __alloc_skb().
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net/mlx5e: Fix oops from ERR_PTR in act-miss restore teardown
 
-yep. It's a bpf prog responsibility to avoid garbage in the payload.
+This change clears attr->act_id_restore_rule to NULL after
+esw_add_restore_rule() fails, so the teardown path no longer
+dereferences an ERR_PTR cookie as if it were a real mlx5_flow_handle.
 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> index a9001d1c902f..4c135858f297 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> @@ -5863,6 +5863,7 @@ int mlx5e_tc_action_miss_mapping_get(struct mlx5e_priv *priv, struct mlx5_flow_a
+>  	attr->act_id_restore_rule = esw_add_restore_rule(esw, *act_miss_mapping);
+>  	if (IS_ERR(attr->act_id_restore_rule)) {
+>  		err = PTR_ERR(attr->act_id_restore_rule);
+> +		attr->act_id_restore_rule = NULL;
+>  		goto err_rule;
+>  	}
+
+[High]
+The commit message states that after this change "teardown only sees
+NULL or a valid handle", framing NULL as benign.  Is that invariant
+actually enforced on the consumer side?
+
+Looking at the teardown helper:
+
+drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:mlx5e_tc_action_miss_mapping_put() {
+    struct mapping_ctx *ctx = mlx5e_get_priv_obj_mapping(priv);
+
+    if (is_mdev_switchdev_mode(priv->mdev))
+        mlx5_del_flow_rules(attr->act_id_restore_rule);
+    mapping_remove(ctx, act_miss_mapping);
+}
+
+There is no NULL check before mlx5_del_flow_rules(), and
+mlx5_del_flow_rules() itself dereferences handle->rule[0] without a
+NULL check:
+
+drivers/net/ethernet/mellanox/mlx5/core/fs_core.c:mlx5_del_flow_rules() {
+    struct fs_fte *fte;
+    int i;
+    ...
+    fs_get_obj(fte, handle->rule[0]->node.parent);
+    down_write_ref_node(&fte->node, false);
+    ...
+}
+
+So on any path where mlx5e_tc_action_miss_mapping_put() is reached with
+attr->act_id_restore_rule == NULL in switchdev mode, this patch
+converts the original ERR_PTR dereference into a NULL dereference at
+the same site rather than avoiding the crash.
+
+Today the put is gated by attr->ct_attr.offloaded in
+mlx5_tc_ct_delete_flow(), and __mlx5_tc_ct_flow_offload() leaves
+offloaded clear when mlx5e_tc_action_miss_mapping_get() fails, so the
+specific oops in the call trace should no longer be reachable.  But
+should the put be made symmetric with the new "NULL or valid" producer
+contract, e.g.:
+
+    if (is_mdev_switchdev_mode(priv->mdev) && attr->act_id_restore_rule)
+        mlx5_del_flow_rules(attr->act_id_restore_rule);
+
+so that any future caller that relies on the documented invariant
+(including mlx5e_clone_flow_attr_for_post_act() in en_tc.c, which
+already inherits this field) does not reintroduce the same oops with a
+slightly different fault address?
+-- 
 pw-bot: cr
 
