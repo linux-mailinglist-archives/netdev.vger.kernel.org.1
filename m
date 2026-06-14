@@ -1,103 +1,103 @@
-Return-Path: <netdev+bounces-299197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4PUOH2OOLmoWzQQAu9opvQ
-	(envelope-from <netdev+bounces-299197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:20:03 +0200
+	id BfPAJeeQLmqyzgQAu9opvQ
+	(envelope-from <netdev+bounces-299198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:30:47 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A5D680E68
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:20:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8BC680EA5
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:30:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b="iCD/ml38";
-	dkim=pass header.d=redhat.com header.s=google header.b=FgfjfK3N;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299197-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299197-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=LRDQI4RS;
+	dkim=pass header.d=redhat.com header.s=google header.b=TBIMQCbj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299198-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299198-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 541D630015BD
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:19:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 790663001850
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30B7313E24;
-	Sun, 14 Jun 2026 11:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184A239DBD6;
+	Sun, 14 Jun 2026 11:30:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B48B75801
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 11:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2EA34DCF3
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 11:30:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781435996; cv=none; b=FyOJY3sFs5XmnkGriwwDcDF0dsoVpr8dol02jIt3XAPq3X3Xk2h+2kCYXKlrMNDxgsrnMILnUT3Rvf+dQHnBQVDkN4trBa0UKnj9bN20ztoUwkmpP4WlqKMb2F+d5ynqbEUSN9sVE/wBuibm5GJNltMGJE2VaaMVUaJrL0uVR24=
+	t=1781436641; cv=none; b=orATDbGEdtskzHaN+N2q6DR3XGr2agv9TIRGE3wol4Yf6wUI4sls77/6yEV8h054rOI9/PlJH2JBGBBYYgSHW73p5R9d0+hcIFL4FcbkX24sC/0UzCKvudiED3m81DpmdFqRf4ZnU2JLPLUr9gF99VJ29AfiDlazLfqJ71C6qXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781435996; c=relaxed/simple;
-	bh=2Gkj1TAMvgisXRCCGbSvr8DL0Lqah979yGwO67wQolU=;
+	s=arc-20240116; t=1781436641; c=relaxed/simple;
+	bh=BSMMNkk80Y2j2iA4qmCq+Z5bMBUGyNo2i3G//sXc1hA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SOpiZzlPJXTiXFj+b1TrxA3lCEdv/ZlboTdBPBsv5M0dMO7P4ihPx4YfaAuQ78imEbTCt7zSghkuLx2oyLP+g7RyEa7O8EO09gtBKQHZHY+NZ0AvJn0Om+ivOOvpkxt4la7pKRgPW1Vr4ekloi11cpXkz1/ymhAJVKolkxaig20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iCD/ml38; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FgfjfK3N; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=YqOpVM+kXK1h444wWKRHM9qHQfxbGR42w17b4I8xjTRJOHsgX3FnBXMTkigMnPeyHZfJ5KW/bEkwIPkD9yhtui3DmEdK/jsF4ZoHSkd/fBEffSglyrN9+RhCp7llcyDzF36WYNYWq5bEfBnbZ8LQzhRXZdVTHPQT15Ky45S5mn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LRDQI4RS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TBIMQCbj; arc=none smtp.client-ip=170.10.129.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781435994;
+	s=mimecast20190719; t=1781436638;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kkd4mvxbS0UZ6zZjSfTSJXTskUPh6tCEruxpS1UjCaw=;
-	b=iCD/ml38Rh01RA4aKV2KuvcxyvA1VDdGN+TzF3QJ14Kmc3DUd+jFvvnC2f8jbAX0w35o1Z
-	uJBzqaEb5S3PZMyxhAF1LSwsybja8UlmJdlsh0XExadR3X130I1p/rN06ozA69k6B61dkQ
-	tsXMgAQZZoekl7f40E4Ka5VTcAFl054=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Mn9qXtPUeoWgSilSCUuR0/l8m+OiZ6LyUPY900AFYjk=;
+	b=LRDQI4RSwQpCACYxSxt8olJLCYK4e9HY3FyBg+MzSAFM4kUH9HDt3ZFRO9N6iQzNyqJNBF
+	/HlvljaUtDnIiHxqlQ2YE72tptFJASXkCzPeZn0w6JstDduzuNHNtvjI1yz3mIqNwiZhWa
+	XDHJy0juYD446BMK0XPZAEb1GkyZGcE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-414-qlK70gRsNOOCmDKPnt6kqA-1; Sun, 14 Jun 2026 07:19:51 -0400
-X-MC-Unique: qlK70gRsNOOCmDKPnt6kqA-1
-X-Mimecast-MFC-AGG-ID: qlK70gRsNOOCmDKPnt6kqA_1781435991
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490c4f61a34so16217875e9.2
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 04:19:51 -0700 (PDT)
+ us-mta-225-yYBSUxIYNii967GGU2Nl5Q-1; Sun, 14 Jun 2026 07:30:37 -0400
+X-MC-Unique: yYBSUxIYNii967GGU2Nl5Q-1
+X-Mimecast-MFC-AGG-ID: yYBSUxIYNii967GGU2Nl5Q_1781436636
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-490b79e6b94so20739735e9.2
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 04:30:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781435990; x=1782040790; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1781436636; x=1782041436; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=kkd4mvxbS0UZ6zZjSfTSJXTskUPh6tCEruxpS1UjCaw=;
-        b=FgfjfK3NVNilBJ+2qTlto+75+Y4b+SjrLeFpq9adynjLGpszafS5UWCR9RsV+CK41m
-         E7CBOpIVL8LcLc3SoyNWFljhRLnn6VQrQnPyd8XKO5DtWBipiaQJP9IyeTwGSxWkqAcS
-         gwUTJJa+78mSaGeZ0SLJdabRL84hinb+QfwozgFcnPqPWx/NEO2vxHCfXelsgUTDjNsd
-         mF4ep7+MEEuuF4w5Ti6XqsXX35cMUkIVD1siPR5tPH7qEn6/jk+vAz1qP/MoCL4t+8nA
-         e774cOgS/YhyRoeAw48GnuuyyYfDX/bl2tLwFjDPFS9vl1TUkprZQxpbXPRuru1UM/lh
-         nBrA==
+        bh=Mn9qXtPUeoWgSilSCUuR0/l8m+OiZ6LyUPY900AFYjk=;
+        b=TBIMQCbj6RCVhExTYCjxGmRhM0JVM+4jyp4Pmd9lM01NlRqNq/eKYbsIyF+PbT91/0
+         hDPjtDgMfQ+IBrNINmQljpjAB9u7xJ3y4o2vlLis37t3J3q+f9OCDwkY9HcIMpp+zYh0
+         gkCW7Ls/CuU8UQ+mtzoS+Ka4nROJCt7otuaMh8s7Pcu05ukj0KCkoyARoNAnZattohG9
+         +c7mX52ooUPgzafo3xtNv9q3C9BpSN+BnSQ/UsO2bq9PqNHUIrec80NW3Kpi6ljTCZg8
+         ixLJ9LnlPhRrWHstGVmK0E217946BRCj8Zo215R3C9lFkV5UwiMwT54ntTvCdoBz0K0/
+         ts5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781435990; x=1782040790;
+        d=1e100.net; s=20251104; t=1781436636; x=1782041436;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kkd4mvxbS0UZ6zZjSfTSJXTskUPh6tCEruxpS1UjCaw=;
-        b=cb6IrsuvkUIXL7dDd2zWVxZsNG/RUCQKA0T9xAhVrJ2vmrhddfSCK7M3obIfy+Rymc
-         6AQX2is/vNfAY1gGlXohhRqwdkGaDp0uAUHNIWbrCQHeJYNfB7xrA6N46AUlguJ+Nwh6
-         spp2YTbNnn9q3PMQ8pYnqvZrohKJFfuI2rDB1lro2BXT1lwJh8mKbcESGa5KzILNU50N
-         nSov1cugdRmot4NPZKhPvD/iq7vwgOSIWqDvRcUqUypJluqiYayrvxXFrB12B6tkkrHi
-         TGx7yyiAOhDhz61y7EJ6bhXX7heBRq33dRl7FpA1Y5hokC6gnde8Ezkfl5zrtx6mbc6e
-         MgcQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/XzxiXTwnIIHzoUKrz/Wc2iTkwI8291t1Tsr7TWY9es0obz1wY6GK1ECKoqGnFcElqyhc/RoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwikKGIZimGkbEPqrzp5AqFXuZSGxsYo2LBbh95zRoILgfP1aPe
-	BFIdbtSyZDdD1pq+h6XSSFqgz0e9cXoYOlqmu9SKUMAz03NJX1BHzLXE4xPFWH+Tork6GQG7rw6
-	Ix1jDY+pEbYelNaVar2yp36z+bo947cMMWGUyLK/9rsUUqibHz8C/uwOSDg==
-X-Gm-Gg: Acq92OG8/+ulfA8vwWQod3MuemWIPfVLJaGyUD7hSBrb2Dw+RY7gLJAo0eV3aYRcrFm
-	EmuQCU0CVtxlY4PbUgySFFK7Dj0njiqrzTSA1llg3RIRFeMlP+k790ZiRiR+g5//20niRfbOA6u
-	x6g4idAjTDIF8+umiAgRaHTVJV4S54vLYn50yk5DUUgiOezk6LdYtRYVof/Vvjvj6SUp8Heyo2h
-	T24stjn5LeHry98lttm3lKrfsPi6zKR56gAm0zzknTsftKniEA44JSKwQICAh3gpW7HI11WPFQ5
-	AnnGV96yHLZM5tGryQZKzGyHEC7SKOIuPlFRZ2cbfT4v9zgRPd1sLwXmo2/rx7NdYCwtbnU1tZP
-	kHpwMnCpA5Z+qhYC6JmGQvsd1hiW31sfqyJlXTJjtUjyvmIaz1ZzZGAQ=
-X-Received: by 2002:a05:600c:e556:20b0:490:b9c3:6c58 with SMTP id 5b1f17b1804b1-490ec4fe879mr89099785e9.16.1781435990629;
-        Sun, 14 Jun 2026 04:19:50 -0700 (PDT)
-X-Received: by 2002:a05:600c:e556:20b0:490:b9c3:6c58 with SMTP id 5b1f17b1804b1-490ec4fe879mr89099565e9.16.1781435990241;
-        Sun, 14 Jun 2026 04:19:50 -0700 (PDT)
+        bh=Mn9qXtPUeoWgSilSCUuR0/l8m+OiZ6LyUPY900AFYjk=;
+        b=sgKiym0nsFDA7kdR5KY930ZNfKcI+6n1jlFrUcSvVryFYj6XvTNeuDIC7AXlAaE/cu
+         6klCfECs5DsALW5osR1fpO6CHcCpNchBhOs3TkdosrFYIg7xgDXx0UqiRZkIy1ef8h9R
+         ur2d7eCB0WvGPa/I5BuKp0x/QQB3j4tdD8nqfgJY5paHRpJV6nKJLLrCDiNfp183UvAf
+         2xFTtCqsayN8I1vFSNDbOTmGHo+JqPaea0tf2JTK+qd9OMyiYzQTnGBVR0udVlvpx5h5
+         4ZoS14AjIiN9ICzVCICWjZzGeoRWVEk6wallfNn0LEer24oKK3G1WmKLnRJdTdGScx/r
+         WXaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+s3kBJONpMttelhitU49WQ7Jw/Vrx5tvevhWwCVNrMGiXBU1U4IkcQ4njaUGqTMe0GW0Ow/aM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRcME7PYKD61cEoawDEUOEyaAsQDnht0T8vHPa7oBj++xorllo
+	DH/vCYaMRfiLIu5ZP6zdFDQtSpb8wULFTwKqyTuEkS6o4sFHpmxhMwz1dZ8fo+KQ+PIyIOwNyj6
+	/M47zV5PrQqwCGa8nM844gWP/LgF2JJmzNZG3qvyra2NS/EXzJAOGUNQZig==
+X-Gm-Gg: Acq92OE5Px1njXjQW50oKeixLCOwNq4ltf4FLCwmMEk+3uLPHR6wlXILe7lwxhC4gyB
+	aMHWpj5cWyFZgEqTGFZ7beDP6wSi0kF0sXC61dp22gKwgmd+us3+tFeY2ajtlHIk4fTyG06QbQ9
+	rCbMxqv7f9FB7qVAlrF+qHEB1n70dkC5N2deJWyqMc7nepOaPbrRNEGvJWRuCdUBzXKmBMVO/ao
+	18IDqw4W56o/tDSWWRdOgcBxvb6e405p9F/LK0G5oOB2j2GPDnR1pXSzcsmFVTUKpYfTOMiT9Kg
+	gCFoEr817aeYxHtOer6ldwSU8UnL3gPwEi88PnPPouNiTUCZu8neF2Gn+Q+DI/ZDF2vL4OXWv2K
+	f63HIoUlw1zlzwK95G1mqtkX5ybFQMCmA27sqqfFdt1dTa+dwdGAbj8k=
+X-Received: by 2002:a05:600c:c3cf:10b0:490:b025:f324 with SMTP id 5b1f17b1804b1-490ec51f5femr88606375e9.32.1781436635813;
+        Sun, 14 Jun 2026 04:30:35 -0700 (PDT)
+X-Received: by 2002:a05:600c:c3cf:10b0:490:b025:f324 with SMTP id 5b1f17b1804b1-490ec51f5femr88606095e9.32.1781436635391;
+        Sun, 14 Jun 2026 04:30:35 -0700 (PDT)
 Received: from [192.168.88.32] ([150.228.25.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492202edf89sm165147515e9.1.2026.06.14.04.19.48
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492201fad25sm163739065e9.0.2026.06.14.04.30.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jun 2026 04:19:49 -0700 (PDT)
-Message-ID: <554ff2bd-e4d7-4e64-8ec4-86dc7da85992@redhat.com>
-Date: Sun, 14 Jun 2026 13:19:47 +0200
+        Sun, 14 Jun 2026 04:30:34 -0700 (PDT)
+Message-ID: <45aa7689-9168-4825-9040-0ef68f4b8fcb@redhat.com>
+Date: Sun, 14 Jun 2026 13:30:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,7 +105,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 04/11] net: Enable BIG TCP with partial GSO
+Subject: Re: [PATCH net-next v7 06/11] udp: Support gro_ipv4_max_size > 65536
 To: Alice Mikityanska <alice.kernel@fastmail.im>,
  Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -118,10 +118,10 @@ Cc: Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>,
  Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
  Alice Mikityanska <alice@isovalent.com>
 References: <20260611192955.604661-1-alice.kernel@fastmail.im>
- <20260611192955.604661-5-alice.kernel@fastmail.im>
+ <20260611192955.604661-7-alice.kernel@fastmail.im>
 From: Paolo Abeni <pabeni@redhat.com>
 Content-Language: en-US
-In-Reply-To: <20260611192955.604661-5-alice.kernel@fastmail.im>
+In-Reply-To: <20260611192955.604661-7-alice.kernel@fastmail.im>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
@@ -130,11 +130,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299197-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299198-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:alice.kernel@fastmail.im,m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FREEMAIL_TO(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,kernel.org,gmail.com,blackwall.org];
@@ -158,98 +158,22 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 65A5D680E68
+X-Rspamd-Queue-Id: 8A8BC680EA5
 
 On 6/11/26 9:29 PM, Alice Mikityanska wrote:
 > From: Alice Mikityanska <alice@isovalent.com>
 > 
-> skb_segment is called for partial GSO, when netif_needs_gso returns true
-> in validate_xmit_skb. Partial GSO is needed, for example, when
-> segmentation of tunneled traffic is offloaded to a NIC that only
-> supports inner checksum offload.
-> 
-> Currently, skb_segment clamps the segment length to 65534 bytes, because
-> gso_size == 65535 is a special value GSO_BY_FRAGS, and we don't want
-> to accidentally assign mss = 65535, as it would fall into the
-> GSO_BY_FRAGS check further in the function.
-> 
-> This implementation, however, artificially blocks len > 65534, which is
-> possible since the introduction of BIG TCP. To allow bigger lengths and
-> avoid resegmentation of BIG TCP packets, store the gso_by_frags flag in
-> the beginning and don't use a special value of mss for this purpose
-> after mss was modified.
-> 
-> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> ---
->  drivers/net/netdevsim/psp.c |  2 +-
->  net/core/skbuff.c           | 10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/netdevsim/psp.c b/drivers/net/netdevsim/psp.c
-> index d3e36c74be62..6b3532b5e360 100644
-> --- a/drivers/net/netdevsim/psp.c
-> +++ b/drivers/net/netdevsim/psp.c
-> @@ -92,7 +92,7 @@ nsim_do_psp(struct sk_buff *skb, struct netdevsim *ns,
->  		 * provide a valid checksum here, so the skb isn't dropped.
->  		 */
->  		uh = udp_hdr(skb);
-> -		udplen = ntohs(uh->len) ?: skb->len - skb_transport_offset(skb);
-> +		udplen = udp_get_len(skb, uh, skb_transport_offset(skb));
->  		csum = skb_checksum(skb, skb_transport_offset(skb),
->  				    udplen, 0);
->  
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index c64693fcb2d1..5dcee79df8cf 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4773,6 +4773,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
->  	struct sk_buff *tail = NULL;
->  	struct sk_buff *list_skb = skb_shinfo(head_skb)->frag_list;
->  	unsigned int mss = skb_shinfo(head_skb)->gso_size;
-> +	bool gso_by_frags = mss == GSO_BY_FRAGS;
->  	unsigned int doffset = head_skb->data - skb_mac_header(head_skb);
->  	unsigned int offset = doffset;
->  	unsigned int tnl_hlen = skb_tnl_header_len(head_skb);
-> @@ -4788,7 +4789,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
->  	int nfrags, pos;
->  
->  	if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
-> -	    mss != GSO_BY_FRAGS && mss != skb_headlen(head_skb)) {
-> +	    !gso_by_frags && mss != skb_headlen(head_skb)) {
->  		struct sk_buff *check_skb;
->  
->  		for (check_skb = list_skb; check_skb; check_skb = check_skb->next) {
-> @@ -4816,7 +4817,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
->  	sg = !!(features & NETIF_F_SG);
->  	csum = !!can_checksum_protocol(features, proto);
->  
-> -	if (sg && csum && (mss != GSO_BY_FRAGS))  {
-> +	if (sg && csum && !gso_by_frags)  {
->  		if (!(features & NETIF_F_GSO_PARTIAL)) {
->  			struct sk_buff *iter;
->  			unsigned int frag_len;
-> @@ -4850,9 +4851,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
->  		/* GSO partial only requires that we trim off any excess that
->  		 * doesn't fit into an MSS sized block, so take care of that
->  		 * now.
-> -		 * Cap len to not accidentally hit GSO_BY_FRAGS.
->  		 */
-> -		partial_segs = min(len, GSO_BY_FRAGS - 1) / mss;
-> +		partial_segs = len / mss;
+> Currently, gro_max_size and gro_ipv4_max_size can be set to values
+> bigger than 65536, and GRO will happily aggregate UDP to the configured
+> size (for example, with TCP traffic in VXLAN tunnels). 
 
-Sashiko/gemini says the above can lead to hit BUG_ON() later.
+Sashiko gemini says IPv4 will not be happy, suspecting iph_totlen() will
+not work properly, but that is wrong, because skb_is_gso_tcp() will
+still be true for the relevant GSO packets.
 
-I *think* it's not a false positive, as it looks like skb_segment()
-assumes an skb can hold `mss` bytes without resorting to frag_list
-usage, and mss > MAX_SKB_FRAGS * PAGE_SIZE  breaks such assumption.
-
-I think handling correctly this case will requires some non trivial
-surgery to skb_segment: both `while (pos < offset + len) {` loops must
-be updated to feed data from `frags` as needed instead of
-BUG_ON()/net_warn_ratelimited(skb_shinfo(nskb)->nr_frags >= MAX_SKB_FRAGS);
+It would be nice to explicitly mentioning such fact here.
 
 /P
 
