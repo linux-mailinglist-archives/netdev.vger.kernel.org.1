@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-299136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299137-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jZJIGW8oLmroqAQAu9opvQ
-	(envelope-from <netdev+bounces-299136-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:05:03 +0200
+	id ixeRBZMoLmrtqAQAu9opvQ
+	(envelope-from <netdev+bounces-299137-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:05:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD93C680549
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E7B680558
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:05:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=Wu+NPUUI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299136-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299136-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UrBXl85u;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299137-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299137-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C15F2305431B
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 04:01:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2729F3058FD3
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 04:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B98F2D12F3;
-	Sun, 14 Jun 2026 04:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025652D5412;
+	Sun, 14 Jun 2026 04:01:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E73272816
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 04:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA3C2BE7DB
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 04:01:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781409685; cv=none; b=DftP05PlNUUCxQN4YfqRGIuAUWaK+LZ6YgVWMdJ1az4X8exvlFS0LLsGWPebMT2llIPlaLOtj6TdIn7xwxQv/0t3tK33OE73tL5jM3RjnLMWnEpTCdzytZfKMES/57s+5EgrnbHaOfx1GNKLAw+3xf0XNyHofI5aUpK7cPwilIU=
+	t=1781409690; cv=none; b=mPkRBXe6BfdMdhgeBPOJqaV5omvFLmrc/Z6R8THQDD+/ZxNZ9BjLBnrvQSuwlRPSxtHEjEnOIdLcQ3kgOnkb+hJMyK/aqqrtpyenH7PC+U2Xi1IjxvGHHbeCBg9t9HFcROIzmKGpj1X16qCg6qNR4GuXpXlw49VL3gxk+6tHmc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781409685; c=relaxed/simple;
-	bh=kB2qOi/yAHpfOsWCbelMdPq1dkousPiimwvD21oIm3I=;
+	s=arc-20240116; t=1781409690; c=relaxed/simple;
+	bh=1Lr8lhopJLB4l3/8uIHxvubAFVhlBm3hpzdsgOpnjLk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mz5jab2lJstW+6KNyunsPfS1K90TDLpEy3v2ZTQMPQdLC6ysKRgvkSJSqtggJCq/ANddMgQxDGuBr4KzPDo/1p4R1kOzUuZiJIvtb1KEaXvZvgH6Cno9m4ug+ygInq4oLek5sJFORRS29pi8Z2UqQ2oEutLBzLBcGEFxgQdf3x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wu+NPUUI; arc=none smtp.client-ip=209.85.215.174
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c85822059d8so1456240a12.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 21:01:22 -0700 (PDT)
+	 MIME-Version; b=VI2cy+84IBAzsH+My7cr8IrtihPUcjvyTz7Z0kZ05dJcby+2DKZdZoWraQuqGB2AFVvGZU93kUbQUBXByyejTwkd2MwowwUwON5bCnMDhsdJ2mPhy9+f2OgZHadFNm6fAAhVZs+YkahMAej7Iml1u+DsZNzjNa/dzS3p6jRXG+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrBXl85u; arc=none smtp.client-ip=209.85.215.172
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c86214eead7so934737a12.0
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 21:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781409682; x=1782014482; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781409688; x=1782014488; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dluNpCPRBDSOzKss3pUIDIAJmusvd9OAlTIMPgyePu4=;
-        b=Wu+NPUUI2JCJMyauTmOnp7Eb1/swomOtrXcBFELzUt1P0zJ0c+o0IaZaFCWiH4i7Yv
-         aDm81GLlCkntfDlGL/MPVnc9L1cBnOuOgMbRQFUp7zmz5jCyN1hoZ1sRbN+TPFL9C4Nc
-         uEzd+JpPAj+qDg0/030AdRNtstUidDR7bDfc08jbpaZWsxZ2Kb50VesVUI6S0n8rU4t3
-         3UhcQCIDBCr/NN9Ddn6ByCqT0fZvdd+AWOZn1CRV/mYsigc6nkx+SEDQNyQA+bwUXu6M
-         dJdmy4flqILIrbmcyMVVZV2umi9rpwAG+X3M7vHufroqKcvuv/fsv6Nciy0O+8Jt+A1s
-         xgVg==
+        bh=2UyMi/KYvRNIKUlOOeZw9yUh9eSU0o6XkwqlaaJqTO0=;
+        b=UrBXl85uu9jKICMoyEzBMEVVuOPHty8yVCG+HDHFUotE+0u5Eyt+X+HGByoXYFHL/y
+         WUBwExcnstak+X6GB7wFihCOCzmKceVvMqdecW74Je6I29lA+Lqn0AjfzY/jOebGKljT
+         EfAI7kDpcDJaXzbF8mq07bN7oBPkdEFK6k/RXHdQur9pQqEvxTqDk/IJhYa1xIdpqhXe
+         OEV4HoDd8EvwWp+VEaxlN42DDjShEmRmZXIlwA+NC+gXIwSngZc9+PI9ruMEm//qpBIs
+         Ec8HnDF0rvEQD9Jj/IyJ9PJ8zCG16KULK33RCPBEmw8aoEB/CTGNnMTvM8kYTOAPKCM6
+         NZxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781409682; x=1782014482;
+        d=1e100.net; s=20251104; t=1781409688; x=1782014488;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=dluNpCPRBDSOzKss3pUIDIAJmusvd9OAlTIMPgyePu4=;
-        b=TSyJBMv7UTipTgm9BZjOfW/IgYOxlwxOMjKSOB1VLQT5+k+Cy4Tu161oNyn3MFl+8e
-         0mzcpxIFWSp5/gt1EqDyKDmc4uNei1emXAGtx4By6oCoJT/eCMkujTBlZMO2S6oyoiu/
-         SAMFzfQXvGlNhzARnKK9aiNnb2f4ZorJM3o3/sNbjbDRxgR7BehyAlwgQuA6+p27e4Cs
-         6Nh7UUKF0AOti9PQbXEXUjXfGFx+Yu23HIowz9AL/wqHNQqS2vymF90N/KUpOMDJARl6
-         4MAs0FAiinwtDkm+3hVOMSU3hw10BATHH0PifF0WJSZlkKQu2ucqN7WtZx3E3at4YFZq
-         hO3w==
-X-Gm-Message-State: AOJu0YzNxjRZePYu8y9cqj2MEJCNtuAVP1MGZM8HsCMzzTw+Z8zW+MEK
-	gpp5ki83KYOhi+pAll/9Kcxadr0JEeHzVUKo5E8Yt1c71LeVNJTaktZ2yED4vNu2
-X-Gm-Gg: Acq92OHWsyKLseIjdJpz/5b7FRyk45XFG4zTSBYgQGMb+1HDthY6eG+uk45d1tRnk5m
-	zEDWoUuEq2cTw/7asQ86oan59H+o5VLvGvXpfHL1bng2SUabhSxlu60lQj3VMeEY4EMEFq6HgWC
-	bfcsPeSYQNf6/2wtcQPnLxah4yYmFXtjsoXP+wyLNyg1hocMEPXRVWdtO/Gs2mZ7NnLoo5QbY4t
-	7ogIVacGzgIYze5P8viQvEXxdN9iKQyyeVQJE0fClqE+/6Z2DvAQMEudtJcmZ/OdMVHS3YuH2RX
-	h6PYs85L6TLzz9KIjVs4BbC4L5qSwqf0oDCvC1HZhMf8hlj2CLtugPhsgtB/+lpvF29OxU9uscB
-	qyesohWdxLlS6WWzp2mDM4EOePLRk8Qk6bDkyhQEtRnMQTfMB9OBYqx6XMtbVFlV74sTsdHM17L
-	RBHABD2Md6qN7NpTgX3YQ=
-X-Received: by 2002:a05:6a21:a518:b0:3b3:be05:2b73 with SMTP id adf61e73a8af0-3b783c19128mr11049750637.18.1781409682284;
-        Sat, 13 Jun 2026 21:01:22 -0700 (PDT)
+        bh=2UyMi/KYvRNIKUlOOeZw9yUh9eSU0o6XkwqlaaJqTO0=;
+        b=GNlYiLJmtlxtxGpFwIlZFlrRc5lO8Io+GiXXsW0kGs7/pTb8EkzZLAUnuPzDLqBfUQ
+         GScrRu3McyjbLKRkbuRguy7fdwnThXYwOfbI5l/yMi7CUba+AKO9MUVQ/3OlrGa3EwWl
+         fYoSIylOcJl9nhsEW+SC+c8j1W5IDNjLN25GpoTvSG7kguAkZTDVPgopUMP9835N5pFD
+         DABV02wKY6Wi+uZO9zTGzKLc3wLZAq2uS7LQl0U9mnOKdTA716qYqdlc7RAqA2jQ3TFi
+         feCGAbd4DwgLGdiGsSWrXixOuaHuD17yIkeprPscWZFDyYTQx9JKi5XpnrXrl0M7APUN
+         la+A==
+X-Gm-Message-State: AOJu0Yzmh05Ggfr9ExXdQESkfa89EwuZWrPttmuKAZPPjCxVPgnwilvK
+	kkI/33fL06yqDgnIZGgmhwyKB3aJoKpee3hGSkVPynRZVVkqQFXbyDcrlHpRECr5
+X-Gm-Gg: Acq92OFHQ+T+Du0mV6sjwQLUs7GSjaRPKy59XlpyfPjbYXa+CkY/Cp/1RNL2pOrJj8V
+	q3sfmVn/1jNd6yhAtz3phB22Er9pgrsn11BL7i3gLTJzizNd9VadZ5bt9rGH8CJpAMU2UvErdbv
+	LY1Cf7tuYeEhBEajuEzjR7xkVc7sj506ap1c/ICHT/wtm+dz3V0aSksZPc6ntDs8Qb2ICI3Ofih
+	ZiaPUpIpqLNNudhju2AhpD56Ky+aSRs9OOi98bfnLpLJRUolZZUoafKnCr2sdXnBxExq3zZWIwU
+	Z0evyscWh7msvJHuqK8yxBxXMMfIaHXSiFZvYqj7O0zbuTrmjcIv/0FeYnHFvBBN5qFme46OV6i
+	fR5lMLhtICsC7oi3Z3kZkTTMEPDLzrsz8mGB/ckWnhW4p2Wb3RObnyEvY6ywl5UGL1+4i9098/9
+	054GLFaCt27qS1BppllgA=
+X-Received: by 2002:a05:6300:614e:b0:3a3:adea:83bc with SMTP id adf61e73a8af0-3b7857de9bamr8068767637.15.1781409688176;
+        Sat, 13 Jun 2026 21:01:28 -0700 (PDT)
 Received: from mincom1 ([115.4.79.42])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661a67603sm5676983a12.0.2026.06.13.21.01.17
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661a67603sm5676983a12.0.2026.06.13.21.01.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jun 2026 21:01:21 -0700 (PDT)
+        Sat, 13 Jun 2026 21:01:27 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: netdev@vger.kernel.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>
@@ -98,9 +98,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Felix Fietkau <nbd@nbd.name>,
 	linux-kernel@vger.kernel.org,
 	Jihong Min <hurryman2212@gmail.com>
-Subject: [RFC PATCH net-next 5/7] net: airoha: add QDMA support for SOE packets
-Date: Sun, 14 Jun 2026 13:00:30 +0900
-Message-ID: <20260614040032.1567994-6-hurryman2212@gmail.com>
+Subject: [RFC PATCH net-next 6/7] net: airoha: add PPE support for SOE flows
+Date: Sun, 14 Jun 2026 13:00:31 +0900
+Message-ID: <20260614040032.1567994-7-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260614040032.1567994-1-hurryman2212@gmail.com>
 References: <20260614040032.1567994-1-hurryman2212@gmail.com>
@@ -123,7 +123,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299136-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299137-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[hurryman2212@gmail.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gondor.apana.org.au,secunet.com,vger.kernel.org,gmail.com,collabora.com,lists.infradead.org,nbd.name];
 	FREEMAIL_FROM(0.00)[gmail.com];
@@ -146,969 +146,798 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AD93C680549
+X-Rspamd-Queue-Id: 64E7B680558
 
-Add QDMA RX/TX plumbing for SOE packets, including the SOE RX ring,
-coherent RX slots, SOE completion decoding, and the private QDMA submit
-helper used by the SOE provider. Wire the Ethernet netdev feature and
-lifetime hooks through the SOE stubs.
+Add PPE metadata handling for SOE flows so decrypted packets can carry
+their original FOE/SA context until the normal egress path is known, and
+so XFRM flowtable entries can be programmed with SOE SA and hop
+information.
 
 Signed-off-by: Jihong Min <hurryman2212@gmail.com>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 668 ++++++++++++++++++++---
- 1 file changed, 591 insertions(+), 77 deletions(-)
+ drivers/net/ethernet/airoha/airoha_ppe.c  | 606 +++++++++++++++++++++-
+ include/linux/soc/airoha/airoha_offload.h |   5 +
+ 2 files changed, 585 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 5f1a118875fb..42fd30c12ed7 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -6,6 +6,7 @@
- #include <linux/of.h>
- #include <linux/of_net.h>
- #include <linux/of_reserved_mem.h>
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 91bcc55a6ac6..faa5f04d4c7b 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -6,18 +6,77 @@
+ 
+ #include <linux/ip.h>
+ #include <linux/ipv6.h>
++#include <linux/kstrtox.h>
 +#include <linux/moduleparam.h>
+ #include <linux/of_platform.h>
  #include <linux/platform_device.h>
- #include <linux/tcp.h>
- #include <linux/u64_stats_sync.h>
-@@ -16,6 +17,67 @@
+ #include <linux/rhashtable.h>
++#include <linux/sysfs.h>
++#include <linux/tcp.h>
++#include <linux/udp.h>
+ #include <net/ipv6.h>
++#include <net/netfilter/nf_flow_table.h>
+ #include <net/pkt_cls.h>
++#include <net/route.h>
  
  #include "airoha_regs.h"
  #include "airoha_eth.h"
 +#include "airoha_soe.h"
+ 
+ static DEFINE_MUTEX(flow_offload_mutex);
+ static DEFINE_SPINLOCK(ppe_lock);
+ 
++#define AIROHA_FOE_HOP0			GENMASK(31, 29)
++#define AIROHA_FOE_HOP1			GENMASK(28, 26)
++#define AIROHA_FOE_HOP2			GENMASK(25, 23)
++#define AIROHA_FOE_HOP3			GENMASK(22, 20)
++#define AIROHA_FOE_HOP_MASK						\
++	(AIROHA_FOE_HOP0 | AIROHA_FOE_HOP1 | AIROHA_FOE_HOP2 |		\
++	 AIROHA_FOE_HOP3)
++#define AIROHA_PPE_SOE_DEFAULT_TUNNEL_MTU	1500
++#define AIROHA_PPE_SOE_MAGIC_IPSEC		0x72a1
++#define AIROHA_PPE_SOE_PORT_AG			0x3f
++#define AIROHA_PPE_SOE_CHANNEL			2
++#define AIROHA_PPE_SOE_META_TIMEOUT_MS		1000
++#define AIROHA_PPE_SOE_MAGIC_GDM4		0x729a
++#define AIROHA_PPE_SOE_MARK_MAGIC		0x5e000000
++#define AIROHA_PPE_SOE_MARK_MAGIC_MASK		0xff000000
++#define AIROHA_PPE_SOE_MARK_HASH_MASK		0x00ffff00
++#define AIROHA_PPE_DEFAULT_BIND_RATE		0x1e
++#define AIROHA_PPE_SOE_BIND_DELAY_PACKETS	2
++#define AIROHA_PPE_FORCE_COMMIT_PROBE_WINDOW	0
 +
-+/* QDMA1 uses a different RX IRQ bank layout than QDMA0 on EN7581. */
-+#define AIROHA_QDMA_WAN_RX_IRQ0_BANK_PIN_MASK 0x0000839f
-+#define AIROHA_QDMA_WAN_RX_IRQ1_BANK_PIN_MASK 0x7f800400
-+#define AIROHA_QDMA_WAN_RX_IRQ2_BANK_PIN_MASK 0x00000000
-+#define AIROHA_QDMA_WAN_RX_IRQ3_BANK_PIN_MASK 0x00000040
-+
-+static unsigned int airoha_qdma0_rx_irq_bank_mask[AIROHA_MAX_NUM_IRQ_BANKS] = {
-+	RX_IRQ0_BANK_PIN_MASK,
-+	RX_IRQ1_BANK_PIN_MASK,
-+	RX_IRQ2_BANK_PIN_MASK,
-+	RX_IRQ3_BANK_PIN_MASK,
++struct airoha_ppe_soe_tuple_info {
++	unsigned int tunnel_mtu;
++	u8 sa_index;
++	u8 hop;
 +};
 +
-+static unsigned int airoha_qdma1_rx_irq_bank_mask[AIROHA_MAX_NUM_IRQ_BANKS] = {
-+	AIROHA_QDMA_WAN_RX_IRQ0_BANK_PIN_MASK,
-+	AIROHA_QDMA_WAN_RX_IRQ1_BANK_PIN_MASK,
-+	AIROHA_QDMA_WAN_RX_IRQ2_BANK_PIN_MASK,
-+	AIROHA_QDMA_WAN_RX_IRQ3_BANK_PIN_MASK,
-+};
++static unsigned int airoha_ppe_bind_rate = AIROHA_PPE_DEFAULT_BIND_RATE;
++static unsigned int airoha_ppe_soe_inline_bind_delay_packets =
++	AIROHA_PPE_SOE_BIND_DELAY_PACKETS;
++static unsigned int airoha_ppe_soe_inline_force_commit_probe_window =
++	AIROHA_PPE_FORCE_COMMIT_PROBE_WINDOW;
++static struct airoha_ppe *airoha_ppe_active;
 +
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+#define AIROHA_SOE_RX_RING 10
-+#define AIROHA_SOE_RX_ALLOC_NDESC 2048
-+#define AIROHA_SOE_RX_NDESC_DEFAULT 512
-+#define AIROHA_SOE_RX_BUF_SIZE 4096
-+#define AIROHA_SOE_RX_BUF_SIZE_MIN 128
-+#define AIROHA_SOE_RX_BUF_SIZE_MAX 16384
-+#define AIROHA_SOE_DECRYPT_FOE_REASON_MASK \
-+	(BIT(PPE_CPU_REASON_UN_HIT) | BIT(PPE_CPU_REASON_HIT_UNBIND) | \
-+	 BIT(PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED))
++static int airoha_ppe_set_bind_rate(const char *val,
++				    const struct kernel_param *kp);
++static int airoha_ppe_get_bind_rate(char *buf, const struct kernel_param *kp);
 +
-+static int airoha_soe_rx_poll_desc_budget = AIROHA_SOE_RX_NDESC_DEFAULT;
-+static int airoha_soe_rx_max_frame_descs = 128;
-+static int airoha_soe_probe_rx_ndesc = AIROHA_SOE_RX_NDESC_DEFAULT;
-+static int airoha_soe_probe_rx_buf_size = AIROHA_SOE_RX_BUF_SIZE;
-+static bool airoha_soe_probe_rx_coherent = true;
-+static int airoha_soe_probe_rx_scatter = 1;
++module_param_named(soe_inline_force_commit_probe_window,
++		   airoha_ppe_soe_inline_force_commit_probe_window, uint, 0600);
++MODULE_PARM_DESC(soe_inline_force_commit_probe_window,
++		 "Adjacent FOE slots searched before force-commit");
++module_param_named(soe_inline_bind_delay_packets,
++		   airoha_ppe_soe_inline_bind_delay_packets, uint, 0600);
++MODULE_PARM_DESC(soe_inline_bind_delay_packets,
++		 "CPU-visible SOE decrypt packets before binding FOE entry");
++module_param_call(ppe_bind_rate, airoha_ppe_set_bind_rate,
++		  airoha_ppe_get_bind_rate, NULL, 0600);
++__MODULE_PARM_TYPE(ppe_bind_rate, "uint");
++MODULE_PARM_DESC(ppe_bind_rate,
++		 "PPE bind-rate threshold for L2B and bind fields");
 +
-+module_param_named(soe_rx_poll_desc_budget, airoha_soe_rx_poll_desc_budget, int,
-+		   0600);
-+MODULE_PARM_DESC(soe_rx_poll_desc_budget,
-+		 "Maximum SOE RX descriptors consumed per poll");
-+module_param_named(soe_rx_max_frame_descs, airoha_soe_rx_max_frame_descs, int,
-+		   0600);
-+MODULE_PARM_DESC(soe_rx_max_frame_descs,
-+		 "Maximum descriptors per SOE RX frame before dropping the chain");
-+module_param_named(soe_probe_rx_ndesc, airoha_soe_probe_rx_ndesc, int, 0600);
-+MODULE_PARM_DESC(soe_probe_rx_ndesc, "SOE RX descriptor count");
-+module_param_named(soe_probe_rx_buf_size, airoha_soe_probe_rx_buf_size, int,
-+		   0600);
-+MODULE_PARM_DESC(soe_probe_rx_buf_size, "SOE RX buffer size");
-+module_param_named(soe_probe_rx_coherent, airoha_soe_probe_rx_coherent, bool,
-+		   0600);
-+MODULE_PARM_DESC(soe_probe_rx_coherent, "Use coherent SOE RX buffers");
-+module_param_named(soe_probe_rx_scatter, airoha_soe_probe_rx_scatter, int,
-+		   0600);
-+MODULE_PARM_DESC(soe_probe_rx_scatter,
-+		 "SOE RX scatter mode: 0 disabled, 1 enabled");
-+#endif
- 
- u32 airoha_rr(void __iomem *base, u32 offset)
- {
-@@ -71,6 +133,100 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
- 	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
+ static const struct rhashtable_params airoha_flow_table_params = {
+ 	.head_offset = offsetof(struct airoha_flow_table_entry, node),
+ 	.key_offset = offsetof(struct airoha_flow_table_entry, cookie),
+@@ -78,6 +137,17 @@ bool airoha_ppe_is_enabled(struct airoha_eth *eth, int index)
+ 	return airoha_fe_rr(eth, REG_PPE_GLO_CFG(index)) & PPE_GLO_CFG_EN_MASK;
  }
  
-+static unsigned int *airoha_qdma_rx_irq_bank_masks(struct airoha_qdma *qdma)
++static void airoha_ppe_apply_bind_rate(struct airoha_eth *eth, int ppe_idx)
 +{
-+	struct airoha_eth *eth = qdma->eth;
-+	int id = qdma - &eth->qdma[0];
++	u32 rate = min_t(u32, READ_ONCE(airoha_ppe_bind_rate),
++			 FIELD_MAX(PPE_BIND_RATE_BIND_MASK));
 +
-+	return id ? airoha_qdma1_rx_irq_bank_mask :
-+		    airoha_qdma0_rx_irq_bank_mask;
++	airoha_fe_rmw(eth, REG_PPE_BIND_RATE(ppe_idx),
++		      PPE_BIND_RATE_L2B_BIND_MASK | PPE_BIND_RATE_BIND_MASK,
++		      FIELD_PREP(PPE_BIND_RATE_L2B_BIND_MASK, rate) |
++			      FIELD_PREP(PPE_BIND_RATE_BIND_MASK, rate));
 +}
 +
-+static u32 airoha_qdma_rx_irq_bank_mask(struct airoha_qdma *qdma, int bank)
-+{
-+	unsigned int *masks = airoha_qdma_rx_irq_bank_masks(qdma);
-+
-+	if (bank < 0 || bank >= AIROHA_MAX_NUM_IRQ_BANKS)
-+		return 0;
-+
-+	return READ_ONCE(masks[bank]);
-+}
-+
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+static u32 airoha_qdma_rx_irq_all_bank_mask(struct airoha_qdma *qdma)
-+{
-+	u32 mask = 0;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(qdma->irq_banks); i++)
-+		mask |= airoha_qdma_rx_irq_bank_mask(qdma, i);
-+
-+	return mask;
-+}
-+#endif
-+
-+static void airoha_qdma_apply_rx_irq_bank_masks(struct airoha_qdma *qdma)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(qdma->irq_banks); i++) {
-+		struct airoha_irq_bank *irq_bank = &qdma->irq_banks[i];
-+		u32 mask = airoha_qdma_rx_irq_bank_mask(qdma, i);
-+
-+		airoha_qdma_set_irqmask(irq_bank, QDMA_INT_REG_IDX0,
-+					RX_COHERENT_LOW_INT_MASK,
-+					INT_RX0_MASK(mask));
-+		airoha_qdma_set_irqmask(irq_bank, QDMA_INT_REG_IDX1,
-+					RX_NO_CPU_DSCP_LOW_INT_MASK |
-+						RX_DONE_LOW_INT_MASK,
-+					INT_RX1_MASK(mask));
-+		airoha_qdma_set_irqmask(irq_bank, QDMA_INT_REG_IDX2,
-+					RX_NO_CPU_DSCP_HIGH_INT_MASK |
-+						RX_DONE_HIGH_INT_MASK,
-+					INT_RX2_MASK(mask));
-+		airoha_qdma_set_irqmask(irq_bank, QDMA_INT_REG_IDX3,
-+					RX_COHERENT_HIGH_INT_MASK,
-+					INT_RX3_MASK(mask));
-+	}
-+}
-+
-+static void airoha_qdma_set_rx_done_irq(struct airoha_qdma *qdma, int qid,
-+					bool enable)
-+{
-+	int i, intr_reg;
-+	u32 mask;
-+
-+	intr_reg = qid < RX_DONE_HIGH_OFFSET ? QDMA_INT_REG_IDX1 :
-+					       QDMA_INT_REG_IDX2;
-+	mask = BIT(qid % RX_DONE_HIGH_OFFSET);
-+
-+	for (i = 0; i < ARRAY_SIZE(qdma->irq_banks); i++) {
-+		if (!(BIT(qid) & airoha_qdma_rx_irq_bank_mask(qdma, i)))
-+			continue;
-+
-+		if (enable)
-+			airoha_qdma_irq_enable(&qdma->irq_banks[i], intr_reg,
-+					       mask);
-+		else
-+			airoha_qdma_irq_disable(&qdma->irq_banks[i], intr_reg,
-+						mask);
-+	}
-+
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (qid != AIROHA_SOE_RX_RING)
-+		return;
-+
-+	if (BIT(qid) & airoha_qdma_rx_irq_all_bank_mask(qdma))
-+		return;
-+
-+	/* SOE RX10 may not be covered by the shared bank mask; use bank 0. */
-+	if (enable)
-+		airoha_qdma_irq_enable(&qdma->irq_banks[0], intr_reg, mask);
-+	else
-+		airoha_qdma_irq_disable(&qdma->irq_banks[0], intr_reg, mask);
-+#endif
-+}
-+
- static int airoha_set_macaddr(struct airoha_gdm_dev *dev, const u8 *addr)
+ static u32 airoha_ppe_get_timestamp(struct airoha_ppe *ppe)
  {
- 	u8 ref_addr[ETH_ALEN] __aligned(2);
-@@ -532,6 +688,11 @@ static int airoha_fe_init(struct airoha_eth *eth)
- 	airoha_fe_wr(eth, REG_FE_CDM1_OQ_MAP2, BIT(4));
- 	airoha_fe_wr(eth, REG_FE_CDM1_OQ_MAP3, BIT(28));
+ 	return airoha_fe_get(ppe->eth, REG_FE_FOE_TS,
+@@ -157,15 +227,14 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+ 			      FIELD_PREP(PPE_DRAM_TB_NUM_ENTRY_MASK,
+ 					 dram_num_entries));
  
-+	/* SOE/TDMA output depends on PSE shared-buffer flow control instead
-+	 * of leaving port-local sharing disabled.
-+	 */
-+	airoha_fe_clear(eth, REG_PSE_FC_CFG, PSE_TDMA_SHARE_BUF_DIS_MASK);
-+
- 	airoha_fe_vip_setup(eth);
- 	airoha_fe_pse_ports_init(eth);
+-		airoha_fe_rmw(eth, REG_PPE_BIND_RATE(i),
+-			      PPE_BIND_RATE_L2B_BIND_MASK |
+-			      PPE_BIND_RATE_BIND_MASK,
+-			      FIELD_PREP(PPE_BIND_RATE_L2B_BIND_MASK, 0x1e) |
+-			      FIELD_PREP(PPE_BIND_RATE_BIND_MASK, 0x1e));
++		airoha_ppe_apply_bind_rate(eth, i);
  
-@@ -597,20 +758,29 @@ static int airoha_qdma_fill_rx_queue(struct airoha_queue *q)
- 		int offset;
- 		u32 val;
+ 		airoha_fe_wr(eth, REG_PPE_HASH_SEED(i), PPE_HASH_SEED);
+ 		airoha_fe_clear(eth, REG_PPE_PPE_FLOW_CFG(i),
+ 				PPE_FLOW_CFG_IP6_6RD_MASK);
++		airoha_fe_set(eth, REG_PPE_PPE_FLOW_CFG(i),
++			      PPE_FLOW_CFG_IP4_IPSEC_MASK |
++				      PPE_FLOW_CFG_IP6_IPSEC_MASK);
  
--		page = page_pool_dev_alloc_frag(q->page_pool, &offset,
--						q->buf_size);
--		if (!page)
--			break;
-+		if (q->rx_coherent) {
-+			/* Coherent slots avoid page_pool recycling for SOE frames. */
-+			offset = q->head * q->buf_size;
-+			e->buf = q->rx_coherent_buf + offset;
-+			e->dma_addr = q->rx_coherent_dma + offset;
-+			e->dma_len = q->buf_size;
-+		} else {
-+			page = page_pool_dev_alloc_frag(q->page_pool, &offset,
-+							q->buf_size);
-+			if (!page)
-+				break;
-+
-+			offset += AIROHA_RX_HEADROOM;
-+			e->buf = page_address(page) + offset;
-+			e->dma_addr = page_pool_get_dma_addr(page) + offset;
-+			e->dma_len =
-+				SKB_WITH_OVERHEAD(AIROHA_RX_LEN(q->buf_size));
-+		}
- 
- 		q->head = (q->head + 1) % q->ndesc;
- 		q->queued++;
- 		nframes++;
- 
--		offset += AIROHA_RX_HEADROOM;
--		e->buf = page_address(page) + offset;
--		e->dma_addr = page_pool_get_dma_addr(page) + offset;
--		e->dma_len = SKB_WITH_OVERHEAD(AIROHA_RX_LEN(q->buf_size));
--
- 		val = FIELD_PREP(QDMA_DESC_LEN_MASK, e->dma_len);
- 		WRITE_ONCE(desc->ctrl, cpu_to_le32(val));
- 		WRITE_ONCE(desc->addr, cpu_to_le32(e->dma_addr));
-@@ -652,92 +822,210 @@ airoha_qdma_get_gdm_dev(struct airoha_eth *eth, struct airoha_qdma_desc *desc)
- 	return port->devs[d] ? port->devs[d] : ERR_PTR(-ENODEV);
- }
- 
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+static bool airoha_qdma_rx_is_soe(u32 msg0)
-+{
-+	u32 hop_flags = FIELD_GET(QDMA_ETH_RXMSG_HOP_FLAGS_MASK, msg0);
-+
-+	return hop_flags >= 3 && hop_flags <= 7;
-+}
-+#endif
-+
- static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- {
--	enum dma_data_direction dir = page_pool_get_dma_dir(q->page_pool);
-+	enum dma_data_direction dir;
- 	struct airoha_qdma *qdma = q->qdma;
- 	struct airoha_eth *eth = qdma->eth;
- 	int qid = q - &qdma->q_rx[0];
-+	int desc_budget = q->ndesc;
-+	int desc_done = 0;
- 	int done = 0;
- 
--	while (done < budget) {
-+	dir = q->rx_coherent ? DMA_FROM_DEVICE :
-+			       page_pool_get_dma_dir(q->page_pool);
-+
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (airoha_soe_rx_poll_desc_budget > 0)
-+		desc_budget = min(airoha_soe_rx_poll_desc_budget, q->ndesc);
-+#endif
-+
-+	while (q->queued > 0 && done < budget && desc_done < desc_budget) {
- 		struct airoha_queue_entry *e = &q->entry[q->tail];
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
--		u32 hash, reason, msg1, desc_ctrl;
--		struct airoha_gdm_dev *dev;
-+		u32 hash, reason, msg0, msg1, msg2, desc_ctrl;
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+		/* Scattered SOE completions only tag the first descriptor. */
-+		bool partial_soe = q->skb && !q->skb->dev;
-+#endif
-+		struct airoha_gdm_dev *dev = NULL;
-+		struct net_device *rx_dev = NULL;
- 		struct net_device *netdev;
-+		bool soe_pkt = false;
- 		int data_len, len;
--		struct page *page;
-+		struct page *page = NULL;
- 
- 		desc_ctrl = le32_to_cpu(READ_ONCE(desc->ctrl));
- 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
- 			break;
- 
- 		dma_rmb();
-+		desc_done++;
- 
- 		q->tail = (q->tail + 1) % q->ndesc;
- 		q->queued--;
- 
--		dma_sync_single_for_cpu(eth->dev, e->dma_addr, e->dma_len,
--					dir);
-+		if (!q->rx_coherent)
-+			dma_sync_single_for_cpu(eth->dev, e->dma_addr,
-+						e->dma_len, dir);
-+
-+		if (!q->rx_coherent)
-+			page = virt_to_head_page(e->buf);
-+
-+		if (q->rx_drop_chain) {
-+			if (!FIELD_GET(QDMA_DESC_MORE_MASK, desc_ctrl)) {
-+				q->rx_drop_chain = false;
-+				q->rx_frame_descs = 0;
-+				done++;
-+			}
-+			if (!q->rx_coherent)
-+				page_pool_put_full_page(q->page_pool, page,
-+							true);
-+			continue;
-+		}
- 
--		page = virt_to_head_page(e->buf);
- 		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
--		data_len = q->skb ? AIROHA_RX_LEN(q->buf_size) : e->dma_len;
-+		data_len = q->skb && !q->rx_coherent ?
-+				   AIROHA_RX_LEN(q->buf_size) :
-+				   e->dma_len;
- 		if (!len || data_len < len)
- 			goto free_frag;
- 
--		dev = airoha_qdma_get_gdm_dev(eth, desc);
--		if (IS_ERR(dev))
--			goto free_frag;
-+		msg0 = le32_to_cpu(READ_ONCE(desc->msg0));
-+		msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
-+		msg2 = le32_to_cpu(READ_ONCE(desc->msg2));
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+		soe_pkt = partial_soe || airoha_qdma_rx_is_soe(msg0);
-+#endif
-+		if (!soe_pkt) {
-+			dev = airoha_qdma_get_gdm_dev(eth, desc);
-+			if (IS_ERR(dev))
-+				goto free_frag;
-+			netdev = netdev_from_priv(dev);
-+			rx_dev = netdev;
-+		}
- 
--		netdev = netdev_from_priv(dev);
- 		if (!q->skb) { /* first buffer */
--			q->skb = napi_build_skb(e->buf - AIROHA_RX_HEADROOM,
--						q->buf_size);
-+			if (q->rx_coherent) {
-+				q->skb = napi_alloc_skb(&q->napi, len);
-+				if (q->skb)
-+					skb_put_data(q->skb, e->buf, len);
-+			} else {
-+				void *buf = e->buf - AIROHA_RX_HEADROOM;
-+
-+				q->skb = napi_build_skb(buf, q->buf_size);
-+			}
- 			if (!q->skb)
- 				goto free_frag;
- 
--			skb_reserve(q->skb, AIROHA_RX_HEADROOM);
--			__skb_put(q->skb, len);
--			skb_mark_for_recycle(q->skb);
--			q->skb->dev = netdev;
--			q->skb->protocol = eth_type_trans(q->skb, netdev);
--			q->skb->ip_summed = CHECKSUM_UNNECESSARY;
-+			q->rx_drop_chain = false;
-+			q->rx_frame_descs = 1;
-+			if (!q->rx_coherent) {
-+				skb_reserve(q->skb, AIROHA_RX_HEADROOM);
-+				__skb_put(q->skb, len);
-+				skb_mark_for_recycle(q->skb);
-+			}
-+			q->skb->dev = soe_pkt ? NULL : netdev;
-+			q->skb->ip_summed = soe_pkt ? CHECKSUM_NONE :
-+						      CHECKSUM_UNNECESSARY;
- 			skb_record_rx_queue(q->skb, qid);
-+			if (soe_pkt) {
-+				q->soe_rx_msg0 = msg0;
-+				q->soe_rx_msg2 = msg2;
-+			}
-+			if (!soe_pkt)
-+				q->skb->protocol = eth_type_trans(q->skb,
-+								  netdev);
- 		} else { /* scattered frame */
--			struct skb_shared_info *shinfo = skb_shinfo(q->skb);
--			int nr_frags = shinfo->nr_frags;
--
--			if (nr_frags >= ARRAY_SIZE(shinfo->frags))
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+			if (soe_pkt && airoha_soe_rx_max_frame_descs > 0 &&
-+			    q->rx_frame_descs >=
-+				    airoha_soe_rx_max_frame_descs) {
-+				q->rx_drop_chain =
-+					FIELD_GET(QDMA_DESC_MORE_MASK, desc_ctrl);
- 				goto free_frag;
--
--			skb_add_rx_frag(q->skb, nr_frags, page,
--					e->buf - page_address(page), len,
--					q->buf_size);
-+			}
-+#endif
-+			q->rx_frame_descs++;
-+			if (q->rx_coherent) {
-+				if (skb_tailroom(q->skb) < len) {
-+					unsigned int needed;
-+
-+					needed = len - skb_tailroom(q->skb);
-+					if (pskb_expand_head(q->skb, 0, needed,
-+							     GFP_ATOMIC))
-+						goto free_frag;
-+				}
-+				skb_put_data(q->skb, e->buf, len);
-+			} else {
-+				struct skb_shared_info *shinfo =
-+					skb_shinfo(q->skb);
-+				int nr_frags = shinfo->nr_frags;
-+
-+				if (nr_frags >= ARRAY_SIZE(shinfo->frags))
-+					goto free_frag;
-+
-+				skb_add_rx_frag(q->skb, nr_frags, page,
-+						e->buf - page_address(page),
-+						len, q->buf_size);
-+			}
- 		}
- 
- 		if (FIELD_GET(QDMA_DESC_MORE_MASK, desc_ctrl))
- 			continue;
- 
-+		q->rx_drop_chain = false;
-+		q->rx_frame_descs = 0;
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+		if (soe_pkt) {
-+			u32 hop_flags = FIELD_GET(QDMA_ETH_RXMSG_HOP_FLAGS_MASK,
-+						  q->soe_rx_msg0);
-+			u32 sa_index = FIELD_GET(QDMA_ETH_RXMSG_SW_UDF_MASK,
-+						 q->soe_rx_msg2);
-+
-+			done++;
-+			if (!airoha_soe_rx_skb(eth->soe, q->skb, sa_index,
-+					       hop_flags))
-+				dev_kfree_skb(q->skb);
-+			q->skb = NULL;
-+			continue;
-+		}
-+#endif
-+
- 		if (netdev_uses_dsa(netdev)) {
- 			struct airoha_gdm_port *port = dev->port;
-+			struct dsa_port *cpu_dp = netdev->dsa_ptr;
-+			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG, msg0);
- 
- 			/* PPE module requires untagged packets to work
- 			 * properly and it provides DSA port index via the
- 			 * DMA descriptor. Report DSA tag to the DSA stack
- 			 * via skb dst info.
- 			 */
--			u32 msg0 = le32_to_cpu(READ_ONCE(desc->msg0));
--			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG, msg0);
--
- 			if (sptag < ARRAY_SIZE(port->dsa_meta) &&
- 			    port->dsa_meta[sptag])
- 				skb_dst_set_noref(q->skb,
- 						  &port->dsa_meta[sptag]->dst);
-+
-+			if (cpu_dp && cpu_dp->ds) {
-+				struct dsa_port *dp =
-+					dsa_to_port(cpu_dp->ds, sptag);
-+
-+				if (dp && dsa_port_is_user(dp) &&
-+				    dp->cpu_dp == cpu_dp && dp->user)
-+					rx_dev = dp->user;
-+			}
- 		}
- 
--		msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
- 		hash = FIELD_GET(AIROHA_RXD4_FOE_ENTRY, msg1);
- 		if (hash != AIROHA_RXD4_FOE_ENTRY)
- 			skb_set_hash(q->skb, jhash_1word(hash, 0),
-@@ -749,18 +1037,54 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 					     false);
- 
- 		done++;
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+		/* Native ESP/NAT-T packets enter through the normal RX path
-+		 * first. If they match an inbound packet-offload SA, consume
-+		 * the encrypted skb here and resubmit it to SOE before GRO
-+		 * takes ownership of the packet. SOE decrypts the original
-+		 * ESP/NAT-T packet; after GRO or the normal RX stack processes
-+		 * the skb, it is no longer a suitable hardware decrypt
-+		 * candidate. Keep the RX FOE hash/reason so the decrypt
-+		 * completion can later bind the PPE flow after egress is known.
-+		 */
-+		if (hash != AIROHA_RXD4_FOE_ENTRY) {
-+			bool foe_valid = false;
-+
-+			if (reason < 32)
-+				foe_valid = AIROHA_SOE_DECRYPT_FOE_REASON_MASK &
-+					    BIT(reason);
-+			if (airoha_soe_rx_plain_skb(dev, q->skb, rx_dev, hash,
-+						    reason, foe_valid)) {
-+				q->skb = NULL;
-+				continue;
-+			}
-+		} else if (airoha_soe_rx_plain_skb(dev, q->skb, rx_dev, hash,
-+						   reason, false)) {
-+			q->skb = NULL;
-+			continue;
-+		}
-+#endif
- 		napi_gro_receive(&q->napi, q->skb);
- 		q->skb = NULL;
- 		continue;
- free_frag:
-+		q->rx_drop_chain = !!FIELD_GET(QDMA_DESC_MORE_MASK, desc_ctrl);
-+		q->rx_frame_descs = 0;
-+		done++;
- 		if (q->skb) {
- 			dev_kfree_skb(q->skb);
- 			q->skb = NULL;
- 		}
--		page_pool_put_full_page(q->page_pool, page, true);
-+		if (!q->rx_coherent)
-+			page_pool_put_full_page(q->page_pool, page, true);
- 	}
- 	airoha_qdma_fill_rx_queue(q);
- 
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (desc_done && !done)
-+		return 1;
-+#endif
-+
- 	return done;
- }
- 
-@@ -776,17 +1100,9 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
- 
- 	if (done < budget && napi_complete(napi)) {
- 		struct airoha_qdma *qdma = q->qdma;
--		int i, qid = q - &qdma->q_rx[0];
--		int intr_reg = qid < RX_DONE_HIGH_OFFSET ? QDMA_INT_REG_IDX1
--							 : QDMA_INT_REG_IDX2;
--
--		for (i = 0; i < ARRAY_SIZE(qdma->irq_banks); i++) {
--			if (!(BIT(qid) & RX_IRQ_BANK_PIN_MASK(i)))
--				continue;
-+		int qid = q - &qdma->q_rx[0];
- 
--			airoha_qdma_irq_enable(&qdma->irq_banks[i], intr_reg,
--					       BIT(qid % RX_DONE_HIGH_OFFSET));
--		}
-+		airoha_qdma_set_rx_done_irq(qdma, qid, true);
- 	}
- 
- 	return done;
-@@ -795,7 +1111,7 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
- static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 				     struct airoha_qdma *qdma, int ndesc)
- {
--	const struct page_pool_params pp_params = {
-+	struct page_pool_params pp_params = {
- 		.order = 0,
- 		.pool_size = 256,
- 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-@@ -809,8 +1125,21 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 	int qid = q - &qdma->q_rx[0], thr;
- 	dma_addr_t dma_addr;
- 
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (qid == AIROHA_SOE_RX_RING) {
-+		ndesc = max(ndesc, AIROHA_SOE_RX_ALLOC_NDESC);
-+		if (airoha_soe_probe_rx_ndesc > 0)
-+			ndesc = clamp(airoha_soe_probe_rx_ndesc, 1,
-+				      AIROHA_SOE_RX_ALLOC_NDESC);
-+	}
-+#endif
-+
- 	q->buf_size = PAGE_SIZE / 2;
- 	q->qdma = qdma;
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (qid == AIROHA_SOE_RX_RING)
-+		q->rx_coherent = airoha_soe_probe_rx_coherent;
-+#endif
- 
- 	q->entry = devm_kzalloc(eth->dev, ndesc * sizeof(*q->entry),
- 				GFP_KERNEL);
-@@ -821,19 +1150,45 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 				      &dma_addr, GFP_KERNEL);
- 	if (!q->desc)
- 		return -ENOMEM;
-+	q->desc_dma = dma_addr;
- 
--	q->page_pool = page_pool_create(&pp_params);
--	if (IS_ERR(q->page_pool)) {
--		int err = PTR_ERR(q->page_pool);
-+	if (!q->rx_coherent) {
-+		q->page_pool = page_pool_create(&pp_params);
-+		if (IS_ERR(q->page_pool)) {
-+			int err = PTR_ERR(q->page_pool);
- 
--		q->page_pool = NULL;
--		return err;
-+			q->page_pool = NULL;
-+			return err;
-+		}
-+	}
-+
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (qid == AIROHA_SOE_RX_RING) {
-+		size_t buf_size;
-+		int max_buf_size;
-+
-+		q->rx_alloc_ndesc = ndesc;
-+		max_buf_size = q->rx_coherent ? AIROHA_SOE_RX_BUF_SIZE_MAX :
-+						AIROHA_SOE_RX_BUF_SIZE;
-+		q->buf_size = clamp(airoha_soe_probe_rx_buf_size,
-+				    AIROHA_SOE_RX_BUF_SIZE_MIN, max_buf_size);
-+		if (q->rx_coherent) {
-+			buf_size = q->buf_size * ndesc;
-+			q->rx_coherent_buf =
-+				dmam_alloc_coherent(eth->dev, buf_size,
-+						    &q->rx_coherent_dma,
-+						    GFP_KERNEL);
-+			if (!q->rx_coherent_buf)
-+				return -ENOMEM;
-+			q->rx_coherent_buf_size = buf_size;
-+		}
- 	}
-+#endif
- 
- 	q->ndesc = ndesc;
- 	netif_napi_add(eth->napi_dev, &q->napi, airoha_qdma_rx_napi_poll);
- 
--	airoha_qdma_wr(qdma, REG_RX_RING_BASE(qid), dma_addr);
-+	airoha_qdma_wr(qdma, REG_RX_RING_BASE(qid), q->desc_dma);
- 	airoha_qdma_rmw(qdma, REG_RX_RING_SIZE(qid),
- 			RX_RING_SIZE_MASK,
- 			FIELD_PREP(RX_RING_SIZE_MASK, ndesc));
-@@ -843,7 +1198,14 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 			FIELD_PREP(RX_RING_THR_MASK, thr));
- 	airoha_qdma_rmw(qdma, REG_RX_DMA_IDX(qid), RX_RING_DMA_IDX_MASK,
- 			FIELD_PREP(RX_RING_DMA_IDX_MASK, q->head));
--	airoha_qdma_set(qdma, REG_RX_SCATTER_CFG(qid), RX_RING_SG_EN_MASK);
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (qid == AIROHA_SOE_RX_RING && !airoha_soe_probe_rx_scatter)
-+		airoha_qdma_clear(qdma, REG_RX_SCATTER_CFG(qid),
-+				  RX_RING_SG_EN_MASK);
-+	else
-+#endif
-+		airoha_qdma_set(qdma, REG_RX_SCATTER_CFG(qid),
-+				RX_RING_SG_EN_MASK);
- 
- 	airoha_qdma_fill_rx_queue(q);
- 
-@@ -859,11 +1221,14 @@ static void airoha_qdma_cleanup_rx_queue(struct airoha_queue *q)
- 	while (q->queued) {
- 		struct airoha_queue_entry *e = &q->entry[q->tail];
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
--		struct page *page = virt_to_head_page(e->buf);
- 
--		dma_sync_single_for_cpu(eth->dev, e->dma_addr, e->dma_len,
--					page_pool_get_dma_dir(q->page_pool));
--		page_pool_put_full_page(q->page_pool, page, false);
-+		if (!q->rx_coherent) {
-+			struct page *page = virt_to_head_page(e->buf);
-+
-+			dma_sync_single_for_cpu(eth->dev, e->dma_addr, e->dma_len,
-+						page_pool_get_dma_dir(q->page_pool));
-+			page_pool_put_full_page(q->page_pool, page, false);
-+		}
- 		/* Reset DMA descriptor */
- 		WRITE_ONCE(desc->ctrl, 0);
- 		WRITE_ONCE(desc->addr, 0);
-@@ -1045,8 +1410,24 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
- 			airoha_qdma_rmw(qdma, REG_IRQ_CLEAR_LEN(id),
- 					IRQ_CLEAR_LEN_MASK, 0x80);
- 		airoha_qdma_rmw(qdma, REG_IRQ_CLEAR_LEN(id),
--				IRQ_CLEAR_LEN_MASK, (done & 0x7f));
-+				IRQ_CLEAR_LEN_MASK,
-+				(done & 0x7f));
-+	}
-+
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (done && airoha_soe_has_pending_rx(eth->soe)) {
-+		int i;
-+
-+		/* SOE decrypt completions can lag behind TX cleanup IRQs. */
-+		for (i = 0; i < ARRAY_SIZE(eth->qdma); i++) {
-+			struct airoha_queue *rxq =
-+				&eth->qdma[i].q_rx[AIROHA_SOE_RX_RING];
-+
-+			if (rxq->ndesc)
-+				napi_schedule(&rxq->napi);
-+		}
- 	}
-+#endif
- 
- 	if (done < budget && napi_complete(napi))
- 		airoha_qdma_irq_enable(&qdma->irq_banks[0], QDMA_INT_REG_IDX0,
-@@ -1346,16 +1727,11 @@ static int airoha_qdma_hw_init(struct airoha_qdma *qdma)
- 	for (i = 0; i < ARRAY_SIZE(qdma->irq_banks); i++) {
- 		/* clear pending irqs */
- 		airoha_qdma_wr(qdma, REG_INT_STATUS(i), 0xffffffff);
--		/* setup rx irqs */
--		airoha_qdma_irq_enable(&qdma->irq_banks[i], QDMA_INT_REG_IDX0,
--				       INT_RX0_MASK(RX_IRQ_BANK_PIN_MASK(i)));
--		airoha_qdma_irq_enable(&qdma->irq_banks[i], QDMA_INT_REG_IDX1,
--				       INT_RX1_MASK(RX_IRQ_BANK_PIN_MASK(i)));
--		airoha_qdma_irq_enable(&qdma->irq_banks[i], QDMA_INT_REG_IDX2,
--				       INT_RX2_MASK(RX_IRQ_BANK_PIN_MASK(i)));
--		airoha_qdma_irq_enable(&qdma->irq_banks[i], QDMA_INT_REG_IDX3,
--				       INT_RX3_MASK(RX_IRQ_BANK_PIN_MASK(i)));
- 	}
-+	airoha_qdma_apply_rx_irq_bank_masks(qdma);
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	airoha_qdma_set_rx_done_irq(qdma, AIROHA_SOE_RX_RING, true);
-+#endif
- 	/* setup tx irqs */
- 	airoha_qdma_irq_enable(&qdma->irq_banks[0], QDMA_INT_REG_IDX0,
- 			       TX_COHERENT_LOW_INT_MASK | INT_TX_MASK);
-@@ -2176,6 +2552,110 @@ int airoha_get_fe_port(struct airoha_gdm_dev *dev)
- 	}
- }
- 
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+int airoha_qdma_xmit_skb(struct airoha_gdm_dev *dev, struct sk_buff *skb,
-+			 u32 msg0, u32 msg1, u32 msg2)
-+{
-+	struct net_device *netdev = netdev_from_priv(dev);
-+	struct airoha_qdma *qdma = dev->qdma;
-+	u32 nr_frags, len;
-+	struct airoha_queue_entry *e;
-+	struct netdev_queue *txq;
-+	struct airoha_queue *q;
-+	LIST_HEAD(tx_list);
-+	int i = 0, qid;
-+	void *data;
-+	u16 index;
-+
-+	qid = airoha_qdma_get_txq(qdma, skb_get_queue_mapping(skb));
-+	q = &qdma->q_tx[qid];
-+	if (WARN_ON_ONCE(!q->ndesc))
-+		return -ENODEV;
-+
-+	spin_lock_bh(&q->lock);
-+
-+	txq = skb_get_tx_queue(netdev, skb);
-+	nr_frags = 1 + skb_shinfo(skb)->nr_frags;
-+	if (q->queued + nr_frags >= q->ndesc) {
-+		netif_tx_stop_queue(txq);
-+		q->txq_stopped = true;
-+		spin_unlock_bh(&q->lock);
-+		return -EBUSY;
-+	}
-+
-+	len = skb_headlen(skb);
-+	data = skb->data;
-+
-+	e = list_first_entry(&q->tx_list, struct airoha_queue_entry, list);
-+	index = e - q->entry;
-+
-+	while (true) {
-+		struct airoha_qdma_desc *desc = &q->desc[index];
-+		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-+		dma_addr_t addr;
-+		u32 val;
-+
-+		addr = dma_map_single(netdev->dev.parent, data, len,
-+				      DMA_TO_DEVICE);
-+		if (unlikely(dma_mapping_error(netdev->dev.parent, addr)))
-+			goto error_unmap;
-+
-+		list_move_tail(&e->list, &tx_list);
-+		e->skb = i == nr_frags - 1 ? skb : NULL;
-+		e->dma_addr = addr;
-+		e->dma_len = len;
-+
-+		e = list_first_entry(&q->tx_list, struct airoha_queue_entry,
-+				     list);
-+		index = e - q->entry;
-+
-+		val = FIELD_PREP(QDMA_DESC_LEN_MASK, len);
-+		if (i < nr_frags - 1)
-+			val |= FIELD_PREP(QDMA_DESC_MORE_MASK, 1);
-+		WRITE_ONCE(desc->ctrl, cpu_to_le32(val));
-+		WRITE_ONCE(desc->addr, cpu_to_le32(addr));
-+		val = FIELD_PREP(QDMA_DESC_NEXT_ID_MASK, index);
-+		WRITE_ONCE(desc->data, cpu_to_le32(val));
-+		WRITE_ONCE(desc->msg0, cpu_to_le32(msg0));
-+		WRITE_ONCE(desc->msg1, cpu_to_le32(msg1));
-+		WRITE_ONCE(desc->msg2, cpu_to_le32(msg2));
-+
-+		if (++i == nr_frags)
-+			break;
-+
-+		data = skb_frag_address(frag);
-+		len = skb_frag_size(frag);
-+	}
-+	q->queued += i;
-+
-+	skb_tx_timestamp(skb);
-+	netdev_tx_sent_queue(txq, skb->len);
-+	if (q->ndesc - q->queued < q->free_thr) {
-+		netif_tx_stop_queue(txq);
-+		q->txq_stopped = true;
-+	}
-+
-+	/* SOE submits do not run in the regular ndo_start_xmit batching path. */
-+	airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid), TX_RING_CPU_IDX_MASK,
-+			FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
-+
-+	spin_unlock_bh(&q->lock);
-+
-+	return 0;
-+
-+error_unmap:
-+	list_for_each_entry(e, &tx_list, list) {
-+		dma_unmap_single(netdev->dev.parent, e->dma_addr, e->dma_len,
-+				 DMA_TO_DEVICE);
-+		e->dma_addr = 0;
-+	}
-+	list_splice(&tx_list, &q->tx_list);
-+	spin_unlock_bh(&q->lock);
-+
-+	return -ENOMEM;
-+}
-+#endif
-+
- static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 				   struct net_device *netdev)
- {
-@@ -2185,6 +2665,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	struct airoha_queue_entry *e;
- 	struct netdev_queue *txq;
- 	struct airoha_queue *q;
-+	bool soe_decrypt_skb = false;
- 	LIST_HEAD(tx_list);
- 	int i = 0, qid;
- 	void *data;
-@@ -2223,6 +2704,11 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	       FIELD_PREP(QDMA_ETH_TXMSG_FPORT_MASK, fport) |
- 	       FIELD_PREP(QDMA_ETH_TXMSG_METER_MASK, 0x7f);
- 
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (dev->eth->ppe)
-+		soe_decrypt_skb = airoha_ppe_soe_skb_marked(skb);
-+#endif
-+
- 	q = &qdma->q_tx[qid];
- 	if (WARN_ON_ONCE(!q->ndesc))
- 		goto error;
-@@ -2293,13 +2779,24 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 		q->txq_stopped = true;
- 	}
- 
--	if (netif_xmit_stopped(txq) || !netdev_xmit_more())
-+	if (netif_xmit_stopped(txq) || !netdev_xmit_more() ||
-+	    soe_decrypt_skb)
- 		airoha_qdma_rmw(qdma, REG_TX_CPU_IDX(qid),
- 				TX_RING_CPU_IDX_MASK,
- 				FIELD_PREP(TX_RING_CPU_IDX_MASK, index));
- 
- 	spin_unlock_bh(&q->lock);
- 
-+	/* SOE decrypt flow binding needs the final egress netdev and QDMA
-+	 * descriptor context. The SOE RX path marks only candidate packets; bind
-+	 * only after the current plaintext packet has been queued and kicked so
-+	 * the newly bound decrypt entry cannot race the CPU-transmitted packet.
-+	 */
-+#if IS_REACHABLE(CONFIG_NET_AIROHA_SOE)
-+	if (soe_decrypt_skb)
-+		airoha_ppe_soe_xmit_skb(&dev->eth->ppe->dev, skb, netdev);
-+#endif
-+
- 	return NETDEV_TX_OK;
- 
- error_unmap:
-@@ -3096,6 +3593,12 @@ static int airoha_dev_tc_setup(struct net_device *dev,
- 	}
- }
- 
-+static int airoha_dev_set_features(struct net_device *netdev,
-+				   netdev_features_t features)
-+{
-+	return airoha_soe_set_features(netdev, features);
-+}
-+
- static const struct net_device_ops airoha_netdev_ops = {
- 	.ndo_init		= airoha_dev_init,
- 	.ndo_open		= airoha_dev_open,
-@@ -3105,6 +3608,7 @@ static const struct net_device_ops airoha_netdev_ops = {
- 	.ndo_start_xmit		= airoha_dev_xmit,
- 	.ndo_get_stats64        = airoha_dev_get_stats64,
- 	.ndo_set_mac_address	= airoha_dev_set_macaddr,
-+	.ndo_set_features	= airoha_dev_set_features,
- 	.ndo_setup_tc		= airoha_dev_tc_setup,
- };
- 
-@@ -3230,6 +3734,7 @@ static int airoha_alloc_gdm_device(struct airoha_eth *eth,
- 	dev->eth = eth;
- 	dev->nbq = nbq;
- 	port->devs[index] = dev;
-+	airoha_soe_build_netdev(netdev, airoha_qdma_xmit_skb);
- 
+ 		for (p = 0; p < ARRAY_SIZE(eth->ports); p++)
+ 			airoha_fe_rmw(eth, REG_PPE_MTU(i, p),
+@@ -509,6 +578,162 @@ static int airoha_ppe_foe_entry_set_ipv6_tuple(struct airoha_foe_entry *hwe,
  	return 0;
  }
-@@ -3409,10 +3914,14 @@ static int airoha_probe(struct platform_device *pdev)
- 	strscpy(eth->napi_dev->name, "qdma_eth", sizeof(eth->napi_dev->name));
- 	platform_set_drvdata(pdev, eth);
  
--	err = airoha_hw_init(pdev, eth);
-+	err = airoha_soe_init(eth);
- 	if (err)
- 		goto error_netdev_free;
- 
-+	err = airoha_hw_init(pdev, eth);
-+	if (err)
-+		goto error_soe_deinit;
++static int airoha_ppe_soe_fill_inner_ipv4_data(struct sk_buff *skb,
++					       struct airoha_flow_data *data,
++					       int *type, int *l4proto)
++{
++	unsigned int ip_offset = ETH_HLEN;
++	union {
++		struct tcphdr tcp;
++		struct udphdr udp;
++	} ports;
++	struct iphdr iph_buf, *iph;
++	unsigned int l4_offset;
++	struct udphdr *udp;
++	struct tcphdr *tcp;
 +
- 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
- 		airoha_qdma_start_napi(&eth->qdma[i]);
- 
-@@ -3457,11 +3966,14 @@ static int airoha_probe(struct platform_device *pdev)
- 			netdev = netdev_from_priv(dev);
- 			if (netdev->reg_state == NETREG_REGISTERED)
- 				unregister_netdev(netdev);
-+			airoha_soe_teardown_netdev(netdev);
- 			of_node_put(netdev->dev.of_node);
- 		}
- 		airoha_metadata_dst_free(port);
++	if (skb_headlen(skb) < ETH_HLEN)
++		return -EINVAL;
++
++	memcpy(&data->eth, skb->data, ETH_HLEN);
++	if (data->eth.h_proto != htons(ETH_P_IP))
++		return -EAFNOSUPPORT;
++
++	iph = skb_header_pointer(skb, ip_offset, sizeof(iph_buf), &iph_buf);
++	if (!iph || iph->ihl < 5 || iph->version != 4)
++		return -EINVAL;
++
++	l4_offset = ip_offset + iph->ihl * 4;
++	data->v4.src_addr = iph->saddr;
++	data->v4.dst_addr = iph->daddr;
++	*l4proto = iph->protocol;
++
++	switch (iph->protocol) {
++	case IPPROTO_TCP:
++		tcp = skb_header_pointer(skb, l4_offset, sizeof(ports.tcp),
++					 &ports.tcp);
++		if (!tcp)
++			return -EINVAL;
++
++		data->src_port = tcp->source;
++		data->dst_port = tcp->dest;
++		*type = PPE_PKT_TYPE_IPV4_HNAPT;
++		break;
++	case IPPROTO_UDP:
++		udp = skb_header_pointer(skb, l4_offset, sizeof(ports.udp),
++					 &ports.udp);
++		if (!udp)
++			return -EINVAL;
++
++		data->src_port = udp->source;
++		data->dst_port = udp->dest;
++		*type = PPE_PKT_TYPE_IPV4_HNAPT;
++		break;
++	default:
++		*type = PPE_PKT_TYPE_IPV4_ROUTE;
++		break;
++	}
++
++	return 0;
++}
++
++static int airoha_ppe_foe_entry_set_soe_fields(struct airoha_foe_entry *hwe,
++					       u8 sa_index, u8 hop,
++					       unsigned int tunnel_mtu)
++{
++	int type;
++
++	if (hop > FIELD_MAX(AIROHA_FOE_HOP0))
++		return -ERANGE;
++
++	type = FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe->ib1);
++	switch (type) {
++	case PPE_PKT_TYPE_IPV4_HNAPT:
++	case PPE_PKT_TYPE_IPV4_ROUTE:
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	tunnel_mtu = min_t(unsigned int, tunnel_mtu,
++			   FIELD_MAX(AIROHA_FOE_TUNNEL_MTU));
++
++	/* SOE FOE entries store the hop selector and SA index here. */
++	hwe->ipv4.rsv[0] &= ~AIROHA_FOE_HOP_MASK;
++	hwe->ipv4.rsv[0] |= FIELD_PREP(AIROHA_FOE_HOP0, hop);
++
++	hwe->ipv4.data &= ~(AIROHA_FOE_ACTDP | AIROHA_FOE_TUNNEL_ID);
++	hwe->ipv4.data |= AIROHA_FOE_TUNNEL |
++			  FIELD_PREP(AIROHA_FOE_ACTDP, sa_index);
++
++	hwe->ipv4.l2.meter &= ~AIROHA_FOE_TUNNEL_MTU;
++	hwe->ipv4.l2.meter |= FIELD_PREP(AIROHA_FOE_TUNNEL_MTU, tunnel_mtu);
++
++	hwe->ib1 &= ~AIROHA_FOE_IB1_BIND_TUNNEL_DECAP;
++
++	return 0;
++}
++
++static int
++airoha_ppe_soe_get_tuple_info(const struct flow_offload_tuple *tuple,
++			      struct airoha_ppe_soe_tuple_info *info)
++{
++	int err;
++
++	if (!tuple || !info)
++		return -EINVAL;
++	if (tuple->xmit_type != FLOW_OFFLOAD_XMIT_XFRM)
++		return -EOPNOTSUPP;
++
++	err = airoha_soe_xfrm_ppe_info(tuple->dst_cache, &info->sa_index,
++				       &info->hop);
++	if (err)
++		return err;
++
++	info->tunnel_mtu = tuple->mtu ? tuple->mtu :
++				      AIROHA_PPE_SOE_DEFAULT_TUNNEL_MTU;
++
++	return 0;
++}
++
++static int
++airoha_ppe_foe_entry_set_soe_info(struct airoha_foe_entry *hwe,
++				  const struct flow_offload_tuple *tuple)
++{
++	struct airoha_ppe_soe_tuple_info info;
++	int err;
++
++	if (!tuple)
++		return 0;
++	if (tuple->xmit_type != FLOW_OFFLOAD_XMIT_XFRM)
++		return 0;
++
++	err = airoha_ppe_soe_get_tuple_info(tuple, &info);
++	if (err)
++		return err;
++
++	err = airoha_ppe_foe_entry_set_soe_fields(hwe, info.sa_index,
++						  info.hop, info.tunnel_mtu);
++	if (err)
++		return err;
++
++	/* XFRM packet-offload entries are not plain Ethernet/IP entries:
++	 * the PPE must tag them as SOE/IPsec work and submit them through the
++	 * SOE-facing channel/port aggregation path. Without these fields the
++	 * entry can still become BND, but traffic falls back to the slow path
++	 * instead of the inline encrypt/decrypt datapath.
++	 */
++	hwe->ipv4.l2.common.etype = AIROHA_PPE_SOE_MAGIC_IPSEC;
++	hwe->ipv4.data &= ~AIROHA_FOE_CHANNEL;
++	hwe->ipv4.data |= FIELD_PREP(AIROHA_FOE_CHANNEL,
++				     AIROHA_PPE_SOE_CHANNEL);
++	hwe->ipv4.ib2 &= ~AIROHA_FOE_IB2_PORT_AG;
++	hwe->ipv4.ib2 |= FIELD_PREP(AIROHA_FOE_IB2_PORT_AG,
++				    AIROHA_PPE_SOE_PORT_AG);
++
++	return 0;
++}
++
+ static u32 airoha_ppe_foe_get_entry_hash(struct airoha_ppe *ppe,
+ 					 struct airoha_foe_entry *hwe)
+ {
+@@ -633,6 +858,9 @@ static void airoha_ppe_foe_flow_stats_update(struct airoha_ppe *ppe,
+ 		meter = &hwe->ipv4.l2.meter;
  	}
- 	airoha_hw_cleanup(eth);
-+error_soe_deinit:
-+	airoha_soe_deinit(eth);
- error_netdev_free:
- 	free_netdev(eth->napi_dev);
- 	platform_set_drvdata(pdev, NULL);
-@@ -3492,12 +4004,14 @@ static void airoha_remove(struct platform_device *pdev)
- 				continue;
  
- 			netdev = netdev_from_priv(dev);
-+			airoha_soe_teardown_netdev(netdev);
- 			unregister_netdev(netdev);
- 			of_node_put(netdev->dev.of_node);
- 		}
- 		airoha_metadata_dst_free(port);
++	if (*data & AIROHA_FOE_TUNNEL)
++		return;
++
+ 	pse_port = FIELD_GET(AIROHA_FOE_IB2_PSE_PORT, *ib2);
+ 	if (pse_port == FE_PSE_PORT_CDM4)
+ 		return;
+@@ -868,16 +1096,129 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+ 	return 0;
+ }
+ 
+-static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+-					struct sk_buff *skb,
+-					u32 hash, bool rx_wlan)
++static void airoha_ppe_soe_meta_store(struct airoha_ppe_soe_meta *meta,
++				      u32 key_hash, u16 foe_hash, u8 sa_index,
++				      u8 hop)
+ {
+-	struct airoha_flow_table_entry *e;
+-	struct airoha_foe_bridge br = {};
+-	struct airoha_foe_entry *hwe;
+-	bool commit_done = false;
+-	struct hlist_node *n;
+-	u32 index, state;
++	u8 seen = 1;
++
++	if (READ_ONCE(meta->valid) &&
++	    READ_ONCE(meta->key_hash) == key_hash &&
++	    READ_ONCE(meta->foe_hash) == foe_hash &&
++	    READ_ONCE(meta->sa_index) == sa_index &&
++	    READ_ONCE(meta->hop) == hop &&
++	    time_before_eq(jiffies, READ_ONCE(meta->expires)))
++		seen = min_t(u8, READ_ONCE(meta->seen) + 1, U8_MAX);
++
++	WRITE_ONCE(meta->key_hash, key_hash);
++	WRITE_ONCE(meta->foe_hash, foe_hash);
++	WRITE_ONCE(meta->sa_index, sa_index);
++	WRITE_ONCE(meta->hop, hop);
++	WRITE_ONCE(meta->seen, seen);
++	WRITE_ONCE(meta->expires,
++		   jiffies + msecs_to_jiffies(AIROHA_PPE_SOE_META_TIMEOUT_MS));
++	WRITE_ONCE(meta->valid, 1);
++}
++
++void airoha_ppe_soe_mark_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
++			     u16 hash, u8 sa_index, u8 hop)
++{
++	struct airoha_ppe *ppe;
++	u32 ppe_hash_mask;
++
++	if (!dev || !skb)
++		return;
++
++	ppe = dev->priv;
++	if (!ppe || !ppe->soe_meta)
++		return;
++
++	ppe_hash_mask = airoha_ppe_get_total_num_entries(ppe) - 1;
++	if (hash > ppe_hash_mask)
++		return;
++
++	/* SOE decrypt completion is CPU-visible before normal routing has
++	 * selected the plaintext egress netdev. Keep the original encrypted FOE
++	 * hash and SA hop briefly on the skb so airoha_dev_xmit() can finish
++	 * the PPE entry once the final egress descriptor is known.
++	 */
++	airoha_ppe_soe_meta_store(&ppe->soe_meta[hash], hash, hash, sa_index,
++				  hop);
++	ppe->foe_check_time[hash] = 0;
++
++	skb->mark &= ~(AIROHA_PPE_SOE_MARK_MAGIC_MASK |
++		       AIROHA_PPE_SOE_MARK_HASH_MASK);
++	skb->mark |= AIROHA_PPE_SOE_MARK_MAGIC |
++		     FIELD_PREP(AIROHA_PPE_SOE_MARK_HASH_MASK, hash);
++}
++
++bool airoha_ppe_soe_skb_marked(struct sk_buff *skb)
++{
++	return skb && ((skb->mark & AIROHA_PPE_SOE_MARK_MAGIC_MASK) ==
++		       AIROHA_PPE_SOE_MARK_MAGIC);
++}
++
++void airoha_ppe_soe_xmit_skb(struct airoha_ppe_dev *dev, struct sk_buff *skb,
++			     struct net_device *netdev)
++{
++	struct airoha_foe_entry entry, tmpl, *hwe;
++	struct airoha_flow_data data = {};
++	struct airoha_ppe_soe_meta *meta;
++	u32 ppe_hash_mask, key_hash;
++	struct airoha_gdm_dev *gdm;
++	struct airoha_ppe *ppe;
++	unsigned long expires;
++	u16 hash;
++	int err, l4proto, type;
++	u8 sa_index, hop;
++	u8 seen;
++
++	if (!dev || !skb || !netdev)
++		return;
++
++	if ((skb->mark & AIROHA_PPE_SOE_MARK_MAGIC_MASK) !=
++	    AIROHA_PPE_SOE_MARK_MAGIC)
++		return;
++
++	ppe = dev->priv;
++	if (!ppe || !ppe->soe_meta)
++		goto clear_mark;
++
++	ppe_hash_mask = airoha_ppe_get_total_num_entries(ppe) - 1;
++	key_hash = FIELD_GET(AIROHA_PPE_SOE_MARK_HASH_MASK, skb->mark);
++	if (key_hash > ppe_hash_mask)
++		goto clear_mark;
++
++	meta = &ppe->soe_meta[key_hash];
++	if (!READ_ONCE(meta->valid))
++		goto clear_mark;
++
++	if (READ_ONCE(meta->key_hash) != key_hash)
++		goto clear_mark;
++
++	expires = READ_ONCE(meta->expires);
++	if (time_after(jiffies, expires)) {
++		WRITE_ONCE(meta->valid, 0);
++		goto clear_mark;
++	}
++
++	hash = READ_ONCE(meta->foe_hash);
++	if (hash > ppe_hash_mask) {
++		WRITE_ONCE(meta->valid, 0);
++		goto clear_mark;
++	}
++
++	seen = READ_ONCE(meta->seen);
++	if (seen <= READ_ONCE(airoha_ppe_soe_inline_bind_delay_packets))
++		goto clear_mark;
++
++	err = airoha_ppe_soe_fill_inner_ipv4_data(skb, &data, &type, &l4proto);
++	if (err)
++		goto clear_mark;
++
++	sa_index = READ_ONCE(meta->sa_index);
++	hop = READ_ONCE(meta->hop);
++	WRITE_ONCE(meta->valid, 0);
+ 
+ 	spin_lock_bh(&ppe_lock);
+ 
+@@ -885,13 +1226,120 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 	if (!hwe)
+ 		goto unlock;
+ 
+-	state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, hwe->ib1);
+-	if (state == AIROHA_FOE_STATE_BIND)
++	switch (FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe->ib1)) {
++	case PPE_PKT_TYPE_IPV4_HNAPT:
++	case PPE_PKT_TYPE_IPV4_ROUTE:
++		break;
++	default:
+ 		goto unlock;
++	}
+ 
+-	index = airoha_ppe_foe_get_entry_hash(ppe, hwe);
+-	hlist_for_each_entry_safe(e, n, &ppe->foe_flow[index], list) {
++	err = airoha_ppe_foe_entry_prepare(ppe->eth, &tmpl, netdev, type,
++					   &data, l4proto);
++	if (err)
++		goto unlock;
++
++	memcpy(&entry, hwe, sizeof(entry));
++	entry.ib1 &= ~(AIROHA_FOE_IB1_BIND_STATE |
++		       AIROHA_FOE_IB1_BIND_KEEPALIVE |
++		       AIROHA_FOE_IB1_BIND_TIMESTAMP);
++	entry.ib1 |= FIELD_PREP(AIROHA_FOE_IB1_BIND_STATE,
++				AIROHA_FOE_STATE_BIND) |
++		     AIROHA_FOE_IB1_BIND_TTL;
++	entry.ib1 = (entry.ib1 & (AIROHA_FOE_IB1_BIND_PACKET_TYPE |
++				  AIROHA_FOE_IB1_BIND_UDP)) |
++		    (tmpl.ib1 & ~(AIROHA_FOE_IB1_BIND_PACKET_TYPE |
++				  AIROHA_FOE_IB1_BIND_UDP));
++	entry.ipv4.ib2 = tmpl.ipv4.ib2;
++	entry.ipv4.data = tmpl.ipv4.data;
++	memcpy(&entry.ipv4.l2, &tmpl.ipv4.l2, sizeof(entry.ipv4.l2));
++
++	gdm = netdev_priv(netdev);
++	if (gdm->port && gdm->port->id == AIROHA_GDM4_IDX)
++		entry.ipv4.l2.common.etype = AIROHA_PPE_SOE_MAGIC_GDM4;
++
++	if (FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, entry.ib1) ==
++	    PPE_PKT_TYPE_IPV4_HNAPT)
++		memcpy(&entry.ipv4.new_tuple, &entry.ipv4.orig_tuple,
++		       sizeof(entry.ipv4.new_tuple));
++
++	/* Commit the original decrypt entry only after the normal transmit path
++	 * has provided the final plaintext egress descriptor. Binding it at SOE
++	 * RX completion would miss this device-specific L2/PSE state.
++	 */
++	err = airoha_ppe_foe_entry_set_soe_fields(&entry, sa_index, hop,
++						  AIROHA_PPE_SOE_DEFAULT_TUNNEL_MTU);
++	if (!err)
++		airoha_ppe_foe_commit_entry(ppe, &entry, hash, false);
++
++unlock:
++	spin_unlock_bh(&ppe_lock);
++clear_mark:
++	skb->mark &= ~(AIROHA_PPE_SOE_MARK_MAGIC_MASK |
++		       AIROHA_PPE_SOE_MARK_HASH_MASK);
++}
++
++void airoha_ppe_soe_flush_sa(struct airoha_ppe *ppe, u8 sa_index)
++{
++	u32 num_entries, hash;
++
++	if (!ppe)
++		return;
++
++	num_entries = airoha_ppe_get_total_num_entries(ppe);
++
++	spin_lock_bh(&ppe_lock);
++	for (hash = 0; hash < num_entries; hash++) {
++		struct airoha_foe_entry *hwe;
++		u32 state, type;
++
++		hwe = airoha_ppe_foe_get_entry_locked(ppe, hash);
++		if (!hwe)
++			continue;
++
++		state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, hwe->ib1);
++		if (state != AIROHA_FOE_STATE_BIND)
++			continue;
++
++		type = FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe->ib1);
++		if (type != PPE_PKT_TYPE_IPV4_HNAPT &&
++		    type != PPE_PKT_TYPE_IPV4_ROUTE)
++			continue;
++
++		if (!(hwe->ipv4.data & AIROHA_FOE_TUNNEL))
++			continue;
++
++		if (FIELD_GET(AIROHA_FOE_ACTDP, hwe->ipv4.data) != sa_index)
++			continue;
++
++		/* NAT-T data and IKE control both use UDP/4500. A stale SOE
++		 * bound entry can otherwise keep sending later IKE_AUTH packets
++		 * to the SOE path after the SA has been deleted.
++		 */
++		hwe->ib1 &= ~AIROHA_FOE_IB1_BIND_STATE;
++		hwe->ib1 |= FIELD_PREP(AIROHA_FOE_IB1_BIND_STATE,
++				       AIROHA_FOE_STATE_INVALID);
++		airoha_ppe_foe_commit_entry(ppe, hwe, hash, false);
++	}
++	spin_unlock_bh(&ppe_lock);
++}
++
++static bool airoha_ppe_foe_try_flow_commit_bucket(struct airoha_ppe *ppe,
++						  struct airoha_foe_entry *hwe,
++						  u32 hash, u32 probe_index,
++						  bool rx_wlan,
++						  bool allow_l2_subflow)
++{
++	struct airoha_flow_table_entry *e;
++	struct hlist_node *n;
++	bool commit_done = false;
++	u32 state;
++
++	hlist_for_each_entry_safe(e, n, &ppe->foe_flow[probe_index], list) {
+ 		if (e->type == FLOW_TYPE_L2_SUBFLOW) {
++			if (!allow_l2_subflow)
++				continue;
++
+ 			state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, hwe->ib1);
+ 			if (state != AIROHA_FOE_STATE_BIND) {
+ 				e->hash = 0xffff;
+@@ -908,6 +1356,51 @@ static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
+ 		e->hash = hash;
  	}
- 	airoha_hw_cleanup(eth);
-+	airoha_soe_deinit(eth);
  
- 	free_netdev(eth->napi_dev);
- 	platform_set_drvdata(pdev, NULL);
++	return commit_done;
++}
++
++static void airoha_ppe_foe_insert_entry(struct airoha_ppe *ppe,
++					struct sk_buff *skb,
++					u32 hash, bool rx_wlan)
++{
++	struct airoha_flow_table_entry *e;
++	struct airoha_foe_bridge br = {};
++	struct airoha_foe_entry *hwe;
++	bool commit_done = false;
++	u32 index, mask, state, window;
++	unsigned int i;
++
++	spin_lock_bh(&ppe_lock);
++
++	hwe = airoha_ppe_foe_get_entry_locked(ppe, hash);
++	if (!hwe)
++		goto unlock;
++
++	state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, hwe->ib1);
++	if (state == AIROHA_FOE_STATE_BIND)
++		goto unlock;
++
++	index = airoha_ppe_foe_get_entry_hash(ppe, hwe);
++	commit_done =
++		airoha_ppe_foe_try_flow_commit_bucket(ppe, hwe, hash, index,
++						      rx_wlan, true);
++
++	mask = airoha_ppe_get_total_num_entries(ppe) - 1;
++	window = min_t(u32,
++		       READ_ONCE(airoha_ppe_soe_inline_force_commit_probe_window),
++		       mask);
++	for (i = 1; !commit_done && i <= window; i++) {
++		u32 candidates[2] = { (index + i) & mask, (index - i) & mask };
++		unsigned int j;
++
++		for (j = 0; !commit_done && j < ARRAY_SIZE(candidates); j++) {
++			commit_done =
++				airoha_ppe_foe_try_flow_commit_bucket(ppe, hwe,
++								      hash, candidates[j],
++								      rx_wlan, false);
++		}
++	}
++
+ 	if (commit_done)
+ 		goto unlock;
+ 
+@@ -940,8 +1433,9 @@ airoha_ppe_foe_l2_flow_commit_entry(struct airoha_ppe *ppe,
+ 				       airoha_l2_flow_table_params);
+ }
+ 
+-static int airoha_ppe_foe_flow_commit_entry(struct airoha_ppe *ppe,
+-					    struct airoha_flow_table_entry *e)
++static int
++airoha_ppe_foe_flow_commit_entry(struct airoha_ppe *ppe,
++				 struct airoha_flow_table_entry *e)
+ {
+ 	int type = FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, e->data.ib1);
+ 	u32 hash;
+@@ -1057,6 +1551,7 @@ static int airoha_ppe_entry_idle_time(struct airoha_ppe *ppe,
+ static int airoha_ppe_flow_offload_replace(struct airoha_eth *eth,
+ 					   struct flow_cls_offload *f)
+ {
++	const struct flow_offload_tuple *tuple = (const void *)f->cookie;
+ 	struct flow_rule *rule = flow_cls_offload_flow_rule(f);
+ 	struct airoha_flow_table_entry *e;
+ 	struct airoha_flow_data data = {};
+@@ -1183,7 +1678,9 @@ static int airoha_ppe_flow_offload_replace(struct airoha_eth *eth,
+ 		flow_rule_match_ipv4_addrs(rule, &addrs);
+ 		data.v4.src_addr = addrs.key->src;
+ 		data.v4.dst_addr = addrs.key->dst;
+-		airoha_ppe_foe_entry_set_ipv4_tuple(&hwe, &data, false);
++		err = airoha_ppe_foe_entry_set_ipv4_tuple(&hwe, &data, false);
++		if (err)
++			return err;
+ 	}
+ 
+ 	if (addr_type == FLOW_DISSECTOR_KEY_IPV6_ADDRS) {
+@@ -1228,6 +1725,10 @@ static int airoha_ppe_flow_offload_replace(struct airoha_eth *eth,
+ 			return err;
+ 	}
+ 
++	err = airoha_ppe_foe_entry_set_soe_info(&hwe, tuple);
++	if (err)
++		return err;
++
+ 	e = kzalloc_obj(*e);
+ 	if (!e)
+ 		return -ENOMEM;
+@@ -1350,16 +1851,26 @@ static int airoha_ppe_flow_offload_cmd(struct airoha_eth *eth,
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static int airoha_ppe_flush_sram_entries(struct airoha_ppe *ppe)
++static int airoha_ppe_flush_entries(struct airoha_ppe *ppe)
+ {
++	u32 ppe_num_entries = airoha_ppe_get_total_num_entries(ppe);
+ 	u32 sram_num_entries = airoha_ppe_get_total_sram_num_entries(ppe);
+ 	struct airoha_foe_entry *hwe = ppe->foe;
+ 	int i, err = 0;
+ 
++	memset(hwe, 0, ppe_num_entries * sizeof(*hwe));
++	if (ppe->foe_stats) {
++		u32 ppe_num_stats_entries =
++			airoha_ppe_get_total_num_stats_entries(ppe);
++
++		memset(ppe->foe_stats, 0,
++		       ppe_num_stats_entries * sizeof(*ppe->foe_stats));
++	}
++	dma_wmb();
++
+ 	for (i = 0; i < sram_num_entries; i++) {
+ 		int err;
+ 
+-		memset(&hwe[i], 0, sizeof(*hwe));
+ 		err = airoha_ppe_foe_commit_sram_entry(ppe, i);
+ 		if (err)
+ 			break;
+@@ -1368,6 +1879,37 @@ static int airoha_ppe_flush_sram_entries(struct airoha_ppe *ppe)
+ 	return err;
+ }
+ 
++static int airoha_ppe_set_bind_rate(const char *val,
++				    const struct kernel_param *kp)
++{
++	struct airoha_ppe *ppe;
++	unsigned long rate;
++	int err, i;
++
++	err = kstrtoul(val, 0, &rate);
++	if (err)
++		return err;
++	if (rate > FIELD_MAX(PPE_BIND_RATE_BIND_MASK))
++		return -ERANGE;
++
++	WRITE_ONCE(airoha_ppe_bind_rate, (unsigned int)rate);
++
++	mutex_lock(&flow_offload_mutex);
++	ppe = READ_ONCE(airoha_ppe_active);
++	if (ppe) {
++		for (i = 0; i < ppe->eth->soc->num_ppe; i++)
++			airoha_ppe_apply_bind_rate(ppe->eth, i);
++	}
++	mutex_unlock(&flow_offload_mutex);
++
++	return 0;
++}
++
++static int airoha_ppe_get_bind_rate(char *buf, const struct kernel_param *kp)
++{
++	return sysfs_emit(buf, "%u\n", READ_ONCE(airoha_ppe_bind_rate));
++}
++
+ static struct airoha_npu *airoha_ppe_npu_get(struct airoha_eth *eth)
+ {
+ 	struct airoha_npu *npu = airoha_npu_get(eth->dev);
+@@ -1601,12 +2143,20 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 			return -ENOMEM;
+ 	}
+ 
+-	ppe->foe_check_time = devm_kzalloc(eth->dev, ppe_num_entries,
+-					   GFP_KERNEL);
++	ppe->foe_check_time =
++		devm_kzalloc(eth->dev,
++			     ppe_num_entries * sizeof(*ppe->foe_check_time),
++			     GFP_KERNEL);
+ 	if (!ppe->foe_check_time)
+ 		return -ENOMEM;
+ 
+-	err = airoha_ppe_flush_sram_entries(ppe);
++	ppe->soe_meta = devm_kzalloc(eth->dev,
++				     ppe_num_entries * sizeof(*ppe->soe_meta),
++				     GFP_KERNEL);
++	if (!ppe->soe_meta)
++		return -ENOMEM;
++
++	err = airoha_ppe_flush_entries(ppe);
+ 	if (err)
+ 		return err;
+ 
+@@ -1622,6 +2172,8 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 	if (err)
+ 		goto error_l2_flow_table_destroy;
+ 
++	WRITE_ONCE(airoha_ppe_active, ppe);
++
+ 	return 0;
+ 
+ error_l2_flow_table_destroy:
+@@ -1636,6 +2188,8 @@ void airoha_ppe_deinit(struct airoha_eth *eth)
+ {
+ 	struct airoha_npu *npu;
+ 
++	WRITE_ONCE(airoha_ppe_active, NULL);
++
+ 	mutex_lock(&flow_offload_mutex);
+ 
+ 	npu = rcu_replace_pointer(eth->npu, NULL,
+diff --git a/include/linux/soc/airoha/airoha_offload.h b/include/linux/soc/airoha/airoha_offload.h
+index 7589fccfeef6..120dbd274c89 100644
+--- a/include/linux/soc/airoha/airoha_offload.h
++++ b/include/linux/soc/airoha/airoha_offload.h
+@@ -11,7 +11,12 @@
+ #include <linux/workqueue.h>
+ 
+ enum {
++	PPE_CPU_REASON_UN_HIT = 0x0d,
++	PPE_CPU_REASON_HIT_UNBIND = 0x0e,
+ 	PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED = 0x0f,
++	PPE_CPU_REASON_HIT_BIND_FORCE_CPU = 0x16,
++	PPE_CPU_REASON_HIT_BIND_EXCEED_MTU = 0x1c,
++	PPE_CPU_REASON_NOT_THROUGH_PPE = 0x1e,
+ };
+ 
+ struct airoha_ppe_dev {
 -- 
 2.53.0
 
