@@ -1,91 +1,64 @@
-Return-Path: <netdev+bounces-299144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XpA8Bdw1LmoaqwQAu9opvQ
-	(envelope-from <netdev+bounces-299144-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:02:20 +0200
+	id Wpq4B087Lmr6qwQAu9opvQ
+	(envelope-from <netdev+bounces-299148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620BA6805FB
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67E3E680649
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=uN5Z6BZu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299144-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299144-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=infradead.org header.s=bombadil.20210309 header.b=3W8h2lHU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299148-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299148-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 446D03030E83
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 05:01:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2105C3016C86
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 05:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF5F307AC6;
-	Sun, 14 Jun 2026 05:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB102313532;
+	Sun, 14 Jun 2026 05:25:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013008.outbound.protection.outlook.com [40.93.201.8])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4EC30BBB6
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 05:01:25 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781413287; cv=fail; b=D70qGZW6xeMxeIhMm2ETNVaGFtDnBub70tL7X0wT+AGFhredkqNo/EX9rX8891kiY6NXsI2BcuXzQCKXx/4hNgaNp0+Ihiea0/M+u1weEQpaP2PK2D2bJkJoJ0I+31ze43cncDCyfrJPPoNmnrgyesyW65jfUWu/v2JF+YtPFYw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781413287; c=relaxed/simple;
-	bh=FAzljHnNLKfrNSJpjCqajj6mK8WAlU+c7h0j/yheMdA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B+NbJU2ufTnUn1qA/BET4OmOWYEvV9SuGye5aTauklRel5gwLUBkpkq+WtM/K2rgj58x0m72lxeJ5bPaqRf1otFeFsS24nlNmb4VXcuzvu5paUC7mqY5vpBi8pqr7/8qwTT7MEQojG3lJPq93A/vyVwwS1FZQbqcqoD8EEBBUyw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uN5Z6BZu; arc=fail smtp.client-ip=40.93.201.8
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rG+Rwa1dHNPI26OTJRgVV6fF+L5XSL7yzErwI+w3nVa2i0Nb2rFsxuuzJeW+r/BtQCyH4J0aKlZN7vlShOrHovBohYKWfOYvV6sizBMLWlILLHtZ0sAlbv/GPJvG14TnLkQ0YPySzj7F7+RvbftTV6Y3A2mNW2ZY5VGdITSrGwreEQ7CeNMWd1ei64iUv4FwzcVqKljYlZlepE9hjADpflnNrvFA3Wx3+s2AE1Bj/cnZSeQJWoa5KtrCqM/zEQsEQPHN+JT/qsPIxj0msTKqngHHHBs37wEsiMLY+O61CguF+yz5tDhcNNAKeSX1VFc2qvZy0bF34KpkgAD7+eV/cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X8FJJOjg8ATRTWcfcMUqbJ2bU9Dy7eiWi9AMCFDRESo=;
- b=CjZhpj1SaYR0iUvLccNRfdMrkoeMXlwjO9w1yo0bBM7u+7HHfNp9M6HIJ+y0bIk050dnm+9ZEsPDps9PXm0SV8VQD9SPdFHXSM7/GsZm3902aKdH0sLBUzj27uFrkXIEnvlbZ0YdGSUIr49J/4IM3Fox5C13SN9AbFmOKf1xE3ObZ2oUIaAc4M7lqb9j5fhqcrm7fTBTIQ9TTEbR+OVK3BfWdLNx+qdK5J+d29U7A3VA/hLb1l80WdursS0Nk+d2JUWe1XbsGwVr5eVjbtXdRfMvDLLDeLS0cTOYXbtSWjVk3en3nm803fF9/0sb5ripQXBC45u4pcB2vJL86pZ5Tg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X8FJJOjg8ATRTWcfcMUqbJ2bU9Dy7eiWi9AMCFDRESo=;
- b=uN5Z6BZuH5MFLg5Rt/GGUTLNGBS+JfcNgjcdNvPXY8ECx3pLk69aZPIUfAuYPLa2ghiurBWJBtCKY/E36GXkOk9CxenPly97A6wewqFhZQt6a+EB8R+WFjDpxFCtmnZqfz2D7vaiAcW4vJ2CenJrHabo8JTOeEKvURhWQ4xHpRk=
-Received: from PH8PR02CA0008.namprd02.prod.outlook.com (2603:10b6:510:2d0::17)
- by SJ2PR12MB8848.namprd12.prod.outlook.com (2603:10b6:a03:537::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.16; Sun, 14 Jun
- 2026 05:01:21 +0000
-Received: from CY4PEPF0000EE33.namprd05.prod.outlook.com
- (2603:10b6:510:2d0:cafe::46) by PH8PR02CA0008.outlook.office365.com
- (2603:10b6:510:2d0::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.16 via Frontend Transport; Sun,
- 14 Jun 2026 05:01:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CY4PEPF0000EE33.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Sun, 14 Jun 2026 05:01:21 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Sun, 14 Jun
- 2026 00:01:20 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: Brett Creeley <brett.creeley@amd.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>, Vamsi Atluri
-	<Vamsi.Atluri@amd.com>
-Subject: [PATCH v4 6/6] pds_core: add debugfs support for host backed memory
-Date: Sun, 14 Jun 2026 05:00:52 +0000
-Message-ID: <20260614050052.1048328-7-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260614050052.1048328-1-nikhil.rao@amd.com>
-References: <20260614050052.1048328-1-nikhil.rao@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E18171BB;
+	Sun, 14 Jun 2026 05:25:29 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781414732; cv=none; b=q7v3FLQPBLnC43uE4MNUsS8EF/t4rTdsq3G8z7XAVbNBk2xqU0w1vThPvgQMa8u7z/2OA+pOhIBv19cRch/IERQmTvwbr8YNP5vlzR4xovgotuLVAi2tbuj4n3VT7tCS/AMCC0cU2oS85cRYeQSe3VS8oPUag11ABX3z0ilY2qE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781414732; c=relaxed/simple;
+	bh=Wsq6G7fZ7O8DVr+ZbnYMsBrFbnCcXsEYcTaM0JO/9vc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UjZQdczv3B+FX/zySRBwqqwc1JuoUr8tRdtWJf5Mjwk9Duwe3iVofCe/3lHCOKttRXrcPQPKdl/ICPn5hZQO6KXtFObLgB+cJSDFYZzDcWtndG3aeMg454ya/bpfVE8VnFPM07cBhZKPK7DH2HfEIlX1+QJ00W7/+yQU/Vr5jJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3W8h2lHU; arc=none smtp.client-ip=198.137.202.133
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=4D/iiY0jnzk08BanLlMnRV0PRyLRiwG/H5ijrGY/r/g=; b=3W8h2lHU/a6ayN8kUYZn8n1EaI
+	wug78Tg3UE41ZDH7eDo8pIKrzhnlB4TpB3GbSo6U0v8XCHjKTyOIqSiDHZI3SZeDUTZd/T5QUZqnI
+	fSH+mofROwGAbXFdqPJjQ9pm6eVwl00+QPCxpXTRPiMx4XjXJ6SPxYlLNg+gQIidT8NPu5ggIjbcu
+	giIkddT+ZBb+Nm4O42SiqCRG2qKbMqLq/tF+XjU5IKm3ECfZA7JGqi8IgnHoAtgfCoJ1RZBigQmTv
+	2IR7jFDNFAA+bgaSj1zw8lrtVGIFJ0aC/s1oCbD/bZxPOSeW4be6Ho0o6zMabPmecN1TtD8psbhOc
+	PipUyvUw==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wYdLb-0000000ClDr-0Qun;
+	Sun, 14 Jun 2026 05:25:27 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH net-next] netfilter: x_tables.h: fix all kernel-doc warnings
+Date: Sat, 13 Jun 2026 22:25:24 -0700
+Message-ID: <20260614052524.1559494-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,169 +66,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE33:EE_|SJ2PR12MB8848:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c0bd9ef-df44-4915-5aad-08dec9d1f9fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|23010399003|22082099003|18002099003|6133799003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	tZyrydHFmVhbJ1gvxCwAIowbBbhPLkQdLpde8qyJ25NPOHD+h9FhfstXZv/ZHJ1q0+0lmEf5YAf59i7D/8u1X42Am97XPqdtVUG+GS9TKAGKaM4BWzZ3aZ7k0zQ00OIZ9+QZPpMq80oHrRek+v8Zw4dyBoZS8tDzQqe1jgAreYc6D+qGfaZFF04LO71FWd8T2lR7QUiCt0+0V6xk96nF3hlB6VWLksxj9SESHKyE4Jn8V2BN9DVZ8d0DVEKQp+jw9ncrUgP5ydQZdhxmqFvkhmUwiRrj5+wjyTX6KKd5xcJH2YmkEqLfLtBHpxjtmJE3TzLOy8dNv586AuDa7vgznqaVGo/b1AO/gQk24d2n9UWi9zHVn3BOHHslKoUebv4aA1B8vEYdqlG4i5chi8QfuR0w99ZaONgpd7C91rw8MxcvLCFV8/lqPLK1PmFhAnAjxfZHfEBMq2WEC58gj+JOWe4CClZ29aqeOD3jC3/sLhbwCnDIb/dd3DZMFQA61iqCWX3UGcykTpLlcWT2+XLiWHEl4/iin35q10KrgFQVDK/bzJL00eRfThPCysYRBFQVyV5SXhv8LtacmStXCyfxiypaGt9q3jQonySUiRnAMXddK2IDdterBpiJLX2RmdEW1ZLp3TEoE2vQblniWC+i3o/14HtA0hKUupbKL7v4l33As8QCLft1fRKUEuTKfOF28Nm8dV5J+/710XavH7xzk+xFBjP9W0O8OxMrVvjxRbo=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(23010399003)(22082099003)(18002099003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	8/StAaxVOzzG6FkwO1j0i56rVkYkoSCAp7Lsj/z1HrC9m5O16QFiDzn3waHyyqa6JxTn7yjEFWVzYAGokRxbdBxjZA9VSl60Zj8M9T5TZf+WvxCAQ5b84ieV1oapz8SYKA/UV3MWf3SeOE21MvouBTPiDtgCmSIuumnw4jzgBSyGRRtTOHLVuKtZaBxnkx8Vf4ce5+BAs3Qg88FQ1jUjAWZuPp7vuzsK18yX13fv3HKJxNo38FwL1e7+idLigWHR5YpdiKQ/qvnDLZ+TKNv6wv+Xv0UCt4FZleVj6SId1/tuckcdEvGqSOWqUobitt/JtzFvDd0fa0gb0bWwHjU/9pf72rr2Xc3wUf9XtvppfsYh7vPb7/MOQsagCQnfkL11pgGtENRjQ46jNaD8eLSapBIVHdaZspZ5MH1wAIVKA9abG4G2xau126n01uuX5pmq
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2026 05:01:21.1726
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c0bd9ef-df44-4915-5aad-08dec9d1f9fc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE33.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8848
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-299144-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299148-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:eric.joyner@amd.com,m:Vamsi.Atluri@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:rdunlap@infradead.org,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rdunlap@infradead.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,amd.com:dkim,amd.com:email,amd.com:mid,amd.com:from_mime];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,infradead.org:dkim,infradead.org:email,infradead.org:mid,infradead.org:from_mime,netfilter.org:email,strlen.de:email,nwl.cc:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 620BA6805FB
+X-Rspamd-Queue-Id: 67E3E680649
 
-From: Vamsi Atluri <Vamsi.Atluri@amd.com>
+- use correct names in kernel-doc comments
+- add missing struct members to kernel-doc comments
 
-Add debugfs file to display host memory allocations including tag,
-size, order, and physical address for each memory request.
+Warning: include/linux/netfilter/x_tables.h:41 struct member 'targinfo' not described in 'xt_action_param'
+Warning: include/linux/netfilter/x_tables.h:41 Excess struct member 'targetinfo' description in 'xt_action_param'
+Warning: include/linux/netfilter/x_tables.h:90 struct member 'family' not described in 'xt_mtchk_param'
+Warning: include/linux/netfilter/x_tables.h:90 struct member 'nft_compat' not described in 'xt_mtchk_param'
+Warning: include/linux/netfilter/x_tables.h:101 expecting prototype for struct xt_mdtor_param. Prototype was for struct xt_mtdtor_param instead
 
-Signed-off-by: Vamsi Atluri <Vamsi.Atluri@amd.com>
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'net' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'table' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'target' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'targinfo' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'hook_mask' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'family' not described in 'xt_tgchk_param'
+Warning: include/linux/netfilter/x_tables.h:121 struct member 'nft_compat' not described in 'xt_tgchk_param'
+
+Warning: include/linux/netfilter/x_tables.h:345 expecting prototype for xt_recseq(). Prototype was for DECLARE_PER_CPU() instead
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
- drivers/net/ethernet/amd/pds_core/core.c    |  2 +
- drivers/net/ethernet/amd/pds_core/core.h    |  1 +
- drivers/net/ethernet/amd/pds_core/debugfs.c | 45 +++++++++++++++++++++
- 3 files changed, 48 insertions(+)
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index d1695ca95440..c0a8966dfff9 100644
---- a/drivers/net/ethernet/amd/pds_core/core.c
-+++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -487,6 +487,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 		pdsc->viftype_status = NULL;
- 	}
- 
-+	pdsc_debugfs_del_host_mem(pdsc);
- 	pdsc_host_mem_free(pdsc);
- 	pdsc_dev_uninit(pdsc);
- 
-@@ -498,6 +499,7 @@ int pdsc_start(struct pdsc *pdsc)
- 	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
- 			   PDS_CORE_INTR_MASK_CLEAR);
- 	pdsc_host_mem_add(pdsc);
-+	pdsc_debugfs_add_host_mem(pdsc);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
-index 53e5a6f0af9c..b453493c093f 100644
---- a/drivers/net/ethernet/amd/pds_core/core.h
-+++ b/drivers/net/ethernet/amd/pds_core/core.h
-@@ -304,6 +304,7 @@ void pdsc_debugfs_add_irqs(struct pdsc *pdsc);
- void pdsc_debugfs_add_qcq(struct pdsc *pdsc, struct pdsc_qcq *qcq);
- void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq);
- void pdsc_debugfs_add_host_mem(struct pdsc *pdsc);
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc);
- 
- int pdsc_err_to_errno(enum pds_core_status_code code);
- bool pdsc_is_fw_running(struct pdsc *pdsc);
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 810a0cd9bcac..ef0a1b7d159b 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -178,3 +178,48 @@ void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq)
- 	debugfs_remove_recursive(qcq->dentry);
- 	qcq->dentry = NULL;
- }
-+
-+static int host_mem_show(struct seq_file *seq, void *v)
-+{
-+	struct pdsc *pdsc = seq->private;
-+	struct pdsc_host_mem *hm;
-+	int i;
-+
-+	if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
-+		seq_puts(seq, "No host memory allocated\n");
-+		return 0;
-+	}
-+
-+	seq_printf(seq, "Host memory requests: %u\n\n",
-+		   pdsc->num_host_mem_reqs);
-+	seq_puts(seq, "Tag    Size         Order  PA\n");
-+	seq_puts(seq, "---    ----         -----  --\n");
-+
-+	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
-+		hm = &pdsc->host_mem_reqs[i];
-+
-+		if (!hm->pg)
-+			continue;
-+
-+		seq_printf(seq, "%-6u %-12u %-6u %pad\n",
-+			   hm->tag, hm->size, hm->order, &hm->pa);
-+	}
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(host_mem);
-+
-+void pdsc_debugfs_add_host_mem(struct pdsc *pdsc)
-+{
-+	if (!(pdsc->dev_ident.capabilities &
-+	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
-+		return;
-+
-+	debugfs_create_file("host_mem", 0400, pdsc->dentry,
-+			    pdsc, &host_mem_fops);
-+}
-+
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc)
-+{
-+	debugfs_lookup_and_remove("host_mem", pdsc->dentry);
-+}
--- 
-2.43.0
+ include/linux/netfilter/x_tables.h |   29 +++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
+--- linext-2026-0610.orig/include/linux/netfilter/x_tables.h
++++ linext-2026-0610/include/linux/netfilter/x_tables.h
+@@ -18,7 +18,7 @@
+  * @match:	the match extension
+  * @target:	the target extension
+  * @matchinfo:	per-match data
+- * @targetinfo:	per-target data
++ * @targinfo:	per-target data
+  * @state:	pointer to hook state this packet came from
+  * @fragoff:	packet is a fragment, this is the data offset
+  * @thoff:	position of transport header relative to skb->data
+@@ -77,7 +77,9 @@ static inline u_int8_t xt_family(const s
+  * @match:	struct xt_match through which this function was invoked
+  * @matchinfo:	per-match data
+  * @hook_mask:	via which hooks the new rule is reachable
+- * Other fields as above.
++ * @family:	actual NFPROTO_* through which the function is invoked
++ *		(helpful when match->family == NFPROTO_UNSPEC)
++ * @nft_compat:	running from the nft compat layer if true
+  */
+ struct xt_mtchk_param {
+ 	struct net *net;
+@@ -91,8 +93,13 @@ struct xt_mtchk_param {
+ };
+ 
+ /**
+- * struct xt_mdtor_param - match destructor parameters
+- * Fields as above.
++ * struct xt_mtdtor_param - match destructor parameters
++ *
++ * @net:	network namespace through which the check was invoked
++ * @match:	struct xt_match through which this function was invoked
++ * @matchinfo:	per-match data
++ * @family:	actual NFPROTO_* through which the function is invoked
++ *		(helpful when match->family == NFPROTO_UNSPEC)
+  */
+ struct xt_mtdtor_param {
+ 	struct net *net;
+@@ -105,10 +112,16 @@ struct xt_mtdtor_param {
+  * struct xt_tgchk_param - parameters for target extensions'
+  * checkentry functions
+  *
++ * @net:	network namespace through which the check was invoked
++ * @table:	table the rule is tried to be inserted into
+  * @entryinfo:	the family-specific rule data
+  * 		(struct ipt_entry, ip6t_entry, arpt_entry, ebt_entry)
+- *
+- * Other fields see above.
++ * @target:	the target extension
++ * @targinfo:	per-target data
++ * @hook_mask:	via which hooks the new rule is reachable
++ * @family:	actual NFPROTO_* through which the function is invoked
++ *		(helpful when match->family == NFPROTO_UNSPEC)
++ * @nft_compat:	running from the nft compat layer if true
+  */
+ struct xt_tgchk_param {
+ 	struct net *net;
+@@ -336,9 +349,9 @@ struct xt_table_info *xt_alloc_table_inf
+ void xt_free_table_info(struct xt_table_info *info);
+ 
+ /**
+- * xt_recseq - recursive seqcount for netfilter use
++ * var xt_recseq - recursive seqcount for netfilter use
+  *
+- * Packet processing changes the seqcount only if no recursion happened
++ * Packet processing changes the seqcount only if no recursion happened.
+  * get_counters() can use read_seqcount_begin()/read_seqcount_retry(),
+  * because we use the normal seqcount convention :
+  * Low order bit set to 1 if a writer is active.
 
