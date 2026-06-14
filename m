@@ -1,142 +1,202 @@
-Return-Path: <netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i/zgEtJkLmoBvQQAu9opvQ
-	(envelope-from <netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:22:42 +0200
+	id MwdBCwplLmokvQQAu9opvQ
+	(envelope-from <netdev+bounces-299181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:23:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D2D9680A3F
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:22:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9DB7680A55
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:23:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=CnzdlwBn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20201202 header.b=P0QJXngM;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299181-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299181-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 315263003EEB
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:22:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 93571300E618
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C6F27A10F;
-	Sun, 14 Jun 2026 08:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7F839732F;
+	Sun, 14 Jun 2026 08:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D98E2F3C0E
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1014B2F3C0E;
+	Sun, 14 Jun 2026 08:23:30 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781425359; cv=none; b=kq4PZVcy+zFMI/an8gczD+Aqb/vEluyJF+m3DiYjmR/PYCSsyXEFZ4Vu+k/60Sk1RPd050i1aWBA8bF9/Tcanskx6KFT0+YjCwr/9+qQfdnFfT1gh37GAFrnqaUydcZ0v3JEEPFTmFZ2C2rtyy2Cr53mbcixjo6BgNjh45KmMmw=
+	t=1781425411; cv=none; b=bYEbm48pBKWSZBkqNww5f7qfIn0Mr1OCTnHHg8H+Z83pLq1Etg2oN0zFZi+b/azxBNuMgW/FU+4YvoJbZmb9HCT9zzQkgDs5qmc9xt7dYjkgFsuRM7BEMUG3kopG6bLCTPSUmAnkZKnUe8R+d0mFUZSpiWQfTuetfYs0fb3obN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781425359; c=relaxed/simple;
-	bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
-	h=Content-Type:MIME-Version:Subject:From:To:Cc:Date:Message-ID:
-	 In-Reply-To:References; b=Tv2OydxzRu2r/y0b6HNHwoNR2e7xkAz5vZL+x/zR6t2r13G5Fqubl0C06SOCKLI9CkZKUKdrFxKyMfNWwVSTOkAdbu0Unw1g2+3qN2+fh9ySAVT33jmqnRSiIHaQYnczKKmu4Tys59mTh2MgF+sun0wOoOS7d53GNKtbTf9bmWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnzdlwBn; arc=none smtp.client-ip=209.85.214.176
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2c0c3315c5dso25243215ad.3
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 01:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781425356; x=1782030156; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:cc:to:from:subject
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
-        b=CnzdlwBnp8QscPBXMTa9wQYuWIn8m4BeoEzE7nt8UDMisra/xQXDkW69hOHPggX6u9
-         Z9MRwBb6VMhG+H9aJOc/KtVBJ4W6k3mtgNsRutWaGOFUPdypdx9il6TJNvqBaNorT5NV
-         7DdT7XuOreua7B6IuOkQ09lADlqS3v8f/gc79IDpjnJMElHQLcYWIoa98imHR4TbONO+
-         G29IzdgBA9HHtkLxFOvOUqnQKlsVFVpNREVHWHkyeOv5vIvnd5E/UI4x0DBIBa7+OazJ
-         s6+wE6EsT2hrX1wlJeU9ch9llpNFZwSF0ksUIUQNF/YF9YXpdBDlpwXAtRtBJtM+360f
-         L/mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781425356; x=1782030156;
-        h=references:in-reply-to:message-id:date:cc:to:from:subject
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
-        b=YpouxBScZzPqb/zOz9DE8If0WnE7+17WpB90vdrcwawHXTH0dbvLKhIALi/eZUSIGJ
-         uIMtNH7EzxgZwJSuRhnlBIlyzYhDmKXqBerAgLjmHYCe8sRMjAaSIQ4znX481mcxMb3w
-         lXyDCftRcSOXK5zKTRYDDTUmSmsDOZZiSWRSVptEqoKuQxcqvAfKHjwFGN5hA7MXYeGS
-         dbvz627J5PcfIJHvQU54XifMPdJgyOGefc6LEiOJeHG9W1aWScYEBDF5R87Eyi/sy1mJ
-         VxQfMKCdoNtU7MyEh7R01Loat4zrEJv5N26C8fssIx7gLhG/2viFxEbUadL1YPvX8BBa
-         xoiQ==
-X-Gm-Message-State: AOJu0Yz2mQvAy0WhJtC0kKlur4Ph756uYvfTLbetSChmMR75kImBQBg5
-	iZW1lHvH0h2Q8LLD83zv6wkcgu4UyAJxjJamRQFkf5VtYx7swGY57mIh9GSywNsuCUI=
-X-Gm-Gg: Acq92OGKIu+9sjHAm5N8jdPgeizx23O54xJI10IccouwFo05vcwCNEC29LgurqiJYeW
-	Pvbsu6JbfywaMi9eAQPd6imPjY5MOtSR3RBDQgNKkyDs9d4JmOqj085lEUp+W3yP3Q5kSZVj0di
-	VZ24tftf6w46WJLXRCEP9wg3h+ZyaREu4EyMnrpsZukiJhQqY+AyvBvjp0ej5jOCdMfQOAa99f+
-	axnefnBtZUbzxngwixL0LaUbioGL8vwgKEWXcRPX+HF/W274mbaTB1A4Mzd/SOwdGFXqFm+iFok
-	wljT22BqwCKCB57FnRXap+n3wGeaRgO2Opyx7hxgh8tu8uvhSEO5SONufGhb5b3gjuY3nbQfHTE
-	pBcxxX54qww+aWZn/S+6gfjGufWyBtvXB1x2x2aJFyEsAQyaiKgplaHskMH44Km/JoqwcbLjSdR
-	0cnXkNGhMx1PXUWqhU
-X-Received: by 2002:a17:902:f78a:b0:2c0:ab82:6ba7 with SMTP id d9443c01a7336-2c412840b4cmr130549805ad.33.1781425356220;
-        Sun, 14 Jun 2026 01:22:36 -0700 (PDT)
-Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4327aca9dsm67318685ad.50.2026.06.14.01.22.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 01:22:35 -0700 (PDT)
-Content-Type: text/plain; charset="us-ascii"
+	s=arc-20240116; t=1781425411; c=relaxed/simple;
+	bh=ymNAAb8fzK+dW/h8VM7c41dvOOZKJqXiAFCQzJ22aas=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=MecC3bd3m5P7hVTAk2K2KE8XWVCfjq3c+Z5DyWhKXEEJlq92RUQRCUi78mWvisO7ir/TJ1i5RRuhnN2zJ0zQFXQb2lzssKPfbgL8/X2srVOU8YleJG/l2ZRy+7IHpTl9xLqswu0mh5XO/zlX0B0bnwg0CB1esNZJ2rKuy9viEtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0QJXngM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A86A5C2BCB0;
+	Sun, 14 Jun 2026 08:23:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1781425410;
+	bh=ymNAAb8fzK+dW/h8VM7c41dvOOZKJqXiAFCQzJ22aas=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=P0QJXngMYQ4QC318FsT08z3Lvg1prBaG+QbjIxmE3Opn3F+AmYCLRXh87MBemS51a
+	 gfG0amxTtnL/UyEwHmQinWnLzPHeyUAr4PKpVokGiyorFjCwqUcDFFbStnyTTEuttf
+	 ZTmXGO1h7JREt7ikogHX+qESTPnn5vlB94I5BXIZlwNlfeHrSDpu1Fh2DhZa1a+KL4
+	 3ipZVopZnRrdAjNtvBhJK1rOfZbK+zImDv32PwgvPmZCL2lUzqK6cCOfBp5270ivxC
+	 s2uuBX+EV0ctpVZbvlXcAARsrWxPjx+CWRAT7gymdVXBFt0QNtsXyB1FMqbfVdE5iW
+	 8HlEW0RaOPLlQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1A1CD98C7;
+	Sun, 14 Jun 2026 08:23:30 +0000 (UTC)
+From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
+Subject: [PATCH v3 0/3] net/smc: bound wire-controlled CDC cursors against
+ the local buffers
+Date: Sun, 14 Jun 2026 03:23:29 -0500
+Message-Id: <20260614-b4-disp-edd64be9-v3-0-551fa514257e@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: net: airoha: Remove dead MT7996 NPU firmware declarations
-From: win847@gmail.com
-To: netdev@vger.kernel.org
-Cc: lorenzo@kernel.org
-Date: Sun, 14 Jun 2026 16:22:32 +0800
-Message-ID: <178142535221.1923709.6145590590751458758@gmail.com>
-In-Reply-To: <6a2dea77.01c4f138.336eeb.a256@mx.google.com>
-References: <6a2dea77.01c4f138.336eeb.a256@mx.google.com>
+X-B4-Tracking: v=1; b=H4sIAAFlLmoC/x3MMQqAMAxA0atIZgNVQ6VeRRxsk2oWLS2IIN7d4
+ viG/x8oklUKTM0DWS4teh4VQ9tA2NdjE1Suht701tiO0BOyloTCbMmLQ28chWjHyMJQs5Ql6v0
+ v5+V9P7Q4T6BiAAAA
+To: Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Dust Li <dust.li@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Sidraya Jayagond <sidraya@linux.ibm.com>
+Cc: Eric Dumazet <edumazet@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Mahanta Jambigi <mjambigi@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+ Ursula Braun <ubraun@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>, 
+ linux-s390@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, Tony Lu <tonylu@linux.alibaba.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1781425409; l=4054;
+ i=hexlabsecurity@proton.me; s=proton; h=from:subject:message-id;
+ bh=ymNAAb8fzK+dW/h8VM7c41dvOOZKJqXiAFCQzJ22aas=;
+ b=Sq1Lt5oYCPGfJBXndHAyJ84bHQFVqUmZc4kNdNiv2j7PBvgSdnK6+FMQVRwNzDEwCHhhzBVWZ
+ lZL+LURD10YBte0BxPEjfo70u5mBR+hMrbuFSownL/tflclglcFeOqA
+X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
+ pk=dmppBMZNLLoPzxHi9l8tZDzEZUunPbgsYqIZYXeUrL0=
+X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/proton with
+ auth_id=814
+X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
+Reply-To: hexlabsecurity@proton.me
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299179-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_RECIPIENTS(0.00)[m:wenjia@linux.ibm.com,m:dust.li@linux.alibaba.com,m:alibuda@linux.alibaba.com,m:sidraya@linux.ibm.com,m:edumazet@google.com,m:davem@davemloft.net,m:mjambigi@linux.ibm.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:ubraun@linux.ibm.com,m:raspl@linux.ibm.com,m:linux-s390@vger.kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:kuba@kernel.org,m:tonylu@linux.alibaba.com,s:lists@lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299181-lists,netdev=lfdr.de,hexlabsecurity.proton.me];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	HAS_REPLYTO(0.00)[hexlabsecurity@proton.me];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8D2D9680A3F
+X-Rspamd-Queue-Id: D9DB7680A55
 
-Thank you for the clarification, Lorenzo.
+A peer's CDC producer/consumer cursors are copied from the wire and used,
+without an upper bound against the local buffers, as (a) a raw index into the
+RMB on the urgent path, (b) the receive length in smc_rx_recvmsg(), and (c) the
+send length in smc_tx_sendmsg() on the SMC-D DMB-merge path.  A malicious or
+buggy peer can forge a cursor so each of these runs past the relevant buffer:
+an out-of-bounds read of adjacent kernel memory (disclosed to the peer) on the
+receive/urgent side, and an out-of-bounds write of attacker-influenced length
+and content on the send side.
 
-You're right - I missed the DTS-based firmware loading mechanism
-introduced in commit 3847173525e30. The MODULE_FIRMWARE() macros
-are indeed used to notify userspace for firmware loading, and the
-firmware names are defined via DTS for different board configurations.
+This series bounds each wire-controlled value at its point of use against the
+local buffer, enforcing invariants the code already documents
+("0 <= bytes_to_rcv <= rmb_desc->len", "0 <= sndbuf_space <= sndbuf_desc->len").
+Conforming peers always keep these values in range, so the bounds are no-ops in
+normal operation.
 
-I'll drop this patch.
+  1/3 bounds the producer cursor count to rmb_desc->len at the SMC-R/SMC-D
+      conversion boundary (the urgent-path raw index).  The bound is applied to
+      the producer cursor only -- the consumer cursor indexes the peer's RMB and
+      is bounded by peer_rmbe_size, so clamping it to our rmb_desc->len would
+      under-credit peer_rmbe_space and stall transmit to a peer with a larger
+      RMB.
+  2/3 bounds the readable count in smc_rx_recvmsg() so the wrap-around copy
+      cannot read past the RMB.
+  3/3 bounds the write space in smc_tx_sendmsg() so the wrap-around copy cannot
+      write past the send buffer.
 
-Regards,
-Wayen
+This supersedes two separately-posted patches and folds them into one series
+together with the producer-cursor fix, after review feedback that they share a
+root cause:
+  - net/smc: bound peer producer cursor and bytes_to_rcv on SMC-D CDC receive
+    https://lore.kernel.org/netdev/20260610084803.186516-1-hexlabsecurity@proton.me/
+  - net/smc: bound sndbuf_space on the SMC-D DMB-merge receive path
+    https://lore.kernel.org/netdev/20260610090928.192177-1-hexlabsecurity@proton.me/
+
+Changes since those postings (addressing the review):
+  - The receive/send bounds were previously applied in the CDC receive tasklet,
+    after the atomic_add().  As the review noted, that read-then-set is not
+    atomic, and a recvmsg()/sendmsg() on another CPU can observe the inflated
+    value in the window between the atomic_add() and the clamp: recvmsg() runs
+    under lock_sock(), which leaves the slock free, so it is not serialized
+    against the bh_lock_sock() CDC tasklet.  The bound now lives at the consumer,
+    where the value is used to size the copy, which is race-free.
+  - The bounds now also reject a negative value (if (x < 0 || x > len)): across
+    many forged CDC messages the signed accumulator can wrap negative, which a
+    plain "> len" check misses and min_t(size_t, ...) then turns into a huge
+    length.
+  - The SMC-R producer-cursor bound is applied only to the producer cursor at
+    the call site, not in the shared smc_cdc_cursor_to_host() helper, so the
+    consumer cursor (bounded by peer_rmbe_size) is no longer truncated.
+
+Verified with an in-kernel KASAN A/B matrix on x86-64 (SMC-D loopback,
+CONFIG_SMC_LO; no special hardware): each sink produces a slab-out-of-bounds
+read/write for a forged cursor and is clean with the patch, and both the
+cross-CPU race and the negative-accumulator case are reproduced and closed.
+Logs available on request.
+
+---
+Bryam Vargas (3):
+      net/smc: bound the wire-controlled producer cursor to the RMB
+      net/smc: bound the receive length to the RMB in smc_rx_recvmsg()
+      net/smc: bound the send length to the send buffer in smc_tx_sendmsg()
+
+ net/smc/smc_cdc.h | 27 ++++++++++++++++++++++++---
+ net/smc/smc_rx.c  | 12 ++++++++++++
+ net/smc/smc_tx.c  | 13 +++++++++++++
+ 3 files changed, 49 insertions(+), 3 deletions(-)
+---
+base-commit: 8e65320d91cdc3b241d4b94855c88459b91abf66
+change-id: 20260614-b4-disp-edd64be9-b094cf67fded
+
+Best regards,
+-- 
+Bryam Vargas <hexlabsecurity@proton.me>
+
+
 
