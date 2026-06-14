@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-299169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299170-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u3bLEf5XLmr3tgQAu9opvQ
-	(envelope-from <netdev+bounces-299169-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:58 +0200
+	id 80ZmNw9YLmr7tgQAu9opvQ
+	(envelope-from <netdev+bounces-299170-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:28:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924A76808FA
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4055F6808FF
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:28:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=cyXgh3NE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299169-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299169-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=hgc4WDo0;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299170-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299170-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4060302452A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1BA75303B6C8
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DF73932E9;
-	Sun, 14 Jun 2026 07:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA76E3932D1;
+	Sun, 14 Jun 2026 07:25:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
+Received: from mail-ua1-f97.google.com (mail-ua1-f97.google.com [209.85.222.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403D53932D1
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99B338E8A5
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:25:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781421939; cv=none; b=ialO3lF9pVl4DM6HjpRBxvmJ4/zL3obbHFfNWZTuqLF9DPbAlYRiQdZVj1s2ihTTOfxmrhfx7fLA/MBUhkqCygbZ+YVaNv6eYFHCPLk03+sWDreesX0XgV23evHTHf+pi5N8VXqfNeYU+5yDdTc+tqkv9Ack66PZVrjNoWFOvZU=
+	t=1781421940; cv=none; b=Kl741FMK5cjTrp8SLMembxA6Z+E89b02Nk9I0e4V11LRa3GZifHJTjq7aVMXYTu21Z4P5mttJUwZNMcUzL19epLT5ZfSnovMxPU/XgIWV7TViHa5O8mT15BmZXMnVlzbooV/6g1bVHs7ln991XA92x4WvT2m193J27rKRC47GsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781421939; c=relaxed/simple;
-	bh=xqpYv96Oyk3CuLaJ0DzpWHIT7DLCdrxzoY/Yq7v/WjQ=;
+	s=arc-20240116; t=1781421940; c=relaxed/simple;
+	bh=hJx+/dQevM5co97L2DGJA3dwIA4S6fLJoKPsAhJA70A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FIQQBMfPwWFRK+6UwPeMxOslTZtlPe7a/a52Rtzo3zLv4FvbCLXA7H/pdAfqPcx9i8MxORQTAg/rpif8hchZ/F45SULOr0ojs+OdKMyeU7JVM0jjgIgH9qEkcOKOb0/L/2wqeVNXfECLFqGXh8bx/nlDF0NLQ8Dy+xXtCRfRfTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cyXgh3NE; arc=none smtp.client-ip=209.85.160.227
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-51761d27612so28698371cf.3
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:37 -0700 (PDT)
+	 MIME-Version; b=YL5hdtPGwZMPHH1QPPnmOpZ4FcBEf7KSqoMr233tGHKOOBlBhjrM68ZTPzGlMTWCHOgqqdQKIkzJPq031T0SwXXQkwIA1DHJ3sGYBpLInxLGMhqP/rREYMxz6ENSRu4J9QC1K0BUH0fh20oDxy0fRXah/efFcIF6EERNCZpNDJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hgc4WDo0; arc=none smtp.client-ip=209.85.222.97
+Received: by mail-ua1-f97.google.com with SMTP id a1e0cc1a2514c-9666739d3bcso679191241.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781421936; x=1782026736;
+        d=1e100.net; s=20251104; t=1781421937; x=1782026737;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rzPddETFZYLWtgViawFTMwEozw0jyPoDQc1YS99rzDU=;
-        b=WyJ8mlCpIYwifGcsmivzlsSNrnIlnX1yYqXREM6iqJsMZerNomgu8iTcHvsXsnTd5j
-         mDidQJnRNuU4gfhuZlhwdOt7vMvV4s0EaZlaB62Ng0nXvVqWsXZh7cWBKeUMyz4t6Xx4
-         +eJRv5Xb16iDGbHCMCdD8vBD6frDbLbyNJgXAeAofHRncTph3rmhw5mPxcEEz7oIQMTi
-         pscyCx3mnrrjFmPKWbffmXmpjApWfq7oQ3HKEo7kwMJKj1/EnLcg+Ri5ZWc6ySibLo1P
-         QFiUZSPJSsNYdv3pjJrYjWtPiYkOrg9OjMv3z6RcT9qOUovLXtvLNgWkWnFHp9TuQzTA
-         VXNA==
-X-Gm-Message-State: AOJu0YzQ1WhKoHsxNFG+7OSHaL/XCiUbi85RIPKdOjkew6jwQ5+/FQan
-	9t7ELoa3eABOMneAAbguM7FBCYqsAS4zgcxivg2+wuSed3RHr61eLXuVtSIYPGCQHVricflDB9A
-	WmzfMI9Mb//sE2k3DyWUrKqH0IENgbbMyBKY4SBa9ou0vkc/9b45DADNGIhbF9fBMnsRp30U0oJ
-	k6oa/rX8kDMykG3kYPQCi8s67+CDMs7fIp+VkiKWau3d78zlCzfjXOLnWtWY9ocpHo7NiprCYmN
-	eZK9y/ldLE=
-X-Gm-Gg: Acq92OEGFIw2x/gJTx/I6OFCFFPe6iZr/KLbZok9B+9UGWyvVx48mGz6tTkDysbdtUU
-	nEMJgDwqQlKqYUVuVkOD6ISeavnDOYa9OC/6WIZ2ALda2juh3DYx3NfZhUaGgqK74XP8Lc+WFpA
-	FKLAdfDMJa9s9UiuZmsA91qzgVwUftALPiYDn/3lMfJCcCxxGphc45NixDngqAQOJuz0ibD7aS2
-	DpFn2ExQU7p+ZqOJI/KbN0TJVD4y+MQloUyNPrHAjdeu0skrtz4tfl/bwPiaDgJnis+9tiE4NsS
-	3ZtecjEinUekpsd97m1U0JzsrrSR4MHdvwGsk5QOCZoDvfO4Ygaqk2ckB0gMcMGp5mRkros+Uvg
-	TO1mWxVufzoE75M0IqREiqUj+w7LNUhspGG9hU3Un5x9XevgapI44yYZgRDYwU7gmTo9f8YpQn8
-	EBd1vpSHAYqMmreicxbFeaPSIEbucR+0ELUnv920IuFnoywXYJyu0HuLAK
-X-Received: by 2002:ac8:5f11:0:b0:517:61d5:2f85 with SMTP id d75a77b69052e-517fe5cbddfmr141814241cf.33.1781421936083;
-        Sun, 14 Jun 2026 00:25:36 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-18.dlp.protect.broadcom.com. [144.49.247.18])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-517fb6389f3sm3517931cf.10.2026.06.14.00.25.35
+        bh=vL2RDlMbK6Afvp+OSi8Ug808OMipj2OAtXDMLphhi6g=;
+        b=ljiKEVE8ELBcfFNn36P2Ts6AR+FFyDyT43HWizwof8hybOxEWlZqyBauGsmlI8vDL6
+         wW9/I0oYtAhRf79kFrs9DlL0uGIGYtkM7SlwEewQKGIGhI4lvqm1QN/8nvfyC9JJcy/d
+         hR7+EzqgO7RwukbngeaUugqZd/OcQZCSpnCrG08XGhfP6rybYckImP8VgSO0phKGLn7R
+         3L0KOuF1HxoNERnDo2Bel0oPhANNjH9CsJNbs4a9qlKoA2aDNXtSd30Gi1uphFzj01Lo
+         rAXF4/bTPifjFo+WACGWDYlF50y6DLElnM9R4QNuYUAhCOW7yrzIB+CCOz2ueSoY03Ac
+         YtKw==
+X-Gm-Message-State: AOJu0YwBoGhoOeRPMB7UiihxAlZnUfP9QOlboyaqEgZBa7XoWB3ePqT/
+	UvDCZVO4FQ6jI7JODEcJCqDavtkxkRFkXTEqV3CMfTMBRtRLKuYrdMhhDn1B+eKhzH1TCw5wRdY
+	lnBY3JNk69cYUynT/O7B0miOUoVtBL+M6sEHla1ZczFew1+M5I2M2FTebIusBF+9nHlNhJKxQh3
+	l9b91LD4vlEPan098jOD3lVsWnszvuSMJiLXdFdJuOjfLUgsOk4IXufInFNCnC9LygtUCZhN4LI
+	Xpe+DSvwYs=
+X-Gm-Gg: Acq92OH/aiZ6e6kknNDflAxjRYK4m/C+31vj3XHb3J87qldE4z4JF+x0UV4TvBnBF47
+	9vyELjiqVEiQ1IrU0ld8xazxr//eIMpk7w9VT4CKQ2SPjjzT2SjEztGRBN7FiDwU+jo20n3p99z
+	WZVIqPhdnZUDq7fra5lMgs+vjCuIpqKgFc2j5cKlulLGSXjBbFzTxgTRKE5XHjl4uaU0Usd43HX
+	sd/vxR9gmTzWfuIjGoHoVQaTsGwZaCFGYQRHONjQ+ZGAB30EEVyJEBEckGMgj/zdc6+I/onxUwt
+	a1TKhinweSsg3qYhKPQIqMCknJVPhfwNsytoJ9/cW7pYPXcFmkpku7EJpBPxn1WdgoFmwxO9Vf0
+	HMv8805iEQyY7gIUOZQW/fYn+G8JZZS7xsSTCpnv3CV/XUv8knW88lsPg0m2AIjXBH9Li/SGyRw
+	O01M6i3Vjx06H5a/5XZgN0bjTcA8XOUTbs6ra1h5HpoUMeALYIei2Tqrk4BuI=
+X-Received: by 2002:a05:6102:26c2:b0:6cb:d562:b96a with SMTP id ada2fe7eead31-71f6021797dmr2680414137.14.1781421937367;
+        Sun, 14 Jun 2026 00:25:37 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-72084bd5709sm87212137.7.2026.06.14.00.25.36
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Jun 2026 00:25:36 -0700 (PDT)
+        Sun, 14 Jun 2026 00:25:37 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-304f23c55b2so3067801eec.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:35 -0700 (PDT)
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-3075fa5a407so1992932eec.1
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781421934; x=1782026734; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1781421935; x=1782026735; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rzPddETFZYLWtgViawFTMwEozw0jyPoDQc1YS99rzDU=;
-        b=cyXgh3NEXg2+PJ9bWRsVgNTWS5JpgshEfBVSfU18iP72R3UTTJA3y4FJHTen/ih+2X
-         UotS8WV+xKviqH3CSO5CsAKWrB012mDnmk1dm4y3rSFgobWJ8qxkffpbW1ciTBXG1CL6
-         lTqAtdVha76SeBmLqnZ18Oeta7nK5QPpn0eOg=
-X-Received: by 2002:a05:7301:4902:b0:2da:2ec2:64fe with SMTP id 5a478bee46e88-30820096392mr4568486eec.24.1781421934059;
+        bh=vL2RDlMbK6Afvp+OSi8Ug808OMipj2OAtXDMLphhi6g=;
+        b=hgc4WDo02CAmtfwDEFQ08fAzOExQMRosqBo8P+2x+XbzFxhY4G0axwp4v39SUd61ZJ
+         lxzxBhG6nbYDYdUcop/eiNEiMjarQu92NdHWvSvUflCjBNKhiXh0fhGpkCpeRGujEhfA
+         HkKbM02KZaF8aVIXTvfXJb4+SEFCe158nDwrU=
+X-Received: by 2002:a05:7300:4791:b0:304:c651:bdfe with SMTP id 5a478bee46e88-3093eb498bcmr3610245eec.17.1781421935237;
+        Sun, 14 Jun 2026 00:25:35 -0700 (PDT)
+X-Received: by 2002:a05:7300:4791:b0:304:c651:bdfe with SMTP id 5a478bee46e88-3093eb498bcmr3610235eec.17.1781421934474;
         Sun, 14 Jun 2026 00:25:34 -0700 (PDT)
-X-Received: by 2002:a05:7301:4902:b0:2da:2ec2:64fe with SMTP id 5a478bee46e88-30820096392mr4568472eec.24.1781421933328;
-        Sun, 14 Jun 2026 00:25:33 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43bc7sm10043280eec.22.2026.06.14.00.25.32
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43bc7sm10043280eec.22.2026.06.14.00.25.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 00:25:32 -0700 (PDT)
+        Sun, 14 Jun 2026 00:25:33 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -97,9 +97,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v3 11/15] bnxt_en: Add crypto MPC transmit/completion infrastructure
-Date: Sun, 14 Jun 2026 00:24:03 -0700
-Message-ID: <20260614072407.2761092-12-michael.chan@broadcom.com>
+Subject: [PATCH net-next v3 12/15] bnxt_en: Support kTLS TX offload by implementing .tls_dev_add/del()
+Date: Sun, 14 Jun 2026 00:24:04 -0700
+Message-ID: <20260614072407.2761092-13-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260614072407.2761092-1-michael.chan@broadcom.com>
 References: <20260614072407.2761092-1-michael.chan@broadcom.com>
@@ -120,12 +120,12 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-299169-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299170-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
@@ -138,7 +138,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_NONE(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
@@ -147,624 +147,732 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 924A76808FA
+X-Rspamd-Queue-Id: 4055F6808FF
 
-Add infrastructure to support sending crypto commands using the
-midpath channels (MPCs).  bnxt_xmit_crypto_cmd() is used to send a
-crypto command and sleep with timeout until the completion is received.
-If it times out, we recover by resetting the MPC.   The next patch will
-use this infrastructure to offload kTLS connections.
+Add basic infrastructure to allocate and free kTLS context IDs (KIDs)
+to support kTLS TX offload.  To offload a connection in .tls_dev_add(),
+the first step is to allocate a KID.  After that the kTLS offload
+command is sent to the HW via MPC using the function
+bnxt_xmit_crypto_cmd() introduced in the last patch.
+
+In .tls_dev_del(), we send the delete command to the HW using the
+same bnxt_xmit_crypto_cmd().  After that we free the KID, making it
+available for new offload.  There is extra logic to handle ifdown,
+FW reset, and device reconfiguration while deleting the connection.
+
+bnxt_ktls_init() assigns bnxt_ktls_ops to the netdev and sets up
+the TLS TX offload feature.  bnxt_ktls_init() will be called in
+the next patch.
 
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
 v3:
-Multiple improvements for the MPC timeout logic, including the use of
-refcount to terminate the timeout instead of the arbitrary 200msec poll
-wait, add synchronize_net().
+Use wait_event() in bnxt_ktls_dev_del() in case the device is in transient
+reconfig state instead of poll wait.
+
+Call bnxt_crypto_del_all() after BNXT_STATE_OPEN is cleared as documented.
+
+Use memzero_explicit() to clear sensitive TLS parameters.
 
 v2:
-https://lore.kernel.org/netdev/20260512212105.3488258-12-michael.chan@broadcom.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   4 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   2 +
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 138 +++++++++++++++-
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  |  95 +++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c | 153 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h |   9 ++
- 6 files changed, 398 insertions(+), 3 deletions(-)
+https://lore.kernel.org/netdev/20260512212105.3488258-13-michael.chan@broadcom.com/
 
+Fix unused variable warning
+Fix error recovery issues
+
+v1:
+https://lore.kernel.org/netdev/20260504235836.3019499-13-michael.chan@broadcom.com/
+---
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  16 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   1 +
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  |  81 ++++-
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  |  11 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 339 ++++++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    | 112 ++++++
+ 7 files changed, 559 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/Makefile b/drivers/net/ethernet/broadcom/bnxt/Makefile
+index 3acdb81fa958..88e68248aad4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/Makefile
++++ b/drivers/net/ethernet/broadcom/bnxt/Makefile
+@@ -5,4 +5,4 @@ bnxt_en-y := bnxt.o bnxt_hwrm.o bnxt_sriov.o bnxt_ethtool.o bnxt_dcb.o bnxt_ulp.
+ bnxt_en-$(CONFIG_BNXT_FLOWER_OFFLOAD) += bnxt_tc.o
+ bnxt_en-$(CONFIG_DEBUG_FS) += bnxt_debugfs.o
+ bnxt_en-$(CONFIG_BNXT_HWMON) += bnxt_hwmon.o
+-bnxt_en-$(CONFIG_BNXT_TLS) += bnxt_mpc.o bnxt_crypto.o
++bnxt_en-$(CONFIG_BNXT_TLS) += bnxt_mpc.o bnxt_crypto.o bnxt_ktls.o
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index dc8957243cc6..6779fd993184 100644
+index 6779fd993184..8478589b8b99 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7714,7 +7714,7 @@ void bnxt_hwrm_cp_ring_free(struct bnxt *bp, struct bnxt_cp_ring_info *cpr)
- 	ring->fw_ring_id = INVALID_HW_RING_ID;
+@@ -78,6 +78,7 @@
+ #include <net/tso.h>
+ #include "bnxt_mpc.h"
+ #include "bnxt_crypto.h"
++#include "bnxt_ktls.h"
+ 
+ #define BNXT_TX_TIMEOUT		(5 * HZ)
+ #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
+@@ -13281,6 +13282,7 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 		static_branch_disable(&bnxt_xdp_locking_key);
+ 	}
+ 	set_bit(BNXT_STATE_OPEN, &bp->state);
++	bnxt_ktls_wake(bp);
+ 	bnxt_enable_int(bp);
+ 	/* Enable TX queues */
+ 	bnxt_tx_enable(bp);
+@@ -13422,7 +13424,8 @@ static int bnxt_open(struct net_device *dev)
+ static bool bnxt_drv_busy(struct bnxt *bp)
+ {
+ 	return (test_bit(BNXT_STATE_IN_SP_TASK, &bp->state) ||
+-		test_bit(BNXT_STATE_READ_STATS, &bp->state));
++		test_bit(BNXT_STATE_READ_STATS, &bp->state) ||
++		bnxt_ktls_busy(bp));
  }
  
--static void bnxt_clear_one_cp_ring(struct bnxt *bp, struct bnxt_cp_ring_info *cpr)
-+void bnxt_clear_one_cp_ring(struct bnxt *bp, struct bnxt_cp_ring_info *cpr)
- {
- 	struct bnxt_ring_struct *ring = &cpr->cp_ring_struct;
- 	int i, size = ring->ring_mem.page_size;
-@@ -14378,7 +14378,7 @@ static int bnxt_hwrm_rx_ring_reset(struct bnxt *bp, int ring_nr)
- 	return hwrm_req_send_silent(bp, req);
- }
+ static void bnxt_get_ring_stats(struct bnxt *bp,
+@@ -13440,9 +13443,20 @@ static void __bnxt_close_nic(struct bnxt *bp, bool irq_re_init,
  
--static void bnxt_reset_task(struct bnxt *bp, bool silent)
-+void bnxt_reset_task(struct bnxt *bp, bool silent)
- {
- 	if (!silent)
- 		bnxt_dbg_dump_states(bp);
+ 	clear_bit(BNXT_STATE_OPEN, &bp->state);
+ 	smp_mb__after_atomic();
++	/* Wake any kTLS delete waiting on a reconfig so it re-evaluates and
++	 * either keeps waiting for the reopen or aborts (ifdown / FW reset).
++	 */
++	bnxt_ktls_wake(bp);
+ 	while (bnxt_drv_busy(bp))
+ 		msleep(20);
+ 
++	/* Delete all crypto connections and KIDs only on ifdown and FW reset,
++	 * not ethtool config changes.
++	 */
++	if (!netif_running(bp->dev) ||
++	    test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
++		bnxt_crypto_del_all(bp);
++
+ 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
+ 		bnxt_clear_rss_ctxs(bp);
+ 	/* Flush rings and disable interrupts */
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 7e24949f2238..e91c9f27cd99 100644
+index e91c9f27cd99..0ca0345a0e11 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -3020,6 +3020,7 @@ int bnxt_hwrm_tx_ring_alloc(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- void bnxt_hwrm_tx_ring_free(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 			    bool close_path);
- void bnxt_hwrm_cp_ring_free(struct bnxt *bp, struct bnxt_cp_ring_info *cpr);
-+void bnxt_clear_one_cp_ring(struct bnxt *bp, struct bnxt_cp_ring_info *cpr);
- int bnxt_total_tx_rings(struct bnxt *bp);
- int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
-@@ -3065,6 +3066,7 @@ void bnxt_get_ring_drv_stats(struct bnxt *bp,
- bool bnxt_rfs_capable(struct bnxt *bp, bool new_rss_ctx);
- int bnxt_dbg_hwrm_rd_reg(struct bnxt *bp, u32 reg_off, u16 num_words,
- 			 u32 *reg_buf);
-+void bnxt_reset_task(struct bnxt *bp, bool silent);
- void bnxt_fw_exception(struct bnxt *bp);
- void bnxt_fw_reset(struct bnxt *bp);
- int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
+@@ -2474,6 +2474,7 @@ struct bnxt {
+ 
+ 	struct bnxt_mpc_info	*mpc_info;
+ 	struct bnxt_crypto_info	*crypto_info;
++	struct bnxt_tls_info	*ktls_info;
+ 
+ 	unsigned int		current_interval;
+ #define BNXT_TIMER_INTERVAL	HZ
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
-index 94dfbcc460c7..49f192c1ddbb 100644
+index 49f192c1ddbb..b82fd40d5de1 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
-@@ -5,10 +5,12 @@
- #include <linux/types.h>
- #include <linux/kernel.h>
- #include <linux/slab.h>
-+#include <linux/pci.h>
- #include <linux/bnxt/hsi.h>
- 
+@@ -11,6 +11,7 @@
  #include "bnxt.h"
  #include "bnxt_hwrm.h"
-+#include "bnxt_mpc.h"
+ #include "bnxt_mpc.h"
++#include "bnxt_ktls.h"
  #include "bnxt_crypto.h"
  
  static u32 bnxt_get_max_crypto_key_ctx(struct bnxt *bp, int key_type)
-@@ -42,6 +44,7 @@ void bnxt_alloc_crypto_info(struct bnxt *bp,
- 	u16 max_keys = le16_to_cpu(resp->max_key_ctxs_alloc);
- 	struct bnxt_crypto_info *crypto = bp->crypto_info;
- 	struct bnxt_kctx *kctx;
-+	char name[64];
- 	int i;
- 
- 	if (BNXT_VF(bp))
-@@ -53,6 +56,15 @@ void bnxt_alloc_crypto_info(struct bnxt *bp,
- 				    "Unable to allocate crypto info\n");
- 			return;
- 		}
-+		snprintf(name, sizeof(name), "bnxt_crypto-%s",
-+			 dev_name(&bp->pdev->dev));
-+		crypto->mpc_cache =
-+			kmem_cache_create(name,
-+					  sizeof(struct bnxt_crypto_cmd_ctx),
-+					  0, SLAB_HWCACHE_ALIGN, NULL);
-+		if (!crypto->mpc_cache)
-+			goto alloc_err;
-+
- 		for (i = 0; i < BNXT_MAX_CRYPTO_KEY_TYPE; i++) {
- 			kctx = &crypto->kctx[i];
- 			kctx->type = i;
-@@ -69,6 +81,10 @@ void bnxt_alloc_crypto_info(struct bnxt *bp,
+@@ -80,13 +81,90 @@ void bnxt_alloc_crypto_info(struct bnxt *bp,
+ 		kctx->max_ctx = bnxt_get_max_crypto_key_ctx(bp, i);
  	}
  	crypto->max_key_ctxs_alloc = max_keys;
- 	bp->fw_cap |= BNXT_FW_CAP_KTLS;
-+	return;
-+
-+alloc_err:
-+	kfree(crypto);
+-	bp->fw_cap |= BNXT_FW_CAP_KTLS;
++	if (!bp->ktls_info)
++		bnxt_alloc_ktls_info(bp);
++	if (bp->ktls_info)
++		bp->fw_cap |= BNXT_FW_CAP_KTLS;
+ 	return;
+ 
+ alloc_err:
+ 	kfree(crypto);
  }
  
- /**
-@@ -119,8 +135,13 @@ void bnxt_clear_crypto(struct bnxt *bp)
-  */
- void bnxt_free_crypto_info(struct bnxt *bp)
- {
++int bnxt_crypto_del(struct bnxt *bp, u8 type, u8 kind, u32 kid)
++{
++	struct bnxt_tx_ring_info *txr;
++	struct ce_delete_cmd cmd = {};
++	u32 data;
++
++	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state) &&
++	    test_bit(BNXT_STATE_FW_FATAL_COND, &bp->state))
++		return 0;
++
++	txr = bnxt_select_mpc_ring(bp, type);
++	if (!txr)
++		return -ENODEV;
++	if (kind == BNXT_CTX_KIND_CK_TX)
++		data = CE_DELETE_CMD_CTX_KIND_CK_TX;
++	else if (kind == BNXT_CTX_KIND_CK_RX)
++		data = CE_DELETE_CMD_CTX_KIND_CK_RX;
++	else
++		return -EINVAL;
++
++	data |= CE_DELETE_CMD_OPCODE_DEL |
++		(BNXT_KID_HW(kid) << CE_DELETE_CMD_KID_SFT);
++
++	cmd.ctx_kind_kid_opcode = cpu_to_le32(data);
++	return bnxt_xmit_crypto_cmd(bp, txr, &cmd, sizeof(cmd),
++				    BNXT_MPC_TMO_MSECS);
++}
++
++static void bnxt_crypto_del_all_kids(struct bnxt *bp, struct bnxt_kid_info *kid)
++{
++	int i, rc;
++
++	for (i = 0; i < kid->count; i++) {
++		if (!test_bit(i, kid->ids)) {
++			rc = bnxt_crypto_del(bp, kid->type, kid->kind,
++					     kid->start_id + i);
++			if (!rc)
++				set_bit(i, kid->ids);
++		}
++	}
++}
++
++/**
++ * bnxt_crypto_del_all - Delete all crypto connections
++ * @bp: pointer to bnxt device
++ *
++ * Delete all crypto connections and free all KIDs for re-use during
++ * shutdown.  Increment the epoch counter to invalidate any outstanding
++ * key references.
++ *
++ * This function assumes serialization (called during shutdown) and does
++ * not use locking.
++ *
++ * Context: Process context during shutdown/reset
++ */
++void bnxt_crypto_del_all(struct bnxt *bp)
++{
 +	struct bnxt_crypto_info *crypto = bp->crypto_info;
++	struct bnxt_kid_info *kid;
++	struct bnxt_kctx *kctx;
++	int i;
 +
 +	if (!crypto)
 +		return;
++
++	/* Shutting down, no need to protect the lists. */
++	for (i = 0; i < BNXT_MAX_CRYPTO_KEY_TYPE; i++) {
++		kctx = &crypto->kctx[i];
++		list_for_each_entry(kid, &kctx->list, list)
++			bnxt_crypto_del_all_kids(bp, kid);
++		kctx->epoch++;
++	}
++}
++
+ /**
+  * bnxt_clear_crypto - Clear all crypto key contexts
+  * @bp: pointer to bnxt device
+@@ -137,6 +215,7 @@ void bnxt_free_crypto_info(struct bnxt *bp)
+ {
+ 	struct bnxt_crypto_info *crypto = bp->crypto_info;
+ 
++	bnxt_free_ktls_info(bp);
+ 	if (!crypto)
+ 		return;
  	bnxt_clear_crypto(bp);
--	kfree(bp->crypto_info);
-+	kmem_cache_destroy(crypto->mpc_cache);
-+	kfree(crypto);
- 	bp->crypto_info = NULL;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+index e873994fb098..72e18860cec1 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+@@ -144,6 +144,8 @@ struct bnxt_crypto_cmd_ctx {
+ #ifdef CONFIG_BNXT_TLS
+ void bnxt_alloc_crypto_info(struct bnxt *bp,
+ 			    struct hwrm_func_qcaps_output *resp);
++int bnxt_crypto_del(struct bnxt *bp, u8 type, u8 kind, u32 kid);
++void bnxt_crypto_del_all(struct bnxt *bp);
+ void bnxt_clear_crypto(struct bnxt *bp);
+ void bnxt_free_crypto_info(struct bnxt *bp);
+ void bnxt_hwrm_reserve_pf_key_ctxs(struct bnxt *bp,
+@@ -163,6 +165,15 @@ static inline void bnxt_alloc_crypto_info(struct bnxt *bp,
+ {
  }
  
-@@ -365,6 +386,82 @@ int bnxt_key_ctx_alloc_one(struct bnxt *bp, struct bnxt_kctx *kctx, u8 kind,
- 	return -EAGAIN;
- }
- 
-+#define BNXT_XMIT_CRYPTO_RETRY_MAX	10
-+#define BNXT_XMIT_CRYPTO_MIN_TMO	100
-+#define BNXT_XMIT_CRYPTO_MAX_TMO	150
-+
-+int bnxt_xmit_crypto_cmd(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			 void *cmd, unsigned int len, unsigned int tmo)
++static inline int bnxt_crypto_del(struct bnxt *bp, u8 type, u8 kind, u32 kid)
 +{
-+	struct bnxt_crypto_info *crypto = bp->crypto_info;
-+	struct bnxt_crypto_cmd_ctx *ctx = NULL;
-+	unsigned long tmo_left, handle = 0;
-+	int rc, retry = 0;
++	return -EOPNOTSUPP;
++}
 +
-+	if (tmo) {
-+		u32 kid = CE_CMD_KID(cmd);
++static inline void bnxt_crypto_del_all(struct bnxt *bp)
++{
++}
 +
-+		ctx = kmem_cache_alloc(crypto->mpc_cache, GFP_KERNEL);
-+		if (!ctx)
-+			return -ENOMEM;
-+		init_completion(&ctx->cmp);
-+		handle = (unsigned long)ctx;
-+		ctx->kid = kid;
-+		ctx->client = txr->tx_ring_struct.mpc_chnl_type;
-+		ctx->status = 0;
-+		/* One reference for this caller, one for the handle stored in
-+		 * the TX buf ring.  The latter is dropped by
-+		 * bnxt_crypto_mpc_cmp() when the command is completed normally
-+		 * or after timeout.
-+		 */
-+		refcount_set(&ctx->refcnt, 2);
-+		retry = BNXT_XMIT_CRYPTO_RETRY_MAX;
-+		might_sleep();
-+	}
-+	do {
-+		spin_lock_bh(&txr->tx_lock);
-+		rc = bnxt_start_xmit_mpc(bp, txr, cmd, len, handle);
-+		spin_unlock_bh(&txr->tx_lock);
-+		if (rc == -EBUSY && tmo && retry)
-+			usleep_range(BNXT_XMIT_CRYPTO_MIN_TMO,
-+				     BNXT_XMIT_CRYPTO_MAX_TMO);
-+		else
-+			break;
-+	} while (retry--);
-+	if (rc || !tmo) {
-+		/* The completion will never arrive, drop one reference */
-+		if (ctx)
-+			refcount_dec(&ctx->refcnt);
-+		goto xmit_done;
-+	}
+ static inline void bnxt_clear_crypto(struct bnxt *bp)
+ {
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
+new file mode 100644
+index 000000000000..9f6bdfb2e9e0
+--- /dev/null
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
+@@ -0,0 +1,339 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright (c) 2026 Broadcom Inc. */
 +
-+	tmo_left = wait_for_completion_timeout(&ctx->cmp, msecs_to_jiffies(tmo));
-+	if (!tmo_left) {
-+		netdev_warn(bp->dev, "crypto MP cmd %08x timed out\n",
-+			    *((u32 *)cmd));
-+		bnxt_mpc_timeout(bp, txr);
-+		rc = -ETIMEDOUT;
-+		goto xmit_done;
-+	}
-+	if (ctx->status == BNXT_CMD_CTX_COMPLETED &&
-+	    CE_CMPL_STATUS(&ctx->ce_cmp) == CE_CMPL_STATUS_OK)
-+		rc = 0;
-+	else
-+		rc = -EIO;
-+xmit_done:
-+	if (rc) {
-+		u8 status = ctx ? ctx->status : 0;
++#include <net/tls.h>
++#include <linux/bnxt/hsi.h>
 +
-+		netdev_warn(bp->dev,
-+			    "MPC transmit failed, ring idx %d, op 0x%x, kid 0x%x, status 0x%x\n",
-+			    txr->bnapi->index, CE_CMD_OP(cmd), CE_CMD_KID(cmd),
-+			    status);
++#include "bnxt.h"
++#include "bnxt_mpc.h"
++#include "bnxt_crypto.h"
++#include "bnxt_ktls.h"
++
++/**
++ * bnxt_alloc_ktls_info - Allocate and initialize kTLS offload context
++ * @bp: pointer to bnxt device
++ *
++ * Allocates the main kTLS crypto info structure
++ *
++ * This function is called during device initialization when firmware
++ * reports kTLS offload capability. If allocation fails, kTLS offload
++ * will not be available but the device will still function.
++ *
++ * Context: Process context
++ *
++ * Return: zero on success, negative error code otherwise:
++ *	ENOMEM: out of memory
++ */
++int bnxt_alloc_ktls_info(struct bnxt *bp)
++{
++	struct bnxt_tls_info *ktls = bp->ktls_info;
++
++	if (BNXT_VF(bp))
++		return -EOPNOTSUPP;
++	if (ktls)
++		return 0;
++
++	ktls = kzalloc_obj(*ktls);
++	if (!ktls) {
++		netdev_warn(bp->dev, "Unable to allocate kTLS info\n");
++		return -ENOMEM;
 +	}
-+	if (ctx && refcount_dec_and_test(&ctx->refcnt))
-+		kmem_cache_free(crypto->mpc_cache, ctx);
++	ktls->counters = kzalloc_objs(*ktls->counters,
++				      BNXT_KTLS_MAX_CTRL_COUNTERS);
++	if (!ktls->counters)
++		goto ktls_err;
++
++	init_waitqueue_head(&ktls->open_wq);
++	bp->ktls_info = ktls;
++	return 0;
++
++ktls_err:
++	kfree(ktls->counters);
++	kfree(ktls);
++	return -ENOMEM;
++}
++
++/**
++ * bnxt_free_ktls_info - Free kTLS crypto offload resources
++ * @bp: pointer to bnxt device
++ *
++ * Frees all resources associated with kTLS crypto offload
++ *
++ * Context: Process context during device shutdown/removal
++ */
++void bnxt_free_ktls_info(struct bnxt *bp)
++{
++	struct bnxt_tls_info *ktls = bp->ktls_info;
++
++	if (!ktls)
++		return;
++	kfree(ktls->counters);
++	kfree(ktls);
++	bp->ktls_info = NULL;
++}
++
++/* Copy in reverse byte order */
++static void bnxt_copy_tls_mp_data(u8 *dst, u8 *src, int bytes)
++{
++	int i;
++
++	for (i = 0; i < bytes; i++)
++		dst[bytes - i - 1] = src[i];
++}
++
++static int bnxt_crypto_add(struct bnxt *bp, enum tls_offload_ctx_dir direction,
++			   struct tls_crypto_info *crypto_info, u32 tcp_seq_no,
++			   u32 kid)
++{
++	struct bnxt_tx_ring_info *txr;
++	struct ce_add_cmd cmd = {0};
++	u32 data;
++	int rc;
++
++	if (direction == TLS_OFFLOAD_CTX_DIR_TX) {
++		txr = bnxt_select_mpc_ring(bp, BNXT_MPC_TCE_TYPE);
++		cmd.ctx_kind = CE_ADD_CMD_CTX_KIND_CK_TX;
++	} else {
++		return -EOPNOTSUPP;
++	}
++	if (!txr)
++		return -ENODEV;
++
++	data = CE_ADD_CMD_OPCODE_ADD | (BNXT_KID_HW(kid) << CE_ADD_CMD_KID_SFT);
++	switch (crypto_info->cipher_type) {
++	case TLS_CIPHER_AES_GCM_128: {
++		struct tls12_crypto_info_aes_gcm_128 *aes;
++
++		aes = (void *)crypto_info;
++		data |= CE_ADD_CMD_ALGORITHM_AES_GCM_128;
++		if (crypto_info->version == TLS_1_3_VERSION)
++			data |= CE_ADD_CMD_VERSION_TLS1_3;
++		memcpy(&cmd.session_key, aes->key, sizeof(aes->key));
++		memcpy(&cmd.salt, aes->salt, sizeof(aes->salt));
++		memcpy(&cmd.addl_iv, aes->iv, sizeof(aes->iv));
++		bnxt_copy_tls_mp_data(cmd.record_seq_num, aes->rec_seq,
++				      sizeof(aes->rec_seq));
++		break;
++	}
++	case TLS_CIPHER_AES_GCM_256: {
++		struct tls12_crypto_info_aes_gcm_256 *aes;
++
++		aes = (void *)crypto_info;
++		data |= CE_ADD_CMD_ALGORITHM_AES_GCM_256;
++		if (crypto_info->version == TLS_1_3_VERSION)
++			data |= CE_ADD_CMD_VERSION_TLS1_3;
++		memcpy(&cmd.session_key, aes->key, sizeof(aes->key));
++		memcpy(&cmd.salt, aes->salt, sizeof(aes->salt));
++		memcpy(&cmd.addl_iv, aes->iv, sizeof(aes->iv));
++		bnxt_copy_tls_mp_data(cmd.record_seq_num, aes->rec_seq,
++				      sizeof(aes->rec_seq));
++		break;
++	}
++	default:
++		return -EOPNOTSUPP;
++	}
++	cmd.ver_algo_kid_opcode = cpu_to_le32(data);
++	cmd.pkt_tcp_seq_num = cpu_to_le32(tcp_seq_no);
++	cmd.tls_header_tcp_seq_num = cmd.pkt_tcp_seq_num;
++	rc = bnxt_xmit_crypto_cmd(bp, txr, &cmd, sizeof(cmd),
++				  BNXT_MPC_TMO_MSECS);
++	memzero_explicit(&cmd, sizeof(cmd));
 +	return rc;
 +}
 +
- int bnxt_crypto_init(struct bnxt *bp)
- {
- 	struct bnxt_crypto_info *crypto = bp->crypto_info;
-@@ -396,3 +493,42 @@ int bnxt_crypto_init(struct bnxt *bp)
- 
- 	return 0;
- }
-+
-+void bnxt_crypto_mpc_cmp(struct bnxt *bp, u32 client, unsigned long handle,
-+			 struct bnxt_cmpl_entry cmpl[], u32 entries)
++static bool bnxt_ktls_cipher_supported(struct bnxt *bp,
++				       struct tls_crypto_info *crypto_info)
 +{
-+	struct bnxt_crypto_cmd_ctx *ctx;
-+	struct ce_cmpl *cmp = NULL;
-+	u32 len, kid;
++	u16 type = crypto_info->cipher_type;
++	u16 version = crypto_info->version;
 +
-+	if (likely(cmpl))
-+		cmp = cmpl[0].cmpl;
-+	if (!handle || entries != 1) {
-+		if (entries != 1 && cmpl) {
-+			netdev_warn(bp->dev, "Invalid entries %d with handle %lx cmpl %08x in %s()\n",
-+				    entries, handle, *(u32 *)cmp, __func__);
-+		}
-+		if (!handle)
-+			return;
-+	}
-+	ctx = (void *)handle;
-+	ctx->status = BNXT_CMD_CTX_COMPLETED;
-+	if (unlikely(!cmpl)) {
-+		ctx->status |= BNXT_CMD_CTX_RESET;
-+		goto cmp_done;
-+	}
-+	kid = CE_CMPL_KID(cmp);
-+	if (ctx->kid != kid || ctx->client != client || entries != 1) {
-+		netdev_warn(bp->dev,
-+			    "Invalid CE cmpl 0x%08x with entries %d for client %d with status 0x%x, expected kid 0x%x and client %d\n",
-+			    *(u32 *)cmp, entries, client, ctx->status, ctx->kid,
-+			    ctx->client);
-+		ctx->status |= BNXT_CMD_CTX_ERROR;
-+	}
-+	len = min_t(u32, cmpl[0].len, sizeof(ctx->ce_cmp));
-+	memcpy(&ctx->ce_cmp, cmpl[0].cmpl, len);
-+cmp_done:
-+	complete(&ctx->cmp);
-+	if (refcount_dec_and_test(&ctx->refcnt))
-+		kmem_cache_free(bp->crypto_info->mpc_cache, ctx);
++	if ((type == TLS_CIPHER_AES_GCM_128 ||
++	     type == TLS_CIPHER_AES_GCM_256) &&
++	    (version == TLS_1_2_VERSION ||
++	     version == TLS_1_3_VERSION))
++		return true;
++	return false;
 +}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
-index c5a5081b31fa..e873994fb098 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
-@@ -4,6 +4,8 @@
- #ifndef BNXT_CRYPTO_H
- #define BNXT_CRYPTO_H
- 
-+#include <linux/refcount.h>
 +
- #define BNXT_MAX_TX_CRYPTO_KEYS		204800
- #define BNXT_MAX_RX_CRYPTO_KEYS		204800
- 
-@@ -57,6 +59,80 @@ struct bnxt_crypto_info {
- 	u16			max_key_ctxs_alloc;
- 
- 	struct bnxt_kctx	kctx[BNXT_MAX_CRYPTO_KEY_TYPE];
++static void bnxt_set_ktls_ctx_tx(struct tls_context *tls_ctx,
++				 struct bnxt_ktls_offload_ctx_tx *kctx_tx)
++{
++	struct bnxt_ktls_tx_driver_state *tx =
++		__tls_driver_ctx(tls_ctx, TLS_OFFLOAD_CTX_DIR_TX);
 +
-+	struct kmem_cache	*mpc_cache;
-+};
++	tx->ctx_tx = kctx_tx;
++}
 +
-+struct ce_delete_cmd {
-+	__le32  ctx_kind_kid_opcode;
-+	#define CE_DELETE_CMD_OPCODE_MASK		0xfUL
-+	#define CE_DELETE_CMD_OPCODE_SFT		0
-+	#define CE_DELETE_CMD_OPCODE_DEL		 0x2UL
-+	#define CE_DELETE_CMD_KID_MASK			0xfffff0UL
-+	#define CE_DELETE_CMD_KID_SFT			4
-+	#define CE_DELETE_CMD_CTX_KIND_MASK		0x1f000000UL
-+	#define CE_DELETE_CMD_CTX_KIND_SFT		24
-+	#define CE_DELETE_CMD_CTX_KIND_CK_TX		 (0x11UL << 24)
-+	#define CE_DELETE_CMD_CTX_KIND_CK_RX		 (0x12UL << 24)
-+};
++static struct bnxt_ktls_offload_ctx_tx *
++bnxt_get_ktls_ctx_tx(struct tls_context *tls_ctx)
++{
++	struct bnxt_ktls_tx_driver_state *tx =
++		__tls_driver_ctx(tls_ctx, TLS_OFFLOAD_CTX_DIR_TX);
 +
-+#define CE_CMD_OP_MASK			0x00000fU
-+#define CE_CMD_KID_MASK			0xfffff0U
-+#define CE_CMD_KID_SFT			4
++	return tx->ctx_tx;
++}
 +
-+#define CE_CMD_OP(cmd_p)					\
-+	(le32_to_cpu(*(__le32 *)(cmd_p)) & CE_CMD_OP_MASK)
-+
-+#define CE_CMD_KID(cmd_p)					\
-+	((le32_to_cpu(*(__le32 *)(cmd_p)) & CE_CMD_KID_MASK) >> CE_CMD_KID_SFT)
-+
-+struct ce_cmpl {
-+	__le16	client_subtype_type;
-+	#define CE_CMPL_TYPE_MASK			0x3fUL
-+	#define CE_CMPL_TYPE_SFT			0
-+	#define CE_CMPL_TYPE_MID_PATH_SHORT		 0x1eUL
-+	#define CE_CMPL_SUBTYPE_MASK			0xf00UL
-+	#define CE_CMPL_SUBTYPE_SFT			8
-+	#define CE_CMPL_SUBTYPE_SOLICITED		 (0x0UL << 8)
-+	#define CE_CMPL_SUBTYPE_ERR			 (0x1UL << 8)
-+	#define CE_CMPL_SUBTYPE_RESYNC			 (0x2UL << 8)
-+	#define CE_CMPL_MP_CLIENT_MASK			0xf000UL
-+	#define CE_CMPL_MP_CLIENT_SFT			12
-+	#define CE_CMPL_MP_CLIENT_TCE			 (0x0UL << 12)
-+	#define CE_CMPL_MP_CLIENT_RCE			 (0x1UL << 12)
-+	__le16	status;
-+	#define CE_CMPL_STATUS_MASK			0xfUL
-+	#define CE_CMPL_STATUS_SFT			0
-+	#define CE_CMPL_STATUS_OK			 0x0UL
-+	#define CE_CMPL_STATUS_CTX_LD_ERR		 0x1UL
-+	#define CE_CMPL_STATUS_FID_CHK_ERR		 0x2UL
-+	#define CE_CMPL_STATUS_CTX_VER_ERR		 0x3UL
-+	#define CE_CMPL_STATUS_DST_ID_ERR		 0x4UL
-+	#define CE_CMPL_STATUS_MP_CMD_ERR		 0x5UL
-+	u32	opaque;
-+	__le32	v;
-+	#define CE_CMPL_V           0x1UL
-+	__le32	kid;
-+	#define CE_CMPL_KID_MASK    0xfffffUL
-+	#define CE_CMPL_KID_SFT     0
-+};
-+
-+#define CE_CMPL_STATUS(ce_cmpl)						\
-+	(le16_to_cpu((ce_cmpl)->status) & CE_CMPL_STATUS_MASK)
-+
-+#define CE_CMPL_KID(ce_cmpl)						\
-+	(le32_to_cpu((ce_cmpl)->kid) & CE_CMPL_KID_MASK)
-+
-+struct bnxt_crypto_cmd_ctx {
-+	struct completion cmp;
-+	struct ce_cmpl ce_cmp;
-+	refcount_t refcnt;
++static int bnxt_ktls_dev_add(struct net_device *dev, struct sock *sk,
++			     enum tls_offload_ctx_dir direction,
++			     struct tls_crypto_info *crypto_info,
++			     u32 start_offload_tcp_sn)
++{
++	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
++	struct bnxt *bp = netdev_priv(dev);
++	struct bnxt_crypto_info *crypto;
++	struct tls_context *tls_ctx;
++	struct bnxt_tls_info *ktls;
++	struct bnxt_kctx *kctx;
 +	u32 kid;
-+	u16 client;
-+	u8 status;
-+#define BNXT_CMD_CTX_COMPLETED	0x1
-+#define BNXT_CMD_CTX_ERROR	0x2
-+#define BNXT_CMD_CTX_RESET	0x4
- };
- 
- #define BNXT_TCK(crypto)	((crypto)->kctx[BNXT_TX_CRYPTO_KEY_TYPE])
-@@ -76,7 +152,11 @@ bool bnxt_kid_valid(struct bnxt_kctx *kctx, u32 id);
- void bnxt_free_one_kctx(struct bnxt_kctx *kctx, u32 id);
- int bnxt_key_ctx_alloc_one(struct bnxt *bp, struct bnxt_kctx *kctx, u8 kind,
- 			   u32 *id);
-+int bnxt_xmit_crypto_cmd(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			 void *cmd, unsigned int len, unsigned int tmo);
- int bnxt_crypto_init(struct bnxt *bp);
-+void bnxt_crypto_mpc_cmp(struct bnxt *bp, u32 client, unsigned long handle,
-+			 struct bnxt_cmpl_entry cmpl[], u32 entries);
- #else
- static inline void bnxt_alloc_crypto_info(struct bnxt *bp,
- 					  struct hwrm_func_qcaps_output *resp)
-@@ -112,9 +192,24 @@ static inline int bnxt_key_ctx_alloc_one(struct bnxt *bp,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int bnxt_xmit_crypto_cmd(struct bnxt *bp,
-+				       struct bnxt_tx_ring_info *txr,
-+				       void *cmd, unsigned int len,
-+				       unsigned int tmo)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int bnxt_crypto_init(struct bnxt *bp)
- {
- 	return 0;
- }
-+
-+static inline void bnxt_crypto_mpc_cmp(struct bnxt *bp, u32 client,
-+				       unsigned long handle,
-+				       struct bnxt_cmpl_entry cmpl[],
-+				       u32 entries)
-+{
-+}
- #endif	/* CONFIG_BNXT_TLS */
- #endif	/* BNXT_CRYPTO_H */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
-index 30f4b3bf181b..31a0a4c1ccfa 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.c
-@@ -9,6 +9,7 @@
- 
- #include "bnxt.h"
- #include "bnxt_mpc.h"
-+#include "bnxt_crypto.h"
- 
- void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
- {
-@@ -488,6 +489,154 @@ int bnxt_start_xmit_mpc(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	return 0;
- }
- 
-+/* Returns true if the ring is successfully marked as closing. */
-+static bool bnxt_disable_mpc_ring(struct bnxt_mpc_info *mpc, int mpc_ring)
-+{
-+	struct bnxt_tx_ring_info *txr;
-+	bool disabled = false;
-+	int i;
-+
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
-+		if (mpc_ring >= mpc->mpc_ring_count[i])
-+			continue;
-+		txr = &mpc->mpc_rings[i][mpc_ring];
-+		spin_lock_bh(&txr->tx_lock);
-+		if (!READ_ONCE(txr->dev_state)) {
-+			disabled = true;
-+			WRITE_ONCE(txr->dev_state, BNXT_DEV_STATE_CLOSING);
-+		}
-+		spin_unlock_bh(&txr->tx_lock);
-+		if (!disabled)
-+			break;
-+	}
-+	/* Make sure napi polls see @dev_state change */
-+	if (disabled)
-+		synchronize_net();
-+	return disabled;
-+}
-+
-+static void bnxt_enable_mpc_ring(struct bnxt_mpc_info *mpc, int mpc_ring)
-+{
-+	struct bnxt_tx_ring_info *txr;
-+	int i;
-+
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
-+		if (mpc_ring >= mpc->mpc_ring_count[i])
-+			continue;
-+		txr = &mpc->mpc_rings[i][mpc_ring];
-+		WRITE_ONCE(txr->dev_state, 0);
-+	}
-+}
-+
-+static void bnxt_clear_one_mpc_entries(struct bnxt *bp,
-+				       struct bnxt_tx_ring_info *txr)
-+{
-+	struct bnxt_sw_mpc_tx_bd *tx_buf;
-+	unsigned long handle;
-+	int i, max_idx;
-+	u32 client;
-+
-+	max_idx = bp->tx_nr_pages * TX_DESC_CNT;
-+
-+	for (i = 0; i < max_idx; i++) {
-+		tx_buf = &txr->tx_mpc_buf_ring[i];
-+		handle = tx_buf->handle;
-+		if (handle) {
-+			client = txr->tx_ring_struct.mpc_chnl_type;
-+			bnxt_crypto_mpc_cmp(bp, client, handle, NULL, 0);
-+			tx_buf->handle = 0;
-+		}
-+	}
-+}
-+
-+static void bnxt_mpc_ring_stop(struct bnxt *bp, struct bnxt_mpc_info *mpc,
-+			       int mpc_ring)
-+{
-+	struct bnxt_tx_ring_info *txr;
-+	struct bnxt_cp_ring_info *cpr;
-+	int i;
-+
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
-+		if (mpc->mpc_ring_count[i] > mpc_ring) {
-+			txr = &mpc->mpc_rings[i][mpc_ring];
-+			bnxt_hwrm_tx_ring_free(bp, txr, true);
-+		}
-+	}
-+	/* CP rings must be freed at the end to guarantee that the HWRM_DONE
-+	 * responses for HWRM_RING_FREE can still be seen on the CP rings.
-+	 */
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
-+		if (mpc->mpc_ring_count[i] > mpc_ring) {
-+			txr = &mpc->mpc_rings[i][mpc_ring];
-+			cpr = txr->tx_cpr;
-+			if (cpr) {
-+				bnxt_hwrm_cp_ring_free(bp, cpr);
-+				bnxt_clear_one_cp_ring(bp, cpr);
-+			}
-+			bnxt_clear_one_mpc_entries(bp, txr);
-+		}
-+	}
-+}
-+
-+static int bnxt_mpc_ring_start(struct bnxt *bp, struct bnxt_mpc_info *mpc,
-+			       int mpc_ring)
-+{
-+	struct bnxt_tx_ring_info *txr;
-+	int i, rc;
-+
-+	for (i = 0; i < BNXT_MPC_TYPE_MAX; i++) {
-+		if (mpc->mpc_ring_count[i] > mpc_ring) {
-+			txr = &mpc->mpc_rings[i][mpc_ring];
-+			txr->tx_prod = 0;
-+			txr->tx_cons = 0;
-+			txr->tx_hw_cons = 0;
-+			rc = bnxt_hwrm_one_mpc_ring_alloc(bp, txr);
-+			if (rc)
-+				return rc;
-+		}
-+	}
-+	return 0;
-+}
-+
-+static int bnxt_mpc_ring_reset(struct bnxt *bp, int mpc_ring)
-+{
-+	struct bnxt_mpc_info *mpc = bp->mpc_info;
 +	int rc;
 +
-+	if (!mpc)
-+		return 0;
-+	if (mpc_ring >= mpc->mpc_cp_rings)
-+		return -EINVAL;
++	BUILD_BUG_ON(sizeof(struct bnxt_ktls_tx_driver_state) >
++		     TLS_DRIVER_STATE_SIZE_TX);
 +
-+	if (!bnxt_disable_mpc_ring(mpc, mpc_ring))
-+		return 0;
++	ktls = bp->ktls_info;
++	if (direction == TLS_OFFLOAD_CTX_DIR_RX)
++		return -EOPNOTSUPP;
 +
-+	netdev_warn(bp->dev, "Resetting MPC ring %d\n", mpc_ring);
-+	netdev_lock(bp->dev);
-+	bnxt_mpc_ring_stop(bp, mpc, mpc_ring);
-+
-+	rc = bnxt_mpc_ring_start(bp, mpc, mpc_ring);
-+	if (rc) {
-+		netdev_err(bp->dev, "Error starting MPC ring %d, rc: %d, resetting device\n",
-+			   mpc_ring, rc);
-+		bnxt_mpc_ring_stop(bp, mpc, mpc_ring);
-+		bnxt_reset_task(bp, true);
-+		netdev_unlock(bp->dev);
-+		/* Return here as bnxt_reset_task() will clear everything */
-+		return rc;
++	if (!BNXT_SUPPORTS_KTLS(bp)) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_NO_CAP]);
++		return -EOPNOTSUPP;
 +	}
-+	netdev_unlock(bp->dev);
-+	bnxt_enable_mpc_ring(mpc, mpc_ring);
++	atomic_inc(&ktls->pending);
++	/* Make sure bnxt_close_nic() sees pending before we check the
++	 * BNXT_STATE_OPEN flag.
++	 */
++	smp_mb__after_atomic();
++	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_STATE_NOT_OPEN]);
++		rc = -ENODEV;
++		goto exit;
++	}
++
++	if (!bnxt_ktls_cipher_supported(bp, crypto_info)) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_INVALID_CIPHER]);
++		rc = -EOPNOTSUPP;
++		goto exit;
++	}
++
++	kctx_tx = kzalloc_obj(*kctx_tx);
++	if (!kctx_tx) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_NO_MEM]);
++		rc = -ENOMEM;
++		goto exit;
++	}
++	tls_ctx = tls_get_ctx(sk);
++	crypto = bp->crypto_info;
++	kctx = &crypto->kctx[BNXT_TX_CRYPTO_KEY_TYPE];
++	rc = bnxt_key_ctx_alloc_one(bp, kctx, BNXT_CTX_KIND_CK_TX, &kid);
++	if (rc) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_KEY_CTX_ALLOC]);
++		goto free_ctx;
++	}
++	rc = bnxt_crypto_add(bp, direction, crypto_info, start_offload_tcp_sn,
++			     kid);
++	if (rc) {
++		atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_CRYPTO_CMD]);
++		goto free_kctx;
++	}
++	kctx_tx->kid = kid;
++	kctx_tx->tcp_seq_no = start_offload_tcp_sn;
++	bnxt_set_ktls_ctx_tx(tls_ctx, kctx_tx);
++	atomic64_inc(&ktls->counters[BNXT_KTLS_TX_ADD]);
++	goto exit;
++
++free_kctx:
++	bnxt_free_one_kctx(kctx, kid);
++free_ctx:
++	kfree(kctx_tx);
++exit:
++	atomic_dec(&ktls->pending);
++	return rc;
++}
++
++#define KTLS_RETRY_MAX		100
++#define KTLS_WAIT_TMO_MS	100
++
++static void bnxt_ktls_dev_del(struct net_device *dev,
++			      struct tls_context *tls_ctx,
++			      enum tls_offload_ctx_dir direction)
++{
++	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
++	struct bnxt *bp = netdev_priv(dev);
++	struct bnxt_crypto_info *crypto;
++	struct bnxt_tls_info *ktls;
++	struct bnxt_kctx *kctx;
++	int retry_cnt = 0;
++	u8 kind;
++	u32 kid;
++
++	ktls = bp->ktls_info;
++retry:
++	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
++		/* During ifdown or FW reset, all connections will be torn
++		 * down by bnxt_crypto_del_all() / FUNC_RESET, so nothing to
++		 * do here.  Only a reconfiguration is transient and
++		 * __bnxt_open_nic() will set BNXT_STATE_OPEN again and wake us.
++		 */
++		if (!netif_running(dev) ||
++		    test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
++			goto free;
++		/* Bound the wait so a wedged reconfig can't block the kTLS
++		 * destruct work indefinitely.
++		 */
++		if (retry_cnt++ > KTLS_RETRY_MAX) {
++			atomic64_inc(&ktls->counters[BNXT_KTLS_ERR_RETRY_EXCEEDED]);
++			netdev_warn(dev, "%s timed out waiting for device, state %lx\n",
++				    __func__, bp->state);
++			goto free;
++		}
++		wait_event_timeout(ktls->open_wq,
++				   test_bit(BNXT_STATE_OPEN, &bp->state) ||
++				   !netif_running(dev) ||
++				   test_bit(BNXT_STATE_IN_FW_RESET, &bp->state),
++				   msecs_to_jiffies(KTLS_WAIT_TMO_MS));
++		goto retry;
++	}
++	atomic_inc(&ktls->pending);
++	/* Make sure bnxt_close_nic() sees pending before we check the
++	 * BNXT_STATE_OPEN flag.
++	 */
++	smp_mb__after_atomic();
++	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
++		atomic_dec(&ktls->pending);
++		goto retry;
++	}
++
++	crypto = bp->crypto_info;
++	kctx_tx = bnxt_get_ktls_ctx_tx(tls_ctx);
++	kid = kctx_tx->kid;
++	kctx = &crypto->kctx[BNXT_TX_CRYPTO_KEY_TYPE];
++	kind = BNXT_CTX_KIND_CK_TX;
++	atomic64_inc(&ktls->counters[BNXT_KTLS_TX_DEL]);
++	if (bnxt_kid_valid(kctx, kid) &&
++	    !bnxt_crypto_del(bp, kctx->type, kind, kid))
++		bnxt_free_one_kctx(kctx, kid);
++
++	atomic_dec(&ktls->pending);
++free:
++	bnxt_set_ktls_ctx_tx(tls_ctx, NULL);
++	kfree(kctx_tx);
++}
++
++static const struct tlsdev_ops bnxt_ktls_ops = {
++	.tls_dev_add = bnxt_ktls_dev_add,
++	.tls_dev_del = bnxt_ktls_dev_del,
++};
++
++int bnxt_ktls_init(struct bnxt *bp)
++{
++	struct bnxt_tls_info *ktls = bp->ktls_info;
++	struct net_device *dev = bp->dev;
++
++	if (!ktls)
++		return 0;
++
++	dev->tlsdev_ops = &bnxt_ktls_ops;
++	dev->hw_features |= NETIF_F_HW_TLS_TX;
++	dev->features |= NETIF_F_HW_TLS_TX;
 +	return 0;
 +}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+new file mode 100644
+index 000000000000..5a4f39f15e80
+--- /dev/null
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
+@@ -0,0 +1,112 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright (c) 2026 Broadcom Inc. */
 +
-+int bnxt_mpc_timeout(struct bnxt *bp, struct bnxt_tx_ring_info *txr)
++#ifndef BNXT_KTLS_H
++#define BNXT_KTLS_H
++
++#include <linux/wait.h>
++
++/* Control plane counters */
++enum bnxt_ktls_ctrl_counters {
++	BNXT_KTLS_TX_ADD = 0,
++	BNXT_KTLS_TX_DEL,
++
++	/* Error counters for debugging */
++	BNXT_KTLS_ERR_NO_MEM,			/* Memory allocation failure */
++	BNXT_KTLS_ERR_NO_CAP,			/* Capability lost after FW reset */
++	BNXT_KTLS_ERR_KEY_CTX_ALLOC,		/* Key context alloc failure */
++	BNXT_KTLS_ERR_CRYPTO_CMD,		/* Crypto command failure */
++	BNXT_KTLS_ERR_DEVICE_BUSY,		/* Device not ready */
++	BNXT_KTLS_ERR_INVALID_CIPHER,		/* Unsupported cipher */
++	BNXT_KTLS_ERR_STATE_NOT_OPEN,		/* Device not open */
++	BNXT_KTLS_ERR_RETRY_EXCEEDED,		/* Retry limit exceeded */
++
++	BNXT_KTLS_MAX_CTRL_COUNTERS,
++};
++
++struct bnxt_tls_info {
++	atomic_t		pending;
++
++	/* Woken from __bnxt_open_nic()/__bnxt_close_nic() when
++	 * BNXT_STATE_OPEN changes, so a kTLS delete can wait out a ring
++	 * reconfiguration instead of polling the state bit.
++	 */
++	wait_queue_head_t	open_wq;
++
++	/* Atomic counters for control path */
++	atomic64_t		*counters;
++};
++
++struct bnxt_ktls_offload_ctx_tx {
++	u32		tcp_seq_no;	/* tcp seq no in sync with HW */
++	u32		next_tcp_seq_no;/* staged tcp seq no */
++	u32		kid;
++	u32		pending_bytes;	/* staged payload bytes */
++};
++
++struct bnxt_ktls_tx_driver_state {
++	struct bnxt_ktls_offload_ctx_tx *ctx_tx;
++};
++
++struct ce_add_cmd {
++	__le32	ver_algo_kid_opcode;
++	#define CE_ADD_CMD_OPCODE_MASK			0xfUL
++	#define CE_ADD_CMD_OPCODE_SFT			0
++	#define CE_ADD_CMD_OPCODE_ADD			 0x1UL
++	#define CE_ADD_CMD_KID_MASK			0xfffff0UL
++	#define CE_ADD_CMD_KID_SFT			4
++	#define CE_ADD_CMD_ALGORITHM_MASK		0xf000000UL
++	#define CE_ADD_CMD_ALGORITHM_SFT		24
++	#define CE_ADD_CMD_ALGORITHM_AES_GCM_128	 0x1000000UL
++	#define CE_ADD_CMD_ALGORITHM_AES_GCM_256	 0x2000000UL
++	#define CE_ADD_CMD_VERSION_MASK			0xf0000000UL
++	#define CE_ADD_CMD_VERSION_SFT			28
++	#define CE_ADD_CMD_VERSION_TLS1_2		 (0x0UL << 28)
++	#define CE_ADD_CMD_VERSION_TLS1_3		 (0x1UL << 28)
++	u8	ctx_kind;
++	#define CE_ADD_CMD_CTX_KIND_MASK		0x1fUL
++	#define CE_ADD_CMD_CTX_KIND_SFT			0
++	#define CE_ADD_CMD_CTX_KIND_CK_TX		 0x11UL
++	#define CE_ADD_CMD_CTX_KIND_CK_RX		 0x12UL
++	u8	unused0[3];
++	u8	salt[4];
++	u8	unused1[4];
++	__le32	pkt_tcp_seq_num;
++	__le32	tls_header_tcp_seq_num;
++	u8	record_seq_num[8];
++	u8	session_key[32];
++	u8	addl_iv[8];
++};
++
++static inline bool bnxt_ktls_busy(struct bnxt *bp)
 +{
-+	if (txr->tx_ring_struct.queue_id == BNXT_MPC_QUEUE_ID)
-+		return bnxt_mpc_ring_reset(bp, txr->txq_index);
-+	return -EINVAL;
++	return bp->ktls_info && atomic_read(&bp->ktls_info->pending) > 0;
 +}
 +
- static bool bnxt_mpc_unsolicit(struct mpc_cmp *mpcmp)
- {
- 	u32 client = MPC_CMP_CLIENT_TYPE(mpcmp);
-@@ -504,6 +653,7 @@ int bnxt_mpc_cmp(struct bnxt *bp, struct bnxt_cp_ring_info *cpr, u32 *raw_cons)
- 	u16 cons = RING_CMP(*raw_cons);
- 	struct mpc_cmp *mpcmp, *mpcmp1;
- 	u32 tmp_raw_cons = *raw_cons;
-+	unsigned long handle = 0;
- 	u32 client, cmpl_num;
- 	u8 type;
- 
-@@ -552,11 +702,14 @@ int bnxt_mpc_cmp(struct bnxt *bp, struct bnxt_cp_ring_info *cpr, u32 *raw_cons)
- 			goto cmp_done;
- 		}
- 		mpc_buf = &txr->tx_mpc_buf_ring[RING_TX(bp, tx_cons)];
-+		if (!READ_ONCE(txr->dev_state))
-+			handle = mpc_buf->handle;
- 		mpc_buf->handle = 0;
- 		tx_cons += mpc_buf->inline_bds;
- 		WRITE_ONCE(txr->tx_cons, tx_cons);
- 		txr->tx_hw_cons = RING_TX(bp, tx_cons);
- 	}
-+	bnxt_crypto_mpc_cmp(bp, client, handle, cmpl_entry_arr, cmpl_num);
- 
- cmp_done:
- 	*raw_cons = tmp_raw_cons;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
-index aa7f2666f0ca..b9a9fc771665 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_mpc.h
-@@ -22,6 +22,8 @@ enum bnxt_mpc_type {
- #define BNXT_DFLT_MPC_TCE	BNXT_MAX_MPC
- #define BNXT_DFLT_MPC_RCE	BNXT_MAX_MPC
- 
-+#define BNXT_MPC_TMO_MSECS      1000
++/* Wake any kTLS control op waiting for a BNXT_STATE_OPEN transition. */
++static inline void bnxt_ktls_wake(struct bnxt *bp)
++{
++	if (bp->ktls_info)
++		wake_up_all(&bp->ktls_info->open_wq);
++}
 +
- struct bnxt_mpc_info {
- 	u8			mpc_chnls_cap;
- 	u8			mpc_cp_rings;
-@@ -106,6 +108,7 @@ void bnxt_hwrm_mpc_ring_free(struct bnxt *bp, bool close_path);
- struct bnxt_tx_ring_info *bnxt_select_mpc_ring(struct bnxt *bp, int ring_type);
- int bnxt_start_xmit_mpc(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 			void *data, unsigned int len, unsigned long handle);
-+int bnxt_mpc_timeout(struct bnxt *bp, struct bnxt_tx_ring_info *txr);
- int bnxt_mpc_cmp(struct bnxt *bp, struct bnxt_cp_ring_info *cpr, u32 *raw_cons);
- #else
- static inline void bnxt_alloc_mpc_info(struct bnxt *bp, u8 mpc_chnls_cap)
-@@ -192,6 +195,12 @@ static inline int bnxt_start_xmit_mpc(struct bnxt *bp,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int bnxt_mpc_timeout(struct bnxt *bp,
-+				   struct bnxt_tx_ring_info *txr)
++#ifdef CONFIG_BNXT_TLS
++int bnxt_alloc_ktls_info(struct bnxt *bp);
++void bnxt_free_ktls_info(struct bnxt *bp);
++int bnxt_ktls_init(struct bnxt *bp);
++#else
++static inline int bnxt_alloc_ktls_info(struct bnxt *bp)
 +{
 +	return -EOPNOTSUPP;
 +}
 +
- static inline int bnxt_mpc_cmp(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 			       u32 *raw_cons)
- {
++static inline void bnxt_free_ktls_info(struct bnxt *bp)
++{
++}
++
++static inline int bnxt_ktls_init(struct bnxt *bp)
++{
++	return -EOPNOTSUPP;
++}
++#endif	/* CONFIG_BNXT_TLS */
++#endif	/* BNXT_KTLS_H */
 -- 
 2.51.0
 
