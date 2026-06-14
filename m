@@ -1,200 +1,316 @@
-Return-Path: <netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id jFqTB6TbLmrj4wQAu9opvQ
-	(envelope-from <netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:49:40 +0200
+	id eutTKnfeLmqZ5QQAu9opvQ
+	(envelope-from <netdev+bounces-299240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 19:01:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEDA681961
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:49:39 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F71F681A79
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 19:01:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=AtA8T52z;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299240-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299240-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 448BF300361E
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 16:49:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BDB93018C05
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 16:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC812E7BB6;
-	Sun, 14 Jun 2026 16:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7A63CAA2E;
+	Sun, 14 Jun 2026 16:58:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37BC28C869
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 16:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC7E3C4567
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 16:58:49 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781455777; cv=none; b=Do99xFQTfHNMclldd/vxLDl3nQjKECFvwv2rFZq0qSAmpOvRaIBJ3UK+7RttP89ia6G/OB1J3HppeoD4PLMn/+5XJMRfrLPxi/VilIyEUlJRyV0tCPA5uxXbEIjPIlEncJTWsVZvqf+btw01wYiRFyp7RpSpDHEr+hY9nxSN64M=
+	t=1781456331; cv=none; b=cgQjrkMfuj61FQBkwkq2vpHesTJQmuw/G3CnxK2dGCkbqiXOw42f2iQkIsKDtkYFFZgLUZtMY3SQ3U7+uxNhty/gfA6q6xJoHQVb0t0OjZXHjxCAwtYxEaVCJkLLHGmGU/gdmDQb7cDkZl6mNyRY4voVCNKSIlBS20MipKQu80A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781455777; c=relaxed/simple;
-	bh=Rbmqlh5X77XiKIehBbP7xpfKX9im+AeF0mpBH1PsugI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rnVot8Ro/vGmGudiZTTvry0aLPwCnfIy9NNYbTiIzVfegqc9JX8uQvvZKXiRKku09OTBZFpgpgCUv2XFD2KjrVOWEc581IY4vSwPF2N0hvYWukT3mwYTbiToRWE1e2x5qHb++pN/POsVN16rOifE56bqLe9T8do9hRF7Tl+B+PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
-Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-48576b535b6so2652744b6e.2
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 09:49:35 -0700 (PDT)
+	s=arc-20240116; t=1781456331; c=relaxed/simple;
+	bh=7IdpY+k79B2YWJ0CnSLw1j3KS2sj8jUBaBz9rtQMWbA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1wOvkDsG/DHHr7IK0bDijvaegpT8/ef64GTvBMapsCEIusSUKst1qGDKTIvuyJLB1T7slXGV3H+NIMiq5KPK93y6AfRmB56UJXQmJhfmXD1AiQ7LnF1zEjQmEq4n3mt9VBdjKJLhX9QQThqytdDCHxXcwTx9GPd8YopDK0880U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AtA8T52z; arc=none smtp.client-ip=209.85.214.181
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2c0b9328c4aso18727235ad.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 09:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781456329; x=1782061129; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G+Bwa8OE8aYBzyp2EbWsiox6q4n51csJQ5PupXYRyz4=;
+        b=AtA8T52zX+u9rl054YgX1dT7TMEVomrJ4e/9/2zqsw/FH5+qeBpxoKCux5gBNRNUEQ
+         kGvOfw7sEB4CXLFRHTMxhX+jJLyFcI8MLiN8ALZhPwJhbe57ygp93DIY0zrMxHCI51he
+         l8zAqWnYRhWHPwzwSy9rTuc5TNlLXNV2zlw6IptcDMdV281qknM0/3EDN+/x3p5qU11q
+         GxIGJ/WbdmLxXAkuQ64E2u5jFhUmEdjUoxi6YOl0XwQRsMyZoCzZtGB85oF231P0eYGE
+         IXpO5zhurVHzvpCWljxPfdITlTMfm/rfmhvp5qu2hLSRb8ujFjKL3mHXrEm3GQb+Frp+
+         UTig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781455774; x=1782060574;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zKQe3tHQuohfTiUdhggcYhl3bqm+NLkjvqbPDTnfoNI=;
-        b=hCV0wRYrKh0NzXLOhyHreytCpwIe1zrFBWlt3uZzkYYus++UHzKwn0TzorQOUDlLC8
-         A9b73bVq+K9jE5nvW7rIRCkLfU0OhBdLHghJdQDQyQhhXGdgg7yJP04qSQYw8guSTqOl
-         O9avOsHxVaqucvwMW9eTnoa4ysgiPZ6ilfSU0YexR4gCFPkaJWRPtJe7n9bJ294QXod5
-         hGyxHgzm/ylCbx5O9adaJGUK0G4KwKlMgV6zY2b65D+eiL/2DP1mE3dJttJWfTLGo3SJ
-         ChuKAZVgYCCFbTm86crLTFQ2ediAEsAZXX63Ngor+nLnbDvVvgtPvVdVEUhZnrXgTpLe
-         ut2A==
-X-Forwarded-Encrypted: i=1; AFNElJ8d0QmgJtwwJ5oJGYSec+Er+Nmf+aKhkpoEXbZaFMY3J/euScANiTFbhry6vq7YcVk8xvoCUSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXhN0/kiblysqAGf8HKBhJ0nDGdeTwXvhvm6t/B5fXTr/3DEDB
-	JLYWBoTJfjdfEJHAX4HDhgWkfH3LSFLj+4BjsleCVEfoIjiG4gCEWijgUr5cUuY8F7kRc/hdW6Y
-	D5QrX0n2dAsAtMs/kpjWeY7k7rIBEzz4j0PukPOYyPa9rQLo3vIuprE8lYGY=
+        d=1e100.net; s=20251104; t=1781456329; x=1782061129;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G+Bwa8OE8aYBzyp2EbWsiox6q4n51csJQ5PupXYRyz4=;
+        b=PFhiYfZ+su7CdyNnGTcSjuIdLTIec7b1rYh5av1kL9mmncAYD4Z9mBsVXbEwkSlUj3
+         wpEz3TG5vn32TR+hvNhqvkVMEv4tVKfwkKtXqxr1wTVWxpUxxEc24+wSmPBj4bajsSOT
+         xLwv6zaqsQt/8cj90srYzIAKDDExuRit2j+fy/17NBKzX4CuowG281GqZZmVwCXqAvl0
+         mKj9iq5GkuXDy6o7jxLoVQedKnjG7/Mh1cCJnOW590nm3n2tyKrtPASC3AvWqy9x2YZR
+         ErXkSxdnWz4eBM25QXy0b9f4e7ZQObOqR1nrrb9NAfqq77/qLRtIFjnUkNo7Gg1hddVM
+         be+g==
+X-Gm-Message-State: AOJu0Yx3I17IXsSXoEhVZIaV1mjYhusbttcJiVg9VRug/cK3bBgPU8IY
+	Ig5ZLuYJfH0OWknXCIl7Q7rtQwiBpD7Q9GRndvIAbDwE1QDkZHwf1AVf
+X-Gm-Gg: Acq92OEoXwJYDQlIbuxS0a8m/HLW/Cg2u4hZDRs10PmisBzcHwao4UqgnqSkfxqQMe7
+	dEgnV5TUtSvbqgYy7i9dgGYwhlyxqj4EydbJ6BO4f0+7EbQX1HiSny9mE/B4VscU+byoK3NraHj
+	GutyVZfsUtfuZkAYPoCn8Dd0LW+q5WFflurdK38Ua5BxMhKQH+UZzTSahLIN2vz1d6bgEMMJpIg
+	mHwmeqN2JxXRSxetiLeh4Rkx1hiTWggfeIqMIUai3z+Cfci+5aFlLZtRj/Axjad5RMlhHcOoyec
+	Xp4Ty55qrkmltLdAMSeg16ScNNSTX2TGKHf+C0U/Xj6qChIQupC7EgTxFyEz04wWYsJnQb1mTbF
+	ueHQMnVN6MRLjt4T/D38BZS32RjkVBmecllhhuCwJgnCKrWB9dxYENG93aLPiA2EEoZ7eWbsRZb
+	0ZlnzQgdZwSv2/8QWW6Y8kJbR5euVg7JA=
+X-Received: by 2002:a17:903:198e:b0:2bd:8395:fedd with SMTP id d9443c01a7336-2c412b30fabmr116699975ad.37.1781456329262;
+        Sun, 14 Jun 2026 09:58:49 -0700 (PDT)
+Received: from DESKTOP-MUHC17F.lan ([188.253.121.147])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c42fbb5b79sm74457405ad.36.2026.06.14.09.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jun 2026 09:58:48 -0700 (PDT)
+From: Zhenzhong Wu <jt26wzz@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	menglong8.dong@gmail.com,
+	eddyz87@gmail.com,
+	shung-hsi.yu@suse.com,
+	stable@vger.kernel.org,
+	mykolal@fb.com,
+	tamird@kernel.org
+Subject: [PATCH stable 6.6.y v3 0/4] bpf: linked scalar precision fixes
+Date: Mon, 15 Jun 2026 00:58:37 +0800
+Message-ID: <cover.1781194510.git.jt26wzz@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:16a7:b0:467:819:dc61 with SMTP id
- 5614622812f47-48741ab5ca9mr4772348b6e.23.1781455774706; Sun, 14 Jun 2026
- 09:49:34 -0700 (PDT)
-Date: Sun, 14 Jun 2026 09:49:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a2edb9e.8812e0fc.3c3fa4.0014.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in __ieee80211_start_scan (2)
-From: syzbot <syzbot+f961b9f94edbc266f1f8@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299239-lists,netdev=lfdr.de,f961b9f94edbc266f1f8];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,storage.googleapis.com:url,vger.kernel.org:from_smtp,googlegroups.com:email,appspotmail.com:email,goo.gl:url,syzkaller.appspotmail.com:from_mime,syzkaller.appspot.com:url];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:johannes@sipsolutions.net,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,google.com,suse.com,fb.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299240-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:john.fastabend@gmail.com,m:andrii@kernel.org,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:kpsingh@kernel.org,m:haoluo@google.com,m:jolsa@kernel.org,m:menglong8.dong@gmail.com,m:eddyz87@gmail.com,m:shung-hsi.yu@suse.com,m:stable@vger.kernel.org,m:mykolal@fb.com,m:tamird@kernel.org,m:johnfastabend@gmail.com,m:menglong8dong@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jt26wzz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	ALIAS_RESOLVED(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6BEDA681961
+X-Rspamd-Queue-Id: 1F71F681A79
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+This v3 targets 6.6.y and changes the backport strategy based on review
+feedback on v2.
 
-HEAD commit:    627366c51145 ptp: ocp: fix resource freeing order
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1114f186580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04
-dashboard link: https://syzkaller.appspot.com/bug?extid=f961b9f94edbc266f1f8
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+The original observed failure was found in Rust/Aya-generated eBPF
+around helper calls. Rust match lowering can keep a helper return value
+and a scalar filled through a by-reference helper argument in the same
+enum-style control flow. That makes it easy for the verifier-visible
+scalar values to become linked by scalar id.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The relevant verifier-log bytecode from the original reproducer is
+below. The later instructions only store r7 into a map so user space can
+observe which branch the verifier kept.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/fdf7eb944feb/disk-627366c5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ab07a79e10f6/vmlinux-627366c5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/270e46d829a1/bzImage-627366c5.xz
+  15: (85) call bpf_get_func_ret#184    ; R0_w=scalar() fp-8_w=mmmmmmmm
+  16: (79) r7 = *(u64 *)(r10 -8)        ; R7_w=scalar() R10=fp0
+  17: (15) if r0 == 0x0 goto pc+1       ; R0_w=scalar()
+  18: (bf) r7 = r0                    ; R0=scalar(id=1) R7=scalar(id=1)
+  19: (55) if r0 != 0x0 goto pc+6       ; R0=0
+  20: (67) r7 <<= 32                    ; R7_w=0
+  21: (77) r7 >>= 32                    ; R7_w=0
+  22: (b7) r1 = 1                       ; R1_w=1
+  23: (55) if r7 != 0xf goto pc+1
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f961b9f94edbc266f1f8@syzkaller.appspotmail.com
+The important verifier state shape is:
 
-------------[ cut here ]------------
-!ieee80211_prep_hw_scan(sdata)
-WARNING: net/mac80211/scan.c:879 at __ieee80211_start_scan+0x1336/0x1d40 net/mac80211/scan.c:879, CPU#0: syz.0.5003/24116
-Modules linked in:
-CPU: 0 UID: 0 PID: 24116 Comm: syz.0.5003 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
-RIP: 0010:__ieee80211_start_scan+0x1336/0x1d40 net/mac80211/scan.c:879
-Code: 06 90 e8 bd 74 b0 f6 48 83 fd 09 0f 84 41 07 00 00 83 fd 03 0f 84 3f 07 00 00 e8 25 6f b0 f6 e9 d5 f2 ff ff e8 1b 6f b0 f6 90 <0f> 0b 90 e9 0d fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 53 fa
-RSP: 0018:ffffc9000674f170 EFLAGS: 00010293
-RAX: ffffffff8b154795 RBX: ffff888053bf8e40 RCX: ffff888079661f00
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffff88804acc3024 R08: ffffffff903034f7 R09: 1ffffffff206069e
-R10: dffffc0000000000 R11: fffffbfff206069f R12: ffff88804acc3060
-R13: dffffc0000000000 R14: ffff88805c5a0f20 R15: ffff88805c5a2a88
-FS:  00007fe61492d6c0(0000) GS:ffff8881252a0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fe613987cc0 CR3: 0000000075924000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- rdev_scan+0x147/0x300 net/wireless/rdev-ops.h:467
- nl80211_trigger_scan+0x1aa1/0x1f50 net/wireless/nl80211.c:11046
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2555
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1899
- sock_sendmsg_nosec net/socket.c:787 [inline]
- __sock_sendmsg net/socket.c:802 [inline]
- ____sys_sendmsg+0x972/0x9f0 net/socket.c:2699
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2753
- __sys_sendmsg net/socket.c:2785 [inline]
- __do_sys_sendmsg net/socket.c:2790 [inline]
- __se_sys_sendmsg net/socket.c:2788 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2788
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe61399ce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe61492d028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fe613c15fa0 RCX: 00007fe61399ce59
-RDX: 0000000004000000 RSI: 0000200000000900 RDI: 0000000000000003
-RBP: 00007fe61492d090 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fe613c16038 R14: 00007fe613c15fa0 R15: 00007fff3acb29d8
- </TASK>
+  1. The program checks "if r0 == 0". The jump target is the success
+     path, and the fallthrough path is the failure path.
+
+  2. On the failure path, "r7 = r0" gives r0 and r7 the same scalar id.
+     The real success path skips that assignment, so r7 is independent
+     there.
+
+  3. At the later "if r0 != 0" check, an affected verifier can explore
+     an impossible continuation where r0 is zero and r7 is narrowed
+     through the shared scalar id as well.
+
+  4. That impossible continuation reaches the return-value comparison
+     with the wrong r7 value. When the real success path is analyzed
+     later, state pruning can consider it safe against the earlier
+     cached verifier state and skip the real continuation.
+
+The root cause is verifier scalar state tracking, not helper-specific
+behavior. A helper return value in r0 and another scalar can become
+linked by scalar id on one branch. The real success path can skip that
+assignment, so the two verifier states are not equivalent.
+
+The relevant pruning point is that regsafe()/states_equal() accepted
+the real success-path state against an earlier cached state where r0 was
+an imprecise scalar and r7 constraints were loose enough to cover the
+current r7. In the impossible path, r0 and r7 are linked by scalar id
+after instruction 18. In the real success path, instruction 18 is
+skipped and that scalar-id relationship does not exist. These states
+should therefore not be treated as equivalent for pruning.
+
+The upstream linked-scalar precision series fixes that root cause by
+recording, in jmp_history, which linked registers were synchronized at
+each conditional jump and by using that per-instruction history during
+precision backtracking. This covers both the original r0 == 0 /
+r0 != 0 shape and the r0 == 1 / r0 != 1 shape used by the separate
+runtime selftest.
+
+A Rust/Aya-specific runtime reproducer/selftest discussed in the v2
+thread has been submitted separately to bpf-next for review:
+
+  https://lore.kernel.org/bpf/20260611160749.391279-1-jt26wzz@gmail.com/
+
+That reproducer keeps the same helper-return/control-flow shape but
+shifts the success value to 1 before branching. This avoids depending
+on the not-equal-zero refinement and exercises linked scalar precision
+during state pruning directly. It uses bpf_skb_load_bytes() in the
+normal tc test-run path and does not require fexit attach or
+bpf_get_func_ret(). It is not included in this stable series because
+per review feedback it should go through bpf-next first before being
+considered for stable.
+
+Targeted results for that separate helper-status runtime reproducer are:
+
+  v6.6.142 + reproducer:                                  FAIL
+  v6.6.142 + v2 d028/9e backport path + reproducer:      FAIL
+  v6.6.142 + this linked-scalars series + reproducer:    PASS
+  bpf-next + reproducer:                                  PASS
+
+Changes since v2:
+  - update the subject from the v2 not-equal title to reflect the
+    linked-scalar precision backport used in this version;
+  - replace the d028f87517d6/9e314f5d8682 backport path with the full
+    upstream linked-scalar precision-tracking series suggested during
+    review;
+  - drop the custom Rust/Aya selftest from the stable series and point
+    to the separate bpf-next review instead;
+  - adapt the linked_regs_broken_link_2 selftest log expectations for
+    6.6.y, where the verifier does not derive the same non-constant
+    JMP_X scalar-vs-scalar range used by the upstream log check;
+  - keep 6.6.y as the first stable target and document that older LTS
+    trees need separate adaptations.
+
+v2:
+  https://lore.kernel.org/r/20260607170959.823755-1-jt26wzz@gmail.com/
+
+RFC v1:
+  https://lore.kernel.org/r/20260601180400.1381736-1-jt26wzz@gmail.com/
+
+Backport details:
+
+This series is based on v6.6.142 / stable/linux-6.6.y commit
+924b4a879cbb ("Linux 6.6.142"). I would like it applied to 6.6.y first.
+The same issue is reproducible on 6.1.y, 5.15.y, and 5.10.y, but those
+trees need separate older-layout adaptations.
+
+Instead of backporting the d028f87517d6 not-equal refinement plus the
+9e314f5d8682 range-combining prerequisite, this series backports the
+full upstream linked-scalar precision-tracking series:
+
+  4bf79f9be434
+    bpf: Track equal scalars history on per-instruction level
+  842edb5507a1
+    bpf: Remove mark_precise_scalar_ids()
+  bebc17b1c03b
+    selftests/bpf: Tests for per-insn sync_linked_regs() precision
+    tracking
+  cfbf25481d6d
+    selftests/bpf: Update comments find_equal_scalars->sync_linked_regs
+
+Upstream series:
+  https://lore.kernel.org/r/20240718202357.1746514-1-eddyz87@gmail.com/
+
+Patches 1 and 2 are the verifier changes from that upstream series. The
+main 6.6.y-specific verifier adaptation is in patch 1: 6.6.y does not
+yet have the newer BPF_ADD_CONST scalar-id representation, so
+sync_linked_regs() is adapted to the older scalar-id layout. Patch 2
+then follows on top of that adapted layout.
+
+Patches 3 and 4 bring the upstream verifier selftests and comment
+updates. Patch 3 has one 6.6.y-specific log adaptation:
+linked_regs_broken_link_2 keeps the "div by zero" reject check, but
+drops the upstream mark_precise log expectations because 6.6.y does not
+derive the scalar-vs-scalar range for that non-constant JMP_X
+comparison. Patch 4 only updates the two pre-existing comments that are
+present in 6.6.y.
+
+Relevant QEMU selftest results on 6.6.y with this backport:
+
+  verifier_scalar_ids passed all 18 subtests, including the newly
+  backported linked-scalar precision tests and the related
+  check_ids_in_regsafe tests.
+
+Thanks to Shung-Hsi Yu for reviewing v2 and suggesting the upstream
+linked-scalar precision series as the preferred backport direction.
+
+Eduard Zingerman (4):
+  bpf: Track equal scalars history on per-instruction level
+  bpf: Remove mark_precise_scalar_ids()
+  selftests/bpf: Tests for per-insn sync_linked_regs() precision
+    tracking
+  selftests/bpf: Update comments find_equal_scalars->sync_linked_regs
+
+ include/linux/bpf_verifier.h                  |   4 +
+ kernel/bpf/verifier.c                         | 367 +++++++++++-------
+ .../selftests/bpf/progs/verifier_scalar_ids.c | 253 ++++++++----
+ .../selftests/bpf/progs/verifier_spill_fill.c |   4 +-
+ .../bpf/progs/verifier_subprog_precision.c    |   2 +-
+ .../testing/selftests/bpf/verifier/precise.c  |   2 +-
+ 6 files changed, 417 insertions(+), 215 deletions(-)
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+base-commit: 924b4a879cbb75aef37c160b955b92f6894b11a4
+-- 
+2.43.0
 
