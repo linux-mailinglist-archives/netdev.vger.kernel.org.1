@@ -1,150 +1,221 @@
-Return-Path: <netdev+bounces-299107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299108-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nvJpD5TxLWq6nAQAu9opvQ
-	(envelope-from <netdev+bounces-299107-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 02:11:00 +0200
+	id CLniCtHyLWoYnQQAu9opvQ
+	(envelope-from <netdev+bounces-299108-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 02:16:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97860680188
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 02:10:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54DD36801A1
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 02:16:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="m/YSI3Mf";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299107-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299107-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=xf6BnHcp;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299108-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299108-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7DC6830099BE
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:10:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50141300A8D2
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 00:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A782772E;
-	Sun, 14 Jun 2026 00:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9221F3B85;
+	Sun, 14 Jun 2026 00:16:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011038.outbound.protection.outlook.com [52.101.57.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E7A2135B8
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:10:54 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781395856; cv=none; b=qOSOwQTsHwqmFQBx7uQJvcem513AXxg/mqvheGTkDbbglmkKZf4g8qqCXhXzdXWUjyAZKzLLBSQsDuLR8dFm7TSWcbKt8zrxERKqAgx0kqzOofiylEM49VHfk1juTgFHeGGD+a7hMiUc1A8zgTEatYeI/WpFm7qqXqoeHLvjz3w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781395856; c=relaxed/simple;
-	bh=z3JPufBLKyPEG56l3ed0X93NQz8KsewzFS36we9xZbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iXduaZkcuWqpnX9PcEWuo5dwu+8FlJ2T2mqMmyEqK1vq+UHJc/c5jQfKx9Aoc+SMxj8UaJmNC10CJafM6+/6bBJxw/BlMz92Rv64UD54i+TQ+zRcCM01GNIcEqer+NACd1IveOhh/Sfi7vrUtm8PBwcJbjJYG/Tf+zpOnuA0J60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/YSI3Mf; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B605E1F000E9;
-	Sun, 14 Jun 2026 00:10:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781395854;
-	bh=iVGWX8CTJMTSnQUUg8I8G4xd1w723/IV0/c/rDWcb4o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=m/YSI3MfUtuAFpISmhJxLo65XTHfWMA5E7z6oSE56efHUWRSfn9ov74DUSKYyjgOU
-	 ZiQ/tk0jehzIMqmVpUW8Gpmp6ZHw7ViIianP6mYMuyjUe/Z1W2OErnDbROA05FbeIV
-	 liKOl53qLu5a+Uyx06ZfaEWcL8N/uPbXJVYEOhBNC75XtODrkgrzsrZo+m6wBe9B7F
-	 cdzIbDI6ENoUGsSGqkoHRqr8N+0AKdRIk4Q8IjPl/N5H29xG1Rr5JDzEmPtuS4RJ3j
-	 RGjnTlwQJd5ruGt6FY0vQLcw8M4s5OFrMMtn7pj2kfFw1KqOXSnemSUmDOazj9ZYgt
-	 vyzS/Cm/R63bA==
-Date: Sat, 13 Jun 2026 17:10:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiang Mei <xmei5@asu.edu>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, yotam.gi@gmail.com,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- bestswngs@gmail.com
-Subject: Re: [PATCH net] psample: zero the netlink attribute padding in
- PSAMPLE_ATTR_DATA
-Message-ID: <20260613171052.0dbdfea4@kernel.org>
-In-Reply-To: <CAPpSM+RuCaNoYFN7JKGDeUScK2-xLjSULA4i8bnChmG05hBaNA@mail.gmail.com>
-References: <20260607031640.2743713-1-xmei5@asu.edu>
-	<20260609183018.1764046d@kernel.org>
-	<ohbtwmotp5mvghzjkwpjecz4rglal3ayh5bylw72qkv6fjscii@3ks3kavmycel>
-	<20260613164820.491226a7@kernel.org>
-	<CAPpSM+RuCaNoYFN7JKGDeUScK2-xLjSULA4i8bnChmG05hBaNA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E9C125A0
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:16:11 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781396172; cv=fail; b=l2E5TtssZ0fnTryyu+aiJ0ZyYZbONhZkw9uX81jGqnaP65SydffGvwyvOtaN6MyBcahFFF0kXntZPbcnGsofEytRlOvtCYP2nw/vEvfQyA4AC/6G3tk/hmf5UxjJGjt3/8Bc0MQ21sOqlNz65+fawVkrU9CpOD5DJlW7+PLbXjc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781396172; c=relaxed/simple;
+	bh=bp551bPi1Z8JqcZLTryKKrj+LuN4ZV1DLrjQ7OgCDn8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LXIOcl/sHqiIWQpCSsk/pTzGGqoqYak9F10//zddNxIyodzGTDTqYwkzfwjrzMJOEoae0Q31UaepLTC2giDrNMXmlqqL4lyL9FaBSHlHqwZgQHhKnjGjs7g3fVofIy7LF4emAG3pqdKY7HoibEgzzEHMi8MS8Ib6BiaVrYt2vC8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xf6BnHcp; arc=fail smtp.client-ip=52.101.57.38
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QQBtWiQIngHqr2t9xAEq6vr+egkz/x1GVlDFnToZVhChRXAyjfOp64DwmZjRplK4olfsuKCVxGvxbqv8HKpnv9oNFmXTpR0TwcECkOipP+ZZuvO+SIqpCmZKwBzGemXM+MbJkrF59k8+5umAgCCH0vVk90/Ro6AZw06PsxVUYfsL5zimsyRXVIAGplf18nNeJDX/C0AakSrkiFzRYqV949z9zqf0bnP0DUz2YxauQk5CKyarPBQyCcOGzHfDbti67i3YP87J03L3+IwjVZ0rNDlNtC11vV0SFjnwWiVXNQq/mYkaOA+1GuEG1XY9FZazTenDx7o56aJSkIbzl6w8bQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tzMqkAjG5eJLPWXjW9/ufFvtW/fvMjbZLQvqT3Eukxg=;
+ b=IZZBj6wNJy4+48GH7CvdC3WPc8QRGvV/gxchG5iCkkxfzKSm29XbXj+8Ro7DKnzj5XcV+LQ+rKyM56JsqHlGqCo1Tt1YtO3FeauRe+kP4T0AO2OVgVcbDdNof+7bA/R0eCLl+ZqPf4gOHycmzv2qgTDA69w/rv6acdE4yORl8n3K05WMdG3IGhkEM87n4lxk6WopomoA21H7goOCZ4KdULTX+e/fzUWH9zb0XuR+c2QF/k3Sk+NyszGu2qQ/9cgaj62U/JnOCqmc+wls8zvzkAmo/Ay0elOaOvXadIXgs53AISjBJ+iBU2ORp+6FN3gcQ9w8+M9FlXkUyOWWoGAu3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tzMqkAjG5eJLPWXjW9/ufFvtW/fvMjbZLQvqT3Eukxg=;
+ b=xf6BnHcpyGXW+m5g9aRvTe7ViyHO8HtMdyZM7guq8zQ7GnnYqWGcAbLmQn47PijtdRE2MRVCVgj4ewdX1kmIIJLGL0Q/AXX2vFFXb9gpbX6LDL7OqzYkfv2hKzv0BeSQt0tfahr4/cw7vRva6IlDfN/DID5Brwebod8rLCMPdA8=
+Received: from MN2PR12MB3485.namprd12.prod.outlook.com (2603:10b6:208:c9::22)
+ by MN0PR12MB5809.namprd12.prod.outlook.com (2603:10b6:208:375::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.16; Sun, 14 Jun
+ 2026 00:16:03 +0000
+Received: from MN2PR12MB3485.namprd12.prod.outlook.com
+ ([fe80::7ac:5acc:f8b7:65c9]) by MN2PR12MB3485.namprd12.prod.outlook.com
+ ([fe80::7ac:5acc:f8b7:65c9%5]) with mapi id 15.21.0092.017; Sun, 14 Jun 2026
+ 00:16:03 +0000
+Message-ID: <7e1e35d2-92dd-4737-a465-37aa6155ced1@amd.com>
+Date: Sat, 13 Jun 2026 17:15:58 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/6] pds_core: Add PLDM firmware update and
+ host backed memory support
+To: Jakub Kicinski <kuba@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, Brett Creeley <brett.creeley@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Joyner <eric.joyner@amd.com>
+References: <20260608223256.12357-1-nikhil.rao@amd.com>
+ <75c74b95-097a-47c9-9a55-a4150394abf8@amd.com>
+ <41d3815e-f060-4003-9974-42530addc641@intel.com>
+ <9e0a17e1-006d-473a-adff-ab76bf91d0ab@amd.com>
+ <1264de6d-a669-4afa-ad08-594d956e101a@intel.com>
+ <20260613135811.1b1f7e65@kernel.org>
+Content-Language: en-US
+From: "Rao, Nikhil" <nikhirao@amd.com>
+In-Reply-To: <20260613135811.1b1f7e65@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR21CA0026.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::36) To MN2PR12MB3485.namprd12.prod.outlook.com
+ (2603:10b6:208:c9::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3485:EE_|MN0PR12MB5809:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2eb7b3fe-b4d2-4161-cc5b-08dec9aa1e83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|23010399003|18002099003|22082099003|4143699003|5023799004|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	Ex6rLoRytkZB2a7RqoerlanSWpiyqDigZrMtiCLk+zI1Mjugxy+8qYHSd1sm8r7CK6Mjend6Us3zVL8saK/KuSItibXCncgCHklaAVgNBBE0IjZtnCBP932Baw94YJKYj5wsmhDHMmZ3XdJ6EntGZTKmbZ8vI3csYK7GeNdD0WNnvyQ880xRWIi1A15RiEBVKqtPTOgXXdMt7oqF4Pv0VVersL+r7KQxOc0/6wn4Q+6r675/iF6ZG6/rEsYoqeCzvKpZ1pzsYXeYj8Kne+B9ieuOgXnwdryj1z3wEZ1AbFXoR/3lT0ZXg3VZ7RpnQWoYkBfY19Ko/pxWk1s3hc71DOIAcf8exi05qwi6mAfgPv8SuVNAEIoH8RmLVznyQWfPUccM/USMoGXUr2tE9wYhxkqrqqczv6BADzH5pfMCDuaycemfxkCupkalnmyNiv8ItixcUENaBR8nm/SfWMv0qQDWhhZ6ADkrOAqMdyffW0kUyYpK21DkPRmLfHy8YiFzfeE/gyy08cwX7+YbX0TEAQVYGtYVyubQU1Bl7gYVjdkTTTPDH04XzMHpbEmoLM/zu9AUgDDI0u+bZ66FfRgIQofq3GlYM0QGxtKYHH8psM48RvN3Uiuh3Vf6BK3hmiz0s+gb5eh4YHuvRSGJcr1RtVtZepjgqS/jJvGs8bcWAxH5thFkaFGKCD5DI0Mc0voS
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3485.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(23010399003)(18002099003)(22082099003)(4143699003)(5023799004)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RjNiRXJZYzhZY3NVV1B1ZUtBNFp4QmNkMWl5NFVYV3Qyb0l5TENma09WaWht?=
+ =?utf-8?B?QUwyamVoejFvSGUzM216WXc2VXNqWlV1NGl4RGNlN3M2NFl3QjNmeDZoV3Rz?=
+ =?utf-8?B?bkVvR2gyUmI3YktaekpRN1ZBcnB1dzR6YVpVcE1ZdVFTOFV3dy9FM01OK1JY?=
+ =?utf-8?B?WHM2TTljT2xieW9sWlJkeW4rMEY2blRXK1ZiTDRjUk50VGYwbDg0TTRjc0Nw?=
+ =?utf-8?B?cVd5NTM3Sm1SNFpyTWFRdm9ZUVdDNXZJbkcwd3FCV2JMKzFiOHRjcUNwNnN5?=
+ =?utf-8?B?dmVidDFQY2hLNmtFRkNUVzlSQWRLb3dUb2dQbmZwZ0t4NzcraHZyd3hzWGFo?=
+ =?utf-8?B?MVFQN29KdHhtUTdnNFozd3pnYnR0b1IxUUZNQTh3UW9oRjI5Z0hGK20zbWJy?=
+ =?utf-8?B?TG4zNzNXZk90bldaUXR3aDZYYUdyYUhEbllHWjBEQWQxa0lYdzE0OFc5d0gz?=
+ =?utf-8?B?ZVByWmlzS3lSa0IrcUtkaUxqem14NWJhSkFrZ0dnVDF3VkJsSXB4NC82THE3?=
+ =?utf-8?B?bjNvcEdNNzg3ZGZRT3dob0Y1U1dZS1RqM3NNY0Q1SURHZGV4MWVsdHpQeUU4?=
+ =?utf-8?B?U2hFQ2ZwZk82UFFiMWM4cSsrRmViYUk2dm9FLzVPNFdsTmwyL2NhVnVJdzJV?=
+ =?utf-8?B?QTJYandnY1FSR2xlWU1EcHB1d0NZQk5YUHFUUk1FQzNQZm5sS215dFZKQ0VP?=
+ =?utf-8?B?YWZmS2t5WktwbmtoOWNsbDlsSkpVaW1VSTgzckVrTUVvRUZjMEdjbGRNblo0?=
+ =?utf-8?B?SUFQaWdLcmF0Tzk2TnJTSlI1RG00ZGNydGFZTDRrWVBNdDdqM1JWQzFINDJj?=
+ =?utf-8?B?bU1zZUN4bXhoTWYxT3M0c3JqTEcvQ1BwVkZhQXFscXVKQ2V1bXk1UFVDOXpp?=
+ =?utf-8?B?Nm1HRkk1UlVQYy9LZW1tRVRUN2tZY0oxclpiUUh4SDM2cHROZWdDL3pDTHhB?=
+ =?utf-8?B?YWpjYW91d2M1bjBZN01jc1JiRFl1N0MwMHk0bEMwMXBCcXZPeEs3ZENJeUVD?=
+ =?utf-8?B?VlhNZytFeWV3MTA1ME40emhRQ055S0kwV0FrTXNjbnRZVmJFaHQzVy8yK09x?=
+ =?utf-8?B?SWQzaU4vd1NPM2kxa2hVR2VUczZvcTFNRjlsU0JCZ1R6Szk4UjMzNGcrbVZY?=
+ =?utf-8?B?dlV4aVhheVJLYUZWM2d6ZlRxM1huM1pISDhiQmYrTWNIcm83L3RzaGs0Y3g4?=
+ =?utf-8?B?U0wrQWE1TThiODdGYVlMUnV1dnZMQWZkaU1uWU1MTEZGR3FqK2grSXFVWVhC?=
+ =?utf-8?B?QVFSc2Fmbm5DOEc3SjJCaVpDTzZKbnJrTndyUVByVXB5bCs3TUttS1Q0WWdr?=
+ =?utf-8?B?OHJ2aVZaQ1VadGdPTXNjSGFCcWx4c1J3cUREQ1RuM1crcTBjUDZUbGJuOXY1?=
+ =?utf-8?B?NDRWMFhnT214Kzk0K1ZvUjFESTJjRnAyR2lCeXdnOG5QbWhIK2RsRENsbXdB?=
+ =?utf-8?B?OFZCcDd6SVhQeEluVGxBTW9iR3ZFakdNSDN3YXdFNmtGUUs4QVN1QmQ0d29q?=
+ =?utf-8?B?WXlwNEpsR004Zzg4OUdxcmpYUy9XeWxMekRFbkFYbkd5S09MSm1TNDl3UkZi?=
+ =?utf-8?B?ckg5NGl1YnFsSEVXd0ZPbS9HeVYwODEzNVJVRkVYd2k2ZHNoay90RWJRMWRX?=
+ =?utf-8?B?cncwOUhvMlBWcm5Qa0l2Q21obm4yVmtWZTlWSEhOaW9ZeXpiWXhqaXhTeU5F?=
+ =?utf-8?B?N29PQlF2SWtLaEg3ODN3Qzk4RzlnUW1MbCtXMERQMUpsMkR6WHdmcFFmbjlq?=
+ =?utf-8?B?NVRyOWZvYUlmT2hTVXZ6eHVPVHM5QWFIMWlWNTJtbW5sQk4xZ0ROTEZyU05p?=
+ =?utf-8?B?cHpocVNIdmJlL2tKNTA2WGcwSFRDTEFNNUdWYjdtTXJBbkdJOE9TZm92RmZY?=
+ =?utf-8?B?Y1RaMlhRSG9acVdiWDJ3eVlGZHdXUkpVVFEyTlJ0VGU1Q2VLbVlvQjhtODRm?=
+ =?utf-8?B?SElCQk00Z05GYVlVWS9WNWQ5Z05LczdRLzlVdDl3aXJWZnd1ZkYydzJ6bHpm?=
+ =?utf-8?B?bVdpRHhXTHRaZXlaM2tubnJPaHpXSHUzR3dTZXJYTU1YU0hxQmU3Tkg1TFM5?=
+ =?utf-8?B?ZCtVSnFuRkNtREwyT3JmL1VhcGN5SGZLM0V0OXFFZEMxZnFsZExqR1JlL3dV?=
+ =?utf-8?B?ZWkwYktNR084aGNXOXhPZEdpNE95TlpqMGdXTU44dFFRaTRpNGNPZGUzam95?=
+ =?utf-8?B?OGtUeWdIcnlzSlBmYmJwazlaV21oRE5tTTZEYm5FZWpySUVSY0dEU3d6Ym5C?=
+ =?utf-8?B?cWZSbGEvRW1pNXo5SzlOZ2piellCQ1U1VGVsbDVaN3NEVkN2RDJwMXI4V09I?=
+ =?utf-8?B?SFVmUkh5Q2JiRGdpRlphUGlpaUNuVElZSGh2UVBOOWtza1l0REI0UT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2eb7b3fe-b4d2-4161-cc5b-08dec9aa1e83
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3485.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2026 00:16:02.8973
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: //Wqu0grFB0pKRCL+/mzJgTbrkPlXBAaBtgfxfTbDL6pH6U28iT2uo4W7lj9rp54gQH+EMTQL0tMGpw3tPx07g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5809
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299107-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:xmei5@asu.edu,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:yotam.gi@gmail.com,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:bestswngs@gmail.com,m:yotamgi@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,gmail.com,google.com,redhat.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299108-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:jacob.e.keller@intel.com,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:eric.joyner@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 97860680188
+X-Rspamd-Queue-Id: 54DD36801A1
 
-On Sat, 13 Jun 2026 17:02:39 -0700 Xiang Mei wrote:
-> > >       if (data_len) {
-> > > -             int nla_len = nla_total_size(data_len);
-> > >               struct nlattr *nla;
-> > >
-> > > -             nla = skb_put(nl_skb, nla_len);
-> > > -             nla->nla_type = PSAMPLE_ATTR_DATA;
-> > > -             nla->nla_len = nla_attr_size(data_len);
-> > > +             nla = nla_reserve(nl_skb, PSAMPLE_ATTR_DATA, data_len);
-> > > +             if (!nla)
-> > > +                     goto error;
-> > >
-> > >               if (skb_copy_bits(skb, 0, nla_data(nla), data_len))
-> > >                       goto error;
-> > >
-> > > Let me know if the new patch makes sense.  
-> >
-> > I assumed the author intentionally was avoiding the memset for
-> > the memory we will override with data. Otherwise the whole dance
-> > could be avoided and nla_put() would have been the answer.  
+On 6/13/2026 1:58 PM, Jakub Kicinski wrote:
+> On Thu, 11 Jun 2026 11:53:13 -0700 Jacob Keller wrote:
+>> On 6/11/2026 10:15 AM, Rao, Nikhil wrote:
+>>>> The preference is to use generic names when possible/feasible. I think
+>>>> at least some of your name choices could align with the generic ones.
+>>>>
+>>>> Could you explain why fw.mainfw was selected and fw.mgmt was deemed not
+>>>> suitable?
+>>>
+>>> This component handles both control and data path, so fw.mgmt didn't
+>>> feel right since devlink-info.rst explicitly excludes data path from
+>>> that definition. We went with fw.mainfw to indicate it's the primary
+>>> firmware component
+>>
+>> It might make sense to extend or add a new definition in this case.
+>> Technically you could also report both fw.mgmt and fw.app together, but
+>> I think that would be more confusing.
+>>
+>> Perhaps Jakub has a suggestion on the name or policy here. The
+>> maintainer preference has generally been to use or extend standardized
+>> names first unless the name or component is clearly unique to the device.
 > 
-> The reason nla_put() isn't used here is that the payload source is the
-> sampled skb, which can be nonlinear, so the data has to be gathered with
-> skb_copy_bits() rather than a flat memcpy().
+> If it covers both datapath and mgmt then shouldn't it be just "fw" ?
+> Right now driver reports something "running"-only as "fw", looks off
 
-That too.
+Will change the PLDM component from "fw.mainfw" to just "fw".
 
-> There is no nla_put() variant that takes an skb source, hence the
-> reserve-then-copy.
-> 
-> But that doesn't require open-coding the attribute: nla_reserve() only
-> memsets the alignment padding (nla_padlen), never the data region, so
-> nla_reserve() + skb_copy_bits() writes every byte exactly once with no
-> redundant memset over the payload. The bug was that the open-coded
-> version dropped that padding-zero step.
+For identity version 2+, the PLDM code reports both running and stored 
+versions. For version 1 (no PLDM), will retain the dev_info.fw_version 
+running-only report.
 
-I find it hard to believe that nla_reserve() was not considered.
-It's a widely used function in the networking stack.
-Please move on.
+Thanks,
+Nikhil
 
