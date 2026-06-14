@@ -1,199 +1,207 @@
-Return-Path: <netdev+bounces-299130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299131-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id xqySLhUlLmpvqAQAu9opvQ
-	(envelope-from <netdev+bounces-299130-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 05:50:45 +0200
+	id fGZrA4AnLmq7qAQAu9opvQ
+	(envelope-from <netdev+bounces-299131-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:01:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D82E6804CF
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 05:50:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519026804F7
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 06:01:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=asu.edu header.s=google header.b="DziB/dQ0";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299130-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299130-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=asu.edu;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=l6hGXIpg;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299131-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299131-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D8AD300A124
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:50:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AE4D30238DE
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 04:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ED44244694;
-	Sun, 14 Jun 2026 03:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F02923ABA8;
+	Sun, 14 Jun 2026 04:01:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4960613AA2D
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 03:50:42 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781409043; cv=pass; b=N6fO4CgD4OwEU908ItwZ0Bpxy2HsSzgCKjKy/Xnx1+vBniWakMKhgLI29CqE+go9YEzl+LXyI2x8BfemGJmAP9Lsw5XNeUmxFp+ArNjkamIjs8Dbe/weEDfQxCHQFlE8dF95HYt42juMqseAxQAja1XqynkpAH6M8iUDMcoy2Og=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781409043; c=relaxed/simple;
-	bh=KkfiQerEAQFPhNuP2DUe3isI30rRJpWqVG7KeJwWnPA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lb5FiEvpIYDSo7Wrsjs5aWtCReMcR81LIKu7437ujtGE0fuhuyvu1JMcic5NmTq0+zkA75NGRmDtztih3wPrg9C7pYcyb+LtCBmZHmEN0V2KVu4yLcWmqV+GCA/db1ETZvRNVGjB82w8M+XPybrN9JFNTf/Y15Msg4m8B+D51Ew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=DziB/dQ0; arc=pass smtp.client-ip=209.85.214.179
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2bf237e1433so27067305ad.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 20:50:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781409041; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Z0Dn4wH3tqjFLUQwVtRA7B4NT34up2sU1nxn5WY3RUITq2adrIakQrpPD4oYWSfza6
-         N/CcPsMMOhlqMrruqZjPoc5fLDqlQF+j88Gx5wBXQKwEwvDNdGTTRwXGSV9d2cN6JNzU
-         Im30sKFQ9iM29SSPiQPG+uXKbGgO+1DWtc7+hVnHrNDZtlemFBllnctAR3LT+MTH/EeH
-         O+oDcVepV1xi6z2HBHU5HEr3YXKExMdUUV287fD+/WuCkuQHGdMe3GA802jbqRWNYOJg
-         OrZ2Iuf4kztIDJl+Ed2sh4/TmexfhASahtjRpQXLYriAloxD2PB9KuB/PuSnTY5k9b8b
-         3XSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YgtaJRtn47yniJqSuUEdgEZ2iDNmLr75v1SjdgEcQJk=;
-        fh=ZYxaXIYMvabb9dHeZ2FhzI5l0he1avKb9pG0M/0Xuwc=;
-        b=bffsUMs9kXQuw2JwJ36kgAmX2JhN7h+AbEBB2Ll8hR5BxtfeR3aRO+VqP7qo85UI+8
-         UYfsewArNErG+WDqFZ4kzLP83mtQlcOkfqw86vXpYoXgGr8m6XnDvAYr00DfziiYHVhF
-         dNiaoI3wrLFVhqX/BdpL9MXwRsVDfowxtN9dG3HLosXk1FlURfgJLmosGJWMoiOSVNpl
-         K8KVi04wqkbanJBcZTU6263oZSA/RRH9VXk/R0h7H8ON+VTUjNFo3akqQZiMRjibJjz0
-         NvohBIh4yHe0plIuN9gE+iM+eEusjOKi9bg+qsQXe0AXKZTXRfoX3EASPAGXZoJrjMFk
-         07kQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E77E2772E
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 04:00:58 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781409660; cv=none; b=BGulZNux1AnuR+esAjSgLi/3d3/SyIfwCmkTKhNIQ2Y5yUWibWjtpWAsqhNMlNVkXBSRQLjtAkvfLywhaqGwHnI82waRdbFy5gRf6u5ME0/Jj6NhCu+fpPe+12c0jb/A9TbIFnXqnPx3LOGhqdfHAdPIT6xe64QU+1cQlZUeuDM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781409660; c=relaxed/simple;
+	bh=APT6um1Gw37K7BhotudONjWhazcoIfn8CWJ3A7ulKkI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VfpEZxgblQUKHypfuBJxlQlRtptNvyCwwPJMVs/81iPGzB9pEAHXSqlXxMPaJtodHfsErH7v8ZIGU7sNgpacuRrqb05zAtmJr3pKjIqcepeR0TN3zIIaIxW5v9DOYngYoXtDj5sYNRpyt88tWXl4wlW9wm4ZsFMobxq10tc0SSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l6hGXIpg; arc=none smtp.client-ip=209.85.216.52
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-36b900f350fso1967351a91.0
+        for <netdev@vger.kernel.org>; Sat, 13 Jun 2026 21:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1781409041; x=1782013841; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YgtaJRtn47yniJqSuUEdgEZ2iDNmLr75v1SjdgEcQJk=;
-        b=DziB/dQ0dk4UN96Lma9S2lAeXZlrfSvrwCfwQP3UpV8mxjoWfrQH5HH++szANIXbu/
-         801T4aNRY4YZOo2UfrWidKSSuETIl9LlLySAvgNmKkhiwBLeiS5tC1B9KYCDn9HAt/Rr
-         54nVVXHapdZnZcSAngwgwPtdnG6KVY7nZxTCi+QghUfuuJf3mqbHPeV6DHhnYWUVuBmQ
-         t+36/vecslTLTTGkeIltxO/bMPY2vLY2HyJo5NEslvcm1//X5Ni3HVtg5+VQ1nEV0rIf
-         O7gGJKXnpSt7rDHM0xH30swkWzDAQR0w140DEzoeDcb4PKFEvVF6CRwwwmMRVo6IBjau
-         ULkw==
+        d=gmail.com; s=20251104; t=1781409658; x=1782014458; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q49mRONNBYR0JeB0FoFSRUEZksnbOzysOYCNAb9xxlY=;
+        b=l6hGXIpgzKTgu0GF5KE5NyKQ5JIjnIu1HUFB63vTIbWIylCRvDwVFtcXv5qjskkNGI
+         VlxbSJ0Ph6k5wT6K1ZhpRg91M3ppt3+N9x1K97VXsMzd5kXT3tUrs3zLT5bWpplR8Z1T
+         Z0JVebbzWKLNOFqc0COJaCe9GT4XPPZRgg95BPkJgZjL2fiNsOiKD6lBLufGPFYcDY1s
+         7hIeQAYkCWRzRQzXjNTNAABuD9UfSjv3Hnnre8RoGdkzqsOizqiiP7n1cxpcXuoRK4rk
+         QGLJd7AHnlSejDbPfzSCRAwGdfBjIoglW++i+AzD3snrhLjXJtsVx2yiZimGfmBD6FxC
+         FfFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781409041; x=1782013841;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YgtaJRtn47yniJqSuUEdgEZ2iDNmLr75v1SjdgEcQJk=;
-        b=P4eCCZTz4X2ZgylFxBj8c7bA6w+Amtrf72nNxP4IR9Nx3/FB/Qedw8SyyZqfLyihg1
-         jLmxY2TMQUhM0amqmcgKjo27gRAC/6DPQEH7GdzuV/kdBUY8rg7ckwNWr6On5q1W3HOQ
-         1d9779B9sS5i/aOt81PsMEaARUAVsq1CQK+TWKWaliAdZ6fZLGkxhq0pYWUiuKM75Wcr
-         lbUGJQm9XqVt02FSfcBN0pzG7edFwLX+Wju4zICOSJOI+fwx6ac5zmUvvOsiyv2VZ9cy
-         nYzFPiA+1dXTw2lyQmKXneybxu36yiisnntU8vCeuU/nNHJ3zb0fWaPy4S24zYPDjb8Q
-         NHtw==
-X-Gm-Message-State: AOJu0YwzL5goT+/Eptik+LYPCPqWKmmK340+I45xNQg19BG2/LiVNS7b
-	iM4XIMhxE/srdn//iKXfo0YgUoL04EDQNGDaTWhA5hRJbzUOsE/OTAUkTqC8Ac8ScUx3VlnnTDZ
-	Pfr9V8P2t3StEXPDwrN8bmf0lD4ACETxwqtAnDqjV
-X-Gm-Gg: Acq92OE+RNzH/aKrCIETegMpqxCpLUOw0sGyQffP3zTH1QbZEg8JJCSvSYOK0ClWQ7y
-	SSoU1FUOgCnoKrMcFhv18WQ7ykD4qXDTLSSh46BjgtK26fpZnGFfvebweZYs83KJfBWCgPZj8FB
-	AggmKSQ2iUkdhuIjrvtOuyA7k6QKDzed7tTYuXLN8tePiI2uQma4pWftZvVFDbseYGlUjXiHueX
-	pDHeMC/6cJMC6RXSbpFBjKswjpq1bWBl/Nyb3NjahEaVlliGu22Dk62WqtwM/UnYdl1LcH7+2nX
-	y3pCdR42zNMrsUdDhw==
-X-Received: by 2002:a17:903:1aef:b0:2bf:2e06:2ebf with SMTP id
- d9443c01a7336-2c412653828mr105149065ad.31.1781409041635; Sat, 13 Jun 2026
- 20:50:41 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781409658; x=1782014458;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q49mRONNBYR0JeB0FoFSRUEZksnbOzysOYCNAb9xxlY=;
+        b=fZHi8/dPBuQT6zdOg7IwUFnZ6ID82fj8lnEVzlVsuA1t2E+FGRmhBjnywmrEJdkse7
+         kN5jud8NjoFggRCW25E9mrPS1T0xVpMBopKdBkBdllviL/BpvmIciP/vSFaAihjIsl5F
+         rXoBvV46cWS61j5cumOFVE0NKiNAMqXeMBVCfBSxKwnZ6QoqLHUFLLeAqdLZI9He2fzg
+         I4/7yGjBpw5Xcju0OXAFCSUpNsoz+n8cNTrPzoqY31uay63akyKKjnRLTjUN+t0FZfE0
+         jweU/UtLNbQC2NIayfTmJiCyO0HFWNs2yYLNl9OHQT0mD7I85SbjcB/IskMXKTXw8PWP
+         bPcQ==
+X-Gm-Message-State: AOJu0Yz+lvWx26gOel+s8ombv3s7A3mvP4yU53AfWi35XE2UUZ7yW20w
+	n8rSA7vUt5x1/kb0wPPSPhbqEL0JKICUt/Io5PYn382ovLzzjYvFQI10GDUhHtbZ
+X-Gm-Gg: Acq92OGtRi+YkSo0D1o70gzbFSHryNFgzEues71VooHs4SkDCwz62l7jDn0+1KBZL1Q
+	FyyWq+WNa3lG94trZDcrqPAZ5St0g/F3bqZ5t3JAcSpRxOqEqCVrfE4xtX5Y/xGN65EFANutvVs
+	N19EWwf889PoGbgGGQTSbHCSxJNt1oCD9P5TyJabGN6p2Yb6cCK6Ud3a879hJc5Vq2729RYkHnE
+	hwXq07bcfRrDovsC2rGX9nLvxlZCd03Cm5k2tHeFzcxrVk1m0C6mJbrXfdP29dw8dpAwQ6cORsG
+	Z5nFxz7I1mnqgpRdtFABVEVf7JKPGVEAZuhjE54mvuhijVqzOTcI7ZJZKl54RiC78Hr0L5rQi8Q
+	Jhsu9+QMvORfUWsouXQwTBUkjdizFI7RZTWeAaWHnfp7EZIThfpHmZfoIF1gi/5AVgtoKlOE4Ur
+	hY7qED+jP3yFUt6R/Ee0vfrpOyeMRSMA==
+X-Received: by 2002:a17:90b:5588:b0:367:d850:6a5f with SMTP id 98e67ed59e1d1-37c2bd79bc6mr5257855a91.25.1781409658385;
+        Sat, 13 Jun 2026 21:00:58 -0700 (PDT)
+Received: from mincom1 ([115.4.79.42])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661a67603sm5676983a12.0.2026.06.13.21.00.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jun 2026 21:00:57 -0700 (PDT)
+From: Jihong Min <hurryman2212@gmail.com>
+To: netdev@vger.kernel.org,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	linux-kernel@vger.kernel.org,
+	Jihong Min <hurryman2212@gmail.com>
+Subject: [RFC PATCH net-next 0/7] net: airoha: add EN7581 SOE ESP packet offload
+Date: Sun, 14 Jun 2026 13:00:25 +0900
+Message-ID: <20260614040032.1567994-1-hurryman2212@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260607031640.2743713-1-xmei5@asu.edu> <20260609183018.1764046d@kernel.org>
- <ohbtwmotp5mvghzjkwpjecz4rglal3ayh5bylw72qkv6fjscii@3ks3kavmycel>
- <20260613164820.491226a7@kernel.org> <CAPpSM+RuCaNoYFN7JKGDeUScK2-xLjSULA4i8bnChmG05hBaNA@mail.gmail.com>
- <20260613171052.0dbdfea4@kernel.org>
-In-Reply-To: <20260613171052.0dbdfea4@kernel.org>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Sat, 13 Jun 2026 20:50:30 -0700
-X-Gm-Features: AVVi8CfIDXQxjAOpMhwjcCdLmtbxBO4EuX00PcRD11tCRNjH-csgI-daSb47wfE
-Message-ID: <CAPpSM+Ri4KA+L33T5F2MmE07YdN4QYq6G=eU1b1mpi2+fjQjCw@mail.gmail.com>
-Subject: Re: [PATCH net] psample: zero the netlink attribute padding in PSAMPLE_ATTR_DATA
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, yotam.gi@gmail.com, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299130-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299131-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[hurryman2212@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gondor.apana.org.au,secunet.com,vger.kernel.org,gmail.com,collabora.com,lists.infradead.org,nbd.name];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:yotam.gi@gmail.com,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:bestswngs@gmail.com,m:yotamgi@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,gmail.com,google.com,redhat.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:herbert@gondor.apana.org.au,m:steffen.klassert@secunet.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:devicetree@vger.kernel.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:ansuelsmth@gmail.com,m:nbd@nbd.name,m:linux-kernel@vger.kernel.org,m:hurryman2212@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hurryman2212@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,asu.edu:dkim,asu.edu:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2D82E6804CF
+X-Rspamd-Queue-Id: 519026804F7
 
-On Sat, Jun 13, 2026 at 5:10=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat, 13 Jun 2026 17:02:39 -0700 Xiang Mei wrote:
-> > > >       if (data_len) {
-> > > > -             int nla_len =3D nla_total_size(data_len);
-> > > >               struct nlattr *nla;
-> > > >
-> > > > -             nla =3D skb_put(nl_skb, nla_len);
-> > > > -             nla->nla_type =3D PSAMPLE_ATTR_DATA;
-> > > > -             nla->nla_len =3D nla_attr_size(data_len);
-> > > > +             nla =3D nla_reserve(nl_skb, PSAMPLE_ATTR_DATA, data_l=
-en);
-> > > > +             if (!nla)
-> > > > +                     goto error;
-> > > >
-> > > >               if (skb_copy_bits(skb, 0, nla_data(nla), data_len))
-> > > >                       goto error;
-> > > >
-> > > > Let me know if the new patch makes sense.
-> > >
-> > > I assumed the author intentionally was avoiding the memset for
-> > > the memory we will override with data. Otherwise the whole dance
-> > > could be avoided and nla_put() would have been the answer.
-> >
-> > The reason nla_put() isn't used here is that the payload source is the
-> > sampled skb, which can be nonlinear, so the data has to be gathered wit=
-h
-> > skb_copy_bits() rather than a flat memcpy().
->
-> That too.
->
-> > There is no nla_put() variant that takes an skb source, hence the
-> > reserve-then-copy.
-> >
-> > But that doesn't require open-coding the attribute: nla_reserve() only
-> > memsets the alignment padding (nla_padlen), never the data region, so
-> > nla_reserve() + skb_copy_bits() writes every byte exactly once with no
-> > redundant memset over the payload. The bug was that the open-coded
-> > version dropped that padding-zero step.
->
-> I find it hard to believe that nla_reserve() was not considered.
-> It's a widely used function in the networking stack.
-Thanks for your time of discussion. v3 has been sent.
+Add Secure Offload Engine (SOE) support for the Airoha EN7581 Ethernet
+driver. SOE provides inline ESP packet offload for native ESP and NAT-T
+traffic, with the Ethernet/QDMA path used to submit packets to the SOE
+block and the PPE path used to bind eligible ESP flows. NETIF_F_GSO_ESP
+and NETIF_F_HW_ESP_TX_CSUM are intentionally left out for now and will be
+revisited separately for feasibility.
 
-Xiang
-> Please move on.
+This is posted as RFC because the code was originally developed and tested
+against an OpenWrt 6.18 Airoha tree, not against the current upstream
+net-next driver. The original OpenWrt commit used as the source for this
+RFC is available at:
+https://github.com/hurryman2212/OpenW1700k-test/commit/7c1b5e662f7790b3d23ed143beadc1dcbf6d15f7
+
+The SOE part is intentionally linked into the airoha Ethernet module
+instead of being exposed as an independent crypto or platform driver. The
+user-visible ESP offload control is a netdev capability: xfrmdev_ops and
+NETIF_F_HW_ESP live on the target netdev, and the feature can be controlled
+through the usual netdev feature path. SOE also shares the FE/QDMA/PPE
+datapath, private queues, DSA conduit handling and netdev lifetime owned by
+airoha_eth.
+
+Patch 1 adds xdo_dev_packet_xmit() because the existing XFRM packet
+offload transmit path does not provide a hook for hardware whose ESP engine
+is reached through device-specific packet forwarding. SOE needs to consume
+the skb, add a hardware hop descriptor, steer it to a private QDMA path and
+return the final transmit status. Drivers that do not implement the
+optional callback keep the existing XFRM output behavior.
+
+Jihong Min (7):
+  xfrm: allow packet offload drivers to own transmit
+  dt-bindings: net: airoha: add EN7581 SOE
+  arm64: dts: airoha: add EN7581 SOE node
+  net: airoha: add SOE registers and driver state
+  net: airoha: add QDMA support for SOE packets
+  net: airoha: add PPE support for SOE flows
+  net: airoha: add SOE XFRM packet offload support
+
+ .../bindings/net/airoha,en7581-soe.yaml       |   48 +
+ MAINTAINERS                                   |    1 +
+ arch/arm64/boot/dts/airoha/en7581.dtsi        |    6 +
+ drivers/net/ethernet/airoha/Kconfig           |   13 +
+ drivers/net/ethernet/airoha/Makefile          |    1 +
+ drivers/net/ethernet/airoha/airoha_eth.c      |  668 +++++-
+ drivers/net/ethernet/airoha/airoha_eth.h      |   40 +
+ drivers/net/ethernet/airoha/airoha_ppe.c      |  606 +++++-
+ drivers/net/ethernet/airoha/airoha_regs.h     |   16 +
+ drivers/net/ethernet/airoha/airoha_soe.c      | 1896 +++++++++++++++++
+ drivers/net/ethernet/airoha/airoha_soe.h      |  126 ++
+ include/linux/netdevice.h                     |    8 +
+ include/linux/soc/airoha/airoha_offload.h     |    5 +
+ net/xfrm/xfrm_output.c                        |   11 +
+ 14 files changed, 3342 insertions(+), 103 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/airoha,en7581-soe.yaml
+ create mode 100644 drivers/net/ethernet/airoha/airoha_soe.c
+ create mode 100644 drivers/net/ethernet/airoha/airoha_soe.h
+
+-- 
+2.53.0
 
