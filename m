@@ -1,521 +1,352 @@
-Return-Path: <netdev+bounces-299233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299235-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PMylGxXPLmqD3QQAu9opvQ
-	(envelope-from <netdev+bounces-299233-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:56:05 +0200
+	id J7BfCcTSLmo43wQAu9opvQ
+	(envelope-from <netdev+bounces-299235-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:11:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DBE681727
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:56:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E4F6817C4
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:11:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=oFQETYle;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299233-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299233-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=QSCcWuBF;
+	dkim=pass header.d=redhat.com header.s=google header.b="hc/1kF5c";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299235-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299235-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D91033008A76
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:56:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EF5203002307
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 16:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A18B386453;
-	Sun, 14 Jun 2026 15:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0C82848A7;
+	Sun, 14 Jun 2026 16:11:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6045421FF23
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 15:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F2270830
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 16:11:43 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781452562; cv=none; b=H9Nf0XvajA5H0vPt6N5UhMDe4CtCkWwFHNaAECHpV8jWH2A2cKIdwMh8UX/hizV3ArDtf5DUL6dCkbJuj0ZWMXH98xUgtYQ9/2aH1uXluvgBvsCQtjuPoAiVPd9HzwBpydIcv/h45FraCwS3Mwn5H5GTL4tXJHkJHvNODt9KTC0=
+	t=1781453505; cv=none; b=WrRp5UnGYiuk7rEnohUyT6jiynKy6jkStSHcBz5p1orblhDuwBN/Xkt2v11BOFkIj9dQJfVspXneZL577Lfrp9efMHUS+jR6WgxwlqlS8SKZ8HLPyibo0XRSgF74E1pzE6eaulf5TDMrNMteJJOgryAPPdtgqFJxxN6jtGb65jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781452562; c=relaxed/simple;
-	bh=6CsdZmxFZtGbdO2ws8b1HWLbyrN5w1wO98MYgMaKDs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P7zcEEGnucz6OGlvWDNi4svGynut2cA6cjVdqNsOaoE8SYWGAMEfZXATsxjZxNe2QGVSbuvk+51q+sVFUbNyDj0r+Q4s2Wbj/TR+HmBL5n7HTXyKpaSrTegHXnrraS0ZNSqSpU1q7fIokda8f57uxcKuBpHxG7lpesK72tnEL3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=oFQETYle; arc=none smtp.client-ip=74.125.82.181
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-3074adb8fcaso3071415eec.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:56:00 -0700 (PDT)
+	s=arc-20240116; t=1781453505; c=relaxed/simple;
+	bh=7lnHDMOyFIMBRKoBtIkEfhEiKa9AwRRO5mCQD6nUUWI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HMHMbEXm176lp32GTdcKgWy0weOekOfxeXC6TlNJZjDajcue+JjQ2xnX9HJFKSy4ZlM//rzgxwgNfh4X2hF5Xv+2JzeOD+y9B12t0BRPF3b0NRmIYH0ia/ascKjXvHcyRC5vrtl4LC/01Hfx0jm7E9Hj7bvUtpn/e/G4WCnbrNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QSCcWuBF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hc/1kF5c; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781453502;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QPrD7vsVlbzeiOG2gzgEPheKRSPg/FcdoyT9Knl/jB4=;
+	b=QSCcWuBF0P6TrNypTIpZD3tFXu2pEFoxW9DRQfDIpzYybEDCvtGd/WifRG7FIYL65jUgc0
+	MMsO71raOw81oroyGOjE0z6wFO4LhFADXGQoR0pNZAUMhAqhwV1/bVTZduHvrMLfGRRqkZ
+	zPRb7UOL2kOveTFJofZWVsVBXCLMo+4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-f9oCVDbsOsa_PBy2iznHkw-1; Sun, 14 Jun 2026 12:11:41 -0400
+X-MC-Unique: f9oCVDbsOsa_PBy2iznHkw-1
+X-Mimecast-MFC-AGG-ID: f9oCVDbsOsa_PBy2iznHkw_1781453500
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-45ef93c359fso2181536f8f.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 09:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1781452559; x=1782057359; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WXrFaQ/QnB/9JLymgg98ar/g1st35tkHVFlmEYcRrgU=;
-        b=oFQETYle2QpKFx6Cl+2PL5aH+2xf97ePOvkM9vtlTIEokS86e2beoildAfiB3jSq2p
-         bK2y/f1BP/I2qw5ktg/OtXJLWEOocPTb2alEZf1lbHbqann8VwBuMJBZuU/DwEvfWwh4
-         ZJPnFu++9EHabcQtbcszu7eo5miO8oE0zH7mJ3MSzF/6yFL/ai1/6bw7+QKa4n0YVoRN
-         K1Aq+ni+GQkV1Z6Kqf5Mx4tykzHalJUU2IOHQVmFBgM7MsqiebX8TxAL8H6zYJOkC9ff
-         WO7RFJ9tn4EgtGOVTYANI7tpp/R/+sj0AZgaQU6p4eS27s7R3DAl7jLCbPW4t6Thexip
-         ngJw==
+        d=redhat.com; s=google; t=1781453500; x=1782058300; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QPrD7vsVlbzeiOG2gzgEPheKRSPg/FcdoyT9Knl/jB4=;
+        b=hc/1kF5cqi9FaOeO3Sgxvv2cZpjDhnpAS6pMo/AMhIQjn/wrQoQMPUrVo6vMli8xMG
+         YBC87zn6cEXI+vG9TtH2NHUKSy3Pf0pM1dlVl07fGiY+R4qnuN11cjCrB5R3OJwx7LvH
+         pjRxe2uv5YPyZYicf5cpDW48jxmAQoet6YqlyQgk6g0okZV2kkIPM+rMSvzUTONtzZ04
+         ychD6fK0bHgIQIvErM/EqD8CgNMmR8vpFWuvQTdipUBosNyWF0h9PuxWQRuoMjtSz2t6
+         dHxac810KQavEvk90c8ctU1aOAMAbSct9PELxKf2r4Mvh0uRDhLlyg8aFvT9CHq0ZU2q
+         Kieg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781452559; x=1782057359;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WXrFaQ/QnB/9JLymgg98ar/g1st35tkHVFlmEYcRrgU=;
-        b=m2t4SoIWrGFQ21Xj47kvIO7ON12xiMNd+w1CRZN64r6X/IkX0SUgBUibKK0bIxecd5
-         S+kpYtbLsxk2+/v6VkS0snvVOtFxBvus+jAs+LH14aFqqXh/DHixBWd/SrXt4H3crfGp
-         h6Wc1mjMT0BT1Ha8tblvbB+BitM6pr/JpJnWpl+i2+mHe/jUQKpPUZdeMdWH+oDD+++j
-         q4pbHshn2UZBJTum+rU2Fk0uqHFoQbwyw8JfysA5zkLcpBkgF1oHkng0D/Ndr57vUpVw
-         IXX6mntKtzdyBuCEw6eJ6TMFyH0n8UlBpxw1yacPceFcAT3rvmTXRyaZ+sV1DjoFZWot
-         fQaQ==
-X-Gm-Message-State: AOJu0YymG9UGEDXKmar/buUR5lfFlq+Pi4acTNTngpJ79eIp5k/y1OlD
-	GxlgGO77MUtioTcW99ZKkd1xbsVD3YoQrU6Wp5j128Z4pPM6RyzwLlAbnlNSDkOqppk=
-X-Gm-Gg: Acq92OGl9CS7tIdJ1JXKTLNk0g7OGQPYpDGx+yN6QUfNSOIoQn3OVFvBpgx9Jj3KdmC
-	TNOw7pdPK4Fb7MgEmWjNH3h+9QSO7BwM10SzP7kPjNhKDjNVkdaBAub561M/PkDAInR/X9fdtVj
-	TFux9MbENILL/t4R9EdO3c+1czV8cVfmrkxTgnrABdwjh7sBMB/bIN1E5acwNzEViCjJcH5zSmM
-	KGdcgHWIL609ICs8Xmj+K5rLUtCO83Ki8Crl3NxT6AjlInAVURfFn8oBpCR++K6EgMouTBjqLWb
-	0pzxgQp57xLmxPh26cXAorM5KWi5tXz0zr6pfaZllPi6eoakqOe/Gq2tMrCj/jSgyfts6NBDvbC
-	MoT40CRDWzK6saeZ7YtivohXDROqNI3G62ZCf7wxoMAn6IiO6aWdr7FtMz16gxerHVFrh5xbHE2
-	ASbsr+Z72aJT17F+tNGmXftYJ+BKuuz1goVFzacqYX8WUJYhNKP0zn1r+0abBrZFC9
-X-Received: by 2002:a05:7300:80ce:b0:2f2:8857:17f6 with SMTP id 5a478bee46e88-3081ff63daamr6128313eec.4.1781452559385;
-        Sun, 14 Jun 2026 08:55:59 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e5d0828sm12482533eec.10.2026.06.14.08.55.58
+        d=1e100.net; s=20251104; t=1781453500; x=1782058300;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QPrD7vsVlbzeiOG2gzgEPheKRSPg/FcdoyT9Knl/jB4=;
+        b=RCW7vPRLVDaV30nqJoa/IOTa0GGQArBT37N2ouBt7uvFziYdmjUDu2gTvBQScAXq8v
+         NEVMKy9+1xN1YX+/KEvs8LlOouUOiStk9lIK6eDPMBRH5dgLl8vlhI3IsR83zEAIuJeH
+         GITrUqh2EadUpMeQ9vpLrQFa610T8Xtze7l5SN/WLpGjgTwef+gHIoQ5foosRRPDCv3y
+         AluSb3ozucs8PA2z1JvXhX7QZZQaevwm+Q7cm0zXPpWgdcn9rqXVXbFXRDpag9jwP7C5
+         h/PKYkLm/trcJeU5Fg1rLRMzEjLcHYXVi6/8st4DVwf3/+gshMIWgptnTPOK1XERWZYf
+         12jg==
+X-Gm-Message-State: AOJu0YwiUSYyEO3jR/L87nSGQxq9WquSvKc/KDXwsPwBnHmB1oVDeHev
+	wZNjEVFtvjBFZ9qlJr+PwBrYIGng0rD06BaPjsSuuDPdabiL7sT24mfDMRho9NX0b+SgsrTvh7+
+	VcX3m7CketD1PtxXF9OgDpWbbcLqwzXryaX3VkNAAgOhBjFfKZju/iIyQIQ==
+X-Gm-Gg: Acq92OEg1N00z87dLMMx+lcRJjoE6f88rHmD63ZMdJMOPJg9hT4jmmZMu0XpzPLKC5i
+	jQrYcTksOph0imKsPELvAJQL0X9yM0MNp3LOxjgn9z+3ZyOWGGkn9mSvECFQG06KZXpDNmCfaaT
+	Q4LgUXmdXO4kl2AtbkuvusCsUifxryoUmwIS57JpJs3v0OJk7UOEtjD8gM9uWjCX6cYz1KiQ7ur
+	P3XBJ8LjH9vutrpGeI1GJB8r4rGl677pghWKStwC07uKw1MoDgvfc++IGgrkrgmMi7riwTCEVat
+	VrmKok4i8M+FQ4AOqMG8T3FApdDV9WstztNN0sVoGt8vwiTCfLLh5c5PZlp82qjdPhp5khHAB/b
+	WRwzpnyyAIsmLu1zhtVnRSJuwCA2eqw==
+X-Received: by 2002:a05:6000:290e:b0:45e:f381:cd7b with SMTP id ffacd0b85a97d-4606da6985fmr15513347f8f.8.1781453500292;
+        Sun, 14 Jun 2026 09:11:40 -0700 (PDT)
+X-Received: by 2002:a05:6000:290e:b0:45e:f381:cd7b with SMTP id ffacd0b85a97d-4606da6985fmr15513312f8f.8.1781453499874;
+        Sun, 14 Jun 2026 09:11:39 -0700 (PDT)
+Received: from fedora.redhat.com ([2a0d:3344:17d1:b608:8e5:8aea:ed86:b36b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2d933esm24468783f8f.33.2026.06.14.09.11.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 08:55:59 -0700 (PDT)
-Date: Sun, 14 Jun 2026 08:55:56 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH iproute2-next] ipaddress: add support for showing IPv4
- devconf attributes
-Message-ID: <20260614085556.1efda1eb@phoenix.local>
-In-Reply-To: <3e4a425e-0f58-48dc-a2bc-88fd6eb4a302@suse.de>
-References: <20260612231722.30579-1-fmancera@suse.de>
-	<20260612192936.61c23f85@phoenix.local>
-	<bdccf9bf-994d-445c-8167-4bcd8cd77e6e@suse.de>
-	<3e4a425e-0f58-48dc-a2bc-88fd6eb4a302@suse.de>
+        Sun, 14 Jun 2026 09:11:39 -0700 (PDT)
+From: mheib@redhat.com
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net-next] i40e: add devlink parameter for Flow Director ATR sample rate
+Date: Sun, 14 Jun 2026 19:11:31 +0300
+Message-ID: <20260614161131.192068-1-mheib@redhat.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299233-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299235-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:fmancera@suse.de,m:netdev@vger.kernel.org,m:dsahern@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[mheib@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:mheib@redhat.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mheib@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:from_mime,networkplumber-org.20251104.gappssmtp.com:dkim,vger.kernel.org:from_smtp,phoenix.local:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B3DBE681727
+X-Rspamd-Queue-Id: A8E4F6817C4
 
-On Sat, 13 Jun 2026 09:22:38 +0200
-Fernando Fernandez Mancera <fmancera@suse.de> wrote:
+From: Mohammad Heib <mheib@redhat.com>
 
-> On 6/13/26 8:41 AM, Fernando Fernandez Mancera wrote:
-> > On 6/13/26 4:29 AM, Stephen Hemminger wrote: =20
-> >> On Sat, 13 Jun 2026 01:17:22 +0200
-> >> Fernando Fernandez Mancera <fmancera@suse.de> wrote:
-> >> =20
-> >>> tatic void print_inet(FILE *fp, struct rtattr *inet_attr)
-> >>> +{
-> >>> +=C2=A0=C2=A0=C2=A0 struct rtattr *tb[IFLA_INET_MAX + 1];
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0 parse_rtattr_nested(tb, IFLA_INET_MAX, inet_attr);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0 if (tb[IFLA_INET_CONF] && show_details) {
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int *conf =3D RTA_DATA(tb=
-[IFLA_INET_CONF]);
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int max_elements =3D RTA_=
-PAYLOAD(tb[IFLA_INET_CONF]) /=20
-> >>> sizeof(int);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_FORWARDING)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "forwarding", "forwarding %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_FO=
-RWARDING - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_MC_FORWARDING)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "mc_forwarding", "mc_forwarding=20
-> >>> %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_MC=
-_FORWARDING - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_PROXY_ARP)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "proxy_arp", "proxy_arp %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_PR=
-OXY_ARP - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ACCEPT_REDIRECTS)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "accept_redirects",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "accept_redirects %s=
- ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AC=
-CEPT_REDIRECTS - 1] ?=20
-> >>> "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_SECURE_REDIRECTS)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "secure_redirects",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "secure_redirects %s=
- ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_SE=
-CURE_REDIRECTS - 1] ?=20
-> >>> "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_SEND_REDIRECTS)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "send_redirects",=20
-> >>> "send_redirects %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_SE=
-ND_REDIRECTS - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_SHARED_MEDIA)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "shared_media", "shared_media %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_SH=
-ARED_MEDIA - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_RP_FILTER)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "rp_filter", "rp_filter %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_RP_FILTER - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ACCEPT_SOURCE_ROUTE)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "accept_source_route",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "accept_source_route=
- %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AC=
-CEPT_SOURCE_ROUTE - 1] ?=20
-> >>> "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_BOOTP_RELAY)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "bootp_relay", "bootp_relay %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_BO=
-OTP_RELAY - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_LOG_MARTIANS)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "log_martians", "log_martians %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_LO=
-G_MARTIANS - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_TAG)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "tag", "tag %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_TAG - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARPFILTER)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "arpfilter", "arpfilter %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AR=
-PFILTER - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_MEDIUM_ID)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "medium_id", "medium_id %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_MEDIUM_ID - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_NOXFRM)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "noxfrm", "noxfrm %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_NO=
-XFRM - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_NOPOLICY)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "nopolicy", "nopolicy %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_NO=
-POLICY - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_FORCE_IGMP_VERSION)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "force_igmp_version",=20
-> >>> "force_igmp_version %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_FORCE_IGMP_VERSION -=
- 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARP_ANNOUNCE)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "arp_announce", "arp_announce %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_ARP_ANNOUNCE - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARP_IGNORE)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "arp_ignore", "arp_ignore %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_ARP_IGNORE - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_PROMOTE_SECONDARIES)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "promote_secondaries",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "promote_secondaries=
- %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_PR=
-OMOTE_SECONDARIES - 1] ?=20
-> >>> "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARP_ACCEPT)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "arp_accept", "arp_accept %d ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_ARP_ACCEPT - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARP_NOTIFY)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "arp_notify", "arp_notify %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AR=
-P_NOTIFY - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ACCEPT_LOCAL)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "accept_local", "accept_local %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AC=
-CEPT_LOCAL - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_SRC_VMARK)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "src_vmark", " src_vmark %s",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_SR=
-C_VMARK - 1] ? "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_PROXY_ARP_PVLAN)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "proxy_arp_pvlan",=20
-> >>> "proxy_arp_pvlan %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_PR=
-OXY_ARP_PVLAN - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ROUTE_LOCALNET)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "route_localnet",=20
-> >>> "route_localnet %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_RO=
-UTE_LOCALNET - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_BC_FORWARDING)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "bc_forwarding", "bc_forwarding=20
-> >>> %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_BC=
-_FORWARDING - 1] ? "on" :=20
-> >>> "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D=20
-> >>> IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "igmpv2_unsolicited_report_interval",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "igmpv2_unsolicited_report_interval %d=
- ",
-> >>> +                 =20
-> >>> conf[IPV4_DEVCONF_IGMPV2_UNSOLICITED_REPORT_INTERVAL - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D=20
-> >>> IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_int(PRINT_ANY, "igmpv3_unsolicited_report_interval",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "igmpv3_unsolicited_report_interval %d=
- ",
-> >>> +                 =20
-> >>> conf[IPV4_DEVCONF_IGMPV3_UNSOLICITED_REPORT_INTERVAL - 1]);
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_IGNORE_ROUTES_WITH_LINKDOWN)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "ignore_routes_with_linkdown",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ignore_routes_with_=
-linkdown %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_IG=
-NORE_ROUTES_WITH_LINKDOWN -=20
-> >>> 1] ?
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_DROP_UNICAST_IN_L2_MULTICAST)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "drop_unicast_in_l2_multicast",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "drop_unicast_in_l2_=
-multicast %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_DR=
-OP_UNICAST_IN_L2_MULTICAST=20
-> >>> - 1] ?
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_DROP_GRATUITOUS_ARP)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "drop_gratuitous_arp",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "drop_gratuitous_arp=
- %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_DR=
-OP_GRATUITOUS_ARP - 1] ?=20
-> >>> "on" : "off");
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_elements >=3D IPV=
-4_DEVCONF_ARP_EVICT_NOCARRIER)
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p=
-rint_string(PRINT_ANY, "arp_evict_nocarrier",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "arp_evict_nocarrier=
- %s ",
-> >>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 conf[IPV4_DEVCONF_AR=
-P_EVICT_NOCARRIER - 1] ?=20
-> >>> "on" : "off");
-> >>> +=C2=A0=C2=A0=C2=A0 }
-> >>> +}
-> >>> + =20
-> >> There are three different ways to display a flag value in JSON used in=
-=20
-> >> iproute2.
-> >> This one is my least favorite.
-> >>
-> >> The three ways are:
-> >> =C2=A0=C2=A0=C2=A0 - print_bool
-> >> =C2=A0=C2=A0=C2=A0 - print_null (only if on)
-> >> =C2=A0=C2=A0=C2=A0 - print_string
-> >>
-> >> I would use the print_null pattern but print_bool would also be ok.
-> >> =20
-> >=20
-> > Thanks for the suggestion Stephen, I would pick print_bool in this case.
-> >=20
-> > If one of the options evolves to supporting something else we could=20
-> > easily adapt it without breaking compatibility if we use print_bool. If=
-=20
-> > we use print_null I don't think we could do that.
-> >  =20
->=20
-> Hm. I am actually not so sure about this..
->=20
-> the current print_string approach matches the setter and also the=20
-> netconf side. While print_bool would be easier to parse for JSON, it=20
-> looks not so good for command line output.
->=20
-> print_null presents a different problem, users would need to make sure=20
-> their parsing is working with an iproute2 version that support these new=
-=20
-> attributes.
->=20
-> So I am not so sure what is the best option here.
+The i40e driver uses Flow Director ATR to periodically update flow
+steering information for active TCP flows. The update frequency is
+currently controlled by I40E_DEFAULT_ATR_SAMPLE_RATE and is fixed at
+driver build time.
 
-None of this is a hard requirement. The requirement is that the output
-be valid JSON. The other common practices are:
-  - non JSON output of display should match the input command line
-    there were even some user tools that depended on this to do save/restor=
-e of state
-  - JSON output should be easy to parse in python.
+On systems with a large number of queues and high-rate TCP workloads,
+the default sampling interval can result in frequent Flow Director
+reprogramming for long-lived flows.
 
-If user is using python to read JSON (which seems like the most common).
-then bool or presence allows for use in conditional.
+The amount of TCP packet reordering observed on some systems is
+sensitive to the ATR sampling interval. Increasing the interval reduces
+Flow Director programming activity and can significantly reduce the
+associated reordering.
 
+Since the optimal sampling interval depends on the workload and system
+configuration, a single fixed value is not suitable for all deployments.
 
+Add a devlink parameter to allow administrators to tune the ATR sample
+rate at runtime without rebuilding the driver or disabling ATR
+functionality entirely.
 
->>> import json
->>> json.loads('{"forwarding": true}')["forwarding"]
-True                          # <class 'bool'>
->>> json.loads('{"forwarding": "on"}')["forwarding"]
-'on'        =20
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
+---
+ Documentation/networking/devlink/i40e.rst     | 19 ++++++
+ drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+ .../net/ethernet/intel/i40e/i40e_devlink.c    | 65 +++++++++++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  4 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  4 +-
+ 5 files changed, 90 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/networking/devlink/i40e.rst b/Documentation/networking/devlink/i40e.rst
+index 51c887f0dc83..704469aa9acf 100644
+--- a/Documentation/networking/devlink/i40e.rst
++++ b/Documentation/networking/devlink/i40e.rst
+@@ -40,6 +40,25 @@ Parameters
+ 
+         The default value is ``0`` (internal calculation is used).
+ 
++.. list-table:: Driver specific parameters implemented
++    :widths: 5 5 90
++
++    * - Name
++      - Mode
++      - Description
++    * - ``atr_sample_rate``
++      - runtime
++      - Controls how frequently Flow Director ATR updates flow steering
++        information for active TCP flows.
++
++        ATR programs Flow Director entries based on sampled transmitted
++        packets. The sampling interval is specified as the number of
++        transmitted packets between ATR updates.
++
++        Lower values increase Flow Director programming activity, while
++        higher values reduce the update frequency.
++
++        The default value is ``20``.
+ 
+ Info versions
+ =============
+diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+index 1b6a8fbaa648..88eb40ee45f0 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e.h
++++ b/drivers/net/ethernet/intel/i40e/i40e.h
+@@ -487,6 +487,7 @@ struct i40e_pf {
+ 	u16 rss_size_max;          /* HW defined max RSS queues */
+ 	u16 fdir_pf_filter_count;  /* num of guaranteed filters for this PF */
+ 	u16 num_alloc_vsi;         /* num VSIs this driver supports */
++	u32 atr_sample_rate;
+ 	bool wol_en;
+ 
+ 	struct hlist_head fdir_filter_list;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+index 229179ccc131..16e51762db45 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+@@ -33,12 +33,77 @@ static int i40e_max_mac_per_vf_get(struct devlink *devlink,
+ 	return 0;
+ }
+ 
++static int i40e_atr_sample_rate_set(struct devlink *devlink,
++				    u32 id,
++				    struct devlink_param_gset_ctx *ctx,
++				    struct netlink_ext_ack *extack)
++{
++	struct i40e_pf *pf = devlink_priv(devlink);
++	struct i40e_vsi *vsi;
++	u32 sample_rate = ctx->val.vu32;
++	int i;
++
++	pf->atr_sample_rate = sample_rate;
++
++	if (!test_bit(I40E_FLAG_FD_ATR_ENA, pf->flags))
++		return 0;
++
++	vsi = i40e_pf_get_main_vsi(pf);
++	if (!vsi)
++		return 0;
++
++	for (i = 0; i < vsi->num_queue_pairs; i++) {
++		if (!vsi->tx_rings[i])
++			continue;
++		vsi->tx_rings[i]->atr_sample_rate = sample_rate;
++		vsi->tx_rings[i]->atr_count = 0;
++	}
++
++	return 0;
++}
++
++static int i40e_atr_sample_rate_get(struct devlink *devlink,
++				    u32 id,
++				    struct devlink_param_gset_ctx *ctx,
++				    struct netlink_ext_ack *extack)
++{
++	struct i40e_pf *pf = devlink_priv(devlink);
++
++	ctx->val.vu32 = pf->atr_sample_rate;
++
++	return 0;
++}
++
++static int i40e_atr_sample_rate_validate(struct devlink *devlink, u32 id,
++					 union devlink_param_value val,
++					 struct netlink_ext_ack *extack)
++{
++	if (!val.vu32) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "ATR sample rate must be greater than 0");
++		return -EINVAL;
++	}
++	return 0;
++}
++
++enum i40e_dl_param_id {
++	I40E_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
++	I40E_DEVLINK_PARAM_ID_ATR_SAMPLE_RATE,
++};
++
+ static const struct devlink_param i40e_dl_params[] = {
+ 	DEVLINK_PARAM_GENERIC(MAX_MAC_PER_VF,
+ 			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+ 			      i40e_max_mac_per_vf_get,
+ 			      i40e_max_mac_per_vf_set,
+ 			      NULL),
++	DEVLINK_PARAM_DRIVER(I40E_DEVLINK_PARAM_ID_ATR_SAMPLE_RATE,
++			     "atr_sample_rate",
++			     DEVLINK_PARAM_TYPE_U32,
++			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
++			     i40e_atr_sample_rate_get,
++			     i40e_atr_sample_rate_set,
++			     i40e_atr_sample_rate_validate),
+ };
+ 
+ static void i40e_info_get_dsn(struct i40e_pf *pf, char *buf, size_t len)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index d59750c490f4..9c8144970a34 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -3458,7 +3458,7 @@ static int i40e_configure_tx_ring(struct i40e_ring *ring)
+ 
+ 	/* some ATR related tx ring init */
+ 	if (test_bit(I40E_FLAG_FD_ATR_ENA, vsi->back->flags)) {
+-		ring->atr_sample_rate = I40E_DEFAULT_ATR_SAMPLE_RATE;
++		ring->atr_sample_rate = vsi->back->atr_sample_rate;
+ 		ring->atr_count = 0;
+ 	} else {
+ 		ring->atr_sample_rate = 0;
+@@ -12745,6 +12745,8 @@ static int i40e_sw_init(struct i40e_pf *pf)
+ 		}
+ 	}
+ 
++	pf->atr_sample_rate = I40E_DEFAULT_ATR_SAMPLE_RATE;
++
+ 	if ((pf->hw.func_caps.fd_filters_guaranteed > 0) ||
+ 	    (pf->hw.func_caps.fd_filters_best_effort > 0)) {
+ 		set_bit(I40E_FLAG_FD_ATR_ENA, pf->flags);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+index bb741ff3e5f2..7e29e9244c3a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+@@ -372,8 +372,8 @@ struct i40e_ring {
+ 	u16 next_to_clean;
+ 	u16 xdp_tx_active;
+ 
+-	u8 atr_sample_rate;
+-	u8 atr_count;
++	u32 atr_sample_rate;
++	u32 atr_count;
+ 
+ 	bool ring_active;		/* is ring online or not */
+ 	bool arm_wb;		/* do something to arm write back */
+-- 
+2.53.0
+
 
