@@ -1,172 +1,139 @@
-Return-Path: <netdev+bounces-299230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299231-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wiaiMJPILmrR2gQAu9opvQ
-	(envelope-from <netdev+bounces-299230-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:28:19 +0200
+	id +pGEEonJLmrp2gQAu9opvQ
+	(envelope-from <netdev+bounces-299231-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:32:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABBC681640
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:28:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C964681651
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 17:32:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=f0NrNKfg;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299230-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299230-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=usrtVg5H;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299231-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299231-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8F0D300874E
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:28:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 680623008289
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB73E39A4B8;
-	Sun, 14 Jun 2026 15:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BB933AD88;
+	Sun, 14 Jun 2026 15:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F55439935D;
-	Sun, 14 Jun 2026 15:28:06 +0000 (UTC)
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538CC204C3B
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 15:32:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781450892; cv=none; b=hmGfBIIdMw9qU0/KwSTmHXFDjQzwivbi0mSKv9VnG2bNUUQzQBuiOIX80u4Ldt48aOOuFrKbuMhMJyjz4PHOam/Fd6Da2aJ3b8Sh+Lo6lWWOhfVjCYIBEd7eDJFNRoAe6ImXjGPpEZi5doSo6fcE3QjHtHXSBfAP1Sq+GI4Jv+I=
+	t=1781451140; cv=none; b=Lk/oviJcHhq2dFfBrUF4gAPCtBs59SWdshbGepF4EaBkLxqGynkRw70sEr9vxlrqmNwUr/7cJeUF/UNUkW4wgTPod4xp2Q4oaWADUiL6aih5i7o1LPc+IcZe0NzqZ1cHeazatUDvIQL1CS858IQ+P+8MRkcoWwWYFy7s9DZkoGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781450892; c=relaxed/simple;
-	bh=RA6Ixt9t/D/Tq/FQzJslWZS1ccrzpLVjhsaW8rGl2i4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1qWYmIVyIBlySBQ2VmeULercqE/HQJptuUI5ykCK76Pf49e3Ux4fnkM6EyUPo2wmo4S45s2YK5WtvXUrk+SeAJqMCKsJCSv3UZ1K7VbzRgtgjBFb8MBzWilc7ueBTeeTcRX2bbC50Zf+bPlWu3dSxSSP+9mtoTZLDl2G5IeGC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=f0NrNKfg; arc=none smtp.client-ip=209.97.182.222
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=r0Vh6
-	aD6Sxa0AeAPLHPlYZfHFLnQ0N+vngI60izVk8U=; b=f0NrNKfg7thbcZsrdyMK4
-	gLP1J7fJb0MJnB3ibzqEQKHhVkfBq/mUTvLmL/2mqBLB/ZHbGMkpcyF4rRDAwGBg
-	7OF0s4A0X6rIBlaaGg5aqwOsJ97SaZtSlZA5FFUZrz2DzHJNPwhKh0PLDXElKV6F
-	VPgyyMz//2IJ+xcAbSjrJ0=
-Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
-	by web4 (Coremail) with SMTP id ywQGZQDHq5t1yC5qELxFAg--.40955S2;
-	Sun, 14 Jun 2026 23:27:50 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	s=arc-20240116; t=1781451140; c=relaxed/simple;
+	bh=vtG6I1YRkDLmoTi9RIExw8JVs/PFrmG5JoHLnv0oDNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t887JUMjHGyJeMj7RJ1gLjG5NxhTa1eSVyhJ6ISeiXdwbxQ1S0E4uaCV6vbvBkCmQAYokw17pMWRqshVNmjUXdQsnyY+2hSniQvSK4/tZrZkiXfVPfR9P6fBOV9XYv7lgLPenkn8uGWvTnxLcHp5awYe2YPFvuy6UPuBkcVkmuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=usrtVg5H; arc=none smtp.client-ip=91.218.175.174
+Date: Sun, 14 Jun 2026 17:32:12 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781451137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=it8LMlVWF10Lwo6oFL3Mcq2DPsP7nH+z8zyDQbz1dIc=;
+	b=usrtVg5HC9eNBVVGTLTYRbwuNMph3MKh8bS8buqXecP5vUTHBMmu/wMsevZ0IAXdf/RUbU
+	3lsj+HioYVGV2DDimCAf6br4KG37ypnSZWrKck9f1rSWei0UmQ2/zmLYecszF2iTfMsVvI
+	xdbaYaFH240yuhPIobIftIMaM5JCzqs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] atm: br2684: reject short VC-MUX bridged frames
-Date: Sun, 14 Jun 2026 23:27:45 +0800
-Message-ID: <20260614152746.308-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.53.0.windows.2
+	Willem de Bruijn <willemb@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RESEND 1/6] sock: add sock_kzalloc helper
+Message-ID: <ai7JfHTFgFt6YN_K@linux.dev>
+References: <20260527082509.1133816-8-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:ywQGZQDHq5t1yC5qELxFAg--.40955S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw47XF1xtw1DXr17CF13CFg_yoW8AF15pa
-	9rWFnakFZ5WrW7A34vy342vrW5CFs5tryfKry7Ka47Z3Z0gF18Xw1rKFZagr15C3yrGFyU
-	AayI9FW7KF4DAa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6ryrMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjTa0DUU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgESAWoudiEQCwABsZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260527082509.1133816-8-thorsten.blum@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299230-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299231-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:kuba@kernel.org,m:horms@kernel.org,m:linux-crypto@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,tsinghua.edu.cn:email,seu.edu.cn:email]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4ABBC681640
+X-Rspamd-Queue-Id: 9C964681651
 
-br2684_push() validates the two-byte pad at the start of received=0D
-VC-MUX bridged frames with memcmp(), but does not first make sure that=0D
-those two bytes are present in the skb.=0D
-=0D
-A short AAL5 PDU can reach this path after a BR2684 VCC is attached with=0D
-BR2684_ENCAPS_VC and bridged payload.  If skb->len is 0 or 1, the pad=0D
-comparison reads beyond the valid skb data.  When the bytes beyond=0D
-skb->len compare as zero, the code then continues toward eth_type_trans()=0D
-with the malformed frame.=0D
-=0D
-Reject frames shorter than BR2684_PAD_LEN before checking the pad.  This=0D
-keeps the existing validation for valid VC-MUX bridged frames, which must=0D
-carry the two-byte pad before the Ethernet header.=0D
-=0D
-Fixes: 7e903c2ae36e ("atm: [br2864] fix routed vcmux support")=0D
-Cc: stable@vger.kernel.org=0D
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>=0D
-Reported-by: Ao Wang <wangao@seu.edu.cn>=0D
-Reported-by: Xuewei Feng <fengxw06@126.com>=0D
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>=0D
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
-Assisted-by: GLM:GLM-5.1=0D
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
----=0D
- net/atm/br2684.c | 2 ++=0D
- 1 file changed, 2 insertions(+)=0D
-=0D
-diff --git a/net/atm/br2684.c b/net/atm/br2684.c=0D
-index 6580d67c3456..07283c475a40 100644=0D
---- a/net/atm/br2684.c=0D
-+++ b/net/atm/br2684.c=0D
-@@ -491,6 +491,8 @@ static void br2684_push(struct atm_vcc *atmvcc, struct =
-sk_buff *skb)=0D
- 			skb->pkt_type =3D PACKET_HOST;=0D
- 		} else { /* p_bridged */=0D
- 			/* first 2 chars should be 0 */=0D
-+			if (skb->len < BR2684_PAD_LEN)=0D
-+				goto error;=0D
- 			if (memcmp(skb->data, pad, BR2684_PAD_LEN) !=3D 0)=0D
- 				goto error;=0D
- 			skb_pull(skb, BR2684_PAD_LEN);=0D
-=0D
--- =0D
-2.43.0=0D
+On Wed, May 27, 2026 at 10:25:11AM +0200, Thorsten Blum wrote:
+> Add sock_kzalloc() helper - the sock equivalent to kzalloc().
+> 
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Patch 1/6 needs an Acked-by: from netdev maintainers for the series to
+> go through Herbert's crypto tree:
+> https://lore.kernel.org/lkml/ahVkZOxZtFes6Huf@gondor.apana.org.au/
+> ---
+>  include/net/sock.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 76bfd3e56d63..b521bd34ac9f 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1913,6 +1913,11 @@ void sock_kfree_s(struct sock *sk, void *mem, int size);
+>  void sock_kzfree_s(struct sock *sk, void *mem, int size);
+>  void sk_send_sigurg(struct sock *sk);
+>  
+> +static inline void *sock_kzalloc(struct sock *sk, int size, gfp_t priority)
+> +{
+> +	return sock_kmalloc(sk, size, priority | __GFP_ZERO);
+> +}
+> +
+>  static inline void sock_replace_proto(struct sock *sk, struct proto *proto)
+>  {
+>  	if (sk->sk_socket)
 
+Gentle ping? Patch 1/6 still needs an ack from netdev maintainers.
+
+Thanks,
+Thorsten
 
