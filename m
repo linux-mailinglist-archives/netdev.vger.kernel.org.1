@@ -1,378 +1,200 @@
-Return-Path: <netdev+bounces-299238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AsRAH2PbLmrE4wQAu9opvQ
-	(envelope-from <netdev+bounces-299238-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:48:35 +0200
+	id jFqTB6TbLmrj4wQAu9opvQ
+	(envelope-from <netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:49:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86BD681952
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:48:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BEDA681961
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 18:49:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=bIQeIS4R;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299238-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299238-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=nvidia.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299239-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 31A323029A70
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 16:45:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 448BF300361E
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 16:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1E2395AFA;
-	Sun, 14 Jun 2026 16:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC812E7BB6;
+	Sun, 14 Jun 2026 16:49:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010037.outbound.protection.outlook.com [52.101.201.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0C528136F;
-	Sun, 14 Jun 2026 16:45:15 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781455517; cv=fail; b=CH+L0Xd85coFgQuCyY6ZrGA+z+uWiJf5hG1UOdn7T8AUlif0VvQDVT4/jV6Yq8jcEq5lZ1RMR+slgbUpTugz6UAlnPgcYE2YlGvQpUc5GpP86TrZ4Gnc/NBt30D0XHCFsW8aA5JYxwOwzN4UgLZG/TcZDnobU8KCVXLfH44FKTQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781455517; c=relaxed/simple;
-	bh=VvtfxuOeV/2hobEMI0n00ZjXXhOssSjMxiap7487MmE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tR4m7A2pmdYBesOm/MEIybuNiBKs6NYvcbP4SMg2TOx7lIVl+KRE1ZJ79Jym+TpIxV9DZHmkQgmKWQPOmjPjxO62T/uYJNfnKzxay+xPIupyOLEnqDkMFwoZ343ceiCqTnifo9EZvSSmcSHLayCcsUzr40x1KPdkGGeDTdhLgIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bIQeIS4R; arc=fail smtp.client-ip=52.101.201.37
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WMT+mGUqYfTw+i/aM0RD4GD8IdvI1Mnk7AWE7fXgrjDykyEU+IYJ6c/13QqsFEtc6V0lR2wzm+Nm6mEPCam9OvtN/dVIveIjcwfJQ/lda23Fwt0UwkAOVQjyNwcp6RYdchyky+3Bu3E0fiVJpukU1ZMM18lEMknqTpxNiTbOeol7FrUfpp8u9vYmEYuUQQl3W7sHEni2Ev8CGw/wp1k82ZBEJi/muwuqpKczF7Y4uHQsBY0q7JHwy6qiEtPzrkDSFeEf3mPywb+3aU4sjJG5EAFljInd5POmGZj+vjUYHLHfDuzw+FNoPBl2tKjfNgS2Ex3ylbnIvtTTKbjtT0Cnzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wIUtR485tTWaj9rB8SfpYkteIOO3epK+3yNJLBXz+4g=;
- b=kcpafvLW8FqBdiBbB6N1vYJ2ycciQho7Zy1pZPicy2T9VTlweuIS8IT3o3sc40Vv5f6jyJgLTOCTrqKQi5p/ltssaEcjP87vjRLZ7e1bKyy87EqimMxHfP8Z0DCOWJpML1TM0G2lFGJkvNpHhYIVkh6oto5nD4DpUuIVk0/Z6gPPehu1pgxIR6JJNROu4XCckHaT0EfgdbJZJKYL+zt4mESGXzYrsRz2jnnhgfnLImumy8Tc0OOQJajzGO+0WTsEAB3FrfCMYH+XFrJZCitjWeCJgDB3+F61hrvJhf7gUvoymXtT6EpD+G5wqCcc/+1cjkiegY6CRRt7iC6pqFrQNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wIUtR485tTWaj9rB8SfpYkteIOO3epK+3yNJLBXz+4g=;
- b=bIQeIS4RYjSi/lXWkGOuA4/AXxBENGw5QH9+NgHIxppC8EOxLQAnz77wFx1ff/KrkSlwpLBBDX81XuPzvAo3wCG156zQasBi1rmgQWjMtdKhZ6V6Jm07HE5c2sD92jKeSkfBODhvKtxRqOsGIXUZnsVo3bPi1viI16gdCfZ9Ta0+FScPnlx1gY/fPHGOr4ARNtNseuKOf6nmOJMBGdC1Il7b2s1W+KFhiT3d8fGgW6HTEZLvPUHmkx6nc2/C+Yz6mdHG5ktjHM6Ifhk/exGYgkuUA88uF70zxGdJPiiz9BvRkwY26X8eCAqu0UvClyKLhuiGxU49SvmoO77fA0A/BQ==
-Received: from BY3PR03CA0004.namprd03.prod.outlook.com (2603:10b6:a03:39a::9)
- by DS5PPF2FA070BDF.namprd12.prod.outlook.com (2603:10b6:f:fc00::649) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Sun, 14 Jun
- 2026 16:45:08 +0000
-Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
- (2603:10b6:a03:39a:cafe::15) by BY3PR03CA0004.outlook.office365.com
- (2603:10b6:a03:39a::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.18 via Frontend Transport; Sun,
- 14 Jun 2026 16:45:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Sun, 14 Jun 2026 16:45:07 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 14 Jun
- 2026 09:45:00 -0700
-Received: from [10.221.208.116] (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 14 Jun
- 2026 09:44:52 -0700
-Message-ID: <a8d5f189-5268-4af8-aa1b-d90a14e6260e@nvidia.com>
-Date: Sun, 14 Jun 2026 19:44:49 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37BC28C869
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 16:49:35 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781455777; cv=none; b=Do99xFQTfHNMclldd/vxLDl3nQjKECFvwv2rFZq0qSAmpOvRaIBJ3UK+7RttP89ia6G/OB1J3HppeoD4PLMn/+5XJMRfrLPxi/VilIyEUlJRyV0tCPA5uxXbEIjPIlEncJTWsVZvqf+btw01wYiRFyp7RpSpDHEr+hY9nxSN64M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781455777; c=relaxed/simple;
+	bh=Rbmqlh5X77XiKIehBbP7xpfKX9im+AeF0mpBH1PsugI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rnVot8Ro/vGmGudiZTTvry0aLPwCnfIy9NNYbTiIzVfegqc9JX8uQvvZKXiRKku09OTBZFpgpgCUv2XFD2KjrVOWEc581IY4vSwPF2N0hvYWukT3mwYTbiToRWE1e2x5qHb++pN/POsVN16rOifE56bqLe9T8do9hRF7Tl+B+PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-48576b535b6so2652744b6e.2
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 09:49:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781455774; x=1782060574;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zKQe3tHQuohfTiUdhggcYhl3bqm+NLkjvqbPDTnfoNI=;
+        b=hCV0wRYrKh0NzXLOhyHreytCpwIe1zrFBWlt3uZzkYYus++UHzKwn0TzorQOUDlLC8
+         A9b73bVq+K9jE5nvW7rIRCkLfU0OhBdLHghJdQDQyQhhXGdgg7yJP04qSQYw8guSTqOl
+         O9avOsHxVaqucvwMW9eTnoa4ysgiPZ6ilfSU0YexR4gCFPkaJWRPtJe7n9bJ294QXod5
+         hGyxHgzm/ylCbx5O9adaJGUK0G4KwKlMgV6zY2b65D+eiL/2DP1mE3dJttJWfTLGo3SJ
+         ChuKAZVgYCCFbTm86crLTFQ2ediAEsAZXX63Ngor+nLnbDvVvgtPvVdVEUhZnrXgTpLe
+         ut2A==
+X-Forwarded-Encrypted: i=1; AFNElJ8d0QmgJtwwJ5oJGYSec+Er+Nmf+aKhkpoEXbZaFMY3J/euScANiTFbhry6vq7YcVk8xvoCUSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXhN0/kiblysqAGf8HKBhJ0nDGdeTwXvhvm6t/B5fXTr/3DEDB
+	JLYWBoTJfjdfEJHAX4HDhgWkfH3LSFLj+4BjsleCVEfoIjiG4gCEWijgUr5cUuY8F7kRc/hdW6Y
+	D5QrX0n2dAsAtMs/kpjWeY7k7rIBEzz4j0PukPOYyPa9rQLo3vIuprE8lYGY=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V3 14/15] net/mlx5: SD, defer vport metadata init
- until SD is ready
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Mark Bloch <mbloch@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>, "Edward
- Srouji" <edwards@nvidia.com>, Maher Sanalla <msanalla@nvidia.com>, "Simon
- Horman" <horms@kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>, Kees Cook
-	<kees@kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Parav Pandit
-	<parav@nvidia.com>, Patrisious Haddad <phaddad@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>
-References: <20260612113904.537595-1-tariqt@nvidia.com>
- <20260612113904.537595-15-tariqt@nvidia.com>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <20260612113904.537595-15-tariqt@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|DS5PPF2FA070BDF:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97675acf-0138-4830-16eb-08deca344b0d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|36860700016|82310400026|23010399003|18002099003|22082099003|11063799006|56012099006|6133799003|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	I7tFpzbKhF8lSyPxYSIcNkrbB403ihcxNs6byRKIlKJasFm1xzBgEp/3M0Qic8pERX5ckgG2C6ym1zgrgrMXncLbcQqGDA/GzEJTUkylU+XRFF8MibhrpgxjLacHS55y5kseo4OPRqA2NqTxTbHm2RiYTOy3/tJaEiSkjN0hjgPjTTsQj3tk99HLO/v9OIBkcUBEgJ+O2pxkcL1gIkcy5DwJkxCbZdb6P/TQimM0dEvu1i/Mx0Vn+0HwTvg72rs2dnbaCnzCcTG0t2Ibz7BiVMG/bvLqX2cZKU4Nq72BREFkQNbqgrP1pDXnFSKbXB+02Rb+VEjSUphSeS4V6gB2adAKS30ntvYlPNDXH59Jnwvn/moKUpk4WunMY4QkHSA+oaE3OdqGzm06ItaDH4vGGzx4OA+APxHPoj7y8G9hfpGKbnba8G4+Zv0PGSgX+pMgkjId0c7qQRTadg73Bfe0TCFVL0EPk6dS2OCCYaWQsns7Z4GWpoc60KC+/Mb9uTkdFh+EkT3BbuONLVZjQmX6GcM+etsfZvNKXhv7hE4L9fF2pULs1Oo6zyn89Mlh5J9g8C42/71r98rURDrPkmsQrgYajYlxDb0JsRARt9sEWb+XpXsZtRPlQPDv56IXawlqhFoaqBwFSDvrZ2OTd/m4/7Cs+vMlQZHWiatxJNRJqBvvQAi276FU+2XMR3iszIqzJXv5k5lFO/n/Daej+WaU4TWAZQ65QuPdG1CFCqiF+VQ=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(36860700016)(82310400026)(23010399003)(18002099003)(22082099003)(11063799006)(56012099006)(6133799003)(4143699003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	IBAU1Ey+c2PvWPA6HH2lGIg01Zx0KBkE/ZTPHnSDcu3fjNq587KOv7mThyoa19RZCt5S94okfE545z4dq7DFk3ZyAFoLiyJ/H2KRggCGdOZb99a/j6SVypavpzl0pn3mb8uT2oHQkBDAcoca27EJxZeIlcBIHhZ5msDk7odIsUD4JDJHkhUuNk0nSCHwzoWQwFbvvMCtZZt7S3DPodf3glvupVswHtmbt6rnHuvGLKj6TrzDCldEnlp5xstW3D8HanKsfBDD+8xSWfd6kVZJ2fyio6vYQbHi1j1gkHMLzGr2VGnSXqoWfRyDZsQpc+M6DYtNoh3nMg2bKmS0j7GTJMC4tZkkQllOGJyWz62mYChAyvgQ5XwcJTGOc4scRvD6qodC6dWyKPFkr85+XKcKrMtLjU54oy/l++IPfZdPCGkTl0CUfiU8wCZQE5ju/Lmw
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2026 16:45:07.8370
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97675acf-0138-4830-16eb-08deca344b0d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001C9.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPF2FA070BDF
+X-Received: by 2002:a05:6808:16a7:b0:467:819:dc61 with SMTP id
+ 5614622812f47-48741ab5ca9mr4772348b6e.23.1781455774706; Sun, 14 Jun 2026
+ 09:49:34 -0700 (PDT)
+Date: Sun, 14 Jun 2026 09:49:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a2edb9e.8812e0fc.3c3fa4.0014.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in __ieee80211_start_scan (2)
+From: syzbot <syzbot+f961b9f94edbc266f1f8@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299238-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299239-lists,netdev=lfdr.de,f961b9f94edbc266f1f8];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:ohartoov@nvidia.com,m:edwards@nvidia.com,m:msanalla@nvidia.com,m:horms@kernel.org,m:gbayer@linux.ibm.com,m:kees@kernel.org,m:moshe@nvidia.com,m:parav@nvidia.com,m:phaddad@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nvidia.com:from_mime,sashiko.dev:url,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,storage.googleapis.com:url,vger.kernel.org:from_smtp,googlegroups.com:email,appspotmail.com:email,goo.gl:url,syzkaller.appspotmail.com:from_mime,syzkaller.appspot.com:url];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:johannes@sipsolutions.net,m:linux-kernel@vger.kernel.org,m:linux-wireless@vger.kernel.org,m:netdev@vger.kernel.org,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D86BD681952
+X-Rspamd-Queue-Id: 6BEDA681961
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    627366c51145 ptp: ocp: fix resource freeing order
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1114f186580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=65472e27d1590a04
+dashboard link: https://syzkaller.appspot.com/bug?extid=f961b9f94edbc266f1f8
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fdf7eb944feb/disk-627366c5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ab07a79e10f6/vmlinux-627366c5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/270e46d829a1/bzImage-627366c5.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f961b9f94edbc266f1f8@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+!ieee80211_prep_hw_scan(sdata)
+WARNING: net/mac80211/scan.c:879 at __ieee80211_start_scan+0x1336/0x1d40 net/mac80211/scan.c:879, CPU#0: syz.0.5003/24116
+Modules linked in:
+CPU: 0 UID: 0 PID: 24116 Comm: syz.0.5003 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+RIP: 0010:__ieee80211_start_scan+0x1336/0x1d40 net/mac80211/scan.c:879
+Code: 06 90 e8 bd 74 b0 f6 48 83 fd 09 0f 84 41 07 00 00 83 fd 03 0f 84 3f 07 00 00 e8 25 6f b0 f6 e9 d5 f2 ff ff e8 1b 6f b0 f6 90 <0f> 0b 90 e9 0d fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 53 fa
+RSP: 0018:ffffc9000674f170 EFLAGS: 00010293
+RAX: ffffffff8b154795 RBX: ffff888053bf8e40 RCX: ffff888079661f00
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffff88804acc3024 R08: ffffffff903034f7 R09: 1ffffffff206069e
+R10: dffffc0000000000 R11: fffffbfff206069f R12: ffff88804acc3060
+R13: dffffc0000000000 R14: ffff88805c5a0f20 R15: ffff88805c5a2a88
+FS:  00007fe61492d6c0(0000) GS:ffff8881252a0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fe613987cc0 CR3: 0000000075924000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ rdev_scan+0x147/0x300 net/wireless/rdev-ops.h:467
+ nl80211_trigger_scan+0x1aa1/0x1f50 net/wireless/nl80211.c:11046
+ genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2555
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1899
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x972/0x9f0 net/socket.c:2699
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2753
+ __sys_sendmsg net/socket.c:2785 [inline]
+ __do_sys_sendmsg net/socket.c:2790 [inline]
+ __se_sys_sendmsg net/socket.c:2788 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2788
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe61399ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe61492d028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe613c15fa0 RCX: 00007fe61399ce59
+RDX: 0000000004000000 RSI: 0000200000000900 RDI: 0000000000000003
+RBP: 00007fe61492d090 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fe613c16038 R14: 00007fe613c15fa0 R15: 00007fff3acb29d8
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 12/06/2026 14:39, Tariq Toukan wrote:
-> From: Shay Drory <shayd@nvidia.com>
-> 
-> Allow SD devices to transition to switchdev before the SD group is
-> fully up. Metadata allocation requires the SD group to be ready, so
-> defer it from esw_offloads_enable() until SD shared-FDB activation.
-> 
-> Add mlx5_esw_offloads_init_deferred_metadata() which allocates per-vport
-> metadata and refreshes the ingress ACLs that were previously programmed
-> with metadata=0. The helper is idempotent and can be called multiple
-> times.
-> 
-> Signed-off-by: Shay Drory <shayd@nvidia.com>
-> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->   .../net/ethernet/mellanox/mlx5/core/eswitch.h |  1 +
->   .../mellanox/mlx5/core/eswitch_offloads.c     | 79 ++++++++++++++++++-
->   .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 16 ++++
->   3 files changed, 93 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> index b2b3150f1f04..fea72b1dedab 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-> @@ -440,6 +440,7 @@ struct mlx5_eswitch {
->   
->   void esw_offloads_disable(struct mlx5_eswitch *esw);
->   int esw_offloads_enable(struct mlx5_eswitch *esw);
-> +int mlx5_esw_offloads_init_deferred_metadata(struct mlx5_eswitch *esw);
->   void esw_offloads_cleanup(struct mlx5_eswitch *esw);
->   int esw_offloads_init(struct mlx5_eswitch *esw);
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> index 4dc190a4e7b2..8fa7e633451c 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> @@ -3675,6 +3675,7 @@ static void esw_offloads_vport_metadata_cleanup(struct mlx5_eswitch *esw,
->   
->   	WARN_ON(vport->metadata != vport->default_metadata);
->   	mlx5_esw_match_metadata_free(esw, vport->default_metadata);
-> +	vport->default_metadata = 0;
->   }
->   
->   static void esw_offloads_metadata_uninit(struct mlx5_eswitch *esw)
-> @@ -3711,6 +3712,73 @@ static int esw_offloads_metadata_init(struct mlx5_eswitch *esw)
->   	return err;
->   }
->   
-> +/* Deferred metadata init for SD devices: allocate vport metadata and
-> + * refresh the ingress ACL for every vport whose ACL was created with
-> + * metadata=0 in esw_create_offloads_acl_tables() / esw_vport_setup().
-> + *
-> + * No Rep is loaded at this point ==> no Rep net-dev exists, so no need
-> + * to take rtnl lock.
-> + *
-> + * Safe to call multiple times - subsequent calls are no-ops.
-> + */
-> +int mlx5_esw_offloads_init_deferred_metadata(struct mlx5_eswitch *esw)
-> +{
-> +	struct mlx5_vport *manager, *vport;
-> +	unsigned long i;
-> +	int err;
-> +
-> +	if (!mlx5_eswitch_vport_match_metadata_enabled(esw))
-> +		return 0;
-> +
-> +	manager = mlx5_eswitch_get_vport(esw, esw->manager_vport);
-> +	if (IS_ERR(manager))
-> +		return PTR_ERR(manager);
-> +
-> +	/* Sanity check: skip if metadata was already initialized */
-> +	if (manager->default_metadata)
-> +		return 0;
-> +
-> +	err = esw_offloads_metadata_init(esw);
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-sashiko.dev says:
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Does unconditionally allocating new metadata here overwrite any dynamically
-assigned vport metadata?
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-[SD] No. no REPs are loaded until SD LAG is created, so user can't do
-any REPs bonding
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-> +	if (err)
-> +		return err;
-> +
-> +	mutex_lock(&esw->state_lock);
-> +	/* Manager vport doesn't have a rep/netdev loaded but its ingress ACL
-> +	 * was programmed with metadata=0 - refresh it explicitly.
-> +	 */
-> +	err = mlx5_esw_acl_ingress_vport_metadata_update(esw,
-> +							 esw->manager_vport,
-> +							 0);
-> +	if (err)
-> +		goto err_acl;
-> +
-> +	/* UPLINK is never marked enabled but its ACL is programmed in
-> +	 * esw_create_offloads_acl_tables(); refresh it explicitly.
-> +	 */
-> +	err = mlx5_esw_acl_ingress_vport_metadata_update(esw, MLX5_VPORT_UPLINK,
-> +							 0);
-
-sashiko.dev says:
-Is the rtnl_lock required during these deferred ACL updates?
-The code comment assumes no representor netdev exists at this point. 
-However,
-for the primary SD device, representor netdevs were loaded and exposed to
-user-space much earlier when its switchdev transition completed.
-
-[SD] same as above, no REPs net-dev exists at this point
-
-> +	if (err)
-> +		goto err_acl;
-> +
-> +	mlx5_esw_for_each_vport(esw, i, vport) {
-> +		if (!vport || !vport->enabled)
-> +			continue;
-> +		err = mlx5_esw_acl_ingress_vport_metadata_update(esw,
-> +								 vport->vport,
-> +								 0);
-> +		if (err)
-> +			goto err_acl;
-> +	}
-> +
-> +	mutex_unlock(&esw->state_lock);
-> +	return 0;
-> +
-> +err_acl:
-> +	esw_offloads_metadata_uninit(esw);
-> +	mutex_unlock(&esw->state_lock);
-> +	return err;
-> +}
-> +
->   int
->   esw_vport_create_offloads_acl_tables(struct mlx5_eswitch *esw,
->   				     struct mlx5_vport *vport)
-> @@ -4072,9 +4140,14 @@ int esw_offloads_enable(struct mlx5_eswitch *esw)
->   	if (err)
->   		goto err_roce;
->   
-> -	err = esw_offloads_metadata_init(esw);
-> -	if (err)
-> -		goto err_metadata;
-> +	/* SD devices defer metadata init until SD is ready and
-> +	 * mlx5_sd_pf_num_get() can return the correct pf_num.
-> +	 */
-> +	if (!mlx5_get_sd(esw->dev)) {
-> +		err = esw_offloads_metadata_init(esw);
-
-sashiko.dev says:
-Does skipping metadata initialization here prematurely expose representors
-with uninitialized metadata?
-esw_offloads_enable() skips metadata initialization for SD devices, leaving
-vport->metadata = 0. Later in this function, representor netdevs are loaded
-and exposed to userspace, which allows userspace to add TC rules matching
-metadata=0 before the metadata is actually initialized.
-
-[SD] same as above
-
-> +		if (err)
-> +			goto err_metadata;
-> +	}
->   
->   	err = esw_set_passing_vport_metadata(esw, true);
->   	if (err)
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> index b35795bac098..2fcccd329eb5 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-> @@ -992,6 +992,7 @@ static bool mlx5_sd_all_paired(struct mlx5_core_dev *primary)
->   static void mlx5_sd_activate_shared_fdb(struct mlx5_core_dev *primary)
->   {
->   	struct mlx5_sd *sd = mlx5_get_sd(primary);
-> +	struct mlx5_core_dev *pos;
->   	struct mlx5_lag *ldev;
->   	struct lag_func *pf;
->   	int err;
-> @@ -1024,6 +1025,21 @@ static void mlx5_sd_activate_shared_fdb(struct mlx5_core_dev *primary)
->   		goto unlock;
->   	}
->   
-> +	/* Initialize vport metadata for all group devices. This is deferred
-> +	 * from esw_offloads_enable() because mlx5_sd_pf_num_get() requires
-> +	 * the SD group to be ready.
-> +	 */
-> +	mlx5_sd_for_each_dev(i, primary, pos) {
-> +		struct mlx5_eswitch *esw = pos->priv.eswitch;
-> +
-> +		err = mlx5_esw_offloads_init_deferred_metadata(esw);
-> +		if (err) {
-> +			sd_warn(primary, "Failed to init metadata for %s: %d\n",
-> +				dev_name(pos->device), err);
-> +			goto unlock;
-> +		}
-> +	}
-> +
->   	err = mlx5_lag_shared_fdb_create(ldev, NULL, 0, sd->group_id);
->   	if (err)
->   		sd_warn(primary, "Failed to create shared FDB: %d\n", err);
-
+If you want to undo deduplication, reply with:
+#syz undup
 
