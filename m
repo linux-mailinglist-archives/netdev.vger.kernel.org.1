@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-299165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Pkw1AMVXLmrptgQAu9opvQ
-	(envelope-from <netdev+bounces-299165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:01 +0200
+	id hTODANBXLmrttgQAu9opvQ
+	(envelope-from <netdev+bounces-299166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0496808E9
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57EDA6808EE
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:27:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=KJFkB1SU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299165-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299165-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=X6wDpGTc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299166-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299166-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 923733031120
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 029CB3021714
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1BA392C57;
-	Sun, 14 Jun 2026 07:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71D73932D1;
+	Sun, 14 Jun 2026 07:25:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f226.google.com (mail-vk1-f226.google.com [209.85.221.226])
+Received: from mail-vk1-f228.google.com (mail-vk1-f228.google.com [209.85.221.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A751F392C52
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C433932EA
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:25:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781421932; cv=none; b=rA5WDC0+5egQ3LoUTyCxJMlBTgs0Gend4V8w6scfRUqthsn8+ojfZzmARq9QRqjwLkANv88JGGR5BMLBuFDWuoRI8n/R/Ykk6L61UUrKCbc00Hmhjfmc5hqNNPfHKXpnIkuN/I6az1MoXy1PLoe0dMYdYnlaChs+oU5AiPf8fT8=
+	t=1781421934; cv=none; b=ins+Lw+pCDKmJfhd15+70YrVV1qPKDVLp0qYcmro8A9a2IsrRiZlyvxEKjIGWoygZK1jfMwX+O4DcRVo2BBftK7FlwtdFlppNut9kujdZOZP/2tgototaUkCHr0y84eguQmUWrDG1kZjgyxzGfINCHwJHeverFkZUSESriCpfUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781421932; c=relaxed/simple;
-	bh=0V8kGIn1NtpjSC9CzDRN8IFo+AtDCGOOW5RSMF4QiNE=;
+	s=arc-20240116; t=1781421934; c=relaxed/simple;
+	bh=nQCNXmnNybwCjMnEiWIO6gEr1knlTJ4G+NvjrDjluzQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GXrU5+eg38Qo0Kx5tj85nM3M2qGILpgyQj/jwQk15Uj6sMGHHH8Sh9voNeK3Vk9hXIli+9d3FokmhItQTQDsdz6rUqyL70+MDeDOSa9MYABrAz3SCE3iTeDjCKNjH5z2rlPdx5wKVHXzI6jEgRFIXl3l0fPtK3nHowpfLdJFmL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KJFkB1SU; arc=none smtp.client-ip=209.85.221.226
-Received: by mail-vk1-f226.google.com with SMTP id 71dfb90a1353d-59f967189e7so937079e0c.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:30 -0700 (PDT)
+	 MIME-Version; b=fN1vcm5Rxie5Bstnxa+m75UOHeAExvc/VJezhYVuMs4/kvaynXdXtv8CZP1YbZCYzBogCuPQGK/2HwpSPJBOc/l3HdI0Yk7vm/VZ8iFuQO0yegIeKX354PC/QYpudJw47k5ezpPuFslDVG50iduz4GR9LHtPlph2EKMlgBJR60Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=X6wDpGTc; arc=none smtp.client-ip=209.85.221.228
+Received: by mail-vk1-f228.google.com with SMTP id 71dfb90a1353d-59d07df448bso1721215e0c.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781421929; x=1782026729;
+        d=1e100.net; s=20251104; t=1781421932; x=1782026732;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cgp12Nbx7NWHfhnS258QRd/gLhsObXHUpDN1CbChKqg=;
-        b=k8EUZUB0tqitr63H+74k7rPqW+obFL/S36NR9zHfagt769ziUkLixbN7Xz0reXa4kF
-         2xYYqIZq5vGfT89LNgoxvbqJICuYaHTuyscq+yDv7SZeOSBtOnYDxTcWpLMOeUn99P16
-         W/kDbcdVUOvwRKRScSdwEai3bc4nrel2978Hz8SMi03sWefHSNfjJGDiTdyhJIigmHnj
-         SA89iJcCd910ZwK1sSslV5Ie/oZCKGkFozTHUP+Ajila4BbsiXBHofX+oztjRQD7U8kX
-         6paPjRRWgQejn2+pGXZbdxOL7YxdczMPCp8SdGzxJfaiydoaIt97Zgk7QecxWUVuglJj
-         kJKQ==
-X-Gm-Message-State: AOJu0YzCGssSs/9pwS6Th5qeYnKHNZyqgjxsQaSeFzUvClQ9s3pmMXUG
-	TrOMQH1T7fhfWwdE+nhX6nrD4MrH3fiD45EIQ3rhmUjbcdfMBMV4vP+NBWVgHy4fjRaT+TTnCGx
-	kSMCzsQst6W0hT70ebz8bLSnwsBNZg0R3YFAQOY5tG3vku88C5hMtVe6eyF2UCgbqgv/JNHZOn4
-	bnVbj00/iovcRvS8783RqCIkLYAQ994WWFnq5LwLk3+rfc6+wY5aMMV85fWsY7wnSMSr8pcsVcS
-	oDVlyDn+o8=
-X-Gm-Gg: Acq92OHN9RFsd+14hizIMtMEvTLl0iI13SCb4PDSqcmELfBNXlJDpPc9K/OJMRWFhBj
-	7axCoBmMSyD+FTi3zi5HZ2OBG1/KbDLV65DSdc086rmEucu9lrz/+7AExOB3iRK0YhesKN0CyWN
-	FqCCAYBowyZ3HkPd1QTlN5U6Kt7cQoqt4w6YKz5WjbumHgEqJDNBi5JDUdiRwKq+EANOdRmML4A
-	elnw6Ch9ZN9gZQpzfK7jHK0GSUp/T1TC9U2RhppYBMHb6w5VSCt/hvJpZ2Op3d5FiEnmqUppUsg
-	4YLivvReC42l0V1jLfuJO4Jb5EYRqdiBMs/ghUopQEixlzStMiWyk6cQ+lwSCijWTn4ntH5Had5
-	bju+BJ//loD/Kq5ab3qphB207wr+Tg7pwN2AsyzAGYMKmisQat2zKsPSXZlneqdb0/WcVU1aVDZ
-	7Ar93iBdD/y/DMKDQF7YK0eIj2q+gkNZlKZGc2YVvx0fLAlTwMjmj7fCT6qiU=
-X-Received: by 2002:a05:6102:801d:b0:6a2:b2a1:f16a with SMTP id ada2fe7eead31-71e88acea75mr5111921137.2.1781421929430;
-        Sun, 14 Jun 2026 00:25:29 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-5bb9012d534sm77189e0c.5.2026.06.14.00.25.28
+        bh=vFcoqWn/lqxmw0cgFIfBqn19kLr1bNllypCVcokWBUU=;
+        b=RYtx68TY+xG/z6GquOqgNcf0ZN0ikv0agJHF4H1mChrK/sMKnhDqCIU9F78mOSvbEI
+         6Z2wRLzygJldwUcoW3BzQhtUCcD3mQrWrE8sK+9hSJFRZkiTXWI02zJZ0cfatWZx82yc
+         3CW3JKxyFdhPVeWRLiiL1zpGVkZsw8RfGf/rxbmGPVWlPdCdliaf/+89GdMQQQw2VQvf
+         7quYBChdVPyqntgRhcIHCRRWV4s3TZfGOYC4+d0HIuH7G/2TL+xbGUvPlCnM8tlt0wOk
+         iRB+ig0w2LWs9J+TR4h1PUCE2hb5CWzYhd9HHFAeZhsQAX+LPfhp9HxXwrG9a0Wjar0n
+         5mzQ==
+X-Gm-Message-State: AOJu0Yw3EO1YRAcnFwXFncRJus+PXT5qHetkUQs9w9llTvRHVr/GUyPG
+	QlwikzPcqMA0A4YHUwGD7VPhVuEksCH2Ny09G2VyKuhkYEAZS6s9v61BzfogpBcfMvalHwxWr5d
+	E+351HfwsUqqg7oKxpqHHRtUpJtoh7/kWMdIqd1P6WdXWN0LvD3O0JVpWGl8qSPRptOhtso/0r5
+	ZEugs/Du1zCgCp49H4yor7nlvkcGSSETYXWtqmfv4gdXYPsZCRAJ/3osz7VrQZsoKboT56fqL0D
+	wOwUuKEr4I=
+X-Gm-Gg: Acq92OFkRn/TsVHb2kPmZHZbZH5bJ3B8c+AJDmXfiMu+eVVzbW7hWeg3Fl0l3IzxmVd
+	p5GHhs35Aa1ATCcbkK0fIEGtoYm/G5sty2lk4gBDlMnBNHGEHvYkSF6DrYkv3Lt/w5d/gfJIQ4R
+	ByqW067hYNNHWmG5oVlILPbpew71oWQX/6kErdP+POsI6Ii6K0HBlQyd9+YKWZVdh5s1anAonns
+	GG4jeTJZ9MSiGfsc+DD5qRo6tbfwDF5Qy5DyloLh/8I31Z3eAPpJPCBvQetIIJ8285NBe8Hj4JR
+	cWSZrxm5WbQIjax272oZJGpEMQsZzh7cBnhDYjh4fZRcWj1bN0fT/wQ5g8fg7cZFBO9NMLkvVDC
+	N1ebU/D9c8RX6t8mINb448xcQcXpabkOPfbprOrv5TjEzAdy7X9zRFg0JBjRj3F6FM8+FFOgCCu
+	oMR03zE3G/bjKRKSTkFubQhiWX7uzNcGqy/cOzgLCVIQfHHqGTG06HARrPRWg=
+X-Received: by 2002:a05:6102:2929:b0:631:4580:6a33 with SMTP id ada2fe7eead31-71f60a17028mr3440235137.21.1781421931944;
+        Sun, 14 Jun 2026 00:25:31 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-121.dlp.protect.broadcom.com. [144.49.247.121])
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-7208725ac6csm90722137.23.2026.06.14.00.25.30
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Jun 2026 00:25:29 -0700 (PDT)
+        Sun, 14 Jun 2026 00:25:31 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-304dd917645so4969274eec.1
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:28 -0700 (PDT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-3080bb0267dso5317240eec.1
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781421928; x=1782026728; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1781421930; x=1782026730; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cgp12Nbx7NWHfhnS258QRd/gLhsObXHUpDN1CbChKqg=;
-        b=KJFkB1SU1kwwIeF3/2BsilgybNBQ89/W2xIT0kTd1yuaLM8U5FqxfKTIq7pRnYFO8Z
-         BQyHiW6LNiAKgpNVa7JCraqR8NE2Pb5/+gCZMjSrPTY4SIFpGFwfS88BdIwUPx4Z32FV
-         eaEeamG8KtkUILIwkBP6PgO2xshxffuN5hb98=
-X-Received: by 2002:a05:7300:7306:b0:304:e6f8:7cc9 with SMTP id 5a478bee46e88-3082005fd53mr5433817eec.20.1781421927515;
-        Sun, 14 Jun 2026 00:25:27 -0700 (PDT)
-X-Received: by 2002:a05:7300:7306:b0:304:e6f8:7cc9 with SMTP id 5a478bee46e88-3082005fd53mr5433807eec.20.1781421926907;
-        Sun, 14 Jun 2026 00:25:26 -0700 (PDT)
+        bh=vFcoqWn/lqxmw0cgFIfBqn19kLr1bNllypCVcokWBUU=;
+        b=X6wDpGTcK6CG99dbru06dVccKuzGk6PCikwa9vra+ZJchE9M4yv326upju+dCbot01
+         nT9IcVB0nbvRZG4dRRm0PqMRzu5KGqbcMBTMgyEI5N5IVih3Csvw16IL6JgBaj2qzGIT
+         6L4kUkN8rdbcoSXts9P7WoR9b32t6g8U/GCYE=
+X-Received: by 2002:a05:7300:80cb:b0:2c7:3a7:c792 with SMTP id 5a478bee46e88-3093bf08cd9mr3250127eec.20.1781421929627;
+        Sun, 14 Jun 2026 00:25:29 -0700 (PDT)
+X-Received: by 2002:a05:7300:80cb:b0:2c7:3a7:c792 with SMTP id 5a478bee46e88-3093bf08cd9mr3250110eec.20.1781421928997;
+        Sun, 14 Jun 2026 00:25:28 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43bc7sm10043280eec.22.2026.06.14.00.25.25
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43bc7sm10043280eec.22.2026.06.14.00.25.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 00:25:25 -0700 (PDT)
+        Sun, 14 Jun 2026 00:25:28 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -97,9 +97,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v3 07/15] bnxt_en: Allocate crypto structure and backing store
-Date: Sun, 14 Jun 2026 00:23:59 -0700
-Message-ID: <20260614072407.2761092-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next v3 08/15] bnxt_en: Reserve crypto RX and TX key contexts on a PF
+Date: Sun, 14 Jun 2026 00:24:00 -0700
+Message-ID: <20260614072407.2761092-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260614072407.2761092-1-michael.chan@broadcom.com>
 References: <20260614072407.2761092-1-michael.chan@broadcom.com>
@@ -125,7 +125,7 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-299165-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299166-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
@@ -147,334 +147,200 @@ X-Spamd-Result: default: False [-6.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4C0496808E9
+X-Rspamd-Queue-Id: 57EDA6808EE
 
-If the chip and firmware support crypto (TLS) offload, allocate a
-bp->crypto_info software structure and backing store to support the RX
-and TX contexts.  Each offloaded TLS connection requires a backing
-store context for each direction.
-
-bp->crypto_info will stay persistent even if kTLS is no longer
-supported after a FW reset.  This makes it easier to avoid NULL
-dereference of bp->crypto_info during FW reset and kTLS offload
-race conditions.
+If kTLS crypto offload is supported, reserve RX and TX key contexts.
+These keys will later be allocated during run-time to support offloading
+TX and RX kTLS connections.
 
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
 v3:
-bp->crypto_info and bp->ktls_info now stay persistent for the driver's
-lifetime.  max keys are refreshed after re-init.
+Add missing ASSETS_TEST flag when checking reserved crypto keys.
 
 v2:
-https://lore.kernel.org/netdev/20260512212105.3488258-8-michael.chan@broadcom.com/
+https://lore.kernel.org/netdev/20260512212105.3488258-9-michael.chan@broadcom.com/
 ---
- drivers/net/ethernet/broadcom/bnxt/Makefile   |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 21 +++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  4 +
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 82 +++++++++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  | 47 +++++++++++
- include/linux/bnxt/hsi.h                      | 37 +++++++++
- 6 files changed, 192 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
- create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 22 +++++++++++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 11 +++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.c  | 32 +++++++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_crypto.h  |  7 ++++
+ 4 files changed, 70 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/Makefile b/drivers/net/ethernet/broadcom/bnxt/Makefile
-index 0506574c007a..3acdb81fa958 100644
---- a/drivers/net/ethernet/broadcom/bnxt/Makefile
-+++ b/drivers/net/ethernet/broadcom/bnxt/Makefile
-@@ -5,4 +5,4 @@ bnxt_en-y := bnxt.o bnxt_hwrm.o bnxt_sriov.o bnxt_ethtool.o bnxt_dcb.o bnxt_ulp.
- bnxt_en-$(CONFIG_BNXT_FLOWER_OFFLOAD) += bnxt_tc.o
- bnxt_en-$(CONFIG_DEBUG_FS) += bnxt_debugfs.o
- bnxt_en-$(CONFIG_BNXT_HWMON) += bnxt_hwmon.o
--bnxt_en-$(CONFIG_BNXT_TLS) += bnxt_mpc.o
-+bnxt_en-$(CONFIG_BNXT_TLS) += bnxt_mpc.o bnxt_crypto.o
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 0d6d4bb7fd6f..dd8b3e09fd2d 100644
+index dd8b3e09fd2d..730af6aee0c8 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -77,6 +77,7 @@
- #include "bnxt_gso.h"
- #include <net/tso.h>
- #include "bnxt_mpc.h"
-+#include "bnxt_crypto.h"
- 
- #define BNXT_TX_TIMEOUT		(5 * HZ)
- #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
-@@ -9370,6 +9371,7 @@ static int bnxt_hwrm_func_backing_store_cfg_v2(struct bnxt *bp,
- 
- static int bnxt_backing_store_cfg_v2(struct bnxt *bp)
+@@ -7785,6 +7785,7 @@ static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
+ static int bnxt_hwrm_get_rings(struct bnxt *bp)
  {
-+	struct bnxt_crypto_info *crypto = bp->crypto_info;
- 	struct bnxt_mpc_info *mpc = bp->mpc_info;
- 	struct bnxt_ctx_mem_info *ctx = bp->ctx;
- 	struct bnxt_ctx_mem_type *ctxm;
-@@ -9377,6 +9379,19 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp)
- 	int rc = 0;
- 	u16 type;
+ 	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
++	struct bnxt_hw_crypto_resc *crypto_resc;
+ 	struct hwrm_func_qcfg_output *resp;
+ 	struct hwrm_func_qcfg_input *req;
+ 	int rc;
+@@ -7845,6 +7846,10 @@ static int bnxt_hwrm_get_rings(struct bnxt *bp)
+ 		}
+ 		hw_resc->resv_cp_rings = cp;
+ 		hw_resc->resv_stat_ctxs = stats;
++
++		crypto_resc = &hw_resc->crypto_resc;
++		crypto_resc->resv_tx_key_ctxs = le32_to_cpu(resp->num_ktls_tx_key_ctxs);
++		crypto_resc->resv_rx_key_ctxs = le32_to_cpu(resp->num_ktls_rx_key_ctxs);
+ 	}
+ get_rings_exit:
+ 	hwrm_req_drop(bp, req);
+@@ -7915,8 +7920,9 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 		}
+ 		req->num_stat_ctxs = cpu_to_le16(hwr->stat);
+ 		req->num_vnics = cpu_to_le16(hwr->vnic);
++		bnxt_hwrm_reserve_pf_key_ctxs(bp, req);
+ 	}
+-	req->enables = cpu_to_le32(enables);
++	req->enables |= cpu_to_le32(enables);
+ 	return req;
+ }
  
-+	if (BNXT_SUPPORTS_KTLS(bp)) {
-+		ctxm = &ctx->ctx_arr[BNXT_CTX_TCK];
-+		rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm,
-+					     BNXT_TCK(crypto).max_ctx, 1);
-+		if (rc)
-+			return rc;
-+		ctxm = &ctx->ctx_arr[BNXT_CTX_RCK];
-+		rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm,
-+					     BNXT_RCK(crypto).max_ctx, 1);
-+		if (rc)
-+			return rc;
-+		last_type = BNXT_CTX_RCK;
-+	}
- 	if (mpc && mpc->mpc_chnls_cap) {
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_MTQM];
- 		rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, ctxm->max_entries, 1);
-@@ -9919,6 +9934,10 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
- 		bp->fw_cap |= BNXT_FW_CAP_BACKING_STORE_V2;
- 	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_TX_COAL_CMPL_CAP)
- 		bp->flags |= BNXT_FLAG_TX_COAL_CMPL;
-+	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_KTLS_SUPPORTED)
-+		bnxt_alloc_crypto_info(bp, resp);
-+	else
-+		bp->fw_cap &= ~BNXT_FW_CAP_KTLS;
+@@ -8318,7 +8324,7 @@ static int bnxt_hwrm_check_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ static int bnxt_hwrm_check_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ {
+ 	struct hwrm_func_cfg_input *req;
+-	u32 flags;
++	u32 flags, flags2 = 0;
  
- 	flags_ext2 = le32_to_cpu(resp->flags_ext2);
- 	if (flags_ext2 & FUNC_QCAPS_RESP_FLAGS_EXT2_RX_ALL_PKTS_TIMESTAMPS_SUPPORTED)
-@@ -16559,6 +16578,7 @@ static void bnxt_remove_one(struct pci_dev *pdev)
- 	bp->ptp_cfg = NULL;
- 	kfree(bp->fw_health);
- 	bp->fw_health = NULL;
-+	bnxt_free_crypto_info(bp);
- 	bnxt_free_mpc_info(bp);
- 	bnxt_cleanup_pci(bp);
- 	bnxt_free_ctx_mem(bp, true);
-@@ -17238,6 +17258,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	bnxt_ethtool_free(bp);
- 	kfree(bp->fw_health);
- 	bp->fw_health = NULL;
-+	bnxt_free_crypto_info(bp);
- 	bnxt_free_mpc_info(bp);
- 	bnxt_cleanup_pci(bp);
- 	bnxt_free_ctx_mem(bp, true);
+ 	req = __bnxt_hwrm_reserve_pf_rings(bp, hwr);
+ 	flags = FUNC_CFG_REQ_FLAGS_TX_ASSETS_TEST;
+@@ -8332,9 +8338,14 @@ static int bnxt_hwrm_check_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 				 FUNC_CFG_REQ_FLAGS_NQ_ASSETS_TEST;
+ 		else
+ 			flags |= FUNC_CFG_REQ_FLAGS_RING_GRP_ASSETS_TEST;
++		if (req->enables &
++		    cpu_to_le32(FUNC_CFG_REQ_ENABLES_KTLS_TX_KEY_CTXS |
++				FUNC_CFG_REQ_ENABLES_KTLS_RX_KEY_CTXS))
++			flags2 |= FUNC_CFG_REQ_FLAGS2_KTLS_KEY_CTX_ASSETS_TEST;
+ 	}
+ 
+ 	req->flags = cpu_to_le32(flags);
++	req->flags2 = cpu_to_le32(flags2);
+ 	return hwrm_req_send_silent(bp, req);
+ }
+ 
+@@ -9748,6 +9759,7 @@ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all)
+ 	struct hwrm_func_resource_qcaps_output *resp;
+ 	struct hwrm_func_resource_qcaps_input *req;
+ 	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
++	struct bnxt_hw_crypto_resc *crypto_resc;
+ 	int rc;
+ 
+ 	rc = hwrm_req_init(bp, req, HWRM_FUNC_RESOURCE_QCAPS);
+@@ -9785,6 +9797,12 @@ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all)
+ 	    hw_resc->max_vnics * BNXT_LARGE_RSS_TO_VNIC_RATIO)
+ 		bp->rss_cap |= BNXT_RSS_CAP_LARGE_RSS_CTX;
+ 
++	crypto_resc = &hw_resc->crypto_resc;
++	crypto_resc->min_tx_key_ctxs = le32_to_cpu(resp->min_ktls_tx_key_ctxs);
++	crypto_resc->max_tx_key_ctxs = le32_to_cpu(resp->max_ktls_tx_key_ctxs);
++	crypto_resc->min_rx_key_ctxs = le32_to_cpu(resp->min_ktls_rx_key_ctxs);
++	crypto_resc->max_rx_key_ctxs = le32_to_cpu(resp->max_ktls_rx_key_ctxs);
++
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+ 		u16 max_msix = le16_to_cpu(resp->max_msix);
+ 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index f875f130f070..954c679e0290 100644
+index 954c679e0290..53fdc45f8020 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2460,6 +2460,7 @@ struct bnxt {
- 	u8			tph_mode;
- 
- 	struct bnxt_mpc_info	*mpc_info;
-+	struct bnxt_crypto_info	*crypto_info;
- 
- 	unsigned int		current_interval;
- #define BNXT_TIMER_INTERVAL	HZ
-@@ -2547,6 +2548,7 @@ struct bnxt {
- 	#define BNXT_FW_CAP_NPAR_1_2			BIT_ULL(42)
- 	#define BNXT_FW_CAP_MIRROR_ON_ROCE		BIT_ULL(43)
- 	#define BNXT_FW_CAP_PTP_PTM			BIT_ULL(44)
-+	#define BNXT_FW_CAP_KTLS			BIT_ULL(45)
- 
- 	u32			fw_dbg_cap;
- 
-@@ -2572,6 +2574,8 @@ struct bnxt {
- 	((bp)->fw_cap & BNXT_FW_CAP_SW_MAX_RESOURCE_LIMITS)
- #define BNXT_MIRROR_ON_ROCE_CAP(bp)	\
- 	((bp)->fw_cap & BNXT_FW_CAP_MIRROR_ON_ROCE)
-+#define BNXT_SUPPORTS_KTLS(bp)	\
-+	((bp)->fw_cap & BNXT_FW_CAP_KTLS)
- 
- 	u32			hwrm_spec_code;
- 	u16			hwrm_cmd_seq;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
-new file mode 100644
-index 000000000000..0777a26600f5
---- /dev/null
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
-@@ -0,0 +1,82 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright (c) 2026 Broadcom Inc. */
-+
-+#include <linux/stddef.h>
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/bnxt/hsi.h>
-+
-+#include "bnxt.h"
-+#include "bnxt_crypto.h"
-+
-+static u32 bnxt_get_max_crypto_key_ctx(struct bnxt *bp, int key_type)
-+{
-+	u32 fw_maj = BNXT_FW_MAJ(bp);
-+
-+	if (key_type == BNXT_TX_CRYPTO_KEY_TYPE)
-+		return (fw_maj < 233) ? BNXT_MAX_TX_CRYPTO_KEYS_PRE_233FW :
-+		       BNXT_MAX_TX_CRYPTO_KEYS;
-+
-+	return (fw_maj < 233) ? BNXT_MAX_RX_CRYPTO_KEYS_PRE_233FW :
-+	       BNXT_MAX_RX_CRYPTO_KEYS;
-+}
-+
-+/**
-+ * bnxt_alloc_crypto_info - Allocate and initialize crypto offload context
-+ * @bp: pointer to bnxt device
-+ * @resp: pointer to firmware capability response
-+ *
-+ * Allocates the main crypto info structure
-+ *
-+ * This function is called during device initialization when firmware
-+ * reports crypto offload capability. If allocation fails, crypto offload
-+ * will not be available but the device will still function.
-+ *
-+ * Context: Process context
-+ */
-+void bnxt_alloc_crypto_info(struct bnxt *bp,
-+			    struct hwrm_func_qcaps_output *resp)
-+{
-+	u16 max_keys = le16_to_cpu(resp->max_key_ctxs_alloc);
-+	struct bnxt_crypto_info *crypto = bp->crypto_info;
-+	struct bnxt_kctx *kctx;
-+	int i;
-+
-+	if (BNXT_VF(bp))
-+		return;
-+	if (!crypto) {
-+		crypto = kzalloc_obj(*crypto);
-+		if (!crypto) {
-+			netdev_warn(bp->dev,
-+				    "Unable to allocate crypto info\n");
-+			return;
-+		}
-+		for (i = 0; i < BNXT_MAX_CRYPTO_KEY_TYPE; i++) {
-+			kctx = &crypto->kctx[i];
-+			kctx->type = i;
-+		}
-+		bp->crypto_info = crypto;
-+	}
-+	for (i = 0; i < BNXT_MAX_CRYPTO_KEY_TYPE; i++) {
-+		kctx = &crypto->kctx[i];
-+		kctx->max_ctx = bnxt_get_max_crypto_key_ctx(bp, i);
-+	}
-+	crypto->max_key_ctxs_alloc = max_keys;
-+	bp->fw_cap |= BNXT_FW_CAP_KTLS;
-+}
-+
-+/**
-+ * bnxt_free_crypto_info - Free crypto offload resources
-+ * @bp: pointer to bnxt device
-+ *
-+ * Frees all resources associated with crypto offload.  Call this function
-+ * only when it is idle with nothing in-flight.
-+ *
-+ * Context: Process context during device shutdown/removal
-+ */
-+void bnxt_free_crypto_info(struct bnxt *bp)
-+{
-+	kfree(bp->crypto_info);
-+	bp->crypto_info = NULL;
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
-new file mode 100644
-index 000000000000..629388fe1e6d
---- /dev/null
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
-@@ -0,0 +1,47 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (c) 2026 Broadcom Inc. */
-+
-+#ifndef BNXT_CRYPTO_H
-+#define BNXT_CRYPTO_H
-+
-+#define BNXT_MAX_TX_CRYPTO_KEYS		204800
-+#define BNXT_MAX_RX_CRYPTO_KEYS		204800
-+
-+#define BNXT_MAX_TX_CRYPTO_KEYS_PRE_233FW	65535
-+#define BNXT_MAX_RX_CRYPTO_KEYS_PRE_233FW	65535
-+
-+enum bnxt_crypto_type {
-+	BNXT_TX_CRYPTO_KEY_TYPE = FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_TX,
-+	BNXT_RX_CRYPTO_KEY_TYPE = FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_RX,
-+	BNXT_MAX_CRYPTO_KEY_TYPE,
-+};
-+
-+struct bnxt_kctx {
-+	u8			type;
-+	u32			max_ctx;
-+};
-+
-+struct bnxt_crypto_info {
-+	u16			max_key_ctxs_alloc;
-+
-+	struct bnxt_kctx	kctx[BNXT_MAX_CRYPTO_KEY_TYPE];
-+};
-+
-+#define BNXT_TCK(crypto)	((crypto)->kctx[BNXT_TX_CRYPTO_KEY_TYPE])
-+#define BNXT_RCK(crypto)	((crypto)->kctx[BNXT_RX_CRYPTO_KEY_TYPE])
-+
-+#ifdef CONFIG_BNXT_TLS
-+void bnxt_alloc_crypto_info(struct bnxt *bp,
-+			    struct hwrm_func_qcaps_output *resp);
-+void bnxt_free_crypto_info(struct bnxt *bp);
-+#else
-+static inline void bnxt_alloc_crypto_info(struct bnxt *bp,
-+					  struct hwrm_func_qcaps_output *resp)
-+{
-+}
-+
-+static inline void bnxt_free_crypto_info(struct bnxt *bp)
-+{
-+}
-+#endif	/* CONFIG_BNXT_TLS */
-+#endif	/* BNXT_CRYPTO_H */
-diff --git a/include/linux/bnxt/hsi.h b/include/linux/bnxt/hsi.h
-index 74a6bf278d88..03444b81beb0 100644
---- a/include/linux/bnxt/hsi.h
-+++ b/include/linux/bnxt/hsi.h
-@@ -3837,6 +3837,43 @@ struct hwrm_func_ptp_ext_qcfg_output {
- 	u8	valid;
+@@ -1362,6 +1362,15 @@ struct bnxt_hw_rings {
+ 	int rss_ctx;
  };
  
-+/* hwrm_func_key_ctx_alloc_input (size:384b/48B) */
-+struct hwrm_func_key_ctx_alloc_input {
-+	__le16	req_type;
-+	__le16	cmpl_ring;
-+	__le16	seq_id;
-+	__le16	target_id;
-+	__le64	resp_addr;
-+	__le16	fid;
-+	__le16	num_key_ctxs;
-+	__le32	dma_bufr_size_bytes;
-+	u8	key_ctx_type;
-+	#define FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_TX      0x0UL
-+	#define FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_RX      0x1UL
-+	#define FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_QUIC_TX 0x2UL
-+	#define FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_QUIC_RX 0x3UL
-+	#define FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_LAST   FUNC_KEY_CTX_ALLOC_REQ_KEY_CTX_TYPE_QUIC_RX
-+	u8	unused_0[7];
-+	__le64	host_dma_addr;
-+	__le32	partition_start_xid;
-+	u8	unused_1[4];
++struct bnxt_hw_crypto_resc {
++	u32	min_tx_key_ctxs;
++	u32	max_tx_key_ctxs;
++	u32	resv_tx_key_ctxs;
++	u32	min_rx_key_ctxs;
++	u32	max_rx_key_ctxs;
++	u32	resv_rx_key_ctxs;
 +};
 +
-+/* hwrm_func_key_ctx_alloc_output (size:192b/24B) */
-+struct hwrm_func_key_ctx_alloc_output {
-+	__le16	error_code;
-+	__le16	req_type;
-+	__le16	seq_id;
-+	__le16	resp_len;
-+	__le16	num_key_ctxs_allocated;
-+	u8	flags;
-+	#define FUNC_KEY_CTX_ALLOC_RESP_FLAGS_KEY_CTXS_CONTIGUOUS     0x1UL
-+	u8	unused_0;
-+	__le32	partition_start_xid;
-+	u8	unused_1[7];
-+	u8	valid;
-+};
+ struct bnxt_hw_resc {
+ 	u16	min_rsscos_ctxs;
+ 	u16	max_rsscos_ctxs;
+@@ -1396,6 +1405,8 @@ struct bnxt_hw_resc {
+ 	u32	max_tx_wm_flows;
+ 	u32	max_rx_em_flows;
+ 	u32	max_rx_wm_flows;
 +
- /* hwrm_func_backing_store_cfg_v2_input (size:512b/64B) */
- struct hwrm_func_backing_store_cfg_v2_input {
- 	__le16	req_type;
++	struct bnxt_hw_crypto_resc	crypto_resc;
+ };
+ 
+ #define BNXT_LARGE_RSS_TO_VNIC_RATIO	7
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
+index 0777a26600f5..e1047b4284ea 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.c
+@@ -80,3 +80,35 @@ void bnxt_free_crypto_info(struct bnxt *bp)
+ 	kfree(bp->crypto_info);
+ 	bp->crypto_info = NULL;
+ }
++
++/**
++ * bnxt_hwrm_reserve_pf_key_ctxs - Reserve key contexts with firmware
++ * @bp: pointer to bnxt device
++ * @req: pointer to HWRM function config request
++ *
++ * Populates the firmware request with key context reservation parameters
++ * for crypto offload based on current max settings and capabilities.
++ *
++ * Context: Process context during device configuration
++ */
++void bnxt_hwrm_reserve_pf_key_ctxs(struct bnxt *bp,
++				   struct hwrm_func_cfg_input *req)
++{
++	struct bnxt_crypto_info *crypto = bp->crypto_info;
++	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
++	struct bnxt_hw_crypto_resc *crypto_resc;
++	u32 tx, rx;
++
++	if (!crypto || !BNXT_SUPPORTS_KTLS(bp))
++		return;
++
++	crypto_resc = &hw_resc->crypto_resc;
++	tx = min(BNXT_TCK(crypto).max_ctx, crypto_resc->max_tx_key_ctxs);
++	rx = min(BNXT_RCK(crypto).max_ctx, crypto_resc->max_rx_key_ctxs);
++	req->num_ktls_tx_key_ctxs = cpu_to_le32(tx);
++	req->num_ktls_rx_key_ctxs = cpu_to_le32(rx);
++	if (tx)
++		req->enables |= cpu_to_le32(FUNC_CFG_REQ_ENABLES_KTLS_TX_KEY_CTXS);
++	if (rx)
++		req->enables |= cpu_to_le32(FUNC_CFG_REQ_ENABLES_KTLS_RX_KEY_CTXS);
++}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+index 629388fe1e6d..e090491006db 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_crypto.h
+@@ -34,6 +34,8 @@ struct bnxt_crypto_info {
+ void bnxt_alloc_crypto_info(struct bnxt *bp,
+ 			    struct hwrm_func_qcaps_output *resp);
+ void bnxt_free_crypto_info(struct bnxt *bp);
++void bnxt_hwrm_reserve_pf_key_ctxs(struct bnxt *bp,
++				   struct hwrm_func_cfg_input *req);
+ #else
+ static inline void bnxt_alloc_crypto_info(struct bnxt *bp,
+ 					  struct hwrm_func_qcaps_output *resp)
+@@ -43,5 +45,10 @@ static inline void bnxt_alloc_crypto_info(struct bnxt *bp,
+ static inline void bnxt_free_crypto_info(struct bnxt *bp)
+ {
+ }
++
++static inline void bnxt_hwrm_reserve_pf_key_ctxs(struct bnxt *bp,
++						 struct hwrm_func_cfg_input *req)
++{
++}
+ #endif	/* CONFIG_BNXT_TLS */
+ #endif	/* BNXT_CRYPTO_H */
 -- 
 2.51.0
 
