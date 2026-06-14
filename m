@@ -1,449 +1,330 @@
-Return-Path: <netdev+bounces-299269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299270-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id u2baJpkOL2pa7gQAu9opvQ
-	(envelope-from <netdev+bounces-299269-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 22:27:05 +0200
+	id xRS/H28RL2qp7gQAu9opvQ
+	(envelope-from <netdev+bounces-299270-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 22:39:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21257682275
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 22:27:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65646682328
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 22:39:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=DIsnci7y;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299269-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299269-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=meta.com header.s=s2048-2025-q2 header.b=vQk5E4x1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299270-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299270-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=meta.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 814923001D5A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 20:27:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EC66B30011B7
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 20:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A02242D89;
-	Sun, 14 Jun 2026 20:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728FA313534;
+	Sun, 14 Jun 2026 20:39:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AADA17993
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 20:27:00 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781468823; cv=none; b=T/83VI8uhNy/KgtQjbGvQJ7pFDj7uY7LxhetTy0+PlC5BjY1HQAb4slZ+Osfr6qErHBQGCuCChLVlK0Ja1Httkifsfkno2kF6YLpZgmtd78FBxEFJlXg6cI5T67fXNU+a5Ih7CgvVARZXUI1j8efNUsN+tecRrdEab5fjPBui0c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781468823; c=relaxed/simple;
-	bh=h7lPB/S5B31nLvaOm5KXiTkYe9b3vaGozMShEa8td+I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mh2YF3qvc8CJmhIF1OOYmQh++kIJRdm3RkFDQf48i2wEYcAEoHTHXKns+7g7o46q7vzwpM3qvo0PygL6rIOe0UZrvk0/B076uZRIUygptmUzqs4fglkajl6fIBsy0wWuf3A7cl13bZsnuBx/JSXjynGmrxB7OBAbYGi/LBCKUkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DIsnci7y; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490b9318997so18821235e9.2
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781468819; x=1782073619; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s+Z9JoS/GOkojVYg9rHkFfzRH/klwQ1mBsb7LuJucAw=;
-        b=DIsnci7yFalo55wo3aBpphdi2TxNxhNLbP/lBpK5X8FO1F8VTDrCApXyUwTZyoxl41
-         V81FUziuIkMQW4ZFboVLdDYNQKZvWQoIY8gqot4yxqIzNpMivIJu693dlhLpbqQqi+3q
-         LDDb06apSGWGaSRE6uNj1saz3DfN4OwpRsjZv3wzDwiUhGGF1mjW45WmkamwROslkkxI
-         dVte927n684Eu+jqS/t5O6qxnAx6wBfRIFxnCSBREeVY0IUAak07DCn59G469PVeYOcs
-         EpgquBsJ3iVVs6YgOjtYOMzc8Wb3uocGdL9L6Fv0ZICKEbzF2x4OxNrzgM2ye6BRvX6c
-         A9NQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601C530C179
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 20:39:03 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781469545; cv=fail; b=S63fOScepHrOqA/q1mFtdSh4VyByOKB3EJ+7ZBpyoFaQbacy59EMRfMW4xtmNEKKH3OfNCdzYN1IWSaxhrjO/8BVUXtQc2XFbBlleoQ441bQ9+H/BBoobi4wYI45aCd0iwLdhQTaqhyfd534+9+Jm43vmphT2ddsDsaX66o2z0w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781469545; c=relaxed/simple;
+	bh=eHU6HTc6KnTWuuFM2OJtR7l0CvhJwObW7krX8I/yEfw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MFNg1IvxK1CoHrFFiga3hiRgJcWR8BjpomTqxpAmRblrmah7VRp1VeR/RMj7vvfM3nHMIZEQ7/EUo+26TxV1asloSdkjIX6VrcdeU5njTUSpCgyXu8MUE8s47AKfHsDWx6d+8cekVlsKi4/W6EBFwYYbZVPe2G34Woi4mOgvTCo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=vQk5E4x1; arc=fail smtp.client-ip=67.231.153.30
+Received: from pps.filterd (m0528004.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65EJe79c024493
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:39:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=vzkgNRR8Jfjz2ksYou42bR8+4eh3BDLeRQp9bJoabj0=; b=vQk5E4x1p9px
+	adYhNTu9fBYlM2+l6IdQfzFTeAMvksj8/I/zMvEYdp62CKauGySxWa9tOvXLqjVF
+	PQlGYGb6Chox83ynGT1XVsl5dZOxf/D8Wah7za1H5pYnzePIxHlApEzFU/Xs0/9K
+	LTfoY4YbmWZ/1i3xjkKpFpeNH6lDXN4bVps4tXXYUvPAsRHFY7GPEubP7QcpwE1b
+	4LCKwqQz8VwzGykULuJxNmT1Vt8bSLXz+Bjy1XaKkYoHIAkhPAp71iqW/sDEJ7h1
+	8z5eRwl5bTDNrggcA0ZkR2ihusAraYAUdQB0R+s1ShVeLok8bkgJtQXiXJYnb7Td
+	5mBnUJvYpw==
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4esrud9njw-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:39:02 -0700 (PDT)
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-68bc68bc910so3418409a12.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:39:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781469541; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JliC+aKWRIH7y18uQxceV75MV6zjHn3AyesdzmS1JbTjz8oekZeUtp1XeIMEpbaoRS
+         BDQ5WafvdWxB3Ih+E+zvkD4RTA93dzY4ofq1yw3KXAoo5tHjag0f2tORuIts2hGPqNdm
+         ChREXCptaIBklsDovJhiwJ/8fX9sbB2DEYKDlgYCX+gjrw03BGqDA/CrKYpaminJJvkY
+         KRMXLe6wHE7FvZOePvT3CeqE5GL3+HzP6J15eurtTjmVOVtYG4JPHyw6JH/annKe1O/A
+         zP6rslz801M2LNaR2XVoPuaJ/UYfVONIvWOos+GXkLmt6D+HFccnS97S/23aNMAej45W
+         7LRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version;
+        bh=LgVmeDT2yFFv7D7NHZlGfD46fKi2Kd63IeyevXfF6qg=;
+        fh=EcI7wNlJK1NvLdm0MOWhm1NHkcC9pPQfs7sY56gcgxM=;
+        b=TlIdBnaBRgw5zRORCBOX1OmDt7RWWitOs4eMc/fxzLYz1/BJnEPAxDv0JRnh/6PtYZ
+         gTcZOu/p6j1AtFls7qNK3Xw4K5UAqD1Hrj4Q3rc/GV7WTAUTsDcypDJjyZR1JiDX2pfY
+         cD3xkcLlXFcpcRFRVyhuuEiyz0j3zwh7ogVexyOfauKc85AEKlElQWct2Zmgjavj6uXk
+         /kUVbkdvTVjt3527ymalluP91rKSRxKzCjfU6P/YyggmX6EAopOToKN6Mfxtv8FQW+pW
+         DwXGMihL2SXy9NOel8cdzMNUlsrHOYWg3iG2ppl7g5jHR9uUPWPcTmIpAXOd1ZhMsdF0
+         QCPg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781468819; x=1782073619;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s+Z9JoS/GOkojVYg9rHkFfzRH/klwQ1mBsb7LuJucAw=;
-        b=ea/voKuWrqMpXB2w6QaqT9BaA/KTtodm3WhDJmEezkeNJN4DZr5g9xuevdofhTwpQH
-         F9OdIbRP8TmcJBGJr+F7dcwfOhrpDxEva6fyBVyc2HKww2XypeK6VM4IazH6ZdFeeYy4
-         OB+3S4odDoA9OXY4PiFQVrwcHpQGuaiwOm81hug8OFUkRadxVaCWOrA+TKwBr09SA7Ca
-         ytXXjHOokMj1fIAilEpIVtg/QltYsD91zB1OY3YeCVVDRDg0Xe9+dKGELqdSidoSVBC8
-         RgBDleYG33f7+K+PRC7kkBTjNX+H21Pf8E7nKVpK629JiUEmausl+/QibjQgfU6FcosF
-         wCuA==
-X-Gm-Message-State: AOJu0YwXo1mrzXlezhk3brHdkK6JftNNLXNNsODjvncxeFpt9wasXSwh
-	F30Wji0iNkaNdZ2xZNdMi1Lkjj8IFacPBM+7RcEm8H0OMZMGy61L3NGu
-X-Gm-Gg: Acq92OFKaWv0ZfhLicwPm6fbVvMq5AriKsnheDxOROZtZ7uvImhClgIftqhIIOM3obo
-	ERwZ+IDGDowVrNJPkfywQjL1oes13x8gp6Qflfml82tyUEx+PUyR9IZnUyvcZo+xZcSS0FDxU+o
-	x1oe8n7axKWLxRlh8eaF4ascbXUj+QUoHzmzUNe6IhI0WxkKwy7vDlGKeZjikzQvimAbM3hD8Bm
-	XNjl8Yv85je5hjEfO/2MvQk9rkGwW+jTe/rIyd1GDG6pxyxKVqfX/0T5fk7Y6RHAVFGaSXZ1z0l
-	9zzFW8qC/y8IcWV/9H8fetU9q1iJGyJYVxTKIheBgwpYIv5+5sl4xQ0NgL92Athz49ZGub4IeWz
-	wTN+9uU9moahTkGN3FrE64CdLdip00FwnLGV+NQM8MUHcDmst09TiJ3P+YPQRqW5/isCSdICBT/
-	Zhckx/8T3KRspV12xWn6o5cAX7PHKFWGSx6osZRn2uNyP2sYDFBB7AyIH7CDszqEE7x8bzRLPH+
-	qV0GsG+SeRhmNCw7P2SqY2GQt7kjoWR2x8rCRN6EpT8UUnX7YGp0+ZhALo8RVUWpw==
-X-Received: by 2002:a05:600c:ac8:b0:490:44eb:c1ec with SMTP id 5b1f17b1804b1-4922014383fmr69298935e9.27.1781468819212;
-        Sun, 14 Jun 2026 13:26:59 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f0e:3200:99ef:ffe6:2586:a7de? (p200300ea8f0e320099efffe62586a7de.dip0.t-ipconnect.de. [2003:ea:8f0e:3200:99ef:ffe6:2586:a7de])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2cf5d9sm24280046f8f.32.2026.06.14.13.26.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jun 2026 13:26:58 -0700 (PDT)
-Message-ID: <04959cda-8631-4346-bbbf-edc444ce242f@gmail.com>
-Date: Sun, 14 Jun 2026 22:26:57 +0200
+        d=1e100.net; s=20251104; t=1781469541; x=1782074341;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LgVmeDT2yFFv7D7NHZlGfD46fKi2Kd63IeyevXfF6qg=;
+        b=pGH9uBTkYTvbezILriEerbZWvqlgg+u2FQDYgeMoayjdJ17Y4qEEmNS6l48n1+b6km
+         Yz+Vf99n/PHNWtzFUh9ZX45KYzXipGJCZwivZyugHGPsp5NoyGskkO14JVXRIE6YoTH6
+         US5/bbJhJ4aEQVvHdndxsupI4OeDlEvmixif0WEFI9DHbIUUB+6gUykzqqjsSai8i+MW
+         wSJm10jGRe6+4wNWpPmnOUQRWPLe3zhQnzBh5q+3rR8kSNS5EOBAkoIV13u42B0jV7wj
+         9LfzX4DtmZ0S0T2cpkQ4xb5YgaI9RrD01MpMDANgEYIWjIMkIkNlPs613CT489CNBLk5
+         zxTg==
+X-Gm-Message-State: AOJu0YxRzdZHUCGWKeEUbaVSehJaE50KMRy3EsYSdYrKztEXtsObt9Gy
+	xtiUb2m/NkVyCYc6N5xOkPj2+pL9sSYxLRMpGeTNqFSZpW2pp74GtnFHS8zPvnI7zh+EMtlFiU6
+	hiTrZ9cL9xX+1pX9htJMk30dK46ferc+g+qFXsMdXsNQYSeyjpK+KfSLl2fa5y2WaNmYt/soprd
+	VFgCS3jGX43G/Y7K1RRQ7WwaD2a0LjrQ==
+X-Gm-Gg: Acq92OFpvBP4mxYkCqOL6Tsg9o8UIkWkWYcmT7Pbpx9lZdI9DzDWtlC+21O3q0++Y87
+	EXWCifBANWUbE7fD8o4uhjBp6UAD60Tiwyyk1o3fquHskARHurVNZe5WtE7LzAyRTfa9TabA8OT
+	APWkSfXsVv4DFrEpng0gVYJlBR6piL44IWpULUH2c88v2KAgIxI+x59MpRXaGIAyVXmu3JAwgEu
+	xFvVYQ=
+X-Received: by 2002:aa7:d1cd:0:b0:691:acd4:df83 with SMTP id 4fb4d7f45d1cf-6936890b94cmr3190499a12.5.1781469540787;
+        Sun, 14 Jun 2026 13:39:00 -0700 (PDT)
+X-Received: by 2002:aa7:d1cd:0:b0:691:acd4:df83 with SMTP id
+ 4fb4d7f45d1cf-6936890b94cmr3190482a12.5.1781469540353; Sun, 14 Jun 2026
+ 13:39:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] r8169: migrate Rx path to page_pool
-To: atharva-potdar <atharvapotdar07@gmail.com>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-References: <20260614054137.32181-1-atharvapotdar07@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260614054137.32181-1-atharvapotdar07@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260612010047.1377331-1-ntspring@meta.com> <20260612010047.1377331-2-ntspring@meta.com>
+ <6ab86192-f0d4-4a00-83c9-3fd6449dc9dd@redhat.com>
+In-Reply-To: <6ab86192-f0d4-4a00-83c9-3fd6449dc9dd@redhat.com>
+From: Neil Spring <ntspring@meta.com>
+Date: Sun, 14 Jun 2026 13:38:33 -0700
+X-Gm-Features: AVVi8CfVyAEglHhJ1KSN0z5otEja-ADCDtBWuoT03y643yoO6doeRS0y2nFQuVQ
+Message-ID: <CAGy2EQY0b2y9xCShqM3JVu7FprPn8qNdoH=THJ=MWY+01dBENA@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 1/2] tcp: rehash onto different local ECMP
+ path on retransmit timeout
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
+        kuniyu@google.com, davem@davemloft.net, kuba@kernel.org,
+        dsahern@kernel.org, horms@kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+        martin.lau@linux.dev, daniel@iogearbox.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: LodnPCUnjnoO_9CyakoY9O1c6vYL9qy9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE0MDIxOCBTYWx0ZWRfX3+SzGV66JoYL
+ rOgHKV7rx5K61ZXlH9CFbENMOhk0ZnTTYpknW3FL2AsyA7rzaXUe4wUPuJiAsalFan1UFlEJ38P
+ wGGXNrK1ff9kU0l4G7/ssbt/JyOZt8ZqnX153MFhaSnmTY5SmjLSgloft0YhsFiqP6/yzj1pc5B
+ mWtmeQl7nlt/u9sFk2fV5SElZbHsO3nqaC2r3JPvgcXxvN7mPmtbVKqfG+9oppc9mc/hLHGMwTO
+ O9tStEUFm2k4J3cfqT111xTk363BNbKXVm2E4E2PlqKJLJAhWnKx0K9nSQs3jNvQt4BpnqevQlw
+ T26bj/vUKjdX+abW9zjDri/OXuvVUucakkux8xcjeLXoaUBG4v/sMFfLugPtoQOqJDQ2Ihd/qV7
+ idjtflSrTphZni8+EbKlVNDUYTItFsXfW3lrV04dYMRtGOQ/J1fKFc7rOkZI4aytGWCywahW/Cl
+ UYsPlO/cgBA9Jz0Fg3A==
+X-Proofpoint-ORIG-GUID: LodnPCUnjnoO_9CyakoY9O1c6vYL9qy9
+X-Authority-Analysis: v=2.4 cv=e+M2j6p/ c=1 sm=1 tr=0 ts=6a2f1166 cx=c_pps
+ a=DTy5UCxgudPLKrSn28m7Kw==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=f7IdgyKtn90A:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=GbPsI2Ihf5RTnMjR_gZv:22 a=20KFwNOVAAAA:8 a=VabnemYjAAAA:8
+ a=TjoYT3vZz40Pw0TJUQcA:9 a=QEXdDO2ut3YA:10 a=VzYV69SsQLkmnS9OQLw-:22
+ a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE0MDIxOCBTYWx0ZWRfX2RhfMz4uqoW5
+ KwpNFWNy8koS+jLXRGrDvz/32aPyO+bP8Eb+nGe9nQlqjlGQnaP9eStmlwqtrHVrs7t7QDYzu6V
+ tLHNqrSVyoHOIbELkpTQFEv5jmBcUzU=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-14_04,2026-06-12_03,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[meta.com:d:+,kernel.org:s:+];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299269-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-299270-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:atharvapotdar07@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hkallweit1@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:edumazet@google.com,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dsahern@kernel.org,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:bpf@vger.kernel.org,m:martin.lau@linux.dev,m:daniel@iogearbox.net,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ntspring@meta.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[meta.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,pp_params.dev:url]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 21257682275
+X-Rspamd-Queue-Id: 65646682328
 
-On 14.06.2026 07:41, atharva-potdar wrote:
-> Replace the driver-managed skb+copy Rx model with page_pool
-> zero-copy in preparation for XDP support.
-> 
-> Key changes:
-> - Allocate order-0 pages via page_pool instead of alloc_pages + dma_map
-> - Build skbs directly from pages with napi_build_skb (zero-copy)
-> - Add rtl8169_rx_refill() to replenish descriptors after processing
-> - Track dirty_rx boundary for efficient refill scheduling
-> - Cap max_mtu to R8169_RX_BUF_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN
->   (order-0 pages can't support arbitrary jumbo frames)
-> 
-If I read this correctly, max_mtu may be lower with this patch.
-This may cause a regression for existing users.
+On Sun, Jun 14, 2026 at 6:54=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> >
+> On 6/12/26 3:00 AM, Neil Spring wrote:
+> > Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO, PLB,
+> > and spurious-retransmission events, but the cached route is reused and
+> > the new hash is not propagated into the ECMP path selection logic.  Two
+> > changes are needed to make rehash select a different local ECMP path:
+> >
+> > 1. Add __sk_dst_reset() alongside sk_rethink_txhash() in
+> >    tcp_write_timeout(), tcp_rcv_spurious_retrans(), and
+> >    tcp_plb_check_rehash() so the cached dst is invalidated and the
+> >    next transmit triggers a fresh route lookup.
+> >
+> > 2. Set fl6->mp_hash from sk_txhash (or tcp_rsk(req)->txhash for
+> >    SYN/ACK retransmits and syncookies) in tcp_v6_connect(),
+> >    inet6_sk_rebuild_header(), inet6_csk_route_req(),
+> >    inet6_csk_route_socket(), tcp_v6_send_response(), and
+> >    cookie_v6_check() so fib6_select_path() picks a path based on the
+> >    new hash.
+> >
+> > The mp_hash override only applies to fib_multipath_hash_policy 0 (the
+> > default L3 policy).  Its hash includes the flow label, but that is 0 by
+> > default -- np->flow_label is unset, and auto_flowlabels only computes
+> > the on-wire label later, per packet -- so flows to the same peer share
+> > one local path.  Keying the hash on sk_txhash makes the local path
+> > per-connection and lets a rehash re-select it.  Policies 1-3 are left
+> > unchanged.
+> >
+> > The mp_hash assignment is factored into a small helper,
+> > ip6_ecmp_set_mp_hash(), shared by inet6_csk_route_req(),
+> > inet6_csk_route_socket(), tcp_v6_connect(), inet6_sk_rebuild_header(),
+> > tcp_v6_send_response(), and cookie_v6_check().  It applies
+> > (txhash >> 1) ?: 1 for policy 0 (the >> 1 keeps mp_hash in the 31-bit
+> > range; ?: 1 keeps it non-zero, since 0 would fall back to
+> > rt6_multipath_hash()).  inet6_csk_route_socket() calls it only for
+> > sk_protocol =3D=3D IPPROTO_TCP so that non-TCP callers (e.g., L2TP via
+> > inet6_csk_xmit) fall through to rt6_multipath_hash() and retain their
+> > existing flow-key-based ECMP behavior.
+> >
+> > tcp_v6_send_response() also sets mp_hash from the response txhash so
+> > that a control packet (a RST from the full socket, or an ACK from a
+> > time-wait socket) selects the same local ECMP nexthop as the
+> > connection's txhash rather than falling back to the flow hash.  The
+> > time-wait socket's tw_txhash is copied from sk_txhash when the
+> > connection enters TIME_WAIT, so it reflects any rehash that occurred.
+> >
+> > Setting mp_hash explicitly is necessary because the default ECMP hash
+> > derives from fl6->flowlabel via np->flow_label, which is not updated
+> > from sk_txhash (REPFLOW is off by default).  ip6_make_flowlabel()
+> > cannot help either, as it runs after the route lookup.
+> >
+> > As a consequence, for policy 0 the local ECMP path of an IPv6 TCP
+> > flow follows sk_txhash even when fl6->flowlabel is non-zero, e.g. a
+> > reflected (REPFLOW) or explicitly set (IPV6_FLOWLABEL_MGR) flow
+> > label.  This is intentional: only local path selection changes, so
+> > rehash can recover from a failed path; the on-wire flow label is
+> > unchanged.
+> >
+> > sk_set_txhash() is moved before ip6_dst_lookup_flow() in
+> > tcp_v6_connect() so the initial ECMP path is selected by the same
+> > txhash that subsequent route rebuilds will use.  This avoids
+> > unintended path changes when the cached dst is naturally invalidated
+> > (e.g., by PMTU discovery or route changes).
+> >
+> > The rehash sites (tcp_write_timeout(), tcp_plb_check_rehash(), and
+> > tcp_rcv_spurious_retrans()) call __sk_rethink_txhash_reset_dst(),
+> > which re-rolls the txhash and, when it changed, drops the cached dst
+> > so the next transmit re-runs route selection.  The dst reset is
+> > guarded by sk->sk_family =3D=3D AF_INET6 since IPv4 ECMP does not
+> > currently use sk_txhash for path selection.  For IPv4-mapped IPv6
+> > sockets this produces a redundant dst reset on a cold path
+> > (RTO/PLB); the subsequent IPv4 route lookup returns the same result.
+> > The helper is deliberately separate from sk_rethink_txhash() itself:
+> > dst_negative_advice() calls sk_rethink_txhash() before its own dst op,
+> > so resetting the dst inside sk_rethink_txhash() would skip that op
+> > (e.g. rt6_remove_exception_rt()).
+> >
+> > For syncookies, cookie_init_sequence() computes the cookie value
+> > before route_req() and sets txhash so the SYN-ACK selects the same
+> > ECMP path that cookie_v6_check() will use when the full socket is
+> > created.  cookie_tcp_reqsk_init() derives txhash from the cookie so
+> > the full socket's ECMP path matches the SYN-ACK.  Both the SYN-ACK
+> > assignment in tcp_conn_request() and the full-socket assignment in
+> > cookie_tcp_reqsk_init() are keyed on the packet family
+> > (skb->protocol =3D=3D ETH_P_IPV6), not sk->sk_family: a dual-stack
+> > AF_INET6 listener also serves IPv4 connections, and the v4 cookie has
+> > mssind bits that would bias TX queue distribution if used as txhash.
+> > IPv4 connections retain net_tx_rndhash().
+> >
+> > cookie_init_sequence() is split from the former version that also
+> > called tcp_synq_overflow() and incremented SYNCOOKIESSENT; those
+> > side effects are now in cookie_record_sent(), called after
+> > route_req() succeeds so they are not bumped when route_req() fails.
+> > cookie_record_sent() is guarded by CONFIG_SYN_COOKIES to
+> > match the guard on tcp_synq_overflow().  route_req() receives 0 as
+> > tw_isn for the syncookie path so that tcp_v6_init_req() still saves
+> > ireq->pktopts for REPFLOW flowlabel reflection and IPv6 cmsg
+> > options.  The ecn_ok clear for syncookies without timestamps stays
+> > after tcp_ecn_create_request() so it takes precedence.
+> >
+> > Signed-off-by: Neil Spring <ntspring@meta.com>
+>
+> This looks good to me, with a minor commit below.
+>
+> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> > index df479277fb80..cc71d84df42b 100644
+> > --- a/net/ipv4/syncookies.c
+> > +++ b/net/ipv4/syncookies.c
+> > @@ -280,9 +280,18 @@ static int cookie_tcp_reqsk_init(struct sock *sk, =
+struct sk_buff *skb,
+> >       treq->snt_synack =3D 0;
+> >       treq->snt_tsval_first =3D 0;
+> >       treq->tfo_listener =3D false;
+> > -     treq->txhash =3D net_tx_rndhash();
+> >       treq->rcv_isn =3D ntohl(th->seq) - 1;
+> >       treq->snt_isn =3D ntohl(th->ack_seq) - 1;
+> > +     if (skb->protocol =3D=3D htons(ETH_P_IPV6)) {
+> > +             /* Use the cookie as txhash so the ECMP path matches
+> > +              * the SYN-ACK, where txhash was also set to the
+> > +              * cookie.  The original request socket (and its
+> > +              * txhash) was freed after sending the SYN-ACK.
+> > +              */
+> > +             treq->txhash =3D treq->snt_isn;
+> > +     } else {
+> > +             treq->txhash =3D net_tx_rndhash();
+>
+> I'm wondering if it would make sense always using snt_isn for txhash in
+> the syn cookie case, regardless of the IP protocol. Beyond reducing the
+> differences between ipv4 and ipv6 it will make the code a little simpler.
 
-> Tested on RTL8168h with iperf3 (~470 Mbps, 0 retransmits) and
-> 1000 pings (0 drops).
-> 
-Assuming your link speed is 1Gbps, 470Mbps is quite low.
+I added the conditional in v11 after the AI review poked at how this wasn't
+plumbed for IPv4; it seemed safer and clearer about v6-vs-v4 use of txhash,
+but I wasn't weighing a goal of avoiding protocol-specific paths.
 
-Did you test also on non-x86 architectures? We had DMA-related regressions
-in the past which showed up on certain non-x86 architectures only.
+I will try no-conditional again in v14 with this feedback, happy to change
+back if anyone has a strong opinion.
 
-> Signed-off-by: atharva-potdar <atharvapotdar07@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 128 ++++++++++++++--------
->  1 file changed, 85 insertions(+), 43 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index ec4fc21fa..9d8d678ac 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -31,6 +31,7 @@
->  #include <linux/unaligned.h>
->  #include <net/ip6_checksum.h>
->  #include <net/netdev_queues.h>
-> +#include <net/page_pool/helpers.h>
->  #include <net/phy/realtek_phy.h>
->  
->  #include "r8169.h"
-> @@ -70,7 +71,9 @@
->  #define InterFrameGap	0x03	/* 3 means InterFrameGap = the shortest one */
->  
->  #define R8169_REGS_SIZE		256
-> -#define R8169_RX_BUF_SIZE	(SZ_16K - 1)
-> +#define R8169_RX_HEADROOM	ALIGN(XDP_PACKET_HEADROOM, 8)
-> +#define R8169_RX_BUF_SIZE	(PAGE_SIZE - R8169_RX_HEADROOM - \
-> +				 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
->  #define NUM_TX_DESC	256	/* Number of Tx descriptor registers */
->  #define NUM_RX_DESC	256	/* Number of Rx descriptor registers */
->  #define R8169_TX_RING_BYTES	(NUM_TX_DESC * sizeof(struct TxDesc))
-> @@ -737,6 +740,7 @@ struct rtl8169_private {
->  	enum mac_version mac_version;
->  	enum rtl_dash_type dash_type;
->  	u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
-> +	u32 dirty_rx; /* Index of first Rx descriptor needing a new buffer */
->  	u32 cur_tx; /* Index into the Tx descriptor buffer of next Rx pkt. */
->  	u32 dirty_tx;
->  	struct TxDesc *TxDescArray;	/* 256-aligned Tx descriptor ring */
-> @@ -745,6 +749,8 @@ struct rtl8169_private {
->  	dma_addr_t RxPhyAddr;
->  	struct page *Rx_databuff[NUM_RX_DESC];	/* Rx data buffers */
->  	struct ring_info tx_skb[NUM_TX_DESC];	/* Tx data buffers */
-> +	struct page_pool *page_pool;
-> +	u32 rx_buf_sz;
->  	u16 cp_cmd;
->  	u16 tx_lpi_timer;
->  	u32 irq_mask;
-> @@ -4148,37 +4154,27 @@ static int rtl8169_change_mtu(struct net_device *dev, int new_mtu)
->  	return 0;
->  }
->  
-> -static void rtl8169_mark_to_asic(struct RxDesc *desc)
-> +static void rtl8169_mark_to_asic(struct RxDesc *desc, u32 rx_buf_sz)
->  {
->  	u32 eor = le32_to_cpu(desc->opts1) & RingEnd;
->  
->  	desc->opts2 = 0;
->  	/* Force memory writes to complete before releasing descriptor */
->  	dma_wmb();
-> -	WRITE_ONCE(desc->opts1, cpu_to_le32(DescOwn | eor | R8169_RX_BUF_SIZE));
-> +	WRITE_ONCE(desc->opts1, cpu_to_le32(DescOwn | eor | rx_buf_sz));
->  }
->  
->  static struct page *rtl8169_alloc_rx_data(struct rtl8169_private *tp,
->  					  struct RxDesc *desc)
->  {
-> -	struct device *d = tp_to_dev(tp);
-> -	int node = dev_to_node(d);
-> -	dma_addr_t mapping;
->  	struct page *data;
->  
-> -	data = alloc_pages_node(node, GFP_KERNEL, get_order(R8169_RX_BUF_SIZE));
-> +	data = page_pool_dev_alloc_pages(tp->page_pool);
->  	if (!data)
->  		return NULL;
->  
-> -	mapping = dma_map_page(d, data, 0, R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
-> -	if (unlikely(dma_mapping_error(d, mapping))) {
-> -		netdev_err(tp->dev, "Failed to map RX DMA!\n");
-> -		__free_pages(data, get_order(R8169_RX_BUF_SIZE));
-> -		return NULL;
-> -	}
-> -
-> -	desc->addr = cpu_to_le64(mapping);
-> -	rtl8169_mark_to_asic(desc);
-> +	desc->addr = cpu_to_le64(page_pool_get_dma_addr(data) + R8169_RX_HEADROOM);
-> +	rtl8169_mark_to_asic(desc, tp->rx_buf_sz);
->  
->  	return data;
->  }
-> @@ -4187,15 +4183,17 @@ static void rtl8169_rx_clear(struct rtl8169_private *tp)
->  {
->  	int i;
->  
-> -	for (i = 0; i < NUM_RX_DESC && tp->Rx_databuff[i]; i++) {
-> -		dma_unmap_page(tp_to_dev(tp),
-> -			       le64_to_cpu(tp->RxDescArray[i].addr),
-> -			       R8169_RX_BUF_SIZE, DMA_FROM_DEVICE);
-> -		__free_pages(tp->Rx_databuff[i], get_order(R8169_RX_BUF_SIZE));
-> +	for (i = 0; i < NUM_RX_DESC; i++) {
-> +		if (!tp->Rx_databuff[i])
-> +			continue;
-> +		page_pool_put_full_page(tp->page_pool, tp->Rx_databuff[i], true);
->  		tp->Rx_databuff[i] = NULL;
->  		tp->RxDescArray[i].addr = 0;
->  		tp->RxDescArray[i].opts1 = 0;
->  	}
-> +
-> +	page_pool_destroy(tp->page_pool);
-> +	tp->page_pool = NULL;
->  }
->  
->  static int rtl8169_rx_fill(struct rtl8169_private *tp)
-> @@ -4221,11 +4219,28 @@ static int rtl8169_rx_fill(struct rtl8169_private *tp)
->  
->  static int rtl8169_init_ring(struct rtl8169_private *tp)
->  {
-> +	struct page_pool_params pp_params = { 0 };
-> +
->  	rtl8169_init_ring_indexes(tp);
-> +	tp->dirty_rx = 0;
-> +	tp->rx_buf_sz = R8169_RX_BUF_SIZE;
->  
->  	memset(tp->tx_skb, 0, sizeof(tp->tx_skb));
->  	memset(tp->Rx_databuff, 0, sizeof(tp->Rx_databuff));
->  
-> +	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-> +	pp_params.order = 0;
-> +	pp_params.pool_size = NUM_RX_DESC;
-> +	pp_params.nid = dev_to_node(tp_to_dev(tp));
-> +	pp_params.dev = tp_to_dev(tp);
-> +	pp_params.dma_dir = DMA_FROM_DEVICE;
-> +	pp_params.offset = R8169_RX_HEADROOM;
-> +	pp_params.max_len = tp->rx_buf_sz;
-> +
-> +	tp->page_pool = page_pool_create(&pp_params);
-> +	if (IS_ERR(tp->page_pool))
-> +		return PTR_ERR(tp->page_pool);
-> +
->  	return rtl8169_rx_fill(tp);
->  }
->  
-> @@ -4312,7 +4327,7 @@ static void rtl_reset_work(struct rtl8169_private *tp)
->  	rtl8169_cleanup(tp);
->  
->  	for (i = 0; i < NUM_RX_DESC; i++)
-> -		rtl8169_mark_to_asic(tp->RxDescArray + i);
-> +		rtl8169_mark_to_asic(tp->RxDescArray + i, tp->rx_buf_sz);
->  
->  	napi_enable(&tp->napi);
->  	rtl_hw_start(tp);
-> @@ -4776,9 +4791,8 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  	for (count = 0; count < budget; count++, tp->cur_rx++) {
->  		unsigned int pkt_size, entry = tp->cur_rx % NUM_RX_DESC;
->  		struct RxDesc *desc = tp->RxDescArray + entry;
-> +		struct page *page;
->  		struct sk_buff *skb;
-> -		const void *rx_buf;
-> -		dma_addr_t addr;
->  		u32 status;
->  
->  		status = le32_to_cpu(READ_ONCE(desc->opts1));
-> @@ -4791,6 +4805,9 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		 */
->  		dma_rmb();
->  
-> +		page = tp->Rx_databuff[entry];
-> +		tp->Rx_databuff[entry] = NULL;
-> +
->  		if (unlikely(status & RxRES)) {
->  			if (net_ratelimit())
->  				netdev_warn(dev, "Rx ERROR. status = %08x\n",
-> @@ -4802,9 +4819,9 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  				dev->stats.rx_crc_errors++;
->  
->  			if (!(dev->features & NETIF_F_RXALL))
-> -				goto release_descriptor;
-> +				goto recycle;
->  			else if (status & RxRWT || !(status & (RxRUNT | RxCRC)))
-> -				goto release_descriptor;
-> +				goto recycle;
->  		}
->  
->  		pkt_size = status & GENMASK(13, 0);
-> @@ -4817,24 +4834,23 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		if (unlikely(rtl8169_fragmented_frame(status))) {
->  			dev->stats.rx_dropped++;
->  			dev->stats.rx_length_errors++;
-> -			goto release_descriptor;
-> +			goto recycle;
->  		}
->  
-> -		skb = napi_alloc_skb(&tp->napi, pkt_size);
-> +		dma_sync_single_for_cpu(d,
-> +					page_pool_get_dma_addr(page) +
-> +					R8169_RX_HEADROOM,
-> +					pkt_size, DMA_FROM_DEVICE);
-> +
-> +		skb = napi_build_skb(page_address(page), PAGE_SIZE);
->  		if (unlikely(!skb)) {
->  			dev->stats.rx_dropped++;
-> -			goto release_descriptor;
-> +			goto recycle;
->  		}
->  
-> -		addr = le64_to_cpu(desc->addr);
-> -		rx_buf = page_address(tp->Rx_databuff[entry]);
-> -
-> -		dma_sync_single_for_cpu(d, addr, pkt_size, DMA_FROM_DEVICE);
-> -		prefetch(rx_buf);
-> -		skb_copy_to_linear_data(skb, rx_buf, pkt_size);
-> -		skb->tail += pkt_size;
-> -		skb->len = pkt_size;
-> -		dma_sync_single_for_device(d, addr, pkt_size, DMA_FROM_DEVICE);
-> +		skb_reserve(skb, R8169_RX_HEADROOM);
-> +		skb_put(skb, pkt_size);
-> +		skb_mark_for_recycle(skb);
->  
->  		rtl8169_rx_csum(skb, status);
->  		skb->protocol = eth_type_trans(skb, dev);
-> @@ -4847,13 +4863,34 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
->  		napi_gro_receive(&tp->napi, skb);
->  
->  		dev_sw_netstats_rx_add(dev, pkt_size);
-> -release_descriptor:
-> -		rtl8169_mark_to_asic(desc);
-> +
-> +		continue;
-> +
-> +recycle:
-> +		page_pool_put_full_page(tp->page_pool, page, true);
->  	}
->  
->  	return count;
->  }
->  
-> +static void rtl8169_rx_refill(struct rtl8169_private *tp)
-> +{
-> +	u32 dirty_rx = tp->dirty_rx;
-> +
-> +	while (dirty_rx != tp->cur_rx) {
-> +		u32 entry = dirty_rx % NUM_RX_DESC;
-> +
-> +		if (!tp->Rx_databuff[entry]) {
-> +			tp->Rx_databuff[entry] = rtl8169_alloc_rx_data(tp,
-> +								       tp->RxDescArray + entry);
-> +			if (!tp->Rx_databuff[entry])
-> +				break;
-> +		}
-> +		dirty_rx++;
-> +	}
-> +	tp->dirty_rx = dirty_rx;
-> +}
-> +
->  static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
->  {
->  	struct rtl8169_private *tp = dev_instance;
-> @@ -4921,6 +4958,7 @@ static int rtl8169_poll(struct napi_struct *napi, int budget)
->  	rtl_tx(dev, tp, budget);
->  
->  	work_done = rtl_rx(dev, tp, budget);
-> +	rtl8169_rx_refill(tp);
->  
->  	if (work_done < budget && napi_complete_done(napi, work_done))
->  		rtl_irq_enable(tp);
-> @@ -5775,8 +5813,12 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	}
->  
->  	jumbo_max = rtl_jumbo_max(tp);
-> -	if (jumbo_max)
-> -		dev->max_mtu = jumbo_max;
-> +	if (jumbo_max) {
-> +		unsigned int page_pool_mtu;
-> +
-> +		page_pool_mtu = R8169_RX_BUF_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
-> +		dev->max_mtu = min_t(int, jumbo_max, page_pool_mtu);
-> +	}
->  
->  	rtl_set_irq_mask(tp);
->  
-> @@ -5808,7 +5850,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	if (jumbo_max)
->  		netdev_info(dev, "jumbo features [frames: %d bytes, tx checksumming: %s]\n",
-> -			    jumbo_max, tp->mac_version <= RTL_GIGA_MAC_VER_06 ?
-> +			    dev->max_mtu, tp->mac_version <= RTL_GIGA_MAC_VER_06 ?
->  			    "ok" : "ko");
->  
->  	if (tp->dash_type != RTL_DASH_NONE) {
+-neil
 
+>
+> Not a blocker in any case.
+>
+> Still I think this could deserve an explicit ack from Eric.
+>
+> /P
+>
 
