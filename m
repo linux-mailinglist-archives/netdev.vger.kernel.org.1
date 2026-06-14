@@ -1,158 +1,133 @@
-Return-Path: <netdev+bounces-299221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299222-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WhDaG1usLmob1wQAu9opvQ
-	(envelope-from <netdev+bounces-299221-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:27:55 +0200
+	id gveGC/KtLmpR1wQAu9opvQ
+	(envelope-from <netdev+bounces-299222-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:34:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F566812C7
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:27:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7DC6812FE
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 15:34:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=No598WEe;
-	dkim=pass header.d=redhat.com header.s=google header.b=CdAVMo3o;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299221-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299221-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Oaoiv7J9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299222-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299222-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 087703004231
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:25:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C494300D849
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 13:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CA390C84;
-	Sun, 14 Jun 2026 13:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA6A3C379D;
+	Sun, 14 Jun 2026 13:34:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1B92F7EF2
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E798346AC4
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 13:34:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781443550; cv=none; b=NbaehTVboz16Bbi4Jc6zzU9Tke0lGvcKjtA0B5HpN/Eva1Y/MxqU3u0TpNrpiOaoDfQNlpCXeFtUzjnjnDdntjzK4lIkDcMVm2PR7zTwMra0t1sdrprK8am4jOjqcUFCj8iOsuCWY1hCg0GOEiNraq4Gh2fNKaLQH5sGFdGGfX4=
+	t=1781444069; cv=none; b=M/qpmfg9sOKJ+aQ6n6GLdrqO42DStPzjhmnYcztROS5MQqoGO4g85ThYAwsfLB6qVHF+T8axlxfJRzUWmHl1mYPC1emFu/QpNU0VPk61zN85N4Z39ww4hEBYZFmMa7/hPewogUF9nLZ8v0unC6uke+guqKbtrAgfBZRx1T2/sCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781443550; c=relaxed/simple;
-	bh=VXkYNjl9+2YJvcllG6mfSBJo2s6uv1fcnxkSOeYhSF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ht+q0TQXqHZ+YHr2sRNY39vFigEiB5zyZXsXbvGirCw+wn3+zVnXKRbFy2xSriX1rpjd9D+mrlx09tCrI0v6HFkfs8b3aSj9GEX5EuYAfu4/EvPvYVLN75+6XXbNvgNQU5jgyvgWDETA+oucHOW8P5VomZI5qgAn2up2VfLEg5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=No598WEe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CdAVMo3o; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781443548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yjjP9j/j3vlNfXrualE9V8Hx1Zk0n0jUO8AZfa6TeAE=;
-	b=No598WEeAjZ2wac8wruydVX29zhFYQQWegkozDnIM8Z3hATC0F9fnqDbiaQ8lsOpydf8k+
-	p6hvCtWFgklnYtidDs52Mb5JyLeGmQA/AcDCSyRpZOH66Q5XAnKKZP17GU+jXTSBXwdJMz
-	FECJdgjwX51m5zsUPgsNfPf/zB05Df0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-358-8LM7kqpeP0SHzwE1L7epww-1; Sun, 14 Jun 2026 09:25:46 -0400
-X-MC-Unique: 8LM7kqpeP0SHzwE1L7epww-1
-X-Mimecast-MFC-AGG-ID: 8LM7kqpeP0SHzwE1L7epww_1781443546
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-460198535bcso1600566f8f.3
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 06:25:46 -0700 (PDT)
+	s=arc-20240116; t=1781444069; c=relaxed/simple;
+	bh=VtSbkEoGLK7d7h97splP75OKWnaxeEds62DNVfuQbPA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LiQkntIoQIV0r0s+mBLyukXKZuwQKaTFBlw9pgAWKxsQhxQYyxBheTCeI3t3KCEO+Mj15/dO0fR6TzwlZLSF6LK1E8d9NyTPE0KciJKl0d4icfdmx+nExAED6F4pIslux8tofczUW73JvF59kVjZ2Z+f5IMWi/B4RjD5/kTkSQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oaoiv7J9; arc=none smtp.client-ip=209.85.128.46
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4908b92904fso29340935e9.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 06:34:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781443545; x=1782048345; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yjjP9j/j3vlNfXrualE9V8Hx1Zk0n0jUO8AZfa6TeAE=;
-        b=CdAVMo3oCcAGit16KvGb/u596dxNzCZk9PqhkNRic92Jy+NsdKFT24d5pS5hWjv/zA
-         /5QY3GqB66IUy+jSA9OXcF6cNQv26hH5GtKJL7gMkccLHi/1Dkw5RrzPlDJW40ZKRQFg
-         FaTUXYUtulGzST0m0p42wUNHQFPThtHwkAIt5YNySsFiEsN0iev+UOckpt7R5ci2cA/S
-         Fh7b8upiIRl/OsywlnkDRLiRiYfiXHQhjIqTw/BLnkZ+7R87kVy7EgGlLHArhpgnhb6U
-         NLg++4e/xcoMrR9+4beWXWVgOQmXhpNalXyMv5ANgswoef0etzhMEbVCzsbnY8TYPT2q
-         mi2A==
+        d=gmail.com; s=20251104; t=1781444066; x=1782048866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=r7QhcKXppkFNFknFr0y9eogSJNjEm4uAgUJFZPULOOc=;
+        b=Oaoiv7J9irIp8w51K+daIsxlWELdb6lSAZf/DbXfl8ldC3ZQ2/CzUoXiR334eqDI1Q
+         QUvSoG5oLZVQm3KwI2YRPeN+E9EFXoAm2AzwM3k5OVvlcSbYbF3WiTFewukcXCjVDRjd
+         +O4MEWtQmDGRaPZSmYBuvpOLwOYhkF+mUF8OvJrAty0DdM2kZ8eX+Bz9HshnRxuBdleg
+         5I5h4r+cR6Hu5Rdss4yHTaQ2kvlEXfrWimguRPz4btFsNQrUlnOEAaod7ImCO5qU2ihK
+         Ipyjnw9pAlMc5OkLpeY+CMv2udisi1yTJS8npERVETqTlSBHK0Jhxsn8qlz2Zg4TyXX2
+         5b9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781443545; x=1782048345;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yjjP9j/j3vlNfXrualE9V8Hx1Zk0n0jUO8AZfa6TeAE=;
-        b=XoANK25dCwwX/gJq0qQZBBaHuqSwJVlMVpuAmH0oCutaMWA57XApS2YEG0/UfpkaHy
-         rfEZrABR/RT7jufg9U3XzzVpanaT11OupXyg7g55QNxCd3tyNMhfNa133BVexO8vw59G
-         GTuPLGsDNwrdkEmYGgNO4MMRmKDYl53jbogoAKNXOu48EmcHr9OabxAYDU7A0R7pB5Zm
-         YalmX2iFkei652WGUfSerjUgmlWvsyp2cVlmWfd/zTWa8HyFc3IVBsPPQW04Wbt6aKBf
-         TEjDhKeSH3iVgw8BHydTpQrwRtPA9tws5N8TNmLbYL5DJOHm8d/JM33mwI3qDSGv2CMm
-         apyg==
-X-Forwarded-Encrypted: i=1; AFNElJ82vs6VNJGkqmzHTTD0FSlzzn5W3wdE7aO9qM+mkfZuss47aUv8iGP3FAbFXQXJbMz2gf3BxTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuQY08PtPaZb6bUb07dPNRZwMdBbzkUOI1wPaPS2BrxR5Bwegb
-	HqJI+Lj146L+Cs+jGpTiy1IYMIPZ1s/zq3x6e1Ue1gMwEebjLeyKj3VSL4xXlyEMu/BliM5OvDd
-	ORBs/FjTnS8BwI8fnccxgmQRavPixYLu2lKlzZz5h6pDNBsvmPdNxBesK/g==
-X-Gm-Gg: Acq92OFg4rt7HYFDXvHsQ+Wtp/S62qI+h+MT+DKbm1+ryghFDmkfXdP5dLPry1u0mjG
-	3ES5HdOAKscoI7qeCTAw0HJtfMP9W2jrqPolKiDD8tnZlYhEbHFAUWU0xiMkyd6RVexs55ezou9
-	jPojXnHU673vZwT/Rba//8/V/ie0+/OUOurVR73qiYIVweLBHJgi6N+JQa/kbVaL8IXIJ69h0Wy
-	nJEzESijMYhKqxMEbFBGn1WkqcNQndoeIqeSC5SdqV7blzcfEhfxvULG3aZ5A1SH9eegJ0LQBG6
-	0I01H7oLu0SW8hHukSROHijwcygGlaVP6j5vfM2sSIAJSvrOTQ4q6aCLoRLTR3JJUlvCf5G52zA
-	EfT6GhGRrqbBp1aX0XWCOdjDvPFZ02EmoB/OUL12CLJ5xD8to60zzj3A=
-X-Received: by 2002:adf:e002:0:20b0:45e:ec27:b4b0 with SMTP id ffacd0b85a97d-4606dba924bmr9255028f8f.18.1781443545537;
-        Sun, 14 Jun 2026 06:25:45 -0700 (PDT)
-X-Received: by 2002:adf:e002:0:20b0:45e:ec27:b4b0 with SMTP id ffacd0b85a97d-4606dba924bmr9254991f8f.18.1781443545116;
-        Sun, 14 Jun 2026 06:25:45 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f263923sm25159258f8f.2.2026.06.14.06.25.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jun 2026 06:25:44 -0700 (PDT)
-Message-ID: <80034a5a-d01e-46d9-9631-951e6c4735bc@redhat.com>
-Date: Sun, 14 Jun 2026 15:25:43 +0200
+        d=1e100.net; s=20251104; t=1781444066; x=1782048866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r7QhcKXppkFNFknFr0y9eogSJNjEm4uAgUJFZPULOOc=;
+        b=Yej7ZQcs1S+peBEZcNNEhXTwfAd3v9uOikrRvm2Pqq181CBB3sWYKOgaq7YoIbTGbE
+         MbVM4fi9oi6fL9CePEBiVTKDE3QR2075YDRDqwaZG5nTS+s/JcVITlz8Gs1DCQ/WrIgm
+         5+GCUvme4H8Lk/c/n9vGxJEMJ4j/7B+pzQVwCvxx7ZufvNG4iCEfT+OcUcPKdgTgsMeX
+         KcYid+atVQl3nREQXaDPwdA6FJCdisazQ+w0wnXv5aPhij8iIbUFxDIe/T/uj/Fp/lZA
+         m5axdunG5DXv8DvIcP1nrNapUjVtfNvBltKekm23O5RTQrcd4JTrJ+Tx9l0PSsZZae5J
+         XSDA==
+X-Gm-Message-State: AOJu0Yw/nQszgriH603yM17PhG0hBrbt/hG6RoNE5c+pvQlBKTuTazHc
+	COqM3++DyWBmLRekwwRt860lSMupLzPN0FNjlYbhw4vCg0b99sRN3JGa
+X-Gm-Gg: Acq92OFyXwbHgq2l3x/x45EejKDacBpRSXQ9KJHo9L4ZmB4EwlIXcU8zVaaKZ6wtEe2
+	lqYUFVQPf8d2AIoYggDX3WMdzi7ik/iE+OkI2BIlwodSVcdE6tec8ibU8GgTIcZkF4sfyhlfOLV
+	Qt+kxuNfIv1AIeBs2I5435ItPxVPlqsnnG+6wPbmy5plvGx0woYcc/wDr33fcCKrgnr9WV/gxBG
+	TqG1d/P7aL3D+qilfQTv2wZN14yQREVTRokt1mTNDCfLpqGItbek1WNaUg1AJozgmy3/I3FcRby
+	ihl5VhPli0c7ssXie9t38RGPEhGXCPa3v0pGWYkbXmp39/N6c/IgXNeHMAh05aGEjOdoOx78gFn
+	lyeafXF9EBGBvrzbSiS18PDakDpUGwJ/A5OAt2o/6bv87N+3WJhIOxZ0XmPKs+PWVPq8CUvaBY/
+	4U0leScq78agBtVbyA6WWJa6lf+w==
+X-Received: by 2002:a05:600c:3422:b0:490:c682:e37d with SMTP id 5b1f17b1804b1-490ec5214d6mr80477375e9.32.1781444066322;
+        Sun, 14 Jun 2026 06:34:26 -0700 (PDT)
+Received: from builder ([2001:9e8:f128:d516:be24:11ff:fe30:5d85])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922037055csm169464295e9.13.2026.06.14.06.34.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jun 2026 06:34:24 -0700 (PDT)
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Simon Horman <horms@kernel.org>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>
+Subject: [PATCH net-next v11 0/2] net: sfp: extend SMBus support
+Date: Sun, 14 Jun 2026 13:34:16 +0000
+Message-ID: <20260614133418.2068201-1-jelonek.jonas@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 02/11] geneve: Fix off-by-one comparing with
- GRO_LEGACY_MAX_SIZE
-To: Alice Mikityanska <alice.kernel@fastmail.im>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Xin Long <lucien.xin@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
- Alice Mikityanska <alice@isovalent.com>
-References: <20260611192955.604661-1-alice.kernel@fastmail.im>
- <20260611192955.604661-3-alice.kernel@fastmail.im>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260611192955.604661-3-alice.kernel@fastmail.im>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299221-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alice.kernel@fastmail.im,m:daniel@iogearbox.net,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:lucien.xin@gmail.com,m:willemdebruijn.kernel@gmail.com,m:willemb@google.com,m:dsahern@kernel.org,m:razor@blackwall.org,m:shuah@kernel.org,m:stfomichev@gmail.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:fw@strlen.de,m:netdev@vger.kernel.org,m:alice@isovalent.com,m:lucienxin@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[fastmail.im,iogearbox.net,davemloft.net,google.com,kernel.org,gmail.com,blackwall.org];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,strlen.de,vger.kernel.org,isovalent.com];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-299222-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:linux@armlinux.org.uk,m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bjorn@mork.no,m:horms@kernel.org,m:jelonek.jonas@gmail.com,m:jelonekjonas@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bootlin.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,mork.no,kernel.org,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
@@ -161,24 +136,135 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D6F566812C7
+X-Rspamd-Queue-Id: 7E7DC6812FE
 
-On 6/11/26 9:29 PM, Alice Mikityanska wrote:
-> From: Alice Mikityanska <alice@isovalent.com>
-> 
-> GRO_LEGACY_MAX_SIZE = 65536; total_len being 65536 is too big to fit
-> into a u16. As can be seen in skb_gro_receive, packets bigger or equal
-> to gro_max_size (or GRO_LEGACY_MAX_SIZE) are dropped with -E2BIG. Apply
-> the same boundary to geneve_post_decap_hint to avoid writing 65536 to a
-> 16-bit iph->tot_len field with an overflow.
-> 
-> Fixes: fd0dd796576e ("geneve: use GRO hint option in the RX path")
-> Signed-off-by: Alice Mikityanska <alice@isovalent.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+Today, the SFP driver only drives I2C adapters that advertise full
+I2C_FUNC_I2C, or SMBus-only adapters via single-byte transfers (with
+hwmon disabled). Several SoCs ship I2C/SMBus-only controllers that
+support more than just byte access -- e.g. word and I2C block -- and
+have SFP cages wired to them. Today, those adapters either work
+poorly or not at all.
 
-This patch and the previous one are pretty much uncontroversial. Let me
-apply them, so that the next iteration will be smaller.
+This series teaches the SFP driver to use the larger SMBus access
+modes when the adapter advertises them, and along the way starts
+honoring i2c_adapter quirks on read/write length so adapters that
+cap below the SFP block size are handled correctly. Patch 1 is a
+small prep doing only the quirks handling; patch 2 extends the
+SMBus path itself.
 
-/P
+Capability matrix supported by patch 2:
+  - BYTE only:                   single-byte access (unchanged).
+  - BYTE + WORD:                 word for >=2-byte chunks, byte tail.
+  - I2C_BLOCK present:           block as the universal transport.
+  - WORD only (no BYTE/BLOCK):   accepted with WARN_ONCE; works for
+                                 even-length transfers, odd-length
+                                 transfers will error at xfer time.
+
+Adapters with asymmetric R/W capabilities (e.g. only READ_I2C_BLOCK
+without WRITE_I2C_BLOCK) remain functionally correct but use the
+worse-supported direction's max for both directions, since
+i2c_max_block_size is a single field. No mainline I2C driver was
+seen advertising such asymmetry; per-direction sizes can be added
+later if needed.
+
+Note:
+Sashiko keeps raising an issue about the write_len cap possibly
+limiting reads too harsh and disabling hwmon functionality although
+not needed. This is theoretically true but I've acknowledged this in
+the past versions multiple times, being rather theoretical because no
+in-tree drivers will trigger this.
+
+---
+v10 -> v11:
+  - use smbus_data.block[0] instead of this_len to address issue
+    flagged by Sashiko in patch 2 [7]
+  - dropped Reviewed-by from Maxime on patch 2 due to changes
+v10: https://lore.kernel.org/netdev/20260612142840.462664-1-jelonek.jonas@gmail.com/
+
+v9 -> v10:
+  - dropped accepted and merged precursor patch
+  - resend as requested by Jakub
+  - added Reviewed-By from Maxime to first patch
+  - acknowledged potential issue flagged by Sashika, impact is
+    theoretical, see [6]
+v9: https://lore.kernel.org/netdev/20260528205242.971410-1-jelonek.jonas@gmail.com/
+
+v8 -> v9:
+  - added precursor patch to mitigate issue flagged by Jakub's AI [3]
+  - issue flagged in [4] acknowledged in [5] but not fixed, due to no
+    practical impact
+  - added Reviewed-By from Maxime to patch 3 (was patch 2 before)
+v8: https://lore.kernel.org/netdev/20260516135442.2234729-1-jelonek.jonas@gmail.com/
+
+v7 -> v8:
+  - avoid leaking uninitialized memory on short reads by
+    zero-initializing i2c_smbus_data variable (Simon)
+  - theoretical issue without practical impact raised at [1]
+    not addressed but acknowledged at [2]
+v7: https://lore.kernel.org/netdev/20260507093301.1144740-1-jelonek.jonas@gmail.com/
+
+v6 -> v7:
+  - use i2c_block_size instead of i2c_max_block_size (Maxime)
+  - move WARN_ONCE into 'else if ()' (Maxime)
+  - reword comments
+  - included Maxime's Reviewed-by for patch 1
+v6: https://lore.kernel.org/netdev/20260505200647.1125311-1-jelonek.jonas@gmail.com/
+
+v5 -> v6:
+  - Split adapter-quirks handling into a separate prep patch (1/2).
+  - Use I2C_SMBUS_I2C_BLOCK_DATA in the block-write branch (was
+    I2C_SMBUS_WORD_DATA), so block writes actually transfer this_len
+    bytes (also flagged by Jakub's AI bot review).
+  - In sfp_smbus_read/write, check i2c_smbus_xfer() return before
+    copying smbus_data into the caller's buffer.
+  - Use I2C_BLOCK as the universal transport when available (carries
+    any length 1..32); drop the this_len > 2 guard on the block
+    branches.
+  - Broaden the SMBus gate to also accept BLOCK-only adapters
+    (Russell).
+  - Accept word-only adapters with WARN_ONCE rather than rejecting
+    them (Andrew).
+  - Add a short comment in sfp_i2c_configure() explaining the access
+    hierarchy (Maxime).
+  - Use the all-bits-set form via i2c_check_functionality() for the
+    composite I2C_FUNC_SMBUS_* checks (Russell).
+v5: https://lore.kernel.org/netdev/20260116113105.244592-1-jelonek.jonas@gmail.com/
+
+v4 -> v5:
+  - made a more general approach, also covering word access
+v4: https://lore.kernel.org/netdev/20260109101321.2804-1-jelonek.jonas@gmail.com/
+
+v3 -> v4:
+  - fix formal issues
+v3: https://lore.kernel.org/netdev/20260105161242.578487-1-jelonek.jonas@gmail.com/
+
+v2 -> v3:
+  - fix previous attempt of v2 to fix return value
+v2: https://lore.kernel.org/netdev/20260105154653.575397-1-jelonek.jonas@gmail.com/
+
+v1 -> v2:
+  - return number of written bytes instead of zero
+v1: https://lore.kernel.org/netdev/20251228213331.472887-1-jelonek.jonas@gmail.com/
+
+[1] https://lore.kernel.org/netdev/20260510164726.1401317-1-horms@kernel.org/
+[2] https://lore.kernel.org/netdev/5129a58d-8852-4395-85e1-8991934810b8@gmail.com/
+[3] https://lore.kernel.org/netdev/20260520234208.565366-1-kuba@kernel.org/
+[4] https://lore.kernel.org/netdev/20260520234204.565333-1-kuba@kernel.org/
+[5] https://lore.kernel.org/netdev/4a1b13f4-9c68-4f4c-a676-fd61e2aeeab0@gmail.com/
+[6] https://lore.kernel.org/netdev/ec27912c-a66e-4a81-8c8c-318d27ec62b5@gmail.com/
+[7] https://sashiko.dev/#/patchset/20260612142840.462664-1-jelonek.jonas%40gmail.com
+
+---
+Jonas Jelonek (2):
+  net: sfp: apply I2C adapter quirks to limit block size
+  net: sfp: extend SMBus support
+
+ drivers/net/phy/sfp.c | 149 ++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 120 insertions(+), 29 deletions(-)
+
+
+base-commit: 383bad5ffeb8a84fcb4b87544429edb82aa5d223
+-- 
+2.51.0
 
 
