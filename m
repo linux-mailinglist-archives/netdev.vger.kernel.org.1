@@ -1,206 +1,142 @@
-Return-Path: <netdev+bounces-299178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id U66+OYNjLmqVvAQAu9opvQ
-	(envelope-from <netdev+bounces-299178-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:17:07 +0200
+	id i/zgEtJkLmoBvQQAu9opvQ
+	(envelope-from <netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:22:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AABB680A22
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:17:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D2D9680A3F
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:22:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=g3dJK+QQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299178-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299178-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=CnzdlwBn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299179-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09E0B30078AD
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:17:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 315263003EEB
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A850C36EA8F;
-	Sun, 14 Jun 2026 08:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C6F27A10F;
+	Sun, 14 Jun 2026 08:22:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A5CCA52
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D98E2F3C0E
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:22:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781425023; cv=none; b=NYKKcE3E+Z8JxKvKr0a5BF+7Dy0oTyz+IHfVelDtTBS/crflq2TN4/byb5QZgTLMjx5AyX+ufYllAultxLX++PHGesK0mfKBDyxbS9CXNGLwwHVyM8SGoZWO5crs3SCwjDuAjQUSOfW2FLWnzIcYCbSeXFvh1sK8eXTI+Djz9jE=
+	t=1781425359; cv=none; b=kq4PZVcy+zFMI/an8gczD+Aqb/vEluyJF+m3DiYjmR/PYCSsyXEFZ4Vu+k/60Sk1RPd050i1aWBA8bF9/Tcanskx6KFT0+YjCwr/9+qQfdnFfT1gh37GAFrnqaUydcZ0v3JEEPFTmFZ2C2rtyy2Cr53mbcixjo6BgNjh45KmMmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781425023; c=relaxed/simple;
-	bh=kY/3oXQduTooELFurkmOdN1c9zeMFSHEPQp2PQBXjP8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N29XgVdTUrvBk/xB2PIxCHR7DG2SM/KA8u9sVmLxlGqJaR85t2z+vLDpC7q9J4byLKSJB6PWrh6S0WlRNVw5t5c4/eBwvzC9Hgzjv4U2rTHMhlaYLEtylOdt4CM7HGcZUqpSfGw7aqlde20J6bJVDXjbjD6qoK1yK26q1919yl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3dJK+QQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9232E1F000E9;
-	Sun, 14 Jun 2026 08:17:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781425020;
-	bh=kuFCWVB426Kzg7aDhxtI+gq3b38s6oLNCDY46FNMzIs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=g3dJK+QQiIJ/R6pfAJSQShczhFQz1HRk4taNVoov5l1qOpsUQ9+v7335+qBVn8g+t
-	 bgeELe2bcKj7U8Tdo1OdI7L/LqRm/KIlidjEd2Y9LtoJ79XQbqHPIY2QUI5g3JzSYN
-	 vDJPDjoGI0G2Y6r/SIwAQz2IZasWKImutBDwAbVSyTBRnwMoBvKetqpXme7pMBSJFH
-	 zg3RhqEfDM1nBxg9GDV8ofaXtLszPZSh8+PU+mmwvbeIIG3JUzoWdWuFFRLns+xznI
-	 Z3/1Z3x09Lq1i9GuEF0FE1PU4XSpT2pk9KJvpxRnCvJ+YKVNV3xgxnfik/Oon6nPFl
-	 rcf0+lAHg02hw==
-Date: Sun, 14 Jun 2026 10:16:58 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: "Wayen.Yan" <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] net: airoha: Remove dead MT7996 NPU firmware declarations
-Message-ID: <ai5jeubrGN1iMgHo@lore-desk>
-References: <6a2dea77.01c4f138.336eeb.a256@mx.google.com>
+	s=arc-20240116; t=1781425359; c=relaxed/simple;
+	bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
+	h=Content-Type:MIME-Version:Subject:From:To:Cc:Date:Message-ID:
+	 In-Reply-To:References; b=Tv2OydxzRu2r/y0b6HNHwoNR2e7xkAz5vZL+x/zR6t2r13G5Fqubl0C06SOCKLI9CkZKUKdrFxKyMfNWwVSTOkAdbu0Unw1g2+3qN2+fh9ySAVT33jmqnRSiIHaQYnczKKmu4Tys59mTh2MgF+sun0wOoOS7d53GNKtbTf9bmWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnzdlwBn; arc=none smtp.client-ip=209.85.214.176
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2c0c3315c5dso25243215ad.3
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 01:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781425356; x=1782030156; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:cc:to:from:subject
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
+        b=CnzdlwBnp8QscPBXMTa9wQYuWIn8m4BeoEzE7nt8UDMisra/xQXDkW69hOHPggX6u9
+         Z9MRwBb6VMhG+H9aJOc/KtVBJ4W6k3mtgNsRutWaGOFUPdypdx9il6TJNvqBaNorT5NV
+         7DdT7XuOreua7B6IuOkQ09lADlqS3v8f/gc79IDpjnJMElHQLcYWIoa98imHR4TbONO+
+         G29IzdgBA9HHtkLxFOvOUqnQKlsVFVpNREVHWHkyeOv5vIvnd5E/UI4x0DBIBa7+OazJ
+         s6+wE6EsT2hrX1wlJeU9ch9llpNFZwSF0ksUIUQNF/YF9YXpdBDlpwXAtRtBJtM+360f
+         L/mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781425356; x=1782030156;
+        h=references:in-reply-to:message-id:date:cc:to:from:subject
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qb21hqb1S7YZ5BeL08StiBkLAbTGYCv15aAj6D/zaWI=;
+        b=YpouxBScZzPqb/zOz9DE8If0WnE7+17WpB90vdrcwawHXTH0dbvLKhIALi/eZUSIGJ
+         uIMtNH7EzxgZwJSuRhnlBIlyzYhDmKXqBerAgLjmHYCe8sRMjAaSIQ4znX481mcxMb3w
+         lXyDCftRcSOXK5zKTRYDDTUmSmsDOZZiSWRSVptEqoKuQxcqvAfKHjwFGN5hA7MXYeGS
+         dbvz627J5PcfIJHvQU54XifMPdJgyOGefc6LEiOJeHG9W1aWScYEBDF5R87Eyi/sy1mJ
+         VxQfMKCdoNtU7MyEh7R01Loat4zrEJv5N26C8fssIx7gLhG/2viFxEbUadL1YPvX8BBa
+         xoiQ==
+X-Gm-Message-State: AOJu0Yz2mQvAy0WhJtC0kKlur4Ph756uYvfTLbetSChmMR75kImBQBg5
+	iZW1lHvH0h2Q8LLD83zv6wkcgu4UyAJxjJamRQFkf5VtYx7swGY57mIh9GSywNsuCUI=
+X-Gm-Gg: Acq92OGKIu+9sjHAm5N8jdPgeizx23O54xJI10IccouwFo05vcwCNEC29LgurqiJYeW
+	Pvbsu6JbfywaMi9eAQPd6imPjY5MOtSR3RBDQgNKkyDs9d4JmOqj085lEUp+W3yP3Q5kSZVj0di
+	VZ24tftf6w46WJLXRCEP9wg3h+ZyaREu4EyMnrpsZukiJhQqY+AyvBvjp0ej5jOCdMfQOAa99f+
+	axnefnBtZUbzxngwixL0LaUbioGL8vwgKEWXcRPX+HF/W274mbaTB1A4Mzd/SOwdGFXqFm+iFok
+	wljT22BqwCKCB57FnRXap+n3wGeaRgO2Opyx7hxgh8tu8uvhSEO5SONufGhb5b3gjuY3nbQfHTE
+	pBcxxX54qww+aWZn/S+6gfjGufWyBtvXB1x2x2aJFyEsAQyaiKgplaHskMH44Km/JoqwcbLjSdR
+	0cnXkNGhMx1PXUWqhU
+X-Received: by 2002:a17:902:f78a:b0:2c0:ab82:6ba7 with SMTP id d9443c01a7336-2c412840b4cmr130549805ad.33.1781425356220;
+        Sun, 14 Jun 2026 01:22:36 -0700 (PDT)
+Received: from [127.0.1.1] ([47.253.114.73])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c4327aca9dsm67318685ad.50.2026.06.14.01.22.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jun 2026 01:22:35 -0700 (PDT)
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VFcFtyNt1TMkbinK"
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+Subject: Re: net: airoha: Remove dead MT7996 NPU firmware declarations
+From: win847@gmail.com
+To: netdev@vger.kernel.org
+Cc: lorenzo@kernel.org
+Date: Sun, 14 Jun 2026 16:22:32 +0800
+Message-ID: <178142535221.1923709.6145590590751458758@gmail.com>
 In-Reply-To: <6a2dea77.01c4f138.336eeb.a256@mx.google.com>
+References: <6a2dea77.01c4f138.336eeb.a256@mx.google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299178-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299179-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWO(0.00)[2];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lore-desk:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5AABB680A22
+X-Rspamd-Queue-Id: 8D2D9680A3F
 
+Thank you for the clarification, Lorenzo.
 
---VFcFtyNt1TMkbinK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You're right - I missed the DTS-based firmware loading mechanism
+introduced in commit 3847173525e30. The MODULE_FIRMWARE() macros
+are indeed used to notify userspace for firmware loading, and the
+firmware names are defined via DTS for different board configurations.
 
-> Remove the NPU_EN7581_7996_FIRMWARE_DATA/RV32 #define macros and
-> their corresponding MODULE_FIRMWARE() declarations. Neither the
-> en7581_npu_soc_data nor the an7583_npu_soc_data references these
-> firmware names, and no firmware loading path in the driver ever
-> requests them. The only references are the #define lines themselves
-> and the MODULE_FIRMWARE() declarations below.
->=20
-> Keeping dead MODULE_FIRMWARE entries causes modprobe/udev to attempt
-> pre-loading non-existent firmware files, generating kernel log noise
-> and misleading distributors about which firmware files to package.
->=20
-> Fixes: 23290c7bc190 ("net: airoha: Introduce Airoha NPU support")
-> Signed-off-by: Wayen <win847@gmail.com>
-
-Please drop this patch since EN7581_7996 firmware is defined via dts
-for 7581:
-
-commit 3847173525e307ebcd23bd4863da943ea78b0057
-Author: Lorenzo Bianconi <lorenzo@kernel.org>
-Date:   Tue Jan 20 11:17:18 2026 +0100
-
-    net: airoha: npu: Add the capability to read firmware names from dts
-   =20
-    Introduce the capability to read the firmware binary names from device-=
-tree
-    using the firmware-name property if available.
-    This patch is needed because NPU firmware binaries are board specific s=
-ince
-    they depend on the MediaTek WiFi chip used on the board (e.g. MT7996 or
-    MT7992) and the WiFi chip version info is not available in the NPU driv=
-er.
-    This is a preliminary patch to enable MT76 NPU offloading if the Airoha=
- SoC
-    is equipped with MT7996 (Eagle) WiFi chipset.
-
-https://github.com/openwrt/openwrt/blob/main/target/linux/airoha/dts/an7581=
--npu-mt7996.dtsi
-
-and here these macros are used to notify userspace for firmware loading.
+I'll drop this patch.
 
 Regards,
-Lorenzo
-
-> ---
->  drivers/net/ethernet/airoha/airoha_npu.c | 4 ----
->  1 file changed, 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ether=
-net/airoha/airoha_npu.c
-> index 17dbdc8325..93095f3894 100644
-> --- a/drivers/net/ethernet/airoha/airoha_npu.c
-> +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> @@ -16,8 +16,6 @@
-> =20
->  #define NPU_EN7581_FIRMWARE_DATA		"airoha/en7581_npu_data.bin"
->  #define NPU_EN7581_FIRMWARE_RV32		"airoha/en7581_npu_rv32.bin"
-> -#define NPU_EN7581_7996_FIRMWARE_DATA		"airoha/en7581_MT7996_npu_data.bi=
-n"
-> -#define NPU_EN7581_7996_FIRMWARE_RV32		"airoha/en7581_MT7996_npu_rv32.bi=
-n"
->  #define NPU_AN7583_FIRMWARE_DATA		"airoha/an7583_npu_data.bin"
->  #define NPU_AN7583_FIRMWARE_RV32		"airoha/an7583_npu_rv32.bin"
->  #define NPU_EN7581_FIRMWARE_RV32_MAX_SIZE	0x200000
-> @@ -822,8 +820,6 @@ module_platform_driver(airoha_npu_driver);
-> =20
->  MODULE_FIRMWARE(NPU_EN7581_FIRMWARE_DATA);
->  MODULE_FIRMWARE(NPU_EN7581_FIRMWARE_RV32);
-> -MODULE_FIRMWARE(NPU_EN7581_7996_FIRMWARE_DATA);
-> -MODULE_FIRMWARE(NPU_EN7581_7996_FIRMWARE_RV32);
->  MODULE_FIRMWARE(NPU_AN7583_FIRMWARE_DATA);
->  MODULE_FIRMWARE(NPU_AN7583_FIRMWARE_RV32);
->  MODULE_LICENSE("GPL");
-> --=20
-> 2.51.0
->=20
->=20
-
---VFcFtyNt1TMkbinK
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCai5jegAKCRA6cBh0uS2t
-rCZWAQDu7IbS3lUX4tiezcJcZUn2Vmnen2mw6vP0GQWec0CDXwD/SwRxiFKqJ5om
-MZ+MOgEjSVMNa8CZl2ZANR4iDqBVtwU=
-=jB5j
------END PGP SIGNATURE-----
-
---VFcFtyNt1TMkbinK--
+Wayen
 
