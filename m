@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-299187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EktKEi1pLmpIvgQAu9opvQ
-	(envelope-from <netdev+bounces-299187-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:41:17 +0200
+	id 6NLXE/p5LmrxxAQAu9opvQ
+	(envelope-from <netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:52:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96DF9680AE4
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:41:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80F01680C9A
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:52:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=Xe7FNDpw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299187-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299187-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=I02DqksV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F32193008D13
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:40:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E237F300B999
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C701369D56;
-	Sun, 14 Jun 2026 08:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AFA35836E;
+	Sun, 14 Jun 2026 09:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CD0204C3B;
-	Sun, 14 Jun 2026 08:40:45 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4DD1DF261;
+	Sun, 14 Jun 2026 09:52:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781426451; cv=none; b=aiQ959tYulVNABpR8o9/pqHNSlpEX76nUwnXz/tRaGlk+akvEF4ZYGBOtm9RBlC9DzqGPcLX0SZW4Y+u9SSHFLXJFacX3AfGcxBij2mS5bOxYxS/+XTeY7c5htHi+FpV54zZeiDiNy93DSzAxpvpEs9ZArOnYkt6HsdigUwup0g=
+	t=1781430772; cv=none; b=QF+rGOMgxdC6rC22XQcu2o1LCgktFJ8YdgQzjTOD49mMrazrwWHVCXI69/K6VSIGio2Su2LMQVyKcNwtwVLFYrryR+7tLbHkann44026ZsCFNpa3oFwGjvmp0S2+Hwaf3ravLa3AG2YRj0ptJOwfac+3KlAGVra4rLd+0hXpPqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781426451; c=relaxed/simple;
-	bh=wnJ2V2tWE9FQV7A8hKDEvTwDBMFoDrSPvkfoTPf19dU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U9vRQJJTkL2rhn959DKCFV0H029UyGUehBw/qlgjAkXlAPOUT6zbqwpnoxxYl8nmFDT/8Y0HqMOz3jIvTOFKfU7aqu75PQCYtycfI9AHCPJGMLo2aG2KgDkTRxKw6POcYCtjp+Bq3umjJOnp5M6tkWX0Kxi9KjLDtaBdRB+f+B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=Xe7FNDpw; arc=none smtp.client-ip=207.46.229.174
+	s=arc-20240116; t=1781430772; c=relaxed/simple;
+	bh=7R2oMCXF7yh/HRb0bDxpLZMyKUeXkdWi85S30PhRtdU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g6Yoj01LXoPGhKYPe8HNo97x++yqS45sk/+0cthHRe9lV1ZkLMd0R/+sH/mIm/63uV5nVfOgHEn7MxeFLH4XbEeIEqdLA7AbHizOWhqyI7ViibT/pWOA03PlshFLuDGSjMDjmAYTlUuFEJ9+fa5gnwgVHTYUVzEuia5dPiOOP4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=I02DqksV; arc=none smtp.client-ip=13.76.78.106
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=NAgki
-	ZP5ccnOJK1dR/DHvqpExriXXY5iHVNkiaZ3ct8=; b=Xe7FNDpwwSo3AVfCgWnxV
-	2ISD0YnDUYZiJOj+ZowRtmGTGD4cMcpz2F2RuNeByVJMp7GED9Sj34yICbxtRbHh
-	c8IByvDlLt/AuqncGQi5oDblzrw+bOgAYkTapM8825x5iK3ILtqbe4nNVY6rpoWR
-	/0UOZ9phQzPFpHdqME/O3w=
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=BfaiD
+	FDk6S0iO2/wHu18Qvg1fwOvjyP5iFL/n/7N7JQ=; b=I02DqksVS+6/ByU2zNzw0
+	jJ26tatLyebxqHbEdTdjA5YyjiS/MEUS9HDmg52wSxMsAaRlhrebpznqAvZgZRoP
+	nQiiUL9P2qiPOqcj60b84strOe5nFfk0pp0Oguq2EnFn5CfNb7LLWjlVkbydSRYc
+	fUiT6QoWBmoMZDKuotlyCg=
 Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
-	by web2 (Coremail) with SMTP id yQQGZQDHoJj9aC5qpIlJAg--.35704S2;
-	Sun, 14 Jun 2026 16:40:29 +0800 (CST)
+	by web3 (Coremail) with SMTP id ygQGZQC3A5HleS5qdZhtAg--.40976S2;
+	Sun, 14 Jun 2026 17:52:37 +0800 (CST)
 From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 To: netdev@vger.kernel.org
 Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Chas Williams <3chas3@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Kees Cook <kees@kernel.org>,
-	linux-atm-general@lists.sourceforge.net,
+	Kito Xu <veritas501@foxmail.com>,
 	linux-kernel@vger.kernel.org,
 	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
 	Ao Wang <wangao@seu.edu.cn>,
@@ -59,9 +58,9 @@ Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
 	Qi Li <qli01@tsinghua.edu.cn>,
 	Ke Xu <xuke@tsinghua.edu.cn>,
 	stable@vger.kernel.org
-Subject: [PATCH net] atm: br2684: validate IP header length before filtering
-Date: Sun, 14 Jun 2026 16:40:26 +0800
-Message-ID: <20260614084027.1179-1-zhaoyz24@mails.tsinghua.edu.cn>
+Subject: [PATCH net] appletalk: Hold socket reference in atalk_rcv()
+Date: Sun, 14 Jun 2026 17:52:24 +0800
+Message-ID: <20260614095226.1210-1-zhaoyz24@mails.tsinghua.edu.cn>
 X-Mailer: git-send-email 2.53.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,25 +69,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:yQQGZQDHoJj9aC5qpIlJAg--.35704S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAF15trW8GF1xWF4kGw4rZrb_yoW5Xw48pa
-	4UCr90kFWrGr17Awn2vw4Uuw45Ar4vq34fXa4xJa4I9wn8Gr18KFWrKFyY9F1Dur45K3W2
-	vrWv9ayUJr4DJaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:ygQGZQC3A5HleS5qdZhtAg--.40976S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw48Jw1kurWDCF47Kr1xZrb_yoW8KF4kpF
+	WrCF4jkFyUt34j9rn5Ja17Ar17CF4kKrW3G34rC342vFn8Wa4Fqr10vw4F9rZ0krZ5GFWj
+	qrZ7GFWjyr1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Avz4vE14
-	v_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRXZ2-DUUU
-	U
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgYRAWosh5zoiQABsp
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6r4fMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjWxR3UU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQESAWot2C-jUAABsR
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -96,20 +95,20 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
 	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299187-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:3chas3@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:linux-atm-general@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,lists.sourceforge.net,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
 	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -119,38 +118,39 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,tsinghua.edu.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tsinghua.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 96DF9680AE4
+X-Rspamd-Queue-Id: 80F01680C9A
 
-When CONFIG_ATM_BR2684_IPFILTER is enabled, packet_fails_filter()=0D
-treats skb->data as an IPv4 header whenever the packet protocol is=0D
-ETH_P_IP and then reads iph->daddr.  That read is not protected by a=0D
-check that the pulled skb still contains a full IPv4 header.=0D
+atalk_search_socket() walks the global atalk_sockets list while holding=0D
+atalk_sockets_lock, but it returns the matching socket after dropping the=0D
+lock without taking a reference.  atalk_rcv() then passes that pointer to=0D
+sock_queue_rcv_skb().=0D
 =0D
-This is reachable through the receive path.  An LLC-routed IPv4 PDU can=0D
-contain only the 8-byte LLC/SNAP header; br2684_push() accepts it,=0D
-sets skb->protocol to ETH_P_IP, pulls the LLC header, and leaves=0D
-skb->len as 0 before the filter runs.  The VC-routed path also reads=0D
-iph->version before checking that the skb contains an IPv4 header, so a=0D
-2-byte PDU starting with an IPv4 version nibble can reach the same=0D
-filter decision.=0D
+That leaves a race with close().  A concurrent atalk_release() can orphan=0D
+the socket, remove it from atalk_sockets, and drop the final reference via=
 =0D
-In both cases the filter can make its pass/drop decision from bytes=0D
-outside the packet data.  A reproducer using a dummy ATM receive device=0D
-filled the skb tailroom with 0xa5 and showed that an 8-byte LLC-routed=0D
-PDU and a 2-byte VC-routed PDU were forwarded when the filter prefix was=0D
-0xa5a5a5a5, even though neither packet contained an IPv4 destination=0D
-address.=0D
+atalk_destroy_socket(), freeing the socket before atalk_rcv() queues the=0D
+incoming skb.=0D
 =0D
-Drop IPv4 packets that are shorter than struct iphdr in=0D
-packet_fails_filter(), before reading iph->daddr.  Also reject=0D
-VC-routed packets shorter than struct iphdr before br2684_push() reads=0D
-iph->version.  Such packets cannot contain a valid IPv4 header, while=0D
-normal minimum-sized IPv4 packets continue through the existing filter=0D
-logic.=0D
+On a KASAN-enabled kernel this can be reproduced by racing AppleTalk DDP=0D
+delivery on loopback against close/rebind of the destination DGRAM socket:=
+=0D
+=0D
+  BUG: KASAN: slab-use-after-free in selinux_socket_sock_rcv_skb()=0D
+  sk_filter_trim_cap()=0D
+  sock_queue_rcv_skb_reason()=0D
+  atalk_rcv()=0D
+  snap_rcv()=0D
+  llc_rcv()=0D
+=0D
+Take a reference on the selected socket before dropping=0D
+atalk_sockets_lock, and put it after sock_queue_rcv_skb() has finished.=0D
+This keeps the socket alive for the receive path without changing socket=0D
+lookup semantics.  A malformed or racing receive still drops the skb on=0D
+queueing failure as before.=0D
 =0D
 Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")=0D
 Cc: stable@vger.kernel.org=0D
@@ -163,33 +163,38 @@ Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
 Assisted-by: GLM:GLM-5.1=0D
 Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
 ---=0D
- net/atm/br2684.c | 3 +++=0D
- 1 file changed, 3 insertions(+)=0D
+ net/appletalk/ddp.c | 5 ++++-=0D
+ 1 file changed, 4 insertions(+), 1 deletion(-)=0D
 =0D
-diff --git a/net/atm/br2684.c b/net/atm/br2684.c=0D
-index 6580d67c3456..fa4b1852d72b 100644=0D
---- a/net/atm/br2684.c=0D
-+++ b/net/atm/br2684.c=0D
-@@ -393,6 +393,7 @@ packet_fails_filter(__be16 type, struct br2684_vcc *brv=
-cc, struct sk_buff *skb)=0D
- 	if (brvcc->filter.netmask =3D=3D 0)=0D
- 		return 0;	/* no filter in place */=0D
- 	if (type =3D=3D htons(ETH_P_IP) &&=0D
-+	    skb->len >=3D sizeof(struct iphdr) &&=0D
- 	    (((struct iphdr *)(skb->data))->daddr & brvcc->filter.=0D
- 	     netmask) =3D=3D brvcc->filter.prefix)=0D
- 		return 0;=0D
-@@ -482,6 +483,8 @@ static void br2684_push(struct atm_vcc *atmvcc, struct =
-sk_buff *skb)=0D
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c=0D
+index 30a6dc06291c..61ec5c569dc3 100644=0D
+--- a/net/appletalk/ddp.c=0D
++++ b/net/appletalk/ddp.c=0D
+@@ -131,6 +131,8 @@ static struct sock *atalk_search_socket(struct sockaddr=
+_at *to,=0D
+ 	}=0D
+ 	s =3D def_socket;=0D
+ found:=0D
++	if (s)=0D
++		sock_hold(s);=0D
+ 	read_unlock_bh(&atalk_sockets_lock);=0D
+ 	return s;=0D
+ }=0D
+@@ -1474,9 +1476,12 @@ static int atalk_rcv(struct sk_buff *skb, struct net=
+_device *dev,=0D
+ 		goto drop;=0D
  =0D
- 			skb_reset_network_header(skb);=0D
- 			iph =3D ip_hdr(skb);=0D
-+			if (skb->len < sizeof(struct iphdr))=0D
-+				goto error;=0D
- 			if (iph->version =3D=3D 4)=0D
- 				skb->protocol =3D htons(ETH_P_IP);=0D
- 			else if (iph->version =3D=3D 6)=0D
-=0D
+ 	/* Queue packet (standard) */=0D
+-	if (sock_queue_rcv_skb(sock, skb) < 0)=0D
++	if (sock_queue_rcv_skb(sock, skb) < 0) {=0D
++		sock_put(sock);=0D
+ 		goto drop;=0D
++	}=0D
+ =0D
++	sock_put(sock);=0D
+ 	return NET_RX_SUCCESS;=0D
+ =0D
+ drop:=0D
 -- =0D
 2.43.0=0D
 
