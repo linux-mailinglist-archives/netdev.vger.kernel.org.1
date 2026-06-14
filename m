@@ -1,177 +1,176 @@
-Return-Path: <netdev+bounces-299176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 7qmDNbZhLmqSuwQAu9opvQ
-	(envelope-from <netdev+bounces-299176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:09:26 +0200
+	id cnTIDNRhLmqvuwQAu9opvQ
+	(envelope-from <netdev+bounces-299177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:09:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B7D6809EA
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:09:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD9326809F8
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:09:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=C6HwtYwH;
-	dkim=pass header.d=redhat.com header.s=google header.b=SP9T8oCW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299176-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299176-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=PI+XcZBd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299177-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299177-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D4C093005387
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:09:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 42DFF30039A6
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 08:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19FF395AED;
-	Sun, 14 Jun 2026 08:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55CC3955EC;
+	Sun, 14 Jun 2026 08:09:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C46D3955EC
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1352F8E96
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 08:09:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781424562; cv=none; b=Tb58oeAY6sDmrPFhcANP6cLSruOj4TP+qnevgdULQxdnii7LsSTWtyLyI2f0It7/z7wVVDePl/7E7uKLXTM/habgWjUtRN65cPTNhAw/chf4EOCHEgd866525+eXthpmBU8L/luQj1mevhC+1nAtasoq+FBgSuYQpn5x8k9mhiw=
+	t=1781424592; cv=none; b=cRueF6k++IcFg2Bc9lxQO+oStltgGqsLM8ty2SobtgY59wizikFV9HpFCGCgL08tT6HP/juPR4uOklk3XRZ1elHnJLCgGyukRpSwQu4C+E/ayyUkmaTLgMitRkkM35BuVgsv2PsDIoRoPCdDpCgJ+dgy/7jsHptKRhDzuty02FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781424562; c=relaxed/simple;
-	bh=O7QCnYsmC9T7DqPOfcZPmAFSh4iJuMkXDFQ2B/VoU+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vgad7FAYNc7xlCvJ69+G3PCGXiUmVklpUUrXawwxmSRzJSktgHXbyUWYJ4PbCSmWllO1fCTUfJHo5ScmJd2OHZYmgrdgSoyNLtQgVX15WJBhd9gZczPYqQlAsVkTfX1J8WT5LStQEVC2576/zj9PIlGG63mD8IUUIfjVaD3sY9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C6HwtYwH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SP9T8oCW; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781424560;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8gpPUZzZ8NEOkby5BaEtAw32WWn5h8dDgNhgJeg12mI=;
-	b=C6HwtYwHMSarbCtPGv1svCZIaiv1W9/vd8bj/ZtCgrAGiP7FwPMeJ543qLsOEaq3nesY8L
-	sKmhWRjxxJhYy5T+a9XR2crlQ19IFesVy9D453rTDfe9tyLkS1yXVh4mgVFkp2123B1GuI
-	qTI2HqA4zpL2lY15ipE05++33vDMw34=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-m_jg1MQvOnuGFR9VLkyWOw-1; Sun, 14 Jun 2026 04:09:19 -0400
-X-MC-Unique: m_jg1MQvOnuGFR9VLkyWOw-1
-X-Mimecast-MFC-AGG-ID: m_jg1MQvOnuGFR9VLkyWOw_1781424558
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-45efa7755faso894181f8f.1
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 01:09:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781424558; x=1782029358; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8gpPUZzZ8NEOkby5BaEtAw32WWn5h8dDgNhgJeg12mI=;
-        b=SP9T8oCWqVVVcrkAQFVsxVYjNEf89yz2Ocr5X/iqBxCvvsuBu/GoCf5ta0bgt/9mq5
-         Ws7bRFUV2P1amYgjoZ3bx1Fkq8Vs4Dlx+50tnovSJN8Hn1UMQtJgyd9xy/BegRcPGD2A
-         cv69napl/DsyTAzKGZad79ghBZ2drHepUQ1QqbTNV/10RSRdBgCzqjSACioRA5a/Bbz9
-         KbWTDie4yNvRK/uYjOIowBRlaHfpGNEctni+PJvZITAV08Xip6IWFMB6gWWvOIH1pxMP
-         uKCsnFSqIVJxS/w48BNelVog+jHiVxpEdFbft//jnfk3RYaFEpz21MilvSQa4qHNxnNZ
-         y6RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781424558; x=1782029358;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8gpPUZzZ8NEOkby5BaEtAw32WWn5h8dDgNhgJeg12mI=;
-        b=d+AkstJwtjOkpLMZK0vthtZVORduP0dIp+90djKSPKs0DNC8I165SEg2JCbRF0cbab
-         HndYogJoa3iUUhANSL0sA5FtS7T6p0AUwLAUfY5IMDX+37ZxnkFyElpmrFzxUyEP9Yr3
-         yeNWGX8JaLemxfeICjoij/NNuPh3116VdazpnzIAas3Z4HaXn7yBFrKcq6EjzBMyUgSQ
-         13bRj4JOy6n/O1zB9NhXGlHaIvizh3gIbFKpy1Sfvu66gYJMY4Or1NsM2UxgBwJqAUqP
-         PR2+6t7LNizq7lGwH1ZMCSOaDbegXDlRdCnY+F09LaNSWKaIy4MWFL1P2wozVEwb8Bfo
-         dWrQ==
-X-Gm-Message-State: AOJu0Ywrmh0LuKF9m03kNEq/sKLa5kC98LBRjmvDp8fRPyslRQZ8EWH5
-	yXMZOtdsDTaQG1c0Lqyiam29pOjjzKIsBM+Fvq5cUBoCTk9WskVwJvOwwLnYsZuxHfCphxpqjWS
-	q7NAvbq5jAxYQR1l9H/+1Hf7V6CZxKYQXWKcvUbtIDf8BqNNFcAyNZ1MQKw==
-X-Gm-Gg: Acq92OH3zvOiZ1NFu2kzp9H8Y1qHjKi1RAUJ3ZFYfJU4ihG1I1TWwfufmJlrHEz+Cec
-	E9xwWT8ZkUeJDzl7RbEy2zT0x0LF3nohiAWd0o84V1OaNl481CU9gCMqJobToKh+8rdIPfDFCf4
-	tcTm8lCHSbWRnfn0eTdFm0KQbrVyqo8dbgQZxAHnaE8hLEEjUrAAdoz4dDYwmy1Lan0a+oZRXfI
-	+1vb10toqG0wDer1eRINXy7AcTNFCrnB3T+OA+sdIzCyWPQ8L7dwwMdCMoYuXyW0gXUbeEZSQ2l
-	HE8bhfvfnwKMhv0EKwqXwMtz8wfMN14K8cU4RaIKW4w2M4ULoPXeX4Hw7hgTpnfKJEcXrgxa8yD
-	MliwvjdexFTHJOVK+WlZmfytety97C1ZlrDqiYCCxzL8W6KeYN++TWMQ=
-X-Received: by 2002:a05:6000:25fa:b0:45e:f5b6:7bf9 with SMTP id ffacd0b85a97d-46074b84e56mr6664949f8f.31.1781424558002;
-        Sun, 14 Jun 2026 01:09:18 -0700 (PDT)
-X-Received: by 2002:a05:6000:25fa:b0:45e:f5b6:7bf9 with SMTP id ffacd0b85a97d-46074b84e56mr6664920f8f.31.1781424557589;
-        Sun, 14 Jun 2026 01:09:17 -0700 (PDT)
-Received: from [192.168.88.32] ([150.228.25.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2dbfb1sm24168006f8f.35.2026.06.14.01.09.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jun 2026 01:09:16 -0700 (PDT)
-Message-ID: <cbfca457-d118-44cf-b51e-9b0221ae0973@redhat.com>
-Date: Sun, 14 Jun 2026 10:09:15 +0200
+	s=arc-20240116; t=1781424592; c=relaxed/simple;
+	bh=Vu3m5Zo/U3lCH3aSOYeWgCi/FfocKpOyI9w7v+JMHI0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dfx5VISOtH0V3Vlo2r9+BVISgt5q2+slQeOKX4hB6SHwwwPxi9Uq9gE37qN/m+xlEMxrnuMFIj7EVxscUHEWKrbQtPaggQInBHT/9tV3J1ON2Zjj1EWpwQaoN67dWbEeQxirekuBjCHsGp+BeS1efw9hkmkn7hglMQ07/CapnLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PI+XcZBd; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53971F000E9;
+	Sun, 14 Jun 2026 08:09:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781424591;
+	bh=6BsbZwfZNV4qPPi4CXgdcpJbR4FJNEYIPAmx8W44Sls=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=PI+XcZBdThtyTLGvfKqWZH3YEgYuEwXy5bZ9WLjLhJx8chGn+7JmYa/JEpCnu6J8c
+	 lR6gcaG4DCAMGf0JF5RcZv2juqNo5CR79HD2fdcf7OtA42j774Kxy2WzAqqmh2PvdQ
+	 3LfwVsv954g/IWlsOT8ssC/6ReBy/wNb/jIGrxK9hE+lxyMldJ1FsQNFq4iQQ9SDzh
+	 SutyimnvvXWeuks69R1W9wPZexFuTofaU2BOYusGMr0896BmVcrRBcOJr+v+98CEaO
+	 t2ki9j6OC0PZU5Ca9bdvEwadD0yahF5EXsEj0MFpZYaHj3lu9oXWLf0NhsA16AV5tx
+	 HGdGGUhUtZ8jQ==
+Date: Sun, 14 Jun 2026 10:09:48 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: "Wayen.Yan" <win847@gmail.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: airoha: Fix skb->priority underflow in
+ airoha_dev_select_queue()
+Message-ID: <ai5hzG8knT0xVEu6@lore-desk>
+References: <6a2de8c5.2c570c9e.53b1a.0e1b@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] tls: reject the combination of TLS and
- sockmap
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
- john.fastabend@gmail.com, sd@queasysnail.net
-References: <20260614014102.461064-1-kuba@kernel.org>
- <20260614014102.461064-2-kuba@kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260614014102.461064-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gewW9LJ9Yc0z9m/c"
+Content-Disposition: inline
+In-Reply-To: <6a2de8c5.2c570c9e.53b1a.0e1b@mx.google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-5.26 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,lunn.ch,kernel.org,cloudflare.com,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-299176-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299177-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:bpf@vger.kernel.org,m:jakub@cloudflare.com,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40B7D6809EA
+X-Rspamd-Queue-Id: CD9326809F8
 
 
+--gewW9LJ9Yc0z9m/c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 6/14/26 3:40 AM, Jakub Kicinski wrote:
-> TLS and sockmap (BPF psock) integration hides a lot of latent bugs.
-> Bugs which may be more or less relevant for real users but they
-> are definitely exploitable.
-> 
-> We could not find anyone actively using this integration so let's
-> reject this config. Adding a TLS socket to a sockmap was already
-> rejected by sk_psock_init() through the inet_csk_has_ulp() check.
-> We need to reject the attempts to configure the TLS keys (rather
-> than adding the ULP itself) because checking prior to the ULP
-> installation is tricky without risking a race with sockmap getting
-> added in parallel (sockmap does not hold the socket lock).
+> In airoha_dev_select_queue(), the expression:
+>=20
+>   queue =3D (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES;
+>=20
+> implicitly converts to unsigned arithmetic: when skb->priority is 0
+> (the default for unclassified traffic), (0u - 1u) wraps to UINT_MAX,
+> and UINT_MAX % 8 =3D 7, routing default best-effort packets to the
+> highest-priority QoS queue. This causes QoS inversion where the
+> majority of traffic on a PON gateway starves actual high-priority
+> flows (VoIP, gaming, etc.).
+>=20
+> Fix by guarding the subtraction: when priority is 0, map to queue 0
+> (lowest priority), otherwise apply the original (priority - 1) % 8
+> mapping.
+>=20
+> Fixes: 2b288b81560b ("net: airoha: Introduce ndo_select_queue callback")
+> Signed-off-by: Wayen <win847@gmail.com>
 
-Aren't both tls_ctx_create() and sk_psock_init() under (write) the
-callback lock? Isn't that enough to avoid races?
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-/P
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 31cdb11cd7..d476ef83c3 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -1933,7 +1933,7 @@ static u16 airoha_dev_select_queue(struct net_devic=
+e *dev, struct sk_buff *skb,
+>  	 */
+>  	channel =3D netdev_uses_dsa(dev) ? skb_get_queue_mapping(skb) : port->i=
+d;
+>  	channel =3D channel % AIROHA_NUM_QOS_CHANNELS;
+> -	queue =3D (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES; /* QoS queue */
+> +	queue =3D skb->priority ? (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES :=
+ 0;
+>  	queue =3D channel * AIROHA_NUM_QOS_QUEUES + queue;
+> =20
+>  	return queue < dev->num_tx_queues ? queue : 0;
+> --=20
+> 2.51.0
+>=20
+>=20
 
+--gewW9LJ9Yc0z9m/c
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCai5hzAAKCRA6cBh0uS2t
+rEW4AQDgDl+fmWFCDiFdPQD/bxbm1gZCWL62t9HyYgsUbdaSngD8Cbcyxxum1E3r
+ttz6ZZwzymUojIGQfi+SAmQN2pIR1QA=
+=7neh
+-----END PGP SIGNATURE-----
+
+--gewW9LJ9Yc0z9m/c--
 
