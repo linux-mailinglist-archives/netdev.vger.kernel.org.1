@@ -1,487 +1,272 @@
-Return-Path: <netdev+bounces-299173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299174-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1CQrJD1YLmoYtwQAu9opvQ
-	(envelope-from <netdev+bounces-299173-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:29:01 +0200
+	id zgYBIXJYLmo1twQAu9opvQ
+	(envelope-from <netdev+bounces-299174-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:29:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E820868090D
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:29:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D86EF680917
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:29:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=eUWu9Kea;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299173-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299173-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=broadcom.com;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=v8NmUSFO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299174-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299174-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 720083025D12
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:25:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D2B53022069
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 07:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD383932F2;
-	Sun, 14 Jun 2026 07:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FF43939B1;
+	Sun, 14 Jun 2026 07:28:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C6D3939B4
-	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A0238D006
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:28:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781421944; cv=none; b=HiJhlJUFgGumF3SbJCUm8wtr+akkfMXhXrnyLqEbrxD79cnD8Pjuc3Bbeq7Oq1Hh/Upf00e2SQxvrqpLXBR/EtjfaVOsYE/4oK/xCHax6kkps99plXcqPV9RVU/Cbatnmmu1cBqVYAEzwjAwIK+zK9aOx4mjJD6dhHPkrZNKEVs=
+	t=1781422111; cv=none; b=DAj0wMBbW2AdSyQKy4DGX08nA/c7Iuc9OnFkLJXwXR9LbDJzev8oFhzfKx4BdcVqh+MmRIkpDsMEPOJsDtYAVOOJN4c6XysY4pdsxd1djLT5GfFxB++7ihMqFRucfQEPCrSH3R/wr9MUG7gZgbeyAJlL/Rj1ITc9prDJzfJMaG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781421944; c=relaxed/simple;
-	bh=MP2mayyVJwIb5OisvaNohzdk0gKHNsjuI085pUx1g+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qvYCvZjV2cv09Uus+dHCqaJgNURSjUdqpxO5gzqJlb97Zsr9/QxR9xZsQRhhi6CLE57OyxwzwidGMDClrtp5/rJNvm+b4kAh7X7rt7n4axd0rHNxx/HkYGEzIYnmmlyPj3qAnPxFvpUHxtLnVIUdvjerYQ1cnLZEG0A249TPXBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eUWu9Kea; arc=none smtp.client-ip=209.85.214.227
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2c68190ade4so897475ad.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781421942; x=1782026742;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eThK1kV6Eo4ZM9VJ7T8ZuKF0viyAbgkh3u4N71GtQ8M=;
-        b=SJic7A1EVfkcUvk7jXJExFTM48SOaN4WCe1k6E+XqLRvY1pgyi2SnBaPRlmnvYpdBO
-         LAo4owkiGjF4gy6SUFpvnKn27qvqZfg3k4FCVo2MLxMqDI5c40kB7j/3Uri9kvOAMByd
-         EjzN+qAw6bjb2rcgm5jauyvR8Cnynh4A1DQC8XtEegccvomXfz49Hn+LvtDLVwXTMWku
-         HqIZHyrGmjyd2Ak0W6R2XP0yClK6zilLPflNjzHB0aTKyQWaaasLBdAbKTv97GHe+brO
-         2sZD46CJ3P57Q78cyeBI9jlAUbWjBJx68pFd/Uzky1h880U9WucpvPjnvWEeN2X/t193
-         Vrig==
-X-Gm-Message-State: AOJu0YxH45hoKu06pvuypQkDzV0EHW1m0j52Ji1aHRAj3j4UR+4eEr1N
-	6E2/r04oA/pSr5TLnHjCT41QZiMRNAfQdzr9qXhxV6kpT2Mlnci0y7BEmGOIPwTdyeW0ur75ZH2
-	1LJPsnhGY8jopPC92QZwq7SDQHoiinRz3/qkI6dW1U8UydSdbj5S/eiroq350L8uT6uMw1Tf3fL
-	M0lJrUtOXS4jLT76NHbU15HVmJELUbGqIyeEvkcFT/xNntXekP3sVtvwqpzoz9tDPLbkAVxxVA9
-	sJM+nao5k4=
-X-Gm-Gg: Acq92OHsoVkFymGSVYrcZncsa3OclAZUj5H2wcBKdqWHoF0Q2iNrLgtcIA/btWR1Os1
-	D+2LJFhgf+60VGXYU5Tnhzn7lyO3FFiwfJcaHnat+/8n96WD4IDUSF83XP+mJOpJTWbNVJ1QFHy
-	DC6X4/1vu75Wwmd99AZVHqyeKkxtoTq2aTj9KnYgGY2dM8MuJHcx3PEvLLRMsgRaTRxU5g5wLCe
-	G9lYu9CCJcswaBdemdaDk9FuCwlZ5Tzu3XmBJGg8twuOAPMm5rxEnA7BGgF8JbARh0jyjTxYlGe
-	sxr/X8tDs/oYIo/Q4QCBXkkiYFMZqLGLWcUvJoi4loMNcnzKezSiAgclM/OM1snz8JuvFad3t2D
-	46+6JB2PdWlGPP04LhPjPq5CJd/3IefxVvyuaGYm5OZf/W46w9yympCXhunYODbfYpLHVrKunM1
-	kPSIVQhiy9/MrlxjGMtpCsjvPzMEQ2TatUz7qtXQgjDHmA5swwkXqlO7cx
-X-Received: by 2002:a17:902:da8a:b0:2c0:a4c3:d7a with SMTP id d9443c01a7336-2c3fd9eb609mr79695855ad.26.1781421941883;
-        Sun, 14 Jun 2026 00:25:41 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-18.dlp.protect.broadcom.com. [144.49.247.18])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c430586081sm5668495ad.20.2026.06.14.00.25.41
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Jun 2026 00:25:41 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-304d2447962so2346706eec.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 00:25:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781421940; x=1782026740; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eThK1kV6Eo4ZM9VJ7T8ZuKF0viyAbgkh3u4N71GtQ8M=;
-        b=eUWu9KeaSbr5TgnDXbD5JVJHBi2qE1ZCwYdQOeFCs/dP12hVa4nonmvglyvnfjbk9k
-         iq/rvGYKZ6MTVb2fmsIbTKOcuHXMd8S+Wj1C6hJyqA1aC6n4cBTDD8g5/tKHqPNy8gJR
-         8SVG77XI/qXRSxTGzZOJSNbUWTmx+bIeC1dHA=
-X-Received: by 2002:a05:7301:c003:b0:304:56fc:775 with SMTP id 5a478bee46e88-3081e615564mr3799078eec.21.1781421939705;
-        Sun, 14 Jun 2026 00:25:39 -0700 (PDT)
-X-Received: by 2002:a05:7301:c003:b0:304:56fc:775 with SMTP id 5a478bee46e88-3081e615564mr3799064eec.21.1781421938980;
-        Sun, 14 Jun 2026 00:25:38 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081ea43bc7sm10043280eec.22.2026.06.14.00.25.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jun 2026 00:25:37 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next v3 15/15] bnxt_en: Add kTLS retransmission support
-Date: Sun, 14 Jun 2026 00:24:07 -0700
-Message-ID: <20260614072407.2761092-16-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.4
-In-Reply-To: <20260614072407.2761092-1-michael.chan@broadcom.com>
-References: <20260614072407.2761092-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1781422111; c=relaxed/simple;
+	bh=bECMYOPYUqZlpw/VV2Rubu/aFJZdOOrGNKt9q4WwtPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YHOPAaIRzWgAPe3GZAy9IYiRg73cbNMXNgqE8CuPYjkh3ZUOL7+9M+EP6ZiD0dYXRe5lvk/qbHE61wtJSjWfk03VWOJLZ1/LXxnAOeDINhU2WbV2bxnrwq//W1XougHfzcSFbUIwuOBIdeXYEXMZDeEwYmiJsLeVI/myZg050Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=v8NmUSFO; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 29970C2BB20
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 07:28:25 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6FA2460014;
+	Sun, 14 Jun 2026 07:28:21 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2AB91106C898D;
+	Sun, 14 Jun 2026 09:28:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781422100; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=nvXgsoZvrQH/u2rhcGoSAkyYDPUbfVN5pXwmA7bDxoY=;
+	b=v8NmUSFOt2VarEUTIlsTdjAvxfmKPLjbQMxJVSRzE74bMaJVW41Szjv+/Xrkr63DxPM6Ed
+	97U88ZOXa/kxHA8Cvb/z5LZQJNsDKFWJkq9idgx0AXKhqhmMjTr4eyZ3FgixNqQHhcf0mR
+	LPYISG83BP5kRg6wbqn+qGcmkpAC1U/fH4+fIsKj4G90w45UMshK4mhaLb5iLyUQKCwYbX
+	/2a8vhA4eNhyZ/t/NX2dvz5yVV58sqWntkbBjaT5uZ7sa1yfwzl9nZUVPaUulJBuB+LChu
+	PgaWvkU5+Jz6KmvrIIn8B3rLb55fakm9c1QHX14fTjBad7Tcvs9zx2v1kiVcpQ==
+Message-ID: <63983efb-dcad-4b34-9d35-4086de11be5e@bootlin.com>
+Date: Sun, 14 Jun 2026 09:28:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/2] net: dsa: realtek: rtl8365mb: add SGMII
+ support for RTL8367S
+To: Johan Alvarado <contact@c127.dev>, linusw@kernel.org,
+ alsi@bang-olufsen.dk, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org
+Cc: linux@armlinux.org.uk, namiltd@yahoo.com, luizluca@gmail.com,
+ linux-kernel@vger.kernel.org
+References: <20260613232136.24246-1-contact@c127.dev>
+ <0100019ec34adee6-37e8121b-823b-460e-b6bf-98588994adc8-000000@email.amazonses.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <0100019ec34adee6-37e8121b-823b-460e-b6bf-98588994adc8-000000@email.amazonses.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[broadcom.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-299173-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:pavan.chebbi@broadcom.com,m:andrew.gospodarek@broadcom.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299174-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:contact@c127.dev,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux@armlinux.org.uk,m:namiltd@yahoo.com,m:luizluca@gmail.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[c127.dev,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,yahoo.com,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E820868090D
+X-Rspamd-Queue-Id: D86EF680917
 
-If TCP retransmits a TLS packet that requires encryption by the NIC, the
-TCP sequence number will go backwards and the hardware will require some
-assistance from the driver.  The driver needs to retrieve the TLS record
-that covers the byte sequence of the retransmitted packet.  If the
-retransmitted packet does not include the tag, the hardware can simply
-encrypt the packet using the informtaion in the TLS record.
+Hi Johan,
 
-The driver provides the TLS record information for the retransmitted
-packet in the presync TX BD.  The presync TX BD introduced in the last
-patch is treated very much like a TX push BD with inline data.  The only
-exception is that no SKB will be stored for the presync TX BD.
+On 6/14/26 01:22, Johan Alvarado wrote:
+> The RTL8367S can mux its embedded SerDes to external interface 1,
+> which is typically used to connect the switch to a CPU port. The chip
+> info table already declares SGMII as a supported interface mode for
+> this chip, but the driver only implements RGMII so far.
+> 
+> Implement SGMII support, with the configuration sequence derived from
+> the GPL-licensed Realtek rtl8367c vendor driver as distributed in the
+> Mercusys MR80X GPL code drop:
+> 
+>  - Add accessors for the SerDes indirect access registers (SDS_INDACS),
+>    through which the SerDes internal registers are reached.
+> 
+>  - Keep the embedded DW8051 microcontroller in reset and disabled. The
+>    vendor driver loads firmware into it to manage the SerDes link, but
+>    analysis of that firmware shows it only duplicates the link
+>    management phylink already performs: it polls the port status and
+>    writes the external interface force registers behind the driver's
+>    back.
+> 
+>  - Clear the line rate bypass bit for the external interface, tune the
+>    SerDes with the vendor-prescribed parameters, mux the SerDes to MAC8
+>    in SGMII mode and only then take the SerDes out of reset, as the
+>    vendor driver does.
+> 
+>  - After deasserting the SerDes reset, reset the SerDes data path via
+>    the SerDes BMCR register to flush the FIFOs and resync the PLL.
+>    This mirrors what the vendor firmware does right after deasserting
+>    the SerDes reset, and ensures a clean link state from cold boot.
+> 
+>  - Force the SGMII link parameters (link, speed, duplex, flow control)
+>    in the SDS_MISC register from the phylink mac_link_up/down
+>    operations, in addition to the usual external interface force
+>    configuration. SGMII in-band autonegotiation is disabled, so only
+>    fixed-link and conventional PHY setups are supported, just like
+>    RGMII.
+> 
+> Tested on a Mercusys MR80X v2.20, where the RTL8367S is connected to
+> the SoC over SGMII.
+> 
+> Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Signed-off-by: Johan Alvarado <contact@c127.dev>
+> ---
 
-Retransmission that includes the TLS tag will be handled in future
-patches.
+[...]
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
-v3:
-Unwind the TX ring properly if the TLS packet cannot be sent.
+> +static int rtl8365mb_ext_config_sgmii(struct realtek_priv *priv, int port)
+> +{
+> +	const struct rtl8365mb_extint *extint =
+> +		rtl8365mb_get_port_extint(priv, port);
+> +	u16 val;
+> +	int ret;
+> +	int i;
+> +
+> +	if (!extint)
+> +		return -ENODEV;
+> +
+> +	/* The SerDes can only be muxed to external interface 1 */
+> +	if (extint->id != 1)
+> +		return -EOPNOTSUPP;
+> +
+> +	/* Hold the embedded DW8051 microcontroller in reset and keep it
+> +	 * disabled. The vendor driver loads firmware into it to manage the
+> +	 * SerDes link, but the firmware only duplicates work that phylink
+> +	 * already does: it polls the port status and forces the external
+> +	 * interface configuration in the very registers this driver manages.
+> +	 * Letting it run would race with phylink.
+> +	 */
+> +	ret = regmap_update_bits(priv->map, RTL8365MB_CHIP_RESET_REG,
+> +				 RTL8365MB_CHIP_RESET_DW8051_MASK,
+> +				 RTL8365MB_CHIP_RESET_DW8051_MASK);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = regmap_update_bits(priv->map, RTL8365MB_MISC_CFG0_REG,
+> +				 RTL8365MB_MISC_CFG0_DW8051_EN_MASK, 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* The vendor driver clears the line rate bypass for all interface
+> +	 * modes except TMII.
+> +	 */
+> +	ret = regmap_update_bits(priv->map, RTL8365MB_BYPASS_LINE_RATE_REG,
+> +				 BIT(extint->id), 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Tune the SerDes with vendor-prescribed parameters */
+> +	for (i = 0; i < ARRAY_SIZE(rtl8365mb_sds_jam_sgmii); i++) {
+> +		ret = rtl8365mb_sds_write(priv, 0,
+> +					  rtl8365mb_sds_jam_sgmii[i].reg,
+> +					  rtl8365mb_sds_jam_sgmii[i].val);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	/* Mux the SerDes to MAC8 in SGMII mode */
+> +	ret = regmap_update_bits(priv->map, RTL8365MB_SDS_MISC_REG,
+> +				 RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK |
+> +					 RTL8365MB_SDS_MISC_MAC8_SEL_HSGMII_MASK,
+> +				 RTL8365MB_SDS_MISC_MAC8_SEL_SGMII_MASK);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = regmap_update_bits(
+> +		priv->map, RTL8365MB_DIGITAL_INTERFACE_SELECT_REG(extint->id),
+> +		RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_MASK(extint->id),
+> +		RTL8365MB_EXT_PORT_MODE_SGMII
+> +			<< RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_OFFSET(
+> +				   extint->id));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Take the SerDes out of reset. The vendor driver does this only
+> +	 * after the SerDes mux and the interface mode are configured.
+> +	 */
+> +	ret = rtl8365mb_sds_write(priv, 0, RTL8365MB_SDS_REG_RESET,
+> +				  RTL8365MB_SDS_RESET_DEASSERT);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Reset the SerDes data path and resync its PLL, mirroring what the
+> +	 * vendor firmware does right after deasserting the SerDes reset.
+> +	 * This flushes the FIFOs and ensures a clean state for the link,
+> +	 * preventing silent drops and CRC errors.
+> +	 */
+> +	ret = rtl8365mb_sds_write(priv, 0, RTL8365MB_SDS_REG_BMCR,
+> +				  RTL8365MB_SDS_BMCR_DPRST_PHASE1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = rtl8365mb_sds_write(priv, 0, RTL8365MB_SDS_REG_BMCR,
+> +				  RTL8365MB_SDS_BMCR_DPRST_PHASE2);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Disable SGMII in-band autonegotiation: the link parameters are
+> +	 * forced in rtl8365mb_phylink_mac_link_up.
+> +	 */
 
-Improve the OOO TLS counters.
+This comment implies that you could deal with SGMII aneg at some point. This, and
+the fact that you end-up with more complex mac_link_up/down sequences that set the
+"ext" settings then the "sds" settings while in SGMII makes me wonder if this whole
+SGMII/2500BaseX series should be represented as a PCS phylink driver.
 
-Fix endianness of the record sequence number.
+It would make more sense, and should also make the code easier to maintain in the
+long run. Have you considered converting this to the phylink_pcs ops, or is there
+something that doesn't quite fit the model here ? There are quite a few DSA switches
+that makes use of this (grep for phylink_pcs), you should have plenty of examples
+to pick from :)
 
-Check valid return address from skb_frag_address_safe().
-
-v2:
-https://lore.kernel.org/netdev/20260512212105.3488258-16-michael.chan@broadcom.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  14 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   4 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   4 +
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.c    | 152 +++++++++++++++++-
- .../net/ethernet/broadcom/bnxt/bnxt_ktls.h    |   2 +
- 5 files changed, 167 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ce3175721be2..2e4d11977407 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -482,9 +482,9 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	unsigned int length, pad = 0;
- 	u32 len, free_size, vlan_tag_flags, cfa_action, flags;
- 	struct bnxt_ktls_offload_ctx_tx *kctx_tx = NULL;
-+	u16 prod, start_prod, last_frag, txts_prod;
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 	struct pci_dev *pdev = bp->pdev;
--	u16 prod, last_frag, txts_prod;
- 	struct bnxt_tx_ring_info *txr;
- 	struct bnxt_sw_tx_bd *tx_buf;
- 	__le32 lflags = 0;
-@@ -500,7 +500,6 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	txq = netdev_get_tx_queue(dev, i);
- 	txr = &bp->tx_ring[bp->tx_ring_map[i]];
--	prod = txr->tx_prod;
- 
- #if (MAX_SKB_FRAGS > TX_MAX_FRAGS)
- 	if (skb_shinfo(skb)->nr_frags > TX_MAX_FRAGS) {
-@@ -529,12 +528,14 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			return NETDEV_TX_BUSY;
- 	}
- 
-+	start_prod = txr->tx_prod;
- 	skb = bnxt_ktls_xmit(bp, txr, skb, &lflags, &kid, &kctx_tx);
- 	if (unlikely(!skb)) {
- 		dev_core_stats_tx_dropped_inc(dev);
- 		return NETDEV_TX_OK;
- 	}
- 
-+	prod = txr->tx_prod;
- 	length = skb->len;
- 	len = skb_headlen(skb);
- 	last_frag = skb_shinfo(skb)->nr_frags;
-@@ -817,9 +818,16 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			/* set SKB to err so PTP worker will clean up */
- 			ptp->txts_req[txts_prod].tx_skb = ERR_PTR(-EIO);
- 	}
-+	txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].skb = NULL;
-+	/* Unwind any kTLS presync BDs */
-+	if (unlikely(txr->tx_prod != start_prod)) {
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bp, start_prod)];
-+		tx_buf->is_push = 0;
-+		tx_buf->inline_data_bds = 0;
-+		WRITE_ONCE(txr->tx_prod, start_prod);
-+	}
- 	if (txr->kick_pending)
- 		bnxt_txr_db_kick(bp, txr, txr->tx_prod);
--	txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].skb = NULL;
- 	dev_core_stats_tx_dropped_inc(dev);
- 	return NETDEV_TX_OK;
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 500bb9171274..339f5bdf2f20 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1191,6 +1191,10 @@ struct bnxt_cmn_sw_stats {
- enum bnxt_ktls_data_counters {
- 	BNXT_KTLS_TX_PKTS = 0,
- 	BNXT_KTLS_TX_BYTES,
-+	BNXT_KTLS_TX_OOO_PKTS,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE,
-+	BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR,
- 
- 	BNXT_KTLS_MAX_DATA_COUNTERS,
- };
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 9b2bc38236d7..8d2ee1976e1a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -359,6 +359,10 @@ static const char *const bnxt_ring_drv_stats_arr[] = {
- static const char *const bnxt_ktls_data_stats[] = {
- 	[BNXT_KTLS_TX_PKTS]		= "tx_tls_encrypted_packets",
- 	[BNXT_KTLS_TX_BYTES]		= "tx_tls_encrypted_bytes",
-+	[BNXT_KTLS_TX_OOO_PKTS]			= "tx_tls_ooo_packets",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC]	= "tx_tls_ooo_fallback_no_sync",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE]	= "tx_tls_ooo_fallback_no_space",
-+	[BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR]	= "tx_tls_ooo_fallback_no_hdr",
- };
- 
- /* kTLS control plane counter strings indexed by enum bnxt_ktls_ctrl_counters */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-index 298fb08e7b9b..4ed2d9d8e10c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.c
-@@ -339,7 +339,8 @@ int bnxt_ktls_init(struct bnxt *bp)
- 	return 0;
- }
- 
--static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes)
-+static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes,
-+				   bool ooo)
- {
- 	struct bnxt_tls_sw_stats *ring_stats = txr->tls_stats;
- 
-@@ -347,6 +348,128 @@ static void bnxt_ktls_inc_tx_stats(struct bnxt_tx_ring_info *txr, u32 bytes)
- 		return;
- 	ring_stats->counters[BNXT_KTLS_TX_PKTS]++;
- 	ring_stats->counters[BNXT_KTLS_TX_BYTES] += bytes;
-+	if (ooo)
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_PKTS]++;
-+}
-+
-+static void bnxt_ktls_pre_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			       u32 kid, struct crypto_prefix_cmd *pre_cmd)
-+{
-+	struct bnxt_sw_tx_bd *tx_buf;
-+	struct tx_bd_presync *psbd;
-+	u32 bd_space, space;
-+	u8 *pcmd;
-+	u16 prod;
-+
-+	prod = txr->tx_prod;
-+	tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+
-+	psbd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	psbd->tx_bd_len_flags_type = CRYPTO_PRESYNC_BD_CMD;
-+	psbd->tx_bd_kid = cpu_to_le32(BNXT_KID_HW(kid));
-+	psbd->tx_bd_opaque =
-+		SET_TX_OPAQUE(bp, txr, prod, CRYPTO_PREFIX_CMD_BDS + 1);
-+
-+	prod = NEXT_TX(prod);
-+	pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+	bd_space = TX_DESC_CNT - TX_IDX(prod);
-+	space = bd_space * sizeof(struct tx_bd);
-+	if (space >= CRYPTO_PREFIX_CMD_SIZE) {
-+		memcpy(pcmd, pre_cmd, CRYPTO_PREFIX_CMD_SIZE);
-+		prod += CRYPTO_PREFIX_CMD_BDS;
-+	} else {
-+		memcpy(pcmd, pre_cmd, space);
-+		prod += bd_space;
-+		pcmd = (void *)&txr->tx_desc_ring[TX_RING(bp, prod)][TX_IDX(prod)];
-+		memcpy(pcmd, (u8 *)pre_cmd + space,
-+		       CRYPTO_PREFIX_CMD_SIZE - space);
-+		prod += CRYPTO_PREFIX_CMD_BDS - bd_space;
-+	}
-+	txr->tx_prod = prod;
-+	tx_buf->is_push = 1;
-+	/* Minus 1 since the header psbd is a single entry short BD */
-+	tx_buf->inline_data_bds = CRYPTO_PREFIX_CMD_BDS - 1;
-+}
-+
-+static int bnxt_ktls_tx_ooo(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+			    struct sk_buff *skb, u32 payload_len, u32 seq,
-+			    struct tls_context *tls_ctx)
-+{
-+	struct bnxt_tls_sw_stats *ring_stats = txr->tls_stats;
-+	struct tls_offload_context_tx *tx_tls_ctx;
-+	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
-+	u32 hdr_tcp_seq, end_seq, total_bds;
-+	struct crypto_prefix_cmd pcmd = {};
-+	struct tls_record_info *record;
-+	unsigned long flags;
-+	bool fwd = false;
-+	__le64 le_rec_sn;
-+	u64 rec_sn;
-+	u8 *hdr;
-+	int rc;
-+
-+	tx_tls_ctx = tls_offload_ctx_tx(tls_ctx);
-+	kctx_tx = bnxt_get_ktls_ctx_tx(tls_ctx);
-+	end_seq = seq + skb->len - skb_tcp_all_headers(skb);
-+	if (unlikely(after(seq, kctx_tx->tcp_seq_no) ||
-+		     after(end_seq, kctx_tx->tcp_seq_no))) {
-+		fwd = true;
-+		pcmd.flags = CRYPTO_PREFIX_CMD_FLAGS_UPDATE_IN_ORDER_VAR_LE;
-+	}
-+
-+	spin_lock_irqsave(&tx_tls_ctx->lock, flags);
-+	record = tls_get_record(tx_tls_ctx, seq, &rec_sn);
-+	if (!record || !record->num_frags) {
-+		rc = -EPROTO;
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_SYNC]++;
-+		goto unlock_exit;
-+	}
-+	hdr_tcp_seq = tls_record_start_seq(record);
-+	hdr = skb_frag_address_safe(&record->frags[0]);
-+
-+	total_bds = CRYPTO_PRESYNC_BDS + skb_shinfo(skb)->nr_frags + 2;
-+	if (bnxt_tx_avail(bp, txr) < total_bds) {
-+		rc = -ENOSPC;
-+		ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_SPACE]++;
-+		goto unlock_exit;
-+	}
-+
-+	if (before(record->end_seq - tls_ctx->prot_info.tag_size,
-+		   seq + payload_len)) {
-+		/* retransmission includes tag bytes */
-+		rc = -EOPNOTSUPP;
-+		goto unlock_exit;
-+	}
-+	pcmd.header_tcp_seq_num = cpu_to_le32(hdr_tcp_seq);
-+	pcmd.start_tcp_seq_num = cpu_to_le32(seq);
-+	pcmd.end_tcp_seq_num = cpu_to_le32(seq + payload_len - 1);
-+	if (tls_ctx->prot_info.version == TLS_1_2_VERSION) {
-+		u32 nonce_bytes = tls_ctx->prot_info.iv_size;
-+		u32 retrans_off = seq - hdr_tcp_seq;
-+
-+		if (!hdr) {
-+			rc = -ENOBUFS;
-+			ring_stats->counters[BNXT_KTLS_TX_OOO_FALLBACK_NO_HDR]++;
-+			goto unlock_exit;
-+		}
-+		if (retrans_off > 5 && retrans_off < 5 + nonce_bytes)
-+			nonce_bytes = retrans_off - 5;
-+		memcpy(pcmd.explicit_nonce, hdr + 5, nonce_bytes);
-+	}
-+	le_rec_sn = cpu_to_le64(rec_sn);
-+	memcpy(&pcmd.record_seq_num[0], &le_rec_sn, sizeof(le_rec_sn));
-+
-+	rc = 0;
-+	bnxt_ktls_pre_xmit(bp, txr, kctx_tx->kid, &pcmd);
-+
-+	if (fwd) {
-+		kctx_tx->next_tcp_seq_no = end_seq;
-+		kctx_tx->pending_fwd = 1;
-+	}
-+
-+unlock_exit:
-+	spin_unlock_irqrestore(&tx_tls_ctx->lock, flags);
-+	return rc;
- }
- 
- struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-@@ -357,6 +480,7 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 	struct bnxt_ktls_offload_ctx_tx *kctx_tx;
- 	struct tls_context *tls_ctx;
- 	u32 seq, payload_len;
-+	int rc;
- 
- 	if (!IS_ENABLED(CONFIG_TLS_DEVICE) || !ktls ||
- 	    !tls_is_skb_tx_device_offloaded(skb))
-@@ -375,14 +499,25 @@ struct sk_buff *bnxt_ktls_xmit(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		 */
- 		kctx_tx->next_tcp_seq_no = seq + payload_len;
- 		kctx_tx->pending_bytes = payload_len;
-+		kctx_tx->pending_ooo = 0;
-+		kctx_tx->pending_fwd = 1;
- 		*kid = BNXT_KID_HW(kctx_tx->kid);
- 		*kctx_tx_p = kctx_tx;
- 		*lflags |= cpu_to_le32(TX_BD_FLAGS_CRYPTO_EN |
- 				       BNXT_TX_KID_LO(*kid));
- 	} else {
--		skb = tls_encrypt_skb(skb);
--		if (!skb)
--			return NULL;
-+		kctx_tx->pending_fwd = 0;
-+		rc = bnxt_ktls_tx_ooo(bp, txr, skb, payload_len, seq, tls_ctx);
-+		if (rc)
-+			return tls_encrypt_skb(skb);
-+
-+		kctx_tx->pending_bytes = payload_len;
-+		kctx_tx->pending_ooo = 1;
-+		*kid = BNXT_KID_HW(kctx_tx->kid);
-+		*kctx_tx_p = kctx_tx;
-+		*lflags |= cpu_to_le32(TX_BD_FLAGS_CRYPTO_EN |
-+				       BNXT_TX_KID_LO(*kid));
-+		return skb;
- 	}
- 	return skb;
- }
-@@ -392,8 +527,13 @@ void bnxt_ktls_xmit_commit(struct bnxt_tx_ring_info *txr,
- {
- 	if (!kctx_tx)
- 		return;
--	kctx_tx->tcp_seq_no = kctx_tx->next_tcp_seq_no;
--	bnxt_ktls_inc_tx_stats(txr, kctx_tx->pending_bytes);
-+	if (kctx_tx->pending_fwd)
-+		kctx_tx->tcp_seq_no = kctx_tx->next_tcp_seq_no;
-+	bnxt_ktls_inc_tx_stats(txr, kctx_tx->pending_bytes,
-+			       kctx_tx->pending_ooo);
-+	kctx_tx->pending_bytes = 0;
-+	kctx_tx->pending_fwd = 0;
-+	kctx_tx->pending_ooo = 0;
- }
- 
- int bnxt_ktls_alloc_tx_ring_stats(struct bnxt *bp, struct bnxt_tx_ring_info *txr)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-index 1c935e0d413d..40b94bbf5a38 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ktls.h
-@@ -43,6 +43,8 @@ struct bnxt_ktls_offload_ctx_tx {
- 	u32		next_tcp_seq_no;/* staged tcp seq no */
- 	u32		kid;
- 	u32		pending_bytes;	/* staged payload bytes */
-+	u32		pending_fwd:1;
-+	u32		pending_ooo:1;
- };
- 
- struct bnxt_ktls_tx_driver_state {
--- 
-2.51.0
+Maxime
 
 
