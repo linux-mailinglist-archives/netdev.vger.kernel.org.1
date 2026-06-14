@@ -1,201 +1,176 @@
-Return-Path: <netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299189-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6NLXE/p5LmrxxAQAu9opvQ
-	(envelope-from <netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:52:58 +0200
+	id NUcEM85+LmoMxwQAu9opvQ
+	(envelope-from <netdev+bounces-299189-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 12:13:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F01680C9A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 11:52:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C4E680D27
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 12:13:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=I02DqksV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299188-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=keN1i+Xz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299189-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299189-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E237F300B999
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 09:52:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8D46300C5BC
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 10:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AFA35836E;
-	Sun, 14 Jun 2026 09:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BACC32BF52;
+	Sun, 14 Jun 2026 10:13:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4DD1DF261;
-	Sun, 14 Jun 2026 09:52:46 +0000 (UTC)
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB73732C8B
+	for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 10:13:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781430772; cv=none; b=QF+rGOMgxdC6rC22XQcu2o1LCgktFJ8YdgQzjTOD49mMrazrwWHVCXI69/K6VSIGio2Su2LMQVyKcNwtwVLFYrryR+7tLbHkann44026ZsCFNpa3oFwGjvmp0S2+Hwaf3ravLa3AG2YRj0ptJOwfac+3KlAGVra4rLd+0hXpPqo=
+	t=1781432011; cv=none; b=XxZMT0eGRcso/2OcYWG8DFLQD9KmEu3ad2F7AkxdN14kBNywziUTZfPGwaNJ24AVuX02Er6FAgeBWG4WqWQmHJokogUs2kEOhAmp1qkvHFjNb17kFcZFtusX8dDcbiZnhI5x1EaGprKTxofv+zRggpWOcnX2KXKDq1B63StTt+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781430772; c=relaxed/simple;
-	bh=7R2oMCXF7yh/HRb0bDxpLZMyKUeXkdWi85S30PhRtdU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g6Yoj01LXoPGhKYPe8HNo97x++yqS45sk/+0cthHRe9lV1ZkLMd0R/+sH/mIm/63uV5nVfOgHEn7MxeFLH4XbEeIEqdLA7AbHizOWhqyI7ViibT/pWOA03PlshFLuDGSjMDjmAYTlUuFEJ9+fa5gnwgVHTYUVzEuia5dPiOOP4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=I02DqksV; arc=none smtp.client-ip=13.76.78.106
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=BfaiD
-	FDk6S0iO2/wHu18Qvg1fwOvjyP5iFL/n/7N7JQ=; b=I02DqksVS+6/ByU2zNzw0
-	jJ26tatLyebxqHbEdTdjA5YyjiS/MEUS9HDmg52wSxMsAaRlhrebpznqAvZgZRoP
-	nQiiUL9P2qiPOqcj60b84strOe5nFfk0pp0Oguq2EnFn5CfNb7LLWjlVkbydSRYc
-	fUiT6QoWBmoMZDKuotlyCg=
-Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
-	by web3 (Coremail) with SMTP id ygQGZQC3A5HleS5qdZhtAg--.40976S2;
-	Sun, 14 Jun 2026 17:52:37 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Kito Xu <veritas501@foxmail.com>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] appletalk: Hold socket reference in atalk_rcv()
-Date: Sun, 14 Jun 2026 17:52:24 +0800
-Message-ID: <20260614095226.1210-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.53.0.windows.2
+	s=arc-20240116; t=1781432011; c=relaxed/simple;
+	bh=V8ILNRycnctlx/yOK6n8nBlj8d32lWGWZ4pfWzD5iFg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XBIaf5UHgwaY02hkQPLAdrlh39qQB5VwW22PTp/SJg3RFlSN/wWv8kgSCmstIoTdapq4fxt7GlZC4pkNFkvsNjedxqfqvtdez17vuZvAIeYhYFO11Krxe5cl/tkiGzXSiC6xgU1dT1mH3r9k9etIlBQ833lrqnb0Ey0PfENOKSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=keN1i+Xz; arc=none smtp.client-ip=95.215.58.171
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781431997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JqdQnygkXzMaJ6mt2m2i9i/0wK8Xf9zkeWFs7G9YnSw=;
+	b=keN1i+XzPhw3q+UVIxflyveBC6Pq8TVXYfrfwfsMc9rSNLicLDzplzy2EbhwdIX6vCvsTl
+	rUEhj2+St3Wbsw7jDNB8QUWWLLp5MdCOcjxzaF5nvALqzXQHeiJbO1MgTdXUWTYma6qEIr
+	/fQJ2Y1zXfi9D3wI1RxEfpveL4EN+mY=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, Jakub Kicinski <kuba@kernel.org>
+Cc: jasowang@redhat.com, mst@redhat.com, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, sdf@fomichev.me, horms@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, bjorn@kernel.org, kerneljasonxing@gmail.com,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: busy-poll: introduce sk_tx_busy_loop()
+Date: Sun, 14 Jun 2026 18:12:46 +0800
+Message-ID: <TYn10tJ2SIGF1pAhF26DRQ@linux.dev>
+In-Reply-To: <20260613112113.55d9313f@kernel.org>
+References:
+ <20260611071242.2485058-1-dongml2@chinatelecom.cn>
+ <20260611071242.2485058-2-dongml2@chinatelecom.cn>
+ <20260613112113.55d9313f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:ygQGZQC3A5HleS5qdZhtAg--.40976S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw48Jw1kurWDCF47Kr1xZrb_yoW8KF4kpF
-	WrCF4jkFyUt34j9rn5Ja17Ar17CF4kKrW3G34rC342vFn8Wa4Fqr10vw4F9rZ0krZ5GFWj
-	qrZ7GFWjyr1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6r4fMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjWxR3UU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQESAWot2C-jUAABsR
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	CTE_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299188-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299189-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	FORGED_SENDER(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_RECIPIENTS(0.00)[m:menglong8.dong@gmail.com,m:kuba@kernel.org,m:jasowang@redhat.com,m:mst@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:magnus.karlsson@intel.com,m:maciej.fijalkowski@intel.com,m:sdf@fomichev.me,m:horms@kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:bjorn@kernel.org,m:kerneljasonxing@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:menglong8dong@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[menglong.dong@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,linux.alibaba.com,lunn.ch,davemloft.net,google.com,intel.com,fomichev.me,kernel.org,iogearbox.net,gmail.com,vger.kernel.org,lists.linux.dev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tsinghua.edu.cn:email]
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,linux.dev:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 80F01680C9A
+X-Rspamd-Queue-Id: 22C4E680D27
 
-atalk_search_socket() walks the global atalk_sockets list while holding=0D
-atalk_sockets_lock, but it returns the matching socket after dropping the=0D
-lock without taking a reference.  atalk_rcv() then passes that pointer to=0D
-sock_queue_rcv_skb().=0D
-=0D
-That leaves a race with close().  A concurrent atalk_release() can orphan=0D
-the socket, remove it from atalk_sockets, and drop the final reference via=
-=0D
-atalk_destroy_socket(), freeing the socket before atalk_rcv() queues the=0D
-incoming skb.=0D
-=0D
-On a KASAN-enabled kernel this can be reproduced by racing AppleTalk DDP=0D
-delivery on loopback against close/rebind of the destination DGRAM socket:=
-=0D
-=0D
-  BUG: KASAN: slab-use-after-free in selinux_socket_sock_rcv_skb()=0D
-  sk_filter_trim_cap()=0D
-  sock_queue_rcv_skb_reason()=0D
-  atalk_rcv()=0D
-  snap_rcv()=0D
-  llc_rcv()=0D
-=0D
-Take a reference on the selected socket before dropping=0D
-atalk_sockets_lock, and put it after sock_queue_rcv_skb() has finished.=0D
-This keeps the socket alive for the receive path without changing socket=0D
-lookup semantics.  A malformed or racing receive still drops the skb on=0D
-queueing failure as before.=0D
-=0D
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")=0D
-Cc: stable@vger.kernel.org=0D
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>=0D
-Reported-by: Ao Wang <wangao@seu.edu.cn>=0D
-Reported-by: Xuewei Feng <fengxw06@126.com>=0D
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>=0D
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
-Assisted-by: GLM:GLM-5.1=0D
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
----=0D
- net/appletalk/ddp.c | 5 ++++-=0D
- 1 file changed, 4 insertions(+), 1 deletion(-)=0D
-=0D
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c=0D
-index 30a6dc06291c..61ec5c569dc3 100644=0D
---- a/net/appletalk/ddp.c=0D
-+++ b/net/appletalk/ddp.c=0D
-@@ -131,6 +131,8 @@ static struct sock *atalk_search_socket(struct sockaddr=
-_at *to,=0D
- 	}=0D
- 	s =3D def_socket;=0D
- found:=0D
-+	if (s)=0D
-+		sock_hold(s);=0D
- 	read_unlock_bh(&atalk_sockets_lock);=0D
- 	return s;=0D
- }=0D
-@@ -1474,9 +1476,12 @@ static int atalk_rcv(struct sk_buff *skb, struct net=
-_device *dev,=0D
- 		goto drop;=0D
- =0D
- 	/* Queue packet (standard) */=0D
--	if (sock_queue_rcv_skb(sock, skb) < 0)=0D
-+	if (sock_queue_rcv_skb(sock, skb) < 0) {=0D
-+		sock_put(sock);=0D
- 		goto drop;=0D
-+	}=0D
- =0D
-+	sock_put(sock);=0D
- 	return NET_RX_SUCCESS;=0D
- =0D
- drop:=0D
--- =0D
-2.43.0=0D
+On 2026/6/14 02:21, Jakub Kicinski wrote:
+> On Thu, 11 Jun 2026 15:12:40 +0800 menglong8.dong@gmail.com wrote:
+> > For now, we use sk_busy_loop() for both rx and tx path. The sk_busy_loop()
+> > will call napi_busy_loop() for the specified napi_id. However, some
+> > nic drivers have tx napi, such as virtio-net. In this case, sk_busy_loop()
+> > doesn't work, as it can only schedule the NAPI for the rx queue.
+> > 
+> > Therefore, introduce sk_tx_busy_loop() for the nic drivers that support tx
+> > napi, which will schedule the tx napi if available.
+> 
+> First, I thought the only difference with Tx NAPI is that it can't be
+> busy polled. So if you want to poll an instance don't register it as 
+> a Tx one instead of adding all this "tx polling" stuff in the core?
+
+I see. Register the tx NAPI with netif_napi_add_config() allow us
+busy poll it. But we still have two NAPI instance: rx NAPI and tx NAPI.
+sk_busy_loop() can only busy poll on one of them.
+
+Before AF_XDP, we don't have the need to send packet via tx NAPI, which
+means that we don't need to busy poll it.
+
+I analyst some nic drivers on the implement of AF_XDP. Some of them
+will check xsk tx ring of current queue and send the data in it in the
+rx NAPI, such as mlx5. Some of them will allocate a extra "rxtx" NAPI
+for the AF_XDP zero-copy queue, which will poll both the data receiving
+and sending.
+
+In the case about, they will do the data sending and receiving for the
+AF_XDP in a single NAPI instance.
+
+However, some driver receiving the data in rx NAPI and send data in
+tx NAPI for AF_XDP. In this case, we can't use sk_busy_loop() for both
+rx path and tx path, as we need to wake different NAPI instance.
+
+> 
+> Second, can this problem happen for any other NIC or is it purely 
+> an artifact of virtio's delayed Tx completion handling?
+
+According to my analysis, only virtio-net and ICSSG driver have
+split NAPI for AF_XDP. I don't have a ICSSG nic, but the codex tell
+me that it does have the same problem.
+
+I'm not sure if it is a good idea to introduce the sk_tx_busy_loop().
+Maybe we can modify the driver instead by using the same NAPI
+for both data sending and receiving, just like others do. The
+advantage of introduce sk_tx_busy_loop() is that we can split the
+data sending and receiving, which maybe more efficient.
+
+> 
+> Third, this series does not apply.
+
+Ah, I'll rebase this series if a V2 is acceptable.
+
+Thanks!
+Menglong Dong
+
+> 
+> 
+
+
+
 
 
