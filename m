@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299122-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id A9aBBeEGLmqHogQAu9opvQ
-	(envelope-from <netdev+bounces-299123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:53 +0200
+	id +CtgHeIGLmqLogQAu9opvQ
+	(envelope-from <netdev+bounces-299122-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA848680315
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8060B680318
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=CHVZ2fM8;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299123-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299123-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Iqos+tAi;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299122-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299122-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B221C300827E
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:41:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DDC2D30028C1
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726542F3C0E;
-	Sun, 14 Jun 2026 01:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989562EEE86;
+	Sun, 14 Jun 2026 01:41:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBDE2DC792;
-	Sun, 14 Jun 2026 01:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A862DF13E;
+	Sun, 14 Jun 2026 01:41:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781401276; cv=none; b=SGyGSsOCI8tgHetLdghd0ym6ZyYm6ku5fUm8KKcGnIZX+pjRmcAfIkCH8WfkyThzp+nH4RgQyIa12nlDo3WOQoHpfWi9kDXtiZsfSM6HV9OMfAuE+JCZ8TQ2zXo+6hgyflq/SItg/jRyivYehFc+JX6KoOs0qt4bMBENjTYpmn8=
+	t=1781401275; cv=none; b=t6HzK8cC4MZ5WGp7djCm+fnXGRRilW6XeHmdMmMsv2jhysw+2HIOP95q+anjlUsxXGBUiEE0QeVvJ2QNBfx7s8zo3pigCd+oGpkJ/bopTpyxEmp7wBMLyq87cf5pznmuMz8eQrB3T5YmLanmtsmX+TBqVnKXOOQ8DvWTa5YPnFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781401276; c=relaxed/simple;
-	bh=Dfq4rqHWCwT3nPKj71n9zKUiELt4N2MN2Kq2IUB8e/s=;
+	s=arc-20240116; t=1781401275; c=relaxed/simple;
+	bh=ISa/DXzSgeGIvrWJ+HZnkPQr03s2ycoDfKQPzEkcu+Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PGJKMgIvuR7M7iGseclx8+KHkg4tPLPJ8LR6Tnrf4q0ECOZX2K107qy7EvtNw/14FPfBTfxRfMlBL7nqeFxm9IokfCBJAxd8dSrPSVxnG6OkDSiDp8b5tWdh9mlzxGIpzTX4eG+7ff/99ffpooAGup1a1Y2iC22DWhQ2yonXsl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHVZ2fM8; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 226521F00A3A;
+	 MIME-Version; b=qaHl8R9v6ZEPLI6mj7mnIiWVH4vfDa0wN70sUAtsdWVUzHtSootqxIM58Ac7bjKsjmDq1XKftkXZSb2X+95H4ieom/ExYQ1JMLFHXP842oWMNTqXlfD7ynbaVaGngGGBbKfPWDJEdaDq1rW8XooHbWzIR6RD8Rm/YV7f1Y4yYLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iqos+tAi; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC0BD1F00AC4;
 	Sun, 14 Jun 2026 01:41:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781401273;
-	bh=/6EDfIZXeHHODbKy06fZZgFvI36Mh7h4earTSixEw2A=;
+	s=k20260515; t=1781401274;
+	bh=rYmuOmNLYOY4fdz1dN9kugcvBM9uiz/C0xCi+CMr1lE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=CHVZ2fM8ybyBfBu13yBRlI+LagVafzzz0P7wwFG/8lCtXi0QNyEGHF6jDnOtUk6dJ
-	 SS1xD6oA0bZ82sF+bgLnEq6kdn5wZIodvc9eaNm0QBY+EHuBpm8h9xRHOlhpCP8zrL
-	 iUUzwqhD/NoOCTqxdP0ot+NlRK9hoXIG4vfh+EhBDcStQpkUr2JWmrIOlVdLQMqRd3
-	 RNlP1PbNP8ZCPFrM0fT/mCAi6/B6A1pp5bCWPrG+57LFFpD8197aRYAry4BqL+QAdE
-	 Y+VAPtpLcLKn3GUsEnyF3ebzAO+sou7sabIm3TyTvKrQ2qzzB31kxs6rJJWuyWgihP
-	 8dWxLl6pQOomw==
+	b=Iqos+tAiL9Nd7npO8B9H4TmFwZaJ9Ct2dXUtEYGCyM98pX3n3ReTTcqt8GW1rlYAQ
+	 06e146EQMSkF/GIRSRQKetd2Ncwv1AY/hFNl/OR+MqbBuff676usB9L5jUnHTtVY5C
+	 ZL+PLvBODfmFXD8vmWaNLj3u5Ub+FBzHKVLb8821zqsgze4T23bxiqifYt0aStvWlG
+	 4P1ZC0pvSWrd2tGJss0+1Atv1XjwcZJgW92h4a2AXQ503Oe4dcDi1qKzFllRCPSmr8
+	 VGinFeX7enP2btV6LhTMah7+KRt3Tf+kITG+gFHPdIpW1r7RN/Qa0qUR9E4JSzwZPj
+	 peDnTjAekt+OQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	john.fastabend@gmail.com,
 	sd@queasysnail.net,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/5] selftests/bpf: drop the unused kTLS program from test_sockmap
-Date: Sat, 13 Jun 2026 18:40:59 -0700
-Message-ID: <20260614014102.461064-5-kuba@kernel.org>
+Subject: [PATCH net-next 5/5] selftests/bpf: test that TLS crypto is rejected on a sockmap socket
+Date: Sat, 13 Jun 2026 18:41:00 -0700
+Message-ID: <20260614014102.461064-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260614014102.461064-1-kuba@kernel.org>
 References: <20260614014102.461064-1-kuba@kernel.org>
@@ -79,7 +79,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,cloudflare.com,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-299123-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299122-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -102,170 +102,106 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: AA848680315
+X-Rspamd-Queue-Id: 8060B680318
 
-With the sockmap + kTLS tests gone, the BPF-side support in test_sockmap
-is dead: the tls_sock_map map and bpf_prog3 (which redirected skbs into
-it) are no longer referenced. Remove them, along with the now-unused
-bpf_write_pass() helper.
-
-bpf_prog3 was progs[2], so renumber the progs[] users in test_sockmap.c:
-the sockops program drops to progs[2] and the sk_msg tx programs to
-progs[3..7]. Shrink the map/prog arrays from 9 to 8 and drop the
-tls_sock_map entry (the last one) from map_names[] to match.
+TLS and sockmap are mutually exclusive. We already have a test
+for the sockmap side rejecting kTLS, add the inverse test matching
+patch 1 of this series.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../selftests/bpf/progs/test_sockmap_kern.h   | 56 -------------------
- tools/testing/selftests/bpf/test_sockmap.c    | 23 ++++----
- 2 files changed, 11 insertions(+), 68 deletions(-)
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 65 +++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-index f48f85f1bd70..284a2f2e50cf 100644
---- a/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_kern.h
-@@ -85,13 +85,6 @@ struct {
- 	__type(value, int);
- } sock_skb_opts SEC(".maps");
- 
--struct {
--	__uint(type, TEST_MAP_TYPE);
--	__uint(max_entries, 20);
--	__uint(key_size, sizeof(int));
--	__uint(value_size, sizeof(int));
--} tls_sock_map SEC(".maps");
--
- SEC("sk_skb/stream_parser")
- int bpf_prog1(struct __sk_buff *skb)
- {
-@@ -135,55 +128,6 @@ int bpf_prog2(struct __sk_buff *skb)
- 
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+index cda6b22cf759..34737e8df6ea 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+@@ -116,6 +116,68 @@ static void test_sockmap_ktls_update_fails_when_sock_has_ulp(int family, int map
+ 	close(s);
  }
  
--static inline void bpf_write_pass(struct __sk_buff *skb, int offset)
--{
--	int err = bpf_skb_pull_data(skb, 6 + offset);
--	void *data_end;
--	char *c;
--
--	if (err)
--		return;
--
--	c = (char *)(long)skb->data;
--	data_end = (void *)(long)skb->data_end;
--
--	if (c + 5 + offset < data_end)
--		memcpy(c + offset, "PASS", 4);
--}
--
--SEC("sk_skb/stream_verdict")
--int bpf_prog3(struct __sk_buff *skb)
--{
--	int err, *f, ret = SK_PASS;
--	const int one = 1;
--
--	f = bpf_map_lookup_elem(&sock_skb_opts, &one);
--	if (f && *f) {
--		__u64 flags = 0;
--
--		ret = 0;
--		flags = *f;
--
--		err = bpf_skb_adjust_room(skb, -13, 0, 0);
--		if (err)
--			return SK_DROP;
--		err = bpf_skb_adjust_room(skb, 4, 0, 0);
--		if (err)
--			return SK_DROP;
--		bpf_write_pass(skb, 0);
--#ifdef SOCKMAP
--		return bpf_sk_redirect_map(skb, &tls_sock_map, ret, flags);
--#else
--		return bpf_sk_redirect_hash(skb, &tls_sock_map, &ret, flags);
--#endif
--	}
--	err = bpf_skb_adjust_room(skb, 4, 0, 0);
--	if (err)
--		return SK_DROP;
--	bpf_write_pass(skb, 13);
--	return ret;
--}
--
- SEC("sockops")
- int bpf_sockmap(struct bpf_sock_ops *skops)
++static void test_sockmap_ktls_enable_fails_when_in_sockmap(int family, int map)
++{
++	struct tls12_crypto_info_aes_gcm_128 crypto = {
++		.info = {
++			.version     = TLS_1_2_VERSION,
++			.cipher_type = TLS_CIPHER_AES_GCM_128,
++		},
++	};
++	struct sockaddr_storage addr = {};
++	socklen_t len = sizeof(addr);
++	struct sockaddr_in6 *v6;
++	struct sockaddr_in *v4;
++	int err, s, zero = 0;
++
++	switch (family) {
++	case AF_INET:
++		v4 = (struct sockaddr_in *)&addr;
++		v4->sin_family = AF_INET;
++		break;
++	case AF_INET6:
++		v6 = (struct sockaddr_in6 *)&addr;
++		v6->sin6_family = AF_INET6;
++		break;
++	default:
++		PRINT_FAIL("unsupported socket family %d", family);
++		return;
++	}
++
++	s = socket(family, SOCK_STREAM, 0);
++	if (!ASSERT_GE(s, 0, "socket"))
++		return;
++
++	err = bind(s, (struct sockaddr *)&addr, len);
++	if (!ASSERT_OK(err, "bind"))
++		goto close;
++
++	err = getsockname(s, (struct sockaddr *)&addr, &len);
++	if (!ASSERT_OK(err, "getsockname"))
++		goto close;
++
++	err = connect(s, (struct sockaddr *)&addr, len);
++	if (!ASSERT_OK(err, "connect"))
++		goto close;
++
++	/* Add the socket to the sockmap, attaching a psock. */
++	err = bpf_map_update_elem(map, &zero, &s, BPF_ANY);
++	if (!ASSERT_OK(err, "sockmap update elem"))
++		goto close;
++
++	/* Installing the TLS ULP is allowed, it does not touch the datapath. */
++	err = setsockopt(s, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
++	if (!ASSERT_OK(err, "setsockopt(TCP_ULP)"))
++		goto close;
++
++	/* Enabling the TLS crypto datapath must be rejected. */
++	err = setsockopt(s, SOL_TLS, TLS_TX, &crypto, sizeof(crypto));
++	ASSERT_ERR(err, "setsockopt(TLS_TX)");
++
++close:
++	close(s);
++}
++
+ static const char *fmt_test_name(const char *subtest_name, int family,
+ 				 enum bpf_map_type map_type)
  {
-diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
-index 32d6068df4b3..ac814eb63edb 100644
---- a/tools/testing/selftests/bpf/test_sockmap.c
-+++ b/tools/testing/selftests/bpf/test_sockmap.c
-@@ -55,10 +55,10 @@ int s1, s2, c1, c2, p1, p2;
- int test_cnt;
- int passed;
- int failed;
--int map_fd[9];
--struct bpf_map *maps[9];
--struct bpf_program *progs[9];
--struct bpf_link *links[9];
-+int map_fd[8];
-+struct bpf_map *maps[8];
-+struct bpf_program *progs[8];
-+struct bpf_link *links[8];
+@@ -170,6 +232,9 @@ static void run_tests(int family, enum bpf_map_type map_type)
+ 	if (test__start_subtest(fmt_test_name("update_fails_when_sock_has_ulp", family, map_type)))
+ 		test_sockmap_ktls_update_fails_when_sock_has_ulp(family, map);
  
- int txmsg_pass;
- int txmsg_redir;
-@@ -967,7 +967,7 @@ static int run_options(struct sockmap_options *options, int cg_fd,  int test)
- 	}
++	if (test__start_subtest(fmt_test_name("enable_fails_when_in_sockmap", family, map_type)))
++		test_sockmap_ktls_enable_fails_when_in_sockmap(family, map);
++
+ 	close(map);
+ }
  
- 	/* Attach to cgroups */
--	err = bpf_prog_attach(bpf_program__fd(progs[3]), cg_fd, BPF_CGROUP_SOCK_OPS, 0);
-+	err = bpf_prog_attach(bpf_program__fd(progs[2]), cg_fd, BPF_CGROUP_SOCK_OPS, 0);
- 	if (err) {
- 		fprintf(stderr, "ERROR: bpf_prog_attach (groups): %d (%s)\n",
- 			err, strerror(errno));
-@@ -983,15 +983,15 @@ static int run_options(struct sockmap_options *options, int cg_fd,  int test)
- 
- 	/* Attach txmsg program to sockmap */
- 	if (txmsg_pass)
--		tx_prog = progs[4];
-+		tx_prog = progs[3];
- 	else if (txmsg_redir)
--		tx_prog = progs[5];
-+		tx_prog = progs[4];
- 	else if (txmsg_apply)
--		tx_prog = progs[6];
-+		tx_prog = progs[5];
- 	else if (txmsg_cork)
--		tx_prog = progs[7];
-+		tx_prog = progs[6];
- 	else if (txmsg_drop)
--		tx_prog = progs[8];
-+		tx_prog = progs[7];
- 	else
- 		tx_prog = NULL;
- 
-@@ -1218,7 +1218,7 @@ static int run_options(struct sockmap_options *options, int cg_fd,  int test)
- 		fprintf(stderr, "unknown test\n");
- out:
- 	/* Detach and zero all the maps */
--	bpf_prog_detach2(bpf_program__fd(progs[3]), cg_fd, BPF_CGROUP_SOCK_OPS);
-+	bpf_prog_detach2(bpf_program__fd(progs[2]), cg_fd, BPF_CGROUP_SOCK_OPS);
- 
- 	for (i = 0; i < ARRAY_SIZE(links); i++) {
- 		if (links[i])
-@@ -1724,7 +1724,6 @@ char *map_names[] = {
- 	"sock_bytes",
- 	"sock_redir_flags",
- 	"sock_skb_opts",
--	"tls_sock_map",
- };
- 
- static int populate_progs(char *bpf_file)
 -- 
 2.54.0
 
