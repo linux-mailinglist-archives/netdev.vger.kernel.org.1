@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-299118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299119-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Sto0AL0GLmp2ogQAu9opvQ
-	(envelope-from <netdev+bounces-299118-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:17 +0200
+	id Hi5kDsIGLmp7ogQAu9opvQ
+	(envelope-from <netdev+bounces-299119-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2566802F6
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBABF6802FD
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 03:41:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=aA0axU2h;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299118-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299118-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HE4CvqC1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299119-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299119-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21AC2300B75A
-	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:41:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E8E223004D2F
+	for <lists+netdev@lfdr.de>; Sun, 14 Jun 2026 01:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD96B27A10F;
-	Sun, 14 Jun 2026 01:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FEA2D0622;
+	Sun, 14 Jun 2026 01:41:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E7E7263B;
-	Sun, 14 Jun 2026 01:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C673220698;
+	Sun, 14 Jun 2026 01:41:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781401271; cv=none; b=H4jRE0puvV/fsVH3F/BgPJGbH+pISfLa9ytINV5VL/Uak8iBzvBZGTbGSax9R2cFt3uVVNDXvvYtXMLT9DG6toulAMJ9wHaxuC6VtNrbM4LblRZjYl4J3PZUyIaOQeU+k2OelSQBHMlhDT5iy72j7eox4P/3ETJfsphvtSDXzvE=
+	t=1781401272; cv=none; b=hqBtXQLuJmwEM9iaefo9BHokb4HpMfnIY5XzYY4Qbd2rM8cSVRxESqWw3I4xgz5SF9E6aVvukKOWH9VLrDWhrC3VuGEjUohc68UPgwjXGyrS1wALuwjsxKm9qFKGwBLkPNO+/fySDWlzVaguxcRuIIzJXaClAJtHvetkcUWSBwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781401271; c=relaxed/simple;
-	bh=JbZdSQrPsoMtCoCsQlptOjGGwGXcWES02t3ZM4IaYqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WN30PHUTHIn1a5sLy+6yEFwM609MtpkRnU6Sdo80qH9ctFfDRo7yQKUlIT8fxabu5GGnOAwkqc8U7Eu2rBjlFRUyA/fCwz6/Kp3jWKHmP2BA+D1ad0MfI4PLeTUv4npScTgd5I9C0avg1cuZrt1OqTsDy/XkWKD7GarivfsLGKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aA0axU2h; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9749D1F000E9;
-	Sun, 14 Jun 2026 01:41:09 +0000 (UTC)
+	s=arc-20240116; t=1781401272; c=relaxed/simple;
+	bh=6ZtoVeNGv2HY0+HwNyGzEio7mlqG+hG8ysuvDF46ANo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CRXBM5wOYNlrP6b4xeodEuOP6alZRugkU59xLHFaucRHR2fkXzvoFSh42dcRM55SaIFJTm6kB2c3tyx/93U8qiL7af6RJmsQiHx6cTWCGgAlM5i5+rtn/tdA0d7DMMCejTqLTjc50FbDWkwpH9Q3y2eMXI+PZKJZWldvkkfO+bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HE4CvqC1; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0318F1F00A3A;
+	Sun, 14 Jun 2026 01:41:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781401270;
-	bh=H2kWOLsf3qvRadBE6Tkjq3oEXqykXbMUDicFB5vUenA=;
-	h=From:To:Cc:Subject:Date;
-	b=aA0axU2hVYwip/24PcDgxNB4zkkKDLjFpi3oqBAVMNDaoAyAr7CkCLj1ALyhA0IXV
-	 Er4wWr2AOOt4cIVmYRzM0oqy/q9lIYElntDWfCuPPEZxXhqemZyYiXf08ZloeEyKm8
-	 QT9fSjIK83svkl/gTFvq7nJ8+fXmbf9tRGFmU8UqBkkoGSNrbiwRJOyL4BXoAp5p/S
-	 TAZ8ZMnBBSmvbWRqtv+XiQfaMu5SN4IDRB2Uh5uh2y8APd+QrH7SSlcZdjMFM8AfSG
-	 IE7MCr0HpzwA1ecIOyijMraIfuAj+eAXvkpKR9ClAxonpTXc7TVnmQE0hxfpaMbi6Q
-	 mmIvPf+l7Gcyg==
+	s=k20260515; t=1781401271;
+	bh=z+qwfR01qpsEEPHdOe1UAxcK9c4EBGjnwGheZ82rpLs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=HE4CvqC1xUrAx1iKsGTJoTpM2diFvkLkwwtZrLxmFYUEd8E+kYlXlVlnp3CF/gePh
+	 P1IPbbeGDUwP4sH/UluCImsg/XYhk/RNH6iPEo2eXnQHCrYkfxXSZ/C4TnolELUoyr
+	 9yJde2uPo2155+UbqhrJs1SIimV1HtN2G0j/pXSR7sugPAvJEcHBqgG8EKVjzTMi3g
+	 uOBFDH8BYeBpJWaDp/8l1ELZAIe1QpM2lTLDrxNoSxfs7Kyu2ceitvgIocdV5BX+9e
+	 uhybdbND8SvCGwl7v4SSlkVmp3CGgTym62extBU+bhDbPg8S60quG1XbQFhBPXXpXk
+	 dC0NV9LAseKGg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -57,10 +58,12 @@ Cc: netdev@vger.kernel.org,
 	john.fastabend@gmail.com,
 	sd@queasysnail.net,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/5] tls: reject the combination of TLS and sockmap
-Date: Sat, 13 Jun 2026 18:40:55 -0700
-Message-ID: <20260614014102.461064-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/5] tls: reject the combination of TLS and sockmap
+Date: Sat, 13 Jun 2026 18:40:56 -0700
+Message-ID: <20260614014102.461064-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260614014102.461064-1-kuba@kernel.org>
+References: <20260614014102.461064-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +79,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -84,7 +87,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,cloudflare.com,gmail.com,queasysnail.net];
-	TAGGED_FROM(0.00)[bounces-299118-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299119-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -99,36 +102,57 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5A2566802F6
+X-Rspamd-Queue-Id: CBABF6802FD
 
-There are no known TLS+sockmap users and it has some known
-hard to solve bugs. Let's reject this configuration as we
-discussed a number of times.
+TLS and sockmap (BPF psock) integration hides a lot of latent bugs.
+Bugs which may be more or less relevant for real users but they
+are definitely exploitable.
 
-Jakub Kicinski (5):
-  tls: reject the combination of TLS and sockmap
-  tls: remove dead sockmap (psock) handling from the SW path
-  selftests/bpf: remove sockmap + ktls tests
-  selftests/bpf: drop the unused kTLS program from test_sockmap
-  selftests/bpf: test that TLS crypto is rejected on a sockmap socket
+We could not find anyone actively using this integration so let's
+reject this config. Adding a TLS socket to a sockmap was already
+rejected by sk_psock_init() through the inet_csk_has_ulp() check.
+We need to reject the attempts to configure the TLS keys (rather
+than adding the ULP itself) because checking prior to the ULP
+installation is tricky without risking a race with sockmap getting
+added in parallel (sockmap does not hold the socket lock).
 
- include/linux/skmsg.h                         |   9 -
- .../selftests/bpf/progs/test_sockmap_kern.h   |  56 ---
- net/core/skmsg.c                              |  52 +--
- net/tls/tls_main.c                            |  19 +-
- net/tls/tls_sw.c                              | 399 ++---------------
- .../selftests/bpf/prog_tests/sockmap_ktls.c   | 420 +++---------------
- .../selftests/bpf/progs/test_sockmap_ktls.c   |  61 ---
- tools/testing/selftests/bpf/test_sockmap.c    | 250 +----------
- 8 files changed, 119 insertions(+), 1147 deletions(-)
- delete mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
+This patch is a minimal rejection of the feature. Subsequent patch
+in the series will do a light dead code removal. Full cleanup would
+require a major rewrite of the Tx path, we don't need skmsg any more.
 
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/tls/tls_main.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 13c88a7b8787..8e7ba018988d 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -643,6 +643,17 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
+ 	int rc = 0;
+ 	int conf;
+ 
++	/* TLS and sockmap are mutually exclusive. A socket already in a
++	 * sockmap (i.e. with a psock attached) cannot be upgraded to TLS.
++	 * sockmap rejects TLS sockets already (see sk_psock_init()).
++	 */
++	rcu_read_lock();
++	if (sk_psock(sk)) {
++		rcu_read_unlock();
++		return -EINVAL;
++	}
++	rcu_read_unlock();
++
+ 	if (sockptr_is_null(optval) || (optlen < sizeof(*crypto_info)))
+ 		return -EINVAL;
+ 
 -- 
 2.54.0
 
