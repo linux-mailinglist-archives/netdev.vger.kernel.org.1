@@ -1,243 +1,182 @@
-Return-Path: <netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299397-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3xI/NoPWL2r2HgUAu9opvQ
-	(envelope-from <netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:40:03 +0200
+	id /MQQDwPaL2q2HwUAu9opvQ
+	(envelope-from <netdev+bounces-299397-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:54:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EBDA68563B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:40:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883CC68581C
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:54:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=iPDF9ezI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299397-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299397-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED1C53011071
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:40:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7410930E6FF6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0136330B535;
-	Mon, 15 Jun 2026 10:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863423431EF;
+	Mon, 15 Jun 2026 10:49:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AB21990C7;
-	Mon, 15 Jun 2026 10:39:53 +0000 (UTC)
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3758634216C
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 10:49:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781519999; cv=none; b=jlc82U6UXLkiFnEDxYzDGj2l8VEEglWAf/IOcmsCkprniqq2LIcnkLs1PEEU94CEVrTwABICWlGDvSr1Rk6Hdyh2IbG0qgc+tRe7nF7pMHzpiPDVUrt5+3IcHNXGIOjyMNAfYajsNhYefXmJR70q0z0IVIHWaAFZOeNGHH7urJY=
+	t=1781520585; cv=none; b=D+aUDQqE5SWEEpqgPAcBvVS/n4wTa7E1JWzEsaHLkZenU8JJnqomqbkJLvnWOkW49ObuIXe9neZ++VcE13wPsoMujW2YmcBwoMxjnYNzx7GTszcRWj0I5naK6q6KMLdr+gaRVsp8fCZyA4cYmZrYB1ud8/ih9YZ9tNnivPXtiA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781519999; c=relaxed/simple;
-	bh=pjPunVM0Lju5iCYpWfHWOCfJjBSSKWp+2Ebpbpdwyzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f+rHAceLbIsU6uqFH0x+Llm8PcwvzB2KKU2g6cnt6ayNf6bNukkxnQzu0zWhBYANIhLppB/WWn1avt1tiqYTCeCRFYC/oVy1sa1LuNpxbsQdy+Bz7gRvup7wwh2cTmIZwF0cY3WCXJhyPlOLEXEFKgQ+28PL4yqfhSH2KxJ75AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=iPDF9ezI; arc=none smtp.client-ip=206.189.21.223
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=GFlRp
-	zpDSFpH2nXPFhy658PC3HdI4pPCMhyiMaEt5+o=; b=iPDF9ezIPMCnyryfxg9vi
-	Ab68Jc4ez7nJR6APfcaSS8CI116I7wnPwRo88mtTam3AkwukvXafC6fewza0OifO
-	P/E/LVtUszh85noQoKe2zuTMcVjAMl9UWVQBccph/Vz4nZYaj3Pnn0A+ziowFsge
-	Qx2TFqTLuLZDc5Z3V/2l/s=
-Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
-	by web5 (Coremail) with SMTP id zAQGZQDXYLtp1i9qZENxAg--.8653S2;
-	Mon, 15 Jun 2026 18:39:37 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+	s=arc-20240116; t=1781520585; c=relaxed/simple;
+	bh=xxEr1M+MbPn727hYmofElG9s4cK91diKEcUKZP5wQa4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G/vrOPqQk2WQVhHUMCJkEbZxEB6K0icuMIOYd9reh2CFoTOgxq1d1htgxWJ/QF7uS+x2IuGeNO3NMIS+IbLQr1svqXByCo7MBNi7YWj8r4WES8lHuDDKVyEyD68q3FPEO/E7O1fdodCHnMsSEpzQBw6hAVTtvQKV8hQLE78ZU6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.207.22.56
+X-QQ-mid: esmtpsz19t1781520532tc60b38e4
+X-QQ-Originating-IP: JG1aL85oLVtuCvSBM6Zbu2Y40Zp3dT/rXRmMrxF2r5c=
+Received: from localhost.localdomain ( [183.157.22.210])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 15 Jun 2026 18:48:51 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 15955490062102303072
+EX-QQ-RecipientCnt: 7
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Kito Xu <veritas501@foxmail.com>,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net] appletalk: fix use-after-free in atalk_find_primary()
-Date: Mon, 15 Jun 2026 18:39:28 +0800
-Message-ID: <20260615103930.1484-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.53.0.windows.2
+Cc: jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v5 0/3] net: libwx: improve VF ethtool support
+Date: Mon, 15 Jun 2026 18:48:46 +0800
+Message-Id: <20260615104849.60444-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:zAQGZQDXYLtp1i9qZENxAg--.8653S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFyfKFy7Ary5ur48Ar1UKFg_yoWrXF4xpF
-	W7urWqka4DX34Ygr4DJrW7AF15Cry8K3y3Cr1rG3W0yrn0gr9a9a40yryavFnIkr97GrZ5
-	JryxK3s7ZF4UCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
-	v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOv38UUUU
-	U
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQETAWovr0JGUAAAss
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5b-1
+X-QQ-XMAILINFO: MIqIAkDP7HbSCN1qUzQP9Hti7etOXPIFlux4nzVIhJFit2nkXbec200u
+	aP7VHVRhHbyxPrHy/tgLwO6gfhHbbW4deOHbLmF+pCgUPRJxvX8kyP3EBppIrPDifuahTIn
+	vsAmwI0PxgQsA9Z66i7xZ//MxUgU0fd+9+uvaF15Gbiwc7xPG1XsQwpESltzlctVNt+l9/e
+	GeIPnqs3hUh+enqm+YkXQx2k28NQ60ovIYllAfm8rZ1HbsRfX3RxZQedKJLvm48xGCa5eJJ
+	EJi4IQ3WdT1cRYOZscX7BmYR/QDhOs71HWdj8is2W8YMpFP/sojIic7CytnDuHfZzqHHxYF
+	Rk42iiJvLrP52/cp2A4LO4f6Ok9SfNeYCgXD60tU8FdVvuIeqN3/oH4dE818cgfo4z4bNKx
+	oY4PjZxYvu56BY0ufWVXaYEraGyGZlJg2QFXT/RmyA2LsBsYXJXUJkU3TjlNzRWCysG2nXa
+	vXWO9TgYjOIwxcASfTU3KrFlYylz1YSKD8wVMv3P5WnWz7nLuQgPLf4hL2CESn1R8BXS+Zl
+	Cg7q3YESg6k/MjIoCsRxZqkCVWq1qD4w24RoAuQDrmzSFjSwNY/35sZ8H7ouD8BsWwHVeUF
+	TxacrJxddwjzmZUQUWcmtxRW7y9Y1KCCQOxFWOx5oSCDLXtxzybLJ6HhuIV3j7aOjFyz5qb
+	/dh22KOZFqTXJN4rj4zKLyYy74NpqpzFhcoaAdN7DqoucZES32jF6j4/iaia37mPtEiYAAM
+	6QWzObsp/8N97TqMNrrMyHMeCyjxE+p6Fr4oAo8eqMEiEk8/JGqagiVOXxmQXgIDaTSHKzT
+	xk06FH1xDnEIRB+/lvoXm1lkzTwhU1A5CKWvQqmA+3Qe2AXlHUmxZ9pEkHzLNsoWIrjOyTV
+	JogZaKtINdCTJ3aqXJz7+CcurPHPxYc9JdWR+q1W0X13mfwa1u1ypNcfa8XahEh3ToIe9nT
+	wgj0iWb2Bd+p95QfMbO8UoA9HEnsvz3ZbegGEnffE4T62Qxpjxk0xV8kKOU9UktlOozA4ds
+	Xv6jG0dYG3rIB3zymG+9t6e082RZZs9g1HQTGXtmXGPUyV8hHc9nLDn/EnuZh89MldDxBR3
+	hT5+EZMyLnRdgyLlMnYDKWgDywCETym/UustrNY4wKjd7PaQLP+NLxu1UPBNUslKEk5GKtI
+	T8aG87PRV3rS66xkt6Sb4HWYUH4uB7zaE9teYCz+4WhxnDo=
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
-	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299393-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-299397-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[net-swift.com];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jiawenwu@trustnetic.com,m:duanqiangwen@net-swift.com,m:horms@kernel.org,m:kuba@kernel.org,m:pabeni@redhat.com,m:mengyuanlou@net-swift.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
-	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mengyuanlou@net-swift.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tsinghua.edu.cn:email]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,net-swift.com:mid,net-swift.com:from_mime,linux.dev:url,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0EBDA68563B
+X-Rspamd-Queue-Id: 883CC68581C
 
-atalk_find_primary() walks the global AppleTalk interface list under=0D
-atalk_interfaces_lock, but returns a pointer to iface->address after=0D
-dropping that lock.  Both atalk_autobind() and atalk_bind() then=0D
-dereference the returned pointer without any lifetime protection.=0D
-=0D
-The interface can be removed concurrently through the normal AppleTalk=0D
-interface ioctl path.  SIOCATALKDIFADDR calls atalk_dev_down(), which=0D
-eventually reaches atif_drop_device() and frees the same struct=0D
-atalk_iface that owns the returned address field.  A racing bind can=0D
-therefore read from freed memory.=0D
-=0D
-This is reachable with a configured AppleTalk interface; reproducing the=0D
-race does not require a malicious device or driver.  The configuration=0D
-ioctls require CAP_NET_ADMIN in the initial user namespace, and=0D
-AF_APPLETALK sockets are limited to init_net.=0D
-=0D
-Fix the lifetime issue without changing the returned address pointer=0D
-type.  Rename the helper to atalk_find_primary_locked() and keep=0D
-atalk_interfaces_lock held across the return.  The callers now copy=0D
-s_net and s_node while the lock is still held, then immediately release=0D
-the lock before doing any further work.=0D
-=0D
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")=0D
-Cc: stable@vger.kernel.org=0D
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>=0D
-Reported-by: Ao Wang <wangao@seu.edu.cn>=0D
-Reported-by: Xuewei Feng <fengxw06@126.com>=0D
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>=0D
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
-Assisted-by: GLM:GLM-5.1=0D
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
----=0D
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c=0D
-index 30a6dc06291c..4d6576cd0ae8 100644=0D
---- a/net/appletalk/ddp.c=0D
-+++ b/net/appletalk/ddp.c=0D
-@@ -351,7 +351,7 @@ struct atalk_addr *atalk_find_dev_addr(struct net_devic=
-e *dev)=0D
- 	return iface ? &iface->address : NULL;=0D
- }=0D
- =0D
--static struct atalk_addr *atalk_find_primary(void)=0D
-+static struct atalk_addr *atalk_find_primary_locked(void)=0D
- {=0D
- 	struct atalk_iface *fiface =3D NULL;=0D
- 	struct atalk_addr *retval;=0D
-@@ -378,7 +378,6 @@ static struct atalk_addr *atalk_find_primary(void)=0D
- 	else=0D
- 		retval =3D NULL;=0D
- out:=0D
--	read_unlock_bh(&atalk_interfaces_lock);=0D
- 	return retval;=0D
- }=0D
- =0D
-@@ -1132,20 +1131,24 @@ static int atalk_autobind(struct sock *sk)=0D
- {=0D
- 	struct atalk_sock *at =3D at_sk(sk);=0D
- 	struct sockaddr_at sat;=0D
--	struct atalk_addr *ap =3D atalk_find_primary();=0D
-+	struct atalk_addr *ap =3D atalk_find_primary_locked();=0D
- 	int n =3D -EADDRNOTAVAIL;=0D
- =0D
- 	if (!ap || ap->s_net =3D=3D htons(ATADDR_ANYNET))=0D
--		goto out;=0D
-+		goto unlock_and_out;=0D
- =0D
- 	at->src_net  =3D sat.sat_addr.s_net  =3D ap->s_net;=0D
- 	at->src_node =3D sat.sat_addr.s_node =3D ap->s_node;=0D
-+	read_unlock_bh(&atalk_interfaces_lock);=0D
- =0D
- 	n =3D atalk_pick_and_bind_port(sk, &sat);=0D
- 	if (!n)=0D
- 		sock_reset_flag(sk, SOCK_ZAPPED);=0D
- out:=0D
- 	return n;=0D
-+unlock_and_out:=0D
-+	read_unlock_bh(&atalk_interfaces_lock);=0D
-+	goto out;=0D
- }=0D
- =0D
- /* Set the address 'our end' of the connection */=0D
-@@ -1165,14 +1168,15 @@ static int atalk_bind(struct socket *sock, struct s=
-ockaddr_unsized *uaddr, int a=0D
- =0D
- 	lock_sock(sk);=0D
- 	if (addr->sat_addr.s_net =3D=3D htons(ATADDR_ANYNET)) {=0D
--		struct atalk_addr *ap =3D atalk_find_primary();=0D
-+		struct atalk_addr *ap =3D atalk_find_primary_locked();=0D
- =0D
- 		err =3D -EADDRNOTAVAIL;=0D
- 		if (!ap)=0D
--			goto out;=0D
-+			goto unlock_and_out;=0D
- =0D
- 		at->src_net  =3D addr->sat_addr.s_net =3D ap->s_net;=0D
- 		at->src_node =3D addr->sat_addr.s_node =3D ap->s_node;=0D
-+		read_unlock_bh(&atalk_interfaces_lock);=0D
- 	} else {=0D
- 		err =3D -EADDRNOTAVAIL;=0D
- 		if (!atalk_find_interface(addr->sat_addr.s_net,=0D
-@@ -1201,6 +1205,9 @@ static int atalk_bind(struct socket *sock, struct soc=
-kaddr_unsized *uaddr, int a=0D
- out:=0D
- 	release_sock(sk);=0D
- 	return err;=0D
-+unlock_and_out:=0D
-+	read_unlock_bh(&atalk_interfaces_lock);=0D
-+	goto out;=0D
- }=0D
- =0D
- /* Set the address we talk to */=0D
-=0D
---=0D
-2.43.0=
+This series improves ethtool support for Wangxun VF drivers
+(ngbevf and txgbevf) in libwx.
+
+This series extends VF support by enabling:
+ring parameter configuration via ethtool -G
+interrupt coalescing configuration via ethtool -C
+per-queue statistics reporting via ethtool -S
+
+Patch 1 adds support for set_ringparam in wx_ethtool_ops_vf,
+allowing VF users to adjust TX/RX descriptor ring sizes.
+Patch 2 enables set_coalesce support for VF devices and updates
+EITR programming to use the VF-specific register access helper.
+Patch 3 adds VF statistics support so ethtool -S can
+report useful runtime counters for VF interfaces.
+
+Changelog:
+v5:
+- patch 3:
+  Convert WX_NUM_{RX,TX}_QUEUES macros to take explicit netdev parameter
+  as suggested by Simon Horman.
+v4: https://lore.kernel.org/all/20260608103946.25786-1-mengyuanlou@net-swift.com
+  sashiko: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260529075147.88398-1-mengyuanlou%40net-swift.com
+- Patch 2:
+  PF and VF share the same ITR value range. Update wx_write_eitr_vf() to apply
+  identical range clamping as the PF path, ensuring consistent coalesce behavior
+  across both device types.
+- Patch 3:
+  Remove wx_update_stats in wxvf_down.
+  Replace both WX_GLOBAL_STATS_LEN and WX_STATS_LEN macros with type-safe
+  static helpers wx_global_stats_len() and wx_stats_len().
+v3: https://lore.kernel.org/all/20260529075147.88398-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Drop netdev_stat_ops support from this patch.
+v2: https://lore.kernel.org/all/20260525101115.13151-1-mengyuanlou@net-swift.com
+- Patch 3:
+  Remove some stats which can be replaced by standard stats defined in
+  include/net/netdev_queues.h.
+- Patch 1:
+  Adding a return value to wx_set_ring to make wx_set_ringparam_vf can
+  be passed back to userspace.
+  Remove freeing and requesting of IRQs. Ring resize only updates descriptor
+  resources and does not change MSI-X vector or interrupt configuration,
+  so IRQs do not need to be reallocated.
+v1: https://lore.kernel.org/all/20260514103405.42175-1-mengyuanlou@net-swift.com
+
+Mengyuan Lou (3):
+  net: libwx: add support for set_ringparam in wx_ethtool_ops_vf
+  net: libwx: add support for set_coalesce in wx_ethtool_ops_vf
+  net: libwx: support vf per-queue statistics via ethtool -S
+
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 138 +++++++++++++++---
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   9 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   4 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.c |   6 +-
+ .../net/ethernet/wangxun/libwx/wx_vf_common.h |   2 +
+ .../net/ethernet/wangxun/libwx/wx_vf_lib.c    |  13 +-
+ 7 files changed, 145 insertions(+), 31 deletions(-)
+
+-- 
+2.30.1
 
 
