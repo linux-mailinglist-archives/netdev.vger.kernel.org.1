@@ -1,215 +1,245 @@
-Return-Path: <netdev+bounces-299353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id B1pGKr2sL2qfEQUAu9opvQ
-	(envelope-from <netdev+bounces-299353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:41:49 +0200
+	id ZwqxIMyxL2p3EgUAu9opvQ
+	(envelope-from <netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:03:24 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1100A68448D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4366684629
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:03:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=HylVFj8o;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299353-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299353-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=ODNxDDQO;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b="/8pMZfjP";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A3D31303AB7A
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:39:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3409030226B0
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3FE3BE633;
-	Mon, 15 Jun 2026 07:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBC23BFAD4;
+	Mon, 15 Jun 2026 07:54:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F2C3BF685
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC193BFAE2;
+	Mon, 15 Jun 2026 07:53:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781509180; cv=none; b=OYNAxCb48wbF3942Fockx4hObO2r8jn/76KOtAEHzvzuCifPAaWmJpVjprGYRNv5ab0fqd+7FgnYsemITZhPqcR7uU5dNqm6lBhCA+Vcjyq6OVBA9dugliXOJMM9HiEbTWDioXJQn7ex8fdZ9XKGqCTuJBX53FUy3YwliiyZl0Q=
+	t=1781510040; cv=none; b=IujQc1HugefzK+Tc4fmJ6cdaafA7ALd0sA05olkJOES7rTiqfeiv0aLc679JlLxvK6MWVwhPRtbd3mKapP/qulOmExMYlFCq9EyAq4VfbOru2eJn/75MqQZTYaXUk/HGIDb55OkVxDENxZBQspRWKdpwmkFGtK3jlgdxBxeKwsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781509180; c=relaxed/simple;
-	bh=gLE8CCQ5SH12vR+rRgkoSJvrMBzBUKCuuw23IvWdWz4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gxETHe4R0BP5tm9kNtOl2g1zml+TcGk2jUAUOJychaYXeEi7N2LCJ0laPQYIOGzp8AlNVzMGPME7Ke0JkBUbB9oHQn7QeFCeXt17uoUOmSVBfH5a7UjM6IV1gw7/lbKes+OCgvZMJKAipv12crgxC1EqTG+RObTCAjG9SPsIWBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HylVFj8o; arc=none smtp.client-ip=209.85.214.178
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c0c32f6ce1so20138275ad.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 00:39:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781509177; x=1782113977; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vbxyv2uuWx2uMg89JQUtXul+SksXRCRyTkytnWrdbbs=;
-        b=HylVFj8olbHUfUyxSEIEg9YPMet/+ntPQWFLo9hdVoorB+YhdS9hNFUJIUSHR8Ib2V
-         kG9bsprvYkkKY6qwgnqt5u4IuHTRKn70Z/g0Np2yOhdvUef/CQSk5lhBVmqiDMwJdMBM
-         JG3WSM54Viep3VFRJSCHEt69AvkI1YBF4TdtPMeHis8arqH6DqAREGPgwYUquiDv4zIk
-         Khe3m0LETBwReGBkHaautnRGSndbR1l60gcMMlcf0Xol1oMEVGUqCvCi+0dp4t7q7d9k
-         +KCxIeQ7JJWpIguW2j9kw+DcQEM9H1EvncKke5yJc2NaPqO2X8RJ416LHijdISkFg/gz
-         wn7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781509177; x=1782113977;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vbxyv2uuWx2uMg89JQUtXul+SksXRCRyTkytnWrdbbs=;
-        b=dyYDRcwpzlQ89ipll61tXyIS6O/ft+9fKksGP1bstspKydsmQD5NpipC5IQid5Lu8e
-         5ajKkO4yFXbs9ZnqDVudYA1UP0ky0q0gYFgOAarNUCPtw862LEHd9e4V30j+bQIyzCs9
-         CBELifRsoItVoMqWF3FZldlpiTFO1nqAQj5T7qgTvkanHQ2F1abGJOyxACIgdLiTy6f+
-         0DzBkNcsQXEljf/k7OD7XhqWfrkJ802vVaiOaXMzu6W+nOxRhvoa1L5y159rau+S38RC
-         q8ocxHZad3uifu1RvBRhXeUGSCEUwvk8KXV/Psic2mRANX0XvGHXlIdmGvxc3DPfN1nW
-         xmTA==
-X-Gm-Message-State: AOJu0YzQV2GMndy0228zpd75Tg4a27r7OwBTx5qq00lE6g5Paqpzv5ER
-	LyxobK3tkc0PsT78r1Ko5RMNtnzL3IsbxC3VCeaCumcyKQ4zwL0BUR/7
-X-Gm-Gg: Acq92OEmtXk0FeL+1HoT4DB8qF5e3z5xe/WbqHImQYCI2mp+6vkrK/NWBmbDCDqSiSi
-	V1Ztb1xO619IVemVWSGnJseryK55hd1R7kYVbGpUA8MRtvLHeg0HbUfftRYxDL8EhTRgEREP4mD
-	rTlNGolbosd/PaiUTAd/mTiLasKt8aMhdZrKGnhD4k13aEH7FF0JuaSt8OkKFknE1dLdWEY2ipt
-	oV7iII8JOajy+bBQHPOtXJdG+yllTvYBqeAGTfB4fAAfkOXPT54txBG8QQnV/R6nXla6rAwBVCr
-	lRWRhqvfJdcNt+486IpFUFZDLuV1Ncs1+Nh67A4f4N27jgCgTHJymuUVKgZIHcV3YMAwxz6zgr3
-	JkDXkNNXaJNEt5seq4xjo/RmSfeCBrKN4hysdeE2jZxcgX9i/IA7aQEyMwMKlZjPKZKagnTkeU3
-	Tq+L6ZoaAM/GSNibeGYqRAsx7JxHVbGUOEVNKNBjPdL+qdCEFndhGGl/F/USOg/3s=
-X-Received: by 2002:a17:903:1a30:b0:2c6:7479:644d with SMTP id d9443c01a7336-2c674796a84mr71837965ad.5.1781509176848;
-        Mon, 15 Jun 2026 00:39:36 -0700 (PDT)
-Received: from localhost.localdomain ([2a12:a304:100::209f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c43307a259sm91271345ad.68.2026.06.15.00.39.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 00:39:36 -0700 (PDT)
-From: Sun Jian <sun.jian.kdev@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	memxor@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	jolsa@kernel.org,
-	shuah@kernel.org,
-	paul.chaignon@gmail.com,
-	Sun Jian <sun.jian.kdev@gmail.com>
-Subject: [PATCH bpf 2/2] selftests/bpf: Cover partial copy of non-linear skb test_run output
-Date: Mon, 15 Jun 2026 15:38:56 +0800
-Message-ID: <20260615073856.152479-3-sun.jian.kdev@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260615073856.152479-1-sun.jian.kdev@gmail.com>
-References: <20260615073856.152479-1-sun.jian.kdev@gmail.com>
+	s=arc-20240116; t=1781510040; c=relaxed/simple;
+	bh=4XLkdt17a7BumTtZvZ/QKmAK5ZbQIHCPTQYDHiDXzdk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Oq9ccoXWx9fGHMTLVw0qKXWTldkWxuYHbnI43r8wq4Yw+22RDxY420ionoiBdkCkFjeMtYHpeiUmitpsjgU/HcU2glcMi6j0nurYIouhITtJL1OQWQeAxr35tduSNcJOJSYARpGv44b8HLWnVCzZneX8S0mhjwcbBJmuXjIbMCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ODNxDDQO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/8pMZfjP; arc=none smtp.client-ip=193.142.43.55
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1781509428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OBrL6lgGQBMYLJZdswh2V1MoY8JuyilmLozsgGz4/8o=;
+	b=ODNxDDQOCe9UfjLWIOph6jNPzGzUPcQ+xb+ydJN9M0i6CFMiDsHRgjKbJLr26Xs92UIUER
+	lKk3TdIbh4npedW/uj/ukiC4XGVc+eObQqnG/f4MIP5kVqDZDM/CLqZ5YNUESHyzn+cLy2
+	/yMm/xh19asWEgDKSKbe4u6Rg+QWSI2SfIM6JuIixgrz8fEimXRjEJxM2P4RyF60ZpOSK7
+	Du6tM6kFrNhg64BegewC6SFUM7+veG/iZtTEBVDQ1OjGbkbULfgR9PhU7HX0X8gHyVY2Mt
+	hV9T1J+MgpL1sefve2st+f6Ub7LERak9Nj+SzSHpQ5DlIoUYAxaXF4UOvWxOBQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1781509428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OBrL6lgGQBMYLJZdswh2V1MoY8JuyilmLozsgGz4/8o=;
+	b=/8pMZfjPCT/NlvqtaxZ/j9kB+C0va9VKo3CGEL3R2t074ZTbNOt/mu7QDZ8BlQUZmbWcIa
+	6osH4nK734IJz6CQ==
+To: Tjerk Kusters <tkusters@aweta.nl>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "hawk@kernel.org" <hawk@kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] igb: only strip Rx timestamp header on the first
+ buffer of a frame
+In-Reply-To: <PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com>
+References: <PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com>
+Date: Mon, 15 Jun 2026 09:43:48 +0200
+Message-ID: <8733yojljf.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299353-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:shuah@kernel.org,m:paul.chaignon@gmail.com,m:sun.jian.kdev@gmail.com,m:paulchaignon@gmail.com,m:sunjiankdev@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299356-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.osuosl.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:tkusters@aweta.nl,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:hawk@kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,aweta.nl:email,linutronix.de:dkim,linutronix.de:email,linutronix.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jax.kurt.home:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1100A68448D
+X-Rspamd-Queue-Id: D4366684629
 
-Add a test case for BPF_PROG_TEST_RUN with a non-linear skb and a short
-data_out buffer.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-The test verifies that test_run returns -ENOSPC, reports the full packet
-length through data_size_out, and copies the packet prefix into data_out.
-The test uses a 100-byte data_out buffer with a 64-byte linear head, so the
-expected output spans both the skb head and the first fragment.
+Hi,
 
-Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
----
- .../selftests/bpf/prog_tests/skb_load_bytes.c | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+On Fri Jun 12 2026, Tjerk Kusters wrote:
+> Hi,
+>
+> The patch is attached (0001-igb-only-strip-Rx-timestamp-header-on-the-fir=
+st-buff.patch)
+> as my mail setup cannot send it inline via git send-email; apologies for =
+the
+> attachment.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c b/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
-index d7f83c0a40a5..134be0ea8ed7 100644
---- a/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
-+++ b/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
-@@ -3,6 +3,39 @@
- #include <network_helpers.h>
- #include "skb_load_bytes.skel.h"
- 
-+#define NONLINEAR_PKT_LEN 9000
-+#define NONLINEAR_HEAD_LEN 64
-+#define SHORT_OUT_LEN 100
-+
-+static void test_nonlinear_data_out_partial(int prog_fd)
-+{
-+	LIBBPF_OPTS(bpf_test_run_opts, tattr);
-+	__u8 pkt[NONLINEAR_PKT_LEN];
-+	__u8 out[SHORT_OUT_LEN];
-+	struct __sk_buff skb = {};
-+	int err, i;
-+
-+	for (i = 0; i < sizeof(pkt); i++)
-+		pkt[i] = i & 0xff;
-+
-+	memset(out, 0xa5, sizeof(out));
-+
-+	skb.data_end = NONLINEAR_HEAD_LEN;
-+
-+	tattr.data_in = pkt;
-+	tattr.data_size_in = sizeof(pkt);
-+	tattr.data_out = out;
-+	tattr.data_size_out = sizeof(out);
-+	tattr.ctx_in = &skb;
-+	tattr.ctx_size_in = sizeof(skb);
-+
-+	err = bpf_prog_test_run_opts(prog_fd, &tattr);
-+
-+	ASSERT_EQ(err, -ENOSPC, "nonlinear_partial_err");
-+	ASSERT_EQ(tattr.data_size_out, sizeof(pkt), "nonlinear_partial_data_size_out");
-+	ASSERT_OK(memcmp(out, pkt, sizeof(out)), "nonlinear_partial_data_out");
-+}
-+
- void test_skb_load_bytes(void)
- {
- 	struct skb_load_bytes *skel;
-@@ -40,6 +73,8 @@ void test_skb_load_bytes(void)
- 	if (!ASSERT_EQ(test_result, 0, "offset 10"))
- 		goto out;
- 
-+	test_nonlinear_data_out_partial(prog_fd);
-+
- out:
- 	skb_load_bytes__destroy(skel);
- }
--- 
-2.43.0
+b4 has a web submission endpoint. Maybe you can use that one:
 
+https://b4.docs.kernel.org/en/latest/contributor/send.html
+
+[snip]
+
+> From fee3e3452dfcd7e109332369672a3e0090cadeb3 Mon Sep 17 00:00:00 2001
+> From: T Kusters <tkusters@aweta.nl>
+> Date: Tue, 9 Jun 2026 14:06:24 +0200
+> Subject: [PATCH net] igb: only strip Rx timestamp header on the first buf=
+fer
+>  of a frame
+>
+> When Rx hardware timestamping is enabled (e.g. ptp4l, which configures
+> HWTSTAMP_FILTER_ALL), the NIC prepends a 16-byte timestamp header to the
+> first Rx buffer of every received frame. igb_clean_rx_irq() strips this
+> header inside its per-buffer loop:
+>
+> 	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
+> 		ts_hdr_len =3D igb_ptp_rx_pktstamp(rx_ring->q_vector,
+> 						 pktbuf, &timestamp);
+> 		pkt_offset +=3D ts_hdr_len;
+> 		size -=3D ts_hdr_len;
+> 	}
+>
+> For a frame that spans more than one Rx buffer (e.g. a jumbo frame), this
+> block runs once per buffer. The timestamp header only exists at the start
+> of the first buffer, but igb_ptp_rx_pktstamp() is called for every buffer.
+>
+> On a continuation buffer the data is packet payload, not a timestamp
+> header. igb_ptp_rx_pktstamp() already has two guards against acting on a
+> non-header buffer: it returns 0 if PTP is disabled, and returns 0 if the
+> reserved dwords (the first 8 bytes) are non-zero. Neither is sufficient
+> here: PTP is enabled, and a continuation buffer whose payload happens to
+> begin with 8 zero bytes passes the reserved-dword check. In that case the
+> payload is mistaken for a valid timestamp header and igb_ptp_rx_pktstamp()
+> returns IGB_TS_HDR_LEN, so the caller strips 16 bytes of real data from
+> that buffer. A frame spanning N buffers whose continuation buffers start
+> with zero bytes therefore loses 16 * (N - 1) bytes from its tail.
+>
+> This is easily triggered by a GigE Vision camera streaming dark frames
+> (mostly 0x00 pixel data) over jumbo UDP with PTP active on the receiver:
+> the all-zero frames arrive truncated while frames with non-zero content
+> are fine. There is no error indication.
+>
+> No content-based check can reliably tell a continuation buffer that begins
+> with zero bytes from a real timestamp header, because both are all zero.
+> Fix it structurally instead: only attempt the strip on the first buffer of
+> a frame, which is the only buffer that can contain a timestamp header. In
+> igb_clean_rx_irq() skb is NULL until the first buffer has been processed,
+> so guarding the strip with !skb restricts it to the first buffer
+> regardless of payload content.
+>
+> Fixes: 5379260852b0 ("igb: Fix XDP with PTP enabled")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: T Kusters <tkusters@aweta.nl>
+
+Great explanation! igb_clean_rx_irq_zc() does not need the same
+treatment, correct?
+
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+
+> ---
+>  drivers/net/ethernet/intel/igb/igb_main.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethe=
+rnet/intel/igb/igb_main.c
+> index ce91dda00ec0..abb55cd589a9 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -9061,7 +9061,8 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_=
+vector, const int budget)
+>  		pktbuf =3D page_address(rx_buffer->page) + rx_buffer->page_offset;
+>=20=20
+>  		/* pull rx packet timestamp if available and valid */
+> -		if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
+> +		if (!skb &&
+> +		    igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
+>  			int ts_hdr_len;
+>=20=20
+>  			ts_hdr_len =3D igb_ptp_rx_pktstamp(rx_ring->q_vector,
+> --=20
+> 2.27.0
+>
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmovrTQTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgiv3D/0UL1rHA6YpGPl2jWtXbXCrHgwJJdw5
+A7Gz5HXnRnXa9w1rEAJR5yTlDo6NGCctjf0ZQbauwUVEoZ24+mBdNWHZbRi+alOw
+CiiLygla3wwCp6bwPdOfxoOWWw1RM9E+auZCv+8Gl9yFinuJkwY7ZgRmdzf99U//
+FhM/mxLAcnheWAWmvPFeaQZY8jcBh7gy//sN5FaFnIamQXIVulKMmfLAuzqPtoUf
+QMT/wL9nLi/yyp0cQUM9OXsb3WCFWfk1VyIHdOFtDKt8xZE3tgotUAH1JwYvUb5A
+EBb7PwgbvPhlqBEjDgtCi7p+KL/Jk8AIxjReHNjG+nXxxc6FURTEkuvkHAu0Zfx9
+O9hc9reE3zsvwDvtrL+wfcMst894XDrQfdlMhDGZDaDHkiOUHk5wpm2FTO3BhM43
+cR1xUuXchLSmUufMYh4aW9iP+k6TqZqdRMK3x/v+4RGhkuHUvHbjEnyCKkfhsRAn
+bqDgB2tnCHHHi3DUAPAu+fRf8yK/D5DYDWTrLT2EIsrDeTqU4DmTrA++NNsfkQU4
+FqPIZssxIYXDDC9PtiG9CEscDL+EkMDeFVGzvYUIL5kLxAUl1UfmMCky9k7Qd4Mt
+Paph8NOdC03rwrQQikqJ2SoH4hnakRiIeBu8YkWVhGKvzU/WTx9PtSKtrhVkzWeR
+tnGF2+a/wNMIOQ==
+=+94Q
+-----END PGP SIGNATURE-----
+--=-=-=--
 
