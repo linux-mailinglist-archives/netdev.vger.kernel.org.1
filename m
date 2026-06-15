@@ -1,170 +1,213 @@
-Return-Path: <netdev+bounces-299447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299448-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lYSDAqr0L2qmJwUAu9opvQ
-	(envelope-from <netdev+bounces-299447-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:48:42 +0200
+	id BEBJFVj4L2ppKgUAu9opvQ
+	(envelope-from <netdev+bounces-299448-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:04:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F2068662D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:48:41 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940DA68682A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:04:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=TX2eiWkr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299447-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299447-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=aweta.nl header.s=selector1 header.b=kKVGYUBR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299448-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299448-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=aweta.nl;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 819D4301DC0C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:48:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0D7F93009385
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE4C3E51EF;
-	Mon, 15 Jun 2026 12:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7BD3E5A25;
+	Mon, 15 Jun 2026 12:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11023119.outbound.protection.outlook.com [52.101.72.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190B722538F
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:48:19 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781527701; cv=none; b=dStsH5nhcAxCgyUCoEZ1xmdngRvN0/SiUqI66XuJWq2kdBj5kkuK01orzlRLX2esGlM8G5Zi+bbOpek6KVrJHwwyG3dHf7evVZbNsWV8/mBqN0d6OtLp9j9ltvZpBIYDy+8IxRq1+Ek8Lb/nEvjLBVjwmMzVuFI1YDBqp14mCc0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781527701; c=relaxed/simple;
-	bh=Yh7JYanZGhEylZQvuUoONACqmN43f60ihANZS5knGfA=;
-	h=Message-ID:Content-Type:MIME-Version:From:To:Cc:Date:Subject; b=lFaH6VgfF/TrHq01EdGl2Fguo+E5ysN0RKIFNC6Z73YFaZWYoUyRxroXN4pcipfuC9miwHLcBZS2t3OVomU4oEppugaTnnpVR6lW07bC6CRJJiqjmJNEolHVDJOHMHKDodV3Sxhi47R3PlEOpGtTvhqDR580pJJ4mUaaBX/QLR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TX2eiWkr; arc=none smtp.client-ip=209.85.210.170
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8423f1d8902so1512646b3a.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 05:48:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781527699; x=1782132499; darn=vger.kernel.org;
-        h=subject:date:cc:to:from:content-transfer-encoding:mime-version
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=an+NyJhpdAxSbgwZ0j7wPX1XyTG7T96Feh4LnwHfKms=;
-        b=TX2eiWkrOFVIPFBLxxGT/7SnCymSzhYujomjsf0lMSifTpsSfxufoghqfY1zRUHZqz
-         f1TYNF8VGeN2RAeCBLJLjZJgRv+bPCU7huq8wj5DhdHXBmRni2RcUkM2ReAn+NkWoLqz
-         nl0KE6YiNjGGANDsM5l3NWHQBo69XmY4C+j7LAPAlkAeoVnml7sUz0LyV9r+1MGqOwJZ
-         2O9Ej+CMTL27YuOUegV5QjoiZkZyTlpQ1FnVvCjQVbnuSd3sn6FyTLz0U8C+xRHp8h7+
-         20noZod/+bTPjRsW/swRJ7Ki9mmFeQ1cGf+EYAqyNShqS5PQ2cYPYv74um6IxYQQzRXi
-         VMrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781527699; x=1782132499;
-        h=subject:date:cc:to:from:content-transfer-encoding:mime-version
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=an+NyJhpdAxSbgwZ0j7wPX1XyTG7T96Feh4LnwHfKms=;
-        b=iOmCgFZZMul/GBT/FgC8Lp7KVAdGSPcIzAaM7f/2KMWhmo5KdrvEyUCY8yzDU1chin
-         DpIT4udSAtgTObSNPLlQzJZRz5/5ZakD03qxsAyyzBXfR2wzx6FVZBjnO3BzfQXDBK5s
-         RZ6vW2SCmzT2FnLw5I9v5/2ARz0n16dvyTNutMOhv9iLZ41XpynOyKtpwLcrmQPl3/ec
-         uydpuPR82qPKdb6xI/q/ULaQ9aM5cy/PUdiUjvJ3o7SQTCVPDG1nWxwEkMQHy69YRpzu
-         FGdp9XKmsfn9GmeolDIm3J1/OiqnxMy7ao2PxiCeBOOY1bK1SZfNPFy6amAwPyqTfGKg
-         seHQ==
-X-Gm-Message-State: AOJu0Yy3g+jXwdUJw0+6z+FHxxFzAVttFHsta5jpXsHevo6Gr8saiRZq
-	uVzwSwpdq7OqMEvfAE2C+affxux1PQ53WtM2h0m8lxuijmGr2Ga8kacPuPIZIcXXsGE=
-X-Gm-Gg: Acq92OFSmcqRlOI5BcJM5kMqAh1UM35H8VWg9BgLE40l1Dy3QngTfuTIvQDqmhnzci3
-	XsVKU1Ml+/Ph7s1xm4SaqDYqmU6Asr9YVGdnw4BdHSs3Cidi1m8lv2KewSFU0iTk/PDkXIHsGf0
-	oBDGGrQXkDwzx1qH61AN7FDdjA/uS7Jc4muyeUzeXVuwDpxMsSB4VFl8mgWQpMy9MIZeIuJqaSU
-	O/a8PXWPQYsCEh+iE1aM3eQMYMXCyCYs4yVNk6CrM32qhe8Z7MFepw1LFw9JJ8SqJ3I+WUaEAN2
-	QVSzqnzt2oR/Bh2vbDVAeQPQEsgeU0L5xK6JPmw2yv5mBrgE5yGcnHcCS4j5xPwO+GHK17jDYmB
-	pGZm7uHH5k6U7PmvYLIv+H9iACPu5NH+4rxzAREh7GBkjZQ7NBQcQ3kfFmnH3pchz5EMqxN5SeK
-	7yHDA0WlkiW/RenfcqVzI=
-X-Received: by 2002:a05:6a00:23d4:b0:842:2419:6bfe with SMTP id d2e1a72fcca58-844e193a3aamr10771235b3a.7.1781527699379;
-        Mon, 15 Jun 2026 05:48:19 -0700 (PDT)
-Received: from [127.0.1.1] ([58.240.122.156])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434acffd04sm9949954b3a.26.2026.06.15.05.48.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 05:48:19 -0700 (PDT)
-Message-ID: <6a2ff493.5934d26d.389ef4.d16d@mx.google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E77B3E5A2D;
+	Mon, 15 Jun 2026 12:48:33 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781527716; cv=fail; b=KS3GRZzQ98sUCfGRJ7BcTfacNIdJLFyZMtNMQm4nl2vxPw9uZ3fsRYPGzWkyVzNKqcqYo/eOH4zz8WB0XZWqj8E6AKGizobjDg9jLaUV9eRnPMdRmkX1k/FJMhTT7rwQX1SicC3UcjeebPNYcE0WNPSgmWPDhsTxlXUFF4V52ho=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781527716; c=relaxed/simple;
+	bh=NcuMPJ412NDj6cMrPKLiYFtduBARHCpQDcntQsoC3sc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hTZH14XR6D5LsQHovfpy7J/1nuyItFUiBDgLPo59G7B0ACu1lei4lM+Ya1VDxqdA6SXRqIdypEr7lxw+/HEdQYIMDI6sI89Jlj+p6xPHdT3UEgiMffsMei0tcmJS7uX/JTVLtYHMS70s0Q9wrZayJm+VfwxzwxBKS9D5BB6tRxs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aweta.nl; spf=pass smtp.mailfrom=aweta.nl; dkim=pass (2048-bit key) header.d=aweta.nl header.i=@aweta.nl header.b=kKVGYUBR; arc=fail smtp.client-ip=52.101.72.119
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=K1NOkiIA+c18MBbaWq0W9GOwli0C+nU8QKe1Pe6NyLsZhWwqjUuQBTaVCExB2eHTSER6pI1lYS5qkuSEaQillDOmynociMfhoGYqOdPZQoIUhe4FtXgH5T19SWQoLvB7vMgnBZh84T7SUDh5tRhAcvg/0akR+pyGitWlb0oiiJ+2s2PawVyebwFmxpTkkX22cbAn7PqPTICbsN59JXeA1OArwP25u/yktsILD4XeazFvd3ntvS3YTUgtORyxYEi/N2ZL2kA8bHeGKMggr0nH10grdJPFYLU7DBkFNarrxEHbYvjEuXwohup1WwD5JajEwGbmMnzNCT5Mpx/t+bGAXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NcuMPJ412NDj6cMrPKLiYFtduBARHCpQDcntQsoC3sc=;
+ b=gZOJcrDOYm/mfoagwRFG+Wox7lau1zPZa3yQxbMAlo3N2b4gsqLfEW0o63Oa9mxU8ZDV1E4bw/JdVIKgmaSPpsQN63of+hqbQCAkK5wZpas3sqP41otwlOZSbCb4fMY57qKVfFSlJDlCdRdvJsxwFT7OilsPPiDv8C9T9ME388j94NsgNzwkRyrrF5P/H3fclnEX/y98+C6GY4fPCCKwp1GTa+FpnZS751Nje09KscleG/ZydbuZdNLEW2KhLKCOrdDO/z9K/7pyQFqOMH7kIQ+/kBFCAZErA+4fZhK8iWCRmvX+Blbb5BtUsTOlj5iB4Xb+4imaLdTZNW3rY8pcgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aweta.nl; dmarc=pass action=none header.from=aweta.nl;
+ dkim=pass header.d=aweta.nl; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aweta.nl; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NcuMPJ412NDj6cMrPKLiYFtduBARHCpQDcntQsoC3sc=;
+ b=kKVGYUBRZ1bwTN0ASgLYZtoieOeS3FPQfAU9ERXHWGBHwYvD4As33bNQdyLZH9NzM+JI/lzzpfysk1+D2bvEG8Yes/l3H6NO9tQb6t9V1LoRmqHyrt48TFMgDSV2NtswyOs+IXoqZKVFKjeKPYWuEAPg+FQ4Zunmkc4gcvYtCaLjttmzskTX75ksKTdYFVSAzv2UJlGB8M+19qgVUrA66WVjFWk1POSi6ijaQOqj7ixHxpCQ06yOaa/k6qYaeNwHsP2vKFqE08wX2tINV0kgNiFQUyX3yt5NPtLmamLT7HUG2Qin6cXvy/NhLBQaYB55nv0SKoE4zGNz5Tbp+Td2yQ==
+Received: from PAWPR05MB10691.eurprd05.prod.outlook.com (2603:10a6:102:35a::6)
+ by DU0PR05MB10523.eurprd05.prod.outlook.com (2603:10a6:10:426::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
+ 2026 12:48:28 +0000
+Received: from PAWPR05MB10691.eurprd05.prod.outlook.com
+ ([fe80::3b9c:573e:3c13:3754]) by PAWPR05MB10691.eurprd05.prod.outlook.com
+ ([fe80::3b9c:573e:3c13:3754%6]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
+ 12:48:28 +0000
+From: Tjerk Kusters <tkusters@aweta.nl>
+To: Kurt Kanzenbach <kurt@linutronix.de>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>, "hawk@kernel.org"
+	<hawk@kernel.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net] igb: only strip Rx timestamp header on the first
+ buffer of a frame
+Thread-Topic: [PATCH net] igb: only strip Rx timestamp header on the first
+ buffer of a frame
+Thread-Index: Adz6QcrRn2ovfM6lTRK8EOoivUdfWACWOigAAAqj4MA=
+Date: Mon, 15 Jun 2026 12:48:28 +0000
+Message-ID:
+ <PAWPR05MB106916AD984FCDF63E73A8E3FB9E62@PAWPR05MB10691.eurprd05.prod.outlook.com>
+References:
+ <PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com>
+ <8733yojljf.fsf@jax.kurt.home>
+In-Reply-To: <8733yojljf.fsf@jax.kurt.home>
+Accept-Language: en-US, nl-NL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAWPR05MB10691:EE_|DU0PR05MB10523:EE_
+x-ms-office365-filtering-correlation-id: 4b4e4ba9-1fe4-4799-1709-08decadc6602
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|7416014|376014|1800799024|366016|56012099006|4143699003|38070700021|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ lDKwXN/v1ZcAIo/+tvnyPm1w99i08R2FcJ2DADtLb133mE2zM3AopGaYBVnKe7dIPs/0YD1N4XAU4z41mm7ErjLzr/PqXUKj6fspT7mQiSjvW1SEaNpNNpyf/+jz0TRBn64/cmzwZRiAsejf5NoKSfTfJA9x9xdAxU07HO+/09UGPr+8BlxDIW9R3awRa61qa7iuG8/he10NlWEGGP0lPKFr9vb7MjYB+iPKABY1yL2Hq4Lnmu+mDwxRdqLSKvcQ3+lYEvLa6ItdDMJR6LrgrwGU6dMiqkjQ1UF/xnP+QLh5kvtG/z0ekkvRmxvp//dhgAZYDYfYbepqSBaVgPH2Zbv09YA/h4OhPf95RsMxSiyU23BEbzBtaEg6R8kIHf0gCm4VpfX5ta2K6CRU9MyFBG37So5Q1qR6+2akZIO84Bc5Q/uRcGO3ef08MlCykF9zPKyk+Zhi6Gd+IWxlSDi+ZPYNOO/Q4AnoLuWybjjRLvGfj7leLxkZ68Lc0VJWTd3AdsLMXw2rwFc49p1gOS3MRjmVRRC6sQhTKUtdXzbBLQ+6h7quaWn/3HywSuZf4SIOiw62157a3nZM8Iqq7j89DwOutEQFDKtUPMhS+G20bNoG6ocTM1SxrM7/aXH5t1omjwo2KMX7htRoz86S/bxzpXcbCNn+BF9QmjVT5wpiiGfHzIkfXbwAaMT5mZ274Zeap3JUA3MmpqSMXRdT9HSkM8gT0DmZ7g6wBlXF8IbTsZu0sFJLBx3EEEI/czGtrz4u
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR05MB10691.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(1800799024)(366016)(56012099006)(4143699003)(38070700021)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ZaDyT4S4W5+oOvwqah3ynDN0Io7bwvqYhCBn9f2l2F0t9UmAcuqdZGh0M2do?=
+ =?us-ascii?Q?gtyErQ1lgFSp0BY/wdbUA+/J0AqTnzVeuwq/3p9VMrafw46La2Mppe5tGy0h?=
+ =?us-ascii?Q?j5Jc+ipxcXh1vQkt9FsCsyYnHVlvMYcGAO+pmhodHPotmh4ie3bDgjzmBDA5?=
+ =?us-ascii?Q?+sQ/3K0XlTFe1aa3OkBMXjn0iqGIYUtl2kGy9ySlQu4qzJwirB4NQqeclPwr?=
+ =?us-ascii?Q?dn7Pi8wuGepjrPNhj+koWJvBEJZxXOhjhZsUEDD8iXualzjL66NjK5IsJhyA?=
+ =?us-ascii?Q?3FCgJdrsbmMLUTpMhsvOSqvdn4UxbX13fIVV00pjtw+qki8TvxgbF7jBD3Jr?=
+ =?us-ascii?Q?0btXTiwpefruojkw9DXiDKOV/IZE9DXci0aIUxnxBL5YBBH5Q3PMg3vQO240?=
+ =?us-ascii?Q?ZvazZPPHAaVDl9pkmRFLbw6oWm6CLPd5GnWDqvXs19Hmqm6b2rjC/GFEmR4x?=
+ =?us-ascii?Q?UH0Tkuo/W5rr/g4QTEgJWUz1Ye9aGy7l4i+RxdwwlRjEFjOgcxDOF/DcuPPl?=
+ =?us-ascii?Q?n4CFs/AhCdAYVLmUheDP1+T/Kjm3OfJUWMTUyQrFertQfywroQb0spsh+yZD?=
+ =?us-ascii?Q?Sb1wqmH9Y1TBv8dyoojPZby0yt51hzWpCIxGgUgFZkhCSeR0NrkSDgnhGEfP?=
+ =?us-ascii?Q?FSsmKyL4UsMHo89teIM/NQ1Bc6yNQ1ln4oXcEkwbUi8bxkJR6Nkqu0HWHp9I?=
+ =?us-ascii?Q?8LsOTnLBuWw0zf9vG79bnPFGDnGicAhZfYGY0JK3Crpggly+1c8g/K1TYoRA?=
+ =?us-ascii?Q?rFuUPRvclpqagjkJ0MdrrRKzNBAReLrgmXdmZx9AJdjkSy46DFLul4AuS4cB?=
+ =?us-ascii?Q?aaJu/AMy99ygdFtKwfJabOcS5YAj5KNd/DWzzdC1OIAffKLtrvdn6bHdvwIZ?=
+ =?us-ascii?Q?vBCUTEt+nXgM77mRygM3gNexaDhsec57iCuGqJ74n+2SMWWjQH63niPgVu9Z?=
+ =?us-ascii?Q?2QedJ65npHi/40BehpWPaXSL1N9ZcMeieka1n8IJeEwxPvuz6/PzvhvtPGWG?=
+ =?us-ascii?Q?kmse3lk6dAod4q5bXGzrpSYU4nM8GpdB0lzRRvwRKT9gniSjZPX1y2WWLYj1?=
+ =?us-ascii?Q?IJitM6ZFulsRthYv8ZnbRpenIwBtpX1iGhaEOtr7EoqEgDMvp/HVu6Fd0cLq?=
+ =?us-ascii?Q?ao21mfsnTKC0htq4s7JJYGchS1WcMxPxcH0lwU6sOTa19wLpez3JOcu7D67H?=
+ =?us-ascii?Q?PyWs2oZ5oqR0GZzlB1gCmw9e6FEuRsoOZgYPjA/hIOh+OPTyAPp7X1N4hhcW?=
+ =?us-ascii?Q?9jlJ0uhimu/GfHjDxXw7JGRfzy819H3guytMbhyrKEWnTrdx3LnrUB8DsMOL?=
+ =?us-ascii?Q?nCp2IGd+ZSQqGkyjg+ZbnI+9RQxOelKU+bO8rbpvsmdu+oIkjF4eKCO6CaWj?=
+ =?us-ascii?Q?1gYbMbIpOkK7u5dTRBRkSPyto4T46LeiRNeR6LjGP6voytzgNsGuQc1MD8sO?=
+ =?us-ascii?Q?HjYJntYzYEITSoArl8LHwJQbuWRvvq2RVmUbBSAAl6ytiQ3aYaQMYb7ZEhfN?=
+ =?us-ascii?Q?ahYtkct4DjkpJayc11yMCklsFavXN/ci7p9+zOgLL5KZn0pftDF5dkV/NcF0?=
+ =?us-ascii?Q?83QfQVxw2Xb0vR/qMEmRqQxkulxVPd0u7ppgOg/EfYBRspZtJnuLcj+p1hRL?=
+ =?us-ascii?Q?oHTcsb8nKkP8uia/zTVV3WrZ0oRF2mjhVapuUwEgmTcGqLry44t9L5z0WaAW?=
+ =?us-ascii?Q?Ie4Atqjg1CO6tyQnRph6NGydOIjKON5VrQY52JTIiDCKKuGM?=
 Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-From: Wayen Yan <win847@gmail.com>
-To: netdev@vger.kernel.org
-Cc: lorenzo@kernel.org, horms@kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Date: Mon, 15 Jun 2026 20:48:13 +0800
-Subject: [PATCH net v2] net: airoha: Fix skb->priority underflow in
+X-OriginatorOrg: aweta.nl
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAWPR05MB10691.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b4e4ba9-1fe4-4799-1709-08decadc6602
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2026 12:48:28.6042
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 6546512a-ba20-41bf-9d8d-c076dcbf6fd9
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Fo2BlkcvVIFxRyWv4+CX95uKDKO8yLqFSxOl4ieTUNrhWWDzOk69+NNI0L/ED8H92wPn+MtaCkkR5aqv5B6KZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR05MB10523
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[aweta.nl,reject];
+	R_DKIM_ALLOW(-0.20)[aweta.nl:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299447-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299448-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lists.osuosl.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	SEM_URIBL_UNKNOWN_FAIL(0.00)[aweta.nl:server fail,linutronix.de:server fail,PAWPR05MB10691.eurprd05.prod.outlook.com:server fail,vger.kernel.org:server fail];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_RECIPIENTS(0.00)[m:kurt@linutronix.de,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:hawk@kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[tkusters@aweta.nl,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[aweta.nl:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tkusters@aweta.nl,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	SEM_URIBL_FRESH15_UNKNOWN_FAIL(0.00)[PAWPR05MB10691.eurprd05.prod.outlook.com:server fail,aweta.nl:server fail,linutronix.de:server fail,vger.kernel.org:server fail];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RBL_SEM_FAIL(0.00)[104.64.211.4:server fail];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mx.google.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,linutronix.de:email,PAWPR05MB10691.eurprd05.prod.outlook.com:mid,aweta.nl:dkim,aweta.nl:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 77F2068662D
+X-Rspamd-Queue-Id: 940DA68682A
 
-From b894fc031e307f1b6756ea9fcac98e82e23815e1 Mon Sep 17 00:00:00 2001
-From: "Wayen.Yan" <win847@gmail.com>
-Date: Sun, 14 Jun 2026 07:30:54 +0800
-Subject: [PATCH net v2] net: airoha: Fix skb->priority underflow in
- airoha_dev_select_queue()
+Hello,
 
-In airoha_dev_select_queue(), the expression:
+>=20
+> Great explanation! igb_clean_rx_irq_zc() does not need the same treatment=
+,
+> correct?
+>=20
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+>=20
 
-  queue = (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES;
+Looks in the ZC path each frame fits in a single buffer, so igb_ptp_rx_pkts=
+tamp() only runs on that one buffer. The bug only hits the regular RX path,=
+ which can spread a frame over multiple buffers and calls igb_ptp_rx_pktsta=
+mp() on each one - a continuation buffer can then be misread as a timestamp=
+ header.
 
-implicitly converts to unsigned arithmetic: when skb->priority is 0
-(the default for unclassified traffic), (0u - 1u) wraps to UINT_MAX,
-and UINT_MAX % 8 = 7, routing default best-effort packets to the
-highest-priority QoS queue. This causes QoS inversion where the
-majority of traffic on a PON gateway starves actual high-priority
-flows (VoIP, gaming, etc.).
+On affected systems I switched to Intel's out-of-tree igb 5.19.10 driver, w=
+hich is not affected. I also reproduced both the failure and the 5.19.10 su=
+ccess with a simple UDP test client/server (jumbo all-zero payloads), match=
+ing what the real GigE camera showed
 
-Fix by guarding the subtraction: when priority is 0, map to queue 0
-(lowest priority), otherwise apply the original (priority - 1) % 8
-mapping.
-
-Fixes: 2b288b81560b ("net: airoha: Introduce ndo_select_queue callback")
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Wayen <win847@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 31cdb11cd7..d476ef83c3 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1933,7 +1933,7 @@ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
- 	 */
- 	channel = netdev_uses_dsa(dev) ? skb_get_queue_mapping(skb) : port->id;
- 	channel = channel % AIROHA_NUM_QOS_CHANNELS;
--	queue = (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES; /* QoS queue */
-+	queue = skb->priority ? (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES : 0;
- 	queue = channel * AIROHA_NUM_QOS_QUEUES + queue;
- 
- 	return queue < dev->num_tx_queues ? queue : 0;
--- 
-2.51.0
+Regards
+Tjerk
 
 
