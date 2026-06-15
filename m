@@ -1,301 +1,300 @@
-Return-Path: <netdev+bounces-299412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JovqL1rpL2qrIwUAu9opvQ
-	(envelope-from <netdev+bounces-299412-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:00:26 +0200
+	id x/E0E4DpL2q3IwUAu9opvQ
+	(envelope-from <netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:01:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF8D685EBF
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48CC3685EE1
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:01:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b="PIeJ/fTm";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299412-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299412-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=SF9VO37P;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BF1E430055D9
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:00:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 371D33006083
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A253E5A0D;
-	Mon, 15 Jun 2026 12:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55123E5589;
+	Mon, 15 Jun 2026 12:00:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7982D37CD37;
-	Mon, 15 Jun 2026 12:00:09 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781524811; cv=fail; b=KjKoSXZEtgvcLqfctAkM6PhqFh5gpdF/5ywQ6dXUJEroBq80Arw0UDPUYPmhzATWnUWyZKBc++EU7hSdOyysu8JQA+NSnMMcLTFf+dXsyRp5btpPrSYACafFAU5F36+r1VJJUMe+PtmFNPd47ImYJurg+s0Lj5U2sDkEXFTzPeM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781524811; c=relaxed/simple;
-	bh=X6OEDYa4KInAxRbaA3tIaNUoTPoz3UGaw/WqPY+rwME=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gElTDmJ5uAQXrKWyp+hYIW8VBDwY6xIAULKh7LA3+2AC4u08MU0Q3hhUSAKQyzH69X8epTYbqJHHErb5cndtHTR78Y6azm9ZaRew07Y7YNVYlCl++vMxarJOelFOY8Cb9Hv3tf5pWxrdEAOZkBJjr+AmX/3fVLOj9LUwTqjH5Ew=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PIeJ/fTm; arc=fail smtp.client-ip=198.175.65.19
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781524810; x=1813060810;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=X6OEDYa4KInAxRbaA3tIaNUoTPoz3UGaw/WqPY+rwME=;
-  b=PIeJ/fTmaLu1kIrElQtqFbLGXNZUcBKVC/5CYLdZQLlR+ekoq7h0m3bh
-   R8+PJ8bqHs0BCIq9TmQuJDPr8D9e1llwumFZkgEnPugeaadThw9sbYu5L
-   gfbfTW6bY986iApTnxHXF2nj6Pyyue+XbFYdL/3TRdexDIjM+we/N586S
-   S/RGL2pmedzHzVXmOq9H9DOZvsttglkjyfAinyiH/4NZ/ppyFlu01Gn07
-   pnFxDvjgG62ZRJKAiST6ZqI8XO8X/S1d7+SO3JvKozIk1VjW2yt+WgJA3
-   GAJK1NplwNX4FFiUHPk13X61QwQrTtfNkQXI08/qj9CLcF9jq/zxocUEh
-   Q==;
-X-CSE-ConnectionGUID: yvV+sLePQOqQcVQLRQHHfQ==
-X-CSE-MsgGUID: BCZ+HHP9SOu3gh0DOa+0jQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11817"; a="82246826"
-X-IronPort-AV: E=Sophos;i="6.24,206,1774335600"; 
-   d="scan'208";a="82246826"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 05:00:09 -0700
-X-CSE-ConnectionGUID: ObGh+DHoSJio4uxPdpA9GQ==
-X-CSE-MsgGUID: 8EphysPwQZWnFsqE6rCwsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,206,1774335600"; 
-   d="scan'208";a="243091070"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 05:00:08 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 15 Jun 2026 05:00:08 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Mon, 15 Jun 2026 05:00:08 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.46) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Mon, 15 Jun 2026 05:00:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o2A4C4MXnuSAd8Z0M2j3WZlgxLGMQxot4OdHLCxGeK7yvW5MzWZIPr60xf0qC9QSiMImRW58LCulUy2vfTVlXIW+MufWfasq6+TgrJ9BhRWu+92wc7LKd1o2csTNkWSkWA+Ah8ddRWC6lM+XvokiCxF2CSKvj5G2u3b9rSXM1EhZuJM1dhO3QfNJB2CzQXlPHO56LwWUx41iaaBIiEqocidzJYg2N6pcFPu4r3j9kP8IzGE9fisvpdsqvxM/jrVlAE5x8AxmvlWbdT2vF21fwwM9+PXv5GxuKxB5R88Zgh3nFiRDCzp+MoNP30kStDVFIRfLeeyp2gETnBjIodL54Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4EDj3Tu2oqAAXLo/yx/QcAM0jXGaUaQv6E3bX6RFqCo=;
- b=eR14jh5guLaQFNZdCtRxB8Voe6C6so8N+1G1hvZeWfA7lgruXd9Snp/x1jP4E9dz2encUqIV3QrQBeKsaTnIPN6PGe5qTj+3wZ0qOmD09EGpvCUivyqvlbeupnHtNjOuLtsslC/68fvojPdejMPfXsAJxnoqmTyzUFcaICaJdtvcFwZivJ2UlBtJvDZUgTeg4+nwBJFVE64Lw7paoZzTPvgDF3UCrZTGhS0xCVOCFXGSTzqmR7zfpWRdSaI0aRqKkccYpb161IbuwsX+WhYgqL/RPonyWKUSLcZvD3XIiaqL9cewB3QAESwb53X/5hR8NtG3KMqtOUjgJDKj6iQMBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by DS7PR11MB7858.namprd11.prod.outlook.com (2603:10b6:8:da::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
- 2026 12:00:00 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
- 12:00:00 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Dawei Feng <dawei.feng@seu.edu.cn>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "marcin.szycik@linux.intel.com"
-	<marcin.szycik@linux.intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "zilin@seu.edu.cn" <zilin@seu.edu.cn>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH net v2] ice: fix memory leak in
- ice_lbtest_prepare_rings()
-Thread-Topic: [Intel-wired-lan] [PATCH net v2] ice: fix memory leak in
- ice_lbtest_prepare_rings()
-Thread-Index: AQHc+b3VGSuMNTsboEqIfmSNMe8rubY/iW7w
-Date: Mon, 15 Jun 2026 12:00:00 +0000
-Message-ID: <IA3PR11MB89861DEDD0C74E75AD9E3579E5E62@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260611161204.605962-1-dawei.feng@seu.edu.cn>
-In-Reply-To: <20260611161204.605962-1-dawei.feng@seu.edu.cn>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS7PR11MB7858:EE_
-x-ms-office365-filtering-correlation-id: 60a8601b-4abb-47bb-3d8f-08decad5a06d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|23010399003|7416014|1800799024|6133799003|56012099006|11063799006|38070700021|22082099003|18002099003;
-x-microsoft-antispam-message-info: KIFIA/2dimDsQLPvM8p4rhgu+dPhv8IyFI1uZrK50BaCy/bjrveZ3vPHM37lpy1WuATt8q96PcfIxgW6Y73/6DhQmJaVV34Q8Upcu0HUltXdtFXpncGPBT4i33lT3Vp5JWMF9+AXJQkNREi+jvOuooGoEos2bYnx1JjROaYIPygs3hANTqqEpc7n0L5L8XZlmSYSfFsdzSQByTLXIOKFsdvoyAp/Ck1HZ6t2MJV/OrnhJjkO65bk13bGte/9s59YFNgSYurwKBMzuI31sVeLSYi6EuXYCYvLR0WHTqkMeEoG0A7FOXjdiMWF0f1S1tpsUVco+17rjGvoeJhauqGvFfCMjeOFU62LBG9e/qqW6zG/Ux1aWeRAtCM4w5GM/NiRz92FcNQkZWbprnAf9Vz3WVOi6mP5+rFbjsoZFUlm7j6baYW6hsawuPPE0qcIGQbwaZMVI92jyFatb4CXydw326IRYxdfob/SCxeQhhxz+VXdeiJiwtwU/y+rGNvgqpnY4vOcH5H9NjUyjfxU9P+qLrk7qfdCwl4nqIEOLNAZanEljsUcquHKNT8lWO09e2nFJmDmlxDyPixoIvlBlzwtD3YmWqSLlnE7HfC87YsG7peYRylTQ+8kovIfCdHQPvrXTSeBvrOjdbsALrQ5EkKya1sgRnhmesJnIceFdxM8rr5wuX3EO4XyGMNXF6FQ/SKvq5bOsp9mUC9ObHZ7y4zwvK5ePPMzvJOQbr7z6TAAECJW39DX5JhxM/7oP6HC8N0R
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(23010399003)(7416014)(1800799024)(6133799003)(56012099006)(11063799006)(38070700021)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?PDlliZYikd0woxjj92oZRFoghwrXYEdzeegzOg7+3Mt0cdWMPXv9ALIgHOEl?=
- =?us-ascii?Q?MVMCHh6iuDr0Z7gCLaXz6Kx7ihl5VUntGCc9L9UP8aapJmYBxf9UOxON8YWC?=
- =?us-ascii?Q?rxotPMhiOPVcq2vbPXXo5JXMt5I6dYnQQtvCNvv2fOcKv00sHIHnKXMiwNEp?=
- =?us-ascii?Q?Q5ebzuxgk5hfphzbONEBBTEdF21ZTXchLj6890sodIepUZC9iW1M1gfiqAex?=
- =?us-ascii?Q?LqMR87cqaHgFz+W56TBWrosaz9UZtLdG9vKpq2TPI9Xbrg9rCwbYBHMVpOFC?=
- =?us-ascii?Q?HPCSL3nxIOcOPaN7Ol0vsIVoI65ygAYqngT7+mgkf6ChVQkx2I3Fz6iHfDPG?=
- =?us-ascii?Q?P8JiTAy78NG21v4PVlqMdc/WbwwNaQt5Lvo6O4xpEZWoY7wpwZJUdd4C32eu?=
- =?us-ascii?Q?zjYRFMnZ3JP8Qj96dIhPsWStX1kLxplfzXUw6+b4tj7ahdflqNA40IeFecj2?=
- =?us-ascii?Q?ykpUqga3m0mqvvFjVA4MEdxwXgcUYmHNjroQy0wJVz4Xw+ciu0gTSSouuZuG?=
- =?us-ascii?Q?lpcdjXsoSIv1fSS7aF3fieNc+BlehSEQMbeeSmhOJPYj6cryGp+xsuTQOk7f?=
- =?us-ascii?Q?jo088+8rSwt8wRQsL3jT/1iWtfjw41BuPpcFCb+mgwD5QrmE+wT9W6rNMjCh?=
- =?us-ascii?Q?TnyHPXwwIjY5Kw8mhUnbR4A2KvDdywVgqVhAtY3Gv+GmOXUDdr/YMMht+nE0?=
- =?us-ascii?Q?ukov+0q0m+xclsBfXhOxDbb22Jw8yc+/TZyV9+AJt4SjU8E2xXg7MRh60r0x?=
- =?us-ascii?Q?lKEFnfP2E16tYvcI48qdBMCRJrHF+poAVqIxH8yGmJb/GsCIHRK842OnTi0W?=
- =?us-ascii?Q?1Jv14rAzuDjSb/amUBbSYc+h6xF2X/d6T9MZg3v/S8vUnN21HpcD/PvhfyWH?=
- =?us-ascii?Q?jl/CpVxv1qV9e5meVwJrdqoQ4FCrS8fZgZ0LWSCd+MH1OvN0bJCQ/bibIecg?=
- =?us-ascii?Q?CX4/2gH7LxkcerGgAzrPayDtTtZLptCZp4oQL0isdHPyGbFFkJIR6O0gwM2Q?=
- =?us-ascii?Q?2+cQtC1gOaPmExx1QQIXNimnsVsmtu9vDtmCuXzKJ0A53wz093ZA3Yrtf36R?=
- =?us-ascii?Q?9+qm5mSoGrVTGxBL7XY85TMn9B9KDwqzvKJ6Ip07EH73yLEcbiothO83DFOQ?=
- =?us-ascii?Q?wUefT9SSk2OoWMoakSFi0ejz9O8oEysUFwVx88zkAk3vU+JGVuvyx8Ccb7FS?=
- =?us-ascii?Q?97gbTCSKGFHg1uAu5DmgkS7Qz5abQtmgILcUPH2jH7C76M/oODk2KguMVDQ9?=
- =?us-ascii?Q?JQOwtbT5aG0JU6GpHOejeBvUlS9Q8PZij9vFGGhQuaKlIPtzfRBSz57ug4EX?=
- =?us-ascii?Q?iTMDi2m8u8U85Etw7FGbl2tXWvzrwm1/691ApKDenx9dPePFIstJwubqBRf2?=
- =?us-ascii?Q?OUjkVOT1B2avVNDmz5Z11o3e88ranBcI+JIiLQS5vLErVrmsX0fePTGeoEa4?=
- =?us-ascii?Q?CbWt7vyFk1ORPOKI1g8vK4HJ9SvhXpZpxMOI3ngEfQyZ1gnOfUWLb9qoqJ3D?=
- =?us-ascii?Q?5x27wCt7GmfipWmK2KsA45vBbfI0rsiSqktyaSyBmpf9tSQuzjeNh4hqkaUl?=
- =?us-ascii?Q?DzlWxD1vpQGoN19zHY/SBIYMVLROniq4gCn7AeKve9MRZeouY1rAjDCH/0RB?=
- =?us-ascii?Q?rC9DPGHqaqkwrRPraRAd9vmDm3UQjjkojk38MU7HZwxkaN3ZG3DT2dgjjQdp?=
- =?us-ascii?Q?TA34Fm5ehkqcqWqgjEYgUweXB+JB0MCRFhTsHZjwcTqeR47f6l/dB04VAuhU?=
- =?us-ascii?Q?5RiZ5/FLFDcVwodskelfv3EEMtig+0E=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296363A3E8C
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:00:38 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781524839; cv=none; b=N1mZMtYNoWX4gpJVvxoJC83z5urmuV2IvcAKpIN+a5+y04KIwfWUjGFLYMWzNGCRAsXlLBB++fB0ncx97XEPGTEss5hrk2Mzf5Vpkpzm3UOGLh0FYlVjvnjv3ZdEqyzNqa6izogEtK3Kjn0WdCajMimKXDEFkqg65fip5o/2SSw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781524839; c=relaxed/simple;
+	bh=6acq9PeasHQIcMpkmcWmA+pB1phowqQhPwbKoP9y+Bw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xc6HlQRHnoY07oXxiBeif/SpesB4Rrxsq8GVmOiZ+KYSXgBLkGLCIOxURcqbCnXh1VRe2lo9xPHd5j7M+X1ZUhFTpkP9KBKeGCWieHOzHGYNkpxuDzujXjf8zPWpJfCXX6V3Vbh/9NFrQhZxJZEwqtIcNCG/pjLT/fr0wZx2Fsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SF9VO37P; arc=none smtp.client-ip=170.10.133.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781524837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s1hEc5bLUwY3/fjpyAWOCm1YDlIxHLbXyYuoOMkd4FI=;
+	b=SF9VO37PThYpe0/qrfHxz42oXG1ufrNYuDM7vN8F97f04LD6IuHUOwRuPGybZdYWbz8Ui2
+	Ri71lWjX//RPAQ5M6lTe/fkoYv0LuSe7T4t/kb4QxF2U3K6R3Ta5bjuXhZ+/D/oo2x7l4n
+	gB573IKuc9oY/nD2nLQ8IephkIOkdpQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-5f5PH8BvOP2kra8o7lRYjQ-1; Mon,
+ 15 Jun 2026 08:00:33 -0400
+X-MC-Unique: 5f5PH8BvOP2kra8o7lRYjQ-1
+X-Mimecast-MFC-AGG-ID: 5f5PH8BvOP2kra8o7lRYjQ_1781524831
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 67EBD1800BC3;
+	Mon, 15 Jun 2026 12:00:30 +0000 (UTC)
+Received: from [10.44.33.96] (unknown [10.44.33.96])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4CEC51955BD4;
+	Mon, 15 Jun 2026 12:00:25 +0000 (UTC)
+Message-ID: <ca33b9b8-aafa-40f0-9943-a6b6736af4e4@redhat.com>
+Date: Mon, 15 Jun 2026 14:00:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: TrxsxSpo/Qs6hhaH2Jbl+jKOBf9y4KYt3fwubCIa+BU/BkBqLMzU7kO1kFc4WEAoqaadboHkj0FwA8tJSbM2YcFvApofKu64r2NvH25TngA+Wm5a8hqoMr6u6aDIBwn6r1l3y8BQtytfkc9NJsabYnTGt96dO7CrdIHquBobQ3lXsEyOpajKSLvNt7JILdzrm6i3V+etTqlYLp2EpM7NUfB+BMWN8CgMXnEoOvh1Tw2D4mQrBdPswoWrjwl7V9CSfCT0VKUAsOlw1mFEwGPrZoTIiuDJvpfHQTlYAGkWK61kxsX0Af6dgYEiAxb540wu3DSfGY+xLxv2s5hG4gO5OA==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60a8601b-4abb-47bb-3d8f-08decad5a06d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2026 12:00:00.1036
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CJCDVJi+PldaTmH2lbojJIBoFTZjHSph7WlazOVEqorKZ9Ozgy+xSdHYK4j65UYDhCF1mdwM2PFFYxd/Rcm7B74lZTwLaZOXmsE8mmldWYk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7858
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
+To: Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Schmidt, Michal" <mschmidt@redhat.com>,
+ Paolo Abeni <pabeni@redhat.com>, "Vaananen, Pasi" <pvaanane@redhat.com>,
+ "Oros, Petr" <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260531194423.383366-1-ivecera@redhat.com>
+ <20260531194423.383366-2-ivecera@redhat.com>
+ <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
+ <CH0PR11MB53941698BDF5C3B8298CC0679B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <aifTFMZtWBgLzhCS@FV6GYCPJ69>
+ <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
+ <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
+ <BN9PR11MB5401F6BA29CBA6F0C78FDB119B1A2@BN9PR11MB5401.namprd11.prod.outlook.com>
+ <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
+ <aiqkZhNdt-WhglDg@FV6GYCPJ69>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <aiqkZhNdt-WhglDg@FV6GYCPJ69>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299412-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:marcin.szycik@linux.intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zilin@seu.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299413-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:vadim.fedorenko@linux.dev,m:arkadiusz.kubalewski@intel.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,kernel.org,redhat.com,microchip.com,linux.dev];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email,resnulli.us:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0EF8D685EBF
+X-Rspamd-Queue-Id: 48CC3685EE1
 
+On 6/11/26 2:09 PM, Jiri Pirko wrote:
+> Wed, Jun 10, 2026 at 05:45:46PM +0200, ivecera@redhat.com wrote:
+>> On 6/10/26 3:04 PM, Kubalewski, Arkadiusz wrote:
+>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>> Sent: Tuesday, June 9, 2026 4:59 PM
+>>>>
+>>>> On 6/9/26 4:00 PM, Kubalewski, Arkadiusz wrote:
+>>>>>> From: Jiri Pirko <jiri@resnulli.us>
+>>>>>> Sent: Tuesday, June 9, 2026 10:51 AM
+>>>>>>
+>>>>>> Mon, Jun 08, 2026 at 07:03:46PM +0200, arkadiusz.kubalewski@intel.com
+>>>>>> wrote:
+>>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>>>>>> Sent: Monday, June 8, 2026 5:48 PM
+>>>>>>>>
+>>>>>>>> On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
+>>>>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
+>>>>>>>>>> Sent: Sunday, May 31, 2026 9:44 PM ...
+>>>>>>>>>>           -
+>>>>>>>>>>             name: gnss
+>>>>>>>>>>             doc: GNSS recovered clock
+>>>>>>>>>> +      -
+>>>>>>>>>> +        name: int-nco
+>>>>>>>>>> +        doc: |
+>>>>>>>>>> +          Device internal numerically controlled oscillator.
+>>>>>>>>>> +          When connected as a DPLL input, the DPLL enters NCO mode
+>>>>>>>>>> +          where the output frequency is adjusted by the host via
+>>>>>>>>>> +          the PTP clock interface.
+>>>>>>>>>
+>>>>>>>>> Hi Ivan!
+>>>>>>>>>
+>>>>>>>>> How would you control this in case of automatic mode dpll?
+>>>>>>>>> Automatic mode DPLL shall be controlled on HW level, such pin
+>>>>>>>>> brakes that rule and requires some driver magic to show it is
+>>>>>>>>> higher priority then the rest of the pins?
+>>>>>>>>
+>>>>>>>> The NCO pin can be connected only in manual mode. In other words a
+>>>>>>>> DPLL in automatic mode cannot select NCO pin (switch to NCO mode) by
+>>>>>>>> its own.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Being picky on DPLL_MODE for enabling feature is not something we
+>>>>>>> can allow if it is not related to HW limitation, is it?
+>>>>>>> Could you please elaborate why it is not possible for AUTOMATIC mode?
+>>>>>>
+>>>>>> In automatic mode, the pin selection logic is defined upon prio. I
+>>>>>> can imagine that if NCO pin has the highest prio of the available
+>>>>>> ones, it gets picked. I would be aligned 100% with automatic mode
+>>>>>> behaviour.
+>>>>>> Is there a real usecase for it?
+>>>>>>
+>>>>>> [..]
+>>>>>
+>>>>> This is not true. AUTOMATIC mode is HW solution, SW driver ONLY
+>>>>> configures priorities on the inputs, not manages the active inputs.
+>>>>> This brakes that behavior, the SW driver would have to manually
+>>>>> override the AUTMATIC mode to be fed from such NCO pin as it doesn't
+>>>>> exists on it's priority list, HW cannot pick or use it.
+>>>>
+>>>> Correct, AUTO mode is hardware feature and it should not be emulated by a
+>>>> driver. If the hardware does not support it then the switching between
+>>>> input references should be done by userspace (by monitoring ffo,
+>>>> phase_offset, operstate).
+>>>>
+>>>
+>>> Yes, exactly, so for AUTOMATIC mode HW it will not be possible to create
+>>> such pin, which means that NCO pin would serve only a MANUAL mode
+>>> implementation.
+>>> Basically this is something we shall not allow to happen. DPLL API
+>>> should be designed to cover the case where AUTO mode is able to implement
+>>> all features consistently.
+>>
+>> If you don't like the proposal from Jiri (NCO switch driven by NCO pin
+>> priority -> highest==enter_nco else leave_nco) then it could be possible
+>> to handle the switching by allowing the state 'connected' in AUTO mode
+>> for the NCO pin type. Then the implementation will be the same for both
+>> selection modes.
+>>
+>> Only difference would be that a user does not need to switch the device
+>>from the AUTO to MANUAL mode.
+>>
+>>>>> The real use case is that any DPLL can switch the mode to this one
+>>>>> instead of implementing MANUAL mode just to use the feature with a
+>>>>> 'virtual' pin.
+>>>>
+>>>> I don't expect this... but it is up to a driver. I don't plan such
+>>>> functionality in zl3073x as the NCO pin does not expose prio_get() and
+>>>> prio_set() callbacks - so it is clear that this pin cannot be part of the
+>>>> automatic selection.
+>>>>
+>>>> Ivan
+>>>
+>>> There is a difference between particular HW and API capabilities, with the
+>>> proposed API we would disallow the possibility of such implementation for
+>>> existing HW variants.
+>>>
+>>> DPLL NCO MODE would allow that but as pointed here by Ivan and by Jiri in
+>>> the other email it would also require the extra implementation for some
+>>> configuration - device level phase/ffo handling.
+>>>
+>>> To summarize it all, I don't have such simple solution for it.
+>>>
+>>> First thing that comes to my mind is to combine both approaches.
+>>> Make it possible for AUTMATIC mode to also set "CONNECTED" state
+>>> on certain kind of "OVERRIDE" pins, where it could be determined by
+>>> the type of PIN and embed that logic into the DPLL subsystem.
+>>
+>> The possible states for particual pins are now handled at a driver level
+>> so the driver decides if the requested state is correct or not. So it
+>> could be easy to implement this.
+>>
+>> For auto mode allowed states:
+>> - input references: selectable / disconnected
+>> - nco pin: connected / disconnected
+>>
+>>> Basically, if driver registers such NCO pin it would be always selected
+>>> manually, and in such case all the other pins are going to disconnected
+>>> state while DPLL mode is also a "OVERRIDE" or something like it.
+>>
+>> I would leave this decision on the driver level... Imagine the potential
+>> HW that would allow to switch NCO mode if there is no valid input
+>> reference.
+>>
+>> Example:
+>>
+>> REF0 (prio 0) -> +------+ -> OUT0
+>> REF1 (prio 1) -> | DPLL | -> ...
+>> NCO  (prio 2) -> +------+ -> OUTn
+>>
+>> Such HW would prefer REF0 or REF1 and lock to one of them if they are
+>> qualified. But if they are NOT, then it switches to NCO mode.
+>>
+>> In this situation the relevant driver would allow to configure priority
+>> and state 'selectable' for this NCO pin.
+>>
+>>> Perhaps the pin type could include OVERRIDE in it's name to make it less
+>>> confusing and needs some extra documentation.
+>>>
+>>> Thoughts?
+>> I think _INT_ is ok. In the case of TYPE_INT_OSCILLATOR it is also
+>> obvious that it is not a standard input reference.
+>>
+>> Jiri, Vadim, Arek, thoughts?
+> 
+> I agree with you, the driver should have the flexibility to implement
+> this according to his/hw's needs/capabilities. If it implements prio
+> selection in AUTO mode, let it have it. If it implements manual NCO pin
+> selection in AUTO mode using connected/disconnected override, let it
+> have it.
+> 
+> Moreover, I actually like the "override" capability for pins in AUTO
+> mode in general. It may be handy for other usecases as well.
+> 
+Arek? Vadim?
 
+Thanks,
+Ivan
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Dawei Feng
-> Sent: Thursday, June 11, 2026 6:12 PM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
-> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S . Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; marcin.szycik@linux.intel.com; intel-wired-
-> lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; zilin@seu.edu.cn; Dawei Feng
-> <dawei.feng@seu.edu.cn>; stable@vger.kernel.org
-> Subject: [Intel-wired-lan] [PATCH net v2] ice: fix memory leak in
-> ice_lbtest_prepare_rings()
->=20
-> ice_lbtest_prepare_rings() frees Rx rings only when
-> ice_vsi_start_all_rx_rings() fails. If ice_vsi_setup_rx_rings() fails
-> after allocating some descriptors, or if ice_vsi_cfg_lan() fails after
-> the Rx rings were prepared, the function reaches the Tx cleanup path
-> without releasing the initialized Rx resources.
->=20
-> Fix this by adding separate unwind paths for Rx setup failure and LAN
-> configuration failure. The Rx setup failure path releases the
-> partially prepared Rx rings before freeing Tx rings, while later
-> failures first undo the LAN Tx configuration and then release the Rx
-> rings in reverse setup order.
->=20
-> The bug was first flagged by an experimental analysis tool we are
-> developing for kernel memory-management bugs while analyzing v6.13-
-> rc1. The tool is still under development and is not yet publicly
-> available. Manual inspection confirms that the bug is still present in
-> v7.1-rc5.
->=20
-> An x86_64 allyesconfig build showed no new warnings. As we do not have
-> an Intel E800 Series adapter available to run the ethtool offline
-> loopback selftest, no runtime testing was able to be performed.
->=20
-> Fixes: 0e674aeb0b77 ("ice: Add handler for ethtool selftest")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
-> ---
-> Changes in v2:
-> - Fix cleanup order
->=20
->  drivers/net/ethernet/intel/ice/ice_ethtool.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index f28416a707d7..10a4abc66974 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -1069,18 +1069,18 @@ static int ice_lbtest_prepare_rings(struct
-> ice_vsi *vsi)
->=20
->  	status =3D ice_vsi_cfg_lan(vsi);
->  	if (status)
-> -		goto err_setup_rx_ring;
-> +		goto err_cfg_lan;
->=20
->  	status =3D ice_vsi_start_all_rx_rings(vsi);
->  	if (status)
-> -		goto err_start_rx_ring;
-> +		goto err_cfg_lan;
->=20
->  	return 0;
->=20
-> -err_start_rx_ring:
-> -	ice_vsi_free_rx_rings(vsi);
-> -err_setup_rx_ring:
-> +err_cfg_lan:
->  	ice_vsi_stop_lan_tx_rings(vsi, ICE_NO_RESET, 0);
-> +err_setup_rx_ring:
-> +	ice_vsi_free_rx_rings(vsi);
->  err_setup_tx_ring:
->  	ice_vsi_free_tx_rings(vsi);
->=20
-> --
-> 2.34.1
-
-
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
