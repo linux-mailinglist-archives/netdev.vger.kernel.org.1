@@ -1,94 +1,66 @@
-Return-Path: <netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qEdkC0dUMGqIRgUAu9opvQ
-	(envelope-from <netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:36:39 +0200
+	id qoX+B1dWMGoXRwUAu9opvQ
+	(envelope-from <netdev+bounces-299577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:45:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 916E068973E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:36:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D05689878
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:45:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=eV4GHmBd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=enrQF0wJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299577-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299577-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7D2AD302FE94
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:36:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBB243068458
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197C238BF61;
-	Mon, 15 Jun 2026 19:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842C03AEF4C;
+	Mon, 15 Jun 2026 19:44:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E27D3AE712
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71305396B7F
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:44:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781552195; cv=none; b=ZZxzc+L3y7Hn4SlJt3wOZnF1iPWojkREMnbI/am8UVeE/JSGrJxlsM878NnLDN6rOwyRBKAD66epd78SENNCok0L5p1bGpXen+glrEvA07moKdAZ+osYP14kuwsV76k6jpyWonH3dv8v7uNcIm5Srq3NHkuSJCMlM34c9dyTqUs=
+	t=1781552660; cv=none; b=Dt791QQKBD75D+ICjOK27RxJrkNF/FVOUhqwFizMfJYisXydVNM2nBtWLpEmYXPiKZKEi92wcrTIDhJEAd1NMGVcT4iJjcSY+2sPHp+dH+UtjBWZBVRDHTS8Ex54ZSLVMZNxqVcS1o0dpFRUh6LwKGb7pku0iVYUBNjtRKulwqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781552195; c=relaxed/simple;
-	bh=zExE5mU1uth3L3YciOkNs3dfGu8JI81ISthn7zqwI9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=caV4zKlB+jA//4bp0EHqjgWpthORdqBVyfwbiI3QYOdzjFUTixWxlWOd50r+0KnZZHMDv425gi8kciO86t/0snlu8dDKlcyPwrwmrGIjr+MqppzkfUaVJUlgEtJqs5AhgPD77947CK7Usn/+gsXrzkBrYZ6u7yJXlEy08n8HoaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eV4GHmBd; arc=none smtp.client-ip=209.85.222.175
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-915d64fead9so484070585a.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:36:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781552192; x=1782156992; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PEPYbPBc5PCqVyemts16X0tQWPQJiI9iZvYMcKt7ijQ=;
-        b=eV4GHmBdnBkmy3GkfHhfP1aIT7CWIzpo9b6VDrMf9nsHtxRLvYgj3nYp1PrbBGv1ep
-         +0jH7yZMcG5jvUe09ctBrmPb+joJif6z3Y//Ahd9fKFeYKvRkzEw8pVWp3q8aOTaxzHd
-         GYw4FpHu5nFKsuTNl4WgHSn+7Ve0QTC7Y5RWNjkSc4oXhkbVb/5AvV95pnj4t/PUZe5J
-         h2gh98lyzE4bc0mKyRWN+Q6Q02ip+WzkhiLWyPeq1EcWX3m+SYihRAnzXnfSd8YvraKO
-         AJQ+ZfIu3HS0XQtNEmFLXmewisSr6CWUd87ut1CaGe82CwdGSg8L2n89PQ4VVtE1pTE4
-         LfVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781552192; x=1782156992;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PEPYbPBc5PCqVyemts16X0tQWPQJiI9iZvYMcKt7ijQ=;
-        b=Zogl+1O5K+uAhSoQdwHzk4dp5I3JZuhOfG2oawCc0nQ5sM6ZHb3kj3NNf2GplrfTGW
-         or5hD5PK68mfmh5/ZDZHPvlG5MJOEUecK+Df0IG3Mm76D1eGo2dYnsq/w1ng8HxhBX39
-         VOPstn+OvMBDNm8MwOM96GgoYXp6pD+db2yYL7mAOzCE4siCVnCyndIOryhHn8tkkn92
-         1JkkmHsZeUcZ2B8B1G66nlMqjrPaWTF410xjEQ16AWHyg8u470SK643UIaP0YAjuo/8q
-         himU+p+UDF4maV0yI61fy2fpCmmzc/8Nk4SctyAS0GfHxZG2njdfqGhvPci2iArhhd0G
-         2aFg==
-X-Gm-Message-State: AOJu0YxiGToRRFjhd9xcTAhwtaay9ihdmCWPFaniMlHcod2QzMQ6FKCA
-	ApvVaaYIA8VpRuWGIiCBv05bpd1vij1e5x1qY5PvBMwohrRp2NfbQ/FxOcHfCw==
-X-Gm-Gg: Acq92OG/7EWa8uC/rPoBnNcGvC+HxN9jwhU5lEETWC5qU8WIEcIeP5OGngfV4uOwydY
-	DkVihU9xA/G8lQeHyqDjDSJThDVsr7un9j/wr25CD0QkwV0TH7bC8BwoV4PWervDU5wM9jIubgm
-	rYqcy1fp7XAPks7zM5UWoEgYSbhwUDhxQyNOvLTMccUpOocwMxflVq7YkQmGsNHb8ntfF8Mb0aB
-	o0ODKXag9sUJ3IapyMaUK3JZjRRSvs/kR4KT7ftZS06OtIX19NXoYSoeSToWTcMJue6yqSir3Fv
-	KedPWntiJP6Pih6Ja4pgxL6BGnTVx7ntdTosmdxoL0pqcCmqzxgSwDZhxDljlvqYP9Q7lQMjfD2
-	2imXntVs2eC1tY6fLyVmy8EYZXrLkdG05T76u/B08N9es6mrcthrPtLretk1vBlkDILf1GnIv8C
-	SQmObokVEbENjicxyUaZKAIFvDGqCFZ2GM1U0g9c+KQ9udKWOZjVJSP3jSuuxIngecKLRylJ/8N
-	lbzoeSwXVP8H7G0bWKhZndAbvn2KMIZ9GZNak2YRoz9y/OhKw3m6L01LJVPxnNM6wFY1FRM1DEK
-X-Received: by 2002:a05:620a:2914:b0:8ee:b817:9a03 with SMTP id af79cd13be357-91c2d8654f5mr139642385a.9.1781552192358;
-        Mon, 15 Jun 2026 12:36:32 -0700 (PDT)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-91619f06835sm1229534085a.14.2026.06.15.12.36.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 12:36:31 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Willy Tarreau <w@1wt.eu>,
-	Zero Day Initiative <zdi-disclosures@trendmicro.com>
-Subject: [PATCH net v2] sctp: hold socket lock when dumping endpoints in sctp_diag
-Date: Mon, 15 Jun 2026 15:36:30 -0400
-Message-ID: <4c1b49ab87e0f7d552ebd8172b364b1994e913c9.1781552190.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1781552660; c=relaxed/simple;
+	bh=DaQ+bInqi6MfHuGHKlDIMPSWqgjpb7ucG8SVRX72WQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jTsX3myJ4j2yOrdg/yH+VWd09ut0HKuoVcpmpBKHirCiQZOeQ4XFruozs07K7iIGhqN0XE5IV0VVqMznL5DfpGB2DJcETX3DeoAmgKondqhcGXHJCTValWWqm7gBQo7rc3pLDMzIU4ogeu080pMkfLyLuenBnVzkl+7v2VkBYQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enrQF0wJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7D0E1F000E9;
+	Mon, 15 Jun 2026 19:44:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781552659;
+	bh=X7BTtysa7IzX4B8v/CmQewNbwhKGI9JBqYofOrifuEc=;
+	h=From:To:Cc:Subject:Date;
+	b=enrQF0wJG8jbUbGmotEsdEMmMqMCzakn9u+9TJfWoTinMOqpozaIGSaeO+jHLEZwQ
+	 WRNW/2+YfEMTqoQ8W110CalYLQq/16IZhABy9UNgz/y9MWQMH88lemzuthoADGb73C
+	 XjYwSLalblCM9oGitS9yZmx+ySld+My/JxjefIyjVFETZn5/HrAFPD+HbTP6FlrPcl
+	 1M8E2B+nbc7X1jk2FyoWaGo8lFoX4FGDnEXryE4lh2blettmGzRfv7D7rL+0GuGJsk
+	 K7nXp0FQLEmqcGmLWFgi1YHM7cbBB7dlkFMViAiGxTdYnnz6rsYhFN17QyK8lBLYZU
+	 Hv/ILAbiM/x9w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	3chas3@gmail.com,
+	mitch@sfgoth.com,
+	linux-atm-general@lists.sourceforge.net,
+	dwmw2@infradead.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 0/9] atm: remove more dead code
+Date: Mon, 15 Jun 2026 12:44:07 -0700
+Message-ID: <20260615194416.752559-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,288 +69,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,1wt.eu,trendmicro.com];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299576-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,sfgoth.com,lists.sourceforge.net,infradead.org];
+	TAGGED_FROM(0.00)[bounces-299577-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:w@1wt.eu,m:zdi-disclosures@trendmicro.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:3chas3@gmail.com,m:mitch@sfgoth.com,m:linux-atm-general@lists.sourceforge.net,m:dwmw2@infradead.org,m:kuba@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,trendmicro.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 916E068973E
+X-Rspamd-Queue-Id: 71D05689878
 
-SCTP_DIAG endpoint dumping was traversing endpoint address lists without
-holding lock_sock(), while those lists could change concurrently via
-socket operations (e.g., bindx changes). This creates a race where
-nla_reserve() counts addresses under RCU protection, but the subsequent
-copy may see fewer entries, potentially leaking uninitialized memory to
-userspace.
+Commit 6deb53595092 ("net: remove unused ATM protocols and legacy
+ATM device drivers") removed a good chunk of old ATM drivers.
+Our goal going forward is to limit the ATM support to PPPoATM
+used in ADSL deployments.
 
-Fix this by:
+A recent burst of AI generated fixes for net/atm/signaling.c and
+net/atm/svc.c made me look closer at the remaining code. PPPoATM runs
+over permanent virtual circuits (PF_ATMPVC) with a statically
+configured VPI/VCI. We can drop switched virtual circuits (SVCs)
+and user-space signaling (atmsigd) support. While digging around
+I noticed a few more obviously dead pieces of code.
 
-- Taking a reference on each endpoint during hash traversal
-- Moving socket operations (lock_sock()) outside read_lock_bh()
-- Serializing address list access during dump
-- Reworking sctp_for_each_endpoint() to support restart-based traversal
-  with (net, pos) tracking
+Annoyingly, I have applied one "fix" to QoS config which will
+now make net conflict with this series :/
 
-Also:
-
-- Add WARN_ON_ONCE() for inconsistent address counts
-- Fix idiag_states filtering for LISTEN vs association cases
-- Skip dumping endpoints being freed (ep->base.dead)
-- Move dump position tracking into iterator, removing cb->args[4] and
-  its comment for sctp_ep_dump().,
-- Update the comment for cb->args[4] and remove the comment for unused
-  cb->args[5] for sctp_sock_dump().
-
-Note: traversal is restart-based and may re-scan buckets multiple times,
-but this is acceptable due to small bucket sizes and required to support
-sleeping-safe callbacks.
-
-This issue was reported by Nico Yip (@_cyeaa_) working with TrendAI Zero
-Day Initiative.
-
-Reported-by: Zero Day Initiative <zdi-disclosures@trendmicro.com>
-Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
 v2:
-  - Improve the changelog to cover more changes.
-  - Check ep->base.dead instead of sctp_sstate(sk, CLOSED) in
-    sctp_ep_dump().
-  - Add an inline comment for idiag_states check in sctp_ep_dump().
-  - Update the inline comment for cb->args[4] for sctp_sock_dump().
-  - Simplify the code a bit by holding ep instead of sk in
-    sctp_for_each_endpoint().
----
- include/net/sctp/sctp.h |  3 +-
- net/sctp/diag.c         | 67 ++++++++++++++++++++---------------------
- net/sctp/socket.c       | 29 +++++++++++++-----
- 3 files changed, 56 insertions(+), 43 deletions(-)
+ - fix build warning on patch 4
+v1: https://lore.kernel.org/20260613201032.77274-1-kuba@kernel.org
 
-diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-index 58242b37b47a..cd82b05354a3 100644
---- a/include/net/sctp/sctp.h
-+++ b/include/net/sctp/sctp.h
-@@ -111,7 +111,8 @@ int sctp_transport_lookup_process(sctp_callback_t cb, struct net *net,
- 				  const union sctp_addr *paddr, void *p, int dif);
- int sctp_transport_traverse_process(sctp_callback_t cb, sctp_callback_t cb_done,
- 				    struct net *net, int *pos, void *p);
--int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *), void *p);
-+int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
-+			   struct net *net, int *pos, void *p);
- int sctp_get_sctp_info(struct sock *sk, struct sctp_association *asoc,
- 		       struct sctp_info *info);
- 
-diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-index d758f5c3e06e..c2a0de2adf6f 100644
---- a/net/sctp/diag.c
-+++ b/net/sctp/diag.c
-@@ -92,6 +92,7 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_buff *skb,
- 		if (!--addrcnt)
- 			break;
- 	}
-+	WARN_ON_ONCE(addrcnt);
- 	rcu_read_unlock();
- 
- 	return 0;
-@@ -373,42 +374,39 @@ static int sctp_ep_dump(struct sctp_endpoint *ep, void *p)
- 	struct sk_buff *skb = commp->skb;
- 	struct netlink_callback *cb = commp->cb;
- 	const struct inet_diag_req_v2 *r = commp->r;
--	struct net *net = sock_net(skb->sk);
- 	struct inet_sock *inet = inet_sk(sk);
- 	int err = 0;
- 
--	if (!net_eq(sock_net(sk), net))
-+	lock_sock(sk);
-+	if (ep->base.dead)
- 		goto out;
- 
--	if (cb->args[4] < cb->args[1])
--		goto next;
--
--	if (!(r->idiag_states & TCPF_LISTEN) && !list_empty(&ep->asocs))
--		goto next;
-+	/* Skip eps with assocs if non-LISTEN states were requested, since
-+	 * they'll be dumped by sctp_sock_dump() during assoc traversal.
-+	 */
-+	if ((r->idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)) &&
-+	    !list_empty(&ep->asocs))
-+		goto out;
- 
- 	if (r->sdiag_family != AF_UNSPEC &&
- 	    sk->sk_family != r->sdiag_family)
--		goto next;
-+		goto out;
- 
- 	if (r->id.idiag_sport != inet->inet_sport &&
- 	    r->id.idiag_sport)
--		goto next;
-+		goto out;
- 
- 	if (r->id.idiag_dport != inet->inet_dport &&
- 	    r->id.idiag_dport)
--		goto next;
--
--	if (inet_sctp_diag_fill(sk, NULL, skb, r,
--				sk_user_ns(NETLINK_CB(cb->skb).sk),
--				NETLINK_CB(cb->skb).portid,
--				cb->nlh->nlmsg_seq, NLM_F_MULTI,
--				cb->nlh, commp->net_admin) < 0) {
--		err = 2;
- 		goto out;
--	}
--next:
--	cb->args[4]++;
-+
-+	err = inet_sctp_diag_fill(sk, NULL, skb, r,
-+				  sk_user_ns(NETLINK_CB(cb->skb).sk),
-+				  NETLINK_CB(cb->skb).portid,
-+				  cb->nlh->nlmsg_seq, NLM_F_MULTI,
-+				  cb->nlh, commp->net_admin);
- out:
-+	release_sock(sk);
- 	return err;
- }
- 
-@@ -479,41 +477,40 @@ static void sctp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 		.r = r,
- 		.net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN),
- 	};
--	int pos = cb->args[2];
-+	int pos;
- 
- 	/* eps hashtable dumps
- 	 * args:
- 	 * 0 : if it will traversal listen sock
- 	 * 1 : to record the sock pos of this time's traversal
--	 * 4 : to work as a temporary variable to traversal list
- 	 */
- 	if (cb->args[0] == 0) {
--		if (!(idiag_states & TCPF_LISTEN))
--			goto skip;
--		if (sctp_for_each_endpoint(sctp_ep_dump, &commp))
--			goto done;
--skip:
-+		if (idiag_states & TCPF_LISTEN) {
-+			pos = cb->args[1];
-+			if (sctp_for_each_endpoint(sctp_ep_dump, net, &pos,
-+						   &commp)) {
-+				cb->args[1] = pos;
-+				return;
-+			}
-+		}
- 		cb->args[0] = 1;
- 		cb->args[1] = 0;
--		cb->args[4] = 0;
- 	}
- 
-+	if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
-+		return;
-+
- 	/* asocs by transport hashtable dump
- 	 * args:
- 	 * 1 : to record the assoc pos of this time's traversal
- 	 * 2 : to record the transport pos of this time's traversal
- 	 * 3 : to mark if we have dumped the ep info of the current asoc
--	 * 4 : to work as a temporary variable to traversal list
--	 * 5 : to save the sk we get from travelsing the tsp list.
-+	 * 4 : to track position within ep->asocs list in sctp_sock_dump()
- 	 */
--	if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
--		goto done;
--
-+	pos = cb->args[2];
- 	sctp_transport_traverse_process(sctp_sock_filter, sctp_sock_dump,
- 					net, &pos, &commp);
- 	cb->args[2] = pos;
--
--done:
- 	cb->args[1] = cb->args[4];
- 	cb->args[4] = 0;
- }
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 66e12fb0c646..c8481461f7d8 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -5369,24 +5369,39 @@ struct sctp_transport *sctp_transport_get_idx(struct net *net,
- }
- 
- int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
--			   void *p) {
--	int err = 0;
--	int hash = 0;
--	struct sctp_endpoint *ep;
-+			   struct net *net, int *pos, void *p) {
-+	int err, hash = 0, idx = 0, start;
- 	struct sctp_hashbucket *head;
-+	struct sctp_endpoint *ep;
- 
- 	for (head = sctp_ep_hashtable; hash < sctp_ep_hashsize;
- 	     hash++, head++) {
-+		start = idx;
-+again:
- 		read_lock_bh(&head->lock);
- 		sctp_for_each_hentry(ep, &head->chain) {
--			err = cb(ep, p);
--			if (err)
-+			if (sock_net(ep->base.sk) != net)
-+				continue;
-+			if (idx++ >= *pos) {
-+				sctp_endpoint_hold(ep);
- 				break;
-+			}
- 		}
- 		read_unlock_bh(&head->lock);
-+
-+		if (ep) {
-+			err = cb(ep, p);
-+			sctp_endpoint_put(ep);
-+			if (err)
-+				return err;
-+			(*pos)++;
-+
-+			idx = start;
-+			goto again;
-+		}
- 	}
- 
--	return err;
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(sctp_for_each_endpoint);
- 
+Jakub Kicinski (9):
+  atm: remove AAL3/4 transport support
+  atm: remove the unused send_oam / push_oam callbacks
+  atm: remove dead SONET PHY ioctls
+  atm: remove the local ATM (NSAP) address registry
+  atm: remove SVC socket support and the signaling daemon interface
+  atm: remove the unused change_qos device operation
+  atm: remove the unused pre_send and send_bh device operations
+  atm: remove unused ATM PHY operations
+  atm: remove orphaned uAPI for deleted drivers, protocols and SVCs
+
+ net/atm/Makefile                  |   2 +-
+ include/linux/atm_tcp.h           |  24 --
+ include/linux/atmdev.h            |  70 +--
+ include/uapi/linux/atm_eni.h      |  24 --
+ include/uapi/linux/atm_he.h       |  21 -
+ include/uapi/linux/atm_idt77105.h |  29 --
+ include/uapi/linux/atm_nicstar.h  |  54 ---
+ include/uapi/linux/atm_tcp.h      |  62 ---
+ include/uapi/linux/atm_zatm.h     |  47 --
+ include/uapi/linux/atmarp.h       |  42 --
+ include/uapi/linux/atmclip.h      |  22 -
+ include/uapi/linux/atmdev.h       |  18 -
+ include/uapi/linux/atmlec.h       |  92 ----
+ include/uapi/linux/atmmpc.h       | 127 ------
+ include/uapi/linux/atmsvc.h       |  56 ---
+ net/atm/addr.h                    |  21 -
+ net/atm/common.h                  |   5 -
+ net/atm/protocols.h               |   1 -
+ net/atm/signaling.h               |  31 --
+ drivers/atm/solos-pci.c           |   4 -
+ net/atm/addr.c                    | 162 -------
+ net/atm/atm_sysfs.c               |  25 --
+ net/atm/br2684.c                  |   3 +-
+ net/atm/common.c                  |  73 +---
+ net/atm/ioctl.c                   |  58 ---
+ net/atm/pppoatm.c                 |   3 +-
+ net/atm/proc.c                    |  56 ---
+ net/atm/raw.c                     |  21 +-
+ net/atm/resources.c               |  59 +--
+ net/atm/signaling.c               | 297 -------------
+ net/atm/svc.c                     | 695 ------------------------------
+ 31 files changed, 15 insertions(+), 2189 deletions(-)
+ delete mode 100644 include/linux/atm_tcp.h
+ delete mode 100644 include/uapi/linux/atm_eni.h
+ delete mode 100644 include/uapi/linux/atm_he.h
+ delete mode 100644 include/uapi/linux/atm_idt77105.h
+ delete mode 100644 include/uapi/linux/atm_nicstar.h
+ delete mode 100644 include/uapi/linux/atm_tcp.h
+ delete mode 100644 include/uapi/linux/atm_zatm.h
+ delete mode 100644 include/uapi/linux/atmarp.h
+ delete mode 100644 include/uapi/linux/atmclip.h
+ delete mode 100644 include/uapi/linux/atmlec.h
+ delete mode 100644 include/uapi/linux/atmmpc.h
+ delete mode 100644 include/uapi/linux/atmsvc.h
+ delete mode 100644 net/atm/addr.h
+ delete mode 100644 net/atm/signaling.h
+ delete mode 100644 net/atm/addr.c
+ delete mode 100644 net/atm/signaling.c
+ delete mode 100644 net/atm/svc.c
+
 -- 
-2.47.1
+2.54.0
 
 
