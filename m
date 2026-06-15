@@ -1,256 +1,241 @@
-Return-Path: <netdev+bounces-299546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299547-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QxOrAqUxMGr2PgUAu9opvQ
-	(envelope-from <netdev+bounces-299546-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:08:53 +0200
+	id 87KaO+cxMGoFPwUAu9opvQ
+	(envelope-from <netdev+bounces-299547-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:10:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E33C5688B15
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:08:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE0D688B3E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:09:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=mcSXSTgB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299546-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299546-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Xbeu7cOJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299547-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299547-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 65D953009E07
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:56:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D306130987D1
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D9840BCA9;
-	Mon, 15 Jun 2026 16:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F45240FDBE;
+	Mon, 15 Jun 2026 16:58:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA862407576
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 16:55:58 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781542560; cv=pass; b=G3Rlfh+8XkahFSWDxCVmxCqAOJXdeOyOaPIqn5ojsnXQRfeMrdVKutIrdDroYBKgP18wkSsRFSpQphqk0VCE6g6GQvkJNH6wc2LpKErymy8+e0GXIsPRJDyV1l/TUytAsTtq5lrd0Acw8O6o+9buMfnz1nlcBObklTRrma0eyvo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781542560; c=relaxed/simple;
-	bh=4YPWMK+0WYWJceGQjSJj/WOQ+Iz5+dRnHqH63ccwQUo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a9Rcn9c3GBMSyhq2ubORQqq+T5LtYwC0AqSKtrntbwUIxlbaAI+IEEqm8lBbCD/Inp5FZnl30qWjhthldS4l+M8Orhbh2NP2UTi147s2fvRK9Tt6s9U5Y0by9v4JCairDZ/oa5Mo2rr9t/3LXy4q4CNuezN8lQh1jpxyJEgrNXY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mcSXSTgB; arc=pass smtp.client-ip=209.85.160.176
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5176fc0cc72so38339731cf.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 09:55:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781542558; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fcFEwnNbJ9zYPbbQWpal3gm923/WeT1I95g4wMNa+rFoqxEdtuosnUPZlf/1LaSRq2
-         dAd3BZNu8ALsfSGPSsC36vNDH7ihzN+rDoiiCitVt01iwpArk6JWHRNMfhw+aesLLozU
-         tA4oHRyqWaJPRmohRIFNcG1OlRRxh0H1SMvRFcINiZzKoIYtZdEFSUHGPEUfuQpUBFzq
-         graJKz/CA0x6tdkmy27T9MDVgyhgMuKcVghZ8AjXjUogjmkquLTW0EwQ2G/nkU7TlWk/
-         REy7nDkozRTkl9cHcf7jhVQq/VqKQ3LUOUytZAAJCk0xFGKyG25vAEqxY54LFJBierHH
-         1ItQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=op3KaiCmJCT9futuSMniceaWe5Q/wKrwv8uwA7WTvb8=;
-        fh=hNzy4O4tk2xeHhbcxz2d6lzTvVRCyXqa1b5K7LahNDg=;
-        b=La+zcaRCb4w2AFSROcZvMSYaRDOCDJaI0WnmtmM3a27pbX2t7D78/qW2yhAhY4r+Jj
-         GxIgIDfKeVidXOsGk70D43X1u6YK/3mOU5n9D2iytifLnEEe459B3J/qAwH9RiyJRIzI
-         nHj8j+KtU0VujfKD6DY8N+f38UxaqM826SUbeIwklI+z0Ladm3/5hupqIp0I9i+dELC8
-         nrBzjef1ezEspyX73hPHt4XRphr5KkaGdRH+gbcoNztRySHBQmGLsTzcnZvGtepSOCHv
-         iJFSzI5G073S5gHaFoljp54P3fyGJmqkLgeD4aRr7Gq36vP3OoUybEInLxH2OPFetzVC
-         +/5A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781542558; x=1782147358; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=op3KaiCmJCT9futuSMniceaWe5Q/wKrwv8uwA7WTvb8=;
-        b=mcSXSTgBoO4O/qL7Qd87hqo3I3Z0I3BGtkW9A2FPKwCQFvqqU09+es8L6ET2ATj6TS
-         7Y0ystcfUhQ/69kFzrPWyYo4/gCZKYKTX9HxxAuBBHdMxPhm+t2G5A6hZdnB2nyYOxen
-         cj+Dw6ZJfmjy6XyY1hcyb+h/1CJuYTQ0VV0GiRrIFZ8Hj647FS/PEPXYNyij5GXyqWhB
-         9iZtnFD/rWWi1xRU0fKOZRhwyEtUxr6w2fgymUImnNv1IGHiMFQdxkid2CVucz4H/za4
-         uxWKCbj5fDTA13HQiDMrAaIyoxWuWw99510D2QSPmEa5OkPiBhGLoBdmiacTXBZRJZn0
-         //LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781542558; x=1782147358;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=op3KaiCmJCT9futuSMniceaWe5Q/wKrwv8uwA7WTvb8=;
-        b=NDXtto3Gcq71dGYUR05k1xtz2xjGEHxrJmKLgbBpR7vKYxMR8BUfLCdsHCEfJfkCTM
-         OIzU0buzc++18+HS5a29HRVVfMSzrpePDQTkdh5BZkSewRKuIJy4/b98LH6ZX8s+CK14
-         dZtYpYKNV/6UFSnGOedWxeOrB6P/W+Fd8RK4AsbRrj62e+SHj74oJL977EXtpWJlf15k
-         m6t1C23P/Cr14VJoQjw+A3DKCniTLyQSJIXvj0G211GnxAeB8SecWvmw6RA60txH4tt3
-         Ng6RpoOeDU3LSLhdT4tF/gjU/ST5MkDZ9gc/UQbtWjjueOSUmOOT30wq/p+s45i6Qv5O
-         VOPg==
-X-Gm-Message-State: AOJu0YzkGPAJweOzQdy1ckvekQerdilpsHQGlxLtxHSryLALvnzPEYfq
-	1QqobRwjCG9uGVYAXdz/4r1p3BgFBHk50kOPdpvGW1Rcuir7SBDDOYowxoaogGVF1tonTSx1yh1
-	tRmrvTRJewHQLI/s0UOerUdlnyuVX2QL7k41LBE2K
-X-Gm-Gg: Acq92OHiTvg9UIgzDWMKHf54JocX04iv6p7K3pSyxnyGp+Lq57sm+xmQCBld5eePJIU
-	dmc/2XChM+ILEkIyqTG0SgjM7GxJemWm/mjZy07A3sPnnPYti81H8aZebG40WkG8erZVPEfPpUR
-	/+lJ/DX1YiLTaZTnR4e9hxecxXl+bsG1gO1IKoV1y2zuVSaFWsSNvC/fDw5TfiiylGINJD13Fn6
-	1m/2oTQJ1wEWF34qkf8v2RZDnilSJZ/tUUogIVTaVU5oUnPyeeRWjDWsZ1aoQXZBScvvbwHcMzu
-	jYsRiWH6q5+y6jwiHU0cV12Wf2tgPDUsFXVSM7efiB6/7RnrWUth8LwlhAmTtqddzWPZETLH4/8
-	fLxVVF4WNhj5phbtyRxvn
-X-Received: by 2002:a05:622a:1115:b0:50f:b4c0:630f with SMTP id
- d75a77b69052e-5195357c228mr175976161cf.54.1781542556797; Mon, 15 Jun 2026
- 09:55:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E0E40F8F6;
+	Mon, 15 Jun 2026 16:58:43 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781542724; cv=none; b=D0t/4QlGkPub2VxnnXdAY9zZxTxziayWBhNOj+iP0ZitLy1iNI1YY2U42E7ibF4Zf8O4G+TMXrhGSaL5vr4ln9DliixseCuz0tt746vwR6VZQ3dHIwdj3NiaDB/3qttgDD6Onx8+rtWdHl40SUtwPPa8Qo4V2em7Y3pBe93jZic=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781542724; c=relaxed/simple;
+	bh=Ngc0fbnXuJYFmVmOuNAA5Y9B2C5ldaEgWbf6FJU7ppA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ciQHVNbE0lZR8hWTEn1bWLBy4emTS57E8Ya2MVhnoAts+OZQ01DaO32NLU1gIwXJzmACTNoGqGDyg6EiEn6YWCpybAgWV4X7WM4fVOJCbLfK1jMzaoduNAVJ8tp0QBjJmpsUEXVy3ai+aQEOehJGDCtPztMzssEGsFDRqaKBsto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xbeu7cOJ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC0F31F000E9;
+	Mon, 15 Jun 2026 16:58:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781542722;
+	bh=YsN1CadyLAyGEhCApEUWtqZDEHhXWdkwP/+0L+D042s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Xbeu7cOJDEW0E3Px8mPyM19tUXuPEpxT3agJG6yWpwZxbE+wJGL8Sth3ecFvyhscH
+	 TTjy7huaXU550bkGnMYhHMHITaiFs3rsE3Kq8y63m33nxxMIEphXqsYZAO0zjuH4dn
+	 5I9DIWFv5aZSWJRdloGe9XWaEXlOvhgVZbZNl9f1O456uLf4MOfLQqKx8MpKpxzeew
+	 3cX3zaBGWEfdbsZM7m+UONlJEnUJrTAERDuDQPc7D2pVfMORCBa/dAWlrRcsBNt2Un
+	 Sn68/kzAz0wqx3rCNNdYOduRPxYyi0RbcgZfb25CMo6zkPBPiGV7X5KQlzZ+ivaP8Z
+	 kIgTP0YZDCL9Q==
+From: Simon Horman <horms@kernel.org>
+To: yun.zhou@windriver.com
+Cc: Simon Horman <horms@kernel.org>,
+	marcin.s.wojtas@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: mvneta_bm: add suspend/resume support to prevent crash after resume
+Date: Mon, 15 Jun 2026 17:58:25 +0100
+Message-ID: <20260615165825.784194-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260614103835.2708515-1-yun.zhou@windriver.com>
+References: <20260614103835.2708515-1-yun.zhou@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260615042158.1600746-1-ntspring@meta.com> <20260615042158.1600746-2-ntspring@meta.com>
-In-Reply-To: <20260615042158.1600746-2-ntspring@meta.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 15 Jun 2026 09:55:45 -0700
-X-Gm-Features: AVVi8CcLt4JINR95JUJ5Pig2rgeZiW8v5j_nnToRd6BeBcgfvgXVPVQccUrwbf4
-Message-ID: <CANn89iLjf-d08s1ofLo3fDUQENYji9qwG6fQbiAN3fyvxP=+BA@mail.gmail.com>
-Subject: Re: [PATCH v14 1/2] tcp: rehash onto different local ECMP path on
- retransmit timeout
-To: Neil Spring <ntspring@meta.com>
-Cc: netdev@vger.kernel.org, ncardwell@google.com, kuniyu@google.com, 
-	davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ntspring@meta.com,m:netdev@vger.kernel.org,m:ncardwell@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:dsahern@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-kselftest@vger.kernel.org,m:bpf@vger.kernel.org,m:martin.lau@linux.dev,m:daniel@iogearbox.net,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-299546-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299547-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:yun.zhou@windriver.com,m:horms@kernel.org,m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,meta.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E33C5688B15
+X-Rspamd-Queue-Id: 6EE0D688B3E
 
-On Sun, Jun 14, 2026 at 9:22=E2=80=AFPM Neil Spring <ntspring@meta.com> wro=
-te:
->
-> Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO, PLB,
-> and spurious-retransmission events, but the cached route is reused and
-> the new hash is not propagated into the ECMP path selection logic.  Two
-> changes are needed to make rehash select a different local ECMP path:
->
-> 1. Add __sk_dst_reset() alongside sk_rethink_txhash() in
->    tcp_write_timeout(), tcp_rcv_spurious_retrans(), and
->    tcp_plb_check_rehash() so the cached dst is invalidated and the
->    next transmit triggers a fresh route lookup.
->
-> 2. Set fl6->mp_hash from sk_txhash (or tcp_rsk(req)->txhash for
->    SYN/ACK retransmits and syncookies) in tcp_v6_connect(),
->    inet6_sk_rebuild_header(), inet6_csk_route_req(),
->    inet6_csk_route_socket(), tcp_v6_send_response(), and
->    cookie_v6_check() so fib6_select_path() picks a path based on the
->    new hash.
->
-> The mp_hash override only applies to fib_multipath_hash_policy 0 (the
-> default L3 policy).  Its hash includes the flow label, but that is 0 by
-> default -- np->flow_label is unset, and auto_flowlabels only computes
-> the on-wire label later, per packet -- so flows to the same peer share
-> one local path.  Keying the hash on sk_txhash makes the local path
-> per-connection and lets a rehash re-select it.  Policies 1-3 are left
-> unchanged.
->
-> The mp_hash assignment is factored into a small helper,
-> ip6_ecmp_set_mp_hash(), shared by inet6_csk_route_req(),
-> inet6_csk_route_socket(), tcp_v6_connect(), inet6_sk_rebuild_header(),
-> tcp_v6_send_response(), and cookie_v6_check().  It applies
-> (txhash >> 1) ?: 1 for policy 0 (the >> 1 keeps mp_hash in the 31-bit
-> range; ?: 1 keeps it non-zero, since 0 would fall back to
-> rt6_multipath_hash()).  inet6_csk_route_socket() calls it only for
-> sk_protocol =3D=3D IPPROTO_TCP so that non-TCP callers (e.g., L2TP via
-> inet6_csk_xmit) fall through to rt6_multipath_hash() and retain their
-> existing flow-key-based ECMP behavior.
->
-> tcp_v6_send_response() also sets mp_hash from the response txhash so
-> that a control packet (a RST from the full socket, or an ACK from a
-> time-wait socket) selects the same local ECMP nexthop as the
-> connection's txhash rather than falling back to the flow hash.  The
-> time-wait socket's tw_txhash is copied from sk_txhash when the
-> connection enters TIME_WAIT, so it reflects any rehash that occurred.
->
-> Setting mp_hash explicitly is necessary because the default ECMP hash
-> derives from fl6->flowlabel via np->flow_label, which is not updated
-> from sk_txhash (REPFLOW is off by default).  ip6_make_flowlabel()
-> cannot help either, as it runs after the route lookup.
->
-> As a consequence, for policy 0 the local ECMP path of an IPv6 TCP
-> flow follows sk_txhash even when fl6->flowlabel is non-zero, e.g. a
-> reflected (REPFLOW) or explicitly set (IPV6_FLOWLABEL_MGR) flow
-> label.  This is intentional: only local path selection changes, so
-> rehash can recover from a failed path; the on-wire flow label is
-> unchanged.
->
-> sk_set_txhash() is moved before ip6_dst_lookup_flow() in
-> tcp_v6_connect() so the initial ECMP path is selected by the same
-> txhash that subsequent route rebuilds will use.  This avoids
-> unintended path changes when the cached dst is naturally invalidated
-> (e.g., by PMTU discovery or route changes).
->
-> The rehash sites (tcp_write_timeout(), tcp_plb_check_rehash(), and
-> tcp_rcv_spurious_retrans()) call __sk_rethink_txhash_reset_dst(),
-> which re-rolls the txhash and, when it changed, drops the cached dst
-> so the next transmit re-runs route selection.  The dst reset is
-> guarded by sk->sk_family =3D=3D AF_INET6 since IPv4 ECMP does not
-> currently use sk_txhash for path selection.  For IPv4-mapped IPv6
-> sockets this produces a redundant dst reset on a cold path
-> (RTO/PLB); the subsequent IPv4 route lookup returns the same result.
-> The helper is deliberately separate from sk_rethink_txhash() itself:
-> dst_negative_advice() calls sk_rethink_txhash() before its own dst op,
-> so resetting the dst inside sk_rethink_txhash() would skip that op
-> (e.g. rt6_remove_exception_rt()).
->
-> For syncookies, cookie_init_sequence() computes the cookie value
-> before route_req() and sets txhash so the SYN-ACK selects the same
-> ECMP path that cookie_v6_check() will use when the full socket is
-> created.  cookie_tcp_reqsk_init() derives txhash from the cookie so
-> the full socket's ECMP path matches the SYN-ACK.  Both the SYN-ACK
-> assignment in tcp_conn_request() and the full-socket assignment in
-> cookie_tcp_reqsk_init() set txhash from the cookie for IPv4 and IPv6
-> alike.  On IPv6 this drives ECMP path selection; on IPv4, which does
-> not use sk_txhash for ECMP, it only affects TX-queue selection.  That
-> selection scales the hash by its high bits (reciprocal_scale()), which
-> are uniform in the keyed secure_tcp_syn_cookie() output -- the MSS index
-> only perturbs the low bits -- so the queue distribution matches
-> net_tx_rndhash().
->
-> cookie_init_sequence() is split from the former version that also
-> called tcp_synq_overflow() and incremented SYNCOOKIESSENT; those
-> side effects are now in cookie_record_sent(), called after
-> route_req() succeeds so they are not bumped when route_req() fails.
-> cookie_record_sent() is guarded by CONFIG_SYN_COOKIES to
-> match the guard on tcp_synq_overflow().  route_req() receives 0 as
-> tw_isn for the syncookie path so that tcp_v6_init_req() still saves
-> ireq->pktopts for REPFLOW flowlabel reflection and IPv6 cmsg
-> options.  The ecn_ok clear for syncookies without timestamps stays
-> after tcp_ecn_create_request() so it takes precedence.
->
-> Signed-off-by: Neil Spring <ntspring@meta.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net: mvneta_bm: add suspend/resume support to prevent crash after resume
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This commit adds suspend and resume callbacks to the mvneta_bm driver
+to handle hardware Buffer Manager state correctly across power cycles.
+It drains and frees buffers on suspend, then reinitializes the BM hardware
+defaults on resume.
+
+> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ethernet/marvell/mvneta_bm.c
+> index 6bb3804949190..ff2fe4020a456 100644
+> --- a/drivers/net/ethernet/marvell/mvneta_bm.c
+> +++ b/drivers/net/ethernet/marvell/mvneta_bm.c
+
+[ ... ]
+
+> @@ -477,6 +477,52 @@ static void mvneta_bm_remove(struct platform_device *pdev)
+>  	clk_disable_unprepare(priv->clk);
+>  }
+>  
+> +#ifdef CONFIG_PM_SLEEP
+> +static int mvneta_bm_suspend(struct device *dev)
+> +{
+> +	struct mvneta_bm *priv = dev_get_drvdata(dev);
+> +	int i;
+> +
+> +	/* Drain buffers and free pool resources while BM is still clocked */
+> +	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
+> +		struct mvneta_bm_pool *bm_pool = &priv->bm_pools[i];
+> +		int size_bytes;
+> +
+> +		if (bm_pool->type == MVNETA_BM_FREE)
+> +			continue;
+> +
+> +		mvneta_bm_bufs_free(priv, bm_pool, bm_pool->port_map);
+> +
+> +		size_bytes = sizeof(u32) * bm_pool->hwbm_pool.size;
+> +		dma_free_coherent(&priv->pdev->dev, size_bytes,
+> +				  bm_pool->virt_addr, bm_pool->phys_addr);
+
+[Severity: Critical]
+Can this dma_free_coherent() call cause a panic or double-free if pool
+creation failed during initialization?
+
+If mvneta_bm_pool_create() fails in mvneta_bm_pool_use(), the pool type is
+left as non-FREE. For example, if the failure is due to an alignment issue
+in mvneta_bm_pool_create():
+
+    if (!IS_ALIGNED((u32)bm_pool->virt_addr, MVNETA_BM_POOL_PTR_ALIGN)) {
+            dma_free_coherent(&pdev->dev, size_bytes, bm_pool->virt_addr,
+                              bm_pool->phys_addr);
+            ...
+            return -ENOMEM;
+    }
+
+This frees virt_addr but leaves the dangling pointer in bm_pool->virt_addr.
+Since the type is no longer MVNETA_BM_FREE, the suspend loop will not
+skip it, leading to a second dma_free_coherent() call on the same pointer.
+
+If the allocation itself failed, virt_addr is NULL, which could also lead
+to a panic here.
+
+> +		bm_pool->virt_addr = NULL;
+> +		bm_pool->type = MVNETA_BM_FREE;
+
+[Severity: Medium]
+Does setting the pool type to MVNETA_BM_FREE cause lockdep tracking issues
+on resume?
+
+When the device resumes, mvneta_resume() will call mvneta_bm_pool_use()
+to recreate the pool. Because the type was reset to MVNETA_BM_FREE here,
+mvneta_bm_pool_use() will execute its initialization block:
+
+    if (new_pool->type == MVNETA_BM_FREE) {
+        ...
+        mutex_init(&hwbm_pool->buf_lock);
+    }
+
+Calling mutex_init() on the existing statically-allocated lock structure
+wipes its wait list and lockdep state. Is there a way to avoid
+re-initializing locks that are already set up?
+
+> +	}
+> +
+> +	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK);
+> +	clk_disable_unprepare(priv->clk);
+> +	return 0;
+> +}
+> +
+> +static int mvneta_bm_resume(struct device *dev)
+> +{
+> +	struct mvneta_bm *priv = dev_get_drvdata(dev);
+> +	int err;
+> +
+> +	err = clk_prepare_enable(priv->clk);
+> +	if (err)
+> +		return err;
+> +
+> +	/* Reinitialize BM hardware; pools are refilled by mvneta_resume() */
+> +	mvneta_bm_default_set(priv);
+> +	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_START_MASK);
+
+[Severity: Critical]
+Is the hardware pool state completely restored during resume?
+
+The commit message notes that mvneta_bm_resume() and mvneta_resume()
+perform full initialization identical to probe. However, mvneta_resume()
+recreates the pool via mvneta_bm_pool_create(), which only restores the
+base address and target attributes:
+
+    mvneta_bm_write(priv, MVNETA_BM_POOL_BASE_REG(bm_pool->id),
+                    bm_pool->phys_addr);
+    mvneta_bm_pool_target_set(priv, bm_pool->id, target_id,  attr);
+    mvneta_bm_pool_enable(priv, bm_pool->id);
+
+It appears the pool capacity (MVNETA_BM_POOL_SIZE_REG) and the read/write
+pointers (MVNETA_BM_POOL_READ_PTR_REG and MVNETA_BM_POOL_WRITE_PTR_REG)
+are missing, as they are normally configured in mvneta_bm_pools_init()
+which isn't called during resume.
+
+Since the BM loses its register state during suspend, won't the hardware
+operate with uninitialized or zero capacity after resume? Could this lead
+to incorrectly wrapped pointers or dropped buffers when refilling the pool?
+
+> +	return 0;
+> +}
+> +#endif
 
