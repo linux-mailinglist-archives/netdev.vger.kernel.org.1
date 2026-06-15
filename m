@@ -1,76 +1,69 @@
-Return-Path: <netdev+bounces-299628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299629-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OBwqFrZzMGq/TAUAu9opvQ
-	(envelope-from <netdev+bounces-299628-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:50:46 +0200
+	id M9BlObRzMGq9TAUAu9opvQ
+	(envelope-from <netdev+bounces-299629-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:50:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FE6B68A39F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:50:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E615368A39A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:50:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FPlgPyPn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299628-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299628-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=maSZAd5I;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299629-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299629-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EBD4130D59C7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:50:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3A3813008092
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB663A8739;
-	Mon, 15 Jun 2026 21:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58F63168EB;
+	Mon, 15 Jun 2026 21:50:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8A73168EB;
-	Mon, 15 Jun 2026 21:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E312E7631;
+	Mon, 15 Jun 2026 21:50:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781560224; cv=none; b=nMmwfqbpKWfldoaqbpo4kX91mjlftzGdob0m6vLUebADrB5ODagmz09UGgZM19UvAp78+IkBuPaX2HBmhzn63Qa/jL3JeHkJXBvNHvNsnTRnhuP27Rmxw1/21yu3UrI3szm12qhzF8PaudTSNZFE/+DdmKu7uAteE/dG85Dmlnc=
+	t=1781560239; cv=none; b=Uq1EXbHDjeCvLlZ2XAmL462KWqZ135RPH4PwGCRDZ/VWnU21qLYL8QR0t6S/NBkzOqyFWDR4KTsHt70DiAkoIK0OZgLdS9m88zb6NiyW/Y2G4CuzsPfsgxtn8/AnABje+7ig1yGGTCGLIAsULxhGCadldS3S/hSA/9/wZbnl0Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781560224; c=relaxed/simple;
-	bh=nbBHTERh0KFAK1aKiV1GLYZku94l+EpzH+fw+6xwXaY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FQZFhyd01mVd/mv0iPpBVg/Rtzsk9Q8gM3KfX9a1ix5uMSgkWh3PtRfb8c5vcITbO2jk4eNAtJxAlgN9AUMZg/VgitkXKcXJJpl55hdGxvteLfjwpRGG/PjGh04JNsZpu2gN+9biNfKn7OgR5jpQS2lHQs/J98CeiZeFQg9dWPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FPlgPyPn; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 170051F000E9;
-	Mon, 15 Jun 2026 21:50:23 +0000 (UTC)
+	s=arc-20240116; t=1781560239; c=relaxed/simple;
+	bh=2DMamNs0h4ZXC5SkjSLbLQslhWpf5W1TUFb9UnPucbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J2eHzZIz4bGt7rRtW/lC3zlq/X40k7cXH+wcjnIr2w1DS43Bpho/1ITb+rWrEO8uS+GuW108JMeJlpuLnRneCtJNJr9JW8Csg/d96PGJOsN9f+sip7ChMah2+OAbJc1VtRQU6wgp2n06h+AlLj1NhWBa4yiAbL3BR6YL5L7r4IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maSZAd5I; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BDC11F000E9;
+	Mon, 15 Jun 2026 21:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781560223;
-	bh=B/XcSAGeoGp/BP+1XhwRml/MI2qj10vi9ZYd7jCnORI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=FPlgPyPnuMeIfmdNU0MP3k6aXAwqDVGYRcBE+vdzcnANEahuHxJHj2EkNlS3P1irG
-	 bA8kdm03jzL0CAYujQzr05f7I7SgYDmlEH7AdJf7+j1+P17KJGHbFrrKRJX2ci7urj
-	 YvTxUdTk3Mz5yKlyDsq1tygwgKni+g9/IcHtySqn/EY1SQq7ephrBf5+WEu+BsbXC2
-	 /61fn0E1dvpYIf1ilHh1HAK/H1u/RBp7e5FfRPATCcPXShx/cKIPK8b6Eu4qZg5sO3
-	 uTraskHJ8ayVvuPud8Rfc890OZKeOsgL+Ky+qeM7fuLqQBpT7XTRGm/JxsmD1QPJNq
-	 kM5RnuPl7b74g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568803839A06;
-	Mon, 15 Jun 2026 21:50:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1781560238;
+	bh=rUmDL9/uSXnWdNDTm7S51nG4txVC/VP/YIY87isaxgY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=maSZAd5Ix4BpMiX30F0b5Q3d+lU10nzTyZIx27FJJfd029aHr4x2f1z8yKBCMv8lp
+	 /z4jOQ8IHcXUabZfJMDx3vUQcxHoso7jPyikcYYtAWXBC8PYetMMnCkWv3hzgiYQ3D
+	 6tagLpYrjRDakp7dgixQkRaeF02O6F6kxjyjoWGGM2u2PFfuARXdj2OA/EKOW3tVKm
+	 6n9D+PP/IN5vadP0crSxIKrWi9030iUreQQHWuRyAYyB1mdk/x9V2LbPOu9k3+lh+v
+	 o5+sIXwV9e+nX3HBJFrnxrKD0YghMrIxysEWtztgWSeEB4P9nRvbvj1j/E0AFlLxFg
+	 cx93xgQr5A+Sw==
+Date: Mon, 15 Jun 2026 14:50:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH net-next] octeontx2-pf: add page pool ethtool statistics
+Message-ID: <20260615145037.0970f6f0@kernel.org>
+In-Reply-To: <20260615032141.521667-1-rkannoth@marvell.com>
+References: <20260615032141.521667-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 net-next 0/9] net: dsa: netc: add bridge mode support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178156021814.308382.3109768586287971042.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 21:50:18 +0000
-References: <20260611021458.2629145-1-wei.fang@oss.nxp.com>
-In-Reply-To: <20260611021458.2629145-1-wei.fang@oss.nxp.com>
-To: Wei Fang (OSS) <wei.fang@oss.nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, chleroy@kernel.org, andrew@lunn.ch,
- olteanv@gmail.com, linux@armlinux.org.uk, wei.fang@nxp.com,
- imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -78,80 +71,56 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,lists.linux.dev,vger.kernel.org,lists.ozlabs.org,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-299628-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-299629-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:wei.fang@oss.nxp.com,m:claudiu.manoil@nxp.com,m:vladimir.oltean@nxp.com,m:xiaoning.wang@nxp.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:chleroy@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:linux@armlinux.org.uk,m:wei.fang@nxp.com,m:imx@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-arm-kernel@lists.infradead.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9FE6B68A39F
+X-Rspamd-Queue-Id: E615368A39A
 
-Hello:
+On Mon, 15 Jun 2026 08:51:41 +0530 Ratheesh Kannoth wrote:
+> Expose page pool allocator statistics through ethtool.
+> When the interface is up, aggregate stats from each
+> receive queue page pool and append the common page_pool ethtool stat
+> block to the driver's private statistics set.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+include/net/page_pool/helpers.h :
 
-On Thu, 11 Jun 2026 10:14:49 +0800 you wrote:
-> From: Wei Fang <wei.fang@nxp.com>
-> 
-> This series adds bridge mode support to the NETC DSA switch driver,
-> covering both VLAN-aware and VLAN-unaware operation.
-> 
-> The NETC switch manages forwarding through a set of hardware tables
-> accessed via NTMP: the FDB table (FDBT), VLAN filter table (VFT), egress
-> treatment table (ETT), and egress count table (ECT). The series extends
-> the NTMP layer with the operations required for bridging, then builds the
-> DSA bridge callbacks on top.
-> 
-> [...]
+/* Deprecated driver-facing API, use netlink instead */
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+int page_pool_ethtool_stats_get_count(void);
+u8 *page_pool_ethtool_stats_get_strings(u8 *data);
+u64 *page_pool_ethtool_stats_get(u64 *data, const void *stats);
 
-Here is the summary with links:
-  - [v5,net-next,1/9] net: enetc: add interfaces to manage dynamic FDB entries
-    https://git.kernel.org/netdev/net-next/c/ca394837dfdd
-  - [v5,net-next,2/9] net: enetc: add "Update" and "Delete" operations to VLAN filter table
-    https://git.kernel.org/netdev/net-next/c/c52b6702a948
-  - [v5,net-next,3/9] net: enetc: add interfaces to manage egress treatment table
-    https://git.kernel.org/netdev/net-next/c/3cc291a35939
-  - [v5,net-next,4/9] net: enetc: add "Update" operation to the egress count table
-    https://git.kernel.org/netdev/net-next/c/d51f238a154a
-  - [v5,net-next,5/9] net: dsa: netc: initialize the group bitmap of ETT and ECT
-    https://git.kernel.org/netdev/net-next/c/1a58ae73dd74
-  - [v5,net-next,6/9] net: enetc: add helpers to set/clear table bitmap
-    https://git.kernel.org/netdev/net-next/c/8469b17310d1
-  - [v5,net-next,7/9] net: dsa: netc: add VLAN filter table and egress treatment management
-    https://git.kernel.org/netdev/net-next/c/84b4a3b30abd
-  - [v5,net-next,8/9] net: dsa: netc: add bridge mode support
-    https://git.kernel.org/netdev/net-next/c/751aa5a5d593
-  - [v5,net-next,9/9] net: dsa: netc: implement dynamic FDB entry ageing
-    https://git.kernel.org/netdev/net-next/c/05b5ee610fbb
+Is the page pool in your driver shared by multiple netdevs?
 
-You are awesome, thank you!
+If not just set netdev in page_pool_params
+If yes then you need to explain it in the commit msg
+
+Please note that net-next is closed for the next 2 weeks
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
