@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-299373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299374-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FtsnAPHBL2q6FwUAu9opvQ
-	(envelope-from <netdev+bounces-299373-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:12:17 +0200
+	id HtqiDX7CL2o1GAUAu9opvQ
+	(envelope-from <netdev+bounces-299374-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:38 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4914A684ECF
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94108684F4F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=adjajgKU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299373-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299373-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=realsil.com.cn header.s=dkim header.b="kd/QOmBE";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299374-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299374-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=realsil.com.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9050C30465F2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:08:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55F00302AC0B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C9C3CF206;
-	Mon, 15 Jun 2026 09:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5C33AEB32;
+	Mon, 15 Jun 2026 09:09:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B413C2BAC;
-	Mon, 15 Jun 2026 09:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CB528C869;
+	Mon, 15 Jun 2026 09:09:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781514496; cv=none; b=cMBRjFhumLj5jDIaxsSa4EHzA1o/3WttCOK84sWq7l6XriLayGzTqjRUYlAfv42O1KS8M1JdCIwq8TPOHPnZYjPeULo8lnLqOKvfQvAZSOEoutdqMnlAC1kMUDO1ihw4eyRZXdFLNCWS0ZAjDF9UQ8KkARCdqVILXVyaAzCH4RU=
+	t=1781514589; cv=none; b=C4/wSEkROsGiQppbsT0UnUoYMTdoX3YHPRh3yGWCBPzuU4PV8rovirx+1Xt5AVvA0pXOel5YuiFYCvSJIuA5oPwZFyBnqP1mVttgPcWiiBNjZe7zJTaE6y799j/bvgI7RkLucGQIuO3ZoEhFUQ4DB/ZSexy9gdoTak3JZ+aLowE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781514496; c=relaxed/simple;
-	bh=UBQ3UcLPjRIMTkPWF2+utSaOLYSar8jA7aT4PmlpIa4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VqhJW7iJfSScilI68YWXsvJ65b4unpXyE9oZzmBVQRAg7YSBejSTGA8izpkSrXIb8Pzgo7n5kUdKSvEHCL6sRMBNi7RX8Sn1tn10PZvKxY2Yw+TJjCzYOtrJCdQWTzkXKVjIL6SSNo8bIHPJbjAtBCqQyM0F4/LlsOOGkRqnIcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=adjajgKU; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA251F000E9;
-	Mon, 15 Jun 2026 09:08:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781514492;
-	bh=wg8fBQfnN9gNnALaLS/O6GaJwTABoRT4jJ3YV+TtFLM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=adjajgKUvGOaFCLS2TpY/h4uFBKu4qtoaFZGs1yLcikx0xc/sxz06HIcpswGq0j6t
-	 0+N5gds5sg082waUrjzIk8hbY1WF1fpC5peeKda5yKrQ7H4tvLIRdYPaawIt0acNjh
-	 xLfpeFfwsWeCJY9BVR83KPCU7CaucA88iUc036RlJz2rLs33trVh649kTyfn9MFZhL
-	 ODu7JkRxQumCQ4H9Uza1YzuSUeFi8f7du8CQiBoOBFZheOBgbRJcyzke0aqhXwG2Ii
-	 Iu5UJFCRcUgWkxEkCi2dKE7FHwROkHNm6a/qptDAUqjDK7h+RXI2gND5E1OLIkl1Cr
-	 A1acw10vItEgw==
-From: Simon Horman <horms@kernel.org>
-To: jelonek.jonas@gmail.com
-Cc: Simon Horman <horms@kernel.org>,
-	o.rempel@pengutronix.de,
-	kory.maincent@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	daniel@makrotopia.org,
-	bjorn@mork.no
-Subject: Re: [PATCH net-next v2 2/2] net: pse-pd: add Realtek/Broadcom PSE MCU driver
-Date: Mon, 15 Jun 2026 10:07:33 +0100
-Message-ID: <20260615090733.739423-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260612132944.460646-3-jelonek.jonas@gmail.com>
-References: <20260612132944.460646-3-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1781514589; c=relaxed/simple;
+	bh=m3E+kZWhK0DH2tpUR769lJwSC7SOSCRvthtrfuEYFfM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iu2YSCvgwHaf7oct+tAaXuu7/ex8+VN0Q+x4+Wxz2xqLhQTWfivxtpLV9fRsDPDr6/xiIxG87fXXw9exv0/6Ev2IOSN70HwWLRnU/1ekoOtFHJZ3e/AjDIWSNhLtUvUJwGe3G1Q6ei4bZEHdKA7xCysvytnxl4BrMd1uMx9rCJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=kd/QOmBE; arc=none smtp.client-ip=211.75.126.72
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65F98JxG4611677, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1781514500;
+	bh=+URlNXDAvvY+rnXpegkxzKYYnGACBDuUYmQRB5T+uf4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=kd/QOmBEfOFFChEpTnXL7jGnEjKjiH0sKQzAr3czQrg8JV1iD3a74F2wcQgjJfWXd
+	 XQ31T7AswWIgsII7F3c8g3LNKd0s/+ue0edtiCR4Ngx2s6JmoYEbENAsg0zDJl14Hz
+	 IID1lE8TqDNGb1lrEKbH85qKkO3wPj6pX3UEXVqmwSJujO7kv+DQtVJGUmAtAp8ONo
+	 e5UWVoEmbi/ep4nSkm9dsW21OVUBX48+wNfhGiudqzikMy/7HZ6n+jwXcFl7PK60al
+	 /Hc8OSXqOLOiYuo6GXvf5ABSfDMns7Op6xyFqNtNgbgPhPf9he/mMnxHvUuDhzdOTz
+	 +e8BnwK7APT1w==
+Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
+	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65F98JxG4611677
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 15 Jun 2026 17:08:19 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17; Mon, 15 Jun 2026 17:08:19 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Mon, 15 Jun 2026 17:08:19 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>, <nb@tipi-net.de>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
+	<javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v5 0/4] Add support for RTL8261C_CG
+Date: Mon, 15 Jun 2026 17:08:12 +0800
+Message-ID: <20260615090817.429-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,327 +74,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FORGED_RECIPIENTS(0.00)[m:jelonek.jonas@gmail.com,m:horms@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299374-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299373-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[realsil.com.cn:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,realsil.com.cn:dkim,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4914A684ECF
+X-Rspamd-Queue-Id: 94108684F4F
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net: pse-pd: add Realtek/Broadcom PSE MCU driver
+From: Javen Xu <javen_xu@realsil.com.cn>
 
-This patch adds a driver for a microcontroller that fronts Realtek and
-Broadcom PSE silicon on PoE switches, exposing the MCU over I2C/SMBus or
-UART using a 12-byte fixed-frame protocol. The driver is split into a
-shared core plus two transport modules, with a per-dialect opcode table
-and parser hooks for the Realtek vs Broadcom variants.
+Add support for RTL8261C_CG and add support for loading firmware.
 
-> diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
-> index 7ef29657ee5d..b065b19db126 100644
-> --- a/drivers/net/pse-pd/Kconfig
-> +++ b/drivers/net/pse-pd/Kconfig
-> @@ -13,6 +13,34 @@ menuconfig PSE_CONTROLLER
->  
->  if PSE_CONTROLLER
->  
-> +config PSE_REALTEK
-> +	tristate
-> +	help
-> +	  Shared core for the Realtek/Broadcom PSE MCU driver. This is
-> +	  selected automatically by the transport options below.
-> +
-> +config PSE_REALTEK_I2C
-> +	tristate "Realtek/Broadcom PSE MCU driver (I2C transport)"
-> +	depends on I2C
-> +	select PSE_REALTEK
-> +	help
-> +	  Driver for the microcontroller (MCU) that fronts the PSE
-> +	  hardware on switches with Realtek or Broadcom PSE chips, attached
-> +	  via I2C/SMBus. The MCU exposes a message-based protocol; the actual
-> +	  PSE silicon is not accessed directly. To compile this driver as a
-> +	  module, choose M here: the module will be called realtek-pse-i2c.
-> +
-> +config PSE_REALTEK_UART
-> +	tristate "Realtek/Broadcom PSE MCU driver (UART transport)"
-> +	depends on SERIAL_DEV_BUS
-> +	select PSE_REALTEK
-> +	help
-> +	  Driver for the microcontroller (MCU) that fronts the PSE
-> +	  hardware on switches with Realtek or Broadcom PSE chips, attached
-> +	  via UART. The MCU exposes a message-based protocol; the actual PSE
-> +	  silicon is not accessed directly. To compile this driver as a
-> +	  module, choose M here: the module will be called realtek-pse-uart.
-> +
+Javen Xu (4):
+  net: phy: c45: add genphy_c45_soft_reset()
+  net: phy: c45: add genphy_c45_config_master_slave()
+  net: phy: realtek: add support for RTL8261C_CG
+  net: phy: realtek: load firmware for RTL8261C_CG
 
-[Medium]
-The realtek, vendor prefix is used for both the Realtek dialect and the
-Broadcom dialect compatibles (realtek,pse-mcu-rtk and
-realtek,pse-mcu-bcm), and the binding documentation explicitly notes
-that the prefix "reflects the platform" rather than the silicon vendor.
-DT compatibles are stable ABI once accepted.
+ drivers/net/phy/phy-c45.c              | 118 +++++++
+ drivers/net/phy/realtek/realtek_main.c | 407 +++++++++++++++++++++++++
+ include/linux/phy.h                    |   1 +
+ include/uapi/linux/mdio.h              |   5 +
+ 4 files changed, 531 insertions(+)
 
-Would a brcm, prefix (or per-MCU-part compatibles) for the Broadcom
-dialect be more appropriate, given that the BCM variant uses Broadcom
-PSE silicon driven by an MCU built by Nuvoton or STMicro and has no
-Realtek involvement?
+-- 
+2.43.0
 
-Similarly, would describing the I2C wire framing (native vs SMBus) via
-separate compatibles be preferable to encoding it in the
-realtek,i2c-protocol DT property, and would describing the actual PSE
-chip in DT (rather than relying on runtime device-id detection) match
-the usual binding patterns?
-
->  config PSE_REGULATOR
->  	tristate "Regulator based PSE controller"
->  	help
-
-[ ... ]
-
-> diff --git a/drivers/net/pse-pd/realtek-pse-core.c b/drivers/net/pse-pd/realtek-pse-core.c
-> new file mode 100644
-> index 000000000000..3a601cfb6280
-> --- /dev/null
-> +++ b/drivers/net/pse-pd/realtek-pse-core.c
-
-[ ... ]
-
-> +static int rtpse_port_cmd(struct rtpse_ctrl *pse, unsigned int port, u8 opcode, u8 arg)
-> +{
-> +	struct rtpse_mcu_msg req, resp;
-> +	int ret;
-> +
-> +	rtpse_mcu_msg_init(&req, opcode);
-> +	req.payload[0] = port;
-> +	req.payload[1] = arg;
-> +
-> +	ret = rtpse_do_xfer(pse, &req, &resp);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (resp.payload[0] != port || resp.payload[1] != 0)
-> +		return -EIO;
-> +
-> +	return 0;
-> +}
-
-[Medium]
-Can an all-zero 12-byte buffer be silently accepted as a successful
-PORT_ENABLE/PORT_DISABLE on the BCM dialect for port 0?
-
-For the BCM dialect, RTPSE_CMD_PORT_ENABLE maps to opcode 0x00, and the
-checksum of eleven zero bytes is 0, so an all-zero response passes the
-opcode and checksum checks in rtpse_do_xfer():
-
-	if (resp->opcode != req->opcode ||
-	    resp->checksum != rtpse_checksum((u8 *)resp, RTPSE_MCU_MSG_SIZE - 1))
-		return -EBADMSG;
-
-rtpse_port_cmd() then verifies payload[0] == port and payload[1] == 0,
-both of which pass when port == 0 and arg is 0 (disable) or when arg is
-1 but the MCU never observed the command and the buffer is all zero
-anyway since payload[1] is checked against 0.
-
-The seq_num field exists in struct rtpse_mcu_msg and is filled with 0xff
-by rtpse_mcu_msg_init() but is never checked on the response side. Could
-a seq_num round-trip check (or a non-zero opcode sentinel for the BCM
-dialect) reject stale or zeroed-out frames here?
-
-[ ... ]
-
-> +static int rtpse_discover(struct rtpse_ctrl *pse, struct rtpse_mcu_info *info)
-> +{
-> +	struct rtpse_mcu_ext_config ext_config;
-> +	unsigned long deadline;
-> +	int ret;
-> +
-> +	/*
-> +	 * The MCU may not answer on the bus yet right after power-up or
-> +	 * enable-gpios assertion: depending on the transport it either stays
-> +	 * silent (-ETIMEDOUT) or does not ACK its address at all (-ENXIO /
-> +	 * -EREMOTEIO). Retry within a bounded wall-time window so a slow boot
-> +	 * still probes, while a genuinely unresponsive MCU fails with its real
-> +	 * error instead of deferring forever and masking it.
-> +	 */
-> +	deadline = jiffies + msecs_to_jiffies(RTPSE_MCU_BOOT_TIMEOUT_MS);
-> +	do {
-> +		ret = rtpse_mcu_get_info(pse, info);
-> +		if (ret != -ETIMEDOUT && ret != -ENXIO &&
-> +		    ret != -EREMOTEIO && ret != -EAGAIN)
-> +			break;
-> +		msleep(RTPSE_MCU_BOOT_RETRY_MS);
-> +	} while (time_before(jiffies, deadline));
-
-[Low]
-The comment says the loop is meant to tolerate a slow-boot MCU, but the
-retry whitelist excludes -EBADMSG and -EIO.
-
-rtpse_do_xfer() returns -EBADMSG when the opcode or checksum mismatch
-fires, and rtpse_port_query()/rtpse_port_cmd() return -EIO when the
-echoed port byte does not match the request. On a UART-attached MCU
-that emits a single garbled frame while its serial peripheral
-stabilises, or on an I2C-attached MCU that returns stale boot-ROM bytes
-right after enable-gpios assertion, the first attempt would surface as
-one of those errors rather than -ETIMEDOUT or -ENXIO, and the loop
-would break out immediately.
-
-Should -EBADMSG (and arguably -EIO) be added to the retry set so the
-documented intent matches the actual behaviour?
-
-[ ... ]
-
-> +int rtpse_register(struct rtpse_ctrl *pse)
-> +{
-
-[ ... ]
-
-> +	if (!info.system_enable) {
-> +		ret = rtpse_set_global_state(pse, true);
-> +		/* Dialects without a global-state concept (e.g. BCM) return
-> +		 * -EOPNOTSUPP; treat that as "no separate enable required".
-> +		 */
-> +		if (ret && ret != -EOPNOTSUPP)
-> +			return dev_err_probe(pse->dev, ret,
-> +					     "failed to enable PSE system\n");
-> +	}
-> +
-> +	ret = regulator_enable(pse->poe_supply);
-> +	if (ret)
-> +		return dev_err_probe(pse->dev, ret, "failed to enable PoE supply\n");
-> +
-> +	ret = devm_add_action_or_reset(pse->dev, rtpse_regulator_disable, pse->poe_supply);
-> +	if (ret)
-> +		return ret;
-
-[Low]
-If rtpse_set_global_state(pse, true) succeeds but a later step in
-rtpse_register() fails (regulator_enable, devm_add_action_or_reset, or
-devm_pse_controller_register), is the MCU left with the PSE subsystem
-enabled while the kernel detaches?
-
-The regulator is rolled back via rtpse_regulator_disable through
-devm_add_action_or_reset, but there does not seem to be a matching
-devm_add_action_or_reset to call rtpse_set_global_state(false) on
-probe-failure or driver-removal. Is that asymmetry intentional?
-
-[ ... ]
-
-> diff --git a/drivers/net/pse-pd/realtek-pse-uart.c b/drivers/net/pse-pd/realtek-pse-uart.c
-> new file mode 100644
-> index 000000000000..785407b379a4
-> --- /dev/null
-> +++ b/drivers/net/pse-pd/realtek-pse-uart.c
-
-[ ... ]
-
-> +static size_t rtpse_uart_receive(struct serdev_device *serdev,
-> +				 const u8 *buf, size_t count)
-> +{
-> +	struct rtpse_uart *ctx = serdev_device_get_drvdata(serdev);
-> +	bool done = false;
-> +	size_t take;
-> +
-> +	scoped_guard(spinlock_irqsave, &ctx->rx_lock) {
-> +		take = min(count, sizeof(ctx->rx_buf) - ctx->rx_len);
-> +		if (take) {
-> +			memcpy(ctx->rx_buf + ctx->rx_len, buf, take);
-> +			ctx->rx_len += take;
-> +			done = (ctx->rx_len == sizeof(ctx->rx_buf));
-> +		}
-> +	}
-> +	if (done)
-> +		complete(&ctx->rx_done);
-> +
-> +	/* consume all to avoid desync/misalignment */
-> +	return count;
-> +}
-
-[ ... ]
-
-> +static int rtpse_uart_send(struct rtpse_ctrl *pse, const struct rtpse_mcu_msg *req)
-> +{
-> +	struct rtpse_uart *ctx = to_rtpse_uart(pse);
-> +	int written;
-> +
-> +	/* clear any leftover rx state before transmitting */
-> +	reinit_completion(&ctx->rx_done);
-> +	scoped_guard(spinlock_irqsave, &ctx->rx_lock)
-> +		ctx->rx_len = 0;
-
-[High]
-Is there a race between reinit_completion() here and the asynchronous
-serdev receive_buf callback when a previous transaction has timed out
-with bytes still in flight?
-
-reinit_completion() is an unlocked x->done = 0 write, and the matching
-complete() in rtpse_uart_receive() is called outside rx_lock. The
-following interleave seems possible:
-
-  rtpse_uart_send() runs reinit_completion()       /* done = 0 */
-  rtpse_uart_receive() takes rx_lock, fills rx_buf
-    to 12 bytes, computes done=true, releases lock
-  rtpse_uart_send() takes rx_lock, sets rx_len = 0,
-    releases lock
-  rtpse_uart_receive() calls complete(&ctx->rx_done) /* done = 1 */
-  rtpse_uart_send() writes the new request
-  rtpse_uart_recv() wait_for_completion_timeout()
-    returns immediately (done was 1), then sees
-    rx_len == 0 and returns -EIO
-
-rtpse_discover()'s retry whitelist covers -ETIMEDOUT, -ENXIO,
--EREMOTEIO, and -EAGAIN but not -EIO, so a single occurrence of this
-race during the boot retry window would break out of the loop and turn
-into a permanent dev_err_probe() failure.
-
-Would moving complete() inside rx_lock in rtpse_uart_receive(), or
-performing reinit_completion() and rx_len = 0 together inside rx_lock
-while excluding the completer, close this window?
-
-> +
-> +	written = serdev_device_write(ctx->serdev, (const u8 *)req, sizeof(*req),
-> +				      RTPSE_UART_TX_TIMEOUT);
-> +	if (written < 0)
-> +		return written;
-> +	if (written != sizeof(*req))
-> +		return -EIO;
-> +
-> +	return 0;
-> +}
-
-[ ... ]
 
