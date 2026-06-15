@@ -1,224 +1,161 @@
-Return-Path: <netdev+bounces-299389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299394-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tqwyIq7UL2q5HgUAu9opvQ
-	(envelope-from <netdev+bounces-299389-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:32:14 +0200
+	id GTbFABrYL2o8HwUAu9opvQ
+	(envelope-from <netdev+bounces-299394-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:46:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0C76855D6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:32:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9655F68570D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:46:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	dmarc=temperror reason="query timed out" header.from=lzu.edu.cn (policy=temperror);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299389-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299389-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299394-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299394-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19C1D3016919
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:31:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 47F7C306D842
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33571990C7;
-	Mon, 15 Jun 2026 10:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE9933F394;
+	Mon, 15 Jun 2026 10:43:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4370B40D586
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 10:31:39 +0000 (UTC)
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68CB339708;
+	Mon, 15 Jun 2026 10:43:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781519504; cv=none; b=EakVRwGBjE4tyXscMg2W7p+MUI8x3muQSqFwRyWngb7eDlkiwR4y3vMnVJ/9hQjjhLZPgvZEE97X2LWI2IE6b4ubiwZzJ5ciBlCVLvGEX1pLLJa5E9G5PWceC4W4tja71JhIeXkb8Xwbe6NL5qcyivbAJPNLCPqR4R0WTQh5fcQ=
+	t=1781520233; cv=none; b=Wjx44uOUfGTiO/ScBM2daqEhP2iMZ4U8YWXHWYI//BwUKdeezdBwW8/d1cmpI7cdd8I69+KW6r79F1tfzm7Cp6IaFRBO+yHw3qks733VD6lwMqRu1CxR3GoIDtB00suL3z0HfyutBPnpeJ3NxKeYjmH64rUIxWRAiApUywcraBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781519504; c=relaxed/simple;
-	bh=A6Cr8/t/bGSOIZJeSzkaWAFO/B5G71kPImAb0vMVRwk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tTv+XqIrOFoxa7yb2XtFpH/L/Y6uLB8uI3igNI1bm9I366/TTWy03NC+8+3UBSSBNup4+hxJaTj4F5RQZWDlNVRuZsEPV8/rzaL75UlL3gtLMefSlwB9dB/XtVLF4vcuAEln9ls1oJis7cipxWRLBtn0fvayt4KEJk3pbZA1r8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowAB3j7l11C9qBlWIAA--.41455S2;
-	Mon, 15 Jun 2026 18:31:17 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuniyu@google.com,
-	david.laight.linux@gmail.com
-Cc: ncardwell@google.com,
-	pabeni@redhat.com,
-	chia-yu.chang@nokia-bell-labs.com,
-	ij@kernel.org,
-	yuuchihsu@gmail.com,
-	idosch@nvidia.com,
-	fmancera@suse.de,
-	herbert@gondor.apana.org.au,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net v2 1/1] net: ipv4: bound TCP reordering sysctl writes and MTU probe sizes
-Date: Mon, 15 Jun 2026 18:31:18 +0800
-Message-ID: <1a5b7e1ef4d70fbad8c8ee0b82d8405f3c964a3d.1781395200.git.bronzed_45_vested@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1781520233; c=relaxed/simple;
+	bh=oVfd44ufR+op111XMW1UXh0Dk/Avy9DCMpoW+by1up8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a6zf9w9OuO0ugr/TjXFDSh5Y4SxKLIEX/GMLUaJEbqkkssPP0Llz++56hJTFP7yDlJWpfxshz4qShW/zG9shhgGixEb+48gGo4W6AzeDw6lLByT4Vzgxz4JmXXSrJJ33iJlUTmm859M9SfQKzZYUV9B+uecB/UN6xGQxZdlp55A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alpha.franken.de; spf=pass smtp.mailfrom=alpha.franken.de; arc=none smtp.client-ip=193.175.24.41
+Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
+	id 1wZ4ey-0000JJ-00; Mon, 15 Jun 2026 12:35:16 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+	id C060CC084D; Mon, 15 Jun 2026 12:33:22 +0200 (CEST)
+Date: Mon, 15 Jun 2026 12:33:22 +0200
+From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Christian Lamparter <chunkeey@googlemail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Andreas Kemnade <andreas@kemnade.info>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-sh@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH 05/10] [v2] mips: select legacy gpiolib interfaces where
+ used
+Message-ID: <ai_U8j3uOoIzoYrJ@alpha.franken.de>
+References: <20260520183815.2510387-1-arnd@kernel.org>
+ <20260520183815.2510387-6-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowAB3j7l11C9qBlWIAA--.41455S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF47CFy8Kr1rAFW7Gw18Grg_yoWrAry3pF
-	Z0k345tr4rGryxKas7ZFW8Zr1xKr48ZF4ak3s8Gryfuw4DWryxAFn2qFWa9Fyj9rWSkrW3
-	Z3WDtr98J3yDAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQETCWouZFIO2QACs9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260520183815.2510387-6-arnd@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.54 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299389-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:edumazet@google.com,m:kuniyu@google.com,m:david.laight.linux@gmail.com,m:ncardwell@google.com,m:pabeni@redhat.com,m:chia-yu.chang@nokia-bell-labs.com,m:ij@kernel.org,m:yuuchihsu@gmail.com,m:idosch@nvidia.com,m:fmancera@suse.de,m:herbert@gondor.apana.org.au,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,m:davidlaightlinux@gmail.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[vger.kernel.org,google.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[google.com,redhat.com,nokia-bell-labs.com,kernel.org,gmail.com,nvidia.com,suse.de,gondor.apana.org.au,lzu.edu.cn,icloud.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299394-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[franken.de];
+	FORGED_RECIPIENTS(0.00)[m:arnd@kernel.org,m:linux-gpio@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:arnd@arndb.de,m:chunkeey@googlemail.com,m:johannes@sipsolutions.net,m:aaro.koskinen@iki.fi,m:andreas@kemnade.info,m:khilman@baylibre.com,m:rogerq@kernel.org,m:tony@atomide.com,m:glaubitz@physik.fu-berlin.de,m:tglx@kernel.org,m:mingo@redhat.com,m:bp@alien8.de,m:dave.hansen@linux.intel.com,m:x86@kernel.org,m:hpa@zytor.com,m:linusw@kernel.org,m:brgl@kernel.org,m:dmitry.torokhov@gmail.com,m:lee@kernel.org,m:pavel@kernel.org,m:mazziesaccount@gmail.com,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-wireless@vger.kernel.org,m:linux-omap@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mips@vger.kernel.org,m:linux-sh@vger.kernel.org,m:linux-input@vger.kernel.org,m:linux-leds@vger.kernel.org,m:netdev@vger.kernel.org,m:bartosz.golaszewski@oss
+ .qualcomm.com,m:chunkeey@gmail.com,m:dmitrytorokhov@gmail.com,m:jonasgorski@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[tsbogend@alpha.franken.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	FREEMAIL_CC(0.00)[vger.kernel.org,arndb.de,googlemail.com,sipsolutions.net,iki.fi,kemnade.info,baylibre.com,kernel.org,atomide.com,physik.fu-berlin.de,redhat.com,alien8.de,linux.intel.com,zytor.com,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,lists.infradead.org,oss.qualcomm.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tsbogend@alpha.franken.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,icloud.com:mid,icloud.com:email,lzu.edu.cn:from_mime,lzu.edu.cn:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:email,alpha.franken.de:mid,alpha.franken.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,qualcomm.com:email,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1F0C76855D6
+X-Rspamd-Queue-Id: 9655F68570D
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
+On Wed, May 20, 2026 at 08:38:10PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> A few old machines have not been converted away from the old-style
+> gpiolib interfaces. Make these select the new CONFIG_GPIOLIB_LEGACY
+> symbol so the code still works where it is needed but can be left
+> out otherwise.
+> 
+> This is the list of all gpio_request() calls in mips:
+> 
+>   arch/mips/alchemy/devboards/db1000.c:           gpio_request(19, "sd0_cd");
+>   arch/mips/alchemy/devboards/db1000.c:           gpio_request(20, "sd1_cd");
+>   arch/mips/alchemy/devboards/db1200.c:   gpio_request(215, "otg-vbus");
+>   arch/mips/bcm47xx/workarounds.c:        err = gpio_request_one(usb_power, GPIOF_OUT_INIT_HIGH, "usb_power");
+>   arch/mips/bcm63xx/boards/board_bcm963xx.c:              gpio_request_one(board.ephy_reset_gpio,
+>   arch/mips/txx9/rbtx4927/setup.c:        gpio_request(15, "sio-dtr");
+> 
+> Most of these should be easy enough to change to modern gpio descriptors
+> or remove if they are no longer in use.
+> 
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Reviewed-by: Linus Walleij <linusw@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v2: no changes. There was no discussion on this, but the patch
+>     has so far not made it into the linux-mips tree, so I'm including
+>     it for completeness.
+> ---
+>  arch/mips/Kconfig         | 5 +++++
+>  arch/mips/alchemy/Kconfig | 1 -
+>  arch/mips/txx9/Kconfig    | 1 +
+>  3 files changed, 6 insertions(+), 1 deletion(-)
 
-Reject invalid `net.ipv4.tcp_reordering` values before they reach TCP
-socket state. The sysctl is stored as an `int` but copied into the
-`u32` `tp->reordering` field for new sockets, so negative writes wrap
-to large values.
+applied to mips-next
 
-With `tcp_mtu_probing=2`, the wrapped value can overflow the
-`tcp_mtu_probe()` size calculation and drive the MTU probing path into
-an out-of-bounds read. Route `tcp_reordering` writes through
-`proc_dointvec_minmax()` and require it to be at least 1. Also require
-`tcp_max_reordering` to be at least 1 so the configured maximum cannot
-become negative either.
+Thomas.
 
-When registering the table for a non-init network namespace, relocate
-`extra2` pointers that refer into `init_net.ipv4` so the
-`tcp_reordering` upper bound follows that namespace's
-`tcp_max_reordering`.
-
-Harden `tcp_mtu_probe()` itself by computing `size_needed` as `u64`.
-This keeps the send queue and window checks from being bypassed through
-signed integer overflow.
-
-Fixes: 91cc17c0e5e5 ("[TCP]: MTUprobe: receiver window & data available checks fixed")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-Changes in v2:
-- Use proc_dointvec_minmax() directly for tcp_reordering and
-  tcp_max_reordering, as suggested in review.
-- Relocate ipv4 .extra2 sysctl pointers for non-init network namespaces.
-- Harden tcp_mtu_probe() by making size_needed a u64.
-- v1 link: https://lore.kernel.org/all/42cd30856907350e1b3834a3338364f9828a307b.1780979031.git.bronzed_45_vested@icloud.com/
-
- net/ipv4/sysctl_net_ipv4.c | 10 ++++++++--
- net/ipv4/tcp_output.c      |  4 ++--
- 2 files changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index c0e85cc171ae..ca1180dba1de 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -1058,7 +1058,9 @@ static struct ctl_table ipv4_net_table[] = {
- 		.data		= &init_net.ipv4.sysctl_tcp_reordering,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE,
-+		.extra2		= &init_net.ipv4.sysctl_tcp_max_reordering,
- 	},
- 	{
- 		.procname	= "tcp_retries1",
-@@ -1293,7 +1295,8 @@ static struct ctl_table ipv4_net_table[] = {
- 		.data		= &init_net.ipv4.sysctl_tcp_max_reordering,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE,
- 	},
- 	{
- 		.procname	= "tcp_dsack",
-@@ -1676,6 +1679,9 @@ static __net_init int ipv4_sysctl_init_net(struct net *net)
- 				 */
- 				table[i].mode &= ~0222;
- 			}
-+			if (table[i].extra2 >= (void *)&init_net.ipv4 &&
-+			    table[i].extra2 < (void *)(&init_net.ipv4 + 1))
-+				table[i].extra2 += (void *)net - (void *)&init_net;
- 		}
- 	}
- 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 6e4bb411dc04..193637a58dcc 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -2687,7 +2687,7 @@ static int tcp_mtu_probe(struct sock *sk)
- 	struct sk_buff *skb, *nskb, *next;
- 	struct net *net = sock_net(sk);
- 	int probe_size;
--	int size_needed;
-+	u64 size_needed;
- 	int copy, len;
- 	int mss_now;
- 	int interval;
-@@ -2711,7 +2711,7 @@ static int tcp_mtu_probe(struct sock *sk)
- 	mss_now = tcp_current_mss(sk);
- 	probe_size = tcp_mtu_to_mss(sk, (icsk->icsk_mtup.search_high +
- 				    icsk->icsk_mtup.search_low) >> 1);
--	size_needed = probe_size + (tp->reordering + 1) * tp->mss_cache;
-+	size_needed = probe_size + (tp->reordering + 1) * (u64)tp->mss_cache;
- 	interval = icsk->icsk_mtup.search_high - icsk->icsk_mtup.search_low;
- 	/* When misfortune happens, we are reprobing actively,
- 	 * and then reprobe timer has expired. We stick with current
 -- 
-2.47.3
-
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
 
