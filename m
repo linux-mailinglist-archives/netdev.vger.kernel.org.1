@@ -1,305 +1,184 @@
-Return-Path: <netdev+bounces-299291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299290-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Up7nC1FgL2pm/QQAu9opvQ
-	(envelope-from <netdev+bounces-299291-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:15:45 +0200
+	id ib4PNDRgL2pa/QQAu9opvQ
+	(envelope-from <netdev+bounces-299290-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:15:16 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6609F682D3F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:15:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A2F682D35
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:15:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299291-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299291-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=oKH6HG9J;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299290-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299290-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6468330068F4
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:15:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0883E3005EBC
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C2C21A447;
-	Mon, 15 Jun 2026 02:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183801A683A;
+	Mon, 15 Jun 2026 02:15:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FA2DDCD
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 02:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B460D1E376C
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 02:15:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781489725; cv=none; b=GrM0jCIr7leWh5nAp4ciYNRugFD13k8TabAgP64Laon0j/ow/+9CzFQjwDwsbBFefv1orNXijSvbA0njD3BMXDtAM3KVBRsZr2FLXKKE4UL/MR1FxfJbR47qBO9QcGivYiuDCen94ZieISnPGh0Xpn6xIUITadp99ly1CNR23aM=
+	t=1781489713; cv=none; b=PNOrfQDwPmYLe8pll5UJqvygq/RhRGVMFE2oIua7dbm3uRrr2nT/1Qx3zuaif8urAXVbsYLdPXJRgH4LMA6QcKUZS+41sbsXkVixFRV4NaQ1fRxvD67TFzEMaTQhdZZjrbUn/+i+szRPYZYpwPOt708IC5F+74yeXejWvZDLl8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781489725; c=relaxed/simple;
-	bh=NvL+i5g+zVsvLYVycDEmE95MROyO7PdhUZNBHmGps3I=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=s1FWhdRK2khEAsyPxGc+cGhKsQuV5+QY3nBQ0x3fTvCwsDzBJxAR8kS77BF/pTLtp3OHK6NQFPP+UeNHbXwk/1oYG8NyzNPvMcP71yTBia/G9qJlDv0Exex4gjgAJGYQS1OY/jBwsKiVwH0ISF4L1X5OwCZX16QDy/2izD0r28I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
-X-QQ-mid:Yeas4t1781489623t034t60564
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.157.22.210])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 17249502123495819819
-To: "'Simon Horman'" <horms@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Richard Cochran'" <richardcochran@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
-	"'Kees Cook'" <kees@kernel.org>,
-	"'Larysa Zaremba'" <larysa.zaremba@intel.com>,
-	"'Joe Damato'" <joe@dama.to>,
-	"'Breno Leitao'" <leitao@debian.org>,
-	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
-	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
-	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
-	"'Thomas Gleixner'" <tglx@kernel.org>,
-	"'Greg Kroah-Hartman'" <gregkh@linuxfoundation.org>,
-	<netdev@vger.kernel.org>,
-	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Richard Cochran'" <richardcochran@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'Jacob Keller'" <jacob.e.keller@intel.com>,
-	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
-	"'Kees Cook'" <kees@kernel.org>,
-	"'Larysa Zaremba'" <larysa.zaremba@intel.com>,
-	"'Joe Damato'" <joe@dama.to>,
-	"'Breno Leitao'" <leitao@debian.org>,
-	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
-	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
-	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
-	"'Thomas Gleixner'" <tglx@kernel.org>,
-	"'Greg Kroah-Hartman'" <gregkh@linuxfoundation.org>
-References: <20260610060917.23980-1-jiawenwu@trustnetic.com> <20260610060917.23980-6-jiawenwu@trustnetic.com> <20260612154117.GC671640@horms.kernel.org>
-In-Reply-To: <20260612154117.GC671640@horms.kernel.org>
-Subject: RE: [PATCH net-next v6 5/5] net: wangxun: add pcie error handler
-Date: Mon, 15 Jun 2026 10:13:42 +0800
-Message-ID: <018201dcfc6c$96419460$c2c4bd20$@trustnetic.com>
+	s=arc-20240116; t=1781489713; c=relaxed/simple;
+	bh=gyjz/USqjUUtM62ty/LRr7o6O6v2mzhDa0axURjvys0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H7INsAjkUUduFoss/XX79c50XEapINf1baov6VEFgEYkdBLRsujVYXgLHVAMpro4MMHEgaUqNF4vYmbaCKfeIXgar1JklrYu1VYwwhxxY/3QYruuD5DNDUc1PwkBt0tTTd0SAqrltEGGLsWCt7yQbGZdmutt+Nqgg2V6FfvzGIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oKH6HG9J; arc=none smtp.client-ip=209.85.160.177
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-51780bbc560so33169771cf.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 19:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781489711; x=1782094511; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dgs8zi4UB7t/plEWUkJHCQvofyIKmiToTSGYIIN2vkI=;
+        b=oKH6HG9J7mdqg1cvcFmByA+uLIzS8ZX6O2HF2P84ewmRZF/aO8R+Qg/dlFSSN/09XV
+         aOURHT6qcKBOUuIw4jj78edELRrFNyuIw4kerq7etpHRpwYg0+gJrTN4loVU6FeGGT+W
+         0Ixzyz430IXXFg8hIFsVUn+EY6b5nSFELU9heDKR9RVGhEmewJHVVGHMKoyMf+4HiMD/
+         2hOaXI0AGY+czjXkwbR+a7rVBvMOlmrfibf4QoICUmgx3/DNgV01VzIhcEhNB8n9Q9xi
+         xIA8R+5D/pULPHZCUywYC4Z9LBnbc6xm97xB64573ezt+Ba7yK5gLykSHAtZvCG9+y/0
+         vvSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781489711; x=1782094511;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dgs8zi4UB7t/plEWUkJHCQvofyIKmiToTSGYIIN2vkI=;
+        b=Zbc0+hzRvHSYpA7uDh/yXxiqubR+/VWoNogsUPbXLsHFyExQ6DEGLTCTrgjwej86bV
+         4x1bX2YppBjuV8Tv0kmvffLwYwl9Vh5of5rZ/CFCfFXed5tdipMl0Gs+hMsSASLRESqa
+         cCM1sRp96QkKgyJuPM1ZfhiDCSPynjcyP5cgUmkTr6oRyrSZ8LZkHjZEE7UidV1+SWrz
+         AiYFAzdhzVrc/H6u0jeu2e1IkQMgZNuutTQIUgS1qGZ8/qL1rVF0frHEjoTqSlYXq6i7
+         3GP3w0tKDhkbQ9GdzzSSHwpHfBpW79z/GiZdgo5pY2xQ1JAcB4+5YtV3UgG++jXxv+ue
+         iNJg==
+X-Forwarded-Encrypted: i=1; AFNElJ9avT+WU51XBZgFGxWwrrqVk8GDlil8UVjd24oENL12iyR3k81EEDjDGJl7Ay5mEuu1tCYPvNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywr3KSOenBGK/5163nHeePaWimKm1EqA5r3hlvvQhmNdysp+WRo
+	Iql17Pba+Dkk69OiOSVdLscZxZ7ROE31MQ4mOG71droNqzAOD3MegISPeu88ggL8ElGMfw==
+X-Gm-Gg: Acq92OHoVYL9fBNu/z/mjgEtgYGBSib/rvXokwuxvbiW2VALesjOVAWhnriMrgIZY1L
+	aXdELsgRr3xtCGgj6GG13Go8dBVwXbdcGRcAtZBKA1SMuD8JwS+Q0FyY3pGWWT5qKaJ3Vb4TyK7
+	IEuAkaJXVdSQQVIPJv+okcxCDVE48igYXc9nptzHzIgNdPQqLHnIYxbDl2WwReQDQRiNQCC3z/r
+	xfZhZGFLcnyNFl/edybHQ1NlGpYeZF5sPGA2roYYH3NXxyOwZY5T/3Hzo0pI4zkQDTD8xTXYYPE
+	BqwzAifKnwxlMpi17YKYT1RmZV+AF87vfSO1s/Fu7zTNfxANUFtS7ikluJPslVzjG34wuf7Buhg
+	mwZg9RFnSnmtvpb7byuZmHXnGFt/NvkzzdBHWT7Fd9rfINzsHs4pmIMKTQ31nZwbT8DGzUXq2hO
+	hUeasTFgI/2hZ13Pd9BOaKrvStYRfv5SZOwHtyHUQU/zPEqxfR68Dl0vDjzE5FwqtBksCDJg==
+X-Received: by 2002:a05:622a:1819:b0:517:5bc6:b575 with SMTP id d75a77b69052e-517fbc898cfmr172653761cf.4.1781489710652;
+        Sun, 14 Jun 2026 19:15:10 -0700 (PDT)
+Received: from localhost.localdomain ([2601:985:4601:5df0:2106:6ce9:6b1:8f70])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8d305134b20sm96793466d6.43.2026.06.14.19.15.10
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 14 Jun 2026 19:15:10 -0700 (PDT)
+From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+To: dwmw2@infradead.org,
+	richardcochran@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [BUG] ptp: vmclock: KASAN slab-use-after-free in vmclock_miscdev_read
+Date: Sun, 14 Jun 2026 22:15:08 -0400
+Message-ID: <178144969601.60470.14493569608271069160@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQH9NqXiSq8t3g99zFNQdAvFN/QoIQJ20AayAkkGzz+12GL9QA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: OceqJ+fpM4/sv7GBIWzlDWCN0iXD+zR/48oXju9HvHqw0ibF7x84y2Wc
-	qT4SSE/GlgMnOJWY6VXKkJXE+r+R9lrnXphPU9iWNXu9b2JkxNEH8zF/7/ieWpu6909qupy
-	NGSd+7ZZ2NiXuU8H1bvrS4/FNAQBkb6KSsX9mH+x7GOA5SOuUKkHSVFtzvRDfi1/Cx0telB
-	+igG4/bLmuI/PpytAG/GxYv+orG4iGQ+1gPSqMc76iFQRFCL4AuIqKFO5R37/Wqf3uTOYbl
-	NJa3iuMiSmF8oEPuj4W7o7zOshW2/owR75cY8fHluhSnJ01O0bQ01VKb0x0ycnkBWGi8j+3
-	R33c/uobGipiLnGdqWG0fIBnyhkOaP1P40AYDxuS/wF5aYcpKUUT1oOi7gpZuCZHh/nMvdj
-	12OYM22C3pJ0k9hbsIf9ky5/yrFLbFA3UUatOp63kBHOtJrNCs3LNDcCER0YQAGz1ZQ+fMw
-	KcotWaHlDpQBWl1BzLqhZd1TGUuO1sS6s6cm1084yUC+EJtUJN9UKZ+w7/wobmsqzKOrB4U
-	PTN5/qhd/eJcuwdcxmXH5ihwQdGxtTxkUbrkgD8H0cGhZ8McNWYs2th2lXlHdHupd8/sX26
-	0a5dZ4x7NLdoYKfeNmM+rKhtTgL+UTrG/4ef1NEVa1mpFna+zzncsExJv8H+x7G7ACwh4LQ
-	HM5E7sAJl91eOBQHXiDlg1tJERbdeExaHifzMBjBsCPdu8gJxrSdFwCS1ACfBJE7dMFBCql
-	UVdH2I6bgby0NMGZgR+2XIn/1MuBVbkdkwvp8f4WmBJDoexh1tCtD85M2Xyl2MDnk/i5Z/c
-	IIrZT60fgDB9qNOv0HCN3QvPOKV9mpvtoEHum1HaUYdAJKjPm9mM8HH0jZkOTW65E3ArKIo
-	xr41YYndLdkUFvjjfTc/3Pltoii7v3zCQVssBepY9JzMGSeo3qrcOn/bVzsMQnxbqXadvAr
-	ZiE41erdP0/MuAtnW7tmoAXITM0/DDXQsRHcHDVg2NbqMhYIXxaAhtZjrHeFlquQgedyoQK
-	u7aYi2V91ouft0xgFwTDc5Rz8yfQh6XzHm/B1vqOhtbbGajHXlGCwFYlLlnI1txK1EdTJ01
-	VJCcQE8Q9Ol0NzpAwKgMGE=
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	FROM_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:kees@kernel.org,m:larysa.zaremba@intel.com,m:joe@dama.to,m:leitao@debian.org,m:aleksandr.loktionov@intel.com,m:u.kleine-koenig@baylibre.com,m:fabio.baltieri@gmail.com,m:tglx@kernel.org,m:gregkh@linuxfoundation.org,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[41];
-	TAGGED_FROM(0.00)[bounces-299291-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299290-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:dwmw2@infradead.org,m:richardcochran@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[infradead.org,gmail.com,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,linuxfoundation.org];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6609F682D3F
+X-Rspamd-Queue-Id: 31A2F682D35
 
-On Fri, Jun 12, 2026 11:41 PM, Simon Horman wrote:
-> On Wed, Jun 10, 2026 at 02:09:17PM +0800, Jiawen Wu wrote:
-> > Support AER driver to handle the PCIe errors. Sometimes netdev watchdog
-> > Tx timeout happens before the AER error report when a PCIe error occurs,
-> > CPU blocking would be caused by MMIO during the reset process. To
-> > prevent it, check PCIe error status in .ndo_tx_timeout. The current
-> > function of ngbe is not yet fully developed, it will be completed in the
-> > future.
-> >
-> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> 
-> Hi Jiawen,
-> 
-> There is AI-generated review of this patch-set available on both
-> https://sashiko.dev and https://netdev-ai.bots.linux.dev/sashiko/
-> 
-> I've tried to filter out only those that seem strictly relevant
-> to the progress of this patch and have included them inline.
-> 
-> I'd appreciate it if you could take a look over this.
-> 
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> 
-> ...
-> 
-> > +/**
-> > + * wx_io_slot_reset - called after the pci bus has been reset.
-> > + * @pdev: Pointer to PCI device
-> > + *
-> > + * Return: pci_ers_result_t.
-> > + *
-> > + * Restart the card from scratch, as if from a cold-boot.
-> > + */
-> > +static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-> > +{
-> > +	struct wx *wx = pci_get_drvdata(pdev);
-> > +	pci_ers_result_t result;
-> > +
-> > +	if (pci_enable_device_mem(pdev)) {
-> > +		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-> > +		result = PCI_ERS_RESULT_DISCONNECT;
-> > +	} else {
-> > +		/* make all memory operations done before clearing the flag */
-> > +		smp_mb__before_atomic();
-> > +		clear_bit(WX_STATE_DISABLED, wx->state);
-> > +		clear_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
-> > +		pci_set_master(pdev);
-> > +		pci_restore_state(pdev);
-> > +		pci_wake_from_d3(pdev, false);
-> > +
-> > +		rtnl_lock();
-> > +		if (netif_running(wx->netdev) && wx->down_suspend)
-> > +			wx->down_suspend(wx);
-> > +		if (wx->do_reset)
-> > +			wx->do_reset(wx->netdev, false);
-> 
-> The AI-generated review on sashiko.dev flags the following.
-> 
-> 	"Does this properly initialize the hardware MAC during PCIe AER
-> 	 slot reset recovery for the ngbe driver?
-> 
-> 	"For txgbe, this correctly maps to txgbe_reset(), which calls
-> 	 txgbe_reset_hw().  However, for ngbe, wx->do_reset maps to
-> 	 ngbe_do_reset() which calls ngbe_reset().
-> 
-> 	"Looking at ngbe_reset():
-> 
-> 	"drivers/net/ethernet/wangxun/ngbe/ngbe_main.c:ngbe_reset() {
-> 	    if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
-> 	        return;
-> 	    wx_flush_sw_mac_table(wx);
-> 	    wx_mac_set_default_filter(wx, wx->mac.addr);
-> 	    if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
-> 	        wx_ptp_reset(wx);
-> 
-> 	"This skips ngbe_reset_hw() and fails to fully reset the hardware.
-> 	 Since a PCIe slot reset clears the device's internal state, when
-> 	 wx_io_resume() subsequently calls ndo_open(), could the device fail
-> 	 to function because its hardware registers and PHY state were never
-> 	 reset?
+Hi,
 
-As stated in the commit message, ngbe is not yet fully implemented due to some
-existing issues with its reset mechanism. These will be refined in a future patch.
+I hit the following KASAN report while testing current upstream kernel.
 
-> > +		rtnl_unlock();
-> > +		result = PCI_ERS_RESULT_RECOVERED;
-> > +	}
-> > +
-> > +	pci_aer_clear_nonfatal_status(pdev);
-> > +
-> > +	return result;
-> > +}
-> 
-> ...
-> 
-> > +static void wx_tx_timeout_recovery(struct wx *wx)
-> > +{
-> > +	/*
-> > +	 * When a PCIe hardware error occurs, the driver should initiate a PCIe
-> > +	 * recovery mechanism. However, this recovery flow relies on the AER
-> > +	 * driver for current kernel policy. Therefore, a self-contained
-> > +	 * recovery mechanism is not implemented yet.
-> > +	 */
-> > +	set_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags);
-> > +	wx_err(wx, "PCIe error detected during tx timeout\n");
-> > +	queue_work(wx->reset_wq, &wx->reset_task);
-> > +}
-> 
-> The AI-generated review on https://netdev-ai.bots.linux.dev/sashiko/ flags:
-> 
-> 	"What clears WX_FLAG_NEED_PCIE_RECOVERY if AER never follows up?
-> 	 wx_tx_timeout_recovery() sets the flag and queues reset_task.
-> 	 reset_task only calls wx_soft_quiesce() and does not clear the
-> 	 flag:
-> 
-> 	    if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
-> 	        wx_soft_quiesce(wx);
-> 
-> 	"The flag is cleared only on the success branch of
-> 	 wx_io_slot_reset(). If the PCIe error never escalates to AER (AER
-> 	 disabled in firmware or kernel, error not reportable, slot_reset
-> 	 returns PCI_ERS_RESULT_DISCONNECT), the flag remains set
-> 	 indefinitely.
-> 
-> 	"Both ngbe_reset() and txgbe_reset() now early-return on this flag:
-> 
-> 	    static void ngbe_reset(struct wx *wx)
-> 	    {
-> 	        if (test_bit(WX_FLAG_NEED_PCIE_RECOVERY, wx->flags))
-> 	            return;
-> 	        ...
-> 	    }
-> 
-> 	"so any subsequent reset path (ethtool reset, ndo_set_features
-> 	 triggered reset, watchdog timeout reset, FDIR reinit,
-> 	 ngbe_reinit_locked / txgbe_reinit_locked) is silently a no-op. The
-> 	 hardware reset capability is effectively disabled until the module
-> 	 is reloaded.
-> 
-> 	"Should wx_tx_timeout_recovery() (or reset_task after the quiesce)
-> 	 clear the flag once the soft-quiesce completes, so the driver's
-> 	 reset machinery remains functional when AER does not follow up?
+The issue was reproduced by opening /dev/vmclock0, unbinding the vmclock
+platform device, and then reading from the old fd.
 
-If a PCIe error happens and AER is unresponsive, the driver currently lacks
-alternative recovery mechanisms. This renders the hardware unusable, making
-any further reset operations disallowed.
+KASAN: slab-use-after-free in vmclock_miscdev_read
+
+I reproduced this on commit: e8c2f9fdadee7cbc75134dc463c1e0d856d6e5c7 (May 25 2026)
+
+The reproducer and .config files are here.
+https://gist.github.com/shuangpengbai/7c2d117852611448a80026f8aa4d4bc4
+
+I'm happy to test debug patches or provide additional information.
+
+Reported-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+
+[  148.011605][ T8390] BUG: KASAN: slab-use-after-free in vmclock_miscdev_read (drivers/ptp/ptp_vmclock.c:409)
+[  148.015241][ T8390] Read of size 8 at addr ffff88811fdc7478 by task repro_vmclock_o/8390
+[  148.018209][ T8390] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[  148.018216][ T8390] Call Trace:
+[  148.018226][ T8390]  <TASK>
+[  148.018232][ T8390]  dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
+[  148.018248][ T8390]  print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
+[  148.018314][ T8390]  kasan_report (mm/kasan/report.c:595)
+[  148.018335][ T8390]  vmclock_miscdev_read (drivers/ptp/ptp_vmclock.c:409)
+[  148.018384][ T8390]  vfs_read (fs/read_write.c:572)
+[  148.018453][ T8390]  __x64_sys_pread64 (fs/read_write.c:765 fs/read_write.c:773 fs/read_write.c:770 fs/read_write.c:770)
+[  148.018483][ T8390]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
+[  148.018498][ T8390]  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+[  148.018604][ T8390]  </TASK>
+[  148.042173][ T8390] Freed by task 8390 on cpu 1 at 147.908511s:
+[  148.042791][ T8390]  kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
+[  148.043265][ T8390]  kasan_save_free_info (mm/kasan/generic.c:584)
+[  148.043775][ T8390]  __kasan_slab_free (mm/kasan/common.c:253 mm/kasan/common.c:285)
+[  148.044256][ T8390]  kfree (include/linux/kasan.h:235 mm/slub.c:2689 mm/slub.c:6251 mm/slub.c:6566)
+[  148.044668][ T8390]  devres_release_all (drivers/base/devres.c:50 drivers/base/devres.c:547 drivers/base/devres.c:576)
+[  148.045171][ T8390]  device_release_driver_internal (drivers/base/dd.c:598 drivers/base/dd.c:1357 drivers/base/dd.c:1375)
+[  148.045791][ T8390]  unbind_store (drivers/base/bus.c:244)
+[  148.046252][ T8390]  kernfs_fop_write_iter (fs/kernfs/file.c:352)
+[  148.046798][ T8390]  vfs_write (fs/read_write.c:595 fs/read_write.c:688)
+[  148.047229][ T8390]  ksys_write (fs/read_write.c:740)
+[  148.047678][ T8390]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
+[  148.048144][ T8390]  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+[  148.048996][ T8390] The buggy address belongs to the object at ffff88811fdc7400
+[  148.048996][ T8390]  which belongs to the cache kmalloc-512 of size 512
+[  148.050394][ T8390] The buggy address is located 120 bytes inside of
+[  148.050394][ T8390]  freed 512-byte region [ffff88811fdc7400, ffff88811fdc7600)
 
 
+Best,
+Shuangpeng
 
