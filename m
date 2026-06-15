@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-299670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QG+RKXyRMGouUgUAu9opvQ
-	(envelope-from <netdev+bounces-299670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:57:48 +0200
+	id ebBIFFeRMGoCUgUAu9opvQ
+	(envelope-from <netdev+bounces-299671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:57:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A50468ABA8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:57:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F356968AB1A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:57:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=gvzUN6Uk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299670-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299670-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=csXy83Ir;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299671-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299671-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99D303044F13
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:56:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 268043024445
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3249736DA10;
-	Mon, 15 Jun 2026 23:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFC8D370ACA;
+	Mon, 15 Jun 2026 23:57:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169D736D9E0;
-	Mon, 15 Jun 2026 23:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE2137186A;
+	Mon, 15 Jun 2026 23:57:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781567819; cv=none; b=JEHcF4L2DHlVtz8L+F4Mqo2SVthqFuB3l5zfBvlWSqSDpCSxRsFGXcbDYWrkpydM5nbNzi6JirFIK77H15RJQ2sYZLNvAFZfl6ALKTXeMSXR8fp0N0JEN5LugLgRFN3ZHlTqlKAroU5kAYu4f8TSgfivuqHuAEIvPgQD98zo47Q=
+	t=1781567821; cv=none; b=lUqsXYyLpWLQft22BIxB+Y3zHQXsi59vyaRkK5lVmij4kuUulIRAaiFirHJhsXGhKQpUKW2ZJsO6jOnVkNUBvjMIEw5Pt2DQ1A4/SsyTd+QZ2C7Z30NqD2lFolV1jLFZL6VKsO9IwDnPPyzR7psxWVBS1EOxMCOsA1QkSolBlSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781567819; c=relaxed/simple;
-	bh=0AsEAFA5lJjz7FdeiEMVNVvbXdyDUj8zi8KTe/UV9hk=;
+	s=arc-20240116; t=1781567821; c=relaxed/simple;
+	bh=u+VdMQAPwin0vklpDkgVQzdr4/UVXMs3t/Qahc7Hl/0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JYF2wa5U7zJWD2BWO08kts1lfF4ik95cNCpLvc47ff662pF3Yuf07V6HIPaXDTqWhM4HQ6cbXIxJskTvq+ft/14Xd4qSH3+g1P4iFQWv45JBchjehhCs80JmCCNpz+UmGgYbrW5GZR/+CHFkyYGQNNZm9iottmVzUmJsYAsO59E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvzUN6Uk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 194FF1F000E9;
-	Mon, 15 Jun 2026 23:56:57 +0000 (UTC)
+	 MIME-Version; b=Yrx+iuVY/TStJizcG806WyTRC1tJ3u1ykD3Q783ekSUD+ZyevcnG+7YVWMrUcbbGHVKAYxhVdtj5TUPQQXhYywt5qOtSpTPPUhA94VB2KFle4ZE4fQkVeHZNkao53+SoNOilUeXHk6MWckk5PKee3h5qNBQfcTMBQ0ZOXvTfC6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csXy83Ir; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D0491F000E9;
+	Mon, 15 Jun 2026 23:56:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781567817;
-	bh=VQgiXnjJ6fSj+/sElJMxxr5OpH6R2crt7tDdnsh7rI4=;
+	s=k20260515; t=1781567820;
+	bh=kJvU7XOIbSyX9Zm4EZO5FyKhGmgcOkVUxZvYfOyaTQE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gvzUN6UkkcOJaUBdPDm3nKWxTFho1m+/20zbBjR8odVbv83K582lvyFUALDDb7dU5
-	 XFfEFL4+H5S9MxiBjIEXJv+ko6ZhNS1TPhYpTUqD7nhumLCoNpx/bRPX27GnvAiu5u
-	 pFcB2ENBnL5kDYQd3AtUHIwC37JJADPl/8pJSwDhPKz3FBYR53j+sDzB1CHna+rK1Y
-	 anlZp4/IvaHysWSmtGyWdxJGzsStMO5SX0AfwVZeLkFpC1GpPg3mTIW36J+DvCbXbG
-	 g8beq7HTCjMBsc9kkeu2E6KgBe1qgNvgzlHPsBohG/IeB7LST883G1wX5jKKKZNYq0
-	 8A7kw7kjejPgA==
+	b=csXy83IrQ+/9BMRoGJEi/VDlG3CXFWEBKqtWSWTCSusM3nwspAb6S2W8QCU5OwP6w
+	 lTO9gFwH1kjLEN+UjdezTZhvdVpqa+uDLzXmd+noDXwbl+uTm75M9ow4ur7rOEu8r6
+	 ofwkVyVhXJYX2U6unvGcsejPPVL95+/joy/DZdxoGu/6Bs9CeUSZ/QSzMHHQnRrf2G
+	 VdPoKcUm+KEdchc5pvuOTQrFtB5bmWgI0lyhOOiVskDDLLGEv1e7N9kDPSrW7wKyS0
+	 usmpyC6JdBMmNtt699G+Z3cFbp4XidIRz4zgjAR28+nL8UGbM1t1EXTy0RNn3C7NYI
+	 QjvLYP1HSfDaA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: daniel@makrotopia.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -62,12 +62,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 6/8] net: dsa: mt7530: convert to use field accessor macros
-Date: Mon, 15 Jun 2026 16:56:52 -0700
-Message-ID: <20260615235652.1060768-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 7/8] net: dsa: mt7530: implement port_fast_age
+Date: Mon, 15 Jun 2026 16:56:58 -0700
+Message-ID: <20260615235658.1060805-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <62e0a7e96bcadba0ec1a0f090c2fd2990c6ae0f1.1781312667.git.daniel@makrotopia.org>
-References: <62e0a7e96bcadba0ec1a0f090c2fd2990c6ae0f1.1781312667.git.daniel@makrotopia.org>
+In-Reply-To: <e6cdb705f0ec142283071e1966000d3a76f71a16.1781312667.git.daniel@makrotopia.org>
+References: <e6cdb705f0ec142283071e1966000d3a76f71a16.1781312667.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,11 +84,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299670-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299671-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:daniel@makrotopia.org,m:kuba@kernel.org,m:chester.a.unal@arinc9.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[15];
@@ -108,124 +108,142 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0A50468ABA8
+X-Rspamd-Queue-Id: F356968AB1A
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: dsa: mt7530: convert to use field accessor macros
+Subject: net: dsa: mt7530: implement port_fast_age
 
-This patch converts the mt7530 DSA driver to use FIELD_GET and FIELD_PREP
-instead of open-coded shift/mask constructs, and replaces a 0x1f literal
-in the PHY address helper with (PHY_MAX_ADDR - 1).
+This change adds a .port_fast_age operation for the mt7530 DSA driver.
+The implementation triggers an ATC flush of all non-static MAC address
+entries and polls ATC_BUSY for completion.
 
 > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 4168adca949f..dcf72ab0cd66 100644
+> index dcf72ab0cd66..c96420c291d5 100644
 > --- a/drivers/net/dsa/mt7530.c
 > +++ b/drivers/net/dsa/mt7530.c
+> @@ -193,6 +193,21 @@ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
+>  	return 0;
+>  }
+>  
+> +static void mt7530_port_fast_age(struct dsa_switch *ds, int port)
+> +{
+> +	struct mt7530_priv *priv = ds->priv;
+> +	struct mt7530_dummy_poll p;
+> +	u32 val;
+> +
+> +	/* Flush all non-static MAC address entries */
+> +	val = ATC_BUSY | ATC_MAT_NON_STATIC_MAC | MT7530_FDB_FLUSH;
+> +	regmap_write(priv->regmap, MT7530_ATC, val);
+
+[High]
+Should this transaction be serialised against priv->reg_mutex?
+
+Every other accessor that touches MT7530_ATC wraps the write+poll
+sequence in mutex_lock(&priv->reg_mutex)/mutex_unlock(&priv->reg_mutex).
+For example mt7530_port_fdb_add(), mt7530_port_fdb_del(),
+mt7530_port_fdb_dump(), mt7530_port_mdb_add() and mt7530_port_mdb_del()
+all hold reg_mutex around the call to mt7530_fdb_cmd():
+
+	mutex_lock(&priv->reg_mutex);
+	mt7530_fdb_write(priv, vid, port_mask, addr, -1, STATIC_ENT);
+	ret = mt7530_fdb_cmd(priv, MT7530_FDB_WRITE, NULL);
+	mutex_unlock(&priv->reg_mutex);
+
+If .port_fast_age runs concurrently with one of those operations, can
+the two write-then-busy-poll sequences on the same MT7530_ATC register
+overlap?
+
+Could one thread's poll loop observe ATC_BUSY clearing for the other
+thread's command, leading mt7530_port_fdb_dump() to read stale ATRD
+data, or could one thread's freshly written ATC command be overwritten
+by the other before the controller has executed it?
+
+> +
+> +	INIT_MT7530_DUMMY_POLL(&p, priv, MT7530_ATC);
+> +	readx_poll_timeout(mt7530_mii_poll, &p, val,
+> +			   !(val & ATC_BUSY), 20, 20000);
+> +}
+
+[Medium]
+Is there a reason the return value of readx_poll_timeout() is ignored
+here?
+
+The structurally identical helper mt7530_fdb_cmd() in the same file
+checks the result and emits a diagnostic on timeout:
+
+	ret = readx_poll_timeout(mt7530_mii_poll, &p, val,
+				 !(val & ATC_BUSY), 20, 20000);
+	if (ret < 0) {
+		dev_err(priv->dev, "reset timeout\n");
+		return ret;
+	}
+
+Peer DSA drivers also log on failure (b53_br_fast_age prints "fast
+ageing failed"; rtl83xx_port_fast_age prints "failed to fast age on
+port %d: %d").
+
+If the ATC engine fails to clear ATC_BUSY within the 20ms timeout,
+mt7530_port_fast_age() returns silently and a subsequent
+mt7530_fdb_cmd() will write a new command on top of the in-flight
+operation. Should this path emit dev_err() on timeout to make a wedged
+ATC engine visible to operators?
+
+> +
+>  static void
+>  mt7530_fdb_read(struct mt7530_priv *priv, struct mt7530_fdb *fdb)
+>  {
 
 [ ... ]
 
-> @@ -1555,7 +1555,7 @@ mt7530_vlan_cmd(struct mt7530_priv *priv, enum mt7530_vlan_cmd cmd, u16 vid)
->  	u32 val;
->  	int ret;
->  
-> -	val = VTCR_BUSY | VTCR_FUNC(cmd) | vid;
-> +	val = VTCR_BUSY | VTCR_FUNC(cmd) | VTCR_VID(vid);
-
 [Low]
-The commit message describes this change as a refactor:
-"Use FIELD_GET and FIELD_PREP instead of open-coding register fields."
+Is the claim in the commit message accurate?
 
-The mt7530_vlan_cmd() hunk is not quite a pure conversion though.  The
-previous code OR'd in vid directly:
+  "This is consistent with what other DSA drivers do (b53, realtek)
+  and relearning is fast."
 
-    val = VTCR_BUSY | VTCR_FUNC(cmd) | vid;
+Both drivers cited actually implement per-port fast aging.
 
-while the new code applies a GENMASK(11, 0) truncation through VTCR_VID():
+In b53, b53_br_fast_age() calls b53_fast_age_port() which writes the
+target port to B53_FAST_AGE_PORT_CTRL and selects FAST_AGE_PORT mode.
 
-    val = VTCR_BUSY | VTCR_FUNC(cmd) | VTCR_VID(vid);
+In realtek, rtl83xx_port_fast_age() calls
+priv->ops->l2_flush(priv, port, 0), and rtl8366rb_port_fast_age()
+flushes only BIT(port) via RTL8366RB_SECURITY_CTRL.
 
-Spec-conformant VIDs always fit in 12 bits, so the runtime result is the
-same, but the value is now masked where it previously was not.
+The mt7530 implementation flushes globally and ignores the port
+argument entirely, which is the opposite of the cited examples. The
+hardware-limitation rationale ("switch does not offer combined
+non-static AND per-port match mode") may be valid, but the b53/realtek
+comparison appears to be the wrong precedent.
 
-A related observation is that the prior VTCR_VID and ATC_HASH macros
-referenced an undeclared x:
-
-    #define  ATC_HASH                       (((x) & 0xfff) << 16)
-    #define  VTCR_VID                       ((x) & 0xfff)
-
-so they could not have been used by any caller before this patch.  Adding
-the (x) parameter and a GENMASK is effectively a fix for those macros.
-
-Would it be worth calling out the VTCR_VID() truncation and the macro
-parameter fix in the commit message, or splitting them into a separate
-patch so the conversion remains a no-op refactor?
+A side effect not mentioned is that an STP transition on one port will
+flush dynamic FDB entries on every other port and every other bridge
+sharing the switch. Should this divergence from the typical
+.port_fast_age contract be called out?
 
 > diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-
-[ ... ]
-
-> @@ -171,32 +176,29 @@ enum mt7530_fdb_cmd {
->  
->  /* Registers for table search read address */
->  #define MT7530_TSRA1			0x84
-
-[ ... ]
-
->  #define MT7530_ATRD			0x8C
-> -#define	 AGE_TIMER			24
-> -#define  AGE_TIMER_MASK			0xff
-> -#define  PORT_MAP			4
-> -#define  PORT_MAP_MASK			0xff
-> -#define  ENT_STATUS			2
-> -#define  ENT_STATUS_MASK		0x3
-> +#define  AGE_TIMER_RD_MASK		GENMASK(31, 24)
-> +#define  PORT_MAP_MASK			GENMASK(11, 4)
-> +#define  ENT_STATUS_MASK		GENMASK(3, 2)
+> index abf19aa69520..decad7a93dbd 100644
+> --- a/drivers/net/dsa/mt7530.h
+> +++ b/drivers/net/dsa/mt7530.h
+> @@ -165,6 +165,7 @@ enum mt753x_to_cpu_fw {
+>  #define  ATC_MAT_MASK			GENMASK(11, 8)
+>  #define  ATC_MAT(x)			FIELD_PREP(ATC_MAT_MASK, x)
+>  #define  ATC_MAT_MACTAB			ATC_MAT(0)
+> +#define  ATC_MAT_NON_STATIC_MAC	ATC_MAT(4)
 
 [Low]
-The mask formerly named AGE_TIMER_MASK is renamed to AGE_TIMER_RD_MASK,
-but the same mask is consumed on both the read and write paths
-(mt7530_fdb_read() and mt7530_fdb_write()), so the _RD_ infix reads as
-"read-side only".
+The new ATC_MAT_NON_STATIC_MAC define uses a single tab between the
+macro name and its value, while the surrounding ATC_MAT_* macros use
+multiple tabs and align the values at the same column. Should this
+follow the existing alignment?
 
-Its sibling fields in the same MT7530_ATRD register keep plain names
-(PORT_MAP_MASK, ENT_STATUS_MASK), and the related ageing counters in
-MT7530_AAC use AGE_CNT_MASK / AGE_UNIT_MASK rather than an _RD_
-disambiguation.
-
-Was the _RD_ infix intentional, and if so, what does it disambiguate
-from?
-
-[ ... ]
-
-> @@ -731,38 +745,48 @@ enum mt7531_xtal_fsel {
->  #define  MT7531_PHY_PLL_OFF		BIT(5)
->  #define  MT7531_PHY_PLL_BYPASS_MODE	BIT(4)
 >  
-> -#define MT753X_CTRL_PHY_ADDR(addr)	((addr + 1) & 0x1f)
-> +#define MT753X_CTRL_PHY_ADDR(addr)	(((addr) + 1) & (PHY_MAX_ADDR - 1))
-
-[Low]
-The replacement evaluates to the same value today, since PHY_MAX_ADDR is
-32 in include/linux/phy.h and PHY_MAX_ADDR - 1 is 0x1f, and both forms
-ultimately derive from the IEEE 802.3 5-bit MDIO PHY-address field.
-
-The original 0x1f represented the width of the hardware register field,
-while PHY_MAX_ADDR - 1 represents the maximum software PHY address minus
-one and additionally relies on PHY_MAX_ADDR being a power of two, which
-phy.h does not formally guarantee.
-
-Given the rest of the patch introduces explicit GENMASK based field
-masks, would something like:
-
-    #define MT753X_CTRL_PHY_ADDR_MASK GENMASK(4, 0)
-    #define MT753X_CTRL_PHY_ADDR(addr) FIELD_PREP(MT753X_CTRL_PHY_ADDR_MASK, (addr) + 1)
-
-be more consistent and make the hardware-field intent clearer?
+>  enum mt7530_fdb_cmd {
+>  	MT7530_FDB_READ	= 0,
 
