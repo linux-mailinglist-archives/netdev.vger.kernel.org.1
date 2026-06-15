@@ -1,216 +1,247 @@
-Return-Path: <netdev+bounces-299346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299347-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RTgLNympL2oAEQUAu9opvQ
-	(envelope-from <netdev+bounces-299346-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:26:33 +0200
+	id rv5wNaqpL2ocEQUAu9opvQ
+	(envelope-from <netdev+bounces-299347-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:28:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 613516842FD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:26:33 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C6D684346
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:28:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=sratmR+D;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299346-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299346-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=altera.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299347-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299347-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2298A300D91F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:26:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DD3C23003981
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9033B9D9B;
-	Mon, 15 Jun 2026 07:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B43F3BE146;
+	Mon, 15 Jun 2026 07:28:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010030.outbound.protection.outlook.com [40.93.198.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7D23B52F4;
-	Mon, 15 Jun 2026 07:26:15 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781508376; cv=fail; b=UJphvQVIme+I3M4lmfP+OZ5ezbbmyD4csf8LWErzb4LQJQ61kWqGGOrt/9xDGG9ANUpdJPJTeRLfC7pBoowmcBCEWg6eg47C6RPvO6So6RELe1xfRRhJ0jOSJZCP9sIaEf2yjQ8KkbTbHhaM3iM4fGtrQmRkC/f2MICP6ylaFNY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781508376; c=relaxed/simple;
-	bh=xXzV7w85bD1Ev5YbVXlfjQqmMwdAV1nIusUxB53P0z4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Zdw7uyfEfUZ6WNfoZAXhlkcKtlliy/R8tQb+U/2SO6UAUt0fkJSoldMnS/ZDp+IaTN2K3EVpwZUqugviprz06BsVwMY/gfojptRZqqjsL4TZs25QrPHgu27Y88I0klg1GBvAwMOWGc23Qo2ByxpTwqROyZuikKvitZ+jICVSJCY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=sratmR+D; arc=fail smtp.client-ip=40.93.198.30
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hTD627tVz/YHNn1R52E+TmSkV3fQZ/O6W6Cql9OItPHRuywnJE1MB/PBaXsmVhkJM5z8f68aoqSxPduvS+xprmHME+nhrpeVVZELZ+b5nf+ITdc60e9VzUimpht06w89GXfvZe6w2Xa2y0FsRfjRM87tqqXHYdEnraT231UH5ie8WWGntdpoFUZWiPgADcvxr/x8xKki5rTukLVrpk1F1Lj1V29K8ePD78V5l8CUnVZWqJXqVrplCS+B58ZWWZ+UzGaVIzlzx6QRczT/1X7LwEJ/CyUx0k1OZWkbf3wZDds69Pw3BXv3jhYL+e/x+Dz+HQwufA4r2+GkGpZoRaatRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xXzV7w85bD1Ev5YbVXlfjQqmMwdAV1nIusUxB53P0z4=;
- b=ibgZzv02ycMDVH8qmqavABGfmFB+NU9qYs4nif08wDVYPnanLItV8n8hXUTYtSmUf2iThZDTWrCTILs4dRDXELYZOV7Rqqjxu1T2jUTFied9B6sedO/SisnR6mtabKw3eotwepgHfSVnQyhwYfi5i43UzLm+/lhajI4DHVYnE/QVNpGpY7RidP+jQDIDKRgFhnu1ZBhi5s5PM7dRoF0ROd7SIij0RH0MDs8Ao1BfbhpZANcQp+bFOk5KLDo7dvVQDbfBleXMmdSE8Bf9/NLUWWQw6EPT88oJc1TjPioRn2ut/dJEFx2/XJgg8o1/bVktbfz5nUWLUxTi+1nENQr46Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xXzV7w85bD1Ev5YbVXlfjQqmMwdAV1nIusUxB53P0z4=;
- b=sratmR+DrJvjoJhUZZfXfzW9IKc6Ad8IWf9swc4+9cO9FqvDw/D+cQnLfiNPbMkB1t8nJE/r+SnUv6k7atxiqwztdLKeHyaM+NIlq0OVzHdt/T6F/cktcFYUNnhyGc/Vffl6xwt21phkG5GJZS3yBvx5vwRCNh9uIiLDtTFyIw55rtTii6beQVmzMkllj66WUbMMmG6rLAoK/X1WF3FZ/2g8wNE1JPoY18kn5tmG0grQ+oA3CZoCh4/AG4M+F3F5Njsj7qVJzl6/ZFIkChbtE7SW/0VF+MV04uCbmsnsySWipTpugOrL81V7rFKb+mYb2gt7HkSrp+JIEqpRPnV7YA==
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
- by SA6PR03MB7878.namprd03.prod.outlook.com (2603:10b6:806:42e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
- 2026 07:26:13 +0000
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
- 07:26:13 +0000
-From: "Nazle Asmade, Muhammad Nazim Amirul"
-	<muhammad.nazim.amirul.nazle.asmade@altera.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: ethtool: mm: Increase FPE verification retry count
-Thread-Topic: [PATCH] net: ethtool: mm: Increase FPE verification retry count
-Thread-Index: AQHc9Jbq62Y8TJUe2E+DsI48lz9PkbY28/YAgAhTW4A=
-Date: Mon, 15 Jun 2026 07:26:13 +0000
-Message-ID: <5b43bd71-98d5-46cd-abe9-3333ce048ea7@altera.com>
-References:
- <20260605025631.2872-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
- <20260609171750.7c5709ac@kernel.org>
-In-Reply-To: <20260609171750.7c5709ac@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR03MB6964:EE_|SA6PR03MB7878:EE_
-x-ms-office365-filtering-correlation-id: c8c060b6-2f19-4477-cdb4-08decaaf6138
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|23010399003|55112099003|38070700021|22082099003|18002099003|4143699003|11063799006|56012099006;
-x-microsoft-antispam-message-info:
- s+xhbqAQ+z5p3hchAFrqSevwUetC3RoXaJOMf0NdJsNqfB5CNVMdO5wQax4kbB5zQWSqlyizVXtR+53Q8BqwYLsmurexjcNPDO6gO2NY/9w8kSMy1JekbD1YF/UGmvwceoPVnWON4qXA7s/Y65wkM0cuETBZYbmsvSpZsbFBAHqF5sezFEGgFD+U2czQGipd8MDBdf4MmNNST297i2DHCtzE8lxbWavhze6+Ch2JZvuSRHQMQjKYOcgwxIjj4zGtkMd/qW2SKflX7GGJ79g0GjyjcbzlqMH5tMmCh/iD2mwF+9u+Nl0bjeVIPYfUIFfChUH7hnoOmtnA3VYZQYT/1mswGjwiawLwYsa5UUaB1PNbkra5Zs7zcf+5RPiMkAtgRvB88rWOXcBQUPM++vk7dBU/w1zYc2n2SB1wqX6+GbCfYLWvzjfKOD4Z32l0GjtrXZls1RLcIcL/t6xXmsUHcsl9zD+Fi4KiGv/pkfdi67HLp4seh8EvKXYWp0/6s/1r/Oc/qG1OHCh6ybMRWOLRY6CW/IZc/3tK5Sj+7AOOJUqKgAkTCwgM32hP8gUSsjKwtRsrkC7BQdI+VsGAIA0+F+YeG8/8iOlaBNp70s94iC8y8DWG5wULsXg1+KBpvEpBMW+9k+4wPPzy7IhL4RubFQP0wfg9noeKULxh/gpHeiGCo9AniLdGw0BEOrJAI5la/XUPKlsVg5Y5UNuk1i3PWR4xl99k2jEwOATgkxZRUu6t63nYPlNo74WrtrQylKPC
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(23010399003)(55112099003)(38070700021)(22082099003)(18002099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?U2NxUXlTeHlxS0hKaDRkK2JRYTRNajI1NFhrL2ZTeTMzV2t3V3ozaXF6SVN4?=
- =?utf-8?B?ZW5qUEJxbUdOclBTVC9wTUFaRmNrQVA4WnBaMEx5b1dRekpFdTJBSXg4Y2ZE?=
- =?utf-8?B?RHIrbmZidEtlWkNUR3FUa0pLZnB5cjkvMmNBbDkycWg5ZHZNRU15YjJ1UVNo?=
- =?utf-8?B?UWwrTWlLN2lnbmY2Mm5FakEzNm45U3N1by9KeUxBVUpZRCttdDhENmdiZFVn?=
- =?utf-8?B?YmxidThpNUoyK0g1d0w4Wmxnd1pzN0tWeHVuMU1FK2ZmYXBlNlpnaGtPV296?=
- =?utf-8?B?VDdLaGZqb2FvbkJOd2RkUU13ZmM4REJnemM4c3BoUXZkcCtEMTU3MWVYSUVv?=
- =?utf-8?B?MFN4cUM0VWIySld3K3UreTVESlBucDNuRjQ0T0gyM29yam5aNHNINjJ0NHVt?=
- =?utf-8?B?VXV3OTRyb3JYdEFTcW9WaDUxbGl3SnUzZGpLenhOeVNiUlpZN2hLSGxaYWkv?=
- =?utf-8?B?K2llYWVoVW1sZG4yMWpBd3NSTlhhSHQ0RnFydHhNYk5GRVRJWlZpWFpqQnBu?=
- =?utf-8?B?YnFCS3RBb2RDTWtSVEpveVBCUHoxQ1lZcDB6bk1SMXoxYVJMNmkwcGlXbGNM?=
- =?utf-8?B?akFLVjB6V2ZPMHpjYTNwWUpHb0pWcEZnRGRzTHZXVzdhTzlFTmFDYXZRRUgy?=
- =?utf-8?B?YkFTZFBqeU5qbVhNQkVWZEVYSGk5MldyQndzYlBRQnRtdU9BcG1zeW5MTmhj?=
- =?utf-8?B?bGsvVFFxRFhEb0lmMVpQSjROUWlVYldKVksxcXdsRTlORW1wMTY0RjJ0RlU2?=
- =?utf-8?B?RWNjWGYvREJuNXJhTTIvdUNXOEVFNnNuSVR3REszVndxd0pVZjZNU1Jnek95?=
- =?utf-8?B?S3hUQnIvaFhrb2E1WjNGdmM0bmd4V1dzWDJxREd5UTJaV1JUY3ppQlNRNmh5?=
- =?utf-8?B?elp3Mk02OGU3Q2RLbzRaMzJXeUhzNFNmWGJTdS9QOHlRVXB3YjVsWTltSERp?=
- =?utf-8?B?aXZCV3RUYVZvWlBpREcxT0lCSjRrc1Y2bWQ4dHZhNmhtR3ZaSlZyUGV1L2pp?=
- =?utf-8?B?U0lkeFBwQUI1b2VRQzJFWFZJa2dpbytxa0dBVkF0VjBGaWVkY0pDZmpKT3Zr?=
- =?utf-8?B?YnB2Q2sycE8yc2NxNU85THljelFZMlh0NmpOcjdhUW5HcTF5UkUzOTNYYk1K?=
- =?utf-8?B?VzVSeS9TdjhZVmNVU1BkZlREcnFZOWNycDhTRVNpZksxMVpPYTJxSldNejg5?=
- =?utf-8?B?dnB3VXNGTmNmMGo4SThJME1nQkEwWkN1VkluQmpNVWJpeG4zQ2l3MnJXcFlD?=
- =?utf-8?B?L3ovTmNPd1NBVFNOZ09kWFArTVEvZElRZ2RIaUFGNDFxS2Z2MW5kZThyZVpL?=
- =?utf-8?B?alpvQSs4UG4xQ1Y4d0Z5dkl2ay8zT041S3M3NzJsUjM3WnJ2Y3NvbTRDRGI4?=
- =?utf-8?B?V241UTdDQ1dacXVJWHRuVXQvc1FYTzR0bkliWmlEY2ZNUTA0U2g0Rzh1dGtj?=
- =?utf-8?B?VC9lMU56OFk3bHdFRXVKK05lblZvTlJ3U0UyTGJtNi9LbUo0RzhlUEJRaFVt?=
- =?utf-8?B?S0Y2cjVzaXh2Yk96cTNkRHRSMmY3dUxpUXdSM0pqSkxyUUF4RmEzcGU0UEdL?=
- =?utf-8?B?d0cwbFhudzlFQjNmUVRxbHZvWUxTUldDclZCYmdJeHpSYmtqSlNTZE5FanBG?=
- =?utf-8?B?UGpjZTJObnJXZStndXgwVUtLRXZ1MWxXRDYyNE11emYrUW9ubEpNZnFtdnlB?=
- =?utf-8?B?MGNKQ01XMERlcnFWbkYvQVVwZUxFcExQNEpzMndHUm9YOXZ1V3pNSmhVd2Rj?=
- =?utf-8?B?NlNMVnI4REtNWXhKZTRFclBnTzg0WlVTaC9GckVLRWt4QVIvMm9ZdFlMMVR2?=
- =?utf-8?B?QnVMS005V2dFZXZaYjdaMkpaWFBpanZTUmtaNHZORVdFYlBiZ1FpVXNZa3Zu?=
- =?utf-8?B?SEswOUpWaGtTa05hcE1wNmVwdjByNXNiQ29PUmZKM0NpeFh2WjNwVkxvU0Rj?=
- =?utf-8?B?NDUvRENuMFZqaTdUZWZjeHpsZnZKS2oxZjJlVXg0U3BMV090cWRWRVp0Undt?=
- =?utf-8?B?TEFscmRQVndRWVowS2RNeHE2ZW5lbllYOTBvUWIyR1h3WnY5U0JKRi92NVV6?=
- =?utf-8?B?em55dnpSaHEzQ1l0dHNJdldkVmYzYzVXZi9McmdKbm43THVUVWhtZ0o0a3BG?=
- =?utf-8?B?eSt0VUVBUFFVSHJHYzNoYlBJMElIenRVY05DNldqY1NaMUY0eE55NGNyeFln?=
- =?utf-8?B?aVhOd082VERHTXZGQlM0cjYvZFZLbWJXbDBrN0dQRmMxdDdOVVM5aTVFSjV2?=
- =?utf-8?B?REl6bUxiNTF0bVdReW1xdWNYczRON2tnTDExTTIwMklKNE5OVDFHeU9ieWdN?=
- =?utf-8?B?Q2twdlgxSTlseGN5OWVoRjVCOFladWY1N1llZWM1WVFmeHJhMTUvRXNVZFZG?=
- =?utf-8?Q?hY6I3YjakCh5k2qiEsAl7hM4Ycy/e1HXteVcM9jeMG+g5?=
-x-ms-exchange-antispam-messagedata-1: pool2fDklnMzzQ==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8253A522175D3B4FBC66528334B02428@namprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72FE36655C
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:28:38 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781508520; cv=none; b=qstjrL3ZvHrmaZTCBrmoCIOc6rW+q0OpWzPSYPDwol2FeWJZaDjg0PIaUlz1tQjdsM9A7WhjJK3g9gTHdfQRYdioH6/8bphtWV+PhMz0wbBEJItd71MFLT436aIutemoi9LJiw8t2LNKc8j+m+6ANLuPGHd3HaCBe8vZ1RMxI+Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781508520; c=relaxed/simple;
+	bh=8lpEyypN30gWNikBRixhQnFqfMFEC+3s1f9GVjm67GU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Z+QYUYTdotxt4B1jlubO5vqz+7brG2iqVisfBzgygt5zwOXa4HxNRnxpAtolqwEPolWcChieqq3dbGP6Su/ZZTkVyRD6jI2/ngbNZ2Mrn3rNBTVjTqiTIoHHqqr/rucNfpycPQxjyrEVObBO3lUqoHejnET8+6SFbFkVQ8+RWNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69de11bef3dso4380206eaf.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 00:28:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781508517; x=1782113317;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E3z+zv4CdVXSRoO/fwCBnamP3Uf88pmxkrNhNxMB/FU=;
+        b=Gq5I8KgKVf9ovBrDUXpZFe878g0hgmUFfM3bi8pdpRKjCNiTDGnTqzKYxJlW8I/4pM
+         wEbS4ZoCCnHhAoDlNTqa39MzBFpYX0pvEcklZQj5W0iVnWR59diG7mjSWhNcSv8PLFOa
+         An2P2rQAMR/g38d5OSE+5K97nOoTro5ZD2d80FLko7heOetNST301d5fNEBID1JweiQb
+         hosBq2Ebr6pL0DDrWlYTvCAGAOvLXq/WhRC897sO9xlStnEGR1aT1s81QJzMORqZfuJH
+         PFSF7bFDvhM2kB4QEX8nl4kfjwFUuShhP86IDsro0cLleyWOjygMg1iktm1ZHmhTiNFG
+         wmSg==
+X-Forwarded-Encrypted: i=1; AFNElJ+zGiXBRYCVyrB9vO57BuvlBj78RLUlcIfKK3CzRAXVwU6MjKHwd41avTd2FimY10hq02665Kw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFVQr9jolih75jh4RIyW676/bELxdNPKYeCQPQp4AjMa+SY5AL
+	qR/z9kAIQgJS7mpicFDS1L3XpDaY4Ut/IHexxb9BJobUmfhj0RJEXuip+NUrgJILsJdjUcSrs0H
+	rmPXa6LJ8d2pDsQFdX20YI7jb0Pfok3JSHMl0faeUyRbn+8Rx2vN5fKlCJr8=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8c060b6-2f19-4477-cdb4-08decaaf6138
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2026 07:26:13.1866
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yAgXUr2d8avPZgh++Zsqu7srCtzgedxVh4ckC4P0pUPFDE24LDDcJHc83vffOKzZxME8PeEWY3PBKDQwtKlkNrfqmNxOOmz+pMEEEKXmFttPmPhcZv7Igf4gjL9sG7BOL2CYgN0oC6WUPJQKfhD8mw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR03MB7878
+X-Received: by 2002:a05:6820:4d0a:b0:69d:c62a:f33d with SMTP id
+ 006d021491bc7-69edc6e9ffdmr8403761eaf.33.1781508517632; Mon, 15 Jun 2026
+ 00:28:37 -0700 (PDT)
+Date: Mon, 15 Jun 2026 00:28:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a2fa9a5.8812e0fc.3c3fa4.0019.GAE@google.com>
+Subject: [syzbot] [net?] possible deadlock in __ethtool_get_link_ksettings
+From: syzbot <syzbot+9bb8bd77f3966641f298@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.44 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=a0842261b62cdea8];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299346-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,st-md-mailman.stormreply.com,lists.infradead.org];
-	DKIM_TRACE(0.00)[altera.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299347-lists,netdev=lfdr.de,9bb8bd77f3966641f298];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[altera.com:dkim,altera.com:email,altera.com:mid,altera.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,goo.gl:url,googlegroups.com:email,storage.googleapis.com:url,syzkaller.appspot.com:url,appspotmail.com:email,syzkaller.appspotmail.com:from_mime];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 613516842FD
+X-Rspamd-Queue-Id: 70C6D684346
 
-T24gMTAvNi8yMDI2IDg6MTcgYW0sIEpha3ViIEtpY2luc2tpIHdyb3RlOg0KPiBPbiBUaHUsICA0
-IEp1biAyMDI2IDE5OjU2OjMxIC0wNzAwDQo+IG11aGFtbWFkLm5hemltLmFtaXJ1bC5uYXpsZS5h
-c21hZGVAYWx0ZXJhLmNvbSB3cm90ZToNCj4+IFRoZSBjdXJyZW50IEZQRSB2ZXJpZmljYXRpb24g
-cmV0cnkgY291bnQgaXMgc2V0IHRvIDMuIEhvd2V2ZXIsDQo+PiB0aGUgSUVFRSA4MDIuM2JyIHN0
-YW5kYXJkIGRvZXMgbm90IHNwZWNpZnkgYSBmaXhlZCB2YWx1ZSBmb3IgdGhpcy4NCj4+IEEgcmV0
-cnkgY291bnQgb2YgMyBtYXkgYmUgaW5zdWZmaWNpZW50IHdoZW4gdGhlIHJlbW90ZSBkZXZpY2Ug
-aXMNCj4+IHNsb3cgdG8gcmVzcG9uZCBkdXJpbmcgbGluay11cC4gSW5jcmVhc2UgdGhlIHJldHJ5
-IGNvdW50IHRvIDIwIHRvDQo+PiBpbXByb3ZlIHJvYnVzdG5lc3MuDQo+IA0KPiBZb3UgbmVlZCB0
-byBDQyB0aGUgYXV0aG9yIC8gZXhwZXJ0IG9uIHRoaXMgY29kZSwgcGxlYXNlIHJlcG9zdA0KPiB3
-aXRoIHRoZSBDQyBmaXhlZC4NClJlcG9zdGVkLCBUaGFua3MgSmFja3ViIQ0KDQpodHRwczovL2xv
-cmUua2VybmVsLm9yZy9hbGwvMjAyNjA2MTUwNzI0MzYuMjYxMjgtMS1tdWhhbW1hZC5uYXppbS5h
-bWlydWwubmF6bGUuYXNtYWRlQGFsdGVyYS5jb20vDQo=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    2319688890d9 geneve: Fix off-by-one comparing with GRO_LEG..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=169064ae580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a0842261b62cdea8
+dashboard link: https://syzkaller.appspot.com/bug?extid=9bb8bd77f3966641f298
+compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/51d0476acca3/disk-23196888.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7b1b6c54f1f5/vmlinux-23196888.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c69ec4023055/bzImage-23196888.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9bb8bd77f3966641f298@syzkaller.appspotmail.com
+
+netlink: 'syz.1.3070': attribute type 10 has an invalid length.
+netlink: 40 bytes leftover after parsing attributes in process `syz.1.3070'.
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+syz.1.3070/18201 is trying to acquire lock:
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2837 [inline]
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: __ethtool_get_link_ksettings+0x109/0x250 net/ethtool/ioctl.c:463
+
+but task is already holding lock:
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2837 [inline]
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: do_setlink+0x3d4/0x4670 net/core/rtnetlink.c:3117
+and the lock comparison function returns 0:
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&dev_instance_lock_key#3);
+  lock(&dev_instance_lock_key#3);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by syz.1.3070/18201:
+ #0: ffffffff8fdc1540 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #0: ffffffff8fdc1540 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #0: ffffffff8fdc1540 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_setlink+0x6a7/0xb20 net/core/rtnetlink.c:3527
+ #1: ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2837 [inline]
+ #1: ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ #1: ffff888079ea6e18 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: do_setlink+0x3d4/0x4670 net/core/rtnetlink.c:3117
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 18201 Comm: syz.1.3070 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain kernel/locking/lockdep.c:3895 [inline]
+ __lock_acquire+0x24bf/0x2cd0 kernel/locking/lockdep.c:5237
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x19d/0x1590 kernel/locking/mutex.c:820
+ netdev_lock include/linux/netdevice.h:2837 [inline]
+ netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ __ethtool_get_link_ksettings+0x109/0x250 net/ethtool/ioctl.c:463
+ __team_port_change_send+0x245/0x560 drivers/net/team/team_core.c:3095
+ __team_port_change_check drivers/net/team/team_core.c:3139 [inline]
+ team_port_change_check+0x82/0x1d0 drivers/net/team/team_core.c:3160
+ team_device_event+0x487/0x570 drivers/net/team/team_core.c:3181
+ notifier_call_chain+0x1a5/0x3d0 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2288 [inline]
+ call_netdevice_notifiers net/core/dev.c:2302 [inline]
+ __dev_notify_flags+0x1aa/0x310 net/core/dev.c:9791
+ netif_change_flags+0xde/0x1b0 net/core/dev.c:9820
+ dev_change_flags+0x128/0x260 net/core/dev_api.c:68
+ vlan_device_event+0x1b4e/0x1f00 net/8021q/vlan.c:494
+ notifier_call_chain+0x1a5/0x3d0 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2288 [inline]
+ call_netdevice_notifiers net/core/dev.c:2302 [inline]
+ __dev_notify_flags+0x1aa/0x310 net/core/dev.c:9791
+ netif_change_flags+0xde/0x1b0 net/core/dev.c:9820
+ do_setlink+0xdd6/0x4670 net/core/rtnetlink.c:3207
+ rtnl_setlink+0x77d/0xb20 net/core/rtnetlink.c:3537
+ rtnetlink_rcv_msg+0x802/0xc00 net/core/rtnetlink.c:7068
+ netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec net/socket.c:787 [inline]
+ __sock_sendmsg net/socket.c:802 [inline]
+ ____sys_sendmsg+0x9b9/0xa20 net/socket.c:2699
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2753
+ __sys_sendmsg net/socket.c:2785 [inline]
+ __do_sys_sendmsg net/socket.c:2790 [inline]
+ __se_sys_sendmsg net/socket.c:2788 [inline]
+ __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2788
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f50af59ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f50b0467028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f50af815fa0 RCX: 00007f50af59ce59
+RDX: 0000000000000000 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f50af632d6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f50af816038 R14: 00007f50af815fa0 R15: 00007ffee67f33e8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
