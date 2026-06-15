@@ -1,97 +1,72 @@
-Return-Path: <netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299411-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id b3tqAEfmL2rRIgUAu9opvQ
-	(envelope-from <netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:47:19 +0200
+	id OW9RG+voL2qLIwUAu9opvQ
+	(envelope-from <netdev+bounces-299411-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:58:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E9685CD1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:47:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5966E685E71
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:58:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=mhpO0K3H;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=biM2fV1+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299411-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299411-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4650330131DE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:46:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 291813002930
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ABB379C33;
-	Mon, 15 Jun 2026 11:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377E63E450B;
+	Mon, 15 Jun 2026 11:58:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3440191F98
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 11:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9A23E4C6E;
+	Mon, 15 Jun 2026 11:58:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781523986; cv=none; b=CrDVOZ5xxGooiMxvTc4fIt+3hOpVaWNMSuXCg5Bstu/+zcGiuHokvrAD8CjOI7fyWnV6EKO84Zl9IuBwDN2L354poP3Y2w0fOCzyYVAhiHVLLsPViG8hRxuTli8/bQN6XKLYqV0d8qeg1gveMo8dSN0PxjefjwLj/PL7dioWxS8=
+	t=1781524708; cv=none; b=gnX2Ib3On1Vwab8mqvixn676PJIXPxcj9ZE1n1J0IavOiKlskWIx/ZeDpTPAWHryKhhwpp6ul+Cz0njadqFohz3mJZbLdaAuX2kHUllBVyhN0BL78zQQ+0xZpfDYYMzdd+N7zufA3u6bUXkRr3Wh9rGMVUy7Pr9ruagmdg57+zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781523986; c=relaxed/simple;
-	bh=2bQGxVUZ9MTPf1QkyzYPrKWsuFsxCujrar5IyTh0Oi0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dWgeSkhjFrRikdvsgVGYc8SX79pyVLkcFjs67W5TrMxJ5K/BX43Th+XNPxSAuYkAIwWR0mVVmIp6ASYTjRA9A9ZgjNoaWumt07iY2STGUHRbuJ88jIjLpQydKQSz5AtdOTfDdWKTPDOf3NnG+5zx+c7fZ0rVx/tcMLLFQVRD2NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=mhpO0K3H; arc=none smtp.client-ip=209.85.128.47
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490b3637b90so24396925e9.3
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 04:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1781523983; x=1782128783; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1jEKzIBUOghNkvDTiM29+zsP3vkJkDD0mPoUSzkRcsQ=;
-        b=mhpO0K3HZ2ZSwmb6umjVEf6bbJFuKXL3cx3AszmYxxQZotchT41kuof7xar2hYwxvh
-         0l8zytrGOgthdJH0fj68NMIFHlQlmb5I7vUqHqU6XjAlQ18CaUOKWJBt/TGX4pTNdrFi
-         BfLUHN6KtEp7EqzfxFHQi+FHpGH+QE7MpDmrj9wq5TwYHHXegBZZ0DH3zr90fG8UeRHT
-         eWeUhEY6BC4nBC5Vn065Gw8Oiwpa/CU28iPsbhT8hfeb6zOwneyzEqgHaJyPKdYHUmPG
-         0VSGYJIdaTOVAFRqwBaZwpwS10Mbety/Qu/bfeyzIsLqo4NtRMf0bDwD9R27p/qaIfhA
-         BL4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781523983; x=1782128783;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1jEKzIBUOghNkvDTiM29+zsP3vkJkDD0mPoUSzkRcsQ=;
-        b=Ts2dJMp/xq5D4a2WpNoCO8x8UtirYAnJiigEhjZ/WcuDKLaRzFC/ETFCuWPqdgzivU
-         79nEx4Zw6ZQ1Vhqqkog9yHdhK8Th38qHMugQT9r+jyCl2o4+YXybfpF+n8gNnh+J+nrA
-         7fS9nF39Ctn/DtdBlq79f2yLfeoSsAzj9H8iPTA+6FlrSt2vaMYwKXvaGQ7/Wao7XCVf
-         dnjmGW049k/TTFDVhWlCRFiI/nIr5ngG/gxqZpGWYA2wqZPmjqV3SX7RYea9nomvdArj
-         ZCdx/uFLfPre7xpIRFKqG47G62mrGGMDEcLvNz+2f8oYYkKZAneR81G7Y61KCcAAYLNv
-         2NaQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8h+LaBT+EwO3AwlbqUBcvIxg2miNmaXkeAvRWRs35TMoE/t6ohIFyiMbFrWUU1j/vFvBtpluo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywUxmPzqwKrHV8jBxCBoArzSfIpbJIzTSXdTa8FtjHmO9hxybn
-	wqreii/91eNmnnw0f3uvUeVvTUNGXl9v0WjdXeYZMfMFO3HDwHDmjn3SWXDX51h27ENm
-X-Gm-Gg: Acq92OFrCMMjl5is1Ce1LM9qB5VW2f1jPjsIwJw4qUmH+SK0TW1VdWmGiUcEbIrhjkp
-	d3JbJBYRdypSGfn39gxheREG2YFEF0R+Xwj91nETkL6tur7c4aTA15B1HVI4SsT9eWtnvdl1zYf
-	VC+ZEPgiYAXCmWpxwK+NRpvcqlWCDIlr0kw5uav029LS5fVKeZ5ODmUOrlkU+JfH0jAa9tIJ6Zz
-	wK00mGoTCjp+TcU5rmXc5y+WQCGugGBwPMZwbbOAwjggmwcQ6oAP2JQtCGMGxzAxzzffEvdywV8
-	CD4psWjZU6v0sTWI79vrT+HyRQuwnRmHDP4By8n6/BqOcMQIfxzD4XpKH7YbUvBEjPiYCia1RO3
-	OTSIdGepLdBVQXaImCQoa4RWqnCYkMoXK1y4S2fYY47a3h/dMwBzQIQ0aqIErokxFU4HxqoG0Wn
-	H80tk0kJwAIFui+W5m8UCe4eRVs9PnZ4TDDQyJUT0uxjGyHhN2FFt6Rh3m85RGhARCzQNBoUwFj
-	9KmqEO0yUxnaPb6Ib84oR00F2+8v7Ggg8xSjYiXM7Yefw==
-X-Received: by 2002:a7b:c017:0:b0:48e:6db3:ff2e with SMTP id 5b1f17b1804b1-49220093459mr95390895e9.15.1781523982724;
-        Mon, 15 Jun 2026 04:46:22 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.209])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49220207efesm212347605e9.0.2026.06.15.04.46.19
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 15 Jun 2026 04:46:21 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: jmaloy@redhat.com
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1781524708; c=relaxed/simple;
+	bh=r98cbYusXx9/Re6eslEbt5yaqvKtc1ZXYecMvqWCdDQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HCam/OtxsjbSycoXacrI7hATsOp+f0RH+GP8HpiWUlqmpZmUtXf4Vjgtm5tn59dlEKJ+vkSParU4iTrnbV1T6WjahEoILi2FDBPfVpSSkwBc8J6WP9cmJmMVqaP4sM+gMFDQsaJCdulgXVL5JmxyI/W9MdjVUhArgNQeFuXrWpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=biM2fV1+; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2179F1F00A3A;
+	Mon, 15 Jun 2026 11:58:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781524706;
+	bh=AxorqoSl7GNbTaT4GN1VoPJxbHSXX4/2W2cvV0NxdmI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=biM2fV1+UuD+NY7cxKRo/9UUMZ1aCXvK64Gz25xP6S3TwYCDzANwAFgUhoZF14eEE
+	 25i9a+FX9LcYzZDT6d44wwqV/xQ9a0U0yd9xBtOJ1mnOMxvn5WWD8hQ8YRd4mPfxXH
+	 28Mq6CKsW0V0JlR+4Kw7m+mLHgzbIS9BAudpQFyNKDYLM8x02jaAORHzv68zSBdbBp
+	 0lJVWBq2CajnnVjRffQ550Q5cNqQZUebLfD1J6F39Jduo7TD69WVc5rkZ5HZlFJWAc
+	 tLWbUS2lw4h2QXFRWA4vYLjj2ZHN8Z2ebRmBJlEB9DykYfOCJsIh53j1Bo4qSLrokR
+	 IyDll7VS220SQ==
+From: Simon Horman <horms@kernel.org>
+To: intel-wired-lan@osuosl.org
+Cc: Simon Horman <horms@kernel.org>,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	aleksander.lobakin@intel.com,
-	tipc-discussion@lists.sourceforge.net,
+	jedrzej.jagielski@intel.com,
+	kshitiz.bartariya@zohomail.in,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
-Date: Mon, 15 Jun 2026 13:46:18 +0200
-Message-ID: <20260615114618.71249-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4] ixgbe: implement get_queue_stats_rx
+Date: Mon, 15 Jun 2026 12:58:06 +0100
+Message-ID: <20260615115806.756776-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260613091231.26601-1-kshitiz.bartariya@zohomail.in>
+References: <20260613091231.26601-1-kshitiz.bartariya@zohomail.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,164 +75,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.04 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:doruk@0sec.ai,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[0sec.ai];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299410-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299411-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@osuosl.org,m:horms@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:jedrzej.jagielski@intel.com,m:kshitiz.bartariya@zohomail.in,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
-	RECEIVED_SPAMHAUS_PBL(0.00)[178.197.218.209:received];
-	RCVD_COUNT_FIVE(0.00)[5];
-	DKIM_TRACE(0.00)[0sec.ai:-];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email]
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4A5E9685CD1
+X-Rspamd-Queue-Id: 5966E685E71
 
-tipc_aead_decrypt() goes straight from tipc_bearer_hold(b) to
-crypto_aead_decrypt(req) without taking a reference on the netns, unlike
-the encrypt path. When crypto_aead_decrypt() is offloaded asynchronously
-(e.g. the SIMD aead wrapper queuing to cryptd), the cryptd worker runs
-tipc_aead_decrypt_done() later. If the bearer's netns is torn down in the
-meantime, cleanup_net() -> tipc_exit_net() -> tipc_crypto_stop() frees the
-per-netns tipc_crypto, and the completion then reads it:
-tipc_aead_decrypt_done() dereferences aead->crypto->stats and
-aead->crypto->net, and tipc_crypto_rcv_complete() dereferences
-aead->crypto->aead[] and the node table -- reading freed memory.
-
-Decoded KASAN splat (v7.1-rc7, CONFIG_KASAN_INLINE + TIPC + TIPC_CRYPTO):
-
-  BUG: KASAN: slab-use-after-free in tipc_aead_decrypt_done (net/tipc/crypto.c:999)
-  Read of size 8 at addr ffff8881056258a8 by task kworker/u16:2/51
-  Workqueue: events_unbound
-  Call Trace:
-   tipc_aead_decrypt_done (net/tipc/crypto.c:999)
-   process_one_work (kernel/workqueue.c:3314)
-   worker_thread (kernel/workqueue.c:3397 kernel/workqueue.c:3478)
-   kthread (kernel/kthread.c:436)
-   ret_from_fork (arch/x86/kernel/process.c:158)
-   ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
-
-  Allocated by task 169:
-   __kasan_kmalloc (mm/kasan/common.c:398 mm/kasan/common.c:415)
-   tipc_crypto_start (net/tipc/crypto.c:1502)
-   tipc_init_net (net/tipc/core.c:72)
-   ops_init (net/core/net_namespace.c:137)
-   setup_net (net/core/net_namespace.c:446)
-   copy_net_ns (net/core/net_namespace.c:579)
-   create_new_namespaces (kernel/nsproxy.c:132)
-   __x64_sys_unshare (kernel/fork.c:3316)
-   do_syscall_64 (arch/x86/entry/syscall_64.c:63)
-   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-  Freed by task 8:
-   kfree (mm/slub.c:6566)
-   tipc_exit_net (net/tipc/core.c:119)
-   cleanup_net (net/core/net_namespace.c:704)
-   process_one_work (kernel/workqueue.c:3314)
-   kthread (kernel/kthread.c:436)
-
-This is the same class of bug that commit e279024617134 ("net/tipc: fix
-slab-use-after-free Read in tipc_aead_encrypt_done") fixed for the encrypt
-side. The encrypt path takes maybe_get_net(aead->crypto->net) before
-crypto_aead_encrypt() and drops it with put_net() on the synchronous
-return paths and in tipc_aead_encrypt_done(); the -EINPROGRESS/-EBUSY
-return keeps the reference for the async callback to release. The decrypt
-path was left without the equivalent guard.
-
-Mirror the encrypt-side fix on the decrypt path: take a net reference
-before crypto_aead_decrypt() (failing with -ENODEV and the matching
-bearer put if it cannot be acquired), keep it across the
--EINPROGRESS/-EBUSY async return, and drop it with put_net() on the
-synchronous success/error return and at the end of
-tipc_aead_decrypt_done().
-
-Reproduced under KASAN on v7.1-rc7: a UDP bearer with a cluster key is
-flooded with crafted encrypted frames from an unknown peer (driving the
-cluster-key decrypt path) while the bearer's netns is repeatedly torn
-down. The completion must run asynchronously to outlive
-tipc_crypto_stop(); on x86 the stock aesni gcm(aes) now decrypts
-synchronously, so the async path was exercised via cryptd offload. The
-unguarded aead->crypto dereference in tipc_aead_decrypt_done() is the
-unpatched upstream path; tipc_aead_decrypt() still lacks
-maybe_get_net(aead->crypto->net), so the completion can outlive the free
-on any config where crypto_aead_decrypt() goes async.
-
-Found by 0sec automated security-research tooling (https://0sec.ai).
-
-Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
-Cc: stable@vger.kernel.org
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
-v3:
- - Rewrite the changelog with the decoded stack trace and frame the
-   reproduction on the current tree (v7.1-rc7); drop the v6.12.92
-   references (Tung Quang Nguyen).
-v2:
- - Add Cc: stable@vger.kernel.org and Alexander Lobakin's Reviewed-by.
-   No functional change.
- net/tipc/crypto.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ixgbe: implement get_queue_stats_rx
 
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index 6d3b6b89b1d1..84a6489da036 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
- 		goto exit;
- 	}
- 
-+	/* Get net to avoid freed tipc_crypto when delete namespace */
-+	if (!maybe_get_net(aead->crypto->net)) {
-+		tipc_bearer_put(b);
-+		rc = -ENODEV;
-+		goto exit;
-+	}
-+
- 	/* Now, do decrypt */
- 	rc = crypto_aead_decrypt(req);
- 	if (rc == -EINPROGRESS || rc == -EBUSY)
- 		return rc;
- 
- 	tipc_bearer_put(b);
-+	put_net(aead->crypto->net);
- 
- exit:
- 	kfree(ctx);
-@@ -984,6 +992,7 @@ static void tipc_aead_decrypt_done(void *data, int err)
- 	}
- 
- 	tipc_bearer_put(b);
-+	put_net(net);
- }
- 
- static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
--- 
-2.43.0
+This patch wires ixgbe into the netdev_stat_ops interface so that per-RX
+queue counters (bytes, packets, alloc_fail, csum_bad) are exported
+through the netdev generic netlink API.
 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index bc16e4c93fd4..67844e25af23 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -9759,6 +9759,30 @@ static void ixgbe_get_stats64(struct net_device *netdev,
+>  	stats->rx_missed_errors	= netdev->stats.rx_missed_errors;
+>  }
+>  
+> +static void ixgbe_get_queue_stats_rx(struct net_device *dev, int idx,
+> +				     struct netdev_queue_stats_rx *stats)
+> +{
+> +	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
+> +	struct ixgbe_ring *ring = adapter->rx_ring[idx];
+> +
+
+[High]
+Can adapter->rx_ring[idx] be observed NULL here?
+
+Elsewhere in the same driver, this slot is treated as nullable. The
+writer side uses WRITE_ONCE() in both directions, for example in
+ixgbe_free_q_vector():
+
+    WRITE_ONCE(adapter->rx_ring[ring->queue_index], NULL);
+
+and the existing readers in ixgbe_main.c pair that with READ_ONCE() and
+a NULL guard, e.g. ixgbe_get_stats64():
+
+    struct ixgbe_ring *ring = READ_ONCE(adapter->rx_ring[i]);
+    if (ring) {
+        ...
+    }
+
+and ixgbe_update_stats():
+
+    struct ixgbe_ring *rx_ring = READ_ONCE(adapter->rx_ring[i]);
+    if (!rx_ring)
+        continue;
+
+If a userspace caller issues a per-queue qstats request while the driver
+is reconfiguring queues (e.g. ixgbe_clear_interrupt_scheme() /
+ixgbe_init_interrupt_scheme() during reset), would a plain dereference
+here oops?
+
+Should this callback follow the same READ_ONCE() plus NULL-skip pattern
+used in ixgbe_get_stats64() and ixgbe_update_stats()?
+
+> +	stats->bytes = ring->stats.bytes;
+> +	stats->packets = ring->stats.packets;
+
+[Medium]
+Should these 64-bit reads be wrapped in a u64_stats_sync read section?
+
+The writer side, ixgbe_update_rx_ring_stats(), updates these counters
+under ring->syncp:
+
+    u64_stats_update_begin(&rx_ring->syncp);
+    rx_ring->stats.packets += total_packets;
+    rx_ring->stats.bytes += total_bytes;
+    u64_stats_update_end(&rx_ring->syncp);
+
+and the syncp is initialized at probe (u64_stats_init() on ring->syncp).
+ixgbe_get_stats64() in this same file already mirrors that on the read
+side:
+
+    do {
+        start = u64_stats_fetch_begin(&ring->syncp);
+        packets = ring->stats.packets;
+        bytes   = ring->stats.bytes;
+    } while (u64_stats_fetch_retry(&ring->syncp, start));
+
+On 32-bit kernels a 64-bit load is not atomic, so without the fetch
+loop can the values returned to userspace be torn (high half from one
+update, low half from another)?
+
+> +	stats->alloc_fail = ring->rx_stats.alloc_rx_page_failed +
+> +			    ring->rx_stats.alloc_rx_buff_failed;
+> +	stats->csum_bad = ring->rx_stats.csum_err;
+> +}
+> +
+
+[ ... ]
 
