@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-299665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4DlnJrKNMGp2UQUAu9opvQ
-	(envelope-from <netdev+bounces-299665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:41:38 +0200
+	id Hs9OAsKNMGp+UQUAu9opvQ
+	(envelope-from <netdev+bounces-299666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:41:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA9368A9E9
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:41:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5921368AA02
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:41:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=S997qUK6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299665-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299665-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="BKqJ9c/2";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299666-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299666-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEE5E3075437
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:40:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB162307DF9E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DFF346E66;
-	Mon, 15 Jun 2026 23:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191BE345725;
+	Mon, 15 Jun 2026 23:40:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C6127FD51;
-	Mon, 15 Jun 2026 23:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF42340403;
+	Mon, 15 Jun 2026 23:40:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781566832; cv=none; b=NbLAClD03u7W7xWCBXO7bEMFjrOaQ7yG1ymk+S2pLxVYs4nvSJ8MgRVHi4lbB9zlrLXXbpkc+boLUMyHGU/io1hy7hGITZmygI6d8iuYIAM2ngwPuQrCy9fY/eZvzJd7UfnMuuR6eG8BcIb6vvkE382n8MqXc13TPWWvOKYQMrI=
+	t=1781566833; cv=none; b=u00W/CG1GO9uCfWK8JwTpWtdMHcMVyWrUg50i8tFGELbJlMHvr1oZXJ8enfxqCUWCs+R/J3BnBK47nulEW+SKGZdGtPZE3mUEG61GGe17crhhVyzmOmLWIzuuR/uI2lMx9kA8N3CzoqrYaTcXosah+5Nitfr2RgBBDZ+eXL9kCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781566832; c=relaxed/simple;
-	bh=YWFhuLh47LIuayAiYIm3986IlaylnHH07h8VfodK68U=;
+	s=arc-20240116; t=1781566833; c=relaxed/simple;
+	bh=QdYGS+1gLW6kM+a+J7pjLRMNG7V653bD9q6hsT+UwTI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IVuzs4veS94TyAEsX9JZdzXwkf3NTUGbHmcjH0rkYy3yybJtyq21M+Gr09kWpbY/PiE3Gj2Mp7lb5+z1GrkrACJAAv8Pg5dy3OK1y9S50Yf6BuoPLbPuIrEPiLHXNLc0klLB7yeCP+ZtNyGLegZWtlTbpvQw7TIk2QqjnRC4h+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S997qUK6; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9E11F000E9;
-	Mon, 15 Jun 2026 23:40:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LGrUHLpqQ8mqtBhSaTKbBVR+IygqrCKMcnT9/Sse5wzXcvFgGWa6+oqfwTndg6+Iky15KtoDBV6TTt9GNFB7md8FAKzAWHEFBYYwPqvMzOmcDWm/jr86zfa8nZEESkcNc1jC8ayG20FNu+xQi9OopzMmVKAbsFk2c2RL2ugTh8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKqJ9c/2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ABE21F00A3D;
+	Mon, 15 Jun 2026 23:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781566830;
-	bh=0HG/R2bpOUkgG08uopBzx3JjVKz2/3HN1JP1LTvWEOc=;
+	s=k20260515; t=1781566831;
+	bh=3bwzDDWjuMcDBe0LdROJFjXNIA8+HW4+PRiOoJLnH14=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=S997qUK6RKKv1he7OdNjuWK4MJQAH2p6y4j2o86GRE4k6ZN/RDa70tfvb7JnuSBYF
-	 cV/pS9yhDC/7PhpnY4cSNKCAW4s2ohMxsM3LGaQpZ3NGuShpUvcZSpyDHlmeO9f1AR
-	 l3B5pRqKl/mvmbUfJQulY/M12AQPQKu/w8ID9GK8OJ2XnxH7uFDppVGnadNGZiF36L
-	 oWBva62MzGekwdZvx2g2JvsPXKwbBAkrL35Y6AJNGRoVma1mqx9n+q6uAPugTSqDbg
-	 J07xTrmLlbloW/EPBFOhM39NjHHs/iI/TYaLilez1AziFuN3JiGZGpkgBCYZyT4Qmu
-	 6xPaI4ucSV1Zw==
+	b=BKqJ9c/2Ugj7I+8FYqhVrXfe16R+zBQJVA9SDtQ9JwUBlTkG25GI/x1zntf/MNnHO
+	 yGXKu6szzHpw+zSLiwKfNnuYYNieq1d/h3hWxVWdrke8XXO8OaOwqAI8rkcT8sJgB2
+	 +IKIP5xS2BEuFWDX5STeD30QuPFd5J9e3MbY0/nD5AquQbOspu44WsFsg6FYDuJMl2
+	 3wMzFgNgJeOQfp6VMthySSMqL3qqSFJ2cpAHPsZ/BWXp0u+NWAWi5VMef8uPYuI4xW
+	 rvzfJR44gUqmth+ayfzyTFALI8I8qXMq3UL7WuCRFpyR4+M5AtWzX0S0CvRXjpfBNd
+	 KQnHxjQXYU60Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 568963839A08;
-	Mon, 15 Jun 2026 23:40:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D08FB3839A08;
+	Mon, 15 Jun 2026 23:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,13 +57,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v14] selftests: net: add local ECMP rehash test
+Subject: Re: [PATCH net-next v14 0/2] tcp: rehash onto different local ECMP
+ path
+ on retransmit timeout
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178156682488.339383.9205404821532401957.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 23:40:24 +0000
-References: <20260615042158.1600746-3-ntspring@meta.com>
-In-Reply-To: <20260615042158.1600746-3-ntspring@meta.com>
+ <178156682638.339383.5955465321121394941.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jun 2026 23:40:26 +0000
+References: <20260615042158.1600746-1-ntspring@meta.com>
+In-Reply-To: <20260615042158.1600746-1-ntspring@meta.com>
 To: Neil Spring <ntspring@meta.com>
 Cc: netdev@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
  kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, dsahern@kernel.org,
@@ -75,13 +77,13 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299665-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-299666-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -101,37 +103,31 @@ X-Spamd-Result: default: False [-5.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2DA9368A9E9
+X-Rspamd-Queue-Id: 5921368AA02
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 14 Jun 2026 21:21:58 -0700 you wrote:
-> Add ecmp_rehash.sh with nine scenarios verifying that TCP rehash
-> selects a different local ECMP path for IPv6:
+On Sun, 14 Jun 2026 21:21:56 -0700 you wrote:
+> Currently sk_rethink_txhash() re-rolls the socket's txhash on RTO,
+> PLB, and spurious-retransmission events, but the new hash is not
+> propagated into the IPv6 ECMP path selection.  The cached
+> route is reused and fib6_select_path() is never re-invoked, so
+> the connection uses the same local ECMP decision.
 > 
->   - SYN retransmission (forward path blocked during setup)
->   - SYN/ACK retransmission (reverse path blocked during setup)
->   - Midstream RTO (forward path blocked on established connection)
->   - Midstream ACK rehash (reverse path blocked on established connection)
->   - PLB rehash (ECN-driven congestion on established connection)
->   - Hash policy 1 negative test (rehash attempted but path unchanged)
->   - No flowlabel leak (client mp_hash does not alter on-wire flowlabel)
->   - Dst rebuild consistency (dst invalidation does not change path)
->   - Syncookie server path consistency (SYN-ACK and post-cookie ACKs
->     use the same ECMP path)
+> This series adds the two missing pieces:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v14] selftests: net: add local ECMP rehash test
-    https://git.kernel.org/netdev/net-next/c/ae57a5533243
+  - [v14,1/2] tcp: rehash onto different local ECMP path on retransmit timeout
+    https://git.kernel.org/netdev/net-next/c/658eb696544c
 
 You are awesome, thank you!
 -- 
