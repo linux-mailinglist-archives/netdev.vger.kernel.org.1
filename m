@@ -1,162 +1,151 @@
-Return-Path: <netdev+bounces-299460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299464-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SDqtEnH/L2oYLgUAu9opvQ
-	(envelope-from <netdev+bounces-299460-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:34:41 +0200
+	id vIHjDhoBMGqGLgUAu9opvQ
+	(envelope-from <netdev+bounces-299464-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:41:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC17686C78
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:34:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 599B2686D1E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:41:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=cN8CNMsq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299460-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299460-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b=hriYTGoR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299464-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299464-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73B033067F0D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:33:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1841B30A1998
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD023F1AA8;
-	Mon, 15 Jun 2026 13:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8DE3F58E9;
+	Mon, 15 Jun 2026 13:39:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371683E557F;
-	Mon, 15 Jun 2026 13:33:44 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781530425; cv=none; b=f8hT3nMT8rAUseuHEkiBRxNZBFBfiz3WfZ4g4RTYhgdHrXCUEcuvmF/xMLh2VvZUHehBC6jVeoAWW7Dn/XXkPC+3J6civ22dPluH/7VZA9BTqh8IOaZrVv1+8v410vMEHHMlFtsn8LJoiLGdmorwjjhmkkbUwSqGBVwy362eq/0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781530425; c=relaxed/simple;
-	bh=N2ntj/ynlOh+zA/3YbsZL3cEPB1z9yqFqBmhPLgjqNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hHxxqujLMO7p9OUxol6dt3nE/5Akx13lBGLH3/QHajBtDTaQs4Lk5hJY+tMfW4tSaMORSZWSDpkv08b6Mpv6BUWyomEc7BqsV0wNzoj9WVu6I852pLnBNvT0SCJLyZTqaY/lsGzqTpd71UdZHG1yYgr9FAVO8WZDzQUi+M1kyUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cN8CNMsq; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id E272F1A37CE;
-	Mon, 15 Jun 2026 13:33:42 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B16B360015;
-	Mon, 15 Jun 2026 13:33:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 61CB9106C94F2;
-	Mon, 15 Jun 2026 15:33:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781530421; h=from:subject:date:message-id:to:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=dOWrt41fp9ZkdsfONhl/POwO170vOA3eDS7WRaAIv2Y=;
-	b=cN8CNMsqV3vnmukdqV8G3Kzmq5G8amSuHqLO4tp10lfiI1kRuxOzzSVIOf7+6AuuwloL9i
-	EG6SwhRzQHIXAoItTEt3q0xG5RNm3La0F1DIV0asn9qRlDZg4i6V45E0qd0ChV4jh3qjXT
-	inGsCfhmYmkyv6LTBNRDy2xV4NQjVWHZntpev9zX9XStGsTgIhLlMTMf9yoUXdQCN9YRwv
-	t/XfzKsI8HZSndynjUihh3WNXfQmnYPID0ISfu59px6MIQgnFV/lBYoPkbtdYnQ+r1vduy
-	l+wlZo1hfEKbr7/6vnPBb9a5YhLqeYxBhb/ysDmThYVw9njwNSrwJliPypg9Kw==
-Message-ID: <371a1df7-084c-4431-bd00-0045298e3212@bootlin.com>
-Date: Mon, 15 Jun 2026 15:33:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A253F4126;
+	Mon, 15 Jun 2026 13:39:32 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781530775; cv=pass; b=vBqYCRPLbZDGIBxBLO8kfBogafFd4luK3WXRmXIWzCzxIYE2+9CcFVJQEme0AEkCGWHaS5a9GvkSShsl94ZB53zFg2vLqtFU6x5kFTbIXwSpvNpVGiFtv/FKHb+zY7ra+IP/KtMmFi3Y1Wd4EagY1X29Hn47ixQsOEg+elcNK1w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781530775; c=relaxed/simple;
+	bh=ASGtZodxLV3FO64zH6r3PhGdLFkZRDXhr6OZzYY2y4I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nOQYNAccoBrUaTqCeeTLORnp9RrI9eFUt1jl4DlRlntpjL/ArUueo7u5iBRoVyt15Xy7EoXeR5+gA34j0ohIbWLafUXZYnqKz70dYLoG2uWTWIYUmHaOSIuSM/SP+liVPDoaRci9u8oPtJIvqZSF/0HGeK21l+Rf+fTD0oaqvCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=hriYTGoR; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1781530743; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=dTVAfJNQeKYgmrIcTtNzo8NQu9NCsfGI6Xfv2f9RpQhAkhDnHYeD/VoUH6Kqem5UwR7j8t/5sO8SAjmOLB+OGrMUhQVfuknwO/YhJHdPnZvMD0Xj11SA3wqPVgjQ6L3AodKrswx3aeO4zpTWd5YIVJ+AUaqCB+LOmCvgD7qiN0s=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1781530743; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=dJfCvLHvQSghos3e6oW9Re3wWcWe+lXCS1XystogHFA=; 
+	b=F35xH8OwB2qh7kmPKmbJlHoDUQqAFWpYkdfmugFeFkTGo8qadZ82gYtgtirsWN8y6aN6gT226ibYjpYysvE6S/glWowSKH5Cffy8ajYsgtI+7RNIQkJkBXxWddhUrwI1R7B/oNl84KEPnvTwfqJUeAayJv7RXPSa0K3Xa+H+l9w=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=carlosgrillet.me;
+	spf=pass  smtp.mailfrom=carlos@carlosgrillet.me;
+	dmarc=pass header.from=<carlos@carlosgrillet.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781530743;
+	s=zmail; d=carlosgrillet.me; i=carlos@carlosgrillet.me;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=dJfCvLHvQSghos3e6oW9Re3wWcWe+lXCS1XystogHFA=;
+	b=hriYTGoRgNNVUWYT5IaXyyuFE+mQvRUC7wnOPmm1B5uqwD1hQBwFcaEaNoJs2KP2
+	PUzKDSBJvPCQaqHpxLQpk4ymG3nwi7877NLbm6flu92kmXCzBnwr3LfcRk16PX0bW27
+	TAiq/ubKwjVb4AL5tRSXiOnHqM2nioWOROuIPHwE=
+Received: by mx.zoho.eu with SMTPS id 1781530741417740.5121897517076;
+	Mon, 15 Jun 2026 15:39:01 +0200 (CEST)
+From: Carlos Grillet <carlos@carlosgrillet.me>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH nf-next v2 0/6] netfilter: replace u_int*_t with kernel int types
+Date: Mon, 15 Jun 2026 15:38:25 +0200
+Message-ID: <20260615133835.51273-1-carlos@carlosgrillet.me>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 01/12] net: phylink: keep and use MAC
- supported_interfaces in phylink struct
-To: Christian Marangi <ansuelsmth@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Saravana Kannan <saravanak@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- llvm@lists.linux.dev
-References: <20260615122950.22281-1-ansuelsmth@gmail.com>
- <20260615122950.22281-2-ansuelsmth@gmail.com>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260615122950.22281-2-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[carlosgrillet.me:s=zmail];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299460-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-299464-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[carlosgrillet.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[carlosgrillet.me:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	TO_DN_SOME(0.00)[]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,carlosgrillet.me:dkim,carlosgrillet.me:mid,carlosgrillet.me:from_mime,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DBC17686C78
+X-Rspamd-Queue-Id: 599B2686D1E
 
-Hello Christian,
+Hi all! This is my first patch series of many, I hope :)
+I'd like to start contributing by helping out with janitor work,
+standardizing code and cleaning up.
 
-On 6/15/26 14:29, Christian Marangi wrote:
-> Add in phylink struct a copy of supported_interfaces from phylink_config
-> and make use of that instead of relying on phylink_config value.
-> 
-> This in preparation for support of PCS handling internally to phylink
-> where a PCS can be removed or added after the phylink is created and we
-> need both a reference of the supported_interfaces value from
-> phylink_config and an internal value that can be updated with the new
-> PCS info.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/phylink.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 087ac63f9193..4d59c0dd78db 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -60,6 +60,11 @@ struct phylink {
->  	/* The link configuration settings */
->  	struct phylink_link_state link_config;
->  
-> +	/* What interface are supported by the current link.
-> +	 * Can change on removal or addition of new PCS.
-> +	 */
-> +	DECLARE_PHY_INTERFACE_MASK(supported_interfaces);
+This patch series replaces POSIX u_int8_t/u_int16_t with the preferred
+kernel types u8/u16 across several netfilter files.
 
-Can you clarify a bit what you mean here ? Is that the combination of the
-interfaces the MAC supports AND the currently in-use PCS ?
+u_int*_t appears in many other files, 48 more to be precise, but I wanted
+to keep this series small, unless advised otherwise.
 
-Maxime
+No functional changes.
+
+Changes in v2:
+- addresses sashiko comments https://sashiko.dev/#/patchset/32368
+  - nf_sockopt: update function prototypes and struct definitions
+  - nf_log: update the corresponding function declarations and the 
+    nf_logfn typedef
+- link to v1: https://lore.kernel.org/all/20260612125146.75672-1-carlos@carlosgrillet.me
+
+Carlos Grillet (6):
+  netfilter: nf_nat_ftp: replace u_int16_t with u16
+  netfilter: nf_nat_irc: replace u_int16_t with u16
+  netfilter: nf_sockopt: replace u_int8_t with u8
+  netfilter: xt_DSCP: replace u_int8_t with u8
+  netfilter: xt_TCPOPTSTRIP: replace u_int8_t and u_int16_t with u8 and u16
+  netfilter: nf_log: replace u_int8_t with u8
+
+ include/linux/netfilter.h      |  6 +++---
+ include/net/netfilter/nf_log.h | 16 ++++++++--------
+ net/netfilter/nf_log.c         | 14 +++++++-------
+ net/netfilter/nf_nat_ftp.c     |  2 +-
+ net/netfilter/nf_nat_irc.c     |  2 +-
+ net/netfilter/nf_sockopt.c     |  8 ++++----
+ net/netfilter/xt_DSCP.c        |  8 ++++----
+ net/netfilter/xt_TCPOPTSTRIP.c |  8 ++++----
+ 8 files changed, 32 insertions(+), 32 deletions(-)
+
+-- 
+2.54.0
 
 
