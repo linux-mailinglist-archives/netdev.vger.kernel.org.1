@@ -1,78 +1,73 @@
-Return-Path: <netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZwqxIMyxL2p3EgUAu9opvQ
-	(envelope-from <netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:03:24 +0200
+	id kESAChWvL2r+EQUAu9opvQ
+	(envelope-from <netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:51:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4366684629
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC82684530
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:51:48 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=ODNxDDQO;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b="/8pMZfjP";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299356-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=linutronix.de header.s=2020 header.b=r31U4Y69;
+	dkim=pass header.d=linutronix.de header.s=2020e header.b=fZrsm2y6;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=linutronix.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3409030226B0
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:54:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 896EB3018AD3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBC23BFAD4;
-	Mon, 15 Jun 2026 07:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC90279DC8;
+	Mon, 15 Jun 2026 07:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC193BFAE2;
-	Mon, 15 Jun 2026 07:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06E1846A
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:49:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781510040; cv=none; b=IujQc1HugefzK+Tc4fmJ6cdaafA7ALd0sA05olkJOES7rTiqfeiv0aLc679JlLxvK6MWVwhPRtbd3mKapP/qulOmExMYlFCq9EyAq4VfbOru2eJn/75MqQZTYaXUk/HGIDb55OkVxDENxZBQspRWKdpwmkFGtK3jlgdxBxeKwsM=
+	t=1781509784; cv=none; b=hlvSxrRDYn2UovP7pRRZIkWmYl9xVAfdnF0rFiMHm/10ITKjuv5oXJuy8MYBGKzdgNDygCM3b/Xo+YT8nK1xI1Cxvr1aGtH1yeeWyJ6G2KijDHhGWSI58SV0aP3u4YSvTlnPuPT1PsXZCbl4dxE8pNWsx1HDGzZzPFEmsM4bGF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781510040; c=relaxed/simple;
-	bh=4XLkdt17a7BumTtZvZ/QKmAK5ZbQIHCPTQYDHiDXzdk=;
+	s=arc-20240116; t=1781509784; c=relaxed/simple;
+	bh=c4JJMwSnvfimUOxJOCW2AajwGbpZVEmZqHtp8aFRfR0=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Oq9ccoXWx9fGHMTLVw0qKXWTldkWxuYHbnI43r8wq4Yw+22RDxY420ionoiBdkCkFjeMtYHpeiUmitpsjgU/HcU2glcMi6j0nurYIouhITtJL1OQWQeAxr35tduSNcJOJSYARpGv44b8HLWnVCzZneX8S0mhjwcbBJmuXjIbMCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ODNxDDQO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/8pMZfjP; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version:Content-Type; b=roJpBhvTP4tM8L9Avlw8yH1QkYaXjXr5YOvVnXVeR7oT1Goc9fV+6znlNN/STQ0L9zPRnrZUADysSfMKp/nL4QKfKvhOditb/Jc4AalHuTmEyZIw8hHcsSdBDd76PiD8tLnS9m95t8iRAE7pc/ucG70OQerrwpJxW0doRQuwZL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=r31U4Y69; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fZrsm2y6; arc=none smtp.client-ip=193.142.43.55
 From: Kurt Kanzenbach <kurt@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1781509428;
+	s=2020; t=1781509781;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OBrL6lgGQBMYLJZdswh2V1MoY8JuyilmLozsgGz4/8o=;
-	b=ODNxDDQOCe9UfjLWIOph6jNPzGzUPcQ+xb+ydJN9M0i6CFMiDsHRgjKbJLr26Xs92UIUER
-	lKk3TdIbh4npedW/uj/ukiC4XGVc+eObQqnG/f4MIP5kVqDZDM/CLqZ5YNUESHyzn+cLy2
-	/yMm/xh19asWEgDKSKbe4u6Rg+QWSI2SfIM6JuIixgrz8fEimXRjEJxM2P4RyF60ZpOSK7
-	Du6tM6kFrNhg64BegewC6SFUM7+veG/iZtTEBVDQ1OjGbkbULfgR9PhU7HX0X8gHyVY2Mt
-	hV9T1J+MgpL1sefve2st+f6Ub7LERak9Nj+SzSHpQ5DlIoUYAxaXF4UOvWxOBQ==
+	bh=o0tZ+vl0/oVDDbMO2Jy34aMtjK8zKupQMv0TXrkr5hs=;
+	b=r31U4Y69rCu0Z3pPRyorUok3sUV15r6BC11GiUJLhqSda8Sl26klGe50s6rKJbzFJIy7by
+	DGppGsl9pDNn8ahXONFznNVDaFcrjFBwGL1QIiXK6vxcNAbgpu1N7aYz5j2MlaWMOYqIRI
+	WgtfqpnH4AWfCpwacacLPZXHHqOhprN/jKwzaP8iq3GMH9w6+cAMGPuAfqfPrDAjM6M+G+
+	8pVRZas97HL+wLSxWsH0SIfGVkchjGqnXmeR6dcrKTHOGEwo0C2nKiFgRUTgcPLQLJiwcm
+	B0tEgy7bVRX0n9wCPhRX9kGjWIdoXWIKSSxDXT8S/qWzpxoA+yhCE0Uy5VPoEA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1781509428;
+	s=2020e; t=1781509781;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OBrL6lgGQBMYLJZdswh2V1MoY8JuyilmLozsgGz4/8o=;
-	b=/8pMZfjPCT/NlvqtaxZ/j9kB+C0va9VKo3CGEL3R2t074ZTbNOt/mu7QDZ8BlQUZmbWcIa
-	6osH4nK734IJz6CQ==
-To: Tjerk Kusters <tkusters@aweta.nl>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "hawk@kernel.org" <hawk@kernel.org>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] igb: only strip Rx timestamp header on the first
- buffer of a frame
-In-Reply-To: <PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com>
-References: <PAWPR05MB1069106D52F4E17F1EDB99C67B9182@PAWPR05MB10691.eurprd05.prod.outlook.com>
-Date: Mon, 15 Jun 2026 09:43:48 +0200
-Message-ID: <8733yojljf.fsf@jax.kurt.home>
+	bh=o0tZ+vl0/oVDDbMO2Jy34aMtjK8zKupQMv0TXrkr5hs=;
+	b=fZrsm2y6/Lom7XpFP23zlO/qZc6UihB7+BHq4zcz1AyVyjDPYy+0O7S5AqxRI1CMM+iK2O
+	kRZ9av8VR6jBlDBA==
+To: Jakub Kicinski <kuba@kernel.org>, anthony.l.nguyen@intel.com
+Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ ade@amicon.ru, dima.ruinskiy@intel.com, jacob.e.keller@intel.com,
+ dish@amicon.ru, avigailx.dahan@intel.com
+Subject: Re: [PATCH net-next 06/15] igb: Retrieve Tx timestamp from BH
+ workqueue
+In-Reply-To: <20260613164306.567d1cc6@kernel.org>
+References: <20260609213559.178657-7-anthony.l.nguyen@intel.com>
+ <20260612095742.662653-3-horms@kernel.org>
+ <20260613164306.567d1cc6@kernel.org>
+Date: Mon, 15 Jun 2026 09:49:40 +0200
+Message-ID: <87zf0wi6p7.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,21 +83,20 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299356-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299354-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lists.osuosl.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:tkusters@aweta.nl,m:netdev@vger.kernel.org,m:intel-wired-lan@lists.osuosl.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:hawk@kernel.org,m:stable@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:anthony.l.nguyen@intel.com,m:horms@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:ade@amicon.ru,m:dima.ruinskiy@intel.com,m:jacob.e.keller@intel.com,m:dish@amicon.ru,m:avigailx.dahan@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -110,136 +104,57 @@ X-Spamd-Result: default: False [-2.26 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linutronix.de:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,aweta.nl:email,linutronix.de:dkim,linutronix.de:email,linutronix.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jax.kurt.home:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jax.kurt.home:mid,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D4366684629
+X-Rspamd-Queue-Id: 7FC82684530
 
 --=-=-=
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Sat Jun 13 2026, Jakub Kicinski wrote:
+> On Fri, 12 Jun 2026 10:57:44 +0100 Simon Horman wrote:
+>> >  		/* reschedule to check later */
+>> > -		schedule_work(&adapter->ptp_tx_work);
+>> > +		queue_work(system_bh_wq, &adapter->ptp_tx_work);=20=20
+>>=20
+>> [Severity: High]
+>> If the hardware timestamp is not yet valid, won't this work item
+>> unconditionally reschedule itself to system_bh_wq without delay?=20
+>
+> This sounds correct, the patch is basically busy polling from a tasklet.
+> BH workqueue is not just another work queue.
 
-On Fri Jun 12 2026, Tjerk Kusters wrote:
-> Hi,
->
-> The patch is attached (0001-igb-only-strip-Rx-timestamp-header-on-the-fir=
-st-buff.patch)
-> as my mail setup cannot send it inline via git send-email; apologies for =
-the
-> attachment.
+Indeed, thanks for the report. Please, drop this patch for now. I'll get
+an Intel 82576 NIC and see how this can be fixed.
 
-b4 has a web submission endpoint. Maybe you can use that one:
-
-https://b4.docs.kernel.org/en/latest/contributor/send.html
-
-[snip]
-
-> From fee3e3452dfcd7e109332369672a3e0090cadeb3 Mon Sep 17 00:00:00 2001
-> From: T Kusters <tkusters@aweta.nl>
-> Date: Tue, 9 Jun 2026 14:06:24 +0200
-> Subject: [PATCH net] igb: only strip Rx timestamp header on the first buf=
-fer
->  of a frame
->
-> When Rx hardware timestamping is enabled (e.g. ptp4l, which configures
-> HWTSTAMP_FILTER_ALL), the NIC prepends a 16-byte timestamp header to the
-> first Rx buffer of every received frame. igb_clean_rx_irq() strips this
-> header inside its per-buffer loop:
->
-> 	if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
-> 		ts_hdr_len =3D igb_ptp_rx_pktstamp(rx_ring->q_vector,
-> 						 pktbuf, &timestamp);
-> 		pkt_offset +=3D ts_hdr_len;
-> 		size -=3D ts_hdr_len;
-> 	}
->
-> For a frame that spans more than one Rx buffer (e.g. a jumbo frame), this
-> block runs once per buffer. The timestamp header only exists at the start
-> of the first buffer, but igb_ptp_rx_pktstamp() is called for every buffer.
->
-> On a continuation buffer the data is packet payload, not a timestamp
-> header. igb_ptp_rx_pktstamp() already has two guards against acting on a
-> non-header buffer: it returns 0 if PTP is disabled, and returns 0 if the
-> reserved dwords (the first 8 bytes) are non-zero. Neither is sufficient
-> here: PTP is enabled, and a continuation buffer whose payload happens to
-> begin with 8 zero bytes passes the reserved-dword check. In that case the
-> payload is mistaken for a valid timestamp header and igb_ptp_rx_pktstamp()
-> returns IGB_TS_HDR_LEN, so the caller strips 16 bytes of real data from
-> that buffer. A frame spanning N buffers whose continuation buffers start
-> with zero bytes therefore loses 16 * (N - 1) bytes from its tail.
->
-> This is easily triggered by a GigE Vision camera streaming dark frames
-> (mostly 0x00 pixel data) over jumbo UDP with PTP active on the receiver:
-> the all-zero frames arrive truncated while frames with non-zero content
-> are fine. There is no error indication.
->
-> No content-based check can reliably tell a continuation buffer that begins
-> with zero bytes from a real timestamp header, because both are all zero.
-> Fix it structurally instead: only attempt the strip on the first buffer of
-> a frame, which is the only buffer that can contain a timestamp header. In
-> igb_clean_rx_irq() skb is NULL until the first buffer has been processed,
-> so guarding the strip with !skb restricts it to the first buffer
-> regardless of payload content.
->
-> Fixes: 5379260852b0 ("igb: Fix XDP with PTP enabled")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: T Kusters <tkusters@aweta.nl>
-
-Great explanation! igb_clean_rx_irq_zc() does not need the same
-treatment, correct?
-
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-
-> ---
->  drivers/net/ethernet/intel/igb/igb_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethe=
-rnet/intel/igb/igb_main.c
-> index ce91dda00ec0..abb55cd589a9 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -9061,7 +9061,8 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_=
-vector, const int budget)
->  		pktbuf =3D page_address(rx_buffer->page) + rx_buffer->page_offset;
->=20=20
->  		/* pull rx packet timestamp if available and valid */
-> -		if (igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
-> +		if (!skb &&
-> +		    igb_test_staterr(rx_desc, E1000_RXDADV_STAT_TSIP)) {
->  			int ts_hdr_len;
->=20=20
->  			ts_hdr_len =3D igb_ptp_rx_pktstamp(rx_ring->q_vector,
-> --=20
-> 2.27.0
->
+Thanks,
+Kurt
 
 --=-=-=
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmovrTQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgiv3D/0UL1rHA6YpGPl2jWtXbXCrHgwJJdw5
-A7Gz5HXnRnXa9w1rEAJR5yTlDo6NGCctjf0ZQbauwUVEoZ24+mBdNWHZbRi+alOw
-CiiLygla3wwCp6bwPdOfxoOWWw1RM9E+auZCv+8Gl9yFinuJkwY7ZgRmdzf99U//
-FhM/mxLAcnheWAWmvPFeaQZY8jcBh7gy//sN5FaFnIamQXIVulKMmfLAuzqPtoUf
-QMT/wL9nLi/yyp0cQUM9OXsb3WCFWfk1VyIHdOFtDKt8xZE3tgotUAH1JwYvUb5A
-EBb7PwgbvPhlqBEjDgtCi7p+KL/Jk8AIxjReHNjG+nXxxc6FURTEkuvkHAu0Zfx9
-O9hc9reE3zsvwDvtrL+wfcMst894XDrQfdlMhDGZDaDHkiOUHk5wpm2FTO3BhM43
-cR1xUuXchLSmUufMYh4aW9iP+k6TqZqdRMK3x/v+4RGhkuHUvHbjEnyCKkfhsRAn
-bqDgB2tnCHHHi3DUAPAu+fRf8yK/D5DYDWTrLT2EIsrDeTqU4DmTrA++NNsfkQU4
-FqPIZssxIYXDDC9PtiG9CEscDL+EkMDeFVGzvYUIL5kLxAUl1UfmMCky9k7Qd4Mt
-Paph8NOdC03rwrQQikqJ2SoH4hnakRiIeBu8YkWVhGKvzU/WTx9PtSKtrhVkzWeR
-tnGF2+a/wNMIOQ==
-=+94Q
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmovrpQTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgkpuD/92xM3i+Fmq8JLdBqzZVzhHHPjT0qMP
+zHPePSbTGvLiUfr+fFg8HU9N5nsmlzuvpvvvbK56DCGFOoqLccjyGjgKnNrr3b3N
+IG+0P7icchqSgcYRoqDw12aaTaBjd3zfIktFp6L2qw3StsvHumhShqNUNeQAWxC3
+3JRHcHxRbs7AFdOXXrHEx0Z3u8KnM2vuaeiIcISe9MHCjeYPXQhVXIF5skDybpbI
+37uaQm3wR1ToL4++e7zS3ZhhPEobo7xJx/EmFis7tzQmwAUwHRVNyKH0u5/LfPCu
+y/H1mJbxNbLy2zP/yg2jSesiF+oVp2F0piCr0QNNUeAO1wdeLlzpgquxflE0md8f
+O6qTO0AWBOwsAR6spb4yT62lYh1bNdmdA8jM6cBSUVX9V2nPVYEDFQgvCmZlRX+f
+puKil1ipeKL+3uqeqtL1Mlj0AcsC+Jx4KP5r1fQvT4U1AhdV4gYuLHXnRhlrCJze
+SvsEuh6KwZYvf27xVrQBGOqR8TzxbYn7JbZlUEqVZzT5t9F20UOwVc3vltmsI7zc
+UsatOAioPuMzZVArZE6BFEAC/4kr19W1RGEMMe0TJJzMrdt+6iuOWFfwLWVN+jcS
+43mi1j6pgCzN4J/L3uWADQxWkihDjsZ5qaBDsII0Wx7yDWHbLfk5XivD96PFOqoo
+piGpJnDU9r2LLQ==
+=gmO8
 -----END PGP SIGNATURE-----
 --=-=-=--
 
