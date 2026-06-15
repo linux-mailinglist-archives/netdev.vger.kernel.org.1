@@ -1,310 +1,343 @@
-Return-Path: <netdev+bounces-299371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299372-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id N0qfFinBL2pdFwUAu9opvQ
-	(envelope-from <netdev+bounces-299371-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:08:57 +0200
+	id kmygGLzBL2qYFwUAu9opvQ
+	(envelope-from <netdev+bounces-299372-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:11:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09976684E75
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:08:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEAE2684EB1
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:11:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=F2VSxmuZ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299371-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299371-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="AZGi31R/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299372-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299372-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 121E6301FB02
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:05:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C87F303D123
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08693C3BFF;
-	Mon, 15 Jun 2026 09:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DC43C4572;
+	Mon, 15 Jun 2026 09:07:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542B430568A
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 09:05:19 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152933C4B83;
+	Mon, 15 Jun 2026 09:07:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781514320; cv=none; b=gq+wIqHwPRzhNFN60MQCNE984j1oSFnHl9c80/L1T1USgq+w7fFlhMYdxjD3tLugwCHwMdl7hJUWO3MEsLs0CI60y4mEe1xFUXbJlyyP4fJH6zXd7KVkzVZ/BOCdcqPksRlvraCl9gYLyl9YUJEgJHFwJ+xgJdgXGDAX+Na95A8=
+	t=1781514454; cv=none; b=MhyyAkYcMZiTiKc03/mUKdhfO9Wy3X7WRIRPLCuxbIDk+4SwkEMQLRbgHcKXxch1BOKgiCTfgqCvzDbl2T0APW84cYy/ieVMcNW0P36xatGce6BNmWHMJBSjpist1Z+ni+Uzqr4h1FFHtn27q/N0yi2UIXRog/D6wZ4/kzsSfeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781514320; c=relaxed/simple;
-	bh=is0aUcqvIZ1xcT2jK43lwzQy9+ksca8vwiUx2SlLA9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ouXUF7lfYkSteADq3fsa5A/dg8MOUFysxOTpbCCO4YbEuNsLqAf/ttr8mt/rWQX3lMwyI9x6DywkgbEnPOrrKnEx4KZbO/BMKCBZ90n1Bj1QOlxwTMY1jZ87X0PgFwdP0EaPSud4KTO0+83fh7jSD0GJoufTOjGHKB4arbXTZr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2VSxmuZ; arc=none smtp.client-ip=209.85.219.47
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8ccd1f57b32so39986756d6.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 02:05:19 -0700 (PDT)
+	s=arc-20240116; t=1781514454; c=relaxed/simple;
+	bh=cYbJKriM1c5oNg3f0KPq+HRDkoJqBGFt0Bko99VEAUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qCT5U81S4zwiPD0xPM8g+2Imx2iYa7isJ2Pz2tki5Wrbm1rXAU4+GuaNtJyMI42uD8nZgwMPpZij7KkgnbEqYnpsC2ogCg3dfZsmE57qV3hfuFC1/EoLS4HfC5ouc4CQ0mv/nbbWf+BaHfKdw/5Al8f8GH2RkdY+7vNeIP5uuTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=AZGi31R/; arc=none smtp.client-ip=13.75.44.102
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781514318; x=1782119118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OvV17BgpJQmVQrI1yyaY3qROAJv7ED+Gi/LtXIZqMPI=;
-        b=F2VSxmuZK3+lLiaTVErbvzZRXcA0gpZd111o4WAO/7BG2E47jI/iYOeprIWpPMJ7DT
-         edFsRWqxMHU4K7Sd8Q3D0UDbeRhqUfgBr1aEX4Yfks42AjeWLGOsGujU6DEsXa7C64tj
-         7I+UqBD6kA/a91zOzFprsyECq0COBq/I/Uk9a9q2C/EYfStgf5ux4UFp4xGGyc8PckAf
-         3pjOma9ymSGyzmmjB9ZoH7JaGVlzl78NnK5ktAQH73+Y76bV0cz7sBFqs3TFX3rg4GKG
-         zQu6m150M6jVXc+n4wb4CLKIln0+U9qpVOidX1Sm52UTfppfG56mFKlgWYEuM9o4tKgB
-         XNIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781514318; x=1782119118;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OvV17BgpJQmVQrI1yyaY3qROAJv7ED+Gi/LtXIZqMPI=;
-        b=U63P0yGJ7yeeUg0ThP5vfpGv0FVPNs9kES8RArS+awZ+Pylc3YDhtYbqrcUtIAWPRW
-         PVumXpYGLzuV+mWcRZBgX6RDVz/1QlBau4oPqhd8M/9+vmboSxIv1a4RYfvZuC+pR+nK
-         q+W8s+h4FHRGP1TBFIa0LlyrnY1EN+YmcQuGegh9GlBI4v90jJAKGAPDUAiHmU1R83gq
-         WexkXzCeIPggkTBEkNobZhFhzK2g9bc+UvQyuXQ2E0cNm4ppD9kgZWC80Pbif57Szs1O
-         6mB9qap6naog0MRRegnodDnc0UE9s/kgrG6ScG0rjs0TBq7z/bq91OjycnZCaSxjdzO2
-         bf0g==
-X-Gm-Message-State: AOJu0Yw1BihzlYsTzaZB8+T7jmjOzYn7I0jO43cCiI61KVovvEuA4LcF
-	GsEdgOF3OSHb40ulUSZKh9yGKUU8bqW6jc8LBWDOtg/QK5tL8RAneYeA0gQoxXOhPVw=
-X-Gm-Gg: Acq92OFT6wWheSFRbPBRi4vGfge8ORUG98giMLPWNRVXnIy9rh7f/omyGBE5pqhK82P
-	OpcuZEoQC2m8lzdvXYwLR7x16c7lJbg6e+r8UKbyvmFAzoEXOOWJwtytmX42pN1kuuQd0nTKP5s
-	Gw+zcgjm4UutnrwpgfFonXQ1QDsPz9nnwGPP27GWGfVPC8OYFUN+r3lYR3xZfsGYgwj7YR+bfIO
-	y0ROoIgLVF8c3j+/9/s219BHU/Tz2ewZ7laPg106RcWQm3cK4tFlzvcXZ+rn26+kTPb8tySr9cm
-	KPYQlGWLpK0YT4cynrHkC/CfPyKgvPt8HTW8wCvkzZ9JgTNsnPDljAINyWwdH9v92XMvDLA+ZTy
-	Si14OpMOmIZzv2p0xnJLDaFwifSr0fXV7UbegqHtM9oEFXcu0loFbWMp52awoBYEUHLL+pCX1lF
-	cYKY/eRFqRyNuBJEAOWFU5a50=
-X-Received: by 2002:ad4:5761:0:b0:8ae:62aa:665a with SMTP id 6a1803df08f44-8d32d858216mr244104566d6.28.1781514318228;
-        Mon, 15 Jun 2026 02:05:18 -0700 (PDT)
-Received: from houminxi.lan ([163.123.141.225])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8d302114676sm109704966d6.20.2026.06.15.02.05.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 02:05:17 -0700 (PDT)
-From: Minxi Hou <houminxi@gmail.com>
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=eFxRL
+	SPb51yd/Kd9E61uwcifN1eEx8Lok5rrcuSCZZw=; b=AZGi31R/pzxSrbi08k8Fh
+	QwYECCQp174JrHqP+2RIICNlHs9YlrG8OSe2onkktFsgz1F5DaHB/OnLIfT5tV0x
+	6aXy+/th3qRTwuRbWof7+RIGLSDl9Mw+hLzgImTMmMl/VAn/CW5knnJNw/28Kce7
+	BMrzRpCROkqpAAznbxMv5A=
+Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
+	by web3 (Coremail) with SMTP id ygQGZQAnc5C6wC9qEmpzAg--.19721S2;
+	Mon, 15 Jun 2026 17:07:07 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 To: netdev@vger.kernel.org
-Cc: aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	Minxi Hou <houminxi@gmail.com>
-Subject: [PATCH net-next v2] selftests/net/openvswitch: add ICMPv6 echo type match test
-Date: Mon, 15 Jun 2026 17:05:07 +0800
-Message-ID: <20260615090507.3647256-1-houminxi@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260613141429.3084962-1-houminxi@gmail.com>
-References: <20260613141429.3084962-1-houminxi@gmail.com>
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Kito Xu <veritas501@foxmail.com>,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] appletalk: fix TOCTOU race in atalk_sendmsg
+Date: Mon, 15 Jun 2026 17:06:33 +0800
+Message-ID: <20260615090635.1549-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.53.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:ygQGZQAnc5C6wC9qEmpzAg--.19721S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxtFyrCFyDWFyDAFyUJFWUArb_yoWxKFyxpF
+	WxCa4YkayDGw1jgrs2qay7Cr1ayrs5GryfGryfJ3y0vFs0gFy8uFy0ya4IvF90yF1kJr4r
+	XFWqva1qkF47XrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6r4fMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjWxR3UU
+	UUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgETAWovr8QmuQAAsg
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-299372-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,ovn.org,davemloft.net,google.com,kernel.org,openvswitch.org,vger.kernel.org,gmail.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-299371-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:aconole@redhat.com,m:echaudro@redhat.com,m:i.maximets@ovn.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:dev@openvswitch.org,m:linux-kselftest@vger.kernel.org,m:houminxi@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[houminxi@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,tsinghua.edu.cn:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,seu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 09976684E75
+X-Rspamd-Queue-Id: AEAE2684EB1
 
-Register OVS_KEY_ATTR_ICMPV6 in the flow key parser so that
-icmpv6(type=...) can be used in flow specifications. Without this
-registration the parser silently drops the token and the kernel
-rejects the flow with EINVAL because the expected ICMPv6 key
-attribute is missing.
-
-While here, add convert_int() to the ovs_key_ipv6 and ovs_key_icmp
-fields_map entries so that specifying a field value produces the
-correct wildcard mask. The IPv6 flow label uses convert_int(20) to
-produce a 20-bit mask (0x000FFFFF), matching the kernel constraint in
-flow_netlink.c that rejects masks with bits 20-31 set; byte-wide
-fields use convert_int(8). The ipv4 counterpart already does this via
-convert_int(); the ipv6 and icmp classes were simply missing the fifth
-tuple element. Existing callers that pass empty parentheses are
-unaffected because convert_int("") returns (0, 0).
-
-Add test_icmpv6 exercising the ICMPv6 echo flow key. The test uses
-static neighbour entries to bypass NDP, then verifies in three steps:
-install icmpv6(type=128) and icmpv6(type=129) flows and confirm ping
-works, remove the flows and confirm ping fails, reinstall and confirm
-recovery.
-
-Signed-off-by: Minxi Hou <houminxi@gmail.com>
----
-v2: fix ovs_key_ipv6 label mask to use convert_int(20) instead of
-    convert_int(32); the IPv6 flow label is 20 bits and the kernel
-    rejects masks with bits 20-31 set in validate_set().
-
- .../selftests/net/openvswitch/openvswitch.sh  | 63 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 26 +++++---
- 2 files changed, 82 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index d533decca5c1..8923224fa88e 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -31,6 +31,7 @@ tests="
- 	pop_vlan				vlan: POP_VLAN action strips tag
- 	dec_ttl					ttl: dec_ttl decrements IP TTL
- 	flow_set				flow-set: Flow modify
-+	icmpv6					icmpv6: ICMPv6 echo type match
- 	psample					psample: Sampling packets with psample"
- 
- info() {
-@@ -377,6 +378,68 @@ test_flow_set() {
- 	return 0
- }
- 
-+test_icmpv6() {
-+	sbx_add "test_icmpv6" || return $?
-+	ovs_add_dp "test_icmpv6" icmpv6 || return 1
-+
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "test_icmpv6" "icmpv6" \
-+			"$ns" "${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add fd00::1/64 dev c1 nodad
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add fd00::2/64 dev s1 nodad
-+	ip netns exec server ip link set s1 up
-+
-+	local cl_mac sl_mac
-+	cl_mac=$(ip netns exec client \
-+		ip link show c1 | awk '/link\/ether/ {print $2}')
-+	[ -z "$cl_mac" ] && \
-+		{ info "failed to get c1 hwaddr"; return 1; }
-+	sl_mac=$(ip netns exec server \
-+		ip link show s1 | awk '/link\/ether/ {print $2}')
-+	[ -z "$sl_mac" ] && \
-+		{ info "failed to get s1 hwaddr"; return 1; }
-+	ip netns exec client \
-+		ip -6 neigh add fd00::2 lladdr "$sl_mac" dev c1
-+	ip netns exec server \
-+		ip -6 neigh add fd00::1 lladdr "$cl_mac" dev s1
-+
-+	ovs_add_flow "test_icmpv6" icmpv6 \
-+	  'in_port(1),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=128)' \
-+	  '2' || return 1
-+	ovs_add_flow "test_icmpv6" icmpv6 \
-+	  'in_port(2),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=129)' \
-+	  '1' || return 1
-+
-+	info "verify ICMPv6 echo with type-specific flows"
-+	ovs_sbx "test_icmpv6" ip netns exec client \
-+		ping -6 -c 1 -W 2 fd00::2 || return 1
-+
-+	ovs_del_flows "test_icmpv6" icmpv6
-+
-+	info "verify ping fails without echo flows"
-+	ovs_sbx "test_icmpv6" ip netns exec client \
-+		ping -6 -c 1 -W 2 fd00::2 >/dev/null 2>&1 \
-+		&& { info "FAIL: ping should fail without flows"
-+		     return 1; }
-+
-+	ovs_add_flow "test_icmpv6" icmpv6 \
-+	  'in_port(1),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=128)' \
-+	  '2' || return 1
-+	ovs_add_flow "test_icmpv6" icmpv6 \
-+	  'in_port(2),eth(),eth_type(0x86dd),ipv6(proto=58),icmpv6(type=129)' \
-+	  '1' || return 1
-+
-+	info "verify connectivity restored"
-+	ovs_sbx "test_icmpv6" ip netns exec client \
-+		ping -6 -c 1 -W 2 fd00::2 || return 1
-+
-+	return 0
-+}
-+
- # psample test
- # - use psample to observe packets
- test_psample() {
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index e1ecfad2c03e..f3edd198223f 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -1255,11 +1255,16 @@ class ovskey(nla):
-                 lambda x: ipaddress.IPv6Address(x).packed if x else 0,
-                 convert_ipv6,
-             ),
--            ("label", "label", "%d", lambda x: int(x) if x else 0),
--            ("proto", "proto", "%d", lambda x: int(x) if x else 0),
--            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0),
--            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0),
--            ("frag", "frag", "%d", lambda x: int(x) if x else 0),
-+            ("label", "label", "%d", lambda x: int(x) if x else 0,
-+                convert_int(20)),
-+            ("proto", "proto", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("tclass", "tclass", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("hlimit", "hlimit", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("frag", "frag", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-         )
- 
-         def __init__(
-@@ -1344,8 +1349,10 @@ class ovskey(nla):
-         )
- 
-         fields_map = (
--            ("type", "type", "%d", lambda x: int(x) if x else 0),
--            ("code", "code", "%d", lambda x: int(x) if x else 0),
-+            ("type", "type", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-+            ("code", "code", "%d", lambda x: int(x) if x else 0,
-+                convert_int(8)),
-         )
- 
-         def __init__(
-@@ -1982,6 +1989,11 @@ class ovskey(nla):
-                 "icmp",
-                 ovskey.ovs_key_icmp,
-             ),
-+            (
-+                "OVS_KEY_ATTR_ICMPV6",
-+                "icmpv6",
-+                ovskey.ovs_key_icmpv6,
-+            ),
-             (
-                 "OVS_KEY_ATTR_TCP_FLAGS",
-                 "tcp_flags",
--- 
-2.54.0
+atalk_sendmsg() looks up an AppleTalk route, stores the returned=0D
+atalk_route and net_device pointers, and then drops the socket lock=0D
+around sock_alloc_send_skb().  The route pointer returned by=0D
+atrtr_find() is only protected while atalk_routes_lock is held; after=0D
+that lock is dropped, a concurrent SIOCDELRT or device-down path can=0D
+unlink the route, drop the device reference, and free the route.=0D
+=0D
+When sendmsg resumes, it can still dereference the stale route and=0D
+device pointers while building or transmitting the packet.  A KASAN=0D
+reproducer using AF_APPLETALK sockets and SIOCADDRT/SIOCDELRT reports=0D
+slab-use-after-free reads in atalk_sendmsg(), with the object allocated=0D
+by atrtr_create() and freed by atrtr_delete().=0D
+=0D
+Fix this by splitting the route lookup into a helper that is called with=0D
+atalk_routes_lock already held.  atalk_sendmsg() now performs route=0D
+lookup, copies the route fields it needs, and takes references to the=0D
+selected devices with netdev_hold() while still holding=0D
+atalk_routes_lock.  After the lock is dropped and skb allocation sleeps,=0D
+the send path uses only the copied route data and the held net_device=0D
+references, which are released with netdev_put() before returning.=0D
+=0D
+This preserves the existing route selection behaviour, including the=0D
+separate loopback route used for broadcast loopback, while removing the=0D
+dangling route/device window.=0D
+=0D
+Fixes: 60d9f461a20b ("appletalk: remove the BKL")=0D
+Cc: stable@vger.kernel.org=0D
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>=0D
+Reported-by: Ao Wang <wangao@seu.edu.cn>=0D
+Reported-by: Xuewei Feng <fengxw06@126.com>=0D
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>=0D
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
+Assisted-by: GLM:GLM-5.1=0D
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
+---=0D
+Changes in v2:=0D
+- Use netdev_hold()/netdev_put() instead of dev_hold()/dev_put().=0D
+- Drop explicit NULL checks before releasing temporary device refs.=0D
+- Link to v1: https://lore.kernel.org/netdev/20260610052315.64504-1-zhaoyz2=
+4@mails.tsinghua.edu.cn/=0D
+---=0D
+ net/appletalk/ddp.c | 67 ++++++++++++++++++++++++++++++++++++-------------=
+----=0D
+ 1 file changed, 46 insertions(+), 21 deletions(-)=0D
+=0D
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c=0D
+index 30a6dc06291c..9b95dd06f600 100644=0D
+--- a/net/appletalk/ddp.c=0D
++++ b/net/appletalk/ddp.c=0D
+@@ -434,7 +434,7 @@ static struct atalk_iface *atalk_find_interface(__be16 =
+net, int node)=0D
+  * the socket (later on...). We know about host routes and the fact=0D
+  * that a route must be direct to broadcast.=0D
+  */=0D
+-static struct atalk_route *atrtr_find(struct atalk_addr *target)=0D
++static struct atalk_route *atrtr_find_locked(struct atalk_addr *target)=0D
+ {=0D
+ 	/*=0D
+ 	 * we must search through all routes unless we find a=0D
+@@ -444,7 +444,6 @@ static struct atalk_route *atrtr_find(struct atalk_addr=
+ *target)=0D
+ 	struct atalk_route *net_route =3D NULL;=0D
+ 	struct atalk_route *r;=0D
+ =0D
+-	read_lock_bh(&atalk_routes_lock);=0D
+ 	for (r =3D atalk_routes; r; r =3D r->next) {=0D
+ 		if (!(r->flags & RTF_UP))=0D
+ 			continue;=0D
+@@ -477,6 +476,15 @@ static struct atalk_route *atrtr_find(struct atalk_add=
+r *target)=0D
+ 	else /* No route can be found */=0D
+ 		r =3D NULL;=0D
+ out:=0D
++	return r;=0D
++}=0D
++=0D
++static struct atalk_route *atrtr_find(struct atalk_addr *target)=0D
++{=0D
++	struct atalk_route *r;=0D
++=0D
++	read_lock_bh(&atalk_routes_lock);=0D
++	r =3D atrtr_find_locked(target);=0D
+ 	read_unlock_bh(&atalk_routes_lock);=0D
+ 	return r;=0D
+ }=0D
+@@ -1553,10 +1561,13 @@ static int atalk_sendmsg(struct socket *sock, struc=
+t msghdr *msg, size_t len)=0D
+ 	int loopback =3D 0;=0D
+ 	struct sockaddr_at local_satalk, gsat;=0D
+ 	struct sk_buff *skb;=0D
+-	struct net_device *dev;=0D
++	struct net_device *dev =3D NULL, *dev_lo =3D NULL;=0D
++	netdevice_tracker dev_tracker, dev_lo_tracker;=0D
+ 	struct ddpehdr *ddp;=0D
+ 	int size, hard_header_len;=0D
+ 	struct atalk_route *rt, *rt_lo =3D NULL;=0D
++	int rt_flags;=0D
++	struct atalk_addr rt_gateway;=0D
+ 	int err;=0D
+ =0D
+ 	if (flags & ~(MSG_DONTWAIT|MSG_CMSG_COMPAT))=0D
+@@ -1600,39 +1611,50 @@ static int atalk_sendmsg(struct socket *sock, struc=
+t msghdr *msg, size_t len)=0D
+ 	/* For headers */=0D
+ 	size =3D sizeof(struct ddpehdr) + len + ddp_dl->header_length;=0D
+ =0D
++	read_lock_bh(&atalk_routes_lock);=0D
+ 	if (usat->sat_addr.s_net || usat->sat_addr.s_node =3D=3D ATADDR_ANYNODE) =
+{=0D
+-		rt =3D atrtr_find(&usat->sat_addr);=0D
++		rt =3D atrtr_find_locked(&usat->sat_addr);=0D
+ 	} else {=0D
+ 		struct atalk_addr at_hint;=0D
+ =0D
+ 		at_hint.s_node =3D 0;=0D
+ 		at_hint.s_net  =3D at->src_net;=0D
+ =0D
+-		rt =3D atrtr_find(&at_hint);=0D
++		rt =3D atrtr_find_locked(&at_hint);=0D
+ 	}=0D
+ 	err =3D -ENETUNREACH;=0D
+-	if (!rt)=0D
++	if (!rt) {=0D
++		read_unlock_bh(&atalk_routes_lock);=0D
+ 		goto out;=0D
++	}=0D
+ =0D
+ 	dev =3D rt->dev;=0D
+-=0D
+-	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",=0D
+-			sk, size, dev->name);=0D
++	netdev_hold(dev, &dev_tracker, GFP_ATOMIC);=0D
++	rt_flags =3D rt->flags;=0D
++	rt_gateway =3D rt->gateway;=0D
+ =0D
+ 	hard_header_len =3D dev->hard_header_len;=0D
+ 	/* Leave room for loopback hardware header if necessary */=0D
+ 	if (usat->sat_addr.s_node =3D=3D ATADDR_BCAST &&=0D
+-	    (dev->flags & IFF_LOOPBACK || !(rt->flags & RTF_GATEWAY))) {=0D
++	    (dev->flags & IFF_LOOPBACK || !(rt_flags & RTF_GATEWAY))) {=0D
+ 		struct atalk_addr at_lo;=0D
+ =0D
+ 		at_lo.s_node =3D 0;=0D
+ 		at_lo.s_net  =3D 0;=0D
+ =0D
+-		rt_lo =3D atrtr_find(&at_lo);=0D
++		rt_lo =3D atrtr_find_locked(&at_lo);=0D
+ =0D
+-		if (rt_lo && rt_lo->dev->hard_header_len > hard_header_len)=0D
+-			hard_header_len =3D rt_lo->dev->hard_header_len;=0D
++		if (rt_lo) {=0D
++			dev_lo =3D rt_lo->dev;=0D
++			netdev_hold(dev_lo, &dev_lo_tracker, GFP_ATOMIC);=0D
++			if (dev_lo->hard_header_len > hard_header_len)=0D
++				hard_header_len =3D dev_lo->hard_header_len;=0D
++		}=0D
+ 	}=0D
++	read_unlock_bh(&atalk_routes_lock);=0D
++=0D
++	net_dbg_ratelimited("SK %p: Size needed %d, device %s\n",=0D
++			    sk, size, dev->name);=0D
+ =0D
+ 	size +=3D hard_header_len;=0D
+ 	release_sock(sk);=0D
+@@ -1675,7 +1697,7 @@ static int atalk_sendmsg(struct socket *sock, struct =
+msghdr *msg, size_t len)=0D
+ 	 * to group we are in)=0D
+ 	 */=0D
+ 	if (ddp->deh_dnode =3D=3D ATADDR_BCAST &&=0D
+-	    !(rt->flags & RTF_GATEWAY) && !(dev->flags & IFF_LOOPBACK)) {=0D
++	    !(rt_flags & RTF_GATEWAY) && !(dev->flags & IFF_LOOPBACK)) {=0D
+ 		struct sk_buff *skb2 =3D skb_copy(skb, GFP_KERNEL);=0D
+ =0D
+ 		if (skb2) {=0D
+@@ -1693,20 +1715,21 @@ static int atalk_sendmsg(struct socket *sock, struc=
+t msghdr *msg, size_t len)=0D
+ 		/* loop back */=0D
+ 		skb_orphan(skb);=0D
+ 		if (ddp->deh_dnode =3D=3D ATADDR_BCAST) {=0D
+-			if (!rt_lo) {=0D
++			if (!dev_lo) {=0D
+ 				kfree_skb(skb);=0D
+ 				err =3D -ENETUNREACH;=0D
+ 				goto out;=0D
+ 			}=0D
+-			dev =3D rt_lo->dev;=0D
+-			skb->dev =3D dev;=0D
++			skb->dev =3D dev_lo;=0D
++			ddp_dl->request(ddp_dl, skb, dev_lo->dev_addr);=0D
++		} else {=0D
++			ddp_dl->request(ddp_dl, skb, dev->dev_addr);=0D
+ 		}=0D
+-		ddp_dl->request(ddp_dl, skb, dev->dev_addr);=0D
+ 	} else {=0D
+ 		net_dbg_ratelimited("SK %p: send out.\n", sk);=0D
+-		if (rt->flags & RTF_GATEWAY) {=0D
+-		    gsat.sat_addr =3D rt->gateway;=0D
+-		    usat =3D &gsat;=0D
++		if (rt_flags & RTF_GATEWAY) {=0D
++			gsat.sat_addr =3D rt_gateway;=0D
++			usat =3D &gsat;=0D
+ 		}=0D
+ =0D
+ 		/*=0D
+@@ -1717,6 +1740,8 @@ static int atalk_sendmsg(struct socket *sock, struct =
+msghdr *msg, size_t len)=0D
+ 	net_dbg_ratelimited("SK %p: Done write (%zd).\n", sk, len);=0D
+ =0D
+ out:=0D
++	netdev_put(dev, &dev_tracker);=0D
++	netdev_put(dev_lo, &dev_lo_tracker);=0D
+ 	release_sock(sk);=0D
+ 	return err ? : len;=0D
+ }=0D
 
 
