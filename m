@@ -1,181 +1,180 @@
-Return-Path: <netdev+bounces-299285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lkC1NhpNL2rq+AQAu9opvQ
-	(envelope-from <netdev+bounces-299285-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:53:46 +0200
+	id 8Q6JADxOL2oB+QQAu9opvQ
+	(envelope-from <netdev+bounces-299286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:58:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9160682AB2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:53:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB7D682AC0
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:58:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.dev header.s=key1 header.b=cWU6WxFr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299285-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299285-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.dev;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299286-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299286-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0AAAC3001189
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 00:53:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B78230048C6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 00:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77081E7C03;
-	Mon, 15 Jun 2026 00:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB311F1513;
+	Mon, 15 Jun 2026 00:58:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657727080D
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 00:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9FC3B18A
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 00:58:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781484821; cv=none; b=NBm128XSVfXvAVWvixUO+ZW/CZJvXz8PlNOAbbLZMOVHFhdWck/pQ/9976eE4XItzGKYRbNeLlFDH8xpTFvxINe/Pu6ki/1VHt6lPd99gxNgRZ8M7O2HGEG6QCILvk+o8ITW8DHsP+3bNIDqJfrHKrgGLOo6xwCcD9nIqOc33E8=
+	t=1781485112; cv=none; b=TA2AoirI6b7lRgTCrCdLdq9SktchuGRAPo1f5QQtzLE7y4W6S++UgLGHuGKA+F36Qn2M6zNd0eR4NXrc1b+fu0FNreVcrfj76mPjyD5qJMO5tIpAXWt2lbVkFWzoUKF5ORbYsq3qtrtBU8WyclPFOj9kYxtix9rPlvn44lv7Cgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781484821; c=relaxed/simple;
-	bh=r+mwMuUqgLXvrizPZU3Vde8otUicXL2hjubspvzLv5M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qcBz9IpHBuy8MGeqjEwWQDRDYBAtw7YG00uVTGrGg4lMpmyoBys5n6BDY9t4khIHm0GbYkMun8pvQnxLuTEMzK2UJ92S8YoeO5cm4uijkRcnszjU9u0Uyy0UG4mF8zmQnEyOKFqtMuB9GOZM9RW4vh1Sk47VjpWT3NkXeuiSw/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cWU6WxFr; arc=none smtp.client-ip=91.218.175.174
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781484808;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=KFGGgGvx+Xz4hzLLgdlnm604TPHKvdtjxWVXaJtUp1Y=;
-	b=cWU6WxFrCQmG72kAxiFGwPk88lKrTbgx8kscwWBvu8zkrSoqYsSFivfMzolmnxF5mue+oj
-	ZsQYvDXljedwmLYyTMgv4xmWOshIFuLAq+VNWDRRf9+x5Axm9ARJ5ljBd3NOjx386Kjzbc
-	DEE155ZIqix7qDnu8OVzElJ8Uj3AVss=
-From: Tao Cui <cui.tao@linux.dev>
-To: dsahern@kernel.org,
-	leonro@nvidia.com
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Tao Cui <cuitao@kylinos.cn>
-Subject: [PATCH iproute2-next v3] rdma: display resource limits in curr/max format
-Date: Mon, 15 Jun 2026 08:53:15 +0800
-Message-ID: <20260615005315.169582-1-cui.tao@linux.dev>
+	s=arc-20240116; t=1781485112; c=relaxed/simple;
+	bh=8vPjg3CoqBcs/o54H5Vf1aTxSdxt4W4RWVAUCH4I6aA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AI12tHfdPVNXS5nR09tuq5pfJaP/vvOGG4ANofyx3yUENG6wubvRNg1GmBwAhtVIyKsA8NwlQDiEv66IyPHfMFOY6mVTQ6VL+1ulQz5TCBzVa9cA4qbV/+UEqreyklW9QGxzLwGtcuUftIj3ZaPsrgCaEGFYvzdsetIfYUgEQaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=52.59.177.22
+X-QQ-mid: esmtpgz16t1781485090tf91fe7e8
+X-QQ-Originating-IP: xLI41NFzWkRT2aRHFAC33FpxRMLgIi+OcZRrqlM1O8o=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 15 Jun 2026 08:58:08 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3144052327750393400
+EX-QQ-RecipientCnt: 12
+Date: Mon, 15 Jun 2026 08:58:08 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+	vadim.fedorenko@linux.dev, u.kleine-koenig@baylibre.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	yaojun@mucse.com
+Subject: Re: [PATCH net-next v7 0/4] net: rnpgbe: Add TX/RX and link status
+ support
+Message-ID: <09A74B70DB12CF18+20260615005808.GA81014@nic-Precision-5820-Tower>
+References: <20260611100036.36370-1-dong100@mucse.com>
+ <20260612184436.GL671640@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260612184436.GL671640@horms.kernel.org>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
+X-QQ-XMAILINFO: Nl/za/qVmWHIX5Uuwlu1xnaNgV6FCqM+S8qXsDFjOBZegPDlDJce2Bl4
+	JvdPxEQ+vrm12jA/qa6sn8MtZdnnbXVi1lpCIu3eDPC5tERWUV1UP39cXgH8s1kyw3pwq4o
+	mNHSUnJz+G78FmTY17u+/aar+z4besDhA6d3fiT+FwczPYa730FXC1oEib3KEpNhvijVmxb
+	nYHD4wYvpL6yOdrG2n5e6sFZCcMVFpnqXzU5aeWm45aw2Ub7tCwcsxtMUREiS4SYBgG+gBK
+	LFYhtTC8tfNrr4B/gsPzgDQorjf17ESJsQPFKRppnffQiw+dtVraC4IfdXw2/uG0boXOnSm
+	i+mIpYJQeyiNjMMRanNcx2t4892AxlH0YLblaTa0D4FKgfu5uYvZ4/dFifoe2JFUHQrmweO
+	ovnsdTKPEqr6YTrQE3K9APCI2Td+/Otaui8u1EkwJ+jYfDlG1emejOiBsmEqA4ve2sM6HsV
+	5/USQWpvDX735Ga4vS7sJkxyPvPxC4VGrS+U+jXquaNFHoA+xjanrR5X+uEV8/slfQ9e5oh
+	G1hxXeO+rzUtGqU7saI1PWKjG12ViVwIwkDg6LtpdSqS1x6+ut6Cw/azImo/IhMHYDz/QZH
+	rwNEALmz5h3db8pAUT35EgBOpFUoVilnWAeHmgvUvTJDrEyXYl2g1FUmLlUtSa7AOfL5DPa
+	cqCHto3bTy2FUj/85ioj6GoQo+HVGaxETpU+bwFXJkft8dVThpMrxogFOuNuWnDFFJeE54G
+	I2hjiKmaVjsdDayWZA55SF8sevFpxUrZ2lYCxRSyd4N5HLzgBi+EB8iJVTkZI0i5laz25bj
+	BNsAMU1CjzBnhPHro4717WGcq6i4rpesIiSSqpDgJSBZO9bnTRZqI2YoS03NFAkfE5L5M5W
+	ULD3QR6i2cNDfLVZWqmvAgW5Pwbtdd3XYKcDioMLkhaTWLPEd9Jrtix12ovx4G/FtWUew/V
+	OVPfhuFsJ+TiMmEW2UeXvs8emDFrfsJxeY5bIn8A1WZQdnjn3I0uP4F9zib4DOBaA6DSkhN
+	C9sYbb46JBfomWH/eD80alIWv9C5R2c/MW0llkSZfJD9Z0hDrjkBHLVeY62JQcD2hPa9fsD
+	r2cVbiiWZtCG6BY+ZxhMaQ=
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299285-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:leonro@nvidia.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:cuitao@kylinos.cn,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:danishanwar@ti.com,m:vadim.fedorenko@linux.dev,m:u.kleine-koenig@baylibre.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:yaojun@mucse.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DMARC_NA(0.00)[mucse.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cui.tao@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dong100@mucse.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299286-lists,netdev=lfdr.de];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,kylinos.cn:email,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D9160682AB2
+X-Rspamd-Queue-Id: 0AB7D682AC0
 
-From: Tao Cui <cuitao@kylinos.cn>
+On Fri, Jun 12, 2026 at 07:44:36PM +0100, Simon Horman wrote:
+> On Thu, Jun 11, 2026 at 06:00:32PM +0800, Dong Yibo wrote:
+> > Hi maintainers,
+> > 
+> > This patch series adds the packet transmission, reception, and link status
+> > management features to the RNPGBE driver, building upon the previously
+> > introduced mailbox communication and basic driver infrastructure.
+> > 
+> > The series introduces:
+> > - Msix/msi interrupt handling with NAPI support
+> > - TX path with scatter-gather DMA and completion handling
+> > - RX path with page pool buffer management
+> > - Link status monitoring and carrier management
+> > 
+> > These changes enable the RNPGBE driver to support basic tx/rx
+> > network operations.
+> > 
+> > Changelog:
+> > v6 -> v7:
+> > [patch 2/4]:
+> > 1. Fix 'frag_idx' error in rnpgbe_tx_map. (Sashiko-gemini)
+> > [patch 3/4]:
+> > 1. Fix skb leak in invalid size path in rnpgbe_clean_rx_irq.
+> >    (Sashiko-gemini)
+> > 2. Fix invalid size range check for rxdesc. (Sashiko-gemini)
+> > [patch 4/4]:
+> > 1. Fix 'data race on the reply payload'. (Sashiko-gemini)
+> > 2. Fix 'asymmetric behaviour' when report up/down. (andrew)
+> > 
+> > links:
+> > ---
+> > v1: https://lore.kernel.org/netdev/20260325091204.94015-1-dong100@mucse.com/
+> > v2: https://lore.kernel.org/netdev/20260403025713.527841-1-dong100@mucse.com/
+> > v3: https://lore.kernel.org/netdev/20260507081539.171844-1-dong100@mucse.com/
+> > v4: https://lore.kernel.org/netdev/20260526033539.164061-1-dong100@mucse.com/
+> > v5: https://lore.kernel.org/netdev/20260528023150.239532-1-dong100@mucse.com/
+> > v6: https://lore.kernel.org/netdev/20260604112750.769215-1-dong100@mucse.com/
+> > 
+> > Additional Notes:
+> 
+> Thanks for the update and the notes.
+> 
+> There is another round of AI-generated review of this patch-set available
+> on both https://sashiko.dev and https://netdev-ai.bots.linux.dev/sashiko/
+> 
+> I would appreciate it if you could look over that too. With a view to
+> addressing any issues that directly affect this patch.
+> 
 
-Parse the new RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX netlink attribute
-to show resource limits alongside current counts in curr/max format:
+Ok, I Will take a look at the AI review results on both sites and fix all
+relevant issues pointed out for this patch.
 
-  Before: 0: mlx5_0: qp 123  cq 45  mr 200  pd 10
-  After:  0: mlx5_0: qp 123/131072  cq 45/65536  mr 200/1000000  pd 10/32768
-
-JSON output provides both current and max fields per resource type
-(e.g. "qp": 123, "qp-max": 131072). Backward compatible: no output
-change when kernel lacks the new attribute.
-
-Signed-off-by: Tao Cui <cuitao@kylinos.cn>
----
- rdma/include/uapi/rdma/rdma_netlink.h |  5 +++++
- rdma/res.c                            | 21 ++++++++++++++++++++-
- rdma/utils.c                          |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/rdma/include/uapi/rdma/rdma_netlink.h b/rdma/include/uapi/rdma/rdma_netlink.h
-index 4356ec4a..e5b8b065 100644
---- a/rdma/include/uapi/rdma/rdma_netlink.h
-+++ b/rdma/include/uapi/rdma/rdma_netlink.h
-@@ -604,6 +604,11 @@ enum rdma_nldev_attr {
- 	RDMA_NLDEV_ATTR_FRMR_POOL_PINNED_HANDLES,	/* u32 */
- 	RDMA_NLDEV_ATTR_FRMR_POOL_KEY_KERNEL_VENDOR_KEY,	/* u64 */
- 
-+	/*
-+	 * Resource summary entry maximum value.
-+	 */
-+	RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX,		/* u64 */
-+
- 	/*
- 	 * Always the end
- 	 */
-diff --git a/rdma/res.c b/rdma/res.c
-index 062f0007..046935e2 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -55,7 +55,26 @@ static int res_print_summary(struct nlattr **tb)
- 
- 		name = mnl_attr_get_str(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_NAME]);
- 		curr = mnl_attr_get_u64(nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
--		res_print_u64(name, curr, nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		if (nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]) {
-+			uint64_t max;
-+			char max_name[64];
-+
-+			max = mnl_attr_get_u64(
-+				nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX]);
-+			snprintf(max_name, sizeof(max_name), "%s-max", name);
-+			print_u64(PRINT_JSON, name, NULL, curr);
-+			print_u64(PRINT_JSON, max_name, NULL, max);
-+			if (!is_json_context()) {
-+				char buf[64];
-+
-+				snprintf(buf, sizeof(buf), "%s %" PRIu64 "/%" PRIu64 " ",
-+					 name, curr, max);
-+				pr_out("%s", buf);
-+			}
-+		} else {
-+			res_print_u64(name, curr,
-+				      nla_line[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_CURR]);
-+		}
- 	}
- 	return 0;
- }
-diff --git a/rdma/utils.c b/rdma/utils.c
-index 87003b2c..90ea1c55 100644
---- a/rdma/utils.c
-+++ b/rdma/utils.c
-@@ -480,6 +480,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
- 	[RDMA_NLDEV_ATTR_EVENT_TYPE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_SYS_ATTR_MONITOR_MODE] = MNL_TYPE_U8,
- 	[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED] = MNL_TYPE_U8,
-+	[RDMA_NLDEV_ATTR_RES_SUMMARY_ENTRY_MAX] = MNL_TYPE_U64,
- };
- 
- static int rd_attr_check(const struct nlattr *attr, int *typep)
--- 
-2.43.0
-
+> ...
+> 
+Thanks for your feedback.
 
