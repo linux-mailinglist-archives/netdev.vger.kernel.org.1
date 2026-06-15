@@ -1,55 +1,99 @@
-Return-Path: <netdev+bounces-299591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299595-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ijh1Jp9XMGqHRwUAu9opvQ
-	(envelope-from <netdev+bounces-299591-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:50:55 +0200
+	id ob/dBN1XMGqWRwUAu9opvQ
+	(envelope-from <netdev+bounces-299595-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:51:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C6A0689940
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:50:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3C3689970
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:51:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=fGUYKvVo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299591-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299591-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=LHiU+i0v;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299595-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299595-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EE34F3015C10
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:50:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C4C83010BDE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80DA3B6366;
-	Mon, 15 Jun 2026 19:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AAB3B531A;
+	Mon, 15 Jun 2026 19:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCA83B530D
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84363B4EAA
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:51:12 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781553037; cv=none; b=QIIQRVENFjwbWdwM3cLS2aoVKMs+u1XkhGTwD6ftCpz07S43ZtkKl7dWYSYlKHAR+Iy1NeeCroArTrrlrHPWyAh88WjG5+3B9uIqNSST38MRfHmPDr0odG8gsQdNgkVaCWUVqI7EOjFYJi17/7WNJ25xsQcoOH9Vjo4rpY46NE8=
+	t=1781553074; cv=none; b=PkIiJejUs0gi1mC8UQQUO/KkAW2EoxJEEvaf5oBEA+caHqhvzemFe7yDT6dVeTVcV5jYbHTv743GCSLRBGeMIi9l7cQM4sNqdYE80VoK8YUGKhgZuZVtmdXX9qIZB5qxMa0CCAY0seXVG1XyhuDD96s6h8gm8uqyenPgWxiZIdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781553037; c=relaxed/simple;
-	bh=26TukVbLG29rKT/ZGTbe03pFiFw9n88YYkgOf86J+0U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bz2zB+IgXlGKUxwvLws6JHsiZr7Kpj1yelV5ImwxUvkmA1efW3T7AxpXCQvBTouL0ynW9GR/m5p/lDt8JsoAepzhdPu+eI/pXnAyGwLI+WbuvV7aXlWLVw2Sgh7OqIbgqxah5hX9VtLUY88tbR0E1AS35Z5mLdYmh2i6+pYW0oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGUYKvVo; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82BCB1F000E9;
-	Mon, 15 Jun 2026 19:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781553036;
-	bh=Y9XOi9qTrmbwbiT8v+AtP/gm0n9V1iHHZRKPg8j/3K4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=fGUYKvVoayRxwytGWq6Z4+FtcJawYR18i82H38zDVJ2LPaUiaK7DOy2GmAFTl6Q+o
-	 NLlvwxe9ZvZWZiX+BpQOTqGWcgpjWDtd1VgljcQGPaJ81xPDO/pSG1HZUoU1EDOLGT
-	 xlgbW8bc+4eBPOLHYkkqBFZcptSZaxmAMFJTYOxG411PI895MIrXmStSrYq9r8o8VF
-	 HPn4FEd4A15vh0vQjv0iZRSwX9lXpII68oI55nAjTicUrKNtvv5KrqWto5BEAOZUru
-	 47u8qGsQYiKcuWXqN0spjD+D12spCwEzyzEb03tTtvuvG9mk+a3p0/hfsoVRok42u8
-	 nG3X3oBw93YLw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A0B3839A06;
-	Mon, 15 Jun 2026 19:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781553074; c=relaxed/simple;
+	bh=uOByGr4vblK9B20Aq+PsLQex9gmyDLYAbOyz1m5A/po=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=WdWoRAZFnG5ArBRARvKiTpdkySumF4d6TVJJlQSXF1lq1/qk3ILfjTCmNWQGuZXyo2NPq6BkjbJin2HbKtWQ181q/0i5i/R8xXc7OqoEwki0mq23SanujYBgLfTM6bmMICsQU09+2Ocp01zvskwJ5/S+ZW8mY+C+GU8PBLDy5T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHiU+i0v; arc=none smtp.client-ip=209.85.214.175
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2c0aa420401so27783505ad.3
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781553072; x=1782157872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zbfwy+N51pnPP3dCRs58iA2OlGOjosl6R8dDok6B7Dc=;
+        b=LHiU+i0vkUWSFh2FCqJXLW65/zd59RiY2l5K8/acrNrXOIwnq/ETwwEhkqsbPhchel
+         1eUFfRcWSHqYShNTMd+2l8T5BeQWgX8CS3E3vz0BZd2cKQpklUbtvRu6Xyvd2gnhv3Bk
+         5GfdJ1JZMq8FKckq4azZ6mh6z/Rim1kXxS8zIlIRyk1op6N6hqGpPGnVumbvgpJ8aYfo
+         OTp2HnbxkS/bqKrY/1mR9Jp3KGtC71+TixzxhkCStuOhd7xIpw8kjqarHPykC0qZxk5t
+         keV8SKkeaTj+E6LlsLMkXd7ax+B6D8plTGSgibduoUSOSBk76wxA4RNS7CLpRj5weL5v
+         UMfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781553072; x=1782157872;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zbfwy+N51pnPP3dCRs58iA2OlGOjosl6R8dDok6B7Dc=;
+        b=SxI8ZTDDnodmMcS71117rtXRdwX8wT6jnLUHheSB9r22wR6VcWKt/eo0fOCZQ4ORXI
+         +d2tMoQONPm2LiVxDHkGpSEgs+Qgb+AbW7YxDUeAjzaiO39hQ8pb3ToXuSiterbz4VKg
+         EctxhgHHn2+jjJbGYhHUGOMzYo9VVagUyUG3CBCnun1afSlRg+IefFimr8ufVbySHU1V
+         v0FPnSPG39ysUfilviZ2b23bACtCFSCPowt3Ql8y3y1JvbfTZDCEJd9Z67iIscJJKk0q
+         pJYGG4AnIgyciot0YQjxhx1oRasj7a52DQsCdLiAkZyyziLY1tpzTp4XzTj+GzuF8v1f
+         F90w==
+X-Forwarded-Encrypted: i=1; AFNElJ+SFKi7U1mglOh+iRw8eWo2al01AK3yUfvesl49Yc8w2bGvKoWHkgM3/KgXtQk9yRGDm9MZ/IU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT6b2gwEKGV0p2HitXIhUW21FFUQwJDUArXLdc1/LH/Mj8VrFV
+	OmY2XyVJY7LWXXOl3uk4ApnoEKj11hLYBZ//F8lDKXiWfY9/zLhpFYt4
+X-Gm-Gg: Acq92OFD0A5NduoH36Y19aQmBGcXd3OCC9wjkv5dEfUmSmMBCrj8lru5sUc9onU1UbW
+	Nb62L8xiyxl3vpYketh9Vpx97vLs0EU0/Spi7mYSuFK3oh9noqBmr5Mu09Fi8BFZE6GXO+oegsB
+	5jIjU+TDa/sv5jyyZrG8G3XiaQmby9Rsp+GpsgXFh0PrwQ3QC/de306VIIFMYsGHsnyN6JwHGgk
+	VO/idqgWofz/qVCzQKM2fGbG/ymTCv+i/sMJo/1ViB5nSzufcEWJkIW8VMEAULOp0b878mu5atw
+	6A+z0yzEz3HbsJJ2eH26JTJrK9UR9xsJYkoINR0rjGC9APSZTBx8fmKLqPsbq7Z+K2lbBqtFOco
+	Izbhk2Ahx+wuwByoITTS6MkoS7LKcdvK1ZDld3vDHmxpS72qasvbxjub9n1QsJzqK4wSXmH/G7v
+	wQpuxQ1KXTgNGp0bWTB7NFL2JMwQuLxc/KyCFo13t3TxpGl15SxnWOx0u6p8IAFPemWcVadB2V
+X-Received: by 2002:a17:903:944:b0:2c4:608:167c with SMTP id d9443c01a7336-2c410cd152emr164854215ad.6.1781553072069;
+        Mon, 15 Jun 2026 12:51:12 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c42f2e5644sm113307285ad.4.2026.06.15.12.51.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 12:51:11 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: Wells Lu <wellslutw@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH net v2 1/2] net: ethernet: sunplus: spl2sw: fix phy_node refcount leak in remove
+Date: Tue, 16 Jun 2026 01:20:31 +0530
+Message-Id: <f3bdd4c91f3e2269b4e256075f9dc70808b1b8e9.1781552725.git.shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1781552725.git.shitalkumar.gandhi@cambiumnetworks.com>
+References: <cover.1781552725.git.shitalkumar.gandhi@cambiumnetworks.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,89 +101,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next 0/5] ipv4: fib: Remove RTNL in
- fib_net_exit_batch().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178155303138.269508.18385193981213232628.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 19:50:31 +0000
-References: <20260612063225.455191-1-kuniyu@google.com>
-In-Reply-To: <20260612063225.455191-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuni1840@gmail.com, netdev@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299591-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:kuniyu@google.com,m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:wellslutw@gmail.com,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:shitalkumar.gandhi@cambiumnetworks.com,s:lists@lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299595-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shitalgandhi45@gmail.com,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cambiumnetworks.com:mid,cambiumnetworks.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6C6A0689940
+X-Rspamd-Queue-Id: DC3C3689970
 
-Hello:
+mac->phy_node is acquired via of_parse_phandle() in spl2sw_probe() and
+stored in the mac private data, transferring ownership of the
+device_node reference to mac. On driver removal, spl2sw_phy_remove()
+disconnects the PHY but never drops that reference, so each
+probe-then-remove cycle leaks one of_node refcount per port permanently.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Drop the reference after phy_disconnect(). While at it, remove the
+redundant inner "if (ndev)" check; comm->ndev[i] was just verified
+non-NULL on the line above.
 
-On Fri, 12 Jun 2026 06:32:03 +0000 you wrote:
-> Currently, we flush all IPv4 routes at ->exit_batch() during
-> netns dismantle, which requires an extra RTNL.
-> 
-> IPv4 routes are not added from the fast path unlike IPv6, so
-> we can flush routes before default_device_exit_batch().
-> 
-> However, there is implicit ordering between ip_fib_net_exit()
-> and default_device_exit_batch().
-> 
-> [...]
+Compile-tested only; no SP7021 hardware available.
 
-Here is the summary with links:
-  - [v1,net-next,1/5] ipv4: fib: Flush all fib_info in fib_table_flush() during netns dismantle.
-    https://git.kernel.org/netdev/net-next/c/64587e936b65
-  - [v1,net-next,2/5] ipv4: fib: Call fib_proc_exit() and nl_fib_lookup_exit() at ->pre_exit().
-    https://git.kernel.org/netdev/net-next/c/c993bd0102aa
-  - [v1,net-next,3/5] ipv4: fib: Free net->ipv4.{fib_table_hash,notifier_ops} without RTNL.
-    https://git.kernel.org/netdev/net-next/c/49374d87e839
-  - [v1,net-next,4/5] ipv4: fib: Avoid calling fib_trie_table() in fib_new_table() for dying net.
-    https://git.kernel.org/netdev/net-next/c/5a7fef12d931
-  - [v1,net-next,5/5] ipv4: fib: Convert fib_net_exit_batch() to ->exit_rtnl().
-    https://git.kernel.org/netdev/net-next/c/759923cf03b0
+Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+---
+ drivers/net/ethernet/sunplus/spl2sw_phy.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_phy.c b/drivers/net/ethernet/sunplus/spl2sw_phy.c
+index 6f899e48f51d..a4889c52e00e 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_phy.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_phy.c
+@@ -79,12 +79,14 @@ int spl2sw_phy_connect(struct spl2sw_common *comm)
+ void spl2sw_phy_remove(struct spl2sw_common *comm)
+ {
+ 	struct net_device *ndev;
++	struct spl2sw_mac *mac;
+ 	int i;
+ 
+ 	for (i = 0; i < MAX_NETDEV_NUM; i++)
+ 		if (comm->ndev[i]) {
+ 			ndev = comm->ndev[i];
+-			if (ndev)
+-				phy_disconnect(ndev->phydev);
++			mac = netdev_priv(ndev);
++			phy_disconnect(ndev->phydev);
++			of_node_put(mac->phy_node);
+ 		}
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
