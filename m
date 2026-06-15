@@ -1,184 +1,117 @@
-Return-Path: <netdev+bounces-299513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299514-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Lt+LIcIdMGrSNwUAu9opvQ
-	(envelope-from <netdev+bounces-299513-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:44:02 +0200
+	id oh3TB/AfMGqKOQUAu9opvQ
+	(envelope-from <netdev+bounces-299514-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:53:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAEE7687D25
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:44:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97666687EC9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:53:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=uB0bp6M3;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299513-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299513-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=DN50c2KJ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299514-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299514-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 869DC30B3B58
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:40:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C57F03065BF6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255434071E9;
-	Mon, 15 Jun 2026 15:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1280B4071C5;
+	Mon, 15 Jun 2026 15:47:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C471940863D
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 15:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54733AA4ED;
+	Mon, 15 Jun 2026 15:47:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781537992; cv=none; b=B6SFD72IYyl+7etwNM1htQxXBk99rIBgcMDxvcwlwl5yCJ/b9poVPnD4lAprTj/WxxLquUZJCqAR62BOBeoxsJHwJ59n0GjhT06fimhicLcs3Y7O0vhzRa5mNOGRwAekutC8I+uiXFYU/+lRJQzUym5r8CtYB43uariDI+tSwDU=
+	t=1781538444; cv=none; b=MuQX+pSLwMxHVgX4HLwv3CEAWpojFQUH0l/K2EE2aXfWsacpWPuu+YNgJvjrinVmTjukecr9Lmy3iQsJoFqyOilBBNtJbhLBkqfjBfCVJO0L75jSDbREzUquufKxIf0uyusyHUzWW8bGQa9jpSLGkrTGV5F89iQjblEmifUQNrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781537992; c=relaxed/simple;
-	bh=JOtbpi4SADCvpSm0vUIE0JvMOiz8jnz8Ujtk1N4yVxI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=for8qYj1kHBpaAh+8YOEAPYJdlJcZQgkl97kEaCMjzh1FZcP6bScwi9V7lq+0wEP3ZeSeqdmCydu8g4txIQE4h1YyBsoXuYY7BmaydYfrlPgXG/jQFHkJQyXtNvgTiL+Zi43LUhmsPG9lGjLD503p5isbtN+1Am4bWuk/GeImNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=uB0bp6M3; arc=none smtp.client-ip=185.246.84.56
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 56C281A3938;
-	Mon, 15 Jun 2026 15:39:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2A55060015;
-	Mon, 15 Jun 2026 15:39:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6DBF0106C971E;
-	Mon, 15 Jun 2026 17:39:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781537988; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=aKGCdkLhQi+Dlzkgpitf7PCsr2EJXcuWkaJEATQz8n4=;
-	b=uB0bp6M3FJSrYF21lNfKKnob2OIIdFgrhvaXenyO3+sN63XOWwcTXpGuQ7ATDrZOvX5f1X
-	36SEWu/3Q71blMoAnJJ6/Ng0dY1LWK4qqyGrexar+8I50rCpTeaYPbN4jWm+PP5UZmISU0
-	Gne8Uo0YYYt0iwCIG9F6Dvts5KtW+IFBhUQSWUNgQN5f/cV6lXv30CJy5PVFj4u26+/Klg
-	2Z/DK9wjc5Tc1fbSQ+KudW1lQTPiy0gobP/o6qZKSOvgPrLkTcloSyvQQCEhDkpSosIXK5
-	xDDXeESr8Rxxj9x1IkGoi/XzH6MwyLesCf/nptNA/E06Z6L35WBarhn73JUh0A==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Frank Wunderlich <frank.wunderlich@linux.dev>
-Subject: [PATCH net-next v12 10/10] Documentation: networking: Update the phy_port infrastructure description
-Date: Mon, 15 Jun 2026 17:39:06 +0200
-Message-ID: <20260615153907.862987-11-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260615153907.862987-1-maxime.chevallier@bootlin.com>
-References: <20260615153907.862987-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1781538444; c=relaxed/simple;
+	bh=ODPoqvUZvmQ0lvE4hImQyI+r1CdbyQtfWgdW9JBM1UA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LqyVtsZ8Caf8gLFR0Xda0g9KMM/SFNvAjPAoLO/Z7YHO+zTWYIFR2q2jUuTMzmpKcZAYAZjTUhUW0STtdk2E1MtvU0Ti4Kh77Sp/r5hTy6e/O7PUdnPQjjoYGd0Vlx3cneOnTiZcNHdPbjNbhVTyaqFRDXoHa7kue3qnvgltWGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DN50c2KJ; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=J4Dxmbmydt3VIHFZ27EBOzcW64ZoZHqTVSYTx4qzqME=; b=DN50c2KJi/eNRsABmuGas8AhF6
+	1iFReYKgAkeXDyIayNjuqIZfVO3FZEX0vyxBWjcJw1FKSeYhqREftIVUOv6gEEEdSRXLzRu66YqSY
+	VsvToT3kVXv1brXyoDTI+jTT6hrcIJKj35hRQ+KhgQE/k2t5nBx738Na2TvxSIxPjKaQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wZ9Wg-007pLf-5S; Mon, 15 Jun 2026 17:47:02 +0200
+Date: Mon, 15 Jun 2026 17:47:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: javen <javen_xu@realsil.com.cn>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	freddy_gu@realsil.com.cn, nb@tipi-net.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, daniel@makrotopia.org,
+	vladimir.oltean@nxp.com
+Subject: Re: [PATCH net-next v5 2/4] net: phy: c45: add
+ genphy_c45_config_master_slave()
+Message-ID: <4893389e-e945-40df-b706-dfb53853c8ad@lunn.ch>
+References: <20260615090817.429-1-javen_xu@realsil.com.cn>
+ <20260615090817.429-3-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260615090817.429-3-javen_xu@realsil.com.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299513-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299514-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:andrew@lunn.ch,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:linux@armlinux.org.uk,m:hkallweit1@gmail.com,m:maxime.chevallier@bootlin.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:thomas.petazzoni@bootlin.com,m:christophe.leroy@csgroup.eu,m:herve.codina@bootlin.com,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:kory.maincent@bootlin.com,m:kabel@kernel.org,m:o.rempel@pengutronix.de,m:nicveronese@gmail.com,m:horms@kernel.org,m:mwojtas@chromium.org,m:romain.gantois@bootlin.com,m:daniel@makrotopia.org,m:dimitri.fedrau@liebherr.com,m:frank.wunderlich@linux.dev,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de,vger.kernel.org,makrotopia.org,nxp.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS(0.00)[m:javen_xu@realsil.com.cn,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com,linux.dev];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,realsil.com.cn:email,vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,lunn.ch:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EAEE7687D25
+X-Rspamd-Queue-Id: 97666687EC9
 
-With SFP now properly supported with phy_port, add some details in the
-documentation. Fix a typo along the way (driver -> driven).
+On Mon, Jun 15, 2026 at 05:08:14PM +0800, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> Add a generic helper to configure forced master/slave mode for Clause 45
+> PHYs using the 10GBASE-T AN control register.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- Documentation/networking/phy-port.rst | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/Documentation/networking/phy-port.rst b/Documentation/networking/phy-port.rst
-index 6e28d9094bce..73ea06db0fd9 100644
---- a/Documentation/networking/phy-port.rst
-+++ b/Documentation/networking/phy-port.rst
-@@ -99,13 +99,29 @@ will eventually be able to report its own ksettings::
-             (_____)-----| Port |
-                         +------+
- 
-+SFP ports
-+=========
-+
-+SFP interfaces involve 2 distinct components, each represented by
-+a :c:type:`struct phy_port <phy_port>` instance :
-+
-+ - The SFP cage itself is a :c:type:`struct phy_port <phy_port>`. It's special
-+   in that it's not an MDI interface, but rather a hot-pluggable MII.
-+   The :c:type:`struct phy_port <phy_port>` associated to it lists the different
-+   MII interfaces we can use on the cage.
-+
-+ - The SFP module, when inserted, will also be associated to a
-+   :c:type:`struct phy_port <phy_port>`, that represents the various linkmodes
-+   that it gives access to. The module's :c:type:`struct phy_port <phy_port>`
-+   doesn't supersedes the cage's port, it references it through
-+   the :c:type:`struct phy_port <phy_port>`. :c:member:`upstream_port` field.
-+
- Next steps
- ==========
- 
--As of writing this documentation, only ports controlled by PHY devices are
--supported. The next steps will be to add the Netlink API to expose these
--to userspace and add support for raw ports (controlled by some firmware, and directly
--managed by the NIC driver).
-+As of writing this documentation, the port's presence and information can only
-+be queried, and it's not possible to change any of the port's settings or select
-+which one should be used.
- 
- Another parallel task is the introduction of a MII muxing framework to allow the
--control of non-PHY driver multi-port setups.
-+control of non-PHY driven multi-port setups.
--- 
-2.54.0
-
+    Andrew
 
