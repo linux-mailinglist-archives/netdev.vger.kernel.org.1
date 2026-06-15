@@ -1,64 +1,72 @@
-Return-Path: <netdev+bounces-299630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299631-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SDWcOpJ0MGrZTAUAu9opvQ
-	(envelope-from <netdev+bounces-299630-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:54:26 +0200
+	id Di+0MG51MGrvTAUAu9opvQ
+	(envelope-from <netdev+bounces-299631-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:58:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7BB68A3C7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:54:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B2268A3F6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:58:06 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dsrDoBPq;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299630-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299630-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=dzy+gkH2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299631-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299631-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1964F3010BE2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:54:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 135BE307604D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E21D3A6B6F;
-	Mon, 15 Jun 2026 21:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857F83B585D;
+	Mon, 15 Jun 2026 21:58:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A832D97AA;
-	Mon, 15 Jun 2026 21:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74011319852;
+	Mon, 15 Jun 2026 21:57:59 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781560464; cv=none; b=fjdfMSPEKgxrnhR8elABfW+aBJhxKbCWMiqFRigOoDMLoQRubqK6K/v5Et1qaP6fszdKKoOQxEOiNRYgW0JynNy/0SfIl/pWgzqipPk3U3Rss1vP8l8MEbaHIvi68vdS41ci0MZ413s0ETho3OvuHlRH5UIXBt9qLlTu1mCEfgA=
+	t=1781560680; cv=none; b=egBj2TAc+gr+ZXeT/MZfL8O/4i7HbfxOetuY76c+4xsMeAi2ofklZm6bj3JjsU6uo6edsd438vjsiW2g9T+J1LcLtDlv9jv2qkiBWQdvgswMobuZ0euWSNYoIdTokRdwMp7mT1ugZFwtI6+AgrA4lSUJuV2186Y/D/qavMKd3t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781560464; c=relaxed/simple;
-	bh=dGUZgZKDHQu9OM7SGJzTWBBy12hBRxcPvhvbvmNirYc=;
+	s=arc-20240116; t=1781560680; c=relaxed/simple;
+	bh=9kivlZtZbuO0VOVybcXe6QAws9Mmpg58aOrzAFKx2q4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qU4XpvSm7fdyMyhQIQvIC6xfuznGWqNnljIpnqqjB8NbMCb8viVoe1JVjcWO9LJCjWWf2g1KFB0LveZ5Z63pThJWqKaAKDhoeumAUr1dhi8ZD78GDzPXvP+Yf6zeodiPws2aqyk5ptLhd+aRrbs7HAVQhnfca5oBxfjshuwVrtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsrDoBPq; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3FD41F000E9;
-	Mon, 15 Jun 2026 21:54:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bRlqGfvVw8j+NiL6HVx9REwOnke52BElw9+mehh+Nn7Ifx+3yPNLW7tVGAj59UZpw1ePfmoctPZX2FCYnvoBewEWJ8L0phuGETwZZU28o5L1F7KZQO/3gMaYFhHR36DYxKeCZwkV5HyTvywl4LuYJ88o2sQdgH3n8K1GEX3lj4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dzy+gkH2; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16521F000E9;
+	Mon, 15 Jun 2026 21:57:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781560463;
-	bh=lYDGmaekj1IBJIPvLpQzQ7ZfcvZY46l4TfM8ED1ZMi8=;
+	s=k20260515; t=1781560679;
+	bh=ZybuVlKws8hgVhXg4VsJD/g+orod/d6HM3+PwcKNxVk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dsrDoBPqKbV7auOhykYfRrzEIIb464xnRsqpIKusGDWBRgMQjy371AJyNUQn+xXHM
-	 iOQ1cEh8UN6MXCFJdkBLpoYNfgC4tbZ3lx5QpNY8dmSkxiA3ZoykwrrK27w/Xl3lZ8
-	 63FJ7IacF7HtgpBO/fHooEXsqV610Xq3qL84ELvlSnUXKL7vw6UFMRNp4rGSpzmGcL
-	 Ed01owCAIeGZCiD8Q9xM2LPe4xTQIRFo16dFEQbu5LBe7GVkSKtXrYe9fnrgUc5sEi
-	 K796Hp1774HE0A7CGRTrCPF1/y/9eGoDWb+9MW75VChX4qXBK+pmHyF5dsZWS+1iLX
-	 tavvi66i2mYlQ==
-Date: Mon, 15 Jun 2026 14:54:22 -0700
+	b=dzy+gkH2/qCX8JT+F7lkPuVsTM3L6UsLZ8D86wt4w/t6ROOeQ11iGwlemG01ax3k7
+	 I3lQv0qdtOM1xOIsd0YpO4wl5CvwzYMNHZSErzo2fTighoGj5SutfOdQTlr56nMSQ6
+	 K+dfaC1nJCANxJPr33HAAvJ5VnWXGtjXlvRLS1iQNDran5OiR1w0NBBg8EfQCAckBt
+	 rbMdrrfKi6CkZO6yfDSmwrWLnPmUTQ2m8VUg4Tq6aajwW45eYznRqiZ7gIK68YKq8j
+	 CTusxYMFdNGCTFdoRamtFeGmiXeZb+n3ZrL3WA535cracAT9NMx4hhvzlCuRLPgGkq
+	 ej+6PFkFapxTw==
+Date: Mon, 15 Jun 2026 14:57:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "illusion.wang" <illusion.wang@nebula-matrix.com>
-Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
- sam.chen@nebula-matrix.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
- corbet@lwn.net, horms@kernel.org, linux-doc@vger.kernel.org,
- pabeni@redhat.com, vadim.fedorenko@linux.dev, lukas.bulwahn@redhat.com,
- edumazet@google.com, enelsonmoore@gmail.com, skhan@linuxfoundation.org,
- hkallweit1@gmail.com, linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH v18 net-next 00/11] nbl driver for Nebulamatrix NICs
-Message-ID: <20260615145422.0bb17248@kernel.org>
-In-Reply-To: <20260611044916.2383-1-illusion.wang@nebula-matrix.com>
-References: <20260611044916.2383-1-illusion.wang@nebula-matrix.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Gerd Hoffmann <kraxel@redhat.com>, Vivek Kasireddy
+ <vivek.kasireddy@intel.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org,
+ sdf@fomichev.me, razor@blackwall.org, daniel@iogearbox.net,
+ almasrymina@google.com, matttbe@kernel.org, skhawaja@google.com,
+ dw@davidwei.uk, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v3 2/4] udmabuf: emit one sg entry per pinned
+ folio
+Message-ID: <20260615145757.0b2ddcf3@kernel.org>
+In-Reply-To: <20260612-tcpdm-large-niovs-v3-2-a3b693e76fcb@meta.com>
+References: <20260612-tcpdm-large-niovs-v3-0-a3b693e76fcb@meta.com>
+	<20260612-tcpdm-large-niovs-v3-2-a3b693e76fcb@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,23 +81,24 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299630-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:illusion.wang@nebula-matrix.com,m:dimon.zhao@nebula-matrix.com,m:alvin.wang@nebula-matrix.com,m:sam.chen@nebula-matrix.com,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:corbet@lwn.net,m:horms@kernel.org,m:linux-doc@vger.kernel.org,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:lukas.bulwahn@redhat.com,m:edumazet@google.com,m:enelsonmoore@gmail.com,m:skhan@linuxfoundation.org,m:hkallweit1@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[nebula-matrix.com,vger.kernel.org,lunn.ch,lwn.net,kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299631-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:donald.hunter@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:vivek.kasireddy@intel.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,intel.com,linaro.org,amd.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -99,23 +108,22 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B7BB68A3C7
+X-Rspamd-Queue-Id: 24B2268A3F6
 
-On Thu, 11 Jun 2026 12:48:59 +0800 illusion.wang wrote:
-> This patch series represents the first phase. We plan to integrate it in
-> two phases: the first phase covers mailbox and chip configuration,
-> while the second phase involves net dev configuration.
-> Together, they will provide basic PF-based Ethernet port transmission and
-> reception capabilities.
+On Fri, 12 Jun 2026 09:25:58 -0700 Bobby Eshleman wrote:
+> dma_map_sgtable() does not always merge contiguous pages for us, so we
+> do this internally before exporting.
+> 
+> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> ---
+>  drivers/dma-buf/udmabuf.c 
 
-7.1 has been tagged and the merge window for 7.2 has started.
-It's a bit late to be adding drivers, so please repost this
-after 7.2-rc1 has been tagged and net-next re-opened:
-https://netdev.bots.linux.dev/net-next.html
+This will need at the very least an ack from DMABUF maintainers,
+so it's a bit late to consider it for 7.2
 -- 
-pw-bot: cr
+pw-bot: defer
 
