@@ -1,227 +1,367 @@
-Return-Path: <netdev+bounces-299650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299651-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hsyeDIWFMGpbUAUAu9opvQ
-	(envelope-from <netdev+bounces-299650-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:06:45 +0200
+	id XMSRCCOHMGqTUAUAu9opvQ
+	(envelope-from <netdev+bounces-299651-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:13:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DF668A87B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:06:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E4C68A8D5
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:13:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=networkplumber-org.20251104.gappssmtp.com header.s=20251104 header.b=mda5SHVl;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299650-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299650-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=networkplumber.org (policy=none);
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="DuDfk/gv";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299651-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299651-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4BBC4301D32E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:06:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F3D3230BB9A8
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 23:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719D53BBFA8;
-	Mon, 15 Jun 2026 23:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0363BED55;
+	Mon, 15 Jun 2026 23:10:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D713AEB2C
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 23:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1553BED08;
+	Mon, 15 Jun 2026 23:10:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781564802; cv=none; b=prFcNpJKo3IE6jg+b+90E8i5hbBJzbGETMixPMCXGaY7QK/QKrGIrCbzDjUU6ljm3Ujumvf9YsmSk4aYaNR52/dh3daLVyEt6n7ZNXspxkyiLihMkC6jPini6BFgcBF+aMh7fa3BnVXY/wU4DBodUxO6+iZADGrrdEqs7bcqrPI=
+	t=1781565043; cv=none; b=paO36tHCfN2lcVEaJme3p3tJnYiBaobf+fFDuz2sHcQ7Pz6OtSkyxCnaTIfYF0hfvmhboPAo0bvb9aN6iHTTi8UeSUn2ljWp3LCT9pPBe6ibXSInJLb+p5Byd+twxOI5UqBjHGZLuvkjRFxrXwD/DT8TGcWtdadeBoOVyNo0m/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781564802; c=relaxed/simple;
-	bh=IcstL6x8+tOsaHFNpd470Yp9K2WSrQVkfu9lGsT3Tbo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=JJxLrKy3v3GoflIru9o3xydSYsNk0fsEzZPucWVIKUcSCI0Q1UdnA6lUxYl+AHPiYRvKTa5pG44WjzGbYGpmkr374UJf9QHp/xlQf2T8RPh1xK9xsm58DueTKDptjtK6+cWGsPfA/3Jm9JQsZOmwaI0vgr2fyFfyDlPNPLUkf5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=mda5SHVl; arc=none smtp.client-ip=74.125.82.170
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-304cf518c9dso6269409eec.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 16:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1781564800; x=1782169600; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r2TlrQllXy7Veio/slo2VFQ94w4OxnfYK/WQGKcvMVw=;
-        b=mda5SHVlliWo0YmiPk4//1fIQ8BwqZspPN29OfhK/9OiZnrB9BhvOIqc7hRBlqPPJn
-         PMcGvjyeS3UQV77vhq8qoyxrhy9zOBGtUQ/UZx/GuqLpddSZ4jr8jvCSU5et4b03t4N5
-         nT6W1E9Zn09DVegZ+ptGYqbk/V0V+StbUHT6arYJ4ohpukL/yVq9cQir46x0O24AvWuw
-         lLL6RNvdz/kf4DQcc+bQtMhValRNpvwUr1U7JAPmDqCBstXMaTqX6LNwivM7ZWW7TBLc
-         v0YAegv/c0dR50JJ+DaWSuWxLCJBtgMmjAQ05sB2qPFbgc/YVUJwF2dzwVCrMCLsBeiU
-         RQLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781564800; x=1782169600;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r2TlrQllXy7Veio/slo2VFQ94w4OxnfYK/WQGKcvMVw=;
-        b=sQ9A/q5lkB8SQitF3VKEHtPV5YKJIyLZLm8aAUBJqCesRSnReOnmkooWXHbbbPewmo
-         +9IEclc6JFSIfcoAd/18PFs60d2arz3AXoTHi9ZF9CbDao+SHrBCfxC6mC9HvONddqUq
-         sP2pvzj4//sSCAw4kA8OAPKmX6yoLfSotF+T1KfL7P9iibPkMcOQK5qxCFfjYwDdsy4C
-         U9xtzOPpBfnLfmynu10C9kwfjZo+CWpN9eSuxKxXtMqKM1ZiPXGquwxm3yL/+QHVLcSi
-         8pZatk7yMqOxTU0ISMjXv8ZLvqV4m2hgdQbXBVtG5doa4U4DjvXhbEPh0wXwAv31KbdR
-         0gsA==
-X-Gm-Message-State: AOJu0Yz2tDojPUvx4AkwDLOldPpmMH6wWy47ZXVRcEMLDkFV/adOmzuc
-	w3MJdjlhv6XghaG7XV4ZiamCDw3/jYMQ+sD3xsTstBtTjp3Qur+2gKWO6ndXWGoyEfFE31iu5yr
-	RNKxD
-X-Gm-Gg: Acq92OG7Nqkjj9FKnWZx0cELPvWY4+q0ymNZcrFlUo3/qYH5OHJry4p6jNbVPUsNmaH
-	SynkISbQZ8QnHlmMBHKC7HKF6EQDL4XndXSEh++4dyrR8yrqx/y/ckkgruXystulBATp87MBC1k
-	7ULole3AOpqigtpBOLBHHXt0tjcfawT8/eunqMx3BlnEuf8/M24Ej+2UQPrvjHudg7QA6OmQfbd
-	cJ4HZStdN0nmxtKcZJBwrhjlfBNOg1SwtNF4C/k1r4Qzc/60+2KfKe/DEPxQf3pyL2W3rhf5zlK
-	P8+1bc0DZ+GGQO50tg3YdxH5b6/xpDRVRg3LOMrv/elu+/Yd6B7S3HuDHaZGphhoQtl/fPJz1yt
-	GMU58Owvwbb+MXgVRQySm0Xtsu7YsiNYI/UA/QieRqzGtMC9aCvNl56L28F2bs1K4DB2k1xpcCV
-	9dEV3jbHuvdQHqWNAe6BBrUAqz2kXvwwaf2W6ZY0PJD1Kisc0C2I3pJ228B95JPkcs
-X-Received: by 2002:a05:7300:4350:b0:2be:7fc2:fc38 with SMTP id 5a478bee46e88-3093551a511mr6941345eec.5.1781564799802;
-        Mon, 15 Jun 2026 16:06:39 -0700 (PDT)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081e91fb97sm17328256eec.14.2026.06.15.16.06.39
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 16:06:39 -0700 (PDT)
-Date: Mon, 15 Jun 2026 16:06:36 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 7.1 release
-Message-ID: <20260615160636.412a064e@phoenix.local>
+	s=arc-20240116; t=1781565043; c=relaxed/simple;
+	bh=X8rqJlmljf51avYJ03ZFHhN8xwFAPibelchGe9jtPdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HnqcqCxtoJVWLPedvYA3QoLtFu9vowuPg/55fuYZeO05045LZB771+bZ8J9Jt9efCZfHdn9dW3hd6kmjxtBUpH0YvNsAIgYaBU+3u4BqtxcTH4QRdtecZw3QFk1hyOoIDmm/SvRbHRPvB9yr4gGlD/04ib0BSX29M47UruO6LGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DuDfk/gv; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD8B1F000E9;
+	Mon, 15 Jun 2026 23:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781565041;
+	bh=n4uN4a+y3crJut6rAVc3LTXhazxwmnD/VCILUOEYgd0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=DuDfk/gvnd105SzD9wRBWKGcWHJIyNL3tOmAn6RNlOZjwnkusKwDrax4xIKVEd5Kk
+	 PjGldRPZjP9eeX9prImoHHmQ86Mc+T3TuI+FcdARBg/+7wxapEWU07PrlDIoo/+8+/
+	 s6WCwc90ugDaabWXHwifZcGTjlxbYGpCSuLrdVL6Ar4skFZxT4Zf7bp3iHXpa4TvxE
+	 +ahGL0kWQ9BFza4M94H/fQMI3I4PIPXp8pyW/eUSLfh6b0dQySAIJb8uIvnoNJ3IVu
+	 rwXmpnumXDhKB9vSqaDw6ZgfUR5Ltv63Qqn0sa88yGbG5rxo7HVNu5F7smGWwQZhZ7
+	 kzWFMBkNcPHrA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: m-malladi@ti.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	elfring@users.sourceforge.net,
+	haokexin@gmail.com,
+	vadim.fedorenko@linux.dev,
+	devnexen@gmail.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	arnd@arndb.de,
+	basharath@couthit.com,
+	afd@ti.com,
+	parvathi@couthit.com,
+	vladimir.oltean@nxp.com,
+	rogerq@kernel.org,
+	danishanwar@ti.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	srk@ti.com,
+	vigneshr@ti.com
+Subject: Re: [PATCH net-next v7 1/2] net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
+Date: Mon, 15 Jun 2026 16:10:38 -0700
+Message-ID: <20260615231038.1007389-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260610052511.781752-2-m-malladi@ti.com>
+References: <20260610052511.781752-2-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-299650-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299651-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	RCPT_COUNT_ONE(0.00)[1];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:m-malladi@ti.com,m:kuba@kernel.org,m:elfring@users.sourceforge.net,m:haokexin@gmail.com,m:vadim.fedorenko@linux.dev,m:devnexen@gmail.com,m:horms@kernel.org,m:jacob.e.keller@intel.com,m:arnd@arndb.de,m:basharath@couthit.com,m:afd@ti.com,m:parvathi@couthit.com,m:vladimir.oltean@nxp.com,m:rogerq@kernel.org,m:danishanwar@ti.com,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:srk@ti.com,m:vigneshr@ti.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,users.sourceforge.net,gmail.com,linux.dev,intel.com,arndb.de,couthit.com,ti.com,nxp.com,redhat.com,google.com,davemloft.net,lunn.ch,lists.infradead.org,vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[phoenix.local:mid,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,networkplumber-org.20251104.gappssmtp.com:dkim,networkplumber.org:from_mime]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 68DF668A87B
+X-Rspamd-Queue-Id: 74E4C68A8D5
 
-This is the regular release of iproute2 corresponding to the 7.1 kernel.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net: ti: icssg-prueth: Add Frame Preemption MAC Merge support
 
-The main theme this cycle is wider JSON output coverage. Victor
-Nogueira added JSON support to the HFSC, QFQ, and multiq
-qdiscs. Matthieu Baerts added JSON to the timestamp helper and MPTCP
-monitor, and Vitaly Grinberg changed dpll monitor mode to send one
-object per event in JSON.
+This patch adds QoS infrastructure for Frame Preemption (FPE) in the
+ICSSG Ethernet driver, including a verify state machine driver helper,
+mqprio-based preemptible-tc mapping, and a link-state callback. A
+follow-up patch in this series wires this up to ethtool's MAC Merge ops.
 
-The dpll command saw the most feature work. Petr Oros added
-client-side filtering for device and pin show, including filtering
-pins by parent-device, parent-pin, direction, and state, and aligned
-the help and man page notation with the actual option parsing. Ivan
-Vecera fixed several man page correctness issues.
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -392,6 +392,8 @@ static void emac_adjust_link(struct net_device *ndev)
+>  		} else {
+>  			icssg_set_port_state(emac, ICSSG_EMAC_PORT_DISABLE);
+>  		}
+> +
+> +		icssg_qos_link_state_update(ndev);
+>  	}
 
-Michael Guralnik added FRMR pools support to rdma, with a show command
-and set commands for aging and pinned, aligned to the merged kernel
-UAPI. Ioana Lazea enabled 64-bit burst values for tc-tbf and
-tc-htb. Eric Dumazet added support for TCP delack timers to ss and
-forced a flush in monitor mode.
+[Medium]
+emac_adjust_link() sets emac->link = 0 before reaching this call. Inside
+icssg_qos_link_state_update() -> icssg_iet_change_preemptible_tcs() ->
+icssg_config_ietfpe(), the very first check is:
 
-Smaller changes: Justin Iurman added seg6 tunsrc support in lwtunnel
-with updated encap documentation; Matthieu Baerts made MPTCP stream
-closure uniform; Hangbin Liu added actor and partner churn state to
-bond slave output; Jiri Pirko showed the devlink instance index in dev
-output and added an mnl_attr_get_uint() fallback; and the obsolete
-hamradio protocols were removed. Kernel headers were refreshed by
-David Ahern.
+    if (!emac->link) {
+            netdev_dbg(ndev, "cannot change IET/FPE state ... \n");
+            return 0;
+    }
 
-One behavior change worth noting for packagers and scripters: 
-libnetlink now flushes stdout only in monitor mode, pairing with the ss monitor flush change.
+so on a link-down the IET path returns early without clearing
+iet->fpe_active or iet->verify_status, even though firmware has already
+been told ICSSG_EMAC_PORT_DISABLE just above. After the follow-up patch
+adds get_mm(), would ethtool then report stale tx_active=true and a
+stale verify_status while the link is down?
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-7.1.0.tar.gz
+The commit message states:
 
-Repository for current release:
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+    Verify state machine re-triggers on link up/down events based on
+    fpe_enabled and fpe_active flags
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+Is the link-down half of that contract implemented anywhere?
 
-David Ahern (3):
-      Update kernel headers
-      Update kernel headers
-      Update kernel headers
+[Medium]
+A related question on the locking design: emac->link is written here by
+emac_adjust_link() without taking iet->fpe_lock, but icssg_config_ietfpe()
+reads emac->link inside the fpe_lock-held critical section. The lockset
+for writers and readers is disjoint, so fpe_lock does not actually
+serialize emac->link.
 
-Eric Dumazet (2):
-      ss: add support for TCP delack timers
-      ss: force a flush in monitor mode
+Can the following interleaving occur?
 
-Hangbin Liu (1):
-      iplink: bond_slave: print actor and partner churn state
+  CPU0 (ndo_setup_tc)               CPU1 (emac_adjust_link)
+  mutex_lock(&iet->fpe_lock);
+  reads emac->link == 1
+                                     emac->link = 0;
+                                     icssg_set_port_state(... DISABLE);
+  proceeds to write FPE regs
+  and issue PREMPT_TX_ENABLE
+  mutex_unlock(&iet->fpe_lock);
+                                     icssg_qos_link_state_update();
+                                       sees emac->link == 0, returns
 
-Ioana Lazea (2):
-      tc/tbf: enable use of 64 bit burst
-      tc/htb: enable use of 64 bit burst
+leaving stale FPE writes on a port the firmware has just disabled? The
+commit message says "fpe_lock serializes all FPE state mutations" but
+emac->link is one of those mutations and is not covered.
 
-Ivan Vecera (1):
-      dpll: fix man page correctness issues
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+> new file mode 100644
+> --- /dev/null
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+> @@ -0,0 +1,282 @@
 
-Jiri Pirko (2):
-      mnl: add fallback implementation for mnl_attr_get_uint()
-      devlink: show devlink instance index in dev output
+[ ... ]
 
-Justin Iurman (2):
-      seg6: add tunsrc support in iproute_lwtunnel
-      man8: update seg6 encap documentation
+> +static int icssg_iet_verify_wait(struct prueth_emac *emac)
+> +{
+> +	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
+> +	struct prueth_qos_iet *iet = &emac->qos.iet;
+> +	unsigned long delay_us, timeout_us;
+> +	u32 status;
+> +	int ret;
+> +
+> +	delay_us = iet->verify_time_ms * 1000;
+> +	timeout_us = delay_us * ICSSG_IET_VERIFY_ATTEMPTS;
+> +
+> +	ret = readb_poll_timeout(config + PRE_EMPTION_VERIFY_STATUS,
+> +				 status,
+> +				 status == ICSSG_IETFPE_STATE_SUCCEEDED,
+> +				 delay_us,
+> +				 timeout_us);
+> +
+> +	iet->verify_status = status;
+> +	return ret;
+> +}
 
-Matthieu Baerts (NGI0) (3):
-      mptcp: uniform stream closure
-      utils: timestamp: add JSON support
-      mptcp: monitor: add JSON support
+[High]
+With ICSSG_IET_MAX_VERIFY_TIME = 128 and ICSSG_IET_VERIFY_ATTEMPTS = 3,
+this can sleep for up to 384ms while iet->fpe_lock is held. fpe_lock is
+acquired by icssg_iet_change_preemptible_tcs() from two paths:
 
-Michael Guralnik (5):
-      rdma: Update headers
-      rdma: Add resource FRMR pools show command
-      rdma: Add FRMR pools set aging command
-      rdma: Add FRMR pools set pinned command
-      rdma: Align FRMR pool UAPI names with merged kernel UAPI
+  - emac_tc_setup_mqprio() via .ndo_setup_tc, called with RTNL held.
+  - icssg_qos_link_state_update() from emac_adjust_link(), invoked by
+    phylib with phydev->lock held (prueth_emac_common_start()
+    explicitly does mutex_lock(phydev->lock) before calling
+    emac_adjust_link).
 
-Petr Oros (5):
-      dpll: add client-side filtering for device show
-      dpll: add client-side filtering for pin show
-      dpll: add pin filtering by parent-device and parent-pin
-      dpll: add direction and state filtering for pin show
-      dpll: align help and man notation with actual option parsing
+Once the follow-up patch wires set_mm() to write iet->mac_verify_configure,
+this sleep becomes reachable from any user with CAP_NET_ADMIN. Should
+the verify wait be deferred to a workqueue or a completion driven by a
+firmware notification rather than block under RTNL / phydev->lock for
+hundreds of milliseconds? Other drivers with MAC Merge support
+(e.g. fec, stmmac) take the deferred-work approach for the same reason.
 
-Stephen Hemminger (4):
-      uapi: update to 7.1-rc1
-      remove hamradio protocols
-      libnetlink: flush stdout only in monitor mode
-      v7.1.0
+[Low]
+The condition only breaks on ICSSG_IETFPE_STATE_SUCCEEDED, but the enum
+also defines a distinct ICSSG_IETFPE_STATE_FAILED value reported by
+firmware on a definitive verify failure. With the current condition,
+would a FAILED state cause the loop to keep polling for the entire
+timeout and then surface as:
 
-Victor Nogueira (3):
-      tc: Add JSON output support to HFSC
-      tc: Add JSON output support to QFQ
-      tc: Add JSON output support to multiq
+    netdev_err(ndev, "MAC Verification failed with timeout\n");
 
-Vitaly Grinberg (1):
-      dpll: Send object per event in JSON monitor mode
+even though it was not actually a timeout? Could the cond also break on
+FAILED so the caller can distinguish the two?
 
+> +int icssg_config_ietfpe(struct net_device *ndev, bool enable)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
+> +	struct prueth_qos_iet *iet = &emac->qos.iet;
+> +	int ret;
+> +	u8 val;
+> +
+> +	lockdep_assert_held(&iet->fpe_lock);
+> +
+> +	if (!emac->link) {
+> +		netdev_dbg(ndev, "cannot change IET/FPE state when interface is down\n");
+> +		return 0;
+> +	}
+
+[ ... ]
+
+> +	if (enable && iet->mac_verify_configure) {
+> +		ret = icssg_iet_verify_wait(emac);
+> +		if (ret) {
+> +			netdev_err(ndev, "MAC Verification failed with timeout\n");
+> +			goto disable_tx;
+> +		}
+> +	} else if (enable) {
+> +		/* Give firmware some time to update
+> +		 * PRE_EMPTION_ACTIVE_TX state
+> +		 */
+> +		usleep_range(100, 200);
+> +	}
+> +
+> +	if (enable) {
+> +		val = readb(config + PRE_EMPTION_ACTIVE_TX);
+> +		if (val != 1) {
+> +			netdev_err(ndev,
+> +				   "Firmware fails to activate IET/FPE\n");
+> +			ret = -EIO;
+> +			goto disable_tx;
+> +		}
+> +		iet->fpe_active = true;
+> +	} else {
+> +		iet->fpe_active = false;
+> +	}
+> +
+> +	icssg_iet_set_preempt_mask(emac);
+> +	netdev_dbg(ndev, "IET FPE %s successfully\n",
+> +		   str_enable_disable(enable));
+> +	return 0;
+> +
+> +disable_tx:
+> +	icssg_set_port_state(emac, ICSSG_EMAC_PORT_PREMPT_TX_DISABLE);
+> +fallback:
+> +	writeb(0, config + PRE_EMPTION_ENABLE_TX);
+> +	writeb(0, config + PRE_EMPTION_ENABLE_VERIFY);
+> +	iet->verify_status = ICSSG_IETFPE_STATE_DISABLED;
+> +	iet->fpe_active =  false;
+> +	return ret;
+> +}
+
+[Medium]
+icssg_set_port_state() only synchronizes the R30 command-done handshake;
+it does not guarantee firmware has finished updating the
+PRE_EMPTION_ACTIVE_TX status byte. Is a 100-200us sleep a documented
+worst-case latency for firmware to publish that byte under load
+(concurrent Rx, TAS, FDB ageing, link events)?
+
+If the byte has not yet been written, this code returns -EIO,
+mischaracterizing it as "Firmware fails to activate IET/FPE", and the
+fallback path then writes PRE_EMPTION_ENABLE_TX = 0, defeating the
+user's enable. icssg_iet_verify_wait() already uses
+readb_poll_timeout() for an analogous status byte; could the same
+pattern be applied here with a small millisecond-range timeout?
+
+[Medium]
+The success path always calls icssg_iet_set_preempt_mask(), and on
+fpe_active=false that helper takes the reset_hw branch and clears all
+per-queue BIT(4) preemptive markers. The disable_tx and fallback paths
+do not call icssg_iet_set_preempt_mask().
+
+If FPE was previously active (so EXPRESS_PRE_EMPTIVE_Q_MAP[i] = BIT(4)
+on some queues) and a subsequent reconfigure fails (verify timeout, or
+PRE_EMPTION_ACTIVE_TX != 1), the failure paths only clear
+PRE_EMPTION_ENABLE_TX / PRE_EMPTION_ENABLE_VERIFY but leave the
+per-queue map and the EXPRESS_PRE_EMPTIVE_Q_MASK with stale preemptive
+bits. Should the failure paths also call icssg_iet_set_preempt_mask()
+(after iet->fpe_active is set to false) to keep the queue map and the
+TX-enable bit consistent?
+
+[ ... ]
+
+> +EXPORT_SYMBOL_GPL(icssg_qos_init);
+
+[ ... ]
+
+> +EXPORT_SYMBOL_GPL(icssg_qos_ndo_setup_tc);
+
+[ ... ]
+
+> +EXPORT_SYMBOL_GPL(icssg_qos_link_state_update);
+
+[Low]
+Per the Makefile change in this patch:
+
+  icssg-y := icssg/icssg_common.o \
+             ...
+             icssg/icssg_ethtool.o \
+             icssg/icssg_qos.o
+
+icssg_qos.o is linked into the same icssg.ko module as the only callers
+(icssg_prueth.c and icssg_common.c). Are there cross-module consumers
+that need these symbols exported, or can the EXPORT_SYMBOL_GPL lines be
+dropped since EXPORT_SYMBOL_GPL is only required for cross-module
+linkage?
+-- 
+pw-bot: cr
 
