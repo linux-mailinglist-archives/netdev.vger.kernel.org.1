@@ -1,160 +1,181 @@
-Return-Path: <netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299355-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kESAChWvL2r+EQUAu9opvQ
-	(envelope-from <netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:51:49 +0200
+	id fzRfCpuvL2oXEgUAu9opvQ
+	(envelope-from <netdev+bounces-299355-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:54:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC82684530
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:51:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CE4684577
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:54:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linutronix.de header.s=2020 header.b=r31U4Y69;
-	dkim=pass header.d=linutronix.de header.s=2020e header.b=fZrsm2y6;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299354-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linutronix.de;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=google.com header.s=20251104 header.b=l9YKQTdG;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299355-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299355-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 896EB3018AD3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:49:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E50A93003713
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 07:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC90279DC8;
-	Mon, 15 Jun 2026 07:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C46F31F9BD;
+	Mon, 15 Jun 2026 07:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06E1846A
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:49:42 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781509784; cv=none; b=hlvSxrRDYn2UovP7pRRZIkWmYl9xVAfdnF0rFiMHm/10ITKjuv5oXJuy8MYBGKzdgNDygCM3b/Xo+YT8nK1xI1Cxvr1aGtH1yeeWyJ6G2KijDHhGWSI58SV0aP3u4YSvTlnPuPT1PsXZCbl4dxE8pNWsx1HDGzZzPFEmsM4bGF4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781509784; c=relaxed/simple;
-	bh=c4JJMwSnvfimUOxJOCW2AajwGbpZVEmZqHtp8aFRfR0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=roJpBhvTP4tM8L9Avlw8yH1QkYaXjXr5YOvVnXVeR7oT1Goc9fV+6znlNN/STQ0L9zPRnrZUADysSfMKp/nL4QKfKvhOditb/Jc4AalHuTmEyZIw8hHcsSdBDd76PiD8tLnS9m95t8iRAE7pc/ucG70OQerrwpJxW0doRQuwZL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=r31U4Y69; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fZrsm2y6; arc=none smtp.client-ip=193.142.43.55
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1781509781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o0tZ+vl0/oVDDbMO2Jy34aMtjK8zKupQMv0TXrkr5hs=;
-	b=r31U4Y69rCu0Z3pPRyorUok3sUV15r6BC11GiUJLhqSda8Sl26klGe50s6rKJbzFJIy7by
-	DGppGsl9pDNn8ahXONFznNVDaFcrjFBwGL1QIiXK6vxcNAbgpu1N7aYz5j2MlaWMOYqIRI
-	WgtfqpnH4AWfCpwacacLPZXHHqOhprN/jKwzaP8iq3GMH9w6+cAMGPuAfqfPrDAjM6M+G+
-	8pVRZas97HL+wLSxWsH0SIfGVkchjGqnXmeR6dcrKTHOGEwo0C2nKiFgRUTgcPLQLJiwcm
-	B0tEgy7bVRX0n9wCPhRX9kGjWIdoXWIKSSxDXT8S/qWzpxoA+yhCE0Uy5VPoEA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1781509781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o0tZ+vl0/oVDDbMO2Jy34aMtjK8zKupQMv0TXrkr5hs=;
-	b=fZrsm2y6/Lom7XpFP23zlO/qZc6UihB7+BHq4zcz1AyVyjDPYy+0O7S5AqxRI1CMM+iK2O
-	kRZ9av8VR6jBlDBA==
-To: Jakub Kicinski <kuba@kernel.org>, anthony.l.nguyen@intel.com
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- ade@amicon.ru, dima.ruinskiy@intel.com, jacob.e.keller@intel.com,
- dish@amicon.ru, avigailx.dahan@intel.com
-Subject: Re: [PATCH net-next 06/15] igb: Retrieve Tx timestamp from BH
- workqueue
-In-Reply-To: <20260613164306.567d1cc6@kernel.org>
-References: <20260609213559.178657-7-anthony.l.nguyen@intel.com>
- <20260612095742.662653-3-horms@kernel.org>
- <20260613164306.567d1cc6@kernel.org>
-Date: Mon, 15 Jun 2026 09:49:40 +0200
-Message-ID: <87zf0wi6p7.fsf@jax.kurt.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FD225228D
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:53:55 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781510036; cv=pass; b=Ad9P2GgzxofpOFT91OSjrFzhyd0xhOQEKK58vWcT252GW7BswJyOtwNvqBhnSrVc7OGgWkrICnNGqbJO2sZQ/2cWpFCuRzZPxKxbCtOKXWcrn1KUH1sMNMTHy4GGCfnwQXUdEGyBFyheHSjv8/ONcJK/uph5K+cK1yLbjoORpjA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781510036; c=relaxed/simple;
+	bh=iqFN/tpX3q6tjB+xBeLewyCE5xHFkLdK34oVqtX0Nhc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KAoP6iUqujXvUYODXlcsUxKtnZKW+kAVwlov/RAkl1/y9VvFbf5XLziVrVmN2RvGhQE0hqzDC/WTewkiQ/Fo+Gpu8R1hz9jUVflDTqeO+coU/2e6Gy34WPhOcMsJOsxIiy28b9F9LOd1ggWXrvIbyk2Olku0sFSFdTcMlSEzuPU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l9YKQTdG; arc=pass smtp.client-ip=209.85.160.174
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-5177945a279so35276091cf.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 00:53:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781510034; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WITQKexDy2gfqLZscXp9CTN2QIEGOsKviktwO8BMl3V1ITPDNZom8bgLArP00/QyAN
+         eZ60RBhvO1ldKe79YM4ojja87YZg+oBEyt28cG4BER881Jl0cD5vNONoCfvi+ceKF4Cy
+         PpnVyZ/EdQuKFx29EojiMg+WHPgBcVJSv7TNqyUBuoZu5JFeUpnZpQaJvP38OkIUu3Mi
+         Ob5wUc+Iu/svM2TgkMGBLbWt4oKcHCnKAJZNPcphFZlQUXFmXMuFa27CHRSYRE0+SJgZ
+         vVGTLj3S90DrIdJ2LK1rNbo3T8CkSt/jtolGEGV14utCYZF+q8o4gS/KOjFV7avnk2eP
+         TwQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iqFN/tpX3q6tjB+xBeLewyCE5xHFkLdK34oVqtX0Nhc=;
+        fh=SAqqgTtWgTJrk/fd1I84jJAJLiPqwqIO4/c+Hmz8xpE=;
+        b=WkEv/CNiHR0VnQFU7vPanXe1UmeR71t2VeYlJAhlh/Extr2qonkX9etzcDWqsiSNtY
+         yiOObvHMx7wqtZ5xuB1p6hs6GegxFkyAi+ojvewFwizMR883ql4Fd7OyVzc6U8HTxwqH
+         jd6D15pqnaNEtg8QkvX5cXzVx9YcGoDWEBauO37qphJ6fieDXMg0rCvMLvo/M10xvnFQ
+         mOhj0CzMk8s8LC8QnsJEVe3Thq6Vi1k453Akr/P3tUnhymZp7IV0ezW3mDNYs2V+/Btr
+         f0xgH0GOcdcOvhtLN4Uec6/gdxS4snHq5Csq0S0BslO7pyqyxGn6PXv3ZzYFwIw0EIsx
+         J42w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781510034; x=1782114834; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iqFN/tpX3q6tjB+xBeLewyCE5xHFkLdK34oVqtX0Nhc=;
+        b=l9YKQTdG3x1smj6vp/0l5hkxo3XPeQMAdQVGZLvjynH9W6E/U9d7Sau5FTKakNndZw
+         odZxtXovROUwNQf3lpl4Av4+XWOVNoTxpWs1BYpQ0jN6LTcIBqyWulzjRUNUrovuVWoa
+         rL0blNbJ3yG1iJkN8SUC5v6pujfbCxK21EGqcfQerBfCn9paZo495fWCHtojZMrBTWDB
+         3aY1t36Rnb1H+D84pXGJUKfIYY4gN7x3h+yyni4eEuqqXWOhbsPXQ7Sl/YaEdzhtX8Ix
+         zFiEDVphVLc10KFCiRKFbki048K14Uaa6o3dCocknAejF+iqOkwGfQGQ50tNAiQktrd/
+         8p5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781510034; x=1782114834;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iqFN/tpX3q6tjB+xBeLewyCE5xHFkLdK34oVqtX0Nhc=;
+        b=a8mU4dHfCfWzAPneuC8Wo2N8ZHl0l+qQx4AvKrnUhy/4asU5kH/cQJRz3OEMFz3hcV
+         Z9j8Rtfsw04is5Z+RlfihNtZtQjdqneY8cPojcdhSPM3ybGs9URU9B0yHScDhsN0d1xu
+         o1lHiH1D0r8f1Ibau37ZiA34Rjz3q862A6nGXqEux6XRP5ybJ5yrM0ZngGm8zZ3XnN2M
+         ohjjRpn78J7NA59XgA6vk1KX+TnZEotx/bcQmshPozBzxCzAJRzKnxY5TKvv/MO9xdT9
+         RTFRedN8SnozgkWiHzs4fqFYDVyHgd84pEOSKDFirEpAwANk81dxDRjVgdF3XLNtxETB
+         2qpA==
+X-Forwarded-Encrypted: i=1; AFNElJ9RDtcFkUzZIzssHaPizxhukSaQzltZg6xW7Z65emT78G1/F9S3N2y50c1amUKa4BNlsrAsabU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywp3+XyubMqxhj8F5OsZ8mn3fAZ9CmgtQCmTq24dt9/vrQQkH6W
+	Dqs/VOdddWw5VlSghK/nJpp4N9wbZ5ohC+ZVfFFR+UdD9rNvEtJRKqed1Os3nBPt1cwQ/fKs/dV
+	1sLenJILgCUQh5GBwx4lpten0K1f8Q28oS6I25DN6
+X-Gm-Gg: Acq92OFOmIrkTYLW96BRSnk/Pv/lknM/vudRqWw8LPS/6YYPVixCbGfOZXQkteU6bxQ
+	IB/w/hoCwPnHMv/n4rQrpl2EBOeNHsott9dDQu/OYNLgBRDWaXqGqLzt5EkgBHJ8b8Ye7WGoj8/
+	jTjkKGvZ+brURTGgSU9oB2t+KXCwdeNviP5Z6UR2Gj9MHGeR/hRZsdrbca7HL9NZQ6+/XsQ1A01
+	lnqnz9ZxedDxsr+sDiNkULZUU0ISZHfrilNoLJ22zFzW/P19nsvjqwPboXGiIgGte7KUUctzH2M
+	+r3UMq88HWwO2iEtcqYgV8g/y2duVFValiAmSol6kaChN1b1XXt/h+HCuNi6GWcRapPCIdM021x
+	IZayVYY4fYJqhCtvI++SKeJK0ydTVhA==
+X-Received: by 2002:a05:622a:4245:b0:519:75f9:e874 with SMTP id
+ d75a77b69052e-51976ed6934mr28436331cf.10.1781510034038; Mon, 15 Jun 2026
+ 00:53:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	MAILLIST(-0.15)[generic];
-	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299354-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:anthony.l.nguyen@intel.com,m:horms@kernel.org,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:netdev@vger.kernel.org,m:ade@amicon.ru,m:dima.ruinskiy@intel.com,m:jacob.e.keller@intel.com,m:dish@amicon.ru,m:avigailx.dahan@intel.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kurt@linutronix.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jax.kurt.home:mid,vger.kernel.org:from_smtp]
-X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7FC82684530
-
---=-=-=
-Content-Type: text/plain
+References: <20260613042619.1108126-1-edumazet@google.com> <20260613101214.1771-1-hdanton@sina.com>
+In-Reply-To: <20260613101214.1771-1-hdanton@sina.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 15 Jun 2026 00:53:42 -0700
+X-Gm-Features: AVVi8Cf6uGM8M8DJH4c64JCDlR5PdeR2re5zLcOyooPl5X-inb2su2lIUzphgfc
+Message-ID: <CANn89iJq89KWm3eyfKTqjXhdKFy6raRLgfsRX8vXYgBpmBnDiA@mail.gmail.com>
+Subject: Re: [PATCH] nbd: Reclassify sockets to avoid lockdep circular dependency
+To: Hillf Danton <hdanton@sina.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
+	syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299355-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:hdanton@sina.com,m:linux-kernel@vger.kernel.org,m:axboe@kernel.dk,m:linux-block@vger.kernel.org,m:nbd@other.debian.org,m:kuniyu@google.com,m:netdev@vger.kernel.org,m:syzbot+607cdcf978b3e79da878@syzkaller.appspotmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[sina.com];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev,607cdcf978b3e79da878];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid,sina.com:email]
+X-Rspamd-Server: lfdr
+X-Rspamd-Queue-Id: 20CE4684577
 
-On Sat Jun 13 2026, Jakub Kicinski wrote:
-> On Fri, 12 Jun 2026 10:57:44 +0100 Simon Horman wrote:
->> >  		/* reschedule to check later */
->> > -		schedule_work(&adapter->ptp_tx_work);
->> > +		queue_work(system_bh_wq, &adapter->ptp_tx_work);=20=20
->>=20
->> [Severity: High]
->> If the hardware timestamp is not yet valid, won't this work item
->> unconditionally reschedule itself to system_bh_wq without delay?=20
+On Sat, Jun 13, 2026 at 3:12=E2=80=AFAM Hillf Danton <hdanton@sina.com> wro=
+te:
 >
-> This sounds correct, the patch is basically busy polling from a tasklet.
-> BH workqueue is not just another work queue.
+> On Sat, 13 Jun 2026 04:26:19 +0000 Eric Dumazet wrote:
+> > syzbot reported a possible circular locking dependency in udp_sendmsg()
+> > where fs_reclaim can be triggered while holding sk_lock, and fs_reclaim
+> > can eventually depend on another sk_lock (e.g., if NBD is used for swap
+> > or writeback and NBD uses TLS/TCP which acquires sk_lock).
+> >
+> > Since the UDP socket and the NBD TCP/TLS socket are different, this is =
+a
+> > false positive. Fix this by reclassifying NBD sockets to a separate loc=
+k
+> > class when they are added to the NBD device.
+> >
+> > This is similar to what nvme-tcp and other network block devices do.
+> >
+> > Fixes: ffa1e7ada456 ("block: Make request_queue lockdep splats show up =
+earlier")
+>
+> Given the Fixes tag, can you specify anything wrong that commit added?
 
-Indeed, thanks for the report. Please, drop this patch for now. I'll get
-an Intel 82576 NIC and see how this can be fixed.
+Nothing 'wrong'.
 
-Thanks,
-Kurt
+This (good) commit allowed LOCKDEP to throw a warning and eventually
+panic the box.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmovrpQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgkpuD/92xM3i+Fmq8JLdBqzZVzhHHPjT0qMP
-zHPePSbTGvLiUfr+fFg8HU9N5nsmlzuvpvvvbK56DCGFOoqLccjyGjgKnNrr3b3N
-IG+0P7icchqSgcYRoqDw12aaTaBjd3zfIktFp6L2qw3StsvHumhShqNUNeQAWxC3
-3JRHcHxRbs7AFdOXXrHEx0Z3u8KnM2vuaeiIcISe9MHCjeYPXQhVXIF5skDybpbI
-37uaQm3wR1ToL4++e7zS3ZhhPEobo7xJx/EmFis7tzQmwAUwHRVNyKH0u5/LfPCu
-y/H1mJbxNbLy2zP/yg2jSesiF+oVp2F0piCr0QNNUeAO1wdeLlzpgquxflE0md8f
-O6qTO0AWBOwsAR6spb4yT62lYh1bNdmdA8jM6cBSUVX9V2nPVYEDFQgvCmZlRX+f
-puKil1ipeKL+3uqeqtL1Mlj0AcsC+Jx4KP5r1fQvT4U1AhdV4gYuLHXnRhlrCJze
-SvsEuh6KwZYvf27xVrQBGOqR8TzxbYn7JbZlUEqVZzT5t9F20UOwVc3vltmsI7zc
-UsatOAioPuMzZVArZE6BFEAC/4kr19W1RGEMMe0TJJzMrdt+6iuOWFfwLWVN+jcS
-43mi1j6pgCzN4J/L3uWADQxWkihDjsZ5qaBDsII0Wx7yDWHbLfk5XivD96PFOqoo
-piGpJnDU9r2LLQ==
-=gmO8
------END PGP SIGNATURE-----
---=-=-=--
+A Fixes: tag does not imply the patch was wrong.
 
