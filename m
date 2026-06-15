@@ -1,164 +1,263 @@
-Return-Path: <netdev+bounces-299409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id G3oeBZ7lL2rCIgUAu9opvQ
-	(envelope-from <netdev+bounces-299409-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:44:30 +0200
+	id b3tqAEfmL2rRIgUAu9opvQ
+	(envelope-from <netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:47:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98619685C9D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:44:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E9685CD1
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:47:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=tipi-net.de header.s=dkim header.b=n4eepFDb;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299409-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299409-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=fail ("headers rsa verify failed") header.d=0sec.ai header.s=google header.b=mhpO0K3H;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299410-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 117CF3008261
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:44:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4650330131DE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B1A3E4C90;
-	Mon, 15 Jun 2026 11:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ABB379C33;
+	Mon, 15 Jun 2026 11:46:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C081D3E5578;
-	Mon, 15 Jun 2026 11:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3440191F98
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 11:46:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781523867; cv=none; b=CZwcBlL+GxB/RxRwSyvPxek8ppcpMrETis5m3/J4dHNaxA1VoRZqeQJtVslrx4Nn/K6VKzUmJxrpUQu8NUEI0xEh1XjHiDAD/nc0OlYnlgK5em1+T08WwjixYrlOSdCuPIqsxE1dOZl710IIosN1tJHX5ZotbNDjqZ0vGKNy0gE=
+	t=1781523986; cv=none; b=CrDVOZ5xxGooiMxvTc4fIt+3hOpVaWNMSuXCg5Bstu/+zcGiuHokvrAD8CjOI7fyWnV6EKO84Zl9IuBwDN2L354poP3Y2w0fOCzyYVAhiHVLLsPViG8hRxuTli8/bQN6XKLYqV0d8qeg1gveMo8dSN0PxjefjwLj/PL7dioWxS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781523867; c=relaxed/simple;
-	bh=QzEQ8bmQRcac/cdT+HGYuruEQVR11ZuItIOQrzpOmVk=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=UJPCeDPFPg1v8MdXLVG61jjDLYWGDUVuFLrMZ3bwmsA7VPQTtmdvmq3Z3EpWOPi11FxQhSfoXb0y5bQFIKkBhf1zLaVXxaGQb6YRLeA71woupFKZbAZLzciLXLCEyr2znaRtwu5HWbQM3YY3WRGjqY1LntCrkaH5+yzM9pciplg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=n4eepFDb; arc=none smtp.client-ip=194.13.80.246
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3E6E2A4B51;
-	Mon, 15 Jun 2026 13:35:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1781523360; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=vcQo2gA7ahzyNWTX7sbWOasW0OaO/03aDK6BDJtgCBk=;
-	b=n4eepFDbySOqpEaPs8y8xch/b32ovHXoy6YC2tV9ekCiWvfOekjgnSr4rEwqVfIvDp5Ana
-	/IRJCL9kQIJrHbxs0K4ChL6KMN4pvhbddP+4GcfIIR11WbDIt0O34YKY8T1I8fPhUWcJHZ
-	zEIBA6dtw+3C0wTCSj5yECmORAI97gQn47kzkmdI0RRTi01oZgMaAX4kcqpCkGBPJiBRDV
-	NM/Crds8cV+K7wncHQ9II3yAEGIJyz9v4vS6bvg3dTki58dWDN+yZBm8dQFYTYcaoBTjuZ
-	XFTt/f/Vut7ZfzrwWMWHsblKTYWEzbNv4bZWo4/oxH51hcl7/Ea2BNf7aDG2Qg==
+	s=arc-20240116; t=1781523986; c=relaxed/simple;
+	bh=2bQGxVUZ9MTPf1QkyzYPrKWsuFsxCujrar5IyTh0Oi0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dWgeSkhjFrRikdvsgVGYc8SX79pyVLkcFjs67W5TrMxJ5K/BX43Th+XNPxSAuYkAIwWR0mVVmIp6ASYTjRA9A9ZgjNoaWumt07iY2STGUHRbuJ88jIjLpQydKQSz5AtdOTfDdWKTPDOf3NnG+5zx+c7fZ0rVx/tcMLLFQVRD2NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=mhpO0K3H; arc=none smtp.client-ip=209.85.128.47
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-490b3637b90so24396925e9.3
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 04:46:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0sec.ai; s=google; t=1781523983; x=1782128783; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1jEKzIBUOghNkvDTiM29+zsP3vkJkDD0mPoUSzkRcsQ=;
+        b=mhpO0K3HZ2ZSwmb6umjVEf6bbJFuKXL3cx3AszmYxxQZotchT41kuof7xar2hYwxvh
+         0l8zytrGOgthdJH0fj68NMIFHlQlmb5I7vUqHqU6XjAlQ18CaUOKWJBt/TGX4pTNdrFi
+         BfLUHN6KtEp7EqzfxFHQi+FHpGH+QE7MpDmrj9wq5TwYHHXegBZZ0DH3zr90fG8UeRHT
+         eWeUhEY6BC4nBC5Vn065Gw8Oiwpa/CU28iPsbhT8hfeb6zOwneyzEqgHaJyPKdYHUmPG
+         0VSGYJIdaTOVAFRqwBaZwpwS10Mbety/Qu/bfeyzIsLqo4NtRMf0bDwD9R27p/qaIfhA
+         BL4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781523983; x=1782128783;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1jEKzIBUOghNkvDTiM29+zsP3vkJkDD0mPoUSzkRcsQ=;
+        b=Ts2dJMp/xq5D4a2WpNoCO8x8UtirYAnJiigEhjZ/WcuDKLaRzFC/ETFCuWPqdgzivU
+         79nEx4Zw6ZQ1Vhqqkog9yHdhK8Th38qHMugQT9r+jyCl2o4+YXybfpF+n8gNnh+J+nrA
+         7fS9nF39Ctn/DtdBlq79f2yLfeoSsAzj9H8iPTA+6FlrSt2vaMYwKXvaGQ7/Wao7XCVf
+         dnjmGW049k/TTFDVhWlCRFiI/nIr5ngG/gxqZpGWYA2wqZPmjqV3SX7RYea9nomvdArj
+         ZCdx/uFLfPre7xpIRFKqG47G62mrGGMDEcLvNz+2f8oYYkKZAneR81G7Y61KCcAAYLNv
+         2NaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8h+LaBT+EwO3AwlbqUBcvIxg2miNmaXkeAvRWRs35TMoE/t6ohIFyiMbFrWUU1j/vFvBtpluo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywUxmPzqwKrHV8jBxCBoArzSfIpbJIzTSXdTa8FtjHmO9hxybn
+	wqreii/91eNmnnw0f3uvUeVvTUNGXl9v0WjdXeYZMfMFO3HDwHDmjn3SWXDX51h27ENm
+X-Gm-Gg: Acq92OFrCMMjl5is1Ce1LM9qB5VW2f1jPjsIwJw4qUmH+SK0TW1VdWmGiUcEbIrhjkp
+	d3JbJBYRdypSGfn39gxheREG2YFEF0R+Xwj91nETkL6tur7c4aTA15B1HVI4SsT9eWtnvdl1zYf
+	VC+ZEPgiYAXCmWpxwK+NRpvcqlWCDIlr0kw5uav029LS5fVKeZ5ODmUOrlkU+JfH0jAa9tIJ6Zz
+	wK00mGoTCjp+TcU5rmXc5y+WQCGugGBwPMZwbbOAwjggmwcQ6oAP2JQtCGMGxzAxzzffEvdywV8
+	CD4psWjZU6v0sTWI79vrT+HyRQuwnRmHDP4By8n6/BqOcMQIfxzD4XpKH7YbUvBEjPiYCia1RO3
+	OTSIdGepLdBVQXaImCQoa4RWqnCYkMoXK1y4S2fYY47a3h/dMwBzQIQ0aqIErokxFU4HxqoG0Wn
+	H80tk0kJwAIFui+W5m8UCe4eRVs9PnZ4TDDQyJUT0uxjGyHhN2FFt6Rh3m85RGhARCzQNBoUwFj
+	9KmqEO0yUxnaPb6Ib84oR00F2+8v7Ggg8xSjYiXM7Yefw==
+X-Received: by 2002:a7b:c017:0:b0:48e:6db3:ff2e with SMTP id 5b1f17b1804b1-49220093459mr95390895e9.15.1781523982724;
+        Mon, 15 Jun 2026 04:46:22 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.209])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49220207efesm212347605e9.0.2026.06.15.04.46.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 15 Jun 2026 04:46:21 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: jmaloy@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	aleksander.lobakin@intel.com,
+	tipc-discussion@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Doruk Tan Ozturk <doruk@0sec.ai>,
+	stable@vger.kernel.org
+Subject: [PATCH net v3] tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
+Date: Mon, 15 Jun 2026 13:46:18 +0200
+Message-ID: <20260615114618.71249-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 15 Jun 2026 13:35:57 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, bcm-kernel-feedback-list@broadcom.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Justin Chen <justin.chen@broadcom.com>, Ovidiu Panait
- <ovidiu.panait.rb@renesas.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] net: bcmgenet: collapse TX priority queues
-In-Reply-To: <20260613145745.36c5403e@kernel.org>
-References: <20260612205915.3156127-1-nb@tipi-net.de>
- <20260613145745.36c5403e@kernel.org>
-Message-ID: <59249267ef946bb39b647fb9cc816c98@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_DKIM_REJECT(1.00)[0sec.ai:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:justin.chen@broadcom.com,m:ovidiu.panait.rb@renesas.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-299409-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:doruk@0sec.ai,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	DMARC_NA(0.00)[0sec.ai];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299410-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
+	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,redhat.com,renesas.com,vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
+	RECEIVED_SPAMHAUS_PBL(0.00)[178.197.218.209:received];
+	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[0sec.ai:-];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 98619685C9D
+X-Rspamd-Queue-Id: 4A5E9685CD1
 
-Hi Jakub
+tipc_aead_decrypt() goes straight from tipc_bearer_hold(b) to
+crypto_aead_decrypt(req) without taking a reference on the netns, unlike
+the encrypt path. When crypto_aead_decrypt() is offloaded asynchronously
+(e.g. the SIMD aead wrapper queuing to cryptd), the cryptd worker runs
+tipc_aead_decrypt_done() later. If the bearer's netns is torn down in the
+meantime, cleanup_net() -> tipc_exit_net() -> tipc_crypto_stop() frees the
+per-netns tipc_crypto, and the completion then reads it:
+tipc_aead_decrypt_done() dereferences aead->crypto->stats and
+aead->crypto->net, and tipc_crypto_rcv_complete() dereferences
+aead->crypto->aead[] and the node table -- reading freed memory.
 
-On 13.6.2026 23:57, Jakub Kicinski wrote:
-> On Fri, 12 Jun 2026 22:59:12 +0200 Nicolai Buchwitz wrote:
->> Tested on Raspberry Pi CM4 (BCM2711):
->>   - Ovidiu's reproducer (iperf3 -u -b0 -P16 -t60) no longer trips
->>     NETDEV_WATCHDOG.
->>   - UDP sustains 956 Mbit/s line rate over 60 s with 0 datagrams
->>     lost (0/4952890).
->>   - Single-stream TCP throughput unchanged at 943 Mbit/s.
-> 
-> Of course it has no impact on a single TCP stream test, since TCP
-> stream can only use one queue. If anything it should help.
-> The testing here is not very convincing. At least install a realistic
-> qdisc (fq/fq_codel/cake) and run multi-stream test with multiple cores?
-> What's the CPU idle delta in such a test?
+Decoded KASAN splat (v7.1-rc7, CONFIG_KASAN_INLINE + TIPC + TIPC_CRYPTO):
 
-Fair. Tests I ran with fq_codel:
+  BUG: KASAN: slab-use-after-free in tipc_aead_decrypt_done (net/tipc/crypto.c:999)
+  Read of size 8 at addr ffff8881056258a8 by task kworker/u16:2/51
+  Workqueue: events_unbound
+  Call Trace:
+   tipc_aead_decrypt_done (net/tipc/crypto.c:999)
+   process_one_work (kernel/workqueue.c:3314)
+   worker_thread (kernel/workqueue.c:3397 kernel/workqueue.c:3478)
+   kthread (kernel/kthread.c:436)
+   ret_from_fork (arch/x86/kernel/process.c:158)
+   ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
 
-   # TCP
-   iperf3 -c <remote> -P 16
-   # UDP
-   iperf3 -c <remote> -u -b 1000M -P 16
-   # RR
-   iperf3 -c <remote> -t 60 &
-   netperf -H <remote> -t TCP_RR -l 30 -- -r 1,1
+  Allocated by task 169:
+   __kasan_kmalloc (mm/kasan/common.c:398 mm/kasan/common.c:415)
+   tipc_crypto_start (net/tipc/crypto.c:1502)
+   tipc_init_net (net/tipc/core.c:72)
+   ops_init (net/core/net_namespace.c:137)
+   setup_net (net/core/net_namespace.c:446)
+   copy_net_ns (net/core/net_namespace.c:579)
+   create_new_namespaces (kernel/nsproxy.c:132)
+   __x64_sys_unshare (kernel/fork.c:3316)
+   do_syscall_64 (arch/x86/entry/syscall_64.c:63)
+   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
 
-With the following results (all based on net-next with PP):
-                               PP       PP+WRR    PP+series
-   TCP -P16 Mbit/s               938       941        941
-   TCP retransmits             56228     57679      48606
-   UDP -b1000M -P16 Mbit/s       956       956        956
-   TCP_RR under TCP load       451.7     453.8      596.8
-   CPU idle                    91.55%   90.53%     90.97%
-   CPU0 softirq                32.6%    33.4%      33.5%
-   CPU1-3 idle (avg)           97.6%    97.7%      97.7%
+  Freed by task 8:
+   kfree (mm/slub.c:6566)
+   tipc_exit_net (net/tipc/core.c:119)
+   cleanup_net (net/core/net_namespace.c:704)
+   process_one_work (kernel/workqueue.c:3314)
+   kthread (kernel/kthread.c:436)
 
-So WRR fixes the watchdog issue, otherwise is within noise. This series
-adds ~31% TCP_RR under load and reduces retransmits by ~14%. Note, that
-bcmgenet on BCM2711 has only two IRQs and no per-queue affinity, so all
-HW interrupts are handled by one core regardless of queue count.
+This is the same class of bug that commit e279024617134 ("net/tipc: fix
+slab-use-after-free Read in tipc_aead_encrypt_done") fixed for the encrypt
+side. The encrypt path takes maybe_get_net(aead->crypto->net) before
+crypto_aead_encrypt() and drops it with put_net() on the synchronous
+return paths and in tipc_aead_encrypt_done(); the -EINPROGRESS/-EBUSY
+return keeps the reference for the async callback to release. The decrypt
+path was left without the equivalent guard.
 
-> 
-> The reason for this change is not coming thru from the submission.
-> Ovidiu's patch makes much more intuitive sense. I'll apply that,
-> please rebase.
+Mirror the encrypt-side fix on the decrypt path: take a net reference
+before crypto_aead_decrypt() (failing with -ENODEV and the matching
+bearer put if it cannot be acquired), keep it across the
+-EINPROGRESS/-EBUSY async return, and drop it with put_net() on the
+synchronous success/error return and at the end of
+tipc_aead_decrypt_done().
 
-Will rebase and resend with a hopefully better reasoning :)
+Reproduced under KASAN on v7.1-rc7: a UDP bearer with a cluster key is
+flooded with crafted encrypted frames from an unknown peer (driving the
+cluster-key decrypt path) while the bearer's netns is repeatedly torn
+down. The completion must run asynchronously to outlive
+tipc_crypto_stop(); on x86 the stock aesni gcm(aes) now decrypts
+synchronously, so the async path was exercised via cryptd offload. The
+unguarded aead->crypto dereference in tipc_aead_decrypt_done() is the
+unpatched upstream path; tipc_aead_decrypt() still lacks
+maybe_get_net(aead->crypto->net), so the completion can outlive the free
+on any config where crypto_aead_decrypt() goes async.
 
-Thanks
-Nicolai
+Found by 0sec automated security-research tooling (https://0sec.ai).
+
+Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+Cc: stable@vger.kernel.org
+Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+v3:
+ - Rewrite the changelog with the decoded stack trace and frame the
+   reproduction on the current tree (v7.1-rc7); drop the v6.12.92
+   references (Tung Quang Nguyen).
+v2:
+ - Add Cc: stable@vger.kernel.org and Alexander Lobakin's Reviewed-by.
+   No functional change.
+ net/tipc/crypto.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index 6d3b6b89b1d1..84a6489da036 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 		goto exit;
+ 	}
+ 
++	/* Get net to avoid freed tipc_crypto when delete namespace */
++	if (!maybe_get_net(aead->crypto->net)) {
++		tipc_bearer_put(b);
++		rc = -ENODEV;
++		goto exit;
++	}
++
+ 	/* Now, do decrypt */
+ 	rc = crypto_aead_decrypt(req);
+ 	if (rc == -EINPROGRESS || rc == -EBUSY)
+ 		return rc;
+ 
+ 	tipc_bearer_put(b);
++	put_net(aead->crypto->net);
+ 
+ exit:
+ 	kfree(ctx);
+@@ -984,6 +992,7 @@ static void tipc_aead_decrypt_done(void *data, int err)
+ 	}
+ 
+ 	tipc_bearer_put(b);
++	put_net(net);
+ }
+ 
+ static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
+-- 
+2.43.0
+
 
