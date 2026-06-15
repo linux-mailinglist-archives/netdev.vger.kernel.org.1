@@ -1,162 +1,171 @@
-Return-Path: <netdev+bounces-299567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299568-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id w5EUGkpIMGpSQwUAu9opvQ
-	(envelope-from <netdev+bounces-299567-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:45:30 +0200
+	id kgRaCIdJMGqeQwUAu9opvQ
+	(envelope-from <netdev+bounces-299568-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:50:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CE1689455
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:45:29 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FB46894F3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:50:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=cloudflare.com header.s=google09082023 header.b=AecFFvZC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299567-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299567-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=cloudflare.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QHhWr0QO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299568-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299568-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC884302C7A1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:45:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4504D3006020
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC0F38F954;
-	Mon, 15 Jun 2026 18:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477403ACA5A;
+	Mon, 15 Jun 2026 18:50:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45C738D3E8
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 18:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2366C3AB294;
+	Mon, 15 Jun 2026 18:50:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781549127; cv=none; b=MLctIUXhnu8QCVHGEWo32dVnwmibpATNT5k8OH9BcnLeyK/wMmRVQI4KtqQ0xfysvqueBeU4cQgD554/j6OAE8PSM2gUCAsutAiif4OcpUB2f2Cxbj/dnrtfoFBb5LaOwuGo1vpldthqJDuPi5Y/c0SWwDNIJdQCF3H4W0Op1ek=
+	t=1781549442; cv=none; b=OWdpzolzDY+75jrF15s6PVZyaXSgAXZaPXdflG+HxjT45rQJ9rszLiP7rUnyTJBUFiO3JzocqdPwUJJBe3RZqXaFidlO3klqYDZsyC047PjGpNZ9VtzwDLeQnhphbkF/JkJ3ZY1GB9bqFeOss5IUTXptsU1W984QNEpxysmGhuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781549127; c=relaxed/simple;
-	bh=y2PIwVUXoCW9TnSY2n/aKtOQkJRqNDHne/v+icBH9dY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kV3abFs9xWHVqJYWR5gmVNYC7IDEibwgg/ZJ/etrpnfCngPZpTFjxpOa6tXxjJRpTJ8KlXbZv9PuyDgLmBIoDHUu1sAK+eKsh8KJcCCooH+Eg4PL/KF3QqOwhFAuGjD/oQFnj6mFZLqW4+CV7MxEJKYYqtGYMsYLCbqgqDjzCHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=AecFFvZC; arc=none smtp.client-ip=209.85.208.54
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6913160c9ddso6881496a12.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 11:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1781549124; x=1782153924; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2PIwVUXoCW9TnSY2n/aKtOQkJRqNDHne/v+icBH9dY=;
-        b=AecFFvZCFUH+cdH3xWC23SZCDdYeUbTajF5x2BOZ9BujrUyVGpfbKNhK6GDYs2fp+N
-         fQhk/eclpof/q8Hr6r6g90pavh/L5kjBaugKJEmmLI+3gE/00OBCvS51QGIBWJwjqZ/x
-         ihijKdSUBNQGrcnXtMvNaEtmdQpH844E2JOvwcl8HjMlyuxZaAkJMbfosyHng5oyC2Er
-         nmMhtQU43pCHTiX254XOvSGxYR2NU+mxysr69PKVxiwzQphaeeewXOYHacfx82xWtVAQ
-         3WZ1r+Udf7PEPInyWWMV08aK7AFq7Dwt9RVIxD4loVIULKs3hF5Gethnac+pyYz21OYv
-         2eZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781549124; x=1782153924;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y2PIwVUXoCW9TnSY2n/aKtOQkJRqNDHne/v+icBH9dY=;
-        b=EzXt/Fvi91YlxYLDvsMz246sjFFeK2scuZrR3o4+cbareVVs3spVclFFhyYQ7PnGp3
-         8eAi+sqxGSc8WMetQGflBU4KIXWfZT2GPSryl5FvcXney4IeOzcY0Gk/sS0h0JHnEho+
-         l1IbJp8KhM73Yi6F4zHUOm7587L5CyvkQoIoV7tHf4shMT+f/IW7NcaB/alkE5ayGX2M
-         iS9y60Cfm4Lk8wkGRGjXUzeWdv/6d86bI4w5xK/9Zckml7jHGdjmuWFH/Lh0JTGrHi+m
-         deYUWPpDcTnF1rFcXSS7thgmJGHM1762juZWAbBKPEadOWMgEcp60pY0rHvOmTw94vqF
-         yp4w==
-X-Forwarded-Encrypted: i=1; AFNElJ9xu1R0h6ABiw2MNV+vSwxD3q0Fd6HwmpA1OSwMqF8T7pp4hHSuNjPv59vOg2dvXTzYMyckYM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAbuamoGubYvaiXbYmQb+UZ7tmtuoWEaN30iMwwFn0DMq0ee0a
-	SGYweepez+RHpS/q5iSZV+4+E2Os6+69pla64JyLpzFzaqcpb5Q0XHuFqkdF4XgPIeY=
-X-Gm-Gg: Acq92OH69vut3xx9+U1Fiki99Jb9hDD/tc/7WRbgKeyXFKvidm2/frQ3i9WH6ASPPCz
-	+ygjhhRBLroMZol/caaxh9YK0nPrXguYywXQU/PKfQYbzwtlBqGcI/bY7h0SzRulY9iExSKIlgP
-	yeF+YuI6J9zK/ap4BOncQCXAousBnBxGrj4gxsLrnAr3nk+6B2NEocnLySnpUCqPTks4uYzU+yi
-	M8QlIKuPkrnpZhwBbAjLfpZgjLMxFkK49ByHhIBpCE7V+AYOIt9vf6+9bMnMMlxK03rMbqF4xyB
-	nQcvmBHE2sqdFYIvRKB70LIM4VNAF0YXa/AGeo65H0RUGeehOGURg4u+LlzZZ0UD6DxXYvwA/nT
-	qsjaKC+SHvHM03cAtYROREj/sw9znbQEj6rcwkl96sd+w9NjeE92sv63e0BWlSijSfbeeWeMHXT
-	gCfJdL5wOR021VTHIoax7gMa/Q5Il5oPRW/y3S
-X-Received: by 2002:a17:906:8473:b0:bfe:ed35:e85a with SMTP id a640c23a62f3a-bff4c9eaf3bmr461429766b.50.1781549124175;
-        Mon, 15 Jun 2026 11:45:24 -0700 (PDT)
-Received: from cloudflare.com ([104.28.21.182])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb5223309sm513470166b.28.2026.06.15.11.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 11:45:22 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  bpf@vger.kernel.org,  john.fastabend@gmail.com,  sd@queasysnail.net
-Subject: Re: [PATCH net-next 1/5] tls: reject the combination of TLS and
- sockmap
-In-Reply-To: <20260614014102.461064-2-kuba@kernel.org> (Jakub Kicinski's
-	message of "Sat, 13 Jun 2026 18:40:56 -0700")
-References: <20260614014102.461064-1-kuba@kernel.org>
-	<20260614014102.461064-2-kuba@kernel.org>
-User-Agent: mu4e 1.14.1; emacs 30.2
-Date: Mon, 15 Jun 2026 20:45:21 +0200
-Message-ID: <87tsr3bq2m.fsf@cloudflare.com>
+	s=arc-20240116; t=1781549442; c=relaxed/simple;
+	bh=Ug8ZP4OBqA1oZ3Dvhxb0xU8a/MfhAew0XbEcGtLPvko=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rE44WHvnueLJVfVFrIYt9YtMVlQAigF108oy/fSo27NHRisjHP3pq20N/VTvVeKyE8Gx/udPFobEqi3m1Hjn10WTSZBrjqzmxNtBY13RXiJkb6jnVViJHbUOrCNVMX6eHAcj3tSL0fJT4yT5P5Cebzsq/8f9SOeFZvWt8xCE14w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHhWr0QO; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0514F1F000E9;
+	Mon, 15 Jun 2026 18:50:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781549441;
+	bh=LNHX3r/9VU1VGfFBkQvGX1PcR0n8q+2QC9RgeUF7Abw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=QHhWr0QOYrBoCfPEVcAb4PDmk7x1qzyOYV42z+8dCUKxjodT0A59rT55mmduYBKCF
+	 r79oD9jPiXt9A1fGX7EpmVLLN1GVz7cLk2YxV5gGZK0Seh1diEKAm64brZNm+mRC2/
+	 SBrGroDHerbRInjvqj8LGgpCSuwKaac+7fdbLf6X41YY5C4P8aAVhO1xqzGB4NS9tM
+	 0RAgTglbOMMtGUB0ymCBlY9FAfqVmgHYNo37yfK2+sK53rbgQ/jdobhAP+B7pRckm+
+	 GDE5Be6ulSH3UfruJfPgBShZV+rOqtUA+5aShlIA+OHUHI46ZoGJ6f4Ub7wDCj641X
+	 nWDphQpwwfx8Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56A263839A06;
+	Mon, 15 Jun 2026 18:50:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V3 00/15] net/mlx5: Add switchdev mode support
+ for
+ Socket Direct single netdev, part 2/2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178154943614.246883.11702954511746985272.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jun 2026 18:50:36 +0000
+References: <20260612113904.537595-1-tariqt@nvidia.com>
+In-Reply-To: <20260612113904.537595-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, shayd@nvidia.com, ohartoov@nvidia.com,
+ edwards@nvidia.com, msanalla@nvidia.com, horms@kernel.org,
+ gbayer@linux.ibm.com, kees@kernel.org, moshe@nvidia.com, parav@nvidia.com,
+ phaddad@nvidia.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, gal@nvidia.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[cloudflare.com:D:+];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[cloudflare.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[cloudflare.com:s=google09082023];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299568-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299567-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,queasysnail.net];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:leon@kernel.org,m:mbloch@nvidia.com,m:shayd@nvidia.com,m:ohartoov@nvidia.com,m:edwards@nvidia.com,m:msanalla@nvidia.com,m:horms@kernel.org,m:gbayer@linux.ibm.com,m:kees@kernel.org,m:moshe@nvidia.com,m:parav@nvidia.com,m:phaddad@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:bpf@vger.kernel.org,m:john.fastabend@gmail.com,m:sd@queasysnail.net,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jakub@cloudflare.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ALIAS_RESOLVED(0.00)[];
-	DKIM_TRACE(0.00)[cloudflare.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,cloudflare.com:dkim,cloudflare.com:email,cloudflare.com:mid,cloudflare.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D1CE1689455
+X-Rspamd-Queue-Id: 21FB46894F3
 
-On Sat, Jun 13, 2026 at 06:40 PM -07, Jakub Kicinski wrote:
-> TLS and sockmap (BPF psock) integration hides a lot of latent bugs.
-> Bugs which may be more or less relevant for real users but they
-> are definitely exploitable.
->
-> We could not find anyone actively using this integration so let's
-> reject this config. Adding a TLS socket to a sockmap was already
-> rejected by sk_psock_init() through the inet_csk_has_ulp() check.
-> We need to reject the attempts to configure the TLS keys (rather
-> than adding the ULP itself) because checking prior to the ULP
-> installation is tricky without risking a race with sockmap getting
-> added in parallel (sockmap does not hold the socket lock).
->
-> This patch is a minimal rejection of the feature. Subsequent patch
-> in the series will do a light dead code removal. Full cleanup would
-> require a major rewrite of the Tx path, we don't need skmsg any more.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
+Hello:
 
-SGTM until we can come up with a generic way to exclude sockmapped
-sockets from ktls and espintcp.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
+On Fri, 12 Jun 2026 14:38:49 +0300 you wrote:
+> Hi,
+> 
+> This is part 2. Find part 1 here:
+> https://lore.kernel.org/all/20260531113954.395443-1-tariqt@nvidia.com/
+> 
+> This series enables Socket Direct single netdev to operate in switchdev
+> mode with shared FDB. SD single netdev combines multiple PCI functions
+> behind a single netdev interface. To support switchdev offloads, these
+> functions must participate in virtual LAG (shared FDB).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,V3,01/15] net/mlx5: E-Switch, skip uplink IB rep load for SD secondary devices
+    https://git.kernel.org/netdev/net-next/c/597baeb467d8
+  - [net-next,V3,02/15] net/mlx5: devcom, expose locked variant of send_event
+    https://git.kernel.org/netdev/net-next/c/95e26588c84b
+  - [net-next,V3,03/15] net/mlx5: devcom, add DEVCOM_CANT_FAIL for non-rollback events
+    https://git.kernel.org/netdev/net-next/c/d5e77e4d3023
+  - [net-next,V3,04/15] net/mlx5: SD, make primary/secondary role determination more robust
+    https://git.kernel.org/netdev/net-next/c/4b918a198389
+  - [net-next,V3,05/15] net/mlx5: SD, add L2 table silent mode query support
+    https://git.kernel.org/netdev/net-next/c/13158554a302
+  - [net-next,V3,06/15] net/mlx5: SD, expend vport metadata for SD secondary devices
+    https://git.kernel.org/netdev/net-next/c/a1bfe9f1da83
+  - [net-next,V3,07/15] net/mlx5: SD, support switchdev mode transition with shared FDB
+    https://git.kernel.org/netdev/net-next/c/2a3fb8b2f450
+  - [net-next,V3,08/15] net/mlx5: E-Switch, notify SD on eswitch disable
+    https://git.kernel.org/netdev/net-next/c/232de72bdea2
+  - [net-next,V3,09/15] net/mlx5: LAG, store demux resources per master lag_func
+    https://git.kernel.org/netdev/net-next/c/eaaf1ff178a0
+  - [net-next,V3,10/15] net/mlx5: LAG, disable both regular and SD LAG on lag_disable_change
+    https://git.kernel.org/netdev/net-next/c/ebd629e70045
+  - [net-next,V3,11/15] net/mlx5: LAG, introduce software vport LAG implementation
+    https://git.kernel.org/netdev/net-next/c/98d56915eef5
+  - [net-next,V3,12/15] net/mlx5: LAG, add MPESW over SD LAG support
+    https://git.kernel.org/netdev/net-next/c/de464720489c
+  - [net-next,V3,13/15] net/mlx5: E-Switch, Tie rep load/unload to SD LAG state
+    https://git.kernel.org/netdev/net-next/c/68c2dd59a6c7
+  - [net-next,V3,14/15] net/mlx5: SD, defer vport metadata init until SD is ready
+    https://git.kernel.org/netdev/net-next/c/e3a02f3ecb13
+  - [net-next,V3,15/15] net/mlx5: SD, enable SD over ECPF and allow switchdev transition
+    https://git.kernel.org/netdev/net-next/c/7bcfb19465fc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
