@@ -1,185 +1,184 @@
-Return-Path: <netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rJB8LdIGMGoSMAUAu9opvQ
-	(envelope-from <netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:06:10 +0200
+	id 02hOGRQIMGp6MAUAu9opvQ
+	(envelope-from <netdev+bounces-299478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:11:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6BF0686ECE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:06:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA4C8686F7D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:11:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=xRXe2fo2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=zdj55i0X;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299478-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299478-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A4B5030091F7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:05:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C79E3032594
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CEC3F6C59;
-	Mon, 15 Jun 2026 14:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C060B3F65EC;
+	Mon, 15 Jun 2026 14:07:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3413F54C8
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 14:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A9F3F4DC6;
+	Mon, 15 Jun 2026 14:07:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781532340; cv=none; b=A0FNoyjbkVspPk2DZVRfmUOq7xYJtuyOi65AyXdSW5gM8lplq+UUbx3fEXGcXOIAo8dkljAem2yd/BY6GmdCnyHtKjWEivGlDusOBN1rZ+9dvKHPhtZDvSBsGffhaWRqRw8YVxujvxHoo7fa89ymjgjjzmibfBVww/sVLbw8LtI=
+	t=1781532438; cv=none; b=WrwWPUIHPR9dzRcFXPQUicNEZhu5dHZw8CkYbxhl2486+tha5Z7MbQZ+zeugVZxi0mtj/o1zoBMNCKFs7HQ9l7dYg8agMakJYZP0siKaIhqvxmGz6vtuN+53hOPO4Tut6kc0VhRCCGOMG+pHYGEw2sevYsWdH04SOibyV5I0vCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781532340; c=relaxed/simple;
-	bh=sti5Jiq+zf2c5nD7digmzH9DCz+UDe5i9vlPytyemk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qU64V8AANLuo5ZjRi41Qtz2qvokh7GYwL8vn9rW2EspdHvqWgeNISE+OEOrVfVUv6/VKWuWp1O/r/m3uPLFCv9I+BHiXtKtGIeNrGM1cpJd3HLoe/TFIzmOHMgnwxuK4PT0TFKq30hYZRlQnYDx0SoA1e1WAt4cQbIUPLVOU2zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=xRXe2fo2; arc=none smtp.client-ip=209.85.128.54
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490cf3000f0so34342505e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:05:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1781532338; x=1782137138; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YyI4pG06qj9OsAcBatlXpkpRpnZN2jeAS5FUIDcJdlk=;
-        b=xRXe2fo2lPX5GfdP30jcAqpG9U5tYLiZWHhG28/v0ees0KGqwoc/NrxkRzutkEdk4m
-         JIt8UL0lA8X7vf4CUwL49LeZYYFH8WsXklNaCoMI59v8paODydb3+vJmZb8PaR5P1nSa
-         u56rD78Sfdza+AXoXZogwBc3q7rS7Xa1Z5esH12vtujw+pw4jG6MtXaBEczAtRESukJx
-         KLyC8sbbKj+EbAq1nmmUPmlRB/YyeSLQkjL/bJS/sw+qKIJxX/XJBc9dFrbWltrEANwj
-         SnhZXXRTCRInkDLGb7Y7Twr2T2ZArZY1UzBLV+MAzybLzx2wR9jcLJ1a4gxMfNm+xUo5
-         pdUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781532338; x=1782137138;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YyI4pG06qj9OsAcBatlXpkpRpnZN2jeAS5FUIDcJdlk=;
-        b=eKlSKuNXRkXjRQSJsPRqPuXEmckwloLjymo+knPEplFkHMgt3Xk0lJ2cOpNWeEDbU9
-         us6bOUUsDLCPoqegULUNv+TmRwt5WfcLJarZbseql8kSYoZaTupIjuu8O2oql4zZmvgz
-         3lIX0slXBMVMt9E8H41XH9QWOHsjICb+BiZPJkwqSLay2BKGmCPTNZshwoEV7dlHXlBY
-         zddGWJCzClARUrulCkLZkS5k3zc3nUoqwZBZELNs/WGeojK3IZXvcL38/5ZnZG3px5sB
-         jIwwjL3qP4NOIpUZywj+JEmHvIy/xw9BO3UXJe52dn1syhxd+ACXw52EypJYeL7kZZak
-         9pBQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/8PetGn1bfbVoBloZzqBQIISzwAv9McbiHWiHJEzSL9KPWDFMd5RwAavR293rW8Wh6B1LgSeE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4CtY4bZeG0up/+PBTfJg3p2S77xpo5QDGKFLT4FWVJ/fe6hXg
-	a+Ff4TXc4oyytMxBC7ys6y3E/IKVXKOmaeA/+22e0cXcc0F9zDw8qyzCtXKkGshesj48
-X-Gm-Gg: Acq92OEv/DJDUmxIPBN6licTpTlIk9VyVmABMQ9z+k0h+bjYAnv0/zz8RxfFhAW8sKp
-	D9dDGN7r6MOv2Qk3iUt3GytNzG8s0VLDMyvuWSJwWkJAkQm6UP/P4XezVuvm54fpq4/cOcVyflZ
-	DOEoOmOqt7fT6dhrBy9lAjY5JvFEI6DKbwcr3NxMd55X/QBlly2kEBBlirdPwL9tsHca5yd68Oo
-	vopoNMsXzr55tgPFosGedN0pM2zG0N3paePsKPEIhmTGSfVplyvQz4Vie2x87LwypbJakr9OGfZ
-	lpHyNeCrgj/SeYpVfxyiwUy64md0TVXU1jM75coUqn/oZRpRJujmyOGU7fUj1A2L6M415woIPsF
-	HWNyyyhyDOcDuSTZua7JxL6KECzZB0cugrZQ3F3q6NPfIyaktwthcQuxBWEeQVGua5eDdNSLuJ/
-	McyStMlDLkKE7uHDC72sb6ovoTsN4cZgHUVeMSC21pOB6SWlCecO3dEUdXvRlaIpgCnGqlaFenN
-	NCU9h88KUkGeSOEHB83VUseRyyuZJJYQDDyZjNUYNt45A==
-X-Received: by 2002:a05:600c:3f07:b0:492:1e36:bafc with SMTP id 5b1f17b1804b1-4921e36bb41mr143543765e9.36.1781532337618;
-        Mon, 15 Jun 2026 07:05:37 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.209])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492203dd0b9sm249125435e9.15.2026.06.15.07.05.35
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 15 Jun 2026 07:05:36 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: borisp@nvidia.com,
-	sd@queasysnail.net,
-	raeds@nvidia.com,
-	ehakim@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
-Date: Mon, 15 Jun 2026 16:05:34 +0200
-Message-ID: <20260615140534.52691-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1781532438; c=relaxed/simple;
+	bh=iunEIKNm11CTXyLswfX8qxc5Ol986Egd0t8gsHMmhrs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=AKVRdFYElhnkM6cK17eACzqPNlIoiiP4DWBxAqp+xYswdprVZrTAJz9l+J9ox6hmb6aWyyuowHTamVenjEOfPBSXy+c1ryzllg64ma9nTlCmmFYlzK6ReckOqguaD0rALSlbvt24/Hz4ABML0IE2MMyA9hQiqzvoRE3ItEWpoRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zdj55i0X; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 54432C5146A;
+	Mon, 15 Jun 2026 14:07:19 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 20E3360015;
+	Mon, 15 Jun 2026 14:07:15 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AF69D106C96A5;
+	Mon, 15 Jun 2026 16:07:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781532433; h=from:subject:date:message-id:to:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=12cJkgmNpZePALEcCCii3OEhCzXZc//+4qAWWEONSCc=;
+	b=zdj55i0XH3giozHt1HpWm9UfrnYusBZsrgy8BIRAXrB12gRGFYttdKWdel5vEcrpKgU3pO
+	kBhdbrbf9QdwQ+fPiu2opW/5t31ghiReeLTz6M8Y8J0kWp7gICiIuQG7YVavMSQEiI06nh
+	XvF3aocbyXTK/ga1gpylQ0kuKXc0Um1owXiC90x7Ys+HJLXRgCbneEwZiDpMT/vI957D7Q
+	/Mj+jd+MV5kLA+KI0SHns+JUCPL7eeozwOQqR9YDjvnN/Pc7ZtsNkSm9VnBjFNVavlxozq
+	mJ5t9Eg7cg97pu12QnsGmSdYOCU/VEFxF7+986tvH4yr+YZ/rUitb7n14j6Eew==
+Message-ID: <867a39de-ccc2-4dcf-be24-ab2542d20ab6@bootlin.com>
+Date: Mon, 15 Jun 2026 16:07:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 05/12] net: phylink: support late PCS provider
+ attach
+To: Christian Marangi <ansuelsmth@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saravana Kannan <saravanak@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
+ <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ llvm@lists.linux.dev
+References: <20260615122950.22281-1-ansuelsmth@gmail.com>
+ <20260615122950.22281-6-ansuelsmth@gmail.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260615122950.22281-6-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-299478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-299477-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:borisp@nvidia.com,m:sd@queasysnail.net,m:raeds@nvidia.com,m:ehakim@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:doruk@0sec.ai,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
-	DMARC_NA(0.00)[0sec.ai];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[0sec.ai:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt,lkml];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B6BF0686ECE
+X-Rspamd-Queue-Id: BA4C8686F7D
 
-macsec_del_rxsc_ctx() frees the RX SC metadata_dst via
-metadata_dst_free(), which directly kfree()s the object and ignores the
-dst_entry refcount. The MACsec RX offload datapath
-mlx5e_macsec_offload_handle_rx_skb() takes a reference on this dst with
-dst_hold() and attaches it to the skb via skb_dst_set(). If such an skb
-is still in flight when the RX SC is deleted, the metadata_dst is freed
-while the skb still references it; the subsequent dst_release() on skb
-free then operates on already-freed memory.
+Hi Christian,
 
-Replace metadata_dst_free() with dst_release() so the metadata_dst is
-freed only after the last reference is dropped. The dst subsystem frees
-metadata_dst objects from dst_destroy() once the refcount reaches zero
-(DST_METADATA is set by metadata_dst_alloc()).
+On 6/15/26 14:29, Christian Marangi wrote:
+> Add support for late PCS provider attachment to a phylink instance.
+> This works by creating a global notifier for the PCS provider and
+> making each phylink instance that makes use of fwnode subscribe to
+> this notifier.
+> 
+> The PCS notifier will emit the event FWNODE_PCS_PROVIDER_ADD every time
+> a new PCS provider is added.
+> 
+> phylink will then react to this event and will call the new function
+> fwnode_phylink_pcs_get_from_fwnode() that will check if the PCS fwnode
+> provided by the event is present in the pcs-handle property of the
+> phylink instance.
+> 
+> If a related PCS is found, then such PCS is added to the phylink
+> instance PCS list.
+> 
+> Then we link the PCS to the phylink instance and we refresh the supported
+> interfaces of the phylink instance.
+> 
+> Finally we check if we are in a major_config_failed scenario and trigger
+> an interface reconfiguration in the next phylink resolve.
+> 
+> In the example scenario where the link was previously torn down due to
+> removal of PCS, the link will be established again as the PCS came back
+> and is now available to phylink.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
 
-Same class of bug and fix as commit c32b26aaa2f9 ("netfilter:
-nft_tunnel: fix use-after-free on object destroy").
+[...]
 
-Fixes: 9b9e23c4dc2b ("net/mlx5e: MACsec, fix memory leak when MACsec device is deleted")
-Cc: stable@vger.kernel.org
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> @@ -2151,6 +2204,10 @@ void phylink_destroy(struct phylink *pl)
+>  	if (pl->link_gpio)
+>  		gpiod_put(pl->link_gpio);
+>  
+> +	/* Unregister notifier for late PCS attach */
+> +	if (pl->fwnode_pcs_nb.notifier_call)
+> +		unregister_fwnode_pcs_notifier(&pl->fwnode_pcs_nb);
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-index 71b3a059c964..2a4e7ed76d31 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-@@ -829,7 +829,7 @@ static void macsec_del_rxsc_ctx(struct mlx5e_macsec *macsec, struct mlx5e_macsec
- 	 */
- 	list_del_rcu(&rx_sc->rx_sc_list_element);
- 	xa_erase(&macsec->sc_xarray, rx_sc->sc_xarray_element->fs_id);
--	metadata_dst_free(rx_sc->md_dst);
-+	dst_release(&rx_sc->md_dst->dst);
- 	kfree(rx_sc->sc_xarray_element);
- 	kfree_rcu_mightsleep(rx_sc);
- }
--- 
-2.43.0
+I wanted to try this out, but I get :
+
+drivers/net/phy/phylink.c:2218:17: error: implicit declaration of function ‘unregister_fwnode_pcs_notifier’; did you mean ‘register_fwnode_pcs_notifier’? [-Werror=implicit-function-declaration]
+ 2218 |                 unregister_fwnode_pcs_notifier(&pl->fwnode_pcs_nb);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 register_fwnode_pcs_notifier
+
+I guess you either need to stub this, or there's a missing Kconfig
+dependency somewhere
+
+Maxime
+
+
 
 
