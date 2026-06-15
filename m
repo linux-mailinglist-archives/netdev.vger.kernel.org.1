@@ -1,178 +1,147 @@
-Return-Path: <netdev+bounces-299402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Io5oEjnfL2oLIQUAu9opvQ
-	(envelope-from <netdev+bounces-299402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:17:13 +0200
+	id qlQlG2/gL2pbIQUAu9opvQ
+	(envelope-from <netdev+bounces-299403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:22:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1C8685A67
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:17:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1945685B1D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:22:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=LKDTr7fE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299402-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299402-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=toke.dk (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299403-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299403-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4E2A3033FA1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:17:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21968304EBBF
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0203E44F3;
-	Mon, 15 Jun 2026 11:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23BA3E4519;
+	Mon, 15 Jun 2026 11:21:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E123E2745
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 11:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B613E44F6;
+	Mon, 15 Jun 2026 11:21:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781522225; cv=none; b=P4GbU21ifRflcpwL2M7x1xJBR7LVk9V1VJY47T5iFgIvwViWd1mpro4ceGzu4ay6qfa6VinyPA2+pb5lrvFLpVoaOnS9eJ7t9MnIUnFxir/ZM8gqco6zp498Yh5M5Pqh1JjmDDH42uOMd6NuNfS2z/TmAuR11jPJci2gy8FNhOM=
+	t=1781522489; cv=none; b=anbEELIpi1WxWONvr4eUebuiS+J/T6t+2HK5ZX3vFIyxGqgx6jSX24B+s3p2vl3omoP9m99yKnBPGY5bcEYLSyFHGLD8zQ7LCPUQxB4Eu5P7WE6JU7gJxwqiWxhwW49VRuu+gUkGracwbKONLjjZCBvWcSPshylP67Nm2BHBJQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781522225; c=relaxed/simple;
-	bh=d4RFhTaPxFFCmH6AlRCJafNoHTeDvIseqfsOBH9V82I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L+oE+hYkUtmryphhQWXGy75EgkW9/54v6cj9TONTxElvEuHfR9rex8irZ0SCdQNCPxQG8sKSoujB593cNVQTpQYotWthn8f2MPp08ddnFCFONALx2qzrZXaUpTKObIUujQgypB5cTEZ+1/or1hTf2kPEKOSb61jbe0xtKas9hLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKDTr7fE; arc=none smtp.client-ip=209.85.218.44
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-bebac79fff8so391219766b.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 04:17:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781522223; x=1782127023; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sga08RS68cA7NsGgPks/diWwawk9O5eve5G9GV8WMYQ=;
-        b=LKDTr7fEWxwmvA5GG6mIW3g8D/lRx7LfQF0YMWaRO3gpE/eSSI3oxDUOpRZwTyBPYA
-         s4h6W/P5PeEN+/69Z1OHqsQNrnoeuJCD8aDSzSgUfreJbQi9t1LN3gYP2/ps3xEFP6Va
-         Auc8CPdrAuZYG7SE4gwjCUKPSdCg2nSH3rBIHlvHkJWPvDx/EePNjOBr4Ym9Lzgy4lpi
-         LVT1iyXxLv4P+lXRBxZjW8VLfGJSWx3YgYMvPHIoz7XdRhmLFzYgP2zZxKiXEBHzvc/X
-         OcLmHQwFX7435NRiJIhXj1q1noDzr2zwkOE1GkTqMYiE/VhCeI/BEBqSgr37G2IjT56K
-         jQ6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781522223; x=1782127023;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sga08RS68cA7NsGgPks/diWwawk9O5eve5G9GV8WMYQ=;
-        b=eu9VC+W6gavsa07/NFdiqWotOr20z2oXpuv6d1uB9qhrLn02hHnA8E8z2HFy8l0MHD
-         WnZR54RghIvJaXljoTmI16K9hydrMls7E7PIGcMcaeuSXH1otlKRA9LXBVsrKfvDbgru
-         uxqzAOf134gY/gPRviY9CLugV80smIRY7cgwf4QXaZch+px+aiwZyCzZrQJzqeE2AwkY
-         rQFVLCQPUW3y5HSWs8kNVGhuzMWBPFgRuhUJoJdGygA6AD98ooiTnG6sgajT+UhwrVVH
-         bI4K5oj9ZM315lu4QdNX3ch3MLEbJWat3Y5fDfyXK2Xp/lmoX5ZvYB8YC/7IaTJy4VYl
-         XsBw==
-X-Forwarded-Encrypted: i=1; AFNElJ/eann9TZZ1WFQn9f2p2yFyITqdKFpeknSjQmEcbX8z67kbUoHG3cgCkSVIEWC2LMkVt4tQz5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoNAV/KK9FXg0b4JfSRZboiHlQy22vvlWptVtOjnJBf+Bu9Gif
-	xf1m/UrS5pNiIWCutawHyEVkCNsoziwPTVTIPtftGVaDFhMmAv7pW12t
-X-Gm-Gg: Acq92OFzrVB2cWvm2pnJ4hM2gb5TGyO0nEAL/T8xdDr8+sf650meqqwdYNcKpCFyJrO
-	IvNO8ckmnt76+MuLF1Fa0Nb3veBvhNHZ1VvhnkBFQMFRwr4NBCFA5ikltSORhwOouOHfNLr7G78
-	aVY9Bs+/B+awqp4ymMiEVLzavbCYhGRWrkxCaNdIVqy4uQdOGOUsCfvQYNNJbBrj3/vC6WnXHVq
-	a92hi98ltG6JdlPx7TAEywuSXLWi3ruhAfDcRawgyg90iE5fecjtiTNB5kurQPXM5+e87Xv8wS/
-	fV0RYcnWEYrfF+6ZoXHU1tXd0R5Wi3lZpUvmgAzd9FcuJHMakM4gTiOkNhUEALKXre4wZ9jR/G7
-	pnGRSMt8Th7nOcv7BkJ/T4R8aGx0E4NIvIYC85mtMmbiICOApiDZ0t1EVFJ5w2iGNwQyq0mPbwJ
-	16IuHzhFjNeS0tdTfdtBQy74SVxeFkhCiY42vnYkRCsnqvC3MxFAGT0iYYnyIpGaZaR7fVkIHfG
-	CRANlFb80KAaCt8yY/n6NopgtewANH7fjY4gRvEv3TWDu2/k6gFO7ZNi1w=
-X-Received: by 2002:a17:907:c305:b0:bec:7661:6397 with SMTP id a640c23a62f3a-bfe2a222b62mr581935066b.29.1781522222408;
-        Mon, 15 Jun 2026 04:17:02 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:2bf9])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb4b2276fsm452438866b.17.2026.06.15.04.17.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jun 2026 04:17:01 -0700 (PDT)
-Message-ID: <a773d177-82f3-4046-866d-852d0d83e08b@gmail.com>
-Date: Mon, 15 Jun 2026 12:16:47 +0100
+	s=arc-20240116; t=1781522489; c=relaxed/simple;
+	bh=eEo+7lV/KNOEviIFhDhv4I6Js9iYIGQ1LsUHg0MJPpI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Kx8NKKMaZgpKCPv3Gi7lyoJj+qfi5AXt1Iib+9fcAfOriACZc1bdKo3mZ1tPlpPA9ETaED/GDOi7q+VZqDCXH5EsFnpunS/fJ7nXypk5S84CZPSDghQqknj28t1qZ546JRQorVKVJ+J7KjtTWjCkf3dcNH3XFJCQIcHwu1J0pqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; arc=none smtp.client-ip=45.145.95.4
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+To: Jakub Kicinski <kuba@kernel.org>, Samuel Moelius
+ <sam.moelius@trailofbits.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, "moderated list:CAKE QDISC"
+ <cake@lists.bufferbloat.net>, "open list:TC subsystem"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] net/sched: cake: reject overhead values that
+ underflow length
+In-Reply-To: <20260613142626.1b2183eb@kernel.org>
+References: <20260609232935.1602659.8545fdb04fbe.cake-overhead-underflow@trailofbits.com>
+ <20260613142626.1b2183eb@kernel.org>
+Date: Mon, 15 Jun 2026 13:21:12 +0200
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87wlw0gic7.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] netdev: expose io_uring rx_page_order
- order via netlink
-To: Jakub Kicinski <kuba@kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jens Axboe <axboe@kernel.dk>,
- Yael Chemla <ychemla@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org
-References: <20260612211709.1456966-2-dtatulea@nvidia.com>
- <20260612211709.1456966-3-dtatulea@nvidia.com>
- <d0401fab-61c5-43e7-93ae-d4757433eb7a@gmail.com>
- <b581d253-135b-4c75-a50d-2049c6d6e249@nvidia.com>
- <20260613170232.6f9e72ba@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260613170232.6f9e72ba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.27 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MIXED_CHARSET(0.59)[subject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[toke.dk : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299402-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:dtatulea@nvidia.com,m:donald.hunter@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:axboe@kernel.dk,m:ychemla@nvidia.com,m:tariqt@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:io-uring@vger.kernel.org,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,kernel.dk,nvidia.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299403-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:sam.moelius@trailofbits.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:cake@lists.bufferbloat.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[asmlsilence@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
+	FORGED_SENDER(0.00)[toke@toke.dk,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[toke@toke.dk,netdev@vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,45.145.95.4:received];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,toke.dk:mid,toke.dk:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8B1C8685A67
+X-Rspamd-Queue-Id: B1945685B1D
 
-On 6/14/26 01:02, Jakub Kicinski wrote:
-> On Sat, 13 Jun 2026 16:09:03 +0200 Dragos Tatulea wrote:
->> On 13.06.26 11:53, Pavel Begunkov wrote:
->>> On 6/12/26 22:17, Dragos Tatulea wrote:
->>>> This adds observability for the io_uring zcrx rx-buf-len configuration.
->>>
->>> It might be nicer to look it up in the queue, e.g. rxq->mp_params,
->>> and make it a queue attribute instead of zcrx specific one. In either
->>> case, no objections.
->>    
->> In io_pp_nl_fill() or in page_pool_nl_fill() as it was done in v1 for order?
-> 
-> It's fine. We decided to make the "page size" a memory provider
-> property, now we're going back to making it a queue level param?
-> Like my RFC had that everyone hated so much? Sigh.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-TBH, I never cared much how nl would show it, so not opposing either
-version. My idea is that even without plumbing in per-queue non-mp size
-configuration, it'd be nice to have a common way to check it b/w
-providers.
+> On Tue,  9 Jun 2026 23:29:36 +0000 Samuel Moelius wrote:
+>> +static const struct netlink_range_validation_signed cake_overhead_range = {
+>> +	.min = -64,
+>> +	.max = 256,
+>
+> Both Sashiko's complain - these values are neither safe nor sufficient.
+>
+> How was the -64 chosen? It looks suspiciously close the min ethernet
+> frame length. But in that case (a) FCS doesn't count so 60, and 
+> (b) even IPv4 TCP packets can be shorter (at qdisc layer) than 64B
+> leading to underflow...
+>
+> I see min rate in cake is 64 but I don't see any other meaning of the
+> 64 literal.
+>
+> Toke, WDYT? Should we use a smaller constant (ETH_HLEN?) or do the
+> check on the datapath?
 
- From the semantics and observability perspective, zcrx is probably not
-that interesting as the parameter is basically just a hint with no affect
-on uapi, and I'd assume people would rather see the page pool size or even
-the NIC's page size. But I guess it depends on what Dragos is really after
-with this patch.
+Hmm, we do actually have a check on the datapath already, so just
+amending that like the second Sashiko suggestion should add no
+additional runtime overhead. In which case there's no reason to add the
+policy at all, I suppose.
 
--- 
-Pavel Begunkov
+So basically:
 
+diff --git i/net/sched/sch_cake.c w/net/sched/sch_cake.c
+index a3c185505afc..259e4b8d09c5 100644
+--- i/net/sched/sch_cake.c
++++ w/net/sched/sch_cake.c
+@@ -1389,10 +1389,7 @@ static u32 cake_calc_overhead(struct cake_sched_data *qd, u32 len, u32 off)
+        if (qd->min_netlen > len)
+                WRITE_ONCE(qd->min_netlen, len);
+ 
+-       len += q->rate_overhead;
+-
+-       if (len < q->rate_mpu)
+-               len = q->rate_mpu;
++       len = max((s32)len + q->rate_overhead, (s32)q->rate_mpu);
+ 
+        if (q->atm_mode == CAKE_ATM_ATM) {
+                len += 47;
+
+(Sashiko suggests using max_t, but that seems a bit redundant when
+there's already casts in the operands, no?)
+
+-Toke
 
