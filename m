@@ -1,176 +1,143 @@
-Return-Path: <netdev+bounces-299639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299640-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hK31GxF/MGpNTwUAu9opvQ
-	(envelope-from <netdev+bounces-299639-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:39:13 +0200
+	id zOKvE6uBMGqsTwUAu9opvQ
+	(envelope-from <netdev+bounces-299640-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:50:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D09B668A6A8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:39:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4162968A787
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:50:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=bzrKEgw4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299639-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299639-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="G/eSgO6v";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299640-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299640-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 197D4302BCDF
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:34:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4E5B93002B7B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15703290AA;
-	Mon, 15 Jun 2026 22:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463B337F731;
+	Mon, 15 Jun 2026 22:50:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE9136AB44
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 22:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C6079CD
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 22:50:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781562888; cv=none; b=jiXFFrMbaVJm9c0TNcxrnrBs3gjujJp87MLFzL/8y4U6M6GfHzK0UzwNkpX8luYCWKQkC3tjkWrdSL9hdKXvL57eq7dNpA3MwGTVhnQzZ6hmkea5qyTJZebInm2Zuzj+pzLWMT3cylisNJ+2Dx171PBInt4CHQNJdAcS3hutq60=
+	t=1781563812; cv=none; b=WbLqcPzRXRAUQQAMEjuxe/yVPYkuQSTxUeyaRYYr8Som14o7BPpK6az2w/LzgbGGwLNhe933+EXvY4q/0MvcWHp4DxY0aSj7x0/4ktRPFtP3SxnTbTtLdKDGMtrGTB2Uwq+i25+rTGlNZb9EvnbOvGK/299VLywGVCcGUa1BnXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781562888; c=relaxed/simple;
-	bh=Uu2ZPwhh5vaVogX8ivqDgkVCAIMI3ZIQzWUWRs83Y+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mvrx8KJaOh3tiYVZh45cCFEvWDu838yeS0lFVRsXo5p3DNkDDtLdlyxzUp/R2NQSc4cFMWBM7U1lW5epxnSx3HmDppb39zwm5SmZTuEnpnza55F6b6sBslw++dPi8a+jprDWae9zjX9w+XSS9QhRWcrIjJGLPH5DS47ZWuChibw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=bzrKEgw4; arc=none smtp.client-ip=209.85.216.53
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-36bcf3d2565so2761669a91.3
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 15:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781562887; x=1782167687; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/BxQrn967BchhiPMVf9s3SPbfGb2SRsf64DIOXc/lgs=;
-        b=bzrKEgw4QH8a/q0js2IwPN/EH7sigXS/lV9JJU0UF76mrhU4GfpEe9CyMg3lyyHZJc
-         9D/kk5Q492XH+0JfbOBiyMgQ316BqPqLzl+H/FLLTwJCtU4xYBdyi1nq6+7pSl0UfzUb
-         HWe/l2ilz50/jpdA1zT1A89/YjVwpfkyszPnvwOkcqk2FslH5QuaCil4BLyKq73jUAxU
-         EjaNtYycVST4MQc++QMIR1zTwmHz/Y3y28bgkyH3bdVvf9WLTI5UEosZYL79U63ajHV0
-         /05T3mbyKL3srdvOl1KWp11hPG2Zdz7/Xe5FC8nXqrvxHkGmbBGAyh4yYDrif5Ctn9Dc
-         qkpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781562887; x=1782167687;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BxQrn967BchhiPMVf9s3SPbfGb2SRsf64DIOXc/lgs=;
-        b=sqxZqhAOyn0v39gyhEqU48oFhmjqSA1ReIacsGAw3ZrpAMLB+IgZz0KeujD4hj5zAb
-         SEihRMBgURbO03qMRSJ3bljDkvmCODeMOaSzX6TGQ5nSrXu/PBYH9mhphCcS9TJkb+/G
-         4vCoN6xDmJS7CeEazxD6X7qpNq73rEP9wUZYDomjjVlpiXDJ5Ux8C27MT6EIs2Ol+Uz5
-         cgQwvB+H1oEQX+dfF5mumsPXZNkJQaTPpvwj3/hr3L9pvTeHX/KmS6ZpHNcjsn2+xQYS
-         ezHFkt9HXTTQk73qYie8FA/izVSstvIxBZjN1lub+aYumsTAvD8dj9e6MMlJfNQ/o/5v
-         GQ1Q==
-X-Gm-Message-State: AOJu0YwKIdLrnB+sNXCzZN3VXFq4EBVxS4qNhO6oLUCoPmO4VxhHuynB
-	anIwi978xftoRgmvh1JUmQQlHwVVthDnDLzUXu6MhoqOx0BFUBCHzCKs7jkvMplQcm8=
-X-Gm-Gg: Acq92OEy0ZBxJ04AFR5gp0S+MZf623IJ+lEMDcyEIVBTDmVhuPDJQsrWjJzDO/Nrj9b
-	bOWFWfdnEHsd3UBl+sXU1jMImAhm23XlFEk71J5Y8tuqL+ZTA/UdPT6FkrTjIO+d8+cugdGnhTQ
-	GmK8iovd1rCCRQlGnftCeq4Hx73Z+2kudw/KQNOwNkqSqAWjwWQUam8CdHHyBOiXLscpVfFfwZo
-	Cj+3mKy0Y/qEZ6/vmyCpkWXF6CKNpbUBJ/y/PyUSeuksZyP07X5Oa1Uc/laoOirIAMvDxijiYjm
-	wINKwvVp/49Y8CS84KOwmjVA+vs+odfz3RR1kru9Ftr6eka4LASATrXXIgnCM9ydj0TIxkqaY9d
-	61lUN87tHssZLUWh0O8GeJ7ioHlOHyfIpNUmWYZBznjvCEvPK0vxcLwj5NyZxWBdYf+1949cFx4
-	mdIDgi
-X-Received: by 2002:a17:90a:a897:b0:36d:66d4:270d with SMTP id 98e67ed59e1d1-37c2bd08179mr9024782a91.20.1781562886775;
-        Mon, 15 Jun 2026 15:34:46 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:53::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c522a019csm620311a91.14.2026.06.15.15.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 15:34:46 -0700 (PDT)
-Date: Mon, 15 Jun 2026 15:34:45 -0700
-From: Joe Damato <joe@dama.to>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2] net: airoha: Fix skb->priority underflow in
-Message-ID: <ajB+BfOXHpRhCTnO@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>, Wayen Yan <win847@gmail.com>,
-	netdev@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-References: <6a2ff493.5934d26d.389ef4.d16d@mx.google.com>
+	s=arc-20240116; t=1781563812; c=relaxed/simple;
+	bh=9IfPHaM2qg9a1ZJo/KxopywVgwethcP2rKtKLON0IhM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Zefb/1ISdct6GtmZdy8eLee6dGwbnUDeV1QDxOXnrw2luv/wF6k1nfNnHxiZcx+cGCzIK9JeYABFhmRiblxC09ctouHjUnuM3y3Qk4DVLiSkjAFEoPOginGEnzV218aktIjOj7I3VxS0t2LUzn8yv1LOcabGvr+5vI53I2Z7Q3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/eSgO6v; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D18121F000E9;
+	Mon, 15 Jun 2026 22:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781563810;
+	bh=+UuQVCAyUvse1CZNlmPDFh59OEsUZB+xGlZxHGND+n8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=G/eSgO6vZTW3YbchjfabTrxKMJadLhtgPRAsobGJN8TnxIW2rMClT9+2+M/Tkm4+X
+	 RiIV6X3pqHoJoK5yotO8qkx7cnS9Ur23r8FraMx3w/mviMytAN/2uVBzdkVuPUxNkc
+	 ePFQpu84tp8hATKLJdM6RTpAeGoCNLhV3fMUicW+DffIIAyOj119ouhie1h06wq0k2
+	 ZVx2XbXoNl0JurGU2OfW9VG32vJLFiMbQrVHdUf5uLD0mciXNobQfnqRYcdQi2op1k
+	 zMog6+d1Y8fNI1wYeH+sQiMAGuN5uZImpEsFlJKahJdiHIfASg5hhNIE4Kqj3SCIZa
+	 K+1x7ZVauUC7w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199623839A08;
+	Mon, 15 Jun 2026 22:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6a2ff493.5934d26d.389ef4.d16d@mx.google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: airoha: Fix always-true condition in PPE1 queue
+ reservation loop
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178156380564.325968.12566495684945605433.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jun 2026 22:50:05 +0000
+References: <6a2ca3de.ad59c0a6.147df9.2ac1@mx.google.com>
+In-Reply-To: <6a2ca3de.ad59c0a6.147df9.2ac1@mx.google.com>
+To: Wayen Yan <win847@gmail.com>
+Cc: netdev@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
+ matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[dama.to];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299640-lists,netdev=lfdr.de,netdevbpf];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299639-lists,netdev=lfdr.de];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,dama-to.20251104.gappssmtp.com:dkim,dama.to:from_mime,dama.to:email]
+	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D09B668A6A8
+X-Rspamd-Queue-Id: 4162968A787
 
-On Mon, Jun 15, 2026 at 08:48:13PM +0800, Wayen Yan wrote:
-> From b894fc031e307f1b6756ea9fcac98e82e23815e1 Mon Sep 17 00:00:00 2001
-> From: "Wayen.Yan" <win847@gmail.com>
-> Date: Sun, 14 Jun 2026 07:30:54 +0800
-> Subject: [PATCH net v2] net: airoha: Fix skb->priority underflow in
->  airoha_dev_select_queue()
-> 
-> In airoha_dev_select_queue(), the expression:
-> 
->   queue = (skb->priority - 1) % AIROHA_NUM_QOS_QUEUES;
-> 
-> implicitly converts to unsigned arithmetic: when skb->priority is 0
-> (the default for unclassified traffic), (0u - 1u) wraps to UINT_MAX,
-> and UINT_MAX % 8 = 7, routing default best-effort packets to the
-> highest-priority QoS queue. This causes QoS inversion where the
-> majority of traffic on a PON gateway starves actual high-priority
-> flows (VoIP, gaming, etc.).
-> 
-> Fix by guarding the subtraction: when priority is 0, map to queue 0
-> (lowest priority), otherwise apply the original (priority - 1) % 8
-> mapping.
-> 
-> Fixes: 2b288b81560b ("net: airoha: Introduce ndo_select_queue callback")
-> Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Wayen <win847@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hello:
 
-Hm, I tried to apply this patch to my tree just to see what would happen with
-the duplicated SMTP headers and it looks like they just get added to the
-commit message.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I think you might need to re-send it (but you'll have to wait 24 hours between
-re-sends).
+On Sat, 13 Jun 2026 08:23:12 +0800 you wrote:
+> In airoha_fe_pse_ports_init(), the inner condition for PPE1 queue
+> reservation is identical to the for-loop bound, making it always true
+> and the else branch dead code:
+> 
+>   for (q = 0; q < pse_port_num_queues[FE_PSE_PORT_PPE1]; q++) {
+>       if (q < pse_port_num_queues[FE_PSE_PORT_PPE1])  /* always true */
+>           set RSV_PAGES;
+>       else
+>           set 0;  /* unreachable */
+>   }
+> 
+> [...]
 
-The code looks fine to me, though, so feel free to include my tag:
+Here is the summary with links:
+  - net: airoha: Fix always-true condition in PPE1 queue reservation loop
+    https://git.kernel.org/netdev/net/c/c66f8511a810
 
-Reviewed-by: Joe Damato <joe@dama.to>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
