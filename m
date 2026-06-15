@@ -1,345 +1,192 @@
-Return-Path: <netdev+bounces-299493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299492-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HLfaKv0TMGr8MwUAu9opvQ
-	(envelope-from <netdev+bounces-299493-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:02:21 +0200
+	id JS/XI/UTMGr6MwUAu9opvQ
+	(envelope-from <netdev+bounces-299492-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:02:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B106687717
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:02:16 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E05B4687712
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:02:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bynar.io header.s=google header.b=N7gEXVBI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299493-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299493-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bynar.io;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="qYTKn/oT";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299492-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299492-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BF230302D4ED
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:01:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E83B303277F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA36400DF7;
-	Mon, 15 Jun 2026 15:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D7B3FF8AA;
+	Mon, 15 Jun 2026 15:01:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382223FE667
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 15:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABBC3FFAA3
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 15:01:08 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781535677; cv=none; b=DR3JOxC1Tb9svl0+TPZbve0IR3cEFLX8WihCr2MYU4lbcHVxd6rF8PfpFF/CxMSS58TMtTnGxWdf2SU5PXv/UlBk7BIBy8dcOBrMw57kX6wO3Up334WXNjzMgKvZpDvPSueNq9NI3AWRfDBcnO7L7ANiZQcPd9+HMHUSUGHEYSY=
+	t=1781535672; cv=none; b=any9GHYO//L0L6+QxuwH/BR1L1LyzdGOyBIG2s04N7a88xdXzC/Tmtrkgg6VEn4Uy7+SLbrX3ilyZgG9zniSUTrc1Kqg6h8WLz2hyAwcHbypCSZtADS1bh3KsBjnmJBNNmXzBu8FCrytCiBBB5a8aYEPIjgAII6V0Gwgoh21NMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781535677; c=relaxed/simple;
-	bh=usCgJBs2ZEcaeIKGQxBoi3hhAqjPIERUW7n12UJneHI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fde6JYricFyaUgnX/fv3JLMJt4dIzFkUtz577UsMRhYJbcR6EIYYzHiq9EqFNwW7JuuogEDIA67nyxKtUHcBnntZkg9os8xs1bCplRtzSzlFUJT1LhXyC5JYhDozHOXvxLjbxr5l4mLWDQJLM66JneZ2Qebc1Hy39SVPvefMC+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=N7gEXVBI; arc=none smtp.client-ip=209.85.167.50
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5ad0abf1f7bso2634832e87.3
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 08:01:12 -0700 (PDT)
+	s=arc-20240116; t=1781535672; c=relaxed/simple;
+	bh=/9k6sT4MtrkT6HKWvvkUyJQlITanHuZy5nOkg8tNSqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VcPMWdg3NEEw9b6YBychVZ33Sti4qNt4QIgLEm4qczo0fGqMYy+lMij7Y9RgKNb1S0g7V4JIpb6snrrA3Ndk3DsDg6RRg6zpXfNGmPRYUE1XIPSvSF8UoEdQFzYsSfN+sumH0/fqCASkO7HbVLfFveoDkq9tNtK9HJFuqfpVhoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYTKn/oT; arc=none smtp.client-ip=209.85.128.45
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490cdae130cso16794815e9.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 08:01:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bynar.io; s=google; t=1781535671; x=1782140471; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=11kq7WU3cShcIS3SBeSPsFjxf0dv/lp/snMdSQFHRt8=;
-        b=N7gEXVBITq2S50UHEdkqrLntCTmm/LIiEIY6MLcLGb69/5lvyp/eyDwEPZlP1b70fE
-         jv7yoAJEDs4Q3sZjj79oRBVAGtaKJZZnL48TMDJOQ2vHnlV+ZuK9MUhf1ZGhunUBGSnJ
-         Qe5fb9aNObLP/v8Bmbvt9AM334P6SyLHqV30sAXiwu5UKknyeYOzjmyKTy+/+2ZJN0hj
-         uyQlQouul8e4TV2/ezlxZM4MwenrrBtt/Yb8J7xXC/Tu90vo91Mxu4kbeBa7F7XKx3Lm
-         c9Y+H+R5KyL3naxECcB0Er7vAWGpIeN0Yoo5wZ03gDffZ10rPXjIy2A/8tIDMs81xVyk
-         0F5Q==
+        d=gmail.com; s=20251104; t=1781535667; x=1782140467; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=khnpdZ2IamFmJh+fpxC56x6GA1zuKN5sdVLEGs525B8=;
+        b=qYTKn/oT4I+IpLaxpqlQn9eQX99VzRNenvy81z5MqVSTo1toWHm9StrH4ElHSnsQRH
+         X0E6HCJxYDCa9y/PeOQTO0A+H+g7blVwLVCnHj94HjWT6ytsAPiG4n11D1wNRR4mU8pP
+         KcSWe0IGQhsAXcd8T7hfXuLvMZNVt4YMwedQBvMrMzQR/hGM73p6KlG9hIdT1UlgT4bc
+         A1PNwuQg0p9Qr4jLyLMfLUvSd0XFfTaUJXUWQzceOiPk9C+NLqltJI02zc1vmXZUan2M
+         gMshcDQy7UAeks9uq0ctMSB3+yqRXqPg+dXNo49hNqplig9t0+HCPtSovhnGQLOgBEFb
+         5zmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781535671; x=1782140471;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1781535667; x=1782140467;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=11kq7WU3cShcIS3SBeSPsFjxf0dv/lp/snMdSQFHRt8=;
-        b=fn7m7r+I0E+AD95BsHo9U3bUdt7q92GRkV0DHeVe1OWi0arqhZWXFhQvwZRYsFa3vT
-         mJs7WV6iZYDOlo2XirJd5IMLwYCk5ZsV2JNTXMcPPRVHRXEwxj4jT/38KrLF+tdgMM/d
-         L00RR0lnj7OnsNRXX+PeO3PaWErWK3fv/7cFrLgUjY5ye13tqgQUTPGffLo3uig3mL0H
-         3gNCY0RmxR3AkXS6Kw0mtsZgQ5VAypv2hWjKROIQIv3UZa/MvU0lrHkezJxL30HVk0OE
-         BoW+/EIuBZOOIx+nXciURT/r4cZ666XJZjhylgnYKBslgGMkEOLr/wQkHnUL4oiqO+9u
-         kbQQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/c95zmmvLYef4xzEy3OBOa6COVCuVAE0loZie7Ad/O+3XuCYI0B/u8chm/FaaQaIdNV2u/bPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5CTL9irTngrO65qpihF9JSQ6WNc6ivjtkjZYX+fYQY/BL0c49
-	h44/ziZj2cyg3m8CAi7Lp+qHVRfROOyWaJAzvC5cBssR0Hg9UrjrFoDCETDdkKUWgxs/
-X-Gm-Gg: Acq92OFm2ivrEv5q3KFg3x3nc3lMCEAh1yWcpdudYaNwYsTRW4CYsRcbVugjBZLJSxP
-	inl8Q4fn+/92FFB3jly+uvBCg8RsQT/29jBMsmc+41yLrQDHkbfgw5kFRIpCxkCKzJRFcudX0o+
-	Ri7NRKeeKdAEb3C913l1/+XeA8sNEaPn7Bz/7h8nIjUYqGdCQ6YiE026z8WdaW1ljz34MmxiVzH
-	hLK5fjElb+Z00TOKHnCnQ3DQsBaPzHaXwP83m9zjZUHMukB1mT4NNLh/9C+N+2cfrLlisn1YETI
-	8/bax05/P7r613Kn//hcMgNiSGxTenXRb/C+qVX6P7FHhYHhtbiRInHEmmbV7OJHxEdXgwrIUOS
-	a5BgORKK+OxRsjgFQeqZg6521Je09m1873vJ73s749nUn3kulgnTobYKLcqhVeouOzYUWuaZK0g
-	S1ng0rXF8VPfk=
-X-Received: by 2002:a05:6512:130e:b0:5aa:4bb4:1e9c with SMTP id 2adb3069b0e04-5ad2db4000cmr4493208e87.18.1781535670570;
-        Mon, 15 Jun 2026 08:01:10 -0700 (PDT)
-Received: from localhost ([2a06:61c2:d427:0:b321:1c7a:b072:326e])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e1b7a3fsm2844185e87.82.2026.06.15.08.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 08:01:10 -0700 (PDT)
-From: Samuel Page <sam@bynar.io>
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Samuel Page <sam@bynar.io>,
-	stable@vger.kernel.org
-Subject: [PATCH net] tipc: free bearer discoverer via RCU to fix tipc_disc_rcv UAF
-Date: Mon, 15 Jun 2026 16:00:09 +0100
-Message-ID: <20260615150009.1734270-1-sam@bynar.io>
-X-Mailer: git-send-email 2.54.0
+        bh=khnpdZ2IamFmJh+fpxC56x6GA1zuKN5sdVLEGs525B8=;
+        b=bbvb6TBG0aoD6kKI/NqOLDIcN3DXqr68BGwI1dN1AXFdfXyIOOi6zX+2xkR23NCTlO
+         /+A2oI03Y50BrhTVuCC2vFoj/8gaZQOMI8bKAdvxLSM+2ZtcsqpcDSRMxlQCBCMK5jPe
+         SaaoywGID/b/cSPFy2T6hysp5QquSnFizC4baQpyhS+m8OCh6QN/leY3HTurkufxCfj0
+         fHb4ExY3LhnmTxNx6khNQ08joTzZdmV8OeEKZWlJtNsjZ0cqkqsc2Cbl0hDHSJdwCFSX
+         EZgo1Z9WJJ7NIql+EgYkl4+474eaq3PAGbvNQ1svAaTwVfQy5xgRIrsQd89VhQ55k3aM
+         ivIw==
+X-Forwarded-Encrypted: i=1; AFNElJ/HDW4U8+UdNChfKQc0wA1lStvl/gpK2irMsiPB3MPrRJAm1GinuckJKkEr+3KshUBhNUDgPc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydwCp62FoWOdh7I2ccfA1KeNcz4r7XPYpbytSo0Dhbwlq1bPes
+	8Zovfv/s2FkdJF7ImmEnlTJlAUHQv8mS8BEKTLRfLq+lCoJK5DlNxCYr
+X-Gm-Gg: Acq92OGU3HuA8woMUxZqsHAOsUuIPYA62xGLnR3DVPhIIx37Ld0CZ5hXV6eskbCp2dJ
+	0/Hyzl/pWNCl5DbulgauYRwaUps1vIRvW56TJYFqZXYPhTbhr117qNXcVlw7QJAr/anUkjRfpyH
+	FGuV28NMRzbDvP8R9qOZmr0F3x+J7b2H/K4RuAR7Okk1gDJ7t2k9dx5wu2S0HfqKuE+x0GogBXO
+	4oDbvNxHDHKkusfJSb+Ed4AjkZM/+p6YBpq/aedp5BBGeR5BxnBVjDqYSBPrDit9ttD+f6dz8Yj
+	m4N+a4fh5P06KgUVbMWlBQo8Dp1Ff0QzbOvX41JKvmAetjtYE4VI9du6JRNZiYKVm7Ggrr5M6DP
+	1PGWM7o7w7wGOX+I0EBgoNF6/RoiZzPs40xlnRx5DsGWjJBTJYvzQwE8yVONTAE9CySK+uLMx6n
+	5XKVRGBu6TzogwBfnqUEn25SNjH8kY6EGMAw3iUSkaRDmEdSZJoPvucUYWzCOJmiMpEL8YsVFIq
+	wLB4dtpwN4lpHSMFoJ4rlswUWBJpQ==
+X-Received: by 2002:a05:600c:c0c3:10b0:490:b724:dbd6 with SMTP id 5b1f17b1804b1-4922005087emr113879755e9.6.1781535666481;
+        Mon, 15 Jun 2026 08:01:06 -0700 (PDT)
+Received: from [10.128.10.215] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4619a041986sm11773154f8f.23.2026.06.15.08.01.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Jun 2026 08:01:05 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <eeacfa0d-9303-407f-8e8a-ecc95d1ab1c8@gmail.com>
+Date: Mon, 15 Jun 2026 16:01:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
+To: Kyle Switch <kyle.switch@motor-comm.com>, mmyangfl@gmail.com,
+ andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: ming.xu@motor-comm.com, xiaolin.xu@motor-comm.com,
+ jianmin.wang@motor-comm.com, de.ge@motor-comm.com
+References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
-	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299493-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:sam@bynar.io,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	RSPAMD_URIBL_FAIL(0.00)[bynar.io:query timed out];
-	DKIM_TRACE(0.00)[bynar.io:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:kyle.switch@motor-comm.com,m:mmyangfl@gmail.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[motor-comm.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299492-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bynar.io:dkim,bynar.io:email,bynar.io:mid,bynar.io:from_mime]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5B106687717
+X-Rspamd-Queue-Id: E05B4687712
 
-bearer_disable() tears down a bearer's discovery object with
-tipc_disc_delete(), which frees the struct tipc_discoverer with a plain,
-synchronous kfree(). The discovery receive path, however, still reads
-that object under RCU in softirq context:
+Hi Kyle,
 
-  tipc_udp_recv()            // udp_media.c, rcu_dereference(ub->bearer)
-    -> tipc_rcv()            // node.c
-      -> tipc_disc_rcv()     // discover.c
-        -> tipc_disc_addr_trial_msg(b->disc, ...)  // reads d->net etc.
+On 6/15/26 12:12, Kyle Switch wrote:
 
-tipc_udp_recv() only gates this path on test_bit(0, &b->up), which is a
-TOCTOU check: an RX softirq that observes b->up == 1 before
-bearer_disable() does clear_bit_unlock(0, &b->up) can still be executing
-inside tipc_disc_rcv() when bearer_disable() reaches
+> diff --git a/drivers/net/dsa/motorcomm/Kconfig b/drivers/net/dsa/motorcomm/Kconfig
+> new file mode 100644
+> index 000000000000..f40d75e2a3f2
+> --- /dev/null
+> +++ b/drivers/net/dsa/motorcomm/Kconfig
+> @@ -0,0 +1,30 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +config MOTORCOMM
+> +	tristate "Motorcomm YT92XX switch family support"
+> +	depends on NET_DSA
+> +	select FIXED_PHY
+> +	help
+> +	  This driver adds support for Motorcomm switch chips. It supports
+> +	  YT921X and YT922X switch.
+> +
+> +choice
+> +	prompt "Motorcomm switch series selection"
+> +	depends on MOTORCOMM
+> +
+> +config MOTORCOMM_YT921X
+> +	bool "Motorcomm YT921X series."
+> +
+> +config MOTORCOMM_YT922X
+> +	bool "Motorcomm YT922X series."
+> +endchoice
+> +
+> +config NET_DSA_MOTORCOMM
+> +	tristate "Motorcomm YT92XX switch DSA driver"
+> +	depends on MOTORCOMM
+> +	depends on (MOTORCOMM_YT921X || MOTORCOMM_YT922X)
+> +	select NET_DSA_TAG_MOTORCOMM
+> +	select NET_IEEE8021Q_HELPERS if DCB
+> +	help
+> +	  Select to enable support for Motorcomm driver.
+> +
+> diff --git a/drivers/net/dsa/motorcomm/Makefile b/drivers/net/dsa/motorcomm/Makefile
+NET_DSA_MOTORCOMM already depends on:
+(MOTORCOMM_YT921X || MOTORCOMM_YT922X)
+with both of those options depending on MOTORCOMM due to the 'choice'
+that they're in, so this additional dependency on MOTORCOMM is
+unnecessary.
 
-	if (b->disc)
-		tipc_disc_delete(b->disc);
+You could also consider using a comment to document that this option is
+depended on indirectly.
 
-and kfree()s the discoverer. The reader then dereferences freed memory
-(d->net, inlined into tipc_disc_rcv()) in softirq context [0].
-
-The bearer itself is freed RCU-safely (tipc_bearer_put() ->
-kfree_rcu(b, rcu)) because the RX path runs under RCU, but the discoverer
-hanging off b->disc is freed synchronously. The same b->disc is also
-touched under rcu_read_lock() by
-tipc_disc_add_dest()/tipc_disc_remove_dest().
-
-Free the discoverer with the same RCU lifetime as its bearer. Add an
-rcu_head to struct tipc_discoverer and defer the kfree_skb()/kfree() to
-an RCU callback so any in-flight reader that already loaded b->disc
-completes before the memory is released. The timer is still shut down
-synchronously up front with timer_shutdown_sync() (which can sleep and
-must not run from the RCU callback), and shutting it down before the
-grace period prevents the periodic LINK_REQUEST timer from rearming or
-re-entering the object.
-
-This mirrors the existing TIPC pattern of pairing call_rcu() with a
-cleanup callback (see tipc_node_free()/tipc_aead_free()).
-
-[0]: (trailing page/memory-state dump trimmed)
-BUG: KASAN: slab-use-after-free in tipc_disc_addr_trial_msg net/tipc/discover.c:149 [inline]
-BUG: KASAN: slab-use-after-free in tipc_disc_rcv+0xe7c/0x103c net/tipc/discover.c:236
-Read of size 8 at addr ffff000028f07428 by task ksoftirqd/0/15
-
-CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 7.0.11 #3 PREEMPT
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0xb4/0xd4 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x118/0x5d8 mm/kasan/report.c:482
- kasan_report+0xb0/0xf4 mm/kasan/report.c:595
- __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
- tipc_disc_addr_trial_msg net/tipc/discover.c:149 [inline]
- tipc_disc_rcv+0xe7c/0x103c net/tipc/discover.c:236
- tipc_rcv+0x1884/0x2b1c net/tipc/node.c:2126
- tipc_udp_recv+0x22c/0x684 net/tipc/udp_media.c:393
- udp_queue_rcv_one_skb+0x898/0x1798 net/ipv4/udp.c:2441
- udp_queue_rcv_skb+0x1b0/0xa44 net/ipv4/udp.c:2518
- udp_unicast_rcv_skb+0x13c/0x348 net/ipv4/udp.c:2678
- __udp4_lib_rcv+0x1aec/0x246c net/ipv4/udp.c:2754
- udp_rcv+0x78/0xa0 net/ipv4/udp.c:2936
- ip_protocol_deliver_rcu+0x68/0x410 net/ipv4/ip_input.c:207
- ip_local_deliver_finish+0x28c/0x4b4 net/ipv4/ip_input.c:241
- NF_HOOK include/linux/netfilter.h:318 [inline]
- NF_HOOK include/linux/netfilter.h:312 [inline]
- ip_local_deliver+0x29c/0x2ec net/ipv4/ip_input.c:262
- dst_input include/net/dst.h:480 [inline]
- ip_rcv_finish net/ipv4/ip_input.c:453 [inline]
- ip_rcv_finish net/ipv4/ip_input.c:439 [inline]
- NF_HOOK include/linux/netfilter.h:318 [inline]
- NF_HOOK include/linux/netfilter.h:312 [inline]
- ip_rcv+0x21c/0x258 net/ipv4/ip_input.c:573
- __netif_receive_skb_one_core+0x110/0x184 net/core/dev.c:6195
- __netif_receive_skb+0x2c/0x170 net/core/dev.c:6308
- process_backlog+0x178/0x488 net/core/dev.c:6659
- __napi_poll+0xa8/0x540 net/core/dev.c:7726
- napi_poll net/core/dev.c:7789 [inline]
- net_rx_action+0x360/0x964 net/core/dev.c:7946
- handle_softirqs+0x2f0/0x7b0 kernel/softirq.c:622
- run_ksoftirqd kernel/softirq.c:1063 [inline]
- run_ksoftirqd+0x6c/0x88 kernel/softirq.c:1055
- smpboot_thread_fn+0x65c/0x958 kernel/smpboot.c:160
- kthread+0x39c/0x444 kernel/kthread.c:436
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-Allocated by task 68873:
- kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
- kasan_save_track+0x20/0x3c mm/kasan/common.c:78
- kasan_save_alloc_info+0x40/0x54 mm/kasan/generic.c:570
- poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
- __kasan_kmalloc+0xd4/0xd8 mm/kasan/common.c:415
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x1b0/0x458 mm/slub.c:5385
- kmalloc_noprof include/linux/slab.h:950 [inline]
- tipc_disc_create+0xdc/0x5e0 net/tipc/discover.c:356
- tipc_enable_bearer+0x8b8/0xf94 net/tipc/bearer.c:348
- __tipc_nl_bearer_enable+0x2a8/0x398 net/tipc/bearer.c:1047
- tipc_nl_bearer_enable+0x2c/0x48 net/tipc/bearer.c:1056
- genl_family_rcv_msg_doit+0x1e4/0x2c0 net/netlink/genetlink.c:1114
- genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
- genl_rcv_msg+0x4e8/0x750 net/netlink/genetlink.c:1209
- netlink_rcv_skb+0x204/0x3cc net/netlink/af_netlink.c:2550
- genl_rcv+0x3c/0x54 net/netlink/genetlink.c:1218
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x638/0x930 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x798/0xc68 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0xe0/0x128 net/socket.c:742
- __sys_sendto+0x230/0x2f4 net/socket.c:2206
- __do_sys_sendto net/socket.c:2213 [inline]
- __se_sys_sendto net/socket.c:2209 [inline]
- __arm64_sys_sendto+0xc4/0x13c net/socket.c:2209
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x84/0x2a8 arch/arm64/kernel/syscall.c:49
- el0_svc_common.constprop.0+0xe4/0x294 arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x44/0x5c arch/arm64/kernel/syscall.c:151
- el0_svc+0x38/0xac arch/arm64/kernel/entry-common.c:724
- el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:743
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-
-Freed by task 60072:
- kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
- kasan_save_track+0x20/0x3c mm/kasan/common.c:78
- kasan_save_free_info+0x4c/0x74 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x88/0xb8 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2685 [inline]
- slab_free mm/slub.c:6170 [inline]
- kfree+0x14c/0x458 mm/slub.c:6488
- tipc_disc_delete+0x50/0x68 net/tipc/discover.c:393
- bearer_disable+0x18c/0x278 net/tipc/bearer.c:418
- tipc_bearer_stop+0xe0/0x198 net/tipc/bearer.c:757
- tipc_net_stop+0x110/0x178 net/tipc/net.c:159
- tipc_exit_net+0x80/0x19c net/tipc/core.c:112
- ops_exit_list net/core/net_namespace.c:199 [inline]
- ops_undo_list+0x244/0x694 net/core/net_namespace.c:252
- cleanup_net+0x3a0/0x830 net/core/net_namespace.c:702
- process_one_work+0x628/0xd38 kernel/workqueue.c:3289
- process_scheduled_works kernel/workqueue.c:3372 [inline]
- worker_thread+0x7a8/0xac0 kernel/workqueue.c:3453
- kthread+0x39c/0x444 kernel/kthread.c:436
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-Fixes: 25b0b9c4e835 ("tipc: handle collisions of 32-bit node address hash values")
-Cc: stable@vger.kernel.org
-Assisted-by: Bynario AI
-Signed-off-by: Samuel Page <sam@bynar.io>
----
- net/tipc/discover.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/tipc/discover.c b/net/tipc/discover.c
-index 3e54d2df5683..844975b691ef 100644
---- a/net/tipc/discover.c
-+++ b/net/tipc/discover.c
-@@ -49,6 +49,7 @@
- 
- /**
-  * struct tipc_discoverer - information about an ongoing link setup request
-+ * @rcu: RCU head used to free the structure after a grace period
-  * @bearer_id: identity of bearer issuing requests
-  * @net: network namespace instance
-  * @dest: destination address for request messages
-@@ -60,6 +61,7 @@
-  * @timer_intv: current interval between requests (in ms)
-  */
- struct tipc_discoverer {
-+	struct rcu_head rcu;
- 	u32 bearer_id;
- 	struct tipc_media_addr dest;
- 	struct net *net;
-@@ -382,6 +384,17 @@ int tipc_disc_create(struct net *net, struct tipc_bearer *b,
- 	return 0;
- }
- 
-+/* RCU callback: free the discoverer only after any concurrent
-+ * tipc_disc_rcv() softirq reader of bearer->disc has finished.
-+ */
-+static void tipc_disc_free_rcu(struct rcu_head *rp)
-+{
-+	struct tipc_discoverer *d = container_of(rp, struct tipc_discoverer, rcu);
-+
-+	kfree_skb(d->skb);
-+	kfree(d);
-+}
-+
- /**
-  * tipc_disc_delete - destroy object sending periodic link setup requests
-  * @d: ptr to link dest structure
-@@ -389,8 +402,7 @@ int tipc_disc_create(struct net *net, struct tipc_bearer *b,
- void tipc_disc_delete(struct tipc_discoverer *d)
- {
- 	timer_shutdown_sync(&d->timer);
--	kfree_skb(d->skb);
--	kfree(d);
-+	call_rcu(&d->rcu, tipc_disc_free_rcu);
- }
- 
- /**
-
-base-commit: 47186409c092cd7dd70350999186c700233e854d
--- 
-2.54.0
-
+- Julian Braha
 
