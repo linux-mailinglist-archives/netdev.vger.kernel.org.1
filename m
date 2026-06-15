@@ -1,161 +1,384 @@
-Return-Path: <netdev+bounces-299575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id CgObDGtSMGodRgUAu9opvQ
-	(envelope-from <netdev+bounces-299575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:28:43 +0200
+	id qEdkC0dUMGqIRgUAu9opvQ
+	(envelope-from <netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:36:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8763D689706
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:28:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 916E068973E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:36:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=cWVQHqa7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299575-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299575-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=eV4GHmBd;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299576-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC2813061699
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:28:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7D2AD302FE94
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1CC3B42EF;
-	Mon, 15 Jun 2026 19:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197C238BF61;
+	Mon, 15 Jun 2026 19:36:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DCA30BB8A
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:28:36 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781551717; cv=pass; b=uqN62gEdnuHy1Teclr36Tw8z8HIvfmzT8A7P+K1HSGh8YbK+lJOIhr+zq/0ZvJmCmR7J2n9cONzNOOxICOsrQs7zoRLiyU0Mib++I5WDqWJ2/gSlCHMOvm+zxncD2syo34jiH28xwbTf5CHHrYUgWeMhdkjeAys0UNTRB3tgJTk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781551717; c=relaxed/simple;
-	bh=QxM2o+oxxRfHFIpPp7v/vof0ha2Od7E+bZPcVI3YQEk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gCvWuDECDvHpQUZuWYOpxCRhqhuzGhpwKT92TD4/nXgqFOgQ9Kadroy9ImNvHlbHL27d/RvxizlDtkeEWNlvupOWmOdb4ZEU1/3clTcehJ69ty1Y0Bqjt7A1tDPVsVTLUPIresk6/8+8Rxlay6Jt0XhOuEu/qMyiTwnzsdiyWGA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cWVQHqa7; arc=pass smtp.client-ip=209.85.167.178
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-4863ee8474eso2473567b6e.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:28:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781551715; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jyrl6ZBXP3D5Po9T1054fX2QJtxnDzMx/tap0qhBbg3iL25sjqszqXsxbJ3weAWxqx
-         d0DjwpkypmsiSuWvNZp/gSRNTzBS8H28KbjiS5L7NNLcsWQaxIqm2cDQFd7bX5QVE8Zm
-         Kyeint9tln5vyNNtYqVjHU3kV2HHg8kIVNJk7JXODv84MyHg+9ey6Le6bCw+IJFOF4y2
-         5PCi4XE9yEpSlqK8W7wQJGn5w0eICGG8swmyD/29siQZOkc82AXArM1RtQx7X5I9qRp/
-         S6Z/jmgxzpOEyt4gLQwGa9KOLlgufWCM0ThmxypUA0iLt2D898PjYeP4yeefvI9IntMD
-         D+zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QxM2o+oxxRfHFIpPp7v/vof0ha2Od7E+bZPcVI3YQEk=;
-        fh=sAYpwydvxS20qzBKxkgWQat7CfhGwSllw5pDLOWQY2M=;
-        b=jiGqj98ukGOVPPpUkqYnTBfmXtcTQ+YaPSJx1a3EvTiqmgllZAAl0CC62ftTkkyaBE
-         eScxsc0984LREMI8o8gyXQ2EWo/1emncIEaTXjLmXSstWIyD8gqh1FRK7pUlGUqeXcVE
-         ImCKeOy8y154HBDsYD1OJEFrXd/f2jXP42gBCfUACsy8nyydKE0M4LE1Gnux6EjnbJ2D
-         PvCRMDWJvQ2zsLe/OA54W3sAqACUYTZTEui7ePd0TQwz8FKSM5cFoRbgSYTiCYWbh6JY
-         GFebueUd4ERgtCfrNRmxpWSphs/1wInNwrW09B6IfMi/cDqM+NxuHQ7u+TzN23cmB2wC
-         ScXQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E27D3AE712
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:36:33 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781552195; cv=none; b=ZZxzc+L3y7Hn4SlJt3wOZnF1iPWojkREMnbI/am8UVeE/JSGrJxlsM878NnLDN6rOwyRBKAD66epd78SENNCok0L5p1bGpXen+glrEvA07moKdAZ+osYP14kuwsV76k6jpyWonH3dv8v7uNcIm5Srq3NHkuSJCMlM34c9dyTqUs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781552195; c=relaxed/simple;
+	bh=zExE5mU1uth3L3YciOkNs3dfGu8JI81ISthn7zqwI9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=caV4zKlB+jA//4bp0EHqjgWpthORdqBVyfwbiI3QYOdzjFUTixWxlWOd50r+0KnZZHMDv425gi8kciO86t/0snlu8dDKlcyPwrwmrGIjr+MqppzkfUaVJUlgEtJqs5AhgPD77947CK7Usn/+gsXrzkBrYZ6u7yJXlEy08n8HoaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eV4GHmBd; arc=none smtp.client-ip=209.85.222.175
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-915d64fead9so484070585a.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781551715; x=1782156515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QxM2o+oxxRfHFIpPp7v/vof0ha2Od7E+bZPcVI3YQEk=;
-        b=cWVQHqa7XQbFiYY55ctzxkcHk631e9Av946JKKeN5lKDrmS2EuQyhgjl7nj2O+SDPB
-         39irM0F3o80VHeBn3HU4z8C+Un3nUEruGKSpQWsF0n7OhZL+v8i2bnXqqBH4oKvirChe
-         /KPhG4ItEI463zNk0MKVgI59Xfx/po9GT1oauzsoKX7ysistBqquzaVXePuRT1nAKG5f
-         Srssyvdco2hMuqFb5pShKfANpBJ7X0M4LcCj+AqfqYILTvEwJoDd4uxsVEmGRHvutAtf
-         ZmWq25e2OFGu5fXYmw6gIXTbrF+Hx11/8aHj3j6gRjoIc3I1Jkwd03K/9yKdBA9I+wJF
-         LJiA==
+        d=gmail.com; s=20251104; t=1781552192; x=1782156992; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PEPYbPBc5PCqVyemts16X0tQWPQJiI9iZvYMcKt7ijQ=;
+        b=eV4GHmBdnBkmy3GkfHhfP1aIT7CWIzpo9b6VDrMf9nsHtxRLvYgj3nYp1PrbBGv1ep
+         +0jH7yZMcG5jvUe09ctBrmPb+joJif6z3Y//Ahd9fKFeYKvRkzEw8pVWp3q8aOTaxzHd
+         GYw4FpHu5nFKsuTNl4WgHSn+7Ve0QTC7Y5RWNjkSc4oXhkbVb/5AvV95pnj4t/PUZe5J
+         h2gh98lyzE4bc0mKyRWN+Q6Q02ip+WzkhiLWyPeq1EcWX3m+SYihRAnzXnfSd8YvraKO
+         AJQ+ZfIu3HS0XQtNEmFLXmewisSr6CWUd87ut1CaGe82CwdGSg8L2n89PQ4VVtE1pTE4
+         LfVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781551715; x=1782156515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QxM2o+oxxRfHFIpPp7v/vof0ha2Od7E+bZPcVI3YQEk=;
-        b=Bc/bpU4jo3Kx/QmKB1iSmhgxKath6O90p1LHrV7SpxbgEUUG40nMP9BRdgt8l77lw2
-         nLqtjzrZibpAGTC+lw1s6IXhLavvS5KYgmz2U8+llZyZklNyTwVRmqi48UnrKbniw3jm
-         ujeklzvLQcKfZLGxD4FMvBPj7lJcfQKegBvfMb1EEhypyPcTOIZaMAygUh8Tbq/JtsvC
-         D9J00XgE+4kDK+fqOPwhTAQ4i/csWrUK4UHacR74HRk4WqHuLSIqkgQMwpNiBsLh64NV
-         umusjDtKnQMcwr7hi3KMmwjsrMyNy0Ku1ibqCk6hUm1M3Cfx/mnSxNOILs46lgoT4uwi
-         L/wA==
-X-Forwarded-Encrypted: i=1; AFNElJ9GN+3Y6Oc4rUlY3fiodyYS9uG23NWYud/szLzi1aEPW4wf2i+4P+vIXbwMsXl8af55mGuLGmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/iZoElNNwMglz+orzhYBlAhmigK+xUsynIOkCJyaOLUHo4Mcb
-	0ytvJqyvokTPjp12qlpowofmZAIlo70d5ZNI1mn8BTlP+rkgGOY6UlXpSaEC8HYsYQyJ65//0Gn
-	82/qe6RbMOp2BhsXwwi0RKzKRinDVT7Q=
-X-Gm-Gg: Acq92OEsQxE687VeSIWtBwevt4fAR87NTRiW0Z2Yi0oefCzMsbMDRbcCn//3bczO3Yi
-	qxKmDy4lkt9v1z5OdgmNFfZOci3P/GEMpQ+iAcsLaZRXZCSZcs/msL6XLBRqzqHcdM4rmK9HRhH
-	wjFqgxnUGdCeC2bU67TRYP7+KRZmHs/umcG7UczsBFp7N02F9qaR6+3wHoDuWYH7igequYi+fAC
-	6YzlvMXR0qaQ/rj5ncTIE5P7+3HHxDq2XodDwxSU65BvOc26IDNh7vek8YGi/WLZmV45600/isG
-	5miuqlaOY4AcOFJEBPnOJVpz6XjpSKHAILNt28Y=
-X-Received: by 2002:a05:6808:4f1f:b0:45e:f0af:5148 with SMTP id
- 5614622812f47-4884c15409bmr325938b6e.30.1781551715056; Mon, 15 Jun 2026
- 12:28:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781552192; x=1782156992;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PEPYbPBc5PCqVyemts16X0tQWPQJiI9iZvYMcKt7ijQ=;
+        b=Zogl+1O5K+uAhSoQdwHzk4dp5I3JZuhOfG2oawCc0nQ5sM6ZHb3kj3NNf2GplrfTGW
+         or5hD5PK68mfmh5/ZDZHPvlG5MJOEUecK+Df0IG3Mm76D1eGo2dYnsq/w1ng8HxhBX39
+         VOPstn+OvMBDNm8MwOM96GgoYXp6pD+db2yYL7mAOzCE4siCVnCyndIOryhHn8tkkn92
+         1JkkmHsZeUcZ2B8B1G66nlMqjrPaWTF410xjEQ16AWHyg8u470SK643UIaP0YAjuo/8q
+         himU+p+UDF4maV0yI61fy2fpCmmzc/8Nk4SctyAS0GfHxZG2njdfqGhvPci2iArhhd0G
+         2aFg==
+X-Gm-Message-State: AOJu0YxiGToRRFjhd9xcTAhwtaay9ihdmCWPFaniMlHcod2QzMQ6FKCA
+	ApvVaaYIA8VpRuWGIiCBv05bpd1vij1e5x1qY5PvBMwohrRp2NfbQ/FxOcHfCw==
+X-Gm-Gg: Acq92OG/7EWa8uC/rPoBnNcGvC+HxN9jwhU5lEETWC5qU8WIEcIeP5OGngfV4uOwydY
+	DkVihU9xA/G8lQeHyqDjDSJThDVsr7un9j/wr25CD0QkwV0TH7bC8BwoV4PWervDU5wM9jIubgm
+	rYqcy1fp7XAPks7zM5UWoEgYSbhwUDhxQyNOvLTMccUpOocwMxflVq7YkQmGsNHb8ntfF8Mb0aB
+	o0ODKXag9sUJ3IapyMaUK3JZjRRSvs/kR4KT7ftZS06OtIX19NXoYSoeSToWTcMJue6yqSir3Fv
+	KedPWntiJP6Pih6Ja4pgxL6BGnTVx7ntdTosmdxoL0pqcCmqzxgSwDZhxDljlvqYP9Q7lQMjfD2
+	2imXntVs2eC1tY6fLyVmy8EYZXrLkdG05T76u/B08N9es6mrcthrPtLretk1vBlkDILf1GnIv8C
+	SQmObokVEbENjicxyUaZKAIFvDGqCFZ2GM1U0g9c+KQ9udKWOZjVJSP3jSuuxIngecKLRylJ/8N
+	lbzoeSwXVP8H7G0bWKhZndAbvn2KMIZ9GZNak2YRoz9y/OhKw3m6L01LJVPxnNM6wFY1FRM1DEK
+X-Received: by 2002:a05:620a:2914:b0:8ee:b817:9a03 with SMTP id af79cd13be357-91c2d8654f5mr139642385a.9.1781552192358;
+        Mon, 15 Jun 2026 12:36:32 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-91619f06835sm1229534085a.14.2026.06.15.12.36.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 12:36:31 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Willy Tarreau <w@1wt.eu>,
+	Zero Day Initiative <zdi-disclosures@trendmicro.com>
+Subject: [PATCH net v2] sctp: hold socket lock when dumping endpoints in sctp_diag
+Date: Mon, 15 Jun 2026 15:36:30 -0400
+Message-ID: <4c1b49ab87e0f7d552ebd8172b364b1994e913c9.1781552190.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260615111235.3544282-1-kyle.switch@motor-comm.com> <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
-In-Reply-To: <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
-From: David Yang <mmyangfl@gmail.com>
-Date: Tue, 16 Jun 2026 03:27:58 +0800
-X-Gm-Features: AVVi8Cehmp8CKRe2OQlszCNtcw-kt4m-YUvrG54WzAR5hO1v2gAOIX-jD7Bk7Hw
-Message-ID: <CAAXyoMOy3dQ=--fjQtdvwpV_86kzT3Mdeouyr7WnFj-kqwtD2A@mail.gmail.com>
-Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
-To: Kyle Switch <kyle.switch@motor-comm.com>
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ming.xu@motor-comm.com, 
-	xiaolin.xu@motor-comm.com, jianmin.wang@motor-comm.com, de.ge@motor-comm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299575-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kyle.switch@motor-comm.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com,1wt.eu,trendmicro.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299576-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:w@1wt.eu,m:zdi-disclosures@trendmicro.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,trendmicro.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8763D689706
+X-Rspamd-Queue-Id: 916E068973E
 
-On Tue, Jun 16, 2026 at 2:55=E2=80=AFAM David Yang <mmyangfl@gmail.com> wro=
-te:
-> Please, start with a minimal patch that only marks functions which use
-> different registers/procedures and makes them virtual, and implement
-> them for yt922x in the future.
+SCTP_DIAG endpoint dumping was traversing endpoint address lists without
+holding lock_sock(), while those lists could change concurrently via
+socket operations (e.g., bindx changes). This creates a race where
+nla_reserve() counts addresses under RCU protection, but the subsequent
+copy may see fewer entries, potentially leaking uninitialized memory to
+userspace.
 
-Sorry, this should be sketching yt922x_dsa_switch_ops with existing
-methods and filling the unimplemented later.
+Fix this by:
+
+- Taking a reference on each endpoint during hash traversal
+- Moving socket operations (lock_sock()) outside read_lock_bh()
+- Serializing address list access during dump
+- Reworking sctp_for_each_endpoint() to support restart-based traversal
+  with (net, pos) tracking
+
+Also:
+
+- Add WARN_ON_ONCE() for inconsistent address counts
+- Fix idiag_states filtering for LISTEN vs association cases
+- Skip dumping endpoints being freed (ep->base.dead)
+- Move dump position tracking into iterator, removing cb->args[4] and
+  its comment for sctp_ep_dump().,
+- Update the comment for cb->args[4] and remove the comment for unused
+  cb->args[5] for sctp_sock_dump().
+
+Note: traversal is restart-based and may re-scan buckets multiple times,
+but this is acceptable due to small bucket sizes and required to support
+sleeping-safe callbacks.
+
+This issue was reported by Nico Yip (@_cyeaa_) working with TrendAI Zero
+Day Initiative.
+
+Reported-by: Zero Day Initiative <zdi-disclosures@trendmicro.com>
+Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+v2:
+  - Improve the changelog to cover more changes.
+  - Check ep->base.dead instead of sctp_sstate(sk, CLOSED) in
+    sctp_ep_dump().
+  - Add an inline comment for idiag_states check in sctp_ep_dump().
+  - Update the inline comment for cb->args[4] for sctp_sock_dump().
+  - Simplify the code a bit by holding ep instead of sk in
+    sctp_for_each_endpoint().
+---
+ include/net/sctp/sctp.h |  3 +-
+ net/sctp/diag.c         | 67 ++++++++++++++++++++---------------------
+ net/sctp/socket.c       | 29 +++++++++++++-----
+ 3 files changed, 56 insertions(+), 43 deletions(-)
+
+diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
+index 58242b37b47a..cd82b05354a3 100644
+--- a/include/net/sctp/sctp.h
++++ b/include/net/sctp/sctp.h
+@@ -111,7 +111,8 @@ int sctp_transport_lookup_process(sctp_callback_t cb, struct net *net,
+ 				  const union sctp_addr *paddr, void *p, int dif);
+ int sctp_transport_traverse_process(sctp_callback_t cb, sctp_callback_t cb_done,
+ 				    struct net *net, int *pos, void *p);
+-int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *), void *p);
++int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
++			   struct net *net, int *pos, void *p);
+ int sctp_get_sctp_info(struct sock *sk, struct sctp_association *asoc,
+ 		       struct sctp_info *info);
+ 
+diff --git a/net/sctp/diag.c b/net/sctp/diag.c
+index d758f5c3e06e..c2a0de2adf6f 100644
+--- a/net/sctp/diag.c
++++ b/net/sctp/diag.c
+@@ -92,6 +92,7 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_buff *skb,
+ 		if (!--addrcnt)
+ 			break;
+ 	}
++	WARN_ON_ONCE(addrcnt);
+ 	rcu_read_unlock();
+ 
+ 	return 0;
+@@ -373,42 +374,39 @@ static int sctp_ep_dump(struct sctp_endpoint *ep, void *p)
+ 	struct sk_buff *skb = commp->skb;
+ 	struct netlink_callback *cb = commp->cb;
+ 	const struct inet_diag_req_v2 *r = commp->r;
+-	struct net *net = sock_net(skb->sk);
+ 	struct inet_sock *inet = inet_sk(sk);
+ 	int err = 0;
+ 
+-	if (!net_eq(sock_net(sk), net))
++	lock_sock(sk);
++	if (ep->base.dead)
+ 		goto out;
+ 
+-	if (cb->args[4] < cb->args[1])
+-		goto next;
+-
+-	if (!(r->idiag_states & TCPF_LISTEN) && !list_empty(&ep->asocs))
+-		goto next;
++	/* Skip eps with assocs if non-LISTEN states were requested, since
++	 * they'll be dumped by sctp_sock_dump() during assoc traversal.
++	 */
++	if ((r->idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)) &&
++	    !list_empty(&ep->asocs))
++		goto out;
+ 
+ 	if (r->sdiag_family != AF_UNSPEC &&
+ 	    sk->sk_family != r->sdiag_family)
+-		goto next;
++		goto out;
+ 
+ 	if (r->id.idiag_sport != inet->inet_sport &&
+ 	    r->id.idiag_sport)
+-		goto next;
++		goto out;
+ 
+ 	if (r->id.idiag_dport != inet->inet_dport &&
+ 	    r->id.idiag_dport)
+-		goto next;
+-
+-	if (inet_sctp_diag_fill(sk, NULL, skb, r,
+-				sk_user_ns(NETLINK_CB(cb->skb).sk),
+-				NETLINK_CB(cb->skb).portid,
+-				cb->nlh->nlmsg_seq, NLM_F_MULTI,
+-				cb->nlh, commp->net_admin) < 0) {
+-		err = 2;
+ 		goto out;
+-	}
+-next:
+-	cb->args[4]++;
++
++	err = inet_sctp_diag_fill(sk, NULL, skb, r,
++				  sk_user_ns(NETLINK_CB(cb->skb).sk),
++				  NETLINK_CB(cb->skb).portid,
++				  cb->nlh->nlmsg_seq, NLM_F_MULTI,
++				  cb->nlh, commp->net_admin);
+ out:
++	release_sock(sk);
+ 	return err;
+ }
+ 
+@@ -479,41 +477,40 @@ static void sctp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 		.r = r,
+ 		.net_admin = netlink_net_capable(cb->skb, CAP_NET_ADMIN),
+ 	};
+-	int pos = cb->args[2];
++	int pos;
+ 
+ 	/* eps hashtable dumps
+ 	 * args:
+ 	 * 0 : if it will traversal listen sock
+ 	 * 1 : to record the sock pos of this time's traversal
+-	 * 4 : to work as a temporary variable to traversal list
+ 	 */
+ 	if (cb->args[0] == 0) {
+-		if (!(idiag_states & TCPF_LISTEN))
+-			goto skip;
+-		if (sctp_for_each_endpoint(sctp_ep_dump, &commp))
+-			goto done;
+-skip:
++		if (idiag_states & TCPF_LISTEN) {
++			pos = cb->args[1];
++			if (sctp_for_each_endpoint(sctp_ep_dump, net, &pos,
++						   &commp)) {
++				cb->args[1] = pos;
++				return;
++			}
++		}
+ 		cb->args[0] = 1;
+ 		cb->args[1] = 0;
+-		cb->args[4] = 0;
+ 	}
+ 
++	if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
++		return;
++
+ 	/* asocs by transport hashtable dump
+ 	 * args:
+ 	 * 1 : to record the assoc pos of this time's traversal
+ 	 * 2 : to record the transport pos of this time's traversal
+ 	 * 3 : to mark if we have dumped the ep info of the current asoc
+-	 * 4 : to work as a temporary variable to traversal list
+-	 * 5 : to save the sk we get from travelsing the tsp list.
++	 * 4 : to track position within ep->asocs list in sctp_sock_dump()
+ 	 */
+-	if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
+-		goto done;
+-
++	pos = cb->args[2];
+ 	sctp_transport_traverse_process(sctp_sock_filter, sctp_sock_dump,
+ 					net, &pos, &commp);
+ 	cb->args[2] = pos;
+-
+-done:
+ 	cb->args[1] = cb->args[4];
+ 	cb->args[4] = 0;
+ }
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 66e12fb0c646..c8481461f7d8 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -5369,24 +5369,39 @@ struct sctp_transport *sctp_transport_get_idx(struct net *net,
+ }
+ 
+ int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
+-			   void *p) {
+-	int err = 0;
+-	int hash = 0;
+-	struct sctp_endpoint *ep;
++			   struct net *net, int *pos, void *p) {
++	int err, hash = 0, idx = 0, start;
+ 	struct sctp_hashbucket *head;
++	struct sctp_endpoint *ep;
+ 
+ 	for (head = sctp_ep_hashtable; hash < sctp_ep_hashsize;
+ 	     hash++, head++) {
++		start = idx;
++again:
+ 		read_lock_bh(&head->lock);
+ 		sctp_for_each_hentry(ep, &head->chain) {
+-			err = cb(ep, p);
+-			if (err)
++			if (sock_net(ep->base.sk) != net)
++				continue;
++			if (idx++ >= *pos) {
++				sctp_endpoint_hold(ep);
+ 				break;
++			}
+ 		}
+ 		read_unlock_bh(&head->lock);
++
++		if (ep) {
++			err = cb(ep, p);
++			sctp_endpoint_put(ep);
++			if (err)
++				return err;
++			(*pos)++;
++
++			idx = start;
++			goto again;
++		}
+ 	}
+ 
+-	return err;
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(sctp_for_each_endpoint);
+ 
+-- 
+2.47.1
+
 
