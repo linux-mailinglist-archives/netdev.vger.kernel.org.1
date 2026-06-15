@@ -1,432 +1,153 @@
-Return-Path: <netdev+bounces-299376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /Hg8HIXCL2o7GAUAu9opvQ
-	(envelope-from <netdev+bounces-299376-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:45 +0200
+	id fM9nEYrCL2o/GAUAu9opvQ
+	(envelope-from <netdev+bounces-299379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02133684F57
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:45 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93E9684F5C
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:14:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=jRYfTzfa;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299376-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299376-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=GLRz3NYW;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299379-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299379-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B78AB3049700
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:09:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4590F3013B60
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241603C2BAC;
-	Mon, 15 Jun 2026 09:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB493D669D;
+	Mon, 15 Jun 2026 09:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EE0332EC8;
-	Mon, 15 Jun 2026 09:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6184B3D565D;
+	Mon, 15 Jun 2026 09:14:42 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781514590; cv=none; b=IQMRkoDLbbdcz8qt37Dq0KcI6qqntznQB76Nip2sX+haeqRmL2so3XDqu6RH6Ph8WuP9rMnyK1SHkRHIZoTK1BCQUv4wo2vF4qsMzrqTkoT0ehRI514kKnOjal3C/ujODlZ6D3wiVXXvjyfB14prxG1g1wglWe31N49sLkFTcj4=
+	t=1781514885; cv=none; b=Gl3wua+HPA4rdmNEudXIDqbiaqntUAORlPS5+jzNx4oiu3eVlowfDODwz1j6hYX/3cDKd84euxYwILxz18jTFc//mjd8LasDwgZnb2zG5dArjRy35DY7J7C8e0iJnn6Whc04LprfmElJR+wk/+E9VH4Jh6H5NCY5SssOYPbrCy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781514590; c=relaxed/simple;
-	bh=ZHphPdc8P7pWI08v5QGUrnK6NHNNYfAbxru1oMkNBb4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLqCDwOVuYmYBLsZlV1naNwjdkteM6v1SjqDfxR9VSWA0+ZHNOfFhT1dDDLm2C9OlW7dAs2HpW/yOyDqnHV850TK8gTM9q0yV7sj7TLUFmMSXmpZyJH4bwgy5YCFyT9WU1+fX1nP1f8fj/z+N/xl9vHOj2Tv0hB3K4pztmQlfe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=jRYfTzfa; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65F98KxJ4611677, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1781514501;
-	bh=rspwOawn0AB706Wrhf+l0GzjJLPEY+eDqbj6JIbxyMo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=jRYfTzfacqLRwxQyOqEDaoL3TqrJoGAFX8wLYMxaPfqY+34f5DfWacrN6S9TPBJcv
-	 XVtqhnILxmF6ZKlcVkApPU5rObb/rCDgfSzgIjuWqAIOm363pmVceiOLgOal9f1Jjv
-	 ZAK9hXqy4/OTOVV0t/70xh22r6HBv+2Akk5Hs9b4KD3zOqfX2GZYrWw0OTfWE/KKB5
-	 19bzVzobTlm18dqc+FCF0Tf4koDKyFc/ax3+Cn9Hc9aDJHwMzvbGq3nEnw5j0ZDUmy
-	 hf+9kfo3j6Cav0ppxvn7/dChbUSgy6zFy7LEQ+WXueTxTp1KqavR1GVQDvcDwjepF6
-	 l6FBYq/7IeFww==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65F98KxJ4611677
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 15 Jun 2026 17:08:20 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Jun 2026 17:08:20 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Mon, 15 Jun 2026 17:08:20 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <freddy_gu@realsil.com.cn>, <nb@tipi-net.de>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<daniel@makrotopia.org>, <vladimir.oltean@nxp.com>, Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v5 4/4] net: phy: realtek: load firmware for RTL8261C_CG
-Date: Mon, 15 Jun 2026 17:08:16 +0800
-Message-ID: <20260615090817.429-5-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260615090817.429-1-javen_xu@realsil.com.cn>
-References: <20260615090817.429-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1781514885; c=relaxed/simple;
+	bh=wkz4FFL7OPRkyrk0cKyMyUmdElorOFsbk1NV7paqqso=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qoIK0NaPHMmPovhE1xag/pajnYgQkFIct5/j5yNfTqRt/7DMqydw3v/wPoY1Zbr7UCSEexrU9zPXgobk9Y2qJxIVS8mI0XwZzFeJHtnTzB9p1wYrzWKHVLZSVXkibwaFIWceaAl+XVaSqozlUH+/pCaQHNQgcThjf178Cnq8c0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLRz3NYW; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35CB61F000E9;
+	Mon, 15 Jun 2026 09:14:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781514881;
+	bh=Wxw8XbVi8IuQOABGxqKZaz3Z/SsxgEmI1ANtbVdermI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GLRz3NYWz5FHnn0OngMeUVpZB0iikR9WoOAQmth85ufnNEtXVoZ0itlNVrRWn7FVM
+	 gWsR2lPbgIEJOi/ojsJc2hxSFGqQxQNeBxKxZTomtoCB4XftRs209TU8AR2s2dREoV
+	 0Ogxz/C8g7tLJzgINwU1nfiUbL0cEdR6zS5JhjgOyPKpmDVKQo8C1UyNQYqSVlgESc
+	 DP357enlJSZEf4KT0LljAhoQ0NHayMzS+zuc26mhkYePEhXMUbmswOx9+twYQpurtM
+	 q2w0ToVX1NilOk1kSHcLAkZW1VPdU/GwRAEBCdK/JD/LTpJDJ+CqPGI4U1hgKiMUIE
+	 JU64YZ9BT5rLw==
+Date: Mon, 15 Jun 2026 12:14:36 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	johannes@sipsolutions.net, corbet@lwn.net,
+	skhan@linuxfoundation.org, workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] docs: exclude driver and netdevsim bugs
+Message-ID: <20260615091436.GP327369@unreal>
+References: <20260603162943.2406080-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260603162943.2406080-1-kuba@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299376-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:freddy_gu@realsil.com.cn,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:vladimir.oltean@nxp.com,m:javen_xu@realsil.com.cn,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,realsil.com.cn,tipi-net.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:johannes@sipsolutions.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:workflows@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299379-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[realsil.com.cn:dkim,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,unreal:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 02133684F57
+X-Rspamd-Queue-Id: A93E9684F5C
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+On Wed, Jun 03, 2026 at 09:29:43AM -0700, Jakub Kicinski wrote:
+> Initial wave of AI-generated fixes was mostly for core and protocols
+> we care about. But the number of irrelevant driver fixes is slowly
+> increasing. Add a section of explicit exclusions to our maintainer
+> profile.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: corbet@lwn.net
+> CC: skhan@linuxfoundation.org
+> CC: workflows@vger.kernel.org
+> CC: linux-doc@vger.kernel.org
+> ---
+>  Documentation/process/maintainer-netdev.rst | 28 +++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+> 
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+> index ec7b9aa2877f..cc4b5fa3b5c1 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -272,6 +272,34 @@ the case today. Please follow the standard stable rules in
+>  :ref:`Documentation/process/stable-kernel-rules.rst <stable_kernel_rules>`,
+>  and make sure you include appropriate Fixes tags!
+>  
+> +Bug fixes
+> +~~~~~~~~~
+> +
+> +Unless explicitly excluded all bug fixes should be targeting the ``net``
+> +tree and contain an appropriate Fixes tag.
+> +
+> +Obvious exclusions:
+> +
+> + - fixes for bugs which only exist in ``net-next`` should target ``net-next``
+> +   (please still include the Fixes tag in the commit message)
+> + - bugs which cannot be reached, e.g. in code paths not executed given
+> +   current in-tree callers
+> + - fixes for compiler warnings and typos
 
-This patch adds support for loading firmware. Download some parameters
-for RTL8261C_CG.
+If you decide to resubmit this patch, could you please remove "fixes for
+compiler warnings" from the exclusion list?
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
-Changes in v2:
- - remove __pack, struct rtl8261x_fw_header and rtl8261x_fw_entry will not pad
- - reverse xmas tree for some definition
- - add explanation on rtl_phy_write_mmd_bits()
+It is quite frustrating to receive a compiler warning originating from a
+different subsystem after the merge window, knowing it will not be
+addressed until the next merge window (around eight weeks later).
 
-Changes in v3:
- - add struct rtl8261x_priv
-
-Changes in v4:
- - add struct device *dev
-
-Changes in v5:
- - no changes
-
-Changes in v6:
- - replace rtl_phy_write_mmd_bits with phy_modify_mmd, keep mdio lock
- - check msb and lsb at the beginning of rtl8261x_fw_execute_entry()
- - add comments on rtl8261x_config_init()
----
- drivers/net/phy/realtek/realtek_main.c | 220 +++++++++++++++++++++++++
- 1 file changed, 220 insertions(+)
-
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index bef476ddbe3d..d1a07d1101b6 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -8,7 +8,9 @@
-  * Copyright (c) 2004 Freescale Semiconductor, Inc.
-  */
- #include <linux/bitops.h>
-+#include <linux/crc32.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/firmware.h>
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/pm_wakeirq.h>
-@@ -281,6 +283,42 @@
- 					 RTL8261X_INT_ALDPS_CHG | \
- 					 RTL8261X_INT_JABBER)
- 
-+#define FW_MAIN_MAGIC			0x52544C38
-+#define FW_SUB_MAGIC_8261C		0x32363143
-+#define RTL8261X_POLL_TIMEOUT_MS	100
-+
-+#define RTL8261C_CE_FW_NAME	"rtl_nic/rtl8261c.bin"
-+MODULE_FIRMWARE(RTL8261C_CE_FW_NAME);
-+
-+enum rtl8261x_fw_op {
-+	OP_WRITE = 0x00,	/* Write */
-+	OP_POLL  = 0x02,	/* Polling */
-+};
-+
-+struct rtl8261x_fw_header {
-+	__le32 main_magic;	/* Main magic number 0x52544C38 ("RTL8") */
-+	__le32 sub_magic;	/* Sub magic number */
-+	__le16 version_major;	/* Major version */
-+	__le16 version_minor;	/* Minor version */
-+	__le16 num_entries;	/* Number of entries */
-+	__le16 reserved;	/* Reserved */
-+	__le32 crc32;		/* CRC32 checksum */
-+};
-+
-+struct rtl8261x_fw_entry {
-+	__u8  type;		/* Operation type (OP_*) */
-+	__u8  dev;		/* MMD device */
-+	__le16 addr;		/* Register address */
-+	__u8  msb;		/* MSB bit position */
-+	__u8  lsb;		/* LSB bit position */
-+	__le16 value;		/* Value to write/compare */
-+	__le16 timeout_ms;	/* Poll timeout in milliseconds */
-+	__u8  poll_set;		/* Poll for set (1) or clear (0) */
-+	__u8  reserved;		/* Reserved */
-+};
-+
-+#define FW_HEADER_SIZE		sizeof(struct rtl8261x_fw_header)
-+#define FW_ENTRY_SIZE		sizeof(struct rtl8261x_fw_entry)
- 
- /* RTL8211E and RTL8211F support up to three LEDs */
- #define RTL8211x_LED_COUNT			3
-@@ -300,6 +338,11 @@ struct rtl821x_priv {
- 	u16 iner;
- };
- 
-+struct rtl8261x_priv {
-+	const char *fw_name;
-+	bool fw_loaded;
-+};
-+
- static int rtl821x_read_page(struct phy_device *phydev)
- {
- 	return __phy_read(phydev, RTL821x_PAGE_SELECT);
-@@ -342,8 +385,16 @@ static int rtl821x_modify_ext_page(struct phy_device *phydev, u16 ext_page,
- 
- static int rtl8261x_probe(struct phy_device *phydev)
- {
-+	struct device *dev = &phydev->mdio.dev;
-+	struct rtl8261x_priv *priv;
- 	int sub_phy_id, ret;
- 
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
- 	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, RTL8261X_EXT_ADDR_REG,
- 			    RTL_8261X_SUB_PHY_ID_ADDR);
- 	if (ret < 0)
-@@ -357,6 +408,7 @@ static int rtl8261x_probe(struct phy_device *phydev)
- 
- 	switch (sub_phy_id) {
- 	case RTL8261C_CE_MODEL:
-+		priv->fw_name = RTL8261C_CE_FW_NAME;
- 		phydev_info(phydev, "RTL8261C detected (sub_id 0x%02x)\n", sub_phy_id);
- 		break;
- 
-@@ -412,6 +464,153 @@ static int rtl8261x_read_status(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_verify_firmware(struct phy_device *phydev, const struct firmware *fw)
-+{
-+	const struct rtl8261x_fw_header *hdr;
-+	u32 main_magic, sub_magic;
-+	u32 calc_crc, file_crc;
-+	size_t data_len;
-+	u16 num_entries;
-+
-+	if (fw->size < FW_HEADER_SIZE) {
-+		phydev_err(phydev, "Firmware too small: %zu bytes\n", fw->size);
-+		return -EINVAL;
-+	}
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	main_magic = le32_to_cpu(hdr->main_magic);
-+	if (main_magic != FW_MAIN_MAGIC) {
-+		phydev_err(phydev, "Invalid firmware magic: 0x%08x\n", main_magic);
-+		return -EINVAL;
-+	}
-+
-+	sub_magic = le32_to_cpu(hdr->sub_magic);
-+	if (sub_magic != FW_SUB_MAGIC_8261C) {
-+		phydev_err(phydev, "Invalid sub magic: 0x%08x\n", sub_magic);
-+		return -EINVAL;
-+	}
-+
-+	num_entries = le16_to_cpu(hdr->num_entries);
-+	data_len = num_entries * FW_ENTRY_SIZE;
-+
-+	if (fw->size != sizeof(*hdr) + data_len) {
-+		phydev_err(phydev, "Firmware size mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	calc_crc = crc32(~0, fw->data + FW_HEADER_SIZE, data_len) ^ ~0;
-+	file_crc = le32_to_cpu(hdr->crc32);
-+
-+	if (calc_crc != file_crc) {
-+		phydev_err(phydev, "CRC32 mismatch: calculated=0x%08x file=0x%08x\n",
-+			   calc_crc, file_crc);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8261x_fw_execute_entry(struct phy_device *phydev,
-+				     const struct rtl8261x_fw_entry *entry)
-+{
-+	u16 addr, value, timeout_ms;
-+	u8 dev, msb, lsb, poll_set;
-+	u32 bits, expect_val;
-+	int ret = 0;
-+	int val;
-+
-+	dev = entry->dev;
-+	addr = le16_to_cpu(entry->addr);
-+	msb = entry->msb;
-+	lsb = entry->lsb;
-+	value = le16_to_cpu(entry->value);
-+	timeout_ms = le16_to_cpu(entry->timeout_ms);
-+	poll_set = entry->poll_set;
-+
-+	if (timeout_ms == 0)
-+		timeout_ms = RTL8261X_POLL_TIMEOUT_MS;
-+
-+	if (msb > 15 || lsb > msb) {
-+		phydev_err(phydev, "Invalid firmware bits: msb=%d, lsb=%d\n", msb, lsb);
-+		return -EINVAL;
-+	}
-+
-+	switch (entry->type) {
-+	case OP_WRITE:
-+		ret = phy_modify_mmd(phydev, dev, addr,
-+				     GENMASK(msb, lsb), (value << lsb) & GENMASK(msb, lsb));
-+		if (ret) {
-+			phydev_err(phydev, "WRITE failed: dev=%d addr=0x%04x\n", dev, addr);
-+			return ret;
-+		}
-+		break;
-+
-+	case OP_POLL: {
-+		bits = GENMASK(msb, lsb);
-+		expect_val = (value << lsb) & bits;
-+
-+		if (poll_set)
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) == expect_val,
-+							1000, timeout_ms * 1000, false);
-+		else
-+			ret = phy_read_mmd_poll_timeout(phydev, dev, addr, val,
-+							(val & bits) != expect_val,
-+							1000, timeout_ms * 1000, false);
-+		if (ret)
-+			phydev_err(phydev, "POLL timeout: dev=%d addr=0x%04x\n",
-+				   dev, addr);
-+		break;
-+	}
-+	default:
-+		phydev_err(phydev, "Unknown firmware operation: %d\n", entry->type);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static int rtl8261x_fw_load(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	const struct rtl8261x_fw_entry *entry;
-+	const struct rtl8261x_fw_header *hdr;
-+	const struct firmware *fw;
-+	int ret, i;
-+
-+	if (!priv->fw_name)
-+		return 0;
-+
-+	ret = request_firmware(&fw, priv->fw_name, &phydev->mdio.dev);
-+	if (ret) {
-+		phydev_err(phydev, "Failed to load firmware %s: %d\n", priv->fw_name, ret);
-+		return ret;
-+	}
-+
-+	ret = rtl8261x_verify_firmware(phydev, fw);
-+	if (ret)
-+		goto release_fw;
-+
-+	hdr = (const struct rtl8261x_fw_header *)fw->data;
-+
-+	entry = (const struct rtl8261x_fw_entry *)(fw->data + FW_HEADER_SIZE);
-+	for (i = 0; i < le16_to_cpu(hdr->num_entries); i++, entry++) {
-+		ret = rtl8261x_fw_execute_entry(phydev, entry);
-+		if (ret) {
-+			phydev_err(phydev, "Entry %d failed: %d\n", i, ret);
-+			goto release_fw;
-+		}
-+	}
-+
-+	priv->fw_loaded = true;
-+
-+release_fw:
-+	release_firmware(fw);
-+	return ret;
-+}
-+
- static int rtl8261x_config_intr(struct phy_device *phydev)
- {
- 	int ret;
-@@ -485,6 +684,26 @@ static int rtl8261x_config_aneg(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8261x_config_init(struct phy_device *phydev)
-+{
-+	struct rtl8261x_priv *priv = phydev->priv;
-+	int ret = 0;
-+
-+	/* The firmware parameters are preserved across IEEE soft resets and
-+	 * suspend/resume cycles. Reloading is only necessary after a power
-+	 * cycle or hard reset.
-+	 */
-+	if (priv->fw_name && !priv->fw_loaded) {
-+		ret = rtl8261x_fw_load(phydev);
-+		if (ret) {
-+			phydev_err(phydev, "Firmware loading failed: %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return ret;
-+}
-+
- static int rtl821x_probe(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -3180,6 +3399,7 @@ static struct phy_driver realtek_drvs[] = {
- 		PHY_ID_MATCH_EXACT(RTL_8261C_CG),
- 		.name			= "Realtek RTL8261C 10Gbps PHY",
- 		.probe			= rtl8261x_probe,
-+		.config_init		= rtl8261x_config_init,
- 		.get_features		= rtl8261x_get_features,
- 		.config_aneg		= rtl8261x_config_aneg,
- 		.read_status		= rtl8261x_read_status,
--- 
-2.43.0
-
+Thanks.
 
