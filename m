@@ -1,165 +1,184 @@
-Return-Path: <netdev+bounces-299540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299541-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id olS+CrguMGpjPgUAu9opvQ
-	(envelope-from <netdev+bounces-299540-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:56:24 +0200
+	id gbU/I4wuMGpbPgUAu9opvQ
+	(envelope-from <netdev+bounces-299541-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:55:40 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE4768895E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:56:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A46568894D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 18:55:40 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=iCrFXoYM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299540-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299540-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="PLydyh/4";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299541-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299541-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5945B311E963
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:49:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E30023122DA8
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D184C413D99;
-	Mon, 15 Jun 2026 16:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C200E411693;
+	Mon, 15 Jun 2026 16:49:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76739413D87;
-	Mon, 15 Jun 2026 16:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CCE41167A;
+	Mon, 15 Jun 2026 16:49:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781542150; cv=none; b=Y7p/Lj2LHMtLrVNDGN9E2u0VjVxJiEW/UDzOUezBZEtrDKc3Ls+l7xXiK6AgiPshE8ymPuFYjFVe2tJyJvGRITyVFARQ6dUKonEA6Dvc2qAgEk4v9GepCSz1tRfBmlcJhsfcImVPYFjCQVjp57SDO3goJ+MoEWGc08EKgGqzvzs=
+	t=1781542156; cv=none; b=KLkIdQOoPXkL6mmCbUleMaXx1VnZGbmXKOV8LGs3Mn5FoEPYsqtyLUkc7N5a8pxKh9nKvzZB16BbfRsfE3HHi+F/C8H4OB7V5+V7KkgFSvUf8xjde782Cx2Ua3b1qIWK4zuzz4XDpkOy7EUc42Yf4ZsVRGWiUzPYDDneySjNTe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781542150; c=relaxed/simple;
-	bh=VqCsKRsvy+mxioqtQLOfn3znlkYCCyYsy9QnRBTu6do=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d2MBoJpFCPcuHChnyTpckMayZ+dIXpVgN43zwN6IRItVMr+FVKJEeKsWxVMcuVEIVkuNbSNKzetgcyqpgsAxnTfU7wZin2ZSPx6kY7GR+HJKcme2xiHFCmg9x83f5TpZUqEAKwohltGYhSD3lbbANASZLSRPhFe6kESFbI87EJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iCrFXoYM; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jC3QU4FZPqQg1AwNqnbDKfJyL5YE4F9tg8zVHB4z4v8=; b=iCrFXoYMz+xsVQ6gls0oFxtpMc
-	jD3or/PzwT5ahterKZkNT0Npz5satnfMPG8wH1nDJtBSVmWfwMQ0gi/OJ7CSigQz8oAVDSSut07Ak
-	jBgGPKYkpmLEGO4onHobglR0U5s0zscMls0GFQLmRcJbnH0goFxP2CXCDxrl7Phc9I5M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wZAUZ-007pmW-2P; Mon, 15 Jun 2026 18:48:55 +0200
-Date: Mon, 15 Jun 2026 18:48:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	s=arc-20240116; t=1781542156; c=relaxed/simple;
+	bh=edfUnc6xtOg8nreVx1l9GgQ7LRTcijUWggT9VmGlqD0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fP66svqIHF3uKarCyBz0QWRMqgfobPjLkAmVu+bPcZeG8BSOGQ8kmMOEidfUSjmpQehCj4fLGl2z05iRtz2yPw0rH52jVHSTWWLIFYTA/TgjwgxXq/7kkwsrX6sCIEyHARG/eVhdYfRfHTQm2pl56jW8rOYBM4RbIwVZ+Ukn2J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLydyh/4; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F471F00A3A;
+	Mon, 15 Jun 2026 16:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781542155;
+	bh=9KMHFkvWVjJq8wV6DOPhDqXx0riaGku/JWu2rovsXjc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=PLydyh/4ZZqAIT+BGQeJHTT3byFU9h9KaswEQyUWLRMCm8aUEZzsGYCz1nEV+QP1c
+	 OoNSNfVAh4tOludtFQuvxJVcUgBB8zA1JTUpgbsLkt9xjeLV91qpDXQS/3c1Bzzqdq
+	 /d1IBcdO4pRpbM6bpWQY6eTzUIRKZRdvBmwmAXj1kUJqOklS/wheOk3ZIAAE6SrwDL
+	 UzF80dFL2WwvhBsb0VcHMeyULSCQ9356PgLZT/YE3ngYPg344T5mMzaWbHlaV8fbAk
+	 H6Dh9BE2K9k3zWPzKQgjip8Q33jJGgyYbgmOiZ85W6D5qvSNh4yJn/cYKOBNOQAp9B
+	 JmT08kiAt0V7Q==
+From: Simon Horman <horms@kernel.org>
+To: zhaoyz24@mails.tsinghua.edu.cn
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kees@kernel.org,
+	veritas501@foxmail.com,
 	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH RFC 3/9] net: stmmac: qcom-ethqos: fix RGMII_ID mode to
- use DLL bypass
-Message-ID: <82705420-771d-41bf-a4d9-ed94dff86ff0@lunn.ch>
-References: <20260612-shikra_ethernet-v1-0-f0f4a1d19929@oss.qualcomm.com>
- <20260612-shikra_ethernet-v1-3-f0f4a1d19929@oss.qualcomm.com>
- <42355330-c22a-4fce-98ab-dc22b321ff16@lunn.ch>
- <ai93X/cNWHtEQsDt@oss.qualcomm.com>
+	yangyx22@mails.tsinghua.edu.cn,
+	wangao@seu.edu.cn,
+	fengxw06@126.com,
+	qli01@tsinghua.edu.cn,
+	xuke@tsinghua.edu.cn,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] appletalk: Hold socket reference in atalk_rcv()
+Date: Mon, 15 Jun 2026 17:48:58 +0100
+Message-ID: <20260615164858.783714-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260614095226.1210-1-zhaoyz24@mails.tsinghua.edu.cn>
+References: <20260614095226.1210-1-zhaoyz24@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ai93X/cNWHtEQsDt@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299540-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_RECIPIENTS(0.00)[m:mohd.anwar@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux@armlinux.org.uk,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299541-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:zhaoyz24@mails.tsinghua.edu.cn,m:horms@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,foxmail.com,mails.tsinghua.edu.cn,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,vger.kernel.org:from_smtp]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6AE4768895E
+X-Rspamd-Queue-Id: 0A46568894D
 
-On Mon, Jun 15, 2026 at 09:24:07AM +0530, Mohd Ayaan Anwar wrote:
-> Hello Andrew,
-> On Thu, Jun 11, 2026 at 10:54:37PM +0200, Andrew Lunn wrote:
-> > On Fri, Jun 12, 2026 at 12:06:59AM +0530, Mohd Ayaan Anwar wrote:
-> > > When "rgmii-id" is selected the PHY supplies both TX and RX delays, so
-> > > the MAC must not add its own.  The driver currently falls through to the
-> > > generic DLL initialisation path which programs it to add a delay.
-> > > 
-> > > Power down the DLL and set DDR bypass mode for RGMII_ID, then program
-> > > the IO_MACRO via a new ethqos_rgmii_id_macro_init() helper.  Also fix
-> > > ethqos_set_clk_tx_rate() to not double the clock rate in bypass mode at
-> > > 100M/10M, and remove RGMII_ID from the phase-shift suppression in
-> > > ethqos_rgmii_macro_init() since RGMII_ID no longer reaches that path.
-> > 
-> > I'm curious how this works at the moment? Do no boards make use of
-> > RGMII ID? Are all current boards broken?
-> 
-> Searching through the DTS, I found that we have two boards using "rgmii"
-> (qcs404-evb-4000.dts and sa8155-adp.dts) and another board using
-> "rgmii-txid" (sa8540p-ride.dts). No board which uses RGMII ID.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+appletalk: Hold socket reference in atalk_rcv()
 
-So this causes problems. We cannot break existing boards, yet it would
-be good to fix the current broken behaviour.
+This commit addresses a use-after-free race by holding a reference to the
+socket found by atalk_search_socket() until after the packet is queued in
+atalk_rcv().
 
-> I don't think any of these boards have extra long wires which would add
-> PCB level delay. They are against the netdev definitions for "rgmii" and
-> "rgmii-txid".
-> 
-> But the first two boards should still be working fine since the current
-> driver programs the IO_MACRO to add the delay when operating in RGMII
-> mode.
+> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+> index 30a6dc06291c3..61ec5c569dc3c 100644
+> --- a/net/appletalk/ddp.c
+> +++ b/net/appletalk/ddp.c
 
-Which is wrong, given the current definition. No delays should be
-added, by either the MAC or the PHY.
+[ ... ]
 
-Please could you contact the Maintainers of these boards and find out
-the real situation with the hardware.
+> @@ -1474,9 +1476,12 @@ static int atalk_rcv(struct sk_buff *skb, struct net_device *dev,
+>  		goto drop;
+>  
+>  	/* Queue packet (standard) */
+> -	if (sock_queue_rcv_skb(sock, skb) < 0)
+> +	if (sock_queue_rcv_skb(sock, skb) < 0) {
+> +		sock_put(sock);
+>  		goto drop;
+> +	}
 
-It could be the best way forward is that you issue a warning when
-"rgmii" is found and pass rgmii-id to the PHY. And you also change the
-two boards to use rgmii-id. Lets think about the rgmii-txid case once
-we better understand it.
+[Severity: High]
+Does this code introduce a memory leak or an infinite timer loop?
 
-	Andrew
+By holding a socket reference in atalk_rcv(), the socket memory is kept alive,
+but atalk_rcv() does not hold the socket lock. A concurrent atalk_release()
+could lock the socket, mark it SOCK_DEAD, and call atalk_destroy_socket(),
+which logically purges the receive queue:
+
+net/appletalk/ddp.c:atalk_destroy_socket() {
+    ...
+    skb_queue_purge(&sk->sk_receive_queue);
+    ...
+}
+
+After this purge, atalk_rcv() might call sock_queue_rcv_skb(). The core
+function __sock_queue_rcv_skb() does not reject packets for SOCK_DEAD sockets.
+It will successfully enqueue the skb and increment sk->sk_rmem_alloc.
+
+Since AppleTalk uses the empty sock_def_destruct() instead of a custom
+sk_destruct callback, is the receive queue ever purged upon final sk_free(),
+or does this permanently leak the skb?
+
+Furthermore, if atalk_destroy_socket() finds other pending allocations and
+arms the destruction timer, will the timer endlessly re-arm itself?
+
+net/appletalk/ddp.c:atalk_destroy_timer() {
+    ...
+    if (sk_has_allocations(sk)) {
+        sk->sk_timer.expires = jiffies + SOCK_DESTROY_TIME;
+        add_timer(&sk->sk_timer);
+    }
+    ...
+}
+
+The timer checks sk_has_allocations(sk), which will remain true indefinitely
+due to the uncleared sk_rmem_alloc from the leaked skb.
+
+>  
+> +	sock_put(sock);
+>  	return NET_RX_SUCCESS;
 
