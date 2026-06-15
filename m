@@ -1,284 +1,197 @@
-Return-Path: <netdev+bounces-299494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299495-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id d6+7CYoVMGrFNAUAu9opvQ
-	(envelope-from <netdev+bounces-299494-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:08:58 +0200
+	id RfeLJSAWMGr2NAUAu9opvQ
+	(envelope-from <netdev+bounces-299495-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:11:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BCB6877CD
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:08:57 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B93368782E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 17:11:28 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=outlook.com header.s=selector1 header.b=eXk+4gQU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299494-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299494-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=outlook.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=eihaTJ1Q;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299495-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299495-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 50B093001861
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:08:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 252C630027F6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09BFD400DFE;
-	Mon, 15 Jun 2026 15:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422CA3D16E0;
+	Mon, 15 Jun 2026 15:11:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SY8PR01CU002.outbound.protection.outlook.com (mail-australiaeastazolkn19010076.outbound.protection.outlook.com [52.103.72.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60768400DEE;
-	Mon, 15 Jun 2026 15:08:49 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781536130; cv=fail; b=lC+abBpaRL2k4THddVLBQ/cDlYHYDuIeSL4ewHwpHPNRnb7AvS9YSSLQO3vE6pAUa/LfQ5VVkp8i559mRHOYspTr8DCed0xBcWHxb3OQSxvOedEnOdgdOLtl7MIHhrd/zYGMD0VIlWUcM2He0qM5a0YjozcGzRkUOiMTSqCPhSY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781536130; c=relaxed/simple;
-	bh=4cZk1bue+wliX3V6akGA9wQmZIxD+L6574F3dG/2vZU=;
-	h=From:Date:Subject:Content-Type:Message-ID:To:Cc:In-Reply-To:
-	 MIME-Version; b=jlxopw3j2ej4cLoDI+3VC7MkYhz/0Dk0NrkjGq66TG0QXffEHCNpiVrZKXHePPrk2dLo72oFT1As+BR5CTCS5SYLcMd6DV5Zqz3d+tRJ4eDRdMnItTv+UqQtVsgk3pN0vdNOTNpYjxHQBpmcSJGxS0fitB+PxP9VtaICxhqQPR0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=eXk+4gQU; arc=fail smtp.client-ip=52.103.72.76
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KbGs2mapk3mddrqvoZsMo/8bh/3P1emGvj1KSkc+qjHRbdr9NJsafw5epOo8vmqrJdNnedNKT433mmo9l/RHiMlPunc5fjl/ttqhTSRE/ul3izn7w4uRwhEji/yEORwZl3tqz0+QRfHKtGUhLeCwpkScEGq49ZMhHgf6qOER0YcPnVSRcmZ13i8y756jbYIvvwm1sqb8Tj0ECeSXe8U43AojSQCZc4844jlwjN7LRGp+uvq4b7mF7oV0fk44q7Pou9jDatRM0ooq2ngXTukQP9cAmUEYobYs8vBQYkWbKaUTNR0I9x469uiYL9cnlo1wW/NoWDN9HG2gp+iuYpx8cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HIopT/fprFf51sZrBWlo+ToR1Ams3zdbcjHw9sIDe0k=;
- b=Bo+uwg9mN6zyBKRD0o/PerRiRFVNXZgfyEmGtU80sSyJdzfWy9X/CNO7BQEsNLjz4bbo1kgHwE3oOQPu9DfENGEczwVwBGyRWH7bLR352jFmRE4bLbM83bLHnGe1tgU4h2OwyB7TZE1en29XAHX8jFzubOMvmH6gVFowVyr1ArgxHWTx4MJUpK9y5YEzHwYunECxPMbzx7tjYo3q/G73gkXoJ09p3zLGjwEJu8D53UkwOoK2THzlyyK+pcmtmlWA88LcLHDoDUO16hd/iAldHoRyaV77NUaKIb2P8epXej1ICRqyd0tRAhRVEnsmUQqTd9k/fm4Jvrr/DA8nOcIHHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HIopT/fprFf51sZrBWlo+ToR1Ams3zdbcjHw9sIDe0k=;
- b=eXk+4gQUBaocC2uh7BVCryJCUpbliOlIAK1dl4tktvVupu5CRntqwTAAOQTxuzCv0GPIK83c9hLh9mBYBqwELmdqAC/+h8smlnf0gzkk9ZZx2a68AymNHeDtLw8zXQRc0zgYVcxse7W4ZaitqI6+bmmiXhfdFYaG6cdm/P4q3vapXuKU7HUXgDa650ghsVElgtTBw5Db2xvV21/2M+w3Ve8ge0jHo9HSzUBPDOBZBQRnJ7PcbshJ9e+myhaalyLel5Ce0B4cR4S9ukiRUrj6CrDswmOmE7PYn8UNGiusIXv9WmqBBQIpLtXKCxnhaFsvxddH9w88AoR7xLYL7oBlDg==
-Received: from SYBPR01MB7881.ausprd01.prod.outlook.com (2603:10c6:10:1b0::5)
- by SY6PR01MB8137.ausprd01.prod.outlook.com (2603:10c6:10:1d0::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
- 2026 15:08:43 +0000
-Received: from SYBPR01MB7881.ausprd01.prod.outlook.com
- ([fe80::7cd2:d6e8:3fa0:5f0c]) by SYBPR01MB7881.ausprd01.prod.outlook.com
- ([fe80::7cd2:d6e8:3fa0:5f0c%3]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
- 15:08:42 +0000
-From: Junrui Luo <moonafterrain@outlook.com>
-Date: Mon, 15 Jun 2026 23:04:27 +0800
-Subject: [PATCH net v3] octeontx2-af: cn10k: restrict VF LMTLINE sharing to
- its own PF
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID:
- <SYBPR01MB78811656934E713B77DA6CEDAFE62@SYBPR01MB7881.ausprd01.prod.outlook.com>
-X-B4-Tracking: v=1; b=H4sIAHoUMGoC/x3KTQqAIBBA4avIrBP8QcGuEi1Ep5qNhUYE4t0bW
- n6816FhJWwwiw4VH2p0FoadBKQjlh0lZTYYZbzy2smNXmzS2BBdyMkrbYDfq+IfeF2g4A3rGB/
- +j2HXXAAAAA==
-X-Change-ID: 20260615-fixes-239a59dc6012
-To: Sunil Goutham <sgoutham@marvell.com>, 
- Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Yuhao Jiang <danisjiang@gmail.com>, stable@vger.kernel.org, 
- Junrui Luo <moonafterrain@outlook.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2657;
- i=moonafterrain@outlook.com; h=from:subject:message-id;
- bh=4cZk1bue+wliX3V6akGA9wQmZIxD+L6574F3dG/2vZU=;
- b=owJ4nJvAy8zAJVb4wiKgu++DA+NptSSGLAORqswPD6xfH5tr6npv9bTLMywXR+3/bMD2eHIWd
- 9P7nY2Pntd2lLIwiHExyIopshwvuPTNwneL7hafLckwc1iZQIYwcHEKwESWKTEydCXtjRHU//5I
- yyNRjT/88ca4LwHKk45+eB3s9SBuUqTpHoZ/BhLrk6797qgN3qi15nz+mjMvviZw8+sGVDlf3ft
- bfNFNdgCJmE2+
-X-Developer-Key: i=moonafterrain@outlook.com; a=openpgp;
- fpr=C770D2F6384DB42DB44CB46371E838508B8EF040
-In-Reply-To: <SYBPR01MB788101745A9E36F6FD81CD7AAF152@SYBPR01MB7881.ausprd01.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR03CA0345.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::20) To SYBPR01MB7881.ausprd01.prod.outlook.com
- (2603:10c6:10:1b0::5)
-X-Microsoft-Original-Message-ID:
- <20260615-fixes-v3-1-c7a66c65b812@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45DA3168EE
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 15:11:19 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781536281; cv=none; b=XPdTn+hKulFq4Eg7FL9EbdKUZrdYuBIRZbL7QE75ffepaUo15pAQo++44+FNMh0City9U1KvOyw/iwZKrgr03/Tn2wVU2jKhOkaxw2eWaXkG4x5JVxPOYCQ7GwFJKCwym03E/QA1pYJnBNTRzDbtaCx6SNnX95KkStwgvUc4Sp4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781536281; c=relaxed/simple;
+	bh=VL9zQWD8H1SjF2MkfF9+3rSYoioI+goB1u7B8YNFWgE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KDUM0tC0FZX1ZgWsmo70r8Kmx72yC5PYrfGmrsYuIdgMjn0+HkXenu44w6tEw4f092nlQFxkVrL/1056fqspa/NRy9DtObsuESylN/rop9PLrhF70HepNYlBqy1wRt+EOiEoQsYbuYhNekP89YKtWKuq0rINgpAxBzLDwjX1/20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eihaTJ1Q; arc=none smtp.client-ip=209.85.128.45
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490ae94a89eso31073815e9.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 08:11:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781536278; x=1782141078; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=atumCYZH4kfixZGFrkvd6pjJYdqMUcUkjREboEVQyOE=;
+        b=eihaTJ1Q7B/IJFzop2El7pLlsfO/+gXNCDOFQd819YFo48LLzMurThImyc2SgMfife
+         OBoLtiuuOm7zTYXtpzu9BUkIY7C66qIanpOtkAeaOif7c8T4T1P5WBCxxKvyhVb2jRqE
+         mMUBjTTeYePvx1PsmGDYqn+V9mQc+s6k+hemgx93C6R1+eDRajzuIpW8zqcs5ZBMCSNC
+         qYMAkVi2P3IN6o6XXnydCYRW1BrJRWRYEQFfdk9qH7o/TX28riOAz0/WkuNSQeHMn2lp
+         7PBudttq9n+kxQu3eYqGFYXKfz/Mf0OT2wj7K0GY/kKjbxVtX1IwwXhZVHZnqYyvbPHo
+         lWRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781536278; x=1782141078;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=atumCYZH4kfixZGFrkvd6pjJYdqMUcUkjREboEVQyOE=;
+        b=l0xD31i1W9kDPZ04YTQBxtKfnIHQQQq20uOGaSyW9kZRF67AZGKBiJUjYNxftTefZI
+         zWvhBvXipoXTxgWBC6j4IiTiZo/fUE5EpFLrJ/WBV7O0FC/r3lkKk/3zosmKZuTmeBK6
+         38i2yCgLRD2YnzFgz8tMsg4RwTuR1COA1rK4l6qQW29HGShkUcTAcyDYdQ3WIWzKC396
+         MUy58xP0etvxYXJD9lS1soUeP1eXXPpkUt/vyWEarydOm6d11x1fhdkVUm5KOAFTqjc8
+         do5/hst7fTdGAgQy9bsl7KNrzqP77ljhzx4cdDlVVIRoesWl8mftdpHRSeoYGC1WTMt7
+         uLxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9BRjNIYBBy67L27oHkTy+AeCUIrUpb31qBawrecl2CWf/h5qFOofGie+GYyqoFqPYNFO1oKr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjmYVjA6VlxMhagZT3HrS5jscdsOCWIVALW/kONo18YBrNt/LL
+	yvELk2j0t9/h5u+Sk8I2+/kWuCPfQlskJRTQ8jXVd9KXcp8cKsixCbqb
+X-Gm-Gg: Acq92OEeNlmM+caUTd60CqSNiaCY/7JeZzIkO5gdJPbQ1KCVr+cZchRBQRJLiM30MVp
+	7LNijuvKiTSpUYQGbKBTYY1WPawAObilsEJnqcQK0Q8JjGpMSQBaXoBVIaPbnDXEJse5shILFbj
+	qPzMeJAinOCTiXtp7ejZrtuFEws68BGA/gTGaehd7qSHAZSPRhtjmPQ07PSLJJGnmz2AYlppltq
+	zj9ClFaTZ/s1mM0N9AvzLFv5nYj4dZDGFqUPy+VjhDqQvWZXScflC07Dkr+6s9Y572yUKEK4qhu
+	M0+cYPECRhXmUy/mHJQv22nm+poAXP1rx2yNm1Ssime0nOgMb7EBrZym2iWWcVfHDgTx6XW0nAI
+	4Q/9KmWYUYZcOJU3utuUTXxF5l+YzSAqVCtELpCO3g8CwSUyImDwoyBAbsnurgvLvdTic7SWm+R
+	AnXSKH/nI9m3vLamNnoFonuuqh+yyv1DLJsGlP4euCB6sdoZxWbWi5JUU=
+X-Received: by 2002:a05:600c:3b02:b0:492:2f3c:d0ed with SMTP id 5b1f17b1804b1-4922f3cd1a2mr6544955e9.30.1781536278038;
+        Mon, 15 Jun 2026 08:11:18 -0700 (PDT)
+Received: from Ansuel-XPS24 (93-34-88-103.ip49.fastwebnet.it. [93.34.88.103])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-492203d08bcsm260449915e9.13.2026.06.15.08.11.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 08:11:17 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [PATCH net] net: ethernet: mtk_eth_soc: fix supported_interface set after phylink_create
+Date: Mon, 15 Jun 2026 17:11:00 +0200
+Message-ID: <20260615151106.15438-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SYBPR01MB7881:EE_|SY6PR01MB8137:EE_
-X-MS-Office365-Filtering-Correlation-Id: eed30998-90f1-4849-0059-08decaeffcfc
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|12121999013|15080799012|8060799015|24071999003|19110799012|23021999003|5072599009|24021099003|6090799003|41001999006|20031999006|24121999003|39105399006|22091999003|10035399007|3412199025|4302099013|440099028|23121099006|40105399003|41105399003|26121999007|1602099012|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MkRjbGRCZDV0dGRzRHF3cXFobURjRWkxQlZ2VE9PUGVTSUM5T2tsS05BbVFT?=
- =?utf-8?B?MHZPUEFIL1IxS2J5WlRRZzlNMGZvdlNUb2hpOHZRSzk5WFA3MzUycGxibFFM?=
- =?utf-8?B?ZGUvQytFNG9WVHdVNm53UFVVakFJQnEyNHFBTS85MlBhRUNpclR1ZEhzajlH?=
- =?utf-8?B?YTBMZmJFb1pBYkFlV0pUZDU4QkZXKzRkSTRQVlM3N3kwQ1FGMHZiWXZCemVT?=
- =?utf-8?B?RFZMWDhmZnBqdTZvS2dqOHJLU1hnQS8rR0xKeG50N3NVNDc4dkJGNVgxdlFN?=
- =?utf-8?B?cklaOW05YWpoRkZBRmQrWVZDSG1zeUp6cXNlL0VsRys1czh5c0pJV2lURU8z?=
- =?utf-8?B?YWtUKy9xeWhjczlOdnZ5V3QzSDk2Y0tkMlZzYWdMVE8veVNVZlRwWXE3WlNY?=
- =?utf-8?B?T3RlYTRPV0p4bU1FSzJSYnAra2I0b0RHaUFnQ21QdFlybVp6S2pFOHNCclhO?=
- =?utf-8?B?b09jaVRCd2RRR0N4eXE3bGF6blNhdUJ6YWdhRFFQRC9pSkRYbG9jc1RIR3ZU?=
- =?utf-8?B?bU13a1M2bC92RzZNUVdsYi82RmtRQ2JSVys5Vk9FSmh1UjBCVkFLM050ODBm?=
- =?utf-8?B?WENYdVVFRTJ1VXRtQkx6TzVobFhVL2g0cUthZWVFN3VtSGJhWFU1SEpvL25I?=
- =?utf-8?B?Y0NuRTJuSHA3WVNaZ3JMdTcveXEvakJ3bERkT3ZqTlVXNW9CNkQrelovVWJQ?=
- =?utf-8?B?ZzBnS25RdVl4c0tUN0ZSdk5ERXBtR1FQalUxbHplcHF0ZnpZbXdXZnhrbVpV?=
- =?utf-8?B?SXduR2VZMzFRMGNDbFRUY0E5clVrSmtYNHhENGtEZm9EbnFnZkVqaTB0TkVm?=
- =?utf-8?B?aVYwbUU0YUFwNmFiRCtsM0RSUGIrNG5LN2oxb0NMekxqdTA0QmZvRkF4MFpH?=
- =?utf-8?B?cUR3Q1dKYVptNXVzeHlMcUdaWVlySjdkRXMvalk0SmxRaWtsc0lvem5NQlNI?=
- =?utf-8?B?SVZ2QlpQRU5kZThCV1RHTWRybldWOTVkcGtKOVhWR3ZzRko4QzlERzR3a2Va?=
- =?utf-8?B?ZFd0MFJvZFMwVG9wODU4TGpHNTNBZGJpSzlrNG1MeEdmTjg2MWM5UUt3Z2M3?=
- =?utf-8?B?OVJLU21NUTZ5eGRVRkdKV2VNTHA3YlkvY0tWZEF4dDNxOWdXRnBkMitJeUZh?=
- =?utf-8?B?MjVnc1ZocExJOHdyb2o4TWxjUWdNcnN2TjJ6TEFXbGdoc252UzJvdmhXaWo0?=
- =?utf-8?B?aG9LeGZEQlNBeXJKUU02QUZHMlk4WlIwdm9SUTRQN0wyZ3dFdzMrNFk0TkFN?=
- =?utf-8?B?bGRKQmhlNEt5OWJzTWVNQUpwemZWb1pBN1k1YnFScmZhTmltRXFuTlQ2dG5R?=
- =?utf-8?B?Z1VJenl6eGl5UjBuR0Z0cjlmc2gyaGRxS2ZrK1prTWJCQlpKajdwM3huWEtx?=
- =?utf-8?B?VkU4L3RvK1ZyMjBxUm1RS1dUZ3h4ZnpIYnJYcE5EQk5nSFJJQTJJaTQ4R1Jm?=
- =?utf-8?B?VFlVeFI0MVRzemw3TzBDZWdIVG5oOFN4ZWVRQVFUVDhIdXlUanNQV0JTcTdG?=
- =?utf-8?B?NWRXYXZ3cmtacUMvV2Yya1hIK1lDSlh1RUhkTFptbzZwZmo0TzZXdERNMWVl?=
- =?utf-8?B?SmlXMFdlQ29LMFlkTnZmcG5sbXdick82NENSWTVxUXBBVDQ3K0dyRWl0WFQw?=
- =?utf-8?B?cmQzU3lFRm81VGpzSFhqckw4bit1M2UzMDB5cmtNN0lTYUJOWDNzdlBoT0dK?=
- =?utf-8?B?RUVEb1RPVWVxMElxTUw2REMxdTd6VDBkV2pxRXpVdnZlUUVzbTBoYkF4WXFI?=
- =?utf-8?B?Z3JtUFk3djBUd1o4ZWdVVU01MVFPVjU0dzk1T2I3NWZLSngveVlleTdvQUV6?=
- =?utf-8?B?UmhWN0o3SmtvTTVoZDZId1I4ZjhhWG02TncxenlDaTdmWEQ1bVFZNDZjQjlZ?=
- =?utf-8?Q?duOyg3eRiJB82?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YTVMQ2FLY1EyUEdrdko4Um56RG5PWlJlL285SjVnMExQcEY1TjBlMzF1Y1F1?=
- =?utf-8?B?VXV1MnBuVDJ3RVRXdHdFZGY4bVB1aSt2RWFXL0lIbkdPakVoWGFldUdZRzQ3?=
- =?utf-8?B?V1c1TjBMcDhkUExHTDV3WWRlVW1uTm0zZFZTTjgzT0Y3bm11Tk0xZDlCRi92?=
- =?utf-8?B?Q2RKbmlla1NEOWtHZ3ppZHM3VjFqUHdQRDJzZUNDbFpUUjRWUy9FbC94aHQz?=
- =?utf-8?B?MzRCSHdtQmNuWVFmaDdmRWpjLzh4TlRPV1IrQlYycTFVa1MzUC9teWg2cHRn?=
- =?utf-8?B?TDdmNWtxb2NRZk9MNGEvNkM3aW16R3hTb1dtZE9IMUtUbWRueGs2WHJjbXY2?=
- =?utf-8?B?djR6emVrdjhEMHVxRktiVFlBVVRQK2Y3Y2dhUFNBTkYvUFppdU5NWWlFOUNQ?=
- =?utf-8?B?NjZlWTcvZ1A0Wld2WG9GOWZwYUp0NnRJVmNzWjJMRzNkK0VYZVYyY2g3cXE0?=
- =?utf-8?B?ZzF0VXl4QnJJbDVDMGNCMG5nM0RUTWhDc204REdKaTcya0FhNUtzUlQyVDVY?=
- =?utf-8?B?dmFTODdFR3NUYmFMVHBaZ2MwMmUxY0p2SERyckREZm40YTJGMWVmMUxLb29q?=
- =?utf-8?B?b09NMmZDeW0rYXdwSnp6R29GdW9wUHp2RS9Jd3pxMmF0NlhTNXVsTm1NeVVs?=
- =?utf-8?B?ZjY0M2tNbHQzRno0Nzg1N1N1Wm91YzFZVWduQ2tVRnRLTlRuQk9JNkluWW5z?=
- =?utf-8?B?RzMzU2p4N25xa0xYTWNudnBSQWpoRTUvZlA3VW5yRDNaODZDKzNCazUvVDVV?=
- =?utf-8?B?MXQwdXZqSlZ6L21pdTE4ay9VcU5seXJZV0hNZjl0bmFxNUp3NEREZGpkRi94?=
- =?utf-8?B?bVpvS1BRcGYwY1dRUE80ekJIVkg4ZTN5aFBqK2hmWGFrZGJ1TFBmZEJtbWV4?=
- =?utf-8?B?OXJkSTdTbU9jU29mcStaMlgrMDFPcHRmU2J5a05RaFl0a1dFUWZlVjhYa1pJ?=
- =?utf-8?B?SkNySmFoK2NkQnYwWEk3OGVMbkpCeWdSTE93S1BPY2loM3FGRVFLMzVYbnda?=
- =?utf-8?B?TVMva21XVFBCdmRzOFE1OXMxc3dOcmhBSXcwZWZuZjJKWXJJcEk3ejJMRllG?=
- =?utf-8?B?RENNOGMwMUhqRmtmV0tPUmxlTUtNVUpYUHdHd1hkRzBmb0RoaElFalJkVnBQ?=
- =?utf-8?B?c2Rsd25wd1VJa0UrSEJWdEdkMFZsWUdiRW5wS21ES1Z0TGJPRVYxazFrbnRk?=
- =?utf-8?B?bm0yRjZIZ3J5d3U1OE1ZQjUrV2E3dWs5Y0k1TmpDemdUNFgyTFJuN0VPS0pO?=
- =?utf-8?B?SFNRbVN2ejhXVUMzcVVlNkpxb2x1UEREL0IweUI1dHhIZ1AySXR2M2pnTndk?=
- =?utf-8?B?amZmUlNOekticDV6RkV1ZUVyZ3hKSTNmWG1KTG9KRGdsN1A3UndVbUtFaUxK?=
- =?utf-8?B?RGFXVk9Ld09adGMxNk9NTGZ4bHZ4STU3dkNuTm9Hc0hId1V5ZVhUaHRmZ1Jm?=
- =?utf-8?B?Q3ViUFpHLzlXRjFDQWNja0FvOVEwYXl3QkNudHhWWm12WTRwM0FZOVdRZGZX?=
- =?utf-8?B?elMrZDR5d0picjJpcVlVMlJzMTV2NHNSSjlDTm5vcnI4Q2F2MnliaitoT25k?=
- =?utf-8?B?NWhPelBzZld2UUZaYU5jWmc2TVEzUnpqd1lZWEs5WEt5S0k3NVJZbzNiSzFD?=
- =?utf-8?B?ZjdRMkdERDlxUlJhUUxDSGREaGhrL0tBK2pMZDVyd29nVEdPMkJyM2d3eHM1?=
- =?utf-8?B?YnVodlA4NjBsNGpnVlJZNmlzMGYyNzVDMnR6emZsdkF2OFQ4TTBqRFZpMDAy?=
- =?utf-8?B?KzNyVis3WXNXRElHdGdoVXFTWG8wY095a3h2UTYrZEJnUkYwTW9NSit3c0My?=
- =?utf-8?B?Y2hxaFZTZzhLeCtHNFp2YzF4cWVBRkFsYmQ5M2haUk9zQVFOYkFIR1MrU2Vj?=
- =?utf-8?Q?RhylDRLJ8yqHH?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eed30998-90f1-4849-0059-08decaeffcfc
-X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB7881.ausprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2026 15:08:42.9142
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY6PR01MB8137
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[outlook.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[outlook.com:s=selector1];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_FROM(0.00)[outlook.com];
+	TAGGED_FROM(0.00)[bounces-299495-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299494-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[nbd.name,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,collabora.com,armlinux.org.uk,makrotopia.org,vger.kernel.org,lists.infradead.org];
+	FORGED_SENDER(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:nbd@nbd.name,m:lorenzo@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:linux@armlinux.org.uk,m:daniel@makrotopia.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:ansuelsmth@gmail.com,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[moonafterrain@outlook.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:danisjiang@gmail.com,m:stable@vger.kernel.org,m:moonafterrain@outlook.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[outlook.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[moonafterrain@outlook.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,outlook.com];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ansuelsmth@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,outlook.com:dkim,outlook.com:email,outlook.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,SYBPR01MB7881.ausprd01.prod.outlook.com:mid]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 22BCB6877CD
+X-Rspamd-Queue-Id: 0B93368782E
 
-rvu_mbox_handler_lmtst_tbl_setup() uses req->base_pcifunc as a direct
-index into the LMT map table to read another function's LMTLINE
-physical base address and copy it into the caller's own LMT map table
-entry. The mailbox dispatcher authenticates req->hdr.pcifunc from the
-IRQ source, but req->base_pcifunc is a separate payload field and is
-not sanitized.
+Everything configured in phylink_config it's assumed to be set before
+calling phylink_create() to permit correct parsing of all the different
+modes and capabilities.
 
-Reject the request with -EPERM when a VF caller's base_pcifunc is not a
-valid function under its own PF. is_pf_func_valid() bounds the FUNC field
-to the PF's configured VF count, keeping the computed index inside the
-caller's own slot block.
+Commit 51cf06ddafc9 ("net: ethernet: mtk_eth_soc: add support for MT7988
+internal 2.5G PHY") while introducing support for 2.5G phy for MT7988,
+probably due to an auto-rebase, placed the configuration of the INTERNAL
+interface mode for the supported_interfaces for phylink_config right after
+phylink_create() introducing a possible problem with supported interfaces
+parsing.
 
-Fixes: 893ae97214c3 ("octeontx2-af: cn10k: Support configurable LMTST regions")
-Reported-by: Yuhao Jiang <danisjiang@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Junrui Luo <moonafterrain@outlook.com>
+While this doesn't currently create any problem/bug, move setting this bit
+before phylink_create() to prevent any possible regression in future code
+change in phylink core.
+
+Fixes: 51cf06ddafc9 ("net: ethernet: mtk_eth_soc: add support for MT7988 internal 2.5G PHY")
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
-Changes in v3:
-- Validate base_pcifunc with is_pf_func_valid() in addition to the same-PF
-  check: it bounds the FUNC field to the PF's configured VF count and
-  rejects non-existent functions, closing the wrap. Thanks to the AI
-  review forwarded by Paolo Abeni for spotting this.
-- Link to v2: https://lore.kernel.org/all/SYBPR01MB788101745A9E36F6FD81CD7AAF152@SYBPR01MB7881.ausprd01.prod.outlook.com
-Changes in v2:
-- Restrict the check to VF callers only. PF callers are trusted and may
- still share LMTLINEs across PFs.
-- Link to v1: https://lore.kernel.org/r/SYBPR01MB7881F8D11D2930BB84215253AF0D2@SYBPR01MB7881.ausprd01.prod.outlook.com
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-index d2163da28d18..fa4ea1258d29 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-@@ -178,6 +178,15 @@ int rvu_mbox_handler_lmtst_tbl_setup(struct rvu *rvu,
- 	 * pcifunc (will be the one who is calling this mailbox).
- 	 */
- 	if (req->base_pcifunc) {
-+		/* A VF is untrusted and must not redirect its LMTLINE to
-+		 * another PF's region, so confine VF callers to their own PF.
-+		 */
-+		if (is_vf(req->hdr.pcifunc) &&
-+		    (!is_pf_func_valid(rvu, req->base_pcifunc) ||
-+		     rvu_get_pf(rvu->pdev, req->hdr.pcifunc) !=
-+		     rvu_get_pf(rvu->pdev, req->base_pcifunc)))
-+			return -EPERM;
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 7d771168b990..5d291e50a47b 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -4960,6 +4960,11 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+ 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
+ 		mac_ops = &rt5350_phylink_ops;
+ 
++	if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_2P5GPHY) &&
++	    id == MTK_GMAC2_ID)
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++			  mac->phylink_config.supported_interfaces);
 +
- 		/* Calculating the LMT table index equivalent to primary
- 		 * pcifunc.
- 		 */
-
----
-base-commit: 9716c086c8e8b141d35aa61f2e96a2e83de212a7
-change-id: 20260615-fixes-239a59dc6012
-
-Best regards,
+ 	phylink = phylink_create(&mac->phylink_config,
+ 				 of_fwnode_handle(mac->of_node),
+ 				 phy_mode, mac_ops);
+@@ -4970,11 +4975,6 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
+ 
+ 	mac->phylink = phylink;
+ 
+-	if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_2P5GPHY) &&
+-	    id == MTK_GMAC2_ID)
+-		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+-			  mac->phylink_config.supported_interfaces);
+-
+ 	SET_NETDEV_DEV(eth->netdev[id], eth->dev);
+ 	eth->netdev[id]->watchdog_timeo = 5 * HZ;
+ 	eth->netdev[id]->netdev_ops = &mtk_netdev_ops;
 -- 
-Junrui Luo <moonafterrain@outlook.com>
+2.53.0
 
 
