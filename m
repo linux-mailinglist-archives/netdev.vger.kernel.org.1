@@ -1,74 +1,83 @@
-Return-Path: <netdev+bounces-299296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IGs0KRpuL2pJAQUAu9opvQ
-	(envelope-from <netdev+bounces-299296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:14:34 +0200
+	id 6nXwBxRvL2qYAQUAu9opvQ
+	(envelope-from <netdev+bounces-299304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:18:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BB1682FBE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:14:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E03F683019
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:18:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=realsil.com.cn header.s=dkim header.b=PfUZcr3N;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299296-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299296-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=realsil.com.cn;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299304-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299304-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28C573001381
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:14:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 58B4030011B9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33296276038;
-	Mon, 15 Jun 2026 03:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC5F279DC3;
+	Mon, 15 Jun 2026 03:18:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3551726738B;
-	Mon, 15 Jun 2026 03:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F2F1A0B0E
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 03:18:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781493269; cv=none; b=VsHl7Q/UdBtsN7Bb8D6ZDmvxL+JTTvjJPqTmFJ2M8Fq4O7bTzZR6D8X7zh1BG1FhdIipMDl5cR9QnhxEyHNomIyl8GMLIdk2pdvLL/n8ap3VQZohDy/80w8H1Y5biJVf7kQVG7tME/rZ3aK99JjJXF33mgryRIy9jZ/vXda6vOs=
+	t=1781493519; cv=none; b=fAW/uPbLPN/ucNA4qzpiv1nunj+nsFLZPDHLh8/TYeX+4mLgpS2hmDS4SnMoIUz7HCCxbK1q0UwNufooX07RPX0Q9gEBwG+26DjcA7zc77Ab9aVx3J1A3OMW0aGhBGVlzkRoMmGK4iw9JSNhCE3i/344u1+Hoft04WGV8Qf+MUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781493269; c=relaxed/simple;
-	bh=SDW+1aca+i8yDrqxFwq2oaZia/1LeDbXSozLBKAhGDk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lbfD1Rfpi6Wfln+WCfqIaoNdshw7GXdlb6GI/59/fjA1UyxUzOQkoFYvyElm5wMni3zSGLF7NNz9z0J/QjtsdlWgE/Vr3C3Jn/qf/kuurYZnggzKLOc22/0CZDPyGc+JSBan6z/5r/hoGuDPgZBv9cBOPMr5rvF+dFIVwgSWRNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=PfUZcr3N; arc=none smtp.client-ip=211.75.126.72
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 65F3DpQxA457249, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1781493231;
-	bh=wrj5UsQq6LyDhfuIzqwXJb1M1z4Wiycs5p67n8lSfcI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=PfUZcr3NPnGItFP4JvdP8N43Y+qaPMLx1yGIwsCkLWEbab7Qb+A1wDuu72LPL03C7
-	 FIkK8JP1QDhh7ecphmn25vM8PZizECgpA/wOoJCnBdAGeMGvGF/P3yNUYnFSIl7yc5
-	 ocpOJNcBjKNep8QEmlkPSkDERYy7A17jRYgWvYkMgka7Zi0+QIHfJsYWyZIoj+gfju
-	 m7uSuy0POPYAfqycL9OAWe6u0IYnbxK097rFli/yOeO0QUXLy/GRUyTU3c5+wecQF5
-	 vxbuJr5m6RT4CZcXuCzk81ZYCXKQ+q9RI+wpnOGz/+mzMpdb7it3YdBJpQJ52uZVd4
-	 sNVfpBYloO8NQ==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 65F3DpQxA457249
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 15 Jun 2026 11:13:51 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 15 Jun 2026 11:13:49 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Mon, 15 Jun 2026 11:13:49 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v8 7/7] r8169: support setting rx queue numbers via ethtool
-Date: Mon, 15 Jun 2026 11:13:45 +0800
-Message-ID: <20260615031345.548-8-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260615031345.548-1-javen_xu@realsil.com.cn>
-References: <20260615031345.548-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1781493519; c=relaxed/simple;
+	bh=p1oPhOSk/bCan/mgE2R5t1GhnJwYtACvOwUcLAcMeow=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=emv8Gw5QWVOsA0R49Ttvhl2g/ee3FsG14g/9WHW/VAKsZS4k5sQrjElZv49fiv4qakl/8Z25/BUWtn59lr/TyQLWH/FUw2jW/3ZWyA84jQBfgiFNSC8e96Bn5dJCwFL+PVZayWL7JZZaEq/kNBK46rIQHwtIfZuKH/YiJqrv0aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+X-UUID: e19f5a9c686811f1aa26b74ffac11d73-20260615
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_TRUSTED, SA_EXISTED, SN_TRUSTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
+	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_T1
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:e0f11f38-2e1b-4b4b-914d-6a092b04f028,IP:10,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-15
+X-CID-INFO: VERSION:1.3.12,REQID:e0f11f38-2e1b-4b4b-914d-6a092b04f028,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:e7bac3a,CLOUDID:892e217f99723ef045d68a126a9b4e13,BulkI
+	D:260615111831FJ3754X5,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|136
+	|850|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,
+	Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BR
+	R:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: e19f5a9c686811f1aa26b74ffac11d73-20260615
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.160.131.80)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1351717247; Mon, 15 Jun 2026 11:18:29 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [net v2] net/sched: fix partial tx_queue_len change rollback
+Date: Mon, 15 Jun 2026 11:18:24 +0800
+Message-Id: <20260615031824.314112-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,259 +85,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[realsil.com.cn,none];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[realsil.com.cn:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-299296-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299304-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[kylinos.cn];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:zhaochenguang@kylinos.cn,m:horms@kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:javen_xu@realsil.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[javen_xu@realsil.com.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[realsil.com.cn:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaochenguang@kylinos.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,realsil.com.cn:dkim,realsil.com.cn:email,realsil.com.cn:mid,realsil.com.cn:from_mime]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 14BB1682FBE
+X-Rspamd-Queue-Id: 3E03F683019
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+When dev_qdisc_change_tx_queue_len() fails partway through updating
+per-tx-queue qdiscs, previously updated queues were left at the new
+size while netif_change_tx_queue_len() only restored dev->tx_queue_len.
 
-This patch add support for changing rx queues by ethtool. We can set rx
-1, 2, 4, 8 by ethtool -L eth1 rx num.
+Pass the original queue length and roll back successfully updated
+queues on failure.
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
 ---
-Changes in v2:
- - no changes
+v2:
+ Address review from Jedrzej Jagielski:
+  - Use READ_ONCE() when reading dev->tx_queue_len (fixes RCT violation)
+  - Coding style: blank line before return; split err declaration and assignment
 
-Changes in v3:
- - no changes
-
-Changes in v4:
- - remove rss_support and rss_enable
- - remove some zero-initialized
- - use kzalloc_objs instead of kcalloc
-
-Changes in v5:
- - no changes
-
-Changes in v6:
- - change subject of this patch
- - defer the assignment of tp->init_rx_desc_type until after
-   rtl8169_down()
- - call netif_set_real_num_rx_queues() to synchronize the new rx queue
-   number with networking core
-
-Changes in v7:
- - no changes
- 
-Changes in v8:
- - if dev is not running, updating tp->rss_data->rss_indir_tbl and
-   calling netif_set_real_num_rx_queue when change rx queue number
- - if system does not provide enough irq_nvecs, return -EINVAL
- - malloc new_rx before device down
+v1:
+ https://lore.kernel.org/all/20260612085438.834763-1-zhaochenguang@kylinos.cn/
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 146 +++++++++++++++++++++-
- 1 file changed, 144 insertions(+), 2 deletions(-)
+ include/net/sch_generic.h |  2 +-
+ net/core/dev.c            |  2 +-
+ net/sched/sch_generic.c   | 28 +++++++++++++++++++++-------
+ 3 files changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index e43366468101..c893f0e3ecff 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2790,11 +2790,16 @@ static void rtl_hw_reset(struct rtl8169_private *tp)
- 	rtl_loop_wait_low(tp, &rtl_chipcmd_cond, 100, 100);
- }
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 11159a50d6a1..fa5cae1b1e84 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -704,7 +704,7 @@ void qdisc_class_hash_remove(struct Qdisc_class_hash *,
+ void qdisc_class_hash_grow(struct Qdisc *, struct Qdisc_class_hash *);
+ void qdisc_class_hash_destroy(struct Qdisc_class_hash *);
  
--static void rtl8169_init_rss(struct rtl8169_private *tp)
-+static void rtl8169_set_rss_indir_tbl(struct rtl8169_private *tp,
-+				      unsigned int num_rx_rings)
- {
- 	for (int i = 0; i < tp->rss_data->hw_supp_indir_tbl_entries; i++)
--		tp->rss_data->rss_indir_tbl[i] = ethtool_rxfh_indir_default(i, tp->num_rx_rings);
-+		tp->rss_data->rss_indir_tbl[i] = ethtool_rxfh_indir_default(i, num_rx_rings);
-+}
- 
-+static void rtl8169_init_rss(struct rtl8169_private *tp)
-+{
-+	rtl8169_set_rss_indir_tbl(tp, tp->num_rx_rings);
- 	netdev_rss_key_fill(tp->rss_data->rss_key, RTL_RSS_KEY_SIZE);
- }
- 
-@@ -6228,6 +6233,141 @@ static void r8169_init_napi(struct rtl8169_private *tp)
+-int dev_qdisc_change_tx_queue_len(struct net_device *dev);
++int dev_qdisc_change_tx_queue_len(struct net_device *dev, unsigned int orig_len);
+ void dev_qdisc_change_real_num_tx(struct net_device *dev,
+ 				  unsigned int new_real_tx);
+ void dev_init_scheduler(struct net_device *dev);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 8bfa8313ef62..5b1aa6885bf3 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9931,7 +9931,7 @@ int netif_change_tx_queue_len(struct net_device *dev, unsigned long new_len)
+ 		res = notifier_to_errno(res);
+ 		if (res)
+ 			goto err_rollback;
+-		res = dev_qdisc_change_tx_queue_len(dev);
++		res = dev_qdisc_change_tx_queue_len(dev, orig_len);
+ 		if (res)
+ 			goto err_rollback;
  	}
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index a93321db8fd7..b5ade6701921 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -1400,13 +1400,14 @@ void dev_deactivate(struct net_device *dev, bool reset_needed)
+ EXPORT_SYMBOL(dev_deactivate);
+ 
+ static int qdisc_change_tx_queue_len(struct net_device *dev,
+-				     struct netdev_queue *dev_queue)
++				     struct netdev_queue *dev_queue,
++				     unsigned int len)
+ {
+ 	struct Qdisc *qdisc = rtnl_dereference(dev_queue->qdisc_sleeping);
+ 	const struct Qdisc_ops *ops = qdisc->ops;
+ 
+ 	if (ops->change_tx_queue_len)
+-		return ops->change_tx_queue_len(qdisc, dev->tx_queue_len);
++		return ops->change_tx_queue_len(qdisc, len);
+ 	return 0;
  }
  
-+static void rtl8169_get_channels(struct net_device *dev,
-+				 struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+
-+	ch->max_rx = tp->hw_supp_num_rx_queues;
-+	ch->max_tx = 1;
-+
-+	ch->rx_count = tp->num_rx_rings;
-+	ch->tx_count = 1;
-+}
-+
-+static int rtl8169_realloc_rx(struct rtl8169_private *tp,
-+			      struct rtl8169_rx_ring *new_rx,
-+			      int new_count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < new_count; i++) {
-+		struct rtl8169_rx_ring *ring = &new_rx[i];
-+
-+		ring->rx_desc_array = dma_alloc_coherent(&tp->pci_dev->dev,
-+							 R8169_RX_RING_BYTES,
-+							 &ring->rx_phy_addr,
-+							 GFP_KERNEL);
-+		if (!ring->rx_desc_array) {
-+			ret = -ENOMEM;
-+			goto err_free;
-+		}
-+
-+		memset(ring->rx_databuff, 0, sizeof(ring->rx_databuff));
-+		ret = rtl8169_rx_fill(tp, ring);
-+		if (ret) {
-+			dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-+					  ring->rx_desc_array, ring->rx_phy_addr);
-+			goto err_free;
-+		}
-+	}
-+	return 0;
-+
-+err_free:
-+	while (--i >= 0) {
-+		rtl8169_rx_clear(tp, &new_rx[i]);
-+		dma_free_coherent(&tp->pci_dev->dev, R8169_RX_RING_BYTES,
-+				  new_rx[i].rx_desc_array, new_rx[i].rx_phy_addr);
-+	}
-+	return ret;
-+}
-+
-+static int rtl8169_set_channels(struct net_device *dev,
-+				struct ethtool_channels *ch)
-+{
-+	struct rtl8169_private *tp = netdev_priv(dev);
-+	bool if_running = netif_running(dev);
-+	enum rx_desc_type old_rx_desc_type;
-+	enum rx_desc_type new_desc_type;
-+	struct rtl8169_rx_ring *new_rx;
-+	int i, ret;
-+
-+	old_rx_desc_type = tp->init_rx_desc_type;
-+
-+	if (!rtl_hw_support_rss(tp)) {
-+		netdev_warn(dev, "This chip does not support multiple channels/RSS.\n");
-+		return -EOPNOTSUPP;
+@@ -1443,9 +1444,10 @@ void mq_change_real_num_tx(struct Qdisc *sch, unsigned int new_real_tx)
+ }
+ EXPORT_SYMBOL(mq_change_real_num_tx);
+ 
+-int dev_qdisc_change_tx_queue_len(struct net_device *dev)
++int dev_qdisc_change_tx_queue_len(struct net_device *dev, unsigned int orig_len)
+ {
+ 	bool up = dev->flags & IFF_UP;
++	unsigned int new_len = READ_ONCE(dev->tx_queue_len);
+ 	unsigned int i;
+ 	int ret = 0;
+ 
+@@ -1453,11 +1455,23 @@ int dev_qdisc_change_tx_queue_len(struct net_device *dev)
+ 		dev_deactivate(dev, false);
+ 
+ 	for (i = 0; i < dev->num_tx_queues; i++) {
+-		ret = qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
+-
+-		/* TODO: revert changes on a partial failure */
++		ret = qdisc_change_tx_queue_len(dev, &dev->_tx[i], new_len);
+ 		if (ret)
+-			break;
++			goto rollback;
 +	}
 +
-+	if (ch->rx_count > R8169_MAX_RX_QUEUES || !is_power_of_2(ch->rx_count) ||
-+	    tp->irq_nvecs < get_min_irq_nvecs(tp))
-+		return -EINVAL;
-+
-+	if (ch->rx_count == tp->num_rx_rings)
-+		return 0;
-+
-+	new_desc_type = ch->rx_count > 1 ? RX_DESC_TYPE_RSS : RX_DESC_TYPE_DEFAULT;
-+
-+	if (!if_running) {
-+		ret = netif_set_real_num_rx_queues(dev, ch->rx_count);
-+		if (ret)
-+			return ret;
-+
-+		tp->num_rx_rings = ch->rx_count;
-+		tp->init_rx_desc_type = new_desc_type;
-+
-+		rtl8169_set_rss_indir_tbl(tp, tp->num_rx_rings);
-+		rtl_set_irq_mask(tp);
-+		return 0;
-+	}
-+
-+	new_rx = kzalloc_objs(*new_rx, R8169_MAX_RX_QUEUES);
-+	if (!new_rx)
-+		return -ENOMEM;
-+
-+	netif_stop_queue(dev);
-+	rtl8169_down(tp);
-+
-+	ret = netif_set_real_num_rx_queues(dev, ch->rx_count);
-+	if (ret)
-+		goto err_up;
-+
-+	tp->init_rx_desc_type = new_desc_type;
-+
-+	ret = rtl8169_realloc_rx(tp, new_rx, ch->rx_count);
-+	if (ret)
-+		goto err_reset;
-+
-+	for (i = 0; i < tp->num_rx_rings; i++)
-+		rtl8169_rx_clear(tp, &tp->rx_ring[i]);
-+	rtl8169_free_rx_desc(tp);
-+
-+	tp->num_rx_rings = ch->rx_count;
-+
-+	memset(tp->rx_ring, 0, sizeof(tp->rx_ring));
-+	memcpy(tp->rx_ring, new_rx, sizeof(*new_rx) * ch->rx_count);
-+
-+	rtl8169_set_rss_indir_tbl(tp, tp->num_rx_rings);
-+	rtl_set_irq_mask(tp);
-+
-+	rtl8169_up(tp);
-+	netif_start_queue(dev);
-+
-+	kfree(new_rx);
++	if (up)
++		dev_activate(dev);
 +
 +	return 0;
 +
-+err_reset:
-+	netif_set_real_num_rx_queues(dev, tp->num_rx_rings);
-+	tp->init_rx_desc_type = old_rx_desc_type;
-+err_up:
-+	rtl8169_up(tp);
-+	netif_start_queue(dev);
-+	kfree(new_rx);
++rollback:
++	while (i-- > 0) {
++		int err;
 +
-+	return ret;
-+}
-+
- static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
-@@ -6246,6 +6386,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.nway_reset		= phy_ethtool_nway_reset,
- 	.get_eee		= rtl8169_get_eee,
- 	.set_eee		= rtl8169_set_eee,
-+	.get_channels		= rtl8169_get_channels,
-+	.set_channels		= rtl8169_set_channels,
- 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
- 	.set_link_ksettings	= rtl8169_set_link_ksettings,
- 	.get_ringparam		= rtl8169_get_ringparam,
++		err = qdisc_change_tx_queue_len(dev, &dev->_tx[i], orig_len);
++		if (err)
++			netdev_warn(dev, "failed to revert tx_queue_len on queue %u\n", i);
+ 	}
+ 
+ 	if (up)
 -- 
-2.43.0
+2.25.1
 
 
