@@ -1,180 +1,237 @@
-Return-Path: <netdev+bounces-299488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299489-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ZXJmBAgQMGrTMgUAu9opvQ
-	(envelope-from <netdev+bounces-299488-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:45:28 +0200
+	id CkKYKPgRMGpyMwUAu9opvQ
+	(envelope-from <netdev+bounces-299489-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:53:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C5D56874E6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:45:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 168C7687628
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:53:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=mYeejUh5;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299488-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299488-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=YFbbhTW9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299489-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299489-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EB0463021CD5
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:43:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1FF3830792AD
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA313FCB2F;
-	Mon, 15 Jun 2026 14:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99BC3FAE02;
+	Mon, 15 Jun 2026 14:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D124E3FC5A2;
-	Mon, 15 Jun 2026 14:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85CEA3F8EBE
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 14:44:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781534563; cv=none; b=C+ihAR3GLihJYJozdHsY/fB7Eu47vZUEh/v64dhsag5DendVBpXilSAglRSI+BLoUwbbXHKOLtaC746T8/C2HXCt+ZbyiGn/DCD77rLU0GAC/lQovFNHySu/or9GnpNd1IFTeH2btsUcykSE2IAaTTcHv2Ro/1KDBQVmVgW/9Ts=
+	t=1781534661; cv=none; b=SkYg9gzj2WT3rnzE2yJGuNbn5wnH2FfUkvN2P456LBc2RXiaveoWwAfIbMBwBuX+4GbG+M7ZD8rvJmjKuORBOvrSgONTgyaDzpyMBh5ksCtTaWW2lIdGvIhzZlDFDShIKvl7p6u4gb2matz4X5VCg0WwhnOl0u7MqL63dC+Zw0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781534563; c=relaxed/simple;
-	bh=lyz0o5bIqrQU6GZA9FlIrh0SIJtPiDxC//iPq+MIZlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PAVkgnGZVkrm58rNXK7T34pSYSBILrhiGyeiW45GcUZVQV5iIcD6n32xFdrNqFVWCeHbfMBj0uxWkGSuQjCyNa3ql8jEkTOCG70XMFPnN5iv6HzuUrQV83vcZBAzYSrJSD5FgX6hnHbJniZ5M6YNb7AHi8gG32Z20LRDcLC2KIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYeejUh5; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E8821F000E9;
-	Mon, 15 Jun 2026 14:42:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781534562;
-	bh=0rbF5ZboVW29ctA9StQPDra1Vwsw3zYmxUpbz90V8XU=;
-	h=Date:From:To:Cc:Subject;
-	b=mYeejUh5X3i6i8Wi9z4oe4NYq+nCAjPsHkFic3fW1a2OeoPogHrwKgnNz15EH/Dmr
-	 +igNibVsxxGQ49+XNLe0a4Ermo5Nvj6gB0m5Nagk/gia/Ah+90ku+Jfx/VtcsbC9m3
-	 GG9dYt30y9/fuUeUI7XnBzerccGlI1/i8Jc7BgTA4+2YHwojkTQDB7G+5txsa/nqu+
-	 ryUlv+6QKejrjvHIH6/pXXUew7ORNSJvhrjnnwYB8c8KqQxIHWbAldzJVgNvqspyRw
-	 jHRX8qcnHUxi6urq4V7zL2t5IFpnkIZLKYUrXqkvJ8J9HHZFRG4MdAsoLYubVzjpIf
-	 ncAlflSB/xCGw==
-Date: Mon, 15 Jun 2026 15:42:38 +0100
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Aditya Garg <gargaditya@linux.microsoft.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <ajAPXu-C_PuTgV-a@sirena.org.uk>
+	s=arc-20240116; t=1781534661; c=relaxed/simple;
+	bh=0uLKTvbEAK+Dn2jOLZxPcDA5FGg6UyplCkgx7XgWTI0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nlqh/jAGm1Bo8w9X1G7VLazOKo6twXzIEFSAr/JkWq/u59erl2uSa+uJl8zny7yI3YaNvBV0Eg80MPnYaHBycx8HCtdmdEUqkXdKdPbSJ2H8UojdQ0y77B6pdXkgLJHrFV7AzghOnovy9OI1xuYKjECwQ/HKA0fKKF6un/FC49M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YFbbhTW9; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id EC1F81A37EE;
+	Mon, 15 Jun 2026 14:44:17 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A343460015;
+	Mon, 15 Jun 2026 14:44:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 528B2106C96A2;
+	Mon, 15 Jun 2026 16:44:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781534656; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=LNQ/A2/WUxw1qFzNZc5VEP3z3YtNzDc9swfW+wlF7i8=;
+	b=YFbbhTW99y38MgG/y6VAC2apnTEuaqt6BDTPv9X3YLQtVK46ALfjRfM6dV6JqDaRUgaKv1
+	Tl5JwKrF2HGbLIpA6BkSC+2OBNkydc3UsTtL6Qs1bij61KpbHSUaB2I5zj/9vHwdAslEjc
+	yxZ/sIka+VFvbfErdSPCAyXCr80uUYXDzHyhezFO2fiMGOdftv0vfRyoisP1Znms6bOc1U
+	NQDEJ6nnFnCxASwF6fHXoT0tny4ZJWkthBI6iRizavgRM6f8jvKuT39ZEl6DBL7M5T8xMu
+	5tP6/dIn7nfxVoVcmwa83SjNCEK9mT6utIwt+jm/qpxSMjTSRqDlNigCOg/iIQ==
+Message-ID: <0355da28-d3d7-41ee-ad85-632cc2e03951@bootlin.com>
+Date: Mon, 15 Jun 2026 16:44:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="/QBcvnCH+4/MDw3o"
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 05/12] net: phylink: support late PCS provider
+ attach
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saravana Kannan <saravanak@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
+ <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ llvm@lists.linux.dev
+References: <20260615122950.22281-1-ansuelsmth@gmail.com>
+ <20260615122950.22281-6-ansuelsmth@gmail.com>
+ <867a39de-ccc2-4dcf-be24-ab2542d20ab6@bootlin.com>
+ <6a3007ce.73de60af.3a056d.d903@mx.google.com>
+ <7702ac09-75fd-49de-8ad2-fceaa122b627@bootlin.com>
+ <6a300da0.d5af3cef.1ca29d.19c4@mx.google.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <6a300da0.d5af3cef.1ca29d.19c4@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-7.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299488-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:gargaditya@linux.microsoft.com,m:linux-kernel@vger.kernel.org,m:linux-next@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299489-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,gmail.com,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sirena.org.uk:mid]
+	TAGGED_RCPT(0.00)[netdev,dt,lkml];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:mid,bootlin.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9C5D56874E6
+X-Rspamd-Queue-Id: 168C7687628
 
 
---/QBcvnCH+4/MDw3o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On 6/15/26 16:35, Christian Marangi wrote:
+> On Mon, Jun 15, 2026 at 04:29:04PM +0200, Maxime Chevallier wrote:
+>>
+>>
+>> On 6/15/26 16:10, Christian Marangi wrote:
+>>> On Mon, Jun 15, 2026 at 04:07:03PM +0200, Maxime Chevallier wrote:
+>>>> Hi Christian,
+>>>>
+>>>> On 6/15/26 14:29, Christian Marangi wrote:
+>>>>> Add support for late PCS provider attachment to a phylink instance.
+>>>>> This works by creating a global notifier for the PCS provider and
+>>>>> making each phylink instance that makes use of fwnode subscribe to
+>>>>> this notifier.
+>>>>>
+>>>>> The PCS notifier will emit the event FWNODE_PCS_PROVIDER_ADD every time
+>>>>> a new PCS provider is added.
+>>>>>
+>>>>> phylink will then react to this event and will call the new function
+>>>>> fwnode_phylink_pcs_get_from_fwnode() that will check if the PCS fwnode
+>>>>> provided by the event is present in the pcs-handle property of the
+>>>>> phylink instance.
+>>>>>
+>>>>> If a related PCS is found, then such PCS is added to the phylink
+>>>>> instance PCS list.
+>>>>>
+>>>>> Then we link the PCS to the phylink instance and we refresh the supported
+>>>>> interfaces of the phylink instance.
+>>>>>
+>>>>> Finally we check if we are in a major_config_failed scenario and trigger
+>>>>> an interface reconfiguration in the next phylink resolve.
+>>>>>
+>>>>> In the example scenario where the link was previously torn down due to
+>>>>> removal of PCS, the link will be established again as the PCS came back
+>>>>> and is now available to phylink.
+>>>>>
+>>>>> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>>>>> ---
+>>>>
+>>>> [...]
+>>>>
+>>>>> @@ -2151,6 +2204,10 @@ void phylink_destroy(struct phylink *pl)
+>>>>>  	if (pl->link_gpio)
+>>>>>  		gpiod_put(pl->link_gpio);
+>>>>>  
+>>>>> +	/* Unregister notifier for late PCS attach */
+>>>>> +	if (pl->fwnode_pcs_nb.notifier_call)
+>>>>> +		unregister_fwnode_pcs_notifier(&pl->fwnode_pcs_nb);
+>>>>
+>>>> I wanted to try this out, but I get :
+>>>>
+>>>> drivers/net/phy/phylink.c:2218:17: error: implicit declaration of function ‘unregister_fwnode_pcs_notifier’; did you mean ‘register_fwnode_pcs_notifier’? [-Werror=implicit-function-declaration]
+>>>>  2218 |                 unregister_fwnode_pcs_notifier(&pl->fwnode_pcs_nb);
+>>>>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>       |                 register_fwnode_pcs_notifier
+>>>>
+>>>> I guess you either need to stub this, or there's a missing Kconfig
+>>>> dependency somewhere
+>>>>
+>>>
+>>> Hi yes if you want toi test just enable CONFIG_FWNODE_PCS. I forgot to add
+>>> the static declaration for unregister_fwnode_pcs_notifier. 
+>>
+>> I'll give it a go with this yeah, I have a few devices here I'd like to
+>> try this on.
+>>
+>> Can you CC me for the next rounds ?
+>>
+> 
+> Sure, if you can would be good to check also the other commit if everything
+> is logically correct.
 
-Today's linux-next merge of the net-next tree got a conflict in:
+Absolutely, I'm planning on doing this :) This is quite the series though,
+I'll try to give it some deeper look in the upcoming days, I expect net-next
+to close soon anyways, so that's as good as it gets for reviewing this :)
 
-  drivers/net/ethernet/microsoft/mana/mana_en.c
+Also, it's probably a good idea to have Sean in CC as well, I know a few people
+interested in the Xilinx PCS his series brought, hopefully he can follow-up on
+this series with the other new PCS drivers.
 
-between commit:
+> 
+> BTW by checking test from patchwork I can see also another fix is needed if
+> you want to test this revision.
+> 
+> phylink_create()
+> 
+> -if (config->num_possible_pcs && pl->mac_ops->mac_select_pcs) {
+> +if (config->num_possible_pcs && mac_ops->mac_select_pcs) {
 
-  f8fd56977eeea ("net: mana: guard TX wq object destroy with INVALID_MANA_H=
-ANDLE check")
+Ack, I'll test it with this change, thanks :)
 
-=66rom the net tree and commit:
+Maxime
 
-  d07efe5a6e641 ("net: mana: Use per-queue allocation for tx_qp to reduce a=
-llocation size")
+> 
+> Aside from these change I expect the current legacy code to be not
+> affected by these change.
 
-=66rom the net-next tree.
+I'll probably have things to say about this "legacy" naming :)
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+Thanks for driving this work forwards anyway, that's 
 
-diff --cc drivers/net/ethernet/microsoft/mana/mana_en.c
-index d7de4c4d25bbe,26aef21c6c2c8..0000000000000
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@@ -2332,14 -2399,15 +2399,16 @@@ static void mana_destroy_txq(struct man
-  			napi_synchronize(napi);
-  			napi_disable_locked(napi);
-  			netif_napi_del_locked(napi);
-- 			apc->tx_qp[i].txq.napi_initialized =3D false;
-+ 			apc->tx_qp[i]->txq.napi_initialized =3D false;
-  		}
- -		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i]->tx_object);
- -		if (apc->tx_qp[i].tx_object !=3D INVALID_MANA_HANDLE)
-++		if (apc->tx_qp[i]->tx_object !=3D INVALID_MANA_HANDLE)
-- 			mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
-++			mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i]->tx_object);
- =20
-- 		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
-+ 		mana_deinit_cq(apc, &apc->tx_qp[i]->tx_cq);
- =20
-- 		mana_deinit_txq(apc, &apc->tx_qp[i].txq);
-+ 		mana_deinit_txq(apc, &apc->tx_qp[i]->txq);
-+=20
-+ 		kvfree(apc->tx_qp[i]);
-  	}
- =20
-  	kfree(apc->tx_qp);
+> 
 
---/QBcvnCH+4/MDw3o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmowD10ACgkQJNaLcl1U
-h9DlZAf/SF3nOP+uAj/jqoZYtu4Umt3BpN94o0KIp53+bE0f/nqY3knknrrC+5pd
-vCx5Kdy+5+JSELyE6MESO0fx8Pl+MwM7IHWwV7l/2gF6NXEx/I6ltkRIKf4nxyQL
-Gi3EA4N4vv2TLN5kP50BzjL7XjCRkV/rlutl8E7ikkc0B5wSVVIyFqyTExD0IPm1
-KrBIeOf6r7GmIw2/ENaznOaDMazrGIZ90jit1mHyAfcJQl0x9Hhm0PL6WYZdNVe8
-NPM9R6+8kUGLgjxCwGLRXZk6jsYKrJdy9tkKlMy+uEtszzXujCHG3fLUYkbiPR/z
-PWlGqYUH3Zm2Fh9Wo1dSA/t6kQlCiA==
-=mvno
------END PGP SIGNATURE-----
-
---/QBcvnCH+4/MDw3o--
 
