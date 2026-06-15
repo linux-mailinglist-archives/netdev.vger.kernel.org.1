@@ -1,127 +1,166 @@
-Return-Path: <netdev+bounces-299390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299391-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fS0rFS3VL2rTHgUAu9opvQ
-	(envelope-from <netdev+bounces-299390-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:34:21 +0200
+	id aaJdErzVL2rdHgUAu9opvQ
+	(envelope-from <netdev+bounces-299391-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:36:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1496855F3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:34:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE4168561A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:36:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Fkt6tDlH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299390-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299390-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299391-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299391-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C86E301AF57
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:34:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3EC4730066B5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B4A2D7DE7;
-	Mon, 15 Jun 2026 10:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C7732ED27;
+	Mon, 15 Jun 2026 10:36:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6D619A2A3;
-	Mon, 15 Jun 2026 10:34:16 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE99640D586
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 10:36:34 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781519657; cv=none; b=j7S/cYLXG3OraxPXUD6XBTSo9VaHM5km52CMdf8m4lXoGWt6Qz3XYDz3RuTBLNOf5+tTdPGQXzMq9Pe7aGy2uB4hDCGjSp30xiuIHdpyA/uNP507uXVlcuC7Mh0pB4idDm+pvmVD6cT5fLsvI2RZjL0FNEn4WUTPYSwOZubW9LQ=
+	t=1781519801; cv=none; b=rtDLFwBIJjzBcA9Xx+J5L8m4OONXlfCa5agu4LvRcMDVNrHG76gzlzg5UnS2uo/JMpJrYA6KeoUHgs9SVHLEtmw46sBnpSY2s1EzhQMrimL13grmIKZlmMxVdQMZej7hntjG4aNq9/84iKoFb6RwQzQkTIudE2eoJ0jZ55xEd+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781519657; c=relaxed/simple;
-	bh=89apKyoVyx0NU3Q5QdL0cWDoy6xVDB2ZD2br42avnlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wjh6JNJWbT0cSojylOx977iFxVi8V+FO6wPcuZ5HMV0ECJRgGaJ7mKBOmOKqtzX2mY3b+ea6Vkr/9syHR4P/0/GWran8VyO+adjX1cwG8ioF4PIcj9iO3EaTMpfuFQz4GR1WaN+YMlayJQZMv/wFvwLbYX07X+0EhcvfhKj7WBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fkt6tDlH; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471E11F000E9;
-	Mon, 15 Jun 2026 10:34:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781519656;
-	bh=Yq8kBNPmxB2ckY04TeWOViDae28qQtfQoD0vJLW20hU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Fkt6tDlH+w/N+P4fpIgDcfDg9soPXLOeY6i+dbDff/a/8jd6bT86JVIRvtfQaq2tN
-	 d7P82EF5JiVClS0K6GeSUxEGGTxSoO6j0TUktovHCdH03D0H9RxOJxH5TEle02Ho+O
-	 nhIBX5Z+QBs0GH1XoFBovFhN+sXw9oqxkxFvld6qcKvZsl4Tc9waTT+35rZNZpIQ1S
-	 LmxwnqecSysi7o5oFxS0hUqgLa7sFhrMBnVsc+KetRv50409sZ5ISGV9Ea7ia0QTUj
-	 9Hoo/wDBrenEcjkMdyLyQgfsutonXLbHjw8l6jDyoVVFnzDtsp6BN9MlId/snVNTgx
-	 yIxmVOUCFH0lQ==
-Date: Mon, 15 Jun 2026 11:34:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: jelonek.jonas@gmail.com, kory.maincent@bootlin.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	daniel@makrotopia.org, bjorn@mork.no
-Subject: Re: [PATCH net-next v2 2/2] net: pse-pd: add Realtek/Broadcom PSE
- MCU driver
-Message-ID: <20260615103411.GF712698@horms.kernel.org>
-References: <20260612132944.460646-3-jelonek.jonas@gmail.com>
- <20260615090733.739423-2-horms@kernel.org>
- <ai_ITHd_xxt7an4q@pengutronix.de>
+	s=arc-20240116; t=1781519801; c=relaxed/simple;
+	bh=cilkiXJoTKf/1DnW4ZFRYfjLP3Ydn6ylgzjtwVSOv2o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=si1Bx3f3J4gRrCxticQz9z/juJYhB6SCcyiNgf0iZAgv2KFr8J5NvjxS+UeMXaCuAmmluKnd33keCF8BpjKZ22yrxKPVSROiI85jDQhjulHdNPDsrFhOPo9rhVD3dq+kq2LQNwfjrwW//BOohlCnaumvnao4vF0xxo4ZIQnhOjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn; spf=pass smtp.mailfrom=hust.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Received: from hust.edu.cn (unknown [172.16.0.52])
+	by app2 (Coremail) with SMTP id HwEQrAB3f7OY1S9q7pUnAA--.2386S2;
+	Mon, 15 Jun 2026 18:36:08 +0800 (CST)
+Received: from uu22.. (unknown [10.12.191.55])
+	by gateway (Coremail) with SMTP id _____wCnngmX1S9qcBFTAA--.12278S2;
+	Mon, 15 Jun 2026 18:36:07 +0800 (CST)
+From: Yinhao Hu <dddddd@hust.edu.cn>
+To: netdev@vger.kernel.org
+Cc: David Heidelberg <david+nfc@ixit.cz>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Dan Carpenter <error27@gmail.com>,
+	dzm91@hust.edu.cn,
+	hust-os-kernel-patches@googlegroups.com,
+	Yinhao Hu <dddddd@hust.edu.cn>
+Subject: [PATCH net] nfc: pn533: prevent division by zero in the listen mode timer
+Date: Mon, 15 Jun 2026 03:35:47 -0700
+Message-ID: <20260615103547.1599528-1-dddddd@hust.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ai_ITHd_xxt7an4q@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:HwEQrAB3f7OY1S9q7pUnAA--.2386S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWxtFW5Gry8Zr43Jw4fXwb_yoW8Cr4kpr
+	Z8XFyayr4DXr4UKF4UGFWDWa4rZ3Z7JrW8tFWUKwsrCF90q3WFyFW5ta1agFs7trWrAr42
+	vFZ5Wr1Dua90kFUanT9S1TB71UUUUbUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm2b7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
+	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
+	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1ln4kS14v26r
+	126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I8C
+	rVACY4xI64kE6c02F40Ex7xfMcIj64x0Y40En7xvr7AKxVW8Jr0_Cr1UMcIj6x8ErcxFaV
+	Av8VW8uFyUJr1UMcIj6xkF7I0En7xvr7AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8
+	JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF04
+	k20xvE74AGY7Cv6cx26r4fZr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAF
+	wI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVF
+	xhVjvjDU0xZFpf9x07bcuciUUUUU=
+X-CM-SenderInfo: bgsqjkiyqyjko6kx23oohg3hdfq/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299390-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:o.rempel@pengutronix.de,m:jelonek.jonas@gmail.com,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:jelonekjonas@gmail.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[ixit.cz,kernel.org,gmail.com,hust.edu.cn,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-299391-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[hust.edu.cn];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:david+nfc@ixit.cz,m:krzk@kernel.org,m:kuba@kernel.org,m:error27@gmail.com,m:dzm91@hust.edu.cn,m:hust-os-kernel-patches@googlegroups.com,m:dddddd@hust.edu.cn,m:david@ixit.cz,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,makrotopia.org,mork.no];
+	FORGED_SENDER(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,nfc];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9D1496855F3
+X-Rspamd-Queue-Id: BFE4168561A
 
-On Mon, Jun 15, 2026 at 11:39:24AM +0200, Oleksij Rempel wrote:
-> Hi Jonas,
-> 
-> On Mon, Jun 15, 2026 at 10:07:33AM +0100, Simon Horman wrote:
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > Full review at: https://sashiko.dev
-> 
-> It probably sounds scary, but sashiko finds not all issues in one time.
-> Bigger patches and more different included frameworks - increase findings
-> probability a lot. With other words, it may more rounds than expected.
+The listen-mode timer handler advances the polling state machine through
+pn533_poll_next_mod(), which computes:
 
-FWIIW, that matches my observations too.
+dev->poll_mod_curr = (dev->poll_mod_curr + 1) % dev->poll_mod_count;
 
-...
+pn533_poll_reset_mod_list() clears dev->poll_mod_count without first
+stopping that timer: pn533_dep_link_down() deletes no timer at all, and
+pn533_stop_poll() uses timer_delete(), which does not wait for a handler
+already running on another CPU. When the handler runs after the count
+has been zeroed, it divides by zero:
+
+Oops: divide error: 0000 [#1] SMP
+RIP: 0010:pn533_listen_mode_timer+0x9b/0x110
+
+Delete the timer synchronously in pn533_poll_reset_mod_list(), the single
+place that clears the list, so the handler can no longer run past a reset.
+Also return early when poll_mod_count is already zero, covering the window
+where pn533_wq_poll() re-arms the timer just before a reset.
+
+Fixes: 6fbbdc16be38 ("NFC: Implement pn533 polling loop")
+Signed-off-by: Yinhao Hu <dddddd@hust.edu.cn>
+---
+ drivers/nfc/pn533/pn533.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
+index d7bdbc82e2ba..88df99001b4a 100644
+--- a/drivers/nfc/pn533/pn533.c
++++ b/drivers/nfc/pn533/pn533.c
+@@ -951,6 +951,7 @@ static inline void pn533_poll_next_mod(struct pn533 *dev)
+ 
+ static void pn533_poll_reset_mod_list(struct pn533 *dev)
+ {
++	timer_delete_sync(&dev->listen_timer);
+ 	dev->poll_mod_count = 0;
+ }
+ 
+@@ -1235,6 +1236,10 @@ static void pn533_listen_mode_timer(struct timer_list *t)
+ {
+ 	struct pn533 *dev = timer_container_of(dev, t, listen_timer);
+ 
++	/* Polling may have been stopped while the timer was pending. */
++	if (!dev->poll_mod_count)
++		return;
++
+ 	dev->cancel_listen = 1;
+ 
+ 	pn533_poll_next_mod(dev);
+-- 
+2.43.0
+
 
