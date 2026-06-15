@@ -1,212 +1,232 @@
-Return-Path: <netdev+bounces-299287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299292-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id tXDLOvBSL2ri+QQAu9opvQ
-	(envelope-from <netdev+bounces-299287-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:18:40 +0200
+	id FbnoA3VqL2pcAAUAu9opvQ
+	(envelope-from <netdev+bounces-299292-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:59:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5353E682B88
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF15682F3D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 04:59:00 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=lVSeNbm1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299287-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299287-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=starfivetech.com (policy=quarantine);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299292-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299292-lists+netdev=lfdr.de@vger.kernel.org";
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 445693001B7A
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 01:17:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02C693006B51
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 02:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF9E2192F9;
-	Mon, 15 Jun 2026 01:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836DA25F7A9;
+	Mon, 15 Jun 2026 02:58:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2138.outbound.protection.partner.outlook.cn [139.219.146.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFDA236A73
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 01:17:00 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781486222; cv=none; b=kw6AyfY6wkKs211/AhIiTZlgXNvElYlQTAYUlCV9GA+It3TCvcOSrWrDNIsOcdd3OdgYFgOrdUFdDS3PqIgimLTcya4vlLc4JYPcTHujHAs/jIRveloVJzjTOqqRDtTA6l/+VeQLoaZ+CvHJCNWspQzNm/CErmutRpGgC+xHJDw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781486222; c=relaxed/simple;
-	bh=trVIk13W7Y5cs88wloEtPHgtgwxXK59dgYVXbQ4YBrE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J5pa7JNlmJoqZjFQ39yZLTgbTSLTFWtvrT57WAey8OnL3T3AR4AJr6vBT4E1mFU4Jo/5DX/Avm2a3vXvdLOO/NaFLS3wJPwHHqg/TkkbT1yWUjRf4Y21jcNNIJNrwcq+HqX3YVQ4kgHhGxiv9CPfiSbR8pWoxUgKYFyeN68++1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lVSeNbm1; arc=none smtp.client-ip=209.85.222.179
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-91563382bcfso322549285a.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jun 2026 18:17:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781486220; x=1782091020; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDlixpD+BqkdIAghv/Y/LRkUC2+7bgGbDTHj+B8lK0g=;
-        b=lVSeNbm1MkipSsN/Oo8kLbyAwlMQpcGklTEqJFirNvDRasZnNnsjBZ64AD3SNz5GI3
-         ND1qINgP8pezXrv46pqseT1p9GD2UThu0yDtMrdAuRSEgwN/rtPSjet7fRjyY6F1qbkk
-         0srj18hQhyUYWxZVtFRTnGRm9YuUggOPnpCMo4FKFy/pAdARdVuicpL1urYty/X1Znpx
-         7dXmCAplPykZSfj9kgd0fszD4Oci0TGRmWzEMONSfVCpwPI4qzFBbftNoRXGDYHbKtnC
-         XqS1g3YIJJZwmA5LAeKRU8waHrjrKvuxsH31Evv4CKDKZuxWP0JUEDM0F94m0s5xaES/
-         fj1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781486220; x=1782091020;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SDlixpD+BqkdIAghv/Y/LRkUC2+7bgGbDTHj+B8lK0g=;
-        b=kICZU4XGB2mzqczM9p29JHE7TVs6FJR7NBZz5H9tqon3jL1xP64ajy2HcNvCXyRvZc
-         ozovdyeWoZt72ZkGLLF0tMij3Y4YT9DjKs42BRyQi4bVZbX0/QlUlBcbIafM+8j3THvx
-         qRcug79ga6/LIquQAdmiuQ7UBwa+HvZkJpq0UdH3BHtTV70mNOJFS6g0aTM+QZnNllDq
-         nhw+J9thXaiSzAmzzk533o3vV+3mJQWDeEu2W3jq7p2YN/7eqTRvh9JT7tKz4rDMdBiM
-         gXRIEYoPknjsOf+jJA2/IUIepL9nm845oK0h8MYODp0Dkkab+J9+i+hXt5ruuqbDXyNw
-         I8MQ==
-X-Gm-Message-State: AOJu0YxObqU/Znx9SG7SCP60GmuecLpelq4zFEV4ax8BkWK4l8BTHo/I
-	fv9PSN6fkzdgzYd4ouTV36tPiXsRyORXEautF2XQNSgOfL2wkQAegfgRqeqeavvjJpKc9Q==
-X-Gm-Gg: Acq92OGYxWl2KwNytRMAx43Eof7fKjwjnjl7gQV+uf4LdCf1A0uS0oJN0/UVWX08Y6b
-	w70AliCP36yXCGoBBEhUW2NsGxGRUCSTuzRjnucDlpnuoH2NDe+iwucTEX0APdx1kukd0tPE7xo
-	CqpeVHPmgRW8KEk1ATtEFCcKGtFSl8yQkMF/4XRUZvurMaorp7jUXAS8cWAnu+PEg6qIzA0JxKS
-	i8Xz5BefJUYrV1dQMlxW1Ah/69qGT5OR767ijFUccLv82+QXrX6NYRni1PvKZT9OI7AnkarZJ4o
-	PSbPiUs2NjPNzQxAOJWfq2z02woimRrN1cajdocsGCdNHoHB247EgtGfLFbTF6TzBf2XKBavpNg
-	NdDce9d7xJOf7WLDuM7A3JMdIChx0bsjWMQzg4u/4cv8+Bu45hUk9RUQ2cz7h4ziyTEEayegTzL
-	tNCt2yG2QkEgdtxo861eSkru+BTvfXVPC5bs00GnHitRPqVsgAtJ95XPFi89TRe7XcI4pKow==
-X-Received: by 2002:a05:620a:25d1:b0:915:aa63:f362 with SMTP id af79cd13be357-9161bf5c9bcmr1886777385a.56.1781486220007;
-        Sun, 14 Jun 2026 18:17:00 -0700 (PDT)
-Received: from localhost.localdomain ([2601:985:4601:5df0:2106:6ce9:6b1:8f70])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9161a006ef0sm904510185a.24.2026.06.14.18.16.58
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 14 Jun 2026 18:16:59 -0700 (PDT)
-From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [BUG] netdevsim: KASAN slab-use-after-free in ref_tracker_free
-Date: Sun, 14 Jun 2026 21:16:57 -0400
-Message-ID: <178144969601.60470.14764529841344817811@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D564128816;
+	Mon, 15 Jun 2026 02:58:52 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781492338; cv=fail; b=rxE13VdnqIgsZ8w0551C99BNppeNu1+u6A/+CLG/feIE4GyOZwQPH0fCe3DkNGsv6bfWXKtDa4WpgcaNxG5biQc/VTx/oeClx0oWTRKpP97UY4lOulWyKFmtViZMvG31MU2AHQoqrN0bW9c8gyycd1MPiWK+vFUof0AXT4GB6F0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781492338; c=relaxed/simple;
+	bh=gvxjd+BivmwY2Q3VJ9dbTb+WM7AjgIIWTm7Um5Zsgp8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=TQR/HhzJxE4bm9B/4UI8F6ZoV8Kot2z4fsamiYt9KP3aDiJNGym/ZiPjPBdDiH1oXj7mWQsVj5GrCPxbXCoD8BmlVK2QgQaEHzMcO0NBNIJ5M4k4dWyhAGJM33vfKBzq2NFvVAk3naojRZXcG4oxZZobCljNjKpqqFhbrWvU8Ok=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.138
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M9EvC2h+1pkhXnuEgUKDpI8lftRJERpGSv0Flf5riGt3yxZvMNtKwNt3QcUVIW9hzCOma0VE0R+Bahfe3/STNJvOdNPmmd4co71TBEFlFsNKqe/X/LQ8O+H5pY78F5bxgBbH32YK+gH0fnvk72NCMar66RQ/ghZbmY3jhgGWE7eBsB/N+j760jVe1oLW/KCD0WiIYj0vCtjSgfZl5F4TnrQvlumgxpHbVbGC9PkkKHulX5blmJwRM435KELYnYfUULTikOFYLwq0DpevWJLa7LpA07EIofYZT6RBP+bl0RcOiMhWCnGyWO/TIcgcRDgHBEo2PEl83nP34s6Ay7PtKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a/UWQP0DGSm6A8W1do7ZQEVppFyB01zLmnQNfo+bRJI=;
+ b=gEz/q+/TeUhSgjZtjgkRPtPOkvbuCnqvxR/BbqTGuIY/wdXEsdvg9kLzP5VUEdmuTtPjKMjTv/2iAkBZXiyOoDTFp+xPiRpDhtxuhb2Q6ogjRC32ctpstjPYexvOuSXDOv/bTqM1wFwb5/p4NQk+dRrl60S+AiW/3/uOOuyA6XU0ERcYkUvqrPybQVawhrIBfeADx13tCiugQ5smBhNO11UkParjUkwEGKWdXHBacCcad9wYpDwPNYlcvodZZQBK8kDbQRSNXLmdGEy4JrU6qq/dJ9pkAvuE8Ys5Xx2Vwp7RfuzwxgJCjqzOuasCnJZbXiUMARmoCJp+rcASx+UZlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:25::15) by SHXPR01MB0877.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:1f::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
+ 2026 01:25:08 +0000
+Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+ ([fe80::9b99:12dc:a115:b90f]) by
+ SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::9b99:12dc:a115:b90f%3])
+ with mapi id 15.21.0113.015; Mon, 15 Jun 2026 01:25:08 +0000
+From: Minda Chen <minda.chen@starfivetech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jose Abreu
+	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Rob Herring
+	<robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>
+Subject: Re: [net-next v1 2/6] net: stmmac: Checking whether priv->phylink if
+ NULL in NCSI case
+Thread-Topic: [net-next v1 2/6] net: stmmac: Checking whether priv->phylink if
+ NULL in NCSI case
+Thread-Index: AQHc+KotsU7CSx9q1kuYrR3iPfERvbY3dEMAgAdmAgA=
+Date: Mon, 15 Jun 2026 01:25:07 +0000
+Message-ID:
+ <SHXPR01MB086317D16524E2E0CEE46D66E6E62@SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn>
+References: <20260610072420.64699-1-minda.chen@starfivetech.com>
+ <20260610072420.64699-3-minda.chen@starfivetech.com>
+ <f3a32c42-27b2-496f-b236-02c33bee1773@lunn.ch>
+In-Reply-To: <f3a32c42-27b2-496f-b236-02c33bee1773@lunn.ch>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SHXPR01MB0863:EE_|SHXPR01MB0877:EE_
+x-ms-office365-filtering-correlation-id: 53f4cca8-5fc9-4fcd-7720-08deca7cefb2
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|56012099006|4143699003|22082099003|18002099003|38070700021;
+x-microsoft-antispam-message-info:
+ rcRb6qzZvhDWUvd30Hodq7nsgaLIlFgPOdXq1m/FhM3nYWeZ98PuEB3w18LbLEZGAPUICmqZVvzr0f8Gl/2KK5YWdFT2VD0HDxKLZ5HMLJH/YRi+ewSrDAW7kskoBGZIOvcjJ8obyaTSQy8rln0kD1TmpVniD8hqAGCsfC/9i3SYkIsmqucFQLZSkMvGK3kd8sZ+c3PrqKzrILRb5YdEqE3ACkjvwUNkU7KqNxXZgwgN4vxVxw7z0I1FxlbYZNmV71/IzfflQADrcNgPf+auuKY/Y56lcAIpvUoz4l3Tnw0tzkEzGoKBgx6iTXRjFxvuzuXArfG3vZXAKTEWgqp7h/hbjbLhfD9TuZZ+umzWhDJeBCm1sdsz7cS+1fOiQvpg0Cv52AaGVsyKS4mYUn3SmH3odVvu0PbDq9QrI5Er+rNBUm1nmMsF9sBhSTVBGZ9wg3WRTlQlN7U755C6IL3FbvtEKL2RkhbNBs3axNlvZvQNFE3+8zKVVGGoTswqcThoF1ToIt/+esiYKL9uVs+HUjsUrsHTnKPRefMmcwXN9WOQeMZljWN5rJz88U1f6ePl
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(56012099006)(4143699003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?hK7+qHUAvr2za3/vDTPNvZR8LreExHYL0jvADhIwYWByijrG6ZLqD0uA2ZC6?=
+ =?us-ascii?Q?rwwKZPSR1CW80j+7JnMvHnTgBUPyT1xWbVx8vtTAOi3fp+vveG6e3A6n/Ez5?=
+ =?us-ascii?Q?y5qYNst7Btudx0XEX28vG5xG5qa/5ugxp+SU5aP+W9xniz42T57ISRfFlezt?=
+ =?us-ascii?Q?AQaao/dV6YHo7v7vMXhbqaJZkWNfmsZFPiy3EB97MyRDNth8Xzz+1nRdFXmN?=
+ =?us-ascii?Q?/S94PB8dAcJPNAMQWSPoD7Dqn8xxJvwK7go/IBDzPOisMAe67x8JE/GYOGa+?=
+ =?us-ascii?Q?37K6Rzdq4tfKuV66vu6oKbAy5r5GyIR0rtBl1vdmEuJt1KPsJUWlac9uUY3t?=
+ =?us-ascii?Q?e6pV0c/nzszj/qklF/2ZmVf3NUSTeGKJZiRorhPaaeDHgkA4juIUSJbMuFLs?=
+ =?us-ascii?Q?s+KsphA2CKFCvAoI0O8y3lkZvFwUhHbgPnyhOnLuRVZZcXst0J5CVDE9Yq5Y?=
+ =?us-ascii?Q?je3gMPveonXqkXHT3+ZHIzB1sbSfNuR6ikh8KCXxVPj+UIrqzBBF1wh7oq1+?=
+ =?us-ascii?Q?I4MF+FiUz2n1m2YOMLRtlFlLByAeJ7vAjOkgzlBRfQx0xPzIqtuLvOvUAO8a?=
+ =?us-ascii?Q?8Y4VFno2YIy6E0W7wQryx845KTj3dw0fV22gp1QcG7ja3xF8V+rZBtJT1rAG?=
+ =?us-ascii?Q?7EwAbZJyZUNYRpfclf2BKfaGFd7ZVV48mgXePHZcqY8Ro8amFgCbrFRv/4kF?=
+ =?us-ascii?Q?+JwbX1ucd38C4U5dwdj80Kf7Qp/L3nULxUSM2tXnaukGo5doTfe4UjMKZ1Ak?=
+ =?us-ascii?Q?cJrzLLltHMyy+OvVaohLq5FPzvlpWrPmdE+wAyjPTBmf1/M0a9d12Ee5x5Ew?=
+ =?us-ascii?Q?tFIs4OFbVtUdebm33fgwmwc3l0lWxsURtc4SyQ/tnzc2LzrTwXZ3No+Brgb/?=
+ =?us-ascii?Q?x7xTNy/ubBWBkkT9SwI4hQALpLRna1iGrTxA9eDofBb+fROWa9zbHW5LlOwS?=
+ =?us-ascii?Q?8Zx7Nivdmw1V5BoYGibw4VJFM3S+pE3BJ/lM7UpgrIt+WYsDK1Y0or8J18Mq?=
+ =?us-ascii?Q?8b/+hbCemynot8z9GgVsXnyAhxzabfvk9fNNzv5odR605C7wmJKqGUuKbSkf?=
+ =?us-ascii?Q?a8Gje/PO76iqTE01A4fgdDSsWfheph/F7J/gyXexa2iywuOAxKOZ56Yo5hK4?=
+ =?us-ascii?Q?zuCPSSz2WXjNMNKKe4v88zTDNEVjHtI6P+//GKZc56rltj9+ieDI5mWLYcd7?=
+ =?us-ascii?Q?pApDD+fLjlh/WABNu714MWRVFX75Coa2FPmPggDzQZrpHY8305jC6nqJP8Sb?=
+ =?us-ascii?Q?CaID1BcVcYPYirKXQ76y6ISu76oOJzwsCTp4C685lkE8QifcJspivibHpZpk?=
+ =?us-ascii?Q?OEreOGZR8ZJm+QzZZ08aKcAmHRS3t2ueffXHmIT5yF805+xcltx4kpmHB1np?=
+ =?us-ascii?Q?W6b2PTpxRELUHIG4uRa5/91bJoL77t1Ui/Wl2tKMqdmUsFQc6+/o7q9wZODZ?=
+ =?us-ascii?Q?vuBttpMQiGN+8dBuKmO0pcvYrNoHCohe/JPm0r4EG2n1HA7Ej1oI2I1ZQsK/?=
+ =?us-ascii?Q?f1HFwCabzOomXBbdb0hCQlYm/dD6nfeWW4fJOcsDpEAx4kgJEZPWZ+4K5jsU?=
+ =?us-ascii?Q?PNLzqjVgXl2P2aq9To5fMP/CUb1GBqXuhmCfEFxx5sifgcJ6NoN4WhFmTsri?=
+ =?us-ascii?Q?AT8YcG7aOhOv4gLUExRfQZNRD4b64eYcF98WyIPuclbd/wi7b0t+Dj7pH0Vi?=
+ =?us-ascii?Q?OTUnhHQsVMFo67aKE+SXlu6svyzE0KENYvq4+/Fhndbck9Al7iMqG+N+C7aW?=
+ =?us-ascii?Q?g5knzyUNyg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53f4cca8-5fc9-4fcd-7720-08deca7cefb2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jun 2026 01:25:07.8418
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IQlHREwQzw7P7T5sN26ypsVBlQtDBl6e6uIxy11gYJ82CkY3nbxySljwbqSydGctx/4h5iiBQGRaIuSgBQZ1LPs7EAL0SbsBfZBQ7Zq/HYU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0877
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299287-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,synopsys.com,gmail.com,armlinux.org.uk,st.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com];
+	TAGGED_FROM(0.00)[bounces-299292-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:joabreu@synopsys.com,m:mcoquelin.stm32@gmail.com,m:linux@armlinux.org.uk,m:peppe.cavallaro@st.com,m:alexandre.torgue@foss.st.com,m:robh+dt@kernel.org,m:krzk+dt@kernel.org,m:conor@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:devicetree@vger.kernel.org,m:mcoquelinstm32@gmail.com,m:robh@kernel.org,m:krzk@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shuangpengkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[minda.chen@starfivetech.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,starfivetech.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5353E682B88
-
-Hi netdev maintainers,
-
-I hit the following KASAN report while testing an upstream kernel.
-
-The issue was reproduced with netdevsim. I have not confirmed whether this is
-specific to netdevsim or whether other net devices can trigger a similar issue.
-
-The KASAN report shows a slab-use-after-free in ref_tracker_free(), reached from
-sysfs_rtnl_lock() while reading phys_port_name.
-
-I reproduced this on commit: e8c2f9fdadee7cbc75134dc463c1e0d856d6e5c7 (May 25 2026)
-
-To help trigger the bug more reliably, we applied a minimal diagnostic patch
-that only adds delays and print statements.
-
-The reproducer and .config files are here.
-https://gist.github.com/shuangpengbai/b49765d646ec4610917015371aa1c3ca
-
-I'm happy to test debug patches or provide additional information.
-
-Reported-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
-
-[ 3145.449971][T17497] BUG: KASAN: slab-use-after-free in ref_tracker_free (lib/ref_tracker.c:295)
-[ 3145.452089][T17497] Read of size 1 at addr ffff888107678598 by task cat/17497
-[ 3145.454439][T17497]
-[ 3145.454977][T17497] Tainted: [W]=WARN
-[ 3145.454980][T17497] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[ 3145.454985][T17497] Call Trace:
-[ 3145.454991][T17497]  <TASK>
-[ 3145.454994][T17497]  dump_stack_lvl (lib/dump_stack.c:94 lib/dump_stack.c:120)
-[ 3145.455002][T17497]  print_report (mm/kasan/report.c:378 mm/kasan/report.c:482)
-[ 3145.455028][T17497]  kasan_report (mm/kasan/report.c:595)
-[ 3145.455046][T17497]  ref_tracker_free (lib/ref_tracker.c:295)
-[ 3145.455083][T17497]  sysfs_rtnl_lock (include/linux/netdevice.h:4491 include/linux/netdevice.h:4508 include/linux/netdevice.h:4534 net/core/net-sysfs.c:122)
-[ 3145.455091][T17497]  phys_port_name_show (net/core/net-sysfs.c:665)
-[ 3145.455118][T17497]  dev_attr_show (drivers/base/core.c:2421)
-[ 3145.455128][T17497]  sysfs_kf_seq_show (fs/sysfs/file.c:65)
-[ 3145.455135][T17497]  seq_read_iter (fs/seq_file.c:231)
-[ 3145.455144][T17497]  vfs_read (fs/read_write.c:493 fs/read_write.c:574)
-[ 3145.455169][T17497]  ksys_read (fs/read_write.c:717)
-[ 3145.455181][T17497]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
-[ 3145.455188][T17497]  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-[ 3145.455193][T17497] RIP: 0033:0x7fcf098c43ce
-[ 3145.455200][T17497] Code: c0 e9 b6 fe ff ff 50 48 8d 3d 6e 08 0b 00 e8 69 01 02 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-[ 3145.455204][T17497] RSP: 002b:00007ffd05e76b98 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-[ 3145.455211][T17497] RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007fcf098c43ce
-[ 3145.455214][T17497] RDX: 0000000000020000 RSI: 00007fcf095e4000 RDI: 0000000000000003
-[ 3145.455217][T17497] RBP: 00007fcf095e4000 R08: 00007fcf095e3010 R09: 0000000000000000
-[ 3145.455219][T17497] R10: fffffffffffffbc5 R11: 0000000000000246 R12: 0000000000000000
-[ 3145.455222][T17497] R13: 0000000000000003 R14: 0000000000020000 R15: 0000000000020000
-[ 3145.455227][T17497]  </TASK>
-[ 3145.455229][T17497]
-[ 3145.479014][T17497] Freed by task 17497 on cpu 0 at 3145.447575s:
-[ 3145.479559][T17497]  kasan_save_track (mm/kasan/common.c:57 mm/kasan/common.c:78)
-[ 3145.479963][T17497]  kasan_save_free_info (mm/kasan/generic.c:584)
-[ 3145.480411][T17497]  __kasan_slab_free (mm/kasan/common.c:253 mm/kasan/common.c:285)
-[ 3145.480813][T17497]  kfree (include/linux/kasan.h:235 mm/slub.c:2689 mm/slub.c:6251 mm/slub.c:6566)
-[ 3145.481148][T17497]  device_release (drivers/base/core.c:2542)
-[ 3145.481567][T17497]  kobject_put (lib/kobject.c:689 lib/kobject.c:720 include/linux/kref.h:65 lib/kobject.c:737)
-[ 3145.481951][T17497]  sysfs_rtnl_lock (net/core/net-sysfs.c:121)
-[ 3145.482351][T17497]  phys_port_name_show (net/core/net-sysfs.c:665)
-[ 3145.482782][T17497]  dev_attr_show (drivers/base/core.c:2421)
-[ 3145.483154][T17497]  sysfs_kf_seq_show (fs/sysfs/file.c:65)
-[ 3145.483586][T17497]  seq_read_iter (fs/seq_file.c:231)
-[ 3145.483975][T17497]  vfs_read (fs/read_write.c:493 fs/read_write.c:574)
-[ 3145.484334][T17497]  ksys_read (fs/read_write.c:717)
-[ 3145.484701][T17497]  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
-[ 3145.485092][T17497]  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-[ 3145.485592][T17497]
-[ 3145.485794][T17497] The buggy address belongs to the object at ffff888107678000
-[ 3145.485794][T17497]  which belongs to the cache kmalloc-cg-8k of size 8192
-[ 3145.486991][T17497] The buggy address is located 1432 bytes inside of
-[ 3145.486991][T17497]  freed 8192-byte region [ffff888107678000, ffff88810767a000)
-[ 3145.488159][T17497]
-[ 3145.488367][T17497] The buggy address belongs to the physical page:
+X-Rspamd-Queue-Id: 2FF15682F3D
 
 
-Best,
-Shuangpeng
+
+>=20
+> > +static inline bool stmmac_phylink_expects_phy(struct phylink *link) {
+> > +	if (link)
+> > +		return phylink_expects_phy(link);
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +static inline int stmmac_phylink_pcs_pre_init(struct phylink *link,
+> > +struct phylink_pcs *pcs) {
+> > +	if (link)
+> > +		return phylink_pcs_pre_init(link, pcs);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static inline void stmmac_phylink_start(struct phylink *link) {
+> > +	if (link)
+> > +		phylink_start(link);
+> > +}
+> > +
+> > +static inline void stmmac_phylink_stop(struct phylink *link) {
+> > +	if (link)
+> > +		phylink_stop(link);
+> > +}
+>=20
+> Please take a step back and think about the Linux big picture architectur=
+e.
+>=20
+> What is stmmac specific here? If you were to add NCSI support to another =
+driver
+> which uses phylink, would it need to replicate all this?
+>=20
+> When you consider how the MAC is configured, does it need to know it is
+> connected to an NCSI? Can the MAC tell the difference between NSCI, fixed=
+-link,
+> a PHY or an SFP? Or does the MAC just need to know RGMII, the link is up,=
+ send
+> frames?
+>=20
+> Please look at adding generic support for NSCI in phylink, and see if the=
+ existing
+> phylink mac ops covers everything needed for configuring the MAC.
+>=20
+> 	Andrew
+
+Thanks. I will try to use fix-PHY link.
 
