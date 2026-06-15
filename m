@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-299599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SyCUB95ZMGoFSAUAu9opvQ
-	(envelope-from <netdev+bounces-299599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:00:30 +0200
+	id hRMsGvpZMGoLSAUAu9opvQ
+	(envelope-from <netdev+bounces-299600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:00:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 638CD689A32
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:00:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC33689A42
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:00:57 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="WrOnm/6K";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299599-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299599-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=W2i6lVdF;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299600-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299600-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BDF9A30C57A2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:00:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE9AA307BA07
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926E138B12E;
-	Mon, 15 Jun 2026 20:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016783793C2;
+	Mon, 15 Jun 2026 20:00:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4653B42F4
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 20:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3B329BDBB;
+	Mon, 15 Jun 2026 20:00:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781553614; cv=none; b=TMEmq2twGPHEcHv5LI6Mdqr9JiNCyr7t//MrBwdsBfb25zKrOIqufuErgk+qcPImNEuS2xcITCa8yYXBRLUIZo/Q5X5VWbzGjHz0ifDdSxK9ET546P5DJul1AfbRsBGsebOQC2UOVL/5e9Dc4MAVXhNPcsLWDH5VLSbIGzWv810=
+	t=1781553621; cv=none; b=bUsn7rTZgn7mcn+Es3LPcKvAm8NWBvw7MbodTtrRWGdCgg9U4/2IL2O7oj8V3w9i2pMb/w90mgHUChnl1N3zpRN4Sg7pIDDYRYmuhJH1hbwZXv9tgS4WISLclKTfPKE8CHdsFx0wvfDpwZz6y6cdZrN1x+FBtHo9XMkQV3WaJDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781553614; c=relaxed/simple;
-	bh=qKfooVQO5FAQ2uKaXdb45oaw4bztcgFjZ/m6GeHu9lY=;
+	s=arc-20240116; t=1781553621; c=relaxed/simple;
+	bh=JUbRWvp9mCNkQmiuZPtvnZAI+5bA8g1SRzhoZtnhheY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H/7NoHQgM2RSeMSQfBHueIAidQY2SuT+2f6gwA+abGJTOpDjZ6HbEdYHNMcDoo2Mj0qn0K0MrFelk/PkpN1Lw08/c/lp4L71PSsTpmMP0Io08y/gEVkoHICdNhRPlP7G7tZBzb/UrxjxUyozPckNy901tRGGPy1gwCgUvmOa3Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrOnm/6K; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11BFF1F000E9;
-	Mon, 15 Jun 2026 20:00:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=A4KoKi8FnmSYR1EaobkW8b95xchzlEQw05nDDaFOhn2Jx2MlEqTRZIl3HBEIjD4oubgeHRqLPNlQWGbcmUyDcJcf9mSyCvlzN1QjIn3kQZxpj0LoX5BL0oj3u7yk9yu89t9fEU8Yt2d1N71SjYrmY7AqrMah6svfAonQIMoBhgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2i6lVdF; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84F6C1F000E9;
+	Mon, 15 Jun 2026 20:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781553613;
-	bh=cQwH9sD+aVZcat2wfR27rUr5vgLOt64pW/pgqA4vdEQ=;
+	s=k20260515; t=1781553620;
+	bh=vsyX/OiGu7noUPnPlEtDjolBJddDnqDIcGdKM36DljU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=WrOnm/6Kj7o9EWDnV9i4JJi8M/1HFlwWy+L/I0LKr9j4NsujvTkKjixDxjiRXDYep
-	 IPfGZAJAuvnWWUwtk3zKyUsOKkJ88/8TnP5GNPZ0R9IoHdR2lraYf7miyXsfwolZrn
-	 HeN3HHhz7deMYqvO6H29ZGoyXNF6U5xSrlY7q1QWk747hoXw21i8rhJaLzt1tUYl5k
-	 VZexGLlfD97qAoNmmmXxxzjQn6vihtSPGTXuiQ4ecLOc8x0Z5ZVPpIplohuMVrmhba
-	 vFWv5aeLswMccqYJ+IKN1FNahJSmxxXanQumU/8cJJADcwr2bDh+7gN/yP3niFvFIt
-	 LpAw5KTL+QLfg==
+	b=W2i6lVdFM8yjEsFy8C3V/rKUYvLjyno+v/z1WXbEPSAc20GTDNQkAttwf1Se6mSDy
+	 L5ZppoZ+2+61HkaZrblkVwJTxDyeEbIFm8q31dDZx9n6y5HXBeo7qQabHF7xcRJgph
+	 c2PeZvMPY8EPJsD8b9vt04clS1pFYRFbXTODT2A+R0EVp8Y+DtkuxPzhW1DzxF3tRp
+	 18xVlEwqcgVpXMDQU1WcxCWnuHBfBSsSq7DUI7623RfmSHe7b63/D0VKk/T5rL0QmJ
+	 dv8RJjnTDoS0ZMGOqh1Sjbdmpq38D/xibjqJ+oVpwqF3iii+AaLdqausUrLY6ujRx6
+	 nePWLYFX1rtYg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5688C3839A06;
-	Mon, 15 Jun 2026 20:00:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D09853839A06;
+	Mon, 15 Jun 2026 20:00:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,77 +57,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tipc: fix UAF in tipc_l2_send_msg()
+Subject: Re: [PATCH net-next 0/2] selftests/vsock: improve vng version and
+ quirk handling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178155360788.272818.6185540664390740665.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 20:00:07 +0000
-References: <20260612135949.4010482-1-edumazet@google.com>
-In-Reply-To: <20260612135949.4010482-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com, jmaloy@redhat.com
+ <178155361538.272818.12192938243650583106.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jun 2026 20:00:15 +0000
+References: <20260612-vsock-test-update-v1-0-7d7eeed3ac8f@meta.com>
+In-Reply-To: <20260612-vsock-test-update-v1-0-7d7eeed3ac8f@meta.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: sgarzare@redhat.com, shuah@kernel.org, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bobbyeshleman@meta.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
+X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
-	TAGGED_FROM(0.00)[bounces-299599-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+64ec81389cbad56a8c35@syzkaller.appspotmail.com,m:jmaloy@redhat.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299600-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:bobbyeshleman@gmail.com,m:sgarzare@redhat.com,m:shuah@kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bobbyeshleman@meta.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,64ec81389cbad56a8c35];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 638CD689A32
+X-Rspamd-Queue-Id: 9CC33689A42
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 12 Jun 2026 13:59:49 +0000 you wrote:
-> Syzbot reported a slab-use-after-free in ipvlan_hard_header() when
-> called from tipc_l2_send_msg().
+On Fri, 12 Jun 2026 12:08:40 -0700 you wrote:
+> As vng has continued updating, there have been two things in our
+> selftests that have been affected. One is that newer versions always
+> emit the vng version warning, and two is that we have a workaround that
+> is not needed in newer versions.
 > 
-> The root cause is that tipc_disable_l2_media() calls synchronize_net()
-> while b->media_ptr is still valid. This allows concurrent RCU readers
-> to obtain the device pointer after synchronize_net() has finished.
-> The pointer is cleared later in bearer_disable(), but without any
-> subsequent synchronization, allowing the device to be freed while
-> still in use by readers.
+> This series just updates the version handling to allow all newer
+> versions without warning and version-gates the workaround to only those
+> versions that don't have the commit that fixed the root cause.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tipc: fix UAF in tipc_l2_send_msg()
-    https://git.kernel.org/netdev/net/c/f4c3d89fc986
+  - [net-next,1/2] selftests/vsock: accept vng 1.33 or >= 1.36
+    https://git.kernel.org/netdev/net-next/c/197503d5ac82
+  - [net-next,2/2] selftests/vsock: skip vng setsid workaround on >= 1.41
+    https://git.kernel.org/netdev/net-next/c/9361bff6bdb7
 
 You are awesome, thank you!
 -- 
