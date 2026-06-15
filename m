@@ -1,271 +1,429 @@
-Return-Path: <netdev+bounces-299571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mTWhOqlMMGpPRAUAu9opvQ
-	(envelope-from <netdev+bounces-299571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:04:09 +0200
+	id 0eQGCWNPMGrIRAUAu9opvQ
+	(envelope-from <netdev+bounces-299572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:15:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 853D76895B6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:04:09 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B1E8689675
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 21:15:46 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=s9VDGSAr;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299571-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299571-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=psWTkrrQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299572-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299572-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CA84C3010901
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:04:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 19D11309A43A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 19:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C816938D3E3;
-	Mon, 15 Jun 2026 19:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FC73AE1B1;
+	Mon, 15 Jun 2026 19:13:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012051.outbound.protection.outlook.com [40.93.195.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6AC30D3F3
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6382539023B
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 19:13:53 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781550247; cv=fail; b=AnK2Fzseztd3zStZg1Bc3CaNV1kmFy9t0Ryl+jgg1dY83X1uvjK1afFxdB2wKya7oC/Pf9Eq6YeMYuwH/N+gkodElUoEq9TSOytA5b7bg0mJFZCpyMMVCwKs02Y5UfLgJ1IgA+YHJmFjUDyVM3l5noA58X/lqxCFiXMtoH3PCFc=
+	t=1781550834; cv=pass; b=gnmbe2NulyV3hV065w9Geq4immI5Z4RLFItbspex5UaH27elBSsLfTwqtnlyz6bVNR6AfiiPAoOHLK4PZDobVnr/qnRdtQy0WWq0xpPJOLcWTgYzc0VG/DxtH7s8pYvEin3cU7zbyn2iV8UsU00ZaU1PK+u1DBSOiv41rIIw4qI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781550247; c=relaxed/simple;
-	bh=yILiCoNGa27IwW78Hq2b++ui6vNySYsk2lIceFxzocs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mOf9ug98hM8nIk82xhQlsIBfdkg4OIM543i3K4tKdiCOzTEOKazI2gdEdvDcVL/unL9PLkW48Lugl4m2jdLY2ZNhFJMx5H68lCa/kJrUVu8ovE80baSnHw59FC6m9pemt+Cw+kyy/ec/yHNIXZmkbRBsjsqCJlFXaQW5cB2w8wc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s9VDGSAr; arc=fail smtp.client-ip=40.93.195.51
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xrNqqZ/y5G8PSBd2AdT8zKPPWq6EL3MAPeZBz0Y1kSCNN3mBipfKnxKyVaTLJztinEsAwOqvvWKpOGkowVnSj4GKZBZD2SEcv/BXLQPseoBMWo0B4RhKiEn3g7C8qDZgPB91DSth2qChTeNoTxFNpLK/gk8Li3IQZSAMnsR38n1ISSuvlKF49EgtvRouNYyoU/vDOtvCw8jTxbit+k91DxId9wvCc3o7lis4F94uiCJeJubPstE0ym0mCcki8M/oKCKWRnuofV86BTWXzW+YA4/9T2t8NRFniWFHj72kOdRsiRr6QB5HspMuCVCj1MXv/IqX0387D0eLy7PJOjS+yw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RE7vpkVXbhYY5cXXTyD2+D8vvConWWfYgZ8ETJGxO5Y=;
- b=dMiMAWnM3kzNfAmC7KGVv4AuwOdirjToZzLMtqWjvTbxq6IgH9qrD0msNVv1VdymY16wT3OLvBaGCYZTlm/zfmYKPOkgIiH963G2s8ILkuKHTeufBIiOX+cvE55q5X8wVDJxHFJsI/DxrHaG2eG7dKCBaWyA29YgA/sHl83bjVvtrqjwMjyhZh1pbTRzLGUaJaSJ6hu1B/idOMSoJJp+gnBHTsogkBNfC7mUbcaVSQ5dbWroGVB9mfiCuIDGW7/Yg6zPhUU0ZklZd4J+adecpcctHKtreRCP3cWtfBvh7+A7ywGJraW4bZxGFDFYp1AukK5R8S/1uFD9/Z4OwVEc6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RE7vpkVXbhYY5cXXTyD2+D8vvConWWfYgZ8ETJGxO5Y=;
- b=s9VDGSArMKJyL6kwzdiaQrGzMXqMi5/ZP5psPDeY1UyRSWh+27AjdbQe0lFXrcVVBd/a4E5q40+ONTHcyjQkFXFiaulKxz8cza5F+RxQq0I2FFVrDQpsK1IE3j3fUleSZsPH71C7PeE4Jn+LrSNkVf4Fn/3LiXoHaN4YCEKEJXY=
-Received: from MN2PR12MB3485.namprd12.prod.outlook.com (2603:10b6:208:c9::22)
- by SA1PR12MB9546.namprd12.prod.outlook.com (2603:10b6:806:459::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
- 2026 19:04:02 +0000
-Received: from MN2PR12MB3485.namprd12.prod.outlook.com
- ([fe80::7ac:5acc:f8b7:65c9]) by MN2PR12MB3485.namprd12.prod.outlook.com
- ([fe80::7ac:5acc:f8b7:65c9%5]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
- 19:04:02 +0000
-Message-ID: <c94b0e52-886b-4a96-94d0-53bb6020d06b@amd.com>
-Date: Mon, 15 Jun 2026 12:04:00 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/6] pds_core: add PLDM firmware update support via
- devlink flash
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, brett.creeley@amd.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, eric.joyner@amd.com, nikhil.rao@amd.com
-References: <20260614050052.1048328-4-nikhil.rao@amd.com>
- <20260615153620.775599-1-horms@kernel.org>
-Content-Language: en-US
-From: "Rao, Nikhil" <nikhirao@amd.com>
-In-Reply-To: <20260615153620.775599-1-horms@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0051.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::26) To MN2PR12MB3485.namprd12.prod.outlook.com
- (2603:10b6:208:c9::22)
+	s=arc-20240116; t=1781550834; c=relaxed/simple;
+	bh=FMIy0BWD4uwx4DE9uPt1G90wX8oVWRsQ03tO8n7vnC0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iF8Dl/89KW/IeGfT8fG1jYkAiyMPO5Rr+OTg1r3ibUbom1885YNTT3DPDcbDTdq19YljfJ2glhD3zhqnyJOAH8N5J1JsDvBzNwBtAyG6b67rrLdRnvOgh2hiG6YFm8SINf/RGJa3oCDTcKlZEUs9D+v5QkXtMVJcrWpnAFKE9OM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=psWTkrrQ; arc=pass smtp.client-ip=209.85.210.175
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8422f395a4aso2482325b3a.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:13:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781550833; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HLOgjqI9Hl4pgUwZzv180vlEA+/t0FP4zWW7XmCVjj/wG9ApiVhSNr+ALEQ74od1pu
+         wjUyr74HVLyFVVGY1zYLhNezEy7md+n20smO0AVx/BOOcqgR3Xkoyi3/JTwJkE9sVJfs
+         FIqIImB57r1QWat42moRTTInY5x/CEuYUOAYf/yVU/C+oGEzkVYAlztbS2MNnTe+uRus
+         Zf3pgO2qKk8la1skKW7bMo4Zgxc9/WioIfe8e1r4kJ/ivQqa7ysf77oU1Ft1QaxOwgMX
+         CA/d8w6yiFAXQM7kl8LfZAPG1T2n5VEhCKawkW/UZmZKj/RoPFvJQn1JpFcecZ+GAujz
+         7UaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=TQH+LHgUJKV6XFgUXUv/ZG7j4uae864ywW17BSCZubM=;
+        fh=VUGsa/P7auRh8xXXlGRBVYBCk/gj8aM5RbHBAgIc/0U=;
+        b=D4fvC0QfCm83gai0fdUtYwET4fqxalCcEZnk5R2qT24BCELIfflxCs3wZMo0y7iYQe
+         rE1zfHMB0WAdq0Y26vMCPJVtV3SoW9QF5ynk4Vwr9fnlT4W6WAfsF3oG259QVVxF3mgG
+         N+B80lbOPcZgC98W7gwpBDYUo3LCKbHKoo9gJ0w0qfH0p25Tt/Yz/iaApXzXB+rIlFr7
+         fLKRrrReneY6kBb7NYNC65+rbf42GvtlMH3FmrNioto+/+GPBosQc9ykkMa8jZ/KM2oa
+         nv4K/md7+myoJi1q3PqD96dZZxKL/pU+6pQGxpJJkXnJ/XfqBzivQ1LMtlE8JFYeB4Qm
+         Mcyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781550833; x=1782155633; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TQH+LHgUJKV6XFgUXUv/ZG7j4uae864ywW17BSCZubM=;
+        b=psWTkrrQStwCutsnUoKr0GYit8rE/dOxz9s92B0b1Ic9Wle9X8FZqV4hLHpMuEq+TV
+         J5/eskn/dNLLCxExzFpaKdjKpTiFK7bLh0P6Cd3ZDkA8kkvewwuMxkqtC9eGIQI68yWB
+         4y1QjBmYaTW6w7oWxuIsb39zzbhBDqMMB8L/P66o/mHVE4P5iOTMfBOpPMqllLH9y2JH
+         Hwys0vVrTyJalkT8HM5moU8pY47IBAUJOTzbQuue3UAjJqNFTd2ouEHs8yiBXArEk0aS
+         g+jMsSKORAdf/6wQ5fK9Az7TEDmTUnaDvMan1Hsb+H5kElGqeo58tS+M6KE0VbEU1dAR
+         340Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781550833; x=1782155633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TQH+LHgUJKV6XFgUXUv/ZG7j4uae864ywW17BSCZubM=;
+        b=Z9BAlCpT2RbdtugENN9kiYTqpQjFtv2OBhP9KU6dWDpS1VyTtvSLl6wueESGzfxmzi
+         JAxtUM3GvQO9x5jIXANqzX7TASZKSpudysfhYXv2rn8WxCAOvnXClSyoqXIq6r/baCZs
+         OM+F/7Lvc019Z64hnUcvkW5fhGnKKxqbPm3AB+eLSG2j57OoSNLrbvGc4yZVLltnRTPr
+         Lr+OtwVivnHHgZE00+2DGVbo1fab0/lLE+pwFPr2igSmLdtHpfhbtOnilVjElzR11rmm
+         TIOTXgjSBQjVmYzCjoAPFuwDMfkOBwOjJY0pAw4nqTCL8sDJ650nr9r9r5PL+KyYLmKs
+         FAyA==
+X-Gm-Message-State: AOJu0YyRIjYodvmCLeh3zQxRpGHSElQIksUx8Ooqlx0oP65YXVOnay8H
+	BlZXSwdV3mpVYsg7UBE/aTKrKY31Hsy5eeA8Q6CWu/MVSuIFrNjb/cbeV9USX+DAwu94spOTZLo
+	5rS88fdtQiQT0R0ztHkpGbhwsMP+FbHQ=
+X-Gm-Gg: Acq92OGbUlznS/1FvVNsnAhiLuOUnL2ssQ6y2+VM0gPhOOPNliD3q6GswwiB4/0CDhb
+	tw0lN2mpaqk02IU4WZwOZxgB96TEwTFLzFk7CqsY6Z3zoxCfDxFM9TsR6UfI2Y825AHtz/sRiW4
+	i4AYVaoexbmUsJbklwCRCBZZ4kjatcCBOcCQ99yDV/7bW/XIiduXR/TiujjdzojOiZ0+7Ku1+Zk
+	g6dhKLQoVaEvNMrdBN4ZkiNjZzCHW/SvSOAA/qiZuXV5bWsBqgMmsbDD9+smkINj4Nh8lNs9x7/
+	CIrDTmX3X0jIKVNOlMJfK5IVDT/Q70xwEJ7eauzSi41qIW04M/fduazuYrmZhysl9NtCDSiRkOM
+	hacwqQQ==
+X-Received: by 2002:a05:6a00:2d28:b0:842:68d3:e2ae with SMTP id
+ d2e1a72fcca58-84513e89612mr587232b3a.15.1781550832786; Mon, 15 Jun 2026
+ 12:13:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3485:EE_|SA1PR12MB9546:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd3fc757-b7db-4b87-9be8-08decb10dd4b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|23010399003|376014|18002099003|22082099003|11063799006|4143699003|5023799004|6133799003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	2Qc8kZ+0EVkNmWL+aA0o7SukF/mBL3FhmyZSy2mWgzPr0NS4bMVqyTebdc8sUUluB7rT8DbGvhBP8MqWPabrhKQFa1OptQDYBkXyLeFR7GZ9ho6kLrEiGpjMnjNAE8CXXfJ5QeLcsK5dsBs06Fc2ty71wNP+axKkiCZJ1DryV1CseX93rpg7xDSwzioM+xGRLNQmY24SAJcAlF7slNt6VQqpUikjiGZZ6t9ZwjnFwHMHhNTIp9mZ8wOGIPGuEIoJj2JvN62DjMcDKTboX4YIz+TCQiMdnfneYbzyr7cPMGoQRzbztlxx1c2JtGujvgETs2sNfKUgvfdyKThaOYGDgF2gKlhJh7OzAU2odVB/lw7mOuBMAcdPTbzSB+TtYkVCH8641SuB6tUSXGA1yPwvg6IjjOtUBif/9tNOfrvJg+ZmIS9POiYXlaLZiwE+UTvOtC4Xnn/8kBJH2ixmiy957XfoQS5gvLRsTTfGWnksttP9pQonduxrnvgpOm0c4WcS6nZA8i6PXL1g/Bs82MP/U/y8y15rbV6Uk82AYpF0eMrTpDJRUwKFleZhURoibs+npHt3z7MYBBhN74ft4qQ2FzLOJpRMGN5VVx4lyZFbVAc4oaJy3nwVyCQuZtf6G3Qjb+wJOMIG7NsrkRdEvYRmjw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3485.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(23010399003)(376014)(18002099003)(22082099003)(11063799006)(4143699003)(5023799004)(6133799003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Z05MeW5JYllNNTRienYxRitEKzdCYnJ6M2lPbk5tYUUyUVdBdFZoQkE5TmZn?=
- =?utf-8?B?eTcrQm9FWktuMUtuWDN1bTk1TXBqOXFOVUx6dGwyaXJFK2ZkYis3cURxSHhI?=
- =?utf-8?B?TFB4c1BWV0c5MTU4VlFrR1FST0pMOXBVSlkwd0dLRHJxMnovMkxRbnZwcStQ?=
- =?utf-8?B?TUk4TGNreWlEb2dTOXVSelVLNG5pTGNlVEFySkdZRk4yUU1yU0dua0FjZXdG?=
- =?utf-8?B?cy83TlQrSVBhWGd4dUFuQmZyZHUxVWZlVFk5R1BycG9PSFQvMTRuZkpUbkY2?=
- =?utf-8?B?Y2tIQk14VjhDUWdyOWs4Um9abmtGNmpQT3lySXM2RTVndjN1ZjdHMU1HSEdh?=
- =?utf-8?B?R1pXeWgrS3BwZllGc0ZWWThzbk5qME1ZTmkycWpVR21nb3k3bExWcjIxRXIy?=
- =?utf-8?B?ZzltTEE2RWZlNDBOeXBoaGsvVDB1RHlWOWdSSHdUSXRBWFdacUxOOTR3dUU4?=
- =?utf-8?B?R0hRVFNRaGxpTGVURzgrZFdCZk10bU5pVVVCL2xwZ2kwL0oxbFNUY05RL2Np?=
- =?utf-8?B?ODJ5cUNGeXRDaHNSM3VoVFVIQmJtelRyYnNWVTdVUCtVdnYvdXhia05IVzJP?=
- =?utf-8?B?Ritpdm4vdit3THZodktWaWIxOVlRZEhXUG1nU0VRMjdQRUZVb3Y5Q3NvWCtq?=
- =?utf-8?B?b1c2dVZEYUZ4TFA3RlIxK0lCMkMrU2lvalBpS20rMldQRktEKzAyVnlmcEZ2?=
- =?utf-8?B?WUdFRytIQVVCcWhhZHRGTlhkQWgvYStKNHJXWUwzQ1BYZ3pNTVNBTTBLRlZt?=
- =?utf-8?B?Sm5nT1ZHcDQ1eTBDZndWV1JPaG5YdDVvYVJoeVRpWGdRZXVZQ0tPd1pHZXl5?=
- =?utf-8?B?T1ZhMnFBVHk2ODJLdU9lZlo2U1RaTmp3SVFXVFN2cjhCcTFuclI1VlVLRGRx?=
- =?utf-8?B?cVhaWldpTWVpT0FqcnRJdk95REdZR3lHbm9mNWFEUUNXamU3WEZCeEp4eExx?=
- =?utf-8?B?L2c3YzVlOVQzTnBQZCtKcDY3YmgzVjI2SWZTMWF1eTJqeEZSSlhKNHFtRDBT?=
- =?utf-8?B?S2tMd01zTmZmVFlFZnI0UGJtYkRkSXRTSjFCeC8yZk9YUDB3VWRxOTdzL1Fr?=
- =?utf-8?B?YTJDd2tmelNCTU1JY2dwOFo0dlYzUksvV2ErWlNJVXBOUWFnamY2M093Rkp1?=
- =?utf-8?B?bERjVDI3WFJYUUdBaVlRdkUyM3VvUGY5c1p2QkVWRE14UUErNDhpQzd5ckdk?=
- =?utf-8?B?TFpjVDQySUtEQ0ZOQ2M3UnMyY2lsSmxjTkVEMi8rTm5Wc041RzdvQ3dEQWtY?=
- =?utf-8?B?bTlIUVZHVVUyRkIwZCsvUllzOGZqVW1XRlVTTTRrU0pZTWJhZGNGdmpNRE9v?=
- =?utf-8?B?OE1iSHlVd1NNazVqZjVhZGYwQWE3Y2RjaHJ0WnliU1UyQkRlamhoTU1CN0lY?=
- =?utf-8?B?SThwS3FxTFlUMEFZNjBUaDdpMzFqNXFZK0xJZGR3VG1acEk1MUZ0RE5QTWdR?=
- =?utf-8?B?N2l3Z0MvWGlUVUhmaHZUbFBob2JuSENOOFI2bTNzWU9pRkhNejlOMVhRczhu?=
- =?utf-8?B?dWQwTmErR252eVJTeEovL21Jc21RU0NlbWR4WjlId0U2K21RQ2M5UWFPbmtD?=
- =?utf-8?B?bXQwWjVLRWJwU3NCVTVDVjh6MDZ6Y0FVNytBTlpSYmswSllSUVJyQUQrMkpW?=
- =?utf-8?B?WmNyL0lyYmZaRnpvbGZMa1AyVFNvUmZNUDlVVkxVYjZMaGNZdGhKbyt5a212?=
- =?utf-8?B?dkxMdG9BQXBEN29UZkNrS1piM3puMjZ4LzZnYjZLOXJoOHlUMGFoNEpVZVlU?=
- =?utf-8?B?T3AyZzRkUFk3a0laZFo3RVVvTVVPRFJqRW1EcEViSnozUnIvLzZFNE02d3Y5?=
- =?utf-8?B?U1MwTVY0OGJGR3VFQXpsU25MOEppVzloUVdrVjFRRnRBWWxPRU5tVGpWcVdu?=
- =?utf-8?B?OGE1R2FIa001V0lJdC96MlRER3RKR2cyWjRTVEdpZFJmSHVLYjNBOGttUEZT?=
- =?utf-8?B?cXQzNmJzRnZkZXdDVVJUSWxOTUNQakF3d2lzZklPRHUwQW9QOSt5UFBvMWhU?=
- =?utf-8?B?SzBtcFpSTTJ5UmN2QlQ1dkZraFRRZVdEZEtyamJoYjVSZXRwd1F0bllvT0VH?=
- =?utf-8?B?SU5CSmI5cTc5RlNEaXA4LzN4cWZTbTNoOGNibndPa3lidnlpZHp0cTFiWHJU?=
- =?utf-8?B?YkpNMjdCbWk3RlQ2NHFmSUpmdHM2WXlyWTZRMmJubjAzdEZwWG5PTTc2WWFq?=
- =?utf-8?B?bGFjOHlRWUhzMmpIc2pKYlYrWDRzSnp6d3RJZ1I2Rm5ZOFlxSlk1SE1COUxl?=
- =?utf-8?B?OTZja21tYmJPZTc0di9FMk1jV2UrMmF0V2dReFJjTlpGcG9jaHY5NFhZRW96?=
- =?utf-8?B?emFmd2RteGJYMzl1eHFNNmpkb1M4ZFNSOGlHYXM5SEFTR1lFZTFqdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd3fc757-b7db-4b87-9be8-08decb10dd4b
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3485.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2026 19:04:02.7432
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W5Go6BqTuqdiDCBpa4IC4F1AfMopAhPWJeiegNvzh3NqZvyKHMeSZ3+QW6YQcR+NO0Cb+vIkzD/qMVpCE0hXKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9546
+References: <1bbd999cf88fb1ea93f4a3743047bce9b51adc24.1781287178.git.lucien.xin@gmail.com>
+ <ai0CcdDCkhBO_RF2@1wt.eu>
+In-Reply-To: <ai0CcdDCkhBO_RF2@1wt.eu>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 15 Jun 2026 15:13:41 -0400
+X-Gm-Features: AVVi8CdklNEKVA42aHgn26YBVXjBqLw1tyWd6IaOgTyW2ZfCWi1hQciX77PBa5U
+Message-ID: <CADvbK_dt0ripQmj6JrLDBmdpxZPSOcs1zuuNqJ39AnjjTi1JsA@mail.gmail.com>
+Subject: Re: [PATCH net] sctp: hold socket lock when dumping endpoints in sctp_diag
+To: Willy Tarreau <w@1wt.eu>
+Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Zero Day Initiative <zdi-disclosures@trendmicro.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299571-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:eric.joyner@amd.com,m:nikhil.rao@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhirao@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299572-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,trendmicro.com];
+	FORGED_RECIPIENTS(0.00)[m:w@1wt.eu,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:zdi-disclosures@trendmicro.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,amd.com:dkim,amd.com:mid,amd.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,trendmicro.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 853D76895B6
+X-Rspamd-Queue-Id: 8B1E8689675
 
+On Sat, Jun 13, 2026 at 3:10=E2=80=AFAM Willy Tarreau <w@1wt.eu> wrote:
+>
+> Hi,
+>
+> On Fri, Jun 12, 2026 at 01:59:38PM -0400, Xin Long wrote:
+> > SCTP_DIAG endpoint dumping currently walks the endpoint hash table
+> > without taking the socket lock before calling inet_sctp_diag_fill().
+> >
+> > This is problematic because inet_sctp_diag_fill() eventually calls
+> > inet_diag_msg_sctpladdrs_fill(), which traverses the endpoint's local
+> > address list twice: once to count entries for nla_reserve(), and once
+> > again to copy the addresses into the netlink buffer.
+> >
+> > Since these two traversals are protected only by separate RCU read-side
+> > critical sections, concurrent socket operations such as
+> > SCTP_SOCKOPT_BINDX_REM may remove entries from the address list between
+> > them. In that case, the number of copied addresses becomes smaller than
+> > the originally reserved buffer size, leaving part of the netlink payloa=
+d
+> > uninitialized and potentially leaking kernel memory to user space.
+> >
+> > Fix this by changing sctp_for_each_endpoint() to iterate with net and
+> > position awareness while taking a reference on each socket, then releas=
+e
+> > the endpoint hash bucket read_lock_bh() before invoking the callback.
+> >
+> > A socket reference is required because the callback acquires lock_sock(=
+),
+> > which must be called outside of read_lock_bh() since lock_sock() may
+> > sleep. Holding a socket reference ensures the socket remains valid afte=
+r
+> > dropping the bucket lock and before acquiring the socket lock.
+> >
+> > With the socket lock held, concurrent bind-address modifications are
+> > serialized against the diagnostic dump, ensuring the local address list
+> > remains stable during buffer sizing and initialization.
+> >
+> > This also simplifies endpoint traversal by removing the temporary
+> > callback local position tracking args[4] and moving dump progress
+> > tracking into sctp_for_each_endpoint() itself.
+> >
+> > While at it, fix the idiag_states check in sctp_ep_dump() and skip ep
+> > dumping when non LISTEN|CLOSE states are also requested and the ep has
+> > assocs, since such cases will be handled later by sctp_sock_dump().
+> >
+> > Reported-by: Zero Day Initiative <zdi-disclosures@trendmicro.com>
+>
+> Please note that the original report suggested this reporter:
+>
+>    Nico Yip (@_cyeaa_) working with TrendAI Zero Day Initiative
+>
+I could find a public email for Nico Yip (@_cyeaa_), and I will
+add this into the changelog as:
 
-On 6/15/2026 8:36 AM, Simon Horman wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at:https://sashiko.dev
-> ---
-> pds_core: add PLDM firmware update support via devlink flash
-> 
-> Implement PLDM FW Update in the pds_core driver using the upstream
-> pldmfw API. This allows updating an entire PLDM FW package at once
-> or updating specific firmware components by name.
-> 
->> diff --git a/drivers/net/ethernet/amd/pds_core/fw.c b/drivers/net/ethernet/amd/pds_core/fw.c
->> --- a/drivers/net/ethernet/amd/pds_core/fw.c
->> +++ b/drivers/net/ethernet/amd/pds_core/fw.c
->> [ ... ]
->> @@ -195,3 +239,720 @@ int pdsc_firmware_update(struct pdsc *pdsc, const struct firmware *fw,
->> [ ... ]
->> +static int pdsc_flash_component_chunk(struct pdsc *pdsc, struct device *dev,
->> [ ... ]
->> +     err = pdsc_devcmd_send_component(pdsc, info, info_sz, dma_addr,
->> +                                      copy_sz, offset, slot_id, comp);
->> +     if (err == -ETIMEDOUT || err == -EAGAIN) {
->> +             pdsc_deferred_dma_add(pdsc, deferred, dma_addr,
->> +                                   component_data, copy_sz, DMA_TO_DEVICE);
->> +             return err;
->> +     }
-> [Severity: High]
-> Can this lead to a race condition that leaks the DMA mapping and memory?
-> 
-> If pdsc_devcmd_send_component() encounters a timeout in the lower level
-> __pdsc_devcmd_locked() function, it will queue pdsc->health_work. The wrapper
-> function __pdsc_devcmd_with_data_nomsg() will then release the devcmd_lock
-> before returning the timeout error back here.
-> 
-> If the scheduled health_work runs and acquires devcmd_lock before this code
-> reaches pdsc_deferred_dma_add(), it could execute a recovery devcmd and
-> call pdsc_deferred_dma_free() on an empty list. When this thread resumes,
-> it adds the timed-out buffer to the deferred DMA list, but its cleanup
-> trigger has already fired, leaving the buffer leaked.
-> 
->> [ ... ]
->> +int pdsc_firmware_update(struct pdsc *pdsc,
->> +                      struct devlink_flash_update_params *params,
->> +                      struct netlink_ext_ack *extack)
->> +{
->> +     int err;
->> +
->> +     if (pdsc->dev_ident.version >= PDS_CORE_IDENTITY_VERSION_2 &&
->> +         pdsc->dev_ident.capabilities &
->> +             cpu_to_le64(PDS_CORE_DEV_CAP_PLDM_FW_UPDATE))
->> +             err = pdsc_pldm_firmware_update(pdsc, params, extack,
->> +                                             params->fw);
->> +     else
->> +             err = pdsc_legacy_firmware_update(pdsc, params->fw, extack);
+    This issue was reported by Nico Yip (@_cyeaa_) working with TrendAI Zer=
+o
+    Day Initiative.
 
-The race scenario is technically possible but does not cause a leak.
+Thanks.
 
-The deferred DMA cleanup is guaranteed by explicit calls in teardown paths:
-
-1. pdsc_reset_prepare() calls pdsc_fw_down() then explicitly calls
-    pdsc_deferred_dma_free() afterward
-2. pdsc_remove() explicitly calls pdsc_deferred_dma_free() at the end
-
-Even if health_work runs on an empty list, the deferred cleanup will
-happen either on the next successful devcmd or in the explicit teardown 
-paths.
-
-> [Severity: High]
-> Does this fallback path ignore the requested component name?
-> 
-> If the device does not support PLDM, the driver falls back to
-> pdsc_legacy_firmware_update() which only takes the params->fw pointer.
-> If a user requested a targeted component update using devlink, this would
-> ignore the component filter and flash the entire monolithic image onto
-> the device.
-> 
-> Should this explicitly check if params->component is set before falling
-> back, and return -EOPNOTSUPP if a component is specified on legacy
-> firmware?
-> 
-
-Yes, this is a valid bug - but it's pre-existing, not introduced by this
-series. Before this patch, pdsc_dl_flash_update() already ignored
-params->component. I'll submit a fix to -net as a standalone patch.
-
-Thanks,
-Nikhil
+> > Fixes: 8f840e47f190 ("sctp: add the sctp_diag.c file")
+> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > ---
+> >  include/net/sctp/sctp.h |  3 +-
+> >  net/sctp/diag.c         | 62 +++++++++++++++++++----------------------
+> >  net/sctp/socket.c       | 34 +++++++++++++++++-----
+> >  3 files changed, 57 insertions(+), 42 deletions(-)
+> >
+> > diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
+> > index 58242b37b47a..cd82b05354a3 100644
+> > --- a/include/net/sctp/sctp.h
+> > +++ b/include/net/sctp/sctp.h
+> > @@ -111,7 +111,8 @@ int sctp_transport_lookup_process(sctp_callback_t c=
+b, struct net *net,
+> >                                 const union sctp_addr *paddr, void *p, =
+int dif);
+> >  int sctp_transport_traverse_process(sctp_callback_t cb, sctp_callback_=
+t cb_done,
+> >                                   struct net *net, int *pos, void *p);
+> > -int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *), =
+void *p);
+> > +int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
+> > +                        struct net *net, int *pos, void *p);
+> >  int sctp_get_sctp_info(struct sock *sk, struct sctp_association *asoc,
+> >                      struct sctp_info *info);
+> >
+> > diff --git a/net/sctp/diag.c b/net/sctp/diag.c
+> > index d758f5c3e06e..9108272ca527 100644
+> > --- a/net/sctp/diag.c
+> > +++ b/net/sctp/diag.c
+> > @@ -92,6 +92,7 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_bu=
+ff *skb,
+> >               if (!--addrcnt)
+> >                       break;
+> >       }
+> > +     WARN_ON_ONCE(addrcnt);
+> >       rcu_read_unlock();
+> >
+> >       return 0;
+> > @@ -373,42 +374,36 @@ static int sctp_ep_dump(struct sctp_endpoint *ep,=
+ void *p)
+> >       struct sk_buff *skb =3D commp->skb;
+> >       struct netlink_callback *cb =3D commp->cb;
+> >       const struct inet_diag_req_v2 *r =3D commp->r;
+> > -     struct net *net =3D sock_net(skb->sk);
+> >       struct inet_sock *inet =3D inet_sk(sk);
+> >       int err =3D 0;
+> >
+> > -     if (!net_eq(sock_net(sk), net))
+> > +     lock_sock(sk);
+> > +     if (sctp_sstate(sk, CLOSED))
+> >               goto out;
+> >
+> > -     if (cb->args[4] < cb->args[1])
+> > -             goto next;
+> > -
+> > -     if (!(r->idiag_states & TCPF_LISTEN) && !list_empty(&ep->asocs))
+> > -             goto next;
+> > +     if ((r->idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)) &&
+> > +         !list_empty(&ep->asocs))
+> > +             goto out;
+> >
+> >       if (r->sdiag_family !=3D AF_UNSPEC &&
+> >           sk->sk_family !=3D r->sdiag_family)
+> > -             goto next;
+> > +             goto out;
+> >
+> >       if (r->id.idiag_sport !=3D inet->inet_sport &&
+> >           r->id.idiag_sport)
+> > -             goto next;
+> > +             goto out;
+> >
+> >       if (r->id.idiag_dport !=3D inet->inet_dport &&
+> >           r->id.idiag_dport)
+> > -             goto next;
+> > -
+> > -     if (inet_sctp_diag_fill(sk, NULL, skb, r,
+> > -                             sk_user_ns(NETLINK_CB(cb->skb).sk),
+> > -                             NETLINK_CB(cb->skb).portid,
+> > -                             cb->nlh->nlmsg_seq, NLM_F_MULTI,
+> > -                             cb->nlh, commp->net_admin) < 0) {
+> > -             err =3D 2;
+> >               goto out;
+> > -     }
+> > -next:
+> > -     cb->args[4]++;
+> > +
+> > +     err =3D inet_sctp_diag_fill(sk, NULL, skb, r,
+> > +                               sk_user_ns(NETLINK_CB(cb->skb).sk),
+> > +                               NETLINK_CB(cb->skb).portid,
+> > +                               cb->nlh->nlmsg_seq, NLM_F_MULTI,
+> > +                               cb->nlh, commp->net_admin);
+> >  out:
+> > +     release_sock(sk);
+> >       return err;
+> >  }
+> >
+> > @@ -479,41 +474,40 @@ static void sctp_diag_dump(struct sk_buff *skb, s=
+truct netlink_callback *cb,
+> >               .r =3D r,
+> >               .net_admin =3D netlink_net_capable(cb->skb, CAP_NET_ADMIN=
+),
+> >       };
+> > -     int pos =3D cb->args[2];
+> > +     int pos;
+> >
+> >       /* eps hashtable dumps
+> >        * args:
+> >        * 0 : if it will traversal listen sock
+> >        * 1 : to record the sock pos of this time's traversal
+> > -      * 4 : to work as a temporary variable to traversal list
+> >        */
+> >       if (cb->args[0] =3D=3D 0) {
+> > -             if (!(idiag_states & TCPF_LISTEN))
+> > -                     goto skip;
+> > -             if (sctp_for_each_endpoint(sctp_ep_dump, &commp))
+> > -                     goto done;
+> > -skip:
+> > +             if (idiag_states & TCPF_LISTEN) {
+> > +                     pos =3D cb->args[1];
+> > +                     if (sctp_for_each_endpoint(sctp_ep_dump, net, &po=
+s,
+> > +                                                &commp)) {
+> > +                             cb->args[1] =3D pos;
+> > +                             return;
+> > +                     }
+> > +             }
+> >               cb->args[0] =3D 1;
+> >               cb->args[1] =3D 0;
+> > -             cb->args[4] =3D 0;
+> >       }
+> >
+> > +     if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
+> > +             return;
+> > +
+> >       /* asocs by transport hashtable dump
+> >        * args:
+> >        * 1 : to record the assoc pos of this time's traversal
+> >        * 2 : to record the transport pos of this time's traversal
+> >        * 3 : to mark if we have dumped the ep info of the current asoc
+> >        * 4 : to work as a temporary variable to traversal list
+> > -      * 5 : to save the sk we get from travelsing the tsp list.
+> >        */
+> > -     if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
+> > -             goto done;
+> > -
+> > +     pos =3D cb->args[2];
+> >       sctp_transport_traverse_process(sctp_sock_filter, sctp_sock_dump,
+> >                                       net, &pos, &commp);
+> >       cb->args[2] =3D pos;
+> > -
+> > -done:
+> >       cb->args[1] =3D cb->args[4];
+> >       cb->args[4] =3D 0;
+> >  }
+> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > index 66e12fb0c646..1ed405dedc01 100644
+> > --- a/net/sctp/socket.c
+> > +++ b/net/sctp/socket.c
+> > @@ -5369,24 +5369,44 @@ struct sctp_transport *sctp_transport_get_idx(s=
+truct net *net,
+> >  }
+> >
+> >  int sctp_for_each_endpoint(int (*cb)(struct sctp_endpoint *, void *),
+> > -                        void *p) {
+> > -     int err =3D 0;
+> > -     int hash =3D 0;
+> > -     struct sctp_endpoint *ep;
+> > +                        struct net *net, int *pos, void *p) {
+> > +     int err, hash =3D 0, idx =3D 0, start;
+> >       struct sctp_hashbucket *head;
+> > +     struct sctp_endpoint *ep;
+> > +     struct sock *sk;
+> >
+> >       for (head =3D sctp_ep_hashtable; hash < sctp_ep_hashsize;
+> >            hash++, head++) {
+> > +             start =3D idx;
+> > +again:
+> > +             sk =3D NULL;
+> >               read_lock_bh(&head->lock);
+> >               sctp_for_each_hentry(ep, &head->chain) {
+> > -                     err =3D cb(ep, p);
+> > -                     if (err)
+> > +                     if (sock_net(ep->base.sk) !=3D net)
+> > +                             continue;
+> > +                     if (idx++ >=3D *pos) {
+> > +                             sk =3D ep->base.sk;
+> > +                             sock_hold(sk);
+> >                               break;
+> > +                     }
+> >               }
+> >               read_unlock_bh(&head->lock);
+> > +
+> > +             if (sk) {
+> > +                     err =3D cb(ep, p);
+> > +                     if (err) {
+> > +                             sock_put(sk);
+> > +                             return err;
+> > +                     }
+> > +                     sock_put(sk);
+> > +                     (*pos)++;
+> > +
+> > +                     idx =3D start;
+> > +                     goto again;
+> > +             }
+> >       }
+> >
+> > -     return err;
+> > +     return 0;
+> >  }
+> >  EXPORT_SYMBOL_GPL(sctp_for_each_endpoint);
+> >
+> > --
+> > 2.47.1
 
