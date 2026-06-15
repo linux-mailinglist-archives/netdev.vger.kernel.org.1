@@ -1,214 +1,228 @@
-Return-Path: <netdev+bounces-299293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aj4YKrJqL2ptAAUAu9opvQ
-	(envelope-from <netdev+bounces-299293-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:00:02 +0200
+	id BtXJI6BsL2rnAAUAu9opvQ
+	(envelope-from <netdev+bounces-299295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:08:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145D9682F4C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:00:02 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB86682F7E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 05:08:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=linux.alibaba.com header.s=default header.b=i+3MDgXc;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299293-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299293-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=linux.alibaba.com;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299295-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299295-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 90B31300565C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:00:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7916930062D4
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 03:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FABE26738B;
-	Mon, 15 Jun 2026 02:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4E3247DE1;
+	Mon, 15 Jun 2026 03:08:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42B91A683A;
-	Mon, 15 Jun 2026 02:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD43223DFB
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 03:07:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781492399; cv=none; b=DnNs9tl6dp7HmF6UnaPj+uiDu1TFIMYnZlIZ2DH1fUSst9vjrCTtRNa9o2mxJfuCx74+vY4OxEeZ8SIwZAld4E5f5iLV7LMkKwtlVwjnJuJMThUB2QFRz4L+1AgAIzORWKSreuCw/+4OwaDSpQkcEX4FNURvorecwbnw4mFfacc=
+	t=1781492882; cv=none; b=kpW5aMIzz/FjGRayiBzzeqdTdapiRnXlW6gYe0AGFl9+IRiBcdpiWkF/NHk8bphoBFBpzbuChlisj2ChyKeMz1z8/wteX3yNOfpNrlHj0bIUllsjooIJypdatYtpVhgKAG01ae2f4wBTezcsALtXlEaniwVWIDVzDTMQh8dw+kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781492399; c=relaxed/simple;
-	bh=57yKZQz0buXNFzXkhUqk+nu0gQIuDjIWbyAXCJFgNMg=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=XfpLb07nyouVV+dITcBdpeXrWmHwuFJrSJUZamwG58FOg4cyMekZhn2UkGwxSiQ1xXOhdpYslmDOt6uXjZF2qosuBJ1/6bhLlUYh60R7gedj9sHGP8roCLX7BsZ2PRyS6XTe/KyiSgpw2I68nfwKZs3bCnOPatNCZz7/Dyxwh60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=i+3MDgXc; arc=none smtp.client-ip=115.124.30.118
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1781492389; h=Message-ID:Subject:Date:From:To;
-	bh=Hs9gJmaIt2CsoVnPgGPaU+fHX1gP7oID7IO1t/2Ii+o=;
-	b=i+3MDgXcu7D9CtgePdbfrNuTg00XC/XNEFjyKLgsGxWlGKo0hZvL1wYsbfzCP8+D94QEM8T+YL1PHdKPDCCH3sxcSpTQQtjPpDoDwFE0VhmPi6WFrlbBNPP8i6it6iWdDZw/ZS3/dYtJ5OEQcv4N8HIJyBwTWdSvw5u05tpIA00=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X4ooTfR_1781492387;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X4ooTfR_1781492387 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Jun 2026 10:59:48 +0800
-Message-ID: <1781491685.0613394-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 1/2] virtio_net: xsk: fix race in rx wake up
-Date: Mon, 15 Jun 2026 10:48:05 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: menglong8.dong@gmail.com
-Cc: mst@redhat.com,
- jasowang@redhat.com,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com,
- minhquangbui99@gmail.com,
- kerneljasonxing@gmail.com,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- eperezma@redhat.com
-References: <20260611025644.2431148-1-dongml2@chinatelecom.cn>
- <20260611025644.2431148-2-dongml2@chinatelecom.cn>
-In-Reply-To: <20260611025644.2431148-2-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1781492882; c=relaxed/simple;
+	bh=0C1UYnmCry08Huufzy/KPisYPs31PBRDAhLGOsARSss=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Qts3LdxYqbEQKS6eHYrdmhMfmc5GBwpZJpQZ17Wg4kUdqx96WiH0SfKn9HLT3z+31nraKdBNJEqRIMTZXE1E0+I2/zv2EeJcQ3Ez33DXWadGLe7fHEIvALJI39K1QDKvDBcQHTxGYT5ChZl65M5iqaNj9SbW/PdrlZjke86gILc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+X-QQ-mid:Yeas8t1781492807t791t52977
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.157.22.210])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 12619361186151596884
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Larysa Zaremba'" <larysa.zaremba@intel.com>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
+	"'Thomas Gleixner'" <tglx@kernel.org>,
+	"'Greg Kroah-Hartman'" <gregkh@linuxfoundation.org>,
+	<netdev@vger.kernel.org>,
+	"'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>,
+	"'Russell King'" <linux@armlinux.org.uk>,
+	"'Jacob Keller'" <jacob.e.keller@intel.com>,
+	"'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>,
+	"'Kees Cook'" <kees@kernel.org>,
+	"'Larysa Zaremba'" <larysa.zaremba@intel.com>,
+	"'Joe Damato'" <joe@dama.to>,
+	"'Breno Leitao'" <leitao@debian.org>,
+	"'Aleksandr Loktionov'" <aleksandr.loktionov@intel.com>,
+	=?iso-8859-1?Q?'Uwe_Kleine-K=F6nig_=28The_Capable_Hub=29'?= <u.kleine-koenig@baylibre.com>,
+	"'Fabio Baltieri'" <fabio.baltieri@gmail.com>,
+	"'Thomas Gleixner'" <tglx@kernel.org>,
+	"'Greg Kroah-Hartman'" <gregkh@linuxfoundation.org>
+References: <20260610060917.23980-1-jiawenwu@trustnetic.com> <20260610060917.23980-5-jiawenwu@trustnetic.com> <20260612154929.GD671640@horms.kernel.org>
+In-Reply-To: <20260612154929.GD671640@horms.kernel.org>
+Subject: RE: [PATCH net-next v6 4/5] net: wangxun: implement soft quiesce for PCIe error recovery
+Date: Mon, 15 Jun 2026 11:06:46 +0800
+Message-ID: <018b01dcfc74$00443c30$00ccb490$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH9NqXiSq8t3g99zFNQdAvFN/QoIQJw8LB5AZ4y8Z213f6/MA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: Nj0bGi/6uW3PSes0yMhWFvyO2EG+v8EjaHTQN1sI2S0QVRmVbMO3h+D/
+	cCpbdWupbdpBhGd1KXAERc85vg+Y6WEkBUasvX783VES6PJs9axNh0WgGvnHbmK8jmhk3CC
+	/2dFcDlzzXQeeKQSA0c3YEpn1oFK9QSULbaTLl+UWqDV4w4etlAUk3vptL4uGAYd0RCnXM7
+	1LAur71mPg6myVJOTN2kxPTQMnjpZc6JkL+h3HMtGus+vnJUdQo74RgGcKu9LOZYYij2Dli
+	KVhI7K0tM1Cxm8A0pk+LxQpaSBDmERk2nQ9E2dm0kMVwiBi0Ik8WoToL/BuEaTuTUti8Jd7
+	WSr0SiaogDZyy4h8XNa1OAgvVLamrWBkIYQRHYLbAm6kqi7pqrUfAvDrl9t6ky0WrVNk3jp
+	yAjdxqZVZo0bJhTYfrcG6C1GcIcP4WV85OwXlbAFbGwDNIDbxQBa7XbxJxRIRiLil6IODFc
+	A7WRua+NUUD4kR+Rwze40SbjRkn6Jriw9LKuZo+HT5am16AhYm2G3sGJnhgM/V0uamGoiix
+	GZGxGeAnx7FoCvoTzIwGFZbpxdWykKUVyHiIm6yEeOsJpKHrXnrGOso0EnD/25Deg006Cws
+	3Nj5KwsNQZ5+gC335mRzdXowq9AutS0n7hayQHGGaS1Yc2Bd7bNgI28B9imXIC+IXHUmVLu
+	RYZ6PI7m1QE9kRdwJdJljH4hO4TuZCQ5R86TdGEJMVWIvpA8NkqYg2KqiB+b1bMHmMP3D6a
+	CTF6J8Mu5KU5BMYjShDDoNK27T8peuFGAoBO6+VqRLyl1mldFQiqLUKIbF0kBtZyRGJU+dF
+	E1gbxhDXtDMQLz/42b+zyGr0A8ND2ehJxSpBV9m2xxMBoAorqgAwL6YFAEjBnrTMTwfQJjL
+	9A2V1NBKChEkXp7QMYo9rAgC+ZIa+2GH/YUes6HO47PFFpSoBpqZ7fKO77irHDhq+4hnlrd
+	SCkmcbFUik5HQ2rQz0dhEwEe+VlmlehgJ7Ubjol0rap1LrFpF+kc3H1pOYOZ2YuqPMX/KgP
+	35e3xNMVeTEAKev0l439bwGhnZp9DnM2cUtkXhdvKMJIL2nnSY7W9fEGmCgIDn5V7ZofnLa
+	ivMo1hbuqIw6X+5J8jIwjo=
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+X-QQ-RECHKSPAM: 0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[alibaba.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:mengyuanlou@net-swift.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:richardcochran@gmail.com,m:linux@armlinux.org.uk,m:jacob.e.keller@intel.com,m:michal.swiatkowski@linux.intel.com,m:kees@kernel.org,m:larysa.zaremba@intel.com,m:joe@dama.to,m:leitao@debian.org,m:aleksandr.loktionov@intel.com,m:u.kleine-koenig@baylibre.com,m:fabio.baltieri@gmail.com,m:tglx@kernel.org,m:gregkh@linuxfoundation.org,m:andrew@lunn.ch,m:fabiobaltieri@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299293-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_FROM(0.00)[bounces-299295-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:menglong8.dong@gmail.com,m:mst@redhat.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:minhquangbui99@gmail.com,m:kerneljasonxing@gmail.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:eperezma@redhat.com,m:menglong8dong@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,intel.com,linux.intel.com,dama.to,debian.org,baylibre.com,linuxfoundation.org];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.alibaba.com:dkim,linux.alibaba.com:mid,linux.alibaba.com:from_mime,chinatelecom.cn:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 145D9682F4C
+X-Rspamd-Queue-Id: 7CB86682F7E
 
-On Thu, 11 Jun 2026 10:56:43 +0800, menglong8.dong@gmail.com wrote:
-> From: Menglong Dong <dongml2@chinatelecom.cn>
->
-> During packet receiving in virtio-net, the rq can be empty, which means
-> "rq->vq->num_free == virtqueue_get_vring_size(rq->vq)", in
-> virtnet_add_recvbuf_xsk(), if we are using xsk. Meanwhile, the fill ring
-> can be empty too, which means we can't allocate anything from
-> xsk_buff_alloc_batch(). Then, we will set the XDP_RING_NEED_WAKEUP flag.
->
-> However, if the user clean all the data in rx ring and fill the
-> "fill ring" and check the XDP_RING_NEED_WAKEUP flag after
-> xsk_buff_alloc_batch() and before xsk_set_rx_need_wakeup(), then the rx
-> napi will never be scheduled: the rx ring is empty, which means we will
-> never receive a packet to trigger the further recv fill. The rx ring is
-> empty now, so the user will not check the flag too.
->
-> Fix this by set the XDP_RING_NEED_WAKEUP flag before
-> xsk_buff_alloc_batch() if both rq->vq and fill ring are empty.
->
-> Meanwhile, set the XDP_RING_NEED_WAKEUP flag if we have any free entry in
-> rq->vq.
->
-> Fixes: e3f8800aa243 ("virtio-net: xsk: Support wakeup on RX side")
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
->  drivers/net/virtio_net.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index f4adcfee7a80..4b5b3fa62008 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1323,16 +1323,27 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->  				   struct xsk_buff_pool *pool, gfp_t gfp)
->  {
->  	struct xdp_buff **xsk_buffs;
-> +	bool need_wakeup;
->  	dma_addr_t addr;
->  	int err = 0;
->  	u32 len, i;
->  	int num;
->
-> +	need_wakeup = xsk_uses_need_wakeup(pool);
->  	xsk_buffs = rq->xsk_buffs;
->
-> +	/* If both rq->vq and fill ring are empty, and then the user submit
-> +	 * all the chunks to the fill ring and check the wake up flag
-> +	 * after xsk_buff_alloc_batch() and before xsk_set_rx_need_wakeup(),
-> +	 * we will lose the chance to wake up the rx napi, so we have to
-> +	 * set the need_wakeup flag here.
-> +	 */
-> +	if (need_wakeup && virtqueue_get_vring_size(rq->vq) == rq->vq->num_free)
-> +		xsk_set_rx_need_wakeup(pool);
+On Fri, Jun 12, 2026 11:49 PM, Simon Horman wrote:
+> On Wed, Jun 10, 2026 at 02:09:16PM +0800, Jiawen Wu wrote:
+> > Function wx_soft_quiesce() provide a lightweight shutdown path during
+> > PCIe error recovery. It avoids MMIO-dependent operations in PCIe error
+> > status.
+> >
+> > Waiting for the service task to complete may unnecessarily delay PCIe
+> > error recovery, especially if the work item is already blocked by the
+> > hardware failure that triggered AER. So the service task is not
+> > explicitly cancelled in quiesce path. As a measure to block the service
+> > task, the checking of WX_STATE_DOWN and WX_STATE_RESETTING is added at
+> > the entry of every work item.
+> >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+> > index 44f3e6505246..dcc8b3ae1445 100644
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+> > @@ -842,6 +842,27 @@ void wx_ptp_stop(struct wx *wx)
+> >  }
+> >  EXPORT_SYMBOL(wx_ptp_stop);
+> >
+> > +void wx_ptp_quiesce(struct wx *wx)
+> > +{
+> > +	if (!test_and_clear_bit(WX_STATE_PTP_RUNNING, wx->state))
+> > +		return;
+> > +
+> > +	clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
+> > +
+> > +	if (wx->ptp_tx_skb) {
+> > +		dev_kfree_skb_any(wx->ptp_tx_skb);
+> > +		wx->ptp_tx_skb = NULL;
+> > +	}
+> 
+> AI-generated review of this patch on sashiko.dev flags a potential UAF here:
+> 
+> 	"Could freeing wx->ptp_tx_skb here cause a use-after-free or
+> 	double-free?
+> 
+> 	"Because ptp_clock_unregister() is called after this block, the PTP
+> 	 kworker might still be running.
+> 
+> 	"If wx_ptp_tx_hwtstamp() reads wx->ptp_tx_skb just before this
+> 	 free, it will pass the freed skb to skb_tstamp_tx() and call
+> 	 dev_kfree_skb_any() on it again.
+> 
+> I'd appreciate it if you could look into that.
 
-Is Condition A here too strict? We should trigger the wakeup under a wider range
-of scenarios.
+I will move ptp_clock_unregister() to be executed before we free wx->ptp_tx_skb.
 
-> +
->  	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
->  	if (!num) {
-> -		if (xsk_uses_need_wakeup(pool)) {
-> +		if (need_wakeup) {
->  			xsk_set_rx_need_wakeup(pool);
->  			/* Return 0 instead of -ENOMEM so that NAPI is
->  			 * descheduled.
-> @@ -1341,8 +1352,6 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->  		}
->
->  		return -ENOMEM;
-> -	} else {
-> -		xsk_clear_rx_need_wakeup(pool);
->  	}
->
->  	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
-> @@ -1363,6 +1372,16 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->  			goto err;
->  	}
->
-> +	if (need_wakeup) {
-> +		if (rq->vq->num_free)
-> +			/* We have free buffers, so we'd better wake up the
-> +			 * rx napi as soon as possible.
-> +			 */
-> +			xsk_set_rx_need_wakeup(pool);
+> 
+> I believe that the other issues raised in that AI-generated review have
+> already been discussed in the context of earlier versions of this
+> patch-set.
+> 
+> > +	clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
+> > +
+> > +	if (wx->ptp_clock) {
+> > +		ptp_clock_unregister(wx->ptp_clock);
+> > +		wx->ptp_clock = NULL;
+> > +		dev_info(&wx->pdev->dev, "removed PHC on %s\n", wx->netdev->name);
+> > +	}
+> > +}
+> 
+> ...
+> 
 
-Is the purpose of waking up RX NAPI to invoke try_fill_recv? However,
-virtnet_poll does not call try_fill_recv directly. it is done
-conditionally.
-
-Thanks.
-
-
-> +		else
-> +			xsk_clear_rx_need_wakeup(pool);
-> +	}
-> +
->  	return num;
->
->  err:
-> --
-> 2.54.0
->
 
