@@ -1,300 +1,226 @@
-Return-Path: <netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299414-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id x/E0E4DpL2q3IwUAu9opvQ
-	(envelope-from <netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:01:04 +0200
+	id j3M9DOnqL2r/IwUAu9opvQ
+	(envelope-from <netdev+bounces-299414-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:07:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CC3685EE1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:01:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D955685F9E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:07:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=SF9VO37P;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299413-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=Nvidia.com header.s=selector2 header.b=drKHsFtb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299414-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299414-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=nvidia.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 371D33006083
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:00:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65736300CE6B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55123E5589;
-	Mon, 15 Jun 2026 12:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE7E3E5589;
+	Mon, 15 Jun 2026 12:03:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011003.outbound.protection.outlook.com [40.93.194.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296363A3E8C
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 12:00:38 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781524839; cv=none; b=N1mZMtYNoWX4gpJVvxoJC83z5urmuV2IvcAKpIN+a5+y04KIwfWUjGFLYMWzNGCRAsXlLBB++fB0ncx97XEPGTEss5hrk2Mzf5Vpkpzm3UOGLh0FYlVjvnjv3ZdEqyzNqa6izogEtK3Kjn0WdCajMimKXDEFkqg65fip5o/2SSw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781524839; c=relaxed/simple;
-	bh=6acq9PeasHQIcMpkmcWmA+pB1phowqQhPwbKoP9y+Bw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xc6HlQRHnoY07oXxiBeif/SpesB4Rrxsq8GVmOiZ+KYSXgBLkGLCIOxURcqbCnXh1VRe2lo9xPHd5j7M+X1ZUhFTpkP9KBKeGCWieHOzHGYNkpxuDzujXjf8zPWpJfCXX6V3Vbh/9NFrQhZxJZEwqtIcNCG/pjLT/fr0wZx2Fsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SF9VO37P; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781524837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s1hEc5bLUwY3/fjpyAWOCm1YDlIxHLbXyYuoOMkd4FI=;
-	b=SF9VO37PThYpe0/qrfHxz42oXG1ufrNYuDM7vN8F97f04LD6IuHUOwRuPGybZdYWbz8Ui2
-	Ri71lWjX//RPAQ5M6lTe/fkoYv0LuSe7T4t/kb4QxF2U3K6R3Ta5bjuXhZ+/D/oo2x7l4n
-	gB573IKuc9oY/nD2nLQ8IephkIOkdpQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-5f5PH8BvOP2kra8o7lRYjQ-1; Mon,
- 15 Jun 2026 08:00:33 -0400
-X-MC-Unique: 5f5PH8BvOP2kra8o7lRYjQ-1
-X-Mimecast-MFC-AGG-ID: 5f5PH8BvOP2kra8o7lRYjQ_1781524831
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 67EBD1800BC3;
-	Mon, 15 Jun 2026 12:00:30 +0000 (UTC)
-Received: from [10.44.33.96] (unknown [10.44.33.96])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4CEC51955BD4;
-	Mon, 15 Jun 2026 12:00:25 +0000 (UTC)
-Message-ID: <ca33b9b8-aafa-40f0-9943-a6b6736af4e4@redhat.com>
-Date: Mon, 15 Jun 2026 14:00:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8DC3E3D9A;
+	Mon, 15 Jun 2026 12:03:13 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781524994; cv=fail; b=FsORCzoEYnKi9CiJmS7B3zOfkLRvf9SZcFrQkXG3uhY2EFP+UK37kiYPrcC1puPgiU0n/XMVvLZstNKlZ60EAWqMgFJEq9XAKcY6DMXkp3R0VEaUeP8K+8vpR9xnxsSBCfz3lHpL4HbAjjSyzoYTLjOlaw0v2xtO6lhMzX8bWSM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781524994; c=relaxed/simple;
+	bh=BEyQEwqi4zacXmb3ad2vAKdv23Mj/Uuuu/LFIIlYEkg=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bGcNq5jCFx75h1TZ7U7RQCfSrwSeBGmodXClotv90ev1p1p/NftUs9+tR3oSXfB5qSGsGI0liSgCwg1xfBrMOIXMM3VMCMr5J/OFEWTiB18HXtinfLnuLSjuXeigU770GAkDiR7+DcjKTEh8RGWBoBcO4EH3na/zxhAMWz2BKvs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=drKHsFtb; arc=fail smtp.client-ip=40.93.194.3
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TEro0hrt2dsz7+n6qlTBhi7yR2d+VUG1owGBdE7mAoKbvvWbvz1au4ZaO+ZsssPxjyMa82EfYjPtUNd5EExsPBlC4wD53HrUM+GdbsNZspeiR7UhSm4DSjjX5YSLODY+tMlzXCnH2i+uzT+3kH1ZGsXwpcsRGLRbk93kvNjO+zaShzF3HBb1K3zgzdoJb34S/et5ptuw5C0O8VLVG2d1gKXHdZkGNwwbj4FkX+hkbqTllkgRztJbYr9JA/ZOOYdNfDOaC4Ee5ukz2oV4sboeKmd91tBfe3CuXFerSbSZNKARDfZJ9mKVhJpkzyWviHhZtagCOhoox2iwe7A9aK9f9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6msL3WKf7vn/sLz0ANyPMxjAH283pOFfY24lajfuwww=;
+ b=oeTPktrJdtl0RNVbGfywlSPdGgAC+P9EHH65YdryPQqu+rwrU5banlc93aeaFjTlf2xNFpZ+21HL/RvjMbNpYFEZP3mwNSaWTocJqalMwsHX80p9YxiYohlLpupj81UY9gtF1wn+7ISOFuu0en6tjrPLPjXTm2Z++M2JNy6/9r5IHdkHLec/hrOp+kUClvJJL2lETlsUopwk+U26lCjm5kS8EwYhzdW/uq3INt13gCpIGxLOF4J5h6VJYX6QNIdNhr8D9sh6OlnyCabbKHrgLzeVMaPxil7vqrI3sWcfSsB8G6TbQz7Fh9EwSYQ08ceZ+InI5IwGJEfXaScZHWzo2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6msL3WKf7vn/sLz0ANyPMxjAH283pOFfY24lajfuwww=;
+ b=drKHsFtbj83vj6szIwvhFM0KrlOgJkadK02tZ8eN365rVVriWH0Rv969KPN5DyLThQ/Rk7OolRocaE6aDmUR77Ptwx7y495F2ZTrSom9uk+tPzdp4Syo398IsqK97v2Cr9o+yq5RQVVk47BGGgxruRA1lmU96iEzOglx0N3J1yQaiHj1WEtBxqaEM/lHn6JEkEl16X3mFZXfoVrVPHrCcFIklp15Qw4vMMLmP5KcmqTxSA9al+n1PyhNXkJks9wjfHyrXi7tgCTh1uKNNmt6chfCsYckXtEs5EQu1O2Q5Fp9JD72NO+w9CjNKJK6sDjT3XSMuRJ67K2pbEbRFzOK7w==
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
+ by DS7PR12MB5984.namprd12.prod.outlook.com (2603:10b6:8:7f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
+ 2026 12:03:04 +0000
+Received: from DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385]) by DM4PR12MB5248.namprd12.prod.outlook.com
+ ([fe80::92d8:797b:4db0:d385%5]) with mapi id 15.21.0113.015; Mon, 15 Jun 2026
+ 12:03:04 +0000
+Message-ID: <054e047e-84a3-4dab-ad5d-604d16fc347d@nvidia.com>
+Date: Mon, 15 Jun 2026 15:02:58 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5: Fix wrong register access in
+ mlx5_query_mtppse()
+To: lirongqing <lirongqing@baidu.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260613153654.1810-1-lirongqing@baidu.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20260613153654.1810-1-lirongqing@baidu.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0020.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:3::9)
+ To DM4PR12MB5248.namprd12.prod.outlook.com (2603:10b6:5:39c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/4] dpll: add DPLL_PIN_TYPE_INT_NCO pin type
-To: Jiri Pirko <jiri@resnulli.us>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Jiri Pirko <jiri@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Schmidt, Michal" <mschmidt@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, "Vaananen, Pasi" <pvaanane@redhat.com>,
- "Oros, Petr" <poros@redhat.com>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Simon Horman <horms@kernel.org>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20260531194423.383366-1-ivecera@redhat.com>
- <20260531194423.383366-2-ivecera@redhat.com>
- <CH0PR11MB5394BA7DB19301ECD5F9B0139B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <b5853501-969a-4ac3-8aff-83c9da9c9834@redhat.com>
- <CH0PR11MB53941698BDF5C3B8298CC0679B1C2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <aifTFMZtWBgLzhCS@FV6GYCPJ69>
- <CH0PR11MB5394DA86D0D2CA45FD3DBEA79B1D2@CH0PR11MB5394.namprd11.prod.outlook.com>
- <99cebea4-156a-4379-922e-07c50f766fbe@redhat.com>
- <BN9PR11MB5401F6BA29CBA6F0C78FDB119B1A2@BN9PR11MB5401.namprd11.prod.outlook.com>
- <fcaa184b-f9e9-44c4-bae8-c4a9c6c41239@redhat.com>
- <aiqkZhNdt-WhglDg@FV6GYCPJ69>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <aiqkZhNdt-WhglDg@FV6GYCPJ69>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5248:EE_|DS7PR12MB5984:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae6391d7-77bb-4d6c-4c89-08decad60e34
+X-LD-Processed: 43083d15-7273-40c1-b7db-39efd9ccc17a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|23010399003|376014|18002099003|22082099003|921020|11063799006|56012099006|3023799007;
+X-Microsoft-Antispam-Message-Info:
+	+CkD6SzHVZT+4R/hXMQA8+r5hUwsNuXIJZHJKirKDsukeJWJnWPXbTSrQx9+LkgN+NPmEGv1JW94qPol1E4mytoHfw7PnzetCoUk5G9D7Vx7oQar/WhFvXIkpTusEnrkgcOON3RiniCGm2rUvJO30xOYoIR9F9BYRglbCd3whFy14iRqNYB70+QOqUbgAcsc5b4SNBtRHIv1sEIu9b61rt4KlquOOEttoGdVYqjN+Lk2uuEnGfP12ssmvcYC8M7nmhvFTEENUU1f8xN0zU8ink4HJChn8iG0dm4R617BbbWwNG1Erenwr8EcPZn7wDiRIPxlJqvxZ3YMPqD/GCd280TPJwV+43HA5avkT6ZSsKVit6cz/wsZ1NQdC1MGbmydWPHB0gRh8QY1Rm7dDO7xJfIFHiYjt6cZ2NQxv2gTV4xmuOI5iHOx0S8+y7UcemywjRlB6sSZt2sXnLpBnxMiIzGj73qVMf9hIjl8D7agTioex+Inng+jaly1s4nHRO5Ry99hiw9C637iQyP551fFk29Ugifw1VrO//Uk2QzdXgc2JGdoeFmb8I2JGFTeftoJbxYx4sc3r+5cs+MlP4D1DUP3A9VKrzucV9lCkU9t+OcSg44aqj3JQrY4OR3abIytegSyiviYgkeU1yXrlEkM4ZwZRL8fx7jIk7XzNnLHwNiZFXzbTZA3RGssdiHI+jzJNi+mJ+2uCemiGorZi8e3nCnpQnUUoNbEEvn2hwTR2XU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5248.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(23010399003)(376014)(18002099003)(22082099003)(921020)(11063799006)(56012099006)(3023799007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?THErb0hTK1FRYWtTbGFuQ0JVUVVGQXVTOVR2Z09memhaMDU2K0ZJMmJJVUhC?=
+ =?utf-8?B?V2V3OTVYL044TllRV0paQVM1NVpSUjlWa09uTHRvTU9Nek9UNjNGVXMyTnl1?=
+ =?utf-8?B?a2R1dHYwREVmSnRTWFpjcG5DOFVkQUhrY3BWTmppUlJWVTlTbkxBUnAzcVg4?=
+ =?utf-8?B?b1BNdm5teHYvaUJaMW1ibVpBWExTWDVZMlV2UDlaR3dtV3h0ZjQ0MWR1QlpT?=
+ =?utf-8?B?WlIyOHNCQ21vYWNVMFA5cWYyMDY0RTMxR2g3cG1vZW53OG94S1MzM0wyMHZM?=
+ =?utf-8?B?MkNlS3UvZjhVUjZSTHA4dFVWNGZPMGN0Z1d3RTdYVWFVT2hWak9qMG0wYTZ1?=
+ =?utf-8?B?UkI5YUpLM0J5em5MaGxUdy8rMnpnZHVVa3JXS0dWc05qQXRrMFVQVWVBaFoz?=
+ =?utf-8?B?LzhjTjFtbkZTNGZOMUliZE4xT3RTL3ZQSW9ST3VMTHNqQlRJYjdPYTgzcy9Y?=
+ =?utf-8?B?Y2twLzd3QnRFS2hKM0tOVFNWYnEzLzhtQktpMFpJMk5OOTB2KzZmM1dvelhH?=
+ =?utf-8?B?K1RKekMvSWpmbWo0Zm1mNytOZjNZbjJkZ2N3ZEN3cG9HMTljejJGcU93bDNH?=
+ =?utf-8?B?Tkt4a0xKWVdNOUZjR0hxVXlTTlgwTGlEMTlQYVdOKzIzSEt0TlFhTXZXVExN?=
+ =?utf-8?B?ckV3REloM0FjdGV0UUVuVWVXWVlKNi8xand4NkZlSEdSUk9tU1hxYklOakNo?=
+ =?utf-8?B?VllNMHJrNDVwOVhST0p2TTB3ZFo2NDgrQ00yS3JwS3FsMzRrUUxrSWU2NVUz?=
+ =?utf-8?B?WUxBdEtlMytkTnFjdTYvUVpGQ1RzM1RJNDFvMnZlM2FXdkNRRHFrQUkzcDZE?=
+ =?utf-8?B?UnVaRTNBMnRhemhiVWFZcmNneG1sdUxaY2hSZVpSL3dhMWkxVGFLUlUzQmdi?=
+ =?utf-8?B?S1hvWi9nU3JTOEZvcGhEenRmYkExcFVFbG4wOCtaMnozTzUxTWNqRmVlUkxU?=
+ =?utf-8?B?QTNCRC9adG94VmkyTGU4V0R5WmhwUmdxTWFxZGpLZXFSdEcwTkFCcStWVkht?=
+ =?utf-8?B?bjBzNk5HbFU2VVA1b29WUFVDRHZIRklsemxnVmxLMGRURTVxOTNWY2F1ek5Z?=
+ =?utf-8?B?dGFTTlVxeXFuTnVyWGV5Tld3S04xOWVSYzlOTzhIMkxOVjlFTXo3ZGxjSkc1?=
+ =?utf-8?B?QlJXSGd3dStPd0JiSWF3eTJ1MmRHUTJJVHJTKzB4dGcxZXQ4dndoWEMvWEo0?=
+ =?utf-8?B?aGgrOFRNbGtBUDZ1ZXJIVXZnZXVuL3pBYjhBNkN4aGY5VFRMVVNNWXlNOFJ1?=
+ =?utf-8?B?Q1gwRUpWMVpoS1dwbW9idXBUS0ZIYi9SQzlFcUFjeWtKZXN6a0NsTGZ3SUFs?=
+ =?utf-8?B?L1B5dDdSUjFMOGg1SkhTbVV6MGR4YjNXM1JnMUp6ckNwSi9UczNCTFd6Qm5S?=
+ =?utf-8?B?ZVZpRnV3TEZKZFhnU3dick1NeTNUNFN2bUdmUHpWS2tIYndtYzBOVDZTdmJ0?=
+ =?utf-8?B?NEh2M1k2THF3ZEgxWmZsTStQTnBvNDFZUWRVUEVaZ0htWjVXMlFERXNHaXNH?=
+ =?utf-8?B?SGU3Mlg0YVYxblF4Q21IbE1tN3lBR1FiQVl0U1lROG5jMzlCTXBuaW1Nemo5?=
+ =?utf-8?B?dFpkRGk4YzBJbnNvSytNSEJhRy9sQk4yZlp3UVdIZFV3c08yTmRoNWNzWlB3?=
+ =?utf-8?B?TEJUWkt4R2dkdm1kUzBRY0E5Z1NyTldDalRBck95a21Jcjl1VmZia2R5M2t4?=
+ =?utf-8?B?ZjM0aGhPb3YyYWVzV0pwRzhOUTVVMXZsYTNaMjl6N3ZqUCtjcS8xaG40RXVi?=
+ =?utf-8?B?Rkk5a0RFbFA4MGhJSlNaZXp1cW14bGhRVWZ2V2pRbStBeHNoQlF6dStweXhJ?=
+ =?utf-8?B?M1ZHck9hTDNadEQ1dnhjKzFGeUpJODd1MnRYWTlzdnlRVzRxRnViRE1MZ09z?=
+ =?utf-8?B?c3JQaXhNTjV4TUkvcG9IY3FoVVg3cmtlL1pncThWdHY3eGJzWkJFUzgxaEdr?=
+ =?utf-8?B?dlVzRTFKK1QwQ0lJU1ZPOFI3d2ZTaG5hOXN5WFNDRnVNandWNkZSbUpoSDBH?=
+ =?utf-8?B?cGRyKzM0RjNoNjhhMkY2STJFbG5jbUJlQkNkS2dYbWJpUHlIWDR0N3BTWGtJ?=
+ =?utf-8?B?U3pPR1ZWeVZUWWYzbTFxOGNQNXlBc0N6ZjhaNUpGaG1pWkVYZHRndWRvN3ox?=
+ =?utf-8?B?aUZQM1hQS0lyWlpsdzZoRkF4MHVKM3p0RHA3ODFiK09FeGhHTUlwSmpuUHZk?=
+ =?utf-8?B?elJuSlVwU0RHVU5SU1pHN0pXc2pwaW1NWmFaamY0bTEyTnhSUWEvZ21keTgx?=
+ =?utf-8?B?QlZLYmpaZHljRjBUV21UY253bDZjOWMwUGVxV2hVN3hhYjU1UFdEbUdMS09B?=
+ =?utf-8?Q?B+eUQ5Fdi+fkZEogxR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae6391d7-77bb-4d6c-4c89-08decad60e34
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5248.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2026 12:03:04.5893
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W7V8SvBxmlRu4Co6Q2hYBBlD5LRr5gEHQuxRMoK5LcdebFx86EeaY9k/uevn+EXn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5984
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-5.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[nvidia.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299413-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:vadim.fedorenko@linux.dev,m:arkadiusz.kubalewski@intel.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:jiri@nvidia.com,m:davem@davemloft.net,m:donald.hunter@gmail.com,m:edumazet@google.com,m:mschmidt@redhat.com,m:pabeni@redhat.com,m:pvaanane@redhat.com,m:poros@redhat.com,m:Prathosh.Satish@microchip.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,nvidia.com,davemloft.net,gmail.com,google.com,kernel.org,redhat.com,microchip.com,linux.dev];
+	TAGGED_FROM(0.00)[bounces-299414-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:lirongqing@baidu.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[gal@nvidia.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:email,resnulli.us:email]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,Nvidia.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 48CC3685EE1
+X-Rspamd-Queue-Id: 9D955685F9E
 
-On 6/11/26 2:09 PM, Jiri Pirko wrote:
-> Wed, Jun 10, 2026 at 05:45:46PM +0200, ivecera@redhat.com wrote:
->> On 6/10/26 3:04 PM, Kubalewski, Arkadiusz wrote:
->>>> From: Ivan Vecera <ivecera@redhat.com>
->>>> Sent: Tuesday, June 9, 2026 4:59 PM
->>>>
->>>> On 6/9/26 4:00 PM, Kubalewski, Arkadiusz wrote:
->>>>>> From: Jiri Pirko <jiri@resnulli.us>
->>>>>> Sent: Tuesday, June 9, 2026 10:51 AM
->>>>>>
->>>>>> Mon, Jun 08, 2026 at 07:03:46PM +0200, arkadiusz.kubalewski@intel.com
->>>>>> wrote:
->>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
->>>>>>>> Sent: Monday, June 8, 2026 5:48 PM
->>>>>>>>
->>>>>>>> On 6/8/26 4:43 PM, Kubalewski, Arkadiusz wrote:
->>>>>>>>>> From: Ivan Vecera <ivecera@redhat.com>
->>>>>>>>>> Sent: Sunday, May 31, 2026 9:44 PM ...
->>>>>>>>>>           -
->>>>>>>>>>             name: gnss
->>>>>>>>>>             doc: GNSS recovered clock
->>>>>>>>>> +      -
->>>>>>>>>> +        name: int-nco
->>>>>>>>>> +        doc: |
->>>>>>>>>> +          Device internal numerically controlled oscillator.
->>>>>>>>>> +          When connected as a DPLL input, the DPLL enters NCO mode
->>>>>>>>>> +          where the output frequency is adjusted by the host via
->>>>>>>>>> +          the PTP clock interface.
->>>>>>>>>
->>>>>>>>> Hi Ivan!
->>>>>>>>>
->>>>>>>>> How would you control this in case of automatic mode dpll?
->>>>>>>>> Automatic mode DPLL shall be controlled on HW level, such pin
->>>>>>>>> brakes that rule and requires some driver magic to show it is
->>>>>>>>> higher priority then the rest of the pins?
->>>>>>>>
->>>>>>>> The NCO pin can be connected only in manual mode. In other words a
->>>>>>>> DPLL in automatic mode cannot select NCO pin (switch to NCO mode) by
->>>>>>>> its own.
->>>>>>>>
->>>>>>>
->>>>>>> Being picky on DPLL_MODE for enabling feature is not something we
->>>>>>> can allow if it is not related to HW limitation, is it?
->>>>>>> Could you please elaborate why it is not possible for AUTOMATIC mode?
->>>>>>
->>>>>> In automatic mode, the pin selection logic is defined upon prio. I
->>>>>> can imagine that if NCO pin has the highest prio of the available
->>>>>> ones, it gets picked. I would be aligned 100% with automatic mode
->>>>>> behaviour.
->>>>>> Is there a real usecase for it?
->>>>>>
->>>>>> [..]
->>>>>
->>>>> This is not true. AUTOMATIC mode is HW solution, SW driver ONLY
->>>>> configures priorities on the inputs, not manages the active inputs.
->>>>> This brakes that behavior, the SW driver would have to manually
->>>>> override the AUTMATIC mode to be fed from such NCO pin as it doesn't
->>>>> exists on it's priority list, HW cannot pick or use it.
->>>>
->>>> Correct, AUTO mode is hardware feature and it should not be emulated by a
->>>> driver. If the hardware does not support it then the switching between
->>>> input references should be done by userspace (by monitoring ffo,
->>>> phase_offset, operstate).
->>>>
->>>
->>> Yes, exactly, so for AUTOMATIC mode HW it will not be possible to create
->>> such pin, which means that NCO pin would serve only a MANUAL mode
->>> implementation.
->>> Basically this is something we shall not allow to happen. DPLL API
->>> should be designed to cover the case where AUTO mode is able to implement
->>> all features consistently.
->>
->> If you don't like the proposal from Jiri (NCO switch driven by NCO pin
->> priority -> highest==enter_nco else leave_nco) then it could be possible
->> to handle the switching by allowing the state 'connected' in AUTO mode
->> for the NCO pin type. Then the implementation will be the same for both
->> selection modes.
->>
->> Only difference would be that a user does not need to switch the device
->>from the AUTO to MANUAL mode.
->>
->>>>> The real use case is that any DPLL can switch the mode to this one
->>>>> instead of implementing MANUAL mode just to use the feature with a
->>>>> 'virtual' pin.
->>>>
->>>> I don't expect this... but it is up to a driver. I don't plan such
->>>> functionality in zl3073x as the NCO pin does not expose prio_get() and
->>>> prio_set() callbacks - so it is clear that this pin cannot be part of the
->>>> automatic selection.
->>>>
->>>> Ivan
->>>
->>> There is a difference between particular HW and API capabilities, with the
->>> proposed API we would disallow the possibility of such implementation for
->>> existing HW variants.
->>>
->>> DPLL NCO MODE would allow that but as pointed here by Ivan and by Jiri in
->>> the other email it would also require the extra implementation for some
->>> configuration - device level phase/ffo handling.
->>>
->>> To summarize it all, I don't have such simple solution for it.
->>>
->>> First thing that comes to my mind is to combine both approaches.
->>> Make it possible for AUTMATIC mode to also set "CONNECTED" state
->>> on certain kind of "OVERRIDE" pins, where it could be determined by
->>> the type of PIN and embed that logic into the DPLL subsystem.
->>
->> The possible states for particual pins are now handled at a driver level
->> so the driver decides if the requested state is correct or not. So it
->> could be easy to implement this.
->>
->> For auto mode allowed states:
->> - input references: selectable / disconnected
->> - nco pin: connected / disconnected
->>
->>> Basically, if driver registers such NCO pin it would be always selected
->>> manually, and in such case all the other pins are going to disconnected
->>> state while DPLL mode is also a "OVERRIDE" or something like it.
->>
->> I would leave this decision on the driver level... Imagine the potential
->> HW that would allow to switch NCO mode if there is no valid input
->> reference.
->>
->> Example:
->>
->> REF0 (prio 0) -> +------+ -> OUT0
->> REF1 (prio 1) -> | DPLL | -> ...
->> NCO  (prio 2) -> +------+ -> OUTn
->>
->> Such HW would prefer REF0 or REF1 and lock to one of them if they are
->> qualified. But if they are NOT, then it switches to NCO mode.
->>
->> In this situation the relevant driver would allow to configure priority
->> and state 'selectable' for this NCO pin.
->>
->>> Perhaps the pin type could include OVERRIDE in it's name to make it less
->>> confusing and needs some extra documentation.
->>>
->>> Thoughts?
->> I think _INT_ is ok. In the case of TYPE_INT_OSCILLATOR it is also
->> obvious that it is not a standard input reference.
->>
->> Jiri, Vadim, Arek, thoughts?
-> 
-> I agree with you, the driver should have the flexibility to implement
-> this according to his/hw's needs/capabilities. If it implements prio
-> selection in AUTO mode, let it have it. If it implements manual NCO pin
-> selection in AUTO mode using connected/disconnected override, let it
-> have it.
-> 
-> Moreover, I actually like the "override" capability for pins in AUTO
-> mode in general. It may be handy for other usecases as well.
-> 
-Arek? Vadim?
+Hello Li RongQing,
 
-Thanks,
-Ivan
+On 13/06/2026 18:36, lirongqing wrote:
+> From: Li RongQing <lirongqing@baidu.com>
+> 
+> In mlx5_query_mtppse(), the result of mtppse_reg query should be read
+> from the output buffer 'out', not the input buffer 'in'. The function
+> currently reads event_arm and event_generation_mode from 'in', which
+> contains the uninitialized query parameters rather than the actual
+> register values.
+> 
+> Fix by reading from the correct buffer 'out'.
+> 
+> Fixes: f9a1ef720e9e ("net/mlx5: Add MTPPS and MTPPSE registers infrastructure")
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/port.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> index ee8b976..2ab6a6a 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+> @@ -921,8 +921,8 @@ int mlx5_query_mtppse(struct mlx5_core_dev *mdev, u8 pin, u8 *arm, u8 *mode)
+>  	if (err)
+>  		return err;
+>  
+> -	*arm = MLX5_GET(mtppse_reg, in, event_arm);
+> -	*mode = MLX5_GET(mtppse_reg, in, event_generation_mode);
+> +	*arm = MLX5_GET(mtppse_reg, out, event_arm);
+> +	*mode = MLX5_GET(mtppse_reg, out, event_generation_mode);
+>  
+>  	return err;
+>  }
 
+This is clearly completely broken, which pointed me to the fact that
+mlx5_query_mtppse() is not used anywhere.
+
+Can you please submit a patch to remove it?
 
