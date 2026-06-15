@@ -1,144 +1,152 @@
-Return-Path: <netdev+bounces-299604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299605-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oPaZKAlhMGo4SQUAu9opvQ
-	(envelope-from <netdev+bounces-299604-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:31:05 +0200
+	id MmoTN4VhMGpASQUAu9opvQ
+	(envelope-from <netdev+bounces-299605-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:33:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C62689DC4
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:31:04 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0D5689DE0
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:33:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=O+1QuY9d;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299604-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299604-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=Avu7pGKu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299605-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299605-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA4983046379
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:30:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A0DED3027968
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F093D3B71AA;
-	Mon, 15 Jun 2026 20:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4286E3B5841;
+	Mon, 15 Jun 2026 20:32:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA553B5841;
-	Mon, 15 Jun 2026 20:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAF130DEB2
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 20:32:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781555414; cv=none; b=Uuc1j4Oz3FvY8w0DaRpphX6OUsLPwm9MeKHPsWUkwEtigYjv9MLCiOLCSr+2K//6IKbQK+l8eKC2I0SBzBT8U3InCLUy147/y5v8xjkcDZmmSx4+dSrRscH79iNDSL/KnkUnf12DiiNc5tli0kQlTz8zH6LRf6TEe33mP70HgD4=
+	t=1781555576; cv=none; b=mTjGqZ4gYIDEQymIb9zDG2ZbhzAnVSuvGkyyBXcGvOB4T/P+yPeW3OWkM485Xd650gLPzh3AqXLrw6GojGVfp7VhPKFPskBtfPGwu9Lu5UY1V/JE4P8Kvk/jel0SU1AUKavkpKI0FTfxMd0aSimxLOrJHZHHOK4ICBiClEHRK4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781555414; c=relaxed/simple;
-	bh=bRQr9t8wtT837TG2tr0GdAxazaLA4sfobrPIOzlVmIY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QMVaYgl/COGczKPUqGmAKOjvYLfBo4vbG1ihTKmLp4VKxzNYHaGZ7lieGz8g6AjuG59fkVHjf05Chv9UsmpdzKwwryZAYvQYmNtFoNZ4jV/FPNOt11mWf5KlASRvyVtXHE6QlnOpFc1kwiZyeCx56Me6HEbfnkEoFodL6a8ltzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+1QuY9d; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86AFC1F000E9;
-	Mon, 15 Jun 2026 20:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781555413;
-	bh=5aMDLIE5PrNUelkHErz/IH1DPJ9zEL4jKjoADG/7r1c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=O+1QuY9dSV6txVh9SRYv2Trkgbf5SsM9wyjpKZOGTIzfUNa7EMlwhPY0zf1fYFkGZ
-	 H5QhLiO25gmCrNaa+MQT7fiMlMszGd8OAcox0m5hYv9cDiFdw1/QBnIbpcykKPCNpG
-	 nLjuemRS0BC1X9DLo2b2AcBftZBha5x2QM8aI9fi/TVfB2O1VmDk4HqDpWTQB3iNbA
-	 lZd59XyM7UBk+CYmO8Pxb2Vs3pedcO2xEV0D4TbReqwKyrpN/8FpWai+I+weRj8r/h
-	 mDxhF+xfTW6NAxIsxg5XV/c2wm8/k13OieJFxt76KtdQO5c8+9a2kvdZXrsqxLmc0q
-	 SIS9sg5SaQO4g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0D0E3839A06;
-	Mon, 15 Jun 2026 20:30:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781555576; c=relaxed/simple;
+	bh=vyf57u2yvDyqcojmNqD+tFuOF6bgs81sXc5Q88y/ZVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJ275EATw/KeRAeyYauy2aogBy1Ou4H8WF8lZZGi5wptrO3rMJRYscPCoVIFTfr+f+NY57sIZrHN1WiMAYygfqx/qSicAFyD5p0DK6KfT7QIeAkxB0rArhcZkuDo9osKxAyI2h3LHS/dQt9YqVtyKFmcOMto4UjZ5Sp6Vq8B4tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=Avu7pGKu; arc=none smtp.client-ip=209.85.215.179
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c8857a27041so1061064a12.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 13:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781555573; x=1782160373; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AjSF43dZSPrUADUnDYnSuZv/ycTbl9Y+Y3hRxda0dXQ=;
+        b=Avu7pGKu8eYRrEv4THDxKqJEeXqoCSP1+eIOYlVBH7Lxqz9/mB/ojf9m2tgHd8OWOI
+         gSJOFY3mx6UFUrDW+KwDekgjykg9bVPuLT5IQYdS4o4Dop9plLDULf55OyzqQb/bEjf3
+         mJs1OFEbzFOIYtzvQYIFcDz7ZQ7MqU0KML1gnp9rzaNp9mkVQhRh/3V3m+P/HTmxlcoK
+         V++QVrZvHroxgNqyNwxZ8nq6l20J0tZuZgbBo3dZuOW7gy9h+qS85C0rvHzVzBnNC2SL
+         /urtimNkWtG41plZjJb3FjLsVNvLboVi4eEvV0qZZzuQlY5yB5CxrkHg64qkqgQGOo6x
+         mOUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781555573; x=1782160373;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AjSF43dZSPrUADUnDYnSuZv/ycTbl9Y+Y3hRxda0dXQ=;
+        b=KT3qGs49YzZceV7pUJ1yMz1K+DI9hhxl3ZKSwz4OefBkcRR4PKM5HhoBRthLgCUmP6
+         IYj5d5nW342GZmRMbHOJg6fzeLxry9ai3a2mB2h+o4kuRldWSsWTvjC62SHD8zt73SRc
+         Xzk6jGxmlCraAHkmuSrQer2BuTZR90fR7z6rFbWv6aulcUEBFcxw97ciNUfhMmxDR585
+         P6rGKWCEqlUcBb7/PKcuZthBWisLdFsmqG0AJMpdyRHBKgmGD8mn2WHDFlE4Q8OqMAAo
+         Mt2xNeJKaLI+q/ioKhFSKhXV7qdYpgQMq3G+qVv30xyIEdC6INTp/tJVyXGNU8aY3xuX
+         HgmQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/8rYkljEAC4ZZcJqbo0aID6bjW29d44QDfyJBsJXc7vS9tnocsXRLiryT3e4EcjoGo9PeMUWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3FK8S0H8C9jE/YZV6/K76nLEXrcG53pVbEmNlp4SkkISqM9xu
+	PZ5p3LdTkrhFXdpoAy9gmYv4DH1AV/JlJCKub/PAMIJYWG2FJvqbgknCxfkvHuJgvb4=
+X-Gm-Gg: Acq92OGWTTmRVD7Ua5xFQBAxcRcHW+qozMQf2P04qF4ZbPjeZsi2WAohjFJen+ztmB0
+	vwnytL5ldMJLhD80kPb51Sz2pSgQngVRU9buX8hNC4nPwflP7+VpCIBQqU0yt0iBJB5sGC85smR
+	JSpzrmrTqT7mBtm6e4rIPuRcHkEF2DXye6ozv6H8WbEOtZMNEeJ8MJgwa4XjXI0pGtwxHnCHJ5p
+	h6R/VBPGhIvkQzIu41dbee7qTHPl5Bf4++bI2EA0/UGglS9ChMEskYShYtaoDgK9bcDE67DzfkK
+	6wmDij8sAMfi54AHmUdOrmckvFGMk3yYNzsFBt6fA1PiAJKeXlu6SdHNejHnVINBOogbycmKGRx
+	fvEI2EQERV+acWyPGfzOl8UTz3GYRnrI3jNfRLc47OvZ5mCz/nfck3kNd/hY/U4SsnW/7ftkJ6k
+	W+l7E=
+X-Received: by 2002:a05:6a00:2e12:b0:83c:928:6e5a with SMTP id d2e1a72fcca58-844e196615bmr13494623b3a.13.1781555572982;
+        Mon, 15 Jun 2026 13:32:52 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:5::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434ad0118asm10179696b3a.27.2026.06.15.13.32.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 13:32:52 -0700 (PDT)
+Date: Mon, 15 Jun 2026 13:32:51 -0700
+From: Joe Damato <joe@dama.to>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com
+Subject: Re: [PATCH net-next] octeontx2-pf: add page pool ethtool statistics
+Message-ID: <ajBhc6nliDO2m+ST@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com
+References: <20260615032141.521667-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] netdev: expose page pool order via
- netlink
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178155540839.284807.2185512260142204749.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jun 2026 20:30:08 +0000
-References: <20260612211709.1456966-2-dtatulea@nvidia.com>
-In-Reply-To: <20260612211709.1456966-2-dtatulea@nvidia.com>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com,
- andrew+netdev@lunn.ch, asml.silence@gmail.com, axboe@kernel.dk,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260615032141.521667-1-rkannoth@marvell.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lunn.ch,kernel.dk,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299604-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299605-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[dama.to];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dtatulea@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:donald.hunter@gmail.com,m:andrew+netdev@lunn.ch,m:asml.silence@gmail.com,m:axboe@kernel.dk,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:io-uring@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:donaldhunter@gmail.com,m:andrew@lunn.ch,m:asmlsilence@gmail.com,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,marvell.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F3C62689DC4
+X-Rspamd-Queue-Id: 8D0D5689DE0
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 13 Jun 2026 00:17:02 +0300 you wrote:
-> This small series exposes io_uring's high order page configuration
-> via the page_pool netlink interface and updates the appropriate
-> selftest to check this value.
+On Mon, Jun 15, 2026 at 08:51:41AM +0530, Ratheesh Kannoth wrote:
+> Expose page pool allocator statistics through ethtool.
+> When the interface is up, aggregate stats from each
+> receive queue page pool and append the common page_pool ethtool stat
+> block to the driver's private statistics set.
 > 
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 > ---
-> v2:
-> - Switched from exposing page_pool order to rx_buf_len via nl_fill of
->   the io_uring memory provider.
-> - Updated selftest to check rx_buf_len.
-> - v1: https://lore.kernel.org/all/20260611161235.3807332-1-dtatulea@nvidia.com/
+>  .../marvell/octeontx2/nic/otx2_ethtool.c      | 35 +++++++++++++++++--
+>  1 file changed, 33 insertions(+), 2 deletions(-)
 > 
-> [...]
 
-Here is the summary with links:
-  - [net-next,v2,1/2] netdev: expose io_uring rx_page_order order via netlink
-    https://git.kernel.org/netdev/net-next/c/5c4adb7fb46f
-  - [net-next,v2,2/2] io_uring/zcrx: selftests: verify rx_buf_len for large chunks
-    https://git.kernel.org/netdev/net-next/c/18f65355e112
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Joe Damato <joe@dama.to>
 
