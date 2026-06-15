@@ -1,99 +1,102 @@
-Return-Path: <netdev+bounces-299476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9BEvJQoHMGofMAUAu9opvQ
-	(envelope-from <netdev+bounces-299476-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:07:06 +0200
+	id rJB8LdIGMGoSMAUAu9opvQ
+	(envelope-from <netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:06:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121D9686EE6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:07:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6BF0686ECE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 16:06:09 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=0sec.ai header.s=google header.b=EKySjeyz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299476-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299476-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=0sec.ai header.s=google header.b=xRXe2fo2;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299477-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C48C30C55E9
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:05:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A4B5030091F7
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 14:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E393F5BF7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CEC3F6C59;
 	Mon, 15 Jun 2026 14:05:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542833F7A83
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 14:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3413F54C8
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 14:05:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781532339; cv=none; b=PKJiwfWzvk7/RA7YPwwgQPrsuCh3awln9DkyYDQ/EQOlICwnXMR7g6ExYHpJ5ghPtMMDk1XSITsQgQnAfxvTYI8zvRuttVQ24/DxUpNjuuo629KoUwJpuhT9erMO5YmbLufUv2Vt3qc1Mw5350BO/i5H2+Awh6ypnejfqO55mjM=
+	t=1781532340; cv=none; b=A0FNoyjbkVspPk2DZVRfmUOq7xYJtuyOi65AyXdSW5gM8lplq+UUbx3fEXGcXOIAo8dkljAem2yd/BY6GmdCnyHtKjWEivGlDusOBN1rZ+9dvKHPhtZDvSBsGffhaWRqRw8YVxujvxHoo7fa89ymjgjjzmibfBVww/sVLbw8LtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781532339; c=relaxed/simple;
-	bh=WEKfdR3nIfiUBVE84Vc5XVgzZju8SkfK1ojCBLqiM+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rFd0b/ehccveWzvBYJ4AwKvqhyOc9ke4MwKybbALJNHUT72bdBv1TYSA/m19dGf+umxXgmxB9qB+Nqf7kS6M6JI4HExSGkV7p4WGVOYXoGGu7JlOQhxjjGs3YVZi5peBT1lZs0rXhRHQnATblvBA5SqBCGnPPajBFaMLuNekHZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=EKySjeyz; arc=none smtp.client-ip=209.85.128.49
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-490cdae130cso16391965e9.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:05:36 -0700 (PDT)
+	s=arc-20240116; t=1781532340; c=relaxed/simple;
+	bh=sti5Jiq+zf2c5nD7digmzH9DCz+UDe5i9vlPytyemk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qU64V8AANLuo5ZjRi41Qtz2qvokh7GYwL8vn9rW2EspdHvqWgeNISE+OEOrVfVUv6/VKWuWp1O/r/m3uPLFCv9I+BHiXtKtGIeNrGM1cpJd3HLoe/TFIzmOHMgnwxuK4PT0TFKq30hYZRlQnYDx0SoA1e1WAt4cQbIUPLVOU2zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=xRXe2fo2; arc=none smtp.client-ip=209.85.128.54
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490cf3000f0so34342505e9.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 07:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1781532335; x=1782137135; darn=vger.kernel.org;
+        d=0sec.ai; s=google; t=1781532338; x=1782137138; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvAw1dsEWiSRXIXzLCtyB3OxbKLq8//WuTTzMwNXLh4=;
-        b=EKySjeyzwVR2/b6wcOTqk0G9chk5aVfbuDom3iyG2nsa867olWyjzEYgRdgVATTf+v
-         Vk4YQOGGQsJtFRAigF2e6sgD6rIOW9Xoax4GGSCfvwEEXeGNrcLFQwako20qHddp0CHS
-         iNP/QZNWjm4roTQjLgtVONL/M1Huj/0jL8ohQx161EAyIdolIkPRkGiDhu+fx/fj/V/S
-         OlHIiXc3D7zV/YyiP64jIttKzu+A0WDmHCSiFw5ak7qVAQnDq2D+o3UpT8kYUu9FaLhC
-         UTiBnpFzk4l27gW5WyGY3fbL1LdZ//tzXCmqwmCroyLaknk//RF1TPBrTKOC+tU/UeYr
-         g+rA==
+        bh=YyI4pG06qj9OsAcBatlXpkpRpnZN2jeAS5FUIDcJdlk=;
+        b=xRXe2fo2lPX5GfdP30jcAqpG9U5tYLiZWHhG28/v0ees0KGqwoc/NrxkRzutkEdk4m
+         JIt8UL0lA8X7vf4CUwL49LeZYYFH8WsXklNaCoMI59v8paODydb3+vJmZb8PaR5P1nSa
+         u56rD78Sfdza+AXoXZogwBc3q7rS7Xa1Z5esH12vtujw+pw4jG6MtXaBEczAtRESukJx
+         KLyC8sbbKj+EbAq1nmmUPmlRB/YyeSLQkjL/bJS/sw+qKIJxX/XJBc9dFrbWltrEANwj
+         SnhZXXRTCRInkDLGb7Y7Twr2T2ZArZY1UzBLV+MAzybLzx2wR9jcLJ1a4gxMfNm+xUo5
+         pdUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781532335; x=1782137135;
+        d=1e100.net; s=20251104; t=1781532338; x=1782137138;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cvAw1dsEWiSRXIXzLCtyB3OxbKLq8//WuTTzMwNXLh4=;
-        b=T41jv/V5EIfKAkEdRo3MheYLZqj/GfaDTUwLlmIcXErm0drNTpOGdIdKg7uFDAwKdC
-         wlyfDkUPA3lt+XZoD0CSyA/TVkJVD3/H+jffcZiJOG+51sgmqLvYE342H3GP5PNOAMkT
-         IkuCtIkRjIrc5zILkVljmU3Ap6DCqRNA4IEBtae9uLwl1LZOfHW3oCXSywF4h9st1tho
-         fI/XAqIsSVDnZJI8TJ+AmFL8IUc9BLPurYo7Yn5Rpy0G4XH0ufIT8lOGrj2xLFNHy1Ax
-         dNgceUcfR1SMNpbkM7b/SY7X38s+q3ndpoQ7IypqsMJ7U/E2eag0l5VtKnVOWj1QHIbo
-         PBKw==
-X-Forwarded-Encrypted: i=1; AFNElJ+N8MGgwmHgB6aNPX9DWn3GV28OysNSyDlom3QCrCNRpp5FDPc2pEcixpDQ2y1CzNKo3f4TFlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzSQFeyV6FLMrDNAWbVqms5qlcIwhq76M3r7TUcfJOSwTscPCD
-	Wy+lENqA6HU10gnflw2qs6+TC1bun1NkM0eAq2z7gKNc73LSTjUKpvgPZmTF8UD1MBrh
-X-Gm-Gg: Acq92OEOHFpihJYnGMJEKYnZ5yNGVmkSvI1wUe+KYFsTVMEb8eZalqRtu4WLceqx8I4
-	c+cMkIDSeDq/4mgL6qmMJK+s/Z2kjN1n1m9c0iX/juZTBWLivF8bnojDu8lcDvhTfryofhYiGBo
-	mHNd5Yo4nYzWtYhiga+uvbIKyB6F3gaL6WNnX9YgS6AuDU5HsacIAKgA7Z42whi84sxQkRtnOaA
-	P57RGEf4Ajk3JvVDdUitlLg7yuXmVE7l5oGF9vSXZTHPSQ4ttDBrzkFrzDeTfDX5y5RvwqCLlpJ
-	UAALo2LE62nL9F2Jv32L3kb/BhGhM6B+YxtRbJVfPoTYaY6b6VWu2UERcy72s0feLyJejM1TXam
-	m+g06jUbFHdRJgnrY31xHbkN1OWrsHB9s3SKRybK2Ff9b50su7CpyJcMSCV2MxtRF63VS5LKsKP
-	ZVQmc7QPoqwMBqlYruhZxm5gxd9csOuM8oh7lBM/ZN9EsJkUevZt/Wo79Eztu0FLK+0g0zthxlM
-	arfqFcuoACF5YfrkEcX9HD7mTVwsG4JOS572QNNHm9l3Q==
-X-Received: by 2002:a05:600c:47d3:b0:490:d354:bcf4 with SMTP id 5b1f17b1804b1-492200e2409mr89495105e9.27.1781532334628;
-        Mon, 15 Jun 2026 07:05:34 -0700 (PDT)
+        bh=YyI4pG06qj9OsAcBatlXpkpRpnZN2jeAS5FUIDcJdlk=;
+        b=eKlSKuNXRkXjRQSJsPRqPuXEmckwloLjymo+knPEplFkHMgt3Xk0lJ2cOpNWeEDbU9
+         us6bOUUsDLCPoqegULUNv+TmRwt5WfcLJarZbseql8kSYoZaTupIjuu8O2oql4zZmvgz
+         3lIX0slXBMVMt9E8H41XH9QWOHsjICb+BiZPJkwqSLay2BKGmCPTNZshwoEV7dlHXlBY
+         zddGWJCzClARUrulCkLZkS5k3zc3nUoqwZBZELNs/WGeojK3IZXvcL38/5ZnZG3px5sB
+         jIwwjL3qP4NOIpUZywj+JEmHvIy/xw9BO3UXJe52dn1syhxd+ACXw52EypJYeL7kZZak
+         9pBQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/8PetGn1bfbVoBloZzqBQIISzwAv9McbiHWiHJEzSL9KPWDFMd5RwAavR293rW8Wh6B1LgSeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4CtY4bZeG0up/+PBTfJg3p2S77xpo5QDGKFLT4FWVJ/fe6hXg
+	a+Ff4TXc4oyytMxBC7ys6y3E/IKVXKOmaeA/+22e0cXcc0F9zDw8qyzCtXKkGshesj48
+X-Gm-Gg: Acq92OEv/DJDUmxIPBN6licTpTlIk9VyVmABMQ9z+k0h+bjYAnv0/zz8RxfFhAW8sKp
+	D9dDGN7r6MOv2Qk3iUt3GytNzG8s0VLDMyvuWSJwWkJAkQm6UP/P4XezVuvm54fpq4/cOcVyflZ
+	DOEoOmOqt7fT6dhrBy9lAjY5JvFEI6DKbwcr3NxMd55X/QBlly2kEBBlirdPwL9tsHca5yd68Oo
+	vopoNMsXzr55tgPFosGedN0pM2zG0N3paePsKPEIhmTGSfVplyvQz4Vie2x87LwypbJakr9OGfZ
+	lpHyNeCrgj/SeYpVfxyiwUy64md0TVXU1jM75coUqn/oZRpRJujmyOGU7fUj1A2L6M415woIPsF
+	HWNyyyhyDOcDuSTZua7JxL6KECzZB0cugrZQ3F3q6NPfIyaktwthcQuxBWEeQVGua5eDdNSLuJ/
+	McyStMlDLkKE7uHDC72sb6ovoTsN4cZgHUVeMSC21pOB6SWlCecO3dEUdXvRlaIpgCnGqlaFenN
+	NCU9h88KUkGeSOEHB83VUseRyyuZJJYQDDyZjNUYNt45A==
+X-Received: by 2002:a05:600c:3f07:b0:492:1e36:bafc with SMTP id 5b1f17b1804b1-4921e36bb41mr143543765e9.36.1781532337618;
+        Mon, 15 Jun 2026 07:05:37 -0700 (PDT)
 Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2c4240sm32087268f8f.27.2026.06.15.07.05.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492203dd0b9sm249125435e9.15.2026.06.15.07.05.35
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 15 Jun 2026 07:05:34 -0700 (PDT)
+        Mon, 15 Jun 2026 07:05:36 -0700 (PDT)
 From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Cc: piotr.raczynski@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	wojciech.drewek@intel.com,
-	intel-wired-lan@lists.osuosl.org,
+Cc: borisp@nvidia.com,
+	sd@queasysnail.net,
+	raeds@nvidia.com,
+	ehakim@nvidia.com,
 	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Doruk Tan Ozturk <doruk@0sec.ai>,
 	stable@vger.kernel.org
-Subject: [PATCH net] ice: eswitch: fix use-after-free of metadata_dst in repr release
-Date: Mon, 15 Jun 2026 16:05:32 +0200
-Message-ID: <20260615140532.52676-1-doruk@0sec.ai>
+Subject: [PATCH net] net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
+Date: Mon, 15 Jun 2026 16:05:34 +0200
+Message-ID: <20260615140534.52691-1-doruk@0sec.ai>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -108,21 +111,21 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[0sec.ai:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-299476-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-299477-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:piotr.raczynski@intel.com,m:michal.swiatkowski@linux.intel.com,m:wojciech.drewek@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:doruk@0sec.ai,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:borisp@nvidia.com,m:sd@queasysnail.net,m:raeds@nvidia.com,m:ehakim@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:doruk@0sec.ai,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[doruk@0sec.ai,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[0sec.ai];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -135,18 +138,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 121D9686EE6
+X-Rspamd-Queue-Id: B6BF0686ECE
 
-ice_eswitch_release_repr() frees the port representor metadata_dst via
+macsec_del_rxsc_ctx() frees the RX SC metadata_dst via
 metadata_dst_free(), which directly kfree()s the object and ignores the
-dst_entry refcount. The eswitch slow-path TX routine
-ice_eswitch_port_start_xmit() takes a reference on this dst with
+dst_entry refcount. The MACsec RX offload datapath
+mlx5e_macsec_offload_handle_rx_skb() takes a reference on this dst with
 dst_hold() and attaches it to the skb via skb_dst_set(). If such an skb
-is still in flight (e.g. queued in a qdisc) when the representor is torn
-down, the metadata_dst is freed while the skb still points at it. When
-the skb is later freed, dst_release() operates on already-freed memory.
+is still in flight when the RX SC is deleted, the metadata_dst is freed
+while the skb still references it; the subsequent dst_release() on skb
+free then operates on already-freed memory.
 
 Replace metadata_dst_free() with dst_release() so the metadata_dst is
 freed only after the last reference is dropped. The dst subsystem frees
@@ -156,26 +159,26 @@ metadata_dst objects from dst_destroy() once the refcount reaches zero
 Same class of bug and fix as commit c32b26aaa2f9 ("netfilter:
 nft_tunnel: fix use-after-free on object destroy").
 
-Fixes: fff292b47ac1 ("ice: add VF representors one by one")
+Fixes: 9b9e23c4dc2b ("net/mlx5e: MACsec, fix memory leak when MACsec device is deleted")
 Cc: stable@vger.kernel.org
 Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 ---
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 2e4f0969035f..41b30a7ca4a9 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -95,7 +95,7 @@ ice_eswitch_release_repr(struct ice_pf *pf, struct ice_repr *repr)
- 		return;
- 
- 	ice_vsi_update_security(vsi, ice_vsi_ctx_set_antispoof);
--	metadata_dst_free(repr->dst);
-+	dst_release(&repr->dst->dst);
- 	repr->dst = NULL;
- 	ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
- 				       ICE_FWD_TO_VSI);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+index 71b3a059c964..2a4e7ed76d31 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+@@ -829,7 +829,7 @@ static void macsec_del_rxsc_ctx(struct mlx5e_macsec *macsec, struct mlx5e_macsec
+ 	 */
+ 	list_del_rcu(&rx_sc->rx_sc_list_element);
+ 	xa_erase(&macsec->sc_xarray, rx_sc->sc_xarray_element->fs_id);
+-	metadata_dst_free(rx_sc->md_dst);
++	dst_release(&rx_sc->md_dst->dst);
+ 	kfree(rx_sc->sc_xarray_element);
+ 	kfree_rcu_mightsleep(rx_sc);
+ }
 -- 
 2.43.0
 
