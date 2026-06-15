@@ -1,241 +1,243 @@
-Return-Path: <netdev+bounces-299392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aDn9BRrWL2rlHgUAu9opvQ
-	(envelope-from <netdev+bounces-299392-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:38:18 +0200
+	id 3xI/NoPWL2r2HgUAu9opvQ
+	(envelope-from <netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:40:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0289968562B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:38:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBDA68563B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 12:40:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299392-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299392-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b=iPDF9ezI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299393-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DF8463003BC6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:38:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED1C53011071
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 10:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAFC43074B1;
-	Mon, 15 Jun 2026 10:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0136330B535;
+	Mon, 15 Jun 2026 10:40:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0AA40D586
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 10:38:10 +0000 (UTC)
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AB21990C7;
+	Mon, 15 Jun 2026 10:39:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781519892; cv=none; b=Tt3us18aUSiU0UiB3uTz+H6GpE6jSuTIiufCWff+IujHG999I2Wiumy7jE5PYCzY7ivCwnd9JMPMMMhWNt55jZVrHyabJQ50CebBikOiVVL8XOoxfGIEVJiBcI9j3fGZqQr6LersLqe9jj/sKmujcQEQVUplTURVRox+ET2DaGs=
+	t=1781519999; cv=none; b=jlc82U6UXLkiFnEDxYzDGj2l8VEEglWAf/IOcmsCkprniqq2LIcnkLs1PEEU94CEVrTwABICWlGDvSr1Rk6Hdyh2IbG0qgc+tRe7nF7pMHzpiPDVUrt5+3IcHNXGIOjyMNAfYajsNhYefXmJR70q0z0IVIHWaAFZOeNGHH7urJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781519892; c=relaxed/simple;
-	bh=s0PnjE2XXkSyiM2t29c+YcY2r0+0fCEpTkVys6WiIP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CDd8YeFO+11g88f4SkElqdby/BiY/+ScQKfYS9rCTqtOevVVGujgPynwnYDuHmLY/g1/h86VPEFCZ+wuTkiF31lmVJS3fWSSg5A2ZkkxcOUso8fx+MauHoyjf7RTH3EPMdIrqzDlSWPLK8l7h8cifSNFsygEZf7EKRx3uaVFwF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACnv7kG1i9q3FiIAA--.41541S3;
-	Mon, 15 Jun 2026 18:38:01 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
+	s=arc-20240116; t=1781519999; c=relaxed/simple;
+	bh=pjPunVM0Lju5iCYpWfHWOCfJjBSSKWp+2Ebpbpdwyzo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f+rHAceLbIsU6uqFH0x+Llm8PcwvzB2KKU2g6cnt6ayNf6bNukkxnQzu0zWhBYANIhLppB/WWn1avt1tiqYTCeCRFYC/oVy1sa1LuNpxbsQdy+Bz7gRvup7wwh2cTmIZwF0cY3WCXJhyPlOLEXEFKgQ+28PL4yqfhSH2KxJ75AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=iPDF9ezI; arc=none smtp.client-ip=206.189.21.223
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=GFlRp
+	zpDSFpH2nXPFhy658PC3HdI4pPCMhyiMaEt5+o=; b=iPDF9ezIPMCnyryfxg9vi
+	Ab68Jc4ez7nJR6APfcaSS8CI116I7wnPwRo88mtTam3AkwukvXafC6fewza0OifO
+	P/E/LVtUszh85noQoKe2zuTMcVjAMl9UWVQBccph/Vz4nZYaj3Pnn0A+ziowFsge
+	Qx2TFqTLuLZDc5Z3V/2l/s=
+Received: from DESKTOP-35NLEVI (unknown [166.111.239.35])
+	by web5 (Coremail) with SMTP id zAQGZQDXYLtp1i9qZENxAg--.8653S2;
+	Mon, 15 Jun 2026 18:39:37 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
 To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	petrm@mellanox.com,
-	davem@davemloft.net,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	bronzed_45_vested@icloud.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net: sched: ets: avoid deficit wrap and empty-round livelock
-Date: Mon, 15 Jun 2026 18:37:54 +0800
-Message-ID: <20260615103759.2404228-2-n05ec@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260615103759.2404228-1-n05ec@lzu.edu.cn>
-References: <20260615103759.2404228-1-n05ec@lzu.edu.cn>
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Kito Xu <veritas501@foxmail.com>,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net] appletalk: fix use-after-free in atalk_find_primary()
+Date: Mon, 15 Jun 2026 18:39:28 +0800
+Message-ID: <20260615103930.1484-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.53.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACnv7kG1i9q3FiIAA--.41541S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxJF1kGFWDtF47CFWUJF1DJrb_yoWrXrWxpF
-	93JF90kFW8Jrs3Wa4xG3y7X3WSkrs3G3Z8ArW3Kw1rKrn8ua1rt34rKw12krn3KFZ8u3sF
-	yF1jva4qkr47CFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
-	JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUFg4SDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQATCWovtdIDMAAAsK
+Content-Transfer-Encoding: quoted-printable
+X-CM-TRANSID:zAQGZQDXYLtp1i9qZENxAg--.8653S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJFyfKFy7Ary5ur48Ar1UKFg_yoWrXF4xpF
+	W7urWqka4DX34Ygr4DJrW7AF15Cry8K3y3Cr1rG3W0yrn0gr9a9a40yryavFnIkr97GrZ5
+	JryxK3s7ZF4UCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
+	v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOv38UUUU
+	U
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQETAWovr0JGUAAAss
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299393-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299392-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,mellanox.com,davemloft.net,gmail.com,lzu.edu.cn,icloud.com];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:zhaoyz24@mails.tsinghua.edu.cn,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:veritas501@foxmail.com,m:linux-kernel@vger.kernel.org,m:yangyx22@mails.tsinghua.edu.cn,m:wangao@seu.edu.cn,m:fengxw06@126.com,m:qli01@tsinghua.edu.cn,m:xuke@tsinghua.edu.cn,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:petrm@mellanox.com,m:davem@davemloft.net,m:yuantan098@gmail.com,m:yifanwucs@gmail.com,m:tomapufckgml@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:bronzed_45_vested@icloud.com,m:n05ec@lzu.edu.cn,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,davemloft.net,google.com,kernel.org,redhat.com,foxmail.com,vger.kernel.org,seu.edu.cn,126.com,tsinghua.edu.cn];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhaoyz24@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,icloud.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,tsinghua.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0289968562B
+X-Rspamd-Queue-Id: 0EBDA68563B
 
-From: Wyatt Feng <bronzed_45_vested@icloud.com>
-
-ETS keeps each DRR-style deficit in a u32 and replenishes it with
-the configured quantum whenever the head packet is too large. Both
-the quantum and qdisc_pkt_len() are user-controlled inputs: a large
-quantum can wrap the deficit counter, while a tiny quantum combined
-with an inflated qdisc_pkt_len() can force billions of iterations in
-softirq context before any packet becomes eligible.
-
-Store deficits in u64 so replenishment remains monotonic, and after
-one complete pass over the active list compute how many additional
-full rounds cannot dequeue from any class. Add that budget in bulk
-instead of advancing one quantum at a time. This preserves ETS ordering
-while removing the non-productive loop.
-
-Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Wyatt Feng <bronzed_45_vested@icloud.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/sched/sch_ets.c | 63 +++++++++++++++++++++++++++++++--------------
- 1 file changed, 44 insertions(+), 19 deletions(-)
-
-diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-index a4b07b661b77..ed3b191781ee 100644
---- a/net/sched/sch_ets.c
-+++ b/net/sched/sch_ets.c
-@@ -40,7 +40,7 @@ struct ets_class {
- 	struct list_head alist; /* In struct ets_sched.active. */
- 	struct Qdisc *qdisc;
- 	u32 quantum;
--	u32 deficit;
-+	u64 deficit;
- 	struct gnet_stats_basic_sync bstats;
- 	struct gnet_stats_queue qstats;
- };
-@@ -465,8 +465,10 @@ ets_qdisc_dequeue_skb(struct Qdisc *sch, struct sk_buff *skb)
- static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
- {
- 	struct ets_sched *q = qdisc_priv(sch);
--	struct ets_class *cl;
-+	struct ets_class *cl, *first;
- 	struct sk_buff *skb;
-+	u64 extra_rounds;
-+	u64 rounds;
- 	unsigned int band;
- 	unsigned int len;
- 
-@@ -481,26 +483,49 @@ static struct sk_buff *ets_qdisc_dequeue(struct Qdisc *sch)
- 		if (list_empty(&q->active))
- 			goto out;
- 
--		cl = list_first_entry(&q->active, struct ets_class, alist);
--		skb = cl->qdisc->ops->peek(cl->qdisc);
--		if (!skb) {
--			qdisc_warn_nonwc(__func__, cl->qdisc);
--			goto out;
--		}
-+		first = list_first_entry(&q->active, struct ets_class, alist);
-+		extra_rounds = U64_MAX;
- 
--		len = qdisc_pkt_len(skb);
--		if (len <= cl->deficit) {
--			cl->deficit -= len;
--			skb = qdisc_dequeue_peeked(cl->qdisc);
--			if (unlikely(!skb))
-+		do {
-+			cl = list_first_entry(&q->active, struct ets_class, alist);
-+			skb = cl->qdisc->ops->peek(cl->qdisc);
-+			if (!skb) {
-+				qdisc_warn_nonwc(__func__, cl->qdisc);
- 				goto out;
--			if (cl->qdisc->q.qlen == 0)
--				list_del_init(&cl->alist);
--			return ets_qdisc_dequeue_skb(sch, skb);
--		}
-+			}
-+
-+			len = qdisc_pkt_len(skb);
-+			if (len <= cl->deficit) {
-+				cl->deficit -= len;
-+				skb = qdisc_dequeue_peeked(cl->qdisc);
-+				if (unlikely(!skb))
-+					goto out;
-+				if (cl->qdisc->q.qlen == 0)
-+					list_del_init(&cl->alist);
-+				return ets_qdisc_dequeue_skb(sch, skb);
-+			}
-+
-+			cl->deficit += cl->quantum;
-+			list_move_tail(&cl->alist, &q->active);
-+
-+			if (len <= cl->deficit) {
-+				extra_rounds = 0;
-+				continue;
-+			}
-+
-+			rounds = div64_u64((u64)len - cl->deficit + cl->quantum - 1,
-+					   cl->quantum);
-+			if (rounds < extra_rounds)
-+				extra_rounds = rounds;
-+		} while (list_first_entry(&q->active, struct ets_class,
-+					  alist) != first);
-+
-+		if (!extra_rounds)
-+			continue;
- 
--		cl->deficit += cl->quantum;
--		list_move_tail(&cl->alist, &q->active);
-+		/* Skip full rounds where no active class can dequeue. */
-+		list_for_each_entry(cl, &q->active, alist)
-+			cl->deficit += extra_rounds * cl->quantum;
- 	}
- out:
- 	return NULL;
--- 
-2.43.7
+atalk_find_primary() walks the global AppleTalk interface list under=0D
+atalk_interfaces_lock, but returns a pointer to iface->address after=0D
+dropping that lock.  Both atalk_autobind() and atalk_bind() then=0D
+dereference the returned pointer without any lifetime protection.=0D
+=0D
+The interface can be removed concurrently through the normal AppleTalk=0D
+interface ioctl path.  SIOCATALKDIFADDR calls atalk_dev_down(), which=0D
+eventually reaches atif_drop_device() and frees the same struct=0D
+atalk_iface that owns the returned address field.  A racing bind can=0D
+therefore read from freed memory.=0D
+=0D
+This is reachable with a configured AppleTalk interface; reproducing the=0D
+race does not require a malicious device or driver.  The configuration=0D
+ioctls require CAP_NET_ADMIN in the initial user namespace, and=0D
+AF_APPLETALK sockets are limited to init_net.=0D
+=0D
+Fix the lifetime issue without changing the returned address pointer=0D
+type.  Rename the helper to atalk_find_primary_locked() and keep=0D
+atalk_interfaces_lock held across the return.  The callers now copy=0D
+s_net and s_node while the lock is still held, then immediately release=0D
+the lock before doing any further work.=0D
+=0D
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")=0D
+Cc: stable@vger.kernel.org=0D
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>=0D
+Reported-by: Ao Wang <wangao@seu.edu.cn>=0D
+Reported-by: Xuewei Feng <fengxw06@126.com>=0D
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>=0D
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>=0D
+Assisted-by: GLM:GLM-5.1=0D
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>=0D
+---=0D
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c=0D
+index 30a6dc06291c..4d6576cd0ae8 100644=0D
+--- a/net/appletalk/ddp.c=0D
++++ b/net/appletalk/ddp.c=0D
+@@ -351,7 +351,7 @@ struct atalk_addr *atalk_find_dev_addr(struct net_devic=
+e *dev)=0D
+ 	return iface ? &iface->address : NULL;=0D
+ }=0D
+ =0D
+-static struct atalk_addr *atalk_find_primary(void)=0D
++static struct atalk_addr *atalk_find_primary_locked(void)=0D
+ {=0D
+ 	struct atalk_iface *fiface =3D NULL;=0D
+ 	struct atalk_addr *retval;=0D
+@@ -378,7 +378,6 @@ static struct atalk_addr *atalk_find_primary(void)=0D
+ 	else=0D
+ 		retval =3D NULL;=0D
+ out:=0D
+-	read_unlock_bh(&atalk_interfaces_lock);=0D
+ 	return retval;=0D
+ }=0D
+ =0D
+@@ -1132,20 +1131,24 @@ static int atalk_autobind(struct sock *sk)=0D
+ {=0D
+ 	struct atalk_sock *at =3D at_sk(sk);=0D
+ 	struct sockaddr_at sat;=0D
+-	struct atalk_addr *ap =3D atalk_find_primary();=0D
++	struct atalk_addr *ap =3D atalk_find_primary_locked();=0D
+ 	int n =3D -EADDRNOTAVAIL;=0D
+ =0D
+ 	if (!ap || ap->s_net =3D=3D htons(ATADDR_ANYNET))=0D
+-		goto out;=0D
++		goto unlock_and_out;=0D
+ =0D
+ 	at->src_net  =3D sat.sat_addr.s_net  =3D ap->s_net;=0D
+ 	at->src_node =3D sat.sat_addr.s_node =3D ap->s_node;=0D
++	read_unlock_bh(&atalk_interfaces_lock);=0D
+ =0D
+ 	n =3D atalk_pick_and_bind_port(sk, &sat);=0D
+ 	if (!n)=0D
+ 		sock_reset_flag(sk, SOCK_ZAPPED);=0D
+ out:=0D
+ 	return n;=0D
++unlock_and_out:=0D
++	read_unlock_bh(&atalk_interfaces_lock);=0D
++	goto out;=0D
+ }=0D
+ =0D
+ /* Set the address 'our end' of the connection */=0D
+@@ -1165,14 +1168,15 @@ static int atalk_bind(struct socket *sock, struct s=
+ockaddr_unsized *uaddr, int a=0D
+ =0D
+ 	lock_sock(sk);=0D
+ 	if (addr->sat_addr.s_net =3D=3D htons(ATADDR_ANYNET)) {=0D
+-		struct atalk_addr *ap =3D atalk_find_primary();=0D
++		struct atalk_addr *ap =3D atalk_find_primary_locked();=0D
+ =0D
+ 		err =3D -EADDRNOTAVAIL;=0D
+ 		if (!ap)=0D
+-			goto out;=0D
++			goto unlock_and_out;=0D
+ =0D
+ 		at->src_net  =3D addr->sat_addr.s_net =3D ap->s_net;=0D
+ 		at->src_node =3D addr->sat_addr.s_node =3D ap->s_node;=0D
++		read_unlock_bh(&atalk_interfaces_lock);=0D
+ 	} else {=0D
+ 		err =3D -EADDRNOTAVAIL;=0D
+ 		if (!atalk_find_interface(addr->sat_addr.s_net,=0D
+@@ -1201,6 +1205,9 @@ static int atalk_bind(struct socket *sock, struct soc=
+kaddr_unsized *uaddr, int a=0D
+ out:=0D
+ 	release_sock(sk);=0D
+ 	return err;=0D
++unlock_and_out:=0D
++	read_unlock_bh(&atalk_interfaces_lock);=0D
++	goto out;=0D
+ }=0D
+ =0D
+ /* Set the address we talk to */=0D
+=0D
+--=0D
+2.43.0=
 
 
