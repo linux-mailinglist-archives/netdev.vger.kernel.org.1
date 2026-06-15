@@ -1,137 +1,127 @@
-Return-Path: <netdev+bounces-299608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299609-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vIQHC3FjMGrHSQUAu9opvQ
-	(envelope-from <netdev+bounces-299608-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:41:21 +0200
+	id h0HyB9BjMGruSQUAu9opvQ
+	(envelope-from <netdev+bounces-299609-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:42:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BE0689F98
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:41:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C1E68A028
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:42:55 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=c127.dev header.s=resend header.b=Q7+djscg;
-	dkim=pass header.d=amazonses.com header.s=224i4yxa5dv7c2xz3womw6peuasteono header.b=AefpJcvC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299608-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299608-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=d1HKdjLw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299609-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299609-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0FAB305A272
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:41:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 230943066ABC
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF053B6341;
-	Mon, 15 Jun 2026 20:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596983B6C1F;
+	Mon, 15 Jun 2026 20:42:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a9-9.smtp-out.amazonses.com (a9-9.smtp-out.amazonses.com [54.240.9.9])
-	(using TLSv1.2 with cipher AES128-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AF8311C2C;
-	Mon, 15 Jun 2026 20:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647BC286D5E;
+	Mon, 15 Jun 2026 20:42:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781556078; cv=none; b=ep2bJ/hsLV5+bhlzVXUbj0svLRxm3SGmnHvifGg13tDgrr0gtVXMqru6Hja9SO25U6NoyU7HWmL4q1ek3UBBkb1M4OuOpUkeaxbjrMkJxlyasQxJYRORBLoQ+OF3UxKVW+cSPT1Q4bNpBInUSQ0pWocneqTybmugk/Wqlnxdwds=
+	t=1781556171; cv=none; b=LbzJ/zHav9oGp4dAD8/Cz3lgPG5odrqHAd/2Y3Tua4sy9fXq5K/xwIg0EEWyppVre6QzVtafx+N60w82VgutiPzwN1JvX8tPRR4+b0cZXQb5PSK54QCcpGqSMDmY4Rr6OwJnya7TpGSdq5xoB/dMPPRi92Zhtk5bLv5yeyJnT7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781556078; c=relaxed/simple;
-	bh=7Nd7pHVxAkJKJ1IKwSAEUgNEuQx3bdCIV3l2aVbH2Tw=;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Date:MIME-Version:
-	 Content-Type; b=djTG8focMtIju+bRVXy/xFKCQ6zuH47fbcKt2spyYu4RysFeedMs8dG2Vk64yxFHfUQSpjLKRXWJOyfxzyAxnTqDxVOXXQb1XcmngOW6/vjpiFNIV4eugd+eFtyGq13XsXAifD3hLBJOmRDDceDoT84hvQxK0O5g+9MbOsYPy48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c127.dev; spf=pass smtp.mailfrom=send.c127.dev; dkim=pass (1024-bit key) header.d=c127.dev header.i=@c127.dev header.b=Q7+djscg; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=AefpJcvC; arc=none smtp.client-ip=54.240.9.9
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple; s=resend;
-	d=c127.dev; t=1781556075;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type;
-	bh=7Nd7pHVxAkJKJ1IKwSAEUgNEuQx3bdCIV3l2aVbH2Tw=;
-	b=Q7+djscgkypi3A6WvEc4PbOq21AHsn4JMZPkd/Kdpm+bdL4RS7Z34jXt/xj9OL3U
-	CPuZItqvs8+PvqJ8UIBAS86xOscSsw63PrIFpmqcAS/RhmxDuX/Er5DAoYKM2drMQgb
-	FQ1X/BcJMx8iYteEPMhsEnukE15/PzYraADoruZg=
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1781556075;
-	h=In-Reply-To:From:To:Cc:Subject:Message-ID:Content-Transfer-Encoding:Date:MIME-Version:Content-Type:Feedback-ID;
-	bh=7Nd7pHVxAkJKJ1IKwSAEUgNEuQx3bdCIV3l2aVbH2Tw=;
-	b=AefpJcvCxmbTaPmFW/I802FbVdW3J8Ip7RX65NEq643SiR+XQtW72yzeXFQtfeK2
-	WOHM/5gUmi8BXq3ivy1kFB2/UvnR1n2Fni1ZaAc2Y0BleFudGGQpbQoB4v4E6Y4hWAP
-	iQrELUXQglA3yvs7plJl7wRWFEFLXQw+7xBWbNoc=
-In-Reply-To: <63983efb-dcad-4b34-9d35-4086de11be5e@bootlin.com>
-From: Johan Alvarado <contact@c127.dev>
-To: maxime.chevallier@bootlin.com, linusw@kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org
-Cc: linux@armlinux.org.uk, namiltd@yahoo.com, luizluca@gmail.com, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/2] net: dsa: realtek: rtl8365mb: add
- SGMII support for RTL8367S
-Message-ID: <0100019ecd045b3f-a7bfbb9d-6659-45c6-8fca-9cdce637092c-000000@email.amazonses.com>
-Content-Transfer-Encoding: 7bit
-Date: Mon, 15 Jun 2026 20:41:15 +0000
+	s=arc-20240116; t=1781556171; c=relaxed/simple;
+	bh=aPTdsFC7OL8pWaV8feS5opuevgkA+VecbasCdeVpSeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bnoVxxtM/NOj5nygLqssP6kZ4Fu3/XsV1hA2mtSI0jOt6bKsy5ET6pqxzDpGZ7YuLTcAt96+TxerwPvl/xp5vuxDrGTJlkbQ2KmuYuDvKVjiZ3xXxGH0YwnSzCOHUoVWgHdyqRM/NtzbopHuZLo6c9ff6ahOvOBFvW8zKtjZ34w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1HKdjLw; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813AE1F00A3D;
+	Mon, 15 Jun 2026 20:42:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781556170;
+	bh=nMnhxfNIZVyV93CrAHISz+K1WU9OroQwaebImzftECY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=d1HKdjLwer4f02pwmKsxGAre7uZHyuXLCAFi/cGSJVg9/QJcLIjK1XgQi1MrjpW35
+	 ECfZ/zEhxc2e0rSqjAXLKUqsNdX2CizYp3sUP7X7QCQKH1xDjerrukAAyjJ2dPzAGy
+	 /6ZNzquNxJuNEZOVjDqDSuyOqZUjoaPvfKirr9VSIYC2ghiUz91NdW1kFYA2rDHqAE
+	 zFb13JkG6klttPUh9WjcPyrX9NTacXowa/uYomdRYCTX/4z5UZ5YSSXstiqSJIzmoS
+	 ahHeu5ukRiw0IvdPAj/gIEbEbCNYsLiXQTsCpNGVuB/T+5k5ogh9FOlqw9uOgiz6TA
+	 Z1ikLUSwVDVnA==
+Date: Mon, 15 Jun 2026 13:42:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com,
+ dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+ yury.norov@gmail.com, pavan.chebbi@broadcom.com
+Subject: Re: [PATCH net-next v10 0/2] net: mana: add ethtool private flag
+ for full-page RX buffers
+Message-ID: <20260615134247.0bd7e16e@kernel.org>
+In-Reply-To: <ajBRwYftEol8IE49@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260602202801.1873742-1-dipayanroy@linux.microsoft.com>
+	<ajBRwYftEol8IE49@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Feedback-ID: :1.us-east-1.z4rHY0qbNtjoW80ZyzVy+DEul17RQEOMT7FC66S60ffkhLWkV35D8ZWXVyxJY1/89bAuLCem4GFJq1VXsxM0u6ZfZbvT1qSjDUeuZG9/Lxk1uINIqi7CenEa93u+fNllqnJMZ0quaBrclhnmtzdFllG4KHSjZOEcaGLa1BWoSpA=:1.us-east-1.epbACCJLarUaEI78XZoGREJ9LamRjxMH5pM2kZb64rA=:AmazonSES
-X-SES-Outgoing: 2026.06.15-54.240.9.9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[c127.dev:s=resend,amazonses.com:s=224i4yxa5dv7c2xz3womw6peuasteono];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-299609-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS(0.00)[m:maxime.chevallier@bootlin.com,m:linusw@kernel.org,m:alsi@bang-olufsen.dk,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux@armlinux.org.uk,m:namiltd@yahoo.com,m:luizluca@gmail.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	DMARC_NA(0.00)[c127.dev];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[bootlin.com,kernel.org,bang-olufsen.dk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FORGED_RECIPIENTS(0.00)[m:dipayanroy@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:leon@kernel.org,m:longli@microsoft.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:ernis@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stephen@networkplumber.org,m:jacob.e.keller@intel.com,m:dipayanroy@microsoft.com,m:leitao@debian.org,m:kees@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:ast@kernel.org,m:sdf@fomichev.me,m:yury.norov@gmail.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299608-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[contact@c127.dev,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,yahoo.com,gmail.com,vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[contact@c127.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[c127.dev:+,amazonses.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,email.amazonses.com:mid,amazonses.com:dkim,c127.dev:dkim,c127.dev:from_mime]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 64BE0689F98
+X-Rspamd-Queue-Id: 69C1E68A028
 
-> This comment implies that you could deal with SGMII aneg at some point.
-> [...] makes me wonder if this whole SGMII/2500BaseX series should be
-> represented as a PCS phylink driver.
+On Mon, 15 Jun 2026 12:25:53 -0700 Dipayaan Roy wrote:
+> Just a gentle ping on this series. The approach was agreed upon, and it
+> has picked up a few Reviewed-by tags as well.
+> 
+> Please let me know if you need anything else from me, or if I should
+> resend it to collect the tags.
 
-Hi Maxime,
-
-You're right, and I'll convert the SerDes path to a phylink_pcs for v4.
-It splits the MAC and SerDes layers cleanly, drops the "ext then sds"
-branches in mac_link_up/down, and makes future in-band aneg an additive
-change instead of a rewrite.
-
-One point I'd like to confirm on scope: I can only test the forced-link
-path on my MR80X (fixed-link / conventional PHY), and I have no setup to
-exercise SGMII in-band autonegotiation. My plan is to do the PCS refactor
-keeping the link forced (outband / no in-band AN), and leave actual
-in-band aneg support for a follow-up once I have hardware to validate it.
-Does limiting v4 to the forced path sound acceptable, or would you prefer
-in-band aneg implemented up front? I'd rather not add a code path I can't
-test.
-
-I'll also reword the misleading "disable in-band aneg" comment.
-
-net-next being closed until the 29th gives me time to do this properly,
-so v4 will carry the PCS conversion, retested on the MR80X v2.20.
-
-Best regards,
-Johan
+Don't recall now what the exact sequence was but pretty sure this 
+no longer applied after some other mana series was merged.
 
