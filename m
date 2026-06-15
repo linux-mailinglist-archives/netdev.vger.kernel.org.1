@@ -1,213 +1,179 @@
-Return-Path: <netdev+bounces-299610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299611-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FeCcEP5jMGr+SQUAu9opvQ
-	(envelope-from <netdev+bounces-299610-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:43:42 +0200
+	id Th/pJDhkMGoLSgUAu9opvQ
+	(envelope-from <netdev+bounces-299611-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:44:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A90D168A066
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:43:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E752168A094
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 22:44:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=pD1g71S7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299610-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299610-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=dama-to.20251104.gappssmtp.com header.s=20251104 header.b=trofXPR9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299611-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299611-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FA38305FAD7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:43:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96C2E311BC21
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 20:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9610B3B6C06;
-	Mon, 15 Jun 2026 20:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333843B6C15;
+	Mon, 15 Jun 2026 20:43:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439A0286D5E
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 20:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0E53B71A9
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 20:43:20 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781556192; cv=none; b=IRcjbefgWwm1+xWIEnNHWTLHzJCyi5NK3gcK2g9ocHzUGFmSRtlXD/Xyjj7nCbG3Bvsr3nBJwjhIVHW0KDgyPsE5Gf/gWvmYBOSTZSGnj6igQ+mvxLV2NEtO8nEB7aAKmDBHh1zMrqnKZljg8cPSkyDisCTuFu0IT0zOUayw+ek=
+	t=1781556202; cv=none; b=SkqeCx16fF4Y49GRSNbbmeiw4N36FcMYekiQxqQa0PREcib0kWk7QsnAQgGJKsrKiARrq2ZO1GpAAx8pS138hDAwZ/VPadxiqME5+Lal2l+LG5N9WtG65qMdeLjCyJAcwgogoTbB8yZfIdHv379s7qp8uUcWFoc5hRQxftYdbSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781556192; c=relaxed/simple;
-	bh=jBlnsK/KMS3kauJF9/6kISkgmEqaeXoqt4eJCNdej84=;
+	s=arc-20240116; t=1781556202; c=relaxed/simple;
+	bh=ItAbYBi28K0MNqBDjO6bRAnm3lIyowUJvCtTVyIeJGc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gJIInqn29wvxWW9mz+yhWcwu6QsDJKi0zRdn3O+f9Bnt5Xd8Th84WLRvwgGcpJFe8XhwYpsdLzfolUCModjBv4VwaQ8xMGiEaBh0Y+wmB0l1iReLEnfX7ia0iZNkUsBDkVrGCjjLftiiMmjfDZ/OTJ5Q73Ttfg3O4lkd+CZCdLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pD1g71S7; arc=none smtp.client-ip=209.85.214.181
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2bf2d865383so5275ad.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 13:43:11 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJlDxdzAaUOeHrN4UXjOhrWhAkSqjm5PW9mNvVyuVG5QsFBFKPFj4Wvkfo9ay/M8G3XusziDyyWIx76fHQD1rswtE4WyeXo/Y0JGgwXCaXeSoXu8l43Y/K4NeJ/eqkYt26TkzZe6rmUZXi4DOFBnV9zcidy8S20wBrqnNcbHMYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=trofXPR9; arc=none smtp.client-ip=209.85.214.170
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2bf1f074a12so38626065ad.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 13:43:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781556191; x=1782160991; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TBDZMBYyw+UgUQjRNToZ0sLPA9XJndpfItnW356E0MI=;
-        b=pD1g71S7EtpQTpT/BiJKtBZQRzfYIfK1WP6Ecf1qhkq9I2q6+0lzhgkJbQX7E6OQx6
-         8lYPIXsjJGFFmk0JHUpWjMO830tdFyAi4czLo4JWIsG9CmGUVWYN36QRues19Q5DkVdj
-         uAb6x+QL2KT8NFZQqfFYaM2OErBJSvUL1I4Qqi2Gw4blEeX6e5fcACZs5tVxoZz7MPRZ
-         XpM+9MbJBKt+snIfigmtEgPTGHOMCfwOSkYzkisOYnJS5b7bxPLQE6QRF/w22kQpxi6z
-         3iR+OB7SKTTm2BqoMleG4St1JpsngU8TGjGfsyVzOw0ZohYNP8iumIUcX+Jidlm/7BNS
-         Y3bg==
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1781556200; x=1782161000; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IppM0Vc4ukPCYxBBrz8f6rK4ET/XTsCGtsSBhGqG1J4=;
+        b=trofXPR9avEaWyEiAggHZBjsxDpClaiod04+q/w0NIffxaRJmxX+BIMANJkrhsUwRp
+         Vmg61WY8sa2JMUctGUd/Bl3dEAdt/fjMprARaRyPuOK4RSopIT6+ACXytNhZitie4ktu
+         vPkeH2lat88n7jRM5r4zhK+3D6ZvqyMFus5TmWpBxRTbOM5pzloSnCm5cn9lJcEtAjFD
+         29VQjju6VtFUMfuGHHxRlkE7GV/F/b0vp4yKFaln2JWy2XOw5deS3ToR+VpDxPAN4VZO
+         jj1UMfsiOs8tIwOQCXYxf+Sacss4ETAidsQS4pqR8zT7fFWK59llP0oTR2YdQDcP7Sc4
+         mxvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781556191; x=1782160991;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20251104; t=1781556200; x=1782161000;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TBDZMBYyw+UgUQjRNToZ0sLPA9XJndpfItnW356E0MI=;
-        b=YE+Y3EYmATgADNfHw8Ydko66HwwUKAGjSq8EAkK8KJ0GFvkP5UoWC2V2qHqUp/8MnK
-         ZwLQgpUHiLC3+aFseshLlOar+FY3pdUK/64vsv3JR1x1UDcqawBZxm5JirH5l2s+PE2w
-         z2g8bcBN6VATHDIw8KEGoMbKsXrf09vUfAWI7jJ1dCsZFTxfiPntH6gAnZCXywYlHh1v
-         K7m8JaQil2YX+O6UqCQNfQpyTzniuqBsMnGYXpSBbX+OrIJxpCPc+gOiSO/FbtSE4fXc
-         t8c6XDvdyMmutFpW0/pOctCunwM91TSuhVnTwa4TEjRWVdwvZoJeKA+oaZvv75PD4YqE
-         jWmw==
-X-Forwarded-Encrypted: i=1; AFNElJ++1A5E79e74GVL4DoK4aLg9RwN2ShMvRy/f2SpBdSKPlTFGH33c+gRMoJXAvhdW8p5SQ6yNFs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+S3va9/GnS1LmBhxsFJZVq+ZOLgpdrxD9QaiE7lA079tWQsE6
-	f3a/+jr8l4p6MBdbx/9Ub15/tAEocTVWQNfm/ME7pXKO5Ftj76YMKocvk/YFk3bhCg==
-X-Gm-Gg: Acq92OFLunYTFY7zMvlu1j5L34xb5Z/mCMU1uMlw+MvD9MnMJ7DJQFomTWQHu+orgL4
-	nDMhjo6UIVpDCxyPdxKKizPGIH2TSzg1qIk0kccJq1ZhPLEJWMzrhlaWNGWhcdPG+ZZRy3TcrWT
-	WQ1NvS+eU6usd4KGZ9/RcWjl9hsCg/NskcI038Sfn8udBdIKKlfWA3R1vGFOB4lJjpH3ZhS+l1h
-	mgF3Smi93D6aRnSi4/b7ia3CCMenJaEZMbgbs9GTiR5aZavsAkngEFoLUR2wjdmm0UAFBeZfTp2
-	jwEB1zPmiewehSHAqW/DQx8bkIYqKPU08N4Huir72iiE7RSkXcO+E2z6gclR5it0IFIHc6Qu0hN
-	LNw9Fukg996iCFowX2t9eZBdilFiduVfEnUgDESThiXVyAb4+fPXki9edyYadSqYMWH+uLtKIa7
-	zMYoXj2iH+WqYiHCa3HRwTaqN7qqhdixjxxrTnu+8xBrq4R4p747NmVaXopWsoQdcF85e6KbjIf
-	u6JowEitIUiGooWe+8a1j99e/miNBsVBjKDCB/tIRM6bQ==
-X-Received: by 2002:a17:902:d581:b0:2c1:ee6e:be1e with SMTP id d9443c01a7336-2c69a35837amr651055ad.28.1781556190181;
-        Mon, 15 Jun 2026 13:43:10 -0700 (PDT)
-Received: from google.com (112.174.16.34.bc.googleusercontent.com. [34.16.174.112])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c5228eb5bsm483197a91.12.2026.06.15.13.43.08
+        bh=IppM0Vc4ukPCYxBBrz8f6rK4ET/XTsCGtsSBhGqG1J4=;
+        b=a1WThk3d/duJqadO18DDRzFdEErGpgVUhqwSSBWuTrrXcQytjMm2LFT5Lisz6oGq8S
+         37U7EXWyqvqzdeo1ywXw+eGpv2G2a6WwVU3amVr9hbcV3Ni7e6HB0wOcjjobaFRt1Mdb
+         KdCaPKxEKpCPgRmACQpjPnrbPIhharh1CmVGeZSRimE05+Ty2CmK6tAbpRer0Y7kwtHa
+         cbe9o3sFZjqlsMLCAVPx1h+ZqayNsy8WDEyddJ3GDs/uQOIxaI/x5ejTZuPxj+8rTppw
+         ZWcnWSi2l7e2LI2YHnXU8o+qGhzanCLIIbqFO7ZOeyfkC4gRbaiRPv5+4SSXg7lCrc9y
+         o9uQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9lJLv/ze6xiVMz/3dekMiWwkGMaPmlMJypMivRktofL95O2f3Fcq7H9MWN28jKlxSRnzZo88c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfIo/+pUumHq+wf3G5szWxTO+syXxMa0nzRuTfzTD97L5xQu+s
+	L8kZhSecbFQ0fU8c8T3e4TbHw2Hc39TuIIbqx8ivgEEh1LjCSrf6OjywQBcJ+Kv6hr8=
+X-Gm-Gg: Acq92OF6s+R1u0IyNqyU61G9vSbOY77IbJzsUv5Hr/fu5IVE71NwwJIm506S5HpURCz
+	LWdxyvtWi4PqnYMsGyrG+hDkvVbwehUTn4WPdPiGu4WExzQ3ToXi6C/L3yuvsTZzR/FNYANNqpT
+	B8LbDfbdLtAB6Qdf3dNI3zpFkoWn7EUp/DJSVqsNwebw+5Uv/LI2mI+5t+nBTf354RV2SbPah75
+	MeTLq8gGAJoy4PuzbbI91UTTIq8oaP9SqFq9+2gXkqwZtIihHt04hNYqEi8vAV/rYmsDSGEH5tb
+	fiYVn5CkmU9jOn7cy7arV3EVxRYWA7NsFo6wnYjdFXRhPz0VbDIgazI8N3XnMtpuOXCbBv5eLE3
+	JB7hwM4OWY5c579sS0yG4xGdOXLAaMYhvXwaYcrnLaSQ5C3xo4nfHDh3UWaq/ENw3bpbvAThBje
+	FozC0=
+X-Received: by 2002:a17:903:950:b0:2c0:b319:fb43 with SMTP id d9443c01a7336-2c69a1731a1mr8508155ad.21.1781556200372;
+        Mon, 15 Jun 2026 13:43:20 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:9::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c433558449sm114681195ad.78.2026.06.15.13.43.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 13:43:09 -0700 (PDT)
-Date: Mon, 15 Jun 2026 20:43:04 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Christian Brauner <christian@brauner.io>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org,
-	Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Todd Kjos <tkjos@android.com>, Vlastimil Babka <vbabka@kernel.org>
-Subject: Re: [PATCH v2 4/5] binder: Remove mmap_lock fallback
-Message-ID: <ajBj2BzEalR8jYX9@google.com>
-References: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com>
- <20260610230417.77D64DBB@davehans-spike.ostc.intel.com>
+        Mon, 15 Jun 2026 13:43:19 -0700 (PDT)
+Date: Mon, 15 Jun 2026 13:43:18 -0700
+From: Joe Damato <joe@dama.to>
+To: Maoyi Xie <maoyixie.tju@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Wei <dw@davidwei.uk>, Stanislav Fomichev <sdf@fomichev.me>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] netdev-genl: report NAPI thread PID in the caller's
+ pid namespace
+Message-ID: <ajBj5j01YmdS02Uw@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Maoyi Xie <maoyixie.tju@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Wei <dw@davidwei.uk>, Stanislav Fomichev <sdf@fomichev.me>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260615171736.1709318-1-maoyixie.tju@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260610230417.77D64DBB@davehans-spike.ostc.intel.com>
+In-Reply-To: <20260615171736.1709318-1-maoyixie.tju@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299610-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:daniel@iogearbox.net,m:razor@blackwall.org,m:dw@davidwei.uk,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:skhawaja@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dave.hansen@linux.intel.com,m:linux-kernel@vger.kernel.org,m:aliceryhl@google.com,m:akpm@linux-foundation.org,m:arve@android.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:surenb@google.com,m:tkjos@android.com,m:vbabka@kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[cmllamas@google.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[google.com:+];
+	DMARC_NA(0.00)[dama.to];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-299611-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cmllamas@google.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,devvm20253.cco0.facebook.com:mid,dama-to.20251104.gappssmtp.com:dkim,dama.to:from_mime,dama.to:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A90D168A066
+X-Rspamd-Queue-Id: E752168A094
 
-On Wed, Jun 10, 2026 at 04:04:17PM -0700, Dave Hansen wrote:
+On Tue, Jun 16, 2026 at 01:17:36AM +0800, Maoyi Xie wrote:
+> netdev_nl_napi_fill_one() reports the NAPI kthread PID in NETDEV_A_NAPI_PID
+> using task_pid_nr(), which returns the PID in the initial pid namespace.
 > 
-> From: Dave Hansen <dave.hansen@linux.intel.com>
+> NETDEV_CMD_NAPI_GET does not have GENL_ADMIN_PERM and the netdev genl family
+> is netnsok, so a caller in a child pid namespace can issue it. That caller
+> then sees the kthread's global PID, even though the kthread is not visible
+> in its pid namespace, where the value should be 0.
 > 
-> Previously, the per-VMA locking could fail in the face of writers
-> which necessitate a fallback to mmap_lock. The new
-> vma_start_read_unlocked() will wait for writers instead of failing.
+> Translate the PID through the caller's pid namespace, the same way commit
+> 3799c2570982 ("io_uring/fdinfo: translate SqThread PID through caller's
+> pid_ns") did for the io_uring SQPOLL thread. The doit and dumpit paths both
+> run synchronously in the caller's context, so task_active_pid_ns(current) is
+> the caller's pid namespace.
 > 
-> Use the new helper. Wait for writers. Remove the fallback to mmap_lock.
-> 
-> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Acked-by: Lorenzo Stoakes <ljs@kernel.org>
-> Reviewed-by: Suren Baghdasaryan <surenb@google.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-> Cc: Vlastimil Babka <vbabka@kernel.org>
-> Cc: Shakeel Butt <shakeel.butt@linux.dev>
-> Cc: linux-mm@kvack.org
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Arve Hjønnevåg <arve@android.com>
-> Cc: Todd Kjos <tkjos@android.com>
-> Cc: Christian Brauner <christian@brauner.io>
-> Cc: Carlos Llamas <cmllamas@google.com>
-> Cc: Alice Ryhl <aliceryhl@google.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Ahern <dsahern@kernel.org>
-> Cc: netdev@vger.kernel.org
-> 
+> Fixes: db4704f4e4df ("netdev-genl: Add PID for the NAPI thread")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
 > ---
-> 
->  b/drivers/android/binder_alloc.c |   17 +++++------------
->  1 file changed, 5 insertions(+), 12 deletions(-)
-> 
-> diff -puN drivers/android/binder_alloc.c~binder-vma-waiter drivers/android/binder_alloc.c
-> --- a/drivers/android/binder_alloc.c~binder-vma-waiter	2026-06-10 15:57:56.419452721 -0700
-> +++ b/drivers/android/binder_alloc.c	2026-06-10 15:57:56.423452863 -0700
-> @@ -259,21 +259,14 @@ static int binder_page_insert(struct bin
->  	struct vm_area_struct *vma;
->  	int ret = -ESRCH;
->  
-> -	/* attempt per-vma lock first */
-> -	vma = lock_vma_under_rcu(mm, addr);
-> -	if (vma) {
-> -		if (binder_alloc_is_mapped(alloc))
-> -			ret = vm_insert_page(vma, addr, page);
-> -		vma_end_read(vma);
-> +	vma = vma_start_read_unlocked(mm, addr);
-> +	if (!vma)
->  		return ret;
-> -	}
->  
-> -	/* fall back to mmap_lock */
-> -	mmap_read_lock(mm);
-> -	vma = vma_lookup(mm, addr);
-> -	if (vma && binder_alloc_is_mapped(alloc))
-> +	if (binder_alloc_is_mapped(alloc))
->  		ret = vm_insert_page(vma, addr, page);
-> -	mmap_read_unlock(mm);
-> +
-> +	vma_end_read(vma);
->  
->  	return ret;
->  }
-> _
+>  net/core/netdev-genl.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
 
-
-Thanks,
-Acked-by: Carlos Llamas <cmllamas@google.com>
+Reviewed-by: Joe Damato <joe@dama.to>
 
