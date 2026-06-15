@@ -1,171 +1,393 @@
-Return-Path: <netdev+bounces-299380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299381-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3GA+OMrCL2pQGAUAu9opvQ
-	(envelope-from <netdev+bounces-299380-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:15:54 +0200
+	id yehbIpXDL2p8GAUAu9opvQ
+	(envelope-from <netdev+bounces-299381-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:19:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C54A684F6F
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:15:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B84684FF3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 11:19:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=D5enJjr9;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299380-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299380-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FBG7se9R;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299381-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299381-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E41493006B43
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:15:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 96EB93013EC6
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 09:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E53A3DA7CE;
-	Mon, 15 Jun 2026 09:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5BD33BF680;
+	Mon, 15 Jun 2026 09:18:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9B03D9DB7;
-	Mon, 15 Jun 2026 09:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD213932E4;
+	Mon, 15 Jun 2026 09:18:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781514952; cv=none; b=ZdLqHZRM1I3ztCjGVRBC8PTX3658HQSQZYDb6ZVq4pJsmhWZSICCqWdxOragg3y+gdz2FQOfbXlupq9anz82B5ix6/FLP2i7jF3ya8S5UpcRiNbkuvAxSIUwFs2WKJH9ldYOLiFJHFUEpb0mfi8uU3AMuKMNkJiNT0Gwo6ezmLY=
+	t=1781515122; cv=none; b=YeouX9QYXPM7ZY9LhKXp8Gi9neo7xuqr2abmsj63INnaIbLBoJWqOJtFHwIC4uc0BVHLO6fGxp0NT/7JJix71rhDkxfX7DsTsohgqSSs6LATKJ1ggme0IIzFuOp0BCVkm1FYoCz/8xRLAyymb8KxUXh2SXAbbXSK6yNhHuvAyCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781514952; c=relaxed/simple;
-	bh=LVAo4Ed2o+uU2kdmhbF/FvxsYQACAQEf1KFVg/vCYHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=ZxHG0QEnnv04tqSPA0noufxZ22ful5EXsql9QgNiMlVX42eXTkCRUCnvOlOCW/H4M0PyqMe5TUvF+2h9xvRHSK+bn6VpGZYaTdVBGCUaSzIaF4xzuhhOVGujR4IJb7pbKzQx4X4vzRe5kuJ8ecrEsDbdNNtpk//mARC9g00pqek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5enJjr9; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB0CA1F000E9;
-	Mon, 15 Jun 2026 09:15:43 +0000 (UTC)
+	s=arc-20240116; t=1781515122; c=relaxed/simple;
+	bh=OnSYF1pHkEV2T04VBjQE5Q50mKp4Lg0Mqilm00UB8O0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=S4dP3C43kcMmfNOSbeSB9ijkbJzTSoG5Z/HMEZ0m5pRgRaVeUC+YyDlO2hI5t9n8ccqt8Hw9rqJTuoDBvQ37y0pjLpGT5heLbkYR5ef9UFMZuHEUUB65a81nSSlzinrs/WwKhX54OQuKe8w6klaLiH4fqe2W67ceG8dqKlpAKu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FBG7se9R; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69AC1F000E9;
+	Mon, 15 Jun 2026 09:18:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781514947;
-	bh=LVAo4Ed2o+uU2kdmhbF/FvxsYQACAQEf1KFVg/vCYHQ=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To;
-	b=D5enJjr9pxzCGfW0djSw6PRO1G8OwqsFGWvmn2Bpbjlw1aepA5k8VByBZqljAUyh4
-	 OG/qhWT5z7m1K3zgPPKhlErCDGOCtNChGTx6fdONSm5855NM/BiTC5eCIQxtVv0rvr
-	 pHPo1eQqKvHkRr5j7fZGhgDoHkSColVteNcP6PnIsPxFL8TvO3FMFB0U9Nkqft/9+m
-	 RTCIEF6o+OCBBhDteeGpGAPetOb4tYDP5uO+ptW6b/pX8HqCgZRFx1E/qJlYrpUQyp
-	 Ge08eqfFIyRNkAaWpOIgTe6sVt6jaxSvW2GkPT1KXunc6r96K4R2si8xCdHIW6tPdV
-	 dOvmiMzEblyeg==
-Message-ID: <fac2b43c-4121-41b3-a7fe-d52ddb63f413@kernel.org>
-Date: Mon, 15 Jun 2026 11:15:40 +0200
+	s=k20260515; t=1781515121;
+	bh=IYSYT0akrNtBSTc3XQEfDwkWdMSJk+gAzuVeOTJyTvU=;
+	h=From:Date:Subject:To:Cc;
+	b=FBG7se9RHHJorsKGW8KgGDxNvEqiHGaSxZ30z/LBPvJofUPMA7JIu7WLn5i3jWTRo
+	 aJyg/3e0scvEPd2PT6M571OJh+KrNhvPFAd+33EFHA+u6EXE1/+4IG/8BLeJJjnqNN
+	 53G7/NIennSO9PgLRkymwjFfVk5rm4WKbJHn8M9mvYyyJ349+JMNwxxjAMU9Y/ZjAr
+	 +ckkSNz89Mz9XPbo6yUz93D4TjQDnDaX/J3ebGRpr5d+OJW8XpOzB7q/KBdL3gabXQ
+	 eVNUcX3IDZXAWHnquJv9k/TvtKW7+np8m4+F18sQIq8fNWnL+OznZI2zxEgz5YyW/D
+	 oZuWNuC25JDjw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 15 Jun 2026 11:18:25 +0200
+Subject: [PATCH nf v2] netfilter: flowtable: fix and simplify IP6IP6 tunnel
+ handling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] selftests: net: do not detect PPPoX loopback
-To: Qingfang Deng <qingfang.deng@linux.dev>
-References: <20260603061746.23452-1-qingfang.deng@linux.dev>
-From: Matthieu Baerts <matttbe@kernel.org>
-Content-Language: fr
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20260603061746.23452-1-qingfang.deng@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260615-b4-nf_flow_ip6_tunnel_proto-update-v2-1-a92e1a40ffc6@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5WNWw6CMBREt2LutzWlQql+uQ9DGh630Eja5ragh
+ rB3G3bg55mZzNkgIlmMcD9tQLjaaL3LIM4n6KfWjcjskBkEF5JLrlhXMme0mf1b2yB1WpzDWQf
+ yybMlDG1CpjpZ3vhViaorIR8FQmM/h+QJzkCTs8nG5Ol7eNfiaP5RrAUrWK1EX/NK9MoMjxdSX
+ l08jdDs+/4Do55aStkAAAA=
+X-Change-ID: 20260608-b4-nf_flow_ip6_tunnel_proto-update-8b64903825b4
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
+ Ido Schimmel <idosch@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-Mailer: b4 0.14.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-5.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:idosch@nvidia.com,m:shuah@kernel.org,m:lorenzo@kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:qingfang.deng@linux.dev,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:linux-ppp@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	HAS_ORG_HEADER(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299380-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-299381-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7C54A684F6F
+X-Rspamd-Queue-Id: F3B84684FF3
 
-Hi Qingfang,
+Fix nf_flow_ip6_tunnel_proto() to use pskb_may_pull() instead of
+skb_header_pointer() to ensure the outer IPv6 header is in the skb
+headroom, which is required for subsequent packet processing. Move
+ctx->offset update inside the IPPROTO_IPV6 conditional block since it
+should only be adjusted when an IP6IP6 tunnel is actually detected.
+Simplify the rx path by removing ipv6_skip_exthdr() and checking
+ip6h->nexthdr directly, as the flowtable fast path only handles simple
+IP6IP6 encapsulation without extension headers.
+Drop the tunnel encapsulation limit destination option support from the
+tx path to match, since the rx path no longer handles extension headers.
+Remove the encap_limit parameter from nf_flow_offload_ipv6_forward(),
+nf_flow_tunnel_ip6ip6_push() and nf_flow_tunnel_v6_push(), along with
+the ipv6_tel_txoption struct and related headroom/MTU adjustments.
 
-On 03/06/2026 08:17, Qingfang Deng wrote:
-> By default, pppd attempts to detect loopbacks on the underlying
-> interface using a pseudo-randomly generated magic number and checks if
-> the same value is received. The seed for the PRNG is a hash of hostname
-> XOR current time XOR pid, which is likely to collide on NIPA, causing
-> false positives. Disable magic number generation.
+Fixes: d98103575dcdd ("netfilter: flowtable: Add IP6IP6 rx sw acceleration")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Drop tunnel encapsulation limit destination option support.
+- Do not allow IPv6 extension headers in nf_flow_ip6_tunnel_proto().
+- Link to v1: https://lore.kernel.org/r/20260608-b4-nf_flow_ip6_tunnel_proto-update-v1-1-782c7052c8fd@kernel.org
+---
+ net/ipv6/ip6_tunnel.c                              |  7 ++
+ net/netfilter/nf_flow_table_ip.c                   | 80 +++++-----------------
+ .../selftests/net/netfilter/nft_flowtable.sh       |  8 +--
+ 3 files changed, 30 insertions(+), 65 deletions(-)
 
-Thank you for the fix!
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 9d1037ac082f..bf1e77f95f18 100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -1850,6 +1850,13 @@ static int ip6_tnl_fill_forward_path(struct net_device_path_ctx *ctx,
+ 	struct dst_entry *dst;
+ 	int err;
+ 
++	if (!(t->parms.flags & IP6_TNL_F_IGN_ENCAP_LIMIT)) {
++		/* encaplimit option is currently not supported is
++		 * sw-acceleration path.
++		 */
++		return -EOPNOTSUPP;
++	}
++
+ 	dst = ip6_route_output(dev_net(ctx->dev), NULL, &fl6);
+ 	if (!dst->error) {
+ 		path->type = DEV_PATH_TUN;
+diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+index 9c05a50d6013..e7a3fb2b2d94 100644
+--- a/net/netfilter/nf_flow_table_ip.c
++++ b/net/netfilter/nf_flow_table_ip.c
+@@ -347,29 +347,23 @@ static bool nf_flow_ip6_tunnel_proto(struct nf_flowtable_ctx *ctx,
+ 				     struct sk_buff *skb)
+ {
+ #if IS_ENABLED(CONFIG_IPV6)
+-	struct ipv6hdr *ip6h, _ip6h;
+-	__be16 frag_off;
+-	u8 nexthdr;
+-	int hdrlen;
++	struct ipv6hdr *ip6h;
+ 
+-	ip6h = skb_header_pointer(skb, ctx->offset, sizeof(*ip6h), &_ip6h);
+-	if (!ip6h)
++	if (!pskb_may_pull(skb, sizeof(*ip6h) + ctx->offset))
+ 		return false;
+ 
++	ip6h = (struct ipv6hdr *)(skb_network_header(skb) + ctx->offset);
+ 	if (ip6h->hop_limit <= 1)
+ 		return false;
+ 
+-	nexthdr = ip6h->nexthdr;
+-	hdrlen = ipv6_skip_exthdr(skb, sizeof(*ip6h) + ctx->offset, &nexthdr,
+-				  &frag_off);
+-	if (hdrlen < 0)
++	if (ipv6_ext_hdr(ip6h->nexthdr))
+ 		return false;
+ 
+-	if (nexthdr == IPPROTO_IPV6) {
+-		ctx->tun.hdr_size = hdrlen;
+-		ctx->tun.proto = IPPROTO_IPV6;
++	if (ip6h->nexthdr == IPPROTO_IPV6) {
++		ctx->tun.proto = ip6h->nexthdr;
++		ctx->tun.hdr_size = sizeof(*ip6h);
++		ctx->offset += ctx->tun.hdr_size;
+ 	}
+-	ctx->offset += ctx->tun.hdr_size;
+ 
+ 	return true;
+ #else
+@@ -648,25 +642,19 @@ static int nf_flow_tunnel_v4_push(struct net *net, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
+-struct ipv6_tel_txoption {
+-	struct ipv6_txoptions ops;
+-	__u8 dst_opt[8];
+-};
+-
+ static int nf_flow_tunnel_ip6ip6_push(struct net *net, struct sk_buff *skb,
+ 				      struct flow_offload_tuple *tuple,
+-				      struct in6_addr **ip6_daddr,
+-				      int encap_limit)
++				      struct in6_addr **ip6_daddr)
+ {
+ 	struct ipv6hdr *ip6h = (struct ipv6hdr *)skb_network_header(skb);
+-	u8 hop_limit = ip6h->hop_limit, proto = IPPROTO_IPV6;
+ 	struct rtable *rt = dst_rtable(tuple->dst_cache);
+ 	__u8 dsfield = ipv6_get_dsfield(ip6h);
+ 	struct flowi6 fl6 = {
+ 		.daddr = tuple->tun.src_v6,
+ 		.saddr = tuple->tun.dst_v6,
+-		.flowi6_proto = proto,
++		.flowi6_proto = IPPROTO_IPV6,
+ 	};
++	u8 hop_limit = ip6h->hop_limit;
+ 	int err, mtu;
+ 	u32 headroom;
+ 
+@@ -674,41 +662,18 @@ static int nf_flow_tunnel_ip6ip6_push(struct net *net, struct sk_buff *skb,
+ 	if (err)
+ 		return err;
+ 
+-	skb_set_inner_ipproto(skb, proto);
++	skb_set_inner_ipproto(skb, IPPROTO_IPV6);
+ 	headroom = sizeof(*ip6h) + LL_RESERVED_SPACE(rt->dst.dev) +
+ 		   rt->dst.header_len;
+-	if (encap_limit)
+-		headroom += 8;
+ 	err = skb_cow_head(skb, headroom);
+ 	if (err)
+ 		return err;
+ 
+ 	skb_scrub_packet(skb, true);
+ 	mtu = dst_mtu(&rt->dst) - sizeof(*ip6h);
+-	if (encap_limit)
+-		mtu -= 8;
+ 	mtu = max(mtu, IPV6_MIN_MTU);
+ 	skb_dst_update_pmtu_no_confirm(skb, mtu);
+ 
+-	if (encap_limit > 0) {
+-		struct ipv6_tel_txoption opt = {
+-			.dst_opt[2] = IPV6_TLV_TNL_ENCAP_LIMIT,
+-			.dst_opt[3] = 1,
+-			.dst_opt[4] = encap_limit,
+-			.dst_opt[5] = IPV6_TLV_PADN,
+-			.dst_opt[6] = 1,
+-		};
+-		struct ipv6_opt_hdr *hopt;
+-
+-		opt.ops.dst1opt = (struct ipv6_opt_hdr *)opt.dst_opt;
+-		opt.ops.opt_nflen = 8;
+-
+-		hopt = skb_push(skb, ipv6_optlen(opt.ops.dst1opt));
+-		memcpy(hopt, opt.ops.dst1opt, ipv6_optlen(opt.ops.dst1opt));
+-		hopt->nexthdr = IPPROTO_IPV6;
+-		proto = NEXTHDR_DEST;
+-	}
+-
+ 	skb_push(skb, sizeof(*ip6h));
+ 	skb_reset_network_header(skb);
+ 
+@@ -716,7 +681,7 @@ static int nf_flow_tunnel_ip6ip6_push(struct net *net, struct sk_buff *skb,
+ 	ip6_flow_hdr(ip6h, dsfield,
+ 		     ip6_make_flowlabel(net, skb, fl6.flowlabel, true, &fl6));
+ 	ip6h->hop_limit = hop_limit;
+-	ip6h->nexthdr = proto;
++	ip6h->nexthdr = IPPROTO_IPV6;
+ 	ip6h->daddr = tuple->tun.src_v6;
+ 	ip6h->saddr = tuple->tun.dst_v6;
+ 	ipv6_hdr(skb)->payload_len = htons(skb->len - sizeof(*ip6h));
+@@ -729,12 +694,10 @@ static int nf_flow_tunnel_ip6ip6_push(struct net *net, struct sk_buff *skb,
+ 
+ static int nf_flow_tunnel_v6_push(struct net *net, struct sk_buff *skb,
+ 				  struct flow_offload_tuple *tuple,
+-				  struct in6_addr **ip6_daddr,
+-				  int encap_limit)
++				  struct in6_addr **ip6_daddr)
+ {
+ 	if (tuple->tun_num)
+-		return nf_flow_tunnel_ip6ip6_push(net, skb, tuple, ip6_daddr,
+-						  encap_limit);
++		return nf_flow_tunnel_ip6ip6_push(net, skb, tuple, ip6_daddr);
+ 
+ 	return 0;
+ }
+@@ -1089,7 +1052,7 @@ static int nf_flow_tuple_ipv6(struct nf_flowtable_ctx *ctx, struct sk_buff *skb,
+ static int nf_flow_offload_ipv6_forward(struct nf_flowtable_ctx *ctx,
+ 					struct nf_flowtable *flow_table,
+ 					struct flow_offload_tuple_rhash *tuplehash,
+-					struct sk_buff *skb, int encap_limit)
++					struct sk_buff *skb)
+ {
+ 	enum flow_offload_tuple_dir dir;
+ 	struct flow_offload *flow;
+@@ -1100,11 +1063,8 @@ static int nf_flow_offload_ipv6_forward(struct nf_flowtable_ctx *ctx,
+ 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
+ 
+ 	mtu = flow->tuplehash[dir].tuple.mtu + ctx->offset;
+-	if (flow->tuplehash[!dir].tuple.tun_num) {
++	if (flow->tuplehash[!dir].tuple.tun_num)
+ 		mtu -= sizeof(*ip6h);
+-		if (encap_limit > 0)
+-			mtu -= 8; /* encap limit option */
+-	}
+ 
+ 	if (unlikely(nf_flow_exceeds_mtu(skb, mtu)))
+ 		return 0;
+@@ -1158,7 +1118,6 @@ unsigned int
+ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
+ 			  const struct nf_hook_state *state)
+ {
+-	int encap_limit = IPV6_DEFAULT_TNL_ENCAP_LIMIT;
+ 	struct flow_offload_tuple_rhash *tuplehash;
+ 	struct nf_flowtable *flow_table = priv;
+ 	struct flow_offload_tuple *other_tuple;
+@@ -1177,8 +1136,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
+ 	if (tuplehash == NULL)
+ 		return NF_ACCEPT;
+ 
+-	ret = nf_flow_offload_ipv6_forward(&ctx, flow_table, tuplehash, skb,
+-					   encap_limit);
++	ret = nf_flow_offload_ipv6_forward(&ctx, flow_table, tuplehash, skb);
+ 	if (ret < 0)
+ 		return NF_DROP;
+ 	else if (ret == 0)
+@@ -1198,7 +1156,7 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
+ 	ip6_daddr = &other_tuple->src_v6;
+ 
+ 	if (nf_flow_tunnel_v6_push(state->net, skb, other_tuple,
+-				   &ip6_daddr, encap_limit) < 0)
++				   &ip6_daddr) < 0)
+ 		return NF_DROP;
+ 
+ 	switch (tuplehash->tuple.xmit_type) {
+diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+index 7a34ef468975..08ad07500e8a 100755
+--- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
++++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+@@ -592,7 +592,7 @@ ip -net "$nsr1" link set tun0 up
+ ip -net "$nsr1" addr add 192.168.100.1/24 dev tun0
+ ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
+ 
+-ip -net "$nsr1" link add name tun6 type ip6tnl local fee1:2::1 remote fee1:2::2
++ip -net "$nsr1" link add name tun6 type ip6tnl local fee1:2::1 remote fee1:2::2 encaplimit none
+ ip -net "$nsr1" link set tun6 up
+ ip -net "$nsr1" addr add fee1:3::1/64 dev tun6 nodad
+ 
+@@ -601,7 +601,7 @@ ip -net "$nsr2" link set tun0 up
+ ip -net "$nsr2" addr add 192.168.100.2/24 dev tun0
+ ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0.forwarding=1 > /dev/null
+ 
+-ip -net "$nsr2" link add name tun6 type ip6tnl local fee1:2::2 remote fee1:2::1 || ret=1
++ip -net "$nsr2" link add name tun6 type ip6tnl local fee1:2::2 remote fee1:2::1 encaplimit none || ret=1
+ ip -net "$nsr2" link set tun6 up
+ ip -net "$nsr2" addr add fee1:3::2/64 dev tun6 nodad
+ 
+@@ -651,7 +651,7 @@ ip -net "$nsr1" route change default via 192.168.200.2
+ ip netns exec "$nsr1" sysctl net.ipv4.conf.tun0/10.forwarding=1 > /dev/null
+ ip netns exec "$nsr1" nft -a insert rule inet filter forward 'meta oif tun0.10 accept'
+ 
+-ip -net "$nsr1" link add name tun6.10 type ip6tnl local fee1:4::1 remote fee1:4::2
++ip -net "$nsr1" link add name tun6.10 type ip6tnl local fee1:4::1 remote fee1:4::2 encaplimit none
+ ip -net "$nsr1" link set tun6.10 up
+ ip -net "$nsr1" addr add fee1:5::1/64 dev tun6.10 nodad
+ ip -6 -net "$nsr1" route delete default
+@@ -670,7 +670,7 @@ ip -net "$nsr2" addr add 192.168.200.2/24 dev tun0.10
+ ip -net "$nsr2" route change default via 192.168.200.1
+ ip netns exec "$nsr2" sysctl net.ipv4.conf.tun0/10.forwarding=1 > /dev/null
+ 
+-ip -net "$nsr2" link add name tun6.10 type ip6tnl local fee1:4::2 remote fee1:4::1 || ret=1
++ip -net "$nsr2" link add name tun6.10 type ip6tnl local fee1:4::2 remote fee1:4::1 encaplimit none || ret=1
+ ip -net "$nsr2" link set tun6.10 up
+ ip -net "$nsr2" addr add fee1:5::2/64 dev tun6.10 nodad
+ ip -6 -net "$nsr2" route delete default
 
-It looks like the test is no longer flaky [1], so I just unignored it on
-NIPA.
+---
+base-commit: 1fad1796b9411217fa77b6a497ed76b999205487
+change-id: 20260608-b4-nf_flow_ip6_tunnel_proto-update-8b64903825b4
 
-[1] https://netdev.bots.linux.dev/contest.html?skip=0&test=pppol2tp-sh
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-Cheers,
-Matt
 
