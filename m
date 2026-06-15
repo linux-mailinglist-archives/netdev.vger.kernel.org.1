@@ -1,99 +1,99 @@
-Return-Path: <netdev+bounces-299469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kcg3B+AEMGp0LwUAu9opvQ
-	(envelope-from <netdev+bounces-299469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:57:52 +0200
+	id 3Xi/I9cEMGptLwUAu9opvQ
+	(envelope-from <netdev+bounces-299471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:57:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A50C0686E3C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:57:51 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E684686E33
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 15:57:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=JnKqJ564;
-	dkim=pass header.d=redhat.com header.s=google header.b=DllrCIKz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299469-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299469-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=THrEkg6c;
+	dkim=pass header.d=redhat.com header.s=google header.b=OSzjgiGh;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299471-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299471-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=redhat.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F04D0303FB74
-	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:56:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8E447300B0A9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jun 2026 13:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B6E3F4DCC;
-	Mon, 15 Jun 2026 13:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3323F4DCC;
+	Mon, 15 Jun 2026 13:56:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415A21990C7
-	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 13:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE953ECBEE
+	for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 13:56:19 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781531762; cv=none; b=EKYLeKDoveO307TlT4Ulefm8A+VES/SmlBXGHi68CoEJ6fSn+jPfITF5Ip/Ijmxnl92KGkJ5uHmk7pLTT0HgbfBbHfC4L7SFDmgxZYwjXByVvJbdKSyXtDLzirCQAVXbaxYHENqhnGD5tIZZM83DL43Oi3pTWmE4Mfl4EgZ2wVs=
+	t=1781531780; cv=none; b=onTeeh0J0bwMyJpitwP2McSAYRJjX5Zucvksa+/Rfh8t3mbXs7ERxTSnc0JtWwLtuNw4eTl5OEyJfqtzHdI8xssuV2hFNNYC4nAUxFFrGGQ4MMBskUm72tXXByttHyxyCmadZPw+92WEip9YN5z1MOPbzKJgKOipHmUmIdosFOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781531762; c=relaxed/simple;
-	bh=azPHeJ6RdZ6MYg3yN5YCdVKMCdOR3cGIJZpIxCTg1u0=;
+	s=arc-20240116; t=1781531780; c=relaxed/simple;
+	bh=x4PEUoA0DN3j5N3eH9Wsgw5xaMxOXCWOUupe3lXDsAk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c23ptFp/9CKO9Gnifirw8OqTk2dBuFpvHHlXwTsdjWt1Ysz3fLe0S4XMyHyfTLZOOzD9y+XYFgAjSXB2ltA7NpLtbyUU+TtRPmbCawHeleVm8ITtYuYXMWBbbNldaQ46DzmO6PkgNi83hfRp/8SlH10c4sc9OQx+QF5C7E1OW9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JnKqJ564; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DllrCIKz; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=Je5ypYXKiuCOPDSYwXYVt7I4Vs6y4wYkt4elqNc80pl5APPHnG+lNI0X/p84lewWXmG0K/ksY04OQf0/9qt6wQHjbJ8QDORA6w76YHumAAgDR142HIRLKq1owilubxalpH4RPpbugM1h1OepsPFOjV1vNvlGjacX6hYUPI9ajkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=THrEkg6c; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OSzjgiGh; arc=none smtp.client-ip=170.10.133.124
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781531760;
+	s=mimecast20190719; t=1781531778;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YPckBN/w9iQXsyyujFhuNAKZOopC9y7aQZ4NPid9/sA=;
-	b=JnKqJ564gx0Df2+o3vRwN31TJcQyKWINNRCN9cuy0dX6fP8YCw1rNdWg4ia5CX8xgRHKu8
-	00hpZxqnucs+vhExIQPdUM1V7/lWMgvL6g1rqOh1jO/0aH22FyqZfuTR+BamXnJ2JG1odW
-	C41xexfTiBTUOiaEag/xa/ORMRIOrtw=
+	bh=HMEiDWgl1uTHxhtX/yfV1uxzTjBC9QcJlXWombZLJFM=;
+	b=THrEkg6cFBq/Z5Uv93veeHHI5C+fcwh1pVwzB6DaZZ5VKdGeL+LhlZV8/bOR8W70CPYZVm
+	l5NnxOizzswEdv2gx5ex3XBkiUpYQiPqCv1SqIgvcg9lqkrzIItYjVoPYXOQ4+vsP78SuK
+	37xjL3y9TfrlPyiMkkZlz1asGQaY/so=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-ZjG0nHOINFiiBKbGntW4vg-1; Mon, 15 Jun 2026 09:55:58 -0400
-X-MC-Unique: ZjG0nHOINFiiBKbGntW4vg-1
-X-Mimecast-MFC-AGG-ID: ZjG0nHOINFiiBKbGntW4vg_1781531758
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-68b3e28267dso3683943a12.3
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 06:55:58 -0700 (PDT)
+ us-mta-438-CKLtZ1BZMxGxWR509SmrcQ-1; Mon, 15 Jun 2026 09:56:01 -0400
+X-MC-Unique: CKLtZ1BZMxGxWR509SmrcQ-1
+X-Mimecast-MFC-AGG-ID: CKLtZ1BZMxGxWR509SmrcQ_1781531760
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6933e58a1bbso3647672a12.3
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 06:56:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781531757; x=1782136557; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1781531760; x=1782136560; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YPckBN/w9iQXsyyujFhuNAKZOopC9y7aQZ4NPid9/sA=;
-        b=DllrCIKz4+C6GWqfdsAPxm12vPFHmLsu5gAHu+DQfnESa/FmSJ+ukAKCpw1BSTD2kT
-         UPc+FLgkkicj8lajnPOx3jTsBxRDgb1ypVFCAaoFI2yGp6bsw1RZlq0JUfI+KtH5I02/
-         QsPG9CS+gvhjsfoB+PZGcEsWBpcIK2jZZ02SBWAP34IqZkw2j3RU5nEJWQiaInvqD+EX
-         fHxns0vQD8iTFrqDItYv8e0mrYHgdqf8rcbOIPO6kTko/Enq+YMAyZs4rrjzOTewu5sg
-         9Vordw3+VGH6vb5cFxinnViqQNaOi1Uv6IObtR1aqdTsJPgMPpcPM6PcZGtiTbzTbwxI
-         PIQA==
+        bh=HMEiDWgl1uTHxhtX/yfV1uxzTjBC9QcJlXWombZLJFM=;
+        b=OSzjgiGh8x7d5CF87DTgk2dD8CvXdUYua3dYxd+BHW4EsdDjC36MxQEF0lWJfpvSs+
+         nMjZnt6TqbwoPm/CVGNv5euHyW9wEQQv25cnxkU9xD9LxYAxsxJ9LGWB/lx4sOQGmDMb
+         F3j8qT8uzoBb24XRmZRHBScOCMafc1O7KTlFqub/+tDp1soIfZ44Q2LLYF8zHMlJG8lb
+         dx7Ep+pYf6zo6FPb/UJQtsizcboKedthnpnIdbfoi8Gy73t8ezGdzBKmvUyv66oOMws0
+         eitSYcK0TIB3Ggzh+kuIq30HFlVM9UG7q1ulIV/e/RY67xZKBpYtsB6xEamCYCYSi8DM
+         qhUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781531757; x=1782136557;
+        d=1e100.net; s=20251104; t=1781531760; x=1782136560;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=YPckBN/w9iQXsyyujFhuNAKZOopC9y7aQZ4NPid9/sA=;
-        b=MatAE4t/xcm1sNTK2yYb2pRK2WyEF7VV+KCzAoiiRI6EABLeT9K2NOrVIk+b7qPEPW
-         Lwx2M/w8rF7lneUd5K4l2coda3tK0BuEVZDopbG+NwojcC9Fi27lA9J1xEaLkXbY1yHu
-         C1aoSEi67QgbUnAKaWu1GD7S6fbULGGW38Jc7D75iElebaaEM3ahUnt8FVF6TtIInTsR
-         qP/TeHL1HPOSWddFNXKCmnKWi0B9w8EYLPc/tEZnraignD5rtiBKXmBND9Awwk/HvClL
-         mfIVT0HlIDvRwylUvYbFiJDFScAjUzoO8S8fSCt/9pZbn6y9I8V1Ll6dcbzypkzYdG+A
-         Hvsg==
-X-Gm-Message-State: AOJu0Yyo3RSZOBFX1siK1Mz0G9H+mFMI4Z7qD7Dzg/IHbQ19MYA1v1XA
-	eCjC0pgFUFjXfpoKC+L/NUs46vQbhUMcf8xsc3sqVJb/6p8xj+l+Nfr5TuLZMEfcQ+BIYaiHBLE
-	wA1ZsmqYswuTvZPKjRw4QNLxKYPLUkQ/3KYrR4LiZJ7jkDVeVNcxtsTBtIQ==
-X-Gm-Gg: Acq92OHrR4AAh3BTuD+Ica57K85E6PntxUDIxy0Vw9TdXW+g6k4H6Bc2jqpc8MXdJjE
-	knfO2b32ZZy1frC4gR8bZRXZYNbq6zGGL46x/U9zd+ZE6hllOKgeqL7X8uejusTJCV9B6b9jXmz
-	vK6VEkKypOFYwP0Kns2146J9gupYDzL/D+pT6j67n35/6nN8YJmM3LDffKOusU9t539I7gef/bW
-	atpKcQAyxHVD7zdL2pEJpSUVun3bPU1vAnsJGGrqQagSjJ081/SzIIFWBDlfmEF3ZXv1WxpuhzB
-	9jjHy22J0ZQbjzEN/GUamsyFB0bZC//sBJJ4TKZKOeQPdhwt13cJARRokSKXH0qh6r8gyvvDlgA
-	YMCtwASellpCOR4nTjbu2ciz+LvO8bk5dI+xavD7Qo7IFCLdTwAxNdU2af6gWdvNtNk5Mxg==
-X-Received: by 2002:a05:6402:350c:b0:687:9c0f:5897 with SMTP id 4fb4d7f45d1cf-693c6a16992mr4050531a12.9.1781531757562;
-        Mon, 15 Jun 2026 06:55:57 -0700 (PDT)
-X-Received: by 2002:a05:6402:350c:b0:687:9c0f:5897 with SMTP id 4fb4d7f45d1cf-693c6a16992mr4050500a12.9.1781531757036;
-        Mon, 15 Jun 2026 06:55:57 -0700 (PDT)
+        bh=HMEiDWgl1uTHxhtX/yfV1uxzTjBC9QcJlXWombZLJFM=;
+        b=e198GKDadiBZZUUVGiMqaQEnSyczmZJLgldnaG1bqECfv7CKkYoFmJ1QXNREr0MiYR
+         B1QmX8ADkYvGtqgaT0kYHHIdTnMIHNCCIwGF8ggx2D25ZBdS3hqstM7NS8FuyiFOmHdo
+         OLAzC8hqQrO/lwqCj1JOcC6aV/m9KD0jojC/5fhQ32ECC6hM/gtJIhUu6BgEASYwOrdk
+         ST0Niz0fqyZz1TRgq7FFsAXA9AiDHHyqEIxGNU+ai7/AS1Ro445ELyJEKOIB54jlSDdN
+         o1PicJ4sBsxnXGvchSYG2P7Xdujzp5Ir4s28JGgsMAUHJXUPj12Lob6LofM3gBcc/hoN
+         PZgQ==
+X-Gm-Message-State: AOJu0Yy5U/kOt4uOmLr94J0alJYFMS2Jtb3C8YEddUcs1ptxZ17SEQIk
+	ociNrL4iQg2gjFJedDMt1PIjF6J3kO13cw4BkrkyhI+xeC+v80MQOJG7r21qcOjwIBVl+yWOZlx
+	qcaeDnK1m1Mo0YLtdDk+SjunF1XBAwFbSS3clyduhOdrgOjJDheHdVtn3PA==
+X-Gm-Gg: Acq92OEgM/hNgZbqKNIG+VpDiCLsMZqp2OhlAsuV0O080K4otI4IxpNh8KQ9TIEVc92
+	ydJ+tkvSKykXws55MNH+/KwGiBjbtMXT3zZ6OCehg46QU2j/ayYqMjYb8miCVHK0tNF1shTXSsF
+	jtE8v0rqTXdHorEIDJ5QLmSOAVqibJ6PyO+UChze7tx4k7IqRR6KaKBz0H0a+0b4ssw+6g5juy1
+	OA0DrvFiJ/wGLgr4iq9dtFeAtuXhrXRyQB2jmCgPK61kDjUtlp59eBBcQ/DB4CwL0Ku9s7FBTCp
+	IZx9oGLN428Jk3R7dm30lboj8QOBIlr3xFyx189JEFV7Lu37vkVhAuTpQ0bwUqEao2R0MS1FAsJ
+	0fMlK/Kvfl7nHLNWINlrMFwykHjwa18tia9hBOmrkhE0Qm6ApDb2ywC8QgseLuQ3jw5ALHA==
+X-Received: by 2002:a05:6402:434b:b0:68b:d10a:a48a with SMTP id 4fb4d7f45d1cf-693784fb02dmr6472057a12.11.1781531760084;
+        Mon, 15 Jun 2026 06:56:00 -0700 (PDT)
+X-Received: by 2002:a05:6402:434b:b0:68b:d10a:a48a with SMTP id 4fb4d7f45d1cf-693784fb02dmr6472024a12.11.1781531759609;
+        Mon, 15 Jun 2026 06:55:59 -0700 (PDT)
 Received: from [10.44.33.51] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-693ab54e6e5sm2952596a12.1.2026.06.15.06.55.56
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-693ab54e6e5sm2952596a12.1.2026.06.15.06.55.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jun 2026 06:55:56 -0700 (PDT)
+        Mon, 15 Jun 2026 06:55:59 -0700 (PDT)
 From: Eelco Chaudron <echaudro@redhat.com>
 To: Adrian Moreno <amorenoz@redhat.com>
 Cc: netdev@vger.kernel.org, aconole@redhat.com, pabeni@redhat.com,
@@ -102,14 +102,14 @@ Cc: netdev@vger.kernel.org, aconole@redhat.com, pabeni@redhat.com,
  Simon Horman <horms@kernel.org>,
  "open list:OPENVSWITCH" <dev@openvswitch.org>,
  open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 2/4] net: openvswitch: add per-flow_table
- lockdep checks
-Date: Mon, 15 Jun 2026 15:55:55 +0200
+Subject: Re: [PATCH net-next v4 3/4] net: openvswitch: decouple flow_table
+ from ovs_mutex
+Date: Mon, 15 Jun 2026 15:55:58 +0200
 X-Mailer: MailMate (2.0r6292)
-Message-ID: <FE904B6B-A82F-4657-A323-2EDB59FA0979@redhat.com>
-In-Reply-To: <20260611045817.1302665-3-amorenoz@redhat.com>
+Message-ID: <5386BD36-679E-4525-AB75-C536BD572150@redhat.com>
+In-Reply-To: <20260611045817.1302665-4-amorenoz@redhat.com>
 References: <20260611045817.1302665-1-amorenoz@redhat.com>
- <20260611045817.1302665-3-amorenoz@redhat.com>
+ <20260611045817.1302665-4-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -124,11 +124,11 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299469-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299471-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -139,7 +139,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_NEQ_ENVFROM(0.00)[echaudro@redhat.com,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
@@ -150,26 +150,42 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A50C0686E3C
+X-Rspamd-Queue-Id: 8E684686E33
 
 On 11 Jun 2026, at 6:58, Adrian Moreno wrote:
 
-> A future patch will introduce a per-flow_table mutex that will protect
-> flow operations independently. In preparation for that, this patch
-> introduces a flow_table lockdep macro, and modifies some function
-> signatures to allow lockdep assertions to run.
+> In order to protect flow operations from RTNL contention, this patch
+> decouples flow_table modifications from ovs_mutex by means of the
+> following:
 >
-> For now, the actual lockdep check logic is a no-op, but adding the
-> infrastructure helps reduce the size of the upcoming patch.
+> 1 - Create a new mutex inside the flow_table that protects it from
+> concurrent modifications.
+> Putting the mutex inside flow_table makes it easier to consume for
+> functions inside flow_table.c that do not currently take pointers to th=
+e
+> datapath.
+> Some function signatures need to be changed to accept flow_table so tha=
+t
+> lockdep checks can be performed.
+>
+> 2 - Create a reference count to temporarily extend rcu protection from
+> the datapath to the flow_table.
+> One reference is held by the datapath, the other is temporarily
+> increased during flow modifications.
 >
 > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 
 Hi Adrian,
 
-See some comments below, and maybe address the Sashiko comment in the
-commit message.
+Thanks for this patch. I did spend quite some time analyzing
+the implications of decoupling the table from ovs_mutex, and
+I think all the concerns I had are covered. I did not do any
+extensive traffic-based testing, but if time allows I will do
+so with your next revision.
+
+Find some comments below.
 
 Cheers,
 
@@ -177,64 +193,110 @@ Eelco
 
 [...]
 
-> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-> index e78c28dd5d9d..72ad3ed12675 100644
-> --- a/net/openvswitch/datapath.c
-> +++ b/net/openvswitch/datapath.c
-> @@ -840,15 +840,16 @@ static size_t ovs_flow_cmd_msg_size(const struct =
-sw_flow_actions *acts,
->  		+ nla_total_size_64bit(8); /* OVS_FLOW_ATTR_USED */
->  }
+
+> @@ -1678,8 +1722,12 @@ static int ovs_dp_cmd_fill_info(struct datapath =
+*dp, struct sk_buff *skb,
+>  	if (nla_put_u32(skb, OVS_DP_ATTR_USER_FEATURES, dp->user_features))
+>  		goto nla_put_failure;
 >
-> -/* Called with ovs_mutex or RCU read lock. */
-> +/* Called with table->lock or RCU read lock. */
->  static int ovs_flow_cmd_fill_stats(const struct sw_flow *flow,
-> +				   const struct flow_table *table,
+> -	if (nla_put_u32(skb, OVS_DP_ATTR_MASKS_CACHE_SIZE,
+> -			ovs_flow_tbl_masks_cache_size(table)))
+> +	rcu_read_lock();
+> +	table =3D rcu_dereference(dp->table);
+> +	err =3D table ? nla_put_u32(skb, OVS_DP_ATTR_MASKS_CACHE_SIZE,
+> +				  ovs_flow_tbl_masks_cache_size(table)) : 0;
+> +	rcu_read_unlock();
+> +	if (err)
+>  		goto nla_put_failure;
+>
+>  	if (dp->user_features & OVS_DP_F_DISPATCH_UPCALL_PER_CPU && pids) {
+> @@ -1817,7 +1865,9 @@ static int ovs_dp_change(struct datapath *dp, str=
+uct nlattr *a[])
+>  			return -ENODEV;
+>
+>  		cache_size =3D nla_get_u32(a[OVS_DP_ATTR_MASKS_CACHE_SIZE]);
+> +		mutex_lock(&table->lock);
+>  		err =3D ovs_flow_tbl_masks_cache_resize(table, cache_size);
+> +		mutex_unlock(&table->lock);
 
-Should 'table' come before 'flow' to be consistent with
-ovs_flow_tbl_insert() and ovs_flow_tbl_remove()? This applies
-to all functions in this patch adding the 'table' parameter.
+The locking schema in flow_table.h does not document that
+ovs_mutex-held writers may skip the refcount steps. Should
+this either be documented as an exception, or should the
+full 7-step protocol be followed here for consistency?
 
->  				   struct sk_buff *skb)
->  {
->  	struct ovs_flow_stats stats;
->  	__be16 tcp_flags;
->  	unsigned long used;
+>  		if (err)
+>  			return err;
+>  	}
 
 [...]
 
-> diff --git a/net/openvswitch/flow_table.h b/net/openvswitch/flow_table.=
-h
-> index 6211bcc72655..3e5e9845c28a 100644
-> --- a/net/openvswitch/flow_table.h
-> +++ b/net/openvswitch/flow_table.h
-> @@ -72,6 +72,22 @@ struct flow_table {
+> @@ -2656,9 +2701,12 @@ static void ovs_dp_masks_rebalance(struct work_s=
+truct *work)
+>  	ovs_lock();
+>  	list_for_each_entry(dp, &ovs_net->dps, list_node) {
+>  		table =3D ovsl_dereference(dp->table);
+> -		if (!table)
+> +		if (!table || !ovs_flow_tbl_get(table))
+>  			continue;
+> +		mutex_lock(&table->lock);
+>  		ovs_flow_masks_rebalance(table);
+> +		mutex_unlock(&table->lock);
+
+Same question as above, but here the RCU steps are skipped
+instead of the refcount steps.
+
+> +		ovs_flow_tbl_put(table);
+>  	}
+>  	ovs_unlock();
 >
->  extern struct kmem_cache *flow_stats_cache;
 >
-> +static inline int lockdep_ovs_tbl_is_held(const struct flow_table *tab=
-le
-> +					  __always_unused)
+
+[...]
+
+> @@ -513,7 +528,7 @@ static void table_instance_destroy(struct table_ins=
+tance *ti,
+>  }
+>
+>  /* No need for locking this function is called from RCU callback. */
+> -void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
+> +static void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu)
+>  {
+>  	struct flow_table *table =3D container_of(rcu, struct flow_table, rcu=
+);
+>
+> @@ -525,9 +540,22 @@ void ovs_flow_tbl_destroy_rcu(struct rcu_head *rcu=
+)
+>  	call_rcu(&mc->rcu, mask_cache_rcu_cb);
+>  	call_rcu(&ma->rcu, mask_array_rcu_cb);
+>  	table_instance_destroy(ti, ufid_ti);
+> +	mutex_destroy(&table->lock);
+>  	kfree(table);
+>  }
+>
+> +void ovs_flow_tbl_put(struct flow_table *table)
 > +{
-> +	return 1;
+> +	if (refcount_dec_and_test(&table->refcnt)) {
+
+Do we need a comment explaining why the 7-step protocol is not
+followed here? Something like:
+
+    /* Last reference dropped, no concurrent writers possible.
+	 * Lock is only needed for lockdep assertions below.
+	 */
+
+> +		mutex_lock(&table->lock);
+> +		table_instance_flow_flush(table,
+> +					  ovs_tbl_dereference(table->ti, table),
+> +					  ovs_tbl_dereference(table->ufid_ti, table));
+> +		mutex_unlock(&table->lock);
+> +		call_rcu(&table->rcu, ovs_flow_tbl_destroy_rcu);
+> +	}
 > +}
 > +
-> +#define ASSERT_OVS_TBL(tbl)   WARN_ON(!lockdep_ovs_tbl_is_held(tbl))
-> +
-> +/* Lock-protected update-allowed dereferences.*/
-> +#define ovs_tbl_dereference(p, tbl)	\
-> +	rcu_dereference_protected(p, lockdep_ovs_tbl_is_held(tbl))
-> +
-> +/* Read dereferences can be protected by either RCU, table lock. */
+>  struct sw_flow *ovs_flow_tbl_dump_next(struct table_instance *ti,
+>  				       u32 *bucket, u32 *last)
+>  {
 
-nit; This comment reads odd, maybe;
-
-/* Read dereferences can be protected by either RCU or table lock. */
-
-> +#define rcu_dereference_ovs_tbl(p, tbl) \
-> +	rcu_dereference_check(p, lockdep_ovs_tbl_is_held(tbl))
-> +
->  int ovs_flow_init(void);
->  void ovs_flow_exit(void);
+[...]
 
 
