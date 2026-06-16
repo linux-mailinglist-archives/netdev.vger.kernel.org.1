@@ -1,205 +1,157 @@
-Return-Path: <netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299799-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JfjBN+QcMWoobwUAu9opvQ
-	(envelope-from <netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:52:36 +0200
+	id FyXYE+EhMWoTcQUAu9opvQ
+	(envelope-from <netdev+bounces-299799-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:13:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C46968DBA4
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:52:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6FD68E0EC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:13:52 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=nbLNPnAo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Lawd5phv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299799-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299799-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD99E3117B53
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:49:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A3141302A399
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46CD421EF5;
-	Tue, 16 Jun 2026 09:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2993A436379;
+	Tue, 16 Jun 2026 10:10:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741323B5846;
-	Tue, 16 Jun 2026 09:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D076F43636F
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 10:10:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781603348; cv=none; b=abNt9fydkX3mrt6yYLEJR1x6vplM9mHh8Av1wfEYCXF8V7gDZcidmfsLKYTknfCW9SlQ8ZoSemXRqJilb4DLEdOmyx+2C8QrO6s2+0O9lzEugCqf2kKTuO1kJcVFBm1q0HGdomY2Q2zfriFbvGTVC5a+IYjemaE9vu7SNt+2qAw=
+	t=1781604617; cv=none; b=DPpojuJCX2eHxoPys+pMXuch0DSZXluk/ir9hvbZRde595Z4tWB8elc68fOaYLT/UPNN/qTdFidpwDjEB6vfT1N9cBhweB9fjiwicT6ENFb/IQTuaBzzBk+tw4M7fgv4LCuw61dU19MJ11Q2mtiakGXLD8XxPWN/ZJQr3A3sQG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781603348; c=relaxed/simple;
-	bh=jiLEocxNQBK6GjMpzXPf7ZOCUOSYAPAZ38ELX1lscIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o30p7rSRpQ56ZjJBHihA1IwtZPs+FnrabTRmD0O/occtMRORzILny7r6UKYFtowXt4B7gGrH7sh3IDWAkNrshnwS/c9RDadP5nQ5HHYmoIOruK9Z7TcAivR7am5xFkPFUYMOiRdCZjVKY/Zfq1qeabk3Dq2ejTl5nvweQDTs+1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nbLNPnAo; arc=none smtp.client-ip=198.175.65.14
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781603348; x=1813139348;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jiLEocxNQBK6GjMpzXPf7ZOCUOSYAPAZ38ELX1lscIw=;
-  b=nbLNPnAob3BkNkA47PDUnSjfnra8Igumnyc2w9WR4aY+GGU9VlF5QkJT
-   MOeHYrl/s0B5N8itYeOo9wvSRkih5hPZm01Mb4IiGDrDpppQDUEKgzGyy
-   FooBq+TB9EEW0ywxQPAimj/CXwIHU4t98dxlMMPxeYMuiXzR/mcv5Knik
-   V39ieRR6EQfEqc1fSuk5RT7Jsau7XnDd9dJ9kHoPhe04po1GKrByX44Lc
-   NxkowA8uumhG/W5AMlxjaaQfe7KId2syd4QsZssaBapvFT3SosLyfOlpz
-   /84+mwI3NMacH9s8QP1H7Z7ITUcWo7viMpA7vz65SYgys4QK4K0S9UTHH
-   A==;
-X-CSE-ConnectionGUID: AxNcf0vpQDuQS6mkZwzzWQ==
-X-CSE-MsgGUID: gGZawzcvT0WqqXJVH/xvNA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11818"; a="86265553"
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="86265553"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 02:49:07 -0700
-X-CSE-ConnectionGUID: XVg//dqXQqi8918oDLukJQ==
-X-CSE-MsgGUID: EE0dTLFuQNKgd0mpuJkkDg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="246843978"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa010.jf.intel.com with ESMTP; 16 Jun 2026 02:49:03 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id 6626895; Tue, 16 Jun 2026 11:49:02 +0200 (CEST)
-Date: Tue, 16 Jun 2026 11:49:02 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Lee Jones <lee@kernel.org>,
-	Mark Brown <broonie@opensource.wolfsonmicro.com>,
-	Thierry Reding <thierry.reding@avionic-design.de>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srini@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Peter Chen <peter.chen@kernel.org>,
-	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
-	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
-	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Subject: Re: [PATCH 07/23] driver core: platform: provide
- platform_device_set_fwnode()
-Message-ID: <ajEcDq0S067wMFaK@black.igk.intel.com>
-References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
- <20260521-pdev-fwnode-ref-v1-7-88c324a1b8d2@oss.qualcomm.com>
- <ah9OIVyrHEhcMHzN@ashevche-desk.local>
- <CAMRc=McLN9Ovoqo3om-3uC=q+=rcKCoiWMctC=yvwiaHacU0PQ@mail.gmail.com>
+	s=arc-20240116; t=1781604617; c=relaxed/simple;
+	bh=uzXYv5SaMaQDxMG6VgWPySzJIVbasUl5XEm2P8yHpGQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=U28i5xBK+thq+KWFi+8nm3gqjur9jOAfkigAj/fYFNpZsT8pBrEdiTHLaGTU5orzXi8aKgl7O9cP6fNCgn0zqlSTalJ/BCeDlUveRHWvvKy9IpKDTnBT4SqVY+yRERNxpYbxNYFliolXlnGM10m/4hDXtzU6p3wNIZSuKctkCp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lawd5phv; arc=none smtp.client-ip=209.85.210.172
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-842848fd613so3794758b3a.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 03:10:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781604615; x=1782209415; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rgXck3qhvoJPxsaGkk1pMrxcKj77tOWzD/6bHjBzG1I=;
+        b=Lawd5phvUBOUpFePSkG6DFAMetQgCPnSpla+UOAoX5G4/M5TbNF+7gw+2gIQ3aWXRd
+         eW/4UmBRXJuuwzK1C/MbHHyLMzY211hetqaKtY8uYLxzXfmiO/juBTHFhkZaSXPigW8Z
+         vqz9EE/nGCw2Gru6qNSkJ1/v6ym/gjvEBML8hCYvKMue0IL13Yy2rCs/a7GrzQ5sYV7b
+         i68tUqqPYq9yPv2l43J1yqBeef1wLXYWG5aLI8W8TUK90KK5ApaghWIJiNaFyZGetGMd
+         +Sla7car0KFqxIPPV1x763CFKCEspYF/eVeMmW+at7Fqg4v7JlbYTbs24ym2lUbZopAc
+         ZHng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781604615; x=1782209415;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rgXck3qhvoJPxsaGkk1pMrxcKj77tOWzD/6bHjBzG1I=;
+        b=aXtaqeL49s3KHagafRjG9Kkslps/HhUDv8N2op1nrqQDB5/jtv86+mk6DLPLJ34nzp
+         xKN9EVcpMK4VCxURYG/1pN1kjWh928c9Fx6rldhFRy9kGINRsmMuOZmetaFKq1cmgr4c
+         PSvLvXTU3YjK556Wcjerrppx/cx5XjZnigsuRuZFX8KPu2Yz94v2mNbEFJrGGjGritzj
+         zjlb3Dtnq913tDyAadVFJt2dJlH/rOFhFXTotmJkium6yKpxOnJrFxq/pWrvAeYIEgwZ
+         AGDWXW+sqf2rdNGQjlRqLD1qL3xnstdwG/4YmFNwAODRZUryeCggiw9XNtEuhfPTC14V
+         yi4A==
+X-Gm-Message-State: AOJu0YxcfaktD7o3BPG4PPv0bt1qG5rAo7A772meWSL9ho30hH5/n9fS
+	DljpvD2/DE9HilGBfiEIWNv0XLc/YjVbDJIvDLN/5GB61KyJ5a2qeBUhbmpUruK/iBFb+Q==
+X-Gm-Gg: Acq92OFyOsoLy2MaeUrxuHTcHoSAlCHRF/qTmrGfrlnTv9/+omckdjSRTjGpEMcg8hE
+	qIW20FDwA+B+vFRn/TJmylUHxplJlXLeEXCvgSKFBkphOYzu2vLCbk2kA0qPpyrv/VCt1YKBnTM
+	PPwW7+gKL18UPQUON3mMFp+2R5O26fIvpZ6FE207FHKjAJD204KwXwgDEsxbT87sWzMtHShNAAf
+	AVGEg0B2cRK3NswBoSRaYGqGT/XKTfN8KqdZaUW/i5XkSDejIKhSDuzFgAD/z6OM7IpumrpQH76
+	XIEfr9Rl3VVAtHIO5VUetgJA3BH3CqTdTsVAL9Z6f4HgRZYHS607J+jqKzimTH83I9dHJE2IOIi
+	M8sGbcvTQ2y0k42w6rPM8w0l7pckRoFWgQfJxEFv/VVcXZyq53cPiW1DoLdsuFG+Zb/OXDE2+dl
+	/mimeHlT0v777wfqHJ
+X-Received: by 2002:a05:6a00:1151:b0:842:6fac:bd3 with SMTP id d2e1a72fcca58-84515556183mr2848320b3a.28.1781604615062;
+        Tue, 16 Jun 2026 03:10:15 -0700 (PDT)
+Received: from [127.0.1.1] ([47.253.114.73])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434ad03fdcsm12396943b3a.24.2026.06.16.03.10.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 03:10:14 -0700 (PDT)
+From: Wayen Yan <win847@gmail.com>
+To: netdev@vger.kernel.org
+Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: [PATCH] net: airoha: fix foe_check_time allocation size
+Date: Tue, 16 Jun 2026 17:49:03 +0800
+Message-ID: <178160461057.2154221.15886112443159132305@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRc=McLN9Ovoqo3om-3uC=q+=rcKCoiWMctC=yvwiaHacU0PQ@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299793-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299799-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	HAS_ORG_HEADER(0.00)[];
-	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com];
-	FORGED_RECIPIENTS(0.00)[m:brgl@kernel.org,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:
- luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_GT_50(0.00)[65];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[black.igk.intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.intel.com:from_mime]
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[win847@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3C46968DBA4
+X-Rspamd-Queue-Id: DD6FD68E0EC
 
-On Thu, Jun 04, 2026 at 05:32:27AM -0700, Bartosz Golaszewski wrote:
-> On Tue, 2 Jun 2026 23:41:53 +0200, Andy Shevchenko
-> <andriy.shevchenko@linux.intel.com> said:
-> > On Thu, May 21, 2026 at 10:36:30AM +0200, Bartosz Golaszewski wrote:
-> >> Provide a helper function encapsulating the logic of assigning firmware
-> >> nodes to platform devices created with platform_device_alloc(). Make the
-> >> kerneldoc state that this is the proper interface for assigning firmware
-> >> nodes to dynamically allocated platform devices. This will allow us to
-> >> switch to counting the references of the device's firmware nodes in the
-> >> future, not only the OF nodes.
-> >
-> > But why different for of_node and fwnode to begin with?!
-> 
-> I'm not following. What are you suggesting?
+foe_check_time is declared as u16 pointer but was allocated with
+only ppe_num_entries bytes instead of ppe_num_entries * sizeof(u16).
 
-After re-reading of this thread, I think I'm suggesting the same what you have
-in plans to do in the future as you put it as "This will allow us to switch to
-counting the references of the device's firmware nodes in the future, not only
-the OF nodes."
+When airoha_ppe_foe_verify_entry() is called with hash >= ppe_num_entries/2,
+it writes beyond the allocated buffer, causing heap buffer overflow and
+potential kernel crash.
 
-// Offtopic
-I haven't heard from you for more than a month on this:
-https://lore.kernel.org/r/af18zdP5HF3_P9Vo@black.igk.intel.com
-Anything should I do? Please, answer to that thread.
+Signed-off-by: Wayen Yan <win847@gmail.com>
+---
+ drivers/net/ethernet/airoha/airoha_ppe.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 5c9dff6bcc..8fb8ecf909 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -1578,7 +1578,8 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 			return -ENOMEM;
+ 	}
+ 
+-	ppe->foe_check_time = devm_kzalloc(eth->dev, ppe_num_entries,
++	ppe->foe_check_time = devm_kzalloc(eth->dev,
++					   ppe_num_entries * sizeof(*ppe->foe_check_time),
+ 					   GFP_KERNEL);
+ 	if (!ppe->foe_check_time)
+ 		return -ENOMEM;
 -- 
-With Best Regards,
-Andy Shevchenko
+2.51.0
 
 
 
