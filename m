@@ -1,201 +1,531 @@
-Return-Path: <netdev+bounces-299848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299851-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 9rXSH3NNMWpNgQUAu9opvQ
-	(envelope-from <netdev+bounces-299848-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:19:47 +0200
+	id JZjsGrFQMWo2ggUAu9opvQ
+	(envelope-from <netdev+bounces-299851-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:33:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D411968FDA8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:19:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49A1A68FF5F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:33:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.com header.s=google header.b=LiN0zueT;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299848-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299848-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=suse.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=zte.com.cn (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299851-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299851-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9FB5D3028F23
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:19:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80076303AF3B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED726286405;
-	Tue, 16 Jun 2026 13:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7402BE057;
+	Tue, 16 Jun 2026 13:31:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732ED315D21
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 13:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A2D2BE026;
+	Tue, 16 Jun 2026 13:31:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781615984; cv=none; b=FrHp17cRRxTAgblKwo/k8A43ZfnYFox+rcniAoB72WFLCdKDNiV3gapw0J8jZNvPXeANmMmJVDdjmlrKrPPPeecFelhqwdKe5skm0xt+F522YAmVzCqnv6hKqYV489Br1pc/X751hamCRXX5CsmOy9ZWll8IfO5cxYJ7UvfFtrk=
+	t=1781616686; cv=none; b=t/QJW8fajnyU4AL6Ng8YxbjVZWDSaTAtZVPbS1pmbwHYq2MY+PF0BoSjbv1oULKOjKLguymfhlcy3SegsI3/mY6S0/1HkIncZ7m5daIZQ39yoCZdaiIu/jcVt0OuuFW1QwH9htyKF+TXqC+JbNggZX1g1yLtN9RXuFf3VAPBsxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781615984; c=relaxed/simple;
-	bh=AhKOFstzmwRxmO+erMePpCNXjN1gNPFj6YHwzy7Y3L4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OBj08mHpefmEc7AiYLu6fI3w9sJQklPv2/FuEAtFdkxy8sHjCxrPV5m1eQV2dys9FqY0qWDxLz06CQy5R4PUvvxk6k/q6vbCy1q6hQgjaWsC+E5w02UTJwoU2MLTw1UYztbTNrX4oPIw8+ynO813bMBhfbRW0Eq9oy3KJbHtHls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LiN0zueT; arc=none smtp.client-ip=209.85.128.44
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-491b390f9e9so38283405e9.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 06:19:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1781615982; x=1782220782; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJJvLQcsXRqIV9bKinu30GBt9W6FiGqkHOghRxLofTY=;
-        b=LiN0zueTap4Veuv4+EJpH6HcLW311xLCRR35/13WpattskW9YoausFMO5Cu0hO8jDF
-         3sGB9Y4n1OdidGceesV0Tdk7F6QOXVMTxqoyaowwJHDYSIlibtT4cXpePd1O19uc04Hq
-         gsbSerTq7oZNi4d073gwRfsKbB4h0HSmptuChzyw1qUYFL+uMavbT6aWv5rfmNk8pkSr
-         84khEpj0ROqRdJHtLrALglTBEU+jNkwXHHsizsFbpXpRqU/sesXHi2bocPiHmofi0zwc
-         gojucWIx/wjOpaQdjOB//mXxcnDlxnwYFr0k8i941nzw46HtnKjoPhrEUSHpH0x2p/0q
-         ILqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781615982; x=1782220782;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aJJvLQcsXRqIV9bKinu30GBt9W6FiGqkHOghRxLofTY=;
-        b=C5wbaFtRcEF7V84DSrtt+rBWBVebINRBbJVTr0AYz5u1QFNJ1tgZova59O+W8Ekvfg
-         Z2KHqyJX7ZEXWE/siBJsIbPuAJ6mM2UJ8rHADmg+RKKHh9Qf3Wu5hmVD8tAtHqoF7f9p
-         ksjni33xnJ/U4PNSHS8SdR2Kno6J23T9BLya99P4+Qstgj7ueHadhrcAR+MHHf7hRyu3
-         o/cGkGqT3pZsAIaCI/aprJr7ZuH+FzK1qfaUfT4YfAKVIopLDC6di4Y4Wj3IUSUB9R50
-         3Y8LnYPrws+WBZZuhxJhNL9bIbmkmwOdd8MCsAN7Jx1K7DLY+aHIJM3l8VLT6lQHznQB
-         JLmg==
-X-Gm-Message-State: AOJu0YzS3jr6TEWfPVA8GZx1zHHeo+B5VLk5eLAG/Xmj0fCRv26CAMDE
-	H6gWY2GEAtZU2ibGA9jXUmFJLc9BSaj4N8K6oy9JgXwzuZy1KmQnbsm6pEGz6NQMeW0L8a899wF
-	tt0C1BZY=
-X-Gm-Gg: Acq92OEkSjkuFw6hJKZOuarzDse2VraRkfdHxj39SeiakK7XA0t13aXfZ37u6bOPprv
-	/jP+MTXipvt1FYxrYnJ4YC6qNdmEcIStm6lHvsdV7BIgoeq1puob7CDNZ7SJ1gu0ZcAcPkPSZuo
-	Psy6e52u7tXamjAmVP5Bew9amiv5cmbtKvj/iK0raF9yOAu3c/IaIFdoJopS44oJPKgv0h+3Myg
-	kiNS1VHIhv39fFFLAe5GpnaJ3tUbO0HvLMOeOAXcyPmDzu1hXPZgFkIOw+TEJM5Qk6GxqBg0hvv
-	NdPXxaIAmGeZLDA9A/lf75LXrmmd6GeqSKFVXGr7cP8Xv0BgvqQDqdqaGl8V9a24/Z8Q0hnU0F3
-	l4iTsajwgoQ76tMpNcumlmykN9EsPGNO1lI1ZlO9DMxE8YWaZD9TpVBj9UQ/OZsG0Flk3w+WyD1
-	MdU8BJyNOMG1VcNMqd7931
-X-Received: by 2002:a05:600c:6812:b0:490:adb6:793d with SMTP id 5b1f17b1804b1-4922ffb7525mr56959135e9.26.1781615981714;
-        Tue, 16 Jun 2026 06:19:41 -0700 (PDT)
-Received: from localhost ([195.94.146.6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa96f0esm83714245e9.12.2026.06.16.06.19.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 06:19:41 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-To: netdev@vger.kernel.org,
-	Theo Lebrun <theo.lebrun@bootlin.com>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org,
-	Nicolai Buchwitz <nb@tipi-net.de>
-Cc: Lukasz Raczylo <lukasz@raczylo.com>,
-	Steffen Jaeckel <sjaeckel@suse.de>
-Subject: [PATCH v2] net: macb: add TX stall timeout callback to recover from lost TSTART write
-Date: Tue, 16 Jun 2026 15:23:03 +0200
-Message-ID: <468f480454a314303bac6a54780b153f689f2267.1781598350.git.andrea.porta@suse.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1781616686; c=relaxed/simple;
+	bh=FkD3aclKQOEI3lz7lfXFpiz0i3/O2auAYh7ArU1GHKU=;
+	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=qgaGri5bU6ekcJtYnvkKeJMfW551TjV5a4VFJmU83+gfCEPswSGw9sb8fe17m4f4tG4so1SNefadOCFdBhQnsiN5kOzyGzf+pxxil6gQLom0DepvkfZB1Rn2+jV9/GazTVZSqkTiYky16ezToOTSkpCqkXWfk/Qg0ZPRqYHRwEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4gfnv72l8Yz8Xrrn;
+	Tue, 16 Jun 2026 21:31:15 +0800 (CST)
+Received: from njy2app04.zte.com.cn ([10.40.12.64])
+	by mse-fl1.zte.com.cn with SMTP id 65GDUsvQ024029;
+	Tue, 16 Jun 2026 21:30:54 +0800 (+08)
+	(envelope-from han.junyang@zte.com.cn)
+Received: from mapi (njy2app02[null])
+	by mapi (Zmail) with MAPI id mid204;
+	Tue, 16 Jun 2026 21:30:57 +0800 (CST)
+X-Zmail-TransId: 2afa6a315011c1e-6a245
+X-Mailer: Zmail v1.0
+Message-ID: <20260616213057452I2KLm3mVgWYl_SUTy_YYS@zte.com.cn>
+In-Reply-To: <20260616212106742_trNLb7r-FL04eDlJO8tT@zte.com.cn>
+References: 20260616212106742_trNLb7r-FL04eDlJO8tT@zte.com.cn
+Date: Tue, 16 Jun 2026 21:30:57 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+From: <han.junyang@zte.com.cn>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <han.junyang@zte.com.cn>, <ran.ming@zte.com.cn>,
+        <han.chengfei@zte.com.cn>, <zhang.yanze@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY2IDEvMl0gZGluZ2hhaTogYWRkIFpURSBuZXR3b3JrIGRyaXZlciBzdXBwb3J0?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 65GDUsvQ024029
+X-TLS: YES
+X-ENVELOPE-SENDER: han.junyang@zte.com.cn
+X-SOURCE-IP: 10.5.228.132 unknown Tue, 16 Jun 2026 21:31:15 +0800
+X-CLEAN: YES
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6A315023.004/4gfnv72l8Yz8Xrrn
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.14 / 15.00];
+	SUBJ_EXCESS_BASE64(1.50)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299848-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:theo.lebrun@bootlin.com,m:andrea.porta@suse.com,m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-rpi-kernel@lists.infradead.org,m:nb@tipi-net.de,m:lukasz@raczylo.com,m:sjaeckel@suse.de,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299851-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[han.junyang@zte.com.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:han.junyang@zte.com.cn,m:ran.ming@zte.com.cn,m:han.chengfei@zte.com.cn,m:zhang.yanze@zte.com.cn,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrea.porta@suse.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.porta@suse.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email,suse.com:mid,suse.com:from_mime,suse.de:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,raczylo.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D411968FDA8
+X-Rspamd-Queue-Id: 49A1A68FF5F
 
-From: Lukasz Raczylo <lukasz@raczylo.com>
+From: Junyang Han <han.junyang@zte.com.cn>
 
-The MACB found in the Raspberry Pi RP1 suffers from sporadic stalls on
-the TX queue.
-While the exact root cause is not yet fully understood, it is likely
-related to a hardware issue where a TSTART write to the NCR register
-is missed, preventing the transmission from being kicked off.
+Add basic framework for ZTE DingHai ethernet PF driver, including
+Kconfig/Makefile build support and PCIe device probe/remove skeleton.
 
-Implement a timeout callback to handle TX queue stalls, triggering the
-existing restart mechanism to recover.
-
-Link: https://lore.kernel.org/all/20260514215459.36109-1-lukasz@raczylo.com/
-Fixes: dc110d1b23564 ("net: cadence: macb: Add support for Raspberry Pi RP1 ethernet controller")
-Signed-off-by: Lukasz Raczylo <lukasz@raczylo.com>
-Co-developed-by: Steffen Jaeckel <sjaeckel@suse.de>
-Signed-off-by: Steffen Jaeckel <sjaeckel@suse.de>
-Co-developed-by: Andrea della Porta <andrea.porta@suse.com>
-Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+Signed-off-by: Junyang Han <han.junyang@zte.com.cn>
 ---
+ MAINTAINERS                               |   6 +
+ drivers/net/ethernet/Kconfig              |   1 +
+ drivers/net/ethernet/Makefile             |   1 +
+ drivers/net/ethernet/zte/Kconfig          |  20 +++
+ drivers/net/ethernet/zte/Makefile         |   6 +
+ drivers/net/ethernet/zte/dinghai/Kconfig  |  34 ++++
+ drivers/net/ethernet/zte/dinghai/Makefile |  10 ++
+ drivers/net/ethernet/zte/dinghai/en_pf.c  | 183 ++++++++++++++++++++++
+ drivers/net/ethernet/zte/dinghai/en_pf.h  |  65 ++++++++
+ 9 files changed, 326 insertions(+)
+ create mode 100644 drivers/net/ethernet/zte/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Kconfig
+ create mode 100644 drivers/net/ethernet/zte/dinghai/Makefile
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.c
+ create mode 100644 drivers/net/ethernet/zte/dinghai/en_pf.h
 
-CHANGES IN v2:
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2fb1c75afd16..73692b09bf7b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -29440,6 +29440,12 @@ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git
+ F:	sound/hda/codecs/senarytech.c
 
-- dropped the rate-limited log message
-- avoid incrementing tx_error as this is per packet
-
----
- drivers/net/ethernet/cadence/macb_main.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index a12aa21244e83..fd282a1700fb9 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -4522,6 +4522,13 @@ static int macb_setup_tc(struct net_device *dev, enum tc_setup_type type,
- 	}
- }
- 
-+static void macb_tx_timeout(struct net_device *dev, unsigned int q)
-+{
-+	struct macb *bp = netdev_priv(dev);
++ZTE DINGHAI ETHERNET DRIVER
++M:	Junyang Han <han.junyang@zte.com.cn>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/zte/
 +
-+	macb_tx_restart(&bp->queues[q]);
+ THE REST
+ M:	Linus Torvalds <torvalds@linux-foundation.org>
+ L:	linux-kernel@vger.kernel.org
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index b8f70e2a1763..c2b6996b0cfe 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -188,5 +188,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
+ source "drivers/net/ethernet/wiznet/Kconfig"
+ source "drivers/net/ethernet/xilinx/Kconfig"
+ source "drivers/net/ethernet/xircom/Kconfig"
++source "drivers/net/ethernet/zte/Kconfig"
+
+ endif # ETHERNET
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 57344fec6ce0..a34bcbd4df4e 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -104,3 +104,4 @@ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
+ obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
+ obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
+ obj-$(CONFIG_OA_TC6) += oa_tc6.o
++obj-$(CONFIG_NET_VENDOR_ZTE) += zte/
+diff --git a/drivers/net/ethernet/zte/Kconfig b/drivers/net/ethernet/zte/Kconfig
+new file mode 100644
+index 000000000000..b95c2fc7db77
+--- /dev/null
++++ b/drivers/net/ethernet/zte/Kconfig
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# ZTE driver configuration
++#
++
++config NET_VENDOR_ZTE
++    bool "ZTE devices"
++    default y
++    help
++      If you have a network (Ethernet) card belonging to this class, say Y.
++      Note that the answer to this question doesn't directly affect the
++      kernel: saying N will just cause the configurator to skip all
++      the questions about Zte cards. If you say Y, you will be asked
++      for your specific card in the following questions.
++
++if NET_VENDOR_ZTE
++
++source "drivers/net/ethernet/zte/dinghai/Kconfig"
++
++endif # NET_VENDOR_ZTE
+diff --git a/drivers/net/ethernet/zte/Makefile b/drivers/net/ethernet/zte/Makefile
+new file mode 100644
+index 000000000000..cd9929b61559
+--- /dev/null
++++ b/drivers/net/ethernet/zte/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for the ZTE device drivers
++#
++
++obj-$(CONFIG_DINGHAI) += dinghai/
+diff --git a/drivers/net/ethernet/zte/dinghai/Kconfig b/drivers/net/ethernet/zte/dinghai/Kconfig
+new file mode 100644
+index 000000000000..94b5bd9b3c50
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/Kconfig
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# ZTE DingHai Ethernet driver configuration
++#
++
++config DINGHAI
++    bool "ZTE DingHai Ethernet driver"
++    depends on NET_VENDOR_ZTE && PCI
++    select NET_DEVLINK
++    help
++      This driver supports ZTE DingHai Ethernet devices.
++
++      DingHai is a high-performance Ethernet controller that supports
++      multiple features including hardware offloading, SR-IOV, and
++      advanced virtualization capabilities.
++
++      If you say Y here, you can select specific driver variants below.
++
++      If unsure, say N.
++
++if DINGHAI
++
++config DINGHAI_PF
++    tristate "ZTE DingHai PF (Physical Function) driver"
++    help
++      This driver supports ZTE DingHai PCI Express Ethernet
++      adapters (PF).
++
++      To compile this driver as a module, choose M here. The module
++      will be named dinghai10e.
++
++      If unsure, say N.
++
++endif # DINGHAI
+diff --git a/drivers/net/ethernet/zte/dinghai/Makefile b/drivers/net/ethernet/zte/dinghai/Makefile
+new file mode 100644
+index 000000000000..f55a8de518be
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Makefile for ZTE DingHai Ethernet driver
++#
++
++ccflags-y += -I$(src)
++
++obj-$(CONFIG_DINGHAI_PF) += dinghai10e.o
++dinghai10e-y := en_pf.o
++
+diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.c b/drivers/net/ethernet/zte/dinghai/en_pf.c
+new file mode 100644
+index 000000000000..99f2a8af5bf4
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/en_pf.c
+@@ -0,0 +1,183 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * ZTE DingHai Ethernet driver
++ * Copyright (c) 2022-2026, ZTE Corporation.
++ */
++
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <net/devlink.h>
++#include <linux/dma-mapping.h>
++#include "en_pf.h"
++
++MODULE_AUTHOR("Junyang Han <han.junyang@zte.com.cn>");
++MODULE_DESCRIPTION("ZTE DingHai series Ethernet driver");
++MODULE_LICENSE("GPL");
++
++static const struct devlink_ops dh_pf_devlink_ops = {};
++
++static const struct pci_device_id dh_pf_pci_table[] = {
++	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_PF_DEVICE_ID), 0 },
++	{ PCI_DEVICE(ZXDH_PF_VENDOR_ID, ZXDH_VF_DEVICE_ID), 0 },
++	{ 0, }
++};
++
++MODULE_DEVICE_TABLE(pci, dh_pf_pci_table);
++
++static int dh_pf_pci_init(struct dh_core_dev *dev)
++{
++	struct zxdh_pf_device *pf_dev = dev->priv;
++	int ret;
++
++	pci_set_drvdata(dev->pdev, dev);
++
++	ret = pci_enable_device(dev->pdev);
++	if (ret) {
++		dev_err(dev->device, "pci_enable_device failed: %d\n", ret);
++		return ret;
++	}
++
++	ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(64));
++	if (ret) {
++		ret = dma_set_mask_and_coherent(dev->device, DMA_BIT_MASK(32));
++		if (ret) {
++			dev_err(dev->device, "dma_set_mask_and_coherent failed: %d\n", ret);
++			goto err_pci;
++		}
++	}
++
++	ret = pci_request_selected_regions(dev->pdev,
++					   pci_select_bars(dev->pdev, IORESOURCE_MEM),
++					   "dh-pf");
++	if (ret) {
++		dev_err(dev->device, "pci_request_selected_regions failed: %d\n", ret);
++		goto err_pci;
++	}
++
++	pci_set_master(dev->pdev);
++	ret = pci_save_state(dev->pdev);
++	if (ret) {
++		dev_err(dev->device, "pci_save_state failed: %d\n", ret);
++		goto err_pci_save_state;
++	}
++
++	pf_dev->pci_ioremap_addr[0] =
++		ioremap(pci_resource_start(dev->pdev, 0),
++			pci_resource_len(dev->pdev, 0));
++	if (!pf_dev->pci_ioremap_addr[0]) {
++		ret = -ENOMEM;
++		dev_err(dev->device, "dh pf pci ioremap failed\n");
++		goto err_pci_save_state;
++	}
++
++	return 0;
++
++err_pci_save_state:
++	pci_release_selected_regions(dev->pdev,
++				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
++err_pci:
++	pci_disable_device(dev->pdev);
++	return ret;
 +}
 +
- static const struct net_device_ops macb_netdev_ops = {
- 	.ndo_open		= macb_open,
- 	.ndo_stop		= macb_close,
-@@ -4540,6 +4547,7 @@ static const struct net_device_ops macb_netdev_ops = {
- 	.ndo_hwtstamp_set	= macb_hwtstamp_set,
- 	.ndo_hwtstamp_get	= macb_hwtstamp_get,
- 	.ndo_setup_tc		= macb_setup_tc,
-+	.ndo_tx_timeout		= macb_tx_timeout,
- };
- 
- /* Configure peripheral capabilities according to device tree
++void dh_pf_pci_close(struct dh_core_dev *dev)
++{
++	struct zxdh_pf_device *pf_dev = dev->priv;
++
++	iounmap(pf_dev->pci_ioremap_addr[0]);
++	pci_release_selected_regions(dev->pdev,
++				     pci_select_bars(dev->pdev, IORESOURCE_MEM));
++	pci_disable_device(dev->pdev);
++}
++
++static int dh_pf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct zxdh_pf_device *pf_dev;
++	struct dh_core_dev *dh_dev;
++	struct devlink *devlink;
++	int ret;
++
++	devlink = devlink_alloc(&dh_pf_devlink_ops, sizeof(struct dh_core_dev),
++				&pdev->dev);
++	if (!devlink) {
++		dev_err(&pdev->dev, "dh_pf devlink alloc failed\n");
++		return -ENOMEM;
++	}
++
++	dh_dev = devlink_priv(devlink);
++	dh_dev->device = &pdev->dev;
++	dh_dev->pdev = pdev;
++	dh_dev->devlink = devlink;
++
++	pf_dev = dh_core_alloc_priv(dh_dev, sizeof(*pf_dev));
++	if (!pf_dev) {
++		dev_err(&pdev->dev, "dh_pf_dev alloc failed\n");
++		ret = -ENOMEM;
++		goto err_pf_dev;
++	}
++
++	pf_dev->bar_chan_valid = false;
++	pf_dev->vepa = false;
++	mutex_init(&dh_dev->lock);
++	mutex_init(&pf_dev->irq_lock);
++
++	dh_dev->coredev_type = GET_COREDEV_TYPE(pdev);
++
++	ret = dh_pf_pci_init(dh_dev);
++	if (ret) {
++		dev_err(&pdev->dev, "dh_pf_pci_init failed: %d\n", ret);
++		goto err_cfg_init;
++	}
++
++	devlink_register(devlink);
++
++	return 0;
++
++err_cfg_init:
++	mutex_destroy(&pf_dev->irq_lock);
++	mutex_destroy(&dh_dev->lock);
++	dh_core_free_priv(dh_dev);
++err_pf_dev:
++	devlink_free(devlink);
++	return ret;
++}
++
++static void dh_pf_remove(struct pci_dev *pdev)
++{
++	struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
++	struct devlink *devlink = priv_to_devlink(dh_dev);
++	struct zxdh_pf_device *pf_dev = dh_dev->priv;
++
++	devlink_unregister(devlink);
++	dh_pf_pci_close(dh_dev);
++	mutex_destroy(&pf_dev->irq_lock);
++	mutex_destroy(&dh_dev->lock);
++	dh_core_free_priv(dh_dev);
++	devlink_free(devlink);
++	pci_set_drvdata(pdev, NULL);
++}
++
++static void dh_pf_shutdown(struct pci_dev *pdev)
++{
++	struct dh_core_dev *dh_dev = pci_get_drvdata(pdev);
++	struct devlink *devlink = priv_to_devlink(dh_dev);
++	struct zxdh_pf_device *pf_dev = dh_dev->priv;
++
++	devlink_unregister(devlink);
++	dh_pf_pci_close(dh_dev);
++	mutex_destroy(&pf_dev->irq_lock);
++	mutex_destroy(&dh_dev->lock);
++	dh_core_free_priv(dh_dev);
++	devlink_free(devlink);
++	pci_set_drvdata(pdev, NULL);
++}
++
++static struct pci_driver dh_pf_driver = {
++	.name = "dinghai10e",
++	.id_table = dh_pf_pci_table,
++	.probe = dh_pf_probe,
++	.remove = dh_pf_remove,
++	.shutdown = dh_pf_shutdown,
++};
++
++module_pci_driver(dh_pf_driver);
+diff --git a/drivers/net/ethernet/zte/dinghai/en_pf.h b/drivers/net/ethernet/zte/dinghai/en_pf.h
+new file mode 100644
+index 000000000000..80ff1b860b83
+--- /dev/null
++++ b/drivers/net/ethernet/zte/dinghai/en_pf.h
+@@ -0,0 +1,65 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * ZTE DingHai Ethernet driver - PF header
++ * Copyright (c) 2022-2026, ZTE Corporation.
++ */
++
++#ifndef __ZXDH_EN_PF_H__
++#define __ZXDH_EN_PF_H__
++
++#include <linux/types.h>
++#include <linux/pci.h>
++#include <linux/mutex.h>
++#include <linux/device.h>
++#include <linux/slab.h>
++
++#define ZXDH_PF_VENDOR_ID	0x1cf2
++#define ZXDH_PF_DEVICE_ID	0x8040
++#define ZXDH_VF_DEVICE_ID	0x8041
++
++enum dh_coredev_type {
++	DH_COREDEV_PF,
++	DH_COREDEV_VF,
++	DH_COREDEV_SF,
++	DH_COREDEV_MPF
++};
++
++struct devlink;
++
++struct dh_core_dev {
++	struct device *device;
++	enum dh_coredev_type coredev_type;
++	struct pci_dev *pdev;
++	struct devlink *devlink;
++	struct mutex lock; /* Protects device configuration */
++	void *priv;
++};
++
++struct zxdh_pf_device {
++	void __iomem *pci_ioremap_addr[6];
++	bool bar_chan_valid;
++	bool vepa;
++	struct mutex irq_lock; /* Protects IRQ operations */
++};
++
++static inline void *dh_core_alloc_priv(struct dh_core_dev *dh_dev,
++				       size_t size)
++{
++	void *priv = kzalloc(size, GFP_KERNEL);
++
++	if (priv)
++		dh_dev->priv = priv;
++	return priv;
++}
++
++static inline void dh_core_free_priv(struct dh_core_dev *dh_dev)
++{
++	kfree(dh_dev->priv);
++}
++
++#define GET_COREDEV_TYPE(pdev) \
++	((pdev)->device == ZXDH_VF_DEVICE_ID ? DH_COREDEV_VF : DH_COREDEV_PF)
++
++void dh_pf_pci_close(struct dh_core_dev *dev);
++
++#endif /* __ZXDH_EN_PF_H__ */
 -- 
-2.35.3
-
+2.27.0
 
