@@ -1,189 +1,352 @@
-Return-Path: <netdev+bounces-299929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299930-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id iOQ0DamLMWoHmQUAu9opvQ
-	(envelope-from <netdev+bounces-299929-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:45:13 +0200
+	id ii8lBsGNMWolmgUAu9opvQ
+	(envelope-from <netdev+bounces-299930-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:54:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1703693711
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:45:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B5FF6939C4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:54:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=A4rQfwjo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299929-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299929-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=bynar.io header.s=google header.b=CQ7+VlwR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299930-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299930-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bynar.io;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 633EC3210BBC
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:38:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EED9B3073A0C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1346947A0CD;
-	Tue, 16 Jun 2026 17:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFB3466B4B;
+	Tue, 16 Jun 2026 17:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E423A9627
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 17:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2396C3C65F2
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 17:53:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781631529; cv=none; b=svcJhbexhCnQDuufd7C0QeBSgxtlQEjj0w9NbyB6lTrH4b3dGwLRyvHLKfqxBZRjso9LxSv/KsBJzIi51xd2iFlcbdqxdy4tLUY4tSFn1ODIVpS/0LW636OjvhhaqUNbYwncMO0l3rgnPrs//ZRy8BCRzK9WfRpx9sYO9QYyBZY=
+	t=1781632437; cv=none; b=KZiAs5OfLFWfZngvOJSpl7kxSOrOIGEQWzQdNP7Ma3fQSyLQ/nBar8aCVaIDDJ8ZXf4EMXTpRVmEfEN1r6epQSpP8rfvEZQSBHWlKo17ZvbQULqajsmvln8BxVyhVdM6RMt0Z03D6D8F3XNmSpAWW513CMyuaHd2MCzxbaGCceM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781631529; c=relaxed/simple;
-	bh=KU086ZV87RJsDDdROV3/g4cXoRGVzMGND86NCTP0dbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=h9B2qgCqATph50A/FBIZcRnX0oajy7wPpa6lettB7w5UumqO6Wjhq2QtkZSzHDTzYdZeboMAHP2fOrgeoxGBrhhLMRtHwUYnr60gKZZ1YnAkKaCCvccSiVzrKCXW6Jk7IE0avj1qDSttwbpP20Syif00q8gOQ/K3h3+tqY18r1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4rQfwjo; arc=none smtp.client-ip=209.85.216.45
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-37c5b9d42efso57887a91.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 10:38:47 -0700 (PDT)
+	s=arc-20240116; t=1781632437; c=relaxed/simple;
+	bh=IaJziNKFsLJQzGfhAcpK8rTjM7nEqvGuSB/qgkC0Q7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sJOvp6LtI/jYI+oaZjcI3MjniFputp4rq31J0gBrYVWopeu4qjcmDK+IICwCV5AM1ou66Zp9VyGQIOkJwtsGWM1tDl2x3Mw2N4wG5zMC3P5jM4ObbwMTZKWkUkMQVSvVFZaBb93IyNtMVmZ7CC52cTd4MAiewZsBRD5IcyVpsq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=CQ7+VlwR; arc=none smtp.client-ip=209.85.208.172
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39664fe2dd8so39658801fa.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 10:53:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781631527; x=1782236327; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+        d=bynar.io; s=google; t=1781632434; x=1782237234; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0CAxTxP49ad2IHfcJCxB/2dsfQiiRHbXlpQIkr0ZpA=;
-        b=A4rQfwjoOTcXOq0WvATz6MX4Km6+hvyk2CIEDwtja3az2jsBHYernLitoEa7ICRCnA
-         X+SwkQg7p2EqF4+g7d4qk1fSoa7/WXKUeu6J5IJLNCovuqV+NcOSbO+KKRYar9o9VOH6
-         t9SvcT48WISr9oeWvBqn6UgIzGlfhkGTBQ/XgWx56nLwXTQozEyIqNrVhE2vPGgxFd0I
-         qelU5ZBQoREdBMHRtw5RUBkgetMMo5oC5vR6hYM2emn0YWahr7MoMSrET6poYSlDWp/4
-         d5H2FwSMwGpjIn8V4AqtTFrrGZSUsY0O7wekSVObjVO5ue9zTRvGfZpNfAfHXz6WQtjF
-         ub7Q==
+        bh=RhFJ7AeZpcOglBnZJ4DK4DqwCVwsUkIV9/uzZOBEYwA=;
+        b=CQ7+VlwRUkDqdNuXFa/XvvbFcL/ln/rNwbT+wmYdUkPLwezRyWhJuDqZAociEf02zf
+         7+Jv0IBcOAkv2kDVRAWP+v9iRS32Ch61tD7npIedOC9WAabu77tfxjBJufDvRBIBcaA2
+         QUD8TtEfPIdyabSCKrs0KLK44pS5EhK+pw8s48zrG7pGKhUPkdH+oY/5IVKNo4E5X3BR
+         t4+6338qvrTF/LrdTKAhlts3WzLf8epWh/L189gucqaBGKm8VdiBI9vg1R9mz3qxL8ee
+         2NzBXM5TtJzuN5lSJPijJrNg/3gz14thGv6NVSf788fHPS9OuOWkyO5wDBiF3x5RZlSS
+         Q0NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781631527; x=1782236327;
-        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+        d=1e100.net; s=20251104; t=1781632434; x=1782237234;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=B0CAxTxP49ad2IHfcJCxB/2dsfQiiRHbXlpQIkr0ZpA=;
-        b=qZdboNsieCi3v9F2i3GjXBD+yK8yVOZTSMntubBH4V9GIhJuHjd+ZKheG5f8EqIzIu
-         K68z71g7CJrUW9AxmA7pmmHalHR3aTHQSsH0N9b+86sWD/ANbQ+DTEjMk3LHS2O+F/H4
-         +SUApqkJtjdCyTWSOofKAIxIJtald+wkqadHOlVOkOGxIbHaa/IxeoweKA6AzEirZ9Uh
-         n/oKfhdSG0xHAI7v8UsjuU2uX5YOk7EMtY3ucOjekkiJhvM4u6Os/L28f6E/6ofusj8H
-         66rQdj2t1nyF6LBYe9ZEpM/QXFT5medLNI4FPuzU5qFwlnbXkyc/zDcqo3n85anGoycA
-         62Ag==
-X-Forwarded-Encrypted: i=1; AFNElJ98/wb+qsFW+QnOUFvY0gnse/uW0eVJzCuxugW8DhSWbO8syANtN1jU/Sc9NU9G3ah6ohhb0Vo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoiDx+2WEL8JuXorhoYHjCQhwxk3FFPosAGeZoLsmPv1ui5zwT
-	NbSZ8kzy+RI55NdBjqmd63YKpMFEOI6oo168uztgafoJQfiC/Qfrl+xL
-X-Gm-Gg: Acq92OGxCN3mGYLUh9cBfR3qwjrLWwlwAhSSGU+KZAOXFuJ8gL4RyyH5UVFGZByH4YX
-	lzAm+Tv8NADqswkaDOUtdn+5a5eX8KaUXPIt0KC0gF/CVAb04YfZUCneEC418LXvfN+hQngNRmF
-	WnqWxhDUFCrl+GsBTFhhlLwj6z5PMpj85jdUihMz8sBj89N/glk9fosn0DJNtKVNv+jIhLUcjMs
-	mLR0Z+LY3ES9GyMs0sVyKdM/Nfu4vnpEkS7kjoQpG/vHZCGZVdTMTZuT6+6v78gmvOxrmKqO25z
-	HfaLgYQzCJ5VuJUEvthTFfWmLXZdzTO91OgWCyIvldNVS6zSVyQBeK3SnG9ibkvQCrgst+Rqa5k
-	qwHj0nlf6c9wp/8CAukcXYHYjRCWI5T7sTtf4nYKOi/7ppo5/3gNXSY/LBcaS47euRpcouHz+PX
-	JGSkCEYu5rSo0l3Q6xzbJXRMCfQk29HUfn8KQluc6XcIkrofOu
-X-Received: by 2002:a17:90b:4a51:b0:369:1dbb:4732 with SMTP id 98e67ed59e1d1-37c8c660d75mr542268a91.0.1781631526784;
-        Tue, 16 Jun 2026 10:38:46 -0700 (PDT)
-Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c521ca980sm3681648a91.6.2026.06.16.10.38.43
+        bh=RhFJ7AeZpcOglBnZJ4DK4DqwCVwsUkIV9/uzZOBEYwA=;
+        b=boVWtLh5B/b1mttgs2uJoIo1ppL2YV0WXNBxoxVGmo+itnwx2/QrpZIzMTcJlzHGO4
+         uqPLfYoBRK69RgsOMfSrhgzPjvuvfAR1CMiv/teup4yG3eKx3G7ruM7ZK+gYsB6tpgJT
+         evZhcQ43a+9dMRKvuVwdIVgKPagJfdj6CB7q3QYKxJRbcOAGrWOvuDKAU3ZfDGqkjr37
+         ehnsvEN1ljjBjMLR/EIsHXcdmY+M03qOE8rWZIQECw/CR1lpH1YO0/aOdBnsk4TFJFsX
+         4XSlbHmM3gTFl1fHugBo9O66F2h54Iezj7pbRAzBHXLgl7K4qqwVynG4etmbrlXJZ42o
+         0snw==
+X-Forwarded-Encrypted: i=1; AFNElJ+J7dNRTf7RSTVt8aOroR3qhkZLRPZon0C5p/UrrcScireT5PWCTih+AinPPlLauozwTZdbaVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrcJR63HxqcmU+nJmDnlj0y504QQ9Cf48pbOa+eC1Na+v5+xln
+	K+pGP96PBqADrc8NksuyultgUWn4O5Odd/Mbzv7ZcgEs6unJ7RmsCvluedXzXcR5G3mT
+X-Gm-Gg: Acq92OGG665OrKcQFZGtyj6kB7pNzdVvH8wIAQf8xkr4u9ZpxMhIqwUMG0bZZlwQPMX
+	WVL/OJ0tjSngx5Fo6OccuaJGeTG7YyUOZq8CtpY2lXDNcsdgZXVvXwJp5ZCciyEpf8hfs4u0C3F
+	mRrxyOxSQaVFwGTAHlcFaXuhrL8vQDfauhewVIgHoNT1yVPgVis7x6J2iW9pJjYP196kiq3l749
+	HzsLdF5au3kMKOqgNvF10j/eRaJOnLoznjzAtVGE8oDf6FmEIN9frQhpC6jb+ik5PGkwzKJxwpg
+	i9V1HglHT2ywVp1CMS+WNttWtCfbjUfEUOI8OyWnHSPF2++DQeuSfOl/QpXKIRSXA0m9FPZOBli
+	ft/sKWsNlxMkIi/pAZ9JNiEAvMsKHPwODyIezFvkApz/s1ZjjpZU2CP1vOfeeDWKxBAuYmDDEjC
+	j+XR6IGq6MoYB+gw==
+X-Received: by 2002:a2e:bd8a:0:b0:394:1254:10d2 with SMTP id 38308e7fff4ca-399697df964mr37181fa.0.1781632433945;
+        Tue, 16 Jun 2026 10:53:53 -0700 (PDT)
+Received: from localhost ([2a01:e11:1405:22c0:744d:7801:2e5d:ef0b])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3995c1a27cbsm8170451fa.37.2026.06.16.10.53.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 10:38:46 -0700 (PDT)
-From: Maoyi Xie <maoyixie.tju@gmail.com>
-To: Mika Westerberg <mika.westerberg@linux.intel.com>,
- Yehezkel Bernat <YehezkelShB@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- [PATCH net] net: thunderbolt: Fix frags[] overflow by bounding frame_count
-Date: Wed, 17 Jun 2026 01:38:41 +0800
-Message-ID: <178163152194.2486768.14724194232649760778@maoyixie.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+        Tue, 16 Jun 2026 10:53:53 -0700 (PDT)
+From: Samuel Page <sam@bynar.io>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: Tung Quang Nguyen <tung.quang.nguyen@est.tech>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Samuel Page <sam@bynar.io>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] tipc: free bearer discoverer via RCU to fix tipc_disc_rcv UAF
+Date: Tue, 16 Jun 2026 18:53:20 +0100
+Message-ID: <20260616175320.1826750-1-sam@bynar.io>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[bynar.io,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[bynar.io:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299929-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[linux.intel.com,gmail.com,lunn.ch,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:mika.westerberg@linux.intel.com,m:YehezkelShB@gmail.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-299930-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jmaloy@redhat.com,m:tung.quang.nguyen@est.tech,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:sam@bynar.io,m:stable@vger.kernel.org,s:lists@lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sam@bynar.io,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bynar.io:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,maoyixie.com:mid,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,bynar.io:dkim,bynar.io:email,bynar.io:mid,bynar.io:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A1703693711
+X-Rspamd-Queue-Id: 7B5FF6939C4
 
-tbnet_poll() assembles a multi-frame ThunderboltIP packet into one skb. The
-first frame goes into the skb linear area and every further frame is added as
-a page fragment.
+bearer_disable() tears down a bearer's discovery object with
+tipc_disc_delete(), which frees the struct tipc_discoverer with a plain,
+synchronous kfree(). The discovery receive path, however, still reads
+that object under RCU in softirq context:
 
-	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
-			page, hdr_size, frame_size,
-			TBNET_RX_PAGE_SIZE - hdr_size);
+  tipc_udp_recv()            // udp_media.c, rcu_dereference(ub->bearer)
+    -> tipc_rcv()            // node.c
+      -> tipc_disc_rcv()     // discover.c
+        -> tipc_disc_addr_trial_msg(b->disc, ...)  // reads d->net etc.
 
-A packet of frame_count frames therefore ends up with frame_count - 1
-fragments. tbnet_check_frame() only bounds the peer supplied frame_count to
-TBNET_RING_SIZE / 4 (64), which is far above MAX_SKB_FRAGS (17 by default). A
-peer that sends a packet of 19 or more small frames pushes nr_frags past
-MAX_SKB_FRAGS, so skb_add_rx_frag() writes past skb_shinfo()->frags[] and
-corrupts memory after the shared info.
+tipc_udp_recv() only gates this path on test_bit(0, &b->up), which is a
+TOCTOU check: an RX softirq that observes b->up == 1 before
+bearer_disable() does clear_bit_unlock(0, &b->up) can still be executing
+inside tipc_disc_rcv() when bearer_disable() reaches
 
-Tighten the start of packet bound to MAX_SKB_FRAGS + 1 so a packet can never
-produce more fragments than frags[] can hold. This matches the recent skb
-frags overflow fixes in other receive paths, for example f0813bcd2d9d ("net:
-wwan: t7xx: fix potential skb->frags overflow in RX path") and 600dc40554dc
-("net: usb: cdc-phonet: fix skb frags[] overflow in rx_complete()").
+	if (b->disc)
+		tipc_disc_delete(b->disc);
 
-Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt cable")
+and kfree()s the discoverer. The reader then dereferences freed memory
+(d->net, inlined into tipc_disc_rcv()) in softirq context [0].
+
+The bearer itself is freed RCU-safely (tipc_bearer_put() ->
+kfree_rcu(b, rcu)) because the RX path runs under RCU, but the discoverer
+hanging off b->disc is freed synchronously. The same b->disc is also
+touched under rcu_read_lock() by
+tipc_disc_add_dest()/tipc_disc_remove_dest().
+
+Free the discoverer with the same RCU lifetime as its bearer. Add an
+rcu_head to struct tipc_discoverer and defer the kfree_skb()/kfree() to
+an RCU callback so any in-flight reader that already loaded b->disc
+completes before the memory is released. The timer is still shut down
+synchronously up front with timer_shutdown_sync() (which can sleep and
+must not run from the RCU callback), and shutting it down before the
+grace period prevents the periodic LINK_REQUEST timer from rearming or
+re-entering the object.
+
+This mirrors the existing TIPC pattern of pairing call_rcu() with a
+cleanup callback (see tipc_node_free()/tipc_aead_free()).
+
+[0]: (trailing page/memory-state dump trimmed)
+BUG: KASAN: slab-use-after-free in tipc_disc_addr_trial_msg net/tipc/discover.c:149 [inline]
+BUG: KASAN: slab-use-after-free in tipc_disc_rcv+0xe7c/0x103c net/tipc/discover.c:236
+Read of size 8 at addr ffff000028f07428 by task ksoftirqd/0/15
+
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 7.0.11 #3 PREEMPT
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0xb4/0xd4 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x118/0x5d8 mm/kasan/report.c:482
+ kasan_report+0xb0/0xf4 mm/kasan/report.c:595
+ __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+ tipc_disc_addr_trial_msg net/tipc/discover.c:149 [inline]
+ tipc_disc_rcv+0xe7c/0x103c net/tipc/discover.c:236
+ tipc_rcv+0x1884/0x2b1c net/tipc/node.c:2126
+ tipc_udp_recv+0x22c/0x684 net/tipc/udp_media.c:393
+ udp_queue_rcv_one_skb+0x898/0x1798 net/ipv4/udp.c:2441
+ udp_queue_rcv_skb+0x1b0/0xa44 net/ipv4/udp.c:2518
+ udp_unicast_rcv_skb+0x13c/0x348 net/ipv4/udp.c:2678
+ __udp4_lib_rcv+0x1aec/0x246c net/ipv4/udp.c:2754
+ udp_rcv+0x78/0xa0 net/ipv4/udp.c:2936
+ ip_protocol_deliver_rcu+0x68/0x410 net/ipv4/ip_input.c:207
+ ip_local_deliver_finish+0x28c/0x4b4 net/ipv4/ip_input.c:241
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip_local_deliver+0x29c/0x2ec net/ipv4/ip_input.c:262
+ dst_input include/net/dst.h:480 [inline]
+ ip_rcv_finish net/ipv4/ip_input.c:453 [inline]
+ ip_rcv_finish net/ipv4/ip_input.c:439 [inline]
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ NF_HOOK include/linux/netfilter.h:312 [inline]
+ ip_rcv+0x21c/0x258 net/ipv4/ip_input.c:573
+ __netif_receive_skb_one_core+0x110/0x184 net/core/dev.c:6195
+ __netif_receive_skb+0x2c/0x170 net/core/dev.c:6308
+ process_backlog+0x178/0x488 net/core/dev.c:6659
+ __napi_poll+0xa8/0x540 net/core/dev.c:7726
+ napi_poll net/core/dev.c:7789 [inline]
+ net_rx_action+0x360/0x964 net/core/dev.c:7946
+ handle_softirqs+0x2f0/0x7b0 kernel/softirq.c:622
+ run_ksoftirqd kernel/softirq.c:1063 [inline]
+ run_ksoftirqd+0x6c/0x88 kernel/softirq.c:1055
+ smpboot_thread_fn+0x65c/0x958 kernel/smpboot.c:160
+ kthread+0x39c/0x444 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+
+Allocated by task 68873:
+ kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
+ kasan_save_track+0x20/0x3c mm/kasan/common.c:78
+ kasan_save_alloc_info+0x40/0x54 mm/kasan/generic.c:570
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0xd4/0xd8 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x1b0/0x458 mm/slub.c:5385
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ tipc_disc_create+0xdc/0x5e0 net/tipc/discover.c:356
+ tipc_enable_bearer+0x8b8/0xf94 net/tipc/bearer.c:348
+ __tipc_nl_bearer_enable+0x2a8/0x398 net/tipc/bearer.c:1047
+ tipc_nl_bearer_enable+0x2c/0x48 net/tipc/bearer.c:1056
+ genl_family_rcv_msg_doit+0x1e4/0x2c0 net/netlink/genetlink.c:1114
+ genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+ genl_rcv_msg+0x4e8/0x750 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x204/0x3cc net/netlink/af_netlink.c:2550
+ genl_rcv+0x3c/0x54 net/netlink/genetlink.c:1218
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x638/0x930 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x798/0xc68 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0xe0/0x128 net/socket.c:742
+ __sys_sendto+0x230/0x2f4 net/socket.c:2206
+ __do_sys_sendto net/socket.c:2213 [inline]
+ __se_sys_sendto net/socket.c:2209 [inline]
+ __arm64_sys_sendto+0xc4/0x13c net/socket.c:2209
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x84/0x2a8 arch/arm64/kernel/syscall.c:49
+ el0_svc_common.constprop.0+0xe4/0x294 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x44/0x5c arch/arm64/kernel/syscall.c:151
+ el0_svc+0x38/0xac arch/arm64/kernel/entry-common.c:724
+ el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:743
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+Freed by task 60072:
+ kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
+ kasan_save_track+0x20/0x3c mm/kasan/common.c:78
+ kasan_save_free_info+0x4c/0x74 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x88/0xb8 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6170 [inline]
+ kfree+0x14c/0x458 mm/slub.c:6488
+ tipc_disc_delete+0x50/0x68 net/tipc/discover.c:393
+ bearer_disable+0x18c/0x278 net/tipc/bearer.c:418
+ tipc_bearer_stop+0xe0/0x198 net/tipc/bearer.c:757
+ tipc_net_stop+0x110/0x178 net/tipc/net.c:159
+ tipc_exit_net+0x80/0x19c net/tipc/core.c:112
+ ops_exit_list net/core/net_namespace.c:199 [inline]
+ ops_undo_list+0x244/0x694 net/core/net_namespace.c:252
+ cleanup_net+0x3a0/0x830 net/core/net_namespace.c:702
+ process_one_work+0x628/0xd38 kernel/workqueue.c:3289
+ process_scheduled_works kernel/workqueue.c:3372 [inline]
+ worker_thread+0x7a8/0xac0 kernel/workqueue.c:3453
+ kthread+0x39c/0x444 kernel/kthread.c:436
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+
+Fixes: 25b0b9c4e835 ("tipc: handle collisions of 32-bit node address hash values")
 Cc: stable@vger.kernel.org
-Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
+Assisted-by: Bynario AI
+Signed-off-by: Samuel Page <sam@bynar.io>
 ---
-Mika preferred the bound in tbnet_check_frame() over the nr_frags <
-MAX_SKB_FRAGS guard in tbnet_poll() that I first floated on the list, so this
-rejects the oversized packet up front. Reproduced under KASAN with a harness
-that mirrors the per-frame skb_add_rx_frag() loop.
+v2:
+ - Wrap the over-80-column container_of() line in tipc_disc_free_rcu()
+   to fix the coding-style issue raised in review.
 
- drivers/net/thunderbolt/main.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+v1: https://lore.kernel.org/netdev/20260615144233.1730935-1-sam@bynar.io/
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 7aae5d915a1e..ac016890646c 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -787,8 +787,12 @@ static bool tbnet_check_frame(struct tbnet *net, const struct tbnet_frame *tf,
- 		return true;
- 	}
+ net/tipc/discover.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/net/tipc/discover.c b/net/tipc/discover.c
+index 3e54d2df5683..761b625bba5a 100644
+--- a/net/tipc/discover.c
++++ b/net/tipc/discover.c
+@@ -49,6 +49,7 @@
  
--	/* Start of packet, validate the frame header */
--	if (frame_count == 0 || frame_count > TBNET_RING_SIZE / 4) {
-+	/* Start of packet, validate the frame header. tbnet_poll() puts the
-+	 * first frame in the skb linear area and every further frame in a page
-+	 * fragment, so a packet may not span more than MAX_SKB_FRAGS + 1 frames
-+	 * without overflowing skb_shinfo()->frags[].
-+	 */
-+	if (frame_count == 0 || frame_count > MAX_SKB_FRAGS + 1) {
- 		net->stats.rx_length_errors++;
- 		return false;
- 	}
+ /**
+  * struct tipc_discoverer - information about an ongoing link setup request
++ * @rcu: RCU head used to free the structure after a grace period
+  * @bearer_id: identity of bearer issuing requests
+  * @net: network namespace instance
+  * @dest: destination address for request messages
+@@ -60,6 +61,7 @@
+  * @timer_intv: current interval between requests (in ms)
+  */
+ struct tipc_discoverer {
++	struct rcu_head rcu;
+ 	u32 bearer_id;
+ 	struct tipc_media_addr dest;
+ 	struct net *net;
+@@ -382,6 +384,18 @@ int tipc_disc_create(struct net *net, struct tipc_bearer *b,
+ 	return 0;
+ }
+ 
++/* RCU callback: free the discoverer only after any concurrent
++ * tipc_disc_rcv() softirq reader of bearer->disc has finished.
++ */
++static void tipc_disc_free_rcu(struct rcu_head *rp)
++{
++	struct tipc_discoverer *d;
++
++	d = container_of(rp, struct tipc_discoverer, rcu);
++	kfree_skb(d->skb);
++	kfree(d);
++}
++
+ /**
+  * tipc_disc_delete - destroy object sending periodic link setup requests
+  * @d: ptr to link dest structure
+@@ -389,8 +403,7 @@ int tipc_disc_create(struct net *net, struct tipc_bearer *b,
+ void tipc_disc_delete(struct tipc_discoverer *d)
+ {
+ 	timer_shutdown_sync(&d->timer);
+-	kfree_skb(d->skb);
+-	kfree(d);
++	call_rcu(&d->rcu, tipc_disc_free_rcu);
+ }
+ 
+ /**
+
+base-commit: 47186409c092cd7dd70350999186c700233e854d
 -- 
-2.34.1
+2.54.0
 
 
