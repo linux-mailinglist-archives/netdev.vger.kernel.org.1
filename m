@@ -1,211 +1,205 @@
-Return-Path: <netdev+bounces-299794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lLbSLCIcMWoCbwUAu9opvQ
-	(envelope-from <netdev+bounces-299794-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:49:22 +0200
+	id JfjBN+QcMWoobwUAu9opvQ
+	(envelope-from <netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:52:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3072C68DB2B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:49:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C46968DBA4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:52:36 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=M17Yq3Y4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299794-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299794-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=intel.com header.s=Intel header.b=nbLNPnAo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299793-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0252930160DE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:49:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD99E3117B53
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66160421EFF;
-	Tue, 16 Jun 2026 09:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46CD421EF5;
+	Tue, 16 Jun 2026 09:49:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE14218A3
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 09:49:14 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781603356; cv=pass; b=B26W25PfEMdE8utkyPEJvaHNWOqZ/kC/+AEe0KdpKHN0YNMgEXhxb0IIlkGplGdDUPHPKVSKqhIh7mds/vRw/nH/PTP2AxIl478kurXwBo4xZioxdKunMiA/edZtIs5Y/0/Ufw5bqNszGp0Lvwvh4h7+LKl/93KyL8CVyl2eVb4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781603356; c=relaxed/simple;
-	bh=QjEqLU00etgxuyHhjOjo1O1DD6A8WJ0GvFeC5XpYtfg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dpCG3tsrUo6GgnpvJV+qskHSq+yDZJQQ1z5eSoIWxAEFesMRn2g+wyfnLPm0pccSutHMlxNHDE9drEjHsrUVMGgA1a2mRA92Pt8Jko7ubCWxMYdqtjbAkUSb7L9IHMLu4XysU+5JuH01WwdZP5R9/0ig0Fpuh+1F6wVoXva/ETc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M17Yq3Y4; arc=pass smtp.client-ip=209.85.160.177
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5177d1ff061so52721cf.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 02:49:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781603354; cv=none;
-        d=google.com; s=arc-20240605;
-        b=k5vaMPdxzJbESlGQDBvSkZHn43cMbho2x13aPg7Z87jrjKbL3oTDK69BfMUtmn67I2
-         TlM0MFIMXZuJKP0RI0yCL3ckdyTGzBAhOYbpS0o+nahdCRH3wQbtRTKoa37Nwevy4gxI
-         FyHgKjh8e/y8z0EFpev/PmNHFEQYQEfnhP6iso0G+c1kogLuKjHHd/HE3EtJhmXyYJmM
-         4Gcc5RyJJu9Y+KDeFA16N+r84EafcWYkBSleMiF8gb4erbwxYGm4czZ+HeGDfpr0LeJi
-         SgFyjyQuhdM/WYD1zuSR1MIQ1crVqBm7cKcY8BASS7nw4TKViAfeFRWKN8URBAfbut2l
-         bppg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2/X+IQDU5vWc0Utt9YT+71W3AhmdLwN2v6pALPN9Aqg=;
-        fh=LNg0vabHBE1uydGeCoY5v0Pbm/6aiGEvXftMmGf22DQ=;
-        b=Cq3KQn3QolfDAzYtJKPBKnGIQ7RsfwR6P2lKf5knSnRDaZjskhANHd0LXVYDnS8+Kw
-         sYripZXot8myiFc3bd7SlAjgm+4Lo1iBIA6zjv25VQEdPWMwAP1ai8wIL5uttUubgKo7
-         AnzPleCzgiFYRn1UYPiwygU07wljKfN/UIxSTW3H6xLpsg4bQlac2y0G6+3DkVYb2lHc
-         umdDQGrGmo88wn4UWmJz5H3X8+tAUhNCI45BSKeN39rMP5gEiktQoSyCgdgWNgbM/4g6
-         WykkKneGa569TW1kye8pXztYXVovew6O8XCg5hLkjzzkN7H1K3b1qt0woTIFbJxRbAUH
-         hcZw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781603354; x=1782208154; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2/X+IQDU5vWc0Utt9YT+71W3AhmdLwN2v6pALPN9Aqg=;
-        b=M17Yq3Y4DO6a6wbwA+tYgzro60asI45/mrkJxOg3CStold3/62T9XAtK7AC3wKOaZy
-         oHH2z6bP+2d3xjgILsGKUx3DZipa7rR39nQCiN/0GidXfh4cqNNTEJmkr/NIKkOshMOD
-         uMXd3GFSF/M2Tyd6XGBfUwjs3hMnCEmVxjxveBhq5+XWKlWGwlNoy0wq3KgiZ3EQs3Al
-         lBRvLCY6mF9kx/OXOkbkjbBx1RCcIVt6LsGXjNbJ01g/YauXbWv9LbFXi5r6bH3xbThu
-         dt08+iMGyXNitZ6kMkr7Oyo7c4y81M8/j+Id5FZ1fPIVASsn1Y3llEkJtgTvePi/rGUd
-         QRJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781603354; x=1782208154;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2/X+IQDU5vWc0Utt9YT+71W3AhmdLwN2v6pALPN9Aqg=;
-        b=fEkyO2zGVgLpxjC7UtfAyx+BeRnMtq316jTx3g1c8gAI7HmB7OU8Kgh9ftJLwMsOqq
-         tnIx/ciRVIlYHCxkwvo4UCE5Wfd5Exl+K8scTfP8bexeTBO/Gg1NOzwT9Z/viEcVkoAx
-         B1tQD6qLr1op/wsqJwbtdojcHyhW9eBKW/EjfTzt4bfSZ4bAsuU2ozRg8INRJu/hOM6J
-         AhZtd+MEEdOZLGiVEaXDXQGFIAeJbBZqZQfGSqcrIrxPlEbWnhAG6z2SBtTqwT+egMqe
-         pK92lcxm8+aTltycDQEBBfYOfLmPUUz1TXkYJYSdaEExTZqagqtVb0q6Srek0deZmdhn
-         hv/Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8bN7IhMqsLdXmz9Yk1xKJNNSMV1pYI9rW5k4nqBy8JJ6zM2figg3oumC6nqXCjlXVKnHt+j28=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyMDPElFU7q/3pOJAFCnJp4Q//VHAaZ3zJs1v/IGAPcEyn5kzs
-	Vzg9b/7HB8ORLniILhU0CtadhdCW+efP48BCDYJLkogTMwqi/hCIHLYab3aluvAV+akQvWL1Chl
-	a9GFxfIqpYhyU+lGK/q1KmRoX3mDVesJXzGbokwAs
-X-Gm-Gg: Acq92OHqs5BEy9/baY4yAdJzZEzE5hn24HJedFJwVQC2gObWeYDTR/xn4BjP2bCXUNx
-	s2Jz5jzYV9RbH6kin1e74dsv0yx68x7rqYw06/W4I0bZTCabqm5TkfRjg7ufXWX94g+HKKF+jQG
-	I1KlVpEVIhLH7QMp8NfmRiLFntu8G/EDymYBNIWuvZ4VdjXGFxIPz4QiOhpzNwMR+8AZa/53fbb
-	1K2kMdkzwxdMJF6oBHvPDrGzUvY+/6emjX2sW1p0ey7Ww+zSDkXl/cttQNI+onw+NY3JH9Z3+Rz
-	8CTqLaTS
-X-Received: by 2002:ac8:7f83:0:b0:510:f9b:fb5f with SMTP id
- d75a77b69052e-519904708a9mr8164151cf.16.1781603353313; Tue, 16 Jun 2026
- 02:49:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741323B5846;
+	Tue, 16 Jun 2026 09:49:07 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781603348; cv=none; b=abNt9fydkX3mrt6yYLEJR1x6vplM9mHh8Av1wfEYCXF8V7gDZcidmfsLKYTknfCW9SlQ8ZoSemXRqJilb4DLEdOmyx+2C8QrO6s2+0O9lzEugCqf2kKTuO1kJcVFBm1q0HGdomY2Q2zfriFbvGTVC5a+IYjemaE9vu7SNt+2qAw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781603348; c=relaxed/simple;
+	bh=jiLEocxNQBK6GjMpzXPf7ZOCUOSYAPAZ38ELX1lscIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o30p7rSRpQ56ZjJBHihA1IwtZPs+FnrabTRmD0O/occtMRORzILny7r6UKYFtowXt4B7gGrH7sh3IDWAkNrshnwS/c9RDadP5nQ5HHYmoIOruK9Z7TcAivR7am5xFkPFUYMOiRdCZjVKY/Zfq1qeabk3Dq2ejTl5nvweQDTs+1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nbLNPnAo; arc=none smtp.client-ip=198.175.65.14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781603348; x=1813139348;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jiLEocxNQBK6GjMpzXPf7ZOCUOSYAPAZ38ELX1lscIw=;
+  b=nbLNPnAob3BkNkA47PDUnSjfnra8Igumnyc2w9WR4aY+GGU9VlF5QkJT
+   MOeHYrl/s0B5N8itYeOo9wvSRkih5hPZm01Mb4IiGDrDpppQDUEKgzGyy
+   FooBq+TB9EEW0ywxQPAimj/CXwIHU4t98dxlMMPxeYMuiXzR/mcv5Knik
+   V39ieRR6EQfEqc1fSuk5RT7Jsau7XnDd9dJ9kHoPhe04po1GKrByX44Lc
+   NxkowA8uumhG/W5AMlxjaaQfe7KId2syd4QsZssaBapvFT3SosLyfOlpz
+   /84+mwI3NMacH9s8QP1H7Z7ITUcWo7viMpA7vz65SYgys4QK4K0S9UTHH
+   A==;
+X-CSE-ConnectionGUID: AxNcf0vpQDuQS6mkZwzzWQ==
+X-CSE-MsgGUID: gGZawzcvT0WqqXJVH/xvNA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11818"; a="86265553"
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="86265553"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 02:49:07 -0700
+X-CSE-ConnectionGUID: XVg//dqXQqi8918oDLukJQ==
+X-CSE-MsgGUID: EE0dTLFuQNKgd0mpuJkkDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="246843978"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by orviesa010.jf.intel.com with ESMTP; 16 Jun 2026 02:49:03 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 6626895; Tue, 16 Jun 2026 11:49:02 +0200 (CEST)
+Date: Tue, 16 Jun 2026 11:49:02 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Lee Jones <lee@kernel.org>,
+	Mark Brown <broonie@opensource.wolfsonmicro.com>,
+	Thierry Reding <thierry.reding@avionic-design.de>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ulf Hansson <ulfh@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Peter Chen <peter.chen@kernel.org>,
+	Paul Cercueil <paul@crapouillou.net>, Bin Liu <b-liu@ti.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Maximilian Luz <luzmaximilian@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-sound@vger.kernel.org,
+	driver-core@lists.linux.dev, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-i2c@vger.kernel.org,
+	iommu@lists.linux.dev, linux-pm@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org, linux-mips@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH 07/23] driver core: platform: provide
+ platform_device_set_fwnode()
+Message-ID: <ajEcDq0S067wMFaK@black.igk.intel.com>
+References: <20260521-pdev-fwnode-ref-v1-0-88c324a1b8d2@oss.qualcomm.com>
+ <20260521-pdev-fwnode-ref-v1-7-88c324a1b8d2@oss.qualcomm.com>
+ <ah9OIVyrHEhcMHzN@ashevche-desk.local>
+ <CAMRc=McLN9Ovoqo3om-3uC=q+=rcKCoiWMctC=yvwiaHacU0PQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260615234220.3946885-1-lrizzo@google.com> <ajESl4osXP7roz5q@pedro-suse.lan>
-In-Reply-To: <ajESl4osXP7roz5q@pedro-suse.lan>
-From: Luigi Rizzo <lrizzo@google.com>
-Date: Tue, 16 Jun 2026 11:48:36 +0200
-X-Gm-Features: AVVi8CcHZ3OPXbKC4trSPNuaSPbYaO79J7ToG8S7bAu191E2DonWT9FNgV4gu7M
-Message-ID: <CAMOZA0+L2+=FEQ5ORvv07JaJix0R+6Q6u01CyMKCbd842To9nA@mail.gmail.com>
-Subject: Re: [PATCH] swiotlb: avoid double copy with swiotlb on tx socket
-To: Pedro Falcato <pfalcato@suse.de>
-Cc: rizzo.unipi@gmail.com, m.szyprowski@samsung.com, robin.murphy@arm.com, 
-	willemb@google.com, kuniyu@google.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	gregkh@linuxfoundation.org, rafael@kernel.org, akpm@linux-foundation.org, 
-	david@kernel.org, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	iommu@lists.linux.dev, driver-core@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRc=McLN9Ovoqo3om-3uC=q+=rcKCoiWMctC=yvwiaHacU0PQ@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:pfalcato@suse.de,m:rizzo.unipi@gmail.com,m:m.szyprowski@samsung.com,m:robin.murphy@arm.com,m:willemb@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:akpm@linux-foundation.org,m:david@kernel.org,m:netdev@vger.kernel.org,m:linux-mm@kvack.org,m:iommu@lists.linux.dev,m:driver-core@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:hawk@kernel.org,m:ilias.apalodimas@linaro.org,m:rizzounipi@gmail.com,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299794-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299793-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[lrizzo@google.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,opensource.wolfsonmicro.com,avionic-design.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,linuxfoundation.org,linux.ibm.com,ellerman.id.au,8bytes.org,arm.com,broadcom.com,nxp.com,pengutronix.de,intel.com,linux.intel.com,ffwll.ch,crapouillou.net,ti.com,kernel.crashing.org,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,lists.infradead.org,lists.freedesktop.org,oss.qualcomm.com];
+	FORGED_RECIPIENTS(0.00)[m:brgl@kernel.org,m:lee@kernel.org,m:broonie@opensource.wolfsonmicro.com,m:thierry.reding@avionic-design.de,m:sebastian.hesselbarth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:srini@kernel.org,m:gregkh@linuxfoundation.org,m:vkoul@kernel.org,m:rafael@kernel.org,m:dakr@kernel.org,m:robh@kernel.org,m:saravanak@kernel.org,m:maddy@linux.ibm.com,m:mpe@ellerman.id.au,m:npiggin@gmail.com,m:chleroy@kernel.org,m:andi.shyti@kernel.org,m:joro@8bytes.org,m:will@kernel.org,m:robin.murphy@arm.com,m:opendmb@gmail.com,m:florian.fainelli@broadcom.com,m:bcm-kernel-feedback-list@broadcom.com,m:ulfh@kernel.org,m:Frank.Li@nxp.com,m:s.hauer@pengutronix.de,m:kernel@pengutronix.de,m:festevam@gmail.com,m:matthew.brost@intel.com,m:thomas.hellstrom@linux.intel.com,m:rodrigo.vivi@intel.com,m:airlied@gmail.com,m:simona@ffwll.ch,m:peter.chen@kernel.org,m:paul@crapouillou.net,m:b-liu@ti.com,m:p.zabel@pengutronix.de,m:
+ luzmaximilian@gmail.com,m:hansg@kernel.org,m:ilpo.jarvinen@linux.intel.com,m:krzk@kernel.org,m:benh@kernel.crashing.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-msm@vger.kernel.org,m:linux-sound@vger.kernel.org,m:driver-core@lists.linux.dev,m:devicetree@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,m:linux-i2c@vger.kernel.org,m:iommu@lists.linux.dev,m:linux-pm@vger.kernel.org,m:imx@lists.linux.dev,m:linux-arm-kernel@lists.infradead.org,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:linux-usb@vger.kernel.org,m:linux-mips@vger.kernel.org,m:platform-driver-x86@vger.kernel.org,m:bartosz.golaszewski@oss.qualcomm.com,m:sebastianhesselbarth@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lrizzo@google.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,samsung.com,arm.com,google.com,davemloft.net,kernel.org,redhat.com,linuxfoundation.org,linux-foundation.org,vger.kernel.org,kvack.org,lists.linux.dev,linaro.org];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_GT_50(0.00)[65];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,suse.de:email,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[black.igk.intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3072C68DB2B
+X-Rspamd-Queue-Id: 3C46968DBA4
 
-On Tue, Jun 16, 2026 at 11:20=E2=80=AFAM Pedro Falcato <pfalcato@suse.de> w=
-rote:
->
-> (+cc page pool maintainers)
-> On Mon, Jun 15, 2026 at 11:42:20PM +0000, Luigi Rizzo wrote:
-> > The use of swiotlb causes an extra data copy on I/O.  For tx sockets,
-> > especially with greedy senders, this has a high chance of happening in
-> > the softirq handler for tx network interrupts, creating a significant
-> > performance bottleneck.
+On Thu, Jun 04, 2026 at 05:32:27AM -0700, Bartosz Golaszewski wrote:
+> On Tue, 2 Jun 2026 23:41:53 +0200, Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com> said:
+> > On Thu, May 21, 2026 at 10:36:30AM +0200, Bartosz Golaszewski wrote:
+> >> Provide a helper function encapsulating the logic of assigning firmware
+> >> nodes to platform devices created with platform_device_alloc(). Make the
+> >> kerneldoc state that this is the proper interface for assigning firmware
+> >> nodes to dynamically allocated platform devices. This will allow us to
+> >> switch to counting the references of the device's firmware nodes in the
+> >> future, not only the OF nodes.
 > >
-> > Allow tx sockets to allocate socket buffers directly from the bounce
-> > buffers. This avoids the second copy and removes the above bottleneck.
-> > The fraction of swiotlb buffers allowed for this feature is set with
-> >    /sys/module/swiotlb/parameters/zerocopy_tx_percent
-> > (0 means disabled, 90 is the maximum, to avoid persistent I/O failures)=
-.
-> >
-> > Implementation:
-> > - define a new page type to unambiguously identify bounce buffers used
-> >   as backing storage for socket buffers
-> > - modify skb_page_frag_refill to perform the modified allocation
-> > - modify the destructors __free_frozen_pages(), free_unref_folio() to
-> >   handle those pages and return them to the pool.
-> >
-> > The savings are especially visible with fewer queues. In synthetic
-> > benchmarks, senders with 1-2 queues would cap around 50Gbps with
-> > conventional swiotlb, and reach over 170Gbps with the feature enabled.
->
-> I could be wrong, but I genuinely think that the way to go about this is
-> using page_pool for regular TX as well. page_pool pages are all dma-mappe=
-d
-> (so whatever swiotlb optimization you want can be done there), and the ne=
-t
-> stack already has awareness of these special pages and special skbs, so i=
-t
-> won't Just Return Them back to the page allocator.
+> > But why different for of_node and fwnode to begin with?!
+> 
+> I'm not following. What are you suggesting?
 
-I am not sure I follow your comment above, can you expand/clarify?
+After re-reading of this thread, I think I'm suggesting the same what you have
+in plans to do in the future as you put it as "This will allow us to switch to
+counting the references of the device's firmware nodes in the future, not only
+the OF nodes."
 
-The problem I am dealing with is that the copy from the socket buffer
-to the bounce buffer is done in the device xmit function. Under high
-it is almost always done by the tx softirq.
-This means that even if we move the copy outside the HARD_TX_LOCK(),
-it would still be almost completely serialized.
-Hence the proposed method to make skb_page_frag_refill() allocate
-directly a bounce buffer (under specific conditions) so there is a single c=
-opy
-done directly to the dma-able buffer, and ii is done  in the user threads/C=
-PUs
-and is not seriallized in the softirq thread.
+// Offtopic
+I haven't heard from you for more than a month on this:
+https://lore.kernel.org/r/af18zdP5HF3_P9Vo@black.igk.intel.com
+Anything should I do? Please, answer to that thread.
 
-I am not sure how page_pool on tx could help here.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-cheers
-luigi
+
 
