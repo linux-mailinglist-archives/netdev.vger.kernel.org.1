@@ -1,147 +1,431 @@
-Return-Path: <netdev+bounces-299777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299778-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XRnjMfwMMWpoawUAu9opvQ
-	(envelope-from <netdev+bounces-299777-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:44:44 +0200
+	id VEgGLAAPMWrSawUAu9opvQ
+	(envelope-from <netdev+bounces-299778-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:53:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D9C68D446
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:44:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AD168D50A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:53:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=resnulli-us.20251104.gappssmtp.com header.s=20251104 header.b=q9oqV193;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299777-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299777-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b=XdHUvTEX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299778-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299778-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6B885300C0DF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:44:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AE260300C0DB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3034030AD0A;
-	Tue, 16 Jun 2026 08:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5FE32ED58;
+	Tue, 16 Jun 2026 08:53:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E51440E8E5
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 08:44:36 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781599482; cv=none; b=NnMs01xnAQ88WimxfRYdgnnEbgZ50qVmIUK53n1FS6uyj7H4aQzYoyBHoz2qy4fIfjgyDTAlmMAXVtwof0oKrR2fANbnIYwspYpe1JMujxm6Mx4PnPJ6Lu1NUDmHZPFXSxfuEW5oPXlh/NaUVeHpzkHSvNOzdzWMvtoff+YKr4A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781599482; c=relaxed/simple;
-	bh=gg7rTUPNLZTVrrfv2XgfdECYmR6PfJK49KGSdjpT9gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X0aPPmlJmMC9zIYDwJmGYf7n2a2EdfaBCH0DlhqJv8yOxahh276TYIPxMQ2pUu1iRannmkAdJQ1jM7M8NSYGBDmfQ4BAL8skpnPlQ85tAN+pP0sWfPuLffchTKuGfpF1wMD25nckWfaIsjlDHtJji8Qef2SPOe7e4R+x+a9f4hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=q9oqV193; arc=none smtp.client-ip=209.85.221.48
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-45f3cf907ceso2220137f8f.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 01:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1781599475; x=1782204275; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gg7rTUPNLZTVrrfv2XgfdECYmR6PfJK49KGSdjpT9gc=;
-        b=q9oqV193vKXHXh4xedW3ZrChBc3nMC4u8KxhpgZp7XKkbeWctPR9e3x0W09zjSYuQu
-         SGI4Thddt0Kr/cTBN9BtxII5YPTwdcNJ8pJ0zcd9SrD+3m5dOkM5N27SQLZA53shl/EC
-         YfVZApiCI91SdhipsCIt/7LGLi2ml5+ZL6dQCe4Af7IkmKdsjoYsm1OTED6VnognJ3/4
-         kEUKcy3aHRa5Xo6wEp0EwJqP1tqKSHm/8aw+KNepXvp8n1I0BfEHMZxZR0llkCqVKeTV
-         3SwvUvlYQhRvQHyMqROzqKwOiRG79NWvXx540UoZCP2aOI9JcowKzEKmGnXeG0qF5UF4
-         ok6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781599475; x=1782204275;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gg7rTUPNLZTVrrfv2XgfdECYmR6PfJK49KGSdjpT9gc=;
-        b=gan88zr5CMMbdqgrhS3PeixOgN9UBFBj2qP+wzHdJmv/xHM//2idoKJcpH4hiCXKVR
-         MGJB0bY4qP5lmPCJnzEhty+tzRh9hn/Zfejtk/i0yebjZtp6k7IALOnFhN1HNyLdBjI2
-         ohn0qxi+P70Nlw6ZSVV95X/iqJXY8MB990EjGqV46M5HLE0qqmbjbdtI2chryoj5tYkD
-         wZ3ugICd5iEiO/8wHNUUo8eHO4y0jFsnKIFwOqAIbe4/MZ744ZMg4arvZJQ8vVYJTfnZ
-         +sPLh/L3vDYR11aYPxpQWO/+dbDLXf/A77cdu3Cpru0v1165x1i3kM6EoPbuznTIXe/I
-         /GIg==
-X-Forwarded-Encrypted: i=1; AFNElJ8EbtIylfVet8wzLRrLxY710uOPwGVIp3NiTB+bl2uopWr3F6Fx0kxsJQU2S0oW89OYVScm8k0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYR75pOwvUb/fzCp7NFklAEhhb/gmD4UbLrNfEVjpx+RYIEDqv
-	nyy3yJ0j3eExw/HmbawTIhD6Oo5rwuk263pQuhO7aPtMgcP1JtTD28GfNEbRf1Mdk9E=
-X-Gm-Gg: Acq92OGPPS/7mjH/131y+a3yZOQSOjPkVRrV/n0Do7DqvmDWkRcC4MWUD4FGf9wRqBh
-	yxnS5Uj55U4XG96sAlWJdt2YuWRlD5hrK5u/cY9n0Vt9Jrwcvv5egUiaC7CE8j6HhU8IKxaLaVo
-	cFDY/m4Lw6vqywdIPGQgwsLp2bA1JwwkYsUe9uF2xS1l3yW0OJq9G1f96qU6xWaaUHmkbD1y2g6
-	kPk3iP25uXhbbbFWQuHD2XrzWfgBHY4NaR8STmFUDI35E2lNRAGGR/ddjmSRYzTt26ZomElS2XU
-	+ipOrmOEhLrE/XpfsSVOmDFK+EM8cNdB/Q8Mu+wVapSep42zjR23Qou0MdT+sKODCkRYpsILhax
-	zvqtZ9DKSXhoQTAmTysBP/65asKpZo0kSvwG87qsTr9NXScMKnw5xKq3edaS/aXj+kcN5zPOOLe
-	3CMBvxtSvMk3D+U6J4r0lqWMjrqQ8HBj8=
-X-Received: by 2002:a05:6000:1787:b0:45e:73b3:4515 with SMTP id ffacd0b85a97d-46074b87912mr19780266f8f.35.1781599474732;
-        Tue, 16 Jun 2026 01:44:34 -0700 (PDT)
-Received: from localhost ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f26f3dcsm40146140f8f.13.2026.06.16.01.44.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 01:44:34 -0700 (PDT)
-Date: Tue, 16 Jun 2026 10:44:26 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	Weiming Shi <bestswngs@gmail.com>, yotam.gi@gmail.com, jhs@mojatatu.com
-Subject: Re: [PATCH net] net: psample: fix info leak in PSAMPLE_ATTR_DATA
-Message-ID: <ajEM5EOOZhcGP2ah@FV6GYCPJ69>
-References: <20260616003046.1099490-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F2430E84F
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 08:53:16 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781599997; cv=fail; b=YXn+p5enTj/swTI1f7V62Nx/GG7YNXFWY+vUF1cYuEV2a7NM0n3yv++WB96TGVJZU9I1+3y7rLyWuO9DCIAWJZ26rSWCngUIqRbbDP3dL3g6zrUp9QlXzgQikXgxyehAB5SvcGqbiJzlO/aBBv2UMlaFiY4p7iAEOtCGlERcSZg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781599997; c=relaxed/simple;
+	bh=4usePgSK6Wt5LOsNduVAkrxUdYa/MyhgXFhObr8BxpE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=L/KdcGFMQNAGd1IZn9JZpe2DOcuB8Xadsmy+ixFFnwuL2xhO45SPuVZMMQovdP0xIb9GP77UoBrBYNYaYlwFM8S/U/eG6n46wwpkV+Ky/b8zNKgQbEiqcMK7HaMK3aEReF8R/4rRM95TShGhg7pJzEWL75/9gu6iBtk0infm4J4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XdHUvTEX; arc=fail smtp.client-ip=198.175.65.12
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781599996; x=1813135996;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4usePgSK6Wt5LOsNduVAkrxUdYa/MyhgXFhObr8BxpE=;
+  b=XdHUvTEXqnC7zSh7mWPS75aBxexX7+WODx4GKXh9VtmDqqOFBtcUwJju
+   g/PpawZNTgl/kyfa9+yHexa159XekHo5MjqMNMpCyz/lNbtP5EyD4jMSn
+   5LoJAC+a3dXYs5EaBpB2gOmeVPaDZYxdSEHKhDwt/LdZIi08wjo8XzWpQ
+   a/CqYx64I6KUuKCYFZOYPpA5Ln8kNTeBxk4Yr2KlnTgU4PKUIhNEhKWJj
+   KXOPJcZIKJh5xruuvZXp2jhF1KlwRXq7HAAA1qH/6PgX5z3MA8Yc++vqw
+   zOepSqw/AkgUH1rsBqRuoRvJhTYUVdDQ8gFWBzZHt+Zz0rKdRIK2lJhKw
+   g==;
+X-CSE-ConnectionGUID: dvHxXM9YT8KfyCU8DY/YJg==
+X-CSE-MsgGUID: D5RsnYl0RzKb4VrgT3A+lQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11818"; a="93848261"
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="93848261"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 01:53:16 -0700
+X-CSE-ConnectionGUID: YEJEYb6gTM2n8gYKfYMN1Q==
+X-CSE-MsgGUID: qnkstXnKRhGXwB5JG/ZeLw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="252837238"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 01:53:15 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 16 Jun 2026 01:53:14 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 16 Jun 2026 01:53:14 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.66) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 16 Jun 2026 01:53:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UZZVX5lbOCSoqzYeP6Cxf+TWGCDO83AWo/5WaS/pW0w4O9nHOrW0SQy3y3it7KARwcNHx67GFrX0PHqyrNipskLiCfdSPdgdi70hMNrTq3iWpGCsxg3Y6e4sYwzisLfK5MAndXSqm0yeQz7yBz0/5incuSFH9SwlzT6n6c27VAC7ZwnpQdQjjCtf9lPcD4z9HKLL+amBJRxsAHVso1yAEsgf7FbbSLFmYG2qbuAdmhxUELBGLxObFA1HOcCtkCL75JMEfoRvJBN8Soh3LS1DYo21oXGxlawDn7diUJ1ML/d81Ev71bkI9U/BuyZFQxLZJQfbv7LwBJjG75HsJ22kpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d6JLkVOVAr0PoR31ZiHNzoGqMqi898C0xPzYDGY4xXM=;
+ b=TEDlgg1sBA5wxR9IGpNULszAiQuJo6g3ChazOzpNGSvIWoXi+joqa4mekzyn0aOVsJnp5p3HracPaC+CNvl+EyuBg2q3OuFsk01Z1BNrvTExGf30SbRW2ma0GokRmZVEOya3YCOO+m1lXUm5cj40DzSoQ7yhKBkC7baztKBEFjOsCCrU0kzoN99hTWX/D4azACZR3hsr+/C5CeG6rG1+V5uAYOh1vQKLu96Q6IftFx4FsK+kZrC8Z9VMyaqq6/GxBLzDLcgtFUyAEpcf5FPGdhy13upy3p6KvJnNqOFlZw+FBZ6KJTl2+yBNsoL8wc+umWJm7zwUbeCjdr82es+csw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB5983.namprd11.prod.outlook.com (2603:10b6:510:1e2::13)
+ by CH2PR11MB8813.namprd11.prod.outlook.com (2603:10b6:610:282::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
+ 2026 08:53:10 +0000
+Received: from PH7PR11MB5983.namprd11.prod.outlook.com
+ ([fe80::4d6a:a025:2e8b:b240]) by PH7PR11MB5983.namprd11.prod.outlook.com
+ ([fe80::4d6a:a025:2e8b:b240%3]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
+ 08:53:10 +0000
+From: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+To: "mheib@redhat.com" <mheib@redhat.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>
+Subject: RE: [Intel-wired-lan] [PATCH net-next] i40e: add devlink parameter
+ for Flow Director ATR sample rate
+Thread-Topic: [Intel-wired-lan] [PATCH net-next] i40e: add devlink parameter
+ for Flow Director ATR sample rate
+Thread-Index: AQHc/BiL3evlwi2s306qJnvvM3oNbLZA4PZg
+Date: Tue, 16 Jun 2026 08:53:10 +0000
+Message-ID: <PH7PR11MB5983EFFCE5D7DBA199640113F3E52@PH7PR11MB5983.namprd11.prod.outlook.com>
+References: <20260614161131.192068-1-mheib@redhat.com>
+In-Reply-To: <20260614161131.192068-1-mheib@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB5983:EE_|CH2PR11MB8813:EE_
+x-ms-office365-filtering-correlation-id: 6d5162f3-7f94-48be-ae5d-08decb84b176
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|7416014|23010399003|376014|366016|1800799024|56012099006|6133799003|11063799006|3023799007|22082099003|18002099003|38070700021;
+x-microsoft-antispam-message-info: hmZeuYD8rptG6f16uizfh3safhkzu/w++PJXzw06959gIGU1ZV5xdlBH9YGV6RTgp1/oQI0yQN5xJDmEWgCV7Y9rzhJZAJSAHYknWBc6NxtS8N5qzoZoEQBOcmL2+FIfucjHwyJwoAzyscWMNkX6OQ4fw41oi7DA7mHFeozyfeHQj32hFct7WuH1qepEcQ0hy7sQFIfdnhnrsckjPpLe2R65OI11yNH+z7tj7jJ+SMSyYqSyT0BPINlZ24T3js1/jXU9rTeumyiB5FhlQ/pyXXEH1pH5o/U/tk97EegfXmL/yNBXYl6fbhV6Lf9UHYv/Q7vkT1OAuZvygkB1g87VgKzrPeXADncnxFhvIIdSICAsM/crEQRIS2E6WVPMNlkFcENQe7giXVR4x3RHAotg1y1SrvNLzXn/Va/5YOWcbxz5xY8ivEYh3bORUrAL/mmNufNpQ58wjBEGMRuJHH77/JwitjKdm9abe8ydpqkGS07TgHbJQECrwQr/5av/5+THulUbrV6xGY1o81wQlZyQ+I9nrgOJv3FXYc7KSAzgjwMnGEbFS5g4IyDoAf4lEFaMqMHZ/EPCYN17US6oqyeIR4hX9lRNsX5j1Pf/35IDORfjH2CSlB+9b9RJmsmc21xnCqVavfHHvzeBSQjcPwqy9A3aWAby/ElOn9DGZK6qB4fnYsflYSlhMF8jxYSuzsTl+EpLY99z4gopxiQ41T19QixcW4/ELcam4IfoQKEGM+zMY+b5Wd47Jo5DavEjm1aC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5983.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(376014)(366016)(1800799024)(56012099006)(6133799003)(11063799006)(3023799007)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?f/9kLXeAnAexYrYwVRFMatqJQkdAPer7BfpnP5AuV9jdwXbge5CxH4buWCuq?=
+ =?us-ascii?Q?CqWW3aGbRcuplgV92Gh+NhMv/eTES5YVCSf3OsBrQCKNOPQU+SwIRvoBtNN1?=
+ =?us-ascii?Q?9BvO6aQOrOR8/Yjmme8FKQ6mZXyoJvFpLFVsAk0vfX5JbAfTSa14G9o25qfu?=
+ =?us-ascii?Q?5VAPbZ3U1p9SnVswc7D5HcFmI3e9SgdnjfQage++MUDKFtPokrPnrRIDq9sA?=
+ =?us-ascii?Q?4QzraBvJgPdD8DxYFZwdv2hEjB5YKlF3aQ+fUtR+vhFWpk2BUL3eDRvxhSwr?=
+ =?us-ascii?Q?zi+P8lccSf4TbG7DokohloB+xwIgwfa6RxoIrYJ6s6XX75DFo+X5GjGDteRY?=
+ =?us-ascii?Q?5urgzJrXpKaBXQzhWCH3SAHsiW510tdeTasJSLGmVZ53w/6Ap8BjvAdxQ6Ik?=
+ =?us-ascii?Q?EqixV+6yzG2q4CQlxOK8VjkkXpSuskIncaa3q4M0PY6lWqdVTG/KaA3QkZ06?=
+ =?us-ascii?Q?kuzGAHdUL45SjrsldAlKxyMgj8920ZXwZKtDWlfz1RrCc249WR/Y5fADnq2+?=
+ =?us-ascii?Q?XhZDrwU1rCkPwMSXJb5W99mNmStH9hGbaU7Ocp9iR/xKBdEWd+6HhSc8tJNj?=
+ =?us-ascii?Q?lZFs9bdFHP4jy4zfTNFK8vGUCzUN1aKW8jjX3ZuTdJ4ZC6vJEAARCwN+Nu9A?=
+ =?us-ascii?Q?E2q5hXdZPf68GHcUAFqs3wUU6TpijF1feZdfVbVQzO/SnJkMmTvoJoRJ34f7?=
+ =?us-ascii?Q?zaZNvVGv7ZSkcw9VTUAN6qEyLGen++4WKqoUqJqUJfzX3IeDtAofUJOJ9uRo?=
+ =?us-ascii?Q?JqmcxiWQmFe9OWb1vKw6EfOjfpUW6A6xMWRxuK40VRlOH+bZ2fx7zF5pn1NV?=
+ =?us-ascii?Q?caFbYHDk5w3gzx8tWtApgm0pLQOxCbfsmYczX4MmhaHMXya4GF0+DhSa6jyC?=
+ =?us-ascii?Q?Yf/zJGmndHOfD2vvzBoXstcvHRagWrNH4EPa5DcX5dG5jRMFkGfh7NbfqvqH?=
+ =?us-ascii?Q?VPt8rpFzE7kixexZUP68ilW//3jzAVkYJdMPKOfD8cFxAa+3Fh4zexMFtGMA?=
+ =?us-ascii?Q?Z160w82NBeMJW0icnwRi10jBGvGw3NVVBI+Mo1hzmbp8u1845SGzyJl8Rvz1?=
+ =?us-ascii?Q?WmMfZg/YBgvAAd4fY5IfZSNKnzpPMKDH0Xqmn3aJ4Ro6YlnCBbuxHxJclEl4?=
+ =?us-ascii?Q?bUnLcLY+/QV2NMY2AhBPhUOFeQdoZ/0hiqr3EtW4O0tVqKtvaA6X+rG7bw8c?=
+ =?us-ascii?Q?EdTv2yW1iWoa7To+9lTMZBzDH/7YnK64zZ9juTQXTeQgQZ3ZGQHi5b9xW4l9?=
+ =?us-ascii?Q?0KSL+PUOwN3AinubR6AUiEiQ7dG0b32//JTHhXrGb5l+oXRHGBOyJvhx9BzP?=
+ =?us-ascii?Q?6AVpxG7duNR/GlDGSxD32Zb5EVhfZUQBv+5G//cM18M6IlLassudCE+JRZjB?=
+ =?us-ascii?Q?PnP0ZynhjfBRHfeYIa2Xukh7jrPPDXBsZHCdYxNw3iTm3ozLmP7o9vQ2+07K?=
+ =?us-ascii?Q?IicpUv35ZzATvxFJGBovlnB/PCEOzE8zw0Xslb82ON53hB1VyxVIiCkC2KD+?=
+ =?us-ascii?Q?jn+GTDqP4PVVJ2DeBKZ4OWdJWKBFMWEV66vfpBs0G8LF3+kySs3ZkhYkEKM+?=
+ =?us-ascii?Q?nvaUlpayaNa02QZtnQWI10RhkArYyAf6D7uYD/+TNG0dtiWzKUpa05wCKWg9?=
+ =?us-ascii?Q?lZNtziFlnZv41RGTdB2LJKhd6XbxFfiVK9NQQrpAz4hbNXuC0tkROFeOUGoS?=
+ =?us-ascii?Q?kYmIpf9Z9SLKNFqi97IvJjCyQ4+/KwOoCCtv6N5bbVGulnxRK/eA7QBBLbBl?=
+ =?us-ascii?Q?/XioeZ4rZQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260616003046.1099490-1-kuba@kernel.org>
+X-Exchange-RoutingPolicyChecked: ZjZ3+MLRN+NRE63yM/hD6QGs4CS6E5f2wF2Xt9jsvRk0mCsyAfl0/eDATmFZSdj5PmYFS6P6JIx+jsiY5uD/hwvf5P6xt374wfQUfJw6jpR1g1DvwCETZhYHoxfC5qLy10+Lv2ItziQTJcgTPV3uM3bQ4yLuPbNtvwS69NUt2blynVU1M6YHrpRccFM3GOLGytJmRNVKnVRpwCxifut1rZ98TkMhZdFtZjeEbO6Xa1k74hfhZPwtDkCNxb+qxuAQVVs79dfEN3be1iRFzs/QqB8pM3cb0OBZcW9NdXNycM/9MXb76/XFAoedlRtS79oSG8dH+Rh3SsCK7M/4itCPKA==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5983.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d5162f3-7f94-48be-ae5d-08decb84b176
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2026 08:53:10.6257
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L6Let3x6cmkcq0u1ssXsgSf2SSgIPAZtHp2zUkItw9F/x93iZ6YKwMa6yHWPxk8uTnnOcRffHJe2PlT+cNP9LYIspdloaos46hrusofpFX4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR11MB8813
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299777-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
+	TAGGED_FROM(0.00)[bounces-299778-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[piotr.kwapulinski@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:mheib@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:jiri@resnulli.us,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:corbet@lwn.net,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:bestswngs@gmail.com,m:yotam.gi@gmail.com,m:jhs@mojatatu.com,m:andrew@lunn.ch,m:yotamgi@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,mojatatu.com];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:from_mime,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,lunn.ch:email,osuosl.org:email,vger.kernel.org:from_smtp,resnulli.us:email,davemloft.net:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[piotr.kwapulinski@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,FV6GYCPJ69:mid,resnulli-us.20251104.gappssmtp.com:dkim]
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F3D9C68D446
+X-Rspamd-Queue-Id: 47AD168D50A
 
-Tue, Jun 16, 2026 at 02:30:46AM +0200, kuba@kernel.org wrote:
->psample open codes nla_put() presumably to avoid wiping
->the data with 0s just to override it with packet data.
->This open coding is missing clearing the pad, however,
->each netlink attr is padded to 4B and data_len may
->not be divisible by 4B.
+>-----Original Message-----
+>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of mh=
+eib@redhat.com
+>Sent: Sunday, June 14, 2026 6:12 PM
+>To: intel-wired-lan@lists.osuosl.org
+>Cc: netdev@vger.kernel.org; jiri@resnulli.us; davem@davemloft.net; edumaze=
+t@google.com; kuba@kernel.org; pabeni@redhat.com; horms@kernel.org; corbet@=
+lwn.net; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemysla=
+w <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch; Mohammad Heib <mhe=
+ib@redhat.com>
+>Subject: [Intel-wired-lan] [PATCH net-next] i40e: add devlink parameter fo=
+r Flow Director ATR sample rate
 >
->Fixes: 6ae0a6286171 ("net: Introduce psample, a new genetlink channel for packet sampling")
->Reported-by: Weiming Shi <bestswngs@gmail.com>
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>From: Mohammad Heib <mheib@redhat.com>
+>
+>The i40e driver uses Flow Director ATR to periodically update flow steerin=
+g information for active TCP flows. The update frequency is currently contr=
+olled by I40E_DEFAULT_ATR_SAMPLE_RATE and is fixed at driver build time.
+>
+>On systems with a large number of queues and high-rate TCP workloads, the =
+default sampling interval can result in frequent Flow Director reprogrammin=
+g for long-lived flows.
+>
+>The amount of TCP packet reordering observed on some systems is sensitive =
+to the ATR sampling interval. Increasing the interval reduces Flow Director=
+ programming activity and can significantly reduce the associated reorderin=
+g.
+>
+>Since the optimal sampling interval depends on the workload and system con=
+figuration, a single fixed value is not suitable for all deployments.
+>
+>Add a devlink parameter to allow administrators to tune the ATR sample rat=
+e at runtime without rebuilding the driver or disabling ATR functionality e=
+ntirely.
+>
+>Signed-off-by: Mohammad Heib <mheib@redhat.com>
+>---
+> Documentation/networking/devlink/i40e.rst     | 19 ++++++
+> drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+> .../net/ethernet/intel/i40e/i40e_devlink.c    | 65 +++++++++++++++++++
+> drivers/net/ethernet/intel/i40e/i40e_main.c   |  4 +-
+> drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  4 +-
+> 5 files changed, 90 insertions(+), 3 deletions(-)
+>
+>diff --git a/Documentation/networking/devlink/i40e.rst b/Documentation/net=
+working/devlink/i40e.rst
+>index 51c887f0dc83..704469aa9acf 100644
+>--- a/Documentation/networking/devlink/i40e.rst
+>+++ b/Documentation/networking/devlink/i40e.rst
+>@@ -40,6 +40,25 @@ Parameters
+>=20
+>         The default value is ``0`` (internal calculation is used).
+>=20
+>+.. list-table:: Driver specific parameters implemented
+>+    :widths: 5 5 90
+>+
+>+    * - Name
+>+      - Mode
+>+      - Description
+>+    * - ``atr_sample_rate``
+>+      - runtime
+>+      - Controls how frequently Flow Director ATR updates flow steering
+>+        information for active TCP flows.
+>+
+>+        ATR programs Flow Director entries based on sampled transmitted
+>+        packets. The sampling interval is specified as the number of
+>+        transmitted packets between ATR updates.
+>+
+>+        Lower values increase Flow Director programming activity, while
+>+        higher values reduce the update frequency.
+>+
+>+        The default value is ``20``.
+>=20
+> Info versions
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet=
+/intel/i40e/i40e.h
+>index 1b6a8fbaa648..88eb40ee45f0 100644
+>--- a/drivers/net/ethernet/intel/i40e/i40e.h
+>+++ b/drivers/net/ethernet/intel/i40e/i40e.h
+>@@ -487,6 +487,7 @@ struct i40e_pf {
+> 	u16 rss_size_max;          /* HW defined max RSS queues */
+> 	u16 fdir_pf_filter_count;  /* num of guaranteed filters for this PF */
+> 	u16 num_alloc_vsi;         /* num VSIs this driver supports */
+>+	u32 atr_sample_rate;
+> 	bool wol_en;
+>=20
+> 	struct hlist_head fdir_filter_list;
+>diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/=
+ethernet/intel/i40e/i40e_devlink.c
+>index 229179ccc131..16e51762db45 100644
+>--- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+>+++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+>@@ -33,12 +33,77 @@ static int i40e_max_mac_per_vf_get(struct devlink *dev=
+link,
+> 	return 0;
+> }
+>=20
+>+static int i40e_atr_sample_rate_set(struct devlink *devlink,
+>+				    u32 id,
+>+				    struct devlink_param_gset_ctx *ctx,
+>+				    struct netlink_ext_ack *extack) {
+>+	struct i40e_pf *pf =3D devlink_priv(devlink);
+>+	struct i40e_vsi *vsi;
+>+	u32 sample_rate =3D ctx->val.vu32;
+>+	int i;
+Please keep the RCT and put 'i' right within a loop.
+Thank you.
+Piotr
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>+
+>+	pf->atr_sample_rate =3D sample_rate;
+>+
+>+	if (!test_bit(I40E_FLAG_FD_ATR_ENA, pf->flags))
+>+		return 0;
+>+
+>+	vsi =3D i40e_pf_get_main_vsi(pf);
+>+	if (!vsi)
+>+		return 0;
+>+
+>+	for (i =3D 0; i < vsi->num_queue_pairs; i++) {
+>+		if (!vsi->tx_rings[i])
+>+			continue;
+>+		vsi->tx_rings[i]->atr_sample_rate =3D sample_rate;
+>+		vsi->tx_rings[i]->atr_count =3D 0;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static int i40e_atr_sample_rate_get(struct devlink *devlink,
+>+				    u32 id,
+>+				    struct devlink_param_gset_ctx *ctx,
+>+				    struct netlink_ext_ack *extack) {
+>+	struct i40e_pf *pf =3D devlink_priv(devlink);
+>+
+>+	ctx->val.vu32 =3D pf->atr_sample_rate;
+>+
+>+	return 0;
+>+}
+>+
+>+static int i40e_atr_sample_rate_validate(struct devlink *devlink, u32 id,
+>+					 union devlink_param_value val,
+>+					 struct netlink_ext_ack *extack)
+>+{
+>+	if (!val.vu32) {
+>+		NL_SET_ERR_MSG_MOD(extack,
+>+				   "ATR sample rate must be greater than 0");
+>+		return -EINVAL;
+>+	}
+>+	return 0;
+>+}
+>+
+>+enum i40e_dl_param_id {
+>+	I40E_DEVLINK_PARAM_ID_BASE =3D DEVLINK_PARAM_GENERIC_ID_MAX,
+>+	I40E_DEVLINK_PARAM_ID_ATR_SAMPLE_RATE,
+>+};
+>+
+> static const struct devlink_param i40e_dl_params[] =3D {
+> 	DEVLINK_PARAM_GENERIC(MAX_MAC_PER_VF,
+> 			      BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+> 			      i40e_max_mac_per_vf_get,
+> 			      i40e_max_mac_per_vf_set,
+> 			      NULL),
+>+	DEVLINK_PARAM_DRIVER(I40E_DEVLINK_PARAM_ID_ATR_SAMPLE_RATE,
+>+			     "atr_sample_rate",
+>+			     DEVLINK_PARAM_TYPE_U32,
+>+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+>+			     i40e_atr_sample_rate_get,
+>+			     i40e_atr_sample_rate_set,
+>+			     i40e_atr_sample_rate_validate),
+> };
+>=20
+> static void i40e_info_get_dsn(struct i40e_pf *pf, char *buf, size_t len) =
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethe=
+rnet/intel/i40e/i40e_main.c
+>index d59750c490f4..9c8144970a34 100644
+>--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+>+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+>@@ -3458,7 +3458,7 @@ static int i40e_configure_tx_ring(struct i40e_ring *=
+ring)
+>=20
+> 	/* some ATR related tx ring init */
+> 	if (test_bit(I40E_FLAG_FD_ATR_ENA, vsi->back->flags)) {
+>-		ring->atr_sample_rate =3D I40E_DEFAULT_ATR_SAMPLE_RATE;
+>+		ring->atr_sample_rate =3D vsi->back->atr_sample_rate;
+> 		ring->atr_count =3D 0;
+> 	} else {
+> 		ring->atr_sample_rate =3D 0;
+>@@ -12745,6 +12745,8 @@ static int i40e_sw_init(struct i40e_pf *pf)
+> 		}
+> 	}
+>=20
+>+	pf->atr_sample_rate =3D I40E_DEFAULT_ATR_SAMPLE_RATE;
+>+
+> 	if ((pf->hw.func_caps.fd_filters_guaranteed > 0) ||
+> 	    (pf->hw.func_caps.fd_filters_best_effort > 0)) {
+> 		set_bit(I40E_FLAG_FD_ATR_ENA, pf->flags); diff --git a/drivers/net/ethe=
+rnet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+>index bb741ff3e5f2..7e29e9244c3a 100644
+>--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+>+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+>@@ -372,8 +372,8 @@ struct i40e_ring {
+> 	u16 next_to_clean;
+> 	u16 xdp_tx_active;
+>=20
+>-	u8 atr_sample_rate;
+>-	u8 atr_count;
+>+	u32 atr_sample_rate;
+>+	u32 atr_count;
+>=20
+> 	bool ring_active;		/* is ring online or not */
+> 	bool arm_wb;		/* do something to arm write back */
+>--
+>2.53.0
+>
 
