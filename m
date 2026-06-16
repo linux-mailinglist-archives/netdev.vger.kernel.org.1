@@ -1,136 +1,137 @@
-Return-Path: <netdev+bounces-299713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 8ulJKYmwMGotWQUAu9opvQ
-	(envelope-from <netdev+bounces-299713-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:10:17 +0200
+	id mZlrFiiyMGp4WQUAu9opvQ
+	(envelope-from <netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:17:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFAB68B68F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:10:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2AF68B6E2
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:17:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=N8CNRlWB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299713-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299713-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=OStTHS9c;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B700300603E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:10:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3219D300FA88
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061A73A9D8C;
-	Tue, 16 Jun 2026 02:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD90A3BFE44;
+	Tue, 16 Jun 2026 02:17:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B310391E49;
-	Tue, 16 Jun 2026 02:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF63B37B413;
+	Tue, 16 Jun 2026 02:17:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781575811; cv=none; b=becoZwR51twE0bHjbfam1/6VAY91XkKn9hR7zRalM1bTzNNPLv5XNZK1Os8lvIG96SYxlDGm4xRo/Yc2vmyzRTHxHGELTGOQLtH0vmcpk/LsArM3bt6D/BIeJALZQGfE0jpWTOO9lYNI44dEMNcqn2tZu+6NbZd9yfZJUKxdf6g=
+	t=1781576227; cv=none; b=PVwmllBjv9fIvXWSxqMt8Hi9Thw61Ej3gAmRfZajEutcnXoziHxtWwJrgnrG46JVK3yOAeCVvNGgaBchvxEluW6yjXX2Oe8XfQVWmXw2mistMd9GzjtHxHSbrgqoBclI1c5aPANj3OwmUds8bpV9m0YWe3vzTfM6yXvfFu4eRp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781575811; c=relaxed/simple;
-	bh=of34fRKBYUZvDxAyR6UMEDMCu20pX0y5iC5TZScvzL4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j/1As3xGgRLu1VcZlMfGRE6vPW+ThwAuWgIFdnF+nNJYRZ6AjgD27CrbhXF5GhGpGeb0oTJ3vZPHSqRdMU7COe/p0gvAjelPI4o+/91HlnLQ+dSuoisjKvNlAnT6biU8fKEP0sNMWv0/QgDTl+cdW289cxneuqs5Wo85YgHFv6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8CNRlWB; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A97BF1F000E9;
-	Tue, 16 Jun 2026 02:10:10 +0000 (UTC)
+	s=arc-20240116; t=1781576227; c=relaxed/simple;
+	bh=iYuwh/QjPCaFltZgY1oNyGfCkwfgJLRV5G8y/pey57o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dDwyFBXPviVRojsR9lz2pUixS+AkXHmOkoMenmN6JcArVvgoIg1fD02gTj/McWu8yE9fav7qzQO1tephnUuFpleif7+ah3gmC2610VsjDOgVhWOfhxrU12SM8YVwJbAY2j4RhLTYxBI/IJuo3lnFGqNF+lva9AobhhaBS4CREbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OStTHS9c; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E4D1F000E9;
+	Tue, 16 Jun 2026 02:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781575810;
-	bh=NYfWWcl8Vaz5dyQoFNOwiQBYjsJN4KQ+mYA8kF+EyLo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=N8CNRlWBeEBYVaVEUrbi4TznVZaamfaX1lYr4WeCV/HNvfbLBm8ChXYkeF+KjfWSy
-	 TIWtRVYXPM1HaIcQ0HomTQ5A2Ri+5lYa5SjBRaYY/TVXJLEtUtmlZYk/xRrYktHve3
-	 RTccuSC1t5I9gE6evXyKKkVJrQo57b4G75AuWCxLIkQ8B0PuQS6xN4C+Rj3Ikak/2K
-	 AjIz+lHq/eLhwVopF4avT2AtuLgDsm2wK5Q5ln9HasOvw2Dw6u+bRtEtWxkDvD7mE8
-	 9sbDqNibM9Ofs0WjHMCTX4STjlMN0fKTKVA1QQNoiE3dzL9VHmLcdKWjqqVhG+2xms
-	 ZSDNb9OE65n3Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0AA93839A26;
-	Tue, 16 Jun 2026 02:10:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1781576226;
+	bh=xD+Oip3IRpQPzSxenYyTvneudjF43QmGVA6/28MSifo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=OStTHS9ceHewKrSU9o18QwJHMw4AaB6qp16uTX1ZTaLPmPIBVJ1pSMw1/lJ3jQeA+
+	 G1Vj/m3qrDZP/n3iLx4qkdSkdRQD7RAXYKDxBmdm/4HEpJs6zXA5x6lFVaHtN17NAI
+	 hw74FSwUS74Zigh7lKdAGeN2AS+22bqzFTCbWu0athb/SR13nF5ZZT3dcoGyc1vCHL
+	 BHjECOGWU8Y7vIwGaDgVr1A4bbBgAtxKo1f8Q6Qn65+vqV6m5HJXYSEBJOYKaMqWjV
+	 i75kqeYQMypXa9zyHUjO7tSEBlL7sd/dgKS8PXvUFzFLOPYGDDsrrFm92iX/5Qa371
+	 H7KQ1oHer7+Qw==
+Date: Mon, 15 Jun 2026 19:17:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: edumazet@google.com, ncardwell@google.com
+Cc: chia-yu.chang@nokia-bell-labs.com, jolsa@kernel.org,
+ yonghong.song@linux.dev, song@kernel.org, linux-kselftest@vger.kernel.org,
+ memxor@gmail.com, shuah@kernel.org, martin.lau@linux.dev, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
+ horms@kernel.org, dsahern@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+ stephen@networkplumber.org, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, kuniyu@google.com, ij@kernel.org,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+Subject: Re: [PATCH v2 net-next 1/1] tcp: Replace min_tso_segs() with
+ tso_segs() CC callback for TCP Prague
+Message-ID: <20260615191704.31be22da@kernel.org>
+In-Reply-To: <20260615185102.5e8de52d@kernel.org>
+References: <20260614071756.239686-1-chia-yu.chang@nokia-bell-labs.com>
+	<20260615185102.5e8de52d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: sja1105: fix lastused timestamp in
- flower
- stats
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178157580564.388586.11606897833464458044.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jun 2026 02:10:05 +0000
-References: <20260614141320.1133321-1-mmyangfl@gmail.com>
-In-Reply-To: <20260614141320.1133321-1-mmyangfl@gmail.com>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, olteanv@gmail.com, andrew@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-299714-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-299713-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:chia-yu.chang@nokia-bell-labs.com,m:jolsa@kernel.org,m:yonghong.song@linux.dev,m:song@kernel.org,m:linux-kselftest@vger.kernel.org,m:memxor@gmail.com,m:shuah@kernel.org,m:martin.lau@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:horms@kernel.org,m:dsahern@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:stephen@networkplumber.org,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:donald.hunter@gmail.com,m:kuniyu@google.com,m:ij@kernel.org,m:koen.de_schepper@nokia-bell-labs.com,m:g.white@cablelabs.com,m:ingemar.s.johansson@ericsson.com,m:mirja.kuehlewind@ericsson.com,m:cheshire@apple.com,m:rs.ietf@gmx.at,m:Jason_Livingood@comcast.com,m:vidhi_goel@apple.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[nokia-bell-labs.com,kernel.org,linux.dev,vger.kernel.org,gmail.com,iogearbox.net,redhat.com,mojatatu.com,networkplumber.org,davemloft.net,lunn.ch,google.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:mmyangfl@gmail.com,m:netdev@vger.kernel.org,m:olteanv@gmail.com,m:andrew@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,nokia-bell-labs.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8BFAB68B68F
+X-Rspamd-Queue-Id: DD2AF68B6E2
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 14 Jun 2026 22:13:16 +0800 you wrote:
-> flow_stats_update() takes an absolute timestamp for lastused, not delta.
-> Fix that.
+On Mon, 15 Jun 2026 18:51:02 -0700 Jakub Kicinski wrote:
+> On Sun, 14 Jun 2026 09:17:56 +0200 chia-yu.chang@nokia-bell-labs.com
+> wrote:
+> > This patch replaces existing min_tso_segs() with tso_segs() CC callbak
+> > for CC algorithm to provides explicit tso segment number of each data
+> > burst and overrides tcp_tso_autosize().
+> > 
+> > No functional change.  
 > 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  drivers/net/dsa/sja1105/sja1105_vl.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> Eric, Neal, looks good?
+> 
+> The min rtt thing in tcp_tso_autosize() helps a bit but if the sender
+> gets congested for a longer stretch min_rtts on new connections are
+> high and we're back to sending small TSO, keeping the sender overloaded.
+> Which is to say - I _hope_ this also solves some of Meta's problems :)
 
-Here is the summary with links:
-  - [net-next] net: dsa: sja1105: fix lastused timestamp in flower stats
-    https://git.kernel.org/netdev/net-next/c/72dfa4700f78
+Ugh, I didn't see the Sashiko report, it's only CCed to the author and
+bpf@, not to netdev :/
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+The zero-check sounds legit. Let's revisit this after the merge window.
 
