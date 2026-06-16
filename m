@@ -1,74 +1,61 @@
-Return-Path: <netdev+bounces-299960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299961-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 1Bz4M2W9MWqXpgUAu9opvQ
-	(envelope-from <netdev+bounces-299960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:17:25 +0200
+	id By9vMVO+MWq2pgUAu9opvQ
+	(envelope-from <netdev+bounces-299961-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:21:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226C9695648
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:17:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F12D69566A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:21:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DrPAWzPo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299960-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299960-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Rlke8vdQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299961-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299961-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E01743186A95
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:17:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E97FE305069C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E7E37F8C6;
-	Tue, 16 Jun 2026 21:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2240838C427;
+	Tue, 16 Jun 2026 21:21:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F322037EFE6;
-	Tue, 16 Jun 2026 21:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298702882C5;
+	Tue, 16 Jun 2026 21:21:17 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781644642; cv=none; b=oOQhzP4nLhRjZKQod00ftn0oBXd6JbgPbTmREF7KADFCxsWM23+wQlh5p6vQ/Qj20UREqIsdLrrwvZ8kRJUN648WbpcJis7LhkwdSn8fY/NMHdEqEXBX0zSceOLX8TIHmQY1HB15i+A0F74LqM0bByh9HU6/OkBd+O5HfAbzKeA=
+	t=1781644879; cv=none; b=GVOnSiRpwYoh/1UgccwsGdhZoQWVEMcIUfLkhIbfbpB7lJyF7LVZ/m10DYH7wT5wjf7rRPLBx6BTGI0M+vCYrAN4OB5kYzJxtTrr2lngnhWtf2qUzec7DUVgw/xGuwcMGWg5IPAQuaipW09hEqR6RkWX285d1MB4t0R4wUsJxeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781644642; c=relaxed/simple;
-	bh=QTMau5ie2GGEAKVBGPZRNG3hRy6adIvv5lbrYw+yI7Y=;
+	s=arc-20240116; t=1781644879; c=relaxed/simple;
+	bh=1Tv5/FnFyi6D+fKZCd/Z4zN0OO59xLBI9zeOH/aArFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J9pbAcRSK1N2BqEcLwrGL/bGZn44WRNLG56blWun7cu9a4w7lvgrbcHzzzgq7Fm0MOVypF1balYdWPl9+U8wNI6SfYgTcYIfWf1gzKakzBtxMKpwQIFfHaB5G52QRXnTseoqJPxyMrbxNvbmRQLqqcMfYs5RhM+S6mztbC6PM8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrPAWzPo; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A8411F00A3A;
-	Tue, 16 Jun 2026 21:17:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=t5OfE9sOCu1rZ0Lxe9ESC0ppSQ37owBu4atHsQRfwwuS+fapONnbDTcrsK+xuS7jsbSzHymoQ6DiEqobWNMgZykzE9NDxwRKb7wULd+qYnIyon/lheArg5Hk0ppEbm/MGmPkQbGEJFFkEqnHeWKmvwQh38sSlnUChFe0AITTBI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rlke8vdQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60FF41F00A3F;
+	Tue, 16 Jun 2026 21:21:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781644641;
-	bh=NmootHN4igiCQs8RopCQPxrV4Rp0tI0uYhX2d5/vyBg=;
+	s=k20260515; t=1781644877;
+	bh=F9tJ8J+1YWFhgXIDv2qG/wlrFsT4MjPbuiDu5CVNtus=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=DrPAWzPozIAd8z0OeZ+cn5GcnA0lYsXw9qioSOB3wnNF/Gisatr1GakVW+8Dj+TbP
-	 WaJbfdg46Jwhx0sMo1uTfI2YHyQ0iSb2SldhS5PDDSLWj3yYzyvL7bN4p2U65MTAUv
-	 PzrOYNrhWG7s0b6PXS5nl1vCTXDry6bAIOPsPThUHM2M4/bTxENJCJsCDMGhBvCzd1
-	 +/rJTSQIqdBDBsNufBqonhIwBIKUH0u7Hc/TXozvP03HeXsvjpsd9ABZ+8CU1L53e1
-	 SPZ4vOzs0pURzmN1s0QufSkCufmL96dLt006EM54nUIIBFIwZZlWipICYdeJqexZlJ
-	 kBPtdv6u4ORiw==
-Date: Tue, 16 Jun 2026 14:17:19 -0700
+	b=Rlke8vdQM9yJeswSAxiqSkZ4HFICgvCP0im/gOYdMNBldqbAXlLMQIo9OlzkKUnqD
+	 4Wd1pbTBb9SIbvlGVX2o/y+FYHQ58k0cw36aokN8lVhDE7SvWMUnLvp9kfjeNNt2lD
+	 R+0tNOZ5rSVaJzomIk49YNpOwyGXiLq5mPXaGh8oLEMNoFtj+Xt2xas5FaF9Uqget3
+	 e81LVxx1Fyb1CRa7DPL+lSYJhjUyt/7XBVANGAbei8PP20CkDXPEmAD0607e6jk54l
+	 pRo+jv8y1TuWheTFVHqygmmY6B+qGOdqpZ3sbkd529x1xSv9Jy3fs27Qv+XhVkj16G
+	 z23obFjtBxfPQ==
+Date: Tue, 16 Jun 2026 14:21:16 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Petr Mladek
- <pmladek@suse.com>, John Ogness <john.ogness@linutronix.de>, Sergey
- Senozhatsky <senozhatsky@chromium.org>, Vlad Poenaru <vlad.wing@gmail.com>,
- Thomas Gleixner <tglx@kernel.org>, netdev@vger.kernel.org, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Breno Leitao
- <leitao@debian.org>, Clark Williams <clrkwllms@kernel.org>, Steven Rostedt
- <rostedt@goodmis.org>, linux-rt-devel@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, Frederic Weisbecker
- <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- K Prateek Nayak <kprateek.nayak@amd.com>
-Subject: Re: [PATCH net] netpoll: run NAPI poll in softirq context to avoid
- rq->lock self-deadlock
-Message-ID: <20260616141719.67684bf0@kernel.org>
-In-Reply-To: <20260616170257.GH49951@noisy.programming.kicks-ass.net>
-References: <20260610183621.3915271-1-vlad.wing@gmail.com>
-	<20260611191114.5bc43a59@kernel.org>
-	<20260616103529.Yh9Dxsjp@linutronix.de>
-	<20260616170257.GH49951@noisy.programming.kicks-ass.net>
+To: Jack Lee <skunkolee@gmail.com>
+Cc: davem@davemloft.net, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: faraday: ftmac100: convert to devm resource
+ management
+Message-ID: <20260616142116.51831811@kernel.org>
+In-Reply-To: <20260616203233.55234-1-skunkolee@gmail.com>
+References: <20260616203233.55234-1-skunkolee@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,56 +70,69 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299960-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-299961-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:skunkolee@gmail.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:peterz@infradead.org,m:bigeasy@linutronix.de,m:pmladek@suse.com,m:john.ogness@linutronix.de,m:senozhatsky@chromium.org,m:vlad.wing@gmail.com,m:tglx@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:linux-rt-devel@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:frederic@kernel.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:kprateek.nayak@amd.com,m:vladwing@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[linutronix.de,suse.com,chromium.org,gmail.com,kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,debian.org,goodmis.org,lists.linux.dev,linaro.org,arm.com,amd.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 226C9695648
+X-Rspamd-Queue-Id: 0F12D69566A
 
-On Tue, 16 Jun 2026 19:02:57 +0200 Peter Zijlstra wrote:
-> > So this is not an issue since commit 7eab73b18630e ("netconsole: convert
-> > to NBCON console infrastructure"). Because from here now on writes are
-> > deferred to the nbcon thread. So this purely about -stable in this case.  
+On Tue, 16 Jun 2026 13:32:33 -0700 Jack Lee wrote:
+> Replace manual resource management with device-managed alternatives:
+> - alloc_etherdev() -> devm_alloc_etherdev()
+> - request_mem_region() + ioremap() -> devm_platform_ioremap_resource()
 > 
-> Hmm, I thought netconsole had some reserved skbs and could to writes
-> 'atomic' like? That said, it was 2.6 era the last time I looked at
-> netconsole.
+> This simplifies error handling by removing manual cleanup in error
+> paths and the remove function, and eliminates the risk of resource
+> leaks.
 
-Yes, that part is fine. The problem is that netconsole tries
-to reap Tx completions if the Tx queue is full. We can't call
-skb destructor in irq context so we put the completed skbs on
-a queue and try to arm softirq to get to them later.
-Arming softirq causes a ksoftirq wake up.
+net-next is closed right now. Also:
 
-We already skip the completion polling if we detect getting called
-from the same networking driver. It's best effort, anyway.
-Networking-side fix would be to toss another OR condition into
-the skip. But we don't have one that'd work cleanly :S
+Quoting documentation:
+
+  Clean-up patches
+  ~~~~~~~~~~~~~~~~
+  
+  Netdev discourages patches which perform simple clean-ups, which are not in
+  the context of other work. For example:
+  
+  * Addressing ``checkpatch.pl``, and other trivial coding style warnings
+  * Addressing :ref:`Local variable ordering<rcs>` issues
+  * Conversions to device-managed APIs (``devm_`` helpers)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
+
+  This is because it is felt that the churn that such changes produce comes
+  at a greater cost than the value of such clean-ups.
+  
+  Conversely, spelling and grammar fixes are not discouraged.
+  
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
+-- 
+pw-bot: reject
 
