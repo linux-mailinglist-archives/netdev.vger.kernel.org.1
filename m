@@ -1,64 +1,72 @@
-Return-Path: <netdev+bounces-299691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299692-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id y1oaCaSfMGo2VgUAu9opvQ
-	(envelope-from <netdev+bounces-299691-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:58:12 +0200
+	id QKYvCm+gMGphVgUAu9opvQ
+	(envelope-from <netdev+bounces-299692-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:01:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A3E68B1E9
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:58:11 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2954D68B242
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:01:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TKZ5AFQI;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299691-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299691-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=T9PR013s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299692-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299692-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E689A3025D15
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:55:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 27E273007B38
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E66A1ACED5;
-	Tue, 16 Jun 2026 00:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568431D5CFB;
+	Tue, 16 Jun 2026 01:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2051946DA;
-	Tue, 16 Jun 2026 00:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644C54502F
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 01:01:15 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781571338; cv=none; b=u30qXpvS4JhBY/SmztECIYw+AMg7vo+TDbDUaA7UvAJv2Ok6OmGMmTrd2CFzHFTCICzXG/uluIbj85kXmUTFtG2ciW7YtNir6QmEjSlAmmHVw/cVUJjg8zaPCl2/mffPjxcmd5jV4om8YiikvKcGp8vJ4Fqzqk41X3sronh+KAs=
+	t=1781571676; cv=none; b=fYufzaJz+YdwaXIibFUpj8RwEFeWWhuQoaQOBggEpwBa878FPWSnztqOyRdvEMSnP0+Mclq5cKy/4WtiCo1kJ46d9eNif4VvfCFaj90bVluXLwmyG9scwFLEluGcIqdim/Bmn2cXhgkTSQW1KjQw4MJK2M+M67I5iAhPNkpAhPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781571338; c=relaxed/simple;
-	bh=/BMQPdKy2mez2NWPXzQui/LvqSQYMnIqUUjhigjlpx0=;
+	s=arc-20240116; t=1781571676; c=relaxed/simple;
+	bh=ls3HmpOgHhONDL/zyYQKXM6JmTBUuGrq/nK+wOXB2Qo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BsI4DiwjRzO+c+PQQB0TW/AEs7PYYVufgTcnOJs/Ulf86Y92SIByt/ePeaAJGWwwDJ5GLWS8eBKhvfQIZqQHVDWsNZdQmIaIGZGSViyNB5laHgDWurVDPGpLGBJY98mDPasiLZmVLLfhqsMUAApGZOcUu8hcyo8oBbK7zOr8hbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKZ5AFQI; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A1E1F000E9;
-	Tue, 16 Jun 2026 00:55:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZJAXsPnbaflT9QhTHjN98XoKJbd8qsZyGi1VHnG7WVLQ1rX3EU28Fv0sGndSRt3q+qfRUZN1bWh3AXtPEKkU+lSJPABlYghTLdmanKsk3/fTmx5XIkgVw3pXOEfRGTXv/hBW62n3f/2oe/iFe31OoOwrBQ8mlKNfGhUJcVDidO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T9PR013s; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0709D1F000E9;
+	Tue, 16 Jun 2026 01:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781571337;
-	bh=lskkInW4j+QflVmCtofwVhf2RQet1ZyLYb6x5LBakeI=;
+	s=k20260515; t=1781571675;
+	bh=Dm0za3nNNqXWe406TFKCsAXtR6FAj8KUkFXQtNDJi0Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TKZ5AFQIoVK5NtSIBcKZ+XK4QNf3pRkYbRoMsoZ4iDboN3wkJk1jZTJ2kwEkojwK7
-	 56Er+BG+jd3/RoIUW9OY1xeprE5dYvsQL1SQ6eAS5vtjFyMGB1ovOkPQOJgcbnDvwK
-	 IDBFmXEP3upDgEU88CBoP68UJPtrnWeWEKyUHx9kaowOkG/8QRvagZ4QGNTGXS8CWI
-	 ex8JjIgvxHy/JHluGsl+c2NhPsbxVYSOUSDFitNKbpJ1P2CzQrLjPgbQ0NTazsuIDa
-	 shXnbiP1zAA9/68Ma1G129w2dlqiLw6AAA79KKtVgfdkclrrkwgVm7yaUqvNB+RqXl
-	 2r9jLauRxnyEQ==
-Date: Mon, 15 Jun 2026 17:55:35 -0700
+	b=T9PR013scgHSgYmlD58QMOy2RY8rEVAxWw+BOUrIKtCNy2yxJLbPKQ0Pny4XppTyk
+	 A3BvaEleJ+/d3tNSEaxTbxc+c8y5u2v/Gn8yP/0XU7jrTBY9yLACTKqVnZYTYD16MF
+	 eZLg6/wrE4isDZnW4cuH2hT0/Ivx6ZDoY4QYjK76e5oLCxiygj6ZtyNmFqozr7aAv2
+	 c9+U+I9fomilkXJg42OmMYy4Jxz9XABA802T5hopFS/6LnUaHwbaD70/JvOtbQIq5M
+	 mLCuKAYXsIG41z4asLnDyppA+pMmR0lkBMccgSyKOdvfI0hQ7uuRVErEyJ4dmziUxa
+	 iH9YMkizGn7Ng==
+Date: Mon, 15 Jun 2026 18:01:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- geert@linux-m68k.org, chleroy@kernel.org, npiggin@gmail.com,
- mpe@ellerman.id.au, maddy@linux.ibm.com, linux-mips@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
-Message-ID: <20260615175535.5bc56cfc@kernel.org>
-In-Reply-To: <c3789160609a10e232ba3e27c4b13adbb170956c.camel@physik.fu-berlin.de>
-References: <20260615222935.947233-1-kuba@kernel.org>
-	<c3789160609a10e232ba3e27c4b13adbb170956c.camel@physik.fu-berlin.de>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>, Jonas
+ Gorski <jonas.gorski@gmail.com>, Hauke Mehrtens <hauke@hauke-m.de>, Kurt
+ Kanzenbach <kurt@linutronix.de>, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, "Chester A. Unal"
+ <chester.a.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Wei Fang <wei.fang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
+ <clement.leger@bootlin.com>, George McCollister
+ <george.mccollister@gmail.com>, David Yang <mmyangfl@gmail.com>,
+ netdev@vger.kernel.org, Sashiko AI Review <sashiko-bot@kernel.org>
+Subject: Re: [PATCH net] net: dsa: Fix skb ownership in taggers
+Message-ID: <20260615180113.13fca89f@kernel.org>
+In-Reply-To: <20260616-dsa-fix-free-skb-v1-1-fd30b35dcf66@kernel.org>
+References: <20260616-dsa-fix-free-skb-v1-1-fd30b35dcf66@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,21 +82,21 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299691-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299692-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_RECIPIENTS(0.00)[m:glaubitz@physik.fu-berlin.de,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:geert@linux-m68k.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:hauke@hauke-m.de,m:kurt@linutronix.de,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:wei.fang@nxp.com,m:xiaoning.wang@nxp.com,m:clement.leger@bootlin.com,m:george.mccollister@gmail.com,m:mmyangfl@gmail.com,m:netdev@vger.kernel.org,m:sashiko-bot@kernel.org,m:jonasgorski@gmail.com,m:matthiasbgg@gmail.com,m:georgemccollister@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,linux-m68k.org,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,broadcom.com,hauke-m.de,linutronix.de,microchip.com,arinc9.com,makrotopia.org,collabora.com,nxp.com,bootlin.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -100,60 +108,21 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 92A3E68B1E9
+X-Rspamd-Queue-Id: 2954D68B242
 
-On Tue, 16 Jun 2026 01:34:06 +0200 John Paul Adrian Glaubitz wrote:
-> On Mon, 2026-06-15 at 15:29 -0700, Jakub Kicinski wrote:
-> > This tiny series moves appletalk out of tree, to:
-> > 
-> >   https://github.com/linux-netdev/mod-orphan
-> > 
-> > Core maintainainers are unable to keep up with the rate of security
-> > bug reports and fixes. Nobody seems to care about appletalk enough
-> > to review the patches.  
-> 
-> Why would fixing these vulnerabilities be relevant? No one is going to
-> expose an Apple Talk server to an untrusted network, are they? The same
-> applies to hamradio and AX.25, they are all used by hobbyists in DMZ
-> networks, so no one really cares about vulnerabilities in these protocols.
-> 
-> I find it sad that AI tools are basically used to shoot at the kernel
-> to kill off features as some people are apparently getting scared by
-> these AI reports and just nuke everything in a panic reaction as if it
-> wouldn't just be possible to disable these protocols at compile time
-> to reduce the attack surface.
-> 
-> > As Eric pointed out Mac OS dropped AppleTalk over a decade ago.  
-> 
-> That's not the point though. No one is going to use AppleTalk to network
-> a Linux box to a modern macOS machine. The usefulness lies in hooking up
-> a Linux box to a vintage Mac or other retro computer.
-> 
-> So far, one of the huge advantages of open source operating systems has
-> always been that even niche use cases were supported and people could make
-> use of old hardware by using open source operating systems over commercial
-> offerings such as Windows or macOS.
-> 
-> With the advent of AI security reports, these niche use cases are more and
-> more being killed off with the argument that a vulnerability in the harmradio
-> code could pose a threat to a large SAP database running on a Linux enterprise
-> distribution. However, if your enterprise distribution is enabling kernel
-> features their customers aren't using and therefore enlarging the attack surface,
-> it's more a problem of said enterprise distribution and not of these old and
-> obscure network protocols.
-> 
-> I am trying my best to save as many classic features in the kernel as possible
-> to enable retro computing but I am sometimes fearing that commercial interest
-> in the kernel is taking over too much making my efforts harder every day.
+On Tue, 16 Jun 2026 00:33:00 +0200 Linus Walleij wrote:
+>  24 files changed, 243 insertions(+), 91 deletions(-)
 
-We can complain about the AI slop til the cows comes home.
-I don't like it, you don't like it. What difference does it make? 
+Impressive. Thanks a lot for doing this.
 
-If y'all have real solutions please share. Complaining about
-"commercial interests" and "nuk[ing] everything in a panic reaction"
-is not helpful.
+patchwork says it doesn't apply to net. Is it on top of net or net-next?
+Since the merge window started already net-next is probably better but
+you need to designate in the subject correctly. Feel free to repost
+without the 24h wait, maybe we can still slip this into our main PR.
+-- 
+pw-bot: cr
 
