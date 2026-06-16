@@ -1,263 +1,183 @@
-Return-Path: <netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299871-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id IFdYL6ZfMWryiAUAu9opvQ
-	(envelope-from <netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:37:26 +0200
+	id RGwBAPJfMWr/iAUAu9opvQ
+	(envelope-from <netdev+bounces-299871-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:38:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB80690918
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:37:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 479C0690937
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:38:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ibm.com header.s=pp1 header.b=aRI6qfEo;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=ibm.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=appspotmail.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299871-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299871-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BF70530EF9C7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:27:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D135B3024519
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B91B379C4A;
-	Tue, 16 Jun 2026 14:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1111536F42A;
+	Tue, 16 Jun 2026 14:27:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962163A1E69;
-	Tue, 16 Jun 2026 14:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A944D3385AC
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 14:27:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781620047; cv=none; b=BpOK4rvl1xVDwTC/8EIuN7XTjqjvyLkbnq9tMJcRVQms3WsSztbpfNmJMbQKMBJh+XZf+LZ5AMTQScQtBnwLoP6pKmWw0z0nVWJyhfjsXFaTdoTXabmlkZdncQ2bU8MDTgg0BgXWiXPkN9jeV7GiA+igk1y2tfEJyCkQcdLsitU=
+	t=1781620043; cv=none; b=nUsIh+Sp2uHFTTqC36N513C6zf47ab6GENE9AG6DtZQhpRIuJLlFQWLk4HRV0iT6IqNoKsHMe4FWhEcELd86amFUg9ExuhEqL/bi+UuMpkjqtqLxSmoAcGjKXJO43Fc1FI1C7Axss9aJMUrdXnpIgUFcYVTAFqWt7CSUV/NIWjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781620047; c=relaxed/simple;
-	bh=1TEa1AEWrpo5vlROCNgvTad5PWUPE/qQn8wASMr7nCI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rYFlxNNljk3OgAb7QSfXwHQsEnK8NOzoBm9Mffvs1wKCnzBXvzLYzZnlbgkNnrnYVtc90cYZhrVnI7ULvtkRHeqyqLq/Zm6NktxUAlXfDhBAQZUBGK0tkizThOcEqnx2N9AJzu2UU4kqUfw70KZUOObfbQRa4RfRSDdtXX/g8TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aRI6qfEo; arc=none smtp.client-ip=148.163.156.1
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GEICjj1763843;
-	Tue, 16 Jun 2026 14:27:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=IjuEIJ
-	SriwuP01r/+rNqGP9V1B2LCAw9Xpaog56O+38=; b=aRI6qfEoXL+uBKVIlvR1P+
-	DUjnck+WtmfRzEYpFdxNSPPozP25iDNI9i13sKCum7JQbawWmYMynlD0LY3VgFHn
-	/gIWOHDgzEzjXATGUcaePVXKCOxaXSyqmOAF6T7S4qSoZ2irSv49lHGlWi+VygOe
-	VcB9jBZdFUxz1uYJ78unQtBJz/z5abIgfMSv9/kopVLFUsSGonR+pyxn8CRKBbxr
-	CS7J8Lw2uFqokAegqewYMOo1XFHJS1Twfik4nvGw1L1eSPdUsgTppXtu/ruCT6rE
-	MQ5McqFS34VBh3qh3dbheMvlr/6um28nY7GXzxf0lV61jGD59LURWoVRCnmKIGdw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4es23np4ef-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jun 2026 14:27:12 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65GEJd7C032673;
-	Tue, 16 Jun 2026 14:27:11 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4eshhq3x7n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jun 2026 14:27:11 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65GER6OE23593388
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Jun 2026 14:27:06 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 04EFA20043;
-	Tue, 16 Jun 2026 14:27:06 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0205F20040;
-	Tue, 16 Jun 2026 14:27:02 +0000 (GMT)
-Received: from [9.39.16.33] (unknown [9.39.16.33])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 16 Jun 2026 14:27:01 +0000 (GMT)
-Message-ID: <430a9dd9-ecfb-4465-9eeb-f854fbbc2e61@linux.ibm.com>
-Date: Tue, 16 Jun 2026 19:57:00 +0530
+	s=arc-20240116; t=1781620043; c=relaxed/simple;
+	bh=8yFVcSsqRfy1MJQP9CJOO+dHPpNs4D5zRwb8yKcs2MY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NIj1RNkCzBJgBNmh5tNwD4ssixeX6DOvlq5MqAFQyR+Iozvd2FEhzF3NTJcCatlDeTG3b7jhLyUspdGiXHg8rpVTXUFSpfJ1hxH58dQedOONcxIZv3SqR5K9TyQYfSlIqHNvDwX52VUEwMS/1RuKIlq5stnddNGfwrGa0gUb/tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69dac65fd9bso3311999eaf.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 07:27:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781620041; x=1782224841;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QqoMiqh1Z8KtpXEtnmBXvlUuF3fai2r7IUxS3BRLfAY=;
+        b=k+Emk1n2PrUpswEtEH2qfnsRfjui4n2jd1Uc1Do3+BFR0dQYXFk/3K4EBkfS/BkOlb
+         7J0kLsJoYzAQUU9xuCJnhI/40Z0Unqrct4gAW3s5SxCH9U75WMd8wticdE4Gc2GnZKiT
+         pNS7bo/dR+Ium9rubhlH6ZB9SQYIv5YE83yMSiCP8dUoHg1PJwr/EXvv4a3SzZpkCiJu
+         HRM5RbCG9RGxk4jGx2c7UqwZkot985Bi03oHUOYtNNCFg3kK/D9NFZU/yuhNUZXbk4A2
+         u/ZKfhN2ySfi/8hQ5KxP06yQajyoXY9ebX/wSvirIYyl618TLMfqPQoU8q85IcXPxU31
+         HL4A==
+X-Forwarded-Encrypted: i=1; AFNElJ9TlQqxqVeJlqzqo13MpUWRa2OHOLY8QyDVoj9vNTUuVgYB5cln7sl1djJJpR2anlzz2b+8PNA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMDRSVjYRAq1O70jF0tuax9hCh1mLtzvUGey3vIKW8o/JIG9cU
+	YnzEWnDsBaIah5V+FK8Irx+amIZs+4Cc0ozSoJG23bCMcoL8Xow772lv/mKgB6wEY5O3/64Liy4
+	nHNL5UVaHqydKPjLSA1J/PNJMVwB5n9XdXdSxvEq/Ja3EkAe3SdU6I1HzeYU=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] net: smc: fix splice entry lifetime imbalance in
- smc_rx_splice
-To: Ren Wei <n05ec@lzu.edu.cn>, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, wenjia@linux.ibm.com,
-        mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, ubraun@linux.ibm.com,
-        stefan.raspl@linux.ibm.com, davem@davemloft.net, yuantan098@gmail.com,
-        zcliangcn@gmail.com, bird@lzu.edu.cn, lx24@stu.ynu.edu.cn,
-        d4n.for.sec@gmail.com
-References: <cover.1781097957.git.d4n.for.sec@gmail.com>
- <192d1b44ed358ca143f44ef167d14153bccc51e9.1781097957.git.d4n.for.sec@gmail.com>
-Content-Language: en-US
-From: Sidraya Jayagond <sidraya@linux.ibm.com>
-In-Reply-To: <192d1b44ed358ca143f44ef167d14153bccc51e9.1781097957.git.d4n.for.sec@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=XtnK/1F9 c=1 sm=1 tr=0 ts=6a315d41 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=pGLkceISAAAA:8
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=lELoO6ydEwu01aG-FtUA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE0NSBTYWx0ZWRfX3aLGkuxzoGY9
- nQ8con6vPfodRZHjAhAtq7B5aqdrNqZ/zW0qc9cTwUNyO7feqwS+u93GPdt1URw8RBaxXpOj7Fr
- X5L5sNG0uOvsEdMNpEHhj4AM9/jzwfR9FqMoCMa9ERnTStuqGDTDH2qa7X9zK/rSmMeKuqeG+Yd
- 5SjnfYqRcbTsjn45nFVFAKULD9xAYG2xLe1yS27cjqDHy69YatG5RNatTXs0/hrgChj4oITUF6w
- 3v8FqzTVHQ8nRpMef9lvHqBBN2Y9y4s7PqsC42x0eUwWBLZqAZkV8YHKsnTKmgqHtKMZ+LglcxH
- tYXEtfqj1XiWDUbv0+K8bhv7FK/k6gAVU3Y9lttrfrAVjrDaCvd2fWmUa8lb5o6u58vVSQM5jCb
- OLw6EhPzkZfPh35xxOAWH0+U+fxRN+1Nt0SahssZRagPtrnSjWWHgpdQrMsIIaxURF1Qq46iasi
- zfnpjx4SqoLS2ZfwKjA==
-X-Proofpoint-GUID: c0J0dIn_JX-poNTUfy1y4PPQMiLBYcKK
-X-Proofpoint-ORIG-GUID: 34lRAMndiN_j3wEzws5yH02GX2zEQfeh
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE0NSBTYWx0ZWRfX3rX96ezEwEg0
- ilxy5r6FKDjUmNWIbHrN5zKu99LrCKOY6GjYuY4WsN1epbalw0P14BA6EP8OBjj7uUIFPdQ2Bsk
- hwc90HB8XsyAYAYu3aOpu4NKPTAtOgo=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_04,2026-06-15_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
- suspectscore=0 clxscore=1011 malwarescore=0 spamscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160145
+X-Received: by 2002:a05:6820:208d:b0:696:21ad:a4f0 with SMTP id
+ 006d021491bc7-69eec931353mr9880399eaf.36.1781620040763; Tue, 16 Jun 2026
+ 07:27:20 -0700 (PDT)
+Date: Tue, 16 Jun 2026 07:27:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a315d48.b0403584.28d0ff.0002.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in tls_err_abort
+From: syzbot <syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sd@queasysnail.net, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=8697a140486f5628];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299872-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299871-lists,netdev=lfdr.de,cca46a9d1276f38af2ae];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:ubraun@linux.ibm.com,m:stefan.raspl@linux.ibm.com,m:davem@davemloft.net,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:lx24@stu.ynu.edu.cn,m:d4n.for.sec@gmail.com,m:d4nforsec@gmail.com,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,syzkaller.appspotmail.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,goo.gl:url,appspotmail.com:email,googlegroups.com:email,syzkaller.appspot.com:url,storage.googleapis.com:url];
+	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sd@queasysnail.net,m:syzkaller-bugs@googlegroups.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,davemloft.net,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.ibm.com:mid,linux.ibm.com:from_mime,vger.kernel.org:from_smtp,ynu.edu.cn:email];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com,queasysnail.net,googlegroups.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2FB80690918
+X-Rspamd-Queue-Id: 479C0690937
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    f6033078a9e6 ip6_tunnel: annotate data-races around t->err..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=122a98ae580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8697a140486f5628
+dashboard link: https://syzkaller.appspot.com/bug?extid=cca46a9d1276f38af2ae
+compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7af9eb2b9b5a/disk-f6033078.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4b7e03b76e68/vmlinux-f6033078.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/38042dd09caa/bzImage-f6033078.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+err >= 0
+WARNING: net/tls/tls_sw.c:73 at tls_err_abort+0x5d/0x80 net/tls/tls_sw.c:73, CPU#0: kworker/0:11/6099
+Modules linked in:
+CPU: 0 UID: 0 PID: 6099 Comm: kworker/0:11 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+Workqueue: pencrypt_serial padata_serial_worker
+RIP: 0010:tls_err_abort+0x5d/0x80 net/tls/tls_sw.c:73
+Code: e8 03 48 b9 00 00 00 00 00 fc ff df 0f b6 04 08 84 c0 75 1b 89 ab 9c 01 00 00 48 89 df 5b 5d e9 c9 a2 32 ff e8 a4 60 8a f7 90 <0f> 0b 90 eb c3 89 f9 80 e1 07 80 c1 03 38 c1 7c d9 e8 1d 9f f5 f7
+RSP: 0018:ffffc900069379e0 EFLAGS: 00010293
+RAX: ffffffff8a3adf8c RBX: ffff88807d1e0d80 RCX: ffff888058bfdd00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000ffffffff
+RBP: 0000000000000000 R08: ffffe8ffffc513e3 R09: 1ffffd1ffff8a27c
+R10: dffffc0000000000 R11: ffffffff8a3c4d70 R12: ffff888028eaf400
+R13: ffff88804441030c R14: dffffc0000000000 R15: ffff888028eaf460
+FS:  0000000000000000(0000) GS:ffff8881252a0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f521f503ff8 CR3: 0000000086fc2000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ tls_encrypt_done+0x223/0x480 net/tls/tls_sw.c:500
+ padata_serial_worker+0x2b9/0x430 kernel/padata.c:343
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3397
+ worker_thread+0xa47/0xfb0 kernel/workqueue.c:3478
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 10/06/26 11:24 pm, Ren Wei wrote:
-> From: Daming Li <d4n.for.sec@gmail.com>
-> 
-> smc_rx_splice() hands candidate pages to splice_to_pipe() without taking
-> references for the lifetime of each splice entry first. That breaks the
-> splice ownership contract in the VM-backed RMB path.
-> 
-> splice_to_pipe() drops unqueued entries through spd_release(), while
-> queued entries are later dropped through the pipe buffer release
-> callback. The current code only tries to take page references after the
-> splice succeeds, and it derives the number of queued VM pages from a
-> mutated offset value. This can underflow page refcounts and trigger a
-> use-after-free. It also leaves the socket lifetime imbalanced in the
-> multi-page VM case, where one sock_hold() can be followed by multiple
-> sock_put() calls.
-> 
-> Fix this by taking the page and socket references for every candidate
-> splice entry before calling splice_to_pipe(), and by releasing the
-> matching private state, page reference, and socket reference from
-> smc_rx_spd_release() for entries that never get queued. This makes the
-> SMC splice path follow the normal splice lifetime rules and removes the
-> broken post-splice VM page counting entirely.
-> 
-> Fixes: 9014db202cb7 ("smc: add support for splice()")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yuan Tan <yuantan098@gmail.com>
-> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: Codex:GPT-5.4
-> Co-developed-by: Liu Xiao <lx24@stu.ynu.edu.cn>
-> Signed-off-by: Liu Xiao <lx24@stu.ynu.edu.cn>
-> Signed-off-by: Daming Li <d4n.for.sec@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> ---
->  net/smc/smc_rx.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
-> index c1d9b923938d..88aee0d93597 100644
-> --- a/net/smc/smc_rx.c
-> +++ b/net/smc/smc_rx.c
-> @@ -150,18 +150,23 @@ static const struct pipe_buf_operations smc_pipe_ops = {
->  static void smc_rx_spd_release(struct splice_pipe_desc *spd,
->  			       unsigned int i)
->  {
-> +	struct smc_spd_priv *priv = (struct smc_spd_priv *)spd->partial[i].private;
-> +	struct sock *sk = &priv->smc->sk;
-> +
-> +	kfree(priv);
->  	put_page(spd->pages[i]);
-> +	sock_put(sk);
->  }
->  
->  static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
->  			 struct smc_sock *smc)
->  {
->  	struct smc_link_group *lgr = smc->conn.lgr;
-> -	int offset = offset_in_page(src);
->  	struct partial_page *partial;
->  	struct splice_pipe_desc spd;
->  	struct smc_spd_priv **priv;
->  	struct page **pages;
-> +	int offset = offset_in_page(src);
->  	int bytes, nr_pages;
->  	int i;
->  
-> @@ -209,6 +214,10 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
->  			offset = 0;
->  		}
->  	}
-> +	for (i = 0; i < nr_pages; i++) {
-> +		get_page(pages[i]);
-> +		sock_hold(&smc->sk);
-> +	}
->  	spd.nr_pages_max = nr_pages;
->  	spd.nr_pages = nr_pages;
->  	spd.pages = pages;
-> @@ -217,16 +226,8 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
->  	spd.spd_release = smc_rx_spd_release;
->  
->  	bytes = splice_to_pipe(pipe, &spd);
-> -	if (bytes > 0) {
-> -		sock_hold(&smc->sk);
-> -		if (!lgr->is_smcd && smc->conn.rmb_desc->is_vm) {
-> -			for (i = 0; i < PAGE_ALIGN(bytes + offset) / PAGE_SIZE; i++)
-> -				get_page(pages[i]);
-> -		} else {
-> -			get_page(smc->conn.rmb_desc->pages);
-> -		}
-> +	if (bytes > 0)
->  		atomic_add(bytes, &smc->conn.splice_pending);
-> -	}
->  	kfree(priv);
->  	kfree(partial);
->  	kfree(pages);
-Code changes looks good to me.
-Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
