@@ -1,147 +1,154 @@
-Return-Path: <netdev+bounces-299892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299893-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Y6lYMGhyMWo9jgUAu9opvQ
-	(envelope-from <netdev+bounces-299892-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:57:28 +0200
+	id GzIaK0h1MWpSjwUAu9opvQ
+	(envelope-from <netdev+bounces-299893-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:09:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A596918E1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:57:28 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C24A0691BF1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:09:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=K1Zgu4IM;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299892-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299892-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=intel.com header.s=Intel header.b=FhlZFyfo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299893-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299893-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7B0133064011
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:49:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 18F953046337
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C587D42B738;
-	Tue, 16 Jun 2026 15:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FB13B840B;
+	Tue, 16 Jun 2026 15:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B9339282C;
-	Tue, 16 Jun 2026 15:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA1739282C;
+	Tue, 16 Jun 2026 15:50:21 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781624943; cv=none; b=QHc2a7ikmJUfhXa3JSo+B6cbs2vOG5NSYIQNQMgpxIwagpjeWoz7N8nUvOqdZMarNRWYbjZ/cvaDPFDDsDqTSg8VWNpNJqsewXVMjZBoaxIBWBiLeu09mf6mAdR5H1AlIFJ+MMzbIbuGpnp8ImGtm2ea3hdy1+Lne0J6jAwWHa4=
+	t=1781625023; cv=none; b=FcP5QHm8LymTGHQeEiuGjfB+Tz93r7uJv685jmV2FNKMCOpZIISstXCB703xjVzQfqsNO4cqbPFrXHcdnB/LgidtYl3q0GzGF0cCrU+TVOEcgJ1NW8iRKM2B9ckqXW0zN5GME+8rjIWq8cGkK9W7Zvvji7nkPZ4KNhvMqY9CZR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781624943; c=relaxed/simple;
-	bh=NQKEtwuJplslo1S0a1EuGFXO5pQxOKxvj/9PhHq1Gw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eAsEYpyUHsE2ca0dy5FYNCEzzNhAYhmc2CzqGzuncP41+T73jgsm/NbNYiWT4CGlI7p88iDoWks/FUhVTtFzJbW//E5NfT+Td0/Se3x3vOF44LElgN5C2OUatuTcmDDXxKFGTvzQESOG8tqSrtXBysaizhC13eRNPvpu19EEcg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1Zgu4IM; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D13EC1F00A3A;
-	Tue, 16 Jun 2026 15:49:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781624942;
-	bh=LwBPJI0zIYaGqkx1gEaeFo2rsRmh3p4qrOGbWDxyeO0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=K1Zgu4IMExh7jVVg+2IFXKcFfxCtgqqknPSgNk95pMqsypDLzD2QVFu6TptWzkDGZ
-	 1YRTc4b7aRDRfRCJLepsIdRKV5PlqaJRGKGzjOzgErOK+HC6N+5vicmrEDClCyYvrG
-	 YEm5iik1EYQiaWU5qzafp8VM/hJ1QPW6iusrwEaaSZWtD/CtGIzbai0Z2JCQJPH2nz
-	 4I/CEpzHPrk0WGCzwnkZeJSrepcJ3biv4V1RH6JUebicDQcaPZifoORh3ZbSOpE+do
-	 CDP1qjdZij4tJYT85PBnJMjWGjmTmywO1no7Rx4VzWJeyaIo6tBSEENR2qURrq5B8B
-	 wOgf3aKc7W4kg==
-Date: Tue, 16 Jun 2026 08:49:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Carsten Strotmann <cas@strotmann.de>
-Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- geert@linux-m68k.org, chleroy@kernel.org, npiggin@gmail.com,
- mpe@ellerman.id.au, maddy@linux.ibm.com, linux-mips@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
-Message-ID: <20260616084901.3319d82e@kernel.org>
-In-Reply-To: <A3590144-073C-46D6-8425-90EE0C4D48E8@strotmann.de>
-References: <20260615222935.947233-1-kuba@kernel.org>
-	<c3789160609a10e232ba3e27c4b13adbb170956c.camel@physik.fu-berlin.de>
-	<20260615175535.5bc56cfc@kernel.org>
-	<A3590144-073C-46D6-8425-90EE0C4D48E8@strotmann.de>
+	s=arc-20240116; t=1781625023; c=relaxed/simple;
+	bh=TwBV8VPYVxSy1EgFWxObclBgVWNGRE9JBaZgyorMpnk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lRQ+E7m9Bj8iw5SswWyv6i8zzKj5CvVf0YLGiH2INIv6dbom277HoB24h2bZ8Idy/hasHYN8+7L2ymlkEk+r4n2jNajKA6fZop4y1ynnNKgojYkLf6t4l6QsS4zStp2Wg7M4UyCr3HkHeoebs3TPbahV+dY6LvllUZCd1wt+SFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FhlZFyfo; arc=none smtp.client-ip=192.198.163.12
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781625022; x=1813161022;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TwBV8VPYVxSy1EgFWxObclBgVWNGRE9JBaZgyorMpnk=;
+  b=FhlZFyfolpeApEpPYBex115yGRidBo62ZAHC8J9xL+lKbePBnf/nk5tD
+   XFkfwHVe09c5wRU4MYS0x1ZAlIvCpPEhc9IgGM1+zPDKG0R363uPyOjje
+   3gI8/IuYDDm2aSYCfz+Pj76iW1+Ga72fUGBoANU8f+wAEkeaR+u4I2XQN
+   Bp4uU9mYGmIIhWMntKwCZ84bTH2nQo6cfqZlSK9LBKQDw1rlvOurQp3dl
+   HeRhVCsj8+UAMt2FSpsXexDun4jA6oz6JIJqmcsCGcNAnpLJFM2xx9H3g
+   EZF1hION5jxRbqAIoBsche6x4uZgT8jIz1fvHbRggTPspO6yubkhmOtVC
+   A==;
+X-CSE-ConnectionGUID: npAVwhvhQWevZV2u5DR6+Q==
+X-CSE-MsgGUID: lTHJMGAGTeOQgjcn2sQrbQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11818"; a="86232985"
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="86232985"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 08:50:21 -0700
+X-CSE-ConnectionGUID: Vlbj8AqaSmypbcOatriXHg==
+X-CSE-MsgGUID: zhg1Np77Q4Ke3T7HM9ZF4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
+   d="scan'208";a="247684278"
+Received: from brc05.iind.intel.com (HELO brc05..) ([10.190.162.156])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 08:50:18 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	stfomichev@gmail.com,
+	kernelxing@tencent.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Cc: bpf@vger.kernel.org
+Subject: [PATCH net-next 0/3] selftests/xsk: stabilize timeout test behavior
+Date: Tue, 16 Jun 2026 21:19:51 +0530
+Message-ID: <20260616154955.1492560-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299892-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_RECIPIENTS(0.00)[m:cas@strotmann.de,m:glaubitz@physik.fu-berlin.de,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:geert@linux-m68k.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:magnus.karlsson@intel.com,m:maciej.fijalkowski@intel.com,m:stfomichev@gmail.com,m:kernelxing@tencent.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:tirthendu.sarkar@intel.com,m:tushar.vyavahare@intel.com,m:bpf@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299893-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[physik.fu-berlin.de,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,linux-m68k.org,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
+	FREEMAIL_TO(0.00)[vger.kernel.org,intel.com,gmail.com,tencent.com,davemloft.net,kernel.org,redhat.com,iogearbox.net];
+	FORGED_SENDER(0.00)[tushar.vyavahare@intel.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tushar.vyavahare@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	ALIAS_RESOLVED(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:mid,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 82A596918E1
+X-Rspamd-Queue-Id: C24A0691BF1
 
-On Tue, 16 Jun 2026 09:13:46 +0200 Carsten Strotmann wrote:
-> I'm a user of AppleTalk and other "Retro"-Features in the Linux Kernel.
-> 
-> On 16 Jun 2026, at 2:55, Jakub Kicinski wrote:
-> 
-> > We can complain about the AI slop til the cows comes home.
-> > I don't like it, you don't like it. What difference does it make?
-> >
-> > If y'all have real solutions please share. Complaining about
-> > "commercial interests" and "nuk[ing] everything in a panic reaction"
-> > is not helpful.  
-> 
-> the solution, as Adrian pointed out, is to leave these features in
-> the Linux kernel but have them disabled by default.
+This series improves AF_XDP selftests by making timeout handling
+explicit and fixing sources of non-determinism in xsk timeout tests.
 
-I think y'all need to internalize that "just leave it in" means work.
-_Someone_ has to handle the reports and patches. And since nobody is
-doing that the code is going to GitHub, where it can continue to "just
-be left" or whatever, without racking up CVEs for the Linux kernel
-and leading to maintainer burn out :/
+Patch 1 introduces test_spec::poll_tmout and removes implicit
+dependence on RX UMEM setup state for timeout behavior.
 
-> Maybe put a warning message in the kernel config tools that people
-> should only enable these if they know what they are doing.
-> 
-> These "retro"-features should not pose any security risk of they are
-> not compiled into a kernel.
+Patch 2 fixes thread harness sequencing by attaching XDP programs
+before worker startup, removing signal-based termination, and using
+barrier synchronization only for dual-thread runs.
 
-Nobody is stopping you from using this code! It's perfectly suitable 
-to be an out of tree module. Maybe it'd be harder if someone wanted to
-remove a CPU architecture you want to use, but protocols are perfectly
-fine as loadable modules. You can continue to use the code from:
- https://github.com/linux-netdev/mod-orphan
+Patch 3 restores shared_umem after POLL_TXQ_FULL so test-local
+configuration does not leak into subsequent cases on shared-netdev
+runs.
 
-Presumably you could get Debian to package that and you wouldn't even
-know the sources no longer live in the kernel tree.
+Together these changes make timeout handling easier to follow and
+improve selftest stability, especially on real NIC runs.
+
+Tushar Vyavahare (3):
+  selftests/xsk: make poll timeout mode explicit
+  selftests/xsk: fix timeout thread harness sequencing
+  selftests/xsk: restore shared_umem after POLL_TXQ_FULL
+
+ .../selftests/bpf/prog_tests/test_xsk.c       | 96 +++++++++++--------
+ .../selftests/bpf/prog_tests/test_xsk.h       |  2 +
+ 2 files changed, 56 insertions(+), 42 deletions(-)
+
+-- 
+2.43.0
+
 
