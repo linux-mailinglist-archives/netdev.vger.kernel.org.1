@@ -1,280 +1,142 @@
-Return-Path: <netdev+bounces-299915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299916-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UdxBNbB6MWqdkQUAu9opvQ
-	(envelope-from <netdev+bounces-299915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:32:48 +0200
+	id NqkLFCt7MWrHkQUAu9opvQ
+	(envelope-from <netdev+bounces-299916-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:34:51 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61EFD692300
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:32:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C34EF692388
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:34:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=ajvhS1DY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299915-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299915-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=debian.org header.s=smtpauto.stravinsky header.b=RIzm9+Pn;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299916-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299916-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=debian.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C17A031F6709
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:20:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B2B531C2FDD
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FC4466B65;
-	Tue, 16 Jun 2026 16:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DF646AF14;
+	Tue, 16 Jun 2026 16:23:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B3237DEBF
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:20:10 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781626812; cv=fail; b=Lt6jbCNTHDrQSQMNiEnESuxrxsZDGDYdd5UnQC5LJzpVg8WrSYGO6n3uqVxe5h1x5h9pWyS4VsN4UkBgi19ya7HsnQZWt2rM71P9xv55DG+mjp+iOE7nZjCGnTfumlUjIpvzAKLjW7e2ZQ7Ol3t7ec0h+ke3K+UcU5YrVk8uQT8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781626812; c=relaxed/simple;
-	bh=Ly1OYFNc0Lx+W7vMvzW8bcus6oTs7FA001nUgZdDPw0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Foz5xBOmAHeBFa95GDlXWHHdGiXF8ehwKTKF468b5/DZ3QAFT+7m21o7NGW7T5AwKNypW8aUF+2izqExIEvjzPYMi9k4/1pXMx47ojx/VWHxEsfeVhexKTpDUukz0zyIuM4LQJxtsaonMcry4Flzy6C/YIr3LHmngaG82PoM4Tc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ajvhS1DY; arc=fail smtp.client-ip=192.198.163.15
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781626810; x=1813162810;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ly1OYFNc0Lx+W7vMvzW8bcus6oTs7FA001nUgZdDPw0=;
-  b=ajvhS1DYkktJlt1LZFHXtnK27THR3RJbviULkqk5n8vkiO49xrovFRLf
-   WfqQV0+lIuPwQnDS5d53JzrjejJsr49gzoBE2DO9ttNmDCNuvc2WMIANX
-   /zu/vuf2HXuUTV0Kkegy1ZL08S4VmmzLUCNMBMoVCBKP+cfJL7LHVDRkc
-   kEVZl6cAu/gyA4D5DL1RnMPWkhuWpCgmkJVhUhCU86jXWev2JuupJ3Uco
-   Gzy3YVv5B7eziM/Q0y+ZlDeEOoYkSitlgPzha4E5YrdFO7KWQN10ZE6A/
-   bT6QOVUf0/ogILAvjduDL/0BB9/dYlPENfwk1tA9LOD7Q+JXh55uxV44u
-   g==;
-X-CSE-ConnectionGUID: vA33AYSuSIaMoWv1X9Cqvw==
-X-CSE-MsgGUID: GPP+Ah/zQJey7RR8F1qDJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11819"; a="82504030"
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="82504030"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 09:20:09 -0700
-X-CSE-ConnectionGUID: Yq226KjWQPm0W3XZVB0Lrg==
-X-CSE-MsgGUID: oHNSQaw8SumdXOUGwovg6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="252120692"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 09:20:09 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 16 Jun 2026 09:20:08 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 16 Jun 2026 09:20:08 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.69) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 16 Jun 2026 09:20:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sh2MSmD7sZJ7KluYWRoYD3cj7tPwIQagYT2qWXjpu//2+Ixh9c81VGqr2OVdN/EBzEHgMjgOrbhQGbsu9zvZebGAfK9QljaUpJlTePSu1b1vyZPUFNFV4w9qOs56XdXsH3ogvIMWWrfOrHvOyEkOEMj9dkFJI7JBoeFJyNrERIK2gCIXcurXo6oKSTaWexPYtxN3hH5HpvR/6+izf4ofqH6aWM2N6BjsizvBaZ8C8NLItgnSAJAgSPfuH2QJIj7ggAe9EPprjpfjL67G9x+YuEYgdoe6DVPj5jTkqhm4lKAE1Vdy/f9HS+dS2UKFT4Ry+qajAfw4LoJCP68Dzrl/vQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YkYvh8GHhG+pZcSMIpxWJko73mdpCYk9IBy4CwbgU5c=;
- b=EtbK9G2APiUfgIPBtI2aJqejZZRBCrg02V/Txbcoe+W4xw46Z/10Nx1xM7cgSDP00BI58Wr+xX/2b9Q2an2iB/MCNxakaBM2efncmI/hMUPxYhehTCYhv0O7KM3IVsDyvuVJ5MKzc4CjcsEJ4m2mdaTd/885rwk5HspRYBQQsxjaV774vrNIMD3ogF8ELM3213Nv+Ud2DuG8CH7KfECUlD95I8OT2jDdIlBuU/ciWA+JARTpsXM2Fb9bJ6y6dUvNvV6uclUnygSs+X0KzPr1sLwZy5aKdmxBLiqLCjKsFGLfMSz+ante2HcuUXxTuCVCRlAe7O9JbzzkZNejZqlIpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS7PR11MB9498.namprd11.prod.outlook.com (2603:10b6:8:261::10)
- by DS7PR11MB6080.namprd11.prod.outlook.com (2603:10b6:8:84::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.113.18; Tue, 16 Jun 2026 16:20:06 +0000
-Received: from DS7PR11MB9498.namprd11.prod.outlook.com
- ([fe80::e3fc:2bca:409f:b925]) by DS7PR11MB9498.namprd11.prod.outlook.com
- ([fe80::e3fc:2bca:409f:b925%5]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 16:20:06 +0000
-Message-ID: <51828156-e859-44db-9926-c076796d0f75@intel.com>
-Date: Tue, 16 Jun 2026 19:20:00 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] e1000e: Report link down after "Detected
- Hardware Unit Hang" ?
-To: Helge Deller <deller@gmx.de>, Andrew Lunn <andrew@lunn.ch>, Helge Deller
-	<deller@kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>
-References: <ai8hmGQmXQu64Ld3@carbonx1>
- <e78576e0-9b55-446f-9d10-da3b7aec9b31@lunn.ch>
- <9d80ed59-5483-4c33-9d27-52fdf24aac6e@gmx.de>
-Content-Language: en-US
-From: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
-In-Reply-To: <9d80ed59-5483-4c33-9d27-52fdf24aac6e@gmx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0015.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::18) To DS7PR11MB9498.namprd11.prod.outlook.com
- (2603:10b6:8:261::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BAF1E8320;
+	Tue, 16 Jun 2026 16:23:05 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781626987; cv=none; b=X9HU0e0ThFRk8Ixb+j5hIZ2cXVRbhxRC2t/CDIjCL3A6PSxpLQa1g1KcOo5eeJdgDHISAzhXPqpeQ9QQl3EG6aIpunva+cpLcf9Wj6/pYfjbKLEqB00XkpQyhV/CW/NqmmqK2U+xBqV3bMRskwo2q/4L1jrWtReHDQRycCgAinw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781626987; c=relaxed/simple;
+	bh=IXsEAwgWvm+ambQ9+3AGPStMs5cLfc6BF+yzHqadZSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uBlXoQ1fH9wig+WjDaQM5CgInoCBwswiFj25kXDPfTv204t+gz3ugxmNnv0wTCCrE/QV13mFSu3lWqFv7nA65wH3TFru1xF2mD6eK+nG1u+p2i1uip+cUrMBHeFS+V1BY/mEYecD5tRSeNFE3ffORVMcrDN/yn/ZoxDB2ArXGuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=RIzm9+Pn; arc=none smtp.client-ip=82.195.75.108
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IRo7D4zv4MpQ9wRyO+ve3dpnbeFV2Oef1k+e+ZUWC0o=; b=RIzm9+PnNC5LEFOKtIe0rhQkOw
+	yRbg8nyVKvPht00btnI5Uu1JqpkM+9V9lpIstwBWoUizaMWByMMM6QWCGjCPJqsSvWbRp6CvcK6UW
+	8JBvEegSB7dv51EMsVNZdbkq0ZF1fxnXD2ANCZ+b060SJbLZdm8aOt1Nr1LkU6pac4RrSY49JU+EB
+	kc830XpfwH+NzHYbS0ql09r0GHzssD+6eaH+crVD8wiTdzVYwRXb/e3+45WRwGQiIlZzE6QseWZpY
+	ZxNVpHUr5d5eZdKuN5K6iWetwugTLjdb7KidVFDkgOArjiVmz3bLhv4Bzu0AkJGW8ZIlVr5VhYpvo
+	aHci+zWQ==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wZWYz-00DyOR-2K;
+	Tue, 16 Jun 2026 16:22:58 +0000
+Date: Tue, 16 Jun 2026 09:22:52 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Stanislav Fomichev <sdf.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next 2/2] udp: convert udp_lib_getsockopt to sockopt_t
+Message-ID: <ajF4Odi_L28LdIXC@gmail.com>
+References: <20260612-getsockopt_phase2-v1-0-7b01f1f5d106@debian.org>
+ <20260612-getsockopt_phase2-v1-2-7b01f1f5d106@debian.org>
+ <aiy7ZR7Yz2Z4Ioyd@devvm7509.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB9498:EE_|DS7PR11MB6080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 237e7bbe-c902-4beb-0019-08decbc32037
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|23010399003|366016|1800799024|56012099006|11063799006|4143699003|6133799003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info: tCI2Z2dl/IX3sj1JOUCG1ZNKEonZ7jZjXdGt7nU9lPHDcKbH1wsRY9gV24Qr/YOKpxY/hvupvohtPp6NkozLpfI+LIyV+QEnp6d+tJ1fpq/J28ZEM5U1OoelpxG0B/OiTu0P1IDwxm5l6iFl7Uq2e6ISD8vNcCk+gGGa9XzoMW8FMNrzwUgVG0T2rniJX81E9IzNKy6xJ0Dptm8wn/WCB/H7Qisl+xGli/nMwGq8LGao1mXWsORtDEViifVpQEu7wWQw1z/XVYNFnLj1+BP7mqLVpqxg0sXxErPo5LccP9UrtYluDoaeVfn3UxzT2Tq6Be7FiM2a11i6UJXhV7+j6Khvd6vPcSsDD+YUTircVQo8Qnum77WMWoEWjBUxZHrjvzbOy7x8Kqfzp+/rESvQ5jt60xsadX/5ovSh9dHe6DgXRndKl3Q60EDzcsXBu5hmza8FiJji2w9XA4Ti/kbo9YSNw2o6526Xdx1cc1fvHK/6NQyWZU8OMjJfkYZsxsaOcLVrHjGuX0b2c7BAdWM0WsoErTG0u+i2AVxDd5aqoVK8get7tnJsZdUJD/LVjAtGpcoKbFNminT4kMz8lCFG77qTCfRcXMM1SDjmZAdDJWiymL0JibgzFTugOaybME06mMVwQbtjs3faYrsWuEU8HRKuS10NjYhqtVbXoyft2CEPXSqaeEtdibSeT/whqXmg
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB9498.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(366016)(1800799024)(56012099006)(11063799006)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?azRBdW1ZNlM2RDZtZ21MSUU0MjR5UW1CSlhmY2svbXo4NWZuMldoOGlkRWhT?=
- =?utf-8?B?VUhuTmwvbFgxSW9uUTBpSC8vL1pSYUdTdU1aNElUUHc1QjlFWFRYREFjS3Mx?=
- =?utf-8?B?UGwrOTEzQStGc0YxQjlaQXEwQnBkN3hlTTUyVy91SzdhUHoxb3pNSjAxQlNU?=
- =?utf-8?B?VUdvM3RQVi90L3U0NjVlSytQeDA2ckNIQ2ZMK2MvblBjaEhFUFFqZk9mRWFE?=
- =?utf-8?B?UmF6bHJDdmd1L2toaHZrWUZjbUdCOVJWOWYreWk4ajFtTldidkVuWWdqQWxl?=
- =?utf-8?B?U3RIZFZOZmt2YWMvTUNGQ001S080WnJNbDBZOXczR2FuQm5BbE8zNjNFVk9p?=
- =?utf-8?B?WVNTd2dyc0dKSlpnYll0M3laWVhuUzVWUThQM0lYaWF2WFZtZnFSbWVVL0I3?=
- =?utf-8?B?bGFYcVMzalo4WTM0NXRtcWZQcS9EZGpFN0ltUlNWZVZsSDVWL2tFRXNSZnNP?=
- =?utf-8?B?TXlIaXF6blRmUUwrNHRuU3o2U1ZwYTMrWHIwVXE3V1ZjTklZdDFYRTBENGxn?=
- =?utf-8?B?TXpxVVVTcTVGWTJmMjBPanQwV2Z6bXkzbEZsSXduRW9qeXc3UElaVnlLRHlW?=
- =?utf-8?B?aFJjaW9XOGlrTGw1RDlXamh1NTRDcjZSQTdPTjJXeWJHZkgrRGJWUHlXRGNU?=
- =?utf-8?B?UzkycmJoc3kzNTBudXN4M0FhWjdwQjdvSDIwZ0ZsV3AyZTZlalgrQVVTT0FX?=
- =?utf-8?B?Y1BoTG9QUGllakdIbzI1bE53UG9QUmxWalIrcitxSzhzVXViYXJUbk10a2Vr?=
- =?utf-8?B?VW82bUxnRFVZUWdiRUR4bVlJaGk2emFRMXlNREVzSVdsNFU3VTYrM1ZHbzRj?=
- =?utf-8?B?N2pXR0N2QVBQM3R6bDUyeEtaanJBVEtCZmlFd0NpMjdMWEZIejhmcjRRSnJv?=
- =?utf-8?B?Uk01cjRsd2MrT1JadXUwMVNIV3hJUHZNbnV0eG9ramdVL1g5NXFIeXRuZWRx?=
- =?utf-8?B?cUhWd0NzOTllU3ZZYzBkQ0ZVM3F4dlpTTU4rN29WdTNveU5MaW5SQzRsZFMy?=
- =?utf-8?B?NEtSRG5pYVM3Y1Fib3I1TzRvTjRyeDBRWFpRcTY1dlRGVURiTjAvWXpXUnpX?=
- =?utf-8?B?b3JWQW1vUVE2QnFnUXBFVld3UFFjT1FZWHg2YnFNZ0tLMzdtZDhvaXlVdGpS?=
- =?utf-8?B?bDR1QVMwNmlkYWszNlRKckZUaldPSGRCTkQzdzBTNjNrZ2dMc1kzem1pM1hw?=
- =?utf-8?B?VFNkYm4zTURkN3dJczU0bVh6TGo2eVJZYmRseCt6cHBhWTRPcHNjRFMwVVRi?=
- =?utf-8?B?dndocHlneGJpcHgramYzM2ZtZnllNm5kKy9WTExoMUowSFJrTFNEa2VoNFlQ?=
- =?utf-8?B?aTFodU1MOHZjd2Fnd2Rmd2VTUDNLK3VEYzVYREZDRUtPVTRlazUvRko2cEwv?=
- =?utf-8?B?MWZOVzFlZm1mVkFBeC9pMUY2QVZVN0ViSWw1ZTFMOXRoTjhhNCtPWENZWXlm?=
- =?utf-8?B?Q2pXZEZCQlF4MEpRMFIybGVLcmVLTUZYNGZVUnlNNzRHN0tMQlgzYVozRHNa?=
- =?utf-8?B?R1BQY2V4VXJ6eTBKS282UFhwWkJpVnhnNFBGNkZ4NCs1S3ZUU1NDWTZaUHcv?=
- =?utf-8?B?RGkxTlRhTnJxbWtHZGdoZ2FpWS9YOHJkVHpPUGFQTjdBVUF3UTZJVUxQMmFH?=
- =?utf-8?B?M2gwSEJ4OWRLSUVZOWZpTFE1YWtZQWxOakZJOEpUejVTOWptVnNNeW9xaUpI?=
- =?utf-8?B?b2UyZjVjTTQwTUVUcDVNMHk5eHY1UERGd3dSYTdTWlN2akhibzQzL0NSbWRC?=
- =?utf-8?B?ajlpNnJscU8zMGp2VFFpMFEzeGh4bndGKzNDRTc3N21VbHgvZXgveGdVUkRB?=
- =?utf-8?B?UlZ3bGdSZStpR3ByOG1tT3Z3TXlsT29XMVpmV0tuVEdyMDhnWnZycmZtNzkv?=
- =?utf-8?B?b0dOVG9yOUtOU2lyb1dLRERFQ29ld2hEVWFCYXdWdlNsdGNOWVBtUTFIY2NE?=
- =?utf-8?B?VFJnUWxqWjVQQVRFZkF4eXBQRXZpSlJvR1lkZ2taejNxenp3NTFZWTd1a2xp?=
- =?utf-8?B?OWNDRjlnSjhFNnhEZWpJWkFITVRhL3A3MHN6ei8zU2NxQ1ZwemlHeXZobWcw?=
- =?utf-8?B?ZVRUa0xpOEFlZ0pENzFxbUdaUWdRMkcyTk1NNjV2ZjBsbnlIZkIzaGFSazBG?=
- =?utf-8?B?TjFSUnJWbVcrYkN2U0pDSGR1QTJDUFoxVHgzSXJlcFVQKzJtRzRZcHptTkxz?=
- =?utf-8?B?a29QZHJpU2ZEVlllYUtzdGRtS1doS3k4blBNY1dreW54eEdmdmdDNW9UZzFl?=
- =?utf-8?B?c2E3aUJFZysySU1jbzNMWE1WNjkwczIrM0p1MEJ4WWNNMFRIbkZ6anNXWm83?=
- =?utf-8?B?SFhJUWg1bDNTTmgyMGxzWU5WTWpaeWFYcWRhWDdGTVpYT1dyMXQ4L3R1NkRm?=
- =?utf-8?Q?Wa6WqsSXl27ZZjwY=3D?=
-X-Exchange-RoutingPolicyChecked: GbSDQTC3z/5KalwagEvGch6B6FbdErR/kuiSw262D03iXaIsSSSC1s1DqDSCA1jyJD+YusPIj0zTzUCUDczOZrkainKOK8iCpHkGk5Ram36RIGhsyHJ+d3TBIdYKHjKntSFmxINvFSXCwgYoBD+nrQFT5kJtgXskpDqvaiMqsFvlY1J1LFx5F04yCYzEXMisymWvrN8pRo2PBUx2ZUZnE8jkRsUCf5+3AIXHFOAS2A/4HGFSG1O6KBGowWyhoxkYRmPeUv3WomgQOwvahRxPA0nzm5OwbMYzRL2Lby/dKHqoYfihYNQv8jXw7qAtGmVQTmP4BzprccctIjoIW5vsvg==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 237e7bbe-c902-4beb-0019-08decbc32037
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB9498.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 16:20:05.9476
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vE40mfRslDoWwzTRgjA3KvXdcjcYj3btOtB3upQSO0Pk5aokiHzZC3ZnFbSpDJy5Gxhb+3+73cKeWsDRX8zCUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6080
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aiy7ZR7Yz2Z4Ioyd@devvm7509.cco0.facebook.com>
+X-Debian-User: leitao
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_RHS_MATCH_TO(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[debian.org,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299915-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:sdf.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:sdfkernel@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299916-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:deller@gmx.de,m:andrew@lunn.ch,m:deller@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[dima.ruinskiy@intel.com,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmx.de,lunn.ch,kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,intel.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dima.ruinskiy@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[debian.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,meta.com];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 61EFD692300
+X-Rspamd-Queue-Id: C34EF692388
 
-On 15/06/2026 23:36, Helge Deller wrote:
-> On 6/15/26 18:41, Andrew Lunn wrote:
->> On Sun, Jun 14, 2026 at 11:48:08PM +0200, Helge Deller wrote:
->>> I'm regularily facing the known "eno1: Detected Hardware Unit Hang:"
->>> with my on-board intel e1000e NIC hardware.
->>> Since none of he various tips on the internet helped, I had the idea
->>> to setup a master/slave bond networking to fail over to another NIC when
->>> the Intel chip hangs.
->>>
->>> Sadly this doesn't work as intended, because the link of the intel NIC
->>> isn't reported "down", so the failover never happens, unless I manually
->>> start "ifconfig eno1 down".
->>>
->>> My question: Shouldn't the intel NIC ideally report Link Down if we know
->>> it hangs? That way a fail-over should at least happen, right?
->>>
->>> Below is a completely untested patch.
->>> Does it make sense that I try to test and/or develop such a patch, or
->>> are there things I miss?
->>
->> If the interface is dead, then setting the carrier down makes a lot of
->> sense. 
-> 
-> That's what I think as well. Thanks for confirming.
-> 
->> One question i have is, what do you need to do to recover the
->> hardware? Will it correctly set the carrier up when you do the
->> recovery?
-> 
-> The only way I could recover was to plug the network cable and re-insert 
-> it.
-> I have not tested bringing the NIC down.
-> But in both cases the driver will need to re-detect the media & link
-> 
->> Also, just looking at your proposed change, it is not clear to me why
->> such an assignment will result in carrier down. It would be good to
->> explain it in the commit message.
-> 
-> Sure. The patch I attached was completely untested and just based on
-> the analysis of the flow and how to make the Link possibly report to be 
-> down.
-> Maybe someone knowledgeable of the driver has a better suggestion how to
-> report the link down situation in a clean way?
-> 
-> Helge
-This does not seem like the right direction to me.
+On Fri, Jun 12, 2026 at 07:10:15PM -0700, Stanislav Fomichev wrote:
+> On 06/12, Breno Leitao wrote:
 
-The "Detected Hardware Unit Hang" print does not indicate that the 
-interface is dead, but that the transmitter is stalled.
+> >  int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+> > -		       char __user *optval, int __user *optlen)
+> > +		       sockopt_t *opt)
+> >  {
+> >  	struct udp_sock *up = udp_sk(sk);
+> >  	int val, len;
+> >  
+> > -	if (get_user(len, optlen))
+> > -		return -EFAULT;
+> 
+> [..]
+> 
+> > -	if (len < 0)
+> > -		return -EINVAL;
+> 
+> I see this part now in sockopt_init_user, but you mention that it's a
+> transitional helper. When we drop it, will we loose this <0 check?
+> Maybe keep `if ((int)opt->optlen < 0))` here for backwards
+> compatibility?
 
-This can be due to an unusually high load, or a HW fault / race 
-condition with another component, etc.
+Good idea. I will do it and respin (once net-next reopens).
 
-When a hang is detected, the transmitter is stopped with 
-netif_stop_queue() and eventually ndo_tx_timeout triggers a full reset 
-to the device, which in many cases recovers it from the hang.
-
-If the hang is persistent, we try to understand the cause and debug it. 
-Permanently marking the device as 'down' because it hung once is not 
-going to be the optimal solution.
-
+Thanks for the review,
+--breno
 
