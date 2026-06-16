@@ -1,200 +1,239 @@
-Return-Path: <netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299885-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fjugFgtpMWq8igUAu9opvQ
-	(envelope-from <netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:17:31 +0200
+	id prK6MGRrMWqCiwUAu9opvQ
+	(envelope-from <netdev+bounces-299885-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:27:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FAB690E1F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:17:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3479D6910B7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:27:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=nxp.com header.s=selector1 header.b=AKRsWACO;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=nxp.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="s sXnc6Z";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=ZavuDNYx;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299885-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299885-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 772BC3013BA8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:16:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E62C30E78E4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D0643DA3C;
-	Tue, 16 Jun 2026 15:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4927143E4BB;
+	Tue, 16 Jun 2026 15:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013048.outbound.protection.outlook.com [52.101.83.48])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0707444103F;
-	Tue, 16 Jun 2026 15:16:45 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781623007; cv=fail; b=pg5D38ZK5a35ocxTzNSswCuPBA1BP3RZhwC8KN2Zxs6H1FWGbK5AsHvKoQ1/gKlYR/2pG3agjp+LCusZ3BzYNqiN85WFQQ8iQObzrRyZMQxnRlT1J2XMbdTZ9WsFwjqnXEQkGowkQ1hMzwrKgp/zPykIaGeVaMC2q2A52HoKe/s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781623007; c=relaxed/simple;
-	bh=adQaE8H9mK3pYxRlagUAVX9BLwlNgbiFM7OFz/sHons=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=suTogQVTqyKq66J+GHPFKCxMFMlldAIYGcyZJsvSQBTDlXGRGLzXop12FCRgZ5hbRpWaFjAsizN6CMCnhvxNadPtQvjmWvxPeQI6d3TGFYiioPCh50IrOn0PyedF9NOzOFfu9hKxmnxpX4+/k+6r/dQhvp7C3Q1GdVviAWWWcgA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=AKRsWACO; arc=fail smtp.client-ip=52.101.83.48
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nFkMe6QmVQfKTeKwGd6MlxzFzhWV8l4gGTAnMbjrDckz0I4BM1vxV5GQ01P9QabmTnBuUyHw9GQRgKnTSrqvSfML43d3C0hN6GsKZsM/Yp70P1mh42HR4uKKdHK7qhR99ETuqvjtK2uUptQpxfp4kx185LO/dekFGhKYQMYXzwoU4b6Y9pedcFAqA1+PyX2CRN1Zy3TFA5iHlTmgpaxRRmGMhZgmOyvBl1HzuCRc/S9XPsC/NvjFamk6Y4xogoBxolfzYC56mM1cG25rbDcZ0M8QhSi7odiz3KVHrh1NxJRcsFWKGG5ONSBxW5Cid1jIDk/YUV6S22s6OdukI7p/uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+hEN0DTeXbWZUpzvYHOO0nyXGy7OAeRiHgqlqV2w+kg=;
- b=dEEbJUfIezxvRhRhDOxvHGFWox4Af+9y+u31Rjl0j2gfsTomnHmk36UnGrhjjUOAmso/uw8PudYv0Ekw0zT+jwZf5NvKC+imJtR4cwAoQ2n1Ckrwwe9karETgvFUzqTZmkvM2IncK/CPqdO4ia/9PHJuzZqm6s/2HhvP2FNQuDGySb3/IFB6ulx4qePyfEJzucnFskQoyUaOi3sTpVuX1em1FJZkmHB00o8OtLFiFF/+sdzQsrZWGphVgxz/EVGNKzmQFDeEamXn5ddsuJu+l4iybZKo+xD8U9NPdzUncCFoTike+mg9NN24ew8A0laWvH2PUHwb8a+o+H7v7C8NOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+hEN0DTeXbWZUpzvYHOO0nyXGy7OAeRiHgqlqV2w+kg=;
- b=AKRsWACOgdmudtw5Plp3cl13KDrwTH80ODqU/OQcedktoZhD3wkuwmVzXANtogXtrVPOachO5K0N4m1xqtE9W0pT8aJiQSXU/iPQ/loez8gPLBxlwnsxlBJW2L+F3YR+XXXFBY8VIsNLctLZZTdhEDd3rmoRLk/zOX0ErCYvV6B6vHB1Bxp9WZyhDD+xp0PJHvlIZNtFekqwNO6qVhf7S6mPG0XSBOk/r7aU5EHMw4Gxz/S8FmmMutAdqJQKPnLLtiQ+Ud9tQb6hsyX/TvV54CcW/dRcYh40acC3XWW2WgKMBJWlZuAcZT1dxO7TRhShj3yuKqaCgeVJFxiTTx1Elw==
-Received: from AM0PR04MB6900.eurprd04.prod.outlook.com (2603:10a6:208:17d::10)
- by AS8PR04MB8296.eurprd04.prod.outlook.com (2603:10a6:20b:3f2::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
- 2026 15:16:43 +0000
-Received: from AM0PR04MB6900.eurprd04.prod.outlook.com
- ([fe80::7fda:8431:ca1b:b023]) by AM0PR04MB6900.eurprd04.prod.outlook.com
- ([fe80::7fda:8431:ca1b:b023%5]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 15:16:43 +0000
-Date: Tue, 16 Jun 2026 18:16:40 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Simon Horman <horms@kernel.org>
-Cc: muhammad.nazim.amirul.nazle.asmade@altera.com, netdev@vger.kernel.org,
-	andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	faizal.abdul.rahim@linux.intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethtool: mm: Increase FPE verification retry count
-Message-ID: <20260616151640.qi4bobvcbeyptvgg@skbuf>
-References: <20260615072436.26128-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
- <20260616071925.GA800687@horms.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260616071925.GA800687@horms.kernel.org>
-X-ClientProxiedBy: VI1PR0502CA0014.eurprd05.prod.outlook.com
- (2603:10a6:803:1::27) To AM0PR04MB6900.eurprd04.prod.outlook.com
- (2603:10a6:208:17d::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1B043E48C;
+	Tue, 16 Jun 2026 15:19:25 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781623169; cv=none; b=VLjRyVqkAbBlF4YOKAZOBcKwO7G+URUvCSz3jmLfuCsPoJX+PZ4VcXiP4Unum1QD6ozzR0VhfTjaAr8b3NQcMPlxpYPDzbTwJMrbtuwz11WCuuh3Urh9SiTlYFPiPsoWwfZCRNgi/wlSHBGNjTwm3o+jnHwqPUFW2f5uSLvSYp0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781623169; c=relaxed/simple;
+	bh=8/jM1JR8GA3NIc2HYTpE4xFSrFmVdfngJfzMnbO0d6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dP/jrD+i9tae4ExS0K//O5S4/xae/95WpgzEi4FO9Yd+MgetP/2xeBBtlNmz5zpynZhZZookfi1hWvSe4ul+u8zSItxNOVxqfewy18R5p7M8gsSUtRINa5uQk4y8wr9xR9fFDwC/i9sk5phlWgXTGhtPLbWoEznCKbPiXy7Hcug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ssXnc6Z0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZavuDNYx; arc=none smtp.client-ip=103.168.172.144
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1C175EC0174;
+	Tue, 16 Jun 2026 11:19:25 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Tue, 16 Jun 2026 11:19:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1781623165; x=
+	1781709565; bh=3favjBJSD//yHx0/BDGq5JvLccuw8zroeYHEyULJUw4=; b=s
+	sXnc6Z0zv7J/rin9Tq1nf65YQ2jV3d+a3CMGjlotAFsIEBGiXwdgk2Blq37ytDw2
+	dColY+Zr6lkR4dFo7+6GuRyfGXi1AhydB+yB4KEWXpNO+v+692xO8dfwNGtol4IO
+	DGQ4eeGsFGUo7bcxOSRavCKKpaVgyK41BgUbU15T1GnOngRKUIrDwV252HYvi1vX
+	xP3+rr8NM5TZ8V0vlO/bo1uyq6Fi+5Wt2oW9wr4kdTaWHdMzZp8esHv4tmMxDcqG
+	uZ+9Be5n4DgkTOJVsxC9deQ1glrkRrkRHGq+izuv1MfJunyfn+9OVc7u2grTvxhl
+	/ConGUHH7NBMHI2k+vcfg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1781623165; x=1781709565; bh=3favjBJSD//yHx0/BDGq5JvLccuw8zroeYH
+	EyULJUw4=; b=ZavuDNYxZ//sQyrmPS8NI4EAF/v7xsL5zBpZYjIAAZwNVghOBiK
+	f8c3xW0IF/kbKFTf9xtDJ3WmTPLZ05y2gUv3ZMCuEC2FOpNv9Ve8K++aZFrn4sj7
+	a9YM/RcZ2X8Q0O0SoWRIYPcbu7Ys0E114nfEunBevhfvtgtPL1LR6bNSWqo9Mm4+
+	gvJgumx/NVY60qg3CVdB8sVBb+VHAjArTjAtAnSO10+XEVfv3wDBZaxYFkROa6+l
+	x2LS63O+PzFvN9yf9g6GLoTY/nHTxjCJpQPZ8q0TG0IHWIBXa0AI80pKsmjo+Hr8
+	iK93mu5vZaKIk01ruYL5Qy4kngsc+HipX+Q==
+X-ME-Sender: <xms:fGkxaoVcKyYf31WNUgLvWZWZUEc4uA-YO3CMNhDCMKp2MhN3OP7LmA>
+    <xme:fGkxailaNK_cWXTFh79ySd59mD5ObzW5tVUgtRakoy-xdKZXPqiQ1B8ig2xPOgCrl
+    JziMcIxFIvks_S9QCFAKKvg6Hn7GPiSlwqHvDzE4SFzcAsgQighibM>
+X-ME-Received: <xmr:fGkxanOi1-ETnKkI7hhuWn6WMMzChvLCMC8VBdCagNb45oJr5CMTXvL4lx_7vU2y4CqbPGb_ryFyZk-c_FATwsU>
+X-ME-Proxy-Cause: dmFkZTEjCYExASkAqtOAuzqwxQ8gDXC6/PgtHWdzK1yflBTZvBXei8DkzSin9lf3yoBth6
+    Yf1M8u2mIJ8DqGZJfk5/2WQNgLXdHewy3MP3rtEX/pVWrxfkMLXdcjNfpDEo8xssjdZ6ce
+    TfUNx7AC8gTVc+eojdAjXyVAjh3lwFhNdvh9ht/0d90zyTvllCvHqSkmAH2c7paK3LmecQ
+    vUX11J6B4Gsoazz/PRGOSztIGxdVfueH5KLm9cLPHcCIvrajcLagSN7TURcnQhkySZrZfm
+    8+fwOKoR3P8/QHomnwYNzmltfnM6JVMxiUnrjngO0xz/EOhOFZDe0yO4VRLNhe/mVak3Q9
+    jJfmlrF3mp+C+RfyC3VvmRC5PYrBqRkZFWvoNQfcgxllXYUyAip0nhweT9BNAYznaMxtPN
+    25UG8q1XgppVYChl6Q8Xh3dwkrse5ypDF+xllOo6uTmlNlIv3CB5cVYN7cruV/lMT5vu1H
+    o70oTiWZX7JT9ezaQ9itUGMco5qwVaZe39ywjA8wKeClTaFJGuKNcS/bK47EFYuyAlZo7X
+    6frw4p8FQJ0dclTLz6GB5yAy7jZ+Y0kLFJdajDZWBYHNR6mkwMF7E1+lYmGQxK+SNTLV2A
+    y6CjYOfLtZKSh7r4LlY0yUt+QoLq3LUBPSLwlgK8jxAZ7ihP/Is6Qg0Q+8/w
+X-ME-Proxy: <xmx:fGkxaqKNOSNyIHlQ3J39ierduS5oeJmVFzUofUODfYFAk5Tn293CEA>
+    <xmx:fGkxah2ck0v8Dq6kFgbqgUBh9ZPwSSYcrdSIuqHmGjghSqW4i5buZg>
+    <xmx:fGkxamUMUD-shkAn2YhBou-LakZtUxc81rIb-pd7DyCqkBxypR1_cA>
+    <xmx:fGkxarNIotq8TqBTFZExXjmcgpuQpbbPoX_YZ1T7DcDxjviFVj7RHA>
+    <xmx:fWkxanS3q_MyObUKPboa-NrPl-6krHjY0om7fjVx7ROAqzt-Fof47W35>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Jun 2026 11:19:24 -0400 (EDT)
+Date: Tue, 16 Jun 2026 17:19:22 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: syzbot <syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	john.fastabend@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in tls_err_abort
+Message-ID: <ajFpejsl1ukTbG96@krikkit>
+References: <6a315d48.b0403584.28d0ff.0002.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6900:EE_|AS8PR04MB8296:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca3dd352-90dc-4988-cdaf-08decbba460a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|1800799024|19092799006|366016|7416014|23010399003|376014|22082099003|18002099003|56012099006|5023799004|4143699003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	oi4ZgdcE65rwPgwXQgy30YGIBBGjtgHn4rx2VUZZBIUOlVEXbAob3UZnVE/+IrNGlllEjarcYlOnJo0qs7nVCqr2+TaL26UeJpKTWkxNNLNI2gK8LWAgnVW1zfXJ53V8odclAgzNJSPNmSx5002yOVsuxvgC+FFjsKBJqFAhYN7GWzH1vh1bB5q+j8AW1m4QF0b+9xavUI3VC7/Gfvgx2JJbUJe2w/abL8hmWrQdWcR7au4kfS9YISZMgHS7LPqDJ1JUk25YWSFn+xQfoW48R2WsHcNXsgntRJZId1xB49h0dC7rWWVTDgoUgia+28ckxJI6qrL00wVD2YUGqCi5s6UsoyFXeUc/zhLjmSFDtyIbpsWMCv1PVqRxvkFUHrcfFGfn6udvUXV8n51Z4l2MF+1G69orB7+kRYUPbLdoifNveRQ9xWAX1YmaWCf0R56J46BHqfyslYi9NDDzpLwd4pGjOXPyTmld8I1dyrW2Eyd2Tt8cv30CTlzOHq6dz8+ga2xoTpY53lUVhZ9KWBNSgUnWbmJNTL9fR3L2+yuUpeWMEG1g7FIWbefdcodVbA3kS28KpUqSYUr27Wd75w7b8g3zewIowyG9krUW3podlBjp7p8xI6s75AWD5Ha+BB69WQjaK5wEVlTWb0ZPLHmsxtS/vxVx9FWrsQpcaGlIXKqVgVFwNofFuVpX/7qLcUZb
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6900.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(19092799006)(366016)(7416014)(23010399003)(376014)(22082099003)(18002099003)(56012099006)(5023799004)(4143699003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?mphkQaz6xOD/5iFu7kYIjm07I6uKak+tzlzYxOrFqBAbNzO2aidOXHhhpvc7?=
- =?us-ascii?Q?yrBUhK0HHYeYJbq+MjcOJlLVTCa9pFCXwfr7wfjqoLfOEb0760XNwwTxd7N5?=
- =?us-ascii?Q?L51wWGrN4uuipyvruYPoDc/sdEKD7S6PhMOBLio/R+07uWYSfMnHyxKa/uY2?=
- =?us-ascii?Q?dCqEKOr6Y1+d1TSeGCt6HOqKemgyXwYVRhUN9mX52Qb3uGuRhJ+XeTb4NAHW?=
- =?us-ascii?Q?L+D/AacLh6fPwelrzbOInxLEXS3Bf1TKWd5QobGrhnqPbbcgjCB5jC71zj1i?=
- =?us-ascii?Q?RaQqMKjusVRosmzFIK3SW+p9D6S4qwF3FBDhzv39pKez+bHCpmCnxMMo8Mwd?=
- =?us-ascii?Q?lTpv67SVgE9P3A4JiHxYfKR2WuEKPqYlN42cH/yY+u79ojDTLccZGyRcouvw?=
- =?us-ascii?Q?znIHFAUSJVxWlVRdeS57kIKgESOtHDDbX7/r+lSzkLaJhwxypjIqpC5KED5o?=
- =?us-ascii?Q?OgwZgZXjYVCSnNr+D3pWCGHqxr67ec5Empfrwqa0dQVHjD8YA9j4KALbK1SP?=
- =?us-ascii?Q?EWOXP6kBXg336TWsmcetZKqI5wKO5vx/z4YnyIP4uTh2TGyz4icS5X8l866R?=
- =?us-ascii?Q?4ErpJ2QL2OySjYcoNH53JGnpPvY/OTH/csCof/bgayeV+nTcyrSOhxcrbShQ?=
- =?us-ascii?Q?cuPNTOLpJtqCnMKrLVZ7hbJ1eePKBQvcCo/vEyIdWwMbSAwO8jN1s6+roLet?=
- =?us-ascii?Q?4s2Xvrreq4fHD9m6Q/aH+Cdl4tVPtjNecbcAwIqrd8P2xuBobXqZqJTH8KLO?=
- =?us-ascii?Q?MLbg1O8SZwNIqa0DDW0ujeo0jcvdjeYPQEfVN0oop1eZJfG7vtlerCQ1luAf?=
- =?us-ascii?Q?yz0fjAVsj3S2P1PlbO9R+CylaKxQ4RQvTcODYH8UNYR3LROx/4ZvjgtrNyFh?=
- =?us-ascii?Q?YqTpGrMB5uIkvPjLU/9MRrxnKAFGEVJ5ymZ5vRLW+Kr17DZr802zThnRuxAk?=
- =?us-ascii?Q?SyK8m+DscY+z1s0O+QYkCcZgRswvn/RP5Sxutrj1DgrESki9FtUbWGl/ypGM?=
- =?us-ascii?Q?Y6EDncuhEUMWobE0b5ktbuPsF4JNDDJEDHAOCkvqFTfKLvcH8H8D/GXI/41W?=
- =?us-ascii?Q?SlD5fzFVVwfCp14R8l/mPCd+40xWtUFhS5y27Z6osMuwbEVCFK7egL1/vSET?=
- =?us-ascii?Q?/JrPvf5j4ZbgIigd2tQ2Ox/CX+5e0UiynruaWOJDgfzUZeAfbysy/q4bFUuY?=
- =?us-ascii?Q?R/mxGWtKM+GsnTsQ0IL6yZZXoPsB385h1X04H3HpM+EJXqMXmj3rMP5CfICf?=
- =?us-ascii?Q?xm4Vqszhvqdj1JDH3H+I2/Ml14AqvRuzBROSYeeQYw1j7KEb+BC89beTK/aR?=
- =?us-ascii?Q?bCMFkxKed5FT2GGZz4vgiNUCOXlt5nhY+U7qeVgmAP0EekXU3PZ+BpwOpxVv?=
- =?us-ascii?Q?bSi59GwlGKIRYoptL08x6WEVmAdf151sRjUaatHy7yBKzcxIKxIydaZJc+lP?=
- =?us-ascii?Q?VXN2+Y4vhx/ZwtfEE/ei0RMQ9Offm9IfMbeQHj5BWhw9GX8e6ZagcktsdHyX?=
- =?us-ascii?Q?fDVQYd2YI2tOrkadx7YwwcCB0e4su13TwlmDQSR3P+gTGuxZztbYkodS3aq4?=
- =?us-ascii?Q?ITUTIaa0qP5mMGlBvhjExGQhMKFr7r+5SB0KIFPaou5gmMVMFMdooFdlHDAt?=
- =?us-ascii?Q?IW49fj8lz/FH5dl8imutbim38hmk50m1jb/+ENfL/c1kAgLkUDPgsjT59Rky?=
- =?us-ascii?Q?r6pxD7sDf7cDZq7O0vBx8c86C4WqLMBUtk6G3B+DYYR2E7JXGitWNILsMOBJ?=
- =?us-ascii?Q?m+nyP1LZWVFreESvdmJYOVhbDLthblBDgHUJ/FkoZOAKVoTzIjdyvqwT+wJk?=
-X-MS-Exchange-AntiSpam-MessageData-1: YIBBtIq/kLeOGEjnoOvDVFuIkCMVdKB5PBk=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca3dd352-90dc-4988-cdaf-08decbba460a
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6900.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 15:16:43.4331
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 39iSjUsHa5xokkWh/UCdtkmrAV8mOhTPnRzFGjKWWEBxOL51sXHHbdPDFh0j2PW7/iuiXWAuwzzrD87GVgMHxA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8296
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6a315d48.b0403584.28d0ff.0002.GAE@google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=8697a140486f5628];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299884-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299885-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:faizal.abdul.rahim@linux.intel.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,storage.googleapis.com:url,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,appspotmail.com:email,queasysnail.net:dkim,queasysnail.net:from_mime,krikkit:mid];
+	FORGED_RECIPIENTS(0.00)[m:syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:john.fastabend@gmail.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,m:syzbot@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com,googlegroups.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,altera.com:email,nxp.com:dkim,nxp.com:from_mime,skbuf:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,cca46a9d1276f38af2ae];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 15FAB690E1F
+X-Rspamd-Queue-Id: 3479D6910B7
 
-On Tue, Jun 16, 2026 at 08:19:25AM +0100, Simon Horman wrote:
-> + Vladimir
+2026-06-16, 07:27:20 -0700, syzbot wrote:
+> Hello,
 > 
-> On Mon, Jun 15, 2026 at 12:24:36AM -0700, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
-> > From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
-> > 
-> > The current FPE verification retry count is set to 3. However,
-> > the IEEE 802.3br standard does not specify a fixed value for this.
-> > A retry count of 3 may be insufficient when the remote device is
-> > slow to respond during link-up. Increase the retry count to 20 to
-> > improve robustness.
-> > 
-> > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> > Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> syzbot found the following issue on:
 > 
-> Vladimir, I'm wondering if you could take a look at this one.
+> HEAD commit:    f6033078a9e6 ip6_tunnel: annotate data-races around t->err..
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=122a98ae580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=8697a140486f5628
+> dashboard link: https://syzkaller.appspot.com/bug?extid=cca46a9d1276f38af2ae
+> compiler:       Debian clang version 22.1.6 (++20260514074242+fc4aad7b5db3-1~exp1~20260514074407.73), Debian LLD 22.1.6
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/7af9eb2b9b5a/disk-f6033078.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/4b7e03b76e68/vmlinux-f6033078.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/38042dd09caa/bzImage-f6033078.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> err >= 0
+> WARNING: net/tls/tls_sw.c:73 at tls_err_abort+0x5d/0x80 net/tls/tls_sw.c:73, CPU#0: kworker/0:11/6099
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6099 Comm: kworker/0:11 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+> Workqueue: pencrypt_serial padata_serial_worker
+> RIP: 0010:tls_err_abort+0x5d/0x80 net/tls/tls_sw.c:73
+> Code: e8 03 48 b9 00 00 00 00 00 fc ff df 0f b6 04 08 84 c0 75 1b 89 ab 9c 01 00 00 48 89 df 5b 5d e9 c9 a2 32 ff e8 a4 60 8a f7 90 <0f> 0b 90 eb c3 89 f9 80 e1 07 80 c1 03 38 c1 7c d9 e8 1d 9f f5 f7
+> RSP: 0018:ffffc900069379e0 EFLAGS: 00010293
+> RAX: ffffffff8a3adf8c RBX: ffff88807d1e0d80 RCX: ffff888058bfdd00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000ffffffff
+> RBP: 0000000000000000 R08: ffffe8ffffc513e3 R09: 1ffffd1ffff8a27c
+> R10: dffffc0000000000 R11: ffffffff8a3c4d70 R12: ffff888028eaf400
+> R13: ffff88804441030c R14: dffffc0000000000 R15: ffff888028eaf460
+> FS:  0000000000000000(0000) GS:ffff8881252a0000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f521f503ff8 CR3: 0000000086fc2000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  tls_encrypt_done+0x223/0x480 net/tls/tls_sw.c:500
 
-IEEE 802.3br is an obsolete standard, I don't even have access to it.
 
-IEEE 802.3-2022 is the current one for the MAC Merge layer. Clause
-99.4.7.2 Constants states:
+	/* Check if error is previously set on socket */
+	if (err || sk->sk_err) {
+		rec = NULL;
 
-verifyLimit: the integer 3, the number of verification attempts
+		/* If err is already set on socket, return the same code */
+		if (sk->sk_err) {
+			ctx->async_wait.err = -sk->sk_err;
+		} else {
+			ctx->async_wait.err = err;
+			tls_err_abort(sk, err);
+		}
+	}
 
-I don't have something in principle against making the verifyLimit
-configurable past IEEE 802.3 for debugging purposes or non-standard
-applications, but keep the default to 3.
+I suspect err==0, and sock_error() consumed sk_err in between (the
+alternative would be err > 0).
+
+Something like this?
+
+-------- 8< --------
+@@ -473,6 +473,7 @@ static void tls_encrypt_done(void *data, int err)
+ 	struct scatterlist *sge;
+ 	struct sk_msg *msg_en;
+ 	struct sock *sk;
++	int sk_err;
+ 
+ 	if (err == -EINPROGRESS) /* see the comment in tls_decrypt_done() */
+ 		return;
+@@ -489,12 +490,13 @@ static void tls_encrypt_done(void *data, int err)
+ 	sge->length += prot->prepend_size;
+ 
+ 	/* Check if error is previously set on socket */
+-	if (err || sk->sk_err) {
++	sk_err = READ_ONCE(sk->sk_err);
++	if (err || sk_err) {
+ 		rec = NULL;
+ 
+ 		/* If err is already set on socket, return the same code */
+-		if (sk->sk_err) {
+-			ctx->async_wait.err = -sk->sk_err;
++		if (sk_err) {
++			ctx->async_wait.err = -sk_err;
+ 		} else {
+ 			ctx->async_wait.err = err;
+ 			tls_err_abort(sk, err);
+
+-- 
+Sabrina
 
