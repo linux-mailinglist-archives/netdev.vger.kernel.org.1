@@ -1,183 +1,270 @@
-Return-Path: <netdev+bounces-299938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299942-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eTVpL5WeMWq6oQUAu9opvQ
-	(envelope-from <netdev+bounces-299938-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:05:57 +0200
+	id 0hTUAJegMWpoogUAu9opvQ
+	(envelope-from <netdev+bounces-299942-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:14:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B8B694BD6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:05:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D98694E05
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:14:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=eM0uS4uv;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299938-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299938-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=google.com header.s=20251104 header.b=PMBfMETo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299942-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299942-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7259326987A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:00:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6980306D606
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24263644AF;
-	Tue, 16 Jun 2026 19:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6313DDDD5;
+	Tue, 16 Jun 2026 19:14:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F62318EDA;
-	Tue, 16 Jun 2026 19:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4753F3DD851
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 19:14:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781636447; cv=none; b=s0hg9R9tMUGa8Kxc4rbu+biJWmb/aUUh5abOpgI1eJZzSfyijqCN+uhHgeqAT+JP0NGbBo+KY/byf5E7JkaOAHqkw9HeqRRAHLkp7Ec0k6mTPCGXuOAqvbe11kWi0EHniGZvhKaiVAGm9WjGmPZIdVhVhQ548tWeu9Dc5PzI35U=
+	t=1781637252; cv=none; b=WyhR6FAMDer2ZsnSahQWoo4mpe0NVHLJAp9UO2qKQDhpyuOgGW65K/knkiixw1vb4E2Eqk6BkG+HZshw/k3sRviXOYI48kf2XBWJOfsyRkrtThtir8fuzuEiHuj50S6nJqdpf909idSfSyhD8p2FJYn/GW5/WE/OBHt49ATILMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781636447; c=relaxed/simple;
-	bh=9zauKfd9oMsCKcEZ6eUaZtCHNQadiZAVA7ORXQdY+/4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gdbbCp4OrQNYkZx5JomtqfIWVbHDACG+uGSfGBNKOnkgNImBfyC3c1gFNGnwtNkomgQ/ooqcvHJynzsnPkVBdIkbC14G+K8TMlHFVK9OaRZw8cL2maMmePMuz/fs5XvRBnDjez2bZtb1I/uyeUy249Q+UjfacaFj0RkV8O74jPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=eM0uS4uv; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GISO8Z3375474;
-	Tue, 16 Jun 2026 12:00:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=2aVRr/bPvNmfWYUZAinz1L3Uz
-	wOSbEM/AR7QGk4sb3U=; b=eM0uS4uv0oRCaTroeq+iQ/ALpYdsVqXGCmJxQlByK
-	9ulvAMXrR2aNJpyXdsprmY3wrutsVGlNzFKv4OFIiG2fzoIFl/tzkBPIKFXHh0tL
-	Ssu45S6Q/03usiWBl4kYwgnzGOViz9a1bnhKnZ6XC9VF2sFd01kQNq1fuQuQ9Xh+
-	t3rxGDdY2KNaGSnOShJvBPjcfKfind17V/NXU2y5fkJi9Ae7VzJ4w/DaPch5WQHZ
-	cPdDsswiz9lTsopEWYkRU/sw770CABMeda4RMNAjNz/oMVoDf6MImWnA+hl3MSQc
-	3oCpz2fvsVF9SXHpWyeJ62mb/9AbXkTzwAMq2JCg//tKA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4etu38m5gu-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jun 2026 12:00:36 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 16 Jun 2026 12:00:35 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 16 Jun 2026 12:00:35 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id E008E3F7048;
-	Tue, 16 Jun 2026 12:00:31 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <bbhushan2@marvell.com>, <rkannoth@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>
-Subject: [net PATCH v2] octeontx2-pf: mcs: Fix mcs resources free on PF shutdown
-Date: Wed, 17 Jun 2026 00:30:20 +0530
-Message-ID: <1781636420-19816-3-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1781636420-19816-1-git-send-email-sbhatta@marvell.com>
-References: <1781636420-19816-1-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1781637252; c=relaxed/simple;
+	bh=HvYzBGY8Fu0XsIDVGSgIUfcUGZGB2e3797ptX29brc4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=o6P+tVHO6HtFKpXTX92PgE5bh9Hirj1CNJAigCiX5PRPjMuLy+HyadDGpRQOC0E2UU1syydUjwWLjkpjbE4xK8ZBfoY/z8oJAS8VVqY3HITrGwnMH8TS/fLB1cmj7K61hiwmpCHgHr/AeqrcEPKlclAtn4/kR7tmDxNJADPyH+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PMBfMETo; arc=none smtp.client-ip=209.85.210.202
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-8424aac207eso4769282b3a.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 12:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781637251; x=1782242051; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0u/i4ROgGdOCls6xW+Dsj2i/9wDSQ1820usOGMQ0KBY=;
+        b=PMBfMETonXZXccEcPyuoaDSg4o+PEuhTDD+ubtTEjs05nYuYiMeaeVWErckmiYmREW
+         RwjP28oNI7NfmZRGqQEXBJutBw9JxWNHHqjc/XEdxRkgvMyR6pv3tsWEAB9bkNgS9MoE
+         wR6EwB+6LWkCCWGz6cdQtrdyDukY0iJKXr4srp/aCpXxtWd4RynWpTvZ5sFpx1m5JjKV
+         Ud4fRHJxRX4m3YsEj0ucMyGSUEN8NnQDpbGc1vvsvu/vz2m4rCiqfKIszSQ1NoIxdYZt
+         uO+TyHG6nX4/Ss6hOWT2wkBsojdDqVvZyV1oRqdej1bpbcd4JYLW8dfC2JQdKUInWvXf
+         g7bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781637251; x=1782242051;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0u/i4ROgGdOCls6xW+Dsj2i/9wDSQ1820usOGMQ0KBY=;
+        b=o3I2EitgCOxCiU0uunGMPTzl7K7HbZ9xihms0C5cmDcef1OnFYClkX9YtC5gtBy5Vf
+         knQqDrJ1lZp8skZoJivZcI75nt0FSWpszcvbrOtwXDzPbS1ID7miRIis5dtUlGmaOFBB
+         49FDGwb3PS/0Jgd86Al2LzPP7j/N9ES29fJ4+aGNOJj4TpL2ZVAMtaX+7Y74sWeCgj1e
+         NorTHBKvS8GTxZ2bZMbfuJ+aizb6igI8na5HhFnDPK5mXpgOTilWpUS3WoV9N7KiFEK9
+         WQxf6PmU3/h/ZqUSl2GYy/XIhyWs0jecQV04yqS+OC7bt3Jsn8HJMRIssgpCnxKc+T2s
+         PO6w==
+X-Forwarded-Encrypted: i=1; AFNElJ8ouK4TTi/H4r6qs//7i4jyNkO+MunYNGkTjDoFRDmd4pyE/pqcAqSMUfaAmp3XJf1ACxu2WVw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS46jkyBkRm50WHCqXAK+3JHvObVYXK3NEMzBWLg9L4KeEHPJC
+	GH49K/7zeCZS+lmvKoGwsa0hH6lG3s7EQgojio+6uaWf2q6MDrcW3VwNECHgAJsRWQg4LduxLMl
+	n8tyzfQ==
+X-Received: from pfnd21.prod.google.com ([2002:aa7:8155:0:b0:842:5989:fb63])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1748:b0:842:4612:55f4
+ with SMTP id d2e1a72fcca58-84524565b69mr406609b3a.31.1781637250324; Tue, 16
+ Jun 2026 12:14:10 -0700 (PDT)
+Date: Tue, 16 Jun 2026 19:13:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: _9O7P8tW9pcMG5N0c5IRyp8fVsq8r8CF
-X-Proofpoint-ORIG-GUID: _9O7P8tW9pcMG5N0c5IRyp8fVsq8r8CF
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX8lGo+MvqWDEk
- 6N3wxgjlVBaKesLBQSwSr7Rwp2KgR5W35+6Fy8f+yo6MORxu/6IrGr5b/WNKVMtss1G4Fp6AXmI
- t50JbPYTag5lUZLa9ijxc4b9EcWkOg8=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX6h9tk+tpfe6G
- mPmd+xd9LdQ3IteY77eSaP+l655oHcInOYfFxjTNOvnF/3PXA3FoorruRiZanBkic1BjmTyZAW2
- AoLK4wYj+3cgqYoBSs41yyuBmRzeQMcT+B4alo7r415r6conLq3Q4Cd0L7xsX4jgbxQNq4IAcEB
- DChgKX8dmaVSUjGS/Pu5m1HnrdY7iPdgj0wK8WhH54mcHYsqkjE83Lcdd9Dw2A935KswhtzzGrY
- qqT9Ia0SOaRNVTwC8QkiRbOo2gUJFgVBq2Rm/eOooLPMk/RNaByHS4bFFRGhK3xyMkg0Jk9+/vU
- /4O8HauejsypMJOM/xBCBzbToBO20U/DRiE3OxGBBwGpaOaIOY2KaBP/+KN+PgRj9QvruvnRg/m
- FnfdphEAXfuraCjaNWivsYt7dSjZs09/ncGILtLyFA0TJnnTmBYMb5xMM59AAJG9nfBhK7V2hr2
- qVTWOCw7QmGOpvUjutA==
-X-Authority-Analysis: v=2.4 cv=SeXHsPRu c=1 sm=1 tr=0 ts=6a319d54 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=qit2iCtTFQkLgVSMPQTB:22 a=M5GUcnROAAAA:8 a=NPitHzPN1ilE7Q4tvNMA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_05,2026-06-16_02,2025-10-01_01
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260616191359.4142661-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next] ipv4: fib_rule: Move fib4_rules_exit() to ->exit().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+965506b59a2de0b6905c@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299938-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299942-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:dsahern@kernel.org,m:idosch@nvidia.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:kuni1840@gmail.com,m:netdev@vger.kernel.org,m:syzbot+965506b59a2de0b6905c@syzkaller.appspotmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:gakula@marvell.com,m:bbhushan2@marvell.com,m:rkannoth@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sbhatta@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org,syzkaller.appspotmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	TAGGED_RCPT(0.00)[netdev,965506b59a2de0b6905c];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 40B8B694BD6
+X-Rspamd-Queue-Id: 56D98694E05
 
-From: Geetha sowjanya <gakula@marvell.com>
+syzbot reported use-after-free of net->ipv4.rules_ops. [0]
 
-On PF shutdown, the current driver free mcs hardware
-resources though mcs resources are not allocated to it.
-This patch checks the mcs resources status and if resources
-are allocated then only sends mailbox message to free them.
+It can be reproduced with these commands:
 
-Fixes: c54ffc73601c ("octeontx2-pf: mcs: Introduce MACSEC hardware offloading")
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+  while true; do
+  	ip netns add ns1
+  	ip -n ns1 link set dev lo up
+  	ip -n ns1 address add 192.0.2.1/24 dev lo
+  	ip -n ns1 link add name dummy1 up type dummy
+  	ip -n ns1 address add 198.51.100.1/24 dev dummy1
+  	ip -n ns1 rule add ipproto tcp sport 12345 table 12345
+  	ip -n ns1 fou add port 5555 ipproto 47 local 192.0.2.1 peer 198.51.100.2 peer_port 54321
+  	ip netns del ns1
+  done
+
+The cited commit moved fib4_rules_exit() earlier to ->exit_rtnl(),
+but the kernel socket destroyed in ->exit() could eventually reach
+__fib_lookup().
+
+I left fib4_rules_exit() in ->exit_rtnl() because fib4_rule_delete()
+calls fib_unmerge(), which requires RTNL.
+
+However, when ->delete() is called, ->configure() has already been
+called, thus fib_unmerge() in ->delete() has no effect.
+
+Let's remove fib_unmerge() in fib4_rule_delete() and move
+fib4_rules_exit() to ->exit().
+
+Many thanks to Ido Schimmel for providing the nice repro very quickly.
+
+Note that we can make fib_rules_ops.delete() return void once
+net-next opens.
+
+[0]:
+BUG: KASAN: slab-use-after-free in fib_rules_lookup+0x15e/0xeb0 net/core/fib_rules.c:321
+Read of size 8 at addr ffff88804ec4c680 by task kworker/u8:21/12641
+
+CPU: 0 UID: 0 PID: 12641 Comm: kworker/u8:21 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ fib_rules_lookup+0x15e/0xeb0 net/core/fib_rules.c:321
+ __fib_lookup+0x106/0x210 net/ipv4/fib_rules.c:96
+ ip_route_output_key_hash_rcu+0x294/0x2720 net/ipv4/route.c:2811
+ ip_route_output_key_hash+0x18d/0x2a0 net/ipv4/route.c:2702
+ __ip_route_output_key include/net/route.h:169 [inline]
+ ip_route_output_flow+0x2a/0x150 net/ipv4/route.c:2929
+ ip4_datagram_release_cb+0x89d/0xbe0 net/ipv4/datagram.c:118
+ release_sock+0x206/0x260 net/core/sock.c:3861
+ inet_shutdown+0x2b1/0x390 net/ipv4/af_inet.c:950
+ udp_tunnel_sock_release+0x6d/0x80 net/ipv4/udp_tunnel_core.c:197
+ fou_release net/ipv4/fou_core.c:562 [inline]
+ fou_exit_net+0x17d/0x1f0 net/ipv4/fou_core.c:1230
+ ops_exit_list net/core/net_namespace.c:199 [inline]
+ ops_undo_list+0x43d/0x8d0 net/core/net_namespace.c:252
+ cleanup_net+0x572/0x810 net/core/net_namespace.c:702
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3397
+ worker_thread+0xa47/0xfb0 kernel/workqueue.c:3478
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Fixes: 759923cf03b0 ("ipv4: fib: Convert fib_net_exit_batch() to ->exit_rtnl().")
+Reported-by: syzbot+965506b59a2de0b6905c@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6a315824.b0403584.28d0ff.0000.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
-v2 changes:
- Fixed AI review so that pfvf->macsec_cfg is freed correctly
+ net/ipv4/fib_frontend.c | 10 ++++++----
+ net/ipv4/fib_rules.c    | 11 ++---------
+ 2 files changed, 8 insertions(+), 13 deletions(-)
 
- .../net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c    | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-index 2cc1bdfd9b2e..4d3a7f4be962 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
-@@ -1776,11 +1776,16 @@ int cn10k_mcs_init(struct otx2_nic *pfvf)
- 
- void cn10k_mcs_free(struct otx2_nic *pfvf)
- {
-+	struct cn10k_mcs_cfg *cfg = pfvf->macsec_cfg;
-+
- 	if (!test_bit(CN10K_HW_MACSEC, &pfvf->hw.cap_flag))
- 		return;
- 
--	cn10k_mcs_free_rsrc(pfvf, MCS_TX, MCS_RSRC_TYPE_SECY, 0, true);
--	cn10k_mcs_free_rsrc(pfvf, MCS_RX, MCS_RSRC_TYPE_SECY, 0, true);
-+	if (!list_empty(&cfg->txsc_list)) {
-+		cn10k_mcs_free_rsrc(pfvf, MCS_TX, MCS_RSRC_TYPE_SECY, 0, true);
-+		cn10k_mcs_free_rsrc(pfvf, MCS_RX, MCS_RSRC_TYPE_SECY, 0, true);
-+	}
-+
- 	kfree(pfvf->macsec_cfg);
- 	pfvf->macsec_cfg = NULL;
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index c7d1f31650d7..42212970d735 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -1612,10 +1612,6 @@ static void ip_fib_net_exit(struct net *net)
+ 			fib_free_table(tb);
+ 		}
+ 	}
+-
+-#ifdef CONFIG_IP_MULTIPLE_TABLES
+-	fib4_rules_exit(net);
+-#endif
  }
+ 
+ static int __net_init fib_net_init(struct net *net)
+@@ -1652,6 +1648,9 @@ static int __net_init fib_net_init(struct net *net)
+ 	ip_fib_net_exit(net);
+ 	rtnl_net_unlock(net);
+ 
++#ifdef CONFIG_IP_MULTIPLE_TABLES
++	fib4_rules_exit(net);
++#endif
+ 	kfree(net->ipv4.fib_table_hash);
+ 	fib4_notifier_exit(net);
+ 	goto out;
+@@ -1671,6 +1670,9 @@ static void __net_exit fib_net_exit_rtnl(struct net *net,
+ 
+ static void __net_exit fib_net_exit(struct net *net)
+ {
++#ifdef CONFIG_IP_MULTIPLE_TABLES
++	fib4_rules_exit(net);
++#endif
+ 	kfree(net->ipv4.fib_table_hash);
+ 	fib4_notifier_exit(net);
+ 	fib4_semantics_exit(net);
+diff --git a/net/ipv4/fib_rules.c b/net/ipv4/fib_rules.c
+index 51f0193092f0..e068a5bace73 100644
+--- a/net/ipv4/fib_rules.c
++++ b/net/ipv4/fib_rules.c
+@@ -352,24 +352,17 @@ static int fib4_rule_configure(struct fib_rule *rule, struct sk_buff *skb,
+ static int fib4_rule_delete(struct fib_rule *rule)
+ {
+ 	struct net *net = rule->fr_net;
+-	int err;
+-
+-	/* split local/main if they are not already split */
+-	err = fib_unmerge(net);
+-	if (err)
+-		goto errout;
+ 
+ #ifdef CONFIG_IP_ROUTE_CLASSID
+ 	if (((struct fib4_rule *)rule)->tclassid)
+ 		atomic_dec(&net->ipv4.fib_num_tclassid_users);
+ #endif
+-	net->ipv4.fib_has_custom_rules = true;
+ 
+ 	if (net->ipv4.fib_rules_require_fldissect &&
+ 	    fib_rule_requires_fldissect(rule))
+ 		net->ipv4.fib_rules_require_fldissect--;
+-errout:
+-	return err;
++
++	return 0;
+ }
+ 
+ static int fib4_rule_compare(struct fib_rule *rule, struct fib_rule_hdr *frh,
 -- 
-2.48.1
+2.54.0.1136.gdb2ca164c4-goog
 
 
