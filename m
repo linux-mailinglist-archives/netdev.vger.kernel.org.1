@@ -1,175 +1,194 @@
-Return-Path: <netdev+bounces-299834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299835-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WvVmGT1EMWrdfgUAu9opvQ
-	(envelope-from <netdev+bounces-299834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:40:29 +0200
+	id 538mDxtFMWoKfwUAu9opvQ
+	(envelope-from <netdev+bounces-299835-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:44:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C6468F6FB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:40:28 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9243968F781
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:44:10 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=QelHVbWC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299834-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299834-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=fail ("headers rsa verify failed") header.d=couthit.com header.s=default header.b=eK+jspAT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299835-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299835-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=couthit.com (policy=none);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2FBAD3015A76
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:37:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48AA331CF933
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E357035677C;
-	Tue, 16 Jun 2026 12:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728DC360EEA;
+	Tue, 16 Jun 2026 12:38:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00951FFC59
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 12:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35291FFC59;
+	Tue, 16 Jun 2026 12:38:38 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781613476; cv=none; b=uqjYS7pPOcLaPoMcI5L05COz6iL0JUAeDI2THmC7P2Zk0fUr/AchE0tf3ywN8wrYw30c1SQoOWTX5xwNn8gNakYIMLxPiK3VgaNGtmvD41/T029qqCnauKKC/UxNnb2K4V8eRGFrVWAJJjAO/WIqI/45604w6dU6ZMzFA6SbrAk=
+	t=1781613520; cv=none; b=heuZ69DY1R47P5OdaZyKLLVAHSh5SEMqTFPgnRWNsnGJvZAB0JptS5SdpSVOVVm+2RzmwqBZAKLgKNq4kCK9QgmNKJ+xh0wiwb3JvsH0zCkf+7xl3w8670c5RvWyViRbnmhUz54ay71KxJ/YZVDA8HeEyvyk5eoDoA20momvFLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781613476; c=relaxed/simple;
-	bh=Kw6izY/k8F6Vki03UJpa0dp0Zb4oydVWokZik8wIm0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hzZPL++AH84/l+EZH2p9d2/+gCexC2fiCk2URHTFcW0d3PXbXj2PTJmVoq3ZLcJWfTrLPs2sV1WyxUOZkH03yHRS8FjKmg6E+SRChzCM93AgERtFgJL65tuGAR2GOPtIFZZhcfXQYou698rrUFzWgkWOxXRPy8lqCSDU4c/sxJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QelHVbWC; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF36D1F000E9;
-	Tue, 16 Jun 2026 12:37:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781613475;
-	bh=5Oy424Sj0LX7AKqPFqDzgHyunoDhCO/BF75OQEB7OE0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QelHVbWCr3gEApPJyMPVPZfr1zOnxFa2AJ38+NGqlCgR2V2XcPtb6cuYKEIa26PCc
-	 YPtodlNOGuV0fWlOQrBtV7KZEpWwBX9LNHqsXWxIvpjOqQaU6fkQ/GXfV9yVpB6eYo
-	 ozX7XbOHntXIMQC/AEpMU0TTbVt4uRnmyeaZLayUwT4MIlIApH5DoO5lZ8L0WODEyU
-	 qEPyHopNUm2cXxCVkDX4m1/SBG6fYLIgSCb4VA+rLWE3S61MBlRXkB9iT5MnYD6VH/
-	 6nObY1y9JseWsEMB834jDL6D7Cg4pFGrIRnDVhBRwWGDtN/7FCgBoEjyDSSoQfouF6
-	 3WkngWTFRTD/w==
-Date: Tue, 16 Jun 2026 14:37:53 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v2] [net] net: airoha: Stop TX queues on error path in
- airoha_dev_open
-Message-ID: <ajFDoTBg3dyB2GRI@lore-desk>
-References: <178161146875.2165143.7400860261990016053@gmail.com>
+	s=arc-20240116; t=1781613520; c=relaxed/simple;
+	bh=1HZnf3YOIZr3sNa+UAJiKFcAZfuOWvElho0ZtXxTpxo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=XJSd85yuRWwln6xBeLWB7XVclGsZmFTzVo1W+iET9cfC0h46GZS3qdOa/2mrfeuY+Xp09+hp5dCHphyFBsXsUElS1Ulbek4s6H+C2Bb2Y/INM7Je7EOIxxT9DWJbifuI7M0IF8Sha6Tq5CC1eqsGe75RCwyALPgTGXSpwHfA0I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=eK+jspAT; arc=none smtp.client-ip=162.240.164.96
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wckBC5c3hxxozy+99Tfp2OGtxZAPUj+u4sggN2dYdKM=; b=eK+jspATY35msdfbuS2bfO/vxH
+	OZuCLaX+VbPQhCNfNtpbJrTL++QtTQhLKXAFZzNzTHQ/6c58GsivezfOCQxXFrdFTq0DeYk0REgZu
+	keS/0lhiHJE/08PPtO7MdVfKV00ZaU7AiZLYpv48lk5TH2Fx/EfNFORQ8MkYNKJQ0A/uEMhy9p5Ql
+	nvZc24kPzEv6QaRK5f2JOQudf0+cmAjgFV02yv9kS0xMqN967tMqcB87dIKmEPPJWCFGT+MtBPSuv
+	WDM+hEfxUMNWpAoH5DBUQNbD3Ie+zP3VkdaS/lIMiZQR7LsFGMkgBdhvaF4M0mm1BoaS9XgY0od08
+	l95aaJOQ==;
+Received: from [115.246.246.98] (port=64590 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.4)
+	(envelope-from <parvathi@couthit.com>)
+	id 1wZT3k-0000000At2L-2NQa;
+	Tue, 16 Jun 2026 08:38:28 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id BBE2119A7F6F;
+	Tue, 16 Jun 2026 18:08:20 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id I02UczKp5CFk; Tue, 16 Jun 2026 18:08:19 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 4213E19A7F69;
+	Tue, 16 Jun 2026 18:08:19 +0530 (IST)
+X-Virus-Scanned: amavis at couthit.local
+Received: from zimbra.couthit.local ([127.0.0.1])
+ by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 0To_K82wJQZa; Tue, 16 Jun 2026 18:08:19 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 25E6F19A7F6F;
+	Tue, 16 Jun 2026 18:08:19 +0530 (IST)
+Date: Tue, 16 Jun 2026 18:08:19 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Parvathi Pudi <parvathi@couthit.com>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, pmohan <pmohan@couthit.com>, 
+	afd <afd@ti.com>, basharath <basharath@couthit.com>, 
+	arnd <arnd@arndb.de>, linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <358063548.1400426.1781613499101.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20260615135600.655e4be4@kernel.org>
+References: <20260611123636.376577-1-parvathi@couthit.com> <20260611123636.376577-4-parvathi@couthit.com> <20260615135600.655e4be4@kernel.org>
+Subject: Re: [PATCH net-next 3/3] net: ti: icssm-prueth: Support duplicate
+ HW offload feature for HSR and PRP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KjNXxW/DJwe/iA3u"
-Content-Disposition: inline
-In-Reply-To: <178161146875.2165143.7400860261990016053@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC148 (Mac)/9.0.0_ZEXTRAS_20240927)
+Thread-Topic: icssm-prueth: Support duplicate HW offload feature for HSR and PRP
+Thread-Index: kRQq2cZyjwWaZc+5ja0kIgdhxnV0YQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[couthit.com:s=default];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299834-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:parvathi@couthit.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:danishanwar@ti.com,m:rogerq@kernel.org,m:pmohan@couthit.com,m:afd@ti.com,m:basharath@couthit.com,m:arnd@arndb.de,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:pratheesh@ti.com,m:j-rameshbabu@ti.com,m:vigneshr@ti.com,m:praneeth@ti.com,m:srk@ti.com,m:rogerq@ti.com,m:m-malladi@ti.com,m:krishna@couthit.com,m:mohan@couthit.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,ti.com:email,couthit.local:mid,vger.kernel.org:from_smtp,couthit.com:from_mime];
+	HAS_X_AS(0.00)[smtp@couthit.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	HAS_X_GMSV(0.00)[smtp@couthit.com];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299835-lists,netdev=lfdr.de];
+	HAS_X_SOURCE(0.00)[];
+	DKIM_TRACE(0.00)[couthit.com:-];
 	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lore-desk:mid]
+	HAS_X_ANTIABUSE(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: F0C6468F6FB
+X-Rspamd-Queue-Id: 9243968F781
 
+Hi,
 
---KjNXxW/DJwe/iA3u
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, 11 Jun 2026 18:03:28 +0530 Parvathi Pudi wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>> 
+>> In HSR and PRP modes each outgoing frame must be sent on both PRU slave
+>> ports.
+>> 
+>> Previously the driver was writing the frame into each port's transmit queue
+>> independently after updating the tags resulting in performing two OCMC
+>> buffer copy operations.
+>> 
+>> Frame duplicate offloading is implemented with a common shared queue
+>> between the two ports. The driver writes the frame once into OCMC RAM,
+>> each port reads from the shared queue and replicates the transmission to
+>> both PRU ports, synchronising between PRU ports are maintained within
+>> firmware with appropriate handling.
+>> 
+>> For HSR the driver inspects the encapsulated ethertype in the HSR tag.
+>> PTP frames (ETH_P_1588) are sent on the directed port only to avoid double
+>> duplication and all other HSR frames are duplicated to both ports.
+>> VLAN-tagged HSR frames are handled by advancing past the 4-byte VLAN header
+>> before reading the HSR tag.
+>> 
+>> For PRP the driver checks the 6-byte RCT trailer for the ETH_P_PRP suffix
+>> to identify redundancy-tagged frames. Frames without an RCT are sent on the
+>> originating port only.
+> 
+> Warning: drivers/net/ethernet/ti/icssm/icssm_prueth.h:113 struct member
+> 'host_recv_flag' not described in 'prueth_packet_info'
+> 
 
-> In airoha_dev_open(), if airoha_set_vip_for_gdm_port() fails after
-> netif_tx_start_all_queues() has been called, the TX queues remain
-> started while the device configuration is incomplete. This leaves
-> the device in an inconsistent state where packets could be
-> transmitted before the VIP/IFC port configuration is complete.
->=20
-> Add netif_tx_stop_all_queues() call on the error path to properly
-> roll back the TX queue state.
->=20
-> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 =
-SoC")
-> Signed-off-by: Wayen Yan <win847@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 31cdb11cd7..cf9c366907 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -1715,8 +1715,10 @@ static int airoha_dev_open(struct net_device *dev)
-> =20
->  	netif_tx_start_all_queues(dev);
->  	err =3D airoha_set_vip_for_gdm_port(port, true);
-> -	if (err)
-> +	if (err) {
-> +		netif_tx_stop_all_queues(dev);
+We will address this in the next version.
 
-I do not think this is necessary since if ndo_open() callback fails, the
-net_device is not marked as running.
+> Please note that net-next will be closed for the next two weeks.
 
-Regards,
-Lorenzo
+Also noted regarding the net-next closure. We will post the updated series
+once the tree reopens.
 
->  		return err;
-> +	}
-> =20
->  	if (netdev_uses_dsa(dev))
->  		airoha_fe_set(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
-> --=20
-> 2.51.0
->=20
->=20
-
---KjNXxW/DJwe/iA3u
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajFDoQAKCRA6cBh0uS2t
-rEAgAQDqk/81Cv2VNY0oTfDbvAQ5ag+hMIs4uuDX4yrwGwyhYQEApGYMF3uo83aZ
-6wQByjRd9vAzTo8XFHg+hfIKjgRjggY=
-=c3L7
------END PGP SIGNATURE-----
-
---KjNXxW/DJwe/iA3u--
+Thanks and Regards,
+Parvathi.
 
