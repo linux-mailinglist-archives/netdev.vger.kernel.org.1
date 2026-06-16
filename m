@@ -1,127 +1,143 @@
-Return-Path: <netdev+bounces-299968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /UkMG2XHMWoPqAUAu9opvQ
-	(envelope-from <netdev+bounces-299968-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:05 +0200
+	id g0xAIHnHMWonqAUAu9opvQ
+	(envelope-from <netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3614695818
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07D5695820
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=2U4caDUx;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299968-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299968-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TtNwvbPU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 147783156D91
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:00:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE4C9316096D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7778A3AA1BA;
-	Tue, 16 Jun 2026 22:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FED3ACA4B;
+	Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA01138C427
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 21:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D983AA1BB;
+	Tue, 16 Jun 2026 22:00:11 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781647201; cv=none; b=tkXzySvTxT6xgl6CoVAgNE3gtdWelPzn+EQYleWYBX+O6WNfv1mNYQ+tg35w7hMzxmal7JLq7g1eW/yNj20Rd0yDBYGQr3s/c0IXz9X0LcFaX4Bd0zhRfOX3KLOY4hOMO7DdslaDQ0iUBlYTclpWL1lvGfraCqCbV0jL33bzlZs=
+	t=1781647213; cv=none; b=C0F8gAjsTFC8JQmI1OaqTVNaIV35ogDL4dEO0Iv/4g+dnpUsqeXoZxdVCWVLTEQ4+4j9N1jESFB5UIumMlAkKgYJSA59deYbLcj7dBHGPDKJsMyVt+PX6aqLYts75z1oo7Wx0NtgdPFnurVMUtWHqWN2cA+HQW2SIjgdPTZmyEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781647201; c=relaxed/simple;
-	bh=PCSVkWb9evagpAo7A/b0nKVdvhkhvdTJAPdD598sx00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g0lU30W4MHefbcAfd1I+tBtk8K+8FwoCYEJBcE0eDOU8bUxlDEYytiMVvlqvGkQ12U/+yzoRBmSDH1NOXyf+i8RyNw7I+Bj7mfbnxHpIbNxKYxSj7qNOL7Pj6kL7bgKMx8cepQXlR6kMdETa6C28jt/0bq/cv+4K2caqIUt7MUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2U4caDUx; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yn4JTONkucNpp7G5/eQyLNtOYAjCl76BiAINMQrjBJw=; b=2U4caDUxztGMOCq6pv1Xs7gM/H
-	E6QBytWGgAUz1XgI6p2uVi2GfwWFOCLKay67naLp6JV9n3LPpTwD8xMzGYvpDtSUINmqUqC7L7YzN
-	qYgBlgEvLhbyiRNPnoVp9d8UFR1T7izBq3HMwdiviHdvTsm0EHkVd+0D4mVEcFADq5u4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wZboy-0082AE-6c; Tue, 16 Jun 2026 23:59:48 +0200
-Date: Tue, 16 Jun 2026 23:59:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
-Cc: Helge Deller <deller@gmx.de>, Helge Deller <deller@kernel.org>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] e1000e: Report link down after "Detected
- Hardware Unit Hang" ?
-Message-ID: <d86c0dd8-8bd8-495a-b750-2a0036fbbee4@lunn.ch>
-References: <ai8hmGQmXQu64Ld3@carbonx1>
- <e78576e0-9b55-446f-9d10-da3b7aec9b31@lunn.ch>
- <9d80ed59-5483-4c33-9d27-52fdf24aac6e@gmx.de>
- <51828156-e859-44db-9926-c076796d0f75@intel.com>
+	s=arc-20240116; t=1781647213; c=relaxed/simple;
+	bh=kSovyPQf1u2/+wpyT4dQZ1O7R+GwVZMm10TSoSuDU04=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YSzBMIbwkJ99NF4PgRb5oM/CMsrWRqGec3eMIoE9LzwJqC76SbKhqWU3IN2OooCvaIHMwO5lty8LuwtELEFaEqzY43oQl7PX7C946daM3FORAuxgcqRfyiKpJu6UsT08Sbh68jTwOcTDKGO/8VKFaJ/lRMBFfwJpsvPkVtjfGg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtNwvbPU; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2EA21F000E9;
+	Tue, 16 Jun 2026 22:00:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781647210;
+	bh=QX+gVE0CESSzoDMopJzLLtkh0bSG3nJdRekHMwjNQJA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=TtNwvbPUrr3/Ys4kJsn4oXYtTJdt5toBBhhuCa28ouxp/5yV3IUpohtwf63BP0mfv
+	 mw4cz5J0gwJF+gpfEUEeajUmenuw4PrE+lrF8XqdIGYX5juI255CSeZ4HQQhJnmsWu
+	 xaflEccirz9LQuM7g2TeX/gCaoH7Qahf4TdYVpjtCL6get8kH8AWA1+24dFB7MsLGe
+	 kmYIQrktAr6/Q1+vKWTyDZNi/cRwd085xqq59gii+ZETGDEUYpcjnJ8AAbIC6wWUgk
+	 v/vXYKFB8bbsLST362F0SozlIYrSb+hlAmmqFWK7WDljlxXLWFY1CxhCsSRGXMK95M
+	 4PlSl0i++NwEw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B393930C2B;
+	Tue, 16 Jun 2026 22:00:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51828156-e859-44db-9926-c076796d0f75@intel.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: skmsg: preserve sg.copy across SG transforms
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178164720514.1257010.17974091199123614376.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Jun 2026 22:00:05 +0000
+References: <20260610062137.49075-1-yimingqian591@gmail.com>
+In-Reply-To: <20260610062137.49075-1-yimingqian591@gmail.com>
+To: Yiming Qian <yimingqian591@gmail.com>
+Cc: security@kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
+ kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ keenanat2000@gmail.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	SUBJECT_ENDS_QUESTION(1.00)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299968-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,cloudflare.com,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299969-lists,netdev=lfdr.de,netdevbpf];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:dima.ruinskiy@intel.com,m:deller@gmx.de,m:deller@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:yimingqian591@gmail.com,m:security@kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:keenanat2000@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmx.de,kernel.org,intel.com,lists.osuosl.org,vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A3614695818
+X-Rspamd-Queue-Id: B07D5695820
 
-> This does not seem like the right direction to me.
-> 
-> The "Detected Hardware Unit Hang" print does not indicate that the interface
-> is dead, but that the transmitter is stalled.
-> 
-> This can be due to an unusually high load, or a HW fault / race condition
-> with another component, etc.
-> 
-> When a hang is detected, the transmitter is stopped with netif_stop_queue()
-> and eventually ndo_tx_timeout triggers a full reset to the device, which in
-> many cases recovers it from the hang.
+Hello:
 
-Does a full reset cause the link to be negotiated again? If so, there
-is no harm in setting the carrier down. If the reset is successful,
-the carrier will be restored. However, if the reset does not recover
-the system, does the carrier say down?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-    Andrew
+On Wed, 10 Jun 2026 06:21:36 +0000 you wrote:
+> The sk_msg sg.copy bitmap is part of the scatterlist entry ownership
+> state. A set bit tells sk_msg_compute_data_pointers() not to expose the
+> entry through writable BPF ctx->data. This protects entries backed by
+> pages that are not private to the sk_msg, such as splice-backed file
+> page-cache pages.
+> 
+> Several sk_msg transform paths move, copy, split, or compact
+> msg->sg.data[] entries without moving the matching sg.copy bit. This can
+> make an externally backed entry arrive at a new slot with a clear copy
+> bit. A later SK_MSG verdict can then expose sg_virt(sge) as writable
+> ctx->data and BPF stores can modify the original page cache.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: skmsg: preserve sg.copy across SG transforms
+    https://git.kernel.org/netdev/net/c/406e8a651a7b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
