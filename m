@@ -1,186 +1,208 @@
-Return-Path: <netdev+bounces-299768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299769-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ArzqL/n8MGpvaAUAu9opvQ
-	(envelope-from <netdev+bounces-299768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:36:25 +0200
+	id L96CA139MGqAaAUAu9opvQ
+	(envelope-from <netdev+bounces-299769-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:38:05 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBDD68CE22
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:36:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6378468CE33
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:38:04 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=n1mYzQL+;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299768-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299768-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=VwV073eR;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299769-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299769-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FF0130FDEF7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:32:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8F5D3028370
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B9D409608;
-	Tue, 16 Jun 2026 07:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26855373BF4;
+	Tue, 16 Jun 2026 07:34:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D33409128
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 07:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48E130D3FA
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 07:34:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781595178; cv=none; b=A6162zenZl1rpWpZgbmNkZBVYq3AGrFPnuPzDlmhCKoImMXkNiWFS3UCS1TeP8y/nRE3WsednJzYmB+0PCpvGFh3LCy484np1WdWo6GtchaTUoc3MLPKhAwOERcF4p0YozV9MWPw9yYpPZ1q0qpK3ksOgeK1hO+Ijs/7G7tyoOk=
+	t=1781595298; cv=none; b=lGfvGdePbA/dvaBe/sTwb2JOAK39kUtSpKH2ZOVQWySUjSd5cwgZb6RtKkq/9+o6iUkAdlpZw07ZeIcdUd3sOkJX5So6MrwdkPBxYMBGcaqh3kdEzGUTOgSIey4WtNT62GNgHV2qFtyiVXzXKA5XN5ITefZuumD/48socnnrBlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781595178; c=relaxed/simple;
-	bh=cd2B0/1gOgvgOhT71QQaefkBal5eD8dZq2pHN3zhVFE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EWeHOGOAfqMfPN+a9tuet/DZtQnuZ+4wX1xWYVjFDawmoFRkE+1zuxz2VnwQmFHQkZfvt4rycsGSMdIUnlq7Av2Q4VgnrB0aIfku43kl3JLyW0IM+pho7wuPJJr7tNt3rAKQCSCL9VRc8LFhPCcml3dCliI2N6RF5RPOjztr+C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n1mYzQL+; arc=none smtp.client-ip=209.85.221.74
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-45ef697092fso2993362f8f.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 00:32:55 -0700 (PDT)
+	s=arc-20240116; t=1781595298; c=relaxed/simple;
+	bh=Rog+vecIJCOoaRBhO4RUtb8aiERuWh4RE6w1j+WTzCo=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pqUMPeC6ggmnT7FOWH7DMiB2luDeM/ePMONj4OCwDNK6yK4ZQQrfD2YzFJuLs4KuPLIx02oki8TjWIbox16UyCJSj9w+8X1zJTHrM4jp9uJyFvOHTzHGPMOnm30mrECTZKkM59MLZATmDq5YrDumktCir9IOQhZ1gY0MFwNHdTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwV073eR; arc=none smtp.client-ip=209.85.214.172
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2c0c1e0b0faso26000135ad.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 00:34:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781595174; x=1782199974; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zyAwKqxz9gNzOb7Kn09Yqf6wA69wLeYs6JAnA+G13A=;
-        b=n1mYzQL+VrofBTHWD3X7KnK1Q7EDBDrA2TSpCW94ENclNMTZxKTRPYFMInqS0YhG5S
-         1GQfXYE1WIVHlIcRsmRfTvcKfWwYF/D9w1Us+Op8QCBHLf3vH3QnPUnKSa44aJlCGOR3
-         a8uhIrII/NLIYwIfgQxsF4fiDGuZVcvyX28kttXm6GpSGaehwgGKVY0SeGhAJsqzJXy5
-         mgj7lQbtMtW4ICPyx4pnHEnAQ/TwhdCD4QLzq/V109ZzcQ/fZ+Gmlp5hz2+0UiGXqpFu
-         oyn8qPFguIohnlQkuNFGHyTX2iyuewS1GvKDVt0hXtPDNYIQ8G0M2a4mK+kzEWXqeeXJ
-         wxRA==
+        d=gmail.com; s=20251104; t=1781595296; x=1782200096; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=je9fX3o0/RPXSuKvoC8V4ThqHHI+ZMgmBm1tthpZ5bQ=;
+        b=VwV073eR7f+ulqH91jtVi3JUTQjw3PjCx4qcWZ6JpEibCsRnqFRLHrvSFMiZPSSdR3
+         OV2vWB+w2kWoBRowkss2TFgBwN4Ms73enrZ0f0W17Bj0JNRTL/XgbaIipbKLJqr6+0bg
+         KJ4Uyt/7AgR8gz+QU/pZrce1iaQT7ZIfeajV+xKG7EsfrwBaV/g5z01QqClku57BRKre
+         wmTRDNDn1rBdB4vep/ntoNiG5Ti29RUu6KYf/c9537J5TFuQ0zOJC5Ligr4NIIbshbdy
+         55HKN1PnG/ekz8Ltgs4CfbuAoYBFw5v95HqlvmG6taIaaLmz9Sj15GE4CNVGF0kbD1a9
+         lu1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781595174; x=1782199974;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zyAwKqxz9gNzOb7Kn09Yqf6wA69wLeYs6JAnA+G13A=;
-        b=B7pD9fGqlTFUO6KJetwAUP7u4Qd/akdixjW2dxqPHOOhPFt0uMha4gxpf2d6XrOZ/r
-         bb0jTI74sesA2mTVFtxbKMcAu0nupkYsj5Y7caWVb3Kwdqjr4kmg0Ft7SQi48lm8JXlI
-         CUntiEhqFh/4sAu09GI+uATWdPwU24Bsmfm3P038GX4E6Onjz6kxNO1DZt2kMJqvny9T
-         FERzxhSMMrw2wOiBjyTu3j+nwGEKK0Ie4g+n7yrcgb2FsfYEwW8uMyt6fbcFJkJTYDfT
-         ce7tE6YzEFUXE3+xbws1Kqwdf9BQ3vlWkFTYV6k/AvduKL/HWXFVYpFRFk5dMx/aWHZB
-         M7mA==
-X-Forwarded-Encrypted: i=1; AFNElJ/6tnfYyQfOymZ4qkWXQOAKFDGKEZu3sF5u1o0Ia3tFK8wwUPV2CvbuhPfcQDxjPsa+c5L71aU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfWkTBN0KQFV0yVOPbAITIOkBXuH/73+/CIfZCTPEmBFmIMeVA
-	7r/049hg1ZYvoJuNY144El0kMjfwUkHWZ2dJvqX3oul0NPMIcKihjqhAWEW58aZoSxHVWDLegRQ
-	3Cz/L0H43UoPHrJ9o0A==
-X-Received: from wmbgv3.prod.google.com ([2002:a05:600c:80c3:b0:490:ad90:c234])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1591:b0:490:e281:287d with SMTP id 5b1f17b1804b1-490ec4c0ceemr150167325e9.1.1781595173855;
- Tue, 16 Jun 2026 00:32:53 -0700 (PDT)
-Date: Tue, 16 Jun 2026 07:32:51 +0000
-In-Reply-To: <20260610230411.617DD5E7@davehans-spike.ostc.intel.com>
+        d=1e100.net; s=20251104; t=1781595296; x=1782200096;
+        h=mime-version:content-transfer-encoding:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=je9fX3o0/RPXSuKvoC8V4ThqHHI+ZMgmBm1tthpZ5bQ=;
+        b=fzYmHM3b4tK4+IpjgDLbXPYC3GkMa9XoDAigi5TGchAJXACKg0p+LEwzQopVCQmIXZ
+         BM/wtdpRbON31V0DGYKqVqYM5BsKtnFB9Gh+VPZPs3/siPiZ0vTMa2tr3uem/J0Lc5Kv
+         aXCQpJjNikEOMCBCP7UpcDXYtSOaJQW5AHbGmvyvaI/wQOBZjAe3qbQuuY0Sv4d5LHF/
+         75/3LjOMF9R3oxuob5Vdbkn1+Gn/CHr0riDc6I/SuiVgtWbeo5GcV6DfOwDj8qo0ntw2
+         luyyxeA0/4Bj2AcVbXKWQ3a2zFZBvhLshP2MAfquqwbK1imSdOVCV12/Lk+OjlVYaqj2
+         uGZA==
+X-Forwarded-Encrypted: i=1; AFNElJ+DfE//gVuX3JoBL6DdFgvNR1rVsib3u8CoL95+ncb62J5FTHM2e5fMoO1EkrlciNGkgbasiXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzavarfF0c2n+Vd4/WJdCYM+R4ZzzAXZYgYtw8SnuJTX2m80vyg
+	Zl+h9rIR6SwC2bSy5WI14tDngz2XGB9aZSift+8srGYwN63jDIXc32zm
+X-Gm-Gg: Acq92OFHg4yVPS5Dj7YHq56gxR8vzpjWPseilCKRCvEDHfqhPq24528lBw0Z0vXo5x+
+	hu5YaMqdl0Q4V325b8izFvFoUWo1ldcVoVUp5S01z+Wv1g5rc5PLfy/bM4z4RZYrbdmcSp08JPn
+	GNDYaxgXe51V24SgXnQVy3BbHmYqwPVozwI8IsvGRDMu8kokYoqz/bpkSTpqffHzh3NKzY16Fgb
+	Fd6i68YEjilmRCFEnC+rRjbHn7MnhNTEtnwEsImrbSIH7LkeBYd4ot0KJAPplTSFPMPdEPUzlml
+	SLsPYu79Bg4Gkfsi4vxyRMca7I4ChSd/ehs0XJP8v46V5ruoqQs6wxNP4u674uL5WrfTXOzPvFf
+	8szgptZjLHkhLOlnvbkq4a0l4vM6zMITr0EuRKo0jdGGNVrt6Hy0qQ/SrY/I4cMYPEOTThcVIMo
+	sFbX1l0vxD4kdaXAQPPdrgSoU1Ztdebi5Er1BuSzYS/W3y7wmE
+X-Received: by 2002:a17:903:3887:b0:2b2:4d36:7ba with SMTP id d9443c01a7336-2c40e0350d2mr192684905ad.0.1781595296273;
+        Tue, 16 Jun 2026 00:34:56 -0700 (PDT)
+Received: from csl-conti-dell7858.ntu.edu.sg ([155.69.195.57])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c6a3ee1052sm4186635ad.48.2026.06.16.00.34.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 00:34:55 -0700 (PDT)
+From: Maoyi Xie <maoyixie.tju@gmail.com>
+To:
+ Mika Westerberg <westeri@kernel.org>, Yehezkel Bernat <YehezkelShB@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: net: thunderbolt: tbnet_poll() can overflow skb_shinfo()->frags[]
+Date: Tue, 16 Jun 2026 15:34:52 +0800
+Message-ID: <178159529251.2170936.1136950368069628844@maoyixie.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260610230409.A44D29FA@davehans-spike.ostc.intel.com> <20260610230411.617DD5E7@davehans-spike.ostc.intel.com>
-Message-ID: <ajD8IymML3eklnj8@google.com>
-Subject: Re: [PATCH v2 1/5] mm: Make per-VMA locks available universally
-From: Alice Ryhl <aliceryhl@google.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Carlos Llamas <cmllamas@google.com>, 
-	Christian Brauner <christian@brauner.io>, David Ahern <dsahern@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-mm@kvack.org, 
-	Lorenzo Stoakes <ljs@kernel.org>, netdev@vger.kernel.org, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Suren Baghdasaryan <surenb@google.com>, 
-	Todd Kjos <tkjos@android.com>, Vlastimil Babka <vbabka@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-299769-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	FORGED_SENDER(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:westeri@kernel.org,m:YehezkelShB@gmail.com,m:andrew+netdev@lunn.ch,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:dave.hansen@linux.intel.com,m:linux-kernel@vger.kernel.org,m:akpm@linux-foundation.org,m:arve@android.com,m:cmllamas@google.com,m:christian@brauner.io,m:dsahern@kernel.org,m:davem@davemloft.net,m:gregkh@linuxfoundation.org,m:Liam.Howlett@oracle.com,m:linux-mm@kvack.org,m:ljs@kernel.org,m:netdev@vger.kernel.org,m:shakeel.butt@linux.dev,m:surenb@google.com,m:tkjos@android.com,m:vbabka@kernel.org,s:lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299768-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[maoyixietju@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1EBDD68CE22
+X-Rspamd-Queue-Id: 6378468CE33
 
-On Wed, Jun 10, 2026 at 04:04:11PM -0700, Dave Hansen wrote:
-> --- a/rust/kernel/mm.rs~unconditional-vma-locks	2026-06-10 15:57:54.051368539 -0700
-> +++ b/rust/kernel/mm.rs	2026-06-10 15:57:54.078369499 -0700
-> @@ -174,7 +174,6 @@ impl MmWithUser {
->      /// When per-vma locks are disabled, this always returns `None`.
->      #[inline]
->      pub fn lock_vma_under_rcu(&self, vma_addr: usize) -> Option<VmaReadGuard<'_>> {
-> -        #[cfg(CONFIG_PER_VMA_LOCK)]
->          {
->              // SAFETY: Calling `bindings::lock_vma_under_rcu` is always okay given an mm where
->              // `mm_users` is non-zero.
-> @@ -188,12 +187,6 @@ impl MmWithUser {
->                  });
->              }
->          }
-> -
-> -        // Silence warnings about unused variables.
-> -        #[cfg(not(CONFIG_PER_VMA_LOCK))]
-> -        let _ = vma_addr;
-> -
-> -        None
+Hi all,
 
-This isn't quite right:
+After the recent skb frags[] overflow fixes (t7xx, cdc-phonet, f_phonet), I
+went looking for the same pattern. I think tbnet_poll() in
+drivers/net/thunderbolt/main.c has it too. I would appreciate it if you could
+take a look.
 
-    error[E0317]: `if` may be missing an `else` clause
-       --> rust/kernel/mm.rs:181:13
-        |
-    181 | /             if !vma.is_null() {
-    182 | |                 return Some(VmaReadGuard {
-    ...   |
-    187 | |                 });
-    188 | |             }
-        | |_____________^ expected `Option<VmaReadGuard<'_>>`, found `()`
-        |
-        = note:   expected enum `core::option::Option<mm::VmaReadGuard<'_>>`
-                found unit type `()`
-        = note: `if` expressions without `else` evaluate to `()`
-        = help: consider adding an `else` block that evaluates to the expected type
+tbnet_poll() reassembles a ThunderboltIP packet that spans several frames into
+one skb. It adds one rx fragment per frame.
 
-This error is triggered because you deleted the return 'None' at the end
-of the function.
+	skb =3D net->skb;
+	if (!skb) {
+		skb =3D build_skb(...);
+		...
+		net->skb =3D skb;
+	} else {
+		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+				page, hdr_size, frame_size,
+				TBNET_RX_PAGE_SIZE - hdr_size);
+	}
 
-I would like to suggest the following implementation
+Nothing checks skb_shinfo(skb)->nr_frags against MAX_SKB_FRAGS here. The frame
+count comes from the peer, in the frame header. tbnet_check_frame() only boun=
+ds
+it at the start of a packet.
 
-        // SAFETY: Calling `bindings::lock_vma_under_rcu` is always okay given an mm where
-        // `mm_users` is non-zero.
-        let vma = unsafe { bindings::lock_vma_under_rcu(self.as_raw(), vma_addr) };
-        if vma.is_null() {
-            return None;
-        }
-        Some(VmaReadGuard {
-            // SAFETY: If `lock_vma_under_rcu` returns a non-null ptr, then it points at a valid
-            // vma. The vma is stable for as long as the vma read lock is held.
-            vma: unsafe { VmaRef::from_raw(vma) },
-            _nts: NotThreadSafe,
-        })
+	if (frame_count =3D=3D 0 || frame_count > TBNET_RING_SIZE / 4) {
+		net->stats.rx_length_errors++;
+		return false;
+	}
 
-Thanks!
-Alice
+TBNET_RING_SIZE is 256, so frame_count can be as large as 64. MAX_SKB_FRAGS i=
+s 17
+by default. Frame 0 builds the skb and every frame after it adds a fragment, =
+so
+nr_frags can reach 63. Once nr_frags hits MAX_SKB_FRAGS, skb_add_rx_frag() wr=
+ites
+one entry past skb_shinfo()->frags[]. The frame_size and MTU checks do not st=
+op
+this. With small frames, 64 fragments stay well under TBNET_MAX_MTU.
+
+So a malicious or buggy peer can send a packet with frame_count between 19 and
+64. The frames only need to increment the way tbnet_check_frame() wants. That
+drives nr_frags past frags[] and overruns skb_shared_info.
+
+The fix I had in mind mirrors f0813bcd2d9d ("net: wwan: t7xx: fix potential
+skb->frags overflow in RX path") and 600dc40554dc ("net: usb: cdc-phonet: fix
+skb frags[] overflow in rx_complete()"). Add the fragment only while there is
+room, and drop the packet otherwise.
+
+	-	} else {
+	+	} else if (skb_shinfo(skb)->nr_frags < MAX_SKB_FRAGS) {
+			skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+					page, hdr_size, frame_size,
+					TBNET_RX_PAGE_SIZE - hdr_size);
+	+	} else {
+	+		net->stats.rx_length_errors++;
+	+		__free_pages(page, TBNET_RX_PAGE_ORDER);
+	+		dev_kfree_skb_any(net->skb);
+	+		net->skb =3D NULL;
+	+		continue;
+		}
+
+I do not have two Thunderbolt hosts, so this is from reading the code. I can =
+put
+together a focused reproducer if that helps.
+
+Does this look like a real overflow? And is the MAX_SKB_FRAGS guard the right
+place, or would you rather tighten the frame_count bound in tbnet_check_frame=
+()?
+It has been there since the driver was added (e69b6c02b4c3), so it is a stable
+candidate. Happy to send a proper patch once you confirm.
+
+Thanks,
+Maoyi
+https://maoyixie.com/
 
