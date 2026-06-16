@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-299698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299699-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i3ngDXSqMGouWAUAu9opvQ
-	(envelope-from <netdev+bounces-299698-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:44:20 +0200
+	id Gfu7AZyqMGo1WAUAu9opvQ
+	(envelope-from <netdev+bounces-299699-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:45:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C983868B510
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:44:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CED268B51B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:44:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=E2o0frn2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299698-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299698-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=OwnPR6I5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299699-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299699-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24C243078F73
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:44:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 755E7300E635
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CE237C0FE;
-	Tue, 16 Jun 2026 01:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8079D37C0E5;
+	Tue, 16 Jun 2026 01:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC4537BE7A
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 01:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A60A37C0E7
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 01:44:56 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781574250; cv=pass; b=I94YZAIPIoKCVOVBOi8X6POhs4VJcPdO76hkgbQcaRZ4Gh3tSpfa17lnJarO564bYKdqm3hLXfNJTWBA3UkvddIipkhbnVLLiX8ornet2MNNZ4x2bqrceZZ2CpQ9FSMcLbq3Cr2DKZ/a/fQ//v64lO+ho3HGVO59pdqpdl3xuOw=
+	t=1781574297; cv=pass; b=KUqXNFgi98hP6cbQVDhZA6mUAs+8Ut9E3kqIIVkb9lrEE5FtKkrSITETQqxIUDMRuL/EU9wvqlj+g2+OT7lGD5frTLFpZhW7pAfOB28KNNDs30JiQtXXGFUdF0R27+fZI32DeBYs2vVJP2E1hxTwmmOUv4Sg2itU+VEg3/rfOY0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781574250; c=relaxed/simple;
-	bh=236fBEIJz/KEeeV7woGGo3ZYcOTNrCWyCpSWEhiGQK4=;
+	s=arc-20240116; t=1781574297; c=relaxed/simple;
+	bh=8tb1U1aZ9n4reEv10sQy7avbCZsN68fkX6jT/KPserc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NIOCk2hfN54MnxuJghYSeX81SKfzYkJiQDmvOqOeuyKLC/DMd/qEEIOPwZbJccdiiDSdOLwbzeXo5v6IE4gL5om+cXybU/feMycQVsHS/T4Aoi2ntQIuOezzaxNlIvgGpuDljV1qj8YhWst9cynw4bCetJTCfw1f3hZdxxIWr48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2o0frn2; arc=pass smtp.client-ip=209.85.128.181
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-7e0b3db3499so29328287b3.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 18:44:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781574247; cv=none;
+	 To:Cc:Content-Type; b=Ho9gx6LbAa/QSKIVSXtFaEFmsYRCVo3OAfXV7+4nuBvljqIG+arFB2R8kg8Uuy9xkS/j8ueCYVlwHoFCSH76RvhwU71coLbUSVhPAtiksos/ab8mBHyqox9TuStUbTZ2gQpPbaVabH6yINiFEFv5E0F++jnj8z+vXQLajNDY0P8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OwnPR6I5; arc=pass smtp.client-ip=209.85.128.181
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-7e0b3db3499so29332727b3.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 18:44:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781574295; cv=none;
         d=google.com; s=arc-20240605;
-        b=OqET2tcCfBPNq2zyOYVlmAnTMYSy3AvzSGnpsyDwl3rxE2+x7RaLvDr8jctKV50WO2
-         pK4LLn5xiN3duWm4bidBZrRTS71NnDI5S2Wve8U+0LBn0UGEZDMGoc8KcpzkLriC2UTK
-         2ZfoczDUunyNeNYQrVsfVBIH98M/Quk7R7938Mdd7dpbAVeFJ6PFZxDyp4L5NKZoWvSo
-         iFTES6uyEvA7cAiExzwEtPAIQJJzFFsj/s2TJdbFiibBWHN4SYX4V0uH7IC/SKrAnyAt
-         DLG84h5H6V0mtN9+xo2uLENx2bcdRn59jgrJryP5QSj6LXQ1VBv2rHeQnldFjO6HVQJ2
-         2X7A==
+        b=H871czGkyYBEJA/xAredm324Lad/SyR0DsBrAhN7CgPm6HOVPa4ySlTkVU7193zToJ
+         RY9RyfKKGURYwsGVRohbaVbzy3QixylL+Med4KPmsypAMEqGYgjEJ/yFYr8g9LBNARTy
+         rfUL37UIdwWIY0DJQSTYAmIRZK3hK+XXQV1XvKxWpFBQ4J6Yo63LY19bo/J13wEc+r+d
+         HGvaqsZ0hLbdD7uCZem+B2SmaO4NW3EF02cyYyDm8YyDKzt4afl/qxpIw1Gh1e9XAVzf
+         z2CZuuZ2dJ4BVkQO3vtswZCtejNVPj10JjMYNq4KWUDl8a89lsDsIGd1L/i07F4hTT0q
+         //VA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=+oKKpyH4QTZmF9PWO5iAvNe25h+SsPEG6KTMiiFXfCc=;
-        fh=wWBAzSoKLjqiWt+J7fALIVlSvzywFdVkppuwTUM+HoQ=;
-        b=K2J5ebM3eKGjzXQDFynSvbHHi8dqsyKSsq3IXZptDPkVjtC200dgZezDzEoW6pUmRR
-         uY1AJUcXskRRnFd50Ypboy0HVHMMCdROkATS2OsaL5Wvh8UK3U5n8vdPXzK1Y67Dz9Gz
-         Ne1AFxw06Wh/cSzDXR0KisQ3pVc2euTUqFsFR0tKAuKbH09DGByH0tEi0G43ze/WO0wJ
-         EoGRnmOkdKp8EVSSKTtHbj2JMAbSshhYlKLciCEm/BmlXgeMiDK8lR70Eany2T+FeaxK
-         CBzCnMSxm/CaIMEe1QJpSjxSvA8QNHRZMq908TqdVcz/Bz2pUZrtyUeVCNGIZMO4lxKs
-         G+cQ==;
+        bh=73H1rmBZsR9HB0wLO22wKQ4YOh6GObKN7jR8HYwzlak=;
+        fh=5x4M7j69rZg5+jMGVbNRVLzLDkCdTHP0GCiz544c0Cc=;
+        b=QH+IR/QyOAXgVddDEAdT9ZWFn3pNbzMM4Xp3IwpMZjcXXBosUc++NIWjOwJ9mnOVWM
+         3W/qPv3NfgXn9zEW1eIu5neTJzAbbfQz1CiMK9U9EGdnS+chpbQT0I91eK2Exe8yzPQu
+         3k5QTgAz9u+R1sJTCvQKTyx2KtY1Jqgn6LRaH9ST5Spd9hffjhJ0fPllbWpv7SmTRvGX
+         Ee4Kl7Zc0a0pZQ8KfyzDr+QIdbqHebKIpc0c+/PsQNRkZxbBS++mPQebYeQ6WR69hQdy
+         lcpBrkmvZlCDKQkNEo1z8HZnwlTvBtczDZk5JbNxEvY/7Ek138fHJ7bpTiYhRT5SDJcP
+         8sFA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781574247; x=1782179047; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781574295; x=1782179095; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+oKKpyH4QTZmF9PWO5iAvNe25h+SsPEG6KTMiiFXfCc=;
-        b=E2o0frn2KSkwnFR4DV7A6TqMGa/Oei7dB2VJLSbtZxgmj/8asuPSLDfPSjAg7Tgo9s
-         ZaL9wyUtGjGBjjNQo7B+ywKOAzZ2qYwDsYuTP4yHYGHB/+FJfE15KvbQb+pkhulZ8lSM
-         jcXzc+7loptnXJaYbCw2OIGI4KLG/S+6fswjUIq+0+zXdIP0TUCVAFxP7ioa2w+F5FfR
-         26cVzvsrGnC0mbgCQm6ED96BK3uOUoPQ7T26lFDZFmBj1hib2zi3TOoGd+dkIZBV5jqd
-         8hgBt7a4jMW53dT4SiudefPd6660+zv4qhyu2aLAWNr2+3kT3nkkUxmhjgdrK72MGyqB
-         pKkA==
+        bh=73H1rmBZsR9HB0wLO22wKQ4YOh6GObKN7jR8HYwzlak=;
+        b=OwnPR6I5iIs3RNyIl7li/ifWPBaRoWSLpVjjuEyDVWS62jUrE/MoAVNMhCMGpbIqrE
+         /2i6BuHuX5b8az7Yo1OrPtmAge1WunOi45at90gpQXXA/h+ywccJRNjhtDGcvoWRkalM
+         0t8GYkldhbtUdD8qInwfGg2TvXqpUAa202NBRcM/1pWS3TcgtOwUXQ/YXcL73q8uHwyZ
+         WQ88gK2/RAaSyRGDAb/uKncOtos2rQsrinmHOu8QAoAUV1OX5Ot4heHifAaX1zRLChWf
+         p+itmcyBFTIaP3TS2nXxeGozYEFk8Ycz22PxffOZOP78k/qVNtZ68Yss6STa5J3UfeAr
+         eUPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781574247; x=1782179047;
+        d=1e100.net; s=20251104; t=1781574295; x=1782179095;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+oKKpyH4QTZmF9PWO5iAvNe25h+SsPEG6KTMiiFXfCc=;
-        b=j0uKwj3qOcn6nkgRnlamrqX7xaKZBzIsYJcUtrkHxPonr+l9Q3j615zUIvjCqme/Pf
-         eKBGu9oFGcCqIIYaMCE/MHvtMA8pXp8NNUWy7crNP7kI2Lhtw64kaJ1eahar09XpXw65
-         L2QoFuV/XspERBVqPP6haccOO40eu0u+tg4hz/cEgoejtE4bIcuVpsxnUV1vy8vkBTuz
-         LkLhVpANtXLhU+xnBqs1kqcLHP/WEN0N3H7ZIk6toKO2ZaLlm11nIDEIUA9yCD39Xp8d
-         jVasSMIFNwC3dWB4HeBeHJV9TDJxHDyqT9RufqyCYPfo5Mc1+dwemIy/qbAVgLFJfMqh
-         fEbw==
-X-Forwarded-Encrypted: i=1; AFNElJ/Df3chfkgXdtVSVgzb68COCQEPuelb4qdPju1GPfPMN5llvmOB76w5ZYtu0oXhGsbyiug0CWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbLfGCsmvIDde2s1TwpMEmG4gIdrxFJi0XTxG6CFFKbnUAzofb
-	LrNXh26n+TVNxsLyQRI8MGqDreeHRDwSqjMYh859VgcIbAMihLFKn+zHWlfWvv3/rPQoW8qDgoe
-	HyyUPhxaBSmFbVNDKUscmX6iKVHcQd+k=
-X-Gm-Gg: Acq92OEEGVhXn+TxevJ29Pya8bRc0pnFZ0LAMiJBVB9Sy6KJSmxLj/4NIrnS5nTOoFN
-	xEL6WVxr4TtZB29iKrsH4sYaA/WtFbAV7ePWa4pNqN5pVWQf5FTqDytj8e9wwMAsYVev5s1B520
-	R3CbWBC8bJZpB1mosQ+ou9bQ7Ke0kwQlrRQ4X2/NId4kvLc9cERbRwDwzw2u+0iAr5Z/VTcvDqy
-	+F8qS8kZbTbw9spScXbYIBp7aK/rjEQbJdapoB6Of70vVv6tfPQWU0lK0SPdXrn6mg6qD9IukgF
-	Fv1fkOYk1oocFP0Nd2U/rA+3ECrK9LNLOOFH4q8f4oNmH34Tgx9sdelToFilVA==
+        bh=73H1rmBZsR9HB0wLO22wKQ4YOh6GObKN7jR8HYwzlak=;
+        b=NFlJnAUc0Lp5Zti/PNuSuGWfiQNfmmqCqpFlJRvkY2zXBW2pWy3c+xNNUxJxA5BkIn
+         YvYw+jvHYwYiQDZPVAiqYMP9mWRbMZl7rCL4vRS7oxlkTMqIksOypA9KHI6kajHZQDjW
+         zq5cl6vy9r6c4zfr9z/FK9CL/l6w2XvQXa0hLSRMPoiXN5b/RBBmv8uvnH8cG+PW/u+k
+         txOXwJehrzvVp4aXfFokubgUAAHy1TnRrsWd8SUKyY7qJ4NAfqAHIykCxSdixMKi7Cg3
+         MkSVp8rmd65kcS+KzWGDwx/RsF23FM+hgC1vl5j8w/7yEPnq1GiVzXYpgrBQobF11KBo
+         yTlw==
+X-Forwarded-Encrypted: i=1; AFNElJ8J1Ap5Z3Hi7soJltHu9bma2CPTD0ui4Z9w2iX8Xc3HQyFRIiLW65On1iu7PGAm1eyAzR8dv4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJhqM3o+iqMDnhDQ2ZP/Flgew/bqu49VD7l5RNR6rwTrvCCoY2
+	GI9z0FwKeloiwmkryEyVVqCEw0FEG16jfn0fsmpVJLsRPaiBzuQ5DfWq/96TIsriUkfkThBWoZK
+	cB2D7zYbiOE1HsHBWMfTpfK/EULvK/sE=
+X-Gm-Gg: Acq92OGMf8NC9XHGOwcdC49FbetxFyGiue5820zHfK5I85f9jZx2v76S0GpbKHPwOJC
+	gj09jAwLZu138PhyphIOavSMHxgFJF0kglB+guzb00w+oFjPnPMVDEd+qL7+1E2Z8mPWV5MLjfP
+	p9RkDgdBSmcelA6qwsYI7OBgMvP2Md4GYTipyH/HBHkwTxN4+mS/Wja6yLcexuLdt0KQf5CZOma
+	57Nx6OPg3p5PwWKqMQNoc28FcSi1VM1Jfs4ZuwNRAxCRWc0LkjV69w7QsPzrzhIlkJFB21IkjxR
+	kAZTT6OvPPv8pbQjtQnGd153jeOBtQUB9xVSkhRJTzeNj/4+fac=
 X-Received: by 2002:a05:690c:4902:b0:7a3:7ad3:3e9e with SMTP id
- 00721157ae682-7f8c37d34b1mr121804007b3.32.1781574247418; Mon, 15 Jun 2026
- 18:44:07 -0700 (PDT)
+ 00721157ae682-7f8c37d34b1mr121816437b3.32.1781574295274; Mon, 15 Jun 2026
+ 18:44:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,13 +100,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260615073856.152479-1-sun.jian.kdev@gmail.com>
- <20260615073856.152479-2-sun.jian.kdev@gmail.com> <ajAAkIv0R3ztfc5g@mail.gmail.com>
-In-Reply-To: <ajAAkIv0R3ztfc5g@mail.gmail.com>
+ <20260615073856.152479-3-sun.jian.kdev@gmail.com> <ajAIdJHvvIH9ZSrM@mail.gmail.com>
+In-Reply-To: <ajAIdJHvvIH9ZSrM@mail.gmail.com>
 From: sun jian <sun.jian.kdev@gmail.com>
-Date: Tue, 16 Jun 2026 09:43:57 +0800
-X-Gm-Features: AVVi8Cf7im9Wiat3H2R_vuZVWzFKDi57wMkvXVzURWHo32EAr5QTdOPWPc2BPvI
-Message-ID: <CABFUUZFKTsaHLSzoMDogSnnzUCikZcb6TzxQ4G640oO4OxmAjA@mail.gmail.com>
-Subject: Re: [PATCH bpf 1/2] bpf: Fix partial copy of non-linear skb test_run output
+Date: Tue, 16 Jun 2026 09:44:45 +0800
+X-Gm-Features: AVVi8CfJxceWjHoo-gL6bJqNaLI_gcPFSgsxs1Oced6jE74a7o2xoyErdyfibJ4
+Message-ID: <CABFUUZEkndSQyxckpNZ8tbP6_o7zL7fBNdrsWNia4JDiHD-NHw@mail.gmail.com>
+Subject: Re: [PATCH bpf 2/2] selftests/bpf: Cover partial copy of non-linear
+ skb test_run output
 To: Paul Chaignon <paul.chaignon@gmail.com>
 Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, ast@kernel.org, 
@@ -120,7 +121,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -135,7 +136,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299698-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299699-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -144,92 +145,105 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C983868B510
+X-Rspamd-Queue-Id: 6CED268B51B
 
-On Mon, Jun 15, 2026 at 9:39=E2=80=AFPM Paul Chaignon <paul.chaignon@gmail.=
-com> wrote:
+On Mon, Jun 15, 2026 at 10:13=E2=80=AFPM Paul Chaignon <paul.chaignon@gmail=
+.com> wrote:
 >
-> On Mon, Jun 15, 2026 at 03:38:55PM +0800, Sun Jian wrote:
-> > For non-linear skbs, bpf_test_finish() derives the linear head copy
-> > length from copy_size - frag_size. This only matches the skb head lengt=
-h
-> > when copy_size is the full packet size.
+> On Mon, Jun 15, 2026 at 03:38:56PM +0800, Sun Jian wrote:
+> > Add a test case for BPF_PROG_TEST_RUN with a non-linear skb and a short
+> > data_out buffer.
 > >
-> > When userspace provides a short data_out buffer, copy_size is clamped t=
-o
-> > that buffer size. If copy_size is smaller than frag_size, the computed
-> > length becomes negative and bpf_test_finish() returns -ENOSPC before
-> > copying the packet prefix or updating data_size_out.
->
-> Thanks for fixing this!
->
+> > The test verifies that test_run returns -ENOSPC, reports the full packe=
+t
+> > length through data_size_out, and copies the packet prefix into data_ou=
+t.
+> > The test uses a 100-byte data_out buffer with a 64-byte linear head, so=
+ the
+> > expected output spans both the skb head and the first fragment.
 > >
-> > Compute the linear head length from the skb layout instead, and clamp t=
-he
-> > head copy length to copy_size. This preserves the expected partial-copy
-> > semantics: return -ENOSPC, copy the packet prefix that fits in data_out=
-,
-> > and report the full packet length through data_size_out.
-> >
-> > Fixes: 838baa351cee ("bpf: Craft non-linear skbs in BPF_PROG_TEST_RUN")
->
-> Wouldn't this bug actually go back to 7855e0db150ad ("bpf: test_run:
-> add xdp_shared_info pointer in bpf_test_finish signature") and also
-> affect the XDP bpf_prog_test_run_xdp()? If so, could you also add a
-> selftest that covers it for XDP?
->
 > > Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
 > > ---
-> >  net/bpf/test_run.c | 11 ++++-------
-> >  1 file changed, 4 insertions(+), 7 deletions(-)
+> >  .../selftests/bpf/prog_tests/skb_load_bytes.c | 35 +++++++++++++++++++
+> >  1 file changed, 35 insertions(+)
 > >
-> > diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> > index 2bc04feadfab..976e8fa31bc9 100644
-> > --- a/net/bpf/test_run.c
-> > +++ b/net/bpf/test_run.c
-> > @@ -453,19 +453,16 @@ static int bpf_test_finish(const union bpf_attr *=
-kattr,
-> >       }
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c b/=
+tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
+> > index d7f83c0a40a5..134be0ea8ed7 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/skb_load_bytes.c
+> > @@ -3,6 +3,39 @@
+> >  #include <network_helpers.h>
+> >  #include "skb_load_bytes.skel.h"
 > >
-> >       if (data_out) {
-> > -             int len =3D sinfo ? copy_size - frag_size : copy_size;
-> > -
-> > -             if (len < 0) {
-> > -                     err =3D -ENOSPC;
-> > -                     goto out;
-> > -             }
-> > +             u32 head_len =3D size - frag_size;
-> > +             u32 len =3D min(copy_size, head_len);
+> > +#define NONLINEAR_PKT_LEN 9000
+> > +#define NONLINEAR_HEAD_LEN 64
+> > +#define SHORT_OUT_LEN 100
+> > +
+> > +static void test_nonlinear_data_out_partial(int prog_fd)
+> > +{
+> > +     LIBBPF_OPTS(bpf_test_run_opts, tattr);
+> > +     __u8 pkt[NONLINEAR_PKT_LEN];
+> > +     __u8 out[SHORT_OUT_LEN];
+> > +     struct __sk_buff skb =3D {};
+> > +     int err, i;
+> > +
+> > +     for (i =3D 0; i < sizeof(pkt); i++)
+> > +             pkt[i] =3D i & 0xff;
+> > +
+> > +     memset(out, 0xa5, sizeof(out));
+> > +
+> > +     skb.data_end =3D NONLINEAR_HEAD_LEN;
+> > +
+> > +     tattr.data_in =3D pkt;
+> > +     tattr.data_size_in =3D sizeof(pkt);
+> > +     tattr.data_out =3D out;
+> > +     tattr.data_size_out =3D sizeof(out);
+> > +     tattr.ctx_in =3D &skb;
+> > +     tattr.ctx_size_in =3D sizeof(skb);
+> > +
+> > +     err =3D bpf_prog_test_run_opts(prog_fd, &tattr);
+> > +
+> > +     ASSERT_EQ(err, -ENOSPC, "nonlinear_partial_err");
+> > +     ASSERT_EQ(tattr.data_size_out, sizeof(pkt), "nonlinear_partial_da=
+ta_size_out");
+> > +     ASSERT_OK(memcmp(out, pkt, sizeof(out)), "nonlinear_partial_data_=
+out");
+> > +}
+> > +
+> >  void test_skb_load_bytes(void)
+> >  {
+> >       struct skb_load_bytes *skel;
+> > @@ -40,6 +73,8 @@ void test_skb_load_bytes(void)
+> >       if (!ASSERT_EQ(test_result, 0, "offset 10"))
+> >               goto out;
 > >
-> >               if (copy_to_user(data_out, data, len))
-> >                       goto out;
-> >
-> >               if (sinfo) {
-> > -                     int i, offset =3D len;
-> > +                     u32 offset =3D len;
-> >                       u32 data_len;
-> > +                     int i;
-> >
-> >                       for (i =3D 0; i < sinfo->nr_frags; i++) {
-> >                               skb_frag_t *frag =3D &sinfo->frags[i];
+> > +     test_nonlinear_data_out_partial(prog_fd);
+> > +
+>
+> Maybe prog_tests/prog_run_opts.c would be a better place to cover this?
+> test_skb_load_bytes() is meant to cover the bpf_skb_load_bytes helper.
+>
+> >  out:
+> >       skb_load_bytes__destroy(skel);
+> >  }
 > > --
 > > 2.43.0
 > >
 
 Hi Paul,
 
-Thanks for taking a look.
+Thanks, agreed. The test is really about BPF_PROG_TEST_RUN copy-out
+semantics, not the bpf_skb_load_bytes() helper.
 
-Yes, that makes sense. I'll re-check the Fixes tag against
-7855e0db150ad and add XDP coverage in v2, since the issue is in the
-shared bpf_test_finish() path.
+I'll move it to prog_run_opts.c in v2.
 
 Thanks,
 Sun Jian
