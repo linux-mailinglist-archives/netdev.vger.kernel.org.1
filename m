@@ -1,189 +1,219 @@
-Return-Path: <netdev+bounces-299677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oAxSAZuYMGpyUwUAu9opvQ
-	(envelope-from <netdev+bounces-299677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:28:11 +0200
+	id eQd2CQCZMGqAUwUAu9opvQ
+	(envelope-from <netdev+bounces-299678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:29:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E87BD68AEDF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:28:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F3B68AF01
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:29:51 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=google.com header.s=20251104 header.b=J7oCtNih;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299677-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299677-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=google.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=nrosp5ex;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299678-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299678-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 06A133003BD5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:28:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E98E305F582
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB26246BD5;
-	Tue, 16 Jun 2026 00:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887FA1FE47B;
+	Tue, 16 Jun 2026 00:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D662513DBA0
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 00:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B88524E4C6;
+	Tue, 16 Jun 2026 00:28:51 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781569685; cv=none; b=Qc7u20l1pE83NK8uHASVjdvpw8jOhKSMgnesLloOD777U4BENsJF1PAtB+GMRy4kpJy8zCr9cyEGcEcdEk1tYY8mx69/iQJ8CCe7SDwFjZV3/vwjVmfr4E/dmyb4EurdA4uzPQqJJ+h+gAqOpC6to68ALzcNhGSrpv/DhyyaKi8=
+	t=1781569733; cv=none; b=M9GWZOwoNQ7k69m044Z5iaaPLoP+tJ+hQC7IZFBrRV/allkXS/3TCWX+sZUREry9N3ZkUxo0O2nhfncTqsZJHFcN8j8UCQpfOZDQ2hFfpEE6YcXFZe+Yqyv//DNr2yZDIeywEJ9hukB5cyQklWRFw1/QVCkX1RjL1hJW2ft7aUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781569685; c=relaxed/simple;
-	bh=Fz7DRDx/ys8/9DEE57BDgxgsaZw6Dt+6ycduI4iFjS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SK8jabIjQke3crRqWWWqKxO+BzuU8wB5X2nJa/JfcZbzBBm4igPBD5A51W0IFmRhMRcDGhgyXfM+3kwjdwna8pqSYK9aE3x+tOVcqdQtHXI7+mQ/L96BSyleASn/Xk9qZly3nhGqXQiLMkFukrqYfMv1HOfEfyVTu4tRyMnxP0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J7oCtNih; arc=none smtp.client-ip=209.85.214.176
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2bf22c18ad3so24765ad.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 17:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781569684; x=1782174484; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A2aERsjGF0PDWk2sO+FNhRojIc+YeRBYDcFVxz8BN5c=;
-        b=J7oCtNihOlP/7QK7gbmjqj5hOTb7AJ8mzQtDyWulUp0Gfny8BSZ/NoPIA+2ho3wlR0
-         0vJdxSwmSKdNfgYEhZZqOauFYlxSjeQ0L5fv2cHAzJqOY8pJX3f6m1zc0tq0iUFQI/nn
-         xE1KCQYLXAOluu1zsU/Tz6h+3+htZ84ftXQY4htNU9xCBy/VEdeYFeKBJsoEh2TsfH6r
-         F8u0ujvWc0D4jKzEaDkbFIbYWWbkxkR0JE6tAKIO22w7I1SAhAHz78slBrqhtXAIU332
-         PfIQ0ssYVabEsnbO4e4gs2q4GN5vmhFnt54CC91fMOMKrnEtVQpp7XA85Dm2QlTlP42r
-         mWKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781569684; x=1782174484;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A2aERsjGF0PDWk2sO+FNhRojIc+YeRBYDcFVxz8BN5c=;
-        b=kmtGUn9M/g0mvG+TVVFznnyUmGA/1ULkY7jlKls1uxgt6nA8fBYg4ig3KDDPgvmGRb
-         qg5ak0y0ForfhbxgwsEwH1eKUufVzG4IZGQpuZMnPXY/Ihi3BaYen2fBS8l1hHwFKSkN
-         n6ah9Z5aPWMqQatQNdjPTBGip1g+rJoQyCsDsT2A0n2R89LnQP+VJ9QMIz3xbhK3iMzn
-         UOXaMLLfVKQQvqBSdCdsvnsEYtq8pohOF4wdXWJlTGfLPLOEQNixidU8QUJX2g9IJGpn
-         W68qWXpqW5EtcsQFkpHDXgjLLSXt406rlwhvL/cpRhQ4e8oYMcyAF1mWsLFizgLB0YPT
-         7jVw==
-X-Forwarded-Encrypted: i=1; AFNElJ/ezNn/BHIlERb6X04X3C5j+JSJV0SEnyYnC41ynb/HOaBXBrnDYboX7MRcU4GKbmix6oMN40Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPKCF65HjJcTf03PFX+K5fj9oudFP0ocZm2CaDDJ8fcGA7K/vK
-	J+K5wAtNih83IssrFucr8nULmADnfBsE4Z9pMVvDPzN+r0IHpSCth1MDkvLi0xph8Q==
-X-Gm-Gg: Acq92OFHAI9mQhIKdfLUbxkp2M9EFcNhKqR8jtFsl1VZMx1isvi0sUs3PEGmpxnzyL7
-	AVpPk9X6QaVfMui1uWikPL2c5n5C8UA1NXiRebSF2962EuOV7R+CEitiIdKHXv/pT8xyj0n2i8r
-	1bLqZjXeX6kP9k2C2Ez3dtK0OjBPRA2hI30SMGzyP1kryt/XlJctjrcTPDeCDj+zNnOCVHtLbcC
-	zAnenPLvLGCqIuRTmP5MUi0FKtDG2d6LS/+WXKnUdCuAHTRZ7GcP0Q3YlR3syUk37IPup4MtWqg
-	WoWzvyA5yOuNaCe0XBGq9TlgxaIp0UHUDd1ZakCUy9E0NBoAbfS+Ua8oEPqd/gPu/sRLMIOdCKW
-	yC4H9V8nfJA34NNVTvgVQeo+fKXJaqck4qcmGRbrFHeCR/xCuxx04+D79yxlUm+xM9eUsaTq49D
-	54j6N1GogQ7qFDGiVZnovg7lmIl28j8Vaa8hwP6mbQBV3aPXxqB6BP41JnFY2r00wIQUkRg1u9j
-	iKPKrGHACQPy7Lkq98=
-X-Received: by 2002:a17:902:ef02:b0:2b4:641a:6b7c with SMTP id d9443c01a7336-2c69c1d4b35mr670855ad.13.1781569683615;
-        Mon, 15 Jun 2026 17:28:03 -0700 (PDT)
-Received: from google.com (25.75.145.34.bc.googleusercontent.com. [34.145.75.25])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8663164a0fsm9890419a12.8.2026.06.15.17.28.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 17:28:03 -0700 (PDT)
-Date: Tue, 16 Jun 2026 00:27:59 +0000
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	David Wei <dw@davidwei.uk>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Dragos Tatulea <dtatulea@nvidia.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] netdev-genl: report NAPI thread PID in the caller's
- pid namespace
-Message-ID: <ajCYhCB7pdywVnM9@google.com>
-References: <20260615171736.1709318-1-maoyixie.tju@gmail.com>
+	s=arc-20240116; t=1781569733; c=relaxed/simple;
+	bh=KPtHxrDcyIwv2ORYz/+gnngulB6FkX6nsdmLmFmefMU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AS2GTsXmH7AS6QGOvFOiZ8OK0kRoutvmzmz3kRJW7MMa0ttVf2O/eihwyexeuwnc6jPqkXQgD77tkJTuJBLrY9xNdGHIIPyRLe/eVOAkI+T6znREp9UiWviZ6AWem7eUzuHbbFCv/V1cxq6xz5k/aNVKeVM0ipBUtJ0Vv1ID8oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nrosp5ex; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D96E1F000E9;
+	Tue, 16 Jun 2026 00:28:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781569731;
+	bh=fDHAdwUV01GxCSxY6I/kO2Xfc6AMmaOEU+dZIiXqh3c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=nrosp5exo+qTuhMLQ/taTNcJCTLGIvgIkl1Egtj9+aCvWc9U33Tyu5ctHSBcLuKvS
+	 XiJ3oAurRrXL6BCz/JBGStA16SBXTzohJe7ANNtgwN90mD+gMk99k1+vgLy7hBR6iN
+	 e3TLsWQ4wwTCsSJW9jxwe/5+ceNlIlXVr0Bo9f9kj1uOhUyhqGs8h9VdQheDJIJHIe
+	 7Ana7OmluB4X7Q6CSg33JVFv0w9moOjVQ571IJH54cAtCDvJ0DaNp9pBqIGPhosZvM
+	 LmJLtHmVWgFJwxqVtRqc3D7XbbJsOZGk5ce4l7Ywyl0KQHoA0H+6bWRWvBafTjeTuP
+	 jQsAr1mFCRwIg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: yun.zhou@windriver.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	qingfang.deng@linux.dev,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] flow_dissector: fix uninit-value in __skb_flow_dissect() for ETH_ADDRS
+Date: Mon, 15 Jun 2026 17:28:50 -0700
+Message-ID: <20260616002850.1096747-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260613113154.2550286-1-yun.zhou@windriver.com>
+References: <20260613113154.2550286-1-yun.zhou@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260615171736.1709318-1-maoyixie.tju@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299677-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[skhawaja@google.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_RECIPIENTS(0.00)[m:maoyixie.tju@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:daniel@iogearbox.net,m:razor@blackwall.org,m:dw@davidwei.uk,m:sdf@fomichev.me,m:dtatulea@nvidia.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:maoyixietju@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:yun.zhou@windriver.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:qingfang.deng@linux.dev,m:jiri@resnulli.us,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299678-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E87BD68AEDF
+X-Rspamd-Queue-Id: 70F3B68AF01
 
-On Tue, Jun 16, 2026 at 01:17:36AM +0800, Maoyi Xie wrote:
->netdev_nl_napi_fill_one() reports the NAPI kthread PID in NETDEV_A_NAPI_PID
->using task_pid_nr(), which returns the PID in the initial pid namespace.
->
->NETDEV_CMD_NAPI_GET does not have GENL_ADMIN_PERM and the netdev genl family
->is netnsok, so a caller in a child pid namespace can issue it. That caller
->then sees the kthread's global PID, even though the kthread is not visible
->in its pid namespace, where the value should be 0.
->
->Translate the PID through the caller's pid namespace, the same way commit
->3799c2570982 ("io_uring/fdinfo: translate SqThread PID through caller's
->pid_ns") did for the io_uring SQPOLL thread. The doit and dumpit paths both
->run synchronously in the caller's context, so task_active_pid_ns(current) is
->the caller's pid namespace.
->
->Fixes: db4704f4e4df ("netdev-genl: Add PID for the NAPI thread")
->Cc: stable@vger.kernel.org
->Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
->---
-> net/core/netdev-genl.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
->
->diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
->index b8f6076d8007..4c23e985cc01 100644
->--- a/net/core/netdev-genl.c
->+++ b/net/core/netdev-genl.c
->@@ -2,6 +2,7 @@
->
-> #include <linux/netdevice.h>
-> #include <linux/notifier.h>
->+#include <linux/pid_namespace.h>
-> #include <linux/rtnetlink.h>
-> #include <net/busy_poll.h>
-> #include <net/net_namespace.h>
->@@ -189,7 +190,8 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
-> 		goto nla_put_failure;
->
-> 	if (napi->thread) {
->-		pid = task_pid_nr(napi->thread);
->+		pid = task_pid_nr_ns(napi->thread,
->+				     task_active_pid_ns(current));
-> 		if (nla_put_u32(rsp, NETDEV_A_NAPI_PID, pid))
-> 			goto nla_put_failure;
-> 	}
->--
->2.43.0
->
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+flow_dissector: fix uninit-value in __skb_flow_dissect() for ETH_ADDRS
 
-Reviewed-by: Samiullah Khawaja <skhawaja@google.com>
+This patch addresses a KMSAN report by gating the read of eth_hdr(skb)
+in __skb_flow_dissect() on skb->dev->hard_header_len being at least the
+size of the ETH_ADDRS dissector key, zeroing the key otherwise. The
+goal is to avoid reading uninitialized memory when a TUN device in
+IFF_TUN (L3) mode passes a packet without a link-layer header to a
+flower filter on a shared block.
+
+Closes: https://syzkaller.appspot.com/bug?extid=fa2f5b1fb06147be5e16
+
+> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+> index 2a98f5fa74eb..de6ca9beee03 100644
+> --- a/net/core/flow_dissector.c
+> +++ b/net/core/flow_dissector.c
+> @@ -1173,13 +1173,20 @@ bool __skb_flow_dissect(const struct net *net,
+>  
+>  	if (dissector_uses_key(flow_dissector,
+>  			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+> -		struct ethhdr *eth = eth_hdr(skb);
+>  		struct flow_dissector_key_eth_addrs *key_eth_addrs;
+>  
+>  		key_eth_addrs = skb_flow_dissector_target(flow_dissector,
+>  							  FLOW_DISSECTOR_KEY_ETH_ADDRS,
+>  							  target_container);
+> -		memcpy(key_eth_addrs, eth, sizeof(*key_eth_addrs));
+> +		/* TC filter blocks can be shared across devices with
+> +		 * different header lengths, so we cannot validate this
+> +		 * when the filter is installed -- check at dissect time.
+> +		 */
+> +		if (skb->dev &&
+> +		    skb->dev->hard_header_len >= sizeof(*key_eth_addrs))
+> +			memcpy(key_eth_addrs, eth_hdr(skb), sizeof(*key_eth_addrs));
+
+[Medium]
+Is hard_header_len the right predicate to gate this read on?
+
+The dissector key is ETH_ALEN+ETH_ALEN, so the gate accepts any device
+with hard_header_len >= 12. IPoIB sets hard_header_len = IPOIB_HARD_LEN
+with dev->type = ARPHRD_INFINIBAND, and ARPHRD_FDDI uses 21 bytes.
+Wouldn't packets on those link types pass this check and have the first
+12 bytes of a non-Ethernet L2 header copied into key_eth_addrs as if
+they were the destination and source MAC addresses?
+
+Would a check on dev->type == ARPHRD_ETHER (or dev->addr_len == ETH_ALEN)
+be more appropriate, so that only true Ethernet framing is read into
+the key?
+
+[Medium]
+Does this gate behave correctly across act_mirred?
+
+act_mirred reassigns skb->dev to the mirror/redirect target before the
+target device's classifier path runs. Consider a packet originally
+framed on an Ethernet device, with a valid mac_header in the linear
+region, redirected to a headerless device such as TUN IFF_TUN that
+shares a TC block with the source. The key_eth_addrs would now be
+zeroed via the else branch even though the original Ethernet header
+is still present in the skb. Is that intended for shared blocks?
+
+[Medium]
+Does this still leave a path where eth_hdr(skb) reads past the buffer?
+
+eth_hdr(skb) expands to skb->head + skb->mac_header. When mac_header is
+the unset sentinel (typeof(skb->mac_header))~0U set by skb allocation
+or by skb_unset_mac_header(), the dereference resolves to skb->head +
+0xFFFF, well past skb_end_pointer(skb). The new gate only inspects
+skb->dev->hard_header_len, which is independent of skb->mac_header, so
+any skb delivered to the dissector with mac_header unset on a device
+whose hard_header_len >= 12 would still read out-of-bounds bytes into
+key_eth_addrs.
+
+Would skb_mac_header_was_set(skb) plus a bounds check that the 12 bytes
+lie within [skb->head, skb_tail_pointer(skb)) be a more direct match
+for the property the commit message describes:
+
+    This assumes the skb has a valid Ethernet header at mac_header,
+    which is not always the case.
+
+> +		else
+> +			memset(key_eth_addrs, 0, sizeof(*key_eth_addrs));
+
+[Low]
+The commit message says:
+
+    If the device does not have a link-layer header large enough to
+    contain the Ethernet addresses, zero the key so the filter will
+    not match.
+
+Is that wording accurate for all filter shapes?
+
+__fl_lookup() uses key_eth_addrs as part of the rhashtable lookup key.
+A flower filter installed to match src_mac 00:00:00:00:00:00 and
+dst_mac 00:00:00:00:00:00 (for example a catch-all on a shared block)
+would, after this change, deterministically match every packet on a
+headerless device, where previously the random skb memory made such a
+filter effectively never match there.
+
+Could the commit message note this corner case, or could a sentinel
+value that cannot collide with a legal user-supplied key be used
+instead of all zeros?
+
+>  	}
+>  
+>  	if (dissector_uses_key(flow_dissector,
+-- 
+pw-bot: cr
 
