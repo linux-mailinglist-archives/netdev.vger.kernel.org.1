@@ -1,213 +1,412 @@
-Return-Path: <netdev+bounces-299770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id nKuFHG/+MGrNaAUAu9opvQ
-	(envelope-from <netdev+bounces-299770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:42:39 +0200
+	id ok3yHmMBMWpBaQUAu9opvQ
+	(envelope-from <netdev+bounces-299771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:55:15 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C596068CE7D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:42:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC07468CFB5
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:55:14 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="R/FWOcUK";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299770-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299770-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=x1UznE0B;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299771-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299771-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5241302F730
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:38:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 393AB30B828F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5379A349CE0;
-	Tue, 16 Jun 2026 07:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B814940803D;
+	Tue, 16 Jun 2026 07:50:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011013.outbound.protection.outlook.com [40.107.130.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AB127281D;
-	Tue, 16 Jun 2026 07:38:19 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781595501; cv=none; b=Ss6MGKZDFr3qil6SGvmjA7g1k2Id1LY3Acox7O3r4H9cLWcibSdCfuqz2R40LpRDMGoVS9PxZe+PqfiQBBoY8LU1zmJwotKGgNFECc6QjTDWhhfSqMOAJfW3hTKfY1c980JokaJ3nS3XXfhFVtKht6AQl9lUReX3Cod7dh3zhMY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781595501; c=relaxed/simple;
-	bh=MSkIdaoPuZyf0+E7gKZE6aLeu+EluDF2kYPJBoLVLbw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aD0rAMP/9DKyK8NwShKtB1N1yL/OWJhNbg02QEM2HKfWEhcndKL8BCMltMcnqfwcGX1xrxnLM6hiK2VJlY7LrDVPJiwXgYbd+JZyufmv4zJVtx6eWVlfCQJ2tEELApYsd5dTe8n1Vy4cx6chjSmNNrUoVNTrNj56xTBUka1HQ18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/FWOcUK; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5B1C1F000E9;
-	Tue, 16 Jun 2026 07:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781595499;
-	bh=NyA9CgW7v+BLAirO4rOGrEPReI5ZIQPK5UVmRjBrp0k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=R/FWOcUKI4psIDFxTdh95hxHu460Qf9DwmFfgv2Lq+o3kuGDAQJ6FFkAdCDg8BA2v
-	 nZjfMG+dTQzvqQ2eaTlFwqYEg6BVdSdMwxGkftykFcyc2y6JA9WVJ/jUi1Estr2nQN
-	 dsk1zDiryL+udCV8LrY2e1zGY3gWTrZupRP2uzXOJYDFGDuI6CIWSm8lAgtz9qp0X9
-	 6YCu+rxOWNX1aoanz7+IjewAvm5U085mQYbwz5uP8jxJlmdqr7KM5ViTEhcRnddrrA
-	 N1uObdmqEdNh9z+yvFGwI2cB3k/Pro0S96xS4+JVeWuasLbSdCyPp2f8XSz0QmlwST
-	 U1S7v5BMmhYlA==
-Message-ID: <cae757f2-4e29-48ae-b4b4-90944552a2aa@kernel.org>
-Date: Tue, 16 Jun 2026 09:38:14 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCDF3EDADF;
+	Tue, 16 Jun 2026 07:50:52 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781596254; cv=fail; b=aABFtN0oVpb4Vu/B1oPyv/WSiLHeAHz1GdjHDkEc1QCOCo5TDeDFRoIlHTuM5bnTWT+CJwHTn8IShv22lWwtxPeQn1lsn+6I3zwvNAE8+YRZpPCfAq5uZPMfWexSLdlDs4w+AAQwXn0hd9yOEdjZypFMOBLKuBfFw5MecyW6JoU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781596254; c=relaxed/simple;
+	bh=64qb5bNskwwbRJVyOpbS83wLXH0PxvhuTbIlA23nCM0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nUqqjluZcHGj9OUk8fM3CyIzUjRQBV82klUkjrW919D+ugoadXGFPg5TUPbawQQ7W+9kQprgyOyXiomn8yUFECw2Lvy9EHK1ThnXI2aMCB7Of2oLC3VBsYJlFkfCVOtwpLvOaA0hNO9EUMPJs/bjRHjyg5tKA24UlOaGxq3N5NA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=x1UznE0B; arc=fail smtp.client-ip=40.107.130.13
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=p6rVvbhVZDimxHhvRFiPXdxNLZ8jb4XAd+IkNri/TNP5igneM0PWKjKaAWIBNron0/HOp3FtxB+itqetUAycf6IK1ZMMEArPdZLxXxZaKwJMmYmpDVPOE4psdwcSAYwOR+aQSqTK2BsLGbWSgUWJ/AIYaZEKVxJ7KbXPUxJ/nB6iRm2IB+9lHYmLWqIdCvxJ8wFNbR6g03/VinucrTANttRROJHX8UriJ676fcH+i+Gr4j6nMz4RQCk338s1OoFba+FlzHC7r2/Lh7V9imlr0USTgH7RPty+MCGYJoWBDb//ghXiMwhgaEeFn1ScejhstXeAWg6dL9ZZXBJ/9HnawQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yf94zHia2YK8fcyXFUqxflBMqNF4x36DOdWC0rVhX20=;
+ b=Dnb7qw5aMbvzpkhxEv4jrChvpN8TE9GhzTZVKbg6GjjLyFfvOJ+Fv6IMf1q3ZBnhbLCailUwEFoB37jyKWQaqsKT1yzdyJUDGXL8RYSNBDuRswIXcMj14UT7LmWyH63EDHKw8Csx9DkW26p2PPB7MLGrx9zTRnJwA6W/0ofn/7aihxBIKNBuLZdAaBwVvq6rDW4vbZN/1ZsRcGaGLm2FJbcMmagFFwixOcOAshhFbWRGUjS7PqYK6nwUugrGv6wOI8PQ5qhclYI+3I0Ep2rwhPd3k1hqXyLx01stqQAOl5LXHECIwq0QknoiXyyMbvilZ4+hXmMw1OY36rVq4ujJbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yf94zHia2YK8fcyXFUqxflBMqNF4x36DOdWC0rVhX20=;
+ b=x1UznE0BncueqB3hqCLlw5OB2gMWDhZZ5PoBuILVkpSsAGDiR4FjlzL2cNEgVS95xjwj38a45Og4VrFa2tO/jceuFN3as59VB7I5sIJcLRmF4VxhP4+tfvjBRykCaJ8KPPO4JfEb24u34bckwwKDZ4pbW9JGjFbCBLk6sGzPbaPVxr5fFqNLHg0CFf8pjWNjDHfeIABDAKGiPjQdUHnmmGzDcrvD9dFfSSQPXY4G+FnEhAPSWAovfH2OiT2fNSm6hRSNg+yRPobidxPRKB3V3niaS+r6ptk3RJ7GGHV6u1GOETv/Pn90HV8N8AAIJ/RDHIjVltjwjJF1NuL45350zg==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ AMBP189MB3110.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:6bc::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.113.18; Tue, 16 Jun 2026 07:50:48 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
+ 07:50:47 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Samuel Page <sam@bynar.io>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>
+Subject: RE: [PATCH net] tipc: free bearer discoverer via RCU to fix
+ tipc_disc_rcv UAF
+Thread-Topic: [PATCH net] tipc: free bearer discoverer via RCU to fix
+ tipc_disc_rcv UAF
+Thread-Index: AQHc/NgOlS3jRPn6sEuvn9KJLah7KLZAzXLQ
+Date: Tue, 16 Jun 2026 07:50:47 +0000
+Message-ID:
+ <GV1P189MB19887A9A37B5B170C112DF8EC6E52@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260615150009.1734270-1-sam@bynar.io>
+In-Reply-To: <20260615150009.1734270-1-sam@bynar.io>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|AMBP189MB3110:EE_
+x-ms-office365-filtering-correlation-id: 260aba40-0012-4518-b7b5-08decb7bfa9c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|23010399003|38070700021|3023799007|22082099003|18002099003|6133799003|11063799006|56012099006|5023799004;
+x-microsoft-antispam-message-info:
+ iOVTAY8F7fBTDRX5VK00uUkHpTRnL86GCjeYUCCBx8Z50KQSJTqjQ0Akb0E/x8H65NLK2FvNP8TCW6DqkMrLQd7raHj2VVibBb4qcownbe588Fw/tbD4ll8T8UM+OTWxm6mMDn6PeRmdFCuruiPbEAyETrTPz1HS4TDik2asmgOhKQU0M/ueWGBHhokZRb4L0KXBRJ3rQRtPnsxvqQ83uTNLTh19wI72T5kEyOj/v0f+ghkiJvxrg9bOxPAkwMoTOlJu2h8EkJjHX4m40HjeqxmJj4iw+Nk8/GmTuWBbe4J3QTycXXjmrDd6TtsPh67LbTyW9glKZY/mY5FP+Bt9HkQXWWlNKXsvDh+bq2+BvwbOz9XdSaPJ70fjKc+5N3XFb+ZS1apdUH2HxN0ihEPYzbcM+MV0aqw0msbvoPwez2Oso+qXDJEaV7+VfXE5EoOOhMpKT63/Y81aY1mjkKEMZpAbv5T5Wz1XxVO3l2WLXbXNtEFXaLLHeDL45OSL7CYVztN1Z2A5v3L8mCxYp1L0GXZICpjS23E8nXTpT5zcf1webGDAXGu3jCBTpdVHhM4iXduL3XbBpfNEUrYssmek/gIfsirdgzpIwHLjgBfEPVps7gbFGuSBUA7OHtSsoGzZ06daJqRur8Bz8C/9FXmfbMV2LJ45LSzfnJf6Rd8leJDTvzGfr5tvKeV5Mb0uJPyFksXwkBEiPIyxSTwYGt8ReOyyDkqfw0mPIt2+RT/uv5AYauCF6Xyf27E5jrB67Kwx
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(23010399003)(38070700021)(3023799007)(22082099003)(18002099003)(6133799003)(11063799006)(56012099006)(5023799004);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?gIiEtbodW7GGWhYECVqrCwbxpQrfiWEpu3u5SSKziH9JIaPfzilHnazgaDl8?=
+ =?us-ascii?Q?DjZCpLs+g+2iQhQuA7NO86HLXByq34+Ps5eqc39nAVp3M3vmeq6aKAjBw9wc?=
+ =?us-ascii?Q?hetM11dIOLeLMuBKxrRQdCh82ZV46b8KX6O4jAzmHWguNiJRUAOGxt9MNlQU?=
+ =?us-ascii?Q?AnQf3CvxtqD5UeFZWAIJSP7V/sBotzT/zuV4+y9b3gLJJZ3pN5Tu6IPQdFwv?=
+ =?us-ascii?Q?UJU2zNsknfL07u/6I8CqqMp8IAwNqYFuiA9ziQm+7n18jbOUwC6svgTJDnlD?=
+ =?us-ascii?Q?2GJy63Gv69nu/S5w98HEUEwzMm+36P9LDsaKg+J6RnFpe/8v3ZMiehrU2O8S?=
+ =?us-ascii?Q?j9ySgpCBYHKEbecTZ4gSoGo3+VEJicoO1IADLStGNSI+cP43xVQL3xpxouWR?=
+ =?us-ascii?Q?w/UciNx2ripDsP8Atj7rhMt+rGW6RyhmvA/6EpBlh1vRHtTG0GyjDHIAcBnb?=
+ =?us-ascii?Q?bCzXTKtCWlPznXrjbvvrosK4HlADb16zj/kW0FDk3NnglAv+plC+p23DsI3d?=
+ =?us-ascii?Q?3h5nkf1xQoOwQhQvIljiJjukfD+r68N9J6MXoMb0NSF0RAcYJ2KcEZatjKl5?=
+ =?us-ascii?Q?FaJLDu2BR0oSAT3OaOxtoVEqPj01up6pFOEadOxoNpliNUjwodl0EU9+7CWo?=
+ =?us-ascii?Q?hRRhEI+LiBR+Cz0Hx2eirPq8G3iVz0/dk1lEZZBasC8ry6D8XpuNcuSYWpen?=
+ =?us-ascii?Q?10m5Hf5fi3dRvSKZ4A7RRTrccI2McHA0YHt4l4ZadD+PXO1trtBRQAtHftM9?=
+ =?us-ascii?Q?7kVX9/rErOu1ze2+IOp8fZj3F95WvTMtnZESnnWzYiMfhEYyCiIgKo+vD5HI?=
+ =?us-ascii?Q?bpRsMbJIJ9gowxeayzEfb9oRR2HoNRX+/hICqjBW086CrZoY7Z5OkHF6hwtf?=
+ =?us-ascii?Q?vAaKls5njIBwgvtRTyITJ2v2Ort4MZQbkxeRnSaX4KNNKExIqLuBkwi6GpcD?=
+ =?us-ascii?Q?XzhxPXRmwHZcMTw7xj327d9kFeYyVYVA3NbAk5VZg24MREnGcuhoDLWGZalp?=
+ =?us-ascii?Q?CHRR96v74AawTNySmB8/ApkY5jk9Fbj+q0mYBZWAnXTZo637MDvMgHSsoT1P?=
+ =?us-ascii?Q?Mr4ll6/sdViBsBCXvn3BVZyHEmx2ja37SoEgG0EDCbNQwdjErTxM2VjnWalf?=
+ =?us-ascii?Q?ItwzdAWsQYkOOdvQZ/AZT3z/CUGmhuj+MotgG9u2xSEkilvseW3gXYzQiw3G?=
+ =?us-ascii?Q?AUCQzlHcIhcxDWtrr+IiIFzPX55cRGD/Q8lyXWrkmQ9cBd+LYzJnPxU9wfEd?=
+ =?us-ascii?Q?pZewiJJkXu9rDTg2gEpFiKpr3+hIjPgf2bA+lZ/ECVR8dF+pMP40RX3+tEz0?=
+ =?us-ascii?Q?FNDQoTR6DPYX86VwcTmugF5kr0UtvWtBOolgrpO5uLrxu1olzm1Q97tkiiQv?=
+ =?us-ascii?Q?YyUqpfxwe1Xh7WwRpaPr3N+vtvzFSw+ZbtaEeQOBZ/FZMlBjMBV9h2Orkqvg?=
+ =?us-ascii?Q?0aV6oqzEtkBgzk9UOlxl1XVBzCYjdnAkfvHnTdb7X/LVRMCqEQ7i8LrfraSy?=
+ =?us-ascii?Q?zTmdgS7dJceUESOXEUq0FX7zpoFas289JDoGc5G2YNj3cGOZ++bCmpcCmGF+?=
+ =?us-ascii?Q?3i/QFq5W8TtfJFfJB8UlhbqJ8Pfxz72NlJLpQudkY6DSV9Es4tSNMNXvhkoI?=
+ =?us-ascii?Q?cveikzlNSJSxJLdrAL84h2gGCI5PrqYC/P2hRdG5o/BkdGBl1qKjqqNVsV/9?=
+ =?us-ascii?Q?4d3gHs+s5EWRXoCa0x+S/4fBBGwr4sW04NavjcT0vqRLcdUXp6VduMtaBJtg?=
+ =?us-ascii?Q?AIJKB2LL9Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] vmsplice: make vmsplice a trivial wrapper for
- preadv2/pwritev2
-To: Joanne Koong <joannelkoong@gmail.com>, Askar Safin <safinaskar@gmail.com>
-Cc: akpm@linux-foundation.org, axboe@kernel.dk, bernd@bsbernd.com,
- brauner@kernel.org, dhowells@redhat.com, fuse-devel@lists.linux.dev,
- hch@infradead.org, jack@suse.cz, linux-api@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, miklos@szeredi.hu, netdev@vger.kernel.org,
- patches@lists.linux.dev, pfalcato@suse.de, rostedt@goodmis.org,
- torvalds@linux-foundation.org, val@packett.cool, viro@zeniv.linux.org.uk,
- willy@infradead.org
-References: <CAJnrk1Y9egYizkx1H9K0cqxSYuB+7vLvQbV7Tf4C5eHFqnnC-A@mail.gmail.com>
- <20260616011516.4039110-1-safinaskar@gmail.com>
- <CAJnrk1Z_V8TShvWV6zwTMQqXra3J4J5CL5ofFMm9DGoLj9whEw@mail.gmail.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <CAJnrk1Z_V8TShvWV6zwTMQqXra3J4J5CL5ofFMm9DGoLj9whEw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 260aba40-0012-4518-b7b5-08decb7bfa9c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2026 07:50:47.8828
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ucXy7knt0FqXNy+ISMDcm7CcxnYFCmuRTLIEMCeAiXPx41P//yCU1wG0f+beWkW7ckPPfn+ksiHkjFTRGtCRGYU25V4O9+cTLeGTxfBZtSk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMBP189MB3110
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DMARC_NA(0.00)[est.tech];
+	TAGGED_FROM(0.00)[bounces-299771-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:joannelkoong@gmail.com,m:safinaskar@gmail.com,m:akpm@linux-foundation.org,m:axboe@kernel.dk,m:bernd@bsbernd.com,m:brauner@kernel.org,m:dhowells@redhat.com,m:fuse-devel@lists.linux.dev,m:hch@infradead.org,m:jack@suse.cz,m:linux-api@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-mm@kvack.org,m:miklos@szeredi.hu,m:netdev@vger.kernel.org,m:patches@lists.linux.dev,m:pfalcato@suse.de,m:rostedt@goodmis.org,m:torvalds@linux-foundation.org,m:val@packett.cool,m:viro@zeniv.linux.org.uk,m:willy@infradead.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS(0.00)[m:sam@bynar.io,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jmaloy@redhat.com,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[david@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299770-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[est.tech:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bynar.io:email,est.tech:dkim,est.tech:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C596068CE7D
+X-Rspamd-Queue-Id: DC07468CFB5
 
-On 6/16/26 08:38, Joanne Koong wrote:
-> On Mon, Jun 15, 2026 at 9:15 PM Askar Safin <safinaskar@gmail.com> wrote:
->>
->> Joanne Koong <joannelkoong@gmail.com>:
->>>
->>> I think this is because of how libfuse handles eof / short reads. When
->>> it detects a short read, it fixes up the header length after the
->>> header was already vmspliced to the pipe because it assumes vmsplice
->>> mapped the header's page into the pipe by reference. It assumes that
->>> modifying the header length in place gets then reflected in what the
->>> pipe later splices out.
->>>
->>> The logic for this happens in fuse_send_data_iov() [1]:
->>> a) sets out->len = headerlen (16) + len (16384) = 16400 in the
->>> stack-allocated fuse_out_header
->>> b) vmsplices the header to the pipe
->>> c) splices the backing file to the pipe. if this hits EOF, it'll get
->>> back 15510 instead of 16384
->>> d) detects the short read [2], fixes up the stack out->len = 16 + 15510 = 15526
->>> e) splices the pipe to /dev/fuse
->>>
->>> After this patch, step b) is a straight copy which means step d)'s
->>> fixup doesn't modify what's in the pipe. This could be fixed up in
->>> libfuse to not depend on modify-after-vmsplice, but I don't think this
->>> helps for applications using already-released libfuse versions. I
->>> think this patch needs to be reverted.
->>>
->>> Thanks,
->>> Joanne
->>>
->>> [1] https://github.com/libfuse/libfuse/blob/master/lib/fuse_lowlevel.c#L846
->>> [2] https://github.com/libfuse/libfuse/blob/master/lib/fuse_lowlevel.c#L956
->>
->> Uh, this is very unfortunate. But I still want to remove vmsplice.
->> Maybe we can somehow save my patchsets? For example, let's return EINVAL
->> for this particular combination (writable pipe + SPLICE_F_NONBLOCK).
-> 
-> writable pipe + SPLICE_F_NONBLOCK is a valid vmsplice call today, so I
-> think returning -EINVAL would still cause regressions.
-I recall that, after the vmsplice vs. fork security issue happened, vmsplice was
-blocked in some container runtimes. e.g., [1] still seems to disable it, added
-in 2021 [2].
+>Subject: [PATCH net] tipc: free bearer discoverer via RCU to fix tipc_disc=
+_rcv
+>UAF
+>
+>bearer_disable() tears down a bearer's discovery object with
+>tipc_disc_delete(), which frees the struct tipc_discoverer with a plain,
+>synchronous kfree(). The discovery receive path, however, still reads that
+>object under RCU in softirq context:
+>
+>  tipc_udp_recv()            // udp_media.c, rcu_dereference(ub->bearer)
+>    -> tipc_rcv()            // node.c
+>      -> tipc_disc_rcv()     // discover.c
+>        -> tipc_disc_addr_trial_msg(b->disc, ...)  // reads d->net etc.
+>
+>tipc_udp_recv() only gates this path on test_bit(0, &b->up), which is a TO=
+CTOU
+>check: an RX softirq that observes b->up =3D=3D 1 before
+>bearer_disable() does clear_bit_unlock(0, &b->up) can still be executing i=
+nside
+>tipc_disc_rcv() when bearer_disable() reaches
+>
+>	if (b->disc)
+>		tipc_disc_delete(b->disc);
+>
+>and kfree()s the discoverer. The reader then dereferences freed memory (d-
+>>net, inlined into tipc_disc_rcv()) in softirq context [0].
+>
+>The bearer itself is freed RCU-safely (tipc_bearer_put() -> kfree_rcu(b, r=
+cu))
+>because the RX path runs under RCU, but the discoverer hanging off b->disc=
+ is
+>freed synchronously. The same b->disc is also touched under rcu_read_lock(=
+)
+>by tipc_disc_add_dest()/tipc_disc_remove_dest().
+>
+>Free the discoverer with the same RCU lifetime as its bearer. Add an rcu_h=
+ead
+>to struct tipc_discoverer and defer the kfree_skb()/kfree() to an RCU call=
+back
+>so any in-flight reader that already loaded b->disc completes before the
+>memory is released. The timer is still shut down synchronously up front wi=
+th
+>timer_shutdown_sync() (which can sleep and must not run from the RCU
+>callback), and shutting it down before the grace period prevents the perio=
+dic
+>LINK_REQUEST timer from rearming or re-entering the object.
+>
+>This mirrors the existing TIPC pattern of pairing call_rcu() with a cleanu=
+p
+>callback (see tipc_node_free()/tipc_aead_free()).
+>
+>[0]: (trailing page/memory-state dump trimmed)
+>BUG: KASAN: slab-use-after-free in tipc_disc_addr_trial_msg
+>net/tipc/discover.c:149 [inline]
+>BUG: KASAN: slab-use-after-free in tipc_disc_rcv+0xe7c/0x103c
+>net/tipc/discover.c:236 Read of size 8 at addr ffff000028f07428 by task
+>ksoftirqd/0/15
+>
+>CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 7.0.11 #3 PREEMPT
+>Hardware name: linux,dummy-virt (DT) Call trace:
+> show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)  __dump_stack
+>lib/dump_stack.c:94 [inline]
+> dump_stack_lvl+0xb4/0xd4 lib/dump_stack.c:120  print_address_description
+>mm/kasan/report.c:378 [inline]
+> print_report+0x118/0x5d8 mm/kasan/report.c:482
+> kasan_report+0xb0/0xf4 mm/kasan/report.c:595
+>__asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+>tipc_disc_addr_trial_msg net/tipc/discover.c:149 [inline]
+>tipc_disc_rcv+0xe7c/0x103c net/tipc/discover.c:236  tipc_rcv+0x1884/0x2b1c
+>net/tipc/node.c:2126
+> tipc_udp_recv+0x22c/0x684 net/tipc/udp_media.c:393
+> udp_queue_rcv_one_skb+0x898/0x1798 net/ipv4/udp.c:2441
+> udp_queue_rcv_skb+0x1b0/0xa44 net/ipv4/udp.c:2518
+> udp_unicast_rcv_skb+0x13c/0x348 net/ipv4/udp.c:2678
+>__udp4_lib_rcv+0x1aec/0x246c net/ipv4/udp.c:2754
+> udp_rcv+0x78/0xa0 net/ipv4/udp.c:2936
+> ip_protocol_deliver_rcu+0x68/0x410 net/ipv4/ip_input.c:207
+> ip_local_deliver_finish+0x28c/0x4b4 net/ipv4/ip_input.c:241  NF_HOOK
+>include/linux/netfilter.h:318 [inline]  NF_HOOK include/linux/netfilter.h:=
+312
+>[inline]  ip_local_deliver+0x29c/0x2ec net/ipv4/ip_input.c:262  dst_input
+>include/net/dst.h:480 [inline]  ip_rcv_finish net/ipv4/ip_input.c:453 [inl=
+ine]
+>ip_rcv_finish net/ipv4/ip_input.c:439 [inline]  NF_HOOK
+>include/linux/netfilter.h:318 [inline]  NF_HOOK include/linux/netfilter.h:=
+312
+>[inline]
+> ip_rcv+0x21c/0x258 net/ipv4/ip_input.c:573
+> __netif_receive_skb_one_core+0x110/0x184 net/core/dev.c:6195
+> __netif_receive_skb+0x2c/0x170 net/core/dev.c:6308
+> process_backlog+0x178/0x488 net/core/dev.c:6659
+> __napi_poll+0xa8/0x540 net/core/dev.c:7726  napi_poll net/core/dev.c:7789
+>[inline]
+> net_rx_action+0x360/0x964 net/core/dev.c:7946
+> handle_softirqs+0x2f0/0x7b0 kernel/softirq.c:622  run_ksoftirqd
+>kernel/softirq.c:1063 [inline]
+> run_ksoftirqd+0x6c/0x88 kernel/softirq.c:1055
+> smpboot_thread_fn+0x65c/0x958 kernel/smpboot.c:160
+> kthread+0x39c/0x444 kernel/kthread.c:436
+> ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+>
+>Allocated by task 68873:
+> kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
+>kasan_save_track+0x20/0x3c mm/kasan/common.c:78
+> kasan_save_alloc_info+0x40/0x54 mm/kasan/generic.c:570
+>poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+> __kasan_kmalloc+0xd4/0xd8 mm/kasan/common.c:415  kasan_kmalloc
+>include/linux/kasan.h:263 [inline]
+> __kmalloc_cache_noprof+0x1b0/0x458 mm/slub.c:5385  kmalloc_noprof
+>include/linux/slab.h:950 [inline]
+> tipc_disc_create+0xdc/0x5e0 net/tipc/discover.c:356
+> tipc_enable_bearer+0x8b8/0xf94 net/tipc/bearer.c:348
+> __tipc_nl_bearer_enable+0x2a8/0x398 net/tipc/bearer.c:1047
+> tipc_nl_bearer_enable+0x2c/0x48 net/tipc/bearer.c:1056
+> genl_family_rcv_msg_doit+0x1e4/0x2c0 net/netlink/genetlink.c:1114
+>genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+> genl_rcv_msg+0x4e8/0x750 net/netlink/genetlink.c:1209
+>netlink_rcv_skb+0x204/0x3cc net/netlink/af_netlink.c:2550
+> genl_rcv+0x3c/0x54 net/netlink/genetlink.c:1218  netlink_unicast_kernel
+>net/netlink/af_netlink.c:1318 [inline]
+> netlink_unicast+0x638/0x930 net/netlink/af_netlink.c:1344
+> netlink_sendmsg+0x798/0xc68 net/netlink/af_netlink.c:1894
+>sock_sendmsg_nosec net/socket.c:727 [inline]
+> __sock_sendmsg+0xe0/0x128 net/socket.c:742
+> __sys_sendto+0x230/0x2f4 net/socket.c:2206  __do_sys_sendto
+>net/socket.c:2213 [inline]  __se_sys_sendto net/socket.c:2209 [inline]
+>__arm64_sys_sendto+0xc4/0x13c net/socket.c:2209  __invoke_syscall
+>arch/arm64/kernel/syscall.c:35 [inline]
+> invoke_syscall+0x84/0x2a8 arch/arm64/kernel/syscall.c:49
+> el0_svc_common.constprop.0+0xe4/0x294 arch/arm64/kernel/syscall.c:132
+>do_el0_svc+0x44/0x5c arch/arm64/kernel/syscall.c:151  el0_svc+0x38/0xac
+>arch/arm64/kernel/entry-common.c:724
+> el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:743
+> el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+>
+>Freed by task 60072:
+> kasan_save_stack+0x3c/0x64 mm/kasan/common.c:57
+>kasan_save_track+0x20/0x3c mm/kasan/common.c:78
+> kasan_save_free_info+0x4c/0x74 mm/kasan/generic.c:584
+>poison_slab_object mm/kasan/common.c:253 [inline]
+> __kasan_slab_free+0x88/0xb8 mm/kasan/common.c:285  kasan_slab_free
+>include/linux/kasan.h:235 [inline]  slab_free_hook mm/slub.c:2685 [inline]
+>slab_free mm/slub.c:6170 [inline]
+> kfree+0x14c/0x458 mm/slub.c:6488
+> tipc_disc_delete+0x50/0x68 net/tipc/discover.c:393
+> bearer_disable+0x18c/0x278 net/tipc/bearer.c:418
+> tipc_bearer_stop+0xe0/0x198 net/tipc/bearer.c:757
+> tipc_net_stop+0x110/0x178 net/tipc/net.c:159  tipc_exit_net+0x80/0x19c
+>net/tipc/core.c:112  ops_exit_list net/core/net_namespace.c:199 [inline]
+> ops_undo_list+0x244/0x694 net/core/net_namespace.c:252
+> cleanup_net+0x3a0/0x830 net/core/net_namespace.c:702
+> process_one_work+0x628/0xd38 kernel/workqueue.c:3289
+>process_scheduled_works kernel/workqueue.c:3372 [inline]
+> worker_thread+0x7a8/0xac0 kernel/workqueue.c:3453
+> kthread+0x39c/0x444 kernel/kthread.c:436
+> ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+>
+>Fixes: 25b0b9c4e835 ("tipc: handle collisions of 32-bit node address hash
+>values")
+>Cc: stable@vger.kernel.org
+>Assisted-by: Bynario AI
+>Signed-off-by: Samuel Page <sam@bynar.io>
+>---
+> net/tipc/discover.c | 16 ++++++++++++++--
+> 1 file changed, 14 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/tipc/discover.c b/net/tipc/discover.c index
+>3e54d2df5683..844975b691ef 100644
+>--- a/net/tipc/discover.c
+>+++ b/net/tipc/discover.c
+>@@ -49,6 +49,7 @@
+>
+> /**
+>  * struct tipc_discoverer - information about an ongoing link setup reque=
+st
+>+ * @rcu: RCU head used to free the structure after a grace period
+>  * @bearer_id: identity of bearer issuing requests
+>  * @net: network namespace instance
+>  * @dest: destination address for request messages @@ -60,6 +61,7 @@
+>  * @timer_intv: current interval between requests (in ms)
+>  */
+> struct tipc_discoverer {
+>+	struct rcu_head rcu;
+> 	u32 bearer_id;
+> 	struct tipc_media_addr dest;
+> 	struct net *net;
+>@@ -382,6 +384,17 @@ int tipc_disc_create(struct net *net, struct tipc_bea=
+rer
+>*b,
+> 	return 0;
+> }
+>
+>+/* RCU callback: free the discoverer only after any concurrent
+>+ * tipc_disc_rcv() softirq reader of bearer->disc has finished.
+>+ */
+>+static void tipc_disc_free_rcu(struct rcu_head *rp) {
+>+	struct tipc_discoverer *d =3D container_of(rp, struct tipc_discoverer,
+>+rcu);
 
-So maybe one could at least assume that many containerized workloads should be
-able to deal with vmsplice not being available nowadays. But in the general case
-I'm afraid Joanne is right.
+A similar patch was submitted 6 days ago: https://patchwork.kernel.org/proj=
+ect/netdevbpf/patch/20260610153349.2546041-2-bestswngs@gmail.com/
 
-[1] https://github.com/containers/common/blob/main/pkg/seccomp/seccomp.json
-[2]
-https://github.com/containers/common/commit/7ced5daafa0e36102eb931050ba3ff99f42bdfac
+I do not receive updated patch from the submitter yet.
+Your patch has the same coding style issue (long line, over 80 columns), se=
+e linux/Documentation/process/coding-style.rst
 
--- 
-Cheers,
+If you break the long line into 2 lines and submit again, I think I can ack=
+nowledge your patch.
 
-David
+>+
+>+	kfree_skb(d->skb);
+>+	kfree(d);
+>+}
+>+
+> /**
+>  * tipc_disc_delete - destroy object sending periodic link setup requests
+>  * @d: ptr to link dest structure
+>@@ -389,8 +402,7 @@ int tipc_disc_create(struct net *net, struct tipc_bear=
+er
+>*b,  void tipc_disc_delete(struct tipc_discoverer *d)  {
+> 	timer_shutdown_sync(&d->timer);
+>-	kfree_skb(d->skb);
+>-	kfree(d);
+>+	call_rcu(&d->rcu, tipc_disc_free_rcu);
+> }
+>
+> /**
+>
+>base-commit: 47186409c092cd7dd70350999186c700233e854d
+>--
+>2.54.0
+>
 
