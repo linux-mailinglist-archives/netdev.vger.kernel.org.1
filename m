@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-299726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 91o4OqfQMGp/XgUAu9opvQ
-	(envelope-from <netdev+bounces-299726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:27:19 +0200
+	id qO6LL7TQMGqBXgUAu9opvQ
+	(envelope-from <netdev+bounces-299727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:27:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E3B068BE37
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:27:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B7D68BE3D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:27:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=uhKKtW+q;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299726-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299726-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=altera.com header.s=selector2 header.b=HRfEo+mX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299727-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299727-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=altera.com;
 	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36F59301EB7B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:27:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 07CBF300B09C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D66D3CB918;
-	Tue, 16 Jun 2026 04:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113273CC7E4;
+	Tue, 16 Jun 2026 04:27:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011023.outbound.protection.outlook.com [52.101.57.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64C03C9893;
-	Tue, 16 Jun 2026 04:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8963CB2FC;
+	Tue, 16 Jun 2026 04:27:03 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781584023; cv=fail; b=LsuJTeJBxUiPTChgEgQ6Dnx1Hm3UTDuXU4K0msnTp4iWJ7YCzMaF3OBMcIgoqbyyOlx3wdfew8DiY+8fVUUYywDpiNcKqUYM7umHKVIzzC4LHEqTStmfIludiLv2Mxh7UlKNkM9m2IXoyqufzB9VE8SuE2Zr6tIosGC8c5yfqaU=
+	t=1781584025; cv=fail; b=A/AbyZARrusT7a7BQOp7gIl2sjuzBEN7e3FmZ5y75MMtV4kPPr3czSxiwM5QcuJou8Gr8fSCMFtBuyyGI+4NpGVa7LkHRl0ysY30nl4EUe354tjcv9Z6i6EMLIOL719OP3/HiJcF0oONzy0G4B160Fz0vVW9puXyiHqtJ8Yh9mU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781584023; c=relaxed/simple;
-	bh=j1tjeByXeIHinLjHoJARApYbtqw5FLZrQo/H1IVDTic=;
+	s=arc-20240116; t=1781584025; c=relaxed/simple;
+	bh=puOrLbmmjXHZ5WFNunGVeEuTt9p5pHZcTS8jeegP6lQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BklNxm1PbLDqyWSFB+zgDbZqeU+7RxRhunC/0Y2bHSMYzMGt4mWTh4UY8FVAjRhM9lnLcqRMoHubjv8yqEt1QHKuRazvb1Z7FuMl03Qzx2cvE4sLFDh5ARSjgVRWmbI9EjbMBTZltyB+Yb6SCwyTHLDx4uJlpZo6cpQStCgW94M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=uhKKtW+q; arc=fail smtp.client-ip=52.101.57.23
+	 Content-Type:MIME-Version; b=DXslaRWRzJaWb2oZHgNkkr33+yxbJGLmMP3SVN0HBV16hKAsdLaxxtx7hBmgyPpEWL/JNQkpa0iZckOvXICe7qUzGK6xS/7nD5PcVTbnySz6D4hBQG4re9EXtgvFN/XxwIJh3fGIQ9lmHcYqAFEhqPTOOk/1ShvpXIks9ff9y8w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=HRfEo+mX; arc=fail smtp.client-ip=52.101.57.23
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mFz7uJHzIQ22HvSrWhMbiXfujS9mSHFOelXgwseVP9mFOqeGUzOXIKOwf286k3Bjdy1eZ8IUIh3irtFf1DJTQbwe8BnieUWYNPRA/Gi8+nWzYa4xNK3hzrEpHV92akb+W0T6FTZRMwQ6fZjbel4Z6FRWJ/vOhxuG/5IAXsLvulQiapzH/rjdW05X/f0pIerYml8hloWKA4317n7C1Jtpk8xWwUVPJ+OX822qWFg34nZ+ZkRxSm/idIjEvnUVHkUYUDx3saRSeVTzyohjqBZXmaHZXOTmlQxpObNyQJQTrjEV4EhjZ+2cGtgXWZwNFfzgRNyB517N0KyHstuL6Argog==
+ b=KYsvFhtCZWuW2I4OiGPEoCjhgB4Jt/2V0bxHk8RLbdnhgXMRqzQZARBbBxx1Lp95+pRtqViT5BsgNWg820rAxsWT22ZB8P+LhiHO7Z8lf0Bcc3iTHkbRRtQciErW7h/8/NNmGYiHLTw5E6BQb5e1UFbSbuTDF2bTi4acef5IXFHKWl3/a0mVtOBdZmY081/DY3hWWTAicTdF0lXaQVLzHSRb+rMhMwDd7tgW7JDCtBR2NT7VWRg4/w5/fZAOzWgekQX32foFDLzsg8epw0zae1Ki4sydAh7ivXDfBdOh1Phk1iHMDhtUIf4fnYKDjPXZVwmc9uBe2RlU0olFYN/yCg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=R6OgbckISqAtzhoezk8E1ClROdhN3BCX2f8lIC8DmhQ=;
- b=ScV96P/AaiWKkNfDmopbTcOD6RKLFOZNQW4+Ur1/XXFAuNenkscbuyIgan+NaWSwbYZyxR4gwXCzKOys13jxk0Jy80GbJkUleO8+qjoQ4kJEk3KmB7/bwKZly04eXnAa9RaS3GHnbWr58BGfGVM0FD1Yuceubz+lfaFMpCHgdk19MZq+S3QrRkzKywvkclQ9w2CY+t/VvPsFOFKkDtqK0hTHbherVkdsmE4cJpzv/ZXKnosOTCoznRxeHrQF5WZZbyZHTgmnV9qG46n9rDtx/c4Y+jBHpkNhh65bClueJfvW/XrAHosiSNKMXcnV+AB6VaVwpoZ2q7c+4bNouJu5Dw==
+ bh=KKtSciYlV8JovYOti5iISY/o1zGHOPNcY3PJ5Tj/A0A=;
+ b=BwDo/pwmKZ0Op11C+f1Gudqyk5dowVi5NgREA9hgm1QfH7osPhId/DrBiGxT6my/Yo7MlZctyVwo56baSm/cvRCev12hlaNwGUt9VVbxtKHO5QNxawB0p80PpkOqyxZ3VY7NFxhbar1vCdjHRpexmzWSSwp2F030MXZhnadWyX67CdsJq3/Zuf5h2dt+PedkNvR+hAVrV6HabJDIdRPKneb1EImrZXAeIDzkb/DMRq4NUOa02NGHsAtJhsFvFAWDkogEnewBEeS7wTMo9uuIzYr1cNGWy0H9+w2H/7eIJsEhMYAV5AuEEbgmpmXLL1DxwVT0Z0qkWZz0LGL+EkmoUA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
  dkim=pass header.d=altera.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R6OgbckISqAtzhoezk8E1ClROdhN3BCX2f8lIC8DmhQ=;
- b=uhKKtW+qZcsxN02a0SYi8B/8pDAZq75W7kN1hxsuQy/uEWYkS9AJhhZdKAkjULa7ILYW8oFFEsLoDnjeiW/uJyKl4s02KNbtPX4HK/4MgCsqYUfA+SNSzYGeUrqdWrTnDahQyvZrn5MHIk/BnPU291u4R/kGRB4YwV3UYo6gLwQlEa+plKIqfiZrlRg71ZyoXmgIrHX4ock7/kO/glHVI6amrd5RoZx444azg2PKteh5+Fg4gaMH78J8zncXHpjRlL3ncJ9LONS3sqWpx+ozYAMxNrhTGTcgY7jggCsfx93YdJWULt8kv5b2vYfkjjYMzndMr9532w/U9I5OmIgAYQ==
+ bh=KKtSciYlV8JovYOti5iISY/o1zGHOPNcY3PJ5Tj/A0A=;
+ b=HRfEo+mXinur3z/X4LgTb28N+3EwlBJN7n4cu3jl+5hSwItqp18v1F/8PpwVkKgfD2ure7KmIemB7Rzw+szIEPRavHReUXFHpWkVwcSErHSlMapzUB3m2mvdRDZm8voDslx6Lzm3PeFfQMjoY/F/Hj/Tyw+oH4pUasLA2qNrlAT5CZOgKFbKAAT8dtwvcDkGRc9qYRij563lisowhvyO1i4nT7hAj39XVvggHtsiy+N14ou3kpSgjpacOYO136hUlLE6hbto/SwWryXl8/INjhWGZ97TIz5XB1bsU9QWINet+GVIN+qCec5X2vPoGMX4mmMhFzY579BoKmROpe3bUA==
 Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
  by PH0PR03MB6333.namprd03.prod.outlook.com (2603:10b6:510:be::14) with
  Microsoft SMTP Server (version=TLS1_2,
@@ -57,7 +57,7 @@ Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
 Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
  ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
  ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 04:26:57 +0000
+ 04:26:58 +0000
 From: muhammad.nazim.amirul.nazle.asmade@altera.com
 To: netdev@vger.kernel.org
 Cc: andrew+netdev@lunn.ch,
@@ -69,9 +69,9 @@ Cc: andrew+netdev@lunn.ch,
 	maxime.chevallier@bootlin.com,
 	Jose.Abreu@synopsys.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/3] net: stmmac: xgmac: fix l4 filter port overwrite on register update
-Date: Mon, 15 Jun 2026 21:26:53 -0700
-Message-ID: <20260616042655.7782-2-muhammad.nazim.amirul.nazle.asmade@altera.com>
+Subject: [PATCH v3 2/3] net: stmmac: fix l3l4 filter rejecting unsupported offload requests
+Date: Mon, 15 Jun 2026 21:26:54 -0700
+Message-ID: <20260616042655.7782-3-muhammad.nazim.amirul.nazle.asmade@altera.com>
 X-Mailer: git-send-email 2.43.7
 In-Reply-To: <20260616042655.7782-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
 References: <20260616042655.7782-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
@@ -88,59 +88,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|PH0PR03MB6333:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea18f175-9631-4fb2-543e-08decb5f8073
+X-MS-Office365-Filtering-Correlation-Id: b06b4517-df02-4dd7-3443-08decb5f80c3
 X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|23010399003|7416014|376014|55112099003|22082099003|18002099003|56012099006|11063799006;
+	BCL:0;ARA:13230040|366016|1800799024|23010399003|7416014|376014|55112099003|3023799007|22082099003|18002099003|56012099006|11063799006|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	5riCYaNFeDyI3lv8LAwAPbwriQ0sA4lfLcYu+3pccoCdug4/4RkeROTyii474Bf7FWWSh0vGnOb31JDKn+SM2CJVHxNHVGmKxkkpQ4E67gGOFFsxTkXLU7AWstVFv8pOZt/XSLYneiBWcaC2oolCIbv7MF+cKdTSz1Wi3UAIAXAN155b/dhjbYLPwqb5Y3T8a4szSfp8/2/boN/oBDDNm8T5j5rX/XflFcKSKoguc6QpHkda7VicT7NqbEg4RXtG2DDKgi9C3Jw1IXXiLJ7EyD4WUlJM/HD7A2Ie4V342NdUAOTje0yH6xWSQcNWraDbxOOIXgFTMHQNTfnWzD71VY82Y3oanCur4RRlxGvwloJGMTx/d2UXuJZpoFcqmviJglslZNiLhAzsH23o8MtUl1Yz9xf/ynvZ/Rrm0b8P5ZIHa6jRbM9zGYM2rzdv9O1cYHj+8j/un4IScD6/B7i8FMrbyf+o/f2nlFIkO/TkKdS+stJ5mqTX9CyZY1lxcyaaZs45rc5YMR0s7g57gdn0oCbJb8bLsLUH0Av8PoGTB/OKfKTc1ZtXZNmDbGthn0/XO/Y3OMCBrGn6v0bmuj6tgb4Jku1SaY/TMk2HesxVEs+RfFVrxeHHeQiNzwyDZcKec1ro7TPF2FIG6psacBrbeJo3BT2qgUD0s98jFgrfcwLAobD2Cq1S+dxlch2uSsK6
+	cgZIcFvDrXkLp54//VfuoLxgWwQmCFfXCmXTbRqE0+dORTMUo7HN+LNZXv3OUS9sGfx9/IiSuePYRgovMsmbG+d5QMgSOFj2NsMO5wqEQymX6jTOPCY69Qeilq2ul3D9go/cBP7evHfrD3K6HJziLPtAwFIfw80B0CDrIVkYO8UJLdkFxDPB9rV2E8T51B2FbDlG9/C3tyn+HchTA3s+4wrfN3xbrHJPh5bBkulASy/+zUZHAIOHnBD9eFDQ8CcN8AqSfAVBKhUXbSe99Ugof9ROBM1IIRh94h3vfAxW1yI4PmMSewWa8ZDDWnh/2TBeme+hLEw0C7o83kA7wwmVS+HSl1ZTCK4k2JbhNCJgV1GSN/IWqtZdtntl6K5WXW9OMgXaHTmZbHX7WcNPOuPfI31dVn9QzSrBy4E2UHJZoQSdmj3fwVnHZ5Ny3e4X4JBpkZUQeIlDhU8JprZgZWsXqUOGkS8RzZeGVwZ0ujz1bRivROPX+CH9r98bx1PKHqm4z7XGEzDJHJmBrHraUzEVJTmfW0lXQh1log+bU1rokyZ1YSUvJ7+J5tUCQddIbea/DDm9yli/exurhp0upwaZqZmAiVdF5Sq+veobHvoO1023bYHosh7LFIzntew8v/sM6/Y3O6GMw3cA4+xgqi5Tgm8r6aTW0pKGIjX2ZqfGC4g1K5YIWMYz1ccFEiFmsSoj
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(7416014)(376014)(55112099003)(22082099003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(7416014)(376014)(55112099003)(3023799007)(22082099003)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?pbWsYJrkQrUNHYU/UGTqM/hBH5wnCxuvUjnkLSrTJvC+kreICyp+8WuAXuri?=
- =?us-ascii?Q?hEzL8Ql0ux1QqydKvDtTWm2y5jAjqGHvbWYjufuiv0om1EE6nNH7T3cySx4v?=
- =?us-ascii?Q?v1jDhJ1gdLsIR0Y032ZTlz2OUexWO+nMddYo1bbuC2PGBRKftbH1mTV1sbZ4?=
- =?us-ascii?Q?+u0OumTcDI8MX+e+W5MCZB+9lHaP6PNo7H2+jikK5+iNhpwbTpewGwLcaNKi?=
- =?us-ascii?Q?N4Gw2Eex7MFW5zHKvTThVcJrpio9/129J4kMCSb2mQDHpFVy+SCxXksia+C0?=
- =?us-ascii?Q?Qx5QTpISl20Pir7zdN+hmHi3I7etzNZe844mJ44p7ikEZuPLRpCDBITtZGst?=
- =?us-ascii?Q?b7FQEWk4dvl3KJmRIKz5gI7JjiQLJseu7QT3DuzhPGmWFqh3jicf6N/s+wnr?=
- =?us-ascii?Q?VqEdh/zzlGTRE9WFEv1ViVTK5VJ/UwHQct10pbT7UZhYIkp3ibPhFdc6YVri?=
- =?us-ascii?Q?ugZvPlzNRO2MkrsClumOwraQ9WN6d4TEiF6090bmW6ERHuwMh0+6tCQC1vAu?=
- =?us-ascii?Q?jNh8i2DfaYLHTdpQikB/Z1e+TrEZ8l88RbFMJabV+WLi6qWiw4uQa8sAg4Ls?=
- =?us-ascii?Q?Lx5gAeqpIH0zbtnKsjLeOrRhlFggcJ+TTwqeQBKfZ9JWBjRHwFsvgf/cxZto?=
- =?us-ascii?Q?lNLd6pf+5U6NlD1te8rcTwolTb38mCdXVBfc9MjXeeoLFAQE1neP+xke+ma5?=
- =?us-ascii?Q?UCqbCOoGdVvHlorXNF6G/iu3O31ZD9zwSCfLdca+Oc8giCvffzoIhS3RGQBj?=
- =?us-ascii?Q?Jf1RaGh+ZUPMy6z2TP8fPd+zghAazd67lBAHgoLBrIjeELNqObh1YFt1A89R?=
- =?us-ascii?Q?QTQploj33Bkf9j6eVsfTqGs8h0YSngrfmaVbcgGCbffeDTTFaBWwtLMnub/X?=
- =?us-ascii?Q?z1fnhSYXpv4Ieth9O5dNx4K7130nPUWZJAzEdR22hgbN8fiTXP7EVyMTDHMS?=
- =?us-ascii?Q?Ea5abxZ5xnf0eoIyouAYMm9Hoxs2zCHC3IrQCOxzKiIBQ4G6z5p9VOncT19v?=
- =?us-ascii?Q?Uz3i1PJAvgoF8AAEqWiFunOrWuL6GGdVBmWN3iJUIhDKlWoW3p5tpC/Zq67/?=
- =?us-ascii?Q?nvO740qq4mAfmg3rOFlTn5Kj3xwYwTbrLcpOAxWXpE0P6bbJgSXYK7e1ldd8?=
- =?us-ascii?Q?k4eNYeTG69+Oh/gNmEw94Lp2Ct2DZNUbBbcX1K4htVTjgkXmI+LPVGcQgK5h?=
- =?us-ascii?Q?6Z9LbiR8XC6aWykmUVnUdj2EV8Bl2feeCCHJFHeLiFWfgEQ+AqLhEXwC7jEs?=
- =?us-ascii?Q?CJnMQpZgQztoJ+sxVcNzaU/ELleuYs++ubq1L28Vz8ZzTAYgSf9jilDLlMnQ?=
- =?us-ascii?Q?v0fceK77hTBzOp/86+FO/el8W/8Bm3IKrho7v2+tNyBoKg/6EC5fVPKYAYUw?=
- =?us-ascii?Q?+GAOYXI6nPu6dzwZ8cMP7+pCJSHsrK2Dk2KMvRrhdbnOT7A09Qp3RS/QBb7L?=
- =?us-ascii?Q?ck7+IvyCbYjjc6g4flFrPXJPQkdPJ6iafS3vLeK1b4WDoIB7YAqBemJtK9Z9?=
- =?us-ascii?Q?p5nsVPVvZamp5Z586RhrvycHedcxHsGYNja1NK7fkoBh8hovPJSIl7D9d/uB?=
- =?us-ascii?Q?nKHt7nOQChAWYjj4/nGKQZ9mcg7M1HrSe/5jA/vkfQjRSHeD2ZBF92cJi4ts?=
- =?us-ascii?Q?3GVzU1ehENS2QqyiEj65ax4HM+gGfRfOsFvjvbyumsJ2xjCfRHe1i7j9gMMY?=
- =?us-ascii?Q?2c5TUifz9z0A7zlrCgLSBzOTrm7c9SEsyxXF/dis124grdNI+1UiP5vb5T+9?=
- =?us-ascii?Q?K+ICYYPOg0XX3ufiLlD4NJZ0/Rmg+Nh3Ank+w7AV8kiv0OeYNVjnRQQNdOUY?=
-X-MS-Exchange-AntiSpam-MessageData-1: cVqQLYlbm9+Yiw==
+	=?us-ascii?Q?xKxs5yGuh4EwhZv/Dp87I55cXr2HLvFVZVK47B9Q3TYxayQV+aKaN5TZzZSY?=
+ =?us-ascii?Q?roaoNMvPnXr/0vXyQbARcyRTtm8zKkPsijEZlMgqmOI37SQ2jjOf3G/GJNPn?=
+ =?us-ascii?Q?L8pKWVqfXxa9M9Mp80wj0f1wkDo/TAUAtnQoBQJ1c+/Px/UK6V2t5x2g/t9t?=
+ =?us-ascii?Q?J8igIfr9fCdBR7kP/Qa1M6KafoskXStWixhDrn0p2XNtqwHJTQoR3Ap737fD?=
+ =?us-ascii?Q?LmCdG3rjajd6RW07N7rq+QM5T8ebvQu10VKV1GJOUt+11xyMZYAtwYUOmrg/?=
+ =?us-ascii?Q?zmFaLHdo45c4e3KEEnd8DmXwXb7rz8UgHHlgrP0Kk8A4CnjGNHsMxyW+MOJt?=
+ =?us-ascii?Q?oSxzJOfSe9LWddO46m0aGe2VuUrctk3f2sUEk31bwZ5JK9zB1wSaF1VgjEeU?=
+ =?us-ascii?Q?YncVUwXZcVTSF4MmiLqfuFln2HyF+7/C4k1wmnji11TIQSPr7SDiDtgajMv+?=
+ =?us-ascii?Q?+gcnj77yXdnqTSoHV/KqXnboGwmB6nCcDOKhYrcKoyLv1WK9MRl5iPUPkU2f?=
+ =?us-ascii?Q?4U5wJOn/dm8Q4TDkO7trcQ09rBgr9licA9hiGCItOZYsJgCGqzYE00Trua8X?=
+ =?us-ascii?Q?D6RMAMSSXjaZFX+ph73rZZBtZhI4OkKCGGn8S9Oxi+IMfsnAMb8KZdCZkq+B?=
+ =?us-ascii?Q?dKE/24LPjAwP0XHml5zb6T/rT2WC0ztrNFjcGrt0Ao4HsyDPsw+t0+IB2fjR?=
+ =?us-ascii?Q?YSG5eyHaeSKdCuspk2nORhhlz5bGPmrvDzZ/wdF+2AXBEC3bkS1rqQERGp2n?=
+ =?us-ascii?Q?8NlCCxSnD8hysdpAzMq0a+MtAmnUbwauMRsSUF95kpbg39X4CkvcZ+iNKY8O?=
+ =?us-ascii?Q?72kiJQtfEmiJRlM5mqhONcNv3ckopGv/q40u2aey4lxHIlJ5wbzJ18Bx6bx+?=
+ =?us-ascii?Q?s0snN5byW+48XYuWIIGBbz2LGaH6Xa/Vt8I2LPCSVd/pb9n8OB9fwyPpFx9i?=
+ =?us-ascii?Q?AQExZeg6waSNqScLMhlu/cwH1KtRAdgVvYYPTADKvQ2v4vVa/baR6swWfzH/?=
+ =?us-ascii?Q?GVBq9zxm0VaAkg3mEKy3qzN6HXEsNdTtvQtWQbhbooRFhJsKRUHY8XYzcCPK?=
+ =?us-ascii?Q?+NVE5fT3C+4upG7AqvKZ5AXyfQCaEhK6Bu0W8vn/sxDE6XIgCUJ8GFKfVt+W?=
+ =?us-ascii?Q?WegThsHjyD76MdfmQy4oZNjVIGdGeZaJXS68Q3Q2m/j0nZxBmQxcz/zEGxTd?=
+ =?us-ascii?Q?ExUSLX/pJiPvIdYdAdr9oExi0vuyixd3pQL8YqRb7im+pm+fMAPQd+kPowAk?=
+ =?us-ascii?Q?QNQO+LBwnHIspF+AKO1CHtJT10FCzdkeyeJniBZ9j+NEA2aabDIt9OGSCArl?=
+ =?us-ascii?Q?gAnJn94SpTzzmts3+/oGnyY92PniyXTF7iXt1CfJrTkYZm2Pc+x4xCAoMBTA?=
+ =?us-ascii?Q?V2JArkbgeWPbcsPFbuBQHgp2PrgOzY/r/Fg9FLuQ2hPJhr8J8yTIBimGVMWZ?=
+ =?us-ascii?Q?jjGBhJldnBE8P1AnJehvIxvA8CLQvBoWVHoVjS7zPk/PA5NVVCW0/TzgtvL7?=
+ =?us-ascii?Q?3YysO4OyZiSGuCeA/V8aL6oaKjcAgHIMDGzqeURQW06nEPKs7ubk9g9XWUPn?=
+ =?us-ascii?Q?ON8kbL8AWlBcLSSmLZccw4SHciHx3xZ6tUMlpx+t3Hs/TYbaJ4RPYtctP6Lm?=
+ =?us-ascii?Q?g07JvFTixyLcYicBLM2pAaLpzlBbAY3f8/PZkps71PmQ2MiX/JBAEM+CDBna?=
+ =?us-ascii?Q?7T40YGy9ARCzUYhti71SyKLDoDJpLKjDZn0QJt8v+LedaccRNQu7gM5HWBTF?=
+ =?us-ascii?Q?C+RHxUfy4sEMPqlXuhdMYhYz6AHVnL6zYp0GGS0nP2wihD+2iiT/35qLNYyZ?=
+X-MS-Exchange-AntiSpam-MessageData-1: RzvcObMMZdm/PQ==
 X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea18f175-9631-4fb2-543e-08decb5f8073
+X-MS-Exchange-CrossTenant-Network-Message-Id: b06b4517-df02-4dd7-3443-08decb5f80c3
 X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 04:26:57.2430
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 04:26:58.0095
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qtsEqPvKwu3Sexa3p7Ezduhy4QX5B2WSihgDGbfsHI3txbPXqdkAZAt2zbnLQSkKuO1IKwpX1fDwrL7jh2V/w66zTu7cS9B0Ypx4TOv6427N+yeiYDHsRcFjvYnQBadvl9TXvT83N8lkBi6iPymdrg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6AQHvPgXwy9xiaaUyw5fZMPQqKVMhXuLjMcd+qBgOT20xzIzlg9VFjKcPfkeSbiZZ7Nk+ggtc+QRr7kI9oke82YtJVrPyZ5jACozUr7nBX8ETQ9v7OxJZo0O9Uj64n0z/x9fW2qbauPXXCZQv5EdJA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6333
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [2.84 / 15.00];
@@ -149,12 +149,12 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299726-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299727-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:Jose.Abreu@synopsys.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
@@ -170,87 +170,119 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,kernel];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[altera.com:dkim,altera.com:email,altera.com:mid,altera.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,altera.com:dkim,altera.com:email,altera.com:mid,altera.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 5E3B068BE37
+X-Rspamd-Queue-Id: B5B7D68BE3D
 
 From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 
-The XGMAC_L4_ADDR register holds both source and destination port
-match values. The current implementation overwrites the entire register
-when configuring either port, so setting one silently erases the other.
+The basic flow parser in tc_add_basic_flow() does not validate match
+keys before proceeding. Unsupported offload configurations such as
+partial protocol masks, non-IPv4 network proto, or non-TCP/UDP transport
+proto are silently accepted instead of returning -EOPNOTSUPP.
 
-Fix this by reading the register first, then masking and updating only
-the relevant field before writing back.
+Add validation to return -EOPNOTSUPP early for:
+- No network or transport proto present in the key
+- Partial protocol mask (only full mask supported)
+- Network proto is not IPv4
+- Transport proto is not TCP or UDP
+
+Each rejection includes an extack message so the user knows which part
+of the match is unsupported.
+
+Also propagate -EOPNOTSUPP from tc_add_basic_flow() in tc_add_flow()
+by returning it directly rather than using break. The break was silently
+discarding the error for FLOW_CLS_REPLACE operations where entry->in_use
+is already true, causing tc_add_flow() to return 0 (success) for
+unsupported replace requests.
 
 Fixes: 425eabddaf0f ("net: stmmac: Implement L3/L4 Filters using TC Flower")
 Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
 Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
 ---
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 28 +++++++++++--------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+Changes in v3:
+- Add extack messages to each -EOPNOTSUPP return so users know which
+  part of the match is unsupported (Jakub Kicinski)
+- Return -EOPNOTSUPP directly instead of break to avoid silently
+  reporting success on unsupported FLOW_CLS_REPLACE (Sashiko review)
+- Patches 1/3 and 3/3 are unchanged from v2
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index f02b434bbd50..52054f31376d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -1370,36 +1370,40 @@ static int dwxgmac2_config_l4_filter(struct mac_device_info *hw, u32 filter_no,
- 		value &= ~XGMAC_L4PEN0;
- 	}
+Changes in v2:
+- No changes
+
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 34 +++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+index d78652718599..14cabe76e53e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+@@ -446,6 +446,7 @@ static int tc_parse_flow_actions(struct stmmac_priv *priv,
+ }
  
--	value &= ~(XGMAC_L4SPM0 | XGMAC_L4SPIM0);
--	value &= ~(XGMAC_L4DPM0 | XGMAC_L4DPIM0);
- 	if (sa) {
- 		value |= XGMAC_L4SPM0;
- 		if (inv)
- 			value |= XGMAC_L4SPIM0;
-+		else
-+			value &= ~XGMAC_L4SPIM0;
- 	} else {
- 		value |= XGMAC_L4DPM0;
- 		if (inv)
- 			value |= XGMAC_L4DPIM0;
-+		else
-+			value &= ~XGMAC_L4DPIM0;
- 	}
+ #define ETHER_TYPE_FULL_MASK	cpu_to_be16(~0)
++#define IP_PROTO_FULL_MASK	0xFF
  
- 	ret = dwxgmac2_filter_write(hw, filter_no, XGMAC_L3L4_CTRL, value);
- 	if (ret)
- 		return ret;
+ static int tc_add_basic_flow(struct stmmac_priv *priv,
+ 			     struct flow_cls_offload *cls,
+@@ -461,6 +462,33 @@ static int tc_add_basic_flow(struct stmmac_priv *priv,
  
--	if (sa) {
--		value = FIELD_PREP(XGMAC_L4SP0, match);
-+	ret = dwxgmac2_filter_read(hw, filter_no, XGMAC_L4_ADDR, &value);
-+	if (ret)
-+		return ret;
+ 	flow_rule_match_basic(rule, &match);
  
--		ret = dwxgmac2_filter_write(hw, filter_no, XGMAC_L4_ADDR, value);
--		if (ret)
--			return ret;
-+	if (sa) {
-+		value &= ~XGMAC_L4SP0;
-+		value |= FIELD_PREP(XGMAC_L4SP0, match);
- 	} else {
--		value = FIELD_PREP(XGMAC_L4DP0, match);
--
--		ret = dwxgmac2_filter_write(hw, filter_no, XGMAC_L4_ADDR, value);
--		if (ret)
--			return ret;
-+		value &= ~XGMAC_L4DP0;
-+		value |= FIELD_PREP(XGMAC_L4DP0, match);
- 	}
- 
-+	ret = dwxgmac2_filter_write(hw, filter_no, XGMAC_L4_ADDR, value);
-+	if (ret)
-+		return ret;
++	/* Both network proto and transport proto not present in the key */
++	if (!match.mask || !(match.mask->n_proto || match.mask->ip_proto)) {
++		NL_SET_ERR_MSG_MOD(cls->common.extack,
++				   "filter must specify network or transport protocol");
++		return -EOPNOTSUPP;
++	}
 +
- 	if (!en)
- 		return dwxgmac2_filter_write(hw, filter_no, XGMAC_L3L4_CTRL, 0);
++	/* If the proto is present in the key and is not full mask */
++	if ((match.mask->n_proto && match.mask->n_proto != ETHER_TYPE_FULL_MASK) ||
++	    (match.mask->ip_proto && match.mask->ip_proto != IP_PROTO_FULL_MASK)) {
++		NL_SET_ERR_MSG_MOD(cls->common.extack,
++				   "only full protocol mask is supported");
++		return -EOPNOTSUPP;
++	}
++
++	/* Network proto is present in the key and is not IPv4 */
++	if (match.mask->n_proto && match.key->n_proto != cpu_to_be16(ETH_P_IP)) {
++		NL_SET_ERR_MSG_MOD(cls->common.extack,
++				   "only IPv4 network protocol is supported");
++		return -EOPNOTSUPP;
++	}
++
++	/* Transport proto is present in the key and is not TCP or UDP */
++	if (match.mask->ip_proto &&
++	    match.key->ip_proto != IPPROTO_TCP &&
++	    match.key->ip_proto != IPPROTO_UDP) {
++		NL_SET_ERR_MSG_MOD(cls->common.extack,
++				   "only TCP and UDP transport protocols are supported");
++		return -EOPNOTSUPP;
++	}
++
+ 	entry->ip_proto = match.key->ip_proto;
+ 	return 0;
+ }
+@@ -598,11 +626,7 @@ static int tc_add_flow(struct stmmac_priv *priv,
+ 		ret = tc_flow_parsers[i].fn(priv, cls, entry);
+ 		if (!ret)
+ 			entry->in_use = true;
+-		else if (ret == -EOPNOTSUPP)
+-			/* The basic flow parser will return EOPNOTSUPP, if a
+-			 * requested offload not fully supported by the hw. And
+-			 * in that case fail early.
+-			 */
+-			break;
++		else if (ret == -EOPNOTSUPP)
++			return ret;
+ 	}
  
+ 	if (!entry->in_use)
 -- 
 2.43.7
 
