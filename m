@@ -1,55 +1,100 @@
-Return-Path: <netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299941-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id THXtEqnHMWo+qAUAu9opvQ
-	(envelope-from <netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:01:13 +0200
+	id jILsMaCfMWotogUAu9opvQ
+	(envelope-from <netdev+bounces-299941-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:10:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D80F9695844
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:01:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA36A694D3F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:10:23 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="m1H0XPZ/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=bE3JPLzf;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299941-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299941-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32E79317EF7C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:00:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 20BD4301E1B3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E853AC0ED;
-	Tue, 16 Jun 2026 22:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD1C3DD513;
+	Tue, 16 Jun 2026 19:00:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7E92877F4;
-	Tue, 16 Jun 2026 22:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943CE3DE428
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 19:00:54 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781647219; cv=none; b=jXWpSRolj4O5bmc3v+mj4dmdgTFzVLBXyJsGDmhNoBuWcrV66Vaa+Vlgm8m71F+nfJHp84iy6idT/7+BmoVLyrPl6HGtZM5HJw5/a4afmcWb0HycgD9yvznP6smNcgnpFbgRFNU1fxzAH9IZqsezI24aYdi0S2th3pJp2URF60w=
+	t=1781636456; cv=none; b=gN8Hj1OsaSPkns5QimMmLtcLsoftKEce4vRMDuCKExWTG7YNf//mOVs/j03TIKMI77101+kDW2FARzNpAQn5iucvvYSlAaIdZA4zOL9rXpdIAp/XdQw8Mia+b3YZlz9W2y0m+xr3eo3YsYrmVoRKVECgQRzZta/nU+F6tBYZXwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781647219; c=relaxed/simple;
-	bh=7a+p+OyXk5sFsbk1C1Cq816Ny9n0Mkp9sVLu/7ongXE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JrOYpqVwAfau0HuXgTvWUbhnLBuAKsuK6A15xr1QYcibJqwLG/qbrglOaST/56r/ThPNj4Bc2t+igTB+9sxlRznJWEZEDAem+Osx1k1smYx4VkHxzu4vzySrZHuXb5CMRWtC9qhD9hhJgFjfQro5hCMG7V/xTKs2TNTyuDRZOPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m1H0XPZ/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E11601F000E9;
-	Tue, 16 Jun 2026 22:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781647217;
-	bh=ga1OeZSzR83I+bdZkALtFqlm11Tz5ZprDN2LnllVuuo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=m1H0XPZ/YZbBgyH3tnrJ6j1r2M6+6elhCGuK0pN6k5a+sJSKsxxgIBnYMzgNBg+aw
-	 8al1mUPkhgyi2bTVabXIYMFi/z5l4yV3wd6csAqc8I2mwclV8BxOmBPlGOcMtIo/ZG
-	 wEg/r+6LoZPDh2ODMtYPbSPzrG48yfugOVhBI97AdZ7c8txuTlA276H8jaEnUntKSY
-	 KgWy5tWRv1vQI8NErJqgroIv1pfhFiKdw2BZck/RCdw7Phs4t5+P6SaatWwO4rYFIQ
-	 HTGCnonB9DyI7WfMUOqJG00HcUeqNVm1R+0aEbhZQHFrTqOfaICHHS4LarNk2bCyyi
-	 Nrq80K5Jm6ssA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938A13930C2B;
-	Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781636456; c=relaxed/simple;
+	bh=9Tyx3IZ683JCdQMRbGJeTjnP9qW7Us8tqu9ScIW2eJ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZulkPsnN3oHnEy1DdoEnSbMqdixKyd2QcNabVg6KkQ3LYMfzSC4/fx5EPHE18T66Ko2S09VwyBoyIUI9vF7HFT5sxav+5k4NltqFCm6ZawLy5FCl7Uxcr9WR5Z9VjgC3UwZEGlnrl6OCcYnka1gnhYI2oruTAelBRd2Fq0pqabo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bE3JPLzf; arc=none smtp.client-ip=209.85.167.46
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa63628d26so4856146e87.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 12:00:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781636453; x=1782241253; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hAylVLBoI1FWIRaqnARn0iCZWEh0HddelhXPEdFepIU=;
+        b=bE3JPLzf2Ayr90aodKGCy3QXSoUKQacdo32bqaaB1GxC8d2+KrbeH4ujPMw3Bl+Ln+
+         gwa8VvdpxKapffdh+G67FlMyVuI+I4LJO5A3Ccp8Egzw4O2fPhGc/BBWkC7ZhYQEDeTk
+         sEzsTIJG7g/PLmIPt3tCUemUUa3VLAP3/7e9XztNdxOLb/V04V/OAVWbt6Cydr8jKasl
+         A+3XsPRDsMxCfIRZQs5KueO/ftN/k6TvI6RamGeZ5cMrJHP20TIbEAS/oxVRHUi7sdMF
+         lcdnCQ/+gPvXMBIOXVo3B3uGTWZaoapq+rFjBPnS+a4WThbrFNL7v0O2cnvObe91sd9N
+         trsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781636453; x=1782241253;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hAylVLBoI1FWIRaqnARn0iCZWEh0HddelhXPEdFepIU=;
+        b=sML1tihdLznpbnYY2hUJ1RNKJ+A+JH7slGc0aVOc/SzyjqZKvdXvBVDBK7vRn7C0/L
+         VEDfYCBax4Dy6mG0yOJQ6i6yisYXiL7NzyDlUY7XlyiBftq+qbNwA/0cjzBLfqrzyjRw
+         TL3xtrwRKc5KNeqma6y7g4rW/EZkTOpRbKuglHMHGQP3OdYTszw4Jh6P5q+YipA3R2cC
+         TdjeVHu9Q+v3JT6vP3YQQg1moETWqZx/1FI09UF4oE+AbI1PT7b1Shv79tLRzEcm7XZX
+         M2U055Qw78nlr3j0KdrnXOB2AT70HsvelRLTrgTCM2AoUlGCY0dwiJ5Rt9vKnamjh6MJ
+         n+4A==
+X-Forwarded-Encrypted: i=1; AFNElJ9f8r9z2pP+kJXFQWaRO2Olnoc5B7TBvnGWcz+8etx6zcSnDDZrfJfg+k20Cuo7BSTjs/kT/VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOkUzMdIaKKMM2lUJDrrmlfzAMvi9K4CYfzO2vKMsMo0C9j1Lb
+	/x6CVagSj1nRQMw/K6D36MXMHrl0MXSbS20Y8mTQKqgIZB+j354ig/UX
+X-Gm-Gg: Acq92OEIT82QIuA0wOrfloBdnfUZZxu66Hily6IwL94OcpvhxehwH+XVOOnbREdn8HR
+	RdRRJdUobKV69oZXLoM8QfOWFU3OHo3t3ubhIWV7WjZfiFCtjvoBFGzQ5M/nFt99lREySGwekaV
+	46z3xD653h09aoIjTz4ZZBhEC40pcsPAIKRvqXr5VeaSw9u2B5dSdlhs/1OHILJ1xlICmpUQZvW
+	X74FBwBShW+N5lU/zjV5hi2A2I7fddX4q47+9jtexOflWyPiRuADqSn4kh0UqPtpxeiC/E1XkEA
+	oyD7H1/4fw6elASHWofI8YQwyQA4ye3hqXfAoWR7uonsk7rwbtxuK3kMMsb1hdIllCkcX6EB9LB
+	pttWPqQDVIXY+09dNYUi+8/y2nIr0PNnRh3nd5zXb79ND6k9+ml4hGNrNmBVkC8HLAC8RGL0MSV
+	operYDoMXijYhqkPCG+a6wAUopFNU7j16IEUnIsrE=
+X-Received: by 2002:a05:6512:baa:b0:5aa:74f8:72f4 with SMTP id 2adb3069b0e04-5ad46fe041bmr185686e87.32.1781636452394;
+        Tue, 16 Jun 2026 12:00:52 -0700 (PDT)
+Received: from grower.astra-academy.ru ([185.32.135.49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e124462sm3738075e87.0.2026.06.16.12.00.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 12:00:51 -0700 (PDT)
+From: Alexander Martyniuk <alexevgmart@gmail.com>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Alexander Martyniuk <alexevgmart@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Huzaifa Sidhpurwala <huzaifas@redhat.com>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH 6.1] net: gro: don't merge zcopy skbs
+Date: Tue, 16 Jun 2026 22:00:36 +0000
+Message-ID: <20260616220038.87364-1-alexevgmart@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,84 +102,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178164721213.1257010.7015290603652926955.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jun 2026 22:00:12 +0000
-References: <20260615222935.947233-1-kuba@kernel.org>
-In-Reply-To: <20260615222935.947233-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- geert@linux-m68k.org, chleroy@kernel.org, npiggin@gmail.com,
- mpe@ellerman.id.au, maddy@linux.ibm.com, linux-mips@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [4.84 / 15.00];
+	DATE_IN_FUTURE(4.00)[2];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,linux-m68k.org,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
+	TAGGED_FROM(0.00)[bounces-299941-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299970-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:alexevgmart@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sashal@kernel.org,m:sd@queasysnail.net,m:imv4bel@gmail.com,m:asml.silence@gmail.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:lvc-project@linuxtesting.org,m:huzaifas@redhat.com,m:willemb@google.com,m:asmlsilence@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:geert@linux-m68k.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,queasysnail.net,vger.kernel.org,linuxtesting.org];
+	GREYLIST(0.00)[pass,body];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexevgmart@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,queasysnail.net:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,msgid.link:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D80F9695844
+X-Rspamd-Queue-Id: CA36A694D3F
 
-Hello:
+From: Sabrina Dubroca <sd@queasysnail.net>
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+commit 4db79a322db8c97f7b73b8a347395ef4d685eb40 upstream.
 
-On Mon, 15 Jun 2026 15:29:33 -0700 you wrote:
-> This tiny series moves appletalk out of tree, to:
-> 
->   https://github.com/linux-netdev/mod-orphan
-> 
-> Core maintainainers are unable to keep up with the rate of security
-> bug reports and fixes. Nobody seems to care about appletalk enough
-> to review the patches.
-> 
-> [...]
+skb_gro_receive() can currently copy frags between the source and GRO
+skb, without checking the zerocopy status, and in particular the
+SKBFL_MANAGED_FRAG_REFS flag.
 
-Here is the summary with links:
-  - [net-next,1/2] appletalk: stop storing per-interface state in struct net_device
-    https://git.kernel.org/netdev/net-next/c/023f9b0f2f4f
-  - [net-next,2/2] appletalk: move the protocol out of tree
-    https://git.kernel.org/netdev/net-next/c/8a398a0c189e
+When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
+on the pages in shinfo->frags. Appending those frags to another skb's
+frags without fixing up the page refcount can lead to UAF.
 
-You are awesome, thank you!
+When either the last skb in the GRO chain (the one we would append
+frags to) or the source skb is zerocopy, don't merge the skbs.
+
+Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
+Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Link: https://patch.msgid.link/c3b7f906bbfcbdfd7b4fa9d6c18a438870df85be.1779307748.git.sd@queasysnail.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Alexander Martyniuk <alexevgmart@gmail.com>
+---
+Backport fix for CVE-2026-46323
+ net/core/gro.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index ea6571c01faa..c5a9733d929a 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -171,6 +171,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 	if (p->pp_recycle != skb->pp_recycle)
+ 		return -ETOOMANYREFS;
+ 
++	if (skb_zcopy(p) || skb_zcopy(skb))
++		return -ETOOMANYREFS;
++
+ 	/* pairs with WRITE_ONCE() in netif_set_gro_max_size() */
+ 	gro_max_size = READ_ONCE(p->dev->gro_max_size);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.2
 
 
