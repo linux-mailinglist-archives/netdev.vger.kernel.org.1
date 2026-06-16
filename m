@@ -1,168 +1,173 @@
-Return-Path: <netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GU2LEbC5MWoopgUAu9opvQ
-	(envelope-from <netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:36 +0200
+	id 0YpoD5C5MWoFpgUAu9opvQ
+	(envelope-from <netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA04695562
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58282695559
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=H+vzG6ss;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="t nn5G4K";
+	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=k6+561Cj;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D349300B2BB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C61F31161FE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED37138237F;
-	Tue, 16 Jun 2026 21:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAB938237F;
+	Tue, 16 Jun 2026 21:01:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D6928A3FA
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 21:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FC328A3FA;
+	Tue, 16 Jun 2026 21:00:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781643689; cv=none; b=N5ku65Xsaherp2/s8nByWVSQdPZqgUHGOixetycE1fylxq2NpBRPLLkUKdaB9olzNjQKk+3C6iBYWd8LE7DAX2ekn7F9zos/MfpO5wunrGY0uRvyflIvmALp+GIE/ZbLnmAeHJM4Vg93rtWXExW0+99Y0c453vJtQuK9Wt04b3o=
+	t=1781643660; cv=none; b=u6Hk0e1ad2Jo+2hRSC1DDNVJ+srFnq0RRTfrqCqXxOnyUp7g7N9s0DNMJWVlxv9Kc9HUirJ8N0JsIKvIVgvlQmsmdDWIIg88/VPQNfPn0eeOJMimP+gqudhm7vxxpb2jdcSS4H5Zc0ioaJfRNPnUBcGxeVF+mSrESOu1Zsg61ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781643689; c=relaxed/simple;
-	bh=QL+6PjHmDG2RTHrGkE252ABZ6JjJ3rD26t7BbfcIWXc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kMtVkR5oV2K/2jwEBamvDJNGWzreQoo7AsaWqpgg9R3AFJ1WXaw7Dvi1la00Ae0lfuFAB0lCI59JFLQ1eXYHsSa3mV7jrl2UxXQbtJ8l2h7ttUjyOz/1AYYukt9WgwFSeK4Tjwo78Z5u1VQ3/+n9WKc4kT5vTQ98r8A6kccPfPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+vzG6ss; arc=none smtp.client-ip=209.85.215.170
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c85a2ca7bf7so1867786a12.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 14:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781643688; x=1782248488; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YAWzaQQD+TwU42qVxhk3XlLYYY09pYfRsBqz1erTu+c=;
-        b=H+vzG6ssF550rx91nyVuUbhnZ7j4qx4/RcNrX4b1suEcGYBKElKdrAo2izPSQOpB3x
-         kW2KLSEh6r1F5vd33ZPwhpftZYYtD2YLnMOeN7t+9frWYm4KAPGTUKAHcKMSYrskofYC
-         k8fS+pWTKxhO1pPTVFJJ6obWehmCD1jSjuGub22VHnIo5hpVUP/vGkD/bUioHNQotvJI
-         PBT1F14z1AxI5LAJAk6ZXaE9f7mN4sEf16jMU7c6HJiZ385RGi9kokHGtMQE8rok7a7g
-         +FEh8HC4QGWKs0dvQTH/SLYq+A+v7ct8/3hmnBp9Xfvr3e7fhgtulvoVXh2WraXNVgMh
-         ba4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781643688; x=1782248488;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YAWzaQQD+TwU42qVxhk3XlLYYY09pYfRsBqz1erTu+c=;
-        b=mAYWDR3q2Vt7hKf597Wwm2i0khpEimMyjva7f4yV8t/NLXHly92v74qjheF6F93ytc
-         JgpXPyenBVKsTblCOcELOHerEFKmzvp1ww5ystaFyXlXYf7qI5Fa6IDeszeK3THE5ode
-         GMXdxj21aktky9gxEnKgiMkEGHwF8E6e+SUul1FjyadunYY5l+PLVjnmWDYTCFDcwxaO
-         UlJ61suPxA/lgK0jGNyf2ZCJ4Z7qBcVPUuLODPXizjsfENtD/NoASRMGnwroxJicsQ6A
-         izHr0C2cyWIZhf3Xhm+IIBIM/xxDSHBma7jRm8vToilYJQ00+0cGKHy5+uG0yWk4GFO2
-         nU4g==
-X-Forwarded-Encrypted: i=1; AFNElJ91mmJLoWVOmMQIymgzIRKN0G6wdbRcV3R6EG48S4c+jjyvTGNvBmJrMOx0z2v5U/eZLrUGIzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE8ZDsEWNBwBwlufPHjIDG2Z7PP9IxtQW6w4I+wREZc++erAAZ
-	5+M+LX1hdKwaVeVFW+WrvIiK/Vebsh6SQJX5OR99YyFgg4SX2APwcojG
-X-Gm-Gg: Acq92OHMi4afmWvSasxe2MQ1IbDjwO+l0lHquEZ7+cZXurvEHS0TKPjS1XVXDMwBqD9
-	VxuJxTNToBJVDMgmu0G7PaKRQE+UCyGl//cAxtdRxFwoRt+6IuRiDsE1ly7G21h54QzMOSYdYi4
-	ghBfJflpDFbVEkhpKJLxzL6+lt3NgABjIVmuQRL5QORolzjn1tJPJuqJOmcafPPuMHvalANOScI
-	oz472uRCWthPdKKhDAfegePvga6S5kv58vzzYSi1JdMqfHmsHBC8NPV8vJWQRJP7NG8kvnvxqjN
-	QY0qa/62aTBKnXcZ7Dy/QMb46Zi0zYW71hh3bW8RnJ4DFlDWfLBlG0Mm/vCHKBe2xU8ZaTREs3w
-	AU+7OhqnX9s8fYABfjzD7yFowhL0JWVk4xyQM9/Ng0D9IFqquFMrCBdojkcU7445cw2qmQ55Rdu
-	weEtqewbZpXY5F4Uuvxb3SfoIkCbCKjK4ZhSYpf7Zf
-X-Received: by 2002:a05:6a20:b603:b0:3b4:6155:cde8 with SMTP id adf61e73a8af0-3b8be3b191dmr870958637.21.1781643686603;
-        Tue, 16 Jun 2026 14:01:26 -0700 (PDT)
-Received: from localhost ([2409:40c4:3a:b56e:6db1:8c82:df5:7a4c])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661b5e974sm12333720a12.4.2026.06.16.14.01.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 14:01:26 -0700 (PDT)
-From: Lovekesh Solanki <lovekeshsolanki00@gmail.com>
-To: anthony.l.nguyen@intel.com
-Cc: przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	Lovekesh Solanki <lovekeshsolanki00@gmail.com>
-Subject: [PATCH] e1000: Remove redundant else after return
-Date: Wed, 17 Jun 2026 02:30:08 +0530
-Message-ID: <20260616210008.109635-1-lovekeshsolanki00@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1781643660; c=relaxed/simple;
+	bh=WsoujMZrT9SaiHwQY0Ibg4au2nX+hLKzfLC+G7CHlVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yqm88mQ86BWCXKHdHYgC8EsE3T9wrEgxiYW3S77OrF/pGYxByfBGBOreFI0dDzzKAK6/9w78EbZsuGS7MMnzVYjbHB19RVQLOUhgXFiw4KbSjgTkdoHUqmRoo4PBZhqXCk5ELMauww62i5DTU93OrypQF2I0P1jZBcR0/onqX5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=tnn5G4KV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=k6+561Cj; arc=none smtp.client-ip=103.168.172.155
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2F0BB140014B;
+	Tue, 16 Jun 2026 17:00:57 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Tue, 16 Jun 2026 17:00:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1781643657; x=
+	1781730057; bh=7OCmBpm14YGh/RsHx8JtMtdaVhHc1rhuAXLFNR688Ls=; b=t
+	nn5G4KV2AemekWneeYwAap6PtV10MvWDvB9cBfn12OJheab73MO8+neGem5vlLvB
+	nDniv9zV4ER/o0qEr+/ZLivwi5ybqt90+5WX3+U6ftgzK1BS//f8rxB7cFVMr5mV
+	fI2QsG3y1VdKYb2L284IuPC4eHBGPo+UyLvyHx99IHQCOhRSPd/IpaD0M8ensdpc
+	cU4xoDfq6w9F9Tt8BRY6fq7eP/jke/umaoPg6grmk7lUN+oGTVev2xtkYkfQwoLi
+	4Vj9o9J5yk7aKfoowpHw1pVse/sZHALvSqdnfEEO7GGb8r3NyvShvEnNoisDaTda
+	farFkV/b112TGa6Q9IxXQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1781643657; x=1781730057; bh=7OCmBpm14YGh/RsHx8JtMtdaVhHc1rhuAXL
+	FNR688Ls=; b=k6+561CjBK2Vh9BHJUAZXuoxhkEAfxxa9lLlpFxKFb5GNZymj8F
+	QluUib2jI8mN3frFVNUuUPf07lKYMpP+DGHZ7w9CW7QytaPhHFTkiT1gTMGRvwhx
+	jmOZ2X2qe36FATkyAmbawJO2/gUdd70G9Pr+IpUYHNOGanGOHZMA1LwTfqQRB+gg
+	ma1QNshz3HGf+4J7AycxgJ5253W54Q5UiETkYhFQJLdnVmO1CuGIYjEovhhwMOE7
+	bRKEp/8eTT7hOXTb8FEtIK7EklxZOQOcrpwJYfkJntypd6seTEWIE9jDlcxbINVZ
+	hX9QDv8ZHllqtYH4x0VOjay++Bjz5wTz5VA==
+X-ME-Sender: <xms:iLkxatFR824kVmKyNli2inOrkjS-FWqRlQ2PMWmlCVytbWZ6dviLqg>
+    <xme:iLkxaoUTylwYO844lilucS0v9oxfsITbH8-q9uccC2SwlQAcwCit9whGkvWrO-gGg
+    lfCywAh70TDJ9Zz6fYv4dXWnqXRSK-Jjbs32w7760rzDSe01TMkdw>
+X-ME-Received: <xmr:iLkxap828PcRwAfzaTOplekAnXQ-aFWMyFB6LD0zUz4IdI-YmZIR91iZ2ZBCqIV__72cWmJcnurIkQVv8rooW_w>
+X-ME-Proxy-Cause: dmFkZTEu80uHfl9AJZCbHRhjyd5Nj29+YGxPuRk4OAYpFusrsU5S0ETpHDtlh12bB+99D9
+    bsESsUIomHC4f/vZ1Z3GqU071/4xLcm/pzs1/NrprCXfJzxh8WAwPZ/Mr0BxYx8NZSC4lN
+    jMdNoS2beNF2BCIQJRS9Y48Y15fETUym59Sy/Vwv0Uu1k4OrtTWdk+FNjaVLWefCfp+jxL
+    DJ8ed+SQujYFNfuZ4VooQuR/LYZqphR0KYBmhZcNNPdidqVEXWU8xH5mno/VU2jZEh+6KE
+    9tR+8vVJRPvA3E0lItMudb0yMZsQNyuGD6ifsda1TJc14x7LY+46tLJlbbMz41jLngcHi7
+    NXdK1L/1NsZyMB/y7B+P2opnW8SwtgHZYfc1c9FmJyWzKiGTXGnZhEkCbt/lPY6uJ77XJ8
+    2Rwme12M+YUZeE0f8arWOgFaUMU3pqScPvOD1e2C5wvqyOrumKIrFnL6/IEQ937wjCtI2p
+    /njdqjEFATbSaQOrb0StrtfK8Oz/2Ca5wxH1TDg+bU6nci+vjjPxfCmT+pcraBDKMhGkyL
+    t4rpM0DT4XS+w8Gj4gw+Nx7KlMV0MECEC9aL/u4tcCwaYZl6g+UZf1H3T0G/CRMkRjcnb6
+    ONBEzdEOK9Crfxakyp457lAYMi4FU9W5IDc/rUgk95Tr3LZk7nONE9oFDklA
+X-ME-Proxy: <xmx:iLkxal4sYGELSN9eASoOYtDp_omMvQVsum5hQRbKKIN_CPa-YuY1tw>
+    <xmx:iLkxaika8tFG5eKZ7JcQgX-zdjtSbPXRchCkBmVoUKwKWZMUofxMLQ>
+    <xmx:iLkxaoF_2vUHxOKcXJNQkNiI9VdgSYY7ef9sJpcMPi_GVLtMgxRvHg>
+    <xmx:iLkxap9z0FxhXd1lWSKdmjPbtWQ6lft4DffIX2tOheZ__cAqG3ki5A>
+    <xmx:ibkxagD5DAlN1ieS1RrNG9CqglBagajJxqFWjRbkp42X0H9Vp67gWwmd>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Jun 2026 17:00:56 -0400 (EDT)
+Date: Tue, 16 Jun 2026 23:00:54 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot <syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in tls_err_abort
+Message-ID: <ajG5hg9oJvyxPplG@krikkit>
+References: <6a315d48.b0403584.28d0ff.0002.GAE@google.com>
+ <ajFpejsl1ukTbG96@krikkit>
+ <20260616082816.4dd0f035@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260616082816.4dd0f035@kernel.org>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-299958-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299957-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:lovekeshsolanki00@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:dkim,queasysnail.net:from_mime,krikkit:mid];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:john.fastabend@gmail.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,m:syzbot@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[lovekeshsolanki00@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com,googlegroups.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lovekeshsolanki00@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,cca46a9d1276f38af2ae];
+	SUBJECT_HAS_QUESTION(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3EA04695562
+X-Rspamd-Queue-Id: 58282695559
 
-The else branch is needless because the preceding branch
-unconditionally returns -ENOMEM
+2026-06-16, 08:28:16 -0700, Jakub Kicinski wrote:
+> On Tue, 16 Jun 2026 17:19:22 +0200 Sabrina Dubroca wrote:
+> > I suspect err==0, and sock_error() consumed sk_err in between (the
+> > alternative would be err > 0).
+> > 
+> > Something like this?
+> 
+> Makes sense, but what's eating sk_err?
 
-Reduce nesting by removing unnecessary else
+The 2 remaining sock_error() in tls_rx_rec_wait()? [1]
 
-Signed-off-by: Lovekesh Solanki <lovekeshsolanki00@gmail.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> Don't we depend on it being set
+> to avoid further state transitions once we hit a crypto error?
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 9b09eb144b81..3d97e952c916 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -1546,11 +1546,10 @@ static int e1000_setup_tx_resources(struct e1000_adapter *adapter,
- 			      "for the transmit descriptor ring\n");
- 			vfree(txdr->buffer_info);
- 			return -ENOMEM;
--		} else {
-+		}
- 			/* Free old allocation, new allocation was successful */
- 			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
- 					  olddma);
--		}
- 	}
- 	memset(txdr->desc, 0, txdr->size);
- 
+I kind of thought so too.
+
+> I thought that's why we don't consume sk_err in recvmsg and sendmsg in
+> the first place (we are not calling sock_error() anywhere)
+
+Umm...
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/tls/tls_sw.c#n1095
+
 -- 
-2.54.0
-
+Sabrina
 
