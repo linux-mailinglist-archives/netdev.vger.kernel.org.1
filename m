@@ -1,194 +1,200 @@
-Return-Path: <netdev+bounces-299882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 6n6hAFppMWrTigUAu9opvQ
-	(envelope-from <netdev+bounces-299882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:18:50 +0200
+	id fjugFgtpMWq8igUAu9opvQ
+	(envelope-from <netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:17:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ACAC690E65
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:18:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15FAB690E1F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:17:31 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="gahrGkU/";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299882-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299882-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=nxp.com header.s=selector1 header.b=AKRsWACO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299884-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=nxp.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38146308EB2D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:11:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 772BC3013BA8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6636542EEBB;
-	Tue, 16 Jun 2026 15:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D0643DA3C;
+	Tue, 16 Jun 2026 15:16:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013048.outbound.protection.outlook.com [52.101.83.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444763BED69;
-	Tue, 16 Jun 2026 15:11:30 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781622691; cv=none; b=V0LI92Eed5DibDeFy56Q5okmdqKqogtgIEuFWBcRfLPm9xycPrOklYDNjTvgDCL2+QRbgWTSWlc5mfR3KS33wRaxmfPE+kScSr/pLYKSuRLyDXR2kk3BYkBcIrOHSflKSUZui+8j8zqfNaaA1b6fbdgAnVI+itsZtQE6GCiQpyk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781622691; c=relaxed/simple;
-	bh=GCK/nO+mowJpDzZU/f37K0tE1WiQbdKbp6EpDp3Fb9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pG+VzHGa8tSEFkgdBTsDlmoAd2jE4aCVS2wYaNaBYM49fIoYiz1EDAX9AjAF7r8ip1f0nYxTpi2nkWBhClwUWG9F0bLl6SgwrHR28tobhIhYraUkR01TrOo6WhRvQ0sY/tRUpWhGwh5IEv5+MbuUcVzPc9e0ROyVuZDYnFAZqaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gahrGkU/; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18C961F000E9;
-	Tue, 16 Jun 2026 15:11:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781622690;
-	bh=caOIpzBUGLY2xhSd7TNoK+CISeB7YToV6GWV4nJJGUc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=gahrGkU/0dSJoLTcYRdvkZZHBEQKHDIWgrOLb5XrXTuOb7BCbDsPqFknODA5rLGDw
-	 g7Em7c/5vK2AaJu1FYlNLsjEN7TizcbrBcs4cMJjobS3Ld9mYxC3QcdjW1QgD+rL6P
-	 3mm3RD+Z3pf4UKHxCz0Qt0QLEPcH7/Ean0emLuutiHmC1pxHJHkn5KffrWTWve2bsg
-	 2zFHJtAbuCyiXkltFo3ntOdi9VgHcF52H9+dY2XszPp0K+O5w8NdxyrFae0+CDM6DM
-	 xW3+aYTSTTSrsqX95DaJu4Vz2xPibj9ekWnpjsIQadG3yURpKyJ+Gi8hdEtzwGPDLw
-	 dX6B6yjoECEDw==
-Date: Tue, 16 Jun 2026 08:11:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Petr Mladek <pmladek@suse.com>, John Ogness <john.ogness@linutronix.de>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Peter Zijlstra
- <peterz@infradead.org>, Vlad Poenaru <vlad.wing@gmail.com>, Thomas Gleixner
- <tglx@kernel.org>, netdev@vger.kernel.org, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Breno Leitao
- <leitao@debian.org>, Clark Williams <clrkwllms@kernel.org>, Steven Rostedt
- <rostedt@goodmis.org>, linux-rt-devel@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, Frederic Weisbecker
- <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- K Prateek Nayak <kprateek.nayak@amd.com>
-Subject: Re: [PATCH net] netpoll: run NAPI poll in softirq context to avoid
- rq->lock self-deadlock
-Message-ID: <20260616081128.04e2c8dd@kernel.org>
-In-Reply-To: <20260616103529.Yh9Dxsjp@linutronix.de>
-References: <20260610183621.3915271-1-vlad.wing@gmail.com>
-	<20260611191114.5bc43a59@kernel.org>
-	<20260616103529.Yh9Dxsjp@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0707444103F;
+	Tue, 16 Jun 2026 15:16:45 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781623007; cv=fail; b=pg5D38ZK5a35ocxTzNSswCuPBA1BP3RZhwC8KN2Zxs6H1FWGbK5AsHvKoQ1/gKlYR/2pG3agjp+LCusZ3BzYNqiN85WFQQ8iQObzrRyZMQxnRlT1J2XMbdTZ9WsFwjqnXEQkGowkQ1hMzwrKgp/zPykIaGeVaMC2q2A52HoKe/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781623007; c=relaxed/simple;
+	bh=adQaE8H9mK3pYxRlagUAVX9BLwlNgbiFM7OFz/sHons=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=suTogQVTqyKq66J+GHPFKCxMFMlldAIYGcyZJsvSQBTDlXGRGLzXop12FCRgZ5hbRpWaFjAsizN6CMCnhvxNadPtQvjmWvxPeQI6d3TGFYiioPCh50IrOn0PyedF9NOzOFfu9hKxmnxpX4+/k+6r/dQhvp7C3Q1GdVviAWWWcgA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=AKRsWACO; arc=fail smtp.client-ip=52.101.83.48
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nFkMe6QmVQfKTeKwGd6MlxzFzhWV8l4gGTAnMbjrDckz0I4BM1vxV5GQ01P9QabmTnBuUyHw9GQRgKnTSrqvSfML43d3C0hN6GsKZsM/Yp70P1mh42HR4uKKdHK7qhR99ETuqvjtK2uUptQpxfp4kx185LO/dekFGhKYQMYXzwoU4b6Y9pedcFAqA1+PyX2CRN1Zy3TFA5iHlTmgpaxRRmGMhZgmOyvBl1HzuCRc/S9XPsC/NvjFamk6Y4xogoBxolfzYC56mM1cG25rbDcZ0M8QhSi7odiz3KVHrh1NxJRcsFWKGG5ONSBxW5Cid1jIDk/YUV6S22s6OdukI7p/uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+hEN0DTeXbWZUpzvYHOO0nyXGy7OAeRiHgqlqV2w+kg=;
+ b=dEEbJUfIezxvRhRhDOxvHGFWox4Af+9y+u31Rjl0j2gfsTomnHmk36UnGrhjjUOAmso/uw8PudYv0Ekw0zT+jwZf5NvKC+imJtR4cwAoQ2n1Ckrwwe9karETgvFUzqTZmkvM2IncK/CPqdO4ia/9PHJuzZqm6s/2HhvP2FNQuDGySb3/IFB6ulx4qePyfEJzucnFskQoyUaOi3sTpVuX1em1FJZkmHB00o8OtLFiFF/+sdzQsrZWGphVgxz/EVGNKzmQFDeEamXn5ddsuJu+l4iybZKo+xD8U9NPdzUncCFoTike+mg9NN24ew8A0laWvH2PUHwb8a+o+H7v7C8NOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+hEN0DTeXbWZUpzvYHOO0nyXGy7OAeRiHgqlqV2w+kg=;
+ b=AKRsWACOgdmudtw5Plp3cl13KDrwTH80ODqU/OQcedktoZhD3wkuwmVzXANtogXtrVPOachO5K0N4m1xqtE9W0pT8aJiQSXU/iPQ/loez8gPLBxlwnsxlBJW2L+F3YR+XXXFBY8VIsNLctLZZTdhEDd3rmoRLk/zOX0ErCYvV6B6vHB1Bxp9WZyhDD+xp0PJHvlIZNtFekqwNO6qVhf7S6mPG0XSBOk/r7aU5EHMw4Gxz/S8FmmMutAdqJQKPnLLtiQ+Ud9tQb6hsyX/TvV54CcW/dRcYh40acC3XWW2WgKMBJWlZuAcZT1dxO7TRhShj3yuKqaCgeVJFxiTTx1Elw==
+Received: from AM0PR04MB6900.eurprd04.prod.outlook.com (2603:10a6:208:17d::10)
+ by AS8PR04MB8296.eurprd04.prod.outlook.com (2603:10a6:20b:3f2::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
+ 2026 15:16:43 +0000
+Received: from AM0PR04MB6900.eurprd04.prod.outlook.com
+ ([fe80::7fda:8431:ca1b:b023]) by AM0PR04MB6900.eurprd04.prod.outlook.com
+ ([fe80::7fda:8431:ca1b:b023%5]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
+ 15:16:43 +0000
+Date: Tue, 16 Jun 2026 18:16:40 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Simon Horman <horms@kernel.org>
+Cc: muhammad.nazim.amirul.nazle.asmade@altera.com, netdev@vger.kernel.org,
+	andrew@lunn.ch, kuba@kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	faizal.abdul.rahim@linux.intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethtool: mm: Increase FPE verification retry count
+Message-ID: <20260616151640.qi4bobvcbeyptvgg@skbuf>
+References: <20260615072436.26128-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
+ <20260616071925.GA800687@horms.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260616071925.GA800687@horms.kernel.org>
+X-ClientProxiedBy: VI1PR0502CA0014.eurprd05.prod.outlook.com
+ (2603:10a6:803:1::27) To AM0PR04MB6900.eurprd04.prod.outlook.com
+ (2603:10a6:208:17d::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6900:EE_|AS8PR04MB8296:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca3dd352-90dc-4988-cdaf-08decbba460a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|1800799024|19092799006|366016|7416014|23010399003|376014|22082099003|18002099003|56012099006|5023799004|4143699003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	oi4ZgdcE65rwPgwXQgy30YGIBBGjtgHn4rx2VUZZBIUOlVEXbAob3UZnVE/+IrNGlllEjarcYlOnJo0qs7nVCqr2+TaL26UeJpKTWkxNNLNI2gK8LWAgnVW1zfXJ53V8odclAgzNJSPNmSx5002yOVsuxvgC+FFjsKBJqFAhYN7GWzH1vh1bB5q+j8AW1m4QF0b+9xavUI3VC7/Gfvgx2JJbUJe2w/abL8hmWrQdWcR7au4kfS9YISZMgHS7LPqDJ1JUk25YWSFn+xQfoW48R2WsHcNXsgntRJZId1xB49h0dC7rWWVTDgoUgia+28ckxJI6qrL00wVD2YUGqCi5s6UsoyFXeUc/zhLjmSFDtyIbpsWMCv1PVqRxvkFUHrcfFGfn6udvUXV8n51Z4l2MF+1G69orB7+kRYUPbLdoifNveRQ9xWAX1YmaWCf0R56J46BHqfyslYi9NDDzpLwd4pGjOXPyTmld8I1dyrW2Eyd2Tt8cv30CTlzOHq6dz8+ga2xoTpY53lUVhZ9KWBNSgUnWbmJNTL9fR3L2+yuUpeWMEG1g7FIWbefdcodVbA3kS28KpUqSYUr27Wd75w7b8g3zewIowyG9krUW3podlBjp7p8xI6s75AWD5Ha+BB69WQjaK5wEVlTWb0ZPLHmsxtS/vxVx9FWrsQpcaGlIXKqVgVFwNofFuVpX/7qLcUZb
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6900.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(19092799006)(366016)(7416014)(23010399003)(376014)(22082099003)(18002099003)(56012099006)(5023799004)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?mphkQaz6xOD/5iFu7kYIjm07I6uKak+tzlzYxOrFqBAbNzO2aidOXHhhpvc7?=
+ =?us-ascii?Q?yrBUhK0HHYeYJbq+MjcOJlLVTCa9pFCXwfr7wfjqoLfOEb0760XNwwTxd7N5?=
+ =?us-ascii?Q?L51wWGrN4uuipyvruYPoDc/sdEKD7S6PhMOBLio/R+07uWYSfMnHyxKa/uY2?=
+ =?us-ascii?Q?dCqEKOr6Y1+d1TSeGCt6HOqKemgyXwYVRhUN9mX52Qb3uGuRhJ+XeTb4NAHW?=
+ =?us-ascii?Q?L+D/AacLh6fPwelrzbOInxLEXS3Bf1TKWd5QobGrhnqPbbcgjCB5jC71zj1i?=
+ =?us-ascii?Q?RaQqMKjusVRosmzFIK3SW+p9D6S4qwF3FBDhzv39pKez+bHCpmCnxMMo8Mwd?=
+ =?us-ascii?Q?lTpv67SVgE9P3A4JiHxYfKR2WuEKPqYlN42cH/yY+u79ojDTLccZGyRcouvw?=
+ =?us-ascii?Q?znIHFAUSJVxWlVRdeS57kIKgESOtHDDbX7/r+lSzkLaJhwxypjIqpC5KED5o?=
+ =?us-ascii?Q?OgwZgZXjYVCSnNr+D3pWCGHqxr67ec5Empfrwqa0dQVHjD8YA9j4KALbK1SP?=
+ =?us-ascii?Q?EWOXP6kBXg336TWsmcetZKqI5wKO5vx/z4YnyIP4uTh2TGyz4icS5X8l866R?=
+ =?us-ascii?Q?4ErpJ2QL2OySjYcoNH53JGnpPvY/OTH/csCof/bgayeV+nTcyrSOhxcrbShQ?=
+ =?us-ascii?Q?cuPNTOLpJtqCnMKrLVZ7hbJ1eePKBQvcCo/vEyIdWwMbSAwO8jN1s6+roLet?=
+ =?us-ascii?Q?4s2Xvrreq4fHD9m6Q/aH+Cdl4tVPtjNecbcAwIqrd8P2xuBobXqZqJTH8KLO?=
+ =?us-ascii?Q?MLbg1O8SZwNIqa0DDW0ujeo0jcvdjeYPQEfVN0oop1eZJfG7vtlerCQ1luAf?=
+ =?us-ascii?Q?yz0fjAVsj3S2P1PlbO9R+CylaKxQ4RQvTcODYH8UNYR3LROx/4ZvjgtrNyFh?=
+ =?us-ascii?Q?YqTpGrMB5uIkvPjLU/9MRrxnKAFGEVJ5ymZ5vRLW+Kr17DZr802zThnRuxAk?=
+ =?us-ascii?Q?SyK8m+DscY+z1s0O+QYkCcZgRswvn/RP5Sxutrj1DgrESki9FtUbWGl/ypGM?=
+ =?us-ascii?Q?Y6EDncuhEUMWobE0b5ktbuPsF4JNDDJEDHAOCkvqFTfKLvcH8H8D/GXI/41W?=
+ =?us-ascii?Q?SlD5fzFVVwfCp14R8l/mPCd+40xWtUFhS5y27Z6osMuwbEVCFK7egL1/vSET?=
+ =?us-ascii?Q?/JrPvf5j4ZbgIigd2tQ2Ox/CX+5e0UiynruaWOJDgfzUZeAfbysy/q4bFUuY?=
+ =?us-ascii?Q?R/mxGWtKM+GsnTsQ0IL6yZZXoPsB385h1X04H3HpM+EJXqMXmj3rMP5CfICf?=
+ =?us-ascii?Q?xm4Vqszhvqdj1JDH3H+I2/Ml14AqvRuzBROSYeeQYw1j7KEb+BC89beTK/aR?=
+ =?us-ascii?Q?bCMFkxKed5FT2GGZz4vgiNUCOXlt5nhY+U7qeVgmAP0EekXU3PZ+BpwOpxVv?=
+ =?us-ascii?Q?bSi59GwlGKIRYoptL08x6WEVmAdf151sRjUaatHy7yBKzcxIKxIydaZJc+lP?=
+ =?us-ascii?Q?VXN2+Y4vhx/ZwtfEE/ei0RMQ9Offm9IfMbeQHj5BWhw9GX8e6ZagcktsdHyX?=
+ =?us-ascii?Q?fDVQYd2YI2tOrkadx7YwwcCB0e4su13TwlmDQSR3P+gTGuxZztbYkodS3aq4?=
+ =?us-ascii?Q?ITUTIaa0qP5mMGlBvhjExGQhMKFr7r+5SB0KIFPaou5gmMVMFMdooFdlHDAt?=
+ =?us-ascii?Q?IW49fj8lz/FH5dl8imutbim38hmk50m1jb/+ENfL/c1kAgLkUDPgsjT59Rky?=
+ =?us-ascii?Q?r6pxD7sDf7cDZq7O0vBx8c86C4WqLMBUtk6G3B+DYYR2E7JXGitWNILsMOBJ?=
+ =?us-ascii?Q?m+nyP1LZWVFreESvdmJYOVhbDLthblBDgHUJ/FkoZOAKVoTzIjdyvqwT+wJk?=
+X-MS-Exchange-AntiSpam-MessageData-1: YIBBtIq/kLeOGEjnoOvDVFuIkCMVdKB5PBk=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca3dd352-90dc-4988-cdaf-08decbba460a
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6900.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 15:16:43.4331
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 39iSjUsHa5xokkWh/UCdtkmrAV8mOhTPnRzFGjKWWEBxOL51sXHHbdPDFh0j2PW7/iuiXWAuwzzrD87GVgMHxA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8296
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299882-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-299884-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:pmladek@suse.com,m:john.ogness@linutronix.de,m:senozhatsky@chromium.org,m:peterz@infradead.org,m:vlad.wing@gmail.com,m:tglx@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:linux-rt-devel@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:frederic@kernel.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:kprateek.nayak@amd.com,m:vladwing@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:muhammad.nazim.amirul.nazle.asmade@altera.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:faizal.abdul.rahim@linux.intel.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[suse.com,linutronix.de,chromium.org,infradead.org,gmail.com,kernel.org,vger.kernel.org,davemloft.net,google.com,redhat.com,debian.org,goodmis.org,lists.linux.dev,linaro.org,arm.com,amd.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,altera.com:email,nxp.com:dkim,nxp.com:from_mime,skbuf:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8ACAC690E65
+X-Rspamd-Queue-Id: 15FAB690E1F
 
-On Tue, 16 Jun 2026 12:35:29 +0200 Sebastian Andrzej Siewior wrote:
-> On 2026-06-11 19:11:14 [-0700], Jakub Kicinski wrote:
-> > On Wed, 10 Jun 2026 11:36:21 -0700 Vlad Poenaru wrote: =20
-> > > @@ -194,11 +194,56 @@ void netpoll_poll_dev(struct net_device *dev)
-> > > +	local_bh_disable();
-> > > + 	poll_napi(dev);
-> > > +	_local_bh_enable(); =20
-> >=20
-> > tglx, Sebastian, are you okay with using _local_bh_enable() to trick
-> > softirq into not waking ksoftirqd? The problematic path is:
-> >=20
-> >   scheduler -> printk -> netconsole -> raise softirq -> scheduler (dead=
-lock)
-> >=20
-> > so the softirq may never get serviced.
-> >=20
-> > In netcons we try to avoid touching the network driver if the Tx path
-> > locks are already held. Ideally we'd do something similar with the
-> > scheduler. Try to do bare minimum if we may be in the scheduler.
-> > Failing that - don't poll the driver if we were called with irqs
-> > already disabled.
-> >=20
-> > Or maybe we only poll from console->write_thread ? =20
->=20
-> So this is not an issue since commit 7eab73b18630e ("netconsole: convert
-> to NBCON console infrastructure"). Because from here now on writes are
-> deferred to the nbcon thread. So this purely about -stable in this case.
->=20
-> Looking at the patch and the amount of comments vs code changes look
-> somehow hackish. That ifdef for PREEMPT_RT is not needed because on
-> PREEMPT_RT we have either nbcon or the legacy console (including
-> netconsole before the mentioned commit) wrapped in a dedicated thread
-> (via force_legacy_kthread()).
-> That means in both cases the flow never ends there and the problem is
-> limited to !PREEMPT_RT.
->=20
-> Now. The scheduler usually does printk_deferred() because of the rq lock
-> so it does not deadlock for various reasons. It is kind of a pity that
-> the various WARN macros don't do that.
-> I don't think that patch is enough. It works around the problem in this
-> scenario but should the NIC driver invoke schedule_work() then we are
-> back here again.
-> Should the network driver acquire a lock then lockdep might observe
-> rq -> driver-lock and then driver-lock -> rq and yell dead lock (CPU1
-> doing AB and CPU2 doing BA). This includes also other console driver so
-> it is not limited to netconsole.
->=20
-> Point being made is that we should avoid the callchain:
->=20
-> |  console_unlock
-> |  vprintk_emit
-> |  __warn
-> |  __enqueue_entity                // WARN_ON_ONCE() here -- rq->lock held
-> |  put_prev_entity
-> |  put_prev_task_fair
-> |  __schedule
->=20
-> basically a printk under the rq lock.
->=20
-> We could add printk_deferred_enter/exit() to all the rq_lock() variants.
-> I think PeterZ loves this the most. And Greg will appreciate it too
-> while backporting because of all the context changes.
->=20
-> We could also introduce WARN_ON_DEFERRED +variants which do the
-> printk_deferred_enter/exit() thingy should around the printk and replace
-> all the WARNs in kernel/sched/.
-> I *think* the tty/console layer has also a deadlock problem where it
-> holds locks and then the WARN(), that never triggers, asks for the same
-> locks again so we might have a second user=E2=80=A6
->=20
-> Adding sched and printk folks for opinions while eyeballing
-> WARN_ON_DEFERRED().
+On Tue, Jun 16, 2026 at 08:19:25AM +0100, Simon Horman wrote:
+> + Vladimir
+> 
+> On Mon, Jun 15, 2026 at 12:24:36AM -0700, muhammad.nazim.amirul.nazle.asmade@altera.com wrote:
+> > From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> > 
+> > The current FPE verification retry count is set to 3. However,
+> > the IEEE 802.3br standard does not specify a fixed value for this.
+> > A retry count of 3 may be insufficient when the remote device is
+> > slow to respond during link-up. Increase the retry count to 20 to
+> > improve robustness.
+> > 
+> > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+> > Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+> 
+> Vladimir, I'm wondering if you could take a look at this one.
 
-Thanks a lot for looking into this! To be clear - the printk_deferred /
-WARN_DEFERRED would be just for stable? Or there's still some
-sensitivity even with nbcon?
+IEEE 802.3br is an obsolete standard, I don't even have access to it.
+
+IEEE 802.3-2022 is the current one for the MAC Merge layer. Clause
+99.4.7.2 Constants states:
+
+verifyLimit: the integer 3, the number of verification attempts
+
+I don't have something in principle against making the verifyLimit
+configurable past IEEE 802.3 for debugging purposes or non-standard
+applications, but keep the default to 3.
 
