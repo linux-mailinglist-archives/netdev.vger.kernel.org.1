@@ -1,144 +1,348 @@
-Return-Path: <netdev+bounces-299751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id LYTmK8jsMGooYwUAu9opvQ
-	(envelope-from <netdev+bounces-299751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:27:20 +0200
+	id OfRJCX/tMGpWYwUAu9opvQ
+	(envelope-from <netdev+bounces-299752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:30:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0138968C81F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:27:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1835568C840
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 08:30:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b="nazHv/Ia";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299751-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299751-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="aW3ZFOn/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299752-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299752-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CEE73025914
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:27:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1EEBC3006020
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8BA3DB312;
-	Tue, 16 Jun 2026 06:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB173DC4BA;
+	Tue, 16 Jun 2026 06:30:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980E83DA7C2
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 06:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9330E3C279B
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 06:30:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781591219; cv=none; b=Bp5H3huQB5C3BBdrQm/3A9ZBlWe6ths6saFBG2EYRGHU1xpQUxxZi6DKyMD4MjSocyhxJVjDQ4VTUVqsi5qCK3FbjyP8SQYUd+tFzoiMOP839ErPc7TpAksQsAF7lymSvpE4k4Vjfd1FDXLVX6GI8rz8fS+RhETa0AzaZMqLDz8=
+	t=1781591416; cv=none; b=iiDe2p5OOnIMnWhAcN84vr2T/cLFu2bhLzQyAD14v5YcDB17ZDBkUcJxn7O27GlA+ltFge7OHxE72roNMEm5Lx+0csRkc6hjT7nUUYLPhFIGKagCO8e9eV9UQlmaVMTCU81cjZKD7sgeVMmrxg20M14lUbfHs99jd2lYEpwTSeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781591219; c=relaxed/simple;
-	bh=iRry9oHclMRfUqD5tUtX/k3q8ux6WR0QhAjkaVxOinM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYC0iXc1hg3G1ieWsLEE5+sMsqr2hFtcwjOcmz/aziXyNjm+Y38jnMuS8BD/87TPOrmzI05OaG1IxGFG3AlXlTgavBawrzT5/VKbEcDn2RfFXZMxb7yNT0s9jQHioDjSePM86UC4cL+4fFnNOMUNRhEzmBqksRNp58amtfSFZTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nazHv/Ia; arc=none smtp.client-ip=209.85.210.174
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-842d37438d8so1617953b3a.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 23:26:58 -0700 (PDT)
+	s=arc-20240116; t=1781591416; c=relaxed/simple;
+	bh=XEC36mzACGCHilvo4lAGsWnkBw/V81r5v4u6FQFOgvs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AT0CsdZRU7pDK1S2XimdiFFiLXlEpMFpWecTQafl7z7Fp6uFxhTs5q9dswEg7sIsLb0BaEF0VacU8kz75Was7ZShCW253Nha/vOBfPXfJ8NxOl9L6ds/EU+fRMqjGFabJk3nWw+eRRYWUtbb/qTqOb/jOMPPKDi+aK4BV7+tSNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aW3ZFOn/; arc=none smtp.client-ip=209.85.208.175
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-39676d82b7fso37490841fa.0
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 23:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781591218; x=1782196018; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rI93y5seViHg5YidVC1YNQsLofTGTFtrXXZXnF5WUWU=;
-        b=nazHv/IaA02hVO+ICRnyNUUUi64Ub3uWOzFJP5EHOR4O0rP3Ig2N3pRDS5yQD2afE3
-         O8ZBdEm3ioT0gzxUQVnvrOUNbh82y5/p/13Zx7jAA/pLA0sU6q8C9WIfxzGR1pCWiQX1
-         wL2ZzZ8AftfzX+bp4/T8E+jLSF+PrFyNxsE6wQkyR4OACbhG1EVSEMxJe5xfTyxxWyOO
-         +v1Y4P/3cxOmhNyxWch6Ntl2hyLMJ1bJ7spRXc7d8ffkiz2/K/u7rFQBCor+/5//eLMg
-         W4GsgK6zdcdC20eJUp8yUPNj0VGsSeqlbM8l4XdMvFDAFXs04XKQJ8rhjbTaEarmge2G
-         OwlQ==
+        d=gmail.com; s=20251104; t=1781591413; x=1782196213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hv4Oosl+VzlLTaV5qUQl01CH44gb7SsUdMG105aKzy0=;
+        b=aW3ZFOn/K+wf9orllp8Z5qGXbk3HAjMAdw5X5/TlzbdoOYU0HaM5jNQI5JXBJCgYND
+         0AME4Z1ZcJGJZAMpmva65dVhPsx4jDol1BkxKQ7o/rvzUELNznVxTW4yQKW8pYRZHIUg
+         dayoGb4Y5mLdwaCKy8G+Q6E5bpx3aH1/HX4o7gsWTvFcLa2+vwt+x44NHcPnWEGycdNJ
+         XezT0nPsMWHWVMfaLECS67Fx8C2Ud84TO+ZyCdd1VnnrVZRdTEM8dzHPJn0eEa3CKeGe
+         e/8KlnPrOnNw4OGhMLgMIFMFNARTGhKCot+0C9Iag0jf/TjPOHf5Wzuuo0JdX9iYGTH0
+         mmAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781591218; x=1782196018;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rI93y5seViHg5YidVC1YNQsLofTGTFtrXXZXnF5WUWU=;
-        b=XQMg8aYUm1N0zIuUdAlrZlTR2v5nRD0ZNOoAeyyVROdjtXm802BDkifUBPJ9h9vW8P
-         +ytlRZzKdavwpXHHMBUGn4ogXYTlZwUgiv7+SCq94R9fT5suXkNLGN0VYw0+745SD4k2
-         oSRiYA/aGqkXTgo2iYBMd2ELKJw2RcOx/cVrrm/23pm70zJjY7baz5re6B+s+nWtLCST
-         NASiL9LJH6gPlX7iT48GzD8HYhUTj6czGdIZ30rLXcbF4kq8fS7Dvdvsqa6OUawrbDVF
-         IyMZT0PjpXfYkiwKYP2roGgNTZ9DqK/o5OZXBrEbgrDdlcpvQmAC5Hjj+kPpwpcCbG+S
-         xVVw==
-X-Gm-Message-State: AOJu0YwB9rgqMoGgWhIbzZ9YoRoDf+syFiQ1/uBw9ft3r5cQr2rWVjbS
-	eHPljcoUQd2bQY4J7GssHSMTSJzWhTSbxJ+/ysbYpE+FzPX/1KuYXfL8
-X-Gm-Gg: Acq92OH2/3P8j9gXA4htZAsyK25i1JHyU3BijMCZ2ZVbMdGLxCaOO8RZ/4o+6O68VHX
-	xBfOldMPSQCQjdnargy93zQytAWI1R9NVAPLLrZlBlqy4U9Jx8sR0KsNwazw1X6v86lfkigWw04
-	BaeK4rUm+0OEM1nb9ZE8c7NFg4ulUETfzC6kbQEaFIfEm6fKyb2We4wm5z42RvTZuO1RVcOFyuP
-	hik0qNQ65vVxs/2iB/FOkMAbxxZsnT7CLDMS/Mnh6/ZsGZmGhoUAnTeyk+a6uCRAabq9BdI0mPA
-	+r4S0AM24/EKFp245f9zvVKSj+Qkk1TiepcbR+vEgzNHKLV9s12DAMwbn+yxKuAzSxBH224Zuc2
-	v3xErVJ7FO/VesQXOsLMC6LOT8Fo2J0fjqybBVOIlZWVRTSo9r84hzIMBwLtrxZp8rNHwcQcuZr
-	7+puevIIGAyldYo1lMQZCu310wragZmXbZYx0X7/ntB2Xd8r6CIo39GiY9qyhbdHAZhXHenx8=
-X-Received: by 2002:a05:6a00:4485:b0:842:2f3d:dff2 with SMTP id d2e1a72fcca58-84515521648mr2243020b3a.34.1781591218063;
-        Mon, 15 Jun 2026 23:26:58 -0700 (PDT)
-Received: from li-1a3e774c-28e4-11b2-a85c-acc9f2883e29.ibm.com ([106.51.160.236])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b009e67sm14154810b3a.42.2026.06.15.23.26.55
+        d=1e100.net; s=20251104; t=1781591413; x=1782196213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hv4Oosl+VzlLTaV5qUQl01CH44gb7SsUdMG105aKzy0=;
+        b=eRfupGgB2gy4U5DxYoBYWi8pzrxWGcOZT8WPv5ELVvEmtQsfdMFSqu0sWDf6mWsu0i
+         j6ODOMBJ2qPnOzQt4+YhTtsRbGfDYGOOEDb3SkarURW6wHChfpBHogp0OTvyCRNjPLcC
+         BroKkwJfxs00QaaE2plI6YtcLnrOL7NZXIXG9lPV9gf+msrF175X3kMA9SM9ACZ92YHj
+         W8KUWh2fz2Du/xkj2j41jGsSeEeRQcnpD4KrAj+BPxy/fu1noGkjuymPe45iMQXQjBtA
+         TccM8iG1fRGjBh8QWMNdCOyOX2x/cfMVoMN11Sy/MpzmfrTMGOzDuO+ThzeefNar8I3d
+         V7uQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/FTvuCRt+Dx7fawXJ8mdVmp+T4KHN1ToBGHzZ+Rn1GaT2k60vy1LRA6pTvCkx+Z6uEytS3Vh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxtUzJ0wJAGCOArUf2Q5eO3hBXOl/JaFgctIoy54fNDoFd1wLl
+	3STQz5qFweeellvN9woYsGY5VpdwnSfl/SGakwSyxF7dRaDjLojERynr
+X-Gm-Gg: Acq92OGptJN3Z+wYdAm8XK4arCHCK06YYyTaSd+zMwSG7Z8G4fxNwTszBw3T34vxNqq
+	Pn14Pij/OnSNaWb0seztJtxB/Ct7aMQBBnBV9Cu8kVxRMvjcg327WDdEBaDc6ds1rMdHgeYqJMC
+	6dd3aO7H00XYSz4Vnme4HLs7Ruo1B4rhIY+eOz4lRBQW8QJK69+VcGP8tU6UObs1vdkW9tkM2XT
+	JVEPWnFUz1jGMNQrf6cKP8YDpGQvo49f30FsLxeMyuYEX0dofmW7OU+GIs6nxZ0zd+G2H6ja9Gd
+	99Hc4yCx46yaN8kIshZ8aQgH+Y0LuEMt/Ige8qbvBKxd/WbLcZFff9Zy4nqDF/+fOddk726iYKQ
+	0FgxTZ6iVctKIirryII37+/Bd3i9lbflwOW+4lxeDpfUmIj4PE4T/uYdXW5o/n+iGfP/48lB+07
+	BGikLgEzCLk2yGdbB6u57Rua30Jv3MPsdlNNa590b4RQzQAs93NWJBUrayg0PqNrMgYL5j
+X-Received: by 2002:a2e:a80e:0:b0:396:6bd5:a9c7 with SMTP id 38308e7fff4ca-3995c85103dmr6238941fa.19.1781591412632;
+        Mon, 15 Jun 2026 23:30:12 -0700 (PDT)
+Received: from cherrypc.astra-academy.ru (109-252-17-231.nat.spd-mgts.ru. [109.252.17.231])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3995c1a3706sm4045501fa.42.2026.06.15.23.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 23:26:57 -0700 (PDT)
-Date: Tue, 16 Jun 2026 11:56:52 +0530
-From: Mukesh Kumar Chaurasiya <mkchauras@gmail.com>
-To: Yeswanth Krishna <yeswanth@linux.ibm.com>
-Cc: netdev@vger.kernel.org, venkat88@linux.ibm.com, 
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [BUG] kernel BUG in team driver: buffer overflow in
- team_add_slave()
-Message-ID: <ajDshKtFNpQAtHQ0@li-1a3e774c-28e4-11b2-a85c-acc9f2883e29.ibm.com>
-References: <3ad19e86-234c-408f-896e-0d6c774fea49@linux.ibm.com>
- <a08b0a7f-089f-4428-9360-9edbec3a5453@linux.ibm.com>
- <ad80ee33-400b-4c63-8197-838c3cf85cef@linux.ibm.com>
+        Mon, 15 Jun 2026 23:30:12 -0700 (PDT)
+From: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Venkata Mohan Reddy <mohanreddykv@gmail.com>,
+	Patrick McHardy <kaber@trash.net>,
+	Julius Volz <juliusv@google.com>,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	Wensong Zhang <wensong@linux-vs.org>,
+	lvc-project@linuxtesting.org
+Subject: [PATCH 5.10/5.15/6.1/6.6/6.12/6.18] ipvs: skip ipv6 extension headers for csum checks
+Date: Tue, 16 Jun 2026 09:30:23 +0300
+Message-ID: <20260616063025.648647-1-nazarkalashnikov0@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad80ee33-400b-4c63-8197-838c3cf85cef@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299751-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:yeswanth@linux.ibm.com,m:netdev@vger.kernel.org,m:venkat88@linux.ibm.com,m:linux-kernel@vger.kernel.org,m:linuxppc-dev@lists.ozlabs.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,verge.net.au,ssi.bg,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,trash.net,vger.kernel.org,linux-vs.org,linuxtesting.org];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[mkchauras@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299752-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:nazarkalashnikov0@gmail.com,m:horms@verge.net.au,m:ja@ssi.bg,m:pablo@netfilter.org,m:kadlec@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mohanreddykv@gmail.com,m:kaber@trash.net,m:juliusv@google.com,m:netdev@vger.kernel.org,m:lvs-devel@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:wensong@linux-vs.org,m:lvc-project@linuxtesting.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkchauras@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[nazarkalashnikov0@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nazarkalashnikov0@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,li-1a3e774c-28e4-11b2-a85c-acc9f2883e29.ibm.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0138968C81F
+X-Rspamd-Queue-Id: 1835568C840
 
-On Tue, Jun 16, 2026 at 11:38:37AM +0530, Yeswanth Krishna wrote:
-> 
-> > Please add below reported-by tag:
-> > Reported-by: Yeswanth Krishna Tellakula <yeswanth@linux.ibm.com>\
-> > 
-> > 
-I am also not able to reproduce it.
-Can you paste the full report of the crash?
+From: Julian Anastasov <ja@ssi.bg>
 
-Regards,
-Mukesh
+commit 05cfe9863ef049d98141dc2969eefde72fb07625 upstream.
+
+Protocol checksum validation fails for IPv6 if there are extension
+headers before the protocol header. iph->len already contains its
+offset, so use it to fix the problem.
+
+Fixes: 2906f66a5682 ("ipvs: SCTP Trasport Loadbalancing Support")
+Fixes: 0bbdd42b7efa ("IPVS: Extend protocol DNAT/SNAT and state handlers")
+Signed-off-by: Julian Anastasov <ja@ssi.bg>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>
+---
+Backport fix for CVE-2026-45850
+ net/netfilter/ipvs/ip_vs_proto_sctp.c | 18 ++++++------------
+ net/netfilter/ipvs/ip_vs_proto_tcp.c  | 21 +++++++--------------
+ net/netfilter/ipvs/ip_vs_proto_udp.c  | 20 +++++++-------------
+ 3 files changed, 20 insertions(+), 39 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto_sctp.c b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+index 83e452916403..63c78a1f3918 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_sctp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_sctp.c
+@@ -10,7 +10,8 @@
+ #include <net/ip_vs.h>
+ 
+ static int
+-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++		unsigned int sctphoff);
+ 
+ static int
+ sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -108,7 +109,7 @@ sctp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!sctp_csum_check(cp->af, skb, pp))
++		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -156,7 +157,7 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!sctp_csum_check(cp->af, skb, pp))
++		if (!sctp_csum_check(cp->af, skb, pp, sctphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -185,19 +186,12 @@ sctp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ }
+ 
+ static int
+-sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++sctp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++		unsigned int sctphoff)
+ {
+-	unsigned int sctphoff;
+ 	struct sctphdr *sh;
+ 	__le32 cmp, val;
+ 
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		sctphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		sctphoff = ip_hdrlen(skb);
+-
+ 	sh = (struct sctphdr *)(skb->data + sctphoff);
+ 	cmp = sh->checksum;
+ 	val = sctp_compute_cksum(skb, sctphoff);
+diff --git a/net/netfilter/ipvs/ip_vs_proto_tcp.c b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+index 7da51390cea6..ede4fa3b63f5 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_tcp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_tcp.c
+@@ -29,7 +29,8 @@
+ #include <net/ip_vs.h>
+ 
+ static int
+-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int tcphoff);
+ 
+ static int
+ tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -166,7 +167,7 @@ tcp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!tcp_csum_check(cp->af, skb, pp))
++		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+ 			return 0;
+ 
+ 		/* Call application helper if needed */
+@@ -244,7 +245,7 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!tcp_csum_check(cp->af, skb, pp))
++		if (!tcp_csum_check(cp->af, skb, pp, tcphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -301,17 +302,9 @@ tcp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 
+ 
+ static int
+-tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int tcphoff)
+ {
+-	unsigned int tcphoff;
+-
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		tcphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		tcphoff = ip_hdrlen(skb);
+-
+ 	switch (skb->ip_summed) {
+ 	case CHECKSUM_NONE:
+ 		skb->csum = skb_checksum(skb, tcphoff, skb->len - tcphoff, 0);
+@@ -322,7 +315,7 @@ tcp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
+ 			if (csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
+ 					    &ipv6_hdr(skb)->daddr,
+ 					    skb->len - tcphoff,
+-					    ipv6_hdr(skb)->nexthdr,
++					    IPPROTO_TCP,
+ 					    skb->csum)) {
+ 				IP_VS_DBG_RL_PKT(0, af, pp, skb, 0,
+ 						 "Failed checksum for");
+diff --git a/net/netfilter/ipvs/ip_vs_proto_udp.c b/net/netfilter/ipvs/ip_vs_proto_udp.c
+index 68260d91c988..ffbebda547fc 100644
+--- a/net/netfilter/ipvs/ip_vs_proto_udp.c
++++ b/net/netfilter/ipvs/ip_vs_proto_udp.c
+@@ -25,7 +25,8 @@
+ #include <net/ip6_checksum.h>
+ 
+ static int
+-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp);
++udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int udphoff);
+ 
+ static int
+ udp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
+@@ -155,7 +156,7 @@ udp_snat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!udp_csum_check(cp->af, skb, pp))
++		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -238,7 +239,7 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 		int ret;
+ 
+ 		/* Some checks before mangling */
+-		if (!udp_csum_check(cp->af, skb, pp))
++		if (!udp_csum_check(cp->af, skb, pp, udphoff))
+ 			return 0;
+ 
+ 		/*
+@@ -297,17 +298,10 @@ udp_dnat_handler(struct sk_buff *skb, struct ip_vs_protocol *pp,
+ 
+ 
+ static int
+-udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
++udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp,
++	       unsigned int udphoff)
+ {
+ 	struct udphdr _udph, *uh;
+-	unsigned int udphoff;
+-
+-#ifdef CONFIG_IP_VS_IPV6
+-	if (af == AF_INET6)
+-		udphoff = sizeof(struct ipv6hdr);
+-	else
+-#endif
+-		udphoff = ip_hdrlen(skb);
+ 
+ 	uh = skb_header_pointer(skb, udphoff, sizeof(_udph), &_udph);
+ 	if (uh == NULL)
+@@ -325,7 +319,7 @@ udp_csum_check(int af, struct sk_buff *skb, struct ip_vs_protocol *pp)
+ 				if (csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
+ 						    &ipv6_hdr(skb)->daddr,
+ 						    skb->len - udphoff,
+-						    ipv6_hdr(skb)->nexthdr,
++						    IPPROTO_UDP,
+ 						    skb->csum)) {
+ 					IP_VS_DBG_RL_PKT(0, af, pp, skb, 0,
+ 							 "Failed checksum for");
+-- 
+2.47.3
 
