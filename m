@@ -1,322 +1,213 @@
-Return-Path: <netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id yKq4EFL6MGqyZwUAu9opvQ
-	(envelope-from <netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:25:06 +0200
+	id v7dSIgL8MGpIaAUAu9opvQ
+	(envelope-from <netdev+bounces-299767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:32:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A673668CD64
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:25:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD0AA68CDDD
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:32:17 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b=0bSLdUZz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=windriver.com header.s=PPS06212021 header.b=rgZukOpc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299767-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299767-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=windriver.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 988DC302514A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:24:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28A713181A57
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE95026738B;
-	Tue, 16 Jun 2026 07:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEC8397343;
+	Tue, 16 Jun 2026 07:28:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012046.outbound.protection.outlook.com [52.101.66.46])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC3A314D18;
-	Tue, 16 Jun 2026 07:24:42 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781594684; cv=fail; b=IaYP08yNISuTuWfrCTTFB5EIJFrES21pHhvpfVLYZ6AHiJkfr9O+S1m9dn68tTS9WvqISDWfE4XezqPDYC+zonABxK4AokxoFMh1nFsYh6ZeGXIUIpd4XTEG5Hz3euKhgWWXV2+XJEyAuKk2gn7R6mvJCokJ5QqcSv7EzSX88To=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781594684; c=relaxed/simple;
-	bh=dwOWiC765CTzven4anywY66iqRv0mDw7IG5KynJgibA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=M9wk+A/2JhRwuNbPWZLEanjuidMQvzRxHUFU5V0cibxuEujApiOnNIg+JR6ZoQRbeHrTj2EToZTz3GD4Qz0NtZ3EHFwXATuvfC5+oh+43okof8YrgIXDMc0dpwDV25V80ovb1sECggJOu3TQjcyh+iBQxh2yJbMO6MDH00zdArs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=0bSLdUZz; arc=fail smtp.client-ip=52.101.66.46
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=g+MpSB9GfcjARxoqQ9n9hsqcfqKz3I14XpELgpCCGjSC6OxovduYLxnI+EMKhwLy8cazlwl9IFCF7lVHakGgZy7MyY2q6cCtibyV/gpijJTK8Kiaxs/iu1dAAfcOSO8Br7Rd2oecmRy2Rh8az8pl7mSLyuyzFChDlrKJYum4Q4DPaca1hJimFd5g/rs1vTIHzvgrR9Xsx8FjNogPH98G/uZ7i49yGIevWsIpSQ58jG4sCZjkNQihnSnjGTsR9MLAMOdBuK3djMT5NS/ASAyih1z4d3GXm9n05sK5PlDPxDUw/rOC6TLO2Zm8WVICe2JdySma9P239HbQaZdcFOk+Sg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yy5KA33UxKXm04+6kmPinXQOunlrDNzPY3jBL+Qf7T8=;
- b=wjR/NTKg0xVXCCh5lU8SbIFBYmGyqhuKv7VsSKMPUtC50SpqUtc3FKjGhuS6ntLyJJkbnmxkgGlNlemsHisnA4GhfIJLVNPr6Sxjt9uaPDtFuyXfoRrCskCAH7YYHN33QjzGUOPOtgQH0RN/SRSCiuAptnqHT6wRqP/8OTHCalpyc3Pyp2pbQEHZ8r2gYhEnQE976eHmh+LlhjrywbsC07Wc/KxoALHYMUNhg+xIR14zd/YmVNdt9Ft48bwxS7EdmvdboNL2ntIhx+5mklbGYCDqb8aKmq8Ra9dRICeLT8ORMaXRrcSAUkR3RRTFDdM5qb/CJdfHpGxLL5gOVHPFXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yy5KA33UxKXm04+6kmPinXQOunlrDNzPY3jBL+Qf7T8=;
- b=0bSLdUZzrsQGrpbTDjiKeTjeRS5o+S879Lzp5QJFgE4Fekc/vbRWx4dAP/JWGjmpOKP12/i71T+ciqqYncwFo3nUor1v+D7mtNzeYYUJ5BuYDnKEWQ6yA/IhfeQAIP71d01GlV9opL2zptAcq7QuGU2lJi8qPtbTz1dbvJcqwayz50dwEF09S79dbicVYKh/jKNYA2ccLijFEFfbE2aqGTTczEAWAoHRu2g1APgFQBZj5gY0gcbk/ee8TaFNd41UJKE1HU/9O23OUr2BuUuzE1PnNNXs+mCfpwtvv9sd+ptXKjIKtmECYroa0tR3cq+72vFZzpK8r5eQYjft9ftuxg==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- GV2P189MB2887.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:265::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.113.18; Tue, 16 Jun 2026 07:24:36 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 07:24:36 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
-	<horms@kernel.org>, "aleksander.lobakin@intel.com"
-	<aleksander.lobakin@intel.com>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "jmaloy@redhat.com" <jmaloy@redhat.com>
-Subject: RE: [PATCH net v3] tipc: fix slab-use-after-free Read in
- tipc_aead_decrypt_done
-Thread-Topic: [PATCH net v3] tipc: fix slab-use-after-free Read in
- tipc_aead_decrypt_done
-Thread-Index: AQHc/Ly7cJEs8zp3ikSAff4HL4pmFLZAyJfA
-Date: Tue, 16 Jun 2026 07:24:36 +0000
-Message-ID:
- <GV1P189MB1988976BF420AA4A8650CF07C6E52@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260615114618.71249-1-doruk@0sec.ai>
-In-Reply-To: <20260615114618.71249-1-doruk@0sec.ai>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|GV2P189MB2887:EE_
-x-ms-office365-filtering-correlation-id: 75035d3f-dc9f-4d4b-c178-08decb7851fb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|56012099006|11063799006|38070700021|18002099003|22082099003;
-x-microsoft-antispam-message-info:
- zw1imTzD9XY1vQjpC7ZhE8gUZvxZT07qN1Zfluf1y1ac1EPdkvu6DSdfBHE0TZMNjvbtndsjG2xkBirQ0i89MpY4yX0X6h6BIMxcEQvzjhntKiee0LsaHEA6L0dciVa1BAwB8wej4qbvuskTgFTt+gMwMkXp2R2xDpsnobOO/4lRFm2nzJAf2iSx5yL9zDcPoiqjN2zVYMz6kimB+rFc17vw+NeMPAzihXgS9WGz72m+fWYbfk27t8wPQG30XljEDUH91Rkoj6/O72J4/RRNGXLcSrumimzF64pvyQleKrk65ZtfCRVzfY8wOQtEYuPntQllOLLnrSuJxIvgZZaJS/ra/wL5ZRgOv/mNEiMWkT80JNwKLrSxysZwftST++ptEbVlY47cS+Y4zDMbVFkPqqfa6lUbESs1stJ7/LYjLgC4CXY8imd7MzMoAVC6dBM9ny+nGuluqhR1uL6KjGI7DpnsVQ2ogrQe41brxjOjLGjw4iwxoOjjEXpUdSCMXXysW3OZtfIW2YhycL39YdkDg05y9TAAxJTVRG6XLvaL16ji5WF6QlAxrEUKae3bQStSIbk52XWiBvq2jA5P50+r9I5c9z9Bvp8GQVg1ZGFzKYJNJtNbdlqyA/6Uu2YKvb0GBvqL4ulnuXjcdf0Iw39VhqEzi8Xso4wuYWdTU7XHSkax5ftWVKY2VXUYWpEGObqh
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(56012099006)(11063799006)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VFuKwOcxLHm+8kRMgs55d5HnFeV2htfMV3fpkUFzOo0dNOQH5F1c6gxDtKc1?=
- =?us-ascii?Q?LKZdUiLn+X3tIEe9UbAxIDr2WNMgC2v251MSYBu4hOmpehQ1TKD03jf9cJB/?=
- =?us-ascii?Q?ElFI6IwLMB5Aech5nolqV5UqyuUNZSfS3SiYqy7QW9ZK6dT6o9TM9TR7CbNQ?=
- =?us-ascii?Q?yA4oNAOWLB6W2KGzzdaw/36p6X0bERnhty0YOPmhWlqPaivk3wNEfUxGg0GS?=
- =?us-ascii?Q?z9T2avqt85esdDkZNXvQ+1mfXN+VuaEhZuZMvS+ToQNNyhdwGcXHtHHGuqjC?=
- =?us-ascii?Q?9OWvudsTBcLvfdle2wO5VApmvKKe45ilq1TMVvm6R5o2untuVN6PktBIGXmy?=
- =?us-ascii?Q?VYK82mTnMq0ixFt0alRuqHSZSwbq91T21w0zeFhP+o5NwlX6tKwfnZKxY3no?=
- =?us-ascii?Q?GYVd2svNJQiKUAy+SxvwNK1sJJ2dbFE+rTffqgLftDcxvXcM6jO2ZZHMu+zb?=
- =?us-ascii?Q?UH+7F0EoMgLLQI2BXgpGSgJaQ+CifJHKwdZGN2Sl4LBrwcqW4rlUrAk1OSM5?=
- =?us-ascii?Q?J3sSv8gHja1QY/QOwLlVnJObH+8SPtDedUwJHnXTEQpp2U2EGHLpf/OrSsPp?=
- =?us-ascii?Q?YuBlKAaJqFAyze+xb0x6v8Eu4wvCSO9SNgn9jq4j7zxY8gfC1oQyzOov15cZ?=
- =?us-ascii?Q?D0Ac1LlZqA7PTL8NfiXz1h85Vh2hstXyL1bWL+dAKJek510fyFyozA6qkQ2x?=
- =?us-ascii?Q?+Jzf2SOizvhQwDl7muUSAI/pL3nLtR22lpvNVKaP24nzA42rTTHpuQ1BWLFf?=
- =?us-ascii?Q?dB/yWJAAwJTxo2vfDDVvwC5VpltTiei8YDjTtO5lkTqI1OhC/6mMhV0FZGjq?=
- =?us-ascii?Q?MbWLEJW+3QuYGa8a1TiAuDrRla4ECX0JDvvlM8P1WmGhX9v2+pzzHkJgrJyG?=
- =?us-ascii?Q?0u+TwSm1OugNOF9/Z+OSP8IvJA2ES1rzJNh8vjbMyqNgBM1Bxke+TVPGh5Rt?=
- =?us-ascii?Q?fKyBU2bCNv4ZSDErW5DrAUmGXaVoGY5MuALycHQm1G470UsoV7CZeN3xUYII?=
- =?us-ascii?Q?2wWorr6CplcpXf+wtFLOTVYkvlKZN+4ek2ULeCPhdAuA65ubpjYYnPoxj71V?=
- =?us-ascii?Q?b6hfmy0YWLjS8kYplKEVa5qd3x1zeKdg/+iqDOeF2FpI7idjl3ntm+6j6UUS?=
- =?us-ascii?Q?bQvd2Nuc68S6jI3WuLsGDXg0ZSJscokdG+gHFeOs/0lmxdxBQyC6F4ufuVQp?=
- =?us-ascii?Q?yY1zwtbVGInszi0hQNFBRaj1ZrG8+GcskTjqk4ppxbrGMFjJI8CQ7RxhHX0Q?=
- =?us-ascii?Q?68rt74TqcWcrHTcrw3pQP03j3oaHSAZJbgDHlSmNjGOta2q4xG/a5ZZUnzcy?=
- =?us-ascii?Q?nt6LSsDYdOlzrOTwDtDSDt7EYki2lPmyroKF/XjF02VPMD6XPxPdD5HfYfz/?=
- =?us-ascii?Q?Be0/BAbEmQahdDCMeQh6Iv/wLER9jIf0cxHH6t3fXwyhq0nyLiCWGGyHg41/?=
- =?us-ascii?Q?7JQ59dqZd6mJb7k/ktUpSC7N/02gn45/WLKFBRK2veIZiKhyuZ1HGVeGLct3?=
- =?us-ascii?Q?bzk9qQo70m3CLtDhi8Y9RobayfbE7O9K/YVViWb0QNVo8k1H5JyBQRPc9Mvk?=
- =?us-ascii?Q?Jq1DJtZnkU6kjMlNC1v2LkWT7f4X7cRjdXtfpXzpSuqQrwjYMwh2ILWev5bh?=
- =?us-ascii?Q?PePXPO//Ipv5yKev9QURHsNaGY5Bbx2aSqquRmpk6PZT3gfKck20P6586/rk?=
- =?us-ascii?Q?SoizmfAtFf8dwYoAYycfKMoLXB+I4r49EmmEQa3rJoOp1yG3xceaTsaW7+EE?=
- =?us-ascii?Q?N4ISN2qKkA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50025280CC1;
+	Tue, 16 Jun 2026 07:28:01 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781594882; cv=none; b=kvefDCCldlLegwLDm4KnQuBL4VF40X1bwkTRFrTElGYlGpl32wGgEnRFpaWDIzNPrdX5QyoMQWJ4aOhbB1JR8iRQOX6xEskR5yiyVVX+BjHOEMYmrLYVPnTW36aEePQ6gSNR4/U4+uj3cNiqcMBm61YkF5Y8JYmpJWAZ7df3uIA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781594882; c=relaxed/simple;
+	bh=nl2KhLYTjDu/weO3hmQUZyto7iut233yvLAozLtohfg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NUE7WmYX6TyZuqVD9v8Jx313sg+QZoSwjhIu04v80cjSg8JgQCQ0mnKQcRiWf7zVuvozNCkMyLtncg3SpTUmYRoqPBozSJP9MRe9SdAzZOa/UzAOO7zCznq6OgMKBk0NQ+gjsvUfonF0ahr0vGBtExD08aW/8IQHryDnotzhkAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=rgZukOpc; arc=none smtp.client-ip=205.220.178.238
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65G69YmF2262437;
+	Tue, 16 Jun 2026 07:26:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=W+cluXi79
+	vQzeFuIuku4WBBZGeVmIeItCbIc6BatS6A=; b=rgZukOpcYnNGd+S126K7d4RLK
+	vAroZ3sOlkRIp/e6mWwk0qyPV+Nq2MnIyjKAk6TSgOuegfapzp0dvNW/OrYUkEfM
+	6PZWeuBXBDVIAG8saY8X5DlnZk0JTkSmmbL72thc4cckRIpPNFtClr5zR3D+qh4X
+	Rx5swT7I7zPZpBiadcqWWz8EJBc8MRPmihoJRNjkp9uyLpPDVx/eoyilifG8BSBb
+	JZaQ71cDizw5AxRPcuqU2rbeipEkjokOTJb36aZLjNX8TiETLQxYwISJtvOSrLbp
+	lunMRU1iLZoWw852qR/4yGOF9h9Pv7ZYPv14l9Er55S8CxHDW/5UoL0nPDwcg==
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4erx63vdqk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 16 Jun 2026 07:26:54 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Tue, 16 Jun 2026 00:26:53 -0700
+Received: from pek-yzhou-d3.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Tue, 16 Jun 2026 00:26:50 -0700
+From: Yun Zhou <yun.zhou@windriver.com>
+To: <marcin.s.wojtas@gmail.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <bigeasy@linutronix.de>, <clrkwllms@kernel.org>,
+        <rostedt@goodmis.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-rt-devel@lists.linux.dev>, <yun.zhou@windriver.com>
+Subject: [PATCH] net: mvneta: free/request IRQ across suspend/resume
+Date: Tue, 16 Jun 2026 15:26:49 +0800
+Message-ID: <20260616072649.2514602-1-yun.zhou@windriver.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75035d3f-dc9f-4d4b-c178-08decb7851fb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2026 07:24:36.4768
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7OfbBP7n/6tFTAzxS0K9hHfFzE6K8FTBrM+CHLxp1qjZRVT6YRogdwdLLfcjVCteb9k/6n9gDXHfMB2cG3JwHYzwINND7npgt5SEJW12y+I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P189MB2887
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=SvmgLvO0 c=1 sm=1 tr=0 ts=6a30fabe cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
+ a=fTW__CHxibyLmBMfj2wP:22 a=t7CeM3EgAAAA:8 a=H1i4495hyjeC5Vi1NPAA:9
+ a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: eASCHtemyO39xCKV8K3IW93vE8r8mEHF
+X-Proofpoint-ORIG-GUID: eASCHtemyO39xCKV8K3IW93vE8r8mEHF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDA3MyBTYWx0ZWRfX1ly//fMlYdK9
+ PkSuq6rwkIyVKraixGuaP6S7ReZOZY3M4GjkhyhogjbBtjOeLFaYUAviNkM2lRDD0z0PDDO297Y
+ ChEt8tKCtx8IcIiECfBggd2qlElfbysbEz1KTKeDY1/WIBajumWr8wOrRDbbYmSCB5EaWjr68tV
+ x1QhY8jJY9Vc5rL3cKHmVbKEnJ5ZLe4ysWX/wPz88Qwsl1PKjPQ+MwyqKHMYuUD7f9hz2mj+KM7
+ /Hi0ASumC3U3lSTgo3NYtRr9yrNULQa7YuuQst/Wq1fhYcoA/IQzcEcNJlR7kJbPAcFzEt2827B
+ tlFoMmcmUKM1Kpebn/B/B+++z4oyVT2rxan/P6M2Vttrh8dssx611l0nqfXGqu4j3JaGAodZWN8
+ Ktaw3fNR029p/ZtVpw30dfbVOGY4nMcUpoSRsrLLJFR2gJ2peXUiNbJOp1S22RIMd2ZRFtvfqY0
+ 8c8irkNEID+bxi2Rsjg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDA3MyBTYWx0ZWRfXxH3wVxPmftBa
+ RICvVkj6cxCAVx5hoNt71qfgAfMb3yPPYNFKc7MpKWoIW3iaKJlJ9MOg4J9ovovsRC4SAqLYcF2
+ h7B7hBZSTbDAv5KHgbLNGc/QAO4v/1pFyMaOl2jWnNOvzY1mlbOT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_02,2026-06-15_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 spamscore=0 priorityscore=1501
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606040000
+ definitions=main-2606160073
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[windriver.com,reject];
+	R_DKIM_ALLOW(-0.20)[windriver.com:s=PPS06212021];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299766-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[est.tech];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jmaloy@redhat.com,s:lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[est.tech:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299767-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:yun.zhou@windriver.com,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,goodmis.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[windriver.com:+];
+	TO_DN_NONE(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,windriver.com:dkim,windriver.com:email,windriver.com:mid,windriver.com:from_mime];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,est.tech:dkim,est.tech:email,est.tech:from_mime,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A673668CD64
+X-Rspamd-Queue-Id: DD0AA68CDDD
 
->Subject: [PATCH net v3] tipc: fix slab-use-after-free Read in
->tipc_aead_decrypt_done
->
->tipc_aead_decrypt() goes straight from tipc_bearer_hold(b) to
->crypto_aead_decrypt(req) without taking a reference on the netns, unlike t=
-he
->encrypt path. When crypto_aead_decrypt() is offloaded asynchronously (e.g.
->the SIMD aead wrapper queuing to cryptd), the cryptd worker runs
->tipc_aead_decrypt_done() later. If the bearer's netns is torn down in the
->meantime, cleanup_net() -> tipc_exit_net() -> tipc_crypto_stop() frees the=
- per-
->netns tipc_crypto, and the completion then reads it:
->tipc_aead_decrypt_done() dereferences aead->crypto->stats and
->aead->crypto->net, and tipc_crypto_rcv_complete() dereferences aead[]
->aead->crypto->and the node table -- reading freed memory.
->
->Decoded KASAN splat (v7.1-rc7, CONFIG_KASAN_INLINE + TIPC +
->TIPC_CRYPTO):
->
->  BUG: KASAN: slab-use-after-free in tipc_aead_decrypt_done
->(net/tipc/crypto.c:999)
->  Read of size 8 at addr ffff8881056258a8 by task kworker/u16:2/51
->  Workqueue: events_unbound
->  Call Trace:
->   tipc_aead_decrypt_done (net/tipc/crypto.c:999)
->   process_one_work (kernel/workqueue.c:3314)
->   worker_thread (kernel/workqueue.c:3397 kernel/workqueue.c:3478)
->   kthread (kernel/kthread.c:436)
->   ret_from_fork (arch/x86/kernel/process.c:158)
->   ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
->
->  Allocated by task 169:
->   __kasan_kmalloc (mm/kasan/common.c:398 mm/kasan/common.c:415)
->   tipc_crypto_start (net/tipc/crypto.c:1502)
->   tipc_init_net (net/tipc/core.c:72)
->   ops_init (net/core/net_namespace.c:137)
->   setup_net (net/core/net_namespace.c:446)
->   copy_net_ns (net/core/net_namespace.c:579)
->   create_new_namespaces (kernel/nsproxy.c:132)
->   __x64_sys_unshare (kernel/fork.c:3316)
->   do_syscall_64 (arch/x86/entry/syscall_64.c:63)
->   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
->
->  Freed by task 8:
->   kfree (mm/slub.c:6566)
->   tipc_exit_net (net/tipc/core.c:119)
->   cleanup_net (net/core/net_namespace.c:704)
->   process_one_work (kernel/workqueue.c:3314)
->   kthread (kernel/kthread.c:436)
->
->This is the same class of bug that commit e279024617134 ("net/tipc: fix sl=
-ab-
->use-after-free Read in tipc_aead_encrypt_done") fixed for the encrypt side=
-.
->The encrypt path takes maybe_get_net(aead->crypto->net) before
->crypto_aead_encrypt() and drops it with put_net() on the synchronous retur=
-n
->paths and in tipc_aead_encrypt_done(); the -EINPROGRESS/-EBUSY return
->keeps the reference for the async callback to release. The decrypt path wa=
-s left
->without the equivalent guard.
->
->Mirror the encrypt-side fix on the decrypt path: take a net reference befo=
-re
->crypto_aead_decrypt() (failing with -ENODEV and the matching bearer put if=
- it
->cannot be acquired), keep it across the -EINPROGRESS/-EBUSY async return,
->and drop it with put_net() on the synchronous success/error return and at =
-the
->end of tipc_aead_decrypt_done().
->
->Reproduced under KASAN on v7.1-rc7: a UDP bearer with a cluster key is
->flooded with crafted encrypted frames from an unknown peer (driving the
->cluster-key decrypt path) while the bearer's netns is repeatedly torn down=
-. The
->completion must run asynchronously to outlive tipc_crypto_stop(); on x86 t=
-he
->stock aesni gcm(aes) now decrypts synchronously, so the async path was
->exercised via cryptd offload. The unguarded aead->crypto dereference in
->tipc_aead_decrypt_done() is the unpatched upstream path;
->tipc_aead_decrypt() still lacks maybe_get_net(aead->crypto->net), so the
->completion can outlive the free on any config where crypto_aead_decrypt()
->goes async.
->
->Found by 0sec automated security-research tooling (https://0sec.ai).
->
->Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
->Cc: stable@vger.kernel.org
->Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
->Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->---
->v3:
-> - Rewrite the changelog with the decoded stack trace and frame the
->   reproduction on the current tree (v7.1-rc7); drop the v6.12.92
->   references (Tung Quang Nguyen).
->v2:
-> - Add Cc: stable@vger.kernel.org and Alexander Lobakin's Reviewed-by.
->   No functional change.
-> net/tipc/crypto.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
->
->diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index
->6d3b6b89b1d1..84a6489da036 100644
->--- a/net/tipc/crypto.c
->+++ b/net/tipc/crypto.c
->@@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct
->tipc_aead *aead,
-> 		goto exit;
-> 	}
->
->+	/* Get net to avoid freed tipc_crypto when delete namespace */
->+	if (!maybe_get_net(aead->crypto->net)) {
->+		tipc_bearer_put(b);
->+		rc =3D -ENODEV;
->+		goto exit;
->+	}
->+
-> 	/* Now, do decrypt */
-> 	rc =3D crypto_aead_decrypt(req);
-> 	if (rc =3D=3D -EINPROGRESS || rc =3D=3D -EBUSY)
-> 		return rc;
->
-> 	tipc_bearer_put(b);
->+	put_net(aead->crypto->net);
->
-> exit:
-> 	kfree(ctx);
->@@ -984,6 +992,7 @@ static void tipc_aead_decrypt_done(void *data, int err=
-)
-> 	}
->
-> 	tipc_bearer_put(b);
->+	put_net(net);
-> }
->
-> static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
->--
->2.43.0
->
+On PREEMPT_RT, the mvneta IRQ handler is force-threaded. Under high
+network traffic, the IRQ can enter suspend with desc->depth == 1
+(masked by the oneshot mechanism between handler invocations).
 
-Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+During suspend, the kernel increments depth to 2 and masks the
+interrupt at the MPIC level (clearing the SRC_CTL CPU routing bit,
+due to IRQCHIP_MASK_ON_SUSPEND). On resume, depth is decremented
+back to 1, but since it does not reach 0, the unmask is never
+called. The MPIC CPU routing remains cleared, permanently disabling
+interrupt delivery.
+
+Fix by freeing the IRQ in suspend and re-requesting it in resume.
+This ensures a clean IRQ state (depth=0, proper hardware routing)
+on every resume cycle, regardless of the pre-suspend depth. This
+follows the approach used by other drivers (e.g. igb).
+
+Fixes: 9768b45ceb0b ("net: mvneta: support suspend and resume")
+Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
+---
+ drivers/net/ethernet/marvell/mvneta.c | 28 +++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 0c061fb0ed07..e7e9a58dbe55 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -5819,6 +5819,20 @@ static int mvneta_suspend(struct device *device)
+ 	mvneta_stop_dev(pp);
+ 	rtnl_unlock();
+ 
++	/* Release IRQ to avoid stale MPIC mask state on resume.
++	 * On PREEMPT_RT, forced-threaded oneshot IRQs may leave the
++	 * interrupt masked (depth>0) at suspend time. This prevents
++	 * resume_device_irqs() from restoring the MPIC CPU routing,
++	 * permanently disabling the interrupt. Re-requesting the IRQ
++	 * on resume guarantees a clean state.
++	 */
++	if (pp->neta_armada3700)
++		free_irq(dev->irq, pp);
++	else {
++		on_each_cpu(mvneta_percpu_disable, pp, true);
++		free_percpu_irq(dev->irq, pp->ports);
++	}
++
+ 	for (queue = 0; queue < rxq_number; queue++) {
+ 		struct mvneta_rx_queue *rxq = &pp->rxqs[queue];
+ 
+@@ -5895,6 +5909,20 @@ static int mvneta_resume(struct device *device)
+ 						 &pp->node_dead);
+ 	}
+ 
++	/* Re-request IRQ (see comment in mvneta_suspend) */
++	if (pp->neta_armada3700) {
++		err = request_irq(dev->irq, mvneta_isr, 0, dev->name, pp);
++	} else {
++		err = request_percpu_irq(dev->irq, mvneta_percpu_isr,
++					dev->name, pp->ports);
++		if (!err)
++			on_each_cpu(mvneta_percpu_enable, pp, true);
++	}
++	if (err) {
++		netdev_err(dev, "cannot request irq %d\n", dev->irq);
++		return err;
++	}
++
+ 	rtnl_lock();
+ 	mvneta_start_dev(pp);
+ 	rtnl_unlock();
+-- 
+2.43.0
+
 
