@@ -1,240 +1,263 @@
-Return-Path: <netdev+bounces-299870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id vWZOMFRdMWqEiAUAu9opvQ
-	(envelope-from <netdev+bounces-299870-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:27:32 +0200
+	id IFdYL6ZfMWryiAUAu9opvQ
+	(envelope-from <netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:37:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63EF66907A7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:27:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB80690918
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:37:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=WFPLgVWZ;
-	dkim=pass header.d=redhat.com header.s=google header.b=FNzC7M3Z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299870-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299870-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=ibm.com header.s=pp1 header.b=aRI6qfEo;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299872-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=ibm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5045230310F5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:26:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF70530EF9C7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF3B376A19;
-	Tue, 16 Jun 2026 14:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B91B379C4A;
+	Tue, 16 Jun 2026 14:27:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F623385AC
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 14:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962163A1E69;
+	Tue, 16 Jun 2026 14:27:24 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781619989; cv=none; b=Jr9+40DqdCOY83eETuSNzQfeDYu0ZIZkIvLYBXJyHYfx1Lf1y4zp3UmoSUvUMNpS5sziKh0/KxAKbnvh9ul0iAbV042kiTJNiy0g9SqsQmR4SDR8tfhTIvluiDCmCRv7zOO7Ite/XsJaE8FXhzo5nx2FrL/FY32cudMrC0XThOA=
+	t=1781620047; cv=none; b=BpOK4rvl1xVDwTC/8EIuN7XTjqjvyLkbnq9tMJcRVQms3WsSztbpfNmJMbQKMBJh+XZf+LZ5AMTQScQtBnwLoP6pKmWw0z0nVWJyhfjsXFaTdoTXabmlkZdncQ2bU8MDTgg0BgXWiXPkN9jeV7GiA+igk1y2tfEJyCkQcdLsitU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781619989; c=relaxed/simple;
-	bh=2FtnmkA6sYVjNf1cUAA6sjpblaIDR9OLH/SC1eJdstY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TInWljQQipppF4SPjGyoeHC7JlRx7rnWoY97LM29jve2khgRUVgHZn+uKLIxOvEVPdh1jL/1IDw1bUCnlHF8OU1jlH9z4AKSUb1cbSyT3Uxc8bDPuNWc8ROUqlUsFoIoTSYEjBUMAa4cQXQBBAVUPquKVcfqwaQKsx2i9Ymz+ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WFPLgVWZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FNzC7M3Z; arc=none smtp.client-ip=170.10.129.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781619987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Dhl41uHQlhSDcthFJy4ATeZ9aIkqmiVNQn4jmxc+ZZI=;
-	b=WFPLgVWZaM5XshKGqaS3O479q/pcyeydlSO2TxXHDyEkhlqLkgTTqw5gHrzx6ZjkrFm445
-	lIyFz9CulitOLjzDRiI+o/YJZ+JdZVYJR0Z+VN7G8nz0alG209OJ0L32PYfnuJjPNpXC+5
-	NwM5GLIA1GBvBmLW5D7lME6RXuzBuRE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-693-nbe7kqQQPHqbAMU2-Ox09Q-1; Tue, 16 Jun 2026 10:26:25 -0400
-X-MC-Unique: nbe7kqQQPHqbAMU2-Ox09Q-1
-X-Mimecast-MFC-AGG-ID: nbe7kqQQPHqbAMU2-Ox09Q_1781619984
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-45ef63d1214so3007782f8f.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 07:26:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781619984; x=1782224784; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dhl41uHQlhSDcthFJy4ATeZ9aIkqmiVNQn4jmxc+ZZI=;
-        b=FNzC7M3ZEcquH5Fh+MJ5LvOIRbOh4dE3tSW9dISD1vwewkWZt9rSFtYsNCw3n1UINw
-         hXnNtzHZhVyuHadmDI6zlIXL0gnPUVmissZE7eaBI4SUbmc6jnga68VkZBt8PaTlKEVE
-         oZJ9FIjSos+WB3hOg2FjQ9DS2GqbfshrhBQCVcurjxSnywmoa0OUtAKVTHl/UgCxfnIb
-         JYIA4MZCkj+5O3edgfJ7L9xc3wkE5Btg3gGwJOCJRbUwcY4NNcCg785mTz2ItJRd5tb9
-         Nq1V4Hx2/zjMZXzwdiQQksnVWmOISsgL1sRuOk3JxwTCGm8hb0WO1HIG2srJmr9GoSev
-         MiAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781619984; x=1782224784;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dhl41uHQlhSDcthFJy4ATeZ9aIkqmiVNQn4jmxc+ZZI=;
-        b=EtPzw462xJC0hO1WspMbWMxEGP4PZa5mTDHezaattKeY0/KFEAQDZBbhUWAf62V79B
-         4/lk/ThMPVOLNs8q8vDXx3WnIp6Wobtq7uQqzBAsOj5gXms1sUC0zh7JnAU432f+0aF4
-         saiDk8TUOSIQsFsc6ScHYJ/4XQtwUEYWKmfUditNZTID8mGOeWVQU2QYE2IlPeltTMJH
-         hLnaG0lxFo6JliDAbnKqYEmeJ1ehLRYJLX2r+WmCzzJJFfVezw+uxZrLcx0DQGTTR7PM
-         C5JOSK3tJaG3gSP8aFZyrba/5XLsghxt4biLQbzyZOk/x54lPzfiWPqomgi8WBiWSUuD
-         NObg==
-X-Forwarded-Encrypted: i=1; AFNElJ857wFBr05tbKmH+6KvlOCKcs+C6xlfGnyyIO4iN66gBjrrGkqjtF/Y5LRUfX+2RavYcRkW+XY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNd670q0KBQKtrklm3K4hMxErkzGRVWLrYaNapDLrG8P2lBnMn
-	i124eZxLtkngfMjm4nlANg3J2UjgI9wCjZy7Z40KiUgHnhsoivb7N/O94udmZcupp7dGMcH96uY
-	/DTH6bgWLsMiWFsfGaNjQo+yVcp+wn8+Kr4tS0l3hHMTIVfP5olm/3T1PpA==
-X-Gm-Gg: Acq92OFxcc5MeZf/TguOV5w6Q7KU6m5aDJBE4ZjvQeOIuozJbaSFQBK+4jaAu3/jXZR
-	Cp+6DhHN6n9dP+RBSg8L30BCNDj10qTee65/8srvqJq1ndqQh2GvktdTWSZTjZlc9EHD+yGmzZA
-	y6pG+zcScI8y+P2QgxQoN2RSad+6bTabLo5O6gtCCHm+mVQRQ9S8r4iH/9/EU9lQ1inFR95abMu
-	GvKJDZMHcwsfaZ3oDTfFmPw3+QjeOpEia2tWE/5wyk08uQJb1Qe9RlkB0lQLfb9wo+/WyAcHxIw
-	cDvioh2u/kuERxOb2FYnOlF3GOt3GFvAYal6qfyOy4v+hKhDqGeUQixfRlsCoJthAZDWe219UnK
-	Q9xPq/Fs81s/s9k60qUhySqpy+lrkWqM3NjygavwlMuinsBEisBInbmLmH59HZ387EhGvfn8=
-X-Received: by 2002:a05:6000:1ac9:b0:45e:eaed:afd2 with SMTP id ffacd0b85a97d-4619f33afc1mr6376240f8f.0.1781619984270;
-        Tue, 16 Jun 2026 07:26:24 -0700 (PDT)
-X-Received: by 2002:a05:6000:1ac9:b0:45e:eaed:afd2 with SMTP id ffacd0b85a97d-4619f33afc1mr6375916f8f.0.1781619981390;
-        Tue, 16 Jun 2026 07:26:21 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-135-12.retail.telecomitalia.it. [82.53.135.12])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2c5266sm51566784f8f.29.2026.06.16.07.26.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 07:26:20 -0700 (PDT)
-Date: Tue, 16 Jun 2026 16:26:08 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Andrey Drobyshev <andrey.drobyshev@virtuozzo.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com, stefanha@redhat.com, 
-	maciej.szmigiero@oracle.com, bchaney@akamai.com, mark.kanda@oracle.com, 
-	ptikhomirov@virtuozzo.com, den@openvz.org
-Subject: Re: [PATCH 2/4] vhost/vsock: add VHOST_RESET_OWNER ioctl
-Message-ID: <ajFcf00nmUcfqofx@sgarzare-redhat>
-References: <20260612165718.433546-1-andrey.drobyshev@virtuozzo.com>
- <20260612165718.433546-3-andrey.drobyshev@virtuozzo.com>
- <ajFRRmA9req1muX6@sgarzare-redhat>
- <129f5833-3a7f-4b2d-a965-20903e4e2fb5@virtuozzo.com>
+	s=arc-20240116; t=1781620047; c=relaxed/simple;
+	bh=1TEa1AEWrpo5vlROCNgvTad5PWUPE/qQn8wASMr7nCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rYFlxNNljk3OgAb7QSfXwHQsEnK8NOzoBm9Mffvs1wKCnzBXvzLYzZnlbgkNnrnYVtc90cYZhrVnI7ULvtkRHeqyqLq/Zm6NktxUAlXfDhBAQZUBGK0tkizThOcEqnx2N9AJzu2UU4kqUfw70KZUOObfbQRa4RfRSDdtXX/g8TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aRI6qfEo; arc=none smtp.client-ip=148.163.156.1
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GEICjj1763843;
+	Tue, 16 Jun 2026 14:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=IjuEIJ
+	SriwuP01r/+rNqGP9V1B2LCAw9Xpaog56O+38=; b=aRI6qfEoXL+uBKVIlvR1P+
+	DUjnck+WtmfRzEYpFdxNSPPozP25iDNI9i13sKCum7JQbawWmYMynlD0LY3VgFHn
+	/gIWOHDgzEzjXATGUcaePVXKCOxaXSyqmOAF6T7S4qSoZ2irSv49lHGlWi+VygOe
+	VcB9jBZdFUxz1uYJ78unQtBJz/z5abIgfMSv9/kopVLFUsSGonR+pyxn8CRKBbxr
+	CS7J8Lw2uFqokAegqewYMOo1XFHJS1Twfik4nvGw1L1eSPdUsgTppXtu/ruCT6rE
+	MQ5McqFS34VBh3qh3dbheMvlr/6um28nY7GXzxf0lV61jGD59LURWoVRCnmKIGdw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4es23np4ef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jun 2026 14:27:12 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65GEJd7C032673;
+	Tue, 16 Jun 2026 14:27:11 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4eshhq3x7n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Jun 2026 14:27:11 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65GER6OE23593388
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Jun 2026 14:27:06 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 04EFA20043;
+	Tue, 16 Jun 2026 14:27:06 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0205F20040;
+	Tue, 16 Jun 2026 14:27:02 +0000 (GMT)
+Received: from [9.39.16.33] (unknown [9.39.16.33])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 16 Jun 2026 14:27:01 +0000 (GMT)
+Message-ID: <430a9dd9-ecfb-4465-9eeb-f854fbbc2e61@linux.ibm.com>
+Date: Tue, 16 Jun 2026 19:57:00 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <129f5833-3a7f-4b2d-a965-20903e4e2fb5@virtuozzo.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/1] net: smc: fix splice entry lifetime imbalance in
+ smc_rx_splice
+To: Ren Wei <n05ec@lzu.edu.cn>, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Cc: alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, wenjia@linux.ibm.com,
+        mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, ubraun@linux.ibm.com,
+        stefan.raspl@linux.ibm.com, davem@davemloft.net, yuantan098@gmail.com,
+        zcliangcn@gmail.com, bird@lzu.edu.cn, lx24@stu.ynu.edu.cn,
+        d4n.for.sec@gmail.com
+References: <cover.1781097957.git.d4n.for.sec@gmail.com>
+ <192d1b44ed358ca143f44ef167d14153bccc51e9.1781097957.git.d4n.for.sec@gmail.com>
+Content-Language: en-US
+From: Sidraya Jayagond <sidraya@linux.ibm.com>
+In-Reply-To: <192d1b44ed358ca143f44ef167d14153bccc51e9.1781097957.git.d4n.for.sec@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=XtnK/1F9 c=1 sm=1 tr=0 ts=6a315d41 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=pGLkceISAAAA:8
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=lELoO6ydEwu01aG-FtUA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE0NSBTYWx0ZWRfX3aLGkuxzoGY9
+ nQ8con6vPfodRZHjAhAtq7B5aqdrNqZ/zW0qc9cTwUNyO7feqwS+u93GPdt1URw8RBaxXpOj7Fr
+ X5L5sNG0uOvsEdMNpEHhj4AM9/jzwfR9FqMoCMa9ERnTStuqGDTDH2qa7X9zK/rSmMeKuqeG+Yd
+ 5SjnfYqRcbTsjn45nFVFAKULD9xAYG2xLe1yS27cjqDHy69YatG5RNatTXs0/hrgChj4oITUF6w
+ 3v8FqzTVHQ8nRpMef9lvHqBBN2Y9y4s7PqsC42x0eUwWBLZqAZkV8YHKsnTKmgqHtKMZ+LglcxH
+ tYXEtfqj1XiWDUbv0+K8bhv7FK/k6gAVU3Y9lttrfrAVjrDaCvd2fWmUa8lb5o6u58vVSQM5jCb
+ OLw6EhPzkZfPh35xxOAWH0+U+fxRN+1Nt0SahssZRagPtrnSjWWHgpdQrMsIIaxURF1Qq46iasi
+ zfnpjx4SqoLS2ZfwKjA==
+X-Proofpoint-GUID: c0J0dIn_JX-poNTUfy1y4PPQMiLBYcKK
+X-Proofpoint-ORIG-GUID: 34lRAMndiN_j3wEzws5yH02GX2zEQfeh
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE0NSBTYWx0ZWRfX3rX96ezEwEg0
+ ilxy5r6FKDjUmNWIbHrN5zKu99LrCKOY6GjYuY4WsN1epbalw0P14BA6EP8OBjj7uUIFPdQ2Bsk
+ hwc90HB8XsyAYAYu3aOpu4NKPTAtOgo=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_04,2026-06-15_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 clxscore=1011 malwarescore=0 spamscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160145
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299870-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:andrey.drobyshev@virtuozzo.com,m:linux-kernel@vger.kernel.org,m:kvm@vger.kernel.org,m:virtualization@lists.linux.dev,m:netdev@vger.kernel.org,m:mst@redhat.com,m:stefanha@redhat.com,m:maciej.szmigiero@oracle.com,m:bchaney@akamai.com,m:mark.kanda@oracle.com,m:ptikhomirov@virtuozzo.com,m:den@openvz.org,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299872-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:n05ec@lzu.edu.cn,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:wenjia@linux.ibm.com,m:mjambigi@linux.ibm.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:ubraun@linux.ibm.com,m:stefan.raspl@linux.ibm.com,m:davem@davemloft.net,m:yuantan098@gmail.com,m:zcliangcn@gmail.com,m:bird@lzu.edu.cn,m:lx24@stu.ynu.edu.cn,m:d4n.for.sec@gmail.com,m:d4nforsec@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.alibaba.com,linux.ibm.com,davemloft.net,gmail.com,lzu.edu.cn,stu.ynu.edu.cn];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.ibm.com:mid,linux.ibm.com:from_mime,vger.kernel.org:from_smtp,ynu.edu.cn:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sidraya@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[virtuozzo.com:email,vger.kernel.org:from_smtp,sgarzare-redhat:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,sashiko.dev:url]
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 63EF66907A7
+X-Rspamd-Queue-Id: 2FB80690918
 
-On Tue, Jun 16, 2026 at 05:10:38PM +0300, Andrey Drobyshev wrote:
->On 6/16/26 4:48 PM, Stefano Garzarella wrote:
->> On Fri, Jun 12, 2026 at 07:57:16PM +0300, Andrey Drobyshev wrote:
->>> From: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
->>>
->>> This ioctl is needed for QEMU's CPR (checkpoint-restore) migration of
->>> the guest with vhost-vsock device.  For this to work, we need to reset
->>> the device ownership on the source side by calling RESET_OWNER, and then
->>> claim it on the dest side by calling SET_OWNER.  We expect not to lose any
->>> AF_VSOCK connection while this happens.
->>>
->>> Signed-off-by: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
->>> ---
->>> drivers/vhost/vsock.c | 28 ++++++++++++++++++++++++++++
->>> 1 file changed, 28 insertions(+)
->>>
->>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>> index b12221ce6faf..e629886e5cf8 100644
->>> --- a/drivers/vhost/vsock.c
->>> +++ b/drivers/vhost/vsock.c
->>> @@ -894,6 +894,32 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
->>> 	return -EFAULT;
->>> }
->>>
->>> +static int vhost_vsock_reset_owner(struct vhost_vsock *vsock)
->>> +{
->>> +	struct vhost_iotlb *umem;
->>> +	long err;
->>> +
->>> +	mutex_lock(&vsock->dev.mutex);
->>> +	err = vhost_dev_check_owner(&vsock->dev);
->>> +	if (err)
->>> +		goto done;
->>> +	umem = vhost_dev_reset_owner_prepare();
->>> +	if (!umem) {
->>> +		err = -ENOMEM;
->>> +		goto done;
->>> +	}
->>> +	/* Follows vhost_vsock_dev_release closely except for guest_cid drop */
->>> +	vsock_for_each_connected_socket(&vhost_transport.transport,
->>> +					vhost_vsock_reset_orphans);
->>
->> In vhost_vsock_reset_orphans() we have:
->>
->> 	rcu_read_lock();
->>
->> 	/* If the peer is still valid, no need to reset connection */
->> 	if (vhost_vsock_get(vsk->remote_addr.svm_cid, sock_net(sk))) {
->> 		rcu_read_unlock();
->> 		return;
->> 	}
->>
->> IIUC we are not removing the guest cid from the hash table, so this
->> check will be always true, and nothing is done.
->>
->> So, is this call really useful?
->>
->
->You're right, and it's most probably an artifact from mimicking the
->vhost_vsock_dev_release() implementation, as mentioned in the comment.
->In our case this whole iteration is a no-op, we better remove it.
->
->BTW earlier I received some feedback from Sashiko AI reviewer, which
->also spotted that same issue (and some more interesting races):
->
->https://sashiko.dev/#/patchset/20260612165718.433546-1-andrey.drobyshev@virtuozzo.com
 
-Oh they seems similar to claude comments I included in my comment on 
-patch 3.
 
-Yeah, we should takes a look, they seems real issues.
-
->
->Apparently it only CC's its reviews to kvm@vger.kernel.org so you can't
->see them right away.  Just wanted to let you know to save your time
->here.  I'll send a v2 with respect to Sashiko remarks.  But of course
->would be great if you spot some more issues here.
->
-
-Thanks for pointing that out, but in general I try to do my reviews 
-before looking at AI reviews (both sashiko or claude locally) to avoid 
-to be too much biased.
-
-Thanks,
-Stefano
-
+On 10/06/26 11:24 pm, Ren Wei wrote:
+> From: Daming Li <d4n.for.sec@gmail.com>
+> 
+> smc_rx_splice() hands candidate pages to splice_to_pipe() without taking
+> references for the lifetime of each splice entry first. That breaks the
+> splice ownership contract in the VM-backed RMB path.
+> 
+> splice_to_pipe() drops unqueued entries through spd_release(), while
+> queued entries are later dropped through the pipe buffer release
+> callback. The current code only tries to take page references after the
+> splice succeeds, and it derives the number of queued VM pages from a
+> mutated offset value. This can underflow page refcounts and trigger a
+> use-after-free. It also leaves the socket lifetime imbalanced in the
+> multi-page VM case, where one sock_hold() can be followed by multiple
+> sock_put() calls.
+> 
+> Fix this by taking the page and socket references for every candidate
+> splice entry before calling splice_to_pipe(), and by releasing the
+> matching private state, page reference, and socket reference from
+> smc_rx_spd_release() for entries that never get queued. This makes the
+> SMC splice path follow the normal splice lifetime rules and removes the
+> broken post-splice VM page counting entirely.
+> 
+> Fixes: 9014db202cb7 ("smc: add support for splice()")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:GPT-5.4
+> Co-developed-by: Liu Xiao <lx24@stu.ynu.edu.cn>
+> Signed-off-by: Liu Xiao <lx24@stu.ynu.edu.cn>
+> Signed-off-by: Daming Li <d4n.for.sec@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/smc/smc_rx.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/net/smc/smc_rx.c b/net/smc/smc_rx.c
+> index c1d9b923938d..88aee0d93597 100644
+> --- a/net/smc/smc_rx.c
+> +++ b/net/smc/smc_rx.c
+> @@ -150,18 +150,23 @@ static const struct pipe_buf_operations smc_pipe_ops = {
+>  static void smc_rx_spd_release(struct splice_pipe_desc *spd,
+>  			       unsigned int i)
+>  {
+> +	struct smc_spd_priv *priv = (struct smc_spd_priv *)spd->partial[i].private;
+> +	struct sock *sk = &priv->smc->sk;
+> +
+> +	kfree(priv);
+>  	put_page(spd->pages[i]);
+> +	sock_put(sk);
+>  }
+>  
+>  static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+>  			 struct smc_sock *smc)
+>  {
+>  	struct smc_link_group *lgr = smc->conn.lgr;
+> -	int offset = offset_in_page(src);
+>  	struct partial_page *partial;
+>  	struct splice_pipe_desc spd;
+>  	struct smc_spd_priv **priv;
+>  	struct page **pages;
+> +	int offset = offset_in_page(src);
+>  	int bytes, nr_pages;
+>  	int i;
+>  
+> @@ -209,6 +214,10 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+>  			offset = 0;
+>  		}
+>  	}
+> +	for (i = 0; i < nr_pages; i++) {
+> +		get_page(pages[i]);
+> +		sock_hold(&smc->sk);
+> +	}
+>  	spd.nr_pages_max = nr_pages;
+>  	spd.nr_pages = nr_pages;
+>  	spd.pages = pages;
+> @@ -217,16 +226,8 @@ static int smc_rx_splice(struct pipe_inode_info *pipe, char *src, size_t len,
+>  	spd.spd_release = smc_rx_spd_release;
+>  
+>  	bytes = splice_to_pipe(pipe, &spd);
+> -	if (bytes > 0) {
+> -		sock_hold(&smc->sk);
+> -		if (!lgr->is_smcd && smc->conn.rmb_desc->is_vm) {
+> -			for (i = 0; i < PAGE_ALIGN(bytes + offset) / PAGE_SIZE; i++)
+> -				get_page(pages[i]);
+> -		} else {
+> -			get_page(smc->conn.rmb_desc->pages);
+> -		}
+> +	if (bytes > 0)
+>  		atomic_add(bytes, &smc->conn.splice_pending);
+> -	}
+>  	kfree(priv);
+>  	kfree(partial);
+>  	kfree(pages);
+Code changes looks good to me.
+Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
 
