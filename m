@@ -1,303 +1,206 @@
-Return-Path: <netdev+bounces-299819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299820-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id NxhhJIszMWqrdwUAu9opvQ
-	(envelope-from <netdev+bounces-299819-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:29:15 +0200
+	id 3QBsB+M0MWoAeAUAu9opvQ
+	(envelope-from <netdev+bounces-299820-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:34:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6D668ECA1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:29:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A618C68ED28
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:34:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=windriver.com header.s=PPS06212021 header.b="ClQit/Aj";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299819-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299819-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=windriver.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=a0CtzMkb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299820-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-299820-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B555A30262CA
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:26:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 22809300F47D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D14E3B71B1;
-	Tue, 16 Jun 2026 11:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ED9429817;
+	Tue, 16 Jun 2026 11:34:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011041.outbound.protection.outlook.com [52.101.65.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABE035A3A4;
-	Tue, 16 Jun 2026 11:26:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781609180; cv=none; b=IKz/XRVNkf3wrdH636cAPl4J5Wt6Xf/7vyIiKUrsnZ0Xy5fkdz4FF1HASgZCbzpXXOWsX7RQbcsEkEMQCpGnHXWHh6E1GOWRi7XjDyjjQgRMAPIW0z/y5q9ljkUu5DneQx8Kc1yZ1nxVSnxya0lUXF+bbj/jNRc7MOpUoYH8kdk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781609180; c=relaxed/simple;
-	bh=efx7XWElmJd88p4RMftNsq1OiTGNZLozSKi35RWSy1w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mUkdM047uk5l6ztF/8tcJH2wuqZl2nsXhk7zoYNCvHqIEmNJm0jB6t6oaOlf1D/1gC/ZlPsgrPiRU9vV9/s78pFhoqNkjsak9b4yEU+atVIz9m/bqoP1K1qWVy8DvRQ9yLL1Nh9Ne3hcZsS13A/w1qLShh8RcROFEUXrebTOZbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=ClQit/Aj; arc=none smtp.client-ip=205.220.166.238
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GA9gUI3485412;
-	Tue, 16 Jun 2026 04:25:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=OWNTkAmqB
-	XhQF0npwnONyVhan8vWqjl3QQ6BqCKD3IM=; b=ClQit/AjYloTczkRPRzdTcE80
-	xdXbjlzdLAcK+49tlHIAsefQIuy1MZMnnfgd0thLGHCZ4p0RLhtgWBx/1c9JMI4l
-	q9mFIp1sELUTHCEZ67mACN0UdRBCbuul4P2feDOxJCKp1sstwG7bHhV8e74tK1LU
-	XSahNv9TnPnZBOHOKp33aP+6LW8FicqR0YSyRQjfT2gmz8ZKbB6v+iVsGM6wwkjJ
-	5Ngp4ize2Fu2mjw3NEbTvB/zTvRXDmbumBvjJwbuEXGusajF8B9ZgnJrrEee5J0O
-	4mKhE2yMT+f7cJlmTKoGpuxTySOZkjzt0FsQFDJx1uFqQUehVD/YMKYL9XBIg==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [128.224.246.36])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4es6qdv5fe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 16 Jun 2026 04:25:43 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) by
- ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.61; Tue, 16 Jun 2026 04:25:43 -0700
-Received: from pek-yzhou-d3.wrs.com (10.11.232.110) by
- ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server id
- 15.1.2507.61 via Frontend Transport; Tue, 16 Jun 2026 04:25:41 -0700
-From: Yun Zhou <yun.zhou@windriver.com>
-To: <marcin.s.wojtas@gmail.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yun.zhou@windriver.com>
-Subject: [PATCH v3] net: mvneta_bm: add suspend/resume support to prevent crash after resume
-Date: Tue, 16 Jun 2026 19:25:40 +0800
-Message-ID: <20260616112540.4181231-1-yun.zhou@windriver.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E3B383C65;
+	Tue, 16 Jun 2026 11:34:55 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781609697; cv=fail; b=BY33IMSJqpqUogk0+b/n9o3WNhDdvWHzeV68qaGuwbXfqfpzmx8xBg19qmr/l2AgFGTgiFoABaRCsagLbqxBgGF1jV1o9g7rzGjrfLizHcopZDdgRd6iIqcoLOwiLgGX2Dih/BkQXct4T/R7S68uruXbMK3BHBnPBXK3igdAuFk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781609697; c=relaxed/simple;
+	bh=dYOBP7WcVgGeW1BwOCI36266Z4vIGjWACoHCK73Kp/w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MPkhV1JRqfXKh2Bsk6t0goWQbrgTa5uhhCVUXngbHxgWPboGmNmvCX3tDpCMMyyhJfhOcFZHe9FLiYmU55tYc/4yhTnw+gtScEr8rbFHC82Ir1P5w2za5MyTqEv2JjSYckLjKHhv7fF2WNkdA1pcv2ViqFfzUWhL+6XWRyl0j2o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=a0CtzMkb; arc=fail smtp.client-ip=52.101.65.41
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=chK/6kp4N0MaISIBWaLKM5TIZJKiItiNrEZQ3A9/qWzMS87JGAbP1KVQZLhANX5nr/Pv6ETbNOXsFfLTPIHlDlEsaOZBBW7JfLhY7+B1QuQ/vkaA8hYjrCYiQzJajWdmVIE53StGOm6SqZYbbhdhTWqFTFtpkHLURli5hHRa/PcYJtcB3ZiNiBZJVxik9wZD7sFVphPJi60bomGo97D59ZlhlBlVdOi3PyZoKqWiVVhTaodo4mK1KntpfOlFumMSySTapj7IV0u13qb147nmeifeCzP8aPMPlZyfZfUTX9nBhkLuLWOzESfsMcvdWqfRCrtNnmqPLanIl6zv3iicLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dYOBP7WcVgGeW1BwOCI36266Z4vIGjWACoHCK73Kp/w=;
+ b=cn9UtckKPsK9tMJ4bkVnF7QJbo6HeDJDVKPMAVoKCsOPpQ6M2hlkVwopy/CdS6jgFeFs0ur49Xpd2x6EH98DzLvbeuruX4yUcOIQMIUSuv9TINbeAAvv5V2ROOyoQXsJBpq+W8LkVcAAT9UNAC0ObAXFIeHs48gi2D2ihpFHapSDIqPCMurlr52mmrhD3InvQNjPXX6eLuK5gqByAPQSC53L9V1c9mbova9MNXQGay6F1M0iwnAOmtMZogXgh3a74+bUqteoo7IwCC3AGBCg0TqeAi9si6kDYCnQ1Yq0oaEx+w3jH4B1sx6XJJciRAjg0nkdywvPs452a1E3Nope7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dYOBP7WcVgGeW1BwOCI36266Z4vIGjWACoHCK73Kp/w=;
+ b=a0CtzMkbr5ygBsajHP54owWxkkvj7GmoCOoztYSinfgS/tDe/v+EyTvQ9WbKb7OB0I6YZkyBcvkaLB2BXGGVpnaY67cassipLRwfuQ8ejF52HhANCbRbOOI8Qu0uB+ZDhQY+a64+ffSvNu7ibCGQUjldGbWhB+dtGrkm9W6IhyqFdBBIPRmln4a9G+QZbX74vQ9vI8QMHp64bxYHFc5VSpuspptmH5f5/FK5RfUHFGwKa06srRavM9wCtsMjb0f9GFdFXJMwCBnvwzyiB6muc1OttdafIK+GAWBHYm9HCWjc4fTuJvCd6B19m/JbopkpUzXvFwdZH889dPlX7NKchg==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ AS8P189MB2467.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5ab::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.113.14; Tue, 16 Jun 2026 11:34:52 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
+ 11:34:51 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Sam P <sam@bynar.io>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, Jon Maloy <jmaloy@redhat.com>,
+	"bestswngs@gmail.com" <bestswngs@gmail.com>
+Subject: Re: [PATCH net] tipc: free bearer discoverer via RCU to fix
+ tipc_disc_rcv UAF
+Thread-Topic: [PATCH net] tipc: free bearer discoverer via RCU to fix
+ tipc_disc_rcv UAF
+Thread-Index: AQHc/NgOlS3jRPn6sEuvn9KJLah7KLZAzXLQgAA4rwCAAAY7Kg==
+Date: Tue, 16 Jun 2026 11:34:51 +0000
+Message-ID:
+ <GV1P189MB198826C04CB2DE2451B4B4F1C6E52@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260615150009.1734270-1-sam@bynar.io>
+ <GV1P189MB19887A9A37B5B170C112DF8EC6E52@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+ <fa2e0cfb-9d60-4295-8a46-f69ce1229094@bynar.io>
+In-Reply-To: <fa2e0cfb-9d60-4295-8a46-f69ce1229094@bynar.io>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|AS8P189MB2467:EE_
+x-ms-office365-filtering-correlation-id: 70d04100-6043-4507-6eac-08decb9b47d2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|10070799003|7416014|1800799024|376014|366016|4143699003|11063799006|56012099006|22082099003|38070700021|18002099003;
+x-microsoft-antispam-message-info:
+ 1c53HXXRt2N4eFlQWyks8gsn2+xmuSJjt+ct2BFaFSOsANQ5mt8u3On5E2Kq3ck2+M1PbTE/LhaLFcqG8Q5PtLuAOoprX0hGpR69K7vhN3amwvfNwq5lLy8Jth2OV8+t3yIwEcs8lnmAl3bIK1YHB/fcIlBjqXaD9G5WXrWQeMweDXHY9r9zlH8jP4gOt+TeKg99b414cxY6ff8C1y235U8ObgUWMxIVJOXwwRr9MJ2r1d6QN7nQnO/WUyfmLwTo0OQGgzCYy7aLvVFY5F889ns1dYcWBln2who3u891KS0QYZZ2E5/8yZs4UxrYTk4BNv1kNEsielNcKDv/cwfXJ2X/6MWdtb6Vxvs11EECvefynT1mlyYjSMKKDf4pybJ8BrNB05gQJWQBeFC+EEER4kYsGqzEX83TIqN80G0f8QFDmjNMSNwPR/pM/IoyI4UUm+8isQAZX2vTi4KntAKK7gYpNpAtZ6ZoAhbMah71ZfWEnmXeGhKc49N6MwhF+zGMn4vbftf3X3YH2qBSAvwHfOE5IuhDJaO0VUq1o/A6IdxzVaP4cEM+AI2mtPI9bOFoz85MfCzsG5BKDUQhmbOwPOKtFRz51p+jwxA/8Oma14Tg/KENa/eEjsnUYa9Z+ozYgFxETuq90xDvttZzYWiEBxuaAHdm8Lm91qdLhy6pV2WZ+F3qoVrSkCAoPXxaS+JVqdDRW+1v2MmpNV8k6J2xAJu773NiJtTHarS9la3bhYRRZM1I4TCqtn46otWkqg1O
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(10070799003)(7416014)(1800799024)(376014)(366016)(4143699003)(11063799006)(56012099006)(22082099003)(38070700021)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?S29rifIBdkLu75i8aKL9v46j+DmDtBECFy7mAGmah1uhPJga+y7qzAMPRc?=
+ =?iso-8859-1?Q?eiJW2rfe/zAls2zUpYF6oWKKuJTZ6/Gesg3g3eBvGgs9Z+KEuNwB8LAodl?=
+ =?iso-8859-1?Q?bbjOZ7vZw79HFGSP3XAWn3t22Kh5q2bx+C8V4RQTFLG1fJqGacd3XzNzff?=
+ =?iso-8859-1?Q?8xGiRkZGt7HkHF5XxxkdXOoG1TibInN6c0dfOAtU2gc4vO2x8KMJQHaUfv?=
+ =?iso-8859-1?Q?V6ueO7G7xyLyte9oJsJ2nnluo9B50aCqgDF1xBl1ZH4frdkYyeGCyewxul?=
+ =?iso-8859-1?Q?yUdEVN+3wBYpl7ucv4xgHaLEijnJqpwlthQS3q9cZCHlGTF2n8iSZ+T+hs?=
+ =?iso-8859-1?Q?h58QMKjAw/csUMYbqbDwdk56BGyBM/+DxICqdNmUOlH8cwdUhYw8f80NYY?=
+ =?iso-8859-1?Q?NlgGM+n7XSP8F3c5zDRaHdkCBUIhoXh5O8fcVzXmvFmmTBh7i/pezuSbaJ?=
+ =?iso-8859-1?Q?Lfc4BATysCdDrFtPOx6rx5oU2erRHbiT878aIx4MjC20WInWKbbLjg/SrP?=
+ =?iso-8859-1?Q?wJcxlapBzple+IjDIuojj9iNlSlY3f1O5+cqSX6S6PNeCjgBB7zS1vlG3D?=
+ =?iso-8859-1?Q?x0oe9jkKePPyBjohuCkQ/OkyMI+HHJpuGUQw/x/KSyPjzP3fyfI5mrlWyk?=
+ =?iso-8859-1?Q?F81r9MdmGdZqr7VRpIujIzmdeo4mNQtekwRdksvGcpeqIWBpysK8alBzAK?=
+ =?iso-8859-1?Q?1EjZ/w2OiSfekQMu2kQD69ixgEWskK3ngjFuNfrfC6eHVhIZlJ5CKFW3ZA?=
+ =?iso-8859-1?Q?LbkCT4/XxHiTVvrrS8F5ayq3jwf7/lTC2KKMRn7g3BRCRMP2IgmR1oB1tr?=
+ =?iso-8859-1?Q?xJM5hsuQx7ajilDTnYcDLOTJod478eteiGxCpCzPyyBMI1gnNhRJN7cME4?=
+ =?iso-8859-1?Q?8P/VFCEQNVJOsFAu3ld54MH4JwCbw+I7XcYJHKnZmjPx/D3uQntMKJlXvf?=
+ =?iso-8859-1?Q?OdP8gnv1/uiUX8L9RmBEElJdeQNmt28pG8Km5TZGlsUwEh8JIoxku+fe7Z?=
+ =?iso-8859-1?Q?ONYWEnRg8vB9AzxrESHXzgBGs/f5XewrZ04Vbh7bSzGqs7QeF2dYnc+xo2?=
+ =?iso-8859-1?Q?aRkqPB+F6fSx7jJCZrQ22o21Xk74PH6VMU0EV8tByBmynqlhbAL7oj1T9Z?=
+ =?iso-8859-1?Q?H88aEp5K9RrByS/Xxy3D5jlfA4mp0kBoKCooR6/VO47RxB7M/vOF3HPQdz?=
+ =?iso-8859-1?Q?Lmlwmnxke3dSV3YjcLJsg8z/93KPnn/oQrGPRJeAeYdQrwQomLDi+7H8HA?=
+ =?iso-8859-1?Q?jA4AXo4Ka4E9xbmA36KT7gHMs7PLoJ7MqwZlnmM44BEeCB3rSiib5lSoFg?=
+ =?iso-8859-1?Q?15a94nwWY1+hgq3+Kv4YqBk23V/9YUNRxl9H5Sx9ZUIkL29ibGgWOt0eLD?=
+ =?iso-8859-1?Q?TrIM1B8HYDVf2/BW0S5D+/1qwLd5xlrmijt8NgWffTAvpjxOlmlpgn+5B4?=
+ =?iso-8859-1?Q?TfP/1AqmdJc3DPYf0Tzqjpg5n8W5HxI5hWHUR7nW4u0OF+/pi3ijQchXwF?=
+ =?iso-8859-1?Q?2/3Gy3otGIELzMyaN4ZLK7L0IJaoCRJS+vN21pPBAE+7hPHxnCmCS7EMPn?=
+ =?iso-8859-1?Q?pWnHJcxcLM4nmUjIcXyetd5Y1YDxHb6noyf/p2OhakatGtbGVN3qDXY3p3?=
+ =?iso-8859-1?Q?C/yBqcRCTtNrPE8PHKQ3DjMM9lBpbiFc1dQwj8tZlGQV43OlRVobB8KDVh?=
+ =?iso-8859-1?Q?QAt4C2K7Ic+GE4KwqQoIhv7o338IMYrkec1FSCe09x/WVlIp0X13wNiWk+?=
+ =?iso-8859-1?Q?folHF3WBPzkGxrZdgG2GXZS3UVXkMfPNLBFEtFzL545DO3zb9xz6ycG7Mc?=
+ =?iso-8859-1?Q?xAEbD669W/3MusMQ70+Gw2IJBnDAL25Zrd08X/j8PjA/Mw+I9KSi6AbMG3?=
+ =?iso-8859-1?Q?+Q?=
+x-ms-exchange-antispam-messagedata-1: xbmkPBfEKPVw1g==
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=DLq/JSNb c=1 sm=1 tr=0 ts=6a3132b7 cx=c_pps
- a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
- a=iKiJcTA2PjBS6x5JeXcw:22 a=t7CeM3EgAAAA:8 a=O8BtC7tisV2pxISLYgAA:9
- a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-GUID: Hb2sP49QmfHfgWh8ZVYC4rPzB1u63ckT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDExNiBTYWx0ZWRfX9/frBmOXV0o/
- JHbcOnaI4fr/XpBTRW412DtUzF2uRSPCPb/pNX7EhHbdksfw7ZEJJ3tCAh17sdzuIjL6Gm8UCic
- YOHxXQJ/AmaWvCssS/k9BkpT16V0rn2HQ96Nwq4aIyAq6eGoHMonj+Jyxty9InWxWG7BjJXdt74
- 1b9isTZTsw3jHF8Dpwb+SBe8lPwVtgO6Bd1qJqDuKkj8ya9dgsJYczGGI77iXlV8uyMMJuX5ijL
- zdmwMxSb/dt/na9oWHS3TBvaPUNXPMQeo0EWyeQ1RWKoZVo9l7wc546OoybjdhoOC2evvLyZw3K
- mAcvG4wrYi48mW1Ha/TGr+oXcV0nriCp39bPeqycPbMAFu9X6K7y1d2MnsrTvIVA36wxiFEwmTQ
- 6C4SLyKF22OAzlIpLH6kquOEyOubYtsyWOJ9wl77gKu0g2MW8UuAkhOZkPfGmM19uqCdsA/M1G1
- +iFUVbPbr73FCQ/pz5w==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDExNiBTYWx0ZWRfX/ozY3MtnS2YJ
- 6RwC2nlmjsOl3KhXP3qTMOGmvDm0P607UO8RHNJXxSnxCE1k4AjcdE3TUmxtxM/Z3mNPtsH3Hdi
- DU5aLXPG4QRmaymBNXNm7HFULVtZ06BWTofsRwrDsuV7HFYGeLMy
-X-Proofpoint-ORIG-GUID: Hb2sP49QmfHfgWh8ZVYC4rPzB1u63ckT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_03,2026-06-15_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 suspectscore=0 phishscore=0 adultscore=0
- impostorscore=0 spamscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160116
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70d04100-6043-4507-6eac-08decb9b47d2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2026 11:34:51.7940
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: d0nwXjGtMlehI/++NX9yW1YnXa30iK/6kTEHdMj9rfTOy8Lll7JVuaNFSO+Ywkw+YP9MbHcxjeZZ/2jvuaz/+KGMk+/ujpPgqMRl6leqWiI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P189MB2467
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[windriver.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[windriver.com:s=PPS06212021];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_NONE(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299819-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yun.zhou@windriver.com,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299820-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:sam@bynar.io,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jmaloy@redhat.com,m:bestswngs@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yun.zhou@windriver.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[windriver.com:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ALIAS_RESOLVED(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DMARC_NA(0.00)[est.tech];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.sourceforge.net,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[est.tech:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,est.tech:dkim,est.tech:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 7B6D668ECA1
+X-Rspamd-Queue-Id: A618C68ED28
 
-The mvneta driver uses the hardware Buffer Manager (BM) for RX buffer
-allocation. During suspend, mvneta disables its clock, causing BM to
-lose all buffer address state. On resume, mvneta_bm_port_init() re-
-attaches the BM pool to the NIC, but BM hardware returns stale/garbage
-buffer addresses. When NAPI poll processes these buffers, DMA cache
-sync hits an invalid virtual address causing a kernel panic:
-
- Unable to handle kernel paging request at virtual address b0000080
- PC is at v7_dma_inv_range
- Call trace:
-  v7_dma_inv_range from arch_sync_dma_for_cpu+0x94/0x158
-  arch_sync_dma_for_cpu from __dma_sync_single_for_cpu+0xc4/0x15c
-  __dma_sync_single_for_cpu from mvneta_rx_swbm+0x6c8/0xf48
-  mvneta_rx_swbm from mvneta_poll+0x6fc/0x70c
-  mvneta_poll from __napi_poll.constprop.0+0x2c/0x1e0
-  __napi_poll.constprop.0 from net_rx_action+0x160/0x2c4
-  net_rx_action from handle_softirqs+0xd8/0x2b8
-  handle_softirqs from run_ksoftirqd+0x30/0x94
-  run_ksoftirqd from smpboot_thread_fn+0x100/0x204
-  smpboot_thread_fn from kthread+0xf4/0x110
-  kthread from ret_from_fork+0x14/0x28
-
-Fix by adding suspend/resume callbacks to the BM driver:
-
-- suspend: drain all buffers (with DMA unmapping), free the BPPE
-  regions, and reset pool state to FREE before stopping BM and gating
-  the clock.
-
-- resume: enable the clock, reinitialize BM defaults, and restore pool
-  read/write pointers and size registers. Pool allocation and buffer
-  refill are handled by mvneta_resume() through the normal
-  mvneta_bm_port_init() path, which sees pools as FREE and performs
-  full initialization identical to probe.
-
-Add a device_link (DL_FLAG_AUTOREMOVE_CONSUMER) in mvneta_probe to
-guarantee BM resumes before mvneta and suspends after mvneta.
-
-Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
----
-v3:
-  - Restore per-pool POOL_SIZE_REG, POOL_READ_PTR_REG, and
-    POOL_WRITE_PTR_REG in resume, since clock gating loses all BM
-    register state.
-  - Check device_link_add() return value and emit dev_warn on failure.
-  - Replace SIMPLE_DEV_PM_OPS (deprecated) with
-    DEFINE_SIMPLE_DEV_PM_OPS and pm_sleep_ptr(), removing the
-    #ifdef CONFIG_PM_SLEEP guard.
-  - Add dev_warn in suspend if not all buffers could be freed.
-
-v2:
-  - Drain buffers via mvneta_bm_bufs_free() in suspend instead of only
-    stopping BM and gating the clock. This ensures proper DMA unmapping
-    and avoids buffer leaks.
-  - Free the BPPE DMA-coherent region in suspend so that resume takes
-    the full probe-time initialization path (alloc + fill), eliminating
-    the need to modify mvneta_bm_pool_create().
-  - Reset pool type to MVNETA_BM_FREE in suspend so mvneta_bm_pool_use()
-    correctly re-creates and refills pools on resume.
-  - Check clk_prepare_enable() return value in resume.
-  - Add device_link between mvneta (consumer) and mvneta_bm (supplier)
-    to guarantee correct suspend/resume ordering.
-
- drivers/net/ethernet/marvell/mvneta.c    |  7 +++
- drivers/net/ethernet/marvell/mvneta_bm.c | 58 ++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 0c061fb0ed07..b4a845f04c05 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -5678,6 +5678,13 @@ static int mvneta_probe(struct platform_device *pdev)
- 					 "use SW buffer management\n");
- 				mvneta_bm_put(pp->bm_priv);
- 				pp->bm_priv = NULL;
-+			} else {
-+				/* Ensure BM suspends after us, resumes before us */
-+				if (!device_link_add(&pdev->dev,
-+						     &pp->bm_priv->pdev->dev,
-+						     DL_FLAG_AUTOREMOVE_CONSUMER))
-+					dev_warn(&pdev->dev,
-+						 "failed to create device link to BM\n");
- 			}
- 		}
- 		/* Set RX packet offset correction for platforms, whose
-diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ethernet/marvell/mvneta_bm.c
-index 6bb380494919..85162a43eaf6 100644
---- a/drivers/net/ethernet/marvell/mvneta_bm.c
-+++ b/drivers/net/ethernet/marvell/mvneta_bm.c
-@@ -477,6 +477,63 @@ static void mvneta_bm_remove(struct platform_device *pdev)
- 	clk_disable_unprepare(priv->clk);
- }
- 
-+static int mvneta_bm_suspend(struct device *dev)
-+{
-+	struct mvneta_bm *priv = dev_get_drvdata(dev);
-+	int i;
-+
-+	/* Drain buffers and free pool resources while BM is still clocked */
-+	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
-+		struct mvneta_bm_pool *bm_pool = &priv->bm_pools[i];
-+		int size_bytes;
-+
-+		if (bm_pool->type == MVNETA_BM_FREE)
-+			continue;
-+
-+		mvneta_bm_bufs_free(priv, bm_pool, bm_pool->port_map);
-+		if (bm_pool->hwbm_pool.buf_num)
-+			dev_warn(&priv->pdev->dev,
-+				 "pool %d: %d buffers not freed\n",
-+				 bm_pool->id, bm_pool->hwbm_pool.buf_num);
-+
-+		size_bytes = sizeof(u32) * bm_pool->hwbm_pool.size;
-+		dma_free_coherent(&priv->pdev->dev, size_bytes,
-+				  bm_pool->virt_addr, bm_pool->phys_addr);
-+		bm_pool->virt_addr = NULL;
-+		bm_pool->type = MVNETA_BM_FREE;
-+	}
-+
-+	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK);
-+	clk_disable_unprepare(priv->clk);
-+	return 0;
-+}
-+
-+static int mvneta_bm_resume(struct device *dev)
-+{
-+	struct mvneta_bm *priv = dev_get_drvdata(dev);
-+	int i, err;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return err;
-+
-+	/* Reinitialize BM hardware; pools are refilled by mvneta_resume() */
-+	mvneta_bm_default_set(priv);
-+
-+	/* Restore pool registers lost during clock gating */
-+	for (i = 0; i < MVNETA_BM_POOLS_NUM; i++) {
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_READ_PTR_REG(i), 0);
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_WRITE_PTR_REG(i), 0);
-+		mvneta_bm_write(priv, MVNETA_BM_POOL_SIZE_REG(i),
-+				priv->bm_pools[i].hwbm_pool.size);
-+	}
-+
-+	mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_START_MASK);
-+	return 0;
-+}
-+
-+static DEFINE_SIMPLE_DEV_PM_OPS(mvneta_bm_pm_ops, mvneta_bm_suspend, mvneta_bm_resume);
-+
- static const struct of_device_id mvneta_bm_match[] = {
- 	{ .compatible = "marvell,armada-380-neta-bm" },
- 	{ }
-@@ -489,6 +546,7 @@ static struct platform_driver mvneta_bm_driver = {
- 	.driver = {
- 		.name = MVNETA_BM_DRIVER_NAME,
- 		.of_match_table = mvneta_bm_match,
-+		.pm = pm_sleep_ptr(&mvneta_bm_pm_ops),
- 	},
- };
- 
--- 
-2.43.0
-
+Subject: Re: [PATCH net] tipc: free bearer discoverer via RCU to fix tipc_d=
+isc_rcv UAF=0A=
+=0A=
+> Oops, I missed that patch! I'm not sure what the etiquette=0A=
+> is in this case, but I'm happy to defer to the original=0A=
+> submitter (CCd) if they're working on a new patch and/or=0A=
+> add any appropriate trailers to my v2.=0A=
+=0A=
+> I've prepared a v2 to submit after the ~24h period,=0A=
+> addressing your changes and taking into account Eric's=0A=
+> feedback from the earlier submission as well=0A=
+> (adding an rcu_barrier() in tipc_exit()).=0A=
+Eric's concern is correct but it needs to be addressed in a separate patch =
+because it is a pre-existing issue. It requires another reproduction (load/=
+unload TIPC kernel module) and other considerations (calling call_rcu() fro=
+m timer etc.).=0A=
+For now, I think you just need to address my comment.=0A=
+=0A=
 
