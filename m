@@ -1,260 +1,200 @@
-Return-Path: <netdev+bounces-299720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qkiwHsC2MGohWgUAu9opvQ
-	(envelope-from <netdev+bounces-299720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:36:48 +0200
+	id 7WoAL3HOMGokXgUAu9opvQ
+	(envelope-from <netdev+bounces-299723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:17:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E257A68B81B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:36:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF0168BD33
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:17:53 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=oIb8oL4p;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299720-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299720-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=google.com header.s=20251104 header.b="Wi/gPJIN";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299723-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299723-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D7A3630268A3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:36:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E8795302E42F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B8E3C13FB;
-	Tue, 16 Jun 2026 02:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CC73C661C;
+	Tue, 16 Jun 2026 04:17:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012026.outbound.protection.outlook.com [40.93.195.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BF83BD246
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 02:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6223B2FC7
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 04:17:49 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781577386; cv=fail; b=dF+di8BbSGlRBuFh03lubHUNplQcIFoFvgIyFmghZjHULGKppLwlpcHJt6rysr3++3jIJTJHoG5qkO/mJW+06J10PhkJ3DJIOcueGlCtlftoi4cfQ6qQeeEwp+n24plzaDvQJScyBpEpdfdYPt40942k/gAlOQ7WrvRHinPeKNQ=
+	t=1781583471; cv=pass; b=dDgqV5Alkshaj+xwG3BP6ZE1/kN5Mt93gYE65O99uu1h3RhsQg0jOuKUIe1v5m1M6lSYqVMhIncEuqzIkcrL7OYI4cVbMDbFfBVqGM6JM829xDkJ2f/Q5BBNxWPfp2fjiV7Mj9fZiQfjoTeOH7BEl3O6Rv2M7BXtGvAAuQ06SDQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781577386; c=relaxed/simple;
-	bh=rfAOxP/63Lmj4dqleoEYOytf2gdnr1BtLWG8DkM1Hzg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lqv5szM0e+gvDRET2qIoVObOTXl7qEWimFcvBGlCw4ivsAO7hSM4HhoLneH8CQaFGVyg+eFWCzhQJ7QH26JZJmEVxxEndy1SIO+ZvIu4iLjQ/n+cEImF4G7ZovhSx+fLB2TH//rkomN3twK0aOPu55WXryrWGhhuFeXN524wkV0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oIb8oL4p; arc=fail smtp.client-ip=40.93.195.26
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HP7TEkgFMOHZau54Zh4RMfbS71KF3btNrNING6xBWUUima5UMsZ9+Zto13ytefUG/avDZqnPRPqUYCWO7ISPk54SmQ/nxRXvO7vfg0AjAhqIO39HHDhmSHmxH9Qs0fCFPYVPxkzVT16XNTgGFmgaStNUyvUhV8KilsZPsKjlEN5+OTMe8JwwjFSBP+4r3ctuGqFtDS9H0YVfnMt44eu3ib9ets+BQq8IMadx7s/kW5QCUubpovnjhAGmB/caG+nxOp4GA0zu2KUmzPEuLtIoEIeXfR6S6xmnLwD97TwgF0K8lXfpDO1VDh5xc18/OrpvCE79yJZ0Yi7Q7yAZZsNeUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N5t4VRzlO8lDnqlMg/d6wVkamHw0p/eLGhhE6joHols=;
- b=HZ/co2YLvtQ3WA1orEtaneS3k8Yg6cmkByeXYS756nfu8zJhCswCiEdefq3IxwS2+hB4D5hYNZ40aleLaio3HrKr9se91nhM6g69IknSYiMMN9LeEZaK4/2WeYRnhrkZTcIH9fQ88QpfNp2qdeMEl93QyQYwPY3aexAWohMBqoUg9lx1LRNZ/5irp9vWa086IyqeFv+2oPByQobnkDThPk6RRwDzluSfQobK+YTSnwIRjifoJryMmS+fHbC95BFxC5jMelVTAmohd6d+YBeTkhSaGLvoup70ukMarWl2lK0eNhmYchzYpGqxm5xDhgeTxCGAAttcsMLMIMuF3/dWIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N5t4VRzlO8lDnqlMg/d6wVkamHw0p/eLGhhE6joHols=;
- b=oIb8oL4poSEzBUYytfHnv+2+eYDS3ta/tTq1spppTxUshq4/322HCzlkZLkKW7KKXvT3jl2EG1tDrH6Zx2PIrwRzjC2lcYXuSoyymTNdqhwKqdva+BuTE5Iotf4CEL534SX2DbrCj+U/eDgH8QtzukPOchgqSf5/nEi4C+0mI/U=
-Received: from SJ0PR03CA0151.namprd03.prod.outlook.com (2603:10b6:a03:338::6)
- by DS4PR12MB9660.namprd12.prod.outlook.com (2603:10b6:8:281::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
- 2026 02:36:21 +0000
-Received: from SJ1PEPF00001CE4.namprd03.prod.outlook.com
- (2603:10b6:a03:338:cafe::3b) by SJ0PR03CA0151.outlook.office365.com
- (2603:10b6:a03:338::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.18 via Frontend Transport; Tue,
- 16 Jun 2026 02:36:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00001CE4.mail.protection.outlook.com (10.167.242.20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Tue, 16 Jun 2026 02:36:21 +0000
-Received: from amd.rund-run.pensando.io (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Mon, 15 Jun
- 2026 21:36:20 -0500
-From: "Nikhil P. Rao" <nikhil.rao@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <kuba@kernel.org>, <brett.creeley@amd.com>, <eric.joyner@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <jacob.e.keller@intel.com>, Vamsi Atluri
-	<Vamsi.Atluri@amd.com>
-Subject: [PATCH net-next v5 6/6] pds_core: add debugfs support for host backed memory
-Date: Tue, 16 Jun 2026 02:35:54 +0000
-Message-ID: <20260616023554.258764-7-nikhil.rao@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260616023554.258764-1-nikhil.rao@amd.com>
-References: <20260616023554.258764-1-nikhil.rao@amd.com>
+	s=arc-20240116; t=1781583471; c=relaxed/simple;
+	bh=UDM9Y2Thjnqa8K+lbXnfW8bZvgfvx5z0YeGl85VJOIs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lzIqb/KdATNu7/MbGMRWpSKd7jb1821BPw6/XK1iB0OmCHzMaoh+DpgvunAP44SEDWI6v3wX5m6YKAr0KtxaeEgpOz0J0WwZKMHWWAylyu+0TsIyEnxNo6bvtLmiANhVx4Yil59LmnGRoGoPfoe9fZts027uItW+4cL6h3c9gdw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wi/gPJIN; arc=pass smtp.client-ip=209.85.219.46
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8ccea53f35cso52313136d6.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 21:17:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781583469; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kvKFea5jlg6a7Lg8l8xrj8QsDsQBlEXbla6EOAxOZBuSP8mltomtgkYUdvHnl6en4V
+         Yn3ZBBHhEy1YpGHrR2ZZ1fTLBpJDgW1CTlMJPrVi4nROXw4/jJfnzYvtY/OKQe9ZKtA7
+         RdGm7KPvL6TMcm4iNqKt1RcjNLj6C/gVrYEXm0I8E03bdTnqkFK2rdMTG/r+g9opslXK
+         bUhePT/zxmKvcGzYAazUjrt1gchLD2zVd5gRTUqdTZZyuL7gahbU0bdvSqcChAKngXL3
+         llg082Glb1b4Gde+Ev2tye6BcjJSko/EVvaBDsEiYOsdX8ItVDtEnTqvyppWUqHD4BlY
+         kOhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=c46bC46uTOFVqkvQFgPWAgxQbVfvX2mDmBYTQGj7PhI=;
+        fh=j1Yb9VKL3YYlaaZym6beZyfjf2162eSrhodoPO7+Ok0=;
+        b=ENPLE8oyC1yk2JZf32RhezgIL0WAQCI173d0OKTuzyqa6TvhfMeCMVQV9eJY1bF/Tw
+         LACzZ0n55PgkdI3K5QMbCHzF5JuFj1gUOA0AJCckdNpXC3SZJJQukCZVuAatuiTubHUh
+         6o6DS9wuP3dMAHMijvjhcv8r55iNi1BVMPNULH2mFZxIDqw1cj4mNgaqJXamV/hDg1wI
+         Of1XwbFt8MPh0dBb8saL7lIRTHm8FucWTW7C6flyDfrJEEv15Gi14IdU54lk11f8g00M
+         XfLasxCKiFoLMqmXXGkaU/dDfr445PT91eHY9qvYPk2RohgAv3z8xG+QqRvNKKdxbK1H
+         xs/g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781583469; x=1782188269; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c46bC46uTOFVqkvQFgPWAgxQbVfvX2mDmBYTQGj7PhI=;
+        b=Wi/gPJINUEZynzRG0s8wVE0qlTVMsvjsu16XDuxjNONko5WX2hqUHfVONZPatBsY3N
+         hHJ4aN9IQARYICQ2gW6uPSUw7ETsdfPOJy648bUf9WE49CrbJLh4WgCDARLBONx8oRHw
+         8IxfL1WmKi22DuNqD/MOhrRNXPpDpDfIYtnTJHnbC28A+v3MUxXqWDFXOhFHA+gNqprv
+         m79BMEktbJajRhuxu96mNVgSxu2+xihxuchZ6d8c/NH276QqZ6ClFA8kM1KGYd+aKXT7
+         Y5pCgsbZICwdG9mwcJnnyHWqkWRGtGKKuX4W/UREXIFi7tEQV0dLlamyBUGtlx3qKAmt
+         ivgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781583469; x=1782188269;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=c46bC46uTOFVqkvQFgPWAgxQbVfvX2mDmBYTQGj7PhI=;
+        b=VmaQxamJJciLhFlLE6buSXQYeZmNK47juqfIxLNDozUaDQt/nYb0Y+eBuEPdoKyR7S
+         fRQZziIE5AHU1a/fqM7nR3cAKcxwDd7A/38iBaZveE7ZE7nhlU9rLBoIuu59fppJOmn4
+         RyZUq3Eu+cpLXPkLqjvjA3kHBOtC0QndO6wHfOLzVFg3lIBCiAkqRfw4LAeaob8+Tx2D
+         F5bXdz9wrcYeY8fhIbTbPIeTgoJD5c7WKZkPNN0wmqkC2fv/fUkiaM1YLZOMDPOIVkxP
+         j6aH225nNX3uxdZp+q/nRH4mk9MxLXNXKrF5SFhcW/DELAucPASMG4vCggeksxjNQZRx
+         Y6Vw==
+X-Forwarded-Encrypted: i=1; AFNElJ8ae7gzL00gfUGrrIZ6U1+ynCitlS0IsmS5IozPdIZVHICqmT1sPmiZcUocDj8Uz7H2td5W3I4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBym29B0vt3FIi6Y9xgEjvZOQDrNfgbdi5v0KEPLqDku17V5ho
+	fOynjik0mBdwa9aKmKAX5yWHfqEvHAbt4wDHR/mFD45G+yi0YuG3KMgxsnVAUbsJenaqvGECq0H
+	N1BPYHqBW0QRj7RHFc2hvAQFIGyJK19R5brvwpQRQ
+X-Gm-Gg: Acq92OF1tQX4PH4rGCNuFcNx6iHuy1+hgf6gDwuu2frYsu4PARDWd3Xsep6CFQN6q07
+	t0nQDKHGTTtxpIHJaIzsWbB5C8VZyWXvP1rTeEDxImEt1Wgi/7ZGKG0n3AqM/cAG8BH0M1DBB54
+	ySHDzTgZF/Z3qRSMTUUa2MyLq6GAEgwunLMnBrbkSILhimEtLaEYwcq+l5ljGkvkX3/qT0ByMAV
+	k37komelEadfuS/wPC7efdwzeVBC4MhH5BkFysfDMX6K4uFFtM/+OSNB+3i8hAt2YE5wDYKfqJY
+	mujsa+XzkHt7wZoUnB7SGazCwyTeJaw5rMHUtUaNzjZ5ZikTxoa6rAyKKS4gCS+ay576rWVzG0/
+	e2dOg3znv3+isZQxy70SgcJXZShKy
+X-Received: by 2002:a05:620a:1a07:b0:914:e3dd:17ea with SMTP id
+ af79cd13be357-917ee4d8a24mr2288565585a.12.1781583467792; Mon, 15 Jun 2026
+ 21:17:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE4:EE_|DS4PR12MB9660:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa6c793b-9693-46d2-ee49-08decb500d54
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|82310400026|23010399003|1800799024|56012099006|11063799006|22082099003|18002099003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	gRHIu3lLsMfxEWev5QRZyTfjYj+rXkBy7d/s8mBxnMMLRNeMuAvvKFwl9phH3ikRs/hW19aEkxs70oI+X5TznMMKYcykgtgT+MDiIU2AN0epthDocCUjCRUPcSQZgaTaNGIAHVCV2Y3ztnn8zs0qIjPv0JyrfYv8T5RthMXlR2/upWUvUIv9q+6eq6o4uOuYRSVTZv2zDfpVYVMeoa3lFFMamoC/WFfT4gnS3kcNzESlr/csbSbCQnJOA/3PS1ehES5396qgnYuHqcdAMPAcni7/6AFNkl4nGWclU6oZKxhHUaNBXKI3S7g6tRa9pRnpGjYKzld3V+NzjTJtPPj+WKxHHdIYB2yIhjl8qkOmBktjSEpyfTqAAzKV2zZe6sjjTTXjdqmiUD1TdfpXo86VuoydzY12J4sN+i5chzGZ4GwYQv9NuPCMxZJLOGHmQrFfD31msvhfVjPs9EXrOSf3M6B3RyyLsvAkvkrK7axr0pHM1MPyGF6f3eoBC5iyRsoZla+tgb7s/7RstlUDnVIiuuzc5PUJWr14W/KRVrIOgsRlkc3frtdNl6rfEcEYqB6VCYNu7gbOkT14tYm3gBevch+erOSEnLoUZ5SapiNaZN0b6TnEcfqJPP+lDHJPEAQYZxeexM6Mz7X0Eg4Zkp1i6duV++1RqMhZZ5CO4//SlN3d1yd8D3A9noxorBmkWWJ9JkbmucfPWTzAl8Zjlax8D8wcqa9yRatIEyuTHSxHhLs=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(23010399003)(1800799024)(56012099006)(11063799006)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	MtNAJyugBpG1LLIa7Dh9DrKwIV26zPW9fUvqisPeqDnopsXHvIWHiDDLcZKMF2bEM6Lt5pZgb0IdXtGmTtMQOwa9splZBMtIhqeloAxVlyRnXbpy53ivjh+NxWeRtdPaU2fgGZmzjnZo+ZVDxQJehX8zYcKu0KouZnkN/fs+s1gBzVqtCToXQ+FVVCc327HaxrC7DjERaRiLxAvn2m+T+XV1NaTBQB8fSclObvWAaG1zQZcn+QadzfbXz7DZuOXdbNfcbgnXJ9PE4n9iHM9VrD4pBF+ObW4qVk/d9hnY72ZVndvMAf70U1zKz0Z5XWNGB5EmnC5MljNbqo9wDpnQIxrFtOpkMTH/zz2tQH5ActelwE2PfSJeKgxDPmXVg52UFiJjWM5jUzfECrlaW9dguTu57HLBNQ1qT6FqRfIvoR/m4IGalJvqpAi+Yt2WQ5/F
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 02:36:21.3327
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa6c793b-9693-46d2-ee49-08decb500d54
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE4.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9660
+References: <20260615234220.3946885-1-lrizzo@google.com>
+In-Reply-To: <20260615234220.3946885-1-lrizzo@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 15 Jun 2026 21:17:36 -0700
+X-Gm-Features: AVVi8CfmRRXK2sLRb18EI2J6HVHIs23OmkonKcsJiFmkB68hhvaCXbcTPeeXIKM
+Message-ID: <CANn89iJabdK5rDpZ8NEXY=_hF87dpjqksh4SRruGnZ=pReKTiA@mail.gmail.com>
+Subject: Re: [PATCH] swiotlb: avoid double copy with swiotlb on tx socket
+To: Luigi Rizzo <lrizzo@google.com>
+Cc: rizzo.unipi@gmail.com, m.szyprowski@samsung.com, robin.murphy@arm.com, 
+	willemb@google.com, kuniyu@google.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, gregkh@linuxfoundation.org, rafael@kernel.org, 
+	akpm@linux-foundation.org, david@kernel.org, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, iommu@lists.linux.dev, driver-core@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-299720-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:kuba@kernel.org,m:brett.creeley@amd.com,m:eric.joyner@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:jacob.e.keller@intel.com,m:Vamsi.Atluri@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nikhil.rao@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299723-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:lrizzo@google.com,m:rizzo.unipi@gmail.com,m:m.szyprowski@samsung.com,m:robin.murphy@arm.com,m:willemb@google.com,m:kuniyu@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:gregkh@linuxfoundation.org,m:rafael@kernel.org,m:akpm@linux-foundation.org,m:david@kernel.org,m:netdev@vger.kernel.org,m:linux-mm@kvack.org,m:iommu@lists.linux.dev,m:driver-core@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:rizzounipi@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,samsung.com,arm.com,google.com,davemloft.net,kernel.org,redhat.com,linuxfoundation.org,linux-foundation.org,vger.kernel.org,kvack.org,lists.linux.dev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E257A68B81B
+X-Rspamd-Queue-Id: 1FF0168BD33
 
-From: Vamsi Atluri <Vamsi.Atluri@amd.com>
+On Mon, Jun 15, 2026 at 4:42=E2=80=AFPM Luigi Rizzo <lrizzo@google.com> wro=
+te:
+>
+> The use of swiotlb causes an extra data copy on I/O.  For tx sockets,
+> especially with greedy senders, this has a high chance of happening in
+> the softirq handler for tx network interrupts, creating a significant
+> performance bottleneck.
+>
+> Allow tx sockets to allocate socket buffers directly from the bounce
+> buffers. This avoids the second copy and removes the above bottleneck.
+> The fraction of swiotlb buffers allowed for this feature is set with
+>    /sys/module/swiotlb/parameters/zerocopy_tx_percent
 
-Add debugfs file to display host memory allocations including tag,
-size, order, and physical address for each memory request.
+Strange name, because your patch targets the regular tcp sendmsg()
+path (with a user -> kernel copy).
 
-Signed-off-by: Vamsi Atluri <Vamsi.Atluri@amd.com>
----
- drivers/net/ethernet/amd/pds_core/core.c    |  2 +
- drivers/net/ethernet/amd/pds_core/core.h    |  1 +
- drivers/net/ethernet/amd/pds_core/debugfs.c | 45 +++++++++++++++++++++
- 3 files changed, 48 insertions(+)
+Typical high performance RPC libraries use TCP TX zerocopy these days.
+They won't benefit from this idea.
+Perhaps you should state this in your changelog or documentation.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index 511482713d15..926f34c10e3a 100644
---- a/drivers/net/ethernet/amd/pds_core/core.c
-+++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -487,6 +487,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 		pdsc->viftype_status = NULL;
- 	}
- 
-+	pdsc_debugfs_del_host_mem(pdsc);
- 	pdsc_host_mem_free(pdsc);
- 	pdsc_dev_uninit(pdsc);
- 
-@@ -498,6 +499,7 @@ int pdsc_start(struct pdsc *pdsc)
- 	pds_core_intr_mask(&pdsc->intr_ctrl[pdsc->adminqcq.intx],
- 			   PDS_CORE_INTR_MASK_CLEAR);
- 	pdsc_host_mem_add(pdsc);
-+	pdsc_debugfs_add_host_mem(pdsc);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
-index 1f80219edc6a..50c11af6c6c6 100644
---- a/drivers/net/ethernet/amd/pds_core/core.h
-+++ b/drivers/net/ethernet/amd/pds_core/core.h
-@@ -304,6 +304,7 @@ void pdsc_debugfs_add_irqs(struct pdsc *pdsc);
- void pdsc_debugfs_add_qcq(struct pdsc *pdsc, struct pdsc_qcq *qcq);
- void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq);
- void pdsc_debugfs_add_host_mem(struct pdsc *pdsc);
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc);
- 
- int pdsc_err_to_errno(enum pds_core_status_code code);
- bool pdsc_is_fw_running(struct pdsc *pdsc);
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 810a0cd9bcac..ef0a1b7d159b 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -178,3 +178,48 @@ void pdsc_debugfs_del_qcq(struct pdsc_qcq *qcq)
- 	debugfs_remove_recursive(qcq->dentry);
- 	qcq->dentry = NULL;
- }
-+
-+static int host_mem_show(struct seq_file *seq, void *v)
-+{
-+	struct pdsc *pdsc = seq->private;
-+	struct pdsc_host_mem *hm;
-+	int i;
-+
-+	if (!pdsc->host_mem_reqs || pdsc->num_host_mem_reqs == 0) {
-+		seq_puts(seq, "No host memory allocated\n");
-+		return 0;
-+	}
-+
-+	seq_printf(seq, "Host memory requests: %u\n\n",
-+		   pdsc->num_host_mem_reqs);
-+	seq_puts(seq, "Tag    Size         Order  PA\n");
-+	seq_puts(seq, "---    ----         -----  --\n");
-+
-+	for (i = 0; i < pdsc->num_host_mem_reqs; i++) {
-+		hm = &pdsc->host_mem_reqs[i];
-+
-+		if (!hm->pg)
-+			continue;
-+
-+		seq_printf(seq, "%-6u %-12u %-6u %pad\n",
-+			   hm->tag, hm->size, hm->order, &hm->pa);
-+	}
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(host_mem);
-+
-+void pdsc_debugfs_add_host_mem(struct pdsc *pdsc)
-+{
-+	if (!(pdsc->dev_ident.capabilities &
-+	     cpu_to_le64(PDS_CORE_DEV_CAP_HOST_MEM)))
-+		return;
-+
-+	debugfs_create_file("host_mem", 0400, pdsc->dentry,
-+			    pdsc, &host_mem_fops);
-+}
-+
-+void pdsc_debugfs_del_host_mem(struct pdsc *pdsc)
-+{
-+	debugfs_lookup_and_remove("host_mem", pdsc->dentry);
-+}
--- 
-2.43.0
+Also, what is the typical size of the bounce buffers in your guests?
 
+With standard tcp_wmem settings, each TCP flow can consume 4 MB.
+
+
+> (0 means disabled, 90 is the maximum, to avoid persistent I/O failures).
+>
+> Implementation:
+> - define a new page type to unambiguously identify bounce buffers used
+>   as backing storage for socket buffers
+> - modify skb_page_frag_refill to perform the modified allocation
+> - modify the destructors __free_frozen_pages(), free_unref_folio() to
+>   handle those pages and return them to the pool.
+>
+> The savings are especially visible with fewer queues. In synthetic
+> benchmarks, senders with 1-2 queues would cap around 50Gbps with
+> conventional swiotlb, and reach over 170Gbps with the feature enabled.
+
+This patch is too large; please split it into smaller functional
+units, so that each domain experts
+can focus on their part.
+
+I see you test SOCK_ZEROCOPY, but some applications setting this flag
+can mix tcp sendmsg() with or without zero-copy.
+
+I also see your patch missed CONFIG_PREEMPT_RT case.
 
