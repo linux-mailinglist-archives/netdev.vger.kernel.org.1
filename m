@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-299935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299933-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id honkOO+WMWp1ngUAu9opvQ
-	(envelope-from <netdev+bounces-299935-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:33:19 +0200
+	id 3ma7IMuWMWpnngUAu9opvQ
+	(envelope-from <netdev+bounces-299933-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:32:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDED6943D3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:33:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1D2B6943A9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:32:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b=BKcnDV2Z;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299935-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299935-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=carlosgrillet.me header.s=zmail header.b=hh5XxhAN;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299933-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299933-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00F3D3216DD3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:30:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1CC731A813E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECD747CC99;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B37646AF3C;
 	Tue, 16 Jun 2026 18:30:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813BB3D8902;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8129B3C4143;
 	Tue, 16 Jun 2026 18:30:54 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781634656; cv=pass; b=PVZJ4y/dxtiah/kUqLX71R9FCg8YrC08GiYSDXDn6JLm85NPAYYC+sVgpk4+gnqZInBfKWrywlg1g+gULTpyWpJB5qiiIx2ntfegtzdv2aU6Lt2FbyhwQdsmoq5PuqUagFUDFHVAAR758Pcdwwc12ExkF0dHZDbSXKCMRLHEsSA=
+	t=1781634656; cv=pass; b=HPIUjUeLUPheIMFv2wx2PNlyoud/o5eD7WvvTeckzdsOHLweJJBwmHwbogrGlUV4Za1F0h6Zd86WqQitdhSWxoE7kxX66LrtPztgpyxUD2d8NJv8bNdXUDvmBVI3slmtjuwZaLD6CtedzAxuXhOtE8RDkKFsPHfSIBVDKWZ1d2c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781634656; c=relaxed/simple;
-	bh=REH0d3wYoIYM1ZfwUz5WWrrGIOX6hD42sKYZ0MI/c68=;
+	bh=2A6STF/MS+4ul6GuxfPH6JzRgXXUBeXshuUyEuGTass=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PX+su7Rqvdluzbxm6K0C5ecYR35tV7YFNthR20/wL+onVzMnFUoly2Hp2JwSjUqHTo30aSCdow9PTrs6GFv8/Py7lOdEq2OhfLxayrnewJyGvn1rNGsUx9ABKdp6Ka48+35QEXWFr5wH1yzRrQ/cEU5qkopS7llZVR3yHGBwJNA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=BKcnDV2Z; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal: i=1; a=rsa-sha256; t=1781634626; cv=none; 
+	 MIME-Version; b=pqV/MScV+GG3faPGq/VWP4AId2s/uyRzyQ5/yY+gF0BiKmcOlIdP0U/r0v0VjTgjoYEU04/fleSwMt08Xozd6FJpPooT5F303GodweXq04qK9Lk0nHwfbMbEHYYR16Jdwq/PIEuBcYhtt78m8ytxQXc2P/zz99kLll4jECcihvc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=carlosgrillet.me; spf=pass smtp.mailfrom=carlosgrillet.me; dkim=pass (1024-bit key) header.d=carlosgrillet.me header.i=carlos@carlosgrillet.me header.b=hh5XxhAN; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal: i=1; a=rsa-sha256; t=1781634628; cv=none; 
 	d=zohomail.eu; s=zohoarc; 
-	b=by5pmXhRVrnkvv1S4D+VIc9b4VBij+dN2jDpAJSwSVq2HordivljUYmjsaKv4WPMqii9sje3s9dYfKLt4EZLj3cuzaz1tW2/amyVjFsY2lZ/ej/KfDhCOZi2CS02EI0XiZS3ilMdKaN5557f92X0QS9V9P6m2pTmWuVyKs9GT/o=
+	b=INsQMuaH03qg6w0nsSgRvM7IKjqYmB2OgBLtb55xuu0vGvgRLiw1XpiqYDp7ECtCfi3U7X3udjF4tM7fLQRHAN8umSsaQO1upAmCdKQD/9JLWo6mFDQfSor7FHP4a45givDZPExDO9/H2Y/BY93/9xp7StJ6Zgl2RssKEOAj84A=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1781634626; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=0KL/XF/Vvi8vAhmaVj+NFnFKfoqpckK1aQ0xkfQQy4E=; 
-	b=IuSYmF2akC6FYicORZV3dJ2N+NmXP168kD7aQi6zKucr21XH2xqM5is/2k2TxwY24+Y48s3Or6ErlI48AptFhd9LcYA8lNbrFjRAfA60hSUOhP8eyzy5n9oPxjGEhq9p5TxXkI6IBcVr6L7Gy8LIPYF9vSZNQYqrhdiArIz9aUo=
+	t=1781634628; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=e3M0BYPSTdgDLkWHJBCNI7FKNBWlduHVIRnKBaVQo0Y=; 
+	b=WCm5xbhWt7OPS6niQcZIrbfxPK86mcf0kLCuAzYpdElkqrqdkzu0UcNAvskznEDEVCXpSmOwadbyfN4kPWhnR2GT0UUGqAvSCewUaTaGfplLXFSvX17FANOx35YDDG56uoCxw0LyGiMp8AaLTNWNP1sCRvdqTljJpP+HnTHbQQs=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
 	dkim=pass  header.i=carlosgrillet.me;
 	spf=pass  smtp.mailfrom=carlos@carlosgrillet.me;
 	dmarc=pass header.from=<carlos@carlosgrillet.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781634626;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1781634628;
 	s=zmail; d=carlosgrillet.me; i=carlos@carlosgrillet.me;
 	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=0KL/XF/Vvi8vAhmaVj+NFnFKfoqpckK1aQ0xkfQQy4E=;
-	b=BKcnDV2Zsaa7Op19Uo71hXYZaJprEunX5AB4a3ERPMs2dP9LxVohdaOocoz9ft3m
-	nVzezXrucP1ck8oKrxUPj5cup+6sfEvTndv1Msi9CqT7vgkm9gzXgi5lHEByrZvO7cr
-	YaSFLLSDMhtDbzPfhdcmrrFFq2SzR8ZwSljwvCZE=
-Received: by mx.zoho.eu with SMTPS id 1781634625040188.20574878349134;
-	Tue, 16 Jun 2026 20:30:25 +0200 (CEST)
+	bh=e3M0BYPSTdgDLkWHJBCNI7FKNBWlduHVIRnKBaVQo0Y=;
+	b=hh5XxhANC9/rkGZVoSEkvnwU/OijVKMS9ZMAn9ccUmP3AXLVfkAy5CqbY2OfBrGU
+	UvhQWD4zMnywSHLCP3Q/bo1dmHXHhO/K+I1Nso6QNa26Q6JOj2WnvXuxt5DAP2gebEK
+	G2oFaBVwpB4dlInhVAvw6MGgAn3wo4awlYcZIYS8=
+Received: by mx.zoho.eu with SMTPS id 1781634626473581.2920691887233;
+	Tue, 16 Jun 2026 20:30:26 +0200 (CEST)
 From: Carlos Grillet <carlos@carlosgrillet.me>
 To: Pablo Neira Ayuso <pablo@netfilter.org>,
 	Florian Westphal <fw@strlen.de>,
 	Phil Sutter <phil@nwl.cc>
 Cc: netfilter-devel@vger.kernel.org,
 	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH nf-next v3 2/4] netfilter: nf_nat_irc: replace u_int16_t with u16
-Date: Tue, 16 Jun 2026 20:29:44 +0200
-Message-ID: <20260616182948.96865-3-carlos@carlosgrillet.me>
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH nf-next v3 3/4] netfilter: nf_sockopt: replace u_int8_t with u8
+Date: Tue, 16 Jun 2026 20:29:45 +0200
+Message-ID: <20260616182948.96865-4-carlos@carlosgrillet.me>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260616182948.96865-1-carlos@carlosgrillet.me>
 References: <20260616182948.96865-1-carlos@carlosgrillet.me>
@@ -82,20 +82,20 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[carlosgrillet.me:s=zmail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:netfilter-devel@vger.kernel.org,m:coreteam@netfilter.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-299935-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299933-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[carlos@carlosgrillet.me,netdev@vger.kernel.org];
 	DMARC_NA(0.00)[carlosgrillet.me];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -107,32 +107,79 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,carlosgrillet.me:dkim,carlosgrillet.me:email,carlosgrillet.me:mid,carlosgrillet.me:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,carlosgrillet.me:dkim,carlosgrillet.me:email,carlosgrillet.me:mid,carlosgrillet.me:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3BDED6943D3
+X-Rspamd-Queue-Id: E1D2B6943A9
 
-Replace POSIX u_int16_t with preferred kernel type u16
+Replace POSIX u_int8_t with preferred kernel type u8, update prototype
+and struct definition.
 
 No functional changes.
 
 Signed-off-by: Carlos Grillet <carlos@carlosgrillet.me>
 ---
- net/netfilter/nf_nat_irc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/netfilter.h  | 6 +++---
+ net/netfilter/nf_sockopt.c | 8 ++++----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/net/netfilter/nf_nat_irc.c b/net/netfilter/nf_nat_irc.c
-index 19c4fcc60c50..14b79cb0171b 100644
---- a/net/netfilter/nf_nat_irc.c
-+++ b/net/netfilter/nf_nat_irc.c
-@@ -39,7 +39,7 @@ static unsigned int help(struct sk_buff *skb,
- 	char buffer[sizeof("4294967296 65635")];
- 	struct nf_conn *ct = exp->master;
- 	union nf_inet_addr newaddr;
--	u_int16_t port;
-+	u16 port;
+diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
+index efbbfa770d66..91b68bdba3f5 100644
+--- a/include/linux/netfilter.h
++++ b/include/linux/netfilter.h
+@@ -181,7 +181,7 @@ static inline void nf_hook_state_init(struct nf_hook_state *p,
+ struct nf_sockopt_ops {
+ 	struct list_head list;
  
- 	/* Reply comes from server. */
- 	newaddr = ct->tuplehash[IP_CT_DIR_REPLY].tuple.dst.u3;
+-	u_int8_t pf;
++	u8 pf;
+ 
+ 	/* Non-inclusive ranges: use 0/0/NULL to never get called. */
+ 	int set_optmin;
+@@ -357,9 +357,9 @@ NF_HOOK_LIST(uint8_t pf, unsigned int hook, struct net *net, struct sock *sk,
+ }
+ 
+ /* Call setsockopt() */
+-int nf_setsockopt(struct sock *sk, u_int8_t pf, int optval, sockptr_t opt,
++int nf_setsockopt(struct sock *sk, u8 pf, int optval, sockptr_t opt,
+ 		  unsigned int len);
+-int nf_getsockopt(struct sock *sk, u_int8_t pf, int optval, char __user *opt,
++int nf_getsockopt(struct sock *sk, u8 pf, int optval, char __user *opt,
+ 		  int *len);
+ 
+ struct flowi;
+diff --git a/net/netfilter/nf_sockopt.c b/net/netfilter/nf_sockopt.c
+index 34afcd03b6f6..19a1d028158c 100644
+--- a/net/netfilter/nf_sockopt.c
++++ b/net/netfilter/nf_sockopt.c
+@@ -59,8 +59,8 @@ void nf_unregister_sockopt(struct nf_sockopt_ops *reg)
+ }
+ EXPORT_SYMBOL(nf_unregister_sockopt);
+ 
+-static struct nf_sockopt_ops *nf_sockopt_find(struct sock *sk, u_int8_t pf,
+-		int val, int get)
++static struct nf_sockopt_ops *nf_sockopt_find(struct sock *sk, u8 pf,
++					      int val, int get)
+ {
+ 	struct nf_sockopt_ops *ops;
+ 
+@@ -89,7 +89,7 @@ static struct nf_sockopt_ops *nf_sockopt_find(struct sock *sk, u_int8_t pf,
+ 	return ops;
+ }
+ 
+-int nf_setsockopt(struct sock *sk, u_int8_t pf, int val, sockptr_t opt,
++int nf_setsockopt(struct sock *sk, u8 pf, int val, sockptr_t opt,
+ 		  unsigned int len)
+ {
+ 	struct nf_sockopt_ops *ops;
+@@ -104,7 +104,7 @@ int nf_setsockopt(struct sock *sk, u_int8_t pf, int val, sockptr_t opt,
+ }
+ EXPORT_SYMBOL(nf_setsockopt);
+ 
+-int nf_getsockopt(struct sock *sk, u_int8_t pf, int val, char __user *opt,
++int nf_getsockopt(struct sock *sk, u8 pf, int val, char __user *opt,
+ 		  int *len)
+ {
+ 	struct nf_sockopt_ops *ops;
 -- 
 2.54.0
 
