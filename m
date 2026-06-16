@@ -1,175 +1,229 @@
-Return-Path: <netdev+bounces-299944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id bsahEsilMWosowUAu9opvQ
-	(envelope-from <netdev+bounces-299944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:36:40 +0200
+	id Z25RC/2lMWoyowUAu9opvQ
+	(envelope-from <netdev+bounces-299945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:37:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7F2694FB2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:36:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB200694FC7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:37:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b="BR43W/Os";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299944-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299944-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=GC8Anh5V;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299945-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299945-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B90831621F6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:35:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3A683024CB1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82833DBD57;
-	Tue, 16 Jun 2026 19:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CAF3DFC6D;
+	Tue, 16 Jun 2026 19:36:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81863DDDD5
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 19:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA573DA7C2
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 19:36:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781638520; cv=none; b=UNd238BH3UvUKqyNb8nZDOmmwsLEl1TTK4CG5igOQ270B+ctj2+OvUB9kTiXrmT4OKe9OGSKtznT0yhbiSCVaBEgGAqdAiiKUhzsl5jxRtTO7sWnMSo1G8x1G9sskX2xpcjZnvh+98TBzxvHRgFifmLWZc6oWyEopyU+cm7lla0=
+	t=1781638598; cv=none; b=jYEHKg8Ner2gW9TmfuQ4NJqY5GhwHGUZt0rvMd5RcEgC9skQJK2c91idZFxRab9WMjrFd4pYoKRykHSZwF27pz0hAmOK7FowwtiKUmZDPwCns+2ll/e0iukNMCcX2cv/42YCYmaWIOlkg8ydWniODLmqaXKYuAP2E5ry+zJ5Gjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781638520; c=relaxed/simple;
-	bh=MY2uIvhGYy/CfCwesRydbU3lcjiu5NG6iPQrb5kFAwE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NpK7Fe61lhZt2FIaBAXHIC4DyBjIlGaPWaZa4Otsi6fHdWZmgsl5yy+U5kJ6adMuL1dlS8WeeKxIsYlUF5Oe4PPXgOAAkAjhK2wWcORyi7hNC5g13yRc7tVjCQQZzHh22khcKxLFdWKBUm/pI0449AVpRY9eaZzfHq+YVIMNVJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BR43W/Os; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C055E1F00A3D;
-	Tue, 16 Jun 2026 19:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781638519;
-	bh=xc7q3CiyQ1xlsHbVpzwNHmz7OTOjIGdfzCQpxWYDYAQ=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=BR43W/Osjpyd2eOM8j3NK/o09+OD9qwp1RZgBtAKFSGCcTRGwr4qN3GB6LRpB0kBA
-	 in3oYPlwDlXvCcYPetAsJyyCOxEMj8uEiT3rAJDd6HEFXXfBgxJOBqCMxw4I+oMt+p
-	 q44mECa9NHLmnW0OHfGzAHx7l1jPAcyuRcqFm1EJlLGFpmaxkG7X5uMrebuAYnCKSf
-	 9z/kzH9xSiG1NO2+WG/q65MC8xEmGYB7rpr9txHG3uIlZamKqak7gJPWN1d2BoPviq
-	 rSM/ogyf7sCkyL5zpzpvTX9dtGl6d6QrPrdmftVip7tZCOSTqI32L1sGbnOf9VWfZr
-	 +5glPWePBRpkA==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 09430F40076;
-	Tue, 16 Jun 2026 15:35:18 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Tue, 16 Jun 2026 15:35:18 -0400
-X-ME-Sender: <xms:daUxarsomvhDc1dUcWchGs59iZakPY9vQ7KAFK_NLCTMK97aijrUbQ>
-    <xme:daUxahqhH0HuF9sX_P0-EihBX_C4EyRFCSDjLNYMTeqY2mfJv0eQi9mTW8tao1FMb
-    akfJQJC_wyWnayYJ5rtlVjwInb8SBxgueN89k9kPOxPTdMSVU3cOw>
-X-ME-Received: <xmr:daUxaiJ8l1TgIW4mQY6zey-d-WDGjCG47u91RYR0bQxTJ_eGHLCNzBlwnoJcvw_T8qaZ0aJnyE2CvDEoUS2n_lPnHr3UQwnz4Cs>
-X-ME-Proxy-Cause: dmFkZTGT4fWcz8GiXUR15Vty2mK9nRAeRCRIMzTX/7Wr8CrObClROCZaHzFrP2gSBL0txg
-    i/yZurKP3Ms1ZHxSrmkAT/RPkMr+mCJPY6mw6/rLDKs7ftWj+AW1ATfhLw/NxaK0svhjQn
-    IMmA0UPUsW29MvvV4dcHkf5ka7QbGtM8mXSRBR5asTWk1WeveU15SagnzDOQ87wlThJ3q1
-    ec36EGBpgp1QUitKFc3T78AOKB3FfTPEK4kt5m68f2Ur/pCdt97X3q1t3UR/O6SXh34L69
-    TSelKDGIDDQ0HXi4+QPG9cEDcu9TBv/ntLYb1sN3krS3Vpni45on3Lmevd+Yv2fQ/VtIaQ
-    mTiJdveLv2fuIWIKGK7h/6sIDtg0fdttgJ1oOpnyl8Tavui9spBPySiHMjJwegfDLdFCz/
-    PrT6ukHLEYaR3IAM6c0rVmZSGRQzjSgwaVaedsgnWFI+a5GxF0LjSvgfWp5afl28pGmdTI
-    lzjDpNlR5G30USCWsEYdpWM1jBbzbkKJsg4U7na32SaZIgpBVxmCuIFk2T+riWYlMCoeGc
-    VoPIksZjfgRwZtD4hAuVnAU/FbAQqN/RXgZrq0RAuYOW8nslS6vKH6+EirSoK/ZZ8TsfnW
-    MMc+jseXiBVsjL2eMZT7ewU7eFFtRIFpzW062Vjgt5QOWmRyi03GLgE9IKqg
-X-ME-Proxy: <xmx:daUxapulfKeQpZH9gvJUIi5STlTAlezD16oTrpi16Hfmo69E_u-AEw>
-    <xmx:daUxanBYO0T5EzU4BWTN2T-M2ByQuVkBC-4mJo3Pt7wbRkHAsxO9SQ>
-    <xmx:daUxap7H2Uaegk-geLEE3dIPwtpbofcWnzaAkZ-WTPLLpMdFlCQ-lg>
-    <xmx:daUxanCDdSClmBZQnoYlOY_NYvUFsfgB5Nba3B3YXxpm6Da_oQ2D8Q>
-    <xmx:dqUxan6rlDhvI7runYI3TmTeuoKMCETKa3Tn8wiKss23Tsb25s6nfAO2>
-Feedback-ID: i67ae4b3e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Jun 2026 15:35:17 -0400 (EDT)
-Date: Tue, 16 Jun 2026 12:35:16 -0700
-From: "Dan Williams (nvidia)" <djbw@kernel.org>
-To: Alejandro Lucero Palau <alucerop@amd.com>, 
- "Dan Williams (nvidia)" <djbw@kernel.org>, 
- alejandro.lucero-palau@amd.com, 
- linux-cxl@vger.kernel.org, 
- netdev@vger.kernel.org, 
- edward.cree@amd.com, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- dave.jiang@intel.com
-Cc: Dan Williams <dan.j.williams@intel.com>, 
- Ben Cheatham <benjamin.cheatham@amd.com>, 
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Message-ID: <6a31a5742e552_9b855100d5@djbw-dev.notmuch>
-In-Reply-To: <17b68fb1-768e-49f6-884d-49e0952621b8@amd.com>
-References: <20260609215755.8685-1-alejandro.lucero-palau@amd.com>
- <20260609215755.8685-4-alejandro.lucero-palau@amd.com>
- <6a28a0c349c9b_4fa7810099@djbw-dev.notmuch>
- <17b68fb1-768e-49f6-884d-49e0952621b8@amd.com>
-Subject: Re: [PATCH v27 3/5] cxl/sfc: Initialize dpa without a mailbox
+	s=arc-20240116; t=1781638598; c=relaxed/simple;
+	bh=x4vuvjMjK3Siqy6TliGJe8+jhWlv6O6RxnFPsOmVF7A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=e13aoDZZZvxoCUsGoi/K0Ggdh+H3MNUjwidJu8nJzjmY0dU2hZHCKi8e4jf6qquU481C4G7MuTLLY8MHbkCvAq/JjAbQMPMBoVvMMNLKEilLVsVkDsncqf8toEdYJghtfr+YF0w6lba8azZuhUn5BLtGuy/0MidtgAcRt0P7r74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GC8Anh5V; arc=none smtp.client-ip=209.85.167.170
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-48611ccd5aeso3145301b6e.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 12:36:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781638596; x=1782243396; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8EO/9z4OOJVGQlHYYaBZaNw8VQwWazXkqSJi3LxEM90=;
+        b=GC8Anh5VfSrdFDAjBCA+t3VBlW9IQNj5CS2020mtctSOl0TPtqgqnGjyN+MItcjWCE
+         R0j+pM5rZJAV44nYdGQv7jC3qjGRKFk5ryfZPJP6ggkny9bOvT5PsAWDBqNcZnOUDHzW
+         55at24VAlGj21mPIJaKOSHd4NigWRARptROZhFH3vPAFtWHmD3Dcc2orE/BzygvegpF8
+         MYKIXU7AGLmA1BXhbVVUIyvaoI5TvJOVe0/vMdnU4AZCkGAi3uDlSMlvfvJARjsCEL6h
+         eT6d5OdfnVWITLk0Pho0d6JAb83fB8Ys9lco4IUXjCHAL6DfOFBC6BEmxTmI4sb3ZPRt
+         MAjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781638596; x=1782243396;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8EO/9z4OOJVGQlHYYaBZaNw8VQwWazXkqSJi3LxEM90=;
+        b=dR1uRkNqd2Bi2nTJgrdfURE/kKDGiCXN/tHkGtv0Zv1Fgvu5TxuhT9nRyPIiQGtv2f
+         ml+aFXM33KiG9Iu9NOumXjZmk9hx5Iu8wpP7J2ZIbO7PeVyxUwIo9wtxtlmXKnZofxBg
+         8JPqEs/CZGLonUHojYsgV7O1n1EnZ3kL38nxRXSYiiS1JPTbiAQmyJiwqjdR/eEOA8ep
+         Rm3d6DYXQD/J7iDLQS4nJySL4OUXIjmYhcogn8gFJoRLd17b3Cs5m4NgriePtJWGuaDe
+         Lerjev2998wOiolE7nqc+cX5Ja/4bAKsQKeMg5H8xd5Bpa6unG42Vwvk0G6yZz9feJcu
+         /Xig==
+X-Forwarded-Encrypted: i=1; AFNElJ/NMWqvSaBoficXrXhMJfuqpbHcKDvT/PBDEpvwhgfB683wlY8vihWP5RmDigrpUc2zQ3BShMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydnH5msC6ui91d+vj0ejLMzwth9JyF5kX6eMUFdQxkjWx5K1bK
+	Ur22BrLEHluNsYey+nLkoLXi0z50U5UpvwDjYQS08XmCcIZpAdThPrAJ
+X-Gm-Gg: Acq92OHUib1m3hwOqjrlBKaFtUtusEsvSbc3tab/+JEkbnEXoQbky2WgRP53ZC5gVVH
+	5koATT4/aFdZcUgkD8u7iAfiDMcCpfLDjmNm/sIoNK4zi1JEg4ebINPI0eWNS9X/akGwfzJ+DrN
+	Oz/AVEK0jB6w1BVDMqhXbqR8EG6qLQKlHCPGXm813/yO4mxbaF1w9afA2EZ1REGM5QmhV6paqBM
+	AHNqxbNQfZN54c4uazDftIQ7v3peigsCa+RP7rHLv2M7lPW4YFN/RruASMMrbtdwgPtmqmvd7Fg
+	wb6/VFBirNQjfp046RUiuoKdvVOxxEkybwAkZwc2dI3df5DUBg7gQO5LC1K4rMGM7Ki7gfBXbUC
+	IozDNemaJ+ELceGmYZnblhhUQjeo3DjimnmYAiu2DAUAMpSKMWBQdm2lloPCfyloA1Lf6UvlEJ8
+	5zFgTQ+LAra7amPcAe3LvZ1As2AL+8+8sXAKUoeeknpgWpSqnULiZ0qgbKVpBvIVcGXjt2hOpy0
+	AHoJBQBrb5uab6lyQ==
+X-Received: by 2002:a05:6808:1b28:b0:479:faf5:ef4c with SMTP id 5614622812f47-48944641750mr389992b6e.32.1781638595545;
+        Tue, 16 Jun 2026 12:36:35 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:53::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4875ddda6b6sm4881214b6e.8.2026.06.16.12.36.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jun 2026 12:36:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 16 Jun 2026 12:36:31 -0700
+Message-Id: <DJAQ65ZVYAN7.2Z8DNW7Z0JE7V@gmail.com>
+Cc: <pablo@netfilter.org>, <fw@strlen.de>, <phil@nwl.cc>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <horms@kernel.org>, <andrii@kernel.org>,
+ <eddyz87@gmail.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+ <memxor@gmail.com>, <martin.lau@linux.dev>, <song@kernel.org>,
+ <yonghong.song@linux.dev>, <jolsa@kernel.org>, <emil@etsalapatis.com>,
+ <shuah@kernel.org>, <kartikey406@gmail.com>, <coreteam@netfilter.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH bpf-next 1/2] bpf: Guard conntrack opts error writes
+From: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+To: "Yiyang Chen" <chenyy23@mails.tsinghua.edu.cn>, <bpf@vger.kernel.org>,
+ <netfilter-devel@vger.kernel.org>
+X-Mailer: aerc
+References: <cover.1781586477.git.chenyy23@mails.tsinghua.edu.cn>
+ <70aeec0ab762aebe65129cf6052e132c7329edc2.1781586477.git.chenyy23@mails.tsinghua.edu.cn>
+In-Reply-To: <70aeec0ab762aebe65129cf6052e132c7329edc2.1781586477.git.chenyy23@mails.tsinghua.edu.cn>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-1.65 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299944-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:alucerop@amd.com,m:djbw@kernel.org,m:alejandro.lucero-palau@amd.com,m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:dan.j.williams@intel.com,m:benjamin.cheatham@amd.com,m:Jonathan.Cameron@huawei.com,s:lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[djbw@kernel.org,netdev@vger.kernel.org];
+	XM_UA_NO_VERSION(0.01)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299945-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:kartikey406@gmail.com,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:chenyy23@mails.tsinghua.edu.cn,m:bpf@vger.kernel.org,m:netfilter-devel@vger.kernel.org,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,etsalapatis.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tsinghua.edu.cn:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9F7F2694FB2
+X-Rspamd-Queue-Id: BB200694FC7
 
-Alejandro Lucero Palau wrote:
-> 
-> On 6/10/26 00:24, Dan Williams (nvidia) wrote:
-> > alejandro.lucero-palau@ wrote:
-> >> From: Alejandro Lucero <alucerop@amd.com>
-> >>
-> >> Type3 relies on mailbox CXL_MBOX_OP_IDENTIFY command for initializing
-> >> memdev state params which end up being used for DPA initialization.
-> >>
-> >> Allow a Type2 driver to initialize DPA simply by giving the size of its
-> >> volatile hardware partition.
-> >>
-> >> Move related functions to memdev.
-> > The code movement is not strictly necessary. Just add cxl_set_capacity()
-> > and we can consider a move later if mbox.o and memdev.o are ever not
-> > both included in cxl_core.o by default.
-> 
-> 
-> I think it is the right thing to do as the new function uses add_part() 
-> (moved) and the other add_part() client is the other function moved, 
-> cxl_mem_dpa_fetch().
-> 
-> Note cxl_mem_get_partition() used by cxl_mem_dpa_fetch() is the one 
-> working with mbox commands and it remains in the same place inside 
-> core/mbox.c and the only cxl_mem_dpa_fetch() client is cxl/pci.c
-> 
-> 
-> This was reviewed and accepted so no reason for not doing it ...
+On Mon Jun 15, 2026 at 10:42 PM PDT, Yiyang Chen wrote:
+> The conntrack lookup and allocation kfuncs take an opts pointer
+> together with an opts__sz argument. The verifier checks only the memory
+> range described by opts__sz, but the wrappers unconditionally write
+> opts->error whenever the internal lookup or allocation helper returns an
+> error.
+>
+> For an invalid size smaller than the end of opts->error, that write can
+> land outside the verifier-checked range. Keep returning NULL for invalid
+> arguments, but only report the error through opts->error when the
+> supplied size includes the field.
+>
+> This preserves error reporting for the supported 12-byte and 16-byte
+> layouts, and for other invalid sizes that still include opts->error.
+>
+> Fixes: b4c2b9593a1c ("net/netfilter: Add unstable CT lookup helpers for X=
+DP and TC-BPF")
+> Fixes: d7e79c97c00c ("net: netfilter: Add kfuncs to allocate and insert C=
+T")
+> Signed-off-by: Yiyang Chen <chenyy23@mails.tsinghua.edu.cn>
+> ---
+>  net/netfilter/nf_conntrack_bpf.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/netfilter/nf_conntrack_bpf.c b/net/netfilter/nf_conntrac=
+k_bpf.c
+> index 40c261cd0af38..3c182024ec509 100644
+> --- a/net/netfilter/nf_conntrack_bpf.c
+> +++ b/net/netfilter/nf_conntrack_bpf.c
+> @@ -65,6 +65,11 @@ enum {
+>  	NF_BPF_CT_OPTS_SZ =3D 16,
+>  };
+> =20
+> +static bool bpf_ct_opts_has_error(u32 opts_len)
+> +{
+> +	return opts_len >=3D offsetofend(struct bpf_ct_opts, error);
+> +}
+> +
+>  static int bpf_nf_ct_tuple_parse(struct bpf_sock_tuple *bpf_tuple,
+>  				 u32 tuple_len, u8 protonum, u8 dir,
+>  				 struct nf_conntrack_tuple *tuple)
+> @@ -298,7 +303,8 @@ bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_s=
+ock_tuple *bpf_tuple,
+>  	nfct =3D __bpf_nf_ct_alloc_entry(dev_net(ctx->rxq->dev), bpf_tuple, tup=
+le__sz,
+>  				       opts, opts__sz, 10);
+>  	if (IS_ERR(nfct)) {
+> -		opts->error =3D PTR_ERR(nfct);
+> +		if (bpf_ct_opts_has_error(opts__sz))
+> +			opts->error =3D PTR_ERR(nfct);
 
-Sure, I am ok to let it go as is.
+LLMs have no taste.
+
+Above two lines could have been one helper
+   bpf_ct_opts_set_error(opts, opts__sz, PTR_ERR(nfct));
+
+Or we can do a step further and simplify the code more.
+Turn this:
+   if (IS_ERR(nfct)) {
+           opts->error =3D PTR_ERR(nfct);
+           return NULL;
+   }
+   return (struct nf_conn___init *)nfct;
+into:
+   return (struct nf_conn___init *)bpf_ct_opts_result(opts, opts__sz, nfct)=
+;
+
+static void *bpf_ct_opts_result(struct bpf_ct_opts *opts, u32 opts__sz, voi=
+d *ret)
+{
+  if (!IS_ERR(ret))
+    return ret;
+  if (opts__sz >=3D offsetofend(struct bpf_ct_opts, error))
+    opts->error =3D PTR_ERR(ret);
+  return NULL;
+}
+
+This kind of small improvements should be obvious to any human developer.
+Please do NOT send us patches straight out of LLM.
+Review it first and think how to improve it.
+
+pw-bot: cr
 
