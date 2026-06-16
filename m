@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-299823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id FDz0HR89MWpWewUAu9opvQ
-	(envelope-from <netdev+bounces-299823-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:10:07 +0200
+	id 63E9FRAsMWqvdAUAu9opvQ
+	(envelope-from <netdev+bounces-299808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:57:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3355968F236
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:10:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA0B68E89E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:57:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=CQFngQ8f;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299823-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299823-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="nMdYxRI/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299808-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299808-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 304D13070AF0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:04:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DFFC33070B0C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDD043D4E0;
-	Tue, 16 Jun 2026 12:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3AA439010;
+	Tue, 16 Jun 2026 10:55:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1145F34E741
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 12:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35AD436351
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 10:55:03 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781611330; cv=none; b=VJ1+B0R7SxFJkRwV8G8dJKxozvJ+Fr4zsg08roJPO28gmEcMEI1f9y6XLrIqzRQYBkzIuXtLoObSAZbSVvkZK12QFdHgeqB6fFIXGf8XdAmRtvOd+i8d5G4KtnTFLdJxlqKP7mXY7nSMwQQ/EO7mqtW4WXmYmapIvS6CRZmJgkA=
+	t=1781607304; cv=none; b=cB516EQyhbCo4sMaT1FeiHHIXj7Pd0MAvnmmsJyldFoSfBiF7GwxsUExKAs6nQkzbdyLksAGM3ZWZgjVsHLUUzupSb7YYDyE64sFk8B3nSuyPOqgHmvXcSG7XZADDsfGx7/2GA9Z4aUkiVfwEpmyDUZnBuTxeC6UvI+t5cF6jYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781611330; c=relaxed/simple;
-	bh=YA05WrW8GLWqzUGnP2oKazYooiYLhjswwVleumjucTQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HTuy64JiIbPK0VVYGj/d2TN4Hv6QYQXX77rO/ukDYaPHPL6sw1Ovirz4t3wP5s908SUAhiT+VjMQcA4yF9OqmX/xXuolC2wkAIfHBi6/eEGjmDmqyaOPtWJNuWt2IBv6RB9ZUOTpQX4+Wwxi40jWqZKbkqPMP0Z8G0MpxoZ156g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQFngQ8f; arc=none smtp.client-ip=209.85.210.180
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8424b00710aso3124326b3a.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 05:02:08 -0700 (PDT)
+	s=arc-20240116; t=1781607304; c=relaxed/simple;
+	bh=jBBNnQC7lq61TLq34Ey49geUnAl0MRFMoFlzzp//5FM=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=SVnVHOpq49cb9XY6u7FcG1+nbFw7nQco976/fJ9iPuEaZ0R37yxZsKaB7QSRdI92dUxn5TV6UIzqOS5TeOn4Bu2EhSnHCpAEurzRwp+ZxezwKN+wePmSl9OGewWtdjubp6k4lGO4ebyRZ0STARmSdnPYpsAEUc58/b8dDANx1Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nMdYxRI/; arc=none smtp.client-ip=209.85.210.178
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8422a92b6d6so2180618b3a.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 03:55:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781611328; x=1782216128; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781607303; x=1782212103; darn=vger.kernel.org;
         h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=R6rJ2lBTSRBiSi/3hBuK1toMuKkxHnWeZuud2dPMa4c=;
-        b=CQFngQ8f2ZdYiVUEphLUUzUK3Tz/k0dhvTDSjcXbYFEz6Jl8H5j/5qehzreAzJXW4i
-         /FjVftIVANff3ftMmKxn6RKJuWN/Y5llGN71FubsDPkut4oe1EFvHaIUd1C5xmHDe2hY
-         HS/dmcRRNYzwb3NgPg80wQ3Ywt0yBak7DSBtvdHnGhG5NFgnsQF9lkY3SHj4ZuecU0Zf
-         tRpU0+BwZsU2xsXWgaLKtrsBXoo5CvYqVdXyhhOO/pKQHYry/+65S7xR4/eOON1eiRVP
-         fxSc7vhZrA2HF+MdwJOFQMMD/zlg1nfBMZ/yuIJK8ziSov67+DTFoEaHaXUm6YnVNPx4
-         Dp+A==
+        bh=72nfFGwOqmCepnKWEGZx1I8t5XYaTrVTqrklMpMGSkY=;
+        b=nMdYxRI/16ZY3irTKWc1TsRLkfY4Lfwzlayv/KTNxRNjjBZ82h4RI3hGrw1Ut6t8LT
+         3RR5LyoUGMhSJ4uYCYLaYwhgSxhUY5UcznT7aYhN8Mx6b2vo++SRFitlBtxhSCrjXev4
+         L0pHhSzr6AOIJJNrApLKFrJnvcya9GyTcvqnKMsfnLfbisTNDL0yfpW6124BRvih5NrW
+         VJSg9rgemmKGXHhRzbwEaImwYtwBIkYYW6tJ4Pp28Ldla62X0ufbHa/1p0gaWKc3peG9
+         x9RwwFIra2DzwwDFEE8mvfGVYBbx3Sc0+GPWdjNAuuK3tvQX5+flxHjTZsmxKsiBZdBT
+         PtXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781611328; x=1782216128;
+        d=1e100.net; s=20251104; t=1781607303; x=1782212103;
         h=mime-version:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R6rJ2lBTSRBiSi/3hBuK1toMuKkxHnWeZuud2dPMa4c=;
-        b=a8m6GWjw8h7MFpQhR5TdQp1hXtNZUtepNq9qHMMLs+OlGp+wjs5AZfLMnBkU9uH+I4
-         acuM1UxpIGT/y1Ygzy9dblIUgNOACei7s1wzdairZNXq4LhAGjpMSVncexfjwHm4NskN
-         fd+nVEaZMqUe3h43Nht030L9y0zyETDs7IwtbHit5cnJbjn75zXSuYxtHMfj5RpdQXJ4
-         cxjjV07CfO33mIcwu7ll/HqgCm3JTCyiem+zM7PyL6+5zktOwh0WPRJOm5l5Htw2bSRV
-         k2D51+PYOBpFOCVpWruBAQBVA0T0/A2nhhSJ6vpZyixbzhHQCx8+uezQM3I234sht6w7
-         Ao5w==
-X-Gm-Message-State: AOJu0YypVdLcCn1QmNrP9GkvfT6vAP9sDolIyDa5huRCyuTMuGjYthlv
-	I6f9BN3AtL+NUSWIiqeRd0HN7S2Q4t2sVSLbyBNuzJWO52ZIAjpKJQmmNQrrGnqcEzTMPg==
-X-Gm-Gg: Acq92OHpXWflaW24e6nC3LTnitGXszVvJu8SzvYaH5TKal15EHSokit4tCJ7X53E87q
-	0OJXEeOU+cyqf8k6TO+uj3lgc7mrN5Cw9IoUz5mj0qGdEY5ZdQRJMoUtDM1rWy2GeILV+K9AWN3
-	+p/3i7hxlRrAu+OFqJbuEeXlyYa0c3/jC/iegYEcKOZlPuQM3C2uA2/nkJQJpzMTyxN8z+T6Xtf
-	Sj6AzRXT0DR0einnyJx2MuU2fc0/v68d6p9fp/fnyYnLjw9i0rquzNBJj/UTPn0f+i7PMSGpqSv
-	wWPA1R9EOuNQ5WNJHr/itJBpOg9zJl3BE/BJGgZGxjEXv7t3ZLqK8aEctrgCaksn94yM7wX1Xhl
-	n2yqHz8lZaIFE9QcG0PI9VMDFyOOkHz4ZyrZXIxyKTP3sBM4HZ2Jy0iexZiE0/lfXpCTvwtIYYy
-	GSfFALgwweolGcnSub
-X-Received: by 2002:a05:6a00:993:b0:83a:4846:90bf with SMTP id d2e1a72fcca58-8451566da92mr3284092b3a.43.1781611328433;
-        Tue, 16 Jun 2026 05:02:08 -0700 (PDT)
+        bh=72nfFGwOqmCepnKWEGZx1I8t5XYaTrVTqrklMpMGSkY=;
+        b=JR4IViz/BRXO/UnkqOUstELQNWAFVP0w+NB6ObuAXFSuY3V4JbNiidjbFnAMMwqzYH
+         FmYLLLGp2T2EG/1jzfnhSemvHOlN+BvDeI+RpwpKaVfjfFnSPk1gKHHroFBy66lYrDjU
+         t4/JXJC+5AP7DjkADaHrrFGsRrk5g1IA5tFam/mzkaKCVXARkfEw0wyreZiGsRdVhhzU
+         jfPE1gwBZO2NynVCjFsrbUebjcc1Nmih09lF4Hx82bNJWOt4ca+lIMt3TqBl8iHRKEMo
+         lUmStJo4i2/ugAnN/rdxgxWKt9mDeGueUuXUoMiC+qUMCm8AAUJJMRCl0JGN4oI3/6CD
+         NO0g==
+X-Gm-Message-State: AOJu0Yy/YP8hKilTMILikQTlwS7llISiVGKs4FSSDZkzwhqpDp/03ysG
+	s2WlruVgrWFyCChetNzt2x9mnBdmV/rA0a+my/aIX+YApxBGGRIJabdDHDZp063LnP76ng==
+X-Gm-Gg: Acq92OGKv3x/KJ9f/AL00CaIE4RgmoCzZHvQyFSFx4Fvu+19i8jyF1UGYhVmAUOt5c5
+	IdSBHx00lUNJf2er11BaiRqh+if2sS9b7OOkGPmUKYAVOnGyPe0EXRRpsTk8/XqDt/leJpb2NKC
+	SopgWq4cV9pldOJkKtEdOKEhG03GdGxeZzBdRELydIj7DBbd6hLUoi4aNBrIzUDkvwHrkkw3TW4
+	5Z04r/PzXNTKBvHEcI8fQJBk3Y3HXFPMByTuBFIt74RUSS2vk+TBWQ/awe5FmT/DBUylERPTQF9
+	sUAJnfIkxPRH9cMg+TvyN3mehQf3JAQf2okIxKt1+j7vyTfr5lnjEHZk0oN81CGKwoEwRyknDNI
+	brHKW5X65eXIdsWAKzXDkui8QZMXz7kip+76FKZW4HXihK0F93zdrJlSgLfI4X5sUreCecIQtIS
+	tZLqqORSDQkRObYJRd
+X-Received: by 2002:a05:6a00:1ad3:b0:842:50fd:4c13 with SMTP id d2e1a72fcca58-84513e1750dmr2556028b3a.4.1781607302958;
+        Tue, 16 Jun 2026 03:55:02 -0700 (PDT)
 Received: from [127.0.1.1] ([47.253.114.73])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434ac9bfe1sm13341635b3a.12.2026.06.16.05.02.03
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b0112edsm11550889b3a.45.2026.06.16.03.54.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 05:02:08 -0700 (PDT)
+        Tue, 16 Jun 2026 03:55:02 -0700 (PDT)
 From: Wayen Yan <win847@gmail.com>
 To: netdev@vger.kernel.org
 Cc: lorenzo@kernel.org, horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: [PATCH v2] [net] net: airoha: Fix QoS counter configuration for Tx-fwd channels
-Date: Tue, 16 Jun 2026 18:50:29 +0800
-Message-ID: <178161132384.2164449.18407700117859190327@gmail.com>
+Subject: [PATCH] net: airoha: Stop TX queues on error path in airoha_dev_open
+Date: Tue, 16 Jun 2026 18:50:39 +0800
+Message-ID: <178160729880.2156257.7978513589649053826@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -91,11 +91,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299823-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299808-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_SENDER(0.00)[win847@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TO_DN_NONE(0.00)[];
@@ -120,37 +120,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3355968F236
+X-Rspamd-Queue-Id: BDA0B68E89E
 
-In airoha_qdma_init_qos_stats(), the Tx-fwd counter was incorrectly
-using register index (i << 1) instead of ((i << 1) + 1). This caused
-the Tx-fwd configuration to overwrite the Tx-cpu configuration for
-each QoS channel, resulting in incorrect QoS statistics.
+In airoha_dev_open(), if airoha_set_vip_for_gdm_port() fails after
+netif_tx_start_all_queues() has been called, the TX queues remain
+started while the device configuration is incomplete. This leaves
+the device in an inconsistent state where packets could be
+transmitted before the VIP/IFC port configuration is complete.
 
-Fix by using the correct register index ((i << 1) + 1) for Tx-fwd
-counter configuration.
+Add netif_tx_stop_all_queues() call on the error path to properly
+roll back the TX queue state.
 
-Fixes: 20bf7d07c956 ("net: airoha: Add sched ETS offload support")
+Fixes: 20bf7d07c956 ("net: airoha: add QDMA support for Airoha EN7581 Ethernet")
 Signed-off-by: Wayen Yan <win847@gmail.com>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 31cdb11cd7..329988a840 100644
+index 31cdb11cd7..cf9c366907 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -1256,7 +1256,7 @@ static void airoha_qdma_init_qos_stats(struct airoha_qdma *qdma)
- 			       FIELD_PREP(CNTR_CHAN_MASK, i));
- 		/* Tx-fwd transferred count */
- 		airoha_qdma_wr(qdma, REG_CNTR_VAL((i << 1) + 1), 0);
--		airoha_qdma_wr(qdma, REG_CNTR_CFG(i << 1),
-+		airoha_qdma_wr(qdma, REG_CNTR_CFG((i << 1) + 1),
- 			       CNTR_EN_MASK | CNTR_ALL_QUEUE_EN_MASK |
- 			       CNTR_ALL_DSCP_RING_EN_MASK |
- 			       FIELD_PREP(CNTR_SRC_MASK, 1) |
+@@ -1715,8 +1715,10 @@ static int airoha_dev_open(struct net_device *dev)
+ 
+ 	netif_tx_start_all_queues(dev);
+ 	err = airoha_set_vip_for_gdm_port(port, true);
+-	if (err)
++	if (err) {
++		netif_tx_stop_all_queues(dev);
+ 		return err;
++	}
+ 
+ 	if (netdev_uses_dsa(dev))
+ 		airoha_fe_set(qdma->eth, REG_GDM_INGRESS_CFG(port->id),
 -- 
 2.51.0
 
