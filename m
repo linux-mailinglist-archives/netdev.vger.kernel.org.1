@@ -1,173 +1,131 @@
-Return-Path: <netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0YpoD5C5MWoFpgUAu9opvQ
-	(envelope-from <netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:04 +0200
+	id dMH+F4+6MWo+pgUAu9opvQ
+	(envelope-from <netdev+bounces-299959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:05:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58282695559
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC275695583
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:05:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=queasysnail.net header.s=fm2 header.b="t nn5G4K";
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=k6+561Cj;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299957-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SQLTYRBb;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299959-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299959-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C61F31161FE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BF9D53181054
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAB938237F;
-	Tue, 16 Jun 2026 21:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1121F3A6EED;
+	Tue, 16 Jun 2026 21:05:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FC328A3FA;
-	Tue, 16 Jun 2026 21:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC80395AFD;
+	Tue, 16 Jun 2026 21:05:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781643660; cv=none; b=u6Hk0e1ad2Jo+2hRSC1DDNVJ+srFnq0RRTfrqCqXxOnyUp7g7N9s0DNMJWVlxv9Kc9HUirJ8N0JsIKvIVgvlQmsmdDWIIg88/VPQNfPn0eeOJMimP+gqudhm7vxxpb2jdcSS4H5Zc0ioaJfRNPnUBcGxeVF+mSrESOu1Zsg61ac=
+	t=1781643907; cv=none; b=Yu54L8/7mvq5OM96Wycpu5TvsEly7KrN8EIoLEdsIY3U6jZcIEWfl60bpIMiWZOSK3tc1qmhPjU9Oa6Idg1uEYzVIoLXxQOJBj1rthxruw3hCI3r6sViSmyTbafgRRR8zZjKilZn8lL9s/g8VeOvh0kfFN/j10ccGXZkv5GJ8Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781643660; c=relaxed/simple;
-	bh=WsoujMZrT9SaiHwQY0Ibg4au2nX+hLKzfLC+G7CHlVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yqm88mQ86BWCXKHdHYgC8EsE3T9wrEgxiYW3S77OrF/pGYxByfBGBOreFI0dDzzKAK6/9w78EbZsuGS7MMnzVYjbHB19RVQLOUhgXFiw4KbSjgTkdoHUqmRoo4PBZhqXCk5ELMauww62i5DTU93OrypQF2I0P1jZBcR0/onqX5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=tnn5G4KV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=k6+561Cj; arc=none smtp.client-ip=103.168.172.155
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 2F0BB140014B;
-	Tue, 16 Jun 2026 17:00:57 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Tue, 16 Jun 2026 17:00:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1781643657; x=
-	1781730057; bh=7OCmBpm14YGh/RsHx8JtMtdaVhHc1rhuAXLFNR688Ls=; b=t
-	nn5G4KV2AemekWneeYwAap6PtV10MvWDvB9cBfn12OJheab73MO8+neGem5vlLvB
-	nDniv9zV4ER/o0qEr+/ZLivwi5ybqt90+5WX3+U6ftgzK1BS//f8rxB7cFVMr5mV
-	fI2QsG3y1VdKYb2L284IuPC4eHBGPo+UyLvyHx99IHQCOhRSPd/IpaD0M8ensdpc
-	cU4xoDfq6w9F9Tt8BRY6fq7eP/jke/umaoPg6grmk7lUN+oGTVev2xtkYkfQwoLi
-	4Vj9o9J5yk7aKfoowpHw1pVse/sZHALvSqdnfEEO7GGb8r3NyvShvEnNoisDaTda
-	farFkV/b112TGa6Q9IxXQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1781643657; x=1781730057; bh=7OCmBpm14YGh/RsHx8JtMtdaVhHc1rhuAXL
-	FNR688Ls=; b=k6+561CjBK2Vh9BHJUAZXuoxhkEAfxxa9lLlpFxKFb5GNZymj8F
-	QluUib2jI8mN3frFVNUuUPf07lKYMpP+DGHZ7w9CW7QytaPhHFTkiT1gTMGRvwhx
-	jmOZ2X2qe36FATkyAmbawJO2/gUdd70G9Pr+IpUYHNOGanGOHZMA1LwTfqQRB+gg
-	ma1QNshz3HGf+4J7AycxgJ5253W54Q5UiETkYhFQJLdnVmO1CuGIYjEovhhwMOE7
-	bRKEp/8eTT7hOXTb8FEtIK7EklxZOQOcrpwJYfkJntypd6seTEWIE9jDlcxbINVZ
-	hX9QDv8ZHllqtYH4x0VOjay++Bjz5wTz5VA==
-X-ME-Sender: <xms:iLkxatFR824kVmKyNli2inOrkjS-FWqRlQ2PMWmlCVytbWZ6dviLqg>
-    <xme:iLkxaoUTylwYO844lilucS0v9oxfsITbH8-q9uccC2SwlQAcwCit9whGkvWrO-gGg
-    lfCywAh70TDJ9Zz6fYv4dXWnqXRSK-Jjbs32w7760rzDSe01TMkdw>
-X-ME-Received: <xmr:iLkxap828PcRwAfzaTOplekAnXQ-aFWMyFB6LD0zUz4IdI-YmZIR91iZ2ZBCqIV__72cWmJcnurIkQVv8rooW_w>
-X-ME-Proxy-Cause: dmFkZTEu80uHfl9AJZCbHRhjyd5Nj29+YGxPuRk4OAYpFusrsU5S0ETpHDtlh12bB+99D9
-    bsESsUIomHC4f/vZ1Z3GqU071/4xLcm/pzs1/NrprCXfJzxh8WAwPZ/Mr0BxYx8NZSC4lN
-    jMdNoS2beNF2BCIQJRS9Y48Y15fETUym59Sy/Vwv0Uu1k4OrtTWdk+FNjaVLWefCfp+jxL
-    DJ8ed+SQujYFNfuZ4VooQuR/LYZqphR0KYBmhZcNNPdidqVEXWU8xH5mno/VU2jZEh+6KE
-    9tR+8vVJRPvA3E0lItMudb0yMZsQNyuGD6ifsda1TJc14x7LY+46tLJlbbMz41jLngcHi7
-    NXdK1L/1NsZyMB/y7B+P2opnW8SwtgHZYfc1c9FmJyWzKiGTXGnZhEkCbt/lPY6uJ77XJ8
-    2Rwme12M+YUZeE0f8arWOgFaUMU3pqScPvOD1e2C5wvqyOrumKIrFnL6/IEQ937wjCtI2p
-    /njdqjEFATbSaQOrb0StrtfK8Oz/2Ca5wxH1TDg+bU6nci+vjjPxfCmT+pcraBDKMhGkyL
-    t4rpM0DT4XS+w8Gj4gw+Nx7KlMV0MECEC9aL/u4tcCwaYZl6g+UZf1H3T0G/CRMkRjcnb6
-    ONBEzdEOK9Crfxakyp457lAYMi4FU9W5IDc/rUgk95Tr3LZk7nONE9oFDklA
-X-ME-Proxy: <xmx:iLkxal4sYGELSN9eASoOYtDp_omMvQVsum5hQRbKKIN_CPa-YuY1tw>
-    <xmx:iLkxaika8tFG5eKZ7JcQgX-zdjtSbPXRchCkBmVoUKwKWZMUofxMLQ>
-    <xmx:iLkxaoF_2vUHxOKcXJNQkNiI9VdgSYY7ef9sJpcMPi_GVLtMgxRvHg>
-    <xmx:iLkxap9z0FxhXd1lWSKdmjPbtWQ6lft4DffIX2tOheZ__cAqG3ki5A>
-    <xmx:ibkxagD5DAlN1ieS1RrNG9CqglBagajJxqFWjRbkp42X0H9Vp67gWwmd>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Jun 2026 17:00:56 -0400 (EDT)
-Date: Tue, 16 Jun 2026 23:00:54 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: syzbot <syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in tls_err_abort
-Message-ID: <ajG5hg9oJvyxPplG@krikkit>
-References: <6a315d48.b0403584.28d0ff.0002.GAE@google.com>
- <ajFpejsl1ukTbG96@krikkit>
- <20260616082816.4dd0f035@kernel.org>
+	s=arc-20240116; t=1781643907; c=relaxed/simple;
+	bh=20MOj3cFIfEmwj14kTofb3V5BqW7mpcKZIyGsLatgfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XBIeR9FHJOKnqZhgrOxOH86Hj02Iqwuq7h4VyIGapxMLCy8xQo0LqeJgxbEhsknnPEQ4f1jDTAYBP5QgEeJgCmSj4ugbO/3ADtNN9pn+tct64Oo5JXb1ZxWD8TgdMtdyrOu76Jd318JkEZXjsQTJ+j9HPVTjCTpz9lrFO9HlqYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQLTYRBb; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B94841F000E9;
+	Tue, 16 Jun 2026 21:05:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781643906;
+	bh=2R8CmtVTZGIH+ClggiKNd4YljShJHA2SfkJJ6kv1B44=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=SQLTYRBbi06gYKC7IZ5HTVbl+rJze67jKydMVFmDf+lJ8ZGRbRIKf00iiYEK2zCZl
+	 OolnUXytFooF06TzCunHiuhB72WLWp0herX34zZHsiw5FNzMzxmlsMp9p7/DSlZgFs
+	 duxuaxQEHEff7Qj/gLUhPMqSu6mqxw4sDzs7ktDQfP2XxqOvlx1/IFP5DGhdhP+djc
+	 164+kEgQYm6sdkeMqHauFp3eAOqkRAz9G7WFAKj3x0DqVUSAEg6PKh4Uma95HP21Kl
+	 azC1lkGaUUfoXMhcQYqRF142jVkf6xfbckm9o5xeSvmj1NH+lfKvOmCmiqMgldBBIs
+	 897ZmG8dq3GEQ==
+Date: Tue, 16 Jun 2026 14:05:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
+ <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>, Sunil Goutham
+ <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Ethan Nelson-Moore
+ <enelsonmoore@gmail.com>, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next V3 2/7] netdevsim: Register devlink after
+ device init
+Message-ID: <20260616140504.75979b27@kernel.org>
+In-Reply-To: <7635d50c-1c82-4090-8907-53a72444fc04@nvidia.com>
+References: <20260605181030.3486619-1-mbloch@nvidia.com>
+	<20260605181030.3486619-3-mbloch@nvidia.com>
+	<20260610165053.7c91f331@kernel.org>
+	<eb525345-da07-414c-9d05-7e00e3eb472f@nvidia.com>
+	<20260611085440.4fe36bf2@kernel.org>
+	<f266dfa5-0c6c-4be0-b73e-b2185dadd6a7@nvidia.com>
+	<7635d50c-1c82-4090-8907-53a72444fc04@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260616082816.4dd0f035@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299957-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299959-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,messagingengine.com:dkim,queasysnail.net:dkim,queasysnail.net:from_mime,krikkit:mid];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:syzbot+cca46a9d1276f38af2ae@syzkaller.appspotmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:horms@kernel.org,m:john.fastabend@gmail.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:syzkaller-bugs@googlegroups.com,m:syzbot@syzkaller.appspotmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,davemloft.net,google.com,kernel.org,gmail.com,vger.kernel.org,redhat.com,googlegroups.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FORGED_SENDER(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS(0.00)[m:mbloch@nvidia.com,m:jiri@resnulli.us,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:horms@kernel.org,m:sgoutham@marvell.com,m:lcherian@marvell.com,m:gakula@marvell.com,m:hkelam@marvell.com,m:sbhatta@marvell.com,m:bbhushan2@marvell.com,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:enelsonmoore@gmail.com,m:linux-doc@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[resnulli.us,google.com,redhat.com,lunn.ch,davemloft.net,lwn.net,linuxfoundation.org,kernel.org,marvell.com,nvidia.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,cca46a9d1276f38af2ae];
-	SUBJECT_HAS_QUESTION(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 58282695559
+X-Rspamd-Queue-Id: BC275695583
 
-2026-06-16, 08:28:16 -0700, Jakub Kicinski wrote:
-> On Tue, 16 Jun 2026 17:19:22 +0200 Sabrina Dubroca wrote:
-> > I suspect err==0, and sock_error() consumed sk_err in between (the
-> > alternative would be err > 0).
-> > 
-> > Something like this?
+On Tue, 16 Jun 2026 20:29:25 +0300 Mark Bloch wrote:
+> I think the explicit helper is the cleanest option here, without any
+> workqueue fallback inside devlink. It avoids depending on devl_register()
+> ordering, and makes the support explicit per driver.
 > 
-> Makes sense, but what's eating sk_err?
+> Does that sound like an acceptable direction?
 
-The 2 remaining sock_error() in tls_rx_rec_wait()? [1]
-
-> Don't we depend on it being set
-> to avoid further state transitions once we hit a crypto error?
-
-I kind of thought so too.
-
-> I thought that's why we don't consume sk_err in recvmsg and sendmsg in
-> the first place (we are not calling sock_error() anywhere)
-
-Umm...
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/net/tls/tls_sw.c#n1095
-
--- 
-Sabrina
+I'd much rather have the workqueue with the purely theoretical race
+with user space than a bunch of drivers that don't act on the cmdline
+params.
 
