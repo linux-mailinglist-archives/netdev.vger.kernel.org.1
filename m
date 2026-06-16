@@ -1,154 +1,142 @@
-Return-Path: <netdev+bounces-299680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0fMXIT2ZMGqNUwUAu9opvQ
-	(envelope-from <netdev+bounces-299680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:30:53 +0200
+	id x4INJiOaMGqlUwUAu9opvQ
+	(envelope-from <netdev+bounces-299681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:34:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A76368AF1D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:30:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D01F68AF41
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:34:43 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=feB7STRW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299680-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299680-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=klHL2vIw;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299681-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299681-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 88748300F779
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:30:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6185311D8C8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 00:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2921C1A6801;
-	Tue, 16 Jun 2026 00:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141202673AA;
+	Tue, 16 Jun 2026 00:33:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1046378F26
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 00:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F3B246BD5;
+	Tue, 16 Jun 2026 00:33:16 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781569850; cv=none; b=ARVp+MUBFsldCDBuW1zMRavEsYWaIpTGVeqzu6pzCCUuuvb4obU71uz4OzldTScFbOYxUSqjpj4bv2X5yKaAtVxrW3dWDYLRdqL6dTw927L3aDmh69Hf/754g+vikbJUHmsqTaN4dhqHhKjrspQzVqsvI5w+rADhuaUGMckI5rM=
+	t=1781569998; cv=none; b=Vo4knd5/XLyUw9NkQ3UwKlEpABxcC1BwR313RkQaFUziIbGB8Cn9PSJf338RXzNN8suZdiDeEJRu+CObxZIb34uERpEGF5mjzn3d2pjwdAFsEXT2/2Epn8HmCq+Rc7QZ5eLRpr8cO/vMVdKCFGsmx0bZYhE9iVdMns8eVJMNYCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781569850; c=relaxed/simple;
-	bh=ogqhqw9MTk4wiyv+yy/tQ9xJEPd9C82de43KoP7cCbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pW2OTbFm9wUmi81vTDPuIlVqbq67g7YJuL/fV061z5zyOal87Qybt6HtID6DUyLG5BU+Jhg1QMeKMZSusoc+lPONV0es9D8ehwSGvHvMcLhX3oFTJmQnetw27FptY0e5bj6KqKU6Y4p/RyjdXPZBnlVv8k66b4h1TbrwBXR1PJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feB7STRW; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324D21F000E9;
-	Tue, 16 Jun 2026 00:30:48 +0000 (UTC)
+	s=arc-20240116; t=1781569998; c=relaxed/simple;
+	bh=QFvD9jCjp9gdZIph8m4xgZh7pDD+9ZFFbGUYFuhiEWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Yy5mS0AOcPTlchnYdxoBypQkh+7B+rir8V7dSXjj2FxGVAxMKJELbZAxg8/JW0TSxif/MSlgGs0rIA88URE71Ah/4hTUhSQfacJxxUlwB78QnCQZ4Od3sGrPM519A5hyPO7N0uee/8p0hIz1USIqoPUkVqM0ffiGy1D43rlHa0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klHL2vIw; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 669E81F00ADE;
+	Tue, 16 Jun 2026 00:33:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781569848;
-	bh=wVyYAaJOZHGmPuGVTnYPiAm/XmP7EdBC5Kvf48oDZyc=;
-	h=From:To:Cc:Subject:Date;
-	b=feB7STRWOmDCLRYhINfDmwYkljsn2OXsyzGOTy98cwxZWmzP0iDKz16SHu89BAoj2
-	 NhPBnZLDnLpFVq4addO3I6vy5NQela4h+6172z74zezbbTZZnWEYYGZQG//gKnkQt/
-	 L8DDkrCfyuM84HHrniCypjvDdWnflF/4yCXfC8+L0cK+xRfb5DpQ1GAxhYWNCjFKVD
-	 KrU7x8O7nJIE63El3IwYXWf23grM5UqCMC2/8LmUFY/4Gv3g67Y7CXHGaKb3fYZDjc
-	 72fPQEPv4wrDbbwJdtT71haxNPh7pdq/d8YdbdHID1oHT8FjGHqs9gelY0XItV8l9l
-	 mjmdWjTz724fw==
+	s=k20260515; t=1781569996;
+	bh=+K/IMa8F/ssrDKZahEBsAtE1o+3QX5n+1ZUkmyJ5JfM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=klHL2vIwvcs/MnUgaLhac22PWlRE86KB4RGM1bRHf97EKGcUFeSH7/rorig1QKRN3
+	 DegjygYckV7WGqY5I/qVXxUtLGJDzaPDMpT6Io/RxMZ/xIQhR1c+9LERlm1Nj5E2y0
+	 5ihUWyx4lA1h/siPOvbEpSkqABqjx7AerYQI+jWfsHfFC1bbErp8JwN2WU6z1uYicS
+	 emBjXBGzBTXfg6qRflO/L83hTdmpIxGWuqCSpffd2R8ogAz2d3O/FXerYGQ+OcRLZy
+	 epq/PtKr1lD7mC6/xmMU3QjTIiiKq2Wj/j8Rk09O2M0+PeXGE6sGGWHuRCBMyl56Yr
+	 iAxNAB6rdI4Sg==
+Date: Mon, 15 Jun 2026 17:33:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Weiming Shi <bestswngs@gmail.com>,
-	yotam.gi@gmail.com,
-	jhs@mojatatu.com,
-	jiri@resnulli.us
-Subject: [PATCH net] net: psample: fix info leak in PSAMPLE_ATTR_DATA
-Date: Mon, 15 Jun 2026 17:30:46 -0700
-Message-ID: <20260616003046.1099490-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.54.0
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com,
+ dipayanroy@microsoft.com, leitao@debian.org, kees@kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, ast@kernel.org, sdf@fomichev.me,
+ yury.norov@gmail.com, pavan.chebbi@broadcom.com
+Subject: Re: [PATCH net-next v10 0/2] net: mana: add ethtool private flag
+ for full-page RX buffers
+Message-ID: <20260615173314.677c33a8@kernel.org>
+In-Reply-To: <ajCXIpDVaVcUcQwd@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260602202801.1873742-1-dipayanroy@linux.microsoft.com>
+	<ajBRwYftEol8IE49@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20260615134247.0bd7e16e@kernel.org>
+	<ajCXIpDVaVcUcQwd@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299681-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,mojatatu.com,resnulli.us];
-	TAGGED_FROM(0.00)[bounces-299680-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:kuba@kernel.org,m:bestswngs@gmail.com,m:yotam.gi@gmail.com,m:jhs@mojatatu.com,m:jiri@resnulli.us,m:andrew@lunn.ch,m:yotamgi@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FORGED_RECIPIENTS(0.00)[m:dipayanroy@linux.microsoft.com,m:kys@microsoft.com,m:haiyangz@microsoft.com,m:wei.liu@kernel.org,m:decui@microsoft.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:leon@kernel.org,m:longli@microsoft.com,m:kotaranov@microsoft.com,m:horms@kernel.org,m:shradhagupta@linux.microsoft.com,m:ssengar@linux.microsoft.com,m:ernis@linux.microsoft.com,m:shirazsaleem@microsoft.com,m:linux-hyperv@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:stephen@networkplumber.org,m:jacob.e.keller@intel.com,m:dipayanroy@microsoft.com,m:leitao@debian.org,m:kees@kernel.org,m:john.fastabend@gmail.com,m:hawk@kernel.org,m:bpf@vger.kernel.org,m:daniel@iogearbox.net,m:ast@kernel.org,m:sdf@fomichev.me,m:yury.norov@gmail.com,m:pavan.chebbi@broadcom.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,m:yurynorov@gmail.com,s:lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me,broadcom.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,mojatatu.com:email]
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A76368AF1D
+X-Rspamd-Queue-Id: 2D01F68AF41
 
-psample open codes nla_put() presumably to avoid wiping
-the data with 0s just to override it with packet data.
-This open coding is missing clearing the pad, however,
-each netlink attr is padded to 4B and data_len may
-not be divisible by 4B.
+On Mon, 15 Jun 2026 17:21:54 -0700 Dipayaan Roy wrote:
+> On Mon, Jun 15, 2026 at 01:42:47PM -0700, Jakub Kicinski wrote:
+> > On Mon, 15 Jun 2026 12:25:53 -0700 Dipayaan Roy wrote:  
+> > > Just a gentle ping on this series. The approach was agreed upon, and it
+> > > has picked up a few Reviewed-by tags as well.
+> > > 
+> > > Please let me know if you need anything else from me, or if I should
+> > > resend it to collect the tags.  
+> > 
+> > Don't recall now what the exact sequence was but pretty sure this 
+> > no longer applied after some other mana series was merged.  
+> 
+> I see, the net-next is closed now, I will rebase and resend this
+> once it opens on June 29th.
 
-Fixes: 6ae0a6286171 ("net: Introduce psample, a new genetlink channel for packet sampling")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: yotam.gi@gmail.com
-CC: jhs@mojatatu.com
-CC: jiri@resnulli.us
----
- net/psample/psample.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Sorry for not flagging this sooner, IDK how it escaped the reply.
+Maybe some mix of Jake's comments plus it not being applicable 
+later.
 
-diff --git a/net/psample/psample.c b/net/psample/psample.c
-index 7763662036fb..c112e1f0ccac 100644
---- a/net/psample/psample.c
-+++ b/net/psample/psample.c
-@@ -476,15 +476,17 @@ void psample_sample_packet(struct psample_group *group,
- 		goto error;
- 
- 	if (data_len) {
--		int nla_len = nla_total_size(data_len);
-+		int nla_len = nla_attr_size(data_len);
- 		struct nlattr *nla;
- 
- 		nla = skb_put(nl_skb, nla_len);
- 		nla->nla_type = PSAMPLE_ATTR_DATA;
--		nla->nla_len = nla_attr_size(data_len);
-+		nla->nla_len = nla_len;
- 
- 		if (skb_copy_bits(skb, 0, nla_data(nla), data_len))
- 			goto error;
-+
-+		skb_put_zero(nl_skb, nla_padlen(data_len));
- 	}
- 
- #ifdef CONFIG_INET
--- 
-2.54.0
-
+Not to deflect blame but y'all should coordinate better, the "no longer
+applies" situation happens in mana a lot more often than with other
+drivers :(
 
