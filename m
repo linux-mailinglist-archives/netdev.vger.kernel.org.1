@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-299696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id WkgxHSunMGq+VwUAu9opvQ
-	(envelope-from <netdev+bounces-299696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:30:19 +0200
+	id CK2TJ0ioMGrxVwUAu9opvQ
+	(envelope-from <netdev+bounces-299697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:35:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C144168B44A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:30:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A0568B49F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 03:35:03 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=X5NSVIO4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299696-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299696-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=yeah.net header.s=s110527 header.b=kCxnGII1;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299697-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299697-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=yeah.net;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B2D3302E42F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:30:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CD8230453A7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 01:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4493F37B027;
-	Tue, 16 Jun 2026 01:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9AA2377563;
+	Tue, 16 Jun 2026 01:34:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C77930F52B
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 01:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287981A6803;
+	Tue, 16 Jun 2026 01:34:53 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781573417; cv=none; b=Ka7GpcvXK7zWgToKO7Dg0zfqFzwcBqQ1kfz5qjCY0Ra2mIMmeUaImYiQG4I1hreI5GPZ+NI9BzpRcAOtCA+mZ/NpyBTUyI2Y6dlG+i6q3zY0d3jV7Vpd5ydZIt8fGj0KNcdT0gQ6VveXXHBHBClPeF5zPp6ledzNB3GveFgE5xw=
+	t=1781573697; cv=none; b=ewNLf6drqEaw7sI9LdHiyKwWmCR6tR7qjUvYB9EtgJJnfpiJPO5wTzOYcku1DKkY2Hm7Io6xOk5nVpPJK2ztRWTP+AnzXoOjvXNMYst9Y+XQJLWzVMTTs+Krdoyk+dthqh8833eUaMsjN5ZTLoL5h9hQoggVLNvCYzt+s2QjrfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781573417; c=relaxed/simple;
-	bh=7tgIoyYODY/BcVOQywpimW35OrDcuCMh7NuqZORYX8M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FYqB7EWbqKMDgMfW9Gch0EQWKQ3ygOtfLUqlUEd47lP5357olK1YT+fwuEAmeu+GV4eA8fb1awZ1I70xsS53HDYKSqBtMhGJ4HZ6W7dgNKYWSV9uhwYoo6yDcav6j69vTwnET0qIUpi4sJs+rKbczzQA9BQJMR4HvGwYo6JMgOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X5NSVIO4; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E314F1F000E9;
-	Tue, 16 Jun 2026 01:30:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781573415;
-	bh=tyKoNQR3ohBhu5b5Ioy1rXURzyGmCi/6JkUJw72EXGE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=X5NSVIO4WCxJhwP1E2lZ/LPhkhDIN5wdHcS5G+iC2YdQYhGYE0f7cBrmBCG9TWKFk
-	 mOhWLzcm1oEr923ny96e0IqccujTfjm3wFIeu03TLfmTlqzZvaiF46UcPBRYgcTEr9
-	 eDR5bFLX7bIAtp2Qkf8Z2RDE4He/WU5XPE5I3PjBV7Wcn6F9bJo3YZDF9uLwUfbui8
-	 JcPI4Wn+B7c/MqS1L164mv3olwncn8MB4Y0B49tKwtNF/VTY837pa84/d3IJ2MclSV
-	 OOqOEMEFUATWyT8fe0O/c4epxs6bolXywdJvIdYd/ZyOlmEQWa7mRVaJTao2gJBSKP
-	 +TKSTXfHufCkw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198363839A26;
-	Tue, 16 Jun 2026 01:30:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781573697; c=relaxed/simple;
+	bh=WYV4koRPq1PmmyhNA3YZTY4oNmZIAQkKo7K0HHdslVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BcweKhTLQjpyvCae5iaPHEte3jMsSO+xzjWRCzSIw24TVkB7Nz6DSLtLGYv6bL7d937jUV13SqxE8HcVQnhLZDrW67hkWhX/Gx44POPW+GCaH/fvyKQ02WnkazYoZSC0YcXqot6FJ1BlNb+7AQ301YwezS44ERclOqyfKAPWXZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=kCxnGII1; arc=none smtp.client-ip=220.197.32.17
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=d+
+	j/xHKmzvqmS+TrPR4bqTM7CeIyRUkY+gr55pSNseM=; b=kCxnGII1a2b8r/pO7b
+	xA/Hz88sjD14u5lZLS7PYvBufKiuPHnNWqeBFmwhSZbDfbrwLeey1uxaus5a/f/5
+	jDEBwP0nfvQXur//U8oRyFdagLZ4C3+/If45AMSRz+lyim9dgzmECfPKtYwRDjJY
+	EYVQyyF+iGLTndPRDRo12/8Ok=
+Received: from zhang.. (unknown [])
+	by gzsmtp1 (Coremail) with UTF8SMTPSA id Mc8vCgDnD2wBqDBqX0J8AA--.25605S4;
+	Tue, 16 Jun 2026 09:33:56 +0800 (CST)
+From: Ziran Zhang <zhangcoder@yeah.net>
+To: Jiri Pirko <jiri@resnulli.us>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Ziran Zhang <zhangcoder@yeah.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] rocker: Fix memory leak in ofdpa_port_fdb()
+Date: Tue, 16 Jun 2026 09:32:45 +0800
+Message-ID: <20260616013245.7098-1-zhangcoder@yeah.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,86 +63,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/5] ionic: Expose more port stats to ethtool
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178157341089.377752.10955268074897440883.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jun 2026 01:30:10 +0000
-References: <20260614205303.48088-1-eric.joyner@amd.com>
-In-Reply-To: <20260614205303.48088-1-eric.joyner@amd.com>
-To: Eric Joyner <eric.joyner@amd.com>
-Cc: netdev@vger.kernel.org, brett.creeley@amd.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- nikhil.rao@amd.com, horms@kernel.org
+X-CM-TRANSID:Mc8vCgDnD2wBqDBqX0J8AA--.25605S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZw13AFy5tr47CFyDArWUJwb_yoWfCrbE9F
+	y8ZF1rJa1kXF4Ykr4YkrW5u34Fkr9rZ3Z2kF47KrWYgFyDur1UJrZrur95JrW8Cr1UuF93
+	AF13ta47CasIyjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xR_UUUUUUUUU==
+X-CM-SenderInfo: x2kd0wpfrgv2o61htxgoqh3/1tbiNQTRkmowqASSyQAA3f
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299696-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-299697-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:eric.joyner@amd.com,m:netdev@vger.kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:nikhil.rao@amd.com,m:horms@kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:jiri@resnulli.us,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:zhangcoder@yeah.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[zhangcoder@yeah.net,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[yeah.net,vger.kernel.org];
+	DKIM_TRACE(0.00)[yeah.net:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhangcoder@yeah.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[yeah.net];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,yeah.net:dkim,yeah.net:email,yeah.net:mid,yeah.net:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C144168B44A
+X-Rspamd-Queue-Id: E9A0568B49F
 
-Hello:
+In ofdpa_port_fdb(), the hash_del() only unlinks the node from
+hash table, but does not free it.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fix this by adding kfree(found) after the !found == removing check,
+where the pointer value is no longer needed.
 
-On Sun, 14 Jun 2026 13:52:58 -0700 you wrote:
-> The primary aim of this patchset is to support the reporting of new port
-> statistics (and one old one) that firmware sends to the driver; these
-> include general FEC codeword stats and the FEC histogram. A scheme for
-> these extra stats is introduced in order to prevent devices that don't
-> support these new statistics from unconditionally setting them or
-> reporting them in ethtool.
-> 
-> [...]
+Found by Coccinelle kfree script.
 
-Here is the summary with links:
-  - [net-next,v5,1/5] ionic: Fix check in ionic_get_link_ext_stats
-    https://git.kernel.org/netdev/net-next/c/7678e69079c1
-  - [net-next,v5,2/5] ionic: Update ionic_if.h with new extra port stats
-    https://git.kernel.org/netdev/net-next/c/433bc5008149
-  - [net-next,v5,3/5] ionic: Report "rx_bits_phy" stat to ethtool
-    https://git.kernel.org/netdev/net-next/c/cb683ff6ee07
-  - [net-next,v5,4/5] ionic: Get "link_down_count" ext link stat from firmware
-    https://git.kernel.org/netdev/net-next/c/3277e605ac01
-  - [net-next,v5,5/5] ionic: Add .get_fec_stats ethtool handler
-    (no matching commit)
+Signed-off-by: Ziran Zhang <zhangcoder@yeah.net>
+---
+ drivers/net/ethernet/rocker/rocker_ofdpa.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/rocker/rocker_ofdpa.c b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+index 66a8ae67c..15d19a8a1 100644
+--- a/drivers/net/ethernet/rocker/rocker_ofdpa.c
++++ b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+@@ -1924,6 +1924,9 @@ static int ofdpa_port_fdb(struct ofdpa_port *ofdpa_port,
+ 		flags |= OFDPA_OP_FLAG_REFRESH;
+ 	}
+ 
++	if (found && removing)
++		kfree(found);
++
+ 	return ofdpa_port_fdb_learn(ofdpa_port, flags, addr, vlan_id);
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
