@@ -1,137 +1,151 @@
-Return-Path: <netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id mZlrFiiyMGp4WQUAu9opvQ
-	(envelope-from <netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:17:12 +0200
+	id ySeRIhmzMGqeWQUAu9opvQ
+	(envelope-from <netdev+bounces-299715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:21:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2AF68B6E2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:17:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA35F68B702
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:21:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=OStTHS9c;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299714-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=SruLL8qr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299715-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299715-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3219D300FA88
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:17:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DB9230158BE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 02:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD90A3BFE44;
-	Tue, 16 Jun 2026 02:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5893C3BF689;
+	Tue, 16 Jun 2026 02:21:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF63B37B413;
-	Tue, 16 Jun 2026 02:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED3F379EE4
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 02:21:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781576227; cv=none; b=PVwmllBjv9fIvXWSxqMt8Hi9Thw61Ej3gAmRfZajEutcnXoziHxtWwJrgnrG46JVK3yOAeCVvNGgaBchvxEluW6yjXX2Oe8XfQVWmXw2mistMd9GzjtHxHSbrgqoBclI1c5aPANj3OwmUds8bpV9m0YWe3vzTfM6yXvfFu4eRp0=
+	t=1781576470; cv=none; b=iMQoYth75lBmXbhmYwPT45eZKEQUr0pzxgMOK0thWFaPbUzRt2WT4igp/PLzD6ISP3l9xDzncoSJtpHS5EyT6XA3YZbrgQc2yy+Ihq2Z3nKYSCT+IggudCd1qsQh7/z0Zrqqd0pFMTLTyHPyBJZPmJ0uqz5guxIRaMZpH6Wl1r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781576227; c=relaxed/simple;
-	bh=iYuwh/QjPCaFltZgY1oNyGfCkwfgJLRV5G8y/pey57o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dDwyFBXPviVRojsR9lz2pUixS+AkXHmOkoMenmN6JcArVvgoIg1fD02gTj/McWu8yE9fav7qzQO1tephnUuFpleif7+ah3gmC2610VsjDOgVhWOfhxrU12SM8YVwJbAY2j4RhLTYxBI/IJuo3lnFGqNF+lva9AobhhaBS4CREbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OStTHS9c; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E4D1F000E9;
-	Tue, 16 Jun 2026 02:17:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781576226;
-	bh=xD+Oip3IRpQPzSxenYyTvneudjF43QmGVA6/28MSifo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OStTHS9ceHewKrSU9o18QwJHMw4AaB6qp16uTX1ZTaLPmPIBVJ1pSMw1/lJ3jQeA+
-	 G1Vj/m3qrDZP/n3iLx4qkdSkdRQD7RAXYKDxBmdm/4HEpJs6zXA5x6lFVaHtN17NAI
-	 hw74FSwUS74Zigh7lKdAGeN2AS+22bqzFTCbWu0athb/SR13nF5ZZT3dcoGyc1vCHL
-	 BHjECOGWU8Y7vIwGaDgVr1A4bbBgAtxKo1f8Q6Qn65+vqV6m5HJXYSEBJOYKaMqWjV
-	 i75kqeYQMypXa9zyHUjO7tSEBlL7sd/dgKS8PXvUFzFLOPYGDDsrrFm92iX/5Qa371
-	 H7KQ1oHer7+Qw==
-Date: Mon, 15 Jun 2026 19:17:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: edumazet@google.com, ncardwell@google.com
-Cc: chia-yu.chang@nokia-bell-labs.com, jolsa@kernel.org,
- yonghong.song@linux.dev, song@kernel.org, linux-kselftest@vger.kernel.org,
- memxor@gmail.com, shuah@kernel.org, martin.lau@linux.dev, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
- horms@kernel.org, dsahern@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
- stephen@networkplumber.org, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, kuniyu@google.com, ij@kernel.org,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Subject: Re: [PATCH v2 net-next 1/1] tcp: Replace min_tso_segs() with
- tso_segs() CC callback for TCP Prague
-Message-ID: <20260615191704.31be22da@kernel.org>
-In-Reply-To: <20260615185102.5e8de52d@kernel.org>
-References: <20260614071756.239686-1-chia-yu.chang@nokia-bell-labs.com>
-	<20260615185102.5e8de52d@kernel.org>
+	s=arc-20240116; t=1781576470; c=relaxed/simple;
+	bh=djO0ft+XrvrJoK1f7tXDZE4lm0hqmiWI78bfeN74K7o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ETNn/kQ7VZwcqG2o3G6gqi/IumyNFvgh5CnGzA2/OSD69kASFmqcvPMN+V/3xTB4feGhQ1JOB0TtdVx06Rmx0Elj7zo7aJfjSYvFwhaamq4toV9twf9Hr6ikWQvALvaZ0BA7BQ1IL+wuHBrsaKhiwkODs5NxROWdwgDnlnHikq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SruLL8qr; arc=none smtp.client-ip=95.215.58.178
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781576465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cgCBIIw/dfWAko3AMACm5KQHuWKcjQCJjJ8LFx83WEM=;
+	b=SruLL8qrEJA6/iv9zghgEJciV1K8BBYx/I7WciaHir7G7ggAGhAvh2cFsleAwGG5RMQiCs
+	JpR0PBAgGGq5V1NZEDYuzdNeWu4Wiz9gPm55xKjp96ZG4xbKUmGlpySxFyVDj1Bi4HqKUW
+	udWaC6x8dsfzhhbtasv6Wo/+vTsuMTY=
+From: Qingfang Deng <qingfang.deng@linux.dev>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jonas Gorski <jonas.gorski@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	=?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>,
+	George McCollister <george.mccollister@gmail.com>,
+	David Yang <mmyangfl@gmail.com>,
+	netdev@vger.kernel.org,
+	Sashiko AI Review <sashiko-bot@kernel.org>
+Subject: Re: [PATCH net] net: dsa: Fix skb ownership in taggers
+Date: Tue, 16 Jun 2026 10:20:43 +0800
+Message-ID: <20260616022043.684-1-qingfang.deng@linux.dev>
+In-Reply-To: <20260616-dsa-fix-free-skb-v1-1-fd30b35dcf66@kernel.org>
+References: <20260616-dsa-fix-free-skb-v1-1-fd30b35dcf66@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299714-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299715-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:ncardwell@google.com,m:chia-yu.chang@nokia-bell-labs.com,m:jolsa@kernel.org,m:yonghong.song@linux.dev,m:song@kernel.org,m:linux-kselftest@vger.kernel.org,m:memxor@gmail.com,m:shuah@kernel.org,m:martin.lau@linux.dev,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:horms@kernel.org,m:dsahern@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:jhs@mojatatu.com,m:stephen@networkplumber.org,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:donald.hunter@gmail.com,m:kuniyu@google.com,m:ij@kernel.org,m:koen.de_schepper@nokia-bell-labs.com,m:g.white@cablelabs.com,m:ingemar.s.johansson@ericsson.com,m:mirja.kuehlewind@ericsson.com,m:cheshire@apple.com,m:rs.ietf@gmx.at,m:Jason_Livingood@comcast.com,m:vidhi_goel@apple.com,m:andrew@lunn.ch,m:donaldhunter@gmail.com,s:lists@lfdr.de];
-	FREEMAIL_CC(0.00)[nokia-bell-labs.com,kernel.org,linux.dev,vger.kernel.org,gmail.com,iogearbox.net,redhat.com,mojatatu.com,networkplumber.org,davemloft.net,lunn.ch,google.com,cablelabs.com,ericsson.com,apple.com,gmx.at,comcast.com];
+	FORGED_RECIPIENTS(0.00)[m:linusw@kernel.org,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:florian.fainelli@broadcom.com,m:jonas.gorski@gmail.com,m:hauke@hauke-m.de,m:kurt@linutronix.de,m:woojung.huh@microchip.com,m:UNGLinuxDriver@microchip.com,m:chester.a.unal@arinc9.com,m:daniel@makrotopia.org,m:matthias.bgg@gmail.com,m:angelogioacchino.delregno@collabora.com,m:wei.fang@nxp.com,m:xiaoning.wang@nxp.com,m:clement.leger@bootlin.com,m:george.mccollister@gmail.com,m:mmyangfl@gmail.com,m:netdev@vger.kernel.org,m:sashiko-bot@kernel.org,m:jonasgorski@gmail.com,m:matthiasbgg@gmail.com,m:georgemccollister@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,hauke-m.de,linutronix.de,microchip.com,arinc9.com,makrotopia.org,collabora.com,nxp.com,bootlin.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[34];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,nokia-bell-labs.com:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,linux.dev:dkim,linux.dev:mid,linux.dev:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DD2AF68B6E2
+X-Rspamd-Queue-Id: AA35F68B702
 
-On Mon, 15 Jun 2026 18:51:02 -0700 Jakub Kicinski wrote:
-> On Sun, 14 Jun 2026 09:17:56 +0200 chia-yu.chang@nokia-bell-labs.com
-> wrote:
-> > This patch replaces existing min_tso_segs() with tso_segs() CC callbak
-> > for CC algorithm to provides explicit tso segment number of each data
-> > burst and overrides tcp_tso_autosize().
-> > 
-> > No functional change.  
-> 
-> Eric, Neal, looks good?
-> 
-> The min rtt thing in tcp_tso_autosize() helps a bit but if the sender
-> gets congested for a longer stretch min_rtts on new connections are
-> high and we're back to sending small TSO, keeping the sender overloaded.
-> Which is to say - I _hope_ this also solves some of Meta's problems :)
+On 16 Jun 2026 at 00:33:00 +0200, Linus Walleij wrote:
+> diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
+> index cf9420439054..23f032b76190 100644
+> --- a/net/dsa/tag_brcm.c
+> +++ b/net/dsa/tag_brcm.c
+> @@ -102,10 +102,12 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
+>  	 * (including FCS and tag) because the length verification is done after
+>  	 * the Broadcom tag is stripped off the ingress packet.
+>  	 *
+> -	 * Let dsa_user_xmit() free the SKB
+> +	 * Free the SKB on error.
+>  	 */
+> -	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_TAG_LEN, false))
+> +	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_TAG_LEN, false)) {
+> +		kfree_skb(skb);
 
-Ugh, I didn't see the Sashiko report, it's only CCed to the author and
-bpf@, not to netdev :/
+There are multiple __skb_put_padto() calls in this patch, which can be
+simplified to:
 
-The zero-check sounds legit. Let's revisit this after the merge window.
+	if (skb_put_padto(skb, minlength))
+		return NULL;
+
+skb_put_padto() frees the skb on error.
+
+Regards,
+Qingfang
 
