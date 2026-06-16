@@ -1,136 +1,322 @@
-Return-Path: <netdev+bounces-299765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 4a77HVP7MGohaAUAu9opvQ
-	(envelope-from <netdev+bounces-299765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:29:23 +0200
+	id yKq4EFL6MGqyZwUAu9opvQ
+	(envelope-from <netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:25:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C169368CDA7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:29:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A673668CD64
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:25:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=ksBhxwFw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299765-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299765-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=0bSLdUZz;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299766-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A60AE312C247
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:24:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 988DC302514A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 07:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C76130569B;
-	Tue, 16 Jun 2026 07:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE95026738B;
+	Tue, 16 Jun 2026 07:24:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012046.outbound.protection.outlook.com [52.101.66.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A96426738B;
-	Tue, 16 Jun 2026 07:24:13 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781594654; cv=none; b=bbq5jEjQfGQFviOcqn27qr2cAA3E/r9f1HhZ+7Y1WPbtylo/u04wpVT8Q1tK+iI0oWYsdhh3NHGXSLNb6AJTAC7akfl4DnvrI092K24MwfjGnE6Pz7qq5d41ds7nsyepJgWz8fOjEfnrhUJBkzO09Z3IE8lLQA311FCNhXSMxyM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781594654; c=relaxed/simple;
-	bh=mSHCAKPeuTTnzKFb0PvI4Fx6VQ5sLrhRW/y2oKPXMzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igXvbNGD7YA5PmPHrhsyJG9gACYdTwv3KerjOyjelkQ6Ah+bmucdZ/QAWkHhVD+j52C5goKeVkmetKPtb8TvfkFookZfhL++sRh0NL35Y4gaXdjVDS/MqmyljAytlHmk6OBfu4D9ZD1Yp7HUxfFHNwb0ytTIYgpIKGwKGLVisYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksBhxwFw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 229611F000E9;
-	Tue, 16 Jun 2026 07:24:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781594653;
-	bh=cl6PMnisnJ9/Bdbcjub8BxhQjZ5k0rKJxO4bzTolNjk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ksBhxwFwZFgd+37XpML9NW934otgeATdW3p6WiCTD8OPkCwwARFiYIMu683z3jOCG
-	 e+KnZt58UC1QIw9M6mX2EC5WlPSnv/H5kk9w3v597m/yl1OpueuWvpdAAGzZyumsNt
-	 P1vv6ZmzJZFuiJwo7kwpgGtAPDTWl/V035IktVf8zNZi7bM1ClmrZDof8FIcp8S41a
-	 baFltYe+8G0ttu5KyDjd2Lt+cT9NBPpMQqJTse1L83AkGxucNB7ofg5aERZ0F8CXpX
-	 QA3kp7RLQcdCJ1Bw5OYKeENO5MsVPzEiylvnrM5V+wrVtol3N3hWhUQ34te9AZG8vH
-	 31G0iPRtgUw0A==
-Date: Tue, 16 Jun 2026 08:24:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
-	marcelo.leitner@gmail.com, w@1wt.eu, zdi-disclosures@trendmicro.com
-Subject: Re: [PATCH net] sctp: hold socket lock when dumping endpoints in
- sctp_diag
-Message-ID: <20260616072408.GR712698@horms.kernel.org>
-References: <1bbd999cf88fb1ea93f4a3743047bce9b51adc24.1781287178.git.lucien.xin@gmail.com>
- <20260615110402.753443-2-horms@kernel.org>
- <CADvbK_e062WLNVy+BbuNTNoJGBvQBR7PHp_BmxLwwSGq4O9_dw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC3A314D18;
+	Tue, 16 Jun 2026 07:24:42 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781594684; cv=fail; b=IaYP08yNISuTuWfrCTTFB5EIJFrES21pHhvpfVLYZ6AHiJkfr9O+S1m9dn68tTS9WvqISDWfE4XezqPDYC+zonABxK4AokxoFMh1nFsYh6ZeGXIUIpd4XTEG5Hz3euKhgWWXV2+XJEyAuKk2gn7R6mvJCokJ5QqcSv7EzSX88To=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781594684; c=relaxed/simple;
+	bh=dwOWiC765CTzven4anywY66iqRv0mDw7IG5KynJgibA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=M9wk+A/2JhRwuNbPWZLEanjuidMQvzRxHUFU5V0cibxuEujApiOnNIg+JR6ZoQRbeHrTj2EToZTz3GD4Qz0NtZ3EHFwXATuvfC5+oh+43okof8YrgIXDMc0dpwDV25V80ovb1sECggJOu3TQjcyh+iBQxh2yJbMO6MDH00zdArs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=0bSLdUZz; arc=fail smtp.client-ip=52.101.66.46
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g+MpSB9GfcjARxoqQ9n9hsqcfqKz3I14XpELgpCCGjSC6OxovduYLxnI+EMKhwLy8cazlwl9IFCF7lVHakGgZy7MyY2q6cCtibyV/gpijJTK8Kiaxs/iu1dAAfcOSO8Br7Rd2oecmRy2Rh8az8pl7mSLyuyzFChDlrKJYum4Q4DPaca1hJimFd5g/rs1vTIHzvgrR9Xsx8FjNogPH98G/uZ7i49yGIevWsIpSQ58jG4sCZjkNQihnSnjGTsR9MLAMOdBuK3djMT5NS/ASAyih1z4d3GXm9n05sK5PlDPxDUw/rOC6TLO2Zm8WVICe2JdySma9P239HbQaZdcFOk+Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yy5KA33UxKXm04+6kmPinXQOunlrDNzPY3jBL+Qf7T8=;
+ b=wjR/NTKg0xVXCCh5lU8SbIFBYmGyqhuKv7VsSKMPUtC50SpqUtc3FKjGhuS6ntLyJJkbnmxkgGlNlemsHisnA4GhfIJLVNPr6Sxjt9uaPDtFuyXfoRrCskCAH7YYHN33QjzGUOPOtgQH0RN/SRSCiuAptnqHT6wRqP/8OTHCalpyc3Pyp2pbQEHZ8r2gYhEnQE976eHmh+LlhjrywbsC07Wc/KxoALHYMUNhg+xIR14zd/YmVNdt9Ft48bwxS7EdmvdboNL2ntIhx+5mklbGYCDqb8aKmq8Ra9dRICeLT8ORMaXRrcSAUkR3RRTFDdM5qb/CJdfHpGxLL5gOVHPFXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yy5KA33UxKXm04+6kmPinXQOunlrDNzPY3jBL+Qf7T8=;
+ b=0bSLdUZzrsQGrpbTDjiKeTjeRS5o+S879Lzp5QJFgE4Fekc/vbRWx4dAP/JWGjmpOKP12/i71T+ciqqYncwFo3nUor1v+D7mtNzeYYUJ5BuYDnKEWQ6yA/IhfeQAIP71d01GlV9opL2zptAcq7QuGU2lJi8qPtbTz1dbvJcqwayz50dwEF09S79dbicVYKh/jKNYA2ccLijFEFfbE2aqGTTczEAWAoHRu2g1APgFQBZj5gY0gcbk/ee8TaFNd41UJKE1HU/9O23OUr2BuUuzE1PnNNXs+mCfpwtvv9sd+ptXKjIKtmECYroa0tR3cq+72vFZzpK8r5eQYjft9ftuxg==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ GV2P189MB2887.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:265::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.113.18; Tue, 16 Jun 2026 07:24:36 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
+ 07:24:36 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
+	<horms@kernel.org>, "aleksander.lobakin@intel.com"
+	<aleksander.lobakin@intel.com>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, "jmaloy@redhat.com" <jmaloy@redhat.com>
+Subject: RE: [PATCH net v3] tipc: fix slab-use-after-free Read in
+ tipc_aead_decrypt_done
+Thread-Topic: [PATCH net v3] tipc: fix slab-use-after-free Read in
+ tipc_aead_decrypt_done
+Thread-Index: AQHc/Ly7cJEs8zp3ikSAff4HL4pmFLZAyJfA
+Date: Tue, 16 Jun 2026 07:24:36 +0000
+Message-ID:
+ <GV1P189MB1988976BF420AA4A8650CF07C6E52@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260615114618.71249-1-doruk@0sec.ai>
+In-Reply-To: <20260615114618.71249-1-doruk@0sec.ai>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|GV2P189MB2887:EE_
+x-ms-office365-filtering-correlation-id: 75035d3f-dc9f-4d4b-c178-08decb7851fb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|56012099006|11063799006|38070700021|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ zw1imTzD9XY1vQjpC7ZhE8gUZvxZT07qN1Zfluf1y1ac1EPdkvu6DSdfBHE0TZMNjvbtndsjG2xkBirQ0i89MpY4yX0X6h6BIMxcEQvzjhntKiee0LsaHEA6L0dciVa1BAwB8wej4qbvuskTgFTt+gMwMkXp2R2xDpsnobOO/4lRFm2nzJAf2iSx5yL9zDcPoiqjN2zVYMz6kimB+rFc17vw+NeMPAzihXgS9WGz72m+fWYbfk27t8wPQG30XljEDUH91Rkoj6/O72J4/RRNGXLcSrumimzF64pvyQleKrk65ZtfCRVzfY8wOQtEYuPntQllOLLnrSuJxIvgZZaJS/ra/wL5ZRgOv/mNEiMWkT80JNwKLrSxysZwftST++ptEbVlY47cS+Y4zDMbVFkPqqfa6lUbESs1stJ7/LYjLgC4CXY8imd7MzMoAVC6dBM9ny+nGuluqhR1uL6KjGI7DpnsVQ2ogrQe41brxjOjLGjw4iwxoOjjEXpUdSCMXXysW3OZtfIW2YhycL39YdkDg05y9TAAxJTVRG6XLvaL16ji5WF6QlAxrEUKae3bQStSIbk52XWiBvq2jA5P50+r9I5c9z9Bvp8GQVg1ZGFzKYJNJtNbdlqyA/6Uu2YKvb0GBvqL4ulnuXjcdf0Iw39VhqEzi8Xso4wuYWdTU7XHSkax5ftWVKY2VXUYWpEGObqh
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(56012099006)(11063799006)(38070700021)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?VFuKwOcxLHm+8kRMgs55d5HnFeV2htfMV3fpkUFzOo0dNOQH5F1c6gxDtKc1?=
+ =?us-ascii?Q?LKZdUiLn+X3tIEe9UbAxIDr2WNMgC2v251MSYBu4hOmpehQ1TKD03jf9cJB/?=
+ =?us-ascii?Q?ElFI6IwLMB5Aech5nolqV5UqyuUNZSfS3SiYqy7QW9ZK6dT6o9TM9TR7CbNQ?=
+ =?us-ascii?Q?yA4oNAOWLB6W2KGzzdaw/36p6X0bERnhty0YOPmhWlqPaivk3wNEfUxGg0GS?=
+ =?us-ascii?Q?z9T2avqt85esdDkZNXvQ+1mfXN+VuaEhZuZMvS+ToQNNyhdwGcXHtHHGuqjC?=
+ =?us-ascii?Q?9OWvudsTBcLvfdle2wO5VApmvKKe45ilq1TMVvm6R5o2untuVN6PktBIGXmy?=
+ =?us-ascii?Q?VYK82mTnMq0ixFt0alRuqHSZSwbq91T21w0zeFhP+o5NwlX6tKwfnZKxY3no?=
+ =?us-ascii?Q?GYVd2svNJQiKUAy+SxvwNK1sJJ2dbFE+rTffqgLftDcxvXcM6jO2ZZHMu+zb?=
+ =?us-ascii?Q?UH+7F0EoMgLLQI2BXgpGSgJaQ+CifJHKwdZGN2Sl4LBrwcqW4rlUrAk1OSM5?=
+ =?us-ascii?Q?J3sSv8gHja1QY/QOwLlVnJObH+8SPtDedUwJHnXTEQpp2U2EGHLpf/OrSsPp?=
+ =?us-ascii?Q?YuBlKAaJqFAyze+xb0x6v8Eu4wvCSO9SNgn9jq4j7zxY8gfC1oQyzOov15cZ?=
+ =?us-ascii?Q?D0Ac1LlZqA7PTL8NfiXz1h85Vh2hstXyL1bWL+dAKJek510fyFyozA6qkQ2x?=
+ =?us-ascii?Q?+Jzf2SOizvhQwDl7muUSAI/pL3nLtR22lpvNVKaP24nzA42rTTHpuQ1BWLFf?=
+ =?us-ascii?Q?dB/yWJAAwJTxo2vfDDVvwC5VpltTiei8YDjTtO5lkTqI1OhC/6mMhV0FZGjq?=
+ =?us-ascii?Q?MbWLEJW+3QuYGa8a1TiAuDrRla4ECX0JDvvlM8P1WmGhX9v2+pzzHkJgrJyG?=
+ =?us-ascii?Q?0u+TwSm1OugNOF9/Z+OSP8IvJA2ES1rzJNh8vjbMyqNgBM1Bxke+TVPGh5Rt?=
+ =?us-ascii?Q?fKyBU2bCNv4ZSDErW5DrAUmGXaVoGY5MuALycHQm1G470UsoV7CZeN3xUYII?=
+ =?us-ascii?Q?2wWorr6CplcpXf+wtFLOTVYkvlKZN+4ek2ULeCPhdAuA65ubpjYYnPoxj71V?=
+ =?us-ascii?Q?b6hfmy0YWLjS8kYplKEVa5qd3x1zeKdg/+iqDOeF2FpI7idjl3ntm+6j6UUS?=
+ =?us-ascii?Q?bQvd2Nuc68S6jI3WuLsGDXg0ZSJscokdG+gHFeOs/0lmxdxBQyC6F4ufuVQp?=
+ =?us-ascii?Q?yY1zwtbVGInszi0hQNFBRaj1ZrG8+GcskTjqk4ppxbrGMFjJI8CQ7RxhHX0Q?=
+ =?us-ascii?Q?68rt74TqcWcrHTcrw3pQP03j3oaHSAZJbgDHlSmNjGOta2q4xG/a5ZZUnzcy?=
+ =?us-ascii?Q?nt6LSsDYdOlzrOTwDtDSDt7EYki2lPmyroKF/XjF02VPMD6XPxPdD5HfYfz/?=
+ =?us-ascii?Q?Be0/BAbEmQahdDCMeQh6Iv/wLER9jIf0cxHH6t3fXwyhq0nyLiCWGGyHg41/?=
+ =?us-ascii?Q?7JQ59dqZd6mJb7k/ktUpSC7N/02gn45/WLKFBRK2veIZiKhyuZ1HGVeGLct3?=
+ =?us-ascii?Q?bzk9qQo70m3CLtDhi8Y9RobayfbE7O9K/YVViWb0QNVo8k1H5JyBQRPc9Mvk?=
+ =?us-ascii?Q?Jq1DJtZnkU6kjMlNC1v2LkWT7f4X7cRjdXtfpXzpSuqQrwjYMwh2ILWev5bh?=
+ =?us-ascii?Q?PePXPO//Ipv5yKev9QURHsNaGY5Bbx2aSqquRmpk6PZT3gfKck20P6586/rk?=
+ =?us-ascii?Q?SoizmfAtFf8dwYoAYycfKMoLXB+I4r49EmmEQa3rJoOp1yG3xceaTsaW7+EE?=
+ =?us-ascii?Q?N4ISN2qKkA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADvbK_e062WLNVy+BbuNTNoJGBvQBR7PHp_BmxLwwSGq4O9_dw@mail.gmail.com>
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75035d3f-dc9f-4d4b-c178-08decb7851fb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2026 07:24:36.4768
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7OfbBP7n/6tFTAzxS0K9hHfFzE6K8FTBrM+CHLxp1qjZRVT6YRogdwdLLfcjVCteb9k/6n9gDXHfMB2cG3JwHYzwINND7npgt5SEJW12y+I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P189MB2887
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299765-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,1wt.eu,trendmicro.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:marcelo.leitner@gmail.com,m:w@1wt.eu,m:zdi-disclosures@trendmicro.com,m:lucienxin@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299766-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[est.tech];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:aleksander.lobakin@intel.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:jmaloy@redhat.com,s:lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[est.tech:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,horms.kernel.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,intel.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,est.tech:dkim,est.tech:email,est.tech:from_mime,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C169368CDA7
+X-Rspamd-Queue-Id: A673668CD64
 
-On Mon, Jun 15, 2026 at 02:24:34PM -0400, Xin Long wrote:
-> On Mon, Jun 15, 2026 at 7:04 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > This is an AI-generated review of your patch. The human sending this
-> > email has considered the AI review valid, or at least plausible.
-> > Full review at: https://netdev-ai.bots.linux.dev/sashiko/
+>Subject: [PATCH net v3] tipc: fix slab-use-after-free Read in
+>tipc_aead_decrypt_done
+>
+>tipc_aead_decrypt() goes straight from tipc_bearer_hold(b) to
+>crypto_aead_decrypt(req) without taking a reference on the netns, unlike t=
+he
+>encrypt path. When crypto_aead_decrypt() is offloaded asynchronously (e.g.
+>the SIMD aead wrapper queuing to cryptd), the cryptd worker runs
+>tipc_aead_decrypt_done() later. If the bearer's netns is torn down in the
+>meantime, cleanup_net() -> tipc_exit_net() -> tipc_crypto_stop() frees the=
+ per-
+>netns tipc_crypto, and the completion then reads it:
+>tipc_aead_decrypt_done() dereferences aead->crypto->stats and
+>aead->crypto->net, and tipc_crypto_rcv_complete() dereferences aead[]
+>aead->crypto->and the node table -- reading freed memory.
+>
+>Decoded KASAN splat (v7.1-rc7, CONFIG_KASAN_INLINE + TIPC +
+>TIPC_CRYPTO):
+>
+>  BUG: KASAN: slab-use-after-free in tipc_aead_decrypt_done
+>(net/tipc/crypto.c:999)
+>  Read of size 8 at addr ffff8881056258a8 by task kworker/u16:2/51
+>  Workqueue: events_unbound
+>  Call Trace:
+>   tipc_aead_decrypt_done (net/tipc/crypto.c:999)
+>   process_one_work (kernel/workqueue.c:3314)
+>   worker_thread (kernel/workqueue.c:3397 kernel/workqueue.c:3478)
+>   kthread (kernel/kthread.c:436)
+>   ret_from_fork (arch/x86/kernel/process.c:158)
+>   ret_from_fork_asm (arch/x86/entry/entry_64.S:245)
+>
+>  Allocated by task 169:
+>   __kasan_kmalloc (mm/kasan/common.c:398 mm/kasan/common.c:415)
+>   tipc_crypto_start (net/tipc/crypto.c:1502)
+>   tipc_init_net (net/tipc/core.c:72)
+>   ops_init (net/core/net_namespace.c:137)
+>   setup_net (net/core/net_namespace.c:446)
+>   copy_net_ns (net/core/net_namespace.c:579)
+>   create_new_namespaces (kernel/nsproxy.c:132)
+>   __x64_sys_unshare (kernel/fork.c:3316)
+>   do_syscall_64 (arch/x86/entry/syscall_64.c:63)
+>   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+>
+>  Freed by task 8:
+>   kfree (mm/slub.c:6566)
+>   tipc_exit_net (net/tipc/core.c:119)
+>   cleanup_net (net/core/net_namespace.c:704)
+>   process_one_work (kernel/workqueue.c:3314)
+>   kthread (kernel/kthread.c:436)
+>
+>This is the same class of bug that commit e279024617134 ("net/tipc: fix sl=
+ab-
+>use-after-free Read in tipc_aead_encrypt_done") fixed for the encrypt side=
+.
+>The encrypt path takes maybe_get_net(aead->crypto->net) before
+>crypto_aead_encrypt() and drops it with put_net() on the synchronous retur=
+n
+>paths and in tipc_aead_encrypt_done(); the -EINPROGRESS/-EBUSY return
+>keeps the reference for the async callback to release. The decrypt path wa=
+s left
+>without the equivalent guard.
+>
+>Mirror the encrypt-side fix on the decrypt path: take a net reference befo=
+re
+>crypto_aead_decrypt() (failing with -ENODEV and the matching bearer put if=
+ it
+>cannot be acquired), keep it across the -EINPROGRESS/-EBUSY async return,
+>and drop it with put_net() on the synchronous success/error return and at =
+the
+>end of tipc_aead_decrypt_done().
+>
+>Reproduced under KASAN on v7.1-rc7: a UDP bearer with a cluster key is
+>flooded with crafted encrypted frames from an unknown peer (driving the
+>cluster-key decrypt path) while the bearer's netns is repeatedly torn down=
+. The
+>completion must run asynchronously to outlive tipc_crypto_stop(); on x86 t=
+he
+>stock aesni gcm(aes) now decrypts synchronously, so the async path was
+>exercised via cryptd offload. The unguarded aead->crypto dereference in
+>tipc_aead_decrypt_done() is the unpatched upstream path;
+>tipc_aead_decrypt() still lacks maybe_get_net(aead->crypto->net), so the
+>completion can outlive the free on any config where crypto_aead_decrypt()
+>goes async.
+>
+>Found by 0sec automated security-research tooling (https://0sec.ai).
+>
+>Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+>Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>---
+>v3:
+> - Rewrite the changelog with the decoded stack trace and frame the
+>   reproduction on the current tree (v7.1-rc7); drop the v6.12.92
+>   references (Tung Quang Nguyen).
+>v2:
+> - Add Cc: stable@vger.kernel.org and Alexander Lobakin's Reviewed-by.
+>   No functional change.
+> net/tipc/crypto.c | 9 +++++++++
+> 1 file changed, 9 insertions(+)
+>
+>diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c index
+>6d3b6b89b1d1..84a6489da036 100644
+>--- a/net/tipc/crypto.c
+>+++ b/net/tipc/crypto.c
+>@@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct
+>tipc_aead *aead,
+> 		goto exit;
+> 	}
+>
+>+	/* Get net to avoid freed tipc_crypto when delete namespace */
+>+	if (!maybe_get_net(aead->crypto->net)) {
+>+		tipc_bearer_put(b);
+>+		rc =3D -ENODEV;
+>+		goto exit;
+>+	}
+>+
+> 	/* Now, do decrypt */
+> 	rc =3D crypto_aead_decrypt(req);
+> 	if (rc =3D=3D -EINPROGRESS || rc =3D=3D -EBUSY)
+> 		return rc;
+>
+> 	tipc_bearer_put(b);
+>+	put_net(aead->crypto->net);
+>
+> exit:
+> 	kfree(ctx);
+>@@ -984,6 +992,7 @@ static void tipc_aead_decrypt_done(void *data, int err=
+)
+> 	}
+>
+> 	tipc_bearer_put(b);
+>+	put_net(net);
+> }
+>
+> static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
+>--
+>2.43.0
+>
 
-...
-
-> Low: #1, #2, #5, not really issues,
-> but worth mentioning about it in changelog.
-> 
-> Critical: #3, not valid.
-> socket refcnt can't be 0 when traversing the chain under read_lock_bh().
-> 
-> But it seems better to hold ep instead sk, and also to check
-> ep->base.dead instead of sk_state CLOSED.
-> 
-> Medium: #4, not valid.
-> it's completely okay to dump duplicate or skip socks because of
-> concurrent close() and listen() in diag.
-> 
-> will post v2 with some improvements mentioned above.
-
-Thanks, much appreciated.
+Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
 
