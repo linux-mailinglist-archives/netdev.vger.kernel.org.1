@@ -1,212 +1,197 @@
-Return-Path: <netdev+bounces-299728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lxViM1/RMGqYXgUAu9opvQ
-	(envelope-from <netdev+bounces-299728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:30:23 +0200
+	id qZYTHALRMGqMXgUAu9opvQ
+	(envelope-from <netdev+bounces-299729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:28:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DD9B68BE83
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:30:23 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D30B868BE62
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 06:28:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=altera.com header.s=selector2 header.b=FFNbZ9+i;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299728-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299728-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=altera.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=asu.edu header.s=google header.b=EIFJnLpT;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299729-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299729-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=asu.edu;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 915623104750
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:27:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC6BD301A428
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 04:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF4E3CDBA9;
-	Tue, 16 Jun 2026 04:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8161A3C5538;
+	Tue, 16 Jun 2026 04:28:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011023.outbound.protection.outlook.com [52.101.57.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AED3CBE61;
-	Tue, 16 Jun 2026 04:27:05 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781584026; cv=fail; b=bMa8WSGPKxt1KciqfmVz+mOldlaJc0t7ZwIY311xzaCy0sQwZ9Np6njr/gLbBjRRvCj+vsJmzP4Si61Y2zzMsIwxL7OOCculjFD44VvOloPsbJWhfpl/x9gaOrV8dcPddZiF8RcTzCrOe7UpWeYWzK+kijZp8QCHWAXCGk+LhXI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781584026; c=relaxed/simple;
-	bh=v9dxslsTPqb3WtvX0rHFQRbfj3DDkbQiXwf6feW8Nbw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JDM47xsiIi6VEjd++whcmf+uQJ6opiS9qyd1DtZ1MwD65ptiES2aqtqtbwl1SHK3g1yLqeN9o8S7EtgKUBTDOYVkVnvFjTfuS8jU73B2/BwJgdtvuSLlHcgDNeuNyoG9ppJFlg/emrYeYGCvttVQshp8gY3m3qsBnXvs1cR7iso=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=FFNbZ9+i; arc=fail smtp.client-ip=52.101.57.23
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A9lAIeshbYPypuqYIMIkizcESp0nekPa2H1bB7x11A+gSGi5p16xSkv9EwN8mm0daJdVlun+F15hc5Q88Mt6DPwtQFUGhd6hKd3eiBwpnNqLdRdCvBItQLfBPYuIUUfk2AVkdn4LeQOWKYjZ5qGXVRULmVC2JRqGOo6IJYaeUGSBDcwbM3SNY2oJAR/RAiny3sKexalGNuseCpZSAX+mKxKNKQvUAVGFBRlihEr0JshjcxiKMqbGSvH5nTmODLdZi/ImiTVACco6ZXZJAjybjbx4zVvH8t4dma//efLGFOyOBmGMF63h4m8ohhnLYfVg8B3a6ISVKvy0r3gc2BLfNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=flVCSC3XhnE/xZQW47yl0FUFr3syt3vux5Zpr+2qRc8=;
- b=hi3nv1nYpH4+kxFUvq/75Z4kUmHck+R/e2JP6PuMp47r3Ay6UAM6u7QOKsgpBVcu2j2JeWs2tpF7lGU8Hfpub+Nj5MSgcN+GnuSOjilMKsXa88NJIHT6lEl4MRdrXfQcu7f5UpUM7lO+z+hZhhXD2GMj7CDsdjcvzlJ2X83M8ll+lEASRDTdrA5GheRl/7qmRizgi6H2NJTC/4Li790bfIp5Mst28e0y/jvrQvACaDL44oi03iYce5OqnTtXyIiHRJCYAJ+xXt+YEoHYOiBU8eXczPOkZFf2H9L95zvlanTW6LLo8dPRNqmW507b+YgAwyBkbKYSZBfD3QJZ9INSPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=flVCSC3XhnE/xZQW47yl0FUFr3syt3vux5Zpr+2qRc8=;
- b=FFNbZ9+i2sLa+CQH+GmwMYAH2H02aSyWakZMFjQWr+4zmVnWxji4yt17jeDJhnZxFk/NIhqlFJABfeYnMNjPnufHOSA/SY44xoGRjYLOE3IhzIdXqb0+H/w6+BQmc93+rxOIC5UBQfhGfnQCTjn1zDX8gX/3zrrUuwxIBaAEUzltzx43xGNbUR5+cycSTrY0UKsRXcNM85q+t+EFJHFIbJqDQR2dephh1GGXjaK87lKlTVI7D3xJQ8Kr4NP2CG+gkmf8Gdxya+TNVBa+o6TFk+knf8x8fguULA7lLvZNyD1R3A6bHXNjhq2MakuJLNbYcrmDxLSr7H6GvID7JT4YGA==
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com (2603:10b6:a03:432::18)
- by PH0PR03MB6333.namprd03.prod.outlook.com (2603:10b6:510:be::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
- 2026 04:26:58 +0000
-Received: from SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775]) by SJ0PR03MB6964.namprd03.prod.outlook.com
- ([fe80::b965:bfa8:58fb:e775%6]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 04:26:58 +0000
-From: muhammad.nazim.amirul.nazle.asmade@altera.com
-To: netdev@vger.kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1FD3C81B4
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 04:28:46 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781584128; cv=none; b=d0ftGg23gEYMD1AtmvSTYtiBSTwheMP3sxWAnavpzWzIlWrqPAdkXEuUl4fZR2Kq5vvFMEBNoii6cymICqra2H5Hdx1J8Rv6RGsJS76yZt9IazLIixBFZHmZrNfR1a3TAGH/Kry9WK16Nul3wS9ACV0fY/oJqm40PvmQzYb9WGM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781584128; c=relaxed/simple;
+	bh=iSnCoy0wOHnjTetJKmG/nh8R5MUt1SEexf5yDRqPPro=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ax9MpSQzoLBzO4LCvmUZB9ATckkz2sYhW2DsVI/BoanuIQ8DFX2aaPlvmB6cmti1DpE38qZUeg04vq5gLbCclv0p6s4NwyJgsPpVxA8IGrj4q/v2mU7oks2ySkGHgzs1464lW5npQA4Ynhp3PddaFgD/DOWGAZzYrIyV8dsOGDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=EIFJnLpT; arc=none smtp.client-ip=209.85.216.54
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-36ba3ea5c46so2352053a91.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jun 2026 21:28:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1781584126; x=1782188926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+s4R842SAMDVeGmCPYwOESmnuBNOdgsUtTVh5NI/emg=;
+        b=EIFJnLpTZBCcq5alsJF8JAYyScIc9SkIQbZk9cXvZWk/SCcoO9iTmvQ/UOLGbnozW7
+         d/HXS9CSqJSUjddGGC/mpvzYZPG6qWWsY7Jn72piEEmGoEkNVE3p8RUf9578wIWl1yc6
+         737nsA36nMm4NaoqmEES5EJF9H5/IaDCXWCxlWIOiqeYhrJlzuPp2PAjJGGGRXTJTrSq
+         9bUi6slKn5yNo7fmnHyBBN8L9zBM2OTMRXCfVhkSlZ9eNQv56ibc1HerLc/SZKFNfJNA
+         aU8gcEepmH8/1REt3qBdBVGLZZR+FUHMq415ed6KhlDzCyjudCQxGsao95Hd/MztMWtV
+         Upww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781584126; x=1782188926;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+s4R842SAMDVeGmCPYwOESmnuBNOdgsUtTVh5NI/emg=;
+        b=jU+9xasu59sskyruRW/2po3ddqGKkAHsQ0iM/Fmz8Hbq2kHpwUC8xUeyvuavnfTyxs
+         cs1xPNhDpDRrG442/A1dg1bA39d8p1Lz1oMOgLnJvadE7J4Z2tcTnUMLScNw9d2s5f+b
+         4kz9uNs7B3AH4RQocFUjOCsFZH1/HPx1r/EnMvhDJWLk83fqnMb6SWszqWz6wRMHXov3
+         i5kOGeTSueDMXe728eWpT+ZHrDL+7ZOJpELh3sO9FmX0n+enRUSV/sk9eM/Fqfj2kFpb
+         WQWicGon0O7hd6QazGtFshoftAiSIR0A8WzcNxCHVVv2SkPf0QWWZSWz4+7VJqn4+Lxo
+         +Nxg==
+X-Forwarded-Encrypted: i=1; AFNElJ/ip0XZKa2pL28zI2tYVBtLW5tpBBj/XZuve0Glswn9CogeIOlQH12u5cZn2NehZWrzzIpUMLE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5jgywfoK8O/vFWkyUAD+tqYPOdh5l2IC2oPxEjGJOtFgD05xv
+	ea/50h+uKfkh/5yH93oiONmz2vMdmej/uFd1+ObdDlRvrjpdioDdaCjwmAZLkfdL1efJez3bvXf
+	ld/+c4++H
+X-Gm-Gg: Acq92OHOnAxOK8Z9LRxjeWBBbfzOuIfABG+4wXl9qU59m6BZ4dIrDLUf45zbzn9DEsv
+	3PtNFgp7YgNS7BmUYq1MDMtkGD5gPTbeJl2cCqSclOtDOT4J3mVoDt2XpW1czy4MLtJbsDA7hLq
+	SYaGqdPKhMiMBfsAZ8fZQVjYxvXtb6zR8cAVmw7bR3lnvWATEJW/CcPNAQfNEfiF0eXIGtgp2Qk
+	L4yF62FVGOy8M1SAu8kfqxr8nZaud8DWZNIZLQAgRURS45LvrCfXD89o1fuwt4RHmxzoqzHblgK
+	RBoHrKsA7xvRWbWGq4cWPR8+d5t0E5n2pgE7n+Mjj2MKj79QJ+fdOBMva0C8bYNF+gq+mpaxYhm
+	5gRtu5DeFBTsbVcMMBJGeIYI2fqadi5ZXAZC4YM7ia6JcKpJUOPNq2QWUVIVjbpcCtwE2FqvpZH
+	/zenkG
+X-Received: by 2002:a17:90b:58c4:b0:35b:9894:f6f9 with SMTP id 98e67ed59e1d1-37a040adfbbmr17185832a91.18.1781584125653;
+        Mon, 15 Jun 2026 21:28:45 -0700 (PDT)
+Received: from p1.. ([73.140.210.38])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c5208fd0fsm1244221a91.0.2026.06.15.21.28.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 21:28:45 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
 Cc: andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	rmk+kernel@armlinux.org.uk,
-	maxime.chevallier@bootlin.com,
-	Jose.Abreu@synopsys.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] net: stmmac: reset residual action in L3L4 filters on delete
-Date: Mon, 15 Jun 2026 21:26:55 -0700
-Message-ID: <20260616042655.7782-4-muhammad.nazim.amirul.nazle.asmade@altera.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260616042655.7782-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-References: <20260616042655.7782-1-muhammad.nazim.amirul.nazle.asmade@altera.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0013.namprd03.prod.outlook.com
- (2603:10b6:a03:33a::18) To SJ0PR03MB6964.namprd03.prod.outlook.com
- (2603:10b6:a03:432::18)
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	minhquangbui99@gmail.com,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v4] virtio-net: fix len check in receive_big()
+Date: Mon, 15 Jun 2026 21:28:37 -0700
+Message-ID: <20260616042837.2249468-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR03MB6964:EE_|PH0PR03MB6333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ee186eb-a444-4239-bdba-08decb5f813f
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|23010399003|7416014|376014|55112099003|22082099003|18002099003|56012099006|11063799006|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	ev3F8Ddriyn99ZWZd8Cte3L8WzrY6CxPdacmuqb94CztNwjpn5IgNeGEzh3pHM8D78rFf8ZL87NnqMwldmqGKy9HjF88P+sNTiJxZ0Js/7PAwmq5LoqwObU9cm3+3hJWwve4SysGDWvwfx4SiVSRZCJOEEWPYQcVQXtWvc+a5UX40DP4raO/9USkejKZaBeQIT2HMyib5bE5jxCeiag6c9mQw06kXS6teIfPEzEdWQz4WsRfPTWnxnMAOWETQNEQTdEfMamCLCnYiOvHPhOsFYoZlwbjjTOtbHtG91zXFgusykx1hBjJswGHrBSPLRsR9E2UylSut5TX0y8YIXyqhX2tRkiD1aDTPb4cZV5fdVZbZBBQnxz70uwF3U2rjCO3mctF+7+tJ8tUbILTo/C5ZhFjWuNMJ5N1KLpudu6KtZmUb3yoEmHoTp1z2J62S4w8l4Q6KkptEy4Nge8S/2gaGCYSG/DN4sWDuSpXfft8FXqzAeUzp+x28hRze5JfZPrRg13yip1xlHP+9lqnijxgTXjSZ6AJZ2FHtNIO2Jhq2GotjnzubXQ1v1obcmaBoRFywV5wcv7QNSdRozlF2oe9cdDnLWQqSrr6sf9sEcF2WgkfetFCsfV8rC3RcR4mB38HQ5hVfb+GEpmJOJOhUyS7f5HjDZqdPsVvVWIdYSWw7kFcpcdhUjID9Z2e7OA7A0VU
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR03MB6964.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(23010399003)(7416014)(376014)(55112099003)(22082099003)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2RM2APNcZYrj9BF0IvST1WYg8VMjlrVij959+70VWx6ySrVip374rWU6wuxE?=
- =?us-ascii?Q?J4PB3fPKptPb4F4FR7f5oP0jL0CkhtcDGniSQnatCXSSrawNopVOXogD9PWx?=
- =?us-ascii?Q?fKa7kcgNPrR/jVkXOwfRwKEe9yk3dBhSrLcpvWvgf3mw99c7d8NzWvLR4rpw?=
- =?us-ascii?Q?DcAxTVhJCthgp9OzC7DndYR1dQe5EoqNB1ujqldkFpY8NnQeW+KSTca6gvjo?=
- =?us-ascii?Q?gX83sjwR14QPfFKD0zX6vvKzC3lOhwVCn5P2rS5bmBYp2b4zdIxF29FcHJcZ?=
- =?us-ascii?Q?jcbdgxgIav2KhkYbwVjdH+qxO7ycRcKeXc7dX0FjKP6TYyu2z4/jDpsAxsm+?=
- =?us-ascii?Q?WFUqyIQ+RI6I6V/loJ3E8X2nWb5yDaDGuAEsAo1zLrIlluJV1xRqgTWvEQa/?=
- =?us-ascii?Q?W3VkXyy0ElLGyJW2XkiHoSFNETVY+jWui6t+taLtAotww+ZqH7ay5dTNW8Pd?=
- =?us-ascii?Q?QTGADnOK+bRNDCl8KoUqbGpppQx9CNXCNidnh/5rDJCH/UNIAQu8HeJx4Kxf?=
- =?us-ascii?Q?6/sJ9a144Ohctx7bmvZ/E8zcDzAeeWETtThRTGGnu2H9bUQZfl7HlllfnPeK?=
- =?us-ascii?Q?aAm73smxQWxj5VCu2E29IGJ7QS51oAhr21YVMbOKJ2y48FiZROx0Y6gWmY9i?=
- =?us-ascii?Q?gdl+egnyYaZbJxTZlREEu2FEOU87purYdC1llsKe9O4NG2AmA5WSbq7/QHG7?=
- =?us-ascii?Q?gLeVraDLgRujfDG5MdkVZQACeakkL//LLvAWsLv2kzJn0Ya3J/gAVTNQeckH?=
- =?us-ascii?Q?ySUQo6clGsLLOMwTGwTBd0uTjYS9WIyB8x5/bz9jCsedWnGZ/a7Ou0BFHfNc?=
- =?us-ascii?Q?5326mmNQ2cSXfuggfLDt6pz5BgTRul7wGqJXuCfoqfH0AShTs6O9vZz0HKef?=
- =?us-ascii?Q?1lf1AP78BomLkb2OkqlTBRzaSTf5RQ6jqVjYywiJLhUwF2WTrxYyA4dGcX4E?=
- =?us-ascii?Q?Pk0CQ7AvN3sngRzwi+UjlrNfmNRT7ZmU91gVlK95zYmFj5hhYi+oXFbKq5WJ?=
- =?us-ascii?Q?PWVPj3fl5cAuzxTpIvz5y82ioXzo2eBktBXgp4hnUuxDRUgM/jd/AkCkUXfP?=
- =?us-ascii?Q?58/b5Ekz1UmqXO037qp4kkRucu6JGQE9xKYo+LA4XTAxntI4aJXHPTL7ZTx5?=
- =?us-ascii?Q?307AUcqLA6pQVizc0smMlAI1ForVOJ4VvZ1+gA9ieEaxfqiwE6YLtbknUXX9?=
- =?us-ascii?Q?BMgRGvRgpO2zWhmCfxrMblSyXXsnDrVFcp5wK49w7QFlGpX4b6HUhLACbNgm?=
- =?us-ascii?Q?SYV3K/hIY8gP4BXuIlIE2ROk29i/3PsX/Rm/rDSqi1GwbquXWitbGEdLPcT0?=
- =?us-ascii?Q?J1ZE1fxH77YgyZjficK+iUsI57jvRnZEhg6Wt06BKVDlB3C8gJc7hF/IvdPU?=
- =?us-ascii?Q?STV2QU09RSs4X7ulwcJqMjNwRyTJjCS+NZ2/576em48XgkoRZqmcxu4NtwP5?=
- =?us-ascii?Q?FgqUCcMxan41utDgSqCQf5PQQFxRyAbjda/GfS6ZHnwy2pc33SIGHAT9CXpt?=
- =?us-ascii?Q?av+4RQ7wsr9LavGxI4dN6oiLhhEol5PQAqpUyNb+cJGZPnZpuA/swkao9y8Y?=
- =?us-ascii?Q?clXj5qIxdb8yNs3r0wtXha4Qn14s+8I1Kp2MwRzCoO/p7hEDkO1b1gHLyOKN?=
- =?us-ascii?Q?Emyk1ZhDTSc8IL4xC+y6ITc2yXGnHvyNObZugL55Pp4IYQtRvSTmAIbdEbY8?=
- =?us-ascii?Q?F3TCHlxm0SAGcSedzIxNKmB3gB5nRVSjtPVdt/meA1U2VEPHT7KSNN1LpP9J?=
- =?us-ascii?Q?lEpB/aK+GoEUABur49TsUA/m8onBHVxGIwuL/yaRVRgPFdiRQEQyeGEUuyWQ?=
-X-MS-Exchange-AntiSpam-MessageData-1: 2szm1855gqk7Iw==
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ee186eb-a444-4239-bdba-08decb5f813f
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR03MB6964.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 04:26:58.5701
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GahR8H597RWTGiKzfL2kPfBiLb4FLt4Wl+5TUgg5dCHa3bbMVKVv8nfr3L09NgRdpmELhXSRYuGoZCZG9ehzfTvhz1AuPf7LPiVksMvLCNCk/5D6+kZ0BH6j67H2KI15C7cIymm6M9Ow8hdehRoHuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR03MB6333
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [2.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[altera.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[altera.com:s=selector2];
+	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299728-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,lists.linux.dev,gmail.com,asu.edu];
+	TAGGED_FROM(0.00)[bounces-299729-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rmk+kernel@armlinux.org.uk,m:maxime.chevallier@bootlin.com,m:Jose.Abreu@synopsys.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:rmk@armlinux.org.uk,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[altera.com:+];
-	FROM_NO_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[muhammad.nazim.amirul.nazle.asmade@altera.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:mst@redhat.com,m:jasowang@redhat.com,m:xuanzhuo@linux.alibaba.com,m:eperezma@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:virtualization@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:minhquangbui99@gmail.com,m:bestswngs@gmail.com,m:xmei5@asu.edu,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[asu.edu:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,altera.com:dkim,altera.com:email,altera.com:mid,altera.com:from_mime,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,alibaba.com:email,asu.edu:dkim,asu.edu:email,asu.edu:mid,asu.edu:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 2DD9B68BE83
+X-Rspamd-Queue-Id: D30B868BE62
 
-From: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+receive_big() bounds the device-announced length by
+(big_packets_num_skbfrags + 1) * PAGE_SIZE.  That is still too loose:
+add_recvbuf_big() sets sg[1] to start at offset
+sizeof(struct padded_vnet_hdr) into the first page, so the chain
+actually carries hdr_len + (PAGE_SIZE - sizeof(padded_vnet_hdr)) +
+big_packets_num_skbfrags * PAGE_SIZE bytes -- 20 bytes less than the
+check allows for the common hdr_len == 12 case.
 
-When deleting an L3/L4 flower filter entry, the action field is not
-reset. If a filter was previously configured with a drop action, that
-action may persist and affect subsequent filter configurations
-unintentionally.
+A malicious virtio backend can announce a len in that gap.  page_to_skb()
+then walks one frag past the page chain, storing a NULL page->private
+into skb_shinfo()->frags[MAX_SKB_FRAGS], which is both an out-of-bounds
+write past the static frag array and a NULL frag handed up the rx path.
 
-Clear the action field when the filter entry is deleted.
+Bound len by the size add_recvbuf_big() actually advertised.
 
-Fixes: 425eabddaf0f ("net: stmmac: Implement L3/L4 Filters using TC Flower")
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-Signed-off-by: Nazim Amirul <muhammad.nazim.amirul.nazle.asmade@altera.com>
+Fixes: 0c716703965f ("virtio-net: fix received length check in big packets")
+Reported-by: Weiming Shi <bestswngs@gmail.com>
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 1 +
- 1 file changed, 1 insertion(+)
+v4: use easy to understand math to compute the max_len
+v3: revoke 2/2 and add Xuan Zhuo's Reviewed-by tag
+v2: add additiona check as 2/2
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 869f84756ca5..4f9758eeb86f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -653,6 +653,7 @@ static int tc_del_flow(struct stmmac_priv *priv,
- 	entry->in_use = false;
- 	entry->cookie = 0;
- 	entry->is_l4 = false;
-+	entry->action = 0;
- 	return ret;
- }
+ drivers/net/virtio_net.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index f4adcfee7a80..8f4562316aaa 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -1999,15 +1999,16 @@ static struct sk_buff *receive_big(struct net_device *dev,
+ 				   struct virtnet_rq_stats *stats)
+ {
+ 	struct page *page = buf;
++	unsigned long max_len = (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE -
++				sizeof(struct padded_vnet_hdr) + vi->hdr_len;
+ 	struct sk_buff *skb;
+ 
+ 	/* Make sure that len does not exceed the size allocated in
+ 	 * add_recvbuf_big.
+ 	 */
+-	if (unlikely(len > (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE)) {
++	if (unlikely(len > max_len)) {
+ 		pr_debug("%s: rx error: len %u exceeds allocated size %lu\n",
+-			 dev->name, len,
+-			 (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE);
++			 dev->name, len, max_len);
+ 		goto err;
+ 	}
  
 -- 
-2.43.7
+2.43.0
 
 
