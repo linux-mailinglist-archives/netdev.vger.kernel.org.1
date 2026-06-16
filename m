@@ -1,168 +1,169 @@
-Return-Path: <netdev+bounces-299924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id f54uCsqDMWpvlQUAu9opvQ
-	(envelope-from <netdev+bounces-299924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:11:38 +0200
+	id n5cFKQeEMWqDlQUAu9opvQ
+	(envelope-from <netdev+bounces-299925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:12:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D270692D5F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:11:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8B1692DB1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:12:39 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=FRWhfbGD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299924-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299924-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=infradead.org header.s=casper.20170209 header.b=AZHf18eO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299925-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299925-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=infradead.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D4588303F085
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:58:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 095A731AD191
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 17:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6908E305688;
-	Tue, 16 Jun 2026 16:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A41478E53;
+	Tue, 16 Jun 2026 17:03:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4680333AD9B;
-	Tue, 16 Jun 2026 16:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A7443E4BC;
+	Tue, 16 Jun 2026 17:03:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781629133; cv=none; b=ZhnrY/0y/IEPy6u2LVBtDpaePmcxYVbS3WwA0amZ/u3cu2RC8FeQs8GPtS4d7e/3us7qP3s58bnmXTO6oiAAmJdCrCSm3U/3X24K3rP5ZvpEIg5LNocYvlEa7rKDECIUluDVWNId+Qal7zV+ORUFM8Di1NRqiMwWRJLeDMbb1yY=
+	t=1781629393; cv=none; b=g5/25hnX9nUO4VZY4mTgaN49M2CiCV2j3BfI4sZHjqtvRW8D6m6tiypy4KXapp5KeQdAW3/vSFaFaIHtEl1c0gogbxPitrKOQWqdQvdOK4ga3KXO0S6dNYoLL4hQjP32wedXL3JG4vQdo4J7wgz5Kk25AL5vKDVHrpd/o6q4sOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781629133; c=relaxed/simple;
-	bh=NOa+jErrqRQ9MsrhxeSAQuk330n+fUDgahzWLv2YT/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DROHjhcjhuypq11IeTvUxE6hdeaxNfcRLfIIpoIu9oJ3ceDbTXdceTNGjW4Rghvph80/qtP8K0AkFpCUNT9o3V9hmBnvoUt7hVUEjmQlKg1ezWlhpMdgjgA1qpH+IdgNiXp2U/vjpjavq90edmUxuDm5uQ9VyHImJVsUpY4XmsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRWhfbGD; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA4261F000E9;
-	Tue, 16 Jun 2026 16:58:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781629132;
-	bh=dV8hOhSlOi61DCP5xtI7L3O3/t1hOJPAET4rF0DveJ4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=FRWhfbGDnBCYZFp8lka20KY54w2nc5KLEQrwkZHK0br5hGxPmTuDCDBYOxBpbFWL1
-	 D2N8t/YWJu/6qo87CeJ0dzQqbSooi+E++sb/2LNi9I0885aFVjSuBD0/RSoYzgTXmU
-	 pCU5tZfIvKoRE2LeJJqljm+e8b+jXnGb6DPPV7ZLQ3mwktAPLZAqyZ9y3w23858hy9
-	 EHxNROGSNQYmtzs/VirEbecx9TgfAaHS7lqWKR9kgIloHqk8IxOjhwfZLngBV4Lrz7
-	 atv4MfPSW2tC5RcR8SQWojsRNJV8CxbKet3ROrAeO1m3hdhkf95JIK65XPLIP1UeXC
-	 5EnMLlHFqmWKg==
-From: Simon Horman <horms@kernel.org>
-To: doruk@0sec.ai
-Cc: Simon Horman <horms@kernel.org>,
-	jmaloy@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksander.lobakin@intel.com,
-	tipc-discussion@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
-Date: Tue, 16 Jun 2026 17:58:31 +0100
-Message-ID: <20260616165831.831231-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260615114618.71249-1-doruk@0sec.ai>
-References: <20260615114618.71249-1-doruk@0sec.ai>
+	s=arc-20240116; t=1781629393; c=relaxed/simple;
+	bh=nXyaxubBahtAj4IF3o5TF1RlpykJP5S53+F1RX11ENA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DZeQ20ifgZwbGUPQmqT1d+Hvzoke+Y7/+htutAQB/PpmeFTVmmM/Dm34qbGz1gF53bODN8IifwkQ6uX+VBJXYNX3hkTby9Wun8Fo2evMwdLA6HFzPCoXGZq3gkz1H6bJEZsOQF7u9r8wp3/d6luyNSxcZqCUp6O05x1spWJG8Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=AZHf18eO; arc=none smtp.client-ip=90.155.50.34
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=gHmaC1y77edf1raPS3NRFAP5eOMW0ukbCIFVpK4KJzo=; b=AZHf18eOjKe9xide+CG8vnAQFU
+	CyIwrdZIxFmuVcYUeNJ1SRVrOv9o/aWH+PrOj61P+piOiP+qXU65EwjR5iCEvZApLA1IxtlhWHU2e
+	AvhCwKIL9gBTUQUxBV7V7ZCao42RwnH8WaeRPg8n0ss2L5JgRMveHDrRGIsGt3qMYolhWE3PlYW85
+	yt77XTh58IUQajIYIrRd7zx16Cexmz4jnPpl5BRxtGy6SzkrwwySN7pxp/DwBeLzFl0HzgKkJ+xY6
+	uDZqRwNGfxFhiBMoAbfSrNu+VMSLTgdd/hyGFlDR4YTEzzu+jfOGA5O3aZ8mBGW2nkR5jcG7/7/bj
+	kgNZrnjg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wZXBi-0000000BAAh-0hDh;
+	Tue, 16 Jun 2026 17:02:58 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 6C0F430039E; Tue, 16 Jun 2026 19:02:57 +0200 (CEST)
+Date: Tue, 16 Jun 2026 19:02:57 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Petr Mladek <pmladek@suse.com>,
+	John Ogness <john.ogness@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Vlad Poenaru <vlad.wing@gmail.com>,
+	Thomas Gleixner <tglx@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>
+Subject: Re: [PATCH net] netpoll: run NAPI poll in softirq context to avoid
+ rq->lock self-deadlock
+Message-ID: <20260616170257.GH49951@noisy.programming.kicks-ass.net>
+References: <20260610183621.3915271-1-vlad.wing@gmail.com>
+ <20260611191114.5bc43a59@kernel.org>
+ <20260616103529.Yh9Dxsjp@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260616103529.Yh9Dxsjp@linutronix.de>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299924-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:horms@kernel.org,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:aleksander.lobakin@intel.com,m:tipc-discussion@lists.sourceforge.net,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299925-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:kuba@kernel.org,m:pmladek@suse.com,m:john.ogness@linutronix.de,m:senozhatsky@chromium.org,m:vlad.wing@gmail.com,m:tglx@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:linux-rt-devel@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:frederic@kernel.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:kprateek.nayak@amd.com,m:vladwing@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,suse.com,linutronix.de,chromium.org,gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com,debian.org,goodmis.org,lists.linux.dev,linaro.org,arm.com,amd.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,sashiko.dev:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[noisy.programming.kicks-ass.net:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3D270692D5F
+X-Rspamd-Queue-Id: 2C8B1692DB1
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-tipc: fix slab-use-after-free Read in tipc_aead_decrypt_done
+On Tue, Jun 16, 2026 at 12:35:29PM +0200, Sebastian Andrzej Siewior wrote:
 
-This commit attempts to fix a slab-use-after-free read in
-tipc_aead_decrypt_done by taking a reference on the network namespace
-before starting asynchronous decryption. It mirrors the encrypt-side fix
-by keeping the reference across the async return and dropping it when done.
+> So this is not an issue since commit 7eab73b18630e ("netconsole: convert
+> to NBCON console infrastructure"). Because from here now on writes are
+> deferred to the nbcon thread. So this purely about -stable in this case.
 
-> diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-> index 6d3b6b89b1d17..84a6489da0360 100644
-> --- a/net/tipc/crypto.c
-> +++ b/net/tipc/crypto.c
-> @@ -941,12 +941,20 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
->  		goto exit;
->  	}
->  
-> +	/* Get net to avoid freed tipc_crypto when delete namespace */
-> +	if (!maybe_get_net(aead->crypto->net)) {
+Hmm, I thought netconsole had some reserved skbs and could to writes
+'atomic' like? That said, it was 2.6 era the last time I looked at
+netconsole.
 
-[Severity: High]
-Could accessing aead->crypto->net read freed memory if the namespace
-teardown races with packet decryption?
+> Now. The scheduler usually does printk_deferred() because of the rq lock
+> so it does not deadlock for various reasons. It is kind of a pity that
+> the various WARN macros don't do that.
 
-If aead is a TX cluster key, its crypto pointer points to the per-netns
-crypto_tx structure. During a concurrent namespace teardown, tipc_exit_net()
-synchronously frees crypto_tx without waiting for an RCU grace period.
+People have tried, last time was here:
 
-Since packet reception (tipc_rcv) executes in softirq under rcu_read_lock()
-but without holding a namespace reference, dereferencing aead->crypto to get
-the net pointer could result in a use-after-free.
+  https://lkml.kernel.org/r/20260611074344.GG48970@noisy.programming.kicks-ass.net
 
-Because tipc_aead_decrypt() already receives the struct net *net directly as
-its first parameter, would it be safer to use maybe_get_net(net) instead to
-avoid accessing the potentially freed aead->crypto structure entirely?
+and I hate deferred with a passion. It means you'll never see the
+message when you wreck the machine.
 
-> +		tipc_bearer_put(b);
-> +		rc = -ENODEV;
-> +		goto exit;
-> +	}
-> +
->  	/* Now, do decrypt */
->  	rc = crypto_aead_decrypt(req);
->  	if (rc == -EINPROGRESS || rc == -EBUSY)
->  		return rc;
->  
->  	tipc_bearer_put(b);
-> +	put_net(aead->crypto->net);
+> We could add printk_deferred_enter/exit() to all the rq_lock() variants.
+> I think PeterZ loves this the most. And Greg will appreciate it too
+> while backporting because of all the context changes.
 
-[Severity: High]
-Does this put_net() call have the same use-after-free risk? Could this also
-use the net parameter directly instead of dereferencing aead->crypto->net?
+No, not going to happen, ever, sorry. Instead printk should delete
+console sem and have printk() itself be atomic safe.
 
-[ ... ]
+As stated, printk deferred is an abomination and needs to die a horrible
+painful death.
+
+As described here:
+
+  https://lkml.kernel.org/r/20260611191922.GK187714@noisy.programming.kicks-ass.net
+
+"So printk should:
+
+ - stick msg in buffer (lockless)
+ - print to atomic consoles (lockless)
+ - use irq_work to wake console kthreads (lockless)
+ - each kthread then tries to flush buffer to its own non-atomic console
+   in non-atomic context."
+
+
+
 
