@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-299939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id TQNsEm6dMWonoQUAu9opvQ
-	(envelope-from <netdev+bounces-299939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:02 +0200
+	id MjT9J6SeMWq/oQUAu9opvQ
+	(envelope-from <netdev+bounces-299940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:06:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D14694A8B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38F5694BE1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:06:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="Ut4 GBv4";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299939-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299939-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=IPRSFJ2s;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299940-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299940-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=marvell.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CBE513014523
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:00:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 571033271CAC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B28293D668F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F2F3DDDD5;
 	Tue, 16 Jun 2026 19:00:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FED34751B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91480362149;
 	Tue, 16 Jun 2026 19:00:46 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781636447; cv=none; b=Pc5tw+hV9eSGGnuA96Em/56roLN+uXWDhdc/ABiPYsF+YRV8nfYx9pj3qLDEkZzrYjalsGZ+mxpCNttvgjtBtSCeK0Sfa1PZzVcnlpHCwabM2GdnBXInkVC6KsOWImTGaTLMzqFOMOeuYTprTdG578YTmAf/QhNC7EGhJuuAYk4=
+	t=1781636447; cv=none; b=qHIdDggMS9Ibio/9ojHWMIAVus5+tMYSYzplNJMC6q46tcvsqTK1W6LMfeXF0yLrFKiWwYweDNX8CVOKkiDOX+PWFkiy4qagR1l11mXIQuknnh7pxJYtYgENXTEjG53OAltHgMy8O8XKGDjjpIcBMWp+KTzmz/uS9pnXhRAcE58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781636447; c=relaxed/simple;
-	bh=+zioaEgxa5PInV7YqxZ+3jsu7SCekLq1m1g8Rxv5/Sg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pmEN6bUMcT+U1xixtun7tGnZ9a4fZ5iukKmXMATQSp8Ffi1hY2g7zBCQ90JIpMEzE7ctHQD+l2EA6Aqq5d98lZ44zY3FdORv4jRxmYS7GnwN+3456nGEcJnIZq+529Y8WUlq9wjmFIUau1JixzCK8Xk6UHiA9AV9JHY3VzKX8Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ut4GBv4U; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GISG7Y4139081;
-	Tue, 16 Jun 2026 12:00:28 -0700
+	bh=GIy6PliBD4y+R8b6uO2g5XSkSc/3nMQi7P6B3FvBOXQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RDUh9c2InDWdj+cFcvA2BZrOIwOJcHxF3bEwYGSIEUiDeJK9rv0TJ9jNmUKQXDHmE5PIZ599pUhsbyG2MDBHFoK3ba5KYM3K727FGdQ3dv1i8fTB7Bw+wAcPu2pltWvr2ZaNWsBC9aRLAB0IXwC4LbvO7YLova8BRXgaAikDFZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IPRSFJ2s; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GIRuFM3433572;
+	Tue, 16 Jun 2026 12:00:32 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=oZhwMPc83Fx4MomyFfHotv3p7mmZdC009+CBBO+kY10=; b=Ut4
-	GBv4UPVI9RZA5Y4T46OgN6ll4HwTwLSi9jdw3xdVd3COgRIiH9qMIHdPHjAHvje3
-	l7aNOUGXMD7sJ3H0VFqohg2DRVuaIpNt0V8++649uE/eSRhDIQABR8cxvBVdakUP
-	/FGeZWKWq+sDeA0dgBJGGeDZOqmoqeIn9dX0OdolkxYUuuv2mlaJWMfLu03bseg+
-	OMWtp3/CLHX9LVoYG2aGyjE0x0LYOb9hjeG5WwqxhHz2oXjF2Tvf6fljBqkG3kS8
-	Q5t3HAjcqMhufMgoe4+eecIcMLe0rv1cOLf2zaaJg3FvDQp9vjG+wBc/YsXnxu0y
-	0r0VAdy9PZK/SoQRj6g==
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=E4wuYy3vP4u2hYK1CCYuR6IyI
+	uiVldv1KgZ/wsZ5Zvs=; b=IPRSFJ2sOuIeK5v081gHZveFajGFAaXnTM860qscm
+	SCECInh5sPrM2UyFBeKyzKCEJgDKzyOCUs2E3RWOumrgqxIubz94pl4y3NPmoGck
+	Evusrtv5mxYQka8i6t8LS2NUjkadzjJzi6ep2473uyByn229W2rKealSK5cLVDX9
+	4Z1Ea9L0Cl2rW/Yt3xkyBuUBZ4VlXNlhmTdD4shMm5tFkLTcAuvyX2iV6Vpq979Y
+	lL/K8BY8XimD2snlvC7lidAjyHDjRTNnCjgxQwiKGC4RRNcorA/RaTMS0jOenG+z
+	4jrOtj4QfbyVFDClYLVl3+dsAKZx76FMBR1c4vdnTgJkQ==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4es6qenje5-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4eu9p7gqdh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jun 2026 12:00:28 -0700 (PDT)
+	Tue, 16 Jun 2026 12:00:32 -0700 (PDT)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 16 Jun 2026 12:00:27 -0700
+ 15.2.1544.25; Tue, 16 Jun 2026 12:00:31 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 16 Jun 2026 12:00:27 -0700
+ Transport; Tue, 16 Jun 2026 12:00:31 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 71D613F704A;
-	Tue, 16 Jun 2026 12:00:23 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id A45543F7048;
+	Tue, 16 Jun 2026 12:00:27 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
@@ -66,10 +67,12 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Subbaraya
  Sundeep" <sbhatta@marvell.com>
-Subject: [net PATCH v2] octeontx2-af: mcs: Fix unsupported secy stats read
-Date: Wed, 17 Jun 2026 00:30:18 +0530
-Message-ID: <1781636420-19816-1-git-send-email-sbhatta@marvell.com>
+Subject: [PATCH] octeontx2-pf: Clear stats of all resources when freeing resources
+Date: Wed, 17 Jun 2026 00:30:19 +0530
+Message-ID: <1781636420-19816-2-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1781636420-19816-1-git-send-email-sbhatta@marvell.com>
+References: <1781636420-19816-1-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,24 +80,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-GUID: 6kzQAw3yFZrv7rGNYmd28G0ASX14dAa0
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX571xP25RDsmW
- JtgTK6WWaatOrwekMN4KHJBYSduq3rxg6meQB4K3qltSGh3gU1lEPlRiCqFpb7iD2qobdwAwTaw
- CqYAhSi3UfgBupaTeqY0SLSMYNkbijE=
-X-Authority-Analysis: v=2.4 cv=TuXWQjXh c=1 sm=1 tr=0 ts=6a319d4c cx=c_pps
+X-Proofpoint-GUID: 7fL57m4u7vOuL8P1jvC0zgogW567puG8
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX7C8/jvCqgbPs
+ nQNA/fVmAZ7WkGGHVztd6nbBrv00IBPcUTIzje2ZJBktp/zsPT5hLWG2V9YvvxV03FPL1Q5YJs4
+ nwHyLm8xbi3QzI1M55oRTMhPBDzcQoo=
+X-Proofpoint-ORIG-GUID: 7fL57m4u7vOuL8P1jvC0zgogW567puG8
+X-Authority-Analysis: v=2.4 cv=eIgjSnp1 c=1 sm=1 tr=0 ts=6a319d50 cx=c_pps
  a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
  a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=cGofA3kQOmG6IaQPiVUA:9
+ a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=xEhMEBUeZgw2hLcffmoA:9
  a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 6kzQAw3yFZrv7rGNYmd28G0ASX14dAa0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX3kXMhAdwDmJI
- u538TDNObDrbIin31P99EEIWk83CVKhTYKxaOoR7hsr3lT6ZgNlpr8Ne1aoHcHoOQcTW177xeds
- oKu3N+DY38RtZLS5h3aZEXY/Iex1H6Q48+qtUbOxYlY7/lBwKVbEPwgG7INEAGuhi9flf8YUhHe
- qrdWt+UDqdrwu9Pq006xorLS0npQjWzo5fq0KnPjp3WrYo4OOT5Wccg17JTOt7VLtuKGO1yGZYQ
- mrhOfWN1EO9Rid9VN77qYdbBE15IC+ErFfKyJ3dckNizh8qkto0LmXr7enNCPQ1EEEOkNyuRHf7
- Qg5Kuf26KcW6Ku7xj8eBW3CdexEk7pe8GEd8zkAnmqU5HeFgbrZYs5PNx9K7nou8LADcw1efhyL
- o7tmMmxuFRmql9BVC6+uOtormXEfH2YggnrKfpNd24/xpa6r76GkLWALV5Udgxg0Mjh8s6T6/i4
- ma19tgRuP+w8Cfjo0qg==
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE5MyBTYWx0ZWRfX6MaY4AuoDi7S
+ xwAgNCWj6Jvm5ShSd8Pwl3A7+DRFDWnW74qDhjKXHQ46fjxrm+NTBVK2dUaRNFKgRsi2j7N7LMU
+ +ksJ55yrg/VZjVz4Ey+7MGXGXYDiAjd2vt5a1dOl/ZNnAzlqv52Ufe+1mGrWTQT6+VhV+1yoZam
+ yE5/5qBz7aLgNl6XhdE53IDbJKbE2EwNxldJ6lPK66zrZVLuxLa5YcQHiwVcTeyh8Q5U19ULmJv
+ NvJXaedskVqeFQFuX5RUTDanB0HOXqA20HgpRM69W1RBkVHpK0v/cG7/S4spkHlNT43Mf6x5xM5
+ aNC3q0mWa80qweDbFXl4Q/c2xHxeF3b68gR1xIx6ahxUJYrnoX+0izJARIR079gavdq2CYwvDvs
+ bFIlGvhnqFXGKJC3PDt+qWu2N94pWoGUnRWpGEq4lwPN8LufydkwB5ncbNCwlbjj5JBc+RPEmat
+ hDxaglJaAFs1CLzJBhw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-16_05,2026-06-16_02,2025-10-01_01
@@ -106,11 +109,11 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299939-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299940-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
@@ -125,71 +128,36 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 45D14694A8B
+X-Rspamd-Queue-Id: F38F5694BE1
 
-From: Geetha sowjanya <gakula@marvell.com>
+When all MCS resources mapped to a PF are being freed then clear
+stats of all those resources too.
 
-Secy control stats counter doesn't exist for CNF10KB platform.
-Skip reading this respective register for CNF10KB silicon while
-fetching secy stats.
-
-Fixes: 9312150af8da ("octeontx2-af: cn10k: mcs: Support for stats collection")
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Fixes: 815debbbf7b5 ("octeontx2-pf: mcs: Clear stats before freeing resource")
 Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 ---
-v2 changes:
- Fixed AI review by modifying debugfs also NOT to access
- Secy control stats counter
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/net/ethernet/marvell/octeontx2/af/mcs.c         | 6 +++---
- drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 3 ++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-index c1775bd01c2b..a07e0b3d8d00 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-@@ -120,13 +120,13 @@ void mcs_get_rx_secy_stats(struct mcs *mcs, struct mcs_secy_stats *stats, int id
- 	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDX(id);
- 	stats->pkt_untaged_cnt = mcs_reg_read(mcs, reg);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+index 4d3a7f4be962..9524d38f1582 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_macsec.c
+@@ -182,6 +182,7 @@ static void cn10k_mcs_free_rsrc(struct otx2_nic *pfvf, enum mcs_direction dir,
+ 	clear_req->id = hw_rsrc_id;
+ 	clear_req->type = type;
+ 	clear_req->dir = dir;
++	clear_req->all = all;
  
--	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYCTLX(id);
--	stats->pkt_ctl_cnt = mcs_reg_read(mcs, reg);
--
- 	if (mcs->hw->mcs_blks > 1) {
- 		reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYNOTAGX(id);
- 		stats->pkt_notag_cnt = mcs_reg_read(mcs, reg);
-+		return;
- 	}
-+	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYCTLX(id);
-+	stats->pkt_ctl_cnt = mcs_reg_read(mcs, reg);
- }
- 
- void mcs_get_flowid_stats(struct mcs *mcs, struct mcs_flowid_stats *stats,
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index fa461489acdd..ca2704b188a5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -482,10 +482,11 @@ static int rvu_dbg_mcs_rx_secy_stats_display(struct seq_file *filp, void *unused
- 		seq_printf(filp, "secy%d: Tagged ctrl pkts: %lld\n", secy_id,
- 			   stats.pkt_tagged_ctl_cnt);
- 		seq_printf(filp, "secy%d: Untaged pkts: %lld\n", secy_id, stats.pkt_untaged_cnt);
--		seq_printf(filp, "secy%d: Ctrl pkts: %lld\n", secy_id, stats.pkt_ctl_cnt);
- 		if (mcs->hw->mcs_blks > 1)
- 			seq_printf(filp, "secy%d: pkts notag: %lld\n", secy_id,
- 				   stats.pkt_notag_cnt);
-+		else
-+			seq_printf(filp, "secy%d: Ctrl pkts: %lld\n", secy_id, stats.pkt_ctl_cnt);
- 	}
- 	mutex_unlock(&mcs->stats_lock);
- 	return 0;
+ 	req = otx2_mbox_alloc_msg_mcs_free_resources(mbox);
+ 	if (!req)
 -- 
 2.48.1
 
