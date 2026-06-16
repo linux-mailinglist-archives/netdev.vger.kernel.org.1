@@ -1,239 +1,193 @@
-Return-Path: <netdev+bounces-299949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299950-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DDCzHUWwMWqupAUAu9opvQ
-	(envelope-from <netdev+bounces-299949-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:21:25 +0200
+	id MiuZIkivMWqBpAUAu9opvQ
+	(envelope-from <netdev+bounces-299950-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:17:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46936952BE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:21:24 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83025695232
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:17:11 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=proton.me header.s=protonmail header.b=Hrj1CtZu;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299949-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299949-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=proton.me;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=kq38Z4FV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299950-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299950-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8503A303259D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:16:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 07C6E301519C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AE4388394;
-	Tue, 16 Jun 2026 20:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64280390CB7;
+	Tue, 16 Jun 2026 20:16:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442A735DA78;
-	Tue, 16 Jun 2026 20:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119DA389110
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 20:16:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781640996; cv=none; b=fiWqlH+G4H5ciXQ26fDohZbJS2qS48HETHF/mZp22lrTHyxe8clcjlmmz+k2z0JX6tXUTjZSk5ciKJ+/VJFTyaCh9HfNE+xgwRdcloa6jiu1EAnS0ox6GPsNFE4ZtiWlQvMiPe/tsv4YkujFw9Km6l7AHvKOau5pCts6q4qN1Qs=
+	t=1781641017; cv=none; b=j/4S8mBflRnUQgQvu/wxRQ+12kRTceaVBvE0Dff00etuNWv3i+MU+RjuGrA4Qqee7wV/mvGGHuiitg7z4xzthM6rA8orgfUWTLK4+3Kn90CuhCAmGaqrXLOdXtkuG7bc6kiexx3bfzGvrGW9BGuBImy1Uc+a2geWrOGGqi57STo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781640996; c=relaxed/simple;
-	bh=db3qSJli4jDRZof723oGb/+ks3Jt+72/lbJ9c8+t6vE=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=UvUPBZ2IIa3JQcun7v6Yci6AsR8E/dyAHYiIjcYGqa1GsQRNMPtElSOCdWukM8gc1aqyAxjBos4chyiLl/fJOEsQuMABPyqjkEx/QcfuFUCS30GlkgJV9p7BmSXAKkvAmiD+zp9TzSFeNb5K+AjCjioJ6A7tZF+w++NoBsAvhRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Hrj1CtZu; arc=none smtp.client-ip=185.70.43.22
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1781640990; x=1781900190;
-	bh=Tyu4xAn0C8J9jySsHHCTPZlC9QmtEw5NEsTGCRFwJYE=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Hrj1CtZuEcPFlA13UBav/ma3CMPBpI/O0G3g7nft3pwgQ2y9l0TTH3HZYrP+S0v8t
-	 dv/NG7bWZmcK4BM5ZxOl+BgOzYwj3wUzN0FDPxGP/MhRnB8SMRS6fLJDtCwfw5R6mX
-	 nEx1bSJto7bh7SWqhMUUfwFF5phgLPKE4iLiseAqSlvFR/9O+ze6UaOqVZI4HWlSlj
-	 4+DAoADzQFNnnduM4SoXnLNdNdLdSFMUTq1WsLD3uMUbUvUNLkGyf+XiKbWSt8Hw2r
-	 fMXLXxJhKvzkQAAxcAHzihLhabmmzR7drGh/k6ChOLMIVBPFWlZR86Bv0sMQR0VVj9
-	 DPnt1ixL4v3zQ==
-Date: Tue, 16 Jun 2026 20:16:22 +0000
-To: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-From: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: =?utf-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, Matthieu Buffet <matthieu@buffet.re>, Paul Moore <paul@paul-moore.com>, Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, linux-security-module@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Landlock: LANDLOCK_ACCESS_NET_CONNECT_TCP bypass via TCP Fast Open
-Message-ID: <20260616201615.275032-1-hexlabsecurity@proton.me>
-Feedback-ID: 199661219:user:proton
-X-Pm-Message-ID: 7635c85011b3c8fa2ca156887e0c834759c13cf8
+	s=arc-20240116; t=1781641017; c=relaxed/simple;
+	bh=NDPe7BjRqQO81lM7S/gk96lWQXHDy2NfdCGZ9cKvSfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M9K+nK8TdMh5Jxjmxw7kc3ZH6xw60caPBE877o8T1JgbOVBvSz+bojw5od/p1IdcsgEkXVNbEe6TditbthWRAfJJgcROiGtSczhDsG51pX8WnLr6uk1Ma/Ar//fuXNHp8NG1avhWkmN7JiKACOTDftGE0aTMEMG8FYOeOI9z9fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kq38Z4FV; arc=none smtp.client-ip=209.85.221.41
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-45ef616daf6so5712478f8f.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 13:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781641014; x=1782245814; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5ZHhd9DZXAW4wgKJX/mXTrxz0x9KgaM+DPaZGQCTuSg=;
+        b=kq38Z4FVvBxl8kKxz6uizR6o7FvFkKKgk6E+SpK5yIJGXpEhyhMgA5/L622GJAtdRl
+         S25Newj6Z4vcGrtkW2GV1ynCyLuRLlBbAvjmmcHc4NgONuwhf6PVlccDDFhKnAmWaf6Y
+         K8HpQq1sLAfLLKzILxEhOc4gzlN8aFDNO3iWnaT/abjZfE6HcuDpz2Ji3i/rRalZ/gei
+         79c5+69HeaLgxVxgZbMTW1qIyFUKGqZwd97Hbo8pLzFPrSDwAreBX87C0IuyzN87CjGy
+         b2skhi6zApUyQroxJVuPGHXhQZLw+A2pkYD6djGjdDVxEErDVVm898wSpwsiJIp8bw7h
+         x0tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781641014; x=1782245814;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5ZHhd9DZXAW4wgKJX/mXTrxz0x9KgaM+DPaZGQCTuSg=;
+        b=qfqGnXZUpOjswbIhzxUL+gY8hz20hcGNoFDqErPPnySWmAegfmOl9QQHG42Y6KGAYN
+         XyviVzh7nwsUng8nClfMbKetNhGWY6WqFw02jXNye5C+ErAl7AMAyLb+rZdAraBRTgnU
+         eERFzm9IFLIKSBP5O7oSlPbwjHTsxCq9exJwpLVLAt7TsXQGkqDdhWJkC9kkgQk0KjmG
+         gSVOrMupljeNl46VAIWK3tUmiA9iJqQRFnZqJ96+qmqPkF1/KxnUjWLDCmilfZxsWnJG
+         kY/ugTAn2IUzBdlt87C2cY+huvvZs37Ukq8sbAT3qAoKxUgEhUI8xYKQyZkISJmpgkbr
+         2TBw==
+X-Forwarded-Encrypted: i=1; AFNElJ/O18rwSOMHZcSgVDDTiSXR5K6rrRuWgeXaD4tZu+1lgZgkCNwKaOGULTGvcCxzE6MMJxiPH/4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzht56AniUKnQxLR8W2l0DbX95ztcTrNS2q7yG8dbjRldUGTr1
+	3N3fL9P1oSkD1k3HEB6p3lxDVDoeNeh4Nk9XgenJxqE5CU9qzijIkJGz
+X-Gm-Gg: Acq92OH8jU9L3dKV2b6z1DZOgDCUBQOWHPXPMuuAO7GEmxoicgo4qsqFby+DZKeq3Uq
+	nV0wyHVMhClzpF0JyI7R+Xvo96WnfqLpTd1DD99Xg1peqfSQVwgjUzBp3NseoT8Tg3TEGrQJFA1
+	cLYKAftJhl1AwKHs+lrbKj+gq2B4oc5D1EArmEzRdPAA167qE6NTr5ftntc7O+uFM5madzZ6Ydg
+	MClHx+ClJkmGRXSNGswYxtsRkNUbYIBzeri4M1fhPRzXAdzaNstyhdJtZCal4qgoxWfm7Twwi7F
+	hhch9CLHJSmSZDF30SCYo9NePfjPmgpfwGJMY6KGwdCjA8No1Eisc2FXArXdHIHNwvYGksuzLPp
+	PJeNt9ehMcPSg+hhJjc0cga8alxfhtgEbMvPsY4SZGh28B1a60SiOlpAk24qFAUvnHjFwCLs04U
+	VnGLuF2W3Dadoyd9r1waRVYIIwKF0b1Dc5aVipvECr+RqBRweSmXm7uIbnzvKg+ikg5pQAlxM=
+X-Received: by 2002:a5d:4650:0:b0:461:a16c:a5f4 with SMTP id ffacd0b85a97d-462391826aemr1168139f8f.33.1781641014427;
+        Tue, 16 Jun 2026 13:16:54 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4619fb12edbsm10160310f8f.17.2026.06.16.13.16.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 13:16:53 -0700 (PDT)
+Date: Tue, 16 Jun 2026 21:16:52 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Stanislav Fomichev <sdf.kernel@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH net-next 2/2] udp: convert udp_lib_getsockopt to
+ sockopt_t
+Message-ID: <20260616211652.448d6b0e@pumpkin>
+In-Reply-To: <ajF4Odi_L28LdIXC@gmail.com>
+References: <20260612-getsockopt_phase2-v1-0-7b01f1f5d106@debian.org>
+	<20260612-getsockopt_phase2-v1-2-7b01f1f5d106@debian.org>
+	<aiy7ZR7Yz2Z4Ioyd@devvm7509.cco0.facebook.com>
+	<ajF4Odi_L28LdIXC@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[proton.me:s=protonmail];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299949-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299950-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:mic@digikod.net,m:gnoack@google.com,m:matthieu@buffet.re,m:paul@paul-moore.com,m:edumazet@google.com,m:ncardwell@google.com,m:linux-security-module@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_RECIPIENTS(0.00)[m:leitao@debian.org,m:sdf.kernel@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:willemdebruijn.kernel@gmail.com,m:shuah@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:kernel-team@meta.com,m:sdfkernel@gmail.com,m:willemdebruijnkernel@gmail.com,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[proton.me:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[proton.me:dkim,proton.me:email,proton.me:mid,proton.me:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,meta.com];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[pumpkin:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C46936952BE
+X-Rspamd-Queue-Id: 83025695232
 
-Hello Micka=C3=ABl, and Landlock folks,
+On Tue, 16 Jun 2026 09:22:52 -0700
+Breno Leitao <leitao@debian.org> wrote:
 
-A task confined by a Landlock ruleset that handles
-LANDLOCK_ACCESS_NET_CONNECT_TCP and is denied connecting to a given port ca=
-n
-still establish a TCP connection to that port by using TCP Fast Open, i.e.
-sendto(fd, ..., MSG_FASTOPEN, &dst, dstlen) on a fresh stream socket. The
-network-egress confinement for TCP connect is silently bypassed.
+> On Fri, Jun 12, 2026 at 07:10:15PM -0700, Stanislav Fomichev wrote:
+> > On 06/12, Breno Leitao wrote:  
+> 
+> > >  int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+> > > -		       char __user *optval, int __user *optlen)
+> > > +		       sockopt_t *opt)
+> > >  {
+> > >  	struct udp_sock *up = udp_sk(sk);
+> > >  	int val, len;
+> > >  
+> > > -	if (get_user(len, optlen))
+> > > -		return -EFAULT;  
+> > 
+> > [..]
+> >   
+> > > -	if (len < 0)
+> > > -		return -EINVAL;  
+> > 
+> > I see this part now in sockopt_init_user, but you mention that it's a
+> > transitional helper. When we drop it, will we loose this <0 check?
+> > Maybe keep `if ((int)opt->optlen < 0))` here for backwards
+> > compatibility?  
+> 
+> Good idea. I will do it and respin (once net-next reopens).
 
-Affected
---------
-Any kernel with CONFIG_SECURITY_LANDLOCK=3Dy and Landlock enabled that supp=
-orts
-the TCP network access rights (Landlock ABI >=3D 4, since Linux 6.7). Confi=
-rmed by
-source inspection on mainline (v7.1-rc7) and reproduced on Linux 7.0.11
-(Landlock ABI 8). No CONFIG beyond Landlock + IPv4/IPv6 TCP; TCP Fast Open =
-client
-is enabled by the per-netns default (net.ipv4.tcp_fastopen has TFO_CLIENT_E=
-NABLE
-set), so no sysctl change and no setsockopt are required.
+The best place for the negative length check is in the syscall wrapper code.
+Pass an unsigned length through to all the protocol code.
+No need to require every function to do the test.
 
-Root cause
-----------
-LANDLOCK_ACCESS_NET_CONNECT_TCP is enforced only by the socket_connect LSM =
-hook
-(hook_socket_connect -> current_check_access_socket). security_socket_conne=
-ct()
-has exactly one call site in the tree, net/socket.c (the connect(2) syscall=
-).
+Note that the length check was actually broken in many protocols
+going way back well before git.
+There has pretty much always been an unsigned min() check that converted
+negative values to small(ish) positive ones before the check for it being
+negative.
+(That predates min() being a #define.)
 
-TCP Fast Open performs an implicit connect inside sendmsg:
+The recent change to actually error optlen < 0 might actually have broken
+some applications that passed uninitialised stack that was always negative!
 
-  tcp_sendmsg_locked()            net/ipv4/tcp.c  (MSG_FASTOPEN branch)
-   -> tcp_sendmsg_fastopen()      net/ipv4/tcp.c
-   -> __inet_stream_connect(..., is_sendmsg=3D1)  net/ipv4/af_inet.c
-   -> sk->sk_prot->connect()      net/ipv4/af_inet.c  -> tcp_v4_connect()
+-- David
 
-This path establishes the connection to the address taken from msg_name but
-never calls security_socket_connect(). The only LSM hook fired on the sendm=
-sg
-path is security_socket_sendmsg(), and Landlock registers no socket_sendmsg
-hook, so LANDLOCK_ACCESS_NET_CONNECT_TCP is never re-checked. __inet_stream=
-_connect()
-itself carries no LSM hook (only the cgroup-BPF pre_connect, a different
-mechanism).
-
-Notably the kernel already mediates the analogous AF_UNIX implicit-connect =
-on the
-send path via the unix_may_send hook, which Landlock does register
-(hook_unix_may_send) -- so the sendmsg-implies-connect pattern is recognize=
-d, but
-the TCP Fast Open case has no equivalent coverage. The MPTCP fast-open path
-(mptcp_sendmsg_fastopen -> __inet_stream_connect) is a second producer of t=
-he
-same unmediated connect (by source inspection; not separately reproduced).
-
-Reproducer
-----------
-A self-contained, fully unprivileged PoC is available on request. It forks =
-an
-unconfined TFO-capable loopback listener, then in a child applies a Landloc=
-k
-ruleset handling LANDLOCK_ACCESS_NET_CONNECT_TCP with no allow rule
-(landlock_create_ruleset() with handled_access_net =3D
-LANDLOCK_ACCESS_NET_CONNECT_TCP, no landlock_add_rule(), then
-landlock_restrict_self(); every TCP connect is denied) and tries the forbid=
-den
-port two ways:
-
-  (1) connect(fd, &dst)                 -> -EACCES   (Landlock enforces CON=
-NECT_TCP)
-  (2) sendto(fd2, buf, len, MSG_FASTOPEN, &dst, dstlen)
-                                        -> succeeds; the listener accepts t=
-he
-                                           connection and reads the payload=
-.
-
-Observed on Linux 7.0.11 (Landlock ABI 8):
-
-  [1] connect(2)            -> ret=3D-1 errno=3D13 (Permission denied)
-  [2] sendto(MSG_FASTOPEN)  -> ret=3D14 errno=3D0 (OK/queued)
-  [+] listener ACCEPTED the confined child's connection; payload=3D"..."
-
-connect(2) to the port is denied while sendto(MSG_FASTOPEN) reaches the ide=
-ntical
-port and delivers data.
-
-Impact
-------
-A sandbox that uses LANDLOCK_ACCESS_NET_CONNECT_TCP to restrict outbound TC=
-P
-(e.g. to keep a confined component from reaching an internal service or a
-metadata endpoint) can be escaped by an unprivileged, self-confined task wi=
-th no
-CAP and no namespace transition -- for any destination port, since the
-implicit-connect path never consults the connect hook regardless of address=
- (the
-run above shows one port). It is an integrity
-bypass of the network-confinement property; no memory safety is involved.
-I score it CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N (6.5 Medium) -- the
-confined task escapes the policy authority that defined its sandbox, a scop=
-e
-change; 5.5 if you treat the Landlock boundary as the same authority (S:U).
-
-Note on the in-flight UDP series
---------------------------------
-The "landlock: Add UDP access control support" series (v5, Matthieu Buffet,
-https://lore.kernel.org/r/20260611162107.49278-3-matthieu@buffet.re) adds a
-socket_sendmsg hook, hook_socket_sendmsg(), but it returns 0 for non-UDP
-sockets:
-
-    if (sk_is_udp(sock->sk))
-            access_request =3D LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP;
-    else
-            return 0;
-
-so a TCP socket using MSG_FASTOPEN still bypasses LANDLOCK_ACCESS_NET_CONNE=
-CT_TCP
-even after that series lands. It may be most convenient to fix this there.
-
-Suggested direction
--------------------
-Re-check LANDLOCK_ACCESS_NET_CONNECT_TCP on the implicit-connect path: eith=
-er have
-the socket_sendmsg hook evaluate CONNECT_TCP for stream sockets when the ca=
-ll
-performs an implicit connect (mirroring the AF_UNIX unix_may_send handling)=
-, or
-place the check inside __inet_stream_connect() so a single chokepoint cover=
-s
-connect(2), TCP Fast Open, and the MPTCP fast-open sibling.
-
-I am happy to send a patch for this if you would like me to.
-
-Best regards,
-
-Bryam Vargas
-Independent security researcher, HEXLAB S.A.S., Cali, Colombia
-hexlabsecurity@proton.me
+> 
+> Thanks for the review,
+> --breno
+> 
 
 
