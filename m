@@ -1,304 +1,168 @@
-Return-Path: <netdev+bounces-299956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YcpvEeq4MWrvpQUAu9opvQ
-	(envelope-from <netdev+bounces-299956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:58:18 +0200
+	id GU2LEbC5MWoopgUAu9opvQ
+	(envelope-from <netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7EB269554D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:58:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA04695562
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:01:35 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=sD26MNSY;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299956-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299956-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=H+vzG6ss;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299958-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1937E3182BEB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 20:58:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2D349300B2BB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 21:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC69339A054;
-	Tue, 16 Jun 2026 20:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED37138237F;
+	Tue, 16 Jun 2026 21:01:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00DC39768C
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 20:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D6928A3FA
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 21:01:28 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781643487; cv=none; b=HjcZn26C2tFDPsGAjeo5X0W1ICzjijCSjaQBzWpri5U+XDlrEmt8+BtQjIhnyp/jn5SyeSRORYzE9Cfj81He6HdizvjIpoStlGDZ06G8Uj48bMLeiB/F2IHy1v3/FDLwX2o0atoPlS5Rwd7RKJixoI4dxJHONRo31B0kltnqI1o=
+	t=1781643689; cv=none; b=N5ku65Xsaherp2/s8nByWVSQdPZqgUHGOixetycE1fylxq2NpBRPLLkUKdaB9olzNjQKk+3C6iBYWd8LE7DAX2ekn7F9zos/MfpO5wunrGY0uRvyflIvmALp+GIE/ZbLnmAeHJM4Vg93rtWXExW0+99Y0c453vJtQuK9Wt04b3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781643487; c=relaxed/simple;
-	bh=MUmT4WQ8gikQW/FOLoONsetD5u39tuO3VxiIsFbd268=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yl2mhuxFtdK5btiIiLr6JSruaPxU9AA7fY8Je8TaKL0gCjBCgr/ZvZWV3hGFkyVOPO8ldxJkhZUL0znLs/P/nCMTLRb1kYatiR2tle2N0MdwXddflMtgAcoJN1LaynfAOjzwiw6qG3I1w83Bvz6+4woolstJShqPzR1jxPa2hew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sD26MNSY; arc=none smtp.client-ip=209.85.160.50
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-442a79dd881so1323442fac.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 13:58:04 -0700 (PDT)
+	s=arc-20240116; t=1781643689; c=relaxed/simple;
+	bh=QL+6PjHmDG2RTHrGkE252ABZ6JjJ3rD26t7BbfcIWXc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kMtVkR5oV2K/2jwEBamvDJNGWzreQoo7AsaWqpgg9R3AFJ1WXaw7Dvi1la00Ae0lfuFAB0lCI59JFLQ1eXYHsSa3mV7jrl2UxXQbtJ8l2h7ttUjyOz/1AYYukt9WgwFSeK4Tjwo78Z5u1VQ3/+n9WKc4kT5vTQ98r8A6kccPfPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+vzG6ss; arc=none smtp.client-ip=209.85.215.170
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c85a2ca7bf7so1867786a12.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 14:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781643484; x=1782248284; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rG4yjs4p+4H4P31U7PQCtrU7WZ2EeT+JyZMQJymeW5U=;
-        b=sD26MNSYv9ZLMxqb1P8qI+3XPTH8FSD8SWooLHUuiCQ1s6THX8h2d9oZK9otgepkmZ
-         L+7vw5kRLiFhMm4ptzIFb5v7SpJrr4VPdidEvKSkm3rQM7zsNu16TuLbxqzbvApfenPl
-         Bc92wTJuZwFBksaYq+LNEJtqL8qMNArEaK/atLfBq4M5ys37Mkq3NJqEO3nDsQ3RjZnm
-         uAZgzEI+ZYytvvmatKMEPQNndEF5C7AER/T55UeFVWLeLPCZqneogbKrZrNsOsahY1JO
-         gpRzR0Fuf69BQoin4mtTuxrSj23kj93piIP2Ibn1fjn5ZOkwXSlYiw7aRLu3ADWyY4e5
-         CTyA==
+        d=gmail.com; s=20251104; t=1781643688; x=1782248488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YAWzaQQD+TwU42qVxhk3XlLYYY09pYfRsBqz1erTu+c=;
+        b=H+vzG6ssF550rx91nyVuUbhnZ7j4qx4/RcNrX4b1suEcGYBKElKdrAo2izPSQOpB3x
+         kW2KLSEh6r1F5vd33ZPwhpftZYYtD2YLnMOeN7t+9frWYm4KAPGTUKAHcKMSYrskofYC
+         k8fS+pWTKxhO1pPTVFJJ6obWehmCD1jSjuGub22VHnIo5hpVUP/vGkD/bUioHNQotvJI
+         PBT1F14z1AxI5LAJAk6ZXaE9f7mN4sEf16jMU7c6HJiZ385RGi9kokHGtMQE8rok7a7g
+         +FEh8HC4QGWKs0dvQTH/SLYq+A+v7ct8/3hmnBp9Xfvr3e7fhgtulvoVXh2WraXNVgMh
+         ba4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781643484; x=1782248284;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rG4yjs4p+4H4P31U7PQCtrU7WZ2EeT+JyZMQJymeW5U=;
-        b=nh14C81S8WKa//NGezYBH2Lnyf+5dug3b81w7r1nhxxPYe1+xYXd3h4+7Fb58qvtlU
-         jVf8xZw7SmgAmoGKwQ9alv2gzJuPqbJaNrXa95hAXCwvPn6RQzPmZXq4SQqb2UE0/I7U
-         jbFxSwFpcq+HNbehwcP0Kdu9QwFVe7PHLkEqg5o/Yqt1Utv10nIlfHwcgz9xbHWOf18v
-         kQEGXmtlPeLxuEKreTVrQ1MIikzrmwKm2Ea3uuJC2sQREVINFotYVdsmXkXjFZIW3FKe
-         82+exUIv6UNckSdRQWvbehAuRTS7oRBLRfyEpYeH+BXorKKaPqGP+uGGj6Zb5Y94jai8
-         zKyw==
-X-Forwarded-Encrypted: i=1; AFNElJ880lRX4ShW93QJqeo+m4ttxNV/NP+R06i4AmZYE/6dswkZPsrx3N4uxEgncn3G5bsmE+H8o/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzJX0aoCo5KbnefC1NnPc2Z+eDZEN1jD+pyengMXD5g5H24gsP
-	WeLsJ2wzk0ur8ZQTXzt4zIAFNoDJcY2WdTjfMYZ4LrGBAsV8aNd58o/F
-X-Gm-Gg: Acq92OEoJcPAb6chI8aBjkuNqN9lniJlHFpeLRp/2CEOCkEoJqRrWL7KA3KXjg97bVt
-	uqKgwTS19xufyJynQinVR/TecA7eaPiOJkJmGLNwARcZAtZamTbgI/77XJXjt9uwQnwOitrLOb6
-	FNrEn8V/2F/hKGO9ut1o3nwyI+vRppQ6xtrUDTW/0XBYF4DXCYEOi8/92AZAUdkRcO7BZXQVtsq
-	YIOP9gcdIv/AW5rCnU8IQ2icC1hnRAjcThG6X6rKJR6rfIJYJt/FXwWkDn1ZOqTsjU/gBCAo3Lu
-	fJBGDOafuhHkLYWItxVIbieLHupxl9ac/1XU0GJ1XjTLYKU98Su2GNw4rR0onMwhzePekK7aFlz
-	jWGFbbCND9QqMgldEs/FUeb/yEPNbYZjOXKb+BcgDAKTs0/m5mscTPpXecnJmJHiaBXDh6RChT9
-	ZY2Y6Fg1u9qEQUDy0zjHHpq/iM7tBUo8FlBCx34NFTUmc=
-X-Received: by 2002:a05:6808:2f0f:b0:479:f7e7:4a81 with SMTP id 5614622812f47-489425d7d4cmr1016628b6e.0.1781643483758;
-        Tue, 16 Jun 2026 13:58:03 -0700 (PDT)
-Received: from devvm29614.prn0.facebook.com ([2a03:2880:ff:8::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4875df7fc36sm5099675b6e.9.2026.06.16.13.57.59
+        d=1e100.net; s=20251104; t=1781643688; x=1782248488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YAWzaQQD+TwU42qVxhk3XlLYYY09pYfRsBqz1erTu+c=;
+        b=mAYWDR3q2Vt7hKf597Wwm2i0khpEimMyjva7f4yV8t/NLXHly92v74qjheF6F93ytc
+         JgpXPyenBVKsTblCOcELOHerEFKmzvp1ww5ystaFyXlXYf7qI5Fa6IDeszeK3THE5ode
+         GMXdxj21aktky9gxEnKgiMkEGHwF8E6e+SUul1FjyadunYY5l+PLVjnmWDYTCFDcwxaO
+         UlJ61suPxA/lgK0jGNyf2ZCJ4Z7qBcVPUuLODPXizjsfENtD/NoASRMGnwroxJicsQ6A
+         izHr0C2cyWIZhf3Xhm+IIBIM/xxDSHBma7jRm8vToilYJQ00+0cGKHy5+uG0yWk4GFO2
+         nU4g==
+X-Forwarded-Encrypted: i=1; AFNElJ91mmJLoWVOmMQIymgzIRKN0G6wdbRcV3R6EG48S4c+jjyvTGNvBmJrMOx0z2v5U/eZLrUGIzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE8ZDsEWNBwBwlufPHjIDG2Z7PP9IxtQW6w4I+wREZc++erAAZ
+	5+M+LX1hdKwaVeVFW+WrvIiK/Vebsh6SQJX5OR99YyFgg4SX2APwcojG
+X-Gm-Gg: Acq92OHMi4afmWvSasxe2MQ1IbDjwO+l0lHquEZ7+cZXurvEHS0TKPjS1XVXDMwBqD9
+	VxuJxTNToBJVDMgmu0G7PaKRQE+UCyGl//cAxtdRxFwoRt+6IuRiDsE1ly7G21h54QzMOSYdYi4
+	ghBfJflpDFbVEkhpKJLxzL6+lt3NgABjIVmuQRL5QORolzjn1tJPJuqJOmcafPPuMHvalANOScI
+	oz472uRCWthPdKKhDAfegePvga6S5kv58vzzYSi1JdMqfHmsHBC8NPV8vJWQRJP7NG8kvnvxqjN
+	QY0qa/62aTBKnXcZ7Dy/QMb46Zi0zYW71hh3bW8RnJ4DFlDWfLBlG0Mm/vCHKBe2xU8ZaTREs3w
+	AU+7OhqnX9s8fYABfjzD7yFowhL0JWVk4xyQM9/Ng0D9IFqquFMrCBdojkcU7445cw2qmQ55Rdu
+	weEtqewbZpXY5F4Uuvxb3SfoIkCbCKjK4ZhSYpf7Zf
+X-Received: by 2002:a05:6a20:b603:b0:3b4:6155:cde8 with SMTP id adf61e73a8af0-3b8be3b191dmr870958637.21.1781643686603;
+        Tue, 16 Jun 2026 14:01:26 -0700 (PDT)
+Received: from localhost ([2409:40c4:3a:b56e:6db1:8c82:df5:7a4c])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661b5e974sm12333720a12.4.2026.06.16.14.01.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 13:58:03 -0700 (PDT)
-Date: Tue, 16 Jun 2026 13:57:49 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Shuah Khan <shuah@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"almasrymina@google.com" <almasrymina@google.com>,
-	"matttbe@kernel.org" <matttbe@kernel.org>,
-	"skhawaja@google.com" <skhawaja@google.com>,
-	"dw@davidwei.uk" <dw@davidwei.uk>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v2 2/4] udmabuf: emit one sg entry per pinned
- folio
-Message-ID: <ajG4zaK9zu7qZT1+@devvm29614.prn0.facebook.com>
-References: <20260611-tcpdm-large-niovs-v2-0-ee2bf15e7523@meta.com>
- <20260611-tcpdm-large-niovs-v2-2-ee2bf15e7523@meta.com>
- <IA0PR11MB71852246277F773AC41DAAA3F8E52@IA0PR11MB7185.namprd11.prod.outlook.com>
+        Tue, 16 Jun 2026 14:01:26 -0700 (PDT)
+From: Lovekesh Solanki <lovekeshsolanki00@gmail.com>
+To: anthony.l.nguyen@intel.com
+Cc: przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	Lovekesh Solanki <lovekeshsolanki00@gmail.com>
+Subject: [PATCH] e1000: Remove redundant else after return
+Date: Wed, 17 Jun 2026 02:30:08 +0530
+Message-ID: <20260616210008.109635-1-lovekeshsolanki00@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <IA0PR11MB71852246277F773AC41DAAA3F8E52@IA0PR11MB7185.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299956-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:vivek.kasireddy@intel.com,m:donald.hunter@gmail.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:kraxel@redhat.com,m:sumit.semwal@linaro.org,m:christian.koenig@amd.com,m:shuah@kernel.org,m:jgg@ziepe.ca,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:dri-devel@lists.freedesktop.org,m:linux-media@vger.kernel.org,m:linaro-mm-sig@lists.linaro.org,m:linux-kselftest@vger.kernel.org,m:sdf@fomichev.me,m:razor@blackwall.org,m:daniel@iogearbox.net,m:almasrymina@google.com,m:matttbe@kernel.org,m:skhawaja@google.com,m:dw@davidwei.uk,m:bobbyeshleman@meta.com,m:donaldhunter@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,linaro.org,amd.com,ziepe.ca,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,fomichev.me,blackwall.org,iogearbox.net,davidwei.uk,meta.com];
+	TAGGED_FROM(0.00)[bounces-299958-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:lovekeshsolanki00@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[lovekeshsolanki00@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lovekeshsolanki00@gmail.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,vger.kernel.org:from_smtp,gitlab.freedesktop.org:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D7EB269554D
+X-Rspamd-Queue-Id: 3EA04695562
 
-On Tue, Jun 16, 2026 at 06:04:03AM +0000, Kasireddy, Vivek wrote:
-> Adding Jason to this discussion.
-> 
-> Hi Bobby,
-> 
-> > Subject: [PATCH net-next v2 2/4] udmabuf: emit one sg entry per pinned
-> > folio
-> > 
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > get_sg_table() emitted one PAGE_SIZE sg entry per page even when the
-> > underlying folio was larger.
-> > 
-> > Instead, walk folios[] and emit one sg entry per folio. When folios
-> We have recently merged a patch (that will make it into 7.2) from Jason that
-> replaced sg_set_folio() with sg_alloc_table_from_pages() in udmabuf driver:
-> https://gitlab.freedesktop.org/drm/tip/-/commit/5bf888673e0dda5a53220fa0c4956271a46c353c
-> 
-> Since you are relying on sg_set_folio(), the core argument against its usage
-> in udmabuf is that it doesn't work well with offsets > PAGE_SIZE, resulting
-> in a malformed scatterlist. Not sure if this can be fixed easily.
-> 
-> > represent large pages (as is for MFD_HUGETLB), each sg entry is a large
-> > page. Normal PAGE_SIZE sg tables are unchanged.
-> > 
-> > This is helpful for importers like net/core/devmem that expect dmabuf sg
-> IMO, udmabuf needs to detect whether importers can handle segments that
-> are > PAGE_SIZE and set the entries appropriately. Please look into how the
-> GPU drivers and other dmabuf exporters/importers handle this situation, so
-> that we can adopt best practices to address this issue.
-> 
-> Thanks,
-> Vivek
+The else branch is needless because the preceding branch
+unconditionally returns -ENOMEM
 
-Hey Vivek,
+Reduce nesting by removing unnecessary else
 
-It sounds looks like that patch might solve my problem. I'll apply and
-troubleshoot from there.
+Signed-off-by: Lovekesh Solanki <lovekeshsolanki00@gmail.com>
+---
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thanks!
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 9b09eb144b81..3d97e952c916 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -1546,11 +1546,10 @@ static int e1000_setup_tx_resources(struct e1000_adapter *adapter,
+ 			      "for the transmit descriptor ring\n");
+ 			vfree(txdr->buffer_info);
+ 			return -ENOMEM;
+-		} else {
++		}
+ 			/* Free old allocation, new allocation was successful */
+ 			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
+ 					  olddma);
+-		}
+ 	}
+ 	memset(txdr->desc, 0, txdr->size);
+ 
+-- 
+2.54.0
 
-Best,
-Bobby
-
-> 
-> > entries to be size and length aligned. Prior to this patch udmabuf
-> > handed over one PAGE_SIZE sg entry per page, so devmem only saw
-> > PAGE_SIZE chunks regardless of the underlying folio size.
-> > 
-> > dma_map_sgtable() does not always merge contiguous pages for us, so we
-> > do this internally before exporting.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> >  drivers/dma-buf/udmabuf.c | 52
-> > ++++++++++++++++++++++++++++++++++++++++++-----
-> >  1 file changed, 47 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/dma-buf/udmabuf.c b/drivers/dma-buf/udmabuf.c
-> > index 94b8ecb892bb..9b751dd98b12 100644
-> > --- a/drivers/dma-buf/udmabuf.c
-> > +++ b/drivers/dma-buf/udmabuf.c
-> > @@ -141,26 +141,68 @@ static void vunmap_udmabuf(struct dma_buf
-> > *buf, struct iosys_map *map)
-> >  	vm_unmap_ram(map->vaddr, ubuf->pagecount);
-> >  }
-> > 
-> > +/* Return the number of contiguous pages backed by the folio at @i.
-> > + * A udmabuf may map only part of a folio, or reference the same folio
-> > + * in multiple non-contiguous runs, so folio_nr_pages() can't be used.
-> > + */
-> > +static pgoff_t udmabuf_folio_nr_pages(struct udmabuf *ubuf, pgoff_t i)
-> > +{
-> > +	struct folio *f = ubuf->folios[i];
-> > +	pgoff_t j;
-> > +
-> > +	for (j = 1; i + j < ubuf->pagecount; j++) {
-> > +		if (ubuf->folios[i + j] != f)
-> > +			break;
-> > +		/* Same folio, but not a sequential offset within it. */
-> > +		if (ubuf->offsets[i + j] != ubuf->offsets[i] + j * PAGE_SIZE)
-> > +			break;
-> > +	}
-> > +	return j;
-> > +}
-> > +
-> > +/* Count the contiguous folio runs in @ubuf, one sg entry per run.
-> > + *
-> > + * Coalescing folios into a single sg entry up front lets importers actually
-> > + * see large chunks. We can't rely on dma_map_sgtable() to do this for us
-> > as
-> > + * the dma_map_direct() path preserves the input scatterlist lengths
-> > verbatim.
-> > + */
-> > +static unsigned int udmabuf_sg_nents(struct udmabuf *ubuf)
-> > +{
-> > +	unsigned int nents = 0;
-> > +	pgoff_t i;
-> > +
-> > +	for (i = 0; i < ubuf->pagecount; i += udmabuf_folio_nr_pages(ubuf,
-> > i))
-> > +		nents++;
-> > +	return nents;
-> > +}
-> > +
-> >  static struct sg_table *get_sg_table(struct device *dev, struct dma_buf
-> > *buf,
-> >  				     enum dma_data_direction direction)
-> >  {
-> >  	struct udmabuf *ubuf = buf->priv;
-> > -	struct sg_table *sg;
-> >  	struct scatterlist *sgl;
-> > -	unsigned int i = 0;
-> > +	struct sg_table *sg;
-> > +	pgoff_t i, run;
-> > +	unsigned int nents;
-> >  	int ret;
-> > 
-> > +	nents = udmabuf_sg_nents(ubuf);
-> > +
-> >  	sg = kzalloc_obj(*sg);
-> >  	if (!sg)
-> >  		return ERR_PTR(-ENOMEM);
-> > 
-> > -	ret = sg_alloc_table(sg, ubuf->pagecount, GFP_KERNEL);
-> > +	ret = sg_alloc_table(sg, nents, GFP_KERNEL);
-> >  	if (ret < 0)
-> >  		goto err_alloc;
-> > 
-> > -	for_each_sg(sg->sgl, sgl, ubuf->pagecount, i)
-> > -		sg_set_folio(sgl, ubuf->folios[i], PAGE_SIZE,
-> > +	sgl = sg->sgl;
-> > +	for (i = 0; i < ubuf->pagecount; i += run) {
-> > +		run = udmabuf_folio_nr_pages(ubuf, i);
-> > +		sg_set_folio(sgl, ubuf->folios[i], run << PAGE_SHIFT,
-> >  			     ubuf->offsets[i]);
-> > +		sgl = sg_next(sgl);
-> > +	}
-> > 
-> >  	ret = dma_map_sgtable(dev, sg, direction, 0);
-> >  	if (ret < 0)
-> > 
-> > --
-> > 2.53.0-Meta
-> 
 
