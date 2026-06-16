@@ -1,227 +1,210 @@
-Return-Path: <netdev+bounces-299842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299843-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HuZQEbpIMWpRgAUAu9opvQ
-	(envelope-from <netdev+bounces-299842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:59:38 +0200
+	id zHH1F/JLMWrugAUAu9opvQ
+	(envelope-from <netdev+bounces-299843-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:13:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19DE68FAFE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 14:59:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A90E468FC9E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 15:13:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=ti.com header.s=selector1 header.b=DYbz2JYw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299842-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299842-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=ti.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=fail ("headers rsa verify failed") header.d=redhat.com header.s=mimecast20190719 header.b=izDkDBJ7;
+	dkim=fail ("headers rsa verify failed") header.d=redhat.com header.s=google header.b=qfBFySeP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299843-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299843-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed)" header.from=redhat.com (policy=quarantine);
+	arc=reject ("signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A44743239200
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:54:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 862FF3028EE6
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 13:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3244536A34D;
-	Tue, 16 Jun 2026 12:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362603624D4;
+	Tue, 16 Jun 2026 13:00:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013047.outbound.protection.outlook.com [40.93.201.47])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BA3369D6E;
-	Tue, 16 Jun 2026 12:54:36 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781614478; cv=fail; b=Y7ngZy77Ldlw7kQf76Ub2oVqtQ91tWkZjzSoHiOSbSAfJzQM58m8sfoKgsq2YXbBH3x3c/hi1asJZbL22ZsflwGwtU7L0aoUrie0VDIPzjhQAZazoexltpQL9Drxi1UDppRevts2QdMdhN01Cqtml2RebVF1a0Rfksnq8g+JGJM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781614478; c=relaxed/simple;
-	bh=dbH9MGnKi1wlLD7wWhngfvgkfsnRUrh/euUg/GllsJI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WQfwftHDnDfBfX1BW+fQkNxSDE+cTRc14HU884xMHDD+Td6wiagr0kOWjLDa5Ry6Nc+Kl8UgWZ/HKZn33YKyxjLZ4UUO4vEJW33WPXJC1rVqNzJFrqFTK0vm44BVLb6IcOUMEi6gRBOIqJz0dlhkI/U6/i293ssUBOV66Q3wb8w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=DYbz2JYw; arc=fail smtp.client-ip=40.93.201.47
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cJ9N96Hhh/dDmiq2Pl5/aqIzpQprd3o6HDrLdF5Objvb8PeeJ9lKDVsSYuV1nxIXKiFDmB5nXNYs80aqJmvmuYzLSMJcRlZ01ivsQQwRkSzDboFQyJHjURiWDPbCK45ZhdnKxL6DnHyeqNBFCWRm+3wt7vU4Xd2IP/bNoLJ7nI7hWTjT6bWdFuWWs5uQz4TInXu+bv3hXlak24wkCDvYSjUjKZ9RqCOvtvAfOC5FITW9J31PuBqlMnF5bHsoiV1kDRX9dRqriQckkN+yjTk51eu1+xBm0WDTOdsQxrEg3hb4mZ9F48Cz+NxJmH7cBh4aNgUlfCP4SpSJ8A6+iMbL9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TSf3030RVTK4uKHu0QPzsTd4Zqy3YqljDoHw7m8yJ5E=;
- b=Yzfs9gdUQRzCMGFeWs2ePFTQbppv9WrAu1tjkeZaoaOKMgXelZd3BOgjWEvEjy7hA5Hj/KNnUp231hyIXLpkN7R/AQenD2pQ4bLwjv0qubwgOQLELObzWBysoDxx6b/9XtFM4qTWd2zjPQjZt+FnlXavAOSSbEwJiJTRZBvVe2dO+MSzeSTUrVp+ZCAPbo6kWcikj7T2i4szSlYZlDYPzKAqZmeiDCai3gPasORPxTO4A/dSc0M0yq3hmqu1x94j550sTKj32kvqZgPcJog3EMe+bxWKIYvGqfzy92FZtgvRnPs+nEO0iR/MhKOKc0RlXOVt0y/Q0olNw0Z0JK0vZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TSf3030RVTK4uKHu0QPzsTd4Zqy3YqljDoHw7m8yJ5E=;
- b=DYbz2JYwdMLGnuxdQWXyk14bpd0qzNS4lcOJQ/eIGLB2IAozeAeGypHPaotFMZklEf4LoTXXvunoENd4VWJdLRZgyl8OQDgCnG/PugigMF1KucXx3ayiYqjTU+j9pRkl6Al5CF2rf0yJVlaowEowEjXAFMzQDTwcCBEu/h+U+rI=
-Received: from DS7PR03CA0136.namprd03.prod.outlook.com (2603:10b6:5:3b4::21)
- by SA1PR10MB6319.namprd10.prod.outlook.com (2603:10b6:806:252::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.13; Tue, 16 Jun
- 2026 12:54:33 +0000
-Received: from DS2PEPF00003442.namprd04.prod.outlook.com
- (2603:10b6:5:3b4:cafe::a9) by DS7PR03CA0136.outlook.office365.com
- (2603:10b6:5:3b4::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.18 via Frontend Transport; Tue,
- 16 Jun 2026 12:54:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- DS2PEPF00003442.mail.protection.outlook.com (10.167.17.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Tue, 16 Jun 2026 12:54:32 +0000
-Received: from DFLE214.ent.ti.com (10.64.6.72) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 16 Jun
- 2026 07:54:29 -0500
-Received: from DFLE211.ent.ti.com (10.64.6.69) by DFLE214.ent.ti.com
- (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Tue, 16 Jun
- 2026 07:54:28 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE211.ent.ti.com
- (10.64.6.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
- Transport; Tue, 16 Jun 2026 07:54:28 -0500
-Received: from [172.24.231.93] (ti.dhcp.ti.com [172.24.231.93] (may be forged))
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 65GCsMfU024437;
-	Tue, 16 Jun 2026 07:54:23 -0500
-Message-ID: <d0123269-b1e8-4fba-94b0-b94d3d9a5405@ti.com>
-Date: Tue, 16 Jun 2026 18:24:22 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F418636493F
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 13:00:01 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781614804; cv=none; b=Wsw9ivWc9jMyXtZeMOHhdU3OIuyiAMm951yazbIhy2NrU4IkYnQSPfvWWh4T96SEv1AQA7bjfC+USfSIECPe+eKVVLpzmz6tRM0q5QvgOlzqmy8GKGC6Yt8boqLzBz8AuC8gHGFhXgAICXcvJKeF832LcSxTM2E2E5q4jpwbdcM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781614804; c=relaxed/simple;
+	bh=bhB8cqYkdx99HnRuLaoyAkAfNvz4q6LWBo4ONFNXjmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZLPG7uH54ZBu76ny+S6Mar9jYNxb5nKpRE4+bc2IHrCE1URN/g9CzvI+ukqXZlL728g7AM6PAkkkofVjMCMJM17mi4SjOjfxLVsNGjDFrRPcEDLNTlpZlOUc5UYrOAphg5lYwoO6gAHPiJyGPW92NZc85lWnlzv856z7yppWlDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=izDkDBJ7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qfBFySeP; arc=none smtp.client-ip=170.10.129.124
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781614801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
+	b=izDkDBJ7Z9CQ+t9sVivC6Fwt7u0570xgxg57lwKfLkuRLZVXR7g/lOyLyRryNTXuBpzFn8
+	Dpr6Rb3M93oiOWlRL2ymPSwCcImleQkcSAKSx+mrqlt5ciA2q9kRjAFZkrlHyPiTqXe2Ws
+	Aw74I8u0mEIbjU253CKkjOkysy7lWxE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-395-KjKpuEWjPYqDv66LG0vPcQ-1; Tue, 16 Jun 2026 08:59:59 -0400
+X-MC-Unique: KjKpuEWjPYqDv66LG0vPcQ-1
+X-Mimecast-MFC-AGG-ID: KjKpuEWjPYqDv66LG0vPcQ_1781614798
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-490a767c7dcso29363245e9.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 05:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1781614798; x=1782219598; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
+        b=qfBFySePK3ONJcI32lzd6ju6Dl/CDZqDAPPuyGNVdApEwfgB/jNpbeJV9aLfTDz75T
+         tdKM7IyQoIJmGwAzMsnsJMldk1OYaan/JX9/sKGbHt3gnwcFWJuPUV7GnoUITZoaR8u+
+         y4NXAiiANlwJ/NpvXrLn3+QDzpy6YBVBWk/vZRj5K8gC8KFUuMupwncPJbJn3XMez4ik
+         XKvZzJsDmweg19Kd1SYCBLjQWfpToum/id/FDZD97zHiu7+d2BkYkIrLJb2hbw5RT2lX
+         T7mvx00958dDF5jkcIAgJsibp8wuGmZMlefkkZE8rnCXMTWSFA+SsW8qkHrbIh3O7yCP
+         BaSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781614798; x=1782219598;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EVj9gc1a5EiZ8GlGp7l1tQy1b06455G3XK/4iEWItig=;
+        b=LRvBIrYPusTDX9QahZEF6xVtvsMW0cDBeaO18CLvFv5RTysEdzBi+IkfpUw/iRqbnI
+         89v2XlxuRbh4M9z2eZCMhirPvo/7VetnSetmC4duB/h+/SNbN7+359AK9Q7IDTgGLKXs
+         wzBC0Pz20Io9LLQQ6V2x7d+XeLLWP68fKCEFCMKxmRBzE21FrG9K/WfWax9zMKgvOd3e
+         vYJ5sJR8shfAt8b/dn+Zxzj5zuRsPUu90SIniOSdDRISR9hLNLkyAGvdGV+t/tHxq8Av
+         Ftk5oEi+in+N9ck93m+tpBQ3QH79rRtO6xbsBz2reyfiZ+HBtNm2za44w8rrq5LWTI8u
+         ojCg==
+X-Gm-Message-State: AOJu0Yyr/leyTROTrMJWLayKWXXRuRwrqCOzmm0WXqpylx1B35k3VtZc
+	NtqJT8ItQemGsBiopRBDye1/IpwlXg4n+8cS3r+6LMFMfxFkhExIhHoqf1GZdLUIV7NDDN5usos
+	yCOhB6CbiyxieC1YccrGD7i1AWeSKOCzLssQtaOtSE2SWgdKdaPaCkUX6Cg==
+X-Gm-Gg: Acq92OEzEuRsMbwKXCOjnTXLoC71ATKpx1ThejVB+4/Q7jWzQl+x6vTDt3wTNupuxHe
+	K0rPQXaGVSmDDmGBwsavh2s/45zus6rNauXab8qinHbALuH1rRoqRy1jxvXpWdd5Q/HUAS6hybo
+	e9zQ76Y9uCz42Xa6Bp4QoPm6t2orpTcRjoieFc9TprE/U+mJi7+LyzJ8rEpgocuPcnV5Kuh75lj
+	sQqBbrIxT4+6I9K9PIFsIcLqDZWZzMvElTd5JekaozYgUgONsI+iHccQfPP31mnXtvlYLjZe9i7
+	wO5MGf9MUOak1VpYQk5Cks/Z+mWaipD1cwvZsazakE+scYBGmmE6OdXO/ap35PK7hPD1M+/K+Ci
+	7WbqgEEC/Loo9xKTThCWS2nH44XUfR2OvUw0yg8H1U8ms7ohddsrY/5Zr4mfLgTQzmdeyLsc=
+X-Received: by 2002:a05:600c:4713:b0:491:7325:39c4 with SMTP id 5b1f17b1804b1-49220164d3bmr190086625e9.34.1781614797531;
+        Tue, 16 Jun 2026 05:59:57 -0700 (PDT)
+X-Received: by 2002:a05:600c:4713:b0:491:7325:39c4 with SMTP id 5b1f17b1804b1-49220164d3bmr190084565e9.34.1781614795388;
+        Tue, 16 Jun 2026 05:59:55 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-135-12.retail.telecomitalia.it. [82.53.135.12])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa97a07sm131444255e9.14.2026.06.16.05.59.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 05:59:54 -0700 (PDT)
+Date: Tue, 16 Jun 2026 14:59:52 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Octavian Purdila <tavip@google.com>,
+	g@sgarzare-redhat.smtp.subspace.kernel.org
+Cc: netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Andrew Morton <akpm@linux-foundation.org>, Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2 2/2] vsock/virtio: restore msg_iter on
+ transmission failure
+Message-ID: <ajFEpMnHsxAYJSOa@sgarzare-redhat>
+References: <20260613000953.467473-1-tavip@google.com>
+ <20260613000953.467473-3-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 2/2] net: ti: icssg-prueth: Add ethtool ops
- for Frame Preemption MAC Merge
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <elfring@users.sourceforge.net>, <haokexin@gmail.com>,
-	<vadim.fedorenko@linux.dev>, <devnexen@gmail.com>, <horms@kernel.org>,
-	<jacob.e.keller@intel.com>, <arnd@arndb.de>, <basharath@couthit.com>,
-	<afd@ti.com>, <parvathi@couthit.com>, <vladimir.oltean@nxp.com>,
-	<rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <srk@ti.com>, <vigneshr@ti.com>
-References: <20260610052511.781752-3-m-malladi@ti.com>
- <20260615231041.1007484-1-kuba@kernel.org>
- <20260615163932.50bb3df0@kernel.org>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <20260615163932.50bb3df0@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003442:EE_|SA1PR10MB6319:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed6102de-8bd4-413c-ebe9-08decba66912
-X-LD-Processed: e5b49634-450b-4709-8abb-1e2b19b982b7,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|23010399003|36860700016|82310400026|1800799024|4143699003|56012099006|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	SQxr1KSDWCOlHg09/PVtVJowckHdAAot+cw3+XXuLBUnFtY03KSgmYqfI4x3d1aK/Fc8vZaX9A1Pl+qrWZwIAKnjdm+5trgArnsvzIgZWMBK10qi2VNEXngwQwqgUYGMNr7Z2Aie2kMe2pc7xRqAVxp0ZJnj8T5bZuM6sHl6JAA4WTPep2EIfY5RrfEBL5oRE96IL0IZLkGL5jM9xkVQVX2du16vkblBCcM8cVcg3Q7ZyvmQ/z0fC6U5K/UDtA4NKqv9q6wfcBYfjdTi7VLnOsraSWfwveQkQeypHcgYqTj/QRyVrryLjRMmNj4Gj7q5pEkDQgKua0Q4nhAVSEu69d3vI4wfmn4UImVytdSXjMYT1FfWG9fIQj8abTOzFg5XFOYxTnk37KdAxkGaN+71f8scSnZgWmBiORGJBp+JyFCKJ+MYxjH3dvqN6NDXIGOaZaomzlBNbH8rTk/PnfnKf6tLIxDtfelVVIQH3KZl2Rd8qyXCBbUywnzDrmzJ4NhZTZKtzpxi1zLgR4Pk/UYOvuk6nn4dbr2j53NuKXKF608U7kCorzjoYzb0Urf4ndM2ABcas0F8Aj8o84aQW30c1IrVnrIFpvhhoyXOneP+KC+N44Gv3Fw7slhHfB2pAg/iGbvynVNsAKlez8pGf6mwzDPBJypDU75ZXzzT5X9MsgMq/dzMUSoNkR/u5rF6Ye6KmXLJFhQKf3orhbHbFddYKCbWY9RAfGw5kgTYXCgrFbg=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(7416014)(376014)(23010399003)(36860700016)(82310400026)(1800799024)(4143699003)(56012099006)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	AlXsitBGVw3Q3G9cJSx8rfXJJna1ZnIk5xzvaTqtvPCLsTZQLFFBH5gSDBmgK4qK6yVo4zOehER6Y+W6+FH8a1JUBgrESFAs4OtBTaHivpWH+iARtdF6nfBJnSvcxpGbDhAy40lRmY+CcbsEfQQOGfOJeH++frepgYoXskozcRquOKz10CwMxhsdCh1fLq2a8YZ4F6IM2wxAMkd0xw4MSpv/1M3C4GK/ZQI43k54S5NkbLTTiOqsmBtoAUP6BiNmvI6ATCSULv8AKdpcKFvFWBXBzrGKkzBV5N94NrH56EdkUV/Z2FtQZ+upml7hJcaB2DHx1tstbLhRjYDkicmuPSIrvbaGD7vTOYRnG6L7Tbq5NntIHIAHzG92mFAnPFqEMK9w1LFLJglDD+GbB5kNNR5Y8mb9rYiyvkpjbvDrCdmrF+c3d5/dLzTI/RueBr7e
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 12:54:32.0031
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed6102de-8bd4-413c-ebe9-08decba66912
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003442.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6319
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260613000953.467473-3-tavip@google.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [5.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[ti.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[ti.com:s=selector1];
+	DMARC_POLICY_QUARANTINE(1.50)[redhat.com : SPF not aligned (relaxed),quarantine];
+	R_DKIM_REJECT(1.00)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299842-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299843-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,ti.com:dkim,ti.com:mid,ti.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FORGED_SENDER(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:elfring@users.sourceforge.net,m:haokexin@gmail.com,m:vadim.fedorenko@linux.dev,m:devnexen@gmail.com,m:horms@kernel.org,m:jacob.e.keller@intel.com,m:arnd@arndb.de,m:basharath@couthit.com,m:afd@ti.com,m:parvathi@couthit.com,m:vladimir.oltean@nxp.com,m:rogerq@kernel.org,m:danishanwar@ti.com,m:pabeni@redhat.com,m:edumazet@google.com,m:davem@davemloft.net,m:andrew+netdev@lunn.ch,m:linux-arm-kernel@lists.infradead.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:srk@ti.com,m:vigneshr@ti.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	GREYLIST(0.00)[pass,body];
+	FORGED_SENDER(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS(0.00)[m:tavip@google.com,m:g@sgarzare-redhat.smtp.subspace.kernel.org,m:netdev@vger.kernel.org,m:viro@zeniv.linux.org.uk,m:akpm@linux-foundation.org,m:avkrasnov@salutedevices.com,m:davem@davemloft.net,m:edumazet@google.com,m:eperezma@redhat.com,m:kuba@kernel.org,m:jasowang@redhat.com,m:kvm@vger.kernel.org,m:linux-block@vger.kernel.org,m:linux-fsdevel@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:mst@redhat.com,m:pabeni@redhat.com,m:horms@kernel.org,m:stefanha@redhat.com,m:virtualization@lists.linux.dev,m:xuanzhuo@linux.alibaba.com,m:syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[users.sourceforge.net,gmail.com,linux.dev,kernel.org,intel.com,arndb.de,couthit.com,ti.com,nxp.com,redhat.com,google.com,davemloft.net,lunn.ch,lists.infradead.org,vger.kernel.org];
-	DKIM_TRACE(0.00)[ti.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[m-malladi@ti.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:-];
 	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,28e5f3d207b14bae122a];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,appspotmail.com:email,sgarzare-redhat:mid,syzkaller.appspot.com:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C19DE68FAFE
+X-Rspamd-Queue-Id: A90E468FC9E
 
-Hi Jakub,
+On Sat, Jun 13, 2026 at 12:09:53AM +0000, Octavian Purdila wrote:
+>When transmission fails in virtio_transport_send_pkt_info, the msg_iter
+>might have been partially advanced. If we don't restore it, the next
+>attempt to send data will use an incorrect iterator state, leading to
+>desync and warnings like "send_pkt() returns 0, but X expected".
+>
+>Specifically, this can happen in the following scenario, triggered by
+>the syzkaller repro:
+>
+>1. A write-only VMA (PROT_WRITE only) is partially populated by a
+>   prior TUN write that failed with -EIO but still faulted in some
+>   pages).
+>2. A vsock sendmmsg call with MSG_ZEROCOPY requests transmission of a
+>   buffer from this VMA.
+>3. The first packet (64KB) is sent successfully because the pages are
+>   populated.
+>4. The second packet allocation fails because GUP fast pins the first page
+>   but GUP slow fails on the next unpopulated page due to PROT_WRITE-only
+>   permissions.
+>5. The iterator is advanced by the partially successful GUP (68KB total
+>   advanced: 64KB from first packet + 4KB from second), but the send loop
+>   breaks and only reports 64KB sent. This creates a 4KB desync.
+>6. The next retry starts with a non-zero iov_offset, disabling zerocopy
+>   and falling back to copy mode.
+>7. In copy mode, the transmission succeeds for the next packets but
+>   exhausts the iterator early because of the desync.
+>8. The final retry sees an empty iterator but zerocopy is re-enabled
+>   (offset resets). It attempts to send the remaining bytes with zerocopy
+>   but pins 0 pages, creating an empty packet.
+>9. The transport sends the empty packet, triggering the warning because
+>   the returned bytes (header only) do not match the expected payload size.
+>10. The loop continues to spin, allocating ubuf_info each time, eventually
+>    exhausting sysctl_optmem_max and returning -ENOMEM to userspace.
+>
+>Restore msg_iter to its original state before the packet allocation
+>and transmission attempt if they fail.
+>
+>Fixes: e0718bd82e27 ("vsock: enable setting SO_ZEROCOPY")
+>Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
+>Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
+>Assisted-by: gemini:gemini-3.1-pro
+>Signed-off-by: Octavian Purdila <tavip@google.com>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++++
+> 1 file changed, 13 insertions(+)
 
-On 6/16/26 05:09, Jakub Kicinski wrote:
-> On Mon, 15 Jun 2026 16:10:41 -0700 Jakub Kicinski wrote:
->>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
->>> index 5ec0b38e0c67..8073deac35c3 100644
->>> --- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
->>> +++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
->>> @@ -189,6 +187,11 @@ static const struct icssg_pa_stats icssg_all_pa_stats[] = {
->>>   	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
->>>   	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
->>>   	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
->>> +	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
->>> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
->>> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
->>> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
->>> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
->>>   	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
->>>   	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
->>>   	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
->>
->> [Medium]
->> Are these five new entries duplicating values that already have a
->> standard uAPI?
->>
->> The same five firmware counters are exposed through the new
->> .get_mm_stats callback as the standardized MAC Merge stats
->> (MACMergeFrameAssOkCount, MACMergeFrameAssErrorCount, MACMergeFragCountRx,
->> MACMergeFragCountTx, MACMergeFrameSmdErrorCount in struct
->> ethtool_mm_stats), and adding them to icssg_all_pa_stats[] also
->> publishes them via emac_get_strings() / emac_get_ethtool_stats() as
->> ethtool -S strings.
->>
->> Documentation/networking/statistics.rst describes ethtool -S as the
->> private-driver-stats interface; counters that have a standard uAPI are
->> expected to flow only through that uAPI.
->>
->> Could the firmware-register lookup table used by emac_get_stat_by_name()
->> be separated from the ethtool -S string table, so the new preemption
->> counters feed get_mm_stats without also showing up under ethtool -S?
-> 
-> This -- not sure about the other complaints but this one looks legit.
+Thanks, looks much better to me now!
 
-I agree that this is legit, but right now there is no other place holder 
-other than pa stats to put the mac merge firmware counters. I believe
-the effort needs to go in re-structuring the hardware and firmware stats 
-implementation to address this issue.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 
