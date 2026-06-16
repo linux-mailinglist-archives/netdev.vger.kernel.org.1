@@ -1,210 +1,212 @@
-Return-Path: <netdev+bounces-299913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299914-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 3o/vJe55MWpUkQUAu9opvQ
-	(envelope-from <netdev+bounces-299913-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:29:34 +0200
+	id AojGDSl6MWpqkQUAu9opvQ
+	(envelope-from <netdev+bounces-299914-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:30:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0529E692211
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 933AB692266
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 18:30:32 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=h7pUsB6s;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299913-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299913-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=gbta7TdU;
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=hinEEWEr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299914-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299914-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB64F31EBA0E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:16:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4AAD3228145
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4F646AEFE;
-	Tue, 16 Jun 2026 16:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4309243E4BA;
+	Tue, 16 Jun 2026 16:17:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEED337DEBF
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1082B44CF37
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:17:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781626591; cv=none; b=CBDpAe2S1D1/SQsDXRhIUaVIORwuX1cLDTtU2u/ZbSxUokFe0bhoPZY18ABDvI0bT926IpViER6XN5p7qf7FUOrwr2kQo00VGwPpQASTIbhbjs3K1DpLmNWyX34FRVsF8yBdRcsNbpx4Xqp6ngzZXKd40hkcV7Xic51kYfSF0tU=
+	t=1781626649; cv=none; b=flv1J1SPH3L4JuBRm6AO+iKzeRAHj5BqOP2ka4fCPib2TvW/6ii8UQjPTqukBifKI6FrgEdscbnfPtZJ01exsHWZosBGhayCmf3hzlhHEiaQ2gqYFKcWP6Npef8tteJhaH/RsbHml61LkCBb3HcNcNgZ7quVr8O9zaLbz7M4b4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781626591; c=relaxed/simple;
-	bh=ucrLXHTtP6pRHhma6/r53bX48kitE1CcLVLhFHsdIuQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jDZ4NHadhlZZr0DJR1wPn4ep+sFEP7ZpyXH9M+tIf2H684kE92jQW1bw12eGreQVR+8R9v1WInxpVupzMCd2JVYBRYGTHTHlZ+qG3ss1MIkGM497L7G6X7SRdnhdngdvndRxKdFWTLwHpLGPoNNEPgC5rpTaGcjgShWRtSuo3xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7pUsB6s; arc=none smtp.client-ip=74.125.82.181
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-30bbe98c3f0so397156eec.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 09:16:30 -0700 (PDT)
+	s=arc-20240116; t=1781626649; c=relaxed/simple;
+	bh=Gpu8Y3KK60SVZzWxPNeDmjgN5yrbsKeY2CSqd06xT0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dlk5koNfg7Dsz5f37MxbFLmT3sACOnbJrVlIO+fnLQMrK7ywZNu9yJiG+orDXIguy5LKy2SzYGKEbUaBbvMURnbxjHGXp6K3oEl4rMXR9qAMCUpqpq4t1UXuBwjh4DIROHLffmKK+gAFsAcs0Sf2petQf/whuYHHTNuqC5cQDzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=gbta7TdU; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hinEEWEr; arc=none smtp.client-ip=205.220.168.131
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GFcrII3666607
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:17:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=k8jmCjdOTgQQP3Z1ADzlmkhE
+	ZtRTG+VtASOwyDTz8jQ=; b=gbta7TdUF6RhAfaKwmB36JsrXQPLO2pBds+OD6d9
+	nKHaRAyIgTz7NxxeT4kAsQUIJCocUvOAmgffkmvki5Q6VI3Rd+b01RToTZqEVwOH
+	QzNgjWF0gFkGKynJEPD7T9WeZ5MzyA6jZlfwswj/hacGUZrT3W70KTJ5cxP1TdwB
+	+WViBjJ4SABFJVK/UPel1wBy3EP2/sYRKCZA/OC31JM+a+tKMjwRtomKGhB7EY1x
+	tKjpS23Yf3gAdmBq6ylx3pkJ4U5UA6EwHvo0b0yPfS6mV4lDSy7z5Z88WS+H7JOS
+	Zl/21WSpfszSNfTgUfKo44yX1wJogqbhzxT2FC6yj9xGXA==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eu1762mdc-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:17:27 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-36d97955899so4598804a91.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 09:17:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781626590; x=1782231390; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ucrLXHTtP6pRHhma6/r53bX48kitE1CcLVLhFHsdIuQ=;
-        b=h7pUsB6sPhK9L782bFlXNrNnyoMgnqstbqY+2zoCllb2Ha6V+5kCFSnEXEKJV1ovUy
-         xJnuk8rHIH3zgKwU26Ky4cwhCJpghnzywrT+JkHFunIBl7E5ZThYU9KPRtpYz5jQKD9A
-         moBNJFoEWlkbBjrkHahoJ7ysro+y5LbGfpTeEay9Wj6jXmCTqow7GmZMdoAmCprQVVWc
-         mBo926imx8AgddShr07eGEGjdZxFXRfRPkk+kfulMwKEy10PnDHruYz7Z838gVgHEo4W
-         og1rxJr65ngs2VcZyk+dQ+ygUB/VIW7KgDEr+D3ZWcfJhxb/vxCSqft9OGI4Vh2wEOV8
-         awpA==
+        d=oss.qualcomm.com; s=google; t=1781626647; x=1782231447; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k8jmCjdOTgQQP3Z1ADzlmkhEZtRTG+VtASOwyDTz8jQ=;
+        b=hinEEWErZMYYuujvAd1yNAQCgAvUBQfPbs5hBQ1RRr3UdA0BOiuWi1Sdx7E292kzen
+         L+caUY5W7RXyDGCwhoOvXU1fzfdLyoHKFrVreHMNs3Y62N9v+18eLDOVLPs1Ky7dfper
+         rbLEHOgWPfjioNzyRzMw08KtXADuHmZNAp5T7JnY+Tsc8Xt24P7KfyDp1y2/Qk8EWEuQ
+         nf0TFl7tnB5ZjR7FSe7GGi7TRO/OtajFR7ihHHYC7Y8szzqfVaMnpxpJvLt3zavT8mse
+         tA/CDvZJ3R5s1dhtfOWc3BUJ2erT9bcI0hf+6LiRbER0KGvRdUAHsXu8W/XCEqm+uvCh
+         FOvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781626590; x=1782231390;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ucrLXHTtP6pRHhma6/r53bX48kitE1CcLVLhFHsdIuQ=;
-        b=H4GfsSyTRAadMIE3MIcHty0fDo9KBGwyZO7Wzbe2VfHV7j3x/+hXNEanogfhsMzt6L
-         XKqd5ijs+YewRh1imCGCI0gl1Ss/zlyD+OTHIQpkd/yKVg7NgPW4C2rFIAUhzZ2qRB+9
-         R7QC6X+03Nv04o5qAvrVyh5SI9AIC0ooGzcYmOsWqsMx6Tqx21Zudj1vHgDml9VgVIwr
-         9D00uj0/jgBByOZFM9AErxoyUwvgN3pw+TrIQViEUbHKNLUeQLJbJtoGoVC9J7gIKyGc
-         fdDHE9TbumR3Q3H2xtvXuq1AXIw7GDejk7k5j7newEO2//2AE8fW9yQnSqiERk1zdbmf
-         oFnw==
-X-Gm-Message-State: AOJu0YwdZJUWYabaRKL1sNYtRq/cfqpXNS6RT7O3k2gTHesBG4INI95B
-	2S4k/aTncCp9mrZJmCN+OhQ7WTk2qihVpEZstmetdBff2xaX0Kw48YSC
-X-Gm-Gg: Acq92OHqYbzCSgG7m+ZEVMALEPmIt4Ofyfq0s//AZfOg8xm+GEE/S/cY9cJ9yG9J/cZ
-	SkHdtXnoetjT4rIhiLaUVin8m/d0uuTBWgXZwzpXh4vaaGJQtJZ5qn/7apqj6IOcf4+ehcFluZE
-	Utym0R2YSQhEXSuXOMMeXzoKuriVP/1PW5bWCan241wXSjpT0GA5epE0BLGdrq6LYlwBqHpSszN
-	cLFP4w8hX3+HqMqoOGc3VwGNxWxlBBPXTp8F5TCxpBnTqGGtFIz1G1bgVjWRs6d20zIg9TZCwi/
-	7LnUhLZQfZuNzU6F39zXsuDbnodOe5hL89RV7SbLlHFnEfVNY8U612AzwZdirvMXsHL1Gag5J/G
-	E7wlZ1hgKVK9iqDOXJsjqoMlPIxEBB94DGZEpm6Ui/zE+blFC7X9QRJ2XPMVpiLSa2LER96hzsk
-	cwUhT//+eblYuJcii7+oOBH1BnEhFuoeW0I2G1IwZRtRmowlZaSDVO+SemoYIyfatPM6IF/smNn
-	08iRpT0z7X2j1L9kLlPEY4=
-X-Received: by 2002:a05:693c:69d2:b0:30a:e531:3141 with SMTP id 5a478bee46e88-30ae5313542mr6036116eec.17.1781626589499;
-        Tue, 16 Jun 2026 09:16:29 -0700 (PDT)
-Received: from [192.168.0.128] ([98.97.36.235])
-        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-3081eb95450sm23977823eec.28.2026.06.16.09.16.26
+        d=1e100.net; s=20251104; t=1781626647; x=1782231447;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k8jmCjdOTgQQP3Z1ADzlmkhEZtRTG+VtASOwyDTz8jQ=;
+        b=aU7//KaTwth+d840wx/hRl41Ha1WrnzB74C1nYWfNV7zv8RQHbVFBf/pGIm0cse3L0
+         PUeKK9Cti2wiNOIZuJPiGaIkPdDlV800thPwYCEioIdpk4z6wJm1tsmYFkQV7XyEyIIW
+         hfrKNVgmNUGTUHUdTkyDH6TM3ZM4TCo3McSTNJlsMyvJ7ygL7JPiPqEH5u8Z4HhiLRph
+         ZzFmkH4RPqTvtSanAG36/ekrch0QzVxINvGMd4cnfsVss98vqjpteqHmCVWRxQMAqPf3
+         6uqKTCRTP3/moA185UfuPz/OfUEVX++57bTbqiRGbxFaYF2kdThUnr+1qAd/vgfwpFG1
+         3PwQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/JBAk9oF/4MXwo2y3LZ8391XBqk2FrYrhVw5lwuSrovvYjMB024EAaRmy7x0qT34JS9kcpwRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE3S3e/xqBsKx9GSpnT19Q0eN8tyPKRotBiykgDl+S21Ke2Wms
+	s7GNuKIRZjOE/xuX1wc+5Zuxw3QkZUpv99jLiLN3E4P+jYFCGOyE6H3B3Cj2GDj+H6v7Xg4xaRZ
+	OWjx+J6+zNh+mRfjEzzdH6szoVCqUUU14+E0UM9UFWjTtXj0wQKIzd4lDDdg=
+X-Gm-Gg: Acq92OHbuA4eH5zWqBTKUFSmB6Hv23UUqcgBx6NEn4auTANn4SbOBsi6xogKOMfq33I
+	XeyhmvTsWDeiU+qK23Pyo9yQWHl8DSbBRULXHvf9bZ1HELeUUXvVrCyO/dViXWk/RFxef482KWf
+	I73ioYHJycOGzB1MQhaLFezWfJuTDrHNY4Y8K9d5VENZw/3ovfbpU+6Hx9IxfEx5AxSYSh0vb9O
+	QkQ5/pHxN44XTByu0XF8L0BYjb/0Io3nyDccaNitXM46PcXtxRi6lYTmxy1yiPMfC9KhFWvXCiB
+	+N3FkiBwMSiIz0qMkFwihsoc6yf1mTB2JHs57ihPF545uGKwtJrMR3k+aRLPsIV2XzM9tDV67s0
+	MSPg1EWPd8PavzPlsDccNAjgjdNzqGATg9zg=
+X-Received: by 2002:a17:90b:4ac7:b0:368:3d3e:efa6 with SMTP id 98e67ed59e1d1-37c93969a18mr139712a91.20.1781626646596;
+        Tue, 16 Jun 2026 09:17:26 -0700 (PDT)
+X-Received: by 2002:a17:90b:4ac7:b0:368:3d3e:efa6 with SMTP id 98e67ed59e1d1-37c93969a18mr139656a91.20.1781626645979;
+        Tue, 16 Jun 2026 09:17:25 -0700 (PDT)
+Received: from oss.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8661a67603sm12281484a12.0.2026.06.16.09.17.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 09:16:27 -0700 (PDT)
-Message-ID: <06d8c98da24e80d148ede4e933bb621c5515a7a2.camel@gmail.com>
-Subject: Re: Ethtool : PRBS feature
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: "Das, Shubham" <shubham.das@intel.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mkubecek@suse.cz"
-	 <mkubecek@suse.cz>, "D H, Siddaraju" <siddaraju.dh@intel.com>, 
- "Chintalapalle, Balaji" <balaji.chintalapalle@intel.com>
-Date: Tue, 16 Jun 2026 09:14:55 -0700
-In-Reply-To: <SN7PR11MB81099B4885C10E16D52A2EB9FFE52@SN7PR11MB8109.namprd11.prod.outlook.com>
-References: 
-	<SN7PR11MB810923BBDEC398E860099150FF1B2@SN7PR11MB8109.namprd11.prod.outlook.com>
-	 <f4a3e4ad-91e2-4844-a29b-81f70151228e@lunn.ch>
-	 <SN7PR11MB81099B4885C10E16D52A2EB9FFE52@SN7PR11MB8109.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+        Tue, 16 Jun 2026 09:17:25 -0700 (PDT)
+Date: Tue, 16 Jun 2026 21:47:17 +0530
+From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Russell King <linux@armlinux.org.uk>, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH RFC 4/9] net: stmmac: qcom-ethqos: add per-platform NOC
+ clock voting
+Message-ID: <ajF3DUGYPBs1iU5f@oss.qualcomm.com>
+References: <20260612-shikra_ethernet-v1-0-f0f4a1d19929@oss.qualcomm.com>
+ <20260612-shikra_ethernet-v1-4-f0f4a1d19929@oss.qualcomm.com>
+ <45d7faac-7c0f-4f89-808e-06129e8420e4@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45d7faac-7c0f-4f89-808e-06129e8420e4@oss.qualcomm.com>
+X-Proofpoint-GUID: gYbzIjrK5BCMCCk2_F3qRr-i7LCAO9XQ
+X-Proofpoint-ORIG-GUID: gYbzIjrK5BCMCCk2_F3qRr-i7LCAO9XQ
+X-Authority-Analysis: v=2.4 cv=I4RVgtgg c=1 sm=1 tr=0 ts=6a317717 cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
+ a=267an7I0AjvZusCT9TAA:9 a=CjuIK1q_8ugA:10 a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE2NiBTYWx0ZWRfX+C4mt72Gu0bh
+ 1p44f/9WhFOOX0XU80OwDawO3J8fCfK0dU8I0lglgBwfWp5Jraz0dAvVUHuNwcRHORj+Hyde83x
+ odMJkbFBnyR3LGQ3btWgLUklb7OiBvQ=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE2NiBTYWx0ZWRfX/YwdRgHbpPkT
+ YY4Hniye+jWG6beMyB0gNx5sddtsMCraveGY/WLRjvO8eMSW4uPUCBWY74WT4wfjVd39oShyC6k
+ nzuZCUG2hUWe52tPWoFnEm8D4NGzCEaH4HwjiauSC+XeWMmM3KFG3w8TEoXwA37AuyPsg6YrnY/
+ j7LOGQQ9HvK9InxvQ31rpfRL0+TyklB6LQEZWOmv9t4gOHJAodiN+8Lq327PTAaySUVz/7cNh92
+ 9usrfc32Zo/4AKU1Xxt1Mh2bUeW9gNw1BsdLRLMzptc3t98/83HE5UQHkoNI4cHJRzVRA/t5xMX
+ g07Gv14nVPiWEIswk3eOeCg26C5Sba8HRGXb0pcWFsZpfll8lBIyZ9mgltzDmrChcCgi6qtbLjg
+ Ah3tiax9MlOCpLQOaei8y5K4ZylEDGVtEGDfvzvr8LWhun7bMGim7Gp6MasfkjK2rwmVCexqhRY
+ 5PxVGbkI/ylv+upnooA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-16_05,2026-06-15_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 malwarescore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606160166
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_FROM(0.00)[bounces-299914-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux@armlinux.org.uk,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FORGED_SENDER(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:shubham.das@intel.com,m:andrew@lunn.ch,m:netdev@vger.kernel.org,m:mkubecek@suse.cz,m:siddaraju.dh@intel.com,m:balaji.chintalapalle@intel.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-299913-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexanderduyck@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 0529E692211
+X-Rspamd-Queue-Id: 933AB692266
 
-On Tue, 2026-06-16 at 12:14 +0000, Das, Shubham wrote:
-> Hi Andrew,
->=20
-> Thanks for the feedback.
->=20
-> Yes, for multi-lane ports we can accept the lane number as an argument li=
-ke:
->=20
-> ethtool --phy-test eth1 lane 0 tx-prbs prbs7
-> ethtool --phy-test eth2 lane 0 rx-prbs prbs7
->=20
-> We referred to "Lee Trager's" "Open-Source Tooling for PHY Management and=
- Testing" session:
-> https://netdevconf.info/0x19/sessions/talk/open-source-tooling-for-phy-ma=
-nagement-and-testing.html?.
-> We have been trying to reach "Lee Trager" to seek more input, latest upda=
-te on the approach and understand if there is a parallel effort in active s=
-o we can collaborate.
-> If you can, please help me connect with "Lee Trager" and others who expre=
-ssed interest in Ethernet PRBS. We are happy to align and start implementat=
-ion.
->=20
+Hi Konrad,
+On Mon, Jun 15, 2026 at 02:13:05PM +0200, Konrad Dybcio wrote:
+> On 6/11/26 8:37 PM, Mohd Ayaan Anwar wrote:
+> > Some SoCs gate the EMAC's path to the System NOC behind dedicated clocks
+> > that must be enabled before the DMA can reach memory.  Add
+> > ethqos_noc_clk_cfg and the corresponding fields in the driver-data and
+> > runtime structs so each compatible can declare its own set with per-clock
+> > rates.  The clocks are acquired during probe and enabled/disabled
+> > alongside the existing link clock in ethqos_clks_config().
+> 
+> Sounds like we should use an OPP table instead, we can't just do 
+> set_rate() on qcom, as that will not propagate the required perf
+> state to the clock controller's supplier power domain (i.e. VDDCX)
+> 
 
-You aren't going to have much luck if you are trying to reach out via
-his Meta address as he has moved onto Nvidia so he is no longer working
-on the fbnic driver.
+Understood, I will test this out for v2.
 
-As far as the work done most of it was internal and making use of
-debugfs. I don't believe any of the work for fbnic began to approach
-the suggested methods for upstreamming the feature as Lee had been
-pulled into other efforts.
-
-> About standardizing across other bus like PCIe and USB, I had a quick dis=
-cussion with our internal designers, but I didn't observe any such SW-level=
- config knobs interest.=20
-> Looks like Ethernet has clear interest and we are joining that Ethernet P=
-RBS community too.
-
-I think it largely depends on what your implementation looks like. The
-point being made was that many of the SerDes PHYs out there are capable
-of use in multiple applications. So instead of being a networking
-device you would be looking at a SerDes PHY such as those in
-"/drivers/phy/".
-
-Also do you know what layer in the PHY you are injecting this PRBS at?
-I would be curious if this is PCS or at the PMD level?
-
-If you are referring to the PCS level then yes, it would make sense to
-have it in the networking subsystem as the PCS at this point is more a
-netdev specific set of drivers, see "/drivers/net/pcs/".
-
-In the case of the PMD that is where things get a bit more interesting.
-There is an IEEE c45 register definition that includes PRBS testing
-registers, however in the case of our implementation the PMD doesn't
-follow that specification and follows more the "/drivers/phy/" model.
-
-> Ethernet PRBS configuration and diagnostics support is well established a=
-nd already widely used in existing Ethernet SERDES deployments.
-> We think Ethernet is the most natural starting point within netdev, as it=
- aligns with current driver practice and existing validation workflows.=C2=
-=A0
-
-The problem is many of these parts used as an Ethernet Serdes PMD are
-really a multiuse part. So for example in the case of the hardware in
-FBNIC we use the same part on the Ethernet PHY as we do for the PCIe
-Gen5 PHY.
-
-The complication in our case is that both are buried behind our FW due
-to the fact that both are shared between slices. However for testing
-purposes and such we could look at disabling the odd slices to
-essentially unshare the hardware if you need another platform to test
-something like this with.
+	Ayaan
 
