@@ -1,55 +1,95 @@
-Return-Path: <netdev+bounces-299975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 92UBNCHKMWqRqAUAu9opvQ
-	(envelope-from <netdev+bounces-299975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:11:45 +0200
+	id ogvCOXjOMWpvqQUAu9opvQ
+	(envelope-from <netdev+bounces-299976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:30:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DBF26958A1
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:11:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457DF695929
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:30:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=jKbwD3o2;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299975-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299975-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=HNGO6CoV;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299976-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299976-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AE35B303D57D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:11:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5508C3178D53
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7845E3ACA4E;
-	Tue, 16 Jun 2026 22:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A913A8723;
+	Tue, 16 Jun 2026 22:26:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9103ACA41
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 22:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A634A3ACA7A
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 22:26:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781647902; cv=none; b=MZCqN4jq2Klic8wE91CM8mcvFCXs5QoCpea6VuB/UDgzsM2iCAytB13UUvHMgbQ0K/i5LiOg8ww6ygdqEnc9X2JfBNXYPv+yZVbQ1N63Bk7yu5Ux8FKuug5SWTcb5d6sbE0+sZQVfcMImOzuYvvIUV/PEZ+EVG8JJ9VsPOiDpag=
+	t=1781648817; cv=none; b=HA/KrQIKbCS57xcnNU2qAtKg0spx8+X0qGcW+//8gzVV79bs9NbxZLnGui1U1ZRsFlUkZ4QTZ56/3mWXR7EhKu/kZnYTfAM71J9K2Vs9ioLNMQg20U+8XFS9EGmTZWx7+b4HcKflNxnlV4HAU8txsYPkakOSNT9S99zsw2pzI6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781647902; c=relaxed/simple;
-	bh=CYQaBUlulMIk0QXaU1x6EL1nxwi+M7Uq7HKmMyVAJV0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JonZqobPHQ8kcKMzPheajV7Ozm4QHUGGRtz5oNdzBejnw4cw5xGcDH2hUELyylFey5oOusIjUT98L6bbK9Xs2oX0mm6izCsyYEH4iTEMsx2UC8Bw0UMdvnInr1GIkFxxSITMu6cerUeQZdGYzCmcdBKb3KU5mfAcEqZbEX+3DGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jKbwD3o2; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0ED41F00A3A;
-	Tue, 16 Jun 2026 22:11:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781647900;
-	bh=CQD2Rea8tT9Evki9cBF/txLTFbUp+ukuW+gnffNHODw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=jKbwD3o2tt0FtNHDpOTzRUzaNm7iND58wdAcyq2/wDBecABCppjOk+AP5zWhoT9aE
-	 RV3k8vVvAe7bz0DyGUraz7LSLLvBKbQ8F1LyVmL+mnQB/Gl0fXBimKpdX8JO9ZgbAY
-	 Vv1BawSJWEfYBTR4544VerFG7Av+DSFEvT2aPGzyDeiKUzr1fqytuq2b4x/eI1J4EL
-	 SbW26dbJv0EnNQx8EgOeskhqro30dm3avZICvfRxZQrBt1NRABe2wy59sNSty+Lbpr
-	 ts208rSiN33hkJmT37/qJ4aiFUCRqGm70mKf4jPaQUrbZb7pzJM01B7HJHvYsVaQ82
-	 1tLPRuYjDNwMw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938533930C2B;
-	Tue, 16 Jun 2026 22:11:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1781648817; c=relaxed/simple;
+	bh=lagiunzXSq9oC2yFzwByQw8wxuRhAtHQcjGd/oG0Ld0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LvIS2HGMNyivwMZEZ+NnsybM0T3stXuS2Hdbu6zjQm1obqagFyk2P00oT4TLwqx0fsKyUC9MPeaAHU+kDXCMaYPZaakjGEoSLxt94opoeHufafUzk1v2D8HAY83kVnx6KkR8awZtAkP+KANZ4dWRnVUuWp10F7J560j4dgioYqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HNGO6CoV; arc=none smtp.client-ip=209.85.214.171
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2c132ac5ec2so50981335ad.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 15:26:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781648816; x=1782253616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4Yll/Wvi91nYOEpP83UIdJkAu2UP4DX4txS/t/t0Jo=;
+        b=HNGO6CoVvU+jpqeojl4yXlU6oILeWdTWJOTnQeAiWLFfpE/0lm4sMIiEb/UPgeQhz7
+         xvAyzgDD8VO49AyhpumkoKUGQjs4xnhy/UDoStbEo9lbrzujhClk53lKaprjv1BldOky
+         aeriE+VFInLcOBUOb+mAW8HHk3mw9e0MD3Mje9fnX/CBZGOaWUW0eT/HbmtquwY1F4L9
+         7pQRpIV8l7ikNn4pLPSupU/Ww5RO0Tp2eaAJZu1E5nVYQjvsquSMcL1zmIzWMaUN+40K
+         By6E5RuK4uPFFWJm/XY14uGBoqPWvT0WfXPNPcKyPHVtEQuVXumXOAfKXwpyU5/mhWt5
+         85Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781648816; x=1782253616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b4Yll/Wvi91nYOEpP83UIdJkAu2UP4DX4txS/t/t0Jo=;
+        b=bc+r1jueG8/hwjxXAB/oFN9CsRsz7pgNbn4YxJGeLfq9cHGKaSWTyqqy25Vob9wYxC
+         I5Wtkp8+T81SuEZiEOmOYdLJGK32sa0YjWb1Bz2+PNOcUsL9UN9i2p7ZO3Ki3fx73P01
+         9CGTQVaBT/qqj8XV922Oh9/LRg8Y+xKbjytpQDVN5gaY+GqpFrRhCMdSWlfFdmulHieB
+         S4nRrAg4ed1ASDR2y5dMTYg9LWKfd8uyEDd3dww7C6ZdBtDAfNm+EjQlZmn7KVAybbD7
+         NzRjQndmAcmGe1dK97QfWrScZHl2uZKsVf33/oRgR+ekyQmM65tnVNgj78Gmf3hN0WSV
+         351A==
+X-Forwarded-Encrypted: i=1; AFNElJ/vi+RU+PB+XG/wR0dMsbaUqH/kCB2YAL2XgVEoRM9d8tCC1ucK0i/43OpMvnqfHEXLwqdcbAY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrCKkCyCcmOiRz0Mkzn96GWgipzg+rUeTcfKcXXl8JQxNICJru
+	0d7LCDijH+KJj5mtE4ArNd8cQUJW+0bJbvwsdw/GcA1k7YU5wTisOZlu
+X-Gm-Gg: Acq92OHDDLqrBEwz8vtaxlvScaKawjhNQDgqrCLJy9soUSdkdpw1CpMJqdqC0Nt8+Qa
+	ixOdIwWlUfifrhk+qRtanIAH0UnWQHw+9TxoaRaKnAkpF7SqwI40BuoFMH5w5zfFuFQCAcv5q5e
+	JrncKwFMMb/KjxfJLd8u0HTgCTVNL/zPY5PeFuEg49JOuNk+dD80W6VvFfZ9ikV0dJzbKRrd48p
+	KFmaFFHG/scv6ZPj/cg+DCNmKThq2LVY0+sUUs44ZVo3oS2005ZIDzBxhUBN59nQNPVLlUsrh+w
+	dqgcZu40kI5Xxws7Q7b4tacaD5AiT5qT6MjdsveEkQ3g9274+o3Is16RjUk7wzzm7k3VOjl7r8p
+	Lj6Ydud0/pmpck2avqiDuoDflaesm8wiBXDykde4hozKk+WPcDLKq6MPM8ney6JTCRvsQTPel3M
+	B6Om8a4JaQ7pKfaoaRmYg8BBDcuczTVlAI2PPBtq0V5sRuZlEKZdSRdxAcHmyHywWs1X5dPMMHW
+	q8p
+X-Received: by 2002:a17:902:f606:b0:2c0:b932:8680 with SMTP id d9443c01a7336-2c6bc0b76camr10361585ad.10.1781648815957;
+        Tue, 16 Jun 2026 15:26:55 -0700 (PDT)
+Received: from moksh-Nitro-ANV15-51.. ([203.192.239.31])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c6a758a3c6sm22532005ad.52.2026.06.16.15.26.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2026 15:26:55 -0700 (PDT)
+From: Moksh Panicker <mokshpanicker.7@gmail.com>
+To: kuba@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	Moksh Panicker <mokshpanicker.7@gmail.com>,
+	syzbot+1cf303af03cf30b1275a@syzkaller.appspot.com
+Subject: [PATCH] netdevsim: Fix deadlock in del_device_store() and nsim_bus_exit()
+Date: Tue, 16 Jun 2026 22:26:44 +0000
+Message-Id: <20260616222644.41344-1-mokshpanicker.7@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,84 +97,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] [net] net: airoha: Fix QoS counter configuration for
- Tx-fwd channels
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178164789527.1259509.13170564105480598534.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jun 2026 22:11:35 +0000
-References: <178161132384.2164449.18407700117859190327@gmail.com>
-In-Reply-To: <178161132384.2164449.18407700117859190327@gmail.com>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, lorenzo@kernel.org, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
- matthias.bgg@gmail.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299975-lists,netdev=lfdr.de,netdevbpf];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:lorenzo@kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,linuxfoundation.org,gmail.com,syzkaller.appspot.com];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299976-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:skhan@linuxfoundation.org,m:mokshpanicker.7@gmail.com,m:syzbot+1cf303af03cf30b1275a@syzkaller.appspot.com,m:andrew@lunn.ch,m:mokshpanicker7@gmail.com,m:syzbot@syzkaller.appspot.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[mokshpanicker7@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mokshpanicker7@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev,1cf303af03cf30b1275a];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DBF26958A1
+X-Rspamd-Queue-Id: 457DF695929
 
-Hello:
+del_device_store() and nsim_bus_exit() both hold nsim_bus_dev_list_lock
+while calling nsim_bus_dev_del(), which calls device_unregister() which
+internally acquires the device lock. If another thread already holds
+the device lock and tries to acquire nsim_bus_dev_list_lock, a deadlock
+occurs:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  INFO: task hung in nsim_bus_dev_del
 
-On Tue, 16 Jun 2026 18:50:29 +0800 you wrote:
-> In airoha_qdma_init_qos_stats(), the Tx-fwd counter was incorrectly
-> using register index (i << 1) instead of ((i << 1) + 1). This caused
-> the Tx-fwd configuration to overwrite the Tx-cpu configuration for
-> each QoS channel, resulting in incorrect QoS statistics.
-> 
-> Fix by using the correct register index ((i << 1) + 1) for Tx-fwd
-> counter configuration.
-> 
-> [...]
+Fix this by releasing nsim_bus_dev_list_lock before calling
+nsim_bus_dev_del() in both locations, after the devices have already
+been removed from the list with list_del().
 
-Here is the summary with links:
-  - [v2,net] net: airoha: Fix QoS counter configuration for Tx-fwd channels
-    https://git.kernel.org/netdev/net-next/c/1402ecccf563
+Reported-by: syzbot+1cf303af03cf30b1275a@syzkaller.appspot.com
+Closes: https://syzkaller.appspot.com/bug?extid=1cf303af03cf30b1275a
+Signed-off-by: Moksh Panicker <mokshpanicker.7@gmail.com>
+---
+ drivers/net/netdevsim/bus.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+index 41483e371..0f02ff8ad 100644
+--- a/drivers/net/netdevsim/bus.c
++++ b/drivers/net/netdevsim/bus.c
+@@ -241,11 +241,12 @@ del_device_store(const struct bus_type *bus, const char *buf, size_t count)
+ 		if (nsim_bus_dev->dev.id != id)
+ 			continue;
+ 		list_del(&nsim_bus_dev->list);
+-		nsim_bus_dev_del(nsim_bus_dev);
+ 		err = 0;
+ 		break;
+ 	}
+ 	mutex_unlock(&nsim_bus_dev_list_lock);
++	if (!err)
++		nsim_bus_dev_del(nsim_bus_dev);
+ 	return !err ? count : err;
+ }
+ static BUS_ATTR_WO(del_device);
+@@ -527,11 +528,11 @@ void nsim_bus_exit(void)
+ 		complete(&nsim_bus_devs_released);
+ 
+ 	mutex_lock(&nsim_bus_dev_list_lock);
+-	list_for_each_entry_safe(nsim_bus_dev, tmp, &nsim_bus_dev_list, list) {
++	list_for_each_entry_safe(nsim_bus_dev, tmp, &nsim_bus_dev_list, list)
+ 		list_del(&nsim_bus_dev->list);
+-		nsim_bus_dev_del(nsim_bus_dev);
+-	}
+ 	mutex_unlock(&nsim_bus_dev_list_lock);
++	list_for_each_entry_safe(nsim_bus_dev, tmp, &nsim_bus_dev_list, list)
++		nsim_bus_dev_del(nsim_bus_dev);
+ 
+ 	wait_for_completion(&nsim_bus_devs_released);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
