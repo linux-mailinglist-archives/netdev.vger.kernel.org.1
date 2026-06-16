@@ -1,107 +1,97 @@
-Return-Path: <netdev+bounces-299805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299782-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id quphNLUqMWpIdAUAu9opvQ
-	(envelope-from <netdev+bounces-299805-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:51:33 +0200
+	id tTWdKC4UMWo4bQUAu9opvQ
+	(envelope-from <netdev+bounces-299782-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:15:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3298168E7AF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 12:51:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B73468D6E4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 11:15:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=sibbuWwF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299805-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299805-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="Wa/ls78t";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299782-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299782-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3AB1A300B3E7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 10:51:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7DBB303283C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 09:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7ED3A48DF;
-	Tue, 16 Jun 2026 10:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A24D42189B;
+	Tue, 16 Jun 2026 09:12:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E75842847B
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 10:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD3141B375
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 09:12:10 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781607091; cv=none; b=dSRFel0te9jNrkdpQ16k1uiD3dnGYodFyJbZmlzEzp8iny/A1/roVIxtQrqVmIhVJRWem0NLmKz3UDiVFZfVhbP3x5XdbrqsYGqDYEF6C+gkY94eWMzppxFtckOjaFgFgP3b+POV6zA31lJvGdw21e5iciQjFedFX0sT7YOwIcw=
+	t=1781601131; cv=none; b=eOPQcReWAgY5oV26IG9pZIzbr7eCYNNcHvDI1orHJFEHw0PkvAp61e4vVQ27NOF+x0xu4CZpiyy/T9BrCul2CTgbYDkQA5VKo8FYAur4RSXXMZ9KuUQJreO6IZWOyrcdOJg/8zIjqs8LwzBXJps98pZoQ3btxbuw+NfExrMiU0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781607091; c=relaxed/simple;
-	bh=BYiitEcXHhRh6eR+a46Lb8G8JNceCCN8CajnI0gLC0Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lK7ZVgKIQSWE8d6poxqBlStq0LS9xBpmF3h8m4HBR13S/BZmILUqOU+nNqhQc4c+y/CRrJxk1awGIiYNt9cGp6DNHb1vLHENVIlcGiVjhkTsUTT1up0j73bIJT/dsYBSbWpDb1u2ArfEfI+Ay7jRCFQfoB17gZDMoCFP6LQDQM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sibbuWwF; arc=none smtp.client-ip=209.85.208.68
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-68bd9fce347so7967483a12.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 03:51:29 -0700 (PDT)
+	s=arc-20240116; t=1781601131; c=relaxed/simple;
+	bh=OLrKwtOMAAXc+cn4sWKdPlWR3wyVQ6X+l83adwNoANE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lp7ruiE0cn4JMmMxNt/QeDBT9ZK2Oq4NVB8dj9tIJKngbj1YLw7ySfvPmWGyFeOmOcvHfsUvmvt5dtVQO6OijhGmev9TWYEkAPCDGy1EF8Mwfi6EW7HWAWLYhBoqNPEIr0Dg5Qt3vdTz/s6ZJ2sUt3tCasJpHdFGGcKGctqxNco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wa/ls78t; arc=none smtp.client-ip=209.85.210.174
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8423f869421so3429736b3a.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 02:12:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781607088; x=1782211888; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781601129; x=1782205929; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cBInyREsNJJq2tfrHgYP7popCDV3FF08GB9ZJkZM/f8=;
-        b=sibbuWwFCWtlXfTITbG3+OP1mWql47pRKcUL9ZVtifRJFeXRp6NIgf9DXmb+lT743h
-         aTm1+/KEiylkJS/4/W3FG+mwfmhOD/ZAF0qCqjk7dHfFSdF2zY9/ZJjTx2aKvfA+Brlx
-         +7ussk304r43dkpg9nEoBxrKcsdE42j0P2lnkW1QRW0nYYqw0c2wSBOjJaxFYzrH20aP
-         CYldhhXjp62utEsbfNB62s700mPVv/pq4sx2nGD52c5Ak4KcnKzKCeh1wzbMfJFGogLP
-         GWYfTNkfn6fIgP6okj9aLE9MG5Lqn0vhokrdPX7BNyJ+gA5IR3XuBxTbybUMICtyclfo
-         td+w==
+        bh=gCMlAj/PQW48QlYO1ogaZDvkUzT5hyp9HL1ZWQeHJVQ=;
+        b=Wa/ls78tFOo1qzCj0oCRILESDpCXDR+h6xSJg5/l2VdBMETLiZn1gUm+h+RiRREdK+
+         AfDtcW986iAokSUUTfiMKvFwwYUYtzHt5VH2ucUg2a0LEJ8brKpjOT/2ysJec+/7w5Te
+         MxJ5Rc95clxinK+O8EeQ++qAB9RrS6zM4JfsE4Nh+1KRGblDIzd2celhNqmEU8uLv7l7
+         bc+p8fE2B7BBoUFkbVsWLsk4/aWvO6hmOllDFHLDechHxlx0L9yre6PkhuuN07c7O6T5
+         Kyrgy6KnqylWW7b9a8JM9q5tTt8O/yavvjb2SnlPJSx3p+qemuZA/G74Pn/Tdac2Ptcf
+         YuSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781607088; x=1782211888;
+        d=1e100.net; s=20251104; t=1781601129; x=1782205929;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cBInyREsNJJq2tfrHgYP7popCDV3FF08GB9ZJkZM/f8=;
-        b=amhNQauWSr3FDWdj2xSQ8n2r0Vtt0QE5Y/K74RJy/nmGfOscxhB4ohC7pZ9rvE9rDi
-         9GdwL1SZG3rBh/rNBaIq8tLKz+18WvvW2mJl+MpmaLmHBBPT0M5RGjIIQdE0TqDNvZkE
-         FJ60oQflBaRvDQCPY0RemPxD92cb8szjkOkb0n55cvzbpSaEXqJHWyd2W1RFc2ZPAbnF
-         LxKJUqXGfdukSxNilwxdprio0+jMpyMskR5EuEujLkHammAnX/mfhItcQ0QtM6f4Pi14
-         H0/tSxjVzG/CYKuPHZiFYsUpeLhxwKYKgXQcYPO/F7KvIq1M1UI9kRAT4NmPrJbtPRhQ
-         TZaw==
-X-Forwarded-Encrypted: i=1; AFNElJ9CA+5TjWiCXAlMDx9La67xEiP5kcS+2EQsg+//MK1/F5LKAdYziqZIo/FLL++h4uv5UuIO8NE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzkj/y7ynTyQrTmQhIPlpzxQTHSFSRTOfQM9sUiaMsbzkDePaB
-	kfX4B7CtQFsjTJXI1AW+fRAjj8FlNXAIbxvofuPGxWy6jKq93TdE5Sbd
-X-Gm-Gg: Acq92OH5EPMzP5Cd7ONljIGzpBsTxSMS3q70RrbtAfXYzdzwLongf7EzV6OUn4XEujz
-	kTHKXY7qxCFaLYgYSIExF9jqrBoY0/graa2806dgb4P+joMzgRiW+easR7bG5gaLDGBqG2tZHzY
-	WkD3cGuQ68UUJu/1SHLRyfmH6392tgNFpV5p7GcI1ZaRaIjiMm5uh8HF9VV+vzIx27abb8RKTq1
-	ztuWd1T41YLkWrY5E+NbmGyfRzoJhf6nFwJeHTP6EnWfuxqX9XQzCiNJFW0tMVGO00/JI5AkiJa
-	Ur5QDupRNidE4BNQN3HdOW781zDBN3VD0yVk7iToZFryd+s+WF+uuNvgst5yO6jp04R4cDtTpFx
-	SdZIRFZCq1IHZeA7RpRfD87hdLJmPr9UXhq9hgOlq8uxOS1G6n8Xjkrly19aQ7dMHqwYTUnceOM
-	7/vW3qpzZ10hUcKk86iWwLtBsUm1C7qjVkk9TKa7efpd6YKplsZRjPl0JDHHuZaBAN4m4A
-X-Received: by 2002:ac2:59cf:0:b0:5aa:6c2f:2a20 with SMTP id 2adb3069b0e04-5ad427a8bf2mr621532e87.30.1781600513392;
-        Tue, 16 Jun 2026 02:01:53 -0700 (PDT)
-Received: from cherrypc.astra-academy.ru (109-252-17-231.nat.spd-mgts.ru. [109.252.17.231])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5ad2e1715d4sm3301048e87.34.2026.06.16.02.01.51
+        bh=gCMlAj/PQW48QlYO1ogaZDvkUzT5hyp9HL1ZWQeHJVQ=;
+        b=cPa3mA5l9PMZyIIf7GGhaKuXmguClpIG+rcYt8VpKGoy8r0+Es2g/cnmHA950d/fAt
+         zm1Y/pbIR4d+Qr7CfwnjVba8tC1CtPJTDqXpABKQu8AmEv4GeBv2sZBiUhG4nQDizPRz
+         B3jgDV6qp87Tc+ev3F39WyY5GPSlolq/he09xUjy1s2JHzpDkKq8lQHI3OGbA5KcpwV7
+         vwWZ3DqoIoYshZLlu3EyHK1UWManN9/kfmK1H1sesdV/+5ymFypQ06jcWf+kfdus3+ps
+         DIg6B9nMauuvLWswD/jQ8p5qCvsrVAJbgTtbPnhnsGoGZ750QdqFRqDVdO9oT/Z3WPh2
+         ndYA==
+X-Forwarded-Encrypted: i=1; AFNElJ+8mfFsjl8e8hfJQeVrsKGevk8We4a5XgMZyeWcbbsmEfvK6Jysji/kFnTYZnPt1yu5qsuDYec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIjaMOHb/QS1CKAyazCDMGACWOIyik0p95mBO2MJkVtb2AJihL
+	RKjNZGPsqcEsct570xKuwph79Ipwfgdk1g3BEqP4X+7L+7zokS5zv3hD
+X-Gm-Gg: Acq92OG5HRLHnVTJGoDdHwQlxWstn8y4IP+nLFBCNSlZgz2ZDeAci4KwQU1ctBfX6J2
+	QnjbgqERiB+JITC+XRxm7yNX4HxY0FNemWFHxWq35ehiS/cgORONOZXbojKTQwIe/7jnT7m74VP
+	ytVu06P83/FhJ5A/VGlB6toRXhhOK8rjKlfCUVnhDVe/jtQMjhBA3h2y29sNR1uOCWXDDDFd//z
+	/eWLp0rOKMLsNkrV5Sduh6ustBUtTNZiTDtCZ48MhOloULGhPLtXH6pN1tlQl9RnTmfGmud60Wz
+	te6Vp9wyy0xCfB3yeS2FCZpOZpYoQjybQMhrO5Seq81TqEdsjyjRF9C6GQtjKWMAyo3NQSGKKTs
+	NO7HhcPOPgb1PviUEGvB+5KxA55h73sQSvRZOsSD64H4uTbEsrK+NfGy/dLYH04nKG2FeYgLuR9
+	Pw98zNKetofUg9yQ906p+Ysm7cQ+yn9l3GbM7y3F0iD4+NxAVAzX5GFKKA60XE2Q==
+X-Received: by 2002:a05:6a00:804:b0:82f:5051:f024 with SMTP id d2e1a72fcca58-844e1a2f1b5mr14917312b3a.27.1781601129475;
+        Tue, 16 Jun 2026 02:12:09 -0700 (PDT)
+Received: from cps-manycore-1.. ([147.46.174.222])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434acf23a7sm12026478b3a.22.2026.06.16.02.12.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 02:01:52 -0700 (PDT)
-From: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
+        Tue, 16 Jun 2026 02:12:09 -0700 (PDT)
+From: Sechang Lim <rhkrqnwk98@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Dongli Zhang <dongli.zhang@oracle.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Si-Wei Liu <si-wei.liu@oracle.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Willem de Bruijn <willemb@google.com>,
-	lvc-project@linuxtesting.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH 5.10/5.15/6.1/6.6/6.12/6.18] tap: free page on error paths in tap_get_user_xdp()
-Date: Tue, 16 Jun 2026 12:02:01 +0300
-Message-ID: <20260616090202.693916-1-nazarkalashnikov0@gmail.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf] bpf, sockmap: fix lock inversion between stab->lock and sk_callback_lock
+Date: Tue, 16 Jun 2026 09:11:51 +0000
+Message-ID: <20260616091153.2966617-1-rhkrqnwk98@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -117,86 +107,138 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-299805-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[nazarkalashnikov0@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,redhat.com,lunn.ch,davemloft.net,google.com,kernel.org,iogearbox.net,fomichev.me,oracle.com,vger.kernel.org,linuxtesting.org,asu.edu];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:gregkh@linuxfoundation.org,m:nazarkalashnikov0@gmail.com,m:willemdebruijn.kernel@gmail.com,m:jasowang@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:dongli.zhang@oracle.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:si-wei.liu@oracle.com,m:willemb@google.com,m:lvc-project@linuxtesting.org,m:xmei5@asu.edu,m:bestswngs@gmail.com,m:willemdebruijnkernel@gmail.com,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-299782-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:edumazet@google.com,m:kuniyu@google.com,m:pabeni@redhat.com,m:willemb@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:horms@kernel.org,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nazarkalashnikov0@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[rhkrqnwk98@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:email,vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,msgid.link:url,oracle.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3298168E7AF
+X-Rspamd-Queue-Id: 1B73468D6E4
 
-From: Weiming Shi <bestswngs@gmail.com>
+sock_map_update_common() and __sock_map_delete() hold stab->lock and call
+sock_map_unref() -> sock_map_del_link() under it. sock_map_del_link() takes
+sk_callback_lock for write to stop the strparser and verdict, giving the
+lock order stab->lock -> sk_callback_lock.
 
-commit 3bcf7aec6a9d16438f2cec29f5d7c8d5b8edf9b2 upstream.
+The opposite order comes from an SK_SKB stream parser. On RX,
+sk_psock_strp_data_ready() holds sk_callback_lock for read while running
+the parser. The verdict redirects the skb to egress, where a sched_cls
+program calls bpf_map_delete_elem() on a sockmap, which takes stab->lock:
 
-tap_get_user_xdp() rejects a frame shorter than ETH_HLEN with -EINVAL,
-and returns -ENOMEM when build_skb() fails. Both paths jump to the err
-label without freeing the page that vhost_net_build_xdp() allocated for
-the frame. tap_sendmsg() discards the per-buffer return value and always
-returns 0, so vhost_tx_batch() takes the success path and never frees
-the page; each rejected frame in a batch leaks one page-frag chunk.
+  WARNING: possible circular locking dependency detected
+  7.1.0-rc6 Not tainted
+  ------------------------------------------------------
+  syz.9.8824 is trying to acquire lock:
+  (&stab->lock){+.-.}-{3:3}, at: __sock_map_delete net/core/sock_map.c:421
+  but task is already holding lock:
+  (clock-AF_INET){++.-}-{3:3}, at: sk_psock_strp_data_ready net/core/skmsg.c:1173
 
-Free the page on both error paths, before the skb is built. This is the
-tap counterpart of the same leak in tun_xdp_one().
+  -> #1 (clock-AF_INET){++.-}-{3:3}:
+         _raw_write_lock_bh
+         sock_map_del_link net/core/sock_map.c:167
+         sock_map_unref net/core/sock_map.c:184
+         sock_map_update_common net/core/sock_map.c:509
+         sock_map_update_elem_sys net/core/sock_map.c:588
+         map_update_elem kernel/bpf/syscall.c:1805
 
-Fixes: 0efac27791ee ("tap: accept an array of XDP buffs through sendmsg()")
-Fixes: ed7f2afdd0e0 ("tap: add missing verification for short frame")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-Reviewed-by: Dongli Zhang <dongli.zhang@oracle.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Link: https://patch.msgid.link/20260521163230.1478627-2-bestswngs@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Nazar Kalashnikov <nazarkalashnikov0@gmail.com>
+  -> #0 (&stab->lock){+.-.}-{3:3}:
+         _raw_spin_lock_bh
+         __sock_map_delete net/core/sock_map.c:421
+         sock_map_delete_elem net/core/sock_map.c:452
+         bpf_prog_06044d24140080b6
+         tcx_run net/core/dev.c:4451
+         sch_handle_egress net/core/dev.c:4541
+         __dev_queue_xmit net/core/dev.c:4808
+         ...
+         tcp_bpf_strp_read_sock net/ipv4/tcp_bpf.c:701
+         strp_data_ready net/strparser/strparser.c:402
+         sk_psock_strp_data_ready net/core/skmsg.c:1174
+         tcp_data_queue net/ipv4/tcp_input.c:5661
+
+  Possible unsafe locking scenario:
+
+         CPU0                    CPU1
+         ----                    ----
+    rlock(clock-AF_INET);
+                                 lock(&stab->lock);
+                                 lock(clock-AF_INET);
+    lock(&stab->lock);
+
+   *** DEADLOCK ***
+
+sk_callback_lock is an rwlock and the established side takes it for write,
+so the read side cannot re-enter once a writer is queued.
+
+sock_map_del_link() uses psock->link_lock and sk_callback_lock, not
+stab->lock. The socket is removed from the slot with xchg() under
+stab->lock, which leaves a single deleter owning it, and its reference is
+dropped only by sk_psock_put() in sock_map_unref(). Release stab->lock
+right after the xchg() and run sock_map_unref() outside it. Do the same
+for the replaced socket in sock_map_update_common(). sock_map_free()
+already unrefs without stab->lock.
+
+Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
 ---
-Backport fix for CVE-2026-46320
- drivers/net/tap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/core/sock_map.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 6fd3b14273b3..b51ce7af1b20 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1052,6 +1052,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 	int err, depth;
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 99e3789492a0..390bd5ee46d4 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -421,13 +421,13 @@ static int __sock_map_delete(struct bpf_stab *stab, struct sock *sk_test,
+ 	spin_lock_bh(&stab->lock);
+ 	if (!sk_test || sk_test == *psk)
+ 		sk = xchg(psk, NULL);
++	spin_unlock_bh(&stab->lock);
  
- 	if (unlikely(xdp->data_end - xdp->data < ETH_HLEN)) {
-+		put_page(virt_to_head_page(xdp->data));
+ 	if (likely(sk))
+ 		sock_map_unref(sk, psk);
+ 	else
  		err = -EINVAL;
- 		goto err;
- 	}
-@@ -1061,6 +1062,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
  
- 	skb = build_skb(xdp->data_hard_start, buflen);
- 	if (!skb) {
-+		put_page(virt_to_head_page(xdp->data));
- 		err = -ENOMEM;
- 		goto err;
- 	}
+-	spin_unlock_bh(&stab->lock);
+ 	return err;
+ }
+ 
+@@ -505,9 +505,10 @@ static int sock_map_update_common(struct bpf_map *map, u32 idx,
+ 
+ 	sock_map_add_link(psock, link, map, &stab->sks[idx]);
+ 	stab->sks[idx] = sk;
++	spin_unlock_bh(&stab->lock);
++
+ 	if (osk)
+ 		sock_map_unref(osk, &stab->sks[idx]);
+-	spin_unlock_bh(&stab->lock);
+ 	return 0;
+ out_unlock:
+ 	spin_unlock_bh(&stab->lock);
 -- 
-2.47.3
+2.43.0
+
 
