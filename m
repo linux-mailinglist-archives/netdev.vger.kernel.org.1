@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id g0xAIHnHMWonqAUAu9opvQ
-	(envelope-from <netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:25 +0200
+	id THXtEqnHMWo+qAUAu9opvQ
+	(envelope-from <netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:01:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B07D5695820
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:00:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D80F9695844
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:01:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TtNwvbPU;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-299969-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b="m1H0XPZ/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299970-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE4C9316096D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32E79317EF7C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 22:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FED3ACA4B;
-	Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E853AC0ED;
+	Tue, 16 Jun 2026 22:00:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D983AA1BB;
-	Tue, 16 Jun 2026 22:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7E92877F4;
+	Tue, 16 Jun 2026 22:00:18 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781647213; cv=none; b=C0F8gAjsTFC8JQmI1OaqTVNaIV35ogDL4dEO0Iv/4g+dnpUsqeXoZxdVCWVLTEQ4+4j9N1jESFB5UIumMlAkKgYJSA59deYbLcj7dBHGPDKJsMyVt+PX6aqLYts75z1oo7Wx0NtgdPFnurVMUtWHqWN2cA+HQW2SIjgdPTZmyEk=
+	t=1781647219; cv=none; b=jXWpSRolj4O5bmc3v+mj4dmdgTFzVLBXyJsGDmhNoBuWcrV66Vaa+Vlgm8m71F+nfJHp84iy6idT/7+BmoVLyrPl6HGtZM5HJw5/a4afmcWb0HycgD9yvznP6smNcgnpFbgRFNU1fxzAH9IZqsezI24aYdi0S2th3pJp2URF60w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781647213; c=relaxed/simple;
-	bh=kSovyPQf1u2/+wpyT4dQZ1O7R+GwVZMm10TSoSuDU04=;
+	s=arc-20240116; t=1781647219; c=relaxed/simple;
+	bh=7a+p+OyXk5sFsbk1C1Cq816Ny9n0Mkp9sVLu/7ongXE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YSzBMIbwkJ99NF4PgRb5oM/CMsrWRqGec3eMIoE9LzwJqC76SbKhqWU3IN2OooCvaIHMwO5lty8LuwtELEFaEqzY43oQl7PX7C946daM3FORAuxgcqRfyiKpJu6UsT08Sbh68jTwOcTDKGO/8VKFaJ/lRMBFfwJpsvPkVtjfGg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtNwvbPU; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2EA21F000E9;
-	Tue, 16 Jun 2026 22:00:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JrOYpqVwAfau0HuXgTvWUbhnLBuAKsuK6A15xr1QYcibJqwLG/qbrglOaST/56r/ThPNj4Bc2t+igTB+9sxlRznJWEZEDAem+Osx1k1smYx4VkHxzu4vzySrZHuXb5CMRWtC9qhD9hhJgFjfQro5hCMG7V/xTKs2TNTyuDRZOPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m1H0XPZ/; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E11601F000E9;
+	Tue, 16 Jun 2026 22:00:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781647210;
-	bh=QX+gVE0CESSzoDMopJzLLtkh0bSG3nJdRekHMwjNQJA=;
+	s=k20260515; t=1781647217;
+	bh=ga1OeZSzR83I+bdZkALtFqlm11Tz5ZprDN2LnllVuuo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=TtNwvbPUrr3/Ys4kJsn4oXYtTJdt5toBBhhuCa28ouxp/5yV3IUpohtwf63BP0mfv
-	 mw4cz5J0gwJF+gpfEUEeajUmenuw4PrE+lrF8XqdIGYX5juI255CSeZ4HQQhJnmsWu
-	 xaflEccirz9LQuM7g2TeX/gCaoH7Qahf4TdYVpjtCL6get8kH8AWA1+24dFB7MsLGe
-	 kmYIQrktAr6/Q1+vKWTyDZNi/cRwd085xqq59gii+ZETGDEUYpcjnJ8AAbIC6wWUgk
-	 v/vXYKFB8bbsLST362F0SozlIYrSb+hlAmmqFWK7WDljlxXLWFY1CxhCsSRGXMK95M
-	 4PlSl0i++NwEw==
+	b=m1H0XPZ/YZbBgyH3tnrJ6j1r2M6+6elhCGuK0pN6k5a+sJSKsxxgIBnYMzgNBg+aw
+	 8al1mUPkhgyi2bTVabXIYMFi/z5l4yV3wd6csAqc8I2mwclV8BxOmBPlGOcMtIo/ZG
+	 wEg/r+6LoZPDh2ODMtYPbSPzrG48yfugOVhBI97AdZ7c8txuTlA276H8jaEnUntKSY
+	 KgWy5tWRv1vQI8NErJqgroIv1pfhFiKdw2BZck/RCdw7Phs4t5+P6SaatWwO4rYFIQ
+	 HTGCnonB9DyI7WfMUOqJG00HcUeqNVm1R+0aEbhZQHFrTqOfaICHHS4LarNk2bCyyi
+	 Nrq80K5Jm6ssA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B393930C2B;
-	Tue, 16 Jun 2026 22:00:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 938A13930C2B;
+	Tue, 16 Jun 2026 22:00:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,43 +57,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: skmsg: preserve sg.copy across SG transforms
+Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178164720514.1257010.17974091199123614376.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Jun 2026 22:00:05 +0000
-References: <20260610062137.49075-1-yimingqian591@gmail.com>
-In-Reply-To: <20260610062137.49075-1-yimingqian591@gmail.com>
-To: Yiming Qian <yimingqian591@gmail.com>
-Cc: security@kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
- kuba@kernel.org, sd@queasysnail.net, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- keenanat2000@gmail.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <178164721213.1257010.7015290603652926955.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Jun 2026 22:00:12 +0000
+References: <20260615222935.947233-1-kuba@kernel.org>
+In-Reply-To: <20260615222935.947233-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ geert@linux-m68k.org, chleroy@kernel.org, npiggin@gmail.com,
+ mpe@ellerman.id.au, maddy@linux.ibm.com, linux-mips@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,cloudflare.com,queasysnail.net,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,linux-m68k.org,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299969-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-299970-lists,netdev=lfdr.de,netdevbpf];
 	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:yimingqian591@gmail.com,m:security@kernel.org,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:kuba@kernel.org,m:sd@queasysnail.net,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:keenanat2000@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:geert@linux-m68k.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -102,37 +101,35 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B07D5695820
+X-Rspamd-Queue-Id: D80F9695844
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 10 Jun 2026 06:21:36 +0000 you wrote:
-> The sk_msg sg.copy bitmap is part of the scatterlist entry ownership
-> state. A set bit tells sk_msg_compute_data_pointers() not to expose the
-> entry through writable BPF ctx->data. This protects entries backed by
-> pages that are not private to the sk_msg, such as splice-backed file
-> page-cache pages.
+On Mon, 15 Jun 2026 15:29:33 -0700 you wrote:
+> This tiny series moves appletalk out of tree, to:
 > 
-> Several sk_msg transform paths move, copy, split, or compact
-> msg->sg.data[] entries without moving the matching sg.copy bit. This can
-> make an externally backed entry arrive at a new slot with a clear copy
-> bit. A later SK_MSG verdict can then expose sg_virt(sge) as writable
-> ctx->data and BPF stores can modify the original page cache.
+>   https://github.com/linux-netdev/mod-orphan
+> 
+> Core maintainainers are unable to keep up with the rate of security
+> bug reports and fixes. Nobody seems to care about appletalk enough
+> to review the patches.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: skmsg: preserve sg.copy across SG transforms
-    https://git.kernel.org/netdev/net/c/406e8a651a7b
+  - [net-next,1/2] appletalk: stop storing per-interface state in struct net_device
+    https://git.kernel.org/netdev/net-next/c/023f9b0f2f4f
+  - [net-next,2/2] appletalk: move the protocol out of tree
+    https://git.kernel.org/netdev/net-next/c/8a398a0c189e
 
 You are awesome, thank you!
 -- 
