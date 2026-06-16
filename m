@@ -1,230 +1,332 @@
-Return-Path: <netdev+bounces-299922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299923-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Sw+XGACCMWq0lAUAu9opvQ
-	(envelope-from <netdev+bounces-299922-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:04:00 +0200
+	id AU9VGQqDMWoJlQUAu9opvQ
+	(envelope-from <netdev+bounces-299923-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:08:26 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2C6E692B0F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDF2C692C39
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 19:08:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b=HBcQsOmQ;
-	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=Tbzczjuf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299922-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299922-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=qualcomm.com;
+	dkim=pass header.d=gmx.de header.s=s31663417 header.b=XQoCz8Bc;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299923-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299923-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=gmx.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7784931D1572
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:50:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB2033359323
+	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 16:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F73747B432;
-	Tue, 16 Jun 2026 16:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A60C33A9EB;
+	Tue, 16 Jun 2026 16:55:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A594347AF4D
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CEA169AD2
+	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:55:14 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781628627; cv=none; b=OSnJuc17dCOdWcqvWBYCwIu7PSGuCsRsPGZ9niJUZQHw66ehIjk+TcJ/ZmYPelAXah8dP+/t0VS8twGuBhvl9cEsV4cqp/XnMRIKDLCAGwAb7rXE6J/2NAwgWBfXj3POeJsY9rcmsvRtqQs3LyyuGqyFScPxaC3txzbiFp8/rhw=
+	t=1781628916; cv=none; b=mvLlfmkpZvVSzzoOprY5yp8I5PwABfQxS9wchXMjSOzkqo8fHDd1HnMXeLvitm7rb0ESMpURn+unYXXLpow6anAG30+TCrYyJ2VZahR7ffQvsp37iLAH1MoVelWbXjGeElYn7H+eSjJhMAsxu8gBZ5Mze+w658jqAOMv/XOhv5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781628627; c=relaxed/simple;
-	bh=IeLUcKceMGp4R1jgMISZkNO7RSur2PrOa7F1GuYJITo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ISTcehCo0q9hcS31mwOCSTUIdP0lKJF9jn8GO5nN72DTsCowiGCViVVtxK8SOpoZ22z6D+M7E3VrN7l1hn7DcT22Wwv9N10ZPG8ykff1B3cefZwBTILAOXA1QdSLe00x/kKtohWrHG9i4cf4EzV2pOiodbfWl7/KhYDRPlDzw0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=HBcQsOmQ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Tbzczjuf; arc=none smtp.client-ip=205.220.180.131
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65GFdbO13966193
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:50:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=ZOml+89Fh4slDZjDTDeUJgvR
-	UxvqEHajVZitLYJCVjk=; b=HBcQsOmQY8YSSYu1Pd7AolxN7wxdOV5JaMmftSza
-	1HmnymCwzB0EcCCZ+JHWjGiizsEHouhQPLgJtBorYRsBceIJMn/PdvlvpI/T5KqN
-	3AbZMx7/dLKqnMSFkgyOhbbDaufPuy4VSJQNwYKOatlJuZMJUx6VC1ycTewcIuau
-	ygQ9FUD/2J52U0O9X8Wku9yfzKGEnp9tumOCHz9H/uujiWMm/gHp/5CGLoR/KSr/
-	xaDWJDrdvOsZxAQPnfxJOsH6bzoKNpvIRFDf/gTy4C3JMhSj1EKDnEDGV+2jOvDS
-	s2moZqVXkPRroWF42OTK0RTB82EKAbFz1DQCgQWAWcjHyw==
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eu1ysth1s-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 16:50:24 +0000 (GMT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8422382178bso3025213b3a.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 09:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781628623; x=1782233423; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOml+89Fh4slDZjDTDeUJgvRUxvqEHajVZitLYJCVjk=;
-        b=Tbzczjufot8QWUAQlWXp+NMwdsaCPfdHhQsRGRxL5bbNT30W4kZxUaIBbTwm1vDSdF
-         kVyEwjvNH9WxsovhrjkJ6HpNbar8+DzoTEzwgxImjDDxr9LX71CadNZJWUHY2Hyl+yay
-         rqYwHujowg1r1z059funcDpCME0DnONW0ZGK9w31U8sGvqHsxbK744lhMwA9bkcxl+Os
-         vH/xNklUKAHfGQItZLN4NeqTTbuVZpqASQzh994EC3JIDHCROpSCRJv18baf+GZJyR4Y
-         dzXPVQt5++uo7qg2W03fAZycf/p1vxqk2Lkkh7auCwRcYRakNKs1E39G5qCppqNnKKb8
-         VkhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781628623; x=1782233423;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOml+89Fh4slDZjDTDeUJgvRUxvqEHajVZitLYJCVjk=;
-        b=piWiuSiZMepY1kz38yL+Cjv2tkRDrlcSNnOBCi/YQ4dcCh4z7Dg5cnlLaddvznT2Un
-         9Dt/rv2LceqAeDZwDKKbnWA9Os1atjW/3IA97Z2iXA8XKFvEyBzRjJM33qODm99gHC7C
-         fIrobxGEtSUe94erIA/5WIXf4c9ejbt8jZ/G3QcdVsb9wffnIbQHowd/+nlHbOYuuYUS
-         wxnw2q0lh4AhEga4rZ1mPAz8V7UhWkb/hk9gbgauuBjF6mi9Amo4yoOOoR2zKHp33t2j
-         lbN23PIgs58Qqhp1FSzqhS9nTuVA2Cds9PardPrl5X+9QbOF8fstG6C1G3eng2HcTTKl
-         xDIA==
-X-Forwarded-Encrypted: i=1; AFNElJ9/gj0Z7EoxuSHL9f6cO7SdlpWCloVNCZOyt7CyF2Wcny0FiwRiwAseu+Bp7oNr8GYZYO238pM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU70hHc4Oex90KJJX7aDfxDwGSIEbwyTYGa0yT/l2c0wtpNM8T
-	2TkvfliTMh2NL7YG898JAgM35emo07IYeJ7qUTSMkDTXrzXrmcHlLHrnL2nTclFCrb+pv42+0Ze
-	kGn4H0X9qimekQJRgoCMNVsstF5oZcv17dfELRgieNEgTrf1LKwIjTGuKANw=
-X-Gm-Gg: Acq92OGRRSDGP+9fV77JCdz5z8IwTZiOaS5XoJeeozuOXwL6Re7EMFFHSawguX8hliq
-	jPUxJBDHhX/8bOYEwc+2kQGgvaSziJpe+RO3in7uDPFA69Cg97dDMuKoRFX4Z2A3lZdiXAZHPnp
-	vPmclxnYCekcsigDjwvv4Ta06iWJ2nfV7D2PD5HiyuF++FglMWdKiGQmyySH3WmllY/yEWu4mHo
-	tyVQPvq6pH8nfRfyXlewNVu8XI8Q+PwxI0JrNBZBX1PVTJiC79k3tGPpeversEz319Gd1YQ1TVW
-	KXD8GRB0gW7nW/GwmjqsRdH5NMjd5t4d+bnJAMxjZH2PVe441B1+qmVq6R+sG4kRsSHvsRM1MJd
-	J22DZ71uX89sA/A+d2jQjGPRLfK/omgDSy04=
-X-Received: by 2002:a05:6a00:94cf:b0:842:5da3:9b83 with SMTP id d2e1a72fcca58-8451561d685mr4168477b3a.33.1781628623509;
-        Tue, 16 Jun 2026 09:50:23 -0700 (PDT)
-X-Received: by 2002:a05:6a00:94cf:b0:842:5da3:9b83 with SMTP id d2e1a72fcca58-8451561d685mr4168450b3a.33.1781628623026;
-        Tue, 16 Jun 2026 09:50:23 -0700 (PDT)
-Received: from oss.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434b040718sm14167850b3a.51.2026.06.16.09.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 09:50:22 -0700 (PDT)
-Date: Tue, 16 Jun 2026 22:20:14 +0530
-From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Russell King <linux@armlinux.org.uk>, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH RFC 8/9] arm64: dts: qcom: shikra-cqs-evk: Enable
- ethernet0
-Message-ID: <ajF+xlipLuZtf4HL@oss.qualcomm.com>
-References: <20260612-shikra_ethernet-v1-0-f0f4a1d19929@oss.qualcomm.com>
- <20260612-shikra_ethernet-v1-8-f0f4a1d19929@oss.qualcomm.com>
- <2cb658f3-f564-4396-884d-d025eaa674a1@oss.qualcomm.com>
+	s=arc-20240116; t=1781628916; c=relaxed/simple;
+	bh=TFqwwniPra8sjDNONWk1icCHtPK5qBnd0w5QvJ+fGmQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u3yJkBNCs7PI8FiKoMPZQFT3UOWcjV7B52FH1zuv4RTXdLHzmM+M8OPKj6gQOTXnkAjIWctDcKGRb1lfFKY2qFzw+lqLKZWxxObG1mf0ZwNdjRH7yhJizdfoKi1eYdY2sft1weIlZ34+9qWLDuSeO6xgQfaENMhm+PjrO4rTi3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=deller@gmx.de header.b=XQoCz8Bc; arc=none smtp.client-ip=212.227.17.22
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1781628908; x=1782233708; i=deller@gmx.de;
+	bh=TFqwwniPra8sjDNONWk1icCHtPK5qBnd0w5QvJ+fGmQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=XQoCz8Bcs4GHOWqu52E66ZfXaeA7RTENjVEVM6eXqS5vYnVGcAzQlIb/YKnNLR1+
+	 OMmwuq69K094RiXIePwcQFr6N2L0YKP2kt4keGaNoEgOH65y6yfwj3cHyhoMZjJ03
+	 lIED1hN6xot0AfMzdV5lsTQ+4cTADIBoAnXdmwwkLUGGkiGlvO2D0zy9UGU7NBRWG
+	 u0OkbvLV0AIK485Kcnhb6TEASha03mBmDtSx38kmpIcWChY00uinIGCUlfcopFYp7
+	 GORPb1oEvTtEuGWJtZ3KTT/0OW8zXWXd35Q0kNnbH9CoU8HHlSxFvjyQVjrmSRpmt
+	 hymbOSwYxDPEWdFlMw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from client.hidden.invalid by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MbRjt-1xAmYf0fKD-00l9QF; Tue, 16
+ Jun 2026 18:55:08 +0200
+Message-ID: <374b8aa0-a35d-4a74-adb2-1b9b2c7a1701@gmx.de>
+Date: Tue, 16 Jun 2026 18:55:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2cb658f3-f564-4396-884d-d025eaa674a1@oss.qualcomm.com>
-X-Proofpoint-GUID: tqW3HORNJE-BeZleB5BaiL37Gq0g_B0p
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE2MDE3MyBTYWx0ZWRfX5sgA5e5L1uQ7
- JLiKvbCGn8b+myHRx5e60baVuN8m8S5YuJIkIvltm19iCD45AduX1HYTLtkSL5BIH5J8a7e+OEC
- +BEJkIYRLuEz6ktUAIGqTPJqcTuJo+I=
-X-Proofpoint-ORIG-GUID: tqW3HORNJE-BeZleB5BaiL37Gq0g_B0p
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE2MDE3MyBTYWx0ZWRfX2AlIpgL0lOIQ
- klIjm04SHXkWWUsQ3niF3J3UITPFKQCkTzPTDJiCaGYKE1Ixelj/YIFsSlKWzjGsJ/EAx4OsNfz
- pGUzwCzUqD7ipnuR9jBCCbx20v1yN5dBR6gcVzRjFUyxRPz4y7/+NWvs6xaaUZKFU5PMjGG5t0o
- 2Mg25bzwmJME865EVxbtsmIX80AKL+LnouFGbanJZfUEt+JU8Xa3JOEtGgubfsAh4AAH4vXZdx7
- YTh1qW5hr3Ew4ZVB3fUMRqTS4ktYmtakENMxwq0S0bPqBsqBozVs6/ME/UCQdB1+9Oc5l5Ka88v
- JNggix4SXWEcvZPvxQiduOodeVY1obw81GK3cZlk8ovECDhLAn5bR4AKcKMl4pyERH2CKKOL5wW
- Q6Xt3Ac7cGkj5SzH2iMk7+BZTDg19O3Jq0DKdumKq/+qMPZhkueLwh5vhP05Fj1AHubWhoftBe+
- ejGlfeNTPpAaEmjQ6qg==
-X-Authority-Analysis: v=2.4 cv=JJcLdcKb c=1 sm=1 tr=0 ts=6a317ed0 cx=c_pps
- a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=kj9zAlcOel0A:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=u2jKJf8zFqWonMdemzYA:9 a=CjuIK1q_8ugA:10 a=2VI0MkxyNR6bbpdq8BZq:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-16_05,2026-06-15_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0
- phishscore=0 priorityscore=1501 adultscore=0 impostorscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606040000
- definitions=main-2606160173
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] e1000e: Report link down after "Detected
+ Hardware Unit Hang" ?
+To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>, Andrew Lunn <andrew@lunn.ch>,
+ Helge Deller <deller@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <ai8hmGQmXQu64Ld3@carbonx1>
+ <e78576e0-9b55-446f-9d10-da3b7aec9b31@lunn.ch>
+ <9d80ed59-5483-4c33-9d27-52fdf24aac6e@gmx.de>
+ <51828156-e859-44db-9926-c076796d0f75@intel.com>
+Content-Language: en-US
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+In-Reply-To: <51828156-e859-44db-9926-c076796d0f75@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:kTJR/JeUxy0TtjPb2JfYpb9gSyXE2bA5SL2GEaNuteLynJCJ3CL
+ aU42VsIFumGjeJIjr06s2AEtHKLG1FS2EJaua4Kht0TYH6Ttk3va/2yJC7qdbZnbib8M/BB
+ XS8LeMw7c8h54snkK4aEmubJOvAxSSUsjgNi5HtF4fAAxlSQJXpXDGYRxapZRbdOKGgTkUd
+ tzO1BVvM4D6Vm+HcMhMVQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:i6T7GqbPgIU=;QRz0CUz+k+ZdT+C7z1X7hBdcRRE
+ 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
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	SUBJECT_ENDS_QUESTION(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,qualcomm.com:dkim,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_FROM(0.00)[bounces-299922-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-299923-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:konrad.dybcio@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux@armlinux.org.uk,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[deller@gmx.de,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:dima.ruinskiy@intel.com,m:andrew@lunn.ch,m:deller@kernel.org,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DKIM_TRACE(0.00)[gmx.de:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[deller@gmx.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmx.de];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,gmx.de:dkim,gmx.de:mid,gmx.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B2C6E692B0F
+X-Rspamd-Queue-Id: BDF2C692C39
 
-On Tue, Jun 16, 2026 at 11:50:26AM +0200, Konrad Dybcio wrote:
-> On 6/11/26 8:37 PM, Mohd Ayaan Anwar wrote:
-> 
-> > +&tlmm {
-> > +	ethernet0_defaults: ethernet0-defaults-state {
-> 
-> s/defaults/default
-> 
-> Please move this definition to shikra.dtsi
-> 
+Hello Dima,
 
-The CQM and CQS variants have identical GPIO mapping but the IQS is
-different. So should I keep this in shikra.dtsi and overwrite for IQS in
-shikra-iqs-evk.dts?
+On 6/16/26 18:20, Ruinskiy, Dima wrote:
+> On 15/06/2026 23:36, Helge Deller wrote:
+>> On 6/15/26 18:41, Andrew Lunn wrote:
+>>> On Sun, Jun 14, 2026 at 11:48:08PM +0200, Helge Deller wrote:
+>>>> I'm regularily facing the known "eno1: Detected Hardware Unit Hang:"
+>>>> with my on-board intel e1000e NIC hardware.
+>>>> Since none of he various tips on the internet helped, I had the idea
+>>>> to setup a master/slave bond networking to fail over to another NIC w=
+hen
+>>>> the Intel chip hangs.
+>>>>
+>>>> Sadly this doesn't work as intended, because the link of the intel NI=
+C
+>>>> isn't reported "down", so the failover never happens, unless I manual=
+ly
+>>>> start "ifconfig eno1 down".
+>>>>
+>>>> My question: Shouldn't the intel NIC ideally report Link Down if we k=
+now
+>>>> it hangs? That way a fail-over should at least happen, right?
+>>>>
+>>>> Below is a completely untested patch.
+>>>> Does it make sense that I try to test and/or develop such a patch, or
+>>>> are there things I miss?
+>>>
+>>> If the interface is dead, then setting the carrier down makes a lot of
+>>> sense.=20
+>>
+>> That's what I think as well. Thanks for confirming.
+>>
+>>> One question i have is, what do you need to do to recover the
+>>> hardware? Will it correctly set the carrier up when you do the
+>>> recovery?
+>>
+>> The only way I could recover was to plug the network cable and re-inser=
+t it.
+>> I have not tested bringing the NIC down.
+>> But in both cases the driver will need to re-detect the media & link
+>>
+>>> Also, just looking at your proposed change, it is not clear to me why
+>>> such an assignment will result in carrier down. It would be good to
+>>> explain it in the commit message.
+>>
+>> Sure. The patch I attached was completely untested and just based on
+>> the analysis of the flow and how to make the Link possibly report to be=
+ down.
+>> Maybe someone knowledgeable of the driver has a better suggestion how t=
+o
+>> report the link down situation in a clean way?
+>>
+>> Helge
+> This does not seem like the right direction to me.
+>=20
+> The "Detected Hardware Unit Hang" print does not indicate that the
+> interface is dead, but that the transmitter is stalled.
 
+Ok. But effectively it means there can nothing be transmitted then at this=
+ stage,
+which somehow is the same as if the Link would be down.
 
-> > +
-> > +	emac0_phy_en_hog: emac0-phy-en-hog {
-> > +		gpio-hog;
-> > +		gpios = <149 GPIO_ACTIVE_HIGH>;
-> > +		output-high;
-> > +		line-name = "emac0-phy-en";
-> > +	};
-> 
-> This looks like a hack - what does this pin actually do?
-> 
+> This can be due to an unusually high load, or a HW fault / race conditio=
+n with another component, etc.
+>
+> When a hang is detected, the transmitter is stopped with
+> netif_stop_queue() and eventually ndo_tx_timeout triggers a full
+> reset to the device, which in many cases recovers it from the hang.
 
-The power supply to both PHYs on Shikra is gated by a GPIO pin. I am
-unsure whether they should be modelled as a fixed, enable-on-boot
-regulator or just like this. They need to be powered on early so that
-MDIO can detect them.
+That would be optimal, but I have never seen it recovering from such stall=
+s since years.
+Also looking at the many reports in the internet, people say it just
+hangs and does not recover until the cable is plugged out (I might be wron=
+g!).
 
-Thank you for the review. I will fix the stylistic issues in v2.
+> If the hang is persistent, we try to understand the cause and debug
+> it. Permanently marking the device as 'down' because it hung once is
+> not going to be the optimal solution.
 
-	Ayaan
+Of course debugging this situation is preferred but it does not help when
+the productive remote system stays unreachable forever.
+Right now it just fills the syslog with the same stuck message.
+Even an module option like "report_link_down_on_hang after 5 automatic re-=
+tries"
+would be good compromise.... You still should be able to get the necessary
+debug info then.
+
+Helge
 
