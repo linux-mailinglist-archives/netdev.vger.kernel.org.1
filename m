@@ -1,233 +1,254 @@
-Return-Path: <netdev+bounces-300235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300236-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 17o9BIn9Mmpj8QUAu9opvQ
-	(envelope-from <netdev+bounces-300235-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:03:21 +0200
+	id o5mfBPD+Mmqa8QUAu9opvQ
+	(envelope-from <netdev+bounces-300236-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:09:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA2469C493
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:03:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F1869C4DF
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:09:19 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=OK8FOx6l;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300235-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300235-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=fail ("headers rsa verify failed") header.d=embeddedor.com header.s=default header.b=StymiaLZ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300236-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300236-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E169B300F442
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 20:03:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 831E63086606
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 20:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C91137C11C;
-	Wed, 17 Jun 2026 20:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42FC3A9601;
+	Wed, 17 Jun 2026 20:08:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from omta38.uswest2.a.cloudfilter.net (omta38.uswest2.a.cloudfilter.net [35.89.44.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2251E2EBDDE
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 20:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816363B14C5
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 20:08:36 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781726598; cv=none; b=CCJIo9iPkjTWQ2WflU7tjCik6O1hwQEet1Idg/S40Ib+9lUe+oVMBG54aAxpk7sgiY9dU+OzSO6mO3I1r0zzhY7jtTPMsiDpP66T2/38QBsa+Gf0WKhIyldhu+tl1gMovIvV9UVLehC8yXS9GtSLLiRx5JN14NRfDkYBkxalSF0=
+	t=1781726919; cv=none; b=Z9pe7VStN2fxlCwwjbBLOVxwGCfdYg0wnjfdETtscjaCvjbjiGyKYNhfhh6bPKQwucAHAFFucp7mZWXLbjn8QbcELTk+C7sujrgo9fksB/0M2YbVMhtlRMhg2XPLxEDVckRWiMyWYd+0jdSbqADHV8GjUT68l1onjFPmVtM8bJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781726598; c=relaxed/simple;
-	bh=RX26t8axNHR2+20GoC02Y1V789ZRLXoB4J2FYEoPhOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hQddvg4ndUdZHH5xL077kCE7QuNw6b7FfCM2/De0jWJURV+0wmjby8vKjDEhtR2dcGpRlrKvOMcU4AfrT1k7I1YEDWuSN4Zq6NdcpJH/HwZ/KQ1OnlEpvVpPn0IBrXGxDrV14GtgDO8IV98gMBjwCT4bDaSGv88PBAfNVLZbB6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OK8FOx6l; arc=none smtp.client-ip=198.175.65.21
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781726596; x=1813262596;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RX26t8axNHR2+20GoC02Y1V789ZRLXoB4J2FYEoPhOI=;
-  b=OK8FOx6lyGzj5ocK1xxRLShHn+7nLG7k6S2ONeLeO5S12Adg2fMG/c2W
-   s288dO+Kv+5Qw5WUIPxxlzn4ojdaWKUA2Y+OvyRFEWO6ZtfBpxS1e3HP0
-   8xtwaXkoqimE77KQS6VbBDV3LT6HizIWbHeWHh1zRqmtXnRVpGIVVgelz
-   SuyVamoPQCr6ke/qhP0stHGtoSknG58jHJ3qSuteHRhzBvuZuAPzoz9nu
-   00yy80UFeWzpvx/9UqmSAtuvYxKyvTUzyIQ3fE6eJJwCOCnL1Fv+oog9O
-   IVN8hesYjVGb8JW9qwWOqno/CguW7FRHyvKHw3X7r42hPhHdxNT65U1o8
-   A==;
-X-CSE-ConnectionGUID: KDFrm9VkR+qaMBsrQtjh4Q==
-X-CSE-MsgGUID: lvnquzDrSXy/W0OSml2WFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11820"; a="82435959"
-X-IronPort-AV: E=Sophos;i="6.24,210,1774335600"; 
-   d="scan'208";a="82435959"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 13:03:15 -0700
-X-CSE-ConnectionGUID: oZ/Ntua8Tzmscqcny8xYcg==
-X-CSE-MsgGUID: BgpdpGDZSzqrbucK7elsTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,210,1774335600"; 
-   d="scan'208";a="286268578"
-Received: from lkp-server01.sh.intel.com (HELO f0d55cb201f0) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 17 Jun 2026 13:03:12 -0700
-Received: from kbuild by f0d55cb201f0 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wZwTc-00000000Uwg-3rli;
-	Wed, 17 Jun 2026 20:03:08 +0000
-Date: Thu, 18 Jun 2026 04:02:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lovekesh Solanki <lovekeshsolanki00@gmail.com>,
-	anthony.l.nguyen@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	Lovekesh Solanki <lovekeshsolanki00@gmail.com>
-Subject: Re: [PATCH] e1000: Remove redundant else after return
-Message-ID: <202606180301.nRhk5lMR-lkp@intel.com>
-References: <20260616210008.109635-1-lovekeshsolanki00@gmail.com>
+	s=arc-20240116; t=1781726919; c=relaxed/simple;
+	bh=36+PfgVOCJz9I5g25FTpnJjvcwXaWyeCjgldF1a0y7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HktmzkKQf/v/t8hD8JHNT3d6Xt6gs6DAo0aqMnhxga949vB2P4+v6BDUnJHgnmB/JUcSBfa4vPb07UvT8QroT94gmP/kFy6/LSRYVs2XmRTL9aeOeMaF3IVzBo5qup34N+UKIHVv99Rt7WfhkQC6SydqC1Wn6jgl2EQbMbIXUoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=StymiaLZ; arc=none smtp.client-ip=35.89.44.37
+Received: from eig-obgw-6005b.ext.cloudfilter.net ([10.0.30.162])
+	by cmsmtp with ESMTPS
+	id ZumywOysTMFEgZwYowdmZG; Wed, 17 Jun 2026 20:08:30 +0000
+Received: from gator4166.hostgator.com ([108.167.190.91])
+	by cmsmtp with ESMTPS
+	id ZwYdw5GWdTzOdZwYdw5gDM; Wed, 17 Jun 2026 20:08:19 +0000
+X-Authority-Analysis: v=2.4 cv=FbE3xI+6 c=1 sm=1 tr=0 ts=6a32febd
+ a=vY9Mjuda9oMEc2E4Cx1x2A==:117 a=vY9Mjuda9oMEc2E4Cx1x2A==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
+ a=pGLkceISAAAA:8 a=P8mRVJMrAAAA:8 a=mo7Kl4tTlkleSoc0kBUA:9 a=QEXdDO2ut3YA:10
+ a=Vc1QvrjMcIoGonisw6Ob:22 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qt2TBGgT0bGtpqlS+Vx9gxbeasYa2lJIaTGRkbloxyg=; b=StymiaLZM5OJYxj7Rg11G9QXlQ
+	OsiofZK7qxxwbZEeTH/JdyMTD1O5/SkowgUfUYaAR8WwXqgNN9CMicQleDqZUQf67uSyW4ZPO9TMQ
+	wfj8fMN+OYSr+OlSKOgiMyC1DR3ffPT1h5dI4LTw1tZf6UxDu7lZ5gbjsjyWYw5YkJJcHaJJf+Hsf
+	2aMRdwDBirbpUiOMgH1KkVVlNCklxLBMudhDYVAtYeoV+BHP1w9PJJnT55wuFlPtwobDcZ2mGIPND
+	UoSpEaj8GcYePyxS5g/6HsVjc8P4ixO7hYV3YRg8aBn4+j/8tkVk87PXAC6phzFohtL16g8xHa1o+
+	eUo3umTg==;
+Received: from [177.238.16.65] (port=57678 helo=[192.168.0.12])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.99.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1wZwYb-000000037XB-2Mbf;
+	Wed, 17 Jun 2026 15:08:17 -0500
+Message-ID: <9e941b82-23d4-44e6-a240-b7949ace76ab@embeddedor.com>
+Date: Wed, 17 Jun 2026 14:08:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260616210008.109635-1-lovekeshsolanki00@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dst_metadata: fix false-positive memcpy overflow
+ in tun_dst_unclone
+To: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev, Johan Thomsen <write@ownrisk.dk>
+References: <20260616100332.1308294-1-i.maximets@ovn.org>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20260616100332.1308294-1-i.maximets@ovn.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.16.65
+X-Source-L: No
+X-Exim-ID: 1wZwYb-000000037XB-2Mbf
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.12]) [177.238.16.65]:57678
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 16
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfIatknACbm4/JfLposR9/X1uGRPAzLfHVnRn6vsA90TRErpt900YOJvAf+vnmOWOeqiYUKOpOTqXWqHNWgWjmSYS7A7RV+sRPTRAHDU6RgEXWYUdjIjw
+ T5ANMSDrIeCE3kSuqJp6AmH7J32n8y+I8d6WGUzwG1Eavt1vTfO2ahuQ9vg7VEJwZeKgbru1QQY63KBICjZMRTF0vZbKoRKD58I=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-300235-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,intel.com];
-	FORGED_SENDER(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:lovekeshsolanki00@gmail.com,m:anthony.l.nguyen@intel.com,m:oe-kbuild-all@lists.linux.dev,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300236-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:i.maximets@ovn.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kees@kernel.org,m:gustavoars@kernel.org,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:linux-kernel@vger.kernel.org,m:linux-hardening@vger.kernel.org,m:llvm@lists.linux.dev,m:write@ownrisk.dk,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DMARC_NA(0.00)[embeddedor.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org,lists.linux.dev,ownrisk.dk];
+	HAS_X_ANTIABUSE(0.00)[];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
 	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	HAS_X_SOURCE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[git-scm.com:url,01.org:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,ovn.org:email,embeddedor.com:mid,embeddedor.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8EA2469C493
+X-Rspamd-Queue-Id: 35F1869C4DF
 
-Hi Lovekesh,
+Hi,
 
-kernel test robot noticed the following build warnings:
+On 6/16/26 04:03, Ilya Maximets wrote:
+> kmalloc_flex() in metadata_dst_alloc() sets __counted_by for the
+> structure to the options_len, which is then initialized to zero.
+> Later, we're initializing the structure by copying the tunnel info
+> together with the options, and this triggers a warning for a potential
+> memcpy overflow, since the compiler estimates that the options can't
+> fit into the structure, even though the memory for them is actually
+> allocated.
+> 
+>   memcpy: detected buffer overflow: 104 byte write of buffer size 96
+>   WARNING: CPU: X PID: Y at lib/string_helpers.c:1036 __fortify_report
+>    skb_tunnel_info_unclone+0x179/0x190
+>    geneve_xmit+0x7fe/0xe00
 
-[auto build test WARNING on tnguy-next-queue/dev-queue]
-[also build test WARNING on tnguy-net-queue/dev-queue linus/master v7.1 next-20260616]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This warning has nothing to do with counted_by. See below for more
+comments.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lovekesh-Solanki/e1000-Remove-redundant-else-after-return/20260617-051633
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20260616210008.109635-1-lovekeshsolanki00%40gmail.com
-patch subject: [PATCH] e1000: Remove redundant else after return
-config: powerpc-randconfig-r073-20260617 (https://download.01.org/0day-ci/archive/20260618/202606180301.nRhk5lMR-lkp@intel.com/config)
-compiler: clang version 23.0.0git (https://github.com/llvm/llvm-project e19d1f51a2c80b63cd8ca95bcc757b7077112808)
-smatch: v0.5.0-9185-gbcc58b9c
+> 
+> The issue is triggered when built with clang and source fortification.
+> 
+> Fix that by doing the copy in two stages: first - the main data with
+> the options_len, then the options.  This way the correct length should
+> be known at the time of the copy.
+> 
+> It would be better if the options_len never changed after allocation,
+> but the allocation code is a little separate from the initialization
+> and it would be awkward and potentially dangerous to return a struct
+> with options_len set to a non-zero value from the metadata_dst_alloc().
+> 
+> Another option would be to use ip_tunnel_info_opts_set(), but it is
+> doing too many unnecessary operations for the use case here.
+> 
+> Fixes: 69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
+> Reported-by: Johan Thomsen <write@ownrisk.dk>
+> Closes: https://lore.kernel.org/netdev/CAKv6aAM8_EWgXScnKmKYm_4SwGDVBK++dzfP+Y6msUXbp99QUw@mail.gmail.com/
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
+> 
+> Johan, if you can test this one in your setup as well, that would
+> be great.  Thanks.
+> 
+>   include/net/dst_metadata.h | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+> index 1fc2fb03ce3f..f45d1e3163f0 100644
+> --- a/include/net/dst_metadata.h
+> +++ b/include/net/dst_metadata.h
+> @@ -164,8 +164,11 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+>   	if (!new_md)
+>   		return ERR_PTR(-ENOMEM);
+>   
+> -	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+> -	       sizeof(struct ip_tunnel_info) + md_size);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202606180301.nRhk5lMR-lkp@intel.com/
+What's going on here is that, internally, fortified memcpy() retrieves
+the destination size via __builtin_dynamic_object_size() in mode 1.
 
-New smatch warnings:
-drivers/net/ethernet/intel/e1000/e1000_main.c:1551 e1000_setup_tx_resources() warn: inconsistent indenting
+That is:
 
-Old smatch warnings:
-arch/powerpc/include/asm/checksum.h:94 csum_tcpudp_nofold() warn: inconsistent indenting
+__builtin_dynamic_object_size(&new_md->u.tun_info, 1)
 
-vim +1551 drivers/net/ethernet/intel/e1000/e1000_main.c
+For the above case, Clang returns sizeof(new_md->u.tun_info) == 96.
 
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1491  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1492  /**
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1493   * e1000_setup_tx_resources - allocate Tx resources (Descriptors)
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1494   * @adapter: board private structure
-581d708eb47ccc drivers/net/e1000/e1000_main.c                Mallikarjuna R Chilakala 2005-10-04  1495   * @txdr:    tx descriptor ring (for a specific queue) to setup
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1496   *
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1497   * Return 0 on success, negative on failure
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1498   **/
-6479884509e6cd drivers/net/e1000/e1000_main.c                Joe Perches              2008-07-11  1499  static int e1000_setup_tx_resources(struct e1000_adapter *adapter,
-581d708eb47ccc drivers/net/e1000/e1000_main.c                Mallikarjuna R Chilakala 2005-10-04  1500  				    struct e1000_tx_ring *txdr)
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1501  {
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1502  	struct pci_dev *pdev = adapter->pdev;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1503  	int size;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1504  
-580f321d8498f1 drivers/net/ethernet/intel/e1000/e1000_main.c Florian Westphal         2014-09-03  1505  	size = sizeof(struct e1000_tx_buffer) * txdr->count;
-89bf67f1f080c9 drivers/net/e1000/e1000_main.c                Eric Dumazet             2010-11-22  1506  	txdr->buffer_info = vzalloc(size);
-14f8dc49532f76 drivers/net/ethernet/intel/e1000/e1000_main.c Joe Perches              2013-02-07  1507  	if (!txdr->buffer_info)
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1508  		return -ENOMEM;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1509  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1510  	/* round up to nearest 4K */
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1511  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1512  	txdr->size = txdr->count * sizeof(struct e1000_tx_desc);
-9099cfb9170f35 drivers/net/e1000/e1000_main.c                Milind Arun Choudhary    2007-04-27  1513  	txdr->size = ALIGN(txdr->size, 4096);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1514  
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1515  	txdr->desc = dma_alloc_coherent(&pdev->dev, txdr->size, &txdr->dma,
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1516  					GFP_KERNEL);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1517  	if (!txdr->desc) {
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1518  setup_tx_desc_die:
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1519  		vfree(txdr->buffer_info);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1520  		return -ENOMEM;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1521  	}
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1522  
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1523  	/* Fix for errata 23, can't cross 64kB boundary */
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1524  	if (!e1000_check_64k_bound(adapter, txdr->desc, txdr->size)) {
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1525  		void *olddesc = txdr->desc;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1526  		dma_addr_t olddma = txdr->dma;
-feb8f47809fcc6 drivers/net/e1000/e1000_main.c                Emil Tantilov            2010-07-26  1527  		e_err(tx_err, "txdr align check failed: %u bytes at %p\n",
-675ad47375c76a drivers/net/e1000/e1000_main.c                Emil Tantilov            2010-04-27  1528  		      txdr->size, txdr->desc);
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1529  		/* Try again, without freeing the previous */
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1530  		txdr->desc = dma_alloc_coherent(&pdev->dev, txdr->size,
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1531  						&txdr->dma, GFP_KERNEL);
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1532  		/* Failed allocation, critical failure */
-96838a40f02950 drivers/net/e1000/e1000_main.c                Jesse Brandeburg         2006-01-18  1533  		if (!txdr->desc) {
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1534  			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1535  					  olddma);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1536  			goto setup_tx_desc_die;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1537  		}
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1538  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1539  		if (!e1000_check_64k_bound(adapter, txdr->desc, txdr->size)) {
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1540  			/* give up */
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1541  			dma_free_coherent(&pdev->dev, txdr->size, txdr->desc,
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1542  					  txdr->dma);
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1543  			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1544  					  olddma);
-feb8f47809fcc6 drivers/net/e1000/e1000_main.c                Emil Tantilov            2010-07-26  1545  			e_err(probe, "Unable to allocate aligned memory "
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1546  			      "for the transmit descriptor ring\n");
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1547  			vfree(txdr->buffer_info);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1548  			return -ENOMEM;
-d66eba46397f54 drivers/net/ethernet/intel/e1000/e1000_main.c Lovekesh Solanki         2026-06-17  1549  		}
-2648345fcbadfa drivers/net/e1000/e1000_main.c                Malli Chilakala          2005-04-28  1550  			/* Free old allocation, new allocation was successful */
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27 @1551  			dma_free_coherent(&pdev->dev, txdr->size, olddesc,
-b16f53bef9be0a drivers/net/e1000/e1000_main.c                Nick Nunley              2010-04-27  1552  					  olddma);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1553  	}
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1554  	memset(txdr->desc, 0, txdr->size);
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1555  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1556  	txdr->next_to_use = 0;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1557  	txdr->next_to_clean = 0;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1558  
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1559  	return 0;
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1560  }
-^1da177e4c3f41 drivers/net/e1000/e1000_main.c                Linus Torvalds           2005-04-16  1561  
+So the warning is reporting that 104 bytes don't fit in an object of
+size 96 bytes, regardless of any counted_by annotation or allocation.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Of course, in this case, the write of 104 bytes into new_md->u.tun_info
+is intentional and controlled, but what if it weren't?
+
+On the other hand, for this same case, GCC currently returns SIZE_MAX,
+which translates to -1 inside fortified memcpy(). Thus, bounds-checking
+is bypassed, which is why this warning doesn't show up with GCC.
+
+However, this is a bug in GCC. We're already looking into that.
+
+I think we've had just a handful of cases like this across the whole
+kernel tree. We can deal with them as you did here (by directly copying
+the composite structure first, and then using memcpy() to copy into the
+flexible-array member). If these cases ever become more common, we
+could create some kind of helper to do both things at once. :)
+
+> +	/* Copy in two stages to keep the __counted_by happy. */
+
+So based on my comments above, this code comment is not correct.
+
+> +	new_md->u.tun_info = md_dst->u.tun_info;
+
+This is fine.
+
+> +	memcpy(ip_tunnel_info_opts(&new_md->u.tun_info),
+> +	       ip_tunnel_info_opts(&md_dst->u.tun_info), md_size);
+
+Is ip_tunnel_info_opts() really needed here?
+
+Probably this works just fine:
+
+memcpy(new_md->u.tun_info.options, md_dst->u.tun_info.options, md_size);
+
+-Gustavo
 
