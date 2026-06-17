@@ -1,148 +1,252 @@
-Return-Path: <netdev+bounces-300005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 0T9DDX4HMmqetwUAu9opvQ
-	(envelope-from <netdev+bounces-300005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:33:34 +0200
+	id vyo3C28IMmq4twUAu9opvQ
+	(envelope-from <netdev+bounces-300006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:37:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5D569626F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:33:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DB1696298
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:37:34 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=163.com header.s=s110527 header.b=mApdaaOW;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300005-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300005-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=163.com;
+	dkim=none;
+	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=motor-comm.com (policy=none);
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300006-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300006-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 32D1E30060AF
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:33:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 765503017BED
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A412E5B21;
-	Wed, 17 Jun 2026 02:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A162DB7AE;
+	Wed, 17 Jun 2026 02:37:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from out198-5.us.a.mail.aliyun.com (out198-5.us.a.mail.aliyun.com [47.90.198.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4452E739F
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 02:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF1646B5;
+	Wed, 17 Jun 2026 02:37:26 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781663607; cv=none; b=czQ+83x1YsxoOJp1WMamqPxCEgbH46Tv1fINTjgmcY81BADGwxPMn5uqiNSznHOhojhSqTI+9P+fU7MYINMiS/YqdCy2b7MogYRLxdkA1t3Mt/IfeoNARev62Ft5Bvh/Bgt8BFVWcswA91Jvbfppntc5Y08m2iYlhrNm5zYUMdY=
+	t=1781663851; cv=none; b=QjykA0tN6De6gZyOtLmw/DX/Cp2um8qR7WZ3Y1m9+/YUn6FxG6NQi8t1G093KTkBq9/h2hnviBw4N/eKgYx7ZQHrE6Ll4QUq4wyRZkBMSSEaquDfd3wH3OhPQjob3OvGJopkosig2/Huz5k92YEFs50apUem0WhcpGv0NDBj2Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781663607; c=relaxed/simple;
-	bh=vVC14vn7bkjD1+7EI3QB08N+5lsbGluXCihSl/wm/mY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jE1L7V8TsfjCDz1IR+4oB1709KK/jWpUfnqsGcS6vuxtjvU5POCGA/KISq9vvYv/5PffQjXE82sh6SuVNKiDiZw1Y3Ctyv0UN48f7LZG+Pr5AD2+cPBnH6QCODnjWqL+/VJ5xEmvFLF2D1Le24KAUxrNIFRXzf/Vo+DBcHR8B6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mApdaaOW; arc=none smtp.client-ip=220.197.31.4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=HC
-	RNru1BWNtykXM8/uZR/foov5l92Z6L8bppAq8MdFc=; b=mApdaaOWQCiQUJZvXg
-	1+DDb1frKumQdePMWzI7Z5JUvYB3FtHQUN990nWefkiWwIcNqas8s06VryT7xgQv
-	oKnArM/aWBi/TThCQVceJqDnz/iJVI7S5R8zmkChi+xb7Br7ltKJQL7Z/Bd/gJ1+
-	/TUL3cz3d1A+Pt99p3Pi8gwa8=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgC3j71MBzJquHB5Cg--.57456S2;
-	Wed, 17 Jun 2026 10:32:44 +0800 (CST)
-From: Lei Zhu <zhulei_szu@163.com>
-To: brett.creeley@amd.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	zhulei_szu@163.com
-Subject: [PATCH net-next] ionic: Change list definition method
-Date: Wed, 17 Jun 2026 10:32:43 +0800
-Message-Id: <20260617023243.61595-1-zhulei_szu@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1781663851; c=relaxed/simple;
+	bh=ptoxcdDdOwV3Xx6iPB2mZtZA6yZbX9Dc0KBuPuyHeOo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M8DcI+Nyrv/4DC3pTW66k5+XdpD88D96+m+d4Jh+8X/Cx6rdyn3WZ6xNVxfxEQBluUs2OT9QWV9R2ICJAPlEwxAh5NsSGoQJozu0S9c3mbutBfnGsc3KfwScWaBlnGNeT5V0iHxBPh7LYSD3tMSF88T5kT5DNCAPHC5PT1o9jSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.5
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.07437074|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.148617-0.00322267-0.848161;FP=18253967789187112720|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037071049;MF=kyle.switch@motor-comm.com;NM=1;PH=DS;RN=14;RT=14;SR=0;TI=SMTPD_---.i-FAxEl_1781663826;
+Received: from 10.30.1.98(mailfrom:kyle.switch@motor-comm.com fp:SMTPD_---.i-FAxEl_1781663826 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 17 Jun 2026 10:37:08 +0800
+Message-ID: <88f726d5-1617-4d2e-8fbb-d3da9478b386@motor-comm.com>
+Date: Wed, 17 Jun 2026 10:37:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
+To: David Yang <mmyangfl@gmail.com>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.xu@motor-comm.com, xiaolin.xu@motor-comm.com,
+ jianmin.wang@motor-comm.com, de.ge@motor-comm.com
+References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
+ <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
+Content-Language: en-US
+From: Kyle Switch <kyle.switch@motor-comm.com>
+In-Reply-To: <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgC3j71MBzJquHB5Cg--.57456S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Cr15tw1UXr47Jw4fAr4DXFb_yoW8GFW3pr
-	W5Aa48Xr4UXr4UW3Wktr4xZFZ5X3WvvrWDurnIk3yrWrn7JF4xAa1qqFW5J3WkXrW8Gw1S
-	qr9F9an8AFn8Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEjg4sUUUUU=
-X-CM-SenderInfo: x2kxzvxlbv63i6rwjhhfrp/xtbCzgz7SWoyB0yjUQAA3R
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[motor-comm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[zhulei_szu@163.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-300005-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:netdev@vger.kernel.org,m:zhulei_szu@163.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mmyangfl@gmail.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[163.com];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhulei_szu@163.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[163.com:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER(0.00)[kyle.switch@motor-comm.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300006-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kyle.switch@motor-comm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1D5D569626F
+X-Rspamd-Queue-Id: 86DB1696298
 
-From: Lei Zhu <zhulei@kylinos.cn>
 
-The LIST_HEAD macro can both define a linked list and initialize
-it in one step. To simplify code, we replace the separate operations
-of linked list definition and manual initialization with the LIST_HEAD
-macro.
 
-Signed-off-by: Lei Zhu <zhulei@kylinos.cn>
----
- drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+On 6/16/26 02:55, David Yang wrote:
+> On Mon, Jun 15, 2026 at 7:12 PM Kyle Switch <kyle.switch@motor-comm.com> wrote:
+>>
+>> Add yt92xx dsa driver supports yt921x and yt922x switch series.
+>> To support more switch series in the future (e.g., yt923x), the most common configurations are abstracted into switch operation interfaces, due to yt921x and yt922x share similar register layouts and operational logic.
+> 
+> You are blindly plugging existing code into your SDK, without sorting
+> out register operations (for example in set_mac_eee and
+> port_change_mtu).
+> 
+> Do not post code you don't understand. Ask if you are not sure.
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
-index 528114877677..967f4e1e97b4 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
-@@ -558,8 +558,8 @@ struct sync_item {
- void ionic_rx_filter_sync(struct ionic_lif *lif)
- {
- 	struct device *dev = lif->ionic->dev;
--	struct list_head sync_add_list;
--	struct list_head sync_del_list;
-+	LIST_HEAD(sync_add_list);
-+	LIST_HEAD(sync_del_list);
- 	struct sync_item *sync_item;
- 	struct ionic_rx_filter *f;
- 	struct hlist_head *head;
-@@ -567,9 +567,6 @@ void ionic_rx_filter_sync(struct ionic_lif *lif)
- 	struct sync_item *spos;
- 	unsigned int i;
- 
--	INIT_LIST_HEAD(&sync_add_list);
--	INIT_LIST_HEAD(&sync_del_list);
--
- 	clear_bit(IONIC_LIF_F_FILTER_SYNC_NEEDED, lif->state);
- 
- 	/* Copy the filters to be added and deleted
--- 
-2.25.1
+Ans: Thank you for your suggestion. I will recheck the code logic again in the future.
+
+> 
+>> +#define CMM_PARAM_CHK(expr, err_code)    \
+>> +       do {                             \
+>> +               if ((u32)(expr)) {       \
+>> +                       return err_code; \
+>> +               }                        \
+>> +       } while (0)
+>> +
+>> +#define CMM_ERR_CHK(op, ret)           \
+>> +       do {                           \
+>> +               ret = (op);            \
+>> +               if (ret != CMM_ERR_OK) \
+>> +                       return ret;    \
+>> +       } while (0)
+> 
+> Do not use macros like this.
+
+Ans: Acknowledged, i will consider how to optimize them in the future.
+
+> 
+>> +#define GET_FIELD(value, low_bit, width) \
+>> +       (((value) >> (low_bit)) & ((1U << (width)) - 1))
+>> +#define CLR_FIELD(value, low_bit, width) \
+>> +       ((value) & (~(((1U << (width)) - 1) << (low_bit))))
+>> +
+>> +#define HAL_FIELD_SET(low_bit, width, entry, data)                    \
+>> +       do {                                                          \
+>> +               *(entry) &= (~(((1UL << (width)) - 1) << (low_bit))); \
+>> +               *(entry) |= ((data) << (low_bit));                    \
+>> +       } while (0)
+>> +
+>> +#define HAL_FIELD_GET(low_bit, width, entry, pdata) \
+>> +       (*(pdata) = (((*(entry)) >> (low_bit)) & ((1UL << (width)) - 1)))
+> 
+> FIELD_PREP() and FIELD_GET().
+> 
+>> +/*
+>> + * Macro Definition
+>> + */
+>> +#ifndef NULL
+>> +#define NULL 0
+>> +#endif
+>> +
+>> +#ifndef FALSE
+>> +#define FALSE 0
+>> +#endif
+>> +
+>> +#ifndef TRUE
+>> +#define TRUE 1
+>> +#endif
+> 
+> Nonsense.
+
+Ans: Acknowledge, will be fixed later.
+
+> 
+>> +       /* Print chipid here since we are interested in lower 16 bits */
+>> +       dev_info(dev,
+>> +                "Motorcomm %s ethernet switch.\n",
+>> +                info->name);
+> 
+> Stop copy-n-paste.
+
+Ans: Sry for this, i will recheck the code to make sure each line of comments and code
+meaningful again.
+
+> 
+> Please, start with a minimal patch that only marks functions which use
+> different registers/procedures and makes them virtual, and implement
+> them for yt922x in the future.
+> 
+>> +       {
+>> +               .compatible = "motorcomm,yt9215,8bytes",
+>> +               .data = &yt92xx_chip_info[YT9215_8B],
+>> +       },
+> 
+> Do not change devicetree compatible strings.
+
+Ans: agreed, this will be fixed later.
+
+> 
+>> --- a/include/uapi/linux/if_ether.h
+>> +++ b/include/uapi/linux/if_ether.h
+>> @@ -118,7 +118,7 @@
+>>  #define ETH_P_QINQ1    0x9100          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
+>>  #define ETH_P_QINQ2    0x9200          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
+>>  #define ETH_P_QINQ3    0x9300          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
+>> -#define ETH_P_YT921X   0x9988          /* Motorcomm YT921x DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
+>> +#define ETH_P_YT92XX   0x9988          /* Motorcomm YT92xx DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
+>>  #define ETH_P_EDSA     0xDADA          /* Ethertype DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
+>>  #define ETH_P_DSA_8021Q        0xDADB          /* Fake VLAN Header for DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
+>>  #define ETH_P_DSA_A5PSW        0xE001          /* A5PSW Tag Value [ NOT AN OFFICIALLY REGISTERED ID ] */
+> 
+> UAPI stands for User-space API. Do not change it unless there is a
+> very very good reason.
+> 
+
+Ans: The default tpid both yt921x and yt922x is 0x9988. I have modified this to 
+allow for simultaneous use in both yt922x and yt921x scenarios.
+
+>> +/* To define the from cpu tag format 8 bytes:
+>> + *
+>> + * 0 1 2 3 4 5 6 7 | 0 1 2 3 4 5 6 7
+>> + *|<----------TPID 0x9988---------->|
+>> + *|<--RESERVE-->|<-----DST PORT---->|
+>> + *|-|<---------RESERVE------------->|
+>> + *|<------------------------------->|
+>> + */
+>> +#define YT922X_TAG_FORMAT2_NAME "yt922x-8b"
+>> +#define YT922X_FORMAT2_TAG_LEN                  8
+>> +#define YT922X_PKT_TYPE          GENMASK(15, 14)
+>> +#define YT922X_8B_CPUTAG_PKT_FROM_CPU      0x1
+>> +#define YT922X_8B_CPUTAG_SRC_PORT          GENMASK(6, 2)
+>> +#define YT922X_8B_CPUTAG_DST_PORTMASK      GENMASK(8, 0)
+>> +#define YT922X_8B_CPUTAG_DST_PORTMASK_0      BIT(15)
+>> +#define YT922X_8B_CPUTAG_DST_PORTMASK_0_EN      0x1
+>> +#define YT922X_8B_CPUTAG_FORCE_DST         BIT(9)
+>> +#define YT922X_8B_CPUTAG_FORCE_DST_EN      0x1
+> 
+> If yt922x tag format shares no common with yt921x, make a new tag driver.
+
+Ans: thank you for your suggestion, we will consider whether to create a new driver in the new file.
+
+> 
+>> +static struct dsa_tag_driver *dsa_tag_driver_array[] = {
+>> +       &DSA_TAG_DRIVER_NAME(yt921x_netdev_ops),
+>> +       &DSA_TAG_DRIVER_NAME(yt922x_4b_netdev_ops),
+>> +       &DSA_TAG_DRIVER_NAME(yt922x_8b_netdev_ops),
+>> +};
+> 
+> If both are supported by the chip and 4b does nothing more than 8b
+> does, do not bother with it.
+
+Ans: 4b and 8b dsa tag may have different application scenarios. from my opinion,
+     1. 4b dsa tag can save 4 bytes of payload
+     2. 8b dsa tag carry more package info.
 
 
