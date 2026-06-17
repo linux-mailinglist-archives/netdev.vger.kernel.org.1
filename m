@@ -1,187 +1,200 @@
-Return-Path: <netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id aPxtH4pnMmoKzgUAu9opvQ
-	(envelope-from <netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:23:22 +0200
+	id 2olzLCdmMmrQzQUAu9opvQ
+	(envelope-from <netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:17:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCCA9697DBB
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:23:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278F3697D19
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:17:27 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SKvst9fX;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Tc2o8afQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5341F304D240
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:18:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 388B0300852F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3CE39D6EE;
-	Wed, 17 Jun 2026 09:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9493F39A7F2;
+	Wed, 17 Jun 2026 09:17:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E411D39B4A3;
-	Wed, 17 Jun 2026 09:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87603399350
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:17:22 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781687908; cv=none; b=p0cn+kwt8jKTV8s6f2Gr7r5s8S/qTWRDqODsjgTZANL0+rTeICufgv33ew9V6l+uM50kX7xFdo4jRMnCb/ge7xvLRvSnvXcuR+x8rbAH9G0kZ4uHjB3gnZCMPf6Yem5QB/jb0WCRPZxIUuZpQ4Vay/IEUiojpS/bHHJCNqg/OU0=
+	t=1781687843; cv=none; b=j2viA8TyHNbRjGurDC6HNa1yvi1jLHxbELZsO7lt9+drE/sNDmYsnSeREoCO5CjthM36vYfqmGhCvEkZp2+KI2hvazIZBKGFIbfY/WPWzqPkcGQdJBR8TOAHT74FyAEdhNbJN5vK7U+YQ5cXhPcg82pNwEZVrY5eUcv62Ik7RCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781687908; c=relaxed/simple;
-	bh=jU+y4zwGW5m9F+uZkVQ/IsuSU9Z9wtD6LH5H8jCyUPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pu3P5hf+pZsF0KrwxHO5jdst89EYaNvLe2tmNrcBU52qSSUuma17Uy9n0RqKuQq/98xYJZCAJzcWF6kxXqohtXHlDB+FoSZhz9SLjZJsHdAeVo6A14l1aLnM046dw16XAMqwUYCbqhvWzcGyD6dOOxzfQOLWYNY8FEf//PX1+6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKvst9fX; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F21A1F000E9;
-	Wed, 17 Jun 2026 09:18:23 +0000 (UTC)
+	s=arc-20240116; t=1781687843; c=relaxed/simple;
+	bh=NKLImyI3HYH86Vh5hC947ygnor4EsnF46Gid2tc64Bc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYYwEhfXwRLzAY5jaoM99SxWFr054gCNmofaMYLqHtVsGiUUMrF8klwJ0cMph7uvlPrSs1fAA99Ra7bTS5ZyPHurvjolcc3zEM8M7zzAJoFTz+Dejs3QMb5MEnAZqFG4CeD+AK4IJc7o6zc3zuqx83Srq25eHek+IDmb5e1jp3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc2o8afQ; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B671F000E9;
+	Wed, 17 Jun 2026 09:17:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781687907;
-	bh=EtNxW7/37fBEOlp38QPfab6gfweMcAFcEQ1RgfKloiU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=SKvst9fXi2R1TDymljJrc6AzQ+h9tCJfP4PIijyCLDV76XTG3aUP7jios0lc8vvJW
-	 wrRahawIRsQ+OPKPdq7je/hchFPjjHCPZohsuaNjxm1BcPjxTCDVY8n2/mCm2aAM7H
-	 zXLrsbXwC+8ziBuz7+e9gDXD5MCmnpwl3Lju9Y8xKD6VyVNK+tviH3ZXMN+LjOqn30
-	 zjKGX2rO5i/EVprgo85hlksRklXiFopnO57f/mv+7cG+7s0fEDqX6b+LDUE6POjJOg
-	 YGhsPv3hyVNyUXUpEOJqlWfTz0ZBfayCvtda9zGnSUnHNCy5JVQkfNgcospb47T/sG
-	 7cnRM1qBtkO+Q==
-From: Simon Horman <horms@kernel.org>
-To: doruk@0sec.ai
-Cc: Simon Horman <horms@kernel.org>,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	borisp@nvidia.com,
-	sd@queasysnail.net,
-	raeds@nvidia.com,
-	ehakim@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
-Date: Wed, 17 Jun 2026 10:16:35 +0100
-Message-ID: <20260617091634.846438-2-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260615140534.52691-1-doruk@0sec.ai>
-References: <20260615140534.52691-1-doruk@0sec.ai>
+	s=k20260515; t=1781687842;
+	bh=ZnXuxdsvCZXi+yhcRRlP0nnKlUJzsEw2xOj6/CVvJuY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Tc2o8afQpKiwso4i+pUMbegXm9w4FdsldOJEIycWlQuBKzvzKP/80uB25ERY7H9to
+	 rlTBV9HS2My1rfz+o5ejfrZv7pxmZVA/3VLl0xw+1VpT9WdMAaKAWs2fQlF642MRWp
+	 R0fZrndsiKF6U6XD4tFD/tYT8DBjO/HryBTGwlRuKeptvYqTlfyqRpuLmqBTa3OAwh
+	 9j9K164Ij7Ja+gPqjqgK4f0zErjFpRDU0dtYxFsvmZ3zYO7nwHGO0sOdRGvdsT3kqX
+	 /nGioXXdZFVhPWbAzswPyQ096Fsff7VYQk1V1GJ3Rz20/AAqQwlk9iPVEJZVPjwkyo
+	 zcJ2kCDF+XuZQ==
+Date: Wed, 17 Jun 2026 11:17:20 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Wayen Yan <win847@gmail.com>
+Cc: netdev@vger.kernel.org, nbd@nbd.name,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net] net: airoha: Fix TX scheduler queue mask loop upper
+ bound
+Message-ID: <ajJmIIpju9P3oyne@lore-desk>
+References: <178166704952.2212140.11002626760717132754@gmail.com>
+ <178168650178.2224380.3950331731013129336@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VyUTMvxzWiaGc/iq"
+Content-Disposition: inline
+In-Reply-To: <178168650178.2224380.3950331731013129336@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-6.76 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300091-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:borisp@nvidia.com,m:sd@queasysnail.net,m:raeds@nvidia.com,m:ehakim@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:nbd@nbd.name,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300087-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
+	RCPT_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lore-desk:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CCCA9697DBB
+X-Rspamd-Queue-Id: 278F3697D19
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
 
-This patch replaces metadata_dst_free() with dst_release() during MACsec
-RX SC deletion. It relies on the dst subsystem's refcounting to defer freeing
-the metadata_dst until the last reference is dropped, aiming to fix a
-use-after-free when an skb still references it.
+--VyUTMvxzWiaGc/iq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-> index 71b3a059c9647..2a4e7ed76d315 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-> @@ -829,7 +829,7 @@ static void macsec_del_rxsc_ctx(struct mlx5e_macsec *macsec, struct mlx5e_macsec
->  	 */
->  	list_del_rcu(&rx_sc->rx_sc_list_element);
->  	xa_erase(&macsec->sc_xarray, rx_sc->sc_xarray_element->fs_id);
-> -	metadata_dst_free(rx_sc->md_dst);
-> +	dst_release(&rx_sc->md_dst->dst);
+> On Tue, Jun 17, 2026, Lorenzo Bianconi wrote:
+> > Even if the current codebase supports just AIROHA_NUM_QOS_CHANNEL (4), =
+the hw
+> > exposes 32 hw QoS channels (AIROHA_NUM_TX_RING). Here we are just clear=
+ing the
+> > configuration, so I guess the current implementation is correct.
+>=20
+> Hi Lorenzo,
+>=20
+> You are right that there is no functional impact, and I agree this
+> should not go to net. Let me explain the register layout I was worried
+> about, and you can decide whether it is worth a net-next cleanup or
+> should just be dropped.
+>=20
+> The two macros are:
+>=20
+> 	REG_QUEUE_CLOSE_CFG(_n)             =3D 0x00a0 + ((_n) & 0xfc)
+> 	TXQ_DISABLE_CHAN_QUEUE_MASK(_n, _m) =3D BIT((_m) + (((_n) & 0x3) << 3))
+>=20
+> REG_QUEUE_CLOSE_CFG() masks the channel with 0xfc, and the bit macro
+> folds the channel with & 0x3 (mod 4) shifted by 3. So one 32-bit
+> register holds 4 channels x 8 queues, 8 queue bits per channel:
+>=20
+> 	channel 0 -> reg 0x00a0, bits  0..7
+> 	channel 1 -> reg 0x00a0, bits  8..15
+> 	channel 2 -> reg 0x00a0, bits 16..23
+> 	channel 3 -> reg 0x00a0, bits 24..31
+> 	channel 4 -> reg 0x00a4, bits  0..7
+> 	...
+>=20
+> In airoha_qdma_set_chan_tx_sched() the loop variable 'i' is passed as
+> the *queue* argument _m, not as a channel:
+>=20
+> 	for (i =3D 0; i < AIROHA_NUM_TX_RING; i++)   // i =3D 0..31
+> 		airoha_qdma_clear(qdma, REG_QUEUE_CLOSE_CFG(channel),
+> 				  TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i));
+>=20
+> Since each channel only has AIROHA_NUM_QOS_QUEUES (8) queues, the correct
+> logic is to clear the 8 queue bits belonging to 'channel'. With i running
+> up to 31 the BIT() shift instead walks past those 8 bits and into the bit
+> ranges of the other channels folded into the same register. For channel 0
+> the accumulated mask becomes 0xffffffff, i.e. it touches channels 1..3 as
+> well.
+>=20
+> This is harmless today only because REG_QUEUE_CLOSE_CFG is written
+> exclusively here, via airoha_qdma_clear() (RMW clear), and the register
+> resets to 0 and is never set anywhere -- so clearing extra bits is a
+> no-op. Functionally the current code is fine, as you say.
+>=20
+> The point is just the loop-bound semantics: 'i' is a per-channel queue
+> index, so the bound should be AIROHA_NUM_QOS_QUEUES (8), not
+> AIROHA_NUM_TX_RING (32). The two happen to be related (32 =3D=3D 4 channe=
+ls *
+> 8 queues) but mean different things.
+>=20
+> Since there is no functional change, feel free to drop this if you would
+> rather not carry a cosmetic patch. If you think the clarity is worth it I
+> can resend against net-next without the Fixes tag.
+>=20
+> Thanks,
+> Wayen
+>=20
 
-[Severity: High]
-Does this change introduce a new use-after-free in the RX datapath?
+Sorry you are right, I misread the code, your patch is correct. Since as you
+pointed out REG_QUEUE_CLOSE_CFG() is actually never set at the moment and t=
+he
+default register value is 0, I would repost this patch for net-next as soon=
+ as
+it is opened (this will avoid merge conflicts).
 
-When dst_release() drops the refcount to 0, concurrent readers in
-mlx5e_macsec_offload_handle_rx_skb() can still find the object via RCU
-and call dst_hold(). Because dst_hold() uses rcuref_get(), it fails on a
-0-refcount object without incrementing the count.
+Regards,
+Lorenzo
 
-However, the datapath still attaches the 0-refcount dst to the skb. When the
-skb is later freed, skb_dst_drop() will call dst_release() on already-freed
-memory.
+--VyUTMvxzWiaGc/iq
+Content-Type: application/pgp-signature; name=signature.asc
 
-Should the datapath be updated to use dst_hold_safe() instead?
+-----BEGIN PGP SIGNATURE-----
 
->  	kfree(rx_sc->sc_xarray_element);
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajJmHwAKCRA6cBh0uS2t
+rFNyAP9PkgQvfxp6CioRi0IbaYkDxw09bkje9eUMjIyNtTw65AEAnUSecAOlA8Ng
+x0S8I6Vr7K3l5fdREJxsd22doNsKKwY=
+=kBNZ
+-----END PGP SIGNATURE-----
 
-[Severity: High]
-This is a pre-existing issue, but does this synchronous kfree() cause a
-use-after-free for concurrent datapath readers?
-
-The element was just removed from the RCU-protected xarray via xa_erase(),
-but the RX datapath can still be accessing it via xa_load() under
-rcu_read_lock() in mlx5e_macsec_offload_handle_rx_skb().
-
-Should this use an RCU-deferred free mechanism instead?
-
-[Severity: Critical]
-This is a pre-existing issue, but does mlx5e_macsec_offload_handle_rx_skb()
-blindly dereference the result of xa_load()?
-
-drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c:mlx5e_macsec_offload_handle_rx_skb() {
-    ...
-    sc_xarray_element = xa_load(&macsec->sc_xarray, fs_id);
-    rx_sc = sc_xarray_element->rx_sc;
-    ...
-}
-
-If xa_load() returns NULL (e.g., if the entry was concurrently deleted by
-xa_erase() or the packet has an unrecognized fs_id), will this cause a
-deterministic kernel panic?
-
-Is a NULL check needed before accessing the returned element?
-
->  	kfree_rcu_mightsleep(rx_sc);
->  }
+--VyUTMvxzWiaGc/iq--
 
