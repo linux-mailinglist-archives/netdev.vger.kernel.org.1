@@ -1,302 +1,195 @@
-Return-Path: <netdev+bounces-299991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id SHiwIW/fMWoHrQUAu9opvQ
-	(envelope-from <netdev+bounces-299991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 01:42:39 +0200
+	id R0hAJv3kMWrorQUAu9opvQ
+	(envelope-from <netdev+bounces-299992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:06:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CBD695C30
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 01:42:38 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0E09695D14
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:06:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=Z01cHDGh;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299991-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-299991-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=google.com header.s=20251104 header.b=VyKfVvUQ;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299992-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-299992-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3D97F30500E5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jun 2026 23:42:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CE71930028D2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 00:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D355F481FCC;
-	Tue, 16 Jun 2026 23:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5604B8834;
+	Wed, 17 Jun 2026 00:06:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DF3481ABD;
-	Tue, 16 Jun 2026 23:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B82A3C2D
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 00:06:13 +0000 (UTC)
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781653348; cv=fail; b=BHtRpwbXveipT9ofhmHZsXpHFUHEb1rIhB/3s1174naEAadBhvjkucnI7oIX2I/XxXEdt+zHgEcOYk43zKJPntB5rbXWdV795JtPjUk6pczTrMcrxPMJ2fo7bsveHZyqW1Vr/eqDYRF7pqJ1VRLSwc+4Uh35emDXDiljJ8nbO1g=
+	t=1781654775; cv=pass; b=Z4eRPPPXDzbB56utCBCKu6I3C2Mxn+VZ8JJwz+h9n2AwNEiW+ytF6g4qAbnhQfwf/aMsENYUwMqMVBRokJfgk1Xc/8lBibe6LBjHQDW/GlqxRAU6oRrVPOWulkjf0KsddYXvYZdzEmUscvajNH8iXb2etuaRyzpjlJLIZJKebEE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781653348; c=relaxed/simple;
-	bh=QFmg8nnKFoA+SzUj+0Jft56NE58ghv7Ef8VkoZEaY1Q=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BU3+cVbpzSfVL8KqFzhZ4PvQtEpZqh+79YsTpDYgGUgeOZecJdUyEkVdYJZwsc5Jd1sl6HpGReoBjuHIZCgupqncJHfPA5dvr/wTsnWzSVB08wSMpdEQ8sbzw1lofITZlLLM2o3bQc1NCXWM1xCPNtXpt7dkb4jH2NKU3W3nPv4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z01cHDGh; arc=fail smtp.client-ip=198.175.65.17
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781653347; x=1813189347;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QFmg8nnKFoA+SzUj+0Jft56NE58ghv7Ef8VkoZEaY1Q=;
-  b=Z01cHDGhUBsR5Dg2GCqT7S5nlP12p5oBtvnRG+VeBO4vI/x/c1qbIc4w
-   7VHDL5M3I4hK9ob/RIMOOGW9R/9Tqw9JetnMIS3NqE+6+RtQajB7eOqip
-   A0RuErs+pKNL+E7zvuUJwFltyNz0dEdKJqkjuf7t/LcU4xVqlFWVmzZPH
-   7fw206Szq5ntQc46Zk6lirn+DsnsyaIb50yjO/pIcgnezn3fTzLdakEAp
-   9e5hUt5sPf+jyRbxjnrJzAqTC99adbxPwCqriUkWK6vjgn2ZKVRol7lzO
-   MWvX7SAE5TOkeaiZC3ZklRnwG+TI+I0hm3xMoNhGkUNGScS1alxmXRNkz
-   w==;
-X-CSE-ConnectionGUID: Zv6o9at2QaCQaeLPsDBGag==
-X-CSE-MsgGUID: TY+V2JfNRwScX/Y8Pl/44Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11819"; a="82446715"
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="82446715"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 16:42:27 -0700
-X-CSE-ConnectionGUID: T8EIr/ZlR2m5dU40rUV9Pg==
-X-CSE-MsgGUID: X08j38XFTWWkZEasSoq2/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,208,1774335600"; 
-   d="scan'208";a="247023349"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 16:42:26 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 16 Jun 2026 16:42:25 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 16 Jun 2026 16:42:25 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.58) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 16 Jun 2026 16:42:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ma77mXFjM71kHMIHdpWugjqHsJ4JjpkDQjGI+C/W9mJYX6A0FylnFG1KCsMwpqPo+F23/WQNznzKUnq8pcAQcuhdinM9p6IQgaTy2RvNhW722th4uFrgQhcAg89l+3rjJPpk+T0sn9HcS7kx7K79ogSQQHt13SuETOGm6yFw4vHZH0Cvx8qmc7ktAljTU9DI3Y5VPSp1ISO6+vksXdiN1fCPuPspPUyWMQcVkmiOFp0Zj1j96HLV4XRvo2gKElmxag7cYf23YmtIEzOO3qjh6RqrZZHj5icTtKwE4B+AJPO9OS9bxtZVT/xzkLLIttob5s1sGRa7kxjBuwv5iVwgXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lG6i0nvX/OzvkhmyAFitC2zc+tYqqOTfjahalcVnDTs=;
- b=bvD5OetT1KFKi0c1Bw3tHjPO+IViLwAEuUA9rYiC9ZYaFVpuxyqYMkcSv5ODbUbaZSYihu6K5v8HslGPgCpY6JYLqRl3IeNLAv+IXWG12h03gx70fQMC9kA3Yx5ikdaICGmxXxJiBKDdYHWvteKJFbYEVu49HhaSfna3kUxdepJyJGY7H1Fw6lRV1B/cn/hNeH+Jyx4KQ2puGhlHZOlCu81akam96VXFm8EYl+5wnQ2BnVb0O4ayCSGv18XU0bbJnepbN+t8QoM0HJ31w3WQ7P35sHi100nLa8Efa1M7/e21Y94qvemFK+fsVeLxXlPI0OpCLob35fdtXgotPldWlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com (2603:10b6:8:134::14)
- by IA4PR11MB8944.namprd11.prod.outlook.com (2603:10b6:208:563::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
- 2026 23:42:21 +0000
-Received: from DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58]) by DS0PR11MB7381.namprd11.prod.outlook.com
- ([fe80::4c39:dfe6:d6dc:6f58%5]) with mapi id 15.21.0113.015; Tue, 16 Jun 2026
- 23:42:21 +0000
-Message-ID: <31630db0-85cb-421b-8ebe-bbae07521533@intel.com>
-Date: Tue, 16 Jun 2026 16:42:18 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: loongson1: Use dev_err_probe()
-To: <keguang.zhang@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC: <linux-mips@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20260615-dwmac-loongson1-v1-1-cbcf5bc01d9b@gmail.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-Content-Language: en-US
-In-Reply-To: <20260615-dwmac-loongson1-v1-1-cbcf5bc01d9b@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0314.namprd03.prod.outlook.com
- (2603:10b6:303:dd::19) To DS0PR11MB7381.namprd11.prod.outlook.com
- (2603:10b6:8:134::14)
+	s=arc-20240116; t=1781654775; c=relaxed/simple;
+	bh=fkrCmopnIb13ipuEWVakk/KrAFvH7xz7xKtU4zl9YnE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BAb0ML36Jn+8ri2Vk7FDSLi5px8lxqCN5aPKHgn4s5PT6JXVooCttRHSmorBtQ7NG9uvBSGeKfn08UA90UVbef/6o34GEEAN0QvOUNuEpoKNjzpmHQDDaMLnvU7L94LGJI+FgawLYW9Ypd8mXvOjr3Tdkl/U0nryrNUjEUXDdvA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VyKfVvUQ; arc=pass smtp.client-ip=74.125.82.175
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-304f590dd91so5930514eec.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 17:06:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781654773; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fWf8vk2wXzvzhiYlucaQsq124OLxz+urvTK505kBpb8oavg0RRvfCJB4zOpcQlsLuE
+         7Bj28+Da1Ww2rX6kGw6QLD5fFPx3c3x/FGj7j2TfTUfrlvtR5+091utDJwgsqc1RLh7k
+         qFCJ+1tLUkE8Gn4RsMklcQHFdoguavjxmZ3zW6u8PUjgKNvc4ipELCuNTf6T+9UKhsMA
+         wIF5Yg/WX9zkHdDbF9oe8Zd0Lw53S+jMy8NnKV2x8uuKxWGJyWW9zdhAhxpm3oNF0205
+         yyQPtVcOmUla/Y7aCnkIQJYVKSAEzE6lsrUBtASFqfC02y7hn/hLHUNKq9BiEl+LfIhN
+         K9lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zN2+45z8RuYVOYkmuHkDGfc4Yz20/+fHvo1TnYpToEo=;
+        fh=XEYuISFnNTW09QotMlHlZDCuZr2UPohCvL77fDWMM3k=;
+        b=APQBoHxkDE460r4GZ6nePihAzC6Y67VMMQ0k3+fOkHHrR0ooSokLzWl0OrBs+5NApl
+         dQoZcAqXCqioCIH+mwDJ2/rpPlEDWCqMJ9M4vV3bJBSOeaFLstjrPRu5s62rjWpe/+UR
+         9LfDTfu5IVNf+PGVjGecvDMjNEMKeM/7RLkc8rycwh9BudnARXq/BpBuN3R9mRsjK31v
+         6Zirn+Sbngh3LsJ7P2FqRP/Eb6QEuVHnAY2R9hBhqE378mDwBxX7srj3dmZfVfeG2U5x
+         OVBQat8Lb7cwLK2OyMQnzhkrkn9s2ur0xBqRWbvnJIwTZC1OLYVy35CC1dyiSdS8UvNM
+         TjBw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1781654773; x=1782259573; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zN2+45z8RuYVOYkmuHkDGfc4Yz20/+fHvo1TnYpToEo=;
+        b=VyKfVvUQXBCvLPemoQfZAR1bpev/sXFbiYLvZNnkHW2QBnUmfUW5+EnR4H82tLJ5mQ
+         fbIQrNhDToKOI5DMRmP4+w7EMro+mYGuAIjLLKP9Lzn3BfdQXT8za5DyMs30k5w653om
+         XFNNEfczuDqsfD5hbSGTrtsSYddnbJUa4K7C4jvMEM8XSaE+n2lJ2mgjTlg98ILI/z76
+         5t/97QXRzCQrAYGq/eN2YsAu909DuCkIu8zcIYY7nQBlK3P3EbeJa+Rby+lsQstVqhGe
+         s/lv8vyKhwQXfYlfGqAo27FN2SyY3wnxyRwRJJSeHt0qUK6RDEP9lV/IulWvAMzMpe4T
+         B7sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781654773; x=1782259573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zN2+45z8RuYVOYkmuHkDGfc4Yz20/+fHvo1TnYpToEo=;
+        b=TZ0P3P0s2xmB8Xs2nrZZ+RZaZ8L14K2pJC/MxIje/jZVjzvJGVfqx9Y61IV+0NcLt9
+         IGOHIiQq5yFtnItf1lU9Fz5i86VU3e/D1FHdmf5OACDwngi73+s2iejRNcbD56WvJ5S6
+         z/Uhf5aldKPfJ4m5Aiw+k7v6yosu32OkALuZjBfowjg8zkNjy/aHfzFxUPBH7y063H1M
+         coCdW43XRhMEEI6YpsFw0HMZb4O0uKLtJsOWXeaA+32Q4Sp4ZUnBz35ERF0BXpyO/xgR
+         t+dOaAxI8d1ik1gDs8h/CmvjWfKmeD5bELtuklqjQYmnP1wz2HERFGiwEKehfmXuy2oB
+         +Jtg==
+X-Forwarded-Encrypted: i=1; AFNElJ+bpPN2iEsMTnapcDFT+ZiDsW6qVNqEdkDtHzNg8efn4vVJtWS3rodCosQ+bi+dV/vujM/eLpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1yHPtMknjPfHIJ62SgsLmki+xPFSJe7WcjK/x84qusdJk2CHn
+	TEnT8agpM/7AuB1nAECk8IfFur4hmrLwlJ7WDuw2+L0T7amr0PyD1KliD2Mb0Ue6xeiWfpKSRaA
+	1gY5GzUxbd+Iu/Wy7bazPMWCtR0kvjnIORTtx6UEB
+X-Gm-Gg: AfdE7cl0K4kUr/XRb9IP9m7Fyc0i6HDqZcWC0nxhf7FirkiZNshgnkeF7j6ICNBO/0i
+	mxnmI5gDOev5E2MvP9rqdDsapI4ZPLoNy4m+a4JSf4H1ac3+979ix+jd/TghWS9p+RopqxEljz+
+	78usS4Img7vLSdSE2TrCSr23/oycXj6UOKMzB1Wk97B2zJ+bvU780uSYdZcg7vBJC3eL9SlERQz
+	7sJHOOkPmIirmVBqkxOv2C6wjp6Z/Q3q2v2dd83qOlBo1BNOHurkVHi+zGCxXNTv5nkc4a077pD
+	/mT+vDAh9xp8Dpvg1AGjYC2faLo98mweLULKsI78bM9OVDc+Dp4GJvyUmWVvLOh2cO4v6GBWyMP
+	FZ2y52YhMn6WGhOODbnekWIDpRWX4ykaR5i+8Owa+wqVlJ32W
+X-Received: by 2002:a05:7300:6917:b0:2e0:1f09:d924 with SMTP id
+ 5a478bee46e88-30bc992c59cmr985150eec.5.1781654772212; Tue, 16 Jun 2026
+ 17:06:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7381:EE_|IA4PR11MB8944:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8d18fd25-8289-4b0f-03f8-08decc00e8cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|23010399003|376014|7416014|366016|56012099006|6133799003|11063799006|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info: HPBFmXAaEmjUgDQNzKJd+mAXgk2mn1DSgdGHVqMCxTshU0vhbTS6g7uF7PWgfSFoyhFqPVHoQ0xt7XriSBtKMoVgm+zJnscVm+H0fIdhzxWW/2Suqfqy673KeZHLtgeGkLiFhNk9qLPPPKCCoTrwETuKYC4DCsl5qLLO3vStyGXlawzlZQwK0bUk7TsJni/jFV5mXeY6l3tpUxmo/ES14rhjEWRIL0bOikKtk63SHSx/ckhG/Fhe3auo630K7Pp108sOmI09wGfNX9djO6XzRVI6PFeb5S9GzL6rGZGWqwKxev2wQTHMjloDlpTHVVmAf/Wu2TGx8XmcHWnnTRBOTPzYJKzGNu1LzvHVT1hbYeD7/ERjA8R783oTzNK+jJalZnV3muHp6ZPxFHkMnoktQc5eCS7zeH6zzovtGJdGd20kI4xNgWOVl3Vq+7MHINzRnqtiYSP/cCMu3xBuifGx7O2z8iMJZjh/c6q2qd4HTWCzvqBEwKi4ORSnBNsiEPJXC56xIMDGd6Nz+yTiajORvFu3wNY94aHnwXqK1JMqqAHd3ZihU93emwLM+kkkW7+yidHiKB+zQnR28FiAGqq55ZfABAVIphFf/1Gh+YO+mAiYYHrcTXWPkTZKjYOj8fW6yyMxXKC1nDrkvm9omPesIFjkIdkge3UXzRITwPwwEpQ4oYz/9fQdoR2gmXK/b2rO
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7381.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(376014)(7416014)(366016)(56012099006)(6133799003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1JaMUtzUGtoSXJrczQvK0lWQVBsSjBjYlc0QkxYVmNTc3NycWVUN0drOTVN?=
- =?utf-8?B?MWxRVEMrVk5Fak9aajlXcXQ1OEc3NWk1NG1jcktobDZqRnBuYkNuUldxMlN0?=
- =?utf-8?B?R25SV1phVllGM0ozU2U0Skowdm1YLzkzalJDblc1aWRsbDZTZS9FelZJaEZy?=
- =?utf-8?B?RlhIM1dkR1l1d1dpWFNpTkhDS3ZzMjJWcWJTSlVLNHpSU2NXZFlONDZsbnhS?=
- =?utf-8?B?a2JMNzU1bEVoZnQ1YkltYjB2T2JzakZTLzE1T2ZwZi90TFRXT2hDS1NLZWNB?=
- =?utf-8?B?RitiZGhPOG5iRHkrclJLYXY0VlhGR09hcGhSK29Xa1RVNG11dkpwKzlVZlpQ?=
- =?utf-8?B?bUdlUFd2bDVtMUVOMTVwS2hLenJONk9LWGxodEtFOTRpeWw2QVZJRFpzd1k5?=
- =?utf-8?B?cEx3Tk5FRStGRVJFaThqTm0ybDlzN2lKaDhSa0ExK01ob3pLWDhyYXZHc1k4?=
- =?utf-8?B?SmJwRTBzWlZnSTlRVmdIa3VsNTRWd21ZZTlRREI0T1RBQ1FpcDVvMVJLcjZs?=
- =?utf-8?B?Y282T0JxY05pK1pYT0VpL0xjTXc2a1g1akZpMmNrZERncFdPYzR0YzBZY1Jo?=
- =?utf-8?B?TXpvR3NoWjlBYXlpNFVrTXI1N3JSdndPOEdLY2ltZmxPU21CTzU0eFFzL1dZ?=
- =?utf-8?B?a2lsV21OaEgyTmtzTkZPZERRbjB0M0dacDEyb2JzVXlNS1ZtM0JnaXh3RGxv?=
- =?utf-8?B?ZFJteXRUb1pXL2F0TFRrWHhtNHlESDlNelNUVkRSTThaeFBwYlpyVEJpMEhD?=
- =?utf-8?B?UWtndkl5aXFJUmNXSzFZSzBaMGZoTUMzbnVsYUJmRlkrV09kaFQvTmVSekNO?=
- =?utf-8?B?amFaR2JHLzloZUJLazNwL3dTWlozVlVjVW9PaGx5Wi9RczhHRkZudHFPN1N2?=
- =?utf-8?B?OXVlS0NBYzdqZlZGS2VjUVJ6MWJ3SzlORENuSjFDYXc3Y01UMFl2WjhDZlNS?=
- =?utf-8?B?UStXMDhsSThtNnJ0VjRYNHViOE1UM3MvcWVteWNLRlhkQytpb1g3WlBtYTht?=
- =?utf-8?B?Y1NWYXBCWDdNd0RQbUtqUkxJcWFUYXJqaWc2ekkvSnRRb1BqZm5YYkpsc0Vk?=
- =?utf-8?B?cEJUVjNidUN6T1RGb1JIcC81eEI5VzBYcFVrKys5WGVrNFkrbTY2T3Y1OXMw?=
- =?utf-8?B?WjJ0UnZQdHJJcE0ydnRmRjhWVDVrR25Kd1BlcnBNbEJ3L2lqZFVFOU1vYy85?=
- =?utf-8?B?M1M4YVhIYWljWkVSTHZpVWVXeTBxYmIwemNhaVNFN3BGZW1wN0Y0OU95Wlp2?=
- =?utf-8?B?R3EyVWNEYXNoRWhlb3dUbllFN001YTA2dzlyKzZ4R0JWWkVXamlxaE8rREk2?=
- =?utf-8?B?WDNuNVlJcWFHeGdHc2I3YWxVRXJQUk5QUE5zTWRFUGZwVSt6TmZwNzljanVW?=
- =?utf-8?B?VSt4WkE2aUtMZlhxWWdrNURvQXlUazVTOWt2QTJEQVhkcmhJNXpTYVlOckpo?=
- =?utf-8?B?Z3pXSFhpcDJLSy9xUTF1RnJEV29TbXorTUdqdkdqOHg2eGQvSEc1WStUT056?=
- =?utf-8?B?Y2JzTEQxYy8xQlBaVHhMSlE2MEpvaUhIT21sV3hBbjcwdkcvakNFRjBwQmhh?=
- =?utf-8?B?bXlZVGc5Yk1OZlF0aFJJR1pKSk1sNVdrMlFZaW4rMlZhZUVscHV4bDhIektQ?=
- =?utf-8?B?ZDlrWjQyTkJHRW0xR3A5WWNuU2lCTXdUNzhVbnBLNms1eXhJL2dSSkh6aTd0?=
- =?utf-8?B?M1JBbjYzWnBrS3NLTUNIZmJUTFlZQ0d6R1JyNHZGdU1kNkVzby9YbnA0RlJu?=
- =?utf-8?B?K2YyclhJbWVsc1J4b29sNm04TEJQVkIySHlwRHZBRXM2dzVYWDlUSGs4d2Rt?=
- =?utf-8?B?dWhZRkpJaldrZHNUU0R5aDZtWlhBNC8vVWI3dWxVbUtDbE5oVlpvM1pFWk5l?=
- =?utf-8?B?dDRIS1M5MUt6SzUrQWlXamJ0WUtjTXR1NnlrZVhqQm5XMXhiVC82RGdpMWFD?=
- =?utf-8?B?akQyNFN0MkpSd2pDSTFHUmFiVW9TU2tTeWJwMW1aaFJ3bis4SVZIUkNjc0Zs?=
- =?utf-8?B?ZG1jeHZ4dkRqVDZNV2lSczdKYkpHcVdFMzNRVkJRNTdsc2RhRDhLY2Zjamk5?=
- =?utf-8?B?eDRsTnBKMzFnOXNDazFPRTlWeGpwd0JzVXVwakZ4QmhyeTF6SFpNeU1Ud3h2?=
- =?utf-8?B?YXBvVWIzL3M1ZG1hZ3lqVXhQZ0QxNkZFdlIvdkoxTllZbUtxMVAzeUpIM3JV?=
- =?utf-8?B?cUtFV20wY2RoS2RNRUl2b21aOVhkQ29PS3pQVTI0Rk84ejhneEk3SnNsTnF1?=
- =?utf-8?B?alF0dmE1Vi91TDRJTTh3MWJENzBDRmN2SjlWS2NRQzAvd2Y1YXVQdndENW12?=
- =?utf-8?B?N0daUVgyZVkvOE1qZ3hVV2ZwckpMNkpxTXhQWlNidjAweHhzRjVZdz09?=
-X-Exchange-RoutingPolicyChecked: gDoLCpC3omJ8wOKQy2q4cMo67U/yHv9A8p1F1JGnLlOXaB9NeKvNGKPUv8skr1wH6E3Z7GysKBBYqpF4DyrEgPbEj9FRS0p9Oz2fKenRIjIWzFN9ZUY7ezFYcGd9y65FnWNIbPWPL5ja4/JYOgZ0vmUTlp2y2R9+eHKnEchKG3S2nungkMJYxIAw2Xb/UkoNvFb5mGeJMOuN4KKjBixL7t0zIKDrRoBSDmfcT1tLofMSM/iNNT+Ns76GEw5AUzckOwWctejc6PXTsI/4Pj/RRfVijETynQ5MUu8jNEXxifnovZ/MwWhSZvcXF5AE4cFJ5LKpHrrPNzIvp/7Q5nbnJA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d18fd25-8289-4b0f-03f8-08decc00e8cf
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7381.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 23:42:21.2585
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DtYzBoQLiRShG5EfCIwONie1n6jx5jwwDqkQ/22kUalJ9a9CGKTkoANQGfvdDIWEjcPowJijQsgi2QCmlWDG1y37huUDu6M0OqrDArH0q9k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB8944
-X-OriginatorOrg: intel.com
+References: <20260616143020.3458085-1-jkoolstra@xs4all.nl> <20260616143020.3458085-2-jkoolstra@xs4all.nl>
+In-Reply-To: <20260616143020.3458085-2-jkoolstra@xs4all.nl>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 16 Jun 2026 17:06:01 -0700
+X-Gm-Features: AVVi8Cce5oIkQ6o0SM96_tTZrEuKWAAnxCW1BPbsireeIZuVvbRqCN_usM_TBAY
+Message-ID: <CAAVpQUDqPsRXdsW31prBCDart-LGsF2EmFVN31gB3Nx6WPT2kA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] net: af_unix: Useful handling of LSM denials on SCM_RIGHTS
+To: Jori Koolstra <jkoolstra@xs4all.nl>
+Cc: brauner@kernel.org, cyphar@cyphar.com, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemb@google.com>, linux-fsdevel@vger.kernel.org, 
+	Jeff Layton <jlayton@kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, 
+	"open list:GENERIC INCLUDE/ASM HEADER FILES" <linux-arch@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299991-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,foss.st.com];
+	FORGED_RECIPIENTS(0.00)[m:jkoolstra@xs4all.nl,m:brauner@kernel.org,m:cyphar@cyphar.com,m:viro@zeniv.linux.org.uk,m:jack@suse.cz,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:arnd@arndb.de,m:willemb@google.com,m:linux-fsdevel@vger.kernel.org,m:jlayton@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-arch@vger.kernel.org,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[xs4all.nl];
+	FORGED_SENDER(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-299992-lists,netdev=lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:keguang.zhang@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux-mips@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:keguangzhang@gmail.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jacob.e.keller@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[10]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 01CBD695C30
+X-Rspamd-Queue-Id: A0E09695D14
 
-On 6/15/2026 5:24 AM, Keguang Zhang via B4 Relay wrote:
-> From: Keguang Zhang <keguang.zhang@gmail.com>
-> 
-> Use dev_err_probe() for the missing match data case to simplify
-> error handling.
-> 
-> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+On Tue, Jun 16, 2026 at 7:29=E2=80=AFAM Jori Koolstra <jkoolstra@xs4all.nl>=
+ wrote:
+>
+> Right now if some LSM such as Smack denies an AF_UNIX socket peer to
+> receive an SCM_RIGHTS fd, the SCM_RIGHTS fd array will be cut short at
+> that point, and MSG_CTRUNC is set on return of recvmsg(). This is
+> highly problematic behaviour, because it leaves the receiver
+> wondering what happened. As per man page MSG_CTRUNC is supposed to
+> indicate that the control buffer was sized too short, but suddenly
+> a permission error might result in the exact same flag being set.
+> Moreover, the receiver has no chance to determine how many fds got
+> originally sent and how many were suppressed.[1]
+>
+> Add a SO_RIGHTS_NOTRUNC option to UNIX sockets to enable more useful
+> handling of LSM denials when receiving SCM_RIGHTS messages: instead of
+> truncating the message at the first blocked fd, keep every fd slot
+> and store the LSM errno in the blocked slot.
+>
+> [1]: https://github.com/uapi-group/kernel-features#useful-handling-of-lsm=
+-denials-on-scm_rights
+>
+> Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
 > ---
+>  fs/file.c                         | 48 ++++++++++++++++++++-----------
+>  include/linux/file.h              |  2 ++
+>  include/net/af_unix.h             |  1 +
 
-At first I recalled that dev_err_probe does strange things with
--EPROBE_DEFER. From the documentation for dev_err_probe:
+net-next is closed during the merge window, so please repost after that.
 
->  * @dev: the pointer to the struct device
->  * @err: error value to test
->  * @fmt: printf-style format string
->  * @...: arguments as specified in the format string
->  *
->  * This helper implements common pattern present in probe functions for error
->  * checking: print debug or error message depending if the error value is
->  * -EPROBE_DEFER and propagate error upwards.
->  * In case of -EPROBE_DEFER it sets also defer probe reason, which can be
->  * checked later by reading devices_deferred debugfs attribute.
->  * It replaces the following code sequence::
->  *
->  *      if (err != -EPROBE_DEFER)
->  *              dev_err(dev, ...);
->  *      else
->  *              dev_dbg(dev, ...);
->  *      return err;
->  *
->  * with::
->  *
->  *      return dev_err_probe(dev, err, ...);
->  *
->  * Using this helper in your probe function is totally fine even if @err
->  * is known to never be -EPROBE_DEFER.
->  * The benefit compared to a normal dev_err() is the standardized format
->  * of the error code, which is emitted symbolically (i.e. you get "EAGAIN"
->  * instead of "-35"), and having the error code returned allows more
->  * compact error paths.
->  *
->  * Returns @err.
->  */
+a few comments: please
 
-I guess even without -EPROBE_DEFER this is still acceptable. The change
-seems fine, if a bit of a minor cleanup. However, net-next is closed,
-and this is definitely not a bug-fix worthy of net. This does have the
-added benefit of
+* add cover letter
+* separate fs/ and net/ changes
+* do not touch tools/testing/selftest/Makefile
+* use kselftest_harness.h and system()
+* check other local rules (reverse xmas tree order, etc) in
+Documentation/process/maintainer-netdev.rst
 
-I'd probably also argue this may go against the desired goals of
-net-next with only wanting such cleanups when in the context of other
-larger work. Of course that decision ultimately belongs to the maintainers.
-
-You can add my reviewed-by when/if you resubmit when net-next re-opens:
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-> index de9aba756aac..ec34adb63f61 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-> @@ -176,10 +176,8 @@ static int ls1x_dwmac_probe(struct platform_device *pdev)
->  				     "Unable to find syscon\n");
->  
->  	data = of_device_get_match_data(&pdev->dev);
-> -	if (!data) {
-> -		dev_err(&pdev->dev, "No of match data provided\n");
-> -		return -EINVAL;
-> -	}
-> +	if (!data)
-> +		return dev_err_probe(&pdev->dev, -EINVAL, "No of match data provided\n");
->  
->  	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
->  	if (!dwmac)
-> 
-> ---
-> base-commit: ec039126b7fac4e3af35ebccaa7c6f9b6875ba81
-> change-id: 20260602-dwmac-loongson1-5e1b9dfc3c62
-> 
-> Best regards,
-
+---
+pw-bot: cr
 
