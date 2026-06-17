@@ -1,291 +1,410 @@
-Return-Path: <netdev+bounces-300128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300129-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 00EuOlmAMmrm0wUAu9opvQ
-	(envelope-from <netdev+bounces-300128-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:09:13 +0200
+	id ClcHLKV9MmoB0wUAu9opvQ
+	(envelope-from <netdev+bounces-300129-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 12:57:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EFE698D59
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:09:12 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50936698BB3
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 12:57:41 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b=JpjJwjtn;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300128-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300128-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	dkim=pass header.d=samsung.com header.s=mail20170921 header.b=tKc3cGqm;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300129-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300129-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=samsung.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id EB9E431CD711
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:48:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F1F4830744DA
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F38C3DD538;
-	Wed, 17 Jun 2026 10:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00DA3A6EED;
+	Wed, 17 Jun 2026 10:48:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3AB3D300F;
-	Wed, 17 Jun 2026 10:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A3B3A3821
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 10:48:31 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781693154; cv=none; b=SkuHVsZx10qqar9qLewfi+LIYJPBYJ1PQdhySg5mCKTdOAri5WAVDakuD3xSiOO5a4zKZtSAwh5+BPw0oE+vhvrVil632pEbkwjAiQIh9VW96fRAFArZD15FODn+4vuP4H+BeooOJizd2YJUWt5H4j8lLLTRg8AbfvI5fBWgxsY=
+	t=1781693314; cv=none; b=uOyit6QHRU+Fh/Q7yK8p5Dm8lsaw5Rcdlb3tfu+4CkjonkhodY7uYMu1vCYAnEZgu8rNYv+iT1KVCb2V+G5WI1+EI0pWafCfyvGNsU0fW8J7ft56i7VTHC3AMrFQBwHzdaxQSV8cuqFMyuQiCqYnbvo9vMWq4uDNXO3eC3IkBEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781693154; c=relaxed/simple;
-	bh=fpCMJMfU8wCh9S5pVZpQhY4EtacnSTJn86rKnPyCsIo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iX50rm0KKsIa5BXSsuta+QXvJyuWVLMzHpJTTn8zvnubOxjI7+hJ45Rcjy8R6+bKHRT0b6Pz0XKKSydM7DVoQKezJI0XQK5gined6SSeIoPQrXUTVspcmDmAQ0cuMpmwi2/R9PvLSEqnLMJHJ38qNXQVksaxUI8YZ/Qbu40TPKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JpjJwjtn; arc=none smtp.client-ip=67.231.156.173
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65H8XnFk1525406;
-	Wed, 17 Jun 2026 03:45:33 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=dgUc1U9bzeG3nrMDE26EL79
-	6nxMAkwRFFQYzLKu4kLM=; b=JpjJwjtn6Vdy2/N5ivVhfY4CQA4Th9h56tEuvr3
-	+mRHVIk487E5ccpL8zS//RAKFPWSXsbAS94cttJb8bLxy3KEA2vB5PlAIiRW0qG0
-	jk25YEQIwqefg/49YhyFjKMsobfX8HwKVc7gFGYDBtG80FeA+JNcFEWKFODr9vk1
-	IxRvIQMcMPslUJRWsklh666laAwslbLo6DwWQmS9a/bYFjkGItXPTO6yRaypA0tF
-	t8fc76Dq5lW6trTlPOf3UtI6fGRihvSXnR0swsOOYGlFMA6vamno2ZVKPaK4DVof
-	IBfqCax6zAeMuuItVWJ85pLOb+FFG37KbEaSTDNqHwsTqpw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4eueg5a4ge-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jun 2026 03:45:32 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 17 Jun 2026 03:45:32 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 17 Jun 2026 03:45:32 -0700
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 6BB873F7083;
-	Wed, 17 Jun 2026 03:45:28 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <davem@davemloft.net>, <hkelam@marvell.com>, <lcherian@marvell.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>
-CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        Ratheesh Kannoth <rkannoth@marvell.com>,
-        Yuho Choi <dbgh9129@gmail.com>
-Subject: [PATCH net] octeontx2-af: fix CGX debugfs RVU AF PCI reference leaks
-Date: Wed, 17 Jun 2026 16:15:25 +0530
-Message-ID: <20260617104525.1321395-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1781693314; c=relaxed/simple;
+	bh=vqBbJI3ntUoavEvQHGcur91R3czJE00FfezuYjOO484=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=DP01J9ws9fn+rqP2h8he+hUlfVGH5ve2A3G026txnsLRUeX/H0lfnfrgycVahy1vaX1EnabItpeeM3pw3Kiud+XoPIDFXmYf7hq2BdcNoQmWaQRCpM+4gPy3gpdD5lF1HJnH9CI7fC6Uv+i13a2gnYafSab5rO1HkmWfuB9+eVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=tKc3cGqm; arc=none smtp.client-ip=210.118.77.11
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260617104823euoutp011ade9d559902e2a75871383e0b3a9e03~52J6vUP5I2406124061euoutp01q
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 10:48:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260617104823euoutp011ade9d559902e2a75871383e0b3a9e03~52J6vUP5I2406124061euoutp01q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1781693303;
+	bh=H9+b5Wb0VfYI+H7N1dUrr+Bdd92hyU4Y1QKyd0n/6qw=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=tKc3cGqmJP+haNfkuh/m/IuCPf8DXeDvYFyOZRBl+BP4134KvG8Pv6HyGDr+OFqw6
+	 8Qc4qJ+RGXAIFqbM2iZJVCOipGzzQlMFO7baRsEeo2xjrfcBDlppFs6ygLbyRU8UnN
+	 l0joyN9T3Dn1/9feUQqBhfgTMOV3PAM2Urd8HGYQ=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260617104823eucas1p2268fc45472e6acbcbe70ee7813b4e9dd~52J6Kw6K60448104481eucas1p2U;
+	Wed, 17 Jun 2026 10:48:23 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260617104822eusmtip12d62084603d36bdf3e6769bf4da55325~52J5uw_A22833428334eusmtip1C;
+	Wed, 17 Jun 2026 10:48:22 +0000 (GMT)
+Message-ID: <a443376e-5187-4268-93b3-58047ef113a8@samsung.com>
+Date: Wed, 17 Jun 2026 12:48:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH v3 net] net: watchdog: fix refcount tracking races
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com,
+	syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20260611152737.2580480-1-edumazet@google.com>
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Vbpte_-QjHKcLXNw1awkVAca6NLIbz5p
-X-Proofpoint-ORIG-GUID: Vbpte_-QjHKcLXNw1awkVAca6NLIbz5p
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE3MDEwMSBTYWx0ZWRfXx6Ex00+gm1Xn
- UwmzCy+mTxfrYYNJJl2YV1DY1VCZntLEaZhAWb4VNeoXOsaPxpmM8VbPQxTDKi5rlsNBIMcHVNt
- vwZcxoLSGdtv9FvbRUZbtkCZLvlPkaU=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE3MDEwMSBTYWx0ZWRfX2DVN+VVqitV+
- 3Usvjs5WMHfQZ/fFBmhqeHF687+XWEPvA8LLh3c55gooLZL/amRQlgWG9xBGjSoGSAOebzP0HSY
- 2AFPQIHiE4Tofn/vrasGkyEhcEql98zr/Udh2LM1DNVy37nSy4VZOJs6t5pi4Aalhf8VBanFOBm
- /iqSgDBpNX+NGqE4FhSCNTbvLZxPRYQAmnMbc7EWYmgiCJ3Ycem4LuU/H5VGGP5F090eUqndugG
- CsA3+4VF4Dpn2KyU0A7ob2QowY6l37+jCE7BJ1EGrWKhYNDmQxzJDjyytakpBzDlXQmceoa7XCf
- 4rl8IjC4o6coHaMogUO23WC7lBTTUIMVfCe9tRBUczxVrlGZiB5+/pkWLxzdaoJNPwVSKEkMkBv
- asc5YZ8+tvHhyTqKtsvKc1x5QQnelr+1gP/9Q0rUGiG5vSBqcDfonZb4ROXryeJfAGmfRtCUfbK
- 9llpWOHlRAcTEumY8mQ==
-X-Authority-Analysis: v=2.4 cv=UqNT8ewB c=1 sm=1 tr=0 ts=6a327acc cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=QXcCYyLzdtTjyudCfB6f:22 a=M5GUcnROAAAA:8 a=pGLkceISAAAA:8
- a=a4YZzIsXFeaM3Y4ekB4A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-17_01,2026-06-16_02,2025-10-01_01
+X-CMS-MailID: 20260617104823eucas1p2268fc45472e6acbcbe70ee7813b4e9dd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260617104823eucas1p2268fc45472e6acbcbe70ee7813b4e9dd
+X-EPHeader: CA
+X-CMS-RootMailID: 20260617104823eucas1p2268fc45472e6acbcbe70ee7813b4e9dd
+References: <20260611152737.2580480-1-edumazet@google.com>
+	<CGME20260617104823eucas1p2268fc45472e6acbcbe70ee7813b4e9dd@eucas1p2.samsung.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-3.65 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[samsung.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[samsung.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[samsung.com:s=mail20170921];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300128-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[lunn.ch,google.com,kernel.org,marvell.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	XM_UA_NO_VERSION(0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300129-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:edumazet@google.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:eric.dumazet@gmail.com,m:syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com,m:syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com,m:ericdumazet@gmail.com,m:syzbot@syzkaller.appspotmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[m.szyprowski@samsung.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:davem@davemloft.net,m:hkelam@marvell.com,m:lcherian@marvell.com,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:kuba@kernel.org,m:rkannoth@marvell.com,m:dbgh9129@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[m.szyprowski@samsung.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[samsung.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TAGGED_RCPT(0.00)[netdev,381d82bbf0253710b35d,3479efbc2821cb2a79f2];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,appspotmail.com:email,samsung.com:dkim,samsung.com:mid,samsung.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E6EFE698D59
+X-Rspamd-Queue-Id: 50936698BB3
 
-CGX per-lmac debugfs seq readers obtained struct rvu via
-pci_get_drvdata(pci_get_device(..., PCI_DEVID_OCTEONTX2_RVU_AF, ...)),
-which leaks a PCI device reference on every read. Store rvu and the CGX
-handle in debugfs inode private data when creating stats, mac_filter,
-and fwdata files (one context per CGX), and use debugfs aux numbers for
-fwdata so lmac_id matches the other CGX debugfs entries.
+Dear All,
 
-Fixes: f967488d095e ("octeontx2-af: Add per CGX port level NIX Rx/Tx counters")
-Fixes: dbc52debf95f ("octeontx2-af: Debugfs support for DMAC filters")
-Fixes: 49f02e6877d1 ("Octeontx2-af: Debugfs support for firmware data")
-Cc: Linu Cherian <lcherian@marvell.com>
-Reported-by: Yuho Choi <dbgh9129@gmail.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../marvell/octeontx2/af/rvu_debugfs.c        | 77 ++++++++++---------
- 1 file changed, 42 insertions(+), 35 deletions(-)
+On 11.06.2026 17:27, Eric Dumazet wrote:
+> Blamed commit converted the untracked dev_hold()/dev_put() calls
+> in the watchdog code to use the tracked dev_hold_track()/dev_put_track()
+> (which were later renamed/interfaced to netdev_hold() and netdev_put()).
+>
+> By introducing dev->watchdog_dev_tracker to store the
+> reference tracking information without adding synchronization
+> between netdev_watchdog_up() and dev_watchdog(), it enabled the
+> race condition where this pointer could be overwritten or freed
+> concurrently, leading to the list corruption crash syzbot reported:
+>
+> list_del corruption, ffff888114a18c00->next is NULL
+>  kernel BUG at lib/list_debug.c:52 !
+> Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+> CPU: 1 UID: 0 PID: 91 Comm: kworker/u8:5 Not tainted syzkaller #0 PREEMPT(lazy)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/09/2026
+> Workqueue: events_unbound linkwatch_event
+>  RIP: 0010:__list_del_entry_valid_or_report.cold+0x22/0x2a lib/list_debug.c:52
+> Call Trace:
+>  <TASK>
+>   __list_del_entry_valid include/linux/list.h:132 [inline]
+>   __list_del_entry include/linux/list.h:246 [inline]
+>   list_move_tail include/linux/list.h:341 [inline]
+>   ref_tracker_free+0x1a7/0x6c0 lib/ref_tracker.c:329
+>   netdev_tracker_free include/linux/netdevice.h:4491 [inline]
+>   netdev_put include/linux/netdevice.h:4508 [inline]
+>   netdev_put include/linux/netdevice.h:4504 [inline]
+>   netdev_watchdog_down net/sched/sch_generic.c:600 [inline]
+>   dev_deactivate_many+0x28c/0xfe0 net/sched/sch_generic.c:1363
+>   dev_deactivate+0x109/0x1d0 net/sched/sch_generic.c:1397
+>   linkwatch_do_dev net/core/link_watch.c:184 [inline]
+>   linkwatch_do_dev+0xd3/0x120 net/core/link_watch.c:166
+>   __linkwatch_run_queue+0x3a5/0x810 net/core/link_watch.c:240
+>   linkwatch_event+0x8f/0xc0 net/core/link_watch.c:314
+>   process_one_work+0xa0e/0x1980 kernel/workqueue.c:3314
+>   process_scheduled_works kernel/workqueue.c:3397 [inline]
+>   worker_thread+0x5ef/0xe50 kernel/workqueue.c:3478
+>   kthread+0x370/0x450 kernel/kthread.c:436
+>   ret_from_fork+0x69a/0xc80 arch/x86/kernel/process.c:158
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>
+> This patch has three coordinated parts:
+>
+> 1) Add dev->watchdog_lock and dev->watchdog_ref_held to serialize watchdog operations.
+>
+> 2) Remove netdev_watchdog_up() call from netif_carrier_on():
+>    This ensures netdev_watchdog_up() is only called from process/BH context
+>    (via linkwatch workqueue dev_activate()), allowing us to use
+>    spin_lock_bh() for synchronization.
+>
+> 3) Synchronize watchdog up and watchdog timer:
+>    Protect netdev_watchdog_up() with tx_global_lock and watchdog_lock.
+>    Only allocate a new tracker in netdev_watchdog_up() if one is
+>    not already present.
+>    In dev_watchdog(), ensure we don't release the tracker if the
+>    timer was rescheduled either by dev_watchdog() itself or concurrently
+>    by netdev_watchdog_up().
+>
+> Fixes: f12bf6f3f942 ("net: watchdog: add net device refcount tracker")
+> Reported-by: syzbot+381d82bbf0253710b35d@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6a26b751.c25708ab.1b19ef.0013.GAE@google.com/T/#u
+> Tested-by: syzbot+3479efbc2821cb2a79f2@syzkaller.appspotmail.com
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+This patch landed recently in linux-next as commit 8eed5519e496 ("net: watchdog:
+fix refcount tracking races"). In my tests I found that it causes the following
+deadlock during system suspend/resume on QEmu's ARM64bit 'virt' machine:
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index fa461489acdd..77ff734438cd 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2809,6 +2809,14 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
- 			    &rvu_dbg_npa_ndc_hits_miss_fops);
- }
- 
-+/* Per-lmac CGX debugfs files need both RVU and CGX handle; inode->i_private
-+ * points here so seq_file ops avoid pci_get_device(PCI_DEVID_OCTEONTX2_RVU_AF).
-+ */
-+struct rvu_cgx_lmac_dbgfs_ctx {
-+	struct rvu	*rvu;
-+	void		*cgxd;
-+};
-+
- #define PRINT_CGX_CUML_NIXRX_STATUS(idx, name)				\
- 	({								\
- 		u64 cnt;						\
-@@ -2831,18 +2839,14 @@ static void rvu_dbg_npa_init(struct rvu *rvu)
- 
- static int cgx_print_stats(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
- 	struct cgx_link_user_info linfo;
- 	struct mac_ops *mac_ops;
--	void *cgxd = s->private;
-+	void *cgxd = dctx->cgxd;
-+	struct rvu *rvu = dctx->rvu;
- 	u64 ucast, mcast, bcast;
- 	int stat = 0, err = 0;
- 	u64 tx_stat, rx_stat;
--	struct rvu *rvu;
--
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
- 
- 	mac_ops = get_mac_ops(cgxd);
- 	/* There can be no CGX devices at all */
-@@ -2949,20 +2953,16 @@ RVU_DEBUG_SEQ_FOPS(cgx_stat, cgx_stat_display, NULL);
- 
- static int cgx_print_dmac_flt(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
- 	struct pci_dev *pdev = NULL;
--	void *cgxd = s->private;
-+	void *cgxd = dctx->cgxd;
-+	struct rvu *rvu = dctx->rvu;
- 	char *bcast, *mcast;
- 	u16 index, domain;
- 	u8 dmac[ETH_ALEN];
--	struct rvu *rvu;
- 	u64 cfg, mac;
- 	int pf;
- 
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
--
- 	pf = cgxlmac_to_pf(rvu, cgx_get_cgxid(cgxd), lmac_id);
- 	domain = 2;
- 
-@@ -3009,17 +3009,13 @@ RVU_DEBUG_SEQ_FOPS(cgx_dmac_flt, cgx_dmac_flt_display, NULL);
- 
- static int cgx_print_fwdata(struct seq_file *s, int lmac_id)
- {
-+	struct rvu_cgx_lmac_dbgfs_ctx *dctx = s->private;
- 	struct cgx_lmac_fwdata_s *fwdata;
--	void *cgxd = s->private;
-+	void *cgxd = dctx->cgxd;
-+	struct rvu *rvu = dctx->rvu;
- 	struct phy_s *phy;
--	struct rvu *rvu;
- 	int cgx_id, i;
- 
--	rvu = pci_get_drvdata(pci_get_device(PCI_VENDOR_ID_CAVIUM,
--					     PCI_DEVID_OCTEONTX2_RVU_AF, NULL));
--	if (!rvu)
--		return -ENODEV;
--
- 	if (!rvu->fwdata)
- 		return -EAGAIN;
- 
-@@ -3126,20 +3122,31 @@ static void rvu_dbg_cgx_init(struct rvu *rvu)
- 		rvu->rvu_dbg.cgx = debugfs_create_dir(dname,
- 						      rvu->rvu_dbg.cgx_root);
- 
--		for_each_set_bit(lmac_id, &lmac_bmap, rvu->hw->lmac_per_cgx) {
--			/* lmac debugfs dir */
--			sprintf(dname, "lmac%d", lmac_id);
--			rvu->rvu_dbg.lmac =
--				debugfs_create_dir(dname, rvu->rvu_dbg.cgx);
--
--			debugfs_create_file_aux_num("stats", 0600, rvu->rvu_dbg.lmac,
--					    cgx, lmac_id, &rvu_dbg_cgx_stat_fops);
--			debugfs_create_file_aux_num("mac_filter", 0600,
--					    rvu->rvu_dbg.lmac, cgx, lmac_id,
--					    &rvu_dbg_cgx_dmac_flt_fops);
--			debugfs_create_file("fwdata", 0600,
--					    rvu->rvu_dbg.lmac, cgx,
--					    &rvu_dbg_cgx_fwdata_fops);
-+		{
-+			struct rvu_cgx_lmac_dbgfs_ctx *ctx;
-+
-+			ctx = devm_kzalloc(rvu->dev, sizeof(*ctx), GFP_KERNEL);
-+			if (!ctx)
-+				continue;
-+
-+			ctx->rvu = rvu;
-+			ctx->cgxd = cgx;
-+
-+			for_each_set_bit(lmac_id, &lmac_bmap, rvu->hw->lmac_per_cgx) {
-+				/* lmac debugfs dir */
-+				sprintf(dname, "lmac%d", lmac_id);
-+				rvu->rvu_dbg.lmac =
-+					debugfs_create_dir(dname, rvu->rvu_dbg.cgx);
-+
-+				debugfs_create_file_aux_num("stats", 0600, rvu->rvu_dbg.lmac,
-+							    ctx, lmac_id, &rvu_dbg_cgx_stat_fops);
-+				debugfs_create_file_aux_num("mac_filter", 0600,
-+							    rvu->rvu_dbg.lmac, ctx, lmac_id,
-+							    &rvu_dbg_cgx_dmac_flt_fops);
-+				debugfs_create_file_aux_num("fwdata", 0600,
-+							    rvu->rvu_dbg.lmac, ctx,
-+							    lmac_id, &rvu_dbg_cgx_fwdata_fops);
-+			}
- 		}
- 	}
- }
+root@target:~# time rtcwake -s10 -mmem
+rtcwake: assuming RTC uses UTC ...
+rtcwake: wakeup from "mem" using /dev/rtc0 at Wed Jun 17 10:46:12 2026
+PM: suspend entry (s2idle)
+Filesystems sync: 0.055 seconds
+Freezing user space processes
+Freezing user space processes completed (elapsed 0.006 seconds)
+OOM killer disabled.
+Freezing remaining freezable tasks
+Freezing remaining freezable tasks completed (elapsed 0.003 seconds)
+
+============================================
+WARNING: possible recursive locking detected
+7.1.0-rc7+ #13003 Not tainted
+--------------------------------------------
+rtcwake/254 is trying to acquire lock:
+ffff000006de64e8 (&dev->tx_global_lock){+.-.}-{3:3}, at: netdev_watchdog_up+0x40/0x108
+
+but task is already holding lock:
+ffff000006de64e8 (&dev->tx_global_lock){+.-.}-{3:3}, at: netif_tx_lock+0x1c/0x34
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&dev->tx_global_lock);
+  lock(&dev->tx_global_lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+6 locks held by rtcwake/254:
+ #0: ffff0000071ab3e8 (sb_writers#5){.+.+}-{0:0}, at: vfs_write+0x1ec/0x35c
+ #1: ffff00000d22c480 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xf0/0x1c4
+ #2: ffff0000049162c8 (kn->active#61){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x100/0x1c4
+ #3: ffffaa79533c03b0 (system_transition_mutex){+.+.}-{4:4}, at: pm_suspend+0x98/0x608
+ #4: ffff000005e3a138 (&dev->mutex){....}-{4:4}, at: device_resume+0xb4/0x254
+ #5: ffff000006de64e8 (&dev->tx_global_lock){+.-.}-{3:3}, at: netif_tx_lock+0x1c/0x34
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 254 Comm: rtcwake Not tainted 7.1.0-rc7+ #13003 PREEMPT
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ show_stack+0x18/0x24 (C)
+ dump_stack_lvl+0x90/0xd0
+ dump_stack+0x18/0x24
+ print_deadlock_bug+0x260/0x350
+ __lock_acquire+0x11b8/0x225c
+ lock_acquire+0x1c4/0x3f0
+ _raw_spin_lock_bh+0x50/0x68
+ netdev_watchdog_up+0x40/0x108
+ netif_device_attach+0x9c/0xb0
+ virtnet_restore+0x100/0x21c
+ virtio_device_restore_priv+0x11c/0x1d0
+ virtio_device_restore+0x14/0x20
+ virtio_mmio_restore+0x34/0x40
+ platform_pm_resume+0x2c/0x68
+ dpm_run_callback+0xa0/0x240
+ device_resume+0x120/0x254
+ dpm_resume+0x1f8/0x2ec
+ dpm_resume_end+0x18/0x34
+ suspend_devices_and_enter+0x1d0/0x990
+ pm_suspend+0x1ec/0x608
+ state_store+0x8c/0x110
+ kobj_attr_store+0x18/0x2c
+ sysfs_kf_write+0x50/0x7c
+ kernfs_fop_write_iter+0x130/0x1c4
+ vfs_write+0x2b8/0x35c
+ ksys_write+0x6c/0x104
+ __arm64_sys_write+0x1c/0x28
+ invoke_syscall+0x54/0x110
+ el0_svc_common.constprop.0+0x40/0xe8
+ do_el0_svc+0x20/0x2c
+ el0_svc+0x54/0x338
+ el0t_64_sync_handler+0xa0/0xe4
+ el0t_64_sync+0x198/0x19c
+
+
+Reverting $subject on top of linux-next fixes this issue.
+
+
+> ---
+> v3: added dev->watchdog_lock and dev->watchdog_ref_held instead of messing
+>     with ref tracker infra. (after sashiko feedback on v2)
+> v2: fix compile error when CONFIG_NET_DEV_REFCNT_TRACKER is not set (Jakub and build bots)
+>
+>  include/linux/netdevice.h |  4 ++++
+>  net/core/dev.c            |  3 ++-
+>  net/sched/sch_generic.c   | 44 +++++++++++++++++++++++++++++----------
+>  3 files changed, 39 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 0e1e581efc5ac264259b2f0fdfe41c50a6f47239..4a0e83709f29e4bcf12f479e464e6bedecc61c69 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1980,6 +1980,8 @@ enum netdev_reg_state {
+>   *	@qdisc_hash:		qdisc hash table
+>   *	@watchdog_timeo:	Represents the timeout that is used by
+>   *				the watchdog (see dev_watchdog())
+> + *	@watchdog_lock:		protect watchdog_ref_held
+> + *	@watchdog_ref_held:	True if the watchdog device ref is taken.
+>   *	@watchdog_timer:	List of timers
+>   *
+>   *	@proto_down_reason:	reason a netdev interface is held down
+> @@ -2392,6 +2394,8 @@ struct net_device {
+>  	/* These may be needed for future network-power-down code. */
+>  	struct timer_list	watchdog_timer;
+>  	int			watchdog_timeo;
+> +	spinlock_t		watchdog_lock;
+> +	bool			watchdog_ref_held;
+>  
+>  	u32                     proto_down_reason;
+>  
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 0c6c270d9f7d115feb824f4ebe6be122c40d745f..731e661d7be6574d5eca4a600e0a5623be4c2485 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -11217,7 +11217,8 @@ static int netif_alloc_netdev_queues(struct net_device *dev)
+>  
+>  	netdev_for_each_tx_queue(dev, netdev_init_one_queue, NULL);
+>  	spin_lock_init(&dev->tx_global_lock);
+> -
+> +	spin_lock_init(&dev->watchdog_lock);
+> +	dev->watchdog_ref_held = false;
+>  	return 0;
+>  }
+>  
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index a93321db8fd75d30c61e146c290bbc139c37c913..6cdf2ccfb0937e45271f8690a0c09d48a24ce769 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -568,16 +568,24 @@ static void dev_watchdog(struct timer_list *t)
+>  				dev->netdev_ops->ndo_tx_timeout(dev, i);
+>  				netif_unfreeze_queues(dev);
+>  			}
+> -			if (!mod_timer(&dev->watchdog_timer,
+> -				       round_jiffies(oldest_start +
+> -						     dev->watchdog_timeo)))
+> -				release = false;
+> +			spin_lock(&dev->watchdog_lock);
+> +			mod_timer(&dev->watchdog_timer,
+> +				  round_jiffies(oldest_start +
+> +						dev->watchdog_timeo));
+> +			release = false;
+> +			spin_unlock(&dev->watchdog_lock);
+>  		}
+>  	}
+>  	spin_unlock(&dev->tx_global_lock);
+>  
+> -	if (release)
+> +	spin_lock(&dev->watchdog_lock);
+> +	if (timer_pending(&dev->watchdog_timer))
+> +		release = false;
+> +	if (release && dev->watchdog_ref_held) {
+>  		netdev_put(dev, &dev->watchdog_dev_tracker);
+> +		dev->watchdog_ref_held = false;
+> +	}
+> +	spin_unlock(&dev->watchdog_lock);
+>  }
+>  
+>  void netdev_watchdog_up(struct net_device *dev)
+> @@ -586,18 +594,34 @@ void netdev_watchdog_up(struct net_device *dev)
+>  		return;
+>  	if (dev->watchdog_timeo <= 0)
+>  		dev->watchdog_timeo = 5*HZ;
+> +	spin_lock_bh(&dev->tx_global_lock);
+> +
+> +	spin_lock(&dev->watchdog_lock);
+>  	if (!mod_timer(&dev->watchdog_timer,
+> -		       round_jiffies(jiffies + dev->watchdog_timeo)))
+> -		netdev_hold(dev, &dev->watchdog_dev_tracker,
+> -			    GFP_ATOMIC);
+> +		       round_jiffies(jiffies + dev->watchdog_timeo))) {
+> +		if (!dev->watchdog_ref_held) {
+> +			netdev_hold(dev, &dev->watchdog_dev_tracker,
+> +				    GFP_ATOMIC);
+> +			dev->watchdog_ref_held = true;
+> +		}
+> +	}
+> +	spin_unlock(&dev->watchdog_lock);
+> +
+> +	spin_unlock_bh(&dev->tx_global_lock);
+>  }
+>  EXPORT_SYMBOL_GPL(netdev_watchdog_up);
+>  
+>  static void netdev_watchdog_down(struct net_device *dev)
+>  {
+>  	netif_tx_lock_bh(dev);
+> -	if (timer_delete(&dev->watchdog_timer))
+> +
+> +	spin_lock(&dev->watchdog_lock);
+> +	if (timer_delete(&dev->watchdog_timer)) {
+>  		netdev_put(dev, &dev->watchdog_dev_tracker);
+> +		dev->watchdog_ref_held = false;
+> +	}
+> +	spin_unlock(&dev->watchdog_lock);
+> +
+>  	netif_tx_unlock_bh(dev);
+>  }
+>  
+> @@ -614,8 +638,6 @@ void netif_carrier_on(struct net_device *dev)
+>  			return;
+>  		atomic_inc(&dev->carrier_up_count);
+>  		linkwatch_fire_event(dev);
+> -		if (netif_running(dev))
+> -			netdev_watchdog_up(dev);
+>  	}
+>  }
+>  EXPORT_SYMBOL(netif_carrier_on);
+
+Best regards
 -- 
-2.43.0
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
