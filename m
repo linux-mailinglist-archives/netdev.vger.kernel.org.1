@@ -1,45 +1,85 @@
-Return-Path: <netdev+bounces-300050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id ENJFINRDMmqvxgUAu9opvQ
-	(envelope-from <netdev+bounces-300050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:51:00 +0200
+	id dm8JFv9DMmq0xgUAu9opvQ
+	(envelope-from <netdev+bounces-300051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:51:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6AF2696F36
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7794696F43
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:51:42 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300050-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300050-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=WCqJCXi9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300051-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300051-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EB2830A19A3
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 06:48:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D03D3051176
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 06:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC14D3B38B8;
-	Wed, 17 Jun 2026 06:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FA33B6BF1;
+	Wed, 17 Jun 2026 06:50:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0943064AE
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:48:40 +0000 (UTC)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6342E381AFC
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:50:48 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781678924; cv=none; b=cSs30IcbUcpnGDvqPrZDnjJHXtMQRgdUN7kn3chHkDIB40vVY7Z17DzAg2Z+XjRrgoxGchm2DLP9Sk1KOgXFlCcj6HUJcdEJfwBskrBhZ0/8JrpDZYkHLhvDYW/lSGyAw6Ab2ChZ39skdCnlO53/eCsl2dmmKkLD2oCnptIeT9M=
+	t=1781679049; cv=none; b=ZbUL6B2oGRZmH0fF8T74jB3C6cLNk6Sv4Z6mtANTL94z7xN24HsZcRiAU58kfjwPglgfbVuLdiiGQAsBZcaykdr7rOl6S8udm6rxSdJeYpmdz1M+rwVMDCT25sJff57it9LTBpS+KZ3h0ca04yfdZRxAJxxnckiaufgIiauqNr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781678924; c=relaxed/simple;
-	bh=9EhSdvYnNJvk8KIBHAqKwEp2ArS/nAALopSYcQ+7Jsw=;
+	s=arc-20240116; t=1781679049; c=relaxed/simple;
+	bh=C7YFZCCu1dOeCsLg6DoF+9ZVtNHvPRq+h+Zo6dLBmB0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mYJ3y0Dl2JRhUD6pjP/1st73BI3BvFTi6U2YYTF5UP653yb54gLnkCL4L6p/dU5BT5L9Ntw1TWPKedGmWp0mV+FRAIABh/7M8p8vaL5IJn8R1MM3oMZfi1huHICO+OebSFzju+jukvXRtma62WvqCM7K1lupQ8/s175TRARePt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hust.edu.cn; spf=pass smtp.mailfrom=hust.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Received: from hust.edu.cn (unknown [172.16.0.50])
-	by app1 (Coremail) with SMTP id HgEQrAA3DqM5QzJqWVmxAA--.18483S2;
-	Wed, 17 Jun 2026 14:48:25 +0800 (CST)
-Received: from [198.18.0.1] (unknown [39.144.124.20])
-	by gateway (Coremail) with SMTP id _____wDn7+s2QzJqmf8sAA--.48457S2;
-	Wed, 17 Jun 2026 14:48:24 +0800 (CST)
-Message-ID: <c14e4b47-0cc0-4141-b0d8-f80633594402@hust.edu.cn>
-Date: Wed, 17 Jun 2026 14:48:22 +0800
+	 In-Reply-To:Content-Type; b=DuNjliq3HxMeytqYFNSxprO49CLFXscHSgPwTSFG1OC9WbXuTKQUFJGbYbuzMqxgtKPf+e29kVkyh/Qizq7bE7NwS4tjvn0Y9J60iyj7yUJ5jdEsFRbZ1cgOSFiNjSkH1Awl3AMqWDzarJKb/8SRDRGgchkM/9qL8AaLrSjWTXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WCqJCXi9; arc=none smtp.client-ip=209.85.221.41
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-46066e640easo3288185f8f.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 23:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781679047; x=1782283847; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Trq1GUdrJefwFDKO73LEpHAox6MBJ2GUwy+Cih5DopY=;
+        b=WCqJCXi9yibRSJ5D2QIBg96wVMVBsltG7hqEhWSiMMjpnepNe7JZcNqou8TvpStsC5
+         0O2VRVRDsZr8u6wYnVE9CMPpGHdot2XRhpzV5dySGs2ikkqUNBVPnz3FHJ7bZ1+V+TEP
+         aihcJCNbrHAZozcBZVodaoqGw+qhMxEUK8KO5H5WWYnmMpFxSCOLQKtK/fGUyB/z8sxB
+         ijoPo6PGn3OTd36WIVXzLOKNiutmb6rQoKwKI6s7cRcJ/20qJnOCoCpTeuT7D0VkSDkp
+         2SON5gb7viS29bcJumAjOzlr6/idKj4TDUPRF4JNb8d4dR/xoIkC+K73wDSZqiZ4ZhXu
+         aoVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781679047; x=1782283847;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Trq1GUdrJefwFDKO73LEpHAox6MBJ2GUwy+Cih5DopY=;
+        b=Y4krXeAh4vce4z1EoSTncxr9WxhW53wSClrwNJ4Jyrbq2A50AbtFNWVOMdDluuhf+y
+         1pW78N6ac3z1oy4HwgcRmU1kQ1vd7Vrpx3m0WuypJV3LKLkFYWg0NF2Jd5bxHu9JncoY
+         bOAfPlisgJLrbHdenMlBncvFrZh+GYhyUQRD1NrH4YjkiJUNTjbirpTyr0QZf0xPQPuR
+         To2ZkF9LSpswTwLkV3+pzv4nZJ2XsBNOZEYiOuYs4shqD76Bgyu1fhoKBHwSNluOTQNP
+         vKB3pCcJ/7vpDGKJ7rj37aDC9lC0Mt3F2y6nDRdsbzx4VhBtJB2sonOU+3v1x/tf7gQH
+         R8VQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8mnKFxu6nFAPPAUZF7lLJ6ohtITkpuIJy/IfwQ5NI7gV9PGBlHHREpzaI0jcGWCSyTpp7fXXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwyaNcF68cCnXFLurYOyz9+4t7tSj/ejI8jQKppQPPd08d9hmR
+	CV8sMzBZXU/YNlyM6h0N9LBpJkAwbLjgmAYTZvJNWW5aoE50C1zDuZmV
+X-Gm-Gg: Acq92OEtg/SKsgUxVFZ9Ck9ecH4URgeCcLSY1fsCkorPLVYOcMqrHquoqDvYlFSyZxX
+	heJxJpngLPGJD0pvxf7wARQlby1PF++qobHwSvRTAGqLA60Q1OYQQYipW3z5ZYmr6MGxDHZCArX
+	MXW/SNTPuyZgPbAjs1m29UYSBjsboaae4OjpBpEptCYC2UIyfOwNAnoNQOR0rssD72/oFMjFNkB
+	1217kior55GicQqjuHyLosBzVcW3+uVmgtEHlwA8/0txCvpJmEBOlgnzo2n5ENk+my7jynTDN5v
+	KdvRetO7Vzc1k8RvQwov5Hqgf8TFZVrWKnFWBsLrKJHuPOh7Uf6QLSuq6n+MCr0TgeJdKKsjsh3
+	dUBxc4LNRCdEhZS7UcaWQ7di2iTxkpe2QgUTd8wG+KRJi3v9TZTX7lel/cAins/7rKP/FPDgTIq
+	AZTJndi8+WSbE0GDSQ8Q9Q1vvP2cGWdQJpZy/Hd98q6ilbrBniWxztm0EprcDng2mBYBmTd/HV3
+	hXtCeOXNwL8oLc=
+X-Received: by 2002:a05:600c:a111:b0:490:e5c1:b89d with SMTP id 5b1f17b1804b1-492333ffd28mr36380385e9.0.1781679046294;
+        Tue, 16 Jun 2026 23:50:46 -0700 (PDT)
+Received: from ?IPV6:2001:9e8:f13a:1701:b918:4041:7c7d:eb1d? ([2001:9e8:f13a:1701:b918:4041:7c7d:eb1d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49233bf0881sm41430175e9.2.2026.06.16.23.50.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jun 2026 23:50:45 -0700 (PDT)
+Message-ID: <36668b89-77ef-406f-9edc-ed57a025754b@gmail.com>
+Date: Wed, 17 Jun 2026 08:50:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,145 +87,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] nfc: pn533: prevent division by zero in the listen
- mode timer
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, David Heidelberg <david+nfc@ixit.cz>,
- Krzysztof Kozlowski <krzk@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Dan Carpenter <error27@gmail.com>, dzm91@hust.edu.cn,
- hust-os-kernel-patches@googlegroups.com
-References: <20260615103547.1599528-1-dddddd@hust.edu.cn>
- <20260616140209.GU712698@horms.kernel.org>
-From: Yinhao Hu <dddddd@hust.edu.cn>
-In-Reply-To: <20260616140209.GU712698@horms.kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: pse-pd: add bindings
+ for Realtek/Broadcom PSE MCU
+Content-Language: en-US
+To: Rob Herring <robh@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
+ =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+References: <20260612132944.460646-1-jelonek.jonas@gmail.com>
+ <20260612132944.460646-2-jelonek.jonas@gmail.com>
+ <20260615212959.GA1679454-robh@kernel.org>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <20260615212959.GA1679454-robh@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:HgEQrAA3DqM5QzJqWVmxAA--.18483S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw18Jr4rXr47XFWfXw48Crg_yoW5WrW5p3
-	98XF1ayr4DXr4UtF4jga98W3WrZ3Z7JFW8JrWrK39rCF90gF1ftFW5ta1agF4vkrZ5Ar12
-	yFW0gr98uay5AFDanT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBEb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
-	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1ln4kS14v26r
-	1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I8C
-	rVACY4xI64kE6c02F40Ex7xfMcIj64x0Y40En7xvr7AKxVW8Jr0_Cr1UMcIj6x8ErcxFaV
-	Av8VW8uFyUJr1UMcIj6xkF7I0En7xvr7AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJVW8
-	JwACjcxG0xvEwIxGrwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fZr1UJr
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07bxrWwUUUUU
-	=
-X-CM-SenderInfo: bgsqjkiyqyjko6kx23oohg3hdfq/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300050-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ixit.cz,kernel.org,gmail.com,hust.edu.cn,googlegroups.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-300051-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[hust.edu.cn];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:david+nfc@ixit.cz,m:krzk@kernel.org,m:kuba@kernel.org,m:error27@gmail.com,m:dzm91@hust.edu.cn,m:hust-os-kernel-patches@googlegroups.com,m:david@ixit.cz,s:lists@lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:robh@kernel.org,m:o.rempel@pengutronix.de,m:kory.maincent@bootlin.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:daniel@makrotopia.org,m:bjorn@mork.no,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dddddd@hust.edu.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jelonekjonas@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,nfc];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A6AF2696F36
+X-Rspamd-Queue-Id: C7794696F43
 
-On 6/16/26 10:02 PM, Simon Horman wrote:
-> On Mon, Jun 15, 2026 at 03:35:47AM -0700, Yinhao Hu wrote:
->> The listen-mode timer handler advances the polling state machine through
->> pn533_poll_next_mod(), which computes:
+Hi Rob,
+
+On 15.06.26 23:29, Rob Herring wrote:
+> On Fri, Jun 12, 2026 at 01:29:41PM +0000, Jonas Jelonek wrote:
+>> [...]
 >>
->> dev->poll_mod_curr = (dev->poll_mod_curr + 1) % dev->poll_mod_count;
->>
->> pn533_poll_reset_mod_list() clears dev->poll_mod_count without first
->> stopping that timer: pn533_dep_link_down() deletes no timer at all, and
->> pn533_stop_poll() uses timer_delete(), which does not wait for a handler
->> already running on another CPU. When the handler runs after the count
->> has been zeroed, it divides by zero:
->>
->> Oops: divide error: 0000 [#1] SMP
->> RIP: 0010:pn533_listen_mode_timer+0x9b/0x110
->>
->> Delete the timer synchronously in pn533_poll_reset_mod_list(), the single
->> place that clears the list, so the handler can no longer run past a reset.
->> Also return early when poll_mod_count is already zero, covering the window
->> where pn533_wq_poll() re-arms the timer just before a reset.
->>
->> Fixes: 6fbbdc16be38 ("NFC: Implement pn533 polling loop")
->> Signed-off-by: Yinhao Hu <dddddd@hust.edu.cn>
->> ---
->>  drivers/nfc/pn533/pn533.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
->> index d7bdbc82e2ba..88df99001b4a 100644
->> --- a/drivers/nfc/pn533/pn533.c
->> +++ b/drivers/nfc/pn533/pn533.c
->> @@ -951,6 +951,7 @@ static inline void pn533_poll_next_mod(struct pn533 *dev)
->>  
->>  static void pn533_poll_reset_mod_list(struct pn533 *dev)
->>  {
->> +	timer_delete_sync(&dev->listen_timer);
->>  	dev->poll_mod_count = 0;
->>  }
->>  
->> @@ -1235,6 +1236,10 @@ static void pn533_listen_mode_timer(struct timer_list *t)
->>  {
->>  	struct pn533 *dev = timer_container_of(dev, t, listen_timer);
->>  
->> +	/* Polling may have been stopped while the timer was pending. */
->> +	if (!dev->poll_mod_count)
->> +		return;
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - realtek,pse-mcu-rtk
+> The "rtk" feels redundant.
+
+In the full Realtek case yes. Do you have a suggestion to improve
+that?
+
+>> +      - realtek,pse-mcu-bcm
+> "brcm" is the standard vendor prefix, so use that instead of "bcm". 
+> Though who defined the protocol in this case? Realtek or Broadcom? In 
+> the latter case, I'd argue that "brcm" should be the vendor prefix.
+
+I'll switch to brcm.
+As Daniel already mentioned, Realtek defines the firmware and thus
+the protocol, in both cases.
+
 >> +
-> 
-> I am concerned that access to poll_mod_count is not synchronised and thus
-> this may not work as intended.
-> 
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  power-supply:
+>> +    description: Regulator supplying the PoE power rail.
+>> +
+>> +  enable-gpios:
+>> +    maxItems: 1
+>> +
+>> +  realtek,i2c-protocol:
+>> +    $ref: /schemas/types.yaml#/definitions/string
+>> +    enum: [ i2c, smbus ]
+>> +    description: |
+>> +      Wire framing the MCU firmware expects on the I2C bus. "smbus" means
+>> +      reads carry a leading command byte (0x00) and a repeated start; "i2c"
+>> +      means bare 12-byte writes and reads with no command prefix. Only
+>> +      applies to the Realtek I2C attachment.
+> I tend to think this should be distinguished by the compatible string. 
+> That would simplify the schema given it only applies to one of the 
+> compatible strings.
 
-Thanks for the review.
+In theory this could also apply to the Broadcom dialect, however I didn't
+have a device with that variant on my desk.
 
-The guard's read is lockless, but it isn't what makes the fix safe;
-timer_delete_sync() is. pn533_poll_reset_mod_list() is the only place
-that clears the count, and it now syncs the timer before the store, so
-the handler can't be mid-pn533_poll_next_mod() when the count is zeroed.
+If you would go with separate compatibles, do you thought about
+something like "realtek,pse-mcu-rtk-i2c" and
+"realtek,pse-mcu-rtk-smbus" (given we stick with rtk) ?
 
-The early return is just a backstop for a timer re-armed after that
-reset, and it mirrors the existing lockless guard in
-pn533_poll_complete() ahead of the other pn533_poll_next_mod() call, the
-same pattern already in-tree.
+> Rob
 
-If you'd still prefer the lockless accesses marked explicitly, I can add
-READ_ONCE()/WRITE_ONCE() in v2.
-
->>  	dev->cancel_listen = 1;
->>  
->>  	pn533_poll_next_mod(dev);
->> -- 
->> 2.43.0
->>
-
+Best regards,
+Jonas
 
