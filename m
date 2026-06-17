@@ -1,100 +1,95 @@
-Return-Path: <netdev+bounces-300176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300177-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id i+/4GTCbMmoC2wUAu9opvQ
-	(envelope-from <netdev+bounces-300176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:03:44 +0200
+	id 2L5zNHygMmrM2wUAu9opvQ
+	(envelope-from <netdev+bounces-300177-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:26:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C9C699F18
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E96B69A149
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:26:20 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=6wind.com header.s=google header.b=Bg2O086R;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300176-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300176-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=6wind.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=amd.com header.s=selector1 header.b=RzXxlb1g;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300177-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300177-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amd.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D601E302B382
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:03:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DD1BC30058E4
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9013090C2;
-	Wed, 17 Jun 2026 13:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF0D401485;
+	Wed, 17 Jun 2026 13:26:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f97.google.com (mail-ed1-f97.google.com [209.85.208.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013069.outbound.protection.outlook.com [40.93.196.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45154306D3F
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 13:03:17 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781701399; cv=none; b=GFPjTh5Wce0QixNex3avHdsxVfGHoDHIA98KhayGbop61jp149ziZjpE0wF5KW9PDilFRR5Mb4pw6Kf3Cli5950DKPd32KFvgJ9GUW2q1iqPHhjmz/Hsk5iD02uBaP1pTmvvJcvk5bzrPD3Uh2fY2JH8kd64dy0/kAqiGrzdoOA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781701399; c=relaxed/simple;
-	bh=ts1rRBosKQFZ+v5qJKwv8dDssbtcNP04PVKunA0itA8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LunMmrQpFjn4JFILlZyQYnrIr11adPnSPyy4vUFnZP6FaGOQuqDN7Jka+FhBt+uyNg8YwETFj9tBuvmWEdwIbfyGJCGS5JxkWZdeNz7uvxfpctqne2lTyzc0z+QdMWXnsEqfn3OCJuEM+27i5j3mJ/kdB54RzeZ7G7BZhCLKdyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Bg2O086R; arc=none smtp.client-ip=209.85.208.97
-Received: by mail-ed1-f97.google.com with SMTP id 4fb4d7f45d1cf-687ed9aabb3so10504432a12.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:03:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1781701396; x=1782306196; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jcApDTh8G83mAxbEBCd++ik2ha9o+kyBGpiZ1fdPeto=;
-        b=Bg2O086RqQnQTeqTWCiuktLU5nhWjH3VuzjLm/GxTS492ajOeYhTYuUCccDHwK2aQG
-         GjKt+gBc3V8fUVnwHZ2z5+BFgDKMW9ngjrQJyA7evCdmOB9uaaAH8W7RZLl7Dt9skTRS
-         FsmtThofbN0LJg9v9WJq6u4H1WdbOMQXCNIQ30DOfejgZ4m6UuKHkSk9XzPozMy7BEWG
-         wVLPKYOl1qvhxz+dloWCQk4PDGiu9te4GSa93Ofdb4GJRPpSQbAG/Nm7G10sjSMgXp/X
-         Bs0Og7GBzWPKNI1Cbyfs22AcXOLom1dozzJgHfPVqKkLL82LHPB5x2a+6Iu6AN0jMcZu
-         s+jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781701396; x=1782306196;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jcApDTh8G83mAxbEBCd++ik2ha9o+kyBGpiZ1fdPeto=;
-        b=jOUcn2IJkJaKoVvEcZW4/dADKHAdeHG6+VEGRq/oUvjxwFCDHIN2wZhdMPiLYAb0e1
-         hvgM+ymyHDubHFQZy2mUsc2aTiRDfxDggQY9YeyWsz3SoUFttxDRJHhCQXdkuJNxvk3+
-         nMmaTkJBd8ow6kbUiLEFZgkAq+fjkiGn3K9MSoc9k7EkKZvFTJ4bIIAe2CUoA5fvMkcj
-         U7IXss79jYm6zvkTT+7W9sBZqxYjDTJhDA1WuCAVd0tcGvo2aTXMnLqzTAzatKdDlfM4
-         o5pqdhmOFIHLyXIMHzviqpfu6gwj9JVmNqVNINuYUX227XLwor71fS/9XRu8d5z88vgV
-         6J5Q==
-X-Gm-Message-State: AOJu0YwmGv3Q74/p6p1sSanhkyOlLoemo9MtqGw8mmK1IUKSKJ812R+z
-	YoaNO1pWdrmm/UpbTaUExmG0/tHWfHynbyUBRoeGXVoXwqhsD2rjpV3ZcdKexcwa3nPZM7dt9HZ
-	jWVoP5P/YkdH62y1fAEcH607msIfLQKoCO26F
-X-Gm-Gg: Acq92OGALm2skWG9Hb0OXOipY629OBYGQudqzIWCqnZsWUu0m84x0YAZv5Ryw69g78C
-	JRJgJ3y25/oMg5ZPeKImJ7Mpc3aob4RSVDvV6yvWiur4nnIySr5WfHF0S+xiPBlDgN/HEJDXQiJ
-	5hcUHmFg99FDYWNE3+aTSdObISP6Ct4EBcj8xOQRf10b8MtoGO7DGQHFe3oVuYlUhMPUGtW7YRD
-	N5OFV9NfEdE/McsBfxJ6VD3sFafItYTT8QC9hysEcsjQ2HwZuxijiJQm0DW8baEZ98OPAH6udIb
-	8bLyjm7bvbEDlmG1rsSyz6CZMxmfxIRzM9F/dzKJJ1tb5f/25SDcRC6hR0/yStINM4gnwHMEq22
-	52GCBX9xD2lMvhcirqXjLOu7Sx5ZU+wAriTl0DigBMw==
-X-Received: by 2002:a17:907:948a:b0:bf4:1188:f288 with SMTP id a640c23a62f3a-c05a274143amr279681266b.17.1781701396300;
-        Wed, 17 Jun 2026 06:03:16 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id a640c23a62f3a-bfdb5ce72f3sm114038066b.51.2026.06.17.06.03.16;
-        Wed, 17 Jun 2026 06:03:16 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from stryper.dev.6wind.com (stryper.dev.6wind.com [10.17.2.5])
-	by smtpservice.6wind.com (Postfix) with ESMTP id 1DFDC179D5;
-	Wed, 17 Jun 2026 15:03:16 +0200 (CEST)
-From: Louis Scalbert <louis.scalbert@6wind.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	jv@jvosburgh.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	fbl@redhat.com,
-	andy@greyhouse.net,
-	shemminger@vyatta.com,
-	maheshb@google.com,
-	jonas.gorski@gmail.com,
-	horms@kernel.org,
-	stephen@networkplumber.org,
-	Louis Scalbert <louis.scalbert@6wind.com>
-Subject: [PATCH iproute2-next v4] ip/bond: add lacp_strict support
-Date: Wed, 17 Jun 2026 15:03:14 +0200
-Message-Id: <20260617130314.3893243-1-louis.scalbert@6wind.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B41D39A07E;
+	Wed, 17 Jun 2026 13:26:17 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781702778; cv=fail; b=uoLP5y98hJ4btLd9IbZzPB4EJZfQ9Qt8W5BT/Kd1VOYHSd97fYFcRW17dExDnJWAbdox/39jCvlZuQn1s8H7T8fCvXlXiDoCUWwRAd4s9/gOX2JQxsoGo0geCR2gOJkyuX0fQjkr6GXe3kmBQ8giwxqBtEeGM3YLIILMSMpnAc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781702778; c=relaxed/simple;
+	bh=SmoAlmJZFPetgSTXGfQFqcG0xAtxvYtoEvjYAURlxCk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r7ebYGayx34P6htYj9sjzDcTOq/jq24tFhX7IT0enfPdL/+pgwymtf6wglN4aEQUcqROrbELMiM7jY3iFXj3qAFyCKafo7gD/E+t+tj2UN/i18S405YtSsGcJ7ZBpW7Pbhawxs4NyFbmmgPpLLH5pAri7iUCEdduij83AtoIYqk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RzXxlb1g; arc=fail smtp.client-ip=40.93.196.69
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c3vvwkilsEW6KbHvk1TbIIPPNXeD4tTiY/YaYOPgA8rVsHoep2oFynx56nlkVOe0CaMaSjsVs1xvXtXW5ctRY4Q8TYkqKnPH+FGOexxrOhdp0attM1MljE68NKmYX6khfxFNBD0Kpvlg1L80zx06sFHXkQOq/cgMXr/RwQBXZ2LJ/atYmG5LSEmaoKyD1cWBN6c+E2E0a0YqHtRqWo2/xE6XsrvPUBxNY6efHUPaiqg9rKQ+gRuVHo5gbKpLI6x1H4RDZp2tUXF3a8rafpECSvt5wXhev0rRDM5JJQNzAZ/SleBBBEMaph3yC9B0Lw4zaAg1BR4X8frXJpAcYR+Xcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j6GfnZmwxSxXlQPKeVdVHk1bLS4Un5iLx//Rnh+JDQc=;
+ b=C9RWESmvRRsc6kzj5BFwAkQzzpVYTO6Zb5dLfazurRMBlZQ/4hqW5IRQwBFf0NyyaotB8cF0SQamtPhD/dEBZsQEkAPyGgzu1ask2CsA2vTe8U6yiig9+Pe6z/f7+hRZTaeMGF+kCxSUlqdHpcLiPzwL4i9Gg3qxMnUjFPMmJDCtEB6INVdYiWDRhg4rMu5OWMvVninf4DEdGrHsK1Q/T+cHWHOTNCf1YDgFd57N6L5ViHVY59YlKsbQiQR0WOP1yc92v/lwdkHjgLqzBbISQKsM9KbT+hu1qTYz4L81iCz659mmdg2me2Lza1KyKminr6Mps29DAfXk1fuSSzNcWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j6GfnZmwxSxXlQPKeVdVHk1bLS4Un5iLx//Rnh+JDQc=;
+ b=RzXxlb1gG046bSDpJLVgSoaLdkkiiONmENrYzDnJVp1vxgC4oWkmMyt8MeK4Xf5P69Ze02bliuf3OIOmYCRUZiy8Sh/iIqehdkias4hxZCb03R4bl3nfcVO4H+muh4l+FV8IM3qsJg6U2hosGZ+MLzk9J6tbPb3G0EzkOdFjg5A=
+Received: from SA9P221CA0010.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::15)
+ by DSSPR12MB999238.namprd12.prod.outlook.com (2603:10b6:8:374::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.16; Wed, 17 Jun
+ 2026 13:26:13 +0000
+Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
+ (2603:10b6:806:25:cafe::33) by SA9P221CA0010.outlook.office365.com
+ (2603:10b6:806:25::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.13 via Frontend Transport; Wed,
+ 17 Jun 2026 13:26:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.139.8 via Frontend Transport; Wed, 17 Jun 2026 13:26:13 +0000
+Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 17 Jun
+ 2026 08:26:13 -0500
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb10.amd.com
+ (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 17 Jun
+ 2026 08:26:12 -0500
+Received: from xhdipdslab46.xilinx.com (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.41 via Frontend
+ Transport; Wed, 17 Jun 2026 08:26:09 -0500
+From: Abhijit Gangurde <abhijit.gangurde@amd.com>
+To: <jgg@ziepe.ca>, <leon@kernel.org>, <brett.creeley@amd.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Abhijit Gangurde <abhijit.gangurde@amd.com>
+Subject: [for-next v3 0/3] Add Reorder Completion Queue (RCQ) support
+Date: Wed, 17 Jun 2026 18:56:02 +0530
+Message-ID: <20260617132605.1888205-1-abhijit.gangurde@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,145 +97,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|DSSPR12MB999238:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43409123-b18b-435b-0cb3-08decc7400bd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|82310400026|36860700016|13003099007|18002099003|6133799003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	ccK/T7hLOdgydi9pyb0DjRtB0qtZumAN+IPlocsT2FFdw0C4nWEZgfqsnolphGdFm+WPS1KNNJx+LyLGSe+l4Xn6w9YQbqrzHqIJPose6L5uErHzYXewpgLR20Xzi/VzujYdf48/sei7is+7HWCvyaO8SEy1GeRe3b+UCI98hAxWaefJUyjv9kTyif3gwD2J3oUDp8Vmj4OECO8e/SQQy6gXDGj/XxbqmOF9T2ZhapV02+C+2NIvIDt53HIuZd42m5f+euzOuPKTPuLP4Hw8lz3jFWLwwWHo+brfMBzVellNPBbYYbx3WeUARH+O1+DYUfFu+wcKAERsc6UrPB7NQH1K6UWbQvc6c1YBg6lkCvYIslmOl1u3OSepXXqfF44jbAQURrxbCIGhE9BDvaSH3o70Zih/CgHg3iOQIjNV20aWC6ruAOyqKXATctmusgN9iWOguSRfiKV4J4untjGded1atQ6d+77fccbrAKsOAu3TMkUDW9yRBUG68zsnbNks1n6rX5veTBE5rlQQE/gKXn3qnQyvRwT7D7eJHilzEqEsPhCfszcKHoehq9nU99GbwdHVlH+xFyw8mkxvWjIQjpDsSKRiyOGaLfNCbK72Sy5bzNJ10yEl1ziM5/j484vLRuSdOpkrig82TgQ+Dy9Y5yFP/Om6iSdLSNhXYPd62ayg0vVrH1EKVX7pc9kgBxQEOepWTr2c/PFrmce7SwWk7mXmL6nomwyr9kpDK/aI0OA=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(82310400026)(36860700016)(13003099007)(18002099003)(6133799003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	F/RjYMjcusr2Uj6o0XkPPv0fd3jMHlNZMcxopRysOAORH929e5g5It0aq4UDTVdiMvpfHV3HED6SnbSLiv8Xi/nwajXgSwWFq44YayjJknVWrX41kg1aGrigbuI9PJhD4m+ldo3iEDSVXMDfe4BDTiu3wr4uAKFO4mK+GAWGyfWwld19ilI4sbc9/nRWTdw4rOqlxIBpXbEsp9GB0fjsObVWgbfMroXFCNlzG1DejKodJdf2ndfHcQiVA4/grPDcefM9VCNU6IDNOO1ylatIzQoHXPJq3OHHGiKXX+Ypw8pFnDtmTX0Df1j1rzIS/FmN65LSYXtb/1saUR7Pxc0BosDWtZ8xLVPec1ice7IGPF4LMtPjBy5/755bpriZ4BnOCBnmFCmJPGVrGaox5s52Bf8X+GISBKp94b8Kjz04gE8jbKfmGGwWPQCy+IaEIDUL
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2026 13:26:13.3219
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43409123-b18b-435b-0cb3-08decc7400bd
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002529D.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DSSPR12MB999238
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300176-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lunn.ch,jvosburgh.net,google.com,kernel.org,redhat.com,greyhouse.net,vyatta.com,gmail.com,networkplumber.org,6wind.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-300177-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:jv@jvosburgh.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:fbl@redhat.com,m:andy@greyhouse.net,m:shemminger@vyatta.com,m:maheshb@google.com,m:jonas.gorski@gmail.com,m:horms@kernel.org,m:stephen@networkplumber.org,m:louis.scalbert@6wind.com,m:andrew@lunn.ch,m:jonasgorski@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jgg@ziepe.ca,m:leon@kernel.org,m:brett.creeley@amd.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:allen.hubbe@amd.com,m:nikhil.agarwal@amd.com,m:linux-rdma@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:abhijit.gangurde@amd.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,amd.com:dkim,amd.com:mid,amd.com:from_mime];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 42C9C699F18
+X-Rspamd-Queue-Id: 6E96B69A149
 
-lacp_strict defines the behavior of a LACP bonding interface
-when no slaves are in Collecting_Distributing state while at least
-'min_links' slaves have carrier.
+This series adds userspace support for the Reorder Completion Queue (RCQ)
+feature in the ionic RDMA driver.
 
-In the default (off) mode, the bonding master remains up and a
-single slave is selected for TX/RX, while traffic received on other
-slaves is dropped. This preserves the existing behavior.
+Patch 1 extends the net/ionic firmware identity structure to expose the
+rcq_sign_bit field from the RDMA LIF identity.
 
-In lacp_strict mode, the bonding master reports carrier down in this
-situation.
+Patch 2 adds robust udata support to extend the qp creation udata
+request
 
-Link: https://lore.kernel.org/netdev/20260603150331.1919611-1-louis.scalbert@6wind.com/
-Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
----
- include/uapi/linux/if_link.h |  1 +
- ip/iplink_bond.c             | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+Patch 3 plumbs the RCQ sign bit through the RDMA driver's LIF configuration,
+exposes it to userspace via the ucontext response, and allows userspace to
+specify ionic specific QP flags during QP creation. This enables rdma-core to
+discover RCQ capability at context allocation time and configure QPs with
+RCQ support.
 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 70aee114..d3a21fba 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1601,6 +1601,7 @@ enum {
- 	IFLA_BOND_NS_IP6_TARGET,
- 	IFLA_BOND_COUPLED_CONTROL,
- 	IFLA_BOND_BROADCAST_NEIGH,
-+	IFLA_BOND_LACP_STRICT,
- 	__IFLA_BOND_MAX,
- };
- 
-diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-index 714fe7bd..d2d822cd 100644
---- a/ip/iplink_bond.c
-+++ b/ip/iplink_bond.c
-@@ -87,6 +87,12 @@ static const char *lacp_rate_tbl[] = {
- 	NULL,
- };
- 
-+static const char *lacp_strict_tbl[] = {
-+	"off",
-+	"on",
-+	NULL,
-+};
-+
- static const char *ad_select_tbl[] = {
- 	"stable",
- 	"bandwidth",
-@@ -155,6 +161,7 @@ static void print_explain(FILE *f)
- 		"                [ ad_user_port_key PORTKEY ]\n"
- 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
- 		"                [ ad_actor_system LLADDR ]\n"
-+		"                [ lacp_strict LACP_STRICT ]\n"
- 		"                [ arp_missed_max MISSED_MAX ]\n"
- 		"\n"
- 		"BONDMODE := balance-rr|active-backup|balance-xor|broadcast|802.3ad|balance-tlb|balance-alb\n"
-@@ -168,6 +175,7 @@ static void print_explain(FILE *f)
- 		"AD_SELECT := stable|bandwidth|count\n"
- 		"COUPLED_CONTROL := off|on\n"
- 		"BROADCAST_NEIGHBOR := off|on\n"
-+		"LACP_STRICT := off|on\n"
- 	);
- }
- 
-@@ -188,6 +196,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 	__u32 packets_per_slave;
- 	__u8 missed_max;
- 	__u8 broadcast_neighbor;
-+	__u8 lacp_strict;
- 	unsigned int ifindex;
- 	int ret;
- 
-@@ -417,6 +426,13 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 				return -1;
- 			addattr_l(n, 1024, IFLA_BOND_AD_ACTOR_SYSTEM,
- 				  abuf, len);
-+		} else if (matches(*argv, "lacp_strict") == 0) {
-+			NEXT_ARG();
-+			if (get_index(lacp_strict_tbl, *argv) < 0)
-+				invarg("invalid lacp_strict", *argv);
-+
-+			lacp_strict = get_index(lacp_strict_tbl, *argv);
-+			addattr8(n, 1024, IFLA_BOND_LACP_STRICT, lacp_strict);
- 		} else if (matches(*argv, "tlb_dynamic_lb") == 0) {
- 			NEXT_ARG();
- 			if (get_u8(&tlb_dynamic_lb, *argv, 0)) {
-@@ -642,6 +658,15 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			   "all_slaves_active %u ",
- 			   rta_getattr_u8(tb[IFLA_BOND_ALL_SLAVES_ACTIVE]));
- 
-+	if (tb[IFLA_BOND_LACP_STRICT]) {
-+		__u8 lacp_strict = rta_getattr_u8(tb[IFLA_BOND_LACP_STRICT]);
-+		print_string(PRINT_FP,
-+			     "lacp_strict",
-+			     "lacp_strict %s ",
-+			     get_name(lacp_strict_tbl, lacp_strict));
-+		print_bool(PRINT_JSON, "lacp_strict", NULL, lacp_strict);
-+	}
-+
- 	if (tb[IFLA_BOND_MIN_LINKS])
- 		print_uint(PRINT_ANY,
- 			   "min_links",
+PR: https://github.com/linux-rdma/rdma-core/pull/1733
+
+v3:
+  - Added robust udata compatibility checks
+v2:
+  - Dropped QP transport mode selection
+  - https://lore.kernel.org/linux-rdma/20260611092544.783731-1-abhijit.gangurde@amd.com/
+v1:
+  - https://lore.kernel.org/linux-rdma/20260430123931.3256130-1-abhijit.gangurde@amd.com/
+
+Abhijit Gangurde (3):
+  net: ionic: Fetch RCQ sign bit from firmware
+  RDMA/ionic: Add robust udata compatibility checks to all uapi verbs
+  RDMA/ionic: Add RCQ userspace support
+
+ .../infiniband/hw/ionic/ionic_controlpath.c   | 72 ++++++++++++++++---
+ drivers/infiniband/hw/ionic/ionic_fw.h        |  2 +
+ drivers/infiniband/hw/ionic/ionic_ibdev.c     |  1 +
+ drivers/infiniband/hw/ionic/ionic_lif_cfg.c   |  1 +
+ drivers/infiniband/hw/ionic/ionic_lif_cfg.h   |  1 +
+ .../net/ethernet/pensando/ionic/ionic_if.h    |  6 +-
+ include/uapi/rdma/ionic-abi.h                 |  4 +-
+ 7 files changed, 77 insertions(+), 10 deletions(-)
+
 -- 
-2.39.2
+2.43.0
 
 
