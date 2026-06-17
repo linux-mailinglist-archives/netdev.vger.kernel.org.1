@@ -1,225 +1,197 @@
-Return-Path: <netdev+bounces-300196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QtDiFEG5Mmoc4gUAu9opvQ
-	(envelope-from <netdev+bounces-300196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 17:12:01 +0200
+	id QAjAOZ69Mmr/4wUAu9opvQ
+	(envelope-from <netdev+bounces-300197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 17:30:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1A0569AD44
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 17:12:00 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9786269B010
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 17:30:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=nxp.com header.s=selector1 header.b="fg/xMfqy";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300196-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300196-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=nxp.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=marvell.com header.s=pfpt0220 header.b="IIy 2Qdk";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300197-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300197-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=marvell.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 88AD030E6FD2
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:06:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4825A3035CCB
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 15:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75A344E045;
-	Wed, 17 Jun 2026 15:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7727481651;
+	Wed, 17 Jun 2026 15:22:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010060.outbound.protection.outlook.com [52.101.69.60])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0C243E48E;
-	Wed, 17 Jun 2026 15:01:43 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781708505; cv=fail; b=SkGeRvUoHth7MZFx8Gb93pB8Y7p31sRkuMsT2qS5ecmG96fAb8WMRYIlioSwrZLjkgB5vjfkSTB0FWfdvcnyQVazWiWGq99fU/BmfYF65C0StckjaWvFI98JL2xbBa70m9VYnb/xYLA130mvlPSfgGeiqfOPUbF+rNrFf97Gwgw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781708505; c=relaxed/simple;
-	bh=EqTSy1xqG9eIIeFPbBJoqO4RRkqlyCppZ8DkCI2ezbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=dSCIEzmF3FBmdJzuJKQtVL/Fh1Y+FvZyP31HxPUL3cY1ahIzmMdT2fKP3J78fbOkx7oEb1ZoqlVcnofFgYUrB77Pmk2nC/FHzOPeq6fldqzqrcnClj0PXUi5AdAyGusYTmfHXPEGfa4kl1tBn7S4zNr6OVMLtVkgimydJNlgKgU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fg/xMfqy; arc=fail smtp.client-ip=52.101.69.60
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RiTz7/hY7a1RyaP9yHt0E5484tYbOooySM2colbtGWElPsk28mLTBaAAPfkwGiMhzA1cgWrrJyR3Mw7cjrjEydTcqHmN9ofONrlBbiPbH2DJaZL53cKPPAWftTuYe+fpaU3gxSlG8/1mGjqYWVVCrUP7sPfiPbLfJfvAM+TGZjUzSbqWM2HkQb4bywyjl+ISq6AYoNUnt22E1KuP+2hbwbbgv9aPRo4NB+4lxgpjZ/ck5kixhqNib/suiX1zGQHH2uL9voNfH+ix5yoVML6t3dWCeSSc+3W9f4WY2m4l8jcXkKmPb1i7SD5bvnGA+/Pjk5v67e1uV9Ez+N2sUPOmew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=29SczF+3NmGQ6ipYPCtMswUm8iiNmaN7pycOvF9bsuE=;
- b=Au2UgP6Ja4NN3RPBeU8rZq3mwNDP4sqdASAx1rjkISObQYAwjndZOPoYeWPg50lPqiISKOAlJZ5kndXMtfXKPlM9Xoy6qo8o8UdgC8lrbrbcDTBwBbjvSLURZpvquLX6khbCP3QiDQ9JxZmfe0MSC1snpZcauHtnaSo7MVDdtSv4eln/BvQvPyGHIn9i7H6prAuiDVfN9NfJZQgZ1AnKr8cqOl9fwqMaVLAoqqBWMnKpZnDPralIs3d3DHDyRjjywI3gVjStmprLZ6lAosKLyQbVtIf3fuqs27njMP3YZwOQkJEanXg0FPWMx9WJi3NZqrOjk2eLR/0mJisepUYXIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=29SczF+3NmGQ6ipYPCtMswUm8iiNmaN7pycOvF9bsuE=;
- b=fg/xMfqyeJupF45/lF55kEvDorInxRPlA4sxon7t77sQTseUQyoVEhJJVwzkUVKgISqxZRocDF+7GI2VlLBB3+xTnRZCHymjwHjpCNjb/56K3iTYOhcqdx7w1ZjFrHwAQIkscADoP3E18ITpw103fcpbq28qonbWiD5W7amT9N8gsQ3q6V21ytimImB5UJ1IOTooMktcZ5N+kbf6wDXg8Jk7Fyr9WhvbMbY1+/HhzxGyplDB47ROQdS3wlXnf6OH2a7dpN77IwKYiH3FH63nofMavuYsRIgjgZK6Fv/Mt52pjA1VL1JGdDsYV+DfK6cuTB9bnySzP0zbcu5fA+xXYA==
-Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
- (2603:10a6:150:319::13) by PR3PR04MB7402.eurprd04.prod.outlook.com
- (2603:10a6:102:89::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Wed, 17 Jun
- 2026 15:01:40 +0000
-Received: from GVXPR04MB12290.eurprd04.prod.outlook.com
- ([fe80::1739:3404:2175:33dd]) by GVXPR04MB12290.eurprd04.prod.outlook.com
- ([fe80::1739:3404:2175:33dd%6]) with mapi id 15.21.0113.015; Wed, 17 Jun 2026
- 15:01:39 +0000
-Date: Wed, 17 Jun 2026 18:01:35 +0300
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, f.fainelli@gmail.com, 
-	vladimir.oltean@nxp.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] dpaa2-switch: fix VLAN upper check not rejecting
- bridge join
-Message-ID: <nafu2eyjctiqaljagc5in7mplqmnz4g2n4yhi2dyyd2qrf7bhp@r2x6uxlnxffd>
-References: <20260616105430.3725910-1-ioana.ciornei@nxp.com>
- <20260617114518.857486-1-horms@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260617114518.857486-1-horms@kernel.org>
-X-ClientProxiedBy: FR4P281CA0089.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cd::18) To GVXPR04MB12290.eurprd04.prod.outlook.com
- (2603:10a6:150:319::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B63D48124B;
+	Wed, 17 Jun 2026 15:22:45 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781709769; cv=none; b=oWpOOxlM5qJRnQGAdpalOdFD/uiXoyHnGpErwRud1tN94cckjIo4hfcJTiihZqaN03D45W7knAa1AfWQYGMZivHuG0lxk6wlYgskV3+b1HNIEZ4Ywd1OyaMSxd8yk9JeciAMC9jrfdgZHOH1foipG1rj0860sShnwRF0MuVc4NQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781709769; c=relaxed/simple;
+	bh=c7LifRHfpxprihIq3Hya/HAQQqwRx1QCp4FlrNqFmvM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tddsC4KCQrZ2meN+el1j2rZ4d5r27QL+EpQI7Zp0hpz8DfZ7Ks+OM0TF1sxXxRAyosv/p4H/RTjrFRqAGwjvw2ah/cfoELdr3ZCMjql+PRzCmCVMU/WmsK/IjSOLH4UdGjsO9cCxTfGQ4512Qw7F7biW2tZa7YUuPdkkMPJ617Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IIy2Qdkl; arc=none smtp.client-ip=67.231.148.174
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65HEGPVr2252290;
+	Wed, 17 Jun 2026 08:22:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=3Do1feV2y8PXaWZ6/Cx1WHXVX3co6azH55bNI566uDQ=; b=IIy
+	2QdklsMX7A6776fY7cgxSU+UEKdNoSi52g81S8OONd1D2hGY9VUyNLgDAywXyKVV
+	LZhv5qP0ThVh/92M4K4ypqu/SLcIXP3UIXuaT3NGtX9n/rIhp1hAZ+3Bfaz2hzjp
+	2dcEeW0Fq0xRfASrgR8gVVxoO+S8WJovM9hX4+5qiA6jWrfA2uJf9DdkrCD0y+Ll
+	5Du2/Mp7OkiTpLEDlVDRAF8raLpyABVOpbkOHlyiwp9h6XfobGwCNKaMCDq0ePDj
+	YdVyV8DBjGEatReOMaBMp3XbWr/rK9Mopka+h9cW/ve1qZAInn+lSi7NEXaTv+/y
+	/3SEi5pEm8QZnpzCV3w==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4eueg4k3tr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jun 2026 08:22:37 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 17 Jun 2026 08:22:36 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 17 Jun 2026 08:22:36 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id 068133F703F;
+	Wed, 17 Jun 2026 08:22:32 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <bbhushan2@marvell.com>, <rkannoth@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>
+Subject: [net PATCH v2] octeontx2-af: Validate NIX maximum LFs correctly
+Date: Wed, 17 Jun 2026 20:52:30 +0530
+Message-ID: <1781709750-23218-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GVXPR04MB12290:EE_|PR3PR04MB7402:EE_
-X-MS-Office365-Filtering-Correlation-Id: ff5a0bc5-afcc-438a-535e-08decc8155d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|19092799006|366016|23010399003|18002099003|22082099003|56012099006|5023799004|11063799006|4143699003|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	zbvlenlQb3lZgWKjgTdxfHKNaoRuAxd8kBr//WRftueSUjeu9sEMUM1VD0sfAVrV3jrl0Q2GBfDPrQcETPyAUA1LPzKnljyAQGttFB8rfPnE92p8yghOOqEnc1/ipo31xVXnBHZ0ivCa7uttCkSmnKpWW7iOwaHG5eTebqHQBLDJbIh1jpfOxQzbWL0MTWAk77gW3QW2Hx8MSGteyoRp1zPkJc+iPmr1ciRBd4GxYMIllpd+u5SnnTeOwpsmEdUYsNY9W/G0FasoSWFlogfHoTK5xAlX6xT7lDNI98EdqdQ58dqA5zLPDyk5ONa7zr+50wNAmqXw9yBR5TcQ2KuFsCf5quEeQuC78qeBF+Tf/UmsnVGVJmDuv37Aijo2uP8lSz/O5jORUdhU1EpAGjHQNfWFh4lM81VUqlYYKy3m/JH+SvoB2hSJ7Kxg4cqHbTtWpiZbaiduU8XblikYJmWviQGd3Ycv/WyNj7vexITxuq1N38Q4rZpSU2uqbw1xt90ICrwQh+Hij4XMWxbD3G+CqGkvNRzgKEBxRICBVTJda7/mVw5UYNOaj3/SG5KzbhXmNQooWyIKPJPbfqfry0T6n/pIWRIuPswjClJG3qlAd58UIn+BljhaMLZNKnonrtgOAlEt856Ehk6/8WfkNMxnkw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR04MB12290.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(19092799006)(366016)(23010399003)(18002099003)(22082099003)(56012099006)(5023799004)(11063799006)(4143699003)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1E6JqRCUBuksOSi381Q7kifKYHOv22A91swWX3aqQ9fhVqlNRkDQH/RLG+Gs?=
- =?us-ascii?Q?kBX27+tkLNwsjniOqqOoPfCJKVS20egSRZn0FbdZhZiR59tiMU0h+uZd0PWw?=
- =?us-ascii?Q?1s3eQ9H1YslvDk1niXVtKKFPugjai6dD/VdgTXPgsmwlsy2jleouLU1RanBv?=
- =?us-ascii?Q?CB/WOnxhKbA6q5Ei6D1jW9M2EVxLm2P5qIEEQwTGIqNECRS8Gm2SpIQOgagY?=
- =?us-ascii?Q?fRtyGd1D+Gfa0fdrOXZj8y+6ToqUHNIeJmHlGGJnItlp6xgbZVOFEe2xYkRR?=
- =?us-ascii?Q?Uctc7uK663uLpSFIgMTMDXwodnlP71T9vMcilQQGPrzyC+DY88of5Bdu88YP?=
- =?us-ascii?Q?flqBPmMjZulJDPrjXvr/1Mk4Y82nRKZi+leDqARmNIfSifc/DDo4j6hbs3bw?=
- =?us-ascii?Q?Q0rRVTRrcCRadJIQURr/tApej5UBHmSwdk7zR+XzLeIrLEm1JM72nA9lW1VL?=
- =?us-ascii?Q?ZGLTokreBx8StL4JZkigv9FS0gSKso0aIJAFRDLueL09Kk33jOKY7ynHJHMy?=
- =?us-ascii?Q?AxzxHdBqL/lNPPR2H3ElfSk3iUnsKNYztTETKwG6hDnNp3O1zCULK5uFqAFw?=
- =?us-ascii?Q?bhFDxJtPkAD2ILBK74bwMap+q4PInBEzQ0/BFPQ82LlvnfD4OJYY3kfjBWJH?=
- =?us-ascii?Q?m1MA1i/1/JT4ha1uS4XtUJ8tzVnnrleYGH5m+HQNne+NeRSnf1RaoxIhxXFC?=
- =?us-ascii?Q?XLxYNUB0/eOXNK9Wm9CSkau02eQnPsyJcDT8sFLWUG+gZPEhpw6ciso9BkUd?=
- =?us-ascii?Q?Kh62VLeFtVMx/TC4jcD+ewYA9i/MmfO3k/mXBHXTqB+B8DKjq7cZ3/gq97Zl?=
- =?us-ascii?Q?dQ5Hr4Ww5drxuP6LczUUxKB804Cj8daA3PeR/CwmYHuOk9557buGFl6kYSqB?=
- =?us-ascii?Q?+Qr/urJloNEDFUVnKKdsTgTzLLYeoXCbHlT9bg3a2IyXVOCmDH9CuHfSlDTN?=
- =?us-ascii?Q?mCBYv1mVHQxhD32LfaMRBSjYbD31NeBWxT0JC3N6P6ouNFWonOLvGHCcy7SG?=
- =?us-ascii?Q?qYINjK27qv+1f1o4LaMh65B/Wy+mET6kyMFtniwMU3xm+LFzcS96y8212QN9?=
- =?us-ascii?Q?GsYkRwHK02Heg2O0u+Sd1nCvoSRmqDySExgfCKR9UNYY2G6g2sUPrCIgr2g+?=
- =?us-ascii?Q?RzP41IgZ38bnGht6vYH7bdaju+fq5xHjtiyqnoYxxVxaOo6LADEjJuJJ6vEZ?=
- =?us-ascii?Q?HFT0Tcvefgzq++mrZBWIQ30AdPjIa1xNnerdnnlhqIPxiEfsCGSGlpr4eL23?=
- =?us-ascii?Q?+l7iftSy/WUyVMCtJcNsdbHNPlD8NvTpmtYPa/ZnVE/1xCuoT5+8cfzwp48j?=
- =?us-ascii?Q?VkZSuP53LFTojbkyj770j+y4JZ9n04dN53lhuPe7L+SUwzs18UnQ8n/AfLJL?=
- =?us-ascii?Q?eGj3w306/5mHRm52ZIyiO2BxDMkIwjhemoUvO4+t9zWTUiQfQwpxEEsxpe8P?=
- =?us-ascii?Q?mtxH7ZjJkT4QoEiszI2J8G8jMrTkSHBILivapx79XBw8oN27iGQ5Y/znfklu?=
- =?us-ascii?Q?RrcQMJQLvkKdoZxyvrah5/wX42L7XV2drwKCuZWZn/SZL4a3ea4D/LJNQAXQ?=
- =?us-ascii?Q?2yt3LX22yH33+PQv8Ll6fEc1HCKrx0yYoxlzPZZIRqfggKL01bDhndt4wpjd?=
- =?us-ascii?Q?dPsc/g3v5Nv1zvZqeSqXg0l9tQoP4BjVghvcfGTCPp7Hc1nQMqulGQ7cq/Lq?=
- =?us-ascii?Q?z4MdX2o8nUpEZ3oT3lxZtLhdj9ZC1nAwXa0tTqcGORNGvPcpXWcVIvU0CPls?=
- =?us-ascii?Q?LvhljxydIg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff5a0bc5-afcc-438a-535e-08decc8155d6
-X-MS-Exchange-CrossTenant-AuthSource: GVXPR04MB12290.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2026 15:01:39.7480
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bmlNTcIny3hUJeJSt2fcB+a67cXBl/Mo52aNKAlHA8JpX84ay002+Knc13yqIs06/iKCTvcEKVQuRSiawx0ucg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7402
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE3MDE0NiBTYWx0ZWRfX4hqhG5yd0rZK
+ FQ1j2SNRBI+/uJmaWW8pQMlXn5osPlgVuo1S1SgSqt+6BgYX+M3dATjohWYht8s8jQ/9GaZ3oem
+ NbRU0ECRyzBBB0myHDN5Ppfd8QjiVY5g+gJHpyYPIC46q+Qc/iQXixqXkHXWMxmAzf8Z9qclTwn
+ Tz52BJZID6HOTxgXUlgOOZ55AuBIhicKXM5l9wGXq4/L/eV/ApyODO6VgW+P6FXV2e1fMSh3kMn
+ 7yxv4VnLT87Q+eL8U0AnPXOwbZJyLwkHKoPJoPlk/4hPXsuSEiBsb3fJNyI79B+7lCAYirOe+HD
+ a+Ulik6xQm/AdA0FVDvYa7DlmUK7BHShnnr0ALU0+fkaVpjuqbwacTSi3FahE5DOo3Dxrrbpngy
+ QMqIb0Q6CzDSrW8qEG4R1EvcJSbsXe5CbbR5PY7yBnNuo6qZK7g8OCnV5eBqG43YZ5NVsFuCH01
+ hD0oOdwPrE1R1XFAw7w==
+X-Proofpoint-ORIG-GUID: vsfGpfTDfurJVe8TuOl2C3a0Xn3J5Wa8
+X-Authority-Analysis: v=2.4 cv=JZqMa0KV c=1 sm=1 tr=0 ts=6a32bbbd cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=M5GUcnROAAAA:8 a=uS7SUEiOpQzJ16ilQwoA:9
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE3MDE0NiBTYWx0ZWRfX8KByKZQY232m
+ ftlLtcz9u7EDFTWypI8UdgN052PE8FbBl2cb/xLlWNDmtqY/Faj0W8b7K9l3fDNSqEXtgzXR1/y
+ owxOkKSDsaVxpGyk5DTYwzY6Ewbp55Y=
+X-Proofpoint-GUID: vsfGpfTDfurJVe8TuOl2C3a0Xn3J5Wa8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-17_02,2026-06-16_02,2025-10-01_01
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.84 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300196-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300197-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:ffainelli@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com,nxp.com];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:gakula@marvell.com,m:bbhushan2@marvell.com,m:rkannoth@marvell.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:sbhatta@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,marvell.com:dkim,marvell.com:email,marvell.com:mid,marvell.com:from_mime];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCVD_COUNT_SEVEN(0.00)[8]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E1A0569AD44
+X-Rspamd-Queue-Id: 9786269B010
 
-On Wed, Jun 17, 2026 at 12:45:18PM +0100, Simon Horman wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> Full review at: https://sashiko.dev
-> ---
-> dpaa2-switch: fix VLAN upper check not rejecting bridge join
-> 
-> The blamed commit refactored the prechangeupper event handling but
-> failed to actually return an error in case
-> dpaa2_switch_prevent_bridging_with_8021q_upper() detected a 802.1q upper
-> on a port which tries to join a bridge. Fix this by returning err
-> instead of 0.
-> 
-> > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > index 52c1cb9cb7e02..46ae81c2fa013 100644
-> > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > @@ -2177,7 +2177,7 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
-> >  	if (err) {
-> >  		NL_SET_ERR_MSG_MOD(extack,
-> >  				   "Cannot join a bridge while VLAN uppers are present");
-> > -		return 0;
-> > +		return err;
-> 
-> [Severity: High]
-> If a user adds an 802.1q VLAN upper device to a port after it has already
-> successfully joined a bridge, won't this check trigger when the port leaves
-> the bridge?
-> 
-> In drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c,
-> dpaa2_switch_prechangeupper_sanity_checks() is called for both bridge joins
-> and unlinks from dpaa2_switch_port_prechangeupper():
-> 
->     err = dpaa2_switch_prechangeupper_sanity_checks(netdev, upper_dev, extack);
->     if (err)
->         return err;
-> 
->     if (!info->linking)
->         dpaa2_switch_port_pre_bridge_leave(netdev);
-> 
-> Since returning an error aborts the notifier chain, an unlink notification
-> would fail this check, preventing dpaa2_switch_port_pre_bridge_leave() from
-> running. Does this lead to state inconsistency and skipped switchdev
-> unoffloads?
-> 
-> Could this check be guarded so it only runs when info->linking is true?
+NIX maximum number of LFs can be set via devlink command
+but that can be done before assigning any LFs to a PF/VF.
+The condition used to check whether any LFs are assigned is
+incorrect. This patch fixes that condition.
 
-Valid point but the fix should be to prevent adding VLAN uppers on
-bridged dpaa2-switch ports since the driver does not support the usecase
-altogether.
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ .../marvell/octeontx2/af/rvu_devlink.c        | 27 +++++++++++++------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
+index 6494a9ee2f0d..3b47ecb44d51 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
+@@ -1510,7 +1510,9 @@ static int rvu_af_dl_nix_maxlf_validate(struct devlink *devlink, u32 id,
+ 	struct rvu_devlink *rvu_dl = devlink_priv(devlink);
+ 	struct rvu *rvu = rvu_dl->rvu;
+ 	u16 max_nix0_lf, max_nix1_lf;
+-	struct npc_mcam *mcam;
++	struct rvu_block *block;
++	int blkaddr = 0;
++	int free_lfs;
+ 	u64 cfg;
+ 
+ 	cfg = rvu_read64(rvu, BLKADDR_NIX0, NIX_AF_CONST2);
+@@ -1518,14 +1520,23 @@ static int rvu_af_dl_nix_maxlf_validate(struct devlink *devlink, u32 id,
+ 	cfg = rvu_read64(rvu, BLKADDR_NIX1, NIX_AF_CONST2);
+ 	max_nix1_lf = cfg & 0xFFF;
+ 
+-	/* Do not allow user to modify maximum NIX LFs while mcam entries
+-	 * have already been assigned.
++	/* Do not allow user to modify maximum NIX LFs while NIX LFs
++	 * have already been assigned. Note that modifying NIX LFs count
++	 * can be done only before any LF attach requests from PFs and VFs
++	 * and not later or concurrently.
+ 	 */
+-	mcam = &rvu->hw->mcam;
+-	if (mcam->bmap_fcnt < mcam->bmap_entries) {
+-		NL_SET_ERR_MSG_MOD(extack,
+-				   "mcam entries have already been assigned, can't resize");
+-		return -EPERM;
++	blkaddr = rvu_get_next_nix_blkaddr(rvu, blkaddr);
++	while (blkaddr) {
++		block = &rvu->hw->block[blkaddr];
++
++		free_lfs = rvu_rsrc_free_count(&block->lf);
++		if (free_lfs != block->lf.max) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "NIX LFs already assigned, can't resize");
++			return -EPERM;
++		}
++
++		blkaddr = rvu_get_next_nix_blkaddr(rvu, blkaddr);
+ 	}
+ 
+ 	if (max_nix0_lf && val.vu16 > max_nix0_lf) {
+-- 
+2.48.1
 
 
