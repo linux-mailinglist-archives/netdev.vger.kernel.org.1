@@ -1,84 +1,79 @@
-Return-Path: <netdev+bounces-300140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300141-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id szcAEiKEMmpl1QUAu9opvQ
-	(envelope-from <netdev+bounces-300140-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:25:22 +0200
+	id KRCRDsGFMmrM1QUAu9opvQ
+	(envelope-from <netdev+bounces-300141-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:32:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2C06990AD
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:25:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09996991A8
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:32:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=infradead.org header.s=desiato.20200630 header.b=CmCUdEuf;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300140-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300140-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=infradead.org;
+	dkim=pass header.d=intel.com header.s=Intel header.b=b5saqkD3;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300141-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300141-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DB73431BC97A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:20:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C78D7322B32D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA363C3C12;
-	Wed, 17 Jun 2026 11:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EBB2FE59C;
+	Wed, 17 Jun 2026 11:21:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEB53C4178;
-	Wed, 17 Jun 2026 11:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E26D3E0236
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 11:21:29 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781695214; cv=none; b=Ah3AZJN8ozRSZEkEa2QseWlwZrXQe+tdkZrdbEiFNn8C/Pgj7KwTrD1kMUIcIs213l4UrM8gk9qVosCn7tGqPJfi4/2Rx3mgCyRE6QKxcB8faN68b0O1pWH1TarGqMlfBe6/7p6kgpEhXHl8sSROiG3QwgIfKieesBmyHwCThm0=
+	t=1781695293; cv=none; b=SFqB0nbU87cSjGGzouovoLLeBOxYKNhr1t5f/XdDnz6gFMIjNYAreukMYopdfPHOojsTi74qreV6P61MjxrPQmWu0hbjRR1EIeFLkANFHSbic7f/o9cOcDQGFzvVOUXXuGERCpG9c2H7hxwiQAgG6v3K6t4VHyXIrtKPHpJi0yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781695214; c=relaxed/simple;
-	bh=DFl0wWs3wZa64CW8NotWTgeXdpSmLH1QUjX84KCFJ64=;
+	s=arc-20240116; t=1781695293; c=relaxed/simple;
+	bh=tPi/YY4XI5glWepvmBLi0Nv9EYXphd/RdJKzp90WbGI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fRmG/o8D6q1m3Nxh5JIl9RIe3b4+6ycTt/FiqtVveBeg3m8tZtCSwUB5Ssu48SvTSiczJ73W6c/mIPkW6fmL3JxKj9LmKNcuwaO+C+5FVAV3a+uR8+m7gg6PEd6JJ2Ipp738r4d/+AwIX4mR7MH7bETWTPtIBAvfocn8W1EDUXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CmCUdEuf; arc=none smtp.client-ip=90.155.92.199
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=36EDr/CyzfD8dqA4WQH+TVeeKiP5aMpQzHU5I0JNKdA=; b=CmCUdEufle9jh4dE4SDN2nAskQ
-	H1t0QpS5pkV/nv70xpB05yd7dgwhXjCySYifTPYRhPw7yXC7GLonCX5LLGTf3+I3UlD+UanRI47S9
-	uItuc3YCSSBVA5yOTrqRt2nF0HGT9u3Qus5yIlKm/UJeZpSh05QemaLTOhSoq+FmUrB350TzGtxAv
-	9CYleJKmH89OTUcUQP9Ovlw/z1NvZ1e5DoncftBJhJCF9bF6p3dfPlfnX+b9maaF2ur2l9NWNsqOm
-	4p/cMvrOP/2N5cE6s8MY0d3OS5Irky52mbqWwIg23H9GV5Kr3GGQnIm7VTsC1tINtEiAmIc8Vy2B9
-	zTBru5jA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.99.2 #2 (Red Hat Linux))
-	id 1wZoJL-0000000C3mB-1Jov;
-	Wed, 17 Jun 2026 11:19:59 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 24BA930036F; Wed, 17 Jun 2026 13:19:58 +0200 (CEST)
-Date: Wed, 17 Jun 2026 13:19:58 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Petr Mladek <pmladek@suse.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Vlad Poenaru <vlad.wing@gmail.com>,
-	Thomas Gleixner <tglx@kernel.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	linux-rt-devel@lists.linux.dev, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	K Prateek Nayak <kprateek.nayak@amd.com>
-Subject: Re: [PATCH net] netpoll: run NAPI poll in softirq context to avoid
- rq->lock self-deadlock
-Message-ID: <20260617111958.GL49951@noisy.programming.kicks-ass.net>
-References: <20260610183621.3915271-1-vlad.wing@gmail.com>
- <20260611191114.5bc43a59@kernel.org>
- <20260616103529.Yh9Dxsjp@linutronix.de>
- <20260616170257.GH49951@noisy.programming.kicks-ass.net>
- <20260616141719.67684bf0@kernel.org>
- <ajJ46o4fomfxY5CX@pathway.suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tlNHzM4W3IEVBhW6Car0wp3b4YTDIJLPvj/YeGdzjFADPPcL7efPr4uGe8o1bRz0MwiTqhtVbiAb3C9Z0Tz2eLxXnWOvwSw1lSFrgter2nV/QTypOBZnMmh7HeQLNUavjcmfMhyvFgSyYnL+yyn+q7AD1w6ITQ9X3MWRDTQvakA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b5saqkD3; arc=none smtp.client-ip=192.198.163.15
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781695289; x=1813231289;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tPi/YY4XI5glWepvmBLi0Nv9EYXphd/RdJKzp90WbGI=;
+  b=b5saqkD3n+5NjUn7XYu1IoaUhVDadLIywjz8A9SPlVLRZBrXdZXrgJaw
+   DCJq5hCj+BZaCVtapazS9iZwcT1b3xbtIk3bBlgUfJ4WOY6aDDFoceuxj
+   20b4n9+ju/m6NYcmvEblgOBVNlThsczdNfmP5Y/2UsX+tGXu+WJiaD1Xa
+   /xi0yvJSzAqm2+D229tW7C6R1eT7Tn2BweBx3GbHEDPTHU3Dy6ifxZ6ud
+   FwJjDqh7oxtqAyjRTVLKdrPl674S191b9jHXGyDD1//1RBxiorqSOqY6g
+   0/fP1emRCRY55GcihMNE5BALUZ025JeKSnndrUwF2H/fid4QoHeFDYb27
+   Q==;
+X-CSE-ConnectionGUID: 27l+++kYSF65S5jAHFrYZw==
+X-CSE-MsgGUID: jM8P8eYrQz6Z/22ZcpSW6w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11819"; a="82577240"
+X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
+   d="scan'208";a="82577240"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 04:21:28 -0700
+X-CSE-ConnectionGUID: sL30sF98S1yedT8Chb4VQQ==
+X-CSE-MsgGUID: FQ3c1UBmQZWfoA+1mFLD7w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
+   d="scan'208";a="272104368"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 04:21:27 -0700
+Date: Wed, 17 Jun 2026 13:21:24 +0200
+From: Raag Jadav <raag.jadav@intel.com>
+To: Michal Wajdeczko <michal.wajdeczko@intel.com>
+Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, rodrigo.vivi@intel.com,
+	riana.tauro@intel.com, dev@lankhorst.se, airlied@gmail.com,
+	simona@ffwll.ch, kuba@kernel.org
+Subject: Re: [PATCH v2 4/4] drm/xe/hw_error: Use HW_ERR prefix in log
+Message-ID: <ajKDNGuBJ9th6-sn@black.igk.intel.com>
+References: <20260523050212.557292-1-raag.jadav@intel.com>
+ <20260523050212.557292-5-raag.jadav@intel.com>
+ <65752da7-a23d-4495-9863-541bdd3f7888@intel.com>
+ <ah16Hfwq7goxBm27@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,75 +82,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ajJ46o4fomfxY5CX@pathway.suse.cz>
+In-Reply-To: <ah16Hfwq7goxBm27@black.igk.intel.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300140-lists,netdev=lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:pmladek@suse.com,m:kuba@kernel.org,m:bigeasy@linutronix.de,m:john.ogness@linutronix.de,m:senozhatsky@chromium.org,m:vlad.wing@gmail.com,m:tglx@kernel.org,m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:leitao@debian.org,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:linux-rt-devel@lists.linux.dev,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:frederic@kernel.org,m:mingo@redhat.com,m:vincent.guittot@linaro.org,m:dietmar.eggemann@arm.com,m:kprateek.nayak@amd.com,m:vladwing@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,linutronix.de,chromium.org,gmail.com,vger.kernel.org,davemloft.net,google.com,redhat.com,debian.org,goodmis.org,lists.linux.dev,linaro.org,arm.com,amd.com];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,intel.com,lankhorst.se,gmail.com,ffwll.ch,kernel.org];
+	TAGGED_FROM(0.00)[bounces-300141-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:michal.wajdeczko@intel.com,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,m:rodrigo.vivi@intel.com,m:riana.tauro@intel.com,m:dev@lankhorst.se,m:airlied@gmail.com,m:simona@ffwll.ch,m:kuba@kernel.org,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
+	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,infradead.org:dkim,infradead.org:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,noisy.programming.kicks-ass.net:mid]
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[black.igk.intel.com:mid,intel.com:dkim,intel.com:email,intel.com:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8E2C06990AD
+X-Rspamd-Queue-Id: A09996991A8
 
-On Wed, Jun 17, 2026 at 12:37:30PM +0200, Petr Mladek wrote:
-> On Tue 2026-06-16 14:17:19, Jakub Kicinski wrote:
-> > On Tue, 16 Jun 2026 19:02:57 +0200 Peter Zijlstra wrote:
-> > > > So this is not an issue since commit 7eab73b18630e ("netconsole: convert
-> > > > to NBCON console infrastructure"). Because from here now on writes are
-> > > > deferred to the nbcon thread. So this purely about -stable in this case.  
+On Mon, Jun 01, 2026 at 02:25:06PM +0200, Raag Jadav wrote:
+> On Mon, Jun 01, 2026 at 01:13:12PM +0200, Michal Wajdeczko wrote:
+> > On 5/23/2026 7:00 AM, Raag Jadav wrote:
+> > > Hardware errors should be logged with HW_ERR prefix. Make them
+> > > consistent with existing logs.
 > > > 
-> > > Hmm, I thought netconsole had some reserved skbs and could to writes
-> > > 'atomic' like? That said, it was 2.6 era the last time I looked at
-> > > netconsole.
+> > > Fixes: 01aab7e1c9d4 ("drm/xe/xe_hw_error: Add support for PVC SoC errors")
+> > > Signed-off-by: Raag Jadav <raag.jadav@intel.com>
+> > > ---
+> > >  drivers/gpu/drm/xe/xe_hw_error.c | 12 ++++++------
+> > >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/drivers/gpu/drm/xe/xe_hw_error.c b/drivers/gpu/drm/xe/xe_hw_error.c
+> > > index 5135e8e4093f..4b72959b2276 100644
+> > > --- a/drivers/gpu/drm/xe/xe_hw_error.c
+> > > +++ b/drivers/gpu/drm/xe/xe_hw_error.c
+> > > @@ -223,9 +223,9 @@ static void log_hw_error(struct xe_tile *tile, const char *name,
+> > >  	struct xe_device *xe = tile_to_xe(tile);
+> > >  
+> > >  	if (severity == DRM_XE_RAS_ERR_SEV_CORRECTABLE)
+> > > -		drm_warn(&xe->drm, "%s %s detected\n", name, severity_str);
+> > > +		drm_warn(&xe->drm, HW_ERR "%s %s detected\n", name, severity_str);
 > > 
-> > Yes, that part is fine. The problem is that netconsole tries
-> > to reap Tx completions if the Tx queue is full. We can't call
-> > skb destructor in irq context so we put the completed skbs on
-> > a queue and try to arm softirq to get to them later.
-> > Arming softirq causes a ksoftirq wake up.
+> > function is per-tile, so shouldn't we use tile-oriented logs instead?
+> 
+> Agree, but then it needs to be done file-wide which I'll pursue once
+> the fix lands and propageted.
+
+Even better, there's a driver-wide refactor[1] incoming.
+
+Raag
+
+[1] https://patchwork.freedesktop.org/series/168333/
+
+> > 		xe_tile_warn(tile, HW_ERR ...)
 > > 
-> > We already skip the completion polling if we detect getting called
-> > from the same networking driver. It's best effort, anyway.
-> > Networking-side fix would be to toss another OR condition into
-> > the skip. But we don't have one that'd work cleanly :S
-> 
-> Alternative solution might be to offload the ksoftirq wake up
-> to an irq_work. It might make this part safe for the
-> console->write_atomic() call.
-> 
-> Well, my understanding is that there are more problems.
-> AFAIK, some drivers do not use an IRQ safe locking, see
-> https://lore.kernel.org/all/oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh/
-
-But anything using locking is not ->write_atomic() and should be driven
-from a kthread, no?
-
+> > >  	else
+> > > -		drm_err_ratelimited(&xe->drm, "%s %s detected\n", name, severity_str);
+> > > +		drm_err_ratelimited(&xe->drm, HW_ERR "%s %s detected\n", name, severity_str);
+> > 
+> > 		xe_tile_err_ratelimited(tile, HW_ERR ...)
+> > 
+> > >  }
+> > >  
+> > >  static void log_gt_err(struct xe_tile *tile, const char *name, int i, u32 err,
+> > > @@ -235,10 +235,10 @@ static void log_gt_err(struct xe_tile *tile, const char *name, int i, u32 err,
+> > >  	struct xe_device *xe = tile_to_xe(tile);
+> > >  
+> > >  	if (severity == DRM_XE_RAS_ERR_SEV_CORRECTABLE)
+> > > -		drm_warn(&xe->drm, "%s %s detected, ERROR_STAT_GT_VECTOR%d:0x%08x\n",
+> > > +		drm_warn(&xe->drm, HW_ERR "%s %s detected, ERROR_STAT_GT_VECTOR%d:0x%08x\n",
+> > >  			 name, severity_str, i, err);
+> > >  	else
+> > > -		drm_err_ratelimited(&xe->drm, "%s %s detected, ERROR_STAT_GT_VECTOR%d:0x%08x\n",
+> > > +		drm_err_ratelimited(&xe->drm, HW_ERR "%s %s detected, ERROR_STAT_GT_VECTOR%d:0x%08x\n",
+> > >  				    name, severity_str, i, err);
+> > >  }
+> > >  
+> > > @@ -255,9 +255,9 @@ static void log_soc_error(struct xe_tile *tile, const char * const *reg_info,
+> > >  
+> > >  	if (strcmp(name, "Undefined")) {
+> > >  		if (severity == DRM_XE_RAS_ERR_SEV_CORRECTABLE)
+> > > -			drm_warn(&xe->drm, "%s SOC %s detected", name, severity_str);
+> > > +			drm_warn(&xe->drm, HW_ERR "%s SOC %s detected", name, severity_str);
+> > >  		else
+> > > -			drm_err_ratelimited(&xe->drm, "%s SOC %s detected", name, severity_str);
+> > > +			drm_err_ratelimited(&xe->drm, HW_ERR "%s SOC %s detected", name, severity_str);
+> > >  		atomic_inc(&info[index].counter);
+> > >  	}
+> > >  }
+> > 
 
