@@ -1,230 +1,142 @@
-Return-Path: <netdev+bounces-300077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Lt9CIpVeMmqezAUAu9opvQ
-	(envelope-from <netdev+bounces-300077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:45:09 +0200
+	id 28lJCgVgMmrFzAUAu9opvQ
+	(envelope-from <netdev+bounces-300078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:51:17 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5143697A55
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB94A697AA2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:51:16 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=intel.com header.s=Intel header.b=XtAp6LqH;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300077-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300077-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=intel.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DuxFI3dC;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300078-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300078-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E3EF63048983
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:43:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9DB6B306E0F0
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E2E3CFF69;
-	Wed, 17 Jun 2026 08:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E8C3DE433;
+	Wed, 17 Jun 2026 08:47:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379583D0903
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 08:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5523D2FFC;
+	Wed, 17 Jun 2026 08:47:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781685823; cv=none; b=ckje9j2LXLbHGEI4lm0o6v0r2S6ie4Ct+Se/G7kOKniRYHMNnjevTLBAMXKXSMkWduDyMZJjFb4iEhFTGrIzYE02mJ8OTTYCsCQeaxwUXYZB87FfXDEnTva5O6E+7yAcKsmUiCRklu990AyiDZeD2lmdz6XFd0u5n+PNS7XnW3g=
+	t=1781686034; cv=none; b=hA5TXxUwf8bIEIUrb6gzOYPhtKIj7yh5InPWOmSKZuqm8IIppKixYJhJb9lL6Z0lSchvP33ZvkXKR8h3BGBgKgBYOodjT30OJJq8fbCLpfIOZaO45WVwg6N5wsLdafBbCv52G7smWnqT38Pp0yHj1J3P/VfzhEk9C62NkbI4qPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781685823; c=relaxed/simple;
-	bh=y6TAMVlRy7PqX/OQ7to6WoMTdCQN7VJj0eBU7zauT9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zv3R3gIES/476aHSGb41rLPCVNWPMGnMYhuritHOIEFYbEbht7qlo0PvaPhpRUGoET0DEz2DA8RA/Tco1oyc9sfcrhJOtmdZFswIg3UgR6jZNIp3QookLs4P/DksQhWuddd3aA1+SGm0vM4+0Uh2zQVjsXWxb6hFTP0P1C649Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XtAp6LqH; arc=none smtp.client-ip=192.198.163.7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781685812; x=1813221812;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=y6TAMVlRy7PqX/OQ7to6WoMTdCQN7VJj0eBU7zauT9Q=;
-  b=XtAp6LqHdtPFLH92t2xPW/mm7agCHiiBBU1AlMMVAdVPBr3JmK9kOX0R
-   I0zazBWjjoHAfVn48lvYV3FEk9u5GfZbIureajr/h6ebMCsY5SIv8aS7T
-   3IFB5HzDnlHxcMhxib6mrcZMc7kAh2taexuvJMOyV0+cWStWGVvTWCb5z
-   l7PZ3GiRM1cBd73bPn3hVmGdYF6DGAPEI3MroUrxdZ2Eqtp8bJF4dkNjc
-   U/9oTpCf+W1zDyybHf1b2b2wsxQU1r5Z78/SbmJzpTieb54IT/cYKvWt0
-   go4DeVOEuz9CR1EsWBgAAw+GPE/MRU5U17SXCzxbFYSwV2jDrmdAqnrnw
-   A==;
-X-CSE-ConnectionGUID: uATYzFHhSwquhdS7OsU4Zg==
-X-CSE-MsgGUID: t+b6HR/uSpiIx1p2ml+oLQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11819"; a="107943269"
-X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
-   d="scan'208";a="107943269"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 01:43:31 -0700
-X-CSE-ConnectionGUID: kVtvwnhAT7W98MA0btWbOg==
-X-CSE-MsgGUID: Curnho7OSn+PQ5NWgpk/pg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
-   d="scan'208";a="251914883"
-Received: from gnrd8.igk.intel.com (HELO GNRD8) ([10.123.232.137])
-  by orviesa003.jf.intel.com with ESMTP; 17 Jun 2026 01:43:31 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-next v1] ixgbe: Implement PCI reset handler
-Date: Wed, 17 Jun 2026 08:43:29 +0000
-Message-ID: <20260617084329.199110-1-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1781686034; c=relaxed/simple;
+	bh=S6mSooM/vtyjoeK/caPdDRvpomij9YUtS8I+hppAXPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OGBQrpeGcN2Hcfj7vG5asWQTCKamt/Etj8bUHCjEa8BfO8exMC5Ve2ma8Un24TTVR9KDquHs5ogA189Q3UfYB6cJlNxMhAvOxsH74Y11YW1I+GUObaqg/lFccb8zj5NujDSZSgw8W/Ahlrb4CU/H1GLIt4ROdhSC4/kI4uBz8q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DuxFI3dC; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EB421F00A3F;
+	Wed, 17 Jun 2026 08:47:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781686026;
+	bh=htuQhUa1HfSLqmSf+a4aGM2L9LirqJSYUGKvORQmPkM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=DuxFI3dCysid9xJBJTERwWsTGfgg74K3i4Y+T0uvGz+gjHYu4R5MZbHNjglDc4BNi
+	 nV/lwjA8n0qbbpt38AVe835BqANxZ6BsFQPgNIw2X4JN8CqnH8+++HJZ/4L7EThdZQ
+	 L2YR9q2MCF3Zm4l7TRPTNDZccOuCrYyNLZ77G7UK1KKXrqQdxmHxOVj69Y6HxhywCM
+	 oCtxeDe8EHLcCDdx3+yFsRKpLXRiuhfRm+MkQt1pekWrWzm8rPBh2AK1ZDR59aWwyI
+	 ERvV994c8jW2KZ2KSR9qo3Os7KFZEKl8kOsfzMg1q1cv3ZZmCTyXdN6QSvF+d5BqJQ
+	 R1M7SHYWx8pZw==
+Date: Wed, 17 Jun 2026 09:47:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, piotr.raczynski@intel.com,
+	michal.swiatkowski@linux.intel.com, wojciech.drewek@intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] ice: eswitch: fix use-after-free of metadata_dst in
+ repr release
+Message-ID: <20260617084701.GB827683@horms.kernel.org>
+References: <20260615140532.52676-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260615140532.52676-1-doruk@0sec.ai>
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300077-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWO(0.00)[2];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-300078-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:piotr.raczynski@intel.com,m:michal.swiatkowski@linux.intel.com,m:wojciech.drewek@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sergey.temerkhanov@intel.com,netdev@vger.kernel.org];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,intel.com:from_mime,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,horms.kernel.org:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A5143697A55
+X-Rspamd-Queue-Id: AB94A697AA2
 
-Implement PCI device reset handler to allow the network device to
-get re-initialized and function after a PCI-level reset.
+On Mon, Jun 15, 2026 at 04:05:32PM +0200, Doruk Tan Ozturk wrote:
+> ice_eswitch_release_repr() frees the port representor metadata_dst via
+> metadata_dst_free(), which directly kfree()s the object and ignores the
+> dst_entry refcount. The eswitch slow-path TX routine
+> ice_eswitch_port_start_xmit() takes a reference on this dst with
+> dst_hold() and attaches it to the skb via skb_dst_set(). If such an skb
+> is still in flight (e.g. queued in a qdisc) when the representor is torn
+> down, the metadata_dst is freed while the skb still points at it. When
+> the skb is later freed, dst_release() operates on already-freed memory.
+> 
+> Replace metadata_dst_free() with dst_release() so the metadata_dst is
+> freed only after the last reference is dropped. The dst subsystem frees
+> metadata_dst objects from dst_destroy() once the refcount reaches zero
+> (DST_METADATA is set by metadata_dst_alloc()).
+> 
+> Same class of bug and fix as commit c32b26aaa2f9 ("netfilter:
+> nft_tunnel: fix use-after-free on object destroy").
 
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 72 +++++++++++++++++++
- 2 files changed, 73 insertions(+)
+I think that the commit cited above moves the code in question around
+but did not introduce the call to dst_release. And I think that this
+bug goes back to when switchdev support was added.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 594ccb28da20..c4b0c5bb89c6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -912,6 +912,7 @@ enum ixgbe_state_t {
- 	__IXGBE_PTP_TX_IN_PROGRESS,
- 	__IXGBE_RESET_REQUESTED,
- 	__IXGBE_PHY_INIT_COMPLETE,
-+	__IXGBE_PCIE_RESET_IN_PROGRESS,
- };
- 
- struct ixgbe_cb {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 2ac274c73d61..a61ee5fff7be 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -12352,6 +12352,76 @@ static pci_ers_result_t ixgbe_io_slot_reset(struct pci_dev *pdev)
- 	return result;
- }
- 
-+#define IXGBE_PCIE_RESET_RETRIES 1000
-+
-+/**
-+ * ixgbe_reset_prep - called before the pci bus is reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Prepare the card for a reset, preventing the service task from running.
-+ */
-+static void ixgbe_reset_prep(struct pci_dev *pdev)
-+{
-+	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
-+	unsigned int timeout = IXGBE_PCIE_RESET_RETRIES;
-+
-+	if (!adapter)
-+		return;
-+
-+	/* Prevent the service task from being requeued in the timer callback
-+	 * while we're resetting.
-+	 */
-+	if (test_bit(__IXGBE_SERVICE_INITED, &adapter->state)) {
-+		timer_delete_sync(&adapter->service_timer);
-+		/* Prevent the service task from running while we're resetting. */
-+		cancel_work_sync(&adapter->service_task);
-+	}
-+
-+	pci_clear_master(pdev);
-+
-+	while (test_and_set_bit(__IXGBE_RESETTING, &adapter->state) && --timeout)
-+		usleep_range(1000, 2000);
-+
-+	if (!timeout) {
-+		e_err(drv, "Timed out waiting for __IXGBE_RESETTING to be released. Reset is needed\n");
-+		pci_set_master(pdev);
-+		return;
-+	}
-+
-+	set_bit(__IXGBE_PCIE_RESET_IN_PROGRESS, &adapter->state);
-+	smp_mb__after_atomic();
-+}
-+
-+/**
-+ * ixgbe_reset_done - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Allow the service task to run and schedule re-initialization.
-+ */
-+static void ixgbe_reset_done(struct pci_dev *pdev)
-+{
-+	struct ixgbe_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	smp_mb__before_atomic();
-+	if (!test_and_clear_bit(__IXGBE_PCIE_RESET_IN_PROGRESS, &adapter->state)) {
-+		e_err(drv, "Reset done called without PCIe reset in progress\n");
-+		return;
-+	}
-+
-+	/* Allow the service task to run */
-+	if (!test_bit(__IXGBE_REMOVING, &adapter->state)) {
-+		clear_bit(__IXGBE_RESETTING, &adapter->state);
-+		smp_mb__after_atomic();
-+	}
-+
-+	/* Schedule re-initialization */
-+	if (!test_bit(__IXGBE_DOWN, &adapter->state)) {
-+		set_bit(__IXGBE_RESET_REQUESTED, &adapter->state);
-+		if (test_bit(__IXGBE_SERVICE_INITED, &adapter->state))
-+			mod_timer(&adapter->service_timer, jiffies + 1);
-+	}
-+}
-+
- /**
-  * ixgbe_io_resume - called when traffic can start flowing again.
-  * @pdev: Pointer to PCI device
-@@ -12384,6 +12454,8 @@ static const struct pci_error_handlers ixgbe_err_handler = {
- 	.error_detected = ixgbe_io_error_detected,
- 	.slot_reset = ixgbe_io_slot_reset,
- 	.resume = ixgbe_io_resume,
-+	.reset_prepare = ixgbe_reset_prep,
-+	.reset_done = ixgbe_reset_done,
- };
- 
- static DEFINE_SIMPLE_DEV_PM_OPS(ixgbe_pm_ops, ixgbe_suspend, ixgbe_resume);
+I would suggest:
 
-base-commit: c50bfa9768ff3a5163746c6362a8a910a0b4dca0
--- 
-2.53.0
+Fixes: 1a1c40df2e80 ("ice: set and release switchdev environment")
+
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
+
+Otherwise, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
