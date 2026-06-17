@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-300034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300035-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QzcNJYgxMmrxwQUAu9opvQ
-	(envelope-from <netdev+bounces-300034-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:32:56 +0200
+	id dk/WNY4xMmr3wQUAu9opvQ
+	(envelope-from <netdev+bounces-300035-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:33:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C09696985
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:32:55 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E65869698F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:33:02 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=microchip.com header.s=mchp header.b=ob4uccyB;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300034-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300034-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=microchip.com header.s=mchp header.b=FBqc6NsL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300035-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300035-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=microchip.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7ECB9305BB6D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 05:32:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 32C66303957A
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 05:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2D630C360;
-	Wed, 17 Jun 2026 05:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B409E311C2D;
+	Wed, 17 Jun 2026 05:32:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6777A1494A8;
-	Wed, 17 Jun 2026 05:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688D11494A8;
+	Wed, 17 Jun 2026 05:32:58 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781674373; cv=none; b=tLAhfBgcozA130xTVJXaNm6Pz+iSjShuOSscHzot9u4ot0RmCWB/X4jiHzzrmaSCOLWqP2Y2egl2LRGE08jmFnPk91ZA6XcfNy7OSNpULx0rZPYKI7wy6wRQulh2awVEnR2W4uxugYKK4a3D4D7n9RC4t8BA7lV/0669vNyea+8=
+	t=1781674379; cv=none; b=lnaCiWkLKE3+FPd7rmosRSV72rZoA5+zjQDJLL+CK4rQCZW90dtI8TP0FzP1l68ifTg7kfuzbgkNwUIsp64Yc6JUW4b4wU7Bpqi7aNVmNl+P4tgyaUcgHcVB2Vuhw7Uwml8ksi+izVBw96KjSIHWMfWMjI2Yzcekw/+YfrX3hZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781674373; c=relaxed/simple;
-	bh=nElNBNKAznnqaiVAP2gfcv9Ta7QLAyZqYembum2OjwY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nyRCa9g5ltk0U44SEIH/fKuEUYv5/GkfHG3MoCriYAPYaE00WFWPgpmTCeaohqYzEDSduF38JyIv23Ye4yA15aeeRassOE0jUa/xQCN3qq5Vw0wHtys0CdwXzdUI8Uqhj9qv9jTJA90mLbCBrQs8bMqsZEFeK5pNO08aq3YhVPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ob4uccyB; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1781674379; c=relaxed/simple;
+	bh=CF6tuQ5Bpv2LWIgdxKTEhbznnrZ8ooydvRqz8sALig4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IuDoYLj0UOJzbn5Nz3gYs9pmZdxlKViifQtDpDr1z2mtYJXjbBpmjFRR404olHzgAurddicJG3SMBBrcyUP42Txzf5YtRfNO46iES13gHQL3yUOxBAoDFxc06Po6ME9EvTzxDue2jlkao/3D3af+ErAxKR80paeuKfZ+Wrs4gx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=FBqc6NsL; arc=none smtp.client-ip=68.232.153.233
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1781674372; x=1813210372;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nElNBNKAznnqaiVAP2gfcv9Ta7QLAyZqYembum2OjwY=;
-  b=ob4uccyBdAW3HrWiqxqDWfMulDH804m1vtd10mPN3kbVse4M0w5aY1LJ
-   4L41ebqqMjdYb7NTbcO2JeK3G8s9ymtF0JJOez6laf+PKmpx8lnPS8YNN
-   X38JPe7d7sC3h+EoAdeS6xjBD8lpdFJJuBDLTfX5l2mJEmqvgzXH7sijF
-   AzZzbC7sX9cRuNmhE/0AAqrxD03HoY/PFeaxObbZ+VQ4jqU+aIGnIeoQU
-   cv35nkirECC2Xrx1NbJMm8NzVioTaLhBf9rJwdVLNM/K/keZFjjyGdsQ3
-   Z0DQtLm+QSYjIxub7dGe5nmptMA5WQQc/3LR7fZnAlnnQDI67PCKX5XIC
+  t=1781674379; x=1813210379;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=CF6tuQ5Bpv2LWIgdxKTEhbznnrZ8ooydvRqz8sALig4=;
+  b=FBqc6NsLPKzrHaylz4Z1NdKwburq3TPWWrPihMCfSkz5SOv5KJ1CQ/wv
+   mun2LlhvSzMk++OdGCMSiNA2SS0Nh+N9p2bDMBxLDVENOg2kKRQ1IYkbm
+   TvXLPxL0PUKBeAd+SO3PkKHi91p6c3q8kg00fq0o6GGez/APoP/j+AtqL
+   abd5myn2pb/HgUu6jGS/3C9YL45fi4myUXgCPPf1Zt4oMsVXlDmSljuqN
+   GxjrFCYgv7sKmk7BFWxE5Uhx2qUZMoMixEWd+l0VPzOuX0iRdo8Es5Cah
+   5iv6ouA2xFP6DVxnH0LjvUsd1EK71iolr5VaHS0sA/828q6+7xE96iWn0
    A==;
-X-CSE-ConnectionGUID: ZaVTlC97TeWTd3HxEn153w==
-X-CSE-MsgGUID: jtRd+cioQzG6JYwFcjsyEw==
+X-CSE-ConnectionGUID: wKVZYtoRRFWuQd1hHak3mw==
+X-CSE-MsgGUID: we2gtDhEQt+0wA9vxtP+1Q==
 X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
-   d="scan'208";a="68341228"
+   d="scan'208";a="59255627"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 22:32:51 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 22:32:58 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
  chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Tue, 16 Jun 2026 22:32:51 -0700
+ 15.2.2562.41; Tue, 16 Jun 2026 22:32:57 -0700
 Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Tue, 16 Jun 2026 22:32:47 -0700
+ 15.1.2507.58 via Frontend Transport; Tue, 16 Jun 2026 22:32:54 -0700
 From: Thangaraj Samynathan <thangaraj.s@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
 	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v4 0/2] net: lan743x: add RMII support for PCI11x1x
-Date: Wed, 17 Jun 2026 11:02:39 +0530
-Message-ID: <20260617053241.157932-1-thangaraj.s@microchip.com>
+Subject: [PATCH net-next v4 1/2] net: lan743x: add RMII strap status detection for PCI11x1x
+Date: Wed, 17 Jun 2026 11:02:40 +0530
+Message-ID: <20260617053241.157932-2-thangaraj.s@microchip.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260617053241.157932-1-thangaraj.s@microchip.com>
+References: <20260617053241.157932-1-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,12 +89,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300034-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300035-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bryan.whitehead@microchip.com,m:UNGLinuxDriver@microchip.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
@@ -109,45 +112,78 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D6C09696985
+X-Rspamd-Queue-Id: 4E65869698F
 
-This series adds RMII interface support for the Microchip PCI11x1x
-Ethernet controller.
+Extend pci11x1x_strap_get_status() to read the RMII strap bits from
+the STRAP_READ register. The is_rmii_en flag is initialized to
+false and updated based on the hardware strap only if SGMII is not
+already enabled. This ensures correct interface identification during
+adapter initialization.
 
-The PCI11x1x device supports RMII as an alternative MAC-PHY interface,
-selected via the STRAP_READ software strap register. Patch 1 reads the
-RMII strap bits from this register and sets the is_rmii_en flag. Patch 2
-uses this flag to configure the PHY interface mode, phylink supported
-interfaces, and enables RMII in hardware via the RMII_CTL register.
+Update the netif_dbg() to report the selected interface as SGMII,
+RMII, or RGMII.
 
-Change Log:
-===========
-v3 -> v4:
-  - Fix dev_dbg() in lan743x_mdiobus_init() to print "RMII operation"
-    instead of "RGMII operation" when RMII is selected [Simon Horman]
+Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 12 ++++++++++--
+ drivers/net/ethernet/microchip/lan743x_main.h |  3 +++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-v2 -> v3:
-  - Update debug log to report selected interface (SGMII/RMII/RGMII)
-    instead of only SGMII enable/disable state [patch 1/2]
-  - Update commit message to document that EEE is disabled by setting
-    lpi_capabilities = 0 [patch 2/2]
-
-v1 -> v2:
-  - Remove redundant mac_capabilities &= ~MAC_1000FD; phylink already
-    handles capability reduction for RMII via phy_caps_from_interface()
-    [patch 2/2]
-
-Thangaraj Samynathan (2):
-  net: lan743x: add RMII strap status detection for PCI11x1x
-  net: lan743x: add support for RMII interface
-
- drivers/net/ethernet/microchip/lan743x_main.c | 34 ++++++++++++++++---
- drivers/net/ethernet/microchip/lan743x_main.h |  6 ++++
- 2 files changed, 36 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 1cdce35e1423..0798f3f1f435 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -42,6 +42,7 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 	u32 strap;
+ 	int ret;
+ 
++	adapter->is_rmii_en = false;
+ 	/* Timeout = 100 (i.e. 1 sec (10 msce * 100)) */
+ 	ret = lan743x_hs_syslock_acquire(adapter, 100);
+ 	if (ret < 0) {
+@@ -73,8 +74,15 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
+ 			adapter->is_sgmii_en = false;
+ 		}
+ 	}
+-	netif_dbg(adapter, drv, adapter->netdev,
+-		  "SGMII I/F %sable\n", adapter->is_sgmii_en ? "En" : "Dis");
++
++	if (!adapter->is_sgmii_en && strap & STRAP_READ_USE_RMII_EN_) {
++		if (strap & STRAP_READ_RMII_EN_)
++			adapter->is_rmii_en = true;
++	}
++
++	netif_dbg(adapter, drv, adapter->netdev, "Selected I/F: %s\n",
++		  adapter->is_sgmii_en ? "SGMII" :
++		  adapter->is_rmii_en  ? "RMII"  : "RGMII");
+ }
+ 
+ static bool is_pci11x1x_chip(struct lan743x_adapter *adapter)
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 1573c8f9c993..1f8d9294a6ef 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -36,7 +36,9 @@
+ #define FPGA_SGMII_OP			BIT(24)
+ 
+ #define STRAP_READ			(0x0C)
++#define STRAP_READ_USE_RMII_EN_		BIT(23)
+ #define STRAP_READ_USE_SGMII_EN_	BIT(22)
++#define STRAP_READ_RMII_EN_		BIT(7)
+ #define STRAP_READ_SGMII_EN_		BIT(6)
+ #define STRAP_READ_SGMII_REFCLK_	BIT(5)
+ #define STRAP_READ_SGMII_2_5G_		BIT(4)
+@@ -1072,6 +1074,7 @@ struct lan743x_adapter {
+ 	struct lan743x_rx       rx[LAN743X_USED_RX_CHANNELS];
+ 	bool			is_pci11x1x;
+ 	bool			is_sgmii_en;
++	bool			is_rmii_en;
+ 	/* protect ethernet syslock */
+ 	spinlock_t		eth_syslock_spinlock;
+ 	bool			eth_syslock_en;
 -- 
 2.34.1
 
