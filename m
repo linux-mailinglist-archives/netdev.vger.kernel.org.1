@@ -1,336 +1,240 @@
-Return-Path: <netdev+bounces-300104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id byCZEdJuMmqOzwUAu9opvQ
-	(envelope-from <netdev+bounces-300104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:54:26 +0200
+	id 2oYsEkpsMmrkzgUAu9opvQ
+	(envelope-from <netdev+bounces-300105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:43:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911AF698233
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:54:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9557698046
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:43:37 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=redhat.com header.s=mimecast20190719 header.b=hIWmu4s9;
-	dkim=pass header.d=redhat.com header.s=google header.b=ExKhtE1L;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300104-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300104-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=redhat.com;
+	dkim=pass header.d=qualcomm.com header.s=qcppdkim1 header.b="GX/i+kn6";
+	dkim=pass header.d=oss.qualcomm.com header.s=google header.b=MtVzLl6W;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300105-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300105-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=qualcomm.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FEDC31D3071
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:43:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ECAFC305EDE0
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47553A1A3F;
-	Wed, 17 Jun 2026 09:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AAE3BB13C;
+	Wed, 17 Jun 2026 09:43:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADDA39D6DD
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF0E3BB130
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:43:02 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781689381; cv=none; b=DbyD/T1tTXfpEA9C3giGKgM88zYxdH6ZIHJ28hITcKFSBMA17BeMlxSCchV65KKyef+mQsrk990WkXzRlDc25W3yxY2rx7caTRn13JHFQXoB7bv6f3FWoPG+c0S0wNp8f9C41VSe85+sBf9NT01aXMd+ludzCQ5qzJhjIZINOB4=
+	t=1781689384; cv=none; b=IbPTXY7Dgos9nZlJGWkx9LqY0kabrAAU72cM8fu3tMNHs0xcyOi4gs1w316FhSL+RQZTn4W9iD33eYvPzw847jRwSJfeKZWRymBLctWmYDFTXJhVXKwJplyJNsbHtcuDh5khgz+nDHX8EEpg5mO1XkRSLvB76ra1ZbK8JUvTAOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781689381; c=relaxed/simple;
-	bh=6dk1V2FkwIjUDraVd9ebLKZ6skrFu0NoYQrzqg9QeDE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LVxNizZBqzKL0CKi+6TMCBTG9dq5Psv4ZFw9aHeo0xGk4FFLMrSzinAGkKyi865Mh8QqBR5xAWvR/2HzJGOK4o0KFDzEyGW64OpXcZWqjBgctz8knKZ/wYnnIDFlnqCPp1WaeRKd7oRdeI3/Oq++v9vKtn7DzzOMkaG0x/TOoOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hIWmu4s9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ExKhtE1L; arc=none smtp.client-ip=170.10.133.124
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781689379;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ozmBpImS8oeWooI3eg5F7+EjraI/5E3NnIle2PdR8uw=;
-	b=hIWmu4s9Rxruex8hxqgHpz9ZxtezH5DE6NhzkCOXv7x4UslDLrRdMoS2+nf1IWYvniSiQu
-	KUL4Cj1n0kc6VqV6nZTy+iEDxItCWUPIRLgtuD+slJd4t7Y/eU6UnBBKTJfGV34nwNz64X
-	BNS+NZQHi7DA6t/JsyuOyBgrnnMjUyI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-0vaI-D4rNfOPpkMK8ePEMg-1; Wed, 17 Jun 2026 05:42:58 -0400
-X-MC-Unique: 0vaI-D4rNfOPpkMK8ePEMg-1
-X-Mimecast-MFC-AGG-ID: 0vaI-D4rNfOPpkMK8ePEMg_1781689377
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-490c840efe6so7174575e9.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 02:42:57 -0700 (PDT)
+	s=arc-20240116; t=1781689384; c=relaxed/simple;
+	bh=EZr0nMvAPIMzIkfRESwH2m1KRPNc91oLSbNsVSniRXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pSCmdEMz2JCVxjRCYOSkxt6u9nH3ABpFsZDXR8UFmjblztCqWQb9R/MVXW0Yox/m0WwVxmjOvGfJox80MWpmLhWWtTBAAUagP7GifFxjD9ooh6Ao3fgcnSrDHy77AKe+tT/whn1oyHxLwrAIxHV6Jo382fNW6k7VgK+zxBm9jMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GX/i+kn6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=MtVzLl6W; arc=none smtp.client-ip=205.220.180.131
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65H8UsiA2025330
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:43:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Y0PFZ3dXkaCLzVPbD6H+hniaJto+R8rtLevzujc1O/Q=; b=GX/i+kn6Y6I3oDWo
+	aKZ3q+/3afC6clikdCrc1fjsFR5e2YYq18MqmjNtGJHnszSyPl6hwpd830Ak7uek
+	bi25KgGDgRZSeh+nmw4Obz/Njq1fFljmEQOmJtBNmi8wdgg036Ni/adGyzEsrQxp
+	WQq6yOWPI3MIHxn0YKWWwQR/Pu6uVowDZSgkjEgP/SBXKHpagFDFUY/5EhtHygzc
+	qcH8nqgKzEOoiboJZJkdYWUW7AQiGGJKa8rIpUKjcOJN7ThxhMMziDXPuAgLtjFq
+	3e1oxGiP35MSTBItCrgq7JVVvSNUV1k1lKVvIHRuaU32O2ZK+qVLUx5NInTVqnUC
+	uGPRhA==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4euees2g6w-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:43:02 +0000 (GMT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-517bdeceb54so13149331cf.2
+        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 02:43:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1781689377; x=1782294177; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ozmBpImS8oeWooI3eg5F7+EjraI/5E3NnIle2PdR8uw=;
-        b=ExKhtE1LQVvWuOJR+cmR/EVFSOQuYdEGrodZfVZ0P0/AEM35HQep2W4Jra0kkFagGy
-         LRdD9nmY/mlIvtPM8vqcw6eV/WmOfAIi15FcYVp1ELeXhmth3kesItjJW01n0sR3Ja1f
-         x3iVpwDU+SIci+9fo6+Oj+t797ibT8PVcHuHPZ1XoWqEoWcMtxiUeoeQjwMdP23WSAHu
-         KBRooVSupDi91wmsKJM6r+MYHX/D7pv2GYy+GFzVIzZlKrD/PFYkfgtAhio3v3oE/vdr
-         GSS7UkkbgJ6Ivx9av4ceOes3MM/4stPEybdw1NtTmc1DjQb9pahB9jcv54JrpLUrjS8n
-         nNqw==
+        d=oss.qualcomm.com; s=google; t=1781689381; x=1782294181; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0PFZ3dXkaCLzVPbD6H+hniaJto+R8rtLevzujc1O/Q=;
+        b=MtVzLl6WzjjLFX4cu2TG8tunwLM1hb45RqXQdyb0fp0jW7Rt2k/XyWjeLILa0rQfzl
+         VNLgF30o5oVw/BkV+EZwIC7BWD2FK2cagiBVqEwPYHe3xCwM2P/4LRItlxTClAB+V9B7
+         YBUTy4H+gFl/+p/QjJEXyRnj6d9+Nwwj9pnjIF6yq12CkDHtYctOzkVYhstlqQ0tbc2O
+         p7AcpqdnTrhdvLu5M1vcPIeinLV+d85pIORCAPGcdMH35/O9z28PC4wzv21nGMeW6HB2
+         cAjI6TWvpgReWnx3x6CIV5bg8KWpYnNhhkZ0MZ2GPIgLpgiOr0MQ/rOi2ilP5Z96PaxI
+         JOag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781689377; x=1782294177;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ozmBpImS8oeWooI3eg5F7+EjraI/5E3NnIle2PdR8uw=;
-        b=MyP6D2T9R2vvflXW4SSjnadzxqy26EU4Nmbe7ebbxq8mGFVF9+pRqOF9e1rTmVkDIs
-         xErFHB8CAjkUOAKKqFRAoqKYfaNqpO7xTjSC41IqVkB2ObMjK/G16x5BUhRnDcwdGSa0
-         xw+xJaXKl3KzGrTrL1GhCqPPS1nSLwgic+B85Rk3nspuGUR12qEHpodlTPMSXtizuZ+9
-         MuYrx0Q7Q3BKrGznCu4FawvA8gVyHzp/wGrawFCRgrW4MzzSMYMQIIvDXiPGWuFhlMKu
-         7gD4miMqEi6nkJ24ca4tKx1GHQu6HYhAyt9SGLQk5fTwgnHcctow9NvCKKaioIJhRp7Y
-         G4Wg==
-X-Forwarded-Encrypted: i=1; AFNElJ8fALsG27sFwISpE6Srk619pqaOnfNNkz7xAcxZsuvz1v3uzcXpnMiWDEeR1MqdDM6L8RJyd30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwW5Q2J0BYDdp7L9nmVpK9q/wZdMbZUo0zqQk8yZDkcnh9VOPDw
-	K+t8aProp4tlrmK5WeYRPCRCAL7VEaZTkb4NWPO+Ykh4KLu4SNyLlLvhC1r7ISwdPc/0Alxh9g+
-	DTmBxvJMggoVA1SBfXOrwuX/VJ9sARlVyJIWWrsZFft3RkxYoA1o9iqur0A==
-X-Gm-Gg: Acq92OGuF4fqWNERiv9E9bHyuBKPe4TmKPhoexLQVePHS57CXqPJ2u5b234sP4CEE0z
-	hEJOOfjfJrJwomIDmJIXt1Z+yRyMp785Q3VEET+ZpOWV3jVek/J4dsWgSvIYfTyYQDFg7e11Slu
-	VU9UP2JuC4C3d3vhXjEDGItYx4vRaIccplGa01bw8SL16vAaR1XUOajKjXG5fAuSM+0sY0PQAr6
-	146zziBUYFQA+iF8ocRfv1NC/C+La6CthQT/LsgkXpq9DtGNNsxR5AF9/e1Nl/Mc13ATSjz8GRg
-	KkejgkXKPV02yKaERj86YuzIhd4AAJWjAApIyiPSqedvvGfuKHhwYNjJ91LFtVrUvIYDpv3r2zR
-	VHLchkQ9G2EezBOrjwsthHkoqrzriJ3kWW8QhaQ==
-X-Received: by 2002:a05:600c:46cf:b0:490:b4cb:3866 with SMTP id 5b1f17b1804b1-492340e7632mr28942665e9.10.1781689376549;
-        Wed, 17 Jun 2026 02:42:56 -0700 (PDT)
-X-Received: by 2002:a05:600c:46cf:b0:490:b4cb:3866 with SMTP id 5b1f17b1804b1-492340e7632mr28942185e9.10.1781689375972;
-        Wed, 17 Jun 2026 02:42:55 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa8b423sm146401065e9.11.2026.06.17.02.42.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2026 02:42:55 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id D20C38074C9; Wed, 17 Jun 2026 11:42:53 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Avinash Duduskar <avinash.duduskar@gmail.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya Dwivedi
- <memxor@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa
- <jolsa@kernel.org>, Emil Tsalapatis <emil@etsalapatis.com>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Mykyta
- Yatsenko <yatsenko@meta.com>, Leon Hwang <leon.hwang@linux.dev>, KP Singh
- <kpsingh@kernel.org>, Anton Protopopov <a.s.protopopov@gmail.com>, Amery
- Hung <ameryhung@gmail.com>, Eyal Birger <eyal.birger@gmail.com>, Rong Tao
- <rongtao@cestc.cn>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 3/4] bpf: Add BPF_FIB_LOOKUP_VLAN_INPUT flag
- to bpf_fib_lookup() helper
-In-Reply-To: <20260616223426.3568080-4-avinash.duduskar@gmail.com>
-References: <20260616223426.3568080-1-avinash.duduskar@gmail.com>
- <20260616223426.3568080-4-avinash.duduskar@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 17 Jun 2026 11:42:53 +0200
-Message-ID: <874ij1h59e.fsf@toke.dk>
+        d=1e100.net; s=20251104; t=1781689381; x=1782294181;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y0PFZ3dXkaCLzVPbD6H+hniaJto+R8rtLevzujc1O/Q=;
+        b=RHDsu2HG0v/hHdneAHYc4WgHuqb916rifOxlJNEY0To3p1abAwMgOn6DAhBhyYmLRQ
+         XbPEMOZRoFYCVeLzuuh6sLN6UR6xW4qePjAZfWccE2DMvaemZbueQ6eEg8g49LKyZF0T
+         SVM0CyKF9OiYdAaAZIfz73PYmU9u9DchV4cL+kkjhTXhlAFhsfpQX+bZ5N8yZE24YeTD
+         zdjLUToHLNt3SiB5RiUrRInzP9449WlnLuTy1xT4YsNq/uQil05EEJv4rZa5misudpds
+         V0IgJsPB3rUMmpj1tfNPEOHvu7Qv4tSwV4XbjEe9hHgOwMpY3p0/hPBL7/V1dipwoogh
+         V5xQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9QCt2QBjJFaoXSbG9K/+R94BipDDgF3MAz8byAaBrZMxHgAGWZfExfNUV7sDrQ+SdJ1P6FFCU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxza3oj+pEzX3K82LL9RYAyyFT4HmWUI4PTW8uXfoFE3YJgneDn
+	vfGZdetr1ZlQLvbiq4NsIYXtS/IUrILISFSSA4MQrSwK9gpWvtMnfUZiJNgniAInQP7IE/3WLHn
+	N3h0BPHXlFiolMF0EovV+C0OrdblgOvXzM/Q80zrpd5DumnzRx2k3fU99Ikk=
+X-Gm-Gg: Acq92OGlKvCFnQmdXKui72S5z9FjGJ2rzG0uFFZyj+LeXUHvBi6/rETIGe0kzdwn/H+
+	09UEoNh6Fgq8dtlOlG+qj3eiuq7Cr24ULN+oobsJneLHznG79P7QaWiSCFIrohEWq96UHcNe4Um
+	go1dQm15S6+QtqPvto/C4mA7nE7/3T52a8pe4neDaAMHNyScEzXIA8AZldVXAud+NGoqJ8nX2pa
+	N80ZfnwFNQKFcxpnmPK3a47fas+flIV1KyicSJordWP3nmDRwrBOYkClXfKMpsMbDUB16DUCdwG
+	Aps6OeMHpObo0tBxPjF+dtVxgwCKCwMvP2IpePTNY4tKL3dEYVT2MwlwEipkkDmUrC05Ejchd9u
+	bwMiXteDhS1MR1spWqet4CmZ8SCG/ZNOqY9c=
+X-Received: by 2002:a05:620a:1727:b0:915:6433:2599 with SMTP id af79cd13be357-91db94877e5mr256353385a.1.1781689381494;
+        Wed, 17 Jun 2026 02:43:01 -0700 (PDT)
+X-Received: by 2002:a05:620a:1727:b0:915:6433:2599 with SMTP id af79cd13be357-91db94877e5mr256350885a.1.1781689381048;
+        Wed, 17 Jun 2026 02:43:01 -0700 (PDT)
+Received: from [192.168.120.170] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6937919b458sm6374523a12.5.2026.06.17.02.42.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jun 2026 02:43:00 -0700 (PDT)
+Message-ID: <4f3c6bee-3ccb-467e-a466-89fece0e6a7f@oss.qualcomm.com>
+Date: Wed, 17 Jun 2026 11:42:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 8/9] arm64: dts: qcom: shikra-cqs-evk: Enable
+ ethernet0
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Russell King <linux@armlinux.org.uk>, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+References: <20260612-shikra_ethernet-v1-0-f0f4a1d19929@oss.qualcomm.com>
+ <20260612-shikra_ethernet-v1-8-f0f4a1d19929@oss.qualcomm.com>
+ <2cb658f3-f564-4396-884d-d025eaa674a1@oss.qualcomm.com>
+ <ajF+xlipLuZtf4HL@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <ajF+xlipLuZtf4HL@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: 9osc8pAubXA95ZJkiykSR4QN8Y-wMWJ2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE3MDA5MCBTYWx0ZWRfX60GNhQJodv8i
+ DQt6Y88+MoLSGnj3S0YLGAbMi+QCxMEcJLjs7BDzgkqtC9HulsFnSI7Kn/mVI//vVjVvwhGLLNZ
+ TDicHRKQuUaMVwEZid6ymrWTsE+JLPzdwj6npJXRR9eIBOtQTPUBwODp34JqbUCGJ8Lo4/wY2Mn
+ YeAa44Ho4ZcQFj7Q67ziGf9oCbF6kOeevRbnUKtZcIAStc8OeXIfbTV+9Xg8hXpDgl5ZpbvUpHw
+ 23KM6QpXa7FaI+yo/BmpKeaIgQuN0DeWvn+6tfi2oizO7dA0pop8i2sUjmhwGNkP1o1OxPp5GYW
+ te9q3jVNQIA9ClR//MS3nvy3d9Lyw0NsMPAtBecb+UCLg3f/6DCeNEdUXF3AWxYJ0rGcFwLzePQ
+ wyC34gO3HjfBne4ax0AkQXiXeOQBvrFEdGBM/j1wG3/Zwjn4btBBkEBzOv7SPC88LqU1I3yNCZx
+ MfP/pmWEgcHDMQteNrA==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE3MDA5MCBTYWx0ZWRfX8asVpQMPJ2C6
+ QpbHWuYIFRzTA6KVw3gj3ny/72Pnu4T47P9RzUgoRvhV+gLqTMRVSGqzOGZTvHOmt8viPDJtFLM
+ EfjcJ9g8SKXW82WoKFMNnRtO20OHmeU=
+X-Authority-Analysis: v=2.4 cv=KeTidwYD c=1 sm=1 tr=0 ts=6a326c26 cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=VwQbUJbxAAAA:8 a=UqCG9HQmAAAA:8 a=zlF0UblE2nBlcRgU2acA:9 a=QEXdDO2ut3YA:10
+ a=kacYvNCVWA4VmyqE58fU:22
+X-Proofpoint-GUID: 9osc8pAubXA95ZJkiykSR4QN8Y-wMWJ2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-17_01,2026-06-16_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 spamscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 malwarescore=0 adultscore=0 priorityscore=1501 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606170090
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.10 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.56)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300104-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:avinash.duduskar@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:eddyz87@gmail.com,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:dsahern@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:yatsenko@meta.com,m:leon.hwang@linux.dev,m:kpsingh@kernel.org,m:a.s.protopopov@gmail.com,m:ameryhung@gmail.com,m:eyal.birger@gmail.com,m:rongtao@cestc.cn,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:avinashduduskar@gmail.com,m:johnfastabend@gmail.com,m:asprotopopov@gmail.com,m:eyalbirger@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-300105-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:mohd.anwar@oss.qualcomm.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:richardcochran@gmail.com,m:andersson@kernel.org,m:konradybcio@kernel.org,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux@armlinux.org.uk,m:linux-arm-msm@vger.kernel.org,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,kernel.org,etsalapatis.com,fomichev.me,davemloft.net,google.com,redhat.com,meta.com,cestc.cn,vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,iogearbox.net];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,toke.dk:mid];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,qualcomm.com:dkim,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,oss.qualcomm.com:from_mime];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[konrad.dybcio@oss.qualcomm.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 911AF698233
+X-Rspamd-Queue-Id: D9557698046
 
-Avinash Duduskar <avinash.duduskar@gmail.com> writes:
+On 6/16/26 6:50 PM, Mohd Ayaan Anwar wrote:
+> On Tue, Jun 16, 2026 at 11:50:26AM +0200, Konrad Dybcio wrote:
+>> On 6/11/26 8:37 PM, Mohd Ayaan Anwar wrote:
+>>
+>>> +&tlmm {
+>>> +	ethernet0_defaults: ethernet0-defaults-state {
+>>
+>> s/defaults/default
+>>
+>> Please move this definition to shikra.dtsi
+>>
+> 
+> The CQM and CQS variants have identical GPIO mapping but the IQS is
+> different. So should I keep this in shikra.dtsi and overwrite for IQS in
+> shikra-iqs-evk.dts?
+> 
+> 
+>>> +
+>>> +	emac0_phy_en_hog: emac0-phy-en-hog {
+>>> +		gpio-hog;
+>>> +		gpios = <149 GPIO_ACTIVE_HIGH>;
+>>> +		output-high;
+>>> +		line-name = "emac0-phy-en";
+>>> +	};
+>>
+>> This looks like a hack - what does this pin actually do?
+>>
+> 
+> The power supply to both PHYs on Shikra is gated by a GPIO pin. I am
+> unsure whether they should be modelled as a fixed, enable-on-boot
+> regulator or just like this. They need to be powered on early so that
+> MDIO can detect them.
 
-> BPF_FIB_LOOKUP_VLAN resolves a VLAN egress. The reverse is also
-> useful: an XDP program receiving a VLAN-tagged frame on a physical
-> device wants the lookup to behave as if the packet had arrived on the
-> corresponding VLAN subinterface, so iif-based policy routing and VRF
-> table selection use the right ingress.
->
-> Add BPF_FIB_LOOKUP_VLAN_INPUT. When set, params->h_vlan_proto and
-> params->h_vlan_TCI are read as an input VLAN tag and the matching VLAN
-> device of params->ifindex is resolved with __vlan_find_dev_deep_rcu().
-> The device must be up and in the same network namespace as
-> params->ifindex (a VLAN device can be moved to another netns while
-> registered on its parent; receive would deliver into that other
-> namespace, which a lookup here cannot represent). If params->ifindex
-> is itself a VLAN device, its inner (QinQ) subinterface is matched.
-> For a bond or team, a tag on a port matches no device and returns
-> NOT_FWDED; pass the master's ifindex.
-> The lookup then runs with the resolved device as the ingress;
-> params->ifindex itself is not modified on the input side. When the
-> resolved device is enslaved to a VRF, both the full lookup (via the
-> l3mdev rule) and BPF_FIB_LOOKUP_DIRECT (via l3mdev_fib_table_rcu())
-> select the VRF's table from the resolved ingress. That follows from
-> feeding the resolved device to the flow as the ingress
-> (fl4.flowi4_iif =3D dev->ifindex), which is what makes l3mdev resolve
-> the VRF master from the subinterface rather than from
-> params->ifindex.
->
-> The two failure classes get different treatment on purpose. A
-> h_vlan_proto other than 802.1Q/802.1ad is API misuse and returns
-> -EINVAL, since it would otherwise reach the WARN in vlan_proto_idx()
-> with a program-controlled value. An unmatched VID, a device that is
-> down, or one in another namespace is a data outcome and returns
-> BPF_FIB_LKUP_RET_NOT_FWDED, matching the DIRECT path when
-> fib_get_table() finds no table and mirroring real ingress, where the
-> receive path drops such frames. A VID of 0 (a priority tag) is looked
-> up literally and normally fails the same way; receive instead
-> processes such frames untagged, so callers should not set the flag for
-> priority tags. Proceeding on the physical device for any of these
-> would be fail-open for the policy-routing cases above.
->
-> The h_vlan fields share a union with tbid, so the flag cannot be
-> combined with BPF_FIB_LOOKUP_TBID. It describes ingress, so it also
-> cannot be combined with BPF_FIB_LOOKUP_OUTPUT. Both combinations
-> return -EINVAL; restricting now keeps a later relaxation backward
-> compatible. Combining with BPF_FIB_LOOKUP_VLAN is allowed: the tag is
-> consumed on the ingress side and the egress tag is written on
-> success.
->
-> Under !CONFIG_VLAN_8021Q the __vlan_find_dev_deep_rcu() stub returns
-> NULL, so every lookup with the flag returns NOT_FWDED, which is
-> correct since no VLAN device can exist.
->
-> Suggested-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Signed-off-by: Avinash Duduskar <avinash.duduskar@gmail.com>
-> ---
->  include/uapi/linux/bpf.h       | 34 ++++++++++++++-
->  net/core/filter.c              | 80 +++++++++++++++++++++++++++++++---
->  tools/include/uapi/linux/bpf.h | 34 ++++++++++++++-
->  3 files changed, 141 insertions(+), 7 deletions(-)
->
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index f77aa9472bf1..57e28da3336a 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -3552,6 +3552,35 @@ union bpf_attr {
->   *			reports the route mtu in *params*->mtu_result, and on
->   *			the tc path without tot_len the mtu check runs after
->   *			the swap, against the parent device.
-> + *		**BPF_FIB_LOOKUP_VLAN_INPUT**
-> + *			Treat *params*->h_vlan_proto and *params*->h_vlan_TCI
-> + *			as an input VLAN tag (e.g. parsed from the packet) and
-> + *			run the lookup as if ingress had happened on the VLAN
-> + *			subinterface carrying that tag for *params*->ifindex,
-> + *			rather than on *params*->ifindex itself. The VID is the
-> + *			low 12 bits of *params*->h_vlan_TCI;
-> + *			*params*->h_vlan_proto must be ETH_P_8021Q or
-> + *			ETH_P_8021AD in network byte order (any other value
-> + *			returns **-EINVAL**). The
-> + *			subinterface is the one configured for that tag on
-> + *			*params*->ifindex; if *params*->ifindex is itself a
-> + *			VLAN device, its inner (QinQ) subinterface is matched.
-> + *			For a bond or team, a tag on a port matches no
-> + *			device and returns NOT_FWDED; pass the master's
-> + *			ifindex.
-> + *			If no matching subinterface exists, or it is not up,
-> + *			or it was moved to another network namespace, the
-> + *			lookup returns **BPF_FIB_LKUP_RET_NOT_FWDED**,
-> + *			mirroring real ingress, which drops a frame whose tag
-> + *			is unconfigured or whose VLAN device is down. A VID of
-> + *			0 (a priority-tagged frame) is looked up literally like
-> + *			any other VID; receive instead processes such frames
-> + *			untagged on the device itself, so do not set this flag
-> + *			for priority tags.
-> + *			Cannot be combined with **BPF_FIB_LOOKUP_TBID** (both
-> + *			use the same input fields) or **BPF_FIB_LOOKUP_OUTPUT**
-> + *			(this flag is ingress-only); doing so returns
-> + *			**-EINVAL**.
+If it's a regulator, then it should be described as a regulator. There
+was some discussion regarding the power resources of PHYs over here:
 
-This comment is also overly long - please trim.
+https://lore.kernel.org/linux-arm-msm/SN7PR19MB67369F7DD02F702437C0F1919D1B2@SN7PR19MB6736.namprd19.prod.outlook.com/
 
->   *
->   *		*ctx* is either **struct xdp_md** for XDP programs or
->   *		**struct sk_buff** tc cls_act programs.
-> @@ -7348,6 +7377,7 @@ enum {
->  	BPF_FIB_LOOKUP_SRC     =3D (1U << 4),
->  	BPF_FIB_LOOKUP_MARK    =3D (1U << 5),
->  	BPF_FIB_LOOKUP_VLAN    =3D (1U << 6),
-> +	BPF_FIB_LOOKUP_VLAN_INPUT =3D (1U << 7),
->  };
->=20=20
->  enum {
-> @@ -7416,7 +7446,9 @@ struct bpf_fib_lookup {
->  		struct {
->  			/* output with BPF_FIB_LOOKUP_VLAN: set from the
->  			 * resolved egress VLAN device (see the flag); zeroed
-> -			 * on other successful lookups.
-> +			 * on other successful lookups. input with
-> +			 * BPF_FIB_LOOKUP_VLAN_INPUT: the VLAN tag to scope
-> +			 * the lookup by.
->  			 */
->  			__be16	h_vlan_proto;
->  			__be16	h_vlan_TCI;
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index b37a12321fba..cfbdd842ce61 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6158,6 +6158,41 @@ static int bpf_fib_set_fwd_params(struct net_devic=
-e *dev,
->=20=20
->  	return 0;
->  }
-> +
-> +/* With BPF_FIB_LOOKUP_VLAN_INPUT the caller passes the packet's VLAN ta=
-g in
-> + * params->h_vlan_proto and params->h_vlan_TCI; the lookup is done as if
-> + * ingress had happened on the matching VLAN subinterface of *dev. Resol=
-ve
-> + * it and store it in *dev. params is not modified.
-> + *
-> + * A protocol other than 802.1Q/802.1AD is API misuse (it would otherwise
-> + * reach the WARN in vlan_proto_idx()), so it is rejected with -EINVAL. =
-An
-> + * unmatched VID, a matching device that is down, or one that was moved
-> + * to another netns (receive would deliver into that netns' stack, which
-> + * a lookup here cannot represent) is a data outcome, reported as
-> + * NOT_FWDED, the same way the DIRECT path reports a missing table. Under
-> + * !CONFIG_VLAN_8021Q __vlan_find_dev_deep_rcu() returns NULL, so every
-> + * call returns NOT_FWDED, which is correct since no subinterface can
-> + * exist.
-> + */
-
-As in the previous patch, please drop this comment.
-
-> +static int bpf_fib_vlan_input_dev(struct net_device **dev,
-> +				  const struct bpf_fib_lookup *params)
-> +{
-
-Just return the dev pointer and use ERR_PTR for errors? That's what we
-usually do for these kinds of functions.
-
--Toke
-
+Konrad
 
