@@ -1,127 +1,131 @@
-Return-Path: <netdev+bounces-300255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300256-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id oFOmGcQaM2pu9gUAu9opvQ
-	(envelope-from <netdev+bounces-300255-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:08:04 +0200
+	id zdMEGQAfM2r49gUAu9opvQ
+	(envelope-from <netdev+bounces-300256-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:26:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA3DB69CA15
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:08:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9EC69CA8F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:26:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=XNxowSn0;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300255-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300255-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=fr.zoreil.com header.s=v20220413 header.b=FF3otWbI;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300256-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300256-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=zoreil.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A70E230FF669
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:07:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13B5F30427E8
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF13428470;
-	Wed, 17 Jun 2026 22:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B365391E7A;
+	Wed, 17 Jun 2026 22:26:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from violet.fr.zoreil.com (violet.fr.zoreil.com [92.243.8.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763233B14B8;
-	Wed, 17 Jun 2026 22:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0C62EEE74
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 22:26:01 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781734067; cv=none; b=Qr6RTaT/C+4W+sFXq1DqjYvgmk1LECeI3iR8eQQluRrZRTgahHSB+RBdwL4duYKtzBlJDZBBMTj3KR/Hq9ljbIjb9UL3BDhuw3roCK+pwhjiq27kxB51Z6gqspabzNpOF8AZ1hCMeYm0sDyl0GfnoHBtp0nMHZ5KMsDB8/d6fpo=
+	t=1781735165; cv=none; b=VVCe8CAmEkD72B4+XWViOIQfONROizjB9uxJKtxD3UTw0YTM00BDOpnkPKUFQoDxjH+ZsBwsF7sVXLq1+bQqmN0JiSgKTKlabPDKJjFpYNOosB6WegklEdonE6Ckz6x3+fdfrUV8qYG04V++pllLWCIpALgkE/eKMZ3BBVOXS6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781734067; c=relaxed/simple;
-	bh=QD9+BuX8vNnlpmK7MBUF8BffYmSDp+kgIN1GCWUfQ4c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k4PkSoSFXIkf7geygyDP3b898ZXPygrC2mhuqUbGl7OZpTwKfSwghq/sEKNv955i9tEMlPrk2K8ozrjyL0SWTNcTdjgwGuUhbjdlVCnPWLoh8qZsJcdJdkKuQbhV2iHCzCF1mAKIiyQpttZrZFSnlCTU8wRMIj5eji4is4cbQ/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNxowSn0; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE301F000E9;
-	Wed, 17 Jun 2026 22:07:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781734066;
-	bh=CqN76L0GmoGTlUxyqmYpYwkQVk5OIJLansyMs93EdPk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XNxowSn0OJP7I2CIW2JV0Oo+0Rb+Kin3QNSOcQuHP6QKaSXwJYNG4kFgHdWzc6Kdf
-	 2pVYVBMVbEft9I+hqRuLM45mXxtDKkIrE16UXxKkNjSPtiG0cNyVdWldzciE/3B/Lg
-	 dxmDRcDjInvW5G/O+L5ZZ2G8zkczw4R31UbnwJ/UclDCiyAl0ng5d7bpd777pgunfq
-	 wEI2dW2j+0XDGEpTVhUup+ZP8N7/EzprERi1gqb9r29KVHngQmWAiFWLOLK0y/EQo+
-	 sQc92qNEXX27qZIhquXOuI/QZ49TFfmsRnXHvh5qclJjht0ry/VefZz5qfZQLLtCR2
-	 qWca2TTAx2Y6A==
-Date: Wed, 17 Jun 2026 15:07:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: <keguang.zhang@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, <linux-mips@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: stmmac: loongson1: Use dev_err_probe()
-Message-ID: <20260617150744.05756f0b@kernel.org>
-In-Reply-To: <6b8db599-5bb2-47f9-ab53-a0b5141af2e5@intel.com>
-References: <20260615-dwmac-loongson1-v1-1-cbcf5bc01d9b@gmail.com>
-	<31630db0-85cb-421b-8ebe-bbae07521533@intel.com>
-	<20260617135407.6ff54e27@kernel.org>
-	<6b8db599-5bb2-47f9-ab53-a0b5141af2e5@intel.com>
+	s=arc-20240116; t=1781735165; c=relaxed/simple;
+	bh=ek5YPfIi3miySu+OGgINN4xoG2HI4oM67+yeKK4gpt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gkwodl3s4skDdqYgeBnmCbqov6D4wc/BP1ESL76sfbc9BkIua5lnroW9FyyHfPKoPGQr9oOUz2jLhJM9QqeMp8JRym6aBPpVztfkozhVTntzwBq/4qwCTlquQwmly3mv3COHcDGyjet89EnFjlRJkfF1tHJ2SSB/UcvHQhckBP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fr.zoreil.com; spf=pass smtp.mailfrom=fr.zoreil.com; dkim=pass (1024-bit key) header.d=fr.zoreil.com header.i=@fr.zoreil.com header.b=FF3otWbI; arc=none smtp.client-ip=92.243.8.30
+Received: from violet.fr.zoreil.com ([127.0.0.1])
+	by violet.fr.zoreil.com (8.17.1/8.17.1) with ESMTP id 65HMPNrF3712048;
+	Thu, 18 Jun 2026 00:25:23 +0200
+DKIM-Filter: OpenDKIM Filter v2.11.0 violet.fr.zoreil.com 65HMPNrF3712048
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fr.zoreil.com;
+	s=v20220413; t=1781735123;
+	bh=Oe/iXlh5kEu7zfbfDHyD/ASRNxkD+zGQJQ4wJjxLfmk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FF3otWbI1wigC2a1xxSwJwujep3hC4tJGWmT/mKZCyagyHuCj5OlT2L26Ni+7lflx
+	 fs+anZT3NqdYSfGub6EXXT5zGm358K0gugWDbaf2DT0KwYBkKOAWc2nnB2IdAXYszX
+	 FC6RMplpEaX+k/lupbUkeVLNVnarmgknRXS9HNfE=
+Received: (from romieu@localhost)
+	by violet.fr.zoreil.com (8.17.1/8.17.1/Submit) id 65HMPNRp3712047;
+	Thu, 18 Jun 2026 00:25:23 +0200
+Date: Thu, 18 Jun 2026 00:25:22 +0200
+From: Francois Romieu <romieu@fr.zoreil.com>
+To: Atharva Potdar <atharvapotdar07@gmail.com>
+Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] r8169: migrate Rx path to page_pool
+Message-ID: <20260617222522.GA3712043@electric-eye.fr.zoreil.com>
+References: <20260614054137.32181-1-atharvapotdar07@gmail.com>
+ <20260614220934.GA3575431@electric-eye.fr.zoreil.com>
+ <CAF9AHva0TSFz5tedMEgJTkhThzDGqmW7MJshAtf3ULbLY4wd=w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAF9AHva0TSFz5tedMEgJTkhThzDGqmW7MJshAtf3ULbLY4wd=w@mail.gmail.com>
+X-Organisation: Land of Sunshine Inc.
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[zoreil.com,reject];
+	R_DKIM_ALLOW(-0.20)[fr.zoreil.com:s=v20220413];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300255-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_RECIPIENTS(0.00)[m:jacob.e.keller@intel.com,m:keguang.zhang@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:mcoquelin.stm32@gmail.com,m:alexandre.torgue@foss.st.com,m:linux-mips@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-stm32@st-md-mailman.stormreply.com,m:linux-arm-kernel@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:keguangzhang@gmail.com,m:andrew@lunn.ch,m:mcoquelinstm32@gmail.com,s:lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300256-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:atharvapotdar07@gmail.com,m:hkallweit1@gmail.com,m:nic_swsd@realtek.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[romieu@fr.zoreil.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[fr.zoreil.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[romieu@fr.zoreil.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,fr.zoreil.com:dkim,fr.zoreil.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CA3DB69CA15
+X-Rspamd-Queue-Id: 9B9EC69CA8F
 
-On Wed, 17 Jun 2026 14:26:25 -0700 Jacob Keller wrote:
-> It does claim that it has benefit since you get the error code emitted
-> symbolically. But we have %pe for that. I wonder if dev_err_probe
-> predates %pe?
+Atharva Potdar <atharvapotdar07@gmail.com> :
+[...]
+> Francois:
+> > You may consider fdd7b4c3302c93f6833e338903ea77245eb510b4 and some related
+> > changes around that time.
+> 
+> I am sorry but I don't fully understand the context of this commit or
+> the behaviour it addresses. Could you please help me regarding what I
+> need to watch out for this change?
 
-I'd argue
+It should be clearer with c0cd884af045338476b8e69a61fceb3f34ff22f1 (and
+may be 6f0333b8fde44b8c04a53b2461504f0e8f1cebe6 as well).
 
-  No of match data provided: -EINVAL
+Old chipsets did not correctly implement receive buffer size limit.
 
-is more confusing than just:
+I have no idea how mildly recent ones (< 15 years) behave.
 
-  No of match data provided
+Reinstatement of the bug on old chipset imho deserves some warning.
 
-the EINVAL is meaningless and hardcoded in this case?
+-- 
+Ueimor
 
