@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-300151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qSSwMSGMMmpy1wUAu9opvQ
-	(envelope-from <netdev+bounces-300151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:59:29 +0200
+	id /1ihE0GLMmoq1wUAu9opvQ
+	(envelope-from <netdev+bounces-300152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:55:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35AFA69964F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:59:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E66C69956F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 13:55:44 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SRueWrjP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300151-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300151-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=I8QHQ9V+;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300152-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300152-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 602EB30E48D8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:40:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F108314BE83
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BDA3E92AF;
-	Wed, 17 Jun 2026 11:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B913EF658;
+	Wed, 17 Jun 2026 11:45:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7D8367284;
-	Wed, 17 Jun 2026 11:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F473EEAF2;
+	Wed, 17 Jun 2026 11:45:32 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781696431; cv=none; b=FFBzXZ5phF6OwDOHfixB9nqAfyFssdZoch5Fjm16mnzVgVyhZRAIVOEasd2fhWHhsMxV5aoHMBh7sBpc/GAeZ0dYkh+lrb8iwT1h5EA6MA4yuI3DohJnSy7zVyOMb/yhKGl+MNefwl7cgWciz0r9tOo1NK8xpwufREcDI2zJgiE=
+	t=1781696734; cv=none; b=TVozG8g7aKMHxbjk11XS1k27ADt2Hu9DLx2gklvoJXMnBtg5UBnVBeVFoWXyusH53JQuT64An8huN89k/igwViKFbaHGvSh7batD1xhJskIIQgRYvNCMcHuJglM3KIn8JlPWmAMPp3tRgpiQcLMVooP+keMz4U8VGhepGML9Jaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781696431; c=relaxed/simple;
-	bh=1IzuiLCpgVRzDiaaTNKjsTHwmM0Wz/vmapGdB9UF+cE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQFKcKFG0DIteGedfUsrqV5amJfIUPvu1HERvLmbcvE6PpGhlea77qNc0DIN5Tx7W4mx8pln3qdYybDIRivfnbm6djUlu994XNMclSfyKjrvG8Skf+wAAtJvqZgDnCJio8Mxm2Rv9dECGvcxpyH3A0+mFFH11X25Oyl5IkpWtA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRueWrjP; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B363E1F000E9;
-	Wed, 17 Jun 2026 11:40:28 +0000 (UTC)
+	s=arc-20240116; t=1781696734; c=relaxed/simple;
+	bh=adDV1ppAUpQ67CpkcMHuvJ795UMWAGCSHaAU4Y3DT1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lxDFQA0giji46HzunkmWUrH2/LQvmC1p3HivQMCU3Wxsz8jag1pBcKX1NzvGuCcCKEgS5FbK5WTU0UuaxlMFWbtS9xxcPw/RTWhje2eENlH+eZok31qgPGLzW4x0gVVLE8w1AgILlPXnwrsPJ8oUk0DYY9jhan972oUYpvX8y88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8QHQ9V+; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2019E1F000E9;
+	Wed, 17 Jun 2026 11:45:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781696430;
-	bh=NDUXhknvkX+D31MgIY8BSQWwYVKJ7dn/MYNRb8Qxhp4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=SRueWrjPO+bv6Me59Q/y6ggB25gVmPSMXA5+YsVrhDa67961Rs+x7ABSfblBbaEDm
-	 AotjIBISkaCAwChMKHpqUNkyVfsNyko7MeMECbLycRPFri/cVlSf1fCDRpUTfACiJY
-	 aUyC9w6hHG9jPM18YbnfxxLLq1hl7My+FPWnGoexL6faH3K7HHh5+CGsF8EZmKptXD
-	 pePJBmwEOqw9hmuvogxWPe/WvRgdObP7Zxyhf/N7cMpP0zwMryObOGQf6H4g3QaVp5
-	 oyzgrm7r3e6acOLlQUPMryyWbQmwc0fqH6K9olt/KhZSMLeGg+lDE2NPfwh7ID0PBW
-	 V2L+QaDh1Vdow==
-Date: Wed, 17 Jun 2026 14:40:24 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	johannes@sipsolutions.net, corbet@lwn.net,
-	skhan@linuxfoundation.org, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: exclude driver and netdevsim bugs
-Message-ID: <20260617114024.GW327369@unreal>
-References: <20260603162943.2406080-1-kuba@kernel.org>
- <20260615091436.GP327369@unreal>
- <20260615091909.78ad2b03@kernel.org>
+	s=k20260515; t=1781696732;
+	bh=AuUrWPb+daIMdbL9iHx34oo1WgA00hCuqCiSD8TIPAo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=I8QHQ9V+nBEhhVjcDw4P4xh5gx0UrTz/EytHqT0wl8x8Z5erqwdZ9CM3C8PPnXLnj
+	 kS2I6TjOy4ShgMxxmiUOy40YYHXMp5NjaDwvVJ7Ep7h+dDYG9N148rEqMYL8uqI4OY
+	 1OMDvVQvrqBFM59Tv4A9XnY2MoAiEhpuTpNamQwgwPIjdJfi/+Fay/UGyMcsCNaXqR
+	 TUSHoYwGVeKjLo1yXu0iR73splVzuGYHbF/gFo7CNC+8NolmRcqbn0sTJYZs3TXpy9
+	 0hnq0Vu+7OFmt+Ku8kzJJb7Vzie0YCVf+jPuTtY1tW64rhxPZs8v8M3AFl3unkSUiZ
+	 BrysC4K/aA2yg==
+From: Simon Horman <horms@kernel.org>
+To: ioana.ciornei@nxp.com
+Cc: Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	f.fainelli@gmail.com,
+	vladimir.oltean@nxp.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] dpaa2-switch: fix VLAN upper check not rejecting bridge join
+Date: Wed, 17 Jun 2026 12:45:18 +0100
+Message-ID: <20260617114518.857486-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260616105430.3725910-1-ioana.ciornei@nxp.com>
+References: <20260616105430.3725910-1-ioana.ciornei@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260615091909.78ad2b03@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:johannes@sipsolutions.net,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:workflows@vger.kernel.org,m:linux-doc@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,vger.kernel.org,gmail.com,nxp.com];
+	TAGGED_FROM(0.00)[bounces-300152-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TAGGED_FROM(0.00)[bounces-300151-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:ioana.ciornei@nxp.com,m:horms@kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:f.fainelli@gmail.com,m:vladimir.oltean@nxp.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,m:ffainelli@gmail.com,s:lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 35AFA69964F
+X-Rspamd-Queue-Id: 8E66C69956F
 
-On Mon, Jun 15, 2026 at 09:19:09AM -0700, Jakub Kicinski wrote:
-> On Mon, 15 Jun 2026 12:14:36 +0300 Leon Romanovsky wrote:
-> > > +Unless explicitly excluded all bug fixes should be targeting the ``net``
-> > > +tree and contain an appropriate Fixes tag.
-> > > +
-> > > +Obvious exclusions:
-> > > +
-> > > + - fixes for bugs which only exist in ``net-next`` should target ``net-next``
-> > > +   (please still include the Fixes tag in the commit message)
-> > > + - bugs which cannot be reached, e.g. in code paths not executed given
-> > > +   current in-tree callers
-> > > + - fixes for compiler warnings and typos  
-> > 
-> > If you decide to resubmit this patch, could you please remove "fixes for
-> > compiler warnings" from the exclusion list?
-> > 
-> > It is quite frustrating to receive a compiler warning originating from a
-> > different subsystem after the merge window, knowing it will not be
-> > addressed until the next merge window (around eight weeks later).
-> 
-> Agreed, FWIW, but not planning to resubmit.
-> I think people misunderstood that I'm __documenting what I already do__
-> rather than trying to have a discussion :/
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+dpaa2-switch: fix VLAN upper check not rejecting bridge join
 
-I'm pretty sure that people aren't aware of it.
+The blamed commit refactored the prechangeupper event handling but
+failed to actually return an error in case
+dpaa2_switch_prevent_bridging_with_8021q_upper() detected a 802.1q upper
+on a port which tries to join a bridge. Fix this by returning err
+instead of 0.
 
-Thanks
+> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> index 52c1cb9cb7e02..46ae81c2fa013 100644
+> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+> @@ -2177,7 +2177,7 @@ dpaa2_switch_prechangeupper_sanity_checks(struct net_device *netdev,
+>  	if (err) {
+>  		NL_SET_ERR_MSG_MOD(extack,
+>  				   "Cannot join a bridge while VLAN uppers are present");
+> -		return 0;
+> +		return err;
+
+[Severity: High]
+If a user adds an 802.1q VLAN upper device to a port after it has already
+successfully joined a bridge, won't this check trigger when the port leaves
+the bridge?
+
+In drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c,
+dpaa2_switch_prechangeupper_sanity_checks() is called for both bridge joins
+and unlinks from dpaa2_switch_port_prechangeupper():
+
+    err = dpaa2_switch_prechangeupper_sanity_checks(netdev, upper_dev, extack);
+    if (err)
+        return err;
+
+    if (!info->linking)
+        dpaa2_switch_port_pre_bridge_leave(netdev);
+
+Since returning an error aborts the notifier chain, an unlink notification
+would fail this check, preventing dpaa2_switch_port_pre_bridge_leave() from
+running. Does this lead to state inconsistency and skipped switchdev
+unoffloads?
+
+Could this check be guarded so it only runs when info->linking is true?
+
+>  	}
+>  
+>  	netdev_for_each_lower_dev(upper_dev, other_dev, iter) {
 
