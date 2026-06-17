@@ -1,200 +1,188 @@
-Return-Path: <netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id 2olzLCdmMmrQzQUAu9opvQ
-	(envelope-from <netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:17:27 +0200
+	id Hg/4M11mMmrczQUAu9opvQ
+	(envelope-from <netdev+bounces-300089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:18:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278F3697D19
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:17:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665AC697D43
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:18:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Tc2o8afQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300087-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=UARaXKgO;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300089-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300089-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 388B0300852F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:17:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 26E5D304E49E
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9493F39A7F2;
-	Wed, 17 Jun 2026 09:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195B439E9A0;
+	Wed, 17 Jun 2026 09:17:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87603399350
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 09:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6E33932F1;
+	Wed, 17 Jun 2026 09:17:47 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781687843; cv=none; b=j2viA8TyHNbRjGurDC6HNa1yvi1jLHxbELZsO7lt9+drE/sNDmYsnSeREoCO5CjthM36vYfqmGhCvEkZp2+KI2hvazIZBKGFIbfY/WPWzqPkcGQdJBR8TOAHT74FyAEdhNbJN5vK7U+YQ5cXhPcg82pNwEZVrY5eUcv62Ik7RCk=
+	t=1781687872; cv=none; b=mOUrLAtIBLi13aYYW/FX5IKB74y/N70vHXEPyTW278bpiaLUiK0thEFQiwuzlqxSjgeoez0FsLBRdvbc6YXsbhq0sssDmrTSXpT10ustScH36zmpZT0tFSiJO+/TKesvSC4OC2PFp1Gvi2zkDyoPNq1T4OF+Vq4ilYfUeU4kUhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781687843; c=relaxed/simple;
-	bh=NKLImyI3HYH86Vh5hC947ygnor4EsnF46Gid2tc64Bc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QYYwEhfXwRLzAY5jaoM99SxWFr054gCNmofaMYLqHtVsGiUUMrF8klwJ0cMph7uvlPrSs1fAA99Ra7bTS5ZyPHurvjolcc3zEM8M7zzAJoFTz+Dejs3QMb5MEnAZqFG4CeD+AK4IJc7o6zc3zuqx83Srq25eHek+IDmb5e1jp3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc2o8afQ; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B671F000E9;
-	Wed, 17 Jun 2026 09:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781687842;
-	bh=ZnXuxdsvCZXi+yhcRRlP0nnKlUJzsEw2xOj6/CVvJuY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Tc2o8afQpKiwso4i+pUMbegXm9w4FdsldOJEIycWlQuBKzvzKP/80uB25ERY7H9to
-	 rlTBV9HS2My1rfz+o5ejfrZv7pxmZVA/3VLl0xw+1VpT9WdMAaKAWs2fQlF642MRWp
-	 R0fZrndsiKF6U6XD4tFD/tYT8DBjO/HryBTGwlRuKeptvYqTlfyqRpuLmqBTa3OAwh
-	 9j9K164Ij7Ja+gPqjqgK4f0zErjFpRDU0dtYxFsvmZ3zYO7nwHGO0sOdRGvdsT3kqX
-	 /nGioXXdZFVhPWbAzswPyQ096Fsff7VYQk1V1GJ3Rz20/AAqQwlk9iPVEJZVPjwkyo
-	 zcJ2kCDF+XuZQ==
-Date: Wed, 17 Jun 2026 11:17:20 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, nbd@nbd.name,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net] net: airoha: Fix TX scheduler queue mask loop upper
- bound
-Message-ID: <ajJmIIpju9P3oyne@lore-desk>
-References: <178166704952.2212140.11002626760717132754@gmail.com>
- <178168650178.2224380.3950331731013129336@gmail.com>
+	s=arc-20240116; t=1781687872; c=relaxed/simple;
+	bh=xu7aOuhQ04R4vpge7pBuLaEXJsx1pCwyTSYVw8HP9MU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pMwmDTYmGspCQ9Wk+2RPfjvjbrRhKdxPA9TKmTfr5T2tQqLVsY2QJMAbOWkEEVNfJFA6L6z73/6UmxTZFfK4CufMrscPn/keZXvPIALf/x46QvbSmRD3xjmF/GAv1rvBlFYsO+M9+UCAnM6b4VCljtOfVRUOM+e9qiaeuzwr1PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UARaXKgO; arc=none smtp.client-ip=185.171.202.116
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 8E6BCC2BB3F;
+	Wed, 17 Jun 2026 09:17:50 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6A641601AA;
+	Wed, 17 Jun 2026 09:17:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 425A3106CA30F;
+	Wed, 17 Jun 2026 11:17:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781687864; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=iZjSYv5+s2q2RljvmzW/0JQPykBdiJHijmZR1vkN4PA=;
+	b=UARaXKgOWONpm2AfTIUcVizriXzTigTxagYOI+sQ5PAE5JlsEYsjEAqZtAw/Aj1T2VSZfp
+	7Sqi3JxaFZhrS77Qj+LpVGCL64IyvLPFbLy6ry+6YjnhuP962bNXch2Zm4HTLV0YwmH/l4
+	VZ0o99YfNW4HofI5LCXAf5JZcede81UaeOqLw6q+nc1SE7x2FVTrKRBf0yTpXNdot63p8J
+	UMiW7JiO5vvsrati/VI3dAUTgaFq1rzZ3+dKc3g2il1nPz5yoP+iRNd3YD8Cr5mQExyca2
+	2UN88CfNSKng1hlj885IAsk9vmuxbAzAjCDTfZvMeR5gZsaL2yMpvXlmNxqbYA==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net v3 0/2] Drop in-flight Tx SKBs on MACB close
+Date: Wed, 17 Jun 2026 11:17:28 +0200
+Message-Id: <20260617-macb-drop-tx-v3-0-d4c7e57d890b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VyUTMvxzWiaGc/iq"
-Content-Disposition: inline
-In-Reply-To: <178168650178.2224380.3950331731013129336@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/12NQQ6CMBREr0K69ptSCgVX3sO4oO1HaoSSthIM4
+ e5CdSEuZzLvzUw8OoOenJKZOByNN7ZfQ3ZIiGrr/oZg9JoJo6ygnGXQ1UqCdnaAMEFTKRRMMKp
+ pTlZkcNiYKeoupMdArp/SP+UdVdhE26w1Plj3iqdjGsdfP9/7xxRSkBkqKUqhS67P0trwMP1R2
+ S7KR/aLl384AwoFF02eVpUudbPHl2V5A+OLSoQAAQAA
+X-Change-ID: 20260423-macb-drop-tx-f9ce72720d05
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>, 
+ Conor Dooley <conor.dooley@microchip.com>
+Cc: Paolo Valerio <pvalerio@redhat.com>, Nicolai Buchwitz <nb@tipi-net.de>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>, 
+ =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.15.2
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.76 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:nbd@nbd.name,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,s:lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-300089-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hskinnemoen@atmel.com,m:jeff@garzik.org,m:conor.dooley@microchip.com,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:theo.lebrun@bootlin.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-300087-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,lore-desk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 278F3697D19
+X-Rspamd-Queue-Id: 665AC697D43
 
+The first patch is here to allow giving a drop reason.
+We dissociate consumed packets from dropped ones that way.
 
---VyUTMvxzWiaGc/iq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Second patch is the main one: it drops unsent packets on close.
+MACB driver forgot freeing its SKBs (and associated DMA mappings).
 
-> On Tue, Jun 17, 2026, Lorenzo Bianconi wrote:
-> > Even if the current codebase supports just AIROHA_NUM_QOS_CHANNEL (4), =
-the hw
-> > exposes 32 hw QoS channels (AIROHA_NUM_TX_RING). Here we are just clear=
-ing the
-> > configuration, so I guess the current implementation is correct.
->=20
-> Hi Lorenzo,
->=20
-> You are right that there is no functional impact, and I agree this
-> should not go to net. Let me explain the register layout I was worried
-> about, and you can decide whether it is worth a net-next cleanup or
-> should just be dropped.
->=20
-> The two macros are:
->=20
-> 	REG_QUEUE_CLOSE_CFG(_n)             =3D 0x00a0 + ((_n) & 0xfc)
-> 	TXQ_DISABLE_CHAN_QUEUE_MASK(_n, _m) =3D BIT((_m) + (((_n) & 0x3) << 3))
->=20
-> REG_QUEUE_CLOSE_CFG() masks the channel with 0xfc, and the bit macro
-> folds the channel with & 0x3 (mod 4) shifted by 3. So one 32-bit
-> register holds 4 channels x 8 queues, 8 queue bits per channel:
->=20
-> 	channel 0 -> reg 0x00a0, bits  0..7
-> 	channel 1 -> reg 0x00a0, bits  8..15
-> 	channel 2 -> reg 0x00a0, bits 16..23
-> 	channel 3 -> reg 0x00a0, bits 24..31
-> 	channel 4 -> reg 0x00a4, bits  0..7
-> 	...
->=20
-> In airoha_qdma_set_chan_tx_sched() the loop variable 'i' is passed as
-> the *queue* argument _m, not as a channel:
->=20
-> 	for (i =3D 0; i < AIROHA_NUM_TX_RING; i++)   // i =3D 0..31
-> 		airoha_qdma_clear(qdma, REG_QUEUE_CLOSE_CFG(channel),
-> 				  TXQ_DISABLE_CHAN_QUEUE_MASK(channel, i));
->=20
-> Since each channel only has AIROHA_NUM_QOS_QUEUES (8) queues, the correct
-> logic is to clear the 8 queue bits belonging to 'channel'. With i running
-> up to 31 the BIT() shift instead walks past those 8 bits and into the bit
-> ranges of the other channels folded into the same register. For channel 0
-> the accumulated mask becomes 0xffffffff, i.e. it touches channels 1..3 as
-> well.
->=20
-> This is harmless today only because REG_QUEUE_CLOSE_CFG is written
-> exclusively here, via airoha_qdma_clear() (RMW clear), and the register
-> resets to 0 and is never set anywhere -- so clearing extra bits is a
-> no-op. Functionally the current code is fine, as you say.
->=20
-> The point is just the loop-bound semantics: 'i' is a per-channel queue
-> index, so the bound should be AIROHA_NUM_QOS_QUEUES (8), not
-> AIROHA_NUM_TX_RING (32). The two happen to be related (32 =3D=3D 4 channe=
-ls *
-> 8 queues) but mean different things.
->=20
-> Since there is no functional change, feel free to drop this if you would
-> rather not carry a cosmetic patch. If you think the clarity is worth it I
-> can resend against net-next without the Fixes tag.
->=20
-> Thanks,
-> Wayen
->=20
+---
+Changes in v3:
+- Drop stats fixing. A proper fix deserves its own net-next refactoring
+  series to migrate to netdev_stat_ops (ynltool uAPI), which will come
+  in later. We keep the tx_dropped++ because they are safe as every
+  other context is disabled when macb_free_consistent() is called.
+- Rebased to latest net/main (406e8a651a7b), nothing to report.
+- Link to v2: https://patch.msgid.link/20260428-macb-drop-tx-v2-0-647f5199d8df@bootlin.com
 
-Sorry you are right, I misread the code, your patch is correct. Since as you
-pointed out REG_QUEUE_CLOSE_CFG() is actually never set at the moment and t=
-he
-default register value is 0, I would repost this patch for net-next as soon=
- as
-it is opened (this will avoid merge conflicts).
+Changes in v2:
+- Increment tx_dropped stat once per SKB, not once per frame.
+- Reset tx_head & tx_tail to avoid keeping stalled cursors.
+- Fix SKB dropped reasons throughout by adding the reason as parameter
+  to macb_tx_unmap(). This is a new patch. Then the drop-all-on-close
+  fix can use this ability to report we are not consuming SKBs.
+- Add increment to stats->tx_dropped on DMA mapping failure and
+  tx_error_task. Done as separate patches (3 and 4).
+- Rebase upon net/main @ 46f74a3f7d57, nothing to report.
+- Link to v1: https://patch.msgid.link/20260424-macb-drop-tx-v1-1-b3ecb787d84d@bootlin.com
 
-Regards,
-Lorenzo
+To: Nicolas Ferre <nicolas.ferre@microchip.com>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Haavard Skinnemoen <hskinnemoen@atmel.com>
+To: Jeff Garzik <jeff@garzik.org>
+To: Conor Dooley <conor.dooley@microchip.com>
+Cc: Paolo Valerio <pvalerio@redhat.com>
+Cc: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>
+Cc: Gregory CLEMENT <gregory.clement@bootlin.com>
+Cc: Benoît Monin <benoit.monin@bootlin.com>
+Cc: Tawfik Bayouk <tawfik.bayouk@mobileye.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 
---VyUTMvxzWiaGc/iq
-Content-Type: application/pgp-signature; name=signature.asc
+---
+Théo Lebrun (2):
+      net: macb: give reasons for Tx SKB kfree
+      net: macb: drop in-flight Tx SKBs on close
 
------BEGIN PGP SIGNATURE-----
+ drivers/net/ethernet/cadence/macb_main.c | 46 +++++++++++++++++++++++++-------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
+---
+base-commit: 712927eaa34199bb62cf370af591c0550ba977de
+change-id: 20260423-macb-drop-tx-f9ce72720d05
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajJmHwAKCRA6cBh0uS2t
-rFNyAP9PkgQvfxp6CioRi0IbaYkDxw09bkje9eUMjIyNtTw65AEAnUSecAOlA8Ng
-x0S8I6Vr7K3l5fdREJxsd22doNsKKwY=
-=kBNZ
------END PGP SIGNATURE-----
+Best regards,
+--  
+Théo Lebrun <theo.lebrun@bootlin.com>
 
---VyUTMvxzWiaGc/iq--
 
