@@ -1,140 +1,209 @@
-Return-Path: <netdev+bounces-300249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AC/1GR4XM2p59QUAu9opvQ
-	(envelope-from <netdev+bounces-300249-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 23:52:30 +0200
+	id iC2gJz8YM2qk9QUAu9opvQ
+	(envelope-from <netdev+bounces-300250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 23:57:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28BD69C94C
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 23:52:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1AAD69C979
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 23:57:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=U28s7e3v;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300249-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300249-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=QiLhRK8r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300250-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300250-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68BF5301D04F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 21:52:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8A823034B2D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 21:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9CD388E45;
-	Wed, 17 Jun 2026 21:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FA73C5DDB;
+	Wed, 17 Jun 2026 21:57:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847E6386C20;
-	Wed, 17 Jun 2026 21:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D263BE630
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 21:57:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781733147; cv=none; b=NjSu2x05oajh9iQTFRK6Ldnl/y02CTOpGIJGlNrkDDwArXB5sFpMgBGe/RtrvON7Eo2Ui1J9gV9ocMcm0ri2bhXrD1LQciaA83zQCuCSwXLzRdxzroAQAm0v/p/NCn6mKFrQ0RNTFPNRmmPmjP+3PIt+SrzVUTfaASImBanl+Ss=
+	t=1781733435; cv=none; b=FA/i3uD7LRRIo1Va9fVdL+wedDDounSWcTBm6lSNTaisMMD+iY+eGN9rsEFIETihpwjsmpD9zgSujKoPRrhVy08cVGN2xbgNW1Mv5UsSSucDddvPUPAVf/hg+/+DEQXKN5pmvQHCvkqnxkVLMbVRGzcTwC0G4hOsnUxbVyasAhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781733147; c=relaxed/simple;
-	bh=u91/Gr8QP7fH6w2fiW94UDBR0FPYyTtWXCVs9PXPN8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mv7jn9hTyBHFFcpIqE8n2vjvHZubPryr70N7RZq/qdxglqnxWMlEX1JDnzbk4IHWCtHYxaWlVlGZkLyf4L7PyACXJ5pcBJOhoarta99F5y+3KYySKfgo0rOu5U+B0iHpw8f87r53Qtb20f/UQrP8TrvPAKBzRYM9Mcqz80iSvvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U28s7e3v; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C74761F000E9;
-	Wed, 17 Jun 2026 21:52:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781733146;
-	bh=XBhULN87TTfxM8KHC3ilMiQOCnX7++hxcpXK3eSVbiQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=U28s7e3vr1Tib0RGPLU81tBoz9VlTgzJ9XndxETY9vLceedtJcdC2w5VUKDoTyQNn
-	 +7riiQx+CuAQdhGewnNZ6pJssnCoG5cP7tVs67S8DQCxESYN6O7654PNP4bw2DTWIb
-	 zf7jQ9s4BA5N6om67Gin/438ltTFd85CHX2KmfLY4c1vcCljN5Fm9lNVkdXLQpz2US
-	 j/rJdnO3pZbaXiBru65m77NXt4YFnMgW9LjPJafRMUAvm9xsi8+tMc/vsOoVl/GFDE
-	 5IsxmrTve1qXnFba9PYAQPqOFciuIPZ9oyMgnm9mKi8bvIVAFhs/dwRo6cXGDwoOAD
-	 rVk8+4QMBVTbQ==
-Date: Wed, 17 Jun 2026 17:52:24 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: stable@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Michael Bommarito <michael.bommarito@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jeffrey Altman <jaltman@auristor.com>,
+	s=arc-20240116; t=1781733435; c=relaxed/simple;
+	bh=sOUDH/eBmJIXEIBOWDo6NLiv7IeXNalHO5VNllEyR4Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IjUz8msaICfH9qI75Tq8a2pymp7sBhmc4ye0ZU4d1Ea8a5qbxfT252tbCBRGSm1tVGLy2UQ0LLfMslqb/vqjxwbuX4CKdwyMFUna3eV/FgLRM5yty/BZSZHPnkR7ca6+IIZuqSnFFc4vAXw7hM3wGGFVMhP8Oz8vgnvAFWPAsUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QiLhRK8r; arc=none smtp.client-ip=74.125.224.43
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-660390acd71so1527544d50.1
+        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 14:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781733432; x=1782338232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4i79txrSdWrklA7gXTPspyO0HfIb8EB9otPoipYJpQ=;
+        b=QiLhRK8r51/esrPFFE3uE1dzndxQLqNKe5FwJmESKWRcY+wmASyzR9pp0KB8/NOKSZ
+         bxULrhjRkcx8L/7dspE/zJM8gQIf1CdRB8L9JuTLie9yvZJXWHwl35KDUYuEzVRITG6E
+         sVLPewzTgD/keq98hfWa2FZHmjbA0thQk4Uk4dGM0tBshCZ10+KZBkw6JXUfcTBvKOGc
+         z7iNTUEY4tG0DA0j7iBbPQkNgvK7PV2M+mof0srraSVo4kMlIz03ioCuwvZA9siOH7xo
+         b+OT5DfRm/t0fEJjTMlH6vhApxR1d1o3fa7wb4oNdzEGkNvmnPAXj43dqCnGTICYLecq
+         o8jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781733432; x=1782338232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b4i79txrSdWrklA7gXTPspyO0HfIb8EB9otPoipYJpQ=;
+        b=jvhBYDzQHtJJm9A++nWYDdwUWXN83l0uS11OMYRVm1IhYcdKqobCmXBYlABHbjYiR1
+         0Bbhw2+r8KpM87Xc7e+/MrdQzHyFAg3k8uvP7wNE8Mk6B2UquaoMgYL0eG9aeRfw37Uq
+         HU+5wdW8vfmbt+KnKNVPeI9oh0luLYJZAAmv4FH2DVTZ4lbgqInBxnTyhiU4VF6L5qvv
+         fLsarEIrwa/JSnd27O8U32xPh46nKNs4CS2A6QukPdzMpEWUw/neJ3chmcBzKiqQxFMS
+         YWkfaVPFCWQ0rZaAOJG4KyEF86thMWx53yCo13tkZ/vNmsLAYozhgWs1Ntk47gG/C52s
+         f5LA==
+X-Forwarded-Encrypted: i=1; AFNElJ+Ul03L/HtqbP6DVejGynIn2TORsp1KrxQMAxEzFXG863Yahw+ufG2iKFVnsiVv6YcWwKpL3lA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOnzRLpu4Op4DwCQnfWo67f0UYBdZdlcTWVyOSNfxMoInBbGXv
+	8/fy2OJjqV0hRW3QuT2u+97oOvAPAFDwXEORN48x1mGYc1jrZ3kC2g1g
+X-Gm-Gg: AfdE7cmhqW+IUZQ4HZ0WNgtRKDdNy/pQ/tUIw5js5RQqYJw6ZpQcE8F+cxj+zu5zlDs
+	LGOhJPQeIe2GJ+FizgeGStqtdclT/GNvrEa03Mh4MpqEtdK8NjjFBUWg/gmOT8CIDSDknNsDB/8
+	ly+jBFDbMeHNutGqtmMSrhQWTeoONlBSHLvjcfUuY6RtPFtNJLLkWPN/F9vv+sHkKjZqQUVNMbW
+	mi679ee3pkv3ki48J5FrSlvWwLVCoijL7HEKsVLn6iMKrGiyMDKF/s08rGuJ1S3m0r27LKy9KyP
+	2UwfGmaFSWHro0EmtQQ2WeqQPlX4Vv6wJAZpR04r+k7wo2snXfdUCi/Pbg/yPOdN2LUpAYIq1Rf
+	dXdMUmQH9UN1FByEZHkAbQ74hWmEzu66Ptw9WRpdBdeFQljG9bfLWVSZwGsuwwBLQMdBDPSifre
+	pUu7tGBFUW/A8kVIyZhkOnA5GjpGpl5uMHHaeLVYmjsBTRVtO8jNSd2RXFjSndDNHZ5WtSvht/a
+	8nRPW6nBG2mFJOzsT7mA9/NPzn5sVXc
+X-Received: by 2002:a05:690c:7107:b0:7dd:a645:a57 with SMTP id 00721157ae682-7ffa0a80b1bmr13574617b3.10.1781733431970;
+        Wed, 17 Jun 2026 14:57:11 -0700 (PDT)
+Received: from server0.tail6e7dd.ts.net (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7fcd3465c7csm55945147b3.39.2026.06.17.14.57.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2026 14:57:11 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-	stable@kernel.org
-Subject: Re: [PATCH 6.6.y] rxrpc: Fix the ACK parser to extract the SACK
- table for parsing
-Message-ID: <ajMXGIoyTqpZCvw-@laps>
-References: <2026061543-superior-passerby-d597@gregkh>
- <20260617180410.271223-1-sashal@kernel.org>
- <20260617132704.0e1fe56b@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net/sched: act_ct: fix nf_connlabels leak on two error paths
+Date: Wed, 17 Jun 2026 17:57:08 -0400
+Message-ID: <20260617215708.1115818-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260617132704.0e1fe56b@kernel.org>
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-300250-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:stable@vger.kernel.org,m:dhowells@redhat.com,m:michael.bommarito@gmail.com,m:marc.dionne@auristor.com,m:jaltman@auristor.com,m:edumazet@google.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:horms@kernel.org,m:linux-afs@lists.infradead.org,m:netdev@vger.kernel.org,m:stable@kernel.org,m:michaelbommarito@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300249-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:jhs@mojatatu.com,m:jiri@resnulli.us,m:pablo@netfilter.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,gmail.com,auristor.com,google.com,davemloft.net,kernel.org,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[michaelbommarito@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B28BD69C94C
+X-Rspamd-Queue-Id: F1AAD69C979
 
-On Wed, Jun 17, 2026 at 01:27:04PM -0700, Jakub Kicinski wrote:
->On Wed, 17 Jun 2026 14:04:10 -0400 Sasha Levin wrote:
->> Subject: [PATCH 6.6.y] rxrpc: Fix the ACK parser to extract the SACK table for parsing
->> Date: Wed, 17 Jun 2026 14:04:10 -0400
->> X-Mailer: git-send-email 2.53.0
->>
->> From: David Howells <dhowells@redhat.com>
->>
->> [ Upstream commit 333b6d5bb9f87827ac2639c737bf9613dbae7253 ]
->
->nit: you missed the "skip patchwork" header on this?
+tcf_ct_fill_params() calls nf_connlabels_get() (setting put_labels) when
+TCA_CT_LABELS is present, but two later error sites use a bare return
+instead of "goto err", skipping the err: nf_connlabels_put() cleanup.
+They also precede the "p->put_labels = put_labels" assignment, so the
+tcf_ct_params_free() fallback does not release the count either. Each
+failed RTM_NEWACTION on these paths leaks one nf_connlabels reference:
+net->ct.labels_used is incremented and never released. The action is
+reachable with CAP_NET_ADMIN over the netns, i.e. from an unprivileged
+user namespace on default-userns kernels.
 
-Hey Jakub,
+Impact: an unprivileged user with CAP_NET_ADMIN over a network namespace
+(e.g. via user namespaces) leaks one nf_connlabels reference per failed
+RTM_NEWACTION on the two error paths; net->ct.labels_used is never
+released.
 
-This one is a backport crafted in response to a failed backport of a stable
-tagged commit.
+The err: label is safe to reach from both sites: p->tmpl is still NULL
+there (kzalloc'd, not yet assigned) and nf_ct_put(NULL) is a no-op, so
+no inline release is needed.
 
-I followed Greg's template to sending those backports to him, but I also think
-that I do want folks to review the actual backport itself.
+Fixes: 70f06c115bcc ("sched: act_ct: switch to per-action label counting")
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+Testing: refcount/counter leak (CWE-772); no sanitizer for this class, so
+the oracle is the nf_connlabels accounting counter net->ct.labels_used.
 
-Do you think it makes sense to add a skip patchwork header on these too?
+Reproduction (UML, before/after, same trigger): CONFIG_NET_ACT_CT=y,
+NF_CONNTRACK_LABELS=y, NF_CONNTRACK_ZONES=n (forces the zone-disabled
+path). A raw RTM_NEWACTION trigger adds "action ct label 0x1/0x1 zone 1"
+20 times; each returns -EOPNOTSUPP.
+  stock:   net->ct.labels_used climbs 1,2,...,20 (get, then bare return,
+           no put) -- 20 leaked counts, never recovered.
+  patched: counter stays balanced (get then goto err -> put); baseline.
+Control: the same loop without "label" (no nf_connlabels_get) leaves the
+counter unchanged on both trees -- the trigger reached the labels path and
+the synthesis is not itself the cause.
 
+Conditions: reachable via RTM_NEWACTION with CAP_NET_ADMIN over the netns,
+i.e. an unprivileged user in a fresh user+net namespace on default-userns
+distros. The easy path needs CONFIG_NF_CONNTRACK_ZONES=n; the
+nf_ct_tmpl_alloc ENOMEM path leaks on any config under memory pressure.
+
+Mitigations: restrict unprivileged user namespaces; otherwise none short of
+the fix. Harness (trigger.c, init) available on request.
+
+ net/sched/act_ct.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+index 6158e13c98d35..f5866a364a74a 100644
+--- a/net/sched/act_ct.c
++++ b/net/sched/act_ct.c
+@@ -1295,7 +1295,8 @@ static int tcf_ct_fill_params(struct net *net,
+ 	if (tb[TCA_CT_ZONE]) {
+ 		if (!IS_ENABLED(CONFIG_NF_CONNTRACK_ZONES)) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Conntrack zones isn't enabled.");
+-			return -EOPNOTSUPP;
++			err = -EOPNOTSUPP;
++			goto err;
+ 		}
+ 
+ 		tcf_ct_set_key_val(tb,
+@@ -1308,7 +1309,8 @@ static int tcf_ct_fill_params(struct net *net,
+ 	tmpl = nf_ct_tmpl_alloc(net, &zone, GFP_KERNEL);
+ 	if (!tmpl) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Failed to allocate conntrack template");
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto err;
+ 	}
+ 	p->tmpl = tmpl;
+ 	if (tb[TCA_CT_HELPER_NAME]) {
 -- 
-Thanks,
-Sasha
+2.53.0
+
 
