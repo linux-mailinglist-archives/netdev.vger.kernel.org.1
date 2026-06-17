@@ -1,135 +1,225 @@
-Return-Path: <netdev+bounces-300065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id DmNmOhxaMmrQywUAu9opvQ
-	(envelope-from <netdev+bounces-300065-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:26:04 +0200
+	id oSznFpZaMmriywUAu9opvQ
+	(envelope-from <netdev+bounces-300066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:28:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404B469786A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:26:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7CD6978AA
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 10:28:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TJWE13wk;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300065-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300065-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=amazon.de header.s=amazoncorp2 header.b=Sn7hK+wt;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300066-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300066-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=amazon.de;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DCD2301E5A2
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:24:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 81AA03061537
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1AC380FE5;
-	Wed, 17 Jun 2026 08:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC65389E13;
+	Wed, 17 Jun 2026 08:27:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237DE17BCA;
-	Wed, 17 Jun 2026 08:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F52380FE5;
+	Wed, 17 Jun 2026 08:27:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781684666; cv=none; b=OuYQa+k9KGqQzPK1UmvGFsUL0s3b2K2he87ddfqokSpo9Gf3eW0LLAxGpGxs/pS5TBK9aujCV9R2cHFXO/Z4SY2IGkD/jstAPB5vfdTKXhzikq1jPI3cDcLPgHX4/NQivJRZELZxXnrZ4CtajbAa46SU1/RXV3vWp2dJz8qKpaM=
+	t=1781684828; cv=none; b=OknC0UkMkttRxT95WFLhqSLiU6xRpkK8s4YGdfhIZHC0beOQb7s3sMSKZyW8I24eKrqm2BHNiYMOOaZbawGDv0KvQDIgt/Yz3zOGCKkGxwEeBOMuA+GGmZHJpQbPxZ4p9i+QARA60+hB/kQkql354CMeaMZvqH/quCQFCx6kQL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781684666; c=relaxed/simple;
-	bh=kuBApJ0y7Vi88cCvSqzgNTYzLnc0J2FB38jctZzfGg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CuJhWlsWjXOfG1I2xo7Q8PFoEdQ1rnqRB2/7zdYIO/u7RFh2JnmbRLBCWLppQnVcSTXuTCFf0SGxqJ5QNJSAIfAJsFZEffRAHwCO79KlhUBiljw5dL4G5PgOXXmBd5bFYzRdukR+gUmf3hVmhZOutpDECGAEBTwddSX8BfCbHU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJWE13wk; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D404C1F000E9;
-	Wed, 17 Jun 2026 08:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781684664;
-	bh=SuzyLArYe5bj+f7+Tp/IYxWPm7dZk8dVDaRvB9u0vM8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TJWE13wkvsj53uRMwF+qNTzbENIExxm1mw03vCAc7ZAxBamTeiUoVbH99HJjzd9Q8
-	 lvmUJz2JAH2Qe1m9/FndJ3qrqoM31Yoaw7hjTvRQ9Nv8R0OZHGAEr5uENW/1EhdPE3
-	 LrSg3vo4uV5KxJjVdIZYJXvcoivt95jw74yIDIMQeXVuakjeMLlPXWZqyMCjlOQpCx
-	 /G6IiAvnQ2jOC1TFU5YLn6RbuMtpoCblH2ybG94EMpMfNAVo6zUx3YDH3M7sxvJTsY
-	 l1Hdn7vhJCfiyG1H+B+LGO4CZorVrAGiVhmd3MYm9hniNVFrr0WhkH8DUTEd5V2CIn
-	 6VSO4bqJUy3Cg==
-Date: Wed, 17 Jun 2026 09:24:20 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ruoyu Wang <ruoyuw560@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Masayuki Ohtake <masa-korg@dsn.okisemi.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] net: pch_gbe: handle TX skb allocation failure
-Message-ID: <20260617082420.GA840150@horms.kernel.org>
-References: <20260615125043.3537046-1-ruoyuw560@gmail.com>
+	s=arc-20240116; t=1781684828; c=relaxed/simple;
+	bh=dciUbXNlFRDfCtnn/jpFw7jss/8tXfrIyWa1uwzuLig=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oHX72i20k8+bpJaiPyKx38Ts7+X4/MrtQQL+6vnMiysc1JUFUBEMvMwGHSFsfChVYDR4vB6z5UuJPTc91Fc4YL+UQpP0PVFVxtRBowW5h2acfo8fxYzpfZwfe/1Kf2WRGJOkIZKw7mv6hZYyg3LpUoI4MOYjVi5ykuNlAAgi50s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=Sn7hK+wt; arc=none smtp.client-ip=44.246.77.92
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1781684826; x=1813220826;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9AxRPNtE9tz/kldGZzfKUdGNScYBLFw4xYGMo02Hvw4=;
+  b=Sn7hK+wtN/0oCu+EhYXoG+InCEEwXkRJFS0C7T2xTEKF2L1WIt+3X9dN
+   +3+yG7gljGESu8kNhV0RGdBD373yBXUp32CPMacXkhl6wA2su4WyPbDSR
+   R3MW6BXAhJc6/h6dzr9IfeVUu1Y8PGPhWDewrWQBRY/EB2SomIBQpt+Iy
+   41mbFcvAZH33KSJNhRdad809kikaGVojyb+jk8Bxgo82YOi8TejRvS4wN
+   2GNO/qSjxV86OttVFqkYHfy/zJe4umR/2Ar85nJB5xVIWsO+4V8glLRty
+   c8UNd16SkmLwhbFATIRLzPp5LXK9omT2RjzO+KnwBO8QQjj/ZUfHyC058
+   w==;
+X-CSE-ConnectionGUID: May9+EmuSqKHRqmOFLj9ww==
+X-CSE-MsgGUID: XbGAfCOrRsOtvltPxd5bGw==
+X-IronPort-AV: E=Sophos;i="6.24,209,1774310400"; 
+   d="scan'208";a="21929506"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 08:27:04 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:11972]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.146:2525] with esmtp (Farcaster)
+ id ae6e0019-f869-4a14-9004-f71149edef74; Wed, 17 Jun 2026 08:27:03 +0000 (UTC)
+X-Farcaster-Flow-ID: ae6e0019-f869-4a14-9004-f71149edef74
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 17 Jun 2026 08:27:03 +0000
+Received: from dev-dsk-mheyne-1b-8cc83676.eu-west-1.amazon.com (10.13.235.223)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 17 Jun 2026 08:27:00 +0000
+From: Maximilian Heyne <mheyne@amazon.de>
+To: <stable@vger.kernel.org>
+CC: Maximilian Heyne <mheyne@amazon.de>, Marc Kleine-Budde
+	<mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, "Nikolay
+ Aleksandrov" <razor@blackwall.org>, "Eric W. Biederman"
+	<ebiederm@aristanetworks.com>, <linux-can@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+Subject: [PATCH 6.12.y] net: add missing ns_capable check for peer netns
+Date: Wed, 17 Jun 2026 08:25:31 +0000
+Message-ID: <20260617-pats-coif-316245c6@mheyne-amazon>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260615125043.3537046-1-ruoyuw560@gmail.com>
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.66 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-3.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[amazon.de:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.de,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[amazon.de:s=amazoncorp2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300065-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:ruoyuw560@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:masa-korg@dsn.okisemi.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:stable@vger.kernel.org,m:mheyne@amazon.de,m:mkl@pengutronix.de,m:mailhol.vincent@wanadoo.fr,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:daniel@iogearbox.net,m:razor@blackwall.org,m:ebiederm@aristanetworks.com,m:linux-can@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300066-lists,netdev=lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[mheyne@amazon.de,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mheyne-amazon:mid,amazon.de:dkim,amazon.de:email,amazon.de:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[amazon.de:+];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mheyne@amazon.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[amazon.de,pengutronix.de,wanadoo.fr,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,blackwall.org,aristanetworks.com,vger.kernel.org];
+	ALIAS_RESOLVED(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 404B469786A
+X-Rspamd-Queue-Id: AD7CD6978AA
 
-On Mon, Jun 15, 2026 at 08:50:42PM +0800, Ruoyu Wang wrote:
-> pch_gbe_alloc_tx_buffers() allocates an skb for each TX descriptor and
-> then passes the returned pointer to skb_reserve(). If netdev_alloc_skb()
-> fails, skb_reserve() dereferences NULL.
-> 
-> Make pch_gbe_alloc_tx_buffers() return an error when an skb allocation
-> fails. On failure, let pch_gbe_alloc_tx_buffers() clean the partially
-> allocated TX ring before returning the error. While bringing the device
-> up, release the RX buffer pool through a shared cleanup helper before
-> unwinding the IRQ setup.
-> 
-> Fixes: 77555ee72282 ("net: Add Gigabit Ethernet driver of Topcliff PCH")
-> Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
-> ---
-> Changes in v3:
-> - Move the partial TX ring cleanup into pch_gbe_alloc_tx_buffers(), as
->   suggested by Simon Horman.
-> 
-> Changes in v2:
-> - Add the kernel-doc return value description for
->   pch_gbe_alloc_tx_buffers().
+The upstream commit 7b735ef81286 ("rtnetlink: add missing
+netlink_ns_capable() check for peer netns") doesn't apply on older
+stable kernels due to refactoring. Therefore, this patch is an attempt
+to implement the same capability check just directly in the respective
+interface types.
 
-Thanks for the updates.
+Approximate the netlink_ns_capable check with an ns_capable check. As
+the newlink operation is synchronous this should result in the same
+behavior.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Without this commit, for example, the following command creating a veth
+device in network namespace of pid 1 succeeds:
+
+$ unshare -U -r -n -- bash -c '
+  ip link add veth0 type veth peer name foobar netns 1
+  sleep 60' &
+$ ip link show foobar
+13: foobar@if2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 96:09:69:92:92:cc brd ff:ff:ff:ff:ff:ff link-netnsid 1
+
+With this patch, it's returning -EPERM.
+
+This fixes CVE-2026-31692
+
+Cc: stable@vger.kernel.org
+Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon device creation.")
+Assisted-by: Kiro:claude
+Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+---
+ drivers/net/can/vxcan.c | 5 +++++
+ drivers/net/netkit.c    | 5 +++++
+ drivers/net/veth.c      | 5 +++++
+ 3 files changed, 15 insertions(+)
+
+diff --git a/drivers/net/can/vxcan.c b/drivers/net/can/vxcan.c
+index 9e1b7d41005f8..851c93bf0b310 100644
+--- a/drivers/net/can/vxcan.c
++++ b/drivers/net/can/vxcan.c
+@@ -211,6 +211,11 @@ static int vxcan_newlink(struct net *net, struct net_device *dev,
+ 	if (IS_ERR(peer_net))
+ 		return PTR_ERR(peer_net);
+ 
++	if (!ns_capable(peer_net->user_ns, CAP_NET_ADMIN)) {
++		put_net(peer_net);
++		return -EPERM;
++	}
++
+ 	peer = rtnl_create_link(peer_net, ifname, name_assign_type,
+ 				&vxcan_link_ops, tbp, extack);
+ 	if (IS_ERR(peer)) {
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index fba2c734f0ec7..e0c42fa0c835c 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -413,6 +413,11 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
+ 	if (IS_ERR(net))
+ 		return PTR_ERR(net);
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN)) {
++		put_net(net);
++		return -EPERM;
++	}
++
+ 	peer = rtnl_create_link(net, ifname, ifname_assign_type,
+ 				&netkit_link_ops, tbp, extack);
+ 	if (IS_ERR(peer)) {
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 77e4b0d1ca557..6ffde7ee2119d 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1854,6 +1854,11 @@ static int veth_newlink(struct net *src_net, struct net_device *dev,
+ 	if (IS_ERR(net))
+ 		return PTR_ERR(net);
+ 
++	if (!ns_capable(net->user_ns, CAP_NET_ADMIN)) {
++		put_net(net);
++		return -EPERM;
++	}
++
+ 	peer = rtnl_create_link(net, ifname, name_assign_type,
+ 				&veth_link_ops, tbp, extack);
+ 	if (IS_ERR(peer)) {
+-- 
+2.50.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
