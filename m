@@ -1,229 +1,187 @@
-Return-Path: <netdev+bounces-300086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id P5XRLExlMmq3zQUAu9opvQ
-	(envelope-from <netdev+bounces-300086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:13:48 +0200
+	id aPxtH4pnMmoKzgUAu9opvQ
+	(envelope-from <netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:23:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10BBB697CCC
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:13:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCCA9697DBB
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:23:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=lunn.ch header.s=20171124 header.b=05W0qCRV;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300086-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300086-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=lunn.ch;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=SKvst9fX;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300091-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5931130078EF
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:07:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5341F304D240
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4203439EF20;
-	Wed, 17 Jun 2026 09:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3CE39D6EE;
+	Wed, 17 Jun 2026 09:18:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAED39022E;
-	Wed, 17 Jun 2026 09:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E411D39B4A3;
+	Wed, 17 Jun 2026 09:18:27 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781687257; cv=none; b=Rp2YHMyPlVeKOgXRnqGEIw1OPgKj8ftzsRzKSIXc7h95XEDMgEoPge4eeFwdYa8yk3yBlcDRfbPJNPfrsceLnlnx13R9CIG78dGsefcrqewe6uLz/A3ZpADsJ8UtsxL1fLI31nCSqwbl5HRAGvgiJrDdlT846UW2BmGl/onUCU4=
+	t=1781687908; cv=none; b=p0cn+kwt8jKTV8s6f2Gr7r5s8S/qTWRDqODsjgTZANL0+rTeICufgv33ew9V6l+uM50kX7xFdo4jRMnCb/ge7xvLRvSnvXcuR+x8rbAH9G0kZ4uHjB3gnZCMPf6Yem5QB/jb0WCRPZxIUuZpQ4Vay/IEUiojpS/bHHJCNqg/OU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781687257; c=relaxed/simple;
-	bh=zQDBg7W0tjJGt6fZCeNBPHVz0JlrFM2CG+k3SzBRxOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWW6pOl6NfJ5OtNBBRyTtYunnbtqikPTur6eakI8bQueyAFPhd3Exv8vYx7jah5NjYk+VkvQbsUQQUrg3IKXhVjzHmLTr4oXCqpSuhmQ727ijm1qwU+1mm263658t9/fwRoMC7dHi61OpTAG8zdCoc2X4lrlmGq0TYt+qH4oRMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=05W0qCRV; arc=none smtp.client-ip=156.67.10.101
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9mQCjsi7dlJQ+lSZ9sXoEOXpUYxJ+F2D5zZ7rEHJnEI=; b=05W0qCRVqSkMVkmOh7ERVV0dIn
-	FoYF8EbXzhP7yJ5mvGgDdaX0508HQQhmccEwTwBmDTLfoceJUR6YxRklyEqBDj+Wr5Xqu46ANt6qx
-	kKpJUDi7GpcHmhCd1F0zqx8HLlwFygY/B5DpBVrSGLlmZBF+MUwwX2lRGM/oF5Ou5W5E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wZmF1-0089Yw-0F; Wed, 17 Jun 2026 11:07:23 +0200
-Date: Wed, 17 Jun 2026 11:07:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kyle Switch <kyle.switch@motor-comm.com>
-Cc: David Yang <mmyangfl@gmail.com>, olteanv@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ming.xu@motor-comm.com,
-	xiaolin.xu@motor-comm.com, jianmin.wang@motor-comm.com,
-	de.ge@motor-comm.com
-Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
-Message-ID: <a689a734-bfd2-4e8f-85dd-9ae210b3161a@lunn.ch>
-References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
- <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
- <88f726d5-1617-4d2e-8fbb-d3da9478b386@motor-comm.com>
+	s=arc-20240116; t=1781687908; c=relaxed/simple;
+	bh=jU+y4zwGW5m9F+uZkVQ/IsuSU9Z9wtD6LH5H8jCyUPk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pu3P5hf+pZsF0KrwxHO5jdst89EYaNvLe2tmNrcBU52qSSUuma17Uy9n0RqKuQq/98xYJZCAJzcWF6kxXqohtXHlDB+FoSZhz9SLjZJsHdAeVo6A14l1aLnM046dw16XAMqwUYCbqhvWzcGyD6dOOxzfQOLWYNY8FEf//PX1+6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKvst9fX; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F21A1F000E9;
+	Wed, 17 Jun 2026 09:18:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781687907;
+	bh=EtNxW7/37fBEOlp38QPfab6gfweMcAFcEQ1RgfKloiU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=SKvst9fXi2R1TDymljJrc6AzQ+h9tCJfP4PIijyCLDV76XTG3aUP7jios0lc8vvJW
+	 wrRahawIRsQ+OPKPdq7je/hchFPjjHCPZohsuaNjxm1BcPjxTCDVY8n2/mCm2aAM7H
+	 zXLrsbXwC+8ziBuz7+e9gDXD5MCmnpwl3Lju9Y8xKD6VyVNK+tviH3ZXMN+LjOqn30
+	 zjKGX2rO5i/EVprgo85hlksRklXiFopnO57f/mv+7cG+7s0fEDqX6b+LDUE6POjJOg
+	 YGhsPv3hyVNyUXUpEOJqlWfTz0ZBfayCvtda9zGnSUnHNCy5JVQkfNgcospb47T/sG
+	 7cnRM1qBtkO+Q==
+From: Simon Horman <horms@kernel.org>
+To: doruk@0sec.ai
+Cc: Simon Horman <horms@kernel.org>,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	borisp@nvidia.com,
+	sd@queasysnail.net,
+	raeds@nvidia.com,
+	ehakim@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
+Date: Wed, 17 Jun 2026 10:16:35 +0100
+Message-ID: <20260617091634.846438-2-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260615140534.52691-1-doruk@0sec.ai>
+References: <20260615140534.52691-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88f726d5-1617-4d2e-8fbb-d3da9478b386@motor-comm.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300086-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300091-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:kyle.switch@motor-comm.com,m:mmyangfl@gmail.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:doruk@0sec.ai,m:horms@kernel.org,m:saeedm@nvidia.com,m:leon@kernel.org,m:tariqt@nvidia.com,m:mbloch@nvidia.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:borisp@nvidia.com,m:sd@queasysnail.net,m:raeds@nvidia.com,m:ehakim@nvidia.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,sashiko.dev:url]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 10BBB697CCC
+X-Rspamd-Queue-Id: CCCA9697DBB
 
-> >> +#define CMM_PARAM_CHK(expr, err_code)    \
-> >> +       do {                             \
-> >> +               if ((u32)(expr)) {       \
-> >> +                       return err_code; \
-> >> +               }                        \
-> >> +       } while (0)
-> >> +
-> >> +#define CMM_ERR_CHK(op, ret)           \
-> >> +       do {                           \
-> >> +               ret = (op);            \
-> >> +               if (ret != CMM_ERR_OK) \
-> >> +                       return ret;    \
-> >> +       } while (0)
-> > 
-> > Do not use macros like this.
-> 
-> Ans: Acknowledged, i will consider how to optimize them in the future.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net/mlx5e: macsec: fix use-after-free of metadata_dst on RX SC delete
 
-It is not about optimization. Hiding a return statement in a macro is
-very bad style. It will lead to locking bugs, and resource leaks,
-because nobody knows the return is there.
+This patch replaces metadata_dst_free() with dst_release() during MACsec
+RX SC deletion. It relies on the dst subsystem's refcounting to defer freeing
+the metadata_dst until the last reference is dropped, aiming to fix a
+use-after-free when an skb still references it.
 
-> >> +/*
-> >> + * Macro Definition
-> >> + */
-> >> +#ifndef NULL
-> >> +#define NULL 0
-> >> +#endif
-> >> +
-> >> +#ifndef FALSE
-> >> +#define FALSE 0
-> >> +#endif
-> >> +
-> >> +#ifndef TRUE
-> >> +#define TRUE 1
-> >> +#endif
-> > 
-> > Nonsense.
-> 
-> Ans: Acknowledge, will be fixed later.
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+> index 71b3a059c9647..2a4e7ed76d315 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
+> @@ -829,7 +829,7 @@ static void macsec_del_rxsc_ctx(struct mlx5e_macsec *macsec, struct mlx5e_macsec
+>  	 */
+>  	list_del_rcu(&rx_sc->rx_sc_list_element);
+>  	xa_erase(&macsec->sc_xarray, rx_sc->sc_xarray_element->fs_id);
+> -	metadata_dst_free(rx_sc->md_dst);
+> +	dst_release(&rx_sc->md_dst->dst);
 
-No. They will be fixed now.
+[Severity: High]
+Does this change introduce a new use-after-free in the RX datapath?
 
-> >> +       /* Print chipid here since we are interested in lower 16 bits */
-> >> +       dev_info(dev,
-> >> +                "Motorcomm %s ethernet switch.\n",
-> >> +                info->name);
-> > 
-> > Stop copy-n-paste.
-> 
-> Ans: Sry for this, i will recheck the code to make sure each line of comments and code
-> meaningful again.
+When dst_release() drops the refcount to 0, concurrent readers in
+mlx5e_macsec_offload_handle_rx_skb() can still find the object via RCU
+and call dst_hold(). Because dst_hold() uses rcuref_get(), it fails on a
+0-refcount object without incrementing the count.
 
-Also, consider the comments. Do the comments add anything useful which
-is not already obvious from the code. Comments should be about "Why?".
+However, the datapath still attaches the 0-refcount dst to the skb. When the
+skb is later freed, skb_dst_drop() will call dst_release() on already-freed
+memory.
 
-> >> --- a/include/uapi/linux/if_ether.h
-> >> +++ b/include/uapi/linux/if_ether.h
-> >> @@ -118,7 +118,7 @@
-> >>  #define ETH_P_QINQ1    0x9100          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >>  #define ETH_P_QINQ2    0x9200          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >>  #define ETH_P_QINQ3    0x9300          /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >> -#define ETH_P_YT921X   0x9988          /* Motorcomm YT921x DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >> +#define ETH_P_YT92XX   0x9988          /* Motorcomm YT92xx DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >>  #define ETH_P_EDSA     0xDADA          /* Ethertype DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >>  #define ETH_P_DSA_8021Q        0xDADB          /* Fake VLAN Header for DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
-> >>  #define ETH_P_DSA_A5PSW        0xE001          /* A5PSW Tag Value [ NOT AN OFFICIALLY REGISTERED ID ] */
-> > 
-> > UAPI stands for User-space API. Do not change it unless there is a
-> > very very good reason.
-> > 
-> 
-> Ans: The default tpid both yt921x and yt922x is 0x9988. I have modified this to 
-> allow for simultaneous use in both yt922x and yt921x scenarios.
+Should the datapath be updated to use dst_hold_safe() instead?
 
-As pointed out, this is UAPI. Any changes to this file need a good
-explanation how it does not change the user API. Do this break
-backwards compatibility with user space applications? Maybe tcpdump or
-wireshark has a dissector which expects ETH_P_YT921X and you have just
-broken it?
+>  	kfree(rx_sc->sc_xarray_element);
 
-> >> +#define YT922X_TAG_FORMAT2_NAME "yt922x-8b"
-> >> +#define YT922X_FORMAT2_TAG_LEN                  8
-> >> +#define YT922X_PKT_TYPE          GENMASK(15, 14)
-> >> +#define YT922X_8B_CPUTAG_PKT_FROM_CPU      0x1
-> >> +#define YT922X_8B_CPUTAG_SRC_PORT          GENMASK(6, 2)
-> >> +#define YT922X_8B_CPUTAG_DST_PORTMASK      GENMASK(8, 0)
-> >> +#define YT922X_8B_CPUTAG_DST_PORTMASK_0      BIT(15)
-> >> +#define YT922X_8B_CPUTAG_DST_PORTMASK_0_EN      0x1
-> >> +#define YT922X_8B_CPUTAG_FORCE_DST         BIT(9)
-> >> +#define YT922X_8B_CPUTAG_FORCE_DST_EN      0x1
-> > 
-> > If yt922x tag format shares no common with yt921x, make a new tag driver.
-> 
-> Ans: thank you for your suggestion, we will consider whether to create a new driver in the new file.
+[Severity: High]
+This is a pre-existing issue, but does this synchronous kfree() cause a
+use-after-free for concurrent datapath readers?
 
-When you look at other tag drivers, you will also notice some drivers
-implement two taggers in one file. So consider this if there is any
-shared code.
+The element was just removed from the RCU-protected xarray via xa_erase(),
+but the RX datapath can still be accessing it via xa_load() under
+rcu_read_lock() in mlx5e_macsec_offload_handle_rx_skb().
 
-> >> +static struct dsa_tag_driver *dsa_tag_driver_array[] = {
-> >> +       &DSA_TAG_DRIVER_NAME(yt921x_netdev_ops),
-> >> +       &DSA_TAG_DRIVER_NAME(yt922x_4b_netdev_ops),
-> >> +       &DSA_TAG_DRIVER_NAME(yt922x_8b_netdev_ops),
-> >> +};
-> > 
-> > If both are supported by the chip and 4b does nothing more than 8b
-> > does, do not bother with it.
-> 
-> Ans: 4b and 8b dsa tag may have different application scenarios. from my opinion,
->      1. 4b dsa tag can save 4 bytes of payload
->      2. 8b dsa tag carry more package info.
+Should this use an RCU-deferred free mechanism instead?
 
-How do you plan to swap between the different formats?
+[Severity: Critical]
+This is a pre-existing issue, but does mlx5e_macsec_offload_handle_rx_skb()
+blindly dereference the result of xa_load()?
 
-The user perspective is that the machine has a collection of interface
-which are used just as normal, using Linux tools likes like
-iproute2. If the user enables a feature which requires the 8b tag
-format, will you change the format from the DSA driver? And swap back
-to the 4 byte format when the feature is no longer needed?
+drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c:mlx5e_macsec_offload_handle_rx_skb() {
+    ...
+    sc_xarray_element = xa_load(&macsec->sc_xarray, fs_id);
+    rx_sc = sc_xarray_element->rx_sc;
+    ...
+}
 
-	Andrew
+If xa_load() returns NULL (e.g., if the entry was concurrently deleted by
+xa_erase() or the packet has an unrecognized fs_id), will this cause a
+deterministic kernel panic?
+
+Is a NULL check needed before accessing the returned element?
+
+>  	kfree_rcu_mightsleep(rx_sc);
+>  }
 
