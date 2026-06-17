@@ -1,188 +1,148 @@
-Return-Path: <netdev+bounces-300041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300042-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H6mWKZI6Mmp/xAUAu9opvQ
-	(envelope-from <netdev+bounces-300041-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:11:30 +0200
+	id zD0ZAY88MmrqxAUAu9opvQ
+	(envelope-from <netdev+bounces-300042-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:19:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C39C696C70
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:11:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5557A696CF1
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 08:19:58 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=canonical.com header.s=20251003 header.b=L1dNSXLd;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300041-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300041-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=canonical.com;
+	dkim=pass header.d=intel.com header.s=Intel header.b=h6qu521a;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300042-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300042-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D036E3019AAD
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 06:11:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B5B7307D7D7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 06:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB773B27E2;
-	Wed, 17 Jun 2026 06:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8183B47C9;
+	Wed, 17 Jun 2026 06:19:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F02F3B27D8
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FB73B42E9
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:19:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781676660; cv=none; b=pSeklylPPUUc/14VI9Zf4ptmypY8800xSlEZRRSoR66ctfjuLE5R7geOXWvMatW+ptU6Zff1eUMujs1jVqrLAszYlwfzcYz/LMHwUJWlWprCYAeFbstqOXIhLjmrDx5TSTR16UzLbpoELxBFKu5cTioyLdP/Tv1pPPHYSQJp8Pk=
+	t=1781677189; cv=none; b=iXJEGOKvgHT76XawDRP5NCaEecXNmAOo91kyG0z6d/iOB8eO3TxjvYCliDBfTdMh187gGtGeXqMeTEvCyhHQGkjIfeVFk8Tala+3s0TCQOtbAI+QBtcKbCQbLw0OKbg1i39CDcrdbqUpjmyHnI/U3edgRZXjGudOtfQJpCJOLUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781676660; c=relaxed/simple;
-	bh=oJAtrOLVtF+GBmtQGqaY9bBzbr0/iVZWQUsi/oY1hhc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VdmO2jURD/lwPbbEQpnVJDfmyYciC4lOZAfuvAwpRH7X/Epk1KU1dQ2AzuR1SfEverjtZHwanuMblcorxePKNkx7G+YEeRkRilZlIS1ZB2/9cedk1ICOO36gOnZb26f3vp5mnxIJEsQul0TjBY6FJgP68HuntPalKsLnTgD1fKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=L1dNSXLd; arc=none smtp.client-ip=185.125.188.123
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 7C2853F610
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 06:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1781676656;
-	bh=yYyjbUwTbz5kYjrY+YDLT8Sq9O45djIje08c44tj+s0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=L1dNSXLdhygcRMn7A9AblErsG9ZIB//1tFzNasW3PyXsr0MPvoj0xX4nPdaK88C0U
-	 OCU35XLLR1R3HJ0CKUZfxDVrHdhEPjaAz4q1qPmE452CfLdLwIVY7pXukPGErtaQ+p
-	 ihzRghRE32xA3GBkr6Kedhbzvh+6du8iwEvWLvl44pEog9ldySC+PC73Dq/hFzpVHy
-	 3xVDZs3qA9uIQ8uX5Og4h3wSNb+14RKAf5qhI0Y/UNtZTrGLOZAOPSfeNxhlzuR36q
-	 zx2W/C2jezx5x0YfYH102h2hulc8mjKuPTnXTU3QLguxzG4UzR1bFNsz+WPyjxgSQH
-	 /iHf2WZnA9rPTRVU2f2al3UVoi2TomeiZZ+hk17FdOIz60LWfRfQ9EKPW0dAy3dMzg
-	 E40wueYTxcU7KjhX3pgBhTuYpsCXq3Sg8I6NoJrKJIFLLLndPoBffluPvJMaQa9qrI
-	 p8WuU0PY8Fk6JyXYQpAoPrq+dY5axMOavoDgrPBJrm8usvyPq711WVoViHgAgi9AHE
-	 dhX44iTr+HVmJ05GhQZyYhBfwq/ZK+Jv+uQBPc+JodgSNgRxuGw0f2CagNlvTpxJAl
-	 YDi0sumNWriNVVZMHk7uU7rHmQcMpssKkGHfC56SmvGWTHlFw/UQZ6D/TQnbK1yvda
-	 3yPwtNmhk/t8EIAONgLCC8Ao=
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490a060eb84so37761845e9.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 23:10:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781676656; x=1782281456;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yYyjbUwTbz5kYjrY+YDLT8Sq9O45djIje08c44tj+s0=;
-        b=pnUV5FoQuP2ghjDImxqfoaiG712WhQ+YKCbYgFwvtK2hrslB0JpYaEOSSgGHWPY8wq
-         o4hdoJTIrjjo2pBaKFULF0P6Ea6Z2r+wIG1UbefytlfyMzs1n3ROiDluYeEMBkxEO2aZ
-         m8Dky3mO6IIOD61IwG5fuffJ0M2hrmJG2/nGYfAJDpJ2DNRvpSbZEvorm6Op6knbi1GN
-         zGBjswtHt1J/6sRcprgXt8q82+Cx+8luboCA7FbhFPK4tNaUyC1rGtpzEEu0287l863u
-         5k/WJ3HmWSYprJBA1L9EYfwVe2g6lzyLj47uKFd8zuzviZlPxGZL7hFHp88jaj6RPGJ6
-         rgCg==
-X-Forwarded-Encrypted: i=1; AFNElJ8PZnAieI6T7Rue/yNtbLCvZjgNsZ21DXH7uBYwwpYuDn0m+25VT5qljlqQHWkXHRwh/etewYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKnoGFS3E1RJR4xgISb7eMTc0dCGH9dyf/dVwXyYVbywFlTfK6
-	lUSs341qBbI71BmfiM14/ohX0jaZSCDFDlW9+V1o9G2QP871+zbBxXEGQes+fqQyLJdJEiu0Lye
-	cxWRL/Ura6GQ3zm6o2X17EBLnpd9ofIAhgm/y8FSBaiGepCtErpqyTaebJDqicx9D76Aa0qZsnQ
-	==
-X-Gm-Gg: Acq92OHZOVr1prM5yhCnbAAaNww0vrf1yiCrXnKPrJd/UUlp9HSzvTdDb0ZYgB5ngU4
-	p/kxrBXT+xsOlMEJWG5x+kWLAZWDhW36Ge7rVxeUfPQXmpsuceKjCfzXYsaOi6bNsB0uaqrBByu
-	FVP9hFZPEgr+QvrOoBYredGh2B54B1s5wa9LMpZoNaKkjKmbky40TbjUM9BxH5FaqMu1slr8IpJ
-	Ia4FC2kWb+04efOGuet3s1uaqKGgejEYEAtLyz7a2O/oxDbnni9j0KkVuZ9GG6mVrfY87J6iUFu
-	8a9n+TZeugaYnGD+PpcSpvmQ0LN6T7KdG74gHzZt/JM6jKE1vU2r61K0PwFbzzzMRnrRYKqZxo3
-	w1W3V9yG5UaQ=
-X-Received: by 2002:a05:600c:5644:b0:490:adb6:7957 with SMTP id 5b1f17b1804b1-49234141d98mr16811895e9.33.1781676656071;
-        Tue, 16 Jun 2026 23:10:56 -0700 (PDT)
-X-Received: by 2002:a05:600c:5644:b0:490:adb6:7957 with SMTP id 5b1f17b1804b1-49234141d98mr16811665e9.33.1781676655730;
-        Tue, 16 Jun 2026 23:10:55 -0700 (PDT)
-Received: from ross-pc.local ([2001:67c:1562:8007::aac:41a0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f26f309sm46674988f8f.14.2026.06.16.23.10.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2026 23:10:55 -0700 (PDT)
-From: Ross Porter <ross.porter@canonical.com>
-To: linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: ross.porter@canonical.com,
-	stable@vger.kernel.org,
-	Edoardo Canepa <edoardo.canepa@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Brett A C Sheffield <bacs@librecast.net>,
-	Oscar Maes <oscmaes92@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] selftests: net: fix file owner for broadcast_ether_dst test
-Date: Wed, 17 Jun 2026 18:10:39 +1200
-Message-ID: <20260617061039.79717-2-ross.porter@canonical.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260617061039.79717-1-ross.porter@canonical.com>
-References: <20260617061039.79717-1-ross.porter@canonical.com>
+	s=arc-20240116; t=1781677189; c=relaxed/simple;
+	bh=BgQYrmR+7GcniQAhoX3so0VbrDhC8RCJSeENc8FMxMA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AaRsQL/O1axxn03vwg0wr9yvI9AoUzkc5LrpJPss0fYvBtRKiqnnGKsFPN5WZCBds1ygXE6XA+yJa8binjcTAPbIkMir1irQTdPB21awiq+zLf0fCszxDEQpyyotZvu5J+avf5pPjvOOnJxI8fXLUeUYGJj+/NWkT/Nh5TeRzJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h6qu521a; arc=none smtp.client-ip=198.175.65.19
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781677182; x=1813213182;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BgQYrmR+7GcniQAhoX3so0VbrDhC8RCJSeENc8FMxMA=;
+  b=h6qu521ad3b/FpfW0x8BQWzziSnE7v0kdTnNreCXeupHe0ezP8xFuK+n
+   ztR+9PLIfx3r/Ite0FbDSzdJHVTf116rxnHpZAx6d3U83yJ4Xnwhf0caf
+   1M7jx5pftqW7arHs2hTjdi74CnaPex0Pe6MdWdOQIb6xxS/TRlhxCAn0s
+   lbO2VmlqDa6qIBY2rlPv5iz6wIXQidv10w2//oQr3WWHjDKt/6RAGKSK+
+   pA2Tv4j3PbJLTzwI70PWtpDZkBUFZAQrxrx2/V4ZA0WuWP104KlPdVKaq
+   cxpd+q06TgxVvMeHIynKPfAaSIFGigoLXsylTP6LG23a4htGhlVTYHH9H
+   Q==;
+X-CSE-ConnectionGUID: JYKdMwijQUWFA+TxnVLhKg==
+X-CSE-MsgGUID: efuRD+3xT/+7zFrpd6Zzwg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11819"; a="82471805"
+X-IronPort-AV: E=Sophos;i="6.24,209,1774335600"; 
+   d="scan'208";a="82471805"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 23:19:41 -0700
+X-CSE-ConnectionGUID: TcktqaFDSh+9s/CfjFS3Sw==
+X-CSE-MsgGUID: 3T/LFQhuQICRo8MgbNZDTA==
+X-ExtLoop1: 1
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2026 23:19:37 -0700
+Date: Wed, 17 Jun 2026 08:19:35 +0200
+From: Raag Jadav <raag.jadav@intel.com>
+To: "Tauro, Riana" <riana.tauro@intel.com>
+Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	netdev@vger.kernel.org, simona.vetter@ffwll.ch, airlied@gmail.com,
+	kuba@kernel.org, lijo.lazar@amd.com, Hawking.Zhang@amd.com,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	dev@lankhorst.se, zachary.mckevitt@oss.qualcomm.com,
+	rodrigo.vivi@intel.com, michal.wajdeczko@intel.com,
+	matthew.d.roper@intel.com, mallesh.koujalagi@intel.com
+Subject: Re: [PATCH v3 1/4] drm/ras: Introduce error threshold
+Message-ID: <ajI8d4FlRH_CtyZV@black.igk.intel.com>
+References: <20260604184849.1011985-1-raag.jadav@intel.com>
+ <20260604184849.1011985-2-raag.jadav@intel.com>
+ <57e1f3a9-14b7-4bec-8765-deb70fe6b636@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <57e1f3a9-14b7-4bec-8765-deb70fe6b636@intel.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-5.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[canonical.com,reject];
-	R_DKIM_ALLOW(-0.20)[canonical.com:s=20251003];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300041-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[canonical.com,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,librecast.net,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER(0.00)[ross.porter@canonical.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:linux-kselftest@vger.kernel.org,m:netdev@vger.kernel.org,m:ross.porter@canonical.com,m:stable@vger.kernel.org,m:edoardo.canepa@canonical.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:bacs@librecast.net,m:oscmaes92@gmail.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ross.porter@canonical.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300042-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:riana.tauro@intel.com,m:intel-xe@lists.freedesktop.org,m:dri-devel@lists.freedesktop.org,m:netdev@vger.kernel.org,m:simona.vetter@ffwll.ch,m:airlied@gmail.com,m:kuba@kernel.org,m:lijo.lazar@amd.com,m:Hawking.Zhang@amd.com,m:davem@davemloft.net,m:pabeni@redhat.com,m:edumazet@google.com,m:dev@lankhorst.se,m:zachary.mckevitt@oss.qualcomm.com,m:rodrigo.vivi@intel.com,m:michal.wajdeczko@intel.com,m:matthew.d.roper@intel.com,m:mallesh.koujalagi@intel.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.freedesktop.org,vger.kernel.org,ffwll.ch,gmail.com,kernel.org,amd.com,davemloft.net,redhat.com,google.com,lankhorst.se,oss.qualcomm.com,intel.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[canonical.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[raag.jadav@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,canonical.com:dkim,canonical.com:email,canonical.com:mid,canonical.com:from_mime,launchpad.net:url]
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,intel.com:dkim,intel.com:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9C39C696C70
+X-Rspamd-Queue-Id: 5557A696CF1
 
-Ensure the output file is always owned by root (even if tcpdump was 
-compiled with `--with-user`), by passing the `-Z root` argument when 
-invoking it.
+On Mon, Jun 15, 2026 at 02:26:05PM +0530, Tauro, Riana wrote:
+> On 05-06-2026 00:16, Raag Jadav wrote:
+> > Add get-error-threshold and set-error-threshold command support which
+> > allows querying/setting error threshold of the counter. Threshold in RAS
+> > context means the number of errors the hardware is expected to accumulate
+> > before it raises them to software. This is to have a fine grained control
+> > over error notifications that are raised by the hardware.
 
-Cc: stable@vger.kernel.org
-Reported-by: Edoardo Canepa <edoardo.canepa@canonical.com>
-Closes: https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/2129815
-Fixes: bf59028ea8d4 ("selftests: net: add test for destination in broadcast packets")
-Suggested-by: Edoardo Canepa <edoardo.canepa@canonical.com>
-Tested-by: Ross Porter <ross.porter@canonical.com>
-Signed-off-by: Ross Porter <ross.porter@canonical.com>
----
- tools/testing/selftests/net/broadcast_ether_dst.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+...
 
-diff --git a/tools/testing/selftests/net/broadcast_ether_dst.sh b/tools/testing/selftests/net/broadcast_ether_dst.sh
-index 334a7eca8a80..5e7a8fe23c7a 100755
---- a/tools/testing/selftests/net/broadcast_ether_dst.sh
-+++ b/tools/testing/selftests/net/broadcast_ether_dst.sh
-@@ -44,7 +44,7 @@ test_broadcast_ether_dst() {
- 	# tcpdump will exit after receiving a single packet
- 	# timeout will kill tcpdump if it is still running after 2s
- 	timeout 2s ip netns exec "${CLIENT_NS}" \
--		tcpdump -i link0 -c 1 -w "${CAPFILE}" icmp &> "${OUTPUT}" &
-+		tcpdump -i link0 -c 1 -w "${CAPFILE}" -Z root icmp &> "${OUTPUT}" &
- 	pid=$!
- 	slowwait 1 grep -qs "listening" "${OUTPUT}"
- 
--- 
-2.53.0
+> > + *     + The driver can optionally implement query_error_threshold() and
+> > + *       set_error_threshold() callbacks to facilitate getting/setting error
+> > + *       threshold of the counter. Threshold in RAS context means the number of
+> > + *       errors the hardware is expected to accumulate before it raises them to
+> > + *       software. This is to have a fine grained control over error notifications
+> > + *       that are raised by the hardware.
+> > + *     + The driver is responsible for error threshold bounds checking.
+> 
+> Can the threshold be set to 0? What should the behaviour be?
 
+Some may want it to be invalid while some may want it to act as a "disable
+notifications" toggle. So it's upto the drivers and their usecases, not for
+us to decide. Will add this.
+
+Raag
 
