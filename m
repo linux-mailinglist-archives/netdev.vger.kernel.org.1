@@ -1,180 +1,238 @@
-Return-Path: <netdev+bounces-300055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300056-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id glWfMUdJMmqHyAUAu9opvQ
-	(envelope-from <netdev+bounces-300055-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:14:15 +0200
+	id 4ftGAZ1LMmofyQUAu9opvQ
+	(envelope-from <netdev+bounces-300056-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:24:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4576B69716E
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:14:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04D5269726A
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:24:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HcFrbHfy;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300055-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300055-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b="KDdN4/41";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300056-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300056-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8A0B301E3FA
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:13:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 46403300600F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 07:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C013E3B9D96;
-	Wed, 17 Jun 2026 07:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662533BB661;
+	Wed, 17 Jun 2026 07:24:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA553AFD1C
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 07:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38573BB670
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 07:24:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781680434; cv=none; b=K/u2t36pABBP0jbQIJ+x9xUSoyUhCw46EZ5R44EqdJbjmITaP+FR6NEVWMhEVXSQd4cfv9RduvndjOVnl9EXhkU8AxGbiiM2g2qHo5b9+y3yAy4qDXjhirN3iQkaAajPTVPgLS+TZpRZYmEWepzTsg/1itIbrSUYQ51lG5Tu9Rw=
+	t=1781681046; cv=none; b=FeaThSOE6d78WWQTzfKb3A7h9mbR0xhDzV+Ga00w3TR57yogMFT9GJO7qtk4sFwUW5UR1eMn6nx0Z3ll50a2tGv001f7Hs/NWvHpP8jldAWh1MbW8EN2Vtb0SD873Eu4cxEOL7XzwILsnS/7kEDCUh+ojO6nfL2V10Tc8CFdW/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781680434; c=relaxed/simple;
-	bh=zyQ8itX7O/KNdNgCPi6XbSXH95QBQbF1QrUWxW9OXNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vAgqTDZNyK+gCAIF6ZbAN6g+C/L1YtlcJwTeKcSifiUciPJO8c7OCI4tHtuIW5rKMQlmZZqKEXXYWWBFTkqh05EJtJsKJ4FmLtbMsPEkBe81qpIgY9bWy1m6Qgu/0WvD+CWm/xvjRyDYdswEh7BDV9muDrk93qf6DHsSzl3PNUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HcFrbHfy; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E511F000E9;
-	Wed, 17 Jun 2026 07:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781680433;
-	bh=x1oewAmKIOweGpwkRj7/2QKkESSIVukJ2iPbPD417jU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HcFrbHfyf+xRVfrLao6nlRPe/js6angNTvuPM5tKyuxdGQFVPAaXmxutbHqtwQlFg
-	 5rw0fLb2BchNIffq038EJOvxETHgQ/ob9SVnoy6Wqo4e1+uJoqwpha9D6ukpZf7cg3
-	 gtS4emT756CuPscYS3LiHPtw7Vn5XU+uAXCBT0o4bs8NwlBucyaiRPDugAeCTO62Vy
-	 TKDWJVHwfC3f3JOc8qv2ZiLTh8CqbF6AkmR8z2M6NVl9MXu28yLFw5HZLJxr5DTrvx
-	 K0Rhe+KnbEtEHqclTLMiLKeMqlJmnngZN9SOoFEymCrn74wmsLrxUByhhB0WCd/yG0
-	 bQmYtug2OQHSg==
-Date: Wed, 17 Jun 2026 09:13:51 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] net: airoha: Fix off-by-one error in HTB rate-limit
- channel removal
-Message-ID: <ajJJL06Wes9vPuvW@lore-desk>
-References: <178166483303.2209640.10761097847073356089@gmail.com>
+	s=arc-20240116; t=1781681046; c=relaxed/simple;
+	bh=vN7HkFzdiO9VzqsNqKseh8p1JebrF1lzD3SPIiY/XGY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZZQtXueEGddPdREs3dxAcZIk/HxT+or09KVbziRe1/DToVPcv8Z+HvYEqFYv9hxPdJr4XP/rsjkRu+68EEB+Jo0W+Obwu6ko/lOgRTMc6QOpAE4wje18MNRBoziBW6xm1dHdYOdiVPqtQ+vfRer/md8e8EQvzjb6AghlNh/RgHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDdN4/41; arc=none smtp.client-ip=209.85.218.50
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-bec49f7e35eso713882666b.2
+        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 00:24:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781681043; x=1782285843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjmUPDClbDkPs/Q/gGvLbyNfztYl4Gq0Pvfi7sSSo90=;
+        b=KDdN4/41BO1EbQHgVku89ugCrEqfFll/5D+APzdWLMnLiaMC+AeYwiS54JNuMeHYVb
+         oLzgZ2xSqg2ox4EGiKiWk3RiV8hpqg9dQKU+3ss0ai9NHrKqF6dD8qLhmGSxkdKU2Li5
+         ic7ZRgkVbnvnNEgXVSaiIiy8sb8stRmJdu+uOjpuGmAG/dNB2I8VmgpwZ/vSpybZpXmk
+         t8zRdjf3B+hwMJdDg8iIV7HgzQeKtlE81WHr5JqdvhADCiuWRVuUQy9R1NawH4ajBhzD
+         xEPmzhVhGqtWD0bO+mdEY+D+t1UjNO2OfRk4MAGJvNXr/MaHxu/nhSwAOeEk5dWQwkgK
+         ObGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781681043; x=1782285843;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XjmUPDClbDkPs/Q/gGvLbyNfztYl4Gq0Pvfi7sSSo90=;
+        b=XKYuKsnOMAOvStw1vFtXddqSPflDcM8scFPNcqKq+l7UcqFsKkRHLZevjNRNHrqdIz
+         G3AD87qexzl9GM4cwu2IS4RuJdkNghj2MFlxPQaMINHAmKuU95/dc531EBH7FRFtIKHT
+         XiXRLezFoJMZ8RZiiujmnM06Vp19Fuk9bZA9fimbUAvgEHWYfdc0jnjWbiZGKX9qEkS2
+         /BKrgetJ+6zXoBALz7niqzIIXaklV6Ak21vRrQ4l/tfq9Dph0z58j176kdgbdJNUKyAB
+         RuilGWIodaaKP2qCZ7pbP1MfTJngIgB58KVI/l9Luy+hl3mCuCRvHwbtTxdbhwVwNf/t
+         ZQPQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8qw0OZyAgsx+8PULwSAMiR/N8lqggKNWMUngeDwpYMF/bs3URH7e9q8Tw6CfVVwt+IYp3O+ro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOrRqy34eTH3tSFvHwJ+6Nkmucx5kejkvHnOervh98FGggO/0K
+	mjCfe7jVgbdV5JGKyGe30ke8slALO5b+kayivBZPI/g4g5IAe7fLQ9s=
+X-Gm-Gg: Acq92OHJSdswTZ3pZEsFmCmIS3t19RZmrDEc6NYGA3Fc11cW9rMrMroB1byFScVX9OE
+	qJ+XFY3btNcTMKFwFpbsjgqyCFRDXeokAhGjLFv7eV8hzkz7Cx7AmFhnsQNlmTEWrafUYVm+SAp
+	Acv0QhVla3yhagk+Z8mId9qtkXmQhE0JsjWs1lQlAn5IY820hgOQX1eGUFdWRp2v6huFccFnAGC
+	RhJpYNMT8rkXjGfkHpQ6j2mxs+ov8ETxY0vJXyP2YPunWX3HH0MGc9U0KdEmZX5b/EWAP6mfALp
+	IgMZF6217dquS0DyLNBjKUbji9JM8OGxOqDt9xo68GYYBBKfWGdacQhjaIT+Ti1rzSq3OBRm/It
+	4OXHxMX+bnM8BgULdsewZWlt8DfJP8/2UhcpDEE2LkgTASZL0m3cuugYA6IxtHAFfQA15RN2k1B
+	tfgGNDBzASNOalJqg73mybsinopFN40xrRbg==
+X-Received: by 2002:a17:906:eec1:b0:bed:6e53:bb25 with SMTP id a640c23a62f3a-c05a73b168amr174284966b.40.1781681041227;
+        Wed, 17 Jun 2026 00:24:01 -0700 (PDT)
+Received: from archlinux ([2.26.254.81])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bfdb51007a9sm733539066b.21.2026.06.17.00.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2026 00:24:00 -0700 (PDT)
+From: NeKon69 <nobodqwe@gmail.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	piotr.kwapulinski@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	NeKon69 <nobodqwe@gmail.com>
+Subject: [PATCH net v2] ice: Fix use-after-scope in ice_sched_add_nodes_to_layer()
+Date: Wed, 17 Jun 2026 10:21:55 +0300
+Message-ID: <20260617072155.1172432-1-nobodqwe@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="XWx7r5PR0vbIn/gZ"
-Content-Disposition: inline
-In-Reply-To: <178166483303.2209640.10761097847073356089@gmail.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300055-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300056-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,intel.com,lists.osuosl.org,vger.kernel.org,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:piotr.kwapulinski@intel.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:nobodqwe@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nobodqwe@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lore-desk:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4576B69716E
+X-Rspamd-Queue-Id: 04D5269726A
 
+Commit 7fb09a737536 ("ice: Modify recursive way of adding nodes")
+changed ice_sched_add_nodes_to_layer() from recursive control flow to an
+iterative loop.
 
---XWx7r5PR0vbIn/gZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Inside the loop, first_teid_ptr may be set to the address of a
+block-local variable:
 
-> In airoha_tc_remove_htb_queue(), the rate-limit was being cleared
-> using (queue + 1) instead of queue, causing:
-> - The original channel rate-limit configuration to remain active
-> - The next channel to be incorrectly disabled
-> - Potential out-of-bounds access when queue =3D=3D 3 (channel 4)
->=20
-> The alloc path (airoha_tc_htb_alloc_leaf_queue) correctly uses
-> channel (0..3), but the remove path incorrectly added 1.
->=20
-> Fix by using queue directly to match the alloc and rollback paths.
->=20
-> Fixes: ef1ca9271313 ("net: airoha: Add sched HTB offload support")
-> Signed-off-by: Wayen Yan <win847@gmail.com>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 31cdb11cd7..02807b3967 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -2805,7 +2805,7 @@ static void airoha_tc_remove_htb_queue(struct net_d=
-evice *dev, int queue)
->  	struct airoha_gdm_port *port =3D netdev_priv(dev);
-> =20
->  	netif_set_real_num_tx_queues(dev, dev->real_num_tx_queues - 1);
-> -	airoha_qdma_set_tx_rate_limit(dev, queue + 1, 0, 0);
-> +	airoha_qdma_set_tx_rate_limit(dev, queue, 0, 0);
->  	clear_bit(queue, port->qos_sq_bmap);
->  }
+    u32 temp;
+    ...
+    if (num_added)
+        first_teid_ptr = &temp;
 
-Please hold on with this patch, I am aware of the bug and the fix is alread=
-y in
-my queue [0]. I am just waiting the net-next to be merged into net in order=
- to
-avoid merge conflicts.
+On the next loop iteration, first_teid_ptr may be passed to
+ice_sched_add_nodes_to_hw_layer(), after temp from the previous
+iteration has gone out of scope.
 
-Regards,
-Lorenzo
+Instead of keeping temporary storage for later calls, allow
+first_node_teid to be NULL when the caller does not need the TEID.
 
-[0] https://github.com/LorenzoBianconi/net-next/commits/airoha-qos-fixes-fo=
-r-net/
+This was found by Clang with LifetimeSafety enabled while testing C
+language support on a Linux allmodconfig build.
 
-> =20
-> --=20
-> 2.51.0
->=20
->=20
+Fixes: 7fb09a737536 ("ice: Modify recursive way of adding nodes")
+Link: https://github.com/llvm/llvm-project/pull/203270
+Signed-off-by: NeKon69 <nobodqwe@gmail.com>
+---
+v2:
+- Allow first_node_teid to be NULL when callers do not need the TEID.
+- Pass NULL after the first TEID has already been returned instead of using
+  temporary stack storage.
+- Update kernel-doc for helpers accepting NULL.
+- Link to v1: https://lore.kernel.org/netdev/20260613101440.80190-1-nobodqwe@gmail.com/
+- Compile-tested with:
+  make drivers/net/ethernet/intel/ice/ice_sched.o
 
---XWx7r5PR0vbIn/gZ
-Content-Type: application/pgp-signature; name=signature.asc
+ drivers/net/ethernet/intel/ice/ice_sched.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajJJLwAKCRA6cBh0uS2t
-rD7nAPoCb+zHRBgNK1OXNfE3oJB6ZsB3wGlp0uwMegk8VHZybAEAyc9hJ66vm9du
-k+x4PfTwYQuMtWYGQ8SCRGCY7Ml3rAw=
-=5sdU
------END PGP SIGNATURE-----
-
---XWx7r5PR0vbIn/gZ--
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index fff0c1afdb41..89e191c839b1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -895,7 +895,8 @@ void ice_sched_cleanup_all(struct ice_hw *hw)
+  * @layer: layer number to add nodes
+  * @num_nodes: number of nodes
+  * @num_nodes_added: pointer to num nodes added
+- * @first_node_teid: if new nodes are added then return the TEID of first node
++ * @first_node_teid: if new nodes are added then return the TEID of first node,
++ *                   may be NULL
+  * @prealloc_nodes: preallocated nodes struct for software DB
+  *
+  * This function add nodes to HW as well as to SW DB for a given layer
+@@ -1000,7 +1001,7 @@ ice_sched_add_elems(struct ice_port_info *pi, struct ice_sched_node *tc_node,
+ 		if (!pi->sib_head[tc_node->tc_num][layer])
+ 			pi->sib_head[tc_node->tc_num][layer] = new_node;
+ 
+-		if (i == 0)
++		if (first_node_teid && i == 0)
+ 			*first_node_teid = teid;
+ 	}
+ 
+@@ -1015,7 +1016,7 @@ ice_sched_add_elems(struct ice_port_info *pi, struct ice_sched_node *tc_node,
+  * @parent: pointer to parent node
+  * @layer: layer number to add nodes
+  * @num_nodes: number of nodes to be added
+- * @first_node_teid: pointer to the first node TEID
++ * @first_node_teid: pointer to the first node TEID, may be NULL
+  * @num_nodes_added: pointer to number of nodes added
+  *
+  * Add nodes into specific HW layer.
+@@ -1078,7 +1079,6 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
+ 	*num_nodes_added = 0;
+ 	while (*num_nodes_added < num_nodes) {
+ 		u16 max_child_nodes, num_added = 0;
+-		u32 temp;
+ 
+ 		status = ice_sched_add_nodes_to_hw_layer(pi, tc_node, parent,
+ 							 layer,	new_num_nodes,
+@@ -1109,13 +1109,11 @@ ice_sched_add_nodes_to_layer(struct ice_port_info *pi,
+ 			 * try the next available sibling.
+ 			 */
+ 			parent = ice_sched_find_next_vsi_node(parent);
+-			/* Don't modify the first node TEID memory if the
+-			 * first node was added already in the above call.
+-			 * Instead send some temp memory for all other
+-			 * recursive calls.
++			/* Don't modify the first node TEID memory if the first node
++			 * was added already in the above call.
+ 			 */
+ 			if (num_added)
+-				first_teid_ptr = &temp;
++				first_teid_ptr = NULL;
+ 
+ 			new_num_nodes = num_nodes - *num_nodes_added;
+ 		}
+-- 
+2.54.0
 
