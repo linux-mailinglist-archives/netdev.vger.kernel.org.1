@@ -1,162 +1,173 @@
-Return-Path: <netdev+bounces-300239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300240-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id rSmnEZQGM2qQ8gUAu9opvQ
-	(envelope-from <netdev+bounces-300239-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:41:56 +0200
+	id 29/CHloHM2qz8gUAu9opvQ
+	(envelope-from <netdev+bounces-300240-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:45:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9473469C63F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE7B69C66C
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 22:45:13 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amazon.com header.s=amazoncorp2 header.b=KvGbkplz;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300239-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300239-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amazon.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=foYNpM6N;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300240-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300240-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 465EB303742D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 20:41:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FD14304814C
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 20:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC42238887C;
-	Wed, 17 Jun 2026 20:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956503CC33F;
+	Wed, 17 Jun 2026 20:45:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF45352007;
-	Wed, 17 Jun 2026 20:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AAA36F91C;
+	Wed, 17 Jun 2026 20:45:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781728910; cv=none; b=qzBnY4f9vlBPFpvD5zezxrW6JUrZzzsazfjCHA17/FwEa9pZluUpUndMLRnA9dbMHZRNn0gQvhDHzQjDT8eLkksbPojf4wpkxydyKXiD7VEQMwPPu+5f6GUU/qyuwfBK7/wJmPkcJgBn1HkhG+nVstvOv3T40X8yn+/pUHRSIpo=
+	t=1781729107; cv=none; b=L4rL5f17zvMSzKWMBTWDQnrFvDAtOmtfeP93uhNezlf8pwemOlN2pu/aeoHQJ5HH/pYbDfM9p6lEWIe6BiN3d9qcf4Fk+orshEk1p/G4Ke+/wlJfcIlhfvJD10uB6RzGeqbb6qGkGanXzCMD2sL2PGlO2Lq2BnPME9sKA9px23I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781728910; c=relaxed/simple;
-	bh=37sp+mqdire77H0TpjdwV2wSbtzaX415p8TqSJZDxoA=;
-	h=MIME-Version:Content-Type:Subject:From:To:CC:In-Reply-To:
-	 References:Date:Message-ID; b=efcKp5Ibvsfptw7LOr4+ewkgJI0E+DLtcPlEm0m0gS0XNy38nMgz8zjMKXTcMIPIwD1Xw4UJup4TYEWehmP9Uy4sYRzzCyY/tcU3wkMDSeAIbaCGt5PcmimKmI3dy19xpIZV5Q0UbNgdxJjmv1E5pabhNonrg2fHlsu/1ov0zGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=KvGbkplz; arc=none smtp.client-ip=52.12.53.23
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1781728909; x=1813264909;
-  h=mime-version:content-transfer-encoding:subject:from:to:
-   cc:in-reply-to:references:date:message-id;
-  bh=7sqvCZHOhWh8gMKbuIiW0+jhIvHImEa2MaoNyK8zT5w=;
-  b=KvGbkplzCaaCTBOWBYJJX08AFwRI/LE3dyuhwV0vDhUUv5B2opvop/Rz
-   PjFu3u9X946bXMf/QO+aO36HZmEDz93HeHyPh1wz76rPQwYyzV/wGcIEC
-   UyG8HjmjL/4jviYtVtle1PEqL+w2l2jh14ufBq3jWeYlYaoasHXEZhu8p
-   /SKwL+LVHepXZ1hQleHzACUUxrFUnkeGqhKb4+g3H4X3SziTDgE8Unh7F
-   XxfYXOoZn2dBWeM9t8VB3egx5cnPKriGHd9jmflAjtoW0npxjALdsS6+Q
-   vY/UhVr16P2CPKmsnCvedlcAei+qBPTghoiubCQEsvxNqhB3HW2w2UxPt
-   w==;
-X-CSE-ConnectionGUID: 4VOTJyskRLSyJiGXlqHeRQ==
-X-CSE-MsgGUID: /Xh0y5hqR+GfC2/pGAzbmg==
-X-IronPort-AV: E=Sophos;i="6.24,210,1774310400"; 
-   d="scan'208";a="21848292"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2026 20:41:46 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:7808]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.143:2525] with esmtp (Farcaster)
- id 6615f163-784c-4ed9-b861-dc0450f2aa41; Wed, 17 Jun 2026 20:41:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 6615f163-784c-4ed9-b861-dc0450f2aa41
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Wed, 17 Jun 2026 20:41:45 +0000
-Received: from dev-dsk-akiyano-1c-2138b29d.eu-west-1.amazon.com (172.19.83.6)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Wed, 17 Jun 2026 20:41:43 +0000
+	s=arc-20240116; t=1781729107; c=relaxed/simple;
+	bh=xGPx+X0RFl0bqs278ZjvITbFt/H8mQ/Pik0MZ7xR6bw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ViHbQ+EQ5Y+4yBERaonvcu+RSk+E4v+nMI7DOs2/Kf+JT1fJSvZk5mAsybSfVcj03EnGtS7cdk2PiI5J1TXgUtDlUkLLHm/HEeBv+xdA1LFx1YXlnhRqB5BZuIrsd85i3MPZoz4+uDxZnOCTE3MINoMXajsvT4TJ/ag0JguDDYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foYNpM6N; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B53C11F000E9;
+	Wed, 17 Jun 2026 20:45:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781729106;
+	bh=pWLcFg98iVgWXU5jkY3pU2Pt0E9oVrM3Uc2cwNvuEK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=foYNpM6NmTxMBAWqSQ1AmxjNb9e6ZBaw9oacl1EomZvRPdZhlXOC5d0HF1n7jR84e
+	 hmUUW70AmdOw/RsNBIV62ovUHSl3MiaDyVBk2LCm24JYxVIfV9FekhokRTrjcHbAB4
+	 wIzOJGQBNcnLhuYt7ogEDNeldaGK/9qkyUUN4oVqpfqxospwYpPgj2fk0wTfy/NyQl
+	 /v6+Y6xjisBfUyymu3gBCrCBSM6A3m/R9NMYEf+pr7Jxaeady3n9HAX0TSmQ4KvxtS
+	 MuxGPPU22DWtH9V1+QOWlOFH94B9XKXYtrMBldhIsnxW/IxgNOwLuRt3i2Q6yo+imC
+	 tSO0ScjKSkV+A==
+Date: Wed, 17 Jun 2026 13:45:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yibo Dong <dong100@mucse.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yaojun@mucse.com
+Subject: Re: [PATCH net] net: rnpgbe: fix mailbox endianness handling
+Message-ID: <20260617134505.57fea1be@kernel.org>
+In-Reply-To: <5249B5A1F6CD9ACB+20260617140530.GA278329@nic-Precision-5820-Tower>
+References: <20260617083531.251119-1-dong100@mucse.com>
+	<bf5366c5-88ae-418c-9c5d-b2249a7f43fc@lunn.ch>
+	<0C93ADB24CB93157+20260617114614.GA273003@nic-Precision-5820-Tower>
+	<26517b8f-33b7-4de7-8fe8-c7dca5fa7a4b@lunn.ch>
+	<5249B5A1F6CD9ACB+20260617140530.GA278329@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ena: clean up XDP TX queues when regular TX
- setup fails
-From: Arthur Kiyanovski <akiyano@amazon.com>
-To: Dawei Feng <dawei.feng@seu.edu.cn>
-CC: <akiyano@amazon.com>, <darinzon@amazon.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>, <sdf@fomichev.me>,
-	<sameehj@amazon.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<jianhao.xu@seu.edu.cn>, <stable@vger.kernel.org>
-In-Reply-To: <20260616142424.4005130-1-dawei.feng@seu.edu.cn>
-References: <20260616142424.4005130-1-dawei.feng@seu.edu.cn>
-Date: Wed, 17 Jun 2026 20:41:30 +0000
-Message-ID: <178172889048.5594.1035759951040148062.b4-review@b4>
-X-Mailer: b4 0.15.2
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-10.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	WHITELIST_SPF_DKIM(-3.00)[amazon.com:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-3.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_RECIPIENTS(0.00)[m:dawei.feng@seu.edu.cn,m:akiyano@amazon.com,m:darinzon@amazon.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:sameehj@amazon.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:bpf@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-300239-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[seu.edu.cn:email,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akiyano@amazon.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300240-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[amazon.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,seu.edu.cn];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS(0.00)[m:dong100@mucse.com,m:andrew@lunn.ch,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:yaojun@mucse.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 9473469C63F
+X-Rspamd-Queue-Id: CAE7B69C66C
 
-On Tue, 16 Jun 2026 22:24:24 +0800, Dawei Feng <dawei.feng@seu.edu.cn> wrote:
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> index 92d149d4f091..5d05020a6d05 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> @@ -2078,14 +2090,21 @@ static int create_queues_with_size_backoff(struct ena_adapter *adapter)
-> [ ... skip 17 lines ... ]
-> +			ena_destroy_xdp_tx_queues(adapter);
->  			goto err_create_tx_queues;
-> +		}
->  
->  		rc = ena_setup_all_rx_resources(adapter);
->  		if (rc)
+On Wed, 17 Jun 2026 22:05:30 +0800 Yibo Dong wrote:
+> On Wed, Jun 17, 2026 at 02:09:00PM +0200, Andrew Lunn wrote:
+> > > My understanding is as follows:
+> > > The firmware structures are defined with__le16 / __le32 for wire form=
+at,
+> > > but the original code cast these struct pointers to u32 * before pass=
+ing
+> > > them to the mailbox read/write routines:
+> > > - Send path: (u32 *)&req -> msg buffer -> writel()
+> > > - Receive path: readl() -> msg buffer -> (u32 *)&reply
+> > > Sparse only sees pure u32 =3D u32 assignments here, so no type mismat=
+ch is
+> > > reported. =20
+> >=20
+> > Can the code be changed so that it does not need the cast? Casts are
+> > bad, as you have just shown. This is something i try to push back on,
+> > it makes you think about types and avoid issues like this.
+> >=20
+> > 	Andrew
+> >  =20
+> Thinking... Yes. A few possibilities:
+>=20
+> 1. Make all fields __le32, then extract via shifts:
+>    struct mbx_fw_cmd_req {
+>        __le32 word0;  // [15:0]=3Dflags  [31:16]=3Dopcode
+>        __le32 word1;  // [15:0]=3Ddatalen [31:16]=3Dret_value
+>        ...
+>    };
+>    But that's painful =E2=80=94 le32_to_cpu(req.word0) >> 16 vs req.opcod=
+e.
+>=20
+> 2. Use a union to keep named fields while also exposing __le32[] access:
+>    union mbx_fw_cmd_req_u {
+>        struct mbx_fw_cmd_req req;
+>        __le32 dwords[sizeof(struct mbx_fw_cmd_req) / sizeof(__le32)];
+>    };
+>    union mbx_fw_cmd_reply_u {
+>        struct mbx_fw_cmd_reply reply;
+>        __le32 dwords[sizeof(struct mbx_fw_cmd_reply) / sizeof(__le32)];
+>    };
+>=20
+>    The transport interface becomes:
+>    int mucse_write_mbx_pf(struct mucse_hw *hw, const __le32 *msg, u16 siz=
+e);
+>    int mucse_read_mbx_pf(struct mucse_hw *hw, __le32 *msg, u16 size);
+>=20
+>    Callers would use:
+>    union mbx_fw_cmd_req_u cmd =3D {};
+>    cmd.req.opcode =3D cpu_to_le16(...);
+>    cmd.req.flags  =3D cpu_to_le16(...);
+>    mucse_write_mbx_pf(hw, cmd.dwords, sizeof(cmd.req));
+>=20
+>    If the transport layer forgets le32_to_cpu(), sparse would catch it
+>    because msg is __le32 * and mbx_data_rd32() returns u32.
+>=20
+>    The downside is an extra union wrapper and an extra level in field
+>    access (cmd.req.opcode vs req.opcode) =E2=80=94 a minor inconvenience.
+>=20
+> Do you have a preference between these, or another approach?
+>=20
+> Thanks for the feedback.
 
-Thank you for submitting the fix.
-
-I verified it on AWS.
-
-The inline cleanup before goto is slightly non-idiomatic — kernel
-style typically prefers label-based unwinding. Splitting
-ena_destroy_all_tx_queues() into regular-only and XDP-only variants
-would allow a clean label chain without special-case code at each call
-site. But that's a larger refactor better suited for net-next; for a
-targeted bug fix this is fine.
-
-Reviewed-by: Arthur Kiyanovski <akiyano@amazon.com>
-Tested-by: Arthur Kiyanovski <akiyano@amazon.com>
-
--- 
-Arthur Kiyanovski <akiyano@amazon.com>
+3. Maybe use memcpy_toio() to transfer the data without any byteswaps?
 
