@@ -1,293 +1,233 @@
-Return-Path: <netdev+bounces-300190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id m3J9GSKtMmoU3gUAu9opvQ
-	(envelope-from <netdev+bounces-300190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 16:20:18 +0200
+	id zU83LMStMmoi3gUAu9opvQ
+	(envelope-from <netdev+bounces-300191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 16:23:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B34A69A7D9
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 16:20:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86ADC69A7F6
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 16:22:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=n7RWfaQ7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300190-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300190-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=digikod.net header.s=20191114 header.b=OGam9oUy;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300191-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300191-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C22E2309F971
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:20:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 83C40301F309
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4964418E3;
-	Wed, 17 Jun 2026 14:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0618425CEE;
+	Wed, 17 Jun 2026 14:22:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92778401491
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 14:20:06 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781706008; cv=pass; b=KcxhoPAYLcHtvxCS1O1Iy9NxIM/pBY3I/LU/57TaBISXHtR/b7BLhPSFlPFXEf7F5H4GbcnB3tAgP54xMHtD/4BnrINzKSZrm2ysQsfGOHuA2hsRbVUnYZFESgCMRse3a11pIjYFrHyZxDiLa/ijC/CdnW9C0h86JIX3PXH0hw4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781706008; c=relaxed/simple;
-	bh=LXjj2AX0Vl2kOkkKEFA18exaCc4ribznTBsnG03/ix4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qf1Q72ELOe2bEGJF6/IsLKOo5CYAb4KUEHCfXQOx+FKYKsV+YSwMTRM2XBvWU7BnAG5E6fxT5S0m42ZuNIUP1qjz/JcqPfRNAqxh8HTD93HS3QJcSWfgckVJbOqSP4Izi+QTxUBjMeLz5UC+dlcO5rWZjzKsc3acsVvQynTe5Q0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n7RWfaQ7; arc=pass smtp.client-ip=74.125.224.51
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-662bb8b1f93so1649542d50.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 07:20:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781706005; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YYBH7xY6Tg69yb4D8HEkvs2SN4RgvGvKl33VSDIRSlULTH0tVqTCySj8oOnwG5IabM
-         CXBRDPJn1k6lRBPOsoq7I5S7OKC0yLe+wG/ZYTHzHRC+WNPhL19ghW3Azw59UpUxlRgs
-         24hdyUlc2XPPTxda7JrvsQChFzoo+T11uYpMtGCqhmXbpP138p1s+Wkgbf++t8ft7et7
-         pYhYSYFkR+rSspbHWIUDKDWFiEPhSGLrO0/8xwBY8vd7fNI35fto4G6LWo9BYkQXCmPq
-         fPxLDpRAnwxvyDG3yNDDvLuvQCpPzLqal/y2VKTDiRanj1uZrGG25HtB0tFhuI3SW47U
-         mHtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KrC9X0aB+Fg+JQYfds61UWaxCNwOvyYtowwG8v7gyUk=;
-        fh=FqlN4mzR/M62otW7BYdqWAkM4SYE1qS5tPrQL03S1II=;
-        b=QfvZtxZt29dr43hCS8nKIKDmzLn5FT4DRpm/BdfRXNl74atCg+wgPskfN4oFfxUnpB
-         cXRpOaeKwYrzMAUNqYxPv90yXotrrsrvfdSMV092HT8Eng7+T0HeGBATsE2OSOQs4Y0Q
-         jDqhf3KDkKuHSoJHGm4JQXEk+g7ZsEuy8KEFva/0lF6H37rUmX/BiKOBg3M3cgx7xkHM
-         zbhWKzUu6abpt5jgXhiOpco8jniWEv/X5zjVhAByv3HxnXSQwDhxWq+kRjX7CFj85Ihs
-         gHQe+YLIlWeRJIG9tIpzIeJkHLur2CZWP9ZHF8JkZRlQUPrA8IP38FbrdDj8StmrmsYO
-         xgGg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781706005; x=1782310805; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KrC9X0aB+Fg+JQYfds61UWaxCNwOvyYtowwG8v7gyUk=;
-        b=n7RWfaQ7ZOd2SD1V9DFHwe13YYH0VxgLZbdiRx442lRvi2cRqo9jRgUg6x24YEJadT
-         odl9vzMHey4oHjq/m8RaDqVlMqUoQRKHyNUa91Tj2yXR55n2QL1cwWIP37wFW/Lp0cOm
-         dOK/ZHk8uc43n0aorJgsDCRKOurioR1SxdTL3TPpGsfZOwdLnm3sZ6n+KBw9M8aToJWL
-         UZyVq/Me66SZn9oWKqpoJRWCUqY22UNCh81OaG6yMCxhXeI6uoWxDdS9c4RlYzOLBSHC
-         HSN9a0wG4DqgFwDs+LEkMofRR/G08PbNsMWenM3REfuI0hFpqtUBQy47iM4rL4WZVTof
-         rjIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781706005; x=1782310805;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KrC9X0aB+Fg+JQYfds61UWaxCNwOvyYtowwG8v7gyUk=;
-        b=CqJFne7vyYDlaexeshBoDWly+xdWmvrKHr2uIgaRn0YO4F+2wmwIqu+nKNmo4uIlgI
-         /RPeIIzorDlREcG/zXv2VsAXnzJS6/0S6WaRXTv/w+IKjTK1pC/imKqkqBBb4CT1/LAr
-         lM5ivxZJqRzQNunEgvehEWyI660K2/usnp0rKyJqqlyxaVw2SnvwF2PUz19ouV7e47jB
-         rPDcpxuhL2kn5BXhRdS9hi3Khf27AqbFdWRXUECu0+IF7mUPYR0gPsnOONOwgbhdhv56
-         bNPH5XEIUoLoa52JUxx8OreauIcqbAcd1CCDnBccB4QLm3RlD3kxdUbJP9cZjMWW8PXP
-         OvWw==
-X-Forwarded-Encrypted: i=1; AFNElJ/6Zi9JrX4Ty7bi+iAcHYbLIw3cJw3yjKpcALzPtj9x+thb7LO3/DVr5jwPsy2KlZ0fDjJoJpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHp0QURKscCX843evhnzYF0/mgzlPaTgzPJkqMoeQjLQy9JalW
-	LQKuokkzTUAehnARjEJdsFOAzFiEFdppADUkgWLyvDDU95kt7Dffry/n0g0g1QEW2xCRedVKnZc
-	/gg/Cc+gncFnV2jvrtR2vIq1zZyg/5OY=
-X-Gm-Gg: AfdE7cnLKM0e9+px8cLStQyCIPPH43bK2sxTz+hQ/zW/QZeoAbURSU7jRKrQUewPlGY
-	DmuvibjMwvImx/sY/WNbN4CM+3qH8r6vHWe6MOfNmQS9/GDCsjSZymINxdzhEbvC0MsremU6b9W
-	lkMVLN5yhMckHZTYWt9CYCMmLVjTL/8RrkyRzB6/t3cK9FK8njqawHovJeKkPfMK7oQaz3U6v67
-	vvHm+GE92nLYOdNgzVCAOqetapSvTEAG02dS3O2MhAgH31W0kIdVqviDNE1VDh5KfHHRon5gCfS
-	Iaj/f3XfIsI6YNVFGDdIqw/FSjeFhAhTaq3IjhqPEV26s0+bzfrEEo/S
-X-Received: by 2002:a05:690e:dc6:b0:660:933d:3057 with SMTP id
- 956f58d0204a3-662cd092f11mr3027618d50.0.1781706005428; Wed, 17 Jun 2026
- 07:20:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91333217F27
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 14:22:51 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781706173; cv=none; b=kQmrIb0MQA6NWsXN5goWplDKy1FbHEkpy4oekDtJ3EsrsWStswK5TzcTpZMMMRgm4ZgvteGW4cWazuU/wSShyMd2GJiyuOc5Kxyiz6q6I/yDovZTcZfCZ9BEk/4oH9D+otkeg7b8PXOdoUi9/0hvAPLuP+e5+DsBrryDTP9tIEg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781706173; c=relaxed/simple;
+	bh=DW6zU2zOMsFZI7KDUAES4xQ9+xPurQXeOEmfIhtkeF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BugLNtCOYYeuAaZNvGSJuh6Fw/p0vBgyiOAybieVE2eVL1PvbSHRNCGkQxHlTNVmq9YSZGv+uJv55P8CFT1SL0we5enc88eAKyvw8wu+mj9BFHkLGYdzUOScwjOq9VPAQhlzCmIYB5Ktwa+C9W/Beww2/NyaZqBJ14zAsvlfpd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=OGam9oUy; arc=none smtp.client-ip=45.157.188.9
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4ggR0415QKzd9x;
+	Wed, 17 Jun 2026 16:22:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1781706163;
+	bh=RwmEzQ+Rlqy195PCTmMZLaQG5VPFhIgJkiiDmwpaCho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OGam9oUyF651V2o8AF4gyiC7WhSJX0Z2Xg5DajQ328tL9+z+4b9pmmPCZvYYsnT41
+	 JarXu/ulqHSKkcucaecD+bJo9k0UQrWzYaxkidJsq36yFHHNh76xPa9Lv6H+gFYPUB
+	 ClJOmm/S5AiRqMGF9E6t2p04hRcEfQt+mtZaiOOI=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4ggR031zwnzYCV;
+	Wed, 17 Jun 2026 16:22:43 +0200 (CEST)
+Date: Wed, 17 Jun 2026 16:22:37 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	Matthieu Buffet <matthieu@buffet.re>, Paul Moore <paul@paul-moore.com>, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Subject: Re: Landlock: LANDLOCK_ACCESS_NET_CONNECT_TCP bypass via TCP Fast
+ Open
+Message-ID: <20260617.eemahv8ui7Ee@digikod.net>
+References: <20260616201615.275032-1-hexlabsecurity@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260617093557.63880-3-sun.jian.kdev@gmail.com> <2dad9b5c184fa101d7cffa1d8f5eea5b5df60f53533d98c68175c9e3ec5ee6ac@mail.kernel.org>
-In-Reply-To: <2dad9b5c184fa101d7cffa1d8f5eea5b5df60f53533d98c68175c9e3ec5ee6ac@mail.kernel.org>
-From: sun jian <sun.jian.kdev@gmail.com>
-Date: Wed, 17 Jun 2026 22:19:52 +0800
-X-Gm-Features: AVVi8CeJJOuka0GCnt7aRS0jt8X52KgHwbpSBiN7gwyo77ljDBh5CLPdi-Ab_Fg
-Message-ID: <CABFUUZFeh18OjQ6EhjD17ZwQKb1aiVNkYKv-hAkVGrHhPpjE4Q@mail.gmail.com>
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Cover partial copy of
- non-linear test_run output
-To: bot+bpf-ci@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, hawk@kernel.org, 
-	john.fastabend@gmail.com, sdf@fomichev.me, toke@redhat.com, 
-	lorenzo@kernel.org, paul.chaignon@gmail.com, martin.lau@kernel.org, 
-	clm@meta.com, ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260616201615.275032-1-hexlabsecurity@proton.me>
+X-Infomaniak-Routing: alpha
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+X-Spamd-Result: default: False [-0.75 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MIXED_CHARSET(0.91)[subject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300190-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300191-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:bot+bpf-ci@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:toke@redhat.com,m:lorenzo@kernel.org,m:paul.chaignon@gmail.com,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:bot@kernel.org,m:johnfastabend@gmail.com,m:paulchaignon@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me,meta.com];
+	DKIM_TRACE(0.00)[digikod.net:+];
+	FORGED_RECIPIENTS(0.00)[m:hexlabsecurity@proton.me,m:gnoack@google.com,m:matthieu@buffet.re,m:paul@paul-moore.com,m:edumazet@google.com,m:ncardwell@google.com,m:linux-security-module@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ivanov.mikhail1@huawei-partners.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[digikod.net];
+	FORGED_SENDER(0.00)[mic@digikod.net,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,vger.kernel.org:from_smtp]
+	ALIAS_RESOLVED(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,digikod.net:dkim,digikod.net:mid,digikod.net:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1B34A69A7D9
-
-On Wed, Jun 17, 2026 at 6:31=E2=80=AFPM <bot+bpf-ci@kernel.org> wrote:
->
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c b/t=
-ools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > index 01f1d1b6715a..9cc898e6a9f7 100644
-> > --- a/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > +++ b/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > @@ -4,6 +4,10 @@
-> >
-> >  #include "test_pkt_access.skel.h"
-> >
-> > +#define NONLINEAR_PKT_LEN 9000
-> > +#define NONLINEAR_LINEAR_DATA_LEN 64
-> > +#define SHORT_OUT_LEN 100
-> > +
->
-> [ ... ]
->
-> > @@ -20,6 +24,69 @@ static void check_run_cnt(int prog_fd, __u64 run_cnt=
-)
-> >             "incorrect number of repetitions, want %llu have %llu\n", r=
-un_cnt, info.run_cnt);
-> >  }
-> >
-> > +static void init_pkt(__u8 *pkt, size_t len)
-> > +{
-> > +     size_t i;
-> > +
-> > +     for (i =3D 0; i < len; i++)
-> > +             pkt[i] =3D i & 0xff;
-> > +}
->
-> A question was raised on v2 about whether pkt_v4 could be reused by
-> reducing the linear area to ETH_HLEN, rather than introducing a custom
-> init_pkt() with a 9000-byte stack packet.
->
-> Can't we reuse pkt_v4 here by reducing the linear area to ETH_HLEN?
-> The v3 still adds init_pkt() and the NONLINEAR_PKT_LEN packet, so this
-> doesn't seem to have been picked up.
->
-> > +
-> > +static void test_skb_nonlinear_data_out_partial(struct test_pkt_access=
- *skel)
-> > +{
-> > +     LIBBPF_OPTS(bpf_test_run_opts, topts);
-> > +     __u8 pkt[NONLINEAR_PKT_LEN];
-> > +     __u8 out[SHORT_OUT_LEN];
-> > +     struct __sk_buff skb =3D {};
-> > +     int prog_fd, err;
-> > +
-> > +     init_pkt(pkt, sizeof(pkt));
-> > +
-> > +     skb.data_end =3D NONLINEAR_LINEAR_DATA_LEN;
-> > +
-> > +     topts.data_in =3D pkt;
-> > +     topts.data_size_in =3D sizeof(pkt);
-> > +     topts.data_out =3D out;
-> > +     topts.data_size_out =3D sizeof(out);
-> > +     topts.ctx_in =3D &skb;
-> > +     topts.ctx_size_in =3D sizeof(skb);
-> > +
-> > +     prog_fd =3D bpf_program__fd(skel->progs.tc_pass_prog);
->
-> [ ... ]
->
-> > diff --git a/tools/testing/selftests/bpf/progs/test_pkt_access.c b/tool=
-s/testing/selftests/bpf/progs/test_pkt_access.c
-> > index bce7173152c6..cd284401eebd 100644
-> > --- a/tools/testing/selftests/bpf/progs/test_pkt_access.c
-> > +++ b/tools/testing/selftests/bpf/progs/test_pkt_access.c
-> > @@ -150,3 +150,15 @@ int test_pkt_access(struct __sk_buff *skb)
-> >
-> >       return TC_ACT_UNSPEC;
-> >  }
-> > +
-> > +SEC("tc")
-> > +int tc_pass_prog(struct __sk_buff *skb)
-> > +{
-> > +     return TC_ACT_OK;
-> > +}
-> > +
-> > +SEC("xdp.frags")
-> > +int xdp_frags_pass_prog(struct xdp_md *ctx)
-> > +{
-> > +     return XDP_PASS;
-> > +}
->
-> A related suggestion on v2 was that, once pkt_v4 is reused, the existing
-> BPF program could be reused instead of adding new pass-through programs.
->
-> Could tc_pass_prog and xdp_frags_pass_prog be dropped in favour of the
-> existing program? The v3 still adds both of these, so this point also
-> seems to be open.
->
->
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a =
-bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
-E.md
->
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/276805=
-11802
+X-Rspamd-Queue-Id: 86ADC69A7F6
 
 Hi,
 
-Thanks for checking this.
+Thanks for the report.  This was previously identified by Mikhail and
+Matthieu, see the related issue:
+https://github.com/landlock-lsm/linux/issues/41
 
-I tried reusing pkt_v4 and the existing TC program, but they do not fit
-the skb case this test is trying to cover.
 
-For skb test_run, IPv4/IPv6 inputs with a too-short L3 header in the
-linear area are rejected before bpf_test_finish(). With pkt_v4 and a
-linear area of ETH_HLEN, the test fails with -EINVAL before reaching the
-partial copy-out path. If the linear area is increased enough to pass the
-IPv4 check, pkt_v4 is too small to both trigger the old
-copy_size - frag_size path and verify that the copied prefix spans the
-linear data and the first fragment. pkt_v6 has the same issue: after
-making the IPv6 header linear, only 20 bytes remain in frags.
+On Tue, Jun 16, 2026 at 08:16:22PM +0000, Bryam Vargas wrote:
+> Hello Mickaël, and Landlock folks,
+> 
+> A task confined by a Landlock ruleset that handles
+> LANDLOCK_ACCESS_NET_CONNECT_TCP and is denied connecting to a given port can
+> still establish a TCP connection to that port by using TCP Fast Open, i.e.
+> sendto(fd, ..., MSG_FASTOPEN, &dst, dstlen) on a fresh stream socket. The
+> network-egress confinement for TCP connect is silently bypassed.
+> 
+> Affected
+> --------
+> Any kernel with CONFIG_SECURITY_LANDLOCK=y and Landlock enabled that supports
+> the TCP network access rights (Landlock ABI >= 4, since Linux 6.7). Confirmed by
+> source inspection on mainline (v7.1-rc7) and reproduced on Linux 7.0.11
+> (Landlock ABI 8). No CONFIG beyond Landlock + IPv4/IPv6 TCP; TCP Fast Open client
+> is enabled by the per-netns default (net.ipv4.tcp_fastopen has TFO_CLIENT_ENABLE
+> set), so no sysctl change and no setsockopt are required.
+> 
+> Root cause
+> ----------
+> LANDLOCK_ACCESS_NET_CONNECT_TCP is enforced only by the socket_connect LSM hook
+> (hook_socket_connect -> current_check_access_socket). security_socket_connect()
+> has exactly one call site in the tree, net/socket.c (the connect(2) syscall).
+> 
+> TCP Fast Open performs an implicit connect inside sendmsg:
+> 
+>   tcp_sendmsg_locked()            net/ipv4/tcp.c  (MSG_FASTOPEN branch)
+>    -> tcp_sendmsg_fastopen()      net/ipv4/tcp.c
+>    -> __inet_stream_connect(..., is_sendmsg=1)  net/ipv4/af_inet.c
+>    -> sk->sk_prot->connect()      net/ipv4/af_inet.c  -> tcp_v4_connect()
+> 
+> This path establishes the connection to the address taken from msg_name but
+> never calls security_socket_connect(). The only LSM hook fired on the sendmsg
+> path is security_socket_sendmsg(), and Landlock registers no socket_sendmsg
+> hook, so LANDLOCK_ACCESS_NET_CONNECT_TCP is never re-checked. __inet_stream_connect()
+> itself carries no LSM hook (only the cgroup-BPF pre_connect, a different
+> mechanism).
+> 
+> Notably the kernel already mediates the analogous AF_UNIX implicit-connect on the
+> send path via the unix_may_send hook, which Landlock does register
+> (hook_unix_may_send) -- so the sendmsg-implies-connect pattern is recognized, but
+> the TCP Fast Open case has no equivalent coverage. The MPTCP fast-open path
+> (mptcp_sendmsg_fastopen -> __inet_stream_connect) is a second producer of the
+> same unmediated connect (by source inspection; not separately reproduced).
+> 
+> Reproducer
+> ----------
+> A self-contained, fully unprivileged PoC is available on request. It forks an
+> unconfined TFO-capable loopback listener, then in a child applies a Landlock
+> ruleset handling LANDLOCK_ACCESS_NET_CONNECT_TCP with no allow rule
+> (landlock_create_ruleset() with handled_access_net =
+> LANDLOCK_ACCESS_NET_CONNECT_TCP, no landlock_add_rule(), then
+> landlock_restrict_self(); every TCP connect is denied) and tries the forbidden
+> port two ways:
+> 
+>   (1) connect(fd, &dst)                 -> -EACCES   (Landlock enforces CONNECT_TCP)
+>   (2) sendto(fd2, buf, len, MSG_FASTOPEN, &dst, dstlen)
+>                                         -> succeeds; the listener accepts the
+>                                            connection and reads the payload.
+> 
+> Observed on Linux 7.0.11 (Landlock ABI 8):
+> 
+>   [1] connect(2)            -> ret=-1 errno=13 (Permission denied)
+>   [2] sendto(MSG_FASTOPEN)  -> ret=14 errno=0 (OK/queued)
+>   [+] listener ACCEPTED the confined child's connection; payload="..."
+> 
+> connect(2) to the port is denied while sendto(MSG_FASTOPEN) reaches the identical
+> port and delivers data.
+> 
+> Impact
+> ------
+> A sandbox that uses LANDLOCK_ACCESS_NET_CONNECT_TCP to restrict outbound TCP
+> (e.g. to keep a confined component from reaching an internal service or a
+> metadata endpoint) can be escaped by an unprivileged, self-confined task with no
+> CAP and no namespace transition -- for any destination port, since the
+> implicit-connect path never consults the connect hook regardless of address (the
+> run above shows one port). It is an integrity
+> bypass of the network-confinement property; no memory safety is involved.
+> I score it CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N (6.5 Medium) -- the
+> confined task escapes the policy authority that defined its sandbox, a scope
+> change; 5.5 if you treat the Landlock boundary as the same authority (S:U).
+> 
+> Note on the in-flight UDP series
+> --------------------------------
+> The "landlock: Add UDP access control support" series (v5, Matthieu Buffet,
+> https://lore.kernel.org/r/20260611162107.49278-3-matthieu@buffet.re) adds a
+> socket_sendmsg hook, hook_socket_sendmsg(), but it returns 0 for non-UDP
+> sockets:
+> 
+>     if (sk_is_udp(sock->sk))
+>             access_request = LANDLOCK_ACCESS_NET_CONNECT_SEND_UDP;
+>     else
+>             return 0;
+> 
+> so a TCP socket using MSG_FASTOPEN still bypasses LANDLOCK_ACCESS_NET_CONNECT_TCP
+> even after that series lands. It may be most convenient to fix this there.
+> 
+> Suggested direction
+> -------------------
+> Re-check LANDLOCK_ACCESS_NET_CONNECT_TCP on the implicit-connect path: either have
+> the socket_sendmsg hook evaluate CONNECT_TCP for stream sockets when the call
+> performs an implicit connect (mirroring the AF_UNIX unix_may_send handling), or
+> place the check inside __inet_stream_connect() so a single chokepoint covers
+> connect(2), TCP Fast Open, and the MPTCP fast-open sibling.
+> 
+> I am happy to send a patch for this if you would like me to.
 
-The existing test_pkt_access program has its own packet-access coverage
-goals and is not just a pass-through carrier. With such a short linear
-area or small packet fixture, it can fail before the test hits the
-bpf_test_finish()'s partial copy-out path. A pass-through TC program is
-therefore a better fit, because it keeps the test focused on the
-bpf_test_finish() copy-out semantics.
+Yes please.
 
-For XDP, this object does not have an existing xdp.frags pass-through
-program, so the small XDP frags program is needed to cover the other
-caller of the shared bpf_test_finish() path.
-
-Thanks,
-Sun Jian
+> 
+> Best regards,
+> 
+> Bryam Vargas
+> Independent security researcher, HEXLAB S.A.S., Cali, Colombia
+> hexlabsecurity@proton.me
+> 
+> 
 
