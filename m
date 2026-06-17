@@ -1,131 +1,221 @@
-Return-Path: <netdev+bounces-300001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300002-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id hozGMef/MWo/tgUAu9opvQ
-	(envelope-from <netdev+bounces-300001-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:01:11 +0200
+	id pQzsDToBMmqKtgUAu9opvQ
+	(envelope-from <netdev+bounces-300002-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:06:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235C7696074
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:01:11 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E2036960E2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 04:06:49 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
 	dkim=none;
-	dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM" header.from=motor-comm.com (policy=none);
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300001-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300001-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300002-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300002-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6509D3088D28
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:00:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 75EFC3026CB1
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 02:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3311EEA31;
-	Wed, 17 Jun 2026 02:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A959C2F3C19;
+	Wed, 17 Jun 2026 02:06:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-49.mail.aliyun.com (out28-49.mail.aliyun.com [115.124.28.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352FD29AAFA;
-	Wed, 17 Jun 2026 02:00:46 +0000 (UTC)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9601F2E7363;
+	Wed, 17 Jun 2026 02:06:40 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781661650; cv=none; b=Y3E9z9cAZMKs2VuTe5xW/d+wsc7dTPypjgvzt7MplGCIWom+u/ejqxQtm1s8VQsAakW5BIziITwxLdQrQ08krDCt69rmgtOp2QTT6qh9dilywtP6vyuQ5LrZpLWB38jkgLNKXHCBVfopt44fZe5m3CJexgsibpScqVEWOswaoCE=
+	t=1781662006; cv=none; b=ttu9KJPchb7xvKiMF1dDW38DQ1R0c/qj91ErRpui3BBuMAN4+aOFc9Wrz/8UbSOnDVjcvIn1yLeDwZy1PgmbkkrYhZNlvGpFXMbST0/TtIrD1uHZVxrTFtX+xa3zU4JbherBziDJR4AxIN2eyiaZHxT+hjddROq1P5fcfNoQEZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781661650; c=relaxed/simple;
-	bh=rCPhsZcrKw5TsOjAfX/d+Cp5oPcxTcO+6Nx2NEFoyN4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fOQpJ96Q2CtqINKAKFGYiyL+jjgdDrVRbZn92NTLSXWqxBw5F9LmWQVtFQ0wVRnmkb9l7l9EBv7qYdB/Z6BozGBIom2k9lNx+H9dUgViHKiVi5ZEusTLniIDvhjzHRexP4BAk5YV9LmKtBKjFIE/nhzXsD1D4w03sDfSY5wDt6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.49
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.08501174|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.283752-0.0045549-0.711693;FP=7057726590387724033|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam033037071049;MF=kyle.switch@motor-comm.com;NM=1;PH=DS;RN=14;RT=14;SR=0;TI=SMTPD_---.i-7sWza_1781661640;
-Received: from 10.30.1.98(mailfrom:kyle.switch@motor-comm.com fp:SMTPD_---.i-7sWza_1781661640 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Wed, 17 Jun 2026 10:00:43 +0800
-Message-ID: <adc1dc4b-1d9d-42e6-8983-f0a7c650a6cd@motor-comm.com>
-Date: Wed, 17 Jun 2026 10:00:40 +0800
+	s=arc-20240116; t=1781662006; c=relaxed/simple;
+	bh=XR5rX7AEi3dE4D9yTc4XpsrNZTxVw02lWpYNIY3tlm4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u9+cF4z8sg1ZuEIUC9OETtqqCZd3Z/AwN01qYxZN9CpLCiV2KiyoTPTFJD+yenW8IxNYorOfkusoS/bVxCpHMRZJnH2duzgpjWq3Q6PMaZ4pTfT0cUVE7XnBsJPGvP2ZhDcHEQ3lkiR0W0L1EWRh1kHRI62B1Bw3Vq3BRS4To0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.76.78.106
+Received: from zju.edu.cn (unknown [10.98.66.117])
+	by mtasvr (Coremail) with SMTP id _____wDH7QElATJqbfO1Ag--.47260S3;
+	Wed, 17 Jun 2026 10:06:30 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.98.66.117])
+	by mail-app4 (Coremail) with SMTP id zi_KCgC36jEkATJqD1WaAQ--.62560S2;
+	Wed, 17 Jun 2026 10:06:28 +0800 (CST)
+From: Fan Wu <fanwu01@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Krzysztof Halasa <khc@pm.waw.pl>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	linux-kernel@vger.kernel.org,
+	Fan Wu <fanwu01@zju.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net/wan/hdlc_ppp: sync per-proto timers before freeing hdlc state
+Date: Wed, 17 Jun 2026 02:05:18 +0000
+Message-Id: <20260617020518.116319-1-fanwu01@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: mmyangfl@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ming.xu@motor-comm.com, xiaolin.xu@motor-comm.com,
- jianmin.wang@motor-comm.com, de.ge@motor-comm.com
-References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
- <3f7bf73b-c8dc-451d-981f-5e5343291960@lunn.ch>
-Content-Language: en-US
-From: Kyle Switch <kyle.switch@motor-comm.com>
-In-Reply-To: <3f7bf73b-c8dc-451d-981f-5e5343291960@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zi_KCgC36jEkATJqD1WaAQ--.62560S2
+X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
+X-CM-DELIVERINFO: =?B?HLlfpwXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
+	sfnXz+g1OQfMo27QHy5TwQyZyhOBsypYEs13K1iRN4yz/iJreJjTS4EGE3UMt20y+GDsI+
+	pdyaw3B8CRgE8f1vi2ap9E6mavGmQbzmcFsnzP86
+X-Coremail-Antispam: 1Uk129KBj93XoWxZrW8Zry8KFWDJr1fKr1ruFX_yoWrXw4kpF
+	W7X3WfAFZYg392qw43Jw4kWFyfArn7t3y7Gw1fGanYvFnxGFyF9FyUtFW2kF4fAFWvkr12
+	vr109w45Z39YywcCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
+	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
+	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
+	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s02
+	6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
+	I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
+	6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj4
+	0_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8
+	JbIYCTnIWIevJa73UjIFyTuYvjxU7gAwDUUUU
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[motor-comm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-300002-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[zju.edu.cn];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:mmyangfl@gmail.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[kyle.switch@motor-comm.com,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-300001-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:khc@pm.waw.pl,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:linux-kernel@vger.kernel.org,m:fanwu01@zju.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_SENDER(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fanwu01@zju.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kyle.switch@motor-comm.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,zju.edu.cn:email,zju.edu.cn:mid,zju.edu.cn:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 235C7696074
+X-Rspamd-Queue-Id: 6E2036960E2
 
+Each PPP control protocol (LCP/IPCP/IPV6CP) embedded in struct ppp
+registers a timer via timer_setup(). That struct ppp is the
+hdlc->state allocation, which detach_hdlc_protocol() frees with kfree()
+in both teardown paths: unregister_hdlc_device() and the re-attach inside
+attach_hdlc_protocol().
 
+The ppp proto never registered a .detach callback, so
+detach_hdlc_protocol() performs no timer synchronization before the
+kfree(). The only cancel, timer_delete(&proto->timer) in ppp_cp_event(),
+is partial (it does not wait for a running callback) and only runs on the
+->CLOSED transition; ppp_stop()/ppp_close() do not sync either. A
+ppp_timer callback already executing (blocked on ppp->lock) survives the
+kfree and then dereferences proto->state / ppp->lock in freed memory,
+leading to a use-after-free.
 
-On 6/15/26 19:34, Andrew Lunn wrote:
-> On Mon, Jun 15, 2026 at 07:12:35PM +0800, Kyle Switch wrote:
->> Add yt92xx dsa driver supports yt921x and yt922x switch series.
->> To support more switch series in the future (e.g., yt923x), the most common configurations are abstracted into switch operation interfaces, due to yt921x and yt922x share similar register layouts and operational logic.
->>
->> - Merge drivers/net/dsa/yt921x.c and the new yt922x support into a
->>   unified yt92xx.c driver.
->>
->> - Add support for yt922x, which can operate with either 4 bytes or
->>   8 bytes DSA tag.
->>
->> - Not change yt921x behaviour but use common switch apis
-> 
-> A 35K line patch is way too big. Please break this up into lots of
-> small patches, each with good commit messages, which are obviously
-> correct.
-> 
-Thank you for your reminding, this patch will submitted  in a series 
-of small patches.
-This patch mainly contains three contents:
-1. Underlying function interface for different motorcomm switch series in 
-the file driver/net/dsa/motorcomm/switch/.
-2. Optimization existing yt921x dsa driver using common switch function apis.
-3. New yt922x dsa driver.
-Can you accept break this up into lots of small patch according to this logic?
-if not, do you have any suggestion? thank you.
+Fix this by adding a .detach helper that calls timer_shutdown_sync() on
+every per-proto timer. detach_hdlc_protocol() invokes proto->detach(dev)
+before kfree(hdlc->state), so timer_shutdown_sync()
+now runs on both free paths.
+timer_shutdown_sync() is used instead of timer_delete_sync() because the
+keepalive path re-arms the timer through add_timer()/mod_timer() and
+shutdown blocks any re-activation during teardown.
 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+Initialize the per-protocol timers in ppp_ioctl() when the protocol is
+attached, and remove the now-redundant timer_setup() from ppp_start(), so
+that the timers are initialized exactly once at attach time and
+ppp_timer_release() never operates on uninitialized timer_list
+structures. attach_hdlc_protocol() uses kmalloc() (not kzalloc), so
+struct ppp's protos[i].timer is uninitialized garbage until the first
+timer_setup(); without this init-at-attach, attaching the PPP protocol
+without ever bringing the device up would leave timer_shutdown_sync()
+operating on uninitialized memory in .detach. Moving the init out of
+ppp_start() (which only runs on NETDEV_UP) into the attach path makes the
+initialization unconditional and avoids initializing the same timer_list
+twice.
+
+This bug was found by static analysis.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
+---
+ drivers/net/wan/hdlc_ppp.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wan/hdlc_ppp.c b/drivers/net/wan/hdlc_ppp.c
+index 159295c4bd6d820ca51bb768a70437b541cb3f1e..302ed27944e7c8586a04f70ea639f2da0f7dcbb9 100644
+--- a/drivers/net/wan/hdlc_ppp.c
++++ b/drivers/net/wan/hdlc_ppp.c
+@@ -619,7 +619,6 @@ static void ppp_start(struct net_device *dev)
+ 		struct proto *proto = &ppp->protos[i];
+
+ 		proto->dev = dev;
+-		timer_setup(&proto->timer, ppp_timer, 0);
+ 		proto->state = CLOSED;
+ 	}
+ 	ppp->protos[IDX_LCP].pid = PID_LCP;
+@@ -639,6 +638,15 @@ static void ppp_close(struct net_device *dev)
+ 	ppp_tx_flush();
+ }
+
++static void ppp_timer_release(struct net_device *dev)
++{
++	struct ppp *ppp = get_ppp(dev);
++	int i;
++
++	for (i = 0; i < IDX_COUNT; i++)
++		timer_shutdown_sync(&ppp->protos[i].timer);
++}
++
+ static struct hdlc_proto proto = {
+ 	.start		= ppp_start,
+ 	.stop		= ppp_stop,
+@@ -647,6 +655,7 @@ static struct hdlc_proto proto = {
+ 	.ioctl		= ppp_ioctl,
+ 	.netif_rx	= ppp_rx,
+ 	.module		= THIS_MODULE,
++	.detach		= ppp_timer_release,
+ };
+
+ static const struct header_ops ppp_header_ops = {
+@@ -657,7 +666,7 @@ static int ppp_ioctl(struct net_device *dev, struct if_settings *ifs)
+ {
+ 	hdlc_device *hdlc = dev_to_hdlc(dev);
+ 	struct ppp *ppp;
+-	int result;
++	int i, result;
+
+ 	switch (ifs->type) {
+ 	case IF_GET_PROTO:
+@@ -685,6 +694,8 @@ static int ppp_ioctl(struct net_device *dev, struct if_settings *ifs)
+ 			return result;
+
+ 		ppp = get_ppp(dev);
++		for (i = 0; i < IDX_COUNT; i++)
++			timer_setup(&ppp->protos[i].timer, ppp_timer, 0);
+ 		spin_lock_init(&ppp->lock);
+ 		ppp->req_timeout = 2;
+ 		ppp->cr_retries = 10;
+--
+2.39.2
+
 
