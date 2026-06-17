@@ -1,152 +1,142 @@
-Return-Path: <netdev+bounces-300168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id UTSRC8KXMmot2gUAu9opvQ
-	(envelope-from <netdev+bounces-300168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:49:06 +0200
+	id r8rRDc+XMmow2gUAu9opvQ
+	(envelope-from <netdev+bounces-300169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:49:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE11699D9B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:49:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B3C699DA1
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 14:49:18 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=N+skJEbE;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300168-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300168-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=bootlin.com header.s=dkim header.b=DMiiXSW9;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300169-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300169-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=bootlin.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CD69301A90B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 12:48:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9D4FB300E62F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 12:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB803EEAE9;
-	Wed, 17 Jun 2026 12:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16B53F0ABC;
+	Wed, 17 Jun 2026 12:49:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D93EEA8
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 12:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D6827A92D;
+	Wed, 17 Jun 2026 12:49:13 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781700536; cv=none; b=Gw4DGhPDr6O0xTFs2Nca/qT4yPtrnLZwo/SPMfwqcRoaDbZpN1eXVNHICaRQRl8GefQIQHMIMrUx5xkuWERguViUmu/DqWZlwq4cjV59Ue9Mqx2tvNZuuwXliFCEEoJLeVi78BrV9SW6UjEZgIykv9LlNkIPppGd4atoJFZ54Sc=
+	t=1781700556; cv=none; b=HnyTH3BPinzeXm98GGn5V2eP3XUfSGDUVXNeqQTL+B7v7oNiir/1rAiZNPhk4f2BXPdC7+MireOaMzxEBAGom81rbUDWbO5uTfg12AeKqnvrD7KcxsXEnU9cT3YbS0g4qxaQ+haAziAt2Edb3KsGaISeAnqUIYWasHCXQ5QCcnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781700536; c=relaxed/simple;
-	bh=IMIppte+gBwuC5XbBRIXlUQ0aozwvo/6xvW4VF9LfrQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2zBo64Xm27ocazIGH9Xm8vBDQXgi44uMGa3qDJo7dWFPd7RBwzhc5L3kkxnNxGhgHTai/uTqFaz4A/aOifxwxlv1zerye/HmSzbsGvngGF7qzWa5utG+mEA8ouQnn1fLBGHk3AHPT330TqMqOut1xu2pBqp2484EmhcmcMZQkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+skJEbE; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A9831F000E9;
-	Wed, 17 Jun 2026 12:48:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781700534;
-	bh=IMIppte+gBwuC5XbBRIXlUQ0aozwvo/6xvW4VF9LfrQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=N+skJEbER87qujetlVk/j6Tkuyd1Vhrm3VXBA4mpK2P60nXN0b5oN1qOIIW6l7Wyj
-	 2ms5f0Emq1qAEDkoFKTGqjGgSEtOPjFRk7/XMQBuCoSq6Nvn4CIfyx9BEHS8kIaHzk
-	 aTjbGFxY9/L25JBs+T0SFQPMOKYOTOsaunEOmJQPHli7aEr6PlvgTDOQJ2VKMMSCdB
-	 q7CRFMHrvi2z+xZaTYC/7Dsa3rYsqlHPTf2v/6JhZoacfchH8uET0V1q8BeohY8UJO
-	 vs/F03aR3R1MwdkUoN5GqAtbKaI9jlrVPlelxSmRugQLTvpKc+PNOafKH1LhBkNzKp
-	 NHJ3OkNZj3iXw==
-Date: Wed, 17 Jun 2026 14:48:52 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Wayen Yan <win847@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com, matthias.bgg@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v2] [net] net: airoha: Clean up RX queues in
- airoha_dev_stop
-Message-ID: <ajKXtDxPipRcA20X@lore-desk>
-References: <178161160256.2165161.14322392784449633554@gmail.com>
- <178170026659.2238511.17652659042899875248@gmail.com>
+	s=arc-20240116; t=1781700556; c=relaxed/simple;
+	bh=fDAMEHEJ9xrFqSiWPkHU8F7DrP2LgGpLQ1ELm2/EC70=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nLcLZv+Cr7Nxb3kxkBjfBZGehBNGpSaAdP7HdzZpxRDVkyp1XaDu+yxXMqfaZ4wxqOpzE+jVdbeErWHQQrrS675GDx6SZu3yJrNHSFwBpnNKGmqsL15mgoIxGtf4O0YMPMkdpNY6TOkwQ2EMM2ulsUtLeDegHSav0ukqADzGdz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DMiiXSW9; arc=none smtp.client-ip=185.246.84.56
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 461121A3970;
+	Wed, 17 Jun 2026 12:49:12 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 17DBB601AA;
+	Wed, 17 Jun 2026 12:49:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 67F12106C80FB;
+	Wed, 17 Jun 2026 14:49:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1781700551; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=7U1EsqHD3joJo6K5RI3ZEt2ypT632SvDp/Xsssj+cJE=;
+	b=DMiiXSW9s2vDf6Ix6fXMzCn1HqRGHNhwYwFtv0jOuvSZzYYZFOEoU/uvCMne62NW68yVTu
+	AqIxz+Fr2S+CvoJrCmv33dwNE5T++PjJIi4zHwdfgj03mUs4bEclffQGL0mfMQpNWJiRMC
+	F78GwoXF+7rp4AosqXxsffNDgojg5f4FlGYA6j5pe+OEpDL+Rf2izku+hlj3yFcgpwCUja
+	1tSk53MA8ljPzzxtIsZFHaxzBuozYy9TZRiM8iPjGdzQds3fkkeevx7wiWr75zpNU2yxBP
+	TXWRcYI3iwGbnC+PuStsuoOfYjFyBXBNBczgkCjPx3qWjjTuti/ogE2BTaBGdw==
+Message-ID: <95249596-5f05-421c-9c8a-693c7b26c4f6@bootlin.com>
+Date: Wed, 17 Jun 2026 14:49:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dwA6XgDlcLvaJ+Fq"
-Content-Disposition: inline
-In-Reply-To: <178170026659.2238511.17652659042899875248@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: mvneta: free/request IRQ across suspend/resume
+To: Yun Zhou <yun.zhou@windriver.com>, marcin.s.wojtas@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, bigeasy@linutronix.de,
+ clrkwllms@kernel.org, rostedt@goodmis.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev
+References: <20260617092028.1722407-1-yun.zhou@windriver.com>
+Content-Language: en-US
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <20260617092028.1722407-1-yun.zhou@windriver.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-5.26 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300168-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_RECIPIENTS(0.00)[m:win847@gmail.com,m:netdev@vger.kernel.org,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:andrew+netdev@lunn.ch,m:angelogioacchino.delregno@collabora.com,m:matthias.bgg@gmail.com,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:andrew@lunn.ch,m:matthiasbgg@gmail.com,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300169-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:yun.zhou@windriver.com,m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:bigeasy@linutronix.de,m:clrkwllms@kernel.org,m:rostedt@goodmis.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-rt-devel@lists.linux.dev,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FREEMAIL_TO(0.00)[windriver.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linutronix.de,goodmis.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,lunn.ch,collabora.com,gmail.com,lists.infradead.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	ALIAS_RESOLVED(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lore-desk:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4EE11699D9B
+X-Rspamd-Queue-Id: 94B3C699DA1
 
+Hi,
 
---dwA6XgDlcLvaJ+Fq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 6/17/26 11:20, Yun Zhou wrote:
+> On PREEMPT_RT, the mvneta IRQ handler is force-threaded. Under high
+> network traffic, the IRQ can enter suspend with desc->depth == 1
+> (masked by the oneshot mechanism between handler invocations).
+> 
+> During suspend, the kernel increments depth to 2 and masks the
+> interrupt at the MPIC level (clearing the SRC_CTL CPU routing bit,
+> due to IRQCHIP_MASK_ON_SUSPEND). On resume, depth is decremented
+> back to 1, but since it does not reach 0, the unmask is never
+> called. The MPIC CPU routing remains cleared, permanently disabling
+> interrupt delivery.
+> 
+> Fix by freeing the IRQ in suspend and re-requesting it in resume.
+> This ensures a clean IRQ state (depth=0, proper hardware routing)
+> on every resume cycle, regardless of the pre-suspend depth. This
+> follows the approach used by other drivers (e.g. igb).
 
-> Thanks Simon for forwarding the AI review. I've reviewed all three
-> concerns:
->=20
-> #1 (NAPI race) and #2 (RX refill) are valid. #2 is the decisive
-> issue: airoha_dev_open() has no RX ring refill, so draining the
-> queues in stop would cause RX stall on next open. This aligns with
-> Lorenzo's earlier feedback =E2=80=94 RX queues don't need cleanup in
-> dev_stop(). I'll drop this patch.
->=20
-> #3 (q->skb leak) is a pre-existing issue, not introduced by this
-> patch. It exists even in the module unload path
-> (airoha_qdma_cleanup()). @Lorenzo =E2=80=94 do you think this warrants a
-> fix? A one-liner in airoha_qdma_cleanup_rx_queue() would cover both
-> paths. Or is this too unlikely to matter in practice?
+This description makes it sound like it's not really a mvneta problem,
+but rather a broader effect from  preempt-rt / irq management / suspend
+interactions.
 
-Soon I will post a patch to run airoha_qdma_cleanup_tx_queue() just in
-airoha_hw_cleanup() so I think we should just drop this patch.
+Is this the expected way to deal with that ?
 
-Regards,
-Lorenzo
+Maxime
 
---dwA6XgDlcLvaJ+Fq
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCajKXtAAKCRA6cBh0uS2t
-rKmiAQDehtR9VrdOdbmTSHIKJQn9uL7BkvVVXPg39gdOUoJbDgD/cL9I+HyY/qdR
-q4EY1FHiIibYx/ptSfwkEGZI8MtXrgg=
-=owDH
------END PGP SIGNATURE-----
-
---dwA6XgDlcLvaJ+Fq--
 
