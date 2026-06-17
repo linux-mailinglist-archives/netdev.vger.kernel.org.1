@@ -1,167 +1,258 @@
-Return-Path: <netdev+bounces-299995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-299996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id fEkLJOr0MWpDtAUAu9opvQ
-	(envelope-from <netdev+bounces-299995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 03:14:18 +0200
+	id 1IhSHjL5MWoatQUAu9opvQ
+	(envelope-from <netdev+bounces-299996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 03:32:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075E3695ED8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 03:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D24695F5D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 03:32:33 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=AYbBsRKs;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299995-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299995-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=google.com header.s=20251104 header.b=N1gtwmle;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-299996-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-299996-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=reject) header.from=google.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7A3B930448A9
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 01:14:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73EE5301841B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 01:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4462C21F0;
-	Wed, 17 Jun 2026 01:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBB02E7F3A;
+	Wed, 17 Jun 2026 01:32:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DD32E5B2D
-	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 01:14:02 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781658844; cv=pass; b=M0UDUqVRR6REq0BxYHCYLqxHyrnwGCcve0O0HjWrtgYhqExY2Y4ynyRk9WrbEFd7fsVAs0o6xZ0F9JcXwQ+ICZ2feO5tqJBEmLXbWKDEFohlYCOb1k+6jUkx9zF9it19MG2IYxoY17+2RSU/6X6CQ3JadnhFkuZNDqp5gQaZHjo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781658844; c=relaxed/simple;
-	bh=B6RQPdbAM1Bdx2RJlhkCbQkRabhwiTgjUzcmiJ3hJJY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=kexUe2LaNhQiR4rG+DT8V7QloZYOQr9rsjGTeYkTaK4vQu2j3cUmSisGHxdfyiyN3eaFVsCbyxoANp2eZfpou4Bv2U667WwPnsTSqRoM0WpM0xnr9jsVl3pEwnRE5ulHCBqrBT4dWGgdWM2xq+k7yVoDB3MGYB6rs3TZlS1DUjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AYbBsRKs; arc=pass smtp.client-ip=209.85.219.48
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8cceb2ecc03so48833356d6.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 18:14:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781658842; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JfIWq19jkRQL/V9Yp4FhHXLMBw+vWqJMTsUr+qysKEpRD65QEwifPm+n0JFrzPrPxI
-         MGAGrK0tHizUBm3CfoQOOTeLwicf+uM6Ci9W7isoBVWV5hrh/DRSlQevacv9Yk0/jRT1
-         IXlHMyOwj802LmiqtKXqU3+MTnBhgKi01yOBy7B/Xqj6flyf1g8Fa57wHCnPTbF3niX4
-         GwxYiwBKKerfR3o5vPoS0TQku3iYQ5NqnR3FCOLmMMQvJ8dYZVH8+dqwh/F5+1ojnWFx
-         KA6dwv5de8N8+itWw3VyOCtJtw+Eg0sf/aCRnVIAOmiltWMicDRXh0Lrxm+yCyZoIWbv
-         WOhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=B6RQPdbAM1Bdx2RJlhkCbQkRabhwiTgjUzcmiJ3hJJY=;
-        fh=aDUZZ9N6NPmO6DMPx8G1ADwl9DVnQFUvUJ2oivftvxg=;
-        b=aFJCZYGk9VbCJ+e8VDrwTUKJ7tnMFoh3aNoSStJiLr7ebbhMYN84ruU+2nU63osrAc
-         vToj2C8Z+zN0OTyhv9u9DdaHIX0H4VN8xo5jXkhszfIIFaC7/I5CaIDGzI3z7hfvrlCE
-         46Bib2FKEa0r3CtNoqBHQt2Vkhwrm2HX1YcZK2vD1U7B8LBUkQ1DDYhFijVv90xWCx8o
-         evA7IY4gK3+8YOvTjUAypCd3nWu2+B/ZRRBeCZJAE1D8DyuK5+XiLsTfY5/IuL4oaGUU
-         ixn++IClgGAvbShzFC+kgg8GUntWpUcQBhZLkFLuJVzLC92THA5oLH8/ZjMOD0Ie8OwC
-         eJ3w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFEC23D283
+	for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 01:32:27 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781659950; cv=none; b=J5sbVIwWh39Zx5L1ODT/pdhKYHXV8oH3n0jGwzP/aEBrbtH+OgqK2vGnkIY5bdw1F7/56Sa790fTWeFKeaUrsdqCZPrqQNqxo8h1CqP++zJnvz5sNGcLqzOq8KXBkT3m+07AfPY6g5UHFunFok/0+oUF2KhmpJ793XbeQDWihfE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781659950; c=relaxed/simple;
+	bh=clYG1vu/qi3k0GakpbRO01Y0pp+3c9cWp59hl1H4dOE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=A3iEgKpw/GDSBkKiqcD1zCttoT7WS6Wo+Q18xZfXZupzszORMXGIL8wWAOFR4YOowm/xw7oP/cKn0/hRf4yzf1MEvU0U/9A9eD8uQBWDcsl7v+RyJHvlUNxVg8hqfl0sCAZlx18CcNgBaDmN0GQuO0W63nWHK0XR/C21gNToF5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N1gtwmle; arc=none smtp.client-ip=209.85.214.202
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2c6bc237b5aso6998475ad.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jun 2026 18:32:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781658842; x=1782263642; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=google.com; s=20251104; t=1781659946; x=1782264746; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=B6RQPdbAM1Bdx2RJlhkCbQkRabhwiTgjUzcmiJ3hJJY=;
-        b=AYbBsRKsMlOdI4SUgbZk8URFHW5Fzscvq77L3Jtc10QoRAyIhIYQ+yU5v3KQuBHvsD
-         HJhkzQ27KvY3lQXGq3mBzb4rHtDtf+3OlrFL1KYQGqu/TVvhgwb7u/zR1Nashybl+dgj
-         UQyDcyV6IOKbSnNaI74MAYTKnhPKID+4QiKiJ75Xh+JFTiMW7z87TRBe5DR95LfJoJ2f
-         2HS7CngNh1yyQag1l2jX0zKb9mrDcQbw065iUVzUA6qkVmMZd8BtFaQ33C9uWfJ4yVgH
-         6bge+SNgyMwT+o0jkrjOZ3YBOMOgp/CNrfz8IF9okrUxa7iSbP/QQTVuj7IZElVXLYRw
-         W5AQ==
+        bh=+xQgZAZkYbqIaNm8Rqc/aLHwmWCJz3RLar9c8eN0I+0=;
+        b=N1gtwmleJUxJdicT5NZg/Xd/sU2srZz4t7e5zOzWeZu9a1lllsEcJC6YRpXi+rsZhR
+         E0r+lGnSQEZ6Z5n+c6FFBkzj4MG7S+hX4qZNTac2cG8LkRT3I5pxF7AODa2NuC29rret
+         ZotFAFCHit6HyQN9bHfntIAX+VxgzQADDB254H8IOuXpGkVF4lQ90oA6AUr2ChtbkH6V
+         7Y+3/FLg2mLNydunRV90B9sJmWGeNl3WV9hfEWluXUXC5TD+jqoBECEJiRzQfvu/kXQV
+         nFS6sRBXcsgmH+HDGDX4n/N03DwtB6QESULSfT5vEiRIkMdEQotEeNl40DzFjJcgtQnG
+         Odlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781658842; x=1782263642;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B6RQPdbAM1Bdx2RJlhkCbQkRabhwiTgjUzcmiJ3hJJY=;
-        b=bvPtgA5VMa7cRcCOhltegiOgw85JxG9DC+00igXQsZ2j4T2GsacEwEJYmZPkuNC7Gf
-         DFlWDmzex/8jkhDzNAYnk0tzLUTGmAfKBy6OcVHaBxX8MnZLjNSni5ThZ0jHgZi0NMFw
-         weAKaJ4uSi/NWP12vi3u4k1JHsdchE5L1FCu1VjN+x/RW1ItVUq2Rcw+I9wrYwrXxMPt
-         SF5mbsWKJP6X7SagTVohxgZESRj21+rYOuw7QzrTWbkRUcFzJ3qlseHS2R3dctENDrAz
-         /KBgVJBJfirIlWwUGoFMv1oBHQSKRcqN6RLmmLNjmpKzrxUWmAZaRIXvTIue+w/whiGy
-         yNaA==
-X-Gm-Message-State: AOJu0Yz21Zd2IZ1aDG/0C8D6uabiWVaHj9N7hxe3hVZMe7rBeRGwlVSW
-	rAl2VZIsiJ8+BNugm+/KmfU5U6M7X6w9fYoW4BfqsalhmVg4O47b37c98wv06hMtbb1AoOD5qae
-	vlk1px7uD0jcocov6SK6ib8jCG0Idu3fKhw==
-X-Gm-Gg: AfdE7ckqZaZsxhgClURmnWbZUFPYTLIDXj9n2x5mOwOFl4IhYMVnbR4UgHNY2x37aSc
-	5TpL4E5mVM+8LyfFmFU9UsDerkZW7fp2UBbnEFoGPfhn/5/sRauO7vwHQO7V5CWdvdcbbx8bYoQ
-	+LJEKGP/2rl/qREF+yhXQnxEIZBBW7FClk6U8yZCLEktA5GYvTAJLBbSitmzv4j8VKwTfp7y9/X
-	xqpyyTb2K5vH3n5fP5dQiK27LjAownoy5FF07XdALuYTbAZUEXXvchjkSJNvl6xgoGT8FzgvwXh
-	FD+KjIU=
-X-Received: by 2002:ad4:594b:0:b0:8ca:25d3:bf41 with SMTP id
- 6a1803df08f44-8db5b6b245cmr36671406d6.8.1781658841830; Tue, 16 Jun 2026
- 18:14:01 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781659946; x=1782264746;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+xQgZAZkYbqIaNm8Rqc/aLHwmWCJz3RLar9c8eN0I+0=;
+        b=I12QVAYR4gzKotrUGYLAe27FBxWWEgWpsKPf7EJ7uESPuI/peSSndDUHgHL46XmePy
+         UMdWNIFlsGWLHHi4tpt6b9sFraJyv9NxYTPArjoMDCd/+0bBqZSjGaTqtaqF86PEX2vH
+         KXd1obWOVgHW125oIvov2FgQgnUhKc/MD0PfFouv7BPTOKo5ZkKPJGRZwio+R4W/n1aB
+         pf09P9wQTeI6w0zLazr8NHmgKedKVhHLwWc9wfFGBikJ4K6tj2uwmzba2uyoMYR+k8Iw
+         p2VoqHVqU6vsZDYFV44TXff70+RT7ZkdViyx6Js8p47QJdhJR6QzcjxpbbStYQzzdNPw
+         1kwQ==
+X-Gm-Message-State: AOJu0YzIi5yKJ2ILo5X2dAfqsmDs7GT30nA+rmFiJZ5BNkh9DtmsRPY1
+	QlUoHU3+r48M5aM3yEQp69kS21uAVV2Z2YNnFXfOl/3JwjGYSeEJxXcST0IVL2DPFVmtx/B5Az0
+	BF1sM1mfDsQsZbfDJ/r1h8bKALD9d6UMTxjza4yiD246AGbyXHjtm7qnYsmyEhoWvOwMgwyFCph
+	8QKXhZ7388pJTuOVjoA8/v9nLRXn53652Uv14hKtwwMkea6Sw=
+X-Received: from plof5.prod.google.com ([2002:a17:902:8605:b0:2bf:1274:c8f])
+ (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:950:b0:2c0:c4c9:4cb with SMTP id d9443c01a7336-2c6bc0c6273mr13052645ad.14.1781659946120;
+ Tue, 16 Jun 2026 18:32:26 -0700 (PDT)
+Date: Tue, 16 Jun 2026 18:32:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Jon Maser <jonmaser8@gmail.com>
-Date: Tue, 16 Jun 2026 18:13:51 -0700
-X-Gm-Features: AVVi8Ce9hCx4Peg0ANlTuotwUozzACAMc_QQSbyx5qGXC13-IVTCvzcW2qgLNPQ
-Message-ID: <CAF=mWJMErgOuTML7hFy6gEH5zqACOdZU62Xh=bR55=VbB4fJ2g@mail.gmail.com>
-Subject: Proposal: module for optional /net directory for network data
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.1136.gdb2ca164c4-goog
+Message-ID: <20260617013208.3781453-1-joshwash@google.com>
+Subject: [PATCH net] gve: fix header buffer corruption with header-split and HW-GRO
+From: Joshua Washington <joshwash@google.com>
 To: netdev@vger.kernel.org
+Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Tim Hostetler <thostet@google.com>, 
+	Ziwei Xiao <ziweixiao@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Jeroen de Borst <jeroendb@google.com>, linux-kernel@vger.kernel.org, 
+	Ankit Garg <nktgrg@google.com>, stable@vger.kernel.org, 
+	Jordan Rhee <jordanrhee@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-299995-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:joshwash@google.com,m:hramamurthy@google.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:willemb@google.com,m:thostet@google.com,m:ziweixiao@google.com,m:pkaligineedi@google.com,m:jeroendb@google.com,m:linux-kernel@vger.kernel.org,m:nktgrg@google.com,m:stable@vger.kernel.org,m:jordanrhee@google.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,s:lists@lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER(0.00)[joshwash@google.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER(0.00)[jonmaser8@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_ONE(0.00)[1];
 	MIME_TRACE(0.00)[0:+];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jonmaser8@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-299996-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joshwash@google.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 075E3695ED8
+X-Rspamd-Queue-Id: D2D24695F5D
 
-A little under the weather but hopefully this comes across well lol
+From: Ankit Garg <nktgrg@google.com>
 
-This may not be for the sensitive. and yeah I do have a mental
-disorder as well, and I'm not an expert
+The DQO RX datapath programs a per-buffer-queue-descriptor
+header_buf_addr at post time and reads the split header back at
+completion time. Both the post and the read currently index the
+header buffer by queue position rather than by the buffer's identity:
 
-But it would be nice for network operations to be aided by a /net
-directory, where devices can have full access to network data,
-including hardcore bit by bit access, complete control of data coming
-in,and out, shell access to network data, you can easily cache network
-operations for forensics, you can enhance firewall technology, even
-with hardware firewalls by giving vendors time to adapt to a high
-level access of network data
+  - post (gve_rx_post_buffers_dqo): header_buf_addr is computed from
+    bufq->tail
+  - read (gve_rx_dqo): the header is read from desc_idx (the completion
+    queue head index)
 
-It needs to be a module to be a true unix imho
+This relies on the buffer-queue index and the completion-queue index
+being equal for the start of every packet, i.e. on the device consuming
+posted buffers and returning completions in the exact same order. That
+assumption does not hold once HW-GRO is enabled with multiple
+flows: coalesced segments are accepted and completed in an order that
+may differ from the order buffers were posted, and segments from
+different flows may interleave.
 
-It can be as easy as cat sendack.ns > /net/0/in && cat /dev/eth0
+That results in two problems:
 
-Its also easy to write a firewall in shell script
+1. Wrong header slot on read. Because the read offset is derived from
+   the completion index (desc_idx) while the device wrote the header to
+   the address programmed for the buffer's buf_id, the driver can copy
+   a header belonging to a different packet. This shows up as
+   throughput drop (about 30% drop and large numbers of TCP
+   retransmissions) with header-split and HW-GRO both enabled and many
+   streams.
 
+2. Header buffer reused while still owned by the device. The driver
+   advances bufq->head by one per completion and re-posts buffers based
+   on that. Arrival of N RX completions only guarantees that at least N
+   RX buffer descriptors have been read by the device. It does not
+   guarantee that the device has relinquished the ownership of all the
+   buffers corresponding to those N descriptors. With out-of-order
+   completions (e.g. the completion for a packet copied into buffer N
+   arrives before the completion for a packet copied into buffer N-1),
+   the driver can re-post and overwrite a header buffer that the device
+   is still going to write into, corrupting the header of a packet
+   whose completion has not yet been processed.
 
-Hopefully that impresses the Linux community!! lol
+Fix both issues by indexing the header buffer by buf_id on both the post
+and read paths. Reading from buf_id's slot is therefore always correct
+regardless of completion ordering (fixes problem 1).
 
-Jon
+Indexing by buf_id also ties each header slot to the lifetime of its
+buffer state. A buffer state is only returned to the free/recycle lists
+when its own completion (buf_id) is processed, so its header slot can
+only be re-posted after the device is done with it. This makes header
+slot reuse safe under out-of-order completions (fixes problem 2).
 
-Also if it gets down to interception, wiretapping, and other felonies
-I dont mind being told no, Its the linux communities job to crack down
-on illegal stuff, just like the nerds before us
+Allocate (gve_rx_alloc_hdr_bufs) and free (gve_rx_free_hdr_bufs) the
+header buffers based on num_buf_states to match the buf_id indexing.
+
+Cc: stable@vger.kernel.org
+Fixes: 5e37d8254e7f ("gve: Add header split data path")
+Signed-off-by: Ankit Garg <nktgrg@google.com>
+Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Signed-off-by: Joshua Washington <joshwash@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 7924dce7..02cba280 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -21,11 +21,13 @@
+ static void gve_rx_free_hdr_bufs(struct gve_priv *priv, struct gve_rx_ring *rx)
+ {
+ 	struct device *hdev = &priv->pdev->dev;
+-	int buf_count = rx->dqo.bufq.mask + 1;
+ 
+ 	if (rx->dqo.hdr_bufs.data) {
+-		dma_free_coherent(hdev, priv->header_buf_size * buf_count,
+-				  rx->dqo.hdr_bufs.data, rx->dqo.hdr_bufs.addr);
++		size_t size =
++			(size_t)priv->header_buf_size * rx->dqo.num_buf_states;
++
++		dma_free_coherent(hdev, size, rx->dqo.hdr_bufs.data,
++				  rx->dqo.hdr_bufs.addr);
+ 		rx->dqo.hdr_bufs.data = NULL;
+ 	}
+ }
+@@ -254,7 +256,7 @@ int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 
+ 	/* Allocate header buffers for header-split */
+ 	if (cfg->enable_header_split)
+-		if (gve_rx_alloc_hdr_bufs(priv, rx, buffer_queue_slots))
++		if (gve_rx_alloc_hdr_bufs(priv, rx, rx->dqo.num_buf_states))
+ 			goto err;
+ 
+ 	/* Allocate RX completion queue */
+@@ -381,10 +383,13 @@ void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
+ 			break;
+ 		}
+ 
+-		if (rx->dqo.hdr_bufs.data)
++		if (rx->dqo.hdr_bufs.data) {
++			u16 buf_id = le16_to_cpu(desc->buf_id);
++
+ 			desc->header_buf_addr =
+ 				cpu_to_le64(rx->dqo.hdr_bufs.addr +
+-					    priv->header_buf_size * bufq->tail);
++					(size_t)priv->header_buf_size * buf_id);
++		}
+ 
+ 		bufq->tail = (bufq->tail + 1) & bufq->mask;
+ 		complq->num_free_slots--;
+@@ -826,10 +831,13 @@ static int gve_rx_dqo(struct napi_struct *napi, struct gve_rx_ring *rx,
+ 		int unsplit = 0;
+ 
+ 		if (hdr_len && !hbo) {
+-			rx->ctx.skb_head = gve_rx_copy_data(priv->dev, napi,
+-							    rx->dqo.hdr_bufs.data +
+-							    desc_idx * priv->header_buf_size,
+-							    hdr_len);
++			size_t offset =
++				(size_t)buffer_id * priv->header_buf_size;
++
++			rx->ctx.skb_head =
++				gve_rx_copy_data(priv->dev, napi,
++						 rx->dqo.hdr_bufs.data + offset,
++						 hdr_len);
+ 			if (unlikely(!rx->ctx.skb_head))
+ 				goto error;
+ 			rx->ctx.skb_tail = rx->ctx.skb_head;
+-- 
+2.55.0.rc0.738.g0c8ab3ebcc-goog
+
 
