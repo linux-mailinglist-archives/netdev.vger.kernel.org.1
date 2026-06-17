@@ -1,181 +1,145 @@
-Return-Path: <netdev+bounces-300090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300092-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id GdaWHHlpMmpmzgUAu9opvQ
-	(envelope-from <netdev+bounces-300090-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:31:37 +0200
+	id rEgvEcxpMmqBzgUAu9opvQ
+	(envelope-from <netdev+bounces-300092-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:33:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6A5E697EDE
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B07697F1B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 11:32:59 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=Qm0iVjU4;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300090-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300090-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=lunn.ch header.s=20171124 header.b=X7UdkVk7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300092-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300092-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=lunn.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 56FE73073115
-	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:18:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A8E3630028E7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jun 2026 09:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB4B3932C2;
-	Wed, 17 Jun 2026 09:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD0D638C437;
+	Wed, 17 Jun 2026 09:19:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3662239BFEC;
-	Wed, 17 Jun 2026 09:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4774813A86C;
+	Wed, 17 Jun 2026 09:19:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781687878; cv=none; b=sQ94aLM1pPmdIjWhCtSBVRe3y+QHGJ4+1bY4uto5JWxr9tbwltegTtJpX520JJmvTfJleGo6/TgFnYNh/8Eer4z5tzegxq0TeMweLlOZIIVHSPmNm15PoTYR+Pc8Owi0sLTnb3g9B4/b0J16Slioyb1nokWXBgh/4hLgEJGUpo4=
+	t=1781687997; cv=none; b=US1RV1mzHXKLWSJYfO7QZzn7GUTgLbUOgJNWf9MN1mrWBVQxuk+vSHoxDS4RKQSxPXWATnIGzHTOGbv8Yao6GrJdJnHcCM7eYVvp2JspOP5OgMemcZe0QSEv/sP/NE+Z/LtBt2Bmayqy0C8N8DEC/NsO5cUUO2AIpOuVjVX24R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781687878; c=relaxed/simple;
-	bh=1jBDxYXWJq8oVg4cfwRSFslEeHBgkTsITO5M9rYbr1Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Gg2TryQ6nuLGD1euMOmC6cst+8sjKB1DEipsWzcpvfY9aa89gmWQASkOLIfF1cuGE1CWxNVd6HGOTuhZyBI8qnDn2kipwR1vM8nvItzLrwuCyFqzn0tIn9RpDA0PbTGM5RxPWbvgSsbw6ag1d9aAZsYCL0igsxxkax5wf/NpAqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Qm0iVjU4; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 722B94E42F2C;
-	Wed, 17 Jun 2026 09:17:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 46A8A601AA;
-	Wed, 17 Jun 2026 09:17:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 804AA106CA350;
-	Wed, 17 Jun 2026 11:17:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781687868; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=G9FpCeKi3Ynv/LOiUy9epKx2SW5IzmteIiDj38KugCY=;
-	b=Qm0iVjU4OMdghsQmnsSO/ZVglUuAgnSWOLaEln7sLb0stSd5BiwNTG+skRE5W6v3NM36gN
-	WIQOk93EJD4sv52sOkRdC9HVawr/X7IFU80SnCCXq1PazwZhwep1i9OgCmhKP2wFB1zGoc
-	GB13r44Stdt2gEgUmPQ9q0Wc/7qHoUm4h4m7TiaNtiWtbj3eNC2ZzwF+EPWwbb8ePFfN8N
-	qvNsINoO3ALOm5y1vsJVXflVV2fQT8s76IUjL/6eSGp0JF40a4ibAL/sMhj9QEPcn3N5yL
-	O/b+AA+zriz0OkqoSBxJne3TuK/MHTD9n+4MLuAli8RdO4XGmVqJ6ApiAWzEfQ==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 17 Jun 2026 11:17:30 +0200
-Subject: [PATCH net v3 2/2] net: macb: drop in-flight Tx SKBs on close
+	s=arc-20240116; t=1781687997; c=relaxed/simple;
+	bh=yPW0/gGgJInFWTDT1Labb4HnGILlEk/0Iq+1T/Whwo0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d/r8QBBL/RIRCIGEM6nYOG2ovO6am7q2YNesr4t6GWKKZkQJXdEG490ru48VbBm9D3vgC07GvfiUkj74Qi4amfgVwHWL5eCNTIXWMDAZPIHNDTOCYUQ8a28AwZfcmt9J00yi0pV+PPdc9iluWFH46pRCmqcMVhTqO76Qi+b1Nvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=X7UdkVk7; arc=none smtp.client-ip=156.67.10.101
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KF3jViJ8RV1au3xZmPm/2f7q1mQz98SWnSozj/8FwZA=; b=X7UdkVk7H+72Dgl+jLszPNvht2
+	oLlcCM+SRixL9VfBfVw3W5IKcY5hWWimyjRolYZ1YdIIsvTYMti/NVI8jAWIbVzaEiwwJWU+VbVo/
+	Gf8I+0bsLbWYCGAzZq9m1H1MJI84Iolq5iMJ8aCgKoioNN9TF8kolu3BHW+Pdnds+aW4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1wZmR1-0089gl-9Q; Wed, 17 Jun 2026 11:19:47 +0200
+Date: Wed, 17 Jun 2026 11:19:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kyle Switch <kyle.switch@motor-comm.com>
+Cc: mmyangfl@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ming.xu@motor-comm.com,
+	xiaolin.xu@motor-comm.com, jianmin.wang@motor-comm.com,
+	de.ge@motor-comm.com
+Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
+Message-ID: <ad636332-6678-48c0-a5a7-9c54b1ba720a@lunn.ch>
+References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
+ <3f7bf73b-c8dc-451d-981f-5e5343291960@lunn.ch>
+ <adc1dc4b-1d9d-42e6-8983-f0a7c650a6cd@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260617-macb-drop-tx-v3-2-d4c7e57d890b@bootlin.com>
-References: <20260617-macb-drop-tx-v3-0-d4c7e57d890b@bootlin.com>
-In-Reply-To: <20260617-macb-drop-tx-v3-0-d4c7e57d890b@bootlin.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>, 
- Conor Dooley <conor.dooley@microchip.com>
-Cc: Paolo Valerio <pvalerio@redhat.com>, Nicolai Buchwitz <nb@tipi-net.de>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- =?utf-8?q?Beno=C3=AEt_Monin?= <benoit.monin@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <adc1dc4b-1d9d-42e6-8983-f0a7c650a6cd@motor-comm.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300090-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300092-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:nicolas.ferre@microchip.com,m:claudiu.beznea@tuxon.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:hskinnemoen@atmel.com,m:jeff@garzik.org,m:conor.dooley@microchip.com,m:pvalerio@redhat.com,m:nb@tipi-net.de,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:vladimir.kondratiev@mobileye.com,m:gregory.clement@bootlin.com,m:benoit.monin@bootlin.com,m:tawfik.bayouk@mobileye.com,m:thomas.petazzoni@bootlin.com,m:maxime.chevallier@bootlin.com,m:theo.lebrun@bootlin.com,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kyle.switch@motor-comm.com,m:mmyangfl@gmail.com,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,bootlin.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,lunn.ch:dkim,lunn.ch:mid,lunn.ch:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: A6A5E697EDE
+X-Rspamd-Queue-Id: 59B07697F1B
 
-The MACB driver has since forever leaked the outgoing SKBs that
-have not yet been marked as completed. They live in queue->tx_skb
-which gets freed without remorse nor checking.
+> Thank you for your reminding, this patch will submitted  in a series 
+> of small patches.
+> This patch mainly contains three contents:
+> 1. Underlying function interface for different motorcomm switch series in 
+> the file driver/net/dsa/motorcomm/switch/.
+> 2. Optimization existing yt921x dsa driver using common switch function apis.
+> 3. New yt922x dsa driver.
+> Can you accept break this up into lots of small patch according to this logic?
+> if not, do you have any suggestion? thank you.
 
-macb_free_consistent() gets called in a few codepaths, but only
-close will trigger the added expressions. In macb_open() and
-macb_alloc_consistent() failure cases, tx_skb just got allocated
-and is empty.
+We need to see the patches, but keep them small, and add functionality
+little by little. I had a very quick look at your first version, and i
+see a lot you will need to change. So just post small bits of code,
+learn from the review comments, and fixup all the rest of the code
+before posting it.
 
-Use the new macb_tx_unmap() prototype to report our error as
-SKB_DROP_REASON_NOT_SPECIFIED rather than SKB_CONSUMED which makes it
-sound like no error occurred. Equivalent to dev_kfree_skb_any().
+One thing i need to point out. Linux has a long tradition of not
+replacing existing code with a new implementation. You take the
+existing code and step by step improve it. So i do not want to see a
+patch which just removes the existing driver. I want to see patches
+which add new functionality to the existing driver, doing refactors as
+needed.
 
-Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+Please also remember:
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 9caae1ef52b1..5a2500bd59a6 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2678,8 +2678,26 @@ static void macb_free_consistent(struct macb *bp)
- 	dma_free_coherent(dev, size, bp->queues[0].rx_ring, bp->queues[0].rx_ring_dma);
- 
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--		kfree(queue->tx_skb);
--		queue->tx_skb = NULL;
-+		if (queue->tx_skb) {
-+			unsigned int dropped = 0, tail;
-+
-+			for (tail = queue->tx_tail; tail != queue->tx_head;
-+			     tail++) {
-+				if (macb_tx_skb(queue, tail)->skb)
-+					dropped++;
-+				macb_tx_unmap(bp, macb_tx_skb(queue, tail), 0,
-+					      SKB_DROP_REASON_NOT_SPECIFIED);
-+			}
-+
-+			queue->stats.tx_dropped += dropped;
-+			bp->dev->stats.tx_dropped += dropped;
-+
-+			kfree(queue->tx_skb);
-+			queue->tx_skb = NULL;
-+		}
-+
-+		queue->tx_head = 0;
-+		queue->tx_tail = 0;
- 		queue->tx_ring = NULL;
- 		queue->rx_ring = NULL;
- 	}
+MOTORCOMM YT921X ETHERNET SWITCH DRIVER
+M:      David Yang <mmyangfl@gmail.com>
+L:      netdev@vger.kernel.org
+S:      Maintained
+F:      Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+F:      drivers/net/dsa/yt921x.*
+F:      net/dsa/tag_yt921x.c
 
--- 
-2.54.0
+David is the Maintainer of this driver. Listen to what he says. In
+time, when you have shown you can also can do the job of being a
+Maintainer, your name will be added.
 
+      Andrew
 
