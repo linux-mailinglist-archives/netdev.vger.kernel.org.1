@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-300379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300381-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id YuoIELG7M2pkFgYAu9opvQ
-	(envelope-from <netdev+bounces-300379-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:34:41 +0200
+	id VCFfJRa8M2pwFgYAu9opvQ
+	(envelope-from <netdev+bounces-300381-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:36:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E07769EE88
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:34:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B5869EEAD
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:36:21 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=Y9MV890t;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300379-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300379-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=pschenker.ch header.s=20220412 header.b=aTgDDw5t;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300381-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300381-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=pschenker.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00189300360F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:29:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4DFC5301BF72
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8929D3C414F;
-	Thu, 18 Jun 2026 09:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C994F3DB626;
+	Thu, 18 Jun 2026 09:32:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [83.166.143.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCD03B71DD;
-	Thu, 18 Jun 2026 09:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6A13DB319
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 09:32:07 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781774995; cv=none; b=PjCXDIGyTNuzaTu/2k1vUPShJHlUMlbqkuKIaBzwgauqHM47/RK86/6/tMSxTKRmoCzXTMSRm3nn1Fde7df2ZUsqxsgx6sfLxfOmfEflo8N6+oZBOMJKY9+OvuWLcfLQJN43yi5Zche52/PfeQLGKUxnxFNizCRCLHAWfVzqP9A=
+	t=1781775129; cv=none; b=F42HEwdEwRbmidbh3n1N4dUfhlPlIHsvSbhPCkM4U1FrUZD5qtnLzC3umXQGB2ubrIt1GDzgofpe+b9JaUF2gQPnNrQAT+Lfdxc6duQ+OMrz0w+oIFGKrG8RiMIL2pnnkBEEGKpEmWa0ZsPLEj4c5lrVV4RrWm/mHIqkXUJIhWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781774995; c=relaxed/simple;
-	bh=ilR+EZ8AS65fpi/jJMtHjhvLmFr7HFjqHwCTNIp6Xsw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VrCnWHGszPWirYFwVgbNGl53j10t6SU3s4qoe2IfLtSFGTB8vVZImXCHucDl5JMEL+xwE81tQc8zXIfz7p44a3v0GyrHNZT88qR+8XjgsAvbRD7Sy5JalmjKynQ3GPOqIfhCZ2Ui+lyGTWwMsSvopKKWIgsIqDqq3d4oxrXzMQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9MV890t; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DF761F000E9;
-	Thu, 18 Jun 2026 09:29:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781774994;
-	bh=xY3E02itJZ/3guyWQm3b0qgZmBwdEEtON2CPCiTjekI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Y9MV890t52WmmXty1o236vJxVmhjV9mdo++QRAv+YS0h3xqI9wqrIMDpzLag4MaHO
-	 O0J3xGqyy23YnmUAiAvaJ7d2RVzXPe7IOTwXevMsssLf2uYop+2kaWO1L18dxwg2aA
-	 kHuvFS21Hq0uIz5GkkCVbe7ceny979gXr6doloOxJZU16kFHvdKJf9yrYAt2+JZFMj
-	 ETfbiAlVmBZjWwz4/ZNcvomosa6iCEZdBRrOAO2M3oUuXjF3Xz/oVsA4Zv8zZSupEj
-	 +ux9gSl61nInkSuSj0F3PgrXP7PcWuHb2eHN368+xzr5Z9AEAy0a9XcwQVDZqQxNC4
-	 DFruqbVxpFrew==
-From: Simon Horman <horms@kernel.org>
-To: dhowells@redhat.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	marc.dionne@auristor.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	d4n.for.sec@gmail.com,
-	n05ec@lzu.edu.cn,
-	jaltman@auristor.com,
-	stable@kernel.org
-Subject: Re: [PATCH net 5/5] afs: Fix uncancelled rxrpc OOB message handler
-Date: Thu, 18 Jun 2026 10:29:29 +0100
-Message-ID: <20260618092929.888053-1-horms@kernel.org>
+	s=arc-20240116; t=1781775129; c=relaxed/simple;
+	bh=yXhezKjx+yVwcCW5dSV5+wzQdX4affVXyHHOblT291E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aq++VA39h9Nd2NFC2X0W+g7bNRtxHh65oM0dMUN/I4F7oyudaWNcqOGd0Povas8fi9CKJaEavOz7zo0LfEjmO+GGWAkXPxssbWfosh/BvkS8wDh/HGYBVwMnacSKM35DT8eyVszwIyngyJUzga7cnLJxy2wJNMSgs3fdg64Qn3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=aTgDDw5t; arc=none smtp.client-ip=83.166.143.170
+Received: from smtp-4-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6b])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4ggwV80p2mzfZ3;
+	Thu, 18 Jun 2026 11:32:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pschenker.ch;
+	s=20220412; t=1781775119;
+	bh=afIfWS9qjU1M1kfgfbvSOJ4Gjss3OoSIyUxQqbcy0ow=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aTgDDw5t6//RH1AMUvqKnMBCgHayW51WWLTsIFV27dLlz5s20wlA026e+sHPu6k2C
+	 xMjGfOd5tkglpaL8awoGelbOdoQHNZhgc+hY3YzJ0RSzseiw6uZuC2998i62pbGzrB
+	 f0QE/i0qSt6N4AAzKJwjPKYVcNQY//BUMhOyvIMw=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4ggwV662lLzjQb;
+	Thu, 18 Jun 2026 11:31:58 +0200 (CEST)
+From: Philippe Schenker <dev@pschenker.ch>
+To: netdev@vger.kernel.org
+Cc: Philippe Schenker <philippe.schenker@impulsing.ch>,
+	Simon Horman <horms@kernel.org>,
+	danishanwar@ti.com,
+	rogerq@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	stable@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	David Carlier <devnexen@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kevin Hao <haokexin@gmail.com>,
+	Meghana Malladi <m-malladi@ti.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: ethernet: ti: icssg: guard PA stat lookups
+Date: Thu, 18 Jun 2026 11:30:24 +0200
+Message-ID: <20260618093037.3448858-1-dev@pschenker.ch>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260616155749.2125907-6-dhowells@redhat.com>
-References: <20260616155749.2125907-6-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,114 +75,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[pschenker.ch,none];
+	R_DKIM_ALLOW(-0.20)[pschenker.ch:s=20220412];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300379-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:d4n.for.sec@gmail.com,m:n05ec@lzu.edu.cn,m:jaltman@auristor.com,m:stable@kernel.org,m:d4nforsec@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[impulsing.ch,kernel.org,ti.com,lists.infradead.org,vger.kernel.org,lunn.ch,gmail.com,davemloft.net,google.com,intel.com,redhat.com,linux.dev];
+	TAGGED_FROM(0.00)[bounces-300381-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:philippe.schenker@impulsing.ch,m:horms@kernel.org,m:danishanwar@ti.com,m:rogerq@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:stable@vger.kernel.org,m:andrew+netdev@lunn.ch,m:devnexen@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:jacob.e.keller@intel.com,m:kuba@kernel.org,m:haokexin@gmail.com,m:m-malladi@ti.com,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[dev@pschenker.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dev@pschenker.ch,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,auristor.com,davemloft.net,google.com,redhat.com,lists.infradead.org,gmail.com,lzu.edu.cn];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[pschenker.ch:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email,pschenker.ch:dkim,pschenker.ch:mid,pschenker.ch:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,impulsing.ch:email,infradead.org:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8E07769EE88
+X-Rspamd-Queue-Id: E5B5869EEAD
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
+From: Philippe Schenker <philippe.schenker@impulsing.ch>
+
+icssg_ndo_get_stats64() unconditionally calls emac_get_stat_by_name()
+with FW PA stat names regardless of whether the PA stats block is
+present on the hardware.  emac_get_stat_by_name() already guards the
+PA stats lookup with `if (emac->prueth->pa_stats)`; when that pointer
+is NULL the lookup falls through to netdev_err() and returns -EINVAL.
+Because ndo_get_stats64 is polled regularly by the networking stack
+this produces thousands of log entries of the form:
+
+  icssg-prueth icssg1-eth end0: Invalid stats FW_RX_ERROR
+
+A secondary consequence is that the int(-EINVAL) return value is
+implicitly widened to a near-ULLONG_MAX unsigned value when accumulated
+into the __u64 fields of rtnl_link_stats64, silently corrupting the
+rx_errors, rx_dropped and tx_dropped counters reported by `ip -s link`.
+
+Every other PA-aware code path in the driver is already guarded with
+the same `if (emac->prueth->pa_stats)` check.  Apply the same guard
+here.
+
+Fixes: 0d15a26b247d ("net: ti: icssg-prueth: Add ICSSG FW Stats")
+Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+Cc: danishanwar@ti.com
+Cc: rogerq@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: stable@vger.kernel.org
+
 ---
-afs: Fix uncancelled rxrpc OOB message handler
 
-This commit cancels AFS OOB message processing during shutdown and moves it
-to afs_wq. It also prevents queuing if the net namespace is no longer live.
+Changes in v2:
+- Removed newline between Fixes tag and Signed-off-by
+- Use return in if statement to guard so we get rid
+  of the 80 char warnings.
+- Added Simon's Reviewed-by. Thanks!
 
-Link: https://sashiko.dev/#/patchset/20260609140911.838677-1-dhowells%40redhat.com
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 49 +++++++++++---------
+ 1 file changed, 28 insertions(+), 21 deletions(-)
 
-> diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-> index fd2d260fb25f9..6241f9349f6b6 100644
-> --- a/fs/afs/rxrpc.c
-> +++ b/fs/afs/rxrpc.c
-[ ... ]
-> @@ -128,6 +128,7 @@ void afs_close_socket(struct afs_net *net)
->  	_enter("");
->  
->  	cancel_work_sync(&net->charge_preallocation_work);
-> +	cancel_work_sync(&net->rx_oob_work);
->  	kernel_listen(net->socket, 0);
->  	flush_workqueue(afs_async_calls);
->  	flush_workqueue(afs_wq);
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index a28a608f9bf4..d9af6419e032 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -1628,28 +1628,35 @@ void icssg_ndo_get_stats64(struct net_device *ndev,
+ 	stats->rx_over_errors = emac_get_stat_by_name(emac, "rx_over_errors");
+ 	stats->multicast      = emac_get_stat_by_name(emac, "rx_multicast_frames");
+ 
+-	stats->rx_errors  = ndev->stats.rx_errors +
+-			    emac_get_stat_by_name(emac, "FW_RX_ERROR") +
+-			    emac_get_stat_by_name(emac, "FW_RX_EOF_SHORT_FRMERR") +
+-			    emac_get_stat_by_name(emac, "FW_RX_B0_DROP_EARLY_EOF") +
+-			    emac_get_stat_by_name(emac, "FW_RX_EXP_FRAG_Q_DROP") +
+-			    emac_get_stat_by_name(emac, "FW_RX_FIFO_OVERRUN");
+-	stats->rx_dropped = ndev->stats.rx_dropped +
+-			    emac_get_stat_by_name(emac, "FW_DROPPED_PKT") +
+-			    emac_get_stat_by_name(emac, "FW_INF_PORT_DISABLED") +
+-			    emac_get_stat_by_name(emac, "FW_INF_SAV") +
+-			    emac_get_stat_by_name(emac, "FW_INF_SA_DL") +
+-			    emac_get_stat_by_name(emac, "FW_INF_PORT_BLOCKED") +
+-			    emac_get_stat_by_name(emac, "FW_INF_DROP_TAGGED") +
+-			    emac_get_stat_by_name(emac, "FW_INF_DROP_PRIOTAGGED") +
+-			    emac_get_stat_by_name(emac, "FW_INF_DROP_NOTAG") +
+-			    emac_get_stat_by_name(emac, "FW_INF_DROP_NOTMEMBER");
++	stats->rx_errors  = ndev->stats.rx_errors;
++	stats->rx_dropped = ndev->stats.rx_dropped;
+ 	stats->tx_errors  = ndev->stats.tx_errors;
+-	stats->tx_dropped = ndev->stats.tx_dropped +
+-			    emac_get_stat_by_name(emac, "FW_RTU_PKT_DROP") +
+-			    emac_get_stat_by_name(emac, "FW_TX_DROPPED_PACKET") +
+-			    emac_get_stat_by_name(emac, "FW_TX_TS_DROPPED_PACKET") +
+-			    emac_get_stat_by_name(emac, "FW_TX_JUMBO_FRM_CUTOFF");
++	stats->tx_dropped = ndev->stats.tx_dropped;
++
++	if (!emac->prueth->pa_stats)
++		return;
++
++	stats->rx_errors  +=
++			emac_get_stat_by_name(emac, "FW_RX_ERROR") +
++			emac_get_stat_by_name(emac, "FW_RX_EOF_SHORT_FRMERR") +
++			emac_get_stat_by_name(emac, "FW_RX_B0_DROP_EARLY_EOF") +
++			emac_get_stat_by_name(emac, "FW_RX_EXP_FRAG_Q_DROP") +
++			emac_get_stat_by_name(emac, "FW_RX_FIFO_OVERRUN");
++	stats->rx_dropped +=
++			emac_get_stat_by_name(emac, "FW_DROPPED_PKT") +
++			emac_get_stat_by_name(emac, "FW_INF_PORT_DISABLED") +
++			emac_get_stat_by_name(emac, "FW_INF_SAV") +
++			emac_get_stat_by_name(emac, "FW_INF_SA_DL") +
++			emac_get_stat_by_name(emac, "FW_INF_PORT_BLOCKED") +
++			emac_get_stat_by_name(emac, "FW_INF_DROP_TAGGED") +
++			emac_get_stat_by_name(emac, "FW_INF_DROP_PRIOTAGGED") +
++			emac_get_stat_by_name(emac, "FW_INF_DROP_NOTAG") +
++			emac_get_stat_by_name(emac, "FW_INF_DROP_NOTMEMBER");
++	stats->tx_dropped +=
++			emac_get_stat_by_name(emac, "FW_RTU_PKT_DROP") +
++			emac_get_stat_by_name(emac, "FW_TX_DROPPED_PACKET") +
++			emac_get_stat_by_name(emac, "FW_TX_TS_DROPPED_PACKET") +
++			emac_get_stat_by_name(emac, "FW_TX_JUMBO_FRM_CUTOFF");
+ }
+ EXPORT_SYMBOL_GPL(icssg_ndo_get_stats64);
+ 
+-- 
+2.54.0
 
-[Severity: High]
-This is a pre-existing issue, but does placing the cancellation and flush
-before kernel_sock_shutdown() leave a window open for the work to be queued
-afterwards?
-
-If kernel_sock_shutdown() is what synchronously disables the notify_oob
-callback from firing, couldn't a delayed callback still queue work on afs_wq
-after we've already flushed it here?
-
-[ ... ]
-> @@ -985,5 +986,6 @@ static void afs_rx_notify_oob(struct sock *sk, struct sk_buff *oob)
->  {
->  	struct afs_net *net = sk->sk_user_data;
->  
-> -	schedule_work(&net->rx_oob_work);
-> +	if (net->live)
-> +		queue_work(afs_wq, &net->rx_oob_work);
->  }
-
-[Severity: High]
-This is a pre-existing issue, but does this lockless check of net->live allow
-a race condition that leads to a use-after-free?
-
-Consider this sequence:
-
-CPU1 (teardown)
-afs_net_exit()
-    net->live = false;
-    afs_close_socket()
-        cancel_work_sync(&net->rx_oob_work);
-        flush_workqueue(afs_wq);
-        kernel_sock_shutdown()  // blocks waiting for recvmsg_lock
-
-CPU2 (incoming OOB)
-rxrpc_notify_socket_oob()
-    spin_lock_irq(&rx->recvmsg_lock);
-    afs_rx_notify_oob()
-        // Reads net->live == true (stale read, or delayed execution)
-        queue_work(afs_wq, &net->rx_oob_work);
-    spin_unlock_irq(&rx->recvmsg_lock);
-
-CPU1 then finishes kernel_sock_shutdown() and frees the net namespace, but
-afs_wq is never flushed again.
-
-Would moving cancel_work_sync() and flush_workqueue() to the end of
-afs_close_socket(), after kernel_sock_shutdown() completes, prevent this race?
+base-commit: 8cd9520d35a6c38db6567e97dd93b1f11f185dc6
+branch: fix-icssg_common-pa-stats-errors__master-7-1
 
