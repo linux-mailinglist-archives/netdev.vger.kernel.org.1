@@ -1,159 +1,193 @@
-Return-Path: <netdev+bounces-300350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300351-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id RvZUG6ioM2onEwYAu9opvQ
-	(envelope-from <netdev+bounces-300350-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:13:28 +0200
+	id H9GRFZepM2o+EwYAu9opvQ
+	(envelope-from <netdev+bounces-300351-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:17:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 077B869E5DC
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:13:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEBAA69E623
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:17:26 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=none;
-	dmarc=none;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300350-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300350-lists+netdev=lfdr.de@vger.kernel.org";
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=Ta7HdCzr;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300351-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300351-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 73DAF301106F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:13:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 599BA3014176
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AA63AF64F;
-	Thu, 18 Jun 2026 08:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819562DB788;
+	Thu, 18 Jun 2026 08:17:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC9E3AE70A
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 08:13:24 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781770405; cv=none; b=IV/lxgP0qSHTw/4feDJTCZ2eJ/098NlDryZowdc1J0E7RLES3VTtK8Hps7xjzN9qaQikJ+s87c2JisDxloxyJfq0PeFfzJiDv/IZ8ojGskuvxslWXZE8oq5d3Um6tl0qG7yYUm5oFjJbQ3Im2P2yid8DiFq8qydiaRmBmt8csZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781770405; c=relaxed/simple;
-	bh=qT3TGQ4d0y9tUfJc/hPKLXqZe+/2KGNG6EH7xLEU0DU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p9qVANp6ZYjWtX/11RrbUIcoe0e3ElVRncnKMks0x+xSSJ2FpIF7vNLL+ZNmZ1wa4ri7i8S7OEtY1HWT76ue3SVghF5zbLNzoklIwCJaHhEYekK97z0K9HwfMx87aET14bzqKVCxsa7t50PRRF7imSqQoGIg1bXYd1aZ+VvG2Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.42
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-6cfd17e9250so272672137.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 01:13:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361DB2C236B
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 08:17:21 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781770643; cv=pass; b=gkLepgfek0sZiqZcFBBLbCriw2t6Ukc98/BYCmz7y5GU3qtuPBjw3YCK7NQT4Xb80t3IRaUrPm5pXs8CfKkemM9jxtyFXIXW2vCvfNbq5bqAEAjGBkF3vV+1PCI6sYmO8c6G/O2IJrSFQaffQV5oMqHY9il3wQRyzB/0o/WYLgE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781770643; c=relaxed/simple;
+	bh=92dHqPbQWC8cy1JTOt2cJGiKdgiKwvLw58yvC9vnAdw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=EbL6oORezpeqY7DBDT0E5Roon/y7FbuBAlI2Lfh5jRDHX3p7nuB21m6BxLFY5tzAUig3ui9o2SNc3VWnlxwVmq0c+ZYJy3EQLLinsUGLmz5f7QcBMphshhar7eHfxmieL67HKrppwyJU4Sm6B3490sRef2fuHN81hcVU0ocyzK8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ta7HdCzr; arc=pass smtp.client-ip=209.85.217.42
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-726840fb461so177943137.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 01:17:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781770641; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eQR8K/JJ50IHqqQnosm9kM0nongOtVAA6T5nKgV5Ovc1pWJiEV67y6XKebox5sIIx1
+         su4LB4ZMBW/4JsrLVC4GV0GVZQdTQmLFw6HvbsVBmzZi8ohQ5BpIiZTYgnMOEfbdyhz1
+         friLT4lE3Ngk+s22VgKYa+vYuzPxoxNSx6I0CpT15Osw09RZXZxDRV3wHVvFCp91w22Q
+         Ew/vbhbUnFU6rxQ9vqEM8dpQu286G1iN7tRWBL18FEZPgd2MNLML7taVbcyR5tdbboq4
+         6xL/zJ/LumxGvGF72J8DMQJD1wIzBIJFjJSY3Z8uWF1+I9MOrNZpXuXPwtXKUxvJxpLs
+         hx+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=lYAYEdq9vWBAIEZK7smUIn8a6mPDxxZ0U8DGdNWY6W0=;
+        fh=/+FEwGs4q4BmeKGnwr32KkoFGr+QKcmmFp6nW7eEuuM=;
+        b=fl8ej3Zy9yfmTSeGZJjkx9YDZi78m23mjFwW2uYYp2ViPrYAdYykuCdwtoTbLtpK3Z
+         vy9Cyk22t1I8saA/RvpwUYMHxv2r0GeFYrx83ItYseTWIzaYjLswBrUeVr9B7WvQ3H4K
+         XlV2uKzIkJkdeAHXj9IVh+29vVQufyS88wg28OHjhG+rfbpYd8AkbxNCUGmpA7+qOuWB
+         W7Xx1aZj3Hfk+Qnw5BvYaSllwyOR5S20NV4dP2ccNsG3fNYN04WIrxk2268q6cnoEJt/
+         H9Jpj8gTKfTsE1tsaRq1kv7kwRvUo0LLs4pQ9WpALyRiXThvrz7F172iuOzHmVPqc+ld
+         tQeg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781770641; x=1782375441; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lYAYEdq9vWBAIEZK7smUIn8a6mPDxxZ0U8DGdNWY6W0=;
+        b=Ta7HdCzrCAgXlxWUMq0eLpfHEzgmxdise/RxGfOmxEGqCV5ZopqkkIAGyFNKikHxQ1
+         ZRfsdM5cBDXi9qpgedezR/YBqWKzfv9XWhR2GRx8sU8GuqHysCkTweTbVdCONOjIDEv5
+         Rs6fC0fdxmIuAgA8MRxTEXLdf19yQ/wb69aX0mSaK37CURxVcf580uqPicspCUyu+5/8
+         DVoxpZhpLJXDvnpIKocF++g+OfRGA/0AHJdwRmuDmhz8+XhGHCN/nqr9s2RhGMWiblHN
+         nFLpDTNS8KtQVngm3CDFveDoosKEqjdWoBRsuYa/F3Zfx9POJxCI3JpAySIGWepVFyUh
+         FFJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781770403; x=1782375203;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CKAZNU0FmJW8v6thQLRjRHc5rQqn36zhhyWy7vfjOZ8=;
-        b=pp/SF8on1gS6CLs8x6vpz4LGYVYleclTaya30O2Uc5a7gNU4CROVSn7Jj4CisWKTS/
-         q+nd5jVOyUx0yDbwuYjOF1jhmhZ0twnjMGyPqsXXOh0/NXwO/FlZ1gcyLGsrs/xYLwvx
-         w62HH+ePYVg33edcWWMn8oQEugm+zd9TrItf3JToyWiiKiEPLSxkWuVaRj6WZCF7Ihsh
-         L88ZXSjDz9i82azrvicyGnZ3CAWYF5/Lb2MzP5gz9MEzAmIs2oEUisNkR03tCVrrKwsI
-         /yvQ3WTXho82g19zmSYFh4o/BzNcYqfGc0bg4hEA83Fk8ucghSX36PwWQU1U7bdowhQ4
-         qgyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8zgSbsQMnQYNPQZvhZCVfbDuFGE1bK0CRyiWLBlE8JsVDaYvnvzl4AD8aiA0MjkDMtNjFypok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQs0In0CivutUEOwsOpW0onk9Yv2IHlxY6OovD9WC0+q74zJ64
-	uCb2QsyGN38PfDccG5jSrksyy/Ry+i+k14PLGobCYeEPUcO8Hc/3xThIBgFoEf+w
-X-Gm-Gg: AfdE7ckaN+y9ldwLZAoeZrJXLcZZKEJjqzsxZWbVqMMcZh6pGoAUChaZgfZGAyyQWEh
-	VWyf2sqvidKGA5O2j9oEyCrTaR1+oLfqodNp0ugI1G6Km+jhX420SG10ZBHdL5yIE+C/sBRFXCb
-	2T4H+E0rYxskgo2/Dvr89LIefynn8N1TizzuUdTrUKssFe5utnUBedheyZyHGN6zTIY0j8ty9fL
-	X4k2eeuGvyH8y8fh6lcnmzLm63qNYga97quR9LBQuFz6JloEGqG5OyjKhaxoDNZivOtjptK8MHt
-	6TEUab2wzWdm0fd4vHIho18b1SOohAf8HZpjQavPkI4LxecAAcAtTJoZab9hPvAB5j0+tkP67X6
-	10rhujjM2Z8NRghFowEG5fax7vcv+0ymaVWlKYQEKopxHbOJjwvtrplYGWIhdt2qX2tybV/xgy6
-	Uc+c5AgQwS0G3xkM4hVjfRfjAplikmqWQpzbP1iEj0bjLK1ZWBCQ==
-X-Received: by 2002:a05:6102:4bc5:b0:633:e67f:b7f with SMTP id ada2fe7eead31-7246d325344mr3981122137.25.1781770403200;
-        Thu, 18 Jun 2026 01:13:23 -0700 (PDT)
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com. [209.85.222.45])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-966a05d0068sm8927413241.11.2026.06.18.01.13.22
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jun 2026 01:13:22 -0700 (PDT)
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-963f63fe025so171288241.0
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 01:13:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+K+4TxBzQGuFxXHoPe07FONIIchLZD5Fp6afqd5fLDNM1vRKB9m+Da+BoB+llMM+rbLUb5qwI=@vger.kernel.org
-X-Received: by 2002:a05:6102:1626:b0:634:92c:bdd0 with SMTP id
- ada2fe7eead31-7245cec5b37mr3787588137.6.1781770401826; Thu, 18 Jun 2026
- 01:13:21 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781770641; x=1782375441;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lYAYEdq9vWBAIEZK7smUIn8a6mPDxxZ0U8DGdNWY6W0=;
+        b=LA0oE1p/EeKP93dynjOTuCw8fz8khIDufVIOFbQDmplGgGRrDN3VsfKtFopHvLfAG1
+         O5lYp73cdadzleOsPYuwsi8mLl6H03OI2+Xw5HmVJGrGCgF0D3337uUMMK/wmS6yiRu2
+         fSw8IQDG29P4a3qCh/JYLf37DCXw8C2NOoSMEO/9r4e7u2ecjNrN7y/fDH9fLhZ8Ecov
+         dIuhiRtYrgfR/3cf39di8KqL6NwW3ecNBPSpNWJ+U8T13oD14jXPTtBlU9zVMJT5QhRO
+         WQJyt8Q5w3EhElgSlHQIIA3DD1cbUS4PVQVF5mtWNdDi39Eg7J2ZXJ003wDmxmtIKMDZ
+         ZHog==
+X-Gm-Message-State: AOJu0YxN3OraURIJ2zm7vIYhAbWQzeB/q8DfBsJLrSX0O85nPr6uGnjR
+	Xlz8745166Ca/cOrjRw4MGAeaY7XM9/t853EA45il/88jM6Lp9kMyA5/5g9frStzDJP/SMUma75
+	I2tNrpTQZjZuElrlPwBRs3D8O6zD/JrEoW2ow
+X-Gm-Gg: AfdE7ckedt6voB73llmgsSIPYvzIu9Qlm2eEp0sIsWZC4A8mlo4F1jKlP3Xom3ZPlNF
+	wTdRNT0N+Ml8dGwG9C97h6mG2P05G3yFKi5fgJr59moXYNCq2jeo6aGHZwCO04C3NOVHj254dzv
+	Dux2YN7ujpeNjVpj/iU3kwiFTCirV5h5CkBaHPs2Nv8cYamo1RpdCRjgjXrwcuBQ00oMU9i0j++
+	u1lUYvJTOQtOhmZGkjrutC24BCajpUbt75GUeTOdlVBX2W1z7PPkN8L3Gs4vl8GMC2j06eAJg==
+X-Received: by 2002:a05:6102:1607:b0:639:3b08:d64c with SMTP id
+ ada2fe7eead31-729294dbd29mr307266137.13.1781770640948; Thu, 18 Jun 2026
+ 01:17:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260616084901.3319d82e@kernel.org> <1781694488854.956546368.818588236@strotmann.de>
- <489024bc-b6e5-f601-3bce-444d75abbf5d@linux-m68k.org> <2791b2e3-bf58-4dce-9262-4f1d8d3241fb@lunn.ch>
-In-Reply-To: <2791b2e3-bf58-4dce-9262-4f1d8d3241fb@lunn.ch>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 18 Jun 2026 10:13:08 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU0em2r-SixT_+EpWJnm4f0g8mReYKBXOw42=HGb_T8WQ@mail.gmail.com>
-X-Gm-Features: AVVi8CfLJ0ddT-LhKt0W0uHSh_81VvaoqDXBIXepEwXCQOI5G8FSGq0oRl6-8XI
-Message-ID: <CAMuHMdU0em2r-SixT_+EpWJnm4f0g8mReYKBXOw42=HGb_T8WQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Finn Thain <fthain@linux-m68k.org>, Carsten Strotmann <carsten@strotmann.de>, 
-	Jakub Kicinski <kuba@kernel.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, davem@davemloft.net, 
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, chleroy@kernel.org, 
-	npiggin@gmail.com, mpe@ellerman.id.au, maddy@linux.ibm.com, 
-	linux-mips@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
-	linuxppc-dev@lists.ozlabs.org
+From: Vimal Agrawal <avimalin@gmail.com>
+Date: Thu, 18 Jun 2026 13:47:09 +0530
+X-Gm-Features: AVVi8CfMP8rMxQL0XcLqLoXczWFbvQxyECbTwafIL9yz3cgDeVOm4e8A1pZk9B0
+Message-ID: <CALkUMdSCpx_ywYCx_ePLdm6yioO1nQWx7sSM=AEgsq0kywHxTw@mail.gmail.com>
+Subject: neigh: poor scalability of forced GC when neighbour count exceeds gc_thresh3
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Vimal Agrawal <vimal.agrawal@sophos.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300350-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:andrew@lunn.ch,m:fthain@linux-m68k.org,m:carsten@strotmann.de,m:kuba@kernel.org,m:glaubitz@physik.fu-berlin.de,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[linux-m68k.org,strotmann.de,kernel.org,physik.fu-berlin.de,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-300351-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:dsahern@gmail.com,m:kuba@kernel.org,m:vimal.agrawal@sophos.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FORGED_SENDER(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,sophos.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[avimalin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid]
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 077B869E5DC
+X-Rspamd-Queue-Id: DEBAA69E623
 
-Hi Andrew,
+While investigating a soft lockup observed during neighbour table
+growth, I noticed that neighbour allocation latency increases
+significantly once the number of entries exceeds gc_thresh3.
 
-On Thu, 18 Jun 2026 at 10:01, Andrew Lunn <andrew@lunn.ch> wrote:
-> If the appletalk community can take the workload off the top level
-> maintainers, respond to all patches within 2 to 3 days, give
-> Reviewed-by, or make change requests, it can probably stay in the
-> Mainline kernel. Otherwise it will move out of tree.
+Test setup:
+net.ipv6.neigh.default.gc_thresh1 = 16384
+net.ipv6.neigh.default.gc_thresh2 = 32768
+net.ipv6.neigh.default.gc_thresh3 = 32768
 
-"2 or 3 days" is rather short.  If we would have to move all code
-maintained by people who cannot respond to all patches within 2 to
-3 days out of the mainline kernel, you'd end up with a networking
-subsystem without supporting OS ;-)
+I created approximately 50,000 reachable neighbour entries and
+measured time spent in __neigh_create(). Once the table size exceeds
+gc_thresh3, neighbour creation latency increases dramatically (in my
+testing, individual allocations can take >16 ms). Profiling shows that
+most of the time is spent waiting on tbl->lock, typically held by
+neigh_forced_gc().
 
-git grep three.*week -- Documentation/
+The relevant path is:
+static int neigh_forced_gc(struct neigh_table *tbl)
+{
+        ...
+        write_lock_bh(&tbl->lock);
+        list_for_each_entry_safe(n, tmp, &tbl->gc_list, gc_list) {
+                if (refcount_read(&n->refcnt) == 1) {
+                        ...
+In my workload, most entries are active/reachable and have refcnt > 1,
+so the GC walk scans a large portion of the neighbour table without
+reclaiming entries. As a result, the lock can be held for a long
+period while traversing the GC list.
 
-Gr{oetje,eeting}s,
+Another observation is that once gc_thresh3 is exceeded, every new
+neighbour allocation attempts a forced GC:
+entries = atomic_inc_return(&tbl->gc_entries) - 1;
 
-                        Geert
+if (entries >= gc_thresh3 ||
+    (entries >= READ_ONCE(tbl->gc_thresh2) &&
+     time_after(now, READ_ONCE(tbl->last_flush) + 5 * HZ))) {
+        if (!neigh_forced_gc(tbl) && entries >= gc_thresh3) {
+                ...
+Unlike the gc_thresh2 case, there is no rate limiting once the table
+is already above gc_thresh3. Under sustained neighbour creation this
+results in repeated full GC scans, further increasing contention on
+tbl->lock.
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Has this scalability issue been discussed previously, or is there a
+reason why forced GC above gc_thresh3 is intentionally not
+rate-limited?
+I would be interested in feedback before working on a patch.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+
+Thanks,
+Vimal Agrawal
 
