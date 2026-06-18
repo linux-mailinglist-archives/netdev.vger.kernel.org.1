@@ -1,230 +1,217 @@
-Return-Path: <netdev+bounces-300442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XgPFLC/1M2okJwYAu9opvQ
-	(envelope-from <netdev+bounces-300442-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:39:59 +0200
+	id DxMrOBb2M2poJwYAu9opvQ
+	(envelope-from <netdev+bounces-300443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:43:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282E16A0A57
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:39:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 583C46A0AB6
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:43:50 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=genexis.eu header.s=selector1 header.b=dvfuAyFS;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300442-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300442-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=genexis.eu;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=leemhuis.info header.s=key2 header.b="iKq9Z/96";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300443-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300443-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4383230FBBC2
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 13:30:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3FFAF30488C9
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 13:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2113DB332;
-	Thu, 18 Jun 2026 13:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335111DC985;
+	Thu, 18 Jun 2026 13:40:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11023097.outbound.protection.outlook.com [40.107.162.97])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905B93EFFC5;
-	Thu, 18 Jun 2026 13:30:11 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781789412; cv=fail; b=cjqTIMfWE6VGHLp3DjIO8E+XOwNpqLC54eBHhmfr8+kqNONbhG6WXJEQ7+Q12+CjpEVjoPj+NNfM7mPUmxTHhgoxKftQ/83gg4Cl4YcZ3xMvuc+0Q099lVR7SM2Twm4m5bUny6/muwzFYV7YEDfun5nvE6cWzrsWph+ebbaXFco=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781789412; c=relaxed/simple;
-	bh=vjamKVOZt3heAMSyoZM1OHnjVI4ZyqHR2VcLhMYp3U0=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dkZwU1lXEuwp3moSJf+lwEHJU5PD++ZUTlH0PXOS+Y7eHhJRol3c5IrUDaYAQoBAPuWivMOQcUsKoviTD8N7vrMB9D6fka9M2izQvc6I9dgpnJ2YRDBuzaMmeJN1t1+EFXpthSSwyAyieVQK4EchO+rUg1QDGSzmknz6Bo0jhOc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=genexis.eu; spf=pass smtp.mailfrom=genexis.eu; dkim=pass (2048-bit key) header.d=genexis.eu header.i=@genexis.eu header.b=dvfuAyFS; arc=fail smtp.client-ip=40.107.162.97
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CFwWqutA8m2SHF7NJ7OpWOJpd5eI0HrVjeTjn7EBc8qgKAKsm8U040dlt7gcWaPErtDRebTsZKmmJ6rWPeKSESYZTXBxUBRRLNJmbqlhI1xlnRJCsdMPQcpmP1GX5sF5Uii7YryhxikzxEWL5ygY3TOQ5mFwYHpOFfoM8CtzOFpmYFt3o9ZpUCtAqsqIu9nVeGzsXk2Tb+dfQ8MzTsvdNuz3ve0LWAFGQIqN2zkef+xwUBFQk4KOUB+vKB5gVdfmQpLwizEhmYfbDzRVy016BHndYUieUubcZV8/hAfLjy1KgJT2XZXsMB+aTQaVjaJAdHBn6/2p5+pblfofificrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NqzVZrxxdtCqsHmvyiTNgkuocxgpVTecJYfn7f0FxYk=;
- b=F0ixFGBZQE7m9TKPFBDT5ibUUUHUO6h9NIJoyCJbZsQB/Nt5Wxxs5hiyOhsqzscSHpc1D8575kbaTY/9YBKvoBlbcUwPJMmdIqCXVNnXu37WhhSbo2yka3piV3LaybJsPFTFLyaLAFq7jYmeNh7ug9PGM0Iex0zpGfQRgGvKWcEBcRWTYTYc3IEJkgctK5DuuBr+cmIxSLz0AFzu+HXLp2MX9S5iBQy8ZOxwQISRr3qJf8oHOADJv8FKnWhxzScPq/qU0HSV5gv8EQ6qt9JNWEMZ8kdOw1gN7PXcBRW7lgN/YK0SqF5LcYgMfCELccI9qhbHnk2T9fG8+d5LTRLMJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=genexis.eu; dmarc=pass action=none header.from=genexis.eu;
- dkim=pass header.d=genexis.eu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=genexis.eu;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NqzVZrxxdtCqsHmvyiTNgkuocxgpVTecJYfn7f0FxYk=;
- b=dvfuAyFSRxoK9s9lCEQa3DuzHayW5hoF/MktaQ8EVPxkKjsH/Xi2nojOqyjGjUa0w27fXfON8phWhgaa/IYkAJMns6y5+kCj25gRWnFLjqVLpm+Jdj6ddpJXewXNM78nsF8vIZOEN7KynllxeqBilF+/FYXOr7tzujK9FlukTJRar4t7bEXunPVCjaz2O3ds3Gwvfer9s9pr4jdqQjZyzF3Jq31wC90C18SlYYmGD9wUXSG1GMCBknKkIBkD0zuYJRjHlAHRXe/W2dDH4EL+bb6oOXX6z058vMsNkM7QASJ9jinmouNOJyWroKZ0tM3F5JJ4sk9nVmjL7OwdJ9A5dQ==
-Received: from DB9PR08MB6697.eurprd08.prod.outlook.com (2603:10a6:10:2ad::14)
- by DB9PR08MB8628.eurprd08.prod.outlook.com (2603:10a6:10:3d0::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Thu, 18 Jun
- 2026 13:30:06 +0000
-Received: from DB9PR08MB6697.eurprd08.prod.outlook.com
- ([fe80::bdec:3e95:6614:441f]) by DB9PR08MB6697.eurprd08.prod.outlook.com
- ([fe80::bdec:3e95:6614:441f%6]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
- 13:30:06 +0000
-Message-ID: <5a63af84-3f97-47a3-a39d-f0f2839c9f3a@genexis.eu>
-Date: Thu, 18 Jun 2026 15:30:04 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v8 11/12] net: pcs: airoha: add PCS driver
- for Airoha AN7581 SoC
-To: Christian Marangi <ansuelsmth@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Saravana Kannan <saravanak@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- llvm@lists.linux.dev, Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20260618125752.1223-1-ansuelsmth@gmail.com>
- <20260618125752.1223-12-ansuelsmth@gmail.com>
-Content-Language: en-US
-From: Benjamin Larsson <benjamin.larsson@genexis.eu>
-In-Reply-To: <20260618125752.1223-12-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: GV2PEPF00023970.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:158:400::332) To DB9PR08MB6697.eurprd08.prod.outlook.com
- (2603:10a6:10:2ad::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA253B27D7
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 13:40:14 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781790019; cv=none; b=RVFxcdfjDqQPbgB0VbX+6FcDdSaNH3/x8lt2tjwMQFCDxXchzT6LO2BLTh2Pf4qNjE/N1NjFQR5mr6IhMh5NnvZLlSVmsGA2oS3dF0h111Q1gkFHXDti9Xiicht6TzSqmosGyoCgiGxFWi+M+pTFL5qB7037ipV7vrBWjjS9e9M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781790019; c=relaxed/simple;
+	bh=E1YtVC8BP8jTDJwiEdVixAjfZCeN8YWyqEqMVhMlzY8=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=ZX/jb56G0QbYzHVwnnuXuU8KY9K1p+l/Bk7CPIlKllqLoLYZHGEJCP+GJ107U8yv6nr+29r8I8nCfTt2JXGIkOt/+7QFPIHSWjP5JDn7Lt7vfCzddTNd2sFXTidqtkga6lwGP4jtLfFSeyzV1aF14YZbiud1c8drtlCpSsUzPOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=iKq9Z/96; arc=none smtp.client-ip=188.68.63.102
+Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4gh2066jFmz6KVv;
+	Thu, 18 Jun 2026 15:39:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
+	s=key2; t=1781789990;
+	bh=E1YtVC8BP8jTDJwiEdVixAjfZCeN8YWyqEqMVhMlzY8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=iKq9Z/96lpRl85WPdhB72b97fHEm3C0s+5NN/kVcmnbtVJtlKGkdsVL6XpyW6mShy
+	 bafK0ZVMDPQFoflAdLUvLLSOnH/GIXo79jg7obQ78JZtMbVpJ8hhJ99G8flIFbPz3j
+	 3Fe9g8lP9U5tFgRKnvzsbwlpxekHVeRAdoJsLLYOzTzbZ69GeMYceTgIkmO2IB+3rP
+	 Z5RuXjlGfoa2WqZEHZasv2DNKtz1uy2NFAZZFy0Qua2YRaDqioChbQyGDPCM5buuV/
+	 y8kMB1VxtPP4XfeZbqBYbD/sjCN1ayv4hXToYUOVMtcHeVAYEJvtsPmw//XGaZ/yHk
+	 Zt2PJyCs/UIEQ==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4gh2043fX6z4yKl;
+	Thu, 18 Jun 2026 15:39:48 +0200 (CEST)
+Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4gh2036GYdz8sZw;
+	Thu, 18 Jun 2026 15:39:47 +0200 (CEST)
+Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
+	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 2D7BF5F941;
+	Thu, 18 Jun 2026 15:39:47 +0200 (CEST)
+Received-SPF: pass (mxe9fb: connection is authenticated)
+Message-ID: <ade91456-2f93-442c-b76c-28bd7157f074@leemhuis.info>
+Date: Thu, 18 Jun 2026 15:39:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB9PR08MB6697:EE_|DB9PR08MB8628:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e2268de-8b3e-42e1-ed66-08decd3db5e4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|23010399003|921020|18002099003|22082099003|56012099006|11063799006|4143699003;
-X-Microsoft-Antispam-Message-Info:
-	Irmb2hjIIAwBwjVUdCy+Tm17MG0gBpSXCi9Pe2PbOuY2SusbuxGrO3BONobAJdLk0zhkjuLf/VMJfR+6kp5G6k43/BCk7A/0MsMa3/Tk6KJJMCn3bvTtYWf90EAJqZJCPuqEUET4RG0Nl7eKkWeZs86sLNCof9Q96Z+wkbvcDjOr5vTy/X3ocRwR6PX+u+4py4XPcJ2BdiP1wHwQhD0Ic4tZcy54sDp5Hq0p5wivLzyrLFT20slKDuk9MYrXlz8MnI2F/cOmGt9NjAN5tWHsOtKDRxxOjoLrz+LJVAjbj+E8mch6xe41VSu3eu9vQIHdwEVwbfrEM+dS5oeA7Eo4Bohaech6s4/HaKxP8ly8B7uP0zCEN/4Xd0+KuJTlnX/WMMgq0Tz6xulgbLzDX3AZJRUA2I/f0T1zjee9VsrCmkRvJa6XiDLlcXaOiDVd4SxtUy63nbEoffB5AmCFjnZIbOjzl+3ZT9yPTZThtKR6rjCm9tWztZ7u+dR3XnowYxe8eCxOJEdAznHSZPQrl0AYeGws/R0S9NCwYREOYPUD0+TtqmO2y7jlZy+OHAqY2Vah4ZffwVc8Cx6d/I0ueHhIqGigHrlmDkxdusFxcGALlu/6ZEaYuhshEmN8UaD5usJtheC8XPxSuDHKeRITDYe/uZ1OZomB2i5yenkbdXN92Bny/SWhNc5CwXPRmXwNmbE9uncodlmPmUILeXmn4ac5v+jy+wuQ7bD+F5jGWKBZoBg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR08MB6697.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(23010399003)(921020)(18002099003)(22082099003)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WUw0VEJ0Y3ZleFBXcDMrUzI3VkhGTysvR2JyME42eWlVdTZrbjRmdmxNUC9h?=
- =?utf-8?B?eDl3dHdZSDlQTXpDZUU3UDUwZFV1a1c2aXN1V0dmRHE0Z0JVSUJCbmY0UFJY?=
- =?utf-8?B?dlJNN2Y0RTNYcFUvb2Q4RUJoSkNvd1NKYm9aQmRxSWZsdkZXNmEzU0cyVWZX?=
- =?utf-8?B?UG5IZ3FDZDdQbHNLWnhHVE5hMVh0SUQzSE5hdldnZ05GRFN0M2ZZS2NQL1Vu?=
- =?utf-8?B?dkI0c0Y0VkYxbk44WmRqcGZHeXEwQlpyRE5GOXBacm42NFNtKzRCKy8yVHg4?=
- =?utf-8?B?RHhScHpnY2d3NHRySGh1Z2l3L1JqZnN4RzFIdzd0emExb3gva2NrSlFFWFBh?=
- =?utf-8?B?d3p5VkZlWU44SWZXZFdZUFNqQVJNSHc1MlNZVTRYdDdROE1ZNnJXKy8vemtY?=
- =?utf-8?B?WDNZK2Nta1FZSE1xMEl6RGdEaExiTlc4K0twZGZva1FhOE1Mc0RYcExqTTY1?=
- =?utf-8?B?NEFleFF4YUJ6NDNtQ2VoYnowTC9TSW1EQmFoN1dWYXlVbDRNbEJBR0Jva0lV?=
- =?utf-8?B?ZWE1VVg4LzQ3R2lIZEVQU3F2MlAzK2Rya1FpRnZvTXFVejJwRTBOUUlIRTBI?=
- =?utf-8?B?Z2xKUWJNeXU1c0J5ZXhCZ3E3YytsSS9MYjE1UmQ3N3dzSHFNZjBKUE9qRG9P?=
- =?utf-8?B?am43SWFRMDFCTnF2aW96T0pJalJVSkl0WlZmLy9tUFArc2cydVBMY1FPTXRo?=
- =?utf-8?B?WlpraUYzOERPbjBxc2szSW1seDhLV1lCWHFXc3hGaHM3K094ZE5xMTVuZEhK?=
- =?utf-8?B?aDY1TFY5NGs3b3g0OWFJTHJvY29ROEo0OWxIQktHalp6SmFwUjBpQ1lxQWt4?=
- =?utf-8?B?bHMzbUxRTkFNM3RsSmJCK2NvTWpKMzBPTmpzRXpqYUJPdUVZQ3B0TDNLSE9J?=
- =?utf-8?B?OXZRVjlFN0F5cDdML3k5NEM2SHBBSStwVUtsQkpGeDRoTW8yZURTVm1INCt6?=
- =?utf-8?B?UzMyem4xODZzS0NmaUN0Vmtxc3pYK2kvcDl5ZGM3WUZUL2NYZ1JDNFFQclk3?=
- =?utf-8?B?NGdmSG9aR1BUaFc3ZVM5dEFFandFOE0wcklRdEhlczhCKzQzb1crUmxlc1d5?=
- =?utf-8?B?MDI0Y1F1S1ViQWhqVURpeVhzVDBBN0ZMalA1RUl1V2dvc3kwSFA3azZ0NGlU?=
- =?utf-8?B?dnRjSk12ZjZMNU45TEtHbGdrOFRpNzhob3hTOW40T3VpYWZiTHRaS3BvN0JF?=
- =?utf-8?B?NC9DMXNSQXlPY0lEdS9pbDlQYkdFUW5YOVQzUEdjZjR3S0UrTkc2TkpjSmFn?=
- =?utf-8?B?OWkwbDQzUURQb0pYTDBSMHllMXdYWm0xbVExaEFMRHRLN1NEMjNTS0RyNHBH?=
- =?utf-8?B?T3lReGZ2aGJJTk8yMFh2RDBNcVFGbHUwSGQ4Q3Vwb252a0VOZDhEY1RaemJn?=
- =?utf-8?B?QitmTjVZR0RUQ1QyOHpoT0x5U3ZRMjVTRjQ2eE1tU0ZrYTZtb29Obi9uVVc3?=
- =?utf-8?B?SktiUFR1L2M5RUtYcXVkcmZjaEFzWGFjQjRLNnhoOGlmcWliTkplNExwdGpk?=
- =?utf-8?B?RXZPM3ZvRFVKWStQZm9obVhMODJzaEo3emJnL2x0K01zMmFtelkyNkdmS3VB?=
- =?utf-8?B?UEYrdldtSVdhUEZ0Ry9QNmdvTDRhU1FIdHJ3cXlsVDczdTZTaDlzSk54TDJy?=
- =?utf-8?B?MUZaTk1ma25UUmYwTzF1eHlGRjhYRWtUOW5Cb2RWdTg2M1JTck5xcWlNNXhZ?=
- =?utf-8?B?dHlCdmpLWHYrS2l6VjNaaThvbjJOY2tpbmkwN0lPSXRkT2xER1RRSGdvMFdM?=
- =?utf-8?B?YjVSTzFwOXBCY0hhYkt2Y0k2NHd0aXdKdndoYWxlZlBDa0o2VHU4Q2NrWms1?=
- =?utf-8?B?cnZzYXRKbFFNRFRwVktxNDlUdWxLeVV1eEFjUWdvWTE4bVBPeFJWWjIrNWxQ?=
- =?utf-8?B?cGVuSjM5SURhQmFFeS9RSHpRR3FBaTMvYlgrRHV4QzNvRGRET0RzaHkxdlBi?=
- =?utf-8?B?b0pHZVVWVlUzWWZ2aHVGTGRUNjZCNkNBUVZSc2ZwUU1QQ2luRjNsTkZocEJp?=
- =?utf-8?B?MzJmaWpwZWV5UjJEN0V5MTlVOHlCSFpYN0lJRmN0UEVMZ2xveW5RcFVqazRM?=
- =?utf-8?B?ZnVxc2VOZVF2RXRkSkxRaWsxa1VsTUZ4emNrYWhCRDBEUWVqYmU4bWhiYkFj?=
- =?utf-8?B?WUpEQUVnNFJDV0JWbE5Dbi9PSmQ5TytJTnY3UlpEWlZCcjB0L09rcWw1VS9w?=
- =?utf-8?B?KzNWT0sxNXVackVtNDhVNzdYUll0U1hBRlV0VWhnMTdySithYjlNNXVDWDZG?=
- =?utf-8?B?QndIRWJkVjRlN3dNQWpUZm1MVFdSaklGdDY2amRyajNoMGV2Q0tza3llZHZz?=
- =?utf-8?B?ZDBvNjVOTldBb3Z0OGdJOHY2b1I0WWJKSjRrejhwbDlQL3VFSzRyTkgwNUll?=
- =?utf-8?Q?HmTINJnhtJ2CUBt0=3D?=
-X-OriginatorOrg: genexis.eu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e2268de-8b3e-42e1-ed66-08decd3db5e4
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR08MB6697.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 13:30:06.3484
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8d891be1-7bce-4216-9a99-bee9de02ba58
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vizWWE/4EaRHshpvi5R2sKa3dJHxEqwucEBMHtjQeLwCYdFf1nf0aSnbXHw3aaOtO2NHq/k7tatr8eX4vixV+20+9Cn7PCxU81V7+/hkdeE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8628
+User-Agent: Mozilla Thunderbird
+From: Thorsten Leemhuis <linux@leemhuis.info>
+Content-Language: de-DE, en-US
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 MEK4
+To: Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev <netdev@vger.kernel.org>, Riana Tauro <riana.tauro@intel.com>
+Subject: building ynl afaics requires updating the UAPI headers first
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: 
+ <178178998747.2030643.15971267552177160941@mxe9fb.netcup.net>
+X-NC-CID: 8A4goW+hEIDtnhAwm1EbEXTMSvecIgmOEa/5iGkjAOxKrAKhBhg=
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[genexis.eu,reject];
-	R_DKIM_ALLOW(-0.20)[genexis.eu:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300442-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300443-lists,netdev=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,leemhuis.info:dkim,leemhuis.info:mid,leemhuis.info:from_mime];
+	DMARC_NA(0.00)[leemhuis.info];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,linuxfoundation.org,armlinux.org.uk,pengutronix.de,vger.kernel.org,lists.infradead.org,lists.linux.dev,bootlin.com];
-	FORGED_RECIPIENTS(0.00)[m:ansuelsmth@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:robh@kernel.org,m:krzk+dt@kernel.org,m:conor+dt@kernel.org,m:horms@kernel.org,m:corbet@lwn.net,m:skhan@linuxfoundation.org,m:lorenzo@kernel.org,m:hkallweit1@gmail.com,m:linux@armlinux.org.uk,m:saravanak@kernel.org,m:p.zabel@pengutronix.de,m:nathan@kernel.org,m:nick.desaulniers+lkml@gmail.com,m:morbo@google.com,m:justinstitt@google.com,m:netdev@vger.kernel.org,m:devicetree@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-doc@vger.kernel.org,m:linux-arm-kernel@lists.infradead.org,m:linux-mediatek@lists.infradead.org,m:llvm@lists.linux.dev,m:maxime.chevallier@bootlin.com,m:andrew@lunn.ch,m:krzk@kernel.org,m:conor@kernel.org,m:nickdesaulniers@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[benjamin.larsson@genexis.eu,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:kuba@kernel.org,m:donald.hunter@gmail.com,m:netdev@vger.kernel.org,m:riana.tauro@intel.com,m:donaldhunter@gmail.com,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[genexis.eu:+];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	FORGED_SENDER(0.00)[linux@leemhuis.info,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[benjamin.larsson@genexis.eu,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@leemhuis.info,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[leemhuis.info:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt,lkml];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,genexis.eu:dkim,genexis.eu:mid,genexis.eu:from_mime]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 282E16A0A57
+X-Rspamd-Queue-Id: 583C46A0AB6
 
-Hi.
+Hi Jakub, Donald! During the past few weeks I two or three times ran
+into errors when building ynl as part of my daily -mainline/-next builds
+based on a srpm pretty close to the kernel srpm used in Fedora rawhide.
+Today I for example ran into this:
 
-On 18/06/2026 14:57, Christian Marangi wrote:
-> Add PCS driver for Airoha AN7581 SoC for Ethernet/PON/PCIe/USB SERDES
-> and permit usage of external PHY or connected SFP cage. Supported modes
-> are USXGMII, 10G-BASER, 2500BASE-X, 1000BASE-X and SGMII.
-> 
-> The driver probe and register the various needed registers and register as
-> a PCS provider for fwnode usage.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->   drivers/net/pcs/Kconfig                    |    2 +
->   drivers/net/pcs/Makefile                   |    2 +
->   drivers/net/pcs/airoha/Kconfig             |   12 +
->   drivers/net/pcs/airoha/Makefile            |    7 +
->   drivers/net/pcs/airoha/pcs-airoha-common.c | 1324 +++++++++++++
->   drivers/net/pcs/airoha/pcs-airoha.h        | 1311 ++++++++++++
->   drivers/net/pcs/airoha/pcs-an7581.c        | 2093 ++++++++++++++++++++
->   7 files changed, 4751 insertions(+)
->   create mode 100644 drivers/net/pcs/airoha/Kconfig
->   create mode 100644 drivers/net/pcs/airoha/Makefile
->   create mode 100644 drivers/net/pcs/airoha/pcs-airoha-common.c
->   create mode 100644 drivers/net/pcs/airoha/pcs-airoha.h
->   create mode 100644 drivers/net/pcs/airoha/pcs-an7581.c
-My comment that the files should be renamed now instead of later when 
-support for other airoha platforms are added still stands. The common 
-code is not common among other platforms (EN7523 as example).
+"""
+> [...]
+>         GEN_RST team.rst                                                                                                            
+>         GEN_RST wireguard.rst                                                                                                       
+>         CC binder-user.o                                                                                                            
+>         CC dev-energymodel-user.o                                                                                                   
+>         CC devlink-user.o                                                                                                           
+>         CC dpll-user.o                                                                                                              
+>         CC drm_ras-user.o                                                                                                           
+> drm_ras-user.c:19:10: error: ‘DRM_RAS_CMD_CLEAR_ERROR_COUNTER’ undeclared here (not in a function); did you mean ‘DRM_RAS_CMD_GET_ER
+> ROR_COUNTER’?                                                                                                                       
+>    19 |         [DRM_RAS_CMD_CLEAR_ERROR_COUNTER] = "clear-error-counter",                                                          
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                                                                    
+>       |          DRM_RAS_CMD_GET_ERROR_COUNTER                                                                                      
+> drm_ras-user.c:19:10: error: array index in initializer not of integer type                                                         
+> drm_ras-user.c:19:10: note: (near initialization for ‘drm_ras_op_strmap’)                                                           
+> make[1]: *** [Makefile:52: drm_ras-user.o] Error 1                                                                                  
+> make[1]: *** Waiting for unfinished jobs....                                                                                        
+> make[1]: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl/generated'                                       
+> make: *** [Makefile:28: generated] Error 2                                                                                          
+> make: Leaving directory '/home/kbuilder/ark-vanilla/linux-knurd42/tools/net/ynl
+"""
 
-MvH
-Benjamin Larsson
+DRM_RAS_CMD_CLEAR_ERROR_COUNTER was introduced to mainline yesterday as
+ee18d39a087792 ("drm/drm_ras: Add clear-error-counter netlink command to
+drm_ras") [v7.1-post].
+
+I finally looked closer today and noticed how to prevent this: update
+the kernel's UAPI files (e.g. the stuff that lives in /usr/include/) on
+the builder. Thing is: that's basically impossible to do from a srpm, as
+those should not change the build environment and can't even when
+working as non-root.
+
+Note sure if relevant and just a shot in the dark, so maybe ignore the
+following:
+
+While investigating this I noticed this comment in
+tools/net/ynl/Makefile.deps:
+
+"""
+> # Try to include uAPI headers from the kernel uapi/ path.
+> # Most code under tools/ requires the respective kernel uAPI headers
+> # to be copied to tools/include. The duplication is annoying.
+> # All the family headers should be self-contained. We avoid the copying
+> # by selectively including just the uAPI header of the family directly
+> # from the kernel sources.
+"""
+
+Is that maybe not the case anymore with the recent changes to ynl?
+
+Ciao, Thorsten
 
