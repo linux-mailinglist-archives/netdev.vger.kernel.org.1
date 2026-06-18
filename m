@@ -1,97 +1,94 @@
-Return-Path: <netdev+bounces-300513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id QEeQDzUqNGqRQQYAu9opvQ
-	(envelope-from <netdev+bounces-300513-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 19:26:13 +0200
+	id JwkzKxs3NGoMRwYAu9opvQ
+	(envelope-from <netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:21:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF7D6A1EDE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 19:26:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2D86A21D0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:21:15 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=amd.com header.s=selector1 header.b=NFJOakan;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300513-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300513-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=amd.com;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=jrife-io.20251104.gappssmtp.com header.s=20251104 header.b=M1Mp5VeL;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C8B13083024
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 17:24:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6113C306DEC5
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6C7348C48;
-	Thu, 18 Jun 2026 17:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5656395ADE;
+	Thu, 18 Jun 2026 18:20:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010002.outbound.protection.outlook.com [52.101.56.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B1B280A56;
-	Thu, 18 Jun 2026 17:24:40 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781803482; cv=fail; b=pgWg3Zv/ins423/wb1zW3OWtkJX9Veh7gM73EKPLLed4AC5izY3zjV/FlczE7g+a2VrPL8NXKU0pkWkuUnhFY28DPTyeKq9K5NkeOnjRVJiAbe4IkwEupUqfENR4N5phRTf6/kJrY3DG63JDYR7dajfzH9g2X/jmywwAYlu57EI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781803482; c=relaxed/simple;
-	bh=BfzjSc63FwBZPueoci0VJ1WLLfFoV+txwsPw/Ssr+Xg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cWUl+9vQXJtoZvqhLPMdpX3empy824g1JwyaoA3/jO/I4ja8jGyLqBeLSHiOluL6qqWA/DOvmRVnZ5xSzzYAgYiCVBh0Avr65BzMhbTmrcSkVarAu2A8y5pK3WQfz0yBJugsM7IKMLyQAdmv1jbp2edKDtgG9Y73W+dk45ZqIZc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NFJOakan; arc=fail smtp.client-ip=52.101.56.2
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R7F7YiyhxiVHbgE1qp7eDRqAGa3Fhecs5sfG6vJh6E2KjWljyv0532ynZKz06cMsnUAgUw5XrrkAMRAaW3Vt3UtzAFo19qGAvDxu9iKpIB09D2p1bBNCbr3vUtuPSj5nCBcHDwAvwDYd+b4UTXQWVxO7KgefhrMc8aJ9Mgvjt/G7kB39oisCvDxOh0amLiNUfULxAM08dU1XvsgWKlytKVliv7sPiteTNjr+RlNIOa3PIKvY2Aw49EWDzAo/E2g1j/yFLFpmOBQ9C+5HTXE1Fe5sjmqhpuLUFeKGNbINSiNv6tA30D5bU2YuGmk1E4IAskBs98C5BKyLU6d3D/MNCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QDQbikAnb7EG98f9l8ft7l3MvDMlev9j0KhpyYB3fBA=;
- b=UZzymi0lSuXTOqcoLn/hg69gJXfuQqDZ9/OJbPkH32mTc4FEUTFam+0KvElD9nj6KbnWHuEEOVtxvdATVuwVGpMewvlVWNkizdgyjmRe5R9JXsMaXAOuZPOwNuYo47eEWySLXIpqs+ryO1f5IE5ObV6zUBX87eAjtEzz7Az4x2w3CIYlc9cIdceHoCT+bXZ97yW7pqRG9NIVLATlFmQp8Us17WOT1pEYb8hkXBnmJyM8lv4vTtbBtZzzako6eQwzlnunzCunqyVGbzMPK4STffS3MNVXvjvRvsEld6tAFGrF7kSyMTK2YKnYaTwjMv7+8vwa2YYi9DXFXl4pGoYkMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QDQbikAnb7EG98f9l8ft7l3MvDMlev9j0KhpyYB3fBA=;
- b=NFJOakanaw4OyHXo6588Cm8sbOLcKPf0F2VOz16f/Gp3w3Pc6jIjpra7/C5OtGbnMkVfWm7GVxmFTpzZK53ahVLG/CGslYvA+U9Ch9zqBG3J4icjKIScq6KcFI1+EVPdWamz6bNYVE0Wp3NqIROl0L1DnEvIKfb7+GcACngMcgs=
-Received: from SA0PR11CA0123.namprd11.prod.outlook.com (2603:10b6:806:131::8)
- by SA3PR12MB8802.namprd12.prod.outlook.com (2603:10b6:806:314::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.12; Thu, 18 Jun
- 2026 17:24:32 +0000
-Received: from SA2PEPF00003AEA.namprd02.prod.outlook.com
- (2603:10b6:806:131:cafe::83) by SA0PR11CA0123.outlook.office365.com
- (2603:10b6:806:131::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.11 via Frontend Transport; Thu,
- 18 Jun 2026 17:24:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SA2PEPF00003AEA.mail.protection.outlook.com (10.167.248.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Thu, 18 Jun 2026 17:24:31 +0000
-Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 18 Jun
- 2026 12:24:31 -0500
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
- (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 18 Jun
- 2026 12:24:31 -0500
-Received: from galena-46a8.xcblab.xilinx.com (10.180.168.240) by
- satlexmb07.amd.com (10.181.42.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.41 via Frontend Transport; Thu, 18 Jun 2026 12:24:30 -0500
-From: <alejandro.lucero-palau@amd.com>
-To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>, <djbw@kernel.org>,
-	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, <dave.jiang@intel.com>
-CC: Alejandro Lucero <alucerop@amd.com>
-Subject: [PATCH v28 5/5] sfc: support pio mapping based on cxl
-Date: Thu, 18 Jun 2026 19:18:06 +0100
-Message-ID: <20260618181806.118745-6-alejandro.lucero-palau@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260618181806.118745-1-alejandro.lucero-palau@amd.com>
-References: <20260618181806.118745-1-alejandro.lucero-palau@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D136376BF1
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 18:20:40 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781806844; cv=none; b=bCa9wyj2sn9g/K1bVdVcGLpCtQ+G6/Y2T8srQrwW9d9/Tgpf40z8RqG+ngeCfMwAVRSa7xKbVxuFoFTlfPMndvdODndC8Kj3O6KueDxO/rVl92vrSFKDVE+xrK7QTCYHwPhOpqvBHHyXNTNBCT8al82PVcWroVsIVXAzCg+TB3Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781806844; c=relaxed/simple;
+	bh=KLWSy+uOiu8A6irIA3J6az/xmGCIyZRKBNJ3RGdXe6Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vD2taw+iys7JUnqiuPIEZ+V/XA6LZtqlTxjugKns4Syfzh9E6TEMeKpsGuGMw6SGra1g2EK3JTV8/5hsYC4uNH4DnAcM57nP62XiQsSFgYbp1KvoBhEFu1Pn2QrOjZhU3UWVtHicNcY7CNtMTJElONx0PiUoxRk1HSUg3NfI7Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=M1Mp5VeL; arc=none smtp.client-ip=74.125.82.170
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-30bee4c0088so91792eec.3
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 11:20:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1781806839; x=1782411639; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lxfXRAD4Q8BkMmwZ9NjvqUwhKA17UvJt+JpE+ccCIUc=;
+        b=M1Mp5VeLQs1KwHfwUcSIOGfQN/ieYY25ARpditbcDt/17slj/Es+ONpj+KgwGRw0SY
+         Q6suvDB3IMEVCkswpDRIwBBBzYQoZqKuEjMtah2tX0E9tKD7vpVxUw65ochl8F1lP4tv
+         YYv4ES+cIoKIjSux4nw3g23/UceEfeii3HdX/XOsM6OW+dbSiEAnhC9SuVV3FZBMdMn4
+         tNcqsLU4klpC7+3lqTxRfyu2qZSbEXXdal6LNvSLy7ZuNibn/jvgM1D+3rxMqbdz4NYq
+         TO6Ak5CtOiIHNPyj6069VmY9otO+MfGnDmbqxlQeHAsrTyOBRlbwgRcQRVuHduYfc4gF
+         2mSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781806839; x=1782411639;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lxfXRAD4Q8BkMmwZ9NjvqUwhKA17UvJt+JpE+ccCIUc=;
+        b=AIwcTjT+XDNpyhiAYFjAO/Y6JU0j717My8tjmjGMpefM67lHG2RuLkQ9gSep8EXZsR
+         pHD7t+A0KZsbLhi2LF/f6/omMbK+4mF/ztIyzaIwQl5QCuAUg/yea/arKZmd9gahpCvs
+         zHzDafrqS6iAf3BsL4XQwdbv9vQQJc5aI1QldyczJKtbJauV+W6fiObOnJ2VtLQThU8C
+         Fey6IpJ1ESFXuP3jt7WAZfM+CYdyIxgaQEafqT4qod4WGNgAFcl0Nl/NBXqbNbTaVnGM
+         OKaP6R47vzddIlA8Qfb2zhLM7SmGvItqru+xkhAzIIOi8OEIkwKOsPdys1OZfRghVFO9
+         8Rtg==
+X-Forwarded-Encrypted: i=1; AFNElJ9YJUhv/w3IbsDLWuv6f7MlXn4Nqfe/QJa51r27iybW8jU/SoBXCWLYfvz8Fd2wf/qQRAc4q+o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCX1dQq96NGIpueot9Abl9YgUOVDMwAaofM05W/3fZ5W65WQIu
+	suOxwTtUp38zbNmISxpsANsixrpUpKwxOtRTZfycBKhtM2NmhGLgR1q6mP25FrhB6yg=
+X-Gm-Gg: AfdE7cnBGJyp+wSYaW4mjgEd5pZrrN2cKpdQU3qgTVvfy7qeWrvLZAJU34RKrlup/Ts
+	Me8ak+1HTbpa+TCUCfSNEIWdI+HmzkjUYuHEQMSTyj4ctAJCCV2MH6cIp/3nU1a/2prNqier9D4
+	CdiorQrlaMNNIRIl2hG03b+XTnz+l2Qe32yPiE+XtBzGNdgn+GmPq0FRsOqLovP8K24rKTDP9N2
+	Tpb/Yo/2R+KbUkuIw8uebUKWsdB5AURxUd/GxS9COi4RvYUZW9R59BjPnog+69tJPynGPqxFu7B
+	z1O0NUb/FfS/zAYVcDezFI/LtlHnArTxA92HOG4M4EPtxLohTfqDSLolY4NvH8qlOeKyqis5dkw
+	pcYqq3Bsot9eYiPrzsCfoa0NLhnv5dGieFo2xcWPMqgUWHtmHoGpi63fOqXNIRq+MpPNkvF+V8a
+	gmP0Fn6x61rtw=
+X-Received: by 2002:a05:7300:220d:b0:30b:ab02:9e5d with SMTP id 5a478bee46e88-30c071939edmr123634eec.6.1781806839191;
+        Thu, 18 Jun 2026 11:20:39 -0700 (PDT)
+Received: from t14.. ([2001:5a8:47ec:d700:1b1d:38b6:64b7:ee72])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c06c33c88sm205950eec.19.2026.06.18.11.20.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 11:20:38 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	netdev@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Paul Chaignon <paul.chaignon@gmail.com>
+Subject: [PATCH v2 bpf-next 0/2] bpf: bpf_redirect_peer egress redirection
+Date: Thu, 18 Jun 2026 11:20:31 -0700
+Message-ID: <20260618182035.43811-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,233 +96,171 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003AEA:EE_|SA3PR12MB8802:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6192a44-4010-44fa-0a2a-08decd5e75ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|23010399003|1800799024|36860700016|82310400026|3023799007|18002099003|22082099003|56012099006|11063799006|6133799003;
-X-Microsoft-Antispam-Message-Info:
-	Ovsd8M+DLCqedcXOvLjLWI0hArluq+4VXp6Z6jRPXFTQPleOVtSv8Hxw3BLbNYh0NR75u9M0jq5saJdkPXI3v8F9tM1M9NoUh15Tqjvbf2JQqeonxyUXB/hm5jKDI/PS0l3tMo2cybtOym9I2o+Eis+b70IM5E/mufvD8z78JpR84DcD7TyjIV2R/oHAqUJZ7vLHvd7r1va7mBtu1f++Ea4pOnZa0G6Difhtx89F2BCxpC2rujX2Wsm9rq6g0KKyCYedCqjPZ48RaEM0MlkHxDjcp+qPb5SCsUZu9UcQLKPkJ81iWt8LNPzD0uDEDbFbhr4+bcpDSyfqyyjz65Wl1aRVyti5xymBE0PWPDPrw9S6I6iCryPNtwnUgQJVoD8xh4C6q4euFwZkDF1vTEtbcIr++cIBovhTuFLV3/AbZGlYY5sRgglTyNTRwsIMJIi8jfhOOM3Nqg9Jz/yWigKiBcFUXZ6+U17CwMjoti9d5Gcx113ihxq+0CFJ4AmeqF9GY31ZyWf57ivFPWVBmSudQZEXSMqLF/+JIogVF/sCldPyD9CfpSiBOvLguGV6u2E9rBmd8t9g01B2E395fj0jdgu99bOmd4AVPB2eTObq9Bn2lPFvR1/luvRqajSkgLZBte5kynfbF2ZIPBjsXV/xYYZ1HSrOH5QhET05kxUZyovapl2UJ9uExXhKjWns/xQDlWEjSU/xgsb9L5ex44cke1veLVVeIL1KdZf+oi/U7eg=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(23010399003)(1800799024)(36860700016)(82310400026)(3023799007)(18002099003)(22082099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	xbsC3WJ+AGr8C4qI+afQo4ZdiWMsGH6DETBS1/G0hIqESrq+cPkgSGqRs4etd9TTpNPP49siCgIkKlUKvCnpihIY7jcTx0NqtYRrtRhtOuPff1jMvdpjucZA0jylvIa2vzdL9DSzb/395ELllDJISRYVybjm7PmzxmhJ7k3fg6Rdv8wKR8hBTZEzIm5nlJnkU4il9+rNrk2TcY/MoRDxo72fmQH8lZ/+Qf/cD7nVzp2EswXzNP0Rl9PbZUe5QM3pi2H2ha6vE9uyFqm4hikKUQLMGEP5lhy+uuzgm1KceHQv/hBcWM9pV4zfTCbGTsMcc9sBMIyZfgoUNgZcRbEQIvPX+wzt1X7Tb0/OGLNRjtpragNFjGpSlkKDLP1iW0uXWa9ZnSd1DhL4M13FewUTuuhNarBkMiCBcqt0AlRrUpGLI5WHf2Sm9X5z6IoqcQLZ
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2026 17:24:31.7721
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6192a44-4010-44fa-0a2a-08decd5e75ad
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003AEA.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8802
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[jrife-io.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS(0.00)[m:linux-cxl@vger.kernel.org,m:netdev@vger.kernel.org,m:djbw@kernel.org,m:edward.cree@amd.com,m:davem@davemloft.net,m:kuba@kernel.org,m:pabeni@redhat.com,m:edumazet@google.com,m:dave.jiang@intel.com,m:alucerop@amd.com,s:lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[jrife.io,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,fomichev.me,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300513-lists,netdev=lfdr.de];
-	FORGED_SENDER(0.00)[alejandro.lucero-palau@amd.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-300518-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:jordan@jrife.io,m:netdev@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:sdf@fomichev.me,m:jiayuan.chen@linux.dev,m:paul.chaignon@gmail.com,m:paulchaignon@gmail.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[jrife.io];
+	DKIM_TRACE(0.00)[jrife-io.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,amd.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alejandro.lucero-palau@amd.com,netdev@vger.kernel.org];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,jrife.io:mid,jrife.io:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,jrife-io.20251104.gappssmtp.com:dkim]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 8CF7D6A1EDE
+X-Rspamd-Queue-Id: 4F2D86A21D0
 
-From: Alejandro Lucero <alucerop@amd.com>
+We have several use cases where a pod injects traffic into the datapath
+of another so that the traffic appears to have originated from that
+pod. One such use case is a synthetic flow generator which injects
+synthetic traffic into a pod's datapath to enable dynamic probing and
+debugging. Another is a transparent proxy where connections originating
+from one pod are redirected towards another which proxies that
+connection. The new connection is bound to the IP of the original pod
+using IP_TRANSPARENT and its traffic is injected into that pod's
+datapath and handled as if it had originated there. This can be used for
+mTLS, etc.
 
-A PIO buffer is a region of device memory to which the driver can write a
-packet for TX, with the device handling the transmit doorbell without
-requiring a DMA for getting the packet data, which helps reducing latency
-in certain exchanges. With CXL mem protocol this latency can be lowered
-further.
+We use bpf_redirect(BPF_F_INGRESS) to direct traffic leaving the proxy,
+flow generator, etc. towards the target pod, ensuring that eBPF programs
+that are meant to intercept traffic leaving that pod are executed.
+However, this doesn't work with netkit.
 
-With a device supporting CXL and successfully initialised, use the cxl
-region to map the memory range and use this mapping for PIO buffers.
+With netkit, an ingress redirection from proxy to workload skips eBPF
+programs that are meant to intercept traffic leaving the pod, since they
+reside on the netkit peer device. One workaround is to attach the
+same program to both the netkit peer device and the TCX ingress hook for
+the netkit pair's primary interface, but
 
-Signed-off-by: Alejandro Lucero <alucerop@amd.com>
----
- drivers/net/ethernet/sfc/ef10.c       | 41 ++++++++++++++++++++++-----
- drivers/net/ethernet/sfc/efx.h        |  1 -
- drivers/net/ethernet/sfc/efx_cxl.c    |  1 +
- drivers/net/ethernet/sfc/net_driver.h |  1 +
- drivers/net/ethernet/sfc/nic.h        |  3 ++
- 5 files changed, 39 insertions(+), 8 deletions(-)
+a) This seems hacky and we need to be careful not to run the same
+   program twice for the same skb in cases where we want to pass that
+   traffic to the host stack.
+b) We're trying to keep the proxy redirection / traffic injection
+   systems as modular and separated from Cilium as possible, the system
+   that manages netkit setup and core eBPF programming.
 
-diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
-index 7e04f115bbaa..73bc064929f6 100644
---- a/drivers/net/ethernet/sfc/ef10.c
-+++ b/drivers/net/ethernet/sfc/ef10.c
-@@ -24,6 +24,7 @@
- #include <linux/wait.h>
- #include <linux/workqueue.h>
- #include <net/udp_tunnel.h>
-+#include "efx_cxl.h"
- 
- /* Hardware control for EF10 architecture including 'Huntington'. */
- 
-@@ -106,7 +107,7 @@ static int efx_ef10_get_vf_index(struct efx_nic *efx)
- 
- static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
- {
--	MCDI_DECLARE_BUF(outbuf, MC_CMD_GET_CAPABILITIES_V4_OUT_LEN);
-+	MCDI_DECLARE_BUF(outbuf, MC_CMD_GET_CAPABILITIES_V7_OUT_LEN);
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
- 	size_t outlen;
- 	int rc;
-@@ -177,6 +178,12 @@ static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
- 			  efx->num_mac_stats);
- 	}
- 
-+	if (outlen < MC_CMD_GET_CAPABILITIES_V7_OUT_LEN)
-+		nic_data->datapath_caps3 = 0;
-+	else
-+		nic_data->datapath_caps3 = MCDI_DWORD(outbuf,
-+						      GET_CAPABILITIES_V7_OUT_FLAGS3);
-+
- 	return 0;
- }
- 
-@@ -1140,6 +1147,9 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 	unsigned int channel_vis, pio_write_vi_base, max_vis;
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
- 	unsigned int uc_mem_map_size, wc_mem_map_size;
-+#ifdef CONFIG_SFC_CXL
-+	struct efx_probe_data *probe_data;
-+#endif
- 	void __iomem *membase;
- 	int rc;
- 
-@@ -1263,8 +1273,23 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 	iounmap(efx->membase);
- 	efx->membase = membase;
- 
--	/* Set up the WC mapping if needed */
--	if (wc_mem_map_size) {
-+	if (!wc_mem_map_size)
-+		goto skip_pio;
-+
-+	/* Set up the WC mapping */
-+
-+#ifdef CONFIG_SFC_CXL
-+	probe_data = container_of(efx, struct efx_probe_data, efx);
-+	if ((nic_data->datapath_caps3 &
-+	    (1 << MC_CMD_GET_CAPABILITIES_V7_OUT_CXL_CONFIG_ENABLE_LBN)) &&
-+	    probe_data->cxl_pio_initialised) {
-+		/* Using PIO through CXL mapping */
-+		nic_data->pio_write_base = probe_data->cxl->ctpio_cxl;
-+		nic_data->pio_write_vi_base = pio_write_vi_base;
-+	} else
-+#endif
-+	{
-+		/* Using legacy PIO BAR mapping */
- 		nic_data->wc_membase = ioremap_wc(efx->membase_phys +
- 						  uc_mem_map_size,
- 						  wc_mem_map_size);
-@@ -1279,12 +1304,14 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 			nic_data->wc_membase +
- 			(pio_write_vi_base * efx->vi_stride + ER_DZ_TX_PIOBUF -
- 			 uc_mem_map_size);
--
--		rc = efx_ef10_link_piobufs(efx);
--		if (rc)
--			efx_ef10_free_piobufs(efx);
- 	}
- 
-+	rc = efx_ef10_link_piobufs(efx);
-+	if (rc)
-+		efx_ef10_free_piobufs(efx);
-+
-+skip_pio:
-+
- 	netif_dbg(efx, probe, efx->net_dev,
- 		  "memory BAR at %pa (virtual %p+%x UC, %p+%x WC)\n",
- 		  &efx->membase_phys, efx->membase, uc_mem_map_size,
-diff --git a/drivers/net/ethernet/sfc/efx.h b/drivers/net/ethernet/sfc/efx.h
-index 45e191686625..057d30090894 100644
---- a/drivers/net/ethernet/sfc/efx.h
-+++ b/drivers/net/ethernet/sfc/efx.h
-@@ -236,5 +236,4 @@ static inline bool efx_rwsem_assert_write_locked(struct rw_semaphore *sem)
- 
- int efx_xdp_tx_buffers(struct efx_nic *efx, int n, struct xdp_frame **xdpfs,
- 		       bool flush);
--
- #endif /* EFX_EFX_H */
-diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-index 3e7c950f83e9..348d7404cd7a 100644
---- a/drivers/net/ethernet/sfc/efx_cxl.c
-+++ b/drivers/net/ethernet/sfc/efx_cxl.c
-@@ -88,6 +88,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
- 		return -ENOMEM;
- 	}
- 
-+	probe_data->cxl_pio_initialised = true;
- 	probe_data->cxl = cxl;
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-index de3fc9537662..3964b2c56609 100644
---- a/drivers/net/ethernet/sfc/net_driver.h
-+++ b/drivers/net/ethernet/sfc/net_driver.h
-@@ -1213,6 +1213,7 @@ struct efx_probe_data {
- 	struct efx_nic efx;
- #ifdef CONFIG_SFC_CXL
- 	struct efx_cxl *cxl;
-+	bool cxl_pio_initialised;
- #endif
- };
- 
-diff --git a/drivers/net/ethernet/sfc/nic.h b/drivers/net/ethernet/sfc/nic.h
-index ec3b2df43b68..7480f9995dfb 100644
---- a/drivers/net/ethernet/sfc/nic.h
-+++ b/drivers/net/ethernet/sfc/nic.h
-@@ -152,6 +152,8 @@ enum {
-  *	%MC_CMD_GET_CAPABILITIES response)
-  * @datapath_caps2: Further Capabilities of datapath firmware (FLAGS2 field of
-  * %MC_CMD_GET_CAPABILITIES response)
-+ * @datapath_caps3: Further Capabilities of datapath firmware (FLAGS3 field of
-+ * %MC_CMD_GET_CAPABILITIES response)
-  * @rx_dpcpu_fw_id: Firmware ID of the RxDPCPU
-  * @tx_dpcpu_fw_id: Firmware ID of the TxDPCPU
-  * @must_probe_vswitching: Flag: vswitching has yet to be setup after MC reboot
-@@ -187,6 +189,7 @@ struct efx_ef10_nic_data {
- 	bool must_check_datapath_caps;
- 	u32 datapath_caps;
- 	u32 datapath_caps2;
-+	u32 datapath_caps3;
- 	unsigned int rx_dpcpu_fw_id;
- 	unsigned int tx_dpcpu_fw_id;
- 	bool must_probe_vswitching;
+It would be handy if instead we could redirect traffic directly from
+one netkit peer device to another. This patch proposes an extension
+to bpf_redirect_peer to allow us to do just that.
+
+With this patch, the BPF_F_EGRESS flag tells bpf_redirect_peer to emit
+the skb in the egress direction of the target interface's peer device
+While the main use case is netkit, I suppose you could also use this
+mode with veth as well if, e.g., there were some eBPF programs attached
+to that side of the veth pair that needed to intercept traffic.
+
+ +---------------------------------------------------------------------+
+ | +-------------------------+         6. bpf_redirect_neigh(eth0)     |
+ | | pod (10.244.0.10)       |           ------------------------      |
+ | |                         |          |                        |     |
+ | |              +--------+ |          |      +---------+       |     |
+ | | 1. packet -->|        | |          |      |         |       |     |
+ | |    leaves ^  | netkit |<===========|======| netkit  |       |     |
+ | |           |  | peer   |=======(eBPF)=====>| primary |       |     |
+ | |           |  |        | |          |      |         |       |     |
+ | |           |  +--------+ |          |      +---------+       |     |
+ | |           |             |          | 2. bpf_redirect        v     |
+ | +-----------|-------------+          |___________________   +-------|
+ |             |                                            |  | eth0  |
+ |             | 5. bpf_redirect_peer(BPF_F_EGRESS)         |  +-------|
+ |             |________________________                    |          |
+ | +-------------------------+          |                   |          |
+ | | proxy (10.244.0.11)     |          |                   |          |
+ | | IP_TRANSPARENT          |          |                   |          |
+ | |              +--------+ |          |      +---------+  |          |
+ | | 3. packet <--|        | |          |      |         |<--          |
+ | |    enters    | netkit |<===========|======| netkit  |             |
+ | |    [proxy]   | peer   |=======(eBPF)=====>| primary |             |
+ | | 4. packet -->|        | |                 |         |             |
+ | |    leaves    +--------+ |                 +---------+             |
+ | |    sip=10.244.0.10      |                                         |
+ | +-------------------------+                                         |
+ +---------------------------------------------------------------------+
+
+Using the proxy use case as an example, in step 5 we would redirect
+traffic leaving the proxy towards the pod's peer device using
+bpf_redirect_peer(BPF_F_EGRESS).
+
+As a bonus, since the skb doesn't have to go through the backlog queue
+it can take full advantage of netkit's performance benefits. I set up a
+test where outgoing iperf3 traffic is injected into the datapath of
+another pod using either bpf_redirect_peer(BPF_F_EGRESS) or
+bpf_redirect(BPF_F_INGRESS). I used Cilium's eBPF host routing mode
+which skips the host stack and uses BPF redirect helpers to do all the
+routing.
+
+  (net.ipv4.tcp_congestion_control=cubic,mtu=1500,100GiB link,Cilium
+   eBPF host routing mode)
+
+BASELINE [bpf_redirect(BPF_F_INGRESS)]
+  1. [iperf pod] ==bpf_redirect([pod b], BPF_F_INGRESS)==> [pod b]
+  2. [pod b]     ==bpf_redirect_neigh([eth0])==>           eth0
+  3. eth0        ==over network==>                         [host b]
+
+  [ ID] Interval           Transfer     Bitrate         Retr
+  [  5]   0.00-60.00  sec   231 GBytes  33.0 Gbits/sec  12060     sender
+  [  5]   0.00-60.00  sec   230 GBytes  33.0 Gbits/sec            receiver
+
+TEST [bpf_redirect_peer(BPF_F_EGRESS)]
+  1. [iperf pod] ==bpf_redirect_peer([pod b], BPF_F_EGRESS)==> [pod b]
+  2. [pod b]     ==bpf_redirect_neigh([eth0])==>               eth0
+  3. eth0        ==over network==>                             [host b]
+
+  [ ID] Interval           Transfer     Bitrate         Retr
+  [  5]   0.00-60.00  sec   272 GBytes  38.9 Gbits/sec    0       sender
+  [  5]   0.00-60.00  sec   272 GBytes  38.9 Gbits/sec            receiver
+
+In this test, using bpf_redirect_peer(BPF_F_EGRESS) for the hop from
+[iperf pod] to [pod b] led to ~18% more throughput compared to
+bpf_redirect(BPF_F_INGRESS).
+
+CHANGES
+=======
+v1->v2: https://lore.kernel.org/bpf/20260613183424.1198073-1-jordan@jrife.io/
+* Introduce and use BPF_F_EGRESS instead of BPF_F_INGRESS (Paul,
+  Jiayuan).
+    Overall opinion was that BPF_F_EGRESS was clearer, but it was
+    acknowledged that this creates some inconsistencies with
+    bpf_redirect where 0 means egress implicitly.
+* Invert `skb->dev = dev;` and `dev_sw_netstats_rx_add` to make the
+  diff cleaner.
+
+Jordan Rife (2):
+  bpf: Support BPF_F_EGRESS with bpf_redirect_peer
+  selftests/bpf: Add tests for bpf_redirect_peer with BPF_F_EGRESS
+
+ include/uapi/linux/bpf.h                      | 19 +++---
+ net/core/filter.c                             | 12 ++--
+ tools/include/uapi/linux/bpf.h                | 19 +++---
+ .../selftests/bpf/prog_tests/tc_redirect.c    | 68 +++++++++++++++++++
+ .../selftests/bpf/progs/test_tc_peer.c        | 22 ++++++
+ 5 files changed, 119 insertions(+), 21 deletions(-)
+
 -- 
-2.34.1
+2.43.0
 
 
