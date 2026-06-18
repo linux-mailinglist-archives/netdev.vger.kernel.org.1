@@ -1,186 +1,210 @@
-Return-Path: <netdev+bounces-300302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300303-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id XP7uEzRZM2qw/gUAu9opvQ
-	(envelope-from <netdev+bounces-300302-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 04:34:28 +0200
+	id vTScEctbM2oD/wUAu9opvQ
+	(envelope-from <netdev+bounces-300303-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 04:45:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B9369D237
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 04:34:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A097E69D28F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 04:45:30 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=CXlqLg61;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300302-lists+netdev=lfdr.de@vger.kernel.org" designates 172.105.105.114 as permitted sender) smtp.mailfrom="netdev+bounces-300302-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=linux.dev header.s=key1 header.b=C3puk66i;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300303-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300303-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=linux.dev;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6A19304D709
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:34:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 92558309A431
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2B731352D;
-	Thu, 18 Jun 2026 02:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AE323D283;
+	Thu, 18 Jun 2026 02:45:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD5E40D56F
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 02:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5671E0E14
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 02:45:25 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781750066; cv=none; b=RH9m47TCDWYfdC6haUclSVKG8g4DPmXeu6Z02pOF2FSTdS54z/yNapMzySQ5xP9mcQkJMy2Yt0FtzWOkYF5UBoT6/OtDS2PUrbflknYNKKPk89lGgWAoHQnsjzKrkUZGfAef+vKPJLtVpk0K99NkwVt618unWnDCPWfN3SHmBF4=
+	t=1781750726; cv=none; b=rAzITyHvt8Fy9/y/jRztyqAzCv2KWTeoyQKkYnkwRs5hqEKtDgELObphldILmmbMBQkPOBe+WGupvoTM8x0j1hj/XCovJD2HJgJnwZI4a+3B4VengD+rHX2Dxr2REZFB7kkbF/mMDPJ4fo6hKRoAgPoc9Ed7vKmCOgXsLIQc26E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781750066; c=relaxed/simple;
-	bh=fUmEeA7dGAXkLEe9ohOlEVhHOmdriGi59MTCsd/DUY0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nem8l8myOrk9yhj58PuyViiuasM6koCMLfK2AVmHktLVGVUYCTuwCyisyom0pcTnQuGi1DeqpbtXoCXW/5VBA8/Sofow/OuTBAMISp3uwsIWhEXdLVsr92KBfJ6eBdgdBQs8UyBeBQnw/Dn+eTemo/crpGxs+vB3Hf7F2gBZ//0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXlqLg61; arc=none smtp.client-ip=209.85.216.47
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-36d98b68d68so195868a91.2
-        for <netdev@vger.kernel.org>; Wed, 17 Jun 2026 19:34:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781750064; x=1782354864; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rFTRihsb4A12HPbEPFddMGd3EZlcBtB3kSw8HdT0K2I=;
-        b=CXlqLg61cf4NBk8o06sA4SocWFqV0zohPDrg1bfX5C1CMZ/7O04lbJkvhT6a8tZqer
-         n0T2WJG8RqTzcaiwEhvP0iuOjEEhwWCqE1ApXw/NaImOoAqsj+y70D4ebudDWXj5aFtU
-         NFvvQW5+ABREpWs9nfQNfkY8UOBRCD2DONhBAFyxUI1zMTuOrzpBcLr6hsZCJM4NT/0x
-         bGBt0Uzw0vSzXyqhVksdQzR914BpO/94E09Gjk8mcD7NiALCUyAWyYjkKpIFvSrkWIHT
-         LaepyK6WN97k0kmge2w3aWQD6gnpjHw17sCB7OO+oZqbUrmGYfX1DPk40m8MLqkNxAw9
-         aqMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781750064; x=1782354864;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rFTRihsb4A12HPbEPFddMGd3EZlcBtB3kSw8HdT0K2I=;
-        b=tSiCsvUhBUGvp9mAOH3CNJ6NzMyguCONkg20gJ3hdamj6rRC7j76X+3fR4nPqhT1Q0
-         xriCTaMGjIsXTpND4j5C9+RUEiNeEt5EE6ttjmHpWQz+OTFgMvfYjLoWe+GOTdKTIeWj
-         oBQ+ur2HE4nwi8hxU3zF7NDD2hHddm491s2ILe1TUUQJfwT7SFz5o5iLWLkIOUzSxbjd
-         FO/0SANqQab7Z7/xfR9du/dJJ0frEa2DUI2NvuF+GUjejuZuUGcdwAKLWrsR2wNOuAEQ
-         p0MZpPReaszjUGXJYVZ0aAyKYBwG2eHUli3ahyCayfFoVjaDCYZIQApeHX2QIv0x68Eo
-         1hPg==
-X-Gm-Message-State: AOJu0YxoaKl629Xt8QH6hrsa9/89CVtcWvEFEUDR8Fn0O6D0Ta0zNWk4
-	o3avvvUtX1qe81z+z/8MXZG/Cdw328HmKiPFZBFlo43wBkTz+4cfJj/WdtoUsg==
-X-Gm-Gg: AfdE7ckcpIc/znItsOsw0wZkZUsT3ZMeXjABY94ZIITFG2GoINeVXCccmbo/vipvnYA
-	jX+rBjNVkIsk9pAbpRwgNMCxbxJ3wXxI1PMdFNWUJ/TgOF+C5ar8+Fm9INXwNf5RhYpZDqutmUB
-	76t9a+OM4rvkZnL+ovoJhNgTE6zw44mPidGmpuTwePwsJrAVI6waOpPL7BRvGARtFfxWQv/KVPw
-	Z5Hk9xl3AA9LI5y4NIvl9EBiSMgSl49NhBbXu07maSsCRWfz43/ay0o42DbH6/1bfGR+FyGxSPJ
-	WY9h1YJU7M2CAR4ZRCPuJs0nlkomkpdklX2exKyyLC78mlXsLRYibyR6GCy6WUFJdYTXXvmtvQt
-	aaloMfh9hJie4eBrsLMR0VQHryPtUCgEZ2JnWGG0jyk90UZZnhtC/yqWO4KwZWXnKrXHO6uHXiA
-	wdztJkvL8QBDM1mbyqobvufEbvc+wmnUNI80nU8u9tQzn6WdzUEc8T3jLcgRxmlT6PURRiqgLUJ
-	CAVcnjQkwecQ62kvg5NigcB
-X-Received: by 2002:a17:90b:1c10:b0:36d:7b62:4767 with SMTP id 98e67ed59e1d1-37ce44ed8c4mr1645800a91.5.1781750063795;
-        Wed, 17 Jun 2026 19:34:23 -0700 (PDT)
-Received: from ryzen ([2601:644:8000:5b5d:7305:54ba:2fb4:e198])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c930d7f81sm4976010a91.6.2026.06.17.19.34.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2026 19:34:23 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rosen Penev <rosenp@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2] net: emac: Fix NULL pointer dereference in emac_probe
-Date: Wed, 17 Jun 2026 19:34:05 -0700
-Message-ID: <20260618023405.415644-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	s=arc-20240116; t=1781750726; c=relaxed/simple;
+	bh=qSaukmowGj++JxcMa/yHy6Yr3sKPTxuk6LlldTdeOqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pMtdld3NdSuIQPq6ww5I5KChOvUtEsB2f+V5XJziWiG/iIHJ2Y/QFmUgGnQWAbaojR8m4qZHUrU8gSZtq8JzzJYdpxgRsJxq8VhBZ8/akZwkdbLVCn5WTJ9y5NvdqyhredwNTTmK+cQsGnWSMRw0kpxze8LsGlAfsFcIa8j9Mrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C3puk66i; arc=none smtp.client-ip=91.218.175.174
+Message-ID: <04931588-e708-40d8-a1b7-3700a1a3b376@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1781750713;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w8TDN8bzEOcGiFm8DZoqtUUF8TKfOf/eHYPCDbduM40=;
+	b=C3puk66iITvSMQ0yJqQY//K6d78xs+4OlkhtRCs3u2ZER4a33+m7J5CkbUrXltia3osEri
+	NmGrrtNCc3pUMqQhpfh3Tb0XVSMpJXXQWzD7wV/ToE2EN8O8uRxWynlYRyEHwGdoQqK1do
+	ZSaCZu985ysGspmmZcgTBP7zdqplX+w=
+Date: Thu, 18 Jun 2026 10:45:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf v2] bpf, sockmap: fix use-after-free when the stream
+ parser resizes the skb
+To: Sechang Lim <rhkrqnwk98@gmail.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Bobby Eshleman
+ <bobbyeshleman@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260612123553.2724240-1-rhkrqnwk98@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260612123553.2724240-1-rhkrqnwk98@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300302-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:rosenp@gmail.com,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300303-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rosenp@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:john.fastabend@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:bobbyeshleman@gmail.com,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: B7B9369D237
+X-Rspamd-Queue-Id: A097E69D28F
 
-Move devm_request_irq() after devm_platform_ioremap_resource() so that
-dev->emacp is mapped before the interrupt handler can fire.  An early
-interrupt hitting emac_irq() would dereference the NULL dev->emacp and
-crash.
 
-Also remove redundant error message. devm_platform_ioremap_resource()
-already returns an error message with dev_err_probe().
+On 6/12/26 8:35 PM, Sechang Lim wrote:
+> sk_psock_strp_parse() runs the BPF_PROG_TYPE_SK_SKB stream-parser program
+> to find the length of the next message. strparser assembles a message out
+> of several received skbs by chaining them onto the head's frag_list and
+> recording where to append the next one in strp->skb_nextp:
+>
+> 	*strp->skb_nextp = skb;
+> 	strp->skb_nextp = &skb->next;
+>
+> and then calls the parser on the head:
+>
+> 	len = (*strp->cb.parse_msg)(strp, head);
+>
+> The parser is only meant to inspect the skb, but the program may call
+> bpf_skb_change_tail() -- or the sibling bpf_skb_pull_data(),
+> bpf_skb_change_head(), bpf_skb_adjust_room(), all allowed for SK_SKB.
+> Once the head carries a frag_list these go
+>
+> 	... -> skb_ensure_writable -> pskb_may_pull -> __pskb_pull_tail
+>
+> and __pskb_pull_tail() frees the frag_list skbs that strparser still
+> tracks through skb_nextp:
+>
+> 	while ((list = skb_shinfo(skb)->frag_list) != insp) {
+> 		skb_shinfo(skb)->frag_list = list->next;
+> 		consume_skb(list);
+> 	}
+>
+> strp->skb_nextp now points into a freed sk_buff. The next segment of
+> the same message arrives in __strp_recv(), which links it with
+> *strp->skb_nextp = skb, an 8-byte write into the freed skb. The free
+> and the write happen in different __strp_recv() calls, so the message
+> has to span at least three segments before it triggers.
+>
+>    BUG: KASAN: slab-use-after-free in __strp_recv+0x447/0xda0
+>    Write of size 8 at addr ffff88810db86140 by task repro/349
+>
+>    Call Trace:
+>     <IRQ>
+>     __strp_recv+0x447/0xda0
+>     __tcp_read_sock+0x13d/0x590
+>     tcp_bpf_strp_read_sock+0x195/0x320
+>     strp_data_ready+0x267/0x340
+>     sk_psock_strp_data_ready+0x1ce/0x350
+>     tcp_data_queue+0x1364/0x2fd0
+>     tcp_rcv_established+0xe07/0x1640
+>     [...]
+>
+>    Allocated by task 349:
+>     skb_clone+0x17b/0x210
+>     __strp_recv+0x2c3/0xda0
+>     __tcp_read_sock+0x13d/0x590
+>     [...]
+>
+>    Freed by task 349:
+>     kmem_cache_free+0x150/0x570
+>     __pskb_pull_tail+0x57b/0xc20
+>     skb_ensure_writable+0x236/0x260
+>     __bpf_skb_change_tail+0x1d4/0x590
+>     sk_skb_change_tail+0x2a/0x40
+>     bpf_prog_1b285dcd6c41373e+0x27/0x30
+>     bpf_prog_run_pin_on_cpu+0xf3/0x260
+>     sk_psock_strp_parse+0x118/0x1e0
+>     __strp_recv+0x4f6/0xda0
+>     [...]
+>
+> The same resize also leaves the head's length inconsistent with its
+> frags, so a later __pskb_pull_tail() can instead hit the
+> BUG_ON(skb_copy_bits(...)) in net/core/skbuff.c.
+>
+> Run the parser on a private clone of the head when the message spans more
+> than one skb and the program can modify the packet
+> (prog->aux->changes_pkt_data), so a resizing helper can only touch the
+> clone and strparser's head and skb_nextp stay valid. Single-skb messages
+> have no frag_list and read-only parsers cannot resize, so both are still
+> parsed in place. If the clone cannot be allocated, return 0 so the caller
+> retries on the next read rather than failing the parser.
+>
+> Fixes: 8a31db561566 ("bpf: add access to sock fields and pkt data from sk_skb programs")
 
-Fixes: dcc34ef7c834 ("net: ibm: emac: manage emac_irq with devm")
-Assisted-by: Opencode:Big-Pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v2: remove redundant error message.
- drivers/net/ethernet/ibm/emac/core.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 80f0c8985845..62ee1b70c3e7 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -3044,6 +3044,12 @@ static int emac_probe(struct platform_device *ofdev)
- 	if (err)
- 		goto err_gone;
+Please consider Kuniyuki Iwashima's suggestion.
 
-+	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
-+	if (IS_ERR(dev->emacp)) {
-+		err = PTR_ERR(dev->emacp);
-+		goto err_gone;
-+	}
-+
- 	/* Setup error IRQ handler */
- 	dev->emac_irq = platform_get_irq(ofdev, 0);
- 	if (dev->emac_irq < 0) {
-@@ -3061,13 +3067,6 @@ static int emac_probe(struct platform_device *ofdev)
+But it only covers the ATTACH path; the other two paths should be 
+covered as well:
 
- 	ndev->irq = dev->emac_irq;
+- BPF_PROG_ATTACH → sock_map_get_from_fd → sock_map_prog_update
+- BPF_LINK_CREATE → sock_map_link_create → sock_map_prog_update
+- replace prog → sock_map_link_update_prog
 
--	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
--	if (IS_ERR(dev->emacp)) {
--		dev_err(&ofdev->dev, "can't map device registers");
--		err = PTR_ERR(dev->emacp);
--		goto err_gone;
--	}
--
- 	/* Wait for dependent devices */
- 	err = emac_wait_deps(dev);
- 	if (err)
---
-2.54.0
+A new helper for this check is probably needed, called from both
+
+sock_map_prog_update() and sock_map_link_update_prog().
+
+
+Since this rejects the program at attach time rather than fixing a 
+runtime crash,
+
+I'm not sure a Fixes tag is appropriate here - thoughts?
 
 
