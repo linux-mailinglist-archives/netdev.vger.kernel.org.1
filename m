@@ -1,158 +1,232 @@
-Return-Path: <netdev+bounces-300340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id kW3LHfSfM2qQEQYAu9opvQ
-	(envelope-from <netdev+bounces-300340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:36:20 +0200
+	id A9dlDFyfM2p4EQYAu9opvQ
+	(envelope-from <netdev+bounces-300337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:33:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6449A69E1C7
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:36:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8CE69E1A0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:33:47 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=yeah.net header.s=s110527 header.b=SJwrpGYQ;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300340-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300340-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=yeah.net;
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=UBtbXkSU;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300337-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300337-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=fail reason="SPF not aligned (relaxed), DKIM not aligned (relaxed)" header.from=canonical.com (policy=reject);
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A3D283008FCF
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 07:36:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5770330046AE
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 07:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED2C257855;
-	Thu, 18 Jun 2026 07:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDC23D0BFB;
+	Thu, 18 Jun 2026 07:33:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CED3612FE;
-	Thu, 18 Jun 2026 07:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32143CF678
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 07:33:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781768173; cv=none; b=oskYb8vjGqDFZdIuOmpdzCl3gJL+P6bTwQwBZ4OOW3RHGpxC0XrPAk6HX1kYAm9uZT0n7mNUQBtKcafJOD7jUZ3BaURab/JttNWxOtEpZhKWDNqnIneGPQJ3EzXpa/w9iqrelXbEuYItxopIIVzplm+1jEQ331bGIBh3yil7FMo=
+	t=1781768022; cv=none; b=e1MSkNJn3FTa/UgheJddlneQxojN3EWHAi2E+rYIWZcL8/HjGAnKXZix8DvlNxzYqCkT6YdffXztLriyB9eBYsbEhr9lcJHeR5y+zHy1dPKwRFlVXN15mEgAhpPYBghfF4byy0dGKlWHLFSFEl4diI5ffD6q/2ONjG+4GOUa+fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781768173; c=relaxed/simple;
-	bh=sHB41GVX7qXOkmY/3+/r+iq81cKdiyrzEmMlJl8psEY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=NV1LO0J8y9CI2T8WwZvks7sD0eBDVfK9d2p9TnolSUg4zrMp+RQDioMwcOy/v3AP5dQ8pPoL/YUDkFEZ72hgIeNaW1Cp/4DfUX3+9SCob65dKzOglrEHFWSxNhuF42NhrcFQSktK7jotIpinbNRbGWHGeLHRULz05gJ09qNhxlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=SJwrpGYQ; arc=none smtp.client-ip=220.197.32.17
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
-	s=s110527; h=Message-ID:Date:MIME-Version:To:From:Subject:
-	Content-Type; bh=CO+rCk3t3Yj2gC/Q8TQOyvQbyN2ohfjyv6cAINQX8+8=;
-	b=SJwrpGYQHDRk5dTkCaYalDPMOxvP53rJb5pCOFMHs+FtgAQjsnpXxXl80rovR5
-	8dfOTwMu9BfIPC2LWLoRgJS/Lp4EZn5EbiS2lBYEUjdh1W8DR/C7TCeeTzuGn59w
-	YccxuKP3r+O5NKfabHcP2zGJk93qcL4vQZl+bcJyz3e+I=
-Received: from [100.70.221.233] (unknown [])
-	by gzsmtp3 (Coremail) with UTF8SMTPA id M88vCgBHtxESnjNqjhhvAg--.26487S2;
-	Thu, 18 Jun 2026 15:28:18 +0800 (CST)
-Message-ID: <c953e09f-9bd5-43c8-b2e4-7305bb435229@yeah.net>
-Date: Thu, 18 Jun 2026 15:28:16 +0800
+	s=arc-20240116; t=1781768022; c=relaxed/simple;
+	bh=gcsJ20YSTpvib9SkO84UdoVBX4pGd5du2v0O1QUk+I8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q2UZHyJMQWAwAdn9ao5cSyEBdc8KSbnq32iFhTEEfiS3D/JNu6l4JcBCGkL+b/PXGKzZvp3IHdeQFr0cj/4NWfeQDlO9AAUNBXm8zzVA7RAmWg7ewfF4Fd047re9XGCtcj7z7hLj4VOCk13efjykCbFuU/SBu+h2lFrI9Jl1c4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBtbXkSU; arc=none smtp.client-ip=209.85.210.170
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8453bcf7276so280438b3a.2
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 00:33:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781768019; x=1782372819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=2ThiB77d7N7pxREshEF4WAMO6IHWL1PWSzLqjBsAI7o=;
+        b=UBtbXkSUB6347f7loMXh4B4yqj/SGb07AmQ3gdi+UBW4+CoAiEpKXGgQArVUzROLUo
+         cBmZs9SnTqf3JowmAHxKe0fQtIYjUffaNulzurB+lrSJehb80d/odKISLwUJCdEN9LWy
+         C/BjPbaKJ8eLnGcrr4Ze/aVlqEhhfM61pbw+SRNPSCwWgNQb4R/RUhC0jNxtrzYAn8iC
+         s6AwTIGmN6+7RvHdmoQj6TzIOHjUA1qot12L0DNCclXKzG++Hy9jOH6wn4C/6YySEXEo
+         LOQQtVb6lvYFegJE37DRcrNIgwL3PYKV0UUHSN1cAs+q4/S0ldvnwDpHNJGNF+p8iFNR
+         cGww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781768019; x=1782372819;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2ThiB77d7N7pxREshEF4WAMO6IHWL1PWSzLqjBsAI7o=;
+        b=DLWvj37j3wfukL5itZo/tl3d9HlMDHcCy134ZIZWdB5tOIsLaaDav+rEZ2vfHLqDIF
+         Yasiq7GtW5960cxNdlonW7fqCpeMFTsy1/Bqeimea8zN5yuJFDFPDO6S7O45teMuW+96
+         IE8n1+SmtSrOAps7QmQAu4ayoMDROgT3URGRRmd+ZtkMX7LtOmXKflYbSQ5cm8OKwJca
+         J6HekAQL/CLmriParV+LOqq62dBYljiARvrrmJ8VuDCRSy43TPadzpiZSHpOL/kGQ5MY
+         svtWHH07Gqa9m3vb9YafX5745d2s3Htt+v/PVpe1f5+K6HNP9NWdlVkdIGF6yfUF2HTg
+         4ddQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8vhVksWMZtuE8qZUfHMEqVUvtofXtr9ux9GKSy/5HJC79yQvwcimEQ9lVI+BUY/ptmZ7YkenA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDoMDGtpW1BYBYW2iSye7nZqf31IpRJ71qi9Gtv6Cjw8MU1XQT
+	FV/4m1joWUFxqss7vrWu8FU5Wj6jBVxwwpmMWnP0ZU6q7fc1t4ofbvbc
+X-Gm-Gg: Acq92OFxhRnh1f/l9NTuUamKDrUcijLr8FNnVKrgUlh/exnI3t4Yx58A1ht40NaLcxQ
+	ywWGABg3nL3UFBrQTw15wcN6i24GtBlU3DMakidGekrlbbbDrWN62GlGzAeZ5peVsjGAw3vjeKG
+	zxjEByEY9S40mMRUnVWLqo4Fuwr6HJlHo+emNNb2l7XuRjUImlx0f4Ukg+ss++5MWgy9fcJgKE3
+	9V/k6nVv7P76i7LqvxHRQPn6J/NvcG/BmNq1hC0q8Z4/5xxp55b96Gra6Gki4zY5vCsRDGZw/gB
+	MvW8l+f8Dkg/dOUD2qyevUZnYVI80Y8kWHXNbi7B7D5s5+U2V37umi/Ycl3V3oohuxqbtQkFF8p
+	5CPHJz7+4MO/keD6VKu5v1E1TcMuvwdKcem/gbwGTgiYcwZpWgznCxP3JipGtMUsD6uVjWKossR
+	nv3+yUDdNvg42/rq7BYMvZrt47/FadjQRmn4kRfc5CFz/FN72jPQSxv9YaYEK25Acr1CPy
+X-Received: by 2002:a05:6a00:3318:b0:842:655d:1232 with SMTP id d2e1a72fcca58-8452414d108mr7957295b3a.0.1781768018779;
+        Thu, 18 Jun 2026 00:33:38 -0700 (PDT)
+Received: from acelan-Precision-5480 (211-75-139-220.hinet-ip.hinet.net. [211.75.139.220])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8434a934a97sm18630390b3a.0.2026.06.18.00.33.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 00:33:37 -0700 (PDT)
+Sender: AceLan Kao <acelan@gmail.com>
+From: "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] igc: Wait for MAC passthrough after reset
+Date: Thu, 18 Jun 2026 15:33:22 +0800
+Message-ID: <20260618073324.1843310-1-acelan.kao@canonical.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: horms@kernel.org, kuniyu@google.com, willemb@google.com,
- linux-kernel@vger.kernel.org
-From: xietangxin <xietangxin@yeah.net>
-Subject: [BUG REPORT] KCSAN: data-race in __ip6_datagram_connect /
- udpv6_sendmsg
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:M88vCgBHtxESnjNqjhhvAg--.26487S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAr4kWF47CFyDXrWrZw17Awb_yoW5Gr1xp3
-	yYyrW5Cr48Jr93ZFyfAa17JFn5ZwsYy3ZxKan2qryYkr4jqr15tF15tr95CFn5trsrGrW7
-	t3Z8Cay2yryDGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRUUUUUUUUU=
-X-CM-SenderInfo: x0lh3tpqj0x0o61htxgoqh3/1tbiIhMTR2oznhPdfwAA3T
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [3.34 / 15.00];
+	DMARC_POLICY_REJECT(2.00)[canonical.com : SPF not aligned (relaxed), DKIM not aligned (relaxed),reject];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[yeah.net,none];
-	R_DKIM_ALLOW(-0.20)[yeah.net:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300340-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:kuniyu@google.com,m:willemb@google.com,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300337-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[acelan.kao@canonical.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[yeah.net:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xietangxin@yeah.net,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[acelan.kao@canonical.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[yeah.net];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,yeah.net:dkim,yeah.net:mid,yeah.net:from_mime]
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6449A69E1C7
+X-Rspamd-Queue-Id: 2C8CE69E1A0
 
-Hi all,
+Some systems support MAC passthrough for dock Ethernet controllers by
+having firmware rewrite the receive address registers after the controller
+reset completes.
 
-We detected a data-race with syzkaller on master branch (commit 95e56f0f293e).
+igc resets the controller before reading RAL0/RAH0, so that reset can
+restore the controller native MAC address temporarily. If the driver reads
+the registers immediately, it can race the firmware rewrite and keep the
+native dock MAC instead of the host passthrough MAC.
 
-The data-race occurs on `sk->sk_v6_daddr`. When a UDP socket is already in
-the ESTABLISHED state, calling sendmsg() with read `sk->sk_v6_daddr`.
-Concurrently, another thread call connect() on the same UDP socket to update
-the remote address, which writes to `sk->sk_v6_daddr`.
+For LMVP devices, poll RAL0/RAH0 after reset and before reading the MAC
+address. Stop once the address registers change to another valid Ethernet
+address, allowing firmware a bounded window to complete the passthrough
+update.
 
-Should we implement READ_ONCE/WRITE_ONCE helpers for `sk->sk_v6_daddr`
-to prevent torn reads? Or acquire the socket lock inside udpv6_sendmsg()
-to serialize with connect()?
+Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 48 +++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-# KCSAN Report
-BUG: KCSAN: data-race in __ip6_datagram_connect / udpv6_sendmsg
-read to 0xffff0000084dbc38 of 8 bytes by task 16916 on cpu 2:
- udpv6_sendmsg+0x1264/0x1a20 (/include/net/ipv6.h:593 net/ipv6/udp.c:1579)
- inet6_sendmsg+0x80/0xc0
- __sock_sendmsg+0xb0/0x138
- ____sys_sendmsg+0x41c/0x4f8
- ___sys_sendmsg+0xcc/0x150
- __sys_sendmsg+0xe8/0x190
- __arm64_sys_sendmsg+0x58/0x78
- invoke_syscall+0x84/0x218
- el0_svc_common.constprop.0+0x1a4/0x1f8
- do_el0_svc+0x3c/0x58
- el0_svc+0x38/0x100
- el0t_64_sync_handler+0xa0/0xe8
- el0t_64_sync+0x190/0x198
-
-write to 0xffff0000084dbc38 of 16 bytes by task 16901 on cpu 1:
- __ip6_datagram_connect+0x348/0x888 (/net/ipv6/datagram.c:247)
- udpv6_connect+0x48/0x178
- inet_dgram_connect+0xe0/0x1e0
- __sys_connect_file+0xd4/0x128
- __sys_connect+0xf0/0x130
- __arm64_sys_connect+0x54/0x78
- invoke_syscall+0x84/0x218
- el0_svc_common.constprop.0+0x1a4/0x1f8
- do_el0_svc+0x3c/0x58
- el0_svc+0x38/0x100
- el0t_64_sync_handler+0xa0/0xe8
- el0t_64_sync+0x190/0x198
-
-# Syzkaller Reproducer
-r0 = bpf$PROG_LOAD(0x5, &(0x7f00000001c0)={0x6, 0x4, &(0x7f0000000100)=ANY=[@ANYBLOB="18000000000000000000000000000000070000000200000095"], &(0x7f0000000040)='GPL\x00', 0x0, 0x0, 0x0, 0x0, 0x9, '\x00', 0x0, @xdp=0x25, 0xffffffffffffffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x3}, 0x94)
-bpf$BPF_PROG_TEST_RUN(0xa, &(0x7f00000002c0)={r0, 0x0, 0xe, 0x0, &(0x7f00000005c0)="d9d96e34a80e31f03a049a9e0000", 0x0, 0xb4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2, 0x0, 0x39}, 0x50) (async, rerun: 32)
-r1 = socket$inet6(0xa, 0x2, 0x0) (rerun: 32)
-connect$inet6(r1, &(0x7f0000000040)={0xa, 0x4e23, 0x100200a, @loopback, 0x7f}, 0x1c) (async, rerun: 32)
-sendmsg$inet6(r1, &(0x7f00000002c0)={&(0x7f0000000140)={0xa, 0x4e22, 0x4, @remote, 0x2}, 0x1c, 0x0}, 0x4000001) (rerun: 32)
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 2c9e2dfd8499..fa9752ed8bc5 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -11,6 +11,7 @@
+ #include <net/pkt_sched.h>
+ #include <linux/bpf_trace.h>
+ #include <net/xdp_sock_drv.h>
++#include <linux/etherdevice.h>
+ #include <linux/pci.h>
+ #include <linux/mdio.h>
+ 
+@@ -69,6 +70,52 @@ static const struct pci_device_id igc_pci_tbl[] = {
+ 
+ MODULE_DEVICE_TABLE(pci, igc_pci_tbl);
+ 
++static void igc_read_rar0(struct igc_hw *hw, u8 *addr, u32 *ral, u32 *rah)
++{
++	*ral = rd32(IGC_RAL(0));
++	*rah = rd32(IGC_RAH(0));
++
++	addr[0] = *ral & 0xff;
++	addr[1] = (*ral >> 8) & 0xff;
++	addr[2] = (*ral >> 16) & 0xff;
++	addr[3] = (*ral >> 24) & 0xff;
++	addr[4] = *rah & 0xff;
++	addr[5] = (*rah >> 8) & 0xff;
++}
++
++static bool igc_is_lmvp_device(struct pci_dev *pdev)
++{
++	switch (pdev->device) {
++	case IGC_DEV_ID_I225_LMVP:
++	case IGC_DEV_ID_I226_LMVP:
++		return true;
++	default:
++		return false;
++	}
++}
++
++static void igc_wait_for_lmvp_mac_passthrough(struct pci_dev *pdev,
++					      struct igc_hw *hw)
++{
++	u8 addr[ETH_ALEN] __aligned(2);
++	u32 orig_ral, orig_rah;
++	u32 ral, rah;
++	int i;
++
++	if (!igc_is_lmvp_device(pdev))
++		return;
++
++	igc_read_rar0(hw, addr, &orig_ral, &orig_rah);
++
++	for (i = 0; i < 100; i++) {
++		msleep(100);
++		igc_read_rar0(hw, addr, &ral, &rah);
++		if ((ral != orig_ral || rah != orig_rah) &&
++		    is_valid_ether_addr(addr))
++			return;
++	}
++}
++
+ enum latency_range {
+ 	lowest_latency = 0,
+ 	low_latency = 1,
+@@ -7259,6 +7306,7 @@ static int igc_probe(struct pci_dev *pdev,
+ 	 * known good starting state
+ 	 */
+ 	hw->mac.ops.reset_hw(hw);
++	igc_wait_for_lmvp_mac_passthrough(pdev, hw);
+ 
+ 	if (igc_get_flash_presence_i225(hw)) {
+ 		if (hw->nvm.ops.validate(hw) < 0) {
 -- 
-Best regards,
-Tangxin Xie
+2.53.0
 
 
