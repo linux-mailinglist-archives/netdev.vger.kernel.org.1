@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300520-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id JwkzKxs3NGoMRwYAu9opvQ
-	(envelope-from <netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:21:15 +0200
+	id vHSfNsU3NGpoRwYAu9opvQ
+	(envelope-from <netdev+bounces-300520-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:24:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F2D86A21D0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:21:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3986A220E
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 20:24:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=jrife-io.20251104.gappssmtp.com header.s=20251104 header.b=M1Mp5VeL;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300518-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=jrife-io.20251104.gappssmtp.com header.s=20251104 header.b=vBKhf4Jv;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300520-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300520-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6113C306DEC5
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:20:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7E5330EBF56
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5656395ADE;
-	Thu, 18 Jun 2026 18:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A8B37F74B;
+	Thu, 18 Jun 2026 18:20:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D136376BF1
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 18:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846ED378832
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 18:20:41 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781806844; cv=none; b=bCa9wyj2sn9g/K1bVdVcGLpCtQ+G6/Y2T8srQrwW9d9/Tgpf40z8RqG+ngeCfMwAVRSa7xKbVxuFoFTlfPMndvdODndC8Kj3O6KueDxO/rVl92vrSFKDVE+xrK7QTCYHwPhOpqvBHHyXNTNBCT8al82PVcWroVsIVXAzCg+TB3Y=
+	t=1781806846; cv=none; b=NHspxcIk4R7wIfD2n0Smyemqa8jLqv74tl2F7GqiD5werhOXpeR0Um+oY9G8wAMt4G+FoU4BBLK797aWNKJtJduOA/uwSuVL0zxW0VrmODIjlwwYFBiV4cWePVUOYDsm/UM41Rb/9UCwvPSsJT2CQl2n8Hqyyc310Fq+jKtlxjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781806844; c=relaxed/simple;
-	bh=KLWSy+uOiu8A6irIA3J6az/xmGCIyZRKBNJ3RGdXe6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vD2taw+iys7JUnqiuPIEZ+V/XA6LZtqlTxjugKns4Syfzh9E6TEMeKpsGuGMw6SGra1g2EK3JTV8/5hsYC4uNH4DnAcM57nP62XiQsSFgYbp1KvoBhEFu1Pn2QrOjZhU3UWVtHicNcY7CNtMTJElONx0PiUoxRk1HSUg3NfI7Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=M1Mp5VeL; arc=none smtp.client-ip=74.125.82.170
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-30bee4c0088so91792eec.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 11:20:40 -0700 (PDT)
+	s=arc-20240116; t=1781806846; c=relaxed/simple;
+	bh=9Q8XceuwfXu3J+N8u/LsL+GSsa6JZKhxnhTkscQL8IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=j5+uP5n2zpsOydVdYXo6ghyIVeU17yScgInDcYmhGJGrZSpt6jR3zWtUGlbNiE9JMeh/WvsdlVovDldUYR+bdZCDQUMFnLw5f/FgHa77seB+I3xJ3wE4U1Uz9RzxKsNTb9swVaG8PVY6afhUix800DAUVlhs/GVV8wSNv8eudaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20251104.gappssmtp.com header.i=@jrife-io.20251104.gappssmtp.com header.b=vBKhf4Jv; arc=none smtp.client-ip=74.125.82.169
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-30beb45c50cso138906eec.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 11:20:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1781806839; x=1782411639; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lxfXRAD4Q8BkMmwZ9NjvqUwhKA17UvJt+JpE+ccCIUc=;
-        b=M1Mp5VeLQs1KwHfwUcSIOGfQN/ieYY25ARpditbcDt/17slj/Es+ONpj+KgwGRw0SY
-         Q6suvDB3IMEVCkswpDRIwBBBzYQoZqKuEjMtah2tX0E9tKD7vpVxUw65ochl8F1lP4tv
-         YYv4ES+cIoKIjSux4nw3g23/UceEfeii3HdX/XOsM6OW+dbSiEAnhC9SuVV3FZBMdMn4
-         tNcqsLU4klpC7+3lqTxRfyu2qZSbEXXdal6LNvSLy7ZuNibn/jvgM1D+3rxMqbdz4NYq
-         TO6Ak5CtOiIHNPyj6069VmY9otO+MfGnDmbqxlQeHAsrTyOBRlbwgRcQRVuHduYfc4gF
-         2mSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781806839; x=1782411639;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=jrife-io.20251104.gappssmtp.com; s=20251104; t=1781806840; x=1782411640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lxfXRAD4Q8BkMmwZ9NjvqUwhKA17UvJt+JpE+ccCIUc=;
-        b=AIwcTjT+XDNpyhiAYFjAO/Y6JU0j717My8tjmjGMpefM67lHG2RuLkQ9gSep8EXZsR
-         pHD7t+A0KZsbLhi2LF/f6/omMbK+4mF/ztIyzaIwQl5QCuAUg/yea/arKZmd9gahpCvs
-         zHzDafrqS6iAf3BsL4XQwdbv9vQQJc5aI1QldyczJKtbJauV+W6fiObOnJ2VtLQThU8C
-         Fey6IpJ1ESFXuP3jt7WAZfM+CYdyIxgaQEafqT4qod4WGNgAFcl0Nl/NBXqbNbTaVnGM
-         OKaP6R47vzddIlA8Qfb2zhLM7SmGvItqru+xkhAzIIOi8OEIkwKOsPdys1OZfRghVFO9
-         8Rtg==
-X-Forwarded-Encrypted: i=1; AFNElJ9YJUhv/w3IbsDLWuv6f7MlXn4Nqfe/QJa51r27iybW8jU/SoBXCWLYfvz8Fd2wf/qQRAc4q+o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCX1dQq96NGIpueot9Abl9YgUOVDMwAaofM05W/3fZ5W65WQIu
-	suOxwTtUp38zbNmISxpsANsixrpUpKwxOtRTZfycBKhtM2NmhGLgR1q6mP25FrhB6yg=
-X-Gm-Gg: AfdE7cnBGJyp+wSYaW4mjgEd5pZrrN2cKpdQU3qgTVvfy7qeWrvLZAJU34RKrlup/Ts
-	Me8ak+1HTbpa+TCUCfSNEIWdI+HmzkjUYuHEQMSTyj4ctAJCCV2MH6cIp/3nU1a/2prNqier9D4
-	CdiorQrlaMNNIRIl2hG03b+XTnz+l2Qe32yPiE+XtBzGNdgn+GmPq0FRsOqLovP8K24rKTDP9N2
-	Tpb/Yo/2R+KbUkuIw8uebUKWsdB5AURxUd/GxS9COi4RvYUZW9R59BjPnog+69tJPynGPqxFu7B
-	z1O0NUb/FfS/zAYVcDezFI/LtlHnArTxA92HOG4M4EPtxLohTfqDSLolY4NvH8qlOeKyqis5dkw
-	pcYqq3Bsot9eYiPrzsCfoa0NLhnv5dGieFo2xcWPMqgUWHtmHoGpi63fOqXNIRq+MpPNkvF+V8a
-	gmP0Fn6x61rtw=
-X-Received: by 2002:a05:7300:220d:b0:30b:ab02:9e5d with SMTP id 5a478bee46e88-30c071939edmr123634eec.6.1781806839191;
-        Thu, 18 Jun 2026 11:20:39 -0700 (PDT)
+        bh=o8iJ+hPA9AmbIsay0hDv08UHV8Hjz9Hsxd24MLmTzII=;
+        b=vBKhf4JvMMJjUSNMOSB/ngPWRQPpneorynY23PMArgBdeXxllA+uNcCTaE6Z3haU5Z
+         kU7HKl4wH24CIuA9RL9Q7OOhv9+GpAguyJsl3vhOAuQstdlyUc4sHPd6zRMe0d9cRdip
+         sKD3cPK/itBEHUSdP2r7Ar9u8ZyfMt1fsQBgn9WsuCX0B/sON9n0GERdsPsyypsRS+Dm
+         W2thrdPIrG7/P1BASN0s4SCfHllEEtfAiWSGNoFmTUndLGX0SO2dg9B6sc07FEw7XJ3D
+         B6w26f9prvz9MbE3sYtYbGvsw6NZUzzID0rtw1H0FjBzzth0soUnYmveCkXZyCqWpKPg
+         ioMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781806840; x=1782411640;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=o8iJ+hPA9AmbIsay0hDv08UHV8Hjz9Hsxd24MLmTzII=;
+        b=Ut5RKkn2M3x2i4Tl9Jbm498KnVaBUqudkH1slLAxxUD323EeCkO5f8PsdKQNIdVghs
+         yiBGTR+ozzzXRiiOSXZfmNTtY4p3kSDFugFh2aVfRa4Ay5P6w3QlIOXlg1zRkizOTtpy
+         +8h2JtMHgChGcBhp9PCNYSNOTdpKaI//ML3oUxi/O0fntrglTF+NdW4lARvDf0C/fmQT
+         Cs9aFJo/lfOqjscT7R/zWhCpHp7G1oeYI292KSi84LeP5y2Yn//OUvHCwKtUsU0Jcu2X
+         NjjJS/Ga+OOFOgDGgPP9vdPoUKKkbNLVXfeqZh6Ol7Zwjcld6F5izSMsczZchWlULRL5
+         nZqw==
+X-Forwarded-Encrypted: i=1; AFNElJ+3OQITmbNsz/ZU25Bc91FiNQiUkc/6mhyMjrezYc27PLZ7mca8dos89E82ECX/C73u7p4frk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6IV0xkxzVQqWofRFxwoucl1OjXUbRTdkrpB44xUTvtiWesAZH
+	F9jGtNceLHwFmxD5XJFpLmcfKyQuGk2wrafiUnbNiKz5c7ZPg/d7sdFZMs7pvCTtmME=
+X-Gm-Gg: AfdE7cnt6nB9FOoSWEx/6mzG3IqzOjbGCy2TYAIkjKIW87+5mYlhjPFnb2Aln2CpksM
+	U/DL3ElYLii3hZyA9v8OgB0CiExaab6Kpu87Xqj3o0q+clz5bYSLQQqI77FdBcrzKqFcUqV6avN
+	diCVOH/qzwTPeEKmFZdcoSngAAcMDOfKAbY4s8MLwllqBW5ifzKNpyZvVsmMP0+QZJTqaTvDy9U
+	Noz52gFmqMAgdqTuJ8nb9s4XwI+G7V0HQcxqLh/huQd5ys9S6as5lZDZIpQXybZO+bdAKYDm2lO
+	LjiTT2nByk5wx2khllsZpUwHmrOZ0CjmOrJc401DJcR5DaH1ObpZCYTQqBQZ9YZxrTLPFv3wHMm
+	powFde+hTFjkdtdSnqZmo6h28G3Z0uSct46/DuC6gLO3XcEb1eccvdCE/nYCOIyZJQQnyH1WdDR
+	wt
+X-Received: by 2002:a05:693c:2d8f:b0:304:8860:74d6 with SMTP id 5a478bee46e88-30c06d89d7bmr168135eec.1.1781806840067;
+        Thu, 18 Jun 2026 11:20:40 -0700 (PDT)
 Received: from t14.. ([2001:5a8:47ec:d700:1b1d:38b6:64b7:ee72])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c06c33c88sm205950eec.19.2026.06.18.11.20.38
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c06c33c88sm205950eec.19.2026.06.18.11.20.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 11:20:38 -0700 (PDT)
+        Thu, 18 Jun 2026 11:20:39 -0700 (PDT)
 From: Jordan Rife <jordan@jrife.io>
 To: bpf@vger.kernel.org
 Cc: Jordan Rife <jordan@jrife.io>,
@@ -85,10 +87,12 @@ Cc: Jordan Rife <jordan@jrife.io>,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	Jiayuan Chen <jiayuan.chen@linux.dev>,
 	Paul Chaignon <paul.chaignon@gmail.com>
-Subject: [PATCH v2 bpf-next 0/2] bpf: bpf_redirect_peer egress redirection
-Date: Thu, 18 Jun 2026 11:20:31 -0700
-Message-ID: <20260618182035.43811-1-jordan@jrife.io>
+Subject: [PATCH v2 bpf-next 1/2] bpf: Support BPF_F_EGRESS with bpf_redirect_peer
+Date: Thu, 18 Jun 2026 11:20:32 -0700
+Message-ID: <20260618182035.43811-2-jordan@jrife.io>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260618182035.43811-1-jordan@jrife.io>
+References: <20260618182035.43811-1-jordan@jrife.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,7 +107,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[jrife-io.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -111,13 +115,13 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	FREEMAIL_CC(0.00)[jrife.io,vger.kernel.org,kernel.org,iogearbox.net,linux.dev,fomichev.me,gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-300518-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300520-lists,netdev=lfdr.de];
 	FORGED_SENDER(0.00)[jordan@jrife.io,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:jordan@jrife.io,m:netdev@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:sdf@fomichev.me,m:jiayuan.chen@linux.dev,m:paul.chaignon@gmail.com,m:paulchaignon@gmail.com,s:lists@lfdr.de];
 	DMARC_NA(0.00)[jrife.io];
 	DKIM_TRACE(0.00)[jrife-io.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -130,9 +134,9 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,jrife.io:mid,jrife.io:from_mime,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,jrife-io.20251104.gappssmtp.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,jrife-io.20251104.gappssmtp.com:dkim,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,jrife.io:email,jrife.io:mid,jrife.io:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4F2D86A21D0
+X-Rspamd-Queue-Id: 5D3986A220E
 
 We have several use cases where a pod injects traffic into the datapath
 of another so that the traffic appears to have originated from that
@@ -238,28 +242,138 @@ In this test, using bpf_redirect_peer(BPF_F_EGRESS) for the hop from
 [iperf pod] to [pod b] led to ~18% more throughput compared to
 bpf_redirect(BPF_F_INGRESS).
 
-CHANGES
-=======
-v1->v2: https://lore.kernel.org/bpf/20260613183424.1198073-1-jordan@jrife.io/
-* Introduce and use BPF_F_EGRESS instead of BPF_F_INGRESS (Paul,
-  Jiayuan).
-    Overall opinion was that BPF_F_EGRESS was clearer, but it was
-    acknowledged that this creates some inconsistencies with
-    bpf_redirect where 0 means egress implicitly.
-* Invert `skb->dev = dev;` and `dev_sw_netstats_rx_add` to make the
-  diff cleaner.
+Signed-off-by: Jordan Rife <jordan@jrife.io>
+---
+ include/uapi/linux/bpf.h       | 19 +++++++++++--------
+ net/core/filter.c              | 12 +++++++-----
+ tools/include/uapi/linux/bpf.h | 19 +++++++++++--------
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
-Jordan Rife (2):
-  bpf: Support BPF_F_EGRESS with bpf_redirect_peer
-  selftests/bpf: Add tests for bpf_redirect_peer with BPF_F_EGRESS
-
- include/uapi/linux/bpf.h                      | 19 +++---
- net/core/filter.c                             | 12 ++--
- tools/include/uapi/linux/bpf.h                | 19 +++---
- .../selftests/bpf/prog_tests/tc_redirect.c    | 68 +++++++++++++++++++
- .../selftests/bpf/progs/test_tc_peer.c        | 22 ++++++
- 5 files changed, 119 insertions(+), 21 deletions(-)
-
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 89b36de5fdbb..c91b5a4bda03 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -5079,17 +5079,19 @@ union bpf_attr {
+  * 	Description
+  * 		Redirect the packet to another net device of index *ifindex*.
+  * 		This helper is somewhat similar to **bpf_redirect**\ (), except
+- * 		that the redirection happens to the *ifindex*' peer device and
+- * 		the netns switch takes place from ingress to ingress without
+- * 		going through the CPU's backlog queue.
++ * 		that the redirection happens to the *ifindex*' peer device. If
++ * 		*flags* is 0, the netns switch takes place from ingress to
++ * 		ingress without going through the CPU's backlog queue. If the
++ * 		**BPF_F_EGRESS** flag is provided then redirection happens in
++ * 		the egress direction of the peer device.
+  *
+  * 		*skb*\ **->mark** and *skb*\ **->tstamp** are not cleared during
+  * 		the netns switch.
+  *
+- * 		The *flags* argument is reserved and must be 0. The helper is
+- * 		currently only supported for tc BPF program types at the
+- * 		ingress hook and for veth and netkit target device types. The
+- * 		peer device must reside in a different network namespace.
++ * 		If the *flags* argument is 0, the helper is currently only
++ * 		supported for tc BPF program types at the ingress hook and for
++ * 		veth and netkit target device types. The peer device must reside
++ * 		in a different network namespace.
+  * 	Return
+  * 		The helper returns **TC_ACT_REDIRECT** on success or
+  * 		**TC_ACT_SHOT** on error.
+@@ -6336,9 +6338,10 @@ enum {
+ /* Flags for bpf_redirect and bpf_redirect_map helpers */
+ enum {
+ 	BPF_F_INGRESS		= (1ULL << 0), /* used for skb path */
++	BPF_F_EGRESS		= (1ULL << 1), /* used for skb path */
+ 	BPF_F_BROADCAST		= (1ULL << 3), /* used for XDP path */
+ 	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4), /* used for XDP path */
+-#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
++#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_EGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
+ };
+ 
+ #define __bpf_md_ptr(type, name)	\
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 2e96b4b847ce..ce2ef5d8ae44 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2529,16 +2529,18 @@ int skb_do_redirect(struct sk_buff *skb)
+ 	if (unlikely(!dev))
+ 		goto out_drop;
+ 	if (flags & BPF_F_PEER) {
+-		if (unlikely(!skb_at_tc_ingress(skb)))
+-			goto out_drop;
+ 		dev = skb_get_peer_dev(dev);
+ 		if (unlikely(!dev ||
+ 			     !(dev->flags & IFF_UP) ||
+ 			     net_eq(net, dev_net(dev))))
+ 			goto out_drop;
++		skb_scrub_packet(skb, false);
++		if (flags & BPF_F_EGRESS)
++			return __bpf_redirect(skb, dev, 0);
++		if (unlikely(!skb_at_tc_ingress(skb)))
++			goto out_drop;
+ 		skb->dev = dev;
+ 		dev_sw_netstats_rx_add(dev, skb->len);
+-		skb_scrub_packet(skb, false);
+ 		return -EAGAIN;
+ 	}
+ 	return flags & BPF_F_NEIGH ?
+@@ -2575,10 +2577,10 @@ BPF_CALL_2(bpf_redirect_peer, u32, ifindex, u64, flags)
+ {
+ 	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+ 
+-	if (unlikely(flags))
++	if (unlikely(flags & ~BPF_F_EGRESS))
+ 		return TC_ACT_SHOT;
+ 
+-	ri->flags = BPF_F_PEER;
++	ri->flags = BPF_F_PEER | flags;
+ 	ri->tgt_index = ifindex;
+ 
+ 	return TC_ACT_REDIRECT;
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 89b36de5fdbb..c91b5a4bda03 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -5079,17 +5079,19 @@ union bpf_attr {
+  * 	Description
+  * 		Redirect the packet to another net device of index *ifindex*.
+  * 		This helper is somewhat similar to **bpf_redirect**\ (), except
+- * 		that the redirection happens to the *ifindex*' peer device and
+- * 		the netns switch takes place from ingress to ingress without
+- * 		going through the CPU's backlog queue.
++ * 		that the redirection happens to the *ifindex*' peer device. If
++ * 		*flags* is 0, the netns switch takes place from ingress to
++ * 		ingress without going through the CPU's backlog queue. If the
++ * 		**BPF_F_EGRESS** flag is provided then redirection happens in
++ * 		the egress direction of the peer device.
+  *
+  * 		*skb*\ **->mark** and *skb*\ **->tstamp** are not cleared during
+  * 		the netns switch.
+  *
+- * 		The *flags* argument is reserved and must be 0. The helper is
+- * 		currently only supported for tc BPF program types at the
+- * 		ingress hook and for veth and netkit target device types. The
+- * 		peer device must reside in a different network namespace.
++ * 		If the *flags* argument is 0, the helper is currently only
++ * 		supported for tc BPF program types at the ingress hook and for
++ * 		veth and netkit target device types. The peer device must reside
++ * 		in a different network namespace.
+  * 	Return
+  * 		The helper returns **TC_ACT_REDIRECT** on success or
+  * 		**TC_ACT_SHOT** on error.
+@@ -6336,9 +6338,10 @@ enum {
+ /* Flags for bpf_redirect and bpf_redirect_map helpers */
+ enum {
+ 	BPF_F_INGRESS		= (1ULL << 0), /* used for skb path */
++	BPF_F_EGRESS		= (1ULL << 1), /* used for skb path */
+ 	BPF_F_BROADCAST		= (1ULL << 3), /* used for XDP path */
+ 	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4), /* used for XDP path */
+-#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
++#define BPF_F_REDIRECT_FLAGS (BPF_F_INGRESS | BPF_F_EGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
+ };
+ 
+ #define __bpf_md_ptr(type, name)	\
 -- 
 2.43.0
 
