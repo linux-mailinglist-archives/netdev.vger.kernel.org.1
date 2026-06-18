@@ -1,289 +1,310 @@
-Return-Path: <netdev+bounces-300359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id OJXmASSwM2pUFAYAu9opvQ
-	(envelope-from <netdev+bounces-300359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:45:24 +0200
+	id PZoBHPKxM2qnFAYAu9opvQ
+	(envelope-from <netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:53:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC08469E8F4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:45:23 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DEBB69E9DB
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:53:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=rhOw7JoC;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300359-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c09:e001:a7::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300359-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=est.tech header.s=selector1 header.b=F70vupDP;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A6FCB302F4B1
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:44:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1013130046A8
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620013B47FA;
-	Thu, 18 Jun 2026 08:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8913B4E94;
+	Thu, 18 Jun 2026 08:45:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013050.outbound.protection.outlook.com [40.107.162.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128103AA182
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 08:44:50 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781772293; cv=none; b=AmiuVNKO/pQ3eNs61mfCH+m9GNi5e7aa3Eo38//9e59Rxeq+81veFJ4fzBB0wcNE40QBTpDmXKDnJotROMokqYbWXwOH243pZSme+hUTB3wAugfeV91KplF7udNsZzbRc2DDh0fbTs4bLrZYI470Qi7IMUig7e8RpEOVATN20Kw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781772293; c=relaxed/simple;
-	bh=76A9PLA0Vo4uGvCdzH6m1R2rU33fdxsc/cfE8TrRFNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DbEv+igvOXSh+KklT317nj+1cyZrRDKI8JpSerCbHo/TyK4mESP+fOq9JSn0jWOiOh9KLm28XpZQzObed3+3a9UeMkJJRByg9G2HPJ2FHmjpeOgF17xcLMCp7EZtsvYla9ybLPdYx20D2xkilpM97DzEMcTSVmqyYjO2ajXKLbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rhOw7JoC; arc=none smtp.client-ip=209.85.128.52
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490c0c92cffso4049145e9.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 01:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781772289; x=1782377089; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BMZN9/XZRkM1cRtvf9YfI3LamYxCsoX5bvp0jYNhRA4=;
-        b=rhOw7JoCdlFDxr43Ajxcrwuh2Rhd4S4I1Ll+1dn5dvfztv3CjTkcREYGKCcydkrIIp
-         PgqgXXK1hSY6T07tW0y3prQJ7MzigP8P1EHEsu05I14uQXBCNPwCpws3IXIuo5wjMF7U
-         CUAlZ8pK9h1iOh97bGCr/gOKxVhjgKgRA9a5gZdo5NJ/oLXEOHBly+GNq0SetASHCTgQ
-         /QeWH4vajVClpYpm4owzidy+Y+tVeNZ/f35EBOX5+CRFZ5ZSScIjXw+/5hzeomOh8kWr
-         YNKc1OOYLaEnQCAK4ZKdEnxGsH+jug+dk+uYpYCuCSiMgeA0r9Ua2mRJ+FSnjV5WEIOk
-         quJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781772289; x=1782377089;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMZN9/XZRkM1cRtvf9YfI3LamYxCsoX5bvp0jYNhRA4=;
-        b=CZQHt7rBn3WDw+tQ+B52ZD/QiJRPfCNz9YFprMMUYOkTnPkl3AzhT6ZQknS7iXza6h
-         wvKPkSbbaTLWLxmE2PUSyg+lD0FnYhdFrbNlk92L4K7Yb8IEqUlW08Ywz6ZrVsber6vD
-         V8IymKwCUTnypneum+yfDRQ+2xia/FMBdgL9KpG+CJ1jP1nRplDR8ROJ+pwK4Bya3Ho2
-         hKIflP47mOJFI80FYaa44I1owWJ1L3LRmntOECof4DhV+qvslYTthCKg8cLV9+ZWuiQN
-         5uWlNcFvjvmReeGsqop2WmhDu9YBA3FZXKL7CT8KjZf5Y0vUZuKpX1CMB+RdJQJ77q1E
-         BUYw==
-X-Forwarded-Encrypted: i=1; AFNElJ+aNSYO6wPKbdKv6MIvlixIVgT7hQfHt5P3Jh4a3j08hTcufRS+LV4c2UbFOJPbw8ghdsVzspc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydlJEiD1xikzHtjdTcXknmwRoCT81mKuQOxJBnbiRI5TI04WF2
-	fGGqapXG5ZmDqaJgtYpFH6O4z0seTzNM3ke13U1ZDuSNOP1M5bR21WJr
-X-Gm-Gg: Acq92OHhlrQ+as8cizal70uGYdPRfPGSTizfEwpnVsESSjTccppOwzrkA6LDENltl5a
-	rbGRiGGiYAfwIaqc993cEf1ZvSG1sFX7f3ffoPmGzme488Wn/X7tHRrSoLlF9KBGPW1gHwgVB3s
-	REH0IaLLcuXm4dNAWkekBo0xjSdasdGbtv8Yx7GDwbVOc6RbG6sF6beLmC4tHL1QVT8CTdfxDLT
-	NNNG286V+UkFsLt8OyawsMWH6gLHrGaNVw3HzyuB86iIA3JRzZJ3G4XwbLPk3aS2XWYBeJxEA9C
-	1vQpDpb3y1728RRlhkCm90K0AgeX3jzr/j3sU3cukoRANkBkiTZRNHvBZKQLa4CDO6rNkSNL/Au
-	Su6J8dMB12Sqk85MdjtQhLlrhB2gLzdcjF4XWl4y1m/D+THzeZ4gVrXxDKUYCbhb0aQy1o0vSDY
-	KKps94RrJYyVSdWhWmMRnjB/7B7gIKjWyhL679cWqlxN1S/ogLTiJvbfNMf2PHP7dPtORZZWuzK
-	vtaDAkaXKS7/IcwgX8KiNqeZ9u+UWye/FEW0IyN0yQMVxlMT2EdOLUTBSWHGHab/cg8wbMcjcDY
-	G7UQqI0jg1WCNj0I4x3wpgUTiL4GWFt/
-X-Received: by 2002:a05:600c:350a:b0:492:1e36:1fe9 with SMTP id 5b1f17b1804b1-49233430b8amr112747915e9.37.1781772289262;
-        Thu, 18 Jun 2026 01:44:49 -0700 (PDT)
-Received: from mail.gmail.com (2a01cb0889497e006e99796483dfbc0d.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:6e99:7964:83df:bc0d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa96f0esm255321905e9.12.2026.06.18.01.44.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 01:44:48 -0700 (PDT)
-Date: Thu, 18 Jun 2026 10:44:46 +0200
-From: Paul Chaignon <paul.chaignon@gmail.com>
-To: sun jian <sun.jian.kdev@gmail.com>
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com,
-	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
-	toke@redhat.com, lorenzo@kernel.org, martin.lau@kernel.org,
-	clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH bpf v3 2/2] selftests/bpf: Cover partial copy of
- non-linear test_run output
-Message-ID: <ajOv_oOd1zInaW1b@mail.gmail.com>
-References: <20260617093557.63880-3-sun.jian.kdev@gmail.com>
- <2dad9b5c184fa101d7cffa1d8f5eea5b5df60f53533d98c68175c9e3ec5ee6ac@mail.kernel.org>
- <CABFUUZFeh18OjQ6EhjD17ZwQKb1aiVNkYKv-hAkVGrHhPpjE4Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFF93385B2;
+	Thu, 18 Jun 2026 08:45:23 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781772325; cv=fail; b=RB4c8BhEyohTAp8Oa2zjdAmhE3NVQ4vBEHpSE1IRsp6Msx6L8DrFg1mKvMjEQNuqvoFcxugvVStQsdzFVttLDA8NR8bahmmPwa9DkQwmraqDB/BIpkprgIAj2u7Yj+5/VBLrrVAsps1ublljOIa7rsW1WsF1r+ITq9fznJn7k8I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781772325; c=relaxed/simple;
+	bh=S6y2NFaTcEQBSrYKIrFl+7K09+d+UwdFfM+bYr/84Cc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VKHpkKx3euRRw+KbhoCCEvw7AuwAfGnmd7CK6LNy5pFdMHiGE5VRq07bjksv7jdTSqXUZ7DhjjL15qBRG+rvK9rAEJ3gPCkBmgXYetp8ERihLoDslxvDdD7dWstcP/L/YTknwuqdMK1m/9aLb0RGNVwQLm0byvgDGMrphs5evbk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=F70vupDP; arc=fail smtp.client-ip=40.107.162.50
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ic8ZZS/JdMJVKoT3SXIb5Qu2EZk2jMLRSZnWRiQ69/5eVGUiKeWBHCWlisrL9N3fzNWdwbhkeOv8cl2z2WQWei1yQzmSDDfIoix/x14ZYmLcOLtCvdBkmgVQOO8KOFQ/Nr8cuvpaZj2Ih8lMr0UvOAzoCetZKg7KexjQUb01YjN7F6rslsRLy54kiYM+AkaJrmaRP9TzexuDCYNghUSX8yUlntMKVnXhXaxEuH/v/UATaV0HDD3Ftzc1ImqrsltsKPiXa+MXtRLgl6Y65gMTaLJA+s4nEfvdJbZsECQ+376tebHTDovcCqAmV72TPx4lbqpZZbCyjvTPbsxk5/LYQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SRU1kjrNc+VDy7bhTKAx0tY1QSD/aN6c59LB4hW9H5k=;
+ b=I4+P8bVBXbaw3ygB0ffCk8Wj8aSz0cxSt1AXrwzGWacbDb/vjpJiHI4xaQLx805PaLcs8Zi3XwNCAVibXy/5fTvELEN2dt2mvV5GIkF1eNRALAIbXB2L/Dxd11FiDsi6S1OG9J8SSk4u+RzAs7QIkgugvyODXMWCKnOK5ixx/Jke4j4+9oHN8lSmUCEea9gx77fr7SyJi4F1/8JR2y8W5pSOrJf8HpX0N7UqIUH28oGZmEEmJVk2D53f7TTNpcgBE39QaoALChoKsvL7ItWNafy8kiX7gXj+rD8TExxhDwy7MLlDlZuXtnu5E2J4IGtA2YUdOAHwbQzkiwqTAd3yJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SRU1kjrNc+VDy7bhTKAx0tY1QSD/aN6c59LB4hW9H5k=;
+ b=F70vupDPGLAUbMsdbUEVUbrur0q1s81lniXJ3kwpjpavCe5ZgLn9HbKKsXZUhOT9M6G/ILbmB86fPLhi9oeUyvS0G8qoX/9HXCZkcITAhEerQe1cGbhxUCHXnK5QrWqnOky314kJs+qWX2b2f1h0L3EcPpopx6KEDzF7gSqk5CEbeLA4rARt1CLKW9aObnx6QW96R1Lwm4dS+GkJl/Zic0IG+K/1Kc/RMZMDhwdRhW/NBXiATfctY+9pcspG0zd35tqFE3VExSrEICHIGcAOg/CCJ05Tr35IpeBmfoTBTeDbe0caNfJDOG9rHXI9T17szCFGqzM8MrLNQIC6EEbzlg==
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
+ DU2PPFBA933CD6B.EURP189.PROD.OUTLOOK.COM (2603:10a6:18:3::aa1) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.139.11; Thu, 18 Jun 2026 08:45:18 +0000
+Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+ ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
+ 08:45:18 +0000
+From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
+To: Weiming Shi <bestswngs@gmail.com>
+CC: Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Xiang Mei <xmei5@asu.edu>, Jon Maloy
+	<jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Subject: RE: [PATCH net v3] tipc: fix use-after-free of the discoverer in
+ tipc_disc_rcv()
+Thread-Topic: [PATCH net v3] tipc: fix use-after-free of the discoverer in
+ tipc_disc_rcv()
+Thread-Index: AQHc/mG778NGJTQ9aEGmBcXEp0hTxLZEAGbQ
+Date: Thu, 18 Jun 2026 08:45:18 +0000
+Message-ID:
+ <GV1P189MB19885A51CB153EBAA966184EC6E32@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
+References: <20260617135744.3383175-3-bestswngs@gmail.com>
+In-Reply-To: <20260617135744.3383175-3-bestswngs@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DU2PPFBA933CD6B:EE_
+x-ms-office365-filtering-correlation-id: ada551ef-c13a-4ae8-8706-08decd15ecc7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|1800799024|7416014|376014|366016|56012099006|11063799006|5023799004|6133799003|22082099003|18002099003|3023799007|38070700021;
+x-microsoft-antispam-message-info:
+ YEK+6Dy+UeMLrZSznMiJrzUcc9CMDJgkGGVGajO09Pcxpcq6XonLT/AlQQv0KQ9GeXKuVkFD1xk9IntW4RcEwMYI6x+2HWelVyBaFhA9BqMUhESY5HQJhS6fD8r2BywmQe8W8lZfp1YhQ4+N9mX0NZIhOJlzDERvc99O/lyRAuDZ2JnxISdik96gjFhPywwIShCI2YrDXz1Tjd4VXTpyZ6n9lm9Ro42WOfewNqDEHd67GFzjn7Af+jp5cDdG8ZMOaTdJYUq0dct8u56GExFc+8ZABCC4lNrO5Qm0Y7RjkrFVDLh2DIyMILFONY8AECJcRNY1WFhklG2nAqdl/xIVzZCNE5bVhXb2wxGrRefvNGxaNqvh2iFTnILmJDJpaSFKiMiWwawg7f7su1lV7oG4PxC83yPyt3jbgZ04vUsecHJRZAGUMRnx3wEJv27abyz9mWqfH5KGfKRsIiOy2MhQhSecQzbBhKrXin/vYur8Ta9mUZf4enqFtBOU8uiSg2zcbDsBYDnub3gNLJTvseY+QWrwILWeOVkgZYGzerJjxXewKwNklndBAMKlasNyOtjoCLUuPYL8MIlvk7Ya4fOFotMkPRzfdCwyjYLAJEHvPnF9FywWeCBJVh1CzK+4aJQMKmqnlitaHvwEb3PFfupwhFkjc2/UGxLjW6YReMNcdIyidJRHIqFuKplt82gEDccyZA8FVfQqXIKwd9BfcuUO6jFxYr5qCS7nPDab241MfweoU1wo3K0rF1AP1ZBM9r5S
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(376014)(366016)(56012099006)(11063799006)(5023799004)(6133799003)(22082099003)(18002099003)(3023799007)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?r2eLV9ARW1cESw/4J0oq6bg+HjIblh16qEBI8SJhIS66t65ogNO2hHKKW3oS?=
+ =?us-ascii?Q?2NXjnnr1WNsZPCGvYbjZvqQi4xzWo3NSD4hZd+G/LLiNHm5vJA9dVzSzDIL6?=
+ =?us-ascii?Q?358IBtpQO3aonXvOFSzlqlh6SbSw1ZGDnbMNGOAyYTKubXKmA6Z20g4de9/q?=
+ =?us-ascii?Q?y6IkDS9C3V3kDgtX02EheRMf7DRtZmkee8JsXdAi12yamKORM3+AQNgR0PNN?=
+ =?us-ascii?Q?U9TivTzNDYrL3p3uh129QfTgFhmBsh9B88P7zC3LE+5vS+YythfZogHmeZuu?=
+ =?us-ascii?Q?Wd/XEHSdFrIEBAf6IyNRDwXZ7qi42WO5EB+DyizC+FjdGL2BUe4x4rO/dML3?=
+ =?us-ascii?Q?vrWEhZZw4C/iOWMrbhDG89RSPY4MbNbq6fVBqe6MB5LNkfBPE8+01KnrkUb5?=
+ =?us-ascii?Q?vUcQ0i+xzCFE/FlLJBPnwAROPhrQfGo+lcNRifLLEmLOOmtG+NIRkPN8DJ00?=
+ =?us-ascii?Q?lpbq6EiVLaI1VD0eSYo34YX/Pi5cp0jdW1rBgmcwJuQ9ks+qjfJfoC9RbMS5?=
+ =?us-ascii?Q?s7PGqQrd7Qk6VREv8PUxb+iEDfIXAT/XL17tpun46OFSsTrofVQWL/6YGU4D?=
+ =?us-ascii?Q?hC0V/DGKkaE6b4RUZsJg4b5HgM9AJBX3U86ixBsZfhG09w9/6yi2AzJSjHst?=
+ =?us-ascii?Q?59nXy9TiaH5F5Xh64cjs1FlsN2OHrJcl+mjatuWTkmorgOy6m3bux78NpH6D?=
+ =?us-ascii?Q?vsQq0ZGbR4F6d2XAYy6HiIW7yJbrbYwqdQTCnHHtY49pY3TE7tndHFrQ/5OS?=
+ =?us-ascii?Q?snz8hH04TkvpOV/pFaSqD4CtQGIVDAI5tuusfig9oVDVeDTcpGVJMJ0HBxH8?=
+ =?us-ascii?Q?2n//C/ExneFidA+RxuWegspiEVb36LalLhoXoTFT+sEPPyBcIlddKubJY+1F?=
+ =?us-ascii?Q?VxWkKZHaKlvoLDSIBTZKg2r4IJRV774aXjZoC1NNPKOdVEKnFjfs3DFJStU9?=
+ =?us-ascii?Q?Z2hQQ73XZfpEL19W1WvrKHvdJVdkJiqA8gSPsviBDZZ153uhrih0+X0+kz32?=
+ =?us-ascii?Q?CNXRp68GNqC4leSE3VT6j/YUC0VdNP67BJxqzTesxaFb0becs6CdGUwv6mFB?=
+ =?us-ascii?Q?BGGivRi8cRef4iVwkPWpUItn7VLlwCPDwK68qVeTFDWabfQnaBZF3+f94bW2?=
+ =?us-ascii?Q?+I3s3E0EuDJbvMDn4B0U99lwaEsXx1EzKccEcZZLAbYYOeqXEFGyxk3kxzMy?=
+ =?us-ascii?Q?8UKzwBjnidoMMtvqjsiOJXqqJhjOs5MV6CVl8JnBqzQms+zOhRBahOUqKhYi?=
+ =?us-ascii?Q?4Nv5unOM/vRox2LakKGax49gLeFbUb11lDkm7x+nviso2qmYaDWIg8vazohO?=
+ =?us-ascii?Q?vzYjmWcRrKjAF/ClZ4TVSWGVr1JY8iCELzBcctiN0O3eZ/o02YY9Qm1pMomp?=
+ =?us-ascii?Q?i7i6Z4ByCCdGaTgH+5wnIoilhsvbM9+DpxwBGkF7ux6t8IZjt0EisDGQ127z?=
+ =?us-ascii?Q?4yo1MSmAvqjuc4DZzsBT98fXXdxfYm/TZtaLRVDy5TSKcShA/QY7Cd5Utl4r?=
+ =?us-ascii?Q?SfdXHqkT/bG7t0URBFVXNANfzWH7Ta9+poVTVKIxJTjKjR8yzpw+cJoGjgEV?=
+ =?us-ascii?Q?0mTJvn4qN/ecqKqz9mD9bXza33I9Daw+IooQ6ZglJryE8cp3xfM9UkfXTQFs?=
+ =?us-ascii?Q?FzT0BTYcmpFSZ7YQTyLbd033yFATkpicFOmnPKoW2BB6gX+I2HjHvW6T/Dfm?=
+ =?us-ascii?Q?tdDixZvZzrHZppnAJzsjmVvBzBSrYkpAMLac8ag04T6mc8q/GvHY6mn8qSVC?=
+ =?us-ascii?Q?0FBhYBbViw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABFUUZFeh18OjQ6EhjD17ZwQKb1aiVNkYKv-hAkVGrHhPpjE4Q@mail.gmail.com>
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: ada551ef-c13a-4ae8-8706-08decd15ecc7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2026 08:45:18.3079
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: NvgNJcYiLN8NPqy8bC4IYk9dD+XSIDp2WhmBhcdFenBvp9he6NwLpR4QeKFR/df/8xuP7YYLfVyPL93rtlwIOES0wjMcuCIsFymfDnaEJ58=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PPFBA933CD6B
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300359-lists,netdev=lfdr.de];
+	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:sun.jian.kdev@gmail.com,m:bot+bpf-ci@kernel.org,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:toke@redhat.com,m:lorenzo@kernel.org,m:martin.lau@kernel.org,m:clm@meta.com,m:ihor.solodrai@linux.dev,m:sunjiankdev@gmail.com,m:bot@kernel.org,m:johnfastabend@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
+	DMARC_NA(0.00)[est.tech];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORWARDED(0.00)[lists@lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300360-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[est.tech:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kernelnewbies.org:url,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,vger.kernel.org:from_smtp,mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:email,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,est.tech:dkim,est.tech:email,est.tech:from_mime]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: DC08469E8F4
+X-Rspamd-Queue-Id: 6DEBB69E9DB
 
-On Wed, Jun 17, 2026 at 10:19:52PM +0800, sun jian wrote:
-> On Wed, Jun 17, 2026 at 6:31 PM <bot+bpf-ci@kernel.org> wrote:
-> >
-> > > diff --git a/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c b/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > > index 01f1d1b6715a..9cc898e6a9f7 100644
-> > > --- a/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > > +++ b/tools/testing/selftests/bpf/prog_tests/prog_run_opts.c
-> > > @@ -4,6 +4,10 @@
-> > >
-> > >  #include "test_pkt_access.skel.h"
-> > >
-> > > +#define NONLINEAR_PKT_LEN 9000
-> > > +#define NONLINEAR_LINEAR_DATA_LEN 64
-> > > +#define SHORT_OUT_LEN 100
-> > > +
-> >
-> > [ ... ]
-> >
-> > > @@ -20,6 +24,69 @@ static void check_run_cnt(int prog_fd, __u64 run_cnt)
-> > >             "incorrect number of repetitions, want %llu have %llu\n", run_cnt, info.run_cnt);
-> > >  }
-> > >
-> > > +static void init_pkt(__u8 *pkt, size_t len)
-> > > +{
-> > > +     size_t i;
-> > > +
-> > > +     for (i = 0; i < len; i++)
-> > > +             pkt[i] = i & 0xff;
-> > > +}
-> >
-> > A question was raised on v2 about whether pkt_v4 could be reused by
-> > reducing the linear area to ETH_HLEN, rather than introducing a custom
-> > init_pkt() with a 9000-byte stack packet.
-> >
-> > Can't we reuse pkt_v4 here by reducing the linear area to ETH_HLEN?
-> > The v3 still adds init_pkt() and the NONLINEAR_PKT_LEN packet, so this
-> > doesn't seem to have been picked up.
-> >
-> > > +
-> > > +static void test_skb_nonlinear_data_out_partial(struct test_pkt_access *skel)
-> > > +{
-> > > +     LIBBPF_OPTS(bpf_test_run_opts, topts);
-> > > +     __u8 pkt[NONLINEAR_PKT_LEN];
-> > > +     __u8 out[SHORT_OUT_LEN];
-> > > +     struct __sk_buff skb = {};
-> > > +     int prog_fd, err;
-> > > +
-> > > +     init_pkt(pkt, sizeof(pkt));
-> > > +
-> > > +     skb.data_end = NONLINEAR_LINEAR_DATA_LEN;
-> > > +
-> > > +     topts.data_in = pkt;
-> > > +     topts.data_size_in = sizeof(pkt);
-> > > +     topts.data_out = out;
-> > > +     topts.data_size_out = sizeof(out);
-> > > +     topts.ctx_in = &skb;
-> > > +     topts.ctx_size_in = sizeof(skb);
-> > > +
-> > > +     prog_fd = bpf_program__fd(skel->progs.tc_pass_prog);
-> >
-> > [ ... ]
-> >
-> > > diff --git a/tools/testing/selftests/bpf/progs/test_pkt_access.c b/tools/testing/selftests/bpf/progs/test_pkt_access.c
-> > > index bce7173152c6..cd284401eebd 100644
-> > > --- a/tools/testing/selftests/bpf/progs/test_pkt_access.c
-> > > +++ b/tools/testing/selftests/bpf/progs/test_pkt_access.c
-> > > @@ -150,3 +150,15 @@ int test_pkt_access(struct __sk_buff *skb)
-> > >
-> > >       return TC_ACT_UNSPEC;
-> > >  }
-> > > +
-> > > +SEC("tc")
-> > > +int tc_pass_prog(struct __sk_buff *skb)
-> > > +{
-> > > +     return TC_ACT_OK;
-> > > +}
-> > > +
-> > > +SEC("xdp.frags")
-> > > +int xdp_frags_pass_prog(struct xdp_md *ctx)
-> > > +{
-> > > +     return XDP_PASS;
-> > > +}
-> >
-> > A related suggestion on v2 was that, once pkt_v4 is reused, the existing
-> > BPF program could be reused instead of adding new pass-through programs.
-> >
-> > Could tc_pass_prog and xdp_frags_pass_prog be dropped in favour of the
-> > existing program? The v3 still adds both of these, so this point also
-> > seems to be open.
-> >
-> >
-> > ---
-> > AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> > See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> >
-> > CI run summary: https://github.com/kernel-patches/bpf/actions/runs/27680511802
-> 
-> Hi,
-> 
-> Thanks for checking this.
+>Subject: [PATCH net v3] tipc: fix use-after-free of the discoverer in
+>tipc_disc_rcv()
+>
+>bearer_disable() frees b->disc with tipc_disc_delete()'s plain kfree(), bu=
+t
+>tipc_disc_rcv() still dereferences b->disc in RX softirq under
+>rcu_read_lock() (tipc_udp_recv -> tipc_rcv -> tipc_disc_rcv).
+>
+>L2 bearers are safe thanks to the synchronize_net() in tipc_disable_l2_med=
+ia(),
+>but the UDP bearer defers that call to the
+>cleanup_bearer() workqueue, so the discoverer is freed with no grace
+>period:
+>
+> BUG: KASAN: slab-use-after-free in tipc_disc_rcv (net/tipc/discover.c:149=
+)
+>Read of size 8 at addr ffff88802348b728 by task poc_tipc/184  <IRQ>
+>  tipc_disc_rcv (net/tipc/discover.c:149)
+>  tipc_rcv (net/tipc/node.c:2126)
+>  tipc_udp_recv (net/tipc/udp_media.c:391)
+>  udp_rcv (net/ipv4/udp.c:2643)
+>  ip_local_deliver_finish (net/ipv4/ip_input.c:241)  </IRQ>  Freed by task=
+ 181:
+>  kfree (mm/slub.c:6565)
+>  bearer_disable (net/tipc/bearer.c:418)
+>  tipc_nl_bearer_disable (net/tipc/bearer.c:1001)
+>
+>The bearer is freed with kfree_rcu(); free the discoverer the same way.
+>Add an rcu_head to struct tipc_discoverer and free it and its skb from an =
+RCU
+>callback.
+>
+>Because the RCU callback (tipc_disc_free_rcu) lives in module text, a
+>call_rcu() that is still pending when the tipc module is unloaded would in=
+voke a
+>freed function. Add an rcu_barrier() to tipc_exit() after the bearer subsy=
+stem
+>has been torn down, so all pending discoverer callbacks have run before th=
+e
+>module text goes away.
+>
+>Reachable from an unprivileged user namespace: the TIPCv2 genl family is
+>netnsok and its bearer commands have no GENL_ADMIN_PERM. Needs
+>CONFIG_TIPC and CONFIG_TIPC_MEDIA_UDP.
+>
+>Fixes: 25b0b9c4e835 ("tipc: handle collisions of 32-bit node address hash
+>values")
+>Reported-by: Xiang Mei <xmei5@asu.edu>
+>Assisted-by: Claude:claude-opus-4-8
+>Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+>---
+>v3:
+> - Reword the rcu_barrier() comment as a TODO (Tung Quang Nguyen).
+>v2:
+> - split the over-80-column container_of() line (Tung Quang Nguyen)
+> - add rcu_barrier() to tipc_exit() so a pending call_rcu() cannot fire
+>   into freed module text after rmmod (Eric Dumazet)
+>
+> net/tipc/core.c     |  5 +++++
+> net/tipc/discover.c | 14 ++++++++++++--
+> 2 files changed, 17 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/tipc/core.c b/net/tipc/core.c index
+>434e70eabe08..1ddecea1df6e 100644
+>--- a/net/tipc/core.c
+>+++ b/net/tipc/core.c
+>@@ -218,6 +218,11 @@ static void __exit tipc_exit(void)
+> 	unregister_pernet_device(&tipc_net_ops);
+> 	tipc_unregister_sysctl();
+>
+>+	/* TODO: Wait for all timers that called call_rcu() to finish before
+>+	 * calling rcu_barrier().
+>+	 */
+>+	rcu_barrier();
+>+
+> 	pr_info("Deactivated\n");
+> }
+>
+>diff --git a/net/tipc/discover.c b/net/tipc/discover.c index
+>3e54d2df5683..b9d06595b067 100644
+>--- a/net/tipc/discover.c
+>+++ b/net/tipc/discover.c
+>@@ -58,6 +58,7 @@
+>  * @skb: request message to be (repeatedly) sent
+>  * @timer: timer governing period between requests
+>  * @timer_intv: current interval between requests (in ms)
+>+ * @rcu: RCU head for deferred freeing
+>  */
+> struct tipc_discoverer {
+> 	u32 bearer_id;
+>@@ -69,6 +70,7 @@ struct tipc_discoverer {
+> 	struct sk_buff *skb;
+> 	struct timer_list timer;
+> 	unsigned long timer_intv;
+>+	struct rcu_head rcu;
+> };
+>
+> /**
+>@@ -382,6 +384,15 @@ int tipc_disc_create(struct net *net, struct tipc_bea=
+rer
+>*b,
+> 	return 0;
+> }
+>
+>+static void tipc_disc_free_rcu(struct rcu_head *rp) {
+>+	struct tipc_discoverer *d =3D container_of(rp, struct tipc_discoverer,
+>+						 rcu);
+>+
+>+	kfree_skb(d->skb);
+>+	kfree(d);
+>+}
+>+
+> /**
+>  * tipc_disc_delete - destroy object sending periodic link setup requests
+>  * @d: ptr to link dest structure
+>@@ -389,8 +400,7 @@ int tipc_disc_create(struct net *net, struct tipc_bear=
+er
+>*b,  void tipc_disc_delete(struct tipc_discoverer *d)  {
+> 	timer_shutdown_sync(&d->timer);
+>-	kfree_skb(d->skb);
+>-	kfree(d);
+>+	call_rcu(&d->rcu, tipc_disc_free_rcu);
+> }
+>
+> /**
+>--
+>2.43.0
+>
 
-Hi Sun Jian,
-
-It would help if you could reply inline instead of at the end of the
-messages, especially when there are multiple comments. See [1] for an
-explanation of how that works.
-
-1: https://kernelnewbies.org/FirstKernelPatch#Responding_inline
-
-> 
-> I tried reusing pkt_v4 and the existing TC program, but they do not fit
-> the skb case this test is trying to cover.
-> 
-> For skb test_run, IPv4/IPv6 inputs with a too-short L3 header in the
-> linear area are rejected before bpf_test_finish(). With pkt_v4 and a
-> linear area of ETH_HLEN, the test fails with -EINVAL before reaching the
-> partial copy-out path. If the linear area is increased enough to pass the
-> IPv4 check, pkt_v4 is too small to both trigger the old
-> copy_size - frag_size path and verify that the copied prefix spans the
-> linear data and the first fragment. pkt_v6 has the same issue: after
-> making the IPv6 header linear, only 20 bytes remain in frags.
-> 
-> The existing test_pkt_access program has its own packet-access coverage
-> goals and is not just a pass-through carrier. With such a short linear
-> area or small packet fixture, it can fail before the test hits the
-> bpf_test_finish()'s partial copy-out path. A pass-through TC program is
-> therefore a better fit, because it keeps the test focused on the
-> bpf_test_finish() copy-out semantics.
-
-If we're keeping tc_pass_prog() then can't we use pkt_v4 and get rid of
-init_pkt?
-
-> 
-> For XDP, this object does not have an existing xdp.frags pass-through
-> program, so the small XDP frags program is needed to cover the other
-> caller of the shared bpf_test_finish() path.
-> 
-> Thanks,
-> Sun Jian
+Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
 
