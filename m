@@ -1,162 +1,190 @@
-Return-Path: <netdev+bounces-300378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300380-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id H5Z9KIu7M2pgFgYAu9opvQ
-	(envelope-from <netdev+bounces-300378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:34:03 +0200
+	id Z0BGG9u7M2prFgYAu9opvQ
+	(envelope-from <netdev+bounces-300380-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:35:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF39B69EE76
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:34:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF1469EE97
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 11:35:22 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=R+BfFysw;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300378-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300378-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	dkim=pass header.d=pschenker.ch header.s=20220412 header.b=QZkCmAOa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300380-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300380-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=pschenker.ch;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 78D7730B7F70
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:29:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41CCF302F99F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723493C6A2B;
-	Thu, 18 Jun 2026 09:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D961E3DB626;
+	Thu, 18 Jun 2026 09:30:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C8E3C0A0F;
-	Thu, 18 Jun 2026 09:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D3D3BED46
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 09:30:50 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781774958; cv=none; b=DKdhZECIkcztE2ucZR1fYIZdahFmMp+yDFZ5+xKBFrHNiNj61uJ9Ft6PAUE+on4cO4BbjUyLJYPlo+pQcKE/eUFBsewnO4JPnjn9BNPF5zGwgJZqo/g8eDnCkey7gK0BWWetqw9GbQJE2qv0cqe4P6QfhMVWr6J6HlB19FlyZPc=
+	t=1781775054; cv=none; b=H2rTrgfPs0u970QKv5h+Szp7KxNcMgmkWOT01rXCKM3Dv4EqPXP2NOlu2/pKO0r19GiWAjdlErKVBTD5xgz/lSlHGnx93drNp6Mh/Lba8qyLFOK/P2tWA2H1ER6xVBLp3KiAl3zVw6Cb1ZhIGqqDo5CBi0u81oJSqSIGXZ6USLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781774958; c=relaxed/simple;
-	bh=c8gqHcV+x26aMaGy/roPIbZdgkOvaUiZUVWoVDqRuCw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iz7M+lNLEcIOtQENaAeYT8ePbAlVUUMN617u/TeLn+3kd9eCgwPKxanXztcNe/rFhnT7IVnt7cTXw37AqCwg1LlXU9m1G5YaVsLO2HkzdE6NaT4vErHl/3J4504WduzUBtgbV6hDw82Y4bVhQrEPUimy7bbBsww1CGm0sz1lVMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+BfFysw; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0361F000E9;
-	Thu, 18 Jun 2026 09:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781774957;
-	bh=sI3OajoS+qnU1/n61HNxOgvTgUraUb6h6oeRCaIbYvA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=R+BfFysw6R7tgdFX7oD/+7LLjas0ow78Vi3GyCt97EKj5SRxHZDh4JaY8LADC/OhU
-	 rzv9ueUHr9Upyhfdw8pVT12mxW+Gx8EIpaxxMdJOZWA7Fts/8ngNofpgpKLelIEXOh
-	 NVxpfpCv5T1wmWTdIEVqWNvtuAyCc08aeyRHUfcZ5Z3AUud5iQtMXWRp2CF93bddeR
-	 6j+IV4b9OD7tMg0ZWvsq9P0INH8zebWz3S8FrW4v8SR5wzwoUZik6hQIK5XmYAToxX
-	 2qAHF3yCk4cTEApzOzDH2Fite5IHup48KCU5nkeVH1hzpUvZerv5qESfaUIzJ4lgWV
-	 ZvksFKUBqHxKA==
-From: Simon Horman <horms@kernel.org>
-To: dhowells@redhat.com
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	marc.dionne@auristor.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	d4n.for.sec@gmail.com,
-	n05ec@lzu.edu.cn,
-	jaltman@auristor.com,
-	stable@kernel.org
-Subject: Re: [PATCH net 4/5] afs: Fix further netns teardown to cancel the preallocation charger
-Date: Thu, 18 Jun 2026 10:29:09 +0100
-Message-ID: <20260618092909.888006-1-horms@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260616155749.2125907-5-dhowells@redhat.com>
-References: <20260616155749.2125907-5-dhowells@redhat.com>
+	s=arc-20240116; t=1781775054; c=relaxed/simple;
+	bh=dB0Vq19/pojtzKMdhU+ZjSekw7vileLMRuihFiNJgbY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fGtdnB4nkW1vTgnuQWrzvdsxdHBBtT3N1sHF6IWmg1gPsBt/wUu3P0gFbUaT3wzPUzhOAZOMUhtrqwHiDNCnI5rr5t8xXfZdqVS156U8wMIYwfohw6KJE46HLpWc89LqmSpy95CAQ9d440XR3yI919DL79ziCMley75QVE6HNgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=QZkCmAOa; arc=none smtp.client-ip=45.157.188.9
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4ggwSm312Wzbwx;
+	Thu, 18 Jun 2026 11:30:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pschenker.ch;
+	s=20220412; t=1781775048;
+	bh=dB0Vq19/pojtzKMdhU+ZjSekw7vileLMRuihFiNJgbY=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=QZkCmAOaWPmGsisoVV7yHqc53vNnggu3Bg6/wYzJCYSgrPjBlmb/6HqOCH9HtFeq1
+	 /oRHdXW3gab/eEdvxtLK+1V8QVwnAgC9tYBywtlMGqYamMHLA6yboVopbf8tiJVjxQ
+	 sL/zRJUCBVWwLL8fkWBN2vWfTWGK0oP4O6u9NTbE=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4ggwSk2kZbzmC6;
+	Thu, 18 Jun 2026 11:30:46 +0200 (CEST)
+Message-ID: <ecb210fddc9f0926c98d682e8ffbf99defa05991.camel@pschenker.ch>
+Subject: Re: [PATCH net] net: ethernet: ti: icssg: guard PA stat lookups
+From: Philippe Schenker <dev@pschenker.ch>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, danishanwar@ti.com, rogerq@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, Andrew Lunn	
+ <andrew+netdev@lunn.ch>, David Carlier <devnexen@gmail.com>, "David S.
+ Miller"	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jacob
+ Keller	 <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Kevin
+ Hao	 <haokexin@gmail.com>, Meghana Malladi <m-malladi@ti.com>, Paolo Abeni	
+ <pabeni@redhat.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 18 Jun 2026 11:29:24 +0200
+In-Reply-To: <20260618091004.GG827683@horms.kernel.org>
+References: <20260616143642.1972071-1-dev@pschenker.ch>
+	 <20260618091004.GG827683@horms.kernel.org>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-b4MkfBcVTcys+AbJZKR4"
+User-Agent: Evolution 3.60.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[pschenker.ch,none];
+	R_DKIM_ALLOW(-0.20)[pschenker.ch:s=20220412];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300378-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:dhowells@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:marc.dionne@auristor.com,m:kuba@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:pabeni@redhat.com,m:linux-afs@lists.infradead.org,m:linux-kernel@vger.kernel.org,m:d4n.for.sec@gmail.com,m:n05ec@lzu.edu.cn,m:jaltman@auristor.com,m:stable@kernel.org,m:d4nforsec@gmail.com,s:lists@lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-300380-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_SENDER(0.00)[dev@pschenker.ch,netdev@vger.kernel.org];
 	FORWARDED(0.00)[lists@lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,kernel.org,lists.infradead.org,lunn.ch,gmail.com,davemloft.net,google.com,intel.com,redhat.com,linux.dev];
+	FORGED_RECIPIENTS(0.00)[m:horms@kernel.org,m:netdev@vger.kernel.org,m:danishanwar@ti.com,m:rogerq@kernel.org,m:linux-arm-kernel@lists.infradead.org,m:stable@vger.kernel.org,m:andrew+netdev@lunn.ch,m:devnexen@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:jacob.e.keller@intel.com,m:kuba@kernel.org,m:haokexin@gmail.com,m:m-malladi@ti.com,m:pabeni@redhat.com,m:vadim.fedorenko@linux.dev,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,auristor.com,davemloft.net,google.com,redhat.com,lists.infradead.org,gmail.com,lzu.edu.cn];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dev@pschenker.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[pschenker.ch:+];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[impulsing.ch:email,infradead.org:email,pschenker.ch:dkim,pschenker.ch:mid,pschenker.ch:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,ti.com:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: EF39B69EE76
+X-Rspamd-Queue-Id: BBF1469EE97
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-Full review at: https://sashiko.dev
----
-afs: Fix further netns teardown to cancel the preallocation charger
 
-This commit modifies the afs network namespace teardown process to wait for
-the preallocation charger work item. It addresses a small window where the
-work item could be requeued after being cancelled by flushing the workqueue
-on which the charger runs.
+--=-b4MkfBcVTcys+AbJZKR4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Link: https://sashiko.dev/#/patchset/20260609140911.838677-1-dhowells%40redhat.com
+Hi Simon
 
-> diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-> --- a/fs/afs/rxrpc.c
-> +++ b/fs/afs/rxrpc.c
-> @@ -130,6 +130,7 @@ void afs_close_socket(struct afs_net *net)
->  	cancel_work_sync(&net->charge_preallocation_work);
->  	kernel_listen(net->socket, 0);
->  	flush_workqueue(afs_async_calls);
-> +	flush_workqueue(afs_wq);
+Thanks for the review and I'll send a v2 with that blank line removed.
+Saw it right after sending the patch.
 
-[Severity: High]
-Will flushing the system-wide global workqueue here cause cross-namespace
-stalls during teardown?
+Philippe
 
-It appears afs_wq is allocated once in afs_init() as a system-wide workqueue
-shared by all AFS network namespaces:
+On Thu, 2026-06-18 at 10:10 +0100, Simon Horman wrote:
+> On Tue, Jun 16, 2026 at 04:35:34PM +0200, Philippe Schenker wrote:
+> > From: Philippe Schenker <philippe.schenker@impulsing.ch>
+> >=20
+> > icssg_ndo_get_stats64() unconditionally calls
+> > emac_get_stat_by_name()
+> > with FW PA stat names regardless of whether the PA stats block is
+> > present on the hardware.=C2=A0 emac_get_stat_by_name() already guards
+> > the
+> > PA stats lookup with `if (emac->prueth->pa_stats)`; when that
+> > pointer
+> > is NULL the lookup falls through to netdev_err() and returns -
+> > EINVAL.
+> > Because ndo_get_stats64 is polled regularly by the networking stack
+> > this produces thousands of log entries of the form:
+> >=20
+> > =C2=A0 icssg-prueth icssg1-eth end0: Invalid stats FW_RX_ERROR
+> >=20
+> > A secondary consequence is that the int(-EINVAL) return value is
+> > implicitly widened to a near-ULLONG_MAX unsigned value when
+> > accumulated
+> > into the __u64 fields of rtnl_link_stats64, silently corrupting the
+> > rx_errors, rx_dropped and tx_dropped counters reported by `ip -s
+> > link`.
+> >=20
+> > Every other PA-aware code path in the driver is already guarded
+> > with
+> > the same `if (emac->prueth->pa_stats)` check.=C2=A0 Apply the same guar=
+d
+> > here.
+> >=20
+> > Fixes: 0d15a26b247d ("net: ti: icssg-prueth: Add ICSSG FW Stats")
+>=20
+> nit: no blank line between tags
+>=20
+> >=20
+> > Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
+> >=20
+> > Cc: danishanwar@ti.com
+> > Cc: rogerq@kernel.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: stable@vger.kernel.org
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-fs/afs/main.c:afs_init() {
-    ...
-    afs_wq = alloc_workqueue("afs", WQ_PERCPU, 0);
-    ...
-}
+--=-b4MkfBcVTcys+AbJZKR4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
-Other namespaces use afs_wq for operations like cell management, which can
-block for tens of seconds waiting for userspace DNS lookups via the
-request_key mechanism.
+-----BEGIN PGP SIGNATURE-----
 
-Since afs_close_socket() runs in the context of the global cleanup_net
-worker thread, does this stall the destruction of all network namespaces
-system-wide until unrelated AFS work across the entire system finishes?
+iQGzBAABCgAdFiEEPaCxfVqqNYSPnRhRjRDjR2hoXxoFAmozunUACgkQjRDjR2ho
+XxorIgv+MdrlIU+2xGujhlcXTn+Dsq0kw33yjB3erdz6HBgq+DdEkIa0y70uv3T2
+MqpKAYE3rPZQ3S8fZWhmzeJAFFXTgVF+G9XANpH9K3f0GClORwvNfjKfeS6sbbo3
+9eg+iiQbKUSRBp6gYmAWySaaVXtu1rl4dWav4PBpHz+E8psyn7gsdBTePWozMhSe
+g9LI+eN8dt9j3khhcaSNQYulCe3GGomP5akVXTDNgYZo3fksJtoYX1r5wgYk78Ni
+UGBZHDol//C/rhpSGh7OF/HkBhz0ALZ6ceA+HzfCMwbJWy8IStRHtmMVBUEg+jZC
+sgJM8IRw5KRzVtp2N48ZgjYH3nryykpheySI+Rp9c7ZnY0Jqf+vDjS3ucjPUEmSk
+XherZhqhT0+nE4eaYJDNU+F/QudOvMHSYH+sk3mnCjpuGdOai8BDdhV+oq1Ql0LV
+W17nyWFwwmtgSQKbR3NV537nWIzKGqz5PEcHye6GowHRoTeH1rbLPSFYaIbPEvbd
+kgjvWlmW
+=KfCZ
+-----END PGP SIGNATURE-----
 
-Would it be safer to explicitly call
-cancel_work_sync(&net->charge_preallocation_work) a second time here instead
-of flushing the shared queue?
+--=-b4MkfBcVTcys+AbJZKR4--
 
