@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-300404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300405-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Q3HVL/jNM2pAGgYAu9opvQ
-	(envelope-from <netdev+bounces-300404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:52:40 +0200
+	id vf8HL53NM2oeGgYAu9opvQ
+	(envelope-from <netdev+bounces-300405-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:51:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A64969F83F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:52:40 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4BC69F7FE
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:51:08 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=broadcom.com header.s=google header.b=MND135qF;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300404-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300404-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=broadcom.com header.s=google header.b=d3koL2IH;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300405-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300405-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=reject) header.from=broadcom.com;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84AC33022073
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:51:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E63F0300860C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46239364927;
-	Thu, 18 Jun 2026 10:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27473EFD24;
+	Thu, 18 Jun 2026 10:51:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f228.google.com (mail-qk1-f228.google.com [209.85.222.228])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC5729C33F
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 10:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682CF3EF0DC
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 10:51:00 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781779859; cv=none; b=M+zYgr0JEPYQldAzlCdd4M+bg2hO9z6f+XQ9QBCSjYHmFIfToO+fQ4Y9TVaTkCyeH/TieXyg6RnA4kLBA1sTPWbFPiKwyjluVy5nEVclry89A9UzPEhRUnVrxSbW3dSILJ2dBcq/scAFRgy3wvVD3HifQi0VlrJYF2usCeE1ORI=
+	t=1781779861; cv=none; b=Gz9b/RYzWaa7NGUHi0TDZm2CdQsEX67mNXJI0SCmxXaZVyxai4CAU+4s77UXGV73rinZH4Xbn6SB6H5Jb+kNmoYTAbnev377p1AUxt3xOtk+5fwIH49lzYcYb78RtSz8T3UXflbW5k3iuiWv2mi4ERuMrGy/g+XcB+qlAX8DY88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781779859; c=relaxed/simple;
-	bh=Se/6XPcHI20qi48T8ngqwuf/Si0p2Lfd7eX5POwmwXM=;
+	s=arc-20240116; t=1781779861; c=relaxed/simple;
+	bh=imh7lzeRo7GqB99dIGp8+jvQIiP9UQhq2gWePCDM2p8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NZPShzowoSAYn9DR+wtE2AUCIqvMOq6Er6fR8BRRB6rkJb6mHpP7MrnWhIMDcZKlpiORItWlvUnspTWbszwDNtknDTohoz82GyYxIsZgQ48F+ICQPos3zakaQS5F2Ri5ofxtI6lxGd+dtr5plCI53RqKOgLTVSaTIA4Dt8FIWwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MND135qF; arc=none smtp.client-ip=209.85.222.228
-Received: by mail-qk1-f228.google.com with SMTP id af79cd13be357-91562bf6c12so101676985a.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:50:57 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=V5tFQL3wNb4L5OKD34EkXq+fZSaWugzi7m3UGS+aWitcd2Uxv8H47498w6OOSI4zNh+UzlcXGiQ4armSps1NZzU2s3Z22Oj9Jjpq9tmiIu8w++sX7Eyg5Jj508bZ/DsbHdVlCipqyciLY72rKvxRFd3jwcebcy6/vOisZLYzzQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=d3koL2IH; arc=none smtp.client-ip=209.85.214.225
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2c68190ade4so14419305ad.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:51:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781779857; x=1782384657;
+        d=1e100.net; s=20251104; t=1781779860; x=1782384660;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=sxUTxt+JD/yjMQrssAU8jOl5mCgW9xPgpAUPTA83Kks=;
-        b=G7XoXEtA9s0clE4O9KqX6U7ULr8oFtirxCUsIN4ykS1qEaZiTkSb+FFF8dtFdIZcLz
-         seHiaBdVVKc4jywRCDXs1uUWhJCeDGi5Cnb+fqq14O7c9w+j/JpXVLHui+27k7iO/Dzs
-         6q9TvE0n4fG5aKnbW3tlGe/E6WfXQwbin2y2/3fxJfk6/VBqFYiFzDqrM/gtX0uk1z8u
-         x4/MIA5k5DXTBV0Q7W+mQ+dDUUO1VkNw9de72ka+/93ZDImhBEQPrO2f+oEPEzDjgDNW
-         KicINQUZqoMZtqC3gt3A7FyVOJd7GeX4Bu9hHTFgc0Slzr4SWwFo/egKf7W93iulYCz+
-         PpIw==
-X-Forwarded-Encrypted: i=1; AFNElJ82OsxWXLcQGFLdYS8vuhSQvqHT6svvklDwjJpj4VmsrTT2YkyRRVp7C1O5sQL1xNpUtRl+Xus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLWhiDzRjxoEIi3c1HAbaIMNq1T050DFRo/DzpybUFIQcEJu6b
-	5mfwEkaLSQcQyQIdB6WvPJtazCz27MijzayG9L7Rbs0UdEocvaJhqfymBPzf6IBE4oGM43LCLQy
-	hwZgXqXuWmkA5CTJqY1wjt1fpr4QmOZBLUfvgrSPlpT3XCbNYWeVyAL0YDbeon3VidUgUbNTxlH
-	aeD6helatPI0XM2W4J8tnKkmgaw9T0f+8pcxQmuHfiRNeCgBF2AtWwN7tGljdhl9oscDKuzNuRi
-	7BWfLXeTjaiZHLENc8=
-X-Gm-Gg: Acq92OFmQ5TazjDM+Bo7MArjrWIM9LiOEpkwii6cNWdscZPZ7B2GFcv9//C1HiWSfwF
-	Lns22avwVlqrwH6YjIKp9suxNZFVKFCFtilLgiX2nGFbfg05VMXZeNRUtZivCvGdreGCAOEey3m
-	f9HNxyqdhbLN7L1hz09nEqkgAUYxxI5BbTElQIJhRHfQsoswqpBVcxWHDiIBDubP2f9TJKVwE7U
-	N4mv/xmVhGfQyZ+irLykiQimy1Q9MlcZj2ZJCPnmopiw2pDGHzTVMoV9PEYatfSFb+gwvnOUtS9
-	9eYaax7SGjh+gHlmyPCijgzbIDPvulJW2a/tFl2CeyD5rERdMAkVk/8Fw0tX1qEIJH+taoRXqsO
-	piTdPm7rmLgpK9HeS08Tfcpqmt9rTDzBgt63nlblPHvjQPyoEcGeTkDhxbk7KxjGZNZ0M9IZYes
-	yuhMZ0CvS+wOWdL0dQS56666MLrZAXDoQw0llKtyiXRnCIHsoyYlU=
-X-Received: by 2002:a05:620a:1a06:b0:914:e3dd:17e8 with SMTP id af79cd13be357-91db948c9f8mr1177292985a.8.1781779856788;
-        Thu, 18 Jun 2026 03:50:56 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-23.dlp.protect.broadcom.com. [144.49.247.23])
-        by smtp-relay.gmail.com with ESMTPS id af79cd13be357-91619f80af1sm65345085a.4.2026.06.18.03.50.55
+        bh=J9YwjIKoRl7XSA7xmw3oT5MIvVpXzyFhlZir9vFzXgs=;
+        b=WVxHq03E3cY7m6Fuf4M2q550ckgV6Rorw9wjPOqHq2V9KIlXVris8SHnm0PzClqh4U
+         +Y9VbaSIkPdSq+GuUgrf2VMxckfPl1MPXBBzCKGiwlEWcJqOGqlKF+ijtW44+8AkcuxW
+         u/2aGEBrH5SFo/cKznG5iNgHcJHDn2wFnjH1lsBIax7ME9Mlf0cj6RidbFIT+ByoqaVR
+         dl8dWVqB+m5bJOUMN1TJ7N6jy496XXvV8+4IUvouv6gGnkwc9bn5zSjzUqn1O4PwY5c9
+         mjRfGN9rh2f6ef9KWrCu82Yq3qPF4v6kAoj/HO26qjJMamJrquofbLhFJ7tB7ECX8YnN
+         47yA==
+X-Forwarded-Encrypted: i=1; AFNElJ8FELPKxB2eTMXeUcq56QmUCgTpVGZa5ZQLVrY6nqHHCz0J/o1proT8avJTC/lQ6+6Riz3ZF/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpCuDFm4MmpfG7YpEf3wjrh/Zb9dHFJtEDoLN+BUFb6g+js7LJ
+	Q/Vk1Y3RV57dK+oKnoNVBI1OSlSNwRZ5bF1RabChOvZEq7ORjbaMlBAXc2Y+qvMWnqx3QpnuB7s
+	ckajAz31GENErqLa8DpnC17gLRce/VPZOBFB61DBCFhNDJqgjXZLLTx7+b+nG6Ji3s8ztEwcRCP
+	/HwDmEIeIuQVupYYRzJgWOtUUN4AWERJhOliq74v0xlnZas9RlsB1NJpt3tVtSJd9kQ4fWpLuZ/
+	1ACZU8NWjCyWE2GxHg=
+X-Gm-Gg: AfdE7clfLx2YglA5mW0MSuseRz51CNVJYSBb2Kjuv8OrxD0AhVDEKYeG+I8KCxHeQdo
+	jXdIRxlqs/VjDdKpUUcWH+XQJX4zIaiygQFWzmXDW7D2FI8ZmavlUmWHFd0KYHLZC4SvvrIIc1M
+	wVt0aCmf5htPFsFzyyCPeUgwRj4HSQmSvtmYbvDskEfJVVWpIGHXo1saZw3mqJPY9lSfamklg2V
+	VzS4OU+6z9Zodit1Vzah4IiJfQn0MrpmzFy+/p3I+I2TKtnj8bRkQHHByYOXOYEeQlIpOqpfiE0
+	FBO+VnhsUPXah08UIU8jPTdInA7VnoAHGViimJOaSC0iT9SsEuCzoBLsrNZ5NZRUzqNiqCt9p7B
+	OwCJyMokjx2cMdsoQWQ1Yko/Xf9/Y5/km6B6oSe8tLIRDFFLv8aIIRGzCNacRCAwqJ3CrGSyf2y
+	Dc5lcpmoeigg34zG6mFVn3xK2zIyfH6AX1Q9jjvgV9eHabS+OEI+eufA==
+X-Received: by 2002:a17:903:2412:b0:2bf:2ea3:af30 with SMTP id d9443c01a7336-2c6de3dfc04mr30039855ad.4.1781779859608;
+        Thu, 18 Jun 2026 03:50:59 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c432e81bdesm15991235ad.39.2026.06.18.03.50.58
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jun 2026 03:50:56 -0700 (PDT)
+        Thu, 18 Jun 2026 03:50:59 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-45ef4931de5so1263120f8f.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:50:55 -0700 (PDT)
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-462d8ccf553so577871f8f.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781779854; x=1782384654; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1781779857; x=1782384657; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxUTxt+JD/yjMQrssAU8jOl5mCgW9xPgpAUPTA83Kks=;
-        b=MND135qFEHyOOOmqD1EEsnZDkBUwQulohsVMNeOW1mY0LALqsUoZxhg/KhP8sgrKr4
-         z/I5priW5avA3X76YypiEUDc4jlbwtzcICQu/dKGZFjhFYqqbAQb37xZI1m2AVL3qUht
-         wEQdt98iBXIfCGIhCc4wUP6XYx7ZJDbOkTgMg=
-X-Forwarded-Encrypted: i=1; AFNElJ+J+v9WaJZ+wDuzGFCDO+AmHFC4gegzQph6Rm8VcqSZpRyDpWOMbVKv2hIEGDV/mUWSxnbFVS4=@vger.kernel.org
-X-Received: by 2002:a5d:5651:0:b0:461:a15a:4160 with SMTP id ffacd0b85a97d-463978b2374mr4215902f8f.13.1781779854474;
-        Thu, 18 Jun 2026 03:50:54 -0700 (PDT)
-X-Received: by 2002:a5d:5651:0:b0:461:a15a:4160 with SMTP id ffacd0b85a97d-463978b2374mr4215865f8f.13.1781779854022;
-        Thu, 18 Jun 2026 03:50:54 -0700 (PDT)
+        bh=J9YwjIKoRl7XSA7xmw3oT5MIvVpXzyFhlZir9vFzXgs=;
+        b=d3koL2IHLOuluuVuoPr0rq/BXarf/vhneebJrsk6GlaoI7pl1O8/tOTicHfMqY2C4Q
+         1IkZ/uEUE99zDfQ5w5FTsPJxprTA7u5p/Fiq3ok4OUbVmBeZJH83Bu8Rz3K5+r843Jxp
+         75ssDeMZavUPPzVrhbeeRohf9gh1T36Y++LwU=
+X-Forwarded-Encrypted: i=1; AFNElJ/JoCM54F8NH3qVF+Eam36JMvMWGdWTJda5InM1oCQhzIod1AhCe3k5DMSHCZ1Z8nXZsDzBHDI=@vger.kernel.org
+X-Received: by 2002:a05:6000:1448:b0:462:6aa1:4393 with SMTP id ffacd0b85a97d-4626aa1456fmr13329706f8f.4.1781779856833;
+        Thu, 18 Jun 2026 03:50:56 -0700 (PDT)
+X-Received: by 2002:a05:6000:1448:b0:462:6aa1:4393 with SMTP id ffacd0b85a97d-4626aa1456fmr13329626f8f.4.1781779856339;
+        Thu, 18 Jun 2026 03:50:56 -0700 (PDT)
 Received: from [192.168.1.21] ([41.140.50.249])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4619fb12edbsm25700899f8f.17.2026.06.18.03.50.51
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4619fb12edbsm25700899f8f.17.2026.06.18.03.50.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jun 2026 03:50:53 -0700 (PDT)
-Message-ID: <0e7f3186-718d-4ce6-9527-447f37b97ef5@broadcom.com>
-Date: Thu, 18 Jun 2026 11:50:51 +0100
+        Thu, 18 Jun 2026 03:50:55 -0700 (PDT)
+Message-ID: <10979641-cf6c-4359-992e-64016d520944@broadcom.com>
+Date: Thu, 18 Jun 2026 11:50:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,8 +100,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: bcmgenet: allocate a single-queue
- netdev
+Subject: Re: [PATCH net-next 2/3] net: bcmgenet: remove dead priority queue
+ plumbing
 To: Nicolai Buchwitz <nb@tipi-net.de>, Doug Berger <opendmb@gmail.com>,
  bcm-kernel-feedback-list@broadcom.com, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
@@ -111,7 +111,7 @@ Cc: Justin Chen <justin.chen@broadcom.com>,
  Ovidiu Panait <ovidiu.panait.rb@renesas.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20260612205915.3156127-1-nb@tipi-net.de>
- <20260612205915.3156127-4-nb@tipi-net.de>
+ <20260612205915.3156127-3-nb@tipi-net.de>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -146,7 +146,7 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20260612205915.3156127-4-nb@tipi-net.de>
+In-Reply-To: <20260612205915.3156127-3-nb@tipi-net.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
@@ -156,12 +156,12 @@ X-Spamd-Result: default: False [-7.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300404-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300405-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[tipi-net.de,gmail.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
@@ -170,8 +170,8 @@ X-Spamd-Result: default: False [-7.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:email];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,broadcom.com:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,tipi-net.de:email];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
@@ -186,18 +186,19 @@ X-Spamd-Result: default: False [-7.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3A64969F83F
+X-Rspamd-Queue-Id: BE4BC69F7FE
 
 
 
 On 6/12/2026 1:59 PM, Nicolai Buchwitz wrote:
-> The driver only uses TX ring 0 and RX ring 0, so allocating a netdev
-> with GENET_MAX_MQ_CNT + 1 = 5 TX and 5 RX slots leaves four of each
-> unused. Switch to alloc_etherdev() which allocates exactly one queue
-> of each kind.
+> With a single TX ring there is nothing left to prioritize. Drop the
+> unused register writes, enum entries, helper macros, and the dead
+> "flow period for ring != 0" branch in bcmgenet_init_tx_ring().
 > 
-> No functional change: netif_set_real_num_{tx,rx}_queues() already
-> clamps the visible queue count to 1.
+> The DMA_ARBITER_{RR,WRR,SP} and DMA_RING_BUF_PRIORITY_* HW defines
+> are kept as register documentation.
+> 
+> No functional change.
 > 
 > Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 
