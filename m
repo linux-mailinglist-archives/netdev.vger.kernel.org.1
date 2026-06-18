@@ -1,246 +1,341 @@
-Return-Path: <netdev+bounces-300345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id eiV2DhalM2p+EgYAu9opvQ
-	(envelope-from <netdev+bounces-300345-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:58:14 +0200
+	id vxAyL4ykM2plEgYAu9opvQ
+	(envelope-from <netdev+bounces-300344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:55:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E413C69E460
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3F269E409
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 09:55:56 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=uniontech.com header.s=onoh2408 header.b="DmRK/I4D";
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300345-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300345-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=uniontech.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
+	dkim=pass header.d=intel.com header.s=Intel header.b="nKNqBKr/";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300344-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300344-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=intel.com;
+	arc=reject ("cv is fail on i=2")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 884583094F2B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 07:56:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2784B30B63F7
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 07:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE453D7D64;
-	Thu, 18 Jun 2026 07:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C3E3D7D83;
+	Thu, 18 Jun 2026 07:55:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096F32EEE61;
-	Thu, 18 Jun 2026 07:55:59 +0000 (UTC)
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781769363; cv=none; b=XvlCW2Eym47JZxYN2A0FR8GdUfo0W7PGCl8FvJ/8BHa0FDN6zEkVxjzctB1XLxjhOIDKNhcFZjLu9a6jVyul1SvQ/IL88u1ajd/miiLbree4Is4+JL6WGoe2FvBSvm+Y1jVUm7FgIBwFzTxFZkh6BqBOwkR6rv5TNeRwjMPHOEY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781769363; c=relaxed/simple;
-	bh=izr3e8xaE7FSAJNGWP+NVdtsvkPSw/DkyFydIwoKxRA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YTHanOR65dbY1tzbg/pKcZ0/soPIDfWlyU+i0p2hu1oj5ZitRUkl2P26ZhtY1wcDoxYlnhrnUfhHemBCL6riawousU+vS2RpZ6vz2ZDkZdEVqQVYhqLypOUfFrUiRPgVUfYnvmSghMkPhXPZuEtU8esyYZe/SN9R6Dn3vYBf998=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=DmRK/I4D; arc=none smtp.client-ip=54.207.19.206
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1781769294;
-	bh=T717HZ9C894Dqy1jhhFqWn/Sw6LU783IrPcrALglV6A=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=DmRK/I4DJMSIpKJrljAOe48SMPr9+KnRKneP0dGEH4XJdRtyo2bh7p9nEfDGivzr/
-	 BvCIZ/Aa0TdoWKj49UMO7WaRHruS1hx86HhmsHtndE5q9JIq2B1cKZp3UyfPTSR1TX
-	 +bJ8dMN1DejGrqTxiFv+KiuVhgycJ6yOhkQxGjIo=
-X-QQ-mid: esmtpsz16t1781769289t900aa2e9
-X-QQ-Originating-IP: tc1D/NFqEptOKYSwYkBpaUPy7wavTZGxAmL57KVP/4U=
-Received: from localhost.localdomain ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 18 Jun 2026 15:54:39 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 3650313968144136322
-EX-QQ-RecipientCnt: 10
-From: ZhaoJinming <zhaojinming@uniontech.com>
-To: Madalin Bucur <madalin.bucur@nxp.com>
-Cc: Sean Anderson <sean.anderson@linux.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ZhaoJinming <zhaojinming@uniontech.com>
-Subject: [PATCH] net: fman: fix clock and device node leak in probe error paths
-Date: Thu, 18 Jun 2026 15:54:35 +0800
-Message-Id: <20260618075435.1262533-1-zhaojinming@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99543C942B;
+	Thu, 18 Jun 2026 07:55:21 +0000 (UTC)
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781769323; cv=fail; b=LQ6md0xRIyAeBbAIEUMLs/lNEWJQmlFNg9uiG7Q4AC7cdfzMcGeCfy5TQyanyDfNdeoMOoizcdBpe7v5EZUidq/HU46MRJimuiIB0LGuoSSr1uUs0MeVCgsbOcGWw7gAPiUscIld376SD0A22L7PkmTK37idQxvTc7Oo9Z9oDW0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781769323; c=relaxed/simple;
+	bh=MZLa+JGEw7Tka2OYrrM8qWY+UWoE27zzd2+nZW3WNPM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=doCf/G5Jf918ChJukd7M04OnNrCfaEkvwBiJKwLgUA01oPwwn/nv9KeWpLSVMiddHxbeVv9zRI3nXd5n55/d7ba1zEKepK/ZyHOKC8t6H1prrja7OAhwHP3QNxwE4yQwjxwEvhohooeBMoixGFkaFhSXI/PB06PXUvmB7t88BWk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nKNqBKr/; arc=fail smtp.client-ip=198.175.65.9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781769322; x=1813305322;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MZLa+JGEw7Tka2OYrrM8qWY+UWoE27zzd2+nZW3WNPM=;
+  b=nKNqBKr/+kyp2F/pGFHj86HaQQ4nGw5aN6fDDNaGTX5CbamXXIP2h6A0
+   msmCFvs0xhGWprXVXN0NjAQYngMOdQefOK8T/5qkBTJ+7GEKMDA4qrAOp
+   su5MXLf8WvhHmQDsA28ZdFUHuCtax2R5KPrwB3Qd6LV1ubyQ+RGXFvWRX
+   qjm6Jkx2pRJvVXsuycJdVuBubwqjKuQQ94WlqxTiJJX4fTuGsBpzXrW4y
+   O4Cor7ifSzHVuroAYgO78vL5Xzl5Rs2sak7RpqTktewUL6vmHfq5ybyXP
+   NjWNO9c/Xx8sGNIMR+hDjbETK0bQ/FTtlcWMj62/fIonGpW+E4DYopPD1
+   Q==;
+X-CSE-ConnectionGUID: 20cWwZ9QR2a7Il5/taZ/ng==
+X-CSE-MsgGUID: nPvhosyNQOysS325uOutVg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11820"; a="105396519"
+X-IronPort-AV: E=Sophos;i="6.24,211,1774335600"; 
+   d="scan'208";a="105396519"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 00:55:22 -0700
+X-CSE-ConnectionGUID: fF5Ku70PQSO6KVZskz/N4Q==
+X-CSE-MsgGUID: em+HDkTVSluyuHZyu/Clpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,211,1774335600"; 
+   d="scan'208";a="247151169"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 00:55:22 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 18 Jun 2026 00:55:21 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Thu, 18 Jun 2026 00:55:21 -0700
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.32)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Thu, 18 Jun 2026 00:55:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FGOQYe62X7Sbiiiaf31+WpxJaagFZzIXQVCnscPIOTEmEyGv6gg9EO0n/7r/slDZGb8/5iA30xddimioyKh7zjl/CQ97tkmepyosEMfBAsf5a0AxxAx10SRW2G9jRi6knaBnJoBO1j83wU/tytTHVxcikuJPz9be2o6z+KbZk6lgW44GNLwecBCjtoP7sSddTvgJfHMNSgIIci0NearyD+dNwGRM9bI7/1TX/djoVxpWOPvV5QVdwmf4IiU38jEmvUG1KBtDgL5YaWwmn05nkI2GmGfxb/yzuyBX6ZCuVYKNn2LZzkDbp5qA4YN4ZZ8WPqf7xtyKnxx6BJS8V0YRyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c93bV5Ed2hZJLTorjnJbgQ5rXC8LYkW3LnjEO+0qg8I=;
+ b=Ar0x/Dvj3DasHYyTBftKqOZZaUNH9O6wN4tVM3yAdENPlYgJdziIk5uTadqh917S/RUK1Iqyc+DH/R40n5hrQ+AtB3EYB8ijZonaudX/6/on1+nbfyfgWIFilaqBT0bUJfVHc3iBdCPbQbmQx4M0GO5T7VU/Ds9G8UEBbqBovqX6OJ6hhKq9NQViRSFqWeqYpYGNHpUMPdhZM3N2izicW9O1OHHPgg2WgEvrWZVlll0xsUYNwmMU64u3o+boc3qRPT9GXncEMmVfW0UHc44U8HkvG638xaJ+S9W0Es2H4hSpTF7ygrPqKG8M4wF4Qy6BYsLZYopmHDUmd4ZHd3kWiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SA1PR11MB8351.namprd11.prod.outlook.com (2603:10b6:806:384::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.11; Thu, 18 Jun
+ 2026 07:55:17 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::e6f0:6afb:6ef9:ab5c%6]) with mapi id 15.21.0139.011; Thu, 18 Jun 2026
+ 07:55:17 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "kao, acelan" <acelan.kao@canonical.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough after
+ reset
+Thread-Topic: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough
+ after reset
+Thread-Index: AQHc/vTUlEkOP48iDECS1E/JP5nT7bZD8Vzg
+Date: Thu, 18 Jun 2026 07:55:17 +0000
+Message-ID: <IA3PR11MB8986B77F49DF672178FEE4BCE5E32@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20260618073324.1843310-1-acelan.kao@canonical.com>
+In-Reply-To: <20260618073324.1843310-1-acelan.kao@canonical.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SA1PR11MB8351:EE_
+x-ms-office365-filtering-correlation-id: caa66b2b-ed27-4b89-242b-08decd0eefd9
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|23010399003|366016|376014|1800799024|11063799006|56012099006|5023799004|6133799003|18002099003|22082099003|38070700021;
+x-microsoft-antispam-message-info: BC0jvGF7iroZW4GX7cE65mqUC6KTk3ks5yL1juP7/5Dk09Foo108Clj0Adzl7UcGRynI8cxQp/gV2/bDyWLikxXlWO7Znq4DvQ4Sc1LiCF3fUu0/AgeppbVg2PnUGpdMVH72+OQQ9ddMUDOcajz1g6YS52O0+AxgJlDOLz9PK+vuDUcIuyNUqOWYloslZhIh8kjZYvtN+LmeJejPJ35lcF+4LqmGCCLwXnCDFUCpHpzJD5LzYdn2UJ3qoAF2PxgoriUk9utUKQDW6cSVi16H14FRKHKs12RSc8W5wDhwj6qldZS/FQgQsaeUUiXiESCYo4uKcCPFNkNhLFgpKA00YTvlBLlGDFfB21t2g+5XNbndv4FbxwxsvD99UV2WEQsX0CyDJkGwPQqCUQDwsyKDd94Jal943EXWIjekDPGwfbvZNM49g2fMP0aI8Rq5Z82/nPfN52F+wyvFdXcGnPu4gWUf0+vIlED1V7jpQaMObXSYr7KnQl/zUegVDJwERIWC3poLY5Vmr4ZPmmhoXnJD4DKiWtNgwSFo562PG1l0KAle9CtzS7GbCmN3tAHb/hpJBdvOe69vshO7GXHS37pU2Yj6AK9YtgTU4uh7z9IhdZ+Qga8ESQqr2ML5JBBz7XOEzGdTD9VSBpXXtfvbfx8C3UqTsY0RtuwggA5NYq36JW8qy79r45chIc/J+nPKlSBjwYmop+D45Erj9XzP2VA39I4WYsrTEC2cnxjjm+hEL26n0aS+larM9aUN6gibWUOM
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(1800799024)(11063799006)(56012099006)(5023799004)(6133799003)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MrhVX7cZ+F34HmVahclzBwe2odEF9a7OoSoM2+loeEzUlIx/e5g4G8W3+6Wz?=
+ =?us-ascii?Q?MEFSXTWxDmi6T4/1dd2Oqwd4H8UpBYuVQqoG6HQmFmHh0+NQshpx5/UaqVC7?=
+ =?us-ascii?Q?cGHbj6t+8zRz6yYemUw+1xkR9cwh9Wg+SaUyP1LNF2b3h56UnIABzdt8NB57?=
+ =?us-ascii?Q?cXJJ5CMaqz60dNmtqTRy30LsfX85PjUKyumgtEQUYWSMxIe0S4HMQgGHSGBc?=
+ =?us-ascii?Q?h7VYUxilzLQKBoiG8Q6Hhco5Bg2tYx5unXEpmT/6ATvTopjJ3dGHodzxOOzo?=
+ =?us-ascii?Q?NgOtGBi25s7B3lQWq0lbujd6SIHC4O5CMfSiowPrN1mN7IH0x0vUkD44PyhH?=
+ =?us-ascii?Q?0hHvBr2lUhWXDUvoA00TjGALfhOYcLBz/h50e2m5Y7sqmUoa0G3j9yNpAk/r?=
+ =?us-ascii?Q?7tb+SxnUNSfTd3pBr/h7fJhEf6g13ukzAR+BhUK8DHx2HkTvJTkCAU/pXuBP?=
+ =?us-ascii?Q?+DzTVR3Wubk5xw1nRKkKkdXKSA0R5jwyaVSYt8UFWDBpI2gpb9gg6DIoHf70?=
+ =?us-ascii?Q?/uLuMK1b4peVzW9ZbRVm//LVXmR46IwG1TTRceJj0TkHdDlWEwFkb+HqmB/7?=
+ =?us-ascii?Q?MzDQfux/Eik/22YzU9WNoRMag5Fu7BXHo/HXzMapEmURjoK8h7GTCjoS061O?=
+ =?us-ascii?Q?yAZtsaUCJFNjKdZ6BNoPI4sfhY0WQzVOvxbnMIKW3Uj7FcKiGJ1DgcBD0RZh?=
+ =?us-ascii?Q?yvm6vt4ILOVr5WAvRlw9jA5Op/OlN3EIOj9s2qgeDwRIHsxWgKXezFxGK6oL?=
+ =?us-ascii?Q?8M9vV+GSFmQ4MUSgq2kpD0n9qHVikYElUMySCgUBFfDR3Iim2ipB6pVDsk3Y?=
+ =?us-ascii?Q?8SD7b4QnKC1FqaO0KmeE4N8rHxbIa1Zhpd7saaeu8FZnBfxYGjj4YmMZU/hJ?=
+ =?us-ascii?Q?WtjXiM6JeQ2a48Wnzni7Zv8wWcPIZCK6yZYtVy6NjsneOfdahDUg8FmswbP2?=
+ =?us-ascii?Q?b1LjgXON7rRQqmYg1JzUOK4qNm7adc1zZXkiBPRM0rnLLNAfggrqPF7cUm10?=
+ =?us-ascii?Q?IPFQdYDMxvv0Uxl2/yVTlD3BLOZxN3QvMhfkBT7i3DogCC3k0MOIJ3AlQyl2?=
+ =?us-ascii?Q?e7Ip5Dh21IdtvllbSwY7lJtk1GtEcU+GkJp7Wwr34Tsf+PhlhDxjLbjxr0FF?=
+ =?us-ascii?Q?+c/0bzmOeZ7HEU3cGNW3tuTVrup+XwnSm7HIAwRkCgrs3CQ/5sChULAjXtpc?=
+ =?us-ascii?Q?3PGcJ7RKLGo39mk3VDHr6UY61fkD0z/5D8IFPydqftHC+tSJ2VeZfG6wOP11?=
+ =?us-ascii?Q?Oy85EWVoPsyRS9CCXNOD4x0n0YT+TQxGmWlsG5ZrO3w6IZ3R1SDBjGX2P3nA?=
+ =?us-ascii?Q?xWORxFnkn+bDNsVuOaz9Zp2jNNGkK6usO/k9tDwQlK8lyoFUuhQSPBAjwp+R?=
+ =?us-ascii?Q?NeOs9UCu12aE/CJu3ZUrtONLxJjrcVvLgrQXdPxpp9W335Hg7gEFyBOCFjMn?=
+ =?us-ascii?Q?/bUAqdP9n+EjbqkKIApHGI/iPiEu8naXJgea/xf29p5Sk9APyScLQH/GQVIq?=
+ =?us-ascii?Q?yfTkyyAXpJ+nQPljbrH5sl9zSqTFVG57uNRl4sw8qVgNOhIjXeXUWK2kiwpW?=
+ =?us-ascii?Q?PbDG3R8T0Szl7BDQCXqyWQdXxRXpGDXgphX49DFDGXjw+9Fso52mwxm9k+7n?=
+ =?us-ascii?Q?/Ug4IY/VQcfSIrOhCtPHZF/U3cnwuyOZ5pW/m9509wbn4nhEW35VRDxHmiH6?=
+ =?us-ascii?Q?6nMFZvwlx4UxMDjO7ukkSKyCoDDGnW9k/1BaTnGvSacvKOZOF0Cb1TR6sCGc?=
+ =?us-ascii?Q?az8katoJIfnBDGff26t6l9PdOoJqPS4=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: OUC5DGN0mB58LQVcoNVdoWumBJy6hy+uuoUIioHx9HNLdtMo6NWb6XSv
-	NnnlcDxnatBInMCNgkMmgD1dIROtr4qzJBDu8ylxqrJEgfB3DisXmFnxwcYda3+CerD0TvV
-	BJQOBDiPNiuLeyvUBmIPT9IxhOHaBvMqJDvDFCvmYbA17Q1VHnLhqUUsq9Xk4sdOyO2s6zO
-	A/FMkG9ZnkZ98cAJeo3D0HwAHWtSZuWzLCVFojl99rJ/nuL2ycWHHsGC0P+lCFjNIY/2AKy
-	FHPY18oSdYQQo/2ClOMGSm2zafg53RLgrhUJLEf/ELLsMcFteggcokquepgTK6d4dHBOgl+
-	Dkau/A6R/z7fVVPsuvYmnUVMuIMhonQtIhoPXN+KvgaXiIfNcbx3ZxrbA+/9H1YOPfZ5+ZN
-	lmu+/BBcvlYpe94pvL1+b7nNO3LNifp+PK5+t8/rID5J7f4JFm4gQ+OLNchfjwhWlqQie07
-	mRXvT8uFxdL1goZI2OVODtCk4oAJMwD9aEr5qm/kldzo2jjgY0/uWsQWp0HdnmPjaYVuXuT
-	kermYTZXpKuWZru9597ShETLi8sdSxZ2xwVzSwSblm6YAMjXUjJvndNixDIdPoaJojzNH53
-	pjBsY536n/Agi4xHXL2Fq3J+G+6Affo5/XHwlp8PQQguZ6cBndL3QifambbD1ZQMQ01tnSa
-	jq0EMEMFE43u4YG57p6pWrD815nD8wcmcEWvm9OTpVdEuhD3KV170gbm+idU6p7S8og4zb4
-	xd4G4okRpu9wjlVnbWQzm0Al624N0lyZSEZ3kqtfnL8dre6o9nrhcYeo1+NETCE06clCOM/
-	qZaK5DCqctwPuEsn0cPcdM6UFoDjRxRkTY6OmslLv5S5AY3yFou3ZLrKdivCglIyhjreY/k
-	SnNr6u77XU87Q/+eHvn6M5TLjnFKWWUXVjVSCwH8oBf7fsUjtTAgaz9bvST3OEt07O/Ph4x
-	2rWQ2H0l8iYsDIE9MNPkEQinchI1SloKOnjulQDklo0h1qvZ4X5flQYMOyyqvz/FqyjNzpT
-	M8LHzW6IbdiyjFIQ9GwmS2nACU2q76o4m6MqURDzqs1sVG0ffU
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+X-Exchange-RoutingPolicyChecked: nqhn0BJ7vggreIzaLUSX0cnAdGaw0PqHtlO5mZevERk2cboV7rcAFyhpf/JEeWghZc2SfXOoYfdEnj6SABvbEjVTCad1UjzkJWNXXBFS+xVsar83s+jP5JS9Rlz3JGgHMd6v5wULlUly6w5z89dKd9YMZWL1zPGNA+EbPEvs3iLjuP6/iLQIs9CO+htwO2kIgFrSxnNfnomsQbMmVfblrsHssR6kQgTDaS3ZXFKoDJ2XldXrIe4/n250M9JDIqYDHkH8o6E1iv7pNSBDF+QB9aFMgECDwujsjZwsKRs6vUjhfnaaRPZnEF9eDYmraTflqfqJ7LAQEUylupkWJ9ymaw==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: caa66b2b-ed27-4b89-242b-08decd0eefd9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2026 07:55:17.0282
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Rpb9RNEv22dWsSSXY89KOEJwGsuz50NenGs5YKnXleTgwBD/HH+WLLMxa0/81H3tQgD9Zey0UKWZ9MhHdFhWJl0/xp92h448PZO3+nE/rxM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8351
+X-OriginatorOrg: intel.com
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[intel.com:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[uniontech.com,none];
-	R_DKIM_ALLOW(-0.20)[uniontech.com:s=onoh2408];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300345-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS(0.00)[m:madalin.bucur@nxp.com,m:sean.anderson@linux.dev,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:zhaojinming@uniontech.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300344-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:acelan.kao@canonical.com,m:anthony.l.nguyen@intel.com,m:przemyslaw.kitszel@intel.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:intel-wired-lan@lists.osuosl.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,canonical.com:email,vger.kernel.org:from_smtp,davemloft.net:email,IA3PR11MB8986.namprd11.prod.outlook.com:mid,osuosl.org:email];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhaojinming@uniontech.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[uniontech.com:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp,uniontech.com:dkim,uniontech.com:email,uniontech.com:mid,uniontech.com:from_mime]
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: E413C69E460
+X-Rspamd-Queue-Id: 3B3F269E409
 
-In read_dts_node(), fm_node is acquired via of_node_get() and clk is
-acquired via of_clk_get(). After a successful of_clk_get() call, the
-error paths for clk_get_rate failure and of_property_read_u32_array
-failure correctly goto fman_node_put (releasing fm_node) but miss
-clk_put(clk).
 
-Worse, all error paths from the MURAM node lookup onward goto
-fman_free directly, skipping both fman_node_put and clk_put, leaking
-both the fm_node and clk references.
 
-of_clk_get() eventually calls __of_clk_get() -> clk_hw_create_clk() ->
-alloc_clk() -> kzalloc_obj() to allocate the clk struct, so clk_put()
-must be called to release this memory. Without it, the allocated clk
-struct is leaked on every probe failure after of_clk_get() succeeds.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Chia-Lin Kao (AceLan) via Intel-wired-lan
+> Sent: Thursday, June 18, 2026 9:33 AM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; intel-
+> wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: [Intel-wired-lan] [PATCH 1/2] igc: Wait for MAC passthrough
+> after reset
+>=20
+> Some systems support MAC passthrough for dock Ethernet controllers by
+> having firmware rewrite the receive address registers after the
+> controller reset completes.
+>=20
+> igc resets the controller before reading RAL0/RAH0, so that reset can
+> restore the controller native MAC address temporarily. If the driver
+> reads the registers immediately, it can race the firmware rewrite and
+> keep the native dock MAC instead of the host passthrough MAC.
+>=20
+> For LMVP devices, poll RAL0/RAH0 after reset and before reading the
+> MAC address. Stop once the address registers change to another valid
+> Ethernet address, allowing firmware a bounded window to complete the
+> passthrough update.
+>=20
+Good day, Chia-Lin
 
-Introduce a clk_put label between the success return and fman_node_put
-in the unwind chain, and redirect all error paths after of_clk_get()
-to this new label. Since no goto target remains for fman_free, fold
-it into fman_node_put and remove the now-unused label.
+It'd be great if you could share more details on how to reproduce the issue=
+.
 
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
- drivers/net/ethernet/freescale/fman/fman.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+What exact hardware setup is affected (dock model, NIC, system)?
+Which firmware/BIOS version?
+How often does the race trigger?
+Do you have a way to reliably reproduce it?
 
-diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-index 013273a2de32..734cbe8efd7e 100644
---- a/drivers/net/ethernet/freescale/fman/fman.c
-+++ b/drivers/net/ethernet/freescale/fman/fman.c
-@@ -2736,7 +2736,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		err = -EINVAL;
- 		dev_err(&of_dev->dev, "%s: Failed to determine FM%d clock rate\n",
- 			__func__, fman->dts_params.id);
--		goto fman_node_put;
-+		goto clk_put;
- 	}
- 	/* Rounding to MHz */
- 	fman->dts_params.clk_freq = DIV_ROUND_UP(clk_rate, 1000000);
-@@ -2746,7 +2746,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (err) {
- 		dev_err(&of_dev->dev, "%s: failed to read fsl,qman-channel-range for %pOF\n",
- 			__func__, fm_node);
--		goto fman_node_put;
-+		goto clk_put;
- 	}
- 	fman->dts_params.qman_channel_base = range[0];
- 	fman->dts_params.num_of_qman_channels = range[1];
-@@ -2757,7 +2757,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		err = -EINVAL;
- 		dev_err(&of_dev->dev, "%s: could not find MURAM node\n",
- 			__func__);
--		goto fman_free;
-+		goto clk_put;
- 	}
- 
- 	err = of_address_to_resource(muram_node, 0,
-@@ -2766,7 +2766,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		of_node_put(muram_node);
- 		dev_err(&of_dev->dev, "%s: of_address_to_resource() = %d\n",
- 			__func__, err);
--		goto fman_free;
-+		goto clk_put;
- 	}
- 
- 	of_node_put(muram_node);
-@@ -2776,7 +2776,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (err < 0) {
- 		dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
- 			__func__, irq, err);
--		goto fman_free;
-+		goto clk_put;
- 	}
- 
- 	if (fman->dts_params.err_irq != 0) {
-@@ -2786,7 +2786,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 		if (err < 0) {
- 			dev_err(&of_dev->dev, "%s: irq %d allocation failed (error = %d)\n",
- 				__func__, fman->dts_params.err_irq, err);
--			goto fman_free;
-+			goto clk_put;
- 		}
- 	}
- 
-@@ -2794,7 +2794,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (IS_ERR(base_addr)) {
- 		err = PTR_ERR(base_addr);
- 		dev_err(&of_dev->dev, "%s: devm_ioremap() failed\n", __func__);
--		goto fman_free;
-+		goto clk_put;
- 	}
- 
- 	fman->dts_params.base_addr = base_addr;
-@@ -2806,7 +2806,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 	if (err) {
- 		dev_err(&of_dev->dev, "%s: of_platform_populate() failed\n",
- 			__func__);
--		goto fman_free;
-+		goto clk_put;
- 	}
- 
- #ifdef CONFIG_DPAA_ERRATUM_A050385
-@@ -2816,9 +2816,10 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
- 
- 	return fman;
- 
-+clk_put:
-+	clk_put(clk);
- fman_node_put:
- 	of_node_put(fm_node);
--fman_free:
- 	kfree(fman);
- 	return ERR_PTR(err);
- }
--- 
-2.20.1
+Also, what is the observed behavior vs. expected behavior? For example,
+which MAC address is seen and which one should be used?
+
+
+> Signed-off-by: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc_main.c | 48
+> +++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c
+> b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 2c9e2dfd8499..fa9752ed8bc5 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -11,6 +11,7 @@
+>  #include <net/pkt_sched.h>
+>  #include <linux/bpf_trace.h>
+>  #include <net/xdp_sock_drv.h>
+> +#include <linux/etherdevice.h>
+>  #include <linux/pci.h>
+>  #include <linux/mdio.h>
+>=20
+> @@ -69,6 +70,52 @@ static const struct pci_device_id igc_pci_tbl[] =3D {
+>=20
+>  MODULE_DEVICE_TABLE(pci, igc_pci_tbl);
+>=20
+> +static void igc_read_rar0(struct igc_hw *hw, u8 *addr, u32 *ral, u32
+> +*rah) {
+> +	*ral =3D rd32(IGC_RAL(0));
+> +	*rah =3D rd32(IGC_RAH(0));
+> +
+> +	addr[0] =3D *ral & 0xff;
+> +	addr[1] =3D (*ral >> 8) & 0xff;
+> +	addr[2] =3D (*ral >> 16) & 0xff;
+> +	addr[3] =3D (*ral >> 24) & 0xff;
+> +	addr[4] =3D *rah & 0xff;
+> +	addr[5] =3D (*rah >> 8) & 0xff;
+> +}
+> +
+> +static bool igc_is_lmvp_device(struct pci_dev *pdev) {
+> +	switch (pdev->device) {
+> +	case IGC_DEV_ID_I225_LMVP:
+> +	case IGC_DEV_ID_I226_LMVP:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +static void igc_wait_for_lmvp_mac_passthrough(struct pci_dev *pdev,
+> +					      struct igc_hw *hw)
+> +{
+> +	u8 addr[ETH_ALEN] __aligned(2);
+> +	u32 orig_ral, orig_rah;
+> +	u32 ral, rah;
+> +	int i;
+> +
+> +	if (!igc_is_lmvp_device(pdev))
+> +		return;
+> +
+> +	igc_read_rar0(hw, addr, &orig_ral, &orig_rah);
+> +
+> +	for (i =3D 0; i < 100; i++) {
+> +		msleep(100);
+> +		igc_read_rar0(hw, addr, &ral, &rah);
+> +		if ((ral !=3D orig_ral || rah !=3D orig_rah) &&
+> +		    is_valid_ether_addr(addr))
+> +			return;
+> +	}
+> +}
+> +
+>  enum latency_range {
+>  	lowest_latency =3D 0,
+>  	low_latency =3D 1,
+> @@ -7259,6 +7306,7 @@ static int igc_probe(struct pci_dev *pdev,
+>  	 * known good starting state
+>  	 */
+>  	hw->mac.ops.reset_hw(hw);
+> +	igc_wait_for_lmvp_mac_passthrough(pdev, hw);
+>=20
+>  	if (igc_get_flash_presence_i225(hw)) {
+>  		if (hw->nvm.ops.validate(hw) < 0) {
+> --
+> 2.53.0
 
 
