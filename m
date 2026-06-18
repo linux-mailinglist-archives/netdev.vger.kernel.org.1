@@ -1,160 +1,126 @@
-Return-Path: <netdev+bounces-300288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300289-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id EQg0CilCM2oC+wUAu9opvQ
-	(envelope-from <netdev+bounces-300288-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:56:09 +0200
+	id yVSdEjBJM2pQ/AUAu9opvQ
+	(envelope-from <netdev+bounces-300289-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 03:26:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791E269CEF6
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:56:08 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3722469D006
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 03:26:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=messagingengine.com header.s=fm1 header.b=eERmQ0ay;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300288-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300288-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=proton.me header.s=edji6ohfindvvaar3ohyzfy2dy.protonmail header.b=YeUMjgq5;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300289-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300289-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=proton.me;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95022303527B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:56:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 47708301D521
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 01:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456BC23AB87;
-	Thu, 18 Jun 2026 00:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27D9253B73;
+	Thu, 18 Jun 2026 01:26:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+Received: from mail-08.mail-europe.com (mail-08.mail-europe.com [57.129.93.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D9722D4C3;
-	Thu, 18 Jun 2026 00:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A340527A123;
+	Thu, 18 Jun 2026 01:25:57 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781744164; cv=none; b=erDoklhcNWRJPLaavZp/KRUj4iTgA1IQ68PBxgpAmlInc6Tn1LeTx+FrVelBR6bQZJgXN/+KKqXjVdLPejzAEcB3oQsYO4EZs6a47+J/IPPIbEjfUiS86mPZuqGyTJgkaoKziJLGCQ/tVVzYYgrKjeSXM0zNXmoebTprQOzHlYs=
+	t=1781745960; cv=none; b=Ud9OzcBIoRMty9BNFim+OR3Z3dTtxUzoKoZ8Lw0uRK9mjyxZ7QS5kFjuPZqbjA+vqM5bpv44j3wXlfXouL5nXwEzF5D2ZV3mZPDO/lu4HfiuKag1AE1vQKXy7ePFSua8enS8Ta5OZI6rns+Z6h/LOPFgrEZLyqImBp/A+G0fR2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781744164; c=relaxed/simple;
-	bh=RbRV3/bgZeP5ukGhZT5t5PNTGVWFGDhPacX80uNTx3E=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=nhpfBR0toEu6IQS2V78rJGiCL6HM8vIOg79xrfQDA3TUfE3hoaVvWP+LTns2vE2Rad6vGn1ncKGKNuSpgmikat7bLTQKs4GB/BqweDK90TPygXP2KLhpJPw0MtEkMCVftO8kQ1ho9X+YM3MeKH8cZo0ofE4RSNCQyJcqZBtkFjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eERmQ0ay; arc=none smtp.client-ip=103.168.172.145
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 3738DEC05E7;
-	Wed, 17 Jun 2026 20:56:01 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Wed, 17 Jun 2026 20:56:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1781744161; x=1781830561; bh=oRkffw0hyh/GuxJCIVfKgEWNAymvT88Y3XY
-	px2BDW/k=; b=eERmQ0ayn9m8wVNhOnqGRZkMB6lds2D6/ZBX5aKImkIIXfgOTbi
-	bBSDJcR8oILGjvE3+26/CCmg1rMxDZhplAMhmLr74EdkgR03Fzo3Pr33uMyYzruw
-	fLWbiYpqvFnIKO1OkdZ/lTWnLN9ZqzlKZ+Pmae7qKjlBGAAT5assyNo9DU2CLm2n
-	hcYgUn9Dcuv0J6tYCTvW0YPaOY9hT4bfB/Ypusbfl/uBe5yp+sMGPTWW3FfNlwXf
-	yG8FsMyCEJ6CCpuqkbMQFgtW5XCsF/M919yTmBgRSXTDhPvZxrrcNhKur7CAJ3xw
-	F55/rzSyXReRpHb7PsV+qL0k/H92V0c4Itw==
-X-ME-Sender: <xms:H0IzarJoPpga0EVjkyYtDAKpuylNksfat_NvfCUhWSOCtjwCzF_f-g>
-    <xme:H0IzamHdndkLe1JzQqFpQuE1xFHz02NY7tkG3dJxEwoiSQfMF57TOdJOmPEwKtHzY
-    KcN0CeNNl1_j8Yp4J3GkmQjc6ElL7AejiJQZOjTqnxH4p3h_WesQA>
-X-ME-Received: <xmr:H0Izaoy6d2LWswGUSgdxEZiGOOIp7F1GAzeKRKpSJyrH0AcCv47p3z-pU9ecUiICg3vu-MH_bhj3VeOXZCQlmtdBfz8XK8kBIME>
-X-ME-Proxy-Cause: dmFkZTEfsd2sy6rGCX9gKFtzw6P16veTBgEOvotvsGqzQMeY4e0byjs4rXjd0jR1EGh9lH
-    Yq1ys3Ja4IDwXPS3v8h80XGdeqX22kwtwfnwKbBWzdXMbQ3K21J/sdYHJ69m1M3WmEMdIu
-    u1nMszQRk8K9LYU0Q7Q7bmIKdExPNa6BOQgw7kl30YHXVdwKmJf3E0sJPtu/GsirOjXIP1
-    OMohMujEERuDNRRVoYibAAjRUfzIntuPTXU4ZMzzhV1KO9u+QyuBjvQZWPFHNeoyfVgbrS
-    xKlIz72VPlV0PJCNH8exmh65DDQ4fM9o2UBLSyaOZeAPSCtscvI5N+qb7q9WWVzoyMW0KJ
-    OK/PhdNbZwjAicc4o1XuhSDvlAX5cy+FtEEvV2F6GwZhMa+lPcgdxqF8OBb/lmLupQ5tEs
-    eheTqaLv4Nsg7nu414U6XqgJZzeXjEHoQKyhhj/PW+xu5f6FM80JRxgBdtwG9jllgL7YcC
-    yqXxG7Cj/sJGT3xVSMUgNWvoLGL7Kb6t1s9H5aAAQMPyEY0Lgd7FGNcJuDBha9e0gs/fps
-    iOWIrG6DUpVNDUVADq/vCJwf9Ebi7fmT8Ljiah57AZUCaHj9g2RUI1FwTR5wI2qitIaKqu
-    uLTAsCEPC2PcldxNQjt5opO4jHMZ5Rs2C0Zvi0g1/JJ5wDCgBUftZn/Xom5g
-X-ME-Proxy: <xmx:H0IzarhtWgRuIMlu2p5-tLhgH2FkJtO7O_M4iRkuEoFf70ad5bOd_A>
-    <xmx:H0IzatL7Euk8fVpAZfJJAWzsTcu0W72nRDeXBvUtVs0R9OUKs0mo6Q>
-    <xmx:H0IzauC7vQlbiuSjd4tSULVmpAMAV6fSiI9w8wwt0RrhGN4Z63PPVg>
-    <xmx:H0IzauSGYEJXZzWQrOlUMtDDUANieswg55yx3NL-E1fVReVzaCOU8A>
-    <xmx:IUIzavmfDbaASv4X0vfqP16GYSQdU_zCwOTdK2L0zg5ukH_f6P9Pfp7h>
-Feedback-ID: i58a146ae:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 17 Jun 2026 20:55:57 -0400 (EDT)
-Date: Thu, 18 Jun 2026 10:55:54 +1000 (AEST)
-From: Finn Thain <fthain@linux-m68k.org>
-To: Carsten Strotmann <carsten@strotmann.de>
-cc: Jakub Kicinski <kuba@kernel.org>, Carsten Strotmann <cas@strotmann.de>, 
-    John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
-    davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-    pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-    geert@linux-m68k.org, chleroy@kernel.org, npiggin@gmail.com, 
-    mpe@ellerman.id.au, maddy@linux.ibm.com, linux-mips@vger.kernel.org, 
-    linux-m68k@lists.linux-m68k.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 0/2] appletalk: move the protocol out of tree
-In-Reply-To: <1781694488854.956546368.818588236@strotmann.de>
-Message-ID: <489024bc-b6e5-f601-3bce-444d75abbf5d@linux-m68k.org>
-References: <20260616084901.3319d82e@kernel.org> <1781694488854.956546368.818588236@strotmann.de>
+	s=arc-20240116; t=1781745960; c=relaxed/simple;
+	bh=O7p1A7X5x41GXGfzPlhDFe+3UIbQXqLuJwmu7r/FXcw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r3iTQb74IQ0ShYHSJ3c/e9qVfdxcARKox/74VYLxDvZLq0tpEF4OHQpQac60R1qQ1Nvpi9eYq5nOke39nTHQkiD57AZsvQIN5ihPqdQJqBvAOg2LGAHjYrREsJ7izi7tJM90Fi9UTJAGzFEaCnRfunWcLLlshucCpnsYYkhU520=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=YeUMjgq5; arc=none smtp.client-ip=57.129.93.249
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=edji6ohfindvvaar3ohyzfy2dy.protonmail; t=1781745941; x=1782005141;
+	bh=O7p1A7X5x41GXGfzPlhDFe+3UIbQXqLuJwmu7r/FXcw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=YeUMjgq5RCVdTetuI5yb34xTm4SMkHOuDClbFAfs5Ia6sDybWU4ryD+E3fJfzyyzs
+	 IvMClPTp/YWHfFU5HTpTVf/3jQKYWRwaiTLsEBdmZW7B/UVqm44mJLznK4LqYm5wLm
+	 KTq3KpaOk1F2d5bHhXZBzowUcbN1XKo1k4YsZqFvyD+Nm+QtXsG8E6NvbBnRiG79WL
+	 AgvC8HDQa8bbquptr+yIj7f4RWbjWioZg/Kdi2L2ZA+o+G5736Ee6iCGRKO8s2iKQ4
+	 TIxSV2Mv7SU6q59mBtbNbA0PLtJJCZgsRBW/tSW6Y0yjIUSFSKmcMbanyyJeM8xWk3
+	 lQ3cFAKuVSKtw==
+Date: Thu, 18 Jun 2026 01:25:33 +0000
+To: Matthieu Buffet <matthieu@buffet.re>
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, =?utf-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, Paul Moore <paul@paul-moore.com>, Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, linux-security-module@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] landlock: fix TCP Fast Open connection bypass
+Message-ID: <20260618012527.34964-1-hexlabsecurity@proton.me>
+In-Reply-To: <20260617180526.15627-2-matthieu@buffet.re>
+References: <20260617.eemahv8ui7Ee@digikod.net> <20260617180526.15627-1-matthieu@buffet.re> <20260617180526.15627-2-matthieu@buffet.re>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: 578dcb4dea7ac936c800840fb4f141f9fbb80230
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[proton.me,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[proton.me:s=edji6ohfindvvaar3ohyzfy2dy.protonmail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300288-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300289-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:carsten@strotmann.de,m:kuba@kernel.org,m:cas@strotmann.de,m:glaubitz@physik.fu-berlin.de,m:davem@davemloft.net,m:netdev@vger.kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:horms@kernel.org,m:geert@linux-m68k.org,m:chleroy@kernel.org,m:npiggin@gmail.com,m:mpe@ellerman.id.au,m:maddy@linux.ibm.com,m:linux-mips@vger.kernel.org,m:linux-m68k@lists.linux-m68k.org,m:linuxppc-dev@lists.ozlabs.org,m:andrew@lunn.ch,s:lists@lfdr.de];
-	DMARC_NA(0.00)[linux-m68k.org];
-	FORGED_SENDER(0.00)[fthain@linux-m68k.org,netdev@vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[kernel.org,strotmann.de,physik.fu-berlin.de,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,linux-m68k.org,gmail.com,ellerman.id.au,linux.ibm.com,lists.linux-m68k.org,lists.ozlabs.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:matthieu@buffet.re,m:mic@digikod.net,m:gnoack@google.com,m:ivanov.mikhail1@huawei-partners.com,m:paul@paul-moore.com,m:edumazet@google.com,m:ncardwell@google.com,m:linux-security-module@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[messagingengine.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fthain@linux-m68k.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hexlabsecurity@proton.me,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[proton.me:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-m68k.org:mid,linux-m68k.org:from_mime,vger.kernel.org:from_smtp]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,proton.me:dkim,proton.me:email,proton.me:mid,proton.me:from_mime,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 791E269CEF6
+X-Rspamd-Queue-Id: 3722469D006
 
+Thanks Matthieu, your #41, so no competing patch from me. I built your v0
+(Landlock + MPTCP) and ran an A/B: without it, a confined task with CONNECT=
+_TCP
+denied still reaches the port via sendto(MSG_FASTOPEN); with it, that path =
+is now
+denied too, on IPv4 and IPv6.
 
-On Wed, 17 Jun 2026, Carsten Strotmann wrote:
+Tested-by: Bryam Vargas <hexlabsecurity@proton.me>
 
-> > _Someone_ has to handle the reports and patches. And since nobody is 
-> > doing that the code is going to GitHub, where it can continue to "just 
-> > be left" or whatever, without racking up CVEs for the Linux kernel and 
-> > leading to maintainer burn out :/
-> > 
-> 
-> That's a good point. The large influx of reports is a problem, and burn 
-> out of maintainers is a too high cost.
-> 
+One scope note, since you mention MPTCP: an MPTCP socket isn't covered.
+sk_is_tcp() is false for the mptcp parent (sk_protocol is IPPROTO_MPTCP), s=
+o
+neither the new sendmsg hook nor the existing socket_connect one mediates i=
+t. On
+the patched kernel my MPTCP arm still reaches the blocked port via both con=
+nect()
+and MSG_FASTOPEN. If MPTCP is meant to be in scope for CONNECT_TCP, the gua=
+rd
+wants `|| sk->sk_protocol =3D=3D IPPROTO_MPTCP` (not sk_is_mptcp(), which i=
+s the
+subflow flag).
 
-Carsten, if, as a maintainer, you want to avoid burnout then
+Bryam
 
-1) don't promise what you can't deliver (that is, decline sponsorship)
-
-2) delegate (that is, leverage AI as an ally not as a lame excuse)
-
-So the question remains: what is it which _can_ be delivered by and for 
-the "community" (by which I mean, that group of people which includes 
-actual end users -- not merely paying customers and sponsored developers).
-
-This question has precious little to do with burnout, but it's the 
-question we need to address.
 
