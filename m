@@ -1,195 +1,184 @@
-Return-Path: <netdev+bounces-300477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300478-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id AjvxHHQQNGpKNAYAu9opvQ
-	(envelope-from <netdev+bounces-300477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 17:36:20 +0200
+	id Qg8GAbYQNGp+NAYAu9opvQ
+	(envelope-from <netdev+bounces-300478-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 17:37:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8AD06A1470
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 17:36:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D8A6A1487
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 17:37:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=bootlin.com header.s=dkim header.b=MlPWB7KP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300477-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300477-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=reject) header.from=bootlin.com;
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=HN6uP1O7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300478-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300478-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9251302416F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:34:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AC3430A19AF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 15:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742A13321DE;
-	Thu, 18 Jun 2026 15:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B235633B6DB;
+	Thu, 18 Jun 2026 15:34:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28CC32B128
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 15:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C38733D509;
+	Thu, 18 Jun 2026 15:34:56 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781796894; cv=none; b=htpOcxauH4MPhmLz6VbBhbnGcqGkfFM3rJ4l9hR48aC/TUjX7AaSJEARAZ+3IqLsfK2e9X87WQeHXKp5PmeUe0sBFmcn4SEU3JPt3vacxA6Vr/GvNEnbi2pgpDV6NMiGxjOTGdPi24EX3ICU+XUyshLDizbKoeva9UDBslH9mZo=
+	t=1781796897; cv=none; b=apxqbHyGk/HRSuOmx1aZJwZMbLLf4HJUnvlNaTQRL53qLLw8SggWWE1DAiHuxholH6K4mx7/DluOarS+CeaONWilgqWi1vBo4Av3Nzo+b1eXIyjadvgKdot9quufHjLvVGj4lYPpIvioJdbrGUbJn45tqibLsFHvME/fAg9DE7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781796894; c=relaxed/simple;
-	bh=66h1cozuW7WJSgfW3nPNiBwBY/hmH341lOk4v+9okMg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oavbFRcTJkRmCwGF5MrQP/EpqWn9kpNmTz2wQYo8oZ14lyeh8KEcTk2U8hvQZFH6RPe4l5HTOZMJP4GHU8OX2rAaN0UWJz1T6UAYWW52GR4QBA/568UFm0WmGjrvXcJwcCNEhOgINDajnx6MZNjjWKWebSNd0PpVpN10JtasXbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MlPWB7KP; arc=none smtp.client-ip=185.246.85.4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id E2F794E42FAD;
-	Thu, 18 Jun 2026 15:34:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B65375FF03;
-	Thu, 18 Jun 2026 15:34:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 34D59106C8189;
-	Thu, 18 Jun 2026 17:34:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781796889; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=sC0bVctGQ7Xf2COYa7bvdpaGebxcOTkkJazq/uVZyy4=;
-	b=MlPWB7KPi/790B5LQTdeAp/AkFLOR4X2+LpjQXWzXavAyeVBBCnT0BAFFtDCi8zJdJ3U3R
-	jUejE/EYVXB/RLA8Ml72Jd1MT/q+uwDXdMXypg3QvTRE3pxAb2CjY18AXPJcl3qiieZlsm
-	YHX10Dr9VH55KoB7jDj1NWv++EZSKqrbzLrKkpBrrNXq+nbEYkcvXxCDVKWwirOYo2nuXA
-	mRYrnOomSew3faYOLdvux9jxp0KHB2epS+exzGGJ+n2xejEl0jGDpncHr4QMXJlftMxrdD
-	R/4/zWaKhRzH3eY7CvN0hBEAirwO3EvnD86PlZ7dLy4qM17Piysx9gU9MF1E+A==
-Message-ID: <df2a8c16-7b84-43ba-88f4-3b99e792376b@bootlin.com>
-Date: Thu, 18 Jun 2026 17:34:42 +0200
+	s=arc-20240116; t=1781796897; c=relaxed/simple;
+	bh=3aj130vGy6lMZ/4OfIru8bKGI+olPagwRhpviFSvlkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sCVOgMvZo10VMn5an8dLCghYJns/XmSqAwqSLsvHkjRy0SAyyJgJywXv7O8doqqLJD7eDEIYNj+VKTsTvq5ld3qIf2HpSKHdZ04cv5wpJqoHNKauVJ9hqFZK1XQkTecV90XQXPC5CnLp4zcXxaZtn5fqaUahuvvN+vuhlRwfCTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HN6uP1O7; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A58E11F000E9;
+	Thu, 18 Jun 2026 15:34:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781796896;
+	bh=JOH3UvfxE8S5XlN8WY1u0RjYXaafi3kxscGtwmwPCtA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=HN6uP1O71BsEK8iDe/0t2lyhS5QrJDYoetGU2bpQDy2wqPGI8dcdfiLqsNzTySV5+
+	 ZgMt4U4bTvBHpVCG8e+ZS23q0mtE5zx3rXg6T0dTNH+qbdayXSWfAdIGfM6sj0cIlJ
+	 FsMLYsmSUFMyp15HL/ip3t+JLbJNcOF72Qa2IN99c36jFoTIrSLR2RK004ARsLvaMs
+	 4O5QIO6LM5bhvlO2/4tCklLd67J44blMffBui1bWY0VmMblHSLa6pcOIQFgrWmlfXf
+	 IWb3KJqbJnq597N5lKNEk/3TNm1hjBo4hWz+qd1s+2uXkk5vEssK0yK1i/EKmBRQXq
+	 2SXy2C4U0FsXw==
+From: Simon Horman <horms@kernel.org>
+To: shaojijie@huawei.com
+Cc: Simon Horman <horms@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	shenjian15@huawei.com,
+	liuyonglong@huawei.com,
+	chenhao418@huawei.com,
+	huangdonghua3@h-partners.com,
+	yangshuaisong@h-partners.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 4/5] net: hns3: differentiate autoneg default values between copper and fiber
+Date: Thu, 18 Jun 2026 16:34:50 +0100
+Message-ID: <20260618153450.909964-1-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260617112721.75186-5-shaojijie@huawei.com>
+References: <20260617112721.75186-5-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: mvneta: re-enable percpu interrupt on resume
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- "Zhou, Yun" <yun.zhou@windriver.com>
-Cc: marcin.s.wojtas@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260618104351.3456161-1-yun.zhou@windriver.com>
- <20260618125128.h5g-StPH@linutronix.de>
- <06d0158e-bf4c-4ad1-8ad3-c8176003ab11@windriver.com>
- <20260618150440.cLDwgyDM@linutronix.de>
-Content-Language: en-US
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <20260618150440.cLDwgyDM@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-300477-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300478-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:bigeasy@linutronix.de,m:yun.zhou@windriver.com,m:marcin.s.wojtas@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:marcinswojtas@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:shaojijie@huawei.com,m:horms@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:shenjian15@huawei.com,m:liuyonglong@huawei.com,m:chenhao418@huawei.com,m:huangdonghua3@h-partners.com,m:yangshuaisong@h-partners.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORWARDED(0.00)[lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,bootlin.com:dkim,bootlin.com:mid,bootlin.com:url,bootlin.com:from_mime]
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sashiko.dev:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: C8AD06A1470
+X-Rspamd-Queue-Id: 59D8A6A1487
 
-Hi,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
+---
+net: hns3: differentiate autoneg default values between copper and fiber
 
-On 6/18/26 17:04, Sebastian Andrzej Siewior wrote:
-> On 2026-06-18 21:56:12 [+0800], Zhou, Yun wrote:
->>
->>> But if the thread is idle then you have one enable too many, don't you?
->>> Well you have the NAPI callback which does disable on the local CPU and
->>> this resume which enables it on every CPU. So this does not look right.
->>>
->>
->> The enable in resume is intentionally unconditional and idempotent
->> (writing MPIC_INT_CLEAR_MASK on an already unmasked IRQ is a no-op).
->>
->>> The interesting question is what happens to the enable_percpu_irq() from
->>> the mvneta_poll(). Is it lost? And if so, how/ why?
->>>
->>
->> The enable_percpu_irq() from mvneta_poll is not "lost" — it never
->> gets a chance to execute. The sequence is:
->>
->> 1. mvneta_percpu_isr: disable_percpu_irq() + napi_schedule()
->> 2. PM freezes kthreads (on PREEMPT_RT, softirq runs in kthread)
-> 
-> But napi_schedule() runs in ksoftird, doesn't it? The per-CPU IRQs are
-> not threaded. That does not look optimal.
-> 
->> 3. NAPI poll cannot run → enable_percpu_irq() is never called
->> 4. mvneta_stop_dev → napi_disable(): cancels the scheduled poll
->>     but does NOT execute the completion path (no enable_percpu_irq)
-> 
-> napi_schedule() sets NAPIF_STATE_SCHED.
-> napi_disable() sets NAPI_STATE_DISABLE and waits until NAPIF_STATE_SCHED
-> is cleared. So if NAPIF_STATE_SCHED was set then enable_percpu_irq()
-> will be invoked unless it leaves somewhere early.
-> However, if DISABLED was already set then it disables the IRQ source but
-> does not schedule NAPI. This is probably what happens.
-> 
->> 5. Resume → napi_enable(): resets NAPI state but MPIC stays masked
->>
->> The unconditional enable in resume covers this case. When NAPI was
->> idle at suspend time, the extra enable is harmless.
-> 
-> There is no desc::depth counting here, that got me confused. But that
-> per-CPU irq is not optimal. Is this a SoC limitation or a design choice?
+This commit addresses a link loss issue during driver initialization on
+optical ports connected to forced-mode remote switches. It modifies
+hclge_init_ae_dev to set autonegotiation based on media type. Copper ports
+retain the AUTONEG_ENABLE default, while optical ports inherit the firmware
+pre-configured autoneg setting.
 
-I _think_ that on mvneta, the mapping is done by assigning queues to CPUs
-directly, and then you have per-cpu register banks to handle the interrupts :
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -11916,6 +11916,9 @@ static int hclge_init_ae_dev(struct hnae3_ae_dev *ae_dev)
+>  	if (ret)
+>  		goto err_ptp_uninit;
+>  
+> +	if (hdev->hw.mac.media_type != HNAE3_MEDIA_TYPE_COPPER)
+> +		hdev->hw.mac.req_autoneg = hdev->hw.mac.autoneg;
+> +
 
-https://elixir.bootlin.com/linux/v7.1/source/drivers/net/ethernet/marvell/mvneta.c#L138
+[Severity: High]
+Does this apply the wrong speed when autonegotiation is disabled on fiber
+ports?
 
-This seems to be confirmed by some comments here [1] :
+During driver initialization, hclge_update_port_info() dynamically probes
+the SFP module and updates mac->speed, but does not update mac->req_speed,
+which retains its statically configured default capability.
 
-static void mvneta_percpu_mask_interrupt(void *arg)
-{
-	struct mvneta_port *pp = arg;
+When hdev->hw.mac.autoneg is 0 (forced-mode), req_autoneg becomes 0, and
+then hclge_set_autoneg_speed_dup() uses req_speed:
 
-	/* All the queue are masked, but actually only the ones
-	 * mapped to this CPU will be masked
-	 */
-	mvreg_write(pp, MVNETA_INTR_NEW_MASK, 0);
-	mvreg_write(pp, MVNETA_INTR_OLD_MASK, 0);
-	mvreg_write(pp, MVNETA_INTR_MISC_MASK, 0);
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:hclge_set_autoneg_speed_dup() {
+...
+    if (!hdev->hw.mac.req_autoneg) {
+        ret = hclge_cfg_mac_speed_dup_hw(hdev, hdev->hw.mac.req_speed,
+...
 }
 
-These registers will control different queue's interrupt behaviour depending
-on which CPU executes that code...
+Could this override the dynamically probed SFP speed with the static default
+speed?
 
-[1] : https://elixir.bootlin.com/linux/v7.1/source/drivers/net/ethernet/marvell/mvneta.c#L1441
+[Severity: High]
+Does this unconditionally disable autonegotiation for V1 optical hardware?
 
-This may be why the design ended-up that way. I'm not saying this is ideal
-though :)
+Looking at hclge_update_port_info(), it only queries SFP information via
+hclge_get_sfp_info() for V2 hardware. For V1 hardware, it falls back to
+hclge_get_sfp_speed(), which leaves mac->autoneg uninitialized (0):
 
-The percpu interrupt mechanism isn't used on armada 3700 (hence all the special
-conditions) because IIRC the interrupt routing is flawed for the network part, and
-all interrupts end-up on CPU0 anyways...
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c:hclge_update_port_info() {
+...
+    if (hdev->ae_dev->dev_version >= HNAE3_DEVICE_VERSION_V2) {
+        speed = mac->speed;
+        ret = hclge_get_sfp_info(hdev, mac);
+    } else {
+        speed = HCLGE_MAC_SPEED_UNKNOWN;
+        ret = hclge_get_sfp_speed(hdev, &speed);
+    }
+...
+}
 
-Maxime
+If mac->autoneg is left as 0, wouldn't req_autoneg unconditionally be set
+to 0 here, overriding the speed and breaking connectivity for V1 devices?
 
+>  	ret = hclge_set_autoneg_speed_dup(hdev);
+>  	if (ret) {
+>  		dev_err(&pdev->dev,
 
