@@ -1,197 +1,198 @@
-Return-Path: <netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300395-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id /EWfNerFM2paGAYAu9opvQ
-	(envelope-from <netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:18:18 +0200
+	id 5PG2H1XGM2p3GAYAu9opvQ
+	(envelope-from <netdev+bounces-300395-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:20:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A4BD69F35D
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:18:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A1D069F3B7
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:20:05 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=baylibre.com header.s=google header.b=ZdPgfVt1;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300393-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
+	dkim=pass header.d=mails.tsinghua.edu.cn header.s=dkim header.b="ZPR2/oRS";
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300395-lists+netdev=lfdr.de@vger.kernel.org" designates 172.232.135.74 as permitted sender) smtp.mailfrom="netdev+bounces-300395-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=mails.tsinghua.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E7EF308A5EB
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:15:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 58984301DD01
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98823EBF3B;
-	Thu, 18 Jun 2026 10:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7073ECBC4;
+	Thu, 18 Jun 2026 10:19:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF543EC2F8
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 10:15:13 +0000 (UTC)
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3973EB0E8;
+	Thu, 18 Jun 2026 10:19:39 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781777720; cv=none; b=YetgL21CHOAzpFlEj795dvwpTWEpL1Qm99VsHpmuhhm9rg7qBhJ5OU3B7h+CMYxYT1K79uEoFpAocXet+RQ5EYj8frEGZ6V2NDTNAFeY9+q2a4rbW3pAL68Po9oXTOZAvPjYN6h/ZWh38dcttEcD2Io35zKSEbbH5PmQMreip78=
+	t=1781777986; cv=none; b=IT0vNs328sXO2krpPXjjz+2prh6JCx3hAETaoLnaD2hjnzAv9qPHuXX8Sq0K66UsyYVJB68dIF7WWu6sF+tKGkLxuPsJsW7qCSrqTA3u9iMABI0f6RvQBO8diigG8UrXs+8Z1z7dDU7GQ8xHq+xeRRnomTtKqd9/rJgiBWj1G/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781777720; c=relaxed/simple;
-	bh=BWcvhUW+0cc5VX+GP36rvT15yne5n9RmucB5Uo/uotk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IJb/5loL1o8xDyW8m+l11Agr5Ze9zkFsxNgDfBAwL35JY4jKnai/0lLpDdNZOmXewqSnbquYADGF/Au2lEy0SEkfjICO0/i4x3b4JEzvXphDxvc+UFZFxHP7U89uVjMXNFRGqshFbryE7HRZQbz+I2Y6P61d89tgGacE+MiQAOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=ZdPgfVt1; arc=none smtp.client-ip=209.85.221.47
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-45ef29c5561so460370f8f.0
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 03:15:12 -0700 (PDT)
+	s=arc-20240116; t=1781777986; c=relaxed/simple;
+	bh=G+PitzFSe2fg4eSYpsm+PJaJd5UrlFZtN6Vmq1Na+kU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JRKjHBCTqptRTZsGb/w/FQrACOKVI9t+UiVAubJUcaAZ0uu1il4CYc0tS+hCf2abNpRNuBFKQ2GsbKUJfAE4Ycc0jY1rSG0CZHl0MFERwA5o0B9Xos9JX0pEBzT8m+TjTnY1TNUCt2e2m8rV0w3ItjjZ8mga60tm9MxF2I5Da0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=ZPR2/oRS; arc=none smtp.client-ip=209.97.182.222
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1781777711; x=1782382511; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OxcIh58Ro8lbA8Z7AdmochDFxerQSeNXvjZHG1Ej2DE=;
-        b=ZdPgfVt1kE2ZaVtU53o5akgU1DgCVRjXIqbxbOeb+SnN93Py2j33xiKcOoVcScw1+m
-         87N1V1EZZssn003Nl2bB18c2cN6pK3zl5XytXdYYRP0DDtcB6qAoD7z0mWFZkI4o8mFs
-         tVqiq88H7/cgkF/6hZLOjLG4ZRHivrX7UrQsqKDooZDjxw3t4ao4d/cSyQjZgZ/SeyH0
-         N991mE41o+0YdxHFrQXyejnnnuJvu3xt/0gFMNkNdsXQDF4yiIgM2ZxIVWa2zwFLu6r0
-         Vhrb3B4prX6ofs0lRvlVjYIgNsat84T3wWUhKZHi8r8NoCl61rH/HmlNok/RwvkSNdqm
-         Fh5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781777711; x=1782382511;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OxcIh58Ro8lbA8Z7AdmochDFxerQSeNXvjZHG1Ej2DE=;
-        b=aBnUcLl9X7yhL+kVCkBO+Egy+QbqQQBYohKIHHqMTi6XOJ2MHBtRRyxLdrI5fS1elt
-         mgStTw7OxjgoQ/BVvLzSjTMBX31dfI68Wc7yVjRt+jJ9oiWzeUrjPjOdFUBOb52hWGir
-         22bpA6L4N6lmPyXZZ+mobr7YcpHYi5OAfQsS9C75qgva1MODDm/iLkHbDiOqw+m45OBS
-         m33OAdtxpwLU+gBtK1MWgkWS4y5qx+5/NhkYZEXImiD0qK3/ziRw9U8EE9+mJOs4lYrK
-         WrmS0gsUGPRt2t2q/U95KT/VeQlH4FiDc/1Vi5pY+CdjmdgaExBLLL3TZeWbJ/aZ5Aoo
-         4HpQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9IpJV2olfUegWsjxJtEU+vewNgNfE6TLvjtTO00o7WS/5fMUDiYpC0Dsz6LzWYXMnYZNVQdD4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHccNY2UsNXNVLRjGCA9oFNPmbBmGUMhfdb4Nc9+SrgKxQ4Ssh
-	iBvJ79CfqC1dcGgo6ZQREEPur1/cxHKCKSijuniSelxmRRYCw5rRBZs57BzeTEyJoWY=
-X-Gm-Gg: AfdE7cmaM3OPg+AmQp7Vm1cu5FsdUQjPwK7cp7bwuvy81J3eFVvdWc67PxYRCpCXjyR
-	Z1FFX1lNfN3GfpXmvcFv8fT2KS3AarP0fp8xyaa17De27xO41Hp5NAGvEMR3wYGN8DtmBxFj2L7
-	j8N2zp+iw7XdxPs7QuWEI6l++/lpkwHnX9K/WoqEZ8kcyYr6preW6X1fbuq6ieIhIEzL5f9JQvz
-	XcIeE0WX3mPM1sBKF7uYWSkXCKkpTTYKs24tYcSeLi2doEdOWl/7eyC+zMFDUNSk930qBb3lXvO
-	flXdZfGaDJ+HBXFpeZg+wodjnYmbr/q/QmEFw5cr8NIvKN6U/nEm2Nr0kH4V/6lksWNGLIIOrRv
-	ZOB36Tizirbca/nTA8HeJFuFOOn4FyY6RJWovmBcPZPjeylCKE+WxP2kOzKf7R4YHtVWhlWhu0g
-	m6tCJCONaEDz9U8Z3+mTQKQYU89R2IXDs2dL7GWmHVQoPfDVLiRCoLcNAtxqU7TOM2PlcZzBwGm
-	iTD
-X-Received: by 2002:a05:6000:2087:b0:460:70ff:fe14 with SMTP id ffacd0b85a97d-463adc9236bmr4887039f8f.42.1781777711239;
-        Thu, 18 Jun 2026 03:15:11 -0700 (PDT)
-Received: from localhost (p200300f65f47db048595530b320b6c5c.dip0.t-ipconnect.de. [2003:f6:5f47:db04:8595:530b:320b:6c5c])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-462236047c8sm17760805f8f.10.2026.06.18.03.15.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 03:15:10 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Mika Westerberg <westeri@kernel.org>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Andreas Noever <andreas.noever@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:In-Reply-To:References:MIME-Version:
+	Content-Transfer-Encoding; bh=Y7guVCzhklovqsmxAETrv+dVmNu2/oIyCL
+	Z54YmwyuI=; b=ZPR2/oRSCkHp0/nMH9GvucrclgDVvmAzeYYJQScyAX1EkIvvjn
+	9MqgWZ6Tc3Uquqnmsom9H0gVkGdNCMZVOxP8csWW31tAAM0oVIbm66bGxKJKm604
+	o9YYvO7ovwW2LjYyhk+YVCHkRceFBnZ8gEnM5YTNdWuJv8fxtl85+zjDs=
+Received: from c9a6c405b3f2.. (unknown [202.112.238.121])
+	by web5 (Coremail) with SMTP id zAQGZQB3L78IxjNq23+CAg--.46531S2;
+	Thu, 18 Jun 2026 18:18:55 +0800 (CST)
+From: Yiyang Chen <chenyy23@mails.tsinghua.edu.cn>
+To: bpf@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Cc: Yiyang Chen <chenyy23@mails.tsinghua.edu.cn>,
+	pablo@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	memxor@gmail.com,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	jolsa@kernel.org,
+	emil@etsalapatis.com,
+	shuah@kernel.org,
+	kartikey406@gmail.com,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH v1 3/3] thunderbold: Drop comma after device id array terminator
-Date: Thu, 18 Jun 2026 12:14:52 +0200
-Message-ID:  <329e2c612b360a01524df7630a8a3acc34a90940.1781776904.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
-References: <cover.1781776904.git.u.kleine-koenig@baylibre.com>
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v2 0/2] bpf: Guard conntrack opts error writes
+Date: Thu, 18 Jun 2026 10:18:42 +0000
+Message-Id: <cover.1781765747.git.chenyy23@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1781586477.git.chenyy23@mails.tsinghua.edu.cn>
+References: <cover.1781586477.git.chenyy23@mails.tsinghua.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1655; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=BWcvhUW+0cc5VX+GP36rvT15yne5n9RmucB5Uo/uotk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqM8UiytK7hE/SMYGmvn17tEkYw4JJmFqOZ+FZ2 TZ5qPoMm06JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCajPFIgAKCRCPgPtYfRL+ TraLB/sEasozUm4YNFh+0ZWpXwFBATBMd6XdLIle165DLme+RkDZn/OSuY3SXYYspOq5PRZZZG7 8EZ7zdpJEdeE6YEYt9Ls5VYG0W1bkqC6ROoie7T75DTFHG6jQZEsH4YKUQ3EIF+zmDfDCVJDKTo ieJ2dKxNrkKgN15TInMfAm60gKjeBc+Zz+Xgjjlh3ldDmeoT9FrBjPW4PPKdzqrPKRgqlXITzcP xFaQUNIaEsHT2dIoCrnNxJL5helTWll5KCzqsQoMa8h9Wi/zVHyZK8AcfKpok02gDFAuv0mnSNA wsnSRoi/lBFIIzrIJ6bsIpUdI7gF6AVbGB7evuFsBnAq99QG
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zAQGZQB3L78IxjNq23+CAg--.46531S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxur47XrWxZr18Xw1fJFyrJFb_yoW5Xry7pF
+	WfKwn0krn7JF4UGF4I9FWxta4rC3Z3J34fCrn8GryfCwnxtry8JFWSvryDuF9xCr9xur1a
+	vw4F9345Cr4rAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Avz4vE14
+	v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRR4E_UUUU
+	U
+X-CM-SenderInfo: xfkh05r1stqzpdlo2hxwvl0wxkxdhvlgxou0/
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_ALLOW(-0.20)[baylibre.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mails.tsinghua.edu.cn,quarantine];
+	R_DKIM_ALLOW(-0.20)[mails.tsinghua.edu.cn:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300393-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300395-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[baylibre.com];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER(0.00)[chenyy23@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	FORGED_RECIPIENTS(0.00)[m:bpf@vger.kernel.org,m:netfilter-devel@vger.kernel.org,m:chenyy23@mails.tsinghua.edu.cn,m:pablo@netfilter.org,m:fw@strlen.de,m:phil@nwl.cc,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:andrii@kernel.org,m:eddyz87@gmail.com,m:ast@kernel.org,m:daniel@iogearbox.net,m:memxor@gmail.com,m:martin.lau@linux.dev,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:emil@etsalapatis.com,m:shuah@kernel.org,m:kartikey406@gmail.com,m:coreteam@netfilter.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-kselftest@vger.kernel.org,s:lists@lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:westeri@kernel.org,m:YehezkelShB@gmail.com,m:andreas.noever@gmail.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:linux-usb@vger.kernel.org,m:andreasnoever@gmail.com,m:andrew@lunn.ch,s:lists@lfdr.de];
-	FORWARDED(0.00)[lists@lfdr.de];
-	FORGED_SENDER(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FREEMAIL_CC(0.00)[mails.tsinghua.edu.cn,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,iogearbox.net,linux.dev,etsalapatis.com,vger.kernel.org];
+	DKIM_TRACE(0.00)[mails.tsinghua.edu.cn:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chenyy23@mails.tsinghua.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[u.kleine-koenig@baylibre.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baylibre.com:+];
-	ALIAS_RESOLVED(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ALIAS_RESOLVED(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[baylibre.com:dkim,baylibre.com:email,baylibre.com:mid,baylibre.com:from_mime,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mails.tsinghua.edu.cn:dkim,mails.tsinghua.edu.cn:mid,mails.tsinghua.edu.cn:from_mime,vger.kernel.org:from_smtp,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 1A4BD69F35D
+X-Rspamd-Queue-Id: 4A1D069F3B7
 
-The usual style for other device id arrays doesn't have a comma after
-the initializer.
+The conntrack lookup/allocation kfuncs expose an opts/opts__sz pair.
+The verifier checks the caller-provided opts__sz range, but the wrappers
+currently write opts->error after internal errors even when opts__sz is too
+small to include that field.
 
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
- drivers/net/thunderbolt/main.c | 2 +-
- drivers/thunderbolt/dma_test.c | 2 +-
- drivers/thunderbolt/stream.c   | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Patch 1 writes opts->error only when opts__sz includes it, and uses a
+single helper to fold ERR_PTR returns into the kfunc ABI result while keeping
+the local nfct result variable in each wrapper.
+Patch 2 adds a bpf_nf regression check that keeps a guard in opts->error
+while passing opts__sz covering only netns_id.
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index edfcfc41a316..c1003e06a8bd 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -1455,7 +1455,7 @@ static DEFINE_SIMPLE_DEV_PM_OPS(tbnet_pm_ops, tbnet_suspend, tbnet_resume);
- 
- static const struct tb_service_id tbnet_ids[] = {
- 	{ TB_SERVICE("network", 1) },
--	{ },
-+	{ }
- };
- MODULE_DEVICE_TABLE(tbsvc, tbnet_ids);
- 
-diff --git a/drivers/thunderbolt/dma_test.c b/drivers/thunderbolt/dma_test.c
-index 63e6bbf00e12..519c67678b08 100644
---- a/drivers/thunderbolt/dma_test.c
-+++ b/drivers/thunderbolt/dma_test.c
-@@ -689,7 +689,7 @@ static const struct dev_pm_ops dma_test_pm_ops = {
- 
- static const struct tb_service_id dma_test_ids[] = {
- 	{ TB_SERVICE("dma_test", 1) },
--	{ },
-+	{ }
- };
- MODULE_DEVICE_TABLE(tbsvc, dma_test_ids);
- 
-diff --git a/drivers/thunderbolt/stream.c b/drivers/thunderbolt/stream.c
-index b28e4e95b422..68d81958262e 100644
---- a/drivers/thunderbolt/stream.c
-+++ b/drivers/thunderbolt/stream.c
-@@ -1630,7 +1630,7 @@ static const struct dev_pm_ops tbstream_pm_ops = {
- 
- static const struct tb_service_id tbstream_ids[] = {
- 	{ TB_SERVICE("stream", 1) },
--	{ },
-+	{ }
- };
- MODULE_DEVICE_TABLE(tbsvc, tbstream_ids);
- 
+The regression check follows the existing bpf_nf test shape.  Before the
+fix, the guard is overwritten with -EINVAL even though opts__sz covers only
+the first four bytes of the options object.  After the fix, the kfunc still
+returns NULL for the invalid size, but the guard remains intact.
+
+Validation, rebased and tested on bpf-next master e771677c937d
+("Merge tag 'for-linus-iommufd' of git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd"):
+
+  git diff --check origin/master..HEAD: OK
+  scripts/checkpatch.pl --strict on 1/2 and 2/2: OK
+  make O=/root/ebpf-verifier-bug-detection/kernel-build/bpf-next \
+    net/netfilter/nf_conntrack_bpf.o: OK
+  Focused QEMU direct-runner against XDP and TC lookup/alloc paths:
+    unpatched bpf-next e771677c937d: guard overwritten with -EINVAL
+    patched v2 007dfd0341cd: guard preserved as 0x12345678
+  QEMU upstream bpf_nf selftest with CONFIG_NF_CONNTRACK_MARK,
+  CONFIG_NF_CONNTRACK_ZONES, and legacy iptables enabled:
+    ./test_progs -t bpf_nf -vv: OK
+  git am of exported 1/2 and 2/2 on a fresh worktree at base: OK
+  range-diff between branch commits and git-am result: equivalent
+
+Changes in v2:
+  - Rebased onto current bpf-next master.
+  - Reworked patch 1 to use bpf_ct_opts_result() for the ERR_PTR-to-NULL
+    conversion and guarded opts->error write, as suggested by Alexei.
+  - Kept the local nfct result variable in each wrapper before returning
+    through bpf_ct_opts_result().
+  - Added matching Fixes tags to the selftest patch so the regression test
+    can be backported with the fix.
+
+v1: https://lore.kernel.org/bpf/cover.1781586477.git.chenyy23@mails.tsinghua.edu.cn/
+
+Yiyang Chen (2):
+  bpf: Guard conntrack opts error writes
+  selftests/bpf: Cover small conntrack opts error writes
+
+ net/netfilter/nf_conntrack_bpf.c              | 35 +++++++------------
+ .../testing/selftests/bpf/prog_tests/bpf_nf.c |  6 ++++
+ .../testing/selftests/bpf/progs/test_bpf_nf.c | 26 ++++++++++++++
+ 3 files changed, 45 insertions(+), 22 deletions(-)
+
+
+base-commit: e771677c937da5808f7b6c1f0e4a97ec1a84f8a8
 -- 
-2.47.3
+2.34.1
 
 
