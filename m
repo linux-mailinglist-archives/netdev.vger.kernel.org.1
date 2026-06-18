@@ -1,257 +1,207 @@
-Return-Path: <netdev+bounces-300420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id HiNzIEfoM2oPIAYAu9opvQ
-	(envelope-from <netdev+bounces-300420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:44:55 +0200
+	id v0qGDp/pM2rtIAYAu9opvQ
+	(envelope-from <netdev+bounces-300421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:50:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D418B6A0249
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:44:54 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8056A02EF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:50:38 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=JULtX1ev;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300420-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300420-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
-	arc=pass ("subspace.kernel.org:s=arc-20240116:i=2")
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=RCC+3A6r;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300421-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300421-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=quarantine) header.from=kernel.org;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49574301651E
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:44:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A8CDC3022DEE
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 12:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015903DEAC3;
-	Thu, 18 Jun 2026 12:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A623EFFC9;
+	Thu, 18 Jun 2026 12:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97156391E58
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 12:44:48 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781786689; cv=pass; b=jMDyq5ZtPi8HOgDt/wLnzLTxqTVoTXu5VoiTJieKipKGfvqL4PoBG/ZIpwS3l9gWgXjsuRkvtCFDc1Kv8bl39SdCuaqBEuQYl125It6lCY3zCDaLPhTm3LDL+9Ril1GdZD8+rAn2cmEdBc5rfipro4XYpHHQToG9+5VzeMirGfk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781786689; c=relaxed/simple;
-	bh=cHjyJlPjkSk5IHnW6U3juQbIjtycKoqgvK8mOpZ8eYs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WIE12t7Iv/Tmto884BnPFtUZEla5Y0cXmnmzrU2f8xAF0lRo4ZFzqtJv0TzQ23doSjwBULyp4DbhgZRCQ9FTDZ/NUPzumv716735EH0UuojYbz0Fvl35MrZQ8i6aQBLoaPNH7aUhGcDuJ/skSdqKcLjULPdlDnoAsN1KcYI/Bco=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JULtX1ev; arc=pass smtp.client-ip=209.85.167.181
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-48611ccd5aeso558717b6e.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 05:44:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781786687; cv=none;
-        d=google.com; s=arc-20240605;
-        b=N5K2XWEgyXSIUj1JRCoXHPYxy05Ht951BSrAO8TDvLzoVTRi1PWK6/J2cZ2Cy28g7P
-         xzNd7RYtjQMUZOAXOCKGF1/zu0Ltlt4NOxItVgCwmmIYC8WG9Ey8uRmmWr27HYRdqFC4
-         ZDGrFVKF7VKRi4YRGdq7KstLZX0XV0+iRPvV2kWcKcbUM9VXo17P85zrTabdW6glwEQ/
-         jQXSlbnidbw99quW+ABEgcJ/oKEdzfVvLDUG1lM+9CxtjXry7YiuDGFTKWsKCxB05uOa
-         +sC70u/F0bbkAnzKS+8NzirXp3EFyw3kmiU/V0rBu5zL1RQOGmReD2z+EXVGv+cPGrnV
-         s8Rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=R2fRRuZw7nJRtSJKkL6hC70A4Xo5k16bD8Q46Pwfou4=;
-        fh=EDHlygtY9SvzUXPxyYVRHo3gxDiL3XP+BxZcmlDqP5g=;
-        b=GVa9YqqXbnX9UPWHai32Nri2OuwuCthEve1BdyuL896WtCYdO5pP0PrqrcyllbyHj2
-         T3xX4McrlWAPFosbTIOWgMuVRJiDUBjTz3mKdZRujXS6UBpacgHPlm/S53Iv+m86whpP
-         C6nHbrtgAPpQ+EK98iPsfPjI5GsTgd3N095H1sMaSNjRFtcWXoKxPcS4GA0E8Uio4HSf
-         Hs7/juXUyuv1ohHIbQEhxBOio5xhNJ6mZfSDPRybmYD4+xmRUQfPB8l4R7oroKzv9KZn
-         onin8HrQN5S0iYbMRSS2WezRP930kRlgpy7HpVweAbWvkwE1+I8L6yIgzpDOo0ubQ7SN
-         65aA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781786687; x=1782391487; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R2fRRuZw7nJRtSJKkL6hC70A4Xo5k16bD8Q46Pwfou4=;
-        b=JULtX1evHXHDkHEwZtey6v+X3+Q/9ouxdBDq17NjEBgZr0yg/riMgduWGRBqEccf1Y
-         dZ3VmuIw1O5B8Q5aLNCRZ6mF47uSoEZNEXCUWtwg/2GwzvANVKuU7a4Qs5s5LViwl0zb
-         A7dTEtPvHmkg16UeUtuNQ7pV604eaaUaWXB0jnmi3MHAm+s5O/gfkxwXw6KNaLgC0x08
-         U8vbE1VLCWIyjPzR2LfU8gaaHAgq9sTG4+e930yBwMhKXkcbqmlEBZaqjESJtl0oK68J
-         S0Z3XD3pAlNHyvJa6eNamgw+RF7RBWgGWFYG5r7a5WSMc9fxyvwEx9n+bJKyqYnl7eKN
-         NoZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781786687; x=1782391487;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=R2fRRuZw7nJRtSJKkL6hC70A4Xo5k16bD8Q46Pwfou4=;
-        b=N19UhyBDC4GdOxw+VW3XX6J64VaKdYa3AoFGz/7G3qZiF72XwVtCL34pr37veQPGlE
-         ODVEiW8kDgJolrYyOYptmivrOkbLmuPvKsbdJ0Z8t+K7/uJBMzf29aRciAZcxJbHaZy7
-         aJ2DUkKZhrpoAtsRTTE4389znOQZuzysSSAu7q9QRuy0lxBn3/uW5LifuoBdL4sFw2wt
-         KpMFBH13hSdZg6Vr1VOkZKX15OLswQTRkQryAZXqbDlS5qcEIil7rokxIqu39WWIBLeA
-         aD3+r2OLn+McAkzEazlHcbHM9KKcRgYSY+oQqcla8DbfWtz9W1/ksJbGz++HNsms8qh3
-         GUqQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+iQ40yQj9VtKFlkaayUhmKlpcOnjgk9Ohhg+dfaaci8wfFa8H9F7Xgqt3918NGQCihVadx/z4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNB9gdecGP9M/tO9ntYKXP9GJAmXI51filsNCjQwpb0/v/JBKQ
-	s9ztvJ+7Ya07YXNPNZFBg5b2ajtPGzGmPfoCHgh5jH4MvwQ5SKFtmN0rMJjyxv07vfZmJopoOW5
-	RFtflkbjm5RBmXdFZR2b7jTsNb5muxyk=
-X-Gm-Gg: Acq92OHUy8KVxy/t3MfimySSufgNT5t/9vDAj06dEm2Sgkjk3+qEP5iZOvuCqK+FYGI
-	RJeUg34Gmh1q7QC8FSKUgIG8JfFk0f1ITd5p1xYbA7QBEcx0V9y9RZC7lYfpkwgyBa/HCdXVbUa
-	kCHDNs4yUzpiIeHgK8f7+arq2NLNFspPCkm5Umwg+DIjgBZaxc0Rg+swPH8BH8BGljvPAZXS8aE
-	4orabUqIRYad0dX5AWX3asXuB90LybBsRD8wf7knM/S8sj+8YTZmknJ5qieQGmt9V5r+f7DGwlZ
-	WqXmTce4+dBA7nHXyf9J8fcOiali
-X-Received: by 2002:a05:6808:1513:b0:486:7c50:6f9d with SMTP id
- 5614622812f47-4894445bb42mr6916588b6e.8.1781786687457; Thu, 18 Jun 2026
- 05:44:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3E138D017;
+	Thu, 18 Jun 2026 12:50:32 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781787033; cv=none; b=tOpoEFxVBDu5cLugQG/N8BuhOXQuXusXi2E53Do0RAHia+4mgUqx1GbO00JD4tWkLy/i5OzK0UUHScl9RDTpmbhe/zwTp2WenQsTgWGK7rXohFxtt7NzMmd9+APVxxk/VRD4ny38po9Hl+Kr15jJ3vAd26G2Fuuzz5eN+Xf8uQc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781787033; c=relaxed/simple;
+	bh=8dJuuv53AAw2VUnQHP9LZ7dCZ3rmBIHMXZ9XxTdI+NM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oUdWGa0gwKy+j4Jp0XCNSLLvSSKC1ysYYuRJ8cimnr1qtVIZ26wkh6l6rBqzzzyX9WwPvQTePqph/48Qrg4XM6KvnV7l1AK0ToCv3S0OY9nTJ2vCqvPFxX+OB9vvxyYckc+c1DoNCKPcryNSuT4M4BmdhkrqnMlQN3nxstR9MPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCC+3A6r; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1935A1F000E9;
+	Thu, 18 Jun 2026 12:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781787032;
+	bh=2UshQf/2RdMObW9304nb/6W02fhtd1jb33bK9uRmD2o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=RCC+3A6rBuwfjOfJHeVNvOLU9V5gB5bENgep3o3+Fkhz7bzLYvOB+RuooD1JrEMAn
+	 b34ef6m+zX5vgfHED15xm1eaw7BD4H3PxpmWGe79J6Lx7WHozcmm27LPEvI3+qwgI6
+	 1AUvrFLJoiTqSR4L+luuHIe3DKY3TFMR8D7FLLAZOdgZWS2GQBUL1lzfpNx4syefwL
+	 qtPPkgQo0pPZClPP/aUg3UUjnGGgKzZd1gHC90RoHGL6qOk3LYXVQczyxUdrzeab1p
+	 5gCP/vj7tDuYlmFj78hkWZZeF2P0ZClY36nIEWmElMK1bkqpGhFmK6CMBQtHgylOhf
+	 AXjEy5TtO03DQ==
+From: Simon Horman <horms@kernel.org>
+To: tariqt@nvidia.com
+Cc: Simon Horman <horms@kernel.org>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	saeedm@nvidia.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	shayd@nvidia.com,
+	ohartoov@nvidia.com,
+	edwards@nvidia.com,
+	msanalla@nvidia.com,
+	phaddad@nvidia.com,
+	parav@nvidia.com,
+	gbayer@linux.ibm.com,
+	kees@kernel.org,
+	moshe@nvidia.com,
+	rongweil@nvidia.com,
+	jacob.e.keller@intel.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gal@nvidia.com
+Subject: Re: [PATCH net 3/3] net/mlx5e: TC, skip peer flow cleanup when LAG seq is unavailable
+Date: Thu, 18 Jun 2026 13:48:22 +0100
+Message-ID: <20260618124820.890808-3-horms@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260617063204.547427-4-tariqt@nvidia.com>
+References: <20260617063204.547427-4-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260615111235.3544282-1-kyle.switch@motor-comm.com>
- <CAAXyoMOp8mYLUx4CQBn=9R8rNqEsb8ybWD0z+=FJgh2j-F0s8A@mail.gmail.com>
- <88f726d5-1617-4d2e-8fbb-d3da9478b386@motor-comm.com> <a689a734-bfd2-4e8f-85dd-9ae210b3161a@lunn.ch>
- <39b79f5b-3e13-4620-83ba-b2ef991acca9@motor-comm.com>
-In-Reply-To: <39b79f5b-3e13-4620-83ba-b2ef991acca9@motor-comm.com>
-From: David Yang <mmyangfl@gmail.com>
-Date: Thu, 18 Jun 2026 20:44:10 +0800
-X-Gm-Features: AVVi8Celi2wc1WuKyqlQlsQWzARO52siyoMLgHl1hX-xUHq9xNA__qNdKNW_GqU
-Message-ID: <CAAXyoMMQwe4vp_05wfgWaPGh7+Lx+38-6FXkoeDE7Asi75VEMg@mail.gmail.com>
-Subject: Re: [RESEND PATCH v1] net: dsa: motorcomm: add yt92xx dsa driver
-To: Kyle Switch <kyle.switch@motor-comm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ming.xu@motor-comm.com, 
-	xiaolin.xu@motor-comm.com, jianmin.wang@motor-comm.com, de.ge@motor-comm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20260515];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300420-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:kyle.switch@motor-comm.com,m:andrew@lunn.ch,m:olteanv@gmail.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ming.xu@motor-comm.com,m:xiaolin.xu@motor-comm.com,m:jianmin.wang@motor-comm.com,m:de.ge@motor-comm.com,s:lists@lfdr.de];
+	TAGGED_FROM(0.00)[bounces-300421-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:tariqt@nvidia.com,m:horms@kernel.org,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:saeedm@nvidia.com,m:mbloch@nvidia.com,m:leon@kernel.org,m:shayd@nvidia.com,m:ohartoov@nvidia.com,m:edwards@nvidia.com,m:msanalla@nvidia.com,m:phaddad@nvidia.com,m:parav@nvidia.com,m:gbayer@linux.ibm.com,m:kees@kernel.org,m:moshe@nvidia.com,m:rongweil@nvidia.com,m:jacob.e.keller@intel.com,m:netdev@vger.kernel.org,m:linux-rdma@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:gal@nvidia.com,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	FORWARDED(0.00)[lists@lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,motor-comm.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: D418B6A0249
+X-Rspamd-Queue-Id: 9E8056A02EF
 
-On Thu, Jun 18, 2026 at 5:53=E2=80=AFPM Kyle Switch <kyle.switch@motor-comm=
-.com> wrote:
-> As you mentioned "One thing i need to point out. Linux has a long traditi=
-on of not
-> replacing existing code with a new implementation. You take the existing =
-code and step by step improve it. " in another mail before.
-> I want to explain the patch in more detail.
->
-> Step 1. We do not attempt to remove the existing driver implementation, a=
-nd don't change the behavior of existing software,
-> we will retain the implementation of the existing driver software layer, =
-but encapsulate the use of hardware operations into
-> functional interfaces. The advantage of this is that it is easy to mainta=
-in and easy to support other motorcomm switch series.
->
-> for example: vlan add ops in dsa driver:
->
-> Existing code:
->
-> yt921x_vlan_add(struct yt921x_priv *priv, int port, u16 vid, bool untagge=
-d)
-> {
->  u64 mask64;
->  u64 ctrl64;
->
->  mask64 =3D YT921X_VLAN_CTRL_PORTn(port) |
->    YT921X_VLAN_CTRL_PORTS(priv->cpu_ports_mask);
->  ctrl64 =3D mask64;
->
->  mask64 |=3D YT921X_VLAN_CTRL_UNTAG_PORTn(port);
->  if (untagged)
->   ctrl64 |=3D YT921X_VLAN_CTRL_UNTAG_PORTn(port);
->
->  return yt921x_reg64_update_bits(priv, YT921X_VLANn_CTRL(vid),
->      mask64, ctrl64);
-> }
->
-> after patch:
->
-> yt921x_vlan_add(struct yt921x_priv *priv, int port, u16 vid, bool untagge=
-d)
-> {
->  struct yt_port_mask member;
->  struct yt_port_mask untag;
->
->  member.portsbits[0] =3D BIT(port) | priv->cpu_ports_mask;
->  if (untagged)
->   untag.portbits[0] =3D BIT(port);
->
->   return yt_vlan_port_set(priv->unit, vid, member, untag);  // Here we us=
-e encapsulated interfaces to complete the hardware configuration.
->                                                              // We can ig=
-nore the differences between different motorcomm series, which will be refl=
-ected in driver/net/dsa/motorocmm/switch/yt_vlan. c
-> }
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 
-No for nuking the existing code. Your encapsulated interfaces do
-everything that no other does
-  - hardwired to static variables everywhere;
-  - invented unnecessary types (yt_enable) and struct (yt_port_mask);
-  - contain lots of unused files and meaningless comments, while;
-  - incomplete in other parts, for example ACL;
-  - still require direct register accesses outside your interfaces.
-I see no chance that your current interfaces will ever be accepted,
-unless you come up with something totally different.
+Simon says: I think the first two issues flagged below warrant
+            consideration within the context of this patch.
 
-Looking at other DSA drivers, please use one of the following approaches wi=
-sely:
+	    But the third and final issue flagged below as pre-existing
+	    seems to be something to consider in the context of
+	    possible follow-up.
+---
+net/mlx5e: TC, skip peer flow cleanup when LAG seq is unavailable
 
-struct yt921x_ops ...;
+This commit addresses a bad memory access crash by skipping peer flows when
+mlx5_lag_get_dev_seq() returns an error. This occurs when the peer isn't in
+the LAG or when no device is marked as master.
 
-// for simple register relocations
-res =3D yt921x_reg_read(priv, priv->ops->some_reg, &val);
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> index a9001d1c902ff..c6e6534a5e23b 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> @@ -2155,6 +2155,9 @@ static void mlx5e_tc_del_fdb_peers_flow(struct mlx5e_tc_flow *flow)
+>  	devcom = flow->priv->mdev->priv.eswitch->devcom;
+>  	mlx5_devcom_for_each_peer_entry(devcom, peer_esw, pos) {
+>  		i = mlx5_lag_get_dev_seq(peer_esw->dev);
+> +		if (i < 0)
+> +			continue;
+> +
 
-// for complex operations, but still reuse the context
-do_something;
-priv->ops->some_op(...);
-do_the_rest;
+[Severity: Critical]
+Does skipping the remainder of this loop prevent the flow from being
+unlinked from the doubly-linked list?
 
-// for something completely different
-struct dsa_switch_ops yt921x_dsa_switch_ops =3D {
-    .some_op =3D yt921x_dsa_some_op,
-};
-struct dsa_switch_ops yt922x_dsa_switch_ops =3D {
-    .some_op =3D yt922x_dsa_some_op,
-};
+By using continue here in mlx5e_tc_del_fdb_peers_flow(), we skip calling
+mlx5e_tc_del_fdb_peer_flow(), which means flow->peer[i] is never
+unlinked from the esw->offloads.peer_flows[original_i] list.
 
-> Step 2. if Step 1 is accepted, later, the plan may be to replace the hard=
-ware configuration involved in the existing dsa driver
-> with the encapsulated interface step by step according to the functional =
-module such as vlan, mirror, lag, etc. Finally, upload the yt922x dsa drive=
-r.
+If the flow is subsequently freed via mlx5e_flow_put(), will this leave a
+freed list node resident in the active list and guarantee a use-after-free
+list corruption during the next list traversal?
 
-You upload the driver for yt922x for your first patch.
+>  		mlx5e_tc_del_fdb_peer_flow(flow, i);
+>  	}
+>  }
 
-Take ar9331 as an example, a DSA driver is only required to implement
-.get_tag_protocol(), .setup(), .phylink_get_caps() and
-phylink_mac_ops, that's is the "minimal" work for a new chip. So
-please make changes to these functions (and possibly more, but keep
-the patch size in a reasonable range), and each of your patches will
-be an actually usable and testable commit.
+[ ... ]
+
+> @@ -5526,6 +5529,9 @@ void mlx5e_tc_clean_fdb_peer_flows(struct mlx5_eswitch *esw)
+>  
+>  	mlx5_devcom_for_each_peer_entry(devcom, peer_esw, pos) {
+>  		i = mlx5_lag_get_dev_seq(peer_esw->dev);
+> +		if (i < 0)
+> +			continue;
+> +
+
+[Severity: Critical]
+Similarly to the above, does this skip unlinking during flow cleanup when
+the LAG sequence is unavailable?
+
+>  		list_for_each_entry_safe(flow, tmp, &esw->offloads.peer_flows[i], peer[i])
+>  			mlx5e_tc_del_fdb_peers_flow(flow);
+>  	}
+
+
+[Severity: Critical]
+This isn't a bug introduced by this patch, but is there a similar missing
+bounds check during flow addition in mlx5e_tc_add_fdb_peer_flow() in this
+same file?
+
+If a flow is added concurrently with LAG teardown, mlx5_lag_get_dev_seq()
+can return -ENOENT (-2):
+
+drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:mlx5e_tc_add_fdb_peer_flow() {
+    ...
+    int i = mlx5_lag_get_dev_seq(peer_esw->dev);
+    ...
+    list_add_tail(&flow->peer[i], &esw->offloads.peer_flows[i]);
+    ...
+}
+
+Does this result in an out-of-bounds write to a negative array index?
 
