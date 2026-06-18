@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-300283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300285-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id Qa6SEtM6M2on+gUAu9opvQ
-	(envelope-from <netdev+bounces-300283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:24:51 +0200
+	id AVjWATE7M2o2+gUAu9opvQ
+	(envelope-from <netdev+bounces-300285-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:26:25 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEEE369CE09
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5164269CE28
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 02:26:24 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=kernel.org header.s=k20260515 header.b=DUjcXrL7;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300283-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300283-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=kernel.org header.s=k20260515 header.b=TVEDfkmu;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300285-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300285-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=quarantine) header.from=kernel.org;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A65E30CCB7F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:21:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5157730FCC15
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 00:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD442367DF;
-	Thu, 18 Jun 2026 00:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E84233944;
+	Thu, 18 Jun 2026 00:21:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCAF20D4FF;
-	Thu, 18 Jun 2026 00:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D503231835;
+	Thu, 18 Jun 2026 00:21:06 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781742065; cv=none; b=ktCkVr9GdSGDekPQs2w0dLgwDE3Uy+ufwfmHBupwNqqWcpbsIDapm5Nze2zM2ku829T2/vD69zm1GNaakGJIZBuV11eTZa6OHy0y+BcpcSQFlYwCYF6koiLQHjEwBJF6wmYpCmz2fncdfeji+fiTlycGR/y2OULtywZwZrpj350=
+	t=1781742072; cv=none; b=bRRD65jwUZQABUEgBYrZQhun7JxBU4lWLV422Ah+Yzt/OVnt4Vn8rD83yMIP9bMfHi9QZC5gCXH4m8hLkSpPLqFWkAw3ZPh2LZygjUvKFxZAh0H457Bb7pPdxqf87V1tUHzMXe0VGLlfQQQwlgnBy6H3sUIG2tARtzU6XJBUkcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781742065; c=relaxed/simple;
-	bh=DWrceq2OhH6aFez2ixZtaml5shxwVq/SuVD3h8iyi34=;
+	s=arc-20240116; t=1781742072; c=relaxed/simple;
+	bh=rihE8P1LlQgL09Ut+uShtWZAbwSxBawYuflRPlcjjcM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ptZZH5r7aujWvldavcEuoYaAVdSLQ0yj0bA9PUIqeO/KKEeFFuQdaYjJPouwDxL5XFav2Rcz8qcMjoKdqAoZT5XNIkzVZPKKm16TKyVDUejtRJku7xqTp97sRifpb4KmRuxLI25udJZTNd6MgRmSUwndnQQzPX8g/wpQyV3Te8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DUjcXrL7; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A331F00A3D;
-	Thu, 18 Jun 2026 00:21:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=WUGMgCTKqr5rjx11alAtblVtFWgqNLfnJmiClsfa0yXvigl73puEgFCQbol2xJdhcl/lwIzX67BD0uKhFSKM1muoaTY/iqIL/1rXVBDnmQ6xIbxAIl2Gi0sU0vZlJL9qJoYN0qNQNagU+Q0mUPwEYXJIfCfzdEfo85ohWtUWxGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVEDfkmu; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0582B1F00A3D;
+	Thu, 18 Jun 2026 00:21:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781742064;
-	bh=uL1gQff5ono3NPytk0J8Nf9toqilNRN+4zKvHHyXafM=;
+	s=k20260515; t=1781742066;
+	bh=CTqlYi+hhRRQgCdk3v8qgENr6TJHgRiZ4CVkU2tocJ0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=DUjcXrL7MaxA6BQEYM7doXUPfknrd26gNOMbHMwkc4D04dKnH6hkZfHpUS1frjaYW
-	 m3hnvfAAPhHFRKqxQkl76vNij8KKoLKp89m0dDbBBASmqer8pbQSTJwxAY/pEGTIIo
-	 xbuXa2Y5oZpnGr9P7XW+2xb2u6xrYFyxHpqHRwVpiRhIpkVwa0p4Qj4U6TSp4gLZ+o
-	 UZX3TMIaJsmGx7pp5+x3qzdTWhZSCptPE1+9rU90F5GwzPVF4v8JalMO9qLcDOVBC+
-	 AV30ppqPbwspnj0TJtI3gmJnm4tAnxLdYL7FojAXrLdWCor+D5YgSAZzzi777eX/Q9
-	 tW+MW2sIDQ9Eg==
+	b=TVEDfkmuNOtz86e65B32eT3VB7BTyAaiJQ4oSmKLxocEK+3MK8Z0DphiwpUoeTd2X
+	 KePKzKhFYGCm4U8T4LlUWZoyIbl+MkDIr5PnKhH/BWziIQbkI6nKygeAm/0wuVfTSc
+	 6wXRKcgGuoS5zcWWFxcC7QSLkvHaRUIGBL7Mz8x0rcUMEdQzbty4VHIfWOCH4dgnqU
+	 5TTO+Vi/8EagZm/O2DvLdkAMphIcY8tZGMWU4rj6O1xshoEqaFl+k68UN8AcbrybS3
+	 0m0EdRWFFYfdIEaPHmj6t58b00ueRhBO0YBxcRi7FHcvGuSEKor78Tmv5kZfDaQBxq
+	 Nk9VD9MOQ4DhA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9395B393102B;
-	Thu, 18 Jun 2026 00:20:59 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 197E0393102B;
+	Thu, 18 Jun 2026 00:21:01 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,20 +57,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] sctp: hold socket lock when dumping endpoints in
- sctp_diag
+Subject: Re: [PATCH net] octeontx2-pf: Fix leak of SQ timestamp buffer on
+ teardown
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178174205813.1875263.14770021083117878767.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Jun 2026 00:20:58 +0000
-References: 
- <4c1b49ab87e0f7d552ebd8172b364b1994e913c9.1781552190.git.lucien.xin@gmail.com>
-In-Reply-To: 
- <4c1b49ab87e0f7d552ebd8172b364b1994e913c9.1781552190.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- marcelo.leitner@gmail.com, w@1wt.eu, zdi-disclosures@trendmicro.com
+ <178174205963.1875263.1360010491725524418.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Jun 2026 00:20:59 +0000
+References: <20260615030704.504536-1-rkannoth@marvell.com>
+In-Reply-To: <20260615030704.504536-1-rkannoth@marvell.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: amakarov@marvell.com, davem@davemloft.net, jesse.brandeburg@intel.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ richardcochran@gmail.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, sgoutham@marvell.com
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-3.66 / 15.00];
 	WHITELIST_SPF_DKIM(-3.00)[kernel.org:d:+,kernel.org:s:+];
@@ -83,51 +82,52 @@ X-Spamd-Result: default: False [-3.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,kernel.org,google.com,redhat.com,gmail.com,1wt.eu,trendmicro.com];
-	TAGGED_FROM(0.00)[bounces-300283-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[marvell.com,davemloft.net,intel.com,kernel.org,vger.kernel.org,gmail.com,lunn.ch,google.com,redhat.com];
+	TAGGED_FROM(0.00)[bounces-300285-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:lucien.xin@gmail.com,m:netdev@vger.kernel.org,m:linux-sctp@vger.kernel.org,m:davem@davemloft.net,m:kuba@kernel.org,m:edumazet@google.com,m:pabeni@redhat.com,m:horms@kernel.org,m:marcelo.leitner@gmail.com,m:w@1wt.eu,m:zdi-disclosures@trendmicro.com,m:lucienxin@gmail.com,m:marceloleitner@gmail.com,s:lists@lfdr.de];
-	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_RECIPIENTS(0.00)[m:rkannoth@marvell.com,m:amakarov@marvell.com,m:davem@davemloft.net,m:jesse.brandeburg@intel.com,m:kuba@kernel.org,m:linux-kernel@vger.kernel.org,m:netdev@vger.kernel.org,m:richardcochran@gmail.com,m:andrew+netdev@lunn.ch,m:edumazet@google.com,m:pabeni@redhat.com,m:sgoutham@marvell.com,m:andrew@lunn.ch,s:lists@lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORWARDED(0.00)[lists@lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	ALIAS_RESOLVED(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
 	FORGED_SENDER_FORWARDING(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	TAGGED_RCPT(0.00)[netdev];
 	FROM_NO_DN(0.00)[];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: CEEE369CE09
+X-Rspamd-Queue-Id: 5164269CE28
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 15 Jun 2026 15:36:30 -0400 you wrote:
-> SCTP_DIAG endpoint dumping was traversing endpoint address lists without
-> holding lock_sock(), while those lists could change concurrently via
-> socket operations (e.g., bindx changes). This creates a race where
-> nla_reserve() counts addresses under RCU protection, but the subsequent
-> copy may see fewer entries, potentially leaking uninitialized memory to
-> userspace.
+On Mon, 15 Jun 2026 08:37:04 +0530 you wrote:
+> The send-queue timestamp ring is allocated with qmem_alloc() when
+> timestamping is used, but otx2_free_sq_res() never freed sq->timestamps,
+> leaking that memory across ifdown and device removal.  Add the missing
+> qmem_free() alongside the other SQ companion buffers.
+> 
+> Fixes: c9c12d339d93 ("octeontx2-pf: Add support for PTP clock")
+> Cc: Aleksey Makarov <amakarov@marvell.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] sctp: hold socket lock when dumping endpoints in sctp_diag
-    https://git.kernel.org/netdev/net/c/7d8297e26b4e
+  - [net] octeontx2-pf: Fix leak of SQ timestamp buffer on teardown
+    https://git.kernel.org/netdev/net/c/a056db30de92
 
 You are awesome, thank you!
 -- 
