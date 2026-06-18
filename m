@@ -1,116 +1,56 @@
-Return-Path: <netdev+bounces-300494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300495-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id lE27EHobNGrIOgYAu9opvQ
-	(envelope-from <netdev+bounces-300494-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:23:22 +0200
+	id AmNhC1IfNGprPAYAu9opvQ
+	(envelope-from <netdev+bounces-300495-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:39:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4401C6A1932
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:23:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77D356A1A3B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 18:39:45 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=VViNd8PX;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=j1Q7Xd1K;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=VViNd8PX;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=j1Q7Xd1K;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300494-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300494-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=suse.de;
+	dkim=none;
+	dmarc=none;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300495-lists+netdev=lfdr.de@vger.kernel.org" designates 172.234.253.10 as permitted sender) smtp.mailfrom="netdev+bounces-300495-lists+netdev=lfdr.de@vger.kernel.org";
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5654C3004D8A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:23:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B284C308D953
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509AA2E091E;
-	Thu, 18 Jun 2026 16:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F101F3115B8;
+	Thu, 18 Jun 2026 16:37:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F30280A56
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 16:23:13 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036975A79B
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 16:36:55 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781799795; cv=none; b=uU0zhGxz7vsFlFhnDlkudecr05TlCJpno1fCivbN6bsjgXxa0O2clm1FUcjSk8cu5rE0ytvP6EKquuUQQKCGNz9Otuqq+8aJY9eNJZoDizg/Zqc7q5J2Gq5moaPE+Cgi/oqQ/tZWu1293hAZOY9Pe3r5d9xFRLL/7fEFWJ1jAds=
+	t=1781800620; cv=none; b=GBaS9+LSaYWXY3QoNttLVv76RTlE+q1bxE9Q3TEog/mOrtUp19MdWRkX8FCRiY5wiJYjUAXLS2dFy7yIuvjhVrxPqvldTEU626/b01GWFrE5Luo/Or+DkMjXUpK8UrghBoxTqvOPv7RovVjc2+ucSpNKyvzHlwC1p5vTmsppHk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781799795; c=relaxed/simple;
-	bh=JPGeb1FJCs44lbD7ccbkaYJ/2mJM+1sDy3CPh7o5/9s=;
+	s=arc-20240116; t=1781800620; c=relaxed/simple;
+	bh=OX691bkwgSszjQe7pCxB1q7+f79cAw6Oj63jnS2/yOs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C9h4arAhXhySDXs4CQ+yKDZhTru/UOncxaluqvX7xNlsR0ZfeB2qN3a4Ol3EMZ1E3IXkCKK38Mm+WbMt3u1FuZMR1/WIDo0yCBhINc4LNxIKKCdB6jBgfHSsuss3IAqWpZeosBP/KGS+dVsWo7z7aNpil1cjmbfjEBx/OOTK9kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VViNd8PX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j1Q7Xd1K; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VViNd8PX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j1Q7Xd1K; arc=none smtp.client-ip=195.135.223.130
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id BA1F76D490;
-	Thu, 18 Jun 2026 16:22:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781799770; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hQKtNx9gkQdqh3XxzOkTF6N8KSOnu1L+mOfISfK7d+c=;
-	b=VViNd8PXyRn1APuxj/fPGujAx1e6IX5mS6DNDwkKBt08zN3kF6+lf2kKYmswPqFOLd2U/a
-	81olWgM2xykI/2E2Tkr2BA3CTSVLW07v2j9GVWSkiXdpcuXzHnIjwPP4FcPVOKG3ofvb2b
-	wVNn9Ru91719xnVuS5re6XSqGwuMPH0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781799770;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hQKtNx9gkQdqh3XxzOkTF6N8KSOnu1L+mOfISfK7d+c=;
-	b=j1Q7Xd1KlsBzWCl+GuPPL050KnAA0kyGoiG43kXwM2h5zhfOyeVsoHIi7JwgjJ94UIhGdG
-	QvPPXuvBPRRDNSBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781799770; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hQKtNx9gkQdqh3XxzOkTF6N8KSOnu1L+mOfISfK7d+c=;
-	b=VViNd8PXyRn1APuxj/fPGujAx1e6IX5mS6DNDwkKBt08zN3kF6+lf2kKYmswPqFOLd2U/a
-	81olWgM2xykI/2E2Tkr2BA3CTSVLW07v2j9GVWSkiXdpcuXzHnIjwPP4FcPVOKG3ofvb2b
-	wVNn9Ru91719xnVuS5re6XSqGwuMPH0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781799770;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hQKtNx9gkQdqh3XxzOkTF6N8KSOnu1L+mOfISfK7d+c=;
-	b=j1Q7Xd1KlsBzWCl+GuPPL050KnAA0kyGoiG43kXwM2h5zhfOyeVsoHIi7JwgjJ94UIhGdG
-	QvPPXuvBPRRDNSBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DA831779A8;
-	Thu, 18 Jun 2026 16:22:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cCJeMlkbNGqCDgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 18 Jun 2026 16:22:49 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
+	 MIME-Version; b=CyFljWsTUjxRVZC3qnIkgPTJjlzYB/Fsbq4x3m7jUm/IDtFsoMrHvYEphnWie+KaExy1zgu/Cqxn22BU/CUEqi/NDvqnZzghpVqhWwITJB5wpLGHGLSHNkKgub+7en6gDrq6dMjR40l8bRzCSNmJwEvQzETyU+2wnlLhGZ2l7n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowAD3E76YHjRqGNqUAA--.62477S3;
+	Fri, 19 Jun 2026 00:36:44 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
 To: netdev@vger.kernel.org
-Cc: nicolas.dichtel@6wind.com,
-	shemminger@vyatta.com,
-	dforster@brocade.com,
-	gospo@cumulusnetworks.com,
-	ddutt@cumulusnetworks.com,
-	brian.haley@hp.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
+Cc: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
 	davem@davemloft.net,
-	idosch@nvidia.com,
-	dsahern@kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH net 6/6] ipv6: fix missing notification for ignore_routes_with_linkdown
-Date: Thu, 18 Jun 2026 18:22:25 +0200
-Message-ID: <20260618162225.4588-7-fmancera@suse.de>
+	eyal.birger@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	qianyuluo3@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH 1/1] xfrm: nat_keepalive: avoid double free on send error
+Date: Fri, 19 Jun 2026 00:36:35 +0800
+Message-ID: <46eb334399ce0e25e0897b42f21020541d159300.1781788385.git.qianyuluo3@gmail.com>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260618162225.4588-1-fmancera@suse.de>
-References: <20260618162225.4588-1-fmancera@suse.de>
+In-Reply-To: <cover.1781788385.git.qianyuluo3@gmail.com>
+References: <cover.1781788385.git.qianyuluo3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -118,100 +58,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -2.80
+X-CM-TRANSID:ygmowAD3E76YHjRqGNqUAA--.62477S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw4rWF1fXF18XFW7Aw4DCFg_yoW5Gr4fpF
+	WUGr9xArZY93s0qr4DJr95Xr15Gr48KrWagF9xGw4Iyrs8Kr1UGF4jkw4aqrn5XF4S9w1Y
+	qr4DtryqyF1DJFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8JVW8Jr1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK6svP
+	MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQACCWozqlMJUwAAsw
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-300494-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:nicolas.dichtel@6wind.com,m:shemminger@vyatta.com,m:dforster@brocade.com,m:gospo@cumulusnetworks.com,m:ddutt@cumulusnetworks.com,m:brian.haley@hp.com,m:horms@kernel.org,m:pabeni@redhat.com,m:kuba@kernel.org,m:edumazet@google.com,m:davem@davemloft.net,m:idosch@nvidia.com,m:dsahern@kernel.org,m:fmancera@suse.de,s:lists@lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORWARDED(0.00)[lists@lfdr.de];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-300495-lists,netdev=lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS(0.00)[m:netdev@vger.kernel.org,m:steffen.klassert@secunet.com,m:herbert@gondor.apana.org.au,m:davem@davemloft.net,m:eyal.birger@gmail.com,m:yuantan098@gmail.com,m:bird@lzu.edu.cn,m:qianyuluo3@gmail.com,m:n05ec@lzu.edu.cn,m:eyalbirger@gmail.com,s:lists@lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORWARDED(0.00)[lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_SENDER(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[secunet.com,gondor.apana.org.au,davemloft.net,gmail.com,lzu.edu.cn];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	ALIAS_RESOLVED(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,suse.de:dkim,suse.de:email,suse.de:mid,suse.de:from_mime]
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,vger.kernel.org:from_smtp,lzu.edu.cn:from_mime,lzu.edu.cn:email]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 4401C6A1932
+X-Rspamd-Queue-Id: 77D356A1A3B
 
-When changing the ignore_routes_with_linkdown sysctl for a specific
-interface, the RTM_NEWNETCONF netlink notification was not being emitted
-to userspace. Fix this by emitting the notification when needed.
+From: Qianyu Luo <qianyuluo3@gmail.com>
 
-In addition, fix bogus return value for successful "all" and specific
-interface write operation leading to a wrong reset of the position
-pointer.
+nat_keepalive_send() frees the keepalive skb whenever the IPv4 or IPv6
+send helper reports an error.
 
-Fixes: 35103d11173b ("net: ipv6 sysctl option to ignore routes when nexthop link is down")
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+That cleanup is only correct before the skb is handed to the output
+path. Once ip_build_and_send_pkt() or ip6_xmit() takes ownership, the
+networking stack may already have consumed the skb before returning an
+error, so freeing it again is unsafe.
+
+Handle the pre-handoff failure cases inside nat_keepalive_send_ipv4()
+and nat_keepalive_send_ipv6(), where the caller still owns the skb, and
+keep nat_keepalive_send() responsible only for family dispatch and the
+unsupported-family cleanup path.
+
+Fixes: f531d13bdfe3 ("xfrm: support sending NAT keepalives in ESP in UDP states")
+Cc: stable@vger.kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Qianyu Luo <qianyuluo3@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- net/ipv6/addrconf.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ net/xfrm/xfrm_nat_keepalive.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 1cfb223476bd..2d81569b692b 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -955,11 +955,7 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_DEFAULT,
- 						     net->ipv6.devconf_dflt);
--		rtnl_net_unlock(net);
--		return 0;
--	}
--
--	if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
-+	} else if (p == &net->ipv6.devconf_all->ignore_routes_with_linkdown) {
- 		WRITE_ONCE(net->ipv6.devconf_dflt->ignore_routes_with_linkdown, newf);
- 		addrconf_linkdown_change(net, newf);
- 		if ((!newf) ^ (!old))
-@@ -968,11 +964,21 @@ static int addrconf_fixup_linkdown(const struct ctl_table *table, int *p, int ne
- 						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 						     NETCONFA_IFINDEX_ALL,
- 						     net->ipv6.devconf_all);
-+	} else {
-+		if (!newf ^ !old) {
-+			struct inet6_dev *idev = table->extra1;
-+
-+			inet6_netconf_notify_devconf(net,
-+						     RTM_NEWNETCONF,
-+						     NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
-+						     idev->dev->ifindex,
-+						     &idev->cnf);
-+		}
+diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepalive.c
+index 458931062a04..f71328096f11 100644
+--- a/net/xfrm/xfrm_nat_keepalive.c
++++ b/net/xfrm/xfrm_nat_keepalive.c
+@@ -55,8 +55,10 @@ static int nat_keepalive_send_ipv4(struct sk_buff *skb,
+ 			   ka->encap_sport, sock_net_uid(net, NULL));
+ 
+ 	rt = ip_route_output_key(net, &fl4);
+-	if (IS_ERR(rt))
++	if (IS_ERR(rt)) {
++		kfree_skb(skb);
+ 		return PTR_ERR(rt);
++	}
+ 
+ 	skb_dst_set(skb, &rt->dst);
+ 
+@@ -100,6 +102,7 @@ static int nat_keepalive_send_ipv6(struct sk_buff *skb,
+ 	sock_net_set(sk, net);
+ 	dst = ip6_dst_lookup_flow(net, sk, &fl6, NULL);
+ 	if (IS_ERR(dst)) {
++		kfree_skb(skb);
+ 		local_unlock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
+ 		return PTR_ERR(dst);
  	}
+@@ -118,7 +121,6 @@ static void nat_keepalive_send(struct nat_keepalive *ka)
+ 					sizeof(struct ipv6hdr)) +
+ 				    sizeof(struct udphdr);
+ 	const u8 nat_ka_payload = 0xFF;
+-	int err = -EAFNOSUPPORT;
+ 	struct sk_buff *skb;
+ 	struct udphdr *uh;
  
- 	rtnl_net_unlock(net);
+@@ -140,16 +142,17 @@ static void nat_keepalive_send(struct nat_keepalive *ka)
  
--	return 1;
-+	return 0;
+ 	switch (ka->family) {
+ 	case AF_INET:
+-		err = nat_keepalive_send_ipv4(skb, ka);
++		nat_keepalive_send_ipv4(skb, ka);
+ 		break;
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	case AF_INET6:
+-		err = nat_keepalive_send_ipv6(skb, ka, uh);
++		nat_keepalive_send_ipv6(skb, ka, uh);
+ 		break;
+ #endif
+-	}
+-	if (err)
++	default:
+ 		kfree_skb(skb);
++		break;
++	}
  }
  
- #endif
+ struct nat_keepalive_work_ctx {
 -- 
-2.54.0
+2.43.7
 
 
