@@ -1,68 +1,56 @@
-Return-Path: <netdev+bounces-300458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id wPQzHwz/M2pFKgYAu9opvQ
-	(envelope-from <netdev+bounces-300458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:22:04 +0200
+	id DqQwItb/M2qlKgYAu9opvQ
+	(envelope-from <netdev+bounces-300460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:25:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DC746A0E85
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:22:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C7E6A0EC1
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 16:25:25 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=seu.edu.cn header.s=default header.b=MoqV4MmD;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300458-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300458-lists+netdev=lfdr.de@vger.kernel.org";
+	dkim=pass header.d=seu.edu.cn header.s=default header.b=VvQdcnNa;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300460-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300460-lists+netdev=lfdr.de@vger.kernel.org";
 	dmarc=pass (policy=none) header.from=seu.edu.cn;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C9347301A051
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:21:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 356703035270
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 14:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB283B777F;
-	Thu, 18 Jun 2026 14:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130C0286417;
+	Thu, 18 Jun 2026 14:24:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D493F38D40D;
-	Thu, 18 Jun 2026 14:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2790A142E83;
+	Thu, 18 Jun 2026 14:24:23 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792516; cv=none; b=PUor9O2WuPDSjLs2NYh24JwM0ub7Eqyxd70IhDx2fTEIz4+8OyUWBUdjVtpYIAIQKnY0rCFJM/5TxeVLUHtw9+UMB0UgecvAubq0OUXZaXTHmEIEpgFGBXMSwZIDnCtERyiB90J3lZkunJzjB8sJRX5eQrqSyVbMVv/68qy/39o=
+	t=1781792670; cv=none; b=uyaG25tfR99ScTP02uj2deIp1e0yKhUFrRRf5FVonPApqyl/I2FZPkxiUC6tJ1EACxOEc5x75Y+18G1yB55efBd8/FEjfELOYzWnqCgC8sSTDyL4Ywtzy3uLTQMyYvdPG6dk4UXhfSHShebS0JY1DnzPYHa/dZBR1NoFNqaAMoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792516; c=relaxed/simple;
-	bh=L5U93jZHJyDASCbYgKUYgJLTODAE27QkVBFWgkckHp0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EqB2qxVCbzj6ADwEIiu4QUvYQC7JenWK2fCq4HyRTm3iCSmH9riiCQ5GoJ0dem9/RU3EVp+Ql03zWov4vnizM+y57WZbo/V787sZgZDpNKogIiWCq7tTlae40npi6xm5KYyRc00RPOcztY/KLZJ9L8o4w3O+E+tsk5v/qiDcfHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=MoqV4MmD; arc=none smtp.client-ip=101.71.155.101
+	s=arc-20240116; t=1781792670; c=relaxed/simple;
+	bh=oE0KH1yRN9OXm4MY+DgB7PZvgNPGXKJrmySL2yrGmuo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CwkxfHGq4pXOLfEhRZlbnDTmRP8MT3uQXl1ppQ7SlFImjxoNqIoeodPOK3TQ/c4OFTb7qA34s10dd7E98SduWkVAZxZwwlxvxRMnr6A0Ysp0Mz1OkbZ6vymnxOrvG55fwGB3pYYwhXTuSlQMxeTZjhKDTZ+UGEZr8ExHqJiCpLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=VvQdcnNa; arc=none smtp.client-ip=101.71.155.101
 Received: from PC-202605011814.localdomain (unknown [222.191.246.242])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 42ee4c373;
-	Thu, 18 Jun 2026 22:16:34 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 42ee4c3b1;
+	Thu, 18 Jun 2026 22:19:07 +0800 (GMT+08:00)
 From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Simon Horman <horms@kernel.org>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	jianhao.xu@seu.edu.cn,
-	runyu.xiao@seu.edu.cn
-Subject: Re: [PATCH net] net/smc: avoid recursive sk_callback_lock in listen data_ready
-Date: Thu, 18 Jun 2026 22:16:29 +0800
-Message-Id: <20260618141629.2904071-1-runyu.xiao@seu.edu.cn>
+	runyu.xiao@seu.edu.cn,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: au1000: move free_irq out of the close-time spinlocked section
+Date: Thu, 18 Jun 2026 22:19:01 +0800
+Message-Id: <20260618141901.2954452-1-runyu.xiao@seu.edu.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <f7e36176-d00a-4471-94ed-d385e579b43d@linux.ibm.com>
-References: <f7e36176-d00a-4471-94ed-d385e579b43d@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,118 +58,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9edb173fd803a1kunmb825a670a55e1
+X-HM-Tid: 0a9edb19963303a1kunmf6ad0178a5724
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZGE4YVkxKGU9MTB0YSE1DHVYeHw
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDS0NCVkxDTU9NTUpOQkMfS1YeHw
 	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSE
 	pPSExVSktLVUpCS0tZBg++
 DKIM-Signature: a=rsa-sha256;
-	b=MoqV4MmDRylUoqoUi+YtDHcBMu14DQc4kKkjuz1YU0otMj8TXwY+HxXTf5/VMCJgubQFjGCt3tHFeYrl5EEsZ9tkpL3WZ6577zEriBUPvds8GKpQEwnePFz4aL9F2DRMJUXyNB06jfdOUEHfithPx4fLeKu6NEppZzBTlAZXfkU=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=GM5MKfzBrLqFzrUns6jEKAvDRObTqAY5/7+P5HHfT8I=;
+	b=VvQdcnNaRvPvinh57fHWlS2HvqWO4YCowebcVVq5qoaJ/ip+jigvuphis5i4Xjnlt0PZS6Of2kVEUu5ZeDZTbFXgL4tmVbmRhDbTcEc4WYXIrgNkwS2bpEecosvKJN8qmqC9fuG62DbeexEk0QMQsiczXh/6uAlzmeGmNhdXZgI=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=swwEH7uSGI7dhuLMMECUZpE4onbMrPdVNZF6LmhCEDk=;
 	h=date:mime-version:subject:message-id:from;
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[seu.edu.cn,none];
 	R_DKIM_ALLOW(-0.20)[seu.edu.cn:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300458-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300460-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS(0.00)[m:mjambigi@linux.ibm.com,m:alibuda@linux.alibaba.com,m:dust.li@linux.alibaba.com,m:sidraya@linux.ibm.com,m:wenjia@linux.ibm.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:tonylu@linux.alibaba.com,m:guwen@linux.alibaba.com,m:horms@kernel.org,m:kgraul@linux.ibm.com,m:linux-rdma@vger.kernel.org,m:linux-s390@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:runyu.xiao@seu.edu.cn,s:lists@lfdr.de];
 	FORWARDED(0.00)[lists@lfdr.de];
 	FORGED_SENDER(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS(0.00)[m:andrew+netdev@lunn.ch,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:netdev@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:jianhao.xu@seu.edu.cn,m:runyu.xiao@seu.edu.cn,m:stable@vger.kernel.org,m:andrew@lunn.ch,s:lists@lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[runyu.xiao@seu.edu.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[seu.edu.cn:+];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	FORGED_RECIPIENTS_FORWARDING(0.00)[];
 	ALIAS_RESOLVED(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_RECIPIENTS_FORWARDING(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,seu.edu.cn:dkim,seu.edu.cn:mid,seu.edu.cn:from_mime]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,seu.edu.cn:dkim,seu.edu.cn:email,seu.edu.cn:mid,seu.edu.cn:from_mime,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 3DC746A0E85
+X-Rspamd-Queue-Id: D7C7E6A0EC1
 
-Hi,
+au1000_close() calls free_irq() while aup->lock is still held with
+spin_lock_irqsave().  free_irq() can sleep because it takes the IRQ
+descriptor request mutex, so it does not belong inside the close-time
+spinlocked section.
 
-Thanks for taking a look.
+This issue was found by our static analysis tool and then manually
+reviewed against the current tree.
 
-The exact Lockdep stack I have is from the grounded reproducer, not from
-a production SMC setup.  The reproducer keeps the same callback shape:
-the close/flush side holds sk_callback_lock and invokes the installed
-sk_data_ready callback, which re-enters smc_clcsock_data_ready() and tries
-to take sk_callback_lock again.
+The grounded PoC kept the ndo_stop carrier and the au1000_close() ->
+free_irq(dev->irq, dev) path while the driver lock was held.  Lockdep
+reported:
 
-The relevant Lockdep report is:
+  BUG: sleeping function called from invalid context
+  1 lock held by exploit/192:
+   #0: (&aup->lock){....}-{2:2}, at: au1000_close+0x23/0x83 [vuln_msv]
+  [ BUG: Invalid wait context ]
+  exploit/192 is trying to lock:
+  (&desc->request_mutex){+.+.}-{3:3}, at: free_irq+0x63/0x360
+  free_irq+0x63/0x360
+  au1000_close+0x65/0x83 [vuln_msv]
 
-  WARNING: possible recursive locking detected
-  kworker/u4:3/39 is trying to acquire lock:
-    (sk_callback_lock) at smc_clcsock_data_ready+0xa/0x4d
+Drop aup->lock before freeing the IRQ.  The protected close-time work
+still stops the device and queue before IRQ teardown, but the sleepable
+IRQ core path now runs outside the spinlocked section.
 
-  but task is already holding lock:
-    (sk_callback_lock) at smc_close_flush_work+0xc/0x30
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+ drivers/net/ethernet/amd/au1000_eth.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  Possible unsafe locking scenario:
+diff --git a/drivers/net/ethernet/amd/au1000_eth.c b/drivers/net/ethernet/amd/au1000_eth.c
+index 9d35ac348ebe..5a04056e38fa 100644
+--- a/drivers/net/ethernet/amd/au1000_eth.c
++++ b/drivers/net/ethernet/amd/au1000_eth.c
+@@ -943,9 +943,10 @@ static int au1000_close(struct net_device *dev)
+ 	/* stop the device */
+ 	netif_stop_queue(dev);
+ 
++	spin_unlock_irqrestore(&aup->lock, flags);
++
+ 	/* disable the interrupt */
+ 	free_irq(dev->irq, dev);
+-	spin_unlock_irqrestore(&aup->lock, flags);
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
 
-        CPU0
-        ----
-        lock(sk_callback_lock);
-        lock(sk_callback_lock);
-
-  *** DEADLOCK ***
-
-  Workqueue: smc_close_wq smc_close_flush_work
-
-  Call Trace:
-    dump_stack_lvl
-    __lock_acquire
-    lock_acquire
-    _raw_read_lock_bh
-    smc_clcsock_data_ready+0xa/0x4d
-    smc_close_flush_work+0x1f/0x30
-    process_one_work
-    worker_thread
-    kthread
-    ret_from_fork
-
-The nvmet change I referred to is:
-
-  2fa8961d3a6a ("nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()")
-
-The stable/backport patch I originally used as the reference is:
-
-  1c90f930e7b4 ("nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()")
-
-Its commit message says that when the socket is closed while in
-TCP_LISTEN, the flush callback can call nvmet_tcp_listen_data_ready()
-with sk_callback_lock already held, so nvmet moved the TCP_LISTEN check
-before taking sk_callback_lock.
-
-For the TCP_LISTEN check: my reasoning was that smc_clcsock_data_ready()
-is installed by smc_listen() on the underlying TCP listen socket and only
-queues smc_tcp_listen_work() for the SMC listen/accept path.  Once that
-underlying socket is no longer in TCP_LISTEN, there should be no SMC
-listen accept work to queue from this callback.  TCP_SYN_RECV and
-TCP_ESTABLISHED are not listen-socket states for this callback path, so I
-did not intend the callback to queue listen work for those states.
-
-That said, if SMC expects smc_clcsock_data_ready() to handle a non-LISTEN
-state during fallback or another transition, then the proposed check is
-too strict and I should rework the fix.
-
-Thanks,
-Runyu
 
