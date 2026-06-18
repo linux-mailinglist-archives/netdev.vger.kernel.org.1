@@ -1,278 +1,172 @@
-Return-Path: <netdev+bounces-300523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id qcO+FkZBNGpQTAYAu9opvQ
-	(envelope-from <netdev+bounces-300523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 21:04:38 +0200
+	id od1hJnhANGrXSwYAu9opvQ
+	(envelope-from <netdev+bounces-300524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 21:01:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD686A248A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 21:04:37 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 136506A2459
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 21:01:12 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=gmail.com header.s=20251104 header.b=MFKNZsJG;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300523-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c0a:e001:db::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300523-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=pass (policy=none) header.from=gmail.com;
+	dkim=pass header.d=tipi-net.de header.s=dkim header.b=lcsiSxE7;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300524-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c04:e001:36c::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300524-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=none;
 	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 091E7303F7E7
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 19:00:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22A3330237CC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 19:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7A333D4F2;
-	Thu, 18 Jun 2026 19:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7343321C2;
+	Thu, 18 Jun 2026 19:01:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5C83382F3
-	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 19:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798072DFA25
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 19:01:04 +0000 (UTC)
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781809245; cv=none; b=i9NCpQ2ETSB4cO4vK0UlNPr7cy8dOcBZGExhRgOw8EpmxIAW3AIEuiqr3tt+LfKBlPa7H//4NM7s4jYiJQ4r1SrhQ/ou+biTsVkt29Y29zEn7cJ6VxOdUWK4C6NAle0UNyOn7R3IwU+3oi9Rap2Ik65Xp9lyWZH9QM0+Uo04G74=
+	t=1781809268; cv=none; b=Uc65rXx8TWrjg+Z6qqpPOXw1Q7mSgXrZtuGwxea23eurcP9b66zbn2Wycd8DxhpzyrEtXgi4nqLifihUvsSHaCsrvBHjbUGmxsMkSbaC7361umbLkkz8Kf5bG6Ex7o9jqAvgOb2rBV76R0+xugav9DJFCm1jMXd+9BH2nzEy4qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781809245; c=relaxed/simple;
-	bh=8kJMz9LKQ/8hfHjif49visLmKVnF4eIjhO0ToUzckXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUfkHVNfAUqDTwSl9co8BdnFDybCZYDihZi6JJRVSqAHWFmboxe9CXfDCsMgKoqAEEbFrsQx1D/OKMXPaOG7tn3Ra9AMtRDHOlhJOz5S2yc3vkTVAfW1Lv4QTvLxJZdtSv2vPI77X3aEEn6R+VaX/+uBx50fDpn5OnYWOFyI5y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFKNZsJG; arc=none smtp.client-ip=209.85.216.43
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-37c8e7c8137so697719a91.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 12:00:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781809243; x=1782414043; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KZJIVkKgNSYCGOK4bX9+88PTNdyEosGt30DWnvoVWjY=;
-        b=MFKNZsJGybN51u5DlLE3vuL/c+ZASTuwQ8136Wh7+E648ocRlI9D91DTdsuiTrhVYr
-         3FxYFqxZhNebkQggoHO6yNw7/2krANRroyNy1Z7peuTTVQYe7yeRDyucuxfRbzEaADMM
-         qALQKFKCDK6T+uDuocjggyLSfjj94Etl14EvJJHX2LAs+jR8aCTE7oiyNmCCjKfONBfy
-         sRzXc0aw8JIfWf8BgwJMbDiNHN+W9J8AL1tFC950NJ+FLgSPOlhsBXrPGtiHiNmgrbMF
-         sMz8NKBEbnBdHW5+KF2DRp8pFgmemEcjRrNTCDWxVHyheBdY2lAWWIjV7QDlE/83Y+ke
-         +XeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781809243; x=1782414043;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KZJIVkKgNSYCGOK4bX9+88PTNdyEosGt30DWnvoVWjY=;
-        b=TYVV3yOX/sZB5qpPJzk3j7y7isE1OhLf42MMSGR7GH7UDG4rokZQIElZIVVJtf7pig
-         dIWQlyMmi/BRJ3bRhuVDf1DsBku+p9epwphpeZi3SR2BwEbVShk07+FVj0QbB9Zm9oaw
-         5Lm1MG96AC2qLgh6ADQsofDOGUAwzOT7ve9J3N4pfcqmtselZiQlVsTHc3wmY1sxIoPl
-         jxIE+m3LunkT+TaaYSnRj/NsCPpfACl7HtIE0qLqEiAuqNnJ19LcUU0V21b/vfdjO6Za
-         G1Tlng4MdK6ssB1fWhT/GpPdDbK9hBXIp69rI3/kzCdH2kfCdghB1JtM5Y+79HM34lAl
-         uQZg==
-X-Forwarded-Encrypted: i=1; AFNElJ9YXLgmwck9LhkWkJsNwzNBfE3cFvKrknHygbccHu7462I9f9KbFPbwrS1RI9yMnnfklqGZFgA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpqcgJBegx7X/9aQPp0gwjAebXesaqor4KvkegcUCnTZpyqVEi
-	b8Y5uaVi8hIG82aHgwEeo35dkxyi5d0V5HJ1BjXHTv4G4FbWz1fHelJQ
-X-Gm-Gg: AfdE7cnC7Zc4m1IjM7ZSMisV4eFcaY+wHewb/sy38MQQgcZCcqVzJ3n3XZsuNvJbIHF
-	WpFvYePfO8lc1Drvi535gnjx/syaQ7wUswv7Bz3IuDnxyV+6M4Z+NsNdfioK5xk4uMdeLoBG6Jy
-	v4j9+35SDFwUCli0BAQjkhOQMs5ccxeLhvMmvvUbqY5E9IY7LKFetaD/nZu4cmBXgtgW2HrL/qy
-	B+aYz4YRJXrEzcNVrDPPAQcitzKNKUIT+zbd6bG/6frCyXJ3+AKKl5xf7jk+U5fAnKmkZ3DcAaY
-	OIfiOAcRSAzHXfJKUfXOasmx9OMZ0WhWUdCkI1OhRg+Cp8/AISztGlxm9UQ9h6dm7A8VUdGULh9
-	Nmur73d8gwPSI3Dh16oQATEWvElgjPJokj9QY3ZUZP/0rW586bpV/sGdyX62oKEaXIOA7im3NSL
-	3lhpSDQ4fmHg==
-X-Received: by 2002:a17:90b:5103:b0:369:2e00:1ff0 with SMTP id 98e67ed59e1d1-37d15e170e3mr781639a91.6.1781809242899;
-        Thu, 18 Jun 2026 12:00:42 -0700 (PDT)
-Received: from john-p8 ([98.97.43.82])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37d1aa48f04sm25097a91.2.2026.06.18.12.00.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 12:00:42 -0700 (PDT)
-Date: Thu, 18 Jun 2026 12:00:40 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Sechang Lim <rhkrqnwk98@gmail.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Liu Jian <liujian56@huawei.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Cong Wang <cwang@multikernel.io>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf] bpf, sockmap: fix BUG_ON in skb_to_sgvec() on a
- resized ingress skb
-Message-ID: <ajQ9YXj216btyriM@john-p8>
-References: <20260613082442.3252576-1-rhkrqnwk98@gmail.com>
+	s=arc-20240116; t=1781809268; c=relaxed/simple;
+	bh=4IP45nhII7Q6U/N69JdgKt9ewfSkbDGTXCnD2UnYJD4=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=kb60l84HfBrPv5ES1GJ0BVwUnexKFubzgzl/iDbWLzLjdVbVB59oWA/9dMYrzzLwicxdYLdyhtQWyEXVe9MXwnnct5tBzUX9rDSUwbFaq7GKpj52x33oMjBjrxwhLia+/OEsz8Ab11x3Ou4iirrx+r17XUKlrA+0QHmiUKl+fi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=lcsiSxE7; arc=none smtp.client-ip=194.13.80.246
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4A6C6A017D;
+	Thu, 18 Jun 2026 21:00:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1781809255; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=X7RIMxF7kllViLgHajMn0jicwvzwIm5k4nYYqE744K8=;
+	b=lcsiSxE7MQIbiFUIXmAnxPduSZWy1T7hfKN76rLsgi6U8QSCbkbpbH8GxVVMEp3a5Sb4KM
+	RoDB8aV9MLsd7bUDwQmBXcboCP4lPYhnsO9NkETonXe6gBMoye6N2L/kI5CYYjwLnaGoNb
+	SiiFxyD774masWt0z7l17b/x/078hKTCx+qv8iVCT3TMEWCM4AkFwE58vZ9dMSA9LomsA2
+	21vigXBL/1c/HiKJuoD21KYf5M/8Yt0faF3JDKWYJvdhfLxRs2Wto1XfTCD+KYJpB3zTrC
+	Qq/K6Y0hNmiARh2Q8LfdG7KRmcf9yZeAOT4pVN9EuwiBF25XuTr4W2VLba9IBQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260613082442.3252576-1-rhkrqnwk98@gmail.com>
+Date: Thu, 18 Jun 2026 21:00:55 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Sven Schuchmann <schuchmann@schleissheimer.de>
+Cc: netdev@vger.kernel.org
+Subject: Re: lan7801 looses VLAN Filter Table
+In-Reply-To: <BEZP281MB224501E38B30BFDC4BD3D364D9E32@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+References: <BEZP281MB224501E38B30BFDC4BD3D364D9E32@BEZP281MB2245.DEUP281.PROD.OUTLOOK.COM>
+Message-ID: <24f3b25001984dce928f564e26bb35d2@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Rspamd-Action: no action
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS(0.00)[m:rhkrqnwk98@gmail.com,m:jakub@cloudflare.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:liujian56@huawei.com,m:daniel@iogearbox.net,m:cwang@multikernel.io,m:netdev@vger.kernel.org,m:bpf@vger.kernel.org,m:linux-kernel@vger.kernel.org,s:lists@lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-300523-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORWARDED(0.00)[lists@lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS(0.00)[m:schuchmann@schleissheimer.de,m:netdev@vger.kernel.org,s:lists@lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johnfastabend@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ALIAS_RESOLVED(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWO(0.00)[2];
+	DMARC_NA(0.00)[tipi-net.de];
+	FORGED_SENDER(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORWARDED(0.00)[lists@lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300524-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	ALIAS_RESOLVED(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,vger.kernel.org:from_smtp]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: ACD686A248A
+X-Rspamd-Queue-Id: 136506A2459
 
-On Sat, Jun 13, 2026 at 08:24:31AM +0000, Sechang Lim wrote:
->sk_psock_skb_ingress_enqueue() maps a received message into a scatterlist
->with skb_to_sgvec(skb, sg, off, len). On the SK_SKB strparser path off and
->len come from the message's strp_msg (stm->offset and stm->full_len), set
->by the stream parser. strparser does not trim the skb, so normally
->skb->len - off >= full_len and len is within the skb.
->
->An SK_SKB verdict (or parser) program may call bpf_skb_change_tail() and
->shrink the skb after full_len was recorded. len then covers more bytes than
->the skb holds, __skb_to_sgvec() walks past the data and trips BUG_ON(len):
+Hi Sven
 
-FWIW this only happens if the strparser program is also attached. If 
-there is no strparser program stm->offset = 0 and stm->full_len will be 
-whatever the verdict program set. So there we would get
-
-   len = skb->len; // then if it shrinks to skb->len - X its ok.
-   off = 0;
-
-
->
->  kernel BUG at net/core/skbuff.c:5286!
->  RIP: 0010:__skb_to_sgvec+0x78c/0x790
->  Call Trace:
->   <IRQ>
->   skb_to_sgvec+0x32/0x90
->   sk_psock_skb_ingress_enqueue+0x42/0x370
->   sk_psock_skb_ingress_self+0x1a8/0x200
->   sk_psock_verdict_apply+0x33c/0x360
->   sk_psock_strp_read+0x24a/0x370
->   __strp_recv+0x66d/0xda0
->   __tcp_read_sock+0x13d/0x590
->   tcp_bpf_strp_read_sock+0x195/0x320
->   strp_data_ready+0x267/0x340
->   sk_psock_strp_data_ready+0x1ce/0x350
->   tcp_data_queue+0x1364/0x2fd0
->   </IRQ>
->
->Clamp len to skb->len - off, and drop the message if off is already past
->the skb. sk_psock_skb_ingress_enqueue() is the only skb_to_sgvec() caller
->and both ingress paths (verdict SK_PASS and the backlog worker) reach it.
->The clamp is a no-op unless the skb was shrunk.
->
->Fixes: 7303524e04af ("skmsg: Lose offset info in sk_psock_skb_ingress")
->Signed-off-by: Sechang Lim <rhkrqnwk98@gmail.com>
->---
-> net/core/skmsg.c | 4 ++++
-> 1 file changed, 4 insertions(+)
->
->diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->index e1850caf1a71..2961178ebd1e 100644
->--- a/net/core/skmsg.c
->+++ b/net/core/skmsg.c
->@@ -550,6 +550,10 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
+On 18.6.2026 17:18, Sven Schuchmann wrote:
+> Hi,
+> I have a problem with a lan7801 chip in Kernel 6.18. I configure 
+> VLAN-ID (2) and an IP address.
+> But if I disconnect and connect the network-cable several times at some 
+> point no packets are
+> received anymore. Without using VLAN this does not happen.
+> 
+> I tracked this down that sometimes the VLAN Filter table seems
+> to get cleared. I hooked into the lan78xx.c driver to dump the vlan 
+> table:
+> 
+> static void lan78xx_get_stats(struct net_device *netdev,
+> 			      struct ethtool_stats *stats, u64 *data)
 > {
-> 	int num_sge, copied;
->
->+	if (off >= skb->len)
->+		return -EINVAL;
->+	len = min_t(u32, len, skb->len - off);
->+
+> 	struct lan78xx_net *dev = netdev_priv(netdev);
+> 	struct lan78xx_priv *pdata = (struct lan78xx_priv *)(dev->data[0]);
+> 
+> 	lan78xx_update_stats(dev);
+> 
+> 	for (int i = 0; i < 3; i++) {
+> 		u32 buf;
+> 		lan78xx_dataport_read(dev, DP_SEL_RSEL_VLAN_DA_, i, 1, &buf);
+> 		if (pdata->vlan_table[i] != buf)
+> 			netdev_err(dev->net, "VLAN TABLE %d: 0x%08x 0x%08x", i, 
+> pdata->vlan_table[i], buf);
+> 		else
+> 			netdev_info(dev->net, "VLAN TABLE %d: 0x%08x 0x%08x", i, 
+> pdata->vlan_table[i], buf);
+> 	}
+> 
+> So I can "read out" the table if I do "ethtool -S" and see it in the 
+> kernel log.
+> Normally the output looks like this:
+> VLAN TABLE 0: 0x00000005 0x00000005
+> So the table looks as expected. The Local Filter table from pdata is 
+> the same as in the chip itself.
+> 
+> But after some cable disconnects and connects I see this:
+> VLAN TABLE 0: 0x00000005 0x00000000
+> So the table got cleared or deleted and no paketes on VLAN-ID 2 go 
+> through.
+> I even can do this after I read out the table in lan78xx_get_stats():
+> 
+> 	lan78xx_dataport_write(dev, DP_SEL_RSEL_VLAN_DA_, 0,
+> 				DP_SEL_VHF_VLAN_LEN, pdata->vlan_table);
+> 
+> ...and with this I can "fix" the table again from the ethtool and it 
+> starts working again.
+> 
+> Has someone seen something like this or can point me to a direction 
+> where
+> I could reinit this table (I already tried at the end of 
+> lan78xx_mac_link_up() without success...)
 
-This is blocking the BUG but will break the socket. We should fix
-at the cause. Something like this untested... although I've never
-used the strparser program in any of our cases.
+I was able to reproduce your issue on my hardware. AFAIU the vlan table 
+is not restored after USB suspend.
+I will send a patch shortly. Would be great if you can test it too.
 
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 2521b643fa05..95347f9d140c 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -542,6 +542,20 @@ static struct sk_msg *sk_psock_create_ingress_msg(struct sock *sk,
-         return alloc_sk_msg(GFP_KERNEL);
-  }
+> 
+> Thanks!
+> 
+> Regards, Sven
 
-+static bool sk_psock_skb_strp_range(struct sk_buff *skb, u32 *off, u32 *len)
-+{
-+       struct strp_msg *stm = strp_msg(skb);
-+
-+       *off = stm->offset;
-+       if (unlikely(*off >= skb->len)) {
-+               *len = 0;
-+               return false;
-+       }
-+
-+       *len = min_t(u32, stm->full_len, skb->len - *off);
-+       return *len;
-+}
-+
-  static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
-                                         u32 off, u32 len,
-                                         struct sk_psock *psock,
-@@ -696,12 +710,8 @@ static void sk_psock_backlog(struct work_struct *work)
-         while ((skb = skb_peek(&psock->ingress_skb))) {
-                 len = skb->len;
-                 off = 0;
--               if (skb_bpf_strparser(skb)) {
--                       struct strp_msg *stm = strp_msg(skb);
--
--                       off = stm->offset;
--                       len = stm->full_len;
--               }
-+               if (skb_bpf_strparser(skb))
-+                       sk_psock_skb_strp_range(skb, &off, &len);
-
-                 /* Resume processing from previous partial state */
-                 if (unlikely(state->len)) {
-@@ -709,6 +719,9 @@ static void sk_psock_backlog(struct work_struct *work)
-                         off = state->off;
-                 }
-
-+               if (unlikely(!len))
-+                       goto out_free_skb;
-+
-                 ingress = skb_bpf_ingress(skb);
-                 skb_bpf_redirect_clear(skb);
-                 do {
-@@ -737,7 +750,8 @@ static void sk_psock_backlog(struct work_struct *work)
-                         len -= ret;
-                 } while (len);
-
--               /* The entire skb sent, clear state */
-+out_free_skb:
-+               /* The skb has been handled, clear state. */
-                 sk_psock_skb_state(psock, state, 0, 0);
-                 skb = skb_dequeue(&psock->ingress_skb);
-                 kfree_skb(skb);
-@@ -1020,10 +1034,10 @@ static int sk_psock_verdict_apply(struct sk_psock *psock, struct sk_buff *skb,
-                         len = skb->len;
-                         off = 0;
-                         if (skb_bpf_strparser(skb)) {
--                               struct strp_msg *stm = strp_msg(skb);
--
--                               off = stm->offset;
--                               len = stm->full_len;
-+                               if (unlikely(!sk_psock_skb_strp_range(skb, &off, &len))) {
-+                                       err = 0;
-+                                       goto out_free;
-+                               }
-                         }
-                         err = sk_psock_skb_ingress_self(psock, skb, off, len, false);
-		}
+Thanks
+Nicolai
 
