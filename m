@@ -1,310 +1,189 @@
-Return-Path: <netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-300361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by mail.lfdr.de with LMTP
-	id PZoBHPKxM2qnFAYAu9opvQ
-	(envelope-from <netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:53:06 +0200
+	id yVggFTCyM2quFAYAu9opvQ
+	(envelope-from <netdev+bounces-300361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:54:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEBB69E9DB
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:53:05 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2EA69E9F9
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 10:54:07 +0200 (CEST)
 Authentication-Results: mail.lfdr.de;
-	dkim=pass header.d=est.tech header.s=selector1 header.b=F70vupDP;
-	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org" designates 2600:3c15:e001:75::12fc:5321 as permitted sender) smtp.mailfrom="netdev+bounces-300360-lists+netdev=lfdr.de@vger.kernel.org";
-	dmarc=none;
-	arc=reject ("cv is fail on i=2")
+	dkim=pass header.d=gmail.com header.s=20251104 header.b=kPQhdo49;
+	spf=pass (mail.lfdr.de: domain of "netdev+bounces-300361-lists+netdev=lfdr.de@vger.kernel.org" designates 104.64.211.4 as permitted sender) smtp.mailfrom="netdev+bounces-300361-lists+netdev=lfdr.de@vger.kernel.org";
+	dmarc=pass (policy=none) header.from=gmail.com;
+	arc=pass ("subspace.kernel.org:s=arc-20240116:i=1")
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1013130046A8
-	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:45:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 90CBE3018EB2
+	for <lists+netdev@lfdr.de>; Thu, 18 Jun 2026 08:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8913B4E94;
-	Thu, 18 Jun 2026 08:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DF73B585D;
+	Thu, 18 Jun 2026 08:46:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013050.outbound.protection.outlook.com [40.107.162.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFF93385B2;
-	Thu, 18 Jun 2026 08:45:23 +0000 (UTC)
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781772325; cv=fail; b=RB4c8BhEyohTAp8Oa2zjdAmhE3NVQ4vBEHpSE1IRsp6Msx6L8DrFg1mKvMjEQNuqvoFcxugvVStQsdzFVttLDA8NR8bahmmPwa9DkQwmraqDB/BIpkprgIAj2u7Yj+5/VBLrrVAsps1ublljOIa7rsW1WsF1r+ITq9fznJn7k8I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781772325; c=relaxed/simple;
-	bh=S6y2NFaTcEQBSrYKIrFl+7K09+d+UwdFfM+bYr/84Cc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VKHpkKx3euRRw+KbhoCCEvw7AuwAfGnmd7CK6LNy5pFdMHiGE5VRq07bjksv7jdTSqXUZ7DhjjL15qBRG+rvK9rAEJ3gPCkBmgXYetp8ERihLoDslxvDdD7dWstcP/L/YTknwuqdMK1m/9aLb0RGNVwQLm0byvgDGMrphs5evbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=F70vupDP; arc=fail smtp.client-ip=40.107.162.50
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ic8ZZS/JdMJVKoT3SXIb5Qu2EZk2jMLRSZnWRiQ69/5eVGUiKeWBHCWlisrL9N3fzNWdwbhkeOv8cl2z2WQWei1yQzmSDDfIoix/x14ZYmLcOLtCvdBkmgVQOO8KOFQ/Nr8cuvpaZj2Ih8lMr0UvOAzoCetZKg7KexjQUb01YjN7F6rslsRLy54kiYM+AkaJrmaRP9TzexuDCYNghUSX8yUlntMKVnXhXaxEuH/v/UATaV0HDD3Ftzc1ImqrsltsKPiXa+MXtRLgl6Y65gMTaLJA+s4nEfvdJbZsECQ+376tebHTDovcCqAmV72TPx4lbqpZZbCyjvTPbsxk5/LYQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SRU1kjrNc+VDy7bhTKAx0tY1QSD/aN6c59LB4hW9H5k=;
- b=I4+P8bVBXbaw3ygB0ffCk8Wj8aSz0cxSt1AXrwzGWacbDb/vjpJiHI4xaQLx805PaLcs8Zi3XwNCAVibXy/5fTvELEN2dt2mvV5GIkF1eNRALAIbXB2L/Dxd11FiDsi6S1OG9J8SSk4u+RzAs7QIkgugvyODXMWCKnOK5ixx/Jke4j4+9oHN8lSmUCEea9gx77fr7SyJi4F1/8JR2y8W5pSOrJf8HpX0N7UqIUH28oGZmEEmJVk2D53f7TTNpcgBE39QaoALChoKsvL7ItWNafy8kiX7gXj+rD8TExxhDwy7MLlDlZuXtnu5E2J4IGtA2YUdOAHwbQzkiwqTAd3yJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SRU1kjrNc+VDy7bhTKAx0tY1QSD/aN6c59LB4hW9H5k=;
- b=F70vupDPGLAUbMsdbUEVUbrur0q1s81lniXJ3kwpjpavCe5ZgLn9HbKKsXZUhOT9M6G/ILbmB86fPLhi9oeUyvS0G8qoX/9HXCZkcITAhEerQe1cGbhxUCHXnK5QrWqnOky314kJs+qWX2b2f1h0L3EcPpopx6KEDzF7gSqk5CEbeLA4rARt1CLKW9aObnx6QW96R1Lwm4dS+GkJl/Zic0IG+K/1Kc/RMZMDhwdRhW/NBXiATfctY+9pcspG0zd35tqFE3VExSrEICHIGcAOg/CCJ05Tr35IpeBmfoTBTeDbe0caNfJDOG9rHXI9T17szCFGqzM8MrLNQIC6EEbzlg==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- DU2PPFBA933CD6B.EURP189.PROD.OUTLOOK.COM (2603:10a6:18:3::aa1) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.11; Thu, 18 Jun 2026 08:45:18 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%6]) with mapi id 15.21.0139.009; Thu, 18 Jun 2026
- 08:45:18 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Weiming Shi <bestswngs@gmail.com>
-CC: Simon Horman <horms@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Xiang Mei <xmei5@asu.edu>, Jon Maloy
-	<jmaloy@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: RE: [PATCH net v3] tipc: fix use-after-free of the discoverer in
- tipc_disc_rcv()
-Thread-Topic: [PATCH net v3] tipc: fix use-after-free of the discoverer in
- tipc_disc_rcv()
-Thread-Index: AQHc/mG778NGJTQ9aEGmBcXEp0hTxLZEAGbQ
-Date: Thu, 18 Jun 2026 08:45:18 +0000
-Message-ID:
- <GV1P189MB19885A51CB153EBAA966184EC6E32@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <20260617135744.3383175-3-bestswngs@gmail.com>
-In-Reply-To: <20260617135744.3383175-3-bestswngs@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DU2PPFBA933CD6B:EE_
-x-ms-office365-filtering-correlation-id: ada551ef-c13a-4ae8-8706-08decd15ecc7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|1800799024|7416014|376014|366016|56012099006|11063799006|5023799004|6133799003|22082099003|18002099003|3023799007|38070700021;
-x-microsoft-antispam-message-info:
- YEK+6Dy+UeMLrZSznMiJrzUcc9CMDJgkGGVGajO09Pcxpcq6XonLT/AlQQv0KQ9GeXKuVkFD1xk9IntW4RcEwMYI6x+2HWelVyBaFhA9BqMUhESY5HQJhS6fD8r2BywmQe8W8lZfp1YhQ4+N9mX0NZIhOJlzDERvc99O/lyRAuDZ2JnxISdik96gjFhPywwIShCI2YrDXz1Tjd4VXTpyZ6n9lm9Ro42WOfewNqDEHd67GFzjn7Af+jp5cDdG8ZMOaTdJYUq0dct8u56GExFc+8ZABCC4lNrO5Qm0Y7RjkrFVDLh2DIyMILFONY8AECJcRNY1WFhklG2nAqdl/xIVzZCNE5bVhXb2wxGrRefvNGxaNqvh2iFTnILmJDJpaSFKiMiWwawg7f7su1lV7oG4PxC83yPyt3jbgZ04vUsecHJRZAGUMRnx3wEJv27abyz9mWqfH5KGfKRsIiOy2MhQhSecQzbBhKrXin/vYur8Ta9mUZf4enqFtBOU8uiSg2zcbDsBYDnub3gNLJTvseY+QWrwILWeOVkgZYGzerJjxXewKwNklndBAMKlasNyOtjoCLUuPYL8MIlvk7Ya4fOFotMkPRzfdCwyjYLAJEHvPnF9FywWeCBJVh1CzK+4aJQMKmqnlitaHvwEb3PFfupwhFkjc2/UGxLjW6YReMNcdIyidJRHIqFuKplt82gEDccyZA8FVfQqXIKwd9BfcuUO6jFxYr5qCS7nPDab241MfweoU1wo3K0rF1AP1ZBM9r5S
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(7416014)(376014)(366016)(56012099006)(11063799006)(5023799004)(6133799003)(22082099003)(18002099003)(3023799007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?r2eLV9ARW1cESw/4J0oq6bg+HjIblh16qEBI8SJhIS66t65ogNO2hHKKW3oS?=
- =?us-ascii?Q?2NXjnnr1WNsZPCGvYbjZvqQi4xzWo3NSD4hZd+G/LLiNHm5vJA9dVzSzDIL6?=
- =?us-ascii?Q?358IBtpQO3aonXvOFSzlqlh6SbSw1ZGDnbMNGOAyYTKubXKmA6Z20g4de9/q?=
- =?us-ascii?Q?y6IkDS9C3V3kDgtX02EheRMf7DRtZmkee8JsXdAi12yamKORM3+AQNgR0PNN?=
- =?us-ascii?Q?U9TivTzNDYrL3p3uh129QfTgFhmBsh9B88P7zC3LE+5vS+YythfZogHmeZuu?=
- =?us-ascii?Q?Wd/XEHSdFrIEBAf6IyNRDwXZ7qi42WO5EB+DyizC+FjdGL2BUe4x4rO/dML3?=
- =?us-ascii?Q?vrWEhZZw4C/iOWMrbhDG89RSPY4MbNbq6fVBqe6MB5LNkfBPE8+01KnrkUb5?=
- =?us-ascii?Q?vUcQ0i+xzCFE/FlLJBPnwAROPhrQfGo+lcNRifLLEmLOOmtG+NIRkPN8DJ00?=
- =?us-ascii?Q?lpbq6EiVLaI1VD0eSYo34YX/Pi5cp0jdW1rBgmcwJuQ9ks+qjfJfoC9RbMS5?=
- =?us-ascii?Q?s7PGqQrd7Qk6VREv8PUxb+iEDfIXAT/XL17tpun46OFSsTrofVQWL/6YGU4D?=
- =?us-ascii?Q?hC0V/DGKkaE6b4RUZsJg4b5HgM9AJBX3U86ixBsZfhG09w9/6yi2AzJSjHst?=
- =?us-ascii?Q?59nXy9TiaH5F5Xh64cjs1FlsN2OHrJcl+mjatuWTkmorgOy6m3bux78NpH6D?=
- =?us-ascii?Q?vsQq0ZGbR4F6d2XAYy6HiIW7yJbrbYwqdQTCnHHtY49pY3TE7tndHFrQ/5OS?=
- =?us-ascii?Q?snz8hH04TkvpOV/pFaSqD4CtQGIVDAI5tuusfig9oVDVeDTcpGVJMJ0HBxH8?=
- =?us-ascii?Q?2n//C/ExneFidA+RxuWegspiEVb36LalLhoXoTFT+sEPPyBcIlddKubJY+1F?=
- =?us-ascii?Q?VxWkKZHaKlvoLDSIBTZKg2r4IJRV774aXjZoC1NNPKOdVEKnFjfs3DFJStU9?=
- =?us-ascii?Q?Z2hQQ73XZfpEL19W1WvrKHvdJVdkJiqA8gSPsviBDZZ153uhrih0+X0+kz32?=
- =?us-ascii?Q?CNXRp68GNqC4leSE3VT6j/YUC0VdNP67BJxqzTesxaFb0becs6CdGUwv6mFB?=
- =?us-ascii?Q?BGGivRi8cRef4iVwkPWpUItn7VLlwCPDwK68qVeTFDWabfQnaBZF3+f94bW2?=
- =?us-ascii?Q?+I3s3E0EuDJbvMDn4B0U99lwaEsXx1EzKccEcZZLAbYYOeqXEFGyxk3kxzMy?=
- =?us-ascii?Q?8UKzwBjnidoMMtvqjsiOJXqqJhjOs5MV6CVl8JnBqzQms+zOhRBahOUqKhYi?=
- =?us-ascii?Q?4Nv5unOM/vRox2LakKGax49gLeFbUb11lDkm7x+nviso2qmYaDWIg8vazohO?=
- =?us-ascii?Q?vzYjmWcRrKjAF/ClZ4TVSWGVr1JY8iCELzBcctiN0O3eZ/o02YY9Qm1pMomp?=
- =?us-ascii?Q?i7i6Z4ByCCdGaTgH+5wnIoilhsvbM9+DpxwBGkF7ux6t8IZjt0EisDGQ127z?=
- =?us-ascii?Q?4yo1MSmAvqjuc4DZzsBT98fXXdxfYm/TZtaLRVDy5TSKcShA/QY7Cd5Utl4r?=
- =?us-ascii?Q?SfdXHqkT/bG7t0URBFVXNANfzWH7Ta9+poVTVKIxJTjKjR8yzpw+cJoGjgEV?=
- =?us-ascii?Q?0mTJvn4qN/ecqKqz9mD9bXza33I9Daw+IooQ6ZglJryE8cp3xfM9UkfXTQFs?=
- =?us-ascii?Q?FzT0BTYcmpFSZ7YQTyLbd033yFATkpicFOmnPKoW2BB6gX+I2HjHvW6T/Dfm?=
- =?us-ascii?Q?tdDixZvZzrHZppnAJzsjmVvBzBSrYkpAMLac8ag04T6mc8q/GvHY6mn8qSVC?=
- =?us-ascii?Q?0FBhYBbViw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39FE25B0A1
+	for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 08:46:15 +0000 (UTC)
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781772377; cv=none; b=gjgXcddLNh62mzQXPMm8MHcvx8J97rAkEWYTV4P38agF4iDauujQlgm3Bz2ffEQ7J4OdHJ6VsaRq4g6NRMAGNM41jbxmRa7ImEACd6QScLqYOQrjUKqjml9C7RIwpeNk6YnfmiIT1/4oGR7g5rXgJNXO39DH/giQVE0LYEZfg6M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781772377; c=relaxed/simple;
+	bh=ZkO6pGqCkfZqy3u/oU51uk/j3lT62505mW0fThy9hk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WNajTvYoiTd598n8DY2AEE2Hm00tioF0UgOX+O2Eq/QTSHxhvqtuwkBKaP4eMVnCXBkS8mY5bTGrDOc7Xwu2ti+pePgMwvTTpNeEeezAt2Kjl82D6CVs/WhSP2QGsFOOXsmh0n6Fjay6y0zHoI+WYwEJW/gEnpeY6Ikd7b2CkIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPQhdo49; arc=none smtp.client-ip=209.85.128.52
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-491b390f9e9so5703125e9.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jun 2026 01:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781772374; x=1782377174; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3PGCTCQszIeeChHhQclIvtZO9APdlhqX7ENI5kXXs3o=;
+        b=kPQhdo49O+yBje7dRhYtDtHt4mCyMKrFOBAd15Qovc/SviFiJm4TKN+LmQiRyh4JqN
+         hyuCSZBO2MEUlMYVnLqBOOYzjuph6m50697h0zjDRx+qgFZB+HEp1jRfKsB+Gz9poVs9
+         pzioYQiWuLcIVIHrLu6PqaUu8P3/Vk5ZYlGQOEbPqDFxQdGqV0p/vxClW3OZmZYsDQpW
+         HQ49OyS9Eku0Z92Fot9TDvBC6KAy9skjsFuZx8y+eVHpF7krlHoNuc1kLNUyjVde21cc
+         qXt5wzsKWTaabaEvJUjIR46xsAMvtyFJPHAjzvdq67c/s1EeqzXiucNBaTqFsrjAxU48
+         9niQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781772374; x=1782377174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3PGCTCQszIeeChHhQclIvtZO9APdlhqX7ENI5kXXs3o=;
+        b=b31SbfylWJBmODKyav5bm/9dZPNk2X8WSYhM8jegBbCYKf4MpaZWrVmSjQ5csIh3sm
+         AfGH4Y7tZLnTd7BEFw0JvhvoyrRr4wA4wgPvZIxKExr0sDv+RD9BDmJ+SfUXxXbkHc4c
+         sP6Zgmra77Ki3q9KLzG/KFVwhdz0gUgaANQgFQE5yIsNOq9Ipz8GgL/+Mvfd/SFBnnHi
+         6O71OTdnjiByleWdqRHj4IFSE6mMqLlcwSGRC0tNcBMzCGZt7apeCBEJaWzWw9sFzwzq
+         pohKtaSMHRu5n51oIO5tJfFk5tF8ipoNvZ/SM8Fq93z9FYfi677X4HwACrg9RLFv9r+R
+         Pd7A==
+X-Forwarded-Encrypted: i=1; AFNElJ++7feKN753rFCbo+jQXFjxgjYf3oW4dYCXTTr+NrFxPIo4WF5H9na3H/ioM//3MK4zqp8EZeY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSbMfsJmKiJzeV6R/T3Y+uivgAUYXfRg9EKQGQcoJCR9JwvjR1
+	Qhnb/eAaONoid2WEjuXFvzobNYUTyRuP6ahX/MVU0dh5I9LxAePzGC6F
+X-Gm-Gg: Acq92OECNUmys3QQ+XV1pl68yLTrNbr0wed1Yov+8uZ2bEay+KE8MEB8EKnXZQMeOgn
+	KghFR6mlypFs1BNT2OYJ+0tKraXPPa3KOzOVWHaz3Zx0IJ6BZZegJxo+71vaLIN/s/vUgOVJCDQ
+	hEk6vAaekj3n+cl6Zty17LFT7QqIW3Hg3iLPODapO+6HGHhx1gm2juR/PuAWi0JMJEeXiNsiSt4
+	oy0rLPXTvasdTKNtYeW8gXrgF7ZZfcgdGxBQ7EOXFgGAApsrxeuJ6WFbiZY4dyBFXkZUaoR7oTt
+	Aln6+jnCgZZvbfCzto+HpMBnsBLTQzmFsRiRhJrjiiHoMDt8jgX54ARafRdmlQ6G0pu3I2jhO8d
+	+dXGHxkHdsYgTi6Ms1cL232iXnQagNMsnK0QpyRmp4luIyEi3ardAS22LfcN4wjlu25Tg+C4j7O
+	sS6WmDaUrPDBg/ufVnGJfxYLuE7KKpqNr0lRpByPBASW/ZELqVYxVv34X8pGjY0RvnBmYNRtZtY
+	l8yR+ovvaEJ5jIYds34+Yh6RC1hOBYwdgamm017LbFnbfJE+gp4zyGR7LqgthNYZ13LCm6G8ZVJ
+	VPbaZBLr3ISzOKS99UkVXUgvIMV8j9mBa/lK1ksMGDk=
+X-Received: by 2002:a05:600c:8189:b0:492:32a0:7f92 with SMTP id 5b1f17b1804b1-492333aabe8mr126392015e9.12.1781772374045;
+        Thu, 18 Jun 2026 01:46:14 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e006e99796483dfbc0d.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:6e99:7964:83df:bc0d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa96f0esm255435305e9.12.2026.06.18.01.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 01:46:13 -0700 (PDT)
+Date: Thu, 18 Jun 2026 10:46:11 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: Sun Jian <sun.jian.kdev@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com,
+	song@kernel.org, yonghong.song@linux.dev, jolsa@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+	toke@redhat.com, lorenzo@kernel.org
+Subject: Re: [PATCH bpf v3 1/2] bpf: Fix partial copy of non-linear test_run
+ output
+Message-ID: <ajOwU4ak1qWlAaYu@mail.gmail.com>
+References: <20260617093557.63880-1-sun.jian.kdev@gmail.com>
+ <20260617093557.63880-2-sun.jian.kdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: ada551ef-c13a-4ae8-8706-08decd15ecc7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2026 08:45:18.3079
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NvgNJcYiLN8NPqy8bC4IYk9dD+XSIDp2WhmBhcdFenBvp9he6NwLpR4QeKFR/df/8xuP7YYLfVyPL93rtlwIOES0wjMcuCIsFymfDnaEJ58=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PPFBA933CD6B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260617093557.63880-2-sun.jian.kdev@gmail.com>
 X-Rspamd-Action: no action
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-300361-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS(0.00)[m:bestswngs@gmail.com,m:horms@kernel.org,m:netdev@vger.kernel.org,m:tipc-discussion@lists.sourceforge.net,m:linux-kernel@vger.kernel.org,m:xmei5@asu.edu,m:jmaloy@redhat.com,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,s:lists@lfdr.de];
-	DMARC_NA(0.00)[est.tech];
+	FORGED_RECIPIENTS(0.00)[m:sun.jian.kdev@gmail.com,m:bpf@vger.kernel.org,m:netdev@vger.kernel.org,m:linux-kselftest@vger.kernel.org,m:linux-kernel@vger.kernel.org,m:ast@kernel.org,m:daniel@iogearbox.net,m:andrii@kernel.org,m:martin.lau@linux.dev,m:eddyz87@gmail.com,m:memxor@gmail.com,m:song@kernel.org,m:yonghong.song@linux.dev,m:jolsa@kernel.org,m:davem@davemloft.net,m:edumazet@google.com,m:kuba@kernel.org,m:pabeni@redhat.com,m:horms@kernel.org,m:shuah@kernel.org,m:hawk@kernel.org,m:john.fastabend@gmail.com,m:sdf@fomichev.me,m:toke@redhat.com,m:lorenzo@kernel.org,m:sunjiankdev@gmail.com,m:johnfastabend@gmail.com,s:lists@lfdr.de];
+	FORGED_SENDER(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,linux.dev,gmail.com,davemloft.net,google.com,redhat.com,fomichev.me];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORWARDED(0.00)[lists@lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-300360-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_SENDER_FORWARDING(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[est.tech:+];
 	ALIAS_RESOLVED(0.00)[];
+	FORGED_SENDER_FORWARDING(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[paulchaignon@gmail.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FORGED_RECIPIENTS_FORWARDING(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,vger.kernel.org:from_smtp,asu.edu:email,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid,est.tech:dkim,est.tech:email,est.tech:from_mime]
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[vger.kernel.org:from_smtp,mail.gmail.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Server: lfdr
-X-Rspamd-Queue-Id: 6DEBB69E9DB
+X-Rspamd-Queue-Id: 4E2EA69E9F9
 
->Subject: [PATCH net v3] tipc: fix use-after-free of the discoverer in
->tipc_disc_rcv()
->
->bearer_disable() frees b->disc with tipc_disc_delete()'s plain kfree(), bu=
-t
->tipc_disc_rcv() still dereferences b->disc in RX softirq under
->rcu_read_lock() (tipc_udp_recv -> tipc_rcv -> tipc_disc_rcv).
->
->L2 bearers are safe thanks to the synchronize_net() in tipc_disable_l2_med=
-ia(),
->but the UDP bearer defers that call to the
->cleanup_bearer() workqueue, so the discoverer is freed with no grace
->period:
->
-> BUG: KASAN: slab-use-after-free in tipc_disc_rcv (net/tipc/discover.c:149=
-)
->Read of size 8 at addr ffff88802348b728 by task poc_tipc/184  <IRQ>
->  tipc_disc_rcv (net/tipc/discover.c:149)
->  tipc_rcv (net/tipc/node.c:2126)
->  tipc_udp_recv (net/tipc/udp_media.c:391)
->  udp_rcv (net/ipv4/udp.c:2643)
->  ip_local_deliver_finish (net/ipv4/ip_input.c:241)  </IRQ>  Freed by task=
- 181:
->  kfree (mm/slub.c:6565)
->  bearer_disable (net/tipc/bearer.c:418)
->  tipc_nl_bearer_disable (net/tipc/bearer.c:1001)
->
->The bearer is freed with kfree_rcu(); free the discoverer the same way.
->Add an rcu_head to struct tipc_discoverer and free it and its skb from an =
-RCU
->callback.
->
->Because the RCU callback (tipc_disc_free_rcu) lives in module text, a
->call_rcu() that is still pending when the tipc module is unloaded would in=
-voke a
->freed function. Add an rcu_barrier() to tipc_exit() after the bearer subsy=
-stem
->has been torn down, so all pending discoverer callbacks have run before th=
-e
->module text goes away.
->
->Reachable from an unprivileged user namespace: the TIPCv2 genl family is
->netnsok and its bearer commands have no GENL_ADMIN_PERM. Needs
->CONFIG_TIPC and CONFIG_TIPC_MEDIA_UDP.
->
->Fixes: 25b0b9c4e835 ("tipc: handle collisions of 32-bit node address hash
->values")
->Reported-by: Xiang Mei <xmei5@asu.edu>
->Assisted-by: Claude:claude-opus-4-8
->Signed-off-by: Weiming Shi <bestswngs@gmail.com>
->---
->v3:
-> - Reword the rcu_barrier() comment as a TODO (Tung Quang Nguyen).
->v2:
-> - split the over-80-column container_of() line (Tung Quang Nguyen)
-> - add rcu_barrier() to tipc_exit() so a pending call_rcu() cannot fire
->   into freed module text after rmmod (Eric Dumazet)
->
-> net/tipc/core.c     |  5 +++++
-> net/tipc/discover.c | 14 ++++++++++++--
-> 2 files changed, 17 insertions(+), 2 deletions(-)
->
->diff --git a/net/tipc/core.c b/net/tipc/core.c index
->434e70eabe08..1ddecea1df6e 100644
->--- a/net/tipc/core.c
->+++ b/net/tipc/core.c
->@@ -218,6 +218,11 @@ static void __exit tipc_exit(void)
-> 	unregister_pernet_device(&tipc_net_ops);
-> 	tipc_unregister_sysctl();
->
->+	/* TODO: Wait for all timers that called call_rcu() to finish before
->+	 * calling rcu_barrier().
->+	 */
->+	rcu_barrier();
->+
-> 	pr_info("Deactivated\n");
-> }
->
->diff --git a/net/tipc/discover.c b/net/tipc/discover.c index
->3e54d2df5683..b9d06595b067 100644
->--- a/net/tipc/discover.c
->+++ b/net/tipc/discover.c
->@@ -58,6 +58,7 @@
->  * @skb: request message to be (repeatedly) sent
->  * @timer: timer governing period between requests
->  * @timer_intv: current interval between requests (in ms)
->+ * @rcu: RCU head for deferred freeing
->  */
-> struct tipc_discoverer {
-> 	u32 bearer_id;
->@@ -69,6 +70,7 @@ struct tipc_discoverer {
-> 	struct sk_buff *skb;
-> 	struct timer_list timer;
-> 	unsigned long timer_intv;
->+	struct rcu_head rcu;
-> };
->
-> /**
->@@ -382,6 +384,15 @@ int tipc_disc_create(struct net *net, struct tipc_bea=
-rer
->*b,
-> 	return 0;
-> }
->
->+static void tipc_disc_free_rcu(struct rcu_head *rp) {
->+	struct tipc_discoverer *d =3D container_of(rp, struct tipc_discoverer,
->+						 rcu);
->+
->+	kfree_skb(d->skb);
->+	kfree(d);
->+}
->+
-> /**
->  * tipc_disc_delete - destroy object sending periodic link setup requests
->  * @d: ptr to link dest structure
->@@ -389,8 +400,7 @@ int tipc_disc_create(struct net *net, struct tipc_bear=
-er
->*b,  void tipc_disc_delete(struct tipc_discoverer *d)  {
-> 	timer_shutdown_sync(&d->timer);
->-	kfree_skb(d->skb);
->-	kfree(d);
->+	call_rcu(&d->rcu, tipc_disc_free_rcu);
-> }
->
-> /**
->--
->2.43.0
->
+On Wed, Jun 17, 2026 at 05:35:56PM +0800, Sun Jian wrote:
+> For non-linear test_run output, bpf_test_finish() derives the linear
+> data copy length from copy_size - frag_size. This only matches the
+> linear data length when copy_size is the full packet size.
+> 
+> When userspace provides a short data_out buffer, copy_size is clamped to
+> that buffer size. If copy_size is smaller than frag_size, the computed
+> length becomes negative and bpf_test_finish() returns -ENOSPC before
+> copying the packet prefix or updating data_size_out.
+> 
+> Compute the linear data length from the packet layout instead, and clamp
+> the linear copy length to copy_size. This preserves the expected
+> partial-copy semantics: return -ENOSPC, copy the packet prefix that fits
+> in data_out, and report the full packet length through data_size_out.
+> 
+> Fixes: 7855e0db150ad ("bpf: test_run: add xdp_shared_info pointer in bpf_test_finish signature")
+> Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+> ---
+>  net/bpf/test_run.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> index 2bc04feadfab..f15c613aaa4e 100644
+> --- a/net/bpf/test_run.c
+> +++ b/net/bpf/test_run.c
+> @@ -453,12 +453,8 @@ static int bpf_test_finish(const union bpf_attr *kattr,
+>  	}
+>  
+>  	if (data_out) {
+> -		int len = sinfo ? copy_size - frag_size : copy_size;
+> -
+> -		if (len < 0) {
+> -			err = -ENOSPC;
+> -			goto out;
+> -		}
+> +		u32 head_len = size - frag_size;
+> +		u32 len = min(copy_size, head_len);
+>  
+>  		if (copy_to_user(data_out, data, len))
+>  			goto out;
 
-Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+Acked-by: Paul Chaignon <paul.chaignon@gmail.com>
+
 
